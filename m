@@ -1,100 +1,399 @@
-Return-Path: <netdev+bounces-31255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFA5E78C558
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 15:31:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EFC478C565
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 15:32:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5BFA1C20A22
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 13:31:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21B022811C4
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 13:32:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 328CB174EB;
-	Tue, 29 Aug 2023 13:30:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0716B174E7;
+	Tue, 29 Aug 2023 13:32:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 269D0174DD
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 13:30:56 +0000 (UTC)
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD42AF7;
-	Tue, 29 Aug 2023 06:30:55 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1qayo1-0005K6-EA; Tue, 29 Aug 2023 15:30:53 +0200
-Message-ID: <6fc058ba-985e-ae31-75f1-d3b1b82aade0@leemhuis.info>
-Date: Tue, 29 Aug 2023 15:30:52 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 713FF14F70
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 13:32:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6108C433CB;
+	Tue, 29 Aug 2023 13:32:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1693315940;
+	bh=0Az+LHCJPGUEfjJPi+qmEsRi96zOqUkJJKO1g8HYero=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=M7UG0EGiTeXArXsarW+8BQr/q4Sy/T6QaqLS2lYWZbXq9S5QLSAp2TTMQTG60MK57
+	 Y5fAimY5EZhSavAK2700Urcw2yQ09b9zEvp+RKiJ6/ep5dKC3GQWUHVgZMP+Pr2R3D
+	 /ERCrvGqypKn0YhryIHd8/cTloLd/srs7R5vhyCUHPD0Vbiw1gc8BrwVigzIXD0tzS
+	 Yke03suLtYQ9rWA4WKldJoVi6YxkaEU5J1sw2r9RiAkSiuTTBcqZCav6o3pkynGx/B
+	 8VTieQGMBuV7OeYZrjjNOu/ryS0wtnJuQz3tc2zTWPUrP77G9LjIKQZynC/wJXQekK
+	 5hFwbEWb1ctSw==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Mike Christie <michael.christie@oracle.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Sasha Levin <sashal@kernel.org>,
+	jasowang@redhat.com,
+	virtualization@lists.linux-foundation.org,
+	kvm@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.4 04/17] vhost-scsi: Fix alignment handling with windows
+Date: Tue, 29 Aug 2023 09:31:51 -0400
+Message-Id: <20230829133211.519957-4-sashal@kernel.org>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20230829133211.519957-1-sashal@kernel.org>
+References: <20230829133211.519957-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: PROBLEM: Broken or delayed ethernet on Xilinx ZCU104 since 5.18
- (regression)
-Content-Language: en-US, de-DE
-To: regressions@lists.linux.dev
-Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- netdev@vger.kernel.org
-References: <CADyTPEzqf8oQAPSFRWJLxAhd-WE4fX2zdoe9Vu6V9hZMn1Yc8g@mail.gmail.com>
- <CAL_JsqLrErF__GGHfanRFCpfbOh6fvz4-aJv32h8OfDjUeZPSg@mail.gmail.com>
- <CADyTPEwgG0=R_b5DNBP0J0auDXu2BNTOwkSUFg-s7pLJUPC+Tg@mail.gmail.com>
- <CADyTPExgjcaUeKiR108geQhr0KwFC0A8qa_n_ST2RxhbSczomQ@mail.gmail.com>
- <CAL_Jsq+N2W0hVN7fUC1rxGL-Hw9B8eQvLgSwyQ3n41kqwDbxyg@mail.gmail.com>
- <CADyTPEyT4NJPrChtvtY=_GePZNeSDRAr9j3KRAk1hkjD=5+i8A@mail.gmail.com>
- <CAL_JsqKGAFtwB+TWc1yKAe_0M4BziEpFnApuWuR3h+Go_=djFg@mail.gmail.com>
- <CADyTPEwY4ydUKGtGNayf+iQSqRVBQncLiv0TpO9QivBVrmOc4g@mail.gmail.com>
- <173b1b67-7f5a-4e74-a2e7-5c70e57ecae5@lunn.ch>
- <CADyTPExypWjMW2PF0EfSFc+vvdzRtNEi_H0p3S-mw1BNWyq6VQ@mail.gmail.com>
- <c38e208b-4ffa-4310-ae00-412447fc4269@lunn.ch>
- <CADyTPEyQcHd5-A2TLf_-U5KdtA5WKZ_mNYKvx3DSMjkNi99E0g@mail.gmail.com>
-From: "Linux regression tracking #update (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <CADyTPEyQcHd5-A2TLf_-U5KdtA5WKZ_mNYKvx3DSMjkNi99E0g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1693315855;f13fe071;
-X-HE-SMSGID: 1qayo1-0005K6-EA
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.4.12
+Content-Transfer-Encoding: 8bit
 
-[TLDR: This mail in primarily relevant for Linux kernel regression
-tracking. See link in footer if these mails annoy you.]
+From: Mike Christie <michael.christie@oracle.com>
 
-On 05.08.23 09:34, Nick Bowler wrote:
-> On 2023-08-05, Andrew Lunn <andrew@lunn.ch> wrote:
->>>> It was also commented out before that change. It could be that gpio
->>>> controller is missing. Do you have the driver for the tca6416 in
->>>> your kernel configuration?
->>>
->>> I have CONFIG_GPIO_PCA953X=y which I think is the correct driver?
->>
->> It does appear to be the correct driver. But check if it has
->> loaded. It is an i2c device, so maybe you are missing the I2C bus
->> master device?
-> 
-> That's it!  I needed to set
-> 
->   CONFIG_I2C_CADENCE=y
-> 
-> and now things are working again!
+[ Upstream commit 5ced58bfa132c8ba0f9c893eb621595a84cfee12 ]
 
-#regzbot resolve: a config change did the trick
-#regzbot ignore-activity
+The linux block layer requires bios/requests to have lengths with a 512
+byte alignment. Some drivers/layers like dm-crypt and the directi IO code
+will test for it and just fail. Other drivers like SCSI just assume the
+requirement is met and will end up in infinte retry loops. The problem
+for drivers like SCSI is that it uses functions like blk_rq_cur_sectors
+and blk_rq_sectors which divide the request's length by 512. If there's
+lefovers then it just gets dropped. But other code in the block/scsi
+layer may use blk_rq_bytes/blk_rq_cur_bytes and end up thinking there is
+still data left and try to retry the cmd. We can then end up getting
+stuck in retry loops where part of the block/scsi thinks there is data
+left, but other parts think we want to do IOs of zero length.
 
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-That page also explains what to do if mails like this annoy you.
+Linux will always check for alignment, but windows will not. When
+vhost-scsi then translates the iovec it gets from a windows guest to a
+scatterlist, we can end up with sg items where the sg->length is not
+divisible by 512 due to the misaligned offset:
 
+sg[0].offset = 255;
+sg[0].length = 3841;
+sg...
+sg[N].offset = 0;
+sg[N].length = 255;
 
+When the lio backends then convert the SG to bios or other iovecs, we
+end up sending them with the same misaligned values and can hit the
+issues above.
+
+This just has us drop down to allocating a temp page and copying the data
+when we detect a misaligned buffer and the IO is large enough that it
+will get split into multiple bad IOs.
+
+Signed-off-by: Mike Christie <michael.christie@oracle.com>
+Message-Id: <20230709202859.138387-2-michael.christie@oracle.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/vhost/scsi.c | 186 +++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 161 insertions(+), 25 deletions(-)
+
+diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
+index bb10fa4bb4f6e..fa19c3f043b12 100644
+--- a/drivers/vhost/scsi.c
++++ b/drivers/vhost/scsi.c
+@@ -25,6 +25,8 @@
+ #include <linux/fs.h>
+ #include <linux/vmalloc.h>
+ #include <linux/miscdevice.h>
++#include <linux/blk_types.h>
++#include <linux/bio.h>
+ #include <asm/unaligned.h>
+ #include <scsi/scsi_common.h>
+ #include <scsi/scsi_proto.h>
+@@ -75,6 +77,9 @@ struct vhost_scsi_cmd {
+ 	u32 tvc_prot_sgl_count;
+ 	/* Saved unpacked SCSI LUN for vhost_scsi_target_queue_cmd() */
+ 	u32 tvc_lun;
++	u32 copied_iov:1;
++	const void *saved_iter_addr;
++	struct iov_iter saved_iter;
+ 	/* Pointer to the SGL formatted memory from virtio-scsi */
+ 	struct scatterlist *tvc_sgl;
+ 	struct scatterlist *tvc_prot_sgl;
+@@ -328,8 +333,13 @@ static void vhost_scsi_release_cmd_res(struct se_cmd *se_cmd)
+ 	int i;
+ 
+ 	if (tv_cmd->tvc_sgl_count) {
+-		for (i = 0; i < tv_cmd->tvc_sgl_count; i++)
+-			put_page(sg_page(&tv_cmd->tvc_sgl[i]));
++		for (i = 0; i < tv_cmd->tvc_sgl_count; i++) {
++			if (tv_cmd->copied_iov)
++				__free_page(sg_page(&tv_cmd->tvc_sgl[i]));
++			else
++				put_page(sg_page(&tv_cmd->tvc_sgl[i]));
++		}
++		kfree(tv_cmd->saved_iter_addr);
+ 	}
+ 	if (tv_cmd->tvc_prot_sgl_count) {
+ 		for (i = 0; i < tv_cmd->tvc_prot_sgl_count; i++)
+@@ -502,6 +512,28 @@ static void vhost_scsi_evt_work(struct vhost_work *work)
+ 	mutex_unlock(&vq->mutex);
+ }
+ 
++static int vhost_scsi_copy_sgl_to_iov(struct vhost_scsi_cmd *cmd)
++{
++	struct iov_iter *iter = &cmd->saved_iter;
++	struct scatterlist *sg = cmd->tvc_sgl;
++	struct page *page;
++	size_t len;
++	int i;
++
++	for (i = 0; i < cmd->tvc_sgl_count; i++) {
++		page = sg_page(&sg[i]);
++		len = sg[i].length;
++
++		if (copy_page_to_iter(page, 0, len, iter) != len) {
++			pr_err("Could not copy data while handling misaligned cmd. Error %zu\n",
++			       len);
++			return -1;
++		}
++	}
++
++	return 0;
++}
++
+ /* Fill in status and signal that we are done processing this command
+  *
+  * This is scheduled in the vhost work queue so we are called with the owner
+@@ -525,15 +557,20 @@ static void vhost_scsi_complete_cmd_work(struct vhost_work *work)
+ 
+ 		pr_debug("%s tv_cmd %p resid %u status %#02x\n", __func__,
+ 			cmd, se_cmd->residual_count, se_cmd->scsi_status);
+-
+ 		memset(&v_rsp, 0, sizeof(v_rsp));
+-		v_rsp.resid = cpu_to_vhost32(cmd->tvc_vq, se_cmd->residual_count);
+-		/* TODO is status_qualifier field needed? */
+-		v_rsp.status = se_cmd->scsi_status;
+-		v_rsp.sense_len = cpu_to_vhost32(cmd->tvc_vq,
+-						 se_cmd->scsi_sense_length);
+-		memcpy(v_rsp.sense, cmd->tvc_sense_buf,
+-		       se_cmd->scsi_sense_length);
++
++		if (cmd->saved_iter_addr && vhost_scsi_copy_sgl_to_iov(cmd)) {
++			v_rsp.response = VIRTIO_SCSI_S_BAD_TARGET;
++		} else {
++			v_rsp.resid = cpu_to_vhost32(cmd->tvc_vq,
++						     se_cmd->residual_count);
++			/* TODO is status_qualifier field needed? */
++			v_rsp.status = se_cmd->scsi_status;
++			v_rsp.sense_len = cpu_to_vhost32(cmd->tvc_vq,
++							 se_cmd->scsi_sense_length);
++			memcpy(v_rsp.sense, cmd->tvc_sense_buf,
++			       se_cmd->scsi_sense_length);
++		}
+ 
+ 		iov_iter_init(&iov_iter, ITER_DEST, cmd->tvc_resp_iov,
+ 			      cmd->tvc_in_iovs, sizeof(v_rsp));
+@@ -615,12 +652,12 @@ static int
+ vhost_scsi_map_to_sgl(struct vhost_scsi_cmd *cmd,
+ 		      struct iov_iter *iter,
+ 		      struct scatterlist *sgl,
+-		      bool write)
++		      bool is_prot)
+ {
+ 	struct page **pages = cmd->tvc_upages;
+ 	struct scatterlist *sg = sgl;
+-	ssize_t bytes;
+-	size_t offset;
++	ssize_t bytes, mapped_bytes;
++	size_t offset, mapped_offset;
+ 	unsigned int npages = 0;
+ 
+ 	bytes = iov_iter_get_pages2(iter, pages, LONG_MAX,
+@@ -629,13 +666,53 @@ vhost_scsi_map_to_sgl(struct vhost_scsi_cmd *cmd,
+ 	if (bytes <= 0)
+ 		return bytes < 0 ? bytes : -EFAULT;
+ 
++	mapped_bytes = bytes;
++	mapped_offset = offset;
++
+ 	while (bytes) {
+ 		unsigned n = min_t(unsigned, PAGE_SIZE - offset, bytes);
++		/*
++		 * The block layer requires bios/requests to be a multiple of
++		 * 512 bytes, but Windows can send us vecs that are misaligned.
++		 * This can result in bios and later requests with misaligned
++		 * sizes if we have to break up a cmd/scatterlist into multiple
++		 * bios.
++		 *
++		 * We currently only break up a command into multiple bios if
++		 * we hit the vec/seg limit, so check if our sgl_count is
++		 * greater than the max and if a vec in the cmd has a
++		 * misaligned offset/size.
++		 */
++		if (!is_prot &&
++		    (offset & (SECTOR_SIZE - 1) || n & (SECTOR_SIZE - 1)) &&
++		    cmd->tvc_sgl_count > BIO_MAX_VECS) {
++			WARN_ONCE(true,
++				  "vhost-scsi detected misaligned IO. Performance may be degraded.");
++			goto revert_iter_get_pages;
++		}
++
+ 		sg_set_page(sg++, pages[npages++], n, offset);
+ 		bytes -= n;
+ 		offset = 0;
+ 	}
++
+ 	return npages;
++
++revert_iter_get_pages:
++	iov_iter_revert(iter, mapped_bytes);
++
++	npages = 0;
++	while (mapped_bytes) {
++		unsigned int n = min_t(unsigned int, PAGE_SIZE - mapped_offset,
++				       mapped_bytes);
++
++		put_page(pages[npages++]);
++
++		mapped_bytes -= n;
++		mapped_offset = 0;
++	}
++
++	return -EINVAL;
+ }
+ 
+ static int
+@@ -659,25 +736,80 @@ vhost_scsi_calc_sgls(struct iov_iter *iter, size_t bytes, int max_sgls)
+ }
+ 
+ static int
+-vhost_scsi_iov_to_sgl(struct vhost_scsi_cmd *cmd, bool write,
+-		      struct iov_iter *iter,
+-		      struct scatterlist *sg, int sg_count)
++vhost_scsi_copy_iov_to_sgl(struct vhost_scsi_cmd *cmd, struct iov_iter *iter,
++			   struct scatterlist *sg, int sg_count)
++{
++	size_t len = iov_iter_count(iter);
++	unsigned int nbytes = 0;
++	struct page *page;
++	int i;
++
++	if (cmd->tvc_data_direction == DMA_FROM_DEVICE) {
++		cmd->saved_iter_addr = dup_iter(&cmd->saved_iter, iter,
++						GFP_KERNEL);
++		if (!cmd->saved_iter_addr)
++			return -ENOMEM;
++	}
++
++	for (i = 0; i < sg_count; i++) {
++		page = alloc_page(GFP_KERNEL);
++		if (!page) {
++			i--;
++			goto err;
++		}
++
++		nbytes = min_t(unsigned int, PAGE_SIZE, len);
++		sg_set_page(&sg[i], page, nbytes, 0);
++
++		if (cmd->tvc_data_direction == DMA_TO_DEVICE &&
++		    copy_page_from_iter(page, 0, nbytes, iter) != nbytes)
++			goto err;
++
++		len -= nbytes;
++	}
++
++	cmd->copied_iov = 1;
++	return 0;
++
++err:
++	pr_err("Could not read %u bytes while handling misaligned cmd\n",
++	       nbytes);
++
++	for (; i >= 0; i--)
++		__free_page(sg_page(&sg[i]));
++	kfree(cmd->saved_iter_addr);
++	return -ENOMEM;
++}
++
++static int
++vhost_scsi_iov_to_sgl(struct vhost_scsi_cmd *cmd, struct iov_iter *iter,
++		      struct scatterlist *sg, int sg_count, bool is_prot)
+ {
+ 	struct scatterlist *p = sg;
++	size_t revert_bytes;
+ 	int ret;
+ 
+ 	while (iov_iter_count(iter)) {
+-		ret = vhost_scsi_map_to_sgl(cmd, iter, sg, write);
++		ret = vhost_scsi_map_to_sgl(cmd, iter, sg, is_prot);
+ 		if (ret < 0) {
++			revert_bytes = 0;
++
+ 			while (p < sg) {
+-				struct page *page = sg_page(p++);
+-				if (page)
++				struct page *page = sg_page(p);
++
++				if (page) {
+ 					put_page(page);
++					revert_bytes += p->length;
++				}
++				p++;
+ 			}
++
++			iov_iter_revert(iter, revert_bytes);
+ 			return ret;
+ 		}
+ 		sg += ret;
+ 	}
++
+ 	return 0;
+ }
+ 
+@@ -687,7 +819,6 @@ vhost_scsi_mapal(struct vhost_scsi_cmd *cmd,
+ 		 size_t data_bytes, struct iov_iter *data_iter)
+ {
+ 	int sgl_count, ret;
+-	bool write = (cmd->tvc_data_direction == DMA_FROM_DEVICE);
+ 
+ 	if (prot_bytes) {
+ 		sgl_count = vhost_scsi_calc_sgls(prot_iter, prot_bytes,
+@@ -700,9 +831,8 @@ vhost_scsi_mapal(struct vhost_scsi_cmd *cmd,
+ 		pr_debug("%s prot_sg %p prot_sgl_count %u\n", __func__,
+ 			 cmd->tvc_prot_sgl, cmd->tvc_prot_sgl_count);
+ 
+-		ret = vhost_scsi_iov_to_sgl(cmd, write, prot_iter,
+-					    cmd->tvc_prot_sgl,
+-					    cmd->tvc_prot_sgl_count);
++		ret = vhost_scsi_iov_to_sgl(cmd, prot_iter, cmd->tvc_prot_sgl,
++					    cmd->tvc_prot_sgl_count, true);
+ 		if (ret < 0) {
+ 			cmd->tvc_prot_sgl_count = 0;
+ 			return ret;
+@@ -718,8 +848,14 @@ vhost_scsi_mapal(struct vhost_scsi_cmd *cmd,
+ 	pr_debug("%s data_sg %p data_sgl_count %u\n", __func__,
+ 		  cmd->tvc_sgl, cmd->tvc_sgl_count);
+ 
+-	ret = vhost_scsi_iov_to_sgl(cmd, write, data_iter,
+-				    cmd->tvc_sgl, cmd->tvc_sgl_count);
++	ret = vhost_scsi_iov_to_sgl(cmd, data_iter, cmd->tvc_sgl,
++				    cmd->tvc_sgl_count, false);
++	if (ret == -EINVAL) {
++		sg_init_table(cmd->tvc_sgl, cmd->tvc_sgl_count);
++		ret = vhost_scsi_copy_iov_to_sgl(cmd, data_iter, cmd->tvc_sgl,
++						 cmd->tvc_sgl_count);
++	}
++
+ 	if (ret < 0) {
+ 		cmd->tvc_sgl_count = 0;
+ 		return ret;
+-- 
+2.40.1
 
 
