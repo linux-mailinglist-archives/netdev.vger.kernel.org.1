@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-31203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2B5378C2C1
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 12:56:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEF9878C2C3
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 12:56:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BA16281056
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 10:56:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5544280DF5
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 10:56:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A03E1548A;
-	Tue, 29 Aug 2023 10:53:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24546154AA;
+	Tue, 29 Aug 2023 10:53:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CFB6156EE
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 10:53:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4E34C433D9;
-	Tue, 29 Aug 2023 10:53:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF36B156EE
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 10:53:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 732C2C433CA;
+	Tue, 29 Aug 2023 10:53:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693306423;
-	bh=9zmrYjn6LWQoCN8M+Pfq1cMEVS3X4afFI5xUTUylk9U=;
+	s=k20201202; t=1693306429;
+	bh=isFMv5J3rpOHLVDhhNbIoTnhkQjoG9ObXVsYmwnSTWs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WVVrPESKLYcAUxzJmt5RAO+ycX88zWTndFYyE+Q94iGeJUeSk2tj1ca82lhJ9phtN
-	 QFcks0qmANxaz0vEwhUBNZxkftuZY3DxiIDwm1h3BoZMXDayn/yHibKkvugLcqtlzs
-	 sB2DjgbPLJ3T5omR1SXoE4SU3JmIlFlqcykhhAAqCvlYvpSSVEwZyYgNZyiLFAH1ef
-	 ur4OcijEYZmyQ72JJAhc3GclZs0qglAKH5YxLnPAUkWRrxt6Hrqss7lvYLABhPEglT
-	 qP2aXjnfg7YuvuvhrldQRMA+kGhpwWTRfBZEYa7qDhNFfA1l5WgS/j0gARvKCIvP56
-	 iZZHa9GuWCBGg==
+	b=uhoBUQV2UlvEvXTJ6FesBJUWqQ8Fgm4vPFQR3HIO5bXsCvSSxhZFddMPEm0stx9ef
+	 lMRynaqBRCIVrvXglDzIgWvfuNXWJvNeMTNUO7MEx5bQMfUlG7YWN9DC40vnXhy2KA
+	 V5X06L2jau4ArXqR+Gt+rvakJx4Bmdoj7hYswq7SUCBC/nBTtRHqd1xNsgwOq6nMLb
+	 gDz7uN2o7DVL0uUpAuDv9Z0ZN1Ud+XK3jAiOUvfy5IjbvkK9P2RkafPzmqFpWUFHdD
+	 kiH9G4Cw9hG/3cIw2SuRlgzlWaS+bQb+NBToTsk7Nx/rNTImuQsh9u/B3Pz95GYWzC
+	 H19/PmdaPlrZg==
 From: Jisheng Zhang <jszhang@kernel.org>
 To: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
 	Alexandre Torgue <alexandre.torgue@foss.st.com>,
@@ -64,9 +64,9 @@ To: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
 Cc: netdev@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 11/22] net: stmmac: dwmac-meson: use devm_stmmac_probe_config_dt()
-Date: Tue, 29 Aug 2023 18:40:22 +0800
-Message-Id: <20230829104033.955-12-jszhang@kernel.org>
+Subject: [PATCH net-next 12/22] net: stmmac: dwmac-meson8b: use devm_stmmac_probe_config_dt()
+Date: Tue, 29 Aug 2023 18:40:23 +0800
+Message-Id: <20230829104033.955-13-jszhang@kernel.org>
 X-Mailer: git-send-email 2.40.0
 In-Reply-To: <20230829104033.955-1-jszhang@kernel.org>
 References: <20230829104033.955-1-jszhang@kernel.org>
@@ -86,14 +86,14 @@ stmmac_pltfr_remove_no_dt().
 
 Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
 ---
- .../net/ethernet/stmicro/stmmac/dwmac-meson.c | 27 +++++--------------
- 1 file changed, 7 insertions(+), 20 deletions(-)
+ .../ethernet/stmicro/stmmac/dwmac-meson8b.c   | 55 ++++++-------------
+ 1 file changed, 18 insertions(+), 37 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c
-index 959f88c6da16..3373d3ec2368 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c
-@@ -52,35 +52,22 @@ static int meson6_dwmac_probe(struct platform_device *pdev)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-meson8b.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-meson8b.c
+index 0b159dc0d5f6..37f249980929 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-meson8b.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-meson8b.c
+@@ -400,33 +400,27 @@ static int meson8b_dwmac_probe(struct platform_device *pdev)
  	if (ret)
  		return ret;
  
@@ -110,16 +110,79 @@ index 959f88c6da16..3373d3ec2368 100644
 +	if (!dwmac)
 +		return -ENOMEM;
  
- 	dwmac->reg = devm_platform_ioremap_resource(pdev, 1);
--	if (IS_ERR(dwmac->reg)) {
--		ret = PTR_ERR(dwmac->reg);
+ 	dwmac->data = (const struct meson8b_dwmac_data *)
+ 		of_device_get_match_data(&pdev->dev);
+-	if (!dwmac->data) {
+-		ret = -EINVAL;
 -		goto err_remove_config_dt;
 -	}
-+	if (IS_ERR(dwmac->reg))
-+		return PTR_ERR(dwmac->reg);
++	if (!dwmac->data)
++		return -EINVAL;
+ 	dwmac->regs = devm_platform_ioremap_resource(pdev, 1);
+-	if (IS_ERR(dwmac->regs)) {
+-		ret = PTR_ERR(dwmac->regs);
+-		goto err_remove_config_dt;
+-	}
++	if (IS_ERR(dwmac->regs))
++		return PTR_ERR(dwmac->regs);
+ 
+ 	dwmac->dev = &pdev->dev;
+ 	ret = of_get_phy_mode(pdev->dev.of_node, &dwmac->phy_mode);
+ 	if (ret) {
+ 		dev_err(&pdev->dev, "missing phy-mode property\n");
+-		goto err_remove_config_dt;
++		return ret;
+ 	}
+ 
+ 	/* use 2ns as fallback since this value was previously hardcoded */
+@@ -448,53 +442,40 @@ static int meson8b_dwmac_probe(struct platform_device *pdev)
+ 		if (dwmac->rx_delay_ps > 3000 || dwmac->rx_delay_ps % 200) {
+ 			dev_err(dwmac->dev,
+ 				"The RGMII RX delay range is 0..3000ps in 200ps steps");
+-			ret = -EINVAL;
+-			goto err_remove_config_dt;
++			return -EINVAL;
+ 		}
+ 	} else {
+ 		if (dwmac->rx_delay_ps != 0 && dwmac->rx_delay_ps != 2000) {
+ 			dev_err(dwmac->dev,
+ 				"The only allowed RGMII RX delays values are: 0ps, 2000ps");
+-			ret = -EINVAL;
+-			goto err_remove_config_dt;
++			return -EINVAL;
+ 		}
+ 	}
+ 
+ 	dwmac->timing_adj_clk = devm_clk_get_optional(dwmac->dev,
+ 						      "timing-adjustment");
+-	if (IS_ERR(dwmac->timing_adj_clk)) {
+-		ret = PTR_ERR(dwmac->timing_adj_clk);
+-		goto err_remove_config_dt;
+-	}
++	if (IS_ERR(dwmac->timing_adj_clk))
++		return PTR_ERR(dwmac->timing_adj_clk);
+ 
+ 	ret = meson8b_init_rgmii_delays(dwmac);
+ 	if (ret)
+-		goto err_remove_config_dt;
++		return ret;
+ 
+ 	ret = meson8b_init_rgmii_tx_clk(dwmac);
+ 	if (ret)
+-		goto err_remove_config_dt;
++		return ret;
+ 
+ 	ret = dwmac->data->set_phy_mode(dwmac);
+ 	if (ret)
+-		goto err_remove_config_dt;
++		return ret;
+ 
+ 	ret = meson8b_init_prg_eth(dwmac);
+ 	if (ret)
+-		goto err_remove_config_dt;
++		return ret;
  
  	plat_dat->bsp_priv = dwmac;
- 	plat_dat->fix_mac_speed = meson6_dwmac_fix_mac_speed;
  
 -	ret = stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
 -	if (ret)
@@ -134,15 +197,15 @@ index 959f88c6da16..3373d3ec2368 100644
 +	return stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
  }
  
- static const struct of_device_id meson6_dwmac_match[] = {
-@@ -91,7 +78,7 @@ MODULE_DEVICE_TABLE(of, meson6_dwmac_match);
+ static const struct meson8b_dwmac_data meson8b_dwmac_data = {
+@@ -539,7 +520,7 @@ MODULE_DEVICE_TABLE(of, meson8b_dwmac_match);
  
- static struct platform_driver meson6_dwmac_driver = {
- 	.probe  = meson6_dwmac_probe,
+ static struct platform_driver meson8b_dwmac_driver = {
+ 	.probe  = meson8b_dwmac_probe,
 -	.remove_new = stmmac_pltfr_remove,
 +	.remove_new = stmmac_pltfr_remove_no_dt,
  	.driver = {
- 		.name           = "meson6-dwmac",
+ 		.name           = "meson8b-dwmac",
  		.pm		= &stmmac_pltfr_pm_ops,
 -- 
 2.40.1
