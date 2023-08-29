@@ -1,181 +1,280 @@
-Return-Path: <netdev+bounces-31232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31234-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E59B078C44E
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 14:35:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F9E278C45B
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 14:39:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B782281148
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 12:35:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D108D1C20A2D
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 12:39:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8B3914F95;
-	Tue, 29 Aug 2023 12:35:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88752156DB;
+	Tue, 29 Aug 2023 12:38:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA5A714AB3
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 12:35:45 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB905A3
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 05:35:43 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d7454a43541so5201397276.1
-        for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 05:35:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1693312543; x=1693917343;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=upywnKQrXIg4Bu64T3NzqGiYeE8oJnfengtXAcANbMo=;
-        b=bCJ+fvmXBx+lHitrzuuIDJymNwznnSRyqHD+wfk7a7TuJfmqjfeFHjip8HMO/3UMml
-         yb+/cY6jjODVlSJyQQ831YoCzyfa/dz0Id9O9+ugWzDukHwxGKrZ6njpPQolgoLle9TH
-         cSOMcnMOB4BazWcil5jyQKoj4ATFwys1vUez/Eh06HtLh32BsTvfMJHpiTotMS+ziRjv
-         JoMdc+IxUmVEMnW3CxTXISYm/ue/rficKi6CqSOZse6Sh9ZlO1n4BDjQp/luF750rRkd
-         HY+CjWjQvIJ2ALsMo7QdCfmVxXZ0adEyc3f3oLOnS2rIyf4k77HYvbD/9Zf6GHpFXfJm
-         4S7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693312543; x=1693917343;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=upywnKQrXIg4Bu64T3NzqGiYeE8oJnfengtXAcANbMo=;
-        b=d6wXAzyq5YxgpSR1xx1sBg/Tt46bSjeaCfoOBAyT/4KeliN8zVQOh8vO+5xpMw7JUF
-         tREzlO549dsO7ssNGO+hQqEzuhmlNYP3f06aMd+3yDztXU3LAeIlA12hZ9dP/A7hRVoM
-         Ufyy2JPcRYgjmCxEaG1oxmGmRme2JjIzm8J0yOz3Ws/VBBNB0YBbDTAl55Rh2d5ApY+G
-         9obrPv524w+gFt0iUgisc0gAdutWbQgJTd2GPkrxlSUxpjMmM7uqQuiD4TpOu6k3sLEr
-         fAxTUErnB+LjRlPdnuyGWbPHOh3qROgKCmKxVq5/kV4SDQMRX9ZDMqaNbd5oQIQSyvzQ
-         bieA==
-X-Gm-Message-State: AOJu0YzU/GYCIxo80/TxHknp66sBVIoRWuhCQNk4+5oxhlNTpv5RpFv5
-	Du4idx63wWRY5r9poQ2qKD3KRo9mq/crsg==
-X-Google-Smtp-Source: AGHT+IG7QmnFfjGfZI7cELuGr9mEWnEW1XFyuAlZzX57hPVV4TCHxC7oVeebbF90sbx0Heba+oIm0Fj7hiwiFw==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:4057:0:b0:d71:9aa2:d953 with SMTP id
- n84-20020a254057000000b00d719aa2d953mr860778yba.5.1693312543035; Tue, 29 Aug
- 2023 05:35:43 -0700 (PDT)
-Date: Tue, 29 Aug 2023 12:35:41 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C65156DA
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 12:38:41 +0000 (UTC)
+Received: from phobos.denx.de (phobos.denx.de [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D4B9D7;
+	Tue, 29 Aug 2023 05:38:39 -0700 (PDT)
+Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id A6C37864E1;
+	Tue, 29 Aug 2023 14:38:36 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1693312717;
+	bh=4oQIhfEeW8PprqtRZ+HIY9RD/oqGi59F9dmuR6o4GqA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=RnOb+6riZJ4PKYVN4GyuViQvsGzteh/TcwmfVZ1XPPh0JQlnhmZK+2lwFI5DK01U6
+	 kCrCOS8AJ58qjLiZYQtaN1qsqGM0wvRmd7Koxk6fCkIa0nNEhV448163GurEme20aE
+	 9ybOEjJQyEhKd/FGihtDqJtQWvrjlvsGpiWYH68NhazrrfIv6lKBZp8XOkKb3YSjzY
+	 187Rkl/A3m5HHNXCzJP7zUEZzjt7NpxZd9psLdLcSs1elNcoKL6yIZvMTta1H6EoQy
+	 LDpKbozcK2Yx5S+gX9sa3yl0kjwcNkIpVx281xBD3Ggi6XoxjwmUvAcBw+MfOY3qQ7
+	 Tj3kke2CQwvUg==
+Date: Tue, 29 Aug 2023 14:38:29 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Vladimir Oltean <olteanv@gmail.com>, Tristram.Ha@microchip.com, Oleksij
+ Rempel <linux@rempel-privat.de>, Arun Ramadoss
+ <arun.ramadoss@microchip.com>, f.fainelli@gmail.com, andrew@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ Woojung.Huh@microchip.com, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH 2/2] net: dsa: microchip: Provide Module 4 KSZ9477
+ errata (DS80000754C)
+Message-ID: <20230829143829.68410966@wsk>
+In-Reply-To: <20230829114739.GC31399@pengutronix.de>
+References: <20230824154827.166274-1-lukma@denx.de>
+	<20230824154827.166274-2-lukma@denx.de>
+	<BYAPR11MB35583A648E4E44944A0172A0ECE3A@BYAPR11MB3558.namprd11.prod.outlook.com>
+	<20230825103911.682b3d70@wsk>
+	<862e5225-2d8e-8b8f-fc6d-c9b48ac74bfc@gmail.com>
+	<BYAPR11MB3558A24A05D30BA93408851EECE3A@BYAPR11MB3558.namprd11.prod.outlook.com>
+	<20230826104910.voaw3ndvs52yoy2v@skbuf>
+	<20230829103533.7966f332@wsk>
+	<20230829101851.435pxwwse2mo5fwi@skbuf>
+	<20230829132429.529283be@wsk>
+	<20230829114739.GC31399@pengutronix.de>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.42.0.rc2.253.gd59a3bf2b4-goog
-Message-ID: <20230829123541.3745013-1-edumazet@google.com>
-Subject: [PATCH net] net/sched: fq_pie: avoid stalls in fq_pie_timer()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot+e46fbd5289363464bc13@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/xQQWG5zK/dtc4Bo4dkMkTVH";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-When setting a high number of flows (limit being 65536),
-fq_pie_timer() is currently using too much time as syzbot reported.
+--Sig_/xQQWG5zK/dtc4Bo4dkMkTVH
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Add logic to yield the cpu every 2048 flows (less than 150 usec
-on debug kernels).
-It should also help by not blocking qdisc fast paths for too long.
-Worst case (65536 flows) would need 31 jiffies for a complete scan.
+Hi Oleksij,
 
-Relevant extract from syzbot report:
+> Hi Lukasz,
+>=20
+> On Tue, Aug 29, 2023 at 01:24:29PM +0200, Lukasz Majewski wrote:
+> > Hi Vladimir,
+> >  =20
+> > > Hi Lukasz,
+> > >=20
+> > > On Tue, Aug 29, 2023 at 10:35:33AM +0200, Lukasz Majewski wrote: =20
+> > > > Hi Vladimir,
+> > > >    =20
+> > > > > On Fri, Aug 25, 2023 at 06:48:41PM +0000,
+> > > > > Tristram.Ha@microchip.com wrote:   =20
+> > > > > > > > IMHO adding functions to MMD modification would
+> > > > > > > > facilitate further development (for example LED setup).
+> > > > > > > >     =20
+> > > > > > >=20
+> > > > > > > We already have some KSZ9477 specific initialization done
+> > > > > > > in the Micrel PHY driver under drivers/net/phy/micrel.c,
+> > > > > > > can we converge on the PHY driver which has a reasonable
+> > > > > > > amount of infrastructure for dealing with workarounds,
+> > > > > > > indirect or direct MMD accesses etc.?     =20
+> > > > > >=20
+> > > > > > Actually the internal PHY used in the
+> > > > > > KSZ9897/KSZ9477/KSZ9893 switches are special and only used
+> > > > > > inside those switches. Putting all the switch related code
+> > > > > > in Micrel PHY driver does not really help.  When the switch
+> > > > > > is reset all those PHY registers need to be set again, but
+> > > > > > the PHY driver only executes those code during PHY
+> > > > > > initialization.  I do not know if there is a good way to
+> > > > > > tell the PHY to re-initialize again.=20
+> > > > >=20
+> > > > > Suppose there was a method to tell the PHY driver to
+> > > > > re-initialize itself. What would be the key points in which
+> > > > > the DSA switch driver would need to trigger that method?
+> > > > > Where is the switch reset at runtime?   =20
+> > > >=20
+> > > > Tristam has explained why adding the internal switch PHY errata
+> > > > to generic PHY code is not optimal.   =20
+> > >=20
+> > > Yes, and I didn't understand that explanation, so I asked a
+> > > clarification question. =20
+> >=20
+> > Ok. Let's wait for Tristram's answer.
+> >  =20
+> > >  =20
+> > > > If adding MMD generic code is a problem - then I'm fine with
+> > > > just clearing proper bits with just two indirect writes in the
+> > > > drivers/net/dsa/microchip/ksz9477.c
+> > > >=20
+> > > > I would also prefer to keep the separate ksz9477_errata()
+> > > > function, so we could add other errata code there.
+> > > >=20
+> > > > Just informative - without this patch the KSZ9477-EVB board's
+> > > > network is useless when the other peer has EEE enabled by
+> > > > default (like almost all non managed ETH switches).   =20
+> > >=20
+> > > No, adding direct PHY MMD access code to the ksz9477 switch
+> > > driver is not even the biggest problem - even though, IIUC, the
+> > > "workaround" to disable EEE advertisement could be moved to
+> > > ksz9477_get_features() in drivers/net/phy/micrel.c, where
+> > > phydev->supported_eee could be cleared. =20
+> >=20
+> > To be even more interesting (after looking into the PHY micrel.c
+> > code):
+> > https://elixir.bootlin.com/linux/latest/source/drivers/net/phy/micrel.c=
+#L1804
+> >=20
+> > The errata from this patch is already present.
+> >=20
+> > The issue is that ksz9477_config_init() (drivers/net/phy/micrel.c)
+> > is executed AFTER generic phy_probe():
+> > https://elixir.bootlin.com/linux/latest/source/drivers/net/phy/phy_devi=
+ce.c#L3256
+> > in which the EEE advertisement registers are read.
+> >=20
+> > Hence, those registers needs to be cleared earlier - as I do in
+> > ksz9477_setup() in drivers/net/dsa/microchip/ksz9477.
+> >=20
+> > Here the precedence matters ... =20
+> > >=20
+> > > The biggest problem that I see is that Oleksij Rempel has "just"
+> > > added EEE support to the KSZ9477 earlier this year, with an ack
+> > > from Arun Ramadoss: 69d3b36ca045 ("net: dsa: microchip: enable
+> > > EEE support"). I'm not understanding why the erratum wasn't a
+> > > discussion topic then. =20
+> >=20
+> > +1 =20
+>=20
+> As this erratum states:  "this feature _can_ cause link drops".
+> For example I was indeed able to have EEE relates issue between this
+> switch and a link partner with AR8035 PHY. Following patch addressing
+> this issue:
+> https://lore.kernel.org/all/20230327142202.3754446-8-o.rempel@pengutronix=
+.de/
+> So, in this case KSZ9477 was not the bad side.
+>=20
 
-rcu: INFO: rcu_preempt detected expedited stalls on CPUs/tasks: { 0-.... } 2663 jiffies s: 873 root: 0x1/.
-rcu: blocking rcu_node structures (internal RCU debug):
-Sending NMI from CPU 1 to CPUs 0:
-NMI backtrace for cpu 0
-CPU: 0 PID: 5177 Comm: syz-executor273 Not tainted 6.5.0-syzkaller-00453-g727dbda16b83 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
-RIP: 0010:check_kcov_mode kernel/kcov.c:173 [inline]
-RIP: 0010:write_comp_data+0x21/0x90 kernel/kcov.c:236
-Code: 2e 0f 1f 84 00 00 00 00 00 65 8b 05 01 b2 7d 7e 49 89 f1 89 c6 49 89 d2 81 e6 00 01 00 00 49 89 f8 65 48 8b 14 25 80 b9 03 00 <a9> 00 01 ff 00 74 0e 85 f6 74 59 8b 82 04 16 00 00 85 c0 74 4f 8b
-RSP: 0018:ffffc90000007bb8 EFLAGS: 00000206
-RAX: 0000000000000101 RBX: ffffc9000dc0d140 RCX: ffffffff885893b0
-RDX: ffff88807c075940 RSI: 0000000000000100 RDI: 0000000000000001
-RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000000 R12: ffffc9000dc0d178
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
-FS:  0000555555d54380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f6b442f6130 CR3: 000000006fe1c000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <NMI>
- </NMI>
- <IRQ>
- pie_calculate_probability+0x480/0x850 net/sched/sch_pie.c:415
- fq_pie_timer+0x1da/0x4f0 net/sched/sch_fq_pie.c:387
- call_timer_fn+0x1a0/0x580 kernel/time/timer.c:1700
+The errata: http://ww1.microchip.com/downloads/jp/DeviceDoc/jp599888.pdf
 
-Fixes: ec97ecf1ebe4 ("net: sched: add Flow Queue PIE packet scheduler")
-Link: https://lore.kernel.org/lkml/00000000000017ad3f06040bf394@google.com/
-Reported-by: syzbot+e46fbd5289363464bc13@syzkaller.appspotmail.com
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/sched/sch_fq_pie.c | 27 +++++++++++++++++++--------
- 1 file changed, 19 insertions(+), 8 deletions(-)
+Module 4, "End user implications":
+--------8<----------
+If the link partner is not known, or if the link partner is EEE
+capable, then the EEE feature should be manually disabled to avoid link
+drop problems.
+-------->8----------
 
-diff --git a/net/sched/sch_fq_pie.c b/net/sched/sch_fq_pie.c
-index 591d87d5e5c0f10379645da9eb0f4e7309d74916..68e6acd0f130d93de42b75f8af40513899b5e2bd 100644
---- a/net/sched/sch_fq_pie.c
-+++ b/net/sched/sch_fq_pie.c
-@@ -61,6 +61,7 @@ struct fq_pie_sched_data {
- 	struct pie_params p_params;
- 	u32 ecn_prob;
- 	u32 flows_cnt;
-+	u32 flows_cursor;
- 	u32 quantum;
- 	u32 memory_limit;
- 	u32 new_flow_count;
-@@ -375,22 +376,32 @@ static int fq_pie_change(struct Qdisc *sch, struct nlattr *opt,
- static void fq_pie_timer(struct timer_list *t)
- {
- 	struct fq_pie_sched_data *q = from_timer(q, t, adapt_timer);
-+	unsigned long next, tupdate;
- 	struct Qdisc *sch = q->sch;
- 	spinlock_t *root_lock; /* to lock qdisc for probability calculations */
--	u32 idx;
-+	int max_cnt, i;
- 
- 	rcu_read_lock();
- 	root_lock = qdisc_lock(qdisc_root_sleeping(sch));
- 	spin_lock(root_lock);
- 
--	for (idx = 0; idx < q->flows_cnt; idx++)
--		pie_calculate_probability(&q->p_params, &q->flows[idx].vars,
--					  q->flows[idx].backlog);
--
--	/* reset the timer to fire after 'tupdate' jiffies. */
--	if (q->p_params.tupdate)
--		mod_timer(&q->adapt_timer, jiffies + q->p_params.tupdate);
-+	/* Limit this expensive loop to 2048 flows per round. */
-+	max_cnt = min_t(int, q->flows_cnt - q->flows_cursor, 2048);
-+	for (i = 0; i < max_cnt; i++) {
-+		pie_calculate_probability(&q->p_params,
-+					  &q->flows[q->flows_cursor].vars,
-+					  q->flows[q->flows_cursor].backlog);
-+		q->flows_cursor++;
-+	}
- 
-+	tupdate = q->p_params.tupdate;
-+	next = 0;
-+	if (q->flows_cursor >= q->flows_cnt) {
-+		q->flows_cursor = 0;
-+		next = tupdate;
-+	}
-+	if (tupdate)
-+		mod_timer(&q->adapt_timer, jiffies + next);
- 	spin_unlock(root_lock);
- 	rcu_read_unlock();
- }
--- 
-2.42.0.rc2.253.gd59a3bf2b4-goog
+> Since this erratum do not describe exact cause of this issue
 
+IMHO, it does - "The EEE feature is enabled by default, but it is not
+fully operational. "
+
+It looks like some silicon issue - which in details is probably only
+known to Micrel/Microchip.
+
+> or
+> specific link partners where this functionality is not working, I
+> would prefer to give the user the freedom of choice.
+
+The problem is that - the user - would encounter broken network when
+connected to per advertising EEE.=20
+
+Hence, I would prefer to apply the Errata and then somebody, who would
+like to enable EEE can try if it works for him.
+
+IMHO, code to fix erratas shall be added unconditionally, without any
+"freedom of choice".
+
+>=20
+> The same issue we have with Pause Frame support. It is not always a
+> good choice, but user has freedom to configure it.
+>=20
+> Today I wont to create a test setup with different EEE capable link
+> partners on one side and KSZ9477 on other side and let it run some
+> days. Just to make sure.
+>=20
+> Beside, are you able to reproduce this issue?
+>=20
+
+Yes, I can reproduce the issue. I do use two Microchip's development
+boards (KSZ9477-EVB [1]) connected together to test HSR as well as
+communication with HOST PC.
+
+The network on this board without this patch is not usable (continually
+I do encounter link up/downs).
+
+Another test scenario is to connect this board to non-managed ETH
+switch (which shall have the EEE advertised by default).
+
+
+Please be also aware, that this errata fix is (implicitly I think)
+already present in the kernel:
+https://elixir.bootlin.com/linux/latest/source/drivers/net/phy/micrel.c#L18=
+04
+
+However, the execution order of PHY/DSA functions with newest mainline
+makes it not working any more (I've described it in details in the
+earlier mail to Vladimir).
+
+> Regards,
+> Oleksij
+
+Links:
+[1] - https://www.microchip.com/en-us/development-tool/evb-ksz9477-1
+
+
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/xQQWG5zK/dtc4Bo4dkMkTVH
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmTt5sUACgkQAR8vZIA0
+zr0aAwgAgEZGUs4z/+fB52lCyHVIsdw+vpX5CfPMEgL7NyqeEkMZiklspkcCL6T6
+3SOS7wqlsjDPjKyh4BMoLtYkcqUEIbN+43aQ3JpQ8c9TV4h7rrQyZDAKJ0NS61mq
+zcIq6h1EyCDp0K4pCYElIgIZHRG4F/Pzj0HrZ2slYL1LSINr/JImjNoi0U8uaZBB
+yCbtZN+XcVXeHCLUfkZiwlkNqH4DzfDYvro2XGEVLuPLjqSeaeSW60CjLfaeCv7p
+IYI5nH8ehtAncndNbcaYS3+EFudV1rZIdCHgGPz8jteVj96kduEqqzgm/CxGsshi
+GcObn4b6aAT75olmhqyN5/RsNr211g==
+=sv4S
+-----END PGP SIGNATURE-----
+
+--Sig_/xQQWG5zK/dtc4Bo4dkMkTVH--
 
