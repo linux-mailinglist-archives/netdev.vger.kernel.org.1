@@ -1,93 +1,169 @@
-Return-Path: <netdev+bounces-31316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1687878CFB4
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 00:57:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 202BB78CFDB
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 01:06:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DC951C20A6A
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 22:57:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 500591C209E0
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 23:06:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B82DE6FBA;
-	Tue, 29 Aug 2023 22:57:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A1756FCD;
+	Tue, 29 Aug 2023 23:06:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC4976AAC
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 22:57:27 +0000 (UTC)
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com [209.85.216.71])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68BDF1BE
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 15:57:26 -0700 (PDT)
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2717f4ba116so4032402a91.0
-        for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 15:57:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693349846; x=1693954646;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cAx6PSOlRe1SoOmdVLTfSTqRq8XYYm/GJtA05ydLXZQ=;
-        b=F0p/cBFPoS8suy81xIc/A/C3BemzjfwUwB3TbrSo1jBGHQgFb8cBNVjliU2gyChd1g
-         EJr2O94GuuMDKn6EAoPRu5zSsp6U9oWYwvMGGBKX53DnhUAuZn5S0OWh8XPAVEXH3wM0
-         nt9M2Ll2KDGVEYIM/nPGu5gA0yPGyehetasSSQi0FJAjYjQuG55JTNVp+758iSotFi6A
-         63OAZ48geaEtci7YBXJxU0chUdyGMHRLYzM2JOsY5xbq1RqB7nzgvXcOdvuBrKnKjmv9
-         KTBxWpUU2AGuu9/2BF5wsqj7IpG0nPAhIY13df6VgM6PW/AZ+/iYX72VTFpF4/1jKi14
-         cMpg==
-X-Gm-Message-State: AOJu0YwM+ot6ClZ3b0FhLOywScjnWli6z8RpAhmKPQlaQ2WhMGaEJD71
-	Oy73eXAkaDpFAT9Yep9gqkyu/odn1+YQrUBuHEjcMiA/Nbe6
-X-Google-Smtp-Source: AGHT+IEzdCowiZmXUDDhkbYINfZE/r+09JEfRrBJG3TV1PZiXW7dTgVeIl0Jj6WsJu8Hs/EFNhtwmwBtC0shQ2WpNjmc8DS1vxGs
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB6E66FAB
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 23:06:07 +0000 (UTC)
+Received: from nautica.notk.org (ipv6.notk.org [IPv6:2001:41d0:1:7a93::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79CC41BF;
+	Tue, 29 Aug 2023 16:05:37 -0700 (PDT)
+Received: by nautica.notk.org (Postfix, from userid 108)
+	id EFDE8C023; Wed, 30 Aug 2023 01:05:35 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
+	t=1693350335; bh=dQHdkT5Gp4NzAC/U19NudWM0qbVpz/0YzX6DXUrgrU8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XS4D5XU0wXBqa5VoXoKJqu7ZT3qrIwS0cTp+M8Bstdu1h55bk9CxOITynDdloV3Dm
+	 UeVlL6si6gTbL//h1GUju0n9dZgGjCYtHunz+ZwhFhmzSi7nSnEm+/qJOIvTkJ1pxl
+	 wwu96KMlOjdg1Xuj1DU05QK8B4JIvitma8cQ6A2N0xjq/B5wtb94QxBDvg4Mg/HemL
+	 vLIkmL+aGpcFPnJ4QOp8GonouZ9SqcAbjmg+jXHiEJ/j5rP28+lLElfYSGo1RF4B/q
+	 fR2+drhPF5vk6ddhOHttRrdNFhNdN4jwAFRn7QmHHXvFOc579eHAidqgZd13OdlAiq
+	 Gq9qMztLDxY0Q==
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Received: from gaia (localhost [127.0.0.1])
+	by nautica.notk.org (Postfix) with ESMTPS id CB810C009;
+	Wed, 30 Aug 2023 01:05:26 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org; s=2;
+	t=1693350334; bh=dQHdkT5Gp4NzAC/U19NudWM0qbVpz/0YzX6DXUrgrU8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Z8K02d90bU3sYHjw49onFq3FMgLLGv0QmiMPW43N2x2S26ncmvtmX+HBX9c+0MaSl
+	 mtxekmDUFFLy26mN0DlHj1Urq0sKG7N93V2upft+EXuNvPHANDBu3DtLXQ+VB2ZRfC
+	 eK2uy7RW6btEIkbjz9BU11u+/SWghJTAfMzl07fqhR+AmeBLITI2iJIfvJG7UO0nsr
+	 +VTurKbqWkEvFLkDiuE7+oi1dDM0dMcJHAez3S6WBTvN61fNNd+IzNHtsAxDaMgP3n
+	 E1/xa7VpfJJ/GQcSMBW2nTXXyGHZEEDVd+SFJD4b784h9WMQOjHcWl8cMyAmoOMYbV
+	 mZnJ7AqkLmyFw==
+Received: from localhost (gaia [local])
+	by gaia (OpenSMTPD) with ESMTPA id 3031a51d;
+	Tue, 29 Aug 2023 23:05:22 +0000 (UTC)
+Date: Wed, 30 Aug 2023 08:05:07 +0900
+From: Dominique Martinet <asmadeus@codewreck.org>
+To: Marco Elver <elver@google.com>
+Cc: syzbot <syzbot+e441aeeb422763cc5511@syzkaller.appspotmail.com>,
+	davem@davemloft.net, edumazet@google.com, ericvh@kernel.org,
+	kuba@kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux_oss@crudebyte.com,
+	lucho@ionkov.net, netdev@vger.kernel.org, pabeni@redhat.com,
+	syzkaller-bugs@googlegroups.com, v9fs@lists.linux.dev
+Subject: Re: [syzbot] [net?] [v9fs?] KCSAN: data-race in p9_fd_create /
+ p9_fd_create (2)
+Message-ID: <ZO55o4lE2rKO5AlI@codewreck.org>
+References: <000000000000d26ff606040c9719@google.com>
+ <ZO3PFO_OpNfBW7bd@codewreck.org>
+ <ZO38mqkS0TYUlpFp@elver.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a17:90a:c908:b0:268:5c5d:25cf with SMTP id
- v8-20020a17090ac90800b002685c5d25cfmr153388pjt.4.1693349845961; Tue, 29 Aug
- 2023 15:57:25 -0700 (PDT)
-Date: Tue, 29 Aug 2023 15:57:25 -0700
-In-Reply-To: <00000000000017ad3f06040bf394@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000000c97a4060417bcaf@google.com>
-Subject: Re: [syzbot] [net] INFO: rcu detected stall in sys_close (5)
-From: syzbot <syzbot+e46fbd5289363464bc13@syzkaller.appspotmail.com>
-To: brauner@kernel.org, davem@davemloft.net, edumazet@google.com, 
-	eric.dumazet@gmail.com, gautamramk@gmail.com, hdanton@sina.com, 
-	jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org, lesliemonis@gmail.com, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	mohitbhasi1998@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	sdp.sachin@gmail.com, syzkaller-bugs@googlegroups.com, tahiliani@nitk.edu.in, 
-	viro@zeniv.linux.org.uk, vsaicharan1998@gmail.com, xiyou.wangcong@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZO38mqkS0TYUlpFp@elver.google.com>
 
-syzbot has bisected this issue to:
+Marco Elver wrote on Tue, Aug 29, 2023 at 04:11:38PM +0200:
+> On Tue, Aug 29, 2023 at 07:57PM +0900, Dominique Martinet wrote:
+> [...]
+> > Yes well that doesn't seem too hard to hit, both threads are just
+> > setting O_NONBLOCK to the same fd in parallel (0x800 is 04000,
+> > O_NONBLOCK)
+> > 
+> > I'm not quite sure why that'd be a problem; and I'm also pretty sure
+> > that wouldn't work anyway (9p has no muxing or anything that'd allow
+> > sharing the same fd between multiple mounts)
+> > 
+> > Can this be flagged "don't care" ?
+> 
+> If it's an intentional data race, it could be marked data_race() [1].
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/tools/memory-model/Documentation/access-marking.txt
 
-commit ec97ecf1ebe485a17cd8395a5f35e6b80b57665a
-Author: Mohit P. Tahiliani <tahiliani@nitk.edu.in>
-Date:   Wed Jan 22 18:22:33 2020 +0000
+Thanks!
 
-    net: sched: add Flow Queue PIE packet scheduler
+> However, staring at this code for a bit, I wonder why the f_flags are
+> set on open, and not on initialization somewhere...
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=101bb718680000
-start commit:   727dbda16b83 Merge tag 'hardening-v6.6-rc1' of git://git.k..
-git tree:       upstream
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=121bb718680000
-console output: https://syzkaller.appspot.com/x/log.txt?x=141bb718680000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=45047a5b8c295201
-dashboard link: https://syzkaller.appspot.com/bug?extid=e46fbd5289363464bc13
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14780797a80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17c1fc9fa80000
+This open is during the mount initialization (mount/p9_client_create,
+full path in the stack); there's no more initialization-ish code we
+have.
+The problem here is that we allow to pass any old arbitrary fd, so the
+user can open their fd how they want and abuse mount to use it on
+multiple mounts, even if that has no way of working (as I mentionned,
+there's no control flow at all -- you'll create two completely separate
+client state machines that'll both try to read and/or write (separate
+fds) on the same fd, and it'll all get jumbled up.
+> 
+> Anyway, a patch like the below would document that the data race is
+> intended and we assume that there is no way (famous last words) the
+> compiler or the CPU can mess it up (and KCSAN won't report it again).
 
-Reported-by: syzbot+e46fbd5289363464bc13@syzkaller.appspotmail.com
-Fixes: ec97ecf1ebe4 ("net: sched: add Flow Queue PIE packet scheduler")
+That's good enough for me as my position really is just "don't do
+that"... Would that also protect from syzcaller sending the fd to mount
+on one side, and calling fcntl(F_SETFL) on the side?
+At this rate we might as well just take the file's f_lock as setfl does,
+but perhaps there's a way to steal the fd from userspace somehow?
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+It's not just "don't use this fd for another mount", it really is "don't
+use this fd anymore while it is used by a mount".
+
+This is made complicated that we only want to steal half of the fd, you
+could imagine a weird setup like this:
+
+ ┌────────────────────────────────────┐         ┌─────────────────┐
+ │                                    │         │                 │
+ │                                    │         │  kernel client  │
+ │   fd3 tcp to server                │         │                 │
+ │       write end  ◄─────────────────┼─────────┤                 │
+ │                                    │         │                 │
+ │       read end   ──┐               │         │                 │
+ │                    │               │         │                 │
+ │   fd4 pipeA        │ MITMing...    │         │                 │
+ │                    │               │         │                 │
+ │       write end  ◄─┘               │         │                 │
+ │                                    │         │                 │
+ │   fd5 pipeB                        │         │                 │
+ │                                    │         │                 │
+ │       read end  ───────────────────┼────────►│                 │
+ │                                    │         │                 │
+ │                                    │         │                 │
+ └────────────────────────────────────┘         └─────────────────┘
+
+I'm not sure we actually want to support something like that, but it's
+currently possible and making mount act like close() on the fd would
+break this... :|
+
+So, yeah, well; this is one of these "please don't do this" that
+syzcaller has no way of knowing about; it's good to test (please don't
+do this has no security guarantee so the kernel shouldn't blow up!),
+but if the only fallout is breakage then yeah data_race() is fine.
+
+Compilers and/or CPU might be able to blow this out of proportion, but
+hopefully they won't go around modifying another unrelated value in
+memory somewhere, and we do fdget so it shouldn't turn into a UAF, so I
+guess it's fine?... Just taking f_lock here won't solve anything and
+might give the impression we support concurrent uses.
+
+
+Sorry for rambling, and thanks for the patch; I'm not sure if Eric has
+anything planned for next cycle but either of us can take it and call it
+a day.
+-- 
+Dominique Martinet | Asmadeus
 
