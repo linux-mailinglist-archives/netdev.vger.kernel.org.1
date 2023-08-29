@@ -1,75 +1,71 @@
-Return-Path: <netdev+bounces-31282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46B7178C6FF
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 16:11:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A82B878C712
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 16:15:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A3F41C20A4D
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 14:11:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E34821C20A30
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 14:15:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C18BE1775B;
-	Tue, 29 Aug 2023 14:11:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C283117AA0;
+	Tue, 29 Aug 2023 14:15:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B520614AA7
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 14:11:53 +0000 (UTC)
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55D091BE
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 07:11:46 -0700 (PDT)
-Received: by mail-wm1-x329.google.com with SMTP id 5b1f17b1804b1-401187f8071so28087535e9.0
-        for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 07:11:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5687EADC
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 14:15:09 +0000 (UTC)
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91CD71A3
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 07:15:04 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id 41be03b00d2f7-55b5a37acb6so273128a12.0
+        for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 07:15:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1693318305; x=1693923105;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RJ8yJVk1WanTGK6noPSAuAu8J5j6k7b3gO5IRwPDORc=;
-        b=pDfSqxW/VMwLUzzQxKkJcrvOyXGTdi+m78jrAmELfOR+jSL0bgTFPe2YgNMeaGm350
-         WqLnoRfNyy2lFNrVO4duvKoqPamj5nY9lGvzw2VhoxrwDxyj7nkjxn43BmXimhKvw9NY
-         DwPWGVP7ItRZm6gATl1VZn6FI1X6ELDpEOqWG0TnhPeNPfxnOUX6sHhVBaDdH8trBDJi
-         hF0O3b8w5t0r9ezlMaWcqBM+qQ9jSMzQrJV5eASglFcEEVeR3SVc+HS9Jh89cAsCIHTw
-         tFvOYpPFIMwX50nbMcxQjp9qgV2+tdAd25nqTTPy2pS9KENK9Or7oO2a0fSmt6KedIbd
-         fBOA==
+        d=gmail.com; s=20221208; t=1693318504; x=1693923304;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xeDylU+kXIFI8VAdQQpgMmEQl8NnsxokpRjlVOYRtKA=;
+        b=AGSVVljt3aRF4LN3ayyc9rZw4RtXnf0clXTLwGTTzTYEyhZTPUeDuMqb1fzmSQtbA/
+         7RQBRB72SCWz68W7Z9JIBXvxVcoB0beIbop+Cft+2xoHSk6BwUfi6C0YfabAuyYlLVJy
+         OjZRDTyikVOaBj1/RAB0J/cTXd0HsPT97FkTPQBUNe10kzmDo1yVy/RoMyUjwtNUXgoY
+         yFJazB1tS5lZZjLnX/3JsnHEWQ47nBmMXmfogb335h4VtXWM/E0Md93JwtQWQiEfzfMG
+         MgdkvvKBx496dk0fz75vpKOLbaAEh8I1IG9fAyhKTHpyuLrerdIrwehDItTrfWwb7GUJ
+         +jtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693318305; x=1693923105;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RJ8yJVk1WanTGK6noPSAuAu8J5j6k7b3gO5IRwPDORc=;
-        b=HKClrwC4i8r1zVHiyqsgQ5eyVAagI2qi8DfUi40LjmhS3na3oELMQOINZOsGvDnkB5
-         eQuqpUzePgCXk28jchqe0mwupJMDTCRQeouMMDb9W8HSepIpr+aZo3xIpQtfYk03hJO/
-         ChC+uT8e7tNlf3sgaEhNMDXxUS0yM1hbasu/yBTSfrwr6K3OipzMnTYMNEh6t2psnp6B
-         UbCBg4aAVDE1rusX/l8JprVLw3cUHBoIA0KZIeIRox+Dg5B8YxMOl0xS530PJ1fM8KPA
-         Ve6551DraICCGMD466rxjJSzGAt4aNvvhUopvaUEI0WQb5h8WNS3McBD7D0vCrZoni6h
-         QEjw==
-X-Gm-Message-State: AOJu0YypvSfNX9M6y9IJv5edacDQksYDAQdQkoxRPxjw0gHewi6hdZHU
-	+ohxHpQGHS8vc2BS9zlIEPhKvQ==
-X-Google-Smtp-Source: AGHT+IFFCPGxLiaYC5WNJ7fqI+TG+TcdZx3IaR6+EMXKEo+SeqxY92aYFuyGltp0GJAZesLUqlFAyA==
-X-Received: by 2002:a05:600c:3b07:b0:401:b53e:6c55 with SMTP id m7-20020a05600c3b0700b00401b53e6c55mr2216906wms.0.1693318304674;
-        Tue, 29 Aug 2023 07:11:44 -0700 (PDT)
-Received: from elver.google.com ([2a00:79e0:9c:201:3380:af04:1905:46a])
-        by smtp.gmail.com with ESMTPSA id 24-20020a05600c22d800b003fbe791a0e8sm14138042wmg.0.2023.08.29.07.11.43
+        d=1e100.net; s=20221208; t=1693318504; x=1693923304;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xeDylU+kXIFI8VAdQQpgMmEQl8NnsxokpRjlVOYRtKA=;
+        b=A96Y7PhNOEuKMypCyS7gmnNWYgJspn1JlW6z+7tteLbuFZtxiv+dM6Qw7eC7caFmdM
+         4vmbX7k4z7P1JzOus6rjVoeqI2hZnqqBHDLHIAeebzOyJXMEnt+0PC2b3LVAkLdwbzTv
+         9nkt2QRToodFejWYcdFR72ipSy7FnDC/hyqDdwv2KAuShwgj/rLbH0TdIFOuEQ0Fi3up
+         T3vh8qQYhGufPr3TDR9FzzQmMzxZ3FbkHSFcadYVg34fM4fpbZsyIGdwaQwMbRX3S7Z1
+         aVAv5UtsvwdRc6M9eY0Cr7qbgbPM1zSqkpNZaR3aZ7pmRK4KM528WP7p80O6dpoAUGAr
+         6c8A==
+X-Gm-Message-State: AOJu0YwTcJEArKD6U2QXY7GJrzGGyId7yZrs69SIs77fAGT/MfpRx70e
+	qBwJf+EoRckObizHPbKsft4=
+X-Google-Smtp-Source: AGHT+IG0hnW9A6TptY6/hdALT2AqqXTwK8YH8j4HVLGl9OI6OPvKnHGzHhHrVsjpvLcjEPcZA1ikXA==
+X-Received: by 2002:a17:90a:3041:b0:26d:412c:fc3c with SMTP id q1-20020a17090a304100b0026d412cfc3cmr26759955pjl.3.1693318503990;
+        Tue, 29 Aug 2023 07:15:03 -0700 (PDT)
+Received: from hoboy.vegasvil.org ([2601:640:8000:54:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id t20-20020a17090b019400b002694fee879csm10854513pjs.36.2023.08.29.07.15.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Aug 2023 07:11:43 -0700 (PDT)
-Date: Tue, 29 Aug 2023 16:11:38 +0200
-From: Marco Elver <elver@google.com>
-To: Dominique Martinet <asmadeus@codewreck.org>
-Cc: syzbot <syzbot+e441aeeb422763cc5511@syzkaller.appspotmail.com>,
-	davem@davemloft.net, edumazet@google.com, ericvh@kernel.org,
-	kuba@kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux_oss@crudebyte.com,
-	lucho@ionkov.net, netdev@vger.kernel.org, pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com, v9fs@lists.linux.dev
-Subject: Re: [syzbot] [net?] [v9fs?] KCSAN: data-race in p9_fd_create /
- p9_fd_create (2)
-Message-ID: <ZO38mqkS0TYUlpFp@elver.google.com>
-References: <000000000000d26ff606040c9719@google.com>
- <ZO3PFO_OpNfBW7bd@codewreck.org>
+        Tue, 29 Aug 2023 07:15:03 -0700 (PDT)
+Date: Tue, 29 Aug 2023 07:15:01 -0700
+From: Richard Cochran <richardcochran@gmail.com>
+To: Xabier Marquiegui <reibax@gmail.com>
+Cc: chrony-dev@chrony.tuxfamily.org, mlichvar@redhat.com,
+	netdev@vger.kernel.org, ntp-lists@mattcorallo.com
+Subject: Re: [PATCH] ptp: Demultiplexed timestamp channels
+Message-ID: <ZO39ZUlbLPp2py2O@hoboy.vegasvil.org>
+References: <Y/hGIQzT7E48o3Hz@hoboy.vegasvil.org>
+ <20230829114752.2695430-1-reibax@gmail.com>
+ <20230829114752.2695430-2-reibax@gmail.com>
+ <ZO37vZvXX9OPDLHH@hoboy.vegasvil.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,115 +74,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZO3PFO_OpNfBW7bd@codewreck.org>
-User-Agent: Mutt/2.2.9 (2022-11-12)
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+In-Reply-To: <ZO37vZvXX9OPDLHH@hoboy.vegasvil.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Aug 29, 2023 at 07:57PM +0900, Dominique Martinet wrote:
-[...]
-> Yes well that doesn't seem too hard to hit, both threads are just
-> setting O_NONBLOCK to the same fd in parallel (0x800 is 04000,
-> O_NONBLOCK)
+On Tue, Aug 29, 2023 at 07:07:57AM -0700, Richard Cochran wrote:
+
+> > The operation can be controlled via sysfs. See file
+> > Documentation/ABI/testing/sysfs-ptp for more details.
 > 
-> I'm not quite sure why that'd be a problem; and I'm also pretty sure
-> that wouldn't work anyway (9p has no muxing or anything that'd allow
-> sharing the same fd between multiple mounts)
-> 
-> Can this be flagged "don't care" ?
+> No need for new sysfs hooks.
 
-If it's an intentional data race, it could be marked data_race() [1].
+Just add a ioctl that adds a filter to an open file.
+The filter can be a simple bit mask of say, 1024 bits.
 
-However, staring at this code for a bit, I wonder why the f_flags are
-set on open, and not on initialization somewhere...
-
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/tools/memory-model/Documentation/access-marking.txt
-
-Anyway, a patch like the below would document that the data race is
-intended and we assume that there is no way (famous last words) the
-compiler or the CPU can mess it up (and KCSAN won't report it again).
-
------- >8 ------
-
-From: Marco Elver <elver@google.com>
-Date: Tue, 29 Aug 2023 15:48:58 +0200
-Subject: [PATCH] 9p: Annotate data-racy writes to file::f_flags
-
-syzbot reported:
-
- | BUG: KCSAN: data-race in p9_fd_create / p9_fd_create
- |
- | read-write to 0xffff888130fb3d48 of 4 bytes by task 15599 on cpu 0:
- |  p9_fd_open net/9p/trans_fd.c:842 [inline]
- |  p9_fd_create+0x210/0x250 net/9p/trans_fd.c:1092
- |  p9_client_create+0x595/0xa70 net/9p/client.c:1010
- |  v9fs_session_init+0xf9/0xd90 fs/9p/v9fs.c:410
- |  v9fs_mount+0x69/0x630 fs/9p/vfs_super.c:123
- |  legacy_get_tree+0x74/0xd0 fs/fs_context.c:611
- |  vfs_get_tree+0x51/0x190 fs/super.c:1519
- |  do_new_mount+0x203/0x660 fs/namespace.c:3335
- |  path_mount+0x496/0xb30 fs/namespace.c:3662
- |  do_mount fs/namespace.c:3675 [inline]
- |  __do_sys_mount fs/namespace.c:3884 [inline]
- |  [...]
- |
- | read-write to 0xffff888130fb3d48 of 4 bytes by task 15563 on cpu 1:
- |  p9_fd_open net/9p/trans_fd.c:842 [inline]
- |  p9_fd_create+0x210/0x250 net/9p/trans_fd.c:1092
- |  p9_client_create+0x595/0xa70 net/9p/client.c:1010
- |  v9fs_session_init+0xf9/0xd90 fs/9p/v9fs.c:410
- |  v9fs_mount+0x69/0x630 fs/9p/vfs_super.c:123
- |  legacy_get_tree+0x74/0xd0 fs/fs_context.c:611
- |  vfs_get_tree+0x51/0x190 fs/super.c:1519
- |  do_new_mount+0x203/0x660 fs/namespace.c:3335
- |  path_mount+0x496/0xb30 fs/namespace.c:3662
- |  do_mount fs/namespace.c:3675 [inline]
- |  __do_sys_mount fs/namespace.c:3884 [inline]
- |  [...]
- |
- | value changed: 0x00008002 -> 0x00008802
-
-Within p9_fd_open(), O_NONBLOCK is added to f_flags of the read and
-write files. This may happen concurrently if e.g. 2 tasks mount the same
-filesystem.
-
-Mark the plain read-modify-writes as intentional data-races, with the
-assumption that the result of executing the accesses concurrently will
-always result in the same result despite the accesses themselves not
-being atomic.
-
-Reported-by: syzbot+e441aeeb422763cc5511@syzkaller.appspotmail.com
-Signed-off-by: Marco Elver <elver@google.com>
----
- net/9p/trans_fd.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/net/9p/trans_fd.c b/net/9p/trans_fd.c
-index 00b684616e8d..9b01e15a758b 100644
---- a/net/9p/trans_fd.c
-+++ b/net/9p/trans_fd.c
-@@ -833,13 +833,13 @@ static int p9_fd_open(struct p9_client *client, int rfd, int wfd)
- 	if (!(ts->rd->f_mode & FMODE_READ))
- 		goto out_put_rd;
- 	/* prevent workers from hanging on IO when fd is a pipe */
--	ts->rd->f_flags |= O_NONBLOCK;
-+	data_race(ts->rd->f_flags |= O_NONBLOCK);
- 	ts->wr = fget(wfd);
- 	if (!ts->wr)
- 		goto out_put_rd;
- 	if (!(ts->wr->f_mode & FMODE_WRITE))
- 		goto out_put_wr;
--	ts->wr->f_flags |= O_NONBLOCK;
-+	data_race(ts->wr->f_flags |= O_NONBLOCK);
- 
- 	client->trans = ts;
- 	client->status = Connected;
--- 
-2.42.0.rc2.253.gd59a3bf2b4-goog
-
+Thanks,
+Richard
 
