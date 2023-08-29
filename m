@@ -1,120 +1,122 @@
-Return-Path: <netdev+bounces-31280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D712078C6CE
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 16:05:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EE8478C6E3
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 16:08:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4AA9E2811F8
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 14:05:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F04B32811CE
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 14:08:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1A1117753;
-	Tue, 29 Aug 2023 14:05:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF45F17757;
+	Tue, 29 Aug 2023 14:08:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4A5C14AA7
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 14:05:12 +0000 (UTC)
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CED2CD1
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 07:05:06 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A0E171B2
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 14:08:10 +0000 (UTC)
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEA479D
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 07:08:00 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id 98e67ed59e1d1-27197b0b733so252540a91.1
+        for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 07:08:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1693317906; x=1724853906;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=HIjB6DSGcDiXSyJUkfXprhzVVBjmfilf4Wii2YLRbOw=;
-  b=oiQKfJANMP30n/nTDZpQs3IrnBL0+RhY4JVpdxNDsqJ8IsHffP+5mzFn
-   aIBmlyFtDStHBJoSbsovTf173nbjYJc/JlVWpCqYOLeDNHK1fcJRMzAkt
-   3yZjNpAFxupk1xuDkSJnUQejsDW5xBFGpZ2HkzJqHDdTPxoEsJVEDaFtN
-   lH9czGadEzZOvqRmJ/FJT3Otmjuq3m0A6eIvyj6LCXM8ChTBgaZLPdZKK
-   Vsz8GLdb8JtaCWqVRr1gOfwJhdMt+6nAI1YNnvT09ydPQMLkKjMT+v6eh
-   CUIQnCJze3A2g7bXNPocLZpfybvGdUdzZelYunLa8EMq9dhagGFNZsPk0
-   Q==;
-X-IronPort-AV: E=Sophos;i="6.02,210,1688421600"; 
-   d="scan'208";a="32680003"
-Received: from vtuxmail01.tq-net.de ([10.115.0.20])
-  by mx1.tq-group.com with ESMTP; 29 Aug 2023 16:05:04 +0200
-Received: from steina-w.localnet (steina-w.tq-net.de [10.123.53.21])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by vtuxmail01.tq-net.de (Postfix) with ESMTPSA id 0271E280045;
-	Tue, 29 Aug 2023 16:05:03 +0200 (CEST)
-From: Alexander Stein <alexander.stein@ew.tq-group.com>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net-next] net: stmmac: failure to probe without MAC interface specified
-Date: Tue, 29 Aug 2023 16:05:03 +0200
-Message-ID: <4507976.LvFx2qVVIh@steina-w>
-Organization: TQ-Systems GmbH
-In-Reply-To: <E1qayn0-006Q8J-GE@rmk-PC.armlinux.org.uk>
-References: <E1qayn0-006Q8J-GE@rmk-PC.armlinux.org.uk>
+        d=gmail.com; s=20221208; t=1693318080; x=1693922880;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tQenVO/unOFDUGMqoWkT2B8zntkdnduAT+CdqKerxbo=;
+        b=BK3yjlsoWnMLFSqFv6TJ9CvpUUIRLc+y0BWtrUYoDRekjxt/4t7ngdhrmbPbiYZgPC
+         rCaXM8zXKpJC8pLntZ2Y3XqsdfZjH15G/9hmYhsAs9r+lQEGqjGQwVu1RqiKIkThMNKq
+         GSVXMpC2d2QRhBsXGVM2QxYyf5gNcmVwIuPJM2666DnezMcCqxb17Idl/l73P5KDqtWe
+         CeGtYuXtz5P5U/aHHL0bVrEQXRjCnEbE6FLCnDRh84Kcv7nNJVlOaj1QCP3XXcjAh3JI
+         yhKUJZ9IUrZGrhmEEy+m+TBxizOQ9q2cwJYRow5UxMTUUXweBB6XoCTwk6scpHjbZLdp
+         arrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693318080; x=1693922880;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tQenVO/unOFDUGMqoWkT2B8zntkdnduAT+CdqKerxbo=;
+        b=AmEAoKUAEPYf7lvDXAHZtMr3v1QKxW+v6hyf5ZzghAOIPapve9AOUvHzCK1PJBkJWU
+         opoe+odk1Jv0vMClmpl+sZbihGUGxHogrxd8dUX1Rr4MA6uFUanTkCafO5EJ24bqNZpS
+         CpbtrzuO3BrFaOcEFuZkiwXLUQHJ6fcC702MQdhOdXWxSfed6Gtt/cSf4PZz+dvAYIPU
+         oq5USyncTJXla3+q5yu1yRLU1567OSJSq2BhsZN5ozySMQH2m2R45UWnN04ZJMiaWLG5
+         5cbpsv6SGNaghIZpltuKCVoD7qxBYi5maF90e9XMFUuZbfkCVZVCQ1sA2aWnAyIpSiLo
+         MpHA==
+X-Gm-Message-State: AOJu0Yw3oKMRlFYwn8oyICa4cWfmbqIeCgm86iiKxLqxQA1U4r0E7hI/
+	/XcWoUhPJyqRXbfVsauZrhJZSFfBuJI=
+X-Google-Smtp-Source: AGHT+IHHHWV1augxa46PbIR/+ixn/2sFL8TuxgVxq7rRgN0Rvkoeyz8q5X6rnMx8uManXCRjLZvk+g==
+X-Received: by 2002:a17:90a:9a8:b0:26d:40ec:3cf3 with SMTP id 37-20020a17090a09a800b0026d40ec3cf3mr26150693pjo.0.1693318079938;
+        Tue, 29 Aug 2023 07:07:59 -0700 (PDT)
+Received: from hoboy.vegasvil.org ([2601:640:8000:54:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id x5-20020a17090abc8500b00268b439a0cbsm8936261pjr.23.2023.08.29.07.07.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Aug 2023 07:07:59 -0700 (PDT)
+Date: Tue, 29 Aug 2023 07:07:57 -0700
+From: Richard Cochran <richardcochran@gmail.com>
+To: Xabier Marquiegui <reibax@gmail.com>
+Cc: chrony-dev@chrony.tuxfamily.org, mlichvar@redhat.com,
+	netdev@vger.kernel.org, ntp-lists@mattcorallo.com
+Subject: Re: [PATCH] ptp: Demultiplexed timestamp channels
+Message-ID: <ZO37vZvXX9OPDLHH@hoboy.vegasvil.org>
+References: <Y/hGIQzT7E48o3Hz@hoboy.vegasvil.org>
+ <20230829114752.2695430-1-reibax@gmail.com>
+ <20230829114752.2695430-2-reibax@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230829114752.2695430-2-reibax@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Am Dienstag, 29. August 2023, 15:29:50 CEST schrieb Russell King (Oracle):
-> Alexander Stein reports that commit a014c35556b9 ("net: stmmac: clarify
-> difference between "interface" and "phy_interface"") caused breakage,
-> because plat->mac_interface will never be negative. Fix this by using
-> the "rc" temporary variable in stmmac_probe_config_dt().
->=20
-> Reported-by: Alexander Stein <alexander.stein@ew.tq-group.com>
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+On Tue, Aug 29, 2023 at 01:47:52PM +0200, Xabier Marquiegui wrote:
+> Add the posibility to demultiplex the timestamp channels for
+> external timestamp event channels.
+> 
+> In some applications it can be necessary to have different
+> consumers for different timestamp channels. For example,
+> synchronize to an external pps source with linuxptp ts2phc
+> while timestmping external events with another application.
+> 
+> This change proposes the dynamic creation of one char-device
+> per timestamp channel only if the user requests the demuxing
+> of timestamp channels. It allows for on-the-fly demuxing of
+> specific channels.
+
+No need to make complex configuration to enable this.  Just make one
+queue per open character device, and one for sysfs.
+
+> The operation can be controlled via sysfs. See file
+> Documentation/ABI/testing/sysfs-ptp for more details.
+
+No need for new sysfs hooks.
+
 > ---
-> I don't think the net tree is up to date with the net-next, so this
-> patch needs applying to net-next preferably before the pull request
-> to fix a regression.
+>  Documentation/ABI/testing/sysfs-ptp |  16 +++
+>  MAINTAINERS                         |   5 +
+>  drivers/ptp/Makefile                |   2 +-
+>  drivers/ptp/ptp_chardev.c           |   2 -
+>  drivers/ptp/ptp_clock.c             |  22 ++-
+>  drivers/ptp/ptp_demuxtschan.c       | 211 ++++++++++++++++++++++++++++
 
-On top of next-20230829:
-Tested-by: Alexander Stein <alexander.stein@ew.tq-group.com>
+No need to add a second char dev implementation.
+Just change the existing one to have a per-file queue.
 
-Thanks
+General comment: Lots of coding style violations here.
+See CodingStyle and use scripts/checkpatch.pl
 
-> Thanks.
->=20
->  drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c index
-> 35f4b1484029..0f28795e581c 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> @@ -419,9 +419,8 @@ stmmac_probe_config_dt(struct platform_device *pdev, =
-u8
-> *mac) return ERR_PTR(phy_mode);
->=20
->  	plat->phy_interface =3D phy_mode;
-> -	plat->mac_interface =3D stmmac_of_get_mac_mode(np);
-> -	if (plat->mac_interface < 0)
-> -		plat->mac_interface =3D plat->phy_interface;
-> +	rc =3D stmmac_of_get_mac_mode(np);
-> +	plat->mac_interface =3D rc < 0 ? plat->phy_interface : rc;
->=20
->  	/* Some wrapper drivers still rely on phy_node. Let's save it while
->  	 * they are not converted to phylink. */
-
-
-=2D-=20
-TQ-Systems GmbH | M=FChlstra=DFe 2, Gut Delling | 82229 Seefeld, Germany
-Amtsgericht M=FCnchen, HRB 105018
-Gesch=E4ftsf=FChrer: Detlef Schneider, R=FCdiger Stahl, Stefan Schneider
-http://www.tq-group.com/
-
-
+Thanks,
+Richard
 
