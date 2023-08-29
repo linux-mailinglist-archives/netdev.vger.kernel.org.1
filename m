@@ -1,135 +1,169 @@
-Return-Path: <netdev+bounces-31307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31308-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2ECF078CD24
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 21:45:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BF2978CD89
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 22:28:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0810528128B
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 19:45:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91B4A1C20A68
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 20:28:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8E8218049;
-	Tue, 29 Aug 2023 19:45:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38252182A8;
+	Tue, 29 Aug 2023 20:28:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9740A174E6
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 19:45:11 +0000 (UTC)
-Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D0CB1B1
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 12:45:10 -0700 (PDT)
-Received: by mail-yb1-xb35.google.com with SMTP id 3f1490d57ef6-d7b89c596d8so660392276.3
-        for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 12:45:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2550117751
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 20:28:10 +0000 (UTC)
+Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEC56FC;
+	Tue, 29 Aug 2023 13:28:09 -0700 (PDT)
+Received: by mail-yb1-xb2d.google.com with SMTP id 3f1490d57ef6-d7830c5b20aso268363276.0;
+        Tue, 29 Aug 2023 13:28:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693338309; x=1693943109; darn=vger.kernel.org;
+        d=gmail.com; s=20221208; t=1693340889; x=1693945689; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jijHRnu69Kg5rSYFP51KuY9+nU2Oa5Kw8OE4nsWTp74=;
-        b=Uu7ECylCrotM6DOHT+2CedC++wZqTlEY3FIfjkVoCH8r0FoPVphy/E6lXQ1rmqWow5
-         pgkmBmRGAsTHlAwur9T5aqeDQx3wrSwoeRf4aDxy/yHpbw16rmXKGOHPYpRSc685CfL6
-         xfrIM9pY39ARhWGNu4ARG/X91c3sNbXa49u4T8IU1Gbt6hujCXYqqfOWsf4pLBVjR4Wb
-         geD0p/4HYm6OGK0v/rcXIIiF/y/eJH1gyY//Usp2QmgJLMcWeNk/Y0JegsbKDb5bP0F2
-         RMjCfUDG+0d7EPGzxsglr23IVb4uqX+1PuEWuM8qcKGK0jWy0bFqFKiaSg6Dpf/o4Ri3
-         fURg==
+        bh=ZPW+cOvYjdKPx86Qz2gFq/jADvb6OQZRgDTzS7TqGTE=;
+        b=GRcM7Pgi7fDBwz6pP22iDKve7e14XPbj9rquPI22umZzjsWcsiTA+CW0eLlBTjonnb
+         VXMJ/0hbprZJBEmP4azLMPYN+1DhTjwx9tnZZSRCSVTklLkAVJ815AK6k5OewLCKgmC1
+         jynpcvadXdLkFRoUhYPMl9ewwoxjiFVmJKO4EYSOLXCEXt3EsJFpABdNY5w1FNh0TbWo
+         bIkhsZUKAX6nfh63fJn5gCBo83CmJaEtXdDscwLEaX6xC8V1zrWij8g5bpxD8zqLc+vz
+         golGeUWXw6dZ/95D3hksX1JfHkU4kM1X5Uj1BSXFGG69PfEEEBJIHqucZLct8eKmy401
+         /P1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693338309; x=1693943109;
+        d=1e100.net; s=20221208; t=1693340889; x=1693945689;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jijHRnu69Kg5rSYFP51KuY9+nU2Oa5Kw8OE4nsWTp74=;
-        b=kD6cZdcmWhVrRYp0B0koKwwYM5wLMfNMvvzxQLmDJshat4UwooRAPtJvfK2ZYykRtX
-         nckZHDQ2FuHe+tZQ9ZGewuCbR/wrlknKsUO6/zL47yjvIFe0Vgc+3LZwoafBYjgSO37q
-         xZQJGgEhKy3clo99GhlDU+Ulmxeipo+HJTMWEpgGGHlbo+6evb6i4n3Q3DlFk/CgmLFG
-         NR86LrM4W6mQd7R68dMUaq7f3xdZ2aFs2+dw/Hoo7VrzK6YEtVKKue3ID1ymXiMoTanU
-         odxJ37+4hnrF6WZvuwWayf6HkEFOWRn3AoSKNg0pEayyoolkkft5Bc1IzTE5nOLV1mfo
-         pN4g==
-X-Gm-Message-State: AOJu0YwODx2IR4xSEdQdsVBxdrwHttQ0I8GQLyaNkklZ1wCjSXtamA5K
-	UzfAfxDSTvnVLQrvl4S5c/SGoZeMQ/wZU+w+tYk=
-X-Google-Smtp-Source: AGHT+IH+K2+/kNXq9qWv3bz0QonK3j7qOpnnWKA+5rt4PUC4QtcprLvD2XSlLeVCtkivJrIAvv3evQ0CUdZHh+ZAk0k=
-X-Received: by 2002:a25:ad4e:0:b0:d4d:f8f4:e409 with SMTP id
- l14-20020a25ad4e000000b00d4df8f4e409mr118004ybe.57.1693338309225; Tue, 29 Aug
- 2023 12:45:09 -0700 (PDT)
+        bh=ZPW+cOvYjdKPx86Qz2gFq/jADvb6OQZRgDTzS7TqGTE=;
+        b=FtA0n8hQpyFfNQ7YHgqVqPq6RLHfe+weSvVreZWnxEW6iewsH5QkJ2eUpPoWxNhRjJ
+         shzUix5FbwTPcTbbh8a4P8ogWrC7iRmt/2rCymGd+hf9UE/ph+gZNWTm/yBYzSCADH9k
+         p6DuWi4vPZg6OkV039Tkrh5g3qdych6pDsvmxeRDfy5LBvLyhju9BosXD85MxGe2GDN8
+         NOHVtCk/mCGZubrxGtwfMi9exo2S9twPfuwqx2Y4vQcMWhpMUngKo+pYHWIj4oWL4nc1
+         ZWRVCG8jKrp+GhYtW26BfXP7C43tWOE7vyIuHPdQ1dRYJz7F9dRhjeghHwyvgzEtfRy4
+         A5AQ==
+X-Gm-Message-State: AOJu0YxfJEgPhfUszFO1ZJWtq2AqhiPJ20TvkRN9v3GVtR2VDk41RpML
+	+HHb/ZOCHzZYpERYx8vCPLd3HE4CfOP/lrgI++U=
+X-Google-Smtp-Source: AGHT+IFN9KsI/KIYW36rLN6ro7UvPWLJe/AkYqpEHQtIP3KTxPCc24Pk5crT24CtYNL6vyVfaJdFxgjNXA+jrFJ0AIQ=
+X-Received: by 2002:a25:b003:0:b0:d72:652f:4054 with SMTP id
+ q3-20020a25b003000000b00d72652f4054mr3781771ybf.16.1693340888850; Tue, 29 Aug
+ 2023 13:28:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230828124419.2915961-1-edumazet@google.com> <CADvbK_eRLiosLw9mFbRJ5mmoCmR8vrYchk+Lvt9WjO_f=SLUwg@mail.gmail.com>
- <CANn89iL_OU1w6TTdZe45PaDkR9o8BbdXoTuF1XS9Ed=5g_NdAA@mail.gmail.com>
- <CADvbK_fTP1x0uqz3w9OPLpGPLMD5AcCfwT0-Lx2dkPXDGLVqxw@mail.gmail.com> <CANn89iKDKR+PDXMO9e76+NJt_a-WMGaD1Gk7Yer7Mn4hD2sX9A@mail.gmail.com>
-In-Reply-To: <CANn89iKDKR+PDXMO9e76+NJt_a-WMGaD1Gk7Yer7Mn4hD2sX9A@mail.gmail.com>
+References: <20230829071334.58083-1-n.zhandarovich@fintech.ru>
+In-Reply-To: <20230829071334.58083-1-n.zhandarovich@fintech.ru>
 From: Xin Long <lucien.xin@gmail.com>
-Date: Tue, 29 Aug 2023 15:44:48 -0400
-Message-ID: <CADvbK_d07SQ=xO=GtGL8DzOQH2x=T2ObMWdUknQrTnQT+-JZLw@mail.gmail.com>
-Subject: Re: [PATCH net] sctp: annotate data-races around sk->sk_wmem_queued
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, syzbot <syzkaller@googlegroups.com>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Date: Tue, 29 Aug 2023 16:27:48 -0400
+Message-ID: <CADvbK_eQaqSJmNDGwz5A9tAmb0y2rZwZXxdC52B4hjjWRGZtUA@mail.gmail.com>
+Subject: Re: [PATCH net] sctp: fix uninit-value in sctp_inq_pop()
+To: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	linux-sctp@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, 
+	syzbot+70a42f45e76bede082be@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Aug 29, 2023 at 3:24=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
+On Tue, Aug 29, 2023 at 3:14=E2=80=AFAM Nikita Zhandarovich
+<n.zhandarovich@fintech.ru> wrote:
 >
-> On Tue, Aug 29, 2023 at 9:05=E2=80=AFPM Xin Long <lucien.xin@gmail.com> w=
-rote:
-> >
-> > On Tue, Aug 29, 2023 at 2:19=E2=80=AFPM Eric Dumazet <edumazet@google.c=
-om> wrote:
-> > >
-> > > On Tue, Aug 29, 2023 at 8:14=E2=80=AFPM Xin Long <lucien.xin@gmail.co=
-m> wrote:
-> > > >
-> > > > On Mon, Aug 28, 2023 at 8:44=E2=80=AFAM Eric Dumazet <edumazet@goog=
-le.com> wrote:
-> > > > >
-> > > > > sk->sk_wmem_queued can be read locklessly from sctp_poll()
-> > > > >
-> > > > >                 sk->sk_rcvbuf);
-> > > > Just wondering why sk->sk_sndbuf/sk_rcvbuf doesn't need READ_ONCE()
-> > > > while adding READ_ONCE for sk->sk_wmem_queued in here?
-> > > >
-> > >
-> > > Separate patches for sk_sndbuf, sk_rcvbuf, sk_err, sk_shutdown, and
-> > > many other socket fields.
-> > >
-> > > I prefer having small patches to reduce merge conflicts in backports.
-> > >
-> > > Note that I used  READ_ONCE(sk->sk_sndbuf) in sctp_writeable(),
-> > > (I assume this is why you asked)
-> > Yes.
-> >
-> > Not sure about tcp's seq_show, but as sctp_assocs_seq_show() is only
+> Syzbot identified a case [1] of uninitialized memory usage in
+> sctp_inq_pop(), specifically in 'ch->length'.
 >
-> tcp seq_show uses requested spinlocks on lhash or ehash tables, but
-> not socket lock.
+> Fix the issue by ensuring that 'ch->length' reflects the size of
+> 'sctp_chunkhdr *ch' before accessing it.
 >
-> > under rcu_read_lock() and with a hold of transport/association/socket,
-> > does it mean all members of assoc should also use READ_ONCE()?
+> [1]
+> BUG: KMSAN: uninit-value in sctp_inq_pop+0x1597/0x1910 net/sctp/inqueue.c=
+:205
+>  sctp_inq_pop+0x1597/0x1910 net/sctp/inqueue.c:205
+>  sctp_assoc_bh_rcv+0x1a7/0xc50 net/sctp/associola.c:997
+>  sctp_inq_push+0x23e/0x2b0 net/sctp/inqueue.c:80
+>  sctp_backlog_rcv+0x394/0xd80 net/sctp/input.c:331
+>  sk_backlog_rcv include/net/sock.h:1115 [inline]
+>  __release_sock+0x207/0x570 net/core/sock.c:2911
+>  release_sock+0x6b/0x1e0 net/core/sock.c:3478
+>  sctp_wait_for_connect+0x486/0x810 net/sctp/socket.c:9325
+>  sctp_sendmsg_to_asoc+0x1ea7/0x1ee0 net/sctp/socket.c:1884
+>  ...
 >
-> Probably...
-OK, just thinking syzbot may report it in the future here.
+> Uninit was stored to memory at:
+>  sctp_inq_pop+0x151a/0x1910 net/sctp/inqueue.c:201
+>  sctp_assoc_bh_rcv+0x1a7/0xc50 net/sctp/associola.c:997
+>  sctp_inq_push+0x23e/0x2b0 net/sctp/inqueue.c:80
+>  sctp_backlog_rcv+0x394/0xd80 net/sctp/input.c:331
+>  sk_backlog_rcv include/net/sock.h:1115 [inline]
+>  __release_sock+0x207/0x570 net/core/sock.c:2911
+>  release_sock+0x6b/0x1e0 net/core/sock.c:3478
+>  sctp_wait_for_connect+0x486/0x810 net/sctp/socket.c:9325
+>  sctp_sendmsg_to_asoc+0x1ea7/0x1ee0 net/sctp/socket.c:1884
+>  ...
+>
+> Uninit was created at:
+>  slab_post_alloc_hook+0x12d/0xb60 mm/slab.h:716
+>  slab_alloc_node mm/slub.c:3451 [inline]
+>  __kmem_cache_alloc_node+0x4ff/0x8b0 mm/slub.c:3490
+>  __do_kmalloc_node mm/slab_common.c:965 [inline]
+>  __kmalloc_node_track_caller+0x118/0x3c0 mm/slab_common.c:986
+>  kmalloc_reserve+0x248/0x470 net/core/skbuff.c:585
+>  __alloc_skb+0x318/0x740 net/core/skbuff.c:654
+>  alloc_skb include/linux/skbuff.h:1288 [inline]
+>  sctp_packet_pack net/sctp/output.c:472 [inline]
+>  sctp_packet_transmit+0x1729/0x4150 net/sctp/output.c:621
+>  sctp_outq_flush_transports net/sctp/outqueue.c:1173 [inline]
+>  ...
+>
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Reported-and-tested-by: syzbot+70a42f45e76bede082be@syzkaller.appspotmail=
+.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3D70a42f45e76bede082be
+> Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+> ---
+>  net/sctp/inqueue.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/net/sctp/inqueue.c b/net/sctp/inqueue.c
+> index 7182c5a450fb..98ce9524c87c 100644
+> --- a/net/sctp/inqueue.c
+> +++ b/net/sctp/inqueue.c
+> @@ -197,6 +197,7 @@ struct sctp_chunk *sctp_inq_pop(struct sctp_inq *queu=
+e)
+>                 }
+>         }
+>
+> +       ch->length =3D htons(sizeof(*ch));
+>         chunk->chunk_hdr =3D ch;
+>         chunk->chunk_end =3D ((__u8 *)ch) + SCTP_PAD4(ntohs(ch->length));
+>         skb_pull(chunk->skb, sizeof(*ch));
+> --
+> 2.25.1
+>
+Hi, Nikita
 
->
-> > (Note I think we don't expect the seq show to be that accurate.)
->
-> Yeah, this is really best effort, inet_diag is probably what we want
-> to harden these days.
+You can't just overwrite "ch->length", "ch" is the header of the received c=
+hunk.
+if it says ch->length is Uninit, it means either the chunk parsing in
+the receiver
+is overflow or the format of the chunk created in the sender is incorrect.
 
-Acked-by: Xin Long <lucien.xin@gmail.com>
+If you can reproduce it stably, I suggest you start from sctp_inq_pop() and
+print out the skb info and data in there, and see if it's a normal chunk.
 
 Thanks.
 
