@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-31194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E21FC78C298
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 12:53:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B27278C29F
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 12:53:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F2BD1C20A00
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 10:53:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9CE928103C
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 10:53:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2631014F9C;
-	Tue, 29 Aug 2023 10:52:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E1351548A;
+	Tue, 29 Aug 2023 10:52:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2B251548A
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 10:52:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F020DC433C7;
-	Tue, 29 Aug 2023 10:52:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E7A515481
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 10:52:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA5E2C433C9;
+	Tue, 29 Aug 2023 10:52:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693306362;
-	bh=YlrN4bDSNF+KqWi7kN9bxa/oeNXOFAT09nZc/x9+vhk=;
+	s=k20201202; t=1693306369;
+	bh=R5nkuuiNFkrWBoIZMqvZG0C7QkTrSVA812AJPM93YC4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MT7nQTlUYtZiYAgGtLh+udooCtUNmM5y7PhDkmFnTeeNwPirp2P35OpOTsHzsUoV2
-	 26aWoycgV/rvHl5bdRSndWyDksEsg0ZhUkQWFnEn5/EulaFgg2XMSRVVABk//MciFJ
-	 a+iGLwUF82z4m4SWtOAecwkNA2ROwzKZlk8a5cfbATRbmTN5HfdN6vMQmO8h4bO4YY
-	 EPS86bXYZfu5dUSRmoVV41IkGhWyd9Vz6MvYjeBOvKs0AcsUrh9OMWFdcyO0k9EXEm
-	 YAj01P2eZZ/cZm+IfeFXD8BbwIGqt74GOO9rFA2fzcyCZOJY8vIdQBhAz8wxkUcVUf
-	 ptPXdHcjefFVQ==
+	b=iJsu/I3d87cvHLK0Qgq+FtAhg4MTdzl3KQQ2FINF1VhorGE0SMH9XFIO3zlJvpvsa
+	 IxrTWPp0pXrzu3s5EXKgFU2QxWW3G9LGqR7t7wKk1QgRo+ZO130xflrB7lto9iB9aa
+	 d8HmMmgA5B/Irwo+1l3feOkwjXW9f3GhIlIxbUyJ2rw6+k/4nJdNXhszgGs8k7Edy/
+	 2n6N/9DaRQih16aotIDSDnTn5t2uAFk0MUI5wu0rrTg+9l0R7d/B3MCehS71dZMI5z
+	 5LAs+uKq3Q8wEY6000Q7lO4uMAbjnTY7nRP8kRwcVbuiZUNWvuzmYEELEu9pNxjkkK
+	 aXXMJx7SVFgpA==
 From: Jisheng Zhang <jszhang@kernel.org>
 To: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
 	Alexandre Torgue <alexandre.torgue@foss.st.com>,
@@ -64,9 +64,9 @@ To: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
 Cc: netdev@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 02/22] net: stmmac: dwmac-dwc-qos-eth: use devm_stmmac_probe_config_dt()
-Date: Tue, 29 Aug 2023 18:40:13 +0800
-Message-Id: <20230829104033.955-3-jszhang@kernel.org>
+Subject: [PATCH net-next 03/22] net: stmmac: dwmac-generic: use devm_stmmac_probe_config_dt()
+Date: Tue, 29 Aug 2023 18:40:14 +0800
+Message-Id: <20230829104033.955-4-jszhang@kernel.org>
 X-Mailer: git-send-email 2.40.0
 In-Reply-To: <20230829104033.955-1-jszhang@kernel.org>
 References: <20230829104033.955-1-jszhang@kernel.org>
@@ -81,60 +81,55 @@ Content-Transfer-Encoding: 8bit
 Simplify the driver's probe() function by using the devres
 variant of stmmac_probe_config_dt().
 
+The remove_new() callback now needs to be switched to
+stmmac_pltfr_remove_no_dt().
+
 Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
 ---
- .../ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c   | 15 +++------------
- 1 file changed, 3 insertions(+), 12 deletions(-)
+ .../net/ethernet/stmicro/stmmac/dwmac-generic.c  | 16 +++-------------
+ 1 file changed, 3 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
-index 61ebf36da13d..ec924c6c76c6 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
-@@ -435,15 +435,14 @@ static int dwc_eth_dwmac_probe(struct platform_device *pdev)
- 	if (IS_ERR(stmmac_res.addr))
- 		return PTR_ERR(stmmac_res.addr);
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-generic.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-generic.c
+index 20fc455b3337..84582fc04d2e 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-generic.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-generic.c
+@@ -27,7 +27,7 @@ static int dwmac_generic_probe(struct platform_device *pdev)
+ 		return ret;
  
--	plat_dat = stmmac_probe_config_dt(pdev, stmmac_res.mac);
-+	plat_dat = devm_stmmac_probe_config_dt(pdev, stmmac_res.mac);
- 	if (IS_ERR(plat_dat))
- 		return PTR_ERR(plat_dat);
- 
- 	ret = data->probe(pdev, plat_dat, &stmmac_res);
- 	if (ret < 0) {
- 		dev_err_probe(&pdev->dev, ret, "failed to probe subdriver\n");
--
--		goto remove_config;
-+		return ret;
+ 	if (pdev->dev.of_node) {
+-		plat_dat = stmmac_probe_config_dt(pdev, stmmac_res.mac);
++		plat_dat = devm_stmmac_probe_config_dt(pdev, stmmac_res.mac);
+ 		if (IS_ERR(plat_dat)) {
+ 			dev_err(&pdev->dev, "dt configuration failed\n");
+ 			return PTR_ERR(plat_dat);
+@@ -46,17 +46,7 @@ static int dwmac_generic_probe(struct platform_device *pdev)
+ 		plat_dat->unicast_filter_entries = 1;
  	}
  
- 	ret = dwc_eth_dwmac_config_dt(pdev, plat_dat);
-@@ -458,25 +457,17 @@ static int dwc_eth_dwmac_probe(struct platform_device *pdev)
- 
- remove:
- 	data->remove(pdev);
--remove_config:
--	stmmac_remove_config_dt(pdev, plat_dat);
- 
- 	return ret;
+-	ret = stmmac_pltfr_probe(pdev, plat_dat, &stmmac_res);
+-	if (ret)
+-		goto err_remove_config_dt;
+-
+-	return 0;
+-
+-err_remove_config_dt:
+-	if (pdev->dev.of_node)
+-		stmmac_remove_config_dt(pdev, plat_dat);
+-
+-	return ret;
++	return stmmac_pltfr_probe(pdev, plat_dat, &stmmac_res);
  }
  
- static void dwc_eth_dwmac_remove(struct platform_device *pdev)
- {
--	struct net_device *ndev = platform_get_drvdata(pdev);
--	struct stmmac_priv *priv = netdev_priv(ndev);
--	const struct dwc_eth_dwmac_data *data;
--
--	data = device_get_match_data(&pdev->dev);
-+	const struct dwc_eth_dwmac_data *data = device_get_match_data(&pdev->dev);
+ static const struct of_device_id dwmac_generic_match[] = {
+@@ -77,7 +67,7 @@ MODULE_DEVICE_TABLE(of, dwmac_generic_match);
  
- 	stmmac_dvr_remove(&pdev->dev);
- 
- 	data->remove(pdev);
--
--	stmmac_remove_config_dt(pdev, priv->plat);
- }
- 
- static const struct of_device_id dwc_eth_dwmac_match[] = {
+ static struct platform_driver dwmac_generic_driver = {
+ 	.probe  = dwmac_generic_probe,
+-	.remove_new = stmmac_pltfr_remove,
++	.remove_new = stmmac_pltfr_remove_no_dt,
+ 	.driver = {
+ 		.name           = STMMAC_RESOURCE_NAME,
+ 		.pm		= &stmmac_pltfr_pm_ops,
 -- 
 2.40.1
 
