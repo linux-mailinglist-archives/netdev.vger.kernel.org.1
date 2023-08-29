@@ -1,137 +1,112 @@
-Return-Path: <netdev+bounces-31237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A36AA78C48E
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 14:55:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E6FF78C48F
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 14:56:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B6AD280CB0
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 12:55:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9AEA281177
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 12:56:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 764AE156DB;
-	Tue, 29 Aug 2023 12:55:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE8B7156DE;
+	Tue, 29 Aug 2023 12:56:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68DB7156C7
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 12:55:06 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DB61CCE
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 05:55:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693313700; x=1724849700;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=OqrJ7NCugAHCrcBizDstYU3tAj/RSOo3I5oth/zsfMI=;
-  b=P4eUdrx4SXeO6Buj4yfsPu3YR3UOrQMEjIzmIxI4Oo1O640Ab8/kaq4e
-   JchrVGCkfRwe1e0QVWZXO123e5EeveCbGPgPRt0R5E2ziUy3EmYC+e9Lu
-   NJFSmcc6yUJLudytvViOO7k13UnI/L5/0heqy1OO4CdZ1ln67Bft7Iclo
-   jaMSTs+c1nDfU372a0fcQ1z9Lk5fJ/ZHeRm8KCZNLLUpnsnC7TJJur+6v
-   op7YIu9duw+hpFYN7/wkT3JeXajTWhwYCpA1DcX3WhEPq2gW6Pq6ek/fq
-   uK69d8OhyBR7oCXyGxdOe5AauKbx2PbNOW8wyEIp4OBDcdswD4+ANlhzx
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10817"; a="379128822"
-X-IronPort-AV: E=Sophos;i="6.02,210,1688454000"; 
-   d="scan'208";a="379128822"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2023 05:54:59 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10817"; a="828785221"
-X-IronPort-AV: E=Sophos;i="6.02,210,1688454000"; 
-   d="scan'208";a="828785221"
-Received: from lkp-server02.sh.intel.com (HELO daf8bb0a381d) ([10.239.97.151])
-  by FMSMGA003.fm.intel.com with ESMTP; 29 Aug 2023 05:54:57 -0700
-Received: from kbuild by daf8bb0a381d with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qayF8-0008jn-1C;
-	Tue, 29 Aug 2023 12:54:52 +0000
-Date: Tue, 29 Aug 2023 20:54:44 +0800
-From: kernel test robot <lkp@intel.com>
-To: Karol Kolacinski <karol.kolacinski@intel.com>,
-	intel-wired-lan@lists.osuosl.org
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Karol Kolacinski <karol.kolacinski@intel.com>,
-	anthony.l.nguyen@intel.com, jesse.brandeburg@intel.com
-Subject: Re: [Intel-wired-lan] [PATCH v4 iwl-next 02/11] ice: introduce PTP
- state machine
-Message-ID: <202308292029.9Je6bgXn-lkp@intel.com>
-References: <20230829104041.64131-3-karol.kolacinski@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8A2114AB3;
+	Tue, 29 Aug 2023 12:56:14 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C76CF9D;
+	Tue, 29 Aug 2023 05:56:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:To:Subject:Sender:
+	Reply-To:Cc:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=9fb4MYRP5fYSklYNqpx8Lj2woGj0yb+xRYXtbbot1Dw=; b=CabpNKtJo88GC2q+1Jpvh+ylAj
+	vrgwVo6Mk6S5Do3l92KY84wxZS7mArCCHFup3B7qexnXU+i67NJ24IvYelhdJD+sZlHzZPzhIFU1M
+	2OrjYQ/JzsIFttHbnW3su44f98kjPVDuCoJnmO8n51nYNTTZpK5R6H8YVkf6yqI6AMT4zHo0KFvRu
+	jBjGjnsdqWHVQt8opvQ/R3OJ+RcyXPAW0NoExa8vhc10cKEZL8BsFrwvHZxtZh5As+Gz54HRhKRfv
+	ibfOJLElp32qAPC9ik3TiHJiWe0yswVWR0dqgmKD7GlTK1Q0b86aC1MH0dF8T0NKoBfiCIotd9KQj
+	pODPlbmg==;
+Received: from sslproxy03.your-server.de ([88.198.220.132])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qayGN-000Gqj-Rv; Tue, 29 Aug 2023 14:56:08 +0200
+Received: from [85.1.206.226] (helo=linux.home)
+	by sslproxy03.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qayGN-000PV2-HA; Tue, 29 Aug 2023 14:56:07 +0200
+Subject: Re: [syzbot] [bpf?] [net?] KASAN: slab-use-after-free Read in
+ xsk_diag_dump
+To: syzbot <syzbot+822d1359297e2694f873@syzkaller.appspotmail.com>,
+ andrii@kernel.org, ast@kernel.org, bjorn@kernel.org, bpf@vger.kernel.org,
+ davem@davemloft.net, edumazet@google.com, hawk@kernel.org,
+ john.fastabend@gmail.com, jonathan.lemon@gmail.com, kuba@kernel.org,
+ linux-kernel@vger.kernel.org, maciej.fijalkowski@intel.com,
+ magnus.karlsson@intel.com, netdev@vger.kernel.org, pabeni@redhat.com,
+ syzkaller-bugs@googlegroups.com
+References: <000000000000af3ba506040b7d0c@google.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <3d8fa470-8ca9-561c-8381-0687f9e69d10@iogearbox.net>
+Date: Tue, 29 Aug 2023 14:56:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230829104041.64131-3-karol.kolacinski@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <000000000000af3ba506040b7d0c@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.8/27015/Tue Aug 29 09:39:45 2023)
+X-Spam-Status: No, score=-0.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Karol,
+Hi Magnus,
 
-kernel test robot noticed the following build warnings:
+On 8/29/23 10:20 AM, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    5c905279a1b7 Merge branch 'pds_core-error-handling-fixes'
+> git tree:       net
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=16080070680000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=1e4a882f77ed77bd
+> dashboard link: https://syzkaller.appspot.com/bug?extid=822d1359297e2694f873
+> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14ec63a7a80000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=109926eba80000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/98add120b6e5/disk-5c905279.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/c9e9009eadbd/vmlinux-5c905279.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/b840142cc0c1/bzImage-5c905279.xz
+> 
+> The issue was bisected to:
+> 
+> commit 18b1ab7aa76bde181bdb1ab19a87fa9523c32f21
+> Author: Magnus Karlsson <magnus.karlsson@intel.com>
+> Date:   Mon Feb 28 09:45:52 2022 +0000
+> 
+>      xsk: Fix race at socket teardown
 
-[auto build test WARNING on 938672aefaeb88c4e3b6d8bc04ff97900e0809dd]
+please take a look when you get a chance.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Karol-Kolacinski/ice-use-ice_pf_src_tmr_owned-where-available/20230829-184543
-base:   938672aefaeb88c4e3b6d8bc04ff97900e0809dd
-patch link:    https://lore.kernel.org/r/20230829104041.64131-3-karol.kolacinski%40intel.com
-patch subject: [Intel-wired-lan] [PATCH v4 iwl-next 02/11] ice: introduce PTP state machine
-config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20230829/202308292029.9Je6bgXn-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230829/202308292029.9Je6bgXn-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202308292029.9Je6bgXn-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/net/ethernet/intel/ice/ice_ptp.c:265:20: warning: 'ice_ptp_state_str' defined but not used [-Wunused-function]
-     265 | static const char *ice_ptp_state_str(enum ice_ptp_state state)
-         |                    ^~~~~~~~~~~~~~~~~
-
-
-vim +/ice_ptp_state_str +265 drivers/net/ethernet/intel/ice/ice_ptp.c
-
-   257	
-   258	/**
-   259	 * ice_ptp_state_str - Convert PTP state to readable string
-   260	 * @state: PTP state to convert
-   261	 *
-   262	 * Returns: the human readable string representation of the provided PTP
-   263	 * state, used for printing error messages.
-   264	 */
- > 265	static const char *ice_ptp_state_str(enum ice_ptp_state state)
-   266	{
-   267		switch (state) {
-   268		case ICE_PTP_UNINIT:
-   269			return "UNINITIALIZED";
-   270		case ICE_PTP_INITIALIZING:
-   271			return "INITIALIZING";
-   272		case ICE_PTP_READY:
-   273			return "READY";
-   274		case ICE_PTP_RESETTING:
-   275			return "RESETTING";
-   276		case ICE_PTP_ERROR:
-   277			return "ERROR";
-   278		}
-   279	
-   280		return "UNKNOWN";
-   281	}
-   282	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks a lot,
+Daniel
 
