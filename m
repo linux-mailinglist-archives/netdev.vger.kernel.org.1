@@ -1,552 +1,226 @@
-Return-Path: <netdev+bounces-31233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A282578C45A
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 14:38:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B464678C46B
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 14:44:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54ED9281138
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 12:38:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F4FE1C20A11
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 12:44:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBDA0154AE;
-	Tue, 29 Aug 2023 12:38:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F5EE156CD;
+	Tue, 29 Aug 2023 12:44:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6A9514F95
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 12:38:39 +0000 (UTC)
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CD71D2
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 05:38:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1693312716; x=1724848716;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=3jzzpEtb6XFqiO15vT81Dtv6J1/Ecg0IfN8+3JmYrhk=;
-  b=R0+fTva7J7GOT04spzIg51Ebw2mXczdHBE49n2+2iKAtT4RiWCpy+12j
-   Sjhz/x1b+UCCJ6KtIfprJvOQoqbAGK01V7o1d8pk2m9++0z5MMnlMxWgI
-   aDCg1Yb9Jb5//Mw620XhgkBpo4ijguSYlV634ZlKbCN9hDn/It981I3zH
-   Vp+pU9fyEjrehgNR0FkkwWD0yxvs3I33ie6+wEmyHb32AekoZMc4aU4fb
-   CwM2zAh66ykBCqb9HXMNcwqxC/wYUznZftWu1+a3IlCkxa0Naj8Bxrfpv
-   eNX/qe4ZwhxwZlRtw0DneuWeEBAH/8uuY29/OotAuplfDLtIS2sOK3Fmc
-   A==;
-X-IronPort-AV: E=Sophos;i="6.02,210,1688421600"; 
-   d="scan'208";a="32677373"
-Received: from vtuxmail01.tq-net.de ([10.115.0.20])
-  by mx1.tq-group.com with ESMTP; 29 Aug 2023 14:38:34 +0200
-Received: from steina-w.localnet (steina-w.tq-net.de [10.123.53.21])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B5C414AB3;
+	Tue, 29 Aug 2023 12:44:50 +0000 (UTC)
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D172EC;
+	Tue, 29 Aug 2023 05:44:48 -0700 (PDT)
+Received: from [192.168.100.7] (unknown [39.34.186.40])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by vtuxmail01.tq-net.de (Postfix) with ESMTPSA id F3295280045;
-	Tue, 29 Aug 2023 14:38:33 +0200 (CEST)
-From: Alexander Stein <alexander.stein@ew.tq-group.com>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Feiyang Chen <chenfeiyang@loongson.cn>, Heiner Kallweit <hkallweit1@gmail.com>, Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com, Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>, NXP Linux Team <linux-imx@nxp.com>, Vladimir Zapolskiy <vz@mleia.com>, Emil Renner Berthing <kernel@esmil.dk>, Samin Guo <samin.guo@starfivetech.com>, Chen-Yu Tsai <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>, Matthias Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno <angelogioacchino.
- delregno@collabora.com>, linux-sunxi@lists.linux.dev, linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next] net: stmmac: clarify difference between "interface" and "phy_interface"
-Date: Tue, 29 Aug 2023 14:38:33 +0200
-Message-ID: <12274852.O9o76ZdvQC@steina-w>
-Organization: TQ-Systems GmbH
-In-Reply-To: <E1qZq83-005tts-6K@rmk-PC.armlinux.org.uk>
-References: <E1qZq83-005tts-6K@rmk-PC.armlinux.org.uk>
+	(Authenticated sender: usama.anjum)
+	by madras.collabora.co.uk (Postfix) with ESMTPSA id 34AB166071E6;
+	Tue, 29 Aug 2023 13:44:43 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1693313087;
+	bh=cfiui2p/zolzYZeGqAwVeu0rIPcbeARCFyKi56+VWiA=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=DpERwzY7oMMBkwdhEyKjbDyfWUXTHWyXPn69CNWPLwq/RkTXN09xZt6Q6M8W8QPb2
+	 I5SPnpqdQojsx6jz5qDx3rwDEC37hiUYSucLGpw6+mhtazaRLE5hJ6xgBugzc8YjRH
+	 65YdHlOLhC8m+iUKANLi7w9nq2QVEJMTwGAXBmf4HxrNu8NWqov5sH3yyWhgmdzJO9
+	 urFmpwBgiloHCiZOk05EVQDv4xuQwA9cKnu1VXmSYGIlJ5FepvK5x5dGSaCQqssE7F
+	 vfT927RKYhiOsmT/OIUHvXZVTcSqZN8DnI+rBIl6PRuimN91KuHEslxmHk0hXZRR01
+	 KpAnSAk3XQJbw==
+Message-ID: <6144228a-799f-4de3-8483-b7add903df0c@collabora.com>
+Date: Tue, 29 Aug 2023 17:44:38 +0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Cc: Muhammad Usama Anjum <usama.anjum@collabora.com>
+Subject: Re: [syzbot] [net?] WARNING in inet_sock_destruct (4)
+To: syzbot <syzbot+de6565462ab540f50e47@syzkaller.appspotmail.com>,
+ bpf@vger.kernel.org, davem@davemloft.net, bpf@vger.kernel.org,
+ davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ jacob.e.keller@intel.com, jiri@nvidia.com, kuba@kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ syzkaller-bugs@googlegroups.com, fishgylk@gmail.com, bagasdotme@gmail.com
+References: <00000000000010353a05fecceea0@google.com>
+Content-Language: en-US
+From: Muhammad Usama Anjum <usama.anjum@collabora.com>
+In-Reply-To: <00000000000010353a05fecceea0@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Russel,
+On 6/23/23 7:36 PM, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit: 45a3e24f65e9 Linux 6.4-rc7
+> git tree: upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=160cc82f280000
+> kernel config: https://syzkaller.appspot.com/x/.config?x=2cbd298d0aff1140
+> dashboard link: https://syzkaller.appspot.com/bug?extid=de6565462ab540f50e47
+> compiler: gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+> syz repro: https://syzkaller.appspot.com/x/repro.syz?x=160aacb7280000
+> C reproducer: https://syzkaller.appspot.com/x/repro.c?x=17c115d3280000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/c09bcd4ec365/disk-45a3e24f.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/03549b639718/vmlinux-45a3e24f.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/91f203e5f63e/bzImage-45a3e24f.xz
+> 
+> The issue was bisected to:
+> 
+> commit 565b4824c39fa335cba2028a09d7beb7112f3c9a
+> Author: Jiri Pirko <jiri@nvidia.com>
+> Date: Mon Feb 6 09:41:51 2023 +0000
+> 
+> devlink: change port event netdev notifier from per-net to global
+> 
+> bisection log: https://syzkaller.appspot.com/x/bisect.txt?x=110a1a5b280000
+> final oops: https://syzkaller.appspot.com/x/report.txt?x=130a1a5b280000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=150a1a5b280000
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+de6565462ab540f50e47@syzkaller.appspotmail.com
+> Fixes: 565b4824c39f ("devlink: change port event netdev notifier from per-net to global")
+> 
+> ------------[ cut here ]------------
+> WARNING: CPU: 0 PID: 5025 at net/ipv4/af_inet.c:154 inet_sock_destruct+0x6df/0x8a0 net/ipv4/af_inet.c:154
+This same warning has been spotted and reported:
+https://bugzilla.kernel.org/show_bug.cgi?id=217555
 
-Am Samstag, 26. August 2023, 12:02:51 CEST schrieb Russell King (Oracle):
-> Clarify the difference between "interface" and "phy_interface" in
-> struct plat_stmmacenet_data, both by adding a comment, and also
-> renaming "interface" to be "mac_interface". The difference between
-> these are:
->=20
->  MAC ----- optional PCS ----- SerDes ----- optional PHY ----- Media
->        ^                               ^
->  mac_interface                   phy_interface
->=20
-> Note that phylink currently only deals with phy_interface.
->=20
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Syzbot has found the same warning on 4.14, 5.15, 6.1, 6.5-rc and latest
+mainline (1c59d383390f9) kernels. The provided reproducers (such as
+https://syzkaller.appspot.com/text?tag=ReproC&x=15a10e8aa80000) are
+reproducing the same warnings on multicore (at least 2 CPUs) qemu instance.
+
+> Modules linked in:
+> CPU: 0 PID: 5025 Comm: syz-executor250 Not tainted 6.4.0-rc7-syzkaller #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/27/2023
+> RIP: 0010:inet_sock_destruct+0x6df/0x8a0 net/ipv4/af_inet.c:154
+> Code: ff e8 c5 9f e0 f8 0f 0b e9 07 fe ff ff e8 b9 9f e0 f8 0f 0b e9 3f fe ff ff e8 ad 9f e0 f8 0f 0b e9 95 fd ff ff e8 a1 9f e0 f8 <0f> 0b e9 9f fe ff ff e8 d5 6a 33 f9 e9 7a fc ff ff 4c 89 e7 e8 08
+> RSP: 0018:ffffc90000007de8 EFLAGS: 00010246
+> RAX: 0000000000000000 RBX: 00000000fffff000 RCX: 0000000000000100
+> RDX: ffff8880792f8000 RSI: ffffffff88a3a73f RDI: 0000000000000005
+> RBP: ffff88814aa99980 R08: 0000000000000005 R09: 0000000000000000
+> R10: 00000000fffff000 R11: 0000000000094001 R12: ffff88814aa999a8
+> R13: ffff88814aa99bf4 R14: ffffc90000007ed8 R15: 0000000000000004
+> FS: 0000000000000000(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+> CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007f579b4f6ec8 CR3: 000000000c571000 CR4: 00000000003506f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+> <IRQ>
+> __sk_destruct+0x4d/0x770 net/core/sock.c:2130
+> rcu_do_batch kernel/rcu/tree.c:2115 [inline]
+> rcu_core+0x806/0x1ad0 kernel/rcu/tree.c:2377
+> __do_softirq+0x1d4/0x905 kernel/softirq.c:571
+> invoke_softirq kernel/softirq.c:445 [inline]
+> __irq_exit_rcu+0x114/0x190 kernel/softirq.c:650
+> irq_exit_rcu+0x9/0x20 kernel/softirq.c:662
+> sysvec_apic_timer_interrupt+0x97/0xc0 arch/x86/kernel/apic/apic.c:1106
+> </IRQ>
+> <TASK>
+> asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:645
+> RIP: 0010:write_comp_data+0x3c/0x90 kernel/kcov.c:236
+> Code: 01 00 00 49 89 f8 65 48 8b 14 25 c0 bb 03 00 a9 00 01 ff 00 74 0e 85 f6 74 59 8b 82 0c 16 00 00 85 c0 74 4f 8b 82 e8 15 00 00 <83> f8 03 75 44 48 8b 82 f0 15 00 00 8b 92 ec 15 00 00 48 8b 38 48
+> RSP: 0018:ffffc90003a7fbf8 EFLAGS: 00000246
+> RAX: 0000000000000000 RBX: ffffc90003a7b020 RCX: ffffffff814d76d1
+> RDX: ffff8880792f8000 RSI: 0000000000000000 RDI: 0000000000000007
+> RBP: ffff8880792f8000 R08: 0000000000000007 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000094001 R12: 0000000000000000
+> R13: ffffc90003a78000 R14: dffffc0000000000 R15: ffff8880792f85f8
+> stack_not_used include/linux/sched/task_stack.h:107 [inline]
+> check_stack_usage kernel/exit.c:776 [inline]
+> do_exit+0x17f1/0x29b0 kernel/exit.c:918
+> do_group_exit+0xd4/0x2a0 kernel/exit.c:1024
+> get_signal+0x2318/0x25b0 kernel/signal.c:2876
+> arch_do_signal_or_restart+0x79/0x5c0 arch/x86/kernel/signal.c:306
+> exit_to_user_mode_loop kernel/entry/common.c:168 [inline]
+> exit_to_user_mode_prepare+0x11f/0x240 kernel/entry/common.c:204
+> __syscall_exit_to_user_mode_work kernel/entry/common.c:286 [inline]
+> syscall_exit_to_user_mode+0x1d/0x50 kernel/entry/common.c:297
+> do_syscall_64+0x46/0xb0 arch/x86/entry/common.c:86
+> entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> RIP: 0033:0x7f579b4a1d39
+> Code: Unable to access opcode bytes at 0x7f579b4a1d0f.
+> RSP: 002b:00007f579b431308 EFLAGS: 00000246 ORIG_RAX: 00000000000000ca
+> RAX: fffffffffffffe00 RBX: 00007f579b52a4d8 RCX: 00007f579b4a1d39
+> RDX: 0000000000000000 RSI: 0000000000000080 RDI: 00007f579b52a4d8
+> RBP: 00007f579b52a4d0 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 00007f579b4f72c0
+> R13: 00007f579b52a4dc R14: 00007f579b431400 R15: 0000000000022000
+> </TASK>
+> ----------------
+> Code disassembly (best guess):
+> 0: 01 00 add %eax,(%rax)
+> 2: 00 49 89 add %cl,-0x77(%rcx)
+> 5: f8 clc
+> 6: 65 48 8b 14 25 c0 bb mov %gs:0x3bbc0,%rdx
+> d: 03 00
+> f: a9 00 01 ff 00 test $0xff0100,%eax
+> 14: 74 0e je 0x24
+> 16: 85 f6 test %esi,%esi
+> 18: 74 59 je 0x73
+> 1a: 8b 82 0c 16 00 00 mov 0x160c(%rdx),%eax
+> 20: 85 c0 test %eax,%eax
+> 22: 74 4f je 0x73
+> 24: 8b 82 e8 15 00 00 mov 0x15e8(%rdx),%eax
+> * 2a: 83 f8 03 cmp $0x3,%eax <-- trapping instruction
+> 2d: 75 44 jne 0x73
+> 2f: 48 8b 82 f0 15 00 00 mov 0x15f0(%rdx),%rax
+> 36: 8b 92 ec 15 00 00 mov 0x15ec(%rdx),%edx
+> 3c: 48 8b 38 mov (%rax),%rdi
+> 3f: 48 rex.W
+> 
+> 
 > ---
->=20
-> One last patch before Sunday - I would like to get this merged as it
-> touches multiple stmmac platforms before any further are added.
->=20
-> This patch merely renames the "plat_dat->interface" to "->mac_interface"
-> but doesn't change which any code uses.
->=20
-> All code which uses plat->interface (now plat->mac_interface) are
-> determining the interface from the MAC side not the PHY side. These
-> need a code review against the docs to check whether that is correct.
-> Essentially, every .c file touched by this needs a code review. This
-> code review should not affect whether this patch is merged.
->=20
->  .../net/ethernet/stmicro/stmmac/dwmac-imx.c   | 14 ++++++-------
->  .../ethernet/stmicro/stmmac/dwmac-ingenic.c   | 20 +++++++++----------
->  .../ethernet/stmicro/stmmac/dwmac-loongson.c  |  2 +-
->  .../ethernet/stmicro/stmmac/dwmac-lpc18xx.c   |  4 ++--
->  .../ethernet/stmicro/stmmac/dwmac-mediatek.c  |  2 +-
->  .../ethernet/stmicro/stmmac/dwmac-socfpga.c   |  2 +-
->  .../ethernet/stmicro/stmmac/dwmac-starfive.c  |  4 ++--
->  .../net/ethernet/stmicro/stmmac/dwmac-stm32.c |  8 ++++----
->  .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |  6 +++---
->  .../net/ethernet/stmicro/stmmac/stmmac_main.c |  6 ++++--
->  .../ethernet/stmicro/stmmac/stmmac_platform.c |  6 +++---
->  include/linux/stmmac.h                        | 15 +++++++++++++-
->  12 files changed, 52 insertions(+), 37 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-> b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c index
-> 535856fffaea..df34e34cc14f 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-> @@ -70,7 +70,7 @@ static int imx8mp_set_intf_mode(struct
-> plat_stmmacenet_data *plat_dat) struct imx_priv_data *dwmac =3D
-> plat_dat->bsp_priv;
->  	int val;
->=20
-> -	switch (plat_dat->interface) {
-> +	switch (plat_dat->mac_interface) {
->  	case PHY_INTERFACE_MODE_MII:
->  		val =3D GPR_ENET_QOS_INTF_SEL_MII;
->  		break;
-> @@ -87,7 +87,7 @@ static int imx8mp_set_intf_mode(struct
-> plat_stmmacenet_data *plat_dat) break;
->  	default:
->  		pr_debug("imx dwmac doesn't support %d interface\n",
-> -			 plat_dat->interface);
-> +			 plat_dat->mac_interface);
->  		return -EINVAL;
->  	}
->=20
-> @@ -110,7 +110,7 @@ static int imx93_set_intf_mode(struct
-> plat_stmmacenet_data *plat_dat) struct imx_priv_data *dwmac =3D
-> plat_dat->bsp_priv;
->  	int val;
->=20
-> -	switch (plat_dat->interface) {
-> +	switch (plat_dat->mac_interface) {
->  	case PHY_INTERFACE_MODE_MII:
->  		val =3D MX93_GPR_ENET_QOS_INTF_SEL_MII;
->  		break;
-> @@ -125,7 +125,7 @@ static int imx93_set_intf_mode(struct
-> plat_stmmacenet_data *plat_dat) break;
->  	default:
->  		dev_dbg(dwmac->dev, "imx dwmac doesn't support %d=20
-interface\n",
-> -			 plat_dat->interface);
-> +			 plat_dat->mac_interface);
->  		return -EINVAL;
->  	}
->=20
-> @@ -192,8 +192,8 @@ static void imx_dwmac_fix_speed(void *priv, unsigned =
-int
-> speed, unsigned int mod plat_dat =3D dwmac->plat_dat;
->=20
->  	if (dwmac->ops->mac_rgmii_txclk_auto_adj ||
-> -	    (plat_dat->interface =3D=3D PHY_INTERFACE_MODE_RMII) ||
-> -	    (plat_dat->interface =3D=3D PHY_INTERFACE_MODE_MII))
-> +	    (plat_dat->mac_interface =3D=3D PHY_INTERFACE_MODE_RMII) ||
-> +	    (plat_dat->mac_interface =3D=3D PHY_INTERFACE_MODE_MII))
->  		return;
->=20
->  	switch (speed) {
-> @@ -260,7 +260,7 @@ static int imx_dwmac_mx93_reset(void *priv, void __io=
-mem
-> *ioaddr) value |=3D DMA_BUS_MODE_SFT_RESET;
->  	writel(value, ioaddr + DMA_BUS_MODE);
->=20
-> -	if (plat_dat->interface =3D=3D PHY_INTERFACE_MODE_RMII) {
-> +	if (plat_dat->mac_interface =3D=3D PHY_INTERFACE_MODE_RMII) {
->  		usleep_range(100, 200);
->  		writel(RMII_RESET_SPEED, ioaddr + MAC_CTRL_REG);
->  	}
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
-> b/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c index
-> e22ef0d6bc73..0a20c3d24722 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
-> @@ -89,7 +89,7 @@ static int jz4775_mac_set_mode(struct plat_stmmacenet_d=
-ata
-> *plat_dat) struct ingenic_mac *mac =3D plat_dat->bsp_priv;
->  	unsigned int val;
->=20
-> -	switch (plat_dat->interface) {
-> +	switch (plat_dat->mac_interface) {
->  	case PHY_INTERFACE_MODE_MII:
->  		val =3D FIELD_PREP(MACPHYC_TXCLK_SEL_MASK,=20
-MACPHYC_TXCLK_SEL_INPUT) |
->  			  FIELD_PREP(MACPHYC_PHY_INFT_MASK,=20
-MACPHYC_PHY_INFT_MII);
-> @@ -118,7 +118,7 @@ static int jz4775_mac_set_mode(struct
-> plat_stmmacenet_data *plat_dat) break;
->=20
->  	default:
-> -		dev_err(mac->dev, "Unsupported interface %d", plat_dat-
->interface);
-> +		dev_err(mac->dev, "Unsupported interface %d", plat_dat-
->mac_interface);
->  		return -EINVAL;
->  	}
->=20
-> @@ -130,13 +130,13 @@ static int x1000_mac_set_mode(struct
-> plat_stmmacenet_data *plat_dat) {
->  	struct ingenic_mac *mac =3D plat_dat->bsp_priv;
->=20
-> -	switch (plat_dat->interface) {
-> +	switch (plat_dat->mac_interface) {
->  	case PHY_INTERFACE_MODE_RMII:
->  		dev_dbg(mac->dev, "MAC PHY Control Register:=20
-PHY_INTERFACE_MODE_RMII\n");
-> break;
->=20
->  	default:
-> -		dev_err(mac->dev, "Unsupported interface %d", plat_dat-
->interface);
-> +		dev_err(mac->dev, "Unsupported interface %d", plat_dat-
->mac_interface);
->  		return -EINVAL;
->  	}
->=20
-> @@ -149,14 +149,14 @@ static int x1600_mac_set_mode(struct
-> plat_stmmacenet_data *plat_dat) struct ingenic_mac *mac =3D
-> plat_dat->bsp_priv;
->  	unsigned int val;
->=20
-> -	switch (plat_dat->interface) {
-> +	switch (plat_dat->mac_interface) {
->  	case PHY_INTERFACE_MODE_RMII:
->  		val =3D FIELD_PREP(MACPHYC_PHY_INFT_MASK,=20
-MACPHYC_PHY_INFT_RMII);
->  		dev_dbg(mac->dev, "MAC PHY Control Register:=20
-PHY_INTERFACE_MODE_RMII\n");
-> break;
->=20
->  	default:
-> -		dev_err(mac->dev, "Unsupported interface %d", plat_dat-
->interface);
-> +		dev_err(mac->dev, "Unsupported interface %d", plat_dat-
->mac_interface);
->  		return -EINVAL;
->  	}
->=20
-> @@ -169,7 +169,7 @@ static int x1830_mac_set_mode(struct
-> plat_stmmacenet_data *plat_dat) struct ingenic_mac *mac =3D
-> plat_dat->bsp_priv;
->  	unsigned int val;
->=20
-> -	switch (plat_dat->interface) {
-> +	switch (plat_dat->mac_interface) {
->  	case PHY_INTERFACE_MODE_RMII:
->  		val =3D FIELD_PREP(MACPHYC_MODE_SEL_MASK,=20
-MACPHYC_MODE_SEL_RMII) |
->  			  FIELD_PREP(MACPHYC_PHY_INFT_MASK,=20
-MACPHYC_PHY_INFT_RMII);
-> @@ -177,7 +177,7 @@ static int x1830_mac_set_mode(struct
-> plat_stmmacenet_data *plat_dat) break;
->=20
->  	default:
-> -		dev_err(mac->dev, "Unsupported interface %d", plat_dat-
->interface);
-> +		dev_err(mac->dev, "Unsupported interface %d", plat_dat-
->mac_interface);
->  		return -EINVAL;
->  	}
->=20
-> @@ -190,7 +190,7 @@ static int x2000_mac_set_mode(struct
-> plat_stmmacenet_data *plat_dat) struct ingenic_mac *mac =3D
-> plat_dat->bsp_priv;
->  	unsigned int val;
->=20
-> -	switch (plat_dat->interface) {
-> +	switch (plat_dat->mac_interface) {
->  	case PHY_INTERFACE_MODE_RMII:
->  		val =3D FIELD_PREP(MACPHYC_TX_SEL_MASK,=20
-MACPHYC_TX_SEL_ORIGIN) |
->  			  FIELD_PREP(MACPHYC_RX_SEL_MASK,=20
-MACPHYC_RX_SEL_ORIGIN) |
-> @@ -220,7 +220,7 @@ static int x2000_mac_set_mode(struct
-> plat_stmmacenet_data *plat_dat) break;
->=20
->  	default:
-> -		dev_err(mac->dev, "Unsupported interface %d", plat_dat-
->interface);
-> +		dev_err(mac->dev, "Unsupported interface %d", plat_dat-
->mac_interface);
->  		return -EINVAL;
->  	}
->=20
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c index
-> a25c187d3185..2cd6fce5c993 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> @@ -117,7 +117,7 @@ static int loongson_dwmac_probe(struct pci_dev *pdev,
-> const struct pci_device_id }
->=20
->  	plat->phy_interface =3D phy_mode;
-> -	plat->interface =3D PHY_INTERFACE_MODE_GMII;
-> +	plat->mac_interface =3D PHY_INTERFACE_MODE_GMII;
->=20
->  	pci_set_master(pdev);
->=20
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c
-> b/drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c index
-> 18e84ba693a6..d0aa674ce705 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c
-> @@ -50,9 +50,9 @@ static int lpc18xx_dwmac_probe(struct platform_device
-> *pdev) goto err_remove_config_dt;
->  	}
->=20
-> -	if (plat_dat->interface =3D=3D PHY_INTERFACE_MODE_MII) {
-> +	if (plat_dat->mac_interface =3D=3D PHY_INTERFACE_MODE_MII) {
->  		ethmode =3D LPC18XX_CREG_CREG6_ETHMODE_MII;
-> -	} else if (plat_dat->interface =3D=3D PHY_INTERFACE_MODE_RMII) {
-> +	} else if (plat_dat->mac_interface =3D=3D PHY_INTERFACE_MODE_RMII) {
->  		ethmode =3D LPC18XX_CREG_CREG6_ETHMODE_RMII;
->  	} else {
->  		dev_err(&pdev->dev, "Only MII and RMII mode supported\n");
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c
-> b/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c index
-> 7580077383c0..cd796ec04132 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c
-> @@ -587,7 +587,7 @@ static int mediatek_dwmac_common_data(struct
-> platform_device *pdev, {
->  	int i;
->=20
-> -	plat->interface =3D priv_plat->phy_mode;
-> +	plat->mac_interface =3D priv_plat->phy_mode;
->  	if (priv_plat->mac_wol)
->  		plat->flags |=3D STMMAC_FLAG_USE_PHY_WOL;
->  	else
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-> b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c index
-> 7db176e8691f..9bf102bbc6a0 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-> @@ -236,7 +236,7 @@ static int socfpga_get_plat_phymode(struct socfpga_dw=
-mac
-> *dwmac) struct net_device *ndev =3D dev_get_drvdata(dwmac->dev);
->  	struct stmmac_priv *priv =3D netdev_priv(ndev);
->=20
-> -	return priv->plat->interface;
-> +	return priv->plat->mac_interface;
->  }
->=20
->  static void socfpga_sgmii_config(struct socfpga_dwmac *dwmac, bool enabl=
-e)
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
-> b/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c index
-> 892612564694..9289bb87c3e3 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
-> @@ -60,7 +60,7 @@ static int starfive_dwmac_set_mode(struct
-> plat_stmmacenet_data *plat_dat) unsigned int mode;
->  	int err;
->=20
-> -	switch (plat_dat->interface) {
-> +	switch (plat_dat->mac_interface) {
->  	case PHY_INTERFACE_MODE_RMII:
->  		mode =3D STARFIVE_DWMAC_PHY_INFT_RMII;
->  		break;
-> @@ -72,7 +72,7 @@ static int starfive_dwmac_set_mode(struct
-> plat_stmmacenet_data *plat_dat)
->=20
->  	default:
->  		dev_err(dwmac->dev, "unsupported interface %d\n",
-> -			plat_dat->interface);
-> +			plat_dat->mac_interface);
->  		return -EINVAL;
->  	}
->=20
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-> b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c index
-> 3a09085819dc..26ea8c687881 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-> @@ -171,7 +171,7 @@ static int stm32mp1_set_mode(struct plat_stmmacenet_d=
-ata
-> *plat_dat)
->=20
->  	clk_rate =3D clk_get_rate(dwmac->clk_eth_ck);
->  	dwmac->enable_eth_ck =3D false;
-> -	switch (plat_dat->interface) {
-> +	switch (plat_dat->mac_interface) {
->  	case PHY_INTERFACE_MODE_MII:
->  		if (clk_rate =3D=3D ETH_CK_F_25M && dwmac->ext_phyclk)
->  			dwmac->enable_eth_ck =3D true;
-> @@ -210,7 +210,7 @@ static int stm32mp1_set_mode(struct plat_stmmacenet_d=
-ata
-> *plat_dat) break;
->  	default:
->  		pr_debug("SYSCFG init :  Do not manage %d interface\n",
-> -			 plat_dat->interface);
-> +			 plat_dat->mac_interface);
->  		/* Do not manage others interfaces */
->  		return -EINVAL;
->  	}
-> @@ -230,7 +230,7 @@ static int stm32mcu_set_mode(struct plat_stmmacenet_d=
-ata
-> *plat_dat) u32 reg =3D dwmac->mode_reg;
->  	int val;
->=20
-> -	switch (plat_dat->interface) {
-> +	switch (plat_dat->mac_interface) {
->  	case PHY_INTERFACE_MODE_MII:
->  		val =3D SYSCFG_MCU_ETH_SEL_MII;
->  		pr_debug("SYSCFG init : PHY_INTERFACE_MODE_MII\n");
-> @@ -241,7 +241,7 @@ static int stm32mcu_set_mode(struct plat_stmmacenet_d=
-ata
-> *plat_dat) break;
->  	default:
->  		pr_debug("SYSCFG init :  Do not manage %d interface\n",
-> -			 plat_dat->interface);
-> +			 plat_dat->mac_interface);
->  		/* Do not manage others interfaces */
->  		return -EINVAL;
->  	}
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-> b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c index
-> c23420863a8d..01e77368eef1 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-> @@ -1016,7 +1016,7 @@ static int sun8i_dwmac_set_syscon(struct device *de=
-v,
->  	if (gmac->variant->support_rmii)
->  		reg &=3D ~SYSCON_RMII_EN;
->=20
-> -	switch (plat->interface) {
-> +	switch (plat->mac_interface) {
->  	case PHY_INTERFACE_MODE_MII:
->  		/* default */
->  		break;
-> @@ -1031,7 +1031,7 @@ static int sun8i_dwmac_set_syscon(struct device *de=
-v,
->  		break;
->  	default:
->  		dev_err(dev, "Unsupported interface mode: %s",
-> -			phy_modes(plat->interface));
-> +			phy_modes(plat->mac_interface));
->  		return -EINVAL;
->  	}
->=20
-> @@ -1231,7 +1231,7 @@ static int sun8i_dwmac_probe(struct platform_device
-> *pdev) /* platform data specifying hardware features and callbacks.
->  	 * hardware features were copied from Allwinner drivers.
->  	 */
-> -	plat_dat->interface =3D interface;
-> +	plat_dat->mac_interface =3D interface;
->  	plat_dat->rx_coe =3D STMMAC_RX_COE_TYPE2;
->  	plat_dat->tx_coe =3D 1;
->  	plat_dat->flags |=3D STMMAC_FLAG_HAS_SUN8I;
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c index
-> e52ae165c968..c92bab6e2341 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -1119,7 +1119,7 @@ static const struct phylink_mac_ops
-> stmmac_phylink_mac_ops =3D { */
->  static void stmmac_check_pcs_mode(struct stmmac_priv *priv)
->  {
-> -	int interface =3D priv->plat->interface;
-> +	int interface =3D priv->plat->mac_interface;
->=20
->  	if (priv->dma_cap.pcs) {
->  		if ((interface =3D=3D PHY_INTERFACE_MODE_RGMII) ||
-> @@ -1214,7 +1214,9 @@ static int stmmac_phy_setup(struct stmmac_priv *pri=
-v)
->  		priv->phylink_config.ovr_an_inband =3D
->  			mdio_bus_data->xpcs_an_inband;
->=20
-> -	/* Set the platform/firmware specified interface mode */
-> +	/* Set the platform/firmware specified interface mode. Note, phylink
-> +	 * deals with the PHY interface mode, not the MAC interface mode.
-> +	 */
->  	__set_bit(mode, priv->phylink_config.supported_interfaces);
->=20
->  	/* If we have an xpcs, it defines which PHY interfaces are=20
-supported. */
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c index
-> ff330423ee66..35f4b1484029 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> @@ -419,9 +419,9 @@ stmmac_probe_config_dt(struct platform_device *pdev, =
-u8
-> *mac) return ERR_PTR(phy_mode);
->=20
->  	plat->phy_interface =3D phy_mode;
-> -	plat->interface =3D stmmac_of_get_mac_mode(np);
-> -	if (plat->interface < 0)
-> -		plat->interface =3D plat->phy_interface;
-> +	plat->mac_interface =3D stmmac_of_get_mac_mode(np);
-> +	if (plat->mac_interface < 0)
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+> 
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+> 
+> If the bug is already fixed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
+> 
+> If you want syzbot to run the reproducer, reply with:
+> #syz test: git://repo/address.git branch-or-commit-hash
+> If you attach or paste a git patch, syzbot will apply it before testing.
+> 
+> If you want to change bug's subsystems, reply with:
+> #syz set subsystems: new-subsystem
+> (See the list of subsystem names on the web dashboard)
+> 
+> If the bug is a duplicate of another bug, reply with:
+> #syz dup: exact-subject-of-another-report
+> 
+> If you want to undo deduplication, reply with:
+> #syz undup
+> 
 
-This check is never true as mac_interface is now an unsigned enum=20
-(phy_interface_t). Thus mac_interface is not set to phy_interface resulting=
- in=20
-an invalid mac_interface. My platform (arch/arm64/boot/dts/freescale/imx8mp-
-tqma8mpql-mba8mpxl.dts) fails to probe now.
-
-Best regards,
-Alexander
-
-> +		plat->mac_interface =3D plat->phy_interface;
->=20
->  	/* Some wrapper drivers still rely on phy_node. Let's save it while
->  	 * they are not converted to phylink. */
-> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-> index b2ccd827bb80..ce89cc3e4913 100644
-> --- a/include/linux/stmmac.h
-> +++ b/include/linux/stmmac.h
-> @@ -223,7 +223,20 @@ struct dwmac4_addrs {
->  struct plat_stmmacenet_data {
->  	int bus_id;
->  	int phy_addr;
-> -	int interface;
-> +	/* MAC ----- optional PCS ----- SerDes ----- optional PHY -----=20
-Media
-> +	 *       ^                               ^
-> +	 * mac_interface                   phy_interface
-> +	 *
-> +	 * mac_interface is the MAC-side interface, which may be the same
-> +	 * as phy_interface if there is no intervening PCS. If there is a
-> +	 * PCS, then mac_interface describes the interface mode between the
-> +	 * MAC and PCS, and phy_interface describes the interface mode
-> +	 * between the PCS and PHY.
-> +	 */
-> +	phy_interface_t mac_interface;
-> +	/* phy_interface is the PHY-side interface - the interface used by
-> +	 * an attached PHY.
-> +	 */
->  	phy_interface_t phy_interface;
->  	struct stmmac_mdio_bus_data *mdio_bus_data;
->  	struct device_node *phy_node;
-
-
-=2D-=20
-TQ-Systems GmbH | M=FChlstra=DFe 2, Gut Delling | 82229 Seefeld, Germany
-Amtsgericht M=FCnchen, HRB 105018
-Gesch=E4ftsf=FChrer: Detlef Schneider, R=FCdiger Stahl, Stefan Schneider
-http://www.tq-group.com/
-
-
+-- 
+BR,
+Muhammad Usama Anjum
 
