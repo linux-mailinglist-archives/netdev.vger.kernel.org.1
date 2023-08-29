@@ -1,128 +1,179 @@
-Return-Path: <netdev+bounces-31311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CF2D78CF51
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 00:00:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7540978CF60
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 00:05:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D84E1C20A65
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 22:00:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5EFE1C20A6B
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 22:05:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1F78182CC;
-	Tue, 29 Aug 2023 22:00:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 304E2182CE;
+	Tue, 29 Aug 2023 22:05:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0E0818004
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 22:00:52 +0000 (UTC)
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBF59185;
-	Tue, 29 Aug 2023 15:00:51 -0700 (PDT)
-Received: by mail-pg1-x52f.google.com with SMTP id 41be03b00d2f7-564b8e60ce9so2492941a12.2;
-        Tue, 29 Aug 2023 15:00:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693346451; x=1693951251; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7AbmmeaYNSK+xFuTeyE4JSZ3qAAot8leOcqkK7mLOP4=;
-        b=Lf9lkMguOJXNlNXHeJY7P6X50Kbce+DmFwWwM0IcGsOKE4sKhi3S/eWi/DIJGuk4Gi
-         sBi2Fa80CtSEVaAEFIcfiC+oL46MijY8bUysJuwCtbtlRGKYuApTt+IIQiA2XjKLdIm7
-         BMsP5j2LEt6ALe4TE8Z+U6+PfTgq5mxfC9ygh0ADfhpJ57RViU7Dt6Sd/b59Vkz8XUvV
-         XTbIDUqY0WAdXVftQbVmXObrg6el5IFZgu49V0GbxhoViITw5UigVrbrI91WA8yXKMn0
-         9XoUf/Op+ulNCnTJtHZfbF/PvI4IMacWjAjr12GLqTRoQzVOOu3FztxQKvVL8RMUxhW0
-         Wdlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693346451; x=1693951251;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7AbmmeaYNSK+xFuTeyE4JSZ3qAAot8leOcqkK7mLOP4=;
-        b=lCWF7QoeNkdtdU7xRO/olQPF14ymlAu8vaWXaVotasxYu6K67riXXQhYbfcEf1D6hX
-         WGVxrT69pRNI6APOAFUcJQF5X8I4jZg766d5hKj1om1PCiIJrUw6dW8VdoQbMGJohNGQ
-         jARCxxA0hd45uSBnW1hU+gTZKoyuRnZhVnbNGdpjf0J9yqHFNMuIYMW0ECvyJ4xRfdOE
-         but7+Bg+wdGooz+13eL/1G64e9lN+EnKY4LfJnK7aBNW+vVf0yEPH+2PNr32I6Hk9uAf
-         95DMLeDBQDGVglXhC0HuXfrESskFFeSpPvzDb87ShoaKsWDT2biG8W8yI6fgYJDZn0oF
-         cJCg==
-X-Gm-Message-State: AOJu0Yz54ZHyCfjICOz9QBQCukuur7OxgIwjFrYI/sKtQrAJqtBwEYU7
-	tM1VO+EsBCci8rQehKKZYk0=
-X-Google-Smtp-Source: AGHT+IH8QCwNZ3CYO9kZlCcZAA/jbZZ6Rff9v9fSRJEhU61IgCz0RBRhELjO4xJmijLtwY4RPBmAyA==
-X-Received: by 2002:a05:6a20:970a:b0:137:7198:af9b with SMTP id hr10-20020a056a20970a00b001377198af9bmr452096pzc.56.1693346451066;
-        Tue, 29 Aug 2023 15:00:51 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id t16-20020a639550000000b0056f8b44058csm9344965pgn.12.2023.08.29.15.00.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Aug 2023 15:00:50 -0700 (PDT)
-Message-ID: <8ea50868-8854-1b4a-b43d-253279fabdd4@gmail.com>
-Date: Tue, 29 Aug 2023 15:00:34 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A55FE14AAF
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 22:05:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22F49C433C8;
+	Tue, 29 Aug 2023 22:05:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1693346740;
+	bh=ojaStiMswxHngruqtAyEP4JLMV2P2VbdaI9qxzixeKA=;
+	h=Date:From:To:Cc:Subject:From;
+	b=bp94ihDJaTYMJTUzL1Dnw8s1/Y8v4bVWcLo+Ws4Sq53ix/xkqK8/1J4VzX2o0WBNC
+	 npGjYRa28MYtrbKEYL3cYYlY/9sEJB80EQeGVeMJLwuOxbu12ISiJPRVUUgss6/A8b
+	 wGpRwRdDJNliBUdToFBtqDGuQzxHPQiSSQ/c23qjPNBsuYBD2dwRlBdQYjPKKgwTNa
+	 KSImKWjsNBydiPanayxWS6VdgZzP8YLcetiEDqWU9axnvHUyUth7AQN9e/ISDadk5x
+	 CcVEkMpwf+M/Qqt9YOpRCBCvWUJOlcrNXjzrBpf2kf5UlAfkUp8MnSJnWt08VT+SUk
+	 9yNiP55KOri5A==
+Date: Tue, 29 Aug 2023 15:05:39 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: netdev@vger.kernel.org
+Cc: netdev-driver-reviewers@vger.kernel.org
+Subject: [ANN] netdev development stats for 6.6
+Message-ID: <20230829150539.6f998d1f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH 2/2] net: dsa: microchip: Provide Module 4 KSZ9477 errata
- (DS80000754C)
-Content-Language: en-US
-To: Tristram.Ha@microchip.com, olteanv@gmail.com
-Cc: andrew@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, Woojung.Huh@microchip.com, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- UNGLinuxDriver@microchip.com, lukma@denx.de
-References: <20230824154827.166274-1-lukma@denx.de>
- <20230824154827.166274-2-lukma@denx.de>
- <BYAPR11MB35583A648E4E44944A0172A0ECE3A@BYAPR11MB3558.namprd11.prod.outlook.com>
- <20230825103911.682b3d70@wsk>
- <862e5225-2d8e-8b8f-fc6d-c9b48ac74bfc@gmail.com>
- <BYAPR11MB3558A24A05D30BA93408851EECE3A@BYAPR11MB3558.namprd11.prod.outlook.com>
- <20230826104910.voaw3ndvs52yoy2v@skbuf>
- <BYAPR11MB3558EFBB4DBC86AC3C338747ECE7A@BYAPR11MB3558.namprd11.prod.outlook.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <BYAPR11MB3558EFBB4DBC86AC3C338747ECE7A@BYAPR11MB3558.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On 8/29/23 14:57, Tristram.Ha@microchip.com wrote:
->> On Fri, Aug 25, 2023 at 06:48:41PM +0000, Tristram.Ha@microchip.com wrote:
->>>>> IMHO adding functions to MMD modification would facilitate further
->>>>> development (for example LED setup).
->>>>
->>>> We already have some KSZ9477 specific initialization done in the Micrel
->>>> PHY driver under drivers/net/phy/micrel.c, can we converge on the PHY
->>>> driver which has a reasonable amount of infrastructure for dealing with
->>>> workarounds, indirect or direct MMD accesses etc.?
->>>
->>> Actually the internal PHY used in the KSZ9897/KSZ9477/KSZ9893 switches
->>> are special and only used inside those switches.  Putting all the switch
->>> related code in Micrel PHY driver does not really help.  When the switch
->>> is reset all those PHY registers need to be set again, but the PHY driver
->>> only executes those code during PHY initialization.  I do not know if
->>> there is a good way to tell the PHY to re-initialize again.
->>
->> Suppose there was a method to tell the PHY driver to re-initialize itself.
->> What would be the key points in which the DSA switch driver would need
->> to trigger that method? Where is the switch reset at runtime?
-> 
-> Currently the DSA switch driver loads independently and is then
-> controlled by the main DSA driver.  The switch is reset during
-> initialization, and later the PHYs are initialized.  I was talking
-> hypothetically that the switch may need to be reset to correct some
-> hardware problems, but then there may be no good way to tell the PHYs to
-> re-initialize.
+Hi!
 
-There is phy_init_hw() which will do just that.
--- 
-Florian
+General stats
+-------------
 
+The cycle started on June 27th and ended on August 28th, it was exactly
+the same length as the previous release cycle.
+
+We have seen total of 16834 messages on the list (272 / day) which is
+10% higher than last time (but very similar to the 6.4 cycle). The
+number of commits directly applied by netdev maintainers increased
+by 20% to 22 commits a day breaking the 3 release long streak of 18 / day.
+The increases seem a little surprising to me, TBH, after all this
+release covered a lot of the vacation season.
+
+The number of participants in the ML discussions continues to oscillate
+around 770 individuals. 
+
+The patch review rate (Review/Ack tags) has recovered back to the 6.4
+level and is respectively at 66% and 58%. Hopefully the 6.5 dip was
+temporary.
+
+Rankings
+--------
+
+Top reviewers (thr):                 Top reviewers (msg):                
+   1 (   ) [44] Simon Horman            1 (   ) [59] Simon Horman        
+   2 (   ) [33] Jakub Kicinski          2 (   ) [56] Jakub Kicinski      
+   3 (   ) [13] Andrew Lunn             3 (   ) [30] Andrew Lunn         
+   4 ( +9) [11] Leon Romanovsky         4 ( +9) [21] Leon Romanovsky     
+   5 ( -1) [ 8] Paolo Abeni             5 (   ) [13] Russell King        
+   6 ( -1) [ 6] Eric Dumazet            6 ( +5) [11] David Ahern         
+   7 ( +4) [ 6] David Ahern             7 (+33) [10] Jesper Dangaard Brouer
+   8 ( +6) [ 6] Ido Schimmel            8 ( +1) [10] Paolo Abeni         
+   9 ( -3) [ 6] Russell King            9 ( -5) [ 9] Eric Dumazet        
+  10 ( +5) [ 5] Willem de Bruijn       10 ( +9) [ 9] Ido Schimmel        
+  11 (+41) [ 5] Jesper Dangaard Brouer 11 ( +5) [ 8] Willem de Bruijn    
+  12 (+24) [ 4] Alexander Lobakin      12 ( -2) [ 8] Michael S. Tsirkin  
+
+The top reviewer ranking is stable enough, with Simon topping the list
+(as well as the kernel-wide reviewer list, congrats!).
+Ido returns to the top 12 by actively reviewing core routing as well as
+some "protocol driver" code. Jesper jumps into top 12 registering the
+highest move from his work reviewing the page pool code. Leon returns
+to #4 after a less active 6.5 cycle.
+
+Top authors (thr):                   Top authors (msg):                  
+   1 (***) [8] Yue Haibing              1 ( +2) [24] Tony Nguyen         
+   2 ( -1) [7] Jakub Kicinski           2 (   ) [19] Saeed Mahameed      
+   3 ( -1) [5] Eric Dumazet             3 ( +2) [17] Jakub Kicinski      
+   4 ( -1) [5] Tony Nguyen              4 (+21) [17] Eric Dumazet        
+   5 (***) [4] Jinjie Ruan              5 (***) [16] Qi Zheng            
+   6 (***) [3] Suman Ghosh              6 (+25) [14] Jiri Pirko          
+   7 ( -1) [3] Kuniyuki Iwashima        7 (***) [13] Hannes Reinecke     
+   8 ( +2) [3] Daniel Golle             8 (+18) [11] Vladimir Oltean     
+   9 ( +6) [3] Lin Ma                   9 (+15) [11] Dmitry Safonov      
+  10 (***) [3] Hangbin Liu             10 (+31) [10] Larysa Zaremba      
+
+Yue Haibing tops the raking of most threads started with the work 
+of removing unused declarations from the kernel. 
+Jinjie Ruan authored patches removing of_match_ptr() annotations
+and "fixing" minor issues with error handling.
+
+Qi Zheng posted the huge "refcount+RCU method to implement lockless
+slab shrink" series a few times, not really related to netdev.
+Hannes Reinecke worked on TLS and TLS + NVMe integration.
+
+Company rankings
+----------------
+
+Top reviewers (thr):                 Top reviewers (msg):                
+   1 (   ) [44] Corigine                1 ( +1) [66] Meta                
+   2 (   ) [37] Meta                    2 ( -1) [59] Corigine            
+   3 (   ) [23] RedHat                  3 (   ) [51] RedHat              
+   4 ( +3) [23] nVidia                  4 ( +2) [46] nVidia              
+   5 ( -1) [17] Intel                   5 ( -1) [32] Intel               
+   6 (   ) [14] Google                  6 ( -1) [30] Andrew Lunn         
+   7 ( -2) [13] Andrew Lunn             7 (   ) [29] Google              
+
+The company ranking is pretty stable, with only notable movement being
+nVidia's return to #4.
+
+Top authors (thr):                   Top authors (msg):                  
+   1 ( +5) [25] Huawei                  1 (   ) [86] Intel               
+   2 ( -1) [19] Intel                   2 ( +1) [70] nVidia              
+   3 ( -1) [17] RedHat                  3 ( -1) [52] RedHat              
+   4 (   ) [12] Meta                    4 ( +6) [44] Huawei              
+   5 ( -2) [11] nVidia                  5 (   ) [38] Meta                
+   6 ( -1) [10] Google                  6 ( +7) [32] Google              
+   7 ( +5) [ 9] Marvell                 7 ( +1) [25] AMD                 
+
+Development vs reviewing scores
+-------------------------------
+
+Top scores (positive):               Bottom scores (negative):              
+   1 (   ) [542] Corigine               1 (+31) [136] Huawei             
+   2 (   ) [346] Meta                   2 (   ) [106] Intel              
+   3 (   ) [188] Andrew Lunn            3 ( +7) [ 82] Bytedance          
+   4 ( +1) [124] RedHat                 4 ( +4) [ 76] AMD                
+   5 ( +1) [ 87] Linaro                 5 (***) [ 70] SUSE               
+   6 ( +1) [ 82] Enfabrica              6 ( +7) [ 57] Marvell            
+   7 ( -3) [ 67] Google          
+   8 ( +2) [ 58] Linux Foundation  
+   9 (+12) [ 56] Broadcom             
+  10 ( +4) [ 52] ARM            
+  11 (***) [ 45] Microchip      
+  12 ( +3) [ 41] nVidia          
+
+The semi-automated changes from Huawei have returned after a few
+releases of relative calm, putting the company firmly as #1 negative
+contributor from the reviewing perspective. This saves Intel from going
+to #1, but note that in absolute terms the "negative" side of the
+ranking got a lot worse. Previously first three positions had scores
+of 55, 42 and 40, so they would *not even make the top 6* now!
+SUSE is likely a temporary blip due to work from Hannes, but the other
+companies on the list should take a hard look at themselves.
+
+Not much movement on the "good" side. With the exception of nVidia,
+the changes there seem to be mostly by posting volume not increase 
+in reviews.
+
+Thanks to everyone who contributed code to networking trees in this
+release cycle, and huge thanks to everyone reviewing!
+
+--
+
+No major changes to the stats generation process in this release, 
+I focused on minor improvements to parsing and matching people 
+to companies.
+
+Code: https://github.com/kuba-moo/ml-stat
 
