@@ -1,35 +1,50 @@
-Return-Path: <netdev+bounces-31298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D71278CB69
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 19:38:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C9BA978CBAC
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 20:04:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E8CF1C20978
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 17:38:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B27131C209E8
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 18:04:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3FEC18005;
-	Tue, 29 Aug 2023 17:38:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9A3418010;
+	Tue, 29 Aug 2023 18:04:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D313B17FE6
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 17:38:22 +0000 (UTC)
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07D8CC9
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 10:38:20 -0700 (PDT)
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.96)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1qb2fO-0007vm-0O;
-	Tue, 29 Aug 2023 17:38:15 +0000
-Date: Tue, 29 Aug 2023 18:37:07 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDD7A17751
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 18:04:22 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B3B311B
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 11:04:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=wt0UnUry4s4o90X62ska/PMsqYR2EM6/9OuKNIxueCs=; b=yTpYR5xeVghn5gSN99htQZvmVO
+	qHwxKYRILOePK6heTLD79vjVHZEaNgC+/Gm/qRu2X4pHrGtM92zWVzcuFAsxH6m5C1wech30FVXQW
+	qKDxXaBFa5zeauHVcgQGTYqTZKEODgiA2UftJuagDeBhgrn3Jt3QCVrWrys5DvCD8Ri8g+99STkyl
+	eoxwktQOIxzuW9r3aMV4uClRJakFEdTY73iCM6rordM1IJEEBuzQpwojkNo2rAWhlD+I/f4nknLms
+	YS5G+5Z/K9H960jW54borRvtudOkc3s/5NYNYOxHHoYFqEtad7og36YmzuxD5slwWZJo/F/3G8fdz
+	cd7hNJew==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57786)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qb34Z-0000pD-20;
+	Tue, 29 Aug 2023 19:04:15 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qb34X-0004qr-4Z; Tue, 29 Aug 2023 19:04:13 +0100
+Date: Tue, 29 Aug 2023 19:04:13 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Daniel Golle <daniel@makrotopia.org>
 Cc: =?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
 	netdev@vger.kernel.org, simonebortolin@hack-gpon.org,
 	nanomad@hack-gpon.org, Federico Cappon <dududede371@gmail.com>,
@@ -39,122 +54,35 @@ Cc: =?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
 	pabeni@redhat.com, nbd@nbd.name
 Subject: Re: [RFC] RJ45 to SFP auto-sensing and switching in mux-ed
  single-mac devices (XOR RJ/SFP)
-Message-ID: <ZO4sw2gOQjn1GXDg@makrotopia.org>
+Message-ID: <ZO4zHdeeMFGqCx3d@shell.armlinux.org.uk>
 References: <CAC8rN+AQUKH1pUHe=bZh+bw-Wxznx+Lvom9iTruGQktGb=FFyw@mail.gmail.com>
  <ZO4RAtaoNX6d66mb@shell.armlinux.org.uk>
+ <ZO4sw2gOQjn1GXDg@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZO4RAtaoNX6d66mb@shell.armlinux.org.uk>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <ZO4sw2gOQjn1GXDg@makrotopia.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
+	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Aug 29, 2023 at 04:38:42PM +0100, Russell King (Oracle) wrote:
-> On Tue, Aug 29, 2023 at 05:12:48PM +0200, Nicolò Veronese wrote:
-> > Hi,
-> > 
-> > I and some folks in CC are working to properly port all the
-> >  functions of a Zyxel ex5601-t0 to OpenWrt.
-> > 
-> > The manufacturer decided to use a single SerDes connected
-> >  to both an SPF cage and an RJ45 phy. A simple GPIO is
-> >  used to control a 2 Channel 2:1 MUX to switch the two SGMII pairs
-> >  between the RJ45 and the SFP.
-> > 
-> >   ┌─────┐  ┌──────┐   ┌─────────┐
-> >   │     │  │      │   │         │
-> >   │     │  │      ├───┤ SFP     │
-> >   │     │  │      │   └─────────┘
-> >   │     │  │      │
-> >   │ MAC ├──┤ MUX  │   ┌─────────┐
-> >   │     │  │      │   │         │
-> >   │     │  │      │   │ RJ45    │
-> >   │     │  │      ├───┤ 2.5G PHY│
-> >   │     │  │      │   │         │
-> >   └─────┘  └───▲──┘   └─────────┘
-> >                │
-> >   MUX-GPIO ────┘
+On Tue, Aug 29, 2023 at 06:37:07PM +0100, Daniel Golle wrote:
+> Another thing which came to my mind is the existing port field in
+> many ethtool ops which could be either PORT_TP or PORT_FIBRE to
+> destinguish the TP PHY from the SFP at least for xLINKSETTINGS.
 
-Note that most recent MediaTek SoCs have a similar setup built-into the
-SoC itself: One MAC can either be internally connected to a built-in
-2.5G TP PHY or used with an external PHY or SFP via SerDes ie.
-USXGMII/10GBase-R/5GBase-R/2500Base-X/1000Base-X/SGMII **which doesn't
-share any pins with the TP PHY**. Hence board manufactorers are likely
-to build devices exposing that MAC in both ways, as SFP cage and 2.5G
-PHY, because the 2.5G PHY basically comes "for free".
+However, PORT_TP also gets used for RJ45 SFPs, so that doesn't
+distinguish between a built-in PHY and a SFP PHY.
 
-In this case switching the MAC between the two is done using a mux bit
-in ETHSYS syscon. However, one should also take care of powering on
-and off the 2.5G PHY and maintain the trapdoor in the MDIO bus
-allowing the access either built-in PHY or an external PHY at the same
-address, so it's a bit more complicated than just a single bit.
-
-> 
-> This is do-able in software, but is far from a good idea.
-> 
-> Yes, it would be possible to "disconnect" the RJ45 PHY from the netdev,
-> and switch to the SFP and back again. It would be relatively easy for
-> phylink to do that. What phylink would need to do is to keep track of
-> the SFP PHY and netdev-native PHY independently, and multiplex between
-> the two. It would also have to manage the netdev->phydev pointer.
-> Any changes to this must be done under the rtnl lock.
-> 
-> So technically it's possible. However, there is no notification to
-> userspace when such a change may occur. There's also the issue that
-> userspace may be in the process of issuing ethtool commands that are
-> affecting one of the PHYs. While holding the rtnl lock will block
-> those calls, a change between the PHY and e.g. a PHY on the SFP
-> would cause the ethtool command to target a different PHY from what
-> was the original target.
-
-I can see that the lack of such notification is already an issue even
-without the change described above. I've actually struggled with that
-just a few days ago:
-Some of the SFP+ modules I use for testing expose the built-in
-marvell10g PHY via I2C using the RollBall protocol. The protocol
-apparently requires a long waiting time between power-on and being
-able to access the PHY (something like 25 seconds). So any ethtool
-command issued after boot and before the 25 seconds have passed will
-have no effect as of today, because the PHY is only being attached
-after that. And this is not only a problem when hot-plugging the
-module, obviously, but also when having it plugged in already
-during boot.
-
-So having userspace notification "some about the PHY has changed"
-would already be nice to have, because that'd would an easy way
-OpenWrt's netifd could know that it has to re-read supported
-capabilities and re-apply ethtool link settings.
-
-> 
-> To solve that sanely, every PHY-based ethtool probably needs a way
-> to specify which PHY the command is intended for, but then there's
-> the question of how userspace users react to that - because it's
-> likely more than just modifying the ethtool utility, ethtool
-> commands are probably used from many programs.
-
-Maybe just a cookie to make sure "sessions" of ethtool calls are
-not broken by a changed from PHY to SFP or vice versa?
-Ie. GLINKSETTINGS will should give you a cookie to be used with
-SLINKSETTINGS and so one. The cookie may not identify the PHY, but
-rather just the previous call to GLINKSETTINGS.
-
-And this could even be optional from perspective of userspace.
-
-> 
-> IMHO, it needs a bit of thought beyond "what can we do to support a
-> mux".
-> 
-
-Another thing which came to my mind is the existing port field in
-many ethtool ops which could be either PORT_TP or PORT_FIBRE to
-destinguish the TP PHY from the SFP at least for xLINKSETTINGS.
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
