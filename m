@@ -1,124 +1,103 @@
-Return-Path: <netdev+bounces-31225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 106BF78C3B9
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 13:58:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D553578C3ED
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 14:12:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E37231C209EF
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 11:58:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A0E12810E7
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 12:12:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54693156CA;
-	Tue, 29 Aug 2023 11:58:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53311156D2;
+	Tue, 29 Aug 2023 12:12:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 488DF154B6
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 11:58:38 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09AA3199;
-	Tue, 29 Aug 2023 04:58:35 -0700 (PDT)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.53])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RZm9z2XZpzrSQZ;
-	Tue, 29 Aug 2023 19:56:55 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Tue, 29 Aug
- 2023 19:58:33 +0800
-Subject: Re: [PATCH net-next v7 1/6] page_pool: frag API support for 32-bit
- arch with 64-bit DMA
-To: Jakub Kicinski <kuba@kernel.org>, Alexander Duyck
-	<alexander.duyck@gmail.com>
-CC: Ilias Apalodimas <ilias.apalodimas@linaro.org>, Mina Almasry
-	<almasrymina@google.com>, <davem@davemloft.net>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Lorenzo Bianconi
-	<lorenzo@kernel.org>, Liang Chen <liangchen.linux@gmail.com>, Alexander
- Lobakin <aleksander.lobakin@intel.com>, Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Eric Dumazet <edumazet@google.com>, Jesper
- Dangaard Brouer <hawk@kernel.org>
-References: <20230816100113.41034-1-linyunsheng@huawei.com>
- <20230816100113.41034-2-linyunsheng@huawei.com>
- <CAC_iWjJd8Td_uAonvq_89WquX9wpAx0EYYxYMbm3TTxb2+trYg@mail.gmail.com>
- <20230817091554.31bb3600@kernel.org>
- <CAC_iWjJQepZWVrY8BHgGgRVS1V_fTtGe-i=r8X5z465td3TvbA@mail.gmail.com>
- <20230817165744.73d61fb6@kernel.org>
- <CAC_iWjL4YfCOffAZPUun5wggxrqAanjd+8SgmJQN0yyWsvb3sg@mail.gmail.com>
- <20230818145145.4b357c89@kernel.org>
- <1b8e2681-ccd6-81e0-b696-8b6c26e31f26@huawei.com>
- <20230821113543.536b7375@kernel.org>
- <5bd4ba5d-c364-f3f6-bbeb-903d71102ea2@huawei.com>
- <20230822083821.58d5d26c@kernel.org>
- <79a49ccd-b0c0-0b99-4b4d-c4a416d7e327@huawei.com>
- <20230823072552.044d13b3@kernel.org>
- <CAKgT0UeSOBbXohq1rZ3YsB4abB_-5ktkLtYbDKTah8dvaojruA@mail.gmail.com>
- <5aae00a4-42c0-df8b-30cb-d47c91cf1095@huawei.com>
- <20230825170850.517fad7d@kernel.org>
- <CAKgT0UeHfQLCzNALUnYyJwtGpUnd=4JbMSy00srgdKZz=SFemw@mail.gmail.com>
- <20230828083810.4f86b9a3@kernel.org>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <2b570282-24f8-f23b-1ff7-ad836794baa9@huawei.com>
-Date: Tue, 29 Aug 2023 19:58:32 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 483F0156CE
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 12:12:17 +0000 (UTC)
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7717CFA;
+	Tue, 29 Aug 2023 05:12:06 -0700 (PDT)
+Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 4EAB1803AB;
+	Tue, 29 Aug 2023 14:11:59 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1693311119;
+	bh=/S2MVrHJ96elw+baGLSrrlAWfYyFodKVEtqPjPiH3ZY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Rq2cqAzeiBwyqcK2W11At9U3uNiBSbeVbNuK7RSR/W8pAkwBJ1chfcMMtd77KdyY0
+	 qaYzcOnuRGy+PZM8TZ7KhO6I8PK4leo8vYIeusINiNuJXSdSGda6bqVvMJqMcllueR
+	 mBEgfQbx14CxbcT+OtGuv8gcdctPh6Bx9vR5qiIyxiePxXxgFRLNidtNsInIDVMnsj
+	 lO3816CqF6iB49jYQK899fuoBiCYnPbduAt4krg53JQrhRYrscD1TzLPr7qLvt7LVu
+	 7wXJ6SKexuVyQYyNpixU/Kg6rk/rdqLuTcSqS22UbzM6H4wPROx2/e3S9T0oH820q0
+	 Qy6qDkguehGpg==
+From: Lukasz Majewski <lukma@denx.de>
+To: Tristram.Ha@microchip.com,
+	Eric Dumazet <edumazet@google.com>,
+	davem@davemloft.net,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Vladimir Oltean <olteanv@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	UNGLinuxDriver@microchip.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Lukasz Majewski <lukma@denx.de>
+Subject: [PATCH 0/4] net: dsa: hsr: Enable HSR HW offloading for KSZ9477
+Date: Tue, 29 Aug 2023 14:11:28 +0200
+Message-Id: <20230829121132.414335-1-lukma@denx.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20230828083810.4f86b9a3@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.69.30.204]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023/8/28 23:38, Jakub Kicinski wrote:
-> On Mon, 28 Aug 2023 07:50:33 -0700 Alexander Duyck wrote:
->> Actually we could keep it pretty simple. We just have to create a
->> #define using DMA_BIT_MASK for the size of the page pool DMA. We could
->> name it something like PP_DMA_BIT_MASK. The drivers would just have to
->> use that to define their bit mask when they call
->> dma_set_mask_and_coherent. In that case the DMA API would switch to
->> bounce buffers automatically in cases where the page DMA address would
->> be out of bounds.
->>
->> The other tweak we could look at doing would be to just look at the
->> dma_get_required_mask and add a warning and/or fail to load page pool
->> on systems where the page pool would not be able to process that when
->> ANDed with the device dma mask.
+This patch series provides support for HSR HW offloading in KSZ9477
+switch IC.
 
-As the all arches have used CONFIG_PHYS_ADDR_T_64BIT:
-https://elixir.free-electrons.com/linux/v6.4-rc6/K/ident/CONFIG_PHYS_ADDR_T_64BIT
+To test this feature:
+ip link add name hsr0 type hsr slave1 lan1 slave2 lan2 supervision 45 version 1
+ifconfig lan1 up;ifconfig lan2 up
+ifconfig hsr0 192.168.0.1 up
 
-arm: Large Physical Address Extension or LPAE, 40 bits of phys addr.
-arc: Physical Address Extension or PAE, 40 bits of phys addr.
-mips: eXtended Physical Addressing or PXA, 40 bits of phys addr.
-powerpc: does not seems to have a name for the feature, and have 36
-         bits of phys addr.
-riscv: large physical address, 34 bits of phys addr.
-x86: Physical Address Extension or PAE, 36 bits of phys addr.
+To remove HSR network device:
+ip link del hsr0
 
-It do seem that we are worrying too much, So I am going to follow jakub's
-suggestion. If we make a wrong assumption, we print a warning for that.
+Test HW:
+Two KSZ9477-EVB boards with HSR ports set to "Port1" and "Port2".
 
->>
->> With those two changes the setup should be rock solid in terms of any
->> risks of the DMA address being out of bounds, and with minimal
->> performance impact as we would have verified all possibilities before
->> we even get into the hot path.
-> 
-> Sounds like a plan!
-> .
-> 
+Lukasz Majewski (4):
+  net: dsa: Extend the dsa_switch structure to hold info about HSR ports
+  net: dsa: Extend ksz9477 TAG setup to support HSR frames duplication
+  net: dsa: hsr: Enable in KSZ9477 switch HW HSR offloading
+  net: dsa: hsr: Provide generic HSR ksz_hsr_{join|leave} functions
+
+ drivers/net/dsa/microchip/ksz9477.c    | 96 ++++++++++++++++++++++++++
+ drivers/net/dsa/microchip/ksz9477.h    |  4 ++
+ drivers/net/dsa/microchip/ksz_common.c | 69 ++++++++++++++++++
+ include/net/dsa.h                      |  3 +
+ net/dsa/tag_ksz.c                      |  5 ++
+ 5 files changed, 177 insertions(+)
+
+-- 
+2.20.1
+
 
