@@ -1,215 +1,130 @@
-Return-Path: <netdev+bounces-31169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 289B478C104
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 11:12:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 367C478C188
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 11:31:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB247280FC6
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 09:12:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C54A281000
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 09:31:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 915B814F63;
-	Tue, 29 Aug 2023 09:12:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D03914F69;
+	Tue, 29 Aug 2023 09:31:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E32763C0
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 09:12:33 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD2AB97
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 02:12:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693300350; x=1724836350;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=HCw1TTeDURtJNiuyWebXCBEHkj051qiIcqtYyruCNU4=;
-  b=A3sXA581jCDDMbupwziemaU0I5qpYAuhIYg5cZIpbQbnQkXoTNaWT0xh
-   bzmNckYoGjPwehEX/lZlV2Rhjp0PHaQYs1Ahcx8NaJf90dnn+TKbltXcY
-   F8MjMpYxuiC+grGOhtbQTsbn858hMCQfmqxlad9GodYiYdLvhayBMRsKT
-   Bm/JIN/zGjhjboReMazokq4JrStT1NW+A71lbpxk7On5ZlGvKPdVcOINl
-   b7P8tYuSqak/AhQbruIYoT6QP/3zo+9yGAyqJS5kYAgdIpECHXgHoUX4C
-   rsueg/Cse/S5lkuY9ecc7GnHwQwqpUtHdyDy3zxJtPlgTizUXkjQU5cnB
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10816"; a="441669963"
-X-IronPort-AV: E=Sophos;i="6.02,210,1688454000"; 
-   d="scan'208";a="441669963"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2023 02:12:29 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10816"; a="1069381480"
-X-IronPort-AV: E=Sophos;i="6.02,210,1688454000"; 
-   d="scan'208";a="1069381480"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmsmga005.fm.intel.com with ESMTP; 29 Aug 2023 02:12:29 -0700
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Tue, 29 Aug 2023 02:12:29 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Tue, 29 Aug 2023 02:12:29 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.108)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Tue, 29 Aug 2023 02:12:29 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XR/IN9aq1K38BP8GcP+01E8wnQOL+6bvyWruTVncgZD/z1tgp9seSU5oWAjFEIBslpB2Jp++xaDQR1CVAaEIURabq4qN3V9eJW2yVWnFJbpe39gUMZHcs2/UHhkJIswbEEc/OCJRDBJc0hPOGufCzIeo0PApib0wPZsUvK3yUkoNUtC+Sf8FTnQy0CindzCQqm7TUfgJbzdPhvZttwS8Da1n33D+EiZfKVI7pjGn34RhOEpx66MEV2L0ZgavjBc9ylhAfR+07SXtc+OTFQOmqmBcMe2CwA8kgSvYfDlr+vTAahDZyjb0VHau8hWqikvgICWophb2UCrIBIlRBV0awg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=s4lc9D85qJrKN3rNTvlUA5oFOX8bm9ME5zHhN4h5jG0=;
- b=Rb3hocSmtI8qgR94ksqZ3mvvAv6F4rMkSOXbqXL7aKyrxFvx6mBIkEfrMVbcQL18gAvNnRoRUaRZhOjr9o9UKYxLnpRHYujmuBvTbBTVIQZydYvQp8nklkM8hbRINv+DsQGJ8sBxgYRky7gxvp9igZ3xvIBqbV/AJ2QQaRpEW/stU8fqioWxepztbdMjrnNYDRn2+UAGOadR8XljI21GdbcOWrvoxQE0WfiGGCzmInKXEwP0gI2SCSdR83m9OO/YXtZeNTT6JTv6I1WLc5JO9c0piZzLztqlTQS/69K+FRcp9yMaJDgFDjZ36PA38GAd2iJ7z/MQjtbJbN2s7hWi0Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
- by SJ0PR11MB5792.namprd11.prod.outlook.com (2603:10b6:a03:425::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.34; Tue, 29 Aug
- 2023 09:12:22 +0000
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::5842:74bc:4aaf:a4fb]) by MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::5842:74bc:4aaf:a4fb%7]) with mapi id 15.20.6699.035; Tue, 29 Aug 2023
- 09:12:22 +0000
-From: "Drewek, Wojciech" <wojciech.drewek@intel.com>
-To: Ido Schimmel <idosch@idosch.org>
-CC: Jakub Kicinski <kuba@kernel.org>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "idosch@nvidia.com" <idosch@nvidia.com>
-Subject: RE: [PATCH iwl-next v2] ice: Disable Cage Max Power override
-Thread-Topic: [PATCH iwl-next v2] ice: Disable Cage Max Power override
-Thread-Index: AQHZ1qBBv7SVSOjez0eHlWI2L+3Nxa/6wcIAgAMXFgCAAydJcA==
-Date: Tue, 29 Aug 2023 09:12:22 +0000
-Message-ID: <MW4PR11MB57766C3B9C05C94F51630251FDE7A@MW4PR11MB5776.namprd11.prod.outlook.com>
-References: <20230824085459.35998-1-wojciech.drewek@intel.com>
- <20230824083201.79f79513@kernel.org>
- <MW4PR11MB57768054635E8DEF841BB2A9FDE3A@MW4PR11MB5776.namprd11.prod.outlook.com>
- <ZOsNhgd3ZxXEaEA5@shredder>
-In-Reply-To: <ZOsNhgd3ZxXEaEA5@shredder>
-Accept-Language: pl-PL, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW4PR11MB5776:EE_|SJ0PR11MB5792:EE_
-x-ms-office365-filtering-correlation-id: e01885d1-ed5a-44e3-744e-08dba8700d97
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 3b9lTHjE3OOg1vo1gBsxaNkNusbP05d0X1imxjzILA/ayCst+WyPMPWNF2vx3ugR6s6IXcjPB+w3QI7s2NmtsuqkhJzXR5fO5owOw5N2A1/0pvlOnsE7wDNn3R4FUXJcQ0Sjdf+TryfrZlBNqhoBQigCpilDJbCi+wxfgd3Ze6vjWOmuQAoeorP0s4iT2xORs97OK+7v6Oj5cggSXtlgl/0A5TKzGcnoDOiq43RYerCQN0cG1oSFk3Y6/qgVFEb9Trj5sIP3dbl11f0OOz7+iILotYrYxrxh/SVmLLmWduoJVRdCPWXMZfvJ35Onv/vrI6TOGBzb1D0Hqwdg8y+46ZOywtUzust2wyAZJRMXo/N2zATX33TVmZLXYUPyN/1VYA51l8vUa4baAkakxlik8tcyBdCinfEWtvK79cd9bbAL6EhEqkRMRay2BHHgngy3mPQtNoxWoAZ9Dlhhq0mwyfpK/ANtEHGDJdRzVFUqWtCOpWYnWGStxL5vry5WGp4iseZcQoQABubRZWAnECWz6x0kNe07nOk7RE2uX9paVgBkhS2/uJ/2jkhwJsxHU9oSyKwxcaw6dNMKx2b2LdmnvJc3zhHeWnK5Zf1ZWNXYXu+Kw7mYAg3ChqDWE1Nl2Hz9
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(136003)(376002)(366004)(39860400002)(396003)(451199024)(1800799009)(186009)(7696005)(71200400001)(6506007)(86362001)(55016003)(82960400001)(38100700002)(33656002)(38070700005)(122000001)(26005)(2906002)(83380400001)(76116006)(9686003)(53546011)(478600001)(52536014)(8676002)(66946007)(66446008)(4326008)(5660300002)(64756008)(66476007)(66556008)(8936002)(316002)(6916009)(41300700001)(54906003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?UbCHpUxDUCEsq2tTj5RvrjdPePnUT6Q90RAsK5I/itodZ8VOAvsMP2/r5QHE?=
- =?us-ascii?Q?BaG4q8Gc7AmMhfbJ/Q70WheJq3GghX0YcWc7QB7lY5HlEoACNFo13/7R4L5B?=
- =?us-ascii?Q?cVLaiPuW3IdzZTpqOOFaO7D66OU0q4vDOY0NN4sEoJOT5w8mxZi/MXsC3xBP?=
- =?us-ascii?Q?qiOsQvIX+AcJsbUZEosFYZvsenxj6b/NczYL1WKQN/F3sbPFVcShEzA3YJF9?=
- =?us-ascii?Q?GhJE2zK+VQajoHbXdyh514I+P4+Br0fRHCDdpoO739EVaL7KPd+iEhYxwSxf?=
- =?us-ascii?Q?yn1ydGxNdOCJItKLqOkK7I2I2VTNk536XHzoN7GbKrf/5wlBYFzyOlI7a+Du?=
- =?us-ascii?Q?4LTc1GLLRhSEV5LXCJVJ9NLVxzKTtO6+OnTPhe+w09tihfEyuvRH5N6aMweL?=
- =?us-ascii?Q?x4qDfMVVTfaJ8c+19/vqFX4rZ4O0FtPMndPQIgWE9YZ/h1lepaT0ZURWb8HE?=
- =?us-ascii?Q?n3ksTnsB0raa2DUa5zycm9T/sLLuapRt8ylLok3hZLlO7w34wqub34rV+P0y?=
- =?us-ascii?Q?rbVHbqSSG9tRxe89+HTn3USWrdR4oWdtQ+VH2N/U36jNd1pin2ZoAqoe0HCl?=
- =?us-ascii?Q?sidTb2DwtfqWzxGr+hupKKYUCKjDqmHE4SRUWl7sFsQRiF7j+Txjd/Gi0QFZ?=
- =?us-ascii?Q?/IYr7WxH8tWfxL+K96HuAWzUGL1ZIaFcJpX129rGnX6mVxNifoCooQbG8MTi?=
- =?us-ascii?Q?hQVjWBLKLHEz2+kbLDvn7wHA0cV9BFfOKKiv5BR2J8XW4avCCoJrTAtQS2jj?=
- =?us-ascii?Q?ocnLyGgtSja3j6ANHoYQa0V9JuZdMti2t/6h8PJXeKRR6ohmRkX7jlKzwyuK?=
- =?us-ascii?Q?6mLQRPYcxOMVxNw4KGzuyO5kFlio9Ni+wu+1h5wMBkeQiMnCAzKZbxZJmodC?=
- =?us-ascii?Q?RDKYO+EYSDq9QJuqrDryY5+D2exGD7938Bd2JwzYgEbgDllrwkv+eehCixda?=
- =?us-ascii?Q?GkT6d+fIWXBjIxIdb0SC0lg3yLOPifs9iREAd0sTobIoiNg1w1ORwWI3fycw?=
- =?us-ascii?Q?rwKiGIgcM7YGk2EagvjhRM5GdvaA/BD10h0RoOCmisrkT2jjgjner5ZkYfcQ?=
- =?us-ascii?Q?GoPgmXadg90eGSRZ0r877jOVVVjP4qRtcvb7dKxPvuM7fy2cEZdkp3NOgA7d?=
- =?us-ascii?Q?RtO49bOgukJV2nNcwo3wUsxsbttyBmfLxYOLRif3pjXlFYSRIuTEDReBtb+j?=
- =?us-ascii?Q?A2sML+SZBa7hXVME40++8kKgcCxP3yJtFAPJoOQAXGaG0UQBUHslngqPZ/mg?=
- =?us-ascii?Q?aFR36VrNc2AGViACoGpCj7W0NC5ttB5Du5yZuxafxl77Ewkyk4IUtj7f+1h3?=
- =?us-ascii?Q?+Jwl0pQfakyt4joPleHJ5lL2+gAblBfirQ/W4vVGm1272NkSCgCptYA7QgDD?=
- =?us-ascii?Q?+Mgtv2oSvgABRJeY5k6rffiLTcsjwQ3QJ19HCD6CfWTBdumBf3f00Nl/Z8h2?=
- =?us-ascii?Q?bJzbaX53SkPbwUR05z0hkCAZNwzm5vUWNlBfLYuyt3qd5XlDXUOBHG08TFfK?=
- =?us-ascii?Q?Q3ejc+djTY2eDX/rfbmpI64M83lyI3lFZ5ethKIYq2Gdoug1M3TMGjqqVzat?=
- =?us-ascii?Q?0Nu9WKA5tthhSq2ORgWFfiaQ0p3wMUqDMtWLnrra?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E43113FF4
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 09:31:39 +0000 (UTC)
+Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA624CCE
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 02:31:08 -0700 (PDT)
+Received: by mail-ot1-x330.google.com with SMTP id 46e09a7af769-6bf04263dc8so1938797a34.3
+        for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 02:31:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1693301468; x=1693906268;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=guePXrPopLgOPcdT283gc5sTu7sw+Yj419mnndMktxQ=;
+        b=G46WNf6fPWXXmiaXK3LOGve4BCV8l2KqIxaloMmV3wkqAr3ZO5uSD1EkVsUytFDNd3
+         ZW4wQc3URjkmfHrKBc1uGO5VYKoynZgFmnk5k16OkThVEiarySxdGyUnYRHng+Yt/fSH
+         NCB07AZkoGuNVEDW5GYDoeYyUd2f5KfLOmyRNRwsctkVhLExnZjkRl3BrldDlq3AP6kd
+         uwdb9K9QgkwThOczV4x6f3yoKSVIYJqxQiS3n/krZDQQ9uZC7lcHl7RdUJiUjBbtpruE
+         uERXMKeg8Q93dAefTNg/TtxWxcUFrwtd/D7UADUeJAwcRqLx26yJ87Kz1LBjcAayiaE3
+         lj3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693301468; x=1693906268;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=guePXrPopLgOPcdT283gc5sTu7sw+Yj419mnndMktxQ=;
+        b=ANnEPjJ8QYDC33HjxvfBRZvOeQOyjH+Lj3JNjZrYw+yPKbbpqrlfkmmkUTgslNZmbD
+         SZMuXNHsCzzvV2DfovbT7Sa851yiM2swC8WM01lscTi7/IkkJoA3Ub30CRc1UzByMDtq
+         2Bt+dW+UgiBY+ViQj4EGGSzCLxL9dU4CnyqBEge0KLqdEWw/c2m74gRdq+IXBIK3N2jc
+         AiW1NO2FZQrf1RCcDqESpqHnhnk2IzqaiN5haVfFENMhIZ/h+FGN40hrFXj1/Z2sh1DW
+         bySlmh2yX9ZKxPdI1vhZ1LheExHZqhEBJSRLvnfd+IcEjLHHsDGciUTmPfawV5OAQes2
+         6JuA==
+X-Gm-Message-State: AOJu0YyKaLvW2zv4XOALtn0XYFY+Qjuf8loA2VMVKw7+4r7m+YZyVG8w
+	w7NSD/COCmCIxqCcdN0JCBM5qA==
+X-Google-Smtp-Source: AGHT+IGkPraI08Qww1nC+lwqJvqyudyb6VsEAq0bqdSWvhaRu2JO4pyOm2p9Ozj4qi8c/yS/CCrB5A==
+X-Received: by 2002:a05:6830:119:b0:6b8:7a79:db37 with SMTP id i25-20020a056830011900b006b87a79db37mr16733428otp.22.1693301467999;
+        Tue, 29 Aug 2023 02:31:07 -0700 (PDT)
+Received: from medusa.lab.kspace.sh (c-98-207-191-243.hsd1.ca.comcast.net. [98.207.191.243])
+        by smtp.googlemail.com with ESMTPSA id g7-20020a63ad07000000b005649cee408fsm8741081pgf.0.2023.08.29.02.31.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Aug 2023 02:31:07 -0700 (PDT)
+Date: Tue, 29 Aug 2023 02:31:05 -0700
+From: Mohamed Khalfella <mkhalfella@purestorage.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: willemjdebruijn <willemdebruijn.kernel@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	David Howells <dhowells@redhat.com>,
+	Jesper Dangaard Brouer <brouer@redhat.com>,
+	Kees Cook <keescook@chromium.org>,
+	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:BPF [MISC]" <bpf@vger.kernel.org>
+Subject: Re: [PATCH] skbuff: skb_segment, Update nfrags after calling zero
+ copy functions
+Message-ID: <20230829093105.GA611013@medusa>
+References: <20230828233210.36532-1-mkhalfella@purestorage.com>
+ <64ed7188a2745_9cf208e1@penguin.notmuch>
+ <20230829065010.GO4091703@medusa>
+ <CANn89iLbNF_kGG9S3R9Y8gpoEM71Wesoi1mTA3-at4Furc+0Fg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e01885d1-ed5a-44e3-744e-08dba8700d97
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Aug 2023 09:12:22.0489
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: pq8hoqHGrhlzpFmsRs/++AgEFK0QCrdqoNIZJAoWIIxlk9KFn5/physQKGwzVTQA+AwJoL80Snojgkyokem8p+3XYQWsqvUmWocq475qukk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5792
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89iLbNF_kGG9S3R9Y8gpoEM71Wesoi1mTA3-at4Furc+0Fg@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,T_SPF_PERMERROR autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-> -----Original Message-----
-> From: Ido Schimmel <idosch@idosch.org>
-> Sent: niedziela, 27 sierpnia 2023 10:47
-> To: Drewek, Wojciech <wojciech.drewek@intel.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>; intel-wired-lan@lists.osuosl.org; n=
-etdev@vger.kernel.org; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>; idosch@nvidia.com
-> Subject: Re: [PATCH iwl-next v2] ice: Disable Cage Max Power override
->=20
-> On Fri, Aug 25, 2023 at 11:01:07AM +0000, Drewek, Wojciech wrote:
-> > CC: Ido
+On 2023-08-29 10:07:59 +0200, Eric Dumazet wrote:
+> On Tue, Aug 29, 2023 at 8:50 AM Mohamed Khalfella
+> <mkhalfella@purestorage.com> wrote:
 > >
-> > > -----Original Message-----
-> > > From: Jakub Kicinski <kuba@kernel.org>
-> > > Sent: czwartek, 24 sierpnia 2023 17:32
-> > > To: Drewek, Wojciech <wojciech.drewek@intel.com>
-> > > Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; Kitszel=
-, Przemyslaw <przemyslaw.kitszel@intel.com>
-> > > Subject: Re: [PATCH iwl-next v2] ice: Disable Cage Max Power override
-> > >
-> > > On Thu, 24 Aug 2023 10:54:59 +0200 Wojciech Drewek wrote:
-> > > > NVM module called "Cage Max Power override" allows to
-> > > > change max power in the cage. This can be achieved
-> > > > using external tools. The responsibility of the ice driver is to
-> > > > go back to the default settings whenever port split is done.
-> > > > This is achieved by clearing Override Enable bit in the
-> > > > NVM module. Override of the max power is disabled so the
-> > > > default value will be used.
-> > >
-> > > Can you say more? We have ETHTOOL_MSG_MODULE_GET / SET, sounds like
-> > > something we could quite easily get ethtool to support?
+> > On 2023-08-28 21:18:16 -0700, willemjdebruijn wrote:
+> > > Small point: nfrags is not the only state that needs to be refreshed
+> > > after a fags realloc, also frag.
 > >
-> > So you're suggesting that ethtool could support setting the maximum pow=
-er in the cage?
-> > Something like:
-> >  - new "--set-module" parameter called "power-max"
-> >  - new "--get-module" parameters: "power-max-allowed", "power-min-allow=
-ed" indicating limitations reported by the HW.
+> > I am new to this code. Can you help me understand why frag needs to be
+> > updated too? My reading of this code is that frag points to frags array
+> > in shared info. As long as shared info pointer remain the same frag
+> > pointer should remain valid.
 > >
-> > About the patch itself, it's only about restoration of the default sett=
-ings upon port split. Those might be overwritten by
-> > Intel's external tools.
->=20
-> Can you please explain why this setting needs to be changed in the first
-> place and why it needs to be restored to the default on port split?
+> 
+> skb_copy_ubufs() could actually call skb_unclone() and thus skb->head
+> could be re-allocated.
+> 
+> I guess that if you run your patch (and a repro of the bug ?) with
+> KASAN enabled kernel, you should see a possible use-after-free ?
+> 
+> To force the skb_unclone() path, having a tcpdump catching all packets
+> would be enough I think.
+> 
 
-In some cases users are trying to use media with power exceeding max allowe=
-d value.
-Port split require system reboot so it feels natural to me to restore defau=
-lt settings.
+Okay, I see it now. I have not tested this patch with tcpdump capturing
+packets at the same time. Also, during my testing I have not seen the
+value of skb->head changnig. Now you are mentioning it it, I will make
+sure to test with tcpdump running and see skb->head changing. Thank you
+for pointing that out.
+
+For frag, I guess something like frag = &skb_shinfo(list_skb)->frags[i];
+should do the job. I have not tested it though. I will need to do more
+testing before posting updated patch.
 
