@@ -1,159 +1,217 @@
-Return-Path: <netdev+bounces-31287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0ECB278C85D
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 17:13:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7390E78C86C
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 17:17:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EB611C20A1D
-	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 15:13:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA45D28121D
+	for <lists+netdev@lfdr.de>; Tue, 29 Aug 2023 15:17:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A795E17AB1;
-	Tue, 29 Aug 2023 15:13:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A17217AB8;
+	Tue, 29 Aug 2023 15:17:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98513156CC
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 15:13:01 +0000 (UTC)
-Received: from mail-oa1-x2c.google.com (mail-oa1-x2c.google.com [IPv6:2001:4860:4864:20::2c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D1FEBD
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 08:13:00 -0700 (PDT)
-Received: by mail-oa1-x2c.google.com with SMTP id 586e51a60fabf-1c8e9d75ce1so2579506fac.3
-        for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 08:13:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693321979; x=1693926779;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ylPNlFhBdiOQiDVAnWeqfH/kGdZp1MWEZ59Dr+ruGeM=;
-        b=Br818mPDCYYsDGaLxZfFkTrxjP5KG8mMmRFv8jwF16pAddOc/VT/lggMd4n6ojmFFk
-         iRvvdulsTaZn1n8EmUhbB4qkSVr35dNQCEP0BGd+XGzy9hax3z+uBBTLymGHfAGCeFrb
-         aWrTBH7nIfub54nETfb45/1676AnXAtXyqtQlK3LZene/N1DuCrYzpkCITmy4IckGpBh
-         h9UdfitRudetXdxhtmD3GL4EoNP77P8kjBt+eNug6V5QZlU3PdTlr9lMMEk/sIXeszsK
-         UlETbJBH5NHS9kxaQqpKKYX2mGxGWVBLYaoiHNkgp8rGQnM29LZBiiRqtJOZRdhMBHqx
-         QSvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693321979; x=1693926779;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ylPNlFhBdiOQiDVAnWeqfH/kGdZp1MWEZ59Dr+ruGeM=;
-        b=ZECyMt4hih3nS0/sVj9m4HiCOt57YTNXRfMVgkti3SDl5cV/wzZNnVenpE2p/8IZGU
-         GEKbX+aprR2YHqdAXlpN96oCCz7niYtpc8a+wEOA2dAJM0p/nEUdjGJnK0zqE1yY9qRd
-         krYYBPpbUCMkml/wOwhK7bP2lAHhGoc1raBI9pgFWWEAUsqoh83DwhnKOH1qfIIRk+w8
-         OImC3yMjO4x3mZLuwrfNqW4nUhysX051gh0cYOIvRr4XCJ/gWZXJeCKmjaqeKGrzt6si
-         UxZ2iHtuMb14FLu0z4rfrghmqY3xPJAKZ6QmKZ9W/zswpJ9Ln/mvnvQQ986o9+1A/9X3
-         1RPA==
-X-Gm-Message-State: AOJu0Yw3sy23wSRAOJCvu2/dlrAupwqdw0gkXvalc45PQuhz6aIbdry3
-	DOy1Z61pyR4VVFDZIztc4bSv0dC08OU7OUZPvojlidw+OgNSiwT/
-X-Google-Smtp-Source: AGHT+IEdB5nEaA3Jvmzd2B9yzOZ7lIgz032uk1g2sY/cLr94+asDQ7MemfwYwb27YECsRWTQQ9rjWE8+VTGpVJCvR18=
-X-Received: by 2002:a05:6870:428a:b0:19f:6fae:d5fc with SMTP id
- y10-20020a056870428a00b0019f6faed5fcmr14770938oah.33.1693321978947; Tue, 29
- Aug 2023 08:12:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1710E16404
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 15:17:14 +0000 (UTC)
+Received: from GBR01-CWX-obe.outbound.protection.outlook.com (mail-cwxgbr01on2131.outbound.protection.outlook.com [40.107.121.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B4EDBD
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 08:17:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Fz7z2VbgeH1q/HW1nmhKxzCcR0yVHEMqxOmR651/KrIP1AAnGxKu86O5PTeEwBMIzNzCn+6frVVSfTVYY9K2bfE0PwUn7hk4VOBNn7uyZhRqVpjhWSg4c6PTYo39MBJwrucYWFwcvw83yKLtQCc/iXbYXGRj8Eh5kxhNeuqkUw7AzUn5kk9P9PuGf8+NhdgTUziJTj6tNhtbnbWoUru0voSE49pHxJyTLGY6jF019ZPLWk84IvFOngf8SCZu4QaQ/nnOMLDyY4hfnr8c2SssoQ5t9FpnVejE8JpXifQhcbFSajFN7Oo8oVVE4EjVn+f5BDELKaOX7bVTyX8eQ+amrA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5V+2gJffgrCEEdwJmyZXw2fCIdjqzFixXOv8s+oB93U=;
+ b=l/bBz4b6nSTaS+T7a7qvQwedEZyy7zIaKjOcH4LPK5suEGBOAqqzRrylMBnr4HvxSS+Tiymv0GFNSQ0tRTJ7g3KbeHdfzZd4sjh9SpJ4mr6qU7dGj9B979m7XMyubl65p2OJAP39hXSfIlZq1rHIrt6FIl7FxRxPppTR6kqcClJeqWJIKdLt8lDTxlk1T/rHCr3oymUDxymhH7yAMQlUQMXj4S1okugqWpfAlcUlRG1ngF2MK+MIiV5cSlhoTfN5qA+NGSwFTDDMlocR4P+m5sWQesmvXJf+TQTs73yVnQV/qeij8qKcKPUiJAoi3smPO3SGNhgbfdvHYvZk+DFk/w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=city.ac.uk; dmarc=pass action=none header.from=city.ac.uk;
+ dkim=pass header.d=city.ac.uk; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=city.ac.uk;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5V+2gJffgrCEEdwJmyZXw2fCIdjqzFixXOv8s+oB93U=;
+ b=KoQt1hoKlLkvpW7qtdqk07XUuOZ1lz1C+4C83hWKXurWw618qOavmLustu4s2XrkK3/d7VxbbJe288TWzidxHBtVWXMr8CvNFE1TVrbHjS5QUtsewAoliuwJVFHpikvdSMdgAcTUsGUyiAcb/2m6J+VZGmpi1+BME1b+CUZqkpt8jW6X5bZ9aDtOGwHJXNNib++acixdxScmbik8hBkoFcrt+9JHC2bzrA/Gyg1G47V6ypjxX+ckzKGvCSY9MGNrt5hHBjtRNp/5EzJUQmEnV9YOhnHP+M0Loifpuw6UGTdaX0O15BeGWCaMXzrn4nSUaprGttt50PGN08QuEllJEw==
+Received: from CWLP265MB6449.GBRP265.PROD.OUTLOOK.COM (2603:10a6:400:1e3::6)
+ by CWLP265MB5867.GBRP265.PROD.OUTLOOK.COM (2603:10a6:400:1b1::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.35; Tue, 29 Aug
+ 2023 15:17:08 +0000
+Received: from CWLP265MB6449.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::2dd7:2a0a:99f8:5a0d]) by CWLP265MB6449.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::2dd7:2a0a:99f8:5a0d%5]) with mapi id 15.20.6699.035; Tue, 29 Aug 2023
+ 15:17:08 +0000
+From: "Maglione, Gregorio" <Gregorio.Maglione@city.ac.uk>
+To: Stephen Hemminger <stephen@networkplumber.org>
+CC: Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Florian Westphal <fw@strlen.de>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Rakocevic, Veselin"
+	<Veselin.Rakocevic.1@city.ac.uk>, "Markus.Amend@telekom.de"
+	<Markus.Amend@telekom.de>, "nathalie.romo-moreno@telekom.de"
+	<nathalie.romo-moreno@telekom.de>
+Subject: Re: DCCP Deprecation
+Thread-Topic: DCCP Deprecation
+Thread-Index:
+ AQHZsyaN7TZv6xK98EGiSIL1O2/QRK+zUMeAgAAj8gCAAND+cYAAErwAgDh/to2AAGYxAIAABfPKgAAf/YCAAp5C1YAAdvKAgBExn/k=
+Date: Tue, 29 Aug 2023 15:17:08 +0000
+Message-ID:
+ <CWLP265MB64494218BFFF89EFB445543EC9E7A@CWLP265MB6449.GBRP265.PROD.OUTLOOK.COM>
+References:
+ <CWLP265MB6449FC7D80FB6DDEE9D76DA9C930A@CWLP265MB6449.GBRP265.PROD.OUTLOOK.COM>
+	<20230710182253.81446-1-kuniyu@amazon.com>
+	<20230710133132.7c6ada3a@hermes.local>
+	<CWLP265MB6449543ADBE7B64F5FE1D9F8C931A@CWLP265MB6449.GBRP265.PROD.OUTLOOK.COM>
+	<0cb1b68794529c4d4493b5891f6dc0e9a3a03331.camel@redhat.com>
+	<CWLP265MB644915995F6D87F6F186BEF7C915A@CWLP265MB6449.GBRP265.PROD.OUTLOOK.COM>
+	<20230816080000.333b39c2@hermes.local>
+	<CWLP265MB644901EC2B8353A2AA2A813CC915A@CWLP265MB6449.GBRP265.PROD.OUTLOOK.COM>
+	<20230816101547.1c292d64@hermes.local>
+	<CWLP265MB6449B1A1718B6D8CD3EBFB27C91BA@CWLP265MB6449.GBRP265.PROD.OUTLOOK.COM>
+ <20230818092027.1542c503@hermes.local>
+In-Reply-To: <20230818092027.1542c503@hermes.local>
+Accept-Language: en-GB, en-US
+Content-Language: en-GB
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=city.ac.uk;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CWLP265MB6449:EE_|CWLP265MB5867:EE_
+x-ms-office365-filtering-correlation-id: f78c48af-c622-4c4d-7265-08dba8a3030b
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ H7k9GBjQXkqBqifhEqz/B4a9KXsrOyZNPZg3wiz3PTzmpx2sXrcFscjusIvS+DFv2e7LkMyXrDNKaGSbMNdgW3HvO4jz/FuvsJtFhjvgiP1qMUydl2UHieZNTHf9+RQSwOAFsr9YBIFyjWgnnZBKz5vL8P55Ic4F0A931JSq6BGsGEQEY+0Whuy0lDWvbj6pf08wdYtQtJFBMaFWCx+xQbB91bsyyIi/oG6Vu4Fb0sz3h9YXRjddk/upL9Lzd21V5mpriyQRg6JyDhm8q02LdgS9mPagPXs27UFfeudCFJU629q5EieefWSOS16VEhsa7EqI6AWdjyb+Eby99lbppz/RY/Xdop/02GsKmuFMCrk8IqF/hwgKOio2HA7jgy3gJRqleF/J5dcbgnFG93VSDrkyOIoeoTo/mZoigZwMo9E0t6fqalu0Fs9luEaGQEsPo0hxr/40zQUx22xRHagV0P5T+wkQb8uq73o9VR3VX8PmUHDcfnZCBHVM/hIYl9rqNgAMiFdqMFkFiRfHdl1s9a8geuwkFY6njzfEOuW0xXPTcEDlqDEZWbvgNrp7nZSxJ+CsPb+C0aQnA2800UyWWhiTk4h0Y4wgom9v/R/n/JY=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP265MB6449.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(136003)(39860400002)(366004)(346002)(376002)(396003)(1800799009)(186009)(451199024)(9686003)(71200400001)(7696005)(6506007)(53546011)(478600001)(76116006)(83380400001)(26005)(2906002)(7416002)(6916009)(786003)(316002)(64756008)(66446008)(54906003)(7116003)(66476007)(66556008)(91956017)(66946007)(52536014)(8936002)(41300700001)(5660300002)(8676002)(4326008)(122000001)(33656002)(3480700007)(55016003)(38100700002)(38070700005)(86362001)(66899024);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?AgIt3UqWysr12l+srqEM0hJemjo/75e11a0UcmYJB7KOW6y59aST8LeLre?=
+ =?iso-8859-1?Q?0VnNdSjA+g9ehRjeQ2gThfwCkEP59MBfEeAcC8aozXM/0NXDIsw6Sm+nI4?=
+ =?iso-8859-1?Q?kdn1pJ3pf9Qv0/PbLPVqtM6lRUh0d302ogc9AXcF5pEeqZ7EqnbD2TaDQm?=
+ =?iso-8859-1?Q?aaTmC+h7cmll2trlXoH2ZwKq64VaAiErdn4wj1Q8Sgyb9XoqwKTSofD+Q0?=
+ =?iso-8859-1?Q?P2o978yjKZ4pddrI4H1sheRvBl9tMNH9Dx81KUIDwBngI+NXCwSIrFt7z6?=
+ =?iso-8859-1?Q?kUfRgJHM0grCVOIGfHBYx5Gvp9u4JV/3oYJElxNHSsT4OuKd/UqQTCid4E?=
+ =?iso-8859-1?Q?qyOMX4E5OaNbB+qYNV9hddWiqgh6G9eMF42MHu3mCktlOhnbnuiSaJWKI4?=
+ =?iso-8859-1?Q?HL+OHAC0Oko2qZddabsF3sOsIKhqi7Rs6y10ckdsrh1e4FtGYWX9BiHBTQ?=
+ =?iso-8859-1?Q?CWNmZF80DPsfrR1+zT7Z8Q2nLGxDYGdk9kg8YxT4I7irBZ90tAIg2NhUzC?=
+ =?iso-8859-1?Q?iSrNcYmZQmO3N4uJ5wU9mzlXW5R1VotSBfh81UoW0QoY6AtGvD3VubCUr7?=
+ =?iso-8859-1?Q?eDtwv7VysJbS6FNaeQvwd4l02A27RIbdlEsYd0Jx3/5wHpcUUvzDuG8KWT?=
+ =?iso-8859-1?Q?djdxixAyKW71mV9FCkhjaGdDz0F5ttSLMmasrkmrw2Zt2aCM7Fgp18ZK33?=
+ =?iso-8859-1?Q?3ED8oF6N+YJ8FxPnCpfO8ilpgn/C8rhBcZBLo43r6reFGTtZGp+oeaaszM?=
+ =?iso-8859-1?Q?0tOSqCN8nJA4aHjRdvvGqSkMuGu4XwdJVPaDO6JPKAr+F03E4586ZC3sN3?=
+ =?iso-8859-1?Q?YaLOhlxK1ddFX0TUpsAe6GWalXRhNeUBQyXdRMHYYc/bXCNhXBXqDWZ+t+?=
+ =?iso-8859-1?Q?zTXEt/P5NsuDHizvo/iSeKbCd+4WMaaufSyjWsQuQHCiSlMBchwvuYM+Ad?=
+ =?iso-8859-1?Q?G1e6UoJqS1IQeKY/SbjmJmEMyaUSBVs6ZPBs1v1sfrO32qy6qYqO6Yoww6?=
+ =?iso-8859-1?Q?fhIkI+P3qu0lWtR7RaUDPpOQo9HraDdYlwfZJdrUK3IzzDOLpOOX4Bkq/V?=
+ =?iso-8859-1?Q?pSAqgmvmUPBV1Z4cxIBM7gCkmSIByvBHDcxhmL1YwNzfa53Q9hmwdSebpc?=
+ =?iso-8859-1?Q?Ib643akAvnbfFx33+2WXbKDnJChjB+csqBdr7yj4SppYnSfYMs96+qEz5O?=
+ =?iso-8859-1?Q?5xi4t6AO6B9DjcUOeSR5nrIOOFVy3i8bmZSUrH9WONO0mBPEW5BjJ6lIYo?=
+ =?iso-8859-1?Q?PZdzwiSRKiTWpIFCrv8J0X0Ht+yJ2HRXjBh8ZFNDaxmRp7skIMg5CgDH9o?=
+ =?iso-8859-1?Q?n5qfRCK567JvFM4daGhh3auRStr0BdIpPIXzyAWnskld/ucPrcFX38o1LM?=
+ =?iso-8859-1?Q?L/dNCWhCmCzW0YpOKyaoOma19ogZ/FpgXWvx7ZceNZglndKx6j1RK1h/xm?=
+ =?iso-8859-1?Q?fqcpluaqNhjboE5osOyTqAFurwKmGjEYONvMvBwxsFGVSyXFhpmxLisPji?=
+ =?iso-8859-1?Q?94D6XKWouhGrWoX4Io+wyxGawJpnM3wOxwHmRSQqsSvJXKPWwpABSDYKsU?=
+ =?iso-8859-1?Q?/KdXG6VfE0d+Uql418qa7rHt/WyemCwnZYvdugWVesu0u5QKQL+2z2AjYM?=
+ =?iso-8859-1?Q?0++KH4haTUBgSwdBQVoGF1MzLKiiZb/X+9B8MEISeJQhRl5RW/rvOpWw?=
+ =?iso-8859-1?Q?=3D=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>
-Date: Tue, 29 Aug 2023 17:12:48 +0200
-Message-ID: <CAC8rN+AQUKH1pUHe=bZh+bw-Wxznx+Lvom9iTruGQktGb=FFyw@mail.gmail.com>
-Subject: [RFC] RJ45 to SFP auto-sensing and switching in mux-ed single-mac
- devices (XOR RJ/SFP)
-To: netdev@vger.kernel.org
-Cc: simonebortolin@hack-gpon.org, nanomad@hack-gpon.org, 
-	Federico Cappon <dududede371@gmail.com>, daniel@makrotopia.org, lorenzo@kernel.org, 
-	ftp21@ftp21.eu, pierto88@hack-gpon.org, hitech95@hack-gpon.org, 
-	davem@davemloft.net, andrew@lunn.ch, edumazet@google.com, 
-	hkallweit1@gmail.com, kuba@kernel.org, pabeni@redhat.com, 
-	linux@armlinux.org.uk, nbd@nbd.name
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: city.ac.uk
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CWLP265MB6449.GBRP265.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: f78c48af-c622-4c4d-7265-08dba8a3030b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Aug 2023 15:17:08.7167
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: dd615949-5bd0-4da0-ac52-28ef8d336373
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: np8pp6cRryVIfIZIkLhHJ02uktoxHk1LcQn18hh1KeSp6SNQnNZ/CntwUrrXDbpUtD7QFHqRR43DorPk2phFmwJE6Pz+G7/vWTsC/0nhD+o=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CWLP265MB5867
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
-
-I and some folks in CC are working to properly port all the
- functions of a Zyxel ex5601-t0 to OpenWrt.
-
-The manufacturer decided to use a single SerDes connected
- to both an SPF cage and an RJ45 phy. A simple GPIO is
- used to control a 2 Channel 2:1 MUX to switch the two SGMII pairs
- between the RJ45 and the SFP.
-
-  =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=90  =E2=94=
-=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=90   =E2=94=
-=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=90
-  =E2=94=82     =E2=94=82  =E2=94=82      =E2=94=82   =E2=94=82         =E2=
-=94=82
-  =E2=94=82     =E2=94=82  =E2=94=82      =E2=94=9C=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=A4 SFP     =E2=94=82
-  =E2=94=82     =E2=94=82  =E2=94=82      =E2=94=82   =E2=94=94=E2=94=80=E2=
-=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=98
-  =E2=94=82     =E2=94=82  =E2=94=82      =E2=94=82
-  =E2=94=82 MAC =E2=94=9C=E2=94=80=E2=94=80=E2=94=A4 MUX  =E2=94=82   =E2=
-=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=80=E2=94=90
-  =E2=94=82     =E2=94=82  =E2=94=82      =E2=94=82   =E2=94=82         =E2=
-=94=82
-  =E2=94=82     =E2=94=82  =E2=94=82      =E2=94=82   =E2=94=82 RJ45    =E2=
-=94=82
-  =E2=94=82     =E2=94=82  =E2=94=82      =E2=94=9C=E2=94=80=E2=94=80=E2=94=
-=80=E2=94=A4 2.5G PHY=E2=94=82
-  =E2=94=82     =E2=94=82  =E2=94=82      =E2=94=82   =E2=94=82         =E2=
-=94=82
-  =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=98  =E2=94=
-=94=E2=94=80=E2=94=80=E2=94=80=E2=96=B2=E2=94=80=E2=94=80=E2=94=98   =E2=94=
-=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
-=E2=94=80=E2=94=98
-               =E2=94=82
-  MUX-GPIO =E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=98
-
-Other vendors may implement this differently (e.g. Keenetic
- KN-1011 has a similar setup, although the PHY is doing all the work),
- but this seems a common enough approach to produce cheap CPEs
- with multiple interface types for fiber internet.
-
-In this particular case, Zyxel implemented a user-land script[1] that is
- continuously polling GPIO 57 (Moddef0) of the SFP cage.
-
-Once an SFP module is detected the process continues as follows:
-- An MDIO command disables the RJ45 PHY
-- A GPIO write to GPIO 10 that switches the MUX to the SFP interface
-- The MAC is then re-configured by writing directly to the SoC registers
- using a mix of lookup tables and heuristics/try-catch.
-
-This allows Zyxel to configure the MAC with the supposedly correct SFP
- interface speed, bypassing any well-established interface speed
- auto-detection and negotiation logic.
-
-Zyxel also configures the GMAC at boot with a fixed speed of 2500M
- forcing the link status to be always up irrespective of the real
- physical interface status.
-
-On SFP disconnect the process is simply applied in reverse.
-
-We are looking for guidance on how to design changes that could achieve
- the following goals and could be accepted upstream in the future:
-
- - SFP and RJ45 speed auto-sensing and auto-negotiation working
- - Automatic SFP/RJ45 switching
- - Failsafe logic in case both media are connected.
- - Reduce overall potential power consumption and rate-adaption by not
-   having the GMAC always switched to 2500M mode without reason.
- - (optional) default configurable logic for both failsafe and idle status
-
-References:
-[1]: https://github.com/pameruoso/zyxel-ex5601t0/blob/V5.70(ACDZ.0)C0/targe=
-t/linux/mediatek/ex5601t0/base-files/bin/sfp_wan.sh
+> Yes, the implementation needs to be aligned with the legal license requir=
+ements.=0A=
+> It might not be the ideal solution but any mix of GPL and non-GPL compone=
+nts needs=0A=
+> to stay with in the legal constraints.=0A=
+=0A=
+For the purpose of upstreaming, the repository was forked [https://github.c=
+om/GREGORIO-M/mp-dccp] to remove non-GPL components and to update the licen=
+se to show GPL-2.0. Is this enough to solve the license issue? If so, is it=
+ still agreeable for us to upstream and maintain MP-DCCP, so that, once DCC=
+P deprecates, MP-DCCP becomes the sole DCCP enabler in the kernel? What ste=
+ps would the upstreaming involve? Do you require any information about the =
+MP?=0A=
+=0A=
+From: Stephen Hemminger <stephen@networkplumber.org>=0A=
+Sent: 18 August 2023 17:20=0A=
+To: Maglione, Gregorio <Gregorio.Maglione@city.ac.uk>=0A=
+Cc: Paolo Abeni <pabeni@redhat.com>; Kuniyuki Iwashima <kuniyu@amazon.com>;=
+ Jakub Kicinski <kuba@kernel.org>; David S. Miller <davem@davemloft.net>; E=
+ric Dumazet <edumazet@google.com>; Florian Westphal <fw@strlen.de>; netdev@=
+vger.kernel.org <netdev@vger.kernel.org>; Rakocevic, Veselin <Veselin.Rakoc=
+evic.1@city.ac.uk>; Markus.Amend@telekom.de <Markus.Amend@telekom.de>; nath=
+alie.romo-moreno@telekom.de <nathalie.romo-moreno@telekom.de>=0A=
+Subject: Re: DCCP Deprecation =0A=
+=A0=0A=
+CAUTION: This email originated from outside of the organisation. Do not cli=
+ck links or open attachments unless you recognise the sender and believe th=
+e content to be safe.=0A=
+=0A=
+=0A=
+On Fri, 18 Aug 2023 09:35:02 +0000=0A=
+"Maglione, Gregorio" <Gregorio.Maglione@city.ac.uk> wrote:=0A=
+=0A=
+> > > The protocol works at the kernel level, and has a GPL scheduler and r=
+eordering which are the default algorithms. The GitHub implementation inclu=
+des some non-GPL schedulers and reordering algorithms used for testing, whi=
+ch can be removed if upstreaming.=0A=
+> >IANAL=0A=
+> >=0A=
+> >The implementation I looked at on github was in IMHO a GPL violation bec=
+ause it linked GPL=0A=
+> and non GPL code into a single module. That makes it a derived work.=0A=
+> >=0A=
+> >If you put non-GPL scheduler into userspace, not a problem.=0A=
+> >=0A=
+> >If you put non-GPL scheduler into a different kernel module, according t=
+o precedent=0A=
+> set by filesystems and other drivers; then it would be allowed.=A0 BUT yo=
+u would need=0A=
+> to only use exported API's not marked GPL.=A0 And adding new EXPORT_SYMBO=
+L() only=0A=
+> used by non-GPL code would get rejected. Kernel developers are openly hos=
+tile to non-GPL=0A=
+> code and would want any export symbols to be EXPORT_SYMBOL_GPL.=0A=
+>=0A=
+> I see, the problem centres around the implementation rather than the prot=
+ocol, as the protocol itself does not need these non-GPL components. So, wo=
+uld another option to the ones you've already suggested be that of creating=
+ a repository without the non-GPL components, and consider only that for pu=
+rposes of upstreaming?=0A=
+=0A=
+Yes, the implementation needs to be aligned with the legal license requirem=
+ents.=0A=
+It might not be the ideal solution but any mix of GPL and non-GPL component=
+s needs=0A=
+to stay with in the legal constraints.=
 
