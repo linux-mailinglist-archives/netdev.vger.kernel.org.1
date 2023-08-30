@@ -1,481 +1,268 @@
-Return-Path: <netdev+bounces-31455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31457-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B78178E18F
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 23:43:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFAAC78E202
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 00:01:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92654281168
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 21:43:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE1B0280D7B
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 22:01:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 485058486;
-	Wed, 30 Aug 2023 21:43:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E9BD883B;
+	Wed, 30 Aug 2023 22:01:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35427747D
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 21:43:00 +0000 (UTC)
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 837B7CC
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 14:42:29 -0700 (PDT)
-Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-31de47996c8so27959f8f.2
-        for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 14:42:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693431678; x=1694036478; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E4SOmJcovueELRWloeT1AZWURy5zGsL6x6LbWkPvTT4=;
-        b=ZGevZgSrHPMUIAgaCA2pXP+t88ZkVxBo1SeO+iyBXvwvZYckiGEkfcvdyyqzkYtxzL
-         yrVSTNFQW/mH2nsU7xTYjL1Cc/cvBmnVOsSFj0MEIRV6xtA0dxukLN5QfoJnmKqR7/aZ
-         5RasdUK37mGuWLkmA46gDwIrI28lT6Jgw6GqHIq1GeR4JyuwQZntrtt4kKC6F7g1HqDa
-         L9F+VkSO9IUh5adNtp5n2m5LAhuPZdSZl/Rv14oxesF6Tt+5PnVFW5mdmmPQMIR9qmLY
-         KB4GyzsksSA8gepS62t6wlEiU5sitvvsIm6YGL0blYZj7lNfqnqwPVsEtVaNWJ2mJ7qB
-         Hhzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693431678; x=1694036478;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=E4SOmJcovueELRWloeT1AZWURy5zGsL6x6LbWkPvTT4=;
-        b=hV1Bxe1DDjjMIaTksdmmh40mTYVBO3iUQBu7Nj701iFWxq+3ajrW4pn+aUvDNVjdL4
-         P3B78QYqI2hVPGtXj6zLt8hwj/XjhljTQIR0XNKGqWr/ZAMZeIVEReK26lIQdZULGzr6
-         du6B+5dJQeTsmjDZaNJKzZQTnOZoRit46qjkLLhlQqESNbEpUbkmFZThi2z0HVCGFuJa
-         GT5luqqyNB52k9h4tNr9oQsDWzWkQoHcdvKY8setupjlaaRdcROYn0tG9EjCFzPXYDtY
-         AhmMMIIlFI98L0B0jNdWEffLUCG5nVXZbH00txpKjSgucFybleDSVi0FaRjXKsBuwgux
-         Sb+A==
-X-Gm-Message-State: AOJu0Yx5lgVGmEmcYe/gnC9/zeAipPRg11liSP1w1iF0cgHpjG8pYkuv
-	cIj21QGX7DQYKwNjVDJilbM=
-X-Google-Smtp-Source: AGHT+IGCKDkbodo2xrR8YMbyxlmTS7bioqqwIkfBdnxhZ4wM8Jm2HJbTkzRdWd181Z8uomGcARMZcw==
-X-Received: by 2002:a5d:6b88:0:b0:319:6fff:f2c1 with SMTP id n8-20020a5d6b88000000b003196ffff2c1mr2694512wrx.38.1693431678079;
-        Wed, 30 Aug 2023 14:41:18 -0700 (PDT)
-Received: from xmarquiegui-HP-ZBook-15-G6.internal.ainguraiiot.com (210.212-55-6.static.clientes.euskaltel.es. [212.55.6.210])
-        by smtp.gmail.com with ESMTPSA id l4-20020adffe84000000b003176eab8868sm33434wrr.82.2023.08.30.14.41.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Aug 2023 14:41:17 -0700 (PDT)
-From: Xabier Marquiegui <reibax@gmail.com>
-To: richardcochran@gmail.com
-Cc: chrony-dev@chrony.tuxfamily.org,
-	mlichvar@redhat.com,
-	netdev@vger.kernel.org,
-	ntp-lists@mattcorallo.com,
-	reibax@gmail.com
-Subject: [PATCH] ptp: Demultiplexed timestamp channels
-Date: Wed, 30 Aug 2023 23:41:01 +0200
-Message-Id: <20230830214101.509086-2-reibax@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230830214101.509086-1-reibax@gmail.com>
-References: <ZO37vZvXX9OPDLHH@hoboy.vegasvil.org>
- <20230830214101.509086-1-reibax@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EAD0749B;
+	Wed, 30 Aug 2023 22:01:40 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79EB810C8;
+	Wed, 30 Aug 2023 15:01:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1693432872; x=1724968872;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=05fV2nbo/+cH7rUuq5i63nAOWiuva1fan8zkIH6gRko=;
+  b=MpX3vN966x6rGbC/AFlHj81RRRdeP1spydwgDWDVhQNrYGwW3qgHOZNg
+   C7Pc+m26csf8FmDn7+w1mehSx/5DjlxbnsrxG3xkZ6LBwzp6p6FI4qiaw
+   jber37Pw+aXKTmOFldfo1sPdRQe6vbZ018Lop716ION6t0Ew9dFtsC6w9
+   F3oLogs9edRKFi+TzfqwJeLLUjtpvkU5qmY065Rt6hAIoea+lj6kbtnui
+   eOvk/2oVdC9cW8P4iW4nWunyku3W9c0pJ8YFoaPmRIXrc+msHNzNvVfMp
+   yR2zwYxaZ2aQuV0n3UcOOjz8Hp0Hi0AGf3vY9Z5zUsoAhC7sNoAj0KaFR
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10818"; a="462135425"
+X-IronPort-AV: E=Sophos;i="6.02,214,1688454000"; 
+   d="scan'208";a="462135425"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2023 14:57:37 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10818"; a="853882373"
+X-IronPort-AV: E=Sophos;i="6.02,214,1688454000"; 
+   d="scan'208";a="853882373"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmsmga002.fm.intel.com with ESMTP; 30 Aug 2023 14:57:37 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 30 Aug 2023 14:57:36 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Wed, 30 Aug 2023 14:57:36 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.105)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Wed, 30 Aug 2023 14:57:36 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XaDGjdTP9RCJmB9n14Vu2uqF8E94MUVsc0fkkbj0aOKojYZqFuZe6NRk+vGvs1it75D3/JCTJV9xexW1by3XyuDdR1mcjCbvAYha3tt3oN7Ok8MkuQtvyDAWVl7XTJkGLOJh2KokbTxsh2B9o+OrofSOK9eyTmENGYF9VA4xCQukeQRMTfkQ5isCe3TUErkk/xf5RTz6BLgj4/UgRkH6gS0ngxfKaJDbAUSC3Rb5gkp4vy2hdyYtLpxpKrTBbkIYgnEby0+bSEWOrYW1xyJOuwH8wbCZ0N3BoSdcPkhvD32dk2/ZjGBrIuB7EW+pRAZxCV7D9owynO2/7mNqeIUVjw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6iaBkReoTb0bKznEbXBNRjdg29jwGr4vjyibsybcLiM=;
+ b=kxOldErg6ikmuTiz+CvH+0GcmWQn+hwzV/HJ0boglc7pyO4HFYl3pvBtKNfAIyVbn5VnOVJ9ABlouixSPkl9nJvcO2Oi61GFhpqsEpItqXe6Koqv/zJ8U3O5OO2jhzxi2Zf9XIHDApfr6k/U77tZDxP6OYvWeYg5bk6AUeuoCj9xW2UtHH4Yhw+PyUNu6L3FFLP2igIv6iC5ExPl6d1KtjBY4a/SigIhf4f9NpkiKfNiF4tZP0+YewooFkIfKzoTNNFSKlDy+mCGfUAP+t2BYaAKc5da9LcjFmzsS2HiRdBqauh2atnVm0bWHCPZfU06tVKusZ7VPtb2NQ3HTQ58mw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ IA1PR11MB6242.namprd11.prod.outlook.com (2603:10b6:208:3e8::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.20; Wed, 30 Aug
+ 2023 21:57:34 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::c1f9:b4eb:f57e:5c3d]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::c1f9:b4eb:f57e:5c3d%3]) with mapi id 15.20.6699.035; Wed, 30 Aug 2023
+ 21:57:34 +0000
+Date: Wed, 30 Aug 2023 23:57:22 +0200
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Magnus Karlsson <magnus.karlsson@gmail.com>
+CC: <magnus.karlsson@intel.com>, <bjorn@kernel.org>, <ast@kernel.org>,
+	<daniel@iogearbox.net>, <netdev@vger.kernel.org>, <jonathan.lemon@gmail.com>,
+	<bpf@vger.kernel.org>,
+	<syzbot+822d1359297e2694f873@syzkaller.appspotmail.com>
+Subject: Re: [PATCH bpf] xsk: fix xsk_diag use-after-free error during socket
+ cleanup
+Message-ID: <ZO+7QvZRfCuCIO3Q@boxer>
+References: <20230830151704.14855-1-magnus.karlsson@gmail.com>
+ <ZO92QCe1s7yUiHRR@boxer>
+ <CAJ8uoz2SMuwrO_OvrvJyWynfKMYuNNcxwNzt_O=T_=TnY4sA2g@mail.gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <CAJ8uoz2SMuwrO_OvrvJyWynfKMYuNNcxwNzt_O=T_=TnY4sA2g@mail.gmail.com>
+X-ClientProxiedBy: BE1P281CA0035.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:22::12) To DM4PR11MB6117.namprd11.prod.outlook.com
+ (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|IA1PR11MB6242:EE_
+X-MS-Office365-Filtering-Correlation-Id: 90c06865-5926-41a4-2bb0-08dba9a41dd0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: lZg9Z564xwxUzfDayNHSDK08xHZ4ZlydFWdYaF9N1y0+gF9CD5zuOK/kJUdfDa7wgs4iOfRYq3htn4OVoUx/LfpC1mfA4G5Pz6V149UfK28vs4DvJ2OLAt72KYXpMFfM61wr66JpSusgMeGEX8DVoBqGV3P1Cwpx9iYzEabzIOAhiCnTtx4KdqMPWuIZUXUeEyeTKz8+23xAg0pXp2qMQ8uLfrZs77r8zE/7oyvkrkvGI5rkIXBYSPUJryX/NTQs+UfVuui8/DW7pHBuBsmq8soW2LzNhzroosUIkHUFz12YdHH8BFbPrbUFl89ryxKo+yyIxoeU5oemgzReLn1fpvkWsIVJAsoQZ6r/BFmdRcYhhK1pACH4fO8qdspndueW/MTKF7V99wK22nrSPXenNAdl00416r0699k5oY3oKzvSgHrT03Kxb/yrLsOMhicUUVNknibhBpH4/tS3GjCZtMDbaTAifb6z8mEoYyoW/AnXDV5NKM+PHOARyaYNgRWsc63mmWmoCNDRw/fTrf/XqNfvDl2DspoOp5xh1Q6aRWc6yh5/wpH50+lp3TCeBWsRH4vpn3ny9Hzt+P0SnSu0HnQgsYZX3Ahjqu7Wgw2h8OQ=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(376002)(39860400002)(136003)(396003)(346002)(1800799009)(186009)(451199024)(478600001)(66476007)(66946007)(66556008)(6916009)(316002)(82960400001)(38100700002)(2906002)(41300700001)(8676002)(8936002)(86362001)(5660300002)(44832011)(4326008)(83380400001)(6512007)(9686003)(6486002)(26005)(6666004)(6506007)(33716001)(67856001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?bf8cp6A1Os9FCnSIwDbBeTZtb1RaCyRam171cAfa4+BnHOAaGSFd10f7btbh?=
+ =?us-ascii?Q?0k3LTTCjxRSj99KA+LnM3APlFcTspl+vjdiickEc9w3NJ+lnRT5YZj/P6XNj?=
+ =?us-ascii?Q?t0Q5qFsfnI0rKpy6BQ37dafDh2owdLjK5TwtaPCCBWE4i9D7DLwJQSol40eL?=
+ =?us-ascii?Q?D36qwgcc/nAM8AO5qmg6z2BdxSi8B+HysX1/9ftvGPsrv8n75WdI37U+QleN?=
+ =?us-ascii?Q?ehp9sA325AdD5RLqWiBdLA3cpM+GgadntGi5u8ElwMJcVIPItP0pR130srip?=
+ =?us-ascii?Q?o5E7lCTOHoMjl0LjaPA1o0eusb+TSdw5eOr2cClA1MI2jI5xrxPBmAvkDpQX?=
+ =?us-ascii?Q?zTOVxEbXP0hdg/QYcAhNmLDItsX+i7YjCBzf7uXMFDrTYFI/tnI76nyqkoh3?=
+ =?us-ascii?Q?O7bAkdm5fsCun+YiXZhRs1KIYlLvBtb0rzqiyd3CnCA7Z82+FoIyvcZTKJSn?=
+ =?us-ascii?Q?xAZrp2lKF0ufmYgg+z/GduSISKUdbY9N5T8n106YcDaXZdWXf7Mbq0z874cL?=
+ =?us-ascii?Q?m9pT660GjHCmmY18rBr66hZ2fd2lLKjbk5QlggoSvOh7Gj8CSuI81ml7XENH?=
+ =?us-ascii?Q?Ot8dc3SjtaYTlB5SCjrHRpAZ7ujEyyQ68ODLgY6yVTKScs/oI7qC0cgh2IUW?=
+ =?us-ascii?Q?Y5mTXyf6SARJ0MJw8sVDsYhagKPiD+toCMlcQ/RBZlYvYx77Cwgm3cw4QAyk?=
+ =?us-ascii?Q?Fp5sY47ILXptxzApi1ADOnSGw1prY4P8v5rstxNAIP7ItjN5jlSkCkIr+mEp?=
+ =?us-ascii?Q?W6HAFWJR6BA1MNLj40TNC02oI1+4GJmrDY9q2porf0snx3BaukLccE77dY7P?=
+ =?us-ascii?Q?UXMh2YPfuyNakxrjShki0NVQwwMoGWrwyAetNEl9RM5dtoxZIfiIONUMAeMS?=
+ =?us-ascii?Q?Z9dGzIFLAug9EASgFwxRYF3TPgT48rtn6Iy9pYYPAyRJm7plC7IjgoMccIv2?=
+ =?us-ascii?Q?Rf7MrBfRjs1gwtoBx4m3Wp0s/A+KF/sadmrtihQElWMbe/BeV0AOttI2ST6F?=
+ =?us-ascii?Q?3wNXfuKae+qDJrWecsGKiSJmZAg0VDEsVYYF/hFTsLq6dPiul4mQAQoimdzT?=
+ =?us-ascii?Q?mWpk8Gro/E3DlXVcXuolQjjkbZ0cM5MND7WyrbkoUJfo6NLN4UEIpiwq9uxc?=
+ =?us-ascii?Q?qjO70ZkND+yC+BHV8VyZ9hb+8Fr4mjx2BD8fUvkRQN9ZRbH3iB928W9+aaJJ?=
+ =?us-ascii?Q?GP+9+KpD7KV+m3zy8Z36VZzNRhguKK/l4OjTzCU2+8OB3GWZx7aU673XO0yR?=
+ =?us-ascii?Q?UyFSXPObEKVL8j2X87rYeC6iS4DfRDQ5KoqR9aM3iM5jZ2BjZi8fKtWJf9IG?=
+ =?us-ascii?Q?kOgwz21i2mNF40UBTbrURvN0m8pCqVZ0mLzb9nsXQX8g/ShycQnqXob6k1es?=
+ =?us-ascii?Q?41AsN6bstOzKQOu0rhk+2/z0gew1Pkx3dHe3TDqUNbf4iIvl8RSyHYU0PW9X?=
+ =?us-ascii?Q?ctK/rDDGu/cHtQXybUqD01WN22OKAK8xQ82GXneRodALcdW2Q2jWJCgONCZS?=
+ =?us-ascii?Q?qo18So+mpYTlRwEV2tSLGoIWcMAFA11rENG1m2krjhzqvKf3Tj/ROaVgWZu9?=
+ =?us-ascii?Q?yy1Tp1AaK8oB9Pk4JXdbJ6jAlLzt3bkc22bmunTmEboyq5APUEm6OFZ6tDol?=
+ =?us-ascii?Q?DQ=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 90c06865-5926-41a4-2bb0-08dba9a41dd0
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Aug 2023 21:57:34.5598
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: sgLzEXeSItTtG9plbJpywJXq5CKRGZCyawypjkGGPdi4fT2k8pOPWRvzAou0dHlHlcpTQN5LhyCJPKpRyQE7DG2gpOg+TtzyR/WGQwfKYXc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6242
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add the posibility to demultiplex the timestamp channels for
-external timestamp event channels.
+On Wed, Aug 30, 2023 at 08:58:09PM +0200, Magnus Karlsson wrote:
+> On Wed, 30 Aug 2023 at 19:03, Maciej Fijalkowski
+> <maciej.fijalkowski@intel.com> wrote:
+> >
+> > On Wed, Aug 30, 2023 at 05:17:03PM +0200, Magnus Karlsson wrote:
+> > > From: Magnus Karlsson <magnus.karlsson@intel.com>
+> > >
+> > > Fix a use-after-free error that is possible if the xsk_diag interface
+> > > is used at the same time as the socket is being closed. In the early
+> >
+> > I thought our understanding is: socket is alive, we use diag interface
+> > against it but netdev that we bound socket to is being torn down.
+> 
+> If the socket was not going down at the same time, we would still have
+> a reference to the netdevice and it would not disappear. So the socket
+> needs to be going down for this to happen.
 
-In some applications it can be necessary to have different
-consumers for different timestamp channels. For example,
-synchronize to an external pps source with linuxptp ts2phc
-while timestmping external events with another application.
+No, I am able to trigger this now on my local system with KASAN turned on
+via:
 
-This commit maintains the original multiplexed queue and adds an
-individual queue per external timestamp channel. All enabled channels
-will be directed to the multiplexed queue by default. On file open, a
-specific channel will be redirected to the dedicated char device, and on
-close it will automatically go back to the multiplexed queue.
+window 0:
+sudo ./xdpsock -i enp24s0f0np0 -r -z -q 17
 
-Signed-off-by: Xabier Marquiegui <reibax@gmail.com>
----
- drivers/ptp/ptp_chardev.c | 167 +++++++++++++++++++++++++++++++++++---
- drivers/ptp/ptp_clock.c   |  43 +++++++---
- drivers/ptp/ptp_private.h |  22 +++++
- 3 files changed, 210 insertions(+), 22 deletions(-)
+window 1:
+watch -n 0.1 "ss --xdp -e"
 
-diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
-index 362bf756e6b7..c31cfc5b0907 100644
---- a/drivers/ptp/ptp_chardev.c
-+++ b/drivers/ptp/ptp_chardev.c
-@@ -10,11 +10,14 @@
- #include <linux/sched.h>
- #include <linux/slab.h>
- #include <linux/timekeeping.h>
--
-+#include <linux/cdev.h>
-+#include <linux/fs.h>
- #include <linux/nospec.h>
- 
- #include "ptp_private.h"
- 
-+#define DMTSC_NOT -1
-+
- static int ptp_disable_pinfunc(struct ptp_clock_info *ops,
- 			       enum ptp_pin_function func, unsigned int chan)
- {
-@@ -443,16 +446,24 @@ __poll_t ptp_poll(struct posix_clock *pc, struct file *fp, poll_table *wait)
- 
- #define EXTTS_BUFSIZE (PTP_BUF_TIMESTAMPS * sizeof(struct ptp_extts_event))
- 
--ssize_t ptp_read(struct posix_clock *pc,
--		 uint rdflags, char __user *buf, size_t cnt)
-+ssize_t ptp_queue_read(struct ptp_clock *ptp, char __user *buf, size_t cnt,
-+		       int dmtsc)
- {
--	struct ptp_clock *ptp = container_of(pc, struct ptp_clock, clock);
--	struct timestamp_event_queue *queue = &ptp->tsevq;
-+	struct timestamp_event_queue *queue;
-+	struct mutex *tsevq_mux;
- 	struct ptp_extts_event *event;
- 	unsigned long flags;
- 	size_t qcnt, i;
- 	int result;
- 
-+	if (dmtsc < 0) {
-+		queue = &ptp->tsevq;
-+		tsevq_mux = &ptp->tsevq_mux;
-+	} else {
-+		queue = &ptp->dmtsc_devs.cdev_info[dmtsc].tsevq;
-+		tsevq_mux = &ptp->dmtsc_devs.cdev_info[dmtsc].tsevq_mux;
-+	}
-+
- 	if (cnt % sizeof(struct ptp_extts_event) != 0)
- 		return -EINVAL;
- 
-@@ -461,23 +472,23 @@ ssize_t ptp_read(struct posix_clock *pc,
- 
- 	cnt = cnt / sizeof(struct ptp_extts_event);
- 
--	if (mutex_lock_interruptible(&ptp->tsevq_mux))
-+	if (mutex_lock_interruptible(tsevq_mux))
- 		return -ERESTARTSYS;
- 
- 	if (wait_event_interruptible(ptp->tsev_wq,
- 				     ptp->defunct || queue_cnt(queue))) {
--		mutex_unlock(&ptp->tsevq_mux);
-+		mutex_unlock(tsevq_mux);
- 		return -ERESTARTSYS;
- 	}
- 
- 	if (ptp->defunct) {
--		mutex_unlock(&ptp->tsevq_mux);
-+		mutex_unlock(tsevq_mux);
- 		return -ENODEV;
- 	}
- 
- 	event = kmalloc(EXTTS_BUFSIZE, GFP_KERNEL);
- 	if (!event) {
--		mutex_unlock(&ptp->tsevq_mux);
-+		mutex_unlock(tsevq_mux);
- 		return -ENOMEM;
- 	}
- 
-@@ -497,7 +508,7 @@ ssize_t ptp_read(struct posix_clock *pc,
- 
- 	cnt = cnt * sizeof(struct ptp_extts_event);
- 
--	mutex_unlock(&ptp->tsevq_mux);
-+	mutex_unlock(tsevq_mux);
- 
- 	result = cnt;
- 	if (copy_to_user(buf, event, cnt))
-@@ -506,3 +517,139 @@ ssize_t ptp_read(struct posix_clock *pc,
- 	kfree(event);
- 	return result;
- }
-+
-+ssize_t ptp_read(struct posix_clock *pc, uint rdflags, char __user *buf,
-+		 size_t cnt)
-+{
-+	struct ptp_clock *ptp = container_of(pc, struct ptp_clock, clock);
-+
-+	return ptp_queue_read(ptp, buf, cnt, DMTSC_NOT);
-+}
-+
-+static int ptp_dmtsc_open(struct inode *inode, struct file *file)
-+{
-+	struct ptp_dmtsc_cdev_info *cdev = container_of(
-+		inode->i_cdev, struct ptp_dmtsc_cdev_info, dmtsc_cdev);
-+
-+	file->private_data = cdev;
-+
-+	if (mutex_lock_interruptible(&cdev->pclock->dmtsc_en_mux))
-+		return -ERESTARTSYS;
-+	cdev->pclock->dmtsc_en_flags |= (0x1 << (cdev->minor));
-+	mutex_unlock(&cdev->pclock->dmtsc_en_mux);
-+
-+	return stream_open(inode, file);
-+}
-+
-+int ptp_dmtsc_release(struct inode *inode, struct file *file)
-+{
-+	struct ptp_dmtsc_cdev_info *cdev = file->private_data;
-+
-+	if (mutex_lock_interruptible(&cdev->pclock->dmtsc_en_mux))
-+		return -ERESTARTSYS;
-+	cdev->pclock->dmtsc_en_flags &= ~(0x1 << (cdev->minor));
-+	mutex_unlock(&cdev->pclock->dmtsc_en_mux);
-+
-+	return 0;
-+}
-+
-+ssize_t ptp_dmtsc_read(struct file *file, char __user *buf, size_t cnt,
-+		       loff_t *offset)
-+{
-+	struct ptp_dmtsc_cdev_info *cdev = file->private_data;
-+
-+	return ptp_queue_read(cdev->pclock, buf, cnt, cdev->minor);
-+}
-+
-+static const struct file_operations fops = {
-+						.owner = THIS_MODULE,
-+						.open = ptp_dmtsc_open,
-+						.read = ptp_dmtsc_read,
-+						.release = ptp_dmtsc_release
-+						};
-+
-+void ptp_dmtsc_cdev_clean(struct ptp_clock *ptp)
-+{
-+	int idx, major;
-+	dev_t device;
-+
-+	major = MAJOR(ptp->dmtsc_devs.devid);
-+	for (idx = 0; idx < ptp->info->n_ext_ts; idx++) {
-+		if (ptp->dmtsc_devs.cdev_info[idx].minor >= 0) {
-+			device = MKDEV(major, idx);
-+			device_destroy(ptp->dmtsc_devs.dmtsc_class, device);
-+			cdev_del(&ptp->dmtsc_devs.cdev_info[idx].dmtsc_cdev);
-+			ptp->dmtsc_devs.cdev_info[idx].minor = -1;
-+		}
-+	}
-+	class_destroy(ptp->dmtsc_devs.dmtsc_class);
-+	unregister_chrdev_region(ptp->dmtsc_devs.devid, ptp->info->n_ext_ts);
-+	mutex_destroy(&ptp->dmtsc_devs.cdev_info[idx].tsevq_mux);
-+}
-+
-+int ptp_dmtsc_dev_register(struct ptp_clock *ptp)
-+{
-+	int err, idx, major;
-+	dev_t device;
-+	struct device *dev;
-+
-+	/* Allocate memory for demuxed device management */
-+	ptp->dmtsc_devs.cdev_info = kcalloc(ptp->info->n_ext_ts,
-+					    sizeof(*ptp->dmtsc_devs.cdev_info),
-+					    GFP_KERNEL);
-+	if (!ptp->dmtsc_devs.cdev_info) {
-+		err = -ENODEV;
-+		goto err;
-+	}
-+	for (idx = 0; idx < ptp->info->n_ext_ts; idx++)
-+		ptp->dmtsc_devs.cdev_info[idx].minor = -1;
-+	/* Create devices for all channels. The mask will control which of them get fed */
-+	err = alloc_chrdev_region(&ptp->dmtsc_devs.devid, 0,
-+				  ptp->info->n_ext_ts, "ptptsevqch");
-+	if (!err) {
-+		major = MAJOR(ptp->dmtsc_devs.devid);
-+		ptp->dmtsc_devs.dmtsc_class =
-+			class_create(THIS_MODULE, "ptptsevqch_class");
-+		for (idx = 0; idx < ptp->info->n_ext_ts; idx++) {
-+			mutex_init(&ptp->dmtsc_devs.cdev_info[idx].tsevq_mux);
-+			device = MKDEV(major, idx);
-+			ptp->dmtsc_devs.cdev_info[idx].pclock = ptp;
-+			cdev_init(&ptp->dmtsc_devs.cdev_info[idx].dmtsc_cdev,
-+				  &fops);
-+			err = cdev_add(
-+				&ptp->dmtsc_devs.cdev_info[idx].dmtsc_cdev,
-+				device, 1);
-+			if (err) {
-+				goto cdev_clean;
-+			} else {
-+				ptp->dmtsc_devs.cdev_info[idx].minor = idx;
-+				dev = device_create(ptp->dmtsc_devs.dmtsc_class,
-+						    &ptp->dev, device, NULL,
-+						    "ptp%dch%d", ptp->index,
-+						    idx);
-+				if (IS_ERR(dev)) {
-+					err = PTR_ERR(dev);
-+					goto cdev_clean;
-+				}
-+			}
-+		}
-+	} else {
-+		goto dev_clean;
-+	}
-+	return 0;
-+
-+cdev_clean:
-+	ptp_dmtsc_cdev_clean(ptp);
-+dev_clean:
-+	kfree(ptp->dmtsc_devs.cdev_info);
-+	ptp->dmtsc_devs.cdev_info = NULL;
-+err:
-+	return err;
-+}
-+
-+void ptp_dmtsc_dev_uregister(struct ptp_clock *ptp)
-+{
-+	ptp_dmtsc_cdev_clean(ptp);
-+	kfree(ptp->dmtsc_devs.cdev_info);
-+	ptp->dmtsc_devs.cdev_info = NULL;
-+}
-diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
-index 80f74e38c2da..0a42c27c3514 100644
---- a/drivers/ptp/ptp_clock.c
-+++ b/drivers/ptp/ptp_clock.c
-@@ -172,6 +172,7 @@ static void ptp_clock_release(struct device *dev)
- 
- 	ptp_cleanup_pin_groups(ptp);
- 	kfree(ptp->vclock_index);
-+	mutex_destroy(&ptp->dmtsc_en_mux);
- 	mutex_destroy(&ptp->tsevq_mux);
- 	mutex_destroy(&ptp->pincfg_mux);
- 	mutex_destroy(&ptp->n_vclocks_mux);
-@@ -232,7 +233,9 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
- 	mutex_init(&ptp->tsevq_mux);
- 	mutex_init(&ptp->pincfg_mux);
- 	mutex_init(&ptp->n_vclocks_mux);
-+	mutex_init(&ptp->dmtsc_en_mux);
- 	init_waitqueue_head(&ptp->tsev_wq);
-+	ptp->dmtsc_en_flags = 0x0;
- 
- 	if (ptp->info->getcycles64 || ptp->info->getcyclesx64) {
- 		ptp->has_cycles = true;
-@@ -307,21 +310,27 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
- 
- 	/* Create a posix clock and link it to the device. */
- 	err = posix_clock_register(&ptp->clock, &ptp->dev);
--	if (err) {
--		if (ptp->pps_source)
--			pps_unregister_source(ptp->pps_source);
-+	if (err)
-+		goto reg_err;
- 
--		if (ptp->kworker)
--			kthread_destroy_worker(ptp->kworker);
-+	/* Create chardevs for demuxed external timestamp channels */
-+	if (ptp_dmtsc_dev_register(ptp))
-+		goto reg_err;
- 
--		put_device(&ptp->dev);
-+	return ptp;
- 
--		pr_err("failed to create posix clock\n");
--		return ERR_PTR(err);
--	}
-+reg_err:
-+	ptp_dmtsc_dev_uregister(ptp);
-+	if (ptp->pps_source)
-+		pps_unregister_source(ptp->pps_source);
- 
--	return ptp;
-+	if (ptp->kworker)
-+		kthread_destroy_worker(ptp->kworker);
-+
-+	put_device(&ptp->dev);
- 
-+	pr_err("failed to create posix clock\n");
-+	return ERR_PTR(err);
- no_pps:
- 	ptp_cleanup_pin_groups(ptp);
- no_pin_groups:
-@@ -330,6 +339,7 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
- 	if (ptp->kworker)
- 		kthread_destroy_worker(ptp->kworker);
- kworker_err:
-+	mutex_destroy(&ptp->dmtsc_en_mux);
- 	mutex_destroy(&ptp->tsevq_mux);
- 	mutex_destroy(&ptp->pincfg_mux);
- 	mutex_destroy(&ptp->n_vclocks_mux);
-@@ -367,6 +377,8 @@ int ptp_clock_unregister(struct ptp_clock *ptp)
- 	if (ptp->pps_source)
- 		pps_unregister_source(ptp->pps_source);
- 
-+	ptp_dmtsc_dev_uregister(ptp);
-+
- 	posix_clock_unregister(&ptp->clock);
- 
- 	return 0;
-@@ -378,12 +390,19 @@ void ptp_clock_event(struct ptp_clock *ptp, struct ptp_clock_event *event)
- 	struct pps_event_time evt;
- 
- 	switch (event->type) {
--
- 	case PTP_CLOCK_ALARM:
- 		break;
- 
- 	case PTP_CLOCK_EXTTS:
--		enqueue_external_timestamp(&ptp->tsevq, event);
-+		/* If event index demuxed queue mask is enabled send to dedicated fifo */
-+		if (ptp->dmtsc_en_flags & (0x1 << event->index)) {
-+			enqueue_external_timestamp(
-+				&ptp->dmtsc_devs.cdev_info[event->index].tsevq,
-+				event);
-+		} else {
-+			enqueue_external_timestamp(&ptp->tsevq, event);
-+		}
-+
- 		wake_up_interruptible(&ptp->tsev_wq);
- 		break;
- 
-diff --git a/drivers/ptp/ptp_private.h b/drivers/ptp/ptp_private.h
-index 75f58fc468a7..c473ef75d8d7 100644
---- a/drivers/ptp/ptp_private.h
-+++ b/drivers/ptp/ptp_private.h
-@@ -27,6 +27,20 @@ struct timestamp_event_queue {
- 	spinlock_t lock;
- };
- 
-+struct ptp_dmtsc_cdev_info {
-+	struct cdev dmtsc_cdev; /* Demuxed event device chardev */
-+	int minor; /* Demuxed event queue chardev device minor */
-+	struct ptp_clock *pclock; /* Direct access to parent clock device */
-+	struct mutex tsevq_mux; /* Protect access to device management */
-+	struct timestamp_event_queue tsevq; /* simple fifo for time stamps */
-+};
-+
-+struct ptp_dmtsc_dev_info {
-+	dev_t devid;
-+	struct class *dmtsc_class;
-+	struct ptp_dmtsc_cdev_info *cdev_info;
-+};
-+
- struct ptp_clock {
- 	struct posix_clock clock;
- 	struct device dev;
-@@ -36,6 +50,11 @@ struct ptp_clock {
- 	struct pps_device *pps_source;
- 	long dialed_frequency; /* remembers the frequency adjustment */
- 	struct timestamp_event_queue tsevq; /* simple fifo for time stamps */
-+	u32 dmtsc_en_flags; /* Demultiplexed timestamp channels enable flags */
-+	struct mutex
-+		dmtsc_en_mux; /* Demultiplexed timestamp channels sysfs mutex */
-+	struct ptp_dmtsc_dev_info
-+		dmtsc_devs; /* Demultiplexed timestamp channel access character devices */
- 	struct mutex tsevq_mux; /* one process at a time reading the fifo */
- 	struct mutex pincfg_mux; /* protect concurrent info->pin_config access */
- 	wait_queue_head_t tsev_wq;
-@@ -139,4 +158,7 @@ void ptp_cleanup_pin_groups(struct ptp_clock *ptp);
- 
- struct ptp_vclock *ptp_vclock_register(struct ptp_clock *pclock);
- void ptp_vclock_unregister(struct ptp_vclock *vclock);
-+
-+int ptp_dmtsc_dev_register(struct ptp_clock *ptp);
-+void ptp_dmtsc_dev_uregister(struct ptp_clock *ptp);
- #endif
--- 
-2.34.1
+window 2:
+sudo rmmod ice
 
+we hold the device via dev_get_by_index() in xsk_bind() but dev_put() is
+called from xsk_unbind_dev() which can happen either from xsk_release() or
+xsk_notifier(), our case refers to the latter.
+
+I don't see currently how ss gets the ifname but after rmmoding ice I am
+getting something bogus over there:
+
+Recv-Q Send-Q Local Address:Port Peer Address:PortProcess
+0      0               if18:q17              *     ino:18691 sk:2001
+        rx(entries:2048)
+        umem(id:0,size:16777216,num_pages:4096,chunk_size:4096,headroom:0,ifindex:0,qid:17,zc:1,refs:1)
+        fr(entries:4096)
+        cr(entries:2048)
+        stats(rx dropped:0,rx invalid:0,rx queue full:0,rx fill ring empty:0,tx invalid:0,tx ring empty:0)
+
+'if18' instead 'enp24s0f0np0'. With your patch we bail out early so we
+wouldn't have that problem AFAICT.
+
+> >
+> > > days of AF_XDP, the way we tested that a socket was not bound or being
+> > > closed was to simply check if the netdevice pointer in the xsk socket
+> > > structure was NULL. Later, a better system was introduced by having an
+> > > explicit state variable in the xsk socket struct. For example, the
+> > > state of a socket that is going down is XSK_UNBOUND.
+> > >
+> > > The commit in the Fixes tag below deleted the old way of signalling
+> > > that a socket is going down, setting dev to NULL. This in the belief
+> > > that all code using the old way had been exterminated. That was
+> > > unfortunately not true as the xsk diagnostics code was still using the
+> > > old way and thus does not work as intended when a socket is going
+> > > down. Fix this by introducing a test against the state variable. If
+> >
+> > Again, I believe it was not the socket going down but rather the netdev?
+> >
+> > > the socket is going down, simply abort the diagnostic's netlink
+> > > operation.
+> > >
+> > > Fixes: 18b1ab7aa76b ("xsk: Fix race at socket teardown")
+> > > Reported-by: syzbot+822d1359297e2694f873@syzkaller.appspotmail.com
+> >
+> > Nit: I see syzbot wanted you to include:
+> > Reported-and-tested-by: syzbot+822d13...@syzkaller.appspotmail.com
+> >
+> > > Signed-off-by: Magnus Karlsson <magnus.karlsson@intel.com>
+> > > ---
+> > >  net/xdp/xsk_diag.c | 3 +++
+> > >  1 file changed, 3 insertions(+)
+> > >
+> > > diff --git a/net/xdp/xsk_diag.c b/net/xdp/xsk_diag.c
+> > > index c014217f5fa7..da3100bfa1c5 100644
+> > > --- a/net/xdp/xsk_diag.c
+> > > +++ b/net/xdp/xsk_diag.c
+> > > @@ -111,6 +111,9 @@ static int xsk_diag_fill(struct sock *sk, struct sk_buff *nlskb,
+> > >       sock_diag_save_cookie(sk, msg->xdiag_cookie);
+> > >
+> > >       mutex_lock(&xs->mutex);
+> > > +     if (xs->state == XSK_UNBOUND)
+> > > +             goto out_nlmsg_trim;
+> >
+> > With the above I feel like we can get rid of xs->dev test in
+> > xsk_diag_put_info(), no?
+> 
+> It has to stay since the socket does not get a reference to the device
+> until it is bound. It is fine to use the xsk_diag interface on an
+> unbound socket to query its state.
+
+Yes good point here.
+
+> 
+> > > +
+> > >       if ((req->xdiag_show & XDP_SHOW_INFO) && xsk_diag_put_info(xs, nlskb))
+> > >               goto out_nlmsg_trim;
+> > >
+> > >
+> > > base-commit: 35d2b7ffffc1d9b3dc6c761010aa3338da49165b
+> > > --
+> > > 2.42.0
+> > >
 
