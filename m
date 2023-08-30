@@ -1,109 +1,231 @@
-Return-Path: <netdev+bounces-31427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2413878D6EC
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 17:21:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5778878D6F0
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 17:22:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DF8E1C20803
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 15:21:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13CF4281165
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 15:22:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76B5E6FCD;
-	Wed, 30 Aug 2023 15:21:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D5666FCE;
+	Wed, 30 Aug 2023 15:22:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64AC56FB5
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 15:21:38 +0000 (UTC)
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69F5C1A3
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 08:21:36 -0700 (PDT)
-Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-401d2e11dacso6675575e9.0
-        for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 08:21:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=isovalent.com; s=google; t=1693408895; x=1694013695; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=g3CtT48jPlJIgusYzTnrLdg/99F2+CEON4UsLWqQKko=;
-        b=PTndykky8SKmMRVa5wJO30iumxi4Lb2OpAoYzFfYTFpw9ZubZSzfnYBymf8lUNhyJW
-         zqttAdCC9VCrk6umAHFliAGPuDCVO/Q2XHr/CQkec0nRASvTS5sUsLqISy9hxSfLcwt0
-         F0ymHP8oCZy2B+D2066kMSYpXh9+69CW5dbTF4ooShZNT39pDe8xoiy2FjT6tjMlUdvH
-         tXXXcVM6zEuqEP199hVWNNskvjrBeUcoeZ0QQzE0Jq6Eh3XsXnaPUhzbwvy4QeFIh3tB
-         aH18EJrY/Yng2ykQ8rFJIeTzw/JTo6AF4/o16Tfuwy0zUW7qm4aIGKR1eq+ZFNzcbeLk
-         uA5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693408895; x=1694013695;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=g3CtT48jPlJIgusYzTnrLdg/99F2+CEON4UsLWqQKko=;
-        b=NmMGAkY9pe2vqI0I6KlO4B0mJOt8Q1LLyO6sH5FjNYD1pCOXU/PuBdvl2Gi7Ctyf/h
-         52jZW+9bqw20CNkmfAtvPxshogNyQR6D4vNRV+SR3LUf7a4YIxDbV6JDDz/o8Ub0vAT0
-         pC7rv2Y+9n8JhW9u8r2qHCYHkm0aHMgZQWqzA4r9/2YuWHFMYEycfpLk9xdVaB06Crtj
-         RyhD84N7s2XfLqliW/4Vg+7hr0AAnDrRvOA4Hm1Lg3fUd1C2xGEv3iZ65eVIkRskolpS
-         2D3HhQXNiKEEKi/VRTlCdgZtoBnTdCG1OftyEErVBnAKDQw/0FRtvv7kWNBELjdx/K6X
-         zaJQ==
-X-Gm-Message-State: AOJu0Yy79IxC8dLTDw2cQ4VebuqTLqmtNFV4TJ9z1o2xplyrDFBb8u0m
-	qzt4xtusB+AYl1gt7dJrlhNpnw==
-X-Google-Smtp-Source: AGHT+IEzQMej866IzE8FCkgk6gCxfjVeFksIip5jMrjrfICUSVE6k6l/gLx7wW7sFI65pTLcljpopg==
-X-Received: by 2002:a7b:cb90:0:b0:3ff:516b:5c4c with SMTP id m16-20020a7bcb90000000b003ff516b5c4cmr2126478wmi.18.1693408894839;
-        Wed, 30 Aug 2023 08:21:34 -0700 (PDT)
-Received: from ?IPV6:2a02:8011:e80c:0:ab9c:c93c:ba9e:7ca? ([2a02:8011:e80c:0:ab9c:c93c:ba9e:7ca])
-        by smtp.gmail.com with ESMTPSA id r19-20020a05600c299300b003fe539b83f2sm2556800wmd.42.2023.08.30.08.21.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Aug 2023 08:21:34 -0700 (PDT)
-Message-ID: <2195c267-619e-4877-af5e-48ef56b81d4c@isovalent.com>
-Date: Wed, 30 Aug 2023 16:21:33 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF66223DF
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 15:22:17 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AD3DE8;
+	Wed, 30 Aug 2023 08:22:16 -0700 (PDT)
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37UFLPpL023915;
+	Wed, 30 Aug 2023 15:22:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=53sLwnGonkpXAXzVVklWzh9zTYYX/g9yTHqhb9DOJMA=;
+ b=mbwdPYszzq7npX1Mm1BnK5zOAHx4XX5qYtnzdUiAwOQgaXYBgJIzZW78IkiEA7JMf9rR
+ AtTsgB1pIkdLIcOepMnceyIJRBUC/FGUbvnXA7p/B4eP9epbhe2yeNnBrS6BvdpQPb/D
+ ZDEkGpXGkZPBr+DxIxwiervyRenjCGyyqtwq072OaOS5+tdpqmS6urfTCfpt4jjJ7bpM
+ 4TxzK2etvmXQnLMHpE8P9whWWHNjehhRQTFS3BVpLD9BX1tS5CP1TaUGcSN/BZEblsvp
+ 3x27ndi73JVP2JLpdsnv26X3bsXbUToi4Nqnfe2sIk8c8kXAcmy5FfsM1F0kP9ol0ade tw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3st6hxbvsx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 30 Aug 2023 15:22:12 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 37UFCSnA025225;
+	Wed, 30 Aug 2023 15:22:12 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3st6hxbvs3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 30 Aug 2023 15:22:11 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37UErEK8020514;
+	Wed, 30 Aug 2023 15:22:10 GMT
+Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3sqv3yn2r0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 30 Aug 2023 15:22:10 +0000
+Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
+	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37UFM95E25887074
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 30 Aug 2023 15:22:09 GMT
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9ECFB5804B;
+	Wed, 30 Aug 2023 15:22:09 +0000 (GMT)
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 08EEB58063;
+	Wed, 30 Aug 2023 15:22:07 +0000 (GMT)
+Received: from [9.171.54.171] (unknown [9.171.54.171])
+	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 30 Aug 2023 15:22:06 +0000 (GMT)
+Message-ID: <c3a624a6-68b5-46f3-e9ea-9e2acc65bb90@linux.ibm.com>
+Date: Wed, 30 Aug 2023 17:22:06 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.14.0
+Subject: Re: [RFC PATCH v2 net-next 4/6] net/smc: support max connections per
+ lgr negotiation
+To: Guangguan Wang <guangguan.wang@linux.alibaba.com>, jaka@linux.ibm.com,
+        kgraul@linux.ibm.com, tonylu@linux.alibaba.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: horms@kernel.org, alibuda@linux.alibaba.com, guwen@linux.alibaba.com,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20230807062720.20555-1-guangguan.wang@linux.alibaba.com>
+ <20230807062720.20555-5-guangguan.wang@linux.alibaba.com>
+ <a7ed9f2d-5c50-b37f-07d4-088ceef6aeac@linux.ibm.com>
+ <9f4292c4-4004-b73b-1079-41ce7b1a5750@linux.alibaba.com>
+ <2dbf25a0-05a6-d899-3351-598e952a927d@linux.ibm.com>
+ <484c9f62-748c-6193-9c02-c41449b757b4@linux.alibaba.com>
+ <e1cba3b8-1333-3b30-04f2-c7634bf02da1@linux.ibm.com>
+ <8eb02141-9c5e-8380-285c-d96e6184f539@linux.alibaba.com>
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <8eb02141-9c5e-8380-285c-d96e6184f539@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: NJnfPLPlteBJpdcSueziHcxhuxps6RaO
+X-Proofpoint-GUID: J4TjPj4IDr20vNnaKiidtjG1dh6587Lh
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] Fix invalid escape sequence warnings
-Content-Language: en-GB
-To: Vishal Chourasia <vishalc@linux.ibm.com>
-Cc: andrii.nakryiko@gmail.com, andrii@kernel.org, ast@kernel.org,
- bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net,
- haoluo@google.com, hawk@kernel.org, john.fastabend@gmail.com,
- jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org,
- linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org,
- sachinp@linux.ibm.com, sdf@google.com, song@kernel.org,
- srikar@linux.vnet.ibm.com, yhs@fb.com
-References: <e640e5f2-381c-4f65-40b9-c2e3e94696f9@linux.ibm.com>
- <20230829074931.2511204-1-vishalc@linux.ibm.com>
-From: Quentin Monnet <quentin@isovalent.com>
-In-Reply-To: <20230829074931.2511204-1-vishalc@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-08-29_16,2023-08-29_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 clxscore=1015
+ suspectscore=0 priorityscore=1501 mlxscore=0 mlxlogscore=999 adultscore=0
+ spamscore=0 phishscore=0 impostorscore=0 malwarescore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2308100000
+ definitions=main-2308300140
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H4,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 29/08/2023 08:49, Vishal Chourasia wrote:
-> The script bpf_doc.py generates multiple SyntaxWarnings related to invalid
-> escape sequences when executed with Python 3.12. These warnings do not appear in
-> Python 3.10 and 3.11 and do not affect the kernel build, which completes
-> successfully.
+
+
+On 30.08.23 05:17, Guangguan Wang wrote:
 > 
-> This patch resolves these SyntaxWarnings by converting the relevant string
-> literals to raw strings or by escaping backslashes. This ensures that
-> backslashes are interpreted as literal characters, eliminating the warnings.
 > 
-> Signed-off-by: Vishal Chourasia <vishalc@linux.ibm.com>
-> Reported-by: Srikar Dronamraju <srikar@linux.vnet.ibm.com>
+> On 2023/8/29 21:18, Wenjia Zhang wrote:
+>>
+>>
+>> On 29.08.23 04:31, Guangguan Wang wrote:
+>>>
+>>>
+>>> On 2023/8/28 20:54, Wenjia Zhang wrote:
+>>>>
+>>>>
+>>>> On 15.08.23 08:31, Guangguan Wang wrote:
+>>>>>
+>>>>>
+>>>>> On 2023/8/10 00:04, Wenjia Zhang wrote:
+>>>>>>
+>>>>>>
+>>>>>> On 07.08.23 08:27, Guangguan Wang wrote:
+>>>>>>> Support max connections per lgr negotiation for SMCR v2.1,
+>>>>>>> which is one of smc v2.1 features.
+>>>>> ...
+>>>>>>> @@ -472,6 +473,9 @@ int smc_llc_send_confirm_link(struct smc_link *link,
+>>>>>>>          confllc->link_num = link->link_id;
+>>>>>>>          memcpy(confllc->link_uid, link->link_uid, SMC_LGR_ID_SIZE);
+>>>>>>>          confllc->max_links = SMC_LLC_ADD_LNK_MAX_LINKS;
+>>>>>>> +    if (link->lgr->smc_version == SMC_V2 &&
+>>>>>>> +        link->lgr->peer_smc_release >= SMC_RELEASE_1)
+>>>>>>> +        confllc->max_conns = link->lgr->max_conns;
+>>>>>>>          /* send llc message */
+>>>>>>>          rc = smc_wr_tx_send(link, pend);
+>>>>>>>      put_out:
+>>>>>>
+>>>>>> Did I miss the negotiation process somewhere for the following scenario?
+>>>>>> (Example 4 in the document)
+>>>>>> Client                 Server
+>>>>>>        Proposal(max conns(16))
+>>>>>>        ----------------------->
+>>>>>>
+>>>>>>        Accept(max conns(32))
+>>>>>>        <-----------------------
+>>>>>>
+>>>>>>        Confirm(max conns(32))
+>>>>>>        ----------------------->
+>>>>>
+>>>>> Did you mean the accepted max conns is different(not 32) from the Example 4 when the proposal max conns is 16?
+>>>>>
+>>>>> As described in (https://www.ibm.com/support/pages/node/7009315) page 41:
+>>>>> ...
+>>>>> 2. Max conns and max links values sent in the CLC Proposal are the client preferred values.
+>>>>> 3. The v2.1 values sent in the Accept message are the final values. The client must accept the values or
+>>>>> DECLINE the connection.
+>>>>> 4. Max conns and links values sent in the CLC Accept are the final values (server dictates). The server can
+>>>>> either honor the client’s preferred values or return different (negotiated but final) values.
+>>>>> ...
+>>>>>
+>>>>> If I understand correctly, the server dictates the final value of max conns, but how the server dictates the final
+>>>>> value of max conns is not defined in SMC v2.1. In this patch, the server use the minimum value of client preferred
+>>>>> value and server preferred value as the final value of max conns. The max links is negotiated with the same logic.
+>>>>>
+>>>>> Client                 Server
+>>>>>         Proposal(max conns(client preferred))
+>>>>>         ----------------------->
+>>>>>           Accept(max conns(accepted value)) accepted value=min(client preferred, server preferred)
+>>>>>         <-----------------------
+>>>>>           Confirm(max conns(accepted value))
+>>>>>         ----------------------->
+>>>>>
+>>>>> I also will add this description into commit message for better understanding.
+>>>>>
+>>>>> Thanks,
+>>>>> Guangguan Wang
+>>>>>
+>>>>>
+>>>>>
+>>>>
+>>>> Sorry for the late answer, I'm just back from vacation.
+>>>>
+>>>> That's true that the protocol does not define how the server decides the final value(s). I'm wondering if there is some reason for you to use the minimum value instead of maximum (corresponding to the examples in the document). If the both prefered values (client's and server's) are in the range of the acceptable value, why not the maximum? Is there any consideration on that?
+>>>>
+>>>> Best,
+>>>> Wenjia
+>>>
+>>> Since the value of the default preferred max conns is already the maximum value of the range(16-255), I am wondering
+>>> whether it makes any sense to use the maximum for decision, where the negotiated result of max conns is always 255.
+>>> So does the max links.
+>>>
+>>> Thanks,
+>>> Guangguan
+>>
+>> I don't think the server's default maxconns must be the maximum value, i.e 255. Since the patches series are already applied, we say the previous implementation uses maximus value because the maxconns is not tunable, so that we choose an appropriate value as the default value.
+>> Now the value is negotiable, the default value could be also the server's prefer value.
+> If the server's default maxconns could be other value rather than maximum value, it's OK to use other decision algorithm(minimum, maximum or others).
+> But it is still a question that how to tune the default maxconns, maybe it is different from different linux distributions and different vendors of rdma nic.
+> 
+That's true. I think more discussion is needed. Let's talk about it 
+offline first, since these patches are already applied.
 
-Thanks! I observed that this patch fixes warnings reported by pyright in
-my editor. I've also validated that the generated files (helpers man
-page, syscall man page, bpf_helper_defs.h) remain unchanged.
+BTW, thank you for the efforts!
 
-Tested-by: Quentin Monnet <quentin@isovalent.com>
+Best,
+Wenjia
 
+>> But regarding maxlinks, I'm fine with the minimus, and actually it should be, because it should not be possible to try to add another link if one of the peers can and want to support only one link, i.e. down-level.
+> Agree with you.
+> 
+>> Any opinion?
+>>
+>> Best,
+>> Wenjia
+> 
+> Thanks,
+> Guangguan Wang
 
