@@ -1,172 +1,113 @@
-Return-Path: <netdev+bounces-31370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31371-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 893F878D558
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 13:00:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E12D78D55C
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 13:01:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC8882812A7
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 10:59:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88EA31C203B8
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 11:01:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3F0B3D62;
-	Wed, 30 Aug 2023 10:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 509DB3D6D;
+	Wed, 30 Aug 2023 11:01:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1FC41FBC
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 10:59:57 +0000 (UTC)
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C6F61BF
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 03:59:56 -0700 (PDT)
-Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
-	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qbIvG-000610-89; Wed, 30 Aug 2023 12:59:42 +0200
-Received: from ore by ptx.hi.pengutronix.de with local (Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qbIvF-000544-3I; Wed, 30 Aug 2023 12:59:41 +0200
-Date: Wed, 30 Aug 2023 12:59:41 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
-	davem@davemloft.net, Woojung Huh <woojung.huh@microchip.com>,
-	Vladimir Oltean <olteanv@gmail.com>, Tristram.Ha@microchip.com,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] net: phy: Provide Module 4 KSZ9477 errata
- (DS80000754C)
-Message-ID: <20230830105941.GH31399@pengutronix.de>
-References: <20230830092119.458330-1-lukma@denx.de>
- <20230830092119.458330-2-lukma@denx.de>
- <20230830101813.GG31399@pengutronix.de>
- <20230830125224.1012459f@wsk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4218D20E2
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 11:01:05 +0000 (UTC)
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A0481BF
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 04:01:03 -0700 (PDT)
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@breakpoint.cc>)
+	id 1qbIwW-00008O-L5; Wed, 30 Aug 2023 13:01:00 +0200
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: Florian Westphal <fw@strlen.de>,
+	Stanislav Fomichev <sdf@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	Ido Schimmel <idosch@nvidia.com>
+Subject: [PATCH net] net: fib: avoid warn splat in flow dissector
+Date: Wed, 30 Aug 2023 13:00:37 +0200
+Message-ID: <20230830110043.30497-1-fw@strlen.de>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230830125224.1012459f@wsk>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 30, 2023 at 12:52:24PM +0200, Lukasz Majewski wrote:
-> Hi Oleksij,
-> 
-> > On Wed, Aug 30, 2023 at 11:21:19AM +0200, Lukasz Majewski wrote:
-> > > The KSZ9477 errata points out (in 'Module 4') the link up/down
-> > > problem when EEE (Energy Efficient Ethernet) is enabled in the
-> > > device to which the KSZ9477 tries to auto negotiate.
-> > > 
-> > > The suggested workaround is to clear advertisement of EEE for PHYs
-> > > in this chip driver.
-> > > 
-> > > Signed-off-by: Lukasz Majewski <lukma@denx.de>
-> > > ---
-> > >  drivers/net/phy/micrel.c | 31 ++++++++++++++++++++++++++++++-
-> > >  1 file changed, 30 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-> > > index 87b090ad2874..469dcd8a5711 100644
-> > > --- a/drivers/net/phy/micrel.c
-> > > +++ b/drivers/net/phy/micrel.c
-> > > @@ -1418,6 +1418,35 @@ static int ksz9131_get_features(struct
-> > > phy_device *phydev) return 0;
-> > >  }
-> > >  
-> > > +static int ksz9477_get_features(struct phy_device *phydev)
-> > > +{
-> > > +	__ETHTOOL_DECLARE_LINK_MODE_MASK(zero) = { 0, };
-> > > +	int ret;
-> > > +
-> > > +	ret = genphy_read_abilities(phydev);
-> > > +	if (ret)
-> > > +		return ret;
-> > > +
-> > > +	/* KSZ9477 Errata DS80000754C
-> > > +	 *
-> > > +	 * Module 4: Energy Efficient Ethernet (EEE) feature
-> > > select must be
-> > > +	 * manually disabled
-> > > +	 *   The EEE feature is enabled by default, but it is not
-> > > fully
-> > > +	 *   operational. It must be manually disabled through
-> > > register
-> > > +	 *   controls. If not disabled, the PHY ports can
-> > > auto-negotiate
-> > > +	 *   to enable EEE, and this feature can cause link drops
-> > > when linked
-> > > +	 *   to another device supporting EEE.
-> > > +	 *
-> > > +	 *   Although, the KSZ9477 MMD register
-> > > +	 *   (MMD_DEVICE_ID_EEE_ADV.MMD_EEE_ADV) advertise that
-> > > EEE is
-> > > +	 *   operational one needs to manualy clear them to follow
-> > > the chip
-> > > +	 *   errata.
-> > > +	 */
-> > > +	linkmode_and(phydev->supported_eee, phydev->supported,
-> > > zero); +
-> > > +	return 0;
-> > > +}
-> > > +
-> > >  #define KSZ8873MLL_GLOBAL_CONTROL_4	0x06
-> > >  #define KSZ8873MLL_GLOBAL_CONTROL_4_DUPLEX	BIT(6)
-> > >  #define KSZ8873MLL_GLOBAL_CONTROL_4_SPEED	BIT(4)
-> > > @@ -4871,7 +4900,7 @@ static struct phy_driver ksphy_driver[] = {
-> > >  	.handle_interrupt = kszphy_handle_interrupt,
-> > >  	.suspend	= genphy_suspend,
-> > >  	.resume		= genphy_resume,
-> > > -	.get_features	= ksz9131_get_features,
-> > > +	.get_features	= ksz9477_get_features,  
-> > 
-> > Sorry, i didn't described all details how to implement it.
-> > 
-> > This code will break EEE support for the KSZ8563R switch.
-> > 
-> 
-> And then another switch (KSZ8563R) pops up.... with regression....
+New skbs allocated via nf_send_reset() have skb->dev == NULL.
 
-Initially ksz9477_get_features() was introduced to fix KSZ8563R.
+fib*_rules_early_flow_dissect helpers already have a 'struct net'
+argument but its not passed down to the flow dissector core, which
+will then WARN as it can't derive a net namespace to use:
 
-> In the micrel.c the ksz9477_get_features was only present in:
-> https://elixir.bootlin.com/linux/latest/source/drivers/net/phy/micrel.c#L4832
-> https://elixir.bootlin.com/linux/latest/source/drivers/net/phy/micrel.c#L4874
-> so I only changed it there.
-> 
-> Apparently the KSZ8563R re-uses the KSZ9477 code.
+ WARNING: CPU: 0 PID: 0 at net/core/flow_dissector.c:1016 __skb_flow_dissect+0xa91/0x1cd0
+ [..]
+  ip_route_me_harder+0x143/0x330
+  nf_send_reset+0x17c/0x2d0 [nf_reject_ipv4]
+  nft_reject_inet_eval+0xa9/0xf2 [nft_reject_inet]
+  nft_do_chain+0x198/0x5d0 [nf_tables]
+  nft_do_chain_inet+0xa4/0x110 [nf_tables]
+  nf_hook_slow+0x41/0xc0
+  ip_local_deliver+0xce/0x110
+  ..
 
-Most (all?) switch variant support by the ksz9477 DSA driver share the same
-PHYid, so it is not possible to identify it by the micrel.c PHY driver.
-As far as a know, the only commonly accepted way to notify about some quirks
-between this both drivers is not user dev_flags.
+Cc: Stanislav Fomichev <sdf@google.com>
+Cc: David Ahern <dsahern@kernel.org>
+Cc: Ido Schimmel <idosch@nvidia.com>
+Fixes: 812fa71f0d96 ("netfilter: Dissect flow after packet mangling")
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=217826
+Signed-off-by: Florian Westphal <fw@strlen.de>
+---
+ include/net/ip6_fib.h | 5 ++++-
+ include/net/ip_fib.h  | 5 ++++-
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
-Regards,
-Oleskij
+diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
+index c9ff23cf313e..1ba9f4ddf2f6 100644
+--- a/include/net/ip6_fib.h
++++ b/include/net/ip6_fib.h
+@@ -642,7 +642,10 @@ static inline bool fib6_rules_early_flow_dissect(struct net *net,
+ 	if (!net->ipv6.fib6_rules_require_fldissect)
+ 		return false;
+ 
+-	skb_flow_dissect_flow_keys(skb, flkeys, flag);
++	memset(flkeys, 0, sizeof(*flkeys));
++	__skb_flow_dissect(net, skb, &flow_keys_dissector,
++			   flkeys, NULL, 0, 0, 0, flag);
++
+ 	fl6->fl6_sport = flkeys->ports.src;
+ 	fl6->fl6_dport = flkeys->ports.dst;
+ 	fl6->flowi6_proto = flkeys->basic.ip_proto;
+diff --git a/include/net/ip_fib.h b/include/net/ip_fib.h
+index a378eff827c7..f0c13864180e 100644
+--- a/include/net/ip_fib.h
++++ b/include/net/ip_fib.h
+@@ -418,7 +418,10 @@ static inline bool fib4_rules_early_flow_dissect(struct net *net,
+ 	if (!net->ipv4.fib_rules_require_fldissect)
+ 		return false;
+ 
+-	skb_flow_dissect_flow_keys(skb, flkeys, flag);
++	memset(flkeys, 0, sizeof(*flkeys));
++	__skb_flow_dissect(net, skb, &flow_keys_dissector,
++			   flkeys, NULL, 0, 0, 0, flag);
++
+ 	fl4->fl4_sport = flkeys->ports.src;
+ 	fl4->fl4_dport = flkeys->ports.dst;
+ 	fl4->flowi4_proto = flkeys->basic.ip_proto;
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.41.0
+
 
