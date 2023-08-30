@@ -1,215 +1,138 @@
-Return-Path: <netdev+bounces-31383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9774978D58D
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 13:32:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B1F378D591
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 13:35:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BC232813A3
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 11:32:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1CF1281339
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 11:35:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4F515254;
-	Wed, 30 Aug 2023 11:32:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86FE65254;
+	Wed, 30 Aug 2023 11:35:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D44655390
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 11:32:10 +0000 (UTC)
-Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 748251BB;
-	Wed, 30 Aug 2023 04:32:08 -0700 (PDT)
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 37UBVsOq066456;
-	Wed, 30 Aug 2023 06:31:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1693395114;
-	bh=D3DF7bFRaHneyzCISsMhUq3IavR7ujFPxdncVi54Hus=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=KoQyTC70Jl1uILsy/3o6LjgdXKliI1MXWBftIn10x/jWKY/lqOTVW4FSoQx4fPYsD
-	 Pst5tbYCIpBbeV7CvwgixrEK+FZwKQrBBMat7Vkf3GXzeE1nUwwT3Hl+0B/awAcJba
-	 bb+4slrd9ara5sd7xp1ueYxeY4hR31fLdtbADHq4=
-Received: from DLEE111.ent.ti.com (dlee111.ent.ti.com [157.170.170.22])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 37UBVsIZ037763
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 30 Aug 2023 06:31:54 -0500
-Received: from DLEE109.ent.ti.com (157.170.170.41) by DLEE111.ent.ti.com
- (157.170.170.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 30
- Aug 2023 06:31:54 -0500
-Received: from fllv0039.itg.ti.com (10.64.41.19) by DLEE109.ent.ti.com
- (157.170.170.41) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 30 Aug 2023 06:31:54 -0500
-Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
-	by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 37UBVsgi073006;
-	Wed, 30 Aug 2023 06:31:54 -0500
-Received: from localhost (uda0501179.dhcp.ti.com [172.24.227.35])
-	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 37UBVri9000676;
-	Wed, 30 Aug 2023 06:31:54 -0500
-From: MD Danish Anwar <danishanwar@ti.com>
-To: Andrew Lunn <andrew@lunn.ch>, Vignesh Raghavendra <vigneshr@ti.com>,
-        Roger
- Quadros <rogerq@kernel.org>,
-        Jacob Keller <jacob.e.keller@intel.com>,
-        Simon
- Horman <horms@kernel.org>, MD Danish Anwar <danishanwar@ti.com>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Rob Herring <robh+dt@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
-	<edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>
-CC: <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <srk@ti.com>, <r-gunasekaran@ti.com>
-Subject: [RFC PATCH net-next 2/2] net: ti: icssg-prueth: Add support for half duplex operation
-Date: Wed, 30 Aug 2023 17:01:34 +0530
-Message-ID: <20230830113134.1226970-3-danishanwar@ti.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230830113134.1226970-1-danishanwar@ti.com>
-References: <20230830113134.1226970-1-danishanwar@ti.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79C3D46BD
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 11:35:33 +0000 (UTC)
+Received: from us-smtp-delivery-44.mimecast.com (unknown [207.211.30.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C56301B0
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 04:35:31 -0700 (PDT)
+Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-187-jd2J6nWIP-ub-FPQJRRIag-1; Wed, 30 Aug 2023 07:35:14 -0400
+X-MC-Unique: jd2J6nWIP-ub-FPQJRRIag-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8A2C23811F26;
+	Wed, 30 Aug 2023 11:35:13 +0000 (UTC)
+Received: from hog (unknown [10.45.224.12])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id A130940C6F4C;
+	Wed, 30 Aug 2023 11:35:11 +0000 (UTC)
+Date: Wed, 30 Aug 2023 13:35:10 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: "Radu Pirea (OSS)" <radu-nicolae.pirea@oss.nxp.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, richardcochran@gmail.com,
+	sebastian.tobuschat@nxp.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC net-next v2 5/5] net: phy: nxp-c45-tja11xx: implement
+ mdo_insert_tx_tag
+Message-ID: <ZO8pbtnlOVauabjC@hog>
+References: <20230824091615.191379-1-radu-nicolae.pirea@oss.nxp.com>
+ <20230824091615.191379-6-radu-nicolae.pirea@oss.nxp.com>
+ <ZOx0L722xg5-J_he@hog>
+ <5d42d6c9-2f0c-8913-49ec-50a25860c49f@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <5d42d6c9-2f0c-8913-49ec-50a25860c49f@oss.nxp.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,SPF_HELO_NONE,SPF_NONE autolearn=no
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This patch adds support for half duplex operation at 10M and 100M link
-speeds for AM654x/AM64x devices.
-- Driver configures rand_seed, a random number, in DMEM HD_RAND_SEED_OFFSET
-field, which will be used by firmware for Back off time calculation.
-- Driver informs FW about half duplex link operation in DMEM
-PORT_LINK_SPEED_OFFSET field by setting bit 7 for 10/100M HD.
+2023-08-28, 16:46:02 +0300, Radu Pirea (OSS) wrote:
+> 
+> 
+> On 28.08.2023 13:17, Sabrina Dubroca wrote:
+> > 2023-08-24, 12:16:15 +0300, Radu Pirea (NXP OSS) wrote:
+> > > Implement mdo_insert_tx_tag to insert the TLV header in the ethernet
+> > > frame.
+> > > 
+> > > If extscs parameter is set to 1, then the TLV header will contain the
+> > > TX SC that will be used to encrypt the frame, otherwise the TX SC will
+> > > be selected using the MAC source address.
+> > 
+> > In which case would a user choose not to use the SCI? Using the MAC
+> > address is probably fine in basic setups, but having to fiddle with a
+> > module parameter (so unloading and reloading the module, which means
+> > losing network connectivity) to make things work when the setup
+> > evolves is really not convenient.
+> > 
+> > Is there a drawback to always using the SCI?
+> > 
+> 
+> I see your concern. If the PHY driver is reloaded, then the offloaded MACsec
+> configuration will vanish from the hardware. Actually, just a call to
+> phy_disconnect is enough to break an offloaded MACsec iface and can be
+> achieved by:
+> ip link set eth0 down && ip link set eth0 up
 
-Hence, the half duplex operation depends on board design the
-"ti,half-duplex-capable" property has to be enabled for ICSS-G ports if HW
-is capable to perform half duplex.
+And it's not restored when the link goes back up? That's inconvenient :/
+Do we end up with inconsistent state? ie driver and core believe
+everything is still offloaded, but HW lost all state? do we leak
+some resources allocated by the driver?
 
-Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
----
- drivers/net/ethernet/ti/icssg/icssg_config.c | 14 ++++++++++++++
- drivers/net/ethernet/ti/icssg/icssg_prueth.c | 17 +++++++++++++++--
- drivers/net/ethernet/ti/icssg/icssg_prueth.h |  2 ++
- 3 files changed, 31 insertions(+), 2 deletions(-)
+We could add a flush/restore in macsec_notify when the lower device
+goes down/up, maybe limited to devices that request this (I don't know
+if all devices would need it, or maybe all devices offloading to the
+PHY but not to the MAC).
 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
-index 03968dbc2d62..b676d200ee90 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_config.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
-@@ -540,6 +540,17 @@ int emac_set_port_state(struct prueth_emac *emac,
- 	return ret;
- }
- 
-+void icssg_config_half_duplex(struct prueth_emac *emac)
-+{
-+	u32 val;
-+
-+	if (!emac->half_duplex)
-+		return;
-+
-+	val = get_random_u32();
-+	writel(val, emac->dram.va + HD_RAND_SEED_OFFSET);
-+}
-+
- void icssg_config_set_speed(struct prueth_emac *emac)
- {
- 	u8 fw_speed;
-@@ -560,6 +571,9 @@ void icssg_config_set_speed(struct prueth_emac *emac)
- 		return;
- 	}
- 
-+	if (emac->duplex == DUPLEX_HALF)
-+		fw_speed |= FW_LINK_SPEED_HD;
-+
- 	writeb(fw_speed, emac->dram.va + PORT_LINK_SPEED_OFFSET);
- }
- 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-index c2d1d0c7deb0..00e1e286e351 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-@@ -1048,6 +1048,8 @@ static void emac_adjust_link(struct net_device *ndev)
- 		 * values
- 		 */
- 		if (emac->link) {
-+			if (emac->duplex == DUPLEX_HALF)
-+				icssg_config_half_duplex(emac);
- 			/* Set the RGMII cfg for gig en and full duplex */
- 			icssg_update_rgmii_cfg(prueth->miig_rt, emac);
- 
-@@ -1166,9 +1168,13 @@ static int emac_phy_connect(struct prueth_emac *emac)
- 		return -ENODEV;
- 	}
- 
-+	if (!emac->half_duplex) {
-+		dev_dbg(prueth->dev, "half duplex mode is not supported\n");
-+		phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_10baseT_Half_BIT);
-+		phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_100baseT_Half_BIT);
-+	}
-+
- 	/* remove unsupported modes */
--	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_10baseT_Half_BIT);
--	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_100baseT_Half_BIT);
- 	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_1000baseT_Half_BIT);
- 	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_Pause_BIT);
- 	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_Asym_Pause_BIT);
-@@ -2454,6 +2460,10 @@ static int prueth_probe(struct platform_device *pdev)
- 				      eth0_node->name);
- 			goto exit_iep;
- 		}
-+
-+		if (of_find_property(eth0_node, "ti,half-duplex-capable", NULL))
-+			prueth->emac[PRUETH_MAC0]->half_duplex = 1;
-+
- 		prueth->emac[PRUETH_MAC0]->iep = prueth->iep0;
- 	}
- 
-@@ -2465,6 +2475,9 @@ static int prueth_probe(struct platform_device *pdev)
- 			goto netdev_exit;
- 		}
- 
-+		if (of_find_property(eth1_node, "ti,half-duplex-capable", NULL))
-+			prueth->emac[PRUETH_MAC1]->half_duplex = 1;
-+
- 		prueth->emac[PRUETH_MAC1]->iep = prueth->iep0;
- 	}
- 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-index 43b67213d8c7..6854ba4253c6 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-@@ -155,6 +155,7 @@ struct prueth_emac {
- 	struct icss_iep *iep;
- 	unsigned int rx_ts_enabled : 1;
- 	unsigned int tx_ts_enabled : 1;
-+	unsigned int half_duplex : 1;
- 
- 	/* DMA related */
- 	struct prueth_tx_chn tx_chns[PRUETH_MAX_TX_QUEUES];
-@@ -313,6 +314,7 @@ int icssg_config(struct prueth *prueth, struct prueth_emac *emac,
- int emac_set_port_state(struct prueth_emac *emac,
- 			enum icssg_port_state_cmd state);
- void icssg_config_set_speed(struct prueth_emac *emac);
-+void icssg_config_half_duplex(struct prueth_emac *emac);
- 
- /* Buffer queue helpers */
- int icssg_queue_pop(struct prueth *prueth, u8 queue);
+And what happens in this case?
+    ip link add link eth0 type macsec offload phy
+    ip link set eth0 down
+    ip macsec add macsec0 rx sci ...
+    ip macsec add macsec0 tx sa 0 ...
+    # etc
+    ip link set eth0 up
+
+Will offload work with the current code?
+
+> The only drawback is related to the PTP frames encryption. Due to hardware
+> limitations, PHY timestamping + MACsec will not work if the custom header is
+> inserted. The only way to get this work is by using the MAC SA selection and
+> running PTP on the real netdev.
+
+Could you add some documentation explaining that? Users need this
+information to make the right choice for their use case. Maybe
+directly in the description of the module parameter, something like:
+"Select the TX SC using TLV header information. PTP frames encryption
+cannot work when this feature is enabled."
+
+If it's in the module parameter I guess it can't be too
+verbose. Otherwise I don't know where else to put it.
+
+And the parameter's name and/or description should probably include
+macsec/MACsec if it's visible at the level of the whole module (ie if
+macsec support isn't a separate module), just to give context at to
+what the TXSC is (and what the encryption for the PTP frames refers
+to).
+
 -- 
-2.34.1
+Sabrina
 
 
