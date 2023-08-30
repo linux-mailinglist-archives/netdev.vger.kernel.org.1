@@ -1,37 +1,50 @@
-Return-Path: <netdev+bounces-31408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31410-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1C1078D68A
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 16:27:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33F2878D694
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 16:39:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2CEB1C2074E
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 14:27:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE8432810AC
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 14:39:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CE156AA3;
-	Wed, 30 Aug 2023 14:27:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60C0663CD;
+	Wed, 30 Aug 2023 14:39:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F65F3FFB
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 14:27:21 +0000 (UTC)
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 915FA12F
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 07:27:19 -0700 (PDT)
-Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
-	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qbM9l-0005o1-43; Wed, 30 Aug 2023 16:26:53 +0200
-Received: from ore by ptx.hi.pengutronix.de with local (Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qbM9i-0006uX-Ue; Wed, 30 Aug 2023 16:26:50 +0200
-Date: Wed, 30 Aug 2023 16:26:50 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 539CB3FFB
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 14:39:15 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CC68193;
+	Wed, 30 Aug 2023 07:39:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=lFcx4zTPkgw6rQGeLwVoG5WLUudW6yfyt4AfeA6EqmQ=; b=hbQd/qul234oG3fzVBrVo09ovH
+	cvHlPoVnKO7bTnzbefdHYmglbyFYBguR5eFnwkRND8Kgu2DJI0suPtSEsOlSMSlp44r/cPtXvt1UA
+	SdmEGP4nRb78To5zG1p7KkSlDRyMeCQtSqVpGX9oYLLYdMXt8ROtgVotbigJSGxtOlXJBVA5AFgL0
+	yxrA5SmEH3boU+KOhj1q63SvHXZhl4JFQI3altWlM74ABUpSXHiBT8v2rc5tsBcSRvJPbsWewVZoc
+	Ni7NPSq8/4JYQNTw/igJtLhlvj93N7KgPZJBsZxfRBUCvOB5Jmj22kRiw6vT+Jpie9sZoHVpMHOU4
+	asJAVDiQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38888)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qbMLQ-0001kB-32;
+	Wed, 30 Aug 2023 15:38:56 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qbMLP-0005m5-MF; Wed, 30 Aug 2023 15:38:55 +0100
+Date: Wed, 30 Aug 2023 15:38:55 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
 Cc: Lukasz Majewski <lukma@denx.de>, Eric Dumazet <edumazet@google.com>,
 	Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net,
 	Woojung Huh <woojung.huh@microchip.com>,
@@ -43,9 +56,8 @@ Cc: Lukasz Majewski <lukma@denx.de>, Eric Dumazet <edumazet@google.com>,
 	linux-kernel@vger.kernel.org
 Subject: Re: [PATCH 2/2] net: phy: Provide Module 4 KSZ9477 errata
  (DS80000754C)
-Message-ID: <20230830142650.GL31399@pengutronix.de>
-References: <20230830092119.458330-1-lukma@denx.de>
- <20230830092119.458330-2-lukma@denx.de>
+Message-ID: <ZO9Uf5DjJ6Kf6uvh@shell.armlinux.org.uk>
+References: <20230830092119.458330-2-lukma@denx.de>
  <20230830101813.GG31399@pengutronix.de>
  <20230830125224.1012459f@wsk>
  <20230830105941.GH31399@pengutronix.de>
@@ -54,132 +66,53 @@ References: <20230830092119.458330-1-lukma@denx.de>
  <ZO83htinyfAp4mWw@shell.armlinux.org.uk>
  <20230830130649.GK31399@pengutronix.de>
  <ZO9Ejx9G8laNRasu@shell.armlinux.org.uk>
+ <20230830142650.GL31399@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZO9Ejx9G8laNRasu@shell.armlinux.org.uk>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230830142650.GL31399@pengutronix.de>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RDNS_NONE,SPF_HELO_NONE,
+	SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 30, 2023 at 02:30:55PM +0100, Russell King (Oracle) wrote:
-> On Wed, Aug 30, 2023 at 03:06:49PM +0200, Oleksij Rempel wrote:
-> > On Wed, Aug 30, 2023 at 01:35:18PM +0100, Russell King (Oracle) wrote:
-> > > On Wed, Aug 30, 2023 at 02:17:38PM +0200, Oleksij Rempel wrote:
-> > > > On Wed, Aug 30, 2023 at 01:51:51PM +0200, Lukasz Majewski wrote:
-> > > > > Hi Oleksij,
-> > > > 
-> > > > > It looks like the most optimal solution would be the one proposed by
-> > > > > Tristam:
-> > > > > https://www.spinics.net/lists/netdev/msg932044.html
-> > > > 
-> > > > In this case, please add the reason why it would work on this HW and
-> > > > will not break by any changes in PHYlib or micrel.c driver.
-> > > > 
-> > > > If I remember it correctly, in KSZ9477 variants, if you write to EEE
-> > > > advertisement register, it will affect the state of a EEE capability
-> > > > register. Which break IEEE 802.3 specification and the reason why
-> > > > ksz9477_get_features() actually exist. But can be used as workaround if
-> > > > it is written early enough before PHYlib tried to read EEE capability
-> > > > register.
-> > > > 
-> > > > Please confirm my assumption by applying your workaround and testing it
-> > > > with ethtool --show-eee lanX.
-> > > > 
-> > > > It should be commented in the code with all kind of warnings:
-> > > > Don't move!!! We use one bug to workaround another bug!!! If PHYlib
-> > > > start scanning PHYs before this code is executed, then thing may break!!
-> > > 
-> > > Why would phylib's scanning cause breakage?
-> > > 
-> > > phylib's scanning for PHYs is about reading the ID registers etc. It
-> > > doesn't do anything until the PHY has been found, and then the first
-> > > thing that happens when the phy_device structure is created is an
-> > > appropriate driver is located, and the driver's ->probe function
-> > > is called.
-> > > 
-> > > If that is successful, then the fewatures are read. If the PHY
-> > > driver's ->features member is set, then that initialises the
-> > > "supported" mask and we read the EEE abilities.
-> > > 
-> > > If ->features is not set, then we look to see whether the driver
-> > > provides a ->get_features method, and call that.
-> > > 
-> > > Otherwise we use the generic genphy_c45_pma_read_abilities() or
-> > > genphy_read_abilities() depending whether the PHY's is_c45 is set
-> > > or not.
-> > > 
-> > > So, if you want to do something very early before features are read,
-> > > then either don't set .features, and do it early in .get_features
-> > > before calling anything else, or do it in the ->probe function.
-> > 
-> > Let me summarize my view on the problem, so may be you can suggest a better
-> > way to solve it.
-> > - KSZ9477, KSZ8565, KSZ9893, KSZ9563, seems to have different quirks by
-> >   the same PHYid. micrel.c driver do now know what exact HW is actually
-> >   in use.
-> > - A set of PHY workarounds was moved from dsa/microchip/ksz9477.c to
-> >   micrel.c, one of this workaround was clearing EEE advertisement
-> >   register, which by accident was clearing EEE capability register.
-> >   Since EEE cap was cleared by the dsa/microchip/ksz9477.c code before
-> >   micrel.c was probed, PHYlib was assuming that his PHY do not supports
-> >   EEE and dint tried to use it.
-> >   After moving this code to micrel.c, it is now trying to change EEE
-> >   advertisement state without letting PHYlib to know about it and PHYlib
-> >   re enables it as actually excepted.
-> > - so far, only KSZ9477 seems to be broken beyond repair, so it is better
-> >   to disable EEE without giving it as a choice for user configuration.
+On Wed, Aug 30, 2023 at 04:26:50PM +0200, Oleksij Rempel wrote:
+> @Lukasz,
 > 
-> We do have support in phylib for "broken EEE modes" which DT could set
-> for the broken PHYs, and as it is possible to describe the DSA PHYs in
-> DT. This sets phydev->eee_broken_modes.
+> can you please try to set eee_broken_modes to all-ones. Somewhat like
+> this:
+> ksz9477_config_init()
+> ...
+>    ...quirks...
 > 
-> phydev->eee_broken_modes gets looked at when genphy_config_aneg() or
-> genphy_c45_an_config_aneg() gets called - which will happen when the
-> PHY is being "started".
-> 
-> So, you could add the DT properties as appropriate to disable all the
-> EEE modes.
-> 
-> Alternatively, in your .config_init function, you could detect your
-> flag and force eee_broken_modes to all-ones.
+>    if (phydev->dev_flages & .. NO_EEE...)
+>        phydev->eee_broken_modes = -1;
 
-@Lukasz,
+That's fine in config_init().
 
-can you please try to set eee_broken_modes to all-ones. Somewhat like
-this:
-ksz9477_config_init()
-...
-   ...quirks...
+>    err = genphy_restart_aneg(phydev);
 
-   if (phydev->dev_flages & .. NO_EEE...)
-       phydev->eee_broken_modes = -1;
+That isn't necessary, and in any case, calling it will just cause the
+AN enable and AN restart bits in BMCR to be set, nothing will be
+reprogrammed.
 
-   err = genphy_restart_aneg(phydev);
-   ...
+However, at a later point, when the PHY is started (by phy_start()
+being called) the state will be set to PHY_UP, and the state machine
+triggered. That sets needs_aneg which will then call phy_start_aneg().
 
-@Russell, thx!
+That then goes on to call phy_config_aneg(), which will either call
+the driver specific config_aneg() function, or one of the two generic
+genphy.*config_aneg() functions. These will then program the EEE
+advertisement.
 
-Regards,
-Oleksij
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
