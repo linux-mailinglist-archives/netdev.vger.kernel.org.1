@@ -1,205 +1,144 @@
-Return-Path: <netdev+bounces-31361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3041778D4F9
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 11:55:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 187B078D507
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 12:07:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 851B3281369
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 09:55:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 011EA28136F
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 10:07:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6844B1FCA;
-	Wed, 30 Aug 2023 09:55:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E61C20FC;
+	Wed, 30 Aug 2023 10:07:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 596501FBF
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 09:55:27 +0000 (UTC)
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC0CF1B0
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 02:55:25 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-58cb845f2f2so73107347b3.1
-        for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 02:55:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1693389325; x=1693994125; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=8GlybaVzkWOBzPs3XaENUlcdKd7YZN4U/Q8ry5Fni0A=;
-        b=Ot8TizPXoNjbaL0o6J+NeXTStBgQetiSWq4CiiBCoYBGRfWKvrY7mdBtXhC1MQhy2b
-         gTECsM0MtkRa+iWh5qWH6sUtxxRmx0PZxkWEhhw392Te5V5rp32beUQylJxa1K6dm0u6
-         1n8QE2Ssx49e6R2BZh1lvYWYBbFLGuqkBWukHw6Yn3WT7gdSMSkXt8llu2GtPSgzOp67
-         /x/tqh0X5t3VJSTzONAFnf+iTcyTDktpMIsJXC8edxH27Z3+zm9UfYhLc6xqIc3LXWSz
-         BSphnY7zglGAGbdw4xiZoQIgSzBuX63rqXnp4CivAlvGlJyYPs0fsJENLD/4VSctUSWF
-         8rRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693389325; x=1693994125;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8GlybaVzkWOBzPs3XaENUlcdKd7YZN4U/Q8ry5Fni0A=;
-        b=kFWjV9YB5xlPtSNx6oqjjhW4QzJZcuPpUH/wnjyrhBMnSgeBDKXxUCNCdBu1CBQ28/
-         hkLqC53q/qnpLLlJQc65Fe5QNvXIuiFTW900JJLlZ3pNtRefbGkP5lohrZqTgi7ht2da
-         pW/Es3s2nR/EE4XW/0pB2FLdI2J0/uDnXyBPDRdg4wgB67Dijn62luM6eDtdPKqQqYAd
-         RBkNhrQLsOnuWBHMFe7y55wXjjerMqaF/XYxpgV3aQz+b4e5VKjKk/kFhqfyWOMIODkH
-         1stERZ1ZUL3dfLRg1sMSR7ajK2icyJYa9CkLvcwnOfu41J62rMxT82s9Ucmk6YdJ55ML
-         hYgg==
-X-Gm-Message-State: AOJu0YyeTBAuA+sbzs3+T4kaK7RJ/QWVscSuiWcDP1KrL1qbTS1elbih
-	h6MSFM9Br3LcfGQIFQ5S8wVwo/xaKKibdg==
-X-Google-Smtp-Source: AGHT+IERKoNkRtMwN1UxxGuQcWnAopsJtij7CANLBXkSQdvBuXfdGl0bFstmCkpHm8NZPanJ5oHC2U1l9AiJzQ==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:2f0f:0:b0:d77:8641:670c with SMTP id
- v15-20020a252f0f000000b00d778641670cmr48306ybv.10.1693389324945; Wed, 30 Aug
- 2023 02:55:24 -0700 (PDT)
-Date: Wed, 30 Aug 2023 09:55:20 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE1BA20F7
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 10:07:45 +0000 (UTC)
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28817107;
+	Wed, 30 Aug 2023 03:07:44 -0700 (PDT)
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+	id 1qbI6u-00059M-41; Wed, 30 Aug 2023 12:07:40 +0200
+Message-ID: <e9644f38-57be-5d26-0c08-08a74eee7cb1@leemhuis.info>
+Date: Wed, 30 Aug 2023 12:07:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.42.0.rc2.253.gd59a3bf2b4-goog
-Message-ID: <20230830095520.1046984-1-edumazet@google.com>
-Subject: [PATCH v2 net] ipv4: annotate data-races around fi->fib_dead
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>, 
-	David Ahern <dsahern@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: Fwd: Unexplainable packet drop starting at v6.4
+Content-Language: en-US, de-DE
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Tirthendu Sarkar <tirthendu.sarkar@intel.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Regressions <regressions@lists.linux.dev>,
+ Linux Networking <netdev@vger.kernel.org>,
+ Linux Intel Ethernet Drivers <intel-wired-lan@lists.osuosl.org>,
+ Bagas Sanjaya <bagasdotme@gmail.com>
+References: <e79edb0f-de89-5041-186f-987d30e0187c@gmail.com>
+From: "Linux regression tracking (Thorsten Leemhuis)"
+ <regressions@leemhuis.info>
+Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
+In-Reply-To: <e79edb0f-de89-5041-186f-987d30e0187c@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1693390064;6dc12fb9;
+X-HE-SMSGID: 1qbI6u-00059M-41
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-syzbot complained about a data-race in fib_table_lookup() [1]
+[replying with a heavily adjust set of recipients]
 
-Add appropriate annotations to document it.
+On 18.07.23 02:51, Bagas Sanjaya wrote:
+> 
+> I notice a regression report on Bugzilla [1]. Quoting from it:
 
-[1]
-BUG: KCSAN: data-race in fib_release_info / fib_table_lookup
+Tirthendu Sarkar, turned out this regressions reported in
+https://bugzilla.kernel.org/show_bug.cgi?id=217678 is caused by your
+change e9031f2da1a ("i40e: introduce next_to_process to i40e_ring")
+[v6.4-rc1] that Tony applied in March.
 
-write to 0xffff888150f31744 of 1 bytes by task 1189 on cpu 0:
-fib_release_info+0x3a0/0x460 net/ipv4/fib_semantics.c:281
-fib_table_delete+0x8d2/0x900 net/ipv4/fib_trie.c:1777
-fib_magic+0x1c1/0x1f0 net/ipv4/fib_frontend.c:1106
-fib_del_ifaddr+0x8cf/0xa60 net/ipv4/fib_frontend.c:1317
-fib_inetaddr_event+0x77/0x200 net/ipv4/fib_frontend.c:1448
-notifier_call_chain kernel/notifier.c:93 [inline]
-blocking_notifier_call_chain+0x90/0x200 kernel/notifier.c:388
-__inet_del_ifa+0x4df/0x800 net/ipv4/devinet.c:432
-inet_del_ifa net/ipv4/devinet.c:469 [inline]
-inetdev_destroy net/ipv4/devinet.c:322 [inline]
-inetdev_event+0x553/0xaf0 net/ipv4/devinet.c:1606
-notifier_call_chain kernel/notifier.c:93 [inline]
-raw_notifier_call_chain+0x6b/0x1c0 kernel/notifier.c:461
-call_netdevice_notifiers_info net/core/dev.c:1962 [inline]
-call_netdevice_notifiers_mtu+0xd2/0x130 net/core/dev.c:2037
-dev_set_mtu_ext+0x30b/0x3e0 net/core/dev.c:8673
-do_setlink+0x5be/0x2430 net/core/rtnetlink.c:2837
-rtnl_setlink+0x255/0x300 net/core/rtnetlink.c:3177
-rtnetlink_rcv_msg+0x807/0x8c0 net/core/rtnetlink.c:6445
-netlink_rcv_skb+0x126/0x220 net/netlink/af_netlink.c:2549
-rtnetlink_rcv+0x1c/0x20 net/core/rtnetlink.c:6463
-netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
-netlink_unicast+0x56f/0x640 net/netlink/af_netlink.c:1365
-netlink_sendmsg+0x665/0x770 net/netlink/af_netlink.c:1914
-sock_sendmsg_nosec net/socket.c:725 [inline]
-sock_sendmsg net/socket.c:748 [inline]
-sock_write_iter+0x1aa/0x230 net/socket.c:1129
-do_iter_write+0x4b4/0x7b0 fs/read_write.c:860
-vfs_writev+0x1a8/0x320 fs/read_write.c:933
-do_writev+0xf8/0x220 fs/read_write.c:976
-__do_sys_writev fs/read_write.c:1049 [inline]
-__se_sys_writev fs/read_write.c:1046 [inline]
-__x64_sys_writev+0x45/0x50 fs/read_write.c:1046
-do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
-entry_SYSCALL_64_after_hwframe+0x63/0xcd
+Could you (or someone else) please take a look? The bugzilla ticket has
+details and a comment from a second person that seems to be affected by
+the same problem. And 6.5 seems to still show the problem.
 
-read to 0xffff888150f31744 of 1 bytes by task 21839 on cpu 1:
-fib_table_lookup+0x2bf/0xd50 net/ipv4/fib_trie.c:1585
-fib_lookup include/net/ip_fib.h:383 [inline]
-ip_route_output_key_hash_rcu+0x38c/0x12c0 net/ipv4/route.c:2751
-ip_route_output_key_hash net/ipv4/route.c:2641 [inline]
-__ip_route_output_key include/net/route.h:134 [inline]
-ip_route_output_flow+0xa6/0x150 net/ipv4/route.c:2869
-send4+0x1e7/0x500 drivers/net/wireguard/socket.c:61
-wg_socket_send_skb_to_peer+0x94/0x130 drivers/net/wireguard/socket.c:175
-wg_socket_send_buffer_to_peer+0xd6/0x100 drivers/net/wireguard/socket.c:200
-wg_packet_send_handshake_initiation drivers/net/wireguard/send.c:40 [inline]
-wg_packet_handshake_send_worker+0x10c/0x150 drivers/net/wireguard/send.c:51
-process_one_work+0x434/0x860 kernel/workqueue.c:2600
-worker_thread+0x5f2/0xa10 kernel/workqueue.c:2751
-kthread+0x1d7/0x210 kernel/kthread.c:389
-ret_from_fork+0x2e/0x40 arch/x86/kernel/process.c:145
-ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+--
+Everything you wanna know about Linux kernel regression tracking:
+https://linux-regtracking.leemhuis.info/about/#tldr
+If I did something stupid, please tell me, as explained on that page.
 
-value changed: 0x00 -> 0x01
+>> Hi,
+>>
+>> After I updated to 6.4 through Archlinux kernel update, suddenly I noticed random packet losses on my routers like nodes. I have these networking relevant config on my nodes
+>>
+>> 1. Using archlinux
+>> 2. Network config through systemd-networkd
+>> 3. Using bird2 for BGP routing, but not relevant to this bug.
+>> 4. Using nftables for traffic control, but seems not relevant to this bug. 
+>> 5. Not using fail2ban like dymanic filtering tools, at least at L3/L4 level
+>>
+>> After I ruled out systemd-networkd, nftables related issues. I tracked down issues to kernel.
+>>
+>> Here's the tcpdump I'm seeing on one side of my node ""
+>>
+>> ```
+>> sudo tcpdump -i fios_wan port 38851
+>> tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
+>> listening on fios_wan, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+>> 10:33:06.073236 IP [BOS1_NODE].38851 > [REDACTED_PUBLIC_IPv4_1].38851: UDP, length 148
+>> 10:33:11.406607 IP [BOS1_NODE].38851 > [REDACTED_PUBLIC_IPv4_1].38851: UDP, length 148
+>> 10:33:16.739969 IP [BOS1_NODE].38851 > [REDACTED_PUBLIC_IPv4_1].38851: UDP, length 148
+>> 10:33:21.859856 IP [BOS1_NODE].38851 > [REDACTED_PUBLIC_IPv4_1].38851: UDP, length 148
+>> 10:33:27.193176 IP [BOS1_NODE].38851 > [REDACTED_PUBLIC_IPv4_1].38851: UDP, length 148
+>> 5 packets captured
+>> 5 packets received by filter
+>> 0 packets dropped by kernel
+>> ```
+>>
+>> But on the other side "[REDACTED_PUBLIC_IPv4_1]", tcpdump is replying packets in this wireguard stream. So packet is lost somewhere in the link.
+>>
+>> From the otherside, I can do "mtr" to "[BOS1_NODE]"'s public IP and found the moment the link got lost is right at "[BOS1_NODE]", that means "[BOS1_NODE]"'s networking stack completely drop the inbound packets from specific ip addresses.
+>>
+>> Some more digging
+>>
+>> 1. This situation began after booting in different delays. Sometimes can trigger after 30 seconds after booting, and sometimes will be after 18 hours or more.
+>> 2. It can envolve into worse case that when I do "ip neigh show", the ipv4 ARP table and ipv6 neighbor discovery start to appear as "invalid", meaning the internet is completely loss.
+>> 3. When this happened to wan facing interface, it seems OK with lan facing interfaces. WAN interface was using Intel X710-T4L using i40e and lan side was using virtio
+>> 4. I tried to bisect in between 6.3 and 6.4, and the first bad commit it reports was "a3efabee5878b8d7b1863debb78cb7129d07a346". But this is not relevant to networking at all, maybe it's the wrong commit to look at. At the meantime, because I haven't found a reproducible way of 100% trigger the issue, it may be the case during bisect some "good" commits are actually bad. 
+>> 5. I also tried to look at "dmesg", nothing interesting pop up. But I'll make it available upon request.
+>>
+>> This is my first bug reports. Sorry for any confusion it may lead to and thanks for reading.
+> 
+> See Bugzilla for the full thread.
+> 
+> Thorsten: The reporter had a bad bisect (some bad commits were marked as good
+> instead), hence SoB chain for culprit (unrelated) ipvu commit is in To:
+> list. I also asked the reporter (also in To:) to provide dmesg and request
+> rerunning bisection, but he doesn't currently have a reliable reproducer.
+> Is it the best I can do?
+> 
+> Anyway, I'm adding this regression to be tracked in regzbot:
+> 
+> #regzbot introduced: a3efabee5878b8 https://bugzilla.kernel.org/show_bug.cgi?id=217678
+> #regzbot title: packet drop on Intel X710-T4L due to ipvu boot fix
+> 
+> Thanks.
+> 
+> [1]: https://bugzilla.kernel.org/show_bug.cgi?id=217678
+> 
 
-Reported by Kernel Concurrency Sanitizer on:
-CPU: 1 PID: 21839 Comm: kworker/u4:18 Tainted: G W 6.5.0-syzkaller #0
-
-Fixes: dccd9ecc3744 ("ipv4: Do not use dead fib_info entries.")
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: David Ahern <dsahern@kernel.org>
----
-v2: rebase on latest net tree
-
- net/ipv4/fib_semantics.c | 5 ++++-
- net/ipv4/fib_trie.c      | 3 ++-
- 2 files changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
-index 65ba18a91865ae9a9bd850052811509b8fb3a79b..eafa4a033515782b4ade9a81ec12cb22f5e51e35 100644
---- a/net/ipv4/fib_semantics.c
-+++ b/net/ipv4/fib_semantics.c
-@@ -278,7 +278,8 @@ void fib_release_info(struct fib_info *fi)
- 				hlist_del(&nexthop_nh->nh_hash);
- 			} endfor_nexthops(fi)
- 		}
--		fi->fib_dead = 1;
-+		/* Paired with READ_ONCE() from fib_table_lookup() */
-+		WRITE_ONCE(fi->fib_dead, 1);
- 		fib_info_put(fi);
- 	}
- 	spin_unlock_bh(&fib_info_lock);
-@@ -1581,6 +1582,7 @@ struct fib_info *fib_create_info(struct fib_config *cfg,
- link_it:
- 	ofi = fib_find_info(fi);
- 	if (ofi) {
-+		/* fib_table_lookup() should not see @fi yet. */
- 		fi->fib_dead = 1;
- 		free_fib_info(fi);
- 		refcount_inc(&ofi->fib_treeref);
-@@ -1619,6 +1621,7 @@ struct fib_info *fib_create_info(struct fib_config *cfg,
- 
- failure:
- 	if (fi) {
-+		/* fib_table_lookup() should not see @fi yet. */
- 		fi->fib_dead = 1;
- 		free_fib_info(fi);
- 	}
-diff --git a/net/ipv4/fib_trie.c b/net/ipv4/fib_trie.c
-index 74d403dbd2b4e6128dacd1bfc3579a1fc3d635aa..d13fb9e76b9718c674b82ea9069f98fb29f06425 100644
---- a/net/ipv4/fib_trie.c
-+++ b/net/ipv4/fib_trie.c
-@@ -1582,7 +1582,8 @@ int fib_table_lookup(struct fib_table *tb, const struct flowi4 *flp,
- 		if (fa->fa_dscp &&
- 		    inet_dscp_to_dsfield(fa->fa_dscp) != flp->flowi4_tos)
- 			continue;
--		if (fi->fib_dead)
-+		/* Paired with WRITE_ONCE() in fib_release_info() */
-+		if (READ_ONCE(fi->fib_dead))
- 			continue;
- 		if (fa->fa_info->fib_scope < flp->flowi4_scope)
- 			continue;
--- 
-2.42.0.rc2.253.gd59a3bf2b4-goog
-
+#regzbot introduced: e9031f2da1a
+#regzbot poke
 
