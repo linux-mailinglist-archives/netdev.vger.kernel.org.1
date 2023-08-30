@@ -1,84 +1,71 @@
-Return-Path: <netdev+bounces-31399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 736FF78D624
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 15:30:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C3D778D626
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 15:31:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A67491C203B6
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 13:30:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1152B281175
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 13:31:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05A005694;
-	Wed, 30 Aug 2023 13:30:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 181805694;
+	Wed, 30 Aug 2023 13:31:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E55C5538A
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 13:30:41 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B78E198
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 06:30:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1693402239;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QrmtevR+OHspc/c545A2F7OAMYEjllnCprVaLeVCRbQ=;
-	b=Oi4msi9VB3j0ZgJuqCfU42WZObDCxWJQgAsZSl+Ouk+H2iUVnUXEzIGaL5vwsQk/KvfAk+
-	Sr4GcZdrMPg08zs5kLCFGQoaMKuXUfz9yJjGHRsG29qALHoCv4Fb+tdDPJPSONkvCBUdry
-	EIquKv6LZqSAsIYytV/oq6fMaN3Xd9c=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-172-GuJV49bPPUi3JaMy8TK0uA-1; Wed, 30 Aug 2023 09:30:38 -0400
-X-MC-Unique: GuJV49bPPUi3JaMy8TK0uA-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-978a991c3f5so428899866b.0
-        for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 06:30:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693402237; x=1694007037;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QrmtevR+OHspc/c545A2F7OAMYEjllnCprVaLeVCRbQ=;
-        b=h/SI0JoCDwuzjxpJsz9A/j7KDJTAixPgPO7cL1wKhgfr1hA7Cg82I9l+thhZNNQcUS
-         fKEYY/e2dp6xSb5q2tVYbvsDBFy0XXZhyL/Dar+mpb0oOiNPp3MQTDpFKUbFh6IFvJaL
-         zh/7ycXLgqGxwaMhmakUII3MPzfcy+QEFjj85V9pCRxvGkkUj+on/c2DP+RdbhYRyRyF
-         u6wV7m/yvcXvDV8ljE9JdBLl885rIZJa7CoSmsgu0vjRA8AYibuR8lWNek36XAbEAEU+
-         6VwkgP3kw3MCVbFwh3y8KxActE4FIRLcgcW1GKia0oJa2528IrWD/cntzZSc5FbZMHEI
-         UkxA==
-X-Gm-Message-State: AOJu0YykV01FnfJzsmLyuOGlzRUHBvGY9Z7a4CaEbVZ12iu79XxKSvc+
-	m4L368cZ/GOfmjFfaeq4kyBCILXIfRPUE52rz+FDRUmjI07/FJLCPKRufzsxY3ZAu38Jrv+rI3J
-	ajTDaOHnvcz6x4e0K
-X-Received: by 2002:a17:906:8b:b0:9a5:7887:ef09 with SMTP id 11-20020a170906008b00b009a57887ef09mr1872771ejc.32.1693402237183;
-        Wed, 30 Aug 2023 06:30:37 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEYxUHeyUiFVorh4ZDehN292nCkRvDukdS6QYJWdvud4F+ML6iNTqT9rYxTEkbhUobIqpPlWg==
-X-Received: by 2002:a17:906:8b:b0:9a5:7887:ef09 with SMTP id 11-20020a170906008b00b009a57887ef09mr1872753ejc.32.1693402236839;
-        Wed, 30 Aug 2023 06:30:36 -0700 (PDT)
-Received: from redhat.com ([2.55.167.22])
-        by smtp.gmail.com with ESMTPSA id ju26-20020a17090798ba00b00982a352f078sm7183100ejc.124.2023.08.30.06.30.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Aug 2023 06:30:35 -0700 (PDT)
-Date: Wed, 30 Aug 2023 09:30:31 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, xieyongji@bytedance.com,
-	jasowang@redhat.com, david.marchand@redhat.com, lulu@redhat.com,
-	linux-kernel@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-	xuanzhuo@linux.alibaba.com, eperezma@redhat.com
-Subject: Re: [PATCH v3 0/3] vduse: add support for networking devices
-Message-ID: <20230830091607-mutt-send-email-mst@kernel.org>
-References: <20230705100430.61927-1-maxime.coquelin@redhat.com>
- <20230810150347-mutt-send-email-mst@kernel.org>
- <20230810142949.074c9430@kernel.org>
- <20230810174021-mutt-send-email-mst@kernel.org>
- <20230810150054.7baf34b7@kernel.org>
- <ad2b2f93-3598-cffc-0f0d-fe20b2444011@redhat.com>
- <20230829130430-mutt-send-email-mst@kernel.org>
- <651476f1-ccae-0ba1-4778-1a63f34aa65d@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09E1063AB
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 13:31:12 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 706A2198;
+	Wed, 30 Aug 2023 06:31:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=qXDnTENf1cpDwSglV1bKnUnQe/xh9v6pAXIFuXIgylc=; b=OG050MqMB1dVOtvFlGV2rC0qD4
+	mZmWrfGqn72HGqSt1lahm1QBPQXkMhwzi1s75kucl+kg5N4RcCfbW1WQfpGbDB3cOvdjKWGUvKPR6
+	jaaarw2cbWpS3ByStjNbdZ4aYR2oCUpNDTwB6PDfV+3JmcenFiuxwBH1AGSp3x9eI+31XqvXfwDWi
+	7iLvnFqrwVkmiNMgBakVdH4XS4wjQ16Xd99Z0z8AUodi5ej+HWHq2LsjkiVCArfYyhDTlDZ3vqsUf
+	dAl7vAPKw4oXerqXOPi9WCscpSOL8BJLM3pCjUTohwsG7yOYxp68lSm8vsrIN9ljW7xS3U3Wr8jA5
+	bqPCzRIg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57212)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qbLHb-0001f6-2h;
+	Wed, 30 Aug 2023 14:30:57 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qbLHb-0005j4-IW; Wed, 30 Aug 2023 14:30:55 +0100
+Date: Wed, 30 Aug 2023 14:30:55 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Lukasz Majewski <lukma@denx.de>, Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Vladimir Oltean <olteanv@gmail.com>, Tristram.Ha@microchip.com,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	UNGLinuxDriver@microchip.com,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] net: phy: Provide Module 4 KSZ9477 errata
+ (DS80000754C)
+Message-ID: <ZO9Ejx9G8laNRasu@shell.armlinux.org.uk>
+References: <20230830092119.458330-1-lukma@denx.de>
+ <20230830092119.458330-2-lukma@denx.de>
+ <20230830101813.GG31399@pengutronix.de>
+ <20230830125224.1012459f@wsk>
+ <20230830105941.GH31399@pengutronix.de>
+ <20230830135151.683303db@wsk>
+ <20230830121738.GJ31399@pengutronix.de>
+ <ZO83htinyfAp4mWw@shell.armlinux.org.uk>
+ <20230830130649.GK31399@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,68 +74,102 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <651476f1-ccae-0ba1-4778-1a63f34aa65d@redhat.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230830130649.GK31399@pengutronix.de>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
+	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 30, 2023 at 01:27:18PM +0200, Maxime Coquelin wrote:
-> 
-> 
-> On 8/29/23 19:05, Michael S. Tsirkin wrote:
-> > On Tue, Aug 29, 2023 at 03:34:06PM +0200, Maxime Coquelin wrote:
+On Wed, Aug 30, 2023 at 03:06:49PM +0200, Oleksij Rempel wrote:
+> On Wed, Aug 30, 2023 at 01:35:18PM +0100, Russell King (Oracle) wrote:
+> > On Wed, Aug 30, 2023 at 02:17:38PM +0200, Oleksij Rempel wrote:
+> > > On Wed, Aug 30, 2023 at 01:51:51PM +0200, Lukasz Majewski wrote:
+> > > > Hi Oleksij,
 > > > 
+> > > > It looks like the most optimal solution would be the one proposed by
+> > > > Tristam:
+> > > > https://www.spinics.net/lists/netdev/msg932044.html
 > > > 
-> > > On 8/11/23 00:00, Jakub Kicinski wrote:
-> > > > On Thu, 10 Aug 2023 17:42:11 -0400 Michael S. Tsirkin wrote:
-> > > > > > Directly into the stack? I thought VDUSE is vDPA in user space,
-> > > > > > meaning to get to the kernel the packet has to first go thru
-> > > > > > a virtio-net instance.
-> > > > > 
-> > > > > yes. is that a sufficient filter in your opinion?
-> > > > 
-> > > > Yes, the ability to create the device feels stronger than CAP_NET_RAW,
-> > > > and a bit tangential to CAP_NET_ADMIN. But I don't have much practical
-> > > > experience with virt so no strong opinion, perhaps it does make sense
-> > > > for someone's deployment? Dunno..
-> > > > 
+> > > In this case, please add the reason why it would work on this HW and
+> > > will not break by any changes in PHYlib or micrel.c driver.
 > > > 
-> > > I'm not sure CAP_NET_ADMIN should be required for creating the VDUSE
-> > > devices, as the device could be attached to vhost-vDPA and so not
-> > > visible to the Kernel networking stack.
+> > > If I remember it correctly, in KSZ9477 variants, if you write to EEE
+> > > advertisement register, it will affect the state of a EEE capability
+> > > register. Which break IEEE 802.3 specification and the reason why
+> > > ksz9477_get_features() actually exist. But can be used as workaround if
+> > > it is written early enough before PHYlib tried to read EEE capability
+> > > register.
 > > > 
-> > > However, CAP_NET_ADMIN should be required to attach the VDUSE device to
-> > > virtio-vdpa/virtio-net.
+> > > Please confirm my assumption by applying your workaround and testing it
+> > > with ethtool --show-eee lanX.
 > > > 
-> > > Does that make sense?
-> > > 
-> > > Maxime
+> > > It should be commented in the code with all kind of warnings:
+> > > Don't move!!! We use one bug to workaround another bug!!! If PHYlib
+> > > start scanning PHYs before this code is executed, then thing may break!!
 > > 
-> > OK. How are we going to enforce it?
+> > Why would phylib's scanning cause breakage?
+> > 
+> > phylib's scanning for PHYs is about reading the ID registers etc. It
+> > doesn't do anything until the PHY has been found, and then the first
+> > thing that happens when the phy_device structure is created is an
+> > appropriate driver is located, and the driver's ->probe function
+> > is called.
+> > 
+> > If that is successful, then the fewatures are read. If the PHY
+> > driver's ->features member is set, then that initialises the
+> > "supported" mask and we read the EEE abilities.
+> > 
+> > If ->features is not set, then we look to see whether the driver
+> > provides a ->get_features method, and call that.
+> > 
+> > Otherwise we use the generic genphy_c45_pma_read_abilities() or
+> > genphy_read_abilities() depending whether the PHY's is_c45 is set
+> > or not.
+> > 
+> > So, if you want to do something very early before features are read,
+> > then either don't set .features, and do it early in .get_features
+> > before calling anything else, or do it in the ->probe function.
 > 
-> Actually, it seems already enforced for all VDPA devices types.
-> Indeed, the VDPA_CMD_DEV_NEW Netlink command used to add the device to
-> the VDPA bus has the GENL_ADMIN_PERM flag set, and so require
-> CAT_NET_ADMIN.
+> Let me summarize my view on the problem, so may be you can suggest a better
+> way to solve it.
+> - KSZ9477, KSZ8565, KSZ9893, KSZ9563, seems to have different quirks by
+>   the same PHYid. micrel.c driver do now know what exact HW is actually
+>   in use.
+> - A set of PHY workarounds was moved from dsa/microchip/ksz9477.c to
+>   micrel.c, one of this workaround was clearing EEE advertisement
+>   register, which by accident was clearing EEE capability register.
+>   Since EEE cap was cleared by the dsa/microchip/ksz9477.c code before
+>   micrel.c was probed, PHYlib was assuming that his PHY do not supports
+>   EEE and dint tried to use it.
+>   After moving this code to micrel.c, it is now trying to change EEE
+>   advertisement state without letting PHYlib to know about it and PHYlib
+>   re enables it as actually excepted.
+> - so far, only KSZ9477 seems to be broken beyond repair, so it is better
+>   to disable EEE without giving it as a choice for user configuration.
 
-Hmm good point. Pity I didn't notice earlier. Oh well there's always
-the next release.
+We do have support in phylib for "broken EEE modes" which DT could set
+for the broken PHYs, and as it is possible to describe the DSA PHYs in
+DT. This sets phydev->eee_broken_modes.
 
-> > Also, we need a way for selinux to enable/disable some of these things
-> > but not others.
-> 
-> Ok, I can do it in a patch on top.
-> Do you have a pointer where it is done for Virtio Block devices?
-> 
-> Maxime
+phydev->eee_broken_modes gets looked at when genphy_config_aneg() or
+genphy_c45_an_config_aneg() gets called - which will happen when the
+PHY is being "started".
 
-It's not done yet - at the moment vduse device is always block so we
-didn't need the distinction.
+So, you could add the DT properties as appropriate to disable all the
+EEE modes.
+
+Alternatively, in your .config_init function, you could detect your
+flag and force eee_broken_modes to all-ones.
+
+The problem with clearing ->supported_eee is that will stop
+genphy_c45_write_eee_adv() writing the advertisement register -
+which means if bits are set in the register, they won't be cleared
+because phylib thinks the registers aren't supported. So you won't
+actually be disabling anything by clearing ->supported_eee.
 
 -- 
-MST
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
