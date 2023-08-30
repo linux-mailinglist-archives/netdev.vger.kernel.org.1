@@ -1,233 +1,188 @@
-Return-Path: <netdev+bounces-31432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3088378D744
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 17:49:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CEE678D748
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 17:50:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60C361C204AB
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 15:49:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D6091C203B0
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 15:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CB467469;
-	Wed, 30 Aug 2023 15:48:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DCF8746A;
+	Wed, 30 Aug 2023 15:50:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC4D0525E
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 15:48:56 +0000 (UTC)
-Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8332B19A;
-	Wed, 30 Aug 2023 08:48:55 -0700 (PDT)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-	by mailout.nyi.internal (Postfix) with ESMTP id 7294A5C0125;
-	Wed, 30 Aug 2023 11:48:52 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute6.internal (MEProxy); Wed, 30 Aug 2023 11:48:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm1; t=1693410532; x=1693496932; bh=OBnVGQWEM3kMS
-	4B7KKbSwDUGaRUbADHZE4qYXlfiygM=; b=PvLNe5kKHYWU/kPp5/cS8VLuYCn9I
-	4lNckk7tMtgEHmv4VNrGWwF88UPNyjelrIt7RkQqqlHto6gN4L8mntb0sbyqBSia
-	86Gxu5hZr2/RTRD6MpIRfKuS2vc5Ib803/E+YRRgtv87koxrbg/1fwaDM87f5LwZ
-	fowfKR72EM4xuLyc7Asu7O+tYYurB3QEkL6epRmM73azPWKMMRcNuzzT61Aj+JDq
-	Br8aqCnp2Pvk1u9LMniYDnKecBb4IfHVIHOJkV4l+qvocqwDgFi/EpST95gUeyG0
-	hUCw6NhUXB62k+XdF81EXT88acnubjpR1msWjpKWG/4AqtGRdnKNT5CGQ==
-X-ME-Sender: <xms:5GTvZCaczUmjdeSEq0nl0ximLjWr1U7ozfldVZiKrqZPkz2nnpudAg>
-    <xme:5GTvZFa801WI9x03l1A-ufF_yqbejNTdsiL_3h1XBVRzonkRW18yeoZop7EMD1jfe
-    yN0haE1F5pSnWg>
-X-ME-Received: <xmr:5GTvZM_MBPGrGMELEqs7Jdgkr7_MKzoZbntMVUU6iV1q_jBu2RQsOXHW-rDA45CY8wO5nez5mf_0o1qQwyIquIhXKBsBlw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrudefkedgleeiucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcu
-    ufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrth
-    htvghrnhepvddufeevkeehueegfedtvdevfefgudeifeduieefgfelkeehgeelgeejjeeg
-    gefhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepih
-    guohhstghhsehiughoshgthhdrohhrgh
-X-ME-Proxy: <xmx:5GTvZEqaxIQAAKiuq-FIvjQDhoLF0v9aUNUpPLz5BxSjyFAAHJKzuw>
-    <xmx:5GTvZNrxz85PDRLg9sUaNoLDszxQmtGMjusVDuZzD3pCtt6FCdJTCA>
-    <xmx:5GTvZCRysmOkjJ1pC5TIDwgLB72K86VK-Ju0Jx1Jznt93zQ_Sc4fSQ>
-    <xmx:5GTvZBeHTOFhHHRduGki5e_tMbXpiDxjr4ZJN18IgrzifRAN7wSrUA>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 30 Aug 2023 11:48:51 -0400 (EDT)
-Date: Wed, 30 Aug 2023 18:48:46 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
-	Shuah Khan <shuah@kernel.org>, Petr Machata <petrm@nvidia.com>
-Subject: Re: [PATCH net v4 3/3] selftests: fib_tests: Add multipath list
- receive tests
-Message-ID: <ZO9k3kSVHpxO1owX@shredder>
-References: <20230830091341.17273-1-sriram.yagnaraman@est.tech>
- <20230830091341.17273-4-sriram.yagnaraman@est.tech>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 300B46AB2
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 15:50:33 +0000 (UTC)
+Received: from mail-yw1-x1130.google.com (mail-yw1-x1130.google.com [IPv6:2607:f8b0:4864:20::1130])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B79219A
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 08:50:30 -0700 (PDT)
+Received: by mail-yw1-x1130.google.com with SMTP id 00721157ae682-58fae4a5285so65395567b3.0
+        for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 08:50:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1693410630; x=1694015430; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KHWnKAzPdpzy6W4szuD/Bbv3AOxHCSpeCw9JT/WIhKo=;
+        b=aArk8W3wdGGpKBF1WsyPBiN7l9znMariMNVnDQKWUFvJsE/iJvKA+kIOoNWesHxxSj
+         qFBLWSFr5LRj1nNGjYuwEATM9wCbghBu9eQpuUchzFDhpBuMhtjSPbVMBhddesC5ia0Z
+         RR0S3rFblNxoMOw8oWlcRfpcWq6NDGMz9KnKzhbpbLFrGTUjkX4i4L1PTMq/8zFvaBWb
+         BmjgdoBan/PSlyMHK8FoHImR54fNLDWVBv83mwvSflLeG8l3PPQmM1oiAdIAH7udW4Fg
+         oWfBQKSFwBHBcJAO8IGOgixoKHdoDwqR/usrsOIgZgfB+bug1DkvgOnsl2LGETij3qEj
+         BtpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693410630; x=1694015430;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KHWnKAzPdpzy6W4szuD/Bbv3AOxHCSpeCw9JT/WIhKo=;
+        b=Ay0gv+j2QTHntqRDMryyV1pfpkm5Tp8aILjRRcsuyEFzmAZQrSw4OzqTDUEH06lTzU
+         PE2hn+ZUkmBLpHbzcvwjsdRCQLPKQTCp3AbMIjJOO98eUecTgpd3xR+licg7wLX6nGmE
+         JMzhuHButAwyoxejjJd13A01sQN61MQsk9EpeiEN6fa6Sipyy4z8TFWOsbqfgAZWUN41
+         KSTuNXhM4ZC5B4QU+5XRslP6qIPX3vz6uKvyCyQfr39QqSHDj0IAaTaFpIdym3po8adV
+         VCzPCkuKlxyJGoeXNsizxhm+Q5mHxE4TnNLgR6ZoaBA4ZUM76dmjSTPDTk5tqL/qiTqa
+         QaHA==
+X-Gm-Message-State: AOJu0YxQuSlLwDkdbks6gbwD8X3aaH6u/qqQG54xrNJqQt9BNwCeESkN
+	GsQyTNUYG5ls14ZJVhO116f2cI5FHJ34P0k6TMnYPg==
+X-Google-Smtp-Source: AGHT+IGSRGYmNkVyq7cTen8sUoZePAYOKJCKMnt2CbvHebmqlxy1qlK5duCGtODW0oCnAyzYBK2i2AiJlB84td9SVaI=
+X-Received: by 2002:a81:4a04:0:b0:577:60d4:a879 with SMTP id
+ x4-20020a814a04000000b0057760d4a879mr2790466ywa.33.1693410629749; Wed, 30 Aug
+ 2023 08:50:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230830091341.17273-4-sriram.yagnaraman@est.tech>
+References: <20230829123541.3745013-1-edumazet@google.com> <ZO9Q0ih6OQhq7sio@localhost.localdomain>
+ <CAM0EoMnpL5rE-zDhiY_FKTOguX_3kKkWCGdX0ry8ZWXjmRLjfA@mail.gmail.com> <CANn89iLf6+6679LrTV-c2XZWMEeRc3O0N+++yKNqQUxQzjspJw@mail.gmail.com>
+In-Reply-To: <CANn89iLf6+6679LrTV-c2XZWMEeRc3O0N+++yKNqQUxQzjspJw@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Wed, 30 Aug 2023 11:50:18 -0400
+Message-ID: <CAM0EoMn+W0xiFxS9VPjzgW0-z2-M-cNS2RwXZJeRN6+G7ENmWw@mail.gmail.com>
+Subject: Re: [PATCH net] net/sched: fq_pie: avoid stalls in fq_pie_timer()
+To: Eric Dumazet <edumazet@google.com>
+Cc: Michal Kubiak <michal.kubiak@intel.com>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, syzbot+e46fbd5289363464bc13@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 30, 2023 at 11:13:41AM +0200, Sriram Yagnaraman wrote:
-> +link_stats_get()
-> +{
-> +	local ns=$1; shift
-> +        local dev=$1; shift
-> +        local dir=$1; shift
-> +        local stat=$1; shift
+On Wed, Aug 30, 2023 at 11:00=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
+ wrote:
+>
+> On Wed, Aug 30, 2023 at 4:48=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.co=
+m> wrote:
+> >
+> > On Wed, Aug 30, 2023 at 10:30=E2=80=AFAM Michal Kubiak <michal.kubiak@i=
+ntel.com> wrote:
+> > >
+> > > On Tue, Aug 29, 2023 at 12:35:41PM +0000, Eric Dumazet wrote:
+> > > > When setting a high number of flows (limit being 65536),
+> > > > fq_pie_timer() is currently using too much time as syzbot reported.
+> > > >
+> > > > Add logic to yield the cpu every 2048 flows (less than 150 usec
+> > > > on debug kernels).
+> > > > It should also help by not blocking qdisc fast paths for too long.
+> > > > Worst case (65536 flows) would need 31 jiffies for a complete scan.
+> > > >
+> > > > Relevant extract from syzbot report:
+> > > >
+> > > > rcu: INFO: rcu_preempt detected expedited stalls on CPUs/tasks: { 0=
+-.... } 2663 jiffies s: 873 root: 0x1/.
+> > > > rcu: blocking rcu_node structures (internal RCU debug):
+> > > > Sending NMI from CPU 1 to CPUs 0:
+> > > > NMI backtrace for cpu 0
+> > > > CPU: 0 PID: 5177 Comm: syz-executor273 Not tainted 6.5.0-syzkaller-=
+00453-g727dbda16b83 #0
+> > > > Hardware name: Google Google Compute Engine/Google Compute Engine, =
+BIOS Google 07/26/2023
+> > > > RIP: 0010:check_kcov_mode kernel/kcov.c:173 [inline]
+> > > > RIP: 0010:write_comp_data+0x21/0x90 kernel/kcov.c:236
+> > > > Code: 2e 0f 1f 84 00 00 00 00 00 65 8b 05 01 b2 7d 7e 49 89 f1 89 c=
+6 49 89 d2 81 e6 00 01 00 00 49 89 f8 65 48 8b 14 25 80 b9 03 00 <a9> 00 01=
+ ff 00 74 0e 85 f6 74 59 8b 82 04 16 00 00 85 c0 74 4f 8b
+> > > > RSP: 0018:ffffc90000007bb8 EFLAGS: 00000206
+> > > > RAX: 0000000000000101 RBX: ffffc9000dc0d140 RCX: ffffffff885893b0
+> > > > RDX: ffff88807c075940 RSI: 0000000000000100 RDI: 0000000000000001
+> > > > RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000000
+> > > > R10: 0000000000000000 R11: 0000000000000000 R12: ffffc9000dc0d178
+> > > > R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+> > > > FS:  0000555555d54380(0000) GS:ffff8880b9800000(0000) knlGS:0000000=
+000000000
+> > > > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > > CR2: 00007f6b442f6130 CR3: 000000006fe1c000 CR4: 00000000003506f0
+> > > > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> > > > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> > > > Call Trace:
+> > > >  <NMI>
+> > > >  </NMI>
+> > > >  <IRQ>
+> > > >  pie_calculate_probability+0x480/0x850 net/sched/sch_pie.c:415
+> > > >  fq_pie_timer+0x1da/0x4f0 net/sched/sch_fq_pie.c:387
+> > > >  call_timer_fn+0x1a0/0x580 kernel/time/timer.c:1700
+> > > >
+> > > > Fixes: ec97ecf1ebe4 ("net: sched: add Flow Queue PIE packet schedul=
+er")
+> > > > Link: https://lore.kernel.org/lkml/00000000000017ad3f06040bf394@goo=
+gle.com/
+> > > > Reported-by: syzbot+e46fbd5289363464bc13@syzkaller.appspotmail.com
+> > > > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > >
+> > > The code logic and style looks good to me.
+> > > However, I don't have experience with that code to estimate if 2048
+> > > flows per round is enough to avoid stalls for all normal circumstance=
+s,
+> > > so I guess someone else should take a look.
+> > >
+> >
+> > Eric, I had the same question: Why 2048 (why not 12 for example? ;->).
+> > Could that number make more sense to add as an init attribute? Not
+> > asking you to add it but i or somebody else could send a followup
+> > patch after.
+>
+> This is based on experimentation.
+>
+> I started using 1024, then saw that using 2048 was okay.
+>
+> I think I gave some numbers in the changelog :
+> "(less than 150 usec on debug kernels)."
+>
+> Spending 150 usec every jiffie seems reasonable to me.
+>
+> Honestly, I am not sure if anyone was/is using a high number of flows,
+> given that whole qdisc enqueue/dequeue operations were frozen every 15ms =
+for
+> 2 or 3 ms on non debug kernels :/
 
-Indentation is off...
+Unfortunately such numbers tend to depend on the CPU used etc. Once
+your patch goes in we can add an extension to set a netlink attribute
+so the user can change this value (by default keep it at 2048).
 
-> +
-> +        ip -n $ns -j -s link show dev $dev \
-> +                | jq '.[]["stats64"]["'$dir'"]["'$stat'"]'
-> +}
-> +
-> +list_rcv_eval()
-> +{
-> +	local name=$1; shift
-> +	local file=$1; shift
-> +	local expected=$1; shift
-> +	local exp=$1; shift
+cheers,
+jamal
 
-Nit: You can drop the first and last arguments since they don't change
-between both invocations.
-
-> +
-> +
-
-Unnecessary blank line
-
-
-> +	local count=$(tail -n 1 $file | jq '.["counter-value"] | tonumber | floor')
-> +	local ratio=$(echo "scale=2; $count / $expected" | bc -l)
-> +	local res=$(echo "$ratio $exp" | bc)
-> +	[[ $res -eq 1 ]]
-> +	log_test $? 0 "$name route hit ratio ($ratio)"
-> +}
-> +
-> +ipv4_mpath_list_test()
-> +{
-> +	echo
-> +	echo "IPv4 multipath list receive tests"
-> +
-> +	mpath_dep_check || return 1
-> +
-> +	route_setup
-> +
-> +	set -e
-> +	run_cmd "ip netns exec ns1 ethtool -K veth1 tcp-segmentation-offload off"
-> +
-> +	run_cmd "ip netns exec ns2 bash -c \"echo 20000 > /sys/class/net/veth2/gro_flush_timeout\""
-> +	run_cmd "ip netns exec ns2 bash -c \"echo 1 > /sys/class/net/veth2/napi_defer_hard_irqs\""
-> +	run_cmd "ip netns exec ns2 ethtool -K veth2 generic-receive-offload on"
-> +	run_cmd "ip -n ns2 link add name nh1 up type dummy"
-> +	run_cmd "ip -n ns2 link add name nh2 up type dummy"
-> +	run_cmd "ip -n ns2 address add 172.16.201.1/24 dev nh1"
-> +	run_cmd "ip -n ns2 address add 172.16.202.1/24 dev nh2"
-> +	run_cmd "ip -n ns2 neigh add 172.16.201.2 lladdr 00:11:22:33:44:55 nud perm dev nh1"
-> +	run_cmd "ip -n ns2 neigh add 172.16.202.2 lladdr 00:aa:bb:cc:dd:ee nud perm dev nh2"
-> +	run_cmd "ip -n ns2 route add 203.0.113.0/24
-> +		nexthop via 172.16.201.2 nexthop via 172.16.202.2"
-> +	run_cmd "ip netns exec ns2 sysctl -qw net.ipv4.fib_multipath_hash_policy=1"
-> +	set +e
-> +
-> +	local dmac=$(ip -n ns2 -j link show dev veth2 | jq -r '.[]["address"]')
-> +	local tmp_file=$(mktemp)
-> +	local cmd="ip netns exec ns1 mausezahn veth1 -a own -b $dmac
-> +		-A 172.16.101.1 -B 203.0.113.1 -t udp 'sp=12345,dp=0-65535' -q"
-> +
-> +	# Packets forwarded in a list using a multipath route must not reuse a
-> +	# cached result so that a flow always hits the same nexthop. In other
-> +	# words, the FIB lookup tracepoint needs to be triggered for every
-> +	# packet.
-> +	local t0_rx_pkts=$(link_stats_get ns2 veth2 rx packets)
-> +	run_cmd "perf stat -e fib:fib_table_lookup --filter 'err == 0' -j -o $tmp_file -- $cmd"
-> +	local t1_rx_pkts=$(link_stats_get ns2 veth2 rx packets)
-> +	local diff=$(echo $t1_rx_pkts - $t0_rx_pkts | bc -l)
-> +	list_rcv_eval "Multipath" $tmp_file $diff ">= 0.95"
-> +
-> +	rm $tmp_file
-> +	route_cleanup
-> +}
-> +
-> +ipv6_mpath_list_test()
-> +{
-> +	echo
-> +	echo "IPv6 multipath list receive tests"
-> +
-> +	mpath_dep_check || return 1
-> +
-> +	route_setup
-> +
-> +	set -e
-> +	run_cmd "ip netns exec ns1 ethtool -K veth1 tcp-segmentation-offload off"
-> +
-> +	run_cmd "ip netns exec ns2 bash -c \"echo 20000 > /sys/class/net/veth2/gro_flush_timeout\""
-> +	run_cmd "ip netns exec ns2 bash -c \"echo 1 > /sys/class/net/veth2/napi_defer_hard_irqs\""
-> +	run_cmd "ip netns exec ns2 ethtool -K veth2 generic-receive-offload on"
-> +	run_cmd "ip -n ns2 link add name nh1 up type dummy"
-> +	run_cmd "ip -n ns2 link add name nh2 up type dummy"
-> +	run_cmd "ip -n ns2 -6 address add 2001:db8:201::1/64 dev nh1"
-> +	run_cmd "ip -n ns2 -6 address add 2001:db8:202::1/64 dev nh2"
-> +	run_cmd "ip -n ns2 -6 neigh add 2001:db8:201::2 lladdr 00:11:22:33:44:55 nud perm dev nh1"
-> +	run_cmd "ip -n ns2 -6 neigh add 2001:db8:202::2 lladdr 00:aa:bb:cc:dd:ee nud perm dev nh2"
-> +	run_cmd "ip -n ns2 -6 route add 2001:db8:301::/64
-> +		nexthop via 2001:db8:201::2 nexthop via 2001:db8:202::2"
-> +	run_cmd "ip netns exec ns2 sysctl -qw net.ipv6.fib_multipath_hash_policy=1"
-> +	set +e
-> +
-> +	local dmac=$(ip -n ns2 -j link show dev veth2 | jq -r '.[]["address"]')
-> +	local tmp_file=$(mktemp)
-> +	local cmd="ip netns exec ns1 mausezahn -6 veth1 -a own -b $dmac
-> +		-A 2001:db8:101::1 -B 2001:db8:301::1 -t udp 'sp=12345,dp=0-65535' -q"
-> +
-> +	# Packets forwarded in a list using a multipath route must not reuse a
-> +	# cached result so that a flow always hits the same nexthop. In other
-> +	# words, the FIB lookup tracepoint needs to be triggered for every
-> +	# packet.
-> +	local t0_rx_pkts=$(link_stats_get ns2 veth2 rx packets)
-> +	run_cmd "perf stat -e fib6:fib6_table_lookup --filter 'err == 0' -j -o $tmp_file -- $cmd"
-> +	local t1_rx_pkts=$(link_stats_get ns2 veth2 rx packets)
-> +	local diff=$(echo $t1_rx_pkts - $t0_rx_pkts | bc -l)
-> +	list_rcv_eval "Multipath" $tmp_file $diff ">= 0.95"
-> +
-> +	rm $tmp_file
-> +	route_cleanup
-> +}
-> +
->  ################################################################################
->  # usage
->  
-> @@ -2433,6 +2587,8 @@ do
->  	ipv6_mangle)			ipv6_mangle_test;;
->  	ipv4_bcast_neigh)		ipv4_bcast_neigh_test;;
->  	fib6_gc_test|ipv6_gc)		fib6_gc_test;;
-> +	ipv4_mpath_list)		ipv4_mpath_list_test;;
-> +	ipv6_mpath_list)		ipv6_mpath_list_test;;
->  
->  	help) echo "Test names: $TESTS"; exit 0;;
->  	esac
-> -- 
-> 2.34.1
-> 
-> 
+>
+>
+> > Other than that:
+> >
+> > Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> >
+> > cheers,
+> > jamal
+> >
+> > > Thanks,
+> > > Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
+> > >
 
