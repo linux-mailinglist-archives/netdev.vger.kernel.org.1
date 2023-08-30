@@ -1,142 +1,153 @@
-Return-Path: <netdev+bounces-31354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01C0A78D48C
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 11:21:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76BAB78D497
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 11:38:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3387E1C209BB
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 09:21:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DA692812B3
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 09:38:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58F061C39;
-	Wed, 30 Aug 2023 09:21:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3DBE1FB2;
+	Wed, 30 Aug 2023 09:38:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48DEB1C10
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 09:21:40 +0000 (UTC)
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73338CCB;
-	Wed, 30 Aug 2023 02:21:38 -0700 (PDT)
-Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 428BA864EF;
-	Wed, 30 Aug 2023 11:21:36 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1693387296;
-	bh=8vxd2qPCpP6m2nYudlDH5tbegJ9wBVvB3PF1O86stzU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=C1DJodv45zfCQqRv/NeXJL8jLT/pbfn0bfkbs8hXNptSsHmq/vP7KSPgrZV33woan
-	 i8LP/1OQVxiBVWzSRZTomxKGwPMa4kGcDqDc3/7vDGrVP5exdGMekrlSl0Mf9ZEYkR
-	 DpfkVTAmbnbhsrBkZv5vz2YOroZZQwxrDAxOK+xAnzx7BQoJSeQ+esNML7kiBBfyLh
-	 7d092I8jtm8xcxyuc1r3hHf81SF0QinLrmUAp64+wn4KxNhcIsnPdcy8grALUbKYBB
-	 E1j+hVPghC/qoSEAPdNr/7JOJ+mxayC8agS2Qey2SC3DeO7lypYHxVKvLE4VVawbbz
-	 vvDw2rHEl7NsQ==
-From: Lukasz Majewski <lukma@denx.de>
-To: Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	davem@davemloft.net,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Tristram.Ha@microchip.com,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	UNGLinuxDriver@microchip.com,
-	Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Lukasz Majewski <lukma@denx.de>
-Subject: [PATCH 2/2] net: phy: Provide Module 4 KSZ9477 errata (DS80000754C)
-Date: Wed, 30 Aug 2023 11:21:19 +0200
-Message-Id: <20230830092119.458330-2-lukma@denx.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230830092119.458330-1-lukma@denx.de>
-References: <20230830092119.458330-1-lukma@denx.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E63AE1C03
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 09:38:03 +0000 (UTC)
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 267E6BE
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 02:38:02 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1bdf4752c3cso33018565ad.2
+        for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 02:38:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693388281; x=1693993081; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=W4+SLtNpLYDV+P8YGvT9chqjBTHV7jwmYv+FwFjghA0=;
+        b=IH1A8JAVoAQMC4BhxnL575UZkcz6TNC3dipgd0xJ6qM+39oTdSGqjrnMFlyFhHqz8J
+         CGtzRf+iWBOtfG83tz5PPtRtOPtqOkPb038KjtEDcnaaYu+krmGrizWhJU8zrIszQdaW
+         MYfhFt7kVmjsilVhbu1qhubFqUCHjslmYJ9bHHZpP8kMct4GmOIXwrWfyrXBRQBGhW8f
+         7LQuj44YdXkACy5ve+K+ViuAfs4rA1tMcQwNMzlvUZuLqeyY0Vv+Dlh3i1O7iWChZzp0
+         N9D8QtKIr5MHS+UBo9f5nL7bhFOTZUhdmdJqvSQ6NBCEcXr9d/f5YYKxQUoAHJWUz0zh
+         nO5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693388281; x=1693993081;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=W4+SLtNpLYDV+P8YGvT9chqjBTHV7jwmYv+FwFjghA0=;
+        b=XXozuKcFxb6g9O3PC9Du5bASBEWXR3qmRyb/KbRBeQo77JobyEWvvmD3KZtc6JPwza
+         ja/06eh3rHa5J1mqWQqXcva9eldtP/ci9G4yDCJwpftb5/30kQUqcb8ZFEcau26MHigp
+         8r9JcCPCNjjv1M504daKMFsw9jK/ry0+L7Ufu8qM5ULNIPpqJ+mEYD67mRmSazF6Gevc
+         PEJ9scicu8w0FBcOqeHyXyil8G6CqDaj1tbgdPwXi3J2J//WyHTDvlwe5JeQI8Oyct2g
+         TDhwOqDAlVaGGcU878hyrl2kLW1911M8ca0Hhc9xKObZClLsjl8s+ZToHBb85NTSxWCE
+         lXKQ==
+X-Gm-Message-State: AOJu0Yz6yvtGUkLXzaZjVfT4CacKyy8ZX/r9XEdQ//rifDwgF7sz081j
+	Y63ZgRmQ3TEhazNmKca8Lrv+yWrkuR0=
+X-Google-Smtp-Source: AGHT+IFY2yog9wkLdqpl2bt9J7KdWHsHCi0aY2L+1xJalX0BTsV6kOF2bKp1deWrxGWPEf/h8yBI2g==
+X-Received: by 2002:a17:902:dac5:b0:1c2:1b71:f2ed with SMTP id q5-20020a170902dac500b001c21b71f2edmr120301plx.5.1693388280990;
+        Wed, 30 Aug 2023 02:38:00 -0700 (PDT)
+Received: from Laptop-X1 ([2409:8a02:7820:a6d0:fe00:94b0:34da:834c])
+        by smtp.gmail.com with ESMTPSA id jk17-20020a170903331100b001bdf046ed71sm10757812plb.120.2023.08.30.02.37.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Aug 2023 02:38:00 -0700 (PDT)
+Date: Wed, 30 Aug 2023 17:37:55 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Ido Schimmel <idosch@idosch.org>,
+	Thomas Haller <thaller@redhat.com>
+Subject: Re: [PATCH net-next] ipv6: do not merge differe type and protocol
+ routes
+Message-ID: <ZO8N8yyYubzB2bJF@Laptop-X1>
+References: <20230830061622.2320096-1-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230830061622.2320096-1-liuhangbin@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The KSZ9477 errata points out (in 'Module 4') the link up/down problem
-when EEE (Energy Efficient Ethernet) is enabled in the device to which
-the KSZ9477 tries to auto negotiate.
+Sorry, Looks it failed when I cancel the git send-email. There is
+a typo in the subject. Should be "different" instead of "differe"...
 
-The suggested workaround is to clear advertisement of EEE for PHYs in
-this chip driver.
+I will fix this if there is an update needed.
 
-Signed-off-by: Lukasz Majewski <lukma@denx.de>
----
- drivers/net/phy/micrel.c | 31 ++++++++++++++++++++++++++++++-
- 1 file changed, 30 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index 87b090ad2874..469dcd8a5711 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -1418,6 +1418,35 @@ static int ksz9131_get_features(struct phy_device *phydev)
- 	return 0;
- }
- 
-+static int ksz9477_get_features(struct phy_device *phydev)
-+{
-+	__ETHTOOL_DECLARE_LINK_MODE_MASK(zero) = { 0, };
-+	int ret;
-+
-+	ret = genphy_read_abilities(phydev);
-+	if (ret)
-+		return ret;
-+
-+	/* KSZ9477 Errata DS80000754C
-+	 *
-+	 * Module 4: Energy Efficient Ethernet (EEE) feature select must be
-+	 * manually disabled
-+	 *   The EEE feature is enabled by default, but it is not fully
-+	 *   operational. It must be manually disabled through register
-+	 *   controls. If not disabled, the PHY ports can auto-negotiate
-+	 *   to enable EEE, and this feature can cause link drops when linked
-+	 *   to another device supporting EEE.
-+	 *
-+	 *   Although, the KSZ9477 MMD register
-+	 *   (MMD_DEVICE_ID_EEE_ADV.MMD_EEE_ADV) advertise that EEE is
-+	 *   operational one needs to manualy clear them to follow the chip
-+	 *   errata.
-+	 */
-+	linkmode_and(phydev->supported_eee, phydev->supported, zero);
-+
-+	return 0;
-+}
-+
- #define KSZ8873MLL_GLOBAL_CONTROL_4	0x06
- #define KSZ8873MLL_GLOBAL_CONTROL_4_DUPLEX	BIT(6)
- #define KSZ8873MLL_GLOBAL_CONTROL_4_SPEED	BIT(4)
-@@ -4871,7 +4900,7 @@ static struct phy_driver ksphy_driver[] = {
- 	.handle_interrupt = kszphy_handle_interrupt,
- 	.suspend	= genphy_suspend,
- 	.resume		= genphy_resume,
--	.get_features	= ksz9131_get_features,
-+	.get_features	= ksz9477_get_features,
- } };
- 
- module_phy_driver(ksphy_driver);
--- 
-2.20.1
-
+Hangbin
+On Wed, Aug 30, 2023 at 02:16:22PM +0800, Hangbin Liu wrote:
+> Different with IPv4, IPv6 will auto merge the same metric routes into
+> multipath routes. But the different type and protocol routes are also
+> merged, which will lost user's configure info. e.g.
+> 
+> + ip route add local 2001:db8:103::/64 via 2001:db8:101::10 dev dummy1 table 100
+> + ip route append unicast 2001:db8:103::/64 via 2001:db8:101::10 dev dummy2 table 100
+> + ip -6 route show table 100
+> local 2001:db8:103::/64 metric 1024 pref medium
+>         nexthop via 2001:db8:101::10 dev dummy1 weight 1
+>         nexthop via 2001:db8:101::10 dev dummy2 weight 1
+> 
+> + ip route add 2001:db8:104::/64 via 2001:db8:101::10 dev dummy1 proto kernel table 200
+> + ip route append 2001:db8:104::/64 via 2001:db8:101::10 dev dummy2 proto bgp table 200
+> + ip -6 route show table 200
+> 2001:db8:104::/64 proto kernel metric 1024 pref medium
+>         nexthop via 2001:db8:101::10 dev dummy1 weight 1
+>         nexthop via 2001:db8:101::10 dev dummy2 weight 1
+> 
+> So let's skip counting the different type and protocol routes as siblings.
+> After update, the different type/protocol routes will not be merged.
+> 
+> + ip -6 route show table 100
+> local 2001:db8:103::/64 via 2001:db8:101::10 dev dummy1 metric 1024 pref medium
+> 2001:db8:103::/64 via 2001:db8:101::10 dev dummy2 metric 1024 pref medium
+> 
+> + ip -6 route show table 200
+> 2001:db8:104::/64 via 2001:db8:101::10 dev dummy1 proto kernel metric 1024 pref medium
+> 2001:db8:104::/64 via 2001:db8:101::10 dev dummy2 proto bgp metric 1024 pref medium
+> 
+> Reported-by: Thomas Haller <thaller@redhat.com>
+> Closes: https://bugzilla.redhat.com/show_bug.cgi?id=2161994
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> ---
+> All fib test passed:
+> Tests passed: 203
+> Tests failed:   0
+> ---
+>  net/ipv6/ip6_fib.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
+> index 28b01a068412..f60f5d14f034 100644
+> --- a/net/ipv6/ip6_fib.c
+> +++ b/net/ipv6/ip6_fib.c
+> @@ -1133,6 +1133,11 @@ static int fib6_add_rt2node(struct fib6_node *fn, struct fib6_info *rt,
+>  							rt->fib6_pmtu);
+>  				return -EEXIST;
+>  			}
+> +
+> +			if (iter->fib6_type != rt->fib6_type ||
+> +			    iter->fib6_protocol != rt->fib6_protocol)
+> +				goto next_iter;
+> +
+>  			/* If we have the same destination and the same metric,
+>  			 * but not the same gateway, then the route we try to
+>  			 * add is sibling to this route, increment our counter
+> -- 
+> 2.41.0
+> 
 
