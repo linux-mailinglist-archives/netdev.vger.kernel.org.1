@@ -1,73 +1,57 @@
-Return-Path: <netdev+bounces-31355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76BAB78D497
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 11:38:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23B3978D49A
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 11:38:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DA692812B3
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 09:38:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A0021C20ACC
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 09:38:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3DBE1FB2;
-	Wed, 30 Aug 2023 09:38:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB27F1FB3;
+	Wed, 30 Aug 2023 09:38:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E63AE1C03
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 09:38:03 +0000 (UTC)
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 267E6BE
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 02:38:02 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1bdf4752c3cso33018565ad.2
-        for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 02:38:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693388281; x=1693993081; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=W4+SLtNpLYDV+P8YGvT9chqjBTHV7jwmYv+FwFjghA0=;
-        b=IH1A8JAVoAQMC4BhxnL575UZkcz6TNC3dipgd0xJ6qM+39oTdSGqjrnMFlyFhHqz8J
-         CGtzRf+iWBOtfG83tz5PPtRtOPtqOkPb038KjtEDcnaaYu+krmGrizWhJU8zrIszQdaW
-         MYfhFt7kVmjsilVhbu1qhubFqUCHjslmYJ9bHHZpP8kMct4GmOIXwrWfyrXBRQBGhW8f
-         7LQuj44YdXkACy5ve+K+ViuAfs4rA1tMcQwNMzlvUZuLqeyY0Vv+Dlh3i1O7iWChZzp0
-         N9D8QtKIr5MHS+UBo9f5nL7bhFOTZUhdmdJqvSQ6NBCEcXr9d/f5YYKxQUoAHJWUz0zh
-         nO5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693388281; x=1693993081;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W4+SLtNpLYDV+P8YGvT9chqjBTHV7jwmYv+FwFjghA0=;
-        b=XXozuKcFxb6g9O3PC9Du5bASBEWXR3qmRyb/KbRBeQo77JobyEWvvmD3KZtc6JPwza
-         ja/06eh3rHa5J1mqWQqXcva9eldtP/ci9G4yDCJwpftb5/30kQUqcb8ZFEcau26MHigp
-         8r9JcCPCNjjv1M504daKMFsw9jK/ry0+L7Ufu8qM5ULNIPpqJ+mEYD67mRmSazF6Gevc
-         PEJ9scicu8w0FBcOqeHyXyil8G6CqDaj1tbgdPwXi3J2J//WyHTDvlwe5JeQI8Oyct2g
-         TDhwOqDAlVaGGcU878hyrl2kLW1911M8ca0Hhc9xKObZClLsjl8s+ZToHBb85NTSxWCE
-         lXKQ==
-X-Gm-Message-State: AOJu0Yz6yvtGUkLXzaZjVfT4CacKyy8ZX/r9XEdQ//rifDwgF7sz081j
-	Y63ZgRmQ3TEhazNmKca8Lrv+yWrkuR0=
-X-Google-Smtp-Source: AGHT+IFY2yog9wkLdqpl2bt9J7KdWHsHCi0aY2L+1xJalX0BTsV6kOF2bKp1deWrxGWPEf/h8yBI2g==
-X-Received: by 2002:a17:902:dac5:b0:1c2:1b71:f2ed with SMTP id q5-20020a170902dac500b001c21b71f2edmr120301plx.5.1693388280990;
-        Wed, 30 Aug 2023 02:38:00 -0700 (PDT)
-Received: from Laptop-X1 ([2409:8a02:7820:a6d0:fe00:94b0:34da:834c])
-        by smtp.gmail.com with ESMTPSA id jk17-20020a170903331100b001bdf046ed71sm10757812plb.120.2023.08.30.02.37.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Aug 2023 02:38:00 -0700 (PDT)
-Date: Wed, 30 Aug 2023 17:37:55 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Ido Schimmel <idosch@idosch.org>,
-	Thomas Haller <thaller@redhat.com>
-Subject: Re: [PATCH net-next] ipv6: do not merge differe type and protocol
- routes
-Message-ID: <ZO8N8yyYubzB2bJF@Laptop-X1>
-References: <20230830061622.2320096-1-liuhangbin@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EDBA1877
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 09:38:44 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96EC9137
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 02:38:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1693388323; x=1724924323;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=u1N+bgT8zMGDdEpJbmX55bZ4gv1X62VDamNUa/1OLfE=;
+  b=CKAdVtdf0yGWYyeU4lfdI3LMCkDO/xA7Loc2n9s1dD8kBF6cFFqVLRTn
+   5i3iD6+s5mmGnKT7oHaFAItU5P4GXWxvWF36zksB2PJGkwfortVJrHk0p
+   Sq4XuGzr1BaUI5qu7/yYTl0w2QfpsldlRr3nVVwQD4a1HzKMdOCvUAwiT
+   4ULLP1kJaBY4X/Uxlble6GvsuwAXZMlHpjp/HI3RgP9H4E29g54lRBfEC
+   NrXQ9Qr5XM3RPJMkiDvuVnCf6O3lwEL0FLvgJw3hiJ68BtKOe386po/C9
+   PzJ5qbXlEop6jzT6adqKn3fEmvni3CsnQREzp1fedHLH1v0Ivt/PsmHWG
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10817"; a="355102468"
+X-IronPort-AV: E=Sophos;i="6.02,213,1688454000"; 
+   d="scan'208";a="355102468"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2023 02:38:42 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10817"; a="715834498"
+X-IronPort-AV: E=Sophos;i="6.02,213,1688454000"; 
+   d="scan'208";a="715834498"
+Received: from unknown (HELO localhost.localdomain) ([10.237.112.144])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2023 02:38:41 -0700
+Date: Wed, 30 Aug 2023 11:38:14 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Jinjie Ruan <ruanjinjie@huawei.com>
+Cc: netdev@vger.kernel.org, Richard Cochran <richardcochran@gmail.com>
+Subject: Re: [PATCH -next] ptp: ptp_ines: Use list_for_each_entry() helper
+Message-ID: <ZO8OBiCRLrK7OZL2@localhost.localdomain>
+References: <20230830090816.529438-1-ruanjinjie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,78 +60,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230830061622.2320096-1-liuhangbin@gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+In-Reply-To: <20230830090816.529438-1-ruanjinjie@huawei.com>
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Sorry, Looks it failed when I cancel the git send-email. There is
-a typo in the subject. Should be "different" instead of "differe"...
-
-I will fix this if there is an update needed.
-
-Hangbin
-On Wed, Aug 30, 2023 at 02:16:22PM +0800, Hangbin Liu wrote:
-> Different with IPv4, IPv6 will auto merge the same metric routes into
-> multipath routes. But the different type and protocol routes are also
-> merged, which will lost user's configure info. e.g.
+On Wed, Aug 30, 2023 at 05:08:16PM +0800, Jinjie Ruan wrote:
+> Convert list_for_each() to list_for_each_entry() so that the this
+> list_head pointer and list_entry() call are no longer needed, which
+> can reduce a few lines of code. No functional changed.
 > 
-> + ip route add local 2001:db8:103::/64 via 2001:db8:101::10 dev dummy1 table 100
-> + ip route append unicast 2001:db8:103::/64 via 2001:db8:101::10 dev dummy2 table 100
-> + ip -6 route show table 100
-> local 2001:db8:103::/64 metric 1024 pref medium
->         nexthop via 2001:db8:101::10 dev dummy1 weight 1
->         nexthop via 2001:db8:101::10 dev dummy2 weight 1
-> 
-> + ip route add 2001:db8:104::/64 via 2001:db8:101::10 dev dummy1 proto kernel table 200
-> + ip route append 2001:db8:104::/64 via 2001:db8:101::10 dev dummy2 proto bgp table 200
-> + ip -6 route show table 200
-> 2001:db8:104::/64 proto kernel metric 1024 pref medium
->         nexthop via 2001:db8:101::10 dev dummy1 weight 1
->         nexthop via 2001:db8:101::10 dev dummy2 weight 1
-> 
-> So let's skip counting the different type and protocol routes as siblings.
-> After update, the different type/protocol routes will not be merged.
-> 
-> + ip -6 route show table 100
-> local 2001:db8:103::/64 via 2001:db8:101::10 dev dummy1 metric 1024 pref medium
-> 2001:db8:103::/64 via 2001:db8:101::10 dev dummy2 metric 1024 pref medium
-> 
-> + ip -6 route show table 200
-> 2001:db8:104::/64 via 2001:db8:101::10 dev dummy1 proto kernel metric 1024 pref medium
-> 2001:db8:104::/64 via 2001:db8:101::10 dev dummy2 proto bgp metric 1024 pref medium
-> 
-> Reported-by: Thomas Haller <thaller@redhat.com>
-> Closes: https://bugzilla.redhat.com/show_bug.cgi?id=2161994
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
 > ---
-> All fib test passed:
-> Tests passed: 203
-> Tests failed:   0
-> ---
->  net/ipv6/ip6_fib.c | 5 +++++
->  1 file changed, 5 insertions(+)
+>  drivers/ptp/ptp_ines.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
 > 
-> diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-> index 28b01a068412..f60f5d14f034 100644
-> --- a/net/ipv6/ip6_fib.c
-> +++ b/net/ipv6/ip6_fib.c
-> @@ -1133,6 +1133,11 @@ static int fib6_add_rt2node(struct fib6_node *fn, struct fib6_info *rt,
->  							rt->fib6_pmtu);
->  				return -EEXIST;
->  			}
-> +
-> +			if (iter->fib6_type != rt->fib6_type ||
-> +			    iter->fib6_protocol != rt->fib6_protocol)
-> +				goto next_iter;
-> +
->  			/* If we have the same destination and the same metric,
->  			 * but not the same gateway, then the route we try to
->  			 * add is sibling to this route, increment our counter
+> diff --git a/drivers/ptp/ptp_ines.c b/drivers/ptp/ptp_ines.c
+> index ed215b458183..c74f2dbbe3a2 100644
+> --- a/drivers/ptp/ptp_ines.c
+> +++ b/drivers/ptp/ptp_ines.c
+> @@ -237,11 +237,9 @@ static struct ines_port *ines_find_port(struct device_node *node, u32 index)
+>  {
+>  	struct ines_port *port = NULL;
+>  	struct ines_clock *clock;
+> -	struct list_head *this;
+>  
+>  	mutex_lock(&ines_clocks_lock);
+> -	list_for_each(this, &ines_clocks) {
+> -		clock = list_entry(this, struct ines_clock, list);
+> +	list_for_each_entry(clock, &ines_clocks, list) {
+>  		if (clock->node == node) {
+>  			port = &clock->port[index];
+>  			break;
 > -- 
-> 2.41.0
+> 2.34.1
 > 
+
+Nice
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
