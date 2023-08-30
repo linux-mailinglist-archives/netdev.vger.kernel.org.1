@@ -1,221 +1,138 @@
-Return-Path: <netdev+bounces-31436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 315AC78D7C3
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 19:03:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 37C4F78D7D4
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 19:30:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D5E51C2042E
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 17:03:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 116F71C20429
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 17:30:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB8D26D39;
-	Wed, 30 Aug 2023 17:03:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8184E7479;
+	Wed, 30 Aug 2023 17:30:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFF2A3FFB;
-	Wed, 30 Aug 2023 17:03:17 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D0B419A;
-	Wed, 30 Aug 2023 10:03:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693414996; x=1724950996;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=GI1gENhzcGhV34TZumodSxjeWBMj54pPTl64PitmIwI=;
-  b=GWnolMcw7lhzpVRUmgmTO3tPXUNdsQXS2LMhi/tOOYw0GGxVCqzSWbOP
-   y/7SyKrDcYvA11vQmPegPsQtUIddd0rEClO/s8iZu6qZJCLbrOGZzLmN3
-   N3/ChL8oW+++8bInzpiuYARyF9xfA/USkZHG34en9OUkUzT2qs/wZMn1J
-   KK/WS2qfmuAaLKwegy5kCsHaHfHIw0Pg2tY6hOKZJtlSj7q6jqi+mfait
-   cfge+ThAR6lgPzynB5CGQsS8+z6OrcqqOAaIVNKpLuJ01scrmaXWdSC3y
-   G6w9h8/mRaaVmmAg7iZW2/10+zzaWthP7f8iceloNnt2n7A+NdJqd2dyb
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10818"; a="356015884"
-X-IronPort-AV: E=Sophos;i="6.02,214,1688454000"; 
-   d="scan'208";a="356015884"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2023 10:03:15 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10818"; a="774173171"
-X-IronPort-AV: E=Sophos;i="6.02,214,1688454000"; 
-   d="scan'208";a="774173171"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga001.jf.intel.com with ESMTP; 30 Aug 2023 10:03:15 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 30 Aug 2023 10:03:15 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Wed, 30 Aug 2023 10:03:15 -0700
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.49) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Wed, 30 Aug 2023 10:03:14 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PfoUw3xoDyw1uOcM81LIMRmr4ZnSM1YmB8ezxiK+2o5WT8OK5mrbxFFyFNGSMfsRjvybFWkSgjA9vBsnTZbkEQMPmxfVZZvdAtpeR+iS1BGnInTTipa3rkxYOi6kgp1v7LRjxu8v3/8fuhWCGmLQymqh/p+3KI/rmjHLYDdoxEo5ozUZVzFgOY7KYuuxdn31wMDKn6VnWDoY/N3XfHs2FM3imYueM/eIFPtabAC0HjENTpvOEm2ZGDkzpT8ZViBOXuFrgO5FkqQCkr9WPlwJzSqpa/v3agorvT6mQ8xny4QrZl73HPcVDWxcFu1rK1JugE9E3cQlXE+s0gmT51sFHQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=In5ufpnt2W109OVPzAaZea8RyhHozXpHJT/Zeqrs9ns=;
- b=c9psHpscrtTYTKOVpmNyFafZSzTBe0gJ7fk2aURYguZdXlwaSMQ3n862OvGAQCGy1oruch/2rBenveqIVaTlRbR9vEjHwBMg8npl7xZhcbMU8B5mULDkBTXip3AmWFpoCxKLISuK0YmnySNgx4Ll+WHqo+2HeTtrilCPrcLDN12um1fpAJ2qRAoLYowbsA4dYGRkfO8aCCXtXY65n7Xt/vYXB8ldR+ajub2KqZ3uJtW/PJ3BILN6zQLPWO5eVZ686t/XBilKwmAwPHlXw985Z/P/rFffsc+s4eUeE7L+vKiNwP9d0c5IN8yrYYqx/vaIG+0pJNHZ7gbyhin04buEtQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
- CY8PR11MB7687.namprd11.prod.outlook.com (2603:10b6:930:74::14) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6745.20; Wed, 30 Aug 2023 17:03:12 +0000
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::c1f9:b4eb:f57e:5c3d]) by DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::c1f9:b4eb:f57e:5c3d%3]) with mapi id 15.20.6699.035; Wed, 30 Aug 2023
- 17:03:10 +0000
-Date: Wed, 30 Aug 2023 19:02:56 +0200
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: Magnus Karlsson <magnus.karlsson@gmail.com>
-CC: <magnus.karlsson@intel.com>, <bjorn@kernel.org>, <ast@kernel.org>,
-	<daniel@iogearbox.net>, <netdev@vger.kernel.org>, <jonathan.lemon@gmail.com>,
-	<bpf@vger.kernel.org>,
-	<syzbot+822d1359297e2694f873@syzkaller.appspotmail.com>
-Subject: Re: [PATCH bpf] xsk: fix xsk_diag use-after-free error during socket
- cleanup
-Message-ID: <ZO92QCe1s7yUiHRR@boxer>
-References: <20230830151704.14855-1-magnus.karlsson@gmail.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20230830151704.14855-1-magnus.karlsson@gmail.com>
-X-ClientProxiedBy: FR3P281CA0132.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:94::12) To DM4PR11MB6117.namprd11.prod.outlook.com
- (2603:10b6:8:b3::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F9A26AA3
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 17:30:47 +0000 (UTC)
+X-Greylist: delayed 1226 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 30 Aug 2023 10:30:45 PDT
+Received: from good-out-06.clustermail.de (good-out-06.clustermail.de [IPv6:2a02:708:0:2c::3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B103193
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 10:30:45 -0700 (PDT)
+Received: from [10.0.0.15] (helo=frontend.clustermail.de)
+	by smtpout-02.clustermail.de with esmtp (Exim 4.96)
+	(envelope-from <Daniel.Klauer@gin.de>)
+	id 1qbOhh-0007iI-23;
+	Wed, 30 Aug 2023 19:10:06 +0200
+Received: from [217.6.33.237] (helo=Win2012-02.gin-domain.local)
+	by frontend.clustermail.de with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
+	(Exim 4.96)
+	(envelope-from <Daniel.Klauer@gin.de>)
+	id 1qbOhi-0007kc-0z;
+	Wed, 30 Aug 2023 19:10:06 +0200
+Received: from [10.176.8.48] (10.176.8.48) by Win2012-02.gin-domain.local
+ (10.160.128.12) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 30 Aug
+ 2023 19:10:05 +0200
+Message-ID: <30428046-fe1a-be57-1df6-2830bd33a385@gin.de>
+Date: Wed, 30 Aug 2023 19:10:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|CY8PR11MB7687:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6ea48b06-aa34-4c99-fa0d-08dba97afd04
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: JHuTHTkcp74AM4JbyDk+ef/FO7fQ0PWjAhhe5Zn+O/3r09sKn4t378BCQlQuC0eJrhRdCYjZO7KiqecFGCXCg5/hb5EtkFgfXD5Q/LOx/5K9b7nrjJiEnN5gl64ivbuawBL/yrTuN2kWSJFA4fx4NpMRlCxTP15ZV2OW0ESOMylwqJA9NdtLGfsEdJLA56h9Xx/dk10UOt1BCCq045rULR/iQJRMy7Vdqn2wCescQWr1mw9giggJdoQMln4fTpY87IQeDbOCsOexwJIOyJU5A54VQ3q+gPX+HFy74vmDlRlKmpwJ1K73iSRg1jlxWNjNZD6vTgxE2SaB8Kri+mah9AADbm8gPlr0/lf2cZg4vmitsi6i/Cra0WzFloMmOxZJVt8VXmHy0qZkZO7Cb+GqzgK/QX43TsXE/xltm8t+UlViSawat70pP47MmttAr1uHAsZmGtAyS+iVkTBiir2twoLLhJOW2MyeAazMB0coFxJM8R2a0EnxcBRFTLTyL+WORkUN+owUb9Lxhuyw7cn1IyrX4gtDXeHos9j77tZyJWbk3Ixzm73C4QCHehVAXxK6
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(39860400002)(376002)(346002)(136003)(366004)(396003)(451199024)(186009)(1800799009)(478600001)(38100700002)(26005)(66946007)(41300700001)(6512007)(9686003)(83380400001)(66476007)(66556008)(82960400001)(6486002)(6506007)(6916009)(6666004)(316002)(44832011)(5660300002)(4326008)(8676002)(8936002)(86362001)(2906002)(33716001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?96jOhnd3uSjrJ/AaEiNzqOSrZdgGiwtlBA5RcbXhn5m73iL+0M6RDYvE5ZwV?=
- =?us-ascii?Q?wy2bfCYPVFNb0DswiVQXX6mV/CVOSwGVqa0yJ9poouhJSLo+P40N0YZgU5Rl?=
- =?us-ascii?Q?TXKAQQOJYTBR0yCn5otJT0kYhM5RBm5M5W0k1R/fkWX18ftz4oiejCHxaEUU?=
- =?us-ascii?Q?Sl/4/8p9rRFLYJAoNSZZpl/PQXeva3zbiQAA9ey8qtX/ffKZ7SoFlgPCjQfx?=
- =?us-ascii?Q?4saHw2DFl2oPF4lVpPsWxSePs0Pfubdw/4A54if8+bEWa+LiBRt9PD7ET/Fc?=
- =?us-ascii?Q?HzrLIWxPvUCWvDW1xV1JbLBDh022kSrXAh9vDnvYxWAxdaXdN0gfqRb96npk?=
- =?us-ascii?Q?YLJ0Vld/r4I8krUaOcASlDSB3+N3VFUXlBrqOxoZBy3T+abKA+n0/PzQwQCv?=
- =?us-ascii?Q?FJ83WBBIi9PpRddYtz90uFMtN1gh95KtGKD1KRF2NiWpn9muh9DWJ4801lNm?=
- =?us-ascii?Q?1adEJSN7MzKwU46TZXLb/NwMrRWjUtmrzBGr9E+istWzi8Xz1PRXOJ3c0mhq?=
- =?us-ascii?Q?OtmwkyfRy5jjhZ9JSINQ0+/wWXHkMCEP9mVsFizpyd15Tkt9hym0my71y88Z?=
- =?us-ascii?Q?q4TmliQB82y66MDFB3OpcnIYjEUblz7mVfbIJh4rZWX81xercbramdO4r0Jz?=
- =?us-ascii?Q?bdOj+OVQSyrjtb+N3G2ZeVrm9K3heg4cgBEVK2xj9lnisPQ7x8WLkiuBYg4d?=
- =?us-ascii?Q?3nmL6lpqjZVCciykVogc6w+9o7mXTq8tMsVMK26DhFnUfPT1apSWqLDBT6X4?=
- =?us-ascii?Q?DZpSXInT9sN6bCWnpshRx9OXxvejaf6Zn+lYS2WtZlkEkDl4FiJwJj0TvTxg?=
- =?us-ascii?Q?G2JhohKFXKZct1yS9W8hcnBouPcnUwVoCYZrn3eCHjqbIeso715hOjz+6/47?=
- =?us-ascii?Q?QgFDh9T0aQYbdUuGxU7dGCajHzuPSji8p0KCzMxUwCoIdO53GWQ07vZZri64?=
- =?us-ascii?Q?GuakIU3VjXG5Bn+XGES5q4YDzsODg0fmgZl3gHO8q34r5yPqaOqvjRgj+SnJ?=
- =?us-ascii?Q?VIgigef3OHAAQKPRmuKcGi/YQfhmOFWKl+XuzdgNNjWsA+BzXYXzuVqJS+Ng?=
- =?us-ascii?Q?WfkyTFxdx1Jyly61RSyvz4KNEfG9SZoHqj6NcC747+X/WLSo0Yr5XWDfnq6q?=
- =?us-ascii?Q?RdpS3u/aurz8RLNAdcBetE35cOHQ1bq6DDodFynUkSyF/k38LVsD96f9TOS1?=
- =?us-ascii?Q?SwGOsn7AsB8Go1XsUbaneU0zBc4FTp1oKJ1LP6faB97U8dgAiVWrdm9hiG8Y?=
- =?us-ascii?Q?N8iY61c5EVaRNJsu3qW8kNpcvKi2P9ixS5KN4031L4C6cV+9UjUPxBiE+HTI?=
- =?us-ascii?Q?zUmqv8aKxmCFHOeQpmraBUCPxxq6SBoXX6wPGyj3g66s2jpy68UXOvH+/SHZ?=
- =?us-ascii?Q?ySh0lG/86HKfcPs8nNY0kb74o05DCJGhHo/g87UNFGCCNkRvkctN8dcAizMf?=
- =?us-ascii?Q?e0yyNDWGMQoCAGeSeJnBcyTHUmBT9pYbXMmVZyhFe/RhCHBvDJkFqYp2i8+w?=
- =?us-ascii?Q?mTf95mepRCHPwPqfltrAjSwWtCLlye3JhkXp/5skYR+5jqMymHBJPdRIJFln?=
- =?us-ascii?Q?4i/6PZW8sBtvg5UB7PyGoUb7g/Us2G0ijyHhAhZC/EW/2ksKrXHJ2W7iWKHP?=
- =?us-ascii?Q?9w=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6ea48b06-aa34-4c99-fa0d-08dba97afd04
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Aug 2023 17:03:10.1876
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gZsSKdeVbUJ6FWKCSvAQIoWTBAwI8i7duuRxOkq0pwQbB1po6BIgiqIvb3qjJ/ZocBcMG26o65Z/w0+r9mfAvn3nxL6y95fxWK3Xsb12HIs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7687
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Content-Language: en-US
+To: Ioana Ciornei <ioana.ciornei@nxp.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+From: Daniel Klauer <daniel.klauer@gin.de>
+Subject: [bug] dpaa2-eth: "Wrong SWA type" and null deref in
+ dpaa2_eth_free_tx_fd()
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.176.8.48]
+X-ClientProxiedBy: Win2012-02.gin-domain.local (10.160.128.12) To
+ Win2012-02.gin-domain.local (10.160.128.12)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A29342AAB59637C67
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 30, 2023 at 05:17:03PM +0200, Magnus Karlsson wrote:
-> From: Magnus Karlsson <magnus.karlsson@intel.com>
-> 
-> Fix a use-after-free error that is possible if the xsk_diag interface
-> is used at the same time as the socket is being closed. In the early
+Hi,
 
-I thought our understanding is: socket is alive, we use diag interface
-against it but netdev that we bound socket to is being torn down.
+while doing Ethernet tests with raw packet sockets on our custom LX2160A board with Linux v6.1.50 (plus some patches for board support, but none for dpaa2-eth), I noticed the following crash:
 
-since xs->dev was freed but not NULLed, xsk_diag_put_info() uses this ptr
-to retrieve ifindex.
+[   26.290737] Wrong SWA type
+[   26.290760] WARNING: CPU: 7 PID: 0 at drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c:1117 dpaa2_eth_free_tx_fd.isra.0+0x36c/0x380 [fsl_dpaa2_eth]
 
-> days of AF_XDP, the way we tested that a socket was not bound or being
-> closed was to simply check if the netdevice pointer in the xsk socket
-> structure was NULL. Later, a better system was introduced by having an
-> explicit state variable in the xsk socket struct. For example, the
-> state of a socket that is going down is XSK_UNBOUND.
-> 
-> The commit in the Fixes tag below deleted the old way of signalling
-> that a socket is going down, setting dev to NULL. This in the belief
-> that all code using the old way had been exterminated. That was
-> unfortunately not true as the xsk diagnostics code was still using the
-> old way and thus does not work as intended when a socket is going
-> down. Fix this by introducing a test against the state variable. If
+followed by
 
-Again, I believe it was not the socket going down but rather the netdev?
+[   26.323016] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000028
+[   26.324122] Mem abort info:
+[   26.324475]   ESR = 0x0000000096000004
+[   26.324948]   EC = 0x25: DABT (current EL), IL = 32 bits
+[   26.325618]   SET = 0, FnV = 0
+[   26.326004]   EA = 0, S1PTW = 0
+[   26.326406]   FSC = 0x04: level 0 translation fault
+[   26.327021] Data abort info:
+[   26.327385]   ISV = 0, ISS = 0x00000004
+[   26.327869]   CM = 0, WnR = 0
+[   26.328244] user pgtable: 4k pages, 48-bit VAs, pgdp=00000020861cf000
+[   26.329055] [0000000000000028] pgd=0000000000000000, p4d=0000000000000000
+[   26.329912] Internal error: Oops: 0000000096000004 [#1] PREEMPT SMP
+[   26.330702] Modules linked in: tag_dsa marvell mv88e6xxx aes_ce_blk caam_jr aes_ce_cipher caamhash_desc crct10dif_ce ghash_ce fsl_dpaa2_eth caamalg_desc xhci_plat_hcd sha256_generic gf128mul libsha256 libaes xhci_hcd crypto_engine pcs_lynx sha2_ce sha1_ce usbcore libdes sha256_arm64 cfg80211 dp83867 sha1_generic fsl_mc_dpio xgmac_mdio dpaa2_console dwc3 ahci ahci_qoriq udc_core caam libahci_platform roles error libahci usb_common libata at24 lm90 qoriq_thermal nvmem_layerscape_sfp sfp mdio_i2c
+[   26.336237] CPU: 7 PID: 0 Comm: swapper/7 Tainted: G        W          6.1.50-00121-g10168a070f4d #11
+[   26.337396] Hardware name: mpxlx2160a (DT)
+[   26.337956] pstate: 20000005 (nzCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[   26.338833] pc : dpaa2_eth_free_tx_fd.isra.0+0xd4/0x380 [fsl_dpaa2_eth]
+[   26.339673] lr : dpaa2_eth_free_tx_fd.isra.0+0xb4/0x380 [fsl_dpaa2_eth]
+[   26.340512] sp : ffff800008cf3d70
+[   26.340931] x29: ffff800008cf3d70 x28: ffff002002900000 x27: 0000000000000000
+[   26.341832] x26: 0000000000000001 x25: 0000000000000001 x24: 0000000000000000
+[   26.342732] x23: 0000000000002328 x22: ffff002009742728 x21: 00000020884fffc2
+[   26.343633] x20: ffff002009740840 x19: ffff0020084fffc2 x18: 0000000000000018
+[   26.344534] x17: ffff8026b3a9a000 x16: ffff800008cf0000 x15: fffffffffffed3f8
+[   26.345435] x14: 0000000000000000 x13: ffff800008bad028 x12: 0000000000000966
+[   26.346335] x11: 0000000000000322 x10: ffff800008c09b58 x9 : ffff800008bad028
+[   26.347236] x8 : 0001000000000000 x7 : ffff0020095e6480 x6 : 00000020884fffc2
+[   26.348137] x5 : ffff0020095e6480 x4 : 0000000000000000 x3 : 0000000000000000
+[   26.349037] x2 : 00000000e7e00000 x1 : 0000000000000001 x0 : 0000000049759e0c
+[   26.349938] Call trace:
+[   26.350247]  dpaa2_eth_free_tx_fd.isra.0+0xd4/0x380 [fsl_dpaa2_eth]
+[   26.351044]  dpaa2_eth_tx_conf+0x84/0xc0 [fsl_dpaa2_eth]
+[   26.351720]  dpaa2_eth_poll+0xec/0x3a4 [fsl_dpaa2_eth]
+[   26.352375]  __napi_poll+0x34/0x180
+[   26.352816]  net_rx_action+0x128/0x2b4
+[   26.353290]  _stext+0x124/0x2a0
+[   26.353687]  ____do_softirq+0xc/0x14
+[   26.354139]  call_on_irq_stack+0x24/0x40
+[   26.354635]  do_softirq_own_stack+0x18/0x2c
+[   26.355164]  __irq_exit_rcu+0xc4/0xf0
+[   26.355628]  irq_exit_rcu+0xc/0x14
+[   26.356059]  el1_interrupt+0x34/0x60
+[   26.356511]  el1h_64_irq_handler+0x14/0x20
+[   26.357028]  el1h_64_irq+0x64/0x68
+[   26.357458]  cpuidle_enter_state+0x12c/0x314
+[   26.357997]  cpuidle_enter+0x34/0x4c
+[   26.358450]  do_idle+0x208/0x270
+[   26.358860]  cpu_startup_entry+0x24/0x30
+[   26.359356]  secondary_start_kernel+0x128/0x14c
+[   26.359928]  __secondary_switched+0x64/0x68
+[   26.360460] Code: 7100081f 54000d00 71000c1f 540000c0 (3940a360) 
+[   26.361228] ---[ end trace 0000000000000000 ]---
 
-> the socket is going down, simply abort the diagnostic's netlink
-> operation.
-> 
-> Fixes: 18b1ab7aa76b ("xsk: Fix race at socket teardown")
-> Reported-by: syzbot+822d1359297e2694f873@syzkaller.appspotmail.com
+It happens when receiving big Ethernet frames on a AF_PACKET + SOCK_RAW socket, for example MTU 9000. It does not happen with the standard MTU 1500. It does not happen when just sending.
 
-Nit: I see syzbot wanted you to include:
-Reported-and-tested-by: syzbot+822d13...@syzkaller.appspotmail.com
+It's 100% reproducible here, however it seems to depend on the data rate/load: Once it happened after receiving the first 80 frames, another time after the first 300 frames, etc., and if I only send 5 frames per second, it does not happen at all.
 
-> Signed-off-by: Magnus Karlsson <magnus.karlsson@intel.com>
-> ---
->  net/xdp/xsk_diag.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/net/xdp/xsk_diag.c b/net/xdp/xsk_diag.c
-> index c014217f5fa7..da3100bfa1c5 100644
-> --- a/net/xdp/xsk_diag.c
-> +++ b/net/xdp/xsk_diag.c
-> @@ -111,6 +111,9 @@ static int xsk_diag_fill(struct sock *sk, struct sk_buff *nlskb,
->  	sock_diag_save_cookie(sk, msg->xdiag_cookie);
->  
->  	mutex_lock(&xs->mutex);
-> +	if (xs->state == XSK_UNBOUND)
-> +		goto out_nlmsg_trim;
+Please let me know if I should provide more info or do more tests. I can provide a test program if needed.
 
-With the above I feel like we can get rid of xs->dev test in
-xsk_diag_put_info(), no?
-
-> +
->  	if ((req->xdiag_show & XDP_SHOW_INFO) && xsk_diag_put_info(xs, nlskb))
->  		goto out_nlmsg_trim;
->  
-> 
-> base-commit: 35d2b7ffffc1d9b3dc6c761010aa3338da49165b
-> -- 
-> 2.42.0
-> 
+Kind regards,
+Daniel
 
