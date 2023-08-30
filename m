@@ -1,50 +1,37 @@
-Return-Path: <netdev+bounces-31378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7188B78D57B
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 13:20:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6501178D57D
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 13:20:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55E351C20A74
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 11:20:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65EF41C209CD
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 11:20:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4BFF46BD;
-	Wed, 30 Aug 2023 11:20:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E4BD46BF;
+	Wed, 30 Aug 2023 11:20:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A77A91C08
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 11:20:16 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E3A91BB;
-	Wed, 30 Aug 2023 04:20:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=04rA3QMGu6b8RzLVqZdwsj34mORbZ+1WIjhmdElzWKA=; b=M76T7FdSLwSJ2klAhj8Gg+yM/5
-	EMEc+J0aZdzFLyN41/fOmVUyfcToAPl5pVqbZOK/BRn7v57j8HB95Od9hEaYmGVYIKKcztQ1ItJZk
-	KDLQl9S4mg9fSQpTpBryiD7VGliK+bzgiAlFQTZW8w+4gFyMFP7VS9j4UfbDsQk+CMScTqA7G1Tk8
-	dM1bg8tcvuoxqu0UTNMVZ2bk17KhBnmJkN+JsfLu3rXrE2/qb+fvD682C+hPZdLDDW3UttQiYTqTz
-	5a4tFAg1phPgDnYDxHARy8LVobVfNohj6XtpvLaRoKZbLbdVHTvQ1DyENNJSFSLTyNmSSLvSoc6Ur
-	i35sZNeg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56328)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qbJEx-0001Vs-1w;
-	Wed, 30 Aug 2023 12:20:03 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qbJEx-0005dp-E1; Wed, 30 Aug 2023 12:20:03 +0100
-Date: Wed, 30 Aug 2023 12:20:03 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4019A2FB6
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 11:20:51 +0000 (UTC)
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8F06122
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 04:20:50 -0700 (PDT)
+Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
+	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qbJFR-0008Lm-P3; Wed, 30 Aug 2023 13:20:33 +0200
+Received: from ore by ptx.hi.pengutronix.de with local (Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qbJFQ-0006pn-1b; Wed, 30 Aug 2023 13:20:32 +0200
+Date: Wed, 30 Aug 2023 13:20:32 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
 Cc: Lukasz Majewski <lukma@denx.de>, Eric Dumazet <edumazet@google.com>,
 	Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net,
 	Woojung Huh <woojung.huh@microchip.com>,
@@ -56,57 +43,36 @@ Cc: Lukasz Majewski <lukma@denx.de>, Eric Dumazet <edumazet@google.com>,
 	linux-kernel@vger.kernel.org
 Subject: Re: [PATCH 2/2] net: phy: Provide Module 4 KSZ9477 errata
  (DS80000754C)
-Message-ID: <ZO8l42ooy3PX1l8X@shell.armlinux.org.uk>
+Message-ID: <20230830112032.GI31399@pengutronix.de>
 References: <20230830092119.458330-1-lukma@denx.de>
  <20230830092119.458330-2-lukma@denx.de>
- <20230830101813.GG31399@pengutronix.de>
+ <ZO8jIQJLE53GH6G6@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230830101813.GG31399@pengutronix.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <ZO8jIQJLE53GH6G6@shell.armlinux.org.uk>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 30, 2023 at 12:18:13PM +0200, Oleksij Rempel wrote:
+On Wed, Aug 30, 2023 at 12:08:17PM +0100, Russell King (Oracle) wrote:
 > On Wed, Aug 30, 2023 at 11:21:19AM +0200, Lukasz Majewski wrote:
-> > The KSZ9477 errata points out (in 'Module 4') the link up/down problem
-> > when EEE (Energy Efficient Ethernet) is enabled in the device to which
-> > the KSZ9477 tries to auto negotiate.
-> > 
-> > The suggested workaround is to clear advertisement of EEE for PHYs in
-> > this chip driver.
-> > 
-> > Signed-off-by: Lukasz Majewski <lukma@denx.de>
-> > ---
-> >  drivers/net/phy/micrel.c | 31 ++++++++++++++++++++++++++++++-
-> >  1 file changed, 30 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-> > index 87b090ad2874..469dcd8a5711 100644
-> > --- a/drivers/net/phy/micrel.c
-> > +++ b/drivers/net/phy/micrel.c
-> > @@ -1418,6 +1418,35 @@ static int ksz9131_get_features(struct phy_device *phydev)
-> >  	return 0;
-> >  }
-> >  
-> > +static int ksz9477_get_features(struct phy_device *phydev)
-> > +{
-> > +	__ETHTOOL_DECLARE_LINK_MODE_MASK(zero) = { 0, };
-> > +	int ret;
-> > +
-> > +	ret = genphy_read_abilities(phydev);
-> > +	if (ret)
-> > +		return ret;
-> > +
 > > +	/* KSZ9477 Errata DS80000754C
 > > +	 *
 > > +	 * Module 4: Energy Efficient Ethernet (EEE) feature select must be
@@ -123,41 +89,24 @@ On Wed, Aug 30, 2023 at 12:18:13PM +0200, Oleksij Rempel wrote:
 > > +	 *   errata.
 > > +	 */
 > > +	linkmode_and(phydev->supported_eee, phydev->supported, zero);
-> > +
-> > +	return 0;
-> > +}
-> > +
-> >  #define KSZ8873MLL_GLOBAL_CONTROL_4	0x06
-> >  #define KSZ8873MLL_GLOBAL_CONTROL_4_DUPLEX	BIT(6)
-> >  #define KSZ8873MLL_GLOBAL_CONTROL_4_SPEED	BIT(4)
-> > @@ -4871,7 +4900,7 @@ static struct phy_driver ksphy_driver[] = {
-> >  	.handle_interrupt = kszphy_handle_interrupt,
-> >  	.suspend	= genphy_suspend,
-> >  	.resume		= genphy_resume,
-> > -	.get_features	= ksz9131_get_features,
-> > +	.get_features	= ksz9477_get_features,
 > 
-> Sorry, i didn't described all details how to implement it.
+> Hi,
 > 
-> This code will break EEE support for the KSZ8563R switch.
+> I'm wondering whether you had a reason to write the above, rather than
+> use the simpler:
 > 
-> Please search for MICREL_KSZ8_P1_ERRATA in the kernel source.
-> Then add new flag, for example MICREL_NO_EEE and use it in a similar
-> way how MICREL_KSZ8_P1_ERRATA was set and used. With this
-> implementation, first patch is not needed.
-> 
-> The code will be something like this:
->    if (dev_flags & MICREL_NO_EEE)
->       /* lots of comments */
->       linkmode_and(phydev->supported_eee, phydev->supported, zero);
+> 	linkmode_zero(phydev->supported_eee);
 
-I can't believe two people are writing code like this...
+Ah, I wondered what was the proper name for this and was not able to
+found it.
 
-	linkmode_zero(phydev->supported_eee);
+Thank you!
 
-will work just as well.
-
+Regards,
+Oleksij
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
