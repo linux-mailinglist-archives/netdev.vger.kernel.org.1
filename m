@@ -1,88 +1,197 @@
-Return-Path: <netdev+bounces-31419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E231478D6C6
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 17:01:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD8ED78D6C9
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 17:02:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE5001C208BC
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 15:01:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E5E928116C
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 15:02:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E4316FA4;
-	Wed, 30 Aug 2023 15:01:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41E936FA7;
+	Wed, 30 Aug 2023 15:02:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B26D65397
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 15:01:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13FC4C433C9;
-	Wed, 30 Aug 2023 15:01:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693407675;
-	bh=zo90yza714kYCLXkBZoQ5PaxTE4B0CIm2YnHLkmZ1fQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=H2tIcdCGN2FlKjojR5IPLI5KY7UUPwpckp25nLmdr54n5Yiev+4Rs+dvAk9xCgChC
-	 fmSNzPK9U6yH0eou9OTgqbU4YtqH6fVtc31RZGQBmuXpWcdOzk4N5q9e1h7GzQJCMo
-	 PbjiRI4TpW9OUimYnz+iWMcM9s9cfkr7/wLo+ntUEHlT0jkMeQPYuZrey1Np9fIpXc
-	 7f/MnyHvIFR8QWsWRYREUnJgg5C/9mQbqquc009AbJk6RSLvCTrGqECbgF2HekzCbM
-	 7IDUG1fJR2bNsnzj6kXtdUm/4yafvvvPPi6BGlWtST1H418FeYtaDlx3gZUId0RFh5
-	 F0kw/n1ZC13iQ==
-Message-ID: <fd984268-efd7-e10e-8d0d-13de73c0b212@kernel.org>
-Date: Wed, 30 Aug 2023 09:01:14 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36C6F3FFB
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 15:02:43 +0000 (UTC)
+Received: from px.funlab.cc (px.funlab.cc [IPv6:2a01:4f8:c010:6bd5::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 998DF1A2;
+	Wed, 30 Aug 2023 08:02:41 -0700 (PDT)
+Received: from [192.168.1.40] (unknown [83.27.115.100])
+	(Authenticated sender: doka@funlab.cc)
+	by px.funlab.cc (Postfix) with ESMTPSA id 116E6602BA;
+	Wed, 30 Aug 2023 18:02:39 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=funlab.cc; s=dkim;
+	t=1693407759; bh=wLWCndZBolb584JQz+iw/o1bq04QE7Zr3wQ9bkJ9P3o=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=KUXFBHTAZ+YMZmxMa0nunbW7rosTHmwDlcNs0M1AtpkTiAtY0gAVqPCLHiclbLckW
+	 +zMF2uGKz5NUGHseT47Pz2xUfS3B2ppn9BAMUU4CHEQpKKrxilzp//JlkyWXbhYcNQ
+	 ZFqk0vwCjCyrHP2oQurScFy5okjtMS6IBeFXWSIchIK97azV8MFdtvfmvKsO9KXjhq
+	 Kgpet42bfs2PY9uX5UWJ9OI2ah/FB18fnvmMAO7h42ljlRxb5i4qpKnYBMAhD+IY2p
+	 aphfJUiy6R/oa4qYuQXsqxV2A34E3w3FmUWk1oEEHJQgfZqBwHb76xpoiZLlVI93nC
+	 suEilXdrEbsEQ==
+Message-ID: <49f87e48-7898-97d5-0140-1dab840ce0f2@funlab.cc>
+Date: Wed, 30 Aug 2023 17:02:28 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.14.0
-Subject: Re: [PATCH v2 iproute2-next 1/2] tc: support the netem seed parameter
- for loss and corruption events
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.0
+Cc: doka@funlab.cc, "David S. Miller" <davem@davemloft.net>,
+ David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>,
+ Linux Networking <netdev@vger.kernel.org>,
+ Linux Netfilter <netfilter-devel@vger.kernel.org>
+Subject: Re: [Networking] ERSPAN decapsulation drops DHCP unicast packets
 Content-Language: en-US
-To: Petr Machata <petrm@nvidia.com>,
- =?UTF-8?Q?Fran=c3=a7ois_Michel?= <francois.michel@uclouvain.be>
-Cc: netdev@vger.kernel.org, stephen@networkplumber.org
-References: <20230823100128.54451-1-francois.michel@uclouvain.be>
- <20230823100128.54451-2-francois.michel@uclouvain.be>
- <87y1hurv2f.fsf@nvidia.com>
- <172898f6-56a7-6ce3-212c-a468f4ad6262@uclouvain.be>
- <87pm34slyw.fsf@nvidia.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <87pm34slyw.fsf@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
+To: Bagas Sanjaya <bagasdotme@gmail.com>, linux-kernel@vger.kernel.org
+References: <eaf3d0d8-fca2-029e-9c57-ddae31f17726@funlab.cc>
+ <ZOqv7E9/Qn2T1GwD@debian.me> <4b5b5ce0-e7a0-db7d-f23f-dde4b041f2fe@funlab.cc>
+From: Volodymyr Litovka <doka@funlab.cc>
+In-Reply-To: <4b5b5ce0-e7a0-db7d-f23f-dde4b041f2fe@funlab.cc>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On 8/30/23 7:22 AM, Petr Machata wrote:
-> 
-> François Michel <francois.michel@uclouvain.be> writes:
-> 
->> Hi,
->>
->> Le 29/08/23 à 12:07, Petr Machata a écrit :
->>> Took me a while to fight my way through all the unreads to this, and
->>> it's already merged, but...
->>> francois.michel@uclouvain.be writes:
+Hi colleagues,
+
+sorry bothering you, but can anyone shed light on this issue? This stops 
+me and I will be glad to hear, where I'm wrong and/or where try to look 
+into the problem.
+
+Thank you very much.
+
+On 8/27/23 10:34, Volodymyr Litovka wrote:
+> Hi Bagas,
+>
+> this tested on:
+>
+> - 5.19.0-42 on Intel 82599ES 10-Gigabit SFI/SFP+ Network Connection
+>   -- this is host hardware
+> - 6.2.0-32 on Virtio network device (under KVM 6.2 on host hardware 
+> above)
+> - 6.5.0-060500rc7 on Virtio network device (under KVM 6.2 on host 
+> hardware above)
+>
+> Result is the same for all cases.
+>
+> Thank you.
+>
+> On 8/27/23 04:07, Bagas Sanjaya wrote:
+>> On Sat, Aug 26, 2023 at 09:55:30PM +0200, Volodymyr Litovka wrote:
+>>> Hi colleagues,
 >>>
->>>> diff --git a/tc/q_netem.c b/tc/q_netem.c
->>>> index 8ace2b61..febddd49 100644
->>>> --- a/tc/q_netem.c
->>>> +++ b/tc/q_netem.c
->>>> @@ -31,6 +31,7 @@ static void explain(void)
->>>>   		"                 [ loss random PERCENT [CORRELATION]]\n"
->>>>   		"                 [ loss state P13 [P31 [P32 [P23 P14]]]\n"
->>>>   		"                 [ loss gemodel PERCENT [R [1-H [1-K]]]\n"
->>>> +		"                 [ seed SEED \n]"
->>> The newline seems misplaced.
+>>> I'm trying to catch and process (in 3rd party analytics app) DHCP 
+>>> packets
+>>> from ERSPAN session, but cannot do this due to absence of DHCP unicast
+>>> packets after decapsulation.
+>>>
+>>> The model is pretty simple: there is PHY interface (enp2s0) which 
+>>> receive
+>>> ERSPAN traffic and erspan-type interface to get decapsulated packets
+>>> (inspan, created using command "ip link add inspan type erspan seq 
+>>> key 10
+>>> local 10.171.165.65 erspan_ver 1", where 10.171.165.65 is ERSPAN 
+>>> target).
+>>> Then I'm going to rewrite headers in the proper ways (nftable's netdev
+>>> family) and forward packets to the pool of workers.
+>>>
+>>> Having this, I'm expecting everything, which is encapsulated inside 
+>>> ERSPAN,
+>>> on 'inspan' interface. And there is _almost_ everything except DHCP 
+>>> unicast
+>>> packets - tcpdump shows about 1kps on this interface of decapsulated
+>>> packets, but no DHCP unicast (see below traces).
+>>>
+>>> To avoid any interactions, I removed and disabled everything that 
+>>> can catch
+>>> DHCP in userspace - systemd-networkd, netplan, dhcp-client. There is 
+>>> no DHCP
+>>> server and ifupdown - for test purposes, I'm bringing networking 
+>>> manually.
+>>> Apparmor disabled as well. Kernel (Linux 5.19.0-42-generic
+>>> #43~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC) compiled without CONFIG_IP_PNP
+>>> (according to /boot/config-5.19.0-42-generic). Nothing in userspace 
+>>> listens
+>>> on UDP/68 and UDP/67:
+>> Can you reproduce this on latest mainline?
 >>
->> Sorry for that, I don't know how I could have missed that.
->> Should I send a patch to fix this ?
-> 
-> That would be the way to get it fixed, yes.
-> 
+>>> # netstat -tunlpa
+>>> Active Internet connections (servers and established)
+>>> Proto Recv-Q Send-Q Local Address           Foreign Address
+>>> State       PID/Program name
+>>> tcp        0      0 0.0.0.0:22 0.0.0.0:* LISTEN      544/sshd:
+>>> /usr/sbin
+>>> tcp6       0      0 :::22 :::*                    LISTEN 544/sshd:
+>>> /usr/sbin
+>>>
+>>> I have no ideas, why this is happening. Decapsulation itself works, but
+>>> particular kind of packets get lost.
+>>>
+>>> I will appreciate if anyone can help me understand where is the bug 
+>>> - in my
+>>> configuration or somewhere inside the kernel?
+>>>
+>>> Evidence of traffic presence/absence is below.
+>>>
+>>> Thank you.
+>>>
+>>> Encapsulated ERSPAN session (udp and port 67/68) contains lot of 
+>>> different
+>>> kinds of DHCP packets:
+>>>
+>>> # tcpdump -s0 -w- -i enp2s0 'proto gre and ether[73:1]=17 and
+>>> (ether[84:2]=67 or ether[84:2]=68)' | tshark -r- -l
+>>>   [ ... ]
+>>>      7   0.001942  0.0.0.0 → 255.255.255.255 DHCP 392 DHCP Discover -
+>>> Transaction ID 0x25c096fc
+>>>      8   0.003432  z.z.z.z → a.a.a.a         DHCP 418 DHCP ACK      -
+>>> Transaction ID 0x5515126a
+>>>      9   0.005170  m.m.m.m → z.z.z.z         DHCP 435 DHCP Discover -
+>>> Transaction ID 0xa7b7
+>>>     10   0.005171  m.m.m.m → z.z.z.z         DHCP 435 DHCP Discover -
+>>> Transaction ID 0xa7b7
+>>>     11   0.015399  n.n.n.n → z.z.z.z         DHCP 690 DHCP Request  -
+>>> Transaction ID 0x54955233
+>>>     12   0.025537  z.z.z.z → n.n.n.n         DHCP 420 DHCP ACK      -
+>>> Transaction ID 0x54955233
+>>>     13   0.030313  z.z.z.z → m.m.m.m         DHCP 413 DHCP Offer    -
+>>> Transaction ID 0xa7b7
+>>>
+>>> but decapsulated traffic (which I'm seeing on inspan interface) 
+>>> contains
+>>> just the following:
+>>>
+>>> # tcpdump -i inspan 'port 67 or port 68'
+>>> listening on inspan, link-type EN10MB (Ethernet), snapshot length 
+>>> 262144
+>>> bytes
+>>> 17:23:36.540721 IP 0.0.0.0.bootpc > 255.255.255.255.bootps: BOOTP/DHCP,
+>>> Request from 00:1a:64:33:8d:fa (oui Unknown), length 300
+>>> 17:23:39.760036 IP 0.0.0.0.bootpc > 255.255.255.255.bootps: BOOTP/DHCP,
+>>> Request from 00:1a:64:33:8d:fa (oui Unknown), length 300
+>>> 17:23:44.135711 IP 0.0.0.0.bootpc > 255.255.255.255.bootps: BOOTP/DHCP,
+>>> Request from 00:1a:64:33:8d:fa (oui Unknown), length 300
+>>> 17:23:52.008504 IP 0.0.0.0.bootpc > 255.255.255.255.bootps: BOOTP/DHCP,
+>>> Request from 00:1a:64:33:8d:fa (oui Unknown), length 300
+>>>
+>> What hardware?
+>>
+-- 
+Volodymyr Litovka
+   "Vision without Execution is Hallucination." -- Thomas Edison
 
-yes, please send a patch. thanks catching it, Petr.
 
