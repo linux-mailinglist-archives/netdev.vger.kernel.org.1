@@ -1,110 +1,149 @@
-Return-Path: <netdev+bounces-31395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86E0378D5F1
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 14:45:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA6EA78D609
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 15:07:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BEF641C20821
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 12:45:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4835E281175
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 13:07:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8489D525E;
-	Wed, 30 Aug 2023 12:45:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04BBB5679;
+	Wed, 30 Aug 2023 13:07:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 797592107
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 12:45:22 +0000 (UTC)
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB254C2;
-	Wed, 30 Aug 2023 05:45:20 -0700 (PDT)
-Received: from fsav120.sakura.ne.jp (fsav120.sakura.ne.jp [27.133.134.247])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 37UCiu1T038329;
-	Wed, 30 Aug 2023 21:44:56 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav120.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav120.sakura.ne.jp);
- Wed, 30 Aug 2023 21:44:56 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav120.sakura.ne.jp)
-Received: from [192.168.1.6] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 37UCiuog038326
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Wed, 30 Aug 2023 21:44:56 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <f607a7d5-8075-f321-e3c0-963993433b14@I-love.SAKURA.ne.jp>
-Date: Wed, 30 Aug 2023 21:44:57 +0900
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5DF753B2
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 13:07:08 +0000 (UTC)
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B66B6185
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 06:07:06 -0700 (PDT)
+Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
+	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qbKuJ-0003ia-1k; Wed, 30 Aug 2023 15:06:51 +0200
+Received: from ore by ptx.hi.pengutronix.de with local (Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qbKuH-0003WT-3v; Wed, 30 Aug 2023 15:06:49 +0200
+Date: Wed, 30 Aug 2023 15:06:49 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Lukasz Majewski <lukma@denx.de>, Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Vladimir Oltean <olteanv@gmail.com>, Tristram.Ha@microchip.com,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	UNGLinuxDriver@microchip.com,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] net: phy: Provide Module 4 KSZ9477 errata
+ (DS80000754C)
+Message-ID: <20230830130649.GK31399@pengutronix.de>
+References: <20230830092119.458330-1-lukma@denx.de>
+ <20230830092119.458330-2-lukma@denx.de>
+ <20230830101813.GG31399@pengutronix.de>
+ <20230830125224.1012459f@wsk>
+ <20230830105941.GH31399@pengutronix.de>
+ <20230830135151.683303db@wsk>
+ <20230830121738.GJ31399@pengutronix.de>
+ <ZO83htinyfAp4mWw@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: selftests: net: pmtu.sh: Unable to handle kernel paging request
- at virtual address
-Content-Language: en-US
-To: Hillf Danton <hdanton@sina.com>,
-        Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc: Netdev <netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20230830112600.4483-1-hdanton@sina.com>
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <20230830112600.4483-1-hdanton@sina.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ZO83htinyfAp4mWw@shell.armlinux.org.uk>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023/08/30 20:26, Hillf Danton wrote:
->> <4>[  399.014716] Call trace:
->> <4>[  399.015702]  percpu_counter_add_batch+0x28/0xd0
->> <4>[  399.016399]  dst_destroy+0x44/0x1e4
->> <4>[  399.016681]  dst_destroy_rcu+0x14/0x20
->> <4>[  399.017009]  rcu_core+0x2d0/0x5e0
->> <4>[  399.017311]  rcu_core_si+0x10/0x1c
->> <4>[  399.017609]  __do_softirq+0xd4/0x23c
->> <4>[  399.017991]  ____do_softirq+0x10/0x1c
->> <4>[  399.018320]  call_on_irq_stack+0x24/0x4c
->> <4>[  399.018723]  do_softirq_own_stack+0x1c/0x28
->> <4>[  399.022639]  __irq_exit_rcu+0x6c/0xcc
->> <4>[  399.023434]  irq_exit_rcu+0x10/0x1c
->> <4>[  399.023962]  el1_interrupt+0x8c/0xc0
->> <4>[  399.024810]  el1h_64_irq_handler+0x18/0x24
->> <4>[  399.025324]  el1h_64_irq+0x64/0x68
->> <4>[  399.025612]  _raw_spin_lock_bh+0x0/0x6c
->> <4>[  399.026102]  cleanup_net+0x280/0x45c
->> <4>[  399.026403]  process_one_work+0x1d4/0x310
->> <4>[  399.027140]  worker_thread+0x248/0x470
->> <4>[  399.027621]  kthread+0xfc/0x184
->> <4>[  399.028068]  ret_from_fork+0x10/0x20
+On Wed, Aug 30, 2023 at 01:35:18PM +0100, Russell King (Oracle) wrote:
+> On Wed, Aug 30, 2023 at 02:17:38PM +0200, Oleksij Rempel wrote:
+> > On Wed, Aug 30, 2023 at 01:51:51PM +0200, Lukasz Majewski wrote:
+> > > Hi Oleksij,
+> > 
+> > > It looks like the most optimal solution would be the one proposed by
+> > > Tristam:
+> > > https://www.spinics.net/lists/netdev/msg932044.html
+> > 
+> > In this case, please add the reason why it would work on this HW and
+> > will not break by any changes in PHYlib or micrel.c driver.
+> > 
+> > If I remember it correctly, in KSZ9477 variants, if you write to EEE
+> > advertisement register, it will affect the state of a EEE capability
+> > register. Which break IEEE 802.3 specification and the reason why
+> > ksz9477_get_features() actually exist. But can be used as workaround if
+> > it is written early enough before PHYlib tried to read EEE capability
+> > register.
+> > 
+> > Please confirm my assumption by applying your workaround and testing it
+> > with ethtool --show-eee lanX.
+> > 
+> > It should be commented in the code with all kind of warnings:
+> > Don't move!!! We use one bug to workaround another bug!!! If PHYlib
+> > start scanning PHYs before this code is executed, then thing may break!!
 > 
-> static void cleanup_net(struct work_struct *work)
-> {
-> 	...
+> Why would phylib's scanning cause breakage?
 > 
-> 	synchronize_rcu();
+> phylib's scanning for PHYs is about reading the ID registers etc. It
+> doesn't do anything until the PHY has been found, and then the first
+> thing that happens when the phy_device structure is created is an
+> appropriate driver is located, and the driver's ->probe function
+> is called.
 > 
-> 	/* Run all of the network namespace exit methods */
-> 	list_for_each_entry_reverse(ops, &pernet_list, list)
-> 		ops_exit_list(ops, &net_exit_list);
-> 	...
+> If that is successful, then the fewatures are read. If the PHY
+> driver's ->features member is set, then that initialises the
+> "supported" mask and we read the EEE abilities.
 > 
-> Why did the RCU sync above fail to work in this report, Eric?
+> If ->features is not set, then we look to see whether the driver
+> provides a ->get_features method, and call that.
+> 
+> Otherwise we use the generic genphy_c45_pma_read_abilities() or
+> genphy_read_abilities() depending whether the PHY's is_c45 is set
+> or not.
+> 
+> So, if you want to do something very early before features are read,
+> then either don't set .features, and do it early in .get_features
+> before calling anything else, or do it in the ->probe function.
 
-Why do you assume that synchronize_rcu() failed to work?
-The trace merely says that an interrupt handler ran somewhere from
-cleanup_net(), and something went wrong inside dst_destroy().
+Let me summarize my view on the problem, so may be you can suggest a better
+way to solve it.
+- KSZ9477, KSZ8565, KSZ9893, KSZ9563, seems to have different quirks by
+  the same PHYid. micrel.c driver do now know what exact HW is actually
+  in use.
+- A set of PHY workarounds was moved from dsa/microchip/ksz9477.c to
+  micrel.c, one of this workaround was clearing EEE advertisement
+  register, which by accident was clearing EEE capability register.
+  Since EEE cap was cleared by the dsa/microchip/ksz9477.c code before
+  micrel.c was probed, PHYlib was assuming that his PHY do not supports
+  EEE and dint tried to use it.
+  After moving this code to micrel.c, it is now trying to change EEE
+  advertisement state without letting PHYlib to know about it and PHYlib
+  re enables it as actually excepted.
+- so far, only KSZ9477 seems to be broken beyond repair, so it is better
+  to disable EEE without giving it as a choice for user configuration.
 
-Please decode the trace into filename:line format (like syzbot reports)
-using scripts/faddr2line tool, in order to find the exact location.
-
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
