@@ -1,308 +1,224 @@
-Return-Path: <netdev+bounces-31327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31328-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04FA878D303
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 07:35:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63B3F78D321
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 08:06:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8D422812C9
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 05:35:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25E9E1C20A82
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 06:06:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CFFA15BA;
-	Wed, 30 Aug 2023 05:35:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B233315C2;
+	Wed, 30 Aug 2023 06:06:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC8F815A0;
-	Wed, 30 Aug 2023 05:35:22 +0000 (UTC)
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A48CFC;
-	Tue, 29 Aug 2023 22:35:21 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id 98e67ed59e1d1-26f38171174so3286089a91.3;
-        Tue, 29 Aug 2023 22:35:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693373720; x=1693978520; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=BcXw+zHITcyTt8fguxH0pg2GRFn+w02Glz+Wr2nO71o=;
-        b=qj4ofPt9RsynglfvS3vqpyPzQQJRTUfJYf5pGHw4Uw77biz5Ij643IDkZ4v/LuwmgK
-         NLg3bsaDox3D025nf3IfoWBtt5Jh6oET2CmCBHqKjqUZNaOR+4N+wjEmIefF8qjFj/DG
-         Jw4Qf3P0ZWQyCofrBXLvLLn+ZUI4gntyl2jBveE/6zZf57a1rpvwcVklfhtYEOQ0juE/
-         5VmEUnL4zfqqSovrDod0E4tD7YqMgebKYHPUooTe5HxM7DlfuRc4tDOBKAOmzFOA/pje
-         tUcW1CkrRq6YAHXSqNK4JXhE40afMUiRufC2wVy4PbBZ19pWWSToE2/JzdE6EFX4j7+L
-         a6Sg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693373720; x=1693978520;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BcXw+zHITcyTt8fguxH0pg2GRFn+w02Glz+Wr2nO71o=;
-        b=D33+rFbtFRXlf1ZPbEjbDLu5qYNyuC/Bg0TPhbafYS9CPgMH5unbmPE5KS4p2VTjFH
-         P0aV4FQ3W14sUVHa+3uz4KnmIGLL9JLhxF3SBiVdJAkpxjQZOsfIIaWPSXWDeR8vFrSG
-         v2T4L+Er8C8hRztoBq/1NhrsKQWlJTtjF4nsoBay7d8rNo0qvRtXLaCfMnymiCS0l73H
-         sXZJsR1nPsodYcHDA0PAEwm1rOz5g0pYGu6yTXNIoeYh4AyKLtl/uRTtffhX0HYKLxZ1
-         tCHNow3E7mCk8YW4wMItZEQXmMOlsgvsbYDlutAWcgL+8NJV4yQPvNsfF0kOo/f5jDcf
-         UtTw==
-X-Gm-Message-State: AOJu0YxhK9df/GvpsHbZkpkf/KuuFbADh7Pb5Q64v3DGzhnJgTrijSIh
-	Pif+x94uRx9pv3bpxb25oOCkrVaMntA=
-X-Google-Smtp-Source: AGHT+IFwolUX4ai10qXL09aQU0B2qSYjhqyJH5hVmGqOo+zQ1v3ya0oQzWHk3Go229B/NKHrrUI2aw==
-X-Received: by 2002:a17:90a:928a:b0:26d:2162:f596 with SMTP id n10-20020a17090a928a00b0026d2162f596mr1190310pjo.6.1693373720037;
-        Tue, 29 Aug 2023 22:35:20 -0700 (PDT)
-Received: from john.lan ([2605:59c8:148:ba00:2873:7391:ec8:280a])
-        by smtp.gmail.com with ESMTPSA id 20-20020a17090a195400b0026b55e28035sm524533pjh.52.2023.08.29.22.35.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Aug 2023 22:35:19 -0700 (PDT)
-From: John Fastabend <john.fastabend@gmail.com>
-To: bpf@vger.kernel.org
-Cc: john.fastabend@gmail.com,
-	jakub@cloudflare.com,
-	netdev@vger.kernel.org
-Subject: [PATCH bpf] bpf: sockmap, fix preempt_rt splat when using raw_spin_lock_t
-Date: Tue, 29 Aug 2023 22:35:17 -0700
-Message-Id: <20230830053517.166611-1-john.fastabend@gmail.com>
-X-Mailer: git-send-email 2.33.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D86915A0
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 06:06:29 +0000 (UTC)
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2084.outbound.protection.outlook.com [40.107.223.84])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A98ADCE0;
+	Tue, 29 Aug 2023 23:06:22 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gSAscC2h/vJ/MHaDbkRxovPqYqulIsLq89jaFecE7697yHOEqAkW7gXzj28Hv3qJjodo9eAYcTiZyw51TzAB2+93EXFhmt/RUjQjNBOFZohSEUZvAo4kP8yf02Sa/t7yBkgudEBdwDwKpW1/KdGOUCluy6Byrt8cqNa1PHNjpbEaOjFlH+X8Qs+6oSS9Mox4Jz557YRKrF99MJBOeRCleozHiMPgdx2VtpPVyPW2oYzopvrF4hiYvk2aL7u+D62OxkRc4VchDWfTYoD2afC82NH+wCMss0ZTk8Cy0MfxPc2XIiPamf8pTZHX4zOqu9Sn3vDIKrHrs0yRGT2IoCVrDg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8jdRkH40Wmi0x56X5Kx0Z/BhOpNUpHW0v+C8m3lZaNw=;
+ b=fIsa1jGsSVBACuhPOhqy8tT2H1gzRH+nO/G1x5/KXuwiHzTwJBnb/GWMZpKeSqwl0cONuNz47CfYHLhj44KFT/C5UvmDDqM42xmzIXLsqDUC768ipFDjSxHrBsfs/03aUvSUVED6j7ybxIoDoNK+IWCCBQdkX7WHAgBVjVzr6uDPeKAE6y1GSrVP7eCscNdnAzkZ1BpAlpw62DXDDpvTavrXtYAXoGfjgKGiBKOcjuci+zI0gqr1p5w2YXlQqyIde4zZz4cuobKuU16Hqt6m+V630EnVhjXXvUwET03481vA8EVN6fCczCz81JZA+sLByMvR0R5AqjvXEex+2hlBWw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8jdRkH40Wmi0x56X5Kx0Z/BhOpNUpHW0v+C8m3lZaNw=;
+ b=lDHP+ziQBE9pjOlW+CStByOnA2azC787zxDX8DiwoJ/ekYanAPnyyDb9c4foPGWUxyUkV6Onga3iQW0VNE4ojbC8bZznKnOhqxznPltiYXlKPhEpwAsXTtvScyMVP8v8bYAiQ2s3pj/Xtlz9rolqnI2uvVnp3ixUoK5Hc85QcC0=
+Received: from PH8PR12MB6675.namprd12.prod.outlook.com (2603:10b6:510:1c2::15)
+ by IA1PR12MB6116.namprd12.prod.outlook.com (2603:10b6:208:3e8::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.34; Wed, 30 Aug
+ 2023 06:06:19 +0000
+Received: from PH8PR12MB6675.namprd12.prod.outlook.com
+ ([fe80::3a16:8b71:150d:5e82]) by PH8PR12MB6675.namprd12.prod.outlook.com
+ ([fe80::3a16:8b71:150d:5e82%4]) with mapi id 15.20.6745.020; Wed, 30 Aug 2023
+ 06:06:18 +0000
+From: "Goud, Srinivas" <srinivas.goud@amd.com>
+To: Rob Herring <robh@kernel.org>
+CC: "wg@grandegger.com" <wg@grandegger.com>, "mkl@pengutronix.de"
+	<mkl@pengutronix.de>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>, "p.zabel@pengutronix.de"
+	<p.zabel@pengutronix.de>, "git (AMD-Xilinx)" <git@amd.com>, "Simek, Michal"
+	<michal.simek@amd.com>, "linux-can@vger.kernel.org"
+	<linux-can@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "devicetree@vger.kernel.org"
+	<devicetree@vger.kernel.org>, "appana.durga.rao@xilinx.com"
+	<appana.durga.rao@xilinx.com>, "naga.sureshkumar.relli@xilinx.com"
+	<naga.sureshkumar.relli@xilinx.com>
+Subject: RE: [PATCH v3 1/3] dt-bindings: can: xilinx_can: Add ECC property
+ 'xlnx,has-ecc'
+Thread-Topic: [PATCH v3 1/3] dt-bindings: can: xilinx_can: Add ECC property
+ 'xlnx,has-ecc'
+Thread-Index: AQHZ2cBiFgY83WJUzUyA4MeJwK/v66//2S+AgAKA3EA=
+Date: Wed, 30 Aug 2023 06:06:18 +0000
+Message-ID:
+ <PH8PR12MB6675C31C6D1DCD3281FE8A10E1E6A@PH8PR12MB6675.namprd12.prod.outlook.com>
+References: <1693234725-3615719-1-git-send-email-srinivas.goud@amd.com>
+ <1693234725-3615719-2-git-send-email-srinivas.goud@amd.com>
+ <20230828154309.GA604444-robh@kernel.org>
+In-Reply-To: <20230828154309.GA604444-robh@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH8PR12MB6675:EE_|IA1PR12MB6116:EE_
+x-ms-office365-filtering-correlation-id: 8171a4af-35ef-4728-e026-08dba91f39c8
+x-ld-processed: 3dd8961f-e488-4e60-8e11-a82d994e183d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ nktevzhfNn042/vzbMGmF93RTXA+gunlsTTHtMUD/IyVuIeyv2C4Lxny0hgljEz3EVvuWGF8MHEyWZR5/3cEM44txwjiPPu4EjK8a15aI9suP5ZK63kyVuuQonx94+fwCDIq2hlJT9NntwqNPRUBABXQZe4HTesbiuLyHK7008iqmYZ77QW6L7tl9W9aeSKr7HTpHaO10NhDZNWA2TOdnn+MWFhkqj0EJ4l0HnAI+jY4k/9AH8ajaDWbv3g3NpuGWsr0HU43FfG2aI5arjXjUE1JYi71mjE0aNOBW4po0w82BIrNE7OsgSlIJMd6+InRJQK6CPdr1p72Wa9zLgOpebifE9I2TCW1g3FOCZ0NHwXAcqCdWgPhFSLkgGjHFWytrDfRE0ndXisr9iyVSSxl2CTICwvMlpc2FQm6/HiUYDLBkHes9kjntPT3KmRp1PTq6EitkeujsqT6fO8JqB8PoSB8IY7Zm7E6f4ANXTd/IaFB1HryZUPG+NFfgTM/0gzr3uilZ7N6KlzRiJQaeH6GleqJZmU7a+dMRtdKHFsyEkGuPglwYrBiwFNv6ucL5T3yAJKpNWPcr06JRYzTbSDf55G6qpzSVSeW6msA7xseBCo=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR12MB6675.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(346002)(396003)(376002)(366004)(136003)(451199024)(1800799009)(186009)(9686003)(26005)(316002)(38100700002)(6916009)(38070700005)(41300700001)(4326008)(33656002)(7416002)(55016003)(2906002)(52536014)(86362001)(5660300002)(8676002)(83380400001)(8936002)(71200400001)(66446008)(7696005)(966005)(6506007)(64756008)(66476007)(54906003)(66556008)(76116006)(66946007)(478600001)(122000001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?1M0Ie0xntR7NpchwXJa+iXPOrWjo24LNZB5aUsZZ69485yZzZkpzClh5Enlu?=
+ =?us-ascii?Q?kKVfrBi3JqYQqGZKmv5wNemZjmIFillpRCDE49CwfCxHHtDJfri8lLlvTGIR?=
+ =?us-ascii?Q?gDsQnMKGClC/+E+0xUm85bHyneO6CeatC+zoCWxPI2k+ZUPVAoRtld4EKRRV?=
+ =?us-ascii?Q?0m9YV5UBvQtm9R+kHkLeovClnv+fD0peQa7rOh7+ChrJVoh05e5salT5p++V?=
+ =?us-ascii?Q?tDcIti/hlIgKA8LToYL7md4qt2te3q8UoRX7hjYaFP7xaWGfqQODinYoxsm4?=
+ =?us-ascii?Q?tGkJBxif4zc+4dqEEge6diwuiH0HrfSaJEvGscdPc/t2qQwpyioQgZMm1aoL?=
+ =?us-ascii?Q?114NcDfr+2rSYkctmgjlCw2zCbN6mynDBlVleq6eATG9KaL4TVR/+5ece0Ii?=
+ =?us-ascii?Q?l1z8P1vtZ5q+fmzlppcr3gVH0Sb9Y75O6398zMaHc8riw2DnuN9OXFUWGQx/?=
+ =?us-ascii?Q?uvaTqw15m68J34PcaSZCcyqLDhkJWEEUAkWmfAfkXTRzPS4o41in6crdbZJa?=
+ =?us-ascii?Q?8raObcJSHzzvBgu9HmeLmqbUKOKObRUPkivM9lIg91yB8mpol1diTgRMFRtQ?=
+ =?us-ascii?Q?Ik7nE9h16g3L+jrmUW+3GMgTrtOHj1qTNPUyi4J7nSA1GyET+KGBLzGGNVVe?=
+ =?us-ascii?Q?NXfgogm6Kwe4BIk+Wf9+5JZ3ff288ivRI3dm3vs0rr2ZaYriA824GLlK5KE3?=
+ =?us-ascii?Q?3w1fSXdV71c8VlTNgPsVrXvqRTiZNReNCtjElBGDNLrXf9pYdSxqo+CQFBHp?=
+ =?us-ascii?Q?S4p4/jqjAxZXpakheMYOnBay4N5l+QqAJbJPHxqKioLi8B3i2QoEKZOzIJ9N?=
+ =?us-ascii?Q?8TxSRb0GQ22lmS1X4g6QXFsgUFv7N3x54ZDRJm3uAhyq6NDojMAwA4Nutnbl?=
+ =?us-ascii?Q?1mYD6ltTtkhU8Iz3+ApaT41TFtNiMwXx0owKFNmgSumc9pF6sXaUGV/hHSAf?=
+ =?us-ascii?Q?SpzygmKYpmS1YRpRDLx3G6FNDiCtzsEayj1Z1XYOKRXXKMSzLDgN5a2VTHEv?=
+ =?us-ascii?Q?2ALuWTn2v46tEx5dol+nuoLR4b0XPUDErrLaxRYgdzJ+y24/dGS+u5+M17Jg?=
+ =?us-ascii?Q?tjIHzlEFLnnWfpwG6FjbqVgrTDNlkpRImNqJHrgST7iVNrZDdE4tKwhXb5bf?=
+ =?us-ascii?Q?aNOcUd3iQvHTlc6YLNuUwaCnseYuDpLCUG4owuA1suyzcYlUP87KXTo/BM8H?=
+ =?us-ascii?Q?4ciaCXk8VAoyKpaj6z26qT3WosHiy0HCGm/egZ3d4UNyDCkx/PggC91V4jib?=
+ =?us-ascii?Q?cWbWDHvE64wJB6AWCMMR5DbDJJ0gEDkqPBdaD7opXhFqYZXn4gYB96kPmB4K?=
+ =?us-ascii?Q?ZpmqwIip5wwzGPVA52BXl6kV2CV+0430BtLzskHDaL7xHAglcQ/7IVYPYVj9?=
+ =?us-ascii?Q?AQiLvbVMpuMTHwG0y/HNePtIt5cQk4+nmhz8jR43hsvfoJeVv7IkUaUGlnV6?=
+ =?us-ascii?Q?b+9E7KnsI2smxCCppD5HlEjzBuoZSg1uwfIyoE7/aNjuc9HdDmpnM7qcXTZS?=
+ =?us-ascii?Q?2womVlid7WsGcNZFU3Z+eJjTioASuP158YYLcPjh8gYsvP86Ay+8jCpTt1tJ?=
+ =?us-ascii?Q?r/tezVd6VGReBtKSatk=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR12MB6675.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8171a4af-35ef-4728-e026-08dba91f39c8
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Aug 2023 06:06:18.1409
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: V3P0CaKSEBO222bH1cctvlUWevWvS7/aYJfVVWgKm80yYJo21mk4AbEHFhEAQsFL
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6116
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Sockmap and sockhash maps are a collection of psocks that are
-objects representing a socket plus a set of metadata needed
-to manage the BPF programs associated with the socket. These
-maps use the stab->lock to protect from concurrent operations
-on the maps, e.g. trying to insert to objects into the array
-at the same time in the same slot. Additionally, a sockhash map
-has a bucket lock to protect iteration and insert/delete into
-the hash entry.
+Hi Rob,
 
-Each psock has a psock->link which is a linked list of all the
-maps that a psock is attached to. This allows a psock (socket)
-to be included in multiple sockmap and sockhash maps. This
-linked list is protected the psock->link_lock.
+>-----Original Message-----
+>From: Rob Herring <robh@kernel.org>
+>Sent: Monday, August 28, 2023 9:13 PM
+>To: Goud, Srinivas <srinivas.goud@amd.com>
+>Cc: wg@grandegger.com; mkl@pengutronix.de; davem@davemloft.net;
+>edumazet@google.com; kuba@kernel.org; pabeni@redhat.com;
+>krzysztof.kozlowski+dt@linaro.org; conor+dt@kernel.org;
+>p.zabel@pengutronix.de; git (AMD-Xilinx) <git@amd.com>; Simek, Michal
+><michal.simek@amd.com>; linux-can@vger.kernel.org; linux-arm-
+>kernel@lists.infradead.org; linux-kernel@vger.kernel.org;
+>netdev@vger.kernel.org; devicetree@vger.kernel.org;
+>appana.durga.rao@xilinx.com; naga.sureshkumar.relli@xilinx.com
+>Subject: Re: [PATCH v3 1/3] dt-bindings: can: xilinx_can: Add ECC property
+>'xlnx,has-ecc'
+>
+>On Mon, Aug 28, 2023 at 08:28:43PM +0530, Srinivas Goud wrote:
+>> ECC feature added to Tx and Rx FIFOs for Xilinx AXI CAN Controller.
+>> Part of this feature configuration and counter registers added in IP
+>> for 1bit/2bit ECC errors.
+>>
+>> xlnx,has-ecc is optional property and added to Xilinx AXI CAN
+>> Controller node if ECC block enabled in the HW
+>>
+>> Signed-off-by: Srinivas Goud <srinivas.goud@amd.com>
+>> ---
+>> Changes in v3:
+>> Update commit description
+>>
+>> Changes in v2:
+>> None
+>
+>Doesn't apply, dependency?
+This patch is created on top of below commit and this is part of the=20
+linux-can-next/master and Linux torvalds GIT
+https://lore.kernel.org/all/bfaed896cc51af02fe5f290675313ab4dcab0d33.168916=
+4442.git.michal.simek@amd.com/
 
-They _must_ be nested correctly to avoid deadlock,
+>
+>>
+>>  Documentation/devicetree/bindings/net/can/xilinx,can.yaml | 5 +++++
+>>  1 file changed, 5 insertions(+)
+>>
+>> diff --git a/Documentation/devicetree/bindings/net/can/xilinx,can.yaml
+>> b/Documentation/devicetree/bindings/net/can/xilinx,can.yaml
+>> index 64d57c3..c842610 100644
+>> --- a/Documentation/devicetree/bindings/net/can/xilinx,can.yaml
+>> +++ b/Documentation/devicetree/bindings/net/can/xilinx,can.yaml
+>> @@ -49,6 +49,10 @@ properties:
+>>    resets:
+>>      maxItems: 1
+>>
+>> +  xlnx,has-ecc:
+>> +    $ref: /schemas/types.yaml#/definitions/flag
+>> +    description: CAN Tx and Rx fifo ECC enable flag (AXI CAN)
+>
+>has ECC or enable ECC?
+Will update description with "has ECC"
 
-  lock(stab->lock)
-    : do BPF map operations and psock insert/delete
-    lock(psock->link_lock)
-       : add map to psock linked list of maps
-    unlock(psock->link_lock)
-  unlock(stab->lock)
+>
+>> +
+>>  required:
+>>    - compatible
+>>    - reg
+>> @@ -137,6 +141,7 @@ examples:
+>>          interrupts =3D <GIC_SPI 59 IRQ_TYPE_EDGE_RISING>;
+>>          tx-fifo-depth =3D <0x40>;
+>>          rx-fifo-depth =3D <0x40>;
+>> +        xlnx,has-ecc
+>
+>Obviously not tested.
+Will fix it.
 
-For non PREEMPT_RT kernels both raw_spin_lock_t and spin_lock_t
-are guaranteed to not sleep. But, with PREEMPT_RT kernels the
-spin_lock_t variants may sleep. In the current code we have
-many patterns like this,
-
-   rcu_critical_section:
-      raw_spin_lock(stab->lock)
-         spin_lock(psock->link_lock) <- may sleep ouch
-         spin_unlock(psock->link_lock)
-      raw_spin_unlock(stab->lock)
-   rcu_critical_section
-
-Nesting spin_lock() inside a raw_spin_lock() violates locking
-rules for PREEMPT_RT kernels. And additionally we do alloc(GFP_ATOMICS)
-inside the stab->lock, but those might sleep on PREEMPT_RT kernels.
-The result is splats like this,
-
-./test_progs -t sockmap_basic
-[   33.344330] bpf_testmod: loading out-of-tree module taints kernel.
-[   33.441933]
-[   33.442089] =============================
-[   33.442421] [ BUG: Invalid wait context ]
-[   33.442763] 6.5.0-rc5-01731-gec0ded2e0282 #4958 Tainted: G           O
-[   33.443320] -----------------------------
-[   33.443624] test_progs/2073 is trying to lock:
-[   33.443960] ffff888102a1c290 (&psock->link_lock){....}-{3:3}, at: sock_map_update_common+0x2c2/0x3d0
-[   33.444636] other info that might help us debug this:
-[   33.444991] context-{5:5}
-[   33.445183] 3 locks held by test_progs/2073:
-[   33.445498]  #0: ffff88811a208d30 (sk_lock-AF_INET){+.+.}-{0:0}, at: sock_map_update_elem_sys+0xff/0x330
-[   33.446159]  #1: ffffffff842539e0 (rcu_read_lock){....}-{1:3}, at: sock_map_update_elem_sys+0xf5/0x330
-[   33.446809]  #2: ffff88810d687240 (&stab->lock){+...}-{2:2}, at: sock_map_update_common+0x177/0x3d0
-[   33.447445] stack backtrace:
-[   33.447655] CPU: 10 PID
-
-To fix observe we can't readily remove the allocations (for that
-we would need to use/create something similar to bpf_map_alloc). So
-convert raw_spin_lock_t to spin_lock_t. We note that sock_map_update
-that would trigger the allocate and potential sleep is only allowed
-through sys_bpf ops and via sock_ops which precludes hw interrupts
-and low level atomic sections in RT preempt kernel. On non RT
-preempt kernel there are no changes here and spin locks sections
-and alloc(GFP_ATOMIC) are still not sleepable.
-
-Signed-off-by: John Fastabend <john.fastabend@gmail.com>
----
- net/core/sock_map.c | 36 ++++++++++++++++++------------------
- 1 file changed, 18 insertions(+), 18 deletions(-)
-
-diff --git a/net/core/sock_map.c b/net/core/sock_map.c
-index 8f07fea39d9e..cb11750b1df5 100644
---- a/net/core/sock_map.c
-+++ b/net/core/sock_map.c
-@@ -18,7 +18,7 @@ struct bpf_stab {
- 	struct bpf_map map;
- 	struct sock **sks;
- 	struct sk_psock_progs progs;
--	raw_spinlock_t lock;
-+	spinlock_t lock;
- };
- 
- #define SOCK_CREATE_FLAG_MASK				\
-@@ -44,7 +44,7 @@ static struct bpf_map *sock_map_alloc(union bpf_attr *attr)
- 		return ERR_PTR(-ENOMEM);
- 
- 	bpf_map_init_from_attr(&stab->map, attr);
--	raw_spin_lock_init(&stab->lock);
-+	spin_lock_init(&stab->lock);
- 
- 	stab->sks = bpf_map_area_alloc((u64) stab->map.max_entries *
- 				       sizeof(struct sock *),
-@@ -411,7 +411,7 @@ static int __sock_map_delete(struct bpf_stab *stab, struct sock *sk_test,
- 	struct sock *sk;
- 	int err = 0;
- 
--	raw_spin_lock_bh(&stab->lock);
-+	spin_lock_bh(&stab->lock);
- 	sk = *psk;
- 	if (!sk_test || sk_test == sk)
- 		sk = xchg(psk, NULL);
-@@ -421,7 +421,7 @@ static int __sock_map_delete(struct bpf_stab *stab, struct sock *sk_test,
- 	else
- 		err = -EINVAL;
- 
--	raw_spin_unlock_bh(&stab->lock);
-+	spin_unlock_bh(&stab->lock);
- 	return err;
- }
- 
-@@ -487,7 +487,7 @@ static int sock_map_update_common(struct bpf_map *map, u32 idx,
- 	psock = sk_psock(sk);
- 	WARN_ON_ONCE(!psock);
- 
--	raw_spin_lock_bh(&stab->lock);
-+	spin_lock_bh(&stab->lock);
- 	osk = stab->sks[idx];
- 	if (osk && flags == BPF_NOEXIST) {
- 		ret = -EEXIST;
-@@ -501,10 +501,10 @@ static int sock_map_update_common(struct bpf_map *map, u32 idx,
- 	stab->sks[idx] = sk;
- 	if (osk)
- 		sock_map_unref(osk, &stab->sks[idx]);
--	raw_spin_unlock_bh(&stab->lock);
-+	spin_unlock_bh(&stab->lock);
- 	return 0;
- out_unlock:
--	raw_spin_unlock_bh(&stab->lock);
-+	spin_unlock_bh(&stab->lock);
- 	if (psock)
- 		sk_psock_put(sk, psock);
- out_free:
-@@ -835,7 +835,7 @@ struct bpf_shtab_elem {
- 
- struct bpf_shtab_bucket {
- 	struct hlist_head head;
--	raw_spinlock_t lock;
-+	spinlock_t lock;
- };
- 
- struct bpf_shtab {
-@@ -910,7 +910,7 @@ static void sock_hash_delete_from_link(struct bpf_map *map, struct sock *sk,
- 	 * is okay since it's going away only after RCU grace period.
- 	 * However, we need to check whether it's still present.
- 	 */
--	raw_spin_lock_bh(&bucket->lock);
-+	spin_lock_bh(&bucket->lock);
- 	elem_probe = sock_hash_lookup_elem_raw(&bucket->head, elem->hash,
- 					       elem->key, map->key_size);
- 	if (elem_probe && elem_probe == elem) {
-@@ -918,7 +918,7 @@ static void sock_hash_delete_from_link(struct bpf_map *map, struct sock *sk,
- 		sock_map_unref(elem->sk, elem);
- 		sock_hash_free_elem(htab, elem);
- 	}
--	raw_spin_unlock_bh(&bucket->lock);
-+	spin_unlock_bh(&bucket->lock);
- }
- 
- static long sock_hash_delete_elem(struct bpf_map *map, void *key)
-@@ -932,7 +932,7 @@ static long sock_hash_delete_elem(struct bpf_map *map, void *key)
- 	hash = sock_hash_bucket_hash(key, key_size);
- 	bucket = sock_hash_select_bucket(htab, hash);
- 
--	raw_spin_lock_bh(&bucket->lock);
-+	spin_lock_bh(&bucket->lock);
- 	elem = sock_hash_lookup_elem_raw(&bucket->head, hash, key, key_size);
- 	if (elem) {
- 		hlist_del_rcu(&elem->node);
-@@ -940,7 +940,7 @@ static long sock_hash_delete_elem(struct bpf_map *map, void *key)
- 		sock_hash_free_elem(htab, elem);
- 		ret = 0;
- 	}
--	raw_spin_unlock_bh(&bucket->lock);
-+	spin_unlock_bh(&bucket->lock);
- 	return ret;
- }
- 
-@@ -1000,7 +1000,7 @@ static int sock_hash_update_common(struct bpf_map *map, void *key,
- 	hash = sock_hash_bucket_hash(key, key_size);
- 	bucket = sock_hash_select_bucket(htab, hash);
- 
--	raw_spin_lock_bh(&bucket->lock);
-+	spin_lock_bh(&bucket->lock);
- 	elem = sock_hash_lookup_elem_raw(&bucket->head, hash, key, key_size);
- 	if (elem && flags == BPF_NOEXIST) {
- 		ret = -EEXIST;
-@@ -1026,10 +1026,10 @@ static int sock_hash_update_common(struct bpf_map *map, void *key,
- 		sock_map_unref(elem->sk, elem);
- 		sock_hash_free_elem(htab, elem);
- 	}
--	raw_spin_unlock_bh(&bucket->lock);
-+	spin_unlock_bh(&bucket->lock);
- 	return 0;
- out_unlock:
--	raw_spin_unlock_bh(&bucket->lock);
-+	spin_unlock_bh(&bucket->lock);
- 	sk_psock_put(sk, psock);
- out_free:
- 	sk_psock_free_link(link);
-@@ -1115,7 +1115,7 @@ static struct bpf_map *sock_hash_alloc(union bpf_attr *attr)
- 
- 	for (i = 0; i < htab->buckets_num; i++) {
- 		INIT_HLIST_HEAD(&htab->buckets[i].head);
--		raw_spin_lock_init(&htab->buckets[i].lock);
-+		spin_lock_init(&htab->buckets[i].lock);
- 	}
- 
- 	return &htab->map;
-@@ -1147,11 +1147,11 @@ static void sock_hash_free(struct bpf_map *map)
- 		 * exists, psock exists and holds a ref to socket. That
- 		 * lets us to grab a socket ref too.
- 		 */
--		raw_spin_lock_bh(&bucket->lock);
-+		spin_lock_bh(&bucket->lock);
- 		hlist_for_each_entry(elem, &bucket->head, node)
- 			sock_hold(elem->sk);
- 		hlist_move_list(&bucket->head, &unlink_list);
--		raw_spin_unlock_bh(&bucket->lock);
-+		spin_unlock_bh(&bucket->lock);
- 
- 		/* Process removed entries out of atomic context to
- 		 * block for socket lock before deleting the psock's
--- 
-2.33.0
-
+Thanks,
+Srinivas
 
