@@ -1,166 +1,131 @@
-Return-Path: <netdev+bounces-31422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1FF578D6D3
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 17:07:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EA5B78D6E2
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 17:17:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD9331C2074C
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 15:07:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EAD31C208CB
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 15:17:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21ECE6FD1;
-	Wed, 30 Aug 2023 15:06:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EC056FDB;
+	Wed, 30 Aug 2023 15:17:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 143096FD0
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 15:06:40 +0000 (UTC)
-Received: from EUR01-HE1-obe.outbound.protection.outlook.com (mail-he1eur01on2090.outbound.protection.outlook.com [40.107.13.90])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBEA91A3
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 08:06:39 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BzMG/OkZgC/o1PJDYifSp64be98jIy9L+zoAYZXz+QhnwGIvqhUTh74KMUqN2GCmoyWJpd0JE0vYCIwFPYU0cOKxCAyOmZiBEJSDofy7/i2WvpiXApbjZNBpi2REgdgyrQ446TWb956R84AH4eBJovETt+BOg+1sZWMC0EQWgkJy7Fpg53Ga4Btdcc3vEo4rpWGLZvWVSn3chcGeGGxDjmT1ZwkenW0Al2STcpxgZta/CO0Pn+STH36mWpN7jPr0Ju5gb+GAxU8AewjnyKSWg9UWsttffXsZLCT52j5reSFs0PawDHHAB1Ynr4oej1W3w4qxdj1Lo03DrRBNY3uS3g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RDT0D+XudDiX+Fy1Qf3n7KgelNw9zMFkE2RIHKDJ3dc=;
- b=jYjec4nly/ak0TjHlp1apMXBBmwYLN7QOj6r1ehlptmNidOurm0hSTDg+yg8GOWIwsGS7cHW3ZLwm+4FX7uHt2pIoBQPOuA1W0mLYe0ymCPCtxun/FPiARY/lXF0xXNGAdIu9X3EfkgR7pynePMoRQEFcxTNhmScRWWTyE6FIWpx4bAKQZT2NzxAOxJKQeer0F87XrM+Ais+ZZ2LI2caOsioXjuMkn2Uf9jN8v/GOotW/G0BNo6BBZrah15W139WNLnQjOTmx4vE6X01yWOqE5F96pCecynYO8Cp2++U7ZNEP1cYWNuBUTbdzOIpRxOyZQlvX++DgnLGhBOs8uwslQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=uclouvain.be; dmarc=pass action=none header.from=uclouvain.be;
- dkim=pass header.d=uclouvain.be; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uclouvain.be;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RDT0D+XudDiX+Fy1Qf3n7KgelNw9zMFkE2RIHKDJ3dc=;
- b=dW3IHphvSZsrv1AmCgGPB/iROZh6nHCJBWS+k9j2U/eANZbQ02eLG567839dxr5tlSJf7dqS5vvqtqhXc8Abq/WmVRv3KnpO9eZE5zsyQX5IhbjwSel4WDRxeslMoZFsGym/BrnhMxvVU3b5nx/pY/D4bAL/Wonjc+51EldD8alWK/tRRyLF0ymug4GkugIvjXy4SgZpeVPmogsurruBgrIBswxWkspUpeiDmxDEsaITbtKS0eMZCl3xmqzsC5tzh9qemPI90eBQLcVLqnAgtQh1i8Yg32sK8z8hPmSh9eMIIDpfmwt4KmRR8rrA4gZN0Po9VfK4Nrf1j2i/wmeisg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=uclouvain.be;
-Received: from DB9PR03MB7689.eurprd03.prod.outlook.com (2603:10a6:10:2c2::11)
- by PAXPR03MB7951.eurprd03.prod.outlook.com (2603:10a6:102:21a::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.34; Wed, 30 Aug
- 2023 15:06:35 +0000
-Received: from DB9PR03MB7689.eurprd03.prod.outlook.com
- ([fe80::b3b9:9dc1:b4b0:ffe2]) by DB9PR03MB7689.eurprd03.prod.outlook.com
- ([fe80::b3b9:9dc1:b4b0:ffe2%4]) with mapi id 15.20.6745.020; Wed, 30 Aug 2023
- 15:06:35 +0000
-From: francois.michel@uclouvain.be
-To:
-Cc: netdev@vger.kernel.org,
-	francois.michel@uclouvain.be,
-	stephen@networkplumber.org,
-	petrm@nvidia.com,
-	dsahern@kernel.org
-Subject: [PATCH iproute2-next 1/1] tc: fix typo in netem's usage string
-Date: Wed, 30 Aug 2023 17:05:21 +0200
-Message-ID: <20230830150531.44641-2-francois.michel@uclouvain.be>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230830150531.44641-1-francois.michel@uclouvain.be>
-References: <20230830150531.44641-1-francois.michel@uclouvain.be>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: FR3P281CA0098.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a1::14) To DB9PR03MB7689.eurprd03.prod.outlook.com
- (2603:10a6:10:2c2::11)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B3C06FD5;
+	Wed, 30 Aug 2023 15:17:36 +0000 (UTC)
+Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D8401A2;
+	Wed, 30 Aug 2023 08:17:35 -0700 (PDT)
+Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-401ef656465so1858085e9.1;
+        Wed, 30 Aug 2023 08:17:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693408653; x=1694013453; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=PeStNgIFyhYkU5cmLWBgd4BV9abdD1hSxAhShc4Rniw=;
+        b=a8XCeYMc3Un1JNT/RIWo7+7u1LzId6h2HH6LrSEbNDWfhTJqGCFkw9c2+qd47fhju4
+         HWV6xJsx9TRMflIeT31NaaMKm1z1/KLVcuX8jZj0YRBX6/YFyuQ1dkMbRdcwd8fc9W3t
+         4jQO8q5JN59e97d/kConO++lKr1Wheu9yTRx7RREsIsXaLFKy0K4UMYqeuLYXA36hB8P
+         NHsDjDYdTP2F/XdmBZFUpGF3vFlVEWvUOoBvcx6/gKICqqb8huJzFZr8lLOmYZyv8FWL
+         QfignBo+Kz6l0yY6JHnk3OiiGyv6tVqYjbUmWV0lAItcLSKoGZYuTBTIQvHhvBtUyn5d
+         Ikuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693408653; x=1694013453;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PeStNgIFyhYkU5cmLWBgd4BV9abdD1hSxAhShc4Rniw=;
+        b=HD+CYhL/tBW3VSWWD9OjUS5JPW1hzzYopTV9Szb2dvI67sJjPQDJ97T4aznBNYqMG/
+         gmy6krR6MRLxHTPaz1XedtQp3VYvEZNz3dWZbI7Og+zAWjEZRsoC8mn7T1BsG4SoclkU
+         cUx07MJyqaZ+5vpV5MGADHA9V24u8bVua3yTv78WG1wVRj7+ltCu4Aez4AAljp3ppp/b
+         p8o7rB6HbuBQeEvV2A91FU3UZOOM863IfCgZvKg4cq9dgFsj/W8ob5ntlEvt+Np+bTPG
+         XpLJVnnIhJEYcGh0PlARH0QpaKXlqaRCwewxkJfmMzTi8p3aKEyvY6gIPmd/X73ZIH30
+         PDTQ==
+X-Gm-Message-State: AOJu0Yz1BlBApygasKe7Y+63REQnv9NlSqGQfBfPtr/u+VSpc9uHnBAU
+	dg4mdYww3tAIYQKz6rorA10=
+X-Google-Smtp-Source: AGHT+IHGprUSVMZhj6MIp3VxMSV5tq1dagJ2Ilu7ATS68B26J+0S0NPcz835UxBmvHI0Sj0UZfA1cA==
+X-Received: by 2002:a05:600c:3b8c:b0:401:b0f8:c26a with SMTP id n12-20020a05600c3b8c00b00401b0f8c26amr2117752wms.4.1693408653156;
+        Wed, 30 Aug 2023 08:17:33 -0700 (PDT)
+Received: from localhost.localdomain (h-176-10-144-222.NA.cust.bahnhof.se. [176.10.144.222])
+        by smtp.gmail.com with ESMTPSA id r19-20020a05600c299300b003fe539b83f2sm2546562wmd.42.2023.08.30.08.17.31
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 30 Aug 2023 08:17:32 -0700 (PDT)
+From: Magnus Karlsson <magnus.karlsson@gmail.com>
+To: magnus.karlsson@intel.com,
+	bjorn@kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	netdev@vger.kernel.org,
+	maciej.fijalkowski@intel.com
+Cc: jonathan.lemon@gmail.com,
+	bpf@vger.kernel.org,
+	syzbot+822d1359297e2694f873@syzkaller.appspotmail.com
+Subject: [PATCH bpf] xsk: fix xsk_diag use-after-free error during socket cleanup
+Date: Wed, 30 Aug 2023 17:17:03 +0200
+Message-ID: <20230830151704.14855-1-magnus.karlsson@gmail.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DB9PR03MB7689:EE_|PAXPR03MB7951:EE_
-X-MS-Office365-Filtering-Correlation-Id: 020957d7-c586-456a-5a49-08dba96ab3db
-X-MS-Exchange-AtpMessageProperties: SA
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	0FbRprGO4YuTJZ6g+uS05bZLD2awGPBENy7HJj+jqp0GryzY037lqvR7Y8c6KnO2SxCrDrswA2Dr0wpt8tJLN+vaof5UZusyMHo4JgH4VCNksoUZ4lrWS1VkvL9+3vhmlmtHrmOGYnCjCMZI6qCweQBglmlSBbAD85dm3MeXDvFLoqsJiKtrcKxhCjl2HcgFZ0Dq7LWWpCu9mWMM0LcTHWQbVbpDa2fTZ0S6v/nl7TlAu5hC2W+H4I9ZMlzHfgjwSnr4P7/y1WDzlr+zZT9U9xRj+iXl/VsGT4Up9jSaMDZjusXR+3s93WB/kjBYAeU+aApqDxGvZ+oRvUGA24lB2lLar3yqJR4j+hYmIP0Dn+9tnkhF0SahqjjyHGQyak+kdYJqq+PRvs8Ugiz9KXwVt30Tv3YsVcDjbj3Xydwc9NIhhH47iqOMk+X51vV/DgGboi1+TIMHsTqYzJQYJGmU7V+OF1IpEdLRkwYcn9u960nLe5uO+TOxX48JWCvJziezSTxQqO1EoKibHgM1QVHtxbXNZ8FLqG8Z5E8rTUHjR3nU3z+HabBfWmA/ADdf2VVrNhlwdh9weJKZ9wCYrxa5yvyKUiDdMtIdpmKQFu6UxGM=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR03MB7689.eurprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(366004)(376002)(136003)(346002)(396003)(451199024)(1800799009)(186009)(109986022)(6512007)(9686003)(316002)(38100700002)(786003)(41300700001)(4326008)(66574015)(2906002)(4744005)(86362001)(5660300002)(1076003)(36756003)(2616005)(8676002)(83380400001)(8936002)(6666004)(6506007)(66476007)(6486002)(66556008)(52116002)(66946007)(478600001)(266003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NFBQZy9OUEMxOWVOekttRmN5cHBHQXFObnVaaEp4TEdOR1ZWZDZ4aGdZV0t5?=
- =?utf-8?B?M1FaUlQ0dndOSmpWTG5aMjk0TVUrRndRTlQ3YXBSY2ZTVkd2bW5yZTl1dC91?=
- =?utf-8?B?RThPRXFiWFVvVVF0Zm5Hd1p1OExqQVIvS3FGRzF4SjJEL1Zwb0srOUpvbU1N?=
- =?utf-8?B?N3RteXo5MkgxQk9LWDlUaVpSNEhHb2l1QjVMZ3E0QlVXMEo0MStZUElBN3Vy?=
- =?utf-8?B?c2ZmQmRrNVQvS2F3MVlNZWRmL0Y2SlNGVFFLUTE5YklKdlhDWHNOSDFZcE40?=
- =?utf-8?B?Q1drUWYyQzVXZjJIR1l0Y1RERFJiTWk3d21uTTMzUmV3aVp4TmVkcXk0ZDBJ?=
- =?utf-8?B?aFVHaWt1TXhZcmxlQU95TEZtSW92STh1YXRiTk9wZURCUlAvaFRvNUVDcEU4?=
- =?utf-8?B?R2I0YkFsUEJzQnNCOFlpYVdyaTRhRlFwWHZMZGIrYk1qaFMzYVk5THlqNWhh?=
- =?utf-8?B?cUlMd0xiSEdiS1lXUUp6clZjNGJUdnV3R3hHb2VESVAxYVlWWkFBL1lCWU1a?=
- =?utf-8?B?TnpyeHdoNlQvdUR3OE5PREpzWHBnTjhPeWJ5cFNxbUw5amxkZ2x2T1NzTlZC?=
- =?utf-8?B?ODQ5MGdSOS9TTUJBNm5TcEwzTGVzQnRaQ3RXaER5REtVTVVhb0ZLN1piaTI0?=
- =?utf-8?B?ZzM3NTVQQnp2c3F1VjJWYUFNdHpZc013ZUVDTEtxNDhzS1d4ZllKbVFZWWtq?=
- =?utf-8?B?OHpKNmROL1BlNFpnZ2UxOUNBeDhQT3U2Z25UMll5NVRSM1J1amNTcW1Ib1lk?=
- =?utf-8?B?N2FiVTBhdkF5MUZkb2hLM0w0SFRvNGhlNjJMMTFUOGVRSnVON3ExcHpEWS91?=
- =?utf-8?B?VG5LL1QrRlQ0VldXQk9lT2c4VDBYT3puRU9WeUtKNXFkb1BIdHpyUmdjMVZw?=
- =?utf-8?B?QzJmMk1US1M2K3VhWklMV3lRczdsUTU1dk9ybk90Qm5HUlBoSnRPVHhDeC9w?=
- =?utf-8?B?bmlpQXJobG1rTktYWWVVVFFHWHBndlcrNnFGU2h5R0tFbXYrdWNMVlVCWGFZ?=
- =?utf-8?B?VDBrNDZWNTE1YjYzTFU1aThuTGVsSTZLbWtKeVJXVkk2T1ZHa25QTklNMDRu?=
- =?utf-8?B?UEZib3Z4Z3pDQzJVOVJ6eDNZQmkwR1loRmc2ZkFQTHZ2eElTQWZON3dqS1RN?=
- =?utf-8?B?N05jU3laVlk1K00xTzhYYXQvUlM1NlBDdm1tK3owL1UvYklKY0NYeW9BK3N5?=
- =?utf-8?B?MHR2cjJhbW11eGRoZ3JLU1Q2ZmdNUDg1SzBESjV6ajhYWEF1c2p2Nmg5R1Zn?=
- =?utf-8?B?TEJJSGJ4WHZwSHFtL0hQcFhxRUdHdG9aR2tzRit0N2trRi9FaXVCaER1Vldo?=
- =?utf-8?B?Kzd6UTRGTFhialJzbExkcjhMdmhwUnc1c29DWDBFSHBYOG15U0VnQndzTGNB?=
- =?utf-8?B?Qy9PYTFCU3diTnlDNlE5SkhiOUVQMk1XbXg3QkdDZGpucVJsSXVXTWhwMGN5?=
- =?utf-8?B?emgraWxTNFd0dytWOUtOVUJtd1gzZm5UREoyREdKVjdVand1QnVzVit6eEJU?=
- =?utf-8?B?ZEE5dXFLdXVXSFdSRHpUYUhOVmtRTVNIZ3Y1b0R2dFlUVUJQREFtY3hsNUQy?=
- =?utf-8?B?bG9GMTA0eXNpZlErL1cyajBYanR6L2Vma3REdk9mRkxQcG9SR3djRWp1UHkx?=
- =?utf-8?B?OWFZWmo4ZThTWSt3aGZDaFFHRFJsaHFZa1E1QXcxc3NSQ21TUUtDWFdVVG9Z?=
- =?utf-8?B?UTlMYWtFa1NNREhIMWhOUmFuaTJwOU95YUxxcGhoOGhMZEZkc1J3YVhuai9q?=
- =?utf-8?B?KzdTckZKTWZWQ2pSZVo1MG5CL2w3a0o0bEI4TS9URVR4eTljcDJPY1B2cEcr?=
- =?utf-8?B?MENWY1Q5UWlabDNSekl6ZmM4Z0lLZjlNVDNPNDQydlBmTWJzYmYveGJvMGxy?=
- =?utf-8?B?b0FhUUJLckNCVy90dG1GVEEwbzYzck40aDRkYmJrNHJQVE0wUktXL0NTVTFn?=
- =?utf-8?B?SG40aGRXN0pSWWRpT1d1ZWJVWWVsNkw2VzhRblZrOWVwY2NFRVFhSHdRODBu?=
- =?utf-8?B?TzJtZWVNZ1VpdUdvVkI3enRWeFRoMVIyV2tGVkFRSTVkb05lRkNwcGlrZnl4?=
- =?utf-8?B?KzdSY3NaS3Z4bkZORWNYRmZKdjVadFpDVmZQb09JMEFIWk5Ud3hoN3Vobmlv?=
- =?utf-8?B?TW9VRHVxd0hUSEpkeXdKWlBHakZkNCtwU05wby9UclZ6L25SaTU0RWwxMTMx?=
- =?utf-8?B?VGNYL0R6WVJiY1hVdnY5ZXp2d3llZjZ4UkdENCtORnFjY3REN2pKU3R2aUxz?=
- =?utf-8?B?VEtpM3pBdGJmLzRGemxNRU5TaElBPT0=?=
-X-OriginatorOrg: uclouvain.be
-X-MS-Exchange-CrossTenant-Network-Message-Id: 020957d7-c586-456a-5a49-08dba96ab3db
-X-MS-Exchange-CrossTenant-AuthSource: DB9PR03MB7689.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Aug 2023 15:06:35.4521
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 7ab090d4-fa2e-4ecf-bc7c-4127b4d582ec
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: hYNE50OdEtkyljPFR78//JFliIb8RxHFISejjUEiNJICQivV7K20PTWWrS7r6ochTEgx1rpH6UxRbitsReHz2TdtjhZmmPe94OQopOEL0X0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR03MB7951
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: François Michel <francois.michel@uclouvain.be>
+From: Magnus Karlsson <magnus.karlsson@intel.com>
 
-Signed-off-by: François Michel <francois.michel@uclouvain.be>
+Fix a use-after-free error that is possible if the xsk_diag interface
+is used at the same time as the socket is being closed. In the early
+days of AF_XDP, the way we tested that a socket was not bound or being
+closed was to simply check if the netdevice pointer in the xsk socket
+structure was NULL. Later, a better system was introduced by having an
+explicit state variable in the xsk socket struct. For example, the
+state of a socket that is going down is XSK_UNBOUND.
+
+The commit in the Fixes tag below deleted the old way of signalling
+that a socket is going down, setting dev to NULL. This in the belief
+that all code using the old way had been exterminated. That was
+unfortunately not true as the xsk diagnostics code was still using the
+old way and thus does not work as intended when a socket is going
+down. Fix this by introducing a test against the state variable. If
+the socket is going down, simply abort the diagnostic's netlink
+operation.
+
+Fixes: 18b1ab7aa76b ("xsk: Fix race at socket teardown")
+Reported-by: syzbot+822d1359297e2694f873@syzkaller.appspotmail.com
+Signed-off-by: Magnus Karlsson <magnus.karlsson@intel.com>
 ---
- tc/q_netem.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/xdp/xsk_diag.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/tc/q_netem.c b/tc/q_netem.c
-index febddd49..3be647ff 100644
---- a/tc/q_netem.c
-+++ b/tc/q_netem.c
-@@ -31,7 +31,7 @@ static void explain(void)
- 		"                 [ loss random PERCENT [CORRELATION]]\n"
- 		"                 [ loss state P13 [P31 [P32 [P23 P14]]]\n"
- 		"                 [ loss gemodel PERCENT [R [1-H [1-K]]]\n"
--		"                 [ seed SEED \n]"
-+		"                 [ seed SEED ]\n"
- 		"                 [ ecn ]\n"
- 		"                 [ reorder PERCENT [CORRELATION] [ gap DISTANCE ]]\n"
- 		"                 [ rate RATE [PACKETOVERHEAD] [CELLSIZE] [CELLOVERHEAD]]\n"
+diff --git a/net/xdp/xsk_diag.c b/net/xdp/xsk_diag.c
+index c014217f5fa7..da3100bfa1c5 100644
+--- a/net/xdp/xsk_diag.c
++++ b/net/xdp/xsk_diag.c
+@@ -111,6 +111,9 @@ static int xsk_diag_fill(struct sock *sk, struct sk_buff *nlskb,
+ 	sock_diag_save_cookie(sk, msg->xdiag_cookie);
+ 
+ 	mutex_lock(&xs->mutex);
++	if (xs->state == XSK_UNBOUND)
++		goto out_nlmsg_trim;
++
+ 	if ((req->xdiag_show & XDP_SHOW_INFO) && xsk_diag_put_info(xs, nlskb))
+ 		goto out_nlmsg_trim;
+ 
+
+base-commit: 35d2b7ffffc1d9b3dc6c761010aa3338da49165b
 -- 
-2.41.0
+2.42.0
 
 
