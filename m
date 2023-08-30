@@ -1,108 +1,124 @@
-Return-Path: <netdev+bounces-31372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D84FD78D568
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 13:08:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C99D78D569
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 13:09:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A35C21C20A74
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 11:08:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1C6128136B
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 11:09:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E2EE3D8F;
-	Wed, 30 Aug 2023 11:08:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAF41441D;
+	Wed, 30 Aug 2023 11:09:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A334406
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 11:08:35 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40FCACC9;
-	Wed, 30 Aug 2023 04:08:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=9V7gLBLZ4ZKefaxWBsYfcwRLnheQHNxgytolgk5UJx4=; b=MOSJKQtbd3z7WPVenT49uuXaP8
-	pcvv3LZSs7xeMW/5TFV6whOaDHFr6OGbp/dgpY220yaXJJs70jzdRj+WADcWn/QNzxParn7yPr6xp
-	SWxxIM/Za2OgGmJd9egkK39QaBiRpBk6cOsoR9r70Y4Lia/lHPx0i3YG4y9rnRm0pD52/QnqIABqJ
-	ScGYmAIIIEVIRQj++xzfQEL7HP6RFI6R0ZpzYQ78MVdYWr2+uij4WilA2SM6uJSC8BoWYbBoFZUF2
-	Poj1CPIvkrDAWCzLZu8X+kE8FH8FJiMBj+XpKW+cnKWtL7j7EDSEkOm0JKlpiieaQzCAKqBCG41+L
-	DTDPYXLg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42286)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qbJ3a-0001Us-2S;
-	Wed, 30 Aug 2023 12:08:18 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qbJ3Z-0005cg-M8; Wed, 30 Aug 2023 12:08:17 +0100
-Date: Wed, 30 Aug 2023 12:08:17 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
-	davem@davemloft.net, Woojung Huh <woojung.huh@microchip.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>, Tristram.Ha@microchip.com,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	UNGLinuxDriver@microchip.com,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] net: phy: Provide Module 4 KSZ9477 errata
- (DS80000754C)
-Message-ID: <ZO8jIQJLE53GH6G6@shell.armlinux.org.uk>
-References: <20230830092119.458330-1-lukma@denx.de>
- <20230830092119.458330-2-lukma@denx.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFB253D6D
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 11:09:08 +0000 (UTC)
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87187CC9;
+	Wed, 30 Aug 2023 04:09:06 -0700 (PDT)
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 37UB8sJC031855;
+	Wed, 30 Aug 2023 06:08:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1693393734;
+	bh=aTIg5mzV7JiNY3xt8bYwUjiNb7vWP7ZZum5iREsZtTQ=;
+	h=From:To:CC:Subject:Date;
+	b=Fc27m1+bXAStdsdD7heVkIAO5Hoa0SVl35K1GkEDe8aMM7ldGo0LXz0NinBxFqdc4
+	 u1p4i1Bw8IX8zaP9YR6qaajF/LxNATvtcvFljD5g1wISWPtAEOBGvDCtEfOVU+qSyJ
+	 jcivULGwkKVCdOJQQ+8Q+leerzILXnC1QbH455Lo=
+Received: from DFLE115.ent.ti.com (dfle115.ent.ti.com [10.64.6.36])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 37UB8spd020349
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 30 Aug 2023 06:08:54 -0500
+Received: from DFLE100.ent.ti.com (10.64.6.21) by DFLE115.ent.ti.com
+ (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 30
+ Aug 2023 06:08:53 -0500
+Received: from lelv0327.itg.ti.com (10.180.67.183) by DFLE100.ent.ti.com
+ (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Wed, 30 Aug 2023 06:08:53 -0500
+Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
+	by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id 37UB8r3O100193;
+	Wed, 30 Aug 2023 06:08:53 -0500
+Received: from localhost (uda0501179.dhcp.ti.com [172.24.227.35])
+	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 37UB8qRY005982;
+	Wed, 30 Aug 2023 06:08:53 -0500
+From: MD Danish Anwar <danishanwar@ti.com>
+To: Simon Horman <horms@kernel.org>, Roger Quadros <rogerq@kernel.org>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Jacob Keller
+	<jacob.e.keller@intel.com>, Andrew Lunn <andrew@lunn.ch>,
+        MD Danish Anwar
+	<danishanwar@ti.com>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Paolo Abeni
+	<pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+        Eric Dumazet
+	<edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <srk@ti.com>,
+        <r-gunasekaran@ti.com>
+Subject: [RFC PATCH net-next 0/4] Introduce switch mode and TAPRIO offload support for ICSSG driver
+Date: Wed, 30 Aug 2023 16:38:43 +0530
+Message-ID: <20230830110847.1219515-1-danishanwar@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230830092119.458330-2-lukma@denx.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 30, 2023 at 11:21:19AM +0200, Lukasz Majewski wrote:
-> +	/* KSZ9477 Errata DS80000754C
-> +	 *
-> +	 * Module 4: Energy Efficient Ethernet (EEE) feature select must be
-> +	 * manually disabled
-> +	 *   The EEE feature is enabled by default, but it is not fully
-> +	 *   operational. It must be manually disabled through register
-> +	 *   controls. If not disabled, the PHY ports can auto-negotiate
-> +	 *   to enable EEE, and this feature can cause link drops when linked
-> +	 *   to another device supporting EEE.
-> +	 *
-> +	 *   Although, the KSZ9477 MMD register
-> +	 *   (MMD_DEVICE_ID_EEE_ADV.MMD_EEE_ADV) advertise that EEE is
-> +	 *   operational one needs to manualy clear them to follow the chip
-> +	 *   errata.
-> +	 */
-> +	linkmode_and(phydev->supported_eee, phydev->supported, zero);
+This series adds support for switch-mode and TAPRIO offload for ICSSG 
+driver. This series also introduces helper APIs to configure firmware
+maintained FDB (Forwarding Database) and VLAN tables. These APIs are later
+used by ICSSG driver in switch mode.
 
-Hi,
+Thanks and Regards,
+Md Danish Anwar
 
-I'm wondering whether you had a reason to write the above, rather than
-use the simpler:
+MD Danish Anwar (3):
+  net: ti: icssg-prueth: Add helper functions to configure FDB
+  net: ti: icssg-switch: Add switchdev based driver for ethernet switch
+    support
+  net: ti: icssg-prueth: Add support for ICSSG switch firmware on AM654
+    PG2.0 EVM
 
-	linkmode_zero(phydev->supported_eee);
+Roger Quadros (1):
+  net: ti: icssg_prueth: add TAPRIO offload support
 
-Thanks.
+ drivers/net/ethernet/ti/Kconfig               |   1 +
+ drivers/net/ethernet/ti/Makefile              |   4 +-
+ drivers/net/ethernet/ti/icssg/icssg_config.c  | 324 +++++++++++-
+ drivers/net/ethernet/ti/icssg/icssg_config.h  |  25 +
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c  | 367 +++++++++++++-
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h  |  55 ++
+ drivers/net/ethernet/ti/icssg/icssg_qos.c     | 294 +++++++++++
+ drivers/net/ethernet/ti/icssg/icssg_qos.h     | 119 +++++
+ .../net/ethernet/ti/icssg/icssg_switchdev.c   | 478 ++++++++++++++++++
+ .../net/ethernet/ti/icssg/icssg_switchdev.h   |  13 +
+ 10 files changed, 1666 insertions(+), 14 deletions(-)
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_qos.c
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_qos.h
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_switchdev.c
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_switchdev.h
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.34.1
+
 
