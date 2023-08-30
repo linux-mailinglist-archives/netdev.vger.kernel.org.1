@@ -1,187 +1,247 @@
-Return-Path: <netdev+bounces-31434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A33C78D74D
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 17:53:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD00B78D7A6
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 18:38:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CA342810D6
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 15:53:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DC341C208FB
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 16:38:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECFB8746C;
-	Wed, 30 Aug 2023 15:53:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A0E15383;
+	Wed, 30 Aug 2023 16:38:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E08D37469
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 15:53:41 +0000 (UTC)
-Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C06D193
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 08:53:40 -0700 (PDT)
-Received: by mail-qt1-x82e.google.com with SMTP id d75a77b69052e-4036bd4fff1so352911cf.0
-        for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 08:53:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1693410819; x=1694015619; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MNz7cpf2XwdCtEvSFjcjD+zwimXx2MBuyu+yEYFgDqg=;
-        b=q9PKHjtiDYXmanLrsnfKjx7+gGxdCEQ1PeDz/GmMRTcBmjbwW6ViPq4zJgue524k+m
-         L26GAWO+DCyUdIvFV6UFKvWEy+gt6TZW6eIUYXQW+GwgsNfytnsEr8xMMk/zmOzLMQc6
-         1Bi7GlkT0bT/f7ne4TfHghbzvG3U91JTvqg/luwbfa4Ay2nuI5MqH2fCpQ01rSkqh30+
-         mWr67SEn4ObU7S5RR6gt/dBzzAufEDHNINH/rRzsrP/ZYNUCB8edkGgnqOpe5LFyOpNP
-         DdodbkDfzZ58gygxKdpfglrJmzjchRUggS0i/jWKvT2PHkHcX1v0u1ljIa89GGZCWjqQ
-         +rnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693410819; x=1694015619;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MNz7cpf2XwdCtEvSFjcjD+zwimXx2MBuyu+yEYFgDqg=;
-        b=CZrkhNhmYEPJA0n0BMai34C4m4kOABm1Peby9VTteq8120yi85dUiP/06XRHcYikrH
-         a37uObaRkssUWATWZtVtT4gG3gQzYJZFU+6MfNN3jdm39J5JQZvHyWTjFyi82wGOhREx
-         SiKuj4UpkVUIFpLtjpzAoqxHLGa8gg3fhXuDW98yGCRU5DklN8wl1ZqsCK0Y8EJH4AvM
-         /IEyLioNeAdM9eGYDUysLSPY67yu1VMQJ877FlkI5/j5doa1V9CfuTWix3ywVhb38JOt
-         wtSh9JLYcZXs06BF+QAjWMXJzJ7prl5Rqz87/3swnWBOiKPFzUMkNlVLE33l+hrtZxEB
-         xj3w==
-X-Gm-Message-State: AOJu0Yx8VHrCmd9gTVfxLElSrE7jdpnNjnRAcd7kp+Odrasu/PIrQCMS
-	pmuhwvnn8IuuY/y9fatVnP7FfbLzFfaMvVZK72i6lQ==
-X-Google-Smtp-Source: AGHT+IEPRuXLavQ88WWm6s+FebZe3L4VexmvBdRKzcSvKYGSYf0tl8kuuDTxH/ajZuWplvfSILPRkAUiVRcYtLV3w6w=
-X-Received: by 2002:a05:622a:452:b0:410:9855:ac6 with SMTP id
- o18-20020a05622a045200b0041098550ac6mr548673qtx.14.1693410819254; Wed, 30 Aug
- 2023 08:53:39 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A54723D4
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 16:38:36 +0000 (UTC)
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59B4B19A;
+	Wed, 30 Aug 2023 09:38:32 -0700 (PDT)
+Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 94013863DA;
+	Wed, 30 Aug 2023 18:38:24 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1693413505;
+	bh=Vq4tCwGppZsplQyXZje86VCfWpaZHishwdiN+Yqfavg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=G7GyKrERuJqi8IhQNYV2gMCOHk2zZKdRRMjRSTOLkfZkv89siaO9eiSVzRsiTHpvC
+	 mtvlovxnRuiFZkpfWYRDhZ8T4TDCeU4SfVsBTVFLsKAUSEWdj9q3WTDoOU4/KQ6Wii
+	 yQ+5NIOSl+7HiDo6Ag9OSzDyF109XefnltyG1jmfU0HsRP/4lVVu7i050PfGOrJBMb
+	 FJ9/15RIQlMyNGflCncoGnOVl9WclNWq7hYSrhWv3AkDE9ykuiVRll9lWjpby69oJu
+	 gr/GtiXg/KP6x63kQtKxaxQ6wakxXv5xskNlQ/6TSnG4c9so63fKSLDkRSVrndQ/7t
+	 rrljrDpu+vG2A==
+Date: Wed, 30 Aug 2023 18:38:18 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, Eric Dumazet
+ <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net,
+ Woojung Huh <woojung.huh@microchip.com>, Vladimir Oltean
+ <olteanv@gmail.com>, Tristram.Ha@microchip.com, Florian Fainelli
+ <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, UNGLinuxDriver@microchip.com, Heiner Kallweit
+ <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] net: phy: Provide Module 4 KSZ9477 errata
+ (DS80000754C)
+Message-ID: <20230830183818.1f42919b@wsk>
+In-Reply-To: <20230830142650.GL31399@pengutronix.de>
+References: <20230830092119.458330-1-lukma@denx.de>
+	<20230830092119.458330-2-lukma@denx.de>
+	<20230830101813.GG31399@pengutronix.de>
+	<20230830125224.1012459f@wsk>
+	<20230830105941.GH31399@pengutronix.de>
+	<20230830135151.683303db@wsk>
+	<20230830121738.GJ31399@pengutronix.de>
+	<ZO83htinyfAp4mWw@shell.armlinux.org.uk>
+	<20230830130649.GK31399@pengutronix.de>
+	<ZO9Ejx9G8laNRasu@shell.armlinux.org.uk>
+	<20230830142650.GL31399@pengutronix.de>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230829123541.3745013-1-edumazet@google.com> <ZO9Q0ih6OQhq7sio@localhost.localdomain>
- <CAM0EoMnpL5rE-zDhiY_FKTOguX_3kKkWCGdX0ry8ZWXjmRLjfA@mail.gmail.com>
- <CANn89iLf6+6679LrTV-c2XZWMEeRc3O0N+++yKNqQUxQzjspJw@mail.gmail.com> <CAM0EoMn+W0xiFxS9VPjzgW0-z2-M-cNS2RwXZJeRN6+G7ENmWw@mail.gmail.com>
-In-Reply-To: <CAM0EoMn+W0xiFxS9VPjzgW0-z2-M-cNS2RwXZJeRN6+G7ENmWw@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 30 Aug 2023 17:53:28 +0200
-Message-ID: <CANn89iK0An9y-u3pCfQZism9F0Mtt6Qn-J7DwA=vsk6k+sNcjw@mail.gmail.com>
-Subject: Re: [PATCH net] net/sched: fq_pie: avoid stalls in fq_pie_timer()
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Michal Kubiak <michal.kubiak@intel.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, syzbot+e46fbd5289363464bc13@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; boundary="Sig_/HDhBKiZ42GjkylX./H/Qstn";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+	T_SPF_TEMPERROR autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 30, 2023 at 5:50=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com>=
- wrote:
->
-> On Wed, Aug 30, 2023 at 11:00=E2=80=AFAM Eric Dumazet <edumazet@google.co=
-m> wrote:
-> >
-> > On Wed, Aug 30, 2023 at 4:48=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.=
-com> wrote:
-> > >
-> > > On Wed, Aug 30, 2023 at 10:30=E2=80=AFAM Michal Kubiak <michal.kubiak=
-@intel.com> wrote:
-> > > >
-> > > > On Tue, Aug 29, 2023 at 12:35:41PM +0000, Eric Dumazet wrote:
-> > > > > When setting a high number of flows (limit being 65536),
-> > > > > fq_pie_timer() is currently using too much time as syzbot reporte=
-d.
-> > > > >
-> > > > > Add logic to yield the cpu every 2048 flows (less than 150 usec
-> > > > > on debug kernels).
-> > > > > It should also help by not blocking qdisc fast paths for too long=
-.
-> > > > > Worst case (65536 flows) would need 31 jiffies for a complete sca=
-n.
-> > > > >
-> > > > > Relevant extract from syzbot report:
-> > > > >
-> > > > > rcu: INFO: rcu_preempt detected expedited stalls on CPUs/tasks: {=
- 0-.... } 2663 jiffies s: 873 root: 0x1/.
-> > > > > rcu: blocking rcu_node structures (internal RCU debug):
-> > > > > Sending NMI from CPU 1 to CPUs 0:
-> > > > > NMI backtrace for cpu 0
-> > > > > CPU: 0 PID: 5177 Comm: syz-executor273 Not tainted 6.5.0-syzkalle=
-r-00453-g727dbda16b83 #0
-> > > > > Hardware name: Google Google Compute Engine/Google Compute Engine=
-, BIOS Google 07/26/2023
-> > > > > RIP: 0010:check_kcov_mode kernel/kcov.c:173 [inline]
-> > > > > RIP: 0010:write_comp_data+0x21/0x90 kernel/kcov.c:236
-> > > > > Code: 2e 0f 1f 84 00 00 00 00 00 65 8b 05 01 b2 7d 7e 49 89 f1 89=
- c6 49 89 d2 81 e6 00 01 00 00 49 89 f8 65 48 8b 14 25 80 b9 03 00 <a9> 00 =
-01 ff 00 74 0e 85 f6 74 59 8b 82 04 16 00 00 85 c0 74 4f 8b
-> > > > > RSP: 0018:ffffc90000007bb8 EFLAGS: 00000206
-> > > > > RAX: 0000000000000101 RBX: ffffc9000dc0d140 RCX: ffffffff885893b0
-> > > > > RDX: ffff88807c075940 RSI: 0000000000000100 RDI: 0000000000000001
-> > > > > RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000000
-> > > > > R10: 0000000000000000 R11: 0000000000000000 R12: ffffc9000dc0d178
-> > > > > R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
-> > > > > FS:  0000555555d54380(0000) GS:ffff8880b9800000(0000) knlGS:00000=
-00000000000
-> > > > > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > > > CR2: 00007f6b442f6130 CR3: 000000006fe1c000 CR4: 00000000003506f0
-> > > > > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> > > > > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> > > > > Call Trace:
-> > > > >  <NMI>
-> > > > >  </NMI>
-> > > > >  <IRQ>
-> > > > >  pie_calculate_probability+0x480/0x850 net/sched/sch_pie.c:415
-> > > > >  fq_pie_timer+0x1da/0x4f0 net/sched/sch_fq_pie.c:387
-> > > > >  call_timer_fn+0x1a0/0x580 kernel/time/timer.c:1700
-> > > > >
-> > > > > Fixes: ec97ecf1ebe4 ("net: sched: add Flow Queue PIE packet sched=
-uler")
-> > > > > Link: https://lore.kernel.org/lkml/00000000000017ad3f06040bf394@g=
-oogle.com/
-> > > > > Reported-by: syzbot+e46fbd5289363464bc13@syzkaller.appspotmail.co=
-m
-> > > > > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > > >
-> > > > The code logic and style looks good to me.
-> > > > However, I don't have experience with that code to estimate if 2048
-> > > > flows per round is enough to avoid stalls for all normal circumstan=
-ces,
-> > > > so I guess someone else should take a look.
-> > > >
-> > >
-> > > Eric, I had the same question: Why 2048 (why not 12 for example? ;->)=
-.
-> > > Could that number make more sense to add as an init attribute? Not
-> > > asking you to add it but i or somebody else could send a followup
-> > > patch after.
-> >
-> > This is based on experimentation.
-> >
-> > I started using 1024, then saw that using 2048 was okay.
-> >
-> > I think I gave some numbers in the changelog :
-> > "(less than 150 usec on debug kernels)."
-> >
-> > Spending 150 usec every jiffie seems reasonable to me.
-> >
-> > Honestly, I am not sure if anyone was/is using a high number of flows,
-> > given that whole qdisc enqueue/dequeue operations were frozen every 15m=
-s for
-> > 2 or 3 ms on non debug kernels :/
->
-> Unfortunately such numbers tend to depend on the CPU used etc. Once
-> your patch goes in we can add an extension to set a netlink attribute
-> so the user can change this value (by default keep it at 2048).
->
+--Sig_/HDhBKiZ42GjkylX./H/Qstn
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Then syzbot will set this new attribute to 65536 and we are back to
-the initial bug.
+Hi Oleksij,
+
+> On Wed, Aug 30, 2023 at 02:30:55PM +0100, Russell King (Oracle) wrote:
+> > On Wed, Aug 30, 2023 at 03:06:49PM +0200, Oleksij Rempel wrote: =20
+> > > On Wed, Aug 30, 2023 at 01:35:18PM +0100, Russell King (Oracle)
+> > > wrote: =20
+> > > > On Wed, Aug 30, 2023 at 02:17:38PM +0200, Oleksij Rempel wrote:
+> > > > =20
+> > > > > On Wed, Aug 30, 2023 at 01:51:51PM +0200, Lukasz Majewski
+> > > > > wrote: =20
+> > > > > > Hi Oleksij, =20
+> > > > >  =20
+> > > > > > It looks like the most optimal solution would be the one
+> > > > > > proposed by Tristam:
+> > > > > > https://www.spinics.net/lists/netdev/msg932044.html =20
+> > > > >=20
+> > > > > In this case, please add the reason why it would work on this
+> > > > > HW and will not break by any changes in PHYlib or micrel.c
+> > > > > driver.
+> > > > >=20
+> > > > > If I remember it correctly, in KSZ9477 variants, if you write
+> > > > > to EEE advertisement register, it will affect the state of a
+> > > > > EEE capability register. Which break IEEE 802.3 specification
+> > > > > and the reason why ksz9477_get_features() actually exist. But
+> > > > > can be used as workaround if it is written early enough
+> > > > > before PHYlib tried to read EEE capability register.
+> > > > >=20
+> > > > > Please confirm my assumption by applying your workaround and
+> > > > > testing it with ethtool --show-eee lanX.
+> > > > >=20
+> > > > > It should be commented in the code with all kind of warnings:
+> > > > > Don't move!!! We use one bug to workaround another bug!!! If
+> > > > > PHYlib start scanning PHYs before this code is executed, then
+> > > > > thing may break!! =20
+> > > >=20
+> > > > Why would phylib's scanning cause breakage?
+> > > >=20
+> > > > phylib's scanning for PHYs is about reading the ID registers
+> > > > etc. It doesn't do anything until the PHY has been found, and
+> > > > then the first thing that happens when the phy_device structure
+> > > > is created is an appropriate driver is located, and the
+> > > > driver's ->probe function is called.
+> > > >=20
+> > > > If that is successful, then the fewatures are read. If the PHY
+> > > > driver's ->features member is set, then that initialises the
+> > > > "supported" mask and we read the EEE abilities.
+> > > >=20
+> > > > If ->features is not set, then we look to see whether the driver
+> > > > provides a ->get_features method, and call that.
+> > > >=20
+> > > > Otherwise we use the generic genphy_c45_pma_read_abilities() or
+> > > > genphy_read_abilities() depending whether the PHY's is_c45 is
+> > > > set or not.
+> > > >=20
+> > > > So, if you want to do something very early before features are
+> > > > read, then either don't set .features, and do it early in
+> > > > .get_features before calling anything else, or do it in the
+> > > > ->probe function. =20
+> > >=20
+> > > Let me summarize my view on the problem, so may be you can
+> > > suggest a better way to solve it.
+> > > - KSZ9477, KSZ8565, KSZ9893, KSZ9563, seems to have different
+> > > quirks by the same PHYid. micrel.c driver do now know what exact
+> > > HW is actually in use.
+> > > - A set of PHY workarounds was moved from dsa/microchip/ksz9477.c
+> > > to micrel.c, one of this workaround was clearing EEE advertisement
+> > >   register, which by accident was clearing EEE capability
+> > > register. Since EEE cap was cleared by the
+> > > dsa/microchip/ksz9477.c code before micrel.c was probed, PHYlib
+> > > was assuming that his PHY do not supports EEE and dint tried to
+> > > use it. After moving this code to micrel.c, it is now trying to
+> > > change EEE advertisement state without letting PHYlib to know
+> > > about it and PHYlib re enables it as actually excepted.
+> > > - so far, only KSZ9477 seems to be broken beyond repair, so it is
+> > > better to disable EEE without giving it as a choice for user
+> > > configuration. =20
+> >=20
+> > We do have support in phylib for "broken EEE modes" which DT could
+> > set for the broken PHYs, and as it is possible to describe the DSA
+> > PHYs in DT. This sets phydev->eee_broken_modes.
+> >=20
+> > phydev->eee_broken_modes gets looked at when genphy_config_aneg() or
+> > genphy_c45_an_config_aneg() gets called - which will happen when the
+> > PHY is being "started".
+> >=20
+> > So, you could add the DT properties as appropriate to disable all
+> > the EEE modes.
+> >=20
+> > Alternatively, in your .config_init function, you could detect your
+> > flag and force eee_broken_modes to all-ones. =20
+>=20
+> @Lukasz,
+>=20
+> can you please try to set eee_broken_modes to all-ones. Somewhat like
+> this:
+> ksz9477_config_init()
+> ...
+>    ...quirks...
+>=20
+>    if (phydev->dev_flages & .. NO_EEE...)
+>        phydev->eee_broken_modes =3D -1;
+>=20
+>    err =3D genphy_restart_aneg(phydev);
+>    ...
+>=20
+
+The implementation as you suggested seems to work :-)
+
+The ksz_get_phy_flags() - where the MICREL_NO_EEE is set is executed
+before ksz9477_config_init().
+
+And then the eee_broken_modes are taken into account.
+
+# ethtool --show-eee lan1
+EEE Settings for lan1:
+        EEE status: disabled
+        Tx LPI: 0 (us)
+        Supported EEE link modes:  100baseT/Full=20
+                                   1000baseT/Full=20
+        Advertised EEE link modes:  Not reported
+        Link partner advertised EEE link modes:  Not reported
+
+I will prepare tomorrow a proper patch.
+
+> @Russell, thx!
+>=20
+> Regards,
+> Oleksij
+
+
+
+
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/HDhBKiZ42GjkylX./H/Qstn
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmTvcHoACgkQAR8vZIA0
+zr2CKggAwnXHPCv9T3+LjMLaAbCfTmQYU3/eM2lw9tY6SuziHn5nilWy1m2YPxHy
+fCMCf65/sJO5ll3aY7g6rZrgJNzaA65O/WcevEMzsJdbORHknngFtSmbjEWKhZML
+zccUWjONPEQJRz8VKHbSEBJU0+vI6WM/V8gMlezIsHLWv2r3CyUEdovDm5Byfu2x
+/+Hveps5DckxLILVBqHz/26ilrLV50RjUbQhL/CNjy/vP+flFzb+v3d4d2EAkEqD
+ypOylv6tQUvptjLeBTRHTb5yYH+f2TOaktZNBA8VK8DPohSFhgAoeL9jS06tltNY
+cxF01C4vci92cJysyHglAGWOb4MJnA==
+=C6Us
+-----END PGP SIGNATURE-----
+
+--Sig_/HDhBKiZ42GjkylX./H/Qstn--
 
