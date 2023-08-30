@@ -1,186 +1,154 @@
-Return-Path: <netdev+bounces-31398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FEBC78D618
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 15:24:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 736FF78D624
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 15:30:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5771281185
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 13:24:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A67491C203B6
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 13:30:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D168567F;
-	Wed, 30 Aug 2023 13:24:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05A005694;
+	Wed, 30 Aug 2023 13:30:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1275B3FFB
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 13:24:05 +0000 (UTC)
-Received: from phobos.denx.de (phobos.denx.de [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4ACF21A3;
-	Wed, 30 Aug 2023 06:24:04 -0700 (PDT)
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 9ECB0862F1;
-	Wed, 30 Aug 2023 15:24:01 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1693401842;
-	bh=tDm48SEXOQC336EEKo1jetqWgnlrhRnlP90mRK3rqnQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KxhWoohO3lenSAOjuLRo2n9uOXXREQkOjVTwPhMbyefQK87DcN4fkAAvusmGNj8Cp
-	 4AknMk2N9nW1Fq4ElwRg2hJhQKR0Knb52GUhm1ijBjOfiYDvjjSOW30+W4LQBCscQU
-	 Y4FeZb1ONsf+6pdSUoWZDMq3pmdurX+lnw+LD22CTqjWQAMSwwq45rgBCk8ijtWKh2
-	 0JegeE8gbJxfjmlqVDA5ow3MulpT/SYu4K3O57blkPCUPYoSAo6e4J4h4SSIxtDokN
-	 WgYjPRcWFpvjWFyf8QIzo5ESj8OvqFabFQnO5ZRZVEMlvLRHnPPYGIwMsSfOi11+mC
-	 /QYljx+zCTYEQ==
-Date: Wed, 30 Aug 2023 15:23:54 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
- davem@davemloft.net, Woojung Huh <woojung.huh@microchip.com>, Vladimir
- Oltean <olteanv@gmail.com>, Tristram.Ha@microchip.com, Florian Fainelli
- <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, UNGLinuxDriver@microchip.com, Russell King
- <linux@armlinux.org.uk>, Heiner Kallweit <hkallweit1@gmail.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] net: phy: Provide Module 4 KSZ9477 errata
- (DS80000754C)
-Message-ID: <20230830152354.57108943@wsk>
-In-Reply-To: <20230830121738.GJ31399@pengutronix.de>
-References: <20230830092119.458330-1-lukma@denx.de>
-	<20230830092119.458330-2-lukma@denx.de>
-	<20230830101813.GG31399@pengutronix.de>
-	<20230830125224.1012459f@wsk>
-	<20230830105941.GH31399@pengutronix.de>
-	<20230830135151.683303db@wsk>
-	<20230830121738.GJ31399@pengutronix.de>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E55C5538A
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 13:30:41 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B78E198
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 06:30:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1693402239;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QrmtevR+OHspc/c545A2F7OAMYEjllnCprVaLeVCRbQ=;
+	b=Oi4msi9VB3j0ZgJuqCfU42WZObDCxWJQgAsZSl+Ouk+H2iUVnUXEzIGaL5vwsQk/KvfAk+
+	Sr4GcZdrMPg08zs5kLCFGQoaMKuXUfz9yJjGHRsG29qALHoCv4Fb+tdDPJPSONkvCBUdry
+	EIquKv6LZqSAsIYytV/oq6fMaN3Xd9c=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-172-GuJV49bPPUi3JaMy8TK0uA-1; Wed, 30 Aug 2023 09:30:38 -0400
+X-MC-Unique: GuJV49bPPUi3JaMy8TK0uA-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-978a991c3f5so428899866b.0
+        for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 06:30:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693402237; x=1694007037;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QrmtevR+OHspc/c545A2F7OAMYEjllnCprVaLeVCRbQ=;
+        b=h/SI0JoCDwuzjxpJsz9A/j7KDJTAixPgPO7cL1wKhgfr1hA7Cg82I9l+thhZNNQcUS
+         fKEYY/e2dp6xSb5q2tVYbvsDBFy0XXZhyL/Dar+mpb0oOiNPp3MQTDpFKUbFh6IFvJaL
+         zh/7ycXLgqGxwaMhmakUII3MPzfcy+QEFjj85V9pCRxvGkkUj+on/c2DP+RdbhYRyRyF
+         u6wV7m/yvcXvDV8ljE9JdBLl885rIZJa7CoSmsgu0vjRA8AYibuR8lWNek36XAbEAEU+
+         6VwkgP3kw3MCVbFwh3y8KxActE4FIRLcgcW1GKia0oJa2528IrWD/cntzZSc5FbZMHEI
+         UkxA==
+X-Gm-Message-State: AOJu0YykV01FnfJzsmLyuOGlzRUHBvGY9Z7a4CaEbVZ12iu79XxKSvc+
+	m4L368cZ/GOfmjFfaeq4kyBCILXIfRPUE52rz+FDRUmjI07/FJLCPKRufzsxY3ZAu38Jrv+rI3J
+	ajTDaOHnvcz6x4e0K
+X-Received: by 2002:a17:906:8b:b0:9a5:7887:ef09 with SMTP id 11-20020a170906008b00b009a57887ef09mr1872771ejc.32.1693402237183;
+        Wed, 30 Aug 2023 06:30:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEYxUHeyUiFVorh4ZDehN292nCkRvDukdS6QYJWdvud4F+ML6iNTqT9rYxTEkbhUobIqpPlWg==
+X-Received: by 2002:a17:906:8b:b0:9a5:7887:ef09 with SMTP id 11-20020a170906008b00b009a57887ef09mr1872753ejc.32.1693402236839;
+        Wed, 30 Aug 2023 06:30:36 -0700 (PDT)
+Received: from redhat.com ([2.55.167.22])
+        by smtp.gmail.com with ESMTPSA id ju26-20020a17090798ba00b00982a352f078sm7183100ejc.124.2023.08.30.06.30.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Aug 2023 06:30:35 -0700 (PDT)
+Date: Wed, 30 Aug 2023 09:30:31 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Maxime Coquelin <maxime.coquelin@redhat.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, xieyongji@bytedance.com,
+	jasowang@redhat.com, david.marchand@redhat.com, lulu@redhat.com,
+	linux-kernel@vger.kernel.org,
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+	xuanzhuo@linux.alibaba.com, eperezma@redhat.com
+Subject: Re: [PATCH v3 0/3] vduse: add support for networking devices
+Message-ID: <20230830091607-mutt-send-email-mst@kernel.org>
+References: <20230705100430.61927-1-maxime.coquelin@redhat.com>
+ <20230810150347-mutt-send-email-mst@kernel.org>
+ <20230810142949.074c9430@kernel.org>
+ <20230810174021-mutt-send-email-mst@kernel.org>
+ <20230810150054.7baf34b7@kernel.org>
+ <ad2b2f93-3598-cffc-0f0d-fe20b2444011@redhat.com>
+ <20230829130430-mutt-send-email-mst@kernel.org>
+ <651476f1-ccae-0ba1-4778-1a63f34aa65d@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/r8EfiN=D1y4NgEH=TvzF.ZJ";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <651476f1-ccae-0ba1-4778-1a63f34aa65d@redhat.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---Sig_/r8EfiN=D1y4NgEH=TvzF.ZJ
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Wed, Aug 30, 2023 at 01:27:18PM +0200, Maxime Coquelin wrote:
+> 
+> 
+> On 8/29/23 19:05, Michael S. Tsirkin wrote:
+> > On Tue, Aug 29, 2023 at 03:34:06PM +0200, Maxime Coquelin wrote:
+> > > 
+> > > 
+> > > On 8/11/23 00:00, Jakub Kicinski wrote:
+> > > > On Thu, 10 Aug 2023 17:42:11 -0400 Michael S. Tsirkin wrote:
+> > > > > > Directly into the stack? I thought VDUSE is vDPA in user space,
+> > > > > > meaning to get to the kernel the packet has to first go thru
+> > > > > > a virtio-net instance.
+> > > > > 
+> > > > > yes. is that a sufficient filter in your opinion?
+> > > > 
+> > > > Yes, the ability to create the device feels stronger than CAP_NET_RAW,
+> > > > and a bit tangential to CAP_NET_ADMIN. But I don't have much practical
+> > > > experience with virt so no strong opinion, perhaps it does make sense
+> > > > for someone's deployment? Dunno..
+> > > > 
+> > > 
+> > > I'm not sure CAP_NET_ADMIN should be required for creating the VDUSE
+> > > devices, as the device could be attached to vhost-vDPA and so not
+> > > visible to the Kernel networking stack.
+> > > 
+> > > However, CAP_NET_ADMIN should be required to attach the VDUSE device to
+> > > virtio-vdpa/virtio-net.
+> > > 
+> > > Does that make sense?
+> > > 
+> > > Maxime
+> > 
+> > OK. How are we going to enforce it?
+> 
+> Actually, it seems already enforced for all VDPA devices types.
+> Indeed, the VDPA_CMD_DEV_NEW Netlink command used to add the device to
+> the VDPA bus has the GENL_ADMIN_PERM flag set, and so require
+> CAT_NET_ADMIN.
 
-Hi Oleksij,
+Hmm good point. Pity I didn't notice earlier. Oh well there's always
+the next release.
 
-> On Wed, Aug 30, 2023 at 01:51:51PM +0200, Lukasz Majewski wrote:
-> > Hi Oleksij, =20
->=20
-> > It looks like the most optimal solution would be the one proposed by
-> > Tristam:
-> > https://www.spinics.net/lists/netdev/msg932044.html =20
->=20
-> In this case, please add the reason why it would work on this HW and
-> will not break by any changes in PHYlib or micrel.c driver.
->=20
+> > Also, we need a way for selinux to enable/disable some of these things
+> > but not others.
+> 
+> Ok, I can do it in a patch on top.
+> Do you have a pointer where it is done for Virtio Block devices?
+> 
+> Maxime
 
-The ksz9477_config_cpu_port() is called from ksz_setup. In this
-function we would clear 7.60 MMD register for EEE advertisement.
+It's not done yet - at the moment vduse device is always block so we
+didn't need the distinction.
 
-Only after the switch initialization, the phy code reads 7.60 register
-for each port and on that basis decides if the EEE is supported or not.
+-- 
+MST
 
-(And only then ksz9477_get_features() is executed. Finally
-ksz_get_phy_flags() is called.
-
-> If I remember it correctly, in KSZ9477 variants, if you write to EEE
-> advertisement register, it will affect the state of a EEE capability
-> register. Which break IEEE 802.3 specification and the reason why
-> ksz9477_get_features() actually exist. But can be used as workaround
-> if it is written early enough before PHYlib tried to read EEE
-> capability register.
->=20
-> Please confirm my assumption by applying your workaround and testing
-> it with ethtool --show-eee lanX.
->=20
-
-# ethtool --show-eee lan1
-EEE Settings for lan1:
-        EEE status: disabled
-        Tx LPI: 0 (us)
-        Supported EEE link modes:  100baseT/Full=20
-                                   1000baseT/Full=20
-        Advertised EEE link modes:  Not reported
-        Link partner advertised EEE link modes:  Not reported
-#=20
-# ethtool --show-eee lan2
-EEE Settings for lan2:
-        EEE status: disabled
-        Tx LPI: 0 (us)
-        Supported EEE link modes:  100baseT/Full=20
-                                   1000baseT/Full=20
-        Advertised EEE link modes:  Not reported
-        Link partner advertised EEE link modes:  Not reported
-
-
-> It should be commented in the code with all kind of warnings:
-> Don't move!!! We use one bug to workaround another bug!!!
-
-As I've pointed out in the previous e-mail. This kind of bug cannot be
-easily fixed with modifying flags in ksz_get_phy_flags() as this
-function is called after ksz9477_get_features().
-
-I'm open for ideas to do it right...
-
-> If PHYlib
-> start scanning PHYs before this code is executed, then thing may
-> break!!
-
-Is it possible that PHY lib will start scanning for phys before the DSA
-switch IC is probed with SPI?
-
-KSZ9477-EVB DTS is not using "mdio" node - i.e. the "old" scheme for DSA
-switch is used.
-
->=20
-> ... it is broken as hell....
->=20
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/r8EfiN=D1y4NgEH=TvzF.ZJ
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmTvQuoACgkQAR8vZIA0
-zr28MggAiXlqveYPpB1sKH2Tl9fFC0ko55CfeSHMhzvn0yVKX6fEA2+oHzuebFeX
-gYvC92NFDA65mDzuM/pBrPK/WJJ67aQei2ofZv/dE8XPWyF4lhcg5gpMw6ZFheW0
-xOFgiSWJe3cLDi7HZ2iyCguFKYLP5DWWzYLPwAwoewJkWXDhwStI6o+4j1p63Tm/
-7wOUDi8SGosKx99PDB5p7XWBOCDiX7KDmcNGizA2Nkq68Fmq9Mz8fJ1Ars4C4FnQ
-L3afFHT2xqEJdPZVt1vNCLGjQOHmZJly8h0gi12cTTwntsqucs1xNe02k4uUfQz1
-qOmPA8Aec5UWxEpAJlI7o/0fpqyr1A==
-=N+Tp
------END PGP SIGNATURE-----
-
---Sig_/r8EfiN=D1y4NgEH=TvzF.ZJ--
 
