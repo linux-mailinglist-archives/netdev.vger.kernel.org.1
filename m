@@ -1,175 +1,162 @@
-Return-Path: <netdev+bounces-31400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C3D778D626
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 15:31:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D8B4178D642
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 15:42:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1152B281175
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 13:31:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 387432811B6
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 13:42:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 181805694;
-	Wed, 30 Aug 2023 13:31:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 113DD63AD;
+	Wed, 30 Aug 2023 13:42:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09E1063AB
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 13:31:12 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 706A2198;
-	Wed, 30 Aug 2023 06:31:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=qXDnTENf1cpDwSglV1bKnUnQe/xh9v6pAXIFuXIgylc=; b=OG050MqMB1dVOtvFlGV2rC0qD4
-	mZmWrfGqn72HGqSt1lahm1QBPQXkMhwzi1s75kucl+kg5N4RcCfbW1WQfpGbDB3cOvdjKWGUvKPR6
-	jaaarw2cbWpS3ByStjNbdZ4aYR2oCUpNDTwB6PDfV+3JmcenFiuxwBH1AGSp3x9eI+31XqvXfwDWi
-	7iLvnFqrwVkmiNMgBakVdH4XS4wjQ16Xd99Z0z8AUodi5ej+HWHq2LsjkiVCArfYyhDTlDZ3vqsUf
-	dAl7vAPKw4oXerqXOPi9WCscpSOL8BJLM3pCjUTohwsG7yOYxp68lSm8vsrIN9ljW7xS3U3Wr8jA5
-	bqPCzRIg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57212)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qbLHb-0001f6-2h;
-	Wed, 30 Aug 2023 14:30:57 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qbLHb-0005j4-IW; Wed, 30 Aug 2023 14:30:55 +0100
-Date: Wed, 30 Aug 2023 14:30:55 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Lukasz Majewski <lukma@denx.de>, Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Vladimir Oltean <olteanv@gmail.com>, Tristram.Ha@microchip.com,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	UNGLinuxDriver@microchip.com,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00CF11FBB
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 13:42:54 +0000 (UTC)
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3D41A3;
+	Wed, 30 Aug 2023 06:42:53 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1bc83a96067so34830625ad.0;
+        Wed, 30 Aug 2023 06:42:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693402973; x=1694007773; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3hvoy5sr8tqMiOZS3BEhHF+S+RG6KoTmJT68EUAGq/c=;
+        b=YFBWiQTNMhjPzYQIxwkqb71J/vkJq1nb+5sldXTELyIJ8Hx8bQY2DfB7/1gldKBk9b
+         tlo9gtZqxUqF+anldbT/UA+llLoHVMk0Dui2KWuwtrWXZOxnu+XoBnvDVsURK0jvQ01n
+         uXr4x1wW7gJxWnNpmX8Ahf5J1I6K8paKmTkrz5mHJ/LRYj47X8sMZbVCN+d7zxFe0RmC
+         PvMPzo1Ts9cwwW1Q7LgN4OnW9UECmTgJcg/5Arg/jxMaxAdnzHhpcFhL2yORj2HLYW6G
+         LCY4xpksTy0r2Ais8j5XZ5wMZYA3s/UDXoz9xa5PnZ6yldPU5IRM4/vf4d4XytJ8YsGg
+         BlRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693402973; x=1694007773;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3hvoy5sr8tqMiOZS3BEhHF+S+RG6KoTmJT68EUAGq/c=;
+        b=PxkBk5vQfzIbSnqJyJwWQIZooONazH0AjDClCPo/iI3oV1cSKC5u/i6vvlr7EoHN4b
+         n/gE+VRfTkIiVji5H+/qpLb1/bheTpkwKojyUe7SaD+S9/Vvx38VV1bTwjLeIS+QunOh
+         nQRbqSvPEeG2hfaFXsXc1/LQRoKi1evNE4lLR2tAlEXtuMIzgJgJB4jb36KU5sjhbp+6
+         cs3UMkRjl3CM+JoXaXNgvXQj3907ZzxPcOQ2nn/WHbEoJDHTW73mSz/A2qouZ6c1/kEH
+         RY+BQviFDEl49kyH8T45aEctqeHgz8KTseC5aRQWuzMEOMo//TrE7NOvuiznX88ZKlPN
+         nojQ==
+X-Gm-Message-State: AOJu0YwO+tHPbHL3sRr+vJUp9C70+ImYPYH1VNb9tCQHmEpQy2ms7F2p
+	DY4tOxPVim1YjWQ0FvAto4tKeFx3SBaVJSL1
+X-Google-Smtp-Source: AGHT+IHNYCBqBKdVjz0xIDBB9g8PFCd6b36ktfUPu2blBKShGdiYXmzPGnJZooI8qTUr5rN1CpnZVg==
+X-Received: by 2002:a17:902:f80d:b0:1c1:f5a6:bdfa with SMTP id ix13-20020a170902f80d00b001c1f5a6bdfamr2100502plb.7.1693402972678;
+        Wed, 30 Aug 2023 06:42:52 -0700 (PDT)
+Received: from kelvin-ThinkPad-L14-Gen-1.lan ([103.184.129.7])
+        by smtp.gmail.com with ESMTPSA id a11-20020a170902eccb00b001b86dd825e7sm11042280plh.108.2023.08.30.06.42.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Aug 2023 06:42:52 -0700 (PDT)
+From: Keguang Zhang <keguang.zhang@gmail.com>
+To: netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-mips@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] net: phy: Provide Module 4 KSZ9477 errata
- (DS80000754C)
-Message-ID: <ZO9Ejx9G8laNRasu@shell.armlinux.org.uk>
-References: <20230830092119.458330-1-lukma@denx.de>
- <20230830092119.458330-2-lukma@denx.de>
- <20230830101813.GG31399@pengutronix.de>
- <20230830125224.1012459f@wsk>
- <20230830105941.GH31399@pengutronix.de>
- <20230830135151.683303db@wsk>
- <20230830121738.GJ31399@pengutronix.de>
- <ZO83htinyfAp4mWw@shell.armlinux.org.uk>
- <20230830130649.GK31399@pengutronix.de>
+Cc: Lee Jones <lee@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Serge Semin <Sergey.Semin@baikalelectronics.ru>,
+	Keguang Zhang <keguang.zhang@gmail.com>
+Subject: [PATCH v4 0/4] Move Loongson1 MAC arch-code to the driver dir
+Date: Wed, 30 Aug 2023 21:42:37 +0800
+Message-Id: <20230830134241.506464-1-keguang.zhang@gmail.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230830130649.GK31399@pengutronix.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 30, 2023 at 03:06:49PM +0200, Oleksij Rempel wrote:
-> On Wed, Aug 30, 2023 at 01:35:18PM +0100, Russell King (Oracle) wrote:
-> > On Wed, Aug 30, 2023 at 02:17:38PM +0200, Oleksij Rempel wrote:
-> > > On Wed, Aug 30, 2023 at 01:51:51PM +0200, Lukasz Majewski wrote:
-> > > > Hi Oleksij,
-> > > 
-> > > > It looks like the most optimal solution would be the one proposed by
-> > > > Tristam:
-> > > > https://www.spinics.net/lists/netdev/msg932044.html
-> > > 
-> > > In this case, please add the reason why it would work on this HW and
-> > > will not break by any changes in PHYlib or micrel.c driver.
-> > > 
-> > > If I remember it correctly, in KSZ9477 variants, if you write to EEE
-> > > advertisement register, it will affect the state of a EEE capability
-> > > register. Which break IEEE 802.3 specification and the reason why
-> > > ksz9477_get_features() actually exist. But can be used as workaround if
-> > > it is written early enough before PHYlib tried to read EEE capability
-> > > register.
-> > > 
-> > > Please confirm my assumption by applying your workaround and testing it
-> > > with ethtool --show-eee lanX.
-> > > 
-> > > It should be commented in the code with all kind of warnings:
-> > > Don't move!!! We use one bug to workaround another bug!!! If PHYlib
-> > > start scanning PHYs before this code is executed, then thing may break!!
-> > 
-> > Why would phylib's scanning cause breakage?
-> > 
-> > phylib's scanning for PHYs is about reading the ID registers etc. It
-> > doesn't do anything until the PHY has been found, and then the first
-> > thing that happens when the phy_device structure is created is an
-> > appropriate driver is located, and the driver's ->probe function
-> > is called.
-> > 
-> > If that is successful, then the fewatures are read. If the PHY
-> > driver's ->features member is set, then that initialises the
-> > "supported" mask and we read the EEE abilities.
-> > 
-> > If ->features is not set, then we look to see whether the driver
-> > provides a ->get_features method, and call that.
-> > 
-> > Otherwise we use the generic genphy_c45_pma_read_abilities() or
-> > genphy_read_abilities() depending whether the PHY's is_c45 is set
-> > or not.
-> > 
-> > So, if you want to do something very early before features are read,
-> > then either don't set .features, and do it early in .get_features
-> > before calling anything else, or do it in the ->probe function.
-> 
-> Let me summarize my view on the problem, so may be you can suggest a better
-> way to solve it.
-> - KSZ9477, KSZ8565, KSZ9893, KSZ9563, seems to have different quirks by
->   the same PHYid. micrel.c driver do now know what exact HW is actually
->   in use.
-> - A set of PHY workarounds was moved from dsa/microchip/ksz9477.c to
->   micrel.c, one of this workaround was clearing EEE advertisement
->   register, which by accident was clearing EEE capability register.
->   Since EEE cap was cleared by the dsa/microchip/ksz9477.c code before
->   micrel.c was probed, PHYlib was assuming that his PHY do not supports
->   EEE and dint tried to use it.
->   After moving this code to micrel.c, it is now trying to change EEE
->   advertisement state without letting PHYlib to know about it and PHYlib
->   re enables it as actually excepted.
-> - so far, only KSZ9477 seems to be broken beyond repair, so it is better
->   to disable EEE without giving it as a choice for user configuration.
+In order to convert Loongson1 MAC platform devices to the devicetree
+nodes, Loongson1 MAC arch-code should be moved to the driver dir.
+Add dt-binding document and update MAINTAINERS file accordingly. 
+    
+In other words, this patchset is a preparation for converting
+Loongson1 platform devices to devicetree.
 
-We do have support in phylib for "broken EEE modes" which DT could set
-for the broken PHYs, and as it is possible to describe the DSA PHYs in
-DT. This sets phydev->eee_broken_modes.
+Changelog
+V3 -> V4: Add Acked-by tag from Krzysztof Kozlowski
+          Add "|" to description part
+          Amend "phy-mode" property
+          Drop ls1x_dwmac_syscon definition and its instances
+          Drop three redundant fields from the ls1x_dwmac structure
+          Drop the ls1x_dwmac_init() method.
+          Update the dt-binding document entry of Loongson1 Ethernet
+          Some minor improvements
+V2 -> V3: Split the DT-schema file into loongson,ls1b-gmac.yaml
+          and loongson,ls1c-emac.yaml (suggested by Serge Semin)
+          Change the compatibles to loongson,ls1b-gmac and loongson,ls1c-emac
+          Rename loongson,dwmac-syscon to loongson,ls1-syscon
+          Amend the title
+          Add description
+          Add Reviewed-by tag from Krzysztof Kozlowski
+          Change compatibles back to loongson,ls1b-syscon
+          and loongson,ls1c-syscon
+          Determine the device ID by physical
+          base address(suggested by Serge Semin)
+          Use regmap instead of regmap fields
+          Use syscon_regmap_lookup_by_phandle()
+          Some minor fixes
+          Update the entries of MAINTAINERS
+V1 -> V2: Leave the Ethernet platform data for now
+          Make the syscon compatibles more specific
+          Fix "clock-names" and "interrupt-names" property
+          Rename the syscon property to "loongson,dwmac-syscon"
+          Drop "phy-handle" and "phy-mode" requirement
+          Revert adding loongson,ls1b-dwmac/loongson,ls1c-dwmac
+          to snps,dwmac.yaml
+          Fix the build errors due to CONFIG_OF being unset
+          Change struct reg_field definitions to const
+          Rename the syscon property to "loongson,dwmac-syscon"
+          Add MII PHY mode for LS1C
+          Improve the commit message
 
-phydev->eee_broken_modes gets looked at when genphy_config_aneg() or
-genphy_c45_an_config_aneg() gets called - which will happen when the
-PHY is being "started".
+Keguang Zhang (4):
+  dt-bindings: mfd: syscon: Add compatibles for Loongson-1 syscon
+  dt-bindings: net: Add Loongson-1 Ethernet Controller
+  net: stmmac: Add glue layer for Loongson-1 SoC
+  MAINTAINERS: Update MIPS/LOONGSON1 entry
 
-So, you could add the DT properties as appropriate to disable all the
-EEE modes.
+ .../devicetree/bindings/mfd/syscon.yaml       |   2 +
+ .../bindings/net/loongson,ls1b-gmac.yaml      | 114 +++++++++
+ .../bindings/net/loongson,ls1c-emac.yaml      | 113 +++++++++
+ MAINTAINERS                                   |   3 +
+ drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 +
+ drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
+ .../ethernet/stmicro/stmmac/dwmac-loongson1.c | 219 ++++++++++++++++++
+ 7 files changed, 463 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/loongson,ls1b-gmac.yaml
+ create mode 100644 Documentation/devicetree/bindings/net/loongson,ls1c-emac.yaml
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c
 
-Alternatively, in your .config_init function, you could detect your
-flag and force eee_broken_modes to all-ones.
 
-The problem with clearing ->supported_eee is that will stop
-genphy_c45_write_eee_adv() writing the advertisement register -
-which means if bits are set in the register, they won't be cleared
-because phylib thinks the registers aren't supported. So you won't
-actually be disabling anything by clearing ->supported_eee.
-
+base-commit: 56585460cc2ec44fc5d66924f0a116f57080f0dc
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.39.2
+
 
