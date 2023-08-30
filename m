@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-31330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D770E78D337
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 08:16:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FA3F78D338
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 08:16:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14A6C1C209BB
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 06:16:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDB112812D9
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 06:16:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A57015C5;
-	Wed, 30 Aug 2023 06:16:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 079A715C5;
+	Wed, 30 Aug 2023 06:16:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B37215A0
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 06:16:01 +0000 (UTC)
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A70CCD2
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 23:16:00 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1bf3a2f4528so40919635ad.2
-        for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 23:16:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F019915A0
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 06:16:31 +0000 (UTC)
+Received: from mail-ua1-x935.google.com (mail-ua1-x935.google.com [IPv6:2607:f8b0:4864:20::935])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07C38CCB
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 23:16:31 -0700 (PDT)
+Received: by mail-ua1-x935.google.com with SMTP id a1e0cc1a2514c-7a25184a648so1822816241.2
+        for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 23:16:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693376159; x=1693980959; darn=vger.kernel.org;
+        d=gmail.com; s=20221208; t=1693376189; x=1693980989; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
         bh=ZmvTj6z/xHNFVH3ZETwtxTxR57Mwo1lTVCpREPyFqeQ=;
-        b=e7GHhCSgK2jsDemyFJW2ozGpZWPrwXmP3RAtAxnU7V0Trun72PUA6fX+dBaXhO55ou
-         /1N5ORjreKViJfvwEpwRqnsZoimrxkQk1ZJS6pCA2i7HUZyu4KlQWWKyRnfoWOgrH1a3
-         kfOj80BRCtv6P/AeVc25uUnjIcPHmkobPdMGxFHNIoef4hNfR4cZ0/uhfREDwvpn0Zq9
-         nUn2PkdYZp33Lj8IXq6sO8kYQ9eAapO9CKmbw0+h6br9YUWfP5fx7boESNBU0vuU1GGa
-         y4yJVOnffUoTfcF300kEX7V/x6yJjyudmQLG3Ch96Nl50oNbk141+miG7PezDwq4ojP+
-         CR+g==
+        b=awoPPrpAiNIQy0zSP1jJG2Rq3dHsYBJARnYyHJkkQZPiAV6mEMv/T5c6HI1Zs/mzci
+         EMcdsnqv295M8vkqNsCzllNyJtkimHokqEeZhb+Y7BDrB/KjCNvuYTSznjnfsWaOTrcp
+         hzZZ3pCBi0g5skDI15qHlF8bI8T4XWa2ueXJ5ttwVOPwhMW5UPkLYW2H+XoLhvXICVVg
+         hOD28FGmvnqwQ94whtMnL3EXvIfCB/Z2jbua23tNHOYwk0cqfExLLuW17a3i9KGr1Y5U
+         qECFvem0Wuvc2FzPpWEhp7Cwo08IUf/7bXOHcVmhuiGfi/b8DRlzb+o7+a1tPetLhWKN
+         BF5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693376159; x=1693980959;
+        d=1e100.net; s=20221208; t=1693376189; x=1693980989;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
         bh=ZmvTj6z/xHNFVH3ZETwtxTxR57Mwo1lTVCpREPyFqeQ=;
-        b=O+cgQl/EiQ7Trk30utqIwXNgCPvLwnxXUdjuC0L9hf8PI3Qx6MtGAw4jMJUjDYRF0b
-         kXR+M1pqfmrjMKG2qTTUbXLH6sBrHkPnMfsx9/hBdzimjUrW/Cllhtanv6D8WrfHJqsG
-         DQYd3Gbpx7EATAK6q8jaVA4pir4GQyatoj2jjbntgnWmCObNHcbjvR3GKzTfVhCkY33J
-         9bVo1oioRd3U+gbOj9vsVYcNfT6iKUmrNSneSsrD77woQwdTz4Ri3QSK8eJEQXrv0PBb
-         fbkjJ6PwG51JLoAwnffP46JDIE0yF2ZUVyQDpzbTNn9q9AaOvNf9hb4xlsxrpMc0jLvx
-         qGSg==
-X-Gm-Message-State: AOJu0YxJq2fOIfDwSkr15ces7ByLvnDMdneQZvNxUabg/qJdSceQLNti
-	2lZEAebzXMXDlcY+vCCCzipP2XF8swg=
-X-Google-Smtp-Source: AGHT+IFO/9kV77RUfJjEV5dni38G8BCDAveWFsMUdJwaKpsBmrMi6SY27W3NRN6epRUK3fREh82b8g==
-X-Received: by 2002:a17:903:1208:b0:1bb:9b29:20d9 with SMTP id l8-20020a170903120800b001bb9b2920d9mr1462810plh.20.1693376158996;
-        Tue, 29 Aug 2023 23:15:58 -0700 (PDT)
+        b=ktObxeE+3CzXhBHM7SKMiawzSOvpMoxE+OQmOtZ8SzOVEOq93DJNrg0pANtrT0yBCR
+         ghkJlBptnJz7e9CP+nH/F2bam+dGwaiuPqW7Q1v96Sg2GSrqsG0s9Ff8RmmteY05A2AT
+         +xu6dGrP/I8EOMnkykIThIxaxbt7uFKy5xy2oKsKUh0oFM7vPlo0wQoL3kwJZzpEt3jM
+         bB5AApNSERvpIPTKCN2McJB6913EvoHWtPaPrm36osjvHsx/DnMQb3ldrYqY3QzT924a
+         LkQuHXvL3JbAkBMjOtg7jHHUOUATiXyHk0ZAH2uAG3t6N2BUUm8Z3i311+5Jk+v//JB/
+         E0Uw==
+X-Gm-Message-State: AOJu0Yz/axCSpH5aLPnINRG2PJW6KsSZ5ocbhY1Kc5x4jvKJDwdL5bUl
+	g3lw8DNexkhGtmgkDpnEGmFg0pXfujI=
+X-Google-Smtp-Source: AGHT+IEjCVDUu8wLOBtfKhAOHp/QQXd6VaunRGCnpm+XM3ViO6KQtB2D/RdxwlxiWrNp9zJN64VyoA==
+X-Received: by 2002:a67:f993:0:b0:44d:476b:3bc0 with SMTP id b19-20020a67f993000000b0044d476b3bc0mr1280048vsq.28.1693376189384;
+        Tue, 29 Aug 2023 23:16:29 -0700 (PDT)
 Received: from Laptop-X1.redhat.com ([2409:8a02:7820:a6d0:fe00:94b0:34da:834c])
-        by smtp.gmail.com with ESMTPSA id v4-20020a170902b7c400b001b8a3dd5a4asm10325803plz.283.2023.08.29.23.15.54
+        by smtp.gmail.com with ESMTPSA id cm8-20020a17090afa0800b00267b7c5d232sm550085pjb.48.2023.08.29.23.16.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Aug 2023 23:15:57 -0700 (PDT)
+        Tue, 29 Aug 2023 23:16:28 -0700 (PDT)
 From: Hangbin Liu <liuhangbin@gmail.com>
 To: netdev@vger.kernel.org
 Cc: "David S . Miller" <davem@davemloft.net>,
@@ -66,8 +66,8 @@ Cc: "David S . Miller" <davem@davemloft.net>,
 	Hangbin Liu <liuhangbin@gmail.com>,
 	Thomas Haller <thaller@redhat.com>
 Subject: [PATCH net-next] ipv6: do not merge differe type and protocol routes
-Date: Wed, 30 Aug 2023 14:15:50 +0800
-Message-ID: <20230830061550.2319741-1-liuhangbin@gmail.com>
+Date: Wed, 30 Aug 2023 14:16:22 +0800
+Message-ID: <20230830061622.2320096-1-liuhangbin@gmail.com>
 X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
