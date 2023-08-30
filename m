@@ -1,122 +1,154 @@
-Return-Path: <netdev+bounces-31459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 086FE78E210
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 00:07:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 68BC578E258
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 00:31:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B373D2810B5
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 22:07:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F15B8281304
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 22:31:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 879B28BE5;
-	Wed, 30 Aug 2023 22:07:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 092E56FA1;
+	Wed, 30 Aug 2023 22:31:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AA758468
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 22:07:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 260A1C433C9;
-	Wed, 30 Aug 2023 22:07:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693433229;
-	bh=iOlG6QCwPEJAv18mUAR+gdYgQ3y/Ze8QpP2zXy4kL3o=;
-	h=From:To:Cc:Subject:Date:From;
-	b=OSGioPeq7kf+PXKsN9z4re0fo54QSQB74WhbvhWvlQ9x1HR+fMd0ddWlA8zQDRA6X
-	 kKLqf95hKIZKgoZfEBNc+EuV2GsjbsOOicm323e1xCIg39xa/NnIdCoMlpfxgt0Izw
-	 FjKy7RpolV5TiAkHKpYnruB1xCWCFyaXfBaQY6mX9RQyxTBbxpA9ZmpDH6M+LnISpL
-	 NILcX4ZyRnz6+qAWAfmNeus3GNMTU7dsWZ3BzHrNkyFP0RFBqLjA1Xp41iyS9eKOpL
-	 edDfpkjxispR+CgX2ute1NZKTfZObfkgLMW+vgOGU1O92+kfqy8XEpIihd3ZzdxYre
-	 Vb+B6gkcZ6y9A==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	corbet@lwn.net,
-	workflows@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	rdunlap@infradead.org,
-	laurent.pinchart@ideasonboard.com
-Subject: [PATCH net v2] docs: netdev: document patchwork patch states
-Date: Wed, 30 Aug 2023 15:06:58 -0700
-Message-ID: <20230830220659.170911-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDF4D290D
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 22:31:44 +0000 (UTC)
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BCEB10D3
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 15:31:12 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-68a3f1d8be2so144206b3a.3
+        for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 15:31:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1693434671; x=1694039471; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=wLDN7invAXGpseGpdDIIZ1SIKjfNtH5ZhUlLs7bFFN0=;
+        b=G+D+893AUA3w7U7FwsSee1/qSn5MIl3e5oCnBQwN+SvV4FlCbIY6NZJRTkrGOyq+Kq
+         huqtpO3Q/73VrRzkX2bC4W355wngK8EPdj0yjWmC4b9PAWUS3s5NCqQnamY80LkkwiCL
+         wdhsSEdRxT0/xzIcgM48yv2sb1o83+tOGXztk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693434671; x=1694039471;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wLDN7invAXGpseGpdDIIZ1SIKjfNtH5ZhUlLs7bFFN0=;
+        b=ik5M4vM2eaAFnSGE1YF9bzlNDEzvQ3k9yrCnRpCdMiLK72tZkpvk/luEELXmlHoVUe
+         aMoS9DXwZ4eA5iytbpbogZgBkAOnsNghO++KrXTXce6sxviDPhFgz+MrovIU5F5cUUfX
+         KZWApNDrdfni6GFypHdhv+0+SUjV2uypFp0zV+OHGFGWopyJNQeonHb78+0eGZrVt7Nj
+         +ogPxZGf9c1NYciTp7TTTJKyRzOdtd9h5coOMIC7VDa3U92Y3pJ+P9I9dEX7zHTl69aM
+         c8x3RhuwLOfeSgrG69N3RhLRddesgZopCGL+fCITHugz2tP+Y9m8PV9dF+wmHu016Rll
+         brsw==
+X-Gm-Message-State: AOJu0YwJOxFdZm73hr0wqH5K7OuJC8hc2H7P8SzqxNNV8VIEeiW9qiyT
+	XR2OQc8Cjo91DZSGbHA5Lvwfhw==
+X-Google-Smtp-Source: AGHT+IHrlwyuuGG2TNqsxkvlcHDbOA6H/Roidvdt8I8o1ntXeNMScdFrJueXW8h5EV6g+ONFbgkLTQ==
+X-Received: by 2002:a05:6a00:189b:b0:68c:638b:e2c6 with SMTP id x27-20020a056a00189b00b0068c638be2c6mr4193982pfh.9.1693434671611;
+        Wed, 30 Aug 2023 15:31:11 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id p22-20020a62ab16000000b006870721fcc5sm73775pff.175.2023.08.30.15.31.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Aug 2023 15:31:11 -0700 (PDT)
+Date: Wed, 30 Aug 2023 15:31:10 -0700
+From: Kees Cook <keescook@chromium.org>
+To: Jeff Johnson <quic_jjohnson@quicinc.com>
+Cc: Christian Lamparter <chunkeey@gmail.com>, kernel@quicinc.com,
+	Kalle Valo <kvalo@kernel.org>,
+	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@toke.dk>,
+	Christian Lamparter <chunkeey@googlemail.com>,
+	Stanislaw Gruszka <stf_xl@wp.pl>,
+	Helmut Schaa <helmut.schaa@googlemail.com>,
+	Ping-Ke Shih <pkshih@realtek.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] mac80211: Use flexible array in struct
+ ieee80211_tim_ie
+Message-ID: <202308301529.AC90A9EF98@keescook>
+References: <20230829-ieee80211_tim_ie-v2-0-fdaf19fb1c0e@quicinc.com>
+ <20230829-ieee80211_tim_ie-v2-2-fdaf19fb1c0e@quicinc.com>
+ <1774098a-5062-4f12-a760-f16036d095e3@gmail.com>
+ <9da7f41e-6d4a-452a-8042-0b09cad71bb8@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <9da7f41e-6d4a-452a-8042-0b09cad71bb8@quicinc.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-The patchwork states are largely self-explanatory but small
-ambiguities may still come up. Document how we interpret
-the states in networking.
+On Wed, Aug 30, 2023 at 01:22:37PM -0700, Jeff Johnson wrote:
+> On 8/30/2023 12:51 PM, Christian Lamparter wrote:
+> > Hi,
+> > 
+> > On 8/29/23 15:29, Jeff Johnson wrote:
+> > > Currently struct ieee80211_tim_ie defines:
+> > >     u8 virtual_map[1];
+> > > 
+> > > Per the guidance in [1] change this to be a flexible array.
+> > > 
+> > > As a result of this change, adjust all related struct size tests to
+> > > account for the fact that the sizeof(struct ieee80211_tim_ie) now
+> > > accounts for the minimum size of the virtual_map.
+> > > 
+> > > [1] https://docs.kernel.org/process/deprecated.html#zero-length-and-one-element-arrays
+> > > 
+> > > Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
+> > > ---
+> > > diff --git a/include/linux/ieee80211.h b/include/linux/ieee80211.h
+> > > index bd2f6e19c357..4cdc2eb98f16 100644
+> > > --- a/include/linux/ieee80211.h
+> > > +++ b/include/linux/ieee80211.h
+> > > @@ -961,7 +961,7 @@ struct ieee80211_tim_ie {
+> > >       u8 dtim_period;
+> > >       u8 bitmap_ctrl;
+> > >       /* variable size: 1 - 251 bytes */
+> > > -    u8 virtual_map[1];
+> > > +    u8 virtual_map[];
+> > >   } __packed;
+> > 
+> > 
+> > Uhh, the 802.11 (my 2012 Version has this in) spec in
+> > 8.4.2.7 TIM Element demands this to be 1 - 251 bytes.
+> > And this is why there's a comment above... With your
+> > change this could be confusing. Would it be possible
+> > to fix that somehow? Like in a anonymous union/group
+> > with a flexible array and a u8?
+> 
+> Adding Kees to the discussion for any advice. Yes, the virtual_map must
+> contain at least one octet but may contain more than one. And to complicate
+> matters, the information that tells us how many octets are actually present
+> is found outside the struct; the TLV header that precedes the struct will
+> contain the length of the struct, and hence the length of the bitmap is that
+> size - 2 (the size of the dtim_period and bitmap_ctrl fields).
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-v2:
- - add a sentence about New vs Under Review
- - s/maintainer/export/ for Needs ACK
- - fix indent
-v1: https://lore.kernel.org/all/20230828184447.2142383-1-kuba@kernel.org/
+Bummer about the count variable being elsewhere, but we'll deal with
+that later. :)
 
-CC: corbet@lwn.net
-CC: workflows@vger.kernel.org
-CC: linux-doc@vger.kernel.org
+For the array declaration, though, yes, we can do a "minimum size 1" like
+this:
 
-CC: rdunlap@infradead.org
-CC: laurent.pinchart@ideasonboard.com
----
- Documentation/process/maintainer-netdev.rst | 29 ++++++++++++++++++++-
- 1 file changed, 28 insertions(+), 1 deletion(-)
+	union {
+		u8 required_byte;
+		DECLARE_FLEX_ARRAY(u8, virtual_map);
+	};
 
-diff --git a/Documentation/process/maintainer-netdev.rst b/Documentation/process/maintainer-netdev.rst
-index c1c732e9748b..b2c082e64c95 100644
---- a/Documentation/process/maintainer-netdev.rst
-+++ b/Documentation/process/maintainer-netdev.rst
-@@ -120,7 +120,34 @@ Status of a patch can be checked by looking at the main patchwork
-   https://patchwork.kernel.org/project/netdevbpf/list/
- 
- The "State" field will tell you exactly where things are at with your
--patch. Patches are indexed by the ``Message-ID`` header of the emails
-+patch:
-+
-+================== =============================================================
-+Patch state        Description
-+================== =============================================================
-+New, Under review  pending review, patch is in the maintainerâ€™s queue for
-+                   review; the two states are used interchangeably (depending on
-+                   the exact co-maintainer handling patchwork at the time)
-+Accepted           patch was applied to the appropriate networking tree, this is
-+                   usually set automatically by the pw-bot
-+Needs ACK          waiting for an ack from an area expert or testing
-+Changes requested  patch has not passed the review, new revision is expected
-+                   with appropriate code and commit message changes
-+Rejected           patch has been rejected and new revision is not expected
-+Not applicable     patch is expected to be applied outside of the networking
-+                   subsystem
-+Awaiting upstream  patch should be reviewed and handled by appropriate
-+                   sub-maintainer, who will send it on to the networking trees
-+Deferred           patch needs to be reposted later, usually due to dependency
-+                   or because it was posted for a closed tree
-+Superseded         new version of the patch was posted, usually set by the
-+                   pw-bot
-+RFC                not to be applied, usually not in maintainerâ€™s review queue,
-+                   pw-bot can automatically set patches to this state based
-+                   on subject tags
-+================== =============================================================
-+
-+Patches are indexed by the ``Message-ID`` header of the emails
- which carried them so if you have trouble finding your patch append
- the value of ``Message-ID`` to the URL above.
- 
 -- 
-2.41.0
-
+Kees Cook
 
