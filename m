@@ -1,184 +1,206 @@
-Return-Path: <netdev+bounces-31337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F368878D3B4
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 09:45:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 779DB78D3C6
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 09:59:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B56D1281095
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 07:45:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 577141C208E5
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 07:59:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C85111869;
-	Wed, 30 Aug 2023 07:45:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B2941872;
+	Wed, 30 Aug 2023 07:59:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAFFF1847
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 07:45:38 +0000 (UTC)
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2076.outbound.protection.outlook.com [40.107.243.76])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB957CDA;
-	Wed, 30 Aug 2023 00:45:36 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Q+nZMZPy8XGFT1iw15F1tCjfiohEMsiQpnTkLm90I400JBuja3Ci1oz68nQrKN94b0CARXJ/WsZqhxUi4MptPDqiJj6oKJ9UWzG1iy2drl65w/ILuiNLZsO7sPDPrkAU+4C6dyIaAB5kTpgiUVBnZ3g5QhsF2F6SLWm353axBjhnzZujnYYgdfXavxFdHEIhD/4assoPC3z6xDxLjmcxOb7b7Q8Yo/uMViV0gKFCw+NwMiRn2eoPCjDA8BMsgVEWPHRcfCQmN6DE3TtSm1FnZIMQ8DQH28LBI52eXQp2xYg6JpYBCiACP39bKIEPwnfWut8xJorTxuW4Jjxnk1tKDw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Y6C3fiLE6YqDLo1WZTbyJZk90MSomQLVnYX1rRk3rbQ=;
- b=TKzOgtK4ITP+aTCzh0jqG4HzJhKFcoWp5vSD+wyLxHA9iG5W0QcaAAWo+nO1oOiUWwIdvfoOUgHFJMt9H9GV9wNT8QOFajII/X1toEi4vEcSsA1WQPY1+tbN72RfMx340dMMCiHK4x/TNBQhJ3RE0oVjJaaQT+TESOVp9ALdnAGdF1OAjUIx0R+ANEyn6STIe6qo2lJ+6Adlf5JXDJuqB6HaPkHMefQ+M/I5juH3KL44lF5WGlm8BBrR2YFqtim0HPtsg+wpWpd51my4jkG2OTy8t7tU9g6hSomE65UTRGCpUY5c99v5mhVqh+EVcg4W8tl4oD+gB8xqxbv3V+mRwA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Y6C3fiLE6YqDLo1WZTbyJZk90MSomQLVnYX1rRk3rbQ=;
- b=Ewn11E5hVfMvL2BvHRiDOPA8ceOOchLLZkQj5dCOFRzDZRw+6NCPfHZKRtgsrMkwB7vqgleAiijS/b0o+yl6OSnlng/8iZ46eaPdE/MGH17noLx+DFDbZM318BEFsITIpWrPYGXGvh4RWJDF0P7VqAc1TevHqAnZXbWPN2j+Kws=
-Received: from PH8PR12MB6675.namprd12.prod.outlook.com (2603:10b6:510:1c2::15)
- by PH0PR12MB7485.namprd12.prod.outlook.com (2603:10b6:510:1e9::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.35; Wed, 30 Aug
- 2023 07:45:33 +0000
-Received: from PH8PR12MB6675.namprd12.prod.outlook.com
- ([fe80::3a16:8b71:150d:5e82]) by PH8PR12MB6675.namprd12.prod.outlook.com
- ([fe80::3a16:8b71:150d:5e82%4]) with mapi id 15.20.6745.020; Wed, 30 Aug 2023
- 07:45:32 +0000
-From: "Goud, Srinivas" <srinivas.goud@amd.com>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, Rob Herring
-	<robh@kernel.org>
-CC: "wg@grandegger.com" <wg@grandegger.com>, "mkl@pengutronix.de"
-	<mkl@pengutronix.de>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>, "p.zabel@pengutronix.de"
-	<p.zabel@pengutronix.de>, "git (AMD-Xilinx)" <git@amd.com>, "Simek, Michal"
-	<michal.simek@amd.com>, "linux-can@vger.kernel.org"
-	<linux-can@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>, "appana.durga.rao@xilinx.com"
-	<appana.durga.rao@xilinx.com>, "naga.sureshkumar.relli@xilinx.com"
-	<naga.sureshkumar.relli@xilinx.com>
-Subject: RE: [PATCH v3 1/3] dt-bindings: can: xilinx_can: Add ECC property
- 'xlnx,has-ecc'
-Thread-Topic: [PATCH v3 1/3] dt-bindings: can: xilinx_can: Add ECC property
- 'xlnx,has-ecc'
-Thread-Index: AQHZ2cBiFgY83WJUzUyA4MeJwK/v66//2S+AgAKA3ECAABVFAIAABFdQ
-Date: Wed, 30 Aug 2023 07:45:32 +0000
-Message-ID:
- <PH8PR12MB6675D7CE487C584529A4F0EBE1E6A@PH8PR12MB6675.namprd12.prod.outlook.com>
-References: <1693234725-3615719-1-git-send-email-srinivas.goud@amd.com>
- <1693234725-3615719-2-git-send-email-srinivas.goud@amd.com>
- <20230828154309.GA604444-robh@kernel.org>
- <PH8PR12MB6675C31C6D1DCD3281FE8A10E1E6A@PH8PR12MB6675.namprd12.prod.outlook.com>
- <12a0f531-851f-cd09-3d56-828e2aeccae3@linaro.org>
-In-Reply-To: <12a0f531-851f-cd09-3d56-828e2aeccae3@linaro.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH8PR12MB6675:EE_|PH0PR12MB7485:EE_
-x-ms-office365-filtering-correlation-id: 4451030d-31e0-4a24-7942-08dba92d16e3
-x-ld-processed: 3dd8961f-e488-4e60-8e11-a82d994e183d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- iJ4PyFeR5xe6wuMgCVnSXrv6aFa+dF8SUz7rssBRGBll9DNOOGtQTMfComhWOC5aPBQjF8ZkEK5zX2h7SzP00Y0CLHtlOMx5eMNr4+N2ebPGcC7xFgIlX8z0JMWVsQh3zC7VV/1kEygH6l6sfgTo/6k7dkYXUnQpIPkenT+QfVRKgiFpTVWctXoxbSC+AG9AFBjn1I5qV265z2TtzR6XbfIo3H9h+O/QTV8VhksWnbrtISjBu11jXS2P6tKAgLi6DPnYCG3wlICeV4EFtUZpwuFHpqRVJM1GpV/nx3fxfcOWgbLRB7lSQ9OKeasjo7sxq8zB/4GxeoR35hFovySuMulJ0UY4W9Vttl9erE4hdBAh94xYeEwTI/b1n2TyEiYT/o+3BE+xm/c/Tci/0lRQeK3/yCrXS8212ILYbKl9mC0X107FZ7vqQR/3yrPZ0nWas5C1xjYAQxnQdRyiKLXuI0dXEXDBxHusX7t3OcmiVUa40kZegdZpTIneTzPXiJrcVJ/156/pMLO5nm41HCQGDfSA5Lv/HimFn8XC7n39feWSsBl1TW2FqDVhcMhwMVrk0DA+AKX1w4FBUeS6EF72m7yetBNB8uP5q4iqYRxGUv61ZnRmFKsndo+ySQenbMJX
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR12MB6675.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(136003)(366004)(376002)(396003)(39860400002)(1800799009)(186009)(451199024)(8936002)(110136005)(478600001)(76116006)(122000001)(7696005)(66556008)(6506007)(66946007)(71200400001)(66476007)(64756008)(54906003)(66446008)(38070700005)(316002)(38100700002)(41300700001)(9686003)(26005)(5660300002)(8676002)(83380400001)(2906002)(55016003)(86362001)(52536014)(7416002)(33656002)(4326008);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?TzdyZXhWcWRGVC9IRUtzTHpBTElDZDMwbm9kdjZ6V2c1dHRQbnljVjlibEFY?=
- =?utf-8?B?VEhUWVF3azhmZ2x1aFl4M0hXSlJxWTJTQTY0T21rVnRzVFd0azlYZWthdi96?=
- =?utf-8?B?dThTNkIzTGFtWXBEeXREQ09mdThiakZ4R0FIeS9DWW4yNmU2RUcxakw3SG40?=
- =?utf-8?B?b3RUdFdUNlBMU0Iwc1BBbGltT0d6TGtyaWVQdTFEVXcyc0JsL0VQY25Yek1q?=
- =?utf-8?B?cFBtZS9LM3c4eHdGL2pVM2VhRVl6SGRvZFZnT3VZdTEra0JPTU93UHdCTVZt?=
- =?utf-8?B?bVlmMDNEcmk5YVBLWjgvdDFJbVhzUUYxOEpHdldqUzVDN3RUa0lRQWlaRmtt?=
- =?utf-8?B?ZU9TRU9xTlg3b05laW15YmhXMHNsclJSMVVlSitVSERxTk9FYk9JV1pZRi9X?=
- =?utf-8?B?TllKUFRxbm5ZNnZIVjBBVXVZNVBwUngyTnQxK3hCK2FLbkQvelU0Y21zdGJu?=
- =?utf-8?B?VnYvcjI4WTg1S3poVWhFeUJLTUVlRmVOTTZaQ0M0RmNaK0dZSmRwMU1naUtE?=
- =?utf-8?B?dGl0L0RLNnlwd0RMd3Q2RXQ4Vk5GeE42NnFpK3B5L2V4VEFqRkVTbDdPRGVR?=
- =?utf-8?B?UUJKWlRCYWJuaWtVYXhoRko5LzJHcGpNdURycWMwVUlna2FXNlVMQnM5Y0tC?=
- =?utf-8?B?QTkza1BMY1BjdnU4VGVkUGpRUFFtN1R1VU8vODNuYVdROVRLQnVyR1h2blU2?=
- =?utf-8?B?Vm1XYXc2Y25GZlZiZVM2WC80QlBBbWFyd2lsN0pqdXhnWU1abUYvbjNuYmpO?=
- =?utf-8?B?VDZzVlVSbzJkb3k3TTFGeE4zcmlOVFBGL3N6akV6cWFJK3o3UlNwT1VXMlhN?=
- =?utf-8?B?dFRnMXJIVG5mdVZvMGFZMWJVWTZSL01ydHpBVlZ4bzdZMURKWTRYcFpuK2My?=
- =?utf-8?B?T2ZrNnZGNGw3TmhOeGNlZUx6SGlhb3FtWUFIYjVESzREb3laN2MxelJjeHVp?=
- =?utf-8?B?TGxSSmJwdjZURnBUeGNPMzZWSG43RzB5dXhUWFd4WDhZektJL3ZUd2g2YWJv?=
- =?utf-8?B?Z3JBbXJUNjQyWXcvQ1dOR0dMWExUYTZVak8xYTVTQzlTblg1eXVQU1p6OTBx?=
- =?utf-8?B?TmYxUUlxZEVxYVhJbmxISmlGdFNTaDZCZlc5SmNvWHVueFo0dmZXbEJFYk1l?=
- =?utf-8?B?Zk1FQ2hpdjlGZkRJVWNrN1dROE50bEdUZXltSERqVVdES1UyMGJhd0pjVXFJ?=
- =?utf-8?B?RHpSdkErN1RTNXc1cGRhYm9Fd0k5S3V0eFpMTis5K0dNYklVcndqZVcrYUhD?=
- =?utf-8?B?YTM1RmVCeFBoV3hULytVclg5V1I0d2laajJNQVA3MGxrM3lWdzFqSVdqWlE2?=
- =?utf-8?B?UnlJK3ViM2NMVXMyb1o0Slppc3RZNXJLbGJ5RVVsU014SjZTYzViUTZOZUt1?=
- =?utf-8?B?SXJaL1h4RUgxWkdXZkYwVVA4MFBRMm4vZDEyS05OUEhhMXhrQklySUhqOUdu?=
- =?utf-8?B?dktCR1EyOCtBeXlWN3FzSTFiemxEMC9VMVlFSHovbHhTZ2RUQnJYR2QweHh2?=
- =?utf-8?B?akRHdlpUcDRRSFNLTlVMdHFJMDE1dy9VVU5ybDRlT0pIVDZzeFJBYTVyUHpz?=
- =?utf-8?B?NnJaYXhWSEs5eDhHaURsNWo3NzhxQ3ZtZHZ3b3k1cDFPYjFxVzNheXdMazE4?=
- =?utf-8?B?VkkrRlYwaVppNk1GTUVHTWpWV3JUT3Zuc1ltN2g2L25sOHpnUENmQkxhODFt?=
- =?utf-8?B?UnhXMzZEb2RXVytvalFmRWd1cDVpOGRnZi9DOXBJd0R1YkdaTlpBNHdic2VO?=
- =?utf-8?B?QUhwRFlMYmM1M0RzenpPcWtUN1lqS1JURWVKenJwU0dhNnpndEtWeDhPMFNz?=
- =?utf-8?B?ZzNGTzlYWWtacmJIQUVrYjNYUCtEZ3k1MDZncjdKMG0zclAxQTVEV0RPQTYy?=
- =?utf-8?B?N3N3TlpaMHozc2hvVHJJMnR0eTZHN2FyZmhCNW9IaDkwTkFDZFFhT2FCcU15?=
- =?utf-8?B?NzNMWDRIRnF1ZXFEcVdveTNzdEsxNlgrcGRNZzNmLzg2YWFmL05CMHRHS0oy?=
- =?utf-8?B?TnBLOU1LU1lNdUtWbk50VDJqc0RXTTkvQnhFZzFGR042T1VJcUJ2N1lLSTBW?=
- =?utf-8?B?MnY4Z050U09kZFVjZVJSZVB3M3ZMN0xoWlJZMVpOQWw2ZGNzRzlwdHRhazlV?=
- =?utf-8?Q?CVQI=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDCE01847
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 07:59:39 +0000 (UTC)
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92B95CD8
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 00:59:37 -0700 (PDT)
+Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-401da71b7c5so11033905e9.2
+        for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 00:59:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1693382376; x=1693987176; darn=vger.kernel.org;
+        h=user-agent:in-reply-to:content-transfer-encoding
+         :content-disposition:mime-version:references:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pMMQyokSBoYi+7NtlQGYb+yVajJvpYPKJBULBUddiXM=;
+        b=3uiKl5PfYWRpzSYKHy3QPtVLLKXSmsWonpdImDI3XL1mQRj2Q2Fh7ujqIAojBCT8Vw
+         Tx62FY1x8dkztef++CPwmDFCN9ByDs7sP9igs+5zuYGzQ0HqlK3dC3G/iDtl95h0jMyW
+         p2nB3BUlEt5g1c9sMYae0Q0p05J8SZbJf8rAqYEJM1uhCp1TToSbTSPMqZfZR2oSG2ls
+         XtAGUvaBTm5NIQUm54Q/HMY7W7yjnLfVPZC1lf8ggSLCmK37XMVUnBnRlomp1S8o08M3
+         IYxVgda0Fm7yB+BCFzTU/KFiX4NFf6vvk7pBgdXXFdj3Tll9rK46YaFyg5WK7wmYxK6h
+         FkBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693382376; x=1693987176;
+        h=user-agent:in-reply-to:content-transfer-encoding
+         :content-disposition:mime-version:references:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pMMQyokSBoYi+7NtlQGYb+yVajJvpYPKJBULBUddiXM=;
+        b=hHncwuMrOGybchLGsmyUBGySJFvjhIYDtEr/PCs69T2uw/NpgHlE+IaD6k0Ye86G6M
+         FY2AaPq8hoWQt9FCqN5L+GsYxUrpw5F6RhW35c+U2XqkKEXU40j/bNHCTV3Fct2GJkvo
+         +lD+2SE0JmxxrusrWSlWRbRNx3lkvS8EwoekXShLQXHG6wNV5z0nGDYp6pTFi6K0e2q8
+         7RaCBW3dH82pgDEOF7MmpOKXkNWwoWCBky9Raz9iCaeUt4F/OE3DB8IzM9kYwryD5qGQ
+         ra2MNMwbPiXxPz1am0MjRiGTuMci3JUpBXXgIJeg7jC0+/JZlLRVN9BXDEc1oBeJ6gpt
+         pVOg==
+X-Gm-Message-State: AOJu0YwmNbyaGj6doMt+tO4Gk/tDedl2djh2nSsfXgzFQvwWj9bqZfZj
+	xZSbuVBO/dQInSBb8cN6Bc6qSw==
+X-Google-Smtp-Source: AGHT+IEjcIizQH3HgpknpZ6G1AFB4laTKJh2Uyrdj3Zs0MAtHyfmRBdqpsjNPzBAd35S2HBtWY8ifA==
+X-Received: by 2002:a05:600c:2256:b0:400:6bee:f4fe with SMTP id a22-20020a05600c225600b004006beef4femr1225816wmm.21.1693382375870;
+        Wed, 30 Aug 2023 00:59:35 -0700 (PDT)
+Received: from elver.google.com ([2a00:79e0:9c:201:3380:af04:1905:46a])
+        by smtp.gmail.com with ESMTPSA id z6-20020a5d4406000000b003143c6e09ccsm15889160wrq.16.2023.08.30.00.59.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Aug 2023 00:59:35 -0700 (PDT)
+Date: Wed, 30 Aug 2023 09:59:30 +0200
+From: Marco Elver <elver@google.com>
+To: Dominique Martinet <asmadeus@codewreck.org>
+Cc: syzbot <syzbot+e441aeeb422763cc5511@syzkaller.appspotmail.com>,
+	davem@davemloft.net, edumazet@google.com, ericvh@kernel.org,
+	kuba@kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux_oss@crudebyte.com,
+	lucho@ionkov.net, netdev@vger.kernel.org, pabeni@redhat.com,
+	syzkaller-bugs@googlegroups.com, v9fs@lists.linux.dev
+Subject: Re: [syzbot] [net?] [v9fs?] KCSAN: data-race in p9_fd_create /
+ p9_fd_create (2)
+Message-ID: <ZO724hKaHLCrSOa/@elver.google.com>
+References: <000000000000d26ff606040c9719@google.com>
+ <ZO3PFO_OpNfBW7bd@codewreck.org>
+ <ZO38mqkS0TYUlpFp@elver.google.com>
+ <ZO55o4lE2rKO5AlI@codewreck.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR12MB6675.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4451030d-31e0-4a24-7942-08dba92d16e3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Aug 2023 07:45:32.5441
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: d3d0I5wOk9QhjPGfOp1ddy5Rwc9bT6gawVt7ZjD4UmOWR+y0heXIFO83VGFCfk49
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7485
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-	autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZO55o4lE2rKO5AlI@codewreck.org>
+User-Agent: Mutt/2.2.9 (2022-11-12)
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-SGkgS3J6eXN6dG9mLA0KDQo+LS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj5Gcm9tOiBLcnp5
-c3p0b2YgS296bG93c2tpIDxrcnp5c3p0b2Yua296bG93c2tpQGxpbmFyby5vcmc+DQo+U2VudDog
-V2VkbmVzZGF5LCBBdWd1c3QgMzAsIDIwMjMgMTI6NDMgUE0NCj5UbzogR291ZCwgU3Jpbml2YXMg
-PHNyaW5pdmFzLmdvdWRAYW1kLmNvbT47IFJvYiBIZXJyaW5nIDxyb2JoQGtlcm5lbC5vcmc+DQo+
-Q2M6IHdnQGdyYW5kZWdnZXIuY29tOyBta2xAcGVuZ3V0cm9uaXguZGU7IGRhdmVtQGRhdmVtbG9m
-dC5uZXQ7DQo+ZWR1bWF6ZXRAZ29vZ2xlLmNvbTsga3ViYUBrZXJuZWwub3JnOyBwYWJlbmlAcmVk
-aGF0LmNvbTsNCj5rcnp5c3p0b2Yua296bG93c2tpK2R0QGxpbmFyby5vcmc7IGNvbm9yK2R0QGtl
-cm5lbC5vcmc7DQo+cC56YWJlbEBwZW5ndXRyb25peC5kZTsgZ2l0IChBTUQtWGlsaW54KSA8Z2l0
-QGFtZC5jb20+OyBTaW1laywgTWljaGFsDQo+PG1pY2hhbC5zaW1la0BhbWQuY29tPjsgbGludXgt
-Y2FuQHZnZXIua2VybmVsLm9yZzsgbGludXgtYXJtLQ0KPmtlcm5lbEBsaXN0cy5pbmZyYWRlYWQu
-b3JnOyBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnOw0KPm5ldGRldkB2Z2VyLmtlcm5lbC5v
-cmc7IGRldmljZXRyZWVAdmdlci5rZXJuZWwub3JnOw0KPmFwcGFuYS5kdXJnYS5yYW9AeGlsaW54
-LmNvbTsgbmFnYS5zdXJlc2hrdW1hci5yZWxsaUB4aWxpbnguY29tDQo+U3ViamVjdDogUmU6IFtQ
-QVRDSCB2MyAxLzNdIGR0LWJpbmRpbmdzOiBjYW46IHhpbGlueF9jYW46IEFkZCBFQ0MgcHJvcGVy
-dHkNCj4neGxueCxoYXMtZWNjJw0KPg0KPk9uIDMwLzA4LzIwMjMgMDg6MDYsIEdvdWQsIFNyaW5p
-dmFzIHdyb3RlOg0KPj4+PiArDQo+Pj4+ICByZXF1aXJlZDoNCj4+Pj4gICAgLSBjb21wYXRpYmxl
-DQo+Pj4+ICAgIC0gcmVnDQo+Pj4+IEBAIC0xMzcsNiArMTQxLDcgQEAgZXhhbXBsZXM6DQo+Pj4+
-ICAgICAgICAgIGludGVycnVwdHMgPSA8R0lDX1NQSSA1OSBJUlFfVFlQRV9FREdFX1JJU0lORz47
-DQo+Pj4+ICAgICAgICAgIHR4LWZpZm8tZGVwdGggPSA8MHg0MD47DQo+Pj4+ICAgICAgICAgIHJ4
-LWZpZm8tZGVwdGggPSA8MHg0MD47DQo+Pj4+ICsgICAgICAgIHhsbngsaGFzLWVjYw0KPj4+DQo+
-Pj4gT2J2aW91c2x5IG5vdCB0ZXN0ZWQuDQo+PiBXaWxsIGZpeCBpdC4NCj4+DQo+DQo+Rml4IGl0
-IGJ5IGZpeGluZyBlcnJvciBvciBieSB0ZXN0aW5nPyBDYW4geW91IGRvIGJvdGg/DQpUZXN0ZWQg
-d2l0aCB2MSBhbmQgbWlzc2VkIGluIHYyIGR1ZSB0byBjb3B5IHBhc3RlLCB3aWxsIHRlc3QgYW5k
-IHNlbmQgbmV4dCB2ZXJzaW9uLg0KDQpUaGFua3MuDQpTcmluaXZhcw0KDQo=
+On Wed, Aug 30, 2023 at 08:05AM +0900, Dominique Martinet wrote:
+> Marco Elver wrote on Tue, Aug 29, 2023 at 04:11:38PM +0200:
+> > On Tue, Aug 29, 2023 at 07:57PM +0900, Dominique Martinet wrote:
+> > [...]
+> > > Yes well that doesn't seem too hard to hit, both threads are just
+> > > setting O_NONBLOCK to the same fd in parallel (0x800 is 04000,
+> > > O_NONBLOCK)
+> > > 
+> > > I'm not quite sure why that'd be a problem; and I'm also pretty sure
+> > > that wouldn't work anyway (9p has no muxing or anything that'd allow
+> > > sharing the same fd between multiple mounts)
+> > > 
+> > > Can this be flagged "don't care" ?
+> > 
+> > If it's an intentional data race, it could be marked data_race() [1].
+> > [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/tools/memory-model/Documentation/access-marking.txt
+> 
+> Thanks!
+> 
+> > However, staring at this code for a bit, I wonder why the f_flags are
+> > set on open, and not on initialization somewhere...
+> 
+> This open is during the mount initialization (mount/p9_client_create,
+> full path in the stack); there's no more initialization-ish code we
+> have.
+> The problem here is that we allow to pass any old arbitrary fd, so the
+> user can open their fd how they want and abuse mount to use it on
+> multiple mounts, even if that has no way of working (as I mentionned,
+> there's no control flow at all -- you'll create two completely separate
+> client state machines that'll both try to read and/or write (separate
+> fds) on the same fd, and it'll all get jumbled up.
+> > 
+> > Anyway, a patch like the below would document that the data race is
+> > intended and we assume that there is no way (famous last words) the
+> > compiler or the CPU can mess it up (and KCSAN won't report it again).
+> 
+> That's good enough for me as my position really is just "don't do
+> that"... Would that also protect from syzcaller sending the fd to mount
+> on one side, and calling fcntl(F_SETFL) on the side?
+
+No, data_race() is only for marking intentional data races. In a
+production kernel, it's a no-op (generated code is identical). In a
+KCSAN kernel, it will make the tool not report such data races.
+
+syzkaller doesn't care, and can still produce such programs (so that
+other bug detectors can still see an issue if there is one somewhere).
+
+> At this rate we might as well just take the file's f_lock as setfl does,
+> but perhaps there's a way to steal the fd from userspace somehow?
+> 
+> It's not just "don't use this fd for another mount", it really is "don't
+> use this fd anymore while it is used by a mount".
+> 
+> This is made complicated that we only want to steal half of the fd, you
+> could imagine a weird setup like this:
+> 
+>  ┌────────────────────────────────────┐         ┌─────────────────┐
+>  │                                    │         │                 │
+>  │                                    │         │  kernel client  │
+>  │   fd3 tcp to server                │         │                 │
+>  │       write end  ◄─────────────────┼─────────┤                 │
+>  │                                    │         │                 │
+>  │       read end   ──┐               │         │                 │
+>  │                    │               │         │                 │
+>  │   fd4 pipeA        │ MITMing...    │         │                 │
+>  │                    │               │         │                 │
+>  │       write end  ◄─┘               │         │                 │
+>  │                                    │         │                 │
+>  │   fd5 pipeB                        │         │                 │
+>  │                                    │         │                 │
+>  │       read end  ───────────────────┼────────►│                 │
+>  │                                    │         │                 │
+>  │                                    │         │                 │
+>  └────────────────────────────────────┘         └─────────────────┘
+> 
+> I'm not sure we actually want to support something like that, but it's
+> currently possible and making mount act like close() on the fd would
+> break this... :|
+> 
+> So, yeah, well; this is one of these "please don't do this" that
+> syzcaller has no way of knowing about; it's good to test (please don't
+> do this has no security guarantee so the kernel shouldn't blow up!),
+> but if the only fallout is breakage then yeah data_race() is fine.
+
+Right, if the only breakage is some corruption of the particular file in
+user space, and the kernel is still in a good state, then I think this
+is fine. However, if the kernel can potentially crash or corrupt
+completely unrelated data, it may be a problem.
+
+> Compilers and/or CPU might be able to blow this out of proportion, but
+> hopefully they won't go around modifying another unrelated value in
+> memory somewhere, and we do fdget so it shouldn't turn into a UAF, so I
+> guess it's fine?...
+
+No, the kernel strongly assumes "locally undefined behaviour" for data
+races in the worst case, i.e. some garbage value being written into
+f_flags. To guard against that we'd have to use READ_ONCE/WRITE_ONCE.
+
+But given the best-effort nature of this based on "don't do this" i.e.
+not really supported, data_race() is probably more than enough. You may
+want to amend the patch I sent to clarify that (I wasn't aware of it).
+
+> Just taking f_lock here won't solve anything and
+> might give the impression we support concurrent uses.
+> 
+> 
+> Sorry for rambling, and thanks for the patch; I'm not sure if Eric has
+> anything planned for next cycle but either of us can take it and call it
+> a day.
+
+Thanks for the explanation!
 
