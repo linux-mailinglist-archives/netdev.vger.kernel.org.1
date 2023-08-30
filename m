@@ -1,145 +1,158 @@
-Return-Path: <netdev+bounces-31331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FA3F78D338
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 08:16:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C1CD78D339
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 08:16:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDB112812D9
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 06:16:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 153C52812E4
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 06:16:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 079A715C5;
-	Wed, 30 Aug 2023 06:16:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A715015A0;
+	Wed, 30 Aug 2023 06:16:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F019915A0
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 06:16:31 +0000 (UTC)
-Received: from mail-ua1-x935.google.com (mail-ua1-x935.google.com [IPv6:2607:f8b0:4864:20::935])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07C38CCB
-	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 23:16:31 -0700 (PDT)
-Received: by mail-ua1-x935.google.com with SMTP id a1e0cc1a2514c-7a25184a648so1822816241.2
-        for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 23:16:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693376189; x=1693980989; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZmvTj6z/xHNFVH3ZETwtxTxR57Mwo1lTVCpREPyFqeQ=;
-        b=awoPPrpAiNIQy0zSP1jJG2Rq3dHsYBJARnYyHJkkQZPiAV6mEMv/T5c6HI1Zs/mzci
-         EMcdsnqv295M8vkqNsCzllNyJtkimHokqEeZhb+Y7BDrB/KjCNvuYTSznjnfsWaOTrcp
-         hzZZ3pCBi0g5skDI15qHlF8bI8T4XWa2ueXJ5ttwVOPwhMW5UPkLYW2H+XoLhvXICVVg
-         hOD28FGmvnqwQ94whtMnL3EXvIfCB/Z2jbua23tNHOYwk0cqfExLLuW17a3i9KGr1Y5U
-         qECFvem0Wuvc2FzPpWEhp7Cwo08IUf/7bXOHcVmhuiGfi/b8DRlzb+o7+a1tPetLhWKN
-         BF5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693376189; x=1693980989;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZmvTj6z/xHNFVH3ZETwtxTxR57Mwo1lTVCpREPyFqeQ=;
-        b=ktObxeE+3CzXhBHM7SKMiawzSOvpMoxE+OQmOtZ8SzOVEOq93DJNrg0pANtrT0yBCR
-         ghkJlBptnJz7e9CP+nH/F2bam+dGwaiuPqW7Q1v96Sg2GSrqsG0s9Ff8RmmteY05A2AT
-         +xu6dGrP/I8EOMnkykIThIxaxbt7uFKy5xy2oKsKUh0oFM7vPlo0wQoL3kwJZzpEt3jM
-         bB5AApNSERvpIPTKCN2McJB6913EvoHWtPaPrm36osjvHsx/DnMQb3ldrYqY3QzT924a
-         LkQuHXvL3JbAkBMjOtg7jHHUOUATiXyHk0ZAH2uAG3t6N2BUUm8Z3i311+5Jk+v//JB/
-         E0Uw==
-X-Gm-Message-State: AOJu0Yz/axCSpH5aLPnINRG2PJW6KsSZ5ocbhY1Kc5x4jvKJDwdL5bUl
-	g3lw8DNexkhGtmgkDpnEGmFg0pXfujI=
-X-Google-Smtp-Source: AGHT+IEjCVDUu8wLOBtfKhAOHp/QQXd6VaunRGCnpm+XM3ViO6KQtB2D/RdxwlxiWrNp9zJN64VyoA==
-X-Received: by 2002:a67:f993:0:b0:44d:476b:3bc0 with SMTP id b19-20020a67f993000000b0044d476b3bc0mr1280048vsq.28.1693376189384;
-        Tue, 29 Aug 2023 23:16:29 -0700 (PDT)
-Received: from Laptop-X1.redhat.com ([2409:8a02:7820:a6d0:fe00:94b0:34da:834c])
-        by smtp.gmail.com with ESMTPSA id cm8-20020a17090afa0800b00267b7c5d232sm550085pjb.48.2023.08.29.23.16.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Aug 2023 23:16:28 -0700 (PDT)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Ido Schimmel <idosch@idosch.org>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Thomas Haller <thaller@redhat.com>
-Subject: [PATCH net-next] ipv6: do not merge differe type and protocol routes
-Date: Wed, 30 Aug 2023 14:16:22 +0800
-Message-ID: <20230830061622.2320096-1-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B5DF1859
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 06:16:46 +0000 (UTC)
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AB6BCCB
+	for <netdev@vger.kernel.org>; Tue, 29 Aug 2023 23:16:45 -0700 (PDT)
+Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
+	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qbEVA-00061g-4N; Wed, 30 Aug 2023 08:16:28 +0200
+Received: from ore by ptx.hi.pengutronix.de with local (Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qbEV8-0007z2-B3; Wed, 30 Aug 2023 08:16:26 +0200
+Date: Wed, 30 Aug 2023 08:16:26 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Tristram.Ha@microchip.com
+Cc: lukma@denx.de, olteanv@gmail.com, linux@rempel-privat.de,
+	Arun.Ramadoss@microchip.com, f.fainelli@gmail.com, andrew@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	Woojung.Huh@microchip.com, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH 2/2] net: dsa: microchip: Provide Module 4 KSZ9477 errata
+ (DS80000754C)
+Message-ID: <20230830061626.GF31399@pengutronix.de>
+References: <20230826104910.voaw3ndvs52yoy2v@skbuf>
+ <20230829103533.7966f332@wsk>
+ <20230829101851.435pxwwse2mo5fwi@skbuf>
+ <20230829132429.529283be@wsk>
+ <20230829114739.GC31399@pengutronix.de>
+ <20230829143829.68410966@wsk>
+ <20230829144209.GD31399@pengutronix.de>
+ <20230829172913.518210b0@wsk>
+ <20230829171205.GE31399@pengutronix.de>
+ <BYAPR11MB3558DDEACCFE005DA1D41CDCECE7A@BYAPR11MB3558.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <BYAPR11MB3558DDEACCFE005DA1D41CDCECE7A@BYAPR11MB3558.namprd11.prod.outlook.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Different with IPv4, IPv6 will auto merge the same metric routes into
-multipath routes. But the different type and protocol routes are also
-merged, which will lost user's configure info. e.g.
+On Tue, Aug 29, 2023 at 10:23:26PM +0000, Tristram.Ha@microchip.com wrote:
+> > Yes, removing linkmod_and() will not should not help. I said, "The
+> > phydev->supported_eee should be cleared."
+> > 
+> > For example like this:
+> > --- a/drivers/net/phy/micrel.c
+> > +++ b/drivers/net/phy/micrel.c
+> > @@ -1400,6 +1400,7 @@ static int ksz9131_config_aneg(struct phy_device *phydev)
+> > 
+> >  static int ksz9477_get_features(struct phy_device *phydev)
+> >  {
+> > +       __ETHTOOL_DECLARE_LINK_MODE_MASK(zero) = { 0, };
+> >         int ret;
+> > 
+> >         ret = genphy_read_abilities(phydev);
+> > @@ -1413,7 +1414,7 @@ static int ksz9477_get_features(struct phy_device
+> > *phydev)
+> >          * KSZ8563R should have 100BaseTX/Full only.
+> >          */
+> >         linkmode_and(phydev->supported_eee, phydev->supported,
+> > -                    PHY_EEE_CAP1_FEATURES);
+> > +                    zero);
+> > 
+> >         return 0;
+> >  }
+> > 
+> > You will need to clear it only on KSZ9477 variants with this bug.
+> > This change is tested and it works on my KSZ9477-EVB.
+>  
+> I think this is best for disabling EEE support.
+> I think before some customers asked for Ethtool EEE support not because
+> they want to use it but to disable it because of link instability.
+> KSZ9893/KSZ9563 switches should have the same problem.  The EEE problem
+> depends on the link partner.  For example my laptop does not have problem
+> even though EEE is enabled, although I am not sure if EEE is really
+> active.  The problem here is just using two KSZ9477 switches and
+> programming those PHY setup values and enabling EEE will make the link
+> unstable.  Management decided to disable EEE feature to avoid customer
+> support issues.
+> Another issue is EEE should be disabled when using 1588 PTP.
+> 
 
-+ ip route add local 2001:db8:103::/64 via 2001:db8:101::10 dev dummy1 table 100
-+ ip route append unicast 2001:db8:103::/64 via 2001:db8:101::10 dev dummy2 table 100
-+ ip -6 route show table 100
-local 2001:db8:103::/64 metric 1024 pref medium
-        nexthop via 2001:db8:101::10 dev dummy1 weight 1
-        nexthop via 2001:db8:101::10 dev dummy2 weight 1
+I'd like to share my thoughts on the concerns raised:
 
-+ ip route add 2001:db8:104::/64 via 2001:db8:101::10 dev dummy1 proto kernel table 200
-+ ip route append 2001:db8:104::/64 via 2001:db8:101::10 dev dummy2 proto bgp table 200
-+ ip -6 route show table 200
-2001:db8:104::/64 proto kernel metric 1024 pref medium
-        nexthop via 2001:db8:101::10 dev dummy1 weight 1
-        nexthop via 2001:db8:101::10 dev dummy2 weight 1
+- KSZ9477 & EEE: Disabling EEE for the KSZ9477 makes sense, especially since
+the datasheet doesn't list it as supported.
 
-So let's skip counting the different type and protocol routes as siblings.
-After update, the different type/protocol routes will not be merged.
+- EEE Support for KSZ9893 & KSZ9563: The datasheets for the KSZ9893 indicate
+support for EEE. The erratum recommends making adjustments to the "transmit
+Refresh Time for Waketx to meet the IEEE Refresh Time specification" instead of
+turning it off completely. The same applies to KSZ9563. We should consider
+these adjustments.
 
-+ ip -6 route show table 100
-local 2001:db8:103::/64 via 2001:db8:101::10 dev dummy1 metric 1024 pref medium
-2001:db8:103::/64 via 2001:db8:101::10 dev dummy2 metric 1024 pref medium
+- General Experience with KSZ Chips*: From my experience with these chips,
+irrespective of the EEE functionality, only the 1000/full and 100/full link
+modes tend to be stable enough.
 
-+ ip -6 route show table 200
-2001:db8:104::/64 via 2001:db8:101::10 dev dummy1 proto kernel metric 1024 pref medium
-2001:db8:104::/64 via 2001:db8:101::10 dev dummy2 proto bgp metric 1024 pref medium
+- Responsibility to Customers and Certifications: As a part of the product
+supply chain, I believe in our commitment to honesty with our customers. When
+we select components for end products, we trust their listed features. For
+instance, designing for ENERGY STAR certification requires that all
+copper-based physical network ports in an LNE product must be compliant with
+IEEE 802.3 Clause 78, which mandates Energy Efficient Ethernet. If Microchip
+promotes a KSZ* chip with EEE as a feature, it becomes a cornerstone of the end
+product. Negating a key functionality, which was sold and then incorporated
+into the product, could risk non-compliance with certification criteria.
 
-Reported-by: Thomas Haller <thaller@redhat.com>
-Closes: https://bugzilla.redhat.com/show_bug.cgi?id=2161994
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
----
-All fib test passed:
-Tests passed: 203
-Tests failed:   0
----
- net/ipv6/ip6_fib.c | 5 +++++
- 1 file changed, 5 insertions(+)
+- Consistency in Product Representation: If the overarching company decision is
+to disable the EEE feature for all chips to preempt potential customer support
+issues, our product information should mirror this change. It's crucial that we
+neither misrepresent nor over-promise on features. Your deeper insights, given
+your involvement with Microchip's strategy, would be most enlightening.
 
-diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-index 28b01a068412..f60f5d14f034 100644
---- a/net/ipv6/ip6_fib.c
-+++ b/net/ipv6/ip6_fib.c
-@@ -1133,6 +1133,11 @@ static int fib6_add_rt2node(struct fib6_node *fn, struct fib6_info *rt,
- 							rt->fib6_pmtu);
- 				return -EEXIST;
- 			}
-+
-+			if (iter->fib6_type != rt->fib6_type ||
-+			    iter->fib6_protocol != rt->fib6_protocol)
-+				goto next_iter;
-+
- 			/* If we have the same destination and the same metric,
- 			 * but not the same gateway, then the route we try to
- 			 * add is sibling to this route, increment our counter
+Regards,
+Oleksij
 -- 
-2.41.0
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
