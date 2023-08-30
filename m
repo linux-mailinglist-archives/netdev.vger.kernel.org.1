@@ -1,131 +1,105 @@
-Return-Path: <netdev+bounces-31424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EA5B78D6E2
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 17:17:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2388C78D6E1
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 17:17:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EAD31C208CB
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 15:17:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09ACC1C2040F
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 15:17:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EC056FDB;
-	Wed, 30 Aug 2023 15:17:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 850E06FC3;
+	Wed, 30 Aug 2023 15:17:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B3C06FD5;
-	Wed, 30 Aug 2023 15:17:36 +0000 (UTC)
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D8401A2;
-	Wed, 30 Aug 2023 08:17:35 -0700 (PDT)
-Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-401ef656465so1858085e9.1;
-        Wed, 30 Aug 2023 08:17:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693408653; x=1694013453; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PeStNgIFyhYkU5cmLWBgd4BV9abdD1hSxAhShc4Rniw=;
-        b=a8XCeYMc3Un1JNT/RIWo7+7u1LzId6h2HH6LrSEbNDWfhTJqGCFkw9c2+qd47fhju4
-         HWV6xJsx9TRMflIeT31NaaMKm1z1/KLVcuX8jZj0YRBX6/YFyuQ1dkMbRdcwd8fc9W3t
-         4jQO8q5JN59e97d/kConO++lKr1Wheu9yTRx7RREsIsXaLFKy0K4UMYqeuLYXA36hB8P
-         NHsDjDYdTP2F/XdmBZFUpGF3vFlVEWvUOoBvcx6/gKICqqb8huJzFZr8lLOmYZyv8FWL
-         QfignBo+Kz6l0yY6JHnk3OiiGyv6tVqYjbUmWV0lAItcLSKoGZYuTBTIQvHhvBtUyn5d
-         Ikuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693408653; x=1694013453;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PeStNgIFyhYkU5cmLWBgd4BV9abdD1hSxAhShc4Rniw=;
-        b=HD+CYhL/tBW3VSWWD9OjUS5JPW1hzzYopTV9Szb2dvI67sJjPQDJ97T4aznBNYqMG/
-         gmy6krR6MRLxHTPaz1XedtQp3VYvEZNz3dWZbI7Og+zAWjEZRsoC8mn7T1BsG4SoclkU
-         cUx07MJyqaZ+5vpV5MGADHA9V24u8bVua3yTv78WG1wVRj7+ltCu4Aez4AAljp3ppp/b
-         p8o7rB6HbuBQeEvV2A91FU3UZOOM863IfCgZvKg4cq9dgFsj/W8ob5ntlEvt+Np+bTPG
-         XpLJVnnIhJEYcGh0PlARH0QpaKXlqaRCwewxkJfmMzTi8p3aKEyvY6gIPmd/X73ZIH30
-         PDTQ==
-X-Gm-Message-State: AOJu0Yz1BlBApygasKe7Y+63REQnv9NlSqGQfBfPtr/u+VSpc9uHnBAU
-	dg4mdYww3tAIYQKz6rorA10=
-X-Google-Smtp-Source: AGHT+IHGprUSVMZhj6MIp3VxMSV5tq1dagJ2Ilu7ATS68B26J+0S0NPcz835UxBmvHI0Sj0UZfA1cA==
-X-Received: by 2002:a05:600c:3b8c:b0:401:b0f8:c26a with SMTP id n12-20020a05600c3b8c00b00401b0f8c26amr2117752wms.4.1693408653156;
-        Wed, 30 Aug 2023 08:17:33 -0700 (PDT)
-Received: from localhost.localdomain (h-176-10-144-222.NA.cust.bahnhof.se. [176.10.144.222])
-        by smtp.gmail.com with ESMTPSA id r19-20020a05600c299300b003fe539b83f2sm2546562wmd.42.2023.08.30.08.17.31
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 30 Aug 2023 08:17:32 -0700 (PDT)
-From: Magnus Karlsson <magnus.karlsson@gmail.com>
-To: magnus.karlsson@intel.com,
-	bjorn@kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	netdev@vger.kernel.org,
-	maciej.fijalkowski@intel.com
-Cc: jonathan.lemon@gmail.com,
-	bpf@vger.kernel.org,
-	syzbot+822d1359297e2694f873@syzkaller.appspotmail.com
-Subject: [PATCH bpf] xsk: fix xsk_diag use-after-free error during socket cleanup
-Date: Wed, 30 Aug 2023 17:17:03 +0200
-Message-ID: <20230830151704.14855-1-magnus.karlsson@gmail.com>
-X-Mailer: git-send-email 2.42.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 736EE5398
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 15:17:34 +0000 (UTC)
+Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74B701A3
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 08:17:33 -0700 (PDT)
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+	by mailout.nyi.internal (Postfix) with ESMTP id DED465C0109;
+	Wed, 30 Aug 2023 11:17:32 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute3.internal (MEProxy); Wed, 30 Aug 2023 11:17:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm1; t=1693408652; x=1693495052; bh=0qPtmyyUpQSLN
+	Odgbtpe33Gx+tXIvgjJ/8JvU5B4E+8=; b=tO8IWeumdcaoWkBD1zxdBSwvMjxxP
+	PHIEn/o6KClMduHCafpD68S7ggy5J1waZd0ekscD0ItsBl4qPfE7EzlTacdcqCF/
+	20VBZ7ybnIlF+YU058eza/9QPlzh4KNs6WLCSnik040m1haqRaof4lEIgM9CpC9X
+	bMi7KmumX9JQrgS4YlotjofumsgNDBd6zBKbEjmoI3GK6EfIxu/COrjrSPBRQwqr
+	7ET7GyXZRr6uBAiPTtv9fpjTeXeoirTwWNSvx0VqYBNjtRw/+LwaP+V2mCjvFjS6
+	Uce4ivRaFX2+uO522UwCaTybnCSOdKm2KlqN2hjHSxK6OQPQgOPDL/mzg==
+X-ME-Sender: <xms:jF3vZIkHtnLIbFo7RMw-xnlSYf7YexHD0LXn8vdaZ01OZF48QbE2jg>
+    <xme:jF3vZH1niGrB2mgdOCFyOFhWQiBcsfvCZzqQfZe03bEiouAcbZSz305wRiLqcJjSB
+    I6j2oB-mOQxvA8>
+X-ME-Received: <xmr:jF3vZGq2qq05iDOMBPAvaA5I7oXNqkNkwwSklxDiHR3iAmxRFThNG9eGkAVrq79YGgHsrdhwXx80blx4Ow5O_KO2Q3FQ9g>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrudefkedgkeekucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcu
+    ufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrth
+    htvghrnhepvddufeevkeehueegfedtvdevfefgudeifeduieefgfelkeehgeelgeejjeeg
+    gefhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepih
+    guohhstghhsehiughoshgthhdrohhrgh
+X-ME-Proxy: <xmx:jF3vZElTLqxkzcP3fRz7EpT_YibOm0OC5r5Fq6RKCVjY70yrp5q1wA>
+    <xmx:jF3vZG3QHECtkvV2wVpAZnprlz6FbpOjwben01RgQFotwGZgz8KNiA>
+    <xmx:jF3vZLtI6Vo_fbfAGHSWVaSq3pzRilwpHBxr9Z0hxPwKw9wD9SUtgg>
+    <xmx:jF3vZLzq7SnSLB-vxY9e5fU-fcULJK6TyEZefztmgvjEu7gIYRS8yw>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 30 Aug 2023 11:17:31 -0400 (EDT)
+Date: Wed, 30 Aug 2023 18:17:27 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: "Drewek, Wojciech" <wojciech.drewek@intel.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+	"idosch@nvidia.com" <idosch@nvidia.com>
+Subject: Re: [PATCH iwl-next v2] ice: Disable Cage Max Power override
+Message-ID: <ZO9dhzhK+psufXqS@shredder>
+References: <20230824085459.35998-1-wojciech.drewek@intel.com>
+ <20230824083201.79f79513@kernel.org>
+ <MW4PR11MB57768054635E8DEF841BB2A9FDE3A@MW4PR11MB5776.namprd11.prod.outlook.com>
+ <ZOsNhgd3ZxXEaEA5@shredder>
+ <MW4PR11MB57766C3B9C05C94F51630251FDE7A@MW4PR11MB5776.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <MW4PR11MB57766C3B9C05C94F51630251FDE7A@MW4PR11MB5776.namprd11.prod.outlook.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Magnus Karlsson <magnus.karlsson@intel.com>
+On Tue, Aug 29, 2023 at 09:12:22AM +0000, Drewek, Wojciech wrote:
+> In some cases users are trying to use media with power exceeding max allowed value.
+> Port split require system reboot so it feels natural to me to restore default settings.
 
-Fix a use-after-free error that is possible if the xsk_diag interface
-is used at the same time as the socket is being closed. In the early
-days of AF_XDP, the way we tested that a socket was not bound or being
-closed was to simply check if the netdevice pointer in the xsk socket
-structure was NULL. Later, a better system was introduced by having an
-explicit state variable in the xsk socket struct. For example, the
-state of a socket that is going down is XSK_UNBOUND.
+I don't believe it's the kernel's responsibility to undo changes done by
+external tools. Given that the tool is able to change this setting, I
+assume it can also restore it back to default.
 
-The commit in the Fixes tag below deleted the old way of signalling
-that a socket is going down, setting dev to NULL. This in the belief
-that all code using the old way had been exterminated. That was
-unfortunately not true as the xsk diagnostics code was still using the
-old way and thus does not work as intended when a socket is going
-down. Fix this by introducing a test against the state variable. If
-the socket is going down, simply abort the diagnostic's netlink
-operation.
+Moreover, it doesn't sound like port split won't work without this
+change, so placing this change there only because we assume that a
+reboot will follow seems random.
 
-Fixes: 18b1ab7aa76b ("xsk: Fix race at socket teardown")
-Reported-by: syzbot+822d1359297e2694f873@syzkaller.appspotmail.com
-Signed-off-by: Magnus Karlsson <magnus.karlsson@intel.com>
----
- net/xdp/xsk_diag.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/net/xdp/xsk_diag.c b/net/xdp/xsk_diag.c
-index c014217f5fa7..da3100bfa1c5 100644
---- a/net/xdp/xsk_diag.c
-+++ b/net/xdp/xsk_diag.c
-@@ -111,6 +111,9 @@ static int xsk_diag_fill(struct sock *sk, struct sk_buff *nlskb,
- 	sock_diag_save_cookie(sk, msg->xdiag_cookie);
- 
- 	mutex_lock(&xs->mutex);
-+	if (xs->state == XSK_UNBOUND)
-+		goto out_nlmsg_trim;
-+
- 	if ((req->xdiag_show & XDP_SHOW_INFO) && xsk_diag_put_info(xs, nlskb))
- 		goto out_nlmsg_trim;
- 
-
-base-commit: 35d2b7ffffc1d9b3dc6c761010aa3338da49165b
--- 
-2.42.0
-
+I think the best way forward is to extend ethtool as was already
+suggested. It should allow you to avoid the split brain situation where
+the hardware is configured by both the kernel and an external tool.
 
