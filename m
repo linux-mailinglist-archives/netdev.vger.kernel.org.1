@@ -1,152 +1,205 @@
-Return-Path: <netdev+bounces-31360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D74F978D4EA
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 11:48:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3041778D4F9
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 11:55:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 140C01C20ACB
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 09:48:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 851B3281369
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 09:55:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCA841FBF;
-	Wed, 30 Aug 2023 09:48:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6844B1FCA;
+	Wed, 30 Aug 2023 09:55:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE37620E3
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 09:48:47 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E7351B3;
-	Wed, 30 Aug 2023 02:48:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693388926; x=1724924926;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=orlWb/RTxKwxmmASqoBVNPU97JJXkwjIwCGq+9b7IOI=;
-  b=gdtnRX8Qq4wUugYquYr/o/zeVJtMak6Ssb4r+ruzHn/jGz0UW0vxww1h
-   gpFAkG4SCYVMBKOgqyoQvb19NaHx1ToZij6owjF9fGad7sHD3dNz3Vw9B
-   pUd53TN6htMaKrjNRW6wBidt6DutVVToJdQHEK4zCCUZPKwm19IM2+67W
-   AhMXSK1C0CvgeuxvSpC6a4Cwwx/g95OILPGIOanu9t6FqdR1FNKdpNo9i
-   3uAp5xHXF3lPy+tTOEwLdITOCLztICcQhdUApWZ+Z10csOQyh2miWSc0m
-   AJp5dmuRZeVd2zmw4bjkwwStKY8R0LEIUnjpGkcgsFuLGl98Oao5uv8ae
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10817"; a="461970656"
-X-IronPort-AV: E=Sophos;i="6.02,213,1688454000"; 
-   d="scan'208";a="461970656"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2023 02:48:45 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10817"; a="732552815"
-X-IronPort-AV: E=Sophos;i="6.02,213,1688454000"; 
-   d="scan'208";a="732552815"
-Received: from unknown (HELO localhost.localdomain) ([10.237.112.144])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2023 02:48:39 -0700
-Date: Wed, 30 Aug 2023 11:48:31 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
-	davem@davemloft.net, Woojung Huh <woojung.huh@microchip.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>, Tristram.Ha@microchip.com,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] net: phy: Provide Module 4 KSZ9477 errata
- (DS80000754C)
-Message-ID: <ZO8QbyKphyTmuv/g@localhost.localdomain>
-References: <20230830092119.458330-1-lukma@denx.de>
- <20230830092119.458330-2-lukma@denx.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 596501FBF
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 09:55:27 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC0CF1B0
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 02:55:25 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-58cb845f2f2so73107347b3.1
+        for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 02:55:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1693389325; x=1693994125; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=8GlybaVzkWOBzPs3XaENUlcdKd7YZN4U/Q8ry5Fni0A=;
+        b=Ot8TizPXoNjbaL0o6J+NeXTStBgQetiSWq4CiiBCoYBGRfWKvrY7mdBtXhC1MQhy2b
+         gTECsM0MtkRa+iWh5qWH6sUtxxRmx0PZxkWEhhw392Te5V5rp32beUQylJxa1K6dm0u6
+         1n8QE2Ssx49e6R2BZh1lvYWYBbFLGuqkBWukHw6Yn3WT7gdSMSkXt8llu2GtPSgzOp67
+         /x/tqh0X5t3VJSTzONAFnf+iTcyTDktpMIsJXC8edxH27Z3+zm9UfYhLc6xqIc3LXWSz
+         BSphnY7zglGAGbdw4xiZoQIgSzBuX63rqXnp4CivAlvGlJyYPs0fsJENLD/4VSctUSWF
+         8rRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693389325; x=1693994125;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8GlybaVzkWOBzPs3XaENUlcdKd7YZN4U/Q8ry5Fni0A=;
+        b=kFWjV9YB5xlPtSNx6oqjjhW4QzJZcuPpUH/wnjyrhBMnSgeBDKXxUCNCdBu1CBQ28/
+         hkLqC53q/qnpLLlJQc65Fe5QNvXIuiFTW900JJLlZ3pNtRefbGkP5lohrZqTgi7ht2da
+         pW/Es3s2nR/EE4XW/0pB2FLdI2J0/uDnXyBPDRdg4wgB67Dijn62luM6eDtdPKqQqYAd
+         RBkNhrQLsOnuWBHMFe7y55wXjjerMqaF/XYxpgV3aQz+b4e5VKjKk/kFhqfyWOMIODkH
+         1stERZ1ZUL3dfLRg1sMSR7ajK2icyJYa9CkLvcwnOfu41J62rMxT82s9Ucmk6YdJ55ML
+         hYgg==
+X-Gm-Message-State: AOJu0YyeTBAuA+sbzs3+T4kaK7RJ/QWVscSuiWcDP1KrL1qbTS1elbih
+	h6MSFM9Br3LcfGQIFQ5S8wVwo/xaKKibdg==
+X-Google-Smtp-Source: AGHT+IERKoNkRtMwN1UxxGuQcWnAopsJtij7CANLBXkSQdvBuXfdGl0bFstmCkpHm8NZPanJ5oHC2U1l9AiJzQ==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a25:2f0f:0:b0:d77:8641:670c with SMTP id
+ v15-20020a252f0f000000b00d778641670cmr48306ybv.10.1693389324945; Wed, 30 Aug
+ 2023 02:55:24 -0700 (PDT)
+Date: Wed, 30 Aug 2023 09:55:20 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230830092119.458330-2-lukma@denx.de>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.rc2.253.gd59a3bf2b4-goog
+Message-ID: <20230830095520.1046984-1-edumazet@google.com>
+Subject: [PATCH v2 net] ipv4: annotate data-races around fi->fib_dead
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>, 
+	David Ahern <dsahern@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 30, 2023 at 11:21:19AM +0200, Lukasz Majewski wrote:
-> The KSZ9477 errata points out (in 'Module 4') the link up/down problem
-> when EEE (Energy Efficient Ethernet) is enabled in the device to which
-> the KSZ9477 tries to auto negotiate.
-> 
-> The suggested workaround is to clear advertisement of EEE for PHYs in
-> this chip driver.
-> 
-> Signed-off-by: Lukasz Majewski <lukma@denx.de>
-Hi,
+syzbot complained about a data-race in fib_table_lookup() [1]
 
-As the net is target you should add fixes tag which the commit that your
-changes is fixing (workarounding :) )
+Add appropriate annotations to document it.
 
-> ---
->  drivers/net/phy/micrel.c | 31 ++++++++++++++++++++++++++++++-
->  1 file changed, 30 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-> index 87b090ad2874..469dcd8a5711 100644
-> --- a/drivers/net/phy/micrel.c
-> +++ b/drivers/net/phy/micrel.c
-> @@ -1418,6 +1418,35 @@ static int ksz9131_get_features(struct phy_device *phydev)
->  	return 0;
->  }
->  
-> +static int ksz9477_get_features(struct phy_device *phydev)
-> +{
-> +	__ETHTOOL_DECLARE_LINK_MODE_MASK(zero) = { 0, };
-= { 0 };
+[1]
+BUG: KCSAN: data-race in fib_release_info / fib_table_lookup
 
-> +	int ret;
-> +
-> +	ret = genphy_read_abilities(phydev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* KSZ9477 Errata DS80000754C
-> +	 *
-> +	 * Module 4: Energy Efficient Ethernet (EEE) feature select must be
-> +	 * manually disabled
-> +	 *   The EEE feature is enabled by default, but it is not fully
-> +	 *   operational. It must be manually disabled through register
-> +	 *   controls. If not disabled, the PHY ports can auto-negotiate
-> +	 *   to enable EEE, and this feature can cause link drops when linked
-> +	 *   to another device supporting EEE.
-> +	 *
-> +	 *   Although, the KSZ9477 MMD register
-> +	 *   (MMD_DEVICE_ID_EEE_ADV.MMD_EEE_ADV) advertise that EEE is
-> +	 *   operational one needs to manualy clear them to follow the chip
-> +	 *   errata.
-> +	 */
-> +	linkmode_and(phydev->supported_eee, phydev->supported, zero);
-> +
-> +	return 0;
-> +}
-> +
->  #define KSZ8873MLL_GLOBAL_CONTROL_4	0x06
->  #define KSZ8873MLL_GLOBAL_CONTROL_4_DUPLEX	BIT(6)
->  #define KSZ8873MLL_GLOBAL_CONTROL_4_SPEED	BIT(4)
-> @@ -4871,7 +4900,7 @@ static struct phy_driver ksphy_driver[] = {
->  	.handle_interrupt = kszphy_handle_interrupt,
->  	.suspend	= genphy_suspend,
->  	.resume		= genphy_resume,
-> -	.get_features	= ksz9131_get_features,
-> +	.get_features	= ksz9477_get_features,
->  } };
->  
->  module_phy_driver(ksphy_driver);
-> -- 
-> 2.20.1
-> 
+write to 0xffff888150f31744 of 1 bytes by task 1189 on cpu 0:
+fib_release_info+0x3a0/0x460 net/ipv4/fib_semantics.c:281
+fib_table_delete+0x8d2/0x900 net/ipv4/fib_trie.c:1777
+fib_magic+0x1c1/0x1f0 net/ipv4/fib_frontend.c:1106
+fib_del_ifaddr+0x8cf/0xa60 net/ipv4/fib_frontend.c:1317
+fib_inetaddr_event+0x77/0x200 net/ipv4/fib_frontend.c:1448
+notifier_call_chain kernel/notifier.c:93 [inline]
+blocking_notifier_call_chain+0x90/0x200 kernel/notifier.c:388
+__inet_del_ifa+0x4df/0x800 net/ipv4/devinet.c:432
+inet_del_ifa net/ipv4/devinet.c:469 [inline]
+inetdev_destroy net/ipv4/devinet.c:322 [inline]
+inetdev_event+0x553/0xaf0 net/ipv4/devinet.c:1606
+notifier_call_chain kernel/notifier.c:93 [inline]
+raw_notifier_call_chain+0x6b/0x1c0 kernel/notifier.c:461
+call_netdevice_notifiers_info net/core/dev.c:1962 [inline]
+call_netdevice_notifiers_mtu+0xd2/0x130 net/core/dev.c:2037
+dev_set_mtu_ext+0x30b/0x3e0 net/core/dev.c:8673
+do_setlink+0x5be/0x2430 net/core/rtnetlink.c:2837
+rtnl_setlink+0x255/0x300 net/core/rtnetlink.c:3177
+rtnetlink_rcv_msg+0x807/0x8c0 net/core/rtnetlink.c:6445
+netlink_rcv_skb+0x126/0x220 net/netlink/af_netlink.c:2549
+rtnetlink_rcv+0x1c/0x20 net/core/rtnetlink.c:6463
+netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
+netlink_unicast+0x56f/0x640 net/netlink/af_netlink.c:1365
+netlink_sendmsg+0x665/0x770 net/netlink/af_netlink.c:1914
+sock_sendmsg_nosec net/socket.c:725 [inline]
+sock_sendmsg net/socket.c:748 [inline]
+sock_write_iter+0x1aa/0x230 net/socket.c:1129
+do_iter_write+0x4b4/0x7b0 fs/read_write.c:860
+vfs_writev+0x1a8/0x320 fs/read_write.c:933
+do_writev+0xf8/0x220 fs/read_write.c:976
+__do_sys_writev fs/read_write.c:1049 [inline]
+__se_sys_writev fs/read_write.c:1046 [inline]
+__x64_sys_writev+0x45/0x50 fs/read_write.c:1046
+do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+read to 0xffff888150f31744 of 1 bytes by task 21839 on cpu 1:
+fib_table_lookup+0x2bf/0xd50 net/ipv4/fib_trie.c:1585
+fib_lookup include/net/ip_fib.h:383 [inline]
+ip_route_output_key_hash_rcu+0x38c/0x12c0 net/ipv4/route.c:2751
+ip_route_output_key_hash net/ipv4/route.c:2641 [inline]
+__ip_route_output_key include/net/route.h:134 [inline]
+ip_route_output_flow+0xa6/0x150 net/ipv4/route.c:2869
+send4+0x1e7/0x500 drivers/net/wireguard/socket.c:61
+wg_socket_send_skb_to_peer+0x94/0x130 drivers/net/wireguard/socket.c:175
+wg_socket_send_buffer_to_peer+0xd6/0x100 drivers/net/wireguard/socket.c:200
+wg_packet_send_handshake_initiation drivers/net/wireguard/send.c:40 [inline]
+wg_packet_handshake_send_worker+0x10c/0x150 drivers/net/wireguard/send.c:51
+process_one_work+0x434/0x860 kernel/workqueue.c:2600
+worker_thread+0x5f2/0xa10 kernel/workqueue.c:2751
+kthread+0x1d7/0x210 kernel/kthread.c:389
+ret_from_fork+0x2e/0x40 arch/x86/kernel/process.c:145
+ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+
+value changed: 0x00 -> 0x01
+
+Reported by Kernel Concurrency Sanitizer on:
+CPU: 1 PID: 21839 Comm: kworker/u4:18 Tainted: G W 6.5.0-syzkaller #0
+
+Fixes: dccd9ecc3744 ("ipv4: Do not use dead fib_info entries.")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: David Ahern <dsahern@kernel.org>
+---
+v2: rebase on latest net tree
+
+ net/ipv4/fib_semantics.c | 5 ++++-
+ net/ipv4/fib_trie.c      | 3 ++-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
+index 65ba18a91865ae9a9bd850052811509b8fb3a79b..eafa4a033515782b4ade9a81ec12cb22f5e51e35 100644
+--- a/net/ipv4/fib_semantics.c
++++ b/net/ipv4/fib_semantics.c
+@@ -278,7 +278,8 @@ void fib_release_info(struct fib_info *fi)
+ 				hlist_del(&nexthop_nh->nh_hash);
+ 			} endfor_nexthops(fi)
+ 		}
+-		fi->fib_dead = 1;
++		/* Paired with READ_ONCE() from fib_table_lookup() */
++		WRITE_ONCE(fi->fib_dead, 1);
+ 		fib_info_put(fi);
+ 	}
+ 	spin_unlock_bh(&fib_info_lock);
+@@ -1581,6 +1582,7 @@ struct fib_info *fib_create_info(struct fib_config *cfg,
+ link_it:
+ 	ofi = fib_find_info(fi);
+ 	if (ofi) {
++		/* fib_table_lookup() should not see @fi yet. */
+ 		fi->fib_dead = 1;
+ 		free_fib_info(fi);
+ 		refcount_inc(&ofi->fib_treeref);
+@@ -1619,6 +1621,7 @@ struct fib_info *fib_create_info(struct fib_config *cfg,
+ 
+ failure:
+ 	if (fi) {
++		/* fib_table_lookup() should not see @fi yet. */
+ 		fi->fib_dead = 1;
+ 		free_fib_info(fi);
+ 	}
+diff --git a/net/ipv4/fib_trie.c b/net/ipv4/fib_trie.c
+index 74d403dbd2b4e6128dacd1bfc3579a1fc3d635aa..d13fb9e76b9718c674b82ea9069f98fb29f06425 100644
+--- a/net/ipv4/fib_trie.c
++++ b/net/ipv4/fib_trie.c
+@@ -1582,7 +1582,8 @@ int fib_table_lookup(struct fib_table *tb, const struct flowi4 *flp,
+ 		if (fa->fa_dscp &&
+ 		    inet_dscp_to_dsfield(fa->fa_dscp) != flp->flowi4_tos)
+ 			continue;
+-		if (fi->fib_dead)
++		/* Paired with WRITE_ONCE() in fib_release_info() */
++		if (READ_ONCE(fi->fib_dead))
+ 			continue;
+ 		if (fa->fa_info->fib_scope < flp->flowi4_scope)
+ 			continue;
+-- 
+2.42.0.rc2.253.gd59a3bf2b4-goog
+
 
