@@ -1,138 +1,114 @@
-Return-Path: <netdev+bounces-31384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B1F378D591
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 13:35:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EAFA978D596
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 13:37:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1CF1281339
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 11:35:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3DF028121C
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 11:37:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86FE65254;
-	Wed, 30 Aug 2023 11:35:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73C095259;
+	Wed, 30 Aug 2023 11:37:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79C3D46BD
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 11:35:33 +0000 (UTC)
-Received: from us-smtp-delivery-44.mimecast.com (unknown [207.211.30.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C56301B0
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 04:35:31 -0700 (PDT)
-Received: from mimecast-mx02.redhat.com (66.187.233.73 [66.187.233.73]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-187-jd2J6nWIP-ub-FPQJRRIag-1; Wed, 30 Aug 2023 07:35:14 -0400
-X-MC-Unique: jd2J6nWIP-ub-FPQJRRIag-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8A2C23811F26;
-	Wed, 30 Aug 2023 11:35:13 +0000 (UTC)
-Received: from hog (unknown [10.45.224.12])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id A130940C6F4C;
-	Wed, 30 Aug 2023 11:35:11 +0000 (UTC)
-Date: Wed, 30 Aug 2023 13:35:10 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: "Radu Pirea (OSS)" <radu-nicolae.pirea@oss.nxp.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, richardcochran@gmail.com,
-	sebastian.tobuschat@nxp.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC net-next v2 5/5] net: phy: nxp-c45-tja11xx: implement
- mdo_insert_tx_tag
-Message-ID: <ZO8pbtnlOVauabjC@hog>
-References: <20230824091615.191379-1-radu-nicolae.pirea@oss.nxp.com>
- <20230824091615.191379-6-radu-nicolae.pirea@oss.nxp.com>
- <ZOx0L722xg5-J_he@hog>
- <5d42d6c9-2f0c-8913-49ec-50a25860c49f@oss.nxp.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63E3D524D
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 11:37:42 +0000 (UTC)
+Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D0E2D2;
+	Wed, 30 Aug 2023 04:37:41 -0700 (PDT)
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 37UBbVXX068241;
+	Wed, 30 Aug 2023 06:37:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1693395451;
+	bh=AyNAgQCLIMrc74RIuimykU88eCLuawiFiAk5AvdbM+M=;
+	h=From:To:CC:Subject:Date;
+	b=RkMzR+4YEgpPOvIDzJ8Y4/Aq769iDs3VPRG7o27PYHov3Mvwgsry/59jXsSWVmUi3
+	 OsR3m/cdY1kTzfUR0/3vrscL28aezhiPLg54OOJxqMskXLFTnxnFk991iXtP0r2R+g
+	 RShTglLCbx1ewah2CoY8zSuFQbi1QbRpAo5kuCzg=
+Received: from DFLE110.ent.ti.com (dfle110.ent.ti.com [10.64.6.31])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 37UBbVAw041765
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 30 Aug 2023 06:37:31 -0500
+Received: from DFLE115.ent.ti.com (10.64.6.36) by DFLE110.ent.ti.com
+ (10.64.6.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 30
+ Aug 2023 06:37:31 -0500
+Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE115.ent.ti.com
+ (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Wed, 30 Aug 2023 06:37:30 -0500
+Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
+	by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 37UBbV3i051449;
+	Wed, 30 Aug 2023 06:37:31 -0500
+Received: from localhost (uda0501179.dhcp.ti.com [172.24.227.35])
+	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 37UBbUB5010808;
+	Wed, 30 Aug 2023 06:37:30 -0500
+From: MD Danish Anwar <danishanwar@ti.com>
+To: Andrew Lunn <andrew@lunn.ch>, Vignesh Raghavendra <vigneshr@ti.com>,
+        Roger
+ Quadros <rogerq@kernel.org>,
+        Jacob Keller <jacob.e.keller@intel.com>,
+        Simon
+ Horman <horms@kernel.org>, MD Danish Anwar <danishanwar@ti.com>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
+	<edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <srk@ti.com>, <r-gunasekaran@ti.com>
+Subject: [RFC PATCH net-next 0/2] Add support for ICSSG on AM64x EVM
+Date: Wed, 30 Aug 2023 17:07:22 +0530
+Message-ID: <20230830113724.1228624-1-danishanwar@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <5d42d6c9-2f0c-8913-49ec-50a25860c49f@oss.nxp.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,SPF_HELO_NONE,SPF_NONE autolearn=no
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-2023-08-28, 16:46:02 +0300, Radu Pirea (OSS) wrote:
-> 
-> 
-> On 28.08.2023 13:17, Sabrina Dubroca wrote:
-> > 2023-08-24, 12:16:15 +0300, Radu Pirea (NXP OSS) wrote:
-> > > Implement mdo_insert_tx_tag to insert the TLV header in the ethernet
-> > > frame.
-> > > 
-> > > If extscs parameter is set to 1, then the TLV header will contain the
-> > > TX SC that will be used to encrypt the frame, otherwise the TX SC will
-> > > be selected using the MAC source address.
-> > 
-> > In which case would a user choose not to use the SCI? Using the MAC
-> > address is probably fine in basic setups, but having to fiddle with a
-> > module parameter (so unloading and reloading the module, which means
-> > losing network connectivity) to make things work when the setup
-> > evolves is really not convenient.
-> > 
-> > Is there a drawback to always using the SCI?
-> > 
-> 
-> I see your concern. If the PHY driver is reloaded, then the offloaded MACsec
-> configuration will vanish from the hardware. Actually, just a call to
-> phy_disconnect is enough to break an offloaded MACsec iface and can be
-> achieved by:
-> ip link set eth0 down && ip link set eth0 up
+This series adds support for ICSSG driver on AM64x EVM.
 
-And it's not restored when the link goes back up? That's inconvenient :/
-Do we end up with inconsistent state? ie driver and core believe
-everything is still offloaded, but HW lost all state? do we leak
-some resources allocated by the driver?
+First patch of the series adds compatible for AM64x EVM in icssg-prueth
+dt binding. Second patch adds support for AM64x compatible in the ICSSG 
+driver.
 
-We could add a flush/restore in macsec_notify when the lower device
-goes down/up, maybe limited to devices that request this (I don't know
-if all devices would need it, or maybe all devices offloading to the
-PHY but not to the MAC).
+This series depends on [1] which is posted as RFC.
 
-And what happens in this case?
-    ip link add link eth0 type macsec offload phy
-    ip link set eth0 down
-    ip macsec add macsec0 rx sci ...
-    ip macsec add macsec0 tx sa 0 ...
-    # etc
-    ip link set eth0 up
+[1] https://lore.kernel.org/all/20230830110847.1219515-1-danishanwar@ti.com/
 
-Will offload work with the current code?
+Thanks and Regards,
+Md Danish Anwar
 
-> The only drawback is related to the PTP frames encryption. Due to hardware
-> limitations, PHY timestamping + MACsec will not work if the custom header is
-> inserted. The only way to get this work is by using the MAC SA selection and
-> running PTP on the real netdev.
+MD Danish Anwar (2):
+  dt-bindings: net: Add compatible for AM64x in ICSSG
+  net: ti: icssg-prueth: Add AM64x icssg support
 
-Could you add some documentation explaining that? Users need this
-information to make the right choice for their use case. Maybe
-directly in the description of the module parameter, something like:
-"Select the TX SC using TLV header information. PTP frames encryption
-cannot work when this feature is enabled."
-
-If it's in the module parameter I guess it can't be too
-verbose. Otherwise I don't know where else to put it.
-
-And the parameter's name and/or description should probably include
-macsec/MACsec if it's visible at the level of the whole module (ie if
-macsec support isn't a separate module), just to give context at to
-what the TXSC is (and what the encryption for the PTP frames refers
-to).
+ Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml | 1 +
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c               | 5 +++++
+ 2 files changed, 6 insertions(+)
 
 -- 
-Sabrina
+2.34.1
 
 
