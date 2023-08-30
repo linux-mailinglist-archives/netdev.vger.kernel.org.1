@@ -1,142 +1,87 @@
-Return-Path: <netdev+bounces-31344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5FBB78D46D
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 10:56:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2570B78D479
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 11:05:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B4281C20ACC
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 08:56:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AE622812FD
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 09:05:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86D40187B;
-	Wed, 30 Aug 2023 08:56:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F8EB187B;
+	Wed, 30 Aug 2023 09:05:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 714C5636;
-	Wed, 30 Aug 2023 08:56:06 +0000 (UTC)
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88D38CC9;
-	Wed, 30 Aug 2023 01:56:03 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.153])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4RbJ6l5tbMz4f3mWf;
-	Wed, 30 Aug 2023 16:55:59 +0800 (CST)
-Received: from [10.67.111.192] (unknown [10.67.111.192])
-	by APP1 (Coremail) with SMTP id cCh0CgD3aygfBO9kp4dNBw--.49911S2;
-	Wed, 30 Aug 2023 16:56:00 +0800 (CST)
-Message-ID: <04e4df50-eed7-8944-0f0b-19bded6f37ef@huaweicloud.com>
-Date: Wed, 30 Aug 2023 16:55:59 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3455B1877
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 09:05:41 +0000 (UTC)
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12B16CC9
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 02:05:35 -0700 (PDT)
+Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.56])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4RbJHv4Dq2z1L9Gl;
+	Wed, 30 Aug 2023 17:03:55 +0800 (CST)
+Received: from huawei.com (10.90.53.73) by kwepemi500008.china.huawei.com
+ (7.221.188.139) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Wed, 30 Aug
+ 2023 17:05:33 +0800
+From: Jinjie Ruan <ruanjinjie@huawei.com>
+To: <netdev@vger.kernel.org>, <gregkh@linuxfoundation.org>,
+	<jirislaby@kernel.org>, <benjamin.tissoires@redhat.com>, Karsten Keil
+	<isdn@linux-pingi.de>
+CC: <ruanjinjie@huawei.com>
+Subject: [PATCH -next] isdn: capi, Use list_for_each_entry() helper
+Date: Wed, 30 Aug 2023 17:05:28 +0800
+Message-ID: <20230830090529.529209-1-ruanjinjie@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH bpf v3 3/4] selftests/bpf: fix a CI failure caused by
- vsock sockmap test
-Content-Language: en-US
-To: Daniel Borkmann <daniel@iogearbox.net>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, John Fastabend <john.fastabend@gmail.com>,
- Bobby Eshleman <bobby.eshleman@bytedance.com>
-Cc: Jakub Sitnicki <jakub@cloudflare.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
- Cong Wang <cong.wang@bytedance.com>
-References: <20230804073740.194770-1-xukuohai@huaweicloud.com>
- <20230804073740.194770-4-xukuohai@huaweicloud.com>
- <13ccc3b5-a392-9391-79ec-143a8701c1f5@iogearbox.net>
-From: Xu Kuohai <xukuohai@huaweicloud.com>
-In-Reply-To: <13ccc3b5-a392-9391-79ec-143a8701c1f5@iogearbox.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgD3aygfBO9kp4dNBw--.49911S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxWF1UGrWfCFyfZrW3KFW3ZFb_yoW5AF4UpF
-	W5tFZ3tr4Ykr9a9FsYkF1DGFy0yrWvqw1UJryUZFy7X345Grn3CrZ0qrsIkF13trs5Za4r
-	tF4qgay7X34kGaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvIb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
-	e2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
-	Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q
-	6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
-	kF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE
-	14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf
-	9x07UWE__UUUUU=
-X-CM-SenderInfo: 50xn30hkdlqx5xdzvxpfor3voofrz/
+Content-Type: text/plain
+X-Originating-IP: [10.90.53.73]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemi500008.china.huawei.com (7.221.188.139)
 X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 8/30/2023 4:10 PM, Daniel Borkmann wrote:
-> Hi Xu,
-> 
-> On 8/4/23 9:37 AM, Xu Kuohai wrote:
->> From: Xu Kuohai <xukuohai@huawei.com>
->>
->> BPF CI has reported the following failure:
->>
->> Error: #200/79 sockmap_listen/sockmap VSOCK test_vsock_redir
->>    Error: #200/79 sockmap_listen/sockmap VSOCK test_vsock_redir
->>    ./test_progs:vsock_unix_redir_connectible:1506: egress: write: Transport endpoint is not connected
->>    vsock_unix_redir_connectible:FAIL:1506
->>    ./test_progs:vsock_unix_redir_connectible:1506: ingress: write: Transport endpoint is not connected
->>    vsock_unix_redir_connectible:FAIL:1506
->>    ./test_progs:vsock_unix_redir_connectible:1506: egress: write: Transport endpoint is not connected
->>    vsock_unix_redir_connectible:FAIL:1506
->>    ./test_progs:vsock_unix_redir_connectible:1514: ingress: recv() err, errno=11
->>    vsock_unix_redir_connectible:FAIL:1514
->>    ./test_progs:vsock_unix_redir_connectible:1518: ingress: vsock socket map failed, a != b
->>    vsock_unix_redir_connectible:FAIL:1518
->>    ./test_progs:vsock_unix_redir_connectible:1525: ingress: want pass count 1, have 0
->>
->> It’s because the recv(... MSG_DONTWAIT) syscall in the test case is
->> called before the queued work sk_psock_backlog() in the kernel finishes
->> executing. So the data to be read is still queued in psock->ingress_skb
->> and cannot be read by the user program. Therefore, the non-blocking
->> recv() reads nothing and reports an EAGAIN error.
->>
->> So replace recv(... MSG_DONTWAIT) with xrecv_nonblock(), which calls
->> select() to wait for data to be readable or timeout before calls recv().
->>
->> Fixes: d61bd8c1fd02 ("selftests/bpf: add a test case for vsock sockmap")
->> Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
-> 
-> This is unfortunately still flaky and showing up from time to time in BPF CI, e.g. a
-> very recent one can be found here:
-> 
-> https://github.com/kernel-patches/bpf/actions/runs/6021475685/job/16335248421
-> 
-> [...]
-> Error: #211 sockmap_listen
-> Error: #211/79 sockmap_listen/sockmap VSOCK test_vsock_redir
->    Error: #211/79 sockmap_listen/sockmap VSOCK test_vsock_redir
->    ./test_progs:vsock_unix_redir_connectible:1501: egress: write: Transport endpoint is not connected
->    vsock_unix_redir_connectible:FAIL:1501
->    ./test_progs:vsock_unix_redir_connectible:1501: ingress: write: Transport endpoint is not connected
->    vsock_unix_redir_connectible:FAIL:1501
->    ./test_progs:vsock_unix_redir_connectible:1501: egress: write: Transport endpoint is not connected
->    vsock_unix_redir_connectible:FAIL:1501
-> 
-> Could you continue to look into it to make the test more robust?
-> 
+Convert list_for_each() to list_for_each_entry() so that the l
+list_head pointer and list_entry() call are no longer needed, which
+can reduce a few lines of code. No functional changed.
 
-OK, it looks like I only noticed the recv failure and ignored the
-write failure. I'll take it a look.
+Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+---
+ drivers/isdn/capi/capi.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-> Thanks a lot,
-> Daniel
+diff --git a/drivers/isdn/capi/capi.c b/drivers/isdn/capi/capi.c
+index 2f3789515445..6664eb3dc35c 100644
+--- a/drivers/isdn/capi/capi.c
++++ b/drivers/isdn/capi/capi.c
+@@ -1326,11 +1326,9 @@ static inline void capinc_tty_exit(void) { }
+ static int __maybe_unused capi20_proc_show(struct seq_file *m, void *v)
+ {
+ 	struct capidev *cdev;
+-	struct list_head *l;
+ 
+ 	mutex_lock(&capidev_list_lock);
+-	list_for_each(l, &capidev_list) {
+-		cdev = list_entry(l, struct capidev, list);
++	list_for_each_entry(cdev, &capidev_list, list) {
+ 		seq_printf(m, "0 %d %lu %lu %lu %lu\n",
+ 			   cdev->ap.applid,
+ 			   cdev->ap.nrecvctlpkt,
+-- 
+2.34.1
 
 
