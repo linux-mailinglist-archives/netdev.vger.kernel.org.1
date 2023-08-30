@@ -1,113 +1,108 @@
-Return-Path: <netdev+bounces-31371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E12D78D55C
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 13:01:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D84FD78D568
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 13:08:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88EA31C203B8
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 11:01:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A35C21C20A74
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 11:08:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 509DB3D6D;
-	Wed, 30 Aug 2023 11:01:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E2EE3D8F;
+	Wed, 30 Aug 2023 11:08:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4218D20E2
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 11:01:05 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A0481BF
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 04:01:03 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@breakpoint.cc>)
-	id 1qbIwW-00008O-L5; Wed, 30 Aug 2023 13:01:00 +0200
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: Florian Westphal <fw@strlen.de>,
-	Stanislav Fomichev <sdf@google.com>,
-	David Ahern <dsahern@kernel.org>,
-	Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH net] net: fib: avoid warn splat in flow dissector
-Date: Wed, 30 Aug 2023 13:00:37 +0200
-Message-ID: <20230830110043.30497-1-fw@strlen.de>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A334406
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 11:08:35 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40FCACC9;
+	Wed, 30 Aug 2023 04:08:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=9V7gLBLZ4ZKefaxWBsYfcwRLnheQHNxgytolgk5UJx4=; b=MOSJKQtbd3z7WPVenT49uuXaP8
+	pcvv3LZSs7xeMW/5TFV6whOaDHFr6OGbp/dgpY220yaXJJs70jzdRj+WADcWn/QNzxParn7yPr6xp
+	SWxxIM/Za2OgGmJd9egkK39QaBiRpBk6cOsoR9r70Y4Lia/lHPx0i3YG4y9rnRm0pD52/QnqIABqJ
+	ScGYmAIIIEVIRQj++xzfQEL7HP6RFI6R0ZpzYQ78MVdYWr2+uij4WilA2SM6uJSC8BoWYbBoFZUF2
+	Poj1CPIvkrDAWCzLZu8X+kE8FH8FJiMBj+XpKW+cnKWtL7j7EDSEkOm0JKlpiieaQzCAKqBCG41+L
+	DTDPYXLg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42286)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qbJ3a-0001Us-2S;
+	Wed, 30 Aug 2023 12:08:18 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qbJ3Z-0005cg-M8; Wed, 30 Aug 2023 12:08:17 +0100
+Date: Wed, 30 Aug 2023 12:08:17 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
+	davem@davemloft.net, Woojung Huh <woojung.huh@microchip.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>, Tristram.Ha@microchip.com,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	UNGLinuxDriver@microchip.com,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] net: phy: Provide Module 4 KSZ9477 errata
+ (DS80000754C)
+Message-ID: <ZO8jIQJLE53GH6G6@shell.armlinux.org.uk>
+References: <20230830092119.458330-1-lukma@denx.de>
+ <20230830092119.458330-2-lukma@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230830092119.458330-2-lukma@denx.de>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
+	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-New skbs allocated via nf_send_reset() have skb->dev == NULL.
+On Wed, Aug 30, 2023 at 11:21:19AM +0200, Lukasz Majewski wrote:
+> +	/* KSZ9477 Errata DS80000754C
+> +	 *
+> +	 * Module 4: Energy Efficient Ethernet (EEE) feature select must be
+> +	 * manually disabled
+> +	 *   The EEE feature is enabled by default, but it is not fully
+> +	 *   operational. It must be manually disabled through register
+> +	 *   controls. If not disabled, the PHY ports can auto-negotiate
+> +	 *   to enable EEE, and this feature can cause link drops when linked
+> +	 *   to another device supporting EEE.
+> +	 *
+> +	 *   Although, the KSZ9477 MMD register
+> +	 *   (MMD_DEVICE_ID_EEE_ADV.MMD_EEE_ADV) advertise that EEE is
+> +	 *   operational one needs to manualy clear them to follow the chip
+> +	 *   errata.
+> +	 */
+> +	linkmode_and(phydev->supported_eee, phydev->supported, zero);
 
-fib*_rules_early_flow_dissect helpers already have a 'struct net'
-argument but its not passed down to the flow dissector core, which
-will then WARN as it can't derive a net namespace to use:
+Hi,
 
- WARNING: CPU: 0 PID: 0 at net/core/flow_dissector.c:1016 __skb_flow_dissect+0xa91/0x1cd0
- [..]
-  ip_route_me_harder+0x143/0x330
-  nf_send_reset+0x17c/0x2d0 [nf_reject_ipv4]
-  nft_reject_inet_eval+0xa9/0xf2 [nft_reject_inet]
-  nft_do_chain+0x198/0x5d0 [nf_tables]
-  nft_do_chain_inet+0xa4/0x110 [nf_tables]
-  nf_hook_slow+0x41/0xc0
-  ip_local_deliver+0xce/0x110
-  ..
+I'm wondering whether you had a reason to write the above, rather than
+use the simpler:
 
-Cc: Stanislav Fomichev <sdf@google.com>
-Cc: David Ahern <dsahern@kernel.org>
-Cc: Ido Schimmel <idosch@nvidia.com>
-Fixes: 812fa71f0d96 ("netfilter: Dissect flow after packet mangling")
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=217826
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- include/net/ip6_fib.h | 5 ++++-
- include/net/ip_fib.h  | 5 ++++-
- 2 files changed, 8 insertions(+), 2 deletions(-)
+	linkmode_zero(phydev->supported_eee);
 
-diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
-index c9ff23cf313e..1ba9f4ddf2f6 100644
---- a/include/net/ip6_fib.h
-+++ b/include/net/ip6_fib.h
-@@ -642,7 +642,10 @@ static inline bool fib6_rules_early_flow_dissect(struct net *net,
- 	if (!net->ipv6.fib6_rules_require_fldissect)
- 		return false;
- 
--	skb_flow_dissect_flow_keys(skb, flkeys, flag);
-+	memset(flkeys, 0, sizeof(*flkeys));
-+	__skb_flow_dissect(net, skb, &flow_keys_dissector,
-+			   flkeys, NULL, 0, 0, 0, flag);
-+
- 	fl6->fl6_sport = flkeys->ports.src;
- 	fl6->fl6_dport = flkeys->ports.dst;
- 	fl6->flowi6_proto = flkeys->basic.ip_proto;
-diff --git a/include/net/ip_fib.h b/include/net/ip_fib.h
-index a378eff827c7..f0c13864180e 100644
---- a/include/net/ip_fib.h
-+++ b/include/net/ip_fib.h
-@@ -418,7 +418,10 @@ static inline bool fib4_rules_early_flow_dissect(struct net *net,
- 	if (!net->ipv4.fib_rules_require_fldissect)
- 		return false;
- 
--	skb_flow_dissect_flow_keys(skb, flkeys, flag);
-+	memset(flkeys, 0, sizeof(*flkeys));
-+	__skb_flow_dissect(net, skb, &flow_keys_dissector,
-+			   flkeys, NULL, 0, 0, 0, flag);
-+
- 	fl4->fl4_sport = flkeys->ports.src;
- 	fl4->fl4_dport = flkeys->ports.dst;
- 	fl4->flowi4_proto = flkeys->basic.ip_proto;
+Thanks.
+
 -- 
-2.41.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
