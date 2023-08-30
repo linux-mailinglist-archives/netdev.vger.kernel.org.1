@@ -1,167 +1,136 @@
-Return-Path: <netdev+bounces-31429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C99978D6FC
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 17:29:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B6A978D718
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 17:36:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 019EC2810FE
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 15:29:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 716721C203E0
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 15:36:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3967D6FD1;
-	Wed, 30 Aug 2023 15:29:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 025C26FD5;
+	Wed, 30 Aug 2023 15:36:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D3B723DF
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 15:29:44 +0000 (UTC)
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 504781A3
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 08:29:43 -0700 (PDT)
-Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-40078c4855fso53745325e9.3
-        for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 08:29:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1693409382; x=1694014182; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:from
-         :content-language:references:cc:to:subject:reply-to:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1N4xeRS7u5SwQUwXLzC4QTPCvrGeeBsZ3NmBvXt8mkg=;
-        b=huJNaxFWoO5W96r5jt5bJVqZBfYNGWD/u/BLa8LFalSxi8I9ajICzhVUpE0z1QUfdE
-         N8srnLX3e4ZPksB+dmD5cHdCuTMe40lRGX/xOdYf/0IEdAQ5wuwf4UaRKt5H2uSGamdR
-         gWTZ7FmFFd/XkDg0Lj3wkPBDDaKctd5P6IREnJ5nAmuERG0/swAs7sDZvUf85XdJVTkB
-         eGz7SSp3ZqO9XlChvBJR3CRVD3MHnX5t4Aob7nPJxn1laNKUxqTM1CDrc0TZbZUnbvvf
-         E5b1rxfcBSA/milL9eTzLrLb7n3npGSQTPMtv/r/qOpNZLLEEFutSvAnttMjuMvEFa2X
-         oqyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693409382; x=1694014182;
-        h=content-transfer-encoding:in-reply-to:organization:from
-         :content-language:references:cc:to:subject:reply-to:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=1N4xeRS7u5SwQUwXLzC4QTPCvrGeeBsZ3NmBvXt8mkg=;
-        b=izlrPnm4XD8q7RSelFbKwncrR2qzObE6AAAajdhZEgO2ysWhbEby2xHrIdN9YJ7lYa
-         OEZKhw8RcReDOLF9WFgFcBSuv9i+uCf9n2iauRll3BenAWYv2fpV2I7rYjWecZSifk3i
-         prTpvMvTUXz49LtwNAhwTgy7HIIVeLF1uAsYKT6+v0ST/U4R5q59Ku1oKCYLXcJPiJcO
-         jfFq8rnrcOByeqzkM51gxA9vC2l1A/QQzZ6xz7klILrjCSxtLWy4t4qRJUcfGlCUwaKn
-         vzlAwxfMoR64W1uwbhUTNHs2PRe5qnEfzR8bkgu3xNXo8yAaaDX+nqnQzWe3ItYPRW12
-         fjdQ==
-X-Gm-Message-State: AOJu0YzCr+S2Qi5/R1vHkmS/mZGhwRdRx5fuWl84p/Hb1L1mlJeP+LkL
-	xErqt5w2mQTfHB0cNcvgH1TYvsvwT7QH3TCYH2U=
-X-Google-Smtp-Source: AGHT+IFvOpSRL+cKCsE/yoLq3Om9eGUwdXfTFQsZtAGrulQxu09ffBecu9w9nRC8Doc27ZFoIypmWw==
-X-Received: by 2002:a05:600c:22c3:b0:401:b53e:6c3b with SMTP id 3-20020a05600c22c300b00401b53e6c3bmr2101738wmg.6.1693409381560;
-        Wed, 30 Aug 2023 08:29:41 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:88aa:cf33:6b9f:40b5? ([2a01:e0a:b41:c160:88aa:cf33:6b9f:40b5])
-        by smtp.gmail.com with ESMTPSA id z23-20020a1c4c17000000b00401d8181f8bsm2586756wmf.25.2023.08.30.08.29.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Aug 2023 08:29:40 -0700 (PDT)
-Message-ID: <eeb19959-26f4-e8c1-abde-726dbb2b828d@6wind.com>
-Date: Wed, 30 Aug 2023 17:29:39 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E66B853AB
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 15:36:28 +0000 (UTC)
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2055.outbound.protection.outlook.com [40.107.92.55])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACF26113
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 08:36:27 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jtPHvRyIq8Tsi6LujLIQ+wOzqKStdIOYGd41iIEHF/hlmEHBFcNzzAqEps1ZgtvUf0pGHtJn+A+KkHpLzXxtgvRrofB5VO84QLree0AkrcY2rn20wapz2XveZ+964MSSZW9HtEkyXkrNsVPZUrinHUZHzaX5XtNGCLymKmoNT4x/aLN6tsQwLkOr9tVUmO1WJM51pUvIGfHYL7+6+T1hk2o9n+bigOwc6rmI51czM5+2j4Wq/HY8gjALebxCh1O5VEB0VBLkja3aAoEg6WRfWQ5tAxWCCW6t323eI/9HET+eXA5YYiT/2Kxfdqv2QU3RkghDJyUc413bwNra+u+O0w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rE8x8CF3qflK/TCtyJ3mSrmGOZbtdXynrkA6hcrUjwQ=;
+ b=iY1/XbYAmang6L3f1UWq3y2cOpty6Bg+qq1VaLmLI6/Oveq6iXvPqTdNHsrQk2IVfbQU6BGPP7/6HFCDSajVelSsQqaOsUwXU8242MBc7B+9Hsm/QcY9uRtxS8LnKo0xn/+QWew0IaZjBAm1Qk6dfC6A0FaO0DAW3fzd+Z/MdjgGSKVP0vJpYXFBzyHQczyzrhm2XW3/JiKGhprJY9rMw5migZX+O3EA5JencdVgXTOmcRTjaVftX3Ke75LuhIZ+mhPeXV5H03ivuXmi3ZWhB1NEb6Zhq/CYc15bCyPsRhE/2CuNhvwu9SKfYvQ0o6A0edLTYsy/iZrHH1ksP5+LLg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rE8x8CF3qflK/TCtyJ3mSrmGOZbtdXynrkA6hcrUjwQ=;
+ b=kHDixRkTWBYWrUjjAkVzvc8gEPnp+tSz7gLbWDV2jLNPpfLYD42LSIeJjJ3E56/jT+7k+579OG9qyoXOSay10QQkBJUwsMCu9m6AmC5QosvHeQbtwQMyZoCnMoy2sQrnvH6LX6MZRe7RnCf66ExhQBPYqRF656e70rDyiehtHFbiaFqLMI8aEzkJxtqNkqzy92rJXD4YTBiEkbTk+SrpB64FOLkFnQey2UdthecDkkB3D888TxI3wlPrEfs3DVaQ7D2KWzxlY41EeT02kDtNlO3l8H6UMtTPbSCWrfvcf/Lwa25B6QD/fGV8xI83zPa1p4lCAKG+eAyCI8S3CMhHaQ==
+Received: from SA0PR13CA0015.namprd13.prod.outlook.com (2603:10b6:806:130::20)
+ by SA1PR12MB6970.namprd12.prod.outlook.com (2603:10b6:806:24d::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.18; Wed, 30 Aug
+ 2023 15:36:24 +0000
+Received: from SN1PEPF00026368.namprd02.prod.outlook.com
+ (2603:10b6:806:130:cafe::78) by SA0PR13CA0015.outlook.office365.com
+ (2603:10b6:806:130::20) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.20 via Frontend
+ Transport; Wed, 30 Aug 2023 15:36:23 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SN1PEPF00026368.mail.protection.outlook.com (10.167.241.133) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6745.16 via Frontend Transport; Wed, 30 Aug 2023 15:36:22 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Wed, 30 Aug 2023
+ 08:36:08 -0700
+Received: from yaviefel (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Wed, 30 Aug
+ 2023 08:36:06 -0700
+References: <20230830150531.44641-1-francois.michel@uclouvain.be>
+ <20230830150531.44641-2-francois.michel@uclouvain.be>
+User-agent: mu4e 1.8.11; emacs 28.2
+From: Petr Machata <petrm@nvidia.com>
+To: <francois.michel@uclouvain.be>
+CC: <netdev@vger.kernel.org>, <stephen@networkplumber.org>,
+	<petrm@nvidia.com>, <dsahern@kernel.org>
+Subject: Re: [PATCH iproute2-next 1/1] tc: fix typo in netem's usage string
+Date: Wed, 30 Aug 2023 17:32:01 +0200
+In-Reply-To: <20230830150531.44641-2-francois.michel@uclouvain.be>
+Message-ID: <87ledssftn.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH net-next] ipv6: do not merge differe type and protocol
- routes
-To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>, David Ahern
- <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Ido Schimmel <idosch@idosch.org>, Thomas Haller <thaller@redhat.com>
-References: <20230830061550.2319741-1-liuhangbin@gmail.com>
-Content-Language: en-US
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Organization: 6WIND
-In-Reply-To: <20230830061550.2319741-1-liuhangbin@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Originating-IP: [10.126.231.35]
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF00026368:EE_|SA1PR12MB6970:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2fcca471-6f7f-4174-d1ad-08dba96edd5f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	Vd0ba7S6BV5lMJK0L4lDncdjL2W/E+tgeJSt+/GzCfk80qEMNATDrrDF27yaAT0CMsQcJWomH8Id3jdHQbppg+7O47auGtHsH0k5biCMccdMufmVXvm+OqnY97WsqPxkgX0KKCPxnpRxtvaKrdo+Q7x/pRJTviHfHdJHzt2xxfK7FjTWJDSnJ4RzZU/oYea/zKaxI/U0hlwgfZ3iDBu3LfRfJpDUX7a8p9GnvOuqhRoIQCNM1QYNRR7vbOq4WEuSkQos9Y9sAfI0COsDtQBcC2kPPzJ5ckOPlESxHko+JniEx/I+U9cZKLk4PjwHRYjvINy+gCZmrrWI2b5elulNuWOaTVkNBR9fbCvFdOSTnIEHRejio3BajJXLIUsdOwQAVFVvrfFC2qsgFFXsMe5IslMBSmVSmQ0ZW5WwZoLyeYKbZRVy7v7nANdYhFUiZ7z9pIVAY/7a0h4wfp+eeuFp5WAKalBHc0s5CqL3VMtAxybBvwqa4AxgWWeW4vV+kRd1S39OLuu0BthndSG/SB0IvsZZyWTtXLJa5m4u/u7I3ByuP8uao3+/2zdW8GvBrQrPbkQiR2ajvUjy/zh+GOnhUNq2XtuHUCqO8JhzWrU/LLDIyu6YL+Bla0KDRHu4EFw1JZ2x+nfdtVDhbcjJLTFOPJ3+EhdmvwrJZbBXoqGdp1upeQBq35sSZnpVD+Ab3J6WW07EQPAuuUpsAXWU/fb/Kvrk4SyjR0lMLQ2YE5CPiaE=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(396003)(346002)(136003)(376002)(39860400002)(1800799009)(186009)(451199024)(82310400011)(46966006)(40470700004)(36840700001)(356005)(82740400003)(7636003)(8936002)(6666004)(70206006)(478600001)(70586007)(54906003)(6916009)(316002)(41300700001)(40460700003)(16526019)(8676002)(5660300002)(36756003)(2906002)(2616005)(4744005)(47076005)(86362001)(36860700001)(40480700001)(26005)(336012)(426003)(4326008);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Aug 2023 15:36:22.7191
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2fcca471-6f7f-4174-d1ad-08dba96edd5f
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF00026368.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6970
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Le 30/08/2023 à 08:15, Hangbin Liu a écrit :
-> Different with IPv4, IPv6 will auto merge the same metric routes into
-> multipath routes. But the different type and protocol routes are also
-> merged, which will lost user's configure info. e.g.
-> 
-> + ip route add local 2001:db8:103::/64 via 2001:db8:101::10 dev dummy1 table 100
-> + ip route append unicast 2001:db8:103::/64 via 2001:db8:101::10 dev dummy2 table 100
-> + ip -6 route show table 100
-> local 2001:db8:103::/64 metric 1024 pref medium
->         nexthop via 2001:db8:101::10 dev dummy1 weight 1
->         nexthop via 2001:db8:101::10 dev dummy2 weight 1
-> 
-> + ip route add 2001:db8:104::/64 via 2001:db8:101::10 dev dummy1 proto kernel table 200
-> + ip route append 2001:db8:104::/64 via 2001:db8:101::10 dev dummy2 proto bgp table 200
-> + ip -6 route show table 200
-> 2001:db8:104::/64 proto kernel metric 1024 pref medium
->         nexthop via 2001:db8:101::10 dev dummy1 weight 1
->         nexthop via 2001:db8:101::10 dev dummy2 weight 1
-> 
-> So let's skip counting the different type and protocol routes as siblings.
-> After update, the different type/protocol routes will not be merged.
-> 
-> + ip -6 route show table 100
-> local 2001:db8:103::/64 via 2001:db8:101::10 dev dummy1 metric 1024 pref medium
-> 2001:db8:103::/64 via 2001:db8:101::10 dev dummy2 metric 1024 pref medium
-> 
-> + ip -6 route show table 200
-> 2001:db8:104::/64 via 2001:db8:101::10 dev dummy1 proto kernel metric 1024 pref medium
-> 2001:db8:104::/64 via 2001:db8:101::10 dev dummy2 proto bgp metric 1024 pref medium
 
-This seems wrong. The goal of 'ip route append' is to add a next hop, not to
-create a new route. Ok, it adds a new route if no route exists, but it seems
-wrong to me to use it by default, instead of 'add', to make things work magically.
+francois.michel@uclouvain.be writes:
 
-It seems more correct to return an error in these cases, but this will change
-the uapi and it may break existing setups.
+> From: Fran=C3=A7ois Michel <francois.michel@uclouvain.be>
+>
+> Signed-off-by: Fran=C3=A7ois Michel <francois.michel@uclouvain.be>
 
-Before this patch, both next hops could be used by the kernel. After it, one
-route will be ignored (the former or the last one?). This is confusing and also
-seems wrong.
+Reviewed-by: Petr Machata <petrm@nvidia.com>
 
-> 
-> Reported-by: Thomas Haller <thaller@redhat.com>
-> Closes: https://bugzilla.redhat.com/show_bug.cgi?id=2161994
-Please, don't put private link. The bug entry is not public.
+That said...
 
-Can you explain what is the initial problem?
+>  		"                 [ loss state P13 [P31 [P32 [P23 P14]]]\n"
+>  		"                 [ loss gemodel PERCENT [R [1-H [1-K]]]\n"
 
-
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> ---
-> All fib test passed:
-> Tests passed: 203
-> Tests failed:   0
-> ---
->  net/ipv6/ip6_fib.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-> index 28b01a068412..f60f5d14f034 100644
-> --- a/net/ipv6/ip6_fib.c
-> +++ b/net/ipv6/ip6_fib.c
-> @@ -1133,6 +1133,11 @@ static int fib6_add_rt2node(struct fib6_node *fn, struct fib6_info *rt,
->  							rt->fib6_pmtu);
->  				return -EEXIST;
->  			}
-> +
-> +			if (iter->fib6_type != rt->fib6_type ||
-> +			    iter->fib6_protocol != rt->fib6_protocol)
-> +				goto next_iter;
-> +
->  			/* If we have the same destination and the same metric,
->  			 * but not the same gateway, then the route we try to
->  			 * add is sibling to this route, increment our counter
+... and sorry for piling on like this, but since we are in the domain of
+fixing netem typos, if you would also fix the missing brackets on these
+two lines, that would be awesome.
 
