@@ -1,43 +1,35 @@
-Return-Path: <netdev+bounces-31438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37C4F78D7D4
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 19:30:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D7EB78D7CB
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 19:12:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 116F71C20429
-	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 17:30:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9898D1C20400
+	for <lists+netdev@lfdr.de>; Wed, 30 Aug 2023 17:12:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8184E7479;
-	Wed, 30 Aug 2023 17:30:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 645F17466;
+	Wed, 30 Aug 2023 17:12:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F9A26AA3
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 17:30:47 +0000 (UTC)
-X-Greylist: delayed 1226 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 30 Aug 2023 10:30:45 PDT
-Received: from good-out-06.clustermail.de (good-out-06.clustermail.de [IPv6:2a02:708:0:2c::3])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B103193
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 10:30:45 -0700 (PDT)
-Received: from [10.0.0.15] (helo=frontend.clustermail.de)
-	by smtpout-02.clustermail.de with esmtp (Exim 4.96)
-	(envelope-from <Daniel.Klauer@gin.de>)
-	id 1qbOhh-0007iI-23;
-	Wed, 30 Aug 2023 19:10:06 +0200
-Received: from [217.6.33.237] (helo=Win2012-02.gin-domain.local)
-	by frontend.clustermail.de with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
-	(Exim 4.96)
-	(envelope-from <Daniel.Klauer@gin.de>)
-	id 1qbOhi-0007kc-0z;
-	Wed, 30 Aug 2023 19:10:06 +0200
-Received: from [10.176.8.48] (10.176.8.48) by Win2012-02.gin-domain.local
- (10.160.128.12) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 30 Aug
- 2023 19:10:05 +0200
-Message-ID: <30428046-fe1a-be57-1df6-2830bd33a385@gin.de>
-Date: Wed, 30 Aug 2023 19:10:05 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 558526FB2
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 17:12:41 +0000 (UTC)
+Received: from exchange.fintech.ru (exchange.fintech.ru [195.54.195.159])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8787FF;
+	Wed, 30 Aug 2023 10:12:39 -0700 (PDT)
+Received: from Ex16-01.fintech.ru (10.0.10.18) by exchange.fintech.ru
+ (195.54.195.169) with Microsoft SMTP Server (TLS) id 14.3.498.0; Wed, 30 Aug
+ 2023 20:12:36 +0300
+Received: from [192.168.211.130] (10.0.253.138) by Ex16-01.fintech.ru
+ (10.0.10.18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Wed, 30 Aug
+ 2023 20:12:36 +0300
+Message-ID: <7836783b-458d-4d2a-2de5-4a0118b0941c@fintech.ru>
+Date: Wed, 30 Aug 2023 10:12:35 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -46,93 +38,118 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
+Subject: Re: [PATCH net] sctp: fix uninit-value in sctp_inq_pop()
 Content-Language: en-US
-To: Ioana Ciornei <ioana.ciornei@nxp.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-From: Daniel Klauer <daniel.klauer@gin.de>
-Subject: [bug] dpaa2-eth: "Wrong SWA type" and null deref in
- dpaa2_eth_free_tx_fd()
+To: Xin Long <lucien.xin@gmail.com>
+CC: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<linux-sctp@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>,
+	<syzbot+70a42f45e76bede082be@syzkaller.appspotmail.com>
+References: <20230829071334.58083-1-n.zhandarovich@fintech.ru>
+ <CADvbK_eQaqSJmNDGwz5A9tAmb0y2rZwZXxdC52B4hjjWRGZtUA@mail.gmail.com>
+From: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+In-Reply-To: <CADvbK_eQaqSJmNDGwz5A9tAmb0y2rZwZXxdC52B4hjjWRGZtUA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.176.8.48]
-X-ClientProxiedBy: Win2012-02.gin-domain.local (10.160.128.12) To
- Win2012-02.gin-domain.local (10.160.128.12)
-X-EsetResult: clean, is OK
-X-EsetId: 37303A29342AAB59637C67
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.0.253.138]
+X-ClientProxiedBy: Ex16-02.fintech.ru (10.0.10.19) To Ex16-01.fintech.ru
+ (10.0.10.18)
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,NICE_REPLY_A,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
 
-while doing Ethernet tests with raw packet sockets on our custom LX2160A board with Linux v6.1.50 (plus some patches for board support, but none for dpaa2-eth), I noticed the following crash:
 
-[   26.290737] Wrong SWA type
-[   26.290760] WARNING: CPU: 7 PID: 0 at drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c:1117 dpaa2_eth_free_tx_fd.isra.0+0x36c/0x380 [fsl_dpaa2_eth]
+On 8/29/23 13:27, Xin Long wrote:
+> On Tue, Aug 29, 2023 at 3:14 AM Nikita Zhandarovich
+> <n.zhandarovich@fintech.ru> wrote:
+>>
+>> Syzbot identified a case [1] of uninitialized memory usage in
+>> sctp_inq_pop(), specifically in 'ch->length'.
+>>
+>> Fix the issue by ensuring that 'ch->length' reflects the size of
+>> 'sctp_chunkhdr *ch' before accessing it.
+>>
+>> [1]
+>> BUG: KMSAN: uninit-value in sctp_inq_pop+0x1597/0x1910 net/sctp/inqueue.c:205
+>>  sctp_inq_pop+0x1597/0x1910 net/sctp/inqueue.c:205
+>>  sctp_assoc_bh_rcv+0x1a7/0xc50 net/sctp/associola.c:997
+>>  sctp_inq_push+0x23e/0x2b0 net/sctp/inqueue.c:80
+>>  sctp_backlog_rcv+0x394/0xd80 net/sctp/input.c:331
+>>  sk_backlog_rcv include/net/sock.h:1115 [inline]
+>>  __release_sock+0x207/0x570 net/core/sock.c:2911
+>>  release_sock+0x6b/0x1e0 net/core/sock.c:3478
+>>  sctp_wait_for_connect+0x486/0x810 net/sctp/socket.c:9325
+>>  sctp_sendmsg_to_asoc+0x1ea7/0x1ee0 net/sctp/socket.c:1884
+>>  ...
+>>
+>> Uninit was stored to memory at:
+>>  sctp_inq_pop+0x151a/0x1910 net/sctp/inqueue.c:201
+>>  sctp_assoc_bh_rcv+0x1a7/0xc50 net/sctp/associola.c:997
+>>  sctp_inq_push+0x23e/0x2b0 net/sctp/inqueue.c:80
+>>  sctp_backlog_rcv+0x394/0xd80 net/sctp/input.c:331
+>>  sk_backlog_rcv include/net/sock.h:1115 [inline]
+>>  __release_sock+0x207/0x570 net/core/sock.c:2911
+>>  release_sock+0x6b/0x1e0 net/core/sock.c:3478
+>>  sctp_wait_for_connect+0x486/0x810 net/sctp/socket.c:9325
+>>  sctp_sendmsg_to_asoc+0x1ea7/0x1ee0 net/sctp/socket.c:1884
+>>  ...
+>>
+>> Uninit was created at:
+>>  slab_post_alloc_hook+0x12d/0xb60 mm/slab.h:716
+>>  slab_alloc_node mm/slub.c:3451 [inline]
+>>  __kmem_cache_alloc_node+0x4ff/0x8b0 mm/slub.c:3490
+>>  __do_kmalloc_node mm/slab_common.c:965 [inline]
+>>  __kmalloc_node_track_caller+0x118/0x3c0 mm/slab_common.c:986
+>>  kmalloc_reserve+0x248/0x470 net/core/skbuff.c:585
+>>  __alloc_skb+0x318/0x740 net/core/skbuff.c:654
+>>  alloc_skb include/linux/skbuff.h:1288 [inline]
+>>  sctp_packet_pack net/sctp/output.c:472 [inline]
+>>  sctp_packet_transmit+0x1729/0x4150 net/sctp/output.c:621
+>>  sctp_outq_flush_transports net/sctp/outqueue.c:1173 [inline]
+>>  ...
+>>
+>> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+>> Reported-and-tested-by: syzbot+70a42f45e76bede082be@syzkaller.appspotmail.com
+>> Closes: https://syzkaller.appspot.com/bug?extid=70a42f45e76bede082be
+>> Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+>> ---
+>>  net/sctp/inqueue.c | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/net/sctp/inqueue.c b/net/sctp/inqueue.c
+>> index 7182c5a450fb..98ce9524c87c 100644
+>> --- a/net/sctp/inqueue.c
+>> +++ b/net/sctp/inqueue.c
+>> @@ -197,6 +197,7 @@ struct sctp_chunk *sctp_inq_pop(struct sctp_inq *queue)
+>>                 }
+>>         }
+>>
+>> +       ch->length = htons(sizeof(*ch));
+>>         chunk->chunk_hdr = ch;
+>>         chunk->chunk_end = ((__u8 *)ch) + SCTP_PAD4(ntohs(ch->length));
+>>         skb_pull(chunk->skb, sizeof(*ch));
+>> --
+>> 2.25.1
+>>
+> Hi, Nikita
+> 
+> You can't just overwrite "ch->length", "ch" is the header of the received chunk.
+> if it says ch->length is Uninit, it means either the chunk parsing in
+> the receiver
+> is overflow or the format of the chunk created in the sender is incorrect.
+> 
+> If you can reproduce it stably, I suggest you start from sctp_inq_pop() and
+> print out the skb info and data in there, and see if it's a normal chunk.
+> 
+> Thanks.
 
-followed by
+Thank you for your feedback, I'll follow your advice and try to narrow
+the problem down.
 
-[   26.323016] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000028
-[   26.324122] Mem abort info:
-[   26.324475]   ESR = 0x0000000096000004
-[   26.324948]   EC = 0x25: DABT (current EL), IL = 32 bits
-[   26.325618]   SET = 0, FnV = 0
-[   26.326004]   EA = 0, S1PTW = 0
-[   26.326406]   FSC = 0x04: level 0 translation fault
-[   26.327021] Data abort info:
-[   26.327385]   ISV = 0, ISS = 0x00000004
-[   26.327869]   CM = 0, WnR = 0
-[   26.328244] user pgtable: 4k pages, 48-bit VAs, pgdp=00000020861cf000
-[   26.329055] [0000000000000028] pgd=0000000000000000, p4d=0000000000000000
-[   26.329912] Internal error: Oops: 0000000096000004 [#1] PREEMPT SMP
-[   26.330702] Modules linked in: tag_dsa marvell mv88e6xxx aes_ce_blk caam_jr aes_ce_cipher caamhash_desc crct10dif_ce ghash_ce fsl_dpaa2_eth caamalg_desc xhci_plat_hcd sha256_generic gf128mul libsha256 libaes xhci_hcd crypto_engine pcs_lynx sha2_ce sha1_ce usbcore libdes sha256_arm64 cfg80211 dp83867 sha1_generic fsl_mc_dpio xgmac_mdio dpaa2_console dwc3 ahci ahci_qoriq udc_core caam libahci_platform roles error libahci usb_common libata at24 lm90 qoriq_thermal nvmem_layerscape_sfp sfp mdio_i2c
-[   26.336237] CPU: 7 PID: 0 Comm: swapper/7 Tainted: G        W          6.1.50-00121-g10168a070f4d #11
-[   26.337396] Hardware name: mpxlx2160a (DT)
-[   26.337956] pstate: 20000005 (nzCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-[   26.338833] pc : dpaa2_eth_free_tx_fd.isra.0+0xd4/0x380 [fsl_dpaa2_eth]
-[   26.339673] lr : dpaa2_eth_free_tx_fd.isra.0+0xb4/0x380 [fsl_dpaa2_eth]
-[   26.340512] sp : ffff800008cf3d70
-[   26.340931] x29: ffff800008cf3d70 x28: ffff002002900000 x27: 0000000000000000
-[   26.341832] x26: 0000000000000001 x25: 0000000000000001 x24: 0000000000000000
-[   26.342732] x23: 0000000000002328 x22: ffff002009742728 x21: 00000020884fffc2
-[   26.343633] x20: ffff002009740840 x19: ffff0020084fffc2 x18: 0000000000000018
-[   26.344534] x17: ffff8026b3a9a000 x16: ffff800008cf0000 x15: fffffffffffed3f8
-[   26.345435] x14: 0000000000000000 x13: ffff800008bad028 x12: 0000000000000966
-[   26.346335] x11: 0000000000000322 x10: ffff800008c09b58 x9 : ffff800008bad028
-[   26.347236] x8 : 0001000000000000 x7 : ffff0020095e6480 x6 : 00000020884fffc2
-[   26.348137] x5 : ffff0020095e6480 x4 : 0000000000000000 x3 : 0000000000000000
-[   26.349037] x2 : 00000000e7e00000 x1 : 0000000000000001 x0 : 0000000049759e0c
-[   26.349938] Call trace:
-[   26.350247]  dpaa2_eth_free_tx_fd.isra.0+0xd4/0x380 [fsl_dpaa2_eth]
-[   26.351044]  dpaa2_eth_tx_conf+0x84/0xc0 [fsl_dpaa2_eth]
-[   26.351720]  dpaa2_eth_poll+0xec/0x3a4 [fsl_dpaa2_eth]
-[   26.352375]  __napi_poll+0x34/0x180
-[   26.352816]  net_rx_action+0x128/0x2b4
-[   26.353290]  _stext+0x124/0x2a0
-[   26.353687]  ____do_softirq+0xc/0x14
-[   26.354139]  call_on_irq_stack+0x24/0x40
-[   26.354635]  do_softirq_own_stack+0x18/0x2c
-[   26.355164]  __irq_exit_rcu+0xc4/0xf0
-[   26.355628]  irq_exit_rcu+0xc/0x14
-[   26.356059]  el1_interrupt+0x34/0x60
-[   26.356511]  el1h_64_irq_handler+0x14/0x20
-[   26.357028]  el1h_64_irq+0x64/0x68
-[   26.357458]  cpuidle_enter_state+0x12c/0x314
-[   26.357997]  cpuidle_enter+0x34/0x4c
-[   26.358450]  do_idle+0x208/0x270
-[   26.358860]  cpu_startup_entry+0x24/0x30
-[   26.359356]  secondary_start_kernel+0x128/0x14c
-[   26.359928]  __secondary_switched+0x64/0x68
-[   26.360460] Code: 7100081f 54000d00 71000c1f 540000c0 (3940a360) 
-[   26.361228] ---[ end trace 0000000000000000 ]---
-
-It happens when receiving big Ethernet frames on a AF_PACKET + SOCK_RAW socket, for example MTU 9000. It does not happen with the standard MTU 1500. It does not happen when just sending.
-
-It's 100% reproducible here, however it seems to depend on the data rate/load: Once it happened after receiving the first 80 frames, another time after the first 300 frames, etc., and if I only send 5 frames per second, it does not happen at all.
-
-Please let me know if I should provide more info or do more tests. I can provide a test program if needed.
-
-Kind regards,
-Daniel
+With regards,
+Nikita
 
