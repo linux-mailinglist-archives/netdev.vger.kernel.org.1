@@ -1,161 +1,192 @@
-Return-Path: <netdev+bounces-31574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A472B78ED9E
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 14:50:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ED9F78EDD7
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 14:58:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A7FA281566
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 12:50:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A377A281552
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 12:58:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ABBA11706;
-	Thu, 31 Aug 2023 12:50:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F1BC11710;
+	Thu, 31 Aug 2023 12:58:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F226429A0
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 12:50:53 +0000 (UTC)
-Received: from out-247.mta1.migadu.com (out-247.mta1.migadu.com [IPv6:2001:41d0:203:375::f7])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14A75CF2
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 05:50:49 -0700 (PDT)
-Message-ID: <f7c7aeb7-c43a-23c0-1c93-2bcb79d4d689@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1693486247;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rBzsFF9Aekog2IqwVNJElwdWwC36Gc+4PxmW8O3uWXA=;
-	b=Qel81u6H0iUgB/UTe9FW3bsMg+TNKvOTmwI48o2fEjQKmJEqgM9WLUXzL5iWMEoMrxPzsF
-	A3XwLPIi/vfYUGuqka6ALU6HUEh+cgi5+aFY7li9i72ZnXjVlxU8rFWRmshCXCd4r0hKax
-	g9gDSyHsL/81OkrezYOTFXVaovJnEUM=
-Date: Thu, 31 Aug 2023 08:50:42 -0400
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D5647481;
+	Thu, 31 Aug 2023 12:58:33 +0000 (UTC)
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD6ADCF2;
+	Thu, 31 Aug 2023 05:58:31 -0700 (PDT)
+Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-99c93638322so154912766b.1;
+        Thu, 31 Aug 2023 05:58:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693486710; x=1694091510; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=k8DYQ7uXcJO6r+s6TemNXKJyBx508B85eJ8IVr0n4Ys=;
+        b=FhKg2mROH6plvNyT7VH8RDwqY7gM9+J3lcHa43ViQWDmWpE0+1X6M/lVMa6EHrnhZi
+         2k2DRV3Ecg35GxcWPg6oNjzasmksyJHJb9VhyKc3UJMDzHagf387c6UHL9FvKMnFxwFg
+         p8Rtp209EKjonevtbrK0HJIvbgbwTEbK4nxR3In9oQEJf4I+7XAiY3uci/Ry0h8jqs9N
+         KU3dHqAAT6A0NPVmgLuQZIO/W+dU5ADiSj5XBpSTHXB0jZboSLWZ+BIVMWkDawkW8IiQ
+         FJbbUxgvnSFoL1mIPqiobNi82b20arWu2W10WfmF5MMmVxvV2qprojEtZ2YgCspu/N4K
+         uR7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693486710; x=1694091510;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=k8DYQ7uXcJO6r+s6TemNXKJyBx508B85eJ8IVr0n4Ys=;
+        b=DU+zOlwPaoeHW7ro/N8iMxE96gb7jPMwvpc7CPkwS7EnH4SiW2egNgIMnLEu/olx0f
+         7DLZpDaW4svmj6t8boAv8JnJrBLHMMsc8FEdyWcvTgWm7/OUMKcW/qhNg6yfaHIPeSSp
+         1fGmKUpQgea6DPZ6pcO2wX0qt/fXpu9DIiNFTTRl+E56yFVC/N5ldBeSj/oW3pZKA2cz
+         oX9u4D8ivD+47LecOGBvYrdnyLK9f7QbW3njJVOdyd2JBuGG0I4VMT0WjtD/Rt32fGXI
+         jdb2+VrxEnmeIdfuOwIlvaOu0iEp2WsJ78fOOq1tOaxAoYt6zjdbZ3ATW48lNsmoZknf
+         0g8A==
+X-Gm-Message-State: AOJu0Yx2mLPKpgm+BOTv8Inr7qJxc2J3ppDogq233TSBSZHUveQ8G/BK
+	o0wyUHXFGyAqn2bXEhJmJHJXOj9Lf+U=
+X-Google-Smtp-Source: AGHT+IFvN+zaf4qLVDnGrAs18vC4O8NE5EtHF2Ku6pb+2wQ8Uokl7w7CVF1oKaeNFKYiV8ozaipKOA==
+X-Received: by 2002:a17:907:7283:b0:9a5:83f0:9bc5 with SMTP id dt3-20020a170907728300b009a583f09bc5mr3032414ejc.18.1693486709998;
+        Thu, 31 Aug 2023 05:58:29 -0700 (PDT)
+Received: from [192.168.1.95] (host-176-36-0-241.b024.la.net.ua. [176.36.0.241])
+        by smtp.gmail.com with ESMTPSA id lj17-20020a170906f9d100b009829dc0f2a0sm730975ejb.111.2023.08.31.05.58.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Aug 2023 05:58:29 -0700 (PDT)
+Message-ID: <e18920c41ad99d22837e82ad3df7a33e12b67aaf.camel@gmail.com>
+Subject: Re: [PATCH bpf-next] selftests/bpf: fix a CI failure caused by
+ vsock write
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: Xu Kuohai <xukuohai@huaweicloud.com>, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org
+Cc: Daniel Borkmann <daniel@iogearbox.net>, Bobby Eshleman
+	 <bobby.eshleman@bytedance.com>
+Date: Thu, 31 Aug 2023 15:58:28 +0300
+In-Reply-To: <20230831013105.2930824-1-xukuohai@huaweicloud.com>
+References: <20230831013105.2930824-1-xukuohai@huaweicloud.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [Intel-wired-lan] [PATCH net] ixgbe: fix timestamp configuration
- code
-Content-Language: en-US
-To: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>,
- "Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
- "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
- Jakub Kicinski <kuba@kernel.org>, Alexander Duyck
- <alexander.duyck@gmail.com>, "Rustad, Mark D" <mark.d.rustad@intel.com>,
- Darin Miller <darin.j.miller@intel.com>,
- Jeff Kirsher <jeffrey.t.kirsher@intel.com>,
- Richard Cochran <richardcochran@gmail.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-References: <20230823221537.816541-1-vadim.fedorenko@linux.dev>
- <BL0PR11MB3122FF925838E8F850787467BDE5A@BL0PR11MB3122.namprd11.prod.outlook.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <BL0PR11MB3122FF925838E8F850787467BDE5A@BL0PR11MB3122.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 31/08/2023 06:18, Pucha, HimasekharX Reddy wrote:
->> -----Original Message-----
->> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of Vadim Fedorenko
->> Sent: Thursday, August 24, 2023 3:46 AM
->> To: Brandeburg, Jesse <jesse.brandeburg@intel.com>; Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Jakub Kicinski <kuba@kernel.org>; Alexander Duyck <alexander.duyck@gmail.com>; Rustad, Mark D <mark.d.rustad@intel.com>; Darin Miller <darin.j.miller@intel.com>; Jeff Kirsher <jeffrey.t.kirsher@intel.com>; Richard Cochran <richardcochran@gmail.com>
->> Cc: netdev@vger.kernel.org; intel-wired-lan@lists.osuosl.org; Vadim Fedorenko <vadim.fedorenko@linux.dev>
->> Subject: [Intel-wired-lan] [PATCH net] ixgbe: fix timestamp configuration code
->>
->> The commit in fixes introduced flags to control the status of hardware
->> configuration while processing packets. At the same time another structure
->> is used to provide configuration of timestamper to user-space applications.
->> The way it was coded makes this structures go out of sync easily. The
->> repro is easy for 82599 chips:
->>
->> [root@hostname ~]# hwstamp_ctl -i eth0 -r 12 -t 1
->> current settings:
->> tx_type 0
->> rx_filter 0
->> new settings:
->> tx_type 1
->> rx_filter 12
->>
->> The eth0 device is properly configured to timestamp any PTPv2 events.
->>
->> [root@hostname ~]# hwstamp_ctl -i eth0 -r 1 -t 1
->> current settings:
->> tx_type 1
->> rx_filter 12
->> SIOCSHWTSTAMP failed: Numerical result out of range
->> The requested time stamping mode is not supported by the hardware.
->>
->> The error is properly returned because HW doesn't support all packets
->> timestamping. But the adapter->flags is cleared of timestamp flags
->> even though no HW configuration was done. From that point no RX timestamps
->> are received by user-space application. But configuration shows good
->> values:
->>
->> [root@hostname ~]# hwstamp_ctl -i eth0
->> current settings:
->> tx_type 1
->> rx_filter 12
->>
->> Fix the issue by applying new flags only when the HW was actually
->> configured.
->>
->> Fixes: a9763f3cb54c ("ixgbe: Update PTP to support X550EM_x devices")
->> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
->> ---
->>   drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c | 28 +++++++++++---------
->>   1 file changed, 15 insertions(+), 13 deletions(-)
->>
-> 
-> Hi,
-> With patch also we are observing same issue.
+On Thu, 2023-08-31 at 09:31 +0800, Xu Kuohai wrote:
+> From: Xu Kuohai <xukuohai@huawei.com>
+>=20
+> While commit 90f0074cd9f9 ("selftests/bpf: fix a CI failure caused by vso=
+ck sockmap test")
+> fixes a receive failure of vsock sockmap test, there is still a write fai=
+lure:
+>=20
+> Error: #211/79 sockmap_listen/sockmap VSOCK test_vsock_redir
+> Error: #211/79 sockmap_listen/sockmap VSOCK test_vsock_redir
+>   ./test_progs:vsock_unix_redir_connectible:1501: egress: write: Transpor=
+t endpoint is not connected
+>   vsock_unix_redir_connectible:FAIL:1501
+>   ./test_progs:vsock_unix_redir_connectible:1501: ingress: write: Transpo=
+rt endpoint is not connected
+>   vsock_unix_redir_connectible:FAIL:1501
+>   ./test_progs:vsock_unix_redir_connectible:1501: egress: write: Transpor=
+t endpoint is not connected
+>   vsock_unix_redir_connectible:FAIL:1501
+>=20
+> The reason is that the vsock connection in the test is set to ESTABLISHED=
+ state
+> by function virtio_transport_recv_pkt, which is executed in a workqueue t=
+hread,
+> so when the user space test thread runs before the workqueue thread, this
+> problem occurs.
+>=20
+> To fix it, before writing the connection, wait for it to be connected.
 
-Hi,
+Fun fact:
+while trying this patch I hit an oops [1]. I'm currently trying to
+bisect the commit causing this oops and have the following observation:
+- good revisions don't have this test as flip-flop
+- bad revisions have this test as flip-flop.
 
-What kind of issue do you observe? The hardware doesn't support
-timestamping of all packets. The issue this patch fixes is that
-after failed attempt to setup the timestamping of all RX packets,
-the driver stops reading timestamps at all even though it reports
-that timestamping of PTP RX packets is enabled.
+[1] https://lore.kernel.org/bpf/de816b89073544deb2ce34c4b242d583a6d4660f.ca=
+mel@gmail.com/
 
-> 
-> # ./hwstamp_ctl -i eth10
-> current settings:
-> tx_type 1
-> rx_filter 12
-> # ./hwstamp_ctl -i eth10 -r 1 -t 1
-> current settings:
-> tx_type 1
-> rx_filter 12
-> SIOCSHWTSTAMP failed: Numerical result out of range
-> The requested time stamping mode is not supported by the hardware.
-> 
-> Adapter details: Niantic (Spring Fountain)
-> 
-> SUT info:
-> H/W:
->    Manufacturer: Intel Corporation
->    Product Name: S2600STQ
->    RAM: [62G/8G/49G]
->    CPU: Intel(R) Xeon(R) Platinum 8180 CPU @ 2.50GHz [112/112]
->    PF bus-info: 0000:d8:00.1 0x8086:0x10fb 0x8086 0x000c (0x01)
-> S/W:
->    OS: "Red Hat Enterprise Linux 8.6 (Ootpa)" 6.5.0-rc7_next-queue_28-Aug-2023-01755-g938672aefaeb
->    CMD: BOOT_IMAGE=(hd0,msdos2)/vmlinuz-6.5.0-rc7_next-queue_28-Aug-2023-01755-g938672aefaeb root=/dev/mapper/rhel_os--delivery-root ro crashkernel=1G-4G:192M,4G-64G:256M,64G-:512M resume=/dev/mapper/rhel_os--delivery-swap rd.lvm.lv=rhel_os-delivery/root rd.lvm.lv=rhel_os-delivery/swap selinux=0 biosdevname=0 net.ifnames=0 rhgb quiet
->    FW firmware-version: 0x000161bf
->    PF version: 6.5.0-rc7_next-queue_28-Aug-202
-> 
-> 
+>=20
+> Fixes: d61bd8c1fd02 ("selftests/bpf: add a test case for vsock sockmap")
+> Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
+> ---
+>  .../bpf/prog_tests/sockmap_helpers.h          | 29 +++++++++++++++++++
+>  .../selftests/bpf/prog_tests/sockmap_listen.c |  5 ++++
+>  2 files changed, 34 insertions(+)
+>=20
+> diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_helpers.h b/t=
+ools/testing/selftests/bpf/prog_tests/sockmap_helpers.h
+> index d12665490a90..837dfb0361c6 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/sockmap_helpers.h
+> +++ b/tools/testing/selftests/bpf/prog_tests/sockmap_helpers.h
+> @@ -179,6 +179,35 @@
+>  		__ret;                                                         \
+>  	})
+> =20
+> +static inline int poll_connect(int fd, unsigned int timeout_sec)
+> +{
+> +	struct timeval timeout =3D { .tv_sec =3D timeout_sec };
+> +	fd_set wfds;
+> +	int r;
+> +	int eval;
+> +	socklen_t esize;
+> +
+> +	FD_ZERO(&wfds);
+> +	FD_SET(fd, &wfds);
+> +
+> +	r =3D select(fd + 1, NULL, &wfds, NULL, &timeout);
+> +	if (r =3D=3D 0)
+> +		errno =3D ETIME;
+> +
+> +	if (r !=3D 1)
+> +		return -1;
+> +
+> +	if (getsockopt(fd, SOL_SOCKET, SO_ERROR, &eval, &esize) < 0)
+> +		return -1;
+> +
+> +	if (eval !=3D 0) {
+> +		errno =3D eval;
+> +		return -1;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  static inline int poll_read(int fd, unsigned int timeout_sec)
+>  {
+>  	struct timeval timeout =3D { .tv_sec =3D timeout_sec };
+> diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c b/to=
+ols/testing/selftests/bpf/prog_tests/sockmap_listen.c
+> index 5674a9d0cacf..2d3bf38677b6 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
+> @@ -1452,6 +1452,11 @@ static int vsock_socketpair_connectible(int sotype=
+, int *v0, int *v1)
+>  	if (p < 0)
+>  		goto close_cli;
+> =20
+> +	if (poll_connect(c, IO_TIMEOUT_SEC) < 0) {
+> +		FAIL_ERRNO("poll_connect");
+> +		goto close_cli;
+> +	}
+> +
+>  	*v0 =3D p;
+>  	*v1 =3D c;
+> =20
 
 
