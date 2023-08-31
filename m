@@ -1,76 +1,86 @@
-Return-Path: <netdev+bounces-31647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F17A978F3E9
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 22:26:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 738EC78F404
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 22:30:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2D401C20B1F
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 20:26:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D0341C20B5D
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 20:30:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52A0F19BD0;
-	Thu, 31 Aug 2023 20:26:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 825FF19BD3;
+	Thu, 31 Aug 2023 20:30:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C91018C26
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 20:26:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39477C433C7;
-	Thu, 31 Aug 2023 20:26:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1693513567;
-	bh=NNAeoqLpCZgpHOi/0zl8S9CWF7TvuYfjEBTVaJJVnnY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=K5PsRxAGOZQA0kflTYSdafWsrNSih0hyFr8o6j1WN+7hPpQWOehea22aMNHu9bqW6
-	 tBWafpqejmso08kd0bt3ugM087/dX8czMd8lyPevFtH5arLgVzduZhw34EW8B8AZ3l
-	 32GazId82GcrECG9gPF0X645giSQT/MtlUpazKg8=
-Date: Thu, 31 Aug 2023 22:26:04 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Jordan Rife <jrife@google.com>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org
-Subject: Re: Stable Backport: net: Avoid address overwrite in kernel_connect
-Message-ID: <2023083113-unwed-chalice-c8d6@gregkh>
-References: <CADKFtnSPTQGLxfpn38cfwTPk=JY-=Ywne2DFoRkq03m-eKo17Q@mail.gmail.com>
- <7702c74e-482f-cd89-1d12-fb6869bd53f2@iogearbox.net>
- <2023083123-musky-exterior-5fa5@gregkh>
- <CADKFtnRw=9F7Epa2T1N_2Zeu4sj+YySuvVb-PTOdfiAF9g4cPA@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 056F21AA7A;
+	Thu, 31 Aug 2023 20:30:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7D5ADC433CA;
+	Thu, 31 Aug 2023 20:30:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1693513823;
+	bh=pqDP+zEjFuzOiOs+tgYZ2bf6Znca1Xga7yBy0aQPi+Q=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ooVFYbMxXlHYHm4YaqNS1xoSE9JBmMv8jqfJKHpQZIO6cDiE3SZrJ2aXUX6wnNDRD
+	 eQvkSy5aBlXCzLl/ATveA1MahYzTx4L2vVR0o3WhoKUdYgN8uKfAqjaPm7g3144mf9
+	 LkclpeW72riSzwlZ2ZlS2b0upGgf6IKGC5hm2hLPmqusx1YFJDQruep/MKu8jnnpRc
+	 POfwMFqDjDcOb/4hdhpyc2G5q2Mfl7NDR2qezaRZppw4u72nbuy0yQphcsvLtuBOTe
+	 LNaa74fo9QWQxdAHDGrC8DOpzMVr6VhMreUk/CCZN7Ambaq4iCIcP2aPImHxTJslcg
+	 8aDq6hMNektfw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 617A1E29F33;
+	Thu, 31 Aug 2023 20:30:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CADKFtnRw=9F7Epa2T1N_2Zeu4sj+YySuvVb-PTOdfiAF9g4cPA@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf v2] selftests/bpf: Include build flavors for install
+ target
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169351382339.13181.6255269847761617623.git-patchwork-notify@kernel.org>
+Date: Thu, 31 Aug 2023 20:30:23 +0000
+References: <20230831162954.111485-1-bjorn@kernel.org>
+In-Reply-To: <20230831162954.111485-1-bjorn@kernel.org>
+To: =?utf-8?b?QmrDtnJuIFTDtnBlbCA8Ympvcm5Aa2VybmVsLm9yZz4=?=@codeaurora.org
+Cc: andrii@kernel.org, mykolal@fb.com, bpf@vger.kernel.org,
+ daniel@iogearbox.net, netdev@vger.kernel.org, bjorn@rivosinc.com,
+ ast@kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, Aug 31, 2023 at 01:09:04PM -0700, Jordan Rife wrote:
-> Greg,
+Hello:
+
+This patch was applied to bpf/bpf.git (master)
+by Daniel Borkmann <daniel@iogearbox.net>:
+
+On Thu, 31 Aug 2023 18:29:54 +0200 you wrote:
+> From: Björn Töpel <bjorn@rivosinc.com>
 > 
-> Sorry if I've misunderstood. The netdev FAQ
-> (https://www.kernel.org/doc/html/v5.7/networking/netdev-FAQ.html#q-i-see-a-network-patch-and-i-think-it-should-be-backported-to-stable)
-> seemed to indicate that I should send network backport requests to
-> netdev.
-
-5.7 is a very old kernel version, please use the documentation from the
-latest kernel version.
-
-You can use "latest" instead of "v5.7" there.
-
-> I saw "option 2" in
-> https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
-> which reads
+> When using the "install" or targets depending on install,
+> e.g. "gen_tar", the BPF machine flavors weren't included.
 > 
-> > send an email to stable@vger.kernel.org containing the subject of the patch, the commit ID, why you think it should be applied, and what kernel version you wish it to be applied to.
+> A command like:
+>   | make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- O=/workspace/kbuild \
+>   |    HOSTCC=gcc FORMAT= SKIP_TARGETS="arm64 ia64 powerpc sparc64 x86 sgx" \
+>   |    -C tools/testing/selftests gen_tar
+> would not include bpf/no_alu32, bpf/cpuv4, or bpf/bpf-gcc.
 > 
-> Would "option 3" listed there be preferred?
+> [...]
 
-What's wrong with option 2?
+Here is the summary with links:
+  - [bpf,v2] selftests/bpf: Include build flavors for install target
+    https://git.kernel.org/bpf/bpf/c/be8e754cbfac
 
-thanks,
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-greg k-h
+
 
