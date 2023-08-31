@@ -1,162 +1,124 @@
-Return-Path: <netdev+bounces-31577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CB9478EE44
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 15:13:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03E3B78EE75
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 15:22:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DFC81C20AB9
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 13:13:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5CB9281580
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 13:22:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05E8211717;
-	Thu, 31 Aug 2023 13:12:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49A0711719;
+	Thu, 31 Aug 2023 13:22:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8CE67481
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 13:12:44 +0000 (UTC)
-Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15F36E47
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 06:12:43 -0700 (PDT)
-Received: by mail-qt1-x836.google.com with SMTP id d75a77b69052e-40c72caec5cso326171cf.0
-        for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 06:12:43 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36C437481
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 13:22:35 +0000 (UTC)
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 884D3CEB
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 06:22:33 -0700 (PDT)
+Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-401b3ea0656so7484435e9.0
+        for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 06:22:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1693487562; x=1694092362; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=T/huV5o30ehyBDkZTLAeL6fF4iNyMfdkbrHpT0k6p7w=;
-        b=JEEGdW7Df4+eZS9q9mioz6hTbBnhFF5+hnHvlo71vwmhpxksSXInE3keIGmjrWY+nE
-         ubrkQdXYSu9v2UP2S6H0WF07JnrASkJwgcky9bibSb7OH6lHCXRlNezqZUlpEHSceW0k
-         ebJ0fzZixK5Z80T6mcq0nykOodLliLYOArDqkL0Bv8pg3/QBgTYup1bw+3DlgX4pvHD1
-         uuQcvHYhaGo+286BA9yWWsHx2miI/Yajb/XmtEIbe70L1G6i0I1Dg8b3Cn52lTzd5i2s
-         8Ad8a3nfXbtbA5alABNejlvwlUu9iRM5M/LIwru1GNlmFogjNj/xwgtIN40HZsyemLPH
-         Ea5A==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1693488152; x=1694092952; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7INKZZajCRPr5cTXh/nUGkhu0LeE9esjkNG2LqXI4Nk=;
+        b=xjGcPoHghBFJr/q+LF4yn9ZQDDRPLRR4kFOIgJAnEZ6CUfZScjaSl4aRkLzLUkvUwp
+         OitINcNWuoQYdMBHaXaa9zGdM62RwZ1TSmCuMPDHUStTZQH31z8mSAGd6t3Y07sLx0/c
+         544vHPoL0y8GV98DupfKJQj7iBqLDm8cOsTO72+xrIr0/z2N/jU/hwOvPkFKOeRRXv6o
+         oPq7osfKk5aCnUV9BSl0RJLWMbIQC8jy1vAAqdWTXfcSx/a94miT5WRxo9dgBT4ZmTNx
+         Zss7x8xj2H9CDErVUKU1QvdbBXUuOXupRvHShNex7gIFmKdMXv9Q8G8d7BhUM0a+sxL+
+         8ieQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693487562; x=1694092362;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=T/huV5o30ehyBDkZTLAeL6fF4iNyMfdkbrHpT0k6p7w=;
-        b=hno44ayDWvz6ClURa9cPniIaRlEUa/fRD9mS7YK8ASc5DdzS3t0BxEtOQj/BZz5O6V
-         WfoEpYVGvoCNEYMLh3bwb6NCd2kV5Lb1SF3JKQ5QFChzzI8vO2csoXx11eG1G8HHSy0X
-         5WPPVla7GjfiTpE8NHeKGVStHCxbsEe6GQAiT+FBT9O5PJtwizVjedK2f3JJGj5QnT1K
-         oJlvh4HJJ/wQX4+2KJ91DoUoe/oDYQo4enO8HhNoTmvIHNfKnL338K3wAiRoOOsIL8hJ
-         kTDtFtOoM03b6i9P48mPWbYlwECNOm38Ff2PrQe7DDzcqezz1n9yqgPa6EzMT15zRaCw
-         tmHQ==
-X-Gm-Message-State: AOJu0YwENJ8/C3UVJnJJZCx9mYSCdtGcDJ8z6Nx7z43651z1xpIrEUEi
-	TT+oT2a5Yd7sJHsQ54GnTNAcFTXfGFggLsYzCtxjtfs/4i8v/mcvS5uP7g==
-X-Google-Smtp-Source: AGHT+IH2mkhQfIcjyTWUqv498TnaRV47GCJhQNbYRwFZwHLARHlgpCh8NdEpndJYLzEfOEy2RNlPQC1YpcWg7JoGIYA=
-X-Received: by 2002:ac8:7e83:0:b0:403:ac9c:ac2f with SMTP id
- w3-20020ac87e83000000b00403ac9cac2fmr189216qtj.17.1693487561914; Thu, 31 Aug
- 2023 06:12:41 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1693488152; x=1694092952;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7INKZZajCRPr5cTXh/nUGkhu0LeE9esjkNG2LqXI4Nk=;
+        b=HUO21NRgnjtIQyZZFxZKs9ZNGNNffCYOsdMI444KEUrOV7QMU0Chf9YhxWCutzv+4X
+         cihyOQH1GCGlh2xhCelKcWzEqAfhGrKiARrLsM5lVUghZHwVDjIzqqKfYWsdylN6keDV
+         7s+hDCkxpxaXXSb01hwLaXKBYonpu33ClxHagWhejdW4Xq2bRZHU4cW39XagdKdlebuC
+         /MMhNf5EPuRVHSu5HHjArOkksPlJp5tbjcIr4b4dT3xifWhGJjsRrUnMtp0bIH2qQJDH
+         I6cJ8qRgUFIjfHIbuU9Owm5OAaVEUTTyusSVhMO2WIiaquIPWljkQqFccpVGBY0nTES3
+         xpjQ==
+X-Gm-Message-State: AOJu0Yxm/unuEMY07Fh6k3aGwLNsCb/LYxE+9zHzQPe0/bx8dYOjLKEP
+	5WlMSvrC3Z5ZsV45aGN5W7KsUDFh/ylMQXGGY3w=
+X-Google-Smtp-Source: AGHT+IHfz6tzF4sPPdFQPL/4ugkIDSsaVv12JYzB4GdAT2mrYknGW3dWZAx1GaBgAnuf/53+bdwAgg==
+X-Received: by 2002:a7b:cd0a:0:b0:3fe:dd91:b5b6 with SMTP id f10-20020a7bcd0a000000b003fedd91b5b6mr4309029wmj.25.1693488151867;
+        Thu, 31 Aug 2023 06:22:31 -0700 (PDT)
+Received: from localhost ([212.23.236.67])
+        by smtp.gmail.com with ESMTPSA id a22-20020a05600c225600b003fefcbe7fa8sm1981002wmm.28.2023.08.31.06.22.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Aug 2023 06:22:30 -0700 (PDT)
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: stephen@networkplumber.org,
+	dsahern@gmail.com
+Subject: [patch iproute2-next 0/6] devlink: implement dump selector for devlink objects show commands
+Date: Thu, 31 Aug 2023 15:22:23 +0200
+Message-ID: <20230831132229.471693-1-jiri@resnulli.us>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230830112600.4483-1-hdanton@sina.com> <f607a7d5-8075-f321-e3c0-963993433b14@I-love.SAKURA.ne.jp>
- <20230831114108.4744-1-hdanton@sina.com>
-In-Reply-To: <20230831114108.4744-1-hdanton@sina.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 31 Aug 2023 15:12:30 +0200
-Message-ID: <CANn89iLCCGsP7SFn9HKpvnKu96Td4KD08xf7aGtiYgZnkjaL=w@mail.gmail.com>
-Subject: Re: selftests: net: pmtu.sh: Unable to handle kernel paging request
- at virtual address
-To: Hillf Danton <hdanton@sina.com>
-Cc: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, Netdev <netdev@vger.kernel.org>, 
-	"Paul E. McKenney" <paulmck@kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, 
-	Naresh Kamboju <naresh.kamboju@linaro.org>, LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Aug 31, 2023 at 2:17=E2=80=AFPM Hillf Danton <hdanton@sina.com> wro=
-te:
->
-> On Wed, 30 Aug 2023 21:44:57 +0900 Tetsuo Handa <penguin-kernel@I-love.SA=
-KURA.ne.jp>
-> >On 2023/08/30 20:26, Hillf Danton wrote:
-> >>> <4>[  399.014716] Call trace:
-> >>> <4>[  399.015702]  percpu_counter_add_batch+0x28/0xd0
-> >>> <4>[  399.016399]  dst_destroy+0x44/0x1e4
-> >>> <4>[  399.016681]  dst_destroy_rcu+0x14/0x20
-> >>> <4>[  399.017009]  rcu_core+0x2d0/0x5e0
-> >>> <4>[  399.017311]  rcu_core_si+0x10/0x1c
-> >>> <4>[  399.017609]  __do_softirq+0xd4/0x23c
-> >>> <4>[  399.017991]  ____do_softirq+0x10/0x1c
-> >>> <4>[  399.018320]  call_on_irq_stack+0x24/0x4c
-> >>> <4>[  399.018723]  do_softirq_own_stack+0x1c/0x28
-> >>> <4>[  399.022639]  __irq_exit_rcu+0x6c/0xcc
-> >>> <4>[  399.023434]  irq_exit_rcu+0x10/0x1c
-> >>> <4>[  399.023962]  el1_interrupt+0x8c/0xc0
-> >>> <4>[  399.024810]  el1h_64_irq_handler+0x18/0x24
-> >>> <4>[  399.025324]  el1h_64_irq+0x64/0x68
-> >>> <4>[  399.025612]  _raw_spin_lock_bh+0x0/0x6c
-> >>> <4>[  399.026102]  cleanup_net+0x280/0x45c
-> >>> <4>[  399.026403]  process_one_work+0x1d4/0x310
-> >>> <4>[  399.027140]  worker_thread+0x248/0x470
-> >>> <4>[  399.027621]  kthread+0xfc/0x184
-> >>> <4>[  399.028068]  ret_from_fork+0x10/0x20
-> >>
-> >> static void cleanup_net(struct work_struct *work)
-> >> {
-> >>      ...
-> >>
-> >>      synchronize_rcu();
-> >>
-> >>      /* Run all of the network namespace exit methods */
-> >>      list_for_each_entry_reverse(ops, &pernet_list, list)
-> >>              ops_exit_list(ops, &net_exit_list);
-> >>      ...
-> >>
-> >> Why did the RCU sync above fail to work in this report, Eric?
-> >
-> > Why do you assume that synchronize_rcu() failed to work?
->
-> In the ipv6 pernet_operations [1] for instance, dst_entries_destroy() is
-> invoked after RCU sync to ensure that nobody is using the exiting net,
-> but this report shows that protection falls apart.
+From: Jiri Pirko <jiri@nvidia.com>
 
-Because synchronize_rcu() is not the same than rcu_barrier()
+First 5 patches are preparations for the last one.
 
-The dst_entries_add()/ percpu_counter_add_batch() call should not
-happen after an rcu grace period.
+Motivation:
 
-Something like this (untested) patch
+For SFs, one devlink instance per SF is created. There might be
+thousands of these on a single host. When a user needs to know port
+handle for specific SF, he needs to dump all devlink ports on the host
+which does not scale good.
 
-diff --git a/net/core/dst.c b/net/core/dst.c
-index 980e2fd2f013b3e50cc47ed0666ee5f24f50444b..f02fdd1da6066a4d56c2a0aa803=
-8eca76d62f8bd
-100644
---- a/net/core/dst.c
-+++ b/net/core/dst.c
-@@ -163,8 +163,13 @@ EXPORT_SYMBOL(dst_dev_put);
+Solution:
 
- void dst_release(struct dst_entry *dst)
- {
--       if (dst && rcuref_put(&dst->__rcuref))
-+       if (dst && rcuref_put(&dst->__rcuref)) {
-+               if (!(dst->flags & DST_NOCOUNT)) {
-+                       dst->flags |=3D DST_NOCOUNT;
-+                       dst_entries_add(dst->ops, -1);
-+               }
-                call_rcu_hurry(&dst->rcu_head, dst_destroy_rcu);
-+       }
- }
- EXPORT_SYMBOL(dst_release);
+Allow user to pass devlink handle (and possibly other attributes)
+alongside the dump command and dump only objects which are matching
+the selection.
 
-It is not even clear why we are still counting dst these days.
-We removed the ipv4 route cache a long time ago, and ipv6 got a
-similar treatment.
+Example:
+$ devlink port show
+auxiliary/mlx5_core.eth.0/65535: type eth netdev eth2 flavour physical port 0 splittable false
+auxiliary/mlx5_core.eth.1/131071: type eth netdev eth3 flavour physical port 1 splittable false
+
+$ devlink port show auxiliary/mlx5_core.eth.0
+auxiliary/mlx5_core.eth.0/65535: type eth netdev eth2 flavour physical port 0 splittable false
+
+$ devlink port show auxiliary/mlx5_core.eth.1
+auxiliary/mlx5_core.eth.1/131071: type eth netdev eth3 flavour physical port 1 splittable false
+
+Jiri Pirko (6):
+  devlink: move DL_OPT_SB into required options
+  devlink: make parsing of handle non-destructive to argv
+  devlink: implement command line args dry parsing
+  devlink: return -ENOENT if argument is missing
+  mnl_utils: introduce a helper to check if dump policy exists for
+    command
+  devlink: implement dump selector for devlink objects show commands
+
+ devlink/devlink.c   | 376 ++++++++++++++++++++++++++------------------
+ include/mnl_utils.h |   1 +
+ lib/mnl_utils.c     | 121 +++++++++++++-
+ 3 files changed, 342 insertions(+), 156 deletions(-)
+
+-- 
+2.41.0
+
 
