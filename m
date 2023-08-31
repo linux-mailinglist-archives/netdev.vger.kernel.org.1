@@ -1,157 +1,161 @@
-Return-Path: <netdev+bounces-31636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9BD078F284
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 20:24:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CF0FF78F28F
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 20:27:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26C791C20B4B
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 18:24:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF06A1C202E7
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 18:27:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E5B319897;
-	Thu, 31 Aug 2023 18:23:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 442841989C;
+	Thu, 31 Aug 2023 18:27:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FD2619893
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 18:23:31 +0000 (UTC)
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89283E76;
-	Thu, 31 Aug 2023 11:23:29 -0700 (PDT)
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37VGqv1Z015308;
-	Thu, 31 Aug 2023 18:23:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : date :
- subject : mime-version : content-type : content-transfer-encoding :
- message-id : references : in-reply-to : to : cc; s=qcppdkim1;
- bh=IJf8Pu/6BU2lt6uAstwMsRX3afks4d+RjDyGbuNxntM=;
- b=fBYT15YZO6AMbOnu1/qLdxKB2X2MFnkjzIThppqv/8IJq7O9/JaeD5T8V6Fajlms/Woo
- 5tSg2dt9GyCm8VoyBOguey6cNLUm1YKE1yyXvXDFooePOH0T9MQjnLqLMj2XtowNz0fY
- 3wTW2w00REwuJszpG/uDxt6Sp2hX+aWqHsbQLkjDb+27YIT4Ea2x2bnMrFy4KWe1U92j
- Dj1RQgX5OHCgs8FQcFjU0+V0d5nyY0BdMDRk+O5WBxBKDcpfxbJadrRE73OO9tmKft2a
- ODIps2c8RBOedzbIilKoSa5c/rcl6rVyzWp6uXCBUYERz4lTTpFAmsSc6z0DkpzEblgr 8g== 
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3stxru071s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 31 Aug 2023 18:23:04 +0000
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 37VIN3BS000964
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 31 Aug 2023 18:23:03 GMT
-Received: from hu-jjohnson-lv.qualcomm.com (10.49.16.6) by
- nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.36; Thu, 31 Aug 2023 11:23:00 -0700
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-Date: Thu, 31 Aug 2023 11:22:58 -0700
-Subject: [PATCH v3 2/2] mac80211: Use flexible array in struct
- ieee80211_tim_ie
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53B48F57
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 18:27:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3CBCC433C7;
+	Thu, 31 Aug 2023 18:27:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1693506474;
+	bh=723Ya4oty/q02E8B93Q/MYOIyPGv3Rk4F+15t1DLClk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=gRiXZur09akESL6wl7teCLMDhsLm7+ARPbh52sPN6KKGiPoGSkISTe5u+0L91Gn4y
+	 QhD/7oYLV4pC2qgi8niXB/7g+oE8u0CB3+0E9fspS0fIvI1W+PtZYLKLzPp1JVEhge
+	 B9omCz6b38dEQWXm8KjOwT5XUVFahxaCijSEJmXqcg1ljKR1Em30SCInmiR+RZfPmF
+	 JaMps1vuIx4HzhsjxdRjHVcij6+133/uPDzBeRMbgH8xXQMEzPv6oCQOHSn0n0WDUP
+	 eg63VKxm+K41eDaLWcio9ZB3HivTAJEyWoXbiH4PGJ6IzkMRth3vvNLBbfT5iT+5SE
+	 HUDTzjS2O753g==
+Message-ID: <2546e031-f189-e1b1-bc50-bc7776045719@kernel.org>
+Date: Thu, 31 Aug 2023 12:27:52 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20230831-ieee80211_tim_ie-v3-2-e10ff584ab5d@quicinc.com>
-References: <20230831-ieee80211_tim_ie-v3-0-e10ff584ab5d@quicinc.com>
-In-Reply-To: <20230831-ieee80211_tim_ie-v3-0-e10ff584ab5d@quicinc.com>
-To: <kernel@quicinc.com>, Kalle Valo <kvalo@kernel.org>,
-        =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
-        "Christian
- Lamparter" <chunkeey@googlemail.com>,
-        Stanislaw Gruszka <stf_xl@wp.pl>,
-        "Helmut Schaa" <helmut.schaa@googlemail.com>,
-        Ping-Ke Shih
-	<pkshih@realtek.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Kees Cook
-	<keescook@chromium.org>
-CC: <linux-wireless@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, Jeff Johnson <quic_jjohnson@quicinc.com>
-X-Mailer: b4 0.12.3
-X-Originating-IP: [10.49.16.6]
-X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: LiCqdd0xbcioSUS6eezCocJY3MUEpGaz
-X-Proofpoint-ORIG-GUID: LiCqdd0xbcioSUS6eezCocJY3MUEpGaz
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-31_16,2023-08-31_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
- clxscore=1015 malwarescore=0 adultscore=0 priorityscore=1501
- impostorscore=0 suspectscore=0 mlxlogscore=538 mlxscore=0 bulkscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2308100000 definitions=main-2308310164
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.0
+Subject: Re: [PATCH net-next] ipv6: do not merge differe type and protocol
+ routes
+To: nicolas.dichtel@6wind.com, Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Ido Schimmel <idosch@idosch.org>,
+ Thomas Haller <thaller@redhat.com>
+References: <20230830061550.2319741-1-liuhangbin@gmail.com>
+ <eeb19959-26f4-e8c1-abde-726dbb2b828d@6wind.com>
+ <01baf374-97c0-2a6f-db85-078488795bf9@kernel.org>
+ <db56de33-2112-5a4c-af94-6c8d26a8bfc1@6wind.com> <ZPBn9RQUL5mS/bBx@Laptop-X1>
+ <62bcd732-31ed-e358-e8dd-1df237d735ef@6wind.com>
+Content-Language: en-US
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <62bcd732-31ed-e358-e8dd-1df237d735ef@6wind.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Currently struct ieee80211_tim_ie defines:
-	u8 virtual_map[1];
+On 8/31/23 5:58 AM, Nicolas Dichtel wrote:
+> Le 31/08/2023 à 12:14, Hangbin Liu a écrit :
+>> Hi Nicolas,
+>> On Thu, Aug 31, 2023 at 10:17:19AM +0200, Nicolas Dichtel wrote:
+>>>>>> So let's skip counting the different type and protocol routes as siblings.
+>>>>>> After update, the different type/protocol routes will not be merged.
+>>>>>>
+>>>>>> + ip -6 route show table 100
+>>>>>> local 2001:db8:103::/64 via 2001:db8:101::10 dev dummy1 metric 1024 pref medium
+>>>>>> 2001:db8:103::/64 via 2001:db8:101::10 dev dummy2 metric 1024 pref medium
+>>>>>>
+>>>>>> + ip -6 route show table 200
+>>>>>> 2001:db8:104::/64 via 2001:db8:101::10 dev dummy1 proto kernel metric 1024 pref medium
+>>>>>> 2001:db8:104::/64 via 2001:db8:101::10 dev dummy2 proto bgp metric 1024 pref medium
+>>>>>
+>>>>> This seems wrong. The goal of 'ip route append' is to add a next hop, not to
+>>>>> create a new route. Ok, it adds a new route if no route exists, but it seems
+>>>>> wrong to me to use it by default, instead of 'add', to make things work magically.
+>>>>
+>>>> Legacy API; nothing can be done about that (ie., that append makes a new
+>>>> route when none exists).
+>>>>
+>>>>>
+>>>>> It seems more correct to return an error in these cases, but this will change
+>>>>> the uapi and it may break existing setups.
+>>>>>
+>>>>> Before this patch, both next hops could be used by the kernel. After it, one
+>>>>> route will be ignored (the former or the last one?). This is confusing and also
+>>>>> seems wrong.
+>>>>
+>>>> Append should match all details of a route to add to an existing entry
+>>>> and make it multipath. If there is a difference (especially the type -
+>>>> protocol difference is arguable) in attributes, then they are different
+>>>> routes.
+>>>>
+>>>
+>>> As you said, the protocol difference is arguable. It's not a property of the
+>>> route, just a hint.
+>>> I think the 'append' should match a route whatever the protocol is.
+>>> 'ip route change' for example does not use the protocol to find the existing
+>>> route, it will update it:
+>>>
+>>> $ ip -6 route add 2003:1:2:3::/64 via 2001::2 dev eth1
+>>> $ ip -6 route
+>>> 2003:1:2:3::/64 via 2001::2 dev eth1 metric 1024 pref medium
+>>> $ ip -6 route change 2003:1:2:3::/64 via 2001::2 dev eth1 protocol bgp
+>>> $ ip -6 route
+>>> 2003:1:2:3::/64 via 2001::2 dev eth1 proto bgp metric 1024 pref medium
+>>> $ ip -6 route change 2003:1:2:3::/64 via 2001::2 dev eth1 protocol kernel
+>>> $ ip -6 route
+>>> 2003:1:2:3::/64 via 2001::2 dev eth1 proto kernel metric 1024 pref medium
+>>
+>> Not sure if I understand correctly, `ip route replace` should able to
+>> replace all other field other than dest and dev. It's for changing the route,
+>> not only nexthop.
+>>>
+>>> Why would 'append' selects route differently?
+>>
+>> The append should also works for a single route, not only for append nexthop, no?
+> I don't think so. The 'append' should 'join', not add. Adding more cases where a
+> route is added instead of appended doesn't make the API clearer.
+> 
+> With this patch, it will be possible to add a new route with the 'append'
+> command when the 'add' command fails:
+> $ ip -6 route add local 2003:1:2:3::/64 via 2001::2 dev eth1 table 200
+> $ ip -6 route add unicast 2003:1:2:3::/64 via 2001::2 dev eth1 table 200
+> RTNETLINK answers: File exists
+> 
+> $ ip -6 route add 2003:1:2:3::/64 via 2001::2 dev eth1 protocol bgp table 200
+> $ ip -6 route add 2003:1:2:3::/64 via 2001::2 dev eth1 protocol kernel table 200
+> RTNETLINK answers: File exists
+> 
+> This makes the API more confusing and complex. And I don't understand how it
+> will be used later. There will be 2 routes on the system, but only one will be
+> used, which one? This is confusing.
+> 
+>>
+>>>
+>>> This patch breaks the legacy API.
+>>
+>> As the patch's description. Who would expect different type/protocol route
+>> should be merged as multipath route? I don't think the old API is correct.
+> The question is not 'who expect', but 'is there some systems somewhere that rely
+> on this (deliberately or not)'.
+> Frankly, the protocol is just informative, so I don't see why it is a problem to
+> ignore it with the 'append' command.
+> For the type, it is weird, for sure. Rejecting the command seems better than
+> duplicating routes. Which route is used by the stack?
+> 
+> 
 
-Per the guidance in [1] change this to be a flexible array.
+Part of my intent with fib_tests.sh was to document the legacy meaning
+of 'append, prepend, replace, and change' options while also providing a
+test script to detect changes that cause a regression.
 
-Per the discussion in [2] wrap the virtual_map in a union with a u8
-item in order to preserve the existing expectation that the
-virtual_map must contain at least one octet (at least when used in a
-non-S1G PPDU). This means that no driver changes are required.
-
-[1] https://docs.kernel.org/process/deprecated.html#zero-length-and-one-element-arrays
-[2] https://lore.kernel.org/linux-wireless/202308301529.AC90A9EF98@keescook/
-
-Suggested-by: Kees Cook <keescook@chromium.org>
-Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
----
- include/linux/ieee80211.h | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
-
-diff --git a/include/linux/ieee80211.h b/include/linux/ieee80211.h
-index bd2f6e19c357..340d7e0f6bf7 100644
---- a/include/linux/ieee80211.h
-+++ b/include/linux/ieee80211.h
-@@ -951,17 +951,24 @@ struct ieee80211_wide_bw_chansw_ie {
-  * @dtim_count: DTIM Count
-  * @dtim_period: DTIM Period
-  * @bitmap_ctrl: Bitmap Control
-+ * @required_octet: "Syntatic sugar" to force the struct size to the
-+ *                  minimum valid size when carried in a non-S1G PPDU
-  * @virtual_map: Partial Virtual Bitmap
-  *
-  * This structure represents the payload of the "TIM element" as
-- * described in IEEE Std 802.11-2020 section 9.4.2.5.
-+ * described in IEEE Std 802.11-2020 section 9.4.2.5. Note that this
-+ * definition is only applicable when the element is carried in a
-+ * non-S1G PPDU. When the TIM is carried in an S1G PPDU, the Bitmap
-+ * Control and Partial Virtual Bitmap may not be present.
-  */
- struct ieee80211_tim_ie {
- 	u8 dtim_count;
- 	u8 dtim_period;
- 	u8 bitmap_ctrl;
--	/* variable size: 1 - 251 bytes */
--	u8 virtual_map[1];
-+	union {
-+		u8 required_octet;
-+		DECLARE_FLEX_ARRAY(u8, virtual_map);
-+	};
- } __packed;
- 
- /**
-
--- 
-2.42.0
-
+I do agree now that protocol is informative (passthrough from the kernel
+perspective) so not really part of the route. That should be dropped
+from the patch leaving just a check on rt_type as to whether the routes
+are different. From there the append, prepend, replace and change
+semantics should decide what happens (ie., how the route is inserted).
 
