@@ -1,188 +1,110 @@
-Return-Path: <netdev+bounces-31554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80EF578EBDD
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 13:20:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F45378EBE1
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 13:20:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B537281420
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 11:20:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 599AE2814E6
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 11:20:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B26B69460;
-	Thu, 31 Aug 2023 11:18:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 642208F74;
+	Thu, 31 Aug 2023 11:20:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6C1FC2FD
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 11:18:55 +0000 (UTC)
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7441ACE4;
-	Thu, 31 Aug 2023 04:18:54 -0700 (PDT)
-Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 3097686572;
-	Thu, 31 Aug 2023 13:18:52 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1693480732;
-	bh=Oh6+2Og4JNes230QX3F+ylAvYwPth7/wlwN9Q1c/94U=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FmMSDZ9mZ5CFNV1LNupGDeIr3YAF85e+bEV0ZY3P1NeODZBIm0gZP9bzOiZFqtQ+d
-	 HvoSSpTejq/HCXFbaS+lPeAJVDGlZH/95/8fW5yCvJ3m6/23a5B0QEDJzqKors/s0d
-	 JTBooF2BVyLe5LIKpfgXxNwaM2dEAt7LoKUxamkRYHud7XTEO4z57abV/z3l+6HLj0
-	 qgRk91XE4zP2ONkiw/aRCILwcXKmc0ytdoPwhOpKNFVObBxCsfxrSqC7+3xGvMqSG4
-	 sRVaUqPxzHgMmmyF903HDxviVI/2O28P9KdE/71K43GvI6SmP8SKUvk5qvetDqLbg6
-	 RGcFLDQs4Jtvw==
-From: Lukasz Majewski <lukma@denx.de>
-To: Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	davem@davemloft.net,
-	Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Vladimir Oltean <olteanv@gmail.com>
-Cc: Tristram.Ha@microchip.com,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	UNGLinuxDriver@microchip.com,
-	George McCollister <george.mccollister@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Lukasz Majewski <lukma@denx.de>
-Subject: [PATCH v2 4/4] net: dsa: hsr: Provide generic HSR ksz_hsr_{join|leave} functions
-Date: Thu, 31 Aug 2023 13:18:27 +0200
-Message-Id: <20230831111827.548118-5-lukma@denx.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230831111827.548118-1-lukma@denx.de>
-References: <20230831111827.548118-1-lukma@denx.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55CFA8F6E
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 11:20:46 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1BE4E4C;
+	Thu, 31 Aug 2023 04:20:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=7XFdGYMDNVSq8CV1JzaT+3F2PZ/VizVU8Z8a8zgCGPo=; b=zDW8azAAIuKKg48t8Mi7GqHGvY
+	Clz5Gwzm2v1bLMpZSI66ouPq9ds69t80FrLoDwja566j4PE5jzZO19NnieBxUOxHXPjyeJx2aYrNQ
+	kyVhojBLd/Urr+Svbj96r+OsNAPQ8oxZ0u/V96wz7mcmlGh9kqPMfXLI8SP97fyo1J5Fd2bGwm074
+	NFaFU0vI7dk9QC5xb+VGdcLIt7g4xj91+THiJds4wdv0qyRrMDorGnvIxaLNsCMX5jMBzDEcPvOIE
+	0GCY2kgWNaxNikXGGMQ4zw8IFhuz3m6HNvfQY8lS+JbvgtoaoPlvJcvj1t/i/L7hJvkBRHlW8OBRc
+	JrW1eviQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55220)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qbfij-0002kB-22;
+	Thu, 31 Aug 2023 12:20:17 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qbfij-0006kS-CR; Thu, 31 Aug 2023 12:20:17 +0100
+Date: Thu, 31 Aug 2023 12:20:17 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Lukasz Majewski <lukma@denx.de>
+Subject: Re: [PATCH net v1] net: phy: micrel: Correct bit assignment for
+ MICREL_KSZ8_P1_ERRATA flag
+Message-ID: <ZPB3cYMnFq1qGRv0@shell.armlinux.org.uk>
+References: <20230831110427.3551432-1-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230831110427.3551432-1-o.rempel@pengutronix.de>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
+	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This patch provides the common KSZ (i.e. Microchip) DSA code with support
-for HSR aware devices.
+On Thu, Aug 31, 2023 at 01:04:27PM +0200, Oleksij Rempel wrote:
+> The previous assignment of the phy_device quirk for the
+> MICREL_KSZ8_P1_ERRATA flag was incorrect, working only due to
+> coincidental conditions. Specifically:
+> 
+> - The flag MICREL_KSZ8_P1_ERRATA, intended for KSZ88xx switches, was
+>   mistakenly overlapping with the MICREL_PHY_FXEN and
+>   MICREL_PHY_50MHZ_CLK flags.
+> - MICREL_PHY_FXEN is used by the KSZ8041 PHY, and its related code path
+>   wasn't executed for KSZ88xx PHYs and other way around.
+> - Additionally, the code path associated with the MICREL_PHY_50MHZ_CLK
+>   flag wasn't executed for KSZ88xx either.
+> 
+> Fixes: 49011e0c1555d ("net: phy: micrel: ksz886x/ksz8081: add cabletest support")
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> ---
+>  include/linux/micrel_phy.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/include/linux/micrel_phy.h b/include/linux/micrel_phy.h
+> index 8bef1ab62bba3..0cedbeb9167c3 100644
+> --- a/include/linux/micrel_phy.h
+> +++ b/include/linux/micrel_phy.h
+> @@ -43,7 +43,7 @@
+>  /* struct phy_device dev_flags definitions */
+>  #define MICREL_PHY_50MHZ_CLK	0x00000001
+>  #define MICREL_PHY_FXEN		0x00000002
+> -#define MICREL_KSZ8_P1_ERRATA	0x00000003
+> +#define MICREL_KSZ8_P1_ERRATA	BIT(3)
 
-To be more specific - generic ksz_hsr_{join|leave} functions are provided,
-now only supporting KSZ9477 IC.
+Please can you also convert the other two flags to use BIT() as well to
+make the entire thing explicitly bit-orientated? Thanks.
 
-Signed-off-by: Lukasz Majewski <lukma@denx.de>
----
-Changes for v2:
-- None
----
- drivers/net/dsa/microchip/ksz_common.c | 69 ++++++++++++++++++++++++++
- 1 file changed, 69 insertions(+)
-
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 579fde54d1e1..853f9fe60758 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -16,6 +16,7 @@
- #include <linux/etherdevice.h>
- #include <linux/if_bridge.h>
- #include <linux/if_vlan.h>
-+#include <linux/if_hsr.h>
- #include <linux/irq.h>
- #include <linux/irqdomain.h>
- #include <linux/of_mdio.h>
-@@ -3433,6 +3434,72 @@ u16 ksz_hsr_get_ports(struct dsa_switch *ds)
- 	return 0;
- }
- 
-+static int ksz_hsr_join(struct dsa_switch *ds, int port, struct net_device *hsr)
-+{
-+	struct dsa_port *partner = NULL, *dp;
-+	struct ksz_device *dev = ds->priv;
-+	enum hsr_version ver;
-+	int ret;
-+
-+	ret = hsr_get_version(hsr, &ver);
-+	if (ret)
-+		return ret;
-+
-+	switch (dev->chip_id) {
-+	case KSZ9477_CHIP_ID:
-+		if (ver == PRP_V1)
-+			return -EOPNOTSUPP;
-+	}
-+
-+	/* We can't enable redundancy on the switch until both
-+	 * redundant ports have signed up.
-+	 */
-+	dsa_hsr_foreach_port(dp, ds, hsr) {
-+		if (dp->index != port) {
-+			partner = dp;
-+			break;
-+		}
-+	}
-+
-+	if (!partner)
-+		return 0;
-+
-+	switch (dev->chip_id) {
-+	case KSZ9477_CHIP_ID:
-+		return ksz9477_hsr_join(ds, port, hsr, partner);
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+
-+	return 0;
-+}
-+
-+static int ksz_hsr_leave(struct dsa_switch *ds, int port,
-+			 struct net_device *hsr)
-+{
-+	struct dsa_port *partner = NULL, *dp;
-+	struct ksz_device *dev = ds->priv;
-+
-+	dsa_hsr_foreach_port(dp, ds, hsr) {
-+		if (dp->index != port) {
-+			partner = dp;
-+			break;
-+		}
-+	}
-+
-+	if (!partner)
-+		return 0;
-+
-+	switch (dev->chip_id) {
-+	case KSZ9477_CHIP_ID:
-+		return ksz9477_hsr_leave(ds, port, hsr, partner);
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+
-+	return 0;
-+}
-+
- static const struct dsa_switch_ops ksz_switch_ops = {
- 	.get_tag_protocol	= ksz_get_tag_protocol,
- 	.connect_tag_protocol   = ksz_connect_tag_protocol,
-@@ -3452,6 +3519,8 @@ static const struct dsa_switch_ops ksz_switch_ops = {
- 	.get_sset_count		= ksz_sset_count,
- 	.port_bridge_join	= ksz_port_bridge_join,
- 	.port_bridge_leave	= ksz_port_bridge_leave,
-+	.port_hsr_join		= ksz_hsr_join,
-+	.port_hsr_leave		= ksz_hsr_leave,
- 	.port_stp_state_set	= ksz_port_stp_state_set,
- 	.port_pre_bridge_flags	= ksz_port_pre_bridge_flags,
- 	.port_bridge_flags	= ksz_port_bridge_flags,
 -- 
-2.20.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
