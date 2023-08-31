@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-31581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9877078EE7A
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 15:23:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4664D78EE7B
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 15:23:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C91FF1C20ABF
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 13:23:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01299281572
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 13:23:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D239111C84;
-	Thu, 31 Aug 2023 13:22:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91D5E11C9D;
+	Thu, 31 Aug 2023 13:22:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C188411C82
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 13:22:39 +0000 (UTC)
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BC09CEB
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 06:22:38 -0700 (PDT)
-Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-401da71b7faso8193215e9.2
-        for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 06:22:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8466811C82
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 13:22:41 +0000 (UTC)
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E47ECEB
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 06:22:40 -0700 (PDT)
+Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-401d67434daso7800745e9.2
+        for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 06:22:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1693488157; x=1694092957; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1693488159; x=1694092959; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fO1qCKwrMIuDKlrQa6pAbTr3sD/BPmYH7vzrt4lfo9o=;
-        b=jW4bLm8RExVM/v3A5SR+xzOzAhCwWQx4pL0d8ds4Tqu/s3J/x3FwRR3m5PDMWZReaU
-         PYj6mBSf8Mc5l2rCx6bov5VlkEyOS2hbYpLzSWWKvVQVFFyjc8mxCvQoM0FW44KjViZc
-         kpFYMSK4+CjTKPCGlotI4B99+WRNzLOa4kBzjMlpiChlwYMxdhKseufad9Y/NHrKMXyA
-         VdqqvtRqjUVg2MY22OSaJudoGffKNe6+4ItheukCb2Cd22aPj4Fm9Hvt72BvXl0mX0vC
-         o/B/mYwVOeUv4SY0zXArbbBj9hHAlZjLkEMPeanyw8Y0c2MG0UVXyqNe8jTn2lxDgH2p
-         Pf8g==
+        bh=hLucJPRDjS5JeAlu2s6d3E9cWHltRgyGs33l+Nj7uBY=;
+        b=B+6TiTHNXnw/fHpI8Wywez/bBdBSvuIRE50uMbVm1bUA1WL2FqMnwR1RBnkg/C6oH9
+         cPyD0CdTXcF3v7UkqXR0+1FxvaYxuFn+uCzJRX0NjVLtJA/Jr00OX1MsOVjWRWHPUym1
+         uc3L85cZlD5F5s0AHfHPrvEFSe7eEv8J34eI9wFNpsTkLLaMw60u2+IjD/+YEYijr1Jf
+         hPO66Cg4gtVgHLUBWu33/HIzpat3doTbYzL+7G1uMHrqqGvcibQgCKS6Q8ZY0appP2Gy
+         gUG+qkB76GJr2P7Tfr9invMk4PlcoHjf9fixG+7aoRpGebZbXyOty+7Ut4I71kmpYhHU
+         a9IA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693488157; x=1694092957;
+        d=1e100.net; s=20221208; t=1693488159; x=1694092959;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=fO1qCKwrMIuDKlrQa6pAbTr3sD/BPmYH7vzrt4lfo9o=;
-        b=hqt9K1xen+DG6k0pr9sPFMCuBh7pt28Vs+pKPy5J5B/ACyO2MNQiWJSir77jN0Vo23
-         IGiRYPx6jxFohI7zCd0GbVId2llCNQhko+fAgXCiovRobHHOuUzBE4k/fTK0H+YYaM1r
-         u9o5ebDi3OWnZHguG/Uu9fcI8H2EP/X/SU7fqkkziYgJ+r+cHIM0pFaKBm+MzWDthT/X
-         2ejVq7DqSmzo6Zn9IdthnR2mVOd8goypQfmgBUtnN+lAZL2i07KSBaesSrwkn5RG8PMU
-         hNA5Z+5qHcCH8Cd5M/ENb0wM2zTJ+vPLXlzk2sd8raoTVj5idEQAZTcJKmMZqm6vbsEW
-         Z6Cg==
-X-Gm-Message-State: AOJu0YwHkmyJxw1Ky/x6lU7Sc3C4FVcXHVzgPIpoNKnlQylMaquRRoZX
-	+8F/d9LDFLiqhDlJwPF9QUImhOw45CyKtadvUtI=
-X-Google-Smtp-Source: AGHT+IEnkZkoiP7m5NenJYYYcSu3pgmvitG/W5ttddAtcuyLs5XlHd+CMeXNzCJCDNeC3hmLrypk6Q==
-X-Received: by 2002:a1c:7718:0:b0:400:57d1:4914 with SMTP id t24-20020a1c7718000000b0040057d14914mr4086176wmi.5.1693488156990;
-        Thu, 31 Aug 2023 06:22:36 -0700 (PDT)
+        bh=hLucJPRDjS5JeAlu2s6d3E9cWHltRgyGs33l+Nj7uBY=;
+        b=A+nvBdyrVdLq+8ZdckkHBZIahp5Spgw8I18ZVLvszH9wvtsEcITXypD+BaS3fWLTmm
+         T9AP4pG9riS2avDb5lB7GcDu9M3fsbvHGxDQa4cESMZLNkhOMfeeHYSj+8T5rIL+cHMR
+         Tt/1U1ITfektiRQqNJrQ4TfGIKYOkKDfP58TcpZto4qJedV5ELy4CHEY6MTDKAuMjFtN
+         tqpfebuFEry8V9TWbU+st0cPYer4INwiTM3JC46bbqjD1HG0YTwzx3fWMVTI8tnq4Czy
+         ZN3jGMIQSXKcJc9r74Jx+0ejGz0uhLEcQ+2cFPhn4N7hpgyHtZdUBLBrDlceo1du1/0x
+         O9MQ==
+X-Gm-Message-State: AOJu0Yz1h9ZDnaebzB3bU2hu9GUm6SJYmangEC8i5z8VDYQ7fMCpd3Y9
+	1nruYrwbpXLwYSsiVRyFq+7ag2wsntf4Br2xXHc=
+X-Google-Smtp-Source: AGHT+IGPFmpt8rnQmejMFmsgnH49il6+s+yQc51+YjF/XOlzs0Ym7FYbjGSz03rrNQNrEymwhjAqgg==
+X-Received: by 2002:a05:600c:446:b0:401:bbeb:97c4 with SMTP id s6-20020a05600c044600b00401bbeb97c4mr4508873wmb.37.1693488158693;
+        Thu, 31 Aug 2023 06:22:38 -0700 (PDT)
 Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id m9-20020a7bca49000000b003fed1ba0b8esm1981983wml.8.2023.08.31.06.22.36
+        by smtp.gmail.com with ESMTPSA id i9-20020a05600011c900b0031c77c010e1sm2191511wrx.96.2023.08.31.06.22.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Aug 2023 06:22:36 -0700 (PDT)
+        Thu, 31 Aug 2023 06:22:38 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: stephen@networkplumber.org,
 	dsahern@gmail.com
-Subject: [patch iproute2-next 3/6] devlink: implement command line args dry parsing
-Date: Thu, 31 Aug 2023 15:22:26 +0200
-Message-ID: <20230831132229.471693-4-jiri@resnulli.us>
+Subject: [patch iproute2-next 4/6] devlink: return -ENOENT if argument is missing
+Date: Thu, 31 Aug 2023 15:22:27 +0200
+Message-ID: <20230831132229.471693-5-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230831132229.471693-1-jiri@resnulli.us>
 References: <20230831132229.471693-1-jiri@resnulli.us>
@@ -81,58 +81,55 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-In preparation to the follow-up dump selector patch, introduce function
-dl_argv_dry_parse() which allows to do dry parsing of command line
-arguments without printing out any error messages to the user.
+In preparation to the follow-up dump selector patch, make sure that the
+command line arguments parsing function returns -ENOENT in case the
+option is missing so the caller can distinguish.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
- devlink/devlink.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ devlink/devlink.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/devlink/devlink.c b/devlink/devlink.c
-index e7b5b788863a..8d2424f58cc2 100644
+index 8d2424f58cc2..6a46a4ecf648 100644
 --- a/devlink/devlink.c
 +++ b/devlink/devlink.c
-@@ -64,6 +64,7 @@
- static int g_new_line_count;
- static int g_indent_level;
- static bool g_indent_newline;
-+static bool g_err_suspended;
- 
- #define INDENT_STR_STEP 2
- #define INDENT_STR_MAXLEN 32
-@@ -74,6 +75,8 @@ pr_err(const char *fmt, ...)
+@@ -1048,7 +1048,7 @@ static int strtobool(const char *str, bool *p_val)
+ static int ident_str_validate(char *str, unsigned int expected)
  {
- 	va_list ap;
+ 	if (!str)
+-		return -EINVAL;
++		return -ENOENT;
  
-+	if (g_err_suspended)
-+		return;
- 	va_start(ap, fmt);
- 	vfprintf(stderr, fmt, ap);
- 	va_end(ap);
-@@ -2284,6 +2287,21 @@ static int dl_argv_parse(struct dl *dl, uint64_t o_required,
- 	return dl_args_finding_required_validate(o_required, o_found);
- }
+ 	if (get_str_char_count(str, '/') != expected) {
+ 		pr_err("Wrong identification string format.\n");
+@@ -1131,7 +1131,7 @@ static int dl_argv_handle_port(struct dl *dl, char *str, char **p_bus_name,
  
-+static int dl_argv_dry_parse(struct dl *dl, uint64_t o_required,
-+			     uint64_t o_optional)
-+{
-+	char **argv = dl->argv;
-+	int argc = dl->argc;
-+	int err;
-+
-+	g_err_suspended = true;
-+	err = dl_argv_parse(dl, o_required, o_optional);
-+	g_err_suspended = false;
-+	dl->argv = argv;
-+	dl->argc = argc;
-+	return err;
-+}
-+
- static void
- dl_function_attr_put(struct nlmsghdr *nlh, const struct dl_opts *opts)
- {
+ 	if (!str) {
+ 		pr_err("Port identification (\"bus_name/dev_name/port_index\" or \"netdev ifname\") expected.\n");
+-		return -EINVAL;
++		return -ENOENT;
+ 	}
+ 	slash_count = get_str_char_count(str, '/');
+ 	switch (slash_count) {
+@@ -1159,7 +1159,7 @@ static int dl_argv_handle_both(struct dl *dl, char *str, char **p_bus_name,
+ 		pr_err("One of following identifications expected:\n"
+ 		       "Devlink identification (\"bus_name/dev_name\")\n"
+ 		       "Port identification (\"bus_name/dev_name/port_index\" or \"netdev ifname\")\n");
+-		return -EINVAL;
++		return -ENOENT;
+ 	}
+ 	slash_count = get_str_char_count(str, '/');
+ 	if (slash_count == 1) {
+@@ -1681,7 +1681,7 @@ static int dl_args_finding_required_validate(uint64_t o_required,
+ 		o_flag = dl_args_required[i].o_flag;
+ 		if ((o_required & o_flag) && !(o_found & o_flag)) {
+ 			pr_err("%s\n", dl_args_required[i].err_msg);
+-			return -EINVAL;
++			return -ENOENT;
+ 		}
+ 	}
+ 	if (o_required & ~o_found) {
 -- 
 2.41.0
 
