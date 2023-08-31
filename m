@@ -1,115 +1,129 @@
-Return-Path: <netdev+bounces-31487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5258278E578
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 06:40:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B96B378E592
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 07:15:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06EB4281292
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 04:40:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13ADC281344
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 05:15:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0EDD139B;
-	Thu, 31 Aug 2023 04:40:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08A601854;
+	Thu, 31 Aug 2023 05:15:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C42431360
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 04:40:48 +0000 (UTC)
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E07D1E8
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 21:40:46 -0700 (PDT)
-Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
-	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qbZTS-0003zJ-7a; Thu, 31 Aug 2023 06:40:06 +0200
-Received: from ore by ptx.hi.pengutronix.de with local (Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qbZTQ-0004mf-Il; Thu, 31 Aug 2023 06:40:04 +0200
-Date: Thu, 31 Aug 2023 06:40:04 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
-	davem@davemloft.net, Woojung Huh <woojung.huh@microchip.com>,
-	Vladimir Oltean <olteanv@gmail.com>, Tristram.Ha@microchip.com,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	UNGLinuxDriver@microchip.com,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] net: phy: Provide Module 4 KSZ9477 errata
- (DS80000754C)
-Message-ID: <20230831044004.GA17603@pengutronix.de>
-References: <20230830101813.GG31399@pengutronix.de>
- <20230830125224.1012459f@wsk>
- <20230830105941.GH31399@pengutronix.de>
- <20230830135151.683303db@wsk>
- <20230830121738.GJ31399@pengutronix.de>
- <ZO83htinyfAp4mWw@shell.armlinux.org.uk>
- <20230830130649.GK31399@pengutronix.de>
- <ZO9Ejx9G8laNRasu@shell.armlinux.org.uk>
- <20230830142650.GL31399@pengutronix.de>
- <20230830183818.1f42919b@wsk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8B951846;
+	Thu, 31 Aug 2023 05:15:24 +0000 (UTC)
+Received: from mail-qv1-xf2b.google.com (mail-qv1-xf2b.google.com [IPv6:2607:f8b0:4864:20::f2b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BAB9D2;
+	Wed, 30 Aug 2023 22:15:19 -0700 (PDT)
+Received: by mail-qv1-xf2b.google.com with SMTP id 6a1803df08f44-6516bc20f37so1435926d6.1;
+        Wed, 30 Aug 2023 22:15:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693458918; x=1694063718; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=M8FIm4HOaEvNyGP3mdXlZvY4sb39VihsE/tZdbALed8=;
+        b=ME/5KVvmx0h07oVhAwuBXJFRVRZrfEEVdsKNpr6uRho9QjZMP/WSdQB/IonNsiknXD
+         GLSPJwjr7M903X41lbctshxgiju8Yl1yxHApkGJgKy6UYzO+wBrMSKP2/zR3oILy6dem
+         hIKdLz20tG7q6WFGFH61Oatt580N5g2PESR7NTHg9w7cOeWjDIDEk2UVX83z+j3QsdpA
+         JwkF4UTrksMR0B+jFdCW15YQLHLX73ZJkA84EZaWUzt0wATChJjXv+gqTKIAhdFT06pP
+         To6tEiHu2Mv6Y6Vvat2TDV0WPxhAyyrR9snaPpgLUhKiWbrw4bLcEzPNobh4EiO98Trb
+         EJGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693458918; x=1694063718;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=M8FIm4HOaEvNyGP3mdXlZvY4sb39VihsE/tZdbALed8=;
+        b=fGRxJyzkpCWXj+ryYep775j2vPjcJc69cTwPqOKtEq+GdzQejlFyzMpPOPrNZndO2V
+         uO2BBXWhXoqjn7a29UKyMEwi0JktLcurDDHSECJjlhQo2/3SR3vOzsbsz9IQUfONxPnM
+         ikTu9+pKrvi2BQETDyhdG1kdqDF7M7JfyQNMnENjt8NU6I5Rg1imWoY/xGl3P3EKolEq
+         GxZLXNvM+/FEVvMv4XsmcJKzEB3qzMFAWtIT1UtcIqbUJgf5yLBJStG0cCKwAHN0FtBt
+         hZ8jKTBQP50N5jZUg02PMKCGkwkWAXsoMQ/YK2aJM2G7uYC2KAHVvVjgMarJbdIGbYlH
+         2pwA==
+X-Gm-Message-State: AOJu0YxijBDSG5q6vW3AXCUy8SGgICgdiXXUOpr818qmy1HzxnPg06yA
+	b+UBFkJ2+Aqtf+/tDPlhtJsjowUH6BPyLVCN6UU=
+X-Google-Smtp-Source: AGHT+IF7AAV77xKsJCzoV+Bu5gHFIlBoNDuDAlriBlSVpWp/GZ5tmKuBC18U6WnmOilTrcbJTed6WwcZny7OQneFJYg=
+X-Received: by 2002:a05:6214:1d2c:b0:64f:8b28:b753 with SMTP id
+ f12-20020a0562141d2c00b0064f8b28b753mr4480064qvd.0.1693458918578; Wed, 30 Aug
+ 2023 22:15:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230830183818.1f42919b@wsk>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20230830151704.14855-1-magnus.karlsson@gmail.com>
+In-Reply-To: <20230830151704.14855-1-magnus.karlsson@gmail.com>
+From: Magnus Karlsson <magnus.karlsson@gmail.com>
+Date: Thu, 31 Aug 2023 07:15:06 +0200
+Message-ID: <CAJ8uoz3V+UXc0K1uYA2zU7oxmbOAQPAf3Uti7W3cmH4hK1s9kg@mail.gmail.com>
+Subject: Re: [PATCH bpf] xsk: fix xsk_diag use-after-free error during socket cleanup
+To: magnus.karlsson@intel.com, bjorn@kernel.org, ast@kernel.org, 
+	daniel@iogearbox.net, netdev@vger.kernel.org, maciej.fijalkowski@intel.com
+Cc: jonathan.lemon@gmail.com, bpf@vger.kernel.org, 
+	syzbot+822d1359297e2694f873@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Lukasz,
+On Wed, 30 Aug 2023 at 17:17, Magnus Karlsson <magnus.karlsson@gmail.com> wrote:
+>
+> From: Magnus Karlsson <magnus.karlsson@intel.com>
+>
+> Fix a use-after-free error that is possible if the xsk_diag interface
+> is used at the same time as the socket is being closed. In the early
+> days of AF_XDP, the way we tested that a socket was not bound or being
+> closed was to simply check if the netdevice pointer in the xsk socket
+> structure was NULL. Later, a better system was introduced by having an
+> explicit state variable in the xsk socket struct. For example, the
+> state of a socket that is going down is XSK_UNBOUND.
+>
+> The commit in the Fixes tag below deleted the old way of signalling
+> that a socket is going down, setting dev to NULL. This in the belief
+> that all code using the old way had been exterminated. That was
+> unfortunately not true as the xsk diagnostics code was still using the
+> old way and thus does not work as intended when a socket is going
+> down. Fix this by introducing a test against the state variable. If
+> the socket is going down, simply abort the diagnostic's netlink
+> operation.
+>
+> Fixes: 18b1ab7aa76b ("xsk: Fix race at socket teardown")
+> Reported-by: syzbot+822d1359297e2694f873@syzkaller.appspotmail.com
+> Signed-off-by: Magnus Karlsson <magnus.karlsson@intel.com>
+> ---
+>  net/xdp/xsk_diag.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/net/xdp/xsk_diag.c b/net/xdp/xsk_diag.c
+> index c014217f5fa7..da3100bfa1c5 100644
+> --- a/net/xdp/xsk_diag.c
+> +++ b/net/xdp/xsk_diag.c
+> @@ -111,6 +111,9 @@ static int xsk_diag_fill(struct sock *sk, struct sk_buff *nlskb,
+>         sock_diag_save_cookie(sk, msg->xdiag_cookie);
+>
+>         mutex_lock(&xs->mutex);
+> +       if (xs->state == XSK_UNBOUND)
 
-On Wed, Aug 30, 2023 at 06:38:18PM +0200, Lukasz Majewski wrote:
-> Hi Oleksij,
- 
-> The implementation as you suggested seems to work :-)
-> 
-> The ksz_get_phy_flags() - where the MICREL_NO_EEE is set is executed
-> before ksz9477_config_init().
-> 
-> And then the eee_broken_modes are taken into account.
-> 
-> # ethtool --show-eee lan1
-> EEE Settings for lan1:
->         EEE status: disabled
->         Tx LPI: 0 (us)
->         Supported EEE link modes:  100baseT/Full 
->                                    1000baseT/Full 
->         Advertised EEE link modes:  Not reported
->         Link partner advertised EEE link modes:  Not reported
-> 
-> I will prepare tomorrow a proper patch.
+Sorry, but I have to spin a v2. There should be a READ_ONCE() here of the state.
 
-can you please by the way remove this line:
-https://elixir.bootlin.com/linux/v6.5/source/drivers/net/phy/micrel.c#L1803
-
-it is obsolet by eee_broken_modes.
-
-Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+> +               goto out_nlmsg_trim;
+> +
+>         if ((req->xdiag_show & XDP_SHOW_INFO) && xsk_diag_put_info(xs, nlskb))
+>                 goto out_nlmsg_trim;
+>
+>
+> base-commit: 35d2b7ffffc1d9b3dc6c761010aa3338da49165b
+> --
+> 2.42.0
+>
 
