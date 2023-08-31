@@ -1,126 +1,119 @@
-Return-Path: <netdev+bounces-31601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3101678EFE0
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 17:01:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A75578EFE9
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 17:03:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 681301C20A38
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 15:01:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 041342815BC
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 15:03:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11999125AA;
-	Thu, 31 Aug 2023 15:00:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05F5B125B5;
+	Thu, 31 Aug 2023 15:03:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00777186A
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 15:00:57 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2FDDCC5
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 08:00:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1693494056;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Vgwa1dB9SPLXrOuebcpc/xedsvZ9jq5rbgcVN4pe9yQ=;
-	b=FBuzfSrLRkrWrrPGOFz1Fy1XTwRHN2XVo8JaHnQLVWvrsRcfu0XRXj6EhS5wP1xM9ZVe3r
-	IF/+R/OROo4amAdOgt1T/8w/I5ZdZkTpZU5CREFp3edcgvWtsz5wPdvBv8wxb7eSZpeQFO
-	85H1qNSFISAATyBQQYpxrgGBaAP9fWk=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-653-9rp1c5wWMe67ansjXjOAUg-1; Thu, 31 Aug 2023 11:00:53 -0400
-X-MC-Unique: 9rp1c5wWMe67ansjXjOAUg-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-978a991c3f5so68985766b.0
-        for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 08:00:53 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E317C11CBA;
+	Thu, 31 Aug 2023 15:03:11 +0000 (UTC)
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74795CC5;
+	Thu, 31 Aug 2023 08:03:10 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-991c786369cso109404466b.1;
+        Thu, 31 Aug 2023 08:03:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693494189; x=1694098989; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=VJr3S4oVZbd7ZT/Wt+7mrgyluXxLgkA2mmGZaMzWAxQ=;
+        b=cJjlNM5J2cApuvt65DqY7DI9RPE4K3833or49Kc1/p0wDw3Jh0/j4r/sA8VMKqeoFe
+         yzLouxxeEDKnsBxRXImWoBHcxHepMk8C2Iemc6ehkhYvJHMzPeLzI6hNaTh8vTcEIuih
+         Br2OkTfG92GMI6mwso2/royffukGfzLCCrAsCuANeHJDH+CLaOr6Cb3Y80KamD/Spm1d
+         tEUkjconAkbCAdwW6YcCYkJniHEGI0ueHiIVUn4LGSOkr1rTwyXFcYV87WOx8z9zADAA
+         jjXTTjcF5JPQJcmwHe92liB2esdqQoPzREvEqYYDOaqaDsFQPxbZ6uuVZ0sXYK+od7d5
+         QpXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693494052; x=1694098852;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Vgwa1dB9SPLXrOuebcpc/xedsvZ9jq5rbgcVN4pe9yQ=;
-        b=aYz74jer3F+bUe1Nk8wt2o6dWN97njNG9eT5iKwj4TK8im1n/2qpukEB6ZqDnW4BQm
-         ETwg+QI7VMzqzQ6qeb+PfLpbeB9lPlK/mBgY9EMM9q/JxDtCv2MNki4bVvts2qDPcrUo
-         IJZr5bhSL8zqNxga2B29H8Qr0eTDbiXuq2L7P7jijHtND9Je1aF3DQWK6gKLc+qYp3EN
-         tEb3pGAnnf8MloXzTqV0GtMLEKk0RWtr1w9mb6aD4BL5jaRfVsmSqPQVEstE1gXDRTxJ
-         RUzcHD3O+4oMuRsR4HOBWJfmxFaz7Ygu0P7lt+UzKsid7MUrZswsN85hZY3ZN1ZaRReN
-         zvng==
-X-Gm-Message-State: AOJu0Yx999GRrV37Gf2V0ZzcnI2YonADP5RCO6CWFTHWnaiKd+tYsDGn
-	gCly5rEfKx2+Bxd6+i17xymlpix2NVMHiqAQu0yK3BDC5XFi56lI3VExfk1EcE0/aLINYTJweZK
-	wlf8rFLmCOx4lSNEj
-X-Received: by 2002:a17:906:5a6f:b0:9a3:c4f4:12dc with SMTP id my47-20020a1709065a6f00b009a3c4f412dcmr4524808ejc.7.1693494052174;
-        Thu, 31 Aug 2023 08:00:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEItJP1c9NKLWMSDU2Fjxe2iKrYoxUCLRWz4/6JWjMqNieHJ8iRQusTIkf8kXERSXMOfiazaw==
-X-Received: by 2002:a17:906:5a6f:b0:9a3:c4f4:12dc with SMTP id my47-20020a1709065a6f00b009a3c4f412dcmr4524784ejc.7.1693494051830;
-        Thu, 31 Aug 2023 08:00:51 -0700 (PDT)
-Received: from sgarzare-redhat (host-82-57-51-114.retail.telecomitalia.it. [82.57.51.114])
-        by smtp.gmail.com with ESMTPSA id rs10-20020a170907036a00b00992b510089asm855137ejb.84.2023.08.31.08.00.50
+        d=1e100.net; s=20221208; t=1693494189; x=1694098989;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=VJr3S4oVZbd7ZT/Wt+7mrgyluXxLgkA2mmGZaMzWAxQ=;
+        b=EKdRUrrBhfqNnmMttohZ96+pzerhMAAx9il4Bl/YrSzXVgas0KLLQwsT+VRSs25AWR
+         mfomEV2gVw8S/GGFpuxeU+fhrOFs6bGJQq0dfWHhtig8M4/0UfGDcvP1pakXK2sUi8Vt
+         FKolWc6WDq6zMt5nnmmQfRPN4mlO2aO8CniniASC1NwN6GPdywau8MyBJLWdf5lS4wSF
+         Jx3CE6GkBHzdfRVyYmPICrG9pysCL0y74QfM+mDilePsv/oRom2mh2gtEIeiKjSRSMbE
+         m0+1GU5Im2YKl5wI4wZp+4JuufAYIrxcQdJuYgTpOxB/iwVTWzxdTIwbHhXPY2ZBjiuI
+         mb5g==
+X-Gm-Message-State: AOJu0YyMQBaKm7DzKdmV970+scmujKDh5MuSd3cQyOPtnYr7zX+Xy7n0
+	UH3mYvXw85WjKgdq/p0m9s4=
+X-Google-Smtp-Source: AGHT+IEW+ktfjOUsEEI5CWESHXT9h4cOqIVOPWDVyT8ai1Es9Izu+9nja9zmyaHhiEK/bTn4jOXIFA==
+X-Received: by 2002:a17:907:77da:b0:9a1:f21e:cdfe with SMTP id kz26-20020a17090777da00b009a1f21ecdfemr3796205ejc.58.1693494186444;
+        Thu, 31 Aug 2023 08:03:06 -0700 (PDT)
+Received: from [192.168.1.95] (host-176-36-0-241.b024.la.net.ua. [176.36.0.241])
+        by smtp.gmail.com with ESMTPSA id e19-20020a1709067e1300b009a198078c53sm834496ejr.214.2023.08.31.08.03.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Aug 2023 08:00:51 -0700 (PDT)
-Date: Thu, 31 Aug 2023 17:00:40 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Arseniy Krasnov <avkrasnov@salutedevices.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
-	oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v2 1/2] vsock: send SIGPIPE on write to shutdowned
- socket
-Message-ID: <gqhfmvel7kkglvaco5lnjiggfj57j7ie5erp6vjvfmm5ifwsw5@o2tzqsnvoc7x>
-References: <20230826175900.3693844-1-avkrasnov@salutedevices.com>
- <20230826175900.3693844-2-avkrasnov@salutedevices.com>
+        Thu, 31 Aug 2023 08:03:05 -0700 (PDT)
+Message-ID: <082a6db6838d3aee5ca39eabd35d4da0c9691a0d.camel@gmail.com>
+Subject: Re: [BUG bpf-next] bpf/net: Hitting gpf when running selftests
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: Jiri Olsa <olsajiri@gmail.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>,  Andrii Nakryiko <andrii@kernel.org>,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, Martin KaFai Lau
+ <kafai@fb.com>,  Song Liu <songliubraving@fb.com>, Yonghong Song
+ <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, KP Singh
+ <kpsingh@chromium.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
+ <haoluo@google.com>, Hou Tao <houtao1@huawei.com>
+Date: Thu, 31 Aug 2023 18:03:04 +0300
+In-Reply-To: <de816b89073544deb2ce34c4b242d583a6d4660f.camel@gmail.com>
+References: <ZO+RQwJhPhYcNGAi@krava> <ZO+vetPCpOOCGitL@krava>
+	 <de816b89073544deb2ce34c4b242d583a6d4660f.camel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20230826175900.3693844-2-avkrasnov@salutedevices.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Aug 26, 2023 at 08:58:59PM +0300, Arseniy Krasnov wrote:
->POSIX requires to send SIGPIPE on write to SOCK_STREAM socket which was
->shutdowned with SHUT_WR flag or its peer was shutdowned with SHUT_RD
->flag. Also we must not send SIGPIPE if MSG_NOSIGNAL flag is set.
->
->Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
->---
-> net/vmw_vsock/af_vsock.c | 3 +++
-> 1 file changed, 3 insertions(+)
+On Thu, 2023-08-31 at 13:52 +0300, Eduard Zingerman wrote:
+> On Wed, 2023-08-30 at 23:07 +0200, Jiri Olsa wrote:
+> > On Wed, Aug 30, 2023 at 08:58:11PM +0200, Jiri Olsa wrote:
+> > > hi,
+> > > I'm hitting crash below on bpf-next/master when running selftests,
+> > > full log and config attached
+> >=20
+> > it seems to be 'test_progs -t sockmap_listen' triggering that
+>=20
+> Hi,
+>=20
+> I hit it as well, use the following command to reproduce:
+>=20
+>   for i in $(seq 1 100); do \
+>     ./test_progs -a 'sockmap_listen/sockmap VSOCK test_vsock_redir' \
+>     | grep Summary; \
+>   done
+>=20
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+For what its worth, bisect points to the following commit:
+147f3efaa241 ("sched/fair: Implement an EEVDF-like scheduling policy")
 
->
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index 020cf17ab7e4..013b65241b65 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -1921,6 +1921,9 @@ static int vsock_connectible_sendmsg(struct socket *sock, struct msghdr *msg,
-> 			err = total_written;
-> 	}
-> out:
->+	if (sk->sk_type == SOCK_STREAM)
->+		err = sk_stream_error(sk, msg->msg_flags, err);
->+
-> 	release_sock(sk);
-> 	return err;
-> }
->-- 
->2.25.1
->
+Which was merged into bpf-next 3 days ago as a part of:
+3ca9a836ff53 ("Merge tag 'sched-core-2023-08-28' of git://git.kernel.org/pu=
+b/scm/linux/kernel/git/tip/tip")
 
+Scheduling changes uncovered some old race condition?
+
+[...]
 
