@@ -1,179 +1,82 @@
-Return-Path: <netdev+bounces-31532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DDAF78E964
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 11:29:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FFA678E9A2
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 11:40:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD6FF281460
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 09:29:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E85B11C208F0
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 09:40:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB1A28814;
-	Thu, 31 Aug 2023 09:29:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 878FF8BE6;
+	Thu, 31 Aug 2023 09:40:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D949C79F8
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 09:29:26 +0000 (UTC)
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79847CEA;
-	Thu, 31 Aug 2023 02:29:24 -0700 (PDT)
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 3D11B86556;
-	Thu, 31 Aug 2023 11:29:22 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1693474162;
-	bh=1D3Qgb3Pi6YnUtvh04RQFkgAJbK1KQQ0PEsZIO0c6W0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=N3DCE24p+3/frfNRwhmRtciInUxjmkqmRSCmPmqUQbcs3zYhieAAGHm4o7av1k+eC
-	 Op15I/GeshFQJ0X5IRpLfVG3fWAM6VYuKLWxd4yxcEXiud3+uNwptYv+d0qYbFtCEW
-	 I0lQYu/fnkib38Clj1tnqQ/q+m9o57Ui5OXPiyoWbvmt/eT/cdrAXGVVom04UNl29p
-	 w1oBCHRjdDf2nN6ZnRn/YntmMaJi3s8Dl2zI+Qbj6gULmFMxLMQCVMS2hfFAAv78a0
-	 FcqwMDCtKS2j+OQ8cjIve+ZqbBk/JcipuI0+Qzh1vwJFi1OxdEDkfDAnwT2DCoo9UR
-	 CFgq4iEdsrVqg==
-Date: Thu, 31 Aug 2023 11:29:15 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Tristram.Ha@microchip.com, Eric Dumazet  <edumazet@google.com>,
- davem@davemloft.net, Woojung Huh  <woojung.huh@microchip.com>, Vladimir
- Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Florian Fainelli
- <f.fainelli@gmail.com>, Jakub Kicinski  <kuba@kernel.org>,
- UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/4] net: dsa: Extend the dsa_switch structure to hold
- info about HSR ports
-Message-ID: <20230831112915.5b114379@wsk>
-In-Reply-To: <6b4733f4a5bedd465b7ee5ea435dcdaf12a61321.camel@redhat.com>
-References: <20230829121132.414335-1-lukma@denx.de>
-	<20230829121132.414335-2-lukma@denx.de>
-	<6b4733f4a5bedd465b7ee5ea435dcdaf12a61321.camel@redhat.com>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41E2D8498
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 09:40:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8B0FAC433C9;
+	Thu, 31 Aug 2023 09:40:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1693474827;
+	bh=KXo/YBq6BJFIJUoJy9tJTJDU+Y/228TBLaRYndV3a6k=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=qe1+E8EWoCF29GmaUm/8kKatkuDtM/OUSCbpILvF9pV0yDY0S15G+7qItxSGZz+om
+	 NUqtr5cuJa1rA+MrtShxaFVOGSkDKWIbFwrdQuhbe+ufEHzg8EZGXHylEhGrSXWORA
+	 yfEFAXg3hFGP4il8HFK181cCtw8EK/m6CR3jQ2IbCNVJQFlK+dem9TbAevBzkoMixM
+	 82HJj42jpT3dpyiElt3e3tbhVsvg+CTNlQYxToI3CaRLuxRZ2kwUfm0yCSI+WRSWeJ
+	 BqzbkfrfKsenOKB6LNhM10HP1a/X4xCh1Xgk3mVnAE3hXUUaixCtYADgm5MEW5KIaL
+	 5DCvts0vRPckQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6F37DE29F33;
+	Thu, 31 Aug 2023 09:40:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/660TvqHPzRjNY.MftTFaPm.";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net/sched: fq_pie: avoid stalls in fq_pie_timer()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169347482745.21305.4489281873039852777.git-patchwork-notify@kernel.org>
+Date: Thu, 31 Aug 2023 09:40:27 +0000
+References: <20230829123541.3745013-1-edumazet@google.com>
+In-Reply-To: <20230829123541.3745013-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, jhs@mojatatu.com,
+ xiyou.wangcong@gmail.com, jiri@resnulli.us, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com, syzbot+e46fbd5289363464bc13@syzkaller.appspotmail.com
 
---Sig_/660TvqHPzRjNY.MftTFaPm.
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hello:
 
-Hi Paolo,
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-> On Tue, 2023-08-29 at 14:11 +0200, Lukasz Majewski wrote:
-> > Information about HSR aware ports in a DSA switch can be helpful
-> > when one needs tags to be adjusted before the HSR frame is sent.
-> >=20
-> > For example - with ksz9477 switch - the TAG needs to be adjusted to
-> > have both HSR ports marked in tag to allow execution of HW based
-> > frame duplication.
-> >=20
-> > Signed-off-by: Lukasz Majewski <lukma@denx.de>
-> > ---
-> >  include/net/dsa.h | 3 +++
-> >  1 file changed, 3 insertions(+)
-> >=20
-> > diff --git a/include/net/dsa.h b/include/net/dsa.h
-> > index d309ee7ed04b..15274afc42bb 100644
-> > --- a/include/net/dsa.h
-> > +++ b/include/net/dsa.h
-> > @@ -470,6 +470,9 @@ struct dsa_switch {
-> >  	/* Number of switch port queues */
-> >  	unsigned int		num_tx_queues;
-> > =20
-> > +	/* Bitmask indicating ports supporting HSR */
-> > +	u16                     hsr_ports;
-> > +
-> >  	/* Drivers that benefit from having an ID associated with
-> > each
-> >  	 * offloaded LAG should set this to the maximum number of
-> >  	 * supported IDs. DSA will then maintain a mapping of _at =20
->=20
-> Out of sheer ignorance, I think this new field does not belong to
-> dsa_switch, at least not in this form. AFAICS there is no current hard
-> limitation on the number of ports a DSA switch can handle at the API
-> level, and this will introduce an hard one.
->=20
-> I think you are better off keeping this field in the KSZ-specific
-> struct.
+On Tue, 29 Aug 2023 12:35:41 +0000 you wrote:
+> When setting a high number of flows (limit being 65536),
+> fq_pie_timer() is currently using too much time as syzbot reported.
+> 
+> Add logic to yield the cpu every 2048 flows (less than 150 usec
+> on debug kernels).
+> It should also help by not blocking qdisc fast paths for too long.
+> Worst case (65536 flows) would need 31 jiffies for a complete scan.
+> 
+> [...]
 
-That was mine first idea - to move it to struct ksz_device from
-./drivers/net/dsa/ksz_common.h
+Here is the summary with links:
+  - [net] net/sched: fq_pie: avoid stalls in fq_pie_timer()
+    https://git.kernel.org/netdev/net/c/8c21ab1bae94
 
-However, this file and this struct is not easily accessible from
-net/dsa/tag_ksz.c
-
-One idea was to use an exported function - e.g. ksz_get_hsr_ports() and
-in it I would read the hsr_ports member ?
-
-Another option would be to loop through all switch ports with
-hsr_for_each_port(), but this would affect overall network performance.
-
-> If you really want to keep it here you should remove the above
-> limitation somehow (possibly a query op to check if a given port is
-> HSR aware???)
-
-I will use the idea of exported helper function to get HSR members
-ports.
-
->=20
-> In any case this series looks like net-next material, does not apply
-> correctly to net-next and net-next is currently closed. You can share
-> a new version as RFC or wait for net-next to re-open in ~2w.
->=20
-
-I will prepare v2 and then adjust it to net-next when required.
-
-> Cheers,
->=20
-> Paolo
->=20
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/660TvqHPzRjNY.MftTFaPm.
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmTwXWsACgkQAR8vZIA0
-zr3diQgA3y/D/XBRsPzCT0wKoUyGMoext1WPk/GH4t9IQJAHHVtRZgBU7Y5B1Gh0
-ADbhxOxQUOqfR7avWZR6n4S46/3LD2E5xiA9Y36ZtXrxFibDgLhYWtuLiu0mG0nT
-eqWcZEKnPl6jpf6V+kGFBJSqGJxlIFKLJW5iBHZEgrAc3FIAu+oVv+0JUnAv9C4d
-Kna3Cp4ifwpLd9yGBHVphhXrV4HISoGctpsBCXyNdf6Pqsu/5gxXLF2yPYe+dAUT
-uZS2SYYx6cI/HtoMQRVHOK8HQl7jYYZD7TwueuMHBTIhWOE622aR2Ho1S7CCkmKN
-GyCG9p1E4hWH89wWXKmx5qZrV117YA==
-=YLWD
------END PGP SIGNATURE-----
-
---Sig_/660TvqHPzRjNY.MftTFaPm.--
 
