@@ -1,121 +1,193 @@
-Return-Path: <netdev+bounces-31504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED02778E6FE
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 09:13:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E9D6978E72A
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 09:26:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16D2E2813B7
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 07:13:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 907AA2813BF
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 07:26:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BC185257;
-	Thu, 31 Aug 2023 07:13:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8605F5399;
+	Thu, 31 Aug 2023 07:25:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F008C1FCC
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 07:13:27 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38D871A3;
-	Thu, 31 Aug 2023 00:13:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=nQmwGWZMB7/FjyQkzIZQo5e/NXyg0NMGcJ/zVLN4YVM=; b=TLvYmZJoAD9oJIu60xxX1dp8bi
-	BX9vjHQ10bcTo5gtekRo6qb+qBAWzvJUQ32D/qhLOo7FpL9FU6ngg9zVl6vHgEl4S8I/s6uIHoS9m
-	IH0H2zFT7bHOu1i+f5ttnG0U9Dj3UFpdvCAT367a0LoIl2fUGrI7f7O078ILYoOVqHVuICnn3SSAE
-	LnwGySpujw8zr6vt4nX6dodbDmebk47PUY79PfFlqNg1KuaSaFM8qm/SAJFVrYZ2d1x/TF4fXhmqg
-	FbQaLtPRkcmP9If36evOZSk92+WUnT2rdWMB5srGxIYD76jU8YG3/yh8wA5czv+i23WGRu+tKbCmH
-	GLRJfmWQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59796)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qbbrc-0002Vr-1x;
-	Thu, 31 Aug 2023 08:13:12 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qbbra-0006aH-J6; Thu, 31 Aug 2023 08:13:10 +0100
-Date: Thu, 31 Aug 2023 08:13:10 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Lukasz Majewski <lukma@denx.de>, Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77BBE20FC
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 07:25:59 +0000 (UTC)
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC10E1A3;
+	Thu, 31 Aug 2023 00:25:55 -0700 (PDT)
+Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 54CB486553;
+	Thu, 31 Aug 2023 09:25:52 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1693466753;
+	bh=LmJ+R00fIDY5vMQf7vbplFSGlX0EieN90/WMaosRzto=;
+	h=From:To:Cc:Subject:Date:From;
+	b=j+OdS2AxdImgzU/sMZ3nedL8Zb5DiFOLfkqKu61OJDxbnPR87cHuV6I19F5GDOBpQ
+	 msAkiPG/erduSLLCD45+aHPkYkQHXznkoGcAKz+U3YpWQL2hMQR6ZepM83Zge3Dbdk
+	 T5QXye8kXzPjgRp4rT5dxuPosGlAvPK3pTHjiyARaAt01VuOYUWjUue6FFcuOUug5r
+	 /9PKLBOyIuXi2LWLpFZ1BO0ggODUDwGQ9uCQ97iKVOsNxu1G0Aeq+j2yjqv4XvjIZM
+	 mComkNEXYvziU1jfivgOPrDWiJ5jmqRZcUKzKTWPl5ANbKV6rxPTBeW4cTQVKR9Ef6
+	 /b6zoCT6B6Mpg==
+From: Lukasz Majewski <lukma@denx.de>
+To: Tristram.Ha@microchip.com,
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	davem@davemloft.net,
 	Woojung Huh <woojung.huh@microchip.com>,
-	Vladimir Oltean <olteanv@gmail.com>, Tristram.Ha@microchip.com,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
 	UNGLinuxDriver@microchip.com,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] net: phy: Provide Module 4 KSZ9477 errata
- (DS80000754C)
-Message-ID: <ZPA9hmlew3mT2TVr@shell.armlinux.org.uk>
-References: <20230830125224.1012459f@wsk>
- <20230830105941.GH31399@pengutronix.de>
- <20230830135151.683303db@wsk>
- <20230830121738.GJ31399@pengutronix.de>
- <ZO83htinyfAp4mWw@shell.armlinux.org.uk>
- <20230830130649.GK31399@pengutronix.de>
- <ZO9Ejx9G8laNRasu@shell.armlinux.org.uk>
- <20230830142650.GL31399@pengutronix.de>
- <20230830183818.1f42919b@wsk>
- <20230831044004.GA17603@pengutronix.de>
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Michael Walle <michael@walle.cc>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	Oleksij Rempel <linux@rempel-privat.de>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Lukasz Majewski <lukma@denx.de>
+Subject: [PATCH v3] net: phy: Provide Module 4 KSZ9477 errata (DS80000754C)
+Date: Thu, 31 Aug 2023 09:25:27 +0200
+Message-Id: <20230831072527.537839-1-lukma@denx.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230831044004.GA17603@pengutronix.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RDNS_NONE,SPF_HELO_NONE,
-	SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Aug 31, 2023 at 06:40:04AM +0200, Oleksij Rempel wrote:
-> Hi Lukasz,
-> 
-> On Wed, Aug 30, 2023 at 06:38:18PM +0200, Lukasz Majewski wrote:
-> > Hi Oleksij,
->  
-> > The implementation as you suggested seems to work :-)
-> > 
-> > The ksz_get_phy_flags() - where the MICREL_NO_EEE is set is executed
-> > before ksz9477_config_init().
-> > 
-> > And then the eee_broken_modes are taken into account.
-> > 
-> > # ethtool --show-eee lan1
-> > EEE Settings for lan1:
-> >         EEE status: disabled
-> >         Tx LPI: 0 (us)
-> >         Supported EEE link modes:  100baseT/Full 
-> >                                    1000baseT/Full 
-> >         Advertised EEE link modes:  Not reported
-> >         Link partner advertised EEE link modes:  Not reported
-> > 
-> > I will prepare tomorrow a proper patch.
-> 
-> can you please by the way remove this line:
-> https://elixir.bootlin.com/linux/v6.5/source/drivers/net/phy/micrel.c#L1803
-> 
-> it is obsolet by eee_broken_modes.
+The KSZ9477 errata points out (in 'Module 4') the link up/down problems
+when EEE (Energy Efficient Ethernet) is enabled in the device to which
+the KSZ9477 tries to auto negotiate.
 
-... and if possible verify on the link partner side that indeed no
-EEE modes are being advertised by the Micrel device.
+The suggested workaround is to clear advertisement of EEE for PHYs in
+this chip driver.
 
+To avoid regressions with other switch ICs the new MICREL_NO_EEE flag
+has been introduced.
+
+Moreover, the in-register disablement of MMD_DEVICE_ID_EEE_ADV.MMD_EEE_ADV
+MMD register is removed, as this code is both; now executed too late
+(after previous rework of the PHY and DSA for KSZ switches) and not
+required as setting all members of eee_broken_modes bit field prevents
+the KSZ9477 from advertising EEE.
+
+Fixes: 69d3b36ca045 ("net: dsa: microchip: enable EEE support") (for KSZ9477).
+
+Signed-off-by: Lukasz Majewski <lukma@denx.de>
+
+---
+Changes for v2:
+- Move this fix from clearing directly
+  MMD_DEVICE_ID_EEE_ADV.MMD_EEE_ADV MMD register in KSZ DSA switch
+  initialization to more generic solution in the micrel.c PHY driver
+
+Changes for v3:
+- Drop the rename patch
+- Use MICREL_NO_EEE flag as suggested by Oleksij
+- Extend the ksz9477_config_init to avoid regression
+- Do not use the direct write to MMD 7.60 register - instead the
+  phydev->eee_broken_modes is used
+---
+ drivers/net/dsa/microchip/ksz_common.c | 16 +++++++++++++++-
+ drivers/net/phy/micrel.c               |  9 ++++++---
+ include/linux/micrel_phy.h             |  1 +
+ 3 files changed, 22 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index 6c0623f88654..d9d843efd111 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -2337,13 +2337,27 @@ static u32 ksz_get_phy_flags(struct dsa_switch *ds, int port)
+ {
+ 	struct ksz_device *dev = ds->priv;
+ 
+-	if (dev->chip_id == KSZ8830_CHIP_ID) {
++	switch (dev->chip_id) {
++	case KSZ8830_CHIP_ID:
+ 		/* Silicon Errata Sheet (DS80000830A):
+ 		 * Port 1 does not work with LinkMD Cable-Testing.
+ 		 * Port 1 does not respond to received PAUSE control frames.
+ 		 */
+ 		if (!port)
+ 			return MICREL_KSZ8_P1_ERRATA;
++		break;
++	case KSZ9477_CHIP_ID:
++		/* KSZ9477 Errata DS80000754C
++		 *
++		 * Module 4: Energy Efficient Ethernet (EEE) feature select must
++		 * be manually disabled
++		 *   The EEE feature is enabled by default, but it is not fully
++		 *   operational. It must be manually disabled through register
++		 *   controls. If not disabled, the PHY ports can auto-negotiate
++		 *   to enable EEE, and this feature can cause link drops when
++		 *   linked to another device supporting EEE.
++		 */
++		return MICREL_NO_EEE;
+ 	}
+ 
+ 	return 0;
+diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+index b6d7981b2d1e..927d3d54658e 100644
+--- a/drivers/net/phy/micrel.c
++++ b/drivers/net/phy/micrel.c
+@@ -1800,9 +1800,6 @@ static const struct ksz9477_errata_write ksz9477_errata_writes[] = {
+ 	/* Transmit waveform amplitude can be improved (1000BASE-T, 100BASE-TX, 10BASE-Te) */
+ 	{0x1c, 0x04, 0x00d0},
+ 
+-	/* Energy Efficient Ethernet (EEE) feature select must be manually disabled */
+-	{0x07, 0x3c, 0x0000},
+-
+ 	/* Register settings are required to meet data sheet supply current specifications */
+ 	{0x1c, 0x13, 0x6eff},
+ 	{0x1c, 0x14, 0xe6ff},
+@@ -1847,6 +1844,12 @@ static int ksz9477_config_init(struct phy_device *phydev)
+ 			return err;
+ 	}
+ 
++	/* According to KSZ9477 Errata DS80000754C (Module 4) all EEE modes
++	 * in this switch shall be regarded as broken.
++	 */
++	if (phydev->dev_flags & MICREL_NO_EEE)
++		phydev->eee_broken_modes = -1;
++
+ 	err = genphy_restart_aneg(phydev);
+ 	if (err)
+ 		return err;
+diff --git a/include/linux/micrel_phy.h b/include/linux/micrel_phy.h
+index 8bef1ab62bba..eed474fc7308 100644
+--- a/include/linux/micrel_phy.h
++++ b/include/linux/micrel_phy.h
+@@ -44,6 +44,7 @@
+ #define MICREL_PHY_50MHZ_CLK	0x00000001
+ #define MICREL_PHY_FXEN		0x00000002
+ #define MICREL_KSZ8_P1_ERRATA	0x00000003
++#define MICREL_NO_EEE	0x00000004
+ 
+ #define MICREL_KSZ9021_EXTREG_CTRL	0xB
+ #define MICREL_KSZ9021_EXTREG_DATA_WRITE	0xC
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.20.1
+
 
