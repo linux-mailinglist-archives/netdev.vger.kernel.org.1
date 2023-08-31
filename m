@@ -1,44 +1,39 @@
-Return-Path: <netdev+bounces-31565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61C7678ECAB
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 14:00:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 364DE78ECAD
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 14:00:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FDB0281508
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 12:00:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 661241C20ACA
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 12:00:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D268E9473;
-	Thu, 31 Aug 2023 12:00:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50668C2C1;
+	Thu, 31 Aug 2023 12:00:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5D48944D
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 12:00:14 +0000 (UTC)
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B6DCE43;
-	Thu, 31 Aug 2023 05:00:08 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id AE01F60014;
-	Thu, 31 Aug 2023 12:00:02 +0000 (UTC)
-From: Remi Pommarel <repk@triplefau.lt>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Remi Pommarel <repk@triplefau.lt>,
-	stable@vger.kernel.org
-Subject: [PATCH net] net: stmmac: remove unneeded stmmac_poll_controller
-Date: Thu, 31 Aug 2023 14:00:04 +0200
-Message-Id: <20230831120004.6919-1-repk@triplefau.lt>
-X-Mailer: git-send-email 2.40.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE9F111BB;
+	Thu, 31 Aug 2023 12:00:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B193EC433C7;
+	Thu, 31 Aug 2023 12:00:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1693483223;
+	bh=fQuCc+pT8AFDqLlZJ9XoMzF8snrZ0LhmySkKQUntOls=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=OMOGH7e7firZvdmnxf6Qxbb152CYEpdg7uMNtuLnyeNYzxI4R1HSW3N/0kIMrKK2K
+	 NpEjpkPERWaQOn+nChQYn6o8S/7ciJaBsSlBkt0OzuhXYuSg4uIw5hpvgWsEefTyu2
+	 Qohz+q4/MHZG3+/j6nrEfaNUBMhXNeLttmCspzSTLv8N7e76y6drDHc09OS++zAEtf
+	 761k02erJppcGisbozdJtT434J98ELlb6pKPc5B0IhvCslYBgAVbhCVp5fLejIC9rm
+	 OYaRJCyBGESW0tmGjgIEUOYuZ2YO1838flrptqqh3Qmh5595H5EvMe2QpPIDFZuB/1
+	 csNNXzwMQGkcg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 92FDAC595D2;
+	Thu, 31 Aug 2023 12:00:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -46,113 +41,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: repk@triplefau.lt
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: Re: [PATCH v2] Fix invalid escape sequence warnings
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169348322359.7795.11591685845254219512.git-patchwork-notify@kernel.org>
+Date: Thu, 31 Aug 2023 12:00:23 +0000
+References: <20230829074931.2511204-1-vishalc@linux.ibm.com>
+In-Reply-To: <20230829074931.2511204-1-vishalc@linux.ibm.com>
+To: Vishal Chourasia <vishalc@linux.ibm.com>
+Cc: andrii.nakryiko@gmail.com, andrii@kernel.org, ast@kernel.org,
+ bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net,
+ haoluo@google.com, hawk@kernel.org, john.fastabend@gmail.com,
+ jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org,
+ linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org,
+ quentin@isovalent.com, sachinp@linux.ibm.com, sdf@google.com,
+ song@kernel.org, srikar@linux.vnet.ibm.com, yhs@fb.com
 
-Using netconsole netpoll_poll_dev could be called from interrupt
-context, thus using disable_irq() would cause the following kernel
-warning with CONFIG_DEBUG_ATOMIC_SLEEP enabled:
+Hello:
 
-  BUG: sleeping function called from invalid context at kernel/irq/manage.c:137
-  in_atomic(): 1, irqs_disabled(): 128, non_block: 0, pid: 10, name: ksoftirqd/0
-  CPU: 0 PID: 10 Comm: ksoftirqd/0 Tainted: G        W         5.15.42-00075-g816b502b2298-dirty #117
-  Hardware name: aml (r1) (DT)
-  Call trace:
-   dump_backtrace+0x0/0x270
-   show_stack+0x14/0x20
-   dump_stack_lvl+0x8c/0xac
-   dump_stack+0x18/0x30
-   ___might_sleep+0x150/0x194
-   __might_sleep+0x64/0xbc
-   synchronize_irq+0x8c/0x150
-   disable_irq+0x2c/0x40
-   stmmac_poll_controller+0x140/0x1a0
-   netpoll_poll_dev+0x6c/0x220
-   netpoll_send_skb+0x308/0x390
-   netpoll_send_udp+0x418/0x760
-   write_msg+0x118/0x140 [netconsole]
-   console_unlock+0x404/0x500
-   vprintk_emit+0x118/0x250
-   dev_vprintk_emit+0x19c/0x1cc
-   dev_printk_emit+0x90/0xa8
-   __dev_printk+0x78/0x9c
-   _dev_warn+0xa4/0xbc
-   ath10k_warn+0xe8/0xf0 [ath10k_core]
-   ath10k_htt_txrx_compl_task+0x790/0x7fc [ath10k_core]
-   ath10k_pci_napi_poll+0x98/0x1f4 [ath10k_pci]
-   __napi_poll+0x58/0x1f4
-   net_rx_action+0x504/0x590
-   _stext+0x1b8/0x418
-   run_ksoftirqd+0x74/0xa4
-   smpboot_thread_fn+0x210/0x3c0
-   kthread+0x1fc/0x210
-   ret_from_fork+0x10/0x20
+This patch was applied to bpf/bpf.git (master)
+by Daniel Borkmann <daniel@iogearbox.net>:
 
-Since [0] .ndo_poll_controller is only needed if driver doesn't or
-partially use NAPI. Because stmmac does so, stmmac_poll_controller
-can be removed fixing the above warning.
+On Tue, 29 Aug 2023 13:19:31 +0530 you wrote:
+> The script bpf_doc.py generates multiple SyntaxWarnings related to invalid
+> escape sequences when executed with Python 3.12. These warnings do not appear in
+> Python 3.10 and 3.11 and do not affect the kernel build, which completes
+> successfully.
+> 
+> This patch resolves these SyntaxWarnings by converting the relevant string
+> literals to raw strings or by escaping backslashes. This ensures that
+> backslashes are interpreted as literal characters, eliminating the warnings.
+> 
+> [...]
 
-[0] commit ac3d9dd034e5 ("netpoll: make ndo_poll_controller() optional")
+Here is the summary with links:
+  - [v2] Fix invalid escape sequence warnings
+    https://git.kernel.org/bpf/bpf/c/121fd33bf2d9
 
-Cc: <stable@vger.kernel.org> # 5.15.x
-Signed-off-by: Remi Pommarel <repk@triplefau.lt>
----
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 30 -------------------
- 1 file changed, 30 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 4727f7be4f86..9b5c0ebf0519 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -5938,33 +5938,6 @@ static irqreturn_t stmmac_msi_intr_rx(int irq, void *data)
- 	return IRQ_HANDLED;
- }
- 
--#ifdef CONFIG_NET_POLL_CONTROLLER
--/* Polling receive - used by NETCONSOLE and other diagnostic tools
-- * to allow network I/O with interrupts disabled.
-- */
--static void stmmac_poll_controller(struct net_device *dev)
--{
--	struct stmmac_priv *priv = netdev_priv(dev);
--	int i;
--
--	/* If adapter is down, do nothing */
--	if (test_bit(STMMAC_DOWN, &priv->state))
--		return;
--
--	if (priv->plat->multi_msi_en) {
--		for (i = 0; i < priv->plat->rx_queues_to_use; i++)
--			stmmac_msi_intr_rx(0, &priv->dma_conf.rx_queue[i]);
--
--		for (i = 0; i < priv->plat->tx_queues_to_use; i++)
--			stmmac_msi_intr_tx(0, &priv->dma_conf.tx_queue[i]);
--	} else {
--		disable_irq(dev->irq);
--		stmmac_interrupt(dev->irq, dev);
--		enable_irq(dev->irq);
--	}
--}
--#endif
--
- /**
-  *  stmmac_ioctl - Entry point for the Ioctl
-  *  @dev: Device pointer.
-@@ -6800,9 +6773,6 @@ static const struct net_device_ops stmmac_netdev_ops = {
- 	.ndo_eth_ioctl = stmmac_ioctl,
- 	.ndo_setup_tc = stmmac_setup_tc,
- 	.ndo_select_queue = stmmac_select_queue,
--#ifdef CONFIG_NET_POLL_CONTROLLER
--	.ndo_poll_controller = stmmac_poll_controller,
--#endif
- 	.ndo_set_mac_address = stmmac_set_mac_address,
- 	.ndo_vlan_rx_add_vid = stmmac_vlan_rx_add_vid,
- 	.ndo_vlan_rx_kill_vid = stmmac_vlan_rx_kill_vid,
+You are awesome, thank you!
 -- 
-2.40.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
