@@ -1,119 +1,275 @@
-Return-Path: <netdev+bounces-31602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A75578EFE9
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 17:03:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AA7178EFFE
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 17:13:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 041342815BC
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 15:03:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82A851C20A38
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 15:13:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05F5B125B5;
-	Thu, 31 Aug 2023 15:03:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F03B9125BC;
+	Thu, 31 Aug 2023 15:13:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E317C11CBA;
-	Thu, 31 Aug 2023 15:03:11 +0000 (UTC)
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74795CC5;
-	Thu, 31 Aug 2023 08:03:10 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-991c786369cso109404466b.1;
-        Thu, 31 Aug 2023 08:03:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693494189; x=1694098989; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=VJr3S4oVZbd7ZT/Wt+7mrgyluXxLgkA2mmGZaMzWAxQ=;
-        b=cJjlNM5J2cApuvt65DqY7DI9RPE4K3833or49Kc1/p0wDw3Jh0/j4r/sA8VMKqeoFe
-         yzLouxxeEDKnsBxRXImWoBHcxHepMk8C2Iemc6ehkhYvJHMzPeLzI6hNaTh8vTcEIuih
-         Br2OkTfG92GMI6mwso2/royffukGfzLCCrAsCuANeHJDH+CLaOr6Cb3Y80KamD/Spm1d
-         tEUkjconAkbCAdwW6YcCYkJniHEGI0ueHiIVUn4LGSOkr1rTwyXFcYV87WOx8z9zADAA
-         jjXTTjcF5JPQJcmwHe92liB2esdqQoPzREvEqYYDOaqaDsFQPxbZ6uuVZ0sXYK+od7d5
-         QpXg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCFA11173D
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 15:13:14 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE116E4F
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 08:13:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1693494789;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7q3Y4yiktGEyTW0UFreHL9GRNARDnev7O8/a837iJGA=;
+	b=DZtClbuJSddpDbH3YClUnvxDVX2yELYYn2bH0LUWmQzcFL04eWtiZe6ZZclQjB7ijWQX1O
+	ggDOO+9b88BA1kFUYRWUCH6FfOwIZv1qiosTj28hpQ1WpxGcG01tIjpWOR37uvpn9Xcesa
+	ig9y0agi3G7Qos5b78FEvKT+2IjWaAo=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-412-7OTbqG15NDeeJ539Vkke1w-1; Thu, 31 Aug 2023 11:13:07 -0400
+X-MC-Unique: 7OTbqG15NDeeJ539Vkke1w-1
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-52a0f6f7a3aso718397a12.0
+        for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 08:13:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693494189; x=1694098989;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VJr3S4oVZbd7ZT/Wt+7mrgyluXxLgkA2mmGZaMzWAxQ=;
-        b=EKdRUrrBhfqNnmMttohZ96+pzerhMAAx9il4Bl/YrSzXVgas0KLLQwsT+VRSs25AWR
-         mfomEV2gVw8S/GGFpuxeU+fhrOFs6bGJQq0dfWHhtig8M4/0UfGDcvP1pakXK2sUi8Vt
-         FKolWc6WDq6zMt5nnmmQfRPN4mlO2aO8CniniASC1NwN6GPdywau8MyBJLWdf5lS4wSF
-         Jx3CE6GkBHzdfRVyYmPICrG9pysCL0y74QfM+mDilePsv/oRom2mh2gtEIeiKjSRSMbE
-         m0+1GU5Im2YKl5wI4wZp+4JuufAYIrxcQdJuYgTpOxB/iwVTWzxdTIwbHhXPY2ZBjiuI
-         mb5g==
-X-Gm-Message-State: AOJu0YyMQBaKm7DzKdmV970+scmujKDh5MuSd3cQyOPtnYr7zX+Xy7n0
-	UH3mYvXw85WjKgdq/p0m9s4=
-X-Google-Smtp-Source: AGHT+IEW+ktfjOUsEEI5CWESHXT9h4cOqIVOPWDVyT8ai1Es9Izu+9nja9zmyaHhiEK/bTn4jOXIFA==
-X-Received: by 2002:a17:907:77da:b0:9a1:f21e:cdfe with SMTP id kz26-20020a17090777da00b009a1f21ecdfemr3796205ejc.58.1693494186444;
-        Thu, 31 Aug 2023 08:03:06 -0700 (PDT)
-Received: from [192.168.1.95] (host-176-36-0-241.b024.la.net.ua. [176.36.0.241])
-        by smtp.gmail.com with ESMTPSA id e19-20020a1709067e1300b009a198078c53sm834496ejr.214.2023.08.31.08.03.05
+        d=1e100.net; s=20221208; t=1693494786; x=1694099586;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7q3Y4yiktGEyTW0UFreHL9GRNARDnev7O8/a837iJGA=;
+        b=UlL4W/PtPRrMlS/41hnCvDns40v9O+1b7IXVzvoDxp4YcUV8ZVA/Y5XhPrRfnc7/Bx
+         FKaIj2+YuqCXcu+BdsGKujetjLh8Ejl0ImH+zDOh4TyxKSNvLXrNLugsZ1LiEb0e+uHk
+         qDaHLWVl56fpPB6iGcY9E1xrYmWrpisu/tsrN9uMtWOdW1lMe9UdcnX1XVVV96tCi3xZ
+         f2PBkCOhgj8tAedasBTQKyuYW5aaI3vsePZtrbHXdTQdvX6H4/TURh1SzvVGLvaxn3qU
+         MXICO1kLkWWRWnxyh1hXyT3JsgsZEGYWqTWR8xLxKVMI4CbEvZbm9+5e9E3P/hOvYgLj
+         IaaA==
+X-Gm-Message-State: AOJu0YxExKxpOkRSbIbWOvPYhvK6oRA2DHcdZBXB+/MNTID9QN2o3gqJ
+	4Zzlv6+uTXku4U+bVPDv5Ns4adn+VPGKNF+IVPcIC5BGMvJNChSX1bRxB12geemlVRBoyOvtdfX
+	cD6g/P4jVBc4VKNnd
+X-Received: by 2002:a17:907:2711:b0:99b:627b:e96d with SMTP id w17-20020a170907271100b0099b627be96dmr3925105ejk.44.1693494786302;
+        Thu, 31 Aug 2023 08:13:06 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF715v/t0gaQyatoS18qed412E+sQSxkJ3L84oJw2LaknRVSuElh16mJtXthOZpoaHZRxEsZQ==
+X-Received: by 2002:a17:907:2711:b0:99b:627b:e96d with SMTP id w17-20020a170907271100b0099b627be96dmr3925080ejk.44.1693494785954;
+        Thu, 31 Aug 2023 08:13:05 -0700 (PDT)
+Received: from sgarzare-redhat (host-82-57-51-114.retail.telecomitalia.it. [82.57.51.114])
+        by smtp.gmail.com with ESMTPSA id i2-20020a1709064ec200b0099bc8db97bcsm852964ejv.131.2023.08.31.08.13.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Aug 2023 08:03:05 -0700 (PDT)
-Message-ID: <082a6db6838d3aee5ca39eabd35d4da0c9691a0d.camel@gmail.com>
-Subject: Re: [BUG bpf-next] bpf/net: Hitting gpf when running selftests
-From: Eduard Zingerman <eddyz87@gmail.com>
-To: Jiri Olsa <olsajiri@gmail.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>,  Andrii Nakryiko <andrii@kernel.org>,
- netdev@vger.kernel.org, bpf@vger.kernel.org, Martin KaFai Lau
- <kafai@fb.com>,  Song Liu <songliubraving@fb.com>, Yonghong Song
- <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, KP Singh
- <kpsingh@chromium.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
- <haoluo@google.com>, Hou Tao <houtao1@huawei.com>
-Date: Thu, 31 Aug 2023 18:03:04 +0300
-In-Reply-To: <de816b89073544deb2ce34c4b242d583a6d4660f.camel@gmail.com>
-References: <ZO+RQwJhPhYcNGAi@krava> <ZO+vetPCpOOCGitL@krava>
-	 <de816b89073544deb2ce34c4b242d583a6d4660f.camel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu1 
+        Thu, 31 Aug 2023 08:13:05 -0700 (PDT)
+Date: Thu, 31 Aug 2023 17:13:02 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
+	oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v2 2/2] test/vsock: shutdowned socket test
+Message-ID: <tejk4hvlsjalsrm4fimm7vojhwhluj6ous3im33kmkydpmv6fi@nvy3twy6gtxy>
+References: <20230826175900.3693844-1-avkrasnov@salutedevices.com>
+ <20230826175900.3693844-3-avkrasnov@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20230826175900.3693844-3-avkrasnov@salutedevices.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, 2023-08-31 at 13:52 +0300, Eduard Zingerman wrote:
-> On Wed, 2023-08-30 at 23:07 +0200, Jiri Olsa wrote:
-> > On Wed, Aug 30, 2023 at 08:58:11PM +0200, Jiri Olsa wrote:
-> > > hi,
-> > > I'm hitting crash below on bpf-next/master when running selftests,
-> > > full log and config attached
-> >=20
-> > it seems to be 'test_progs -t sockmap_listen' triggering that
->=20
-> Hi,
->=20
-> I hit it as well, use the following command to reproduce:
->=20
->   for i in $(seq 1 100); do \
->     ./test_progs -a 'sockmap_listen/sockmap VSOCK test_vsock_redir' \
->     | grep Summary; \
->   done
->=20
+On Sat, Aug 26, 2023 at 08:59:00PM +0300, Arseniy Krasnov wrote:
+>This adds two tests for 'shutdown()' call. It checks that SIGPIPE is
+>sent when MSG_NOSIGNAL is not set and vice versa. Both flags SHUT_WR
+>and SHUT_RD are tested.
+>
+>Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+>---
+> tools/testing/vsock/vsock_test.c | 138 +++++++++++++++++++++++++++++++
+> 1 file changed, 138 insertions(+)
 
-For what its worth, bisect points to the following commit:
-147f3efaa241 ("sched/fair: Implement an EEVDF-like scheduling policy")
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-Which was merged into bpf-next 3 days ago as a part of:
-3ca9a836ff53 ("Merge tag 'sched-core-2023-08-28' of git://git.kernel.org/pu=
-b/scm/linux/kernel/git/tip/tip")
+>
+>diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>index 90718c2fd4ea..148fc9c47c50 100644
+>--- a/tools/testing/vsock/vsock_test.c
+>+++ b/tools/testing/vsock/vsock_test.c
+>@@ -19,6 +19,7 @@
+> #include <time.h>
+> #include <sys/mman.h>
+> #include <poll.h>
+>+#include <signal.h>
+>
+> #include "timeout.h"
+> #include "control.h"
+>@@ -1170,6 +1171,133 @@ static void test_seqpacket_msg_peek_server(const struct test_opts *opts)
+> 	return test_msg_peek_server(opts, true);
+> }
+>
+>+static sig_atomic_t have_sigpipe;
+>+
+>+static void sigpipe(int signo)
+>+{
+>+	have_sigpipe = 1;
+>+}
+>+
+>+static void test_stream_check_sigpipe(int fd)
+>+{
+>+	ssize_t res;
+>+
+>+	have_sigpipe = 0;
+>+
+>+	res = send(fd, "A", 1, 0);
+>+	if (res != -1) {
+>+		fprintf(stderr, "expected send(2) failure, got %zi\n", res);
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	if (!have_sigpipe) {
+>+		fprintf(stderr, "SIGPIPE expected\n");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	have_sigpipe = 0;
+>+
+>+	res = send(fd, "A", 1, MSG_NOSIGNAL);
+>+	if (res != -1) {
+>+		fprintf(stderr, "expected send(2) failure, got %zi\n", res);
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	if (have_sigpipe) {
+>+		fprintf(stderr, "SIGPIPE not expected\n");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+}
+>+
+>+static void test_stream_shutwr_client(const struct test_opts *opts)
+>+{
+>+	int fd;
+>+
+>+	struct sigaction act = {
+>+		.sa_handler = sigpipe,
+>+	};
+>+
+>+	sigaction(SIGPIPE, &act, NULL);
+>+
+>+	fd = vsock_stream_connect(opts->peer_cid, 1234);
+>+	if (fd < 0) {
+>+		perror("connect");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	if (shutdown(fd, SHUT_WR)) {
+>+		perror("shutdown");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	test_stream_check_sigpipe(fd);
+>+
+>+	control_writeln("CLIENTDONE");
+>+
+>+	close(fd);
+>+}
+>+
+>+static void test_stream_shutwr_server(const struct test_opts *opts)
+>+{
+>+	int fd;
+>+
+>+	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
+>+	if (fd < 0) {
+>+		perror("accept");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	control_expectln("CLIENTDONE");
+>+
+>+	close(fd);
+>+}
+>+
+>+static void test_stream_shutrd_client(const struct test_opts *opts)
+>+{
+>+	int fd;
+>+
+>+	struct sigaction act = {
+>+		.sa_handler = sigpipe,
+>+	};
+>+
+>+	sigaction(SIGPIPE, &act, NULL);
+>+
+>+	fd = vsock_stream_connect(opts->peer_cid, 1234);
+>+	if (fd < 0) {
+>+		perror("connect");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	control_expectln("SHUTRDDONE");
+>+
+>+	test_stream_check_sigpipe(fd);
+>+
+>+	control_writeln("CLIENTDONE");
+>+
+>+	close(fd);
+>+}
+>+
+>+static void test_stream_shutrd_server(const struct test_opts *opts)
+>+{
+>+	int fd;
+>+
+>+	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
+>+	if (fd < 0) {
+>+		perror("accept");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	if (shutdown(fd, SHUT_RD)) {
+>+		perror("shutdown");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	control_writeln("SHUTRDDONE");
+>+	control_expectln("CLIENTDONE");
+>+
+>+	close(fd);
+>+}
+>+
+> static struct test_case test_cases[] = {
+> 	{
+> 		.name = "SOCK_STREAM connection reset",
+>@@ -1250,6 +1378,16 @@ static struct test_case test_cases[] = {
+> 		.run_client = test_seqpacket_msg_peek_client,
+> 		.run_server = test_seqpacket_msg_peek_server,
+> 	},
+>+	{
+>+		.name = "SOCK_STREAM SHUT_WR",
+>+		.run_client = test_stream_shutwr_client,
+>+		.run_server = test_stream_shutwr_server,
+>+	},
+>+	{
+>+		.name = "SOCK_STREAM SHUT_RD",
+>+		.run_client = test_stream_shutrd_client,
+>+		.run_server = test_stream_shutrd_server,
+>+	},
+> 	{},
+> };
+>
+>-- 
+>2.25.1
+>
+>
 
-Scheduling changes uncovered some old race condition?
-
-[...]
 
