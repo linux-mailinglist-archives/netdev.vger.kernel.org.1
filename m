@@ -1,193 +1,162 @@
-Return-Path: <netdev+bounces-31505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9D6978E72A
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 09:26:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46FD878E731
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 09:30:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 907AA2813BF
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 07:26:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B8121C20858
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 07:30:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8605F5399;
-	Thu, 31 Aug 2023 07:25:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE12B53AE;
+	Thu, 31 Aug 2023 07:30:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77BBE20FC
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 07:25:59 +0000 (UTC)
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC10E1A3;
-	Thu, 31 Aug 2023 00:25:55 -0700 (PDT)
-Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 54CB486553;
-	Thu, 31 Aug 2023 09:25:52 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1693466753;
-	bh=LmJ+R00fIDY5vMQf7vbplFSGlX0EieN90/WMaosRzto=;
-	h=From:To:Cc:Subject:Date:From;
-	b=j+OdS2AxdImgzU/sMZ3nedL8Zb5DiFOLfkqKu61OJDxbnPR87cHuV6I19F5GDOBpQ
-	 msAkiPG/erduSLLCD45+aHPkYkQHXznkoGcAKz+U3YpWQL2hMQR6ZepM83Zge3Dbdk
-	 T5QXye8kXzPjgRp4rT5dxuPosGlAvPK3pTHjiyARaAt01VuOYUWjUue6FFcuOUug5r
-	 /9PKLBOyIuXi2LWLpFZ1BO0ggODUDwGQ9uCQ97iKVOsNxu1G0Aeq+j2yjqv4XvjIZM
-	 mComkNEXYvziU1jfivgOPrDWiJ5jmqRZcUKzKTWPl5ANbKV6rxPTBeW4cTQVKR9Ef6
-	 /b6zoCT6B6Mpg==
-From: Lukasz Majewski <lukma@denx.de>
-To: Tristram.Ha@microchip.com,
-	Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	davem@davemloft.net,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	UNGLinuxDriver@microchip.com,
-	Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Michael Walle <michael@walle.cc>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Oleksij Rempel <linux@rempel-privat.de>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Lukasz Majewski <lukma@denx.de>
-Subject: [PATCH v3] net: phy: Provide Module 4 KSZ9477 errata (DS80000754C)
-Date: Thu, 31 Aug 2023 09:25:27 +0200
-Message-Id: <20230831072527.537839-1-lukma@denx.de>
-X-Mailer: git-send-email 2.39.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E3E5399
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 07:30:03 +0000 (UTC)
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 949721B2
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 00:30:01 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1bf092a16c9so3823235ad.0
+        for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 00:30:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1693467001; x=1694071801; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=kHkD8InmtdxNYFBphrJMG48olpat1cNrjKg/T++oikw=;
+        b=X2LJhVLDLe3qiBlg6znrNnaI62Id/93YkpkURgRh3gEty6ipgaRXVK/bZIy7KA2JHL
+         7CqZfO+R7upsJaReVacXqxYhFSWyjS2uTl2PFkerymU9wuobdqp0nRleNM8V+GO6ROT1
+         Seg9vo2SNrxpCSUACFD5RCX0kU4sKFCmGke3soI0bQeglm02KGiHiAt62dBMVR6O/Dx0
+         cHJysZpTc0KMZHesn4KDuqxlx3JCM8FLskTtYa+HCwSnsrYvMvNCOgUw614bP39G2rGM
+         MWFCuT0fgaICHCoEM+SCeJ2WgVjtcMq8+9M/jQ3fNDVijtWbc7BhfVC3+0gQxvhRPAkj
+         kLsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693467001; x=1694071801;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kHkD8InmtdxNYFBphrJMG48olpat1cNrjKg/T++oikw=;
+        b=lCtEOhpn4NlVFrTzocgbTwXoMSFCAgc5iUpIlid1h/spAYsNw30eXMPbOvXrzdNs1M
+         sPYJQLOAbMX8D7nDQOsLvb6RMj5V2Iotrt7MvUPrvAiegP9xStjmnpEfetKUulcqt5Rb
+         3pMC9w3cf+okLNLFOxeH+8yOnlcE0dU48NOH48LAf/c6e1rheiZK5L0Dyx+DVd8Dayp+
+         ppFqRtaNci+p3db48zaCLXnyv95SIv6kN1+CjDwUK+LiSKtFbb9ke1mDf63W2vo9cbmZ
+         +SMpLEOKufz5Py/hTxchfStUaU2ayXIHoERvkSdps/zW7Sk9+sQZNB8CT2fadniqxU06
+         HKJQ==
+X-Gm-Message-State: AOJu0YzMcCr5CJutr74PSAWC4yaqNpYvN3Emyv23KbUeXPtt3qbbVQie
+	ASh8cnKmagUM8B0rE2iFJ77meQ==
+X-Google-Smtp-Source: AGHT+IE5O2NqR8s3cBctEV1BFg7RgqUoh1WdEYsOUTORcefwrWw6BJhLjj6CuS6Bcy8/aQitmNUHGw==
+X-Received: by 2002:a17:902:d4c9:b0:1c0:d777:3224 with SMTP id o9-20020a170902d4c900b001c0d7773224mr4655799plg.50.1693467000995;
+        Thu, 31 Aug 2023 00:30:00 -0700 (PDT)
+Received: from medusa.lab.kspace.sh (c-98-207-191-243.hsd1.ca.comcast.net. [98.207.191.243])
+        by smtp.googlemail.com with ESMTPSA id ji5-20020a170903324500b001b80d399730sm647892plb.242.2023.08.31.00.29.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Aug 2023 00:30:00 -0700 (PDT)
+Date: Thu, 31 Aug 2023 00:29:57 -0700
+From: Mohamed Khalfella <mkhalfella@purestorage.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: willemdebruijn.kernel@gmail.com, alexanderduyck@fb.com,
+	bpf@vger.kernel.org, brouer@redhat.com, davem@davemloft.net,
+	dhowells@redhat.com, keescook@chromium.org, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com, willemb@google.com, stable@vger.kernel.org
+Subject: Re: [PATCH v2] skbuff: skb_segment, Call zero copy functions before
+ using skbuff frags
+Message-ID: <20230831072957.GA3696339@medusa>
+References: <64ed7188a2745_9cf208e1@penguin.notmuch>
+ <20230830232811.9876-1-mkhalfella@purestorage.com>
+ <CANn89iJVnS_dGDtU7AVWgVrun-p68DZ0A3Pde47MHNeeQ2nwRA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+In-Reply-To: <CANn89iJVnS_dGDtU7AVWgVrun-p68DZ0A3Pde47MHNeeQ2nwRA@mail.gmail.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+	SPF_HELO_NONE,T_SPF_PERMERROR autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The KSZ9477 errata points out (in 'Module 4') the link up/down problems
-when EEE (Energy Efficient Ethernet) is enabled in the device to which
-the KSZ9477 tries to auto negotiate.
+On 2023-08-31 08:58:51 +0200, Eric Dumazet wrote:
+> On Thu, Aug 31, 2023 at 1:28 AM Mohamed Khalfella
+> <mkhalfella@purestorage.com> wrote:
+> >         do {
+> >                 struct sk_buff *nskb;
+> >                 skb_frag_t *nskb_frag;
+> > @@ -4465,6 +4471,10 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
+> >                     (skb_headlen(list_skb) == len || sg)) {
+> >                         BUG_ON(skb_headlen(list_skb) > len);
+> >
+> > +                       nskb = skb_clone(list_skb, GFP_ATOMIC);
+> > +                       if (unlikely(!nskb))
+> > +                               goto err;
+> > +
+> 
+> This patch is quite complex to review, so I am asking if this part was
+> really needed ?
 
-The suggested workaround is to clear advertisement of EEE for PHYs in
-this chip driver.
+Unfortunately the patch is complex because I try to avoid calling
+skb_orphan_frags() in the middle of processing these frags. Otherwise
+it would be much harder to implement because as reallocated frags do not
+map 1:1 with existing frags as Willem mentioned.
 
-To avoid regressions with other switch ICs the new MICREL_NO_EEE flag
-has been introduced.
+> <1>  : You moved here <2> and <3>
 
-Moreover, the in-register disablement of MMD_DEVICE_ID_EEE_ADV.MMD_EEE_ADV
-MMD register is removed, as this code is both; now executed too late
-(after previous rework of the PHY and DSA for KSZ switches) and not
-required as setting all members of eee_broken_modes bit field prevents
-the KSZ9477 from advertising EEE.
+<2> was moved here because skb_clone() calls skb_orphan_frags(). By
+moving this up we do not need to call skb_orphan_frags() for list_skb
+and we can start to use nr_frags and frags without worrying their value
+is going to change.
 
-Fixes: 69d3b36ca045 ("net: dsa: microchip: enable EEE support") (for KSZ9477).
+<3> was moved here because <2> was moved here. Fail fast if we can not
+clone list_skb.
 
-Signed-off-by: Lukasz Majewski <lukma@denx.de>
+> 
+> If this is not strictly needed, please keep the code as is to ease
+> code review...
+> 
+> >                         i = 0;
+> >                         nfrags = skb_shinfo(list_skb)->nr_frags;
+> >                         frag = skb_shinfo(list_skb)->frags;
+> > @@ -4483,12 +4493,8 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
+> >                                 frag++;
+> >                         }
+> >
+> > -                       nskb = skb_clone(list_skb, GFP_ATOMIC);
+> 
+> <2>
+> 
+> >                         list_skb = list_skb->next;
+> >
+> > -                       if (unlikely(!nskb))
+> > -                               goto err;
+> > -
+> 
+> <3>
+> 
+> >                         if (unlikely(pskb_trim(nskb, len))) {
+> >                                 kfree_skb(nskb);
+> >                                 goto err;
+> > @@ -4564,12 +4570,16 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
+> >                 skb_shinfo(nskb)->flags |= skb_shinfo(head_skb)->flags &
+> >                                            SKBFL_SHARED_FRAG;
+> >
+> > -               if (skb_orphan_frags(frag_skb, GFP_ATOMIC) ||
+> > -                   skb_zerocopy_clone(nskb, frag_skb, GFP_ATOMIC))
+> > +               if (skb_zerocopy_clone(nskb, list_skb, GFP_ATOMIC))
+> 
+> Why using list_skb here instead of frag_skb ?
+> Again, I have to look at the whole thing to understand why you did this.
 
----
-Changes for v2:
-- Move this fix from clearing directly
-  MMD_DEVICE_ID_EEE_ADV.MMD_EEE_ADV MMD register in KSZ DSA switch
-  initialization to more generic solution in the micrel.c PHY driver
-
-Changes for v3:
-- Drop the rename patch
-- Use MICREL_NO_EEE flag as suggested by Oleksij
-- Extend the ksz9477_config_init to avoid regression
-- Do not use the direct write to MMD 7.60 register - instead the
-  phydev->eee_broken_modes is used
----
- drivers/net/dsa/microchip/ksz_common.c | 16 +++++++++++++++-
- drivers/net/phy/micrel.c               |  9 ++++++---
- include/linux/micrel_phy.h             |  1 +
- 3 files changed, 22 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 6c0623f88654..d9d843efd111 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -2337,13 +2337,27 @@ static u32 ksz_get_phy_flags(struct dsa_switch *ds, int port)
- {
- 	struct ksz_device *dev = ds->priv;
- 
--	if (dev->chip_id == KSZ8830_CHIP_ID) {
-+	switch (dev->chip_id) {
-+	case KSZ8830_CHIP_ID:
- 		/* Silicon Errata Sheet (DS80000830A):
- 		 * Port 1 does not work with LinkMD Cable-Testing.
- 		 * Port 1 does not respond to received PAUSE control frames.
- 		 */
- 		if (!port)
- 			return MICREL_KSZ8_P1_ERRATA;
-+		break;
-+	case KSZ9477_CHIP_ID:
-+		/* KSZ9477 Errata DS80000754C
-+		 *
-+		 * Module 4: Energy Efficient Ethernet (EEE) feature select must
-+		 * be manually disabled
-+		 *   The EEE feature is enabled by default, but it is not fully
-+		 *   operational. It must be manually disabled through register
-+		 *   controls. If not disabled, the PHY ports can auto-negotiate
-+		 *   to enable EEE, and this feature can cause link drops when
-+		 *   linked to another device supporting EEE.
-+		 */
-+		return MICREL_NO_EEE;
- 	}
- 
- 	return 0;
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index b6d7981b2d1e..927d3d54658e 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -1800,9 +1800,6 @@ static const struct ksz9477_errata_write ksz9477_errata_writes[] = {
- 	/* Transmit waveform amplitude can be improved (1000BASE-T, 100BASE-TX, 10BASE-Te) */
- 	{0x1c, 0x04, 0x00d0},
- 
--	/* Energy Efficient Ethernet (EEE) feature select must be manually disabled */
--	{0x07, 0x3c, 0x0000},
--
- 	/* Register settings are required to meet data sheet supply current specifications */
- 	{0x1c, 0x13, 0x6eff},
- 	{0x1c, 0x14, 0xe6ff},
-@@ -1847,6 +1844,12 @@ static int ksz9477_config_init(struct phy_device *phydev)
- 			return err;
- 	}
- 
-+	/* According to KSZ9477 Errata DS80000754C (Module 4) all EEE modes
-+	 * in this switch shall be regarded as broken.
-+	 */
-+	if (phydev->dev_flags & MICREL_NO_EEE)
-+		phydev->eee_broken_modes = -1;
-+
- 	err = genphy_restart_aneg(phydev);
- 	if (err)
- 		return err;
-diff --git a/include/linux/micrel_phy.h b/include/linux/micrel_phy.h
-index 8bef1ab62bba..eed474fc7308 100644
---- a/include/linux/micrel_phy.h
-+++ b/include/linux/micrel_phy.h
-@@ -44,6 +44,7 @@
- #define MICREL_PHY_50MHZ_CLK	0x00000001
- #define MICREL_PHY_FXEN		0x00000002
- #define MICREL_KSZ8_P1_ERRATA	0x00000003
-+#define MICREL_NO_EEE	0x00000004
- 
- #define MICREL_KSZ9021_EXTREG_CTRL	0xB
- #define MICREL_KSZ9021_EXTREG_DATA_WRITE	0xC
--- 
-2.20.1
-
+Oops, this is a mistake. It should be frag_skb. Will fix it run the test
+one more time and post v3.
 
