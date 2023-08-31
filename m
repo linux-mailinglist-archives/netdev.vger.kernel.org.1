@@ -1,124 +1,94 @@
-Return-Path: <netdev+bounces-31649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BD1178F420
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 22:35:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2763878F428
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 22:36:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C6771C20AF9
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 20:35:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D51CC281749
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 20:36:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2F0F19BD2;
-	Thu, 31 Aug 2023 20:35:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D08BD19BD7;
+	Thu, 31 Aug 2023 20:36:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C461B8F57
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 20:35:06 +0000 (UTC)
-Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 755001B1
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 13:35:02 -0700 (PDT)
-Received: by mail-ej1-x633.google.com with SMTP id a640c23a62f3a-99cce6f7de2so149329066b.3
-        for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 13:35:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1693514101; x=1694118901; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0aWePRdbXzBpRT6QRQ1CHpCsys7WhYwP5Qvoi+71DC8=;
-        b=jKpPkWgO8vIqrT2TFEKg8GrnekwoWfTROsKFR3AFuuoQKSwkiWBTm2a1o/T3xg5Pbt
-         jk8H7MOKNdo2t3t2EqtwmiTPyzzaio1DGB7To1bg2hoHnhNVmdxNPVFU0nJpLl6+15kY
-         64asK/nr0+v/x7aIOf8kTWAhBaDI1CpqdXwytmvQbbsel2deSuJY9tZvc0o0frfaQrXo
-         xtK8geJ39sHkt4m0DSmbsbeLd0vTX50cHyy3pStHxi5IribOiwKviruxNDPuh4qrKl3b
-         qjgun874Zboh42CM/ohpckWm/glEKBEHEe5iHE03cdEMCXaGgXvb2KhxpUQxNm4wUqKA
-         NKIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693514101; x=1694118901;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0aWePRdbXzBpRT6QRQ1CHpCsys7WhYwP5Qvoi+71DC8=;
-        b=htz0kHo8Ln/NxuTkOeAA3B43dc+bV9sdPXata276j40dOJ1ZI1QOh3g1mTDg83qxek
-         3MXBoMsoX0g8B8/keLiMUgBBEYfov2fDq2gwvnoOM595EyR7BUNCWIUsujNz3h/+creE
-         gX/SNk7SHHITjBxLJXpIX2+mkLlYo9yQ+ODtIgDKkBzra1ADVsfUc2FkI53s3mGCcLC/
-         wJ33TRVk7VqymWscX7UAp7KTzEVREqrliJpxVEcqBK4+MUO2HhyHoAwey/KBEuS2HheP
-         5fmgkyeD8Cfts15F/+GDVS4C7kAad/olmFDeojHttDgn+v8xShSXFBm11kBPtvHo/BEq
-         jqBg==
-X-Gm-Message-State: AOJu0YxPKCGCFJIZCTunc6h0shgSCcMdae3YhCKNrXZhaoG9XhuD3caA
-	RElNJZr8WE1h2j0d76payuc03+/z6OkYQXy29vsat/ckJvlq+gLYQ1d2eg==
-X-Google-Smtp-Source: AGHT+IHup9hoQwkLNGGktO82ukgCAO5UZGpGqbhLIz1xZwq30feUF6eGalwUSHAueY7o8QMRcLSQ7l62CB+k/miuixs=
-X-Received: by 2002:a17:907:78d9:b0:9a1:e994:3440 with SMTP id
- kv25-20020a17090778d900b009a1e9943440mr315092ejc.4.1693514100852; Thu, 31 Aug
- 2023 13:35:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9D1B18C26;
+	Thu, 31 Aug 2023 20:36:26 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51C41E7A;
+	Thu, 31 Aug 2023 13:36:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=IRy+jY3LYBzy+1khXTmPoKs3NhI+qRJ1PfaTp9S4xeg=; b=O5d5mNvRLgwJlq7sYmWWTzFDSX
+	59I43cnXZ+NNfkuKlbB445ItTWxtGhXbx/2foj4AyW3iUwJJle5lGQnXiVwgJLFYNcPAegU2u8JLJ
+	wjn1ZtttAE/FdlooGRxJDtb2nrhZ64nFEY100mUkXvzasYURv60hOtvA0xUkXYX7Oliere8BshZ4Q
+	mI5Z5qOipqk2+HTkYZ99u59W9V+0uduaHnQHaCu951LFua9MPr0mPf1T7zqL9JPjP3AxWdAo2t07k
+	EI6YtigZMm2ZqnbSnfoArlooyDYhtB5yGviUch6pgjsPBmQncD2a7scB0/eZj5qvBlhEDOb7Ywg23
+	xaEIcRBw==;
+Received: from sslproxy03.your-server.de ([88.198.220.132])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qboOi-0006jM-MW; Thu, 31 Aug 2023 22:36:13 +0200
+Received: from [178.197.249.54] (helo=linux.home)
+	by sslproxy03.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qboOi-000Rwp-KF; Thu, 31 Aug 2023 22:36:12 +0200
+Subject: Re: [PATCH bpf v2] selftests/bpf: Include build flavors for install
+ target
+To: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
+ Andrii Nakryiko <andrii@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ bpf@vger.kernel.org, netdev@vger.kernel.org
+Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@rivosinc.com>,
+ Alexei Starovoitov <ast@kernel.org>, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20230831162954.111485-1-bjorn@kernel.org>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <8351f451-43a4-86cf-562b-c0433ee38c50@iogearbox.net>
+Date: Thu, 31 Aug 2023 22:36:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CADKFtnSPTQGLxfpn38cfwTPk=JY-=Ywne2DFoRkq03m-eKo17Q@mail.gmail.com>
- <7702c74e-482f-cd89-1d12-fb6869bd53f2@iogearbox.net> <2023083123-musky-exterior-5fa5@gregkh>
- <CADKFtnRw=9F7Epa2T1N_2Zeu4sj+YySuvVb-PTOdfiAF9g4cPA@mail.gmail.com> <2023083113-unwed-chalice-c8d6@gregkh>
-In-Reply-To: <2023083113-unwed-chalice-c8d6@gregkh>
-From: Jordan Rife <jrife@google.com>
-Date: Thu, 31 Aug 2023 13:34:49 -0700
-Message-ID: <CADKFtnQpD_LKDMZM8qoJF94m40+cP46--eqjhuu0LV8RobmsoQ@mail.gmail.com>
-Subject: Re: Stable Backport: net: Avoid address overwrite in kernel_connect
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <20230831162954.111485-1-bjorn@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.8/27017/Thu Aug 31 09:40:48 2023)
+X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Oops, my mistake. Sorry for the mixup! In that case, I will
+On 8/31/23 6:29 PM, Björn Töpel wrote:
+> From: Björn Töpel <bjorn@rivosinc.com>
+> 
+> When using the "install" or targets depending on install,
+> e.g. "gen_tar", the BPF machine flavors weren't included.
+> 
+> A command like:
+>    | make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- O=/workspace/kbuild \
+>    |    HOSTCC=gcc FORMAT= SKIP_TARGETS="arm64 ia64 powerpc sparc64 x86 sgx" \
+>    |    -C tools/testing/selftests gen_tar
+> would not include bpf/no_alu32, bpf/cpuv4, or bpf/bpf-gcc.
+> 
+> Include the BPF machine flavors for "install" make target.
+> 
+> Signed-off-by: Björn Töpel <bjorn@rivosinc.com>
 
-> send an email to stable@vger.kernel.org containing the subject of the pat=
-ch, the commit ID, why you think it should be applied, and what kernel vers=
-ion you wish it to be applied to.
-
-as option 2 suggests.
-
--Jordan
-
-On Thu, Aug 31, 2023 at 1:26=E2=80=AFPM Greg KH <gregkh@linuxfoundation.org=
-> wrote:
->
-> On Thu, Aug 31, 2023 at 01:09:04PM -0700, Jordan Rife wrote:
-> > Greg,
-> >
-> > Sorry if I've misunderstood. The netdev FAQ
-> > (https://www.kernel.org/doc/html/v5.7/networking/netdev-FAQ.html#q-i-se=
-e-a-network-patch-and-i-think-it-should-be-backported-to-stable)
-> > seemed to indicate that I should send network backport requests to
-> > netdev.
->
-> 5.7 is a very old kernel version, please use the documentation from the
-> latest kernel version.
->
-> You can use "latest" instead of "v5.7" there.
->
-> > I saw "option 2" in
-> > https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
-> > which reads
-> >
-> > > send an email to stable@vger.kernel.org containing the subject of the=
- patch, the commit ID, why you think it should be applied, and what kernel =
-version you wish it to be applied to.
-> >
-> > Would "option 3" listed there be preferred?
->
-> What's wrong with option 2?
->
-> thanks,
->
-> greg k-h
+Lgtm, applied, thanks!
 
