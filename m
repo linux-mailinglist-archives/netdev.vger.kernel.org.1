@@ -1,81 +1,85 @@
-Return-Path: <netdev+bounces-31535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 937A378E9DB
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 12:02:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3318078E9FC
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 12:14:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C60772813D5
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 10:02:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF4A21C2097C
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 10:14:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5168D8C11;
-	Thu, 31 Aug 2023 10:01:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A83388F47;
+	Thu, 31 Aug 2023 10:14:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 324AE79F8;
-	Thu, 31 Aug 2023 10:01:56 +0000 (UTC)
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FA3ACED;
-	Thu, 31 Aug 2023 03:01:55 -0700 (PDT)
-Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-401e6ce2d9fso1967685e9.1;
-        Thu, 31 Aug 2023 03:01:55 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BAD98498
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 10:14:21 +0000 (UTC)
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2D42E42
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 03:14:19 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id 98e67ed59e1d1-26934bc3059so1265456a91.1
+        for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 03:14:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693476114; x=1694080914; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jf6tZ7D0c+M0qI7hvLDPOPzPZwynaJptNs7Uyj1gb8Q=;
-        b=AtXagKEMO6VcXa1HNZ7pfmnczL18yHg4leuvodkw+4HU+urfNDM0mZ4E74Gx3N4wmL
-         WH2fBZywE1OJvHuzHvIxPlmOQUdybuFPV7qw3Fkm8EewDGgdv1D5TEE9MLxibbpojhTB
-         mL09kZtKxFX6vyrTGE5Enbld+Qz2ZH51zfT5OPYbE/5rISGr7/g/hQfUKohhwKcXERW0
-         2X3WWRAyx0WOGH7icQ29QqgsSWZfdsqQ7Xh/NhBdlVbzz6oBIJB3E8uAVDtcvLNeBpUT
-         TFBKFJiNiOdRuyGqNfaGk6kpmCECSIR61ddKkbXZM30CieG52953BLLc8hzS+srqZtvp
-         rebg==
+        d=gmail.com; s=20221208; t=1693476859; x=1694081659; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=f989IGcUqq8Px/bgiHpX6peJL1AeLepklJyWMmNd6B4=;
+        b=oX3UpdKFSQ4YKGT60rnFvYDvPBAxUArQqMxoqnciF4AOpsaFuTEgxZHih2ABSFqjM7
+         HVDNlbFEc/QPdXC7A8WuM5+brYZiKd2rma+peKjVD0tOgN45Eo5ZEgN3xCcQbvY1CZq8
+         RbfU9bPgpqVWlEeeFIa+4GEC8X7rGdOFeKcUTzo6H67eL7VXJa0fizsX+FLTcDO8inMr
+         brJqMQiCSMxzRjuxIbU6voaY4UIyLFb+nLpNzDgqC/dW1rX8OYB+vh11xTWPDWrGuaKb
+         9bWiDTvWq2dyNSKrYr8LPXy2UJsKS/0EA5/m+BKwcmYXpHhNhUqQxZCNmk673GNp147/
+         Zxdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693476114; x=1694080914;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jf6tZ7D0c+M0qI7hvLDPOPzPZwynaJptNs7Uyj1gb8Q=;
-        b=cTv5xwEAaFbDAXDEvfTZzVWvCdEGLWPrB5beYyDJwkiz7RGo7RGORtBRte+KCzB85k
-         E8Ophn4m5kFhlhaIN8SGbr4BXgfVjVvxkiMvQxDXb3mgIVuEjEg10dgSugCDWY1LaTvQ
-         lcVE7BxeVHdVp9yVbmz4mUmxsw7Razwtd9j1BB5HRtPBIQZcG3bQZYzfkEG0qytz2ris
-         yf98f0RwfAPdgJjOQCOtJdso3jxnGLTpXVa5yzLQjvIsUugris28QvuZfqOylvidFDnV
-         rkAitMHqYlwRb9wNw5LXEcK4cotFzk5EIhQ4BNyiPLv83VDtmd2uxbsuiUQ+yLAkUKBC
-         V9ng==
-X-Gm-Message-State: AOJu0Yyj2X/PbcTTUYbG6by2K50PYgj1dMzPw77mcHrbYuD5bX96ojSr
-	Rhlsxhe10pLkNIP8Z6SJ9qA=
-X-Google-Smtp-Source: AGHT+IHJBNarGEnAVttlcOVTsuzNYCs8aNYRRrByvC7hNX2cBCsObNoUbRhwX8rEdcVJSl6T1eey8A==
-X-Received: by 2002:a5d:4b0d:0:b0:317:5f08:32a3 with SMTP id v13-20020a5d4b0d000000b003175f0832a3mr3385722wrq.6.1693476113471;
-        Thu, 31 Aug 2023 03:01:53 -0700 (PDT)
-Received: from localhost.localdomain (h-176-10-144-222.NA.cust.bahnhof.se. [176.10.144.222])
-        by smtp.gmail.com with ESMTPSA id d15-20020adffd8f000000b00317ab75748bsm1664751wrr.49.2023.08.31.03.01.51
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 31 Aug 2023 03:01:52 -0700 (PDT)
-From: Magnus Karlsson <magnus.karlsson@gmail.com>
-To: magnus.karlsson@intel.com,
-	bjorn@kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	netdev@vger.kernel.org,
-	maciej.fijalkowski@intel.com
-Cc: jonathan.lemon@gmail.com,
-	bpf@vger.kernel.org,
-	syzbot+822d1359297e2694f873@syzkaller.appspotmail.com
-Subject: [PATCH bpf v2] xsk: fix xsk_diag use-after-free error during socket cleanup
-Date: Thu, 31 Aug 2023 12:01:17 +0200
-Message-ID: <20230831100119.17408-1-magnus.karlsson@gmail.com>
-X-Mailer: git-send-email 2.42.0
+        d=1e100.net; s=20221208; t=1693476859; x=1694081659;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f989IGcUqq8Px/bgiHpX6peJL1AeLepklJyWMmNd6B4=;
+        b=TOCfUu5l9qc8uSlHci3muH6KzfHt04A6imy/rj1SWa/QEm3IkKZIuB9rCTTVD8C/9M
+         1GsoMHo9SRsAm/+muezSr7xGSa5ZcWLuAXw9riLRW1asU3NIdThJU8hlUs3bpLc0NJP1
+         Zr/wwY31SK8oUR6xefuCNCtaU0/PZYFqRVQCxYVwWVheN5/SKgZpQ6xoMvXVcEtNi4v/
+         fhflgVy9ivGvzEpt3vlLCpE6dcKzJF341ahAqMG0/yIldqZ+SU8YKZ/pg3VSHizHe1WJ
+         CAM4dpa4qurYyHshuspl4UqAPshePIpE1KgouIxqzBQ4Nuv8fftxdP91Diy+WtQ+ppsx
+         /RrA==
+X-Gm-Message-State: AOJu0YwOqoJqLJqqIqWf6JL8bq2XQR/S+wHOjdr/r1jN05sbemuR2PwI
+	UbNQmT3noxxwT0THhQlsdLI=
+X-Google-Smtp-Source: AGHT+IFjdlfv/4DY+NnfRsY2G1j/QQKfOPNL/HmoNLPcWoYlvD5QO+V8GTu26Gd7MzaaBX6DsZNzDQ==
+X-Received: by 2002:a17:90b:1d84:b0:269:4fe8:687 with SMTP id pf4-20020a17090b1d8400b002694fe80687mr3189876pjb.19.1693476859245;
+        Thu, 31 Aug 2023 03:14:19 -0700 (PDT)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id j14-20020a17090a694e00b0026b70d2a8a2sm1028615pjm.29.2023.08.31.03.14.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Aug 2023 03:14:17 -0700 (PDT)
+Date: Thu, 31 Aug 2023 18:14:13 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Ido Schimmel <idosch@idosch.org>,
+	Thomas Haller <thaller@redhat.com>
+Subject: Re: [PATCH net-next] ipv6: do not merge differe type and protocol
+ routes
+Message-ID: <ZPBn9RQUL5mS/bBx@Laptop-X1>
+References: <20230830061550.2319741-1-liuhangbin@gmail.com>
+ <eeb19959-26f4-e8c1-abde-726dbb2b828d@6wind.com>
+ <01baf374-97c0-2a6f-db85-078488795bf9@kernel.org>
+ <db56de33-2112-5a4c-af94-6c8d26a8bfc1@6wind.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <db56de33-2112-5a4c-af94-6c8d26a8bfc1@6wind.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -83,54 +87,70 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Magnus Karlsson <magnus.karlsson@intel.com>
+Hi Nicolas,
+On Thu, Aug 31, 2023 at 10:17:19AM +0200, Nicolas Dichtel wrote:
+> >>> So let's skip counting the different type and protocol routes as siblings.
+> >>> After update, the different type/protocol routes will not be merged.
+> >>>
+> >>> + ip -6 route show table 100
+> >>> local 2001:db8:103::/64 via 2001:db8:101::10 dev dummy1 metric 1024 pref medium
+> >>> 2001:db8:103::/64 via 2001:db8:101::10 dev dummy2 metric 1024 pref medium
+> >>>
+> >>> + ip -6 route show table 200
+> >>> 2001:db8:104::/64 via 2001:db8:101::10 dev dummy1 proto kernel metric 1024 pref medium
+> >>> 2001:db8:104::/64 via 2001:db8:101::10 dev dummy2 proto bgp metric 1024 pref medium
+> >>
+> >> This seems wrong. The goal of 'ip route append' is to add a next hop, not to
+> >> create a new route. Ok, it adds a new route if no route exists, but it seems
+> >> wrong to me to use it by default, instead of 'add', to make things work magically.
+> > 
+> > Legacy API; nothing can be done about that (ie., that append makes a new
+> > route when none exists).
+> > 
+> >>
+> >> It seems more correct to return an error in these cases, but this will change
+> >> the uapi and it may break existing setups.
+> >>
+> >> Before this patch, both next hops could be used by the kernel. After it, one
+> >> route will be ignored (the former or the last one?). This is confusing and also
+> >> seems wrong.
+> > 
+> > Append should match all details of a route to add to an existing entry
+> > and make it multipath. If there is a difference (especially the type -
+> > protocol difference is arguable) in attributes, then they are different
+> > routes.
+> > 
+> 
+> As you said, the protocol difference is arguable. It's not a property of the
+> route, just a hint.
+> I think the 'append' should match a route whatever the protocol is.
+> 'ip route change' for example does not use the protocol to find the existing
+> route, it will update it:
+> 
+> $ ip -6 route add 2003:1:2:3::/64 via 2001::2 dev eth1
+> $ ip -6 route
+> 2003:1:2:3::/64 via 2001::2 dev eth1 metric 1024 pref medium
+> $ ip -6 route change 2003:1:2:3::/64 via 2001::2 dev eth1 protocol bgp
+> $ ip -6 route
+> 2003:1:2:3::/64 via 2001::2 dev eth1 proto bgp metric 1024 pref medium
+> $ ip -6 route change 2003:1:2:3::/64 via 2001::2 dev eth1 protocol kernel
+> $ ip -6 route
+> 2003:1:2:3::/64 via 2001::2 dev eth1 proto kernel metric 1024 pref medium
 
-Fix a use-after-free error that is possible if the xsk_diag interface
-is used after the socket has been unbound from the device. This can
-happen either due to the socket being closed or the device
-disappearing. In the early days of AF_XDP, the way we tested that a
-socket was not bound to a device was to simply check if the netdevice
-pointer in the xsk socket structure was NULL. Later, a better system
-was introduced by having an explicit state variable in the xsk socket
-struct. For example, the state of a socket that is on the way to being
-closed and has been unbound from the device is XSK_UNBOUND.
+Not sure if I understand correctly, `ip route replace` should able to
+replace all other field other than dest and dev. It's for changing the route,
+not only nexthop.
+> 
+> Why would 'append' selects route differently?
 
-The commit in the Fixes tag below deleted the old way of signalling
-that a socket is unbound, setting dev to NULL. This in the belief that
-all code using the old way had been exterminated. That was
-unfortunately not true as the xsk diagnostics code was still using the
-old way and thus does not work as intended when a socket is going
-down. Fix this by introducing a test against the state variable. If
-the socket is in the state XSK_UNBOUND, simply abort the diagnostic's
-netlink operation.
+The append should also works for a single route, not only for append nexthop, no?
 
-Fixes: 18b1ab7aa76b ("xsk: Fix race at socket teardown")
-Reported-and-tested-by: syzbot+822d1359297e2694f873@syzkaller.appspotmail.com
-Signed-off-by: Magnus Karlsson <magnus.karlsson@intel.com>
----
-v1 -> v2:
-  * Added READ_ONCE for the state variable [Magnus]
-  * Improved commit message [Maciej]
+> 
+> This patch breaks the legacy API.
 
- net/xdp/xsk_diag.c | 3 +++
- 1 file changed, 3 insertions(+)
+As the patch's description. Who would expect different type/protocol route
+should be merged as multipath route? I don't think the old API is correct.
 
-diff --git a/net/xdp/xsk_diag.c b/net/xdp/xsk_diag.c
-index c014217f5fa7..22b36c8143cf 100644
---- a/net/xdp/xsk_diag.c
-+++ b/net/xdp/xsk_diag.c
-@@ -111,6 +111,9 @@ static int xsk_diag_fill(struct sock *sk, struct sk_buff *nlskb,
- 	sock_diag_save_cookie(sk, msg->xdiag_cookie);
-
- 	mutex_lock(&xs->mutex);
-+	if (READ_ONCE(xs->state) == XSK_UNBOUND)
-+		goto out_nlmsg_trim;
-+
- 	if ((req->xdiag_show & XDP_SHOW_INFO) && xsk_diag_put_info(xs, nlskb))
- 		goto out_nlmsg_trim;
-
-
-base-commit: 7d35eb1a184a3f0759ad9e9cde4669b5c55b2063
---
-2.42.0
+Thanks
+Hangbin
 
