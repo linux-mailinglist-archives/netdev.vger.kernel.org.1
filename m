@@ -1,96 +1,138 @@
-Return-Path: <netdev+bounces-31633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E32D78F25B
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 20:16:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4642C78F27D
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 20:23:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31D3F1C20B1D
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 18:16:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76B0C1C20B1D
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 18:23:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 993BE19893;
-	Thu, 31 Aug 2023 18:16:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DC7C19897;
+	Thu, 31 Aug 2023 18:23:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 344068F57
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 18:16:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EF99C433C8;
-	Thu, 31 Aug 2023 18:16:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693505798;
-	bh=XeZVeiYpBVcPEbHL4neQaU/M5IGVLY/U/Mj6DQ6GalA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MqnDV9Oczcpv+5UwkALr3OsvzNOZZJhiZzRapdSmN3ePWjI0ztjUyQ42UFFLib/UI
-	 mnpfFfAVYbqLCExTU39BH0HKS4ALEnhyq5tGWxqQxAmFLZtA3vzoVti6K1QqwyYB//
-	 Pwv2zsXslmdJX6pHVfqoHYfF5hsBoDvReiJQyfn0IdGFWBB3HOnIAxIPP2JBghJF/O
-	 x1dKf/cX/wjJBiHcv+4oBfmmvWENJt4n/0fhQbS3tWCYvrelh8BhvvEEs30hNM7lCh
-	 janYTlSKR3mvk32K+yv0d2eUVYpi2khOzMYNat+rUkg4ayABGmCQAgnjRrj+djCFMv
-	 mtTYeyjqjDIDA==
-Received: (nullmailer pid 2536101 invoked by uid 1000);
-	Thu, 31 Aug 2023 18:16:36 -0000
-Date: Thu, 31 Aug 2023 13:16:36 -0500
-From: Rob Herring <robh@kernel.org>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vignesh Raghavendra <vigneshr@ti.com>, Roger Quadros <rogerq@kernel.org>, Jacob Keller <jacob.e.keller@intel.com>, Simon Horman <horms@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, netdev@vger.kernel.org, srk@ti.com, r-gunasekaran@ti.com
-Subject: Re: [RFC PATCH net-next 1/2] dt-bindings: net: Add documentation for
- Half duplex support.
-Message-ID: <20230831181636.GA2484338-robh@kernel.org>
-References: <20230830113134.1226970-1-danishanwar@ti.com>
- <20230830113134.1226970-2-danishanwar@ti.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC97D193A2
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 18:23:21 +0000 (UTC)
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC272E63;
+	Thu, 31 Aug 2023 11:23:20 -0700 (PDT)
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37VDusal019670;
+	Thu, 31 Aug 2023 18:23:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : subject :
+ date : message-id : mime-version : content-type :
+ content-transfer-encoding : to : cc; s=qcppdkim1;
+ bh=6jtt+DhViAJuO+cKOsP8zuY5qDC3CpI+xO5LQW5CWys=;
+ b=nx4pZMxLlzHi0j0UXAs455t35DQVQoSnpUfl76Z0gEDQBQm/l4SAc7Ziz6Zo3F6Z2ULD
+ 7hMd0t8f0ythUHN+B3CznjH58cANWvr+1JTrNHRp4dOLSoNrwQlJZZxUvNpW+S0qS+Kx
+ fVXhFHjB2aTJZxAESvEGi+hH0ilYKsDlFRYGMBvPgvFr8VwnMYbifUrPjhqtfkL7bED1
+ FOfe4yrz4OEnZOdKhZjwDAuLR/pWgjYxqmhBNLMnu2Hk77qNWhwQlM2sOgrdfVpdAhac
+ FsNPSW7aJDiIFO++sxgy+W8CiXSIxS0I9fDcXuZuGNSRi4kWWfM8yCxls9x7V16nakUv IA== 
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3stku29xrh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 31 Aug 2023 18:23:04 +0000
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 37VIN24S010469
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 31 Aug 2023 18:23:02 GMT
+Received: from hu-jjohnson-lv.qualcomm.com (10.49.16.6) by
+ nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.36; Thu, 31 Aug 2023 11:23:00 -0700
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+Subject: [PATCH v3 0/2] wifi: Fix struct ieee80211_tim_ie::virtual_map
+Date: Thu, 31 Aug 2023 11:22:56 -0700
+Message-ID: <20230831-ieee80211_tim_ie-v3-0-e10ff584ab5d@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230830113134.1226970-2-danishanwar@ti.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAIDa8GQC/32OzQ6CMBAGX4X0bE1/EIon38MYUtqt7EHQFhsN4
+ d0txIMk6nE2mfl2JAE8QiD7bCQeIgbsuwRykxHT6u4MFG1iIpiQTIkdRQBQTHBeD3ipESiTFc8
+ l004WliTt6sHhY0keT4lbDEPvn8tC5PP1TyxyyqhQpgTJpRWVPdzuaLAzW9Nf5vpbVT/UwpY6b
+ 3RTMnArdf4kis/16ktCpISz2vHKNdwwWCemaXoBA78z8TABAAA=
+To: <kernel@quicinc.com>, Kalle Valo <kvalo@kernel.org>,
+        =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
+        "Christian
+ Lamparter" <chunkeey@googlemail.com>,
+        Stanislaw Gruszka <stf_xl@wp.pl>,
+        "Helmut Schaa" <helmut.schaa@googlemail.com>,
+        Ping-Ke Shih
+	<pkshih@realtek.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        "David S.
+ Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Kees Cook
+	<keescook@chromium.org>
+CC: <linux-wireless@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, Jeff Johnson <quic_jjohnson@quicinc.com>
+X-Mailer: b4 0.12.3
+X-Originating-IP: [10.49.16.6]
+X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: ahr65fjEb7W4kcJd_KvteSgdgJHISFft
+X-Proofpoint-ORIG-GUID: ahr65fjEb7W4kcJd_KvteSgdgJHISFft
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-08-31_16,2023-08-31_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
+ lowpriorityscore=0 mlxscore=0 malwarescore=0 spamscore=0 phishscore=0
+ bulkscore=0 priorityscore=1501 adultscore=0 suspectscore=0 mlxlogscore=649
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2308100000
+ definitions=main-2308310164
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, Aug 30, 2023 at 05:01:33PM +0530, MD Danish Anwar wrote:
-> In order to support half-duplex operation at 10M and 100M link speeds, the
-> PHY collision detection signal (COL) should be routed to ICSSG
-> GPIO pin (PRGx_PRU0/1_GPI10) so that firmware can detect collision signal
-> and apply the CSMA/CD algorithm applicable for half duplex operation. A DT
-> property, "ti,half-duplex-capable" is introduced for this purpose. If
-> board has PHY COL pin conencted to PRGx_PRU1_GPIO10, this DT property can
-> be added to eth node of ICSSG, MII port to support half duplex operation at
-> that port.
+To align with [1] change struct ieee80211_tim_ie::virtual_map to be a
+flexible array.
 
-I take it the GPIO here is not visble to the OS and that's why it's not 
-described in DT?
- 
-> 
-> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
-> ---
->  Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml b/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
-> index 13371159515a..59da9aeaee7e 100644
-> --- a/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
-> +++ b/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
-> @@ -107,6 +107,13 @@ properties:
->                phandle to system controller node and register offset
->                to ICSSG control register for RGMII transmit delay
->  
-> +          ti,half-duplex-capable:
+As a precursor, add a size check in a place where one is currently
+missing.
 
-capable or...
+[1] https://docs.kernel.org/process/deprecated.html#zero-length-and-one-element-arrays
 
-> +            type: boolean
-> +            description:
-> +              Enable half duplex operation on ICSSG MII port. This requires
+Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
+---
+Changes in v3:
+- [PATCH 2/2] mac80211: Use flexible array in struct ieee80211_tim_ie
+-     Complete rewrite based upon v2 discussion. As a result no driver changes are required
+- Link to v2: https://lore.kernel.org/r/20230829-ieee80211_tim_ie-v2-0-fdaf19fb1c0e@quicinc.com
 
-enable the mode?
+Changes in v2:
+- Cover Letter
+-     removed internal note
+- [PATCH 2/2] mac80211: Use flexible array in struct ieee80211_tim_ie
+-     Fixed typo: s/no/now/
+- Link to v1: https://lore.kernel.org/r/20230828-ieee80211_tim_ie-v1-0-6d7a4bab70ef@quicinc.com
 
-Maybe too late if it's already been assumed not supported, but shouldn't 
-supporting half duplex be the default? I guess half duplex isn't too 
-common any more.
+---
+Jeff Johnson (2):
+      wifi: cw1200: Avoid processing an invalid TIM IE
+      mac80211: Use flexible array in struct ieee80211_tim_ie
 
-Rob
+ drivers/net/wireless/st/cw1200/txrx.c |  2 +-
+ include/linux/ieee80211.h             | 13 ++++++++++---
+ 2 files changed, 11 insertions(+), 4 deletions(-)
+---
+base-commit: b32add2d20ea6e62f30a3c0a7c2fb306ec5ceb3d
+change-id: 20230825-ieee80211_tim_ie-0391430af36d
+
 
