@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-31579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4090D78EE77
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 15:23:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6085F78EE78
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 15:23:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF161281565
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 13:22:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16F4B28158D
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 13:23:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EB6F1172C;
-	Thu, 31 Aug 2023 13:22:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ABCB11739;
+	Thu, 31 Aug 2023 13:22:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F18781172B
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 13:22:36 +0000 (UTC)
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EC9CCFE
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 06:22:35 -0700 (PDT)
-Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-31c5a2e8501so631404f8f.0
-        for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 06:22:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EA151172B
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 13:22:38 +0000 (UTC)
+Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0781CEB
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 06:22:36 -0700 (PDT)
+Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-3ff7d73a6feso7338015e9.1
+        for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 06:22:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1693488153; x=1694092953; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1693488155; x=1694092955; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rKFtUbKKPKW7K/rcbBsZRAnuPjgGSYr12XFfzjq1ADs=;
-        b=kf9nhnqPzkeNzCAbW6WzAFcMpXYoiMis+gHqbRxs+F/sEzWiuXtptQctqrZwaCTjcs
-         ip/JkyuCvpsw7xGvM77H64GflYmP5mqQzj+3J5lqkCuuw17O+Kg07ZvWt3nzlPgsxDDy
-         3hzKMlt/9zoskaFcgeW/k7T80QLohSUkpuUBWPTcuhglVkTwUbreT86ABer2fZ1DhMrm
-         UAF7dEVMyabPzpeRKZgXQIgTke+MLNcWXXQNKgK8fnCC/Eyb6On4jnZ6CWwcLVAa+p/m
-         +NQxioonNEjepKxT/YtUMuIAoVAsxOQxCLZzFnrDucZQ3yv/sQg49YWhLGgcdn9EZLvS
-         Abqw==
+        bh=BNGjPi8Kz3iWxuqrnIa6y+7h6yi5Yp1+x9gNKGAxkDk=;
+        b=AN9HIyke08Tr9OifM9Gn8TOkBwe5yPsclZngGODBnhq4+UuflpbDFcIADjt33oHAWo
+         vz5tLQvOo/V+9HkVTiPcwsNrlK8TeZ+Qvqdopa/ylc36cqLyz74vWSq9xr/AOrVJLv5V
+         rBIGdrs+fU2CWwbK/iJuP4dwdz+ve5JwlsAAqrNN+RAiqUq16/9t5kMya1BbV+6DUrZV
+         XW2KIprNM3kwfl0hAxch7ST1XKHyv1ytKS4oPhTyd2JuM1Lj6Y79Oj9YnRiaGwsZMuG7
+         1+xIfFY2vI/f1UgxHwY+yIuOHWgJLweK2VmLcVFAvA8K9gbgvdqNOWTYSGNx/1CfKa8a
+         Nb4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693488153; x=1694092953;
+        d=1e100.net; s=20221208; t=1693488155; x=1694092955;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rKFtUbKKPKW7K/rcbBsZRAnuPjgGSYr12XFfzjq1ADs=;
-        b=jEExvSsjBYW5A6qTTfbf3iC4HcHhRy3Db2Tx0Io0l6z+5NwHF3pwiGUnjVoL1+nsDN
-         HGol9ZREFhurVVjY/Y7RDUswIuk2gbEJxAmGlnfale96pwkiidRuH4P+23TEXzM/kEdy
-         Icj6fbKAOx3lccqJShXfu2+JbtSOpI/aYD2MvFTXdQ25dxNuWvwUTLJXl5QVqiBGnoyq
-         sepHBjFKj0FpSxtdVUSGejlowFkI7ABXScDD9UKK4O4Fe56ASJei//mC2Q1dW0M4ttPr
-         4hZySxSDLFRSNkSMHWTzNNA9MG1LNKBJjwxYUVGTKahYYU7WSZk7tF3dqfqLrgL5A/6E
-         NDqQ==
-X-Gm-Message-State: AOJu0YzkhBYXB0ZC+N9nWhRxqzuCbu56QXtk1h37IYOS6GZgHgSLeevV
-	z6aTUFX7y7CuUeHEst350qaxfKb7y4HCdEzXR0s=
-X-Google-Smtp-Source: AGHT+IGQxikohTMZlQVymFsctJxHER4F/gFHQpesrDcskYVnmXCenhIilohbeF5Fb56mEQCoHBQnow==
-X-Received: by 2002:adf:e7cc:0:b0:31a:ccc6:b8de with SMTP id e12-20020adfe7cc000000b0031accc6b8demr4253729wrn.50.1693488153686;
-        Thu, 31 Aug 2023 06:22:33 -0700 (PDT)
+        bh=BNGjPi8Kz3iWxuqrnIa6y+7h6yi5Yp1+x9gNKGAxkDk=;
+        b=EnQUkwXi3b24NAHiMMzN5IxzeE7lAabXtACBFYVU9qzYa/geuMUmkC2eg7hTKwXFqs
+         mStO65JKAQc2qU6UD6g0n9EvBq6vfJSQomypFEfXXkQyOqGSSYbtk70xQ92mMwyEUZKK
+         TiwP6t2hnpUfMNYrjf9YO4JgdaeRyiTe4WiRbCPf7FoGvg0z/vA8vNDrAvw9zbyW4rdT
+         aHsUzO09mj1Gqcxk38ymaNbrqKhNKOlR+cRhjsOvKdxXiV2A81cQ+1agRlw8w9mNXE/7
+         r5ctlQtH2yCH/T67fQd+Le8/GJxV60F+mg+x3FY5mZKomC3T5UMDHj4BM5hyHMlfvq1O
+         TmnQ==
+X-Gm-Message-State: AOJu0YygKPvng14b6pHIQpxHEmAHEYYolxsmv0BB/sN3VwksxKtwDjXv
+	uYybb+xCZi8FS2yd4ZSYy8iaIRtUyUsVK10EszY=
+X-Google-Smtp-Source: AGHT+IEWA4SZ02tkNm/xGuUUWeoNYfBL+JiuaQjw00f4DRehp//L26ZwswRjwWRy+7s2bknIyRNnEA==
+X-Received: by 2002:a05:600c:3798:b0:3f5:fff8:d4f3 with SMTP id o24-20020a05600c379800b003f5fff8d4f3mr4177435wmr.7.1693488155246;
+        Thu, 31 Aug 2023 06:22:35 -0700 (PDT)
 Received: from localhost ([212.23.236.67])
-        by smtp.gmail.com with ESMTPSA id i5-20020adfefc5000000b0031759e6b43fsm2241102wrp.39.2023.08.31.06.22.32
+        by smtp.gmail.com with ESMTPSA id l3-20020a1ced03000000b003feae747ff2sm5191368wmh.35.2023.08.31.06.22.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Aug 2023 06:22:33 -0700 (PDT)
+        Thu, 31 Aug 2023 06:22:34 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: stephen@networkplumber.org,
 	dsahern@gmail.com
-Subject: [patch iproute2-next 1/6] devlink: move DL_OPT_SB into required options
-Date: Thu, 31 Aug 2023 15:22:24 +0200
-Message-ID: <20230831132229.471693-2-jiri@resnulli.us>
+Subject: [patch iproute2-next 2/6] devlink: make parsing of handle non-destructive to argv
+Date: Thu, 31 Aug 2023 15:22:25 +0200
+Message-ID: <20230831132229.471693-3-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230831132229.471693-1-jiri@resnulli.us>
 References: <20230831132229.471693-1-jiri@resnulli.us>
@@ -81,131 +81,176 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-This is basically a cosmetic change. The SB index is not required to be
-passed by user and implicitly index 0 is used. This is ensured by
-special treating at the end of dl_argv_parse(). Move this option from
-optional to required options.
+Currently, handle parsing is destructive as the "\0" string ends are
+being put in certain positions during parsing. That prevents it from
+being used repeatedly. This is problematic with the follow-up patch
+implementing dry-parsing. Fix by making a copy of handle argv during
+parsing.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
- devlink/devlink.c | 35 +++++++++++++++++------------------
- 1 file changed, 17 insertions(+), 18 deletions(-)
+ devlink/devlink.c | 46 ++++++++++++++++++++++++++--------------------
+ 1 file changed, 26 insertions(+), 20 deletions(-)
 
 diff --git a/devlink/devlink.c b/devlink/devlink.c
-index 616720a9051f..713ac1f201e2 100644
+index 713ac1f201e2..e7b5b788863a 100644
 --- a/devlink/devlink.c
 +++ b/devlink/devlink.c
-@@ -2271,7 +2271,7 @@ static int dl_argv_parse(struct dl *dl, uint64_t o_required,
+@@ -378,6 +378,7 @@ struct dl {
+ 	struct list_head ifname_map_list;
+ 	int argc;
+ 	char **argv;
++	char *handle_argv;
+ 	bool no_nice_names;
+ 	struct dl_opts opts;
+ 	bool json_output;
+@@ -1066,9 +1067,8 @@ static int __dl_argv_handle(char *str, char **p_bus_name, char **p_dev_name)
+ 	return 0;
+ }
  
- 	opts->present = o_found;
+-static int dl_argv_handle(struct dl *dl, char **p_bus_name, char **p_dev_name)
++static int dl_argv_handle(char *str, char **p_bus_name, char **p_dev_name)
+ {
+-	char *str = dl_argv_next(dl);
+ 	int err;
  
--	if ((o_optional & DL_OPT_SB) && !(o_found & DL_OPT_SB)) {
-+	if ((o_required & DL_OPT_SB) && !(o_found & DL_OPT_SB)) {
- 		opts->sb_index = 0;
- 		opts->present |= DL_OPT_SB;
+ 	err = ident_str_validate(str, 1);
+@@ -1121,10 +1121,9 @@ static int __dl_argv_handle_port_ifname(struct dl *dl, char *str,
+ 	return 0;
+ }
+ 
+-static int dl_argv_handle_port(struct dl *dl, char **p_bus_name,
++static int dl_argv_handle_port(struct dl *dl, char *str, char **p_bus_name,
+ 			       char **p_dev_name, uint32_t *p_port_index)
+ {
+-	char *str = dl_argv_next(dl);
+ 	unsigned int slash_count;
+ 
+ 	if (!str) {
+@@ -1146,11 +1145,10 @@ static int dl_argv_handle_port(struct dl *dl, char **p_bus_name,
  	}
-@@ -5721,7 +5721,7 @@ static int cmd_sb_show(struct dl *dl)
- 		flags |= NLM_F_DUMP;
- 	}
- 	else {
--		err = dl_argv_parse(dl, DL_OPT_HANDLE, DL_OPT_SB);
-+		err = dl_argv_parse(dl, DL_OPT_HANDLE | DL_OPT_SB, 0);
+ }
+ 
+-static int dl_argv_handle_both(struct dl *dl, char **p_bus_name,
++static int dl_argv_handle_both(struct dl *dl, char *str, char **p_bus_name,
+ 			       char **p_dev_name, uint32_t *p_port_index,
+ 			       uint64_t *p_handle_bit)
+ {
+-	char *str = dl_argv_next(dl);
+ 	unsigned int slash_count;
+ 	int err;
+ 
+@@ -1199,10 +1197,9 @@ static int __dl_argv_handle_name(char *str, char **p_bus_name,
+ 	return str_split_by_char(handlestr, p_bus_name, p_dev_name, '/');
+ }
+ 
+-static int dl_argv_handle_region(struct dl *dl, char **p_bus_name,
++static int dl_argv_handle_region(char *str, char **p_bus_name,
+ 				 char **p_dev_name, char **p_region)
+ {
+-	char *str = dl_argv_next(dl);
+ 	int err;
+ 
+ 	err = ident_str_validate(str, 2);
+@@ -1218,10 +1215,9 @@ static int dl_argv_handle_region(struct dl *dl, char **p_bus_name,
+ }
+ 
+ 
+-static int dl_argv_handle_rate_node(struct dl *dl, char **p_bus_name,
++static int dl_argv_handle_rate_node(char *str, char **p_bus_name,
+ 				    char **p_dev_name, char **p_node)
+ {
+-	char *str = dl_argv_next(dl);
+ 	int err;
+ 
+ 	err = ident_str_validate(str, 2);
+@@ -1244,11 +1240,10 @@ static int dl_argv_handle_rate_node(struct dl *dl, char **p_bus_name,
+ 	return err;
+ }
+ 
+-static int dl_argv_handle_rate(struct dl *dl, char **p_bus_name,
++static int dl_argv_handle_rate(char *str, char **p_bus_name,
+ 			       char **p_dev_name, uint32_t *p_port_index,
+ 			       char **p_node_name, uint64_t *p_handle_bit)
+ {
+-	char *str = dl_argv_next(dl);
+ 	char *identifier;
+ 	int err;
+ 
+@@ -1698,14 +1693,24 @@ static int dl_argv_parse(struct dl *dl, uint64_t o_required,
+ {
+ 	struct dl_opts *opts = &dl->opts;
+ 	uint64_t o_all = o_required | o_optional;
++	char *str = dl_argv_next(dl);
+ 	uint64_t o_found = 0;
+ 	int err;
+ 
++	if (str) {
++		str = strdup(str);
++		if (!str)
++			return -ENOMEM;
++		free(dl->handle_argv);
++		dl->handle_argv = str;
++	}
++
+ 	if (o_required & DL_OPT_HANDLE && o_required & DL_OPT_HANDLEP) {
+ 		uint64_t handle_bit;
+ 
+-		err = dl_argv_handle_both(dl, &opts->bus_name, &opts->dev_name,
+-					  &opts->port_index, &handle_bit);
++		err = dl_argv_handle_both(dl, str, &opts->bus_name,
++					  &opts->dev_name, &opts->port_index,
++					  &handle_bit);
  		if (err)
  			return err;
- 	}
-@@ -5800,8 +5800,8 @@ static int cmd_sb_pool_show(struct dl *dl)
- 		flags |= NLM_F_DUMP;
- 	}
- 	else {
--		err = dl_argv_parse(dl, DL_OPT_HANDLE | DL_OPT_SB_POOL,
--				    DL_OPT_SB);
-+		err = dl_argv_parse(dl, DL_OPT_HANDLE | DL_OPT_SB |
-+				    DL_OPT_SB_POOL, 0);
+ 		o_required &= ~(DL_OPT_HANDLE | DL_OPT_HANDLEP) | handle_bit;
+@@ -1714,7 +1719,7 @@ static int dl_argv_parse(struct dl *dl, uint64_t o_required,
+ 		   o_required & DL_OPT_PORT_FN_RATE_NODE_NAME) {
+ 		uint64_t handle_bit;
+ 
+-		err = dl_argv_handle_rate(dl, &opts->bus_name, &opts->dev_name,
++		err = dl_argv_handle_rate(str, &opts->bus_name, &opts->dev_name,
+ 					  &opts->port_index,
+ 					  &opts->rate_node_name,
+ 					  &handle_bit);
+@@ -1724,25 +1729,25 @@ static int dl_argv_parse(struct dl *dl, uint64_t o_required,
+ 			handle_bit;
+ 		o_found |= handle_bit;
+ 	} else if (o_required & DL_OPT_HANDLE) {
+-		err = dl_argv_handle(dl, &opts->bus_name, &opts->dev_name);
++		err = dl_argv_handle(str, &opts->bus_name, &opts->dev_name);
  		if (err)
  			return err;
- 	}
-@@ -5821,8 +5821,8 @@ static int cmd_sb_pool_set(struct dl *dl)
- 	struct nlmsghdr *nlh;
- 	int err;
- 
--	err = dl_argv_parse(dl, DL_OPT_HANDLE | DL_OPT_SB_POOL |
--			    DL_OPT_SB_SIZE | DL_OPT_SB_THTYPE, DL_OPT_SB);
-+	err = dl_argv_parse(dl, DL_OPT_HANDLE | DL_OPT_SB | DL_OPT_SB_POOL |
-+			    DL_OPT_SB_SIZE | DL_OPT_SB_THTYPE, 0);
- 	if (err)
- 		return err;
- 
-@@ -5889,8 +5889,8 @@ static int cmd_sb_port_pool_show(struct dl *dl)
- 		flags |= NLM_F_DUMP;
- 	}
- 	else {
--		err = dl_argv_parse(dl, DL_OPT_HANDLEP | DL_OPT_SB_POOL,
--				    DL_OPT_SB);
-+		err = dl_argv_parse(dl, DL_OPT_HANDLEP | DL_OPT_SB |
-+				    DL_OPT_SB_POOL, 0);
+ 		o_found |= DL_OPT_HANDLE;
+ 	} else if (o_required & DL_OPT_HANDLEP) {
+-		err = dl_argv_handle_port(dl, &opts->bus_name, &opts->dev_name,
+-					  &opts->port_index);
++		err = dl_argv_handle_port(dl, str, &opts->bus_name,
++					  &opts->dev_name, &opts->port_index);
  		if (err)
  			return err;
- 	}
-@@ -5910,8 +5910,8 @@ static int cmd_sb_port_pool_set(struct dl *dl)
- 	struct nlmsghdr *nlh;
- 	int err;
- 
--	err = dl_argv_parse(dl, DL_OPT_HANDLEP | DL_OPT_SB_POOL | DL_OPT_SB_TH,
--			    DL_OPT_SB);
-+	err = dl_argv_parse(dl, DL_OPT_HANDLEP | DL_OPT_SB | DL_OPT_SB_POOL |
-+			    DL_OPT_SB_TH, 0);
- 	if (err)
- 		return err;
- 
-@@ -5996,8 +5996,8 @@ static int cmd_sb_tc_bind_show(struct dl *dl)
- 		flags |= NLM_F_DUMP;
- 	}
- 	else {
--		err = dl_argv_parse(dl, DL_OPT_HANDLEP | DL_OPT_SB_TC |
--				    DL_OPT_SB_TYPE, DL_OPT_SB);
-+		err = dl_argv_parse(dl, DL_OPT_HANDLEP | DL_OPT_SB | DL_OPT_SB_TC |
-+				    DL_OPT_SB_TYPE, 0);
+ 		o_found |= DL_OPT_HANDLEP;
+ 	} else if (o_required & DL_OPT_HANDLE_REGION) {
+-		err = dl_argv_handle_region(dl, &opts->bus_name,
++		err = dl_argv_handle_region(str, &opts->bus_name,
+ 					    &opts->dev_name,
+ 					    &opts->region_name);
  		if (err)
  			return err;
- 	}
-@@ -6017,9 +6017,8 @@ static int cmd_sb_tc_bind_set(struct dl *dl)
- 	struct nlmsghdr *nlh;
- 	int err;
+ 		o_found |= DL_OPT_HANDLE_REGION;
+ 	} else if (o_required & DL_OPT_PORT_FN_RATE_NODE_NAME) {
+-		err = dl_argv_handle_rate_node(dl, &opts->bus_name,
++		err = dl_argv_handle_rate_node(str, &opts->bus_name,
+ 					       &opts->dev_name,
+ 					       &opts->rate_node_name);
+ 		if (err)
+@@ -9902,6 +9907,7 @@ static struct dl *dl_alloc(void)
  
--	err = dl_argv_parse(dl, DL_OPT_HANDLEP | DL_OPT_SB_TC |
--			    DL_OPT_SB_TYPE | DL_OPT_SB_POOL | DL_OPT_SB_TH,
--			    DL_OPT_SB);
-+	err = dl_argv_parse(dl, DL_OPT_HANDLEP | DL_OPT_SB | DL_OPT_SB_TC |
-+			    DL_OPT_SB_TYPE | DL_OPT_SB_POOL | DL_OPT_SB_TH, 0);
- 	if (err)
- 		return err;
- 
-@@ -6338,7 +6337,7 @@ static int cmd_sb_occ_show(struct dl *dl)
- 	uint16_t flags = NLM_F_REQUEST | NLM_F_ACK | NLM_F_DUMP;
- 	int err;
- 
--	err = dl_argv_parse(dl, DL_OPT_HANDLE | DL_OPT_HANDLEP, DL_OPT_SB);
-+	err = dl_argv_parse(dl, DL_OPT_HANDLE | DL_OPT_HANDLEP | DL_OPT_SB, 0);
- 	if (err)
- 		return err;
- 
-@@ -6374,7 +6373,7 @@ static int cmd_sb_occ_snapshot(struct dl *dl)
- 	struct nlmsghdr *nlh;
- 	int err;
- 
--	err = dl_argv_parse(dl, DL_OPT_HANDLE, DL_OPT_SB);
-+	err = dl_argv_parse(dl, DL_OPT_HANDLE | DL_OPT_SB, 0);
- 	if (err)
- 		return err;
- 
-@@ -6391,7 +6390,7 @@ static int cmd_sb_occ_clearmax(struct dl *dl)
- 	struct nlmsghdr *nlh;
- 	int err;
- 
--	err = dl_argv_parse(dl, DL_OPT_HANDLE, DL_OPT_SB);
-+	err = dl_argv_parse(dl, DL_OPT_HANDLE | DL_OPT_SB, 0);
- 	if (err)
- 		return err;
+ static void dl_free(struct dl *dl)
+ {
++	free(dl->handle_argv);
+ 	free(dl);
+ }
  
 -- 
 2.41.0
