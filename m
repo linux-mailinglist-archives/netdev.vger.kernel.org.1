@@ -1,240 +1,167 @@
-Return-Path: <netdev+bounces-31517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E2B078E7BF
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 10:17:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BCA778E7BB
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 10:17:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48DC728129E
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 08:17:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E43A12813D3
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 08:17:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD70B79CD;
-	Thu, 31 Aug 2023 08:17:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA71A6FCA;
+	Thu, 31 Aug 2023 08:17:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA08279C3
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 08:17:33 +0000 (UTC)
-Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E156C1A2
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 01:17:31 -0700 (PDT)
-Received: by mail-io1-xd30.google.com with SMTP id ca18e2360f4ac-792409bc1cdso12610639f.0
-        for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 01:17:31 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7B9C6FBD
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 08:17:24 +0000 (UTC)
+Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A05311A4
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 01:17:22 -0700 (PDT)
+Received: by mail-wr1-x429.google.com with SMTP id ffacd0b85a97d-31aeedbb264so405087f8f.0
+        for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 01:17:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1693469851; x=1694074651; darn=vger.kernel.org;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=MET/hQwpeova7Ho1GgzgDeTkiQ/1n+JC7QsFR+YAzPA=;
-        b=RMNs5f1WFrirnZtwwIPAdXnGsNAL4yKRBufYVnB32Mm8ZlWubGHYWAWjapSgn38uWN
-         C2fyT+m/4dKBbvVGQVRdeLjLFNCeZLCDFzkCXbt0LTkZTnj7cSssEE2aR3joc0+Iu3of
-         FIPKeOSWessfrNcU0Gymfq9mwJSc2tuHhtj+lJ7qCKycFiCZdyIcTXhImIOpK+9X8NMk
-         DssKoJssc6hEy3thG19BSYN80PDZKgMDCgZE2kqhOwEUOgpVIvzupPgHT60q2OQFC8CL
-         9jV1blsY5+xBQTF9GIyPR+4JmERSd7MGiLH2yhV9T+y3mwlbY1eFl62Dp2gnP5p4gqHO
-         n/OQ==
+        d=6wind.com; s=google; t=1693469841; x=1694074641; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=omi2x8HAjaQOtFgKTUdzMFLm5NYOyArcbTM6HLpJX+M=;
+        b=cJwRhcjgkInl04W2twubZMCtRzYPUzELWJ1WNpPbkVMo8eIa3oFeOPQd9hZokEebc5
+         /ySWeyxudkBvRJGAR2H/FTJ8utQ4Gxlyd1QiAjX+Po0bo4eyWP+59iMgDseXGC4GWs6k
+         gBAlWTWKt1GwsV7DW6OgrBhW9Ei1DZhg2O7o3YFIJGYgH4zcSKADDxLIsj5QGSKnvqIx
+         v2dXtGtbLjl9DVJjrVUKmfiB3zVU+l2xeVyEqY44n5k2RcqjV2R6O9JSErU9aXfGwrD5
+         Q1MyKmT+ktVMk92fReCDqEhre1yInsWgDToL+nJzi/gGrnU2DwhkX7xY0HgFOvGGancM
+         7Wcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693469851; x=1694074651;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MET/hQwpeova7Ho1GgzgDeTkiQ/1n+JC7QsFR+YAzPA=;
-        b=QA4Trg5k3GX+8Flguk3XHhEtwqpMmgdrqZv3EcBKvKfPga7PU/YKoHzrXJl6fG3AgU
-         5rEJXWeYSxaNhgXrOsCxeBEdntEvryWkFaxS7H7A19aZ8htZvKuBRqgHzbWlQUxXOO9S
-         51fg8KgHJWWygcajWPeOzYZ8RfuywOGgXHePPGJOvljQ4BIrt0PMAEADvyZAt40ljW+R
-         kgrsjZo7CywN9weNfeNjtyyKO7SDLhIH5VuxbAEhi5KJFX8ky7S1Fi2K93nwdIrKIQ0N
-         R9JARu0nkzML8HkxuKutJQ6V3HZFEgSU+pUOHFHPUtFfiiRk5ArEX1+fhi1947Pb48IT
-         EPuA==
-X-Gm-Message-State: AOJu0YxqzZkdH2xIl293zbDnvB3flCcopC/UAXxzqNzz4C4KDC/u9ddJ
-	gfEaYQX1ZJlG+dRzPF5VYlnTZQ==
-X-Google-Smtp-Source: AGHT+IEmrcoYzrntW7B3jhyZRnwIUzkciWvOSXmi4UX/2NMeseAAguKjuoc//VCN5QB0kFm3teffJA==
-X-Received: by 2002:a5d:9d92:0:b0:791:8f62:31ef with SMTP id ay18-20020a5d9d92000000b007918f6231efmr2154312iob.5.1693469850925;
-        Thu, 31 Aug 2023 01:17:30 -0700 (PDT)
-Received: from dev-mkhalfella2.dev.purestorage.com ([208.88.159.128])
-        by smtp.googlemail.com with ESMTPSA id dm8-20020a0566023b8800b00791e6ae3aa4sm312282iob.23.2023.08.31.01.17.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Aug 2023 01:17:30 -0700 (PDT)
-From: Mohamed Khalfella <mkhalfella@purestorage.com>
-To: willemdebruijn.kernel@gmail.com
-Cc: alexanderduyck@fb.com,
-	bpf@vger.kernel.org,
-	brouer@redhat.com,
-	davem@davemloft.net,
-	dhowells@redhat.com,
-	edumazet@google.com,
-	keescook@chromium.org,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	mkhalfella@purestorage.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	willemb@google.com,
-	stable@vger.kernel.org
-Subject: [PATCH v3] skbuff: skb_segment, Call zero copy functions before using skbuff frags
-Date: Thu, 31 Aug 2023 02:17:02 -0600
-Message-Id: <20230831081702.101342-1-mkhalfella@purestorage.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <64ed7188a2745_9cf208e1@penguin.notmuch>
-References: <64ed7188a2745_9cf208e1@penguin.notmuch>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,T_SPF_PERMERROR autolearn=unavailable autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+        d=1e100.net; s=20221208; t=1693469841; x=1694074641;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=omi2x8HAjaQOtFgKTUdzMFLm5NYOyArcbTM6HLpJX+M=;
+        b=dGhlNncGqtiJzJIw0DW5OxWi2sS+K2kAEBnQaHpQ9AjTwOu8JgpbIe8NAmCrkvtnb8
+         lBgipKfO2VxgEkEPC4/n0GGE3dZJMb4IUhnO5eWhDxrXM0MhMQaO2evw1zDFrDYyHIPj
+         gosr7H7OFNLpGzd/C0Rfju4764iOXfB3h1Uey1yAfDSvbfu7SXxo8+a3nPGA/TLER9sQ
+         6TD/MIHPpeqjl9bBCQve1CC1I9h/n6QuqORa9zM8PBAewT7Nn01b+XoINoZmnhjl+5cx
+         AT1LJmksjfBks77mu5GoRrqA2UNlunmAL8V5DF/TEVOCHG/eKiAMNg//HXqh4ZOJ7TqT
+         7k8Q==
+X-Gm-Message-State: AOJu0YxR/Smem5siB4qIj2Q6QO+7qezUdGsxeLp2A+o2PkZoY6yBdGDK
+	njGRul5GiHvi1ZJMtNAULCFK4OKPIKXBn/OPbnw=
+X-Google-Smtp-Source: AGHT+IFJbSzhseqdOp4JB2ARKmuSPEPJu1T8krxx1MT9N16W6Y/1Jr6suLBYBSEcUHHqesImkVvpug==
+X-Received: by 2002:a5d:568a:0:b0:315:9993:1caa with SMTP id f10-20020a5d568a000000b0031599931caamr3236306wrv.12.1693469841132;
+        Thu, 31 Aug 2023 01:17:21 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:b41:c160:8ad8:2775:884a:f43f? ([2a01:e0a:b41:c160:8ad8:2775:884a:f43f])
+        by smtp.gmail.com with ESMTPSA id k11-20020a5d6d4b000000b0031ad2663ed0sm1338533wri.66.2023.08.31.01.17.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 31 Aug 2023 01:17:20 -0700 (PDT)
+Message-ID: <db56de33-2112-5a4c-af94-6c8d26a8bfc1@6wind.com>
+Date: Thu, 31 Aug 2023 10:17:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH net-next] ipv6: do not merge differe type and protocol
+ routes
+Content-Language: en-US
+To: David Ahern <dsahern@kernel.org>, Hangbin Liu <liuhangbin@gmail.com>,
+ netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Ido Schimmel <idosch@idosch.org>,
+ Thomas Haller <thaller@redhat.com>
+References: <20230830061550.2319741-1-liuhangbin@gmail.com>
+ <eeb19959-26f4-e8c1-abde-726dbb2b828d@6wind.com>
+ <01baf374-97c0-2a6f-db85-078488795bf9@kernel.org>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Organization: 6WIND
+In-Reply-To: <01baf374-97c0-2a6f-db85-078488795bf9@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Commit bf5c25d60861 ("skbuff: in skb_segment, call zerocopy functions
-once per nskb") added the call to zero copy functions in skb_segment().
-The change introduced a bug in skb_segment() because skb_orphan_frags()
-may possibly change the number of fragments or allocate new fragments
-altogether leaving nrfrags and frag to point to the old values. This can
-cause a panic with stacktrace like the one below.
+Le 30/08/2023 à 20:57, David Ahern a écrit :
+> On 8/30/23 9:29 AM, Nicolas Dichtel wrote:
+>> Le 30/08/2023 à 08:15, Hangbin Liu a écrit :
+>>> Different with IPv4, IPv6 will auto merge the same metric routes into
+>>> multipath routes. But the different type and protocol routes are also
+>>> merged, which will lost user's configure info. e.g.
+>>>
+>>> + ip route add local 2001:db8:103::/64 via 2001:db8:101::10 dev dummy1 table 100
+>>> + ip route append unicast 2001:db8:103::/64 via 2001:db8:101::10 dev dummy2 table 100
+>>> + ip -6 route show table 100
+>>> local 2001:db8:103::/64 metric 1024 pref medium
+>>>         nexthop via 2001:db8:101::10 dev dummy1 weight 1
+>>>         nexthop via 2001:db8:101::10 dev dummy2 weight 1
+>>>
+>>> + ip route add 2001:db8:104::/64 via 2001:db8:101::10 dev dummy1 proto kernel table 200
+>>> + ip route append 2001:db8:104::/64 via 2001:db8:101::10 dev dummy2 proto bgp table 200
+>>> + ip -6 route show table 200
+>>> 2001:db8:104::/64 proto kernel metric 1024 pref medium
+>>>         nexthop via 2001:db8:101::10 dev dummy1 weight 1
+>>>         nexthop via 2001:db8:101::10 dev dummy2 weight 1
+>>>
+>>> So let's skip counting the different type and protocol routes as siblings.
+>>> After update, the different type/protocol routes will not be merged.
+>>>
+>>> + ip -6 route show table 100
+>>> local 2001:db8:103::/64 via 2001:db8:101::10 dev dummy1 metric 1024 pref medium
+>>> 2001:db8:103::/64 via 2001:db8:101::10 dev dummy2 metric 1024 pref medium
+>>>
+>>> + ip -6 route show table 200
+>>> 2001:db8:104::/64 via 2001:db8:101::10 dev dummy1 proto kernel metric 1024 pref medium
+>>> 2001:db8:104::/64 via 2001:db8:101::10 dev dummy2 proto bgp metric 1024 pref medium
+>>
+>> This seems wrong. The goal of 'ip route append' is to add a next hop, not to
+>> create a new route. Ok, it adds a new route if no route exists, but it seems
+>> wrong to me to use it by default, instead of 'add', to make things work magically.
+> 
+> Legacy API; nothing can be done about that (ie., that append makes a new
+> route when none exists).
+> 
+>>
+>> It seems more correct to return an error in these cases, but this will change
+>> the uapi and it may break existing setups.
+>>
+>> Before this patch, both next hops could be used by the kernel. After it, one
+>> route will be ignored (the former or the last one?). This is confusing and also
+>> seems wrong.
+> 
+> Append should match all details of a route to add to an existing entry
+> and make it multipath. If there is a difference (especially the type -
+> protocol difference is arguable) in attributes, then they are different
+> routes.
+> 
 
-[  193.894380] BUG: kernel NULL pointer dereference, address: 00000000000000bc
-[  193.895273] CPU: 13 PID: 18164 Comm: vh-net-17428 Kdump: loaded Tainted: G           O      5.15.123+ #26
-[  193.903919] RIP: 0010:skb_segment+0xb0e/0x12f0
-[  194.021892] Call Trace:
-[  194.027422]  <TASK>
-[  194.072861]  tcp_gso_segment+0x107/0x540
-[  194.082031]  inet_gso_segment+0x15c/0x3d0
-[  194.090783]  skb_mac_gso_segment+0x9f/0x110
-[  194.095016]  __skb_gso_segment+0xc1/0x190
-[  194.103131]  netem_enqueue+0x290/0xb10 [sch_netem]
-[  194.107071]  dev_qdisc_enqueue+0x16/0x70
-[  194.110884]  __dev_queue_xmit+0x63b/0xb30
-[  194.121670]  bond_start_xmit+0x159/0x380 [bonding]
-[  194.128506]  dev_hard_start_xmit+0xc3/0x1e0
-[  194.131787]  __dev_queue_xmit+0x8a0/0xb30
-[  194.138225]  macvlan_start_xmit+0x4f/0x100 [macvlan]
-[  194.141477]  dev_hard_start_xmit+0xc3/0x1e0
-[  194.144622]  sch_direct_xmit+0xe3/0x280
-[  194.147748]  __dev_queue_xmit+0x54a/0xb30
-[  194.154131]  tap_get_user+0x2a8/0x9c0 [tap]
-[  194.157358]  tap_sendmsg+0x52/0x8e0 [tap]
-[  194.167049]  handle_tx_zerocopy+0x14e/0x4c0 [vhost_net]
-[  194.173631]  handle_tx+0xcd/0xe0 [vhost_net]
-[  194.176959]  vhost_worker+0x76/0xb0 [vhost]
-[  194.183667]  kthread+0x118/0x140
-[  194.190358]  ret_from_fork+0x1f/0x30
-[  194.193670]  </TASK>
+As you said, the protocol difference is arguable. It's not a property of the
+route, just a hint.
+I think the 'append' should match a route whatever the protocol is.
+'ip route change' for example does not use the protocol to find the existing
+route, it will update it:
 
-In this case calling skb_orphan_frags() updated nr_frags leaving nrfrags
-local variable in skb_segment() stale. This resulted in the code hitting
-i >= nrfrags prematurely and trying to move to next frag_skb using
-list_skb pointer, which was NULL, and caused kernel panic. Move the call
-to zero copy functions before using frags and nr_frags.
+$ ip -6 route add 2003:1:2:3::/64 via 2001::2 dev eth1
+$ ip -6 route
+2003:1:2:3::/64 via 2001::2 dev eth1 metric 1024 pref medium
+$ ip -6 route change 2003:1:2:3::/64 via 2001::2 dev eth1 protocol bgp
+$ ip -6 route
+2003:1:2:3::/64 via 2001::2 dev eth1 proto bgp metric 1024 pref medium
+$ ip -6 route change 2003:1:2:3::/64 via 2001::2 dev eth1 protocol kernel
+$ ip -6 route
+2003:1:2:3::/64 via 2001::2 dev eth1 proto kernel metric 1024 pref medium
 
-Fixes: bf5c25d60861 ("skbuff: in skb_segment, call zerocopy functions once per nskb")
-Signed-off-by: Mohamed Khalfella <mkhalfella@purestorage.com>
-Reported-by: Amit Goyal <agoyal@purestorage.com>
-Cc: stable@vger.kernel.org
----
- net/core/skbuff.c | 34 ++++++++++++++++++++--------------
- 1 file changed, 20 insertions(+), 14 deletions(-)
+Why would 'append' selects route differently?
 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index a298992060e6..74a8829a6b59 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -4354,21 +4354,20 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
- 	struct sk_buff *segs = NULL;
- 	struct sk_buff *tail = NULL;
- 	struct sk_buff *list_skb = skb_shinfo(head_skb)->frag_list;
--	skb_frag_t *frag = skb_shinfo(head_skb)->frags;
- 	unsigned int mss = skb_shinfo(head_skb)->gso_size;
- 	unsigned int doffset = head_skb->data - skb_mac_header(head_skb);
--	struct sk_buff *frag_skb = head_skb;
- 	unsigned int offset = doffset;
- 	unsigned int tnl_hlen = skb_tnl_header_len(head_skb);
- 	unsigned int partial_segs = 0;
- 	unsigned int headroom;
- 	unsigned int len = head_skb->len;
-+	struct sk_buff *frag_skb;
-+	skb_frag_t *frag;
- 	__be16 proto;
- 	bool csum, sg;
--	int nfrags = skb_shinfo(head_skb)->nr_frags;
- 	int err = -ENOMEM;
- 	int i = 0;
--	int pos;
-+	int nfrags, pos;
- 
- 	if ((skb_shinfo(head_skb)->gso_type & SKB_GSO_DODGY) &&
- 	    mss != GSO_BY_FRAGS && mss != skb_headlen(head_skb)) {
-@@ -4445,6 +4444,13 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
- 	headroom = skb_headroom(head_skb);
- 	pos = skb_headlen(head_skb);
- 
-+	if (skb_orphan_frags(head_skb, GFP_ATOMIC))
-+		return ERR_PTR(-ENOMEM);
-+
-+	nfrags = skb_shinfo(head_skb)->nr_frags;
-+	frag = skb_shinfo(head_skb)->frags;
-+	frag_skb = head_skb;
-+
- 	do {
- 		struct sk_buff *nskb;
- 		skb_frag_t *nskb_frag;
-@@ -4465,6 +4471,10 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
- 		    (skb_headlen(list_skb) == len || sg)) {
- 			BUG_ON(skb_headlen(list_skb) > len);
- 
-+			nskb = skb_clone(list_skb, GFP_ATOMIC);
-+			if (unlikely(!nskb))
-+				goto err;
-+
- 			i = 0;
- 			nfrags = skb_shinfo(list_skb)->nr_frags;
- 			frag = skb_shinfo(list_skb)->frags;
-@@ -4483,12 +4493,8 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
- 				frag++;
- 			}
- 
--			nskb = skb_clone(list_skb, GFP_ATOMIC);
- 			list_skb = list_skb->next;
- 
--			if (unlikely(!nskb))
--				goto err;
--
- 			if (unlikely(pskb_trim(nskb, len))) {
- 				kfree_skb(nskb);
- 				goto err;
-@@ -4564,12 +4570,16 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
- 		skb_shinfo(nskb)->flags |= skb_shinfo(head_skb)->flags &
- 					   SKBFL_SHARED_FRAG;
- 
--		if (skb_orphan_frags(frag_skb, GFP_ATOMIC) ||
--		    skb_zerocopy_clone(nskb, frag_skb, GFP_ATOMIC))
-+		if (skb_zerocopy_clone(nskb, frag_skb, GFP_ATOMIC))
- 			goto err;
- 
- 		while (pos < offset + len) {
- 			if (i >= nfrags) {
-+				if (skb_orphan_frags(list_skb, GFP_ATOMIC) ||
-+				    skb_zerocopy_clone(nskb, list_skb,
-+						       GFP_ATOMIC))
-+					goto err;
-+
- 				i = 0;
- 				nfrags = skb_shinfo(list_skb)->nr_frags;
- 				frag = skb_shinfo(list_skb)->frags;
-@@ -4583,10 +4593,6 @@ struct sk_buff *skb_segment(struct sk_buff *head_skb,
- 					i--;
- 					frag--;
- 				}
--				if (skb_orphan_frags(frag_skb, GFP_ATOMIC) ||
--				    skb_zerocopy_clone(nskb, frag_skb,
--						       GFP_ATOMIC))
--					goto err;
- 
- 				list_skb = list_skb->next;
- 			}
--- 
-2.17.1
-
+This patch breaks the legacy API.
 
