@@ -1,150 +1,139 @@
-Return-Path: <netdev+bounces-31491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97F7978E5E5
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 07:41:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 411BA78E610
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 07:59:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C49B01C2097C
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 05:41:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F2AE281034
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 05:59:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75F9D1855;
-	Thu, 31 Aug 2023 05:41:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EB3B186A;
+	Thu, 31 Aug 2023 05:59:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 628D01846
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 05:41:01 +0000 (UTC)
-Received: from mail-oo1-xc32.google.com (mail-oo1-xc32.google.com [IPv6:2607:f8b0:4864:20::c32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE979EA
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 22:40:54 -0700 (PDT)
-Received: by mail-oo1-xc32.google.com with SMTP id 006d021491bc7-573675e6b43so332882eaf.0
-        for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 22:40:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F8241855
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 05:59:52 +0000 (UTC)
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09307E0;
+	Wed, 30 Aug 2023 22:59:52 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id 98e67ed59e1d1-26fc9e49859so342178a91.0;
+        Wed, 30 Aug 2023 22:59:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693460454; x=1694065254; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=U5IfIVeN01tRJkWFJQjJszLVp4Gy6lQv3JzGFgaAZn0=;
-        b=YBGiC8eEwm4dumRgvmmZ8wZM2rMnBVjckjpi0RjC8w0qPFjlZ/EiFSp8v/6A7Ax9oe
-         O0dM1G456Ud38NJ2yuLbUHVGtq2I2WJ3k2KMtcUHX3eBwapiQydtk+1A8r4WqLc6djji
-         q/waYj1uqyVJkUA4ncFFUOU7CD8Y0JuxHymuzbQiuJf72pzS3LMykNg4dzVfq4etIzOC
-         wisbGorw/zB7bvp1oL9PAnP/WTNmceDnjAp/mFTtKGIsYRVYwuRFJFAw/OiMx+gHrEF4
-         Xm5ITb3GqG6j/iczCnLqDMdJ8GCNz6YhWrTPzE1V83KwR5TcelW57K+A3v5ZoaCR2ExO
-         w91A==
+        d=gmail.com; s=20221208; t=1693461591; x=1694066391; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Zf4ZLHQJDSZ6LP6AyJ6FAFVwKlDmGeG8mwIgn9s5FDo=;
+        b=OH/VqLtVxe3z+SemSb1icUSBoaHOCN+GroS/WAAKL63irDdrRepY0WdkyWq5B2jliV
+         383C5SIZyDLS5Uh3lOgFa/Dhg29QlmRi9tBPAF0b40xGeQrlkSRnFbJG3aZTIYK0cgH8
+         +h8IHBs2jBEC17CdOcKhkFYNSqJ6xybBO30VPmK/8QVrUVowSPiufoYnj6F540QXCeL+
+         CKaX/nE1eqqDVzOWl/VT81zUrRZNFnCkwnoDcQ1Bku+J8GiENXP5Eq/tIgve6x4lzefH
+         b9Lhfh4Mm8QBi60q9aia48i7CSBuuYb6AMLk2NIjArvpvpu3sqUKL1dIn6p7pH0YepMr
+         RWjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693460454; x=1694065254;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=U5IfIVeN01tRJkWFJQjJszLVp4Gy6lQv3JzGFgaAZn0=;
-        b=Sh2sFcaK/Uy0Uo4w518bfrq2zR3yq7FDj+oXcXRfK+wbRHuLYijpgrycDzBJz68LD9
-         bPCGXp3vUPRJdop5fpRGRodUekjRbbVmu6GRbGUi/ypDkz2UWcbOj/nv4+bQsE5Gwd/N
-         x71hoIcZFRD5ot+niypvw3om2lq4g2rT2DgOwWkQ66jzqANs4SEhC4EspoOWGatfsNlo
-         pDffRETAJVVkGVfoM/IfUrrwn9M8lAV031vLYMYeU+pkVk7DbtUSWf4fF1YoQaLl2wBG
-         JsJdMciZcMQZdUbLm2Cfys3MHwCjZLwihp+UeTt6JAeBvSYWzgz5tMrvN4PeG8iFx2NE
-         PEDg==
-X-Gm-Message-State: AOJu0YwL2eBB4ezeVthpTGrWHh3yDAQX/xbCZu1CIdbenLL2OwNdQLET
-	tq3dD6D35zwnjLwAqSxr/VSlOHPd12QeCk5YChI=
-X-Google-Smtp-Source: AGHT+IFgpj+w4DEo7DAVAPnkl/uS+evMrGSCVWit0YAk4WeNLM2L4GkPc6OBhajHUUvMhJqEUouUJu626FnejLbiiHo=
-X-Received: by 2002:a4a:314f:0:b0:571:1fad:ebdb with SMTP id
- v15-20020a4a314f000000b005711fadebdbmr4222314oog.3.1693460453960; Wed, 30 Aug
- 2023 22:40:53 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1693461591; x=1694066391;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Zf4ZLHQJDSZ6LP6AyJ6FAFVwKlDmGeG8mwIgn9s5FDo=;
+        b=epgGWTdS5KqcqCeEX/KDnZyqVS8hjmc5SDSKwttvTJ3i0v8l5s5QkQil2yjQGuGV30
+         2GeFv43skvopISZ1zNxR0pTTx3rEzIS8PdBn5a5Qo8AVmPtfQwC96JgGwD2fYwgq2sSv
+         w572gIprJD1do2+jwOr7N/SJ3nIqLLj+9G1z4ZnpBLUecfchT99Zx5q+eELCUG3Xzccg
+         EXNCicm5ZnJQ79+IbcaeYkigj9IybvjOoxBMF6iAWWLKHsGS4qrVNJseobPMhFquuQh+
+         3tiknVbNRb5+rvmL2L5AVB5xHyZYtvj7VHR937V7HU3Wab1C77jpADudilviw09kID7W
+         D2uQ==
+X-Gm-Message-State: AOJu0YzmCIA2DKMetzQVhNoGvm698Y8CSnuRVq/uXtQf8+M3P6/NxOm6
+	3xYa5gAdVkj/U11QiCZVuqsX8R5s/vU=
+X-Google-Smtp-Source: AGHT+IE5hnyEGLipkDO9TTKdoDXpsktWQ5QVaIitLUAr5zJXsi0uL0HEXzLGFL1it0swdOmOyXwtXw==
+X-Received: by 2002:a17:90a:b305:b0:263:e423:5939 with SMTP id d5-20020a17090ab30500b00263e4235939mr4273224pjr.28.1693461591407;
+        Wed, 30 Aug 2023 22:59:51 -0700 (PDT)
+Received: from debian.me ([103.124.138.83])
+        by smtp.gmail.com with ESMTPSA id j23-20020a17090ae61700b00268238583acsm2156218pjy.32.2023.08.30.22.59.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Aug 2023 22:59:50 -0700 (PDT)
+Received: by debian.me (Postfix, from userid 1000)
+	id 1474D8205DE8; Thu, 31 Aug 2023 12:59:47 +0700 (WIB)
+Date: Thu, 31 Aug 2023 12:59:47 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: youngbludproductions <youngbludproductions@proton.me>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: Linux Networking <netdev@vger.kernel.org>
+Subject: Re: [PATCH] Update: Fixing SSH Hardware Key Issue
+Message-ID: <ZPAsU4Ywy44gqlt5@debian.me>
+References: <TQT4YufaV3YuStoFkD5gAcplDIsO76FYEqGQqYzLxrWzgNJ2FwqI__DjgyBZlPSOV6BVJXE54Wf8zroK728hlDXV2Mn5wt9kw2iovRBGPuI=@proton.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230821011116.21931-1-alexhenrie24@gmail.com>
- <20230829054623.104293-1-alexhenrie24@gmail.com> <20230829054623.104293-4-alexhenrie24@gmail.com>
- <20230830182852.175e0ac2@kernel.org>
-In-Reply-To: <20230830182852.175e0ac2@kernel.org>
-From: Alex Henrie <alexhenrie24@gmail.com>
-Date: Wed, 30 Aug 2023 23:40:17 -0600
-Message-ID: <CAMMLpeSQaHRWXfxS3ew_pbKq93VRDaFGJTkWhwKzu_5hf-REFQ@mail.gmail.com>
-Subject: Re: [PATCH v2 3/5] net: ipv6/addrconf: clamp preferred_lft to the
- minimum required
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, jbohac@suse.cz, benoit.boissinot@ens-lyon.org, 
-	davem@davemloft.net, hideaki.yoshifuji@miraclelinux.com, dsahern@kernel.org, 
-	pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="/12qiNF5hL0WbB6p"
+Content-Disposition: inline
+In-Reply-To: <TQT4YufaV3YuStoFkD5gAcplDIsO76FYEqGQqYzLxrWzgNJ2FwqI__DjgyBZlPSOV6BVJXE54Wf8zroK728hlDXV2Mn5wt9kw2iovRBGPuI=@proton.me>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Aug 30, 2023 at 7:28=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Mon, 28 Aug 2023 23:44:45 -0600 Alex Henrie wrote:
-> > If the preferred lifetime was less than the minimum required lifetime,
-> > ipv6_create_tempaddr would error out without creating any new address.
-> > On my machine and network, this error happened immediately with the
-> > preferred lifetime set to 1 second, after a few minutes with the
-> > preferred lifetime set to 4 seconds, and not at all with the preferred
-> > lifetime set to 5 seconds. During my investigation, I found a Stack
-> > Exchange post from another person who seems to have had the same
-> > problem: They stopped getting new addresses if they lowered the
-> > preferred lifetime below 3 seconds, and they didn't really know why.
-> >
-> > The preferred lifetime is a preference, not a hard requirement. The
-> > kernel does not strictly forbid new connections on a deprecated address=
-,
-> > nor does it guarantee that the address will be disposed of the instant
-> > its total valid lifetime expires. So rather than disable IPv6 privacy
-> > extensions altogether if the minimum required lifetime swells above the
-> > preferred lifetime, it is more in keeping with the user's intent to
-> > increase the temporary address's lifetime to the minimum necessary for
-> > the current network conditions.
-> >
-> > With these fixes, setting the preferred lifetime to 3 or 4 seconds "jus=
-t
-> > works" because the extra fraction of a second is practically
-> > unnoticeable. It's even possible to reduce the time before deprecation
-> > to 1 or 2 seconds by also disabling duplicate address detection (settin=
-g
-> > /proc/sys/net/ipv6/conf/*/dad_transmits to 0). I realize that that is a
-> > pretty niche use case, but I know at least one person who would gladly
-> > sacrifice performance and convenience to be sure that they are getting
-> > the maximum possible level of privacy.
->
-> Not entirely sure what the best way to handle this is.
-> And whether the patch should be treated as a Fix or "general
-> improvement" - meaning - whether we should try to backport this :(
 
-I'm not exactly a subject matter expert here, but for what it's worth,
-I think it's important but not important enough to backport. (I would
-definitely like to backport the integer underflow fix though.) I'd
-love to get more people to test these patches and to hear more from
-the original authors.
+--/12qiNF5hL0WbB6p
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> > Link: https://serverfault.com/a/1031168/310447
-> > Fixes: eac55bf97094 (IPv6: do not create temporary adresses with too sh=
-ort preferred lifetime, 2008-04-02)
->
-> Thanks for adding the Fixes tag - you're missing the quotes inside
-> the parenthesis:
->
-> Fixes: eac55bf97094 ("IPv6: do not create temporary adresses with too sho=
-rt preferred lifetime, 2008-04-02")
->
-> The exact format is important since people may script around it.
-> Since we haven't heard back from Paolo or David on v2 could you repost
-> with that fixed?
+On Thu, Aug 31, 2023 at 05:20:19AM +0000, youngbludproductions wrote:
+> Hey folks,
+>=20
+> I've been experiencing some weird behavior with SSH and my hardware key. =
+After some investigation, I've identified the root cause and prepared a pat=
+ch to address the issue.
+>=20
+> The patch modifies the SSH code to ensure proper handling of hardware key=
+s, resolving the unexpected behavior. I've tested it extensively and it see=
+ms to resolve the problem on my end.
+>=20
+> Please find the patch below:
+>=20
+> diff --git a/net/ssh.c b/net/ssh.c
+> index 1234567..abcdefg 100644
+> --- a/net/ssh.c
+> +++ b/net/ssh.c
+> @@ -123,7 +123,7 @@ static int ssh_handle_key(struct ssh_session *session=
+, struct ssh_key *key)
+>         /* Code to handle key goes here */
+>         return 0;
+>  }
+>=20
+> -// Additional changes go here
+> +// Additional changes go here to fix the hardware key issue
 
-Sorry, I should have looked at the examples more closely instead of
-assuming that they were the same as `git log --format=3Dref`. I will
-send a v3 with the Fixes tags in the conventional Linux kernel format.
+What? Dummy diff?
 
-Thanks for the feedback,
+Does configuring openssh not fix your issue so that you have to resort
+to patching openssh package?
 
--Alex
+Confused...
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--/12qiNF5hL0WbB6p
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZPAsSwAKCRD2uYlJVVFO
+o+EKAP9TmiqOLbJWKdkc/KDxG3OiY0D5VH64KsVbmQx5Eom2qgD+KwWllvS4Xtbp
+dpDArBYsw52SGAFlS4PGq8YPDY893ws=
+=0eZy
+-----END PGP SIGNATURE-----
+
+--/12qiNF5hL0WbB6p--
 
