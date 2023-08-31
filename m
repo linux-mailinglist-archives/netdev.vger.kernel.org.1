@@ -1,147 +1,274 @@
-Return-Path: <netdev+bounces-31502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6EE078E6BC
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 08:46:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D449778E6E7
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 08:59:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9EF31C208C7
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 06:46:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF17E1C20858
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 06:59:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E9DA1FD9;
-	Thu, 31 Aug 2023 06:46:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EE395258;
+	Thu, 31 Aug 2023 06:59:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 231121C20
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 06:46:51 +0000 (UTC)
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07297A4;
-	Wed, 30 Aug 2023 23:46:51 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id 98e67ed59e1d1-26d0d376ec7so371958a91.2;
-        Wed, 30 Aug 2023 23:46:51 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AD3C5257
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 06:59:08 +0000 (UTC)
+Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E52BCE9
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 23:59:03 -0700 (PDT)
+Received: by mail-qt1-x836.google.com with SMTP id d75a77b69052e-40c72caec5cso227011cf.0
+        for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 23:59:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693464410; x=1694069210; darn=vger.kernel.org;
+        d=google.com; s=20221208; t=1693465142; x=1694069942; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Hwsn/fhLrXXqL5sdshf2nxUI7vcdgz+hyuqbEx4WJpU=;
-        b=XSwoOqw9iye92fg49LCWJoD7tbwBLcr0w/4Sb0L481G36aNuk4KV+RCkBlhQo9zTzP
-         CRfdbL0DY+JIpi0egfl3RtgxTd5JJ5h7kQTv6bEWUdWD2wRFbbWqBEE7EwlJzMH9w747
-         ezY7ZBDLQ/j03KYTPGxv3DRq7jfIDzcIKF3SqJXk52k1NEVJND2ZdxISjdd896+Nflqe
-         7KPJ55s2YZiCKn4x/3mUwdETcBA83soCz16jsqSrdLp4fki5REvTUrY9slRCjQ/I4Hr6
-         JfLB7xuJdEIWvImLjmte/UrQkeexjH4oBkQ2eWQY2gtCfBA0unk9wbcBVWAEw/p/gFFm
-         FOWw==
+        bh=IOHsH3FuQowJe3RoNYbiGF4iqcicBzMr1cRMvpWiXTQ=;
+        b=N0Kn0kBUW7GQcWOxBKp0dYup+961GEeN1OQbG++hieEcHPXePKfg5DMMJ+feZS/edj
+         roCcpeonzC+PlFqvg6kRI/it4mCbd12Z+Hr5iNflkQtcnuUYmqluMlCetIT00M44goBm
+         nhq6fLqhb0a6bgQseyKf+QhIDHK62USozzl+sJOp3aRE99l6nmDEaarFFm6ZjIQTkpK8
+         VbcDcKda8DTqa1yZp5SLiDVlr2H6FeNx0NMolnjH7U21/aIFSM4ST5aPs41q5EZzKij9
+         qjrhOP8ppjeJohHh202B6qtvtIeVpp3GiuXGFSxJ+YM8JcFz1ZZLWKbYtFdirlEUSbkK
+         K8JA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693464410; x=1694069210;
+        d=1e100.net; s=20221208; t=1693465142; x=1694069942;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Hwsn/fhLrXXqL5sdshf2nxUI7vcdgz+hyuqbEx4WJpU=;
-        b=h/GVZ4ct3u91HpBljzZ6JYWTFqYewU1UOWYdlf7SqNbFK0dz9Va22B31GHLiZhUpnR
-         1lBvF5vpKwh8JDffUtwIs/V7VWONJWTxB+jFgx++vBUUAHnEldH9sUHkhUtEGULcjQ55
-         NgKRzf9MKWHhiIjR36qk6/syRpFRqKbF3dyQBBV5/JmVijJJH7U8GA5X3gCnlUnt9tur
-         CkplZ91YjM5H7IT9MYe/l1bv7rAxjGSDG5EuWcYST6y7S8XYQoF640zCjyMks3+gBXrN
-         M3yXKH220KCuw8ZVFQux6D01Azm4UagVk6NdIE5bweQMXC8azxLZ5Rbyz6LCH2qbkZG8
-         tG5w==
-X-Gm-Message-State: AOJu0YyyZPRn65P/OL8MLggvpXIsHMXEJ0zIH3Q6D+DGmoGFezB3DHUv
-	QafHM06Rw4F77KejIhVsXvy6PEgePIDcMmUX82U=
-X-Google-Smtp-Source: AGHT+IFoRkwGonaGpiH4PQM+abnBEm7q/IGhhzLOeOQMfiF7bwrsvt1J75ta+aGQdSdMdA5GtegUPiVAwRqS5tw0MIA=
-X-Received: by 2002:a17:90a:bb15:b0:26d:227c:9068 with SMTP id
- u21-20020a17090abb1500b0026d227c9068mr4164858pjr.16.1693464410160; Wed, 30
- Aug 2023 23:46:50 -0700 (PDT)
+        bh=IOHsH3FuQowJe3RoNYbiGF4iqcicBzMr1cRMvpWiXTQ=;
+        b=OU+/4gXabBwhhz1xmazXVcEMT4yHJ1YhN2Vca16R5XODQUlS/M+gKcGD0TkZQv0U2j
+         yk0g3SC93/sU/6/xowBoFjFNgZdSM8FL8pSLpTL3OHtP5/hpgsOaB3ok3tZa1T9TioG5
+         uYVlpI0CTYVpdSRXjTNVJDCAXPrNBcQQ1FSQ4VdxfGBbG0jE1ZADHIJCy78x+aJdipx3
+         tjNHPr/kmr8x/8yqSX2qBY5m5A6RMQJJqtXCSlAGlhjYr+xnhVBb2C/SBD/qbpBN6QEU
+         YdpbPEH74idtRGaBBJYIedwWHA0WCR3F0iE4U/Rk0IFsjIhZe5sQKIYSDmcZdll/qDmq
+         DJOQ==
+X-Gm-Message-State: AOJu0YxvGtnXxIqgWCbvG5s6UJrfvWdqqlN6bNZL1npCQcf7xSZIb5ih
+	ET/5Ki9f+21AyVkd4MjwoZjuFD3op44470gTK7RyQQ==
+X-Google-Smtp-Source: AGHT+IGBcKysU77vcTgjUTs8+44BbI/uugse6nl0ocYjxaZcPVstg2ZhvTc+/xgphGEcs8NpbooKk0RdkM8FCGYaI3g=
+X-Received: by 2002:ac8:7f0c:0:b0:3f5:2006:50f1 with SMTP id
+ f12-20020ac87f0c000000b003f5200650f1mr210597qtk.12.1693465142241; Wed, 30 Aug
+ 2023 23:59:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230725030026.1664873-1-zyytlz.wz@163.com> <20230815100844.GA495519@google.com>
- <20230829134616.GA215597@google.com> <CAJedcCyFqJiXa9QHM6-Mg1ezF2tOKkyv2ukoOu+_T3YAdEhWdQ@mail.gmail.com>
-In-Reply-To: <CAJedcCyFqJiXa9QHM6-Mg1ezF2tOKkyv2ukoOu+_T3YAdEhWdQ@mail.gmail.com>
-From: Zheng Hacker <hackerzheng666@gmail.com>
-Date: Thu, 31 Aug 2023 14:46:38 +0800
-Message-ID: <CAJedcCxE3gbiF4_MTeTXNpcr4zPA0KtBw_qEq_pP8x=3PhVo5Q@mail.gmail.com>
-Subject: Re: [PATCH v4] net: ravb: Fix possible UAF bug in ravb_remove
-To: Lee Jones <lee@kernel.org>, Simon Horman <simon.horman@corigine.com>
-Cc: Zheng Wang <zyytlz.wz@163.com>, s.shtylyov@omp.ru, linyunsheng@huawei.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	richardcochran@gmail.com, p.zabel@pengutronix.de, geert+renesas@glider.be, 
-	magnus.damm@gmail.com, yoshihiro.shimoda.uh@renesas.com, 
-	biju.das.jz@bp.renesas.com, wsa+renesas@sang-engineering.com, 
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, 1395428693sheep@gmail.com, 
-	alex000young@gmail.com
+References: <64ed7188a2745_9cf208e1@penguin.notmuch> <20230830232811.9876-1-mkhalfella@purestorage.com>
+In-Reply-To: <20230830232811.9876-1-mkhalfella@purestorage.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 31 Aug 2023 08:58:51 +0200
+Message-ID: <CANn89iJVnS_dGDtU7AVWgVrun-p68DZ0A3Pde47MHNeeQ2nwRA@mail.gmail.com>
+Subject: Re: [PATCH v2] skbuff: skb_segment, Call zero copy functions before
+ using skbuff frags
+To: Mohamed Khalfella <mkhalfella@purestorage.com>
+Cc: willemdebruijn.kernel@gmail.com, alexanderduyck@fb.com, 
+	bpf@vger.kernel.org, brouer@redhat.com, davem@davemloft.net, 
+	dhowells@redhat.com, keescook@chromium.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	willemb@google.com, stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi everyone,
-
-After reviewing all comments about the patch. I agree with Jakub. But
-adding reference on net_device is a big move. All related drivers must
-modify the code.
-For now, I couldn't think a better idea about the fix. Thanks for your
-effort and sorry for my late reply.
-
-Best regards,
-Zheng Wang
-
-Zheng Hacker <hackerzheng666@gmail.com> =E4=BA=8E2023=E5=B9=B48=E6=9C=8830=
-=E6=97=A5=E5=91=A8=E4=B8=89 12:30=E5=86=99=E9=81=93=EF=BC=9A
+On Thu, Aug 31, 2023 at 1:28=E2=80=AFAM Mohamed Khalfella
+<mkhalfella@purestorage.com> wrote:
 >
-> Sorry for my late reply. I'll update another patch later today.
+> Commit bf5c25d60861 ("skbuff: in skb_segment, call zerocopy functions
+> once per nskb") added the call to zero copy functions in skb_segment().
+> The change introduced a bug in skb_segment() because skb_orphan_frags()
+> may possibly change the number of fragments or allocate new fragments
+> altogether leaving nrfrags and frag to point to the old values. This can
+> cause a panic with stacktrace like the one below.
 >
-> Best regards,
-> Zheng
+> [  193.894380] BUG: kernel NULL pointer dereference, address: 00000000000=
+000bc
+> [  193.895273] CPU: 13 PID: 18164 Comm: vh-net-17428 Kdump: loaded Tainte=
+d: G           O      5.15.123+ #26
+> [  193.903919] RIP: 0010:skb_segment+0xb0e/0x12f0
+> [  194.021892] Call Trace:
+> [  194.027422]  <TASK>
+> [  194.072861]  tcp_gso_segment+0x107/0x540
+> [  194.082031]  inet_gso_segment+0x15c/0x3d0
+> [  194.090783]  skb_mac_gso_segment+0x9f/0x110
+> [  194.095016]  __skb_gso_segment+0xc1/0x190
+> [  194.103131]  netem_enqueue+0x290/0xb10 [sch_netem]
+> [  194.107071]  dev_qdisc_enqueue+0x16/0x70
+> [  194.110884]  __dev_queue_xmit+0x63b/0xb30
+> [  194.121670]  bond_start_xmit+0x159/0x380 [bonding]
+> [  194.128506]  dev_hard_start_xmit+0xc3/0x1e0
+> [  194.131787]  __dev_queue_xmit+0x8a0/0xb30
+> [  194.138225]  macvlan_start_xmit+0x4f/0x100 [macvlan]
+> [  194.141477]  dev_hard_start_xmit+0xc3/0x1e0
+> [  194.144622]  sch_direct_xmit+0xe3/0x280
+> [  194.147748]  __dev_queue_xmit+0x54a/0xb30
+> [  194.154131]  tap_get_user+0x2a8/0x9c0 [tap]
+> [  194.157358]  tap_sendmsg+0x52/0x8e0 [tap]
+> [  194.167049]  handle_tx_zerocopy+0x14e/0x4c0 [vhost_net]
+> [  194.173631]  handle_tx+0xcd/0xe0 [vhost_net]
+> [  194.176959]  vhost_worker+0x76/0xb0 [vhost]
+> [  194.183667]  kthread+0x118/0x140
+> [  194.190358]  ret_from_fork+0x1f/0x30
+> [  194.193670]  </TASK>
 >
-> Lee Jones <lee@kernel.org> =E4=BA=8E2023=E5=B9=B48=E6=9C=8829=E6=97=A5=E5=
-=91=A8=E4=BA=8C 21:46=E5=86=99=E9=81=93=EF=BC=9A
-> >
-> > On Tue, 15 Aug 2023, Lee Jones wrote:
-> >
-> > > On Tue, 25 Jul 2023, Zheng Wang wrote:
-> > >
-> > > > In ravb_probe, priv->work was bound with ravb_tx_timeout_work.
-> > > > If timeout occurs, it will start the work. And if we call
-> > > > ravb_remove without finishing the work, there may be a
-> > > > use-after-free bug on ndev.
-> > > >
-> > > > Fix it by finishing the job before cleanup in ravb_remove.
-> > > >
-> > > > Note that this bug is found by static analysis, it might be
-> > > > false positive.
-> > > >
-> > > > Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
-> > > > Signed-off-by: Zheng Wang <zyytlz.wz@163.com>
-> > > > Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-> > > > ---
-> > > > v4:
-> > > > - add information about the bug was found suggested by Yunsheng Lin
-> > > > v3:
-> > > > - fix typo in commit message
-> > > > v2:
-> > > > - stop dev_watchdog so that handle no more timeout work suggested b=
-y Yunsheng Lin,
-> > > > add an empty line to make code clear suggested by Sergey Shtylyov
-> > > > ---
-> > > >  drivers/net/ethernet/renesas/ravb_main.c | 3 +++
-> > > >  1 file changed, 3 insertions(+)
-> > >
-> > > Trying my best not to sound like a broken record, but ...
-> > >
-> > > What's the latest with this fix?  Is a v5 en route?
-> >
-> > Any update please Zheng Wang?
-> >
-> > --
-> > Lee Jones [=E6=9D=8E=E7=90=BC=E6=96=AF]
+> In this case calling skb_orphan_frags() updated nr_frags leaving nrfrags
+> local variable in skb_segment() stale. This resulted in the code hitting
+> i >=3D nrfrags prematurely and trying to move to next frag_skb using
+> list_skb pointer, which was NULL, and caused kernel panic. Move the call
+> to zero copy functions before using frags and nr_frags.
+>
+> Fixes: bf5c25d60861 ("skbuff: in skb_segment, call zerocopy functions onc=
+e per nskb")
+> Signed-off-by: Mohamed Khalfella <mkhalfella@purestorage.com>
+> Reported-by: Amit Goyal <agoyal@purestorage.com>
+> Cc: stable@vger.kernel.org
+> ---
+>  net/core/skbuff.c | 34 ++++++++++++++++++++--------------
+>  1 file changed, 20 insertions(+), 14 deletions(-)
+>
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index a298992060e6..18a33dc2d6af 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -4354,21 +4354,20 @@ struct sk_buff *skb_segment(struct sk_buff *head_=
+skb,
+>         struct sk_buff *segs =3D NULL;
+>         struct sk_buff *tail =3D NULL;
+>         struct sk_buff *list_skb =3D skb_shinfo(head_skb)->frag_list;
+> -       skb_frag_t *frag =3D skb_shinfo(head_skb)->frags;
+>         unsigned int mss =3D skb_shinfo(head_skb)->gso_size;
+>         unsigned int doffset =3D head_skb->data - skb_mac_header(head_skb=
+);
+> -       struct sk_buff *frag_skb =3D head_skb;
+>         unsigned int offset =3D doffset;
+>         unsigned int tnl_hlen =3D skb_tnl_header_len(head_skb);
+>         unsigned int partial_segs =3D 0;
+>         unsigned int headroom;
+>         unsigned int len =3D head_skb->len;
+> +       struct sk_buff *frag_skb;
+> +       skb_frag_t *frag;
+>         __be16 proto;
+>         bool csum, sg;
+> -       int nfrags =3D skb_shinfo(head_skb)->nr_frags;
+>         int err =3D -ENOMEM;
+>         int i =3D 0;
+> -       int pos;
+> +       int nfrags, pos;
+>
+>         if ((skb_shinfo(head_skb)->gso_type & SKB_GSO_DODGY) &&
+>             mss !=3D GSO_BY_FRAGS && mss !=3D skb_headlen(head_skb)) {
+> @@ -4445,6 +4444,13 @@ struct sk_buff *skb_segment(struct sk_buff *head_s=
+kb,
+>         headroom =3D skb_headroom(head_skb);
+>         pos =3D skb_headlen(head_skb);
+>
+> +       if (skb_orphan_frags(head_skb, GFP_ATOMIC))
+> +               return ERR_PTR(-ENOMEM);
+> +
+> +       nfrags =3D skb_shinfo(head_skb)->nr_frags;
+> +       frag =3D skb_shinfo(head_skb)->frags;
+> +       frag_skb =3D head_skb;
+> +
+>         do {
+>                 struct sk_buff *nskb;
+>                 skb_frag_t *nskb_frag;
+> @@ -4465,6 +4471,10 @@ struct sk_buff *skb_segment(struct sk_buff *head_s=
+kb,
+>                     (skb_headlen(list_skb) =3D=3D len || sg)) {
+>                         BUG_ON(skb_headlen(list_skb) > len);
+>
+> +                       nskb =3D skb_clone(list_skb, GFP_ATOMIC);
+> +                       if (unlikely(!nskb))
+> +                               goto err;
+> +
+
+This patch is quite complex to review, so I am asking if this part was
+really needed ?
+<1>  : You moved here <2> and <3>
+
+If this is not strictly needed, please keep the code as is to ease
+code review...
+
+>                         i =3D 0;
+>                         nfrags =3D skb_shinfo(list_skb)->nr_frags;
+>                         frag =3D skb_shinfo(list_skb)->frags;
+> @@ -4483,12 +4493,8 @@ struct sk_buff *skb_segment(struct sk_buff *head_s=
+kb,
+>                                 frag++;
+>                         }
+>
+> -                       nskb =3D skb_clone(list_skb, GFP_ATOMIC);
+
+<2>
+
+>                         list_skb =3D list_skb->next;
+>
+> -                       if (unlikely(!nskb))
+> -                               goto err;
+> -
+
+<3>
+
+>                         if (unlikely(pskb_trim(nskb, len))) {
+>                                 kfree_skb(nskb);
+>                                 goto err;
+> @@ -4564,12 +4570,16 @@ struct sk_buff *skb_segment(struct sk_buff *head_=
+skb,
+>                 skb_shinfo(nskb)->flags |=3D skb_shinfo(head_skb)->flags =
+&
+>                                            SKBFL_SHARED_FRAG;
+>
+> -               if (skb_orphan_frags(frag_skb, GFP_ATOMIC) ||
+> -                   skb_zerocopy_clone(nskb, frag_skb, GFP_ATOMIC))
+> +               if (skb_zerocopy_clone(nskb, list_skb, GFP_ATOMIC))
+
+Why using list_skb here instead of frag_skb ?
+Again, I have to look at the whole thing to understand why you did this.
+
+>                         goto err;
+>
+>                 while (pos < offset + len) {
+>                         if (i >=3D nfrags) {
+> +                               if (skb_orphan_frags(list_skb, GFP_ATOMIC=
+) ||
+> +                                   skb_zerocopy_clone(nskb, list_skb,
+> +                                                      GFP_ATOMIC))
+> +                                       goto err;
+> +
+
+This part is fine.
+
+>                                 i =3D 0;
+>                                 nfrags =3D skb_shinfo(list_skb)->nr_frags=
+;
+>                                 frag =3D skb_shinfo(list_skb)->frags;
+> @@ -4583,10 +4593,6 @@ struct sk_buff *skb_segment(struct sk_buff *head_s=
+kb,
+>                                         i--;
+>                                         frag--;
+>                                 }
+> -                               if (skb_orphan_frags(frag_skb, GFP_ATOMIC=
+) ||
+> -                                   skb_zerocopy_clone(nskb, frag_skb,
+> -                                                      GFP_ATOMIC))
+> -                                       goto err;
+>
+>                                 list_skb =3D list_skb->next;
+>                         }
+> --
+> 2.17.1
+>
+
+Thanks.
 
