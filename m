@@ -1,87 +1,114 @@
-Return-Path: <netdev+bounces-31639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31640-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC78578F2DC
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 20:48:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC87B78F331
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 21:18:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F4322816A3
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 18:48:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00DC11C20B05
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 19:18:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFE45198AE;
-	Thu, 31 Aug 2023 18:47:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53FE019BB4;
+	Thu, 31 Aug 2023 19:18:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3CA28F57
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 18:47:58 +0000 (UTC)
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E7EDE5F
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 11:47:57 -0700 (PDT)
-Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-99bcf2de59cso136525566b.0
-        for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 11:47:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43F5814A93
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 19:18:32 +0000 (UTC)
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62BCDE65
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 12:18:31 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1c1f8aaab9aso9482415ad.1
+        for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 12:18:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1693507675; x=1694112475; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=otamgPRS7Hkx5IKNXkHinQsi5qi2Cf9JHp7MAFPszyk=;
-        b=feHFvpJ20IOe8HR3kp4D5CSQ4HOeC0j2On2gZrWVA/ofX/PCJpiamHWF8fbf6qBDo8
-         qdl9+lPkhYI9u/seEE0HMC5gRCSznmiSn5FfJ4M+QOb1Bq0V/lWuwtOgLYj305EUYfVb
-         ve8Uvr6m4fn8ooJux6ZxlteTMkv8j+L8auolYQGZtaLVj2YExPZPFR3vqJ+KH7T8Rd3F
-         SAJ5G0aWBWFoIdQg/HA+RE59Syw5wSL3mL2fbPH9+talD0fO5xWKi02QdgKPE/aihX2+
-         7fjv2rpreXygUtP8mP1l+vuFv3dQNGjPAMeCRQ+5BqBTgLtcScObbHtUsp2NGl0bXiCw
-         UdKA==
+        d=chromium.org; s=google; t=1693509511; x=1694114311; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GsqiH/F0uiLsgZIOirUAxv8nRkz7x6zqX7vHcWml97w=;
+        b=c6Z1i7tbOl0pBGpw7EAB3G5WmSTikIg6ZqDWf/YIHaVKo8BRqj0K5M9bGo7GnBZPOZ
+         F8hQGw+1tQPmhlJmajGIqg6VgSIKa3s+ETXKfrP87Fj8GaWmkQ7p/UzIQmNZEjXreHU7
+         Dsly0nsqDp1M66pziR+EQCiwhCU7kVP6CBz54=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693507675; x=1694112475;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=otamgPRS7Hkx5IKNXkHinQsi5qi2Cf9JHp7MAFPszyk=;
-        b=hMKFpx0dfWDumKZkJV1GKMzj3C5T6AeflIlDBrzRpdF44Dqg/VYrDshEg+4c8tROvT
-         tvTfiMbV5ap37eQe+0liLhRgw/kd9SMD0erfrZiwzJBCg/QD4cA0FcKwFkr75hTJRTcr
-         MFy9mTLg845dn+7bMQQFc9zQ7Dznpufc+d29zZdU6uhv/WazdKhwQvGXQvEvr1GZlENF
-         8XaV28zTiEREA+pPJXMlvmJaGJyN1SrrRsWvdwyD/jNbJNjgK3FOGFZwBRUdTlJOC3Dw
-         W1FpEd8EcPvmuel00dPvY6ZhbYNbdpFzAbip1JlU/Y5InPR1MIMEmmIXmFAHjTV9spWZ
-         8iMg==
-X-Gm-Message-State: AOJu0Ywirpsl7xDKIiAyLYDByJUIApW+3Fx6pOu4Wq2+8bDe42jDqikt
-	WsRT9yrtUP/m7dufWZ8rythVf9uBc45pZ4Q76GScOM+77Vebg73pfRz1OA==
-X-Google-Smtp-Source: AGHT+IEEGDvG/frPq+NqgmrUJdeV0Tjp2O3eaeoOUwN5ug7HY6Z5OIJss6j569812PiAyYP3Y0yEp/UdwUQmKwFUz7Q=
-X-Received: by 2002:a17:907:2bc9:b0:9a1:f449:ebd5 with SMTP id
- gv9-20020a1709072bc900b009a1f449ebd5mr148003ejc.33.1693507675431; Thu, 31 Aug
- 2023 11:47:55 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1693509511; x=1694114311;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GsqiH/F0uiLsgZIOirUAxv8nRkz7x6zqX7vHcWml97w=;
+        b=fIoHXL5jeIegIdxa6ahcjKt/TA9okdx4Eb7zUcVBXNUxtQhpXUNx4BLIRFsDruD2f4
+         g4Q+oWPRg/Oz9dWuk+5gJ9FdMNQ14IakMQTjEH+2oG7fRLcZddr5iTFx5qgGBH8ZCPRY
+         IL3fHfynOLBzpZ7tFs/kJFy/SPX637GFzGUDwJAk3d6mInUG+A4fSx3U84B/EGaJIZcj
+         Sf7rblgBhWJBdmmBCao7Y6iI3anLk8b2xe/VgF95O7NuSbiwmCxIxd+rPcK46F6JVznv
+         WrgeoCHYql4+eJnKzTyP9dhXvFb5UT0BqHg6Ag2mDclEHDned9KHXLJR3a2W4H49sKTK
+         jEyQ==
+X-Gm-Message-State: AOJu0Yz5MHmjB+dZvnPJyoNSMgp++0PPtoE40+G9lChS1neJiEoqzHMp
+	L5s1NMeYhj2J+szB8LMjBx98bQ==
+X-Google-Smtp-Source: AGHT+IHAB09QJKFbJyJ6Mj/J8+vjv8IjfbkJCAe02z4bfIN2Qk8IUL2743Wr0Yrhw/3xqxR3apNxNg==
+X-Received: by 2002:a17:903:26d4:b0:1c0:aa04:dc2f with SMTP id jg20-20020a17090326d400b001c0aa04dc2fmr632850plb.11.1693509510884;
+        Thu, 31 Aug 2023 12:18:30 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id jf13-20020a170903268d00b001b8b07bc600sm1573727plb.186.2023.08.31.12.18.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Aug 2023 12:18:30 -0700 (PDT)
+Date: Thu, 31 Aug 2023 12:18:29 -0700
+From: Kees Cook <keescook@chromium.org>
+To: Jeff Johnson <quic_jjohnson@quicinc.com>
+Cc: kernel@quicinc.com, Kalle Valo <kvalo@kernel.org>,
+	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@toke.dk>,
+	Christian Lamparter <chunkeey@googlemail.com>,
+	Stanislaw Gruszka <stf_xl@wp.pl>,
+	Helmut Schaa <helmut.schaa@googlemail.com>,
+	Ping-Ke Shih <pkshih@realtek.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v3 2/2] mac80211: Use flexible array in struct
+ ieee80211_tim_ie
+Message-ID: <202308311218.D82D90A@keescook>
+References: <20230831-ieee80211_tim_ie-v3-0-e10ff584ab5d@quicinc.com>
+ <20230831-ieee80211_tim_ie-v3-2-e10ff584ab5d@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Jordan Rife <jrife@google.com>
-Date: Thu, 31 Aug 2023 11:47:44 -0700
-Message-ID: <CADKFtnSPTQGLxfpn38cfwTPk=JY-=Ywne2DFoRkq03m-eKo17Q@mail.gmail.com>
-Subject: Stable Backport: net: Avoid address overwrite in kernel_connect
-To: netdev@vger.kernel.org
-Cc: dborkman@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230831-ieee80211_tim_ie-v3-2-e10ff584ab5d@quicinc.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Upstream Commit ID: 0bdf399342c5acbd817c9098b6c7ed21f1974312
-Patchwork Link:
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=0bdf399342c5
-Requested Kernel Versions: 4.19, 5.4, 5.10, 5.15, 6.1, 6.4, 6.5
+On Thu, Aug 31, 2023 at 11:22:58AM -0700, Jeff Johnson wrote:
+> Currently struct ieee80211_tim_ie defines:
+> 	u8 virtual_map[1];
+> 
+> Per the guidance in [1] change this to be a flexible array.
+> 
+> Per the discussion in [2] wrap the virtual_map in a union with a u8
+> item in order to preserve the existing expectation that the
+> virtual_map must contain at least one octet (at least when used in a
+> non-S1G PPDU). This means that no driver changes are required.
+> 
+> [1] https://docs.kernel.org/process/deprecated.html#zero-length-and-one-element-arrays
+> [2] https://lore.kernel.org/linux-wireless/202308301529.AC90A9EF98@keescook/
+> 
+> Suggested-by: Kees Cook <keescook@chromium.org>
+> Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
 
-This patch addresses an incompatibility between eBPF connect4/connect6
-programs and kernel space clients such as NFS. At present, the issue
-this patch fixes is a blocker for users that want to combine NFS with
-Cilium. The fix has been applied upstream but the same bug exists with
-older kernels.
+Looks good to me! Thanks for the conversion. :)
 
--Jordan
+Reviewed-by: Kees Cook <keescook@chromium.org>
+
+-- 
+Kees Cook
 
