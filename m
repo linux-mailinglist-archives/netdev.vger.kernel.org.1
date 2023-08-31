@@ -1,274 +1,121 @@
-Return-Path: <netdev+bounces-31503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31504-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D449778E6E7
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 08:59:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED02778E6FE
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 09:13:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF17E1C20858
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 06:59:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16D2E2813B7
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 07:13:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EE395258;
-	Thu, 31 Aug 2023 06:59:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BC185257;
+	Thu, 31 Aug 2023 07:13:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AD3C5257
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 06:59:08 +0000 (UTC)
-Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E52BCE9
-	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 23:59:03 -0700 (PDT)
-Received: by mail-qt1-x836.google.com with SMTP id d75a77b69052e-40c72caec5cso227011cf.0
-        for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 23:59:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1693465142; x=1694069942; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IOHsH3FuQowJe3RoNYbiGF4iqcicBzMr1cRMvpWiXTQ=;
-        b=N0Kn0kBUW7GQcWOxBKp0dYup+961GEeN1OQbG++hieEcHPXePKfg5DMMJ+feZS/edj
-         roCcpeonzC+PlFqvg6kRI/it4mCbd12Z+Hr5iNflkQtcnuUYmqluMlCetIT00M44goBm
-         nhq6fLqhb0a6bgQseyKf+QhIDHK62USozzl+sJOp3aRE99l6nmDEaarFFm6ZjIQTkpK8
-         VbcDcKda8DTqa1yZp5SLiDVlr2H6FeNx0NMolnjH7U21/aIFSM4ST5aPs41q5EZzKij9
-         qjrhOP8ppjeJohHh202B6qtvtIeVpp3GiuXGFSxJ+YM8JcFz1ZZLWKbYtFdirlEUSbkK
-         K8JA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693465142; x=1694069942;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IOHsH3FuQowJe3RoNYbiGF4iqcicBzMr1cRMvpWiXTQ=;
-        b=OU+/4gXabBwhhz1xmazXVcEMT4yHJ1YhN2Vca16R5XODQUlS/M+gKcGD0TkZQv0U2j
-         yk0g3SC93/sU/6/xowBoFjFNgZdSM8FL8pSLpTL3OHtP5/hpgsOaB3ok3tZa1T9TioG5
-         uYVlpI0CTYVpdSRXjTNVJDCAXPrNBcQQ1FSQ4VdxfGBbG0jE1ZADHIJCy78x+aJdipx3
-         tjNHPr/kmr8x/8yqSX2qBY5m5A6RMQJJqtXCSlAGlhjYr+xnhVBb2C/SBD/qbpBN6QEU
-         YdpbPEH74idtRGaBBJYIedwWHA0WCR3F0iE4U/Rk0IFsjIhZe5sQKIYSDmcZdll/qDmq
-         DJOQ==
-X-Gm-Message-State: AOJu0YxvGtnXxIqgWCbvG5s6UJrfvWdqqlN6bNZL1npCQcf7xSZIb5ih
-	ET/5Ki9f+21AyVkd4MjwoZjuFD3op44470gTK7RyQQ==
-X-Google-Smtp-Source: AGHT+IGBcKysU77vcTgjUTs8+44BbI/uugse6nl0ocYjxaZcPVstg2ZhvTc+/xgphGEcs8NpbooKk0RdkM8FCGYaI3g=
-X-Received: by 2002:ac8:7f0c:0:b0:3f5:2006:50f1 with SMTP id
- f12-20020ac87f0c000000b003f5200650f1mr210597qtk.12.1693465142241; Wed, 30 Aug
- 2023 23:59:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F008C1FCC
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 07:13:27 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38D871A3;
+	Thu, 31 Aug 2023 00:13:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=nQmwGWZMB7/FjyQkzIZQo5e/NXyg0NMGcJ/zVLN4YVM=; b=TLvYmZJoAD9oJIu60xxX1dp8bi
+	BX9vjHQ10bcTo5gtekRo6qb+qBAWzvJUQ32D/qhLOo7FpL9FU6ngg9zVl6vHgEl4S8I/s6uIHoS9m
+	IH0H2zFT7bHOu1i+f5ttnG0U9Dj3UFpdvCAT367a0LoIl2fUGrI7f7O078ILYoOVqHVuICnn3SSAE
+	LnwGySpujw8zr6vt4nX6dodbDmebk47PUY79PfFlqNg1KuaSaFM8qm/SAJFVrYZ2d1x/TF4fXhmqg
+	FbQaLtPRkcmP9If36evOZSk92+WUnT2rdWMB5srGxIYD76jU8YG3/yh8wA5czv+i23WGRu+tKbCmH
+	GLRJfmWQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59796)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qbbrc-0002Vr-1x;
+	Thu, 31 Aug 2023 08:13:12 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qbbra-0006aH-J6; Thu, 31 Aug 2023 08:13:10 +0100
+Date: Thu, 31 Aug 2023 08:13:10 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Lukasz Majewski <lukma@denx.de>, Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Vladimir Oltean <olteanv@gmail.com>, Tristram.Ha@microchip.com,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	UNGLinuxDriver@microchip.com,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] net: phy: Provide Module 4 KSZ9477 errata
+ (DS80000754C)
+Message-ID: <ZPA9hmlew3mT2TVr@shell.armlinux.org.uk>
+References: <20230830125224.1012459f@wsk>
+ <20230830105941.GH31399@pengutronix.de>
+ <20230830135151.683303db@wsk>
+ <20230830121738.GJ31399@pengutronix.de>
+ <ZO83htinyfAp4mWw@shell.armlinux.org.uk>
+ <20230830130649.GK31399@pengutronix.de>
+ <ZO9Ejx9G8laNRasu@shell.armlinux.org.uk>
+ <20230830142650.GL31399@pengutronix.de>
+ <20230830183818.1f42919b@wsk>
+ <20230831044004.GA17603@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <64ed7188a2745_9cf208e1@penguin.notmuch> <20230830232811.9876-1-mkhalfella@purestorage.com>
-In-Reply-To: <20230830232811.9876-1-mkhalfella@purestorage.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 31 Aug 2023 08:58:51 +0200
-Message-ID: <CANn89iJVnS_dGDtU7AVWgVrun-p68DZ0A3Pde47MHNeeQ2nwRA@mail.gmail.com>
-Subject: Re: [PATCH v2] skbuff: skb_segment, Call zero copy functions before
- using skbuff frags
-To: Mohamed Khalfella <mkhalfella@purestorage.com>
-Cc: willemdebruijn.kernel@gmail.com, alexanderduyck@fb.com, 
-	bpf@vger.kernel.org, brouer@redhat.com, davem@davemloft.net, 
-	dhowells@redhat.com, keescook@chromium.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	willemb@google.com, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230831044004.GA17603@pengutronix.de>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RDNS_NONE,SPF_HELO_NONE,
+	SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Aug 31, 2023 at 1:28=E2=80=AFAM Mohamed Khalfella
-<mkhalfella@purestorage.com> wrote:
->
-> Commit bf5c25d60861 ("skbuff: in skb_segment, call zerocopy functions
-> once per nskb") added the call to zero copy functions in skb_segment().
-> The change introduced a bug in skb_segment() because skb_orphan_frags()
-> may possibly change the number of fragments or allocate new fragments
-> altogether leaving nrfrags and frag to point to the old values. This can
-> cause a panic with stacktrace like the one below.
->
-> [  193.894380] BUG: kernel NULL pointer dereference, address: 00000000000=
-000bc
-> [  193.895273] CPU: 13 PID: 18164 Comm: vh-net-17428 Kdump: loaded Tainte=
-d: G           O      5.15.123+ #26
-> [  193.903919] RIP: 0010:skb_segment+0xb0e/0x12f0
-> [  194.021892] Call Trace:
-> [  194.027422]  <TASK>
-> [  194.072861]  tcp_gso_segment+0x107/0x540
-> [  194.082031]  inet_gso_segment+0x15c/0x3d0
-> [  194.090783]  skb_mac_gso_segment+0x9f/0x110
-> [  194.095016]  __skb_gso_segment+0xc1/0x190
-> [  194.103131]  netem_enqueue+0x290/0xb10 [sch_netem]
-> [  194.107071]  dev_qdisc_enqueue+0x16/0x70
-> [  194.110884]  __dev_queue_xmit+0x63b/0xb30
-> [  194.121670]  bond_start_xmit+0x159/0x380 [bonding]
-> [  194.128506]  dev_hard_start_xmit+0xc3/0x1e0
-> [  194.131787]  __dev_queue_xmit+0x8a0/0xb30
-> [  194.138225]  macvlan_start_xmit+0x4f/0x100 [macvlan]
-> [  194.141477]  dev_hard_start_xmit+0xc3/0x1e0
-> [  194.144622]  sch_direct_xmit+0xe3/0x280
-> [  194.147748]  __dev_queue_xmit+0x54a/0xb30
-> [  194.154131]  tap_get_user+0x2a8/0x9c0 [tap]
-> [  194.157358]  tap_sendmsg+0x52/0x8e0 [tap]
-> [  194.167049]  handle_tx_zerocopy+0x14e/0x4c0 [vhost_net]
-> [  194.173631]  handle_tx+0xcd/0xe0 [vhost_net]
-> [  194.176959]  vhost_worker+0x76/0xb0 [vhost]
-> [  194.183667]  kthread+0x118/0x140
-> [  194.190358]  ret_from_fork+0x1f/0x30
-> [  194.193670]  </TASK>
->
-> In this case calling skb_orphan_frags() updated nr_frags leaving nrfrags
-> local variable in skb_segment() stale. This resulted in the code hitting
-> i >=3D nrfrags prematurely and trying to move to next frag_skb using
-> list_skb pointer, which was NULL, and caused kernel panic. Move the call
-> to zero copy functions before using frags and nr_frags.
->
-> Fixes: bf5c25d60861 ("skbuff: in skb_segment, call zerocopy functions onc=
-e per nskb")
-> Signed-off-by: Mohamed Khalfella <mkhalfella@purestorage.com>
-> Reported-by: Amit Goyal <agoyal@purestorage.com>
-> Cc: stable@vger.kernel.org
-> ---
->  net/core/skbuff.c | 34 ++++++++++++++++++++--------------
->  1 file changed, 20 insertions(+), 14 deletions(-)
->
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index a298992060e6..18a33dc2d6af 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -4354,21 +4354,20 @@ struct sk_buff *skb_segment(struct sk_buff *head_=
-skb,
->         struct sk_buff *segs =3D NULL;
->         struct sk_buff *tail =3D NULL;
->         struct sk_buff *list_skb =3D skb_shinfo(head_skb)->frag_list;
-> -       skb_frag_t *frag =3D skb_shinfo(head_skb)->frags;
->         unsigned int mss =3D skb_shinfo(head_skb)->gso_size;
->         unsigned int doffset =3D head_skb->data - skb_mac_header(head_skb=
-);
-> -       struct sk_buff *frag_skb =3D head_skb;
->         unsigned int offset =3D doffset;
->         unsigned int tnl_hlen =3D skb_tnl_header_len(head_skb);
->         unsigned int partial_segs =3D 0;
->         unsigned int headroom;
->         unsigned int len =3D head_skb->len;
-> +       struct sk_buff *frag_skb;
-> +       skb_frag_t *frag;
->         __be16 proto;
->         bool csum, sg;
-> -       int nfrags =3D skb_shinfo(head_skb)->nr_frags;
->         int err =3D -ENOMEM;
->         int i =3D 0;
-> -       int pos;
-> +       int nfrags, pos;
->
->         if ((skb_shinfo(head_skb)->gso_type & SKB_GSO_DODGY) &&
->             mss !=3D GSO_BY_FRAGS && mss !=3D skb_headlen(head_skb)) {
-> @@ -4445,6 +4444,13 @@ struct sk_buff *skb_segment(struct sk_buff *head_s=
-kb,
->         headroom =3D skb_headroom(head_skb);
->         pos =3D skb_headlen(head_skb);
->
-> +       if (skb_orphan_frags(head_skb, GFP_ATOMIC))
-> +               return ERR_PTR(-ENOMEM);
-> +
-> +       nfrags =3D skb_shinfo(head_skb)->nr_frags;
-> +       frag =3D skb_shinfo(head_skb)->frags;
-> +       frag_skb =3D head_skb;
-> +
->         do {
->                 struct sk_buff *nskb;
->                 skb_frag_t *nskb_frag;
-> @@ -4465,6 +4471,10 @@ struct sk_buff *skb_segment(struct sk_buff *head_s=
-kb,
->                     (skb_headlen(list_skb) =3D=3D len || sg)) {
->                         BUG_ON(skb_headlen(list_skb) > len);
->
-> +                       nskb =3D skb_clone(list_skb, GFP_ATOMIC);
-> +                       if (unlikely(!nskb))
-> +                               goto err;
-> +
+On Thu, Aug 31, 2023 at 06:40:04AM +0200, Oleksij Rempel wrote:
+> Hi Lukasz,
+> 
+> On Wed, Aug 30, 2023 at 06:38:18PM +0200, Lukasz Majewski wrote:
+> > Hi Oleksij,
+>  
+> > The implementation as you suggested seems to work :-)
+> > 
+> > The ksz_get_phy_flags() - where the MICREL_NO_EEE is set is executed
+> > before ksz9477_config_init().
+> > 
+> > And then the eee_broken_modes are taken into account.
+> > 
+> > # ethtool --show-eee lan1
+> > EEE Settings for lan1:
+> >         EEE status: disabled
+> >         Tx LPI: 0 (us)
+> >         Supported EEE link modes:  100baseT/Full 
+> >                                    1000baseT/Full 
+> >         Advertised EEE link modes:  Not reported
+> >         Link partner advertised EEE link modes:  Not reported
+> > 
+> > I will prepare tomorrow a proper patch.
+> 
+> can you please by the way remove this line:
+> https://elixir.bootlin.com/linux/v6.5/source/drivers/net/phy/micrel.c#L1803
+> 
+> it is obsolet by eee_broken_modes.
 
-This patch is quite complex to review, so I am asking if this part was
-really needed ?
-<1>  : You moved here <2> and <3>
+... and if possible verify on the link partner side that indeed no
+EEE modes are being advertised by the Micrel device.
 
-If this is not strictly needed, please keep the code as is to ease
-code review...
-
->                         i =3D 0;
->                         nfrags =3D skb_shinfo(list_skb)->nr_frags;
->                         frag =3D skb_shinfo(list_skb)->frags;
-> @@ -4483,12 +4493,8 @@ struct sk_buff *skb_segment(struct sk_buff *head_s=
-kb,
->                                 frag++;
->                         }
->
-> -                       nskb =3D skb_clone(list_skb, GFP_ATOMIC);
-
-<2>
-
->                         list_skb =3D list_skb->next;
->
-> -                       if (unlikely(!nskb))
-> -                               goto err;
-> -
-
-<3>
-
->                         if (unlikely(pskb_trim(nskb, len))) {
->                                 kfree_skb(nskb);
->                                 goto err;
-> @@ -4564,12 +4570,16 @@ struct sk_buff *skb_segment(struct sk_buff *head_=
-skb,
->                 skb_shinfo(nskb)->flags |=3D skb_shinfo(head_skb)->flags =
-&
->                                            SKBFL_SHARED_FRAG;
->
-> -               if (skb_orphan_frags(frag_skb, GFP_ATOMIC) ||
-> -                   skb_zerocopy_clone(nskb, frag_skb, GFP_ATOMIC))
-> +               if (skb_zerocopy_clone(nskb, list_skb, GFP_ATOMIC))
-
-Why using list_skb here instead of frag_skb ?
-Again, I have to look at the whole thing to understand why you did this.
-
->                         goto err;
->
->                 while (pos < offset + len) {
->                         if (i >=3D nfrags) {
-> +                               if (skb_orphan_frags(list_skb, GFP_ATOMIC=
-) ||
-> +                                   skb_zerocopy_clone(nskb, list_skb,
-> +                                                      GFP_ATOMIC))
-> +                                       goto err;
-> +
-
-This part is fine.
-
->                                 i =3D 0;
->                                 nfrags =3D skb_shinfo(list_skb)->nr_frags=
-;
->                                 frag =3D skb_shinfo(list_skb)->frags;
-> @@ -4583,10 +4593,6 @@ struct sk_buff *skb_segment(struct sk_buff *head_s=
-kb,
->                                         i--;
->                                         frag--;
->                                 }
-> -                               if (skb_orphan_frags(frag_skb, GFP_ATOMIC=
-) ||
-> -                                   skb_zerocopy_clone(nskb, frag_skb,
-> -                                                      GFP_ATOMIC))
-> -                                       goto err;
->
->                                 list_skb =3D list_skb->next;
->                         }
-> --
-> 2.17.1
->
-
-Thanks.
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
