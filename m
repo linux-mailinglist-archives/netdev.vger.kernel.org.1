@@ -1,193 +1,125 @@
-Return-Path: <netdev+bounces-31651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBC3678F453
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 23:00:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FBD378F4BE
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 23:38:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48B0D1C20B36
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 21:00:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41D521C20B2D
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 21:38:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 868B719BDD;
-	Thu, 31 Aug 2023 21:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B01B31AA74;
+	Thu, 31 Aug 2023 21:38:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44A2653AE;
-	Thu, 31 Aug 2023 21:00:24 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AC32C0;
-	Thu, 31 Aug 2023 14:00:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=Yt7S8X5fXxodIT5fvunkb9YkKBJ9hnjzut/UZHVO4Bw=; b=SOUrZiwyj6Wse/0WhOjorrB0eP
-	xwo/D5E5GoeFtMMjQDQNVKps2anMGWMTEpADamQGChbxXc2DQ3R6ic0mLMQferyXFxuaDglMftpU3
-	Kj1KDZy/touZnf1uZ+SdQSdXRGIgCzkr2r0kyBrQnH+df4b52OE1nYyv/j+7830Bg1+xgEtPHOfpD
-	9OjaLRPlftCh/CsqVSvhSaYg8VwlS89XGrm2R3hxgz1QNHm07v5h2ky8lMPUK+q1pMkBLuJLLMSBH
-	zp13W7OLi8rjnnIJfiL0wbFR+ypP++upga0kns9McpS/Yt55voxaMMVrBLctqgW8fEjth9PUgTpFK
-	qvXHJ3Ig==;
-Received: from 54.249.197.178.dynamic.dsl-lte-bonding.lssmb00p-msn.res.cust.swisscom.ch ([178.197.249.54] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qbom3-0008nZ-Sh; Thu, 31 Aug 2023 23:00:20 +0200
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: davem@davemloft.net
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	daniel@iogearbox.net,
-	ast@kernel.org,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: pull-request: bpf 2023-08-31
-Date: Thu, 31 Aug 2023 23:00:19 +0200
-Message-Id: <20230831210019.14417-1-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.21.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FAC55399
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 21:38:16 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A258107
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 14:38:15 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59285f1e267so43539467b3.0
+        for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 14:38:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1693517894; x=1694122694; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=gEyyA5WGaBb4SvWvFMDKFZvmXfal9HC1160gvHOLwQ4=;
+        b=0lLeZdeJq2TcV3TAHVhsPtUo+1rRUiEBomMbD8dwM6F6oyEdBSaq++gCkAi7xrypIZ
+         h0H0FufA5hYf/5L4wM9VWHdYFrOO1/eL5+W4DgEazc+J8FLA6WYqr23RtRkE5r3Wwg7u
+         J5TuprQVq6d49CDuiAIlTwb6vFRfnqOfkxGagE5wpxGW+t8oZy7KaDvIAywWp3Hha7uV
+         Z4ohvd9pKahhIeVpdRsfHAjDveAI28y92werzlVFLyEXn2AuvbJxKS6hUBAYmvLHlQgu
+         kGutMdIfhMhFETpGKkmS0BMKTAN6IaX1wCk+JoZM/gRBNiB7S/TpoeASV7YfFSyutNse
+         4XKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693517894; x=1694122694;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gEyyA5WGaBb4SvWvFMDKFZvmXfal9HC1160gvHOLwQ4=;
+        b=W2or7gZrd3f+6bgO7grHiUbtQFSOqbwFVUjVA4XWVKgTWRwrum8xSMo83CVyHKtkaw
+         ygVO2WPdpB/ugZKGQxzm0AIXoCu+xFgVO+P4+1zioKWjSmF6sPUBuZ9rUQRuDtXMBGVv
+         RN0RsQR/6rQsTwiLvcA5rDbCgLZQMj25Q42rtO3OtYKITA6EV6M62lENFMi6qHe7q9qK
+         m0OnQ3xojYIUsl8o9K8mifqzuwfWeOI4lDMflBsULawOvnTx2YWn4Iw64g55N5B63Y97
+         ESBrkWsDa57nztoeWBehl6KnjCXcolo7rQmR78u9kLEer6sBiDWhID1d3jlwwZ/Rp/UD
+         4ivQ==
+X-Gm-Message-State: AOJu0Yxn49GTyqyAHe538uehdahIrYvlhvF3TINCXPsVXgEEXXwKQldh
+	RcSodSugbPGuTeB9wQifatch92FTDzHmag==
+X-Google-Smtp-Source: AGHT+IGHaPQrzHy9wiGiMGr79tJRYPJmDr+2ayYXInEgOiB8VPwPQuoROiSC83hpwG0lViUz5y80nTJbKe2U5A==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a81:8d02:0:b0:595:8166:7be with SMTP id
+ d2-20020a818d02000000b00595816607bemr25894ywg.0.1693517894334; Thu, 31 Aug
+ 2023 14:38:14 -0700 (PDT)
+Date: Thu, 31 Aug 2023 21:38:12 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.8/27017/Thu Aug 31 09:40:48 2023)
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
+Message-ID: <20230831213812.3042540-1-edumazet@google.com>
+Subject: [PATCH net] gve: fix frag_list chaining
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, Bailey Forrest <bcf@google.com>, 
+	Willem de Bruijn <willemb@google.com>, Catherine Sullivan <csully@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi David, hi Jakub, hi Paolo, hi Eric,
+gve_rx_append_frags() is able to build skbs chained with frag_list,
+like GRO engine.
 
-The following pull-request contains BPF updates for your *net* tree.
+Problem is that shinfo->frag_list should only be used
+for the head of the chain.
 
-We've added 15 non-merge commits during the last 3 day(s) which contain
-a total of 17 files changed, 468 insertions(+), 97 deletions(-).
+All other links should use skb->next pointer.
 
-The main changes are:
+Otherwise, built skbs are not valid and can cause crashes.
 
-1) BPF selftest fixes: one flake and one related to clang18 testing, from Yonghong Song.
+Equivalent code in GRO (skb_gro_receive()) is:
 
-2) Fix a d_path BPF selftest failure after fast-forward from Linus' tree, from Jiri Olsa.
+    if (NAPI_GRO_CB(p)->last == p)
+        skb_shinfo(p)->frag_list = skb;
+    else
+        NAPI_GRO_CB(p)->last->next = skb;
+    NAPI_GRO_CB(p)->last = skb;
 
-3) Fix a preempt_rt splat in sockmap when using raw_spin_lock_t, from John Fastabend.
+Fixes: 9b8dd5e5ea48 ("gve: DQO: Add RX path")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Bailey Forrest <bcf@google.com>
+Cc: Willem de Bruijn <willemb@google.com>
+Cc: Catherine Sullivan <csully@google.com>
+---
+ drivers/net/ethernet/google/gve/gve_rx_dqo.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-4) Fix a xsk_diag_fill use-after-free race during socket cleanup, from Magnus Karlsson.
+diff --git a/drivers/net/ethernet/google/gve/gve_rx_dqo.c b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+index ea0e38b4d9e9f6c41441729d6ae5693186f03040..f281e42a7ef9680e2049a185782a37d402c7f886 100644
+--- a/drivers/net/ethernet/google/gve/gve_rx_dqo.c
++++ b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+@@ -570,7 +570,10 @@ static int gve_rx_append_frags(struct napi_struct *napi,
+ 		if (!skb)
+ 			return -1;
+ 
+-		skb_shinfo(rx->ctx.skb_tail)->frag_list = skb;
++		if (rx->ctx.skb_tail == rx->ctx.skb_head)
++			skb_shinfo(rx->ctx.skb_head)->frag_list = skb;
++		else
++			rx->ctx.skb_tail->next = skb;
+ 		rx->ctx.skb_tail = skb;
+ 		num_frags = 0;
+ 	}
+-- 
+2.42.0.283.g2d96d420d3-goog
 
-5) Fix xsk_build_skb to address a buggy dereference of an ERR_PTR(), from Tirthendu Sarkar.
-
-6) Fix a bpftool build warning when compiled with -Wtype-limits, from Yafang Shao.
-
-7) Several misc fixes and cleanups in standardization docs, from David Vernet.
-
-8) Fix BPF selftest install to consider no_alu32/cpuv4/bpf-gcc flavors, from Björn Töpel.
-
-9) Annotate a data race in bpf_long_memcpy for KCSAN, from Daniel Borkmann.
-
-10) Extend documentation with a description for CO-RE relocations, from Eduard Zingerman.
-
-11) Fix several invalid escape sequence warnings in bpf_doc.py script, from Vishal Chourasia.
-
-12) Fix the instruction set doc wrt offset of BPF-to-BPF call, from Will Hawkins.
-
-Please consider pulling these changes from:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
-
-Thanks a lot!
-
-Also thanks to reporters, reviewers and testers of commits in this pull-request:
-
-Dan Carpenter, David Vernet, Eduard Zingerman, kernel test robot, Maciej 
-Fijalkowski, Magnus Karlsson, Marco Elver, Quentin Monnet, Srikar 
-Dronamraju, Yonghong Song
-
-----------------------------------------------------------------
-
-The following changes since commit bd6c11bc43c496cddfc6cf603b5d45365606dbd5:
-
-  Merge tag 'net-next-6.6' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next (2023-08-29 11:33:01 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
-
-for you to fetch changes up to be8e754cbfac698d6304bb8382c8d18ac74424d3:
-
-  selftests/bpf: Include build flavors for install target (2023-08-31 22:01:53 +0200)
-
-----------------------------------------------------------------
-bpf-for-netdev
-
-----------------------------------------------------------------
-Björn Töpel (1):
-      selftests/bpf: Include build flavors for install target
-
-Daniel Borkmann (1):
-      bpf: Annotate bpf_long_memcpy with data_race
-
-David Vernet (3):
-      bpf, docs: Move linux-notes.rst to root bpf docs tree
-      bpf, docs: Add abi.rst document to standardization subdirectory
-      bpf, docs: s/eBPF/BPF in standards documents
-
-Eduard Zingerman (1):
-      docs/bpf: Add description for CO-RE relocations
-
-Jiri Olsa (1):
-      selftests/bpf: Fix d_path test
-
-John Fastabend (1):
-      bpf, sockmap: Fix preempt_rt splat when using raw_spin_lock_t
-
-Magnus Karlsson (1):
-      xsk: Fix xsk_diag use-after-free error during socket cleanup
-
-Tirthendu Sarkar (1):
-      xsk: Fix xsk_build_skb() error: 'skb' dereferencing possible ERR_PTR()
-
-Vishal Chourasia (1):
-      bpf, docs: Fix invalid escape sequence warnings in bpf_doc.py
-
-Will Hawkins (1):
-      bpf, docs: Correct source of offset for program-local call
-
-Yafang Shao (1):
-      bpftool: Fix build warnings with -Wtype-limits
-
-Yonghong Song (2):
-      bpf: Prevent inlining of bpf_fentry_test7()
-      selftests/bpf: Fix flaky cgroup_iter_sleepable subtest
-
- Documentation/bpf/btf.rst                          |  31 ++-
- Documentation/bpf/index.rst                        |   1 +
- .../bpf/{standardization => }/linux-notes.rst      |   0
- Documentation/bpf/llvm_reloc.rst                   | 304 +++++++++++++++++++++
- Documentation/bpf/standardization/abi.rst          |  25 ++
- Documentation/bpf/standardization/index.rst        |   2 +-
- .../bpf/standardization/instruction-set.rst        |  44 +--
- include/linux/bpf.h                                |   2 +-
- net/bpf/test_run.c                                 |   1 +
- net/core/sock_map.c                                |  36 +--
- net/xdp/xsk.c                                      |  22 +-
- net/xdp/xsk_diag.c                                 |   3 +
- scripts/bpf_doc.py                                 |  56 ++--
- tools/bpf/bpftool/link.c                           |   2 +-
- tools/testing/selftests/bpf/Makefile               |  12 +
- .../selftests/bpf/prog_tests/bpf_obj_pinning.c     |   5 +-
- tools/testing/selftests/bpf/prog_tests/d_path.c    |  19 +-
- 17 files changed, 468 insertions(+), 97 deletions(-)
- rename Documentation/bpf/{standardization => }/linux-notes.rst (100%)
- create mode 100644 Documentation/bpf/standardization/abi.rst
 
