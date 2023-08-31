@@ -1,89 +1,283 @@
-Return-Path: <netdev+bounces-31586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D399578EEBC
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 15:38:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FD0178EEC2
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 15:38:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 571FF281412
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 13:38:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8000281549
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 13:38:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CCA011729;
-	Thu, 31 Aug 2023 13:38:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C21B31172A;
+	Thu, 31 Aug 2023 13:38:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38FFD11725
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 13:38:06 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A0651A2;
-	Thu, 31 Aug 2023 06:38:05 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1qbhrq-0000RJ-9x; Thu, 31 Aug 2023 15:37:50 +0200
-Date: Thu, 31 Aug 2023 15:37:50 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Wander Lairson Costa <wander@redhat.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Fernando Fernandez Mancera <ffmancera@riseup.net>,
-	"open list:NETFILTER" <netfilter-devel@vger.kernel.org>,
-	"open list:NETFILTER" <coreteam@netfilter.org>,
-	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	Lucas Leong <wmliang@infosec.exchange>, stable@kernel.org
-Subject: Re: [PATCH nf v2] netfilter/osf: avoid OOB read
-Message-ID: <20230831133750.GB15759@breakpoint.cc>
-References: <20230831123931.60606-1-wander@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFFAA11723
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 13:38:41 +0000 (UTC)
+Received: from phobos.denx.de (phobos.denx.de [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 610A2E54;
+	Thu, 31 Aug 2023 06:38:35 -0700 (PDT)
+Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 719A381FA8;
+	Thu, 31 Aug 2023 15:38:27 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1693489107;
+	bh=J98PU36MOszFcGsr/55p5y8gp0Nhib+ynMUDvz3WNAE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GsXYcg9JiH8+VkkeV1braV8aVFhBztspBLzgGM7MJnpQKGIGQ45cOP9R6VriLY8ur
+	 iBCHKBMODhkJOyo/ci3pmXxp+jUD+MPDj6MH0/0pOY9TnWKRqOFMKYwMoQw3QDxnSR
+	 9shraTci/NtkqXJGh0eJw94pv13eGrCEDbNnH0PpzXzVZQELo3dmznBV4IAnHPs3jV
+	 FVO0AdK91kwaoJ6MFQ1H3SyKFpG/CdYakHP+hZ62MJY9UlPJYQDEbS7Dtce50o5oCy
+	 JUWQSChjAuFtMOtepahiYeoom4vumnrWW0R9qt1nsdTF5ipUlI91Rnrxh3r0GBevul
+	 K7Eamqd1/y1PQ==
+Date: Thu, 31 Aug 2023 15:38:20 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: <Tristram.Ha@microchip.com>
+Cc: <andrew@lunn.ch>, <f.fainelli@gmail.com>, <kuba@kernel.org>,
+ <edumazet@google.com>, <bigeasy@linutronix.de>, <pabeni@redhat.com>,
+ <koverskeid@gmail.com>, <matthieu.baerts@tessares.net>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <davem@davemloft.net>
+Subject: Re: [PATCH] net: hsr : Provide fix for HSRv1 supervisor frames
+ decoding
+Message-ID: <20230831153820.6a062ff7@wsk>
+In-Reply-To: <20230828110242.1ceb41a5@wsk>
+References: <20230825153111.228768-1-lukma@denx.de>
+	<BYAPR11MB355805618F510948EAE18278ECE3A@BYAPR11MB3558.namprd11.prod.outlook.com>
+	<20230828110242.1ceb41a5@wsk>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230831123931.60606-1-wander@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; boundary="Sig_/CnjRv2ii8ycVxFsf_5n6.21";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Wander Lairson Costa <wander@redhat.com> wrote:
-> 
-> diff --git a/net/netfilter/nfnetlink_osf.c b/net/netfilter/nfnetlink_osf.c
-> index 8f1bfa6ccc2d..13fedf2aaa0f 100644
-> --- a/net/netfilter/nfnetlink_osf.c
-> +++ b/net/netfilter/nfnetlink_osf.c
-> @@ -315,6 +315,9 @@ static int nfnl_osf_add_callback(struct sk_buff *skb,
->  
->  	f = nla_data(osf_attrs[OSF_ATTR_FINGER]);
->  
-> +	if (f->opt_num > ARRAY_SIZE(f->opt))
-> +		return -EINVAL;
-> +
+--Sig_/CnjRv2ii8ycVxFsf_5n6.21
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Hmm, this isn't enough; as far as I can see there is no validation
-whatsover.
+Hi Tristram,
 
-This should also check that all of:
+> Hi Tristram,
+>=20
+> > > -       /* And leave the HSR tag. */
+> > > +        * And leave the HSR tag.
+> > > +        *
+> > > +        * The HSRv1 supervisory frame encapsulates the v0 frame
+> > > +        * with EtherType of 0x88FB
+> > > +        */
+> > >         if (ethhdr->h_proto =3D=3D htons(ETH_P_HSR)) {
+> > > -               pull_size =3D sizeof(struct ethhdr);
+> > > +               if (hsr->prot_version =3D=3D HSR_V1)
+> > > +                       /* In the above step the DA, SA and
+> > > EtherType
+> > > +                        * (0x892F - HSRv1) bytes has been
+> > > removed.
+> > > +                        *
+> > > +                        * As the HSRv1 has the HSR header added,
+> > > one need
+> > > +                        * to remove path_and_LSDU_size and
+> > > sequence_nr fields.
+> > > +                        *
+> > > +                        */
+> > > +                       pull_size =3D 4;
+> > > +               else
+> > > +                       pull_size =3D sizeof(struct hsr_tag);
+> > > +
+> > >                 skb_pull(skb, pull_size);
+> > >                 total_pull_size +=3D pull_size;
+> > >         }
+> > > @@ -313,6 +328,19 @@ void hsr_handle_sup_frame(struct
+> > > hsr_frame_info *frame) total_pull_size +=3D pull_size;
+> > >=20
+> > >         /* get HSR sup payload */
+> > > +       if (hsr->prot_version =3D=3D HSR_V1) {
+> > > +               /* In the HSRv1 supervisor frame, when
+> > > +                * one with EtherType =3D 0x88FB is extracted, the
+> > > Node A
+> > > +                * MAC address is preceded with type and length
+> > > elements of TLV
+> > > +                * data field.
+> > > +                *
+> > > +                * It needs to be removed to get the remote peer
+> > > MAC address.
+> > > +                */
+> > > +               pull_size =3D sizeof(struct hsr_sup_tlv);
+> > > +               skb_pull(skb, pull_size);
+> > > +               total_pull_size +=3D pull_size;
+> > > +       }
+> > > +
+> > >         hsr_sp =3D (struct hsr_sup_payload *)skb->data;   =20
+> >=20
+> > I thought the fix is simply this:
+> >=20
+> > 	if (ethhdr->h_proto =3D=3D htons(ETH_P_HSR)) {
+> > -		pull_size =3D sizeof(struct ethhdr);
+> > +		pull_size =3D sizeof(struct hsr_tag);
+> > 		skb_pull(skb, pull_size);
+> > 		total_pull_size +=3D pull_size;
+> > 	}
+> >=20
+> > -	pull_size =3D sizeof(struct hsr_tag);
+> > +	pull_size =3D sizeof(struct hsr_sup_tag);
+> >=20
+> > Note the sizes of hsr_tag and hsr_sup_tag are the same: 6 bytes.
+> > The code in 5.15 before this refactored code uses those structures.
+> > When using v0 the EtherType uses the PRP tag instead of the HSR tag
+> > so the HSR related code is not executed.
+> >  =20
+>=20
+> This would not be enough it seems. Please find below skb->data dump
+> when entering hsr_handle_sup_frame() [0]:
+>=20
+> SKB_I100000000: 01 15 4e 00 01 2d 00 10 a1 94 77 30 89 2f 00 34
+> SKB_I100000010: 02 59 88 fb 00 01 84 15 17 06 00 10 a1 94 77 30
+> SKB_I100000020: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> SKB_I100000030: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> SKB_I100000040: 00 00                                         =20
+>=20
+> With the newest kernel (before applying this patch) in [1] we do
+> remove: 01 15 4e 00 01 2d 00 10 a1 94 77 30 89 2f (which is equal to
+> sizeof(struct ethhdr) =3D 6 + 6 + 2 B =3D 14 B)
+>=20
+> So we do have:
+>=20
+> 							  00 34
+> SKB_I100000010: 02 59 88 fb 00 01 84 15 17 06 00 10 a1 94 77 30
+> SKB_I100000020: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> SKB_I100000030: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> SKB_I100000040: 00 00
+>=20
+> And we need to remove rest of the HSR v1 tag (4 Bytes).
+>=20
+> Then we do have:
+>=20
+> SKB_I100000010:       88 fb 00 01 84 15 17 06 00 10 a1 94 77 30
+> SKB_I100000020: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> SKB_I100000030: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> SKB_I100000040: 00 00
+>=20
+> The 0x88FB is the PRP/HSRv0 supervisory frame ETH type, so the tag
+> needs to be removed (6 Bytes) and then we do have TYPE (0x17) and
+> Length (0x06), which indicate the other HSR host IP address.
+>=20
+> When I do apply your proposed changes we would have the DA and SA
+> MAC addresses removed implicitly (as the struct hsr_tag and
+> hsr_sup_tag are 6 bytes in size) and we end up with frame starting
+> with HSR v1 tag - i.e.:
+>=20
+> SKB_I100000000:                                     89 2f 00 34
+> SKB_I100000010: 02 59 88 fb 00 01 84 15 17 06 00 10 a1 94 77 30
+> SKB_I100000020: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> SKB_I100000030: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> SKB_I100000040: 00 00                                         =20
+>=20
+>=20
+> Hence mine question - is my setup or understanding wrong (as the PRP
+> supervisory frame is encapsulated in HSR v1 frame)?=20
+>=20
+> I do use the same kernel on two KSZ9477-EVB boards with Port[12]
+> connected together to work with HSR. I also to explicitly force the
+> HSR driver to use v1 of HSR (by default v0 is enforced).
+>=20
+>=20
+>=20
+>=20
+>=20
+> If you don't mind - I would also like to ask a question regarding the
+> node_db for HSR.
+>=20
+> Why the output of:
+>=20
+> # cat /sys/kernel/debug/hsr/hsr0/node_table                =20
+> Node Table entries for (HSR) device
+> MAC-Address-A,    MAC-Address-B,    time_in[A], time_in[B],=20
+> 00:10:a1:94:77:30 00:00:00:00:00:00    1689193,    1689199,
+>=20
+> Address-B port, DAN-H
+>  	0,        1
+>=20
+> Has the MAC-Address-B equal to 00:00:00:00:00:00 ?
+>=20
+> As I do have the same MAC addresses for both HSR ports (to facilitate
+> frame duplication in KSZ9477 IC removal) I would expect to have this
+> MAC address set to 00:10:a1:94:77:30 as well...
+>=20
+> Is this expected? Or is there any other issue to fix?
+>=20
 
- char    genre[MAXGENRELEN];
- char    version[MAXGENRELEN];
- char    subtype[MAXGENRELEN];
+Tristram, do you have any feedback on those changes?
 
-... have a NUL byte.  You could use strnlen() == ARRAY_SIZE() -> EINVAL
-for those.
+>=20
+> Thanks in advance for your help and support :-)
+>=20
+> Links:
+>=20
+> [0] -
+> https://elixir.bootlin.com/linux/v6.5-rc7/source/net/hsr/hsr_framereg.c#L=
+281
+>=20
+> [1] -
+> https://elixir.bootlin.com/linux/v6.5-rc7/source/net/hsr/hsr_framereg.c#L=
+290
+>=20
+> Best regards,
+>=20
+> Lukasz Majewski
+>=20
+> --
+>=20
+> DENX Software Engineering GmbH,      Managing Director: Erika Unter
+> HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+> Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email:
+> lukma@denx.de
 
-Maybe there is more to be validated, I did not followup with all the
-nested structures buried in user_finger struct.
+
+
+
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/CnjRv2ii8ycVxFsf_5n6.21
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmTwl8wACgkQAR8vZIA0
+zr1JrQf/daUvPrvbjgOu5I19Jl0S2cnYyKTf9CDeRUnErvnermNcFbUR1msZsS+m
+2VKWTy10iDhN+GURwLXXxlnXTa16gPmNyS4GGQWxSHwdjNouCsqrfLPZ3kgRhaPP
+typiR6j5EcgdZ6DHRbNVTnxB5vbmNN1aXJaDsxj30opyf+5wKkTNtUIfefe5jEFR
+ig4Jd1iQhgKwB4O8bxvrWrI/3nzKSyKX8f4088RnNrKn2DwC5BwkXhH6TQK2QBLk
+qf/nenIAGbg0tYWYLZxCJ1oNvrnX5wO7BcpgG0OQsLy7XVtWcRsE7N787tskC0L+
+b/a3ZlGM9CjVCRXuLCqebz70qpxKFQ==
+=uzjf
+-----END PGP SIGNATURE-----
+
+--Sig_/CnjRv2ii8ycVxFsf_5n6.21--
 
