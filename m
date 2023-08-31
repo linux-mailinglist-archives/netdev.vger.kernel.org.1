@@ -1,137 +1,81 @@
-Return-Path: <netdev+bounces-31537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5EB078EA29
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 12:28:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A452B78EA37
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 12:30:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 880571C20A2E
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 10:28:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E90F280DBB
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 10:30:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C6DA8F4E;
-	Thu, 31 Aug 2023 10:28:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D33C63CC;
+	Thu, 31 Aug 2023 10:30:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1068F6FB6
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 10:28:25 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECFF9C5;
-	Thu, 31 Aug 2023 03:28:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=wnCzNlSkE5F1zMwOiuhnLrO8y6BR8P83DNKq+cd66L8=; b=ZBOgF45Taa4/lnz9gOK4Q7kkEx
-	wiHtJVoX++1Dz95Wk9dDKq9AU/33l8hCG2WMcZ5zFlPICqLUi/eXT7J7TPu0UtIp4CvlZ1yBKxNK2
-	hdEs52sGIrUV6UIzegyqhuYRVUA9WzVJ3WatxMBk1adOy6BV7hQ/tg+zwIpK/7lbjqLJFkV36SwlE
-	Pb9Tst2LNeNwX9SBJ6gGqWOIkT3DjGrhrSgOtO/Au71EREeLJqsREdA4quruoGpsvHn8CqyqQcAO0
-	KSGBAjNaoACjh+Ad+GPE4oAUBp0FSkyFqfPoP8cbMPuIESOHfLS4r0VeVpLE1xVRHV6leXH8xssQ7
-	SG9NO5iQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36888)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qbeu9-0002hL-34;
-	Thu, 31 Aug 2023 11:28:01 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qbeu8-0006iI-6t; Thu, 31 Aug 2023 11:28:00 +0100
-Date: Thu, 31 Aug 2023 11:28:00 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Tristram.Ha@microchip.com, Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	UNGLinuxDriver@microchip.com,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Michael Walle <michael@walle.cc>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Oleksij Rempel <linux@rempel-privat.de>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] net: phy: Provide Module 4 KSZ9477 errata
- (DS80000754C)
-Message-ID: <ZPBrMMPiWubgFEZ0@shell.armlinux.org.uk>
-References: <20230831072527.537839-1-lukma@denx.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30E958F5D
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 10:30:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C9AF0C433C7;
+	Thu, 31 Aug 2023 10:30:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1693477823;
+	bh=lcdyCame1K6Cpq/Z9tvWP/+Yb4WyfJASA5xnc1tbzFE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=CZDi3aZYeiVbR0U9vUwRcGzOc140WDZft9QNb1B4cA4qzWyqO8+y3fbGo77GMsYkM
+	 aQklS03l5Jv5mcfzGpqJcop9fa5mbvEM4S4zGHhjIfTmIq0AtZQ63sIY7+Zim4nbFz
+	 LhcmaCuINpDacalwKbvN9QLQm/h00oSne8pOHNxvFrjtYGIc9cBqlwYgVaOoqzKOch
+	 Qo26Kj5sv6CNaazgFDobEy+ZEfkEEC5D8bp2ixRVtb5rZnwYGYxuLpu9T/d8HIo+Qk
+	 HtxmG7DAFwBEmEFARMg/1En2yTHlsLBv1Ql/a7cRHJK6dsZzgEl7Hu+sclAXCtDzH+
+	 Z9pmHY+3xMG1w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B126BE29F34;
+	Thu, 31 Aug 2023 10:30:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230831072527.537839-1-lukma@denx.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net] ipv4: annotate data-races around fi->fib_dead
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169347782372.15498.17752645687758449604.git-patchwork-notify@kernel.org>
+Date: Thu, 31 Aug 2023 10:30:23 +0000
+References: <20230830095520.1046984-1-edumazet@google.com>
+In-Reply-To: <20230830095520.1046984-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, syzkaller@googlegroups.com,
+ dsahern@kernel.org
 
-On Thu, Aug 31, 2023 at 09:25:27AM +0200, Lukasz Majewski wrote:
-> diff --git a/include/linux/micrel_phy.h b/include/linux/micrel_phy.h
-> index 8bef1ab62bba..eed474fc7308 100644
-> --- a/include/linux/micrel_phy.h
-> +++ b/include/linux/micrel_phy.h
-> @@ -44,6 +44,7 @@
->  #define MICREL_PHY_50MHZ_CLK	0x00000001
->  #define MICREL_PHY_FXEN		0x00000002
->  #define MICREL_KSZ8_P1_ERRATA	0x00000003
-> +#define MICREL_NO_EEE	0x00000004
+Hello:
 
-Erm... Maybe someone should clarify this... we have in the code the
-following tests for these "flags":
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-	/* Support legacy board-file configuration */
-	if (phydev->dev_flags & MICREL_PHY_50MHZ_CLK) {
-	        priv->rmii_ref_clk_sel = true;
-	        priv->rmii_ref_clk_sel_val = true;
-	}
+On Wed, 30 Aug 2023 09:55:20 +0000 you wrote:
+> syzbot complained about a data-race in fib_table_lookup() [1]
+> 
+> Add appropriate annotations to document it.
+> 
+> [1]
+> BUG: KCSAN: data-race in fib_release_info / fib_table_lookup
+> 
+> [...]
 
-	/* Skip auto-negotiation in fiber mode */
-	if (phydev->dev_flags & MICREL_PHY_FXEN) {
-	        phydev->speed = SPEED_100;
-	        return 0;
-	}
+Here is the summary with links:
+  - [v2,net] ipv4: annotate data-races around fi->fib_dead
+    https://git.kernel.org/netdev/net/c/fce92af1c29d
 
-	if (phydev->dev_flags & MICREL_KSZ8_P1_ERRATA)
-		return -EOPNOTSUPP;
-
-	/* According to KSZ9477 Errata DS80000754C (Module 4) all EEE modes
-	 * in this switch shall be regarded as broken.
-	 */
-	if (phydev->dev_flags & MICREL_NO_EEE)
-	        phydev->eee_broken_modes = -1;
-
-Is it intentional that setting MICREL_PHY_50MHZ_CLK on its own also
-activates the MICREL_KSZ8_P1_ERRATA and vice versa? Is it intentional
-that setting MICREL_PHY_FXEN also activates MICREL_KSZ8_P1_ERRATA and
-vice versa?
-
-To me, this looks horribly broken, and this patch just perpetuates the
-brokenness (but at least 0x4 doesn't overlap with the other flags.)
-
-If it is intentional, then MICREL_KSZ8_P1_ERRATA should be defined to
-make it explicit - in other words, as
-(MICREL_PHY_FXEN|MICREL_PHY_50MHZ_CLK). If not, all these flags should
-be defined using (1 << n) or BIT() to make it explicit that they're a
-bit, and not just a hex number that gets incremented when the next flag
-is added.
-
-Thanks.
-
+You are awesome, thank you!
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
