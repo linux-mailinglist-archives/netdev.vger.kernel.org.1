@@ -1,152 +1,104 @@
-Return-Path: <netdev+bounces-31629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B7B678F1B5
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 19:10:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC3A678F1B0
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 19:08:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 814951C20AFD
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 17:10:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C45501C20B04
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 17:08:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDCCF18C2A;
-	Thu, 31 Aug 2023 17:10:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4404618C27;
+	Thu, 31 Aug 2023 17:08:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D682D8F57
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 17:10:40 +0000 (UTC)
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53AB91B2;
-	Thu, 31 Aug 2023 10:10:37 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 8AD1D120009;
-	Thu, 31 Aug 2023 20:10:33 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 8AD1D120009
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1693501833;
-	bh=U7WOQB5SYQHqP+B3KeYZ1/+2ZrmmQCAK40U7/k61lho=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-	b=ZTC65bNT3c5Vn+sjGor0A1bjvGv7JUmXe9yZwyZL8D4HYnCCs1jRQKQscD4OzSDPg
-	 HteSX8e5c9kw/hHponCh/QnMh7ARe9LxpBWT8TpY75uap+xitSENmu0GxnRneT3uyT
-	 +7m9WOpEYHqayiyPTJwyHx9kIzQdscY1+egt03d8J6aLlrBWp/TCkQOosGIY5sc4/D
-	 JlkLTS8hX6v2YrQTnk3bk93+D/B97zK1r8KQWLHNE8NRb7Lyjm2gJvMVnTwmCOhlUZ
-	 owIEPJqNosRAiaNKxcQfvMhLk+K7/k7cbJmqCnU5Q80hez02oTBXXCIxgvcT1XRiAj
-	 CQ4qLqC9C1guA==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Thu, 31 Aug 2023 20:10:33 +0300 (MSK)
-Received: from [192.168.0.106] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Thu, 31 Aug 2023 20:10:02 +0300
-Message-ID: <d4e46f76-b245-3815-3dde-00d81f02942f@salutedevices.com>
-Date: Thu, 31 Aug 2023 20:04:15 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 370E511CB6
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 17:08:00 +0000 (UTC)
+Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C33EDA3
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 10:07:58 -0700 (PDT)
+Received: by mail-qt1-x82b.google.com with SMTP id d75a77b69052e-40c72caec5cso14051cf.0
+        for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 10:07:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1693501678; x=1694106478; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KexMA37x2hbBFt8nNrssM03PfVnPAO95fCEOL28aZ2Y=;
+        b=dGfBuEBfAYCZi09TG/50PE5e9Hk6mJHLTX4UUtmXTvQ+Zua0RIYLa0vA/FHsYj1q//
+         4Q6z5uB4YNqg1warUg79lQoF3nHgOier2wNuMKEKyU6UPIE3hSvmjGAzEJMwovfbZKMN
+         paV212bzeJGgY8eTs7BvBUX8Tk4hy6rU+sacWhKafk7WHG4pMfiaweSKUdbTqIW84XPW
+         V+bNrBWg3R7CluS4cQqMTDByPyoxDuCoU0cLnG8MJLaRDb7SbcM0HB73fQoXO3LXXD7P
+         Oc701APNmb8PRMd67+x8voHBptmZsCKF1E7ViNAI03AdykuXZM0ey0hSeS/V6+QOT9PF
+         cevw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693501678; x=1694106478;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KexMA37x2hbBFt8nNrssM03PfVnPAO95fCEOL28aZ2Y=;
+        b=HJVs4jDP3JnEw0B2KeLaAeHIxkwwQ5JkcHsxkp8Luz/9M/XkNyWNCFWiCSHwEFprav
+         wKee9IvzfWM1ILeYY3C20YAXw86izvL1817L/S/iTM90kmDOx7cNXVGFYOsQ6/Co+aR8
+         TN1XXAJUwZ57jlpOJn8sIwuf6rRZ5nzMiYdhWzgn8xIZg1Lcevz8OcbjNa+refwp3Jk1
+         72OAFrUwwbgiaUjD+c58T4CdVIoK1qfdPfmZBMsDqxmbMIC6K0inCNBwarSeOuOw2tuj
+         /gkZ35By1dmotl6zCyQZXjK0qZh7+2Ri3x5DYmAsk+s4aLyfY7uJmpNROQkeQEKALS1V
+         EJ9A==
+X-Gm-Message-State: AOJu0YyYO9y69srCKuDKgSkJ+PYtaGaGDyrBOySZuc8/cKukI0KKCXhz
+	MYqf3Ufqaup8qonxt7FIn6AkCfkh2BooE++jHLsB7g==
+X-Google-Smtp-Source: AGHT+IEBaxkTs2kDjDXeYXBewZBaRXd83tsRKxNf7lHVHeeqmI6HAomuPjy2g+dO6wPd/AXtGZfeS6oslbZI7BFYcnA=
+X-Received: by 2002:a05:622a:19a0:b0:410:916b:eb3f with SMTP id
+ u32-20020a05622a19a000b00410916beb3fmr7561qtc.16.1693501677631; Thu, 31 Aug
+ 2023 10:07:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [RFC PATCH v2 0/2] vsock: handle writes to shutdowned socket
-Content-Language: en-US
-To: Stefano Garzarella <sgarzare@redhat.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin"
-	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
-	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20230826175900.3693844-1-avkrasnov@salutedevices.com>
- <7byt3iwpo5ewpxkjwh6adlzq2nerrbv7trlreujuchsrkworxk@2jxzyul3o5cz>
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-In-Reply-To: <7byt3iwpo5ewpxkjwh6adlzq2nerrbv7trlreujuchsrkworxk@2jxzyul3o5cz>
+References: <20230831165811.18061-1-edward.cree@amd.com>
+In-Reply-To: <20230831165811.18061-1-edward.cree@amd.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 31 Aug 2023 19:07:46 +0200
+Message-ID: <CANn89iKeNw4pjUKmWf=VAEWK-X4JCnP2pJic_9Jb0Whne_4e0Q@mail.gmail.com>
+Subject: Re: [PATCH net] sfc: check for zero length in EF10 RX prefix
+To: edward.cree@amd.com
+Cc: linux-net-drivers@amd.com, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, Edward Cree <ecree.xilinx@gmail.com>, netdev@vger.kernel.org, 
+	habetsm.xilinx@gmail.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 179574 [Aug 31 2023]
-X-KSMG-AntiSpam-Version: 5.9.59.0
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 529 529 a773548e495283fecef97c3e587259fde2135fef, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;lore.kernel.org:7.1.1;127.0.0.199:7.1.2;git.kernel.org:7.1.1;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;100.64.160.123:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2023/08/31 14:51:00
-X-KSMG-LinksScanning: Clean, bases: 2023/08/31 14:51:00
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/08/31 11:36:00 #21745758
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Thu, Aug 31, 2023 at 6:59=E2=80=AFPM <edward.cree@amd.com> wrote:
+>
+> From: Edward Cree <ecree.xilinx@gmail.com>
+>
+> When EF10 RXDP firmware is operating in cut-through mode, packet length
+>  is not known at the time the RX prefix is generated, so it is left as
+>  zero and RX event merging is inhibited to ensure that the length is
+>  available in the RX event.  However, it has been found that in certain
+>  circumstances the RX events for these packets still get merged,
+>  meaning the driver cannot read the length from the RX event, and tries
+>  to use the length from the prefix.
+> The resulting zero-length SKBs cause crashes in GRO since commit
+>  1d11fa696733 ("net-gro: remove GRO_DROP"), so add a check to the driver
+>  to detect these zero-length RX events and discard the packet.
+>
+> Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
 
+Nice bug ;)
 
-On 31.08.2023 18:23, Stefano Garzarella wrote:
-> Hi Arseniy,
-> 
-> On Sat, Aug 26, 2023 at 08:58:58PM +0300, Arseniy Krasnov wrote:
->> Hello,
->>
->> this small patchset adds POSIX compliant behaviour on writes to the
->> socket which was shutdowned with 'shutdown()' (both sides - local with
->> SHUT_WR flag, peer - with SHUT_RD flag). According POSIX we must send
->> SIGPIPE in such cases (but SIGPIPE is not send when MSG_NOSIGNAL is set).
->>
->> First patch is implemented in the same way as net/ipv4/tcp.c:tcp_sendmsg_locked().
->> It uses 'sk_stream_error()' function which handles EPIPE error. Another
->> way is to use code from net/unix/af_unix.c:unix_stream_sendmsg() where
->> same logic from 'sk_stream_error()' is implemented "from scratch", but
->> it doesn't check 'sk_err' field. I think error from this field has more
->> priority to be returned from syscall. So I guess it is better to reuse
->> currently implemented 'sk_stream_error()' function.
->>
->> Test is also added.
->>
->> Head for this patchset is:
->> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=b38460bc463c54e0c15ff3b37e81f7e2059bb9bb
->>
->> Link to v1:
->> https://lore.kernel.org/netdev/20230801141727.481156-1-AVKrasnov@sberdevices.ru/
->>
->> Changelog:
->> v1 -> v2:
->> * 0001 stills the same - SIGPIPE is sent only for SOCK_STREAM as discussed in v1
->>   with Stefano Garzarella <sgarzare@redhat.com>.
->> * 0002 - use 'sig_atomic_t' instead of 'bool' for flag variables updated from
->>   signal handler.
->>
->> Arseniy Krasnov (2):
->>  vsock: send SIGPIPE on write to shutdowned socket
->>  test/vsock: shutdowned socket test
-> 
-> Thanks for this series, I fully reviewed it, LGTM!
-> 
-> Please send it targeting net-next when it reopens.
+Thanks for this fix.
 
-Hi Stefano,
-
-Ok and thanks for review!
-
-Thanks, Arseniy
-
-> 
-> Stefano
-> 
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
