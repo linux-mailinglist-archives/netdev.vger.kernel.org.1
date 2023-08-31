@@ -1,176 +1,186 @@
-Return-Path: <netdev+bounces-31563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B223D78EC94
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 13:54:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 130CA78ECA5
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 13:58:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E34452814ED
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 11:54:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F11E01C20A3F
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 11:58:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7CD39470;
-	Thu, 31 Aug 2023 11:54:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8971B9471;
+	Thu, 31 Aug 2023 11:58:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A7C29466
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 11:54:32 +0000 (UTC)
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55C68C5;
-	Thu, 31 Aug 2023 04:54:30 -0700 (PDT)
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 2DD14805C1;
-	Thu, 31 Aug 2023 13:54:28 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1693482868;
-	bh=s9C/kMwJurNj9m5xf2qLpYtZKtu6ZCmIyRCq5Ip5Eqo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=p+WqBSHUPbXCvCZDLbLMtIA8KOuD0G+MMfbHjVWJtAvIsFbd3JwHtQC5jRKiBbgUW
-	 mIAO/oR3hV/MkIKcbojuv5+eTqFjxzaIcT5V/yNZJX5V6fbPcbs//LptZrGtXoDP1p
-	 HQvHB4IuA6759gW32sTIVt62PRt/gZ63NhUz+62hPRK5hrD9Q+MNx7Juck/BnCX0mi
-	 rVh6bv5arwhtXNp1DZNtTULdzbyt/LmeIg6MnZ0fMtFzxRZRrHHQtiEk4YONiV2rdz
-	 71TKbim71JgIm2d0NldvPKpCruxAv3S5JiqTFd+A27ev7nFwYhM+QLZxJkGiiyggg5
-	 WHhBGtXEBU6mA==
-Date: Thu, 31 Aug 2023 13:54:15 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
- davem@davemloft.net, Woojung Huh <woojung.huh@microchip.com>, Vladimir
- Oltean <olteanv@gmail.com>, Tristram.Ha@microchip.com, Florian Fainelli
- <f.fainelli@gmail.com>, Jakub Kicinski  <kuba@kernel.org>,
- UNGLinuxDriver@microchip.com, George McCollister 
- <george.mccollister@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/4] net: dsa: hsr: Enable HSR HW offloading for
- KSZ9477
-Message-ID: <20230831135415.1dfd8c5c@wsk>
-In-Reply-To: <b6aa2a338c2a2db597415e073819a5fe6d0187a9.camel@redhat.com>
-References: <20230831111827.548118-1-lukma@denx.de>
-	<b6aa2a338c2a2db597415e073819a5fe6d0187a9.camel@redhat.com>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 788DE63CC
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 11:58:54 +0000 (UTC)
+Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6DBBC5
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 04:58:51 -0700 (PDT)
+Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-3ff1c397405so7244545e9.3
+        for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 04:58:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1693483130; x=1694087930; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=naCriicqG+9E/gvs/YTnOWIsGi2x8P8Y5A9LW0ufG+s=;
+        b=YxhVtPv9xTuSWuUnOi79D28h1akQhunuUAVHagbhPl99o24askCaSnnJIiGbTTvgTk
+         BdAtZ2IrzNpMKrQrCdWKATHbLnB9+sS8/0nIps1/VGcWMZ2vVmREiS/MSjA7mCpipjb1
+         9ORKzxQYYjw9oInRQNG8FvQBDPJ0EEPqxGAc8RRMd8PfnqUwCSO17GbWyc2g/TeBYZL9
+         DbD3bbO2x98e3djKlDTmiDxxFbsUTypnQ+rZn7LSZ4tFW57Qx87JmV1nxfLkRd2ZA65+
+         qBITIma72ypkbmQ2ksD50KHZqBsccO+0ZAVul+ttq5lrNrrT59NRZa+7zhcTYYiHY4mg
+         OQ+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693483130; x=1694087930;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=naCriicqG+9E/gvs/YTnOWIsGi2x8P8Y5A9LW0ufG+s=;
+        b=L0CgxtDOdzzNreyHgAkISbmV8up8SvGDJN/WfVtxQ9VikC4YpwMpnvJCCOFqGBGfgU
+         E4N8Q+5Kfd7EnDeLVOyebIVaTRf2kS5g/btRkLjgT5xMaj+hRPE4sg+kTkrA6IPBRIi8
+         AwvraNzqbaHI25wXroibzhxeT1w5Xe+nA8u5aSXz5vp2g7qhIXXmkFh4QXjBRuxlAZud
+         5mwlIyxHPHDXEx43Au3ES10udAAmUgMfu3+ZgEfX3nhpi4DY+yIOi1kUHAaUslcB93np
+         BG78dtZLRTsMXaJJe4YQYeokLJYx/WLwshxFp1KCNOv8gak14nU2G7vuxnS130TZa3SB
+         Lj9g==
+X-Gm-Message-State: AOJu0YzUtc/hBBq7WuNEaa//o5EmxXFPzj4t3o5rWPR8rAxPjmAEO/X8
+	V2aPSSy58vOsmQxKw7Wrlrbsvg==
+X-Google-Smtp-Source: AGHT+IHufI2mn2rvEUwBRD4j9fuODEQuTc9N+TxSlT45FxseYUfoy/661eSNLkI+DOvsFJikKE/Kdw==
+X-Received: by 2002:a5d:40c8:0:b0:31d:d58a:4b5 with SMTP id b8-20020a5d40c8000000b0031dd58a04b5mr3792862wrq.22.1693483130003;
+        Thu, 31 Aug 2023 04:58:50 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:b41:c160:8ad8:2775:884a:f43f? ([2a01:e0a:b41:c160:8ad8:2775:884a:f43f])
+        by smtp.gmail.com with ESMTPSA id x18-20020a5d4452000000b0031431fb40fasm2015932wrr.89.2023.08.31.04.58.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 31 Aug 2023 04:58:49 -0700 (PDT)
+Message-ID: <62bcd732-31ed-e358-e8dd-1df237d735ef@6wind.com>
+Date: Thu, 31 Aug 2023 13:58:48 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/jM9aM9xWa7OVx/m1qz5B46K";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH net-next] ipv6: do not merge differe type and protocol
+ routes
+Content-Language: en-US
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Ido Schimmel <idosch@idosch.org>,
+ Thomas Haller <thaller@redhat.com>
+References: <20230830061550.2319741-1-liuhangbin@gmail.com>
+ <eeb19959-26f4-e8c1-abde-726dbb2b828d@6wind.com>
+ <01baf374-97c0-2a6f-db85-078488795bf9@kernel.org>
+ <db56de33-2112-5a4c-af94-6c8d26a8bfc1@6wind.com> <ZPBn9RQUL5mS/bBx@Laptop-X1>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Organization: 6WIND
+In-Reply-To: <ZPBn9RQUL5mS/bBx@Laptop-X1>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---Sig_/jM9aM9xWa7OVx/m1qz5B46K
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Le 31/08/2023 à 12:14, Hangbin Liu a écrit :
+> Hi Nicolas,
+> On Thu, Aug 31, 2023 at 10:17:19AM +0200, Nicolas Dichtel wrote:
+>>>>> So let's skip counting the different type and protocol routes as siblings.
+>>>>> After update, the different type/protocol routes will not be merged.
+>>>>>
+>>>>> + ip -6 route show table 100
+>>>>> local 2001:db8:103::/64 via 2001:db8:101::10 dev dummy1 metric 1024 pref medium
+>>>>> 2001:db8:103::/64 via 2001:db8:101::10 dev dummy2 metric 1024 pref medium
+>>>>>
+>>>>> + ip -6 route show table 200
+>>>>> 2001:db8:104::/64 via 2001:db8:101::10 dev dummy1 proto kernel metric 1024 pref medium
+>>>>> 2001:db8:104::/64 via 2001:db8:101::10 dev dummy2 proto bgp metric 1024 pref medium
+>>>>
+>>>> This seems wrong. The goal of 'ip route append' is to add a next hop, not to
+>>>> create a new route. Ok, it adds a new route if no route exists, but it seems
+>>>> wrong to me to use it by default, instead of 'add', to make things work magically.
+>>>
+>>> Legacy API; nothing can be done about that (ie., that append makes a new
+>>> route when none exists).
+>>>
+>>>>
+>>>> It seems more correct to return an error in these cases, but this will change
+>>>> the uapi and it may break existing setups.
+>>>>
+>>>> Before this patch, both next hops could be used by the kernel. After it, one
+>>>> route will be ignored (the former or the last one?). This is confusing and also
+>>>> seems wrong.
+>>>
+>>> Append should match all details of a route to add to an existing entry
+>>> and make it multipath. If there is a difference (especially the type -
+>>> protocol difference is arguable) in attributes, then they are different
+>>> routes.
+>>>
+>>
+>> As you said, the protocol difference is arguable. It's not a property of the
+>> route, just a hint.
+>> I think the 'append' should match a route whatever the protocol is.
+>> 'ip route change' for example does not use the protocol to find the existing
+>> route, it will update it:
+>>
+>> $ ip -6 route add 2003:1:2:3::/64 via 2001::2 dev eth1
+>> $ ip -6 route
+>> 2003:1:2:3::/64 via 2001::2 dev eth1 metric 1024 pref medium
+>> $ ip -6 route change 2003:1:2:3::/64 via 2001::2 dev eth1 protocol bgp
+>> $ ip -6 route
+>> 2003:1:2:3::/64 via 2001::2 dev eth1 proto bgp metric 1024 pref medium
+>> $ ip -6 route change 2003:1:2:3::/64 via 2001::2 dev eth1 protocol kernel
+>> $ ip -6 route
+>> 2003:1:2:3::/64 via 2001::2 dev eth1 proto kernel metric 1024 pref medium
+> 
+> Not sure if I understand correctly, `ip route replace` should able to
+> replace all other field other than dest and dev. It's for changing the route,
+> not only nexthop.
+>>
+>> Why would 'append' selects route differently?
+> 
+> The append should also works for a single route, not only for append nexthop, no?
+I don't think so. The 'append' should 'join', not add. Adding more cases where a
+route is added instead of appended doesn't make the API clearer.
 
-Hi Paolo,
+With this patch, it will be possible to add a new route with the 'append'
+command when the 'add' command fails:
+$ ip -6 route add local 2003:1:2:3::/64 via 2001::2 dev eth1 table 200
+$ ip -6 route add unicast 2003:1:2:3::/64 via 2001::2 dev eth1 table 200
+RTNETLINK answers: File exists
 
-> On Thu, 2023-08-31 at 13:18 +0200, Lukasz Majewski wrote:
-> > This patch series provides support for HSR HW offloading in KSZ9477
-> > switch IC.
-> >=20
-> > To test this feature:
-> > ip link add name hsr0 type hsr slave1 lan1 slave2 lan2 supervision
-> > 45 version 1 ifconfig lan1 up;ifconfig lan2 up
-> > ifconfig hsr0 192.168.0.1 up
-> >=20
-> > To remove HSR network device:
-> > ip link del hsr0
-> >=20
-> > Test HW:
-> > Two KSZ9477-EVB boards with HSR ports set to "Port1" and "Port2".
-> >=20
-> > Performance SW used:
-> > nuttcp -S --nofork
-> > nuttcp -vv -T 60 -r 192.168.0.2
-> > nuttcp -vv -T 60 -t 192.168.0.2
-> >=20
-> > Code: v6.5-rc7 Linux repository
-> > Tested HSR v0 and v1
-> > Results:
-> > With KSZ9477 offloading support added: RX: 100 Mbps TX: 98 Mbps
-> > With no offloading 		       RX: 63 Mbps  TX: 63 Mbps
-> >=20
-> >=20
-> > Lukasz Majewski (4):
-> >   net: dsa: Extend the ksz_device structure to hold info about HSR
-> > ports net: dsa: Extend ksz9477 TAG setup to support HSR frames
-> > duplication net: dsa: hsr: Enable in KSZ9477 switch HW HSR
-> > offloading net: dsa: hsr: Provide generic HSR ksz_hsr_{join|leave}
-> > functions
-> >=20
-> >  drivers/net/dsa/microchip/ksz9477.c    | 96
-> > ++++++++++++++++++++++++++ drivers/net/dsa/microchip/ksz9477.h    |
-> >  4 ++ drivers/net/dsa/microchip/ksz_common.c | 81
-> > ++++++++++++++++++++++ drivers/net/dsa/microchip/ksz_common.h |  3 +
-> >  include/linux/dsa/ksz_common.h         |  1 +
-> >  net/dsa/tag_ksz.c                      |  5 ++
-> >  6 files changed, 190 insertions(+)
-> >  =20
-> I'm sorry, it looks like I was not clear previously.
-> ---
-> ## Form letter - net-next-closed
->=20
-> The merge window for v6.6 has begun and therefore net-next is closed
-> for new drivers, features, code refactoring and optimizations.
-> We are currently accepting bug fixes only.
->=20
-> Please repost when net-next reopens after Sept 11th.
->=20
+$ ip -6 route add 2003:1:2:3::/64 via 2001::2 dev eth1 protocol bgp table 200
+$ ip -6 route add 2003:1:2:3::/64 via 2001::2 dev eth1 protocol kernel table 200
+RTNETLINK answers: File exists
 
-This is in fact the RFC kind of patch, as you were the only one who
-replied with feedback on it.
+This makes the API more confusing and complex. And I don't understand how it
+will be used later. There will be 2 routes on the system, but only one will be
+used, which one? This is confusing.
 
-If possible - I would like to gain as much feedback as possible until
-11.09, so this patch set could be applied then.
+> 
+>>
+>> This patch breaks the legacy API.
+> 
+> As the patch's description. Who would expect different type/protocol route
+> should be merged as multipath route? I don't think the old API is correct.
+The question is not 'who expect', but 'is there some systems somewhere that rely
+on this (deliberately or not)'.
+Frankly, the protocol is just informative, so I don't see why it is a problem to
+ignore it with the 'append' command.
+For the type, it is weird, for sure. Rejecting the command seems better than
+duplicating routes. Which route is used by the stack?
 
-> RFC patches sent for review only are obviously welcome at any time.
->=20
 
-Shall I send RFC again? Or is the above explanation enough to proceed
-with review?
-
-> See:
-> https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#devel=
-opment-cycle
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/jM9aM9xWa7OVx/m1qz5B46K
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmTwf2cACgkQAR8vZIA0
-zr0dwgf8D8mGVYVc8/LUKsa1Orc0F8I/RrqxRziPuHP8bmqquJDXCoy8szrT4o9r
-RVUSqefsOTmMNYB2V5FqCyqQbf9pjeSpssNDXLOm6qwbm+byNegHgp9e52IixBud
-nq5553wBWCfByz8PNcGwDTJ6irYbwQkKMiLQNoIfhx30OfLFscaGcKuZRFx8wEI1
-ppl7E7v3Tj0bSmgjFw20FIQ8/tvxJdIYgxCHU98a2cZCaKVNR2LB3nv7pXjZouvr
-9la2jWBQ2cYpUnqFnuvlzSyQexb5ipAtE6ADP3gd2oz+ibmytd2yEw2Bg0pjyNJI
-pwZFsk5s9fWxbMGdKBTH9L5AJ21G2A==
-=aVyX
------END PGP SIGNATURE-----
-
---Sig_/jM9aM9xWa7OVx/m1qz5B46K--
+Regards,
+Nicolas
 
