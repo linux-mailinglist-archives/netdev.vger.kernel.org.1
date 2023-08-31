@@ -1,129 +1,267 @@
-Return-Path: <netdev+bounces-31488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B96B378E592
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 07:15:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24D6C78E599
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 07:18:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13ADC281344
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 05:15:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E566F1C2074A
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 05:18:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08A601854;
-	Thu, 31 Aug 2023 05:15:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40DA51854;
+	Thu, 31 Aug 2023 05:18:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8B951846;
-	Thu, 31 Aug 2023 05:15:24 +0000 (UTC)
-Received: from mail-qv1-xf2b.google.com (mail-qv1-xf2b.google.com [IPv6:2607:f8b0:4864:20::f2b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BAB9D2;
-	Wed, 30 Aug 2023 22:15:19 -0700 (PDT)
-Received: by mail-qv1-xf2b.google.com with SMTP id 6a1803df08f44-6516bc20f37so1435926d6.1;
-        Wed, 30 Aug 2023 22:15:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693458918; x=1694063718; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=M8FIm4HOaEvNyGP3mdXlZvY4sb39VihsE/tZdbALed8=;
-        b=ME/5KVvmx0h07oVhAwuBXJFRVRZrfEEVdsKNpr6uRho9QjZMP/WSdQB/IonNsiknXD
-         GLSPJwjr7M903X41lbctshxgiju8Yl1yxHApkGJgKy6UYzO+wBrMSKP2/zR3oILy6dem
-         hIKdLz20tG7q6WFGFH61Oatt580N5g2PESR7NTHg9w7cOeWjDIDEk2UVX83z+j3QsdpA
-         JwkF4UTrksMR0B+jFdCW15YQLHLX73ZJkA84EZaWUzt0wATChJjXv+gqTKIAhdFT06pP
-         To6tEiHu2Mv6Y6Vvat2TDV0WPxhAyyrR9snaPpgLUhKiWbrw4bLcEzPNobh4EiO98Trb
-         EJGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693458918; x=1694063718;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=M8FIm4HOaEvNyGP3mdXlZvY4sb39VihsE/tZdbALed8=;
-        b=fGRxJyzkpCWXj+ryYep775j2vPjcJc69cTwPqOKtEq+GdzQejlFyzMpPOPrNZndO2V
-         uO2BBXWhXoqjn7a29UKyMEwi0JktLcurDDHSECJjlhQo2/3SR3vOzsbsz9IQUfONxPnM
-         ikTu9+pKrvi2BQETDyhdG1kdqDF7M7JfyQNMnENjt8NU6I5Rg1imWoY/xGl3P3EKolEq
-         GxZLXNvM+/FEVvMv4XsmcJKzEB3qzMFAWtIT1UtcIqbUJgf5yLBJStG0cCKwAHN0FtBt
-         hZ8jKTBQP50N5jZUg02PMKCGkwkWAXsoMQ/YK2aJM2G7uYC2KAHVvVjgMarJbdIGbYlH
-         2pwA==
-X-Gm-Message-State: AOJu0YxijBDSG5q6vW3AXCUy8SGgICgdiXXUOpr818qmy1HzxnPg06yA
-	b+UBFkJ2+Aqtf+/tDPlhtJsjowUH6BPyLVCN6UU=
-X-Google-Smtp-Source: AGHT+IF7AAV77xKsJCzoV+Bu5gHFIlBoNDuDAlriBlSVpWp/GZ5tmKuBC18U6WnmOilTrcbJTed6WwcZny7OQneFJYg=
-X-Received: by 2002:a05:6214:1d2c:b0:64f:8b28:b753 with SMTP id
- f12-20020a0562141d2c00b0064f8b28b753mr4480064qvd.0.1693458918578; Wed, 30 Aug
- 2023 22:15:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30167184C
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 05:18:21 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0F59D2
+	for <netdev@vger.kernel.org>; Wed, 30 Aug 2023 22:18:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1693459100; x=1724995100;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=seyLhPF7coOHVjrYCUsYlWNzVufKHd84IH33Lko6oIk=;
+  b=L8mKPJMOvJtM3n9RXixnxyTDaNuQPOlrK/f+N5J/pbyfTrwj//FvtnCq
+   4dbd5LJgo5TiDymkhunPDo6nrR9PojDYpXICZJ3+WldkhP6LOk3pHdIGN
+   Vr3XJwXas77cZTib0RfB/bIGp3p3u41wHAqcB2eajDPKF9o/SBmkPuwbQ
+   9O5KkEzYSeX1Dl23HEOLrs7ZNPfhY6dOukAvqXYosOqm5rmPKVvpT/2cS
+   QBwMQQaoKtYR6qdgr/P/6W7LL6L3xK4kdOQAhrKpK/Fo7m4sYpX9eJLb7
+   2SX+/hooujs1j85DR6FyMdkyURQKd+UlOXwuyFMtBeIJKCu/dkuRVteYw
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10818"; a="379565658"
+X-IronPort-AV: E=Sophos;i="6.02,215,1688454000"; 
+   d="scan'208";a="379565658"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2023 22:18:20 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10818"; a="768664280"
+X-IronPort-AV: E=Sophos;i="6.02,215,1688454000"; 
+   d="scan'208";a="768664280"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orsmga008.jf.intel.com with ESMTP; 30 Aug 2023 22:18:20 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 30 Aug 2023 22:18:20 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 30 Aug 2023 22:18:19 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Wed, 30 Aug 2023 22:18:19 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.171)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Wed, 30 Aug 2023 22:18:19 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OyJ2xbwK9YXinFwrvqW7V+WZwqZsJqX3Cm1KRZ94Aw5ml+19vlNCcC0bkRiNEDl5dJw8wAVn59PY4iSku5/L78XjU77P0iiAkCkOTl0gsksrS9z5NSjtuaYeyY1LYZHREyWxnt/RyaGBVAPXaEF9zZW117jvRuZpCENj62Ri7k9AnsO/mK1lPpmAd4pgH+LMn6JITS69DChjzhii/0JlV0RiQ4tUBkAOjLpUivzxqXUY9dqjteIZx8nqEKGnYx7pwAOig2l7knFgGYpdbbUZOSpUbZkBTG5/HGASDX8quyTZDRrVRGQizcKT8R5e5YVbrRDL6M7za1xtTzP3pzd2MA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QH7GOIdexB/PAVjKLsad9NTrmoEDWJmItZi4YPE9ebo=;
+ b=R753Ow3LIfAiG2KC/j0fYXF1H0lP1Gt8NvdKuhw7cnET/RvfYrAKCO+vO7+/s5ZU6fec9rd4DR6qOPYDl74mDo1a1d6vV/Z+0KZ+7idGUy6uwkr/88KDsq6CfGk1t5iSn8JvbfZnEW0OiaA7ev9uDuBU6O3wtvsuOnhFqsl7FidM3Rb3jZakyTepT+ADem9Arp3hRWbIFZsMVyJJ2MOdHu6oin7UfTR0s2+J5WLloyB6IPwCUpVcKvSNIKbs3ZL7p5ttUDpzF+k0aan1fwC1VzK1JTQyC8SXWNyg0L1XMJ+ppTrFgx1EHXbl9Sbeu//t+P7E4Dg/CiNAeIzr8n2Z1g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL0PR11MB3122.namprd11.prod.outlook.com (2603:10b6:208:75::32)
+ by MW4PR11MB6740.namprd11.prod.outlook.com (2603:10b6:303:209::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.35; Thu, 31 Aug
+ 2023 05:18:15 +0000
+Received: from BL0PR11MB3122.namprd11.prod.outlook.com
+ ([fe80::a6fa:cb0d:5e13:fc2d]) by BL0PR11MB3122.namprd11.prod.outlook.com
+ ([fe80::a6fa:cb0d:5e13:fc2d%4]) with mapi id 15.20.6745.020; Thu, 31 Aug 2023
+ 05:18:15 +0000
+From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, "Brandeburg, Jesse"
+	<jesse.brandeburg@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, Jakub Kicinski <kuba@kernel.org>, "Alexander
+ Duyck" <alexander.duyck@gmail.com>, "Rustad, Mark D"
+	<mark.d.rustad@intel.com>, Darin Miller <darin.j.miller@intel.com>, "Jeff
+ Kirsher" <jeffrey.t.kirsher@intel.com>, Richard Cochran
+	<richardcochran@gmail.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+Subject: RE: [Intel-wired-lan] [PATCH net] ixgbe: fix timestamp configuration
+ code
+Thread-Topic: [Intel-wired-lan] [PATCH net] ixgbe: fix timestamp configuration
+ code
+Thread-Index: AQHZ1g+ASmiBu+CN/kawX/lH5NF/RrAD4lwQ
+Date: Thu, 31 Aug 2023 05:18:15 +0000
+Message-ID: <BL0PR11MB3122FF925838E8F850787467BDE5A@BL0PR11MB3122.namprd11.prod.outlook.com>
+References: <20230823221537.816541-1-vadim.fedorenko@linux.dev>
+In-Reply-To: <20230823221537.816541-1-vadim.fedorenko@linux.dev>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL0PR11MB3122:EE_|MW4PR11MB6740:EE_
+x-ms-office365-filtering-correlation-id: b06b61c7-4617-4123-3010-08dba9e1ae03
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: G+RR5IBEFIp0PG8FTKpKmzVwrXFGXkD0XVTINKaRBBsPkwYFUCcQ00wA0EbAUbYIDR89KUicM6iDmbdBJsuXzG3s8qUnqHOUqFB3dmALhmcylZIYuvVO59G2wvAWJMpqhJKwfodnvEyS+l6NmACIRp4E7qWnKyFjwjrphR2xTwrJ0VlNHG8Ov38eHNn5PIsHHdFO1vn6nOYsZ3N4mPcEyz4/QE5YW+Je04BRyP2oy1yC5sW83QB/ECugnXXBkJPVr/921RtBZ0CTRLLyt8ze1LkYMa5uzpqgEJazn+/HEzgDGQ2TIMJGQaan7hXijcyxmkh9H22lVyDDpFXy2V2diZ9IGGx52ykut6U2Qc4JJIse6r9O8IquKAeD6LtSt4M50mbc/U8wFHTI3q5n3Ql9VQDluczC+3K+TJm6D8y5d6IF5JdpgvqqTq6qxc+HHZUC9CjzRptOTDd/kFth+IoGZ6G7AQcdvIws6CxQS2QFUm3JU5Lru16Id5uAlnoiw96fFM/MX3zx5Zu2iBnYpWB+9U6T70RQA73Cc9wbOn4f/hta34GOiyIY4VGLQ+HQWOkGpHxYExoFyNX4StKpsC+mQyYnwzd7wHpLifzuBFpLX+gFnsqkms8gx98xpZql1jz3yOgo+caW3qVy2uJz/DEXog==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB3122.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(346002)(136003)(39860400002)(366004)(186009)(451199024)(1800799009)(921005)(8936002)(122000001)(110136005)(478600001)(53546011)(76116006)(7696005)(66476007)(6506007)(71200400001)(66556008)(54906003)(66946007)(64756008)(66446008)(38070700005)(316002)(38100700002)(41300700001)(82960400001)(9686003)(5660300002)(8676002)(55016003)(52536014)(86362001)(26005)(83380400001)(2906002)(33656002)(4326008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?o2AK/iJfeAjs2b4lnjgwq+D6ggMaVT9CA47BN06sH34/2IOVIRUMfOQHQo4r?=
+ =?us-ascii?Q?V7nwJgMfZnLA1RwI6ZPvYUZvcP/jeoGn+iW0Q+d7/yuUdUfhHT3raMNPPAv6?=
+ =?us-ascii?Q?H/nQppr4vOrsWEvJTyYsN+koH3XITPDb3At2feOrnbQk3Dcw3ipZo1jsm0mt?=
+ =?us-ascii?Q?GWpy2c3NWcxt8UC9pcOTVGGUE/Cmpm4EnXwSBh4bZVqVERItKDgEPc2tG6YN?=
+ =?us-ascii?Q?5Fn3ckfK/+QGe3haw/9n6h8iNvINscwTqRp6AyC8f3S0dXlw8VwFFG/ZAeJK?=
+ =?us-ascii?Q?FNH0KgfDNCC8xXUpz3hiB8JXEFaQK8HA1Aa7kwdfrLspe+MtVKjwlKK0ohGc?=
+ =?us-ascii?Q?Gq0mPvRFBj9fK8TygfYPB+I77MEcavUhxSliuwnE0rTda4y9Z2JDPKXoNrYn?=
+ =?us-ascii?Q?CMLSGIxvFGJG1PESqJKT0BHxlSwbYv+4WUvf5MnU90v7RnMKjkNbJYdzPKNn?=
+ =?us-ascii?Q?aQyAZg9k9RBsZ6S0tvizxICyuqzKgq4vnLSkXnlgR2478JMC/BfDxv3I8ocv?=
+ =?us-ascii?Q?OjSJxeoh6db9oaGJKWbDvi9tECllZPgO3ypQaeuLOx+8nJrogNJyp8Fs+BPI?=
+ =?us-ascii?Q?fn/FEaRjOLnGvpcgl2pg615rPFXXj1vBzeFZxikiS5s8CBi5epWcBFzIPbjc?=
+ =?us-ascii?Q?xBnU9tX+A4aszROFdeJrKpavZwb0dF/9j6knMldzlq70tL5mz0pKa4HhmsWZ?=
+ =?us-ascii?Q?7FlCP68Rlf61O3ZryGxcKHZrwWw7ZeWTewonAd2wSZCcDczPfBwJSXN9QzXG?=
+ =?us-ascii?Q?LOpzXJefvdzgcMif0S1Trn0oWuQ6Xtz4qwIT+gl6mVjndSwhAHVK10YvplA5?=
+ =?us-ascii?Q?fd0ppTGUObBKlTm25HfNTI6PYiw6htBGBif6yfsOhUcwukOWaD9jm1++S4BB?=
+ =?us-ascii?Q?ykqEdl9kkEb/UUfbj8RwId1xSHBUWTPntpkaehXehq5XgzTVW1ywm576wZ/D?=
+ =?us-ascii?Q?guzU7KD9RWPx3O6oJMQLMbb4jXo+6/V1irgkCbZSVt54nVvw+BAraOCw1/sR?=
+ =?us-ascii?Q?FaFpZv6rtL4LhWIgFNdj5ckUEmaZ8m5HTrkgakVTTTjAZXrFPUUbmVMdbmJi?=
+ =?us-ascii?Q?Y19Hsf87wPwuK4g+8ClQbZb4FMYqX8xogu5cy2+pgeEtuX5bJ6MeWsoVZQUa?=
+ =?us-ascii?Q?L484eGFJ1mP4pHZtP2Iavqs//+W3XFMiptOmN2ym6Wx6LBMwlxnFed5RuOh+?=
+ =?us-ascii?Q?HXSe7D7HQkMpuvEa3PY23+5N4pybMzbUuCWqXyRA89iWEaop3WSENVOv5o//?=
+ =?us-ascii?Q?d1RLWd7ZQuZdvf9+46wmR6YSymuB4GqsmcQZlDPtzblCp5GmktJPXfNZwpIC?=
+ =?us-ascii?Q?aoIzCGNN40DGXvy5kx2KW2pA01tV32dPpxTzKCcEitBE996j4XMJcacVh7DU?=
+ =?us-ascii?Q?7IgZD+IfXNwNcDa7DZX6NcOXjLKYPMBAVrcX5ThzmrX+tjYSQwofEEajEZx8?=
+ =?us-ascii?Q?cKKVQexL9xLE5H6DWT+hwCaFiX2OL2bXnzya1kUSOluYG8SOMnBpbmS9RaRh?=
+ =?us-ascii?Q?rVoOJQWmzoKQGZC5idpmrTH42aoycui5cMEgtmcSIbF6Eus/PZScqyLfgyF3?=
+ =?us-ascii?Q?IfoWZsj1kqDA2llrmckHhTslfSemjeAlWF59e/Bkk5ILcRLnoHf43ambd5KQ?=
+ =?us-ascii?Q?aA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230830151704.14855-1-magnus.karlsson@gmail.com>
-In-Reply-To: <20230830151704.14855-1-magnus.karlsson@gmail.com>
-From: Magnus Karlsson <magnus.karlsson@gmail.com>
-Date: Thu, 31 Aug 2023 07:15:06 +0200
-Message-ID: <CAJ8uoz3V+UXc0K1uYA2zU7oxmbOAQPAf3Uti7W3cmH4hK1s9kg@mail.gmail.com>
-Subject: Re: [PATCH bpf] xsk: fix xsk_diag use-after-free error during socket cleanup
-To: magnus.karlsson@intel.com, bjorn@kernel.org, ast@kernel.org, 
-	daniel@iogearbox.net, netdev@vger.kernel.org, maciej.fijalkowski@intel.com
-Cc: jonathan.lemon@gmail.com, bpf@vger.kernel.org, 
-	syzbot+822d1359297e2694f873@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB3122.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b06b61c7-4617-4123-3010-08dba9e1ae03
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Aug 2023 05:18:15.4666
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: sqaiWydbV9NrjJ2McClUlI7vqhL3hT+thKifANu4IcdtmHptRv9PlbF/mWOlYbW/fEnzi0HTCl1CV704ueeh01dshg5LPIdUxYdc0BabhD1SrdpLytVhkOz/y9gJbdKx
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB6740
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, 30 Aug 2023 at 17:17, Magnus Karlsson <magnus.karlsson@gmail.com> wrote:
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of V=
+adim Fedorenko
+> Sent: Thursday, August 24, 2023 3:46 AM
+> To: Brandeburg, Jesse <jesse.brandeburg@intel.com>; Nguyen, Anthony L <an=
+thony.l.nguyen@intel.com>; Jakub Kicinski <kuba@kernel.org>; Alexander Duyc=
+k <alexander.duyck@gmail.com>; Rustad, Mark D <mark.d.rustad@intel.com>; Da=
+rin Miller <darin.j.miller@intel.com>; Jeff Kirsher <jeffrey.t.kirsher@inte=
+l.com>; Richard Cochran <richardcochran@gmail.com>
+> Cc: netdev@vger.kernel.org; intel-wired-lan@lists.osuosl.org; Vadim Fedor=
+enko <vadim.fedorenko@linux.dev>
+> Subject: [Intel-wired-lan] [PATCH net] ixgbe: fix timestamp configuration=
+ code
 >
-> From: Magnus Karlsson <magnus.karlsson@intel.com>
+> The commit in fixes introduced flags to control the status of hardware
+> configuration while processing packets. At the same time another structur=
+e
+> is used to provide configuration of timestamper to user-space application=
+s.
+> The way it was coded makes this structures go out of sync easily. The
+> repro is easy for 82599 chips:
 >
-> Fix a use-after-free error that is possible if the xsk_diag interface
-> is used at the same time as the socket is being closed. In the early
-> days of AF_XDP, the way we tested that a socket was not bound or being
-> closed was to simply check if the netdevice pointer in the xsk socket
-> structure was NULL. Later, a better system was introduced by having an
-> explicit state variable in the xsk socket struct. For example, the
-> state of a socket that is going down is XSK_UNBOUND.
+> [root@hostname ~]# hwstamp_ctl -i eth0 -r 12 -t 1
+> current settings:
+> tx_type 0
+> rx_filter 0
+> new settings:
+> tx_type 1
+> rx_filter 12
 >
-> The commit in the Fixes tag below deleted the old way of signalling
-> that a socket is going down, setting dev to NULL. This in the belief
-> that all code using the old way had been exterminated. That was
-> unfortunately not true as the xsk diagnostics code was still using the
-> old way and thus does not work as intended when a socket is going
-> down. Fix this by introducing a test against the state variable. If
-> the socket is going down, simply abort the diagnostic's netlink
-> operation.
+> The eth0 device is properly configured to timestamp any PTPv2 events.
+>=20
+> [root@hostname ~]# hwstamp_ctl -i eth0 -r 1 -t 1
+> current settings:
+> tx_type 1
+> rx_filter 12
+> SIOCSHWTSTAMP failed: Numerical result out of range
+> The requested time stamping mode is not supported by the hardware.
 >
-> Fixes: 18b1ab7aa76b ("xsk: Fix race at socket teardown")
-> Reported-by: syzbot+822d1359297e2694f873@syzkaller.appspotmail.com
-> Signed-off-by: Magnus Karlsson <magnus.karlsson@intel.com>
+> The error is properly returned because HW doesn't support all packets
+> timestamping. But the adapter->flags is cleared of timestamp flags
+> even though no HW configuration was done. From that point no RX timestamp=
+s
+> are received by user-space application. But configuration shows good
+> values:
+>
+> [root@hostname ~]# hwstamp_ctl -i eth0
+> current settings:
+> tx_type 1
+> rx_filter 12
+>
+> Fix the issue by applying new flags only when the HW was actually
+> configured.
+>
+> Fixes: a9763f3cb54c ("ixgbe: Update PTP to support X550EM_x devices")
+> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 > ---
->  net/xdp/xsk_diag.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c | 28 +++++++++++---------
+>  1 file changed, 15 insertions(+), 13 deletions(-)
 >
-> diff --git a/net/xdp/xsk_diag.c b/net/xdp/xsk_diag.c
-> index c014217f5fa7..da3100bfa1c5 100644
-> --- a/net/xdp/xsk_diag.c
-> +++ b/net/xdp/xsk_diag.c
-> @@ -111,6 +111,9 @@ static int xsk_diag_fill(struct sock *sk, struct sk_buff *nlskb,
->         sock_diag_save_cookie(sk, msg->xdiag_cookie);
->
->         mutex_lock(&xs->mutex);
-> +       if (xs->state == XSK_UNBOUND)
 
-Sorry, but I have to spin a v2. There should be a READ_ONCE() here of the state.
+Hi,
+With patch also we are observing same issue.
 
-> +               goto out_nlmsg_trim;
-> +
->         if ((req->xdiag_show & XDP_SHOW_INFO) && xsk_diag_put_info(xs, nlskb))
->                 goto out_nlmsg_trim;
->
->
-> base-commit: 35d2b7ffffc1d9b3dc6c761010aa3338da49165b
-> --
-> 2.42.0
->
+# ./hwstamp_ctl -i eth10
+current settings:
+tx_type 1
+rx_filter 12
+# ./hwstamp_ctl -i eth10 -r 1 -t 1
+current settings:
+tx_type 1
+rx_filter 12
+SIOCSHWTSTAMP failed: Numerical result out of range
+The requested time stamping mode is not supported by the hardware.
+
+Adapter details: Niantic (Spring Fountain)
+
+SUT info:
+H/W:
+  Manufacturer: Intel Corporation
+  Product Name: S2600STQ
+  RAM: [62G/8G/49G]
+  CPU: Intel(R) Xeon(R) Platinum 8180 CPU @ 2.50GHz [112/112]
+  PF bus-info: 0000:d8:00.1 0x8086:0x10fb 0x8086 0x000c (0x01)
+S/W:
+  OS: "Red Hat Enterprise Linux 8.6 (Ootpa)" 6.5.0-rc7_next-queue_28-Aug-20=
+23-01755-g938672aefaeb
+  CMD: BOOT_IMAGE=3D(hd0,msdos2)/vmlinuz-6.5.0-rc7_next-queue_28-Aug-2023-0=
+1755-g938672aefaeb root=3D/dev/mapper/rhel_os--delivery-root ro crashkernel=
+=3D1G-4G:192M,4G-64G:256M,64G-:512M resume=3D/dev/mapper/rhel_os--delivery-=
+swap rd.lvm.lv=3Drhel_os-delivery/root rd.lvm.lv=3Drhel_os-delivery/swap se=
+linux=3D0 biosdevname=3D0 net.ifnames=3D0 rhgb quiet
+  FW firmware-version: 0x000161bf
+  PF version: 6.5.0-rc7_next-queue_28-Aug-202
+
+
 
