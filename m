@@ -1,87 +1,152 @@
-Return-Path: <netdev+bounces-31566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 364DE78ECAD
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 14:00:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63BFD78ECC7
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 14:09:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 661241C20ACA
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 12:00:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E16C281502
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 12:09:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50668C2C1;
-	Thu, 31 Aug 2023 12:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7AC3111AB;
+	Thu, 31 Aug 2023 12:09:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE9F111BB;
-	Thu, 31 Aug 2023 12:00:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B193EC433C7;
-	Thu, 31 Aug 2023 12:00:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693483223;
-	bh=fQuCc+pT8AFDqLlZJ9XoMzF8snrZ0LhmySkKQUntOls=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=OMOGH7e7firZvdmnxf6Qxbb152CYEpdg7uMNtuLnyeNYzxI4R1HSW3N/0kIMrKK2K
-	 NpEjpkPERWaQOn+nChQYn6o8S/7ciJaBsSlBkt0OzuhXYuSg4uIw5hpvgWsEefTyu2
-	 Qohz+q4/MHZG3+/j6nrEfaNUBMhXNeLttmCspzSTLv8N7e76y6drDHc09OS++zAEtf
-	 761k02erJppcGisbozdJtT434J98ELlb6pKPc5B0IhvCslYBgAVbhCVp5fLejIC9rm
-	 OYaRJCyBGESW0tmGjgIEUOYuZ2YO1838flrptqqh3Qmh5595H5EvMe2QpPIDFZuB/1
-	 csNNXzwMQGkcg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 92FDAC595D2;
-	Thu, 31 Aug 2023 12:00:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A7DEC8C0;
+	Thu, 31 Aug 2023 12:09:09 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF9F0C5;
+	Thu, 31 Aug 2023 05:09:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=8a4slKVv/K6FTf6axtxItTQ1c7A/x1G9SFC2cF/bkCM=; b=UDnks1r48rEuxEbvUjCpibstA8
+	zlOxnzt5HyPJqaeFjLXKLXEbEe2SZ3B5QOrvat6HAbL+k416Sb6iIhsLXTKMo1qoDZVjDc12+bZcm
+	xW2I84u20lOgXBBK/oHmP2/fJErTcKY5MFAcyO2zGdt1H98dTGnsvZbTKEfHsHnjaAreABkAqX5Sv
+	EeTB/kV8wvNQgXOA6XjSWBYduKJdrC3X5i5luN++5bXQXCaj7We3GsQxshvQS8VDUwInHWDFAqECJ
+	InCFKKuczHtqpgdHVhQhmS9GQ2MoeE8LV4hkDt9r33l2LBPa1ufDUuCd4pjJvQZNxqc7SZaV+Uknd
+	wn8zojiw==;
+Received: from sslproxy03.your-server.de ([88.198.220.132])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qbgTx-00014N-EK; Thu, 31 Aug 2023 14:09:05 +0200
+Received: from [85.1.206.226] (helo=linux.home)
+	by sslproxy03.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qbgTx-000NPU-Hm; Thu, 31 Aug 2023 14:09:05 +0200
+Subject: Re: [PATCH bpf-next] selftests/bpf: fix a CI failure caused by vsock
+ write
+To: Xu Kuohai <xukuohai@huaweicloud.com>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: Bobby Eshleman <bobby.eshleman@bytedance.com>
+References: <20230831013105.2930824-1-xukuohai@huaweicloud.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <9cf7982c-ec8a-4af9-98a8-549cd87dca70@iogearbox.net>
+Date: Thu, 31 Aug 2023 14:09:05 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Fix invalid escape sequence warnings
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169348322359.7795.11591685845254219512.git-patchwork-notify@kernel.org>
-Date: Thu, 31 Aug 2023 12:00:23 +0000
-References: <20230829074931.2511204-1-vishalc@linux.ibm.com>
-In-Reply-To: <20230829074931.2511204-1-vishalc@linux.ibm.com>
-To: Vishal Chourasia <vishalc@linux.ibm.com>
-Cc: andrii.nakryiko@gmail.com, andrii@kernel.org, ast@kernel.org,
- bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net,
- haoluo@google.com, hawk@kernel.org, john.fastabend@gmail.com,
- jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org,
- linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org,
- quentin@isovalent.com, sachinp@linux.ibm.com, sdf@google.com,
- song@kernel.org, srikar@linux.vnet.ibm.com, yhs@fb.com
+In-Reply-To: <20230831013105.2930824-1-xukuohai@huaweicloud.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.8/27017/Thu Aug 31 09:40:48 2023)
+X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
-
-This patch was applied to bpf/bpf.git (master)
-by Daniel Borkmann <daniel@iogearbox.net>:
-
-On Tue, 29 Aug 2023 13:19:31 +0530 you wrote:
-> The script bpf_doc.py generates multiple SyntaxWarnings related to invalid
-> escape sequences when executed with Python 3.12. These warnings do not appear in
-> Python 3.10 and 3.11 and do not affect the kernel build, which completes
-> successfully.
+On 8/31/23 3:31 AM, Xu Kuohai wrote:
+> From: Xu Kuohai <xukuohai@huawei.com>
 > 
-> This patch resolves these SyntaxWarnings by converting the relevant string
-> literals to raw strings or by escaping backslashes. This ensures that
-> backslashes are interpreted as literal characters, eliminating the warnings.
+> While commit 90f0074cd9f9 ("selftests/bpf: fix a CI failure caused by vsock sockmap test")
+> fixes a receive failure of vsock sockmap test, there is still a write failure:
 > 
-> [...]
+> Error: #211/79 sockmap_listen/sockmap VSOCK test_vsock_redir
+> Error: #211/79 sockmap_listen/sockmap VSOCK test_vsock_redir
+>    ./test_progs:vsock_unix_redir_connectible:1501: egress: write: Transport endpoint is not connected
+>    vsock_unix_redir_connectible:FAIL:1501
+>    ./test_progs:vsock_unix_redir_connectible:1501: ingress: write: Transport endpoint is not connected
+>    vsock_unix_redir_connectible:FAIL:1501
+>    ./test_progs:vsock_unix_redir_connectible:1501: egress: write: Transport endpoint is not connected
+>    vsock_unix_redir_connectible:FAIL:1501
+> 
+> The reason is that the vsock connection in the test is set to ESTABLISHED state
+> by function virtio_transport_recv_pkt, which is executed in a workqueue thread,
+> so when the user space test thread runs before the workqueue thread, this
+> problem occurs.
+> 
+> To fix it, before writing the connection, wait for it to be connected.
+> 
+> Fixes: d61bd8c1fd02 ("selftests/bpf: add a test case for vsock sockmap")
+> Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
 
-Here is the summary with links:
-  - [v2] Fix invalid escape sequence warnings
-    https://git.kernel.org/bpf/bpf/c/121fd33bf2d9
+Thanks for the fix! Looks like this is gone now at least in the tests which succeed,
+but there are still two issues:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+1) s390x fails in BPF CI as below:
 
+https://github.com/kernel-patches/bpf/actions/runs/6031993528/job/16366784236
 
+Error: #211 sockmap_listen
+Error: #211/79 sockmap_listen/sockmap VSOCK test_vsock_redir
+   Error: #211/79 sockmap_listen/sockmap VSOCK test_vsock_redir
+   ./test_progs:vsock_socketpair_connectible:1456: poll_connect: Invalid argument
+   vsock_socketpair_connectible:FAIL:1456
+   ./test_progs:vsock_unix_redir_connectible:1494: vsock_socketpair_connectible() failed
+   vsock_unix_redir_connectible:FAIL:1494
+   ./test_progs:vsock_socketpair_connectible:1456: poll_connect: Invalid argument
+   vsock_socketpair_connectible:FAIL:1456
+   ./test_progs:vsock_unix_redir_connectible:1494: vsock_socketpair_connectible() failed
+   vsock_unix_redir_connectible:FAIL:1494
+   ./test_progs:vsock_socketpair_connectible:1456: poll_connect: Invalid argument
+   vsock_socketpair_connectible:FAIL:1456
+   ./test_progs:vsock_unix_redir_connectible:1494: vsock_socketpair_connectible() failed
+   vsock_unix_redir_connectible:FAIL:1494
+   ./test_progs:vsock_socketpair_connectible:1456: poll_connect: Invalid argument
+   vsock_socketpair_connectible:FAIL:1456
+   ./test_progs:vsock_unix_redir_connectible:1494: vsock_socketpair_connectible() failed
+   vsock_unix_redir_connectible:FAIL:1494
+Error: #211/158 sockmap_listen/sockhash VSOCK test_vsock_redir
+   Error: #211/158 sockmap_listen/sockhash VSOCK test_vsock_redir
+   ./test_progs:vsock_socketpair_connectible:1456: poll_connect: Invalid argument
+   vsock_socketpair_connectible:FAIL:1456
+   ./test_progs:vsock_unix_redir_connectible:1494: vsock_socketpair_connectible() failed
+   vsock_unix_redir_connectible:FAIL:1494
+   ./test_progs:vsock_socketpair_connectible:1456: poll_connect: Invalid argument
+   vsock_socketpair_connectible:FAIL:1456
+   ./test_progs:vsock_unix_redir_connectible:1494: vsock_socketpair_connectible() failed
+   vsock_unix_redir_connectible:FAIL:1494
+   ./test_progs:vsock_socketpair_connectible:1456: poll_connect: Invalid argument
+   vsock_socketpair_connectible:FAIL:1456
+   ./test_progs:vsock_unix_redir_connectible:1494: vsock_socketpair_connectible() failed
+   vsock_unix_redir_connectible:FAIL:1494
+   ./test_progs:vsock_socketpair_connectible:1456: poll_connect: Invalid argument
+   vsock_socketpair_connectible:FAIL:1456
+   ./test_progs:vsock_unix_redir_connectible:1494: vsock_socketpair_connectible() failed
+   vsock_unix_redir_connectible:FAIL:1494
+
+2) Various panics, some GPFs but also seen NULL pointer derefs, discussed in the other
+    thread: https://lore.kernel.org/bpf/ZO+RQwJhPhYcNGAi@krava/
+
+I believe issue 1) might still be related to your fix in here, ptal.
+
+Thanks,
+Daniel
 
