@@ -1,112 +1,103 @@
-Return-Path: <netdev+bounces-31561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7560478EC55
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 13:41:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7984178EC54
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 13:41:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3043528151A
-	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 11:41:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 629491C209C3
+	for <lists+netdev@lfdr.de>; Thu, 31 Aug 2023 11:41:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B94CB9460;
-	Thu, 31 Aug 2023 11:41:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DE8E9447;
+	Thu, 31 Aug 2023 11:41:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD4649444
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 11:41:36 +0000 (UTC)
-Received: from r3-24.sinamail.sina.com.cn (r3-24.sinamail.sina.com.cn [202.108.3.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C32BE63
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 04:41:24 -0700 (PDT)
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([112.97.53.170])
-	by sina.com (172.16.97.23) with ESMTP
-	id 64F07C5D00001B40; Thu, 31 Aug 2023 19:41:19 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 69514931457696
-X-SMAIL-UIID: 61ABE43BA2DA49A7A438DA4E0AE7C64A-20230831-194119
-From: Hillf Danton <hdanton@sina.com>
-To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Cc: Netdev <netdev@vger.kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Naresh Kamboju <naresh.kamboju@linaro.org>,
-	LKML <linux-kernel@vger.kernel.org>
-Subject: Re: selftests: net: pmtu.sh: Unable to handle kernel paging request at virtual address
-Date: Thu, 31 Aug 2023 19:41:08 +0800
-Message-Id: <20230831114108.4744-1-hdanton@sina.com>
-In-Reply-To: <f607a7d5-8075-f321-e3c0-963993433b14@I-love.SAKURA.ne.jp>
-References: <20230830112600.4483-1-hdanton@sina.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB559444
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 11:41:31 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D415E5C
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 04:41:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1693482075;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YnuQHzAIFGo0WZruZWqfRWGANCb/aDF+514/VQ3/nGA=;
+	b=X4O12gA9KSzdfT57lRjxtwfNRlZl+z0UhMjcOZ4Gm8eUhK/yDJ37y5G7imjB3shafUBedk
+	LmI7VAq1q5eZRPXQQkEkWLk6tysFal0tbZDwXngpVo44a6xU0QW2MtG4RbvU3spMDJ+Z/F
+	v4bhEYzwGP/5y4lgHkrYw0T5DCi+q0U=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-310-MZ2iyejRNQuo5FiWKY4oOg-1; Thu, 31 Aug 2023 07:41:14 -0400
+X-MC-Unique: MZ2iyejRNQuo5FiWKY4oOg-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-9a5b578b1c1so9060866b.1
+        for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 04:41:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693482072; x=1694086872;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=YnuQHzAIFGo0WZruZWqfRWGANCb/aDF+514/VQ3/nGA=;
+        b=T9zWgj6YePtRuUXoy0hDcNS4O5zTTyLZNZg8fIdO2HzTCW16xauciP+ZZd9UveKojB
+         wB2sxnHnpimYp02/vT0DfJYPkJGQz26W7hK9lrpGPDP9kVWJefFyiCFtXQ4lZYEPDURO
+         skXL0O0cpF0Qb11DB3SUBqUdOzKhhi1rR09GzyWd43ZyCyaAPOBolPzyGByNGsgKA2ef
+         yVzGpvwCBLR/OAknHQueD2j4Rbk8sJKEa5CqXW47XAVSkb9gW8zBKcjMewYGuLK9+HQq
+         nOMY5nMi75XgDzt1RsZ55QDfr6HWGdn9ELn9IAwSy7+Jz1JVJAHXozvIK7GWVhA1s3Mb
+         UH8Q==
+X-Gm-Message-State: AOJu0YyBL08bVubUHWbqqcxS0VzkQr4ARaXbJBY+8yndqTCUQHVh2Y3x
+	AFF6FqRiTkCde/nbDaQ5yQrNX+pxbvQ4viymKKo/t5TRHZ3i2rqqhWn+YbxdPZ47UdVGVPVGJ5C
+	NRliwmXY5rlBc2ReAJT+Xpa2k
+X-Received: by 2002:a17:906:10dc:b0:9a5:9038:b1e1 with SMTP id v28-20020a17090610dc00b009a59038b1e1mr3985438ejv.2.1693482072714;
+        Thu, 31 Aug 2023 04:41:12 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG5VY1nG5gFbZ/71OW0mNruZkepMA+ngQpuZnkU3OIgnWU2Inj+E0lnl6YIKRYaw2Zy6nAtwA==
+X-Received: by 2002:a17:906:10dc:b0:9a5:9038:b1e1 with SMTP id v28-20020a17090610dc00b009a59038b1e1mr3985424ejv.2.1693482072370;
+        Thu, 31 Aug 2023 04:41:12 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-255-219.dyn.eolo.it. [146.241.255.219])
+        by smtp.gmail.com with ESMTPSA id p19-20020a17090635d300b0099c971ba285sm665123ejb.5.2023.08.31.04.41.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Aug 2023 04:41:11 -0700 (PDT)
+Message-ID: <b2dcff0db691a9b358c4f89cf7a5b65a5a7dc4c5.camel@redhat.com>
+Subject: Re: [PATCH] igb: disable virtualization features on 82580
+From: Paolo Abeni <pabeni@redhat.com>
+To: Corinna Vinschen <vinschen@redhat.com>, Tony Nguyen
+	 <anthony.l.nguyen@intel.com>, jesse.brandeburg@intel.com, 
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Date: Thu, 31 Aug 2023 13:41:10 +0200
+In-Reply-To: <20230831080916.588043-1-vinschen@redhat.com>
+References: <20230831080916.588043-1-vinschen@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, 30 Aug 2023 21:44:57 +0900 Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
->On 2023/08/30 20:26, Hillf Danton wrote:
->>> <4>[  399.014716] Call trace:
->>> <4>[  399.015702]  percpu_counter_add_batch+0x28/0xd0
->>> <4>[  399.016399]  dst_destroy+0x44/0x1e4
->>> <4>[  399.016681]  dst_destroy_rcu+0x14/0x20
->>> <4>[  399.017009]  rcu_core+0x2d0/0x5e0
->>> <4>[  399.017311]  rcu_core_si+0x10/0x1c
->>> <4>[  399.017609]  __do_softirq+0xd4/0x23c
->>> <4>[  399.017991]  ____do_softirq+0x10/0x1c
->>> <4>[  399.018320]  call_on_irq_stack+0x24/0x4c
->>> <4>[  399.018723]  do_softirq_own_stack+0x1c/0x28
->>> <4>[  399.022639]  __irq_exit_rcu+0x6c/0xcc
->>> <4>[  399.023434]  irq_exit_rcu+0x10/0x1c
->>> <4>[  399.023962]  el1_interrupt+0x8c/0xc0
->>> <4>[  399.024810]  el1h_64_irq_handler+0x18/0x24
->>> <4>[  399.025324]  el1h_64_irq+0x64/0x68
->>> <4>[  399.025612]  _raw_spin_lock_bh+0x0/0x6c
->>> <4>[  399.026102]  cleanup_net+0x280/0x45c
->>> <4>[  399.026403]  process_one_work+0x1d4/0x310
->>> <4>[  399.027140]  worker_thread+0x248/0x470
->>> <4>[  399.027621]  kthread+0xfc/0x184
->>> <4>[  399.028068]  ret_from_fork+0x10/0x20
->> 
->> static void cleanup_net(struct work_struct *work)
->> {
->> 	...
->> 
->> 	synchronize_rcu();
->> 
->> 	/* Run all of the network namespace exit methods */
->> 	list_for_each_entry_reverse(ops, &pernet_list, list)
->> 		ops_exit_list(ops, &net_exit_list);
->> 	...
->> 
->> Why did the RCU sync above fail to work in this report, Eric?
->
-> Why do you assume that synchronize_rcu() failed to work?
+On Thu, 2023-08-31 at 10:09 +0200, Corinna Vinschen wrote:
+> Disable virtualization features on 82580 just as on i210/i211.
+> This avoids that virt functions are acidentally called on 82850.
+>=20
+> Signed-off-by: Corinna Vinschen <vinschen@redhat.com>
 
-In the ipv6 pernet_operations [1] for instance, dst_entries_destroy() is
-invoked after RCU sync to ensure that nobody is using the exiting net,
-but this report shows that protection falls apart.
+This looks like a fix to me?!? if so a suitable 'Fixes' tag should be
+included.
 
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/net/ipv6/route.c#n6557
+Thanks!
 
-> The trace merely says that an interrupt handler ran somewhere from
-> cleanup_net(), and something went wrong inside dst_destroy().
+Paolo
 
-But bc9d3a9f2afc and 483c26ff63f4 has been upsteam for quite a while.
-Not sure if it is arm64 specific.
 
