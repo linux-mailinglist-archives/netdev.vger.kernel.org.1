@@ -1,176 +1,133 @@
-Return-Path: <netdev+bounces-31761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31762-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5ECC2790017
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 17:44:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6A2E79001F
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 17:45:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF33228196A
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 15:44:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7AFA1C20873
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 15:45:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A069DC131;
-	Fri,  1 Sep 2023 15:44:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 667C0C132;
+	Fri,  1 Sep 2023 15:45:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93D23C12A
-	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 15:44:41 +0000 (UTC)
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ADE4AC;
-	Fri,  1 Sep 2023 08:44:38 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-401d67434daso21790365e9.2;
-        Fri, 01 Sep 2023 08:44:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693583076; x=1694187876; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9lsrQVJsYRxlLDD91kBwQmQ2vmq9/hoc5Oclnl+/Wgs=;
-        b=EVt85H2wS+NHFE7Cqk6jBWHczJfLd+clAk7Nr7cH1aCQ8vK8fhbBuwcD6obTK8dA2h
-         3Kb2dBcNW5EowdlhU9j8KCFdv1oGVAl3I2sx69GGTD7yCcjMHMfczhLRihudj8tTnb7U
-         1y7zfqrgIOFdfgjFZ4WtiV9l7KHNUBQKdb4Vn86liETCtVX0SnIxS57y8S0uGgwiOoCK
-         Mt54cMw6DqlVi7rOzZhw80rxAiA2evrtbhn+Ves2q10AbDpkEalizImkPBUpC4KgdQgu
-         sIIEjBvFFLrQom9Nc3qC5G76iw+jcWLH1wheVIrSXk12J+VAZgWU8QYgAAwaNkC1rL4Z
-         oDYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693583076; x=1694187876;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9lsrQVJsYRxlLDD91kBwQmQ2vmq9/hoc5Oclnl+/Wgs=;
-        b=gNHqT/u3dApgW6RPSICuejOZpGQQMxv7fsgzmXAG1gHKJUVif2YA8BJTzHoVxf0Wdf
-         0fsPTTHsxVP5a0ltocygSDSOVfKaP5nQKxEbDu9WZIflDHKaXNy/SH6Nwjh5qA/YH4sC
-         ZNgZyj7quU9gkEgQ/+GvEo0f4uVzkj8nu3lRjR17J24gG7p9Z987m70yXaOCv7pE9Jos
-         le6t/F4QSXdmPLysRoyqMkkp6tmsqTtrhjnvH7GAC1qvXNn36jdbFWYpqVAW3RARvNaF
-         cPpdY+S9h9Zm1QyFH4+8La37f6H/hGZFTkvxr345fmP2JHqsRAhDK+imki6PsiUqtSvL
-         2tGg==
-X-Gm-Message-State: AOJu0YyTg62rH3LtyTMUPS96y/lFDRJZRT8IerotMiBWoWs0UTHQBXKP
-	Z0wHqUjuUPQuwmm3bgWcS28=
-X-Google-Smtp-Source: AGHT+IGU4Giofhy7RSb8VpzNRTRMIhpR0XvS2QItBBbG9mdxFWujXu3xQz1BypLpa1yaqJDmzVSbyQ==
-X-Received: by 2002:a7b:c455:0:b0:401:b493:f7c1 with SMTP id l21-20020a7bc455000000b00401b493f7c1mr2138642wmi.35.1693583076283;
-        Fri, 01 Sep 2023 08:44:36 -0700 (PDT)
-Received: from ?IPV6:2a01:c22:72e7:e700:e595:f26a:e77c:3ddd? (dynamic-2a01-0c22-72e7-e700-e595-f26a-e77c-3ddd.c22.pool.telefonica.de. [2a01:c22:72e7:e700:e595:f26a:e77c:3ddd])
-        by smtp.googlemail.com with ESMTPSA id m18-20020a7bca52000000b003fe601a7d46sm8430294wml.45.2023.09.01.08.44.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Sep 2023 08:44:35 -0700 (PDT)
-Message-ID: <d9bd9e24-3e8a-c4b8-8003-903c0038214d@gmail.com>
-Date: Fri, 1 Sep 2023 17:44:34 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B86423BC
+	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 15:45:52 +0000 (UTC)
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::229])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F37710E4;
+	Fri,  1 Sep 2023 08:45:49 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id DABE3FF803;
+	Fri,  1 Sep 2023 15:45:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1693583147;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eE3qgu3x6/GrX88lBaW9YyXsn7DQIvGzCmJgZvdFqtM=;
+	b=A0JLxx43TCRvsxIAObhhC/C6t2VTHPvPR6NMc9HnGh/IKcnz/2xWByoDA5GoVHkqc7xdfO
+	3oxeyy0fvEb6WExEcQVVdqxouG6gXhmRJrJLF9i80NgTNjMT6nsZpO8os277ginja7lGq5
+	NAKXUi1lexjm6p9TWSm6V7bmuI6Vuh8xolJQkveTYjSt+Mqk9w8btsiW9mOSlGgZTx0pt4
+	uZqqvOCxF5mC/Aoxdc3AZZ1PQIbfYgOvkhxkDZ7h1Zo/8fDDYuQot5A4pTtFV5ZV/7vqUA
+	YmoODyLgOoPDWJjLMOM8/wgUxDkU6yoUNEKNQQoDkOJhqSjykkxRF9NblvXNPA==
+Date: Fri, 1 Sep 2023 17:45:37 +0200
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Alexander Aring <aahringo@redhat.com>
+Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt
+ <stefan@datenfreihafen.org>, linux-wpan@vger.kernel.org, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ netdev@vger.kernel.org, David Girault <david.girault@qorvo.com>, Romuald
+ Despres <romuald.despres@qorvo.com>, Frederic Blain
+ <frederic.blain@qorvo.com>, Nicolas Schodet <nico@ni.fr.eu.org>, Guilhem
+ Imberton <guilhem.imberton@qorvo.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH wpan-next 07/11] mac802154: Handle association requests
+ from peers
+Message-ID: <20230901174537.50f88d60@xps-13>
+In-Reply-To: <20230821105259.4659dd74@xps-13>
+References: <20230601154817.754519-1-miquel.raynal@bootlin.com>
+	<20230601154817.754519-8-miquel.raynal@bootlin.com>
+	<CAK-6q+hWsLSy8vx_Hiwo0gRDYsW4Y7U=sQbAi5Na7BXQoOHWhw@mail.gmail.com>
+	<20230821105259.4659dd74@xps-13>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-Subject: Re: [PATCH] r8169: Disable multicast filter for RTL_GIGA_MAC_VER_46
-To: Patrick Thompson <ptf@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- nic_swsd@realtek.com, Chun-Hao Lin <hau@realtek.com>
-References: <20230606140041.3244713-1-ptf@google.com>
- <CAJs+hrHAz17Kvr=9e2FR+R=qZK1TyhpMyHKzSKO9k8fidHhTsA@mail.gmail.com>
- <7aa7af7f-7d27-02bf-bfa8-3551d5551d61@gmail.com>
- <20230606142907.456eec7e@kernel.org>
- <CAJs+hrEO6nqRHPj4kUWRm3UsBiSOU128a4pLEp8p4pokP7MmEg@mail.gmail.com>
- <5caf123b-f626-fb68-476a-5b5cf9a7f31d@gmail.com>
- <CAJs+hrGmHF4EHsYGVPCosSNOE075CzTsP1d9hppMNXAB1n=JAw@mail.gmail.com>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-In-Reply-To: <CAJs+hrGmHF4EHsYGVPCosSNOE075CzTsP1d9hppMNXAB1n=JAw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
 	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 01.09.2023 16:20, Patrick Thompson wrote:
-> Okay sounds good. By the way, here's the patch where the VER_35 logic
-> was added. So one question would be are there more chips without
-> multicast hardware filters?
+Hi Alexander,
 
-There's no public datasheets, therefore nobody but Realtek knows.
-Only public reference is their r8168 driver, and interestingly
-it uses mc filtering for all chip variants, including what is
-version 35 in r8169.
+> > > --- a/net/ieee802154/pan.c
+> > > +++ b/net/ieee802154/pan.c
+> > > @@ -66,3 +66,30 @@ cfg802154_device_is_child(struct wpan_dev *wpan_de=
+v,
+> > >         return NULL;
+> > >  }
+> > >  EXPORT_SYMBOL_GPL(cfg802154_device_is_child);
+> > > +
+> > > +__le16 cfg802154_get_free_short_addr(struct wpan_dev *wpan_dev)
+> > > +{
+> > > +       struct ieee802154_pan_device *child;
+> > > +       __le16 addr;
+> > > +
+> > > +       lockdep_assert_held(&wpan_dev->association_lock);
+> > > +
+> > > +       do {
+> > > +               get_random_bytes(&addr, 2);   =20
+> >=20
+> > This is combined with the max associations setting? I am not sure if
+> > this is the best way to get free values from a u16 value where we have
+> > some data structure of "given" addresses to a node. I recently was
+> > looking into idr/xarray data structure... maybe we can use something
+> > from there. =20
+>=20
+> I actually thought about using an increasing index, but the pseudo
+> random generator seemed appropriate because of its "unpredictability",
+> but there is not real use for that (besides maybe testing purposes). I
+> can definitely switch to another solution.
 
-> ------------------
-> 
-> From: Nathan Walp <faceprint@xxxxxxxxxxxxx>
-> 
-> commit 0481776b7a70f09acf7d9d97c288c3a8403fbfe4 upstream.
-> 
-> RTL_GIGA_MAC_VER_35 includes no multicast hardware filter.
-> 
-> Signed-off-by: Nathan Walp <faceprint@xxxxxxxxxxxxx>
-> Suggested-by: Hayes Wang <hayeswang@xxxxxxxxxxx>
-> Acked-by: Francois Romieu <romieu@xxxxxxxxxxxxx>
-> Signed-off-by: David S. Miller <davem@xxxxxxxxxxxxx>
-> Signed-off-by: Herton Ronaldo Krzesinski <herton.krzesinski@xxxxxxxxxxxxx>
-> ---
-> drivers/net/ethernet/realtek/r8169.c | 3 +++
-> 1 file changed, 3 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/realtek/r8169.c
-> b/drivers/net/ethernet/realtek/r8169.c
-> index eb81da4..e19e1f1 100644
-> --- a/drivers/net/ethernet/realtek/r8169.c
-> +++ b/drivers/net/ethernet/realtek/r8169.c
-> @@ -4271,6 +4271,9 @@ static void rtl_set_rx_mode(struct net_device *dev)
-> mc_filter[1] = swab32(data);
-> }
-> 
-> + if (tp->mac_version == RTL_GIGA_MAC_VER_35)
-> + mc_filter[1] = mc_filter[0] = 0xffffffff;
-> +
-> RTL_W32(MAR0 + 4, mc_filter[1]);
-> RTL_W32(MAR0 + 0, mc_filter[0]);
-> 
-> --
-> 1.7.9.5
-> 
-> --
-> 
-> On Fri, Sep 1, 2023 at 8:48 AM Heiner Kallweit <hkallweit1@gmail.com> wrote:
->>
->> On 01.09.2023 14:28, Patrick Thompson wrote:
->>> Hello,
->>>
->>> I was wondering if this should be extended to all RTL_GIGA_MAC_VERs
->>> greater than 35 as well.
->>>
->> I *think* the mc filtering issue with version 35 is different from the
->> one you're seeing. So not every chip version may be affected.
->> As there's no public errata information let's wait for a statement
->> from Realtek.
->>
->>> Realtek responded to me but I was slow to get them packet captures
->>> that they needed. I am hoping to restart things and get back to this
->>> over the finish line if it's a valid patch.
->>>
->>> I will add the appropriate tags and annotations once I hear back.
->>>
->>> On Tue, Jun 6, 2023 at 5:29 PM Jakub Kicinski <kuba@kernel.org> wrote:
->>>>
->>>> On Tue, 6 Jun 2023 17:11:27 +0200 Heiner Kallweit wrote:
->>>>> Thanks for the report and the patch. I just asked a contact in Realtek
->>>>> whether more chip versions may be affected. Then the patch should be
->>>>> extended accordingly. Let's wait few days for a response.
->>>>>
->>>>> I think we should make this a fix. Add the following as Fixes tag
->>>>> and annotate the patch as "net" (see netdev FAQ).
->>>>>
->>>>> 6e1d0b898818 ("r8169:add support for RTL8168H and RTL8107E")
->>>>
->>>> Perhaps it's best if you repost with the Fixes tag included once
->>>> Realtek responded.
->>
+I looked into this deeper. I didn't felt like idr would be so much
+useful, but I started converting the code to use ida instead (so the
+simplest approach, with no associated pointer). There are actually two
+use cases which clearly match better the random address mechanism.
 
+a/ One can freely decide the short address of the coordinator (it is
+freely selectable by the user) but ida has no mechanism to handle this
+with an API which would prevent such "number to be used".
+
+In practice, this could be workarounded "easily", even though the
+implementation would be dirty IMHO: getting an IDA, if it matches ours,
+just try again without freeing it. TBH I don't like much this idea.
+
+b/ In case we ever want to support master handover, the ida solution
+does not work well...
+
+For now I've kept the current approach (actually adding a missing
+check), but if you know how to solve that I can either update the
+implementation or make a followup patch, especially since the current
+approach is not bounded (in the theoretical case where we have 65k
+devices in the same PAN).
+
+I believe the allocation strategies are not set in stone anyway and can
+easily evolve.
+
+Thanks,
+Miqu=C3=A8l
 
