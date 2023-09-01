@@ -1,158 +1,107 @@
-Return-Path: <netdev+bounces-31714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31715-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C740E78FB95
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 12:08:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B22178FB9F
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 12:14:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32BFD281878
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 10:08:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3A13281984
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 10:14:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0844CA93F;
-	Fri,  1 Sep 2023 10:07:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9E85A940;
+	Fri,  1 Sep 2023 10:14:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1155946F
-	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 10:07:57 +0000 (UTC)
-Received: from us-smtp-delivery-44.mimecast.com (unknown [207.211.30.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8ADBCC
-	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 03:07:55 -0700 (PDT)
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-693-NTN9am3zM7uWtBLtTrRPnA-1; Fri, 01 Sep 2023 06:07:36 -0400
-X-MC-Unique: NTN9am3zM7uWtBLtTrRPnA-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F2C873804514;
-	Fri,  1 Sep 2023 10:07:35 +0000 (UTC)
-Received: from hog (unknown [10.45.224.12])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id C6FAD493110;
-	Fri,  1 Sep 2023 10:07:33 +0000 (UTC)
-Date: Fri, 1 Sep 2023 12:07:32 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Radu Pirea <radu-nicolae.pirea@nxp.com>
-Cc: "atenart@kernel.org" <atenart@kernel.org>,
-	"Radu-nicolae Pirea (OSS)" <radu-nicolae.pirea@oss.nxp.com>,
-	"andrew@lunn.ch" <andrew@lunn.ch>,
-	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	Sebastian Tobuschat <sebastian.tobuschat@nxp.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"richardcochran@gmail.com" <richardcochran@gmail.com>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [RFC net-next v2 5/5] net: phy: nxp-c45-tja11xx: implement
- mdo_insert_tx_tag
-Message-ID: <ZPG35HfRseiv80Pb@hog>
-References: <20230824091615.191379-1-radu-nicolae.pirea@oss.nxp.com>
- <20230824091615.191379-6-radu-nicolae.pirea@oss.nxp.com>
- <ZOx0L722xg5-J_he@hog>
- <5d42d6c9-2f0c-8913-49ec-50a25860c49f@oss.nxp.com>
- <ZO8pbtnlOVauabjC@hog>
- <518c11e9000f895fddb5b3dc4d5b2bf445cf320f.camel@nxp.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CC40945F
+	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 10:14:04 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA3E2E56;
+	Fri,  1 Sep 2023 03:14:00 -0700 (PDT)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.54])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RcYjs0Vy8zrS0t;
+	Fri,  1 Sep 2023 18:12:17 +0800 (CST)
+Received: from [10.174.178.66] (10.174.178.66) by
+ dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Fri, 1 Sep 2023 18:13:58 +0800
+Message-ID: <b5052977-1e5b-faa9-a77e-ac418e942873@huawei.com>
+Date: Fri, 1 Sep 2023 18:13:57 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <518c11e9000f895fddb5b3dc4d5b2bf445cf320f.camel@nxp.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
-X-Spam-Status: No, score=0.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_VALIDITY_RPBL,RDNS_NONE,SPF_HELO_NONE,SPF_NONE autolearn=no
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.2
+Subject: Re: [PATCH net,v2] wifi: mac80211: fix WARNING in
+ ieee80211_link_info_change_notify()
+To: Johannes Berg <johannes@sipsolutions.net>,
+	<linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <weiyongjun1@huawei.com>, <yuehaibing@huawei.com>
+References: <20230901035301.3473463-1-shaozhengchao@huawei.com>
+ <7127fe5a4f2cfcdc3a55269f0a427477e264fabc.camel@sipsolutions.net>
+ <abb4efba-90b4-da14-5683-3cd96819a5e0@huawei.com>
+ <4e96e981f58ca5bccf71952f76efe5e08a88f11d.camel@sipsolutions.net>
+From: shaozhengchao <shaozhengchao@huawei.com>
+In-Reply-To: <4e96e981f58ca5bccf71952f76efe5e08a88f11d.camel@sipsolutions.net>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.178.66]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-2023-09-01, 09:09:06 +0000, Radu Pirea wrote:
-> On Wed, 2023-08-30 at 13:35 +0200, Sabrina Dubroca wrote:
-> ...
+
+
+On 2023/9/1 17:19, Johannes Berg wrote:
+> Hi,
 > 
-> > And it's not restored when the link goes back up? That's inconvenient
-> > :/
-> > Do we end up with inconsistent state? ie driver and core believe
-> > everything is still offloaded, but HW lost all state? do we leak
-> > some resources allocated by the driver?
 > 
-> Yes. We end up with inconsistent state. The HW will lost all state when
-> the phy is reseted. No resource is leaked, everything is there, but the
-> configuration needs to be reapplied.
+>> 	Do you mean it shouldn't be allowed to set mcast rate when dev
+>> is stopped,
+>>
 > 
-> > 
-> > We could add a flush/restore in macsec_notify when the lower device
-> > goes down/up, maybe limited to devices that request this (I don't
-> > know
-> > if all devices would need it, or maybe all devices offloading to the
-> > PHY but not to the MAC).
+> Probably?
 > 
-> Agreed.
-> We can do a flush very simple, but to restore the configuration maybe
-> we should to save the key in the macsec_key structure. I am not sure if
-> the key can be extracted from crypto_aead structure.
-
-Either that or in the driver. I have a small preference for driver,
-because then cases that don't need this restore won't have to keep the
-key in memory, reducing the likelihood of accidentally sharing it.
-OTOH, if we centralize that code, it's easier to make sure everything
-is cleared from kernel memory when we delete the SA.
-
-
-> > And what happens in this case?
-> >     ip link add link eth0 type macsec offload phy
-> >     ip link set eth0 down
-> >     ip macsec add macsec0 rx sci ...
-> >     ip macsec add macsec0 tx sa 0 ...
-> >     # etc
-> >     ip link set eth0 up
-> > 
-> > Will offload work with the current code?
+>>   as in the following code?
+>>
+>> --- a/net/wireless/rdev-ops.h
+>> +++ b/net/wireless/rdev-ops.h
+>> @@ -1229,7 +1229,7 @@ rdev_set_mcast_rate(struct
+>> cfg80211_registered_device *rdev,
+>>           int ret = -ENOTSUPP;
+>>
+>>           trace_rdev_set_mcast_rate(&rdev->wiphy, dev, mcast_rate);
+>> -       if (rdev->ops->set_mcast_rate)
+>> +       if (rdev->ops->set_mcast_rate && netif_running(dev))
+>>                   ret = rdev->ops->set_mcast_rate(&rdev->wiphy, dev,
+>>
 > 
-> (the interface was up before)
-> [root@alarm ~]# ip link add link end0 macsec0 type macsec encrypt on
-> offload phy 
-> [root@alarm ~]# ip link set end0 down
-> [root@alarm ~]# ip macsec add macsec0 rx port 1 address
-> 00:01:be:be:ef:33
-> RTNETLINK answers: Operation not supported
-
-Where does that EOPNOTSUPP come from? nxp_c45_mdo_add_rxsc from this
-version of the code can't return that, and macsec_add_rxsc also
-shouldn't at this point.
-
-Ideally all implementations (HW or SW) should behave the same, but at
-least that saves us from having to restore state in the HW, if we
-couldn't create it at all.
-
-> But let's consider the next case:
->     ip link add link eth0 type macsec offload phy
->     ip link set eth0 down
->     ip link set eth0 up
->     ip macsec add macsec0 rx sci ...
->     ip macsec add macsec0 tx sa 0 ...
->     # etc
+> Certainly not. Please don't do random patches without looking at the
+> subsystem as a whole. If you don't want to take the time to understand
+> how things work in wireless, then better don't send patches at all.
 > 
-> In this case, any HW configuration written by .mdo_add_secy will be
-> lost.
+> johannes
 
-So we need a way to restore the config in HW, whether that's done
-entirely in the driver or initiated by macsec itself.
+Hi johannes:
+	It's a little difficult for me to solve this warning. This
+warning has been going on for more than one year. Could you help solve 
+it? Thank you.
 
+links: 
+https://groups.google.com/g/syzkaller-bugs/c/FofxpVlkONg/m/v296EFNnAAAJ
 
-Antoine, is any of this relevant to the mscc driver?
-
--- 
-Sabrina
-
+Zhengchao Shao
 
