@@ -1,101 +1,87 @@
-Return-Path: <netdev+bounces-31689-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB39D78F8F7
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 09:12:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7956678F907
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 09:20:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13CC41C20B99
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 07:12:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78DC81C20B85
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 07:20:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2E3979D8;
-	Fri,  1 Sep 2023 07:12:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 382F28BE8;
+	Fri,  1 Sep 2023 07:20:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B66016ABC
-	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 07:12:31 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F51710D2;
-	Fri,  1 Sep 2023 00:12:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ZTZ8SXVcOjA8cytY7ZRFk3Xrk4Dudxy372U5a+JE25c=; b=sMgp6AqBZSshQJyphg9ApcEzJ8
-	g/5VIHJpEx5dLwTnt8X2oyNRtWxxgilmwzPQv1LEJmO+eKPfOm6had9N1LqWkBMeSyFL/kjVzoGUi
-	lCFnbCDQAejTN6yqNe12Sa/C8YUEMgNed8uM2CPnYAZHY+iGjvA6v0m+DJre1lWfdyl/Utv2T/Jmd
-	Gzup2j1bpKTqOe2Z3Y5VD9LH2srSWBm/PYs8LSmdKgynnFhx2dJMq1Qz/LfJHmgkcg8TY3AbIlaNQ
-	MFZk8yoZfnSFfBCw4yMNkLwvMa+uWzFortseyaAzdVFjUnMvXg/uFZuKje3Y5pOUmdcI1mBBvkDVj
-	0UED61cQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50582)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qbyKI-0003fG-1T;
-	Fri, 01 Sep 2023 08:12:18 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qbyKH-0007dU-16; Fri, 01 Sep 2023 08:12:17 +0100
-Date: Fri, 1 Sep 2023 08:12:16 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Lukasz Majewski <lukma@denx.de>
-Subject: Re: [PATCH net v2 1/1] net: phy: micrel: Correct bit assignments for
- phy_device flags
-Message-ID: <ZPGO0GVyH0Gh4yrW@shell.armlinux.org.uk>
-References: <20230901045323.3907976-1-o.rempel@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D2823C3B
+	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 07:20:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9FA9CC433C9;
+	Fri,  1 Sep 2023 07:20:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1693552826;
+	bh=pQJufM2gfsTvjtgulQq2rIq0spW0AEUvlhqXCYjOrKs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Qq0PBa6/A3K+z0YiaPcRmGqSdBTUUZawpsQ57xRPZ0HVhYKmJU3WyMfZH+7niwn+k
+	 NVC0V4+icVMw1UqqLjoELYwjKtbSF2eJSeIW5LTQS5SN93M/aYlzrld9zHQLCz7s1h
+	 LQcgx5EcKEieV9bek6Hwz1tjxvcBOVgK4XUDz9ysBTrc1foRkOk4XEmWx+RaD13GSq
+	 ACTQbx3+JA8hSOnuoWXvVNRORzE3Ub+B9wfaDFBTnF5RK+fspMhbd1JKDos0DQJYRe
+	 YD3G/DNY0CXnAYGkpX2hE3pwtqbIIiLYefckZYhuqQW4FfDJWZd7tgwA072FBckG0T
+	 Mp0r8urxq1AdQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7DC74C595D2;
+	Fri,  1 Sep 2023 07:20:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230901045323.3907976-1-o.rempel@pengutronix.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] sfc: check for zero length in EF10 RX prefix
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169355282650.26042.12939448647833622026.git-patchwork-notify@kernel.org>
+Date: Fri, 01 Sep 2023 07:20:26 +0000
+References: <20230831165811.18061-1-edward.cree@amd.com>
+In-Reply-To: <20230831165811.18061-1-edward.cree@amd.com>
+To:  <edward.cree@amd.com>
+Cc: linux-net-drivers@amd.com, davem@davemloft.net, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, ecree.xilinx@gmail.com,
+ netdev@vger.kernel.org, habetsm.xilinx@gmail.com
 
-On Fri, Sep 01, 2023 at 06:53:23AM +0200, Oleksij Rempel wrote:
-> Previously, the defines for phy_device flags in the Micrel driver were
-> ambiguous in their representation. They were intended to be bit masks
-> but were mistakenly defined as bit positions. This led to the following
-> issues:
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Thu, 31 Aug 2023 17:58:11 +0100 you wrote:
+> From: Edward Cree <ecree.xilinx@gmail.com>
 > 
-> - MICREL_KSZ8_P1_ERRATA, designated for KSZ88xx switches, overlapped
->   with MICREL_PHY_FXEN and MICREL_PHY_50MHZ_CLK.
-> - Due to this overlap, the code path for MICREL_PHY_FXEN, tailored for
->   the KSZ8041 PHY, was not executed for KSZ88xx PHYs.
-> - Similarly, the code associated with MICREL_PHY_50MHZ_CLK wasn't
->   triggered for KSZ88xx.
+> When EF10 RXDP firmware is operating in cut-through mode, packet length
+>  is not known at the time the RX prefix is generated, so it is left as
+>  zero and RX event merging is inhibited to ensure that the length is
+>  available in the RX event.  However, it has been found that in certain
+>  circumstances the RX events for these packets still get merged,
+>  meaning the driver cannot read the length from the RX event, and tries
+>  to use the length from the prefix.
+> The resulting zero-length SKBs cause crashes in GRO since commit
+>  1d11fa696733 ("net-gro: remove GRO_DROP"), so add a check to the driver
+>  to detect these zero-length RX events and discard the packet.
 > 
-> To rectify this, all three flags have now been explicitly converted to
-> use the `BIT()` macro, ensuring they are defined as bit masks and
-> preventing potential overlaps in the future.
-> 
-> Fixes: 49011e0c1555 ("net: phy: micrel: ksz886x/ksz8081: add cabletest support")
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> [...]
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Here is the summary with links:
+  - [net] sfc: check for zero length in EF10 RX prefix
+    https://git.kernel.org/netdev/net/c/ae074e2b2fd4
 
-Thanks!
-
+You are awesome, thank you!
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
