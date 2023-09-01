@@ -1,49 +1,50 @@
-Return-Path: <netdev+bounces-31657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8C2C78F6AE
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 03:28:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED54978F6C4
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 03:33:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA54C1C20B0E
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 01:28:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30E8D1C20B05
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 01:33:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D47510FA;
-	Fri,  1 Sep 2023 01:28:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91B2710FA;
+	Fri,  1 Sep 2023 01:33:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FEE710E3
-	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 01:28:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0925BC433C7;
-	Fri,  1 Sep 2023 01:28:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B64C10E3
+	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 01:33:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58501C433C7;
+	Fri,  1 Sep 2023 01:33:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693531681;
-	bh=wfKITlhsoQmivTcQnEhF6jPQbiuN6NmrSQ2Hh7h3Qw4=;
+	s=k20201202; t=1693531988;
+	bh=nmrHaG018wY/DNDHLlevsfQP0j2tRtJhM5Z3Cv69FT4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gfZJ0y0KEMzMGUTLDIoB3W5mwXa9hIZHdwdg9OdFt+sno/Yf5W6BE/UnOr6hvslR0
-	 Scu3llwRnQLLdEqu9EQSURsHaKa0kk3eoAA8cCF252uYas/CNVvE3nPLbPSA+TA6SN
-	 9QCZpLzPmDKNVEgcgf+k2Us6hoJg7j/vSM9VzE5hPbWVxraMkLJ+1XlJmfJpee06P8
-	 4vuhTF5bDQxalTeH1qg5NMCQQRD+QRbk8/uRVqpEK2BtduMRxigZUg2kaLL2e02BBS
-	 84oPqXL0ZgDEEROP0xkruzCsXu0WScYKukNsTsB2+Z50ALNN/MgqQxrm4RjuNQ3aR5
-	 iNq011wzXBEHA==
-Date: Thu, 31 Aug 2023 18:28:00 -0700
+	b=UINJE8aYcs0nJ/rjjyxH4COFqtI/x3ioS7j4J+aucywC2O6X9H/hhu4YVFCy76WVE
+	 UVTBOy8ZrEkeAxMrbNK7VdPMvzRi9/0bylrlVMKM/bNgcEe+jQMre3Kub7XmSaCeOh
+	 X1Qu5oNj/Z5IUjsKlzcHSOf8+EocYvhiu26QhOi6bCTQGKYYAvRVE6WUxK/9l+Yfo4
+	 chlRXut28PpKNmrV9243b38J0Cb94UxFnhROuXx3g1HpVh6vmawsFLdfSYRruVIr8+
+	 amn7hnIpzy+Q43sSbh6KVMH1AVhyFvOwc6Lm6JuHbb2U/bDSpI4Oh0clGEWRYAeE84
+	 RdsBvFWvoW+SA==
+Date: Thu, 31 Aug 2023 18:33:07 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: joao@overdrivepizza.com
-Cc: pablo@netfilter.org, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kadlec@netfilter.org, fw@strlen.de,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- rkannoth@marvell.com, wojciech.drewek@intel.com,
- steen.hegenlund@microhip.com, keescook@chromium.org, Joao Moreira
- <joao.moreira@intel.com>
-Subject: Re: [PATCH 0/2] Prevent potential write out of bounds
-Message-ID: <20230831182800.25e5d4d9@kernel.org>
-In-Reply-To: <20230901010437.126631-1-joao@overdrivepizza.com>
-References: <20230901010437.126631-1-joao@overdrivepizza.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, Lukasz Majewski <lukma@denx.de>
+Subject: Re: [PATCH net v1] net: phy: micrel: Correct bit assignment for
+ MICREL_KSZ8_P1_ERRATA flag
+Message-ID: <20230831183307.6145542e@kernel.org>
+In-Reply-To: <20230831112342.GD17603@pengutronix.de>
+References: <20230831110427.3551432-1-o.rempel@pengutronix.de>
+	<ZPB3cYMnFq1qGRv0@shell.armlinux.org.uk>
+	<20230831112342.GD17603@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,23 +54,20 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 31 Aug 2023 18:04:35 -0700 joao@overdrivepizza.com wrote:
-> The function flow_rule_alloc in net/core/flow_offload.c [2] gets an
-> unsigned int num_actions (line 10) and later traverses the actions in
-> the rule (line 24) setting hw.stats to FLOW_ACTION_HW_STATS_DONT_CARE.
+On Thu, 31 Aug 2023 13:23:42 +0200 Oleksij Rempel wrote:
+> > >  /* struct phy_device dev_flags definitions */
+> > >  #define MICREL_PHY_50MHZ_CLK	0x00000001
+> > >  #define MICREL_PHY_FXEN		0x00000002
+> > > -#define MICREL_KSZ8_P1_ERRATA	0x00000003
+> > > +#define MICREL_KSZ8_P1_ERRATA	BIT(3)  
+> > 
+> > Please can you also convert the other two flags to use BIT() as well to
+> > make the entire thing explicitly bit-orientated? Thanks.  
 > 
-> Within the same file, the loop in the line 24 compares a signed int
-> (i) to an unsigned int (num_actions), and then uses i as an array
-> index. If an integer overflow happens, then the array within the loop
-> is wrongly indexed, causing a write out of bounds.
-> 
-> After checking with maintainers, it seems that the front-end caps the
-> maximum value of num_action, thus it is not possible to reach the given
-> write out of bounds, yet, still, to prevent disasters it is better to
-> fix the signedness here.
+> Ack. This patch is for the net. The cleanup will got to the net-next.
+> Except clean up will be accepted for the net too?
 
-How did you find this? The commit messages should include info
-about how the issue was discovered.
--- 
-pw-bot: cr
+The change is simple enough, you can convert all three bits in the fix.
+The commit message could more explicitly say that these defines are
+supposed to be masks not bit positions, tho.
 
