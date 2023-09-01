@@ -1,113 +1,115 @@
-Return-Path: <netdev+bounces-31722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31723-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DE1878FBF1
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 12:53:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5D2978FC0F
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 13:06:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BECFF2819EA
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 10:53:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F49B2819C6
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 11:06:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67C1CA94C;
-	Fri,  1 Sep 2023 10:53:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FC85A955;
+	Fri,  1 Sep 2023 11:06:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59476A93A
-	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 10:53:35 +0000 (UTC)
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C7E510CE;
-	Fri,  1 Sep 2023 03:53:33 -0700 (PDT)
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-268bc714ce0so2086401a91.0;
-        Fri, 01 Sep 2023 03:53:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693565613; x=1694170413;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FWZQOEBhVxoOt4tiQqlHUEMdli9ckDzD5FzzgBxRbUE=;
-        b=M4TpwkcFKIhTR143nsWIg8eLxYTFgn9YpXehWxC9P48CA+VMyw2HcMBOB80koJDkuY
-         TSy6N87cur9+X9NpwCk9oO+eTouYgxlrQQHEHZYqPqZWkKHKVpwF9XRlAy//TrGWtUSi
-         AZSWlM0CtRj1euE9k1MByZR44rhemdryC4Z9X2+WsOrnKmlnr5i3WTOx+Xtfj2/l29IJ
-         Qwy2x7g3raAXYmkQYJX+Zgkyy8R7KnkeYT8+TeaYuhE3fCQGHC11jvGg64yt2wiujptm
-         wuSKgf517OPKEehKGtQuHflfWpEr+17TOXKLM0daMzDHyDdC0R2NbQXVXFOlwncXXR5O
-         /AeA==
-X-Gm-Message-State: AOJu0YwNQGGSO4y3MFLmEgjXrxss86DMCpsJAPhFiMdk1NGByLeejBVT
-	JZ4tVG6g6Am+DyzCt0HT2hMXwVrdLi3L8TEmU4U=
-X-Google-Smtp-Source: AGHT+IHhVLMZe0+O1NerBCfGRiwl5y30FYWye0njx9w566sNUkxJRRfEq/ORX6uAUsYDbODgfRqDBFVrhKW5mQMAcX4=
-X-Received: by 2002:a17:90a:9cc:b0:268:8ff2:5c0d with SMTP id
- 70-20020a17090a09cc00b002688ff25c0dmr2879920pjo.17.1693565612603; Fri, 01 Sep
- 2023 03:53:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43D8779E6
+	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 11:06:02 +0000 (UTC)
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AFAB10D2;
+	Fri,  1 Sep 2023 04:06:01 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 0783F2185A;
+	Fri,  1 Sep 2023 11:06:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1693566360; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ddEY5hmSfZEknJMt5BoR/ARnTSJr3qAhZpAWd1WA6sQ=;
+	b=tujk+flZ+MtJfbZ24Hkdo/mLpNv2iBxplhrqI4DTvD6ardJEvbGN22FLMMCdL1JwkgG/+2
+	UtbMU0SLpsAzeGbt2SGkU+oRBWyJZMPKhiBXItouA8u5TvNXsAjaTVWGhDEKTmWJafBmr+
+	mvr9HU7Gna1Lx42+GAwrO4n0IKjZfYI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1693566360;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ddEY5hmSfZEknJMt5BoR/ARnTSJr3qAhZpAWd1WA6sQ=;
+	b=1DPIkngrFTwgdEMkgQz8P5Y0/tY0WRXCjjRLeZLK4EnAC4eVNM1mjOjg5Xf9+aZecC2jQu
+	62xXsGSJRgmApRAA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id AAA8F13582;
+	Fri,  1 Sep 2023 11:05:59 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+	by imap2.suse-dmz.suse.de with ESMTPSA
+	id ODsjJ5fF8WREdQAAMHmgww
+	(envelope-from <dkirjanov@suse.de>); Fri, 01 Sep 2023 11:05:59 +0000
+Message-ID: <7b8be7bd-baf2-15c0-2a0c-ddf64839a451@suse.de>
+Date: Fri, 1 Sep 2023 14:05:59 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230901082755.27104-1-jiasheng@iscas.ac.cn>
-In-Reply-To: <20230901082755.27104-1-jiasheng@iscas.ac.cn>
-From: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>
-Date: Fri, 1 Sep 2023 19:53:21 +0900
-Message-ID: <CAMZ6RqK3MWEmEO8Yt3KjCYakya5cG0ccxGPcqbHpM2imKuzpVg@mail.gmail.com>
-Subject: Re: [PATCH] can: etas_es58x: Add check for alloc_can_err_skb
-To: Jiasheng Jiang <jiasheng@iscas.ac.cn>
-Cc: wg@grandegger.com, mkl@pengutronix.de, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	arunachalam.santhanam@in.bosch.com, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH v3] fsl_ucc_hdlc: process the result of hold_open()
+Content-Language: en-US
+To: =?UTF-8?B?0JDQu9C10LrRgdCw0L3QtNGA0LAg0JTRjtC/0LjQvdCw?=
+ <adiupina@astralinux.ru>, Jakub Kicinski <kuba@kernel.org>,
+ Zhao Qiang <qiang.zhao@nxp.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
+References: <896acfac-fadb-016b-20ff-a06e18edb4d9@csgroup.eu>
+ <20230828121235.13953-1-adiupina@astralinux.ru>
+ <20230828123849.69466f0a@kernel.org>
+ <977826f0-3289-53bd-b3f6-90977a4e0ca0@astralinux.ru>
+From: Denis Kirjanov <dkirjanov@suse.de>
+In-Reply-To: <977826f0-3289-53bd-b3f6-90977a4e0ca0@astralinux.ru>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri. 1 Sept 2023 at 19:22, Jiasheng Jiang <jiasheng@iscas.ac.cn> wrote:
-> Add check for the return value of alloc_can_err_skb in order to
-> avoid NULL pointer dereference.
->
-> Fixes: 8537257874e9 ("can: etas_es58x: add core support for ETAS ES58X CAN USB interfaces")
-> Signed-off-by: Jiasheng Jiang <jiasheng@iscas.ac.cn>
-> ---
->  drivers/net/can/usb/etas_es58x/es58x_core.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/drivers/net/can/usb/etas_es58x/es58x_core.c b/drivers/net/can/usb/etas_es58x/es58x_core.c
-> index 0c7f7505632c..d694cb22d9f4 100644
-> --- a/drivers/net/can/usb/etas_es58x/es58x_core.c
-> +++ b/drivers/net/can/usb/etas_es58x/es58x_core.c
-> @@ -680,6 +680,8 @@ int es58x_rx_err_msg(struct net_device *netdev, enum es58x_err error,
->         }
->
->         skb = alloc_can_err_skb(netdev, &cf);
-> +       if (!skb)
-> +               return -ENOMEM;
-
-NAK.
-
-The checks on skb or cf are skipped intentionally here in order to
-continue the error handling.
-
-Later in this function, all the access to skb or cf and guarded by an:
-
-        if (cf)
-
-And if cf is not NULL, skb is also guaranteed not to be NULL. For
-further details, please refer to this commit:
-
-  https://git.kernel.org/torvalds/c/c8129487441e
 
 
-Yours sincerely,
-Vincent Mailhol
+On 9/1/23 13:48, Александра Дюпина wrote:
+> Thanks for the review!
+> 
+> 28.08.2023 22:38, Jakub Kicinski пишет:
+>> Don't you have to undo all the things done prior to hdlc_open()?
+> Yes, it looks like I really need to undo everything that was done before hdlc_open().
+> But the question arose - would it be enough to call the uhdlc_close(dev) function?
 
->         switch (error) {
->         case ES58X_ERR_OK:      /* 0: No error */
-> --
-> 2.25.1
->
+looks like it is.
+
+> In addition, it seems to me and my colleagues that a call to hdlc_close(dev) should be added to the uhdlc_close() function, similar to the 
+
+yes, take a look at the comment for hdlc_close()
+
+following functions:
+> 1. drivers/net/wan/n2.c (n2_close function)
+> 2. drivers/net/wan/pc300too.c (pc300_close function)
+> 3. drivers/net/wan/pci200syn.c (pci200_close function)
+> 4. drivers/net/wan/wanxl.c (wanxl_close function)
+> Tell me, please, are we wrong?
+> 
 
