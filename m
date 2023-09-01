@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-31724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24ED878FC14
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 13:07:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35FC178FC1F
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 13:12:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E9151C20C67
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 11:07:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2F15281A0A
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 11:12:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10E47A956;
-	Fri,  1 Sep 2023 11:07:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5A54A958;
+	Fri,  1 Sep 2023 11:12:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06558A943
-	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 11:07:25 +0000 (UTC)
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19D6FE42;
-	Fri,  1 Sep 2023 04:07:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B93B479E6
+	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 11:12:29 +0000 (UTC)
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85B9A107;
+	Fri,  1 Sep 2023 04:12:27 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id CAECD2185F;
-	Fri,  1 Sep 2023 11:07:21 +0000 (UTC)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 33DEA1F45E;
+	Fri,  1 Sep 2023 11:12:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1693566441; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1693566746; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8a57AjKskzWCykzi4HsClcp/cOx+3HL/9e63h2uPTF4=;
-	b=IcxVSLHhJ6IEwkLwitDotQ00lwS6BOSQWmQAAlN5CwhS3rzd+E8j4iFjMTw4lt4LldyVyC
-	rhXd0yYekF317gTrF6Sei8v8ZtW5QyJfpOfr6llJb/bfWnxQgQ/RTe+sAuG+IpJNI2xTY2
-	PKaFzJNZoxgRCMRyU3JGWI/hFrcFFkM=
+	bh=qA31knuQGMKkbCxHuD0KfED2+pMUYgwjt4x2MR5OHvg=;
+	b=PmuL+DrcX/I0nP6KDLqTkG2hxCE2ya7cfJQ14v+Zs4z0NbZq3PE5Q9hUH1SUHuPW5Fc1MV
+	mro+IfBzU9SiAaBkr4spg4gG2Wi8XwgKdOBdyORGzt+qZWepas9L4bRlWsafUFmPzuEGqn
+	R6SvCDAivyU/swutJsRtn8YOStFEgNw=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1693566441;
+	s=susede2_ed25519; t=1693566746;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8a57AjKskzWCykzi4HsClcp/cOx+3HL/9e63h2uPTF4=;
-	b=H2/AX4Bd9itzYhoL7+z7uqLchSRAQX7Y9Iozu/HLAZej1BQol9UAnz1JH56WkADWtYUJUe
-	EgMc93+f69FYaeDg==
+	bh=qA31knuQGMKkbCxHuD0KfED2+pMUYgwjt4x2MR5OHvg=;
+	b=JbgbSDYMWUj67nUAINKeTK9jn5EPAnq9LswZOWtmT+4wLoAtMzdie2O2tu4THXqn8dCpGG
+	GZkdUfowyo6uVqDQ==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
 	(No client certificate requested)
-	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 95F7513582;
-	Fri,  1 Sep 2023 11:07:21 +0000 (UTC)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id CB5E913582;
+	Fri,  1 Sep 2023 11:12:25 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
 	by imap2.suse-dmz.suse.de with ESMTPSA
-	id 0f+AIunF8WTwdQAAMHmgww
-	(envelope-from <dkirjanov@suse.de>); Fri, 01 Sep 2023 11:07:21 +0000
-Message-ID: <a67042bc-ec43-17a4-257e-8276646fc0e3@suse.de>
-Date: Fri, 1 Sep 2023 14:07:21 +0300
+	id BpbvLxnH8WSFeAAAMHmgww
+	(envelope-from <dkirjanov@suse.de>); Fri, 01 Sep 2023 11:12:25 +0000
+Message-ID: <4d953daf-f426-e2fe-ca27-6da30fddaa40@suse.de>
+Date: Fri, 1 Sep 2023 14:12:25 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,15 +65,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.14.0
-Subject: =?UTF-8?Q?Re=3a_=5bPATCH=5d_net/socket=3a_Remove_unnecessary_?=
- =?UTF-8?B?4oCYMOKAmSB2YWx1ZXMgZnJvbSB1c2Vk?=
+Subject: Re: [PATCH] can: etas_es58x: Add check for alloc_can_err_skb
 Content-Language: en-US
-To: Li zeming <zeming@nfschina.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20230902182228.3124-1-zeming@nfschina.com>
+To: Jiasheng Jiang <jiasheng@iscas.ac.cn>, mailhol.vincent@wanadoo.fr,
+ wg@grandegger.com, mkl@pengutronix.de, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ arunachalam.santhanam@in.bosch.com
+Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20230901082755.27104-1-jiasheng@iscas.ac.cn>
 From: Denis Kirjanov <dkirjanov@suse.de>
-In-Reply-To: <20230902182228.3124-1-zeming@nfschina.com>
+In-Reply-To: <20230901082755.27104-1-jiasheng@iscas.ac.cn>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -85,35 +87,30 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 
 
-On 9/2/23 21:22, Li zeming wrote:
-> used is assigned first, so it does not need to initialize the
-> assignment.
-
-that should be posted to net-next once it open
-
+On 9/1/23 11:27, Jiasheng Jiang wrote:
+> Add check for the return value of alloc_can_err_skb in order to
+> avoid NULL pointer dereference.
 > 
-> Signed-off-by: Li zeming <zeming@nfschina.com>
+> Fixes: 8537257874e9 ("can: etas_es58x: add core support for ETAS ES58X CAN USB interfaces")
+> Signed-off-by: Jiasheng Jiang <jiasheng@iscas.ac.cn>
 > ---
->  net/socket.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  drivers/net/can/usb/etas_es58x/es58x_core.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> diff --git a/net/socket.c b/net/socket.c
-> index 2b0e54b2405c..743e54eba06f 100644
-> --- a/net/socket.c
-> +++ b/net/socket.c
-> @@ -569,12 +569,12 @@ static ssize_t sockfs_listxattr(struct dentry *dentry, char *buffer,
->  				size_t size)
->  {
->  	ssize_t len;
-> -	ssize_t used = 0;
-> +	ssize_t used;
+> diff --git a/drivers/net/can/usb/etas_es58x/es58x_core.c b/drivers/net/can/usb/etas_es58x/es58x_core.c
+> index 0c7f7505632c..d694cb22d9f4 100644
+> --- a/drivers/net/can/usb/etas_es58x/es58x_core.c
+> +++ b/drivers/net/can/usb/etas_es58x/es58x_core.c
+> @@ -680,6 +680,8 @@ int es58x_rx_err_msg(struct net_device *netdev, enum es58x_err error,
+>  	}
 >  
->  	len = security_inode_listsecurity(d_inode(dentry), buffer, size);
->  	if (len < 0)
->  		return len;
-> -	used += len;
-> +	used = len;
->  	if (buffer) {
->  		if (size < used)
->  			return -ERANGE;
+>  	skb = alloc_can_err_skb(netdev, &cf);
+> +	if (!skb)
+> +		return -ENOMEM;
+
+Should you adjust the stats for dropped packets as well?
+
+>  
+>  	switch (error) {
+>  	case ES58X_ERR_OK:	/* 0: No error */
 
