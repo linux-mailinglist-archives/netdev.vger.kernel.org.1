@@ -1,78 +1,71 @@
-Return-Path: <netdev+bounces-31668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBA6C78F797
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 05:59:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DEA378F79A
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 06:03:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 388FD2816E3
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 03:59:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1433B1C20B2A
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 04:03:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E411B1FA1;
-	Fri,  1 Sep 2023 03:59:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C5881FA9;
+	Fri,  1 Sep 2023 04:03:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D63BA1C3E
-	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 03:59:00 +0000 (UTC)
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84FD7E47
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 20:58:59 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-68a410316a2so1291432b3a.0
-        for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 20:58:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693540739; x=1694145539; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3IpcFV2+HszfTBdWrnWFCNFj/WvDzdsRlCY13GnN22Y=;
-        b=YtLrVK1XRZ6w7FLutDcwp1ZCZuXDuGoZKFGAJvJA50e57s5QO3qmgY7JtpeoIguY0X
-         NgR9TAl1aJ82PUroNLjc5bUpZiY+TSfUSu7JsNLoyLk1GY4rmBTQfNxifTNBvEeVCjRP
-         Jeg6gSKBbBl1kVE0gnTbxy8DclIlnan6uQNEqHTGGgGxGWg8qaAeIN63hF3LsIJksrIF
-         +Qgkt/nvu75vNiVThgqCVo4aPeW8Rd5wA29IIonaMF3ZtKvuI+9QU6avkoFn6XNInCjt
-         IUh7t8uD9z8FMtbzJ8+eREKpTip9bcxBEuBXrCLWWSwtu+r7dBeho8jQ0IuDDnIJEa6D
-         d9Rg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693540739; x=1694145539;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3IpcFV2+HszfTBdWrnWFCNFj/WvDzdsRlCY13GnN22Y=;
-        b=OCcHiUeh0O8c+0mAYAPxslV5bR/Hznxnj0pSRfKhjMm9DEFGIzD0pw0v0sfQYM7Xbf
-         t379CztphOWoyjZhhg2BIC4tw5tL82KwW5KQl/NlQyWskbdu5koGctgHKeG2osY0LoBI
-         QwVqhqwp1Bf8gGRZFS4PImH6cLVgZGEIGow68kpZ/6FcYOV2H18FC5f/cxgb3nPFeBqQ
-         cf/6vRI6WoDuMFLq6R7QYCoyy7FWGc1Mt1DaxQC8CQ5b2hgYAhSvXjlmpqJptqafUZsE
-         cC0jpjqbPCK/CPaxw8jpRrsIzi7P+ASjZz0fLC4Dbsj5kulg1x0J/pZU7yE58+grkj8M
-         q/vg==
-X-Gm-Message-State: AOJu0Yy3DAoBabHiwPxRWK1NrmjCCFWqXEOw697FBefPNPtWMdJsPDx2
-	xyABgecg9JOelWBdofArJWs=
-X-Google-Smtp-Source: AGHT+IFTukPoRl85qqjs3guAEMyoOj7+HD8IiQ011o5iu0v1vITJgg3roP3xz3xOnGPkcQG1/LeXoQ==
-X-Received: by 2002:a05:6a20:728e:b0:148:2f62:c47f with SMTP id o14-20020a056a20728e00b001482f62c47fmr1837377pzk.41.1693540738906;
-        Thu, 31 Aug 2023 20:58:58 -0700 (PDT)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id v25-20020aa78519000000b00682c1db7551sm1994995pfn.49.2023.08.31.20.58.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Aug 2023 20:58:58 -0700 (PDT)
-Date: Fri, 1 Sep 2023 11:58:54 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Ido Schimmel <idosch@idosch.org>,
-	Thomas Haller <thaller@redhat.com>
-Subject: Re: [PATCH net-next] ipv6: do not merge differe type and protocol
- routes
-Message-ID: <ZPFhfgScZiekiOQd@Laptop-X1>
-References: <20230830061550.2319741-1-liuhangbin@gmail.com>
- <eeb19959-26f4-e8c1-abde-726dbb2b828d@6wind.com>
- <01baf374-97c0-2a6f-db85-078488795bf9@kernel.org>
- <db56de33-2112-5a4c-af94-6c8d26a8bfc1@6wind.com>
- <ZPBn9RQUL5mS/bBx@Laptop-X1>
- <62bcd732-31ed-e358-e8dd-1df237d735ef@6wind.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C4D61FA1
+	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 04:03:27 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7CB4E4C;
+	Thu, 31 Aug 2023 21:03:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1693541005; x=1725077005;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=R+W9qyDSelNlpR13hEosbhX72kNCmpu5QOTLPT7lfD8=;
+  b=mn2WeLvx+ntYsT6F5ewlizr+iwEF7pK8FB9spXbZ9nM4jjl8fsfRUN2m
+   AxBJiUuWQ1ZRr6MQHQUkqqV0qFHiHuAIFTKSGJoBESj/7acfQs8q/AMiJ
+   YW9UK8MLBDLueaacYWwtFcYnEghDXAAxQ6HmczBMh2UQhYpFvxkCeDKOE
+   WjaIyXxjo52XcLMG5maOvv5dG1GfP7cO9q4N3UZaPSAwMjYp1r1yUyOmy
+   qPPILmyuG2DuVnE7/tf21rVhYvkenmnUdX/KJGBawjcQX+UJijB2l03cx
+   QcwSuomnYgNi3/SKJNrUvE/Lxo95G7Ba8aHw/e8PiZq5xtQb+fvQq+otI
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10819"; a="356444025"
+X-IronPort-AV: E=Sophos;i="6.02,218,1688454000"; 
+   d="scan'208";a="356444025"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2023 21:03:24 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10819"; a="986503554"
+X-IronPort-AV: E=Sophos;i="6.02,218,1688454000"; 
+   d="scan'208";a="986503554"
+Received: from lkp-server01.sh.intel.com (HELO 5d8055a4f6aa) ([10.239.97.150])
+  by fmsmga006.fm.intel.com with ESMTP; 31 Aug 2023 21:03:21 -0700
+Received: from kbuild by 5d8055a4f6aa with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qbvNP-0000r5-0i;
+	Fri, 01 Sep 2023 04:03:19 +0000
+Date: Fri, 1 Sep 2023 12:02:53 +0800
+From: kernel test robot <lkp@intel.com>
+To: Lukasz Majewski <lukma@denx.de>, Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net,
+	Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Vladimir Oltean <olteanv@gmail.com>
+Cc: oe-kbuild-all@lists.linux.dev, Tristram.Ha@microchip.com,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, UNGLinuxDriver@microchip.com,
+	George McCollister <george.mccollister@gmail.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Lukasz Majewski <lukma@denx.de>
+Subject: Re: [PATCH v2 2/4] net: dsa: Extend ksz9477 TAG setup to support HSR
+ frames duplication
+Message-ID: <202309011123.BsWErQvO-lkp@intel.com>
+References: <20230831111827.548118-3-lukma@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,62 +74,86 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <62bcd732-31ed-e358-e8dd-1df237d735ef@6wind.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+In-Reply-To: <20230831111827.548118-3-lukma@denx.de>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Aug 31, 2023 at 01:58:48PM +0200, Nicolas Dichtel wrote:
-> > The append should also works for a single route, not only for append nexthop, no?
-> I don't think so. The 'append' should 'join', not add. Adding more cases where a
-> route is added instead of appended doesn't make the API clearer.
-> 
-> With this patch, it will be possible to add a new route with the 'append'
-> command when the 'add' command fails:
-> $ ip -6 route add local 2003:1:2:3::/64 via 2001::2 dev eth1 table 200
-> $ ip -6 route add unicast 2003:1:2:3::/64 via 2001::2 dev eth1 table 200
-> RTNETLINK answers: File exists
-> 
-> $ ip -6 route add 2003:1:2:3::/64 via 2001::2 dev eth1 protocol bgp table 200
-> $ ip -6 route add 2003:1:2:3::/64 via 2001::2 dev eth1 protocol kernel table 200
-> RTNETLINK answers: File exists
-> 
-> This makes the API more confusing and complex. And I don't understand how it
-> will be used later. There will be 2 routes on the system, but only one will be
-> used, which one? This is confusing.
+Hi Lukasz,
 
-Just to makeit it clear, the new patch will not add two route with only
-different type/protocol. Here is the result with my patch.
+kernel test robot noticed the following build errors:
 
-+ ip -6 route flush table 300
-+ ip link add dummy1 up type dummy
-+ ip link add dummy2 up type dummy
-+ ip addr add 2001:db8:101::1/64 dev dummy1
-+ ip addr add 2001:db8:101::2/64 dev dummy2
-+ ip route add local 2001:db8:103::/64 via 2001:db8:101::10 dev dummy1 table 100
-+ ip route append unicast 2001:db8:103::/64 via 2001:db8:101::10 dev dummy1 table 100
-RTNETLINK answers: File exists
+[auto build test ERROR on v6.5]
+[also build test ERROR on next-20230831]
+[cannot apply to net-next/main net/main linus/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-     ^^ here the append still failed
+url:    https://github.com/intel-lab-lkp/linux/commits/Lukasz-Majewski/net-dsa-Extend-the-ksz_device-structure-to-hold-info-about-HSR-ports/20230831-192012
+base:   v6.5
+patch link:    https://lore.kernel.org/r/20230831111827.548118-3-lukma%40denx.de
+patch subject: [PATCH v2 2/4] net: dsa: Extend ksz9477 TAG setup to support HSR frames duplication
+config: openrisc-randconfig-r026-20230901 (https://download.01.org/0day-ci/archive/20230901/202309011123.BsWErQvO-lkp@intel.com/config)
+compiler: or1k-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230901/202309011123.BsWErQvO-lkp@intel.com/reproduce)
 
-+ ip route append unicast 2001:db8:103::/64 via 2001:db8:101::10 dev dummy2 table 100
-+ ip -6 route show table 100
-local 2001:db8:103::/64 via 2001:db8:101::10 dev dummy1 metric 1024 pref medium
-2001:db8:103::/64 via 2001:db8:101::10 dev dummy2 metric 1024 pref medium
-+ ip route add 2001:db8:104::/64 via 2001:db8:101::10 dev dummy1 proto kernel table 200
-+ ip route append 2001:db8:104::/64 via 2001:db8:101::10 dev dummy1 proto bgp table 200
-RTNETLINK answers: File exists
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202309011123.BsWErQvO-lkp@intel.com/
 
-     ^^ And here
+All errors (new ones prefixed by >>):
 
-+ ip route append 2001:db8:104::/64 via 2001:db8:101::10 dev dummy2 proto bgp table 200
-+ ip -6 route show table 200
-2001:db8:104::/64 via 2001:db8:101::10 dev dummy1 proto kernel metric 1024 pref medium
-2001:db8:104::/64 via 2001:db8:101::10 dev dummy2 proto bgp metric 1024 pref medium
+   or1k-linux-ld: net/dsa/tag_ksz.o: in function `ksz9477_xmit':
+>> net/dsa/tag_ksz.c:298:(.text+0xcf8): undefined reference to `ksz_hsr_get_ports'
+   net/dsa/tag_ksz.c:298:(.text+0xcf8): relocation truncated to fit: R_OR1K_INSN_REL_26 against undefined symbol `ksz_hsr_get_ports'
 
-Thanks
-Hangbin
+
+vim +298 net/dsa/tag_ksz.c
+
+   269	
+   270	static struct sk_buff *ksz9477_xmit(struct sk_buff *skb,
+   271					    struct net_device *dev)
+   272	{
+   273		u16 queue_mapping = skb_get_queue_mapping(skb);
+   274		u8 prio = netdev_txq_to_tc(dev, queue_mapping);
+   275		struct dsa_port *dp = dsa_slave_to_port(dev);
+   276		struct ethhdr *hdr;
+   277		__be16 *tag;
+   278		u16 val;
+   279	
+   280		if (skb->ip_summed == CHECKSUM_PARTIAL && skb_checksum_help(skb))
+   281			return NULL;
+   282	
+   283		/* Tag encoding */
+   284		ksz_xmit_timestamp(dp, skb);
+   285	
+   286		tag = skb_put(skb, KSZ9477_INGRESS_TAG_LEN);
+   287		hdr = skb_eth_hdr(skb);
+   288	
+   289		val = BIT(dp->index);
+   290	
+   291		val |= FIELD_PREP(KSZ9477_TAIL_TAG_PRIO, prio);
+   292	
+   293		if (is_link_local_ether_addr(hdr->h_dest))
+   294			val |= KSZ9477_TAIL_TAG_OVERRIDE;
+   295	
+   296		if (dev->features & NETIF_F_HW_HSR_DUP) {
+   297			val &= ~KSZ9477_TAIL_TAG_LOOKUP;
+ > 298			val |= ksz_hsr_get_ports(dp->ds);
+   299		}
+   300	
+   301		*tag = cpu_to_be16(val);
+   302	
+   303		return ksz_defer_xmit(dp, skb);
+   304	}
+   305	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
