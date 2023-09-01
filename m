@@ -1,160 +1,135 @@
-Return-Path: <netdev+bounces-31785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE18D7902CA
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 22:22:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 325127902D0
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 22:28:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 650D3281811
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 20:22:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D04F5281801
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 20:28:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A853D30B;
-	Fri,  1 Sep 2023 20:22:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D33ADF50;
+	Fri,  1 Sep 2023 20:28:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C79CC136;
-	Fri,  1 Sep 2023 20:22:27 +0000 (UTC)
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68FE3E66;
-	Fri,  1 Sep 2023 13:22:26 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1bc83a96067so18715475ad.0;
-        Fri, 01 Sep 2023 13:22:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693599746; x=1694204546; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CaD763ZtpqCjyX5Kt9ZHyZcT5Qifqz2EgCV742e6Gak=;
-        b=CdFZBsmZGXuugQjwUUZidFJouh4Zo4GQTIFJnhtz3vQk8o0XUkx/ZTvlu1WtSzEwMn
-         GIAZMruHlxlIAQQB2mbUKy2uGBIFDc3xUzB7RdjRYL9nW89LqQNavMyjeMYrguapbhBb
-         jWdfL3nZ87HgK+1FAem1kMfCUXRn1WjjC9AAFnqYtK0I1p+oRjpDXJsfalm+p3/eLn8C
-         WrMbl8gl3DoROjid3ImGzAn7X15J7/rVpGIG8ZNp/oT+WM+gxxdfAq4r6IgK8aOONfhr
-         Zslmn7BuMTcTwhLA7/mjkzb5vNkhou9hRNqCt2LKadqXY6IYPLYwmlC3QF0Y6wGPef5f
-         808w==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DB07C136
+	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 20:28:32 +0000 (UTC)
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 483FAE7F
+	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 13:28:31 -0700 (PDT)
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com [209.85.215.200])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id BE92341D35
+	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 20:28:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1693600109;
+	bh=trUGss+XmptPoPRENI5SIudMC9BUyQNCNA1erFL5kbU=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID;
+	b=I3H7M9Toq3lcUG2NGoARVp13pIczDaaNfJ6wJGOlzj7mXEsOZWvZ5PxqN/3DWIvX/
+	 6hKEM6E1K5kF3DoHTDh81/tquU21Ye/MoAiUZfF9lz9o0GJ7S3VUP3aB8mFEhpPslK
+	 F86aacOvxGGd4it2IxUP8c129HiaepRiqRYlbXygIBrnWDB30RmZISR6E63DQWIh0w
+	 J6PIzMzPmEW3TX5W21PXbXHIwGFXhbKKds7nwTIOiDoHEwGrDdc2A3RquGzNWv6xej
+	 SpMSU1TdEX7LECTIgiE7QooQ5ym+VL5AeXVcuMO67MYXuxQhOObvWR3+1Dyl4Utehl
+	 yzYdJCc9iOhcg==
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-56f8334c253so2549438a12.0
+        for <netdev@vger.kernel.org>; Fri, 01 Sep 2023 13:28:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693599746; x=1694204546;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=CaD763ZtpqCjyX5Kt9ZHyZcT5Qifqz2EgCV742e6Gak=;
-        b=jkXb1USmCPJURaIo9W+EeZjAzbKiIydnTVUAj0denDN8loZS/z5uJyt6VKHHjxidYk
-         7jvOlqREDd2QaqWrFY7rHmfZ11Y0ZgdP+ezX4BY+/ZsZNqYkeOwGOOAmlq+mh0KwdQTe
-         GrIdX7NiNfyrikoYaZrBNW+aXv7gt8089dDm1DOmdhH08Z9rija9tp/rvJ1NmGB8sAFJ
-         rVlqQc1YsAhpbhn3/NkRTiyZIu1Hk/TitUPPM3/g7cjd55Ok6A7ry7u4N9TcexcmAcqq
-         h7bN8yt1dFvXQbLFHcPoLU22A9/IrUrpOUd1fCCTAJ7YNmJ0jTIxehm+Jmj0JMrp/mfb
-         IwQQ==
-X-Gm-Message-State: AOJu0YxCnV0uV+vtB+k7fVXfym70ZPSxGusZgk+EKHtmT6iM08dXLGfR
-	fJeP71KI8NrYvSo/4z71SSc=
-X-Google-Smtp-Source: AGHT+IH0ZdSdp6Y8vLNLg1WSx+2EWoJqMEPiOnIB6qoFVQa6nhokWZc2hk23SgekL5JkgGHUMLDuMw==
-X-Received: by 2002:a17:902:ec84:b0:1b9:d2fc:ba9f with SMTP id x4-20020a170902ec8400b001b9d2fcba9fmr4440316plg.11.1693599745774;
-        Fri, 01 Sep 2023 13:22:25 -0700 (PDT)
-Received: from localhost ([98.97.116.126])
-        by smtp.gmail.com with ESMTPSA id c13-20020a170902d48d00b001bd28b9c3ddsm3356511plg.299.2023.09.01.13.22.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Sep 2023 13:22:25 -0700 (PDT)
-Date: Fri, 01 Sep 2023 13:22:24 -0700
-From: John Fastabend <john.fastabend@gmail.com>
-To: Jiri Olsa <olsajiri@gmail.com>, 
- Xu Kuohai <xukuohai@huawei.com>
-Cc: John Fastabend <john.fastabend@gmail.com>, 
- Jiri Olsa <olsajiri@gmail.com>, 
- Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- netdev@vger.kernel.org, 
- bpf@vger.kernel.org, 
- Martin KaFai Lau <kafai@fb.com>, 
- Song Liu <songliubraving@fb.com>, 
- Yonghong Song <yhs@fb.com>, 
- KP Singh <kpsingh@chromium.org>, 
- Stanislav Fomichev <sdf@google.com>, 
- Hao Luo <haoluo@google.com>, 
- Hou Tao <houtao1@huawei.com>, 
- Bobby Eshleman <bobby.eshleman@bytedance.com>
-Message-ID: <64f2480035813_346b0208f5@john.notmuch>
-In-Reply-To: <ZPGvqOQBwP7vPc+l@krava>
-References: <ZO+RQwJhPhYcNGAi@krava>
- <ZO+vetPCpOOCGitL@krava>
- <23cd4ce0-0360-e3c6-6cc9-f597aefb2ab5@huawei.com>
- <1c533412-b192-3868-991a-d35587329803@huawei.com>
- <64f0e7ae869c9_d03ca20847@john.notmuch>
- <64f0f60b1417c_d45ab2086b@john.notmuch>
- <edeee369-974d-3676-cf53-a2ed8c52cea0@huawei.com>
- <ZPGvqOQBwP7vPc+l@krava>
-Subject: Re: [BUG bpf-next] bpf/net: Hitting gpf when running selftests
+        d=1e100.net; s=20221208; t=1693600108; x=1694204908;
+        h=message-id:date:content-id:mime-version:comments:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=trUGss+XmptPoPRENI5SIudMC9BUyQNCNA1erFL5kbU=;
+        b=egwfugXHApdOobndWI1Hw/Hww0J21h0wHbjkXTYipJsKyD783MSMDHNBSWRRJd2NOy
+         NomqlAV0FkHjYewoZ+iEW/Rn+4l4Lwm6bnVGEIHDaIi+tIZT+2cBaqvwPUjSzIZZ0Aw5
+         Ip3pWCbVwLJp2tAVBeNSYtKB01MUgOXBXX5h4kEsDp7PtVXxnqoh+7WcDjDBa+gwntav
+         Rl9LReOJrWAT0YeemhLIuLSHYJvJmB9/inOBF/ph6yDiEgxU/7sa+vt6Wt2R3FFmjRrf
+         FFrblTM4iieSbHEEFCEuN6Qdl0IjDx3uWFCZhEaUP3mhIBzQAripc1jVwAgXFtXwKKqV
+         tPEA==
+X-Gm-Message-State: AOJu0YwLowk51c3q82OiaEwq5DeVjN1XvMCG5gdMNnr6sC2Vq8eRW+3k
+	dyhDFCfJo9jPsYOmuDmW1K7aXqOX6Ot21iHTMkwYhm8+FOoh5dghauaBkVY1vTxiRLXdoHxh0Gk
+	JGVjRrkMxjYyUoPYVNeO5Rn6/2Z+eZ0hUWg==
+X-Received: by 2002:a05:6a21:32a6:b0:14c:d0c0:dd25 with SMTP id yt38-20020a056a2132a600b0014cd0c0dd25mr4361251pzb.57.1693600108328;
+        Fri, 01 Sep 2023 13:28:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHozaMKnYY9iMOdnGx+yJXXWEiezm1GOJMoq+UF9cuFtZRIQH6P1VO6vdBDiyl8xjyC2xNfyw==
+X-Received: by 2002:a05:6a21:32a6:b0:14c:d0c0:dd25 with SMTP id yt38-20020a056a2132a600b0014cd0c0dd25mr4361243pzb.57.1693600108093;
+        Fri, 01 Sep 2023 13:28:28 -0700 (PDT)
+Received: from famine.localdomain ([50.125.80.253])
+        by smtp.gmail.com with ESMTPSA id s21-20020a62e715000000b0068a29521df2sm3460972pfh.177.2023.09.01.13.28.27
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 01 Sep 2023 13:28:27 -0700 (PDT)
+Received: by famine.localdomain (Postfix, from userid 1000)
+	id 34ED060648; Fri,  1 Sep 2023 13:28:27 -0700 (PDT)
+Received: from famine (localhost [127.0.0.1])
+	by famine.localdomain (Postfix) with ESMTP id 2D6BE9F83B;
+	Fri,  1 Sep 2023 13:28:27 -0700 (PDT)
+From: Jay Vosburgh <jay.vosburgh@canonical.com>
+To: patchwork-bot+netdevbpf@kernel.org
+cc: edward.cree@amd.com, linux-net-drivers@amd.com, davem@davemloft.net,
+    kuba@kernel.org, edumazet@google.com, pabeni@redhat.com,
+    ecree.xilinx@gmail.com, netdev@vger.kernel.org,
+    habetsm.xilinx@gmail.com
+Subject: Re: [PATCH net] sfc: check for zero length in EF10 RX prefix
+In-reply-to: <169355282650.26042.12939448647833622026.git-patchwork-notify@kernel.org>
+References: <20230831165811.18061-1-edward.cree@amd.com> <169355282650.26042.12939448647833622026.git-patchwork-notify@kernel.org>
+Comments: In-reply-to patchwork-bot+netdevbpf@kernel.org
+   message dated "Fri, 01 Sep 2023 07:20:26 -0000."
+X-Mailer: MH-E 8.6+git; nmh 1.6; Emacs 29.0.50
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <11385.1693600107.1@famine>
+Date: Fri, 01 Sep 2023 13:28:27 -0700
+Message-ID: <11386.1693600107@famine>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Jiri Olsa wrote:
-> On Fri, Sep 01, 2023 at 05:10:43PM +0800, Xu Kuohai wrote:
-> 
-> SNIP
-> 
-> > > > Trying to come up with some nice fix now.
-> > > 
-> > > Something like this it fixes the splat, but need to think if it
-> > > introduces anything or some better way to do this. Basic idea
-> > > is to bump user->refcnt because we have two references to the
-> > > skb and want to ensure we really only kfree_skb() the skb
-> > > after both references are dropped.
-> > > 
-> > > diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-> > > index a0659fc29bcc..6c31eefbd777 100644
-> > > --- a/net/core/skmsg.c
-> > > +++ b/net/core/skmsg.c
-> > > @@ -612,12 +612,18 @@ static int sk_psock_skb_ingress_self(struct sk_psock *psock, struct sk_buff *skb
-> > >   static int sk_psock_handle_skb(struct sk_psock *psock, struct sk_buff *skb,
-> > >                                 u32 off, u32 len, bool ingress)
-> > >   {
-> > > +       int err = 0;
-> > > +
-> > >          if (!ingress) {
-> > >                  if (!sock_writeable(psock->sk))
-> > >                          return -EAGAIN;
-> > >                  return skb_send_sock(psock->sk, skb, off, len);
-> > >          }
-> > > -       return sk_psock_skb_ingress(psock, skb, off, len);
-> > > +       skb_get(skb);
-> > > +       err = sk_psock_skb_ingress(psock, skb, off, len);
-> > > +       if (err < 0)
-> > > +               kfree_skb(skb);
-> > > +       return err;
-> > >   }
-> > >   static void sk_psock_skb_state(struct sk_psock *psock,
-> > > @@ -685,9 +691,7 @@ static void sk_psock_backlog(struct work_struct *work)
-> > >                  } while (len);
-> > >                  skb = skb_dequeue(&psock->ingress_skb);
-> > > -               if (!ingress) {
-> > > -                       kfree_skb(skb);
-> > > -               }
-> > > +               kfree_skb(skb);
-> > >          }
-> > >   end:
-> > >          mutex_unlock(&psock->work_mutex);
-> > > .
-> > 
-> > With this fix, the crash is gone.
-> 
-> +1, same on my setup
-> 
-> jirka
+patchwork-bot+netdevbpf@kernel.org wrote:
 
-Sent a patch. Add tested-by and acks if you have time. Thanks!
+>Hello:
+>
+>This patch was applied to netdev/net.git (main)
+>by David S. Miller <davem@davemloft.net>:
+>
+>On Thu, 31 Aug 2023 17:58:11 +0100 you wrote:
+>> From: Edward Cree <ecree.xilinx@gmail.com>
+>> 
+>> When EF10 RXDP firmware is operating in cut-through mode, packet length
+>>  is not known at the time the RX prefix is generated, so it is left as
+>>  zero and RX event merging is inhibited to ensure that the length is
+>>  available in the RX event.  However, it has been found that in certain
+>>  circumstances the RX events for these packets still get merged,
+>>  meaning the driver cannot read the length from the RX event, and tries
+>>  to use the length from the prefix.
+>> The resulting zero-length SKBs cause crashes in GRO since commit
+>>  1d11fa696733 ("net-gro: remove GRO_DROP"), so add a check to the driver
+>>  to detect these zero-length RX events and discard the packet.
+>> 
+>> [...]
+
+	Should this have included
+
+Fixes: 1d11fa696733 ("net-gro: remove GRO_DROP")
+
+	to queue the patch for -stable?  We have users running into this
+issue on 5.15 series kernels.
+
+	-J
+
+---
+	-Jay Vosburgh, jay.vosburgh@canonical.com
 
