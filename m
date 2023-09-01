@@ -1,337 +1,115 @@
-Return-Path: <netdev+bounces-31706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A14878FA7C
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 11:10:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FE4D78FA8B
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 11:17:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 553501C20C06
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 09:10:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0633528193A
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 09:17:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5634946B;
-	Fri,  1 Sep 2023 09:10:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5383946F;
+	Fri,  1 Sep 2023 09:17:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A166399;
-	Fri,  1 Sep 2023 09:10:49 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2956710D4;
-	Fri,  1 Sep 2023 02:10:47 -0700 (PDT)
-Received: from kwepemd100003.china.huawei.com (unknown [172.30.72.57])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RcXJv0wNBzrSWD;
-	Fri,  1 Sep 2023 17:09:03 +0800 (CST)
-Received: from [10.67.111.192] (10.67.111.192) by
- kwepemd100003.china.huawei.com (7.221.188.180) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A40B2399
+	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 09:17:42 +0000 (UTC)
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3279DB5;
+	Fri,  1 Sep 2023 02:17:41 -0700 (PDT)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.54])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4RcXSs6wNpz1L9Ft;
+	Fri,  1 Sep 2023 17:15:57 +0800 (CST)
+Received: from [10.174.178.66] (10.174.178.66) by
+ dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1258.23; Fri, 1 Sep 2023 17:10:44 +0800
-Message-ID: <edeee369-974d-3676-cf53-a2ed8c52cea0@huawei.com>
-Date: Fri, 1 Sep 2023 17:10:43 +0800
+ 15.1.2507.31; Fri, 1 Sep 2023 17:17:38 +0800
+Message-ID: <abb4efba-90b4-da14-5683-3cd96819a5e0@huawei.com>
+Date: Fri, 1 Sep 2023 17:17:38 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [BUG bpf-next] bpf/net: Hitting gpf when running selftests
-Content-Language: en-US
-To: John Fastabend <john.fastabend@gmail.com>, Jiri Olsa <olsajiri@gmail.com>
-CC: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
-	<daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
-	<netdev@vger.kernel.org>, <bpf@vger.kernel.org>, Martin KaFai Lau
-	<kafai@fb.com>, Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
-	KP Singh <kpsingh@chromium.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
-	<haoluo@google.com>, Hou Tao <houtao1@huawei.com>, Bobby Eshleman
-	<bobby.eshleman@bytedance.com>
-References: <ZO+RQwJhPhYcNGAi@krava> <ZO+vetPCpOOCGitL@krava>
- <23cd4ce0-0360-e3c6-6cc9-f597aefb2ab5@huawei.com>
- <1c533412-b192-3868-991a-d35587329803@huawei.com>
- <64f0e7ae869c9_d03ca20847@john.notmuch>
- <64f0f60b1417c_d45ab2086b@john.notmuch>
-From: Xu Kuohai <xukuohai@huawei.com>
-In-Reply-To: <64f0f60b1417c_d45ab2086b@john.notmuch>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.2
+Subject: Re: [PATCH net,v2] wifi: mac80211: fix WARNING in
+ ieee80211_link_info_change_notify()
+To: Johannes Berg <johannes@sipsolutions.net>,
+	<linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <weiyongjun1@huawei.com>, <yuehaibing@huawei.com>
+References: <20230901035301.3473463-1-shaozhengchao@huawei.com>
+ <7127fe5a4f2cfcdc3a55269f0a427477e264fabc.camel@sipsolutions.net>
+From: shaozhengchao <shaozhengchao@huawei.com>
+In-Reply-To: <7127fe5a4f2cfcdc3a55269f0a427477e264fabc.camel@sipsolutions.net>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.67.111.192]
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.178.66]
 X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemd100003.china.huawei.com (7.221.188.180)
+ dggpeml500026.china.huawei.com (7.185.36.106)
 X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 9/1/2023 4:20 AM, John Fastabend wrote:
-> John Fastabend wrote:
->> Xu Kuohai wrote:
->>> On 8/31/2023 5:46 PM, Xu Kuohai wrote:
->>>> On 8/31/2023 5:07 AM, Jiri Olsa wrote:
->>>>> On Wed, Aug 30, 2023 at 08:58:11PM +0200, Jiri Olsa wrote:
->>>>>> hi,
->>>>>> I'm hitting crash below on bpf-next/master when running selftests,
->>>>>> full log and config attached
->>>>>
->>>>> it seems to be 'test_progs -t sockmap_listen' triggering that
->>>>>
->>>>> jirka
->>>>>
->>>>>>
->>>>>> jirka
->>>>>>
->>>>>>
->>>>>> ---
->>>>>> [ 1022.710250][ T2556] general protection fault, probably for non-canonical address 0x6b6b6b6b6b6b6b73: 0000 [#1] PREEMPT SMP DEBUG_PAGEALLOC NOPTI^M
->>>>>> [ 1022.711206][ T2556] CPU: 2 PID: 2556 Comm: kworker/2:4 Tainted: G           OE      6.5.0+ #693 1723c8b9805ff5a1672ab7e6f25977078a7bcceb^M
->>>>>> [ 1022.712120][ T2556] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-1.fc38 04/01/2014^M
->>>>>> [ 1022.712830][ T2556] Workqueue: events sk_psock_backlog^M
->>>>>> [ 1022.713262][ T2556] RIP: 0010:skb_dequeue+0x4c/0x80^M
->>>>>> [ 1022.713653][ T2556] Code: 41 48 85 ed 74 3c 8b 43 10 4c 89 e7 83 e8 01 89 43 10 48 8b 45 08 48 8b 55 00 48 c7 45 08 00 00 00 00 48 c7 45 00 00 00 00 00 <48> 89 42 08 48 89 10 e8 e8 6a 41 00 48 89 e8 5b 5d 41 5c c3 cc cc^M
->>>>>> [ 1022.714963][ T2556] RSP: 0018:ffffc90003ca7dd0 EFLAGS: 00010046^M
->>>>>> [ 1022.715431][ T2556] RAX: 6b6b6b6b6b6b6b6b RBX: ffff88811de269d0 RCX: 0000000000000000^M
->>>>>> [ 1022.716068][ T2556] RDX: 6b6b6b6b6b6b6b6b RSI: 0000000000000282 RDI: ffff88811de269e8^M
->>>>>> [ 1022.716676][ T2556] RBP: ffff888141ae39c0 R08: 0000000000000001 R09: 0000000000000000^M
->>>>>> [ 1022.717283][ T2556] R10: 0000000000000001 R11: 0000000000000000 R12: ffff88811de269e8^M
->>>>>> [ 1022.717930][ T2556] R13: 0000000000000001 R14: ffff888141ae39c0 R15: ffff88810a20e640^M
->>>>>> [ 1022.718549][ T2556] FS:  0000000000000000(0000) GS:ffff88846d600000(0000) knlGS:0000000000000000^M
->>>>>> [ 1022.719241][ T2556] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033^M
->>>>>> [ 1022.719761][ T2556] CR2: 00007fb5c25ca000 CR3: 000000012b902004 CR4: 0000000000770ee0^M
->>>>>> [ 1022.720394][ T2556] PKRU: 55555554^M
->>>>>> [ 1022.720699][ T2556] Call Trace:^M
->>>>>> [ 1022.720984][ T2556]  <TASK>^M
->>>>>> [ 1022.721254][ T2556]  ? die_addr+0x32/0x80^M
->>>>>> [ 1022.721589][ T2556]  ? exc_general_protection+0x25a/0x4b0^M
->>>>>> [ 1022.722026][ T2556]  ? asm_exc_general_protection+0x22/0x30^M
->>>>>> [ 1022.722489][ T2556]  ? skb_dequeue+0x4c/0x80^M
->>>>>> [ 1022.722854][ T2556]  sk_psock_backlog+0x27a/0x300^M
->>>>>> [ 1022.723243][ T2556]  process_one_work+0x2a7/0x5b0^M
->>>>>> [ 1022.723633][ T2556]  worker_thread+0x4f/0x3a0^M
->>>>>> [ 1022.723998][ T2556]  ? __pfx_worker_thread+0x10/0x10^M
->>>>>> [ 1022.724386][ T2556]  kthread+0xfd/0x130^M
->>>>>> [ 1022.724709][ T2556]  ? __pfx_kthread+0x10/0x10^M
->>>>>> [ 1022.725066][ T2556]  ret_from_fork+0x2d/0x50^M
->>>>>> [ 1022.725409][ T2556]  ? __pfx_kthread+0x10/0x10^M
->>>>>> [ 1022.725799][ T2556]  ret_from_fork_asm+0x1b/0x30^M
->>>>>> [ 1022.726201][ T2556]  </TASK>^M
->>>>>
->>>>>
->>>>> .
->>>>
->>>> My patch failed on the BPF CI, and the log shows the test also died in skb_dequeue:
->>>>
->>>> https://github.com/kernel-patches/bpf/actions/runs/6031993528/job/16366782122
->>>>
->>>> [...]
->>>>
->>>>     [   74.396478]  ? __die_body+0x1f/0x70
->>>>     [   74.396700]  ? page_fault_oops+0x15b/0x450
->>>>     [   74.396957]  ? fixup_exception+0x26/0x330
->>>>     [   74.397211]  ? exc_page_fault+0x68/0x1a0
->>>>     [   74.397457]  ? asm_exc_page_fault+0x26/0x30
->>>>     [   74.397724]  ? skb_dequeue+0x52/0x90
->>>>     [   74.397954]  sk_psock_destroy+0x8c/0x2b0
->>>>     [   74.398204]  process_one_work+0x28a/0x550
->>>>     [   74.398458]  ? __pfx_worker_thread+0x10/0x10
->>>>     [   74.398730]  worker_thread+0x51/0x3c0
->>>>     [   74.398966]  ? __pfx_worker_thread+0x10/0x10
->>>>     [   74.399235]  kthread+0xf7/0x130
->>>>     [   74.399437]  ? __pfx_kthread+0x10/0x10
->>>>     [   74.399707]  ret_from_fork+0x34/0x50
->>>>     [   74.399967]  ? __pfx_kthread+0x10/0x10
->>>>     [   74.400234]  ret_from_fork_asm+0x1b/0x30
->>>>
->>>>
->>>> After a few tries, I found a way to reproduce the problem.
->>>>
->>>> Here is the reproduce steps:
->>>>
->>>> 1. create a kprobe to delay sk_psock_backlog:
->>>>
->>>> static struct kprobe kp = {
->>>>           .symbol_name = "sk_psock_backlog",
->>>>           .offset = 0x00,
->>>> };
->>>>
->>>> static int handler_pre(struct kprobe *p, struct pt_regs *regs)
->>>> {
->>>>           mdelay(1000);
->>>>           return 0;
->>>> }
->>>>
->>>> static int __init kprobe_init(void)
->>>> {
->>>>           int ret;
->>>>
->>>>           kp.pre_handler = handler_pre;
->>>>
->>>>           ret = register_kprobe(&kp);
->>>>           if (ret < 0) {
->>>>                   return -1;
->>>>           }
->>>>
->>>>           return 0;
->>>> }
->>>>
->>>> 2. insert the kprobe and run the vsock sockmap test:
->>>>
->>>> ./test_progs -t "sockmap_listen/sockmap VSOCK test_vsock_redir"
->>>>
->>>>
->>>>
->>>> I guess the problem is in sk_psock_backlog, where skb is inserted to another
->>>> list before skb_dequeue is called.
->>>>
->>>> So I tested it with the following changes, and found the problem did go away.
->>>>
->>>> --- a/net/core/skmsg.c
->>>> +++ b/net/core/skmsg.c
->>>> @@ -648,7 +648,7 @@ static void sk_psock_backlog(struct work_struct *work)
->>>>                   off = state->off;
->>>>           }
->>>>
->>>> -       while ((skb = skb_peek(&psock->ingress_skb))) {
->>>> +       while ((skb = skb_dequeue(&psock->ingress_skb))) {
->>>>                   len = skb->len;
->>>>                   off = 0;
->>>>                   if (skb_bpf_strparser(skb)) {
->>>> @@ -684,7 +684,6 @@ static void sk_psock_backlog(struct work_struct *work)
->>>>                           len -= ret;
->>>>                   } while (len);
->>>>
->>>> -               skb = skb_dequeue(&psock->ingress_skb);
->>>>                   if (!ingress) {
->>>>                           kfree_skb(skb);
->>>>                   }
->>>>
->>>> Not clear what exactly happened, needs more debugging.
->>>>
->>
->> I can only reproduce this on bpf-next so specific to
->> the vsock use case?
->>
->>>
->>> Use the skb address obtained from skb_peek() in sk_psock_backlog() as the key,
->>> 4 stack traces are obtained.
->>>
->>>
->>> trace 0, the skb is queued to the target socket ingress queue:
->>>
->>> [  120.042016] sk_psock_skb_ingress_enqueue+0xf5/0x160
->>> [  120.045052] sk_psock_backlog+0x206/0x400
->>> [  120.047366] process_one_work+0x292/0x560
->>> [  120.049657] worker_thread+0x53/0x3e0
->>> [  120.051698] kthread+0x102/0x130
->>> [  120.053497] ret_from_fork+0x34/0x50
->>> [  120.055528] ret_from_fork_asm+0x1b/0x30
->>>
->>>
->>> trace 1, the skb is consumed by the user:
->>>
->>> [  120.061537] consume_skb+0x47/0x100
->>> [  120.063394] sk_msg_recvmsg+0x268/0x3e0
->>> [  120.065458] unix_bpf_recvmsg+0x16c/0x610
->>> [  120.067584] unix_stream_recvmsg+0x66/0xa0
->>> [  120.069946] sock_recvmsg+0xc4/0xd0
->>> [  120.072063] __sys_recvfrom+0xaf/0x120
->>> [  120.073933] __x64_sys_recvfrom+0x29/0x30
->>> [  120.076052] do_syscall_64+0x3f/0x90
->>> [  120.077986] entry_SYSCALL_64_after_hwframe+0x6e/0xd8
->>>
->>> trace 2, the vsock socket is closed by the user, and a new skb with
->>> the same address is allocated in vsock_release:
->>>
->>> [  120.084296] __alloc_skb+0xe3/0x180
->>> [  120.086335] virtio_transport_alloc_skb+0x3b/0x2c0
->>> [  120.089174] virtio_transport_send_pkt_info+0x118/0x230
->>> [  120.092191] virtio_transport_release+0x29d/0x400
->>> [  120.094845] __vsock_release+0x3c/0x1e0
->>> [  120.096905] vsock_release+0x18/0x30
->>> [  120.098899] __sock_release+0x3d/0xc0
->>> [  120.100885] sock_close+0x18/0x20
->>> [  120.102606] __fput+0x108/0x2b0
->>> [  120.104636] task_work_run+0x5d/0xa0
->>> [  120.106876] exit_to_user_mode_prepare+0x18c/0x190
->>> [  120.109619] syscall_exit_to_user_mode+0x1d/0x50
->>> [  120.112049] do_syscall_64+0x4c/0x90
->>> [  120.114115] entry_SYSCALL_64_after_hwframe+0x6e/0xd8
->>>
->>> trace 3, sk_psock_backlog() calls skb_dequeue() to unlink the skb, since
->>> this skb is now actually a new skb allocated in vsock_release, its prev
->>> and next fields are both set to NULL, NULL deref occurs.
->>>
->>> [  120.120619] skb_dequeue+0x92/0xa0
->>> [  120.122350] sk_psock_backlog+0x305/0x400
->>> [  120.124512] process_one_work+0x292/0x560
->>> [  120.126771] worker_thread+0x53/0x3e0
->>> [  120.128843] kthread+0x102/0x130
->>> [  120.130772] ret_from_fork+0x34/0x50
->>>
->>> To fix it, it seems reasonable to replace skb_peek() with skb_dequeue()
->>> in sk_psock_backlog(), since we can't prevent the skb from being appended
->>> to an ingress queue and consumed by user, as shown in trace 1 and trace 2.
->>
->> The trouble with skb_dequeue is it breaks other checks that check
->> the backlog queue length. It really is nice to have a single len
->> check that determines if backlog is necessary or not.
->>
->> If we revert something we likely need to go back to holding the
->> sock lock in backlog to ensure a reader can't eat the skb while
->> We still have a reference to it. It wasn't an issue for us because
->> its the exception case.
->>
->> Trying to come up with some nice fix now.
-> 
-> Something like this it fixes the splat, but need to think if it
-> introduces anything or some better way to do this. Basic idea
-> is to bump user->refcnt because we have two references to the
-> skb and want to ensure we really only kfree_skb() the skb
-> after both references are dropped.
-> 
-> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-> index a0659fc29bcc..6c31eefbd777 100644
-> --- a/net/core/skmsg.c
-> +++ b/net/core/skmsg.c
-> @@ -612,12 +612,18 @@ static int sk_psock_skb_ingress_self(struct sk_psock *psock, struct sk_buff *skb
->   static int sk_psock_handle_skb(struct sk_psock *psock, struct sk_buff *skb,
->                                 u32 off, u32 len, bool ingress)
->   {
-> +       int err = 0;
-> +
->          if (!ingress) {
->                  if (!sock_writeable(psock->sk))
->                          return -EAGAIN;
->                  return skb_send_sock(psock->sk, skb, off, len);
->          }
-> -       return sk_psock_skb_ingress(psock, skb, off, len);
-> +       skb_get(skb);
-> +       err = sk_psock_skb_ingress(psock, skb, off, len);
-> +       if (err < 0)
-> +               kfree_skb(skb);
-> +       return err;
->   }
->   
->   static void sk_psock_skb_state(struct sk_psock *psock,
-> @@ -685,9 +691,7 @@ static void sk_psock_backlog(struct work_struct *work)
->                  } while (len);
->   
->                  skb = skb_dequeue(&psock->ingress_skb);
-> -               if (!ingress) {
-> -                       kfree_skb(skb);
-> -               }
-> +               kfree_skb(skb);
->          }
->   end:
->          mutex_unlock(&psock->work_mutex);
-> .
 
-With this fix, the crash is gone.
 
-I am worried that the skb might be inserted into another skb list before
-skb_dequeue is called, but I can’t find such code, it seems this worry
-is unnecessary.
+On 2023/9/1 14:32, Johannes Berg wrote:
+> On Fri, 2023-09-01 at 11:53 +0800, Zhengchao Shao wrote:
+>>
+>> diff --git a/net/mac80211/main.c b/net/mac80211/main.c
+>> index 24315d7b3126..f79e2343dddd 100644
+>> --- a/net/mac80211/main.c
+>> +++ b/net/mac80211/main.c
+>> @@ -285,6 +285,9 @@ void ieee80211_link_info_change_notify(struct ieee80211_sub_if_data *sdata,
+>>   	if (!changed || sdata->vif.type == NL80211_IFTYPE_AP_VLAN)
+>>   		return;
+>>   
+>> +	if (!ieee80211_sdata_running(sdata))
+>> +		return;
+>> +
+>>   	if (!check_sdata_in_driver(sdata))
+>>   		return;
+>>
+> 
+> I don't think this is right. Do you see anything else checking that it's
+> running right before checking it's in the driver? :)
+> 
+> Why can we even get into this call at all? I think the problem is
+> already in cfg80211 allowing this.
+> 
+> johannes
+> 
+
+Hi johannes:
+	Do you mean it shouldn't be allowed to set mcast rate when dev
+is stopped, as in the following code?
+
+--- a/net/wireless/rdev-ops.h
++++ b/net/wireless/rdev-ops.h
+@@ -1229,7 +1229,7 @@ rdev_set_mcast_rate(struct 
+cfg80211_registered_device *rdev,
+         int ret = -ENOTSUPP;
+
+         trace_rdev_set_mcast_rate(&rdev->wiphy, dev, mcast_rate);
+-       if (rdev->ops->set_mcast_rate)
++       if (rdev->ops->set_mcast_rate && netif_running(dev))
+                 ret = rdev->ops->set_mcast_rate(&rdev->wiphy, dev, 
+mcast_rate);
+         trace_rdev_return_int(&rdev->wiphy, ret);
+         return ret;
+
+
+Thank you
+
+Zhengchao Shao
 
