@@ -1,124 +1,198 @@
-Return-Path: <netdev+bounces-31738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8EC178FDBA
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 14:49:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBA3E78FE51
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 15:32:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F4621C20CC0
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 12:49:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75512281AAB
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 13:32:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E609EBA57;
-	Fri,  1 Sep 2023 12:49:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68808BE5A;
+	Fri,  1 Sep 2023 13:32:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA51AA94B
-	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 12:49:26 +0000 (UTC)
-Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29CA61725;
-	Fri,  1 Sep 2023 05:48:58 -0700 (PDT)
-Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-986d8332f50so237004866b.0;
-        Fri, 01 Sep 2023 05:48:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693572521; x=1694177321; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=G5bzuukzep2EFlINwyV0mtHmBBzRYX9Wyigjzt2ikDQ=;
-        b=Og7EXI98AjYOQKEZoRdO9VRQQDvoNfC5SirPPUh54UcOH8yH+8lLUmBaE7NnxOpw5L
-         jo2n6/gt2oLHHOc1pmrHbjtBwcoYth2JmmAAIcl+0pkYiiq4kB5qvngdDBU4b5AsRc3g
-         ZLa1PWk+afX7FwgO9q3F51i+E0RGEWxRFI9IVf/PjY55iSg07LwNNJDnA0eVb/q7aMyU
-         yO/ejMvl0Zo2LS85b9uWTZork6tEBRlTrr2rDMOZWcA+uILDjP0DeQhxcNb5p6lrNNPF
-         gN5nn1le2Ri48xcKVH4ncnWaN0ThorRaaUcyPdfqDAWASjvKbdcUWwOu5oCIaGBdY0RZ
-         4sig==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 585DBBE4D
+	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 13:32:49 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 745A010F1
+	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 06:32:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1693575166;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Gi2RFiSqS90try5umBCa3fQNKy+XWOzNuHb+fMKDjX4=;
+	b=FCmQ7hNAAtceXMb54+LFbaXMpVEw6WcTIKAh/l61VXwK2+i+TUx1RoenKhEGNHjltsfwKi
+	AoIidnfsf10esm005CN1LxJeS1YgZr5QCfZfeh+W1Qefatu9OjuZJpsWEm3RnM9fLbS3UT
+	70MNFL5hV6T00yQded+xKFbbLVbH4So=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-237-Hw0Cm8_eMzeQOUBc6sc39w-1; Fri, 01 Sep 2023 09:32:45 -0400
+X-MC-Unique: Hw0Cm8_eMzeQOUBc6sc39w-1
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-5009ee2287aso2551755e87.2
+        for <netdev@vger.kernel.org>; Fri, 01 Sep 2023 06:32:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693572521; x=1694177321;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=G5bzuukzep2EFlINwyV0mtHmBBzRYX9Wyigjzt2ikDQ=;
-        b=YebR9dwLa+ogXJ6M//cHm/kZ3EuzqKx1l/xdiKYWWmVolsVFhzB119Kel6DJzR+1O7
-         HpOHmtM+E8JQRnZszxpAaIL3QcmRXzO0DFWTOIuPImiA2kQzXh7Wa0cmYse+EoN08IPN
-         2IOF3853g5JhiF3PpM3qNUfEPm0QcYbtxzyi5jgwhVbUJLebURff38kdSNcaMb2o8jym
-         7QuAt1CEoQowIlzqGk7SHbQFdk209cMIIsM0VS9SIyeey3HtvvYjOSYpNSolOYRPd4Aa
-         xHM1d6mVJ5c1vN/pJKCCZ+njSPzQw1SQqHHR+yTmHaQCdMPxcwk94xs6Qu84CfeEBCWE
-         APLg==
-X-Gm-Message-State: AOJu0YzqZt+L9SWro+opgcI+jKziXixQn4YZ9Fal34l0NaARl2djqNru
-	45/6PQUDcdxiFjR2Dzk6Btw=
-X-Google-Smtp-Source: AGHT+IEo10S1a4arg5ZoZ04rB3wvIuz+XnFrF9t9V3kas8AIcCHUPn7c3ke/iGmqfItRD9TLNkHqtA==
-X-Received: by 2002:a17:907:272a:b0:9a1:e1cf:6c6c with SMTP id d10-20020a170907272a00b009a1e1cf6c6cmr1688869ejl.30.1693572520645;
-        Fri, 01 Sep 2023 05:48:40 -0700 (PDT)
-Received: from ?IPV6:2a01:c22:72e7:e700:f12a:7a78:6447:9c5c? (dynamic-2a01-0c22-72e7-e700-f12a-7a78-6447-9c5c.c22.pool.telefonica.de. [2a01:c22:72e7:e700:f12a:7a78:6447:9c5c])
-        by smtp.googlemail.com with ESMTPSA id f25-20020a170906495900b0099bc038eb2bsm1921512ejt.58.2023.09.01.05.48.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Sep 2023 05:48:40 -0700 (PDT)
-Message-ID: <5caf123b-f626-fb68-476a-5b5cf9a7f31d@gmail.com>
-Date: Fri, 1 Sep 2023 14:48:39 +0200
+        d=1e100.net; s=20221208; t=1693575164; x=1694179964;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Gi2RFiSqS90try5umBCa3fQNKy+XWOzNuHb+fMKDjX4=;
+        b=g+EHpnqAwUVVejeBYabZGflnzwUZfUiuJui9TjfBQidvebejQhVFkKzq22dI5hTbNq
+         MP5RVkIhECcp9FX5V1vpbr00NP62n7CGcDdTKGLUXbx4kXqRM4A3XKwbCDYRixCVbPcP
+         JKbZh9BySCoVAKmG2Iz7SiAK+m1yr5cb724n5vDlTGImfW8SMbXX/Bg1yz1dppmFKti0
+         b2EbU0YxKbwWLlbPNcFTYqLm2qWNig32USJ03Q3o3i7Btmx8HBhxbRpDYeTa4VexCSbg
+         0gUov8xzKHP294A8hK5iiyc71girouf0nJ252UC6nqihgtb/TcyOVxufkojGRZZW8Km+
+         fW2g==
+X-Gm-Message-State: AOJu0YxSljM0dnUmfg0WRP1G0mmFn5TlogTTnQgR7zethR97/aanaLvC
+	ZeOUdQ88SLGejT/xYhO3LnPmp4VeYZgNAU90zw4VE6AXZJ0ZSRoO7OqQ0wLwNAXS3sZaE1vtGrR
+	XP8EoBGUBY/C0cCouhSDfO2Pg
+X-Received: by 2002:ac2:52ab:0:b0:500:b301:d8db with SMTP id r11-20020ac252ab000000b00500b301d8dbmr1502380lfm.28.1693575163627;
+        Fri, 01 Sep 2023 06:32:43 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEDIgtwW/WZVKKuUMod4IXcehqAGMXyTiB6vMBoauULajM+Bm1Pd0+eJTB27LM5g+uEEsO4GQ==
+X-Received: by 2002:ac2:52ab:0:b0:500:b301:d8db with SMTP id r11-20020ac252ab000000b00500b301d8dbmr1502347lfm.28.1693575163108;
+        Fri, 01 Sep 2023 06:32:43 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id u12-20020aa7d98c000000b005256aaa6e7asm2060292eds.78.2023.09.01.06.32.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Sep 2023 06:32:42 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 0FA1FD82444; Fri,  1 Sep 2023 15:32:42 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org
+Cc: hawk@kernel.org, pabeni@redhat.com, kuba@kernel.org,
+ davem@davemloft.net, lorenzo@kernel.org, Ilias Apalodimas
+ <ilias.apalodimas@linaro.org>, mtahhan@redhat.com,
+ huangjie.albert@bytedance.com, Yunsheng Lin <linyunsheng@huawei.com>,
+ edumazet@google.com, Liang Chen <liangchen.linux@gmail.com>
+Subject: Re: [PATCH net-next RFC v1 2/4] veth: use generic-XDP functions
+ when dealing with SKBs
+In-Reply-To: <d7d3e320-9b2c-fbc4-7d2d-866741b10cf7@kernel.org>
+References: <169272709850.1975370.16698220879817216294.stgit@firesoul>
+ <169272715407.1975370.3989385869434330916.stgit@firesoul>
+ <87msyg91gl.fsf@toke.dk> <d7d3e320-9b2c-fbc4-7d2d-866741b10cf7@kernel.org>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Fri, 01 Sep 2023 15:32:42 +0200
+Message-ID: <87a5u6t3wl.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-Subject: Re: [PATCH] r8169: Disable multicast filter for RTL_GIGA_MAC_VER_46
-Content-Language: en-US
-To: Patrick Thompson <ptf@google.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- nic_swsd@realtek.com, Chun-Hao Lin <hau@realtek.com>
-References: <20230606140041.3244713-1-ptf@google.com>
- <CAJs+hrHAz17Kvr=9e2FR+R=qZK1TyhpMyHKzSKO9k8fidHhTsA@mail.gmail.com>
- <7aa7af7f-7d27-02bf-bfa8-3551d5551d61@gmail.com>
- <20230606142907.456eec7e@kernel.org>
- <CAJs+hrEO6nqRHPj4kUWRm3UsBiSOU128a4pLEp8p4pokP7MmEg@mail.gmail.com>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-In-Reply-To: <CAJs+hrEO6nqRHPj4kUWRm3UsBiSOU128a4pLEp8p4pokP7MmEg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 01.09.2023 14:28, Patrick Thompson wrote:
-> Hello,
-> 
-> I was wondering if this should be extended to all RTL_GIGA_MAC_VERs
-> greater than 35 as well.
-> 
-I *think* the mc filtering issue with version 35 is different from the
-one you're seeing. So not every chip version may be affected.
-As there's no public errata information let's wait for a statement
-from Realtek.
+Jesper Dangaard Brouer <hawk@kernel.org> writes:
 
-> Realtek responded to me but I was slow to get them packet captures
-> that they needed. I am hoping to restart things and get back to this
-> over the finish line if it's a valid patch.
-> 
-> I will add the appropriate tags and annotations once I hear back.
-> 
-> On Tue, Jun 6, 2023 at 5:29 PM Jakub Kicinski <kuba@kernel.org> wrote:
->>
->> On Tue, 6 Jun 2023 17:11:27 +0200 Heiner Kallweit wrote:
->>> Thanks for the report and the patch. I just asked a contact in Realtek
->>> whether more chip versions may be affected. Then the patch should be
->>> extended accordingly. Let's wait few days for a response.
+> On 24/08/2023 12.30, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>> Jesper Dangaard Brouer <hawk@kernel.org> writes:
+>>=20
+>>> The root-cause the realloc issue is that veth_xdp_rcv_skb() code path (=
+that
+>>> handles SKBs like generic-XDP) is calling a native-XDP function
+>>> xdp_do_redirect(), instead of simply using xdp_do_generic_redirect() th=
+at can
+>>> handle SKBs.
 >>>
->>> I think we should make this a fix. Add the following as Fixes tag
->>> and annotate the patch as "net" (see netdev FAQ).
->>>
->>> 6e1d0b898818 ("r8169:add support for RTL8168H and RTL8107E")
->>
->> Perhaps it's best if you repost with the Fixes tag included once
->> Realtek responded.
+>>> The existing code tries to steal the packet-data from the SKB (and free=
+s the SKB
+>>> itself). This cause issues as SKBs can have different memory models tha=
+t are
+>>> incompatible with native-XDP call xdp_do_redirect(). For this reason th=
+e checks
+>>> in veth_convert_skb_to_xdp_buff() becomes more strict. This in turn mak=
+es this a
+>>> bad approach. Simply leveraging generic-XDP helpers e.g. generic_xdp_tx=
+() and
+>>> xdp_do_generic_redirect() as this resolves the issue given netstack can=
+ handle
+>>> these different SKB memory models.
+>>=20
+>> While this does solve the memory issue, it's also a subtle change of
+>> semantics. For one thing, generic_xdp_tx() has this comment above it:
+>>=20
+>> /* When doing generic XDP we have to bypass the qdisc layer and the
+>>   * network taps in order to match in-driver-XDP behavior. This also mea=
+ns
+>>   * that XDP packets are able to starve other packets going through a qd=
+isc,
+>>   * and DDOS attacks will be more effective. In-driver-XDP use dedicated=
+ TX
+>>   * queues, so they do not have this starvation issue.
+>>   */
+>>=20
+>> Also, more generally, this means that if you have a setup with
+>> XDP_REDIRECT-based forwarding in on a host with a mix of physical and
+>> veth devices, all the traffic originating from the veth devices will go
+>> on different TXQs than that originating from a physical NIC. Or if a
+>> veth device has a mix of xdp_frame-backed packets and skb-backed
+>> packets, those will also go on different queues, potentially leading to
+>> reordering.
+>>=20
+>
+> Mixing xdp_frame-backed packets and skb-backed packet (towards veth)
+> will naturally come from two different data paths, and the BPF-developer
+> that redirected the xdp_frame (into veth) will have taken this choice,
+> including the chance of reordering (given the two data/code paths).
+
+I'm not sure we can quite conclude that this is a choice any XDP
+developers will be actively aware of. At best it's a very implicit
+choice :)
+
+> I will claim that (for SKBs) current code cause reordering on TXQs (as
+> you explain), and my code changes actually fix this problem.
+>
+> Consider a userspace app (inside namespace) sending packets out (to veth
+> peer).  Routing (or bridging) will make netstack send out device A
+> (maybe a physical device).  On veth peer we have XDP-prog running, that
+> will XDP-redirect every 2nd packet to device A.  With current code TXQ
+> reordering will occur, as calling "native" xdp_do_redirect() will select
+> TXQ based on current-running CPU, while normal SKBs will use
+> netdev_core_pick_tx().  After my change, using
+> xdp_do_generic_redirect(), the code end-up using generic_xdp_tx() which
+> (looking at the code) also use netdev_core_pick_tx() to select the TXQ.
+> Thus, I will claim it is more correct (even-though XDP in general
+> doesn't give this guarantee).
+>
+>> I'm not sure exactly how much of an issue this is in practice, but at
+>> least from a conceptual PoV it's a change in behaviour that I don't
+>> think we should be making lightly. WDYT?
+>
+> As desc above, I think this patchset is an improvement.  It might even
+> fix/address the concern that was raised.
+
+Well, you can obviously construct examples in both direction (i.e.,
+where the old behaviour leads to reordering but the new one doesn't, and
+vice versa). I believe you could also reasonably argue that either
+behaviour is more "correct", so if we were just picking between
+behaviours I wouldn't be objecting, I think.
+
+However, we're not just picking between two equally good behaviours,
+we're changing one long-standing behaviour to a different one, and I
+worry this will introduce regressions because there are applications
+that (explicitly or implicitly) rely on the old behaviour.
+
+Also, there's the starvation issue mentioned in the comment I quoted
+above: with this patch it is possible for traffic redirected from a veth
+to effectively starve the host TXQ, where before it wouldn't.
+
+I don't really have a good answer for how we can make sure of this
+either way, but I believe it's cause for concern, which is really my
+main reservation with this change :)
+
+-Toke
 
 
