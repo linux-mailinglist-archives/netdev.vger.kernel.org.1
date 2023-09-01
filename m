@@ -1,206 +1,337 @@
-Return-Path: <netdev+bounces-31705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 877C478FA79
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 11:09:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A14878FA7C
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 11:10:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CB781C20B6B
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 09:09:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 553501C20C06
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 09:10:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39B439467;
-	Fri,  1 Sep 2023 09:09:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5634946B;
+	Fri,  1 Sep 2023 09:10:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A2588BF8
-	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 09:09:10 +0000 (UTC)
-Received: from EUR01-VE1-obe.outbound.protection.outlook.com (mail-ve1eur01on2077.outbound.protection.outlook.com [40.107.14.77])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61AE691;
-	Fri,  1 Sep 2023 02:09:09 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=i6xh2s+yJaRi45hhxdcJq/Os74GRRX1y2lvX+eezz9mHW3huf/DPRbpRv3O4dAujYO/z0A+vvqIMpltz/iL5MDFi+sMXo2/MvriEdUJH2DupIiK3Qtk2ewIxM2203vf2imltuQKNP79Opwf9Jfko6SLyC72s+u/MDSg/WoNXVuup/w/eDZAx6rtXfSOPM7msV9qogeRJ4u1iQBFjSDdCLnVTMA0SKuTMPf6lwLIeZ2YxXwJ0uXiqmXmmiy6UHSd9nXyI51fOK5vUGDCM4sJ+XyElFQMThVKbJAfcRpWcCaDJHV/kGwkSKSuihffq56xe+NePWhAiYuFEGLe92Ww90A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ilT4LvAZs25Ka4tswcUCfLCs3rjc3Bs+OWSbqKnZviQ=;
- b=lYrYzE+5cFPXZK+3h4aI3jbCqTBODpREu7i4zU36t7EAN6vWvWAUsmbjK0lo1kxtFUYQzIJq2jEQPsXGVcgmop+osR0/9LgsWM79hhQ1upPtA+ZkFpGzfPIxU6zpZ7t27TMYsMRWvdy5xzrHQE3hdlAQc3PXp3voGi4kiis/eqzC79aHzYEBUdSHQvx8GegaRY3G6D8GeesYQ+PHF7E7R2yNKHSgbLkW70L2PZQT8UVl0o+BuLPsq7Fleqv1n/3lrtmTO36K9pd4nRwQGSWeDG5aswsX0TtYh+jP0ijVGMr83xQJ1fFD81GkyObLlZS4H7TIrzntvrssVzzN0LYTFQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ilT4LvAZs25Ka4tswcUCfLCs3rjc3Bs+OWSbqKnZviQ=;
- b=kUCDEDJlpBVWa+Zio9PjLh88f8ATf9GiOEeRk+ncYYxzSnvlcvg9zYTfh1P5anba8/zUj52AGjEe7fH7/i3nS9iZAdWcoFDSrlsgU3vFN/aFXgJMbttnQu3iJDfEbWfu1IfV1tsd/T5F4izjR64X7rdYkB67PTls4oxU9yKBgE0=
-Received: from AM9PR04MB8954.eurprd04.prod.outlook.com (2603:10a6:20b:409::7)
- by DBAPR04MB7367.eurprd04.prod.outlook.com (2603:10a6:10:1aa::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.23; Fri, 1 Sep
- 2023 09:09:06 +0000
-Received: from AM9PR04MB8954.eurprd04.prod.outlook.com
- ([fe80::2545:6d13:5905:bf50]) by AM9PR04MB8954.eurprd04.prod.outlook.com
- ([fe80::2545:6d13:5905:bf50%5]) with mapi id 15.20.6745.021; Fri, 1 Sep 2023
- 09:09:06 +0000
-From: Radu Pirea <radu-nicolae.pirea@nxp.com>
-To: "atenart@kernel.org" <atenart@kernel.org>, "Radu-nicolae Pirea (OSS)"
-	<radu-nicolae.pirea@oss.nxp.com>, "sd@queasysnail.net" <sd@queasysnail.net>
-CC: "andrew@lunn.ch" <andrew@lunn.ch>, "linux@armlinux.org.uk"
-	<linux@armlinux.org.uk>, "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"davem@davemloft.net" <davem@davemloft.net>, Sebastian Tobuschat
-	<sebastian.tobuschat@nxp.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"richardcochran@gmail.com" <richardcochran@gmail.com>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [RFC net-next v2 5/5] net: phy: nxp-c45-tja11xx: implement
- mdo_insert_tx_tag
-Thread-Topic: [RFC net-next v2 5/5] net: phy: nxp-c45-tja11xx: implement
- mdo_insert_tx_tag
-Thread-Index: AQHZ1mu4tG1uTW2DJUag1r75iZMRuQ==
-Date: Fri, 1 Sep 2023 09:09:06 +0000
-Message-ID: <518c11e9000f895fddb5b3dc4d5b2bf445cf320f.camel@nxp.com>
-References: <20230824091615.191379-1-radu-nicolae.pirea@oss.nxp.com>
-	 <20230824091615.191379-6-radu-nicolae.pirea@oss.nxp.com>
-	 <ZOx0L722xg5-J_he@hog> <5d42d6c9-2f0c-8913-49ec-50a25860c49f@oss.nxp.com>
-	 <ZO8pbtnlOVauabjC@hog>
-In-Reply-To: <ZO8pbtnlOVauabjC@hog>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.48.4 (by Flathub.org) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM9PR04MB8954:EE_|DBAPR04MB7367:EE_
-x-ms-office365-filtering-correlation-id: 36a4065c-8d12-4416-345a-08dbaacb1843
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- rTJ+Wex0xy9nsY5eHHCIVtH5TcbRNC7Jdt3fhhiohA5JGs9c6ZUubHmtcTM8nx+dc+KSTjrz6CZYFdKVVrpJVKqNfNewTE9N9HkCLrR2CEuY8/ScagR7kBD1SZDVO7SSMJ+tDfbhyw5z/W+iC21lGlE4fZs7dnsCy5JmrgoA8p/yPd4LBdnv8X8ExbSmjLiUDuzrtM8jinZ3m88GuIBTsMbJahEicOrK/lhSwv1+lP2KpAG43+rVwUfI5M8SbPwJyJqqA4/Yz8R8h1RvuqQwBVBkv+FO32KyzAHkyfDWLRZkl5JX2ZhkYEoTBleJ9Sfuf/7XD+LnWk6NOdSWGUYQYQpT1ke4rfV3T2Xj0TDzWdMrgV2B4tB9faSd5vj10cJbiVvJAQXyKuEXny3zbCrh8Vb7JRik0lV//SWacKuOahvwC+vvqMBTCJHI/JSfvmi5lnrf6FbRyY2QQ1p4R/zRcCNz6DQi9XZeMX6kgZdqehGBUsY1BSXYExqeDYAV7DBdctrWP1AdWPdhcK3KzpmwxEtm3zfsjKpBRmeS6eEHGGrzNj85zXvkeHAVP13HGp05bMhyMd9x3zuChEYq3LpP2YOr2Iekvwgz2c136NJK7MTgnXgRYNn5brsLU0vYSn9N
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8954.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(396003)(366004)(346002)(136003)(1800799009)(186009)(451199024)(6486002)(6506007)(71200400001)(6512007)(478600001)(83380400001)(2616005)(26005)(2906002)(7416002)(54906003)(64756008)(66446008)(66476007)(66556008)(316002)(41300700001)(66946007)(76116006)(110136005)(5660300002)(4326008)(8676002)(8936002)(36756003)(86362001)(38100700002)(38070700005)(122000001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?MWtWQyszUEh0UjVSdlYyU0VYUzFaWC8wdjBqMzhPTVArQmNDVSt6SlZjVkJt?=
- =?utf-8?B?bWg1cHBXNG93V0VObjRmVDNYSnY3QktUOXFEWXIxTjF6TzNrMlVndFJweGtP?=
- =?utf-8?B?Z1JMRjkra2xFbkZiOUhIOWpaTlN2L0dZaU41ckZRS2VGTTVJd1VDc1JWVlFR?=
- =?utf-8?B?UytycGY1d0tqTVFZaURIbSs1RHBjZ2taOW1SYXdBeDlWRDJDeSsxYy9jdXFO?=
- =?utf-8?B?anVZTURBNkpWakNOYzZ1dzdzcmZadkxGTnBhdEdBKzdDb1lzTDh5QWpXNW55?=
- =?utf-8?B?eUpQV05WUjBVd0pjeHNkMElKNmVjRStObmhUeXcvczY0Q2tuYUlSbTh5TSty?=
- =?utf-8?B?ZWtMaXp4bE1CaG9WbXkvSjgvZmU5M2ZHaE1EUDFmTnZhazdhdWxWZTloallq?=
- =?utf-8?B?TlA0VjcvV0xGeFdsOXhNd1hubVNxNEtxdTN2MFYyTWt6UmxpTnJaZzBROG8v?=
- =?utf-8?B?TjI1SXpiY2tXRGpRemw3dDhZWi9nK0ZzQzVKWWJ0VHlNUmVFVFhQZmcwNXkv?=
- =?utf-8?B?aWxhMjh5VE9DT1R5a3krb01veTByNURyV2hsSHJVVGVrMitRczgzNVd0R20w?=
- =?utf-8?B?ZGUwMXErYi9wM2s4SHkzeUJLWFkvd3YzUW9KeG02a1RtQzNpZEhock1xTVpK?=
- =?utf-8?B?U09XeXVFc3dIRHU5UG16d1kzL1NnemJpOHcvUzE2N2krWCt4ZE44UjdOd3Rh?=
- =?utf-8?B?NG9RVVBzakVRTWVaV0RUNTZVYkRCanc4TklkbDJVN0FmektyaktiSTIydFhI?=
- =?utf-8?B?YjlwVkkxM2JwN0tFbDhOUnR6K25ZRnFWVUNkNUtwUllRUE42NlFVL204Z1dM?=
- =?utf-8?B?M1lZTmtzSDVHZE5BbDAzak9RNkhiMWZwRUp4NURHc2VRSENsZlJVUEZLM3BJ?=
- =?utf-8?B?akx3cXAzUlk3cFZPOVdTeE1qYVJyWFZoeE9jN3FqWFdpeDBwbi84andHRGdM?=
- =?utf-8?B?V2RNelRDMHpiK1NxSVBHdm02R3BLZmF5MExUVG5GY0hVS0FwVndxQ1dZRnps?=
- =?utf-8?B?ejYzeXJrZnBhb1lZY3hJOHpsN3NpZkEya0hDUkRXOVN3bFEzN0U5TVQzbDBS?=
- =?utf-8?B?alBNNjVmMGhJVjdSZmpqaCtYMUsrbTEvSmU4T0lxUzVDd0tuY0JiM3J0REdp?=
- =?utf-8?B?bVdrYTJ0UWFVbUticW1nWXlzSis3d0oreFU0RkNoTFdIWGxZcnBFK0QrWHBV?=
- =?utf-8?B?b0p1Tjk4QUNnZGsvSXREdU1UYkh2NHMrVzRDT1FlNzZNdURVNHZ0TjVZc0cx?=
- =?utf-8?B?TEY5STFBZkowV00rNFVBdnZWY2tKdklSdjZGa0x1ZXJ5WElKRy9VaW5MZDRO?=
- =?utf-8?B?K2ZiZEoyeUtyOURpd2dFWXluWXUrbTJ5VEZJK0pLZXVRNERIam5BR0tlOUxY?=
- =?utf-8?B?L3F1YTZMT096cHJuR2VpTWFudkZzdnE3RFdzRmdHMmlQYkZXMkNadHl6aE1y?=
- =?utf-8?B?SWR0dUxHQlo0bkFGM09rTWxhYSt5eHE4K3JpZlN0VGVQNTJMUUpwT1dINjBK?=
- =?utf-8?B?ZDczU1BEeG1tQm1RRzRTdUZZc2diYUJ6djZNYnNXWGRaWUN3L2l2TCttRG03?=
- =?utf-8?B?TFRsWjFFM1ZiS3B2aUlpUDFEOE1jdjdxWjJ5R0h3aTNJVk82ZHZkRWN5dVov?=
- =?utf-8?B?QjZxNGtzQkRmVjBzZE94bUdiamxUYkU1Q3JFVUtLam9iTkQ3bkk2czlvZ2tn?=
- =?utf-8?B?VWhzcE1FdnVRQnRqbURhZ3NFUXdWamJ6WnRRZWNsazNtYWpCYTBPRGlwSHZy?=
- =?utf-8?B?VmJRUFl3MjhZV1JLaWhqangzdXB1dkJBTDJPVGVLZXFBTnd0V3d4anFWWlFM?=
- =?utf-8?B?SWtGN3NGUE1OKzFLVTlrUmQraVVxY1NaejRCdktNejl4WXhBb3MzSloyK2NY?=
- =?utf-8?B?WDg0Rjg3RnZsL0ZDN3BYNXRUcGg1UnR6TXhNaTY3NHd1NStKbXl6dlZob2hC?=
- =?utf-8?B?T0JmeG9ra0RlL3hIT3AvQWpvaENjeStESzRxMnRXeTVFa1pqcENOdldYVFlN?=
- =?utf-8?B?SGhSOUhOZVNuS3ZhRUJjTlZXalQzb21EUzJWMWY5U1hGaHNHMkxKalZaaDUv?=
- =?utf-8?B?WFZCc2pCNkl3VTFZbXN5TlBsZGZpeXh6ODZSUTBMWFQ5RjhOcXBKUGFoT0Fl?=
- =?utf-8?B?MTA2eW5jcVliazUwTXBvOXdQc2RrOS9zK1hIWmdKL0FBU1VkeVBER01YNHQ4?=
- =?utf-8?B?OHc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <34C862C79A644C45912B6BB3CF5BBCB1@eurprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A166399;
+	Fri,  1 Sep 2023 09:10:49 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2956710D4;
+	Fri,  1 Sep 2023 02:10:47 -0700 (PDT)
+Received: from kwepemd100003.china.huawei.com (unknown [172.30.72.57])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RcXJv0wNBzrSWD;
+	Fri,  1 Sep 2023 17:09:03 +0800 (CST)
+Received: from [10.67.111.192] (10.67.111.192) by
+ kwepemd100003.china.huawei.com (7.221.188.180) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1258.23; Fri, 1 Sep 2023 17:10:44 +0800
+Message-ID: <edeee369-974d-3676-cf53-a2ed8c52cea0@huawei.com>
+Date: Fri, 1 Sep 2023 17:10:43 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8954.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 36a4065c-8d12-4416-345a-08dbaacb1843
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Sep 2023 09:09:06.4734
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: AtvnJhF1AOAX8K/H/CiH7De6FAxfqMrDzaPT6PYf9e+FMx9TPbv83e0UCE++P6NL6NcKMzNEDm6IBFsmTi2py39ptTjDS/SEe2Xzd6OxgVE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBAPR04MB7367
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [BUG bpf-next] bpf/net: Hitting gpf when running selftests
+Content-Language: en-US
+To: John Fastabend <john.fastabend@gmail.com>, Jiri Olsa <olsajiri@gmail.com>
+CC: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+	<netdev@vger.kernel.org>, <bpf@vger.kernel.org>, Martin KaFai Lau
+	<kafai@fb.com>, Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+	KP Singh <kpsingh@chromium.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
+	<haoluo@google.com>, Hou Tao <houtao1@huawei.com>, Bobby Eshleman
+	<bobby.eshleman@bytedance.com>
+References: <ZO+RQwJhPhYcNGAi@krava> <ZO+vetPCpOOCGitL@krava>
+ <23cd4ce0-0360-e3c6-6cc9-f597aefb2ab5@huawei.com>
+ <1c533412-b192-3868-991a-d35587329803@huawei.com>
+ <64f0e7ae869c9_d03ca20847@john.notmuch>
+ <64f0f60b1417c_d45ab2086b@john.notmuch>
+From: Xu Kuohai <xukuohai@huawei.com>
+In-Reply-To: <64f0f60b1417c_d45ab2086b@john.notmuch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.67.111.192]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemd100003.china.huawei.com (7.221.188.180)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-T24gV2VkLCAyMDIzLTA4LTMwIGF0IDEzOjM1ICswMjAwLCBTYWJyaW5hIER1YnJvY2Egd3JvdGU6
-DQouLi4NCg0KPiBBbmQgaXQncyBub3QgcmVzdG9yZWQgd2hlbiB0aGUgbGluayBnb2VzIGJhY2sg
-dXA/IFRoYXQncyBpbmNvbnZlbmllbnQNCj4gOi8NCj4gRG8gd2UgZW5kIHVwIHdpdGggaW5jb25z
-aXN0ZW50IHN0YXRlPyBpZSBkcml2ZXIgYW5kIGNvcmUgYmVsaWV2ZQ0KPiBldmVyeXRoaW5nIGlz
-IHN0aWxsIG9mZmxvYWRlZCwgYnV0IEhXIGxvc3QgYWxsIHN0YXRlPyBkbyB3ZSBsZWFrDQo+IHNv
-bWUgcmVzb3VyY2VzIGFsbG9jYXRlZCBieSB0aGUgZHJpdmVyPw0KDQpZZXMuIFdlIGVuZCB1cCB3
-aXRoIGluY29uc2lzdGVudCBzdGF0ZS4gVGhlIEhXIHdpbGwgbG9zdCBhbGwgc3RhdGUgd2hlbg0K
-dGhlIHBoeSBpcyByZXNldGVkLiBObyByZXNvdXJjZSBpcyBsZWFrZWQsIGV2ZXJ5dGhpbmcgaXMg
-dGhlcmUsIGJ1dCB0aGUNCmNvbmZpZ3VyYXRpb24gbmVlZHMgdG8gYmUgcmVhcHBsaWVkLg0KDQo+
-IA0KPiBXZSBjb3VsZCBhZGQgYSBmbHVzaC9yZXN0b3JlIGluIG1hY3NlY19ub3RpZnkgd2hlbiB0
-aGUgbG93ZXIgZGV2aWNlDQo+IGdvZXMgZG93bi91cCwgbWF5YmUgbGltaXRlZCB0byBkZXZpY2Vz
-IHRoYXQgcmVxdWVzdCB0aGlzIChJIGRvbid0DQo+IGtub3cNCj4gaWYgYWxsIGRldmljZXMgd291
-bGQgbmVlZCBpdCwgb3IgbWF5YmUgYWxsIGRldmljZXMgb2ZmbG9hZGluZyB0byB0aGUNCj4gUEhZ
-IGJ1dCBub3QgdG8gdGhlIE1BQykuDQoNCkFncmVlZC4NCldlIGNhbiBkbyBhIGZsdXNoIHZlcnkg
-c2ltcGxlLCBidXQgdG8gcmVzdG9yZSB0aGUgY29uZmlndXJhdGlvbiBtYXliZQ0Kd2Ugc2hvdWxk
-IHRvIHNhdmUgdGhlIGtleSBpbiB0aGUgbWFjc2VjX2tleSBzdHJ1Y3R1cmUuIEkgYW0gbm90IHN1
-cmUgaWYNCnRoZSBrZXkgY2FuIGJlIGV4dHJhY3RlZCBmcm9tIGNyeXB0b19hZWFkIHN0cnVjdHVy
-ZS4NCg0KPiANCj4gQW5kIHdoYXQgaGFwcGVucyBpbiB0aGlzIGNhc2U/DQo+IMKgwqDCoCBpcCBs
-aW5rIGFkZCBsaW5rIGV0aDAgdHlwZSBtYWNzZWMgb2ZmbG9hZCBwaHkNCj4gwqDCoMKgIGlwIGxp
-bmsgc2V0IGV0aDAgZG93bg0KPiDCoMKgwqAgaXAgbWFjc2VjIGFkZCBtYWNzZWMwIHJ4IHNjaSAu
-Li4NCj4gwqDCoMKgIGlwIG1hY3NlYyBhZGQgbWFjc2VjMCB0eCBzYSAwIC4uLg0KPiDCoMKgwqAg
-IyBldGMNCj4gwqDCoMKgIGlwIGxpbmsgc2V0IGV0aDAgdXANCj4gDQo+IFdpbGwgb2ZmbG9hZCB3
-b3JrIHdpdGggdGhlIGN1cnJlbnQgY29kZT8NCg0KKHRoZSBpbnRlcmZhY2Ugd2FzIHVwIGJlZm9y
-ZSkNCltyb290QGFsYXJtIH5dIyBpcCBsaW5rIGFkZCBsaW5rIGVuZDAgbWFjc2VjMCB0eXBlIG1h
-Y3NlYyBlbmNyeXB0IG9uDQpvZmZsb2FkIHBoeSANCltyb290QGFsYXJtIH5dIyBpcCBsaW5rIHNl
-dCBlbmQwIGRvd24NCltyb290QGFsYXJtIH5dIyBpcCBtYWNzZWMgYWRkIG1hY3NlYzAgcnggcG9y
-dCAxIGFkZHJlc3MNCjAwOjAxOmJlOmJlOmVmOjMzDQpSVE5FVExJTksgYW5zd2VyczogT3BlcmF0
-aW9uIG5vdCBzdXBwb3J0ZWQNCg0KQnV0IGxldCdzIGNvbnNpZGVyIHRoZSBuZXh0IGNhc2U6DQog
-ICAgaXAgbGluayBhZGQgbGluayBldGgwIHR5cGUgbWFjc2VjIG9mZmxvYWQgcGh5DQogICAgaXAg
-bGluayBzZXQgZXRoMCBkb3duDQogICAgaXAgbGluayBzZXQgZXRoMCB1cA0KICAgIGlwIG1hY3Nl
-YyBhZGQgbWFjc2VjMCByeCBzY2kgLi4uDQogICAgaXAgbWFjc2VjIGFkZCBtYWNzZWMwIHR4IHNh
-IDAgLi4uDQogICAgIyBldGMNCg0KSW4gdGhpcyBjYXNlLCBhbnkgSFcgY29uZmlndXJhdGlvbiB3
-cml0dGVuIGJ5IC5tZG9fYWRkX3NlY3kgd2lsbCBiZQ0KbG9zdC4NCg0KPiANCj4gPiBUaGUgb25s
-eSBkcmF3YmFjayBpcyByZWxhdGVkIHRvIHRoZSBQVFAgZnJhbWVzIGVuY3J5cHRpb24uIER1ZSB0
-bw0KPiA+IGhhcmR3YXJlDQo+ID4gbGltaXRhdGlvbnMsIFBIWSB0aW1lc3RhbXBpbmcgKyBNQUNz
-ZWMgd2lsbCBub3Qgd29yayBpZiB0aGUgY3VzdG9tDQo+ID4gaGVhZGVyIGlzDQo+ID4gaW5zZXJ0
-ZWQuIFRoZSBvbmx5IHdheSB0byBnZXQgdGhpcyB3b3JrIGlzIGJ5IHVzaW5nIHRoZSBNQUMgU0EN
-Cj4gPiBzZWxlY3Rpb24gYW5kDQo+ID4gcnVubmluZyBQVFAgb24gdGhlIHJlYWwgbmV0ZGV2Lg0K
-PiANCj4gQ291bGQgeW91IGFkZCBzb21lIGRvY3VtZW50YXRpb24gZXhwbGFpbmluZyB0aGF0PyBV
-c2VycyBuZWVkIHRoaXMNCj4gaW5mb3JtYXRpb24gdG8gbWFrZSB0aGUgcmlnaHQgY2hvaWNlIGZv
-ciB0aGVpciB1c2UgY2FzZS4gTWF5YmUNCj4gZGlyZWN0bHkgaW4gdGhlIGRlc2NyaXB0aW9uIG9m
-IHRoZSBtb2R1bGUgcGFyYW1ldGVyLCBzb21ldGhpbmcgbGlrZToNCj4gIlNlbGVjdCB0aGUgVFgg
-U0MgdXNpbmcgVExWIGhlYWRlciBpbmZvcm1hdGlvbi4gUFRQIGZyYW1lcyBlbmNyeXB0aW9uDQo+
-IGNhbm5vdCB3b3JrIHdoZW4gdGhpcyBmZWF0dXJlIGlzIGVuYWJsZWQuIg0KPiANCj4gSWYgaXQn
-cyBpbiB0aGUgbW9kdWxlIHBhcmFtZXRlciBJIGd1ZXNzIGl0IGNhbid0IGJlIHRvbw0KPiB2ZXJi
-b3NlLiBPdGhlcndpc2UgSSBkb24ndCBrbm93IHdoZXJlIGVsc2UgdG8gcHV0IGl0Lg0KPiANCj4g
-QW5kIHRoZSBwYXJhbWV0ZXIncyBuYW1lIGFuZC9vciBkZXNjcmlwdGlvbiBzaG91bGQgcHJvYmFi
-bHkgaW5jbHVkZQ0KPiBtYWNzZWMvTUFDc2VjIGlmIGl0J3MgdmlzaWJsZSBhdCB0aGUgbGV2ZWwg
-b2YgdGhlIHdob2xlIG1vZHVsZSAoaWUgaWYNCj4gbWFjc2VjIHN1cHBvcnQgaXNuJ3QgYSBzZXBh
-cmF0ZSBtb2R1bGUpLCBqdXN0IHRvIGdpdmUgY29udGV4dCBhdCB0bw0KPiB3aGF0IHRoZSBUWFND
-IGlzIChhbmQgd2hhdCB0aGUgZW5jcnlwdGlvbiBmb3IgdGhlIFBUUCBmcmFtZXMgcmVmZXJzDQo+
-IHRvKS4NCg0KSSB3aWxsIGltcHJvdmUgdGhlIGNvbW1lbnQgYW5kIGNoYW5nZSB0aGUgbmFtZS4g
-VGhhbmsgeW91Lg0KDQoNCg==
+On 9/1/2023 4:20 AM, John Fastabend wrote:
+> John Fastabend wrote:
+>> Xu Kuohai wrote:
+>>> On 8/31/2023 5:46 PM, Xu Kuohai wrote:
+>>>> On 8/31/2023 5:07 AM, Jiri Olsa wrote:
+>>>>> On Wed, Aug 30, 2023 at 08:58:11PM +0200, Jiri Olsa wrote:
+>>>>>> hi,
+>>>>>> I'm hitting crash below on bpf-next/master when running selftests,
+>>>>>> full log and config attached
+>>>>>
+>>>>> it seems to be 'test_progs -t sockmap_listen' triggering that
+>>>>>
+>>>>> jirka
+>>>>>
+>>>>>>
+>>>>>> jirka
+>>>>>>
+>>>>>>
+>>>>>> ---
+>>>>>> [ 1022.710250][ T2556] general protection fault, probably for non-canonical address 0x6b6b6b6b6b6b6b73: 0000 [#1] PREEMPT SMP DEBUG_PAGEALLOC NOPTI^M
+>>>>>> [ 1022.711206][ T2556] CPU: 2 PID: 2556 Comm: kworker/2:4 Tainted: G           OE      6.5.0+ #693 1723c8b9805ff5a1672ab7e6f25977078a7bcceb^M
+>>>>>> [ 1022.712120][ T2556] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-1.fc38 04/01/2014^M
+>>>>>> [ 1022.712830][ T2556] Workqueue: events sk_psock_backlog^M
+>>>>>> [ 1022.713262][ T2556] RIP: 0010:skb_dequeue+0x4c/0x80^M
+>>>>>> [ 1022.713653][ T2556] Code: 41 48 85 ed 74 3c 8b 43 10 4c 89 e7 83 e8 01 89 43 10 48 8b 45 08 48 8b 55 00 48 c7 45 08 00 00 00 00 48 c7 45 00 00 00 00 00 <48> 89 42 08 48 89 10 e8 e8 6a 41 00 48 89 e8 5b 5d 41 5c c3 cc cc^M
+>>>>>> [ 1022.714963][ T2556] RSP: 0018:ffffc90003ca7dd0 EFLAGS: 00010046^M
+>>>>>> [ 1022.715431][ T2556] RAX: 6b6b6b6b6b6b6b6b RBX: ffff88811de269d0 RCX: 0000000000000000^M
+>>>>>> [ 1022.716068][ T2556] RDX: 6b6b6b6b6b6b6b6b RSI: 0000000000000282 RDI: ffff88811de269e8^M
+>>>>>> [ 1022.716676][ T2556] RBP: ffff888141ae39c0 R08: 0000000000000001 R09: 0000000000000000^M
+>>>>>> [ 1022.717283][ T2556] R10: 0000000000000001 R11: 0000000000000000 R12: ffff88811de269e8^M
+>>>>>> [ 1022.717930][ T2556] R13: 0000000000000001 R14: ffff888141ae39c0 R15: ffff88810a20e640^M
+>>>>>> [ 1022.718549][ T2556] FS:  0000000000000000(0000) GS:ffff88846d600000(0000) knlGS:0000000000000000^M
+>>>>>> [ 1022.719241][ T2556] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033^M
+>>>>>> [ 1022.719761][ T2556] CR2: 00007fb5c25ca000 CR3: 000000012b902004 CR4: 0000000000770ee0^M
+>>>>>> [ 1022.720394][ T2556] PKRU: 55555554^M
+>>>>>> [ 1022.720699][ T2556] Call Trace:^M
+>>>>>> [ 1022.720984][ T2556]  <TASK>^M
+>>>>>> [ 1022.721254][ T2556]  ? die_addr+0x32/0x80^M
+>>>>>> [ 1022.721589][ T2556]  ? exc_general_protection+0x25a/0x4b0^M
+>>>>>> [ 1022.722026][ T2556]  ? asm_exc_general_protection+0x22/0x30^M
+>>>>>> [ 1022.722489][ T2556]  ? skb_dequeue+0x4c/0x80^M
+>>>>>> [ 1022.722854][ T2556]  sk_psock_backlog+0x27a/0x300^M
+>>>>>> [ 1022.723243][ T2556]  process_one_work+0x2a7/0x5b0^M
+>>>>>> [ 1022.723633][ T2556]  worker_thread+0x4f/0x3a0^M
+>>>>>> [ 1022.723998][ T2556]  ? __pfx_worker_thread+0x10/0x10^M
+>>>>>> [ 1022.724386][ T2556]  kthread+0xfd/0x130^M
+>>>>>> [ 1022.724709][ T2556]  ? __pfx_kthread+0x10/0x10^M
+>>>>>> [ 1022.725066][ T2556]  ret_from_fork+0x2d/0x50^M
+>>>>>> [ 1022.725409][ T2556]  ? __pfx_kthread+0x10/0x10^M
+>>>>>> [ 1022.725799][ T2556]  ret_from_fork_asm+0x1b/0x30^M
+>>>>>> [ 1022.726201][ T2556]  </TASK>^M
+>>>>>
+>>>>>
+>>>>> .
+>>>>
+>>>> My patch failed on the BPF CI, and the log shows the test also died in skb_dequeue:
+>>>>
+>>>> https://github.com/kernel-patches/bpf/actions/runs/6031993528/job/16366782122
+>>>>
+>>>> [...]
+>>>>
+>>>>     [   74.396478]  ? __die_body+0x1f/0x70
+>>>>     [   74.396700]  ? page_fault_oops+0x15b/0x450
+>>>>     [   74.396957]  ? fixup_exception+0x26/0x330
+>>>>     [   74.397211]  ? exc_page_fault+0x68/0x1a0
+>>>>     [   74.397457]  ? asm_exc_page_fault+0x26/0x30
+>>>>     [   74.397724]  ? skb_dequeue+0x52/0x90
+>>>>     [   74.397954]  sk_psock_destroy+0x8c/0x2b0
+>>>>     [   74.398204]  process_one_work+0x28a/0x550
+>>>>     [   74.398458]  ? __pfx_worker_thread+0x10/0x10
+>>>>     [   74.398730]  worker_thread+0x51/0x3c0
+>>>>     [   74.398966]  ? __pfx_worker_thread+0x10/0x10
+>>>>     [   74.399235]  kthread+0xf7/0x130
+>>>>     [   74.399437]  ? __pfx_kthread+0x10/0x10
+>>>>     [   74.399707]  ret_from_fork+0x34/0x50
+>>>>     [   74.399967]  ? __pfx_kthread+0x10/0x10
+>>>>     [   74.400234]  ret_from_fork_asm+0x1b/0x30
+>>>>
+>>>>
+>>>> After a few tries, I found a way to reproduce the problem.
+>>>>
+>>>> Here is the reproduce steps:
+>>>>
+>>>> 1. create a kprobe to delay sk_psock_backlog:
+>>>>
+>>>> static struct kprobe kp = {
+>>>>           .symbol_name = "sk_psock_backlog",
+>>>>           .offset = 0x00,
+>>>> };
+>>>>
+>>>> static int handler_pre(struct kprobe *p, struct pt_regs *regs)
+>>>> {
+>>>>           mdelay(1000);
+>>>>           return 0;
+>>>> }
+>>>>
+>>>> static int __init kprobe_init(void)
+>>>> {
+>>>>           int ret;
+>>>>
+>>>>           kp.pre_handler = handler_pre;
+>>>>
+>>>>           ret = register_kprobe(&kp);
+>>>>           if (ret < 0) {
+>>>>                   return -1;
+>>>>           }
+>>>>
+>>>>           return 0;
+>>>> }
+>>>>
+>>>> 2. insert the kprobe and run the vsock sockmap test:
+>>>>
+>>>> ./test_progs -t "sockmap_listen/sockmap VSOCK test_vsock_redir"
+>>>>
+>>>>
+>>>>
+>>>> I guess the problem is in sk_psock_backlog, where skb is inserted to another
+>>>> list before skb_dequeue is called.
+>>>>
+>>>> So I tested it with the following changes, and found the problem did go away.
+>>>>
+>>>> --- a/net/core/skmsg.c
+>>>> +++ b/net/core/skmsg.c
+>>>> @@ -648,7 +648,7 @@ static void sk_psock_backlog(struct work_struct *work)
+>>>>                   off = state->off;
+>>>>           }
+>>>>
+>>>> -       while ((skb = skb_peek(&psock->ingress_skb))) {
+>>>> +       while ((skb = skb_dequeue(&psock->ingress_skb))) {
+>>>>                   len = skb->len;
+>>>>                   off = 0;
+>>>>                   if (skb_bpf_strparser(skb)) {
+>>>> @@ -684,7 +684,6 @@ static void sk_psock_backlog(struct work_struct *work)
+>>>>                           len -= ret;
+>>>>                   } while (len);
+>>>>
+>>>> -               skb = skb_dequeue(&psock->ingress_skb);
+>>>>                   if (!ingress) {
+>>>>                           kfree_skb(skb);
+>>>>                   }
+>>>>
+>>>> Not clear what exactly happened, needs more debugging.
+>>>>
+>>
+>> I can only reproduce this on bpf-next so specific to
+>> the vsock use case?
+>>
+>>>
+>>> Use the skb address obtained from skb_peek() in sk_psock_backlog() as the key,
+>>> 4 stack traces are obtained.
+>>>
+>>>
+>>> trace 0, the skb is queued to the target socket ingress queue:
+>>>
+>>> [  120.042016] sk_psock_skb_ingress_enqueue+0xf5/0x160
+>>> [  120.045052] sk_psock_backlog+0x206/0x400
+>>> [  120.047366] process_one_work+0x292/0x560
+>>> [  120.049657] worker_thread+0x53/0x3e0
+>>> [  120.051698] kthread+0x102/0x130
+>>> [  120.053497] ret_from_fork+0x34/0x50
+>>> [  120.055528] ret_from_fork_asm+0x1b/0x30
+>>>
+>>>
+>>> trace 1, the skb is consumed by the user:
+>>>
+>>> [  120.061537] consume_skb+0x47/0x100
+>>> [  120.063394] sk_msg_recvmsg+0x268/0x3e0
+>>> [  120.065458] unix_bpf_recvmsg+0x16c/0x610
+>>> [  120.067584] unix_stream_recvmsg+0x66/0xa0
+>>> [  120.069946] sock_recvmsg+0xc4/0xd0
+>>> [  120.072063] __sys_recvfrom+0xaf/0x120
+>>> [  120.073933] __x64_sys_recvfrom+0x29/0x30
+>>> [  120.076052] do_syscall_64+0x3f/0x90
+>>> [  120.077986] entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+>>>
+>>> trace 2, the vsock socket is closed by the user, and a new skb with
+>>> the same address is allocated in vsock_release:
+>>>
+>>> [  120.084296] __alloc_skb+0xe3/0x180
+>>> [  120.086335] virtio_transport_alloc_skb+0x3b/0x2c0
+>>> [  120.089174] virtio_transport_send_pkt_info+0x118/0x230
+>>> [  120.092191] virtio_transport_release+0x29d/0x400
+>>> [  120.094845] __vsock_release+0x3c/0x1e0
+>>> [  120.096905] vsock_release+0x18/0x30
+>>> [  120.098899] __sock_release+0x3d/0xc0
+>>> [  120.100885] sock_close+0x18/0x20
+>>> [  120.102606] __fput+0x108/0x2b0
+>>> [  120.104636] task_work_run+0x5d/0xa0
+>>> [  120.106876] exit_to_user_mode_prepare+0x18c/0x190
+>>> [  120.109619] syscall_exit_to_user_mode+0x1d/0x50
+>>> [  120.112049] do_syscall_64+0x4c/0x90
+>>> [  120.114115] entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+>>>
+>>> trace 3, sk_psock_backlog() calls skb_dequeue() to unlink the skb, since
+>>> this skb is now actually a new skb allocated in vsock_release, its prev
+>>> and next fields are both set to NULL, NULL deref occurs.
+>>>
+>>> [  120.120619] skb_dequeue+0x92/0xa0
+>>> [  120.122350] sk_psock_backlog+0x305/0x400
+>>> [  120.124512] process_one_work+0x292/0x560
+>>> [  120.126771] worker_thread+0x53/0x3e0
+>>> [  120.128843] kthread+0x102/0x130
+>>> [  120.130772] ret_from_fork+0x34/0x50
+>>>
+>>> To fix it, it seems reasonable to replace skb_peek() with skb_dequeue()
+>>> in sk_psock_backlog(), since we can't prevent the skb from being appended
+>>> to an ingress queue and consumed by user, as shown in trace 1 and trace 2.
+>>
+>> The trouble with skb_dequeue is it breaks other checks that check
+>> the backlog queue length. It really is nice to have a single len
+>> check that determines if backlog is necessary or not.
+>>
+>> If we revert something we likely need to go back to holding the
+>> sock lock in backlog to ensure a reader can't eat the skb while
+>> We still have a reference to it. It wasn't an issue for us because
+>> its the exception case.
+>>
+>> Trying to come up with some nice fix now.
+> 
+> Something like this it fixes the splat, but need to think if it
+> introduces anything or some better way to do this. Basic idea
+> is to bump user->refcnt because we have two references to the
+> skb and want to ensure we really only kfree_skb() the skb
+> after both references are dropped.
+> 
+> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+> index a0659fc29bcc..6c31eefbd777 100644
+> --- a/net/core/skmsg.c
+> +++ b/net/core/skmsg.c
+> @@ -612,12 +612,18 @@ static int sk_psock_skb_ingress_self(struct sk_psock *psock, struct sk_buff *skb
+>   static int sk_psock_handle_skb(struct sk_psock *psock, struct sk_buff *skb,
+>                                 u32 off, u32 len, bool ingress)
+>   {
+> +       int err = 0;
+> +
+>          if (!ingress) {
+>                  if (!sock_writeable(psock->sk))
+>                          return -EAGAIN;
+>                  return skb_send_sock(psock->sk, skb, off, len);
+>          }
+> -       return sk_psock_skb_ingress(psock, skb, off, len);
+> +       skb_get(skb);
+> +       err = sk_psock_skb_ingress(psock, skb, off, len);
+> +       if (err < 0)
+> +               kfree_skb(skb);
+> +       return err;
+>   }
+>   
+>   static void sk_psock_skb_state(struct sk_psock *psock,
+> @@ -685,9 +691,7 @@ static void sk_psock_backlog(struct work_struct *work)
+>                  } while (len);
+>   
+>                  skb = skb_dequeue(&psock->ingress_skb);
+> -               if (!ingress) {
+> -                       kfree_skb(skb);
+> -               }
+> +               kfree_skb(skb);
+>          }
+>   end:
+>          mutex_unlock(&psock->work_mutex);
+> .
+
+With this fix, the crash is gone.
+
+I am worried that the skb might be inserted into another skb list before
+skb_dequeue is called, but I can’t find such code, it seems this worry
+is unnecessary.
 
