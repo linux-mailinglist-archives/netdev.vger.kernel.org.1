@@ -1,189 +1,91 @@
-Return-Path: <netdev+bounces-31697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9934778FA0B
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 10:38:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D6A1678FA0F
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 10:40:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FA11281419
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 08:38:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64BB3281333
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 08:39:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E511463C8;
-	Fri,  1 Sep 2023 08:38:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83ED663C8;
+	Fri,  1 Sep 2023 08:39:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEDCBEBE;
-	Fri,  1 Sep 2023 08:38:15 +0000 (UTC)
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7503CDB;
-	Fri,  1 Sep 2023 01:38:12 -0700 (PDT)
-Received: from kwepemd100003.china.huawei.com (unknown [172.30.72.55])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4RcWbJ22r0z1L8xr;
-	Fri,  1 Sep 2023 16:36:28 +0800 (CST)
-Received: from [10.67.111.192] (10.67.111.192) by
- kwepemd100003.china.huawei.com (7.221.188.180) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1258.23; Fri, 1 Sep 2023 16:38:08 +0800
-Message-ID: <ee9ee99d-115a-f488-2de5-f402daa892a8@huawei.com>
-Date: Fri, 1 Sep 2023 16:38:08 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79C08EBE
+	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 08:39:57 +0000 (UTC)
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [IPv6:2001:780:45:1d:225:90ff:fe52:c662])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AA4910CF;
+	Fri,  1 Sep 2023 01:39:56 -0700 (PDT)
+Received: from [78.30.34.192] (port=57334 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1qbzh1-00AIpi-NY; Fri, 01 Sep 2023 10:39:54 +0200
+Date: Fri, 1 Sep 2023 10:39:50 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Felix Fietkau <nbd@nbd.name>
+Cc: netfilter-devel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [RFC] netfilter: nf_tables: ignore -EOPNOTSUPP on flowtable
+ device offload setup
+Message-ID: <ZPGjVl7jmLhMhgBP@calendula>
+References: <20230831201420.63178-1-nbd@nbd.name>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH bpf-next v2] selftests/bpf: fix a CI failure caused by
- vsock write
-Content-Language: en-US
-To: Daniel Borkmann <daniel@iogearbox.net>, Xu Kuohai
-	<xukuohai@huaweicloud.com>, <bpf@vger.kernel.org>, <netdev@vger.kernel.org>
-CC: Bobby Eshleman <bobby.eshleman@bytedance.com>
-References: <20230901031037.3314007-1-xukuohai@huaweicloud.com>
- <485647ed-e791-0781-afed-03c2d636a00b@iogearbox.net>
-From: Xu Kuohai <xukuohai@huawei.com>
-In-Reply-To: <485647ed-e791-0781-afed-03c2d636a00b@iogearbox.net>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.67.111.192]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemd100003.china.huawei.com (7.221.188.180)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230831201420.63178-1-nbd@nbd.name>
+X-Spam-Score: -1.9 (-)
+X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 9/1/2023 4:22 PM, Daniel Borkmann wrote:
-> On 9/1/23 5:10 AM, Xu Kuohai wrote:
->> From: Xu Kuohai <xukuohai@huawei.com>
->>
->> While commit 90f0074cd9f9 ("selftests/bpf: fix a CI failure caused by vsock sockmap test")
->> fixes a receive failure of vsock sockmap test, there is still a write failure:
->>
->> Error: #211/79 sockmap_listen/sockmap VSOCK test_vsock_redir
->> Error: #211/79 sockmap_listen/sockmap VSOCK test_vsock_redir
->>    ./test_progs:vsock_unix_redir_connectible:1501: egress: write: Transport endpoint is not connected
->>    vsock_unix_redir_connectible:FAIL:1501
->>    ./test_progs:vsock_unix_redir_connectible:1501: ingress: write: Transport endpoint is not connected
->>    vsock_unix_redir_connectible:FAIL:1501
->>    ./test_progs:vsock_unix_redir_connectible:1501: egress: write: Transport endpoint is not connected
->>    vsock_unix_redir_connectible:FAIL:1501
->>
->> The reason is that the vsock connection in the test is set to ESTABLISHED state
->> by function virtio_transport_recv_pkt, which is executed in a workqueue thread,
->> so when the user space test thread runs before the workqueue thread, this
->> problem occurs.
->>
->> To fix it, before writing the connection, wait for it to be connected.
->>
->> Fixes: d61bd8c1fd02 ("selftests/bpf: add a test case for vsock sockmap")
->> Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
->> ---
->> v1->v2: initialize esize to sizeof(eval) to avoid getsockopt() reading
->> uninitialized value
->> ---
->>   .../bpf/prog_tests/sockmap_helpers.h          | 29 +++++++++++++++++++
->>   .../selftests/bpf/prog_tests/sockmap_listen.c |  5 ++++
->>   2 files changed, 34 insertions(+)
->>
->> diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_helpers.h b/tools/testing/selftests/bpf/prog_tests/sockmap_helpers.h
->> index d12665490a90..abd13d96d392 100644
->> --- a/tools/testing/selftests/bpf/prog_tests/sockmap_helpers.h
->> +++ b/tools/testing/selftests/bpf/prog_tests/sockmap_helpers.h
->> @@ -179,6 +179,35 @@
->>           __ret;                                                         \
->>       })
->> +static inline int poll_connect(int fd, unsigned int timeout_sec)
->> +{
->> +    struct timeval timeout = { .tv_sec = timeout_sec };
->> +    fd_set wfds;
->> +    int r;
->> +    int eval;
->> +    socklen_t esize = sizeof(eval);
->> +
->> +    FD_ZERO(&wfds);
->> +    FD_SET(fd, &wfds);
->> +
->> +    r = select(fd + 1, NULL, &wfds, NULL, &timeout);
->> +    if (r == 0)
->> +        errno = ETIME;
->> +
->> +    if (r != 1)
->> +        return -1;
->> +
->> +    if (getsockopt(fd, SOL_SOCKET, SO_ERROR, &eval, &esize) < 0)
->> +        return -1;
->> +
->> +    if (eval != 0) {
->> +        errno = eval;
->> +        return -1;
->> +    }
->> +
->> +    return 0;
->> +}
->> +
->>   static inline int poll_read(int fd, unsigned int timeout_sec)
->>   {
->>       struct timeval timeout = { .tv_sec = timeout_sec };
->> diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c b/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
->> index 5674a9d0cacf..2d3bf38677b6 100644
->> --- a/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
->> +++ b/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
->> @@ -1452,6 +1452,11 @@ static int vsock_socketpair_connectible(int sotype, int *v0, int *v1)
->>       if (p < 0)
->>           goto close_cli;
->> +    if (poll_connect(c, IO_TIMEOUT_SEC) < 0) {
->> +        FAIL_ERRNO("poll_connect");
->> +        goto close_cli;
->> +    }
->> +
->>       *v0 = p;
->>       *v1 = c;
->>
-> 
-> Should the error path rather be ?
-> 
-> diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c b/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
-> index 2d3bf38677b6..8df8cbb447f1 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
-> @@ -1454,7 +1454,7 @@ static int vsock_socketpair_connectible(int sotype, int *v0, int *v1)
-> 
->          if (poll_connect(c, IO_TIMEOUT_SEC) < 0) {
->                  FAIL_ERRNO("poll_connect");
-> -               goto close_cli;
-> +               goto close_acc;
->          }
-> 
->          *v0 = p;
-> @@ -1462,6 +1462,8 @@ static int vsock_socketpair_connectible(int sotype, int *v0, int *v1)
-> 
->          return 0;
-> 
-> +close_acc:
-> +       close(p);
->   close_cli:
->          close(c);
->   close_srv:
-> 
-> 
-> Let me know and I'll squash this into the fix.
->
+Hi Felix,
 
-Right, the accepted connection should be closed, thanks.
+On Thu, Aug 31, 2023 at 10:14:20PM +0200, Felix Fietkau wrote:
+> On many embedded devices, it is common to configure flowtable offloading for
+> a mix of different devices, some of which have hardware offload support and
+> some of which don't.
+> The current code limits the ability of user space to properly set up such a
+> configuration by only allowing adding devices with hardware offload support to
+> a offload-enabled flowtable.
+> Given that offload-enabled flowtables also imply fallback to pure software
+> offloading, this limitation makes little sense.
+> Fix it by not bailing out when the offload setup returns -EOPNOTSUPP
 
-> Anyway, BPF CI went through fine, only the ongoing panic left to be fixed after that.
-> 
-> Thanks,
-> Daniel
-> 
-> .
+Would you send a v2 to untoggle the offload flag when listing the
+ruleset if EOPNOTSUPP is reported? Thus, the user knows that no
+hardware offload is being used.
 
+> Signed-off-by: Felix Fietkau <nbd@nbd.name>
+> ---
+>  net/netfilter/nf_tables_api.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
+> index 41b826dff6f5..dfa2ea98088b 100644
+> --- a/net/netfilter/nf_tables_api.c
+> +++ b/net/netfilter/nf_tables_api.c
+> @@ -8103,7 +8103,7 @@ static int nft_register_flowtable_net_hooks(struct net *net,
+>  		err = flowtable->data.type->setup(&flowtable->data,
+>  						  hook->ops.dev,
+>  						  FLOW_BLOCK_BIND);
+> -		if (err < 0)
+> +		if (err < 0 && err != -EOPNOTSUPP)
+>  			goto err_unregister_net_hooks;
+>  
+>  		err = nf_register_net_hook(net, &hook->ops);
+> -- 
+> 2.41.0
+> 
 
