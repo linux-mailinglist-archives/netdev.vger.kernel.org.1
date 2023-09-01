@@ -1,275 +1,325 @@
-Return-Path: <netdev+bounces-31780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31781-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6671E79012B
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 19:08:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 940A37901EA
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 20:09:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 975511C208FA
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 17:08:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50A961C209A4
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 18:09:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECC1E11CA5;
-	Fri,  1 Sep 2023 17:05:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9596C2D7;
+	Fri,  1 Sep 2023 18:09:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E20BEBA3A
-	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 17:05:34 +0000 (UTC)
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D1911706;
-	Fri,  1 Sep 2023 10:05:33 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 07395C0005;
-	Fri,  1 Sep 2023 17:05:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1693587931;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7gtO8YzcVvtdc2HoI0634FJxvpThUhRmuHAgUwSgguM=;
-	b=QCbu/fN8/kuKfZTjkZxGzCoWlYL/sJ/cbECATswNXdyMl6nr9nYyB7C4O6ntpM6VzVc8mv
-	+KXLO1TvsNZoSq2T4iO5PcFpNMg4EkwMyNEZbRaUdjVC2JhSyumWkEMev0Off7Bex02iqD
-	46QHvDexEtDJdYS9Rn1Nbyka4pDglLuPobJrmLw4WbhzOX6/IGPhtH4irx/jMZxe6GhOxb
-	QMel3Q2JaOEA/BlftZ6YzM+JURfdPQ0ivvsh7ALzCaWCYz6Snq8+iD7O8r3+F5iaqbyZAQ
-	uLVsOb8EFJQA4YxhGRdb8riBsNV2gCyVltcwH46ziVAZEGtzeyrVNYtt/t3YzQ==
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	linux-wpan@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	netdev@vger.kernel.org,
-	David Girault <david.girault@qorvo.com>,
-	Romuald Despres <romuald.despres@qorvo.com>,
-	Frederic Blain <frederic.blain@qorvo.com>,
-	Nicolas Schodet <nico@ni.fr.eu.org>,
-	Guilhem Imberton <guilhem.imberton@qorvo.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next v2 11/11] ieee802154: Give the user the association list
-Date: Fri,  1 Sep 2023 19:05:01 +0200
-Message-Id: <20230901170501.1066321-12-miquel.raynal@bootlin.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230901170501.1066321-1-miquel.raynal@bootlin.com>
-References: <20230901170501.1066321-1-miquel.raynal@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D0EC134
+	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 18:09:30 +0000 (UTC)
+Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ADFF92
+	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 11:09:28 -0700 (PDT)
+Received: by mail-ot1-x331.google.com with SMTP id 46e09a7af769-6bca3588edbso1663834a34.0
+        for <netdev@vger.kernel.org>; Fri, 01 Sep 2023 11:09:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1693591768; x=1694196568; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=H2i49DufRKSOgePhtC9Aq1qjy6weL4GN6JJVO+yGbZA=;
+        b=P57p2Omrd5jACVpRxI1Ku1BqdRN3AWusrNc1DFcx9nl7ayOp791jBsEzf4r1ztI7n4
+         i4HOUXuOl+mBhXJeUHensyI5whUhFJk51MdzB6TRbetkMdN5JJYCMp3HhmRdouVAexRf
+         lCnM3PuU7pl8HUVfNfqK7P2PM2bWo32+KwN7RComlDzmvOSCK3UliNwZUNl9unN9v1CI
+         jJ3+cxHIMp6fEeRRRdy6WiT4PbmxA+Lgd8zh337yTZb+Z2ylttKxBTbrFJe87w9+c0sm
+         MsCL+fjs+puKsjd9xDNsVKOybp+p2RvgTzk+/R8YDblmeScoE3LrOsOMga0pVowG2xTG
+         1WKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693591768; x=1694196568;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=H2i49DufRKSOgePhtC9Aq1qjy6weL4GN6JJVO+yGbZA=;
+        b=NAxgo4798fbMJUdMcDL5cWdShdkt1fRzdTFWfh+S1XkwND9fosEapmcasko0nE64b4
+         joM9r6cE0hdR2ssBuAv3bMCuZuRoxGpZ5ILwMJZVqD7BA/GOsHugS0ArrunTKS0k0WS2
+         PbVWqzEee19IjZwCZESjJuZNi9lg4h+Vd5QZELfM/n3crhTusIrt1uigUE0RI4qxwG1p
+         1tzE1zYjM1uK9JfKALTV567o/jzYKslqcvKMqikv0rezsS9NQCer8QtJy+ORrAnH6cp5
+         1a22oZ9+dEZj+h2Ca+BgNYBR7kFi1DjuwvCUxJb/kqqiFpAK940s+K/flcM2bwoVSiSd
+         Q9vA==
+X-Gm-Message-State: AOJu0YzHnR5sXf+z8c3mOeOi+kxHwVG/QydaDNJB+dX24+c0XIZRoj0j
+	duHT6Wf+n0fTIi92T2oV00YmUQ==
+X-Google-Smtp-Source: AGHT+IGMWgDrwFDaVuJU3ptsvnmYCkVEhwN3xPt1GdGZe/cxpiJnS9uJb5hrTjHwm4b5aRbb/Qz6eA==
+X-Received: by 2002:a05:6871:88b:b0:1bf:fd8a:826e with SMTP id r11-20020a056871088b00b001bffd8a826emr3352796oaq.55.1693591767720;
+        Fri, 01 Sep 2023 11:09:27 -0700 (PDT)
+Received: from ?IPV6:2804:14d:5c5e:44fb:ea95:e205:ffa8:bfad? ([2804:14d:5c5e:44fb:ea95:e205:ffa8:bfad])
+        by smtp.gmail.com with ESMTPSA id x21-20020a05687031d500b001d0cf6ba822sm2431545oac.53.2023.09.01.11.09.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 01 Sep 2023 11:09:27 -0700 (PDT)
+Message-ID: <39597d43-7522-38e7-1b37-82c4a84158aa@mojatatu.com>
+Date: Fri, 1 Sep 2023 15:09:22 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: miquel.raynal@bootlin.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH net 1/1] net: sched: sch_qfq: Fix UAF in qfq_dequeue()
+Content-Language: en-US
+To: Jamal Hadi Salim <jhs@mojatatu.com>, davem@davemloft.net,
+ kuba@kernel.org, edumazet@google.com, pabeni@redhat.com
+Cc: jiri@resnulli.us, xiyou.wangcong@gmail.com, netdev@vger.kernel.org,
+ sec@valis.email, paolo.valente@unimore.it
+References: <20230901162237.11525-1-jhs@mojatatu.com>
+From: Pedro Tammela <pctammela@mojatatu.com>
+In-Reply-To: <20230901162237.11525-1-jhs@mojatatu.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Upon request, we must be able to provide to the user the list of
-associations currently in place. Let's add a new netlink command and
-attribute for this purpose.
+On 01/09/2023 13:22, Jamal Hadi Salim wrote:
+> From: valis <sec@valis.email>
+> 
+> When the plug qdisc is used as a class of the qfq qdisc it could trigger a
+> UAF. This issue can be reproduced with following commands:
+> 
+>    tc qdisc add dev lo root handle 1: qfq
+>    tc class add dev lo parent 1: classid 1:1 qfq weight 1 maxpkt 512
+>    tc qdisc add dev lo parent 1:1 handle 2: plug
+>    tc filter add dev lo parent 1: basic classid 1:1
+>    ping -c1 127.0.0.1
 
-Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
----
- include/net/nl802154.h    |  18 ++++++-
- net/ieee802154/nl802154.c | 107 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 123 insertions(+), 2 deletions(-)
+Not sure if net or net-next material, but I would also demote the 
+WARN_ON_ONCE
+in qfq_dequeue to a pr_warn[0], as it would just crash kernels that set 
+panic_on_warn and honestly it's not that bad of a misconfiguration (a 
+plain tc qdisc/class del would fix it).
 
-diff --git a/include/net/nl802154.h b/include/net/nl802154.h
-index 8b26faae49e8..4c752f799957 100644
---- a/include/net/nl802154.h
-+++ b/include/net/nl802154.h
-@@ -81,6 +81,7 @@ enum nl802154_commands {
- 	NL802154_CMD_ASSOCIATE,
- 	NL802154_CMD_DISASSOCIATE,
- 	NL802154_CMD_SET_MAX_ASSOCIATIONS,
-+	NL802154_CMD_LIST_ASSOCIATIONS,
- 
- 	/* add new commands above here */
- 
-@@ -151,6 +152,7 @@ enum nl802154_attrs {
- 	NL802154_ATTR_SCAN_DONE_REASON,
- 	NL802154_ATTR_BEACON_INTERVAL,
- 	NL802154_ATTR_MAX_ASSOCIATIONS,
-+	NL802154_ATTR_PEER,
- 
- 	/* add attributes here, update the policy in nl802154.c */
- 
-@@ -389,8 +391,6 @@ enum nl802154_supported_bool_states {
- 	NL802154_SUPPORTED_BOOL_MAX = __NL802154_SUPPORTED_BOOL_AFTER_LAST - 1
- };
- 
--#ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
--
- enum nl802154_dev_addr_modes {
- 	NL802154_DEV_ADDR_NONE,
- 	__NL802154_DEV_ADDR_INVALID,
-@@ -410,12 +410,26 @@ enum nl802154_dev_addr_attrs {
- 	NL802154_DEV_ADDR_ATTR_SHORT,
- 	NL802154_DEV_ADDR_ATTR_EXTENDED,
- 	NL802154_DEV_ADDR_ATTR_PAD,
-+	NL802154_DEV_ADDR_ATTR_PEER_TYPE,
- 
- 	/* keep last */
- 	__NL802154_DEV_ADDR_ATTR_AFTER_LAST,
- 	NL802154_DEV_ADDR_ATTR_MAX = __NL802154_DEV_ADDR_ATTR_AFTER_LAST - 1
- };
- 
-+enum nl802154_peer_type {
-+	NL802154_PEER_TYPE_UNSPEC,
-+
-+	NL802154_PEER_TYPE_PARENT,
-+	NL802154_PEER_TYPE_CHILD,
-+
-+	/* keep last */
-+	__NL802154_PEER_TYPE_AFTER_LAST,
-+	NL802154_PEER_TYPE_MAX = __NL802154_PEER_TYPE_AFTER_LAST - 1
-+};
-+
-+#ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
-+
- enum nl802154_key_id_modes {
- 	NL802154_KEY_ID_MODE_IMPLICIT,
- 	NL802154_KEY_ID_MODE_INDEX,
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index e16e57fc34d0..e26d7cec02ce 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -235,6 +235,7 @@ static const struct nla_policy nl802154_policy[NL802154_ATTR_MAX+1] = {
- 	[NL802154_ATTR_BEACON_INTERVAL] =
- 		NLA_POLICY_MAX(NLA_U8, IEEE802154_ACTIVE_SCAN_DURATION),
- 	[NL802154_ATTR_MAX_ASSOCIATIONS] = { .type = NLA_U32 },
-+	[NL802154_ATTR_PEER] = { .type = NLA_NESTED },
- 
- #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
- 	[NL802154_ATTR_SEC_ENABLED] = { .type = NLA_U8, },
-@@ -1717,6 +1718,107 @@ static int nl802154_set_max_associations(struct sk_buff *skb, struct genl_info *
- 	return 0;
- }
- 
-+static int nl802154_send_peer_info(struct sk_buff *msg,
-+				   struct netlink_callback *cb,
-+				   u32 seq, int flags,
-+				   struct cfg802154_registered_device *rdev,
-+				   struct wpan_dev *wpan_dev,
-+				   struct ieee802154_pan_device *peer,
-+				   enum nl802154_peer_type type)
-+{
-+	struct nlattr *nla;
-+	void *hdr;
-+
-+	ASSERT_RTNL();
-+
-+	hdr = nl802154hdr_put(msg, NETLINK_CB(cb->skb).portid, seq, flags,
-+			      NL802154_CMD_LIST_ASSOCIATIONS);
-+	if (!hdr)
-+		return -ENOBUFS;
-+
-+	genl_dump_check_consistent(cb, hdr);
-+
-+	if (nla_put_u32(msg, NL802154_ATTR_GENERATION,
-+			wpan_dev->association_generation))
-+		goto nla_put_failure;
-+
-+	nla = nla_nest_start_noflag(msg, NL802154_ATTR_PEER);
-+	if (!nla)
-+		goto nla_put_failure;
-+
-+	if (nla_put_u8(msg, NL802154_DEV_ADDR_ATTR_PEER_TYPE, type))
-+		goto nla_put_failure;
-+
-+	if (nla_put_u8(msg, NL802154_DEV_ADDR_ATTR_MODE, peer->mode))
-+		goto nla_put_failure;
-+
-+	if (nla_put(msg, NL802154_DEV_ADDR_ATTR_SHORT,
-+		    IEEE802154_SHORT_ADDR_LEN, &peer->short_addr))
-+		goto nla_put_failure;
-+
-+	if (nla_put(msg, NL802154_DEV_ADDR_ATTR_EXTENDED,
-+		    IEEE802154_EXTENDED_ADDR_LEN, &peer->extended_addr))
-+		goto nla_put_failure;
-+
-+	nla_nest_end(msg, nla);
-+
-+	genlmsg_end(msg, hdr);
-+
-+	return 0;
-+
-+ nla_put_failure:
-+	genlmsg_cancel(msg, hdr);
-+	return -EMSGSIZE;
-+}
-+
-+static int nl802154_list_associations(struct sk_buff *skb,
-+				      struct netlink_callback *cb)
-+{
-+	struct cfg802154_registered_device *rdev;
-+	struct ieee802154_pan_device *child;
-+	struct wpan_dev *wpan_dev;
-+	int err;
-+
-+	err = nl802154_prepare_wpan_dev_dump(skb, cb, &rdev, &wpan_dev);
-+	if (err)
-+		return err;
-+
-+	mutex_lock(&wpan_dev->association_lock);
-+
-+	if (cb->args[2])
-+		goto out;
-+
-+	cb->seq = wpan_dev->association_generation;
-+
-+	if (wpan_dev->parent) {
-+		err = nl802154_send_peer_info(skb, cb, cb->nlh->nlmsg_seq,
-+					      NLM_F_MULTI, rdev, wpan_dev,
-+					      wpan_dev->parent,
-+					      NL802154_PEER_TYPE_PARENT);
-+		if (err < 0)
-+			goto out_err;
-+	}
-+
-+	list_for_each_entry(child, &wpan_dev->children, node) {
-+		err = nl802154_send_peer_info(skb, cb, cb->nlh->nlmsg_seq,
-+					      NLM_F_MULTI, rdev, wpan_dev,
-+					      child,
-+					      NL802154_PEER_TYPE_CHILD);
-+		if (err < 0)
-+			goto out_err;
-+	}
-+
-+	cb->args[2] = 1;
-+out:
-+	err = skb->len;
-+out_err:
-+	mutex_unlock(&wpan_dev->association_lock);
-+
-+	nl802154_finish_wpan_dev_dump(rdev);
-+
-+	return err;
-+}
-+
- #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
- static const struct nla_policy nl802154_dev_addr_policy[NL802154_DEV_ADDR_ATTR_MAX + 1] = {
- 	[NL802154_DEV_ADDR_ATTR_PAN_ID] = { .type = NLA_U16 },
-@@ -2861,6 +2963,11 @@ static const struct genl_ops nl802154_ops[] = {
- 		.internal_flags = NL802154_FLAG_NEED_NETDEV |
- 				  NL802154_FLAG_NEED_RTNL,
- 	},
-+	{
-+		.cmd = NL802154_CMD_LIST_ASSOCIATIONS,
-+		.dumpit = nl802154_list_associations,
-+		/* can be retrieved by unprivileged users */
-+	},
- #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
- 	{
- 		.cmd = NL802154_CMD_SET_SEC_PARAMS,
--- 
-2.34.1
+[0] https://elixir.bootlin.com/linux/latest/source/net/sched/sch_qfq.c#L1001
 
+> 
+> and boom:
+> 
+> [  285.353793] BUG: KASAN: slab-use-after-free in qfq_dequeue+0xa7/0x7f0
+> [  285.354910] Read of size 4 at addr ffff8880bad312a8 by task ping/144
+> [  285.355903]
+> [  285.356165] CPU: 1 PID: 144 Comm: ping Not tainted 6.5.0-rc3+ #4
+> [  285.357112] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.14.0-2 04/01/2014
+> [  285.358376] Call Trace:
+> [  285.358773]  <IRQ>
+> [  285.359109]  dump_stack_lvl+0x44/0x60
+> [  285.359708]  print_address_description.constprop.0+0x2c/0x3c0
+> [  285.360611]  kasan_report+0x10c/0x120
+> [  285.361195]  ? qfq_dequeue+0xa7/0x7f0
+> [  285.361780]  qfq_dequeue+0xa7/0x7f0
+> [  285.362342]  __qdisc_run+0xf1/0x970
+> [  285.362903]  net_tx_action+0x28e/0x460
+> [  285.363502]  __do_softirq+0x11b/0x3de
+> [  285.364097]  do_softirq.part.0+0x72/0x90
+> [  285.364721]  </IRQ>
+> [  285.365072]  <TASK>
+> [  285.365422]  __local_bh_enable_ip+0x77/0x90
+> [  285.366079]  __dev_queue_xmit+0x95f/0x1550
+> [  285.366732]  ? __pfx_csum_and_copy_from_iter+0x10/0x10
+> [  285.367526]  ? __pfx___dev_queue_xmit+0x10/0x10
+> [  285.368259]  ? __build_skb_around+0x129/0x190
+> [  285.368960]  ? ip_generic_getfrag+0x12c/0x170
+> [  285.369653]  ? __pfx_ip_generic_getfrag+0x10/0x10
+> [  285.370390]  ? csum_partial+0x8/0x20
+> [  285.370961]  ? raw_getfrag+0xe5/0x140
+> [  285.371559]  ip_finish_output2+0x539/0xa40
+> [  285.372222]  ? __pfx_ip_finish_output2+0x10/0x10
+> [  285.372954]  ip_output+0x113/0x1e0
+> [  285.373512]  ? __pfx_ip_output+0x10/0x10
+> [  285.374130]  ? icmp_out_count+0x49/0x60
+> [  285.374739]  ? __pfx_ip_finish_output+0x10/0x10
+> [  285.375457]  ip_push_pending_frames+0xf3/0x100
+> [  285.376173]  raw_sendmsg+0xef5/0x12d0
+> [  285.376760]  ? do_syscall_64+0x40/0x90
+> [  285.377359]  ? __static_call_text_end+0x136578/0x136578
+> [  285.378173]  ? do_syscall_64+0x40/0x90
+> [  285.378772]  ? kasan_enable_current+0x11/0x20
+> [  285.379469]  ? __pfx_raw_sendmsg+0x10/0x10
+> [  285.380137]  ? __sock_create+0x13e/0x270
+> [  285.380673]  ? __sys_socket+0xf3/0x180
+> [  285.381174]  ? __x64_sys_socket+0x3d/0x50
+> [  285.381725]  ? entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+> [  285.382425]  ? __rcu_read_unlock+0x48/0x70
+> [  285.382975]  ? ip4_datagram_release_cb+0xd8/0x380
+> [  285.383608]  ? __pfx_ip4_datagram_release_cb+0x10/0x10
+> [  285.384295]  ? preempt_count_sub+0x14/0xc0
+> [  285.384844]  ? __list_del_entry_valid+0x76/0x140
+> [  285.385467]  ? _raw_spin_lock_bh+0x87/0xe0
+> [  285.386014]  ? __pfx__raw_spin_lock_bh+0x10/0x10
+> [  285.386645]  ? release_sock+0xa0/0xd0
+> [  285.387148]  ? preempt_count_sub+0x14/0xc0
+> [  285.387712]  ? freeze_secondary_cpus+0x348/0x3c0
+> [  285.388341]  ? aa_sk_perm+0x177/0x390
+> [  285.388856]  ? __pfx_aa_sk_perm+0x10/0x10
+> [  285.389441]  ? check_stack_object+0x22/0x70
+> [  285.390032]  ? inet_send_prepare+0x2f/0x120
+> [  285.390603]  ? __pfx_inet_sendmsg+0x10/0x10
+> [  285.391172]  sock_sendmsg+0xcc/0xe0
+> [  285.391667]  __sys_sendto+0x190/0x230
+> [  285.392168]  ? __pfx___sys_sendto+0x10/0x10
+> [  285.392727]  ? kvm_clock_get_cycles+0x14/0x30
+> [  285.393328]  ? set_normalized_timespec64+0x57/0x70
+> [  285.393980]  ? _raw_spin_unlock_irq+0x1b/0x40
+> [  285.394578]  ? __x64_sys_clock_gettime+0x11c/0x160
+> [  285.395225]  ? __pfx___x64_sys_clock_gettime+0x10/0x10
+> [  285.395908]  ? _copy_to_user+0x3e/0x60
+> [  285.396432]  ? exit_to_user_mode_prepare+0x1a/0x120
+> [  285.397086]  ? syscall_exit_to_user_mode+0x22/0x50
+> [  285.397734]  ? do_syscall_64+0x71/0x90
+> [  285.398258]  __x64_sys_sendto+0x74/0x90
+> [  285.398786]  do_syscall_64+0x64/0x90
+> [  285.399273]  ? exit_to_user_mode_prepare+0x1a/0x120
+> [  285.399949]  ? syscall_exit_to_user_mode+0x22/0x50
+> [  285.400605]  ? do_syscall_64+0x71/0x90
+> [  285.401124]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+> [  285.401807] RIP: 0033:0x495726
+> [  285.402233] Code: ff ff ff f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b8 0f 1f 00 41 89 ca 64 8b 04 25 18 00 00 00 85 c0 75 11 b8 2c 00 00 00 0f 09
+> [  285.404683] RSP: 002b:00007ffcc25fb618 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
+> [  285.405677] RAX: ffffffffffffffda RBX: 0000000000000040 RCX: 0000000000495726
+> [  285.406628] RDX: 0000000000000040 RSI: 0000000002518750 RDI: 0000000000000000
+> [  285.407565] RBP: 00000000005205ef R08: 00000000005f8838 R09: 000000000000001c
+> [  285.408523] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000002517634
+> [  285.409460] R13: 00007ffcc25fb6f0 R14: 0000000000000003 R15: 0000000000000000
+> [  285.410403]  </TASK>
+> [  285.410704]
+> [  285.410929] Allocated by task 144:
+> [  285.411402]  kasan_save_stack+0x1e/0x40
+> [  285.411926]  kasan_set_track+0x21/0x30
+> [  285.412442]  __kasan_slab_alloc+0x55/0x70
+> [  285.412973]  kmem_cache_alloc_node+0x187/0x3d0
+> [  285.413567]  __alloc_skb+0x1b4/0x230
+> [  285.414060]  __ip_append_data+0x17f7/0x1b60
+> [  285.414633]  ip_append_data+0x97/0xf0
+> [  285.415144]  raw_sendmsg+0x5a8/0x12d0
+> [  285.415640]  sock_sendmsg+0xcc/0xe0
+> [  285.416117]  __sys_sendto+0x190/0x230
+> [  285.416626]  __x64_sys_sendto+0x74/0x90
+> [  285.417145]  do_syscall_64+0x64/0x90
+> [  285.417624]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+> [  285.418306]
+> [  285.418531] Freed by task 144:
+> [  285.418960]  kasan_save_stack+0x1e/0x40
+> [  285.419469]  kasan_set_track+0x21/0x30
+> [  285.419988]  kasan_save_free_info+0x27/0x40
+> [  285.420556]  ____kasan_slab_free+0x109/0x1a0
+> [  285.421146]  kmem_cache_free+0x1c2/0x450
+> [  285.421680]  __netif_receive_skb_core+0x2ce/0x1870
+> [  285.422333]  __netif_receive_skb_one_core+0x97/0x140
+> [  285.423003]  process_backlog+0x100/0x2f0
+> [  285.423537]  __napi_poll+0x5c/0x2d0
+> [  285.424023]  net_rx_action+0x2be/0x560
+> [  285.424510]  __do_softirq+0x11b/0x3de
+> [  285.425034]
+> [  285.425254] The buggy address belongs to the object at ffff8880bad31280
+> [  285.425254]  which belongs to the cache skbuff_head_cache of size 224
+> [  285.426993] The buggy address is located 40 bytes inside of
+> [  285.426993]  freed 224-byte region [ffff8880bad31280, ffff8880bad31360)
+> [  285.428572]
+> [  285.428798] The buggy address belongs to the physical page:
+> [  285.429540] page:00000000f4b77674 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0xbad31
+> [  285.430758] flags: 0x100000000000200(slab|node=0|zone=1)
+> [  285.431447] page_type: 0xffffffff()
+> [  285.431934] raw: 0100000000000200 ffff88810094a8c0 dead000000000122 0000000000000000
+> [  285.432757] raw: 0000000000000000 00000000800c000c 00000001ffffffff 0000000000000000
+> [  285.433562] page dumped because: kasan: bad access detected
+> [  285.434144]
+> [  285.434320] Memory state around the buggy address:
+> [  285.434828]  ffff8880bad31180: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+> [  285.435580]  ffff8880bad31200: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+> [  285.436264] >ffff8880bad31280: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> [  285.436777]                                   ^
+> [  285.437106]  ffff8880bad31300: fb fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
+> [  285.437616]  ffff8880bad31380: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+> [  285.438126] ==================================================================
+> [  285.438662] Disabling lock debugging due to kernel taint
+> 
+> Fix this by:
+> 1. Changing sch_plug's .peek handler to qdisc_peek_dequeued(), a
+> function compatible with non-work-conserving qdiscs
+> 2. Checking the return value of qdisc_dequeue_peeked() in sch_qfq.
+> 
+> Fixes: 462dbc9101ac ("pkt_sched: QFQ Plus: fair-queueing service at DRR cost")
+> Reported-by: valis <sec@valis.email>
+> Signed-off-by: valis <sec@valis.email>
+> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> ---
+>   net/sched/sch_plug.c |  2 +-
+>   net/sched/sch_qfq.c  | 22 +++++++++++++++++-----
+>   2 files changed, 18 insertions(+), 6 deletions(-)
+> 
+> diff --git a/net/sched/sch_plug.c b/net/sched/sch_plug.c
+> index ea8c4a7174bb..35f49edf63db 100644
+> --- a/net/sched/sch_plug.c
+> +++ b/net/sched/sch_plug.c
+> @@ -207,7 +207,7 @@ static struct Qdisc_ops plug_qdisc_ops __read_mostly = {
+>   	.priv_size   =       sizeof(struct plug_sched_data),
+>   	.enqueue     =       plug_enqueue,
+>   	.dequeue     =       plug_dequeue,
+> -	.peek        =       qdisc_peek_head,
+> +	.peek        =       qdisc_peek_dequeued,
+>   	.init        =       plug_init,
+>   	.change      =       plug_change,
+>   	.reset       =	     qdisc_reset_queue,
+> diff --git a/net/sched/sch_qfq.c b/net/sched/sch_qfq.c
+> index befaf74b33ca..09d2955baab1 100644
+> --- a/net/sched/sch_qfq.c
+> +++ b/net/sched/sch_qfq.c
+> @@ -974,10 +974,13 @@ static void qfq_update_eligible(struct qfq_sched *q)
+>   }
+>   
+>   /* Dequeue head packet of the head class in the DRR queue of the aggregate. */
+> -static void agg_dequeue(struct qfq_aggregate *agg,
+> -			struct qfq_class *cl, unsigned int len)
+> +static struct sk_buff *agg_dequeue(struct qfq_aggregate *agg,
+> +				   struct qfq_class *cl, unsigned int len)
+>   {
+> -	qdisc_dequeue_peeked(cl->qdisc);
+> +	struct sk_buff *skb = qdisc_dequeue_peeked(cl->qdisc);
+> +
+> +	if (!skb)
+> +		return NULL;
+>   
+>   	cl->deficit -= (int) len;
+>   
+> @@ -987,6 +990,8 @@ static void agg_dequeue(struct qfq_aggregate *agg,
+>   		cl->deficit += agg->lmax;
+>   		list_move_tail(&cl->alist, &agg->active);
+>   	}
+> +
+> +	return skb;
+>   }
+>   
+>   static inline struct sk_buff *qfq_peek_skb(struct qfq_aggregate *agg,
+> @@ -1132,11 +1137,18 @@ static struct sk_buff *qfq_dequeue(struct Qdisc *sch)
+>   	if (!skb)
+>   		return NULL;
+>   
+> -	qdisc_qstats_backlog_dec(sch, skb);
+>   	sch->q.qlen--;
+> +
+> +	skb = agg_dequeue(in_serv_agg, cl, len);
+> +
+> +	if (!skb) {
+> +		sch->q.qlen++;
+> +		return NULL;
+> +	}
+> +
+> +	qdisc_qstats_backlog_dec(sch, skb);
+>   	qdisc_bstats_update(sch, skb);
+>   
+> -	agg_dequeue(in_serv_agg, cl, len);
+>   	/* If lmax is lowered, through qfq_change_class, for a class
+>   	 * owning pending packets with larger size than the new value
+>   	 * of lmax, then the following condition may hold.
 
