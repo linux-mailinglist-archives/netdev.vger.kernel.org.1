@@ -1,242 +1,109 @@
-Return-Path: <netdev+bounces-31718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69D6F78FBBA
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 12:21:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2967578FBC2
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 12:30:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E93972819BE
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 10:21:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8AB2E28155A
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 10:30:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B3FBA94B;
-	Fri,  1 Sep 2023 10:20:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15B108489;
+	Fri,  1 Sep 2023 10:30:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 101D7AD24
-	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 10:20:53 +0000 (UTC)
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E31610CE;
-	Fri,  1 Sep 2023 03:20:51 -0700 (PDT)
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38158R08000439;
-	Fri, 1 Sep 2023 10:20:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-type; s=qcppdkim1;
- bh=CxkTwtXNuDZ8nz873kFU50hTQXSUIeL+vEV4jI8YuDY=;
- b=KKSeoxwaqsmG4srm54hlp+J395Yjt65vHosKBSxpLC578AzvEixPENbAsq2TQN6MjI8l
- dx7RaA8/mu8esPZYHN5D8aIzZIPkgeXBq89xWXrvXMQTufSq/XltwHZu7q0SGWBwuKCe
- 39wTpJN8NfZDxn+07pbf7u9SdnCxNBrpGfdUxxHgB4CpovzMbQVWVnJYCxhn1/x3g3hL
- LZSyMQpTBKACDUquFVAfOB6X8NTwRyCJM1EPAygCAXIjgLibcQYQSvHkznczP7GOnMaw
- EgYLuftPp8zP8q2bVSVM1yr0IzASSv6ja8lD1IY+mWJAia0qQcwyMNUIMC92fTuBAJKR 3Q== 
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3stv5naq6a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 01 Sep 2023 10:20:42 +0000
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 381AKeS2026429
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 1 Sep 2023 10:20:40 GMT
-Received: from srichara-linux.qualcomm.com (10.80.80.8) by
- nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Fri, 1 Sep 2023 03:20:37 -0700
-From: Sricharan Ramabadhran <quic_srichara@quicinc.com>
-To: <mani@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>,
-        <linux-arm-msm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <quic_viswanat@quicinc.com>,
-        <quic_srichara@quicinc.com>
-Subject: [PATCH net-next 2/2] net: qrtr: Add support for processing DEL_PROC type control message
-Date: Fri, 1 Sep 2023 15:50:21 +0530
-Message-ID: <1693563621-1920-3-git-send-email-quic_srichara@quicinc.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1693563621-1920-1-git-send-email-quic_srichara@quicinc.com>
-References: <1693563621-1920-1-git-send-email-quic_srichara@quicinc.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 041AEAD3C
+	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 10:30:42 +0000 (UTC)
+Received: from nbd.name (nbd.name [46.4.11.11])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 018E910D2;
+	Fri,  1 Sep 2023 03:30:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
+	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=1i5lS85W58QnjOOKtVTvaT39okxLcnuyYWwE7KmFCWo=; b=oHA5xF5qmeQtNtp1SKH9c2XnH1
+	4yQcEbFhcLMAVvIr9WlQpvYgamW74YXruTIhvYlAywHpIVqr85FDnV6nSKhXw4qodMu6xE9D5LrgZ
+	eblqt+/4g5O1wIgAr8QaXkLaLi86IkSADfyT9pYMUGKVsi9IYmgnEIv2bqUIwBfJJuMg=;
+Received: from p4ff13705.dip0.t-ipconnect.de ([79.241.55.5] helo=nf.local)
+	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <nbd@nbd.name>)
+	id 1qc1QE-00ExuY-A9; Fri, 01 Sep 2023 12:30:38 +0200
+Message-ID: <2575f329-7d95-46f8-ab88-2bcdf8b87d66@nbd.name>
+Date: Fri, 1 Sep 2023 12:30:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: j5nUXHzdourcnL855dXd_OJo8ekrYd7V
-X-Proofpoint-ORIG-GUID: j5nUXHzdourcnL855dXd_OJo8ekrYd7V
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-09-01_07,2023-08-31_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- priorityscore=1501 mlxlogscore=790 spamscore=0 adultscore=0
- lowpriorityscore=0 phishscore=0 malwarescore=0 bulkscore=0 impostorscore=0
- mlxscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2308100000 definitions=main-2309010096
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC] netfilter: nf_tables: ignore -EOPNOTSUPP on flowtable
+ device offload setup
+Content-Language: en-US
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, netdev@vger.kernel.org
+References: <20230831201420.63178-1-nbd@nbd.name> <ZPGjVl7jmLhMhgBP@calendula>
+From: Felix Fietkau <nbd@nbd.name>
+Autocrypt: addr=nbd@nbd.name; keydata=
+ xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
+ ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
+ Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
+ AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
+ vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
+ wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
+ TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
+ l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
+ dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
+ HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
+ VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
+ CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
+ VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
+ Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
+ DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
+ wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
+ f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
+ aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
+ FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
+ TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
+ GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
+ cL98efvrjdstUfTCP2pfetyN
+In-Reply-To: <ZPGjVl7jmLhMhgBP@calendula>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-For certain rproc's like modem, when it goes down and endpoint gets
-un-registered, DEL_PROC control message gets forwarded to other
-remote nodes. So remote nodes should listen on the message,
-wakeup all local waiters waiting for tx_resume notifications
-(which will never come) and also forward the message to all
-local qrtr sockets like QMI etc. Adding the support here.
+On 01.09.23 10:39, Pablo Neira Ayuso wrote:
+> Hi Felix,
+> 
+> On Thu, Aug 31, 2023 at 10:14:20PM +0200, Felix Fietkau wrote:
+>> On many embedded devices, it is common to configure flowtable offloading for
+>> a mix of different devices, some of which have hardware offload support and
+>> some of which don't.
+>> The current code limits the ability of user space to properly set up such a
+>> configuration by only allowing adding devices with hardware offload support to
+>> a offload-enabled flowtable.
+>> Given that offload-enabled flowtables also imply fallback to pure software
+>> offloading, this limitation makes little sense.
+>> Fix it by not bailing out when the offload setup returns -EOPNOTSUPP
+> 
+> Would you send a v2 to untoggle the offload flag when listing the
+> ruleset if EOPNOTSUPP is reported? Thus, the user knows that no
+> hardware offload is being used.
 
-Introduced a new rx worker here, because endpoint_post can get called in
-atomic contexts, but processing of DEL_PROC needs to acquire node
-qrtr_tx mutex.
+Wouldn't that mess up further updates to the flowtable? From what I can 
+tell, when updating a flow table, changing its offload flag is not 
+supported.
 
-Signed-off-by: Sricharan Ramabadhran <quic_srichara@quicinc.com>
----
-Right now DEL_PROC is sent only by some legacy targets, latest uses
-only _BYE signalling for local observers only. So later that needs to
-be changed to broadcast and do the same DEL_PROC processing.
-
- include/uapi/linux/qrtr.h |  1 +
- net/qrtr/af_qrtr.c        | 65 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 66 insertions(+)
-
-diff --git a/include/uapi/linux/qrtr.h b/include/uapi/linux/qrtr.h
-index f7e2fb3..1c92015 100644
---- a/include/uapi/linux/qrtr.h
-+++ b/include/uapi/linux/qrtr.h
-@@ -26,6 +26,7 @@ enum qrtr_pkt_type {
- 	QRTR_TYPE_PING          = 9,
- 	QRTR_TYPE_NEW_LOOKUP	= 10,
- 	QRTR_TYPE_DEL_LOOKUP	= 11,
-+	QRTR_TYPE_DEL_PROC	= 13,
- };
- 
- struct qrtr_ctrl_pkt {
-diff --git a/net/qrtr/af_qrtr.c b/net/qrtr/af_qrtr.c
-index 26197a0..426cea0 100644
---- a/net/qrtr/af_qrtr.c
-+++ b/net/qrtr/af_qrtr.c
-@@ -3,6 +3,7 @@
-  * Copyright (c) 2015, Sony Mobile Communications Inc.
-  * Copyright (c) 2013, The Linux Foundation. All rights reserved.
-  */
-+#include <linux/kthread.h>
- #include <linux/module.h>
- #include <linux/netlink.h>
- #include <linux/qrtr.h>
-@@ -122,6 +123,9 @@ static DEFINE_XARRAY_ALLOC(qrtr_ports);
-  * @qrtr_tx_lock: lock for qrtr_tx_flow inserts
-  * @rx_queue: receive queue
-  * @item: list item for broadcast list
-+ * @kworker: worker thread for recv work
-+ * @task: task to run the worker thread
-+ * @read_data: scheduled work for recv work
-  */
- struct qrtr_node {
- 	struct mutex ep_lock;
-@@ -134,6 +138,9 @@ struct qrtr_node {
- 
- 	struct sk_buff_head rx_queue;
- 	struct list_head item;
-+	struct kthread_worker kworker;
-+	struct task_struct *task;
-+	struct kthread_work read_data;
- };
- 
- /**
-@@ -186,6 +193,9 @@ static void __qrtr_node_release(struct kref *kref)
- 	list_del(&node->item);
- 	mutex_unlock(&qrtr_node_lock);
- 
-+	kthread_flush_worker(&node->kworker);
-+	kthread_stop(node->task);
-+
- 	skb_queue_purge(&node->rx_queue);
- 
- 	/* Free tx flow counters */
-@@ -526,6 +536,9 @@ int qrtr_endpoint_post(struct qrtr_endpoint *ep, const void *data, size_t len)
- 
- 	if (cb->type == QRTR_TYPE_RESUME_TX) {
- 		qrtr_tx_resume(node, skb);
-+	} else if (cb->type == QRTR_TYPE_DEL_PROC) {
-+		skb_queue_tail(&node->rx_queue, skb);
-+		kthread_queue_work(&node->kworker, &node->read_data);
- 	} else {
- 		ipc = qrtr_port_lookup(cb->dst_port);
- 		if (!ipc)
-@@ -574,6 +587,50 @@ static struct sk_buff *qrtr_alloc_ctrl_packet(struct qrtr_ctrl_pkt **pkt,
- 	return skb;
- }
- 
-+/* Handle DEL_PROC control message */
-+static void qrtr_node_rx_work(struct kthread_work *work)
-+{
-+	struct qrtr_node *node = container_of(work, struct qrtr_node,
-+					      read_data);
-+	struct qrtr_ctrl_pkt *pkt;
-+	void __rcu **slot;
-+	struct radix_tree_iter iter;
-+	struct qrtr_tx_flow *flow;
-+	struct sk_buff *skb;
-+	struct qrtr_sock *ipc;
-+
-+	while ((skb = skb_dequeue(&node->rx_queue)) != NULL) {
-+		struct qrtr_cb *cb = (struct qrtr_cb *)skb->cb;
-+
-+		ipc = qrtr_port_lookup(cb->dst_port);
-+		if (!ipc) {
-+			kfree_skb(skb);
-+			continue;
-+		}
-+
-+		if (cb->type == QRTR_TYPE_DEL_PROC) {
-+			/* Free tx flow counters */
-+			mutex_lock(&node->qrtr_tx_lock);
-+			radix_tree_for_each_slot(slot, &node->qrtr_tx_flow, &iter, 0) {
-+				flow = *slot;
-+				wake_up_interruptible_all(&flow->resume_tx);
-+			}
-+			mutex_unlock(&node->qrtr_tx_lock);
-+
-+			/* Translate DEL_PROC to BYE for local enqueue */
-+			cb->type = QRTR_TYPE_BYE;
-+			pkt = (struct qrtr_ctrl_pkt *)skb->data;
-+			memset(pkt, 0, sizeof(*pkt));
-+			pkt->cmd = cpu_to_le32(QRTR_TYPE_BYE);
-+
-+			if (sock_queue_rcv_skb(&ipc->sk, skb))
-+				kfree_skb(skb);
-+
-+			qrtr_port_put(ipc);
-+		}
-+	}
-+}
-+
- /**
-  * qrtr_endpoint_register() - register a new endpoint
-  * @ep: endpoint to register
-@@ -599,6 +656,14 @@ int qrtr_endpoint_register(struct qrtr_endpoint *ep, unsigned int nid)
- 	node->nid = QRTR_EP_NID_AUTO;
- 	node->ep = ep;
- 
-+	kthread_init_work(&node->read_data, qrtr_node_rx_work);
-+	kthread_init_worker(&node->kworker);
-+	node->task = kthread_run(kthread_worker_fn, &node->kworker, "qrtr_rx");
-+	if (IS_ERR(node->task)) {
-+		kfree(node);
-+		return -ENOMEM;
-+	}
-+
- 	INIT_RADIX_TREE(&node->qrtr_tx_flow, GFP_KERNEL);
- 	mutex_init(&node->qrtr_tx_lock);
- 
--- 
-2.7.4
-
+- Felix
 
