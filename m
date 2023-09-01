@@ -1,97 +1,110 @@
-Return-Path: <netdev+bounces-31708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0820D78FA92
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 11:19:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 33F9B78FABE
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 11:27:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 330601C20B57
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 09:19:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 201FA1C20C1D
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 09:27:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B18F29475;
-	Fri,  1 Sep 2023 09:19:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EE18A921;
+	Fri,  1 Sep 2023 09:27:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A22585662
-	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 09:19:43 +0000 (UTC)
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3E9D10D4;
-	Fri,  1 Sep 2023 02:19:42 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62D189476
+	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 09:27:25 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86B2DC0;
+	Fri,  1 Sep 2023 02:27:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=uQgxTxph2lJhFNPVlzcNyVzmzrhmG5BzV33mv8A+0Wc=;
-	t=1693559982; x=1694769582; b=PGY0OvK3fZagdnKlvNF9UBpyvFrE43iBISyZEduD6FjzP5Y
-	Omd4j78u1ANElRjM6zXopFKwcMmkIkM5z/NkK+7IWpHJilKNky+cL2p9lVTz4nVnuqLlRsDwqjyRl
-	ma52JB4slzAa1pM3RhwlhVuB6hBDqiAQVQHF80lk/VrMPi0n0lL2jmSPuQuUlhQNld9OKep/+VUhG
-	HuJ9FjNuAkkBibpUADNL/7m2EJJq8bf4TxMED+Toa3uyKaFoNwYRiRd0GueYvVjRaFnWxtkFiU8Ru
-	EyYEG0rVe1YB2BJRcq7ex7Xd11lRvoJF7lV3ADgBXcOCvTXuMIxvwCpWZkEvGGyw==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=XIusW0m1E8VscwLTOTsY+xzTnz+U+iqdOkrObW70Mt0=; b=CwUh4HPSI5V8fX2wl9V7QYdslm
+	aUYA3b/XXt5Uk8ttQemTxsdN3q/ivypM4BhHwJcPBM/Pi0yP9gg7yKJRYl0/x/cJhEOyvqnomow7d
+	DoUXcs0sj91/q53LN/yUgNaI7fYqQMTPXKLAAjpqufyOW1Mw3FH7m3kGmguRS6ipHXKarO1xFX7I4
+	g66Wj5j14+BRMxZ1NUV+3uLq4tw/Gj/aSUESVK1d6D4PVNo7RDWmZvjxFeWobppFHLdeL+pKN5EuG
+	YwG1MzSyAFMlnzC477l94HTnDlZDQt3ym8IGzpyYnFJ78hm1FUNhK4+xSJRPV8Eys6nkhQk0XkJ4N
+	lduakg4g==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57120)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1qc0JU-006miJ-1u;
-	Fri, 01 Sep 2023 11:19:36 +0200
-Message-ID: <4e96e981f58ca5bccf71952f76efe5e08a88f11d.camel@sipsolutions.net>
-Subject: Re: [PATCH net,v2] wifi: mac80211: fix WARNING in
- ieee80211_link_info_change_notify()
-From: Johannes Berg <johannes@sipsolutions.net>
-To: shaozhengchao <shaozhengchao@huawei.com>,
- linux-wireless@vger.kernel.org,  netdev@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
- pabeni@redhat.com
-Cc: weiyongjun1@huawei.com, yuehaibing@huawei.com
-Date: Fri, 01 Sep 2023 11:19:35 +0200
-In-Reply-To: <abb4efba-90b4-da14-5683-3cd96819a5e0@huawei.com>
-References: <20230901035301.3473463-1-shaozhengchao@huawei.com>
-	 <7127fe5a4f2cfcdc3a55269f0a427477e264fabc.camel@sipsolutions.net>
-	 <abb4efba-90b4-da14-5683-3cd96819a5e0@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qc0Qt-0003rZ-1p;
+	Fri, 01 Sep 2023 10:27:15 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qc0Qs-0007iJ-IT; Fri, 01 Sep 2023 10:27:14 +0100
+Date: Fri, 1 Sep 2023 10:27:14 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Radu Pirea <radu-nicolae.pirea@nxp.com>
+Cc: "atenart@kernel.org" <atenart@kernel.org>,
+	"Radu-nicolae Pirea (OSS)" <radu-nicolae.pirea@oss.nxp.com>,
+	"sd@queasysnail.net" <sd@queasysnail.net>,
+	"andrew@lunn.ch" <andrew@lunn.ch>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	Sebastian Tobuschat <sebastian.tobuschat@nxp.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"richardcochran@gmail.com" <richardcochran@gmail.com>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [RFC net-next v2 5/5] net: phy: nxp-c45-tja11xx: implement
+ mdo_insert_tx_tag
+Message-ID: <ZPGuchwza3xr5SaF@shell.armlinux.org.uk>
+References: <20230824091615.191379-1-radu-nicolae.pirea@oss.nxp.com>
+ <20230824091615.191379-6-radu-nicolae.pirea@oss.nxp.com>
+ <ZOx0L722xg5-J_he@hog>
+ <5d42d6c9-2f0c-8913-49ec-50a25860c49f@oss.nxp.com>
+ <ZO8pbtnlOVauabjC@hog>
+ <518c11e9000f895fddb5b3dc4d5b2bf445cf320f.camel@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <518c11e9000f895fddb5b3dc4d5b2bf445cf320f.camel@nxp.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
+	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+On Fri, Sep 01, 2023 at 09:09:06AM +0000, Radu Pirea wrote:
+> On Wed, 2023-08-30 at 13:35 +0200, Sabrina Dubroca wrote:
+> ...
+> 
+> > And it's not restored when the link goes back up? That's inconvenient
+> > :/
+> > Do we end up with inconsistent state? ie driver and core believe
+> > everything is still offloaded, but HW lost all state? do we leak
+> > some resources allocated by the driver?
+> 
+> Yes. We end up with inconsistent state. The HW will lost all state when
+> the phy is reseted. No resource is leaked, everything is there, but the
+> configuration needs to be reapplied.
 
+If it's happening because the PHY is being re-attached from the network
+driver, then wouldn't it be a good idea to synchronise the hardware
+state with the software configuration in the ->config_init function?
 
-> 	Do you mean it shouldn't be allowed to set mcast rate when dev
-> is stopped,
->=20
+Presumably the hardware state is also lost when resuming from suspend
+as well? If so, that'll also fix that issue as well.
 
-Probably?
-
->  as in the following code?
->=20
-> --- a/net/wireless/rdev-ops.h
-> +++ b/net/wireless/rdev-ops.h
-> @@ -1229,7 +1229,7 @@ rdev_set_mcast_rate(struct=20
-> cfg80211_registered_device *rdev,
->          int ret =3D -ENOTSUPP;
->=20
->          trace_rdev_set_mcast_rate(&rdev->wiphy, dev, mcast_rate);
-> -       if (rdev->ops->set_mcast_rate)
-> +       if (rdev->ops->set_mcast_rate && netif_running(dev))
->                  ret =3D rdev->ops->set_mcast_rate(&rdev->wiphy, dev,=20
->=20
-
-Certainly not. Please don't do random patches without looking at the
-subsystem as a whole. If you don't want to take the time to understand
-how things work in wireless, then better don't send patches at all.
-
-johannes
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
