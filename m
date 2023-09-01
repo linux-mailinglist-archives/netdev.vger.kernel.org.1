@@ -1,167 +1,187 @@
-Return-Path: <netdev+bounces-31729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAC7578FCAF
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 13:53:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A41378FCC2
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 13:58:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95DC8281A19
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 11:53:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06EAB1C20C2B
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 11:58:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 966A1BA4B;
-	Fri,  1 Sep 2023 11:53:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0279AD32;
+	Fri,  1 Sep 2023 11:58:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B3042572
-	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 11:53:38 +0000 (UTC)
-Received: from nbd.name (nbd.name [46.4.11.11])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3455591
-	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 04:53:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
-	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=l+CicTddsXcglclry0G7IFJYJAq+L6P+FuEUiadAHPo=; b=kb1VtxpyJiAtfBYOOmVXHCSFNj
-	fkwKjqH0K2fpNtHv7AU0C9O9tlpdipk1DYk5t+yvY80h1ukuGY8j6jr+8e2Y+mELee2eVQ+0o3rtF
-	c0Ogm+rvovOKSdrW6bANDluRPSTBfPIxnnAOwSiUy7He1z2WWNdnD6/l/pPe2qQ1+3mQ=;
-Received: from p4ff13705.dip0.t-ipconnect.de ([79.241.55.5] helo=nf.local)
-	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <nbd@nbd.name>)
-	id 1qc2iK-00EyVX-Br; Fri, 01 Sep 2023 13:53:24 +0200
-Message-ID: <44ebe3fd-5898-4e48-a642-ee7457c0c032@nbd.name>
-Date: Fri, 1 Sep 2023 13:53:23 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C5112572
+	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 11:58:25 +0000 (UTC)
+Received: from EUR02-AM0-obe.outbound.protection.outlook.com (mail-am0eur02on2089.outbound.protection.outlook.com [40.107.247.89])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F94610E0;
+	Fri,  1 Sep 2023 04:58:18 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=icVKT9T9cgkU8OGO9H+3GNb8mi4Oj2z0p5VnfSxfnop1F/X55aKBd8u43txgono4jS71JDhE2N4oEVioK3NBy+MfruPRvTrHLnOOS86rX1jjJLYFedPOxN0sUc/a8brbr3UIrDexiUGD6B/jgWk26gkL7eT5sv9GbqbxXfBIjDEcr6Sa9ZCw/adl+Ca+e80E0hYQEtAOP0enqXvAsT5HoXEqR7cfUySTfRb6sPyJF9In2BiUFzYp9BNaPqz+qPfpWb0fw1+ZoWnHBMsX83Nzwg7sbQGXPFQP2PbFJHZK9wuxp6ejypasXLbKcPKc8pVyXwKaBOMx9vn9bRqZDBjwwQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=uFH2rC4jo3moEdUxywcQ87zA+pfKhLwSUC9hjOYrz5o=;
+ b=FKVuLGPNOCMho03l5ol0MhpZ2S2yECLuH+wASV7VeXe/4YrEcn6YYgeEKCEhgSdczjdbt9PPadL4I2qimZT/FtFlLswB3O1PH5mjMlEr8QSDG/fRuhtRFE3jHrLVyIYxx0Evc4jYjT/JN6QWsrme4rBWDok0r0FWNCIlZS5MyybEfsMJdAVX5FttvX5IcLBt8+lGzVuBsfA8UwasHU1vdQP2Mu/VmvU4PBzPf2kCYoDUNvRF7Si+txUHZ/tVDkoyu933u1L4RzIrBSW4Cd0+OeO4oTrMUSqgSSp6Y5sDDzqAJ8i+a1jc95Y0u7nxkm3PjNtVYvOdSEn3jYCDOjWsrw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector2-NXP1-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uFH2rC4jo3moEdUxywcQ87zA+pfKhLwSUC9hjOYrz5o=;
+ b=Tf82E4RaesaE5oybn48MZKz1dxw13C06hwjpvLipCXFasN/6Qwa3KI3a7XoBtg1KanA3UE3mUqGjFRZ8rRmkpkl4pb1WbSqWNWFjwPzLEYCgm3DUYCq/B1anKC2U2iCeIIThwi8LzChJqd6HGbxMuabXs5T4CWV8ddOMciSFVnI=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=oss.nxp.com;
+Received: from AM9PR04MB8954.eurprd04.prod.outlook.com (2603:10a6:20b:409::7)
+ by DU2PR04MB8981.eurprd04.prod.outlook.com (2603:10a6:10:2e0::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.23; Fri, 1 Sep
+ 2023 11:58:14 +0000
+Received: from AM9PR04MB8954.eurprd04.prod.outlook.com
+ ([fe80::2545:6d13:5905:bf50]) by AM9PR04MB8954.eurprd04.prod.outlook.com
+ ([fe80::2545:6d13:5905:bf50%5]) with mapi id 15.20.6745.021; Fri, 1 Sep 2023
+ 11:58:14 +0000
+Message-ID: <831bc700-a9a2-7eda-e97b-e1d54dc806f9@oss.nxp.com>
+Date: Fri, 1 Sep 2023 14:58:12 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [RFC net-next v2 5/5] net: phy: nxp-c45-tja11xx: implement
+ mdo_insert_tx_tag
+Content-Language: en-US
+To: Sabrina Dubroca <sd@queasysnail.net>,
+ Radu Pirea <radu-nicolae.pirea@nxp.com>
+Cc: "atenart@kernel.org" <atenart@kernel.org>, "andrew@lunn.ch"
+ <andrew@lunn.ch>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+ "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ Sebastian Tobuschat <sebastian.tobuschat@nxp.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "pabeni@redhat.com" <pabeni@redhat.com>,
+ "richardcochran@gmail.com" <richardcochran@gmail.com>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <20230824091615.191379-1-radu-nicolae.pirea@oss.nxp.com>
+ <20230824091615.191379-6-radu-nicolae.pirea@oss.nxp.com>
+ <ZOx0L722xg5-J_he@hog> <5d42d6c9-2f0c-8913-49ec-50a25860c49f@oss.nxp.com>
+ <ZO8pbtnlOVauabjC@hog>
+ <518c11e9000f895fddb5b3dc4d5b2bf445cf320f.camel@nxp.com>
+ <ZPG35HfRseiv80Pb@hog>
+From: "Radu Pirea (OSS)" <radu-nicolae.pirea@oss.nxp.com>
+In-Reply-To: <ZPG35HfRseiv80Pb@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AS4PR09CA0006.eurprd09.prod.outlook.com
+ (2603:10a6:20b:5e0::16) To AM9PR04MB8954.eurprd04.prod.outlook.com
+ (2603:10a6:20b:409::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: stmmac: Use hrtimer for TX coalescing
-Content-Language: en-US
-To: Vincent Whitchurch <Vincent.Whitchurch@axis.com>,
- "joabreu@synopsys.com" <joabreu@synopsys.com>,
- "kuba@kernel.org" <kuba@kernel.org>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "alexandre.torgue@st.com" <alexandre.torgue@st.com>,
- "peppe.cavallaro@st.com" <peppe.cavallaro@st.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- kernel <kernel@axis.com>
-References: <20201120150208.6838-1-vincent.whitchurch@axis.com>
- <732f3c01-a36f-4c9b-8273-a55aba9094d8@nbd.name>
- <2e1db3c654b4e76c7249e90ecf8fa9d64046cbb8.camel@axis.com>
- <a4ee2e37-6b2f-4cab-aab8-b9c46a7c1334@nbd.name>
- <f3c70b8e345a174817e6a7f38725d958f8193bf1.camel@axis.com>
- <8a2d04f5-7cd8-4b49-b538-c85e3c1caec9@nbd.name>
- <a583c9fae69a4b2db8ddd70ed2c086c11456871a.camel@axis.com>
-From: Felix Fietkau <nbd@nbd.name>
-Autocrypt: addr=nbd@nbd.name; keydata=
- xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
- ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
- Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
- AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
- vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
- wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
- TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
- l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
- dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
- HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
- VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
- CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
- VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
- Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
- DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
- wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
- f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
- aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
- FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
- TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
- GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
- cL98efvrjdstUfTCP2pfetyN
-In-Reply-To: <a583c9fae69a4b2db8ddd70ed2c086c11456871a.camel@axis.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8954:EE_|DU2PR04MB8981:EE_
+X-MS-Office365-Filtering-Correlation-Id: d7a687fd-6f07-4a6f-900d-08dbaae2b8e6
+X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	eo7jpL2QGQa0NaKh2cJgPGCtu7TG/kG0khH5M3bAQIOTI85+jOVkRJYLf8/OdInrjry3zpNDN/SfRzF5edp4xWimF4RGzMXk/JLoG/0JkdOOfjhDEbSi5PgTvP2zKwVjEQWWeK9aXKm/RLxKWJgjwgRzIuNJLn29IVLsxXNevrq0Lr5tEulkzliF+Qlt3imBFnRNoxfPYCt7fxzmD2L3pEP4j+KVyFa/AhJ6lHlYkBEy5kT+Gc1WTE4vriPGP4CmZfs+myCfbGzdMvwVyDt3yLosRKRgnHpJCQaE2srJ95bPosf4YC4AxAv7TYt6azO5LuVDPuaQjzY+NCn5AuiP+sL1nKgfjXEogpx/9GqfMwysDANv4oymySqbnziSkZCVcDnff/xnlFYk8EZuHWIYbugCe9XX5xuIG2K2p1HR3vkgyji4cCjdpGdF5VoNlZ75W6GCiiNH9DAeFPNs1g3kOHuVHlGpDb+eRY2ab2GAvPWa5mqehwyi9smd2p2ANwPkjVKdmU8vzemYjudyKxSRUTd3cFiH/+5bDTLrDlT4QfOpaXHWGp9zl9swHtJPSxhPqKCUcdpTK+1+f6/qO31hgvF8wwE83CqXNZRKxyre/jBeJp6ohflj0+WdCBJ+ASVVVngjLkPYvKh7ilhCf77C3Q==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8954.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(346002)(136003)(366004)(396003)(451199024)(186009)(1800799009)(31686004)(6506007)(6512007)(6486002)(31696002)(86362001)(38100700002)(2616005)(2906002)(4744005)(26005)(966005)(53546011)(478600001)(110136005)(66946007)(8676002)(8936002)(4326008)(5660300002)(7416002)(41300700001)(316002)(66476007)(54906003)(66556008)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?MGhrSGd1a0JSTm9vM3EzQkphRm0rK21pclBTajdReFJRWmVzTG1HeHJpRXZ6?=
+ =?utf-8?B?Y3JaSlpvMjl2UEVkNG53WU1iWXFDVjZCOVMzdU9UdkJmczdsVGs5dVN3aFg3?=
+ =?utf-8?B?MlpXNTV4WnNXWHFaYjVkb0lpRmF4Ti8zQVE3ZFc3WWh3U3FWNW42S0pPVXJ1?=
+ =?utf-8?B?dFpYWWxjS2lsdzVCSjVYclFLdlFvNWk3cTVTVGxnSzBMZnRYVnZjVGJwalBN?=
+ =?utf-8?B?aDNyNTZRTWVlMmZobWU1NUUwSUdPYjFkL096NThRcFZRZmc2TU8vaXl4bDYr?=
+ =?utf-8?B?MFJBTDBXd2MrWXVBdzNRZGUrSHhqS2lsT3ZRUXdJaDFCbGRiRXZENU53RVBr?=
+ =?utf-8?B?OXZQbG9Sc1hHNkUzMzdUNUY1bjhMVmtaNSsyRENpbnlJNFNCNzZCUEY1dllG?=
+ =?utf-8?B?c216ejRsY1hUN29jS1lGWmNKaU9XWDZVWVJJYzJqdkFjVXhORTY0UnFtd3JF?=
+ =?utf-8?B?SVVhQU8rRGF0ZzNRT2Z5WDJ6dGJFeFdYUWNuUHNPRWlPWUJxcHFPeW5WTHk1?=
+ =?utf-8?B?RnFXMUpGUGlsN09Hbk5OV1VKZWl1UnpNTTdRN0UxL1lhcmFwTGlUejhPYUJl?=
+ =?utf-8?B?ZVFRd3I0USt3TkJxZ3pveWxKS2FURUkrNGJGNHN5U2c3MU01VkRRTEEvY3JS?=
+ =?utf-8?B?aERHY2U3U05laTdJRDFnQkRVRXduei9lcE93d0tsQ1BLVmRiNHZ1ZU1rdlhy?=
+ =?utf-8?B?dU1Kc0MwMmZ4ZlUzL3JXTnpWbkNQektQY0pYczVjalV0bVNWdng3d2RudGR1?=
+ =?utf-8?B?ZzM3RjFycjZlb1NpYWNmcjdyOHJDRnJvdXk0WU9aVWNvYWt3b0wyeXJtZERH?=
+ =?utf-8?B?eHVwNnFJaU9QdVRTMlEzNVozV1ZNZ1BKSXYvQ2dHTVZ5dllYajFVQW5nbzdk?=
+ =?utf-8?B?YmI1eHNoS1VzNWpiOVlRTGF1RElqbytPQ1o5SytxeVFXRy94cEFqbXVqS0lp?=
+ =?utf-8?B?ZHZzNVBmRWtIRjRZWVF1VVZyVGVTWkFNMUkrMnNNdCt5cjc5VHpiVDlqeDA3?=
+ =?utf-8?B?VVd6RHZVQ1dRdWIrNUNuSlBrVDJUOUp6Q3FHTFIrRUc0MXVKalQrWUZaaUIr?=
+ =?utf-8?B?anE4RTBtMXJQcUJDL2VMMG4rdTYwM09hNmVRcTJFT3FNYXVXOGYrK2VEbk8v?=
+ =?utf-8?B?bWRIWUdjYVNBOGNtUHNYRm52MVk1Z3JLUElPY2EzeTZQM1oyL20vcXUybzR6?=
+ =?utf-8?B?MlhGWlNzaU5sVXlmVlNGQllSdXdsTFVVdXZMclFkaWNpTmxqSWFKWTN3VUJr?=
+ =?utf-8?B?WkJWclNQRkVvdXhIa1pTRVdvYkRES1pBQ1dZTTE4anZ2bUpRVmQ2TWZDL1RH?=
+ =?utf-8?B?WEcwdWxYSGpuWjE0Q2RIcW16VjRHdGI5Wm5oS1hkaVBpMVFYcGh2SHhEeHlz?=
+ =?utf-8?B?QzRjeU9JK0Y2OStqdDhuQThpQjc5dGJOMjEzQndnZ1Z5NXFJVWhtNzJ5SW1L?=
+ =?utf-8?B?NVorZE1QdHg2TnpFbG0wd2FBOFZrenVPTE51YXdreUtkZXNYWkFMeUt3eW9z?=
+ =?utf-8?B?ZVZPZk1aOTBrdGh1WGFWK2h4NUpGeGdLYXdKdko0Smx2UXhTbFAvM25kMmd1?=
+ =?utf-8?B?V3dDa2xQV3RCU2daTUkzQ2dBU01TTk5WZkNuSlBHMTdteEkzQ2FFMndKeW8z?=
+ =?utf-8?B?STd6Y1pUK2JBejFJMkZwZHdqS01WOHJ2N1VwN3ZHRzhaSlJwcmx5Q3VLTmoy?=
+ =?utf-8?B?YUFkdlVGTFlWN3NId3NtVWxFd0xhT25LbXZVdWNJZnhwblE2ZUYwblA4T1E3?=
+ =?utf-8?B?ZmFyRndyTmZjMXp6dUs5b3pXMTkwNWZQRFZyQWVCbStFU21TR0VVc2p3elVB?=
+ =?utf-8?B?OTJnVnRNamhSRDJieHpTbkcrVWFnaUVKRXhtMzBOajdxRUR5ZEo1eVdKTVlE?=
+ =?utf-8?B?Z3gxVFIxRDBZWlcwYnlSV0F0WmkrakJzYldIckJDUnRReGp2WG8zS3dCVHdQ?=
+ =?utf-8?B?QUw1U0h3TldSZ0dhUTRLOWhweS9EMU5xTXlqelU3OTNTdUVWcHBYQTd5TkVN?=
+ =?utf-8?B?Vm9hOHNRSEJuTDk3MktSV3kzWkVSbGhKaHpzYnZ2ZDRVQVZ4UkhNczljNzlW?=
+ =?utf-8?B?TndLZDJyM2prNExoU2d3eGN3TjYrNjFZbjhaUXovZzI3bzB4dWRaSHkxaUZO?=
+ =?utf-8?B?Y2cwZ09SN0c4MVZaN0JweTRYNlEzaTRPUmpDVmxKTkRJdURzUWN4dnZkY0E0?=
+ =?utf-8?B?eWc9PQ==?=
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d7a687fd-6f07-4a6f-900d-08dbaae2b8e6
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8954.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Sep 2023 11:58:14.7128
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: DKX+6UWmbWop4T+UVhFhRX7WbviSacEQO8pZ+ZWQCq+NsOwUR9V+z6o5B3IIiX5tSZ5hDY6U1PhZupc4840+FaY7/eLarA8Ad5i/EENTKHk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR04MB8981
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 01.09.23 13:31, Vincent Whitchurch wrote:
-> On Wed, 2023-08-30 at 23:06 +0200, Felix Fietkau wrote:
->> On 30.08.23 16:55, Vincent Whitchurch wrote:
->> > I looked at it some more and the continuous postponing behaviour strikes
->> > me as quite odd.  For example, if you set tx-frames coalescing to 0 then
->> > cleanups could happen much later than the specified tx-usecs period, in
->> > the absence of RX traffic.  Also, if we'd have to have a shared
->> > timestamp between the callers of stmmac_tx_timer_arm() and the hrtimer
->> > to preserve this continuous postponing behaviour, then we'd need to
->> > introduce some locking between the timer expiry and those functions, to
->> > avoid race conditions.
->> 
->> I just spent some time digging through the history of the timer code, 
->> figuring out the intention behind the continuous postponing behavior.
->> 
->> It's an interrupt mitigation scheme where DMA descriptors are configured 
->> to only generate a completion event every 25 packets, and the only 
->> purpose of the timer is to avoid keeping packets in the queue for too 
->> long after tx activity has stopped.
->> Based on that design, I believe that the continuous postponing actually 
->> makes sense and the patches that eliminate it are misguided. When there 
->> is constant activity, there will be tx completion interrupts that 
->> trigger cleanup.
+On 01.09.2023 13:07, Sabrina Dubroca wrote:
+...
 > 
-> The tx-frames value (25) can be controlled from user space.  If it is
-> set to zero then the driver should still coalesce interrupts based on
-> the interval specified in the tx-usecs setting, but the driver fails to
-> do so because it keeps postponing the cleanup and increasing the latency
-> of the cleanups far beyond the programmed period.
+>>> And what happens in this case?
+>>>      ip link add link eth0 type macsec offload phy
+>>>      ip link set eth0 down
+>>>      ip macsec add macsec0 rx sci ...
+>>>      ip macsec add macsec0 tx sa 0 ...
+>>>      # etc
+>>>      ip link set eth0 up
+>>>
+>>> Will offload work with the current code?
+>>
+>> (the interface was up before)
+>> [root@alarm ~]# ip link add link end0 macsec0 type macsec encrypt on
+>> offload phy
+>> [root@alarm ~]# ip link set end0 down
+>> [root@alarm ~]# ip macsec add macsec0 rx port 1 address
+>> 00:01:be:be:ef:33
+>> RTNETLINK answers: Operation not supported
 > 
->> That said, I did even more digging and I found out that the timer code 
->> was added at a time when the driver didn't even disable tx and rx 
->> interrupts individually, which means that it could not take advantage of 
->> interrupt mitigation via NAPI scheduling + IRQ disable/enable.
->> 
->> I have a hunch that given the changes made to the driver over time, the 
->> timer based interrupt mitigation strategy might just be completely 
->> useless and actively harmful now. It certainly messes with things like 
->> TSQ and BQL in a nasty way.
->> 
->> I suspect that the best and easiest way to deal with this issue is to 
->> simply rip out all that timer nonsense, rely on tx IRQs entirely and 
->> just let NAPI do its thing.
-> 
-> If you want an interrupt for every packet, you can turn off coalescing
-> by setting tx-frames to 1 and tx-usecs 0.  Currently, the driver does
-> not turn off the timer even if tx-usecs is set to zero, but that is
-> trivially fixed.  With such a fix and that setting, the result is a 30x
-> increase in the number of interrupts in a tx-only test.
-> 
-> And tx-frames 25 tx-usecs 0 is of course also bad for throughput since
-> cleanups will not happen when fewer than 25 frames are transmitted.
-If the CPU is not saturated, the increase in interrupts is expected, 
-given that NAPI doesn't do any timer based mitigation.
+> Where does that EOPNOTSUPP come from? nxp_c45_mdo_add_rxsc from this
+> version of the code can't return that, and macsec_add_rxsc also
+> shouldn't at this point.
 
-I guess for devices operating on battery, the timer based coalescing 
-might conserve some power, unless the power drain caused by the CPU 
-overhead of the timer rescheduling is bigger than the power drain from 
-extra wakeups.
+This is the source of -EOPNOTSUPP
+https://elixir.bootlin.com/linux/latest/source/drivers/net/macsec.c#L1928
 
-For a devices where performance matters more (e.g. the ones used with 
-OpenWrt), I believe that the increase in the number of IRQs won't 
-matter, because mitigation should kick in under load.
-
-Could you please post your fix? I think in order to avoid accidental 
-breakage, we should make tx-usecs=0 imply tx-frames=1.
-
-Thanks,
-
-- Felix
+-- 
+Radu P.
 
