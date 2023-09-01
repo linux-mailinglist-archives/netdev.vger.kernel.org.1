@@ -1,197 +1,102 @@
-Return-Path: <netdev+bounces-31695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46DC178F9EC
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 10:22:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0E0778FA01
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 10:34:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00E09281808
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 08:22:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12434281852
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 08:34:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CBAE8F5F;
-	Fri,  1 Sep 2023 08:22:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B849B3D65;
+	Fri,  1 Sep 2023 08:34:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFC876ABC;
-	Fri,  1 Sep 2023 08:22:24 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 586AC193;
-	Fri,  1 Sep 2023 01:22:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=xTxVa1UAcrjHlVMmFYLml5BtOfYxt3hGcJB8ouNw63o=; b=pNpudNUgAwyIV9mbzxjKnKYdHc
-	fmGj/XA0AveUpMGCPgEbOUAVt/VtPrdpd/Ws6611Wf3nvI/x9Xhji7Er6N5vjaBnhWxRBU9PYf0ob
-	rAOJZ5t7jOC2sU8H5xuFrOpRTvfVf4bC3oSHvipOLu3obwGnsql4ZC9HotqpJP3oloUjyTTbY9hTS
-	bK9UE85zpv5EyleODtrSfFTo8CGIP97NzHxhnuTeH55FOHBEjtukQ1M/33uaCxokzItR4OPTyu3v3
-	CB9IdoC7f5EQg/C/Ig6WOnhPafE5kI4HJqFkHEOFRGJZ7i2kXr/RDmpqm0cDhiO3it+P7tDpHR4uF
-	P5sRgJsA==;
-Received: from sslproxy01.your-server.de ([78.46.139.224])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qbzPx-000KpU-1o; Fri, 01 Sep 2023 10:22:13 +0200
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy01.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qbzPx-000Ate-5f; Fri, 01 Sep 2023 10:22:13 +0200
-Subject: Re: [PATCH bpf-next v2] selftests/bpf: fix a CI failure caused by
- vsock write
-To: Xu Kuohai <xukuohai@huaweicloud.com>, bpf@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: Bobby Eshleman <bobby.eshleman@bytedance.com>
-References: <20230901031037.3314007-1-xukuohai@huaweicloud.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <485647ed-e791-0781-afed-03c2d636a00b@iogearbox.net>
-Date: Fri, 1 Sep 2023 10:22:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA6921FCE
+	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 08:34:45 +0000 (UTC)
+X-Greylist: delayed 386 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 01 Sep 2023 01:34:43 PDT
+Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CBC5E54;
+	Fri,  1 Sep 2023 01:34:43 -0700 (PDT)
+Received: from 4d92782a4194.home.arpa (unknown [124.16.138.129])
+	by APP-05 (Coremail) with SMTP id zQCowAD3EAiMoPFkMvj9CA--.33451S2;
+	Fri, 01 Sep 2023 16:27:56 +0800 (CST)
+From: Jiasheng Jiang <jiasheng@iscas.ac.cn>
+To: mailhol.vincent@wanadoo.fr,
+	wg@grandegger.com,
+	mkl@pengutronix.de,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	arunachalam.santhanam@in.bosch.com
+Cc: linux-can@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jiasheng Jiang <jiasheng@iscas.ac.cn>
+Subject: [PATCH] can: etas_es58x: Add check for alloc_can_err_skb
+Date: Fri,  1 Sep 2023 16:27:55 +0800
+Message-Id: <20230901082755.27104-1-jiasheng@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20230901031037.3314007-1-xukuohai@huaweicloud.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.8/27017/Thu Aug 31 09:40:48 2023)
-X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQCowAD3EAiMoPFkMvj9CA--.33451S2
+X-Coremail-Antispam: 1UD129KBjvdXoW7Xw1kZr4xtF48Cr1UJry3twb_yoWfJwb_C3
+	9avry7WF1UCryDK3WDuFnFqryYyr1DZrWxWwsYvFn8JrWUAr1xJr1jvFs3CrnrWFWS9FZ8
+	XwnFyFs8u3y09jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbsAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
+	Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s
+	1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0
+	cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8Jw
+	ACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka
+	0xkIwI1lc2xSY4AK67AK6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r
+	4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF
+	67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2I
+	x0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2
+	z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnU
+	UI43ZEXa7VUjNJ55UUUUU==
+X-Originating-IP: [124.16.138.129]
+X-CM-SenderInfo: pmld2xxhqjqxpvfd2hldfou0/
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 9/1/23 5:10 AM, Xu Kuohai wrote:
-> From: Xu Kuohai <xukuohai@huawei.com>
-> 
-> While commit 90f0074cd9f9 ("selftests/bpf: fix a CI failure caused by vsock sockmap test")
-> fixes a receive failure of vsock sockmap test, there is still a write failure:
-> 
-> Error: #211/79 sockmap_listen/sockmap VSOCK test_vsock_redir
-> Error: #211/79 sockmap_listen/sockmap VSOCK test_vsock_redir
->    ./test_progs:vsock_unix_redir_connectible:1501: egress: write: Transport endpoint is not connected
->    vsock_unix_redir_connectible:FAIL:1501
->    ./test_progs:vsock_unix_redir_connectible:1501: ingress: write: Transport endpoint is not connected
->    vsock_unix_redir_connectible:FAIL:1501
->    ./test_progs:vsock_unix_redir_connectible:1501: egress: write: Transport endpoint is not connected
->    vsock_unix_redir_connectible:FAIL:1501
-> 
-> The reason is that the vsock connection in the test is set to ESTABLISHED state
-> by function virtio_transport_recv_pkt, which is executed in a workqueue thread,
-> so when the user space test thread runs before the workqueue thread, this
-> problem occurs.
-> 
-> To fix it, before writing the connection, wait for it to be connected.
-> 
-> Fixes: d61bd8c1fd02 ("selftests/bpf: add a test case for vsock sockmap")
-> Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
-> ---
-> v1->v2: initialize esize to sizeof(eval) to avoid getsockopt() reading
-> uninitialized value
-> ---
->   .../bpf/prog_tests/sockmap_helpers.h          | 29 +++++++++++++++++++
->   .../selftests/bpf/prog_tests/sockmap_listen.c |  5 ++++
->   2 files changed, 34 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_helpers.h b/tools/testing/selftests/bpf/prog_tests/sockmap_helpers.h
-> index d12665490a90..abd13d96d392 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/sockmap_helpers.h
-> +++ b/tools/testing/selftests/bpf/prog_tests/sockmap_helpers.h
-> @@ -179,6 +179,35 @@
->   		__ret;                                                         \
->   	})
->   
-> +static inline int poll_connect(int fd, unsigned int timeout_sec)
-> +{
-> +	struct timeval timeout = { .tv_sec = timeout_sec };
-> +	fd_set wfds;
-> +	int r;
-> +	int eval;
-> +	socklen_t esize = sizeof(eval);
-> +
-> +	FD_ZERO(&wfds);
-> +	FD_SET(fd, &wfds);
-> +
-> +	r = select(fd + 1, NULL, &wfds, NULL, &timeout);
-> +	if (r == 0)
-> +		errno = ETIME;
-> +
-> +	if (r != 1)
-> +		return -1;
-> +
-> +	if (getsockopt(fd, SOL_SOCKET, SO_ERROR, &eval, &esize) < 0)
-> +		return -1;
-> +
-> +	if (eval != 0) {
-> +		errno = eval;
-> +		return -1;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->   static inline int poll_read(int fd, unsigned int timeout_sec)
->   {
->   	struct timeval timeout = { .tv_sec = timeout_sec };
-> diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c b/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
-> index 5674a9d0cacf..2d3bf38677b6 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
-> @@ -1452,6 +1452,11 @@ static int vsock_socketpair_connectible(int sotype, int *v0, int *v1)
->   	if (p < 0)
->   		goto close_cli;
->   
-> +	if (poll_connect(c, IO_TIMEOUT_SEC) < 0) {
-> +		FAIL_ERRNO("poll_connect");
-> +		goto close_cli;
-> +	}
-> +
->   	*v0 = p;
->   	*v1 = c;
->   
-> 
+Add check for the return value of alloc_can_err_skb in order to
+avoid NULL pointer dereference.
 
-Should the error path rather be ?
+Fixes: 8537257874e9 ("can: etas_es58x: add core support for ETAS ES58X CAN USB interfaces")
+Signed-off-by: Jiasheng Jiang <jiasheng@iscas.ac.cn>
+---
+ drivers/net/can/usb/etas_es58x/es58x_core.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c b/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
-index 2d3bf38677b6..8df8cbb447f1 100644
---- a/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
-+++ b/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
-@@ -1454,7 +1454,7 @@ static int vsock_socketpair_connectible(int sotype, int *v0, int *v1)
+diff --git a/drivers/net/can/usb/etas_es58x/es58x_core.c b/drivers/net/can/usb/etas_es58x/es58x_core.c
+index 0c7f7505632c..d694cb22d9f4 100644
+--- a/drivers/net/can/usb/etas_es58x/es58x_core.c
++++ b/drivers/net/can/usb/etas_es58x/es58x_core.c
+@@ -680,6 +680,8 @@ int es58x_rx_err_msg(struct net_device *netdev, enum es58x_err error,
+ 	}
+ 
+ 	skb = alloc_can_err_skb(netdev, &cf);
++	if (!skb)
++		return -ENOMEM;
+ 
+ 	switch (error) {
+ 	case ES58X_ERR_OK:	/* 0: No error */
+-- 
+2.25.1
 
-         if (poll_connect(c, IO_TIMEOUT_SEC) < 0) {
-                 FAIL_ERRNO("poll_connect");
--               goto close_cli;
-+               goto close_acc;
-         }
-
-         *v0 = p;
-@@ -1462,6 +1462,8 @@ static int vsock_socketpair_connectible(int sotype, int *v0, int *v1)
-
-         return 0;
-
-+close_acc:
-+       close(p);
-  close_cli:
-         close(c);
-  close_srv:
-
-
-Let me know and I'll squash this into the fix.
-
-Anyway, BPF CI went through fine, only the ongoing panic left to be fixed after that.
-
-Thanks,
-Daniel
 
