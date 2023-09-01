@@ -1,113 +1,115 @@
-Return-Path: <netdev+bounces-31674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1047D78F7B2
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 06:53:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B533178F7BF
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 07:00:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E467281756
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 04:53:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32D88281764
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 05:00:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6E6C1C3E;
-	Fri,  1 Sep 2023 04:53:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A96E71FA5;
+	Fri,  1 Sep 2023 05:00:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D81F31386
-	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 04:53:46 +0000 (UTC)
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DEA9E7E
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 21:53:45 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qbw9w-0006Kk-Pq; Fri, 01 Sep 2023 06:53:28 +0200
-Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qbw9t-0034i8-Hc; Fri, 01 Sep 2023 06:53:25 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qbw9t-00GOeB-0W;
-	Fri, 01 Sep 2023 06:53:25 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	Russell King <linux@armlinux.org.uk>,
-	netdev@vger.kernel.org,
-	Lukasz Majewski <lukma@denx.de>
-Subject: [PATCH net v2 1/1] net: phy: micrel: Correct bit assignments for phy_device flags
-Date: Fri,  1 Sep 2023 06:53:23 +0200
-Message-Id: <20230901045323.3907976-1-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93D3515B5
+	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 05:00:01 +0000 (UTC)
+Received: from smtp.smtpout.orange.fr (smtp-21.smtpout.orange.fr [80.12.242.21])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3519BE7F
+	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 21:59:59 -0700 (PDT)
+Received: from [192.168.1.18] ([86.243.2.178])
+	by smtp.orange.fr with ESMTPA
+	id bwGBqGDKD7HAObwGBqnc61; Fri, 01 Sep 2023 06:59:57 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1693544397;
+	bh=tv6B7Fos2siGTtUU4mG/KuNAe/GWDCgVkJ/VsTHCG7M=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=HmBpTMjKbHox0amol/pxmlk8yX8lwqZPFvDcxNt9aA1ulkmt4fsL788UCbxgxwa5r
+	 UbVitixu7ZMfs8WwkFY+Som0NqzBU3DNdthWNkGG7M6ZUxzePYV3n/qOZ/D3ccNYop
+	 YUJhUbhM4zz2A97BmZhQQ1KDatoiETeIDYTlAsv8nApTBvJAPmr3TFf2P65mHQGUC0
+	 wu0bQL2Cll1o9luByjPLxvFTpM47CstgJCZwkHKlTTyDMbcDh+leV731TIbjEmiRTk
+	 TAW5msQdQWjxTy5jsiuwY4Lh9/jZHNNCrln95KbpB9YatqY0Si78bKUwIZCO3+L1GB
+	 iAOpuhfmjoSrw==
+X-ME-Helo: [192.168.1.18]
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Fri, 01 Sep 2023 06:59:57 +0200
+X-ME-IP: 86.243.2.178
+Message-ID: <58b1e635-f31a-8c76-b704-a707bd11d460@wanadoo.fr>
+Date: Fri, 1 Sep 2023 06:59:54 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: =?UTF-8?Q?Re=3a_=5bPATCH=5d_ceph/decode=3a_Remove_unnecessary_?=
+ =?UTF-8?B?4oCYMOKAmSB2YWx1ZXMgZnJvbSByZXQ=?=
+To: Li kunyu <kunyu@nfschina.com>, idryomov@gmail.com, xiubli@redhat.com,
+ jlayton@kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com
+Cc: ceph-devel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20230902201112.4401-1-kunyu__5722.10796396888$1693539625$gmane$org@nfschina.com>
+Content-Language: fr, en-GB
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <20230902201112.4401-1-kunyu__5722.10796396888$1693539625$gmane$org@nfschina.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Previously, the defines for phy_device flags in the Micrel driver were
-ambiguous in their representation. They were intended to be bit masks
-but were mistakenly defined as bit positions. This led to the following
-issues:
+Le 01/09/2023 à 05:40, Li kunyu a écrit :
+> ret is assigned first, so it does not need to initialize the
+> assignment.
+> Bad is not used and can be removed.
+> 
+> Signed-off-by: Li kunyu <kunyu@nfschina.com>
+> ---
+>   net/ceph/decode.c | 5 ++---
+>   1 file changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/ceph/decode.c b/net/ceph/decode.c
+> index bc109a1a4616..9f5f095d8235 100644
+> --- a/net/ceph/decode.c
+> +++ b/net/ceph/decode.c
+> @@ -50,7 +50,7 @@ static int
+>   ceph_decode_entity_addr_legacy(void **p, void *end,
+>   			       struct ceph_entity_addr *addr)
+>   {
+> -	int ret = -EINVAL;
+> +	int ret = 0;
+>   
+>   	/* Skip rest of type field */
+>   	ceph_decode_skip_n(p, end, 3, bad);
+> @@ -66,8 +66,7 @@ ceph_decode_entity_addr_legacy(void **p, void *end,
+>   			      sizeof(addr->in_addr), bad);
+>   	addr->in_addr.ss_family =
+>   			be16_to_cpu((__force __be16)addr->in_addr.ss_family);
+> -	ret = 0;
+> -bad:
+> +
+>   	return ret;
+>   }
+>   
 
-- MICREL_KSZ8_P1_ERRATA, designated for KSZ88xx switches, overlapped
-  with MICREL_PHY_FXEN and MICREL_PHY_50MHZ_CLK.
-- Due to this overlap, the code path for MICREL_PHY_FXEN, tailored for
-  the KSZ8041 PHY, was not executed for KSZ88xx PHYs.
-- Similarly, the code associated with MICREL_PHY_50MHZ_CLK wasn't
-  triggered for KSZ88xx.
+This patch is wrong.
+Look how the ceph_decode_skip_n() macro, for example, is expended.
+You'll see that 'bad' is needed.
 
-To rectify this, all three flags have now been explicitly converted to
-use the `BIT()` macro, ensuring they are defined as bit masks and
-preventing potential overlaps in the future.
+I think that your patch was not compile tested.
 
-Fixes: 49011e0c1555 ("net: phy: micrel: ksz886x/ksz8081: add cabletest support")
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
- include/linux/micrel_phy.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Please do not send patch that are not at least compile tested. Even when 
+it looks obvious.
 
-diff --git a/include/linux/micrel_phy.h b/include/linux/micrel_phy.h
-index 8bef1ab62bba3..322d872559847 100644
---- a/include/linux/micrel_phy.h
-+++ b/include/linux/micrel_phy.h
-@@ -41,9 +41,9 @@
- #define	PHY_ID_KSZ9477		0x00221631
- 
- /* struct phy_device dev_flags definitions */
--#define MICREL_PHY_50MHZ_CLK	0x00000001
--#define MICREL_PHY_FXEN		0x00000002
--#define MICREL_KSZ8_P1_ERRATA	0x00000003
-+#define MICREL_PHY_50MHZ_CLK	BIT(0)
-+#define MICREL_PHY_FXEN		BIT(1)
-+#define MICREL_KSZ8_P1_ERRATA	BIT(2)
- 
- #define MICREL_KSZ9021_EXTREG_CTRL	0xB
- #define MICREL_KSZ9021_EXTREG_DATA_WRITE	0xC
--- 
-2.39.2
-
+CJ
 
