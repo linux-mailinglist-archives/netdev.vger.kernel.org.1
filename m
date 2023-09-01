@@ -1,89 +1,127 @@
-Return-Path: <netdev+bounces-31677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D9B378F827
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 07:47:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B2C6D78F86B
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 08:12:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3570A1C20B5B
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 05:47:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 963201C20B45
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 06:12:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C08143D82;
-	Fri,  1 Sep 2023 05:47:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3152E5237;
+	Fri,  1 Sep 2023 06:12:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B20323FD4
-	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 05:47:00 +0000 (UTC)
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::224])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 813EAE50;
-	Thu, 31 Aug 2023 22:46:55 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPA id C8080E0003;
-	Fri,  1 Sep 2023 05:46:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 232395235
+	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 06:12:54 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BC8610DD;
+	Thu, 31 Aug 2023 23:12:49 -0700 (PDT)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.55])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RcSKJ2PhvzNmrb;
+	Fri,  1 Sep 2023 14:09:08 +0800 (CST)
+Received: from [10.174.178.66] (10.174.178.66) by
+ dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Fri, 1 Sep 2023 14:12:46 +0800
+Message-ID: <e6ae95f1-ec41-7fb4-6124-6cabd7133d26@huawei.com>
+Date: Fri, 1 Sep 2023 14:12:36 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Thu, 31 Aug 2023 22:46:49 -0700
-From: Joao Moreira <joao@overdrivepizza.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: pablo@netfilter.org, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kadlec@netfilter.org, fw@strlen.de,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- rkannoth@marvell.com, wojciech.drewek@intel.com,
- steen.hegenlund@microhip.com, keescook@chromium.org, Joao Moreira
- <joao.moreira@intel.com>
-Subject: Re: [PATCH 0/2] Prevent potential write out of bounds
-In-Reply-To: <20230831182800.25e5d4d9@kernel.org>
-References: <20230901010437.126631-1-joao@overdrivepizza.com>
- <20230831182800.25e5d4d9@kernel.org>
-Message-ID: <00d4a104c17d92562f03042c31ea664b@overdrivepizza.com>
-X-Sender: joao@overdrivepizza.com
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.2
+Subject: Re: [PATCH net,v2] wifi: mac80211: fix WARNING in
+ ieee80211_link_info_change_notify()
+To: Kalle Valo <kvalo@kernel.org>
+CC: <linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<johannes@sipsolutions.net>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <weiyongjun1@huawei.com>,
+	<yuehaibing@huawei.com>
+References: <20230901035301.3473463-1-shaozhengchao@huawei.com>
+ <871qfitsm5.fsf@kernel.org>
+From: shaozhengchao <shaozhengchao@huawei.com>
+In-Reply-To: <871qfitsm5.fsf@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-GND-Sasl: joao@overdrivepizza.com
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Originating-IP: [10.174.178.66]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023-08-31 18:28, Jakub Kicinski wrote:
-> On Thu, 31 Aug 2023 18:04:35 -0700 joao@overdrivepizza.com wrote:
->> The function flow_rule_alloc in net/core/flow_offload.c [2] gets an
->> unsigned int num_actions (line 10) and later traverses the actions in
->> the rule (line 24) setting hw.stats to FLOW_ACTION_HW_STATS_DONT_CARE.
->> 
->> Within the same file, the loop in the line 24 compares a signed int
->> (i) to an unsigned int (num_actions), and then uses i as an array
->> index. If an integer overflow happens, then the array within the loop
->> is wrongly indexed, causing a write out of bounds.
->> 
->> After checking with maintainers, it seems that the front-end caps the
->> maximum value of num_action, thus it is not possible to reach the 
->> given
->> write out of bounds, yet, still, to prevent disasters it is better to
->> fix the signedness here.
+
+
+On 2023/9/1 12:38, Kalle Valo wrote:
+> Zhengchao Shao <shaozhengchao@huawei.com> writes:
 > 
-> How did you find this? The commit messages should include info
-> about how the issue was discovered.
+>> Syz reports the following WARNING:
+>> wlan0: Failed check-sdata-in-driver check, flags: 0x0
+>> WARNING: CPU: 3 PID: 5384 at net/mac80211/main.c:287
+>> ieee80211_link_info_change_notify+0x1c2/0x230
+>> Modules linked in:
+>> RIP: 0010:ieee80211_link_info_change_notify+0x1c2/0x230
+>> Call Trace:
+>> <TASK>
+>> ieee80211_set_mcast_rate+0x3e/0x50
+>> nl80211_set_mcast_rate+0x316/0x650
+>> genl_family_rcv_msg_doit+0x20b/0x300
+>> genl_rcv_msg+0x39f/0x6a0
+>> netlink_rcv_skb+0x13b/0x3b0
+>> genl_rcv+0x24/0x40
+>> netlink_unicast+0x4a2/0x740
+>> netlink_sendmsg+0x83e/0xce0
+>> sock_sendmsg+0xc5/0x100
+>> ____sys_sendmsg+0x583/0x690
+>> ___sys_sendmsg+0xe8/0x160
+>> __sys_sendmsg+0xbf/0x160
+>> do_syscall_64+0x35/0x80
+>> entry_SYSCALL_64_after_hwframe+0x46/0xb0
+>> </TASK>
+>>
+>> The execution process is as follows:
+>> Thread A:
+>> ieee80211_open()
+>>      ieee80211_do_open()
+>>          drv_add_interface()     //set IEEE80211_SDATA_IN_DRIVER flag
+>> ...
+>> rtnl_newlink
+>>      do_setlink
+>> 	dev_change_flags
+>>              ...
+>>              __dev_close_many
+>>                  ieee80211_stop()
+>>                      ieee80211_do_stop()
+>>                          drv_remove_interface() //clear flag
+>> ...
+>> nl80211_set_mcast_rate()
+>>      ieee80211_set_mcast_rate()
+>>          ieee80211_link_info_change_notify()
+>>              check_sdata_in_driver() //WARNING because flag is cleared
+>>
+>> When the wlan device stops, the IEEE80211_SDATA_IN_ DRIVER flag is cleared.
+>> And then after the set mcast rate command is executed, WARNING is generated
+>> because the flag bit has been already cleared.
+>>
+>> Fixes: 591e73ee3f73 ("wifi: mac80211: properly skip link info driver update")
+>> Reported-by: syzbot+bce2ca140cc00578ed07@syzkaller.appspotmail.com
+>> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+> 
+> Wireless patches (ie. anything which starts with "wifi:") go to wireless
+> and wireless-next trees, not to net tree.
+> 
+	Thank you for your reminder. I'll pay attention next time.
 
-Sure, I'll wait a bit longer for more suggestions and add the info in a 
-next patch version.
-
-Meanwhile, fwiiw, I stumbled on the bug when I was reading Nick 
-Gregory's write-up on CVE-2022-25636 [1], which happens nearby but is 
-not exactly this issue.
-
-Tks,
-Joao
-
-[1] - https://nickgregory.me/post/2022/03/12/cve-2022-25636/
+Zhengchao Shao
 
