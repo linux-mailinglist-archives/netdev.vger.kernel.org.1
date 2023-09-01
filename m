@@ -1,45 +1,53 @@
-Return-Path: <netdev+bounces-31675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31676-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B533178F7BF
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 07:00:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EA97A78F7F9
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 07:21:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32D88281764
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 05:00:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A26B28176D
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 05:21:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A96E71FA5;
-	Fri,  1 Sep 2023 05:00:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4378F20F1;
+	Fri,  1 Sep 2023 05:21:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93D3515B5
-	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 05:00:01 +0000 (UTC)
-Received: from smtp.smtpout.orange.fr (smtp-21.smtpout.orange.fr [80.12.242.21])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3519BE7F
-	for <netdev@vger.kernel.org>; Thu, 31 Aug 2023 21:59:59 -0700 (PDT)
-Received: from [192.168.1.18] ([86.243.2.178])
-	by smtp.orange.fr with ESMTPA
-	id bwGBqGDKD7HAObwGBqnc61; Fri, 01 Sep 2023 06:59:57 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1693544397;
-	bh=tv6B7Fos2siGTtUU4mG/KuNAe/GWDCgVkJ/VsTHCG7M=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=HmBpTMjKbHox0amol/pxmlk8yX8lwqZPFvDcxNt9aA1ulkmt4fsL788UCbxgxwa5r
-	 UbVitixu7ZMfs8WwkFY+Som0NqzBU3DNdthWNkGG7M6ZUxzePYV3n/qOZ/D3ccNYop
-	 YUJhUbhM4zz2A97BmZhQQ1KDatoiETeIDYTlAsv8nApTBvJAPmr3TFf2P65mHQGUC0
-	 wu0bQL2Cll1o9luByjPLxvFTpM47CstgJCZwkHKlTTyDMbcDh+leV731TIbjEmiRTk
-	 TAW5msQdQWjxTy5jsiuwY4Lh9/jZHNNCrln95KbpB9YatqY0Si78bKUwIZCO3+L1GB
-	 iAOpuhfmjoSrw==
-X-ME-Helo: [192.168.1.18]
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Fri, 01 Sep 2023 06:59:57 +0200
-X-ME-IP: 86.243.2.178
-Message-ID: <58b1e635-f31a-8c76-b704-a707bd11d460@wanadoo.fr>
-Date: Fri, 1 Sep 2023 06:59:54 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 351941FA5
+	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 05:21:28 +0000 (UTC)
+Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1077E7E;
+	Thu, 31 Aug 2023 22:21:25 -0700 (PDT)
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 3815L8sO110355;
+	Fri, 1 Sep 2023 00:21:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1693545668;
+	bh=J0hVox480wdeTLrybfvYeJEAE1VGg4oiahSoZh+Hb9U=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=hrRuoQZst2kYRNwCjN5sb5qw4DMiOSIrTraRLJz2CxQ09VrKV8uXChLNHuU6nESFR
+	 7WNWIHBJP9SSgWwWv0tWZqgZDCgVJ1k3nQxFZbmM8Zvr6YLEPDWrC+vEIGTvB1pGRq
+	 snrj9k7P3FBEMUkUT1cpp/ctGzEuOZqozt5ejpzE=
+Received: from DFLE115.ent.ti.com (dfle115.ent.ti.com [10.64.6.36])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 3815L8vX020444
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Fri, 1 Sep 2023 00:21:08 -0500
+Received: from DFLE107.ent.ti.com (10.64.6.28) by DFLE115.ent.ti.com
+ (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 1
+ Sep 2023 00:21:08 -0500
+Received: from lelv0326.itg.ti.com (10.180.67.84) by DFLE107.ent.ti.com
+ (10.64.6.28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Fri, 1 Sep 2023 00:21:08 -0500
+Received: from [172.24.227.217] (ileaxei01-snat2.itg.ti.com [10.180.69.6])
+	by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 3815L2Kl028289;
+	Fri, 1 Sep 2023 00:21:03 -0500
+Message-ID: <90669794-2fc1-bff1-104b-cf1daa2e9998@ti.com>
+Date: Fri, 1 Sep 2023 10:51:02 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,68 +56,113 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.13.0
-Subject: =?UTF-8?Q?Re=3a_=5bPATCH=5d_ceph/decode=3a_Remove_unnecessary_?=
- =?UTF-8?B?4oCYMOKAmSB2YWx1ZXMgZnJvbSByZXQ=?=
-To: Li kunyu <kunyu@nfschina.com>, idryomov@gmail.com, xiubli@redhat.com,
- jlayton@kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
-Cc: ceph-devel@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20230902201112.4401-1-kunyu__5722.10796396888$1693539625$gmane$org@nfschina.com>
-Content-Language: fr, en-GB
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <20230902201112.4401-1-kunyu__5722.10796396888$1693539625$gmane$org@nfschina.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Subject: Re: [RFC PATCH net-next 1/2] dt-bindings: net: Add documentation for
+ Half duplex support.
+Content-Language: en-US
+To: Rob Herring <robh@kernel.org>, MD Danish Anwar <danishanwar@ti.com>
+CC: Andrew Lunn <andrew@lunn.ch>, Vignesh Raghavendra <vigneshr@ti.com>,
+        Roger
+ Quadros <rogerq@kernel.org>,
+        Jacob Keller <jacob.e.keller@intel.com>,
+        Simon
+ Horman <horms@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
+        Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+        Eric Dumazet
+	<edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <srk@ti.com>, <r-gunasekaran@ti.com>
+References: <20230830113134.1226970-1-danishanwar@ti.com>
+ <20230830113134.1226970-2-danishanwar@ti.com>
+ <20230831181636.GA2484338-robh@kernel.org>
+From: Md Danish Anwar <a0501179@ti.com>
+Organization: Texas Instruments
+In-Reply-To: <20230831181636.GA2484338-robh@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Le 01/09/2023 à 05:40, Li kunyu a écrit :
-> ret is assigned first, so it does not need to initialize the
-> assignment.
-> Bad is not used and can be removed.
+Hi Rob,
+
+On 31/08/23 11:46 pm, Rob Herring wrote:
+> On Wed, Aug 30, 2023 at 05:01:33PM +0530, MD Danish Anwar wrote:
+>> In order to support half-duplex operation at 10M and 100M link speeds, the
+>> PHY collision detection signal (COL) should be routed to ICSSG
+>> GPIO pin (PRGx_PRU0/1_GPI10) so that firmware can detect collision signal
+>> and apply the CSMA/CD algorithm applicable for half duplex operation. A DT
+>> property, "ti,half-duplex-capable" is introduced for this purpose. If
+>> board has PHY COL pin conencted to PRGx_PRU1_GPIO10, this DT property can
+>> be added to eth node of ICSSG, MII port to support half duplex operation at
+>> that port.
 > 
-> Signed-off-by: Li kunyu <kunyu@nfschina.com>
-> ---
->   net/ceph/decode.c | 5 ++---
->   1 file changed, 2 insertions(+), 3 deletions(-)
+> I take it the GPIO here is not visble to the OS and that's why it's not 
+> described in DT?
+>  
+
+Yes the GPIO here is not visible in the OS and we need to indicate whether the
+PHY COL signal is routed to PRGx_PRU0/1_GPI10 pin or not by setting the
+property "ti,half-duplex-capable" as true.
+
+>>
+>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+>> ---
+>>  Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml | 7 +++++++
+>>  1 file changed, 7 insertions(+)
+>>
+>> diff --git a/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml b/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
+>> index 13371159515a..59da9aeaee7e 100644
+>> --- a/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
+>> +++ b/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
+>> @@ -107,6 +107,13 @@ properties:
+>>                phandle to system controller node and register offset
+>>                to ICSSG control register for RGMII transmit delay
+>>  
+>> +          ti,half-duplex-capable:
 > 
-> diff --git a/net/ceph/decode.c b/net/ceph/decode.c
-> index bc109a1a4616..9f5f095d8235 100644
-> --- a/net/ceph/decode.c
-> +++ b/net/ceph/decode.c
-> @@ -50,7 +50,7 @@ static int
->   ceph_decode_entity_addr_legacy(void **p, void *end,
->   			       struct ceph_entity_addr *addr)
->   {
-> -	int ret = -EINVAL;
-> +	int ret = 0;
->   
->   	/* Skip rest of type field */
->   	ceph_decode_skip_n(p, end, 3, bad);
-> @@ -66,8 +66,7 @@ ceph_decode_entity_addr_legacy(void **p, void *end,
->   			      sizeof(addr->in_addr), bad);
->   	addr->in_addr.ss_family =
->   			be16_to_cpu((__force __be16)addr->in_addr.ss_family);
-> -	ret = 0;
-> -bad:
-> +
->   	return ret;
->   }
->   
+> capable or...
+> 
+>> +            type: boolean
+>> +            description:
+>> +              Enable half duplex operation on ICSSG MII port. This requires
+> 
+> enable the mode?
+> 
 
-This patch is wrong.
-Look how the ceph_decode_skip_n() macro, for example, is expended.
-You'll see that 'bad' is needed.
+I think capable is good here. The property "ti,half-duplex-capable" indicates
+that the board is capable of half duplex operation. This doesn't necessarily
+means we have to enable the half duplex mode. The user can modify the duplex
+settings from ethtool and enable / disable is controlled by the user. This
+property basically let's the driver know that it can support half duplex
+operations and when user enables half duplex mode through ethtool, the driver
+can do the necessary configurations.
 
-I think that your patch was not compile tested.
+When this property is false, half duplex is not supported. If user still wants
+to change the duplex mode, it will get an error saying half duplex is not
+supported.
 
-Please do not send patch that are not at least compile tested. Even when 
-it looks obvious.
+So the property "ti,half-duplex-capable" let's the driver know whether half
+duplex is supported or not. Enable / disable is controlled by user through ethtool.
 
-CJ
+> Maybe too late if it's already been assumed not supported, but shouldn't 
+> supporting half duplex be the default? I guess half duplex isn't too 
+> common any more.
+> 
+
+Unfortunately ICSSG doesn't support half duplex by default. Routing the PHY COL
+signal is necessary.
+
+> Rob
+
+-- 
+Thanks and Regards,
+Danish.
 
