@@ -1,81 +1,85 @@
-Return-Path: <netdev+bounces-31660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44DCB78F6D6
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 03:50:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F7C178F6DD
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 03:51:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8273C28172A
-	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 01:50:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 274F91C20B2B
+	for <lists+netdev@lfdr.de>; Fri,  1 Sep 2023 01:51:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78B451381;
-	Fri,  1 Sep 2023 01:50:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E201710E3;
+	Fri,  1 Sep 2023 01:51:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BB4A1380;
-	Fri,  1 Sep 2023 01:50:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 799B5C433C7;
-	Fri,  1 Sep 2023 01:50:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693533024;
-	bh=abgTGUCEeaZ9uKG6QhHUQjpxwm4Oc0NH3M0GDgPU/Pc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fQrCv09/GsaXvrVqnQCcCAsu9W+FTkTLnUUNn2TzHtDgi5aHUijnDZgz+yvGdzpqA
-	 X7fS8lSZ+OJwxnTKGVy1waCk+3a2P3WgOpOLePH23ksfSFgil0V98h8wINkMNgwwS2
-	 ds1rIYjki77l/nvXVG7cNYohtLG1KH9LxLqhUGvaP62hgP18dq70LRpTy5PERiS6ot
-	 9eCbPnt4C8W53MUrwa1Ce5PrZ7yTrFJnmhhzNlz+O1YM3AmcWELVJJvAQYN4CcFwma
-	 VH5/NRqNk+xxXv0x972zsjy97WOzgliUSjxD0XwgkxR+bitcAYxRtv7VxLfVOJYvXA
-	 WXEFv+WXQSRjQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5E569E29F32;
-	Fri,  1 Sep 2023 01:50:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4EB11842
+	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 01:51:30 +0000 (UTC)
+Received: from mail.nfschina.com (unknown [42.101.60.195])
+	by lindbergh.monkeyblade.net (Postfix) with SMTP id 939D310F2;
+	Thu, 31 Aug 2023 18:51:11 -0700 (PDT)
+Received: from localhost.localdomain (unknown [219.141.250.2])
+	by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPA id 0628260338E84;
+	Fri,  1 Sep 2023 09:51:07 +0800 (CST)
+X-MD-Sfrom: zeming@nfschina.com
+X-MD-SrcIP: 219.141.250.2
+From: Li zeming <zeming@nfschina.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Li zeming <zeming@nfschina.com>
+Subject: [PATCH] =?UTF-8?q?net/socket:=20Remove=20unnecessary=20=E2=80=980?= =?UTF-8?q?=E2=80=99=20values=20from=20used?=
+Date: Sun,  3 Sep 2023 02:22:28 +0800
+Message-Id: <20230902182228.3124-1-zeming@nfschina.com>
+X-Mailer: git-send-email 2.18.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: bpf 2023-08-31
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169353302438.22154.13522542058191626119.git-patchwork-notify@kernel.org>
-Date: Fri, 01 Sep 2023 01:50:24 +0000
-References: <20230831210019.14417-1-daniel@iogearbox.net>
-In-Reply-To: <20230831210019.14417-1-daniel@iogearbox.net>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
- netdev@vger.kernel.org, bpf@vger.kernel.org
+X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,DATE_IN_FUTURE_24_48,
+	RDNS_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+used is assigned first, so it does not need to initialize the
+assignment.
 
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Signed-off-by: Li zeming <zeming@nfschina.com>
+---
+ net/socket.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On Thu, 31 Aug 2023 23:00:19 +0200 you wrote:
-> Hi David, hi Jakub, hi Paolo, hi Eric,
-> 
-> The following pull-request contains BPF updates for your *net* tree.
-> 
-> We've added 15 non-merge commits during the last 3 day(s) which contain
-> a total of 17 files changed, 468 insertions(+), 97 deletions(-).
-> 
-> [...]
-
-Here is the summary with links:
-  - pull-request: bpf 2023-08-31
-    https://git.kernel.org/netdev/net/c/ddaa935d33fc
-
-You are awesome, thank you!
+diff --git a/net/socket.c b/net/socket.c
+index 2b0e54b2405c..743e54eba06f 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -569,12 +569,12 @@ static ssize_t sockfs_listxattr(struct dentry *dentry, char *buffer,
+ 				size_t size)
+ {
+ 	ssize_t len;
+-	ssize_t used = 0;
++	ssize_t used;
+ 
+ 	len = security_inode_listsecurity(d_inode(dentry), buffer, size);
+ 	if (len < 0)
+ 		return len;
+-	used += len;
++	used = len;
+ 	if (buffer) {
+ 		if (size < used)
+ 			return -ERANGE;
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.18.2
 
 
