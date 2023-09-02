@@ -1,134 +1,155 @@
-Return-Path: <netdev+bounces-31809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69F637904BB
-	for <lists+netdev@lfdr.de>; Sat,  2 Sep 2023 04:14:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA7D579054F
+	for <lists+netdev@lfdr.de>; Sat,  2 Sep 2023 07:46:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 731A82819C9
-	for <lists+netdev@lfdr.de>; Sat,  2 Sep 2023 02:14:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E46602819B5
+	for <lists+netdev@lfdr.de>; Sat,  2 Sep 2023 05:46:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AD8017CF;
-	Sat,  2 Sep 2023 02:14:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E03961FA0;
+	Sat,  2 Sep 2023 05:46:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F99E17C8
-	for <netdev@vger.kernel.org>; Sat,  2 Sep 2023 02:14:30 +0000 (UTC)
-X-Greylist: delayed 425 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 01 Sep 2023 19:14:29 PDT
-Received: from dispatch1-us1.ppe-hosted.com (dispatch1-us1.ppe-hosted.com [148.163.129.49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59A5610D4;
-	Fri,  1 Sep 2023 19:14:29 -0700 (PDT)
-Received: from dispatch1-us1.ppe-hosted.com (ip6-localhost [127.0.0.1])
-	by dispatch1-us1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTP id 9D74428A7FA;
-	Sat,  2 Sep 2023 02:07:26 +0000 (UTC)
-X-Virus-Scanned: Proofpoint Essentials engine
-Received: from mail3.candelatech.com (mail2.candelatech.com [208.74.158.173])
-	by mx1-us1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTP id 14EC0240065;
-	Sat,  2 Sep 2023 02:07:22 +0000 (UTC)
-Received: from [192.168.1.115] (unknown [98.97.112.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by mail3.candelatech.com (Postfix) with ESMTPSA id E9C3C13C2B0;
-	Fri,  1 Sep 2023 19:07:19 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail3.candelatech.com E9C3C13C2B0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=candelatech.com;
-	s=default; t=1693620440;
-	bh=bi6uwElLHhc456DM9ev5TQVN6E6OFpFw2o7Hsols/pw=;
-	h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
-	b=dXeuGkGJM25J4DAeHUo5+h6fLueI5ECbTdm/l7y4m6DVysFinv42LsfE7jwfKM1OL
-	 bj8C9vwPjm78cJRKViYyp0BFxpXVsZn5gCT/2a5Urd/HA0GbQnmClz3JtD4Mb0m65S
-	 iHrt+aVaRC1s7XnkLuWmYiIJlvXcNN9rvKwbzNwc=
-Subject: Re: Fwd: RCU indicates stalls with iwlwifi, causing boot failures
-To: Bagas Sanjaya <bagasdotme@gmail.com>,
- Lai Jiangshan <laijs@linux.alibaba.com>,
- "Paul E. McKenney" <paulmck@kernel.org>,
- Gregory Greenman <gregory.greenman@intel.com>,
- Dave Hansen <dave.hansen@linux.intel.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Networking <netdev@vger.kernel.org>,
- Linux Wireless <linux-wireless@vger.kernel.org>,
- Linux RCU <rcu@vger.kernel.org>
-References: <c1caa7c1-b2c6-aac5-54ab-8bcc6e139ca8@gmail.com>
-From: Ben Greear <greearb@candelatech.com>
-Organization: Candela Technologies
-Message-ID: <c3f9b35c-087d-0e34-c251-e249f2c058d3@candelatech.com>
-Date: Fri, 1 Sep 2023 19:07:19 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC931C2B
+	for <netdev@vger.kernel.org>; Sat,  2 Sep 2023 05:46:01 +0000 (UTC)
+Received: from 1wt.eu (ded1.1wt.eu [163.172.96.212])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id B97B492
+	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 22:45:58 -0700 (PDT)
+Received: (from willy@localhost)
+	by pcw.home.local (8.15.2/8.15.2/Submit) id 3825jMGP023000;
+	Sat, 2 Sep 2023 07:45:22 +0200
+Date: Sat, 2 Sep 2023 07:45:22 +0200
+From: Willy Tarreau <w@1wt.eu>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
+        syzkaller <syzkaller@googlegroups.com>
+Subject: Re: [PATCH v1 net 1/4] af_unix: Fix data-races around
+ user->unix_inflight.
+Message-ID: <20230902054522.GA22948@1wt.eu>
+References: <20230902002708.91816-1-kuniyu@amazon.com>
+ <20230902002708.91816-2-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <c1caa7c1-b2c6-aac5-54ab-8bcc6e139ca8@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-MW
-Content-Transfer-Encoding: 7bit
-X-MDID: 1693620443-Y9iIohaJ-lN4
-X-MDID-O:
- us5;ut7;1693620443;Y9iIohaJ-lN4;<greearb@candelatech.com>;b8d401048faafe507750f80ed9fd0903
-X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230902002708.91816-2-kuniyu@amazon.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 9/1/23 5:29 PM, Bagas Sanjaya wrote:
-> Hi,
-> 
-> I notice a bug report on Bugzilla [1]. Quoting from it:
+Hi,
 
-Try booting with pcie=noaer ?
-
-That fixes only known iwlwifi bug we have found in 6.5, but we are also using mostly
-backports iwlwifi driver...
-
-Thanks,
-Ben
-
+On Fri, Sep 01, 2023 at 05:27:05PM -0700, Kuniyuki Iwashima wrote:
+> user->unix_inflight is changed under spin_lock(unix_gc_lock),
+> but too_many_unix_fds() reads it locklessly.
 > 
->> I'm seeing RCU warnings in Linus's current tree (like 87dfd85c38923acd9517e8df4afc908565df0961) that come from RCU:
->>
->> WARNING: CPU: 0 PID: 0 at kernel/rcu/tree_exp.h:787 rcu_exp_handler+0x35/0xe0
->>
->> But they *ONLY* occur on a system with a newer iwlwifi device:
->>
->> aa:00.0 Network controller: Intel Corporation Wi-Fi 6 AX210/AX211/AX411 160MHz (rev 1a)
->>
->> and never in a VM or on an older device (like an 8260).  During a bisect the only seem to occur with the "83" version of the firmware.
->>
->> iwlwifi 0000:aa:00.0: loaded firmware version 83.e8f84e98.0 ty-a0-gf-a0-83.ucode op_mode iwlmvm
->>
->> The first warning gets spit out within a millisecond of the last printk() from the iwlwifi driver.  They eventually result in a big spew of RCU messages like this:
->>
->> [   27.124796] rcu: INFO: rcu_preempt detected expedited stalls on CPUs/tasks: { 0-...D } 125 jiffies s: 193 root: 0x1/.
->> [   27.126466] rcu: blocking rcu_node structures (internal RCU debug):
->> [   27.128114] Sending NMI from CPU 3 to CPUs 0:
->> [   27.128122] NMI backtrace for cpu 0 skipped: idling at intel_idle+0x5f/0xb0
->> [   27.159757] loop30: detected capacity change from 0 to 8
->> [   27.204967] rcu: INFO: rcu_preempt detected expedited stalls on CPUs/tasks: { 0-...D } 145 jiffies s: 193 root: 0x1/.
->> [   27.206353] rcu: blocking rcu_node structures (internal RCU debug):
->> [   27.207751] Sending NMI from CPU 3 to CPUs 0:
->> [   27.207825] NMI backtrace for cpu 0 skipped: idling at intel_idle+0x5f/0xb0
->>
->> I usually see them at boot.  In that case, they usually hang the system and keep it from booting.  I've also encountered them at reboots and also seen them *not* be fatal at boot.  I suspect it has to do with which CPU gets wedged.
+> Let's annotate the write/read accesses to user->unix_inflight.
 > 
-> See Bugzilla for the full thread and attached full dmesg output.
+> BUG: KCSAN: data-race in unix_attach_fds / unix_inflight
 > 
-> Thanks.
+> write to 0xffffffff8546f2d0 of 8 bytes by task 44798 on cpu 1:
+>  unix_inflight+0x157/0x180 net/unix/scm.c:66
+>  unix_attach_fds+0x147/0x1e0 net/unix/scm.c:123
+>  unix_scm_to_skb net/unix/af_unix.c:1827 [inline]
+>  unix_dgram_sendmsg+0x46a/0x14f0 net/unix/af_unix.c:1950
+>  unix_seqpacket_sendmsg net/unix/af_unix.c:2308 [inline]
+>  unix_seqpacket_sendmsg+0xba/0x130 net/unix/af_unix.c:2292
+>  sock_sendmsg_nosec net/socket.c:725 [inline]
+>  sock_sendmsg+0x148/0x160 net/socket.c:748
+>  ____sys_sendmsg+0x4e4/0x610 net/socket.c:2494
+>  ___sys_sendmsg+0xc6/0x140 net/socket.c:2548
+>  __sys_sendmsg+0x94/0x140 net/socket.c:2577
+>  __do_sys_sendmsg net/socket.c:2586 [inline]
+>  __se_sys_sendmsg net/socket.c:2584 [inline]
+>  __x64_sys_sendmsg+0x45/0x50 net/socket.c:2584
+>  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+>  do_syscall_64+0x3b/0x90 arch/x86/entry/common.c:80
+>  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
 > 
-> [1]: https://bugzilla.kernel.org/show_bug.cgi?id=217856
+> read to 0xffffffff8546f2d0 of 8 bytes by task 44814 on cpu 0:
+>  too_many_unix_fds net/unix/scm.c:101 [inline]
+>  unix_attach_fds+0x54/0x1e0 net/unix/scm.c:110
+>  unix_scm_to_skb net/unix/af_unix.c:1827 [inline]
+>  unix_dgram_sendmsg+0x46a/0x14f0 net/unix/af_unix.c:1950
+>  unix_seqpacket_sendmsg net/unix/af_unix.c:2308 [inline]
+>  unix_seqpacket_sendmsg+0xba/0x130 net/unix/af_unix.c:2292
+>  sock_sendmsg_nosec net/socket.c:725 [inline]
+>  sock_sendmsg+0x148/0x160 net/socket.c:748
+>  ____sys_sendmsg+0x4e4/0x610 net/socket.c:2494
+>  ___sys_sendmsg+0xc6/0x140 net/socket.c:2548
+>  __sys_sendmsg+0x94/0x140 net/socket.c:2577
+>  __do_sys_sendmsg net/socket.c:2586 [inline]
+>  __se_sys_sendmsg net/socket.c:2584 [inline]
+>  __x64_sys_sendmsg+0x45/0x50 net/socket.c:2584
+>  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+>  do_syscall_64+0x3b/0x90 arch/x86/entry/common.c:80
+>  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
 > 
+> value changed: 0x000000000000000c -> 0x000000000000000d
+> 
+> Reported by Kernel Concurrency Sanitizer on:
+> CPU: 0 PID: 44814 Comm: systemd-coredum Not tainted 6.4.0-11989-g6843306689af #6
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
+> 
+> Fixes: 712f4aad406b ("unix: properly account for FDs passed over unix sockets")
+> Reported-by: syzkaller <syzkaller@googlegroups.com>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> ---
+> Cc: Willy Tarreau <w@1wt.eu>
+> ---
+>  net/unix/scm.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/unix/scm.c b/net/unix/scm.c
+> index e9dde7176c8a..6ff628f2349f 100644
+> --- a/net/unix/scm.c
+> +++ b/net/unix/scm.c
+> @@ -64,7 +64,7 @@ void unix_inflight(struct user_struct *user, struct file *fp)
+>  		/* Paired with READ_ONCE() in wait_for_unix_gc() */
+>  		WRITE_ONCE(unix_tot_inflight, unix_tot_inflight + 1);
+>  	}
+> -	user->unix_inflight++;
+> +	WRITE_ONCE(user->unix_inflight, user->unix_inflight + 1);
+>  	spin_unlock(&unix_gc_lock);
+>  }
+>  
+> @@ -85,7 +85,7 @@ void unix_notinflight(struct user_struct *user, struct file *fp)
+>  		/* Paired with READ_ONCE() in wait_for_unix_gc() */
+>  		WRITE_ONCE(unix_tot_inflight, unix_tot_inflight - 1);
+>  	}
+> -	user->unix_inflight--;
+> +	WRITE_ONCE(user->unix_inflight, user->unix_inflight - 1);
+>  	spin_unlock(&unix_gc_lock);
+>  }
+>  
+> @@ -99,7 +99,7 @@ static inline bool too_many_unix_fds(struct task_struct *p)
+>  {
+>  	struct user_struct *user = current_user();
+>  
+> -	if (unlikely(user->unix_inflight > task_rlimit(p, RLIMIT_NOFILE)))
+> +	if (unlikely(READ_ONCE(user->unix_inflight) > task_rlimit(p, RLIMIT_NOFILE)))
+>  		return !capable(CAP_SYS_RESOURCE) && !capable(CAP_SYS_ADMIN);
+>  	return false;
+>  }
 
+Looks good to me, thanks!
+Acked-by: Willy Tarreau <w@1wt.eu>
 
--- 
-Ben Greear <greearb@candelatech.com>
-Candela Technologies Inc  http://www.candelatech.com
+Willy
 
