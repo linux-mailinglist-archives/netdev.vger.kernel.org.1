@@ -1,115 +1,134 @@
-Return-Path: <netdev+bounces-31834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB7377908CE
-	for <lists+netdev@lfdr.de>; Sat,  2 Sep 2023 19:07:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8ADF97908E1
+	for <lists+netdev@lfdr.de>; Sat,  2 Sep 2023 19:28:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E21111C20750
-	for <lists+netdev@lfdr.de>; Sat,  2 Sep 2023 17:07:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66FB91C20866
+	for <lists+netdev@lfdr.de>; Sat,  2 Sep 2023 17:28:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C39C0A92A;
-	Sat,  2 Sep 2023 17:07:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CB2AA945;
+	Sat,  2 Sep 2023 17:28:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3CA88830
-	for <netdev@vger.kernel.org>; Sat,  2 Sep 2023 17:07:34 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2F37E58
-	for <netdev@vger.kernel.org>; Sat,  2 Sep 2023 10:07:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1693674451;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=lrrM2Y/zZF7w803gWmPyZ7A2zLr5CJoErzGeQi8Jcu8=;
-	b=CENVSP3gx8gu02pKidLru8Y1Tf2KQzhJGEvw6YdqAr/ZhDNv3QG6Exj3xn8e8rOnubDPRL
-	Ef85dppakZgSt26UUzPRX5S81zWuqXv4CATmWfE0hGV6Q/rYqQNyJJJirFX7KW5sRY/qj1
-	RUsZYi2Mlt2eDje3baBf2po4OduDgfs=
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
- [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-615-g_iVRWziO7-baV8TLG8gWg-1; Sat, 02 Sep 2023 13:07:30 -0400
-X-MC-Unique: g_iVRWziO7-baV8TLG8gWg-1
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-1c097e8a175so909265ad.3
-        for <netdev@vger.kernel.org>; Sat, 02 Sep 2023 10:07:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 328873C1E;
+	Sat,  2 Sep 2023 17:28:34 +0000 (UTC)
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDF8EA4;
+	Sat,  2 Sep 2023 10:28:33 -0700 (PDT)
+Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-52bcd4db4c0so246834a12.0;
+        Sat, 02 Sep 2023 10:28:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693675711; x=1694280511; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7IaXdsjn5RYlEEBpoyNU0z5sLpOD8WZpjwwpazlMpBw=;
+        b=KLMGaxDuiBNCaeQ/0jcYOVQ+++nkre029lGe0YLlVSmUkGk/WxaXSUrhAVvodYZwyl
+         aX32FjR4SuTh2j9folV5CHG7rk5JZfze0gc/My6kQhXGeoH17siFS7jh5xphsWWwkz5H
+         YpyMK7azi+HcH8WpRef72W2uXOH2a4t/CgVnuwnVSEP/MYCdWT6Bzf2LPobTbY8Doijl
+         hlfZiHZGyVu+vBTp4xV/rPMrMEVdidmBi8cp7+qDUHkk16n2+vkGMJZAhC8H3fwZ/c5F
+         alAlVhJaS1sqnA76HkNUYvsv9Ik+CQ4glF5IctBXkO8dRPVKwvcRgJ71JKqqq/4VOKNE
+         tFXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693674449; x=1694279249;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lrrM2Y/zZF7w803gWmPyZ7A2zLr5CJoErzGeQi8Jcu8=;
-        b=j2SG8AdnZeceS2HJmHO1VKo8OqX1gBLaxL3fgg4JZKGPMPWsSd40ET9Hz98ba+5M0W
-         wSL1Fe85uOnKmqG2Ba1R0JJmpWt2kQcwn07BdroGzCmJRxYCRlVXuWJEyGwfX6gn2OEj
-         UhNz6jW+J5YzKmncjwc1le+yb48W3D3q4jlLGGaxCo/pZ28/lGwI3bOH5YK5qGylT9Bw
-         ysc2sw4vfn7RAP7ITmFlPNrg8GkF8fCnFF3sNhcuZHDwU3oHGm6q5MQSpE2zx+/+7v1s
-         YGyGbttswxckAATKndSdgWeVMah67cqwOXYixsDN5aAzpa2IJSdO+O70mhzBM4moLmDV
-         1ifg==
-X-Gm-Message-State: AOJu0Yy5FSDy2/r03USe/vNWMQOPnGsNSJIc+dIUVVZbjvlv/aCxqkiq
-	/0rmiQveHR7D7STbBKW7LzWz/Dcc3l+gs1EUo+t7cROibbfWy/xuZYZGIqU3XD8hE/z3bTfAhwE
-	5H+aVu2pW3YgiKK5D
-X-Received: by 2002:a17:902:c209:b0:1b8:6850:c3c4 with SMTP id 9-20020a170902c20900b001b86850c3c4mr5299031pll.22.1693674449283;
-        Sat, 02 Sep 2023 10:07:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGuy1UPUdxrNCdMmJkPvNypnCa/jr3jSd4rwfJxeJe9vwdZGPIw7NzRd5+fBKpBjT71d9P+Ew==
-X-Received: by 2002:a17:902:c209:b0:1b8:6850:c3c4 with SMTP id 9-20020a170902c20900b001b86850c3c4mr5299022pll.22.1693674448968;
-        Sat, 02 Sep 2023 10:07:28 -0700 (PDT)
-Received: from kernel-devel.local ([240d:1a:c0d:9f00:245e:16ff:fe87:c960])
-        by smtp.gmail.com with ESMTPSA id ji5-20020a170903324500b001b9dadf8bd2sm4870370plb.190.2023.09.02.10.07.27
+        d=1e100.net; s=20221208; t=1693675711; x=1694280511;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7IaXdsjn5RYlEEBpoyNU0z5sLpOD8WZpjwwpazlMpBw=;
+        b=lZe6U7r/Ra009KeaUpXyYYJVSi+PKmqufCTflXZWU8V9Z27IBTGSTtcgBODFPvIfSy
+         xNLFvfg3rM0f+YJ8Dq5OJbZVK4Vqht1ySmTK7uyTwmG5XyCNFPDEWwvsB18YfPxmq14/
+         gz5Mr1QZmGPT74k+r1tAHKyzCgCM0knl6H9q0LBzY+sBTGb3GaNKEJlVL96tRGbmjiwG
+         9ERX6jt5goTWCtRQCIDPQPvlgpZ2aDwybRCuTa7uA98rHm3YpfgjTVK16egqu1OdsliT
+         rp+W0l/RedJ0GItyeG/svwM16mc/MfQi7YAAlBH2BaKYqahozIIVuEcO5PlkQFS+nq3Q
+         5DRQ==
+X-Gm-Message-State: AOJu0Yyglv96nDK0EzztWz0ZYsNwwKdL4I1f0uXgj5pb6uQeHP4E3w+t
+	YlorkXl5hWVqx38frNFv3LXqvXZ4CWI=
+X-Google-Smtp-Source: AGHT+IGSCYAgXxnVOzQIZjYP5KzsSF5/VEt6SWa7WO48xvXSfS0cphv1h1+GSZPNfXi7oZq8s52/yQ==
+X-Received: by 2002:a05:6402:2684:b0:52b:db44:79e3 with SMTP id w4-20020a056402268400b0052bdb4479e3mr10303419edd.4.1693675711237;
+        Sat, 02 Sep 2023 10:28:31 -0700 (PDT)
+Received: from krava ([83.240.63.222])
+        by smtp.gmail.com with ESMTPSA id n13-20020a05640206cd00b0052a1a623267sm3599085edy.62.2023.09.02.10.28.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 Sep 2023 10:07:28 -0700 (PDT)
-From: Shigeru Yoshida <syoshida@redhat.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Shigeru Yoshida <syoshida@redhat.com>
-Subject: [PATCH net] kcm: Destroy mutex in kcm_exit_net()
-Date: Sun,  3 Sep 2023 02:07:08 +0900
-Message-ID: <20230902170708.1727999-1-syoshida@redhat.com>
-X-Mailer: git-send-email 2.41.0
+        Sat, 02 Sep 2023 10:28:30 -0700 (PDT)
+From: Jiri Olsa <olsajiri@gmail.com>
+X-Google-Original-From: Jiri Olsa <jolsa@kernel.org>
+Date: Sat, 2 Sep 2023 19:28:28 +0200
+To: Eduard Zingerman <eddyz87@gmail.com>
+Cc: Jiri Olsa <olsajiri@gmail.com>,
+	John Fastabend <john.fastabend@gmail.com>, xukuohai@huawei.com,
+	edumazet@google.com, cong.wang@bytedance.com, bpf@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH bpf] bpf: sockmap, fix skb refcnt race after locking
+ changes
+Message-ID: <ZPNwvO8ViqLD3MmX@krava>
+References: <20230901202137.214666-1-john.fastabend@gmail.com>
+ <ZPJVlLXB/mggaLh5@krava>
+ <d8ba77cfeff26a8d52ef05d1bae43b5ceffd1b83.camel@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d8ba77cfeff26a8d52ef05d1bae43b5ceffd1b83.camel@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-kcm_exit_net() should call mutex_destroy() on knet->mutex. This is especially
-needed if CONFIG_DEBUG_MUTEXES is enabled.
+On Sat, Sep 02, 2023 at 12:24:01AM +0300, Eduard Zingerman wrote:
 
-Fixes: ab7ac4eb9832 ("kcm: Kernel Connection Multiplexor module")
-Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
----
- net/kcm/kcmsock.c | 2 ++
- 1 file changed, 2 insertions(+)
+SNIP
 
-diff --git a/net/kcm/kcmsock.c b/net/kcm/kcmsock.c
-index 393f01b2a7e6..4580f61426bb 100644
---- a/net/kcm/kcmsock.c
-+++ b/net/kcm/kcmsock.c
-@@ -1859,6 +1859,8 @@ static __net_exit void kcm_exit_net(struct net *net)
- 	 * that all multiplexors and psocks have been destroyed.
- 	 */
- 	WARN_ON(!list_empty(&knet->mux_list));
-+
-+	mutex_destroy(&knet->mutex);
- }
- 
- static struct pernet_operations kcm_net_ops = {
--- 
-2.41.0
+> > >  static void sk_psock_skb_state(struct sk_psock *psock,
+> > > @@ -685,9 +691,7 @@ static void sk_psock_backlog(struct work_struct *work)
+> > >  		} while (len);
+> > >  
+> > >  		skb = skb_dequeue(&psock->ingress_skb);
+> > > -		if (!ingress) {
+> > > -			kfree_skb(skb);
+> > > -		}
+> > > +		kfree_skb(skb);
+> > >  	}
+> > >  end:
+> > >  	mutex_unlock(&psock->work_mutex);
+> > > -- 
+> > > 2.33.0
+> > > 
+> > 
+> > there's no crash wit with fix, but I noticed I occasionally get FAIL
+> > 
+> 
+> Please note this patch:
+> https://lore.kernel.org/bpf/20230901031037.3314007-1-xukuohai@huaweicloud.com/
+> Which should fix the test in question.
 
+ah right it does, thanks
+
+Tested-by: Jiri Olsa <jolsa@kernel.org>
+
+jirka
+
+> 
+> > #212/78  sockmap_listen/sockmap Unix test_unix_redir:OK
+> > ./test_progs:vsock_unix_redir_connectible:1501: ingress: write: Transport endpoint is not connected
+> > vsock_unix_redir_connectible:FAIL:1501
+> > ./test_progs:vsock_unix_redir_connectible:1501: egress: write: Transport endpoint is not connected
+> > vsock_unix_redir_connectible:FAIL:1501
+> > #212/79  sockmap_listen/sockmap VSOCK test_vsock_redir:FAIL
+> > #212/80  sockmap_listen/sockhash IPv4 TCP test_insert_invalid:OK
+> > 
+> > no idea if it's related
+> > 
+> > jirka
+> 
 
