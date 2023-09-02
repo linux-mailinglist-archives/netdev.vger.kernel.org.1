@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-31833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6D9F7908BE
-	for <lists+netdev@lfdr.de>; Sat,  2 Sep 2023 18:52:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB7377908CE
+	for <lists+netdev@lfdr.de>; Sat,  2 Sep 2023 19:07:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC6F1281666
-	for <lists+netdev@lfdr.de>; Sat,  2 Sep 2023 16:52:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E21111C20750
+	for <lists+netdev@lfdr.de>; Sat,  2 Sep 2023 17:07:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D79B48F50;
-	Sat,  2 Sep 2023 16:52:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C39C0A92A;
+	Sat,  2 Sep 2023 17:07:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F0E3C1E
-	for <netdev@vger.kernel.org>; Sat,  2 Sep 2023 16:52:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3CA88830
+	for <netdev@vger.kernel.org>; Sat,  2 Sep 2023 17:07:34 +0000 (UTC)
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2922E42
-	for <netdev@vger.kernel.org>; Sat,  2 Sep 2023 09:52:28 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2F37E58
+	for <netdev@vger.kernel.org>; Sat,  2 Sep 2023 10:07:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1693673547;
+	s=mimecast20190719; t=1693674451;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=tZnuggjXiPxxrN0LJKuKy2l1BGtNDFo8WO5oMG65CzU=;
-	b=GQsbTVyB0iGLohSVJRmqCbVNttqO9sQAAfMna8hiY3Ocw8A2tux/y/hAeCZ/QUZFIJR/7n
-	obPWala1CtD80pj9Ubk3IpRyzbQ6QkVtnr/IyxngKTjWQQ16T+hLfpuC7IJHOhfW0TR0Tq
-	R2v5CjI1qbynwvDG58Us5yDk4Y3t1P4=
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
- [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=lrrM2Y/zZF7w803gWmPyZ7A2zLr5CJoErzGeQi8Jcu8=;
+	b=CENVSP3gx8gu02pKidLru8Y1Tf2KQzhJGEvw6YdqAr/ZhDNv3QG6Exj3xn8e8rOnubDPRL
+	Ef85dppakZgSt26UUzPRX5S81zWuqXv4CATmWfE0hGV6Q/rYqQNyJJJirFX7KW5sRY/qj1
+	RUsZYi2Mlt2eDje3baBf2po4OduDgfs=
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
+ [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-629-NYyVYgm4PSiDuASt1TVtGA-1; Sat, 02 Sep 2023 12:52:26 -0400
-X-MC-Unique: NYyVYgm4PSiDuASt1TVtGA-1
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-56f75ec7ca9so56134a12.3
-        for <netdev@vger.kernel.org>; Sat, 02 Sep 2023 09:52:25 -0700 (PDT)
+ us-mta-615-g_iVRWziO7-baV8TLG8gWg-1; Sat, 02 Sep 2023 13:07:30 -0400
+X-MC-Unique: g_iVRWziO7-baV8TLG8gWg-1
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-1c097e8a175so909265ad.3
+        for <netdev@vger.kernel.org>; Sat, 02 Sep 2023 10:07:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693673545; x=1694278345;
+        d=1e100.net; s=20221208; t=1693674449; x=1694279249;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=tZnuggjXiPxxrN0LJKuKy2l1BGtNDFo8WO5oMG65CzU=;
-        b=OAW91aSUyCYY4KT1ZEi1HWP4m0bUzC5weGFLsRN/EdW7yPlvJkxiOEcls8N46i6zco
-         LxEdTsVsAhdluTAdj9/TKQla1WFRN7iA0vyhShzjRcxr2/S8vmz696+ok+zyhVyLOY+c
-         Sf9z0blOCVGhPlQWpbqW1ouNk17NerE4RuZXAOPuTPpUvdhZOdWP7Jzwpw5peoYj3hpT
-         igMVD7ansOl1VkWEXrt7z7QjpzJw20/UO0EAndhVBTO1+1X7eurZs5jUqywKtQIAsDEW
-         ZjtYvbVqddW3HsTdj6BammIHkraTGJgM5WYNrajlU2E+t9ztTxui1PcOF/PSk554PgJQ
-         czaQ==
-X-Gm-Message-State: AOJu0YxyLamqRuZ/nF0jO1YipJuaT6CJndn1eM5NbTDjhIj7mvaqmWMy
-	GfVSKyjr6lCT8GeFt+AYeVfzzQfYzUPEe83cT8kU7+LehVO+cEu1AaEXWIitsNBunU38ECvX4uj
-	3otMeKSEmziCQb8eM
-X-Received: by 2002:a05:6a20:728e:b0:149:7fea:d88e with SMTP id o14-20020a056a20728e00b001497fead88emr7866468pzk.24.1693673544982;
-        Sat, 02 Sep 2023 09:52:24 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFAAbHUxNQwq8p+UPawwfWP3/BHApDvAuwx7oX4BXx18Uo4sD3lzf4FxsnqstM/GwwZl3J+Hg==
-X-Received: by 2002:a05:6a20:728e:b0:149:7fea:d88e with SMTP id o14-20020a056a20728e00b001497fead88emr7866454pzk.24.1693673544724;
-        Sat, 02 Sep 2023 09:52:24 -0700 (PDT)
+        bh=lrrM2Y/zZF7w803gWmPyZ7A2zLr5CJoErzGeQi8Jcu8=;
+        b=j2SG8AdnZeceS2HJmHO1VKo8OqX1gBLaxL3fgg4JZKGPMPWsSd40ET9Hz98ba+5M0W
+         wSL1Fe85uOnKmqG2Ba1R0JJmpWt2kQcwn07BdroGzCmJRxYCRlVXuWJEyGwfX6gn2OEj
+         UhNz6jW+J5YzKmncjwc1le+yb48W3D3q4jlLGGaxCo/pZ28/lGwI3bOH5YK5qGylT9Bw
+         ysc2sw4vfn7RAP7ITmFlPNrg8GkF8fCnFF3sNhcuZHDwU3oHGm6q5MQSpE2zx+/+7v1s
+         YGyGbttswxckAATKndSdgWeVMah67cqwOXYixsDN5aAzpa2IJSdO+O70mhzBM4moLmDV
+         1ifg==
+X-Gm-Message-State: AOJu0Yy5FSDy2/r03USe/vNWMQOPnGsNSJIc+dIUVVZbjvlv/aCxqkiq
+	/0rmiQveHR7D7STbBKW7LzWz/Dcc3l+gs1EUo+t7cROibbfWy/xuZYZGIqU3XD8hE/z3bTfAhwE
+	5H+aVu2pW3YgiKK5D
+X-Received: by 2002:a17:902:c209:b0:1b8:6850:c3c4 with SMTP id 9-20020a170902c20900b001b86850c3c4mr5299031pll.22.1693674449283;
+        Sat, 02 Sep 2023 10:07:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGuy1UPUdxrNCdMmJkPvNypnCa/jr3jSd4rwfJxeJe9vwdZGPIw7NzRd5+fBKpBjT71d9P+Ew==
+X-Received: by 2002:a17:902:c209:b0:1b8:6850:c3c4 with SMTP id 9-20020a170902c20900b001b86850c3c4mr5299022pll.22.1693674448968;
+        Sat, 02 Sep 2023 10:07:28 -0700 (PDT)
 Received: from kernel-devel.local ([240d:1a:c0d:9f00:245e:16ff:fe87:c960])
-        by smtp.gmail.com with ESMTPSA id t29-20020a63955d000000b0056a36ac322dsm4828323pgn.4.2023.09.02.09.52.22
+        by smtp.gmail.com with ESMTPSA id ji5-20020a170903324500b001b9dadf8bd2sm4870370plb.190.2023.09.02.10.07.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 Sep 2023 09:52:24 -0700 (PDT)
+        Sat, 02 Sep 2023 10:07:28 -0700 (PDT)
 From: Shigeru Yoshida <syoshida@redhat.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -68,11 +68,10 @@ To: davem@davemloft.net,
 	pabeni@redhat.com
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Shigeru Yoshida <syoshida@redhat.com>,
-	syzbot+6f98de741f7dbbfc4ccb@syzkaller.appspotmail.com
-Subject: [PATCH net] kcm: Fix memory leak in error path of kcm_sendmsg()
-Date: Sun,  3 Sep 2023 01:52:16 +0900
-Message-ID: <20230902165216.1721082-1-syoshida@redhat.com>
+	Shigeru Yoshida <syoshida@redhat.com>
+Subject: [PATCH net] kcm: Destroy mutex in kcm_exit_net()
+Date: Sun,  3 Sep 2023 02:07:08 +0900
+Message-ID: <20230902170708.1727999-1-syoshida@redhat.com>
 X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -88,34 +87,9 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-syzbot reported a memory leak like below [1]:
+kcm_exit_net() should call mutex_destroy() on knet->mutex. This is especially
+needed if CONFIG_DEBUG_MUTEXES is enabled.
 
-BUG: memory leak
-unreferenced object 0xffff88810b088c00 (size 240):
-  comm "syz-executor186", pid 5012, jiffies 4294943306 (age 13.680s)
-  hex dump (first 32 bytes):
-    00 89 08 0b 81 88 ff ff 00 00 00 00 00 00 00 00  ................
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace:
-    [<ffffffff83e5d5ff>] __alloc_skb+0x1ef/0x230 net/core/skbuff.c:634
-    [<ffffffff84606e59>] alloc_skb include/linux/skbuff.h:1289 [inline]
-    [<ffffffff84606e59>] kcm_sendmsg+0x269/0x1050 net/kcm/kcmsock.c:815
-    [<ffffffff83e479c6>] sock_sendmsg_nosec net/socket.c:725 [inline]
-    [<ffffffff83e479c6>] sock_sendmsg+0x56/0xb0 net/socket.c:748
-    [<ffffffff83e47f55>] ____sys_sendmsg+0x365/0x470 net/socket.c:2494
-    [<ffffffff83e4c389>] ___sys_sendmsg+0xc9/0x130 net/socket.c:2548
-    [<ffffffff83e4c536>] __sys_sendmsg+0xa6/0x120 net/socket.c:2577
-    [<ffffffff84ad7bb8>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-    [<ffffffff84ad7bb8>] do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
-    [<ffffffff84c0008b>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-In kcm_sendmsg(), newly allocated socket buffers can be added to skb->next. If
-an error occurred and jumped to out_error label, those newly allocated socket
-buffers can be leaked. This patch fixes this issue by remembering the last
-allocated socket buffer in kcm_tx_msg(head)->last_skb.
-
-Link: https://syzkaller.appspot.com/bug?extid=6f98de741f7dbbfc4ccb [1]
-Reported-by: syzbot+6f98de741f7dbbfc4ccb@syzkaller.appspotmail.com
 Fixes: ab7ac4eb9832 ("kcm: Kernel Connection Multiplexor module")
 Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
 ---
@@ -123,18 +97,18 @@ Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
  1 file changed, 2 insertions(+)
 
 diff --git a/net/kcm/kcmsock.c b/net/kcm/kcmsock.c
-index 393f01b2a7e6..34d4062f639a 100644
+index 393f01b2a7e6..4580f61426bb 100644
 --- a/net/kcm/kcmsock.c
 +++ b/net/kcm/kcmsock.c
-@@ -939,6 +939,8 @@ static int kcm_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
+@@ -1859,6 +1859,8 @@ static __net_exit void kcm_exit_net(struct net *net)
+ 	 * that all multiplexors and psocks have been destroyed.
+ 	 */
+ 	WARN_ON(!list_empty(&knet->mux_list));
++
++	mutex_destroy(&knet->mutex);
+ }
  
- 	if (head != kcm->seq_skb)
- 		kfree_skb(head);
-+	else if (copied)
-+		kcm_tx_msg(head)->last_skb = skb;
- 
- 	err = sk_stream_error(sk, msg->msg_flags, err);
- 
+ static struct pernet_operations kcm_net_ops = {
 -- 
 2.41.0
 
