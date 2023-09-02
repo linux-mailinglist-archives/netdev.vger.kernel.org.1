@@ -1,144 +1,170 @@
-Return-Path: <netdev+bounces-31831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4EA2790845
-	for <lists+netdev@lfdr.de>; Sat,  2 Sep 2023 16:34:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAE5D79089C
+	for <lists+netdev@lfdr.de>; Sat,  2 Sep 2023 17:59:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E57AF1C20840
-	for <lists+netdev@lfdr.de>; Sat,  2 Sep 2023 14:34:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 613372816C3
+	for <lists+netdev@lfdr.de>; Sat,  2 Sep 2023 15:59:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B217C5CBB;
-	Sat,  2 Sep 2023 14:34:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E5D18830;
+	Sat,  2 Sep 2023 15:59:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2C1E3C25
-	for <netdev@vger.kernel.org>; Sat,  2 Sep 2023 14:34:31 +0000 (UTC)
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 117D610EB;
-	Sat,  2 Sep 2023 07:34:26 -0700 (PDT)
-Received: by mail-wr1-x434.google.com with SMTP id ffacd0b85a97d-313e742a787so2113f8f.1;
-        Sat, 02 Sep 2023 07:34:25 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F58C3C1E
+	for <netdev@vger.kernel.org>; Sat,  2 Sep 2023 15:59:51 +0000 (UTC)
+Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4838210D4
+	for <netdev@vger.kernel.org>; Sat,  2 Sep 2023 08:59:50 -0700 (PDT)
+Received: by mail-ot1-x331.google.com with SMTP id 46e09a7af769-6b9a2416b1cso79891a34.2
+        for <netdev@vger.kernel.org>; Sat, 02 Sep 2023 08:59:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693665264; x=1694270064; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0LEnYY2fstYIsmMY7pLao9nO8hPctUJEbYLViJghGc0=;
-        b=AlRdnb6hak2ke9J5+VveahbOAJS2TUdLUAxKKedX2oMMCRsTT3epy1jSdgPdi/7vi/
-         Cf9St3nB9VkyWx3TP12DAKzGHe/6Fkq8QItMDUY74RUvgx4ef5Dr+AbDIKBYH5OxhMd0
-         EWo5Jsz5UVjrY/ELZDv2K94tiRWQeO+ULkluh4Vd3YFp4tKpQTqcimVqB7bZ3dTftYmz
-         kIeieEE8xV5r1mQ4cWHBnG9pJFjmhWONJMEKnxo1QE8D48ncnaX7FFt11X+ZCB6OEFVF
-         py9TN/d7F8bMxg0UYbx5vKsSV+keSMyBqJ9bmtMLwWDxSbiS1k0WQF29P8HDuctsPoV4
-         TTJg==
+        d=google.com; s=20221208; t=1693670389; x=1694275189; darn=vger.kernel.org;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AnEkQcajTlSloQfs6AhM0nt/JC6HaPWBmgZ2b8nds0w=;
+        b=cIJW5ueKkmPmKs4QZr8oxj37x6qJYXYZ6qtYMj2EZkMoxfGYcl/v0L1EDg8oULU6Jv
+         WfaU+4LyRJGL3sx6rfS2yW0xB+hZQ8pcR4yu63k4FoBsdrW/rrca28IXKqC06bUyViha
+         iTL71ISGplrt3FEF0E0jN/NU682ZaJD/0quSf+kiL+mMNrJsCTI7df19zkHJftgdEFwr
+         +QGLjqqImI0NqslAgI6XhMZ53LuhsRgItzYMvRIcdM14RG9YQwz7/18xaxtWqu+uMhLf
+         PeqB7Ga3kC8N4exQHXXpTHTSPbOQ4ioWkXwi9jWWLCUhraa5yo/JwLk7DHiha5RGgu0d
+         YTrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693665264; x=1694270064;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0LEnYY2fstYIsmMY7pLao9nO8hPctUJEbYLViJghGc0=;
-        b=aW/NLoTDPIvO2v5e7yK0EB7Nq+svFAuyRWVqFyWJYcRR1AGSDPAQOzVnjp7QKkXT51
-         fsBkOv9oqulqB9QL1o0xu8etAWAwT5v3lzUg5I7geYYmY9nIXMBor9KO8bodaNGYAfES
-         uNTwQznio0pfdiAp7/CRcxXFIBMqVn99zWs+t+eXdQhI7uPQ/6EOlq5zYZcj9rBbTC3u
-         x2xjkuMfNRMPtudSsNiWAbK6NVVlqSZDI4w859SQtP73OAHmzx90IxLucx5HkE7sVPX5
-         vWIWCjPPvnqGxqtvEfUTL4n9zsIieN7LMQtViNlwD2kuCrCDPGHLC9i6KKgPQFkS1K/K
-         b/Yw==
-X-Gm-Message-State: AOJu0Yyhgo/5SoPiDZjylVYaRJ9u0MaOfmzsIkwHSenUFgRq53YtE5jR
-	jHvHq8s/r/yfoKgsnB/+whY=
-X-Google-Smtp-Source: AGHT+IE+L/AuvMNg3BeZbTTlyRe8GsYHB2IcJZPuf2AYkptiWp2rXAcyeMyAUqPj9pdVSJmI2EnL9Q==
-X-Received: by 2002:a05:6000:1291:b0:315:a235:8aa8 with SMTP id f17-20020a056000129100b00315a2358aa8mr6301607wrx.2.1693665264243;
-        Sat, 02 Sep 2023 07:34:24 -0700 (PDT)
-Received: from eldamar.lan (c-82-192-242-114.customer.ggaweb.ch. [82.192.242.114])
-        by smtp.gmail.com with ESMTPSA id l7-20020a7bc447000000b003fe1fe56202sm8143007wmi.33.2023.09.02.07.34.22
+        d=1e100.net; s=20221208; t=1693670389; x=1694275189;
+        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AnEkQcajTlSloQfs6AhM0nt/JC6HaPWBmgZ2b8nds0w=;
+        b=ZJ0/KEpkrIBhd3M/agAAFQiwGNnUBCT3mUzA594sT/Ze8uIoYY2cfnU88x4LpHUXPe
+         8eBhe+BwnR1lQm91R+bVF8BRmKFGT+9/XwhLVE0fp52HyVavJuaRqX9/MyDoan5s1ui7
+         ehn1g2XPOCT2cBoL3O4VpiUDjfe8DCCTfFHWXGwktImYsmDoORgBoCLzFC37iTnSt2Da
+         ga5uW5wOuO6U9wXJaWVIbXkQOXBCkhOjG3P1ZNR1n5v6qoCFt2/4KBXAyTxJJS13LvKK
+         pTBmta2b6wT75sJj76lyb7IzcpIHCeCuluc2ep0YOj/LWqywCscmCjDM8DE692GIVXbP
+         N7Xg==
+X-Gm-Message-State: AOJu0YxmG0oHb9f2m0oRiWPylOzWISINkhfmbsrLIs/hHhV0oXE2bZnw
+	RP9EnJthvdA2slWQv6pChn9InuEbwlQeKjlhg6mliw==
+X-Google-Smtp-Source: AGHT+IHNbQyj6+mHCs/scBX7rqIDKtIjCI5Qe+jbvEVFWGZhIBJKzoOvDyF7NvyL7m3U/GHewnPAGA==
+X-Received: by 2002:a9d:739a:0:b0:6bc:f276:717f with SMTP id j26-20020a9d739a000000b006bcf276717fmr5539891otk.13.1693670389356;
+        Sat, 02 Sep 2023 08:59:49 -0700 (PDT)
+Received: from ripple.attlocal.net (172-10-233-147.lightspeed.sntcca.sbcglobal.net. [172.10.233.147])
+        by smtp.gmail.com with ESMTPSA id p1-20020a25d801000000b00d7baaf6094asm1465838ybg.13.2023.09.02.08.59.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 Sep 2023 07:34:22 -0700 (PDT)
-Sender: Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>
-Received: by eldamar.lan (Postfix, from userid 1000)
-	id 51D71BE2DE0; Sat,  2 Sep 2023 16:34:21 +0200 (CEST)
-Date: Sat, 2 Sep 2023 16:34:21 +0200
-From: Salvatore Bonaccorso <carnil@debian.org>
-To: Zheng Hacker <hackerzheng666@gmail.com>
-Cc: Yunsheng Lin <linyunsheng@huawei.com>, Zheng Wang <zyytlz.wz@163.com>,
-	s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, 1395428693sheep@gmail.com,
-	alex000young@gmail.com
-Subject: Re: [PATCH net] net: ravb: Fix possible UAF bug in ravb_remove
-Message-ID: <ZPNH7bdwe4Zir6EQ@eldamar.lan>
-References: <20230309100248.3831498-1-zyytlz.wz@163.com>
- <cca0b40b-d6f8-54c7-1e46-83cb62d0a2f1@huawei.com>
- <CAJedcCy2n9jHm+uS5RG1T7u8aK8RazrzrC-sQhxFQ_v_ZphjWA@mail.gmail.com>
+        Sat, 02 Sep 2023 08:59:48 -0700 (PDT)
+Date: Sat, 2 Sep 2023 08:59:46 -0700 (PDT)
+From: Hugh Dickins <hughd@google.com>
+X-X-Sender: hugh@ripple.attlocal.net
+To: Dave Hansen <dave.hansen@linux.intel.com>
+cc: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>, 
+    Bagas Sanjaya <bagasdotme@gmail.com>, 
+    Lai Jiangshan <laijs@linux.alibaba.com>, 
+    "Paul E. McKenney" <paulmck@kernel.org>, 
+    Gregory Greenman <gregory.greenman@intel.com>, 
+    Ben Greear <greearb@candelatech.com>, 
+    Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+    Linux Networking <netdev@vger.kernel.org>, 
+    Linux Wireless <linux-wireless@vger.kernel.org>, 
+    Linux RCU <rcu@vger.kernel.org>
+Subject: Re: Fwd: RCU indicates stalls with iwlwifi, causing boot failures
+In-Reply-To: <f0f6a6ec-e968-a91c-dc46-357566d8811@google.com>
+Message-ID: <35f03286-eb1-b7a4-8649-a43945223fe4@google.com>
+References: <c1caa7c1-b2c6-aac5-54ab-8bcc6e139ca8@gmail.com> <c3f9b35c-087d-0e34-c251-e249f2c058d3@candelatech.com> <f0f6a6ec-e968-a91c-dc46-357566d8811@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJedcCy2n9jHm+uS5RG1T7u8aK8RazrzrC-sQhxFQ_v_ZphjWA@mail.gmail.com>
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+On Fri, 1 Sep 2023, Hugh Dickins wrote:
 
-On Sat, Mar 11, 2023 at 12:38:10AM +0800, Zheng Hacker wrote:
-> Yunsheng Lin <linyunsheng@huawei.com> 于2023年3月10日周五 09:12写道：
-> >
-> > On 2023/3/9 18:02, Zheng Wang wrote:
-> > > In ravb_probe, priv->work was bound with ravb_tx_timeout_work.
-> > > If timeout occurs, it will start the work. And if we call
-> > > ravb_remove without finishing the work, ther may be a use
-> >
-> > ther -> there
-> >
+> Hi Dave,
 > 
-> Sorry about the typo, will correct it in the next version.
+> On Fri, 1 Sep 2023, Ben Greear wrote:
+> > On 9/1/23 5:29 PM, Bagas Sanjaya wrote:
+> > > Hi,
+> > > 
+> > > I notice a bug report on Bugzilla [1]. Quoting from it:
+> > 
+> > Try booting with pcie=noaer ?
+> > 
+> > That fixes only known iwlwifi bug we have found in 6.5, but we are also using
+> > mostly
+> > backports iwlwifi driver...
+> > 
+> > Thanks,
+> > Ben
+> > 
+> > > 
+> > >> I'm seeing RCU warnings in Linus's current tree (like
+> > >> 87dfd85c38923acd9517e8df4afc908565df0961) that come from RCU:
+> > >>
+> > >> WARNING: CPU: 0 PID: 0 at kernel/rcu/tree_exp.h:787
+> > >> rcu_exp_handler+0x35/0xe0
+> > >>
+> > >> But they *ONLY* occur on a system with a newer iwlwifi device:
+> > >>
+> > >> aa:00.0 Network controller: Intel Corporation Wi-Fi 6 AX210/AX211/AX411
+> > >> 160MHz (rev 1a)
+> > >>
+> > >> and never in a VM or on an older device (like an 8260).  During a bisect
+> > >> the only seem to occur with the "83" version of the firmware.
+> > >>
+> > >> iwlwifi 0000:aa:00.0: loaded firmware version 83.e8f84e98.0
+> > >> ty-a0-gf-a0-83.ucode op_mode iwlmvm
+> > >>
+> > >> The first warning gets spit out within a millisecond of the last printk()
+> > >> from the iwlwifi driver.  They eventually result in a big spew of RCU
+> > >> messages like this:
+> > >>
+> > >> [   27.124796] rcu: INFO: rcu_preempt detected expedited stalls on
+> > >> CPUs/tasks: { 0-...D } 125 jiffies s: 193 root: 0x1/.
+> > >> [   27.126466] rcu: blocking rcu_node structures (internal RCU debug):
+> > >> [   27.128114] Sending NMI from CPU 3 to CPUs 0:
+> > >> [   27.128122] NMI backtrace for cpu 0 skipped: idling at
+> > >> intel_idle+0x5f/0xb0
+> > >> [   27.159757] loop30: detected capacity change from 0 to 8
+> > >> [   27.204967] rcu: INFO: rcu_preempt detected expedited stalls on
+> > >> CPUs/tasks: { 0-...D } 145 jiffies s: 193 root: 0x1/.
+> > >> [   27.206353] rcu: blocking rcu_node structures (internal RCU debug):
+> > >> [   27.207751] Sending NMI from CPU 3 to CPUs 0:
+> > >> [   27.207825] NMI backtrace for cpu 0 skipped: idling at
+> > >> intel_idle+0x5f/0xb0
+> > >>
+> > >> I usually see them at boot.  In that case, they usually hang the system and
+> > >> keep it from booting.  I've also encountered them at reboots and also seen
+> > >> them *not* be fatal at boot.  I suspect it has to do with which CPU gets
+> > >> wedged.
+> > > 
+> > > See Bugzilla for the full thread and attached full dmesg output.
+> > > 
+> > > Thanks.
+> > > 
+> > > [1]: https://bugzilla.kernel.org/show_bug.cgi?id=217856
 > 
-> > > after free bug on ndev.
-> > >
-> > > Fix it by finishing the job before cleanup in ravb_remove.
-> > >
-> > > Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
-> > > Signed-off-by: Zheng Wang <zyytlz.wz@163.com>
-> > > ---
-> > >  drivers/net/ethernet/renesas/ravb_main.c | 1 +
-> > >  1 file changed, 1 insertion(+)
-> > >
-> > > diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-> > > index 0f54849a3823..07a08e72f440 100644
-> > > --- a/drivers/net/ethernet/renesas/ravb_main.c
-> > > +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> > > @@ -2892,6 +2892,7 @@ static int ravb_remove(struct platform_device *pdev)
-> > >       struct ravb_private *priv = netdev_priv(ndev);
-> > >       const struct ravb_hw_info *info = priv->info;
-> > >
-> > > +     cancel_work_sync(&priv->work);
-> >
-> > As your previous patch, I still do not see anything stopping
-> > dev_watchdog() from calling dev->netdev_ops->ndo_tx_timeout
-> > after cancel_work_sync(), maybe I missed something obvious
-> > here?
-> >
-> Yes, that's a keyed suggestion. I was hurry to report the issue today
-> so wrote with many mistakes.
-> Thanks agagin for the advice. I will review other patch carefully.
+> I just took a look at your dmesg in bugzilla: I see lots of page tables
+> dumped, including "ESPfix Area", and think you're hitting my screwup: see
 > 
-> Best regards,
-> Zheng
+> https://lore.kernel.org/linux-mm/CABXGCsNi8Tiv5zUPNXr6UJw6qV1VdaBEfGqEAMkkXE3QPvZuAQ@mail.gmail.com/
+> 
+> Please give the patch from the end of that thread a try:
 
-Looking through some older reports and proposed patches, has this even
-been accepted later? Or did it felt trough the cracks?
+Mikhail confirmed it for his case, and Linus already took it into his tree:
+ee40d543e97d mm/pagewalk: fix bootstopping regression from extra pte_unmap()
 
-Regards,
-Salvatore
+But I couldn't see the WARN_ON_ONCE I was expecting from __rcu_read_unlock()
+in your dmesg - ah, but it is only when CONFIG_PROVE_LOCKING is enabled.
+
+Hugh
 
