@@ -1,110 +1,127 @@
-Return-Path: <netdev+bounces-31806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D91C79047F
-	for <lists+netdev@lfdr.de>; Sat,  2 Sep 2023 02:29:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29843790480
+	for <lists+netdev@lfdr.de>; Sat,  2 Sep 2023 02:30:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17F9C2819CE
-	for <lists+netdev@lfdr.de>; Sat,  2 Sep 2023 00:29:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D85762819E7
+	for <lists+netdev@lfdr.de>; Sat,  2 Sep 2023 00:30:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34E6B17C8;
-	Sat,  2 Sep 2023 00:29:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F13317F3;
+	Sat,  2 Sep 2023 00:30:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2902B7F
-	for <netdev@vger.kernel.org>; Sat,  2 Sep 2023 00:29:02 +0000 (UTC)
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 163B9E5C
-	for <netdev@vger.kernel.org>; Fri,  1 Sep 2023 17:29:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EE6217CE
+	for <netdev@vger.kernel.org>; Sat,  2 Sep 2023 00:30:02 +0000 (UTC)
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB55CE5C;
+	Fri,  1 Sep 2023 17:30:00 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-68a520dba33so2250489b3a.0;
+        Fri, 01 Sep 2023 17:30:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1693614542; x=1725150542;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Ija+uBTbFeQB5jzIJD1WWoe5JnkENDrvmp+f8ELFah0=;
-  b=g3nVurrIfHsoUewRBOuHWv7VSK/IeZZxycYzGGGvEx0kjOhzOhULG5YD
-   w1zfsogoqRBEhZoTzKEnJeMR+Bmj8sA6BtBXyXc/SE8HwXVa7wJ7yGr6A
-   tIR+ePS7tjFpfQkMPwONpgKrvJ5GhgeoNu4lhmlUo1CmpgKACmH5+/KOc
-   M=;
-X-IronPort-AV: E=Sophos;i="6.02,221,1688428800"; 
-   d="scan'208";a="26496291"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-8a14c045.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2023 00:29:01 +0000
-Received: from EX19MTAUWC001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-	by email-inbound-relay-pdx-2a-m6i4x-8a14c045.us-west-2.amazon.com (Postfix) with ESMTPS id 419CC879F5;
-	Sat,  2 Sep 2023 00:29:01 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Sat, 2 Sep 2023 00:29:00 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.170.14) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Sat, 2 Sep 2023 00:28:58 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net 4/4] af_unix: Fix data race around sk->sk_err.
-Date: Fri, 1 Sep 2023 17:27:08 -0700
-Message-ID: <20230902002708.91816-5-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230902002708.91816-1-kuniyu@amazon.com>
-References: <20230902002708.91816-1-kuniyu@amazon.com>
+        d=gmail.com; s=20221208; t=1693614600; x=1694219400; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tc6DUuHPcnNBCfBzqvAsEZg9fGqkhh0hsQ9G7lrZ5SA=;
+        b=SkeaCRRCpe1dj7U6TNgM5RVQibd6haqaGGqkcSo5srlFFTGnz5ztB7/a5lmYTxcj90
+         R3pzydEtCxh6mXBR9WGaO8gCbWtUyhtksuR6gJ073GTgZpYZVH4+xzowd0cOjd271PCt
+         O10a2oFm50+ua124CWGSzClE433t/OYUjo4vFRjaQdWYJI3LmaKYnLdj49nmZM4kRxgX
+         OOn5PtKb6rJKCMVFWEoHT/uRXTmqgHMFnq+YTQJAp5i40GZd3+Ux5QLuC8I7xJRyPQDz
+         goWHojbgSIXJRk5ChD0AJhn2qCOp3Xev4eFQyDw3iHFNy2sIPVmXogcGqPeUZAYzaop9
+         ONEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693614600; x=1694219400;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=tc6DUuHPcnNBCfBzqvAsEZg9fGqkhh0hsQ9G7lrZ5SA=;
+        b=HKSa389JSUQSe8N7GGVuhhiB7NvIZdeDyDgPxe2DOXhTfzaLViWcPFAoPLTsU0UeBf
+         rhp7034lHbJi9zvERIKVLAiu73ETEyTTZmnBg0Jf/RdleG8PM6V0+SLQSc7cTzzqTkXV
+         ZwPorhXKKOXjMSeQ0Ehwk/JvSQtdbOWF3uXUTZ6o/I6MZnK8ofXNlm7/vv7pvoUdW7UW
+         QCVqPcA1sE8JP5T0MuIQzGP2/2+XNpThIHsSEtYZxwTr1l5YX8D4Pjbpohtw1jf1eNEq
+         C/p7n8a8CtmyhhuqcUvRiHYi4T2NfuqdKYNmc6Asrow94OpX7gE8iV6EEzGPbFebx3bM
+         hFZg==
+X-Gm-Message-State: AOJu0Yxdum+CnDYNalEMIwMikgLWiF2iS20hXF10i9UPA3iUXi24wGLL
+	9bbOZATXGtRye0ljTQtzKyVtCM4fIIY=
+X-Google-Smtp-Source: AGHT+IF2aeKHHwH/dxyHQ+v39okD7qOTYGE5M2UUejMj9xAcmILEUANZ5XAUa528thxhGUuThuslHg==
+X-Received: by 2002:a05:6a20:451:b0:133:71e4:c172 with SMTP id b17-20020a056a20045100b0013371e4c172mr4051792pzb.15.1693614600212;
+        Fri, 01 Sep 2023 17:30:00 -0700 (PDT)
+Received: from [192.168.0.106] ([103.124.138.83])
+        by smtp.gmail.com with ESMTPSA id i12-20020aa787cc000000b006875493da20sm3515245pfo.3.2023.09.01.17.29.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 01 Sep 2023 17:29:59 -0700 (PDT)
+Message-ID: <c1caa7c1-b2c6-aac5-54ab-8bcc6e139ca8@gmail.com>
+Date: Sat, 2 Sep 2023 07:29:55 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.187.170.14]
-X-ClientProxiedBy: EX19D032UWA004.ant.amazon.com (10.13.139.56) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	T_SPF_PERMERROR autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.0
+Content-Language: en-US
+To: Lai Jiangshan <laijs@linux.alibaba.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>,
+ Gregory Greenman <gregory.greenman@intel.com>,
+ Dave Hansen <dave.hansen@linux.intel.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Networking <netdev@vger.kernel.org>,
+ Linux Wireless <linux-wireless@vger.kernel.org>,
+ Linux RCU <rcu@vger.kernel.org>
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+Subject: Fwd: RCU indicates stalls with iwlwifi, causing boot failures
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-As with sk->sk_shutdown shown in the previous patch, sk->sk_err can be
-read locklessly by unix_dgram_sendmsg().
+Hi,
 
-Let's use READ_ONCE() for sk_err as well.
+I notice a bug report on Bugzilla [1]. Quoting from it:
 
-Note that the writer side is marked by commit cc04410af7de ("af_unix:
-annotate lockless accesses to sk->sk_err").
+> I'm seeing RCU warnings in Linus's current tree (like 87dfd85c38923acd9517e8df4afc908565df0961) that come from RCU:
+> 
+> WARNING: CPU: 0 PID: 0 at kernel/rcu/tree_exp.h:787 rcu_exp_handler+0x35/0xe0
+> 
+> But they *ONLY* occur on a system with a newer iwlwifi device:
+> 
+> aa:00.0 Network controller: Intel Corporation Wi-Fi 6 AX210/AX211/AX411 160MHz (rev 1a)
+> 
+> and never in a VM or on an older device (like an 8260).  During a bisect the only seem to occur with the "83" version of the firmware.
+> 
+> iwlwifi 0000:aa:00.0: loaded firmware version 83.e8f84e98.0 ty-a0-gf-a0-83.ucode op_mode iwlmvm
+> 
+> The first warning gets spit out within a millisecond of the last printk() from the iwlwifi driver.  They eventually result in a big spew of RCU messages like this:
+> 
+> [   27.124796] rcu: INFO: rcu_preempt detected expedited stalls on CPUs/tasks: { 0-...D } 125 jiffies s: 193 root: 0x1/.
+> [   27.126466] rcu: blocking rcu_node structures (internal RCU debug):
+> [   27.128114] Sending NMI from CPU 3 to CPUs 0:
+> [   27.128122] NMI backtrace for cpu 0 skipped: idling at intel_idle+0x5f/0xb0
+> [   27.159757] loop30: detected capacity change from 0 to 8
+> [   27.204967] rcu: INFO: rcu_preempt detected expedited stalls on CPUs/tasks: { 0-...D } 145 jiffies s: 193 root: 0x1/.
+> [   27.206353] rcu: blocking rcu_node structures (internal RCU debug):
+> [   27.207751] Sending NMI from CPU 3 to CPUs 0:
+> [   27.207825] NMI backtrace for cpu 0 skipped: idling at intel_idle+0x5f/0xb0
+> 
+> I usually see them at boot.  In that case, they usually hang the system and keep it from booting.  I've also encountered them at reboots and also seen them *not* be fatal at boot.  I suspect it has to do with which CPU gets wedged.
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/core/sock.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+See Bugzilla for the full thread and attached full dmesg output.
 
-diff --git a/net/core/sock.c b/net/core/sock.c
-index e3da7eae9338..16584e2dd648 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -2749,7 +2749,7 @@ static long sock_wait_for_wmem(struct sock *sk, long timeo)
- 			break;
- 		if (READ_ONCE(sk->sk_shutdown) & SEND_SHUTDOWN)
- 			break;
--		if (sk->sk_err)
-+		if (READ_ONCE(sk->sk_err))
- 			break;
- 		timeo = schedule_timeout(timeo);
- 	}
+Thanks.
+
+[1]: https://bugzilla.kernel.org/show_bug.cgi?id=217856
+
 -- 
-2.30.2
-
+An old man doll... just what I always wanted! - Clara
 
