@@ -1,136 +1,186 @@
-Return-Path: <netdev+bounces-31852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D06A790D5D
-	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 19:58:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A872790DD4
+	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 21:55:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4A8B280F61
-	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 17:58:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D734280F70
+	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 19:55:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DAFFAD48;
-	Sun,  3 Sep 2023 17:58:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2056DBA30;
+	Sun,  3 Sep 2023 19:55:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91A7423AA
-	for <netdev@vger.kernel.org>; Sun,  3 Sep 2023 17:58:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8F2FC433C7;
-	Sun,  3 Sep 2023 17:58:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693763915;
-	bh=HHN7TtKjh8/irZevGxQsYwPgVQottw+Irb2rc4Pquos=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=D0+CCUE4MWxM5MoC50KEbunQ3SXgwUzmAT89Di6mVbn6xGvE7TUDb+utwBS5brGAZ
-	 VLFYcyISHFNOluCKrDjvvUIM8jJapymwAB1zWhCPh4sCg6gbCyvVDMGkqkEMDwDxPm
-	 fixLEf+vrt4IHlc/Lcc73H5XPes7eyVIbBpoyeMZSSVWTZCSGFyeqi8nFE5EnYfvhQ
-	 vnbr6CPv+vQKG59Gs0wqgOtFS7BOV+pS2LIXDCxLnmq38s/TyWjc1zNSh7xae+Lz87
-	 UAHquydIaoCmvzho40EJIWzR2ZFUJC8Ae9+zYTRryTmxiNdG7dTkIdmfWWcewUZrau
-	 DsqfDmsRhcm5A==
-From: James Hogan <jhogan@kernel.org>
-To: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Cc: Paul Menzel <pmenzel@molgen.mpg.de>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>, netdev@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, Sasha Neftin <sasha.neftin@intel.com>,
- Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
- "Neftin, Sasha" <sasha.neftin@intel.com>
-Subject:
- Re: [WIP v2] igc: fix deadlock caused by taking RTNL in RPM resume path
-Date: Sun, 03 Sep 2023 18:57:46 +0100
-Message-ID: <2158798.irdbgypaU6@saruman>
-In-Reply-To: <87zg2alict.fsf@intel.com>
-References:
- <20220811151342.19059-1-vinicius.gomes@intel.com>
- <5962826.lOV4Wx5bFT@saruman> <87zg2alict.fsf@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14FE6BA2D
+	for <netdev@vger.kernel.org>; Sun,  3 Sep 2023 19:55:03 +0000 (UTC)
+Received: from mail-pf1-f206.google.com (mail-pf1-f206.google.com [209.85.210.206])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4B6BDE
+	for <netdev@vger.kernel.org>; Sun,  3 Sep 2023 12:55:00 -0700 (PDT)
+Received: by mail-pf1-f206.google.com with SMTP id d2e1a72fcca58-68a3d6ce18cso902857b3a.0
+        for <netdev@vger.kernel.org>; Sun, 03 Sep 2023 12:55:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693770900; x=1694375700;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uWa3iwwkzdPY4YildIzHGcIx9uOwREDiHAagNULjXhs=;
+        b=hMLDSE2a8W/2s88QWZ/ulFUXCPlek8khw5X60GAh4qnod5yPnckZklVcIsEEFPkvOA
+         FWH0ljuJTd2KQ5OnEsWx7Q9T5F2NLnb09+y4SwoJxY4zF6Py7ysMNrNaKHTuJzGklVjQ
+         B4HALlSNTKDOeBUcr50RyJt7MPuW8OiCXOGz/uI2bCjyKQFH1ixJ61OhRqqO+i+luIgm
+         R2jkiP7HsevBwMgiQDELa6oe+/IaHX8MBYLE1U4B0pjTB3m+OvNVRlavX9ix8dLVM9CF
+         xZFhxXdtbVwgqTkgjKUEQD5Al4DEMqS+uI5yJppTBo77JoEkxBONg7PJfzZE9qoVVQLt
+         5IhQ==
+X-Gm-Message-State: AOJu0Yz4/edVGwiEeEftrDprXA9G9MCSww/FIr5GEGrTw8UFfYMO9jkn
+	QN2LcuzMyFRjqMHEmyLhVEYoxz/OTwSBgJ0sKNKAzmzsiM3h
+X-Google-Smtp-Source: AGHT+IEkIjg2R/lH3aIeSKcj8ZfWkzZLtK0sefjowJVjw++uev0i4Xd3oKIQOd84JTflLcP94YlaiBFNWxE7ewL0Qeag+qvpqhvf
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+X-Received: by 2002:a05:6a00:4c11:b0:68a:6787:8413 with SMTP id
+ ea17-20020a056a004c1100b0068a67878413mr2744479pfb.3.1693770900403; Sun, 03
+ Sep 2023 12:55:00 -0700 (PDT)
+Date: Sun, 03 Sep 2023 12:55:00 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000d97f3c060479c4f8@google.com>
+Subject: [syzbot] [bpf?] general protection fault in bpf_prog_offload_verifier_prep
+From: syzbot <syzbot+291100dcb32190ec02a8@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, haoluo@google.com, hawk@kernel.org, 
+	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev, 
+	netdev@vger.kernel.org, sdf@google.com, song@kernel.org, 
+	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tuesday, 29 August 2023 02:58:42 BST Vinicius Costa Gomes wrote:
-> James Hogan <jhogan@kernel.org> writes:
-> > On Sunday, 2 October 2022 11:56:28 BST James Hogan wrote:
-> >> On Monday, 29 August 2022 09:16:33 BST James Hogan wrote:
-> >> > I'd be great to have this longstanding issue properly fixed rather than
-> >> > having to carry a patch locally that may not be lock safe.
-> >> > 
-> >> > Also, any tips for diagnosing the issue of the network link not coming
-> >> > back
-> >> > up after resume? I sometimes have to unload and reload the driver
-> >> > module
-> >> > to
-> >> > get it back again.
-> >> 
-> >> Any thoughts on this from anybody?
-> > 
-> > Ping... I've been carrying this patch locally on archlinux for almost a
-> > year now. Every time I update my kernel and forget to rebuild with the
-> > patch it catches me out with deadlocks after resume, and even with the
-> > patch I frequently have to reload the igc module after resume to get the
-> > network to come up (which is preferable to deadlocks but still really
-> > sucks). I'd really appreciate if it could get some attention.
-> 
-> I am setting up my test systems to reproduce the deadlocks, then let's
-> see what ideas happen about removing the need for those locks.
-> 
-> About the link failures, are there any error messages in the kernel
-> logs? (also, if you could share those logs, can be off-list, it would
-> help) I am trying to think what could be happening, and how to further
-> debug this.
+Hello,
 
-Looking through the resume log, the only network/igc related items are these:
+syzbot found the following issue on:
 
-Sep 03 18:28:17 saruman kernel: igc 0000:06:00.0 enp6s0: NIC Link is Up 1000 Mbps Full Duplex, Flow Control: RX
-Sep 03 18:28:17 saruman NetworkManager[1016]: <info>  [1693762097.7180] manager: sleep: wake requested (sleeping: yes  enabled: yes)
-Sep 03 18:28:17 saruman NetworkManager[1016]: <info>  [1693762097.7181] device (enp6s0): state change: activated -> unmanaged (reason 'sleeping', sys-iface-state: 'managed')
-Sep 03 18:28:17 saruman avahi-daemon[989]: Withdrawing address record for 192.168.1.239 on enp6s0.
-Sep 03 18:28:17 saruman avahi-daemon[989]: Leaving mDNS multicast group on interface enp6s0.IPv4 with address 192.168.1.239.
-Sep 03 18:28:17 saruman avahi-daemon[989]: Interface enp6s0.IPv4 no longer relevant for mDNS.
-Sep 03 18:28:17 saruman NetworkManager[1016]: <info>  [1693762097.8202] manager: NetworkManager state is now CONNECTED_GLOBAL
-Sep 03 18:28:17 saruman NetworkManager[1016]: <info>  [1693762097.8657] manager: NetworkManager state is now DISCONNECTED
-Sep 03 18:28:17 saruman NetworkManager[1016]: <info>  [1693762097.8660] device (enp6s0): state change: unmanaged -> unavailable (reason 'managed', sys-iface-state: 'external')
-Sep 03 18:28:17 saruman systemd[1]: Starting Network Manager Script Dispatcher Service...
-Sep 03 18:28:17 saruman systemd[1]: Started Network Manager Script Dispatcher Service.
-Sep 03 18:28:21 saruman NetworkManager[1016]: <info>  [1693762101.3075] device (enp6s0): carrier: link connected
-Sep 03 18:28:21 saruman NetworkManager[1016]: <info>  [1693762101.3076] device (enp6s0): state change: unavailable -> disconnected (reason 'carrier-changed', sys-iface-state: 'managed')
-Sep 03 18:28:21 saruman NetworkManager[1016]: <info>  [1693762101.3080] policy: auto-activating connection 'Wired connection 1' (f6634f16-77ca-34f7-846a-8c41e15a8ad1)
-Sep 03 18:28:21 saruman NetworkManager[1016]: <info>  [1693762101.3082] device (enp6s0): Activation: starting connection 'Wired connection 1' (f6634f16-77ca-34f7-846a-8c41e15a8ad1)
-Sep 03 18:28:21 saruman NetworkManager[1016]: <info>  [1693762101.3082] device (enp6s0): state change: disconnected -> prepare (reason 'none', sys-iface-state: 'managed')
-Sep 03 18:28:21 saruman NetworkManager[1016]: <info>  [1693762101.3083] manager: NetworkManager state is now CONNECTING
-Sep 03 18:28:21 saruman kernel: igc 0000:06:00.0 enp6s0: NIC Link is Up 1000 Mbps Full Duplex, Flow Control: RX
-Sep 03 18:28:21 saruman kernel: IPv6: ADDRCONF(NETDEV_CHANGE): enp6s0: link becomes ready
-Sep 03 18:28:21 saruman NetworkManager[1016]: <info>  [1693762101.3506] device (enp6s0): state change: prepare -> config (reason 'none', sys-iface-state: 'managed')
-Sep 03 18:28:21 saruman NetworkManager[1016]: <info>  [1693762101.3512] device (enp6s0): state change: config -> ip-config (reason 'none', sys-iface-state: 'managed')
-Sep 03 18:28:21 saruman NetworkManager[1016]: <info>  [1693762101.3515] policy: set 'Wired connection 1' (enp6s0) as default for IPv4 routing and DNS
-Sep 03 18:28:21 saruman avahi-daemon[989]: Joining mDNS multicast group on interface enp6s0.IPv4 with address 192.168.1.239.
-Sep 03 18:28:21 saruman avahi-daemon[989]: New relevant interface enp6s0.IPv4 for mDNS.
-Sep 03 18:28:21 saruman avahi-daemon[989]: Registering new address record for 192.168.1.239 on enp6s0.IPv4.
-Sep 03 18:28:22 saruman systemd[1]: systemd-rfkill.service: Deactivated successfully.
-Sep 03 18:28:23 saruman NetworkManager[1016]: <info>  [1693762103.3544] device (enp6s0): state change: ip-config -> ip-check (reason 'none', sys-iface-state: 'managed')
-Sep 03 18:28:23 saruman NetworkManager[1016]: <info>  [1693762103.3553] device (enp6s0): state change: ip-check -> secondaries (reason 'none', sys-iface-state: 'managed')
-Sep 03 18:28:23 saruman NetworkManager[1016]: <info>  [1693762103.3554] device (enp6s0): state change: secondaries -> activated (reason 'none', sys-iface-state: 'managed')
-Sep 03 18:28:23 saruman NetworkManager[1016]: <info>  [1693762103.3555] manager: NetworkManager state is now CONNECTED_SITE
-Sep 03 18:28:23 saruman NetworkManager[1016]: <info>  [1693762103.3556] device (enp6s0): Activation: successful, device activated.
-Sep 03 18:28:27 saruman NetworkManager[1016]: <info>  [1693762107.3532] device (enp6s0): state change: activated -> unavailable (reason 'carrier-changed', sys-iface-state: 'managed')
-Sep 03 18:28:27 saruman avahi-daemon[989]: Withdrawing address record for 192.168.1.239 on enp6s0.
-Sep 03 18:28:27 saruman avahi-daemon[989]: Leaving mDNS multicast group on interface enp6s0.IPv4 with address 192.168.1.239.
-Sep 03 18:28:27 saruman avahi-daemon[989]: Interface enp6s0.IPv4 no longer relevant for mDNS.
-Sep 03 18:28:27 saruman NetworkManager[1016]: <info>  [1693762107.5266] manager: NetworkManager state is now CONNECTED_LOCAL
-Sep 03 18:28:27 saruman NetworkManager[1016]: <info>  [1693762107.5267] manager: NetworkManager state is now DISCONNECTED
-Sep 03 18:28:27 saruman systemd[1]: NetworkManager-dispatcher.service: Deactivated successfully.
+HEAD commit:    fa09bc40b21a igb: disable virtualization features on 82580
+git tree:       net
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=13382fa8680000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=634e05b4025da9da
+dashboard link: https://syzkaller.appspot.com/bug?extid=291100dcb32190ec02a8
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1529c448680000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15db0248680000
 
-As mentioned previously, CONFIG_PROVE_LOCKING=y and I'm seeing splats during boot, notably RTNL assertion failed at net/core/dev.c (2877) and suspicious RCU usage.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/7ab461d84992/disk-fa09bc40.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/3ac6d43ab2db/vmlinux-fa09bc40.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/778d096a134e/bzImage-fa09bc40.xz
 
-Cheers
-James
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+291100dcb32190ec02a8@syzkaller.appspotmail.com
+
+general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+CPU: 1 PID: 5055 Comm: syz-executor625 Not tainted 6.5.0-syzkaller-04012-gfa09bc40b21a #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
+RIP: 0010:bpf_prog_offload_verifier_prep+0xaa/0x170 kernel/bpf/offload.c:295
+Code: 00 fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 a1 00 00 00 48 b8 00 00 00 00 00 fc ff df 4c 8b 65 10 4c 89 e2 48 c1 ea 03 <80> 3c 02 00 0f 85 93 00 00 00 48 b8 00 00 00 00 00 fc ff df 4d 8b
+RSP: 0018:ffffc900039ff7f8 EFLAGS: 00010246
+RAX: dffffc0000000000 RBX: ffffc9000156e000 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: ffffffff81a8cf76 RDI: ffff888021b25f10
+RBP: ffff888021b25f00 R08: 0000000000000001 R09: fffffbfff195203d
+R10: ffffffff8ca901ef R11: 0000000000000000 R12: 0000000000000000
+R13: 0000000000000005 R14: 0000000000000003 R15: ffffc9000156e060
+FS:  0000555556071380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020000100 CR3: 0000000022f6b000 CR4: 00000000003506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ bpf_check+0x52f3/0xabd0 kernel/bpf/verifier.c:19762
+ bpf_prog_load+0x153a/0x2270 kernel/bpf/syscall.c:2708
+ __sys_bpf+0xbb6/0x4e90 kernel/bpf/syscall.c:5335
+ __do_sys_bpf kernel/bpf/syscall.c:5439 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5437 [inline]
+ __x64_sys_bpf+0x78/0xc0 kernel/bpf/syscall.c:5437
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7f7c0df78ea9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 d1 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffde3592128 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f7c0df78ea9
+RDX: 0000000000000090 RSI: 0000000020000940 RDI: 0000000000000005
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000100000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:bpf_prog_offload_verifier_prep+0xaa/0x170 kernel/bpf/offload.c:295
+Code: 00 fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 a1 00 00 00 48 b8 00 00 00 00 00 fc ff df 4c 8b 65 10 4c 89 e2 48 c1 ea 03 <80> 3c 02 00 0f 85 93 00 00 00 48 b8 00 00 00 00 00 fc ff df 4d 8b
+RSP: 0018:ffffc900039ff7f8 EFLAGS: 00010246
+RAX: dffffc0000000000 RBX: ffffc9000156e000 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: ffffffff81a8cf76 RDI: ffff888021b25f10
+RBP: ffff888021b25f00 R08: 0000000000000001 R09: fffffbfff195203d
+R10: ffffffff8ca901ef R11: 0000000000000000 R12: 0000000000000000
+R13: 0000000000000005 R14: 0000000000000003 R15: ffffc9000156e060
+FS:  0000555556071380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020000100 CR3: 0000000022f6b000 CR4: 00000000003506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess), 3 bytes skipped:
+   0:	df 48 89             	fisttps -0x77(%rax)
+   3:	fa                   	cli
+   4:	48 c1 ea 03          	shr    $0x3,%rdx
+   8:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
+   c:	0f 85 a1 00 00 00    	jne    0xb3
+  12:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+  19:	fc ff df
+  1c:	4c 8b 65 10          	mov    0x10(%rbp),%r12
+  20:	4c 89 e2             	mov    %r12,%rdx
+  23:	48 c1 ea 03          	shr    $0x3,%rdx
+* 27:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
+  2b:	0f 85 93 00 00 00    	jne    0xc4
+  31:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+  38:	fc ff df
+  3b:	4d                   	rex.WRB
+  3c:	8b                   	.byte 0x8b
 
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
