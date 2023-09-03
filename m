@@ -1,170 +1,140 @@
-Return-Path: <netdev+bounces-31838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12716790A7E
-	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 03:49:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1473A790AD2
+	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 06:55:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B678A1C20442
-	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 01:48:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40F561C20750
+	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 04:55:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA25E64F;
-	Sun,  3 Sep 2023 01:48:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3D99EC3;
+	Sun,  3 Sep 2023 04:55:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA2CE623
-	for <netdev@vger.kernel.org>; Sun,  3 Sep 2023 01:48:57 +0000 (UTC)
-Received: from mail-pj1-f78.google.com (mail-pj1-f78.google.com [209.85.216.78])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51FF1136
-	for <netdev@vger.kernel.org>; Sat,  2 Sep 2023 18:48:56 -0700 (PDT)
-Received: by mail-pj1-f78.google.com with SMTP id 98e67ed59e1d1-267f00f6876so264567a91.3
-        for <netdev@vger.kernel.org>; Sat, 02 Sep 2023 18:48:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693705736; x=1694310536;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7FA57F0
+	for <netdev@vger.kernel.org>; Sun,  3 Sep 2023 04:55:07 +0000 (UTC)
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34E3DCD6
+	for <netdev@vger.kernel.org>; Sat,  2 Sep 2023 21:55:05 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1c1f8aaab9aso3193245ad.1
+        for <netdev@vger.kernel.org>; Sat, 02 Sep 2023 21:55:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1693716904; x=1694321704; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=vJf/Eooxdqn3wqXqB/Vii7TxecGvCAC/nj0JGOKvT0c=;
-        b=X8ECRE0zLoh8/x/XeNv+5PxN6VkudlmohxdtPP3wE1RONQBJXJkMPP0T/Ev7pszT8S
-         YasVvtEydKdTAQDAY3mk0O7OCgaAeVlSghuwlWse7OSdNdz6zA0QCn20d5V70s8VnEji
-         6P1ary3bJm5xmOqXe8W77ghG+lWLu8b8Q2XJH6AKLpGTipQrgdHb1iX+y1/ba6uV1dMA
-         zvbGBBdmRA+VvolPraF4TArY90VCRMDnI2diN+xUzk85089yD7Pf/CT+BjT3DEVZsTBE
-         8C51QcOcWXmSl9zFyIxsYUPr/9kwj4PWJS4GxgK7XlzdoHAxcAOAhA3Td72syU5gQPXw
-         o17w==
-X-Gm-Message-State: AOJu0Yw27zEa1hXQt+J5jIEUX5xbSBdlnwahmnq1pS240pnENV6MOlz4
-	WKyCN5FD/amMe4Z2C1LXbvvKaoAIXZF6/5AoSdhF6D9ZzAPp
-X-Google-Smtp-Source: AGHT+IEFEX6CFZNVFPeqX7v6f3QzzaPk9plI5xoyZwo92AT/6EpnmOualPivPJbgREY5sUP34UhQQQ2CeW9fEHhkVfvkuO0U+UYn
+        bh=v+U5CPjOKyPGHDpwnXP0B3NDICrZc2hSQHMD9gvWWzQ=;
+        b=KEpqyDuSD13aFfriIa6Gh0EZ18ZuWmrF41R2zOE8WBE+FTwcBfvFcb3FJQcm4wVknZ
+         KYuAvyedxxv1z8wIF8CjSB7GCMTCuT9JCp0DGb2sahR+4hVi3VHaAOKM+YJ7HE2VWLuQ
+         kp0yeab6pN8yej7irYjltklWWPRfKDWu7L2peIzP874AVo4+jxxsHL93wW1Z0A4+lJgi
+         1MssAmhjlzmq4ZCDOe5yxBXC0LWF/JtW5SA4TVo/DFisna7MKywq/qSnlnHs9X1x/iJ7
+         uh0gGJ9W2VpB+ZZnINIxSl5vdDHL4WQTXmNK74dtgy6IpipezGtbq00+zlV/3v9X1d4M
+         hhNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693716904; x=1694321704;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=v+U5CPjOKyPGHDpwnXP0B3NDICrZc2hSQHMD9gvWWzQ=;
+        b=JgL3fKSMnM91LNGMvSs0qOLrEKinbTjEXHzZQQSCvmmeyXEnKC9IO8Rm5tjrWbExMr
+         vVXxB4KhcTAlYbKmwScH2PlBrfGXqMO9eug5hb5+zU9T5/yLi0x2zeQZUGBbpvTn00sG
+         S2z0IqbeleLPBIzVNo1ZWau3XOp8zlxjO1l0gQ+D4hVz+WuyW3eyassDUV8SqdFskmBY
+         iVmH//9bfbTsCbhPLBqMjcyxRsybSVQc6gM3L6ed0f9SEyqbZf+C1+Nmo86KyjJX5uxy
+         ITHplgoMUImxGlqKEIG0+i2ZRQmxdBvBbC+DfI6Tqu6vY0boYPpXuJ0JOp9XHYRPcMHW
+         yauA==
+X-Gm-Message-State: AOJu0Yz0vlJKwOoxgnopQifcrbSLzS8vBR956lQfxII6W5rrjXYx4ZUv
+	QlAUNgsaa3VZinkHuT2SwP22ag==
+X-Google-Smtp-Source: AGHT+IEZm84G9mzAoT4L/Z2t61RZFgqR47NnzrcVfwzvXzIuo/vipgN26tmwI1A7WWb/kkbrm2Z/rg==
+X-Received: by 2002:a17:902:ef93:b0:1c1:dbd6:9bf6 with SMTP id iz19-20020a170902ef9300b001c1dbd69bf6mr5878849plb.41.1693716904671;
+        Sat, 02 Sep 2023 21:55:04 -0700 (PDT)
+Received: from [10.254.83.51] ([139.177.225.230])
+        by smtp.gmail.com with ESMTPSA id x2-20020a170902ea8200b001bc2831e1a9sm5301651plb.90.2023.09.02.21.54.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 02 Sep 2023 21:55:04 -0700 (PDT)
+Message-ID: <229c6f8d-b89b-1b85-8408-089c4cdf32a9@bytedance.com>
+Date: Sun, 3 Sep 2023 12:54:52 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a17:90b:3d3:b0:26d:26eb:c577 with SMTP id
- go19-20020a17090b03d300b0026d26ebc577mr1478202pjb.6.1693705735819; Sat, 02
- Sep 2023 18:48:55 -0700 (PDT)
-Date: Sat, 02 Sep 2023 18:48:55 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000bcd80b06046a98ac@google.com>
-Subject: [syzbot] [wireless?] WARNING in ieee80211_link_release_channel
-From: syzbot <syzbot+9817a610349542589c42@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_DIGITS,
-	FROM_LOCAL_HEX,HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.0
+Subject: Re: Re: [RFC PATCH net-next 3/3] sock: Throttle pressure-aware
+ sockets under pressure
+To: Simon Horman <horms@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Andrew Morton <akpm@linux-foundation.org>,
+ Shakeel Butt <shakeelb@google.com>, Roman Gushchin
+ <roman.gushchin@linux.dev>, Michal Hocko <mhocko@suse.com>,
+ Johannes Weiner <hannes@cmpxchg.org>, Yosry Ahmed <yosryahmed@google.com>,
+ Yu Zhao <yuzhao@google.com>, "Matthew Wilcox (Oracle)"
+ <willy@infradead.org>, Kefeng Wang <wangkefeng.wang@huawei.com>,
+ Yafang Shao <laoar.shao@gmail.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+ Martin KaFai Lau <martin.lau@kernel.org>, Breno Leitao <leitao@debian.org>,
+ Alexander Mikhalitsyn <alexander@mihalicyn.com>,
+ David Howells <dhowells@redhat.com>, Jason Xing <kernelxing@tencent.com>,
+ open list <linux-kernel@vger.kernel.org>,
+ "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+ "open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>
+References: <20230901062141.51972-1-wuyun.abel@bytedance.com>
+ <20230901062141.51972-4-wuyun.abel@bytedance.com>
+ <20230901135932.GH140739@kernel.org>
+Content-Language: en-US
+From: Abel Wu <wuyun.abel@bytedance.com>
+In-Reply-To: <20230901135932.GH140739@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello,
+Hi Simon, thanks for reviewing!
 
-syzbot found the following issue on:
+On 9/1/23 9:59 PM, Simon Horman wrote:
+> On Fri, Sep 01, 2023 at 02:21:28PM +0800, Abel Wu wrote:
+>> @@ -3087,8 +3100,20 @@ int __sk_mem_raise_allocated(struct sock *sk, int size, int amt, int kind)
+>>   	if (sk_has_memory_pressure(sk)) {
+>>   		u64 alloc;
+>>   
+>> -		if (!sk_under_memory_pressure(sk))
+>> +		/* Be more conservative if the socket's memcg (or its
+>> +		 * parents) is under reclaim pressure, try to possibly
+>> +		 * avoid further memstall.
+>> +		 */
+>> +		if (under_memcg_pressure)
+>> +			goto suppress_allocation;
+>> +
+>> +		if (!sk_under_global_memory_pressure(sk))
+>>   			return 1;
+>> +
+>> +		/* Trying to be fair among all the sockets of same
+>> +		 * protocal under global memory pressure, by allowing
+> 
+> nit: checkpatch.pl --codespell says, protocal -> protocol
 
-HEAD commit:    d68b4b6f307d Merge tag 'mm-nonmm-stable-2023-08-28-22-48' ..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=147267b7a80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c45ae22e154d76fa
-dashboard link: https://syzkaller.appspot.com/bug?extid=9817a610349542589c42
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=128eab18680000
+Will fix in next version.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/eaa3c711dd68/disk-d68b4b6f.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/3ed6d023ff63/vmlinux-d68b4b6f.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/cc05f8831f38/bzImage-d68b4b6f.xz
+Thanks,
+	Abel
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+9817a610349542589c42@syzkaller.appspotmail.com
-
-RBP: 00007f64c7d70120 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000002
-R13: 000000000000006e R14: 00007f64c719c050 R15: 00007f64c72bfa48
- </TASK>
-wlan1: failed to insert STA entry for the AP (error -12)
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 7597 at net/mac80211/chan.c:2021 ieee80211_link_release_channel+0x19f/0x200 net/mac80211/chan.c:2021
-Modules linked in:
-CPU: 0 PID: 7597 Comm: syz-executor.5 Not tainted 6.5.0-syzkaller-04592-gd68b4b6f307d #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
-RIP: 0010:ieee80211_link_release_channel+0x19f/0x200 net/mac80211/chan.c:2021
-Code: ff ff ff ff 48 8d b8 f0 1c 00 00 e8 3b 33 79 00 31 ff 41 89 c5 89 c6 e8 cf 7e c7 f7 45 85 ed 0f 85 6d ff ff ff e8 51 83 c7 f7 <0f> 0b e9 61 ff ff ff 48 c7 c7 d0 28 ad 8e e8 6e 2f 1d f8 e9 3a ff
-RSP: 0018:ffffc9000a0d6b08 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: ffff88806730e3a8 RCX: 0000000000000000
-RDX: ffff8880271ebb80 RSI: ffffffff89c00a5f RDI: 0000000000000005
-RBP: ffff88806730cc80 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000001 R12: ffff88806730d580
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
-FS:  00007f64c7d706c0(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f5579f1bff8 CR3: 0000000075757000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- ieee80211_prep_connection+0x62a/0x14f0 net/mac80211/mlme.c:7065
- ieee80211_mgd_auth+0xa1a/0x1490 net/mac80211/mlme.c:7205
- rdev_auth net/wireless/rdev-ops.h:481 [inline]
- cfg80211_mlme_auth+0x551/0x910 net/wireless/mlme.c:289
- cfg80211_conn_do_work+0x64e/0xfe0 net/wireless/sme.c:181
- cfg80211_sme_connect net/wireless/sme.c:638 [inline]
- cfg80211_connect+0xf07/0x20c0 net/wireless/sme.c:1528
- nl80211_connect+0x13ef/0x1d50 net/wireless/nl80211.c:12018
- genl_family_rcv_msg_doit+0x1fc/0x2e0 net/netlink/genetlink.c:971
- genl_family_rcv_msg net/netlink/genetlink.c:1051 [inline]
- genl_rcv_msg+0x55c/0x800 net/netlink/genetlink.c:1066
- netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2545
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1075
- netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
- netlink_unicast+0x536/0x810 net/netlink/af_netlink.c:1368
- netlink_sendmsg+0x93c/0xe40 net/netlink/af_netlink.c:1910
- sock_sendmsg_nosec net/socket.c:728 [inline]
- sock_sendmsg+0xd9/0x180 net/socket.c:751
- ____sys_sendmsg+0x6ac/0x940 net/socket.c:2538
- ___sys_sendmsg+0x135/0x1d0 net/socket.c:2592
- __sys_sendmsg+0x117/0x1e0 net/socket.c:2621
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f64c707cae9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f64c7d700c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f64c719c050 RCX: 00007f64c707cae9
-RDX: 0000000000000000 RSI: 00000000200001c0 RDI: 0000000000000003
-RBP: 00007f64c7d70120 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000002
-R13: 000000000000006e R14: 00007f64c719c050 R15: 00007f64c72bfa48
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+> 
+>> +		 * the ones that under average usage to raise.
+>> +		 */
+>>   		alloc = sk_sockets_allocated_read_positive(sk);
+>>   		if (sk_prot_mem_limits(sk, 2) > alloc *
+>>   		    sk_mem_pages(sk->sk_wmem_queued +
+>> -- 
+>> 2.37.3
+>>
+>>
 
