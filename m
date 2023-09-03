@@ -1,186 +1,153 @@
-Return-Path: <netdev+bounces-31853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A872790DD4
-	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 21:55:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0D4F790EDD
+	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 00:13:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D734280F70
-	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 19:55:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8BCE280F48
+	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 22:13:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2056DBA30;
-	Sun,  3 Sep 2023 19:55:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18D98BA45;
+	Sun,  3 Sep 2023 22:13:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14FE6BA2D
-	for <netdev@vger.kernel.org>; Sun,  3 Sep 2023 19:55:03 +0000 (UTC)
-Received: from mail-pf1-f206.google.com (mail-pf1-f206.google.com [209.85.210.206])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4B6BDE
-	for <netdev@vger.kernel.org>; Sun,  3 Sep 2023 12:55:00 -0700 (PDT)
-Received: by mail-pf1-f206.google.com with SMTP id d2e1a72fcca58-68a3d6ce18cso902857b3a.0
-        for <netdev@vger.kernel.org>; Sun, 03 Sep 2023 12:55:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07532BA42
+	for <netdev@vger.kernel.org>; Sun,  3 Sep 2023 22:13:48 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A54A4F4
+	for <netdev@vger.kernel.org>; Sun,  3 Sep 2023 15:13:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1693779226;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=VjL9JGcLByfgPaZswLky26tlQQfEuGeRmQ8TWkF1Et8=;
+	b=HbDxDHKD1MmabWjRGAoJpB15cqrCRVg6fNJChly9hPLTdLhcF6DTnHJZsrKY2HRu3j3FGl
+	CaY6UJICcaAXDJ2WBiJ0Ec+VguPPPM4K6l7/fvAyl793UaOPyfZb/ZWQhPS4Vdc7zDCaN9
+	jX7v/P88pUAwbixXGeDOAYBPhlHocns=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-120-kH_-3RNHNZKu4qLAzSL56w-1; Sun, 03 Sep 2023 18:13:45 -0400
+X-MC-Unique: kH_-3RNHNZKu4qLAzSL56w-1
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2bbc1d8011dso7685021fa.1
+        for <netdev@vger.kernel.org>; Sun, 03 Sep 2023 15:13:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693770900; x=1694375700;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uWa3iwwkzdPY4YildIzHGcIx9uOwREDiHAagNULjXhs=;
-        b=hMLDSE2a8W/2s88QWZ/ulFUXCPlek8khw5X60GAh4qnod5yPnckZklVcIsEEFPkvOA
-         FWH0ljuJTd2KQ5OnEsWx7Q9T5F2NLnb09+y4SwoJxY4zF6Py7ysMNrNaKHTuJzGklVjQ
-         B4HALlSNTKDOeBUcr50RyJt7MPuW8OiCXOGz/uI2bCjyKQFH1ixJ61OhRqqO+i+luIgm
-         R2jkiP7HsevBwMgiQDELa6oe+/IaHX8MBYLE1U4B0pjTB3m+OvNVRlavX9ix8dLVM9CF
-         xZFhxXdtbVwgqTkgjKUEQD5Al4DEMqS+uI5yJppTBo77JoEkxBONg7PJfzZE9qoVVQLt
-         5IhQ==
-X-Gm-Message-State: AOJu0Yz4/edVGwiEeEftrDprXA9G9MCSww/FIr5GEGrTw8UFfYMO9jkn
-	QN2LcuzMyFRjqMHEmyLhVEYoxz/OTwSBgJ0sKNKAzmzsiM3h
-X-Google-Smtp-Source: AGHT+IEkIjg2R/lH3aIeSKcj8ZfWkzZLtK0sefjowJVjw++uev0i4Xd3oKIQOd84JTflLcP94YlaiBFNWxE7ewL0Qeag+qvpqhvf
+        d=1e100.net; s=20221208; t=1693779223; x=1694384023;
+        h=content-transfer-encoding:content-disposition:mime-version
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VjL9JGcLByfgPaZswLky26tlQQfEuGeRmQ8TWkF1Et8=;
+        b=JSa7Ng8HmdPEDTNM56EUmIcmfHrnDYlKjqMN/uAfQ448cwAKn/3yBuPOGWAn5/fyi/
+         B6WM9f4U6IElQeDbaph+ASSPzOwxf6Rqo9/SrweIjroCZedUwfKNPA+ZftP4awHH8J0y
+         8HDoxaprfFO4Sp9eceJjPmnprhVhgZJYJ/6GGfgMN+E0wJ0+hLvtVqj12Nv5Et3EdJzl
+         ioPXq09bYBedZCk1nL2YiAPnjB6EJEKs8lC28atzcic5awbz3HHYWJC18CUfm01rvmib
+         3UUB7uOSbur/a7wQhk5z4DOKLr6N9KD2fu41mdJaUvrVEltlN8NY8134KM7vo170qAvz
+         tU6Q==
+X-Gm-Message-State: AOJu0YyQDbvviLOsdL+oOHNIsrL3qAgwgVqioct/kBn+eb6sWgHiQ3DV
+	SSuEg2GyprN3Ku4Yjz5ns2W7qNUHGYw2ay+hzFrbEfn6zKDAvTVZcyrm8QqsxyN2A6d6XDs+rFV
+	EKkCgnpqNXfkBfCXg
+X-Received: by 2002:a2e:b70d:0:b0:2bd:133c:58ff with SMTP id j13-20020a2eb70d000000b002bd133c58ffmr5371565ljo.48.1693779223760;
+        Sun, 03 Sep 2023 15:13:43 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFt5eq/oqAhbyqYfgrqKLbNZZyl3X0ZXzNnLt/MouQMoz3QQr7CiE/cjPIeQZ0ta3ELUrf4kA==
+X-Received: by 2002:a2e:b70d:0:b0:2bd:133c:58ff with SMTP id j13-20020a2eb70d000000b002bd133c58ffmr5371549ljo.48.1693779223406;
+        Sun, 03 Sep 2023 15:13:43 -0700 (PDT)
+Received: from redhat.com ([2.52.1.236])
+        by smtp.gmail.com with ESMTPSA id gf20-20020a170906e21400b0099ce23c57e6sm5257536ejb.224.2023.09.03.15.13.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 03 Sep 2023 15:13:42 -0700 (PDT)
+Date: Sun, 3 Sep 2023 18:13:38 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	eperezma@redhat.com, jasowang@redhat.com, mst@redhat.com,
+	shannon.nelson@amd.com, xuanzhuo@linux.alibaba.com,
+	yuanyaogoog@chromium.org, yuehaibing@huawei.com
+Subject: [GIT PULL] virtio: features
+Message-ID: <20230903181338-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6a00:4c11:b0:68a:6787:8413 with SMTP id
- ea17-20020a056a004c1100b0068a67878413mr2744479pfb.3.1693770900403; Sun, 03
- Sep 2023 12:55:00 -0700 (PDT)
-Date: Sun, 03 Sep 2023 12:55:00 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000d97f3c060479c4f8@google.com>
-Subject: [syzbot] [bpf?] general protection fault in bpf_prog_offload_verifier_prep
-From: syzbot <syzbot+291100dcb32190ec02a8@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, haoluo@google.com, hawk@kernel.org, 
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev, 
-	netdev@vger.kernel.org, sdf@google.com, song@kernel.org, 
-	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-Mutt-Fcc: =sent
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello,
+The following changes since commit 2dde18cd1d8fac735875f2e4987f11817cc0bc2c:
 
-syzbot found the following issue on:
+  Linux 6.5 (2023-08-27 14:49:51 -0700)
 
-HEAD commit:    fa09bc40b21a igb: disable virtualization features on 82580
-git tree:       net
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=13382fa8680000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=634e05b4025da9da
-dashboard link: https://syzkaller.appspot.com/bug?extid=291100dcb32190ec02a8
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1529c448680000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15db0248680000
+are available in the Git repository at:
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/7ab461d84992/disk-fa09bc40.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/3ac6d43ab2db/vmlinux-fa09bc40.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/778d096a134e/bzImage-fa09bc40.xz
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+291100dcb32190ec02a8@syzkaller.appspotmail.com
+for you to fetch changes up to 1acfe2c1225899eab5ab724c91b7e1eb2881b9ab:
 
-general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-CPU: 1 PID: 5055 Comm: syz-executor625 Not tainted 6.5.0-syzkaller-04012-gfa09bc40b21a #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
-RIP: 0010:bpf_prog_offload_verifier_prep+0xaa/0x170 kernel/bpf/offload.c:295
-Code: 00 fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 a1 00 00 00 48 b8 00 00 00 00 00 fc ff df 4c 8b 65 10 4c 89 e2 48 c1 ea 03 <80> 3c 02 00 0f 85 93 00 00 00 48 b8 00 00 00 00 00 fc ff df 4d 8b
-RSP: 0018:ffffc900039ff7f8 EFLAGS: 00010246
-RAX: dffffc0000000000 RBX: ffffc9000156e000 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: ffffffff81a8cf76 RDI: ffff888021b25f10
-RBP: ffff888021b25f00 R08: 0000000000000001 R09: fffffbfff195203d
-R10: ffffffff8ca901ef R11: 0000000000000000 R12: 0000000000000000
-R13: 0000000000000005 R14: 0000000000000003 R15: ffffc9000156e060
-FS:  0000555556071380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020000100 CR3: 0000000022f6b000 CR4: 00000000003506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- bpf_check+0x52f3/0xabd0 kernel/bpf/verifier.c:19762
- bpf_prog_load+0x153a/0x2270 kernel/bpf/syscall.c:2708
- __sys_bpf+0xbb6/0x4e90 kernel/bpf/syscall.c:5335
- __do_sys_bpf kernel/bpf/syscall.c:5439 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:5437 [inline]
- __x64_sys_bpf+0x78/0xc0 kernel/bpf/syscall.c:5437
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f7c0df78ea9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 d1 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffde3592128 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f7c0df78ea9
-RDX: 0000000000000090 RSI: 0000000020000940 RDI: 0000000000000005
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000100000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:bpf_prog_offload_verifier_prep+0xaa/0x170 kernel/bpf/offload.c:295
-Code: 00 fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 a1 00 00 00 48 b8 00 00 00 00 00 fc ff df 4c 8b 65 10 4c 89 e2 48 c1 ea 03 <80> 3c 02 00 0f 85 93 00 00 00 48 b8 00 00 00 00 00 fc ff df 4d 8b
-RSP: 0018:ffffc900039ff7f8 EFLAGS: 00010246
-RAX: dffffc0000000000 RBX: ffffc9000156e000 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: ffffffff81a8cf76 RDI: ffff888021b25f10
-RBP: ffff888021b25f00 R08: 0000000000000001 R09: fffffbfff195203d
-R10: ffffffff8ca901ef R11: 0000000000000000 R12: 0000000000000000
-R13: 0000000000000005 R14: 0000000000000003 R15: ffffc9000156e060
-FS:  0000555556071380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020000100 CR3: 0000000022f6b000 CR4: 00000000003506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess), 3 bytes skipped:
-   0:	df 48 89             	fisttps -0x77(%rax)
-   3:	fa                   	cli
-   4:	48 c1 ea 03          	shr    $0x3,%rdx
-   8:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
-   c:	0f 85 a1 00 00 00    	jne    0xb3
-  12:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
-  19:	fc ff df
-  1c:	4c 8b 65 10          	mov    0x10(%rbp),%r12
-  20:	4c 89 e2             	mov    %r12,%rdx
-  23:	48 c1 ea 03          	shr    $0x3,%rdx
-* 27:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
-  2b:	0f 85 93 00 00 00    	jne    0xc4
-  31:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
-  38:	fc ff df
-  3b:	4d                   	rex.WRB
-  3c:	8b                   	.byte 0x8b
+  virtio_ring: fix avail_wrap_counter in virtqueue_add_packed (2023-09-03 18:10:24 -0400)
 
+----------------------------------------------------------------
+virtio: features
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+a small pull request this time around, mostly because the
+vduse network got postponed to next relase so we can be sure
+we got the security store right.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+----------------------------------------------------------------
+Eugenio Pérez (4):
+      vdpa: add VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK flag
+      vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend feature
+      vdpa: add get_backend_features vdpa operation
+      vdpa_sim: offer VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Jason Wang (1):
+      virtio_vdpa: build affinity masks conditionally
 
-If you want to overwrite bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+Xuan Zhuo (12):
+      virtio_ring: check use_dma_api before unmap desc for indirect
+      virtio_ring: put mapping error check in vring_map_one_sg
+      virtio_ring: introduce virtqueue_set_dma_premapped()
+      virtio_ring: support add premapped buf
+      virtio_ring: introduce virtqueue_dma_dev()
+      virtio_ring: skip unmap for premapped
+      virtio_ring: correct the expression of the description of virtqueue_resize()
+      virtio_ring: separate the logic of reset/enable from virtqueue_resize
+      virtio_ring: introduce virtqueue_reset()
+      virtio_ring: introduce dma map api for virtqueue
+      virtio_ring: introduce dma sync api for virtqueue
+      virtio_net: merge dma operations when filling mergeable buffers
 
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
+Yuan Yao (1):
+      virtio_ring: fix avail_wrap_counter in virtqueue_add_packed
 
-If you want to undo deduplication, reply with:
-#syz undup
+Yue Haibing (1):
+      vdpa/mlx5: Remove unused function declarations
+
+ drivers/net/virtio_net.c           | 230 ++++++++++++++++++---
+ drivers/vdpa/mlx5/core/mlx5_vdpa.h |   3 -
+ drivers/vdpa/vdpa_sim/vdpa_sim.c   |   8 +
+ drivers/vhost/vdpa.c               |  15 +-
+ drivers/virtio/virtio_ring.c       | 412 ++++++++++++++++++++++++++++++++-----
+ drivers/virtio/virtio_vdpa.c       |  17 +-
+ include/linux/vdpa.h               |   4 +
+ include/linux/virtio.h             |  22 ++
+ include/uapi/linux/vhost_types.h   |   4 +
+ 9 files changed, 625 insertions(+), 90 deletions(-)
+
 
