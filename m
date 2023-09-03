@@ -1,111 +1,186 @@
-Return-Path: <netdev+bounces-31841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76AC4790B41
-	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 10:38:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5BF5790BE0
+	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 14:22:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CB611C20823
-	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 08:38:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 003F5280F80
+	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 12:22:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36A7417ED;
-	Sun,  3 Sep 2023 08:38:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C54A72106;
+	Sun,  3 Sep 2023 12:22:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2835917EC
-	for <netdev@vger.kernel.org>; Sun,  3 Sep 2023 08:38:19 +0000 (UTC)
-Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37E69CD
-	for <netdev@vger.kernel.org>; Sun,  3 Sep 2023 01:38:18 -0700 (PDT)
-Received: by mail-ed1-x536.google.com with SMTP id 4fb4d7f45d1cf-52a1ce529fdso523472a12.1
-        for <netdev@vger.kernel.org>; Sun, 03 Sep 2023 01:38:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1693730296; x=1694335096; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fbbCADn6qVo4++0ODqx3/gIn04Tf4kByZXe5yzyZxUM=;
-        b=VNxdGpF4Ry2ttsMb5vW/DLAQ388HKKaP4ZaGQEAlMcn2wabHv+7sfvlCVOr3Ubrxmx
-         kCPDELFUi47ks/B5Drc1QOrWkHGVGzlgNG5E858eUqHj0cHWNi6UgSmjmhroWye9dYGs
-         hkjtVyKCTZtdOvtgwWRiRF+0OeDSSD8V+sXQ0et8Z3DCY4cInajE08bEcTsZT183/QIC
-         e61wMlHlKs2k5Nf/Wx4zFwRq0pCBmu5vNulYGoI8txD2orEU2CRJAfhn9X+H5K49CmJL
-         sdeQSBRpvj36UIOBDPnJAWaC7BnjdTdEnXTRgkCrOOP3T/3jUplBVG0gd+zXK6JpSRWu
-         jOgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693730296; x=1694335096;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fbbCADn6qVo4++0ODqx3/gIn04Tf4kByZXe5yzyZxUM=;
-        b=MDzyL0NpziYVxVUfW5GlhpMGeSV4rumfkfms6gdsYpVykcPExKNzr/LcVDWKnPcVuP
-         q/K3bXbRrnBT80IZTv60j6EnDastIm6tZfqsLrGXf6WTuvd7iS7M/Fw9ocAxFiXDq861
-         3tZoS6N7aec+dBtfa7CHJVZ+4irz7mCezOstgPfVYv4KKyny5kKjW6Msz9PWi0ZeaxZl
-         HqvHq62Es5+It9hIYZeuk3trqAlNpO5fn1vv8itJlfSj/ry5CF/NtzktWkEJZ8D35G4m
-         Z86fU6I9nFAz4hFwPY8IgqmWaxde8WpfPy8xiTYtLeUwJfd8TOdozCYtsUCPGXF9PhU0
-         hmXw==
-X-Gm-Message-State: AOJu0YwAJQG2Lzp+0r7JLHka3y8YRyoCE57EW72fTfSFgXPcEygM8I4t
-	CmX7JgfFnU8JnUyptMfKJtcstw==
-X-Google-Smtp-Source: AGHT+IEeybhfr5z4O/FN4tJJELkxeqP1Pgf+GZ9LeCvf2q04yQRT3voNHGAp5nKMeaUW54dmsz6u3g==
-X-Received: by 2002:aa7:df82:0:b0:52a:1c3c:2ecc with SMTP id b2-20020aa7df82000000b0052a1c3c2eccmr4910403edy.25.1693730296609;
-        Sun, 03 Sep 2023 01:38:16 -0700 (PDT)
-Received: from [192.168.0.103] (haunt.prize.volia.net. [93.72.109.136])
-        by smtp.gmail.com with ESMTPSA id d26-20020a50fb1a000000b0052574ef0da1sm4278942edq.28.2023.09.03.01.38.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 03 Sep 2023 01:38:16 -0700 (PDT)
-Message-ID: <d9439db7-5d1e-5a2d-399c-884e8661c0b9@blackwall.org>
-Date: Sun, 3 Sep 2023 11:38:15 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B481B7F
+	for <netdev@vger.kernel.org>; Sun,  3 Sep 2023 12:22:25 +0000 (UTC)
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F858126;
+	Sun,  3 Sep 2023 05:22:22 -0700 (PDT)
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 383CKBDO022398;
+	Sun, 3 Sep 2023 12:22:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=k0CKR7RTDRnQ7iIZKSJscEYlJcwa01uVpg94z0vnRBI=;
+ b=CmTVqNnp300JdXOZKKVokxmf7EpgbV1Fs7NU4cFUXGmzzr4jJPez+r99h/4WicD9Iq/x
+ bs5Yu0E3qhrl9GpuAdCEt2/IfxDqrtCjHl8yfMsL1r32ndcjrA3R5N8N5odk8cbcwOWs
+ ttmuv/IWX4Q9vvNgwCRdq4+/jBILEqHk902s/xAPYd+mMITQjtK8IfxmunJUoTju0XGE
+ w6uxpCrHVxwaEogANnaJnlB3SUFTim2jX8P1s0qtyN3iWu2QKMzshCooxzS1sPUkoEXM
+ 70zoKAafxkvPZ6Y7UMGZxzzFvLCBkIO7Zw5VUV30ClagSedTkZer2Lifq3SdbqkhZZoX rw== 
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3suw50sn7j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 03 Sep 2023 12:22:15 +0000
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 383CMEvF008699
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 3 Sep 2023 12:22:14 GMT
+Received: from [10.216.14.155] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.30; Sun, 3 Sep
+ 2023 05:22:10 -0700
+Message-ID: <d7b7f611-e15b-e7a0-ce99-bd6c90027853@quicinc.com>
+Date: Sun, 3 Sep 2023 17:52:07 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH iproute2] iplink_bridge: fix incorrect root id dump
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH net-next 1/2] net: qrtr: Prevent stale ports from sending
 Content-Language: en-US
-To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
-Cc: David Ahern <dsahern@kernel.org>,
- Stephen Hemminger <stephen@networkplumber.org>,
- Ido Schimmel <idosch@nvidia.com>
-References: <20230901080226.424931-1-liuhangbin@gmail.com>
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20230901080226.424931-1-liuhangbin@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Bjorn Andersson <quic_bjorande@quicinc.com>, <quic_clew@quicinc.com>
+CC: <mani@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>,
+        <linux-arm-msm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <quic_viswanat@quicinc.com>
+References: <1693563621-1920-1-git-send-email-quic_srichara@quicinc.com>
+ <1693563621-1920-2-git-send-email-quic_srichara@quicinc.com>
+ <20230901141128.GO818859@hu-bjorande-lv.qualcomm.com>
+From: Sricharan Ramabadhran <quic_srichara@quicinc.com>
+In-Reply-To: <20230901141128.GO818859@hu-bjorande-lv.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: K1vR0GmeFoPG5HBs8kCrMuVCjWkWWs7L
+X-Proofpoint-ORIG-GUID: K1vR0GmeFoPG5HBs8kCrMuVCjWkWWs7L
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-09-03_09,2023-08-31_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ lowpriorityscore=0 suspectscore=0 mlxlogscore=999 clxscore=1015
+ spamscore=0 impostorscore=0 adultscore=0 bulkscore=0 mlxscore=0
+ malwarescore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2308100000 definitions=main-2309030115
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 9/1/23 11:02, Hangbin Liu wrote:
-> Fix the typo when dump root_id.
-> 
-> Fixes: 70dfb0b8836d ("iplink: bridge: export bridge_id and designated_root")
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> ---
->   ip/iplink_bridge.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/ip/iplink_bridge.c b/ip/iplink_bridge.c
-> index 7e4e62c81c0c..462075295308 100644
-> --- a/ip/iplink_bridge.c
-> +++ b/ip/iplink_bridge.c
-> @@ -499,7 +499,7 @@ static void bridge_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
->   	if (tb[IFLA_BR_ROOT_ID]) {
->   		char root_id[32];
->   
-> -		br_dump_bridge_id(RTA_DATA(tb[IFLA_BR_BRIDGE_ID]), root_id,
-> +		br_dump_bridge_id(RTA_DATA(tb[IFLA_BR_ROOT_ID]), root_id,
->   				  sizeof(root_id));
->   		print_string(PRINT_ANY,
->   			     "root_id",
+Hi Bjorn,
 
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+On 9/1/2023 7:41 PM, Bjorn Andersson wrote:
+> On Fri, Sep 01, 2023 at 03:50:20PM +0530, Sricharan Ramabadhran wrote:
+>> From: Vignesh Viswanathan <quic_viswanat@quicinc.com>
+>>
+>> If qrtr and some other process try to bind to the QMI Control port at
+> 
+> It's unclear to me which "qrtr" is being referred here, could it be
+> "qrtr-ns", if so could we express that as "the name server".
+> 
 
+  yes, its name-space server. Will put it explicitly.
+
+> We only allow one bind on the qrtr control port, so could it be that
+> "QMI Control port" refer to the control socket in the userspace QC[CS]I
+> libraries, if so that's just any random socket sending out a control
+> message.
+> 
+> Can we please rephrase this problem description to make the chain of
+> events clear?
+> 
+
+   In this case we are talking about a client connecting/sending to QRTR
+   socket and the 'NS' doing a qrtr_bind during its init. There is
+   possibility that a client tries to send to the 'NS' before  processing
+   the ENETRESET. In the case of a NEW_SERVER control message will
+   reach the 'NS' and be forwarded to the firmware. The client will then
+   process the ENETRESET closing and re-opening the socket which triggers
+   a DEL_SERVER and then a second NEW_SERVER. This scenario will give an
+   unnecessary disconnect to the clients on the firmware who were able to
+   initialize on the first NEW_SERVER.
+
+   Also about the patch #2, i guess QRTR_BYE/DEL_PROC should also be
+   broadcasted, right now we are only listening on DEL_PROC sent by
+   legacy kernels like SDX modems. Without that modem SSR feature is
+   broken on IPQ + SDX targets.
+
+>> the same time, NEW_SERVER might come before ENETRESET is given to the
+>> socket. This might cause a socket down/up when ENETRESET is received as
+>> per the protocol and this triggers a DEL_SERVER and a second NEW_SERVER.
+>>
+>> In order to prevent such messages from stale sockets being sent, check
+>> if ENETRESET has been set on the socket and drop the packet.
+>>
+>> Signed-off-by: Chris Lew <quic_clew@quicinc.com>
+>> Signed-off-by: Vignesh Viswanathan <quic_viswanat@quicinc.com>
+> 
+> The first person to certify the patch's origin, must be the author, and
+> when you pick the patch to send it you need to add your s-o-b.
+> 
+> So please fix the author, and add your s-o-b.
+> 
+
+  ok sure, will fix.
+
+> 
+> Let's add Chris to the recipients list as well.
+> 
+
+  ok.
+
+>> ---
+>>   net/qrtr/af_qrtr.c | 10 ++++++++++
+>>   1 file changed, 10 insertions(+)
+>>
+>> diff --git a/net/qrtr/af_qrtr.c b/net/qrtr/af_qrtr.c
+>> index 41ece61..26197a0 100644
+>> --- a/net/qrtr/af_qrtr.c
+>> +++ b/net/qrtr/af_qrtr.c
+>> @@ -851,6 +851,7 @@ static int qrtr_local_enqueue(struct qrtr_node *node, struct sk_buff *skb,
+>>   {
+>>   	struct qrtr_sock *ipc;
+>>   	struct qrtr_cb *cb;
+>> +	struct sock *sk = skb->sk;
+>>   
+>>   	ipc = qrtr_port_lookup(to->sq_port);
+>>   	if (!ipc || &ipc->sk == skb->sk) { /* do not send to self */
+>> @@ -860,6 +861,15 @@ static int qrtr_local_enqueue(struct qrtr_node *node, struct sk_buff *skb,
+>>   		return -ENODEV;
+>>   	}
+>>   
+>> +	/* Keep resetting NETRESET until socket is closed */
+>> +	if (sk && sk->sk_err == ENETRESET) {
+>> +		sk->sk_err = ENETRESET;
+> 
+> Isn't this line unnecessary?
+> 
+
+  yup, will be removed in V2.
+
+Regards,
+  Sricharan
 
