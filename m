@@ -1,153 +1,156 @@
-Return-Path: <netdev+bounces-31854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0D4F790EDD
-	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 00:13:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5753790EFB
+	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 00:31:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8BCE280F48
-	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 22:13:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E62A71C2087F
+	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 22:31:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18D98BA45;
-	Sun,  3 Sep 2023 22:13:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB093BE48;
+	Sun,  3 Sep 2023 22:30:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07532BA42
-	for <netdev@vger.kernel.org>; Sun,  3 Sep 2023 22:13:48 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A54A4F4
-	for <netdev@vger.kernel.org>; Sun,  3 Sep 2023 15:13:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1693779226;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=VjL9JGcLByfgPaZswLky26tlQQfEuGeRmQ8TWkF1Et8=;
-	b=HbDxDHKD1MmabWjRGAoJpB15cqrCRVg6fNJChly9hPLTdLhcF6DTnHJZsrKY2HRu3j3FGl
-	CaY6UJICcaAXDJ2WBiJ0Ec+VguPPPM4K6l7/fvAyl793UaOPyfZb/ZWQhPS4Vdc7zDCaN9
-	jX7v/P88pUAwbixXGeDOAYBPhlHocns=
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
- [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-120-kH_-3RNHNZKu4qLAzSL56w-1; Sun, 03 Sep 2023 18:13:45 -0400
-X-MC-Unique: kH_-3RNHNZKu4qLAzSL56w-1
-Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2bbc1d8011dso7685021fa.1
-        for <netdev@vger.kernel.org>; Sun, 03 Sep 2023 15:13:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1F1FBA48
+	for <netdev@vger.kernel.org>; Sun,  3 Sep 2023 22:30:57 +0000 (UTC)
+Received: from mail-oa1-x2f.google.com (mail-oa1-x2f.google.com [IPv6:2001:4860:4864:20::2f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0CA5DE
+	for <netdev@vger.kernel.org>; Sun,  3 Sep 2023 15:30:55 -0700 (PDT)
+Received: by mail-oa1-x2f.google.com with SMTP id 586e51a60fabf-1d4e0c2901bso213915fac.0
+        for <netdev@vger.kernel.org>; Sun, 03 Sep 2023 15:30:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1693780255; x=1694385055; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Nv6YpToDNZJcA/Ccz8YHJKQ8zE37n7OYKvDh05ivZ8M=;
+        b=eLvFMZ6HweV3i75Mje3KyiQMHp72f3fVYJp4X8QBR1sUoWt5LbUe2oYe6gz7J03xSV
+         aHsv7iDil4KTnD32vRddboJhyW5dIQThpWZBfmdQlNdU/+SQKnZqTkI+8YNmhDFqSNM4
+         M/5uOEBZigGEpPC3vmfjiwnDFOd47IixsMl044OpUX7QG234XdFYwtba/jPyi6PCo/kZ
+         okP+nX6zzbLjyilv/Ocy1qCe5aC4gkdgDOfyh92JWGe8bVg+DmwjlPuuV3kM/V8mAkRG
+         YMrGVWwsvVs5uRT8A9BN8JD3DAOcyXyqtn49LxBGuGru+09OFjvSzk6tINPlQnplnbJD
+         r/Aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693779223; x=1694384023;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VjL9JGcLByfgPaZswLky26tlQQfEuGeRmQ8TWkF1Et8=;
-        b=JSa7Ng8HmdPEDTNM56EUmIcmfHrnDYlKjqMN/uAfQ448cwAKn/3yBuPOGWAn5/fyi/
-         B6WM9f4U6IElQeDbaph+ASSPzOwxf6Rqo9/SrweIjroCZedUwfKNPA+ZftP4awHH8J0y
-         8HDoxaprfFO4Sp9eceJjPmnprhVhgZJYJ/6GGfgMN+E0wJ0+hLvtVqj12Nv5Et3EdJzl
-         ioPXq09bYBedZCk1nL2YiAPnjB6EJEKs8lC28atzcic5awbz3HHYWJC18CUfm01rvmib
-         3UUB7uOSbur/a7wQhk5z4DOKLr6N9KD2fu41mdJaUvrVEltlN8NY8134KM7vo170qAvz
-         tU6Q==
-X-Gm-Message-State: AOJu0YyQDbvviLOsdL+oOHNIsrL3qAgwgVqioct/kBn+eb6sWgHiQ3DV
-	SSuEg2GyprN3Ku4Yjz5ns2W7qNUHGYw2ay+hzFrbEfn6zKDAvTVZcyrm8QqsxyN2A6d6XDs+rFV
-	EKkCgnpqNXfkBfCXg
-X-Received: by 2002:a2e:b70d:0:b0:2bd:133c:58ff with SMTP id j13-20020a2eb70d000000b002bd133c58ffmr5371565ljo.48.1693779223760;
-        Sun, 03 Sep 2023 15:13:43 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFt5eq/oqAhbyqYfgrqKLbNZZyl3X0ZXzNnLt/MouQMoz3QQr7CiE/cjPIeQZ0ta3ELUrf4kA==
-X-Received: by 2002:a2e:b70d:0:b0:2bd:133c:58ff with SMTP id j13-20020a2eb70d000000b002bd133c58ffmr5371549ljo.48.1693779223406;
-        Sun, 03 Sep 2023 15:13:43 -0700 (PDT)
-Received: from redhat.com ([2.52.1.236])
-        by smtp.gmail.com with ESMTPSA id gf20-20020a170906e21400b0099ce23c57e6sm5257536ejb.224.2023.09.03.15.13.40
+        d=1e100.net; s=20221208; t=1693780255; x=1694385055;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Nv6YpToDNZJcA/Ccz8YHJKQ8zE37n7OYKvDh05ivZ8M=;
+        b=IIzkZtCQk/jSUGI79qB3nGRwWRldgszzJz/oZPxwmVHHUbLlpp3G3o2etvXKMriRnH
+         k55P0v5wbFmapbBF4oigLC+YRAVSXXk1NF7raDQpPHlWrkxnrPKYBSrV10coO5k/GNuS
+         I6aQT7GdoY7CklQpcqtaPnX2eMBKv2IXXsneMxV7//DYowPajxGZ66L0YzWO3QeV/pTx
+         RZdfBnV/6vH4T1y9FQzkbHPRqM71NdocYUsWWZBxqLfu1MHbL6jyNpWo6nFdimBasKiw
+         KiNccuFXwmGKcQsySTUgq8jBtPHKsC8XluNJ+P1svHGDsnyxYPMay2iR33s/5UQT0SHw
+         jmQA==
+X-Gm-Message-State: AOJu0YzHUmnVkXdlfK5NT+Lhermr5x+B4279xZKA/EDdtwk3wS6AcGA4
+	oiklfwYRm+fKmu5BR2R9tRhCow==
+X-Google-Smtp-Source: AGHT+IGLu9Ypqvz2HQH6Ke2apJHDtGTD5ZHmV6+9u1MT+8XuCmbNG2jkA6AQg79Zc5mY+kWQOWShIA==
+X-Received: by 2002:a05:6870:568d:b0:1be:c8e2:3ec3 with SMTP id p13-20020a056870568d00b001bec8e23ec3mr11536784oao.14.1693780255066;
+        Sun, 03 Sep 2023 15:30:55 -0700 (PDT)
+Received: from dread.disaster.area (pa49-195-66-88.pa.nsw.optusnet.com.au. [49.195.66.88])
+        by smtp.gmail.com with ESMTPSA id i15-20020a63bf4f000000b00565e96d9874sm5648132pgo.89.2023.09.03.15.30.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 Sep 2023 15:13:42 -0700 (PDT)
-Date: Sun, 3 Sep 2023 18:13:38 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	eperezma@redhat.com, jasowang@redhat.com, mst@redhat.com,
-	shannon.nelson@amd.com, xuanzhuo@linux.alibaba.com,
-	yuanyaogoog@chromium.org, yuehaibing@huawei.com
-Subject: [GIT PULL] virtio: features
-Message-ID: <20230903181338-mutt-send-email-mst@kernel.org>
+        Sun, 03 Sep 2023 15:30:54 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+	(envelope-from <david@fromorbit.com>)
+	id 1qcvcK-00ASFy-0F;
+	Mon, 04 Sep 2023 08:30:52 +1000
+Date: Mon, 4 Sep 2023 08:30:52 +1000
+From: Dave Chinner <david@fromorbit.com>
+To: Hao Xu <hao.xu@linux.dev>
+Cc: Matthew Wilcox <willy@infradead.org>, io-uring@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Stefan Roesch <shr@fb.com>, Clay Harris <bugs@claycon.org>,
+	"Darrick J . Wong" <djwong@kernel.org>,
+	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org, linux-cachefs@redhat.com,
+	ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+	linux-unionfs@vger.kernel.org, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, codalist@coda.cs.cmu.edu,
+	linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+	linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
+	devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
+	Wanpeng Li <wanpengli@tencent.com>
+Subject: Re: [PATCH 07/11] vfs: add nowait parameter for file_accessed()
+Message-ID: <ZPUJHAKzxvXiEDYA@dread.disaster.area>
+References: <20230827132835.1373581-1-hao.xu@linux.dev>
+ <20230827132835.1373581-8-hao.xu@linux.dev>
+ <ZOvA5DJDZN0FRymp@casper.infradead.org>
+ <c728bf3f-d9db-4865-8473-058b26c11c06@linux.dev>
+ <ZO3cI+DkotHQo3md@casper.infradead.org>
+ <642de4e6-801d-fcad-a7ce-bfc6dec3b6e5@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-X-Mutt-Fcc: =sent
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <642de4e6-801d-fcad-a7ce-bfc6dec3b6e5@linux.dev>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The following changes since commit 2dde18cd1d8fac735875f2e4987f11817cc0bc2c:
+On Wed, Aug 30, 2023 at 02:11:31PM +0800, Hao Xu wrote:
+> On 8/29/23 19:53, Matthew Wilcox wrote:
+> > On Tue, Aug 29, 2023 at 03:46:13PM +0800, Hao Xu wrote:
+> > > On 8/28/23 05:32, Matthew Wilcox wrote:
+> > > > On Sun, Aug 27, 2023 at 09:28:31PM +0800, Hao Xu wrote:
+> > > > > From: Hao Xu <howeyxu@tencent.com>
+> > > > > 
+> > > > > Add a boolean parameter for file_accessed() to support nowait semantics.
+> > > > > Currently it is true only with io_uring as its initial caller.
+> > > > 
+> > > > So why do we need to do this as part of this series?  Apparently it
+> > > > hasn't caused any problems for filemap_read().
+> > > > 
+> > > 
+> > > We need this parameter to indicate if nowait semantics should be enforced in
+> > > touch_atime(), There are locks and maybe IOs in it.
+> > 
+> > That's not my point.  We currently call file_accessed() and
+> > touch_atime() for nowait reads and nowait writes.  You haven't done
+> > anything to fix those.
+> > 
+> > I suspect you can trim this patchset down significantly by avoiding
+> > fixing the file_accessed() problem.  And then come back with a later
+> > patchset that fixes it for all nowait i/o.  Or do a separate prep series
+> 
+> I'm ok to do that.
+> 
+> > first that fixes it for the existing nowait users, and then a second
+> > series to do all the directory stuff.
+> > 
+> > I'd do the first thing.  Just ignore the problem.  Directory atime
+> > updates cause I/O so rarely that you can afford to ignore it.  Almost
+> > everyone uses relatime or nodiratime.
+> 
+> Hi Matthew,
+> The previous discussion shows this does cause issues in real
+> producations: https://lore.kernel.org/io-uring/2785f009-2ebb-028d-8250-d5f3a30510f0@gmail.com/#:~:text=fwiw%2C%20we%27ve%20just%20recently%20had%20similar%20problems%20with%20io_uring%20read/write
+> 
 
-  Linux 6.5 (2023-08-27 14:49:51 -0700)
+Then separate it out into it's own patch set so we can have a
+discussion on the merits of requiring using noatime, relatime or
+lazytime for really latency sensitive IO applications. Changing code
+is not always the right solution...
 
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-
-for you to fetch changes up to 1acfe2c1225899eab5ab724c91b7e1eb2881b9ab:
-
-  virtio_ring: fix avail_wrap_counter in virtqueue_add_packed (2023-09-03 18:10:24 -0400)
-
-----------------------------------------------------------------
-virtio: features
-
-a small pull request this time around, mostly because the
-vduse network got postponed to next relase so we can be sure
-we got the security store right.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Eugenio Pérez (4):
-      vdpa: add VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK flag
-      vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend feature
-      vdpa: add get_backend_features vdpa operation
-      vdpa_sim: offer VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK
-
-Jason Wang (1):
-      virtio_vdpa: build affinity masks conditionally
-
-Xuan Zhuo (12):
-      virtio_ring: check use_dma_api before unmap desc for indirect
-      virtio_ring: put mapping error check in vring_map_one_sg
-      virtio_ring: introduce virtqueue_set_dma_premapped()
-      virtio_ring: support add premapped buf
-      virtio_ring: introduce virtqueue_dma_dev()
-      virtio_ring: skip unmap for premapped
-      virtio_ring: correct the expression of the description of virtqueue_resize()
-      virtio_ring: separate the logic of reset/enable from virtqueue_resize
-      virtio_ring: introduce virtqueue_reset()
-      virtio_ring: introduce dma map api for virtqueue
-      virtio_ring: introduce dma sync api for virtqueue
-      virtio_net: merge dma operations when filling mergeable buffers
-
-Yuan Yao (1):
-      virtio_ring: fix avail_wrap_counter in virtqueue_add_packed
-
-Yue Haibing (1):
-      vdpa/mlx5: Remove unused function declarations
-
- drivers/net/virtio_net.c           | 230 ++++++++++++++++++---
- drivers/vdpa/mlx5/core/mlx5_vdpa.h |   3 -
- drivers/vdpa/vdpa_sim/vdpa_sim.c   |   8 +
- drivers/vhost/vdpa.c               |  15 +-
- drivers/virtio/virtio_ring.c       | 412 ++++++++++++++++++++++++++++++++-----
- drivers/virtio/virtio_vdpa.c       |  17 +-
- include/linux/vdpa.h               |   4 +
- include/linux/virtio.h             |  22 ++
- include/uapi/linux/vhost_types.h   |   4 +
- 9 files changed, 625 insertions(+), 90 deletions(-)
-
+-Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
 
