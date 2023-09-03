@@ -1,140 +1,80 @@
-Return-Path: <netdev+bounces-31843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 245AA790BE4
-	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 14:26:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A271790C0C
+	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 15:12:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBA281C20749
-	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 12:26:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65D561C20621
+	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 13:12:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98A71210B;
-	Sun,  3 Sep 2023 12:26:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E4FE23AA;
+	Sun,  3 Sep 2023 13:12:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 874857F
-	for <netdev@vger.kernel.org>; Sun,  3 Sep 2023 12:26:52 +0000 (UTC)
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D1B6126;
-	Sun,  3 Sep 2023 05:26:51 -0700 (PDT)
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 383CLPQ7030893;
-	Sun, 3 Sep 2023 12:26:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=9y8lMAiQW6s58jdKBZd7Bg6zCnZHP+lVGgPcrZSjSjY=;
- b=Sfn/87zMwLT0KVHGQULenfbKseXgjDS6oVG7Im89XFb+J1xu36TRUQN18+bvQcejOTOW
- KCf9yLTQ86bIMN9tE4j0YjCy/zGNQDOHvEoIO+JRAo8kGqueQioCFz+6xlTS/zQYfL5l
- Xo3UBQBAmSa8egjY1IE6eDzDWfeRv6tisiXYCb1FF4dMhgl18+FZmPZpPao+u1yK5I3p
- 3iXireMdpx9+bN25FO81I+PPeBIV9p2MKxCIsCTXrtDVoEgvjaFfcdkHqfuBWZnqLcqt
- VG1t6iC90leKd22uSBn0Kp9xdYySWnWPSEUWRtAoh3E9bBhwevM//iXItbYvz8Av6KPn ag== 
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3sutdtsuyf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 03 Sep 2023 12:26:44 +0000
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 383CQhQj013589
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 3 Sep 2023 12:26:43 GMT
-Received: from [10.216.14.155] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.30; Sun, 3 Sep
- 2023 05:26:39 -0700
-Message-ID: <290c7e5e-ddbb-c754-240f-a3017fed3801@quicinc.com>
-Date: Sun, 3 Sep 2023 17:56:36 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D38E210B
+	for <netdev@vger.kernel.org>; Sun,  3 Sep 2023 13:12:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 69C23C433CA;
+	Sun,  3 Sep 2023 13:12:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1693746753;
+	bh=g8pSR9QSVK6IeE2/A0s/1+eGsGP0iQjvdmE/KxRxGHs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=bGcMumlA/LMwxHzciuPWXEmAmoGpA8XWLb+ZxkzxMGAEh6tVIyf9qQRK43A8t2FMW
+	 mQhhBJuN5VVYjh8KcC/wjBFlZyOoaBHn/qkpGAumIimER83M6Qg7Q/YVqi5CXwE307
+	 NKT/ecSNY4LjYP2/7Phsenq+jsSuV2pzVPsXqe2TEgglG24RAHS21ZcZ3YfK1Vn5SC
+	 fg5pztGMbFctuS1lX+q7kYuzDaFUwvWrF2/HBM4yzVkHkrh9cj8qxFH8TirM4h2cU5
+	 CWp+gk4CjowMmt0dGBL7j8uxDahM+wJcVl6xlq1GmalOh5VleOzb8iExsSBXy9aujv
+	 UIiZPXpmZnlVw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4C894E29F39;
+	Sun,  3 Sep 2023 13:12:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH net-next 0/2] net: qrtr: Few qrtr fixes
-Content-Language: en-US
-To: Simon Horman <horms@kernel.org>
-CC: <mani@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>,
-        <linux-arm-msm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <quic_viswanat@quicinc.com>
-References: <1693563621-1920-1-git-send-email-quic_srichara@quicinc.com>
- <20230901141905.GJ140739@kernel.org>
-From: Sricharan Ramabadhran <quic_srichara@quicinc.com>
-In-Reply-To: <20230901141905.GJ140739@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: uxACoy5d3ZiCl8Nz4S6E3Ie2FlBmUdZv
-X-Proofpoint-GUID: uxACoy5d3ZiCl8Nz4S6E3Ie2FlBmUdZv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-09-03_09,2023-08-31_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- priorityscore=1501 malwarescore=0 adultscore=0 spamscore=0
- lowpriorityscore=0 clxscore=1011 mlxscore=0 suspectscore=0 mlxlogscore=574
- phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2308100000 definitions=main-2309030116
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net] igb: disable virtualization features on 82580
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169374675330.16952.10821656752298867430.git-patchwork-notify@kernel.org>
+Date: Sun, 03 Sep 2023 13:12:33 +0000
+References: <20230831121914.660875-1-vinschen@redhat.com>
+In-Reply-To: <20230831121914.660875-1-vinschen@redhat.com>
+To: Corinna Vinschen <vinschen@redhat.com>
+Cc: anthony.l.nguyen@intel.com, jesse.brandeburg@intel.com,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
 
-Hi Simon,
+Hello:
 
-On 9/1/2023 7:49 PM, Simon Horman wrote:
-> On Fri, Sep 01, 2023 at 03:50:19PM +0530, Sricharan Ramabadhran wrote:
->> Patch #1 fixes a race condition between qrtr driver and ns opening and
->> sending data to a control port.
->>
->> Patch #2 address the issue with legacy targets sending the SSR
->> notifications using DEL_PROC control message.
-> 
-> Hi Sricharan,
-> 
-> if these are fixes then they should be targeted at 'net' rather than
-> 'net-next', and consideration should be given to supplying Fixes tags.
-> 
-  There is as such no existing feature broken without these 2 patches
-  today. Then they might qualify as preparatory patches for adding
-  some features.
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-> If these are not fixes, then please don't describe them as such.
-> In this case targeting net-next is correct, but it is currently closed,
-> as per the form letter below.
+On Thu, 31 Aug 2023 14:19:13 +0200 you wrote:
+> Disable virtualization features on 82580 just as on i210/i211.
+> This avoids that virt functions are acidentally called on 82850.
 > 
-   Sure, then in that case looks like it belongs to 'net-next' and will
-   post V2 once the net-next is opened again.
+> Fixes: 55cac248caa4 ("igb: Add full support for 82580 devices")
+> Signed-off-by: Corinna Vinschen <vinschen@redhat.com>
+> ---
+>  drivers/net/ethernet/intel/igb/igb_main.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 
-> In either case please consider:
-> 
-> * Arranging local variables for new Networking code in
->    reverse xmas tree order - longest line to shortest
-> 
-> * Avoiding introducing new Sparse warnings
-> 
->   ok.
+Here is the summary with links:
+  - [v2,net] igb: disable virtualization features on 82580
+    https://git.kernel.org/netdev/net/c/fa09bc40b21a
 
-> ## Form letter - net-next-closed
-> 
-> The merge window for v6.6 has begun and therefore net-next is closed
-> for new drivers, features, code refactoring and optimizations.
-> We are currently accepting bug fixes only.
-> 
-> Please repost when net-next reopens after Sept 11th.
-> 
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-  ok, sure.
 
-Regards,
-  Sricharan
 
