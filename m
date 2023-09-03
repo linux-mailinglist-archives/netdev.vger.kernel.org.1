@@ -1,80 +1,82 @@
-Return-Path: <netdev+bounces-31844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A271790C0C
-	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 15:12:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47EA0790C55
+	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 16:01:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65D561C20621
-	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 13:12:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF652280F37
+	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 14:01:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E4FE23AA;
-	Sun,  3 Sep 2023 13:12:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D85D42593;
+	Sun,  3 Sep 2023 14:01:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D38E210B
-	for <netdev@vger.kernel.org>; Sun,  3 Sep 2023 13:12:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 69C23C433CA;
-	Sun,  3 Sep 2023 13:12:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693746753;
-	bh=g8pSR9QSVK6IeE2/A0s/1+eGsGP0iQjvdmE/KxRxGHs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=bGcMumlA/LMwxHzciuPWXEmAmoGpA8XWLb+ZxkzxMGAEh6tVIyf9qQRK43A8t2FMW
-	 mQhhBJuN5VVYjh8KcC/wjBFlZyOoaBHn/qkpGAumIimER83M6Qg7Q/YVqi5CXwE307
-	 NKT/ecSNY4LjYP2/7Phsenq+jsSuV2pzVPsXqe2TEgglG24RAHS21ZcZ3YfK1Vn5SC
-	 fg5pztGMbFctuS1lX+q7kYuzDaFUwvWrF2/HBM4yzVkHkrh9cj8qxFH8TirM4h2cU5
-	 CWp+gk4CjowMmt0dGBL7j8uxDahM+wJcVl6xlq1GmalOh5VleOzb8iExsSBXy9aujv
-	 UIiZPXpmZnlVw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4C894E29F39;
-	Sun,  3 Sep 2023 13:12:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C57162572
+	for <netdev@vger.kernel.org>; Sun,  3 Sep 2023 14:01:20 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2647B6
+	for <netdev@vger.kernel.org>; Sun,  3 Sep 2023 07:01:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=FRmvoZb9t6APhYJBtCKJrCvXQcrJ9in/X9+fCHbnW6w=; b=3tXvc7/7TjDjVhrzlFQFzrSQsj
+	JHAXRK4NsORbzL6xAJaeJNyoBDCf+z0+YTgjpDlDVQ/chI3DRuJ6Bf9wy3B2c8co3iH4DZ+I9Yiei
+	hjSddfw8kLk+SJ0tMAjjDaM4q1sxAiLmkdTslvP3dxZ79BOPctPlQ2WOarayMQHmtpaI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qcner-005gdi-GE; Sun, 03 Sep 2023 16:00:57 +0200
+Date: Sun, 3 Sep 2023 16:00:57 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Pawel Chmielewski <pawel.chmielewski@intel.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	"Greenwalt, Paul" <paul.greenwalt@intel.com>, aelior@marvell.com,
+	intel-wired-lan@lists.osuosl.org, manishc@marvell.com,
+	netdev@vger.kernel.org
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2 2/9] ethtool: Add forced
+ speed to supported link modes maps
+Message-ID: <87ea2635-c0b3-4de4-bc65-cbc33a0d5814@lunn.ch>
+References: <20230819093941.15163-1-paul.greenwalt@intel.com>
+ <e6e508a7-3cbc-4568-a1f5-c13b5377f77e@lunn.ch>
+ <e676df0e-b736-069c-77c4-ae58ad1e24f8@intel.com>
+ <ZOZISCYNWEKqBotb@baltimore>
+ <a9fee3a7-8c31-e048-32eb-ed82b8233aee@intel.com>
+ <51ee86d8-5baa-4419-9419-bcf737229868@lunn.ch>
+ <ZPCQ5DNU8k8mfAct@baltimore>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net] igb: disable virtualization features on 82580
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169374675330.16952.10821656752298867430.git-patchwork-notify@kernel.org>
-Date: Sun, 03 Sep 2023 13:12:33 +0000
-References: <20230831121914.660875-1-vinschen@redhat.com>
-In-Reply-To: <20230831121914.660875-1-vinschen@redhat.com>
-To: Corinna Vinschen <vinschen@redhat.com>
-Cc: anthony.l.nguyen@intel.com, jesse.brandeburg@intel.com,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZPCQ5DNU8k8mfAct@baltimore>
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,T_SPF_HELO_TEMPERROR,T_SPF_TEMPERROR autolearn=no
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+> Let me check if I understand correctly- is that what was sent with the
+> v3 [1] , with the initialization helper (ethtool_forced_speed_maps_init)
+> and the structure map in the ethtool code? Or do you have another helper
+> in mind?
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+Sorry for the late reply, been on vacation.
 
-On Thu, 31 Aug 2023 14:19:13 +0200 you wrote:
-> Disable virtualization features on 82580 just as on i210/i211.
-> This avoids that virt functions are acidentally called on 82850.
-> 
-> Fixes: 55cac248caa4 ("igb: Add full support for 82580 devices")
-> Signed-off-by: Corinna Vinschen <vinschen@redhat.com>
-> ---
->  drivers/net/ethernet/intel/igb/igb_main.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+The main thing is you try to reuse the table:
 
-Here is the summary with links:
-  - [v2,net] igb: disable virtualization features on 82580
-    https://git.kernel.org/netdev/net/c/fa09bc40b21a
+static const struct phy_setting settings[] = {}
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+If you can build your helper on top of phy_lookup_setting() even
+better. You don't need a phy_device to use those.
 
-
+	Andrew
 
