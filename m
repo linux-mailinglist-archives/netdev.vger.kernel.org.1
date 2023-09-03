@@ -1,144 +1,170 @@
-Return-Path: <netdev+bounces-31837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31838-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBE59790A6B
-	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 02:53:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12716790A7E
+	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 03:49:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D66B6281470
-	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 00:53:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B678A1C20442
+	for <lists+netdev@lfdr.de>; Sun,  3 Sep 2023 01:48:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 276EC623;
-	Sun,  3 Sep 2023 00:53:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA25E64F;
+	Sun,  3 Sep 2023 01:48:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19938621
-	for <netdev@vger.kernel.org>; Sun,  3 Sep 2023 00:53:53 +0000 (UTC)
-Received: from r3-24.sinamail.sina.com.cn (r3-24.sinamail.sina.com.cn [202.108.3.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD0D7CE0
-	for <netdev@vger.kernel.org>; Sat,  2 Sep 2023 17:53:51 -0700 (PDT)
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([112.97.53.170])
-	by sina.com (172.16.97.23) with ESMTP
-	id 64F3D919000042D2; Sun, 3 Sep 2023 08:53:48 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 76211431457696
-X-SMAIL-UIID: 9A7836D50E5F4CBEBB4D693319DB7479-20230903-085348
-From: Hillf Danton <hdanton@sina.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	Netdev <netdev@vger.kernel.org>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Naresh Kamboju <naresh.kamboju@linaro.org>,
-	LKML <linux-kernel@vger.kernel.org>
-Subject: Re: selftests: net: pmtu.sh: Unable to handle kernel paging request at virtual address
-Date: Sun,  3 Sep 2023 08:53:34 +0800
-Message-Id: <20230903005334.5356-1-hdanton@sina.com>
-In-Reply-To: <CANn89iLCCGsP7SFn9HKpvnKu96Td4KD08xf7aGtiYgZnkjaL=w@mail.gmail.com>
-References: <20230830112600.4483-1-hdanton@sina.com> <f607a7d5-8075-f321-e3c0-963993433b14@I-love.SAKURA.ne.jp> <20230831114108.4744-1-hdanton@sina.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA2CE623
+	for <netdev@vger.kernel.org>; Sun,  3 Sep 2023 01:48:57 +0000 (UTC)
+Received: from mail-pj1-f78.google.com (mail-pj1-f78.google.com [209.85.216.78])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51FF1136
+	for <netdev@vger.kernel.org>; Sat,  2 Sep 2023 18:48:56 -0700 (PDT)
+Received: by mail-pj1-f78.google.com with SMTP id 98e67ed59e1d1-267f00f6876so264567a91.3
+        for <netdev@vger.kernel.org>; Sat, 02 Sep 2023 18:48:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693705736; x=1694310536;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vJf/Eooxdqn3wqXqB/Vii7TxecGvCAC/nj0JGOKvT0c=;
+        b=X8ECRE0zLoh8/x/XeNv+5PxN6VkudlmohxdtPP3wE1RONQBJXJkMPP0T/Ev7pszT8S
+         YasVvtEydKdTAQDAY3mk0O7OCgaAeVlSghuwlWse7OSdNdz6zA0QCn20d5V70s8VnEji
+         6P1ary3bJm5xmOqXe8W77ghG+lWLu8b8Q2XJH6AKLpGTipQrgdHb1iX+y1/ba6uV1dMA
+         zvbGBBdmRA+VvolPraF4TArY90VCRMDnI2diN+xUzk85089yD7Pf/CT+BjT3DEVZsTBE
+         8C51QcOcWXmSl9zFyIxsYUPr/9kwj4PWJS4GxgK7XlzdoHAxcAOAhA3Td72syU5gQPXw
+         o17w==
+X-Gm-Message-State: AOJu0Yw27zEa1hXQt+J5jIEUX5xbSBdlnwahmnq1pS240pnENV6MOlz4
+	WKyCN5FD/amMe4Z2C1LXbvvKaoAIXZF6/5AoSdhF6D9ZzAPp
+X-Google-Smtp-Source: AGHT+IEFEX6CFZNVFPeqX7v6f3QzzaPk9plI5xoyZwo92AT/6EpnmOualPivPJbgREY5sUP34UhQQQ2CeW9fEHhkVfvkuO0U+UYn
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Received: by 2002:a17:90b:3d3:b0:26d:26eb:c577 with SMTP id
+ go19-20020a17090b03d300b0026d26ebc577mr1478202pjb.6.1693705735819; Sat, 02
+ Sep 2023 18:48:55 -0700 (PDT)
+Date: Sat, 02 Sep 2023 18:48:55 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000bcd80b06046a98ac@google.com>
+Subject: [syzbot] [wireless?] WARNING in ieee80211_link_release_channel
+From: syzbot <syzbot+9817a610349542589c42@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_DIGITS,
+	FROM_LOCAL_HEX,HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, 31 Aug 2023 15:12:30 +0200 Eric Dumazet <edumazet@google.com>
-> On Thu, Aug 31, 2023 at 2:17=E2=80=AFPM Hillf Danton <hdanton@sina.com>
-> > On Wed, 30 Aug 2023 21:44:57 +0900 Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-> > >On 2023/08/30 20:26, Hillf Danton wrote:
-> > >>> <4>[  399.014716] Call trace:
-> > >>> <4>[  399.015702]  percpu_counter_add_batch+0x28/0xd0
-> > >>> <4>[  399.016399]  dst_destroy+0x44/0x1e4
-> > >>> <4>[  399.016681]  dst_destroy_rcu+0x14/0x20
-> > >>> <4>[  399.017009]  rcu_core+0x2d0/0x5e0
-> > >>> <4>[  399.017311]  rcu_core_si+0x10/0x1c
-> > >>> <4>[  399.017609]  __do_softirq+0xd4/0x23c
-> > >>> <4>[  399.017991]  ____do_softirq+0x10/0x1c
-> > >>> <4>[  399.018320]  call_on_irq_stack+0x24/0x4c
-> > >>> <4>[  399.018723]  do_softirq_own_stack+0x1c/0x28
-> > >>> <4>[  399.022639]  __irq_exit_rcu+0x6c/0xcc
-> > >>> <4>[  399.023434]  irq_exit_rcu+0x10/0x1c
-> > >>> <4>[  399.023962]  el1_interrupt+0x8c/0xc0
-> > >>> <4>[  399.024810]  el1h_64_irq_handler+0x18/0x24
-> > >>> <4>[  399.025324]  el1h_64_irq+0x64/0x68
-> > >>> <4>[  399.025612]  _raw_spin_lock_bh+0x0/0x6c
-> > >>> <4>[  399.026102]  cleanup_net+0x280/0x45c
-> > >>> <4>[  399.026403]  process_one_work+0x1d4/0x310
-> > >>> <4>[  399.027140]  worker_thread+0x248/0x470
-> > >>> <4>[  399.027621]  kthread+0xfc/0x184
-> > >>> <4>[  399.028068]  ret_from_fork+0x10/0x20
-> > >>
-> > >> static void cleanup_net(struct work_struct *work)
-> > >> {
-> > >>      ...
-> > >>
-> > >>      synchronize_rcu();
-> > >>
-> > >>      /* Run all of the network namespace exit methods */
-> > >>      list_for_each_entry_reverse(ops, &pernet_list, list)
-> > >>              ops_exit_list(ops, &net_exit_list);
-> > >>      ...
-> > >>
-> > >> Why did the RCU sync above fail to work in this report, Eric?
-> > >
-> > > Why do you assume that synchronize_rcu() failed to work?
-> >
-> > In the ipv6 pernet_operations [1] for instance, dst_entries_destroy() is
-> > invoked after RCU sync to ensure that nobody is using the exiting net,
-> > but this report shows that protection falls apart.
-> 
-> Because synchronize_rcu() is not the same than rcu_barrier()
-> 
-> The dst_entries_add()/ percpu_counter_add_batch() call should not
-> happen after an rcu grace period.
+Hello,
 
-	cpu2			cpu3
-	====			====
-	cleanup_net()		rcu_read_lock();
-				it is safe to use either netns or dst
-				rcu_read_unlock();
-	synchronize_rcu();
-				unsafe to access anyone now
-> 
-> Something like this (untested) patch
-> 
-> diff --git a/net/core/dst.c b/net/core/dst.c
-> index 980e2fd2f013b3e50cc47ed0666ee5f24f50444b..f02fdd1da6066a4d56c2a0aa8038eca76d62f8bd
-> 100644
-> --- a/net/core/dst.c
-> +++ b/net/core/dst.c
-> @@ -163,8 +163,13 @@ EXPORT_SYMBOL(dst_dev_put);
-> 
->  void dst_release(struct dst_entry *dst)
->  {
-> -       if (dst && rcuref_put(&dst->__rcuref))
-> +       if (dst && rcuref_put(&dst->__rcuref)) {
-> +               if (!(dst->flags & DST_NOCOUNT)) {
-> +                       dst->flags |=3D DST_NOCOUNT;
-> +                       dst_entries_add(dst->ops, -1);
+syzbot found the following issue on:
 
-Could this add happen after the rcu sync above?
+HEAD commit:    d68b4b6f307d Merge tag 'mm-nonmm-stable-2023-08-28-22-48' ..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=147267b7a80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c45ae22e154d76fa
+dashboard link: https://syzkaller.appspot.com/bug?extid=9817a610349542589c42
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=128eab18680000
 
-> +               }
->                 call_rcu_hurry(&dst->rcu_head, dst_destroy_rcu);
-> +       }
->  }
->  EXPORT_SYMBOL(dst_release);
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/eaa3c711dd68/disk-d68b4b6f.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/3ed6d023ff63/vmlinux-d68b4b6f.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/cc05f8831f38/bzImage-d68b4b6f.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+9817a610349542589c42@syzkaller.appspotmail.com
+
+RBP: 00007f64c7d70120 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000002
+R13: 000000000000006e R14: 00007f64c719c050 R15: 00007f64c72bfa48
+ </TASK>
+wlan1: failed to insert STA entry for the AP (error -12)
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 7597 at net/mac80211/chan.c:2021 ieee80211_link_release_channel+0x19f/0x200 net/mac80211/chan.c:2021
+Modules linked in:
+CPU: 0 PID: 7597 Comm: syz-executor.5 Not tainted 6.5.0-syzkaller-04592-gd68b4b6f307d #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
+RIP: 0010:ieee80211_link_release_channel+0x19f/0x200 net/mac80211/chan.c:2021
+Code: ff ff ff ff 48 8d b8 f0 1c 00 00 e8 3b 33 79 00 31 ff 41 89 c5 89 c6 e8 cf 7e c7 f7 45 85 ed 0f 85 6d ff ff ff e8 51 83 c7 f7 <0f> 0b e9 61 ff ff ff 48 c7 c7 d0 28 ad 8e e8 6e 2f 1d f8 e9 3a ff
+RSP: 0018:ffffc9000a0d6b08 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: ffff88806730e3a8 RCX: 0000000000000000
+RDX: ffff8880271ebb80 RSI: ffffffff89c00a5f RDI: 0000000000000005
+RBP: ffff88806730cc80 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000001 R12: ffff88806730d580
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+FS:  00007f64c7d706c0(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f5579f1bff8 CR3: 0000000075757000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ ieee80211_prep_connection+0x62a/0x14f0 net/mac80211/mlme.c:7065
+ ieee80211_mgd_auth+0xa1a/0x1490 net/mac80211/mlme.c:7205
+ rdev_auth net/wireless/rdev-ops.h:481 [inline]
+ cfg80211_mlme_auth+0x551/0x910 net/wireless/mlme.c:289
+ cfg80211_conn_do_work+0x64e/0xfe0 net/wireless/sme.c:181
+ cfg80211_sme_connect net/wireless/sme.c:638 [inline]
+ cfg80211_connect+0xf07/0x20c0 net/wireless/sme.c:1528
+ nl80211_connect+0x13ef/0x1d50 net/wireless/nl80211.c:12018
+ genl_family_rcv_msg_doit+0x1fc/0x2e0 net/netlink/genetlink.c:971
+ genl_family_rcv_msg net/netlink/genetlink.c:1051 [inline]
+ genl_rcv_msg+0x55c/0x800 net/netlink/genetlink.c:1066
+ netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2545
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1075
+ netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
+ netlink_unicast+0x536/0x810 net/netlink/af_netlink.c:1368
+ netlink_sendmsg+0x93c/0xe40 net/netlink/af_netlink.c:1910
+ sock_sendmsg_nosec net/socket.c:728 [inline]
+ sock_sendmsg+0xd9/0x180 net/socket.c:751
+ ____sys_sendmsg+0x6ac/0x940 net/socket.c:2538
+ ___sys_sendmsg+0x135/0x1d0 net/socket.c:2592
+ __sys_sendmsg+0x117/0x1e0 net/socket.c:2621
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7f64c707cae9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f64c7d700c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f64c719c050 RCX: 00007f64c707cae9
+RDX: 0000000000000000 RSI: 00000000200001c0 RDI: 0000000000000003
+RBP: 00007f64c7d70120 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000002
+R13: 000000000000006e R14: 00007f64c719c050 R15: 00007f64c72bfa48
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
