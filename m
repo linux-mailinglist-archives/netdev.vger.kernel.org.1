@@ -1,51 +1,39 @@
-Return-Path: <netdev+bounces-31887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1077791316
-	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 10:13:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A54B3791317
+	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 10:13:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B292280F92
-	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 08:13:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F93B280F77
+	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 08:13:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 947D910F5;
-	Mon,  4 Sep 2023 08:13:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 797571371;
+	Mon,  4 Sep 2023 08:13:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8851E1367
-	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 08:13:03 +0000 (UTC)
-Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B0B897;
-	Mon,  4 Sep 2023 01:13:00 -0700 (PDT)
-Received: from localhost (unknown [124.16.138.129])
-	by APP-05 (Coremail) with SMTP id zQCowACnrWF3kfVk2CxnCg--.5865S2;
-	Mon, 04 Sep 2023 16:12:39 +0800 (CST)
-From: Chen Ni <nichen@iscas.ac.cn>
-To: borisp@nvidia.com,
-	saeedm@nvidia.com,
-	leon@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	sd@queasysnail.net,
-	raeds@nvidia.com,
-	ehakim@nvidia.com,
-	liorna@nvidia.com,
-	phaddad@nvidia.com,
-	atenart@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Chen Ni <nichen@iscas.ac.cn>
-Subject: [PATCH] net/mlx5e: Add missing check for xa_load
-Date: Mon,  4 Sep 2023 08:12:10 +0000
-Message-Id: <20230904081210.23901-1-nichen@iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1684910F5;
+	Mon,  4 Sep 2023 08:13:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 799A3C433C9;
+	Mon,  4 Sep 2023 08:13:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1693815229;
+	bh=+xoreAuRXKCrxhUSEJeksQA8D7ndz7hYj3wEgwRwgt8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=jSN3BwlF4N8GjTKe6YO8gJUDmsJvok033ElMNErClgSoqkcR2OYL+3VukQSuGKw8O
+	 lFBKt3LIQ3shLbBDzQy3FRcJH4J7cn3gGWDAd3qv9qvSXYnTtd+z+kRQ6X1F4aysMT
+	 rhYUH9TkTa3HlbRIvdwiqNpCv4D9E5ejv9/jnnNAdz8TG1EYZQwHb4eDij/bS85EKS
+	 S9lOnuAL0nB+s/jSmZ45Qaz3gbAlNAe103QhdqeOmgptzjch2Hwwnm1dq9SNRwzIpj
+	 BA9nyu+EF7ZPt9sV4dTc79sja9WcxLZKRebyOTXlkeTonk9h0SmGNBy7kXlLx/t9wT
+	 GqxAw/MgZaSTg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5FDD1C04DD9;
+	Mon,  4 Sep 2023 08:13:49 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,62 +41,49 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowACnrWF3kfVk2CxnCg--.5865S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7XrW7JrW5Ww18XryrXF4fZrb_yoW8Jr13pr
-	17AFW7uF1kGw1xXayUZ3y8Wr15Jw4vqa9a9a4fA3yfXw1DArW7Ary5GFy7Arn0krW5CF4q
-	vwn2v3W3Xan8Jr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvG14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwCY02Avz4vE14v_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr
-	0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY
-	17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcV
-	C0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY
-	6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa
-	73UjIFyTuYvjfUYv38UUUUU
-X-Originating-IP: [124.16.138.129]
-X-CM-SenderInfo: xqlfxv3q6l2u1dvotugofq/
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: Re: [PATCH bpf] bpf: sockmap, fix skb refcnt race after locking changes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169381522938.3122.223485705283897635.git-patchwork-notify@kernel.org>
+Date: Mon, 04 Sep 2023 08:13:49 +0000
+References: <20230901202137.214666-1-john.fastabend@gmail.com>
+In-Reply-To: <20230901202137.214666-1-john.fastabend@gmail.com>
+To: John Fastabend <john.fastabend@gmail.com>
+Cc: olsajiri@gmail.com, xukuohai@huawei.com, eddyz87@gmail.com,
+ edumazet@google.com, cong.wang@bytedance.com, bpf@vger.kernel.org,
+ netdev@vger.kernel.org
 
-Add check for xa_load() in order to avoid NULL pointer
-dereference.
+Hello:
 
-Fixes: b7c9400cbc48 ("net/mlx5e: Implement MACsec Rx data path using MACsec skb_metadata_dst")
-Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
----
- .../net/ethernet/mellanox/mlx5/core/en_accel/macsec.c  | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+This patch was applied to bpf/bpf.git (master)
+by Daniel Borkmann <daniel@iogearbox.net>:
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c
-index c9c1db971652..d2467c0bc3c8 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c
-@@ -1673,10 +1673,12 @@ void mlx5e_macsec_offload_handle_rx_skb(struct net_device *netdev,
- 
- 	rcu_read_lock();
- 	sc_xarray_element = xa_load(&macsec->sc_xarray, fs_id);
--	rx_sc = sc_xarray_element->rx_sc;
--	if (rx_sc) {
--		dst_hold(&rx_sc->md_dst->dst);
--		skb_dst_set(skb, &rx_sc->md_dst->dst);
-+	if (sc_xarray_element) {
-+		rx_sc = sc_xarray_element->rx_sc;
-+		if (rx_sc) {
-+			dst_hold(&rx_sc->md_dst->dst);
-+			skb_dst_set(skb, &rx_sc->md_dst->dst);
-+		}
- 	}
- 
- 	rcu_read_unlock();
+On Fri,  1 Sep 2023 13:21:37 -0700 you wrote:
+> There is a race where skb's from the sk_psock_backlog can be referenced
+> after userspace side has already skb_consumed() the sk_buff and its
+> refcnt dropped to zer0 causing use after free.
+> 
+> The flow is the following,
+> 
+>   while ((skb = skb_peek(&psock->ingress_skb))
+>     sk_psock_handle_Skb(psock, skb, ..., ingress)
+>     if (!ingress) ...
+>     sk_psock_skb_ingress
+>        sk_psock_skb_ingress_enqueue(skb)
+>           msg->skb = skb
+>           sk_psock_queue_msg(psock, msg)
+>     skb_dequeue(&psock->ingress_skb)
+> 
+> [...]
+
+Here is the summary with links:
+  - [bpf] bpf: sockmap, fix skb refcnt race after locking changes
+    https://git.kernel.org/bpf/bpf/c/a454d84ee20b
+
+You are awesome, thank you!
 -- 
-2.25.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
