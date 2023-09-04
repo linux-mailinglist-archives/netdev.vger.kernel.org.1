@@ -1,213 +1,106 @@
-Return-Path: <netdev+bounces-31951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31950-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0041F791A8F
-	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 17:23:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 322B9791A8A
+	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 17:23:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ADA26280C08
-	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 15:23:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFBE1280F9D
+	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 15:23:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 735E7C146;
-	Mon,  4 Sep 2023 15:23:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D105C146;
+	Mon,  4 Sep 2023 15:23:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67CF9C2CC
-	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 15:23:17 +0000 (UTC)
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 151BC170B
-	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 08:23:12 -0700 (PDT)
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1qdBPB-00058K-P3; Mon, 04 Sep 2023 17:22:21 +0200
-Received: from pengutronix.de (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 97AFF218726;
-	Mon,  4 Sep 2023 15:22:20 +0000 (UTC)
-Date: Mon, 4 Sep 2023 17:22:20 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Srinivas Goud <srinivas.goud@amd.com>
-Cc: wg@grandegger.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	p.zabel@pengutronix.de, git@amd.com, michal.simek@amd.com,
-	linux-can@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, appana.durga.rao@xilinx.com,
-	naga.sureshkumar.relli@xilinx.com
-Subject: Re: [PATCH v4 3/3] can: xilinx_can: Add ethtool stats interface for
- ECC errors
-Message-ID: <20230904-unbiased-putt-a1a2919b02c7-mkl@pengutronix.de>
-References: <1693557645-2728466-1-git-send-email-srinivas.goud@amd.com>
- <1693557645-2728466-4-git-send-email-srinivas.goud@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E035AD5F
+	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 15:23:11 +0000 (UTC)
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::225])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB238CF6
+	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 08:22:50 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 8E7951C0008;
+	Mon,  4 Sep 2023 15:22:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1693840968;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3PJmqJcNuJ7HfHSuVrV5p4oCbtVZUtRIC0IHu9qKZwE=;
+	b=LJ+PKbRLz7/p7ubYQoXQCaXTCh2UGlJ+GDII3HzDR9C8szVIlCtA7xITh848+BDEu8yw0J
+	Gx1S7umkbdi0D6SHKtu5+c5rw80yO4RaXB3ll/DlTjE/5YMs5kpqUkhG+8WBXlgFKhkUDP
+	jmEHha090KiA+dkRtuQlkwiO1NkzrXtZeP4yqgxw0EPFwBGy+mB8IEf2n/dHKdmqFI71re
+	jGijJNy95JLFvrcHOS5nQDuDjFnwC62/BuXYt4+gBnVC9UZQU9SnZNl1MjjrBbtblA2Yhj
+	OyGACCPgV/jhXNF+MJs+rQmIYJWo3cTxBz3XlUFMJzBVJ9newDul+D5yDMCpOw==
+Date: Mon, 4 Sep 2023 17:22:45 +0200
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ "Russell King (Oracle)" <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+ glipus@gmail.com, maxime.chevallier@bootlin.com, vadim.fedorenko@linux.dev,
+ richardcochran@gmail.com, gerhard@engleder-embedded.com,
+ thomas.petazzoni@bootlin.com, krzysztof.kozlowski+dt@linaro.org,
+ robh+dt@kernel.org
+Subject: Re: [PATCH net-next RFC v4 2/5] net: Expose available time stamping
+ layers to user space.
+Message-ID: <20230904172245.1fa149fd@kmaincent-XPS-13-7390>
+In-Reply-To: <20230517130706.3432203b@kernel.org>
+References: <20230511203646.ihljeknxni77uu5j@skbuf>
+	<54e14000-3fd7-47fa-aec3-ffc2bab2e991@lunn.ch>
+	<ZF1WS4a2bbUiTLA0@shell.armlinux.org.uk>
+	<20230511210237.nmjmcex47xadx6eo@skbuf>
+	<20230511150902.57d9a437@kernel.org>
+	<20230511230717.hg7gtrq5ppvuzmcx@skbuf>
+	<20230511161625.2e3f0161@kernel.org>
+	<20230512102911.qnosuqnzwbmlupg6@skbuf>
+	<20230512103852.64fd608b@kernel.org>
+	<20230517121925.518473aa@kernel.org>
+	<2f89e35e-b1c9-4e08-9f60-73a96cc6e51a@lunn.ch>
+	<20230517130706.3432203b@kernel.org>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="f5dk3iq2kvsfzpmv"
-Content-Disposition: inline
-In-Reply-To: <1693557645-2728466-4-git-send-email-srinivas.goud@amd.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:b01:1d::7b
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: kory.maincent@bootlin.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Hello I am resuming my work on selectable timestamping layers.
 
---f5dk3iq2kvsfzpmv
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Wed, 17 May 2023 13:07:06 -0700
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-On 01.09.2023 14:10:45, Srinivas Goud wrote:
-> Add ethtool stats interface for reading FIFO 1bit/2bit
-> ECC errors information.
->=20
-> Signed-off-by: Srinivas Goud <srinivas.goud@amd.com>
-> ---
-> Changes in v4:
-> None
->=20
-> Changes in v3:
-> None
->=20
-> Changes in v2:
-> Add ethtool stats interface
->=20
->  drivers/net/can/xilinx_can.c | 25 +++++++++++++++++++++++++
->  1 file changed, 25 insertions(+)
->=20
-> diff --git a/drivers/net/can/xilinx_can.c b/drivers/net/can/xilinx_can.c
-> index 798b32b..50e0c9d 100644
-> --- a/drivers/net/can/xilinx_can.c
-> +++ b/drivers/net/can/xilinx_can.c
-> @@ -219,6 +219,7 @@ struct xcan_devtype_data {
->   * @transceiver:		Optional pointer to associated CAN transceiver
->   * @rstc:			Pointer to reset control
->   * @ecc_enable:			ECC enable flag
-> + * @stats_lock:			Lock for synchronizing hardware stats
+> On Wed, 17 May 2023 21:46:43 +0200 Andrew Lunn wrote:
+> > As i said in an earlier thread, with a bit of a stretch, there could
+> > be 7 places to take time stamps in the system. We need some sort of
+> > identifier to indicate which of these stampers to use.
+> > 
+> > Is clock ID unique? In a switch, i think there could be multiple
+> > stampers, one per MAC port, sharing one clock? So you actually need
+> > more than a clock ID.  
+> 
+> Clock ID is a bit vague too, granted, but in practice clock ID should
+> correspond to the driver fairly well? My thinking was - use clock ID
+> to select the (silicon) device, use a different attribute to select 
+> the stamping point.
+> 
+> IOW try to use the existing attribute before inventing a new one.
 
-To be precise: The lock is about the access of the 64 bit variables not
-about the hardware access:
-"Lock for accessing the "ecc_*bit_*fifo_cnt" stats"
-
->   * @ecc_2bit_rxfifo_cnt:	RXFIFO 2bit ECC count
->   * @ecc_1bit_rxfifo_cnt:	RXFIFO 1bit ECC count
->   * @ecc_2bit_txolfifo_cnt:	TXOLFIFO 2bit ECC count
-> @@ -245,6 +246,7 @@ struct xcan_priv {
->  	struct phy *transceiver;
->  	struct reset_control *rstc;
->  	bool ecc_enable;
-> +	spinlock_t stats_lock; /* Lock for synchronizing hardware stats */
->  	u64 ecc_2bit_rxfifo_cnt;
->  	u64 ecc_1bit_rxfifo_cnt;
->  	u64 ecc_2bit_txolfifo_cnt;
-> @@ -1164,6 +1166,9 @@ static void xcan_err_interrupt(struct net_device *n=
-dev, u32 isr)
-> =20
->  	if (priv->ecc_enable) {
->  		u32 reg_ecc;
-> +		unsigned long flags;
-
-nitpick: move the flags before the reg_ecc.
-
-> +
-> +		spin_lock_irqsave(&priv->stats_lock, flags);
-> =20
->  		reg_ecc =3D priv->read_reg(priv, XCAN_RXFIFO_ECC_OFFSET);
->  		if (isr & XCAN_IXR_E2BERX_MASK) {
-> @@ -1212,6 +1217,8 @@ static void xcan_err_interrupt(struct net_device *n=
-dev, u32 isr)
->  		 */
->  		priv->write_reg(priv, XCAN_ECC_CFG_OFFSET, XCAN_ECC_CFG_REECRX_MASK |
->  				XCAN_ECC_CFG_REECTXOL_MASK | XCAN_ECC_CFG_REECTXTL_MASK);
-> +
-> +		spin_unlock_irqrestore(&priv->stats_lock, flags);
->  	}
-> =20
->  	if (cf.can_id) {
-> @@ -1639,6 +1646,23 @@ static int xcan_get_auto_tdcv(const struct net_dev=
-ice *ndev, u32 *tdcv)
->  	return 0;
->  }
-> =20
-> +static void ethtool_get_ethtool_stats(struct net_device *ndev,
-> +				      struct ethtool_stats *stats, u64 *data)
-> +{
-> +	struct xcan_priv *priv =3D netdev_priv(ndev);
-> +	unsigned long flags;
-> +	int i =3D 0;
-> +
-> +	spin_lock_irqsave(&priv->stats_lock, flags);
-> +	data[i++] =3D priv->ecc_2bit_rxfifo_cnt;
-> +	data[i++] =3D priv->ecc_1bit_rxfifo_cnt;
-> +	data[i++] =3D priv->ecc_2bit_txolfifo_cnt;
-> +	data[i++] =3D priv->ecc_1bit_txolfifo_cnt;
-> +	data[i++] =3D priv->ecc_2bit_txtlfifo_cnt;
-> +	data[i++] =3D priv->ecc_1bit_txtlfifo_cnt;
-> +	spin_unlock_irqrestore(&priv->stats_lock, flags);
-> +}
-> +
->  static const struct net_device_ops xcan_netdev_ops =3D {
->  	.ndo_open	=3D xcan_open,
->  	.ndo_stop	=3D xcan_close,
-> @@ -1648,6 +1672,7 @@ static const struct net_device_ops xcan_netdev_ops =
-=3D {
-> =20
->  static const struct ethtool_ops xcan_ethtool_ops =3D {
->  	.get_ts_info =3D ethtool_op_get_ts_info,
-> +	.get_ethtool_stats =3D ethtool_get_ethtool_stats,
-
-You also should implement .get_strings and .get_sset_count. Have you
-tested your patch with "ethtool -S can0"?
-
->  };
-> =20
->  /**
-> --=20
-> 2.1.1
->=20
->=20
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---f5dk3iq2kvsfzpmv
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmT19ikACgkQvlAcSiqK
-BOjKKwf/XqBeS89ieZVoVrZnmkm/eKWi/h6aE4Oueilc6bRGc0NImrOHvmfFNfad
-ZZ/uNxK8Na5EafNjeI/Blh4H1Pk1KsxuK3wrb8YmrrajrZZwbIhQF+/wRMHW+ops
-CY34A+HZN/dsMseSLORDKTrvexxI0iKqbdLfnBwvVh0gAfEIxsUPzqWp+/Qz9DeW
-b2CHj8te4m7Ovk/KMjlJuipZWwkgjSL6d5D++Z8uTjQWHm0yNvCeCA6CpRTDdkwY
-Ckbb6qDi1I5h37X9JCtOOOgl1TQBaDZeGl6eBGuJDtIUNawL5naLDcPe4BoKyul1
-Xu4th/hAOGXGYrhclCMIjjT4rUAwfg==
-=FRQF
------END PGP SIGNATURE-----
-
---f5dk3iq2kvsfzpmv--
+What do you think of using the clock ID to select the timestamp layer, and add
+a ts_layer field in ts_info that will describe the timestamp layer. This allow
+to have more information than the vague clock ID. We set it in the driver.
+With it, we could easily add new layers different than simple mac and phy.
+I am currently working on this implementation.
 
