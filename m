@@ -1,164 +1,172 @@
-Return-Path: <netdev+bounces-31913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64CF17915F9
-	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 13:00:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDF5579163F
+	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 13:30:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 216D3280F80
-	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 11:00:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DDA31C20283
+	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 11:30:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F27A12102;
-	Mon,  4 Sep 2023 11:00:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC8302119;
+	Mon,  4 Sep 2023 11:30:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0EC11FBD
-	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 11:00:15 +0000 (UTC)
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 264BAAB
-	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 04:00:12 -0700 (PDT)
-Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-4018af1038cso13303715e9.0
-        for <netdev@vger.kernel.org>; Mon, 04 Sep 2023 04:00:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCF531FD6
+	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 11:30:10 +0000 (UTC)
+Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61878189
+	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 04:30:09 -0700 (PDT)
+Received: by mail-qt1-x834.google.com with SMTP id d75a77b69052e-414c54b2551so161191cf.1
+        for <netdev@vger.kernel.org>; Mon, 04 Sep 2023 04:30:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1693825210; x=1694430010; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UbCVRUoy/GXd5quDgH6ve49LRCuWbh+GsmOVO3eo6jg=;
-        b=ZZfkzOv/4YPMOYMgawXKBSUlbW7EbdwTJ8tRNcRdNKCS/YmNfjIABkrgqg980KDCv8
-         WDb2Ok8MPq4mNHaH4a7xaBjOksorb2JPp3Gt3dzP5dUTd0BwknG5SDBX20GkMJqfZnni
-         zIwOB56OQRO9LlFzdS47fjln2hfk0MhQFnKYzGRgVE2Pfd2RJ12beiL3Jhnb5RQKWm0Y
-         fE+8aNVfQ8fyTQomddEcsEDBw8v9QfgXoFb1VxRsneDYTOVtggOQVgG+8E9gm2pLRVLD
-         nvSMEwzsOjuLoQ/lNzmvvcNtAMII5w4GgNj0vgnvI/Y0nXspmv2/JBKKCIPhvnZtuTl5
-         o6xw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693825210; x=1694430010;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20221208; t=1693827008; x=1694431808; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UbCVRUoy/GXd5quDgH6ve49LRCuWbh+GsmOVO3eo6jg=;
-        b=CvtS51SWKWj3Snf+fmc2MxrD5w9SiQCStbFYuPbrbbyA0sJ/ByILXMFDs26ALzcWOi
-         10MRKgDAyaXE3rLCmobOd1KFRz0DW3m/rWFKZDrl5zw4tsARiG1Hg46lIbRoEUc6PDi0
-         csvWFll5LOAlaGvUl2KJfBjs7PtFI6A0+6kzUE0DDyTf0LP8WOJU1lJD/h7rkG3xiZ5X
-         lifhwVagAAdnBT9/8fIiEd9EnNZ8/pPgWRbhQV2Nu4vVLcaUXOmBTbtS18yMzTKaZ6uM
-         tni8f9+zUYJJq5MCeKEjjUGuqsiW1vzgYYBNzCg3fnzJsnjNiDRVwqqynq+y9hgl2fRV
-         IUNA==
-X-Gm-Message-State: AOJu0YyhuznjRLatKNlnzC+u4brINnXRTqYeTz8sOn5sZ1xjdrBOI4vE
-	6qntxFcS+c43XmZ+P5VkhoAasw==
-X-Google-Smtp-Source: AGHT+IGbJMH+4JkNPUHzeVKwhpY0iCzNIgHQjAln2FO9qryNGRK7pF8QZ/dT3kD1yxy/Y2ijHNJRfg==
-X-Received: by 2002:a7b:c851:0:b0:401:2ee0:7558 with SMTP id c17-20020a7bc851000000b004012ee07558mr7388381wml.32.1693825210421;
-        Mon, 04 Sep 2023 04:00:10 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id p9-20020a1c7409000000b003fee53feab5sm13874083wmc.10.2023.09.04.04.00.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Sep 2023 04:00:09 -0700 (PDT)
-Date: Mon, 4 Sep 2023 13:00:08 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: Ziyang Xuan <william.xuanziyang@huawei.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net] team: fix null-ptr-deref when team device type is
- changed
-Message-ID: <ZPW4uC6XkMXl0O2O@nanopsycho>
-References: <20230902092007.3038132-1-william.xuanziyang@huawei.com>
- <ZPWwE9IYArI08Zsc@Laptop-X1>
+        bh=8XUCQKB6pi7IttK1owfeaOm6Ex0tigVABg1Q1Hm9uvA=;
+        b=lGz6L2PbvGWyakjSPH+DEfsj9ze8bHHNBDP1BjVBJ4I7kgAfRe1t9Klh11fGQc89SV
+         3dvNLEdVsFYPcBtDNzQZ1gZ1eBZYpFlXpzmz5eDbFkrvtnRJTKCqcQIAHHdmBvKVnRzI
+         bQT9YQT5Pp2OHsRD+AHsQ639qgRckEEVEe2w8lfYdd6f7DDhXp5KTqm/S/zmXnvI/SFb
+         K2xAX3MHRt4+xtYrOykjo8brnB4UUV9fXUiJpjFA0GLz6r3POE/taFcSsVLQupGj3wGq
+         4p2Qpr7fyT7TwT4dhbK6aapyTfBWW/bYRyZKmI2KmlbJ6QJ6qt+r5LZ7VZDdmbPl+Tje
+         8BfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693827008; x=1694431808;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8XUCQKB6pi7IttK1owfeaOm6Ex0tigVABg1Q1Hm9uvA=;
+        b=T9w07DCAwaIIW1GHPAPCo2q+x14swWvOuwj/ogWbImatmi+kCZS3JcAzMF2D4WwMK8
+         +EniudpU/MTOZKaxvwYC1URDTzTBHafmxqcf0hLFgJdQkMz/VffczB1Idb1PDDsbUfW8
+         LHmQSXRY8Es7w79w4CePaEqD+Ej5vADPSiJEveG/n97AWSxHFyIORjdANYkGjOOh5V82
+         X3CGF4dEKnGaGHe3i6NgMqm6Y2FPa02ac5mToUqjNuQC9z/nxuIPCfIslwJPmEEAXIMH
+         iiyBvOXo0mTe/BVYnYqDjDYowirmv8dYYBjouohrg6zVALd34NnhJbkuN0J1ch+QLX5q
+         QxoQ==
+X-Gm-Message-State: AOJu0Ywldc2BYyyepaFPXwQpu32CBBy71Xj+DDQyBH6e2ITPe2B3YFMd
+	nZS7dX/SOIckVuENm0PP3HB2HONcqJ1x8TVpEqDnSUryTuaXEj6vuaA=
+X-Google-Smtp-Source: AGHT+IF1g9qeeFA7ZtjyeIQy1qMImu6yBb601ONsY8ITLtWyQK0e88+XdZN7JI7wIgLndeZOAnfHFzlNH5A54eez2aY=
+X-Received: by 2002:ac8:5c82:0:b0:40f:dc70:fde2 with SMTP id
+ r2-20020ac85c82000000b0040fdc70fde2mr375758qta.26.1693827008368; Mon, 04 Sep
+ 2023 04:30:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZPWwE9IYArI08Zsc@Laptop-X1>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+References: <20230830112600.4483-1-hdanton@sina.com> <f607a7d5-8075-f321-e3c0-963993433b14@I-love.SAKURA.ne.jp>
+ <20230831114108.4744-1-hdanton@sina.com> <CANn89iLCCGsP7SFn9HKpvnKu96Td4KD08xf7aGtiYgZnkjaL=w@mail.gmail.com>
+ <20230903005334.5356-1-hdanton@sina.com>
+In-Reply-To: <20230903005334.5356-1-hdanton@sina.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 4 Sep 2023 13:29:57 +0200
+Message-ID: <CANn89iJj_VR0L7g3-0=aZpKbXfVo7=BG0tsb8rhiTBc4zi_EtQ@mail.gmail.com>
+Subject: Re: selftests: net: pmtu.sh: Unable to handle kernel paging request
+ at virtual address
+To: Hillf Danton <hdanton@sina.com>
+Cc: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, Netdev <netdev@vger.kernel.org>, 
+	"Paul E. McKenney" <paulmck@kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, 
+	Naresh Kamboju <naresh.kamboju@linaro.org>, LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Mon, Sep 04, 2023 at 12:23:15PM CEST, liuhangbin@gmail.com wrote:
->Hi Ziyang,
+On Sun, Sep 3, 2023 at 5:57=E2=80=AFAM Hillf Danton <hdanton@sina.com> wrot=
+e:
 >
->On Sat, Sep 02, 2023 at 05:20:07PM +0800, Ziyang Xuan wrote:
->> $ teamd -t team0 -d -c '{"runner": {"name": "loadbalance"}}'
->> $ ip link add name t-dummy type dummy
->> $ ip link add link t-dummy name t-dummy.100 type vlan id 100
->> $ ip link add name t-nlmon type nlmon
->> $ ip link set t-nlmon master team0
->> $ ip link set t-nlmon nomaster
->> $ ip link set t-dummy up
->> $ ip link set team0 up
->> $ ip link set t-dummy.100 down
->> $ ip link set t-dummy.100 master team0
->> 
->> When enslave a vlan device to team device and team device type is changed
->> from non-ether to ether, header_ops of team device is changed to
->> vlan_header_ops. That is incorrect and will trigger null-ptr-deref
->> for vlan->real_dev in vlan_dev_hard_header() because team device is not
->> a vlan device.
->> 
->> Use ether_setup() for team device when its type is changed from non-ether
->> to ether to fix the bug.
->> 
->> Fixes: 1d76efe1577b ("team: add support for non-ethernet devices")
->> Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
->> ---
->>  drivers/net/team/team.c | 21 +++++++++++++--------
->>  1 file changed, 13 insertions(+), 8 deletions(-)
->> 
->> diff --git a/drivers/net/team/team.c b/drivers/net/team/team.c
->> index d3dc22509ea5..560e04860aa7 100644
->> --- a/drivers/net/team/team.c
->> +++ b/drivers/net/team/team.c
->> @@ -2127,14 +2127,19 @@ static const struct ethtool_ops team_ethtool_ops = {
->>  static void team_setup_by_port(struct net_device *dev,
->>  			       struct net_device *port_dev)
->>  {
->> -	dev->header_ops	= port_dev->header_ops;
->> -	dev->type = port_dev->type;
->> -	dev->hard_header_len = port_dev->hard_header_len;
->> -	dev->needed_headroom = port_dev->needed_headroom;
->> -	dev->addr_len = port_dev->addr_len;
->> -	dev->mtu = port_dev->mtu;
->> -	memcpy(dev->broadcast, port_dev->broadcast, port_dev->addr_len);
->> -	eth_hw_addr_inherit(dev, port_dev);
->> +	if (port_dev->type == ARPHRD_ETHER) {
->> +		ether_setup(dev);
->> +		eth_hw_addr_random(dev);
->> +	} else {
->> +		dev->header_ops	= port_dev->header_ops;
->> +		dev->type = port_dev->type;
->> +		dev->hard_header_len = port_dev->hard_header_len;
->> +		dev->needed_headroom = port_dev->needed_headroom;
->> +		dev->addr_len = port_dev->addr_len;
->> +		dev->mtu = port_dev->mtu;
->> +		memcpy(dev->broadcast, port_dev->broadcast, port_dev->addr_len);
->> +		eth_hw_addr_inherit(dev, port_dev);
->> +	}
->>  
->>  	if (port_dev->flags & IFF_POINTOPOINT) {
->>  		dev->flags &= ~(IFF_BROADCAST | IFF_MULTICAST);
+> On Thu, 31 Aug 2023 15:12:30 +0200 Eric Dumazet <edumazet@google.com>
+> > On Thu, Aug 31, 2023 at 2:17=3DE2=3D80=3DAFPM Hillf Danton <hdanton@sin=
+a.com>
+> > > On Wed, 30 Aug 2023 21:44:57 +0900 Tetsuo Handa <penguin-kernel@I-lov=
+e.SAKURA.ne.jp>
+> > > >On 2023/08/30 20:26, Hillf Danton wrote:
+> > > >>> <4>[  399.014716] Call trace:
+> > > >>> <4>[  399.015702]  percpu_counter_add_batch+0x28/0xd0
+> > > >>> <4>[  399.016399]  dst_destroy+0x44/0x1e4
+> > > >>> <4>[  399.016681]  dst_destroy_rcu+0x14/0x20
+> > > >>> <4>[  399.017009]  rcu_core+0x2d0/0x5e0
+> > > >>> <4>[  399.017311]  rcu_core_si+0x10/0x1c
+> > > >>> <4>[  399.017609]  __do_softirq+0xd4/0x23c
+> > > >>> <4>[  399.017991]  ____do_softirq+0x10/0x1c
+> > > >>> <4>[  399.018320]  call_on_irq_stack+0x24/0x4c
+> > > >>> <4>[  399.018723]  do_softirq_own_stack+0x1c/0x28
+> > > >>> <4>[  399.022639]  __irq_exit_rcu+0x6c/0xcc
+> > > >>> <4>[  399.023434]  irq_exit_rcu+0x10/0x1c
+> > > >>> <4>[  399.023962]  el1_interrupt+0x8c/0xc0
+> > > >>> <4>[  399.024810]  el1h_64_irq_handler+0x18/0x24
+> > > >>> <4>[  399.025324]  el1h_64_irq+0x64/0x68
+> > > >>> <4>[  399.025612]  _raw_spin_lock_bh+0x0/0x6c
+> > > >>> <4>[  399.026102]  cleanup_net+0x280/0x45c
+> > > >>> <4>[  399.026403]  process_one_work+0x1d4/0x310
+> > > >>> <4>[  399.027140]  worker_thread+0x248/0x470
+> > > >>> <4>[  399.027621]  kthread+0xfc/0x184
+> > > >>> <4>[  399.028068]  ret_from_fork+0x10/0x20
+> > > >>
+> > > >> static void cleanup_net(struct work_struct *work)
+> > > >> {
+> > > >>      ...
+> > > >>
+> > > >>      synchronize_rcu();
+> > > >>
+> > > >>      /* Run all of the network namespace exit methods */
+> > > >>      list_for_each_entry_reverse(ops, &pernet_list, list)
+> > > >>              ops_exit_list(ops, &net_exit_list);
+> > > >>      ...
+> > > >>
+> > > >> Why did the RCU sync above fail to work in this report, Eric?
+> > > >
+> > > > Why do you assume that synchronize_rcu() failed to work?
+> > >
+> > > In the ipv6 pernet_operations [1] for instance, dst_entries_destroy()=
+ is
+> > > invoked after RCU sync to ensure that nobody is using the exiting net=
+,
+> > > but this report shows that protection falls apart.
+> >
+> > Because synchronize_rcu() is not the same than rcu_barrier()
+> >
+> > The dst_entries_add()/ percpu_counter_add_batch() call should not
+> > happen after an rcu grace period.
 >
->Thanks for the report. This fix is similar with what I do in my PATCHv3 [1].
->And this will go back to the discussion of MTU update. How about just update
->the header_ops for ARPHRD_ETHER? e.g.
+>         cpu2                    cpu3
+>         =3D=3D=3D=3D                    =3D=3D=3D=3D
+>         cleanup_net()           rcu_read_lock();
+>                                 it is safe to use either netns or dst
+>                                 rcu_read_unlock();
+>         synchronize_rcu();
+>                                 unsafe to access anyone now
+> >
+> > Something like this (untested) patch
+> >
+> > diff --git a/net/core/dst.c b/net/core/dst.c
+> > index 980e2fd2f013b3e50cc47ed0666ee5f24f50444b..f02fdd1da6066a4d56c2a0a=
+a8038eca76d62f8bd
+> > 100644
+> > --- a/net/core/dst.c
+> > +++ b/net/core/dst.c
+> > @@ -163,8 +163,13 @@ EXPORT_SYMBOL(dst_dev_put);
+> >
+> >  void dst_release(struct dst_entry *dst)
+> >  {
+> > -       if (dst && rcuref_put(&dst->__rcuref))
+> > +       if (dst && rcuref_put(&dst->__rcuref)) {
+> > +               if (!(dst->flags & DST_NOCOUNT)) {
+> > +                       dst->flags |=3D3D DST_NOCOUNT;
+> > +                       dst_entries_add(dst->ops, -1);
 >
->	if (port_dev->type == ARPHRD_ETHER)
->		dev->header_ops	= &eth_header_ops;
->	else
->		dev->header_ops	= port_dev->header_ops;
+> Could this add happen after the rcu sync above?
+>
 
-Yes, this sounds better.
-
-
->
->[1] https://lore.kernel.org/netdev/20230718101741.2751799-3-liuhangbin@gmail.com/
->
->Thanks
->Hangbin
+I do not think so. All dst_release() should happen before netns removal.
 
