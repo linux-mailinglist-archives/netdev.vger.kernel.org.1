@@ -1,169 +1,111 @@
-Return-Path: <netdev+bounces-31934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7878F7917A3
-	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 14:55:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 48D6B791901
+	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 15:44:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 439551C2083B
-	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 12:55:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73DF21C20862
+	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 13:44:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDDBD8F73;
-	Mon,  4 Sep 2023 12:55:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71768BA5F;
+	Mon,  4 Sep 2023 13:44:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1AA41FBD
-	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 12:55:06 +0000 (UTC)
-Received: from mail-pg1-f206.google.com (mail-pg1-f206.google.com [209.85.215.206])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E32CC189
-	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 05:55:04 -0700 (PDT)
-Received: by mail-pg1-f206.google.com with SMTP id 41be03b00d2f7-56f8c8fd8e7so997240a12.1
-        for <netdev@vger.kernel.org>; Mon, 04 Sep 2023 05:55:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693832104; x=1694436904;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mSFcZeG/HAdd7KkdAhnr1McNOW5cat4hY9kHmNWPcQs=;
-        b=bugl8HU7i+lKicEpaCi+zyuIgWA0ESeRjmeGtIMYXnakna/nfp20fpvUNyCozG/Mxl
-         erEEeiG7quHayxGCOkPWc+DxpMxL3F1zlq/T34Wz58zfKV9vpgIwD4saeTpP/SahhPDG
-         IMK5fas99sjYF4GOkBBkJTIWlgcxkLmMj1l8Gvx4/9B/wtERJ1UUun4yoj4nxA2ZBEqv
-         9A5SfKYVWHpteWOGaqZyN3xLOeeU889nLzsL0m3KNbs+UaMqZGLaCFDC5aXU0otfUD/W
-         22oHZ5G/THiZz3JQoBcqLviIiw7MM4kgaeMLXmjFV0SjHURNszODUqOkWd2la/fOQfcI
-         9r1Q==
-X-Gm-Message-State: AOJu0YwCZNzMg6yZ5yP2bWv8jlRScnWO4yFoJ5v+iQc5psxkmyp7Omcz
-	Wev+N+Ox1SDpe/aoU9GVkZhqARV2AzVq45j9wGNVcN39TrQO
-X-Google-Smtp-Source: AGHT+IEx2LAnq8FHlS02J/o9Kd6xLAgz2C8d3276StNqbNT0Ni6/XFKrjMGgJm2SridOqCwlyNieo/OkKhS5FQylK6INwyzkHfC9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61689A925
+	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 13:43:58 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FA4E1733
+	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 06:43:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=xVtDMuyduIbc26acMzI5bTKVDosyTqvCLQl9XuiYYuc=; b=PN
+	/7cwzZEmKgluJ5bNzZJAEGfzmTFSCW87/XO1sfllHuCNdnLYAJT/5Miqe6iieHjG3CjdG+HQ3/Qg1
+	oRgor07i+JkmyC5ozt657dGitIVz79gIxAA0vjoP3q0mC8x+cSTQKosEFfypKGp+NX7ddwmIwazcp
+	uIFHRoAhwwo5IMU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qd9r2-005k7x-Dl; Mon, 04 Sep 2023 15:43:00 +0200
+Date: Mon, 4 Sep 2023 15:43:00 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: f.fainelli@gmail.com, davem@davemloft.net, edumazet@google.com,
+	hkallweit1@gmail.com, kuba@kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com, rmk+kernel@armlinux.org.uk,
+	"shenjian15@huawei.com" <shenjian15@huawei.com>,
+	"liuyonglong@huawei.com" <liuyonglong@huawei.com>,
+	wangjie125@huawei.com, chenhao418@huawei.com,
+	Hao Lan <lanhao@huawei.com>,
+	"wangpeiyang1@huawei.com" <wangpeiyang1@huawei.com>
+Subject: Re: [PATCH net-next] net: phy: avoid kernel warning dump when
+ stopping an errored PHY
+Message-ID: <fd08a80d-c70b-4943-8cca-b038f54f8eaa@lunn.ch>
+References: <aed0bc3b-2d48-2fd9-9587-5910ad68c180@gmail.com>
+ <8e7e02d8-2b2a-8619-e607-fbac50706252@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a17:903:1d2:b0:1b8:ecd:cb7f with SMTP id
- e18-20020a17090301d200b001b80ecdcb7fmr3510890plh.9.1693832104492; Mon, 04 Sep
- 2023 05:55:04 -0700 (PDT)
-Date: Mon, 04 Sep 2023 05:55:04 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000e5c8af0604880492@google.com>
-Subject: [syzbot] [net?] KASAN: global-out-of-bounds Read in
- macvlan_hard_header (4)
-From: syzbot <syzbot+ae8588da4b5f2e5531d2@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8e7e02d8-2b2a-8619-e607-fbac50706252@huawei.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello,
+On Mon, Sep 04, 2023 at 05:50:32PM +0800, Jijie Shao wrote:
+> Hi all,
+> We encountered an issue when resetting our netdevice recently, it seems
+> related to this patch.
+> 
+> During our process, we stop phy first and call phy_start() later.
+> phy_check_link_status returns error because it read mdio failed. The
+> reason why it happened is that the cmdq is unusable when we reset and we
+> can't access to mdio.
 
-syzbot found the following issue on:
+At what point in the flow below do you apply the reset which stops
+access to the MDIO bus? Ideally you want to do phy_stop(), then apply
+the reset, get the hardware working again, and then do a phy_start().
 
-HEAD commit:    27e462c8fad4 Merge tag 'xtensa-20230523' of https://github..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=10961ec5280000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=927d4df6d674370e
-dashboard link: https://syzkaller.appspot.com/bug?extid=ae8588da4b5f2e5531d2
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/8cc4e9023e9b/disk-27e462c8.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/0fae37d588a6/vmlinux-27e462c8.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/d99575c59a4d/bzImage-27e462c8.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+ae8588da4b5f2e5531d2@syzkaller.appspotmail.com
-
-IPv6: ADDRCONF(NETDEV_CHANGE): team1: link becomes ready
-==================================================================
-BUG: KASAN: global-out-of-bounds in dev_hard_header include/linux/netdevice.h:3134 [inline]
-BUG: KASAN: global-out-of-bounds in macvlan_hard_header+0x12f/0x160 drivers/net/macvlan.c:603
-Read of size 8 at addr ffffffff90154998 by task kworker/1:0/21074
-
-CPU: 1 PID: 21074 Comm: kworker/1:0 Not tainted 6.4.0-rc3-syzkaller-00015-g27e462c8fad4 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/28/2023
-Workqueue: mld mld_ifc_work
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xd9/0x150 lib/dump_stack.c:106
- print_address_description.constprop.0+0x2c/0x3c0 mm/kasan/report.c:351
- print_report mm/kasan/report.c:462 [inline]
- kasan_report+0x11c/0x130 mm/kasan/report.c:572
- dev_hard_header include/linux/netdevice.h:3134 [inline]
- macvlan_hard_header+0x12f/0x160 drivers/net/macvlan.c:603
- dev_hard_header include/linux/netdevice.h:3137 [inline]
- neigh_resolve_output net/core/neighbour.c:1547 [inline]
- neigh_resolve_output+0x4b7/0x870 net/core/neighbour.c:1532
- neigh_output include/net/neighbour.h:544 [inline]
- ip6_finish_output2+0x55a/0x1560 net/ipv6/ip6_output.c:134
- __ip6_finish_output net/ipv6/ip6_output.c:195 [inline]
- ip6_finish_output+0x69a/0x1170 net/ipv6/ip6_output.c:206
- NF_HOOK_COND include/linux/netfilter.h:292 [inline]
- ip6_output+0x1f1/0x540 net/ipv6/ip6_output.c:227
- dst_output include/net/dst.h:458 [inline]
- NF_HOOK include/linux/netfilter.h:303 [inline]
- NF_HOOK include/linux/netfilter.h:297 [inline]
- mld_sendpack+0xa09/0xed0 net/ipv6/mcast.c:1820
- mld_send_cr net/ipv6/mcast.c:2121 [inline]
- mld_ifc_work+0x73c/0xe20 net/ipv6/mcast.c:2653
- process_one_work+0x99a/0x15e0 kernel/workqueue.c:2405
- worker_thread+0x67d/0x10c0 kernel/workqueue.c:2552
- kthread+0x344/0x440 kernel/kthread.c:379
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
- </TASK>
-
-The buggy address belongs to the variable:
- nr_zapped_lock_chains+0x18/0x40
-
-The buggy address belongs to the physical page:
-page:ffffea0000405500 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x10154
-flags: 0xfff00000001000(reserved|node=0|zone=1|lastcpupid=0x7ff)
-page_type: 0xffffffff()
-raw: 00fff00000001000 ffffea0000405508 ffffea0000405508 0000000000000000
-raw: 0000000000000000 0000000000000000 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner info is not present (never set?)
-
-Memory state around the buggy address:
- ffffffff90154880: 00 00 00 00 f9 f9 f9 f9 04 f9 f9 f9 f9 f9 f9 f9
- ffffffff90154900: 04 f9 f9 f9 f9 f9 f9 f9 04 f9 f9 f9 f9 f9 f9 f9
->ffffffff90154980: 00 f9 f9 f9 f9 f9 f9 f9 00 00 00 00 00 00 00 00
-                            ^
- ffffffff90154a00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
- ffffffff90154a80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-==================================================================
+> 
+> The process and logs are showed as followed:
+> Process:
+> reset process       |    phy_state_machine           |  phy_state
+> ==========================================================================
+>                     | mutex_lock(&phydev->lock);     | PHY_RUNNING
+>                     | ...                            |
+>                     | case PHY_RUNNING:              |
+>                     | err = phy_check_link_status()  | PHY_RUNNING
+>                     | ...                            |
+>                     | mutex_unlock(&phydev->lock)    | PHY_RUNNING
+>  phy_stop()         |                                |
+>    ...              |                                |
+>    mutex_lock()     |                                | PHY_RUNNING
+>    ...              |                                |
+>    phydev->state =  |                                |
+>      PHY_HALTED;    |                                |  PHY_HALTED
+>    ...              |                                |
+>    mutex_unlock()   |                                |  PHY_HALTED
+>                     | phy_error_precise():           |
+>                     |   mutex_lock(&phydev->lock);   | PHY_HALTED
+>                     |   phydev->state = PHY_ERROR;   | PHY_ERROR
+>                     |   mutex_unlock(&phydev->lock); | PHY_ERROR
+>                     |                                |
+> phy_start()         |                                |  PHY_ERROR
+>   ...               |                                |
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+	Andrew
 
