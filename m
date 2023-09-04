@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-31917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D576C7916C0
-	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 14:02:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 838637916C1
+	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 14:02:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BCC6280ED1
-	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 12:02:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA4A81C20823
+	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 12:02:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CE823FF9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA0867471;
 	Mon,  4 Sep 2023 12:02:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BACF2102
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7CFC442D
 	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 12:02:34 +0000 (UTC)
-Received: from phobos.denx.de (phobos.denx.de [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4C50197;
-	Mon,  4 Sep 2023 05:02:32 -0700 (PDT)
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8748E1B8;
+	Mon,  4 Sep 2023 05:02:33 -0700 (PDT)
 Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
 	(No client certificate requested)
 	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id C55A1805CA;
-	Mon,  4 Sep 2023 14:02:30 +0200 (CEST)
+	by phobos.denx.de (Postfix) with ESMTPSA id 82CEA863A8;
+	Mon,  4 Sep 2023 14:02:31 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1693828951;
-	bh=McKsijySuQgvHOvSD/v6d1lo6B89Lk0uzVHTLTbqVHA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=zN+ntPOvUswPmefl0Jnn084OdxkLljnqaaLaXPaiFsPahGKeoVSG8TwaWeTfYLdwA
-	 9Lmo3B/6nyISFMDFwO91bGAroNX5G6vXS6QIIhE2fOjEO4n4zoOw0r6JRYPXKiY3en
-	 eb9thOJm0Ou221GTraHqg1KjWlKjLwoaIqrLDoGQLvYumIUSDy0JkMgIyVUjGWP0Vh
-	 /5CHUV0QOEv11SsOheVB8HpnBnN8cZ/LikNIeyRao31bfwNEUg/kQTSAS/0ryCfjRR
-	 uXiyShv3vR/M2Tqy2+t3GwnQsSopRiWQmO3J1OnPlF+JIx6NtZKR4xMJcUSpTRDtde
-	 STCGLrm+ovB9w==
+	s=phobos-20191101; t=1693828952;
+	bh=iKsz3lXVX1mLkg6/Pm1nXTQDpxA82A/MCK7KumwAcc4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=lM3iLUvMB0LL+EzPaFrZsQocW7uhF5+V9DYP1giThZsaYQWLsQd9xHyoNEB4yJ4n+
+	 TZg0LbNeoQqQ1gAxIn5QEDxSOsm/9uSEWxXyn/TiQGgENeX02D8VQXXYEemlrBxi4S
+	 /G1l5yTTSvHv7im0h0tfwwjdSaZOcK1JOnCCjjlbxjVmecCqBwp8JR+oyU8If2i0Qo
+	 GLSALHmYKlQDafe9WQIzmgf1d5JdKgfoPyMEYPfnC2CbljgNYzXCSceXSdrW7YYbrL
+	 1z2EpGlo8Hq0cReY9zMJwggpx/yHY5QivZ8u90ruP7zTGRmc9eJvY84OT7lGW3yMy9
+	 muF2geObJbzag==
 From: Lukasz Majewski <lukma@denx.de>
 To: Eric Dumazet <edumazet@google.com>,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -53,10 +53,12 @@ Cc: Tristram.Ha@microchip.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Lukasz Majewski <lukma@denx.de>
-Subject: [PATCH v3 RFC 0/4] net: dsa: hsr: Enable HSR HW offloading for KSZ9477
-Date: Mon,  4 Sep 2023 14:02:05 +0200
-Message-Id: <20230904120209.741207-1-lukma@denx.de>
+Subject: [PATCH v3 RFC 1/4] net: dsa: Extend the ksz_device structure to hold info about HSR ports
+Date: Mon,  4 Sep 2023 14:02:06 +0200
+Message-Id: <20230904120209.741207-2-lukma@denx.de>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230904120209.741207-1-lukma@denx.de>
+References: <20230904120209.741207-1-lukma@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,48 +74,38 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This patch series provides support for HSR HW offloading in KSZ9477
-switch IC.
+Information about HSR aware ports in a DSA switch can be helpful when
+one needs tags to be adjusted before the HSR frame is sent.
 
-To test this feature:
-ip link add name hsr0 type hsr slave1 lan1 slave2 lan2 supervision 45 version 1
-ip link set dev lan1 up
-ip link set dev lan2 up
-ip a add 192.168.0.1/24 dev hsr0
-ip link set dev hsr0 up
+For example - with ksz9477 switch - the TAG needs to be adjusted to have
+both HSR ports marked in tag to allow execution of HW based frame
+duplication.
 
-To remove HSR network device:
-ip link del hsr0
+Signed-off-by: Lukasz Majewski <lukma@denx.de>
+---
+Changes for v2:
+- Use struct ksz_device to store hsr_ports variable
 
-Test HW:
-Two KSZ9477-EVB boards with HSR ports set to "Port1" and "Port2".
+Changes for v3:
+- None
+---
+ drivers/net/dsa/microchip/ksz_common.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Performance SW used:
-nuttcp -S --nofork
-nuttcp -vv -T 60 -r 192.168.0.2
-nuttcp -vv -T 60 -t 192.168.0.2
-
-Code: v6.5-rc7 Linux repository
-Tested HSR v0 and v1
-Results:
-With KSZ9477 offloading support added: RX: 100 Mbps TX: 98 Mbps
-With no offloading 		       RX: 63 Mbps  TX: 63 Mbps
-
-
-Lukasz Majewski (4):
-  net: dsa: Extend the ksz_device structure to hold info about HSR ports
-  net: dsa: Extend ksz9477 TAG setup to support HSR frames duplication
-  net: dsa: hsr: Enable in KSZ9477 switch HW HSR offloading
-  net: dsa: hsr: Provide generic HSR ksz_hsr_{join|leave} functions
-
- drivers/net/dsa/microchip/ksz9477.c    | 103 +++++++++++++++++++++++++
- drivers/net/dsa/microchip/ksz9477.h    |   4 +
- drivers/net/dsa/microchip/ksz_common.c |  81 +++++++++++++++++++
- drivers/net/dsa/microchip/ksz_common.h |   3 +
- include/linux/dsa/ksz_common.h         |   1 +
- net/dsa/tag_ksz.c                      |   5 ++
- 6 files changed, 197 insertions(+)
-
+diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
+index a4de58847dea..9fcafff0c01d 100644
+--- a/drivers/net/dsa/microchip/ksz_common.h
++++ b/drivers/net/dsa/microchip/ksz_common.h
+@@ -158,6 +158,9 @@ struct ksz_device {
+ 	bool synclko_125;
+ 	bool synclko_disable;
+ 
++	/* Bitmask indicating ports supporting HSR */
++	u16 hsr_ports;
++
+ 	struct vlan_table *vlan_cache;
+ 
+ 	struct ksz_port *ports;
 -- 
 2.20.1
 
