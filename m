@@ -1,268 +1,401 @@
-Return-Path: <netdev+bounces-31857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31858-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57257790F6D
-	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 02:59:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90559790F8A
+	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 03:03:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE5E3280A9A
-	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 00:59:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B143D1C208EF
+	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 01:03:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D974B382;
-	Mon,  4 Sep 2023 00:59:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CF84387;
+	Mon,  4 Sep 2023 01:02:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3417381
-	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 00:59:47 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 116AB90
-	for <netdev@vger.kernel.org>; Sun,  3 Sep 2023 17:59:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693789186; x=1725325186;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=sLU9U4Tt8y19QHKPMcnGXspoiTKoNkqNfnmp5ne7Nuc=;
-  b=dJbU25JQuOJls6YoUCnmOE+8ava/sqfKcx+XCVX7aOhzQcSabyyvJBRr
-   a1cPMyQCqKoK2kwvaT3hSjmk69L5JQqmRx188EkELWm6IZn81zhLMLjFA
-   CYU3CPBF+O+hTGBq0UnyfvEnBQRyGlPubdctW6HpgMnb6oP5bEuA7hKSD
-   ftle8c75ddh8CcjtRrNJlNJe/mDUiR1t+FrQY0zRaTvzrr/ik1xLlXuEB
-   8IBUdUFeRa96756dCUyRzbnoqprw4gB0dTTvTj5M60D75NULowRBLirR3
-   mgZSk7thYwroid6JQifRgM52NqPKFHPdlsNH9SnqhtBm9vwhHFSCE0/dY
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10822"; a="380284677"
-X-IronPort-AV: E=Sophos;i="6.02,225,1688454000"; 
-   d="scan'208";a="380284677"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2023 17:59:45 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10822"; a="914328494"
-X-IronPort-AV: E=Sophos;i="6.02,225,1688454000"; 
-   d="scan'208";a="914328494"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orsmga005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 03 Sep 2023 17:59:45 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Sun, 3 Sep 2023 17:59:44 -0700
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Sun, 3 Sep 2023 17:59:44 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Sun, 3 Sep 2023 17:59:44 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.103)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Sun, 3 Sep 2023 17:59:42 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AYu4hCIPFQJ+IXdlDcW2g19VfBRDPSBqyZi4UM21huum7QmppRKorgIbGggiKDuwmLShWwIBk49MFM+8bJsve/BnhqsNqZAAUONcQFQg2zmJCL1jGpJ2uYaqg1uq2UKxmyZqAZWX/ET8mxzuCHLoJmPnIt67gNiKeI7/zdoKt/p8/h5d1wFmH3l7VjMfT7vG3qzqUngT0tpZGiBg9K8rxrqQyaaoPo8U3DDZy5zQSEOsYBwA8qSdRjxdO66kL5xX6HwRBYWrO1CSqkQ9T8Ma+8BcFVxQiIkAk9jAsgDkXSlZ/U0SQF/ZQng4iiK+t2hTSaB+FHHb7dOhB2wSqvJicw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sLU9U4Tt8y19QHKPMcnGXspoiTKoNkqNfnmp5ne7Nuc=;
- b=BZth7bTo6HwZDAPKn6GwYe/LbN4rfotG99tRGRdr+Cgng+zOxrcOh6f+9mXz1nEEJKQDZQsB9wcvI05OeHVrNW09wboMp3EZw69IPPJUbfev39ShZ5YK1GZ+SZ31kD6uA3qT/YlnicGUQ96NAvQUk9sDMoRNRfoLZ2Xbd7I6loHn/hrjqEUqDhIS5b8CDoQcaBUzbzB2MCjhuoBGtrqDki5vq2kIadV4cMGwEsHuEqO5BtdEJNUh5zdLykxJV+KD411FeS1L5+sft1TOz4qmi1luv++b4e2+oT5iLq7oMJAvro/MY6j8j5DbckWShauOmZknOHYCrzHl2jejOqo7rg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from SJ1PR11MB6180.namprd11.prod.outlook.com (2603:10b6:a03:459::14)
- by DM4PR11MB6096.namprd11.prod.outlook.com (2603:10b6:8:af::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.32; Mon, 4 Sep
- 2023 00:59:40 +0000
-Received: from SJ1PR11MB6180.namprd11.prod.outlook.com
- ([fe80::5c05:24f1:bd1b:88f8]) by SJ1PR11MB6180.namprd11.prod.outlook.com
- ([fe80::5c05:24f1:bd1b:88f8%4]) with mapi id 15.20.6745.030; Mon, 4 Sep 2023
- 00:59:40 +0000
-From: "Zulkifli, Muhammad Husaini" <muhammad.husaini.zulkifli@intel.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "davem@davemloft.net"
-	<davem@davemloft.net>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"edumazet@google.com" <edumazet@google.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "Neftin, Sasha" <sasha.neftin@intel.com>,
-	"horms@kernel.org" <horms@kernel.org>, "bcreeley@amd.com" <bcreeley@amd.com>,
-	Naama Meir <naamax.meir@linux.intel.com>
-Subject: RE: [PATCH net v3 2/2] igc: Modify the tx-usecs coalesce setting
-Thread-Topic: [PATCH net v3 2/2] igc: Modify the tx-usecs coalesce setting
-Thread-Index: AQHZ1UdLBr55a0cOOkC26dNjnXpg9K/4uEIAgAFVHMCAABZcAIAAPQoQgAFe04CADiGKkA==
-Date: Mon, 4 Sep 2023 00:59:40 +0000
-Message-ID: <SJ1PR11MB6180F2DBE9F6296E35451B3CB8E9A@SJ1PR11MB6180.namprd11.prod.outlook.com>
-References: <20230822221620.2988753-1-anthony.l.nguyen@intel.com>
-	<20230822221620.2988753-3-anthony.l.nguyen@intel.com>
-	<20230823191928.1a32aed7@kernel.org>
-	<SJ1PR11MB6180CA2B18577F8D10E8490DB81DA@SJ1PR11MB6180.namprd11.prod.outlook.com>
-	<20230824170022.5a055c55@kernel.org>
-	<SJ1PR11MB6180835AA3B1C2CC9611B44AB8E3A@SJ1PR11MB6180.namprd11.prod.outlook.com>
- <20230825173429.2a2d0d9f@kernel.org>
-In-Reply-To: <20230825173429.2a2d0d9f@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ1PR11MB6180:EE_|DM4PR11MB6096:EE_
-x-ms-office365-filtering-correlation-id: ff5f665e-4479-4b5f-9830-08dbace237f9
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 1T7ECNAfubhQpzNl+vCl33pWueTY1oO2ESheURtC4pAklySXnOZ9Vrdov5cv7CUNWcsEYJgh5f//yXRRNv95ugKlsiZJcnZGnvEmnuq5tl1al+VfZ9lVf1CBiL5bXhZTWDV+iveET7dYBd71PJU6DNgiUUv5urPi+WKbm4HgMlbUuBohhmaWHQo9zl1Jvs3SQDwDNutyv7hyk4v42jK+Yq+ENSTd/+GLOKNosMGriW+kPUi7SFu0FIrUS1+LuF5lus8Bel+NF6LWLkITiScfQnc5RiF5CUhA1k178q2Y8+y1gtI+fi+m3fL2TTvpE4lj1ueN2ArR8NWhnVBnd05yghzV63SvhZTVEdRNBRnpM3J1swcdmiq1IAdsfRJ3QQHrSF/ol1gH87zXjZ+/9VlDLhdgiopGA4NiDfoVWnh65TkXH/IAFyOrTcZVqwGcphrZPSzDZBDPrD4QO+zlPrZCC2H4vqYXr6Uv5If7us0j0p46x22giYQy711pU0hl1MkB553yMMk/GJgcUDVAkht+gKhh4rTuTiZf9xLi+zWLmynv53TjMDTTFEAsKfAqlB+gsFCXv+mY7gdLSq+2F/HhQ/x59X6ySYv7v3HlQS/Cvvd4nk2T5pgLP+65jrROFaWJzRZOdNvQyqrpK8UxdFtDJA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR11MB6180.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(136003)(376002)(346002)(39860400002)(186009)(1800799009)(451199024)(41300700001)(82960400001)(122000001)(38070700005)(38100700002)(71200400001)(33656002)(86362001)(966005)(478600001)(83380400001)(26005)(9686003)(7696005)(6506007)(55016003)(76116006)(66556008)(66476007)(66446008)(66946007)(64756008)(2906002)(54906003)(6916009)(316002)(8936002)(8676002)(5660300002)(4326008)(52536014);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?NityUXYxVDVLWWtMdGw3MWdDNkRYeU93ODYzdVRwY0M0clNPdy8vUmlWRlgw?=
- =?utf-8?B?U1FsQ1JJQS96OGx5VG9hT2x0QTJsMTk3MnZvNEpGd0Z2UXlmcWw3ZjkrSlhq?=
- =?utf-8?B?Tm9abUo5NTAzM29DN1RSNFp6c1B1Q3UyWGR5enlRQjNNYnVQM1ppRXYyandM?=
- =?utf-8?B?QW95UUN5cG5kTVZGczhoMnM1QzJZTmM1TWpnV29taGJmamNVZGNDUElobjVh?=
- =?utf-8?B?WW5xZTdISVM5L25HbU4zTlF6L3R2R2VsVGVyRDdkY0l3UE1BWFhRZTZWNWgr?=
- =?utf-8?B?dGxoYUxsMmlmb2h0bERhZEZSLzkxWEpIQVZ2L2U5OGQ4L0JiZVdJRDFjdHAv?=
- =?utf-8?B?RUtUcDhPUmRZaFhRcHlvWm05Zy9xejVEakVaY2UxQVVsdkZFUEw2T3UzY3dZ?=
- =?utf-8?B?V252bkJqdU5pOUVCT0w3YzQ2QWFXbDBTcjlTVU1hd01QL3BlNGFLZ3BUR09R?=
- =?utf-8?B?ZjFwR20xd0Y1MkNkRlZEbjF5WHd3OEt4ZWFlNTQzdFBubC9URmloMkcrNlRN?=
- =?utf-8?B?M0ljMTloQU5CMXFHOUZvV2h1aWdzK2pZd1RsLzFMa3VYbFJSWXQxUGtUcDdP?=
- =?utf-8?B?SlZzTVRkVjdSbSttNmVzTmdvTzZYdnRYdWUxbE0zMnRZQ29SM2U1MlQzZmN3?=
- =?utf-8?B?ZnRCWmliVzhlN2NLZWxMWWRJd3lVN29Fb2JETm5DMXpoK3d1S3VSdVZVdTNJ?=
- =?utf-8?B?d3ZYaUJBTzZtVy9qV0tVZFpBcDh1OStaWDRSSXVwdDNkK1U2dVZIOEpoMDBH?=
- =?utf-8?B?dWZUUVYvYW5wQjVMczF6WmFqaGs2SGFnR2FUdno0UUtoWm9yeVpGVXZSMncr?=
- =?utf-8?B?TXNEaEJUczlkd0o0ZzRyQXc1WFlGd3ViTUhXRWRnVWRBZVVRay9lUnQwU2hu?=
- =?utf-8?B?d2wrU3YzWnJBbGs5Um9oOTlKaUcyUE10SmgrQnVROVNhQStHNTNPOW90VlI1?=
- =?utf-8?B?dk5OODczN1ZhMzNEUHlDdmtGdmk5T292SHhwcVFjdFkyamhTcXZnbVJKcXFy?=
- =?utf-8?B?OThaNURvRlNEOXBIdVlRamtRMmxieUQ3MW4rcFlNWHhuQWkvMnE0ZmoxdmdP?=
- =?utf-8?B?RnMwM1hEelRQeVl4M1FGQzZYbEpGcHVXcUk3UlVEQ0tPM3Y0MjlPUGtmSmUr?=
- =?utf-8?B?ak4xTkhzbCtIS2FUQW1oVkFJUmNvNFlpbEtpRFl6bnhPZGNWMDV5dzBpaVht?=
- =?utf-8?B?MjNDc3loNjd4RmFCL2NTSmFpejZwdWV5dmswQTViL0Z2KzJObWdjZVcrTEdF?=
- =?utf-8?B?aFVxVythTjZadHRMbURoQzRTS0JKMEJaZlV5K0JZZUxLUC9CbHNsMmFjVm1M?=
- =?utf-8?B?aW5KUkF1aEtCalBYdDJpZEFMWjNaOGs3MURBUnd0SUpoRWYxdkxJeno4cjNE?=
- =?utf-8?B?ZVl6ZTVCSE1XV082VVRiV3Vkbm9jcU1vUGFsQnVQSEhFTGxBVUZmK3lRMzMy?=
- =?utf-8?B?OHpkMWNSbUd1S24xTlRBN0hLbjVOMVNhYXM1dStrNGorNmJRcmxaWkw5YlY5?=
- =?utf-8?B?emd1SnQrVDVtbUY0QVM4RnZFWGlSOFl5cGdxc29TRFo4ZWFSUC93OXQrbzh3?=
- =?utf-8?B?MkhUbHVBVHk1U2phYTg2OFExaWRSUG5JQzVQeGFyMCtHeVVsSXdoK05HTk5O?=
- =?utf-8?B?MFFnblpmVlNaYXQvVDVtZ3RqQjZYMDRLc3RVdFJHc0pEQmlqViszT2kzdTNO?=
- =?utf-8?B?Z1JQQnhXeDlBR3lwcnBIZWlrbGc2bVpudXpQeG5BaDd0OEgyYWNDUC9zL3M0?=
- =?utf-8?B?WlZvUkZmVkwvR3I4QVUvalZsMlMxNEtudEtpMTZoWWkvcTJwKzlCT1FzKzZV?=
- =?utf-8?B?bzBDL2s2VTRjcEJaWm9GcSthMlhHVGovQnoyYlZPZmtzbk9tUlNYTElZZFZt?=
- =?utf-8?B?QVBQSnhKNkZCN2ZIOHlKZDV1MTBjUzFlSXJtTzVYaDlCb1JWWmE0aC9wbjZx?=
- =?utf-8?B?TS9IaU9vN3k0MVZ4c2FKQmhXQVRrR2xhNmRvemZHeHdwR0RJbDU4TjEySFZj?=
- =?utf-8?B?OTRDYWM3OWg3U21tNWF3VTE3SWJwdXpzRWVjeVFWVThpYWdIVXZlU0dKRmts?=
- =?utf-8?B?NDBzcU15d1hoZnNBcDFDb0JPSjFRbFl3NjdKa1dMTGVicEt6UUhYWUpsZUMz?=
- =?utf-8?B?eHdSWStTT2tuTlB0aUpDRUFZd0JkRDFmaWdMUThqcDVaVm94VVhaVVprUHZD?=
- =?utf-8?Q?AfOKnJqErsbTnBoUERTTqfA=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A9D6381
+	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 01:02:55 +0000 (UTC)
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D0481B9
+	for <netdev@vger.kernel.org>; Sun,  3 Sep 2023 18:02:36 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1c09673b006so1999035ad.1
+        for <netdev@vger.kernel.org>; Sun, 03 Sep 2023 18:02:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1693789356; x=1694394156; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7SkjlWpTOnFF4QpgAAxUR7lqv3IHtXsX9Ov+YWVrmXw=;
+        b=qC164uBpiTqMDgXCvRgiQKt4Gh699N5mZOL/vYt7en0Jbwz76nMzEY83UKBVSQIW6l
+         aeb79T1fQrqEYwAnWqEg0BUEVogsLmyDn7Er7QB5MMmb3evyGFkJ31LnyaFbCd66DWcw
+         2rEqHGNd94yLw2873vPlsxfffzMVRPFxi+gQvuhDp/nt+kHeFVOC7RU50NpTqz237x8d
+         0EgVDl7W9L5GKWAUtPLGkVf3nghZNwTKtocs80JusMNZMyy2xNrwPVPtVOWAc9Ov7Ec+
+         l+Jy4wlPaRYKxlaBf+eoyU6yz7sgMqtArlqAkIUtWnDR1tDFWMVYywwL0pwAGBUewBHm
+         OWuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693789356; x=1694394156;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7SkjlWpTOnFF4QpgAAxUR7lqv3IHtXsX9Ov+YWVrmXw=;
+        b=Ip58MFXFvBEG3pRGYzw954UkK0KgJFpDDncmKk9cpEgIwcl8HAXxAFrQRvzekK7DOt
+         b6NUt3B/mddGwzNtD/CC0DIEPKe2y7i+r4wvrPa3U1NHSKAgHNVvIwZMa8f3O1ruOi8Y
+         hfySZPfZSQFR3Iwf/x4ONL7WdtxddFsBNcyIb2VBWTmcRo3iQwCt7fGHP0CV7t3aMh8h
+         /Mwr2rT3WFzN+fyq4Pz3xPUXHCpgQzE2/XmTSHNlg0J3ija2q6kr0cnv+DlFqjWPlDKz
+         +127no006/eQQ+/GEjspGwzUrANhuB7WQLAC8A944PFUJtZg9O6x5Kob7Z/MgxtNikoV
+         lk2A==
+X-Gm-Message-State: AOJu0YzxONnkt4o/LsN1gZr6zSK8WhIDzFzTPVGj4XqKIz18g2ja5qWx
+	i+OVfRNbCHmoPoS1IxvtK9MBQA==
+X-Google-Smtp-Source: AGHT+IGGrky2P+bBuH4AKgWBeYdqXOP6u+qaOJyeKMBTbWb7BRdsdnk0jjxmGVwySX0sZe8eaRNDcw==
+X-Received: by 2002:a17:902:ecc8:b0:1c1:fe97:bf34 with SMTP id a8-20020a170902ecc800b001c1fe97bf34mr8040994plh.24.1693789355853;
+        Sun, 03 Sep 2023 18:02:35 -0700 (PDT)
+Received: from dread.disaster.area (pa49-195-66-88.pa.nsw.optusnet.com.au. [49.195.66.88])
+        by smtp.gmail.com with ESMTPSA id d4-20020a170902c18400b001bdcafcf8d3sm6351806pld.69.2023.09.03.18.02.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 03 Sep 2023 18:02:35 -0700 (PDT)
+Received: from dave by dread.disaster.area with local (Exim 4.96)
+	(envelope-from <david@fromorbit.com>)
+	id 1qcxz6-00AVA9-2L;
+	Mon, 04 Sep 2023 11:02:32 +1000
+Date: Mon, 4 Sep 2023 11:02:32 +1000
+From: Dave Chinner <david@fromorbit.com>
+To: Hao Xu <hao.xu@linux.dev>
+Cc: io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Stefan Roesch <shr@fb.com>, Clay Harris <bugs@claycon.org>,
+	"Darrick J . Wong" <djwong@kernel.org>,
+	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	linux-ext4@vger.kernel.org, linux-cachefs@redhat.com,
+	ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+	linux-unionfs@vger.kernel.org, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, codalist@coda.cs.cmu.edu,
+	linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+	linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
+	devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
+	samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
+	Wanpeng Li <wanpengli@tencent.com>
+Subject: Re: [PATCH 02/11] xfs: add NOWAIT semantics for readdir
+Message-ID: <ZPUsqGfeUwupdlLE@dread.disaster.area>
+References: <20230827132835.1373581-1-hao.xu@linux.dev>
+ <20230827132835.1373581-3-hao.xu@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ1PR11MB6180.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ff5f665e-4479-4b5f-9830-08dbace237f9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Sep 2023 00:59:40.4427
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: RX7j2VY+K9K0Nuu1YWKG+pGcBCKbvoW9kiYXLvZljhxmlCDdn5wWy1zdfrp9FtuLRNQ8v9LDah5onG88xoKRq3cRMwx8ex7eLRuPrTgplrvF3AZn+QHNaw86klLSoysg
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6096
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230827132835.1373581-3-hao.xu@linux.dev>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-PiBTdWJqZWN0OiBSZTogW1BBVENIIG5ldCB2MyAyLzJdIGlnYzogTW9kaWZ5IHRoZSB0eC11c2Vj
-cyBjb2FsZXNjZSBzZXR0aW5nDQo+IA0KPiBPbiBGcmksIDI1IEF1ZyAyMDIzIDAzOjQ0OjM1ICsw
-MDAwIFp1bGtpZmxpLCBNdWhhbW1hZCBIdXNhaW5pIHdyb3RlOg0KPiA+ID4gSSBzZWUuIE1heWJl
-IGl0J3MgYmV0dGVyIHRvIGNvbWJpbmUgdGhlIHBhdGNoZXMsIHRoZXkgYXJlIGEgYml0IGhhcmQN
-Cj4gPiA+IHRvIHJldmlldyBpbiBzZXBhcmF0aW9uLg0KPiA+DQo+ID4gSU1ITywgSSB3b3VsZCBs
-aWtlIHRvIHNlcGFyYXRlIGdldCBhbmQgc2V0IGZ1bmN0aW9uIGluIGRpZmZlcmVudCBwYXRjaC4N
-Cj4gPiBNYXliZSBJIGNhbiBhZGQgbW9yZSBkZXRhaWxzIGluIGNvbW1pdCBtZXNzYWdlLiBJcyBp
-dCBva2F5Pw0KPiANCj4gVGhhdCdzIGV4YWN0bHkgd2hhdCBjb25mdXNlZCBtZS4gWW91IG1hZGUg
-aXQgc291bmQgbGlrZSBmaXJzdCBwYXRjaCBpcyBvbmx5IGFib3V0DQo+IEdFVCBidXQgaXQgYWN0
-dWFsbHkgYWxzbyBjaGFuZ2VzIFNFVC4NCg0KSSBhbSBva2F5IHRvIHNxdWFzaCBpdCB0b2dldGhl
-ci4gTW9yZSBleHBsYW5hdGlvbiBiZWxvdy4NCg0KPiANCj4gPiA+IEkgd2FzIGp1c3QgdGhpbmtp
-bmcgb2Ygc29tZXRoaW5nIGFsb25nIHRoZSBsaW5lcyBvZjoNCj4gPiA+DQo+ID4gPiBpZiAoYWRh
-cHRlci0+ZmxhZ3MgJiBJR0NfRkxBR19RVUVVRV9QQUlSUyAmJg0KPiA+ID4gICAgIGFkYXB0ZXIt
-PnR4X2l0cl9zZXR0aW5nICE9IGFkYXB0ZXItPnJ4X2l0cl9zZXR0aW5nKQ0KPiA+ID4gICAgLi4u
-IGVycm9yIC4uLg0KPiA+ID4NCj4gPiA+IHdvdWxkIHRoYXQgd29yaz8NCj4gPg0KPiA+IFRoYW5r
-IHlvdSBmb3IgdGhlIHN1Z2dlc3Rpb24sIGJ1dCBpdCBhcHBlYXJzIHRoYXQgYWRkaXRpb25hbCBj
-aGVja2luZyBpcw0KPiByZXF1aXJlZC4NCj4gPiBJIHRlc3RlZCBpdCB3aXRoIHRoZSBjb2RlIGJl
-bG93LCBhbmQgaXQgYXBwZWFycyB0byB3b3JrLg0KPiA+DQo+ID4gCQkvKiBjb252ZXJ0IHRvIHJh
-dGUgb2YgaXJxJ3MgcGVyIHNlY29uZCAqLw0KPiA+IAkJaWYgKChvbGRfdHhfaXRyICE9IGVjLT50
-eF9jb2FsZXNjZV91c2VjcykgJiYgKG9sZF9yeF9pdHIgPT0gZWMtDQo+ID5yeF9jb2FsZXNjZV91
-c2VjcykpIHsNCj4gPiAJCQlhZGFwdGVyLT50eF9pdHJfc2V0dGluZyA9DQo+ID4gCQkJCWlnY19l
-dGh0b29sX2NvYWxlc2NlX3RvX2l0cl9zZXR0aW5nKGVjLQ0KPiA+dHhfY29hbGVzY2VfdXNlY3Mp
-Ow0KPiA+IAkJCWFkYXB0ZXItPnJ4X2l0cl9zZXR0aW5nID0gYWRhcHRlci0+dHhfaXRyX3NldHRp
-bmc7DQo+ID4gCQl9IGVsc2UgaWYgKChvbGRfcnhfaXRyICE9IGVjLT5yeF9jb2FsZXNjZV91c2Vj
-cykgJiYgKG9sZF90eF9pdHIgPT0NCj4gZWMtPnR4X2NvYWxlc2NlX3VzZWNzKSkgew0KPiA+IAkJ
-CWFkYXB0ZXItPnJ4X2l0cl9zZXR0aW5nID0NCj4gPiAJCQkJaWdjX2V0aHRvb2xfY29hbGVzY2Vf
-dG9faXRyX3NldHRpbmcoZWMtDQo+ID5yeF9jb2FsZXNjZV91c2Vjcyk7DQo+ID4gCQkJYWRhcHRl
-ci0+dHhfaXRyX3NldHRpbmcgPSBhZGFwdGVyLT5yeF9pdHJfc2V0dGluZzsNCj4gPiAJCX0gZWxz
-ZSB7DQo+ID4gCQkJTkxfU0VUX0VSUl9NU0dfTU9EKGV4dGFjaywgIlVuYWJsZSB0byBzZXQgYm90
-aA0KPiBUWCBhbmQgUlggZHVlIHRvIFF1ZXVlIFBhaXJzIEZsYWciKTsNCj4gPiAJCQlyZXR1cm4g
-LUVJTlZBTDsNCj4gPiAJCX0NCj4gDQo+IFdoYXQgaWYgdXNlciBzcGFjZSBkb2VzOg0KPiANCj4g
-ICBjbWQgPSAiZXRodG9vbCAtQyBldGgwICINCj4gICBpZiByeF9taXNtYXRjaDoNCj4gICAgIGNt
-ZCArPSAicngtdXNlY3MgIiArIHJ4dSArICIgIg0KPiAgIGlmIHR4X21pc21hdGNoOg0KPiAgICAg
-Y21kICs9ICJ0eC11c2VjcyAiICsgdHh1ICsgIiAiDQo+ICAgc3lzdGVtKGNtZCkNCj4gDQo+IFdo
-eSBkbyB5b3UgdGhpbmsgdGhhdCB0aGUgYXV0by11cGRhdGUgb2YgdGhlIG90aGVyIHZhbHVlIG1h
-dHRlcnMgc28gbXVjaD8NCj4gV2l0aCBhIGNsZWFyIHdhcm5pbmcgdXNlciBzaG91bGQgYmUgYWJs
-ZSB0byBmaWd1cmUgb3V0IHRoYXQgdGhleSBuZWVkIHRvIHNldCB0aGUNCj4gdmFsdWVzIGlkZW50
-aWNhbGx5Lg0KPiANCj4gSWYgeW91IHdhbnQgdG8gYXV0by11cGRhdGUgbWF5YmUgb25seSBhbGxv
-dyByeC11c2VjcyBjaGFuZ2VzPw0KDQpUaGUgb3JpZ2luYWwgY29kZSBkb2VzIHRoaXMgYWN0aW9u
-LiBPbmx5IGNoYW5nZWQgInJ4LXVzZWNzIiBpcyBhbGxvd2VkLg0KSG93ZXZlciwgbXkgaW50ZW50
-aW9uIGlzIHRvIGluZm9ybSB0aGUgdXNlciBvZiB0aGUgdHgtdXNlY3MgdmFsdWUgd2hlbiB0aGV5
-IGV4ZWN1dGUgdGhlICJldGh0b29sIC1jIGludGVyZmFjZT4iIGNvbW1hbmQuDQpQcmV2aW91c2x5
-LCB3aGVuIHdlIHJhbiB0aGUgcHJldmlvdXMgY29tbWFuZCwgdGhlIHZhbHVlIG9mIHR4LXVzZWNz
-IHdhcyBhbHdheXMgMC4NCk15IHBsYW4gaXMgdG8gZGlzcGxheSB0aGUgc2FtZSB0eC11c2VjcyB2
-YWx1ZSBhcyByeC11c2Vjcywgb3IgdmljZSB2ZXJzYS4NCg0KQW5kLi4gaXQgbmVlZCBzb21lIGNo
-YW5nZXMgb24gb3JpZ2luYWwgY29kZSBiZWxvdzoNCg0KaHR0cHM6Ly9lbGl4aXIuYm9vdGxpbi5j
-b20vbGludXgvbGF0ZXN0L3NvdXJjZS9kcml2ZXJzL25ldC9ldGhlcm5ldC9pbnRlbC9pZ2MvaWdj
-X2V0aHRvb2wuYyNMODgzIA0KUmVtb3ZpbmcgdGhpcyB3aWxsIGFsbG93IHR4LXVzZWNzIHRvIGhh
-dmUgdGhlIHZhbHVlIGJ1dCBpdCB3aWxsIGNhdXNlIHNvbWUgYnVnIGZvciBjaGFuZ2VzIGluIEw5
-MTMgYmVsb3cuIA0KDQpodHRwczovL2VsaXhpci5ib290bGluLmNvbS9saW51eC9sYXRlc3Qvc291
-cmNlL2RyaXZlcnMvbmV0L2V0aGVybmV0L2ludGVsL2lnYy9pZ2NfZXRodG9vbC5jI0w5MTMNClRv
-IHNldCB0aGUgcngtdXNlY3MvdHgtdXNlY3MsIHRoaXMgbGluZSBtdXN0IGJlIHJlbW92ZWQvbW9k
-aWZ5OyBvdGhlcndpc2UgdHgtdXNlY3Mgd2lsbCBhbHdheXMgaGF2ZSBhIHZhbHVlIHdoZW5ldmVy
-IHRoZSBjYWxsYmFjayBpcyBpbiwgd2hpY2ggaXMgdGhlIHJlYXNvbi4NClByZXZpb3VzbHkgd2l0
-aG91dCByZW1vdmluZyB0aGlzLCB3ZSBub3QgYWJsZSB0byBzZXQgcngtdXNlY3MuDQoNCj4gQmFz
-aWNhbGx5Og0KPiANCj4gICBpZiAob2xkX3R4ICE9IGVjLT50eF9jb2FsZXNjZV91c2Vjcykgew0K
-PiAgICAgTkxfU0VUX0VSUl9NU0dfTU9EKGV4dGFjaywgIlF1ZXVlIFBhaXIgbW9kZSBlbmFibGVk
-LCBib3RoIFJ4IGFuZCBUeA0KPiBjb2FsZXNjaW5nIGNvbnRyb2xsZWQgYnkgcngtdXNlY3MiKTsN
-Cj4gICAgcmV0dXJuIC1FSU5WQUw7DQo+ICAgfQ0KPiAgIHJ4X2l0ciA9IHR4X2l0ciA9IGxvZ2lj
-KGVjLT50eF9jb2FsZXNjZV91c2Vjcyk7DQoNClllYWgsIHdlIGNhbiBhbHNvIGp1c3QgbW9kaWZ5
-IGF0IHRoZSBsaW5lIGh0dHBzOi8vZWxpeGlyLmJvb3RsaW4uY29tL2xpbnV4L2xhdGVzdC9zb3Vy
-Y2UvZHJpdmVycy9uZXQvZXRoZXJuZXQvaW50ZWwvaWdjL2lnY19ldGh0b29sLmMjTDkxMyBzaW1p
-bGFyIHRvIHdoYXQgeW91IHByb3Bvc2VkOg0KDQoJaWYgKChhZGFwdGVyLT5mbGFncyAmIElHQ19G
-TEFHX1FVRVVFX1BBSVJTKSAmJg0KCQllYy0+dHhfY29hbGVzY2VfdXNlY3MgIT0gaWdjX2V0aHRv
-b2xfZ2V0X3ByZXZpb3VzX3R4X2NvYWxlc2NlKGFkYXB0ZXIpKSB7DQoJCU5MX1NFVF9FUlJfTVNH
-X01PRChleHRhY2ssICJRdWV1ZSBQYWlyIG1vZGUgZW5hYmxlZCwgYm90aCBSeCBhbmQgVHggY29h
-bGVzY2luZyBjb250cm9sbGVkIGJ5IHJ4LXVzZWNzIik7DQoJCXJldHVybiAtRUlOVkFMOw0KCX0N
-Cg0KSG93ZXZlciwgaWYgdGhlIHVzZXIgZW50ZXJzIHRoZSBzYW1lIHZhbHVlIGZvciB0aGUgdHgt
-dXNlY3MgYW5kIGEgZGlmZmVyZW50IHZhbHVlIGZvciB0aGUgcngtdXNlY3MsIHRoZSBjb21tYW5k
-IHdpbGwgc3VjY2VlZC4gLiBBcmUgeW91IG9rIHdpdGggaXQ/DQpJIGFtIG5vdCBzdXJlIHdobyBp
-cyBnb2luZyB0byBkbyBsaWtlIHRoaXMgYnV0IHllYWguLi4uLi4uIFVubGVzcyB3ZSBibG9ja2lu
-ZyAyIGlucHV0cyBhcmd1bWVudA0KDQpyeC11c2VjczogMTMNCnJ4LWZyYW1lczogbi9hDQpyeC11
-c2Vjcy1pcnE6IG4vYQ0KcngtZnJhbWVzLWlycTogbi9hDQoNCnR4LXVzZWNzOiAxMw0KdHgtZnJh
-bWVzOiBuL2ENCnR4LXVzZWNzLWlycTogbi9hDQp0eC1mcmFtZXMtaXJxOiBuL2ENCg0KcngtdXNl
-Y3MtbG93OiBuL2ENCnJ4LWZyYW1lLWxvdzogbi9hDQp0eC11c2Vjcy1sb3c6IG4vYQ0KdHgtZnJh
-bWUtbG93OiBuL2ENCg0KcngtdXNlY3MtaGlnaDogbi9hDQpyeC1mcmFtZS1oaWdoOiBuL2ENCnR4
-LXVzZWNzLWhpZ2g6IG4vYQ0KdHgtZnJhbWUtaGlnaDogbi9hDQoNCkNRRSBtb2RlIFJYOiBuL2Eg
-IFRYOiBuL2ENCg0Kcm9vdEBQMTJEWUhVU0FJTkk6fiMgZXRodG9vbCAtQyBlbnAxczAgcngtdXNl
-Y3MgMTQgdHgtdXNlY3MgMTMNCnJvb3RAUDEyRFlIVVNBSU5JOn4jDQoNCj4gDQo+IA0KPiBJIGhh
-dGUgdGhlc2UgYXV0by1tYWdpYyBjaGFuZ2VzLCBiZWNhdXNlIEkgaGFkIHRvIGVtYWlsIHN1cHBv
-cnQgLyB2ZW5kb3JzIGluDQo+IHRoZSBwYXN0IGFza2luZyB0aGVtICJ3aGF0IGRvZXMgdGhlIGRl
-dmljZSBfYWN0dWFsbHlfIGRvIiAvICJ3aGF0IGlzIHRoZSBkZXZpY2UNCj4gY2FwYWJsZSBvZiIg
-ZHVlIHRvIHRoZSBkcml2ZXIgZG9pbmcgbWFnaWMuDQo+IFRoZSBBUEkgaXMgZmFpcmx5IGNsZWFy
-LiBJZiB1c2VyIHdhbnRzIHJ4IGFuZCB0eCB0byBiZSBkaWZmZXJlbnQsIGFuZCB0aGUgZGV2aWNl
-IGRvZXMNCj4gbm90IHN1cHBvcnQgdGhhdCAtLSBlcnJvci4NCg0KWWVhaCBsZXQncyBtYWtlIGl0
-IHNpbXBsZSDwn5iKDQo=
+On Sun, Aug 27, 2023 at 09:28:26PM +0800, Hao Xu wrote:
+> From: Hao Xu <howeyxu@tencent.com>
+> 
+> Implement NOWAIT semantics for readdir. Return EAGAIN error to the
+> caller if it would block, like failing to get locks, or going to
+> do IO.
+> 
+> Co-developed-by: Dave Chinner <dchinner@redhat.com>
+
+Not really.
+
+"Co-developed" implies equal development input between all the
+parties, which is not the case here - this patch is based on
+prototype I wrote, whilst you're doing the refining, testing and
+correctness work.
+
+In these cases with XFS code, we add a line in the commit message to
+say:
+
+"This is based on a patch originally written by Dave Chinner."
+
+
+> Signed-off-by: Dave Chinner <dchinner@redhat.com>
+> Signed-off-by: Hao Xu <howeyxu@tencent.com>
+> [fixes deadlock issue, tweak code style]
+
+With a signoff chain like you already have.
+
+In the end you'll also get a RVB from me, which seems rather wrong
+to me if I've apparently been "co-developing" the code....
+
+....
+
+> @@ -156,7 +157,9 @@ xfs_dir2_block_getdents(
+>  	if (xfs_dir2_dataptr_to_db(geo, ctx->pos) > geo->datablk)
+>  		return 0;
+>  
+> -	error = xfs_dir3_block_read(args->trans, dp, &bp);
+> +	if (ctx->flags & DIR_CONTEXT_F_NOWAIT)
+> +		flags |= XFS_DABUF_NOWAIT;
+> +	error = xfs_dir3_block_read(args->trans, dp, flags, &bp);
+>  	if (error)
+>  		return error;
+>  
+
+Given we do this same check in both block and leaf formats to set
+XFS_DABUF_NOWAIT, and we do the DIR_CONTEXT_F_NOWAIT check in
+xfs_readdir() as well, we should probably do this check once at the
+higher level and pass flags down from there with XFS_DABUF_NOWAIT
+already set.
+
+> @@ -240,6 +243,7 @@ xfs_dir2_block_getdents(
+>  STATIC int
+>  xfs_dir2_leaf_readbuf(
+>  	struct xfs_da_args	*args,
+> +	struct dir_context	*ctx,
+>  	size_t			bufsize,
+>  	xfs_dir2_off_t		*cur_off,
+>  	xfs_dablk_t		*ra_blk,
+> @@ -258,10 +262,15 @@ xfs_dir2_leaf_readbuf(
+>  	struct xfs_iext_cursor	icur;
+>  	int			ra_want;
+>  	int			error = 0;
+> -
+> -	error = xfs_iread_extents(args->trans, dp, XFS_DATA_FORK);
+> -	if (error)
+> -		goto out;
+> +	unsigned int		flags = 0;
+> +
+> +	if (ctx->flags & DIR_CONTEXT_F_NOWAIT) {
+> +		flags |= XFS_DABUF_NOWAIT;
+> +	} else {
+> +		error = xfs_iread_extents(args->trans, dp, XFS_DATA_FORK);
+> +		if (error)
+> +			goto out;
+> +	}
+
+Especially as, in hindsight, this doesn't make a whole lot of sense.
+If XFS_DABUF_NOWAIT is set, we keep going until
+xfs_ilock_data_map_shared_nowait() where we call
+xfs_need_iread_extents() to see if we need to read the extents in
+and abort at that point.
+
+So, really, we shouldn't get this far with nowait semantics if
+we haven't read the extents in yet - we're supposed to already have
+the inode locked here and so we should have already checked this
+condition before we bother locking the inode...
+
+i.e. all we should be doing here is this:
+
+	if (!(flags & XFS_DABUF_NOWAIT)) {
+		error = xfs_iread_extents(args->trans, dp, XFS_DATA_FORK);
+		if (error)
+			goto out;
+	}
+
+And then we don't need to pass the VFS dir_context down into low
+level XFS functions unnecessarily.
+
+
+>  
+>  	/*
+>  	 * Look for mapped directory blocks at or above the current offset.
+> @@ -280,7 +289,7 @@ xfs_dir2_leaf_readbuf(
+>  	new_off = xfs_dir2_da_to_byte(geo, map.br_startoff);
+>  	if (new_off > *cur_off)
+>  		*cur_off = new_off;
+> -	error = xfs_dir3_data_read(args->trans, dp, map.br_startoff, 0, &bp);
+> +	error = xfs_dir3_data_read(args->trans, dp, map.br_startoff, flags, &bp);
+>  	if (error)
+>  		goto out;
+>  
+> @@ -360,6 +369,7 @@ xfs_dir2_leaf_getdents(
+>  	int			byteoff;	/* offset in current block */
+>  	unsigned int		offset = 0;
+>  	int			error = 0;	/* error return value */
+> +	int			written = 0;
+>  
+>  	/*
+>  	 * If the offset is at or past the largest allowed value,
+> @@ -391,10 +401,17 @@ xfs_dir2_leaf_getdents(
+>  				bp = NULL;
+>  			}
+>  
+> -			if (*lock_mode == 0)
+> -				*lock_mode = xfs_ilock_data_map_shared(dp);
+> -			error = xfs_dir2_leaf_readbuf(args, bufsize, &curoff,
+> -					&rablk, &bp);
+> +			if (*lock_mode == 0) {
+> +				*lock_mode =
+> +					xfs_ilock_data_map_shared_generic(dp,
+> +					ctx->flags & DIR_CONTEXT_F_NOWAIT);
+> +				if (!*lock_mode) {
+> +					error = -EAGAIN;
+> +					break;
+> +				}
+> +			}
+> +			error = xfs_dir2_leaf_readbuf(args, ctx, bufsize,
+> +					&curoff, &rablk, &bp);
+
+int
+xfs_ilock_readdir(
+	struct xfs_inode	*ip,
+	int			flags)
+{
+	if (flags & XFS_DABUF_NOWAIT) {
+		if (!xfs_ilock_nowait(dp, XFS_ILOCK_SHARED))
+			return -EAGAIN;
+		return XFS_ILOCK_SHARED;
+	}
+	return xfs_ilock_data_map_shared(dp);
+}
+
+And then this code simply becomes:
+
+			if (*lock_mode == 0)
+				*lock_mode = xfs_ilock_readdir(ip, flags);
+
+
+>  			if (error || !bp)
+>  				break;
+>  
+> @@ -479,6 +496,7 @@ xfs_dir2_leaf_getdents(
+>  		 */
+>  		offset += length;
+>  		curoff += length;
+> +		written += length;
+>  		/* bufsize may have just been a guess; don't go negative */
+>  		bufsize = bufsize > length ? bufsize - length : 0;
+>  	}
+> @@ -492,6 +510,8 @@ xfs_dir2_leaf_getdents(
+>  		ctx->pos = xfs_dir2_byte_to_dataptr(curoff) & 0x7fffffff;
+>  	if (bp)
+>  		xfs_trans_brelse(args->trans, bp);
+> +	if (error == -EAGAIN && written > 0)
+> +		error = 0;
+>  	return error;
+>  }
+>  
+> @@ -514,6 +534,7 @@ xfs_readdir(
+>  	unsigned int		lock_mode;
+>  	bool			isblock;
+>  	int			error;
+> +	bool			nowait;
+>  
+>  	trace_xfs_readdir(dp);
+>  
+> @@ -531,7 +552,11 @@ xfs_readdir(
+>  	if (dp->i_df.if_format == XFS_DINODE_FMT_LOCAL)
+>  		return xfs_dir2_sf_getdents(&args, ctx);
+>  
+> -	lock_mode = xfs_ilock_data_map_shared(dp);
+> +	nowait = ctx->flags & DIR_CONTEXT_F_NOWAIT;
+> +	lock_mode = xfs_ilock_data_map_shared_generic(dp, nowait);
+> +	if (!lock_mode)
+> +		return -EAGAIN;
+> +
+
+Given what I said above:
+
+	if (ctx->flags & DIR_CONTEXT_F_NOWAIT) {
+		/*
+		 * If we need to read extents, then we must do IO
+		 * and we must use exclusive locking. We don't want
+		 * to do either of those things, so just bail if we
+		 * have to read extents. Doing this check explicitly
+		 * here means we don't have to do it anywhere else
+		 * in the XFS_DABUF_NOWAIT path.
+		 */
+		if (xfs_need_iread_extents(&ip->i_df))
+			return -EAGAIN;
+		flags |= XFS_DABUF_NOWAIT;
+	}
+	lock_mode = xfs_ilock_readdir(dp, flags);
+
+And with this change, we probably should be marking the entire
+operation as having nowait semantics. i.e. using args->op_flags here
+and only use XFS_DABUF_NOWAIT for the actual IO. ie.
+
+		args->op_flags |= XFS_DA_OP_NOWAIT;
+
+This makes it clear that the entire directory op should run under
+NOWAIT constraints, and it avoids needing to pass an extra flag
+through the stack.  That then makes the readdir locking function
+look like this:
+
+/*
+ * When we are locking an inode for readdir, we need to ensure that
+ * the extents have been read in first. This requires the inode to
+ * be locked exclusively across the extent read, but otherwise we
+ * want to use shared locking.
+ *
+ * For XFS_DA_OP_NOWAIT operations, we do an up-front check to see
+ * if the extents have been read in, so all we need to do in this
+ * case is a shared try-lock as we never need exclusive locking in
+ * this path.
+ */
+static int
+xfs_ilock_readdir(
+	struct xfs_da_args	*args)
+{
+	if (args->op_flags & XFS_DA_OP_NOWAIT) {
+		if (!xfs_ilock_nowait(args->dp, XFS_ILOCK_SHARED))
+			return -EAGAIN;
+		return XFS_ILOCK_SHARED;
+	}
+	return xfs_ilock_data_map_shared(args->dp);
+}
+
+> diff --git a/fs/xfs/xfs_inode.c b/fs/xfs/xfs_inode.c
+> index 9e62cc500140..d088f7d0c23a 100644
+> --- a/fs/xfs/xfs_inode.c
+> +++ b/fs/xfs/xfs_inode.c
+> @@ -120,6 +120,33 @@ xfs_ilock_data_map_shared(
+>  	return lock_mode;
+>  }
+>  
+> +/*
+> + * Similar to xfs_ilock_data_map_shared(), except that it will only try to lock
+> + * the inode in shared mode if the extents are already in memory. If it fails to
+> + * get the lock or has to do IO to read the extent list, fail the operation by
+> + * returning 0 as the lock mode.
+> + */
+> +uint
+> +xfs_ilock_data_map_shared_nowait(
+> +	struct xfs_inode	*ip)
+> +{
+> +	if (xfs_need_iread_extents(&ip->i_df))
+> +		return 0;
+> +	if (!xfs_ilock_nowait(ip, XFS_ILOCK_SHARED))
+> +		return 0;
+> +	return XFS_ILOCK_SHARED;
+> +}
+> +
+> +int
+> +xfs_ilock_data_map_shared_generic(
+> +	struct xfs_inode	*dp,
+> +	bool			nowait)
+> +{
+> +	if (nowait)
+> +		return xfs_ilock_data_map_shared_nowait(dp);
+> +	return xfs_ilock_data_map_shared(dp);
+> +}
+
+And all this "generic" locking stuff goes away.
+
+FWIW, IMO, "generic" is a poor name for an XFS function as there's
+nothing "generic" in XFS.  We tend name the functions after what
+they do, not some abstract concept. Leave "generic" as a keyword for
+widely used core infrastructure functions, not niche, one-off use
+cases like this.
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
 
