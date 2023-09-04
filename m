@@ -1,69 +1,126 @@
-Return-Path: <netdev+bounces-31984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 715A1791D4F
-	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 20:43:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28396791E20
+	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 22:16:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FC9C281073
-	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 18:43:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 195921C2085A
+	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 20:16:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEA81C145;
-	Mon,  4 Sep 2023 18:43:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7E1EC8FD;
+	Mon,  4 Sep 2023 20:16:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC95BE6A
-	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 18:43:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3EABEC433C8;
-	Mon,  4 Sep 2023 18:43:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693853018;
-	bh=P3waEknk93lpso15++IpTOfJPAM5bzNhE1bMrPIVuGA=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=sViUpbyqkVXlv+vATJFmoAi3Q8ukaUKgpv2qd7NPVzJxoY4IX4NRs2tk7AOq8DZUB
-	 PhM+6Z9G9DpU8XfimpDLGM/XloyZS+Jlu2OfFMCj/Bxy0NYwUkI7/mLQUneIZIjSau
-	 ARjsCnKT5mcS5iR9dbTY9iNWfvRjA8n6iWeIeU8bW/yPwqmSLh3XEVwRSDCy3KD4N6
-	 AXyPJadCGthdjr31o23gEAIui2CLUjppxRyIsuAiqSd/hob/HROCz5RsVurUSdOQMt
-	 /ghwUhXVAkUOprAJcSq5jY9wgxtZTj+DfkM9SGELhx/NMCr373nCayNJVQudDMRxXw
-	 ypLljV/qmmgog==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2BF9AC04DD9;
-	Mon,  4 Sep 2023 18:43:38 +0000 (UTC)
-Subject: Re: [GIT PULL] virtio: features
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20230903181338-mutt-send-email-mst@kernel.org>
-References: <20230903181338-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20230903181338-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-X-PR-Tracked-Commit-Id: 1acfe2c1225899eab5ab724c91b7e1eb2881b9ab
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: e4f1b8202fb59c56a3de7642d50326923670513f
-Message-Id: <169385301813.15626.4404495470670396580.pr-tracker-bot@kernel.org>
-Date: Mon, 04 Sep 2023 18:43:38 +0000
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, eperezma@redhat.com, jasowang@redhat.com, mst@redhat.com, shannon.nelson@amd.com, xuanzhuo@linux.alibaba.com, yuanyaogoog@chromium.org, yuehaibing@huawei.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7839C14B
+	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 20:16:24 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94292184
+	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 13:16:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1693858582;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kGoBgsQFryqGjj7NkhmyfIdQDuJkRXBECyY4eqxV61U=;
+	b=hDH8gqtTYYyLc4pW+9XYD1uBTnvXN/ifde+gde5lGyG1+ETE4aEo3aSyLGGhAhXeL8Enee
+	DujN6waly7FidvrwPFqFuij3kR0mDYN4GOqXNVTkVn7Hqc/HC8Mz9PwD+Ps533RGKHwS20
+	jnGtg3bSFg63GoqVKtb4OlT/90TqE3c=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-99-nqZ8nfniN1qcoiVAW_bmIQ-1; Mon, 04 Sep 2023 16:16:17 -0400
+X-MC-Unique: nqZ8nfniN1qcoiVAW_bmIQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EFF9D8008A4;
+	Mon,  4 Sep 2023 20:16:16 +0000 (UTC)
+Received: from [10.22.8.119] (unknown [10.22.8.119])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 2AAE8140E966;
+	Mon,  4 Sep 2023 20:16:15 +0000 (UTC)
+Message-ID: <ad726bb4-fbd1-389c-4978-03eec77b4322@redhat.com>
+Date: Mon, 4 Sep 2023 16:16:15 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: ARM BCM53573 SoC hangs/lockups caused by locks/clock/random
+ changes
+Content-Language: en-US
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
+ Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Will Deacon <will@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
+ Daniel Lezcano <daniel.lezcano@linaro.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Florian Fainelli
+ <f.fainelli@gmail.com>, linux-clk@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, openwrt-devel@lists.openwrt.org,
+ bcm-kernel-feedback-list@broadcom.com
+References: <a03a6e1d-e99c-40a3-bdac-0075b5339beb@gmail.com>
+ <c98e6c5b-d334-075f-71b8-1c2a3b73b205@redhat.com>
+ <ZPX6W6q4+ECPbBmq@shell.armlinux.org.uk>
+From: Waiman Long <longman@redhat.com>
+In-Reply-To: <ZPX6W6q4+ECPbBmq@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-The pull request you sent on Sun, 3 Sep 2023 18:13:38 -0400:
+On 9/4/23 11:40, Russell King (Oracle) wrote:
+> On Mon, Sep 04, 2023 at 11:25:57AM -0400, Waiman Long wrote:
+>> On 9/4/23 04:33, Rafał Miłecki wrote:
+>>> As those hangs/lockups are related to so many different changes it's
+>>> really hard to debug them.
+>>>
+>>> This bug seems to be specific to the slow arch clock that affects
+>>> stability only when kernel locking code and symbols layout trigger some
+>>> very specific timing.
+>>>
+>>> Enabling CONFIG_PROVE_LOCKING seems to make issue go away but it affects
+>>> so much code it's hard to tell why it actually matters.
+>>>
+>>> Same for disabling CONFIG_SMP. I noticed Broadcom's SDK keeps it
+>>> disabled. I tried it and it improves stability (I had 3 devices with 6
+>>> days of uptime and counting) indeed. Again it affects a lot of kernel
+>>> parts so it's hard to tell why it helps.
+>>>
+>>> Unless someone comes up with some magic solution I'll probably try
+>>> building BCM53573 images without CONFIG_SMP for my personal needs.
+>> All the locking operations rely on the fact that the instruction to acquire
+>> or release a lock is atomic. Is it possible that it may not be the case
+>> under certain circumstances for this ARM BCM53573 SoC? Or maybe some Kconfig
+>> options are not set correctly like missing some errata that are needed.
+>>
+>> I don't know enough about the 32-bit arm architecture to say whether this is
+>> the case or not, but that is my best guess.
+> So, BCM53573 is Cortex-A7, which is ARMv7, which has the exclusive
+> load/store instructions. Whether the SoC has the necessary exclusive
+> monitors to support these instructions is another matter, and I
+> suspect someone with documentation would need to check that.
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+To clarify, it is not necessary to use atomic instruction as in x86, but 
+the LL/SC style of synchronization instructions with proper hardware 
+support should also be enough. Again the hardware needs to have the 
+proper support for the correct operation of those synchronization 
+instructions.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/e4f1b8202fb59c56a3de7642d50326923670513f
+Cheers,
+Longman
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
 
