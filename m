@@ -1,401 +1,230 @@
-Return-Path: <netdev+bounces-31858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90559790F8A
-	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 03:03:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1BD5790FF1
+	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 04:15:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B143D1C208EF
-	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 01:03:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A269280F35
+	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 02:15:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CF84387;
-	Mon,  4 Sep 2023 01:02:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B929B396;
+	Mon,  4 Sep 2023 02:15:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A9D6381
-	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 01:02:55 +0000 (UTC)
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D0481B9
-	for <netdev@vger.kernel.org>; Sun,  3 Sep 2023 18:02:36 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1c09673b006so1999035ad.1
-        for <netdev@vger.kernel.org>; Sun, 03 Sep 2023 18:02:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1693789356; x=1694394156; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7SkjlWpTOnFF4QpgAAxUR7lqv3IHtXsX9Ov+YWVrmXw=;
-        b=qC164uBpiTqMDgXCvRgiQKt4Gh699N5mZOL/vYt7en0Jbwz76nMzEY83UKBVSQIW6l
-         aeb79T1fQrqEYwAnWqEg0BUEVogsLmyDn7Er7QB5MMmb3evyGFkJ31LnyaFbCd66DWcw
-         2rEqHGNd94yLw2873vPlsxfffzMVRPFxi+gQvuhDp/nt+kHeFVOC7RU50NpTqz237x8d
-         0EgVDl7W9L5GKWAUtPLGkVf3nghZNwTKtocs80JusMNZMyy2xNrwPVPtVOWAc9Ov7Ec+
-         l+Jy4wlPaRYKxlaBf+eoyU6yz7sgMqtArlqAkIUtWnDR1tDFWMVYywwL0pwAGBUewBHm
-         OWuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693789356; x=1694394156;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7SkjlWpTOnFF4QpgAAxUR7lqv3IHtXsX9Ov+YWVrmXw=;
-        b=Ip58MFXFvBEG3pRGYzw954UkK0KgJFpDDncmKk9cpEgIwcl8HAXxAFrQRvzekK7DOt
-         b6NUt3B/mddGwzNtD/CC0DIEPKe2y7i+r4wvrPa3U1NHSKAgHNVvIwZMa8f3O1ruOi8Y
-         hfySZPfZSQFR3Iwf/x4ONL7WdtxddFsBNcyIb2VBWTmcRo3iQwCt7fGHP0CV7t3aMh8h
-         /Mwr2rT3WFzN+fyq4Pz3xPUXHCpgQzE2/XmTSHNlg0J3ija2q6kr0cnv+DlFqjWPlDKz
-         +127no006/eQQ+/GEjspGwzUrANhuB7WQLAC8A944PFUJtZg9O6x5Kob7Z/MgxtNikoV
-         lk2A==
-X-Gm-Message-State: AOJu0YzxONnkt4o/LsN1gZr6zSK8WhIDzFzTPVGj4XqKIz18g2ja5qWx
-	i+OVfRNbCHmoPoS1IxvtK9MBQA==
-X-Google-Smtp-Source: AGHT+IGGrky2P+bBuH4AKgWBeYdqXOP6u+qaOJyeKMBTbWb7BRdsdnk0jjxmGVwySX0sZe8eaRNDcw==
-X-Received: by 2002:a17:902:ecc8:b0:1c1:fe97:bf34 with SMTP id a8-20020a170902ecc800b001c1fe97bf34mr8040994plh.24.1693789355853;
-        Sun, 03 Sep 2023 18:02:35 -0700 (PDT)
-Received: from dread.disaster.area (pa49-195-66-88.pa.nsw.optusnet.com.au. [49.195.66.88])
-        by smtp.gmail.com with ESMTPSA id d4-20020a170902c18400b001bdcafcf8d3sm6351806pld.69.2023.09.03.18.02.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 Sep 2023 18:02:35 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-	(envelope-from <david@fromorbit.com>)
-	id 1qcxz6-00AVA9-2L;
-	Mon, 04 Sep 2023 11:02:32 +1000
-Date: Mon, 4 Sep 2023 11:02:32 +1000
-From: Dave Chinner <david@fromorbit.com>
-To: Hao Xu <hao.xu@linux.dev>
-Cc: io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Stefan Roesch <shr@fb.com>, Clay Harris <bugs@claycon.org>,
-	"Darrick J . Wong" <djwong@kernel.org>,
-	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org, linux-cachefs@redhat.com,
-	ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-	linux-unionfs@vger.kernel.org, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, codalist@coda.cs.cmu.edu,
-	linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-	linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
-	devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
-	Wanpeng Li <wanpengli@tencent.com>
-Subject: Re: [PATCH 02/11] xfs: add NOWAIT semantics for readdir
-Message-ID: <ZPUsqGfeUwupdlLE@dread.disaster.area>
-References: <20230827132835.1373581-1-hao.xu@linux.dev>
- <20230827132835.1373581-3-hao.xu@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB9A2381
+	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 02:15:07 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC3F9A0
+	for <netdev@vger.kernel.org>; Sun,  3 Sep 2023 19:15:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1693793705; x=1725329705;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ogy0os4JaGZDL8iy4sMUtslIybt3Q8OaOOoeK0X7QX4=;
+  b=RYVK4z0vFk6ClG8UpaunKx2YI+eKIY5YmGqrzwzTd1uav+9czdB8H6zz
+   x2PnGaIscsx8600qPBl3XpxLCQQMsR1wIWIxtn9pTjVy7BQyWiEPYTxj7
+   5VNx/qHU7D1JismyWupgE6ZnNIV9W4IL7ke5Og7imEY4ufAxe9r7L7eIU
+   4POEqIIllkTcZXZAL0+Zi6FP3CNZVDnTUct6R6DWdLHMOZyr+MxsP7TBy
+   tg9qzt91/uPvpdJ9CNALVNcDDMl24JLzBIrb2jarMk6jiiOXpCcDLCbb7
+   yln/TVT0pCEKQabX6Ur8r2kIy2ubGiUEzhzRf17JnmH0YgKZAjhIxUwlb
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10822"; a="379215057"
+X-IronPort-AV: E=Sophos;i="6.02,225,1688454000"; 
+   d="scan'208";a="379215057"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2023 19:15:05 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10822"; a="769826628"
+X-IronPort-AV: E=Sophos;i="6.02,225,1688454000"; 
+   d="scan'208";a="769826628"
+Received: from dpdk-jf-ntb-v2.sh.intel.com ([10.67.119.19])
+  by orsmga008.jf.intel.com with ESMTP; 03 Sep 2023 19:15:01 -0700
+From: Junfeng Guo <junfeng.guo@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	jesse.brandeburg@intel.com,
+	qi.z.zhang@intel.com,
+	ivecera@redhat.com,
+	sridhar.samudrala@intel.com,
+	horms@kernel.org,
+	kuba@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	Junfeng Guo <junfeng.guo@intel.com>
+Subject: [PATCH iwl-next v9 00/15] Introduce the Parser Library
+Date: Mon,  4 Sep 2023 10:14:40 +0800
+Message-Id: <20230904021455.3944605-1-junfeng.guo@intel.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230827132835.1373581-3-hao.xu@linux.dev>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, Aug 27, 2023 at 09:28:26PM +0800, Hao Xu wrote:
-> From: Hao Xu <howeyxu@tencent.com>
-> 
-> Implement NOWAIT semantics for readdir. Return EAGAIN error to the
-> caller if it would block, like failing to get locks, or going to
-> do IO.
-> 
-> Co-developed-by: Dave Chinner <dchinner@redhat.com>
+Current software architecture for flow filtering offloading limited
+the capability of Intel Ethernet 800 Series Dynamic Device
+Personalization (DDP) Package. The flow filtering offloading in the
+driver is enabled based on the naming parsers, each flow pattern is
+represented by a protocol header stack. And there are multiple layers
+(e.g., virtchnl) to maintain their own enum/macro/structure
+to represent a protocol header (IP, TCP, UDP ...), thus the extra
+parsers to verify if a pattern is supported by hardware or not as
+well as the extra converters that to translate represents between
+different layers. Every time a new protocol/field is requested to be
+supported, the corresponding logic for the parsers and the converters
+needs to be modified accordingly. Thus, huge & redundant efforts are
+required to support the increasing flow filtering offloading features,
+especially for the tunnel types flow filtering.
 
-Not really.
+This patch set provides a way for applications to send down training
+packets & masks (in binary) to the driver. Then these binary data
+would be used by the driver to generate certain data that are needed
+to create a filter rule in the filtering stage of switch/RSS/FDIR.
 
-"Co-developed" implies equal development input between all the
-parties, which is not the case here - this patch is based on
-prototype I wrote, whilst you're doing the refining, testing and
-correctness work.
+Note that the impact of a malicious rule in the raw packet filter is
+limited to performance rather than functionality. It may affect the
+performance of the workload, similar to other limitations in FDIR/RSS
+on AVF. For example, there is no resource boundary for VF FDIR/RSS
+rules, so one malicious VF could potentially make other VFs
+inefficient in offloading.
 
-In these cases with XFS code, we add a line in the commit message to
-say:
+The parser library is expected to include boundary checks to prevent
+critical errors such as infinite loops or segmentation faults.
+However, only implementing and validating the parser emulator in a
+sandbox environment (like ebpf) presents a challenge.
 
-"This is based on a patch originally written by Dave Chinner."
+The idea is to make the driver be able to learn from the DDP package
+directly to understand how the hardware parser works (i.e., the
+Parser Library), so that it can process on the raw training packet
+(in binary) directly and create the filter rule accordingly.
 
+Based on this Parser Library, the raw flow filtering of
+switch/RSS/FDIR could be enabled to allow new flow filtering
+offloading features to be supported without any driver changes (only
+need to update the DDP package).
 
-> Signed-off-by: Dave Chinner <dchinner@redhat.com>
-> Signed-off-by: Hao Xu <howeyxu@tencent.com>
-> [fixes deadlock issue, tweak code style]
+v9:
+- Remove 'inline' of function in c file.
+- Refactor bitfield process with FIELD_GET().
+- Fix element access overrun of array key[].
 
-With a signoff chain like you already have.
+v8: https://lore.kernel.org/netdev/20230824075500.1735790-1-junfeng.guo@intel.com/
+- Refactor bits revert functions with existing bitrev8()/bitrev8x4().
 
-In the end you'll also get a RVB from me, which seems rather wrong
-to me if I've apparently been "co-developing" the code....
+v7: https://lore.kernel.org/netdev/20230823093158.782802-1-junfeng.guo@intel.com/
+- Move/Add below marco to the first appeared commit:
+ICE_PARSER_FLG_NUM and ICE_ERR_NOT_IMPL.
 
-....
+v6: https://lore.kernel.org/netdev/20230821081438.2937934-1-junfeng.guo@intel.com/
+- Move `rt` field setting to the correct commit (first introduced).
 
-> @@ -156,7 +157,9 @@ xfs_dir2_block_getdents(
->  	if (xfs_dir2_dataptr_to_db(geo, ctx->pos) > geo->datablk)
->  		return 0;
->  
-> -	error = xfs_dir3_block_read(args->trans, dp, &bp);
-> +	if (ctx->flags & DIR_CONTEXT_F_NOWAIT)
-> +		flags |= XFS_DABUF_NOWAIT;
-> +	error = xfs_dir3_block_read(args->trans, dp, flags, &bp);
->  	if (error)
->  		return error;
->  
+v5: https://lore.kernel.org/netdev/20230821023833.2700902-1-junfeng.guo@intel.com/
+- Update copyrights of new files to be 2023 only.
+- Update patch set series prefix.
+- Fix typo on patch 2 commit message.
 
-Given we do this same check in both block and leaf formats to set
-XFS_DABUF_NOWAIT, and we do the DIR_CONTEXT_F_NOWAIT check in
-xfs_readdir() as well, we should probably do this check once at the
-higher level and pass flags down from there with XFS_DABUF_NOWAIT
-already set.
+v4: https://lore.kernel.org/intel-wired-lan/20230817094240.2584745-1-junfeng.guo@intel.com/
+- Update cover letter series title.
 
-> @@ -240,6 +243,7 @@ xfs_dir2_block_getdents(
->  STATIC int
->  xfs_dir2_leaf_readbuf(
->  	struct xfs_da_args	*args,
-> +	struct dir_context	*ctx,
->  	size_t			bufsize,
->  	xfs_dir2_off_t		*cur_off,
->  	xfs_dablk_t		*ra_blk,
-> @@ -258,10 +262,15 @@ xfs_dir2_leaf_readbuf(
->  	struct xfs_iext_cursor	icur;
->  	int			ra_want;
->  	int			error = 0;
-> -
-> -	error = xfs_iread_extents(args->trans, dp, XFS_DATA_FORK);
-> -	if (error)
-> -		goto out;
-> +	unsigned int		flags = 0;
-> +
-> +	if (ctx->flags & DIR_CONTEXT_F_NOWAIT) {
-> +		flags |= XFS_DABUF_NOWAIT;
-> +	} else {
-> +		error = xfs_iread_extents(args->trans, dp, XFS_DATA_FORK);
-> +		if (error)
-> +			goto out;
-> +	}
+v3: https://lore.kernel.org/intel-wired-lan/20230817093442.2576997-1-junfeng.guo@intel.com/
+- Replace magic hardcoded values with macros.
+- Use size_t to avoid superfluous type cast to uintptr_t in function
+  ice_parser_sect_item_get.
+- Prefix for static local function names to avoid namespace pollution.
+- Use strstarts() function instead of self implementation.
 
-Especially as, in hindsight, this doesn't make a whole lot of sense.
-If XFS_DABUF_NOWAIT is set, we keep going until
-xfs_ilock_data_map_shared_nowait() where we call
-xfs_need_iread_extents() to see if we need to read the extents in
-and abort at that point.
+v2: https://lore.kernel.org/intel-wired-lan/20230605054641.2865142-1-junfeng.guo@intel.com/
+- Fix build warnings.
 
-So, really, we shouldn't get this far with nowait semantics if
-we haven't read the extents in yet - we're supposed to already have
-the inode locked here and so we should have already checked this
-condition before we bother locking the inode...
+Junfeng Guo (15):
+  ice: add parser create and destroy skeleton
+  ice: init imem table for parser
+  ice: init metainit table for parser
+  ice: init parse graph cam tables for parser
+  ice: init boost tcam and label tables for parser
+  ice: init ptype marker tcam table for parser
+  ice: init marker and protocol group tables for parser
+  ice: init flag redirect table for parser
+  ice: init XLT key builder for parser
+  ice: add parser runtime skeleton
+  ice: add internal help functions
+  ice: add parser execution main loop
+  ice: support double vlan mode configure for parser
+  ice: add tunnel port support for parser
+  ice: add API for parser profile initialization
 
-i.e. all we should be doing here is this:
+ drivers/net/ethernet/intel/ice/Makefile       |  11 +
+ drivers/net/ethernet/intel/ice/ice_bst_tcam.c | 353 ++++++++
+ drivers/net/ethernet/intel/ice/ice_bst_tcam.h |  40 +
+ drivers/net/ethernet/intel/ice/ice_common.h   |   3 +
+ drivers/net/ethernet/intel/ice/ice_ddp.c      |  10 +-
+ drivers/net/ethernet/intel/ice/ice_ddp.h      |  14 +
+ drivers/net/ethernet/intel/ice/ice_flg_rd.c   |  77 ++
+ drivers/net/ethernet/intel/ice/ice_flg_rd.h   |  19 +
+ drivers/net/ethernet/intel/ice/ice_imem.c     | 324 +++++++
+ drivers/net/ethernet/intel/ice/ice_imem.h     | 132 +++
+ drivers/net/ethernet/intel/ice/ice_metainit.c | 193 ++++
+ drivers/net/ethernet/intel/ice/ice_metainit.h |  47 +
+ drivers/net/ethernet/intel/ice/ice_mk_grp.c   |  51 ++
+ drivers/net/ethernet/intel/ice/ice_mk_grp.h   |  17 +
+ drivers/net/ethernet/intel/ice/ice_parser.c   | 562 ++++++++++++
+ drivers/net/ethernet/intel/ice/ice_parser.h   | 140 +++
+ .../net/ethernet/intel/ice/ice_parser_rt.c    | 841 ++++++++++++++++++
+ .../net/ethernet/intel/ice/ice_parser_rt.h    |  73 ++
+ .../net/ethernet/intel/ice/ice_parser_util.h  |  37 +
+ drivers/net/ethernet/intel/ice/ice_pg_cam.c   | 444 +++++++++
+ drivers/net/ethernet/intel/ice/ice_pg_cam.h   |  73 ++
+ .../net/ethernet/intel/ice/ice_proto_grp.c    |  94 ++
+ .../net/ethernet/intel/ice/ice_proto_grp.h    |  24 +
+ drivers/net/ethernet/intel/ice/ice_ptype_mk.c |  73 ++
+ drivers/net/ethernet/intel/ice/ice_ptype_mk.h |  23 +
+ drivers/net/ethernet/intel/ice/ice_tmatch.h   |  40 +
+ drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+ drivers/net/ethernet/intel/ice/ice_xlt_kb.c   | 259 ++++++
+ drivers/net/ethernet/intel/ice/ice_xlt_kb.h   |  34 +
+ 29 files changed, 4004 insertions(+), 5 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_bst_tcam.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_bst_tcam.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_flg_rd.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_flg_rd.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_imem.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_imem.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_metainit.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_metainit.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_mk_grp.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_mk_grp.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_parser.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_parser.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_parser_rt.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_parser_rt.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_parser_util.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_pg_cam.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_pg_cam.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_proto_grp.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_proto_grp.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_ptype_mk.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_ptype_mk.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_tmatch.h
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_xlt_kb.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_xlt_kb.h
 
-	if (!(flags & XFS_DABUF_NOWAIT)) {
-		error = xfs_iread_extents(args->trans, dp, XFS_DATA_FORK);
-		if (error)
-			goto out;
-	}
-
-And then we don't need to pass the VFS dir_context down into low
-level XFS functions unnecessarily.
-
-
->  
->  	/*
->  	 * Look for mapped directory blocks at or above the current offset.
-> @@ -280,7 +289,7 @@ xfs_dir2_leaf_readbuf(
->  	new_off = xfs_dir2_da_to_byte(geo, map.br_startoff);
->  	if (new_off > *cur_off)
->  		*cur_off = new_off;
-> -	error = xfs_dir3_data_read(args->trans, dp, map.br_startoff, 0, &bp);
-> +	error = xfs_dir3_data_read(args->trans, dp, map.br_startoff, flags, &bp);
->  	if (error)
->  		goto out;
->  
-> @@ -360,6 +369,7 @@ xfs_dir2_leaf_getdents(
->  	int			byteoff;	/* offset in current block */
->  	unsigned int		offset = 0;
->  	int			error = 0;	/* error return value */
-> +	int			written = 0;
->  
->  	/*
->  	 * If the offset is at or past the largest allowed value,
-> @@ -391,10 +401,17 @@ xfs_dir2_leaf_getdents(
->  				bp = NULL;
->  			}
->  
-> -			if (*lock_mode == 0)
-> -				*lock_mode = xfs_ilock_data_map_shared(dp);
-> -			error = xfs_dir2_leaf_readbuf(args, bufsize, &curoff,
-> -					&rablk, &bp);
-> +			if (*lock_mode == 0) {
-> +				*lock_mode =
-> +					xfs_ilock_data_map_shared_generic(dp,
-> +					ctx->flags & DIR_CONTEXT_F_NOWAIT);
-> +				if (!*lock_mode) {
-> +					error = -EAGAIN;
-> +					break;
-> +				}
-> +			}
-> +			error = xfs_dir2_leaf_readbuf(args, ctx, bufsize,
-> +					&curoff, &rablk, &bp);
-
-int
-xfs_ilock_readdir(
-	struct xfs_inode	*ip,
-	int			flags)
-{
-	if (flags & XFS_DABUF_NOWAIT) {
-		if (!xfs_ilock_nowait(dp, XFS_ILOCK_SHARED))
-			return -EAGAIN;
-		return XFS_ILOCK_SHARED;
-	}
-	return xfs_ilock_data_map_shared(dp);
-}
-
-And then this code simply becomes:
-
-			if (*lock_mode == 0)
-				*lock_mode = xfs_ilock_readdir(ip, flags);
-
-
->  			if (error || !bp)
->  				break;
->  
-> @@ -479,6 +496,7 @@ xfs_dir2_leaf_getdents(
->  		 */
->  		offset += length;
->  		curoff += length;
-> +		written += length;
->  		/* bufsize may have just been a guess; don't go negative */
->  		bufsize = bufsize > length ? bufsize - length : 0;
->  	}
-> @@ -492,6 +510,8 @@ xfs_dir2_leaf_getdents(
->  		ctx->pos = xfs_dir2_byte_to_dataptr(curoff) & 0x7fffffff;
->  	if (bp)
->  		xfs_trans_brelse(args->trans, bp);
-> +	if (error == -EAGAIN && written > 0)
-> +		error = 0;
->  	return error;
->  }
->  
-> @@ -514,6 +534,7 @@ xfs_readdir(
->  	unsigned int		lock_mode;
->  	bool			isblock;
->  	int			error;
-> +	bool			nowait;
->  
->  	trace_xfs_readdir(dp);
->  
-> @@ -531,7 +552,11 @@ xfs_readdir(
->  	if (dp->i_df.if_format == XFS_DINODE_FMT_LOCAL)
->  		return xfs_dir2_sf_getdents(&args, ctx);
->  
-> -	lock_mode = xfs_ilock_data_map_shared(dp);
-> +	nowait = ctx->flags & DIR_CONTEXT_F_NOWAIT;
-> +	lock_mode = xfs_ilock_data_map_shared_generic(dp, nowait);
-> +	if (!lock_mode)
-> +		return -EAGAIN;
-> +
-
-Given what I said above:
-
-	if (ctx->flags & DIR_CONTEXT_F_NOWAIT) {
-		/*
-		 * If we need to read extents, then we must do IO
-		 * and we must use exclusive locking. We don't want
-		 * to do either of those things, so just bail if we
-		 * have to read extents. Doing this check explicitly
-		 * here means we don't have to do it anywhere else
-		 * in the XFS_DABUF_NOWAIT path.
-		 */
-		if (xfs_need_iread_extents(&ip->i_df))
-			return -EAGAIN;
-		flags |= XFS_DABUF_NOWAIT;
-	}
-	lock_mode = xfs_ilock_readdir(dp, flags);
-
-And with this change, we probably should be marking the entire
-operation as having nowait semantics. i.e. using args->op_flags here
-and only use XFS_DABUF_NOWAIT for the actual IO. ie.
-
-		args->op_flags |= XFS_DA_OP_NOWAIT;
-
-This makes it clear that the entire directory op should run under
-NOWAIT constraints, and it avoids needing to pass an extra flag
-through the stack.  That then makes the readdir locking function
-look like this:
-
-/*
- * When we are locking an inode for readdir, we need to ensure that
- * the extents have been read in first. This requires the inode to
- * be locked exclusively across the extent read, but otherwise we
- * want to use shared locking.
- *
- * For XFS_DA_OP_NOWAIT operations, we do an up-front check to see
- * if the extents have been read in, so all we need to do in this
- * case is a shared try-lock as we never need exclusive locking in
- * this path.
- */
-static int
-xfs_ilock_readdir(
-	struct xfs_da_args	*args)
-{
-	if (args->op_flags & XFS_DA_OP_NOWAIT) {
-		if (!xfs_ilock_nowait(args->dp, XFS_ILOCK_SHARED))
-			return -EAGAIN;
-		return XFS_ILOCK_SHARED;
-	}
-	return xfs_ilock_data_map_shared(args->dp);
-}
-
-> diff --git a/fs/xfs/xfs_inode.c b/fs/xfs/xfs_inode.c
-> index 9e62cc500140..d088f7d0c23a 100644
-> --- a/fs/xfs/xfs_inode.c
-> +++ b/fs/xfs/xfs_inode.c
-> @@ -120,6 +120,33 @@ xfs_ilock_data_map_shared(
->  	return lock_mode;
->  }
->  
-> +/*
-> + * Similar to xfs_ilock_data_map_shared(), except that it will only try to lock
-> + * the inode in shared mode if the extents are already in memory. If it fails to
-> + * get the lock or has to do IO to read the extent list, fail the operation by
-> + * returning 0 as the lock mode.
-> + */
-> +uint
-> +xfs_ilock_data_map_shared_nowait(
-> +	struct xfs_inode	*ip)
-> +{
-> +	if (xfs_need_iread_extents(&ip->i_df))
-> +		return 0;
-> +	if (!xfs_ilock_nowait(ip, XFS_ILOCK_SHARED))
-> +		return 0;
-> +	return XFS_ILOCK_SHARED;
-> +}
-> +
-> +int
-> +xfs_ilock_data_map_shared_generic(
-> +	struct xfs_inode	*dp,
-> +	bool			nowait)
-> +{
-> +	if (nowait)
-> +		return xfs_ilock_data_map_shared_nowait(dp);
-> +	return xfs_ilock_data_map_shared(dp);
-> +}
-
-And all this "generic" locking stuff goes away.
-
-FWIW, IMO, "generic" is a poor name for an XFS function as there's
-nothing "generic" in XFS.  We tend name the functions after what
-they do, not some abstract concept. Leave "generic" as a keyword for
-widely used core infrastructure functions, not niche, one-off use
-cases like this.
-
-Cheers,
-
-Dave.
 -- 
-Dave Chinner
-david@fromorbit.com
+2.25.1
+
 
