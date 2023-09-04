@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-31883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C120A791149
-	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 08:21:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 873FC79114B
+	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 08:21:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CE821C204F9
-	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 06:21:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CF811C204F6
+	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 06:21:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64F9CA45;
-	Mon,  4 Sep 2023 06:21:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54287A34;
+	Mon,  4 Sep 2023 06:21:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B6DA34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E52E7FE
 	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 06:21:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8004AC433C7;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 74D5CC433C9;
 	Mon,  4 Sep 2023 06:21:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1693808465;
-	bh=29N1e8HELfP3+P2Rsxxmt1XUP7m58cYlampgq/7u8gA=;
+	bh=etpYbzwAHVtTNrUBJcrpCLc8JFwKatKo6Nm7fue8s3I=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=QzG1ZWJj+MYF8ADGr+84C5CsO7MOE/gFDncHkrxv+RlFaezBIJzrtdac7sXAc4k7z
-	 uBw25Vrwb7xUMs8aX3lEOxAeXBAjVJ+TAyeblu942B6Kjh9q11/3VGPhnW7rqiuGH8
-	 SU7p5hFKRRGv7FiVeicEU9augcxTsDUf1jYyw03Ue0OWrUkK7QhpXmVCb2hVPbdmjm
-	 5F6cUq/IVyoVjpXxIByVMLihN0BCyfLW8Jk2x7kxiKWIKoxnRkA1fhiDExyPkpeOO+
-	 OFUymD8QrwRtcRygJAZgeIZCZju0vdYiM6/IxzpuxGk7+8I1yh8CN21UuBwMhdu29z
-	 3VOEf7kbvq/1Q==
+	b=WYgYnwu+h98hBfvs16o3qXpRovdGzhSGk1you7qoYBT8J7oqpiqs27ps37WnWHRGW
+	 Mg4y6J/1tKHHBF9ZjWrH8zOlO6RqY9BF4cXOFDSI/ZtOZjWpHFCtBfnSvGoUWZJPkd
+	 b8nZ+BLw87GG8S2zExI2Gd0aIpRiOO/so07n1cYibrWISWjDiwZr6L/ah7b1z2tkAs
+	 FfGLQ1LXWR7xxBPtoVgh9c7R1bQ312UGt2jWASMioTuSEjnr54TtokaIMKq7zMUiqV
+	 lY0xjdZeN6T1oKRl7ACQzj5hOmFn2yPJvyIVvuakYaHIBXrjorUNy4+Kyk/uVbaYoG
+	 Co/k3KNllbO5g==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6414DC04E27;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 51656C04E25;
 	Mon,  4 Sep 2023 06:21:05 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,43 +41,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2 1/1] net: phy: micrel: Correct bit assignments for
- phy_device flags
+Subject: Re: [PATCH v3] net: ipv6/addrconf: avoid integer underflow in
+ ipv6_create_tempaddr
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169380846539.7662.5346435566421171880.git-patchwork-notify@kernel.org>
+ <169380846531.7662.5513574099634997948.git-patchwork-notify@kernel.org>
 Date: Mon, 04 Sep 2023 06:21:05 +0000
-References: <20230901045323.3907976-1-o.rempel@pengutronix.de>
-In-Reply-To: <20230901045323.3907976-1-o.rempel@pengutronix.de>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- kernel@pengutronix.de, linux-kernel@vger.kernel.org, linux@armlinux.org.uk,
- netdev@vger.kernel.org, lukma@denx.de
+References: <20230901044219.10062-1-alexhenrie24@gmail.com>
+In-Reply-To: <20230901044219.10062-1-alexhenrie24@gmail.com>
+To: Alex Henrie <alexhenrie24@gmail.com>
+Cc: netdev@vger.kernel.org, jbohac@suse.cz, benoit.boissinot@ens-lyon.org,
+ davem@davemloft.net, hideaki.yoshifuji@miraclelinux.com, dsahern@kernel.org,
+ pabeni@redhat.com, kuba@kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Fri,  1 Sep 2023 06:53:23 +0200 you wrote:
-> Previously, the defines for phy_device flags in the Micrel driver were
-> ambiguous in their representation. They were intended to be bit masks
-> but were mistakenly defined as bit positions. This led to the following
-> issues:
+On Thu, 31 Aug 2023 22:41:27 -0600 you wrote:
+> The existing code incorrectly casted a negative value (the result of a
+> subtraction) to an unsigned value without checking. For example, if
+> /proc/sys/net/ipv6/conf/*/temp_prefered_lft was set to 1, the preferred
+> lifetime would jump to 4 billion seconds. On my machine and network the
+> shortest lifetime that avoided underflow was 3 seconds.
 > 
-> - MICREL_KSZ8_P1_ERRATA, designated for KSZ88xx switches, overlapped
->   with MICREL_PHY_FXEN and MICREL_PHY_50MHZ_CLK.
-> - Due to this overlap, the code path for MICREL_PHY_FXEN, tailored for
->   the KSZ8041 PHY, was not executed for KSZ88xx PHYs.
-> - Similarly, the code associated with MICREL_PHY_50MHZ_CLK wasn't
->   triggered for KSZ88xx.
+> Fixes: 76506a986dc3 ("IPv6: fix DESYNC_FACTOR")
+> Signed-off-by: Alex Henrie <alexhenrie24@gmail.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2,1/1] net: phy: micrel: Correct bit assignments for phy_device flags
-    https://git.kernel.org/netdev/net/c/719c5e37e99d
+  - [v3] net: ipv6/addrconf: avoid integer underflow in ipv6_create_tempaddr
+    https://git.kernel.org/netdev/net/c/f31867d0d9d8
 
 You are awesome, thank you!
 -- 
