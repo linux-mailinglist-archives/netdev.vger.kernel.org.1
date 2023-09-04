@@ -1,141 +1,112 @@
-Return-Path: <netdev+bounces-31986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F8CF791E9F
-	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 22:53:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C123791EB6
+	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 22:58:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1DFB28109D
-	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 20:53:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA44E281089
+	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 20:58:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAA8EC2E6;
-	Mon,  4 Sep 2023 20:53:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 089C6CA45;
+	Mon,  4 Sep 2023 20:58:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC1B7611B
-	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 20:53:10 +0000 (UTC)
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 607A51AB;
-	Mon,  4 Sep 2023 13:53:09 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-99bc9e3cbf1so391554866b.0;
-        Mon, 04 Sep 2023 13:53:09 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6CEFBE6A;
+	Mon,  4 Sep 2023 20:58:36 +0000 (UTC)
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83C0A1AB;
+	Mon,  4 Sep 2023 13:58:35 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2b962535808so28019551fa.0;
+        Mon, 04 Sep 2023 13:58:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693860788; x=1694465588; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=aHjfIBjwCFBAgwZfRF3IlRMeOawfvSH0PIg6BJi4ttA=;
-        b=Nu8DDiJ/JK6b/p3dPS39aeI9KcZZyGg321aZm3kknmKoSORQw8T40Y2LuDCSu2nxCc
-         5j3aNNh9U+xdqOBr+JJJ7a3pZPQu0uFX9UY2+DZugFWcCg3gQPgO2HJnTCG8ed6kljGT
-         UG5meZiXkcTAvYnH547qI7++jsreuLOyt//zlO3+ng5veGiaeCpzDXTq4Ms3Ow83pFet
-         15LVRD5tvodwdK18fgOf3ij0UaXKUCZBeLuWrCCyHkJGsADfgd/7hH40bAgiDmBFfRID
-         UJo4WApHSlcHpT1VjPXlzyOwsj7EcFMg46Xx+41TB1IfODR9ch5cDAi54LqS5ANBnUr3
-         hnyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693860788; x=1694465588;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20221208; t=1693861114; x=1694465914; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=aHjfIBjwCFBAgwZfRF3IlRMeOawfvSH0PIg6BJi4ttA=;
-        b=M0BfpODGvjxjc95O+zGeOuwBx03q3XGLeJgOcsnDXCuxWZPkui4WutjTFhpE4sdWEn
-         uFoQST6VU3Xm7ERDt5PBYSsKHCrl/n6YZ6Z0e6zS5uD4QW+urKsAV8J2Hr+qqacQfvJZ
-         wjCevfmQgsOptM0EemrrAc+ao0YDrwr9+ivdY7NlNXELUI0pPfZR8R6BNkdRpKgvCdO8
-         d86u7Z8AivCe93dk0v+1NTRUQ/4qfN5w3qhnCXQZKRgkkrRZM6zrGi4Y72ckZqVu/0fN
-         cJK660Gz84eqMiDqfYGXdusDm/5bDKjI6gIodjkyji4qCFpLUE18NxGzdFjP5MirGwBM
-         pWQg==
-X-Gm-Message-State: AOJu0YzV9Amaum9GT71Wh++X4/RqToYB/9ObhiJy30csyj7YMUAOo46n
-	pFO79jcLyqyGAhylzWAs3Q4=
-X-Google-Smtp-Source: AGHT+IEaWJhnR9T7MdmYsuNVL1416i0ekktpnad7n+r3rz7HjgR4a6OUCagul3fLhDwi2HCn65/FKw==
-X-Received: by 2002:a17:907:2715:b0:9a5:a543:2744 with SMTP id w21-20020a170907271500b009a5a5432744mr9425483ejk.33.1693860787615;
-        Mon, 04 Sep 2023 13:53:07 -0700 (PDT)
-Received: from skbuf ([188.26.57.165])
-        by smtp.gmail.com with ESMTPSA id e7-20020a170906248700b009920a690cd9sm6616015ejb.59.2023.09.04.13.53.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Sep 2023 13:53:07 -0700 (PDT)
-Date: Mon, 4 Sep 2023 23:53:04 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
-	davem@davemloft.net, Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>, Tristram.Ha@microchip.com,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, UNGLinuxDriver@microchip.com,
-	George McCollister <george.mccollister@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 RFC 4/4] net: dsa: hsr: Provide generic HSR
- ksz_hsr_{join|leave} functions
-Message-ID: <20230904205304.h3fdjqcijytztlpb@skbuf>
-References: <20230904120209.741207-1-lukma@denx.de>
- <20230904120209.741207-5-lukma@denx.de>
+        bh=rWYc1sN2nZiLgbOMsS1/d9hhys3KH6dtJS1x0YVZ6sk=;
+        b=bd+4jJcsq0XOsoeljB5O/qZsAx6g1eDe2iLR7Yb18eRNzy0Zpyo8BtSmFAYBAfiiZ0
+         JwqH+0cjyQz/VtLTH3562Y9ZTCCtQux4RbNW+gARIol1Ljg04dGwELoccvyAGBJwswLd
+         mKI7v+rAY6iMWeu2sd/GfzXANgeh4qra2UVXPfVcJ0SD2r98zfSSH6WZWoxJRoE0KDYK
+         liKIeqqcEAbFH+sVehpRS6MeFDKFfLIHL8zuAnMc9gtc8H3GtSMmH4rtC87wa4tI2Wc6
+         wAE/WHF4A5zonlgC0ae/oG8ts9/O9IbCRUbryinv3W23lGvjV5iv0jervjGqm10BfYB3
+         yMDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693861114; x=1694465914;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rWYc1sN2nZiLgbOMsS1/d9hhys3KH6dtJS1x0YVZ6sk=;
+        b=EfHnAPPR5eklzrbz9N7yxW+Aba5S9uXiyT1/t0TyPkhrMnmMdvE62NJc7PI9decJ75
+         zFRbeeBjcQHf40HK3d0KWI9F2P+ZI709rvyGd9LDTjUAm8ohpP2taPJpt0eMEZL9OxdR
+         NKSr3fF09ma5cj1ZdXTKTL8ydcP+l88+mJiwOS48sGN2REmd6eWDAZ1oRG1bprr9Y+hp
+         vCrCs72G0O1D2A9WDu/hDLPeLavgOI/wvw7UklmNwQxUR4bau2piAT1L+5mDXby+df5Y
+         +v3zWGGhNl8w9yl7Grz57lKR3CFLKq70Q2by7O5Ty080sGDPXoDSSdvW+ODry/B2oXeE
+         v1DQ==
+X-Gm-Message-State: AOJu0YznnV1AVCOkAia5kcTfN3m00ohVkCzgmO45AWtmgI8+wCC5Vqdp
+	YXUw9lNn+VbNEThV4/7bL2S7/TwsiokvRKdw5QA=
+X-Google-Smtp-Source: AGHT+IE8xvsGBNlDMmIAu5unfig1svHr/w7DkNii332TZpP+P95CQn8Vgee7WGQuUkIB2xM3fnvW2ht6JgLNJthWAus=
+X-Received: by 2002:a05:651c:219:b0:2b9:aa4d:3728 with SMTP id
+ y25-20020a05651c021900b002b9aa4d3728mr7663082ljn.29.1693861113415; Mon, 04
+ Sep 2023 13:58:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230904120209.741207-5-lukma@denx.de>
+References: <20230831153455.1867110-1-daan.j.demeyer@gmail.com> <20230831153455.1867110-4-daan.j.demeyer@gmail.com>
+In-Reply-To: <20230831153455.1867110-4-daan.j.demeyer@gmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Mon, 4 Sep 2023 13:58:22 -0700
+Message-ID: <CAADnVQLiUZpCvP+XXvOFQYaByzxDOVk=ALzV5Z0N8FqMaOh03g@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3 3/9] bpf: Add bpf_sock_addr_set_unix_addr() to
+ allow writing unix sockaddr from bpf
+To: Daan De Meyer <daan.j.demeyer@gmail.com>
+Cc: bpf <bpf@vger.kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Kernel Team <kernel-team@meta.com>, Network Development <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Sep 04, 2023 at 02:02:09PM +0200, Lukasz Majewski wrote:
-> This patch provides the common KSZ (i.e. Microchip) DSA code with support
-> for HSR aware devices.
-> 
-> To be more specific - generic ksz_hsr_{join|leave} functions are provided,
-> now only supporting KSZ9477 IC.
-> 
-> Signed-off-by: Lukasz Majewski <lukma@denx.de>
+On Thu, Aug 31, 2023 at 8:36=E2=80=AFAM Daan De Meyer <daan.j.demeyer@gmail=
+.com> wrote:
+>
+> As prep for adding unix socket support to the cgroup sockaddr hooks,
+> let's add a kfunc bpf_sock_addr_set_unix_addr() that allows modifying a s=
+ockaddr
+> from bpf. While this is already possible for AF_INET and AF_INET6, we'll
+> need this kfunc when we add unix socket support since modifying the
+> address for those requires modifying both the address and the sockaddr
+> length.
+>
+> Signed-off-by: Daan De Meyer <daan.j.demeyer@gmail.com>
 > ---
-> Changes for v2:
-> - None
-> 
-> Changes for v3:
-> - Do not return -EOPNOTSUPP for only PRP_V1 (as v2 will not be caught)
-> ---
->  drivers/net/dsa/microchip/ksz_common.c | 69 ++++++++++++++++++++++++++
->  1 file changed, 69 insertions(+)
-> 
-> diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-> index 579fde54d1e1..91d1acaf4494 100644
-> --- a/drivers/net/dsa/microchip/ksz_common.c
-> +++ b/drivers/net/dsa/microchip/ksz_common.c
-> @@ -16,6 +16,7 @@
->  #include <linux/etherdevice.h>
->  #include <linux/if_bridge.h>
->  #include <linux/if_vlan.h>
-> +#include <linux/if_hsr.h>
->  #include <linux/irq.h>
->  #include <linux/irqdomain.h>
->  #include <linux/of_mdio.h>
+>  kernel/bpf/btf.c  |  1 +
+>  net/core/filter.c | 32 +++++++++++++++++++++++++++++++-
+>  2 files changed, 32 insertions(+), 1 deletion(-)
+>
+> diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
+> index 249657c466dd..15c972f27574 100644
+> --- a/kernel/bpf/btf.c
+> +++ b/kernel/bpf/btf.c
+> @@ -7819,6 +7819,7 @@ static int bpf_prog_type_to_kfunc_hook(enum bpf_pro=
+g_type prog_type)
+>  {
+>         switch (prog_type) {
+>         case BPF_PROG_TYPE_UNSPEC:
+> +       case BPF_PROG_TYPE_CGROUP_SOCK_ADDR:
+>                 return BTF_KFUNC_HOOK_COMMON;
 
-This conflicts with commit f44a90104ee5 ("net: dsa: Explicitly include
-correct DT includes") from July, merged through net-next.
-
-"New features" material for networking goes through this tree, please
-submit patches that were formatted (and tested) on top of the most
-recent version of the "main" branch, and use git-send-email
---subject-prefix "[RFC PATCH vN net-next]" to denote that.
-
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/log/
-
-If patches fail to apply to the target kernel, you lose the benefit of
-automatic build testing (which would have highlighted a problem that
-exists since v3). With RFC patches, the kbuild test robot sends build
-breakage reports only to you - with normal patches it sends them to
-everybody.
-
-Please wait for more feedback before posting RFC v5. I will review in
-more detail, but it will take some time.
-
-Thanks.
+hook_common means that they are shared by all prog types.
+See btf_kfunc_id_set_contains().
 
