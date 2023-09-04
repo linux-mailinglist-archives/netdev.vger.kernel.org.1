@@ -1,168 +1,164 @@
-Return-Path: <netdev+bounces-31912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F037F7915E1
-	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 12:50:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 64CF17915F9
+	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 13:00:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3F93280F6D
-	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 10:50:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 216D3280F80
+	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 11:00:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E190620FD;
-	Mon,  4 Sep 2023 10:50:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F27A12102;
+	Mon,  4 Sep 2023 11:00:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D30611FAC
-	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 10:50:56 +0000 (UTC)
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D63E191;
-	Mon,  4 Sep 2023 03:50:55 -0700 (PDT)
-Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-5007616b756so2207509e87.3;
-        Mon, 04 Sep 2023 03:50:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0EC11FBD
+	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 11:00:15 +0000 (UTC)
+Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 264BAAB
+	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 04:00:12 -0700 (PDT)
+Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-4018af1038cso13303715e9.0
+        for <netdev@vger.kernel.org>; Mon, 04 Sep 2023 04:00:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693824653; x=1694429453; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:cc:to
-         :from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eV5JoTi0DCMOSsAGIml4QjVd10Eh9jcupgB9/8GBSPw=;
-        b=N2D7c2FplaazPs4348WmyY6eGUvVNyvkyIwmpdfDhhK7CJ7YAL8D2FZaQTHSH7h8KY
-         XCtN8JJn3lhwdNdo9GCI53O3wQZkSuBnSTAKjTDPgLfNd6EehkJ5xZC0HW6jHzeUYfqF
-         PrJfZoZZPOMFbGpioEhApkyH2wpB9Mf7BobCMF8YLEoLC8ssxJxqAk4y3vxd6gyGSCJ7
-         Ac1/vQFYs6K1W0UIskR46l4nJxW+4NPsqIIVTqHqPyZgr/FI4p9nECEoRS2EQhX26hLG
-         77jPPjoclLO7B9iVfaF5x0vQwjvQ2FNXSxepZYA/52UjreZyUp4Y+c+aZPAaX/tO+OrE
-         wBVg==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1693825210; x=1694430010; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=UbCVRUoy/GXd5quDgH6ve49LRCuWbh+GsmOVO3eo6jg=;
+        b=ZZfkzOv/4YPMOYMgawXKBSUlbW7EbdwTJ8tRNcRdNKCS/YmNfjIABkrgqg980KDCv8
+         WDb2Ok8MPq4mNHaH4a7xaBjOksorb2JPp3Gt3dzP5dUTd0BwknG5SDBX20GkMJqfZnni
+         zIwOB56OQRO9LlFzdS47fjln2hfk0MhQFnKYzGRgVE2Pfd2RJ12beiL3Jhnb5RQKWm0Y
+         fE+8aNVfQ8fyTQomddEcsEDBw8v9QfgXoFb1VxRsneDYTOVtggOQVgG+8E9gm2pLRVLD
+         nvSMEwzsOjuLoQ/lNzmvvcNtAMII5w4GgNj0vgnvI/Y0nXspmv2/JBKKCIPhvnZtuTl5
+         o6xw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693824653; x=1694429453;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:cc:to
-         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=eV5JoTi0DCMOSsAGIml4QjVd10Eh9jcupgB9/8GBSPw=;
-        b=F5nwrpuHwJ2OafW7xSYsBNnfmkhz0hU0VtypkpEIN7XBJQQ0Yu6F/T2n/DISiga69k
-         SwmZfkrZa12whu53bDhFR0OhSRGhZzxZVAveGiremw+9kggMXdlFH5A1NIoMs4R2Apv7
-         3lOLwCl2Elqz/ijCR9i7NUkHKp+hcMWUEJ20ldng7tWEIoqMleZl4/EkfPfUSnbDPMgm
-         2yiTuW6/70/8BkbnYXG3J924byBmBwZIkfhZgpDkhjg9QFf83oTtunUS6EL71Qpdeh9H
-         wS7hbqriL1qgCuBn5GGWEk7Sb5HEEVTp6oARcCQ5wE4N/RvUcQWVMVZcKFjp9+GidcG2
-         BblQ==
-X-Gm-Message-State: AOJu0YyJ1cVpk9koSHcYWRiu/a03D89QSRILlx85YQl3NJfamfMc/Vy4
-	uEhlAKdjHAPIZlHVmEsQQ/U=
-X-Google-Smtp-Source: AGHT+IHjTygKuHa+wTdH3VEwFta6adO0Tlg6xJANZKH9z6sgiqSAQfoWvvKY2g8KJl2mPMkG3mPwEw==
-X-Received: by 2002:a19:4f48:0:b0:500:8723:e457 with SMTP id a8-20020a194f48000000b005008723e457mr5812058lfk.30.1693824652953;
-        Mon, 04 Sep 2023 03:50:52 -0700 (PDT)
-Received: from localhost ([81.168.73.77])
-        by smtp.gmail.com with ESMTPSA id x20-20020a05600c2a5400b00401b242e2e6sm16809585wme.47.2023.09.04.03.50.52
+        d=1e100.net; s=20221208; t=1693825210; x=1694430010;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UbCVRUoy/GXd5quDgH6ve49LRCuWbh+GsmOVO3eo6jg=;
+        b=CvtS51SWKWj3Snf+fmc2MxrD5w9SiQCStbFYuPbrbbyA0sJ/ByILXMFDs26ALzcWOi
+         10MRKgDAyaXE3rLCmobOd1KFRz0DW3m/rWFKZDrl5zw4tsARiG1Hg46lIbRoEUc6PDi0
+         csvWFll5LOAlaGvUl2KJfBjs7PtFI6A0+6kzUE0DDyTf0LP8WOJU1lJD/h7rkG3xiZ5X
+         lifhwVagAAdnBT9/8fIiEd9EnNZ8/pPgWRbhQV2Nu4vVLcaUXOmBTbtS18yMzTKaZ6uM
+         tni8f9+zUYJJq5MCeKEjjUGuqsiW1vzgYYBNzCg3fnzJsnjNiDRVwqqynq+y9hgl2fRV
+         IUNA==
+X-Gm-Message-State: AOJu0YyhuznjRLatKNlnzC+u4brINnXRTqYeTz8sOn5sZ1xjdrBOI4vE
+	6qntxFcS+c43XmZ+P5VkhoAasw==
+X-Google-Smtp-Source: AGHT+IGbJMH+4JkNPUHzeVKwhpY0iCzNIgHQjAln2FO9qryNGRK7pF8QZ/dT3kD1yxy/Y2ijHNJRfg==
+X-Received: by 2002:a7b:c851:0:b0:401:2ee0:7558 with SMTP id c17-20020a7bc851000000b004012ee07558mr7388381wml.32.1693825210421;
+        Mon, 04 Sep 2023 04:00:10 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id p9-20020a1c7409000000b003fee53feab5sm13874083wmc.10.2023.09.04.04.00.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Sep 2023 03:50:52 -0700 (PDT)
-Date: Mon, 4 Sep 2023 11:50:51 +0100
-From: Martin Habets <habetsm.xilinx@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, corbet@lwn.net, workflows@vger.kernel.org,
-	linux-doc@vger.kernel.org, rdunlap@infradead.org,
-	laurent.pinchart@ideasonboard.com, sd@queasysnail.net
-Subject: Re: [PATCH net v4] docs: netdev: document patchwork patch states
-Message-ID: <20230904105051.GB8198@gmail.com>
-Mail-Followup-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	corbet@lwn.net, workflows@vger.kernel.org,
-	linux-doc@vger.kernel.org, rdunlap@infradead.org,
-	laurent.pinchart@ideasonboard.com, sd@queasysnail.net
-References: <20230901142406.586042-1-kuba@kernel.org>
+        Mon, 04 Sep 2023 04:00:09 -0700 (PDT)
+Date: Mon, 4 Sep 2023 13:00:08 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: Ziyang Xuan <william.xuanziyang@huawei.com>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net] team: fix null-ptr-deref when team device type is
+ changed
+Message-ID: <ZPW4uC6XkMXl0O2O@nanopsycho>
+References: <20230902092007.3038132-1-william.xuanziyang@huawei.com>
+ <ZPWwE9IYArI08Zsc@Laptop-X1>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230901142406.586042-1-kuba@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+In-Reply-To: <ZPWwE9IYArI08Zsc@Laptop-X1>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Sep 01, 2023 at 07:24:05AM -0700, Jakub Kicinski wrote:
-> The patchwork states are largely self-explanatory but small
-> ambiguities may still come up. Document how we interpret
-> the states in networking.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Mon, Sep 04, 2023 at 12:23:15PM CEST, liuhangbin@gmail.com wrote:
+>Hi Ziyang,
+>
+>On Sat, Sep 02, 2023 at 05:20:07PM +0800, Ziyang Xuan wrote:
+>> $ teamd -t team0 -d -c '{"runner": {"name": "loadbalance"}}'
+>> $ ip link add name t-dummy type dummy
+>> $ ip link add link t-dummy name t-dummy.100 type vlan id 100
+>> $ ip link add name t-nlmon type nlmon
+>> $ ip link set t-nlmon master team0
+>> $ ip link set t-nlmon nomaster
+>> $ ip link set t-dummy up
+>> $ ip link set team0 up
+>> $ ip link set t-dummy.100 down
+>> $ ip link set t-dummy.100 master team0
+>> 
+>> When enslave a vlan device to team device and team device type is changed
+>> from non-ether to ether, header_ops of team device is changed to
+>> vlan_header_ops. That is incorrect and will trigger null-ptr-deref
+>> for vlan->real_dev in vlan_dev_hard_header() because team device is not
+>> a vlan device.
+>> 
+>> Use ether_setup() for team device when its type is changed from non-ether
+>> to ether to fix the bug.
+>> 
+>> Fixes: 1d76efe1577b ("team: add support for non-ethernet devices")
+>> Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
+>> ---
+>>  drivers/net/team/team.c | 21 +++++++++++++--------
+>>  1 file changed, 13 insertions(+), 8 deletions(-)
+>> 
+>> diff --git a/drivers/net/team/team.c b/drivers/net/team/team.c
+>> index d3dc22509ea5..560e04860aa7 100644
+>> --- a/drivers/net/team/team.c
+>> +++ b/drivers/net/team/team.c
+>> @@ -2127,14 +2127,19 @@ static const struct ethtool_ops team_ethtool_ops = {
+>>  static void team_setup_by_port(struct net_device *dev,
+>>  			       struct net_device *port_dev)
+>>  {
+>> -	dev->header_ops	= port_dev->header_ops;
+>> -	dev->type = port_dev->type;
+>> -	dev->hard_header_len = port_dev->hard_header_len;
+>> -	dev->needed_headroom = port_dev->needed_headroom;
+>> -	dev->addr_len = port_dev->addr_len;
+>> -	dev->mtu = port_dev->mtu;
+>> -	memcpy(dev->broadcast, port_dev->broadcast, port_dev->addr_len);
+>> -	eth_hw_addr_inherit(dev, port_dev);
+>> +	if (port_dev->type == ARPHRD_ETHER) {
+>> +		ether_setup(dev);
+>> +		eth_hw_addr_random(dev);
+>> +	} else {
+>> +		dev->header_ops	= port_dev->header_ops;
+>> +		dev->type = port_dev->type;
+>> +		dev->hard_header_len = port_dev->hard_header_len;
+>> +		dev->needed_headroom = port_dev->needed_headroom;
+>> +		dev->addr_len = port_dev->addr_len;
+>> +		dev->mtu = port_dev->mtu;
+>> +		memcpy(dev->broadcast, port_dev->broadcast, port_dev->addr_len);
+>> +		eth_hw_addr_inherit(dev, port_dev);
+>> +	}
+>>  
+>>  	if (port_dev->flags & IFF_POINTOPOINT) {
+>>  		dev->flags &= ~(IFF_BROADCAST | IFF_MULTICAST);
+>
+>Thanks for the report. This fix is similar with what I do in my PATCHv3 [1].
+>And this will go back to the discussion of MTU update. How about just update
+>the header_ops for ARPHRD_ETHER? e.g.
+>
+>	if (port_dev->type == ARPHRD_ETHER)
+>		dev->header_ops	= &eth_header_ops;
+>	else
+>		dev->header_ops	= port_dev->header_ops;
 
-Reviewed-by: Martin Habets <habetsm.xilinx@gmail.com>
+Yes, this sounds better.
 
-> ---
-> v4:
->  - clarify that patches once set to Awaiting Upstream will stay there
-> v3: no change
-> v2: https://lore.kernel.org/all/20230830220659.170911-1-kuba@kernel.org/
->  - add a sentence about New vs Under Review
->  - s/maintainer/export/ for Needs ACK
->  - fix indent
-> v1: https://lore.kernel.org/all/20230828184447.2142383-1-kuba@kernel.org/
-> 
-> CC: corbet@lwn.net
-> CC: workflows@vger.kernel.org
-> CC: linux-doc@vger.kernel.org
-> 
-> CC: rdunlap@infradead.org
-> CC: laurent.pinchart@ideasonboard.com
-> CC: sd@queasysnail.net
-> ---
->  Documentation/process/maintainer-netdev.rst | 32 ++++++++++++++++++++-
->  1 file changed, 31 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/process/maintainer-netdev.rst b/Documentation/process/maintainer-netdev.rst
-> index c1c732e9748b..db1b81cfba9b 100644
-> --- a/Documentation/process/maintainer-netdev.rst
-> +++ b/Documentation/process/maintainer-netdev.rst
-> @@ -120,7 +120,37 @@ Status of a patch can be checked by looking at the main patchwork
->    https://patchwork.kernel.org/project/netdevbpf/list/
->  
->  The "State" field will tell you exactly where things are at with your
-> -patch. Patches are indexed by the ``Message-ID`` header of the emails
-> +patch:
-> +
-> +================== =============================================================
-> +Patch state        Description
-> +================== =============================================================
-> +New, Under review  pending review, patch is in the maintainer’s queue for
-> +                   review; the two states are used interchangeably (depending on
-> +                   the exact co-maintainer handling patchwork at the time)
-> +Accepted           patch was applied to the appropriate networking tree, this is
-> +                   usually set automatically by the pw-bot
-> +Needs ACK          waiting for an ack from an area expert or testing
-> +Changes requested  patch has not passed the review, new revision is expected
-> +                   with appropriate code and commit message changes
-> +Rejected           patch has been rejected and new revision is not expected
-> +Not applicable     patch is expected to be applied outside of the networking
-> +                   subsystem
-> +Awaiting upstream  patch should be reviewed and handled by appropriate
-> +                   sub-maintainer, who will send it on to the networking trees;
-> +                   patches set to ``Awaiting upstream`` in netdev's patchwork
-> +                   will usually remain in this state, whether the sub-maintainer
-> +                   requested changes, accepted or rejected the patch
-> +Deferred           patch needs to be reposted later, usually due to dependency
-> +                   or because it was posted for a closed tree
-> +Superseded         new version of the patch was posted, usually set by the
-> +                   pw-bot
-> +RFC                not to be applied, usually not in maintainer’s review queue,
-> +                   pw-bot can automatically set patches to this state based
-> +                   on subject tags
-> +================== =============================================================
-> +
-> +Patches are indexed by the ``Message-ID`` header of the emails
->  which carried them so if you have trouble finding your patch append
->  the value of ``Message-ID`` to the URL above.
->  
-> -- 
-> 2.41.0
-> 
+
+>
+>[1] https://lore.kernel.org/netdev/20230718101741.2751799-3-liuhangbin@gmail.com/
+>
+>Thanks
+>Hangbin
 
