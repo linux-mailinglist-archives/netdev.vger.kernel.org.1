@@ -1,260 +1,177 @@
-Return-Path: <netdev+bounces-31961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5776E791B1F
-	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 18:07:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FD2B791B69
+	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 18:24:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AE48280FB2
-	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 16:07:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA4AA1C20853
+	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 16:24:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8FCEC2EE;
-	Mon,  4 Sep 2023 16:07:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D978C2F2;
+	Mon,  4 Sep 2023 16:24:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F027BE4F;
-	Mon,  4 Sep 2023 16:07:37 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC2891B9;
-	Mon,  4 Sep 2023 09:07:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693843655; x=1725379655;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=0gJJBPlh3EirInV6XsztpnJTnGa+tBF21/UMmgnk9V4=;
-  b=XVWxmc1CY6FHZMZ9kUm22Jt4GMzgVrAdPl8gJKrHASeHZSToPxCWZ7So
-   RjeBsUC4jAyWnwaGFyTk+uIIR6u/uIaGkE2RqcDXs6MynSNKZPMMf8NAB
-   7SWOUXCpsyli2Z+SDJNgBMRrwYRVk58IRnmASBp+KRxuS9v1DcZfRvgsK
-   xh5MFzlDTH0ebJVMhCtz9X4GbNPI5RIsS8d8WioM6bW1ecGCHgw26JYze
-   2Vvj3QcfbsqN8Ss2oPdTj4kaVeb1oHMHYMoc4h52+bZwrp7ftrl9q4AOA
-   4YKmLj7l8vUzSGi/gXsIouNiJB+ucBXnkG406KL9ehuUD1wwKLVlVQhNp
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10823"; a="443022640"
-X-IronPort-AV: E=Sophos;i="6.02,226,1688454000"; 
-   d="scan'208";a="443022640"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2023 09:07:07 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10823"; a="806300426"
-X-IronPort-AV: E=Sophos;i="6.02,226,1688454000"; 
-   d="scan'208";a="806300426"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmsmga008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Sep 2023 09:07:07 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 4 Sep 2023 09:07:03 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 4 Sep 2023 09:07:03 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Mon, 4 Sep 2023 09:07:03 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.108)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Mon, 4 Sep 2023 09:07:03 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Hk9HMvmBIk0B0OaZ5sezkcW7qPsw7CfgzSA/oRprDRbV9Sr1SiUXSB6BAJvJxXpgn/jI64f2hGBtnQnLBLKDIxMNC/ESKlpQ1FRuD2mH6CX0n9iyP/jZqJ4V7JXCRF95qcuBfOSK17WwwM5gWcpqJYWe7G63owbKroV6L21TWy98TO49XrhvEJEBvVSQm2aEfCWD3+ZaOcp3Yoh2cBy7DcK6W0QKF/G6K3bHfXvGNU86pn0JSU2pgFbk3IxuI3gzHGSZKkhx/yV4WxuKdJ6KykLLH+loC+294m793Y6sS5DZHeHcxoVDpp/51EV+ScNRhD+afPl03ohwbyEivVLyzQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=79SjfbApact5TIsmOmICtY+fbOdfUyjDo5mHHeUZ39g=;
- b=cb38fwhkdXsEeGzU+a14dNgUbJk1c11WsF+oaY8SJvpMqm6BTSHaIyli6s6qS389i0imKM0gLpBed4M0C1xlFGsTtbR8u+6kQCQs0uvOqKnoZ7UvubO4Si9TzgfN7u9PH1aD5sT5ZXPJ5Jdu33czZl/j2Nf/Cr4AWhgTPCk72Bo1/o1PtZigvlhs6ukDShxBIcWBStT28tJR3niO17ow57xJq70KxouAFJc1xUqzlBxJBJ88k6uROjqQXPHMRLzLzS1qs+tQpYEF2Hr9wrTPW3GdY00xg8YN3Der9naPDK4UekhpaN3G6gkALdh9K4sTXAFzSEWYbxRDr+j1aLp2uQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
- PH0PR11MB4853.namprd11.prod.outlook.com (2603:10b6:510:40::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6745.32; Mon, 4 Sep 2023 16:07:00 +0000
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::c1f9:b4eb:f57e:5c3d]) by DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::c1f9:b4eb:f57e:5c3d%3]) with mapi id 15.20.6745.030; Mon, 4 Sep 2023
- 16:07:00 +0000
-Date: Mon, 4 Sep 2023 18:06:51 +0200
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: Larysa Zaremba <larysa.zaremba@intel.com>
-CC: <bpf@vger.kernel.org>, <ast@kernel.org>, <daniel@iogearbox.net>,
-	<andrii@kernel.org>, <martin.lau@linux.dev>, <song@kernel.org>, <yhs@fb.com>,
-	<john.fastabend@gmail.com>, <kpsingh@kernel.org>, <sdf@google.com>,
-	<haoluo@google.com>, <jolsa@kernel.org>, David Ahern <dsahern@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Willem de Bruijn <willemb@google.com>,
-	Jesper Dangaard Brouer <brouer@redhat.com>, Anatoly Burakov
-	<anatoly.burakov@intel.com>, Alexander Lobakin <alexandr.lobakin@intel.com>,
-	Magnus Karlsson <magnus.karlsson@gmail.com>, Maryam Tahhan
-	<mtahhan@redhat.com>, <xdp-hints@xdp-project.net>, <netdev@vger.kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Alexei Starovoitov
-	<alexei.starovoitov@gmail.com>, Simon Horman <simon.horman@corigine.com>,
-	Tariq Toukan <tariqt@mellanox.com>, Saeed Mahameed <saeedm@mellanox.com>
-Subject: Re: [xdp-hints] [RFC bpf-next 00/23] XDP metadata via kfuncs for ice
- + mlx5
-Message-ID: <ZPYAm9oq0SZ7VEvO@boxer>
-References: <20230824192703.712881-1-larysa.zaremba@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20230824192703.712881-1-larysa.zaremba@intel.com>
-X-ClientProxiedBy: FR0P281CA0242.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:af::12) To DM4PR11MB6117.namprd11.prod.outlook.com
- (2603:10b6:8:b3::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E395C2DF
+	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 16:24:36 +0000 (UTC)
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78EA09D
+	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 09:24:34 -0700 (PDT)
+Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-52bca2e8563so2197071a12.2
+        for <netdev@vger.kernel.org>; Mon, 04 Sep 2023 09:24:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693844673; x=1694449473; darn=vger.kernel.org;
+        h=to:cc:date:message-id:subject:mime-version
+         :content-transfer-encoding:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=G+T6Rx9YsgeIvknysvDIrCrsaJwMh6gU78QhgJK7DhE=;
+        b=r03gj6ltuChM0LfXcquVB2KqQR9LiVN+FO8EW+E2hzk4n/oLne1QI8m1WDyahq0fNI
+         YcP9iyzfXUIlDmF0y2UuDMU9nKZ12YfYigGGdrobAqr1idyqZnBP0FDajENj8Gk/NS4B
+         DZPYGySNvlf7dNCvjDyHT5zby+OP7uqNJuwFaO/DtiO5Ux0EQWDhwsobdijX5lklBUem
+         eRZI1A272GJZcI2bC9jXEp7l2tiprjfK5Y6uf472/7vtISOAPw4Krni/YahLPn5Do5IV
+         nrOmu35zBgIb47i6bXy6RILPiVGJnKZn8LZwf4VmV44lhTWzC3R1O+N34RqL7yAJFXdI
+         xiHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693844673; x=1694449473;
+        h=to:cc:date:message-id:subject:mime-version
+         :content-transfer-encoding:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=G+T6Rx9YsgeIvknysvDIrCrsaJwMh6gU78QhgJK7DhE=;
+        b=V8h6PiVSXkW9f9RRXyOloulNeEjWngegnS7I3Apb0DcqSCT5H0tZNUO92SLt0YLO6p
+         pm/+Uvbs3yosHQpzJ7DeQqIRJA+HC8l9FQGxL6KYNyUn/0bg/jRUhlAB2BVrT5Zeo1Hs
+         o2SDEHB3uOhfRxzVQDu3ACTIqIU8/2Zl+mArR1JYrKA1coK4pWenxg/+gScVUnyNmaD5
+         ghRpo5faWUklZV41p84SD3MJaxFsTWiJJBJ+LMqWtWMrzJvJREI+RCXXsWmbFTOYhRhB
+         ziryMC3Xej1Ate06u96OGI0cBxluO5hXnekWapXzLfLXNq3eIIivOdAcjDj849BveX0y
+         yUyQ==
+X-Gm-Message-State: AOJu0YxgZ76EbLezfePLRszZxYqNOyn5mT3YFI1kDYcjCJDC/XTHidl9
+	hIUzkqgRgdsch8Vm/gGcM9M=
+X-Google-Smtp-Source: AGHT+IGCaFLRSI9YHBZlWXpvKo39pZmQ+1VcXKzPOzZINmIpHGOlNKPfmQofZUOUvB217UnWRZk20g==
+X-Received: by 2002:a05:6402:3811:b0:52e:31be:e4c2 with SMTP id es17-20020a056402381100b0052e31bee4c2mr2116372edb.41.1693844672680;
+        Mon, 04 Sep 2023 09:24:32 -0700 (PDT)
+Received: from smtpclient.apple ([178.254.237.20])
+        by smtp.gmail.com with ESMTPSA id m7-20020aa7c2c7000000b00523a43f9b1dsm6016393edp.22.2023.09.04.09.24.31
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 04 Sep 2023 09:24:31 -0700 (PDT)
+From: Martin Zaharinov <micron10@gmail.com>
+Content-Type: text/plain;
+	charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|PH0PR11MB4853:EE_
-X-MS-Office365-Filtering-Correlation-Id: 48b3f2d8-07aa-4e00-0d42-08dbad60f85e
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: wf80EOuuGPYHVAj9zDJYw4mvU909tawQDf00vvl+5mkNiiz5WvIw1koR6M6BNGWdCNhfTaFl1W3CuuHjFMIn57VvvFt0e2+hBrUJLRIJ+GtSKNNaUCSKOuYDaZ0jdCY8j68905UKPE610j9Alrh3X19t6yLBZrSkw6nHjSUUTHWf0pOGq9ULqhs/Fql1C+iS9oL279aLg1otKQVI04hZFD4kkDmL0JkIGgfhUlalHva7uwJUe4N3HfWCqDcRlNI38feycMLrsTiJxPRg/t+kZMEQkHLmHIlCgWvz8IQ8OhlordopvfSdZ7msOuXDTbmTVfAmcKPQGtpPITF9cNIkXFNCMK4j9H/MWm1iP/aMGeniAgufPf9WV5X1T+NMs+9N5YyWgKpV5MydwX8NOKNVrSwV0aMcr0JReyfJ9FyBk7WP1v0QaOO6CzCYXJtS2I2K86fQYrXEPDhW8Ha5i89ElReP8lvbDdp55+HeEID6h4DOUG0fRaSEotX08UZlpr3Zf/4FkM8/d4Ty9HEsjKIBX4pCAaJ5BAWAhMldajQCWVn/RDP+4EUwmq2U1tSrFL28aar+kydE394ob8cDzlHzww==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(136003)(366004)(376002)(396003)(346002)(39860400002)(186009)(1800799009)(451199024)(7416002)(41300700001)(82960400001)(33716001)(478600001)(6666004)(86362001)(966005)(83380400001)(38100700002)(26005)(9686003)(6512007)(6506007)(6486002)(2906002)(54906003)(6636002)(316002)(66476007)(66556008)(66946007)(8676002)(6862004)(5660300002)(44832011)(8936002)(4326008);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?cLJUrgPnOsl4NQ9Z2XH86NxrbSl3+jVNQ0goWXipyPTVHKWlljtOsRnAclmk?=
- =?us-ascii?Q?2z4zUcyabnNwINqrt8PLuGDGThLpCRO3Rtaov2sZGzb0hdyXYATdiZOJvPha?=
- =?us-ascii?Q?UpK9VPWSgNmZcAhzxCvfpzU1ZfYHn+lEXBaOrg4nv5VpLncozsEHO5A4NCnS?=
- =?us-ascii?Q?ruyZPy1msN+bEYfeY+OS9xk0tDZsHf/etRak2s1AolAn+f4IWIc4gj4hbSyr?=
- =?us-ascii?Q?3mtVWUv+1KcfkTLHRdrJ6SfhGaE65Hwd918mqojzQMyfmisMscEqQlPnmivp?=
- =?us-ascii?Q?+emyWV5ZAeg34xylTtGWSCG9ufnsBz6/MBpzCq6+A4Qmtm6zeiJ2MvdYyu5w?=
- =?us-ascii?Q?8dAR6fwZzVU1TEEdUfP/hMr7me8kkRNr1cokyIL87OQLuPt0zVUDPxSTkxVj?=
- =?us-ascii?Q?WWC9iLHTF/uCC0zcMrbp/z21kqwed8AL6agZq15bHD6yW4ocvuz214tNS72g?=
- =?us-ascii?Q?nQ4qgyng40Zh1Cyuxmy4ocL9QweqTdzrS8NBt9H5KL3FutHQaYPD3Y2bslir?=
- =?us-ascii?Q?jESrl1d/H8WsL8koTnBaaAc6x4xQt1/pH7zAQqCTl2wm5MGCnQmEMaMsyP9Z?=
- =?us-ascii?Q?svnIjc1f4ggEOuaACr6p7EbLMsle7EmLiuMcYsd/BfKYubfFkwswe7kb6F1j?=
- =?us-ascii?Q?wZqiEX8kPZfypZX1BvqQoVA1f4rZhoFbIIQSOe+6shndaQUnV39nZeQNpCfd?=
- =?us-ascii?Q?oKEfWVJxhR7D33gwZ8xOPLtzW7tb/8elJdZCovWCO9y6G4yRZrOzqcnCKOG1?=
- =?us-ascii?Q?eQ/oPfGHKmk4d4IgBVdZU79NVfYmWNiLeiEI4TR0xR+KO6ZQ+De0B736Fic1?=
- =?us-ascii?Q?34IHSaTDknWpb3gXPDml+/34H0mZisOnQACwlah0JO49rTzIj7l6iy1xbEon?=
- =?us-ascii?Q?ggRFLtS+eFNK2vFW5TVlKLdmmoRzSoQ3uwcSsak3tKH/y9oOMnyldtkHYcst?=
- =?us-ascii?Q?JVk7k27h/IP1+lTc8ITtzqIwNcJtLEHGTwqnAew09gGfjsn8uPS2h0J/cx5G?=
- =?us-ascii?Q?ACVcIaX6rUdR0kUs2LF4nEHW5LXKmCEBZ5NICS4xzO95X5H82U/C7XAtg+mz?=
- =?us-ascii?Q?JQlnyWyvIGQaCTbu+EZSdfi6BnS9qogATjwzDZqyIt4Zx30u7wl3LWYVpk35?=
- =?us-ascii?Q?sdMLaxWrP6EeBD0RwOVeOZrGUrhTGgB/m9GMOsMucxJcJxELDxdK4wAScntP?=
- =?us-ascii?Q?0YHE0PpXKUuXcezQmzRjOvBK7qGCzRyVwpTzXz+dNylM4MW0m8AIzMatlniX?=
- =?us-ascii?Q?SdXvg5/qXwxr5S7QIN0MQWtKZHRMEk9+OmQDSGg5CRH52GHMqH3JVw//cQJB?=
- =?us-ascii?Q?u4RKkdT8pw45ZiPh8EjxYhr3sgT2LrX44niTSNcR1UlSUf1639r/Q2gSGZnL?=
- =?us-ascii?Q?h5K97puk5Gp80rxSyJUMVTefkQo/jAagzF3zdjAMAi9WKOOQNGXs43s0+1gl?=
- =?us-ascii?Q?Mj6AsqWErd078cUuWb4wZunGEjT8nDeJ89JmiCRsg4RaP5wh2vrGbkzZF6fy?=
- =?us-ascii?Q?oS2f4xU5LLwaQaJiMNHrwAMatMzpgEsPJGfJpjYi0sI94PUdH0kwh+lAdzMf?=
- =?us-ascii?Q?EIloiEADjXMpngQgNKgrSHIMzZniTFpRsSx42vUeAFo6PdVttJja7qHbLxwa?=
- =?us-ascii?Q?IA=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 48b3f2d8-07aa-4e00-0d42-08dbad60f85e
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Sep 2023 16:07:00.1011
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: zovW1oqZfg5jnypuw95pKqrgC0qV+Z9503GSeyz6Z8goXDxSY8Xq0vyXPgY6HiacGr+CCiXOscmOD+A9p3R5hULDdOX9uJlLiZSyQ9gro0I=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4853
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.700.6\))
+Subject: Vmxnet3 v22 - bug
+Message-Id: <74BF3CC8-2A3A-44FF-98C2-1E20F110A92E@gmail.com>
+Date: Mon, 4 Sep 2023 19:24:20 +0300
+Cc: Alexander Duyck <alexanderduyck@fb.com>,
+ alexandr.lobakin@intel.com,
+ netdev <netdev@vger.kernel.org>
+To: u9012063@gmail.com
+X-Mailer: Apple Mail (2.3731.700.6)
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Aug 24, 2023 at 09:26:39PM +0200, Larysa Zaremba wrote:
-> Alexei has requested an implementation of VLAN and checksum XDP hints
-> for one more driver [0].
-> 
-> This series is exactly the v5 of "XDP metadata via kfuncs for ice" [1]
-> with 2 additional patches for mlx5.
-> 
-> Firstly, there is a VLAN hint implementation. I am pretty sure this
-> one works and would not object adding it to the main series, if someone
-> from nvidia ACKs it.
-> 
-> The second patch is a checksum hint implementation and it is very rough.
-> There is logic duplication and some missing features, but I am sure it
-> captures the main points of the potential end implementation.
-> 
-> I think it is unrealistic for me to provide a fully working mlx5 checksum
-> hint implementation (complex logic, no HW), so would much rather prefer
-> not having it in my main series. My main intension with this RFC is
-> to prove proposed hints functions are suitable for non-intel HW.
+Hi William Tu
 
-I went through ice patches mostly, can you provide performance numbers for
-XDP workloads without metadata in picture? I'd like to see whether
-standard 64b traffic gets affected or not since you're modifying
-ice_rx_ring layout.
 
-> 
-> [0] https://lore.kernel.org/bpf/CAADnVQLNeO81zc4f_z_UDCi+tJ2LS4dj2E1+au5TbXM+CPSyXQ@mail.gmail.com/
-> [1] https://lore.kernel.org/bpf/20230811161509.19722-1-larysa.zaremba@intel.com/
-> 
-> Aleksander Lobakin (1):
->   net, xdp: allow metadata > 32
-> 
-> Larysa Zaremba (22):
->   ice: make RX hash reading code more reusable
->   ice: make RX HW timestamp reading code more reusable
->   ice: make RX checksum checking code more reusable
->   ice: Make ptype internal to descriptor info processing
->   ice: Introduce ice_xdp_buff
->   ice: Support HW timestamp hint
->   ice: Support RX hash XDP hint
->   ice: Support XDP hints in AF_XDP ZC mode
->   xdp: Add VLAN tag hint
->   ice: Implement VLAN tag hint
->   ice: use VLAN proto from ring packet context in skb path
->   xdp: Add checksum hint
->   ice: Implement checksum hint
->   selftests/bpf: Allow VLAN packets in xdp_hw_metadata
->   selftests/bpf: Add flags and new hints to xdp_hw_metadata
->   veth: Implement VLAN tag and checksum XDP hint
->   net: make vlan_get_tag() return -ENODATA instead of -EINVAL
->   selftests/bpf: Use AF_INET for TX in xdp_metadata
->   selftests/bpf: Check VLAN tag and proto in xdp_metadata
->   selftests/bpf: check checksum state in xdp_metadata
->   mlx5: implement VLAN tag XDP hint
->   mlx5: implement RX checksum XDP hint
-> 
->  Documentation/networking/xdp-rx-metadata.rst  |  11 +-
->  drivers/net/ethernet/intel/ice/ice.h          |   2 +
->  drivers/net/ethernet/intel/ice/ice_ethtool.c  |   2 +-
->  .../net/ethernet/intel/ice/ice_lan_tx_rx.h    | 412 +++++++++---------
->  drivers/net/ethernet/intel/ice/ice_lib.c      |   2 +-
->  drivers/net/ethernet/intel/ice/ice_main.c     |  23 +
->  drivers/net/ethernet/intel/ice/ice_ptp.c      |  27 +-
->  drivers/net/ethernet/intel/ice/ice_ptp.h      |  15 +-
->  drivers/net/ethernet/intel/ice/ice_txrx.c     |  19 +-
->  drivers/net/ethernet/intel/ice/ice_txrx.h     |  29 +-
->  drivers/net/ethernet/intel/ice/ice_txrx_lib.c | 343 ++++++++++++---
->  drivers/net/ethernet/intel/ice/ice_txrx_lib.h |  18 +-
->  drivers/net/ethernet/intel/ice/ice_xsk.c      |  26 +-
->  .../net/ethernet/mellanox/mlx5/core/en/txrx.h |  10 +
->  .../net/ethernet/mellanox/mlx5/core/en/xdp.c  | 116 +++++
->  .../net/ethernet/mellanox/mlx5/core/en_rx.c   |  12 +-
->  drivers/net/veth.c                            |  42 ++
->  include/linux/if_vlan.h                       |   4 +-
->  include/linux/mlx5/device.h                   |   4 +-
->  include/linux/skbuff.h                        |  13 +-
->  include/net/xdp.h                             |  29 +-
->  kernel/bpf/offload.c                          |   4 +
->  net/core/xdp.c                                |  57 +++
->  .../selftests/bpf/prog_tests/xdp_metadata.c   | 187 ++++----
->  .../selftests/bpf/progs/xdp_hw_metadata.c     |  48 +-
->  .../selftests/bpf/progs/xdp_metadata.c        |  16 +
->  tools/testing/selftests/bpf/testing_helpers.h |   3 +
->  tools/testing/selftests/bpf/xdp_hw_metadata.c |  67 ++-
->  tools/testing/selftests/bpf/xdp_metadata.h    |  42 +-
->  29 files changed, 1124 insertions(+), 459 deletions(-)
-> 
-> -- 
-> 2.41.0
-> 
+this is report of bug with latest version of vmxnet3 xdp support:
+
+
+[   92.417855] ------------[ cut here ]------------
+[   92.417855] XDP_WARN: xdp_update_frame_from_buff(line:278): Driver =
+BUG: missing reserved tailroom
+[   92.417855] WARNING: CPU: 0 PID: 0 at net/core/xdp.c:586 =
+xdp_warn+0xf/0x20
+[   92.417855] Modules linked in:  pppoe pppox ppp_generic slhc =
+virtio_net net_failover failover virtio_pci virtio_pci_legacy_dev =
+virtio_pci_modern_dev virtio virtio_ring vmxnet3=20
+[   92.417855] CPU: 0 PID: 0 Comm: swapper/0 Tainted: G        W  O      =
+ 6.5.1 #1
+[   92.417855] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS =
+rel-1.16.2-0-gea1b7a073390-prebuilt.qemu.org 04/01/2014
+[   92.417855] RIP: 0010:xdp_warn+0xf/0x20
+[   92.417855] Code: 00 00 c3 0f 1f 84 00 00 00 00 00 83 7f 0c 01 0f 94 =
+c0 c3 0f 1f 84 00 00 00 00 00 48 89 f9 48 c7 c7 3d b2 e4 91 e8 d1 00 8e =
+ff <0f> 0b c3 66 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 53 48 89 fb 8b
+[   92.417855] RSP: 0018:ffffb30180003d40 EFLAGS: 00010286
+[   92.417855] RAX: 0000000000000055 RBX: ffff99bcf7c22ee0 RCX: =
+00000000fffdffff
+[   92.417855] RDX: 00000000fffdffff RSI: 0000000000000001 RDI: =
+00000000ffffffea
+[   92.417855] RBP: ffff99bb849c2000 R08: 0000000000000000 R09: =
+00000000fffdffff
+[   92.417855] R10: ffff99bcf6a00000 R11: 0000000000000003 R12: =
+ffff99bb83840000
+[   92.417855] R13: ffff99bb83842780 R14: ffffb3018081d000 R15: =
+ffff99bb849c2000
+[   92.417855] FS:  0000000000000000(0000) GS:ffff99bcf7c00000(0000) =
+knlGS:0000000000000000
+[   92.417855] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   92.417855] CR2: 00007f9bf822df88 CR3: 00000001a74de000 CR4: =
+00000000003506f0
+[   92.417855] Call Trace:
+[   92.417855]  <IRQ>
+[   92.417855]  ? __warn+0x6c/0x130
+[   92.417855]  ? report_bug+0x1e4/0x260
+[   92.417855]  ? handle_bug+0x36/0x70
+[   92.417855]  ? exc_invalid_op+0x17/0x1a0
+[   92.417855]  ? asm_exc_invalid_op+0x16/0x20
+[   92.417855]  ? xdp_warn+0xf/0x20
+[   92.417855]  xdp_do_redirect+0x15f/0x1c0
+[   92.417855]  vmxnet3_run_xdp+0x17a/0x400 [vmxnet3]
+[   92.417855]  vmxnet3_process_xdp+0xe4/0x760 [vmxnet3]
+[   92.417855]  ? vmxnet3_tq_tx_complete.isra.0+0x21e/0x2c0 [vmxnet3]
+[   92.417855]  vmxnet3_rq_rx_complete+0x7ad/0x1120 [vmxnet3]
+[   92.417855]  vmxnet3_poll_rx_only+0x2d/0xa0 [vmxnet3]
+[   92.417855]  __napi_poll+0x20/0x180
+[   92.417855]  net_rx_action+0x177/0x390
+[   92.417855]  __do_softirq+0xd0/0x202
+[   92.417855]  irq_exit_rcu+0x82/0xa0
+[   92.417855]  common_interrupt+0x7a/0xa0
+[   92.417855]  </IRQ>
+[   92.417855]  <TASK>
+[   92.417855]  asm_common_interrupt+0x22/0x40
+[   92.417855] RIP: 0010:default_idle+0xb/0x10
+[   92.417855] Code: 07 76 e7 48 89 07 49 c7 c0 08 00 00 00 4d 29 c8 4c =
+01 c7 4c 29 c2 e9 72 ff ff ff cc cc cc cc eb 07 0f 00 2d 47 72 29 00 fb =
+f4 <fa> c3 0f 1f 00 65 48 8b 04 25 00 33 02 00 f0 80 48 02 20 48 8b 10
+[   92.417855] RSP: 0018:ffffffff92003e88 EFLAGS: 00000206
+[   92.417855] RAX: 0000000000000000 RBX: 0000000000000000 RCX: =
+0000000000000001
+[   92.417855] RDX: 4000000000000000 RSI: 0000000000000083 RDI: =
+00000000000bfc34
+[   92.417855] RBP: ffffffff92009dc0 R08: ffff99bcf7c1f160 R09: =
+ffff99bcf7c1f100
+[   92.417855] R10: ffff99bcf7c1f100 R11: 0000000000000000 R12: =
+0000000000000000
+[   92.417855] R13: 0000000000000000 R14: ffffffff92009dc0 R15: =
+0000000000000000
+[   92.417855]  default_idle_call+0x1f/0x30
+[   92.417855]  do_idle+0x1df/0x210
+[   92.417855]  cpu_startup_entry+0x14/0x20
+[   92.417855]  rest_init+0xc7/0xd0
+[   92.417855]  arch_call_rest_init+0x5/0x20
+[   92.417855]  start_kernel+0x3e9/0x5b0
+[   92.417855]  x86_64_start_reservations+0x14/0x30
+[   92.417855]  x86_64_start_kernel+0x71/0x80
+[   92.417855]  secondary_startup_64_no_verify+0x167/0x16b
+[   92.417855]  </TASK>
+[   92.417855] ---[ end trace 0000000000000000 ]=E2=80=94
+
+
+Please update if you find a problem.
+
+
+Best regards,
+Martin=
 
