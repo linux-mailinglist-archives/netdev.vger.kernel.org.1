@@ -1,241 +1,189 @@
-Return-Path: <netdev+bounces-31998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32F6379204F
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 06:37:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5271792054
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 07:00:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 735C7281074
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 04:37:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30635281006
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 05:00:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 973C3380;
-	Tue,  5 Sep 2023 04:37:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F1FF657;
+	Tue,  5 Sep 2023 05:00:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8805E363
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 04:37:10 +0000 (UTC)
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 225ED1B6;
-	Mon,  4 Sep 2023 21:37:08 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 651E7120003;
-	Tue,  5 Sep 2023 07:37:05 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 651E7120003
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1693888625;
-	bh=HoIC/Rt7SCCOTU5bzlF4Kw/h0G5mggsepxhm/KWPIrg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-	b=hIJ7B0NsW7yAaf58/o8XZuTZxIYaC/3XsjNmNqKM187fL/S+F2TdfTM/h9P82y2Uw
-	 krF6hyzSxYEaeqbHR8r3haXXXCYVlBEq7prtyRelRQCFHWcn1aImP5140T/3X9K1hx
-	 Z9lyXRTOT+J9mJqx4+UjMSMkBYxORLXGrqTzYSOjrlDo3xgBgT30cAmZjpeV51UeKE
-	 KjbxFmX/1EUC6f21eErA0clUB5+6bQpUVA1/qMlHIBbV2QIueD65HHSIokHNk8e+Fy
-	 yPfRRRAxPJrs3ljcA17u2Jx3QQDjJ+ZXU6yuuZfsG9FYyDWKh/sY+8zvY3gVzS2Wcu
-	 xDLyytGWQw3iw==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Tue,  5 Sep 2023 07:37:03 +0300 (MSK)
-Received: from [192.168.0.106] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Tue, 5 Sep 2023 07:36:59 +0300
-Message-ID: <c3b34d3c-29ea-5a0f-24d3-483836faa7ba@salutedevices.com>
-Date: Tue, 5 Sep 2023 07:30:38 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39B987E3
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 05:00:14 +0000 (UTC)
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2049.outbound.protection.outlook.com [40.107.101.49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F91F8E;
+	Mon,  4 Sep 2023 22:00:13 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QGE4hp05udQKasuNqPuyACZNXrqfqKDXj1CUP72HWGGA35cdJv05tCs1u0irs3P34O7qIm/KVrd5YYZX+XZEz/VvEsTzlcpiLqY6QAz1XJ2ooAk2owtT8C8VVE1Brpkr92OKMqou9k3AL0nCc8VFRLnBddblaEz3nsofqYD+gYrk9ioFiYXRncv0Af7qBVkWRbujCtojQ0SZNlmM6sWb1CLQvt0QpAzdXyDBPRW6nbBm3mWVQCUZG5awpugrkraxQ8zW4AbZYDjPHYgX9MZVm8yVBqjeh0+x2hcHVyVXFVxMeSylMYZDsRLAatgZQfT2FKjOnUbF/xwBMrZ91xyXPw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fBUrtZp1dUSQ0gLbEJuHgjlJfkzQejYmULTWO1xZ//c=;
+ b=DkRTEcaDIMPj/0jiSIIiIxIO6O2PH6S4yGTwWZglp+v+klLbrlsVgcWBtqVabIGfwQjF9nnf4YnWwbtt0UZtUvauVBHgQzJWfSkUrGZ8gg2GTdWNDuFsp+WIFHnzKP5w3Tb0ean5Z0I93vYLCMmYo5p0TSsgdW32UGJvxnTM3iHg8yNAGDZvlK2AL/Kvv5n6p9HZS7YmSbN1z+Z7QQdgiNS0PIRcHc+KhsiHhwua8+EXqA8UvUqgViVSt4ex40s/edwBMitIbr9fRF+b2bTA3PcQNRMnJgKjVLUuZqi4TO//yYyFPl1AGAHs/G5Ry1jRlFGYOh0sRwc1NWQoVJcMGA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fBUrtZp1dUSQ0gLbEJuHgjlJfkzQejYmULTWO1xZ//c=;
+ b=EJL9pV4d5ULVltc589zZ2LD339eNoMzI33UnHZN10DryiFBCd1cjj0YoRsUL92RIAEuUmwRlu1H9NmQDv4isQkg7YHWjlVNM4CeMN2y3i32egxFdeU+/XoOOBYmVp3qRiKn5w74ibNKVbLdonczF9BOrJST8Zd+5x0aP28tbLSA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
+ SA0PR12MB4445.namprd12.prod.outlook.com (2603:10b6:806:95::15) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6745.33; Tue, 5 Sep 2023 05:00:11 +0000
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::5c9:9a26:e051:ddd2]) by DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::5c9:9a26:e051:ddd2%7]) with mapi id 15.20.6745.030; Tue, 5 Sep 2023
+ 05:00:09 +0000
+Message-ID: <1fd3d0a7-e738-40dd-a9b2-37e2adacc01c@amd.com>
+Date: Mon, 4 Sep 2023 22:00:06 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] docs: netdev: update the netdev infra URLs
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ corbet@lwn.net, workflows@vger.kernel.org, linux-doc@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org
+References: <20230901211718.739139-1-kuba@kernel.org>
+Content-Language: en-US
+From: "Nelson, Shannon" <shannon.nelson@amd.com>
+In-Reply-To: <20230901211718.739139-1-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BY5PR17CA0058.namprd17.prod.outlook.com
+ (2603:10b6:a03:167::35) To DS0PR12MB6583.namprd12.prod.outlook.com
+ (2603:10b6:8:d1::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH net-next v7 4/4] vsock/virtio: MSG_ZEROCOPY flag support
-Content-Language: en-US
-To: Stefano Garzarella <sgarzare@redhat.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin"
-	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
-	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20230827085436.941183-1-avkrasnov@salutedevices.com>
- <20230827085436.941183-5-avkrasnov@salutedevices.com>
- <p2u2irlju6yuy54w4tqstaijhpnbmqxwavsdumsmyskrjguwux@kmd7cbavhjbh>
- <0ab443b5-73a5-f092-44a3-52e26244c9a8@salutedevices.com>
- <h63t6heovmyafu2lo6x6rzsbdbrhqhlbuol774ngbgshbycgdu@fgynzbmj5zn7>
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-In-Reply-To: <h63t6heovmyafu2lo6x6rzsbdbrhqhlbuol774ngbgshbycgdu@fgynzbmj5zn7>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 179642 [Sep 04 2023]
-X-KSMG-AntiSpam-Version: 5.9.59.0
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 529 529 a773548e495283fecef97c3e587259fde2135fef, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;127.0.0.199:7.1.2;100.64.160.123:7.1.2;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/09/05 03:12:00 #21800815
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|SA0PR12MB4445:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6fbd3cc6-8b68-4103-f98b-08dbadccfa88
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	6oVo7pJwoghpDBz5dLUhimDWs9eoGCElw44F5M2lzGsmq8VKzZYUp6ytNzS2vrEMnZyI8NLwllN7NYakwoF4vpRTzInBtcRskhmfAuMEko/wu0kZTsu34zGGG867dWVopu5muFPEt8bykU/OOiwxbtsnlPAyfB8yjBzwWL/7kwL5apv4Ti6jhhA7h2iJEc8vz6ZVB1Np8aPsJMkCEXG02DHVJaUAdSC5IZfbRaP8nM/9DxmSt32ZVsJNupw/2ruVOi6jTOhrBvQrfVdYNMG/V/ak7A6MzmtOv9eoAyqcgDfMVY8NRCtH8aPs23SOVbdrNODurKP8h+1M9mhfKXWx162DJZ2Q/jynBJVeTLjfAEytxt7stUvO2P42jfb1ECiwdNCa+qu/nIVDTT1GqpD6eZ3vtnVfuLLrjH1YgNp2Y6TEURMDb6etTbLDTgMC0V1UmgQChU5gNFd7qrjvN+NSPFX5HSJH4Llz2xbvAEgoF2YP2aAizkJsMhTE4grGM8SyCu9wACmnHSE97hkot/eegZYQ8zs7fvBCg199PmSoS4zcDtDkpQ0ZTbWAARP1gzqCHwunc/8APBoEYr0DAARgSN+s/kk9nIgWTl6uj07ZMSX8FmWz5UMos0eukt0Te0I6
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(346002)(376002)(396003)(39860400002)(1800799009)(186009)(451199024)(2906002)(38100700002)(36756003)(86362001)(31696002)(6506007)(6512007)(41300700001)(53546011)(6486002)(316002)(66476007)(66556008)(66946007)(2616005)(4326008)(8676002)(8936002)(478600001)(966005)(6666004)(31686004)(83380400001)(5660300002)(26005)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Qkkrd2FnUzJRS1Njc2RrbFdBd0FWalJDdUQxcEV4QU1SM0M3R0NLRGxIOVA2?=
+ =?utf-8?B?NkNYTTVJNi9BR0lOOGF2UExUWXNjY2dFNlpZUVlscnR2ZVI0NTZxeVBKS3Rt?=
+ =?utf-8?B?ZWYrdzJZYjBOZEY0N3dSY3BPVHh3VmQxT1RBMGxtRXY0MjBKME1WekJwNzRo?=
+ =?utf-8?B?WFVMS0Jyd1c0SGZWRGVZR2dNN1ZWZHc0OTFZdkNRZXRWbWpsTjdYbmd3SzZY?=
+ =?utf-8?B?Zll3TjlKeVpLSWhNQ1N6bEw5S2V2ZkRsc0dXUnZTSGU5bDcwMkVIeDRJdmNF?=
+ =?utf-8?B?RVFlaUFXWWlxL1JRZmx0czhTa2dQejhpOWNXQzNLUnFSNTJWTlo1ZSt1ZmV5?=
+ =?utf-8?B?cnBEWXhUN2wxbjlyakluQ1J0QUVuSXhITzRpYXJNclBNY3h5eDZlM2FWblEv?=
+ =?utf-8?B?czZSdlZRUWM5Ui9CN1JWWldYTGxON2N1Z1dDZ1NRdEdaVDJMNTh5RTYwSUNm?=
+ =?utf-8?B?aHV0d2c3cFp1UEF5bld6aWFXdUhvOW03OWpYSElHbWo5czVwdlFUWFVzbkR1?=
+ =?utf-8?B?RkV5UmN1QitDNUVFYjhNQnBhN3pKNUwxS3JsdnVXdFlVekFHc2ZuTnVjY3JR?=
+ =?utf-8?B?Q2pUKzQ0T3hLZy9nWTJFMXFwVGM1VFJ0cmh3akNKT3dTUjNlWkw1Sm96UFNM?=
+ =?utf-8?B?NGEyZ0w0dUZSdlJDK3M4M1RLeUZoMmxEeUdQaXNVN09RSXdmV3RabUF3Vjkw?=
+ =?utf-8?B?cXpMV3F3SVlMTWVTQUFTK21odkZlRFMySDlZZFRZQVFLa0VMd3Z3TCs5R1Jw?=
+ =?utf-8?B?T1kwUnhuOXdob3Ztcks0UmQ5ZWxDM1Z5eEpLUy9CVmptMzF2cGYzS3BFNDZw?=
+ =?utf-8?B?KytscXpQMHM0WUdqb0x4MTc1RlFUWGZ1Y0xvc24vZVNobzJuelZtNWY0SXpz?=
+ =?utf-8?B?dWh5WEllQWZLcjljRlFHbGtpcVhMenhMMHNWb3FVYWlpalBwaWVjdUI3TTd6?=
+ =?utf-8?B?M2JNWUhlMmZHSWVJS1I4K0tMUjdCa1VzZjh1UnZOTVNXUzNCVVUvTTNXcUJQ?=
+ =?utf-8?B?MUZjQVpja0xYbEwyT0l2cCtPeWE2NHB4K0x5Z2d6K0lHc1IrM3Rya3lyRFla?=
+ =?utf-8?B?UWFCZEpJNm9hZlhJTWQ1aW9ObS90ZmN6ODhhYzM1WmZ2V0tUeE9RQ01IRlkx?=
+ =?utf-8?B?Z2NCLzAyNjNtdU5uR29uQTdibmNNYXNESVZYc0RTYjFlT1RlSThYQzJlY1Mr?=
+ =?utf-8?B?NEVGWU9EVEVCMEtRekZIWWNwQ2kzYVp1V2FLaWtBMFFkVmlIdGdXT1hsM0w4?=
+ =?utf-8?B?eHhFVWROUWRDb3B6NkYrOHBabEtCQjdMYjdRV2xRbktPSmhkeHVDZUlSa25S?=
+ =?utf-8?B?VXlFckF2Z1JOa3BINHlTaWJpck11alliTC9zSnh1ZktkTU1VTFVFbFYvZDll?=
+ =?utf-8?B?LzdDdEkrMWJIeHdxMzYzRGZVL3lGRHJIdFQyUlVTSlN4MW9aK3lKWlVOWEsr?=
+ =?utf-8?B?dk9naWhQazdlNnF4U2JERWREWG9CdE0vTVpNQXBIbmdpTkoxTkxVekxTL0VX?=
+ =?utf-8?B?Z1IzL3g4bU50R0p1Ly9SZDRmdHd5SndxTW90enBpaCtVQ3RzRU95VUM0cEt0?=
+ =?utf-8?B?Q29ZeDhNWDRRVzl3MHlvNGJCZ0FFelZmM1lNQ0VLZW9ScUtTSE5FNjYwbW42?=
+ =?utf-8?B?aEZOdFF0bHZ5dUZiUE9nTFVWZVdvY2VPRmh2NDhBQkxmVUJVRGN6V3dSZW5B?=
+ =?utf-8?B?amY0eFd2WWZhejREZHE4Z0RSUnJEcHJrQWpGbmdidUtyU3h1QlRGYkloMm9V?=
+ =?utf-8?B?cHNLenpSV1lwNzVwS2lkV0pFZnFQRVJVN0FXS2gwYXkwT01RQmdTdGdyZjVH?=
+ =?utf-8?B?cjVRNnVWaVlvWG9tcnRGeUxpZEMyQmJ5T3k3MFBMUG1WQzZnZ2pOS2ZzUnhF?=
+ =?utf-8?B?SWUrbmJEYmJpbjJUN2UxL0l5eWFBaVdRQ0lLQ01pemRsYXRMVmVtY1VqTTUv?=
+ =?utf-8?B?RFFtTmtEaFk3aW9WcVdVSE1sL1BPUHZSSHl2ZFNrajAzbm91SGgycHMwSzYv?=
+ =?utf-8?B?VlBxemRaaEpJdHIxdE1sMlNNWTdLWHFEMlpCUVcycTh3QmZYM0JTNUxrbnZx?=
+ =?utf-8?B?VzJKT3ZSWk9JOFhyQk5keWxTOW1zc3dBbzZtZXl4dmlLdGtUSlpHRitEeER1?=
+ =?utf-8?Q?adrfkOVap3V0H6CQCnRJMmEPJ?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6fbd3cc6-8b68-4103-f98b-08dbadccfa88
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Sep 2023 05:00:09.3664
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: O148ZyF0hZJ1YeimIkZphuTYOMEa2w2ku+iNCGO/+CCYUA8Gqt6ERvL16+m9O3zPEQavmlvJsyqOe6rlXvF+Cw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4445
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-On 04.09.2023 11:21, Stefano Garzarella wrote:
-> On Sun, Sep 03, 2023 at 11:13:23AM +0300, Arseniy Krasnov wrote:
->>
->>
->> On 01.09.2023 15:30, Stefano Garzarella wrote:
->>> On Sun, Aug 27, 2023 at 11:54:36AM +0300, Arseniy Krasnov wrote:
->>>> This adds handling of MSG_ZEROCOPY flag on transmission path: if this
->>>> flag is set and zerocopy transmission is possible (enabled in socket
->>>> options and transport allows zerocopy), then non-linear skb will be
->>>> created and filled with the pages of user's buffer. Pages of user's
->>>> buffer are locked in memory by 'get_user_pages()'. Second thing that
->>>> this patch does is replace type of skb owning: instead of calling
->>>> 'skb_set_owner_sk_safe()' it calls 'skb_set_owner_w()'. Reason of this
->>>> change is that '__zerocopy_sg_from_iter()' increments 'sk_wmem_alloc'
->>>> of socket, so to decrease this field correctly proper skb destructor is
->>>> needed: 'sock_wfree()'. This destructor is set by 'skb_set_owner_w()'.
->>>>
->>>> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+On 9/1/2023 2:17 PM, Jakub Kicinski wrote:
 > 
-> [...]
+> Some corporate proxies block our current NIPA URLs because
+> they use a free / shady DNS domain. As suggested by Jesse
+> we got a new DNS entry from Konstantin - netdev.bots.linux.dev,
+> use it.
 > 
->>>>
->>>> -/* Returns a new packet on success, otherwise returns NULL.
->>>> - *
->>>> - * If NULL is returned, errp is set to a negative errno.
->>>> - */
->>>> -static struct sk_buff *
->>>> -virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
->>>> -               size_t len,
->>>> -               u32 src_cid,
->>>> -               u32 src_port,
->>>> -               u32 dst_cid,
->>>> -               u32 dst_port)
->>>> -{
->>>> -    const size_t skb_len = VIRTIO_VSOCK_SKB_HEADROOM + len;
->>>> -    struct virtio_vsock_hdr *hdr;
->>>> -    struct sk_buff *skb;
->>>> +static bool virtio_transport_can_zcopy(struct virtio_vsock_pkt_info *info,
->>>> +                       size_t max_to_send)
->>>                                               ^
->>> I'd call it `pkt_len`, `max_to_send` is confusing IMHO. I didn't
->>> initially if it was the number of buffers or bytes.
->>>
->>>> +{
->>>> +    const struct virtio_transport *t_ops;
->>>> +    struct iov_iter *iov_iter;
->>>> +
->>>> +    if (!info->msg)
->>>> +        return false;
->>>> +
->>>> +    iov_iter = &info->msg->msg_iter;
->>>> +
->>>> +    if (iov_iter->iov_offset)
->>>> +        return false;
->>>> +
->>>> +    /* We can't send whole iov. */
->>>> +    if (iov_iter->count > max_to_send)
->>>> +        return false;
->>>> +
->>>> +    /* Check that transport can send data in zerocopy mode. */
->>>> +    t_ops = virtio_transport_get_ops(info->vsk);
->>>> +
->>>> +    if (t_ops->can_msgzerocopy) {
->>>
->>> So if `can_msgzerocopy` is not implemented, we always return true after
->>> this point. Should we mention it in the .can_msgzerocopy documentation?
-
-
-^^^
-
-Sorry, ops again. Just checked this code during comments fixing. It is correct
-to "return true;" Idea is:
-
-if (generic conditions for MSG_ZEROCOPY == false)
-    return false;// can't zerocopy
-
-if (t_ops->can_msgzerocopy) //transport needs extra check
-    return t_ops->can_msgzerocopy();
-
-return true;//transport doesn't require extra check and generic conditions above are OK -> can zerocopy
-
-But anyway:
-
-1) I'll add comment in 'struct virtio_transport' for '.can_msgzerocopy' that this callback is
-   not mandatory - just additional transport specific check.
-
-2) Add test for fallback to copy.
-
-Thanks, Arseniy
-
->>
->> Ops, this is my mistake, I must return 'false' in this case. Seems I didn't
->> catch this problem with my tests, because there was no test case where
->> zerocopy will fallback to copy!
->>
->> I'll fix it and add new test!
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: corbet@lwn.net
+> CC: workflows@vger.kernel.org
+> CC: linux-doc@vger.kernel.org
 > 
-> yep, I agree!
+> CC: intel-wired-lan@lists.osuosl.org
 > 
->>
->>>
->>> Can we also mention in the commit description why this is need only for
->>> virtio_tranport and not for vhost and loopback?
->>>
->>>> +        int pages_in_iov = iov_iter_npages(iov_iter, MAX_SKB_FRAGS);
->>>> +        int pages_to_send = min(pages_in_iov, MAX_SKB_FRAGS);
->>>> +
->>>> +        return t_ops->can_msgzerocopy(pages_to_send);
->>>> +    }
->>>> +
->>>> +    return true;
->>>> +}
->>>> +
+> Please LMK if the old URLs pop up somewhere, I may have missed
+> some place. The old patchwork checks will continue to use the
+> old address but new ones should link via netdev.bots...
+> ---
+>   Documentation/process/maintainer-netdev.rst | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> [...]
+> diff --git a/Documentation/process/maintainer-netdev.rst b/Documentation/process/maintainer-netdev.rst
+> index db1b81cfba9b..09dcf6377c27 100644
+> --- a/Documentation/process/maintainer-netdev.rst
+> +++ b/Documentation/process/maintainer-netdev.rst
+> @@ -98,7 +98,7 @@ If you aren't subscribed to netdev and/or are simply unsure if
+>   repository link above for any new networking-related commits.  You may
+>   also check the following website for the current status:
 > 
->>>> @@ -270,6 +395,17 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
->>>>             break;
->>>>         }
->>>>
->>>> +        /* This is last skb to send this portion of data. */
->>>
->>> Sorry I didn't get it :-(
->>>
->>> Can you elaborate this a bit more?
->>
->> I mean that we iterate over user's buffer here, allocating skb on each
->> iteration. And for last skb for this buffer we initialize completion
->> for user (we need to allocate one completion for one syscall).
+> -  https://patchwork.hopto.org/net-next.html
+> +  https://netdev.bots.linux.dev/net-next.html
 > 
-> Okay, so maybe we should explain better also in the code comment.
->>
->> Thanks for review, I'll fix all other comments and resend patchset when
->> 'net-next' will be opened again.
+>   The ``net`` tree continues to collect fixes for the vX.Y content, and is
+>   fed back to Linus at regular (~weekly) intervals.  Meaning that the
+> @@ -185,7 +185,7 @@ must match the MAINTAINERS entry) and a handful of senior reviewers.
 > 
-> Cool, thanks!
-> Stefano
+>   Bot records its activity here:
 > 
+> -  https://patchwork.hopto.org/pw-bot.html
+> +  https://netdev.bots.linux.dev/pw-bot.html
+> 
+>   Review timelines
+>   ~~~~~~~~~~~~~~~~
+> --
+> 2.41.0
+
+Yes, thank you, this works much better through my masters' filters, both 
+here and through the patchwork links to the test result details.
+
+Reviewed by: Shannon Nelson <shannon.nelson@amd.com>
+
 
