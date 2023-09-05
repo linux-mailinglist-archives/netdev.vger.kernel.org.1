@@ -1,76 +1,80 @@
-Return-Path: <netdev+bounces-32031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E05097921D7
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 12:22:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A33EF7921DA
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 12:29:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99DC12810A7
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 10:22:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 705731C20930
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 10:29:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA1F38485;
-	Tue,  5 Sep 2023 10:22:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 354748C14;
+	Tue,  5 Sep 2023 10:29:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C369D8835
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 10:22:47 +0000 (UTC)
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5A611AB;
-	Tue,  5 Sep 2023 03:22:43 -0700 (PDT)
-Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-99c1d03e124so323051166b.2;
-        Tue, 05 Sep 2023 03:22:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693909362; x=1694514162; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OAZ9jRe0bzAzd6VhG2nCrvonILXtr+sxGi5FjeeHfTA=;
-        b=d4EKutAZafHvZi+ds5DVcldWFK1eaq2LOaCWMBb2Mi+r8159G3Er7wA5+RxsSQMk0C
-         u+uej6DMjadhW208pISpcE41F3VhHS2uwwt8jO38Dx8aKbQir3I8nbwNeBzU4aH74lgI
-         RgyT09IplaZnndvhhzmaTqdHASmhdmowywD+9DIJvzFRgih75BAfk1OBpl4DEko9K/qM
-         1wJ9OPQmHO3djrKqPW8f8b4o34gZq12Pfsw11+y/j59/On1rUS6g6u7oSnQMy3s2t/E4
-         75w1uOiHOlrV0vhd7dmtf+dnvK5tx7W9RkeHXBNv3YcPmbeDn+APaY7WvhFSf++Xcc7k
-         gDrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693909362; x=1694514162;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OAZ9jRe0bzAzd6VhG2nCrvonILXtr+sxGi5FjeeHfTA=;
-        b=FQAlyjLzlxFJQLmRNggd8FRJ30pOpasPFPV5+634a8c4BQmFXHOeQecVd3gRSRIgmr
-         JxPK0Sy0DTcTg/kOn05Gh4ys+mYpetVUZHlm0hhQlLIAAD2+ngqvWVEY21UYUsiJucrZ
-         iRDlDmOnWBZzAtY0qbjXtCwfLw519Q6qtffme0VxyTyopac2l5eO6i+m4fW1Tw9WhGUI
-         xm2T2atC/cmg+0UAEQ39WoshWKtRjVM7r+ft8E2ZWW6brnShd+0gj8D0Uc91AB9kIx8+
-         l0L5oFH0YoFQk+3xQAE/LN0vqVgj4NSHejFnYfhQ/QMRoMWPABEHKK0nWXD+8pCDOrpF
-         l6UA==
-X-Gm-Message-State: AOJu0YwOWy3CHKp2MXDSGUh8ipm+yibzsw1FN4FnX9IqWRDS5m7i0nBI
-	vJr5FUYvQ/kDUjP5LqDlhGw=
-X-Google-Smtp-Source: AGHT+IET9073GaNYuPveg/+7AZNtR5MZ5kiO9Cb1gts1cAcPYc/CWRlrpfRllzGw2MLnKt6Xv3CO+A==
-X-Received: by 2002:a17:907:762b:b0:9a1:e8c0:7e30 with SMTP id jy11-20020a170907762b00b009a1e8c07e30mr8401825ejc.7.1693909361991;
-        Tue, 05 Sep 2023 03:22:41 -0700 (PDT)
-Received: from skbuf ([188.26.57.165])
-        by smtp.gmail.com with ESMTPSA id s14-20020a17090699ce00b0099bccb03eadsm7297200ejn.205.2023.09.05.03.22.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Sep 2023 03:22:41 -0700 (PDT)
-Date: Tue, 5 Sep 2023 13:22:39 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
-	davem@davemloft.net, Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>, Tristram.Ha@microchip.com,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, UNGLinuxDriver@microchip.com,
-	George McCollister <george.mccollister@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 RFC 2/4] net: dsa: Extend ksz9477 TAG setup to support
- HSR frames duplication
-Message-ID: <20230905102239.mkufbzxwrvuatlrb@skbuf>
-References: <20230904120209.741207-1-lukma@denx.de>
- <20230904120209.741207-3-lukma@denx.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 143F66AAB;
+	Tue,  5 Sep 2023 10:29:34 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5CF4DB;
+	Tue,  5 Sep 2023 03:29:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1693909773; x=1725445773;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Bn7q6Tcu2HMXKbL23eq+DAUGqdWll8RQjB5RohTItbQ=;
+  b=DBwRdMJHpj03uJQj0+iTo1UjRzTehrF2TdXkkZwBgCmNPq7QQlAOwjnK
+   96+1HlG1roViquYLVDSl7anWSlvThXk2812zJuoaaDgE5rtk5GkAU7FV9
+   xZYPcGbG5xDc5kbOycAbDAp71dR+qE3Xk/q3bqMwnvYJly13Vj8wluko1
+   +feOadG4zR2ICWaYwiRmJd50fq/NE8F+p8IwVJvZACZWEO3ZetgrTSNHL
+   nXb7cU42Vy0njPI66ur5tlI1WJ/BJVsgC2szOP12amG6asV3SvBD5vKM+
+   rX7TYwgB/7KJKjt246fxo9ErtP9gVD81z7J2kNN1liSRVq+1mjNkHgvOr
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10823"; a="356254681"
+X-IronPort-AV: E=Sophos;i="6.02,229,1688454000"; 
+   d="scan'208";a="356254681"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2023 03:29:33 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10823"; a="734605190"
+X-IronPort-AV: E=Sophos;i="6.02,229,1688454000"; 
+   d="scan'208";a="734605190"
+Received: from unknown (HELO smile.fi.intel.com) ([10.237.72.54])
+  by orsmga007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2023 03:29:26 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.96)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1qdTJC-006efP-1u;
+	Tue, 05 Sep 2023 13:29:22 +0300
+Date: Tue, 5 Sep 2023 13:29:22 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: sdf@google.com, axboe@kernel.dk, asml.silence@gmail.com,
+	willemdebruijn.kernel@gmail.com, martin.lau@linux.dev,
+	krisman@suse.de, Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, io-uring@vger.kernel.org,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Alexander Mikhalitsyn <alexander@mihalicyn.com>,
+	Xin Long <lucien.xin@gmail.com>,
+	David Howells <dhowells@redhat.com>,
+	Jason Xing <kernelxing@tencent.com>
+Subject: Re: [PATCH v4 04/10] net/socket: Break down __sys_getsockopt
+Message-ID: <ZPcDAk81DAqevy43@smile.fi.intel.com>
+References: <20230904162504.1356068-1-leitao@debian.org>
+ <20230904162504.1356068-5-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,130 +83,74 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230904120209.741207-3-lukma@denx.de>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <20230904162504.1356068-5-leitao@debian.org>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Sep 04, 2023 at 02:02:07PM +0200, Lukasz Majewski wrote:
-> The KSZ9477 has support for HSR (High-Availability Seamless Redundancy).
-> One of its offloading (i.e. performed in the switch IC hardware) features
-> is to duplicate received frame to both HSR aware switch ports.
+On Mon, Sep 04, 2023 at 09:24:57AM -0700, Breno Leitao wrote:
+> Split __sys_getsockopt() into two functions by removing the core
+> logic into a sub-function (do_sock_getsockopt()). This will avoid
+> code duplication when doing the same operation in other callers, for
+> instance.
 > 
-> To achieve this goal - the tail TAG needs to be modified. To be more
-> specific, both ports must be marked as destination (egress) ones.
+> do_sock_getsockopt() will be called by io_uring getsockopt() command
+> operation in the following patch.
 > 
-> Moreover, according to AN3474 application note, the lookup bit (10)
-> should not be set in the tail tag.
-> 
-> Last but not least - the NETIF_F_HW_HSR_DUP flag indicates that the device
-> supports HSR and assures (in HSR core code) that frame is sent only once
-> from HOST to switch with tail tag indicating both ports.
-> 
-> Information about bits to be set in tag is provided via KSZ generic
-> ksz_hsr_get_ports() function.
-> 
-> Signed-off-by: Lukasz Majewski <lukma@denx.de>
-> ---
-> Changes for v2:
-> - Use ksz_hsr_get_ports() to obtain the bits values corresponding to
->   HSR aware ports
-> 
-> Changes for v3:
-> - None
-> ---
->  drivers/net/dsa/microchip/ksz_common.c | 12 ++++++++++++
->  include/linux/dsa/ksz_common.h         |  1 +
->  net/dsa/tag_ksz.c                      |  5 +++++
->  3 files changed, 18 insertions(+)
-> 
-> diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-> index d9d843efd111..579fde54d1e1 100644
-> --- a/drivers/net/dsa/microchip/ksz_common.c
-> +++ b/drivers/net/dsa/microchip/ksz_common.c
-> @@ -3421,6 +3421,18 @@ static int ksz_setup_tc(struct dsa_switch *ds, int port,
->  	}
->  }
->  
-> +u16 ksz_hsr_get_ports(struct dsa_switch *ds)
-> +{
-> +	struct ksz_device *dev = ds->priv;
+> The same was done for the setsockopt pair.
+
+...
+
+> +	ops = READ_ONCE(sock->ops);
+> +	if (level == SOL_SOCKET) {
+> +		err = sk_getsockopt(sock->sk, level, optname, optval, optlen);
+> +	} else if (unlikely(!ops->getsockopt)) {
+> +		err = -EOPNOTSUPP;
+> +	} else {
+> +		if (WARN_ONCE(optval.is_kernel || optlen.is_kernel,
+> +			      "Invalid argument type"))
+> +			return -EOPNOTSUPP;
 > +
-> +	switch (dev->chip_id) {
-> +	case KSZ9477_CHIP_ID:
-> +		return dev->hsr_ports;
+> +		err = ops->getsockopt(sock, level, optname, optval.user,
+> +				      optlen.user);
+> +	}
+
+Can be written as
+
+	} else if (WARN_ONCE(optval.is_kernel || optlen.is_kernel,
+			     "Invalid argument type"))
+		return -EOPNOTSUPP;
+	} else {
+		err = ops->getsockopt(sock, level, optname, optval.user,
+				      optlen.user);
+	}
+
+With that done, the {} are not needed anymore.
+
+> +	if (!compat) {
+
+	if (compat)
+		return err;
+
+> +		max_optlen = BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen);
+
+> +		err = BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock->sk, level, optname,
+> +						     optval, optlen, max_optlen,
+> +						     err);
+
+	return ... ?
+
 > +	}
 > +
-> +	return 0;
+> +	return err;
 > +}
 
-When CONFIG_NET_DSA_MICROCHIP_KSZ_COMMON=m:
+-- 
+With Best Regards,
+Andy Shevchenko
 
-ld.lld: error: undefined symbol: ksz_hsr_get_ports
-referenced by tag_ksz.c:298 (/opt/net-next/output-arm64-clang/../net/dsa/tag_ksz.c:298)
-              net/dsa/tag_ksz.o:(ksz9477_xmit) in archive vmlinux.a
 
-But before you rush to add EXPORT_SYMBOL_GPL(ksz_hsr_get_ports), be aware
-that due to DSA's design, tag_ksz.ko and ksz_common.ko cannot have any
-symbol dependency on each other, and if you do that, you will break
-module auto-loading. More information here, there were also patches that
-removed those dependencies for other tagger/switch driver pairs:
-https://lore.kernel.org/netdev/20210908220834.d7gmtnwrorhharna@skbuf/
-
-Not to mention that there are other problems with the "dev->hsr_ports"
-concept. For example, having a hsr0 over lan0 and lan1, and a hsr1 over
-lan2 and lan3, would set dev->hsr_ports to GENMASK(3, 0). But you want
-an xmit coming from hsr0 to get sent only to GENMASK(1, 0), and an xmit
-from hsr1 only to GENMASK(3, 2).
-
-In this particular case, the best option seems to be to delete ksz_hsr_get_ports().
-
-> +
->  static const struct dsa_switch_ops ksz_switch_ops = {
->  	.get_tag_protocol	= ksz_get_tag_protocol,
->  	.connect_tag_protocol   = ksz_connect_tag_protocol,
-> diff --git a/include/linux/dsa/ksz_common.h b/include/linux/dsa/ksz_common.h
-> index 576a99ca698d..fa3d9b0f3a72 100644
-> --- a/include/linux/dsa/ksz_common.h
-> +++ b/include/linux/dsa/ksz_common.h
-> @@ -50,4 +50,5 @@ ksz_tagger_data(struct dsa_switch *ds)
->  	return ds->tagger_data;
->  }
->  
-> +u16 ksz_hsr_get_ports(struct dsa_switch *ds);
->  #endif /* _NET_DSA_KSZ_COMMON_H_ */
-> diff --git a/net/dsa/tag_ksz.c b/net/dsa/tag_ksz.c
-> index ea100bd25939..903db95c37ee 100644
-> --- a/net/dsa/tag_ksz.c
-> +++ b/net/dsa/tag_ksz.c
-> @@ -293,6 +293,11 @@ static struct sk_buff *ksz9477_xmit(struct sk_buff *skb,
->  	if (is_link_local_ether_addr(hdr->h_dest))
->  		val |= KSZ9477_TAIL_TAG_OVERRIDE;
->  
-> +	if (dev->features & NETIF_F_HW_HSR_DUP) {
-> +		val &= ~KSZ9477_TAIL_TAG_LOOKUP;
-
-No need to unset a bit which was never set.
-
-> +		val |= ksz_hsr_get_ports(dp->ds);
-> +	}
-
-Would this work instead?
-
-	struct net_device *hsr_dev = dp->hsr_dev;
-	struct dsa_port *other_dp;
-
-	dsa_hsr_foreach_port(other_dp, dp->ds, hsr_dev)
-		val |= BIT(other_dp->index);
-
-> +
->  	*tag = cpu_to_be16(val);
->  
->  	return ksz_defer_xmit(dp, skb);
-> -- 
-> 2.20.1
-> 
 
