@@ -1,146 +1,159 @@
-Return-Path: <netdev+bounces-32094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4848E792329
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 15:52:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 25CC3792331
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 15:57:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76583280F11
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 13:52:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7443C2811DE
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 13:57:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55412D51F;
-	Tue,  5 Sep 2023 13:52:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABB80D521;
+	Tue,  5 Sep 2023 13:57:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 451D05664
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 13:52:34 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B0CE197
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 06:52:33 -0700 (PDT)
-Received: from canpemm500010.china.huawei.com (unknown [172.30.72.54])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Rg6KX0K2ZztSPR;
-	Tue,  5 Sep 2023 21:48:32 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by canpemm500010.china.huawei.com
- (7.192.105.118) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Tue, 5 Sep
- 2023 21:52:29 +0800
-From: Liu Jian <liujian56@huawei.com>
-To: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <hadi@cyberus.ca>,
-	<netdev@vger.kernel.org>
-CC: <liujian56@huawei.com>
-Subject: [PATCH net] net: ipv4: fix one memleak in __inet_del_ifa()
-Date: Tue, 5 Sep 2023 21:55:54 +0800
-Message-ID: <20230905135554.1958156-1-liujian56@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BD16D2F0
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 13:57:25 +0000 (UTC)
+Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46951197;
+	Tue,  5 Sep 2023 06:57:24 -0700 (PDT)
+Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-99c3c8adb27so385085666b.1;
+        Tue, 05 Sep 2023 06:57:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693922243; x=1694527043; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AbqRVHgQYQHhHZOk6eeSls+sEH+8z1toioax1pRSrQA=;
+        b=TgU27uf+DwLJLsSEgKST8+Z6yx8ttbmFZBx45RSGGKQJCkydlYk/yBk4pmarFFvdBV
+         75llmKmmbLZY4308Xj34P1nEjaUlNfRfFz+dIM2fJJRV7hJWDheDuvl+z8sb3x4ioYhC
+         Uo3qrw7sny2r2RcyKH6hwhJyWAWk/euTieQ7xQaEW7iXAlK9BvArx/HEOj2xe8hV6QRJ
+         2Yv0lv2oE5KDNKyEeLghZ6ker1SILjnhBUS1OyjNf8fBn8QHi1Ln5PNLWPTwQNSpGgO8
+         ID8Qjp1ICTDbI2sTN28jrYHzNpbV2E2WnBM8kzxDXKVMl3xiTKFu23Y2D6bAnraKQ3pO
+         uuOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693922243; x=1694527043;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AbqRVHgQYQHhHZOk6eeSls+sEH+8z1toioax1pRSrQA=;
+        b=Tc0dlz7gHW8BKsVA9zW/B8iZT508ayWHYLUvg/gxOC5pZmhB8ghVWNyWDPfoHfX0wf
+         6Z1uD2NuFIVu6mFcujmpU6NQ9I7HOM8UCQP/mhCFdsgz2rgbHtVoircFLv5JIImIByLt
+         TXC0tij/tSe1z/u7bQFcqyKubRokvzGJQqXvK8XhUFFhtWoeZ6guGdlV/lHOM1nKmCR9
+         t/hh7KPyiV/ChxA8eDCjumgsETmh6r+mo+EdzUMc8UZ3o1Xc9i29drejyvsCOPBFswJo
+         scgTvybyxgJC+KKEZqGWjf+0+YY6oFqCa6acpPHqFfgxYbRnBKArF/HOFU/rOFu83+kJ
+         JDqw==
+X-Gm-Message-State: AOJu0YxoL3UywGtY7lID7NQ+ePYGIDNkyf7TB4cYAzahpvs4SGjk/ioc
+	2LRyUd1lHpO/GKN24T6RM8A=
+X-Google-Smtp-Source: AGHT+IFUkfcraBHHjcQBhvbodWnNWOfSRc1PyhGLkQIHdxnC7JN5ddNxJpAQCPbpjEuB58MvQmJtPw==
+X-Received: by 2002:a17:907:7611:b0:9a5:ebfd:79a3 with SMTP id jx17-20020a170907761100b009a5ebfd79a3mr10419926ejc.29.1693922242624;
+        Tue, 05 Sep 2023 06:57:22 -0700 (PDT)
+Received: from skbuf ([188.26.57.165])
+        by smtp.gmail.com with ESMTPSA id p27-20020a17090635db00b00991d54db2acsm7594293ejb.44.2023.09.05.06.57.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Sep 2023 06:57:22 -0700 (PDT)
+Date: Tue, 5 Sep 2023 16:57:19 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
+	davem@davemloft.net, Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>, Tristram.Ha@microchip.com,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, UNGLinuxDriver@microchip.com,
+	George McCollister <george.mccollister@gmail.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 RFC 4/4] net: dsa: hsr: Provide generic HSR
+ ksz_hsr_{join|leave} functions
+Message-ID: <20230905135719.yycwfgonlt244gvx@skbuf>
+References: <20230904120209.741207-1-lukma@denx.de>
+ <20230904120209.741207-1-lukma@denx.de>
+ <20230904120209.741207-5-lukma@denx.de>
+ <20230904120209.741207-5-lukma@denx.de>
+ <20230905104725.zy3lwbxjhqhqyzdj@skbuf>
+ <20230905132351.2e129d53@wsk>
+ <20230905120501.tvkrrzcneq4fdzqa@skbuf>
+ <20230905154744.648c1a8b@wsk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.175.101.6]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- canpemm500010.china.huawei.com (7.192.105.118)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230905154744.648c1a8b@wsk>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-I got the below warning when do fuzzing test:
-unregister_netdevice: waiting for bond0 to become free. Usage count = 2
+On Tue, Sep 05, 2023 at 03:47:44PM +0200, Lukasz Majewski wrote:
+> > > Moreover, for me it seems more natural, that we only allow full HSR
+> > > support for 2 ports or none. Please be aware, that HSR supposed to
+> > > support only 2 ports, and having only one working is not
+> > > recommended by vendor.  
+> > 
+> > And where is it enforced that full HSR offload is only applied to 2
+> > ports or none?
+> 
+> In the ksz_jsr_join() at ksz_common.c -> we exit from this function
+> when !partner.
 
-It can be repoduced via:
+And what about 4 or 6 ports being placed as members of 2 or 3 HSR devices?
+How does the !partner condition help there?
 
-ip link add bond0 type bond
-sysctl -w net.ipv4.conf.bond0.promote_secondaries=1
-ip addr add 4.117.174.103/0 scope 0x40 dev bond0
-ip addr add 192.168.100.111/255.255.255.254 scope 0 dev bond0
-ip addr add 0.0.0.4/0 scope 0x40 secondary dev bond0
-ip addr del 4.117.174.103/0 scope 0x40 dev bond0
-ip link delete bond0 type bond
+> > Results:
+> > With KSZ9477 offloading support added: RX: 100 Mbps TX: 98 Mbps
+> > With no offloading                     RX: 63 Mbps  TX: 63 Mbps
+> > 
+> > What was the setup for the "no offloading" case?
+> > 
+> 
+> I used two boards. I've used the same kernel with and without HSR
+> offloading patches.
+> 
+> Cables were connected to port1 and port2 on each board. Non HSR network
+> was connected to port3.
+> 
+> > (a) kernel did not contain the offloading patch set
+> > 
+> 
+> Yes.
 
-In this reproduction test case, an incorrect 'last_prim' is found in
-__inet_del_ifa(), as a result, the secondary address(0.0.0.4/0 scope 0x40)
-is lost. The memory of the secondary address is leaked and the reference of
-in_device and net_device is leaked.
+Ok, then it would be good to check that your patch set does not break
+something that used to work (software HSR - easiest to check with a
+second pair of ports, but if not possible, it can also be emulated by
+returning -EOPNOTSUPP in .port_hsr_join on an artificial other condition).
 
-Fix this problem by modifying the PROMOTE_SECONDANCE behavior as follows:
-1. Traverse in_dev->ifa_list to search for the actual 'last_prim'.
-2. When last_prim is empty, move 'promote' to the in_dev->ifa_list header.
+> > (b) the testing was on hsr1, in the situation below:
+> > 
+> > ip link add name hsr0 type hsr slave1 lan1 slave2 lan2 supervision 45
+> > version 1 # offloaded ip link add name hsr1 type hsr slave1 lan3
+> > slave2 lan4 supervision 45 version 1 # unoffloaded
+> 
+> I did not setup two hsr devices on the same board. I've used two boards
+> with hsr0 setup on each.
 
-Fixes: 0ff60a45678e ("[IPV4]: Fix secondary IP addresses after promotion")
-Signed-off-by: Liu Jian <liujian56@huawei.com>
----
- net/ipv4/devinet.c | 26 ++++++++++++++++++++------
- 1 file changed, 20 insertions(+), 6 deletions(-)
+Ok, but can you?
 
-diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
-index 9cf64ee47dd2..99278f4b58e0 100644
---- a/net/ipv4/devinet.c
-+++ b/net/ipv4/devinet.c
-@@ -355,14 +355,13 @@ static void __inet_del_ifa(struct in_device *in_dev,
- {
- 	struct in_ifaddr *promote = NULL;
- 	struct in_ifaddr *ifa, *ifa1;
--	struct in_ifaddr *last_prim;
-+	struct in_ifaddr *last_prim = NULL;
- 	struct in_ifaddr *prev_prom = NULL;
- 	int do_promote = IN_DEV_PROMOTE_SECONDARIES(in_dev);
- 
- 	ASSERT_RTNL();
- 
- 	ifa1 = rtnl_dereference(*ifap);
--	last_prim = rtnl_dereference(in_dev->ifa_list);
- 	if (in_dev->dead)
- 		goto no_promotions;
- 
-@@ -371,7 +370,16 @@ static void __inet_del_ifa(struct in_device *in_dev,
- 	 **/
- 
- 	if (!(ifa1->ifa_flags & IFA_F_SECONDARY)) {
--		struct in_ifaddr __rcu **ifap1 = &ifa1->ifa_next;
-+		struct in_ifaddr __rcu **ifap1 = &in_dev->ifa_list;
-+
-+		while ((ifa = rtnl_dereference(*ifap1)) != NULL) {
-+			if (ifa1 == ifa)
-+				break;
-+			last_prim = ifa;
-+			ifap1 = &ifa->ifa_next;
-+		}
-+
-+		ifap1 = &ifa1->ifa_next;
- 
- 		while ((ifa = rtnl_dereference(*ifap1)) != NULL) {
- 			if (!(ifa->ifa_flags & IFA_F_SECONDARY) &&
-@@ -440,9 +448,15 @@ static void __inet_del_ifa(struct in_device *in_dev,
- 
- 			rcu_assign_pointer(prev_prom->ifa_next, next_sec);
- 
--			last_sec = rtnl_dereference(last_prim->ifa_next);
--			rcu_assign_pointer(promote->ifa_next, last_sec);
--			rcu_assign_pointer(last_prim->ifa_next, promote);
-+			if (last_prim) {
-+				last_sec = rtnl_dereference(last_prim->ifa_next);
-+				rcu_assign_pointer(promote->ifa_next, last_sec);
-+				rcu_assign_pointer(last_prim->ifa_next, promote);
-+			} else {
-+				rcu_assign_pointer(promote->ifa_next,
-+						   rtnl_dereference(in_dev->ifa_list));
-+				rcu_assign_pointer(in_dev->ifa_list, promote);
-+			}
- 		}
- 
- 		promote->ifa_flags &= ~IFA_F_SECONDARY;
--- 
-2.34.1
+> > (d) in some other way (please detail)
+> > 
+> > I was specifically asking about situation (b).
+> 
+> I did not tested the hsr0, hsr1 as my (real) use case is with KSZ9477
+> having only 3 ports available for connection (port 1,2,3).
 
+ksz_chip_data :: port_cnt is set to 7 for KSZ9477. I guess that the
+limitation of having only 3 user ports for testing is specific to your
+board, and not to the entire switch as may be seen on other boards,
+correct?
+
+It doesn't mean that the "single HSR device" restriction shouldn't be
+enforced.
 
