@@ -1,106 +1,247 @@
-Return-Path: <netdev+bounces-32087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32088-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCEE97922C8
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 14:58:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6023B7922CA
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 15:04:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2A391C20944
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 12:58:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6947E1C20960
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 13:04:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0508D314;
-	Tue,  5 Sep 2023 12:58:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45B84D506;
+	Tue,  5 Sep 2023 13:04:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B241ED30A
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 12:58:44 +0000 (UTC)
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 23E5CE9;
-	Tue,  5 Sep 2023 05:58:40 -0700 (PDT)
-Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 385CvqzO7024338, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 385CvqzO7024338
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 5 Sep 2023 20:57:52 +0800
-Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.17; Tue, 5 Sep 2023 20:58:19 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS03.realtek.com.tw (172.21.6.96) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.7; Tue, 5 Sep 2023 20:58:18 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::7445:d92b:d0b3:f79c]) by
- RTEXMBS04.realtek.com.tw ([fe80::7445:d92b:d0b3:f79c%5]) with mapi id
- 15.01.2375.007; Tue, 5 Sep 2023 20:58:18 +0800
-From: Hayes Wang <hayeswang@realtek.com>
-To: Paolo Abeni <pabeni@redhat.com>, "kuba@kernel.org" <kuba@kernel.org>,
-        "davem@davemloft.net" <davem@davemloft.net>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        nic_swsd
-	<nic_swsd@realtek.com>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "linux-usb@vger.kernel.org"
-	<linux-usb@vger.kernel.org>
-Subject: RE: [PATCH net] r8152: avoid the driver drops a lot of packets
-Thread-Topic: [PATCH net] r8152: avoid the driver drops a lot of packets
-Thread-Index: AQHZ3ynCVnk5WSMfQUWpVA7+s1E7KrALfhaAgACIBVD//4uUAIAAmlPQ
-Date: Tue, 5 Sep 2023 12:58:18 +0000
-Message-ID: <d46e648ffb2846bea6d7066673135ca0@realtek.com>
-References: <20230904121706.7132-420-nic_swsd@realtek.com>
-	 <32c71d3245127b4aa02b8abd75edcb8f5767e966.camel@redhat.com>
-	 <48d03f3134bf49c0b04b34464cd7487b@realtek.com>
- <223569649ad4ded66786fcc424156b2115b8ccd8.camel@redhat.com>
-In-Reply-To: <223569649ad4ded66786fcc424156b2115b8ccd8.camel@redhat.com>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-originating-ip: [172.22.228.6]
-x-kse-serverinfo: RTEXMBS03.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3266DC8CA
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 13:04:01 +0000 (UTC)
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FFE312E;
+	Tue,  5 Sep 2023 06:04:00 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-9a58dbd5daeso383353866b.2;
+        Tue, 05 Sep 2023 06:04:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693919038; x=1694523838; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AHvfGxDciDTH06pq4bTlZo2uCTCkpAd8V1AM1e/muUA=;
+        b=rfHwB149aAayB2aBrx6vkRsdoFHwEyWFkp9gG94EUSNy8M+TgtLLWHtz54UFlaN7It
+         EX60KA5yXdvttC8QYITq8szUQm1ap1cC21CSff0Xo1hjHt3MW313AxsX+mhiSIOP4JrH
+         LKFRp8z8kKYtqNhYERq0rjPe6Q0/gwY7NyicSzaaVI9ApBP7zpEQbElb2mITZwqu6TMI
+         +h+TVwfN+4vbbXBK0G4iuE4/LiC2B4enCvnMff0FSEXuVPaOTQF8ImtCkC7cqkZpN7zu
+         ltQgJvjwAVLFD8pgcPcruGxoN3iuQx3YSIkjN/dJgkxXx+jWDLkLZ7HDr+AC0Xa/gk/h
+         CA5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693919038; x=1694523838;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AHvfGxDciDTH06pq4bTlZo2uCTCkpAd8V1AM1e/muUA=;
+        b=UgZDKtWy7pULQ4s4h34YX7tpzCpUkr/k8ezxhKngL8arJbTT/7+O7v5PBRFhXjJ29g
+         a9sNdBEq7K2nRG7kFJyyIamt+vqayJveLMvLymuq7w8VF7yZVd4MvjoQ+NVhwy4SAVbo
+         HwwJm4MOEOnYPsmU3YAQ8TZoCONiPrvyG00f72TxHTGGZG00c9bLgpYyg72BfTTvtvw/
+         GBypR5OGWcwLHulkCxD7DKo2y806GD3yVBvlgCzrOmOxfCGSQpQDI3xi0c+pum8D1FGj
+         XiiAIqOZ5Dq73JLRbNdNrGHU+bnfTQ3CzMngPDebZrt8fXRpy4swJiNYwAiShZ0Igb5u
+         zL8g==
+X-Gm-Message-State: AOJu0YyDC10vBLyXOv+hrL0V0UeemLkaEOYmQYkKOoMuZVF6Pw0psFDg
+	c5a0lPN1Bzn9W6zLu4aHUbo=
+X-Google-Smtp-Source: AGHT+IEeHdfeiGoA2IpNlbRg7m43FRRjhp/tOkQR7lhcdDejxN9dbBemf9yKFi9319iaM9xx7z1FGQ==
+X-Received: by 2002:a17:906:20d0:b0:9a1:e994:3444 with SMTP id c16-20020a17090620d000b009a1e9943444mr5749881ejc.3.1693919038282;
+        Tue, 05 Sep 2023 06:03:58 -0700 (PDT)
+Received: from skbuf ([188.26.57.165])
+        by smtp.gmail.com with ESMTPSA id g14-20020a1709061e0e00b00988b8ff849csm7542881ejj.108.2023.09.05.06.03.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Sep 2023 06:03:57 -0700 (PDT)
+Date: Tue, 5 Sep 2023 16:03:55 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
+	davem@davemloft.net, Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>, Tristram.Ha@microchip.com,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, UNGLinuxDriver@microchip.com,
+	George McCollister <george.mccollister@gmail.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 RFC 3/4] net: dsa: hsr: Enable in KSZ9477 switch HW
+ HSR offloading
+Message-ID: <20230905130355.7x3vpgdlmdzg6skz@skbuf>
+References: <20230904120209.741207-1-lukma@denx.de>
+ <20230904120209.741207-1-lukma@denx.de>
+ <20230904120209.741207-4-lukma@denx.de>
+ <20230904120209.741207-4-lukma@denx.de>
+ <20230905103750.u3hbn6xmgthgdpnw@skbuf>
+ <20230905131103.67f41c13@wsk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230905131103.67f41c13@wsk>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-UGFvbG8gQWJlbmkgPHBhYmVuaUByZWRoYXQuY29tPg0KPiBTZW50OiBUdWVzZGF5LCBTZXB0ZW1i
-ZXIgNSwgMjAyMyA3OjIxIFBNDQpbLi4uXQ0KPiBJJ20gc29ycnksIEkgaGF2ZSBhIHZlcnkgc3Vw
-ZXJmaWNpYWwga25vd2xlZGdlIG9mIHRoZSBVU0IgbGF5ZXIsIGJ1dCBpdA0KPiBsb29rcyBsaWtl
-IHRoYXQgd2hlbiBzdWNoIGNvbmRpdGlvbiBpcyByZWFjaGVkLCBpbiB0aGUgd29yc3QgY29uZGl0
-aW9uDQo+IHRoZXJlIGNvdWxkIGJlIHVwIHRvIHVyYnMgaW4gZmxpZ2h0LiBBRkFJQ1MgZWFjaCBv
-ZiB0aGVtIGNhcnJpZXMgYSAxNksNCj4gYnVmZmVyLCBjYW4gYmUgdXAgdG8gMTAgc3RhbmRhcmQt
-bXR1IHBhY2tldHMgLSBvciBtdWNoIG1vcmUgc21hbGwgb25lcy4NCj4gDQo+IFNldHRpbmcgYW4g
-dXBwZXIgbGltaXRzIHRvIHRoZSByeF9xdWV1ZSBzdGlsbCBsb29rcyBsaWtlIGEgcmVhc29uYWJs
-ZQ0KPiBzYWZlZ3VhcmQuDQoNCkkgdGhpbmsgaXQgaXMgdmVyeSBoYXJkIHRvIHF1ZXVlIG1vcmUg
-dGhhbiAxMDAwIHBhY2tldHMuIFRoZSBOQVBJIGNvbnRpbnVlcw0KY29uc3VtaW5nIHRoZSBxdWV1
-ZWQgcGFja2V0cy4gQW5kLCB0aGUgaGFyZHdhcmUgd291bGRuJ3QgY29tcGxldGUgYWxsDQp1cmJz
-IGF0IG9uZSB0aW1lLiBIb3dldmVyLCBJIHdvdWxkIGFkZCBXQVJOX09OX09OQ0UoKSB0byBvYnNl
-cnZlIGlmIA0KYW55IGV4Y2VwdGlvbiB3b3VsZCBvY2N1ci4NCg0KPiA+IEJlc2lkZXMsIGlmIHRo
-ZSBmbG93IGNvbnRyb2wgaXMgZGlzYWJsZWQsIHRoZSBwYWNrZXRzIG1heSBiZSBkcm9wcGVkIGJ5
-DQo+ID4gdGhlIGhhcmR3YXJlIHdoZW4gdGhlIEZJRk8gb2YgdGhlIGRldmljZSBpcyBmdWxsLCBh
-ZnRlciB0aGUgZHJpdmVyIHN0b3BzDQo+ID4gc3VibWl0dGluZyByeC4NCj4gDQo+IElmIHRoZSBp
-bmNvbWluZyByYXRlIGV4Y2VlZHMgdGhlIEgvVyBwcm9jZXNzaW5nIGNhcGFjaXR5LCBwYWNrZXRz
-IGFyZQ0KPiBkcm9wcGVkOiB0aGF0IGlzIGV4cGVjdGVkIGFuZCB1bmF2b2lkYWJsZS4NCj4gDQo+
-IFBvc3NpYmx5IGV4cG9zaW5nIHRoZSByb290IGNhdXNlIGZvciBzdWNoIGRyb3BzIHRvIHVzZXIg
-c3BhY2UgdmlhDQo+IGFwcHJvcHJpYXRlIHN0YXRzIHdvdWxkIGJlIHVzZWZ1bC4NCg0KVGhlIG51
-bWJlciBvZiBwYWNrZXQgd2hpY2ggdGhlIGRldmljZSBkcm9wcyBjb3VsZCBiZSBnb3QgdGhyb3Vn
-aA0KZXRodG9vbC4NCg0KQmVzdCBSZWdhcmRzLA0KSGF5ZXMNCg0KDQo=
+On Tue, Sep 05, 2023 at 01:11:03PM +0200, Lukasz Majewski wrote:
+> > > +/* The KSZ9477 provides following HW features to accelerate
+> > > + * HSR frames handling:
+> > > + *
+> > > + * 1. TX PACKET DUPLICATION FROM HOST TO SWITCH
+> > > + * 2. RX PACKET DUPLICATION DISCARDING
+> > > + * 3. PREVENTING PACKET LOOP IN THE RING BY SELF-ADDRESS FILTERING
+> > > + *
+> > > + * Only one from point 1. has the NETIF_F* flag available.
+> > > + *
+> > > + * Ones from point 2 and 3 are "best effort" - i.e. those will
+> > > + * work correctly most of the time, but it may happen that some
+> > > + * frames will not be caught. Hence, the SW needs to handle those
+> > > + * special cases. However, the speed up gain is considerable when
+> > > + * above features are used.
+> > > + *
+> > > + * Moreover, the NETIF_F_HW_HSR_FWD feature is also enabled, as HSR frames
+> > > + * can be forwarded in the switch fabric between HSR ports.  
+> > 
+> > How do these 2 concepts (autonomous forwarding + software-based
+> > elimination of some frames) work together? If software is not the sole
+> > receiver of traffic which needs to be filtered further, and duplicates
+> > also get forwarded to the network, does this not break the HSR ring?
+> > 
+> 
+> Autonomous forwarding is based on KSZ9477, having the HSR ports
+> "bridged" to send frames between them.
+> 
+> Then, there is also based on HSR tag, and SA in-KSZ9477 feature RX
+> packet duplication discarding which will discard duplicated frames.
+> 
+> Last but not least the - packet loop prevention.
+> 
+> My understanding is as follows:
+> 
+> 1. RX packet duplication removes copy of a frame, which is addressed to
+> cpu port of switch.
+
+Does the duplicate elimination function only do that, as you say, or is
+it supposed to also eliminate duplicates for packets flooded to 2 ports
+as well (the host port, and the other ring port)?
+
+If the latter, then it will fail to eliminate duplicates for packets
+that didn't visit the CPU. So the ring will rely on the self-address
+filtering capability of the other devices, in order not to collapse.
+I see that the software implementation also offers self-address
+filtering in hsr_handle_frame() -> hsr_addr_is_self(), but I don't see
+anything making that mandatory in IEC 62439-3:2018. Can we assume that
+the other ring members will know how to deal with it?
+
+> 2. The "bridge" of HSR passes frames in-KSZ9477, which are not
+> addressed to this cpu host (between other HSR nodes).
+
+How is the switch supposed to know which packets are addressed to this
+CPU port and which are not? I expect separate answers for unicast,
+multicast and broadcast.
+
+> 3. Packet loop prevention - the HSR packet with SA of note which sent
+> it - is not further forwarded.
+> 
+> > What are the causes due to which self-address filtering and duplicate
+> > elimination only work "most of the time"?
+> 
+> Please refer to section "KSZ9477 CHIP LIMITATIONS" in:
+> https://ww1.microchip.com/downloads/en/Appnotes/AN3474-KSZ9477-High-Availability-Seamless-Redundancy-Application-Note-00003474A.pdf
+
+Ok, so the limitation is a race condition in hardware such that, when
+duplicate packets are received on member ports very close in time to
+each other, the hardware fails to detect that they're duplicates.
+
+> > > +	/* Enable discarding of received HSR frames */
+> > > +	ksz_read8(dev, REG_HSR_ALU_CTRL_0__1, &data);
+> > > +	data |= HSR_DUPLICATE_DISCARD;
+> > > +	data &= ~HSR_NODE_UNICAST;
+> > > +	ksz_write8(dev, REG_HSR_ALU_CTRL_0__1, data);
+> > > +
+> > > +	/* Self MAC address filtering for HSR frames to avoid
+> > > +	 * traverse of the HSR ring more than once.
+> > > +	 *
+> > > +	 * The HSR port (i.e. hsr0) MAC address is used.
+> > > +	 */
+> > > +	for (i = 0; i < ETH_ALEN; i++) {
+> > > +		ret = ksz_write8(dev, REG_SW_MAC_ADDR_0 + i, hsr->dev_addr[i]);
+> > > +		if (ret)
+> > > +			return ret;  
+> > 
+> > FWIW:
+> > https://lore.kernel.org/netdev/155ff37f-43d5-5fe0-6de4-c4639909553d@gmail.com/
+> > Some coordination will be required regarding the MAC address that the
+> > switch driver needs to program to these registers. 
+> 
+> Writing of this MAC address is _required_ for PREVENTING PACKET LOOP IN
+> THE RING BY SELF-ADDRESS FILTERING feature.
+
+In case it was not clear, I was talking about coordination between you
+and Oleksij. He needs to program the same register for Wake on LAN.
+
+> In the ifconfig output - the lan1, lan2 and hsr0 shall all have the
+> same MAC address assigned.
+> 
+> I simply take the hsr0 mac address.
+> 
+> > It seems that it is not single purpose.
+> 
+> At least in the case of HSR it looks like single purpose (for the loop
+> prevention).
+
+And for WoL, REG_SW_MAC_ADDR_0 is also single purpose. And for the MAC SA
+in the generated PAUSE frames, also single purpose. Single + single + single = ?
+
+Being a common register for multiple functions, I hope that it won't be
+the users who discover than when multiple functionalities are used in
+tandem (like WoL+HSR), they partially overwrite what the other has done.
+
+So, by coordination, I mean something like a cohesive way of thinking
+out the driver.
+
+For WoL/pause frames, the linked discussion suggested that the switch
+MAC address could be kept in sync with the DSA master's MAC address.
+
+Could that also work here, and could we add a restriction to say
+"Offload not supported for HSR device with a MAC address different from the DSA master"
+and return -EOPNOTSUPP in ksz_hsr_join()? Then ksz9477_hsr_join() would
+not modify this register.
+
+> > > +	/* Enable per port self-address filtering */
+> > > +	ksz_port_cfg(dev, port, REG_PORT_LUE_CTRL,
+> > > PORT_SRC_ADDR_FILTER, true);
+> > > +	ksz_port_cfg(dev, partner->index, REG_PORT_LUE_CTRL,
+> > > +		     PORT_SRC_ADDR_FILTER, true);
+> > > +
+> > > +	/* Setup HW supported features for lan HSR ports */
+> > > +	slave = dsa_to_port(ds, port)->slave;
+> > > +	slave->features |= KSZ9477_SUPPORTED_HSR_FEATURES;
+> > > +
+> > > +	slave = dsa_to_port(ds, partner->index)->slave;
+> > > +	slave->features |= KSZ9477_SUPPORTED_HSR_FEATURES;  
+> > 
+> > Can the code that is duplicated for the partner port be moved to the
+> > caller?
+> 
+> I've followed the convention from xrs700x driver, where we only make
+> setup when we are sure that on both HSR ports the "join" has been
+> called.
+
+If code that is duplicated for both member ports can be moved to code
+paths that get executed for each individual port, then the resulting
+driver code may turn out to be less complex.
+
+It's not a big deal if it can't, and maintaining a sane operating mode
+in that transient state (HSR device with a single member port) is
+obviously much more important. But the question was if it can, and I
+don't think you've answered that?
 
