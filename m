@@ -1,110 +1,238 @@
-Return-Path: <netdev+bounces-32130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE986792EFC
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 21:32:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D173792F1E
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 21:42:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DE642810F0
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 19:32:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 556851C20956
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 19:42:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D01B1DF41;
-	Tue,  5 Sep 2023 19:32:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EA24DF44;
+	Tue,  5 Sep 2023 19:42:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE20EDDD5
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 19:32:45 +0000 (UTC)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 068711719;
-	Tue,  5 Sep 2023 12:32:23 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B6CB8106F;
-	Tue,  5 Sep 2023 09:10:04 -0700 (PDT)
-Received: from [10.1.36.15] (010265703453.arm.com [10.1.36.15])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0AFCF3F64C;
-	Tue,  5 Sep 2023 09:09:19 -0700 (PDT)
-Message-ID: <e949a91f-88b3-681e-6e0e-d5d1e8922284@arm.com>
-Date: Tue, 5 Sep 2023 17:09:15 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FABFDDAF
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 19:42:07 +0000 (UTC)
+Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACBD590
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 12:42:05 -0700 (PDT)
+Received: from mg.bb.i.ssi.bg (localhost [127.0.0.1])
+	by mg.bb.i.ssi.bg (Proxmox) with ESMTP id 7B0CD15D23;
+	Tue,  5 Sep 2023 20:20:44 +0300 (EEST)
+Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
+	by mg.bb.i.ssi.bg (Proxmox) with ESMTPS id 61AC315C2D;
+	Tue,  5 Sep 2023 20:20:44 +0300 (EEST)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by ink.ssi.bg (Postfix) with ESMTPSA id F0CAE3C07C9;
+	Tue,  5 Sep 2023 20:20:40 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
+	t=1693934442; bh=uXnsxklPke/43riYwZDEv4JEk3rKSn5WwWSVg+JZpV0=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References;
+	b=pi96SiJ/FmTInPSx2HWpMx0mizhRBHnrihp/wmS5wV7hY7R7zXnBrVfiWz5eBFofx
+	 L6DJjeg04aS++rrSrb6TjvuBF4OOncieqshv8Fz12QegxM+ANC/nWwCwai8FTd355E
+	 gRjqlxskkC3+qD4fJsGsVF9bYDqzRnr47jIKUr/E=
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.17.1/8.17.1) with ESMTP id 385HKcQe109697;
+	Tue, 5 Sep 2023 20:20:39 +0300
+Date: Tue, 5 Sep 2023 20:20:38 +0300 (EEST)
+From: Julian Anastasov <ja@ssi.bg>
+To: Liu Jian <liujian56@huawei.com>
+cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, hadi@cyberus.ca,
+        netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: ipv4: fix one memleak in __inet_del_ifa()
+In-Reply-To: <20230905135554.1958156-1-liujian56@huawei.com>
+Message-ID: <bcb0e791-37ab-3fff-9da6-a86883924205@ssi.bg>
+References: <20230905135554.1958156-1-liujian56@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-Subject: Re: [PATCH v12 0/6] iommu/dma: s390 DMA API conversion and optimized
- IOTLB flushing
-Content-Language: en-GB
-To: Matthew Rosato <mjrosato@linux.ibm.com>,
- Niklas Schnelle <schnelle@linux.ibm.com>, Joerg Roedel <joro@8bytes.org>,
- Will Deacon <will@kernel.org>, Wenjia Zhang <wenjia@linux.ibm.com>,
- Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Gerd Bayer <gbayer@linux.ibm.com>, Julian Ruess <julianr@linux.ibm.com>,
- Pierre Morel <pmorel@linux.ibm.com>, Alexandra Winter
- <wintera@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>,
- Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
- Hector Martin <marcan@marcan.st>, Sven Peter <sven@svenpeter.dev>,
- Alyssa Rosenzweig <alyssa@rosenzweig.io>,
- David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>,
- Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konrad.dybcio@linaro.org>, Yong Wu <yong.wu@mediatek.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
- Orson Zhai <orsonzhai@gmail.com>, Baolin Wang
- <baolin.wang@linux.alibaba.com>, Chunyan Zhang <zhang.lyra@gmail.com>,
- Chen-Yu Tsai <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>,
- Samuel Holland <samuel@sholland.org>,
- Thierry Reding <thierry.reding@gmail.com>, Krishna Reddy
- <vdumpa@nvidia.com>, Jonathan Hunter <jonathanh@nvidia.com>,
- Jonathan Corbet <corbet@lwn.net>, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, iommu@lists.linux.dev,
- asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- linux-arm-msm@vger.kernel.org, linux-mediatek@lists.infradead.org,
- linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org,
- linux-doc@vger.kernel.org
-References: <20230825-dma_iommu-v12-0-4134455994a7@linux.ibm.com>
- <240c26d3-b821-8410-3142-62e9a8656146@linux.ibm.com>
-From: Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <240c26d3-b821-8410-3142-62e9a8656146@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023-08-25 19:26, Matthew Rosato wrote:
-> On 8/25/23 6:11 AM, Niklas Schnelle wrote:
->> Hi All,
->>
->> This patch series converts s390's PCI support from its platform specific DMA
->> API implementation in arch/s390/pci/pci_dma.c to the common DMA IOMMU layer.
->> The conversion itself is done in patches 3-4 with patch 2 providing the final
->> necessary IOMMU driver improvement to handle s390's special IOTLB flush
->> out-of-resource indication in virtualized environments. The conversion
->> itself only touches the s390 IOMMU driver and s390 arch code moving over
->> remaining functions from the s390 DMA API implementation. No changes to
->> common code are necessary.
->>
-> 
-> I also picked up this latest version and ran various tests with ISM, mlx5 and some NVMe drives.  FWIW, I have been including versions of this series in my s390 dev environments for a number of months now and have also been building my s390 pci iommufd nested translation series on top of this, so it's seen quite a bit of testing from me at least.
-> 
-> So as far as I'm concerned anyway, this series is ready for -next (after the merge window).
 
-Agreed; I'll trust your reviews for the s390-specific parts, so indeed 
-it looks like this should have all it needs now and is ready for a nice 
-long soak in -next once Joerg opens the tree for 6.7 material.
+	Hello,
 
-Cheers,
-Robin.
+On Tue, 5 Sep 2023, Liu Jian wrote:
+
+> I got the below warning when do fuzzing test:
+> unregister_netdevice: waiting for bond0 to become free. Usage count = 2
+> 
+> It can be repoduced via:
+> 
+> ip link add bond0 type bond
+> sysctl -w net.ipv4.conf.bond0.promote_secondaries=1
+> ip addr add 4.117.174.103/0 scope 0x40 dev bond0
+> ip addr add 192.168.100.111/255.255.255.254 scope 0 dev bond0
+> ip addr add 0.0.0.4/0 scope 0x40 secondary dev bond0
+> ip addr del 4.117.174.103/0 scope 0x40 dev bond0
+> ip link delete bond0 type bond
+> 
+> In this reproduction test case, an incorrect 'last_prim' is found in
+> __inet_del_ifa(), as a result, the secondary address(0.0.0.4/0 scope 0x40)
+> is lost. The memory of the secondary address is leaked and the reference of
+> in_device and net_device is leaked.
+> 
+> Fix this problem by modifying the PROMOTE_SECONDANCE behavior as follows:
+> 1. Traverse in_dev->ifa_list to search for the actual 'last_prim'.
+> 2. When last_prim is empty, move 'promote' to the in_dev->ifa_list header.
+
+	So, the problem is that last_prim initially points to the
+first primary address that we are actually removing. Looks like with 
+last_prim we try to promote the secondary IP after all primaries with
+scope >= our scope, i.e. simulating a new IP insert. As the secondary IPs 
+have same scope as their primary, why just not remove the last_prim 
+var/code and to insert the promoted secondary at the same place as the 
+deleted primary? May be your patch does the same: insert at same pos?
+
+Before deletion:
+1. primary1 scope global (to be deleted)
+2. primary2 scope global
+3. promoted_secondary
+
+After deletion (old way, promote as a new insertion):
+1. primary2 scope global   
+2. promoted_secondary scope global (inserted as new primary)
+
+After deletion (new way, promote at same place):
+1. promoted_secondary scope global (now primary, inserted at same place)
+2. primary2 scope global   
+
+	What I mean is to use ifap as last_prim, not tested:
+
+diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
+index 5deac0517ef7..7c71fa8996bb 100644
+--- a/net/ipv4/devinet.c
++++ b/net/ipv4/devinet.c
+@@ -355,14 +355,12 @@ static void __inet_del_ifa(struct in_device *in_dev,
+ {
+ 	struct in_ifaddr *promote = NULL;
+ 	struct in_ifaddr *ifa, *ifa1;
+-	struct in_ifaddr *last_prim;
+ 	struct in_ifaddr *prev_prom = NULL;
+ 	int do_promote = IN_DEV_PROMOTE_SECONDARIES(in_dev);
+ 
+ 	ASSERT_RTNL();
+ 
+ 	ifa1 = rtnl_dereference(*ifap);
+-	last_prim = rtnl_dereference(in_dev->ifa_list);
+ 	if (in_dev->dead)
+ 		goto no_promotions;
+ 
+@@ -374,10 +372,6 @@ static void __inet_del_ifa(struct in_device *in_dev,
+ 		struct in_ifaddr __rcu **ifap1 = &ifa1->ifa_next;
+ 
+ 		while ((ifa = rtnl_dereference(*ifap1)) != NULL) {
+-			if (!(ifa->ifa_flags & IFA_F_SECONDARY) &&
+-			    ifa1->ifa_scope <= ifa->ifa_scope)
+-				last_prim = ifa;
+-
+ 			if (!(ifa->ifa_flags & IFA_F_SECONDARY) ||
+ 			    ifa1->ifa_mask != ifa->ifa_mask ||
+ 			    !inet_ifa_match(ifa1->ifa_address, ifa)) {
+@@ -415,7 +409,7 @@ static void __inet_del_ifa(struct in_device *in_dev,
+ no_promotions:
+ 	/* 2. Unlink it */
+ 
+-	*ifap = ifa1->ifa_next;
++	rcu_assign_pointer(*ifap, rtnl_dereference(ifa1->ifa_next));
+ 	inet_hash_remove(ifa1);
+ 
+ 	/* 3. Announce address deletion */
+@@ -440,9 +434,9 @@ static void __inet_del_ifa(struct in_device *in_dev,
+ 
+ 			rcu_assign_pointer(prev_prom->ifa_next, next_sec);
+ 
+-			last_sec = rtnl_dereference(last_prim->ifa_next);
++			last_sec = rtnl_dereference(*ifap);
+ 			rcu_assign_pointer(promote->ifa_next, last_sec);
+-			rcu_assign_pointer(last_prim->ifa_next, promote);
++			rcu_assign_pointer(*ifap, promote);
+ 		}
+ 
+ 		promote->ifa_flags &= ~IFA_F_SECONDARY;
+> 
+> Fixes: 0ff60a45678e ("[IPV4]: Fix secondary IP addresses after promotion")
+> Signed-off-by: Liu Jian <liujian56@huawei.com>
+> ---
+>  net/ipv4/devinet.c | 26 ++++++++++++++++++++------
+>  1 file changed, 20 insertions(+), 6 deletions(-)
+> 
+> diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
+> index 9cf64ee47dd2..99278f4b58e0 100644
+> --- a/net/ipv4/devinet.c
+> +++ b/net/ipv4/devinet.c
+> @@ -355,14 +355,13 @@ static void __inet_del_ifa(struct in_device *in_dev,
+>  {
+>  	struct in_ifaddr *promote = NULL;
+>  	struct in_ifaddr *ifa, *ifa1;
+> -	struct in_ifaddr *last_prim;
+> +	struct in_ifaddr *last_prim = NULL;
+>  	struct in_ifaddr *prev_prom = NULL;
+>  	int do_promote = IN_DEV_PROMOTE_SECONDARIES(in_dev);
+>  
+>  	ASSERT_RTNL();
+>  
+>  	ifa1 = rtnl_dereference(*ifap);
+> -	last_prim = rtnl_dereference(in_dev->ifa_list);
+>  	if (in_dev->dead)
+>  		goto no_promotions;
+>  
+> @@ -371,7 +370,16 @@ static void __inet_del_ifa(struct in_device *in_dev,
+>  	 **/
+>  
+>  	if (!(ifa1->ifa_flags & IFA_F_SECONDARY)) {
+> -		struct in_ifaddr __rcu **ifap1 = &ifa1->ifa_next;
+> +		struct in_ifaddr __rcu **ifap1 = &in_dev->ifa_list;
+> +
+> +		while ((ifa = rtnl_dereference(*ifap1)) != NULL) {
+> +			if (ifa1 == ifa)
+> +				break;
+> +			last_prim = ifa;
+> +			ifap1 = &ifa->ifa_next;
+> +		}
+> +
+> +		ifap1 = &ifa1->ifa_next;
+>  
+>  		while ((ifa = rtnl_dereference(*ifap1)) != NULL) {
+>  			if (!(ifa->ifa_flags & IFA_F_SECONDARY) &&
+> @@ -440,9 +448,15 @@ static void __inet_del_ifa(struct in_device *in_dev,
+>  
+>  			rcu_assign_pointer(prev_prom->ifa_next, next_sec);
+>  
+> -			last_sec = rtnl_dereference(last_prim->ifa_next);
+> -			rcu_assign_pointer(promote->ifa_next, last_sec);
+> -			rcu_assign_pointer(last_prim->ifa_next, promote);
+> +			if (last_prim) {
+> +				last_sec = rtnl_dereference(last_prim->ifa_next);
+> +				rcu_assign_pointer(promote->ifa_next, last_sec);
+> +				rcu_assign_pointer(last_prim->ifa_next, promote);
+> +			} else {
+> +				rcu_assign_pointer(promote->ifa_next,
+> +						   rtnl_dereference(in_dev->ifa_list));
+> +				rcu_assign_pointer(in_dev->ifa_list, promote);
+> +			}
+>  		}
+>  
+>  		promote->ifa_flags &= ~IFA_F_SECONDARY;
+> -- 
+> 2.34.1
+
+Regards
+
+--
+Julian Anastasov <ja@ssi.bg>
+
 
