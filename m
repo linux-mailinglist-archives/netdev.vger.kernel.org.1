@@ -1,236 +1,104 @@
-Return-Path: <netdev+bounces-32069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FA6A792263
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 14:00:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BD51792260
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 13:59:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2FE01C20971
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 12:00:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C34E01C20944
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 11:59:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76F8AD2EF;
-	Tue,  5 Sep 2023 12:00:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C215FD2EE;
+	Tue,  5 Sep 2023 11:59:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A293D2EE
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 12:00:07 +0000 (UTC)
-Received: from mail.avm.de (mail.avm.de [IPv6:2001:bf0:244:244::120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA44DCE4;
-	Tue,  5 Sep 2023 05:00:05 -0700 (PDT)
-Received: from mail-auth.avm.de (dovecot-mx-01.avm.de [212.42.244.71])
-	by mail.avm.de (Postfix) with ESMTPS;
-	Tue,  5 Sep 2023 13:49:48 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=avm.de; s=mail;
-	t=1693914588; bh=y0Z8uS0jGL6JIldZzeA/+r6i6F/i5k0+Bi7Q1VDh2Tw=;
-	h=From:Date:Subject:To:Cc:From;
-	b=mYtk9pFkvK+PC4NOfBSh/p95Rr7q2/hadfRFx+N/DO+0ABB2jQnfFn6N3HpHe1/PX
-	 lHbYLopzvxPhASR8O3FvuHf8k1iJvjpt493oBEYodV4S6+UYI/puDiOX4D2abK7oZv
-	 UcF3z7+REb9NdmgY5x7fNeOVVa9lvFk90j2A05u0=
-Received: from localhost (unknown [172.17.88.63])
-	by mail-auth.avm.de (Postfix) with ESMTPSA id B613B82160;
-	Tue,  5 Sep 2023 13:49:49 +0200 (CEST)
-From: Johannes Nixdorf <jnixdorf-oss@avm.de>
-Date: Tue, 05 Sep 2023 13:47:26 +0200
-Subject: [PATCH iproute2-next v3] iplink: bridge: Add support for bridge
- FDB learning limits
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5F4DCA70
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 11:59:52 +0000 (UTC)
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87D361AD
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 04:59:51 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-40037db2fe7so24145685e9.0
+        for <netdev@vger.kernel.org>; Tue, 05 Sep 2023 04:59:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1693915190; x=1694519990; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=H9w3uV4OtPsdBYbHCTZu/QSzm/qmPZOCTm5LGAMv9s8=;
+        b=uD2PQQ0XrE3fYNLL0YuN7mGm1A9gTTPFFwi6IGsZ6gOa1nMHXYZewvnOTeQD1DS9Ud
+         NFyrR/NBRTJk2rpMOB8KWjZnnRmm78Vl6Dw3BTT70d/LfOieLJR/PrE7KKf9gZ+1WdEP
+         tGnYNe8+dET1/cIyD+7+Bka48XdJuvwWPWzEyJqTiM7CgfeR4idahStBR9QUcbkNFFJl
+         KJAkWFLn/KDgEaRAgLeepUFHmwUPQA7efFTJO61ALFTu3nWz6/LwDCiDtXBuM8wqdpfT
+         vKIVr8Y5MBkruKS+8wpciyurMs7q2KizzgSnGDAcI1hCst4kFYjweYasYBZ4Z1nk7RSI
+         2Iow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693915190; x=1694519990;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=H9w3uV4OtPsdBYbHCTZu/QSzm/qmPZOCTm5LGAMv9s8=;
+        b=Vuxx8UwFwfo09NiRNczgXJSQ/jQUfBy9S69eShPW4gEhsm4MQtUq7oTfQumcKywdHk
+         T9MPTyBp75QVaIB1Y+DDTxnCqK/RuBkeZPYYKRw1chOrpdtGDVhprLM0uUwdW8tNrxaG
+         rwE1PFOUSKZrznU1mrwQLJRNtjaksmPc4OgVxIGS6GwAbR8Rh8Vd7Ib/9iY3pOzzcx8X
+         cHbLQ+tvY78NLmF24Y45hJO3muZJGyauOWZUCdHtrzOhcgDNPwk6nkc0OlHpNrdIRVAE
+         uFpqb4GvDCUEsEDFK2yRupoMisAZpgniD8fDLlauLL7AgHDk3qGY/j7hZcG6y7yifLhM
+         p+TQ==
+X-Gm-Message-State: AOJu0YznfUBdh7fGOzMPDFrQIPeXpRzhCEmt2zBPMKwzkc9/Ob8XMxaU
+	ImUpj2+6orcVayOAjWEhK1yoOYfHCMQdECQz8cw=
+X-Google-Smtp-Source: AGHT+IHXh3GSboJMjsDNLpubzBj884qaOle8e1HaDZcS5Oou0lZ3DTIj6eJGKfPhqNq6aeaPHcx9pw==
+X-Received: by 2002:adf:f208:0:b0:318:7d5:67bf with SMTP id p8-20020adff208000000b0031807d567bfmr9465711wro.49.1693915190016;
+        Tue, 05 Sep 2023 04:59:50 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id 16-20020a05600c025000b003fee7b67f67sm16725545wmj.31.2023.09.05.04.59.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Sep 2023 04:59:49 -0700 (PDT)
+Date: Tue, 5 Sep 2023 14:59:47 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Jinjie Ruan <ruanjinjie@huawei.com>, netdev@vger.kernel.org
+Cc: gregkh@linuxfoundation.org, philipp.g.hortmann@gmail.com,
+	straube.linux@gmail.com, Larry.Finger@lwfinger.net,
+	wlanfae@realtek.com, mikem@ring3k.org, seanm@seanm.ca,
+	linux-staging@lists.linux.dev
+Subject: Re: [PATCH -next v2 0/3] staging: rtl8192e: Do not call kfree_skb()
+ under spin_lock_irqsave()
+Message-ID: <d7326392-56e4-4ccb-a878-0a03c91d0d85@kadam.mountain>
+References: <20230825015213.2697347-1-ruanjinjie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20230905-fdb_limit-v3-1-34bb124556d8@avm.de>
-X-B4-Tracking: v=1; b=H4sIAE0V92QC/x3MWwqAIBBA0a3EfCeYvdtKRJhONVAWaiFEe0/6P
- HC5Dzi0hA665AGLNzk6TESeJqBWaRZkpKNBcJHzlpds1tO40U6eSYVZUdWqkk0BsT8tzhT+Vw9
- 02uPyKJjB4GF43w+p9A/AagAAAA==
-To: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>, 
- David Ahern <dsahern@gmail.com>, Eric Dumazet <edumazet@google.com>, 
- Florian Fainelli <f.fainelli@gmail.com>, Ido Schimmel <idosch@nvidia.com>, 
- Jakub Kicinski <kuba@kernel.org>, Nikolay Aleksandrov <razor@blackwall.org>, 
- Oleksij Rempel <linux@rempel-privat.de>, Paolo Abeni <pabeni@redhat.com>, 
- Roopa Prabhu <roopa@nvidia.com>, Shuah Khan <shuah@kernel.org>, 
- Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: bridge@lists.linux-foundation.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- Johannes Nixdorf <jnixdorf-oss@avm.de>
-X-Mailer: b4 0.12.3
-X-purgate-ID: 149429::1693914588-237FCDFA-E2BDE4C9/0/0
-X-purgate-type: clean
-X-purgate-size: 5416
-X-purgate-Ad: Categorized by eleven eXpurgate (R) http://www.eleven.de
-X-purgate: This mail is considered clean (visit http://www.eleven.de for further information)
-X-purgate: clean
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230825015213.2697347-1-ruanjinjie@huawei.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Support setting the FDB limit through ip link. The arguments is:
- - fdb_max_learned_entries: A 32-bit unsigned integer specifying the
-                            maximum number of learned FDB entries, with 0
-                            disabling the limit.
+Added netdev because they're really the experts.
 
-Also support reading back the current number of learned FDB entries in
-the bridge by this count. The returned value's name is:
- - fdb_n_learned_entries: A 32-bit unsigned integer specifying the
-                          current number of learned FDB entries.
+On Fri, Aug 25, 2023 at 09:52:10AM +0800, Jinjie Ruan wrote:
+> It is not allowed to call kfree_skb() from hardware interrupt
+> context or with interrupts being disabled.
 
-Example:
+There are no comments which say that this is not allowed.  I have
+reviewed the code to see why it's not allowed.  The only thing I can
+see is that maybe the skb->destructor(skb); in skb_release_head_state()
+sleeps?  Or possibly the uarg->callback() in skb_zcopy_clear()?
 
- # ip -d -j -p link show br0
-[ {
-...
-        "linkinfo": {
-            "info_kind": "bridge",
-            "info_data": {
-...
-                "fdb_n_learned_entries": 2,
-                "fdb_max_learned_entries": 0,
-...
-            }
-        },
-...
-    } ]
- # ip link set br0 type bridge fdb_max_learned_entries 1024
- # ip -d -j -p link show br0
-[ {
-...
-        "linkinfo": {
-            "info_kind": "bridge",
-            "info_data": {
-...
-                "fdb_n_learned_entries": 2,
-                "fdb_max_learned_entries": 1024,
-...
-            }
-        },
-...
-    } ]
+Can you comment more on why this isn't allowed?  Was this detected at
+runtime?  Do you have a stack trace?
 
-Signed-off-by: Johannes Nixdorf <jnixdorf-oss@avm.de>
----
-Changes since v2:
- - Properly split the net-next and iproute2-next threads. (from review)
- - Changed to *_n_* instead of *_cur_*. (from review)
- - Use strcmp() instead of matches(). (from review)
- - Made names in code and documentation consistent. (from review)
- - Various documentation fixes. (from review)
+Once I know more I can add this to Smatch so that it is detected
+automatically using static analysis.
 
-Changes since v1:
- - Sent out the first corresponding iproute2 patches.
-
-net-next v3: https://lore.kernel.org/netdev/20230905-fdb_limit-v3-0-7597cd500a82@avm.de/
-
-v2: https://lore.kernel.org/netdev/20230619071444.14625-1-jnixdorf-oss@avm.de/
-v1: https://lore.kernel.org/netdev/20230515085046.4457-1-jnixdorf-oss@avm.de/
----
- include/uapi/linux/if_link.h |  2 ++
- ip/iplink_bridge.c           | 21 +++++++++++++++++++++
- man/man8/ip-link.8.in        | 10 ++++++++++
- 3 files changed, 33 insertions(+)
-
-diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-index c2ca7a6add0e..51cf58e3171c 100644
---- a/include/uapi/linux/if_link.h
-+++ b/include/uapi/linux/if_link.h
-@@ -508,6 +508,8 @@ enum {
- 	IFLA_BR_VLAN_STATS_PER_PORT,
- 	IFLA_BR_MULTI_BOOLOPT,
- 	IFLA_BR_MCAST_QUERIER_STATE,
-+	IFLA_BR_FDB_N_LEARNED_ENTRIES,
-+	IFLA_BR_FDB_MAX_LEARNED_ENTRIES,
- 	__IFLA_BR_MAX,
- };
- 
-diff --git a/ip/iplink_bridge.c b/ip/iplink_bridge.c
-index 7e4e62c81c0c..f08754618e0f 100644
---- a/ip/iplink_bridge.c
-+++ b/ip/iplink_bridge.c
-@@ -34,6 +34,7 @@ static void print_explain(FILE *f)
- 		"		  [ group_fwd_mask MASK ]\n"
- 		"		  [ group_address ADDRESS ]\n"
- 		"		  [ no_linklocal_learn NO_LINKLOCAL_LEARN ]\n"
-+		"		  [ fdb_max_learned_entries FDB_MAX_LEARNED_ENTRIES ]\n"
- 		"		  [ vlan_filtering VLAN_FILTERING ]\n"
- 		"		  [ vlan_protocol VLAN_PROTOCOL ]\n"
- 		"		  [ vlan_default_pvid VLAN_DEFAULT_PVID ]\n"
-@@ -168,6 +169,14 @@ static int bridge_parse_opt(struct link_util *lu, int argc, char **argv,
- 				bm.optval |= no_ll_learn_bit;
- 			else
- 				bm.optval &= ~no_ll_learn_bit;
-+		} else if (strcmp(*argv, "fdb_max_learned_entries") == 0) {
-+			__u32 fdb_max_learned_entries;
-+
-+			NEXT_ARG();
-+			if (get_u32(&fdb_max_learned_entries, *argv, 0))
-+				invarg("invalid fdb_max_learned_entries", *argv);
-+
-+			addattr32(n, 1024, IFLA_BR_FDB_MAX_LEARNED_ENTRIES, fdb_max_learned_entries);
- 		} else if (matches(*argv, "fdb_flush") == 0) {
- 			addattr(n, 1024, IFLA_BR_FDB_FLUSH);
- 		} else if (matches(*argv, "vlan_default_pvid") == 0) {
-@@ -544,6 +553,18 @@ static void bridge_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- 	if (tb[IFLA_BR_GC_TIMER])
- 		_bridge_print_timer(f, "gc_timer", tb[IFLA_BR_GC_TIMER]);
- 
-+	if (tb[IFLA_BR_FDB_N_LEARNED_ENTRIES])
-+		print_uint(PRINT_ANY,
-+			   "fdb_n_learned_entries",
-+			   "fdb_n_learned_entries %u ",
-+			   rta_getattr_u32(tb[IFLA_BR_FDB_N_LEARNED_ENTRIES]));
-+
-+	if (tb[IFLA_BR_FDB_MAX_LEARNED_ENTRIES])
-+		print_uint(PRINT_ANY,
-+			   "fdb_max_learned_entries",
-+			   "fdb_max_learned_entries %u ",
-+			   rta_getattr_u32(tb[IFLA_BR_FDB_MAX_LEARNED_ENTRIES]));
-+
- 	if (tb[IFLA_BR_VLAN_DEFAULT_PVID])
- 		print_uint(PRINT_ANY,
- 			   "vlan_default_pvid",
-diff --git a/man/man8/ip-link.8.in b/man/man8/ip-link.8.in
-index 7365d0c6b14f..184ae9183712 100644
---- a/man/man8/ip-link.8.in
-+++ b/man/man8/ip-link.8.in
-@@ -1630,6 +1630,8 @@ the following additional arguments are supported:
- ] [
- .BI no_linklocal_learn " NO_LINKLOCAL_LEARN "
- ] [
-+.BI fdb_max_learned_entries " FDB_MAX_LEARNED_ENTRIES "
-+] [
- .BI vlan_filtering " VLAN_FILTERING "
- ] [
- .BI vlan_protocol " VLAN_PROTOCOL "
-@@ -1741,6 +1743,14 @@ or off
- When disabled, the bridge will not learn from link-local frames (default:
- enabled).
- 
-+.BI fdb_max_learned_entries " FDB_MAX_LEARNED_ENTRIES "
-+- set the maximum number of learned FDB entries. If
-+.RI ( FDB_MAX_LEARNED_ENTRIES " == 0) "
-+the feature is disabled. Default is
-+.BR 0 .
-+.I FDB_MAX_LEARNED_ENTRIES
-+is a 32bit unsigned integer.
-+
- .BI vlan_filtering " VLAN_FILTERING "
- - turn VLAN filtering on
- .RI ( VLAN_FILTERING " > 0) "
-
----
-base-commit: 865dd3ab1580092221c73317a844ee65f032c9e8
-change-id: 20230905-fdb_limit-ace1467c6a84
-
-Best regards,
--- 
-Johannes Nixdorf <jnixdorf-oss@avm.de>
+regards,
+dan carpenter
 
 
