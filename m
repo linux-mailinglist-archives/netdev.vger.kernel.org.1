@@ -1,99 +1,82 @@
-Return-Path: <netdev+bounces-32138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8782792FFA
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 22:30:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3FC479302E
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 22:43:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 633BC1C209A4
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 20:30:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C0BB281061
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 20:43:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C17ADF5A;
-	Tue,  5 Sep 2023 20:30:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F35E1DF5B;
+	Tue,  5 Sep 2023 20:43:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D42ADF54
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 20:30:00 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87C5D8E
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 13:29:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=uDkWuZyMLQMnIq2qZJd/Hy90Ye3IhmwIA0hr/2LJ+ug=; b=5XzonQHNYRXjlxkiRpjlBlBpk3
-	Vfh9x4U7GSagm0sjkbzCGReY9lN0HhN1Jf1Jk//j7v66pgPl4dwXUnfOpjhh1F8KlyQDyKmLiYsD3
-	KKyFJOctF3dR0Rf53UnGXXiosJQjub4toDwOX+3j5z39PJKspdhVhmk+x/bzHDWzHPuI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qdcgJ-005pOC-5Z; Tue, 05 Sep 2023 22:29:51 +0200
-Date: Tue, 5 Sep 2023 22:29:51 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Richard Cochran <richardcochran@gmail.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	netdev@vger.kernel.org, glipus@gmail.com,
-	maxime.chevallier@bootlin.com, vadim.fedorenko@linux.dev,
-	gerhard@engleder-embedded.com, thomas.petazzoni@bootlin.com,
-	krzysztof.kozlowski+dt@linaro.org, robh+dt@kernel.org
-Subject: Re: [PATCH net-next RFC v4 2/5] net: Expose available time stamping
- layers to user space.
-Message-ID: <8fd9f2bc-f8a2-4290-8e52-17a39175b3d7@lunn.ch>
-References: <20230511230717.hg7gtrq5ppvuzmcx@skbuf>
- <20230511161625.2e3f0161@kernel.org>
- <20230512102911.qnosuqnzwbmlupg6@skbuf>
- <20230512103852.64fd608b@kernel.org>
- <20230517121925.518473aa@kernel.org>
- <2f89e35e-b1c9-4e08-9f60-73a96cc6e51a@lunn.ch>
- <20230517130706.3432203b@kernel.org>
- <20230904172245.1fa149fd@kmaincent-XPS-13-7390>
- <ZPYYFFxhALYnmXrx@hoboy.vegasvil.org>
- <20230905114717.4a166f79@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1567DDC2
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 20:43:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0EEBC433CA;
+	Tue,  5 Sep 2023 20:43:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1693946593;
+	bh=596bIH4ANHD6bp46x19FKqJe+KCWuiHOsg2nWgtC1kA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=XbIL6+SJAgO5/BwU2AHrksaqe8jYFJ/l7c2VCgfKHFwx9OzVhnHh1nE91m+nbGtPd
+	 3J7Ix+si4xxkY+Yr5QSVkXjBNvxEwIdMmQ3VoXp7chNwPy0UAxMxpe+pOWx0Eo82+P
+	 ASwvjw/MjGCkFyHbKdlXxmzOUQkFAxud+Djf+Jm9NUIPkXUpg6uSGC0NjakRYeA9yz
+	 +67VsB1P8QexDJZKQ7Egh6JL9BFNNYue322bBDxHANrRMO1PRLiFR4XpPSzfP/85rB
+	 KOVZRmAimLeWlRknbRmlzQ8PrFgvw0CuzMVkXRPETEvLQgzmQNvgKoyhFWnmlh0Whd
+	 deaUv1iNLe5xw==
+Date: Tue, 5 Sep 2023 13:43:11 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jinjian Song <songjinjian@hotmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ corbet@lwn.net, loic.poulain@linaro.org, ryazanov.s.a@gmail.com,
+ jiri@resnulli.us, johannes@sipsolutions.net,
+ chandrashekar.devegowda@intel.com, linuxwwan@intel.com,
+ chiranjeevi.rapolu@linux.intel.com, haijun.liu@mediatek.com,
+ m.chetan.kumar@linux.intel.com, ricardo.martinez@linux.intel.com,
+ netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, nmarupaka@google.com, vsankar@lenovo.com,
+ danielwinkler@google.com
+Subject: Re: [net-next v3 0/5] net: wwan: t7xx: fw flashing & coredump
+ support
+Message-ID: <20230905134311.6534e0eb@kernel.org>
+In-Reply-To: <MEYP282MB2697DB3C2C854F72A78BE7F4BBE8A@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
+References: <MEYP282MB2697DB3C2C854F72A78BE7F4BBE8A@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230905114717.4a166f79@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> Maybe we should try to enumerate the use cases, I don't remember now
-> but I think the concern was that there may be multiple PHYs?
+On Tue,  5 Sep 2023 19:26:32 +0800 Jinjian Song wrote:
+> Adds support for t7xx wwan device firmware flashing & coredump collection
+> using devlink.
+> 
+> On early detection of wwan device in fastboot mode driver sets up CLDMA0 HW
+> tx/rx queues for raw data transfer and then registers to devlink framework.
+> On user space application issuing command for firmware update the driver
+> sends fastboot flash command & firmware to program NAND.
 
-You often see a Marvell 10G PHY between a MAC and an SFP cage. You can
-then get a copper SFP module which has a PHY in it.
+## Form letter - net-next-closed
 
-So:
+The merge window for v6.6 has begun and therefore net-next is closed
+for new drivers, features, code refactoring and optimizations.
+We are currently accepting bug fixes only.
 
-"Linux" NIC: [DMA MAC][PHY][PHY] 
+Please repost when net-next reopens after Sept 11th.
 
-And just to make it more interesting, you sometimes see:
+RFC patches sent for review only are obviously welcome at any time.
 
-[MAC] - MII MUX -+---[PHY][PHY]
-                 |
-                 +---[PHY]
+See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+-- 
+pw-bot: defer
 
-This is currently not supported, but there is work in progress to
-address this, by giving each PHY and ID, and extending the netlink
-ethtool so you can enumerate PHYs and individually configure them.
-
-And i pointed out maybe the worst case scenario:
-
-[MAC][PHY][PHY][MAC]switch core[MAC][PHY][PHY]
-
-	Andrew
 
