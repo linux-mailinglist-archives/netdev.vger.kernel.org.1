@@ -1,182 +1,145 @@
-Return-Path: <netdev+bounces-32000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32001-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63F01792082
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 08:20:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C78E0792099
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 08:48:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0DBC281021
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 06:20:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC2D01C208FA
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 06:48:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4CA481B;
-	Tue,  5 Sep 2023 06:20:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAC897F9;
+	Tue,  5 Sep 2023 06:48:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7EE47F3
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 06:20:53 +0000 (UTC)
-Received: from mail-vk1-xa2d.google.com (mail-vk1-xa2d.google.com [IPv6:2607:f8b0:4864:20::a2d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9AAECC4
-	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 23:20:51 -0700 (PDT)
-Received: by mail-vk1-xa2d.google.com with SMTP id 71dfb90a1353d-48d0c7bfc49so1312738e0c.0
-        for <netdev@vger.kernel.org>; Mon, 04 Sep 2023 23:20:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1693894851; x=1694499651; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6dTsyYa/QdP6Tl24EGEqM/W7pZY67ehglq6B9Jrf8D4=;
-        b=bC4GRH43n/O6uqB8W905e4Bd1DGmh/k6yWROpWKQzmFCIh77pymX6l3JptVtyeR01x
-         aF2TqVvIsZznvbcbZoJLzUzgt27LvwUUgDhLJ2iannuQuEGaTuwAjHWd0eP2hM2PvfOR
-         A+oK7DwiZrjJltU76XLF83FAm+0oO/B/MDlJXiy26xk3UOkA8DczOXqEesojvGuYaiwx
-         egegil2eUXik/x6pd4BsNmmcOvcDnPOBlbFhQEjr+xH1ZCwvFoHBkbd7s0IIqPY4EkXi
-         f+W6NcwYu6puBBCmcTjR3bWiQQRzZgSaE7YCzHpCVhtGhWdv9sdHbRBVEOEDJgzSs1aw
-         /fKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693894851; x=1694499651;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6dTsyYa/QdP6Tl24EGEqM/W7pZY67ehglq6B9Jrf8D4=;
-        b=NovfY2CW0x+zNmY2t4ZhZBPmAkvBPH7XRUHzvDF0cLtH17z+YMkVa/AkWMMhEbK1MV
-         o/prhqLinBaeTVSnmdZRDY28Ho9TdfjAkze6gu/QRCLeL7NlWH17aQdBoRR9y+IExKtB
-         m0PKyWzmWgfwETcn6kmb+aon0qwqn7ZzUJFN2k4NxOUzIDBDHt0u43qFyjzHwgZWcs+d
-         T0rJBgF4YbPqoMxeV3fPpQgKzkZcVHiJhByDbv1FKyDpnQv1KwdcFfei36k+5qY8spEK
-         zpL4XcE6MYDG/eBA0Ne7AjbqkxoCwbpGMNMzNYFWtfPbL6No84+Cu7Xo6MG65jSRNvjD
-         dEzw==
-X-Gm-Message-State: AOJu0Yy64QMiFKQ0WpwbfBpTAUBAm3Jp6Cf1weFkFbtOne0GuVKUKXEA
-	dVsTEOktotiIy5pixCE1SYDDJvW1qdtdI1hZuDK0bw==
-X-Google-Smtp-Source: AGHT+IH/hc6gN1xTLSGGfJPyXJHHQub6ol1hzXoe2NEM2Na7aG7mU0a3/C+JV7UXynN3hn4iOEeQUeqbH8Ay4Soc5Ho=
-X-Received: by 2002:a1f:c703:0:b0:48d:348:4e0b with SMTP id
- x3-20020a1fc703000000b0048d03484e0bmr6786184vkf.4.1693894850958; Mon, 04 Sep
- 2023 23:20:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B1BD379
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 06:48:41 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5612B1B4;
+	Mon,  4 Sep 2023 23:48:40 -0700 (PDT)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 384LrkRT017196;
+	Mon, 4 Sep 2023 23:48:24 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=pfpt0220;
+ bh=I7QsQtpzfUbZvSXNhaojvmUw6Aywv2VTTH6a9TUm1Zk=;
+ b=W/n0J9MXtnnBYMg8wmq2mbkQLstpNC2pA+7GcwQR8eoZUM+zhj1oOQtZr1lNdaVDmjYH
+ FOh84XotrW8WVCMAVvCJmwfgpms9WXND0gqkD+S8yS+dPH3GUUzoRJezmjTIwN7nrPpt
+ QbVHeKA6UqIZnXBR6aLqOZs6A+hgCTGlxYQE65cYqlhp+P4WtFPiGmmY9wDZ5E9cR94S
+ sfTAV4I03R8gbwCgpqqdoUFwNBAsCcOEMH/+EuqmqRu/8J5XDyguEa8edgXZPSR5SV2/
+ XbhsLUs67chjuRi5xKUU4w35sHUYZ98lD0S7NFAJWLxElr68bFkkQupdWxN4kaU7f/UN Dg== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3swdqyk31y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Mon, 04 Sep 2023 23:48:24 -0700
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 4 Sep
+ 2023 23:48:22 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Mon, 4 Sep 2023 23:48:22 -0700
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id AEFB85B6977;
+	Mon,  4 Sep 2023 23:48:18 -0700 (PDT)
+From: Geetha sowjanya <gakula@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+        <pabeni@redhat.com>, <sgoutham@marvell.com>, <lcherian@marvell.com>,
+        <gakula@marvell.com>, <jerinj@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>
+Subject: [net PATCH] octeontx2-af: Fix truncation of smq in CN10K NIX AQ enqueue  mbox handler
+Date: Tue, 5 Sep 2023 12:18:16 +0530
+Message-ID: <20230905064816.27514-1-gakula@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230830112600.4483-1-hdanton@sina.com> <f607a7d5-8075-f321-e3c0-963993433b14@I-love.SAKURA.ne.jp>
- <20230831114108.4744-1-hdanton@sina.com> <CANn89iLCCGsP7SFn9HKpvnKu96Td4KD08xf7aGtiYgZnkjaL=w@mail.gmail.com>
-In-Reply-To: <CANn89iLCCGsP7SFn9HKpvnKu96Td4KD08xf7aGtiYgZnkjaL=w@mail.gmail.com>
-From: Naresh Kamboju <naresh.kamboju@linaro.org>
-Date: Tue, 5 Sep 2023 11:50:39 +0530
-Message-ID: <CA+G9fYs26E2vVGKdyMMpjSTkdFXitgRnw+puSc7XSDXpY1sivQ@mail.gmail.com>
-Subject: Re: selftests: net: pmtu.sh: Unable to handle kernel paging request
- at virtual address
-To: Eric Dumazet <edumazet@google.com>
-Cc: Hillf Danton <hdanton@sina.com>, Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, 
-	Netdev <netdev@vger.kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>, 
-	Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Proofpoint-GUID: WCwObZb_LfVJD2NlAB9YbwEo5u6J-il7
+X-Proofpoint-ORIG-GUID: WCwObZb_LfVJD2NlAB9YbwEo5u6J-il7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-09-05_05,2023-08-31_01,2023-05-22_02
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, 31 Aug 2023 at 18:42, Eric Dumazet <edumazet@google.com> wrote:
->
-> On Thu, Aug 31, 2023 at 2:17=E2=80=AFPM Hillf Danton <hdanton@sina.com> w=
-rote:
-> >
-> > On Wed, 30 Aug 2023 21:44:57 +0900 Tetsuo Handa <penguin-kernel@I-love.=
-SAKURA.ne.jp>
-> > >On 2023/08/30 20:26, Hillf Danton wrote:
-> > >>> <4>[  399.014716] Call trace:
-> > >>> <4>[  399.015702]  percpu_counter_add_batch+0x28/0xd0
-> > >>> <4>[  399.016399]  dst_destroy+0x44/0x1e4
-> > >>> <4>[  399.016681]  dst_destroy_rcu+0x14/0x20
-> > >>> <4>[  399.017009]  rcu_core+0x2d0/0x5e0
-> > >>> <4>[  399.017311]  rcu_core_si+0x10/0x1c
-> > >>> <4>[  399.017609]  __do_softirq+0xd4/0x23c
-> > >>> <4>[  399.017991]  ____do_softirq+0x10/0x1c
-> > >>> <4>[  399.018320]  call_on_irq_stack+0x24/0x4c
-> > >>> <4>[  399.018723]  do_softirq_own_stack+0x1c/0x28
-> > >>> <4>[  399.022639]  __irq_exit_rcu+0x6c/0xcc
-> > >>> <4>[  399.023434]  irq_exit_rcu+0x10/0x1c
-> > >>> <4>[  399.023962]  el1_interrupt+0x8c/0xc0
-> > >>> <4>[  399.024810]  el1h_64_irq_handler+0x18/0x24
-> > >>> <4>[  399.025324]  el1h_64_irq+0x64/0x68
-> > >>> <4>[  399.025612]  _raw_spin_lock_bh+0x0/0x6c
-> > >>> <4>[  399.026102]  cleanup_net+0x280/0x45c
-> > >>> <4>[  399.026403]  process_one_work+0x1d4/0x310
-> > >>> <4>[  399.027140]  worker_thread+0x248/0x470
-> > >>> <4>[  399.027621]  kthread+0xfc/0x184
-> > >>> <4>[  399.028068]  ret_from_fork+0x10/0x20
-> > >>
-> > >> static void cleanup_net(struct work_struct *work)
-> > >> {
-> > >>      ...
-> > >>
-> > >>      synchronize_rcu();
-> > >>
-> > >>      /* Run all of the network namespace exit methods */
-> > >>      list_for_each_entry_reverse(ops, &pernet_list, list)
-> > >>              ops_exit_list(ops, &net_exit_list);
-> > >>      ...
-> > >>
-> > >> Why did the RCU sync above fail to work in this report, Eric?
-> > >
-> > > Why do you assume that synchronize_rcu() failed to work?
-> >
-> > In the ipv6 pernet_operations [1] for instance, dst_entries_destroy() i=
-s
-> > invoked after RCU sync to ensure that nobody is using the exiting net,
-> > but this report shows that protection falls apart.
->
-> Because synchronize_rcu() is not the same than rcu_barrier()
->
-> The dst_entries_add()/ percpu_counter_add_batch() call should not
-> happen after an rcu grace period.
->
-> Something like this (untested) patch
->
-> diff --git a/net/core/dst.c b/net/core/dst.c
-> index 980e2fd2f013b3e50cc47ed0666ee5f24f50444b..f02fdd1da6066a4d56c2a0aa8=
-038eca76d62f8bd
-> 100644
-> --- a/net/core/dst.c
-> +++ b/net/core/dst.c
-> @@ -163,8 +163,13 @@ EXPORT_SYMBOL(dst_dev_put);
->
->  void dst_release(struct dst_entry *dst)
->  {
-> -       if (dst && rcuref_put(&dst->__rcuref))
-> +       if (dst && rcuref_put(&dst->__rcuref)) {
-> +               if (!(dst->flags & DST_NOCOUNT)) {
-> +                       dst->flags |=3D DST_NOCOUNT;
-> +                       dst_entries_add(dst->ops, -1);
-> +               }
->                 call_rcu_hurry(&dst->rcu_head, dst_destroy_rcu);
-> +       }
->  }
->  EXPORT_SYMBOL(dst_release);
->
+The smq value used in the CN10K NIX AQ instruction enqueue mailbox
+handler was truncated to 9-bit value from 10-bit value because of
+typecasting the CN10K mbox request structure to the CN9K structure.
+Though this hasn't caused any problems when programming the NIX SQ
+context to the HW because the context structure is the same size.
+However, this causes a problem when accessing the structure parameters.
+This patch reads the right smq value for each platform.
 
-The above patch applied on top of Linux next and tested
-selftests : net: pmtu.sh and test did not crash.
+Fixes: 30077d210c83 ("octeontx2-af: cn10k: Update NIX/NPA context structure")
+Signed-off-by: Geetha sowjanya <gakula@marvell.com>
+Signed-off-by: Sunil Kovvuri Goutham <sgoutham@marvell.com>
+---
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   | 21 +++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
 
-Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
-Tested-by: Naresh Kamboju <naresh.kamboju@linaro.org>
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+index c2f68678e947..23c2f2ed2fb8 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+@@ -846,6 +846,21 @@ static int nix_aq_enqueue_wait(struct rvu *rvu, struct rvu_block *block,
+ 	return 0;
+ }
+ 
++static void nix_get_aq_req_smq(struct rvu *rvu, struct nix_aq_enq_req *req,
++			       u16 *smq, u16 *smq_mask)
++{
++	struct nix_cn10k_aq_enq_req *aq_req;
++
++	if (!is_rvu_otx2(rvu)) {
++		aq_req = (struct nix_cn10k_aq_enq_req *)req;
++		*smq = aq_req->sq.smq;
++		*smq_mask = aq_req->sq_mask.smq;
++	} else {
++		*smq = req->sq.smq;
++		*smq_mask = req->sq_mask.smq;
++	}
++}
++
+ static int rvu_nix_blk_aq_enq_inst(struct rvu *rvu, struct nix_hw *nix_hw,
+ 				   struct nix_aq_enq_req *req,
+ 				   struct nix_aq_enq_rsp *rsp)
+@@ -857,6 +872,7 @@ static int rvu_nix_blk_aq_enq_inst(struct rvu *rvu, struct nix_hw *nix_hw,
+ 	struct rvu_block *block;
+ 	struct admin_queue *aq;
+ 	struct rvu_pfvf *pfvf;
++	u16 smq, smq_mask;
+ 	void *ctx, *mask;
+ 	bool ena;
+ 	u64 cfg;
+@@ -928,13 +944,14 @@ static int rvu_nix_blk_aq_enq_inst(struct rvu *rvu, struct nix_hw *nix_hw,
+ 	if (rc)
+ 		return rc;
+ 
++	nix_get_aq_req_smq(rvu, req, &smq, &smq_mask);
+ 	/* Check if SQ pointed SMQ belongs to this PF/VF or not */
+ 	if (req->ctype == NIX_AQ_CTYPE_SQ &&
+ 	    ((req->op == NIX_AQ_INSTOP_INIT && req->sq.ena) ||
+ 	     (req->op == NIX_AQ_INSTOP_WRITE &&
+-	      req->sq_mask.ena && req->sq_mask.smq && req->sq.ena))) {
++	      req->sq_mask.ena && req->sq.ena && smq_mask))) {
+ 		if (!is_valid_txschq(rvu, blkaddr, NIX_TXSCH_LVL_SMQ,
+-				     pcifunc, req->sq.smq))
++				     pcifunc, smq))
+ 			return NIX_AF_ERR_AQ_ENQUEUE;
+ 	}
+ 
+-- 
+2.25.1
 
-> It is not even clear why we are still counting dst these days.
-> We removed the ipv4 route cache a long time ago, and ipv6 got a
-> similar treatment.
-
-Links,
-https://tuxapi.tuxsuite.com/v1/groups/linaro/projects/naresh/tests/2Uw58x3x=
-JIqqpYDZspTytGe3L1V
-https://tuxapi.tuxsuite.com/v1/groups/linaro/projects/naresh/tests/2Uw58x3x=
-JIqqpYDZspTytGe3L1V/logs?format=3Dhtml
-
-
---
-Linaro LKFT
-https://lkft.linaro.org
 
