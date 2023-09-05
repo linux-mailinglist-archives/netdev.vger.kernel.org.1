@@ -1,119 +1,114 @@
-Return-Path: <netdev+bounces-31995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 600B579204A
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 06:16:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EC18B79204C
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 06:23:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00A1328101E
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 04:16:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 789E128103C
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 04:23:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1244965E;
-	Tue,  5 Sep 2023 04:16:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C275B65E;
+	Tue,  5 Sep 2023 04:23:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0C8F7E
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 04:16:29 +0000 (UTC)
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D601CC7;
-	Mon,  4 Sep 2023 21:16:28 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id 98e67ed59e1d1-26f3e26e55aso1107443a91.3;
-        Mon, 04 Sep 2023 21:16:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B38827E
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 04:23:42 +0000 (UTC)
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AF841B6
+	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 21:23:41 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d7bb58517b8so1679889276.0
+        for <netdev@vger.kernel.org>; Mon, 04 Sep 2023 21:23:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693887388; x=1694492188; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=aeLpY9djXSpdgH4Ae7n5MB3zE0D3lzBJjJWuWYn4B9M=;
-        b=APQVz9WNVetZ4H8NlK4KETQYPo0dXbIwAQpRsRRgajHctu6HWWPounKT4ChGq+BO4V
-         EGy17icSJXfYnUsQV/SepLixMIrnPngxh/K6g43IS2JI+kiWdwxLEHPoPJN3kZhUREkH
-         nMJNraoRdFyafHhIRkajXvUxWTyYXpeciGZYfQShwV0hSrd6kWewZV34diJ6eiiXVKll
-         H4TjoMEZ5ylcAzqhOm+dwy/m0SY0YnUvDPuHFsqWTseE5RRhzLCpd7h+MeWTLbxMqIN0
-         PZKhX6IdBAJ0UdSPIm/q9d7njqygFUthcnHrqw1Z0+YYZMqplzcPxvj4ZUTJGFGX4NOT
-         MrvQ==
+        d=google.com; s=20221208; t=1693887820; x=1694492620; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=lBWCzlSwf8dM4GHNasiEHTJIjOq7TJu9NtuD8yppqjA=;
+        b=vXjQL7FmTPpsUIZRLnGiNeAY+iK5YEJu5BEkIJd9NX1Hx7ybWSF9n+RWg038XqvipI
+         0Or686KabLf9aen2Q0V/XYpd8ip5Mb19b1YzeeFwRgmNmgANIJisII4KWafwbB0LFLpF
+         m+YeMkOig2gPWd0CLOGLxo+QKEfjp9Lic7E5jS9jxm4eVb/2Fb5m/yo5VKpSeVLlvmS2
+         ScEm+2HZwBZT4q1lOmylFlcmTd8xiijZ0DluPLEWBB0mIIRw00tN2TAQbl7veDWAtNk9
+         et8QRsL1hrjSuOBFzpO0n927OKqgDyoqwSzT2kpH4OAVk5V+HECVM/UJrU0cSHYEZc+N
+         uRLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693887388; x=1694492188;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=aeLpY9djXSpdgH4Ae7n5MB3zE0D3lzBJjJWuWYn4B9M=;
-        b=RRvHW/WET8FGQpcYLqVN5L0SY74kVFbFGy3Hf8BV3HrfyJxz011QX8k/DEtuO/ya1G
-         sevKptL/ObGPjytDfzT7WimxGXuMo7dLCpcjt1r9bAQdi0xb6CDN/gYkNwJo0DD7+r1h
-         nVF+3+u7xdbVlN5PWtwS86ggS/vU8BXoOI4W/aZIoZO8WwCpBlO7TGG4x2xs5mXpnj27
-         Hc3EyUcoiXaugksEJ/kHYjXLiMIsYWg3n3jfndnBAaiSfzV8ZcZusPudBkNsx8NJh3f3
-         VXmbpwHGuvLlA5HCJRYiN+S1JSTnS3MNyHFIspJ57WjMmFm5H/UOqWoCg26E5ki84cBo
-         aHCQ==
-X-Gm-Message-State: AOJu0Yyrxt2e38kewx8wUxytUSuKKaNf/9aJ2RlePctYoxzbpGL8d79K
-	pBCzRU66IjMVuTbmI/8YNh8=
-X-Google-Smtp-Source: AGHT+IGHKwLSesdv+VTDY2ZVcovQ2Vrs0ifGMuVs4J32gJ4Kms/n3HDyIZqhULXtcu+bbYFqI4HShQ==
-X-Received: by 2002:a17:90a:788e:b0:26d:20ef:1d32 with SMTP id x14-20020a17090a788e00b0026d20ef1d32mr8899654pjk.38.1693887387618;
-        Mon, 04 Sep 2023 21:16:27 -0700 (PDT)
-Received: from localhost.localdomain ([2405:201:a40d:5ac2:3458:cc95:7315:1247])
-        by smtp.gmail.com with ESMTPSA id oj3-20020a17090b4d8300b002639c4f81cesm9719984pjb.3.2023.09.04.21.16.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Sep 2023 21:16:27 -0700 (PDT)
-From: Shubh <shubhisroking@gmail.com>
-To: =?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Shubh <shubhisroking@gmail.com>
-Subject: [PATCH] net: dsa: mt7530: refactor deprecated strncpy
-Date: Tue,  5 Sep 2023 09:46:14 +0530
-Message-ID: <20230905041614.14272-1-shubhisroking@gmail.com>
-X-Mailer: git-send-email 2.42.0
+        d=1e100.net; s=20221208; t=1693887820; x=1694492620;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lBWCzlSwf8dM4GHNasiEHTJIjOq7TJu9NtuD8yppqjA=;
+        b=B5AQ7h4v/XKbCGDmsCCz1ybjwO2GHiW7LyebbcK4vVrTzLbrY9D55g0swceRp6PxAE
+         DWcMirAXhoeYztOqfjEyO+EtU5/NdHPlmVMDiyaQPmi1nwhAFALZeGYfKDxsDcTi7Vac
+         OE/J5Enbf+SC4UsAcSVbGYMgDHgEuuCs4J3hXXPaI911d9d5aZNkbQHQnDzUem8byh95
+         o4O1aPo61c6wBpHwrqQ79v0fxVT1JaV3stzE59FT7EItPs25hTCRgGhJSCn/Slx3XV4U
+         wxabeZ6CPrsCtEvH5ZwR2VBe+btkxKdjcKpcucIdVW9ZNLcEOYYEliPlx+qreKS4VQvM
+         +64A==
+X-Gm-Message-State: AOJu0YwMfqXH/eJ7MXougQd+lFgwDGGGEASaKhlh9Z3giR++4D/Qv2nw
+	aqSfQrhgfbdfx1Yrg/1BGyDksou5IBelsQ==
+X-Google-Smtp-Source: AGHT+IElhWYz556jeofxh5lkbvOxvTAZno8Kj960zxnExKDoZbfUQD1ckhtQGa/+oEL32P4K0iex9j0DksFWmg==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:1804:b0:d7a:c85c:725b with SMTP
+ id cf4-20020a056902180400b00d7ac85c725bmr262418ybb.7.1693887820755; Mon, 04
+ Sep 2023 21:23:40 -0700 (PDT)
+Date: Tue,  5 Sep 2023 04:23:38 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
+Message-ID: <20230905042338.1345307-1-edumazet@google.com>
+Subject: [PATCH net] igmp: limit igmpv3_newpack() packet size to IP_MAX_MTU
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, David Laight <David.Laight@ACULAB.COM>, 
+	Kyle Zeng <zengyhkyle@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Prefer `strscpy_pad` to `strncpy`.
+This is a follow up of commit 915d975b2ffa ("net: deal with integer
+overflows in kmalloc_reserve()") based on David Laight feedback.
 
-Signed-off-by: Shubh <shubhisroking@gmail.com>
+Back in 2010, I failed to realize malicious users could set dev->mtu
+to arbitrary values. This mtu has been since limited to 0x7fffffff but
+regardless of how big dev->mtu is, it makes no sense for igmpv3_newpack()
+to allocate more than IP_MAX_MTU and risk various skb fields overflows.
+
+Fixes: 57e1ab6eaddc ("igmp: refine skb allocations")
+Link: https://lore.kernel.org/netdev/d273628df80f45428e739274ab9ecb72@AcuMS.aculab.com/
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reported-by: David Laight <David.Laight@ACULAB.COM>
+Cc: Kyle Zeng <zengyhkyle@gmail.com>
 ---
- drivers/net/dsa/mt7530.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/ipv4/igmp.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-index 035a34b50..ee19475ec 100644
---- a/drivers/net/dsa/mt7530.c
-+++ b/drivers/net/dsa/mt7530.c
-@@ -836,7 +836,7 @@ mt7530_get_strings(struct dsa_switch *ds, int port, u32 stringset,
- 		return;
+diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
+index 0c9e768e5628b1c8fd7e87bebe528762ea4a6e1e..418e5fb58fd3f2443f3c88fde5c0776805a832ef 100644
+--- a/net/ipv4/igmp.c
++++ b/net/ipv4/igmp.c
+@@ -353,8 +353,9 @@ static struct sk_buff *igmpv3_newpack(struct net_device *dev, unsigned int mtu)
+ 	struct flowi4 fl4;
+ 	int hlen = LL_RESERVED_SPACE(dev);
+ 	int tlen = dev->needed_tailroom;
+-	unsigned int size = mtu;
++	unsigned int size;
  
- 	for (i = 0; i < ARRAY_SIZE(mt7530_mib); i++)
--		strncpy(data + i * ETH_GSTRING_LEN, mt7530_mib[i].name,
-+		strscpy_pad(data + i * ETH_GSTRING_LEN, mt7530_mib[i].name,
- 			ETH_GSTRING_LEN);
- }
- 
++	size = min(mtu, IP_MAX_MTU);
+ 	while (1) {
+ 		skb = alloc_skb(size + hlen + tlen,
+ 				GFP_ATOMIC | __GFP_NOWARN);
 -- 
-2.42.0
+2.42.0.283.g2d96d420d3-goog
 
 
