@@ -1,135 +1,213 @@
-Return-Path: <netdev+bounces-32070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6B3E792264
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 14:01:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E85F4792266
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 14:05:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 724F8281181
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 12:01:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE9EE1C20984
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 12:05:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6333D2F0;
-	Tue,  5 Sep 2023 12:01:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75B4ED2F2;
+	Tue,  5 Sep 2023 12:05:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA188D2EC
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 12:01:16 +0000 (UTC)
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E57211B3;
-	Tue,  5 Sep 2023 05:01:14 -0700 (PDT)
-Received: from canpemm500006.china.huawei.com (unknown [172.30.72.53])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Rg3vf0Vghz1M9Cj;
-	Tue,  5 Sep 2023 19:59:26 +0800 (CST)
-Received: from [10.174.179.200] (10.174.179.200) by
- canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Tue, 5 Sep 2023 20:01:11 +0800
-Subject: Re: [PATCH net v3] team: fix null-ptr-deref when team device type is
- changed
-To: Paolo Abeni <pabeni@redhat.com>, <jiri@resnulli.us>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<netdev@vger.kernel.org>, <liuhangbin@gmail.com>
-CC: <linux-kernel@vger.kernel.org>
-References: <20230905081056.3365013-1-william.xuanziyang@huawei.com>
- <7125d734bdf73708aae9f431fb5d18b1699499a5.camel@redhat.com>
-From: "Ziyang Xuan (William)" <william.xuanziyang@huawei.com>
-Message-ID: <b7f5a25e-50b7-5738-fd43-52284c1469c9@huawei.com>
-Date: Tue, 5 Sep 2023 20:01:11 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 661CB566D
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 12:05:08 +0000 (UTC)
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18B2A1AD;
+	Tue,  5 Sep 2023 05:05:06 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-5280ef23593so3103386a12.3;
+        Tue, 05 Sep 2023 05:05:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693915504; x=1694520304; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+gVz3kWcbIj8nQYejfFIIpGzb+ZDOuSnviWzYWHdi+E=;
+        b=mhMDbddEX2sq5m3exbp8xpyloRu9BlR69kphkGtBVpb7/ZlizK50uTE7FlcWaEkTxY
+         vdwTPreET5RiGpYlEzIYKaX2PZtZ/PV/Sbmn01D7HebMAwB8AaMoyd6DrMyHuokb4k4U
+         FZqlBoxUKAE6dCJlbYbzb58BT7WxM7j6FM62uiLWsCm/ScayPCc12Ry6kdowaCauE0TK
+         sRXvEbJ456N1avPZj/rMaP5L8BHu4R35mZZ/eRJgp4/lvF0i2yktuFTwYY+Xw+tQ5WP6
+         XG1gnhNCjjQQQjO6eQ13nn73I44vwHGC1gY1LIOjF14fHUGhshyUVtHJP9YffnX454nQ
+         Eijg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693915504; x=1694520304;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+gVz3kWcbIj8nQYejfFIIpGzb+ZDOuSnviWzYWHdi+E=;
+        b=ZWCMGZ3CiyN/nGJ9hhhyp0yPOEQiCf58sahfdQfdgGBe+4jjRMiag7Le+4sIlEL92g
+         8jUcZc0sR0I6nlHDTfN8rr4xF9WFtvV9jMxZwr6JZWHi3+26kW+E3/h7b8DxUWbxQbaF
+         a/A2QH0w1Nv/j2UhKgKDBXpIp/uJ9HpH/VzqqbDPf0eH3mwlyUfBtZKJJj3nApRJo/Dd
+         XBHXufeWhMGoW5II0KuCb5TJo13nAfPkNxyB42Axw6IA7+amfBMOOB1LwwdF1FkAhODB
+         4l2l7ckNfNI1cpzQ3ryxabBBIxT6NMQcYnKDW6qoMAKocWNww2n9l98qob3rlr+u0RdF
+         uNhg==
+X-Gm-Message-State: AOJu0YyBGX2GjNWl/D6sO7Kxr3FrHbJ1KNMJPZrwx1s6QosHIO5Cpf5u
+	2yom8cPGdOOfdBM5epe+aNM=
+X-Google-Smtp-Source: AGHT+IEgRHuMzErVlW6Z+BBYnqnJMVQ8Km6v1D6EBfBDI9Tjrj/wavnD4mSYzck63hU/SOZ7lC9ebA==
+X-Received: by 2002:a50:ee17:0:b0:523:7192:6803 with SMTP id g23-20020a50ee17000000b0052371926803mr10173304eds.8.1693915504473;
+        Tue, 05 Sep 2023 05:05:04 -0700 (PDT)
+Received: from skbuf ([188.26.57.165])
+        by smtp.gmail.com with ESMTPSA id r19-20020aa7cfd3000000b0052284228e3bsm7090947edy.8.2023.09.05.05.05.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Sep 2023 05:05:04 -0700 (PDT)
+Date: Tue, 5 Sep 2023 15:05:01 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
+	davem@davemloft.net, Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>, Tristram.Ha@microchip.com,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, UNGLinuxDriver@microchip.com,
+	George McCollister <george.mccollister@gmail.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 RFC 4/4] net: dsa: hsr: Provide generic HSR
+ ksz_hsr_{join|leave} functions
+Message-ID: <20230905120501.tvkrrzcneq4fdzqa@skbuf>
+References: <20230904120209.741207-1-lukma@denx.de>
+ <20230904120209.741207-1-lukma@denx.de>
+ <20230904120209.741207-5-lukma@denx.de>
+ <20230904120209.741207-5-lukma@denx.de>
+ <20230905104725.zy3lwbxjhqhqyzdj@skbuf>
+ <20230905132351.2e129d53@wsk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <7125d734bdf73708aae9f431fb5d18b1699499a5.camel@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.179.200]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- canpemm500006.china.huawei.com (7.192.105.130)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230905132351.2e129d53@wsk>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> On Tue, 2023-09-05 at 16:10 +0800, Ziyang Xuan wrote:
->> Get a null-ptr-deref bug as follows with reproducer [1].
->>
->> BUG: kernel NULL pointer dereference, address: 0000000000000228
->> ...
->> RIP: 0010:vlan_dev_hard_header+0x35/0x140 [8021q]
->> ...
->> Call Trace:
->>  <TASK>
->>  ? __die+0x24/0x70
->>  ? page_fault_oops+0x82/0x150
->>  ? exc_page_fault+0x69/0x150
->>  ? asm_exc_page_fault+0x26/0x30
->>  ? vlan_dev_hard_header+0x35/0x140 [8021q]
->>  ? vlan_dev_hard_header+0x8e/0x140 [8021q]
->>  neigh_connected_output+0xb2/0x100
->>  ip6_finish_output2+0x1cb/0x520
->>  ? nf_hook_slow+0x43/0xc0
->>  ? ip6_mtu+0x46/0x80
->>  ip6_finish_output+0x2a/0xb0
->>  mld_sendpack+0x18f/0x250
->>  mld_ifc_work+0x39/0x160
->>  process_one_work+0x1e6/0x3f0
->>  worker_thread+0x4d/0x2f0
->>  ? __pfx_worker_thread+0x10/0x10
->>  kthread+0xe5/0x120
->>  ? __pfx_kthread+0x10/0x10
->>  ret_from_fork+0x34/0x50
->>  ? __pfx_kthread+0x10/0x10
->>  ret_from_fork_asm+0x1b/0x30
->>
->> [1]
->> $ teamd -t team0 -d -c '{"runner": {"name": "loadbalance"}}'
->> $ ip link add name t-dummy type dummy
->> $ ip link add link t-dummy name t-dummy.100 type vlan id 100
->> $ ip link add name t-nlmon type nlmon
->> $ ip link set t-nlmon master team0
->> $ ip link set t-nlmon nomaster
->> $ ip link set t-dummy up
->> $ ip link set team0 up
->> $ ip link set t-dummy.100 down
->> $ ip link set t-dummy.100 master team0
->>
->> When enslave a vlan device to team device and team device type is changed
->> from non-ether to ether, header_ops of team device is changed to
->> vlan_header_ops. That is incorrect and will trigger null-ptr-deref
->> for vlan->real_dev in vlan_dev_hard_header() because team device is not
->> a vlan device.
->>
->> Assign eth_header_ops to header_ops of team device when its type is changed
->> from non-ether to ether to fix the bug.
->>
->> Fixes: 1d76efe1577b ("team: add support for non-ethernet devices")
->> Suggested-by: Hangbin Liu <liuhangbin@gmail.com>
->> Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
+On Tue, Sep 05, 2023 at 01:23:51PM +0200, Lukasz Majewski wrote:
+> > Should be squashed into patch 3/4. The split does not make the code
+> > easier to review for me.
 > 
-> I'm sorry to note that this submission does not fit our process:
-> 
-> https://elixir.bootlin.com/linux/latest/source/Documentation/process/maintainer-netdev.rst#L353
-> 
-> this specific kind of process violations tend to make reviewers quite
-> unhappy, please be more careful.
-> 
-Sorry for the inconvenience caused to everyone. It's my fault. I will improve.
+> So you recommend to have only one patch in which the hsr_join{leave}
+> function from ksz_common.c and ksz9477_hsr_join{leave} from ksz9477.c
+> are added?
 
-> Regards,
+Correct. In addition, patch 1/4 will be dropped. So there will be 2
+patches, one on net/dsa/tag_ksz.c and the other on drivers/net/dsa/microchip/.
+
+> > I don't see any restriction to allow offloading a single HSR device.
 > 
-> Paolo
+> As I've written in the other response - I've followed the xrs700x.c
+> convention. 
+
+"the xrs700x.c convention"
+
+xrs700x_hsr_join():
+
+	/* Only ports 1 and 2 can be HSR/PRP redundant ports. */
+	if (port != 1 && port != 2)
+		return -EOPNOTSUPP;
+
+So, checking for ports 1 and 2 is a stronger condition than the one I'm
+asking you to enforce.
+
+The KSZ9477 is more flexible. It can enable HSR offload on any 2 ports,
+not just on ports 1 and 2. But it can still be 2 ports max, no more.
+You haven't copied the xrs700x convention, but you haven't adapted it,
+either.
+
+> Moreover, for me it seems more natural, that we only allow full HSR
+> support for 2 ports or none. Please be aware, that HSR supposed to
+> support only 2 ports, and having only one working is not recommended by
+> vendor.
+
+And where is it enforced that full HSR offload is only applied to 2
+ports or none?
+
+> > Looking at patch 3/4, that will obviously not work due to some
+> > hardware registers which are global and would be overwritten by the
+> > second HSR device.
 > 
-> .
+> I cannot guarantee that there will not be any "side effects" with this
+> approach. And to be honest - I would prefer to spent time on testing
+> recommended setups.
+
+Please read my reply again, keeping in mind that by "HSR device" I mean
+"hsr0" in the commands below, and not the member ports as you've assumed
+when responding.
+
+> > 
+> > For example, a5psw_port_bridge_join() has a similar restriction to
+> > offload a single bridge device.
 > 
+> HSR is IMHO a bit different than plain "bridge" offloading.
+
+Maybe this was not clear, but by "similar" I mean: if you replace the
+"bridge" word with "hsr", and you copy that code snippet from a5psw,
+you get the desired outcome.
+
+static int ksz_hsr_join(struct dsa_switch *ds, int port, struct net_device *hsr,
+			/* optionally pass the extack argument from the caller */)
+{
+	struct ksz_device *dev = ds->priv;
+
+	/* We only support 1 HSR device */
+	if (dev->hsr_dev && hsr != dev->hsr_dev) {
+		NL_SET_ERR_MSG_MOD(extack,
+				   "Offload supported for a single HSR");
+		return -EOPNOTSUPP;
+	}
+
+	dev->hsr_dev = hsr;
+
+	...
+
+	return 0;
+}
+
+I did not imply that HSR is not different than bridge offloading.
+I don't see how that is even related to the discussion.
+
+> > If you return -EOPNOTSUPP, then DSA should fall back to an
+> > unoffloaded, 100% software-based HSR device, and that should work
+> > too. 
+> 
+> And then we would have one port with SW HSR and another one with HW
+> HSR?
+
+No. One HSR device (hsr0, with 2 member ports) with offload and one
+HSR device (hsr1, with 2 member ports) without offload (see (b) below).
+
+> >It would be good if you could verify that the unoffloaded HSR
+> > works well after the changes too.
+> 
+> I've tested on KSZ9477-EVB the SW HSR operation with two ports (and two
+> or three boards) and HW HSR offloading. Results are presented in the
+> cover-letter.
+
+"results in the cover letter"
+
+Results:
+With KSZ9477 offloading support added: RX: 100 Mbps TX: 98 Mbps
+With no offloading                     RX: 63 Mbps  TX: 63 Mbps
+
+What was the setup for the "no offloading" case?
+
+(a) kernel did not contain the offloading patch set
+
+(b) the testing was on hsr1, in the situation below:
+
+ip link add name hsr0 type hsr slave1 lan1 slave2 lan2 supervision 45 version 1 # offloaded
+ip link add name hsr1 type hsr slave1 lan3 slave2 lan4 supervision 45 version 1 # unoffloaded
+
+(d) in some other way (please detail)
+
+I was specifically asking about situation (b).
 
