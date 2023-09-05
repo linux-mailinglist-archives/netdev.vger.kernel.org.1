@@ -1,602 +1,251 @@
-Return-Path: <netdev+bounces-32104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32105-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A5E47923EA
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 17:25:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FB8D7923FA
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 17:37:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 248E31C209F4
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 15:25:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9940281209
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 15:37:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD4ADD531;
-	Tue,  5 Sep 2023 15:25:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 394DBD533;
+	Tue,  5 Sep 2023 15:37:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA4CCD525
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 15:25:13 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1AF8128
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 08:25:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=cRVRGabOf5HK4uSykSyRB/9MKoHcxUzGxWI9tGmZQiA=; b=VkP/10KYOevqEjabGVs4oN3K2T
-	vnKLvl9MCMmiL3ZgOvEHDELONfb4uJw49lIXSNxc/EKOD+NwnxDUMKzmXVuTkr8GRHFfm3CX3x60p
-	vCkR3OrxmXpWh2XrpBGC4r627Gs8C03PCmU6ezWJ/4dqkX9J6MzAfjrKeEU5WrgZPgNdB5Jrrpzdn
-	nD9rRE0i48vWFWDTsFzF7poUTFMPuUhlCmCCrT+n4YX1RE6mcuhJdcOJdv+1jccWYsEnM2KQnGjiY
-	aNURuOXigqBQgYGjHg02vwyR1yAwqLYm7lgfr75kGEWJtX4MxvNGTpy+FiuxuHkF6N5zdH3f2cMS7
-	pbgB2gdw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40858)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qdXvH-00081E-2m;
-	Tue, 05 Sep 2023 16:24:59 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qdXvF-0003nF-LD; Tue, 05 Sep 2023 16:24:57 +0100
-Date: Tue, 5 Sep 2023 16:24:57 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, f.fainelli@gmail.com, davem@davemloft.net,
-	edumazet@google.com, hkallweit1@gmail.com, kuba@kernel.org,
-	netdev@vger.kernel.org, pabeni@redhat.com,
-	"shenjian15@huawei.com" <shenjian15@huawei.com>,
-	"liuyonglong@huawei.com" <liuyonglong@huawei.com>,
-	wangjie125@huawei.com, chenhao418@huawei.com,
-	Hao Lan <lanhao@huawei.com>,
-	"wangpeiyang1@huawei.com" <wangpeiyang1@huawei.com>
-Subject: Re: [PATCH net-next] net: phy: avoid kernel warning dump when
- stopping an errored PHY
-Message-ID: <ZPdISTBrrX345RCz@shell.armlinux.org.uk>
-References: <aed0bc3b-2d48-2fd9-9587-5910ad68c180@gmail.com>
- <8e7e02d8-2b2a-8619-e607-fbac50706252@huawei.com>
- <fd08a80d-c70b-4943-8cca-b038f54f8eaa@lunn.ch>
- <29917acb-bd80-10e5-b1ae-c844ea0e9cbb@huawei.com>
- <ZPcxnHjDJIMe3xt5@shell.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D9242571;
+	Tue,  5 Sep 2023 15:37:47 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF9D3197;
+	Tue,  5 Sep 2023 08:37:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1693928266; x=1725464266;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=7Ock5uHxzRuA7Cr7lKKSh84Sq+U/ImLygtSJGn7c7hQ=;
+  b=n8kXU6lNyJdVM1QfdVDDkbv0MgmzgpBJmB12ijzoOPTe4aGBE7wlTAkP
+   IDhEnvRzQEQFDL4KyO/YOVnFTjy1noRE500PnQrCWyLyXFYzOB52mSn75
+   z+hW780fL36XG39bk0u5aX5OaeFwHPZHYn5bu4AU0UdK52USc9TGIexeA
+   wXRA227JvIgvL5AK0blAaS2CitTzDWIOSwwXQM7ZX74Vd6RI+M5sPkWyu
+   BwBiY0Ni0jSiODeVd2PWlGlIjUr6D1vkbpdSVElh2vMUde1RcuYJOgR8T
+   5okVFpvXC+D6HlAg217Izmu+O3sHAQ7/ipdHvDVSy6qKJOon/rYlkDvIA
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10824"; a="379546547"
+X-IronPort-AV: E=Sophos;i="6.02,229,1688454000"; 
+   d="scan'208";a="379546547"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2023 08:37:45 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10824"; a="776232790"
+X-IronPort-AV: E=Sophos;i="6.02,229,1688454000"; 
+   d="scan'208";a="776232790"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orsmga001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Sep 2023 08:37:45 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Tue, 5 Sep 2023 08:37:44 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Tue, 5 Sep 2023 08:37:44 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.168)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Tue, 5 Sep 2023 08:37:43 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iV0tEDW83TZh2eY6eKxDRYof2cSijqG5iueuYpaoxs2zMlmKVqAgq9upVZczDLXOXAG8XyXVlqs6zzypk7QvdDAjsGcDk3ZzEYJ9fyEu2RwOapyOQVV9T9leZtfuMLV1qX23gt/NH55Qu3mD36atJMciq/nXiai275WT2thRlhgO/Zg1p54BzjSZIPdUU8vNV38WHqykr2gQNlqDNnBCwo7YdY96pa0ZTgGWxbm7mpQIY8lbNTX2j4At5ObphKyDtDbqFgqOHK/V4t56O5Q/jFs+tFWYB+9qCIkVLwR5qJael9+i60Q+uYSnvRKfiTF9PPXAe1WWddQiasJAnE+6cA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+c+AKhh0ngOuEX6T8XIY8tbZje1zEtAxA8JxQQXswwk=;
+ b=ZggGZz7Dl8maq4v/nSwX7FzUhNICZ8eZC3151LokYEOv4pexmYhDZcIqvd2/A9DNoIIGbDqiGLuUaZkKmXTWIFYQ/iGZu5zN9eL2jNmH2K56y7p4LIu6bN0hAuH9VjI/8ITGST7AywM+pvAYa1nWItouULMg1hPXhhlIJyTQKPOifnaKjhVQzLN3DrkA2FdmgalWaXsuX0yjkrIrFLIC3x5DyqSLRj895UfaDmhZGnMVs5EywW8m+t/9z79K5YhjgnR9oPrONrsdcBEyFVcI+wiYuYPXSfW2KIk9ajFMeV2WeQGOX8AhOi0JvI6dHMYnrmKtqUf/+xoO9kKss1tWMQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ DM4PR11MB6454.namprd11.prod.outlook.com (2603:10b6:8:b8::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6745.33; Tue, 5 Sep 2023 15:37:40 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::c1f9:b4eb:f57e:5c3d]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::c1f9:b4eb:f57e:5c3d%3]) with mapi id 15.20.6745.030; Tue, 5 Sep 2023
+ 15:37:40 +0000
+Date: Tue, 5 Sep 2023 17:37:27 +0200
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Larysa Zaremba <larysa.zaremba@intel.com>
+CC: <bpf@vger.kernel.org>, <ast@kernel.org>, <daniel@iogearbox.net>,
+	<andrii@kernel.org>, <martin.lau@linux.dev>, <song@kernel.org>, <yhs@fb.com>,
+	<john.fastabend@gmail.com>, <kpsingh@kernel.org>, <sdf@google.com>,
+	<haoluo@google.com>, <jolsa@kernel.org>, David Ahern <dsahern@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Willem de Bruijn <willemb@google.com>,
+	Jesper Dangaard Brouer <brouer@redhat.com>, Anatoly Burakov
+	<anatoly.burakov@intel.com>, Alexander Lobakin <alexandr.lobakin@intel.com>,
+	Magnus Karlsson <magnus.karlsson@gmail.com>, Maryam Tahhan
+	<mtahhan@redhat.com>, <xdp-hints@xdp-project.net>, <netdev@vger.kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Alexei Starovoitov
+	<alexei.starovoitov@gmail.com>, Simon Horman <simon.horman@corigine.com>,
+	Tariq Toukan <tariqt@mellanox.com>, Saeed Mahameed <saeedm@mellanox.com>
+Subject: Re: [xdp-hints] [RFC bpf-next 03/23] ice: make RX checksum checking
+ code more reusable
+Message-ID: <ZPdLN56BWQVQGKkA@boxer>
+References: <20230824192703.712881-1-larysa.zaremba@intel.com>
+ <20230824192703.712881-4-larysa.zaremba@intel.com>
+ <ZPXxkOCK5e4M/P5H@boxer>
+ <ZPYbYqnStaChh8BY@lincoln>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ZPYbYqnStaChh8BY@lincoln>
+X-ClientProxiedBy: FR2P281CA0169.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:99::10) To DM4PR11MB6117.namprd11.prod.outlook.com
+ (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="f4j4EWQpC9fDDtdz"
-Content-Disposition: inline
-In-Reply-To: <ZPcxnHjDJIMe3xt5@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RDNS_NONE,SPF_HELO_NONE,
-	SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|DM4PR11MB6454:EE_
+X-MS-Office365-Filtering-Correlation-Id: 09ca7a07-b8b3-49b8-4d5e-08dbae2609b8
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: qWW9Igwm9meGenmKdN/vco/SsXF7YrMGwOYRzE+6C2e2lutxJ0qvKCwNbNK3Xk2jA6jjKfeVFU+V+Je6ebfPqhqA++mvOFBO3iJiKeOPHTm7IDyrFdrPkRb0giUbkik1drXI+kWNMTN6BfY2ZXTKiRvAWEUwuiIpKmFMLwNyhkGZ6AYEBw/uM7QQUP5lE5it4jFj/L0MSyX0Iv4GyY+NFdgvlYMQDe6T726qc89qgoMuoEfEi/jN5nKGLMHoOKiIWh/98ukvW0/ueeYmY9BA8YaKx35BF8zwwfvOclRKPA48K0VeYgvKSYAj7+SUhWEpuDXzjULfWUXslKHsUlLWl+XSKL8BGLKAK9kD9IzxVUQnOhl1236wQPkSOMTAqA1+s0HaffZWa/NOowdPSFrheK+UeGCsuq/4kz+vixcS3muM/k48nlKW8lOz4Vw54zUKrJQO6cGRCNOdSzXUg6yq7O+I/Lj6zJNxENKGBbMpAIM0r5DgoAhnXFoHGkAA6JAWrV3kUwRBZOIT1exJZTIyDZzSvHSKDmqPkIqy6agJiIY5UvEK9YA0sG7qJ6uVIkN0
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(39860400002)(376002)(136003)(366004)(396003)(346002)(186009)(1800799009)(451199024)(26005)(2906002)(83380400001)(8676002)(8936002)(33716001)(6512007)(9686003)(6486002)(6506007)(7416002)(86362001)(82960400001)(44832011)(38100700002)(5660300002)(478600001)(6666004)(4326008)(6862004)(6636002)(316002)(66556008)(66476007)(66946007)(54906003)(41300700001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?kkTS6HXBcOSMlFugGY06JCYDl44vnVztVf9tEexG5xoiZOFtXqbDN66/b0Yn?=
+ =?us-ascii?Q?J6t0gqHLxR6g68uO3SGye+KC+UIJ5jc85GMXNiaaD2hBk54poYDGqebjRP4Y?=
+ =?us-ascii?Q?W+g91VcuLygNRI6zfdLIsL3C3uJIYU+MDS23F2hXTy08cUs7Fk9ndpvrBRQa?=
+ =?us-ascii?Q?An39ycz/P5rFOmqqCY5L7lq65idbuQjqEdI56cA7yzgrKX280YS8SjRAPnod?=
+ =?us-ascii?Q?TWkmg4OslTC9y0hI9iw9okTLKVNbSJYARM1QbUaXuSars1stY97yUdUsCf7r?=
+ =?us-ascii?Q?0nUPdMNFAjP7/O+16bHDr1uQENJHaUlvJBQOsTa2dqE6StmwUn4Nfv9Ivf1r?=
+ =?us-ascii?Q?6lMH6N65DRSIIfXDp2ypIBfYYdiEeQxpTEIag5G72rP8FT9CbWQHpQg56cXv?=
+ =?us-ascii?Q?AsYnyfRgpa98z64EgH5SJ3KgMCmCfGx1gEaqSANv1NVXJYG/ULgHlyApNkU1?=
+ =?us-ascii?Q?I+GNtFBrjiAYlQuJkYfFPLbE3X3CZHeS5vNXk7HVliiRxc5EC8Gmfi7s8vP+?=
+ =?us-ascii?Q?/tpegP+y7kyzOkQDOFDl1KCxGArfPGc8GJRld6TQUflYQ6hGAjgnbDfgsZ7B?=
+ =?us-ascii?Q?Y4bFkMc38m/V/8Tq0yQL8avgl0YM7auHdSX/CgtsYK4bfMEfqehqRa1dereV?=
+ =?us-ascii?Q?jJrHkL7AC7GPpurGRVF0Fl4PJnuaxQNYfj1ERdL2WhsRLay1ChxIujsnkLgW?=
+ =?us-ascii?Q?pUJdQMOYh2B8QhgRY7NTHxQkFDKHYinl/XHmH7FD/EYE+NISvNoLGYVeN2ZJ?=
+ =?us-ascii?Q?r1Gg91SXeuEkwW0uUUa0zffh53ShJIkUPKZrGvFY2t77wKpQvCsmVGG1qvQL?=
+ =?us-ascii?Q?cH6whoVUE9p1k4IXNDDGquB7z8nyBDENTnFOIOHgkJym+0GDWUm0l/cnPJYD?=
+ =?us-ascii?Q?bAgvw9a4EcfFF8/qqrZtvuS2chRKxznBSvw9Pkz3E4ijl3pi8kPb4RbgtxAS?=
+ =?us-ascii?Q?ggI+Q/16syCFABN7+tJZy2IHP60cH+wk+xvU0xN8YwhE3hMdwaY1uI5S4AK+?=
+ =?us-ascii?Q?o9BpXOXfGpSvVUlpCsSii6SjSqN7HegBzi/HMGr5GPgeJJp6lJK4X71vBbDw?=
+ =?us-ascii?Q?K/s1SObIzBf7QRFnQq7sTI26lqslcuTJHndwchfCo8Z+EbazNVUGTPigOt2G?=
+ =?us-ascii?Q?grQ0E+SKhnP1d5g7YpbssNDlkTmbIJLU1/isSQ2fc/Mg4Djirv2cYnxsgexN?=
+ =?us-ascii?Q?RBVCy0aLvkCCBzLuIfLxVa/Ib8PXXjXVy6ozjJVn6WbnlpPNx2Byt+2xs32c?=
+ =?us-ascii?Q?yU8bDBbI4vJ46LLh+PnYysW8VtjH2Xg6PnAlSjwn+A02W4zq9Pe5xOU5jzTX?=
+ =?us-ascii?Q?O3uLrPMQqzS9fIpnzbrfA8aT0Ycny9Ts1dAk79gMPcSkQWiEZa7/PjHu+WJ3?=
+ =?us-ascii?Q?VWauOfEKJ72Hav4E4EWOMPXVUTtxLm2qfn96vJIGlqQiNYxkZxqeIqvMoOZa?=
+ =?us-ascii?Q?4/+vpnhrFYnQjWcu7UTuXHrsH+GH4CVIoqflOUBUxZP797EYYnZABS8FiYFA?=
+ =?us-ascii?Q?x3Tazro1wjb6wwtVkvNHAHAwgvfYa+cBkvyF1RSPTgJfOI1NSA9ik8y91ahW?=
+ =?us-ascii?Q?JPu7pCuegabw9Kt2Ygn9vDNqL5xPondPv6qbJ3YqopEkvHj2pL/xDX5Ch5a7?=
+ =?us-ascii?Q?Nw=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 09ca7a07-b8b3-49b8-4d5e-08dbae2609b8
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Sep 2023 15:37:40.0038
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: cbU65JjVdsIs1cuhekeZGj79Xb68SjDH5n/STb7y4mb4l2gYjtzeQL2ITZHUzK21RduES0RP3l95cSEJSuE4OfciUtfJc+sB6k6FOEQCCXY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6454
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Mon, Sep 04, 2023 at 08:01:06PM +0200, Larysa Zaremba wrote:
+> On Mon, Sep 04, 2023 at 05:02:40PM +0200, Maciej Fijalkowski wrote:
+> > On Thu, Aug 24, 2023 at 09:26:42PM +0200, Larysa Zaremba wrote:
+> > > Previously, we only needed RX checksum flags in skb path,
+> > > hence all related code was written with skb in mind.
+> > > But with the addition of XDP hints via kfuncs to the ice driver,
+> > > the same logic will be needed in .xmo_() callbacks.
+> > > 
+> > > Put generic process of determining checksum status into
+> > > a separate function.
+> > > 
+> > > Now we cannot operate directly on skb, when deducing
+> > > checksum status, therefore introduce an intermediate enum for checksum
+> > > status. Fortunately, in ice, we have only 4 possibilities: checksum
+> > > validated at level 0, validated at level 1, no checksum, checksum error.
+> > > Use 3 bits for more convenient conversion.
+> > > 
+> > > Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> > > ---
+> > >  drivers/net/ethernet/intel/ice/ice_txrx_lib.c | 105 ++++++++++++------
+> > >  1 file changed, 69 insertions(+), 36 deletions(-)
+> > > 
+> > > diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+> > > index b2f241b73934..8b155a502b3b 100644
+> > > --- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+> > > +++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+> > > @@ -102,18 +102,41 @@ ice_rx_hash_to_skb(const struct ice_rx_ring *rx_ring,
+> > >  		skb_set_hash(skb, hash, ice_ptype_to_htype(rx_ptype));
+> > >  }
+> > >  
+> > > +enum ice_rx_csum_status {
+> > > +	ICE_RX_CSUM_LVL_0	= 0,
+> > > +	ICE_RX_CSUM_LVL_1	= BIT(0),
+> > > +	ICE_RX_CSUM_NONE	= BIT(1),
+> > > +	ICE_RX_CSUM_ERROR	= BIT(2),
+> > > +	ICE_RX_CSUM_FAIL	= ICE_RX_CSUM_NONE | ICE_RX_CSUM_ERROR,
+> > > +};
+> > > +
+> > >  /**
+> > > - * ice_rx_csum - Indicate in skb if checksum is good
+> > > - * @ring: the ring we care about
+> > > - * @skb: skb currently being received and modified
+> > > + * ice_rx_csum_lvl - Get checksum level from status
+> > > + * @status: driver-specific checksum status
 
---f4j4EWQpC9fDDtdz
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+nit: describe retval?
 
-On Tue, Sep 05, 2023 at 02:48:13PM +0100, Russell King (Oracle) wrote:
-> On Tue, Sep 05, 2023 at 04:49:31PM +0800, Jijie Shao wrote:
-> > We note there are several times lock during phy_state_machine(). The first
-> > is to handle phydev state. It's noting that a competition of phydev lock
-> > happend again if phy_check_link_status() returns an error. Why we don't
-> > held lock until changing state to PHY_ERROR if phy_check_link_status()
-> > returns an error?
+> > > + */
+> > > +static u8 ice_rx_csum_lvl(enum ice_rx_csum_status status)
+> > > +{
+> > > +	return status & ICE_RX_CSUM_LVL_1;
+> > > +}
+> > > +
+> > > +/**
+> > > + * ice_rx_csum_ip_summed - Checksum status from driver-specific to generic
+> > > + * @status: driver-specific checksum status
+
+ditto
+
+> > > + */
+> > > +static u8 ice_rx_csum_ip_summed(enum ice_rx_csum_status status)
+> > > +{
+> > > +	return status & ICE_RX_CSUM_NONE ? CHECKSUM_NONE : CHECKSUM_UNNECESSARY;
+> > 
+> > 	return !(status & ICE_RX_CSUM_NONE);
+> > 
+> > ?
 > 
-> You are quite correct that isn't very good. We can easily get rid of
-> some of this mess, but I don't think all which leaves it still open to
-> the race you describe.
+> status & ICE_RX_CSUM_NONE ? CHECKSUM_NONE : CHECKSUM_UNNECESSARY;
 > 
-> The problem is phy_suspend().
+> is immediately understandable and results in 3 asm operations (I have checked):
 > 
-> First, it calls phy_ethtool_get_wol() which takes the phydev lock. This
-> can be dealt with if we save the state at probe time, and then update
-> the state when phy_ethtool_set_wol() is called.
+> result = status >> 1;
+> result ^= 1;
+> result &= 1;
 > 
-> Second, phy_suspend() calls ->suspend without holding the phydev lock,
-> and holding the lock while calling that may not be safe. Having had a
-> brief look over the implementations (but not delving into any PTP
-> function they may call) does seem to suggest that shouldn't be a big
-> problem, but I don't know whether holding the phydev lock while calling
-> PTP functions is likely to cause issues.
-> 
-> However, looking at that has lead me to the conclusion that there is a
-> lot of duplication of WoL condition testing. phy_suspend() already
-> avoids calling ->suspend() if either phy_ethtool_get_wol() indicates
-> that WoL is enabled, or if the netdev says WoL is enabled.
-> 
-> Many of the ->suspend() implementations, for example,
-> lan88xx_suspend(), dp83822_suspend(), etc test some kind of flag to
-> determine whether WoL is enabled and thus seem to be re-implementing
-> what phy_suspend() is already doing. I think there is scope to delete
-> this code from several drivers.
-> 
-> The easy bits are the patches I've attached to this email. These
-> won't on their own be sufficient to close the race you've identified
-> due to the phy_suspend() issue, but are the best we can do until we
-> can work out what to do about that.
+> I do not think "!(status & ICE_RX_CSUM_NONE);" could produce less.
 
-Having looked deeper at this, I think there may be a solution. See
-these follow-on patches.
+oh, nice. Just the fact that branch being added caught my eye.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
-
---f4j4EWQpC9fDDtdz
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment;
-	filename="0005-net-phy-move-phy_suspend-to-end-of-phy_state_machine.patch"
-
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Bcc: linux@mail.armlinux.org.uk
-Subject: [PATCH net-next 5/8] net: phy: move phy_suspend() to end of
- phy_state_machine()
-MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-
-Move the call to phy_suspend() to the end of phy_state_machine() after
-we release the lock.
-
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/phy/phy.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
-index 2324544aae0d..010e54d7ccb2 100644
---- a/drivers/net/phy/phy.c
-+++ b/drivers/net/phy/phy.c
-@@ -1494,15 +1494,11 @@ void phy_state_machine(struct work_struct *work)
- 		func = &_phy_start_aneg;
- 	}
- 
--	mutex_unlock(&phydev->lock);
--
--	if (do_suspend)
--		phy_suspend(phydev);
--
--	if (err == -ENODEV)
-+	if (err == -ENODEV) {
-+		mutex_unlock(&phydev->lock);
- 		return;
-+	}
- 
--	mutex_lock(&phydev->lock);
- 	if (err < 0)
- 		phy_error_precise(phydev, func, err);
- 
-@@ -1519,6 +1515,9 @@ void phy_state_machine(struct work_struct *work)
- 	if (phy_polling_mode(phydev) && phy_is_started(phydev))
- 		phy_queue_state_machine(phydev, PHY_STATE_TIME);
- 	mutex_unlock(&phydev->lock);
-+
-+	if (do_suspend)
-+		phy_suspend(phydev);
- }
- 
- /**
--- 
-2.30.2
-
-
---f4j4EWQpC9fDDtdz
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment;
-	filename="0006-net-phy-move-phy_state_machine.patch"
-
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Bcc: linux@mail.armlinux.org.uk
-Subject: [PATCH net-next 6/8] net: phy: move phy_state_machine()
-MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-
-Move phy_state_machine() before phy_stop() to avoid subsequent patches
-introducing forward references.
-
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/phy/phy.c | 152 +++++++++++++++++++++---------------------
- 1 file changed, 76 insertions(+), 76 deletions(-)
-
-diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
-index 010e54d7ccb2..508a5434684a 100644
---- a/drivers/net/phy/phy.c
-+++ b/drivers/net/phy/phy.c
-@@ -1353,82 +1353,6 @@ void phy_free_interrupt(struct phy_device *phydev)
- }
- EXPORT_SYMBOL(phy_free_interrupt);
- 
--/**
-- * phy_stop - Bring down the PHY link, and stop checking the status
-- * @phydev: target phy_device struct
-- */
--void phy_stop(struct phy_device *phydev)
--{
--	struct net_device *dev = phydev->attached_dev;
--	enum phy_state old_state;
--
--	if (!phy_is_started(phydev) && phydev->state != PHY_DOWN &&
--	    phydev->state != PHY_ERROR) {
--		WARN(1, "called from state %s\n",
--		     phy_state_to_str(phydev->state));
--		return;
--	}
--
--	mutex_lock(&phydev->lock);
--	old_state = phydev->state;
--
--	if (phydev->state == PHY_CABLETEST) {
--		phy_abort_cable_test(phydev);
--		netif_testing_off(dev);
--	}
--
--	if (phydev->sfp_bus)
--		sfp_upstream_stop(phydev->sfp_bus);
--
--	phydev->state = PHY_HALTED;
--	phy_process_state_change(phydev, old_state);
--
--	mutex_unlock(&phydev->lock);
--
--	phy_state_machine(&phydev->state_queue.work);
--	phy_stop_machine(phydev);
--
--	/* Cannot call flush_scheduled_work() here as desired because
--	 * of rtnl_lock(), but PHY_HALTED shall guarantee irq handler
--	 * will not reenable interrupts.
--	 */
--}
--EXPORT_SYMBOL(phy_stop);
--
--/**
-- * phy_start - start or restart a PHY device
-- * @phydev: target phy_device struct
-- *
-- * Description: Indicates the attached device's readiness to
-- *   handle PHY-related work.  Used during startup to start the
-- *   PHY, and after a call to phy_stop() to resume operation.
-- *   Also used to indicate the MDIO bus has cleared an error
-- *   condition.
-- */
--void phy_start(struct phy_device *phydev)
--{
--	mutex_lock(&phydev->lock);
--
--	if (phydev->state != PHY_READY && phydev->state != PHY_HALTED) {
--		WARN(1, "called from state %s\n",
--		     phy_state_to_str(phydev->state));
--		goto out;
--	}
--
--	if (phydev->sfp_bus)
--		sfp_upstream_start(phydev->sfp_bus);
--
--	/* if phy was suspended, bring the physical link up again */
--	__phy_resume(phydev);
--
--	phydev->state = PHY_UP;
--
--	phy_start_machine(phydev);
--out:
--	mutex_unlock(&phydev->lock);
--}
--EXPORT_SYMBOL(phy_start);
--
- /**
-  * phy_state_machine - Handle the state machine
-  * @work: work_struct that describes the work to be done
-@@ -1520,6 +1444,82 @@ void phy_state_machine(struct work_struct *work)
- 		phy_suspend(phydev);
- }
- 
-+/**
-+ * phy_stop - Bring down the PHY link, and stop checking the status
-+ * @phydev: target phy_device struct
-+ */
-+void phy_stop(struct phy_device *phydev)
-+{
-+	struct net_device *dev = phydev->attached_dev;
-+	enum phy_state old_state;
-+
-+	if (!phy_is_started(phydev) && phydev->state != PHY_DOWN &&
-+	    phydev->state != PHY_ERROR) {
-+		WARN(1, "called from state %s\n",
-+		     phy_state_to_str(phydev->state));
-+		return;
-+	}
-+
-+	mutex_lock(&phydev->lock);
-+	old_state = phydev->state;
-+
-+	if (phydev->state == PHY_CABLETEST) {
-+		phy_abort_cable_test(phydev);
-+		netif_testing_off(dev);
-+	}
-+
-+	if (phydev->sfp_bus)
-+		sfp_upstream_stop(phydev->sfp_bus);
-+
-+	phydev->state = PHY_HALTED;
-+	phy_process_state_change(phydev, old_state);
-+
-+	mutex_unlock(&phydev->lock);
-+
-+	phy_state_machine(&phydev->state_queue.work);
-+	phy_stop_machine(phydev);
-+
-+	/* Cannot call flush_scheduled_work() here as desired because
-+	 * of rtnl_lock(), but PHY_HALTED shall guarantee irq handler
-+	 * will not reenable interrupts.
-+	 */
-+}
-+EXPORT_SYMBOL(phy_stop);
-+
-+/**
-+ * phy_start - start or restart a PHY device
-+ * @phydev: target phy_device struct
-+ *
-+ * Description: Indicates the attached device's readiness to
-+ *   handle PHY-related work.  Used during startup to start the
-+ *   PHY, and after a call to phy_stop() to resume operation.
-+ *   Also used to indicate the MDIO bus has cleared an error
-+ *   condition.
-+ */
-+void phy_start(struct phy_device *phydev)
-+{
-+	mutex_lock(&phydev->lock);
-+
-+	if (phydev->state != PHY_READY && phydev->state != PHY_HALTED) {
-+		WARN(1, "called from state %s\n",
-+		     phy_state_to_str(phydev->state));
-+		goto out;
-+	}
-+
-+	if (phydev->sfp_bus)
-+		sfp_upstream_start(phydev->sfp_bus);
-+
-+	/* if phy was suspended, bring the physical link up again */
-+	__phy_resume(phydev);
-+
-+	phydev->state = PHY_UP;
-+
-+	phy_start_machine(phydev);
-+out:
-+	mutex_unlock(&phydev->lock);
-+}
-+EXPORT_SYMBOL(phy_start);
-+
- /**
-  * phy_mac_interrupt - MAC says the link has changed
-  * @phydev: phy_device struct with changed link
--- 
-2.30.2
-
-
---f4j4EWQpC9fDDtdz
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment;
-	filename="0007-net-phy-split-locked-and-unlocked-section-of-phy_sta.patch"
-
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Bcc: linux@mail.armlinux.org.uk
-Subject: [PATCH net-next 7/8] net: phy: split locked and unlocked section of
- phy_state_machine()
-MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-
-Split out the locked and unlocked sections of phy_state_machine() into
-two separate functions which can be called inside the phydev lock and
-outside the phydev lock as appropriate.
-
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/phy/phy.c | 68 ++++++++++++++++++++++++++-----------------
- 1 file changed, 42 insertions(+), 26 deletions(-)
-
-diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
-index 508a5434684a..b63d9f9320d7 100644
---- a/drivers/net/phy/phy.c
-+++ b/drivers/net/phy/phy.c
-@@ -1353,33 +1353,27 @@ void phy_free_interrupt(struct phy_device *phydev)
- }
- EXPORT_SYMBOL(phy_free_interrupt);
- 
--/**
-- * phy_state_machine - Handle the state machine
-- * @work: work_struct that describes the work to be done
-- */
--void phy_state_machine(struct work_struct *work)
-+enum phy_state_work {
-+	PHY_STATE_WORK_NONE,
-+	PHY_STATE_WORK_ANEG,
-+	PHY_STATE_WORK_SUSPEND,
-+};
-+
-+static enum phy_state_work _phy_state_machine(struct phy_device *phydev)
- {
--	struct delayed_work *dwork = to_delayed_work(work);
--	struct phy_device *phydev =
--			container_of(dwork, struct phy_device, state_queue);
-+	enum phy_state_work state_work = PHY_STATE_WORK_NONE;
- 	struct net_device *dev = phydev->attached_dev;
--	bool needs_aneg = false, do_suspend = false;
--	enum phy_state old_state;
-+	enum phy_state old_state = phydev->state;
- 	const void *func = NULL;
- 	bool finished = false;
- 	int err = 0;
- 
--	mutex_lock(&phydev->lock);
--
--	old_state = phydev->state;
--
- 	switch (phydev->state) {
- 	case PHY_DOWN:
- 	case PHY_READY:
- 		break;
- 	case PHY_UP:
--		needs_aneg = true;
--
-+		state_work = PHY_STATE_WORK_ANEG;
- 		break;
- 	case PHY_NOLINK:
- 	case PHY_RUNNING:
-@@ -1391,7 +1385,7 @@ void phy_state_machine(struct work_struct *work)
- 		if (err) {
- 			phy_abort_cable_test(phydev);
- 			netif_testing_off(dev);
--			needs_aneg = true;
-+			state_work = PHY_STATE_WORK_ANEG;
- 			phydev->state = PHY_UP;
- 			break;
- 		}
-@@ -1399,7 +1393,7 @@ void phy_state_machine(struct work_struct *work)
- 		if (finished) {
- 			ethnl_cable_test_finished(phydev);
- 			netif_testing_off(dev);
--			needs_aneg = true;
-+			state_work = PHY_STATE_WORK_ANEG;
- 			phydev->state = PHY_UP;
- 		}
- 		break;
-@@ -1409,19 +1403,17 @@ void phy_state_machine(struct work_struct *work)
- 			phydev->link = 0;
- 			phy_link_down(phydev);
- 		}
--		do_suspend = true;
-+		state_work = PHY_STATE_WORK_SUSPEND;
- 		break;
- 	}
- 
--	if (needs_aneg) {
-+	if (state_work == PHY_STATE_WORK_ANEG) {
- 		err = _phy_start_aneg(phydev);
- 		func = &_phy_start_aneg;
- 	}
- 
--	if (err == -ENODEV) {
--		mutex_unlock(&phydev->lock);
--		return;
--	}
-+	if (err == -ENODEV)
-+		return state_work;
- 
- 	if (err < 0)
- 		phy_error_precise(phydev, func, err);
-@@ -1438,12 +1430,36 @@ void phy_state_machine(struct work_struct *work)
- 	 */
- 	if (phy_polling_mode(phydev) && phy_is_started(phydev))
- 		phy_queue_state_machine(phydev, PHY_STATE_TIME);
--	mutex_unlock(&phydev->lock);
- 
--	if (do_suspend)
-+	return state_work;
-+}
-+
-+/* unlocked part of the PHY state machine */
-+static void _phy_state_machine_post_work(struct phy_device *phydev,
-+					 enum phy_state_work state_work)
-+{
-+	if (state_work == PHY_STATE_WORK_SUSPEND)
- 		phy_suspend(phydev);
- }
- 
-+/**
-+ * phy_state_machine - Handle the state machine
-+ * @work: work_struct that describes the work to be done
-+ */
-+void phy_state_machine(struct work_struct *work)
-+{
-+	struct delayed_work *dwork = to_delayed_work(work);
-+	struct phy_device *phydev =
-+			container_of(dwork, struct phy_device, state_queue);
-+	enum phy_state_work state_work;
-+
-+	mutex_lock(&phydev->lock);
-+	state_work = _phy_state_machine(phydev);
-+	mutex_unlock(&phydev->lock);
-+
-+	_phy_state_machine_post_work(phydev, state_work);
-+}
-+
- /**
-  * phy_stop - Bring down the PHY link, and stop checking the status
-  * @phydev: target phy_device struct
--- 
-2.30.2
-
-
---f4j4EWQpC9fDDtdz
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment;
-	filename="0008-net-phy-convert-phy_stop-to-use-split-state-machine.patch"
-
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Bcc: linux@mail.armlinux.org.uk
-Subject: [PATCH net-next 8/8] net: phy: convert phy_stop() to use split state
- machine
-MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-
-Convert phy_stop() to use the new locked-section and unlocked-section
-parts of the PHY state machine.
-
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/phy/phy.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
-index b63d9f9320d7..5a5156f9788b 100644
---- a/drivers/net/phy/phy.c
-+++ b/drivers/net/phy/phy.c
-@@ -1467,6 +1467,7 @@ void phy_state_machine(struct work_struct *work)
- void phy_stop(struct phy_device *phydev)
- {
- 	struct net_device *dev = phydev->attached_dev;
-+	enum phy_state_work state_work;
- 	enum phy_state old_state;
- 
- 	if (!phy_is_started(phydev) && phydev->state != PHY_DOWN &&
-@@ -1490,9 +1491,10 @@ void phy_stop(struct phy_device *phydev)
- 	phydev->state = PHY_HALTED;
- 	phy_process_state_change(phydev, old_state);
- 
-+	state_work = _phy_state_machine(phydev);
- 	mutex_unlock(&phydev->lock);
- 
--	phy_state_machine(&phydev->state_queue.work);
-+	_phy_state_machine_post_work(phydev, state_work);
- 	phy_stop_machine(phydev);
- 
- 	/* Cannot call flush_scheduled_work() here as desired because
--- 
-2.30.2
-
-
---f4j4EWQpC9fDDtdz--
+(...)
 
