@@ -1,87 +1,78 @@
-Return-Path: <netdev+bounces-32042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B600792206
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 13:01:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90CE2792209
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 13:02:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C8181C20937
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 11:01:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C6AE28111D
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 11:02:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BBFCCA44;
-	Tue,  5 Sep 2023 11:01:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B172CA47;
+	Tue,  5 Sep 2023 11:02:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B4A8CA43
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 11:01:01 +0000 (UTC)
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D7551AB;
-	Tue,  5 Sep 2023 04:01:00 -0700 (PDT)
-Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-5298e43bb67so5060946a12.1;
-        Tue, 05 Sep 2023 04:01:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F3FE211C
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 11:02:28 +0000 (UTC)
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FDA91AE
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 04:02:26 -0700 (PDT)
+Received: by mail-lj1-x234.google.com with SMTP id 38308e7fff4ca-2bceca8a41aso35891421fa.0
+        for <netdev@vger.kernel.org>; Tue, 05 Sep 2023 04:02:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693911659; x=1694516459; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Zwy2enTt2SO2Sv9oRLC9SuqNesFb2onrt5Fx6Ho7KA8=;
-        b=nk8+2inmrknKcgvJL7umnAT63490i7hGLWbkcO5hoFSSBbxLpjZNkPztQ9lhGlYVVK
-         Jn7zKvfE83QSCjB8FBSDUm+qxC7ItIbFDnGAq2L55noUqg37YXgsOmDsDkCIQqC0Jehn
-         VsvNjqpc7/Fl+2joPT9n83+YGlf7jcAfhw1mXDbldqFNBrDVv8o4Esg8K0YqhDuzKtGM
-         NwKN1GTnpE3vQfddpak9PpFBPsa++F2yKSqFEK+49DxDA4uFnYvXhA9Kpmw4HGqFWM/N
-         xQ2nhVYCIaVIuRmCwQTnFi0dQT34dI3JaQCLWpGLv3xKER8JwyoGEvSUc5hBv6rb1Hu9
-         ruqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693911659; x=1694516459;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20221208; t=1693911744; x=1694516544; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:subject:from:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Zwy2enTt2SO2Sv9oRLC9SuqNesFb2onrt5Fx6Ho7KA8=;
-        b=Wdqet+AhXZ5x37ubVEvLZ5yqD90O0OPfySBJg7GtRU+lHnQ61lUUrf1zhG2qaW6jK5
-         R4jWQ7FXKGbHP9tXs1ZDGBohUvWaveJ7M7ZwD0+Qw3kQo6hTX2MQZiK1KetTKWkMzgaf
-         orA0r4MQNp+UJf9L61yNuuNPxsfWYID9JWHXlAk6s1QA4IEQPH2fjXN9Fq/Zc9mcdvtj
-         72iTBE4MoUp6rd8/E/Y7UV6hDt6/xtg8z89J+kFOmrgq7lRtMtmbMehniLiP1zwNS/ka
-         Un2ILFg5jhiGwKD04hTS+poY0NwLyKuVZsqAmkeDfpKnnKG6AybZzrJewxJqwEWjE/Uc
-         G7Sg==
-X-Gm-Message-State: AOJu0YxmVEQ0J/9phACWCIMsapXUGHw50qbqe6i8UpYpIZIgcJUvJNiQ
-	Lu6FZFab8Ni4OSFqOfmk65k=
-X-Google-Smtp-Source: AGHT+IECWinjGCWmQ4Iuzke+met9TY4SkOWQQZKuyx1EiJ4+IFPhm7nCQotFIWo+YDGJJDiil7HquA==
-X-Received: by 2002:a05:6402:32e:b0:522:d801:7d07 with SMTP id q14-20020a056402032e00b00522d8017d07mr13252480edw.10.1693911658944;
-        Tue, 05 Sep 2023 04:00:58 -0700 (PDT)
-Received: from skbuf ([188.26.57.165])
-        by smtp.gmail.com with ESMTPSA id z14-20020aa7c64e000000b00528922bb53bsm7014864edr.76.2023.09.05.04.00.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Sep 2023 04:00:58 -0700 (PDT)
-Date: Tue, 5 Sep 2023 14:00:56 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
-	davem@davemloft.net, Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>, Tristram.Ha@microchip.com,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, UNGLinuxDriver@microchip.com,
-	George McCollister <george.mccollister@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 RFC 2/4] net: dsa: Extend ksz9477 TAG setup to support
- HSR frames duplication
-Message-ID: <20230905110056.gzkaiznlq5hcvrac@skbuf>
-References: <20230904120209.741207-1-lukma@denx.de>
- <20230904120209.741207-3-lukma@denx.de>
- <20230905102239.mkufbzxwrvuatlrb@skbuf>
- <20230905124409.40c7c2f1@wsk>
+        bh=Q6OvtKSlFCRZS8hBjN04jSFnPDTZpSmr++4fpHiFrcs=;
+        b=iQ2LlMEjcbiGM7b5R5tgzKcN4rhcuNpeB4As3lBszwA0Q13Ksc06KN6GYcmQeaaZ2f
+         JYs+O1fmw24Xs2pp7/FssbcmsZNH6SczWRa2GQiFSl0nUhiwki87HzWlxjo0ALrf+2xT
+         WE66K9x2ALWne9UciHF7R4xs4FsljQHK2QW+aq2zHNLlKZ02pvNSFT6RGijShUDxWJSh
+         cJ9z9tDzkc8cDnbmRTg6QqNZcLewJTSlgBIPz5G9v7WgV0KQy2jhzHvdSVbGr8IBdukv
+         O7E+RVhBiknFzFSMZk6Nx0bzqSOCKpnqOoCvv/RGluMSqJvZpw5sA9wbrIT7mLTHG+An
+         cTUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693911744; x=1694516544;
+        h=content-transfer-encoding:to:subject:from:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Q6OvtKSlFCRZS8hBjN04jSFnPDTZpSmr++4fpHiFrcs=;
+        b=O8ySd9vtPeh8VwasQDT6RO6DOIafUk8rV/JYp8l/y4l6HpZN2eFO+PPhKsGdY5xhzy
+         ksqyj1DJH7JgB56DAmiQbWLBcCvPzfZ4qHUyYeDIgvq6fn3OQKeBa8Td7YpmB1buuOjc
+         QaIDLWW1AdVsOE+5vWIJhiBgTI2x+CZiaJIrI6yGX9x5D2j2LJeA1fMzf6oM5rFegOPv
+         LTJJd/0eesMkK5jNueLYtMpa0AsNanpG1+whshP327PeetNidRDHGFZtoR3GEjSamSlr
+         dCcArTbvCO3CPYLvr8kQlSmD41yt3ydwXqPhQIJnIzT4jxVmvHE2VxyybHeAC2t/U7G6
+         XiTg==
+X-Gm-Message-State: AOJu0YzB2yV9jwUNp09LrICz8x4Xokt4VApKMpyr2gq9OWhllG6qvfon
+	QWgLG7SQBSvob8RpyF6dL1qBaHNus3w=
+X-Google-Smtp-Source: AGHT+IGKHHOgN50XT8x1qQR4qyaJqIH+La24xByU9I5utsDtfP3Ax6srGiX2qpqan4ZCf67788XNOA==
+X-Received: by 2002:a2e:6e13:0:b0:2bc:c4af:36b9 with SMTP id j19-20020a2e6e13000000b002bcc4af36b9mr8896562ljc.52.1693911744156;
+        Tue, 05 Sep 2023 04:02:24 -0700 (PDT)
+Received: from [10.200.8.38] ([137.204.150.17])
+        by smtp.gmail.com with ESMTPSA id 22-20020a05600c229600b003fefb94ccc9sm16437172wmf.11.2023.09.05.04.02.23
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Sep 2023 04:02:23 -0700 (PDT)
+Message-ID: <54cb50af-b8e7-397b-ff7e-f6933b01a4b9@gmail.com>
+Date: Tue, 5 Sep 2023 13:02:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230905124409.40c7c2f1@wsk>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.0
+Content-Language: en-US, it-IT
+From: Sergio Callegari <sergio.callegari@gmail.com>
+Subject: Regression with AX88179A: can't manually set MAC address anymore
+To: netdev@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -89,93 +80,43 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Sep 05, 2023 at 12:44:09PM +0200, Lukasz Majewski wrote:
-> > Not to mention that there are other problems with the "dev->hsr_ports"
-> > concept. For example, having a hsr0 over lan0 and lan1, and a hsr1
-> > over lan2 and lan3, would set dev->hsr_ports to GENMASK(3, 0).
-> 
-> I doubt that having two hsr{01} interfaces is possible with current
-> kernel.
+Hi, reporting here as the issue I am seeing is cross distro and relevant 
+to recent kernels. Hope this is appropriate.
 
-You mean 2 hsr{01} interfaces not being able to coexist in general,
-or just "offloaded" ones?
+I have a USB hub with AX88179A ethernet. I was able to use it regularly, 
+until something changed in recent kernels to have this interface 
+supported by the cdc_ncm driver. After this change it is not possible 
+anymore to work with a manually set MAC address.
 
-> The KSZ9477 allows only to have 2 ports of 5 available as HSR
-> ones.
-> 
-> The same is with earlier chip xrs700x (but this have even bigger
-> constrain - there only ports 1 and 2 can support HSR). 
+More details:
 
-> > > +	if (dev->features & NETIF_F_HW_HSR_DUP) {
-> > > +		val &= ~KSZ9477_TAIL_TAG_LOOKUP;  
-> > 
-> > No need to unset a bit which was never set.
-> 
-> I've explicitly followed the vendor's guidelines - the TAG_LOOKUP needs
-> to be cleared.
-> 
-> But if we can assure that it is not set here I can remove it.
+- before the kernel changes, the interface was supported by a dedicated 
+kernel driver. The driver had glitches but was more or less working. The 
+main issue was that after some usage the driver stopped working. Could 
+fix these glitches with the driver at 
+https://github.com/nothingstopsme/AX88179_178A_Linux_Driver
 
-Let's look at ksz9477_xmit(), filtering only for changes to "u16 val".
+- after the kernel changes, loading the ax88179_178a.ko does not create 
+a network device anymore. The interface can be used with the cdc_ncm 
+driver, however it is not possible anymore to use a manually set MAC 
+address.
 
-static struct sk_buff *ksz9477_xmit(struct sk_buff *skb,
-				    struct net_device *dev)
-{
-	u16 val;
+When you manually set a MAC this appears to be accepted (e.g. ip link 
+reports it correctly), but the card does not receive data anymore. For 
+instance, trying to connect to a DHCP server, you see that the server 
+receives the request, makes an offer, but the offer is never received by 
+the network card.
 
-	val = BIT(dp->index);
+This may be the same issue reported here: 
+https://discussion.fedoraproject.org/t/ax88179-178a-network-fails-to-start-usb-to-eth/77687 
+where the user says he cannot use the adapter when Network Manager is 
+configured to employ a randomized MAC address.
 
-	val |= FIELD_PREP(KSZ9477_TAIL_TAG_PRIO, prio);
+Would be great to have this regression fixed or at least to have the 
+command setting the MAC address erroring out properly.
 
-	if (is_link_local_ether_addr(hdr->h_dest))
-		val |= KSZ9477_TAIL_TAG_OVERRIDE;
+Thanks for the attention.
 
-	if (dev->features & NETIF_F_HW_HSR_DUP) {
-		val &= ~KSZ9477_TAIL_TAG_LOOKUP;
-		val |= ksz_hsr_get_ports(dp->ds);
-	}
-}
+Sergio Callegari
 
-Is KSZ9477_TAIL_TAG_LOOKUP ever set in "val", or am I missing something?
-
-> > > +		val |= ksz_hsr_get_ports(dp->ds);
-> > > +	}  
-> > 
-> > Would this work instead?
-> > 
-> > 	struct net_device *hsr_dev = dp->hsr_dev;
-> > 	struct dsa_port *other_dp;
-> > 
-> > 	dsa_hsr_foreach_port(other_dp, dp->ds, hsr_dev)
-> > 		val |= BIT(other_dp->index);
-> > 
-> 
-> I thought about this solution as well, but I've been afraid, that going
-> through the loop of all 5 ports each time we want to send single packet
-> will reduce the performance.
-> 
-> Hence, the idea with having the "hsr_ports" set once during join
-> function and then use this cached value afterwards.
-
-There was a quote about "premature optimization" which I can't quite remember...
-
-If you can see a measurable performance difference, then the list
-traversal can be converted to something more efficient.
-
-In this case, struct dsa_port :: hsr_dev can be converted to a larger
-struct dsa_hsr structure, similar to struct dsa_port :: bridge.
-That structure could look like this:
-
-struct dsa_hsr {
-	struct net_device *dev;
-	unsigned long port_mask;
-	refcount_t refcount;
-};
-
-and you could replace the list traversal with "val |= dp->hsr->port_mask".
-But a more complex solution requires a justification, which in this case
-is performance-related. So performance data must be gathered.
-
-FWIW, dsa_master_find_slave() also performs a list traversal.
-But similar discussions about performance improvements didn't lead anywhere.
 
