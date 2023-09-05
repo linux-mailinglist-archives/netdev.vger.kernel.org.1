@@ -1,72 +1,90 @@
-Return-Path: <netdev+bounces-32045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4505679220B
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 13:07:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 47FB6792210
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 13:11:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 798F11C2095E
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 11:07:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 789881C20959
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 11:11:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F500CA5F;
-	Tue,  5 Sep 2023 11:07:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D26FBCA6D;
+	Tue,  5 Sep 2023 11:11:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7216ACA49
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 11:07:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CAC6C433C7;
-	Tue,  5 Sep 2023 11:06:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693912021;
-	bh=DDzwoo0FWxIxZY0Djnf1lKgvlQdoIiE5NmUgemTY2K8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=N4/KyZjmezRdHoqSSz7CoXGkF5qGYBwE6ppEJhKPrQZJ5aPzapGta1hGLFC3l5jkL
-	 r0/n5VrD9jQ8bab6VU69k9Y/WdvTUAQaWy19a1H+2erX4hRM7xbjSRVL7YqiIxj1TH
-	 iv/r/gj9smxte/CIwmsUPVIWS6zqksgg1us5VIPuPxDe04BsYY+PDeO5TzbYIm/sSl
-	 pXTkS4H+/G5FWhBNexuUqDbJYbCUxwkURLaIrKVh0AslVkY8T6B3nX8XfMnqJthrNm
-	 OW0Cy4kC/cNYx9zwOVbQG4olf8aPdD0GSTLNZQOz++b47sp/oTPycHZkB5pSno0NpO
-	 tvjMglqY8zR4g==
-Date: Tue, 5 Sep 2023 13:06:53 +0200
-From: Simon Horman <horms@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7C44CA49
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 11:11:15 +0000 (UTC)
+Received: from mail3-165.sinamail.sina.com.cn (mail3-165.sinamail.sina.com.cn [202.108.3.165])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04A1D1AE
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 04:11:13 -0700 (PDT)
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([112.97.61.198])
+	by sina.com (172.16.97.32) with ESMTP
+	id 64F70CCC00007925; Tue, 5 Sep 2023 19:11:11 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 30399712845710
+X-SMAIL-UIID: B0F9B5E4945E436C9D7FF5E9B6A30FC5-20230905-191111
+From: Hillf Danton <hdanton@sina.com>
 To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com,
-	David Laight <David.Laight@aculab.com>,
-	Kyle Zeng <zengyhkyle@gmail.com>
-Subject: Re: [PATCH net] igmp: limit igmpv3_newpack() packet size to
- IP_MAX_MTU
-Message-ID: <20230905110653.GD2146@kernel.org>
-References: <20230905042338.1345307-1-edumazet@google.com>
+Cc: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	Netdev <netdev@vger.kernel.org>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Naresh Kamboju <naresh.kamboju@linaro.org>,
+	LKML <linux-kernel@vger.kernel.org>
+Subject: Re: selftests: net: pmtu.sh: Unable to handle kernel paging request at virtual address
+Date: Tue,  5 Sep 2023 19:10:59 +0800
+Message-Id: <20230905111059.5618-1-hdanton@sina.com>
+In-Reply-To: <CANn89iJj_VR0L7g3-0=aZpKbXfVo7=BG0tsb8rhiTBc4zi_EtQ@mail.gmail.com>
+References: <20230830112600.4483-1-hdanton@sina.com> <f607a7d5-8075-f321-e3c0-963993433b14@I-love.SAKURA.ne.jp> <20230831114108.4744-1-hdanton@sina.com> <CANn89iLCCGsP7SFn9HKpvnKu96Td4KD08xf7aGtiYgZnkjaL=w@mail.gmail.com> <20230903005334.5356-1-hdanton@sina.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230905042338.1345307-1-edumazet@google.com>
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, Sep 05, 2023 at 04:23:38AM +0000, Eric Dumazet wrote:
-> This is a follow up of commit 915d975b2ffa ("net: deal with integer
-> overflows in kmalloc_reserve()") based on David Laight feedback.
-> 
-> Back in 2010, I failed to realize malicious users could set dev->mtu
-> to arbitrary values. This mtu has been since limited to 0x7fffffff but
-> regardless of how big dev->mtu is, it makes no sense for igmpv3_newpack()
-> to allocate more than IP_MAX_MTU and risk various skb fields overflows.
-> 
-> Fixes: 57e1ab6eaddc ("igmp: refine skb allocations")
-> Link: https://lore.kernel.org/netdev/d273628df80f45428e739274ab9ecb72@AcuMS.aculab.com/
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Reported-by: David Laight <David.Laight@ACULAB.COM>
-> Cc: Kyle Zeng <zengyhkyle@gmail.com>
+On Mon, 4 Sep 2023 13:29:57 +0200 Eric Dumazet <edumazet@google.com>
+> On Sun, Sep 3, 2023 at 5:57=E2=80=AFAM Hillf Danton <hdanton@sina.com>
+> > On Thu, 31 Aug 2023 15:12:30 +0200 Eric Dumazet <edumazet@google.com>
+> > > --- a/net/core/dst.c
+> > > +++ b/net/core/dst.c
+> > > @@ -163,8 +163,13 @@ EXPORT_SYMBOL(dst_dev_put);
+> > >
+> > >  void dst_release(struct dst_entry *dst)
+> > >  {
+> > > -       if (dst && rcuref_put(&dst->__rcuref))
+> > > +       if (dst && rcuref_put(&dst->__rcuref)) {
+> > > +               if (!(dst->flags & DST_NOCOUNT)) {
+> > > +                       dst->flags |= DST_NOCOUNT;
+> > > +                       dst_entries_add(dst->ops, -1);
+> >
+> > Could this add happen after the rcu sync above?
+> >
+> I do not think so. All dst_release() should happen before netns removal.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+	cpu2                    cpu3
+	====                    ====
+	cleanup_net()           __sys_sendto
+	                        sock_sendmsg()
+	                        udpv6_sendmsg()
+	synchronize_rcu();
+				dst_release()
 
+Could this one be an exception?
 
