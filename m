@@ -1,89 +1,119 @@
-Return-Path: <netdev+bounces-31994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3823279203D
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 05:55:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 600B579204A
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 06:16:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 952C6280F9B
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 03:55:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00A1328101E
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 04:16:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5E4564E;
-	Tue,  5 Sep 2023 03:55:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1244965E;
+	Tue,  5 Sep 2023 04:16:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 474307E
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 03:55:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69398C433C8;
-	Tue,  5 Sep 2023 03:55:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693886132;
-	bh=lLVUEbQlWPdqOrLlxxs6XsBseI0buyWLU4uLdO6rjow=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=LDgmblXsH4okbJodYbvPlniFpqN89lQ3SXmqVe4Sou8FN9xKjLrSFjBDGFuoSKyI6
-	 IOEaFE6uB3BhB3gwDFcvOp2WwwJYxrwWvCHIdNjvOx7zBWzGPyYtV4INNUW38Ows7m
-	 gdTtPqDbO6Sb0BX1eZ3TXqki38Amve8jq4HFpqlV/UTCPVXncFTYPZ20TDabvSqpsF
-	 48tGKtjsEjME/ZI+OxkaSBZIcyOqutkOyg6WqtgrOWemq2jkQ24TMbAG8oauYDMGig
-	 E5TSxZlBEuHqoJvBReR0SjCNZCPvLClNBKhGR3+lZdFSteZT9RYnle6kdk+uV05pDL
-	 2Ro3z09UFvMFw==
-Date: Mon, 04 Sep 2023 20:55:29 -0700
-From: Kees Cook <kees@kernel.org>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>, netdev@vger.kernel.org
-CC: Kees Cook <keescook@chromium.org>, Jacob Keller <jacob.e.keller@intel.com>,
- intel-wired-lan@lists.osuosl.org,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- linux-hardening@vger.kernel.org, Steven Zou <steven.zou@intel.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Anthony Nguyen <anthony.l.nguyen@intel.com>,
- David Laight <David.Laight@ACULAB.COM>
-Subject: =?US-ASCII?Q?Re=3A_=5BRFC_net-next_v4_1/7=5D_overflow=3A_?= =?US-ASCII?Q?add_DEFINE=5FFLEX=28=29_for_on-stack_allocs?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20230904123107.116381-2-przemyslaw.kitszel@intel.com>
-References: <20230904123107.116381-1-przemyslaw.kitszel@intel.com> <20230904123107.116381-2-przemyslaw.kitszel@intel.com>
-Message-ID: <7AB970A3-883F-49A4-BBCD-23E2CD1E869C@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0C8F7E
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 04:16:29 +0000 (UTC)
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D601CC7;
+	Mon,  4 Sep 2023 21:16:28 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id 98e67ed59e1d1-26f3e26e55aso1107443a91.3;
+        Mon, 04 Sep 2023 21:16:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693887388; x=1694492188; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=aeLpY9djXSpdgH4Ae7n5MB3zE0D3lzBJjJWuWYn4B9M=;
+        b=APQVz9WNVetZ4H8NlK4KETQYPo0dXbIwAQpRsRRgajHctu6HWWPounKT4ChGq+BO4V
+         EGy17icSJXfYnUsQV/SepLixMIrnPngxh/K6g43IS2JI+kiWdwxLEHPoPJN3kZhUREkH
+         nMJNraoRdFyafHhIRkajXvUxWTyYXpeciGZYfQShwV0hSrd6kWewZV34diJ6eiiXVKll
+         H4TjoMEZ5ylcAzqhOm+dwy/m0SY0YnUvDPuHFsqWTseE5RRhzLCpd7h+MeWTLbxMqIN0
+         PZKhX6IdBAJ0UdSPIm/q9d7njqygFUthcnHrqw1Z0+YYZMqplzcPxvj4ZUTJGFGX4NOT
+         MrvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693887388; x=1694492188;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aeLpY9djXSpdgH4Ae7n5MB3zE0D3lzBJjJWuWYn4B9M=;
+        b=RRvHW/WET8FGQpcYLqVN5L0SY74kVFbFGy3Hf8BV3HrfyJxz011QX8k/DEtuO/ya1G
+         sevKptL/ObGPjytDfzT7WimxGXuMo7dLCpcjt1r9bAQdi0xb6CDN/gYkNwJo0DD7+r1h
+         nVF+3+u7xdbVlN5PWtwS86ggS/vU8BXoOI4W/aZIoZO8WwCpBlO7TGG4x2xs5mXpnj27
+         Hc3EyUcoiXaugksEJ/kHYjXLiMIsYWg3n3jfndnBAaiSfzV8ZcZusPudBkNsx8NJh3f3
+         VXmbpwHGuvLlA5HCJRYiN+S1JSTnS3MNyHFIspJ57WjMmFm5H/UOqWoCg26E5ki84cBo
+         aHCQ==
+X-Gm-Message-State: AOJu0Yyrxt2e38kewx8wUxytUSuKKaNf/9aJ2RlePctYoxzbpGL8d79K
+	pBCzRU66IjMVuTbmI/8YNh8=
+X-Google-Smtp-Source: AGHT+IGHKwLSesdv+VTDY2ZVcovQ2Vrs0ifGMuVs4J32gJ4Kms/n3HDyIZqhULXtcu+bbYFqI4HShQ==
+X-Received: by 2002:a17:90a:788e:b0:26d:20ef:1d32 with SMTP id x14-20020a17090a788e00b0026d20ef1d32mr8899654pjk.38.1693887387618;
+        Mon, 04 Sep 2023 21:16:27 -0700 (PDT)
+Received: from localhost.localdomain ([2405:201:a40d:5ac2:3458:cc95:7315:1247])
+        by smtp.gmail.com with ESMTPSA id oj3-20020a17090b4d8300b002639c4f81cesm9719984pjb.3.2023.09.04.21.16.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Sep 2023 21:16:27 -0700 (PDT)
+From: Shubh <shubhisroking@gmail.com>
+To: =?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Shubh <shubhisroking@gmail.com>
+Subject: [PATCH] net: dsa: mt7530: refactor deprecated strncpy
+Date: Tue,  5 Sep 2023 09:46:14 +0530
+Message-ID: <20230905041614.14272-1-shubhisroking@gmail.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On September 4, 2023 5:31:01 AM PDT, Przemek Kitszel <przemyslaw=2Ekitszel@=
-intel=2Ecom> wrote:
-> [=2E=2E=2E]
->+/**
->+ * _DEFINE_FLEX() - helper macro for DEFINE_FLEX() family=2E
->+ * Enables caller macro to pass (different) initializer=2E
->+ *
->+ * @type: structure type name, including "struct" keyword=2E
->+ * @name: Name for a variable to define=2E
->+ * @member: Name of the array member=2E
->+ * @count: Number of elements in the array; must be compile-time const=
-=2E
->+ * @initializer: initializer expression (could be empty for no init)=2E
->+ */
->+#define _DEFINE_FLEX(type, name, member, count, initializer)			\
->+	_Static_assert(__builtin_constant_p(count),				\
->+		       "onstack flex array members require compile-time const count");=
- \
->+	union {									\
->+		u8 bytes[struct_size_t(type, member, count)];			\
->+		type obj;							\
->+	} name##_u initializer;							\
->+	type *name =3D (type *)&name##_u
+Prefer `strscpy_pad` to `strncpy`.
 
-Yeah, I like this! This will make it easy to add __counted_by initializers=
- when we have the need in the future=2E
+Signed-off-by: Shubh <shubhisroking@gmail.com>
+---
+ drivers/net/dsa/mt7530.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+index 035a34b50..ee19475ec 100644
+--- a/drivers/net/dsa/mt7530.c
++++ b/drivers/net/dsa/mt7530.c
+@@ -836,7 +836,7 @@ mt7530_get_strings(struct dsa_switch *ds, int port, u32 stringset,
+ 		return;
+ 
+ 	for (i = 0; i < ARRAY_SIZE(mt7530_mib); i++)
+-		strncpy(data + i * ETH_GSTRING_LEN, mt7530_mib[i].name,
++		strscpy_pad(data + i * ETH_GSTRING_LEN, mt7530_mib[i].name,
+ 			ETH_GSTRING_LEN);
+ }
+ 
+-- 
+2.42.0
 
-
---=20
-Kees Cook
 
