@@ -1,110 +1,209 @@
-Return-Path: <netdev+bounces-32081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32082-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 793717922B2
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 14:34:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 093A77922BB
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 14:42:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6AA2A1C203A8
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 12:34:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B1D71C20944
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 12:42:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65C40A94A;
-	Tue,  5 Sep 2023 12:34:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51F1CD2FA;
+	Tue,  5 Sep 2023 12:42:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 582952FAE
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 12:34:25 +0000 (UTC)
-Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CEBC1A8
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 05:34:23 -0700 (PDT)
-Received: by mail-qt1-x82f.google.com with SMTP id d75a77b69052e-414c54b2551so429901cf.1
-        for <netdev@vger.kernel.org>; Tue, 05 Sep 2023 05:34:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1693917263; x=1694522063; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A8BzvQbB4tFjUYASLDgFKcDVTYztgZfiqPU/fmG9/sI=;
-        b=mwJ+CHBxKPwbSJu5/oMd4cdjcH0ifdEA+cmjThOp6mrdSrA+7eM1gUOkKotYb1J3f7
-         A8B1LLfIQ+M2/dC79KVajUSimqppN+WeijNiHN2/tDCxmEwWwPV2PfJWCdYJVq6Gx78L
-         ODXMNOZJk8xyR1tDlQJNX8eV+vbmCMAVxhMqA8xdK6jj8FSmuZJJB/woXVhOCbeRzEaP
-         NrhAllJsQWQipTRIx6MaaBqoYxt3SxHHNmik7jrx1IcEFhz/pO1uFjHP53lwP/0UWEvE
-         SDJeum12NwIA5kdcux369mVH+IOfZ7VjpmOOpJ7Jjfa5r1T+z/JxUwnvanwDisW3lfmu
-         nm3g==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43E362FAE
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 12:42:54 +0000 (UTC)
+Received: from mail-pl1-f207.google.com (mail-pl1-f207.google.com [209.85.214.207])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13BC01AD
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 05:42:53 -0700 (PDT)
+Received: by mail-pl1-f207.google.com with SMTP id d9443c01a7336-1c0e161e18fso34749355ad.1
+        for <netdev@vger.kernel.org>; Tue, 05 Sep 2023 05:42:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693917263; x=1694522063;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=A8BzvQbB4tFjUYASLDgFKcDVTYztgZfiqPU/fmG9/sI=;
-        b=b4IOkXCntUy6oYbrLc3BFISvVt38mMMGz7fLtPM1sRWiaY99SWmowZ14ryS/x9uSBY
-         7DmwkMTwHszRZSq/1rqmjLOJZppKm++q1mdnsqWaHIZUdHXUWl0wcz3/kYWJqrBTfh/E
-         uA+ULy3F4on8/87dQ25peQRzNQjWpox9Map+lG4q3PMrIqxKZJ3Ps9kG64AVz506rei+
-         nSMVPpkJH/EUgTtcSqZnNCdBtMGUm9oat9ffEozcGnV3gUfIW3zeEhgrrQg8s7s/XgF7
-         xLOFwQALcAQy8zN0/x3atF8bxFL2Xjsrvg1skNyUljDEkQe0ADvQlfZcuwLAyDV62yz3
-         8qKA==
-X-Gm-Message-State: AOJu0YzGT9IPL+KwBZjk75/yu+pkCaanhVmFgRU9fX8r36EHtBbvopZn
-	wgnOqA4OI3BGivx2fQ3DhoOgwTDChk2x311e17TKBg==
-X-Google-Smtp-Source: AGHT+IHOG0XWsTKcJ6r3ybjm+tKuzjktHYYqJIhqxBoDCL24O46IHlDgwAcuSRZN/0OA8GYi7H3AltGHK0q0UV0XNCw=
-X-Received: by 2002:ac8:5993:0:b0:410:653f:90ea with SMTP id
- e19-20020ac85993000000b00410653f90eamr552896qte.1.1693917262647; Tue, 05 Sep
- 2023 05:34:22 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1693917771; x=1694522571;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+A22TUng3ehfxKNM9eOPCzIy7tpRELO/RihFdMxcoOw=;
+        b=bWkC4mhzOoy4XB+dmpwUskvuCgbrUOB23g0uncZpEI8Amcojd4qzUgQ1uoVV08FXKO
+         r4tgnnuqt8VmgnU9EqIswEnKuzgsKlMCgT42dka9H9zr4qSllnTLoxSlqK/3I9lH0yne
+         hL2yLNGqF9x8Wh20m2rXdqt7w3unNuW6btFL+NU4uERaMUDj6ZHJsQFUQrH2t5EJPYJG
+         6eDz5rhV0mYmXdV7kRiWCZzftvIf7OeckxmEm/4kQHxKTPJriWzcsM/C26xIbrG4e+tC
+         3kyYtRxrqcQwDmBkt1Gt8aYeadKShI6RSuN0aqtNP90291bVtmUnaPxYg0x4NI3kt8Dh
+         9gvA==
+X-Gm-Message-State: AOJu0Yw/SKBimZVHOOWYHGrIAsUfoy0o2O9pMvWU5MRUi+qSve8tVq6A
+	oyZxZ7spx9KvaXCqa+e6vZ8ccaBnRqpup/RZ6lmbyHf98nTh
+X-Google-Smtp-Source: AGHT+IHekrccDvZh3yL6oOrsD0OJeiraoLHOiYi6pobMI/N+w1SGXocvD4awgQmGYdOUDTsREl1+E1Ma+dIIH8wj4aUyPFgsN0iK
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230831183750.2952307-1-edumazet@google.com> <d273628df80f45428e739274ab9ecb72@AcuMS.aculab.com>
- <CANn89iJY4=Q0edL-mf2JrRiz8Ld7bQcogOrc4ozLEVD8qz8o2A@mail.gmail.com>
- <837a03d12d8345bfa7e9874c1e7d9156@AcuMS.aculab.com> <ZPZtBWm06f321Tp/@westworld>
- <CANn89iJDsm-xE4K2_BWngOQeuhOFmOhwVfk5=sszf0E+3UcH=g@mail.gmail.com>
- <0669d0d3fefb44aaa3f8021872751693@AcuMS.aculab.com> <CANn89iJtwNuLA2=dY-ZgLVtUrjt-K3K2gNv9XSt5Hyd2tV6+eQ@mail.gmail.com>
-In-Reply-To: <CANn89iJtwNuLA2=dY-ZgLVtUrjt-K3K2gNv9XSt5Hyd2tV6+eQ@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 5 Sep 2023 14:34:11 +0200
-Message-ID: <CANn89iKL9-3RTBhtyg5gxOLfXZVyJoCK0A_K9ui5Ew-KdNtFhw@mail.gmail.com>
-Subject: Re: [PATCH net] net: deal with integer overflows in kmalloc_reserve()
-To: David Laight <David.Laight@aculab.com>
-Cc: Kyle Zeng <zengyhkyle@gmail.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "eric.dumazet@gmail.com" <eric.dumazet@gmail.com>, 
-	syzbot <syzkaller@googlegroups.com>, Kees Cook <keescook@chromium.org>, 
-	Vlastimil Babka <vbabka@suse.cz>
+X-Received: by 2002:a17:902:fb06:b0:1bb:cdea:d959 with SMTP id
+ le6-20020a170902fb0600b001bbcdead959mr2555938plb.0.1693917771735; Tue, 05 Sep
+ 2023 05:42:51 -0700 (PDT)
+Date: Tue, 05 Sep 2023 05:42:51 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000001027a206049bf7da@google.com>
+Subject: [syzbot] [bluetooth?] KASAN: use-after-free Read in hci_conn_security
+From: syzbot <syzbot+b1b9423479233352b99e@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_DIGITS,
+	FROM_LOCAL_HEX,HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Sep 5, 2023 at 2:27=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
-rote:
->
-> On Tue, Sep 5, 2023 at 10:36=E2=80=AFAM David Laight <David.Laight@aculab=
-.com> wrote:
-> >
-> > From: Eric Dumazet
-> > > Sent: 05 September 2023 04:42
-> > ...
-> > > Again, I do not want this patch, I want to fix the root cause(s).
-> > >
-> > > It makes no sense to allow dev->mtu to be as big as 0x7fffffff and
-> > > ultimately allow size to be bigger than 0x80000000
-> >
-> > kmem_alloc_reserve() also needs fixing.
->
-> Yes, this is what I said. Please provide a patch ?
+Hello,
 
-Oops, I thought you were speaking about kmalloc_size_roundup()
+syzbot found the following issue on:
 
-kmalloc_reserve() is fine, all overflows must be taken care of before
-reaching it.
+HEAD commit:    2ea35288c83b skbuff: skb_segment, Call zero copy functions..
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=17f46d87a80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=634e05b4025da9da
+dashboard link: https://syzkaller.appspot.com/bug?extid=b1b9423479233352b99e
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/d8d28ba7b968/disk-2ea35288.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/12a9f785a85b/vmlinux-2ea35288.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/d71c4427c061/bzImage-2ea35288.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+b1b9423479233352b99e@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: use-after-free in instrument_atomic_read include/linux/instrumented.h:68 [inline]
+BUG: KASAN: use-after-free in _test_bit include/asm-generic/bitops/instrumented-non-atomic.h:141 [inline]
+BUG: KASAN: use-after-free in hci_conn_ssp_enabled include/net/bluetooth/hci_core.h:988 [inline]
+BUG: KASAN: use-after-free in hci_conn_security+0x324/0x990 net/bluetooth/hci_conn.c:2409
+Read of size 8 at addr ffff8880784dda70 by task kworker/1:11/12886
+
+CPU: 1 PID: 12886 Comm: kworker/1:11 Not tainted 6.5.0-syzkaller-04006-g2ea35288c83b #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
+Workqueue: events l2cap_info_timeout
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
+ print_address_description mm/kasan/report.c:364 [inline]
+ print_report+0xc4/0x620 mm/kasan/report.c:475
+ kasan_report+0xda/0x110 mm/kasan/report.c:588
+ check_region_inline mm/kasan/generic.c:181 [inline]
+ kasan_check_range+0xef/0x190 mm/kasan/generic.c:187
+ instrument_atomic_read include/linux/instrumented.h:68 [inline]
+ _test_bit include/asm-generic/bitops/instrumented-non-atomic.h:141 [inline]
+ hci_conn_ssp_enabled include/net/bluetooth/hci_core.h:988 [inline]
+ hci_conn_security+0x324/0x990 net/bluetooth/hci_conn.c:2409
+ l2cap_chan_check_security+0x16f/0x320 net/bluetooth/l2cap_core.c:929
+ l2cap_conn_start+0x59b/0xa40 net/bluetooth/l2cap_core.c:1646
+ process_one_work+0xaa2/0x16f0 kernel/workqueue.c:2600
+ worker_thread+0x687/0x1110 kernel/workqueue.c:2751
+ kthread+0x33a/0x430 kernel/kthread.c:389
+ ret_from_fork+0x2c/0x70 arch/x86/kernel/process.c:145
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+ </TASK>
+
+The buggy address belongs to the physical page:
+page:ffffea0001e13740 refcount:0 mapcount:0 mapping:0000000000000000 index:0x4 pfn:0x784dd
+flags: 0xfff00000000000(node=0|zone=1|lastcpupid=0x7ff)
+page_type: 0xffffffff()
+raw: 00fff00000000000 0000000000000000 ffffffff00000201 0000000000000000
+raw: 0000000000000004 0000000000000000 00000000ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as freed
+page last allocated via order 2, migratetype Unmovable, gfp_mask 0x140dc0(GFP_USER|__GFP_COMP|__GFP_ZERO), pid 9825, tgid 9825 (syz-executor.2), ts 251793148654, free_ts 864555377636
+ set_page_owner include/linux/page_owner.h:31 [inline]
+ post_alloc_hook+0x2d2/0x350 mm/page_alloc.c:1570
+ prep_new_page mm/page_alloc.c:1577 [inline]
+ get_page_from_freelist+0x10a9/0x31e0 mm/page_alloc.c:3221
+ __alloc_pages+0x1d0/0x4a0 mm/page_alloc.c:4477
+ __alloc_pages_node include/linux/gfp.h:237 [inline]
+ alloc_pages_node include/linux/gfp.h:260 [inline]
+ __kmalloc_large_node+0x87/0x1c0 mm/slab_common.c:1126
+ __do_kmalloc_node mm/slab_common.c:973 [inline]
+ __kmalloc.cold+0xb/0xe0 mm/slab_common.c:998
+ kmalloc include/linux/slab.h:586 [inline]
+ kzalloc include/linux/slab.h:703 [inline]
+ hci_alloc_dev_priv+0x1d/0x2780 net/bluetooth/hci_core.c:2467
+ hci_alloc_dev include/net/bluetooth/hci_core.h:1600 [inline]
+ __vhci_create_device+0xf7/0x800 drivers/bluetooth/hci_vhci.c:402
+ vhci_create_device drivers/bluetooth/hci_vhci.c:475 [inline]
+ vhci_get_user drivers/bluetooth/hci_vhci.c:532 [inline]
+ vhci_write+0x2c7/0x470 drivers/bluetooth/hci_vhci.c:612
+ call_write_iter include/linux/fs.h:1985 [inline]
+ new_sync_write fs/read_write.c:491 [inline]
+ vfs_write+0x650/0xe40 fs/read_write.c:584
+ ksys_write+0x12f/0x250 fs/read_write.c:637
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+page last free stack trace:
+ reset_page_owner include/linux/page_owner.h:24 [inline]
+ free_pages_prepare mm/page_alloc.c:1161 [inline]
+ free_unref_page_prepare+0x508/0xb90 mm/page_alloc.c:2348
+ free_unref_page+0x33/0x3b0 mm/page_alloc.c:2443
+ hci_release_dev+0x4da/0x600 net/bluetooth/hci_core.c:2792
+ bt_host_release+0x6a/0xb0 net/bluetooth/hci_sysfs.c:93
+ device_release+0xa1/0x240 drivers/base/core.c:2484
+ kobject_cleanup lib/kobject.c:682 [inline]
+ kobject_release lib/kobject.c:713 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x1f7/0x5b0 lib/kobject.c:730
+ put_device+0x1f/0x30 drivers/base/core.c:3733
+ vhci_release+0x87/0x100 drivers/bluetooth/hci_vhci.c:670
+ __fput+0x3f7/0xa70 fs/file_table.c:384
+ task_work_run+0x14d/0x240 kernel/task_work.c:179
+ exit_task_work include/linux/task_work.h:38 [inline]
+ do_exit+0xa99/0x2a20 kernel/exit.c:874
+ do_group_exit+0xd4/0x2a0 kernel/exit.c:1024
+ __do_sys_exit_group kernel/exit.c:1035 [inline]
+ __se_sys_exit_group kernel/exit.c:1033 [inline]
+ __x64_sys_exit_group+0x3e/0x50 kernel/exit.c:1033
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+Memory state around the buggy address:
+ ffff8880784dd900: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+ ffff8880784dd980: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+>ffff8880784dda00: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+                                                             ^
+ ffff8880784dda80: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+ ffff8880784ddb00: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
