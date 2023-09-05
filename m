@@ -1,104 +1,135 @@
-Return-Path: <netdev+bounces-32068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BD51792260
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 13:59:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6B3E792264
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 14:01:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C34E01C20944
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 11:59:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 724F8281181
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 12:01:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C215FD2EE;
-	Tue,  5 Sep 2023 11:59:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6333D2F0;
+	Tue,  5 Sep 2023 12:01:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5F4DCA70
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 11:59:52 +0000 (UTC)
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87D361AD
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 04:59:51 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-40037db2fe7so24145685e9.0
-        for <netdev@vger.kernel.org>; Tue, 05 Sep 2023 04:59:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1693915190; x=1694519990; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=H9w3uV4OtPsdBYbHCTZu/QSzm/qmPZOCTm5LGAMv9s8=;
-        b=uD2PQQ0XrE3fYNLL0YuN7mGm1A9gTTPFFwi6IGsZ6gOa1nMHXYZewvnOTeQD1DS9Ud
-         NFyrR/NBRTJk2rpMOB8KWjZnnRmm78Vl6Dw3BTT70d/LfOieLJR/PrE7KKf9gZ+1WdEP
-         tGnYNe8+dET1/cIyD+7+Bka48XdJuvwWPWzEyJqTiM7CgfeR4idahStBR9QUcbkNFFJl
-         KJAkWFLn/KDgEaRAgLeepUFHmwUPQA7efFTJO61ALFTu3nWz6/LwDCiDtXBuM8wqdpfT
-         vKIVr8Y5MBkruKS+8wpciyurMs7q2KizzgSnGDAcI1hCst4kFYjweYasYBZ4Z1nk7RSI
-         2Iow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693915190; x=1694519990;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H9w3uV4OtPsdBYbHCTZu/QSzm/qmPZOCTm5LGAMv9s8=;
-        b=Vuxx8UwFwfo09NiRNczgXJSQ/jQUfBy9S69eShPW4gEhsm4MQtUq7oTfQumcKywdHk
-         T9MPTyBp75QVaIB1Y+DDTxnCqK/RuBkeZPYYKRw1chOrpdtGDVhprLM0uUwdW8tNrxaG
-         rwE1PFOUSKZrznU1mrwQLJRNtjaksmPc4OgVxIGS6GwAbR8Rh8Vd7Ib/9iY3pOzzcx8X
-         cHbLQ+tvY78NLmF24Y45hJO3muZJGyauOWZUCdHtrzOhcgDNPwk6nkc0OlHpNrdIRVAE
-         uFpqb4GvDCUEsEDFK2yRupoMisAZpgniD8fDLlauLL7AgHDk3qGY/j7hZcG6y7yifLhM
-         p+TQ==
-X-Gm-Message-State: AOJu0YznfUBdh7fGOzMPDFrQIPeXpRzhCEmt2zBPMKwzkc9/Ob8XMxaU
-	ImUpj2+6orcVayOAjWEhK1yoOYfHCMQdECQz8cw=
-X-Google-Smtp-Source: AGHT+IHXh3GSboJMjsDNLpubzBj884qaOle8e1HaDZcS5Oou0lZ3DTIj6eJGKfPhqNq6aeaPHcx9pw==
-X-Received: by 2002:adf:f208:0:b0:318:7d5:67bf with SMTP id p8-20020adff208000000b0031807d567bfmr9465711wro.49.1693915190016;
-        Tue, 05 Sep 2023 04:59:50 -0700 (PDT)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id 16-20020a05600c025000b003fee7b67f67sm16725545wmj.31.2023.09.05.04.59.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Sep 2023 04:59:49 -0700 (PDT)
-Date: Tue, 5 Sep 2023 14:59:47 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Jinjie Ruan <ruanjinjie@huawei.com>, netdev@vger.kernel.org
-Cc: gregkh@linuxfoundation.org, philipp.g.hortmann@gmail.com,
-	straube.linux@gmail.com, Larry.Finger@lwfinger.net,
-	wlanfae@realtek.com, mikem@ring3k.org, seanm@seanm.ca,
-	linux-staging@lists.linux.dev
-Subject: Re: [PATCH -next v2 0/3] staging: rtl8192e: Do not call kfree_skb()
- under spin_lock_irqsave()
-Message-ID: <d7326392-56e4-4ccb-a878-0a03c91d0d85@kadam.mountain>
-References: <20230825015213.2697347-1-ruanjinjie@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA188D2EC
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 12:01:16 +0000 (UTC)
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E57211B3;
+	Tue,  5 Sep 2023 05:01:14 -0700 (PDT)
+Received: from canpemm500006.china.huawei.com (unknown [172.30.72.53])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Rg3vf0Vghz1M9Cj;
+	Tue,  5 Sep 2023 19:59:26 +0800 (CST)
+Received: from [10.174.179.200] (10.174.179.200) by
+ canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Tue, 5 Sep 2023 20:01:11 +0800
+Subject: Re: [PATCH net v3] team: fix null-ptr-deref when team device type is
+ changed
+To: Paolo Abeni <pabeni@redhat.com>, <jiri@resnulli.us>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<netdev@vger.kernel.org>, <liuhangbin@gmail.com>
+CC: <linux-kernel@vger.kernel.org>
+References: <20230905081056.3365013-1-william.xuanziyang@huawei.com>
+ <7125d734bdf73708aae9f431fb5d18b1699499a5.camel@redhat.com>
+From: "Ziyang Xuan (William)" <william.xuanziyang@huawei.com>
+Message-ID: <b7f5a25e-50b7-5738-fd43-52284c1469c9@huawei.com>
+Date: Tue, 5 Sep 2023 20:01:11 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230825015213.2697347-1-ruanjinjie@huawei.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <7125d734bdf73708aae9f431fb5d18b1699499a5.camel@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.179.200]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ canpemm500006.china.huawei.com (7.192.105.130)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Added netdev because they're really the experts.
+> On Tue, 2023-09-05 at 16:10 +0800, Ziyang Xuan wrote:
+>> Get a null-ptr-deref bug as follows with reproducer [1].
+>>
+>> BUG: kernel NULL pointer dereference, address: 0000000000000228
+>> ...
+>> RIP: 0010:vlan_dev_hard_header+0x35/0x140 [8021q]
+>> ...
+>> Call Trace:
+>>  <TASK>
+>>  ? __die+0x24/0x70
+>>  ? page_fault_oops+0x82/0x150
+>>  ? exc_page_fault+0x69/0x150
+>>  ? asm_exc_page_fault+0x26/0x30
+>>  ? vlan_dev_hard_header+0x35/0x140 [8021q]
+>>  ? vlan_dev_hard_header+0x8e/0x140 [8021q]
+>>  neigh_connected_output+0xb2/0x100
+>>  ip6_finish_output2+0x1cb/0x520
+>>  ? nf_hook_slow+0x43/0xc0
+>>  ? ip6_mtu+0x46/0x80
+>>  ip6_finish_output+0x2a/0xb0
+>>  mld_sendpack+0x18f/0x250
+>>  mld_ifc_work+0x39/0x160
+>>  process_one_work+0x1e6/0x3f0
+>>  worker_thread+0x4d/0x2f0
+>>  ? __pfx_worker_thread+0x10/0x10
+>>  kthread+0xe5/0x120
+>>  ? __pfx_kthread+0x10/0x10
+>>  ret_from_fork+0x34/0x50
+>>  ? __pfx_kthread+0x10/0x10
+>>  ret_from_fork_asm+0x1b/0x30
+>>
+>> [1]
+>> $ teamd -t team0 -d -c '{"runner": {"name": "loadbalance"}}'
+>> $ ip link add name t-dummy type dummy
+>> $ ip link add link t-dummy name t-dummy.100 type vlan id 100
+>> $ ip link add name t-nlmon type nlmon
+>> $ ip link set t-nlmon master team0
+>> $ ip link set t-nlmon nomaster
+>> $ ip link set t-dummy up
+>> $ ip link set team0 up
+>> $ ip link set t-dummy.100 down
+>> $ ip link set t-dummy.100 master team0
+>>
+>> When enslave a vlan device to team device and team device type is changed
+>> from non-ether to ether, header_ops of team device is changed to
+>> vlan_header_ops. That is incorrect and will trigger null-ptr-deref
+>> for vlan->real_dev in vlan_dev_hard_header() because team device is not
+>> a vlan device.
+>>
+>> Assign eth_header_ops to header_ops of team device when its type is changed
+>> from non-ether to ether to fix the bug.
+>>
+>> Fixes: 1d76efe1577b ("team: add support for non-ethernet devices")
+>> Suggested-by: Hangbin Liu <liuhangbin@gmail.com>
+>> Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
+> 
+> I'm sorry to note that this submission does not fit our process:
+> 
+> https://elixir.bootlin.com/linux/latest/source/Documentation/process/maintainer-netdev.rst#L353
+> 
+> this specific kind of process violations tend to make reviewers quite
+> unhappy, please be more careful.
+> 
+Sorry for the inconvenience caused to everyone. It's my fault. I will improve.
 
-On Fri, Aug 25, 2023 at 09:52:10AM +0800, Jinjie Ruan wrote:
-> It is not allowed to call kfree_skb() from hardware interrupt
-> context or with interrupts being disabled.
-
-There are no comments which say that this is not allowed.  I have
-reviewed the code to see why it's not allowed.  The only thing I can
-see is that maybe the skb->destructor(skb); in skb_release_head_state()
-sleeps?  Or possibly the uarg->callback() in skb_zcopy_clear()?
-
-Can you comment more on why this isn't allowed?  Was this detected at
-runtime?  Do you have a stack trace?
-
-Once I know more I can add this to Smatch so that it is detected
-automatically using static analysis.
-
-regards,
-dan carpenter
-
+> Regards,
+> 
+> Paolo
+> 
+> .
+> 
 
