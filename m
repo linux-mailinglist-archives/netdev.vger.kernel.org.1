@@ -1,78 +1,107 @@
-Return-Path: <netdev+bounces-32043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90CE2792209
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 13:02:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1109179220A
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 13:05:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C6AE28111D
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 11:02:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 661C028110C
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 11:05:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B172CA47;
-	Tue,  5 Sep 2023 11:02:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A11C3CA5C;
+	Tue,  5 Sep 2023 11:05:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F3FE211C
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 11:02:28 +0000 (UTC)
-Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FDA91AE
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 04:02:26 -0700 (PDT)
-Received: by mail-lj1-x234.google.com with SMTP id 38308e7fff4ca-2bceca8a41aso35891421fa.0
-        for <netdev@vger.kernel.org>; Tue, 05 Sep 2023 04:02:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9186BC8F5
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 11:05:17 +0000 (UTC)
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 193A3132;
+	Tue,  5 Sep 2023 04:05:16 -0700 (PDT)
+Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-99bf3f59905so360146366b.3;
+        Tue, 05 Sep 2023 04:05:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693911744; x=1694516544; darn=vger.kernel.org;
-        h=content-transfer-encoding:to:subject:from:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Q6OvtKSlFCRZS8hBjN04jSFnPDTZpSmr++4fpHiFrcs=;
-        b=iQ2LlMEjcbiGM7b5R5tgzKcN4rhcuNpeB4As3lBszwA0Q13Ksc06KN6GYcmQeaaZ2f
-         JYs+O1fmw24Xs2pp7/FssbcmsZNH6SczWRa2GQiFSl0nUhiwki87HzWlxjo0ALrf+2xT
-         WE66K9x2ALWne9UciHF7R4xs4FsljQHK2QW+aq2zHNLlKZ02pvNSFT6RGijShUDxWJSh
-         cJ9z9tDzkc8cDnbmRTg6QqNZcLewJTSlgBIPz5G9v7WgV0KQy2jhzHvdSVbGr8IBdukv
-         O7E+RVhBiknFzFSMZk6Nx0bzqSOCKpnqOoCvv/RGluMSqJvZpw5sA9wbrIT7mLTHG+An
-         cTUg==
+        d=gmail.com; s=20221208; t=1693911914; x=1694516714; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kV2u1LJ/AQQMdTka+tApDVxIh+Eo+L4Z4u7wlv+3woU=;
+        b=XFBBphpAskDiNvzPrd+HOMtz4E9T0kAeEMxpwzEaJO6Q6+G6CZuLsofywWA7oxSlYq
+         TlCm6UNEke/ZC2/NdlbZge/RamgtQAvawKMhYXQyZaUau/w9ntY/I7VL2nnviYLFZbMB
+         g+xN9Z9baQQQlQo/2FtzPAX6g+8vkF83mMNb76lILz4a1I+jhyGg6gWzpOOljneaX8BI
+         u0PYG2P+NPo1bKYN7otd/wH6vOpuGr96/NtYvy/gUanInH0c2neXcFS89htvKH8W3fMk
+         NDnXiMXIMcsfqn3oyPwZvDq5Z27PiaJSl19VTC6eyhA0sDZfALWslUxwrlKGHOOhYc6i
+         2flw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693911744; x=1694516544;
-        h=content-transfer-encoding:to:subject:from:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Q6OvtKSlFCRZS8hBjN04jSFnPDTZpSmr++4fpHiFrcs=;
-        b=O8ySd9vtPeh8VwasQDT6RO6DOIafUk8rV/JYp8l/y4l6HpZN2eFO+PPhKsGdY5xhzy
-         ksqyj1DJH7JgB56DAmiQbWLBcCvPzfZ4qHUyYeDIgvq6fn3OQKeBa8Td7YpmB1buuOjc
-         QaIDLWW1AdVsOE+5vWIJhiBgTI2x+CZiaJIrI6yGX9x5D2j2LJeA1fMzf6oM5rFegOPv
-         LTJJd/0eesMkK5jNueLYtMpa0AsNanpG1+whshP327PeetNidRDHGFZtoR3GEjSamSlr
-         dCcArTbvCO3CPYLvr8kQlSmD41yt3ydwXqPhQIJnIzT4jxVmvHE2VxyybHeAC2t/U7G6
-         XiTg==
-X-Gm-Message-State: AOJu0YzB2yV9jwUNp09LrICz8x4Xokt4VApKMpyr2gq9OWhllG6qvfon
-	QWgLG7SQBSvob8RpyF6dL1qBaHNus3w=
-X-Google-Smtp-Source: AGHT+IGKHHOgN50XT8x1qQR4qyaJqIH+La24xByU9I5utsDtfP3Ax6srGiX2qpqan4ZCf67788XNOA==
-X-Received: by 2002:a2e:6e13:0:b0:2bc:c4af:36b9 with SMTP id j19-20020a2e6e13000000b002bcc4af36b9mr8896562ljc.52.1693911744156;
-        Tue, 05 Sep 2023 04:02:24 -0700 (PDT)
-Received: from [10.200.8.38] ([137.204.150.17])
-        by smtp.gmail.com with ESMTPSA id 22-20020a05600c229600b003fefb94ccc9sm16437172wmf.11.2023.09.05.04.02.23
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Sep 2023 04:02:23 -0700 (PDT)
-Message-ID: <54cb50af-b8e7-397b-ff7e-f6933b01a4b9@gmail.com>
-Date: Tue, 5 Sep 2023 13:02:22 +0200
+        d=1e100.net; s=20221208; t=1693911914; x=1694516714;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kV2u1LJ/AQQMdTka+tApDVxIh+Eo+L4Z4u7wlv+3woU=;
+        b=PHGw8gEjLDDuksH7ncXJNttWY6Miyw/XmNz2YgbIPgCPjDY/Yt9AUhOGZzhKfeIN6g
+         24cDc18DD4xnMsyGsADDr4CfByRkvggWujToZ3Mn5eNwi5mrCaEH6/8c4XUef0pa/IY7
+         cH7P4PAOKZSYuo0ja2FTgCh992iZipKg92l/ctSRLmw2Ebzt9971rQZG8+0iWUvuuokg
+         ld+ZwlcsWhSogZt41wwMYA5hzvSql2ZkbqIuZ7f6SoEywLW51ghwYacO72+DtXkd3ERN
+         h4s4n6jskQP+OWXVdYWEsisPgFDecgCGG+nG2oWvkAOv5tFMeahinBka/oONkDFVMX9r
+         iVxA==
+X-Gm-Message-State: AOJu0YwsRmqR9tbxTB6lZfK9RiJrHzC86BjpaPKupakrkFRnQGEcA4Iv
+	TPXD8TjomZH33P7/8dip/Vs=
+X-Google-Smtp-Source: AGHT+IGrI66p2CBlDOcMK2yKRkeShj590QUDA31D8xucis1MBr3Sx1jck3yAeoVNwtjgdsXFZ3lyyQ==
+X-Received: by 2002:a17:906:1bb2:b0:9a6:69bf:fa5a with SMTP id r18-20020a1709061bb200b009a669bffa5amr2412702ejg.63.1693911914444;
+        Tue, 05 Sep 2023 04:05:14 -0700 (PDT)
+Received: from skbuf ([188.26.57.165])
+        by smtp.gmail.com with ESMTPSA id t20-20020a1709063e5400b0099ccee57ac2sm7408438eji.194.2023.09.05.04.05.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Sep 2023 04:05:14 -0700 (PDT)
+Date: Tue, 5 Sep 2023 14:05:11 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Cc: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH 2/4] dt-bindings: net: dsa: document internal MDIO bus
+Message-ID: <20230905110511.hyap7grnomzwqj6d@skbuf>
+References: <47b61929-5c2d-4906-b153-2046a94858c8@arinc9.com>
+ <20230813112026.ohsx6srbt2staxma@skbuf>
+ <8a8e14f1-0493-4298-a2cc-6e7ae7929334@arinc9.com>
+ <20230813190157.4y3zoro53qsz43pe@skbuf>
+ <f5f468c1-b5a2-4336-b1d9-fd82da95b21d@arinc9.com>
+ <20230814143601.mnpxtcm2zybnbvoh@skbuf>
+ <0cee0928-74c9-4048-8cd8-70bfbfafd9b2@arinc9.com>
+ <20230827121235.zog4c3ehu2cyd3jy@skbuf>
+ <676d1a2b-6ffa-4aff-8bed-a749c373f5b3@arinc9.com>
+ <CAJq09z6eghuHY+b2y-kGmjKnLiEEOABXGKhjnB-PxJ=-GtYD4w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-Content-Language: en-US, it-IT
-From: Sergio Callegari <sergio.callegari@gmail.com>
-Subject: Regression with AX88179A: can't manually set MAC address anymore
-To: netdev@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJq09z6eghuHY+b2y-kGmjKnLiEEOABXGKhjnB-PxJ=-GtYD4w@mail.gmail.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -80,43 +109,19 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi, reporting here as the issue I am seeing is cross distro and relevant 
-to recent kernels. Hope this is appropriate.
+On Mon, Sep 04, 2023 at 11:42:19PM -0300, Luiz Angelo Daros de Luca wrote:
+> I submitted a small series of patches to unify that behavior between
+> those two drivers:
+> 
+> https://lore.kernel.org/netdev/CAJq09z44SNGFkCi_BCpQ+3DuXhKfGVsMubRYE7AezJsGGOboVA@mail.gmail.com/
+> (This is my answer to the series opening message to include the first
+> paragraph ate by the editor)
+> 
+> There was some discussion but not NAC, ACK or RFC. It would have
+> dropped some lines of code. I can revive it if there is interest.
 
-I have a USB hub with AX88179A ethernet. I was able to use it regularly, 
-until something changed in recent kernels to have this interface 
-supported by the cdc_ncm driver. After this change it is not possible 
-anymore to work with a manually set MAC address.
-
-More details:
-
-- before the kernel changes, the interface was supported by a dedicated 
-kernel driver. The driver had glitches but was more or less working. The 
-main issue was that after some usage the driver stopped working. Could 
-fix these glitches with the driver at 
-https://github.com/nothingstopsme/AX88179_178A_Linux_Driver
-
-- after the kernel changes, loading the ax88179_178a.ko does not create 
-a network device anymore. The interface can be used with the cdc_ncm 
-driver, however it is not possible anymore to use a manually set MAC 
-address.
-
-When you manually set a MAC this appears to be accepted (e.g. ip link 
-reports it correctly), but the card does not receive data anymore. For 
-instance, trying to connect to a DHCP server, you see that the server 
-receives the request, makes an offer, but the offer is never received by 
-the network card.
-
-This may be the same issue reported here: 
-https://discussion.fedoraproject.org/t/ax88179-178a-network-fails-to-start-usb-to-eth/77687 
-where the user says he cannot use the adapter when Network Manager is 
-configured to employ a randomized MAC address.
-
-Would be great to have this regression fixed or at least to have the 
-command setting the MAC address erroring out properly.
-
-Thanks for the attention.
-
-Sergio Callegari
-
+There was no Ack or Nack from me because I didn't manage to understand
+what bothers you if the unified dt-binding has a "compatible" string for
+the "mdio" node, which the driver simply ignores.
+https://lore.kernel.org/netdev/20220706152923.mhc7vw7xkr7xkot4@skbuf/
 
