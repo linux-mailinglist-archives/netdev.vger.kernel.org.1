@@ -1,39 +1,42 @@
-Return-Path: <netdev+bounces-32002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A24987920B1
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 09:22:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2642C7920CA
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 09:46:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 471D8280ED8
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 07:22:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0612D1C203B4
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 07:46:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84302A5D;
-	Tue,  5 Sep 2023 07:22:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7F061C02;
+	Tue,  5 Sep 2023 07:46:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33617A38
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 07:22:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 96758C433C8;
-	Tue,  5 Sep 2023 07:22:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693898546;
-	bh=Qn0ZuiuZ584j+M27My7PDHOjHFp7OTTOs/3NCqIxlbE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dei12qf4+JrNPGPZS3K8KRqumt6gbk7OwejxKI4S8KOfB6DqAfqNyYxJvTfUocjju
-	 b/5H/eC4xjvyjzd4wJOGTsNqgA4ZeV8jOwp9XR1XY28IGX/FsR4VcBMbQJEiypC32F
-	 8faVFQbqRSlM/yrOr1QTjDOohCUQ11t1wb65Vf1JogL0H1ExTMY+KAx1p9xdLyi8Le
-	 4uRs73zjeBCkXyv+XG/U8W8MgQP/qpeOi66feCvtK/TgLmrwg9v8DK0UhmNs11HP0a
-	 PVGwoDHm3QNbK7O3ntM9cDcmMt+ulyycIJVhw41wGLYqcsNZ0D5wrwNG/GTyMKAOa/
-	 /Z9PU8AF8TWJA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7F208C595C5;
-	Tue,  5 Sep 2023 07:22:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCC45ECE
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 07:46:49 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FD1CCCB;
+	Tue,  5 Sep 2023 00:46:46 -0700 (PDT)
+Received: from canpemm500006.china.huawei.com (unknown [172.30.72.57])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RfyF41Rb3zVkRh;
+	Tue,  5 Sep 2023 15:44:08 +0800 (CST)
+Received: from localhost.localdomain (10.175.104.82) by
+ canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Tue, 5 Sep 2023 15:46:43 +0800
+From: Ziyang Xuan <william.xuanziyang@huawei.com>
+To: <jiri@resnulli.us>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <liuhangbin@gmail.com>,
+	<netdev@vger.kernel.org>
+CC: <linux-kernel@vger.kernel.org>
+Subject: [PATCH net v2] team: fix null-ptr-deref when team device type is changed
+Date: Tue, 5 Sep 2023 15:46:38 +0800
+Message-ID: <20230905074638.3304732-1-william.xuanziyang@huawei.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,45 +44,95 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/1] net: sched: sch_qfq: Fix UAF in qfq_dequeue()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169389854651.13349.10095337484077645366.git-patchwork-notify@kernel.org>
-Date: Tue, 05 Sep 2023 07:22:26 +0000
-References: <20230901162237.11525-1-jhs@mojatatu.com>
-In-Reply-To: <20230901162237.11525-1-jhs@mojatatu.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
- pabeni@redhat.com, jiri@resnulli.us, xiyou.wangcong@gmail.com,
- netdev@vger.kernel.org, sec@valis.email, paolo.valente@unimore.it
+Content-Type: text/plain
+X-Originating-IP: [10.175.104.82]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ canpemm500006.china.huawei.com (7.192.105.130)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Get a null-ptr-deref bug as follows with reproducer [1].
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+BUG: kernel NULL pointer dereference, address: 0000000000000228
+...
+RIP: 0010:vlan_dev_hard_header+0x35/0x140 [8021q]
+...
+Call Trace:
+ <TASK>
+ ? __die+0x24/0x70
+ ? page_fault_oops+0x82/0x150
+ ? exc_page_fault+0x69/0x150
+ ? asm_exc_page_fault+0x26/0x30
+ ? vlan_dev_hard_header+0x35/0x140 [8021q]
+ ? vlan_dev_hard_header+0x8e/0x140 [8021q]
+ neigh_connected_output+0xb2/0x100
+ ip6_finish_output2+0x1cb/0x520
+ ? nf_hook_slow+0x43/0xc0
+ ? ip6_mtu+0x46/0x80
+ ip6_finish_output+0x2a/0xb0
+ mld_sendpack+0x18f/0x250
+ mld_ifc_work+0x39/0x160
+ process_one_work+0x1e6/0x3f0
+ worker_thread+0x4d/0x2f0
+ ? __pfx_worker_thread+0x10/0x10
+ kthread+0xe5/0x120
+ ? __pfx_kthread+0x10/0x10
+ ret_from_fork+0x34/0x50
+ ? __pfx_kthread+0x10/0x10
+ ret_from_fork_asm+0x1b/0x30
 
-On Fri,  1 Sep 2023 12:22:37 -0400 you wrote:
-> From: valis <sec@valis.email>
-> 
-> When the plug qdisc is used as a class of the qfq qdisc it could trigger a
-> UAF. This issue can be reproduced with following commands:
-> 
->   tc qdisc add dev lo root handle 1: qfq
->   tc class add dev lo parent 1: classid 1:1 qfq weight 1 maxpkt 512
->   tc qdisc add dev lo parent 1:1 handle 2: plug
->   tc filter add dev lo parent 1: basic classid 1:1
->   ping -c1 127.0.0.1
-> 
-> [...]
+[1]
+$ teamd -t team0 -d -c '{"runner": {"name": "loadbalance"}}'
+$ ip link add name t-dummy type dummy
+$ ip link add link t-dummy name t-dummy.100 type vlan id 100
+$ ip link add name t-nlmon type nlmon
+$ ip link set t-nlmon master team0
+$ ip link set t-nlmon nomaster
+$ ip link set t-dummy up
+$ ip link set team0 up
+$ ip link set t-dummy.100 down
+$ ip link set t-dummy.100 master team0
 
-Here is the summary with links:
-  - [net,1/1] net: sched: sch_qfq: Fix UAF in qfq_dequeue()
-    https://git.kernel.org/netdev/net/c/8fc134fee27f
+When enslave a vlan device to team device and team device type is changed
+from non-ether to ether, header_ops of team device is changed to
+vlan_header_ops. That is incorrect and will trigger null-ptr-deref
+for vlan->real_dev in vlan_dev_hard_header() because team device is not
+a vlan device.
 
-You are awesome, thank you!
+Assign eth_header_ops to header_ops of team device when its type is changed
+from non-ether to ether to fix the bug.
+
+Fixes: 1d76efe1577b ("team: add support for non-ethernet devices")
+Suggested-by: Hangbin Liu <liuhangbin@gmail.com>
+Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
+---
+v2:
+  - Just modify header_ops to eth_header_ops not use ether_setup().
+---
+ drivers/net/team/team.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/team/team.c b/drivers/net/team/team.c
+index d3dc22509ea5..12fb5f4cff06 100644
+--- a/drivers/net/team/team.c
++++ b/drivers/net/team/team.c
+@@ -2127,7 +2127,10 @@ static const struct ethtool_ops team_ethtool_ops = {
+ static void team_setup_by_port(struct net_device *dev,
+ 			       struct net_device *port_dev)
+ {
+-	dev->header_ops	= port_dev->header_ops;
++	if (port_dev->type == ARPHRD_ETHER)
++		dev->header_ops	= &eth_header_ops;
++	else
++		dev->header_ops	= port_dev->header_ops;
+ 	dev->type = port_dev->type;
+ 	dev->hard_header_len = port_dev->hard_header_len;
+ 	dev->needed_headroom = port_dev->needed_headroom;
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.25.1
 
 
