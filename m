@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-32117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5889E792D02
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 20:02:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC29E792D03
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 20:02:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89BC21C20AA8
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 18:02:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 195DC1C20A46
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 18:02:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9D88DDC5;
-	Tue,  5 Sep 2023 18:01:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1578CDDCB;
+	Tue,  5 Sep 2023 18:01:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82E65DDC4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BC9EDDA8
 	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 18:01:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E7B23C433D9;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 038B6C433CD;
 	Tue,  5 Sep 2023 18:01:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1693936900;
-	bh=w2dz+14NU7wgPktFqWoWCxY5vNqW0fD/lMmbU7wuRUA=;
+	bh=sxrm7GJYYpa53mKmtigjhDSiMnrnMSAQumGhA5aO1xI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Grh1gCzPJwBoY2NovXfJaDS7goXK78+PtHBA7/6GI5Sx0WVXzjYLml6SnzA/600BT
-	 y/Y3mPZ4T4s8dPjmfd2iHl41wvYvga6k12mgyOBWXKGgSjSRb5ONjnPv50mS+NIBBi
-	 WxnHlgaJ5ueXPCoTuMUC/CLZ9+qhNSIVds2ZeNJ15VRqjqnxTgnF97gO/lMc1vjTIg
-	 YtqlGKCW1nbJfmS90P1vPM+3VSVyeXCWQufVw/MqbuDiV0AhfG1KK7CKQOMelOSles
-	 BQivMlFwDd3Nve0M9D4zrbgCpv+2Lpc2sga+Z8e2Nq+Mt3Acgo8Uo+iykK3H19xeFs
-	 r2MwFBvajbG8Q==
+	b=IkuSqaZ3jsxxd5mBuTGiUsrl/p3vBXzC/Jag5WBoQBWGAwaqurUtS9d8lBn//m5EN
+	 h+F5dmK+yf1kmNUq9ZgvoCfymFxcCLnu6uPfIv0RM6+PAnlFf96DKbSz3ICoRtQhYk
+	 mRbLEa8ntb8Jl651VeMwv2B9dlmMNnQ0/AF4GYcX6o639p+p5G4uCN7QTAjWDz0a4O
+	 /V1yWePTZZwErTF6hYnL5VozzCsVd91zaKIo/lxY+vFUOCDkqrGrRDN+uOVMQSelXY
+	 EakmAIt8Hs3L4GYSGn9FN1idjqsq0qEKR9XsFMas7gNGBPiZMwT1lJXV2+hfZehVQN
+	 mKSViMyyzySjw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CC7C3C2BBF6;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D7155C595CB;
 	Tue,  5 Sep 2023 18:01:39 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,37 +41,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] igmp: limit igmpv3_newpack() packet size to IP_MAX_MTU
+Subject: Re: [net PATCH] octeontx2-af: Fix truncation of smq in CN10K NIX AQ
+ enqueue  mbox handler
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169393689983.22693.8787710265740710535.git-patchwork-notify@kernel.org>
+ <169393689987.22693.11325949462948037796.git-patchwork-notify@kernel.org>
 Date: Tue, 05 Sep 2023 18:01:39 +0000
-References: <20230905042338.1345307-1-edumazet@google.com>
-In-Reply-To: <20230905042338.1345307-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com, David.Laight@ACULAB.COM,
- zengyhkyle@gmail.com
+References: <20230905064816.27514-1-gakula@marvell.com>
+In-Reply-To: <20230905064816.27514-1-gakula@marvell.com>
+To: Geetha sowjanya <gakula@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ sgoutham@marvell.com, lcherian@marvell.com, jerinj@marvell.com,
+ sbhatta@marvell.com, hkelam@marvell.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Tue,  5 Sep 2023 04:23:38 +0000 you wrote:
-> This is a follow up of commit 915d975b2ffa ("net: deal with integer
-> overflows in kmalloc_reserve()") based on David Laight feedback.
-> 
-> Back in 2010, I failed to realize malicious users could set dev->mtu
-> to arbitrary values. This mtu has been since limited to 0x7fffffff but
-> regardless of how big dev->mtu is, it makes no sense for igmpv3_newpack()
-> to allocate more than IP_MAX_MTU and risk various skb fields overflows.
+On Tue, 5 Sep 2023 12:18:16 +0530 you wrote:
+> The smq value used in the CN10K NIX AQ instruction enqueue mailbox
+> handler was truncated to 9-bit value from 10-bit value because of
+> typecasting the CN10K mbox request structure to the CN9K structure.
+> Though this hasn't caused any problems when programming the NIX SQ
+> context to the HW because the context structure is the same size.
+> However, this causes a problem when accessing the structure parameters.
+> This patch reads the right smq value for each platform.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] igmp: limit igmpv3_newpack() packet size to IP_MAX_MTU
-    https://git.kernel.org/netdev/net/c/c3b704d4a4a2
+  - [net] octeontx2-af: Fix truncation of smq in CN10K NIX AQ enqueue mbox handler
+    https://git.kernel.org/netdev/net/c/29fe7a1b6271
 
 You are awesome, thank you!
 -- 
