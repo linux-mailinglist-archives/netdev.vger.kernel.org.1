@@ -1,266 +1,210 @@
-Return-Path: <netdev+bounces-32037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EE697921EC
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 12:44:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13DA57921F1
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 12:46:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C11E12810E8
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 10:44:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 132CD1C20930
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 10:46:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFF92C14B;
-	Tue,  5 Sep 2023 10:44:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E027EC2DA;
+	Tue,  5 Sep 2023 10:46:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4DD6A38
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 10:44:30 +0000 (UTC)
-Received: from phobos.denx.de (phobos.denx.de [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C20F4199;
-	Tue,  5 Sep 2023 03:44:25 -0700 (PDT)
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 09C148644B;
-	Tue,  5 Sep 2023 12:44:18 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1693910658;
-	bh=oQfqvrxQxUYX2AyYJlPF+NiDhn4uUqpVgDZrhk7D6zE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rOq8V4i9cW6heqvuJKA65SoD77mF4+5cK0R5up1Npp6qiKuxuswBT4/r4VkM8e6ZL
-	 7PXst1Qqt8y2+EZaMTDwPVvLoQG3WDxLuGDiT0f6x+znd1vDSdYPTaynQspKsaOPsc
-	 PR4OAaBx+RNFE/9rrdFn/0b0/hKTCfgEMbJ5WFFaC3nw5dewSfAx8Rl/30bAjDADyT
-	 a1qG0ElLXU2SrhDempCa1+AJrHYuSKSt6tjnzkQ+M0UmgqHKMCvzmdVmW9weguuHY8
-	 11bLvkmxSCjJYwdz1ZQeHATM0tbwOyV5lyTGOUe9wSLVBSWHrit47HZ+GT+rx/Nb+B
-	 EjTiXLAx/4OjA==
-Date: Tue, 5 Sep 2023 12:44:09 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
- davem@davemloft.net, Paolo Abeni <pabeni@redhat.com>, Woojung Huh
- <woojung.huh@microchip.com>, Tristram.Ha@microchip.com, Florian Fainelli
- <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- UNGLinuxDriver@microchip.com, George McCollister
- <george.mccollister@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 RFC 2/4] net: dsa: Extend ksz9477 TAG setup to
- support HSR frames duplication
-Message-ID: <20230905124409.40c7c2f1@wsk>
-In-Reply-To: <20230905102239.mkufbzxwrvuatlrb@skbuf>
-References: <20230904120209.741207-1-lukma@denx.de>
-	<20230904120209.741207-3-lukma@denx.de>
-	<20230905102239.mkufbzxwrvuatlrb@skbuf>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D20A0211C
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 10:46:32 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80B25199
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 03:46:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1693910790;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=KDobuVmsHf6VbTCDGPgqLnhe8HEWnYtAH71GRAdCw84=;
+	b=Z07qXoNbzkJOBA5N3RmnBjieYhyU0Jt2ujSCwEhQjCvPAN9sVPwYJ/6gRgSOGwuuCCOLwr
+	73kV0R9TqSOKBJWDrJd9BBnxnLOc1OSXxsrBuiOnAeh1ww1FPHxP3ZZuBNznug5jduAD3o
+	z+dLmae1oITSHRwWQrC8ee10RtkOdcc=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-125-3oAxKZvwMbCPsY5vgurYsA-1; Tue, 05 Sep 2023 06:46:29 -0400
+X-MC-Unique: 3oAxKZvwMbCPsY5vgurYsA-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-9a1c4506e1eso39121466b.1
+        for <netdev@vger.kernel.org>; Tue, 05 Sep 2023 03:46:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693910788; x=1694515588;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KDobuVmsHf6VbTCDGPgqLnhe8HEWnYtAH71GRAdCw84=;
+        b=GiT0AlxFajmVnInlf4YuOb0na5VfSxtxuGVrc5h0+3FcAXdR0ZGroaLNSGbRC8N60k
+         2+gzdaaog8etyQGFl4/sN7CJDeYYXKc0Rhpjm2Awf3yB4qp5d7iK2w1tPvcaJSeSfLeD
+         zq9ZF5KkxXbCW4BtI+yzC/kDzIjoL6VQ6cCMtT9PyJ2/fhwjerN9F1ue1ekm8hDkTEfG
+         8rl3xrXe+00B/YPWeJYnbBQZ1T2rqXX0e5UDIuBRV86AzPdKtyoQacEXFsJanMeWPkR/
+         CQMQ544Oi+UZoo/pMwcyihgX5t/nw+sGpWjQBlmtB6FA+vF5uXwHrEJpvRV9NKdfd1tS
+         yHRg==
+X-Gm-Message-State: AOJu0YyLTETLPkDgVz3np2znINcDM3GP3Wl7Mms//btRurKRzNTjZiTn
+	EVXGwB/YdNYI+lFnVFByc8jzykOHfG0SKnoS5wJccXVe9nrMvEvsq+L72gCQbADpMl2G3b0tVgT
+	oPRWVc9QddKHL3jQr
+X-Received: by 2002:a17:906:1d9:b0:9a5:ce62:6e1a with SMTP id 25-20020a17090601d900b009a5ce626e1amr9074526ejj.1.1693910788542;
+        Tue, 05 Sep 2023 03:46:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHVP0e7U+C7DkOymIDEKc3tYHSdF8TqbQ0M/RyNmnZKDwX7FgEegi976Dw6DLG26KofkHwMIg==
+X-Received: by 2002:a17:906:1d9:b0:9a5:ce62:6e1a with SMTP id 25-20020a17090601d900b009a5ce626e1amr9074509ejj.1.1693910788209;
+        Tue, 05 Sep 2023 03:46:28 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-254-194.dyn.eolo.it. [146.241.254.194])
+        by smtp.gmail.com with ESMTPSA id qw17-20020a170906fcb100b0099d798a6bb5sm7469193ejb.67.2023.09.05.03.46.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Sep 2023 03:46:27 -0700 (PDT)
+Message-ID: <c1437313a3fea94a66d33f7bf97f363c77838359.camel@redhat.com>
+Subject: Re: [PATCH v4] drivers/net: process the result of hdlc_open() and
+ add call of hdlc_close() in uhdlc_close()
+From: Paolo Abeni <pabeni@redhat.com>
+To: Christophe Leroy <christophe.leroy@csgroup.eu>, Alexandra Diupina
+	 <adiupina@astralinux.ru>, Zhao Qiang <qiang.zhao@nxp.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,  "David S.
+ Miller" <davem@davemloft.net>, "lvc-project@linuxtesting.org"
+ <lvc-project@linuxtesting.org>
+Date: Tue, 05 Sep 2023 12:46:26 +0200
+In-Reply-To: <1005f190-8c03-bb5d-214c-c7fca9dd876b@csgroup.eu>
+References: <20230904123130.14099-1-adiupina@astralinux.ru>
+	 <1005f190-8c03-bb5d-214c-c7fca9dd876b@csgroup.eu>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/NbD=vAmHvH3dutbc5EgpdLp";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	T_SPF_TEMPERROR autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---Sig_/NbD=vAmHvH3dutbc5EgpdLp
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-Hi Vladimir,
-
-> On Mon, Sep 04, 2023 at 02:02:07PM +0200, Lukasz Majewski wrote:
-> > The KSZ9477 has support for HSR (High-Availability Seamless
-> > Redundancy). One of its offloading (i.e. performed in the switch IC
-> > hardware) features is to duplicate received frame to both HSR aware
-> > switch ports.
-> >=20
-> > To achieve this goal - the tail TAG needs to be modified. To be more
-> > specific, both ports must be marked as destination (egress) ones.
-> >=20
-> > Moreover, according to AN3474 application note, the lookup bit (10)
-> > should not be set in the tail tag.
-> >=20
-> > Last but not least - the NETIF_F_HW_HSR_DUP flag indicates that the
-> > device supports HSR and assures (in HSR core code) that frame is
-> > sent only once from HOST to switch with tail tag indicating both
-> > ports.
-> >=20
-> > Information about bits to be set in tag is provided via KSZ generic
-> > ksz_hsr_get_ports() function.
-> >=20
-> > Signed-off-by: Lukasz Majewski <lukma@denx.de>
-> > ---
-> > Changes for v2:
-> > - Use ksz_hsr_get_ports() to obtain the bits values corresponding to
-> >   HSR aware ports
-> >=20
-> > Changes for v3:
-> > - None
-> > ---
-> >  drivers/net/dsa/microchip/ksz_common.c | 12 ++++++++++++
-> >  include/linux/dsa/ksz_common.h         |  1 +
-> >  net/dsa/tag_ksz.c                      |  5 +++++
-> >  3 files changed, 18 insertions(+)
-> >=20
-> > diff --git a/drivers/net/dsa/microchip/ksz_common.c
-> > b/drivers/net/dsa/microchip/ksz_common.c index
-> > d9d843efd111..579fde54d1e1 100644 ---
-> > a/drivers/net/dsa/microchip/ksz_common.c +++
-> > b/drivers/net/dsa/microchip/ksz_common.c @@ -3421,6 +3421,18 @@
-> > static int ksz_setup_tc(struct dsa_switch *ds, int port, }
-> >  }
-> > =20
-> > +u16 ksz_hsr_get_ports(struct dsa_switch *ds)
-> > +{
-> > +	struct ksz_device *dev =3D ds->priv;
-> > +
-> > +	switch (dev->chip_id) {
-> > +	case KSZ9477_CHIP_ID:
-> > +		return dev->hsr_ports;
-> > +	}
-> > +
-> > +	return 0;
-> > +} =20
+On Mon, 2023-09-04 at 17:03 +0000, Christophe Leroy wrote:
 >=20
-> When CONFIG_NET_DSA_MICROCHIP_KSZ_COMMON=3Dm:
->=20
-> ld.lld: error: undefined symbol: ksz_hsr_get_ports
-> referenced by tag_ksz.c:298
-> (/opt/net-next/output-arm64-clang/../net/dsa/tag_ksz.c:298)
-> net/dsa/tag_ksz.o:(ksz9477_xmit) in archive vmlinux.a
->=20
-> But before you rush to add EXPORT_SYMBOL_GPL(ksz_hsr_get_ports), be
-> aware that due to DSA's design, tag_ksz.ko and ksz_common.ko cannot
-> have any symbol dependency on each other, and if you do that, you
-> will break module auto-loading. More information here, there were
-> also patches that removed those dependencies for other tagger/switch
-> driver pairs:
-> https://lore.kernel.org/netdev/20210908220834.d7gmtnwrorhharna@skbuf/
->=20
-
-Ok. I will look on that
-
-> Not to mention that there are other problems with the "dev->hsr_ports"
-> concept. For example, having a hsr0 over lan0 and lan1, and a hsr1
-> over lan2 and lan3, would set dev->hsr_ports to GENMASK(3, 0).
-
-I doubt that having two hsr{01} interfaces is possible with current
-kernel.
-
-The KSZ9477 allows only to have 2 ports of 5 available as HSR
-ones.
-
-The same is with earlier chip xrs700x (but this have even bigger
-constrain - there only ports 1 and 2 can support HSR).=20
-
-> But
-> you want an xmit coming from hsr0 to get sent only to GENMASK(1, 0),
-> and an xmit from hsr1 only to GENMASK(3, 2).
->=20
-> In this particular case, the best option seems to be to delete
-> ksz_hsr_get_ports().
-
-Please see my below comment.
-
->=20
-> > +
-> >  static const struct dsa_switch_ops ksz_switch_ops =3D {
-> >  	.get_tag_protocol	=3D ksz_get_tag_protocol,
-> >  	.connect_tag_protocol   =3D ksz_connect_tag_protocol,
-> > diff --git a/include/linux/dsa/ksz_common.h
-> > b/include/linux/dsa/ksz_common.h index 576a99ca698d..fa3d9b0f3a72
-> > 100644 --- a/include/linux/dsa/ksz_common.h
-> > +++ b/include/linux/dsa/ksz_common.h
-> > @@ -50,4 +50,5 @@ ksz_tagger_data(struct dsa_switch *ds)
-> >  	return ds->tagger_data;
-> >  }
-> > =20
-> > +u16 ksz_hsr_get_ports(struct dsa_switch *ds);
-> >  #endif /* _NET_DSA_KSZ_COMMON_H_ */
-> > diff --git a/net/dsa/tag_ksz.c b/net/dsa/tag_ksz.c
-> > index ea100bd25939..903db95c37ee 100644
-> > --- a/net/dsa/tag_ksz.c
-> > +++ b/net/dsa/tag_ksz.c
-> > @@ -293,6 +293,11 @@ static struct sk_buff *ksz9477_xmit(struct
-> > sk_buff *skb, if (is_link_local_ether_addr(hdr->h_dest))
-> >  		val |=3D KSZ9477_TAIL_TAG_OVERRIDE;
-> > =20
-> > +	if (dev->features & NETIF_F_HW_HSR_DUP) {
-> > +		val &=3D ~KSZ9477_TAIL_TAG_LOOKUP; =20
->=20
-> No need to unset a bit which was never set.
-
-I've explicitly followed the vendor's guidelines - the TAG_LOOKUP needs
-to be cleared.
-
-But if we can assure that it is not set here I can remove it.
-
->=20
-> > +		val |=3D ksz_hsr_get_ports(dp->ds);
-> > +	} =20
->=20
-> Would this work instead?
->=20
-> 	struct net_device *hsr_dev =3D dp->hsr_dev;
-> 	struct dsa_port *other_dp;
->=20
-> 	dsa_hsr_foreach_port(other_dp, dp->ds, hsr_dev)
-> 		val |=3D BIT(other_dp->index);
->=20
-
-I thought about this solution as well, but I've been afraid, that going
-through the loop of all 5 ports each time we want to send single packet
-will reduce the performance.
-
-Hence, the idea with having the "hsr_ports" set once during join
-function and then use this cached value afterwards.
-
-> > +
-> >  	*tag =3D cpu_to_be16(val);
-> > =20
-> >  	return ksz_defer_xmit(dp, skb);
-> > --=20
-> > 2.20.1
+> Le 04/09/2023 =C3=A0 14:31, Alexandra Diupina a =C3=A9crit=C2=A0:
+> > diff --git a/drivers/net/wan/fsl_ucc_hdlc.c b/drivers/net/wan/fsl_ucc_h=
+dlc.c
+> > index 47c2ad7a3e42..fd999dabdd39 100644
+> > --- a/drivers/net/wan/fsl_ucc_hdlc.c
+> > +++ b/drivers/net/wan/fsl_ucc_hdlc.c
+> > @@ -34,6 +34,8 @@
+> >   #define TDM_PPPOHT_SLIC_MAXIN
+> >   #define RX_BD_ERRORS (R_CD_S | R_OV_S | R_CR_S | R_AB_S | R_NO_S | R_=
+LG_S)
 > >  =20
+> > +static int uhdlc_close(struct net_device *dev);
+> > +
+> >   static struct ucc_tdm_info utdm_primary_info =3D {
+> >   	.uf_info =3D {
+> >   		.tsa =3D 0,
+> > @@ -731,7 +733,9 @@ static int uhdlc_open(struct net_device *dev)
+> >   		napi_enable(&priv->napi);
+> >   		netdev_reset_queue(dev);
+> >   		netif_start_queue(dev);
+> > -		hdlc_open(dev);
+> > +
+> > +		int rc =3D hdlc_open(dev);
+>=20
+> Do not mix declarations and code. Please put all declaration at the top=
+=20
+> of the block.
+>=20
+> > +		return rc =3D=3D 0 ? 0 : (uhdlc_close(dev), rc);
+> >   	}
+>=20
+> That's not easy to read.
+>=20
+> I know that's more changes, but I'd prefer something like:
+>=20
+> static int uhdlc_open(struct net_device *dev)
+> {
+> 	u32 cecr_subblock;
+> 	hdlc_device *hdlc =3D dev_to_hdlc(dev);
+> 	struct ucc_hdlc_private *priv =3D hdlc->priv;
+> 	struct ucc_tdm *utdm =3D priv->utdm;
+> 	int rc;
+>=20
+> 	if (priv->hdlc_busy !=3D 1)
+> 		return 0;
+>=20
+> 	if (request_irq(priv->ut_info->uf_info.irq,
+> 			ucc_hdlc_irq_handler, 0, "hdlc", priv))
+> 		return -ENODEV;
+>=20
+> 	cecr_subblock =3D ucc_fast_get_qe_cr_subblock(
+> 				priv->ut_info->uf_info.ucc_num);
+>=20
+> 	qe_issue_cmd(QE_INIT_TX_RX, cecr_subblock,
+> 		     QE_CR_PROTOCOL_UNSPECIFIED, 0);
+>=20
+> 	ucc_fast_enable(priv->uccf, COMM_DIR_RX | COMM_DIR_TX);
+>=20
+> 	/* Enable the TDM port */
+> 	if (priv->tsa)
+> 		qe_setbits_8(&utdm->si_regs->siglmr1_h, 0x1 << utdm->tdm_port);
+>=20
+> 	priv->hdlc_busy =3D 1;
+> 	netif_device_attach(priv->ndev);
+> 	napi_enable(&priv->napi);
+> 	netdev_reset_queue(dev);
+> 	netif_start_queue(dev);
+>=20
+> 	rc =3D hdlc_open(dev);
+> 	if (rc)
+> 		uhdlc_close(dev);
+>=20
+> 	return rc;
+> }
 
+I agree the above is more readable, but I don't think the whole
+refactor is not worthy for a -net fix. I think simply rewriting the
+final statements as:
 
+		rc =3D hdlc_open(dev);
+		if (rc)
+			uhdlc_close(dev);
 
+		return rc;=09
 
-Best regards,
+would be good for -net.
+=20
+> >   	return 0;
+> > @@ -824,6 +828,8 @@ static int uhdlc_close(struct net_device *dev)
+> >   	netdev_reset_queue(dev);
+> >   	priv->hdlc_busy =3D 0;
+> >  =20
+> > +	hdlc_close(dev);
+> > +
+> >   return 0;
+> >    =20
+>=20
+> And while you are looking at the correctness of this code, is it sure=20
+> that uhdlc_open() cannot be called twice in parallele ?
+> If it can be called in parall=C3=A8le I think the "if (priv->hdlc_busy !=
+=3D 1)"=20
+> should be replaced by something using cmpxchg()
 
-Lukasz Majewski
+That part is safe, ndo_open() is invoked under the rtnl lock.
 
---
+The other comments are IMHO relevant, @Alexandra: please address them.
 
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+Thanks!
 
---Sig_/NbD=vAmHvH3dutbc5EgpdLp
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+Paolo
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmT3BnkACgkQAR8vZIA0
-zr1vLgf+PU00qM1jp1h9eWcq3/+PT1Dz1wvwfAJyo0RfNKZs+/+OK9kSQjl0kJsX
-0tWT4/0EMUfin/oRNTjjCYPmXukqZntiU5o98EPRfPGUSEI6namnIuqlhyC0r8cS
-U/EIHPzr7UAdsbt7ovFDQiA33OvA1vShU3NQwMozjQwVRVcouZBNu03EwsHjeax4
-sRjxAGt+YaRi06Ft4G3Trm1e1Toxks3b7F0rykxPAQX1I3sADo0yrjPk7SA3BgXJ
-kBS8/f2kz4WQUhVbwHFSoYaybod+We8nF14HzSnHSh7bHrtGOJJjG/Wl21+1p+KR
-e1jP/Cnq0KUxzoZ/lDDXW8vJlxj0gQ==
-=uWmA
------END PGP SIGNATURE-----
-
---Sig_/NbD=vAmHvH3dutbc5EgpdLp--
 
