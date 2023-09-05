@@ -1,209 +1,120 @@
-Return-Path: <netdev+bounces-32082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 093A77922BB
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 14:42:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAC887922BF
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 14:44:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B1D71C20944
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 12:42:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EEDC28116A
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 12:44:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51F1CD2FA;
-	Tue,  5 Sep 2023 12:42:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90202D2FC;
+	Tue,  5 Sep 2023 12:44:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43E362FAE
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 12:42:54 +0000 (UTC)
-Received: from mail-pl1-f207.google.com (mail-pl1-f207.google.com [209.85.214.207])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13BC01AD
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 05:42:53 -0700 (PDT)
-Received: by mail-pl1-f207.google.com with SMTP id d9443c01a7336-1c0e161e18fso34749355ad.1
-        for <netdev@vger.kernel.org>; Tue, 05 Sep 2023 05:42:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693917771; x=1694522571;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+A22TUng3ehfxKNM9eOPCzIy7tpRELO/RihFdMxcoOw=;
-        b=bWkC4mhzOoy4XB+dmpwUskvuCgbrUOB23g0uncZpEI8Amcojd4qzUgQ1uoVV08FXKO
-         r4tgnnuqt8VmgnU9EqIswEnKuzgsKlMCgT42dka9H9zr4qSllnTLoxSlqK/3I9lH0yne
-         hL2yLNGqF9x8Wh20m2rXdqt7w3unNuW6btFL+NU4uERaMUDj6ZHJsQFUQrH2t5EJPYJG
-         6eDz5rhV0mYmXdV7kRiWCZzftvIf7OeckxmEm/4kQHxKTPJriWzcsM/C26xIbrG4e+tC
-         3kyYtRxrqcQwDmBkt1Gt8aYeadKShI6RSuN0aqtNP90291bVtmUnaPxYg0x4NI3kt8Dh
-         9gvA==
-X-Gm-Message-State: AOJu0Yw/SKBimZVHOOWYHGrIAsUfoy0o2O9pMvWU5MRUi+qSve8tVq6A
-	oyZxZ7spx9KvaXCqa+e6vZ8ccaBnRqpup/RZ6lmbyHf98nTh
-X-Google-Smtp-Source: AGHT+IHekrccDvZh3yL6oOrsD0OJeiraoLHOiYi6pobMI/N+w1SGXocvD4awgQmGYdOUDTsREl1+E1Ma+dIIH8wj4aUyPFgsN0iK
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8372CA94A
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 12:44:10 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A3091AE
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 05:44:09 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qdVPD-0000Dh-Rh; Tue, 05 Sep 2023 14:43:43 +0200
+Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qdVPB-004CMM-U7; Tue, 05 Sep 2023 14:43:41 +0200
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qdVPB-00HGwC-1W;
+	Tue, 05 Sep 2023 14:43:41 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	devicetree@vger.kernel.org
+Subject: [RFC net-next v1 1/2] dt-bindings: net: dsa: microchip: Update ksz device tree bindings for drive strength
+Date: Tue,  5 Sep 2023 14:43:39 +0200
+Message-Id: <20230905124340.4116542-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a17:902:fb06:b0:1bb:cdea:d959 with SMTP id
- le6-20020a170902fb0600b001bbcdead959mr2555938plb.0.1693917771735; Tue, 05 Sep
- 2023 05:42:51 -0700 (PDT)
-Date: Tue, 05 Sep 2023 05:42:51 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000001027a206049bf7da@google.com>
-Subject: [syzbot] [bluetooth?] KASAN: use-after-free Read in hci_conn_security
-From: syzbot <syzbot+b1b9423479233352b99e@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_DIGITS,
-	FROM_LOCAL_HEX,HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello,
+Extend device tree bindings to support drive strength configuration for the
+ksz* switches. Introduced properties:
+- microchip,hi-drive-strength-microamp: Controls the drive strength for
+  high-speed interfaces like GMII/RGMII and more.
+- microchip,lo-drive-strength-microamp: Governs the drive strength for
+  low-speed interfaces such as LEDs, PME_N, and others.
 
-syzbot found the following issue on:
-
-HEAD commit:    2ea35288c83b skbuff: skb_segment, Call zero copy functions..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=17f46d87a80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=634e05b4025da9da
-dashboard link: https://syzkaller.appspot.com/bug?extid=b1b9423479233352b99e
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/d8d28ba7b968/disk-2ea35288.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/12a9f785a85b/vmlinux-2ea35288.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/d71c4427c061/bzImage-2ea35288.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b1b9423479233352b99e@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: use-after-free in instrument_atomic_read include/linux/instrumented.h:68 [inline]
-BUG: KASAN: use-after-free in _test_bit include/asm-generic/bitops/instrumented-non-atomic.h:141 [inline]
-BUG: KASAN: use-after-free in hci_conn_ssp_enabled include/net/bluetooth/hci_core.h:988 [inline]
-BUG: KASAN: use-after-free in hci_conn_security+0x324/0x990 net/bluetooth/hci_conn.c:2409
-Read of size 8 at addr ffff8880784dda70 by task kworker/1:11/12886
-
-CPU: 1 PID: 12886 Comm: kworker/1:11 Not tainted 6.5.0-syzkaller-04006-g2ea35288c83b #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
-Workqueue: events l2cap_info_timeout
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
- print_address_description mm/kasan/report.c:364 [inline]
- print_report+0xc4/0x620 mm/kasan/report.c:475
- kasan_report+0xda/0x110 mm/kasan/report.c:588
- check_region_inline mm/kasan/generic.c:181 [inline]
- kasan_check_range+0xef/0x190 mm/kasan/generic.c:187
- instrument_atomic_read include/linux/instrumented.h:68 [inline]
- _test_bit include/asm-generic/bitops/instrumented-non-atomic.h:141 [inline]
- hci_conn_ssp_enabled include/net/bluetooth/hci_core.h:988 [inline]
- hci_conn_security+0x324/0x990 net/bluetooth/hci_conn.c:2409
- l2cap_chan_check_security+0x16f/0x320 net/bluetooth/l2cap_core.c:929
- l2cap_conn_start+0x59b/0xa40 net/bluetooth/l2cap_core.c:1646
- process_one_work+0xaa2/0x16f0 kernel/workqueue.c:2600
- worker_thread+0x687/0x1110 kernel/workqueue.c:2751
- kthread+0x33a/0x430 kernel/kthread.c:389
- ret_from_fork+0x2c/0x70 arch/x86/kernel/process.c:145
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
- </TASK>
-
-The buggy address belongs to the physical page:
-page:ffffea0001e13740 refcount:0 mapcount:0 mapping:0000000000000000 index:0x4 pfn:0x784dd
-flags: 0xfff00000000000(node=0|zone=1|lastcpupid=0x7ff)
-page_type: 0xffffffff()
-raw: 00fff00000000000 0000000000000000 ffffffff00000201 0000000000000000
-raw: 0000000000000004 0000000000000000 00000000ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as freed
-page last allocated via order 2, migratetype Unmovable, gfp_mask 0x140dc0(GFP_USER|__GFP_COMP|__GFP_ZERO), pid 9825, tgid 9825 (syz-executor.2), ts 251793148654, free_ts 864555377636
- set_page_owner include/linux/page_owner.h:31 [inline]
- post_alloc_hook+0x2d2/0x350 mm/page_alloc.c:1570
- prep_new_page mm/page_alloc.c:1577 [inline]
- get_page_from_freelist+0x10a9/0x31e0 mm/page_alloc.c:3221
- __alloc_pages+0x1d0/0x4a0 mm/page_alloc.c:4477
- __alloc_pages_node include/linux/gfp.h:237 [inline]
- alloc_pages_node include/linux/gfp.h:260 [inline]
- __kmalloc_large_node+0x87/0x1c0 mm/slab_common.c:1126
- __do_kmalloc_node mm/slab_common.c:973 [inline]
- __kmalloc.cold+0xb/0xe0 mm/slab_common.c:998
- kmalloc include/linux/slab.h:586 [inline]
- kzalloc include/linux/slab.h:703 [inline]
- hci_alloc_dev_priv+0x1d/0x2780 net/bluetooth/hci_core.c:2467
- hci_alloc_dev include/net/bluetooth/hci_core.h:1600 [inline]
- __vhci_create_device+0xf7/0x800 drivers/bluetooth/hci_vhci.c:402
- vhci_create_device drivers/bluetooth/hci_vhci.c:475 [inline]
- vhci_get_user drivers/bluetooth/hci_vhci.c:532 [inline]
- vhci_write+0x2c7/0x470 drivers/bluetooth/hci_vhci.c:612
- call_write_iter include/linux/fs.h:1985 [inline]
- new_sync_write fs/read_write.c:491 [inline]
- vfs_write+0x650/0xe40 fs/read_write.c:584
- ksys_write+0x12f/0x250 fs/read_write.c:637
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-page last free stack trace:
- reset_page_owner include/linux/page_owner.h:24 [inline]
- free_pages_prepare mm/page_alloc.c:1161 [inline]
- free_unref_page_prepare+0x508/0xb90 mm/page_alloc.c:2348
- free_unref_page+0x33/0x3b0 mm/page_alloc.c:2443
- hci_release_dev+0x4da/0x600 net/bluetooth/hci_core.c:2792
- bt_host_release+0x6a/0xb0 net/bluetooth/hci_sysfs.c:93
- device_release+0xa1/0x240 drivers/base/core.c:2484
- kobject_cleanup lib/kobject.c:682 [inline]
- kobject_release lib/kobject.c:713 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x1f7/0x5b0 lib/kobject.c:730
- put_device+0x1f/0x30 drivers/base/core.c:3733
- vhci_release+0x87/0x100 drivers/bluetooth/hci_vhci.c:670
- __fput+0x3f7/0xa70 fs/file_table.c:384
- task_work_run+0x14d/0x240 kernel/task_work.c:179
- exit_task_work include/linux/task_work.h:38 [inline]
- do_exit+0xa99/0x2a20 kernel/exit.c:874
- do_group_exit+0xd4/0x2a0 kernel/exit.c:1024
- __do_sys_exit_group kernel/exit.c:1035 [inline]
- __se_sys_exit_group kernel/exit.c:1033 [inline]
- __x64_sys_exit_group+0x3e/0x50 kernel/exit.c:1033
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-Memory state around the buggy address:
- ffff8880784dd900: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
- ffff8880784dd980: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
->ffff8880784dda00: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-                                                             ^
- ffff8880784dda80: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
- ffff8880784ddb00: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-==================================================================
-
-
+Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ .../bindings/net/dsa/microchip,ksz.yaml          | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+index e51be1ac03623..97d655eb01b6f 100644
+--- a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+@@ -49,6 +49,22 @@ properties:
+       Set if the output SYNCLKO clock should be disabled. Do not mix with
+       microchip,synclko-125.
+ 
++  microchip,hi-drive-strength-microamp:
++    description:
++        High Speed Drive Strength. Controls drive strength of GMII / RGMII /
++        MII / RMII (except TX_CLK/REFCLKI, COL and CRS) and CLKO_25_125 lines.
++    minimum: 2000
++    maximum: 28000
++    default: 24000
++
++  microchip,lo-drive-strength-microamp:
++    description:
++        Low Speed Drive Strength. Controls drive strength of TX_CLK / REFCLKI,
++        COL, CRS, LEDs, PME_N, NTRP_N, SDO and SDI/SDA/MDIO lines.
++    minimum: 2000
++    maximum: 28000
++    default: 8000
++
+ required:
+   - compatible
+   - reg
+-- 
+2.39.2
 
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
