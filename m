@@ -1,99 +1,156 @@
-Return-Path: <netdev+bounces-32060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 612EC79223D
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 13:43:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59365792251
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 13:55:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63D001C2095E
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 11:43:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 043DA28113C
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 11:55:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8085FD2E0;
-	Tue,  5 Sep 2023 11:43:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABF0BD2F7;
+	Tue,  5 Sep 2023 11:55:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7299FC8F5
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 11:43:25 +0000 (UTC)
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0686A1AB;
-	Tue,  5 Sep 2023 04:43:22 -0700 (PDT)
-Received: from canpemm500006.china.huawei.com (unknown [172.30.72.54])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Rg3TD6XKdzMl8L;
-	Tue,  5 Sep 2023 19:40:00 +0800 (CST)
-Received: from [10.174.179.200] (10.174.179.200) by
- canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Tue, 5 Sep 2023 19:43:19 +0800
-Subject: Re: [PATCH net v2] team: fix null-ptr-deref when team device type is
- changed
-To: Hangbin Liu <liuhangbin@gmail.com>
-CC: <jiri@resnulli.us>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20230905074638.3304732-1-william.xuanziyang@huawei.com>
- <ZPbsW/bOGeO9Ww8+@Laptop-X1>
-From: "Ziyang Xuan (William)" <william.xuanziyang@huawei.com>
-Message-ID: <ecd693a5-105b-d2b8-5f6d-618d14b491dd@huawei.com>
-Date: Tue, 5 Sep 2023 19:43:18 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0CC2D2F6
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 11:55:21 +0000 (UTC)
+Received: from mail.avm.de (mail.avm.de [212.42.244.94])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DDBB1AE;
+	Tue,  5 Sep 2023 04:55:20 -0700 (PDT)
+Received: from mail-auth.avm.de (unknown [IPv6:2001:bf0:244:244::71])
+	by mail.avm.de (Postfix) with ESMTPS;
+	Tue,  5 Sep 2023 13:49:49 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=avm.de; s=mail;
+	t=1693914590; bh=KyKR2i+DGj/6JbddwGXrO2TV0yqaQ4X+XFsdxioIsO4=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Il/S80Jk4rxGPM8D/O5EE86iJVccCG0FzuVlQrvkksGAejUEqu/5fh+XecO6rUulR
+	 u7G4ZbPvMzSn5XgEhal0ubPb8BT2ZhW+w1DciDw2OV9n3ExY45ldpEAm1bSfSvfwx+
+	 cqRKH4L1LeRsgnNwC8fryg7WyqmoU2CqUVBTjENY=
+Received: from localhost (unknown [172.17.88.63])
+	by mail-auth.avm.de (Postfix) with ESMTPSA id DAA8482158;
+	Tue,  5 Sep 2023 13:49:49 +0200 (CEST)
+From: Johannes Nixdorf <jnixdorf-oss@avm.de>
+Subject: [PATCH net-next v3 0/6] bridge: Add a limit on learned FDB entries
+Date: Tue, 05 Sep 2023 13:47:17 +0200
+Message-Id: <20230905-fdb_limit-v3-0-7597cd500a82@avm.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ZPbsW/bOGeO9Ww8+@Laptop-X1>
-Content-Type: text/plain; charset="gbk"
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.179.200]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- canpemm500006.china.huawei.com (7.192.105.130)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-B4-Tracking: v=1; b=H4sIAEUV92QC/x3MQQqAIBBA0avErBMsK6yrRITWWANloRJCePek5
+ YPPf8GjI/QwFC84fMjTZTNEWcCyK7shozUbal4L3vOGmVXPB50UmFHYam2qbpEScn87NBT/1wg
+ WA7MYA0wpfYVzNOllAAAA
+To: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>, 
+ David Ahern <dsahern@gmail.com>, Eric Dumazet <edumazet@google.com>, 
+ Florian Fainelli <f.fainelli@gmail.com>, Ido Schimmel <idosch@nvidia.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Nikolay Aleksandrov <razor@blackwall.org>, 
+ Oleksij Rempel <linux@rempel-privat.de>, Paolo Abeni <pabeni@redhat.com>, 
+ Roopa Prabhu <roopa@nvidia.com>, Shuah Khan <shuah@kernel.org>, 
+ Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: bridge@lists.linux-foundation.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ Johannes Nixdorf <jnixdorf-oss@avm.de>
+X-Mailer: b4 0.12.3
+X-purgate-ID: 149429::1693914590-514F145F-D2900F6B/0/0
+X-purgate-type: clean
+X-purgate-size: 3779
+X-purgate-Ad: Categorized by eleven eXpurgate (R) http://www.eleven.de
+X-purgate: This mail is considered clean (visit http://www.eleven.de for further information)
+X-purgate: clean
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> On Tue, Sep 05, 2023 at 03:46:38PM +0800, Ziyang Xuan wrote:
->> diff --git a/drivers/net/team/team.c b/drivers/net/team/team.c
->> index d3dc22509ea5..12fb5f4cff06 100644
->> --- a/drivers/net/team/team.c
->> +++ b/drivers/net/team/team.c
->> @@ -2127,7 +2127,10 @@ static const struct ethtool_ops team_ethtool_ops = {
->>  static void team_setup_by_port(struct net_device *dev,
->>  			       struct net_device *port_dev)
->>  {
->> -	dev->header_ops	= port_dev->header_ops;
->> +	if (port_dev->type == ARPHRD_ETHER)
->> +		dev->header_ops	= &eth_header_ops;
->> +	else
->> +		dev->header_ops	= port_dev->header_ops;
->>  	dev->type = port_dev->type;
->>  	dev->hard_header_len = port_dev->hard_header_len;
->>  	dev->needed_headroom = port_dev->needed_headroom;
-> 
-> Hmm.. Do we need to export eth_header_ops? I got error like
-> ERROR: modpost: "eth_header_ops" [drivers/net/team/team.ko] undefined!
-> 
-> But I saw function loopback_setup() could reference this. Not sure what
-> I missed here.
+Introduce a limit on the amount of learned FDB entries on a bridge,
+configured by netlink with a build time default on bridge creation in
+the kernel config.
 
-Yes, I also got the same error, and gave v3 patch with exporting eth_header_ops.
+For backwards compatibility the kernel config default is disabling the
+limit (0).
 
-drivers/net/loopback.o controlled by CONFIG_NET, CONFIG_NET is bool type and usually Y.
-So drivers/net/loopback.o does not need to export eth_header_ops.
+Without any limit a malicious actor may OOM a kernel by spamming packets
+with changing MAC addresses on their bridge port, so allow the bridge
+creator to limit the number of entries.
 
-> 
-> Thanks
-> Hangbin
-> 
-> .
-> 
+Currently the manual entries are identified by the bridge flags
+BR_FDB_LOCAL or BR_FDB_ADDED_BY_USER, atomically bundled under the new
+flag BR_FDB_DYNAMIC_LEARNED. This means the limit also applies to
+entries created with BR_FDB_ADDED_BY_EXT_LEARN but none of BR_FDB_LOCAL
+or BR_FDB_ADDED_BY_USER, e.g. ones added by SWITCHDEV_FDB_ADD_TO_BRIDGE.
+
+Changes since v2:
+ - Fixed the flags for fdb_create in fdb_add_entry to use
+   BIT(...). Previously we passed garbage. (from review)
+ - Set strict_start_type for br_policy. (from review)
+ - Split out the combined accounting and limit patch, and the netlink
+   patch from the combined patch in v2. (from review)
+ - Count atomically, remove the newly introduced lock. (from review)
+ - Added the new attributes to br_policy. (from review)
+ - Added a selftest for the new feature. (from review)
+
+Changes since v1:
+ - Added BR_FDB_ADDED_BY_USER earlier in fdb_add_entry to ensure the
+   limit is not applied.
+ - Do not initialize fdb_*_entries to 0. (from review)
+ - Do not skip decrementing on 0. (from review)
+ - Moved the counters to a conditional hole in struct net_bridge to
+   avoid growing the struct. (from review, it still grows the struct as
+   there are 2 32-bit values)
+ - Add IFLA_BR_FDB_CUR_LEARNED_ENTRIES (from review)
+ - Fix br_get_size() with the added attributes.
+ - Only limit learned entries, rename to
+   *_(CUR|MAX)_LEARNED_ENTRIES. (from review)
+ - Added a default limit in Kconfig. (deemed acceptable in review
+   comments, helps with embedded use-cases where a special purpose kernel
+   is built anyways)
+ - Added an iproute2 patch for easier testing.
+
+Obsolete v1 review comments:
+ - Return better errors to users: Due to limiting the limit to
+   automatically created entries, netlink fdb add requests and changing
+   bridge ports are never rejected, so they do not yet need a more
+   friendly error returned.
+
+iproute2-next v3: https://lore.kernel.org/netdev/20230905-fdb_limit-v3-1-34bb124556d8@avm.de/
+
+v2: https://lore.kernel.org/netdev/20230619071444.14625-1-jnixdorf-oss@avm.de/
+v1: https://lore.kernel.org/netdev/20230515085046.4457-1-jnixdorf-oss@avm.de/
+
+Signed-off-by: Johannes Nixdorf <jnixdorf-oss@avm.de>
+---
+Johannes Nixdorf (6):
+      net: bridge: Set BR_FDB_ADDED_BY_USER early in fdb_add_entry
+      net: bridge: Set strict_start_type for br_policy
+      net: bridge: Track and limit dynamically learned FDB entries
+      net: bridge: Add netlink knobs for number / max learned FDB entries
+      net: bridge: Add a configurable default FDB learning limit
+      selftests: forwarding: bridge_fdb_learning_limit: Add a new selftest
+
+ include/uapi/linux/if_link.h                       |   2 +
+ net/bridge/Kconfig                                 |  13 +
+ net/bridge/br_device.c                             |   2 +
+ net/bridge/br_fdb.c                                |  40 ++-
+ net/bridge/br_netlink.c                            |  16 +-
+ net/bridge/br_private.h                            |   4 +
+ .../net/forwarding/bridge_fdb_learning_limit.sh    | 283 +++++++++++++++++++++
+ 7 files changed, 354 insertions(+), 6 deletions(-)
+---
+base-commit: 2dde18cd1d8fac735875f2e4987f11817cc0bc2c
+change-id: 20230904-fdb_limit-fae5bbf16c88
+
+Best regards,
+-- 
+Johannes Nixdorf <jnixdorf-oss@avm.de>
+
 
