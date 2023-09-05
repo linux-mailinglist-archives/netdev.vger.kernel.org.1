@@ -1,201 +1,104 @@
-Return-Path: <netdev+bounces-32023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEAAB79217C
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 11:33:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E84F792188
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 11:36:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BAF11C208CA
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 09:33:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 957FC2810EB
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 09:36:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 099733FED;
-	Tue,  5 Sep 2023 09:33:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75D9A6AD6;
+	Tue,  5 Sep 2023 09:36:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF5BB63B9
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 09:33:47 +0000 (UTC)
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF04B1A7;
-	Tue,  5 Sep 2023 02:33:45 -0700 (PDT)
-Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 7369E86541;
-	Tue,  5 Sep 2023 11:33:43 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1693906424;
-	bh=iAVgdRx2LKAmMKxyGtj0T+FEye5UUfEr1r4fnHtpa0Q=;
-	h=From:To:Cc:Subject:Date:From;
-	b=KPjmlUqT8XnK/1ics+u9AL1nvLKcx75cdQ/GVuKydKH/R9iISX2AATPq2J67BKyXP
-	 /DhI9157RMTPcf/n8RZxRfoQ55tXJx+Owq5VzlOtPCOEh6vkjnYEikTHxtze0TCNDL
-	 kxeDP2EtTYm/i7tYMQnpIQBekABiKDEdbS82zHsgeM0XSlFlvjjWKThV4cw6hlmMbC
-	 kMzBNZKjBL9aM2kBLq+dLosji3ZKv/yDZsYdIZG12JheGz2v/Tpp3Ljfhgw4jdHuZF
-	 SmfZJqW0Yzj4oANjZho9pN5NPcrCfxBXJarW00w1y/rv6qPP5+Vwk+wODaEBm3DcjC
-	 Zz1B60OxWvjjQ==
-From: Lukasz Majewski <lukma@denx.de>
-To: Tristram.Ha@microchip.com,
-	Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	davem@davemloft.net,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	UNGLinuxDriver@microchip.com,
-	Russell King <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Michael Walle <michael@walle.cc>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Oleksij Rempel <linux@rempel-privat.de>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Lukasz Majewski <lukma@denx.de>
-Subject: [net v4] net: phy: Provide Module 4 KSZ9477 errata (DS80000754C)
-Date: Tue,  5 Sep 2023 11:33:15 +0200
-Message-Id: <20230905093315.784052-1-lukma@denx.de>
-X-Mailer: git-send-email 2.39.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A45F6AC2
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 09:36:45 +0000 (UTC)
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F6BB1A8
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 02:36:41 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mtapsc-5-RE-OIzy8PuGpYbXqCyuTRw-1; Tue, 05 Sep 2023 10:36:38 +0100
+X-MC-Unique: RE-OIzy8PuGpYbXqCyuTRw-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 5 Sep
+ 2023 10:36:34 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Tue, 5 Sep 2023 10:36:34 +0100
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Breno Leitao' <leitao@debian.org>, "sdf@google.com" <sdf@google.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, "asml.silence@gmail.com"
+	<asml.silence@gmail.com>, "willemdebruijn.kernel@gmail.com"
+	<willemdebruijn.kernel@gmail.com>, "martin.lau@linux.dev"
+	<martin.lau@linux.dev>, "krisman@suse.de" <krisman@suse.de>, "Alexei
+ Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+	"Andrii Nakryiko" <andrii@kernel.org>, Song Liu <song@kernel.org>, Yonghong
+ Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>,
+	"KP Singh" <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, Jiri Olsa
+	<jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "io-uring@vger.kernel.org"
+	<io-uring@vger.kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>, "Alexander
+ Mikhalitsyn" <alexander@mihalicyn.com>, Xin Long <lucien.xin@gmail.com>,
+	"David Howells" <dhowells@redhat.com>, Jason Xing <kernelxing@tencent.com>,
+	"Andy Shevchenko" <andriy.shevchenko@linux.intel.com>
+Subject: RE: [PATCH v4 04/10] net/socket: Break down __sys_getsockopt
+Thread-Topic: [PATCH v4 04/10] net/socket: Break down __sys_getsockopt
+Thread-Index: AQHZ30xphJKGpfy/Z06Weh22EiUUErAL+aYg
+Date: Tue, 5 Sep 2023 09:36:34 +0000
+Message-ID: <b9d56ef784ad436c8cb60c4c9fd2d786@AcuMS.aculab.com>
+References: <20230904162504.1356068-1-leitao@debian.org>
+ <20230904162504.1356068-5-leitao@debian.org>
+In-Reply-To: <20230904162504.1356068-5-leitao@debian.org>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The KSZ9477 errata points out (in 'Module 4') the link up/down problems
-when EEE (Energy Efficient Ethernet) is enabled in the device to which
-the KSZ9477 tries to auto negotiate.
+From: Breno Leitao
+> Sent: 04 September 2023 17:25
+>=20
+> Split __sys_getsockopt() into two functions by removing the core
+> logic into a sub-function (do_sock_getsockopt()). This will avoid
+> code duplication when doing the same operation in other callers, for
+> instance.
 
-The suggested workaround is to clear advertisement of EEE for PHYs in
-this chip driver.
+Although a lot more work, I think (others may disagree) that
+the internal getsockopt() functions should be changed to take
+the length as a parameter and return the positive value
+to write back.
 
-To avoid regressions with other switch ICs the new MICREL_NO_EEE flag
-has been introduced.
+=09David
 
-Moreover, the in-register disablement of MMD_DEVICE_ID_EEE_ADV.MMD_EEE_ADV
-MMD register is removed, as this code is both; now executed too late
-(after previous rework of the PHY and DSA for KSZ switches) and not
-required as setting all members of eee_broken_modes bit field prevents
-the KSZ9477 from advertising EEE.
-
-Fixes: 69d3b36ca045 ("net: dsa: microchip: enable EEE support") (for KSZ9477).
-
-Signed-off-by: Lukasz Majewski <lukma@denx.de>
-Tested-by: Oleksij Rempel <o.rempel@pengutronix.de>
-Confirmed disabled EEE with oscilloscope.
-Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
-
----
-Changes for v2:
-- Move this fix from clearing directly
-  MMD_DEVICE_ID_EEE_ADV.MMD_EEE_ADV MMD register in KSZ DSA switch
-  initialization to more generic solution in the micrel.c PHY driver
-
-Changes for v3:
-- Drop the rename patch
-- Use MICREL_NO_EEE flag as suggested by Oleksij
-- Extend the ksz9477_config_init to avoid regression
-- Do not use the direct write to MMD 7.60 register - instead the
-  phydev->eee_broken_modes is used
-
-Changes for v4:
-- Rebase on top of net-next with Oleksij Rempel patch (adding BIT()
-  macros on to Micrel flags) applied
-- Add SoB and Tested-by tags
----
- drivers/net/dsa/microchip/ksz_common.c | 16 +++++++++++++++-
- drivers/net/phy/micrel.c               |  9 ++++++---
- include/linux/micrel_phy.h             |  1 +
- 3 files changed, 22 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 6673122266b7..42db7679c360 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -2335,13 +2335,27 @@ static u32 ksz_get_phy_flags(struct dsa_switch *ds, int port)
- {
- 	struct ksz_device *dev = ds->priv;
- 
--	if (dev->chip_id == KSZ8830_CHIP_ID) {
-+	switch (dev->chip_id) {
-+	case KSZ8830_CHIP_ID:
- 		/* Silicon Errata Sheet (DS80000830A):
- 		 * Port 1 does not work with LinkMD Cable-Testing.
- 		 * Port 1 does not respond to received PAUSE control frames.
- 		 */
- 		if (!port)
- 			return MICREL_KSZ8_P1_ERRATA;
-+		break;
-+	case KSZ9477_CHIP_ID:
-+		/* KSZ9477 Errata DS80000754C
-+		 *
-+		 * Module 4: Energy Efficient Ethernet (EEE) feature select must
-+		 * be manually disabled
-+		 *   The EEE feature is enabled by default, but it is not fully
-+		 *   operational. It must be manually disabled through register
-+		 *   controls. If not disabled, the PHY ports can auto-negotiate
-+		 *   to enable EEE, and this feature can cause link drops when
-+		 *   linked to another device supporting EEE.
-+		 */
-+		return MICREL_NO_EEE;
- 	}
- 
- 	return 0;
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index b6d7981b2d1e..927d3d54658e 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -1800,9 +1800,6 @@ static const struct ksz9477_errata_write ksz9477_errata_writes[] = {
- 	/* Transmit waveform amplitude can be improved (1000BASE-T, 100BASE-TX, 10BASE-Te) */
- 	{0x1c, 0x04, 0x00d0},
- 
--	/* Energy Efficient Ethernet (EEE) feature select must be manually disabled */
--	{0x07, 0x3c, 0x0000},
 -
- 	/* Register settings are required to meet data sheet supply current specifications */
- 	{0x1c, 0x13, 0x6eff},
- 	{0x1c, 0x14, 0xe6ff},
-@@ -1847,6 +1844,12 @@ static int ksz9477_config_init(struct phy_device *phydev)
- 			return err;
- 	}
- 
-+	/* According to KSZ9477 Errata DS80000754C (Module 4) all EEE modes
-+	 * in this switch shall be regarded as broken.
-+	 */
-+	if (phydev->dev_flags & MICREL_NO_EEE)
-+		phydev->eee_broken_modes = -1;
-+
- 	err = genphy_restart_aneg(phydev);
- 	if (err)
- 		return err;
-diff --git a/include/linux/micrel_phy.h b/include/linux/micrel_phy.h
-index 322d87255984..4e27ca7c49de 100644
---- a/include/linux/micrel_phy.h
-+++ b/include/linux/micrel_phy.h
-@@ -44,6 +44,7 @@
- #define MICREL_PHY_50MHZ_CLK	BIT(0)
- #define MICREL_PHY_FXEN		BIT(1)
- #define MICREL_KSZ8_P1_ERRATA	BIT(2)
-+#define MICREL_NO_EEE		BIT(3)
- 
- #define MICREL_KSZ9021_EXTREG_CTRL	0xB
- #define MICREL_KSZ9021_EXTREG_DATA_WRITE	0xC
--- 
-2.20.1
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
 
 
