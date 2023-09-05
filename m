@@ -1,116 +1,97 @@
-Return-Path: <netdev+bounces-32147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75A48793103
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 23:38:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39C4C793105
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 23:38:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5316F1C209F6
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 21:38:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 656AB1C20942
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 21:38:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D3CDFC1C;
-	Tue,  5 Sep 2023 21:38:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 639A3101C5;
+	Tue,  5 Sep 2023 21:38:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50334101C0
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 21:38:03 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54907133;
-	Tue,  5 Sep 2023 14:38:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693949882; x=1725485882;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=9apBiphN57rQ3aiF+Q7XIdDoQMMdkK/gnjUcFUrpp1Y=;
-  b=eEThhPxsH7/2we0hJiQL8UXRpyA4U/RHkrpnSuyVVfT1oLgKhzUfowW4
-   7dQKZzNuCd08qh4UYN2gwvwcG5c6uHBEIylMRtWJuAC/XICHK97o77pXv
-   9o8IVQgkNFUEpSL8ilMRS0tcyiu2CswIuPYMxqoMJfChzYKoQYFAWDY4u
-   tOhnmlpCe77HGBGx69FngXabvfB0MkAs09zGZqUK0RDvxqUF2YvBZrCy2
-   bVcM0iOe67wBqO1Mm5cl2w0E1naPNq60iX62FQDoHAz3C/ktT4H+KqZFC
-   2fT9j2Al/OKX6gkiEXAKNm2Vu3j4ZasawC8lCcTGTsWkcBKIEGxHIYHOs
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10824"; a="443298014"
-X-IronPort-AV: E=Sophos;i="6.02,230,1688454000"; 
-   d="scan'208";a="443298014"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2023 14:38:02 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10824"; a="864902564"
-X-IronPort-AV: E=Sophos;i="6.02,230,1688454000"; 
-   d="scan'208";a="864902564"
-Received: from vcostago-mobl3.jf.intel.com ([10.24.14.106])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2023 14:38:01 -0700
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: sasha.neftin@intel.com,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Ferenc Fejes <ferenc.fejes@ericsson.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jithu Joseph <jithu.joseph@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Vedang Patel <vedang.patel@intel.com>,
-	Andre Guedes <andre.guedes@intel.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH iwl-net v1] igc: Fix infinite initialization loop with early XDP redirect
-Date: Tue,  5 Sep 2023 14:37:52 -0700
-Message-ID: <20230905213753.697461-1-vinicius.gomes@intel.com>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 576CBDF6E
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 21:38:32 +0000 (UTC)
+Received: from out-216.mta0.migadu.com (out-216.mta0.migadu.com [IPv6:2001:41d0:1004:224b::d8])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A0C5191
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 14:38:31 -0700 (PDT)
+Message-ID: <6ad30137-c7d7-884b-c19e-e16288984d57@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1693949909;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wfptWl/s1atqi3XO0dXXzLTryT1h+Nv8xL9FirXe9es=;
+	b=o27bh+yVKqUGlGitwiabSsIdDElCy+P60ie8Z/gXDqEzpsU070xnMihCiNm1R3tho9StF8
+	B4ItLM04MyIqHYCzPyGV2vwVSGkB+oAqBSzr0teCdJuVygd4oMOCIvYIhBL6xsaulHqxeS
+	OPdb1OGFdALWDFFlgrDFiXOHO5QTsfA=
+Date: Tue, 5 Sep 2023 14:38:26 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH bpf-next v3 4/9] bpf: Implement cgroup sockaddr hooks for
+ unix sockets
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+To: Daan De Meyer <daan.j.demeyer@gmail.com>
+Cc: kernel-team@meta.com, netdev@vger.kernel.org, bpf@vger.kernel.org
+References: <20230831153455.1867110-1-daan.j.demeyer@gmail.com>
+ <20230831153455.1867110-5-daan.j.demeyer@gmail.com>
+ <52177bd8-65a5-ef4d-b00d-47509855c3e4@linux.dev>
+In-Reply-To: <52177bd8-65a5-ef4d-b00d-47509855c3e4@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-When a XDP redirect happens before the link is ready, that
-transmission will not finish and will timeout, causing an adapter
-reset. If the redirects do not stop, the adapter will not stop
-resetting.
+On 9/5/23 12:02 PM, Martin KaFai Lau wrote:
+>> @@ -1766,14 +1787,37 @@ static int unix_getname(struct socket *sock, struct 
+>> sockaddr *uaddr, int peer)
+>>       if (!addr) {
+>>           sunaddr->sun_family = AF_UNIX;
+>>           sunaddr->sun_path[0] = 0;
+>> -        err = offsetof(struct sockaddr_un, sun_path);
+>> +        addr_len = offsetof(struct sockaddr_un, sun_path);
+>>       } else {
+>> -        err = addr->len;
+>> +        addr_len = addr->len;
+>>           memcpy(sunaddr, addr->name, addr->len);
+>>       }
+>> +
+>> +    if (peer && cgroup_bpf_enabled(CGROUP_UNIX_GETPEERNAME)) {
+>> +        err = BPF_CGROUP_RUN_SA_PROG(sk, uaddr, &addr_len,
+>> +                         CGROUP_UNIX_GETPEERNAME);
+>> +        if (err)
+> 
+> UNIX_GETPEERNAME can only have return value 1 (OK), so no need to do err check 
+> here.
+> 
+>> +            goto out;
+>> +
+>> +        err = unix_validate_addr(sunaddr, addr_len);
+> 
+> Since the kfunc is specific to the unix address, how about doing the 
+> unix_validate_addr check in the kfunc itself?
 
-Wait for the driver to signal that there's a carrier before allowing
-transmissions to proceed.
+When reading patch 3 again, the kfunc has already checked the addrlen with the 
+UNIX_PATH_MAX. It should be as good as unix_validate_addr() check considering 
+the kfunc can only change the sunaddr->sun_path?
 
-Fixes: 4ff320361092 ("igc: Add support for XDP_REDIRECT action")
-Reported-by: Ferenc Fejes <ferenc.fejes@ericsson.com>
-Closes: https://lore.kernel.org/netdev/0caf33cf6adb3a5bf137eeaa20e89b167c9986d5.camel@ericsson.com/
-Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Tested-by: Ferenc Fejes <ferenc.fejes@ericsson.com>
----
- drivers/net/ethernet/intel/igc/igc_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 293b45717683..98de34d0ce07 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -6491,7 +6491,7 @@ static int igc_xdp_xmit(struct net_device *dev, int num_frames,
- 	struct igc_ring *ring;
- 	int i, drops;
- 
--	if (unlikely(test_bit(__IGC_DOWN, &adapter->state)))
-+	if (unlikely(!netif_carrier_ok(dev)))
- 		return -ENETDOWN;
- 
- 	if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
--- 
-2.41.0
 
 
