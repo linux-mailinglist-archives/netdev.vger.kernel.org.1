@@ -1,141 +1,241 @@
-Return-Path: <netdev+bounces-31997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0A9E79204E
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 06:28:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32F6379204F
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 06:37:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E408B1C2087F
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 04:28:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 735C7281074
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 04:37:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0841B7E3;
-	Tue,  5 Sep 2023 04:28:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 973C3380;
+	Tue,  5 Sep 2023 04:37:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDDC27E
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 04:28:37 +0000 (UTC)
-Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66FC7CC7
-	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 21:28:36 -0700 (PDT)
-Received: by mail-qt1-x835.google.com with SMTP id d75a77b69052e-40a47e8e38dso512031cf.1
-        for <netdev@vger.kernel.org>; Mon, 04 Sep 2023 21:28:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1693888115; x=1694492915; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rZSlyVx9HBHTYN+LF72l+YVKKff26y5vuPEjLykpW8c=;
-        b=GjPig+f/n0w8S5h1eKNP/2iQgs3E5oE+96oIRBEC4BR8oW+1CXBbnUGmcfJxD0mRnV
-         fzadwTHvUGbtmiLLr8TPlcUVFNeergcLVlINuqJBCYDoNwx2ZUisBkCjVHYDfhIZwE7a
-         Rp8Y8aC21xgkY7XLfxJCV8NXF9TtEBZl/iZxyQuxTfy3Yl+f4Pdu66aFO6Kpnlq00zOt
-         H+nv96vWRUu122UFg7Hykzhle2K52jZe5wtjM+vHXQ2JMBaINNj9Io/2PuuuXuSnRTQD
-         MS6FrwwMAqV+aC6n/eMclFLluQQRBAMOd9Yv9tGYzyURfrRvj8fnEo8CGr1omrLX4y9N
-         HltQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693888115; x=1694492915;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rZSlyVx9HBHTYN+LF72l+YVKKff26y5vuPEjLykpW8c=;
-        b=ZSeUrK5eA7Jo/bMvr5ynuV1BuvvNuSg9Y6YmjQy5gWdBr0ZRbjUcmHOm212FPOUHmQ
-         x44ODkmkEO9jqpM11Mvo7if/BN9hlGHh3E3bqEW06vC13//J1nXVstLLd12lslqvKw/D
-         Xb2xSpkhCSggREAloMm43PYHJ9fW++c3CBU1BJPZWpKVP3uxou58uQnZ1tauOS8fmjR2
-         7O22F0LTLs2AWLR0GgcO/UHLZnvoHUDhtLuxgeB3m4z8VVlx6g1z0+MY+tlfShPguigC
-         dWchJLgvgHcJUTyFxpNkJddMuCzsGkPKAQ8ubSLXFUIvsPBa6k2iPE4bsN+7US+6zwvl
-         5eFw==
-X-Gm-Message-State: AOJu0Yz+Zxr+aKG9rl9n6pOduNb3Q7LNHHvHACaIxIY0NDfOwc349/FV
-	rXmHBz2j1+r9ke4QnUcf5yza9TMWZ/LTK5zHUQroGA==
-X-Google-Smtp-Source: AGHT+IGqglOMykbX3m6JgqZb0puLb2cOJfyj0QjBlxrbCVrDrUbAfwK+UAbAW9v4DZKCoawnIDkrhfnSGVYF5mnmTlE=
-X-Received: by 2002:a05:622a:1822:b0:403:b6ff:c0b with SMTP id
- t34-20020a05622a182200b00403b6ff0c0bmr326876qtc.6.1693888115327; Mon, 04 Sep
- 2023 21:28:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8805E363
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 04:37:10 +0000 (UTC)
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 225ED1B6;
+	Mon,  4 Sep 2023 21:37:08 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 651E7120003;
+	Tue,  5 Sep 2023 07:37:05 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 651E7120003
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1693888625;
+	bh=HoIC/Rt7SCCOTU5bzlF4Kw/h0G5mggsepxhm/KWPIrg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
+	b=hIJ7B0NsW7yAaf58/o8XZuTZxIYaC/3XsjNmNqKM187fL/S+F2TdfTM/h9P82y2Uw
+	 krF6hyzSxYEaeqbHR8r3haXXXCYVlBEq7prtyRelRQCFHWcn1aImP5140T/3X9K1hx
+	 Z9lyXRTOT+J9mJqx4+UjMSMkBYxORLXGrqTzYSOjrlDo3xgBgT30cAmZjpeV51UeKE
+	 KjbxFmX/1EUC6f21eErA0clUB5+6bQpUVA1/qMlHIBbV2QIueD65HHSIokHNk8e+Fy
+	 yPfRRRAxPJrs3ljcA17u2Jx3QQDjJ+ZXU6yuuZfsG9FYyDWKh/sY+8zvY3gVzS2Wcu
+	 xDLyytGWQw3iw==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Tue,  5 Sep 2023 07:37:03 +0300 (MSK)
+Received: from [192.168.0.106] (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Tue, 5 Sep 2023 07:36:59 +0300
+Message-ID: <c3b34d3c-29ea-5a0f-24d3-483836faa7ba@salutedevices.com>
+Date: Tue, 5 Sep 2023 07:30:38 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230904154042.3081190-1-qtian@vmware.com>
-In-Reply-To: <20230904154042.3081190-1-qtian@vmware.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 5 Sep 2023 06:28:24 +0200
-Message-ID: <CANn89iKpj81ZJSn3ksS_P7EBwRjbbk=TnvOW8YF=ogHo5TXcwQ@mail.gmail.com>
-Subject: Re: [PATCH net] net/ipv6: SKB symmetric hash should incorporate
- transport ports
-To: Quan Tian <qtian@vmware.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Lars Ekman <uablrek@gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH net-next v7 4/4] vsock/virtio: MSG_ZEROCOPY flag support
+Content-Language: en-US
+To: Stefano Garzarella <sgarzare@redhat.com>
+CC: Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin"
+	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
+	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
+References: <20230827085436.941183-1-avkrasnov@salutedevices.com>
+ <20230827085436.941183-5-avkrasnov@salutedevices.com>
+ <p2u2irlju6yuy54w4tqstaijhpnbmqxwavsdumsmyskrjguwux@kmd7cbavhjbh>
+ <0ab443b5-73a5-f092-44a3-52e26244c9a8@salutedevices.com>
+ <h63t6heovmyafu2lo6x6rzsbdbrhqhlbuol774ngbgshbycgdu@fgynzbmj5zn7>
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+In-Reply-To: <h63t6heovmyafu2lo6x6rzsbdbrhqhlbuol774ngbgshbycgdu@fgynzbmj5zn7>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 179642 [Sep 04 2023]
+X-KSMG-AntiSpam-Version: 5.9.59.0
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 529 529 a773548e495283fecef97c3e587259fde2135fef, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;127.0.0.199:7.1.2;100.64.160.123:7.1.2;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/09/05 03:12:00 #21800815
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Sep 4, 2023 at 5:45=E2=80=AFPM Quan Tian <qtian@vmware.com> wrote:
->
-> __skb_get_hash_symmetric() was added to compute a symmetric hash over
-> the protocol, addresses and transport ports, by commit eb70db875671
-> ("packet: Use symmetric hash for PACKET_FANOUT_HASH."). It uses
-> flow_keys_dissector_symmetric_keys as the flow_dissector to incorporate
-> IPv4 addresses, IPv6 addresses and ports. However, it should not specify
-> the flag as FLOW_DISSECTOR_F_STOP_AT_FLOW_LABEL, which stops further
-> dissection when an IPv6 flow label is encountered, making transport
-> ports not being incorporated in such case.
->
-> As a consequence, the symmetric hash is based on 5-tuple for IPv4 but
-> 3-tuple for IPv6 when flow label is present. It caused a few problems,
-> e.g. when nft symhash and openvswitch l4_sym rely on the symmetric hash
-> to perform load balancing as different L4 flows between two given IPv6
-> addresses would always get the same symmetric hash, leading to uneven
-> traffic distribution.
->
-> Removing the use of FLOW_DISSECTOR_F_STOP_AT_FLOW_LABEL makes sure the
-> symmetric hash is based on 5-tuple for both IPv4 and IPv6 consistently.
->
-> Reported-by: Lars Ekman <uablrek@gmail.com>
-> Closes: https://github.com/antrea-io/antrea/issues/5457
-> Signed-off-by: Quan Tian <qtian@vmware.com>
-> ---
->  net/core/flow_dissector.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
-> index 89d15ceaf9af..b3b3af0e7844 100644
-> --- a/net/core/flow_dissector.c
-> +++ b/net/core/flow_dissector.c
-> @@ -1831,8 +1831,7 @@ u32 __skb_get_hash_symmetric(const struct sk_buff *=
-skb)
->
->         memset(&keys, 0, sizeof(keys));
->         __skb_flow_dissect(NULL, skb, &flow_keys_dissector_symmetric,
-> -                          &keys, NULL, 0, 0, 0,
-> -                          FLOW_DISSECTOR_F_STOP_AT_FLOW_LABEL);
-> +                          &keys, NULL, 0, 0, 0, 0);
->
->         return __flow_hash_from_keys(&keys, &hashrnd);
->  }
-> --
-> 2.42.0
->
 
-Networking patches for net branches must include a Fixes: tag, to help
-automation.
-(providing the sha1 in the changelog is requesting human investigation
-for stable teams,
-because a sha1 could be mentioned even if it is not the bug origin)
 
-Fixes: eb70db875671 ("packet: Use symmetric hash for PACKET_FANOUT_HASH.")
+On 04.09.2023 11:21, Stefano Garzarella wrote:
+> On Sun, Sep 03, 2023 at 11:13:23AM +0300, Arseniy Krasnov wrote:
+>>
+>>
+>> On 01.09.2023 15:30, Stefano Garzarella wrote:
+>>> On Sun, Aug 27, 2023 at 11:54:36AM +0300, Arseniy Krasnov wrote:
+>>>> This adds handling of MSG_ZEROCOPY flag on transmission path: if this
+>>>> flag is set and zerocopy transmission is possible (enabled in socket
+>>>> options and transport allows zerocopy), then non-linear skb will be
+>>>> created and filled with the pages of user's buffer. Pages of user's
+>>>> buffer are locked in memory by 'get_user_pages()'. Second thing that
+>>>> this patch does is replace type of skb owning: instead of calling
+>>>> 'skb_set_owner_sk_safe()' it calls 'skb_set_owner_w()'. Reason of this
+>>>> change is that '__zerocopy_sg_from_iter()' increments 'sk_wmem_alloc'
+>>>> of socket, so to decrease this field correctly proper skb destructor is
+>>>> needed: 'sock_wfree()'. This destructor is set by 'skb_set_owner_w()'.
+>>>>
+>>>> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+> 
+> [...]
+> 
+>>>>
+>>>> -/* Returns a new packet on success, otherwise returns NULL.
+>>>> - *
+>>>> - * If NULL is returned, errp is set to a negative errno.
+>>>> - */
+>>>> -static struct sk_buff *
+>>>> -virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
+>>>> -               size_t len,
+>>>> -               u32 src_cid,
+>>>> -               u32 src_port,
+>>>> -               u32 dst_cid,
+>>>> -               u32 dst_port)
+>>>> -{
+>>>> -    const size_t skb_len = VIRTIO_VSOCK_SKB_HEADROOM + len;
+>>>> -    struct virtio_vsock_hdr *hdr;
+>>>> -    struct sk_buff *skb;
+>>>> +static bool virtio_transport_can_zcopy(struct virtio_vsock_pkt_info *info,
+>>>> +                       size_t max_to_send)
+>>>                                               ^
+>>> I'd call it `pkt_len`, `max_to_send` is confusing IMHO. I didn't
+>>> initially if it was the number of buffers or bytes.
+>>>
+>>>> +{
+>>>> +    const struct virtio_transport *t_ops;
+>>>> +    struct iov_iter *iov_iter;
+>>>> +
+>>>> +    if (!info->msg)
+>>>> +        return false;
+>>>> +
+>>>> +    iov_iter = &info->msg->msg_iter;
+>>>> +
+>>>> +    if (iov_iter->iov_offset)
+>>>> +        return false;
+>>>> +
+>>>> +    /* We can't send whole iov. */
+>>>> +    if (iov_iter->count > max_to_send)
+>>>> +        return false;
+>>>> +
+>>>> +    /* Check that transport can send data in zerocopy mode. */
+>>>> +    t_ops = virtio_transport_get_ops(info->vsk);
+>>>> +
+>>>> +    if (t_ops->can_msgzerocopy) {
+>>>
+>>> So if `can_msgzerocopy` is not implemented, we always return true after
+>>> this point. Should we mention it in the .can_msgzerocopy documentation?
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
 
-Thanks.
+^^^
+
+Sorry, ops again. Just checked this code during comments fixing. It is correct
+to "return true;" Idea is:
+
+if (generic conditions for MSG_ZEROCOPY == false)
+    return false;// can't zerocopy
+
+if (t_ops->can_msgzerocopy) //transport needs extra check
+    return t_ops->can_msgzerocopy();
+
+return true;//transport doesn't require extra check and generic conditions above are OK -> can zerocopy
+
+But anyway:
+
+1) I'll add comment in 'struct virtio_transport' for '.can_msgzerocopy' that this callback is
+   not mandatory - just additional transport specific check.
+
+2) Add test for fallback to copy.
+
+Thanks, Arseniy
+
+>>
+>> Ops, this is my mistake, I must return 'false' in this case. Seems I didn't
+>> catch this problem with my tests, because there was no test case where
+>> zerocopy will fallback to copy!
+>>
+>> I'll fix it and add new test!
+> 
+> yep, I agree!
+> 
+>>
+>>>
+>>> Can we also mention in the commit description why this is need only for
+>>> virtio_tranport and not for vhost and loopback?
+>>>
+>>>> +        int pages_in_iov = iov_iter_npages(iov_iter, MAX_SKB_FRAGS);
+>>>> +        int pages_to_send = min(pages_in_iov, MAX_SKB_FRAGS);
+>>>> +
+>>>> +        return t_ops->can_msgzerocopy(pages_to_send);
+>>>> +    }
+>>>> +
+>>>> +    return true;
+>>>> +}
+>>>> +
+> 
+> [...]
+> 
+>>>> @@ -270,6 +395,17 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+>>>>             break;
+>>>>         }
+>>>>
+>>>> +        /* This is last skb to send this portion of data. */
+>>>
+>>> Sorry I didn't get it :-(
+>>>
+>>> Can you elaborate this a bit more?
+>>
+>> I mean that we iterate over user's buffer here, allocating skb on each
+>> iteration. And for last skb for this buffer we initialize completion
+>> for user (we need to allocate one completion for one syscall).
+> 
+> Okay, so maybe we should explain better also in the code comment.
+>>
+>> Thanks for review, I'll fix all other comments and resend patchset when
+>> 'net-next' will be opened again.
+> 
+> Cool, thanks!
+> Stefano
+> 
 
