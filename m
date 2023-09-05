@@ -1,112 +1,94 @@
-Return-Path: <netdev+bounces-32122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59B2B792D46
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 20:16:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 503C2792D61
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 20:29:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FE09281338
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 18:16:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FB89281182
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 18:29:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9326ADDDB;
-	Tue,  5 Sep 2023 18:15:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E682EDDC7;
+	Tue,  5 Sep 2023 18:29:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86F28DDC2
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 18:15:56 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88627CC2
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 11:15:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693937727; x=1725473727;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=oqNG6uEIJ732iaZG6VhQCL/L3OQh3xYiwVCN4tyjR/s=;
-  b=FDHu7I6ND8rwgKhXSGnXuGjoTKBJK9ZueH5LTYnKrIfEEnkxYZ06sBd+
-   bFHLxUuaP2FTSlu+flgE+/rW2WtgCX9EMXrqr70ArOrByyAXdQQfl/IP/
-   TIqVrI4S+xPEiP8nDwzCa+SYKrWf/mXIbfrCZJ/TwduIRsdjsmvUnC9S6
-   uYPlKUwEL9n5zhj8WOljFIT+IyzkM+xNWcArSBGcx52v00WIldENWZ0+D
-   rX50eOEzerIYEbUFKxfAUMe32orCqY9ZCUKs+ixao7My1BtnRLx0EntX5
-   vg4nv2kiCYvbwGuzORkc/+eLhVa/j0f3/bctPwWNbxx9t11gLta5tm3uv
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10824"; a="356360191"
-X-IronPort-AV: E=Sophos;i="6.02,229,1688454000"; 
-   d="scan'208";a="356360191"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2023 11:14:44 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10824"; a="741197753"
-X-IronPort-AV: E=Sophos;i="6.02,229,1688454000"; 
-   d="scan'208";a="741197753"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orsmga002.jf.intel.com with ESMTP; 05 Sep 2023 11:14:43 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Olga Zaborska <olga.zaborska@intel.com>,
-	anthony.l.nguyen@intel.com,
-	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: [PATCH net 3/3] igb: Change IGB_MIN to allow set rx/tx value between 64 and 80
-Date: Tue,  5 Sep 2023 11:07:08 -0700
-Message-Id: <20230905180708.887924-4-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20230905180708.887924-1-anthony.l.nguyen@intel.com>
-References: <20230905180708.887924-1-anthony.l.nguyen@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7922CDDB5
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 18:29:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52B80C433B9;
+	Tue,  5 Sep 2023 18:28:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1693938541;
+	bh=HNwxnqVLcUvUgsEtkMxU0rL9+To5Mqbb2eXIaUG0S38=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=SfuVpe78aghB8DPNWXGfrTge0/smtp+UAk6OB8SWplYFRWLrpZ99hOBugQ0RDLIq6
+	 toGyXtbytFqoZdQw5T0141yeHnGPx9trJQkZCK+hZpuZDalw0hnVwJ2ZKTz7Tj/b63
+	 c1+bhVdRVswJzrOozTovGu0SEBDV82uuGQToq5iyz/QQEwsq7iCDR/kqTpcpsLtr1i
+	 oPUhcJtpd+WUb8Zh0wnR0CYwyPxRoKFukWkvQJBgUlYwcLzoaGUVjC2kxX2vbuUsvU
+	 ScCC0dtYeY2S2RtT0fQIN//Wf4EzSx2AIQlEdwCCqd5PN98sGa5NWDguDFrzGjRMHF
+	 NQwv2PC9gln8g==
+Received: (nullmailer pid 3757330 invoked by uid 1000);
+	Tue, 05 Sep 2023 18:28:58 -0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+From: Rob Herring <robh@kernel.org>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: kernel@pengutronix.de, Andrew Lunn <andrew@lunn.ch>, linux-kernel@vger.kernel.org, Florian Fainelli <f.fainelli@gmail.com>, Eric Dumazet <edumazet@google.com>, UNGLinuxDriver@microchip.com, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, Woojung Huh <woojung.huh@microchip.com>, netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Arun Ramadoss <arun.ramadoss@microchip.com>, Vladimir Oltean <olteanv@gmail.com>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, "Russell King (Oracle)" <linux@armlinux.org.uk>, Jakub Kicinski <kuba@kernel.org>, Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org
+In-Reply-To: <20230905124340.4116542-1-o.rempel@pengutronix.de>
+References: <20230905124340.4116542-1-o.rempel@pengutronix.de>
+Message-Id: <169393853820.3757299.10173163628142492519.robh@kernel.org>
+Subject: Re: [RFC net-next v1 1/2] dt-bindings: net: dsa: microchip: Update
+ ksz device tree bindings for drive strength
+Date: Tue, 05 Sep 2023 13:28:58 -0500
 
-From: Olga Zaborska <olga.zaborska@intel.com>
 
-Change the minimum value of RX/TX descriptors to 64 to enable setting the rx/tx
-value between 64 and 80. All igb devices can use as low as 64 descriptors.
-This change will unify igb with other drivers.
-Based on commit 7b1be1987c1e ("e1000e: lower ring minimum size to 64")
+On Tue, 05 Sep 2023 14:43:39 +0200, Oleksij Rempel wrote:
+> Extend device tree bindings to support drive strength configuration for the
+> ksz* switches. Introduced properties:
+> - microchip,hi-drive-strength-microamp: Controls the drive strength for
+>   high-speed interfaces like GMII/RGMII and more.
+> - microchip,lo-drive-strength-microamp: Governs the drive strength for
+>   low-speed interfaces such as LEDs, PME_N, and others.
+> 
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> ---
+>  .../bindings/net/dsa/microchip,ksz.yaml          | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+> 
 
-Fixes: 9d5c824399de ("igb: PCI-Express 82575 Gigabit Ethernet driver")
-Signed-off-by: Olga Zaborska <olga.zaborska@intel.com>
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/igb/igb.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
+on your patch (DT_CHECKER_FLAGS is new in v5.13):
 
-diff --git a/drivers/net/ethernet/intel/igb/igb.h b/drivers/net/ethernet/intel/igb/igb.h
-index 015b78144114..a2b759531cb7 100644
---- a/drivers/net/ethernet/intel/igb/igb.h
-+++ b/drivers/net/ethernet/intel/igb/igb.h
-@@ -34,11 +34,11 @@ struct igb_adapter;
- /* TX/RX descriptor defines */
- #define IGB_DEFAULT_TXD		256
- #define IGB_DEFAULT_TX_WORK	128
--#define IGB_MIN_TXD		80
-+#define IGB_MIN_TXD		64
- #define IGB_MAX_TXD		4096
- 
- #define IGB_DEFAULT_RXD		256
--#define IGB_MIN_RXD		80
-+#define IGB_MIN_RXD		64
- #define IGB_MAX_RXD		4096
- 
- #define IGB_DEFAULT_ITR		3 /* dynamic */
--- 
-2.38.1
+yamllint warnings/errors:
+./Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml:54:9: [warning] wrong indentation: expected 6 but found 8 (indentation)
+./Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml:62:9: [warning] wrong indentation: expected 6 but found 8 (indentation)
+
+dtschema/dtc warnings/errors:
+
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20230905124340.4116542-1-o.rempel@pengutronix.de
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
 
 
