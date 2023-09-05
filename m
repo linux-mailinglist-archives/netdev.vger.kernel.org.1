@@ -1,238 +1,100 @@
-Return-Path: <netdev+bounces-32131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D173792F1E
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 21:42:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9178F792D74
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 20:37:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 556851C20956
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 19:42:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB8811C20A8C
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 18:37:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EA24DF44;
-	Tue,  5 Sep 2023 19:42:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 744A2DDCE;
+	Tue,  5 Sep 2023 18:36:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FABFDDAF
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 19:42:07 +0000 (UTC)
-Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACBD590
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 12:42:05 -0700 (PDT)
-Received: from mg.bb.i.ssi.bg (localhost [127.0.0.1])
-	by mg.bb.i.ssi.bg (Proxmox) with ESMTP id 7B0CD15D23;
-	Tue,  5 Sep 2023 20:20:44 +0300 (EEST)
-Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
-	by mg.bb.i.ssi.bg (Proxmox) with ESMTPS id 61AC315C2D;
-	Tue,  5 Sep 2023 20:20:44 +0300 (EEST)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by ink.ssi.bg (Postfix) with ESMTPSA id F0CAE3C07C9;
-	Tue,  5 Sep 2023 20:20:40 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
-	t=1693934442; bh=uXnsxklPke/43riYwZDEv4JEk3rKSn5WwWSVg+JZpV0=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References;
-	b=pi96SiJ/FmTInPSx2HWpMx0mizhRBHnrihp/wmS5wV7hY7R7zXnBrVfiWz5eBFofx
-	 L6DJjeg04aS++rrSrb6TjvuBF4OOncieqshv8Fz12QegxM+ANC/nWwCwai8FTd355E
-	 gRjqlxskkC3+qD4fJsGsVF9bYDqzRnr47jIKUr/E=
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.17.1/8.17.1) with ESMTP id 385HKcQe109697;
-	Tue, 5 Sep 2023 20:20:39 +0300
-Date: Tue, 5 Sep 2023 20:20:38 +0300 (EEST)
-From: Julian Anastasov <ja@ssi.bg>
-To: Liu Jian <liujian56@huawei.com>
-cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, hadi@cyberus.ca,
-        netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: ipv4: fix one memleak in __inet_del_ifa()
-In-Reply-To: <20230905135554.1958156-1-liujian56@huawei.com>
-Message-ID: <bcb0e791-37ab-3fff-9da6-a86883924205@ssi.bg>
-References: <20230905135554.1958156-1-liujian56@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64120DDC5
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 18:36:50 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8259C83
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 11:36:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1693938988; x=1725474988;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=0gWcB4TvPl+6IO95WW2K397nmjiAun3BB4IXEhhj6s0=;
+  b=m0QP2V09mrLYX1VeNRACSNUMDRUBgGnUYFovFw03v/zkVh4be1r5ybgC
+   PUn0f1NMeG/BPtUhNelUqZ2IlpzE+UJDru5iuX5lgiPQdYcByQNLOSGfH
+   NuK0acjaB9oyufOXmZNDqBPyGOBQI9XW3/i/QLfFyzIpdQVBf4Di8rfYc
+   tyRTGAGQ5S2M9EOxEkOK5im/BztqMWpfeilrR2EQgpyoRu57jD+CDxFWs
+   u4Vf5bnsnhWn5W9QO1SC1j3/1L0ZThOA37dqm1rVb4f4+1D0ZP5BwpVk3
+   F6Gd5zTB0vG1fGvSKUrsjB3eyasTX3m5yg2SK6xOo7JHAIJy7TpBZZj8g
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10824"; a="443260807"
+X-IronPort-AV: E=Sophos;i="6.02,229,1688454000"; 
+   d="scan'208";a="443260807"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2023 11:12:56 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10824"; a="884401498"
+X-IronPort-AV: E=Sophos;i="6.02,229,1688454000"; 
+   d="scan'208";a="884401498"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by fmsmga001.fm.intel.com with ESMTP; 05 Sep 2023 11:12:47 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net 0/2][pull request] Intel Wired LAN Driver Updates 2023-09-05 (i40e, iavf)
+Date: Tue,  5 Sep 2023 11:05:19 -0700
+Message-Id: <20230905180521.887861-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+This series contains updates to i40e and iavf drivers.
 
-	Hello,
+Andrii ensures all VSIs are cleaned up for remove in i40e.
 
-On Tue, 5 Sep 2023, Liu Jian wrote:
+Brett reworks logic for setting promiscuous mode that can, currently, cause
+incorrect states on iavf.
 
-> I got the below warning when do fuzzing test:
-> unregister_netdevice: waiting for bond0 to become free. Usage count = 2
-> 
-> It can be repoduced via:
-> 
-> ip link add bond0 type bond
-> sysctl -w net.ipv4.conf.bond0.promote_secondaries=1
-> ip addr add 4.117.174.103/0 scope 0x40 dev bond0
-> ip addr add 192.168.100.111/255.255.255.254 scope 0 dev bond0
-> ip addr add 0.0.0.4/0 scope 0x40 secondary dev bond0
-> ip addr del 4.117.174.103/0 scope 0x40 dev bond0
-> ip link delete bond0 type bond
-> 
-> In this reproduction test case, an incorrect 'last_prim' is found in
-> __inet_del_ifa(), as a result, the secondary address(0.0.0.4/0 scope 0x40)
-> is lost. The memory of the secondary address is leaked and the reference of
-> in_device and net_device is leaked.
-> 
-> Fix this problem by modifying the PROMOTE_SECONDANCE behavior as follows:
-> 1. Traverse in_dev->ifa_list to search for the actual 'last_prim'.
-> 2. When last_prim is empty, move 'promote' to the in_dev->ifa_list header.
+The following are changes since commit 29fe7a1b62717d58f033009874554d99d71f7d37:
+  octeontx2-af: Fix truncation of smq in CN10K NIX AQ enqueue mbox handler
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue 40GbE
 
-	So, the problem is that last_prim initially points to the
-first primary address that we are actually removing. Looks like with 
-last_prim we try to promote the secondary IP after all primaries with
-scope >= our scope, i.e. simulating a new IP insert. As the secondary IPs 
-have same scope as their primary, why just not remove the last_prim 
-var/code and to insert the promoted secondary at the same place as the 
-deleted primary? May be your patch does the same: insert at same pos?
+Andrii Staikov (1):
+  i40e: fix potential memory leaks in i40e_remove()
 
-Before deletion:
-1. primary1 scope global (to be deleted)
-2. primary2 scope global
-3. promoted_secondary
+Brett Creeley (1):
+  iavf: Fix promiscuous mode configuration flow messages
 
-After deletion (old way, promote as a new insertion):
-1. primary2 scope global   
-2. promoted_secondary scope global (inserted as new primary)
+ drivers/net/ethernet/intel/i40e/i40e_main.c   | 10 ++-
+ drivers/net/ethernet/intel/iavf/iavf.h        | 16 ++--
+ drivers/net/ethernet/intel/iavf/iavf_main.c   | 43 +++++------
+ .../net/ethernet/intel/iavf/iavf_virtchnl.c   | 75 ++++++++++++-------
+ 4 files changed, 82 insertions(+), 62 deletions(-)
 
-After deletion (new way, promote at same place):
-1. promoted_secondary scope global (now primary, inserted at same place)
-2. primary2 scope global   
-
-	What I mean is to use ifap as last_prim, not tested:
-
-diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
-index 5deac0517ef7..7c71fa8996bb 100644
---- a/net/ipv4/devinet.c
-+++ b/net/ipv4/devinet.c
-@@ -355,14 +355,12 @@ static void __inet_del_ifa(struct in_device *in_dev,
- {
- 	struct in_ifaddr *promote = NULL;
- 	struct in_ifaddr *ifa, *ifa1;
--	struct in_ifaddr *last_prim;
- 	struct in_ifaddr *prev_prom = NULL;
- 	int do_promote = IN_DEV_PROMOTE_SECONDARIES(in_dev);
- 
- 	ASSERT_RTNL();
- 
- 	ifa1 = rtnl_dereference(*ifap);
--	last_prim = rtnl_dereference(in_dev->ifa_list);
- 	if (in_dev->dead)
- 		goto no_promotions;
- 
-@@ -374,10 +372,6 @@ static void __inet_del_ifa(struct in_device *in_dev,
- 		struct in_ifaddr __rcu **ifap1 = &ifa1->ifa_next;
- 
- 		while ((ifa = rtnl_dereference(*ifap1)) != NULL) {
--			if (!(ifa->ifa_flags & IFA_F_SECONDARY) &&
--			    ifa1->ifa_scope <= ifa->ifa_scope)
--				last_prim = ifa;
--
- 			if (!(ifa->ifa_flags & IFA_F_SECONDARY) ||
- 			    ifa1->ifa_mask != ifa->ifa_mask ||
- 			    !inet_ifa_match(ifa1->ifa_address, ifa)) {
-@@ -415,7 +409,7 @@ static void __inet_del_ifa(struct in_device *in_dev,
- no_promotions:
- 	/* 2. Unlink it */
- 
--	*ifap = ifa1->ifa_next;
-+	rcu_assign_pointer(*ifap, rtnl_dereference(ifa1->ifa_next));
- 	inet_hash_remove(ifa1);
- 
- 	/* 3. Announce address deletion */
-@@ -440,9 +434,9 @@ static void __inet_del_ifa(struct in_device *in_dev,
- 
- 			rcu_assign_pointer(prev_prom->ifa_next, next_sec);
- 
--			last_sec = rtnl_dereference(last_prim->ifa_next);
-+			last_sec = rtnl_dereference(*ifap);
- 			rcu_assign_pointer(promote->ifa_next, last_sec);
--			rcu_assign_pointer(last_prim->ifa_next, promote);
-+			rcu_assign_pointer(*ifap, promote);
- 		}
- 
- 		promote->ifa_flags &= ~IFA_F_SECONDARY;
-> 
-> Fixes: 0ff60a45678e ("[IPV4]: Fix secondary IP addresses after promotion")
-> Signed-off-by: Liu Jian <liujian56@huawei.com>
-> ---
->  net/ipv4/devinet.c | 26 ++++++++++++++++++++------
->  1 file changed, 20 insertions(+), 6 deletions(-)
-> 
-> diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
-> index 9cf64ee47dd2..99278f4b58e0 100644
-> --- a/net/ipv4/devinet.c
-> +++ b/net/ipv4/devinet.c
-> @@ -355,14 +355,13 @@ static void __inet_del_ifa(struct in_device *in_dev,
->  {
->  	struct in_ifaddr *promote = NULL;
->  	struct in_ifaddr *ifa, *ifa1;
-> -	struct in_ifaddr *last_prim;
-> +	struct in_ifaddr *last_prim = NULL;
->  	struct in_ifaddr *prev_prom = NULL;
->  	int do_promote = IN_DEV_PROMOTE_SECONDARIES(in_dev);
->  
->  	ASSERT_RTNL();
->  
->  	ifa1 = rtnl_dereference(*ifap);
-> -	last_prim = rtnl_dereference(in_dev->ifa_list);
->  	if (in_dev->dead)
->  		goto no_promotions;
->  
-> @@ -371,7 +370,16 @@ static void __inet_del_ifa(struct in_device *in_dev,
->  	 **/
->  
->  	if (!(ifa1->ifa_flags & IFA_F_SECONDARY)) {
-> -		struct in_ifaddr __rcu **ifap1 = &ifa1->ifa_next;
-> +		struct in_ifaddr __rcu **ifap1 = &in_dev->ifa_list;
-> +
-> +		while ((ifa = rtnl_dereference(*ifap1)) != NULL) {
-> +			if (ifa1 == ifa)
-> +				break;
-> +			last_prim = ifa;
-> +			ifap1 = &ifa->ifa_next;
-> +		}
-> +
-> +		ifap1 = &ifa1->ifa_next;
->  
->  		while ((ifa = rtnl_dereference(*ifap1)) != NULL) {
->  			if (!(ifa->ifa_flags & IFA_F_SECONDARY) &&
-> @@ -440,9 +448,15 @@ static void __inet_del_ifa(struct in_device *in_dev,
->  
->  			rcu_assign_pointer(prev_prom->ifa_next, next_sec);
->  
-> -			last_sec = rtnl_dereference(last_prim->ifa_next);
-> -			rcu_assign_pointer(promote->ifa_next, last_sec);
-> -			rcu_assign_pointer(last_prim->ifa_next, promote);
-> +			if (last_prim) {
-> +				last_sec = rtnl_dereference(last_prim->ifa_next);
-> +				rcu_assign_pointer(promote->ifa_next, last_sec);
-> +				rcu_assign_pointer(last_prim->ifa_next, promote);
-> +			} else {
-> +				rcu_assign_pointer(promote->ifa_next,
-> +						   rtnl_dereference(in_dev->ifa_list));
-> +				rcu_assign_pointer(in_dev->ifa_list, promote);
-> +			}
->  		}
->  
->  		promote->ifa_flags &= ~IFA_F_SECONDARY;
-> -- 
-> 2.34.1
-
-Regards
-
---
-Julian Anastasov <ja@ssi.bg>
+-- 
+2.38.1
 
 
