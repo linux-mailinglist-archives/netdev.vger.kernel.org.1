@@ -1,383 +1,138 @@
-Return-Path: <netdev+bounces-32129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05C50792E40
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 21:05:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EDE4792F71
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 22:04:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EC471C209D7
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 19:05:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ADF20281186
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 20:04:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DA67DDDD;
-	Tue,  5 Sep 2023 19:05:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1472DF4C;
+	Tue,  5 Sep 2023 20:04:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEFC0DDAF
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 19:05:04 +0000 (UTC)
-Received: from out-213.mta0.migadu.com (out-213.mta0.migadu.com [IPv6:2001:41d0:1004:224b::d5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 384B1CEE
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 12:04:35 -0700 (PDT)
-Message-ID: <52177bd8-65a5-ef4d-b00d-47509855c3e4@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1693940578;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pnMKLkenAHv7Z0a1x7H2J4DxcoYi4GZjMBQaE+GgU1A=;
-	b=S990k/7XAwIwNasdLfq/n1ijnWrQFNXr9Qt81kxY/A1WuATvEzSmkvup9UHn6ICeS2y5MW
-	OFVg1lwmKNGDEwPImUWlL4tEEX06acvf5Yw4QOA0Dma/5/lNwJTfy9DqWQ0eoTwEEP1gEl
-	bbqZKHdb2MvOaiXoMfsx0NInv7/WiV8=
-Date: Tue, 5 Sep 2023 12:02:52 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E341EDDC5
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 20:04:18 +0000 (UTC)
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E96C109
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 13:04:17 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-402c1407139so30591255e9.1
+        for <netdev@vger.kernel.org>; Tue, 05 Sep 2023 13:04:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google; t=1693944256; x=1694549056; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rAHXFSmpuYMwhbTe94DCn7ImjiGtbOJCwz/57HmnOlE=;
+        b=jM/lXP4BRz61PD4Y8IlEAj/GMUfPeiVKwjIyA2CHB7bcONsW8b0x+XuVmi/8kQwSVQ
+         ZYSvZ1pS3H2Ug3uAjSwmza4zezY/ZXmYJnnFUjs0ObE3mAV+An/tTsPl2mmALxD8GOKk
+         HOIVPNMZz3YbhGHziCLh/mFxAWaoD//65DHU60DrRybHUHLdnp34mwuzWnJa/C878hRT
+         Z2yvRYY8nzJQFZIzHZeTf33GLdR4Hb1beVCyDi4vZIEObOLgVEgn7DF2WzSm45Qoul33
+         T1pq4t1QvefRulVRgE+hj1nw9m/jTSQbS5Bte0fwccBqdm9wSNa1p6igcKNmfAopZEq3
+         gk6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693944256; x=1694549056;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rAHXFSmpuYMwhbTe94DCn7ImjiGtbOJCwz/57HmnOlE=;
+        b=AgJ4YvsFpuOa1NrQ9hl8r8Oq0hBbv7Bie3dL8g5P11HZlLbx1MFzYsLeB+p8Scdtb2
+         0JznJ9aJ0ksd1gnYCkaFv3bE88P2+ExMmnCKEi1OQL+EVRZsvbum9lZX7AvSrzfsSI98
+         NC+CyirNEle9xcHrSjNoLODZKVd/Ni8hqqBzMm1mah+wkxR5guMEjviqopnXEeKxNjUs
+         iPF0EIjMjuLySEyekxcpKu4Q2170nS7W2UqEsLit4W1nbsSnIZ4rwkRHQ4e4lkrFtoMl
+         qXyduWehPq2pyi2rP+HEYfcval69cwhfwP22dEL6IVvXNrUvsSFasEOFrf7f3RfrUKKA
+         HtZA==
+X-Gm-Message-State: AOJu0YxQ0WckrMR4cQ1V5IrLLdxxpkqrRpqPzUdn9Kq59lzsKl8wYwAE
+	QipYB0+9/A54lT/Rt38yrFHymA==
+X-Google-Smtp-Source: AGHT+IHelAJ8rhTH2NaDH74hFo3y+fgZsyTP3gVU0H1zG3eGW4P05qp7T1e/T0gSXJZN2+HinXwBvQ==
+X-Received: by 2002:adf:dec1:0:b0:317:731c:4d80 with SMTP id i1-20020adfdec1000000b00317731c4d80mr638853wrn.24.1693944255699;
+        Tue, 05 Sep 2023 13:04:15 -0700 (PDT)
+Received: from [10.83.37.178] ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id i16-20020adfefd0000000b0031c5d74ecd8sm18401955wrp.84.2023.09.05.13.04.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Sep 2023 13:04:15 -0700 (PDT)
+Message-ID: <973ddaf6-0725-8bae-f90b-7921e0104e24@arista.com>
+Date: Tue, 5 Sep 2023 21:04:07 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v3 4/9] bpf: Implement cgroup sockaddr hooks for
- unix sockets
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v10 net-next 08/23] net/tcp: Add AO sign to RST packets
 Content-Language: en-US
-To: Daan De Meyer <daan.j.demeyer@gmail.com>
-Cc: kernel-team@meta.com, netdev@vger.kernel.org, bpf@vger.kernel.org
-References: <20230831153455.1867110-1-daan.j.demeyer@gmail.com>
- <20230831153455.1867110-5-daan.j.demeyer@gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20230831153455.1867110-5-daan.j.demeyer@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Simon Horman <horms@kernel.org>
+Cc: David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org,
+ Andy Lutomirski <luto@amacapital.net>, Ard Biesheuvel <ardb@kernel.org>,
+ Bob Gilligan <gilligan@arista.com>, Dan Carpenter <error27@gmail.com>,
+ David Laight <David.Laight@aculab.com>, Dmitry Safonov
+ <0x7f454c46@gmail.com>, Donald Cassidy <dcassidy@redhat.com>,
+ Eric Biggers <ebiggers@kernel.org>, "Eric W. Biederman"
+ <ebiederm@xmission.com>, Francesco Ruggeri <fruggeri05@gmail.com>,
+ "Gaillardetz, Dominik" <dgaillar@ciena.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+ Ivan Delalande <colona@arista.com>, Leonard Crestez <cdleonard@gmail.com>,
+ "Nassiri, Mohammad" <mnassiri@ciena.com>,
+ Salam Noureddine <noureddine@arista.com>,
+ Simon Horman <simon.horman@corigine.com>,
+ "Tetreault, Francois" <ftetreau@ciena.com>, netdev@vger.kernel.org
+References: <20230815191455.1872316-1-dima@arista.com>
+ <20230815191455.1872316-9-dima@arista.com> <ZNy3+f6ZtDKfsQ5C@vergenet.net>
+From: Dmitry Safonov <dima@arista.com>
+In-Reply-To: <ZNy3+f6ZtDKfsQ5C@vergenet.net>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 8/31/23 8:34 AM, Daan De Meyer wrote:
-> diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-> index 0680569f9bd0..d8f508c56055 100644
-> --- a/kernel/bpf/verifier.c
-> +++ b/kernel/bpf/verifier.c
-> @@ -14540,14 +14540,19 @@ static int check_return_code(struct bpf_verifier_env *env)
->   	case BPF_PROG_TYPE_CGROUP_SOCK_ADDR:
->   		if (env->prog->expected_attach_type == BPF_CGROUP_UDP4_RECVMSG ||
->   		    env->prog->expected_attach_type == BPF_CGROUP_UDP6_RECVMSG ||
-> +		    env->prog->expected_attach_type == BPF_CGROUP_UNIX_RECVMSG ||
->   		    env->prog->expected_attach_type == BPF_CGROUP_INET4_GETPEERNAME ||
->   		    env->prog->expected_attach_type == BPF_CGROUP_INET6_GETPEERNAME ||
-> +		    env->prog->expected_attach_type == BPF_CGROUP_UNIX_GETPEERNAME ||
->   		    env->prog->expected_attach_type == BPF_CGROUP_INET4_GETSOCKNAME ||
-> -		    env->prog->expected_attach_type == BPF_CGROUP_INET6_GETSOCKNAME)
-> +		    env->prog->expected_attach_type == BPF_CGROUP_INET6_GETSOCKNAME ||
-> +		    env->prog->expected_attach_type == BPF_CGROUP_UNIX_GETSOCKNAME)
->   			range = tnum_range(1, 1);
+Hi Simon,
 
-A note that getpeername, getsockname, and recvmsg cannot return err (err is 
-value 0 for cgroup-bpf). More on this later.
+Sorry for the delayed answer, I went on a vacation.
 
->   		if (env->prog->expected_attach_type == BPF_CGROUP_INET4_BIND ||
->   		    env->prog->expected_attach_type == BPF_CGROUP_INET6_BIND)
->   			range = tnum_range(0, 3);
-> +		if (env->prog->expected_attach_type == BPF_CGROUP_UNIX_BIND)
-> +			range = tnum_range(0, 1);
+On 8/16/23 12:50, Simon Horman wrote:
+> On Tue, Aug 15, 2023 at 08:14:37PM +0100, Dmitry Safonov wrote:
+[..]
+>> +	if (tcp_ao_prepare_reset(sk, skb, aoh, l3index, reply->seq,
+>> +				 &key, &traffic_key, &allocated_traffic_key,
+>> +				 &keyid, &ao_sne))
+> 
+> Hi Dmitry,
+> 
+> The type of the 4th parameter of tcp_ao_prepare_reset() (seq) is u32,
+> but here a __be32 value is passed.
 
-A few words in the commit message is needed for the difference on the return 
-code between UNIX_BIND and INET[46]_BIND. (ie. the 
-BPF_RET_BIND_NO_CAP_NET_BIND_SERVICE).
+Yeah, it gets converted in patch "net/tcp: Add TCP-AO sign to twsk".
 
-Also, the default range should be (0, 1) already (the 'struct tnum range = 
-tnum_range(0, 1)' at the beginning of this function). The same goes for 
-UNIX_SENDMSG (and the existing INET[46]_SENDMSG) which should already have the 
-default (0, 1) range. Thus, no need to have a special test case here.
+> Also, it seems that parameter is unused by tcp_ao_prepare_reset().
 
->   		break;
->   	case BPF_PROG_TYPE_CGROUP_SKB:
->   		if (env->prog->expected_attach_type == BPF_CGROUP_INET_EGRESS) {
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 3ed6cd33b268..be4e0e923aa6 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -81,6 +81,7 @@
->   #include <net/xdp.h>
->   #include <net/mptcp.h>
->   #include <net/netfilter/nf_conntrack_bpf.h>
-> +#include <linux/un.h>
+And only gets used in "net/tcp: Add TCP-AO SNE support".
 
-Is this needed?
+Hard times when you keep changing the patch set, eventually some nits
+and bits get introduced in earlier patches only to be modified by later.
 
->   
->   static const struct bpf_func_proto *
->   bpf_sk_base_func_proto(enum bpf_func_id func_id);
-> @@ -7828,6 +7829,7 @@ sock_addr_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
->   		switch (prog->expected_attach_type) {
->   		case BPF_CGROUP_INET4_CONNECT:
->   		case BPF_CGROUP_INET6_CONNECT:
-> +		case BPF_CGROUP_UNIX_CONNECT:
->   			return &bpf_bind_proto;
->   		default:
->   			return NULL;
-> @@ -7856,16 +7858,22 @@ sock_addr_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
->   		switch (prog->expected_attach_type) {
->   		case BPF_CGROUP_INET4_BIND:
->   		case BPF_CGROUP_INET6_BIND:
-> +		case BPF_CGROUP_UNIX_BIND:
->   		case BPF_CGROUP_INET4_CONNECT:
->   		case BPF_CGROUP_INET6_CONNECT:
-> +		case BPF_CGROUP_UNIX_CONNECT:
->   		case BPF_CGROUP_UDP4_RECVMSG:
->   		case BPF_CGROUP_UDP6_RECVMSG:
-> +		case BPF_CGROUP_UNIX_RECVMSG:
->   		case BPF_CGROUP_UDP4_SENDMSG:
->   		case BPF_CGROUP_UDP6_SENDMSG:
-> +		case BPF_CGROUP_UNIX_SENDMSG:
->   		case BPF_CGROUP_INET4_GETPEERNAME:
->   		case BPF_CGROUP_INET6_GETPEERNAME:
-> +		case BPF_CGROUP_UNIX_GETPEERNAME:
->   		case BPF_CGROUP_INET4_GETSOCKNAME:
->   		case BPF_CGROUP_INET6_GETSOCKNAME:
-> +		case BPF_CGROUP_UNIX_GETSOCKNAME:
->   			return &bpf_sock_addr_setsockopt_proto;
->   		default:
->   			return NULL;
-> @@ -7874,16 +7882,22 @@ sock_addr_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
->   		switch (prog->expected_attach_type) {
->   		case BPF_CGROUP_INET4_BIND:
->   		case BPF_CGROUP_INET6_BIND:
-> +		case BPF_CGROUP_UNIX_BIND:
->   		case BPF_CGROUP_INET4_CONNECT:
->   		case BPF_CGROUP_INET6_CONNECT:
-> +		case BPF_CGROUP_UNIX_CONNECT:
->   		case BPF_CGROUP_UDP4_RECVMSG:
->   		case BPF_CGROUP_UDP6_RECVMSG:
-> +		case BPF_CGROUP_UNIX_RECVMSG:
->   		case BPF_CGROUP_UDP4_SENDMSG:
->   		case BPF_CGROUP_UDP6_SENDMSG:
-> +		case BPF_CGROUP_UNIX_SENDMSG:
->   		case BPF_CGROUP_INET4_GETPEERNAME:
->   		case BPF_CGROUP_INET6_GETPEERNAME:
-> +		case BPF_CGROUP_UNIX_GETPEERNAME:
->   		case BPF_CGROUP_INET4_GETSOCKNAME:
->   		case BPF_CGROUP_INET6_GETSOCKNAME:
-> +		case BPF_CGROUP_UNIX_GETSOCKNAME:
->   			return &bpf_sock_addr_getsockopt_proto;
->   		default:
->   			return NULL;
-> @@ -8931,8 +8945,8 @@ static bool sock_addr_is_valid_access(int off, int size,
->   	if (off % size != 0)
->   		return false;
->   
-> -	/* Disallow access to IPv6 fields from IPv4 contex and vise
-> -	 * versa.
-> +	/* Disallow access to fields not belonging to the attach type's address
-> +	 * family.
->   	 */
->   	switch (off) {
->   	case bpf_ctx_range(struct bpf_sock_addr, user_ip4):
-> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> index 86930a8ed012..94fd6f2441d8 100644
-> --- a/net/unix/af_unix.c
-> +++ b/net/unix/af_unix.c
-> @@ -116,6 +116,7 @@
->   #include <linux/freezer.h>
->   #include <linux/file.h>
->   #include <linux/btf_ids.h>
-> +#include <linux/bpf-cgroup.h>
->   
->   #include "scm.h"
->   
-> @@ -1323,6 +1324,12 @@ static int unix_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
->   	struct sock *sk = sock->sk;
->   	int err;
->   
-> +	if (cgroup_bpf_enabled(CGROUP_UNIX_BIND)) {
+What's worse, I can see that seq is getting used as ntohl(seq) and
+tcp_v6_send_reset() does htonl(seq). So, it's better be u32 argument,
+introduced by SNE patch, rather than gets converted to-and-back.
 
-It is a dup test. The same static_key test will be done in 
-BPF_CGROUP_RUN_SA_PROG*() also?
+Thanks for noticing!
 
-The same comment for other places before calling BPF_CGROUP_RUN_PROG_UNIX_* and 
-BPF_CGROUP_RUN_SA_PROG().
+[..]
 
-> +		err = BPF_CGROUP_RUN_PROG_UNIX_BIND_LOCK(sk, uaddr, &addr_len);
-> +		if (err)
-> +			return err;
-> +	}
-> +
->   	if (addr_len == offsetof(struct sockaddr_un, sun_path) &&
->   	    sunaddr->sun_family == AF_UNIX)
->   		return unix_autobind(sk);
-> @@ -1377,6 +1384,13 @@ static int unix_dgram_connect(struct socket *sock, struct sockaddr *addr,
->   		goto out;
->   
->   	if (addr->sa_family != AF_UNSPEC) {
-> +		if (cgroup_bpf_enabled(CGROUP_UNIX_CONNECT)) {
-> +			err = BPF_CGROUP_RUN_PROG_UNIX_CONNECT_LOCK(sk, addr,
-> +								    &alen);
-> +			if (err)
-> +				goto out;
-> +		}
-> +
->   		err = unix_validate_addr(sunaddr, alen);
->   		if (err)
->   			goto out;
-> @@ -1486,6 +1500,13 @@ static int unix_stream_connect(struct socket *sock, struct sockaddr *uaddr,
->   	int err;
->   	int st;
->   
-> +	if (cgroup_bpf_enabled(CGROUP_UNIX_CONNECT)) {
-> +		err = BPF_CGROUP_RUN_PROG_UNIX_CONNECT_LOCK(sk, uaddr,
-> +							    &addr_len);
-> +		if (err)
-> +			goto out;
-> +	}
-> +
->   	err = unix_validate_addr(sunaddr, addr_len);
->   	if (err)
->   		goto out;
-> @@ -1749,7 +1770,7 @@ static int unix_getname(struct socket *sock, struct sockaddr *uaddr, int peer)
->   	struct sock *sk = sock->sk;
->   	struct unix_address *addr;
->   	DECLARE_SOCKADDR(struct sockaddr_un *, sunaddr, uaddr);
-> -	int err = 0;
-> +	int addr_len = 0, err = 0;
->   
->   	if (peer) {
->   		sk = unix_peer_get(sk);
-> @@ -1766,14 +1787,37 @@ static int unix_getname(struct socket *sock, struct sockaddr *uaddr, int peer)
->   	if (!addr) {
->   		sunaddr->sun_family = AF_UNIX;
->   		sunaddr->sun_path[0] = 0;
-> -		err = offsetof(struct sockaddr_un, sun_path);
-> +		addr_len = offsetof(struct sockaddr_un, sun_path);
->   	} else {
-> -		err = addr->len;
-> +		addr_len = addr->len;
->   		memcpy(sunaddr, addr->name, addr->len);
->   	}
-> +
-> +	if (peer && cgroup_bpf_enabled(CGROUP_UNIX_GETPEERNAME)) {
-> +		err = BPF_CGROUP_RUN_SA_PROG(sk, uaddr, &addr_len,
-> +					     CGROUP_UNIX_GETPEERNAME);
-> +		if (err)
-
-UNIX_GETPEERNAME can only have return value 1 (OK), so no need to do err check here.
-
-> +			goto out;
-> +
-> +		err = unix_validate_addr(sunaddr, addr_len);
-
-Since the kfunc is specific to the unix address, how about doing the 
-unix_validate_addr check in the kfunc itself?
-
-> +		if (err)
-> +			goto out;
-> +	}
-> +
-> +	if (!peer && cgroup_bpf_enabled(CGROUP_UNIX_GETSOCKNAME)) {
-> +		err = BPF_CGROUP_RUN_SA_PROG(sk, uaddr, &addr_len,
-> +					     CGROUP_UNIX_GETSOCKNAME);
-> +		if (err)
-
-Same here on the unnecessary err check.
-
-> +			goto out;
-> +
-> +		err = unix_validate_addr(sunaddr, addr_len);
-> +		if (err)
-> +			goto out;
-> +	}
-> +
->   	sock_put(sk);
->   out:
-> -	return err;
-> +	return err ?: addr_len;
->   }
->   
->   static void unix_peek_fds(struct scm_cookie *scm, struct sk_buff *skb)
-> @@ -1919,6 +1963,15 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
->   		goto out;
->   
->   	if (msg->msg_namelen) {
-> +		if (cgroup_bpf_enabled(CGROUP_UNIX_SENDMSG)) {
-> +			err = BPF_CGROUP_RUN_PROG_UNIX_SENDMSG_LOCK(sk,
-> +								    msg->msg_name,
-> +								    &msg->msg_namelen,
-> +								    NULL);
-> +			if (err)
-> +				goto out;
-> +		}
-> +
->   		err = unix_validate_addr(sunaddr, msg->msg_namelen);
->   		if (err)
->   			goto out;
-> @@ -2328,14 +2381,30 @@ static int unix_seqpacket_recvmsg(struct socket *sock, struct msghdr *msg,
->   	return unix_dgram_recvmsg(sock, msg, size, flags);
->   }
->   
-> -static void unix_copy_addr(struct msghdr *msg, struct sock *sk)
-> +static int unix_recvmsg_copy_addr(struct msghdr *msg, struct sock *sk)
->   {
->   	struct unix_address *addr = smp_load_acquire(&unix_sk(sk)->addr);
-> +	int err;
->   
->   	if (addr) {
->   		msg->msg_namelen = addr->len;
->   		memcpy(msg->msg_name, addr->name, addr->len);
-> +
-> +		if (cgroup_bpf_enabled(CGROUP_UNIX_RECVMSG)) {
-> +			err = BPF_CGROUP_RUN_PROG_UNIX_RECVMSG_LOCK(sk,
-> +								    msg->msg_name,
-> +								    &msg->msg_namelen);
-> +			if (err)
-
-Same here on the unnecessary err check.
-
-> +				return err;
-> +
-> +			err = unix_validate_addr(msg->msg_name,
-> +						 msg->msg_namelen);
-
-If unix_validate_addr is done in the kfunc, the unix_recvmsg_copy_addr does not 
-need to return error and the changes in the unix_recvmsg_copy_addr's caller is 
-not needed also.
-
-> +			if (err)
-> +				return err;
-> +		}
->   	}
-> +
-> +	return 0;
->   }
->   
->   int __unix_dgram_recvmsg(struct sock *sk, struct msghdr *msg, size_t size,
-> @@ -2390,8 +2459,11 @@ int __unix_dgram_recvmsg(struct sock *sk, struct msghdr *msg, size_t size,
->   						EPOLLOUT | EPOLLWRNORM |
->   						EPOLLWRBAND);
->   
-> -	if (msg->msg_name)
-> -		unix_copy_addr(msg, skb->sk);
-> +	if (msg->msg_name) {
-> +		err = unix_recvmsg_copy_addr(msg, skb->sk);
-> +		if (err)
-> +			goto out_free;
-> +	}
->   
->   	if (size > skb->len - skip)
->   		size = skb->len - skip;
-> @@ -2743,7 +2815,9 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
->   		if (state->msg && state->msg->msg_name) {
->   			DECLARE_SOCKADDR(struct sockaddr_un *, sunaddr,
->   					 state->msg->msg_name);
-> -			unix_copy_addr(state->msg, skb->sk);
-> +			err = unix_recvmsg_copy_addr(state->msg, skb->sk);
-> +			if (err)
-> +				break;
->   			sunaddr = NULL;
->   		}
+-- 
+           Dmitry
 
 
