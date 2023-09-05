@@ -1,102 +1,106 @@
-Return-Path: <netdev+bounces-32086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DF937922C5
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 14:54:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CCEE97922C8
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 14:58:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 169A01C2099B
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 12:54:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2A391C20944
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 12:58:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3B5CD311;
-	Tue,  5 Sep 2023 12:54:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0508D314;
+	Tue,  5 Sep 2023 12:58:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6DB663D9
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 12:54:17 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BD50B8;
-	Tue,  5 Sep 2023 05:54:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=OeJj+JSjMyHjOYVRVgIa5VnEmjnn/PkxGVs377DiFHc=; b=knYOJUpFOkx/PTFAFCOw7335Um
-	kaB4NqGSQPYJljK5ryCqrSJLAXgROfuCFDZ6nxrDaFaMZ2P1OTzLDGsTkXqBZFy/8cWeORqxUBXqD
-	9SSx+wiegIGGNbSkeppKPolCEzz53X6z4CI2S6jLv0WwAQnUcyhnevP7n7ElGcVrVF7g=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qdVZF-005o8p-8n; Tue, 05 Sep 2023 14:54:05 +0200
-Date: Tue, 5 Sep 2023 14:54:05 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	devicetree@vger.kernel.org
-Subject: Re: [RFC net-next v1 2/2] net: dsa: microchip: ksz9477: Add drive
- strength configuration
-Message-ID: <0db96467-958e-4e5a-bd66-fc469316cfbb@lunn.ch>
-References: <20230905124340.4116542-1-o.rempel@pengutronix.de>
- <20230905124340.4116542-2-o.rempel@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B241ED30A
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 12:58:44 +0000 (UTC)
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 23E5CE9;
+	Tue,  5 Sep 2023 05:58:40 -0700 (PDT)
+Authenticated-By: 
+X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 385CvqzO7024338, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 385CvqzO7024338
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Tue, 5 Sep 2023 20:57:52 +0800
+Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.17; Tue, 5 Sep 2023 20:58:19 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS03.realtek.com.tw (172.21.6.96) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.7; Tue, 5 Sep 2023 20:58:18 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::7445:d92b:d0b3:f79c]) by
+ RTEXMBS04.realtek.com.tw ([fe80::7445:d92b:d0b3:f79c%5]) with mapi id
+ 15.01.2375.007; Tue, 5 Sep 2023 20:58:18 +0800
+From: Hayes Wang <hayeswang@realtek.com>
+To: Paolo Abeni <pabeni@redhat.com>, "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net" <davem@davemloft.net>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        nic_swsd
+	<nic_swsd@realtek.com>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "linux-usb@vger.kernel.org"
+	<linux-usb@vger.kernel.org>
+Subject: RE: [PATCH net] r8152: avoid the driver drops a lot of packets
+Thread-Topic: [PATCH net] r8152: avoid the driver drops a lot of packets
+Thread-Index: AQHZ3ynCVnk5WSMfQUWpVA7+s1E7KrALfhaAgACIBVD//4uUAIAAmlPQ
+Date: Tue, 5 Sep 2023 12:58:18 +0000
+Message-ID: <d46e648ffb2846bea6d7066673135ca0@realtek.com>
+References: <20230904121706.7132-420-nic_swsd@realtek.com>
+	 <32c71d3245127b4aa02b8abd75edcb8f5767e966.camel@redhat.com>
+	 <48d03f3134bf49c0b04b34464cd7487b@realtek.com>
+ <223569649ad4ded66786fcc424156b2115b8ccd8.camel@redhat.com>
+In-Reply-To: <223569649ad4ded66786fcc424156b2115b8ccd8.camel@redhat.com>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-originating-ip: [172.22.228.6]
+x-kse-serverinfo: RTEXMBS03.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230905124340.4116542-2-o.rempel@pengutronix.de>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> +static const struct ksz9477_drive_strength ksz9477_drive_strengths[] = {
-> +	{ SW_DRIVE_STRENGTH_2MA,  2000 },
-> +	{ SW_DRIVE_STRENGTH_4MA,  4000 },
-> +	{ SW_DRIVE_STRENGTH_8MA,  8000 },
-> +	{ SW_DRIVE_STRENGTH_12MA, 12000 },
-> +	{ SW_DRIVE_STRENGTH_16MA, 16000 },
-> +	{ SW_DRIVE_STRENGTH_20MA, 20000 },
-> +	{ SW_DRIVE_STRENGTH_24MA, 24000 },
-> +	{ SW_DRIVE_STRENGTH_28MA, 28000 },
-
-These SW_DRIVE_STRENGTH_ values appear in both ksz8795_reg.h and
-ksz9477_reg.h. Can the code be made common?
-
-> +static u32 ksz9477_drive_strength_to_reg(u32 milliamp)
-> +{
-> +	size_t array_size = ARRAY_SIZE(ksz9477_drive_strengths);
-> +	int i;
-> +
-> +	for (i = 0; i < array_size; i++) {
-> +		if (ksz9477_drive_strengths[i].milliamp >= milliamp)
-> +			return ksz9477_drive_strengths[i].reg_val;
-
-Normally an exact match is used, not the nearest value.
-
-
-    Andrew
-
----
-pw-bot: cr
-
+UGFvbG8gQWJlbmkgPHBhYmVuaUByZWRoYXQuY29tPg0KPiBTZW50OiBUdWVzZGF5LCBTZXB0ZW1i
+ZXIgNSwgMjAyMyA3OjIxIFBNDQpbLi4uXQ0KPiBJJ20gc29ycnksIEkgaGF2ZSBhIHZlcnkgc3Vw
+ZXJmaWNpYWwga25vd2xlZGdlIG9mIHRoZSBVU0IgbGF5ZXIsIGJ1dCBpdA0KPiBsb29rcyBsaWtl
+IHRoYXQgd2hlbiBzdWNoIGNvbmRpdGlvbiBpcyByZWFjaGVkLCBpbiB0aGUgd29yc3QgY29uZGl0
+aW9uDQo+IHRoZXJlIGNvdWxkIGJlIHVwIHRvIHVyYnMgaW4gZmxpZ2h0LiBBRkFJQ1MgZWFjaCBv
+ZiB0aGVtIGNhcnJpZXMgYSAxNksNCj4gYnVmZmVyLCBjYW4gYmUgdXAgdG8gMTAgc3RhbmRhcmQt
+bXR1IHBhY2tldHMgLSBvciBtdWNoIG1vcmUgc21hbGwgb25lcy4NCj4gDQo+IFNldHRpbmcgYW4g
+dXBwZXIgbGltaXRzIHRvIHRoZSByeF9xdWV1ZSBzdGlsbCBsb29rcyBsaWtlIGEgcmVhc29uYWJs
+ZQ0KPiBzYWZlZ3VhcmQuDQoNCkkgdGhpbmsgaXQgaXMgdmVyeSBoYXJkIHRvIHF1ZXVlIG1vcmUg
+dGhhbiAxMDAwIHBhY2tldHMuIFRoZSBOQVBJIGNvbnRpbnVlcw0KY29uc3VtaW5nIHRoZSBxdWV1
+ZWQgcGFja2V0cy4gQW5kLCB0aGUgaGFyZHdhcmUgd291bGRuJ3QgY29tcGxldGUgYWxsDQp1cmJz
+IGF0IG9uZSB0aW1lLiBIb3dldmVyLCBJIHdvdWxkIGFkZCBXQVJOX09OX09OQ0UoKSB0byBvYnNl
+cnZlIGlmIA0KYW55IGV4Y2VwdGlvbiB3b3VsZCBvY2N1ci4NCg0KPiA+IEJlc2lkZXMsIGlmIHRo
+ZSBmbG93IGNvbnRyb2wgaXMgZGlzYWJsZWQsIHRoZSBwYWNrZXRzIG1heSBiZSBkcm9wcGVkIGJ5
+DQo+ID4gdGhlIGhhcmR3YXJlIHdoZW4gdGhlIEZJRk8gb2YgdGhlIGRldmljZSBpcyBmdWxsLCBh
+ZnRlciB0aGUgZHJpdmVyIHN0b3BzDQo+ID4gc3VibWl0dGluZyByeC4NCj4gDQo+IElmIHRoZSBp
+bmNvbWluZyByYXRlIGV4Y2VlZHMgdGhlIEgvVyBwcm9jZXNzaW5nIGNhcGFjaXR5LCBwYWNrZXRz
+IGFyZQ0KPiBkcm9wcGVkOiB0aGF0IGlzIGV4cGVjdGVkIGFuZCB1bmF2b2lkYWJsZS4NCj4gDQo+
+IFBvc3NpYmx5IGV4cG9zaW5nIHRoZSByb290IGNhdXNlIGZvciBzdWNoIGRyb3BzIHRvIHVzZXIg
+c3BhY2UgdmlhDQo+IGFwcHJvcHJpYXRlIHN0YXRzIHdvdWxkIGJlIHVzZWZ1bC4NCg0KVGhlIG51
+bWJlciBvZiBwYWNrZXQgd2hpY2ggdGhlIGRldmljZSBkcm9wcyBjb3VsZCBiZSBnb3QgdGhyb3Vn
+aA0KZXRodG9vbC4NCg0KQmVzdCBSZWdhcmRzLA0KSGF5ZXMNCg0KDQo=
 
