@@ -1,247 +1,255 @@
-Return-Path: <netdev+bounces-32088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6023B7922CA
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 15:04:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 443F47922F4
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 15:23:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6947E1C20960
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 13:04:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C47D1C20986
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 13:23:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45B84D506;
-	Tue,  5 Sep 2023 13:04:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 008AAD50F;
+	Tue,  5 Sep 2023 13:23:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3266DC8CA
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 13:04:01 +0000 (UTC)
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FFE312E;
-	Tue,  5 Sep 2023 06:04:00 -0700 (PDT)
-Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-9a58dbd5daeso383353866b.2;
-        Tue, 05 Sep 2023 06:04:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E86AACA57
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 13:23:07 +0000 (UTC)
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB28619B
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 06:23:05 -0700 (PDT)
+Received: by mail-qt1-x84a.google.com with SMTP id d75a77b69052e-414cac7beaaso18270051cf.1
+        for <netdev@vger.kernel.org>; Tue, 05 Sep 2023 06:23:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693919038; x=1694523838; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AHvfGxDciDTH06pq4bTlZo2uCTCkpAd8V1AM1e/muUA=;
-        b=rfHwB149aAayB2aBrx6vkRsdoFHwEyWFkp9gG94EUSNy8M+TgtLLWHtz54UFlaN7It
-         EX60KA5yXdvttC8QYITq8szUQm1ap1cC21CSff0Xo1hjHt3MW313AxsX+mhiSIOP4JrH
-         LKFRp8z8kKYtqNhYERq0rjPe6Q0/gwY7NyicSzaaVI9ApBP7zpEQbElb2mITZwqu6TMI
-         +h+TVwfN+4vbbXBK0G4iuE4/LiC2B4enCvnMff0FSEXuVPaOTQF8ImtCkC7cqkZpN7zu
-         ltQgJvjwAVLFD8pgcPcruGxoN3iuQx3YSIkjN/dJgkxXx+jWDLkLZ7HDr+AC0Xa/gk/h
-         CA5g==
+        d=google.com; s=20221208; t=1693920185; x=1694524985; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=0lBxCv84UW6hj6rwB1Apsn3aqO+mbNBLfgM1bBjMuk8=;
+        b=syB6s8EnV+77y6XyHjikuMBYCBun9dtGwRwn5LzwCpwsR4YWOqKB1GxvEs7PYNcyRB
+         xi4nAp+sKXuvwlAV0Ge3vq0uXI+GLCj2VjCxP1eLp+VBHOHaGnsSYY8tM73A+IRtJIIs
+         u0b1cxnGG+HeHAFm+h5VjE3Liy3j9NtWD06+4M+tPAe/q/gVdsjMcqaNUD/AwexaJlzn
+         pyAueOlHLP/m309szAvJAFSJeda6QDMgycyOuJuRu37ItevKny5suzz0MHwxbsrZYyE2
+         xfFDdZqLKp3ONu27ncypqIOLuf+bA6NuWbz4F22Obt/j7zNEjn9dny22Zd8gUZ2OVJEe
+         whbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693919038; x=1694523838;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AHvfGxDciDTH06pq4bTlZo2uCTCkpAd8V1AM1e/muUA=;
-        b=UgZDKtWy7pULQ4s4h34YX7tpzCpUkr/k8ezxhKngL8arJbTT/7+O7v5PBRFhXjJ29g
-         a9sNdBEq7K2nRG7kFJyyIamt+vqayJveLMvLymuq7w8VF7yZVd4MvjoQ+NVhwy4SAVbo
-         HwwJm4MOEOnYPsmU3YAQ8TZoCONiPrvyG00f72TxHTGGZG00c9bLgpYyg72BfTTvtvw/
-         GBypR5OGWcwLHulkCxD7DKo2y806GD3yVBvlgCzrOmOxfCGSQpQDI3xi0c+pum8D1FGj
-         XiiAIqOZ5Dq73JLRbNdNrGHU+bnfTQ3CzMngPDebZrt8fXRpy4swJiNYwAiShZ0Igb5u
-         zL8g==
-X-Gm-Message-State: AOJu0YyDC10vBLyXOv+hrL0V0UeemLkaEOYmQYkKOoMuZVF6Pw0psFDg
-	c5a0lPN1Bzn9W6zLu4aHUbo=
-X-Google-Smtp-Source: AGHT+IEeHdfeiGoA2IpNlbRg7m43FRRjhp/tOkQR7lhcdDejxN9dbBemf9yKFi9319iaM9xx7z1FGQ==
-X-Received: by 2002:a17:906:20d0:b0:9a1:e994:3444 with SMTP id c16-20020a17090620d000b009a1e9943444mr5749881ejc.3.1693919038282;
-        Tue, 05 Sep 2023 06:03:58 -0700 (PDT)
-Received: from skbuf ([188.26.57.165])
-        by smtp.gmail.com with ESMTPSA id g14-20020a1709061e0e00b00988b8ff849csm7542881ejj.108.2023.09.05.06.03.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Sep 2023 06:03:57 -0700 (PDT)
-Date: Tue, 5 Sep 2023 16:03:55 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
-	davem@davemloft.net, Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>, Tristram.Ha@microchip.com,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, UNGLinuxDriver@microchip.com,
-	George McCollister <george.mccollister@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 RFC 3/4] net: dsa: hsr: Enable in KSZ9477 switch HW
- HSR offloading
-Message-ID: <20230905130355.7x3vpgdlmdzg6skz@skbuf>
-References: <20230904120209.741207-1-lukma@denx.de>
- <20230904120209.741207-1-lukma@denx.de>
- <20230904120209.741207-4-lukma@denx.de>
- <20230904120209.741207-4-lukma@denx.de>
- <20230905103750.u3hbn6xmgthgdpnw@skbuf>
- <20230905131103.67f41c13@wsk>
+        d=1e100.net; s=20221208; t=1693920185; x=1694524985;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0lBxCv84UW6hj6rwB1Apsn3aqO+mbNBLfgM1bBjMuk8=;
+        b=EzyjMG+JgI3OJH9Jc4NGH959x2i7GgtbM0vzfjPvub3SNzq6AF7POTCoplS0Tb09+b
+         bfrdNvpemvPTHD1rLW0BaEek7OkOhEgmVC+BCmUFZ3g+Pr+CFpoRcsU63nJUzhAn69XO
+         chjPBApbwm6LH/w+KzQSXknb9WTl8gSB6Ijnh1vmDIFbMKX/XwNPFHCqrDL0HC8i6Mtb
+         X8A+MUWMCltB5jobMZlzYoDOtTkq2dpCKHEy07YyynQFsGYfTZRobm421KLL5TtuQdsq
+         JseTobAeWVWk3XNF1beTBsMlE/ZjXM8LOYF6cNzwLcIeGW9GkWpQAFaMF9skQfHWLrxz
+         RmcA==
+X-Gm-Message-State: AOJu0YytLU8qa6N2HmgKz3ZqFLxAE4oz+29IG8FvjbJoCsmMQSlb+zck
+	yHI/UvcQ4fK5/mDDH4Ntg24JflnDC2TMRA==
+X-Google-Smtp-Source: AGHT+IEb2jqkpcBq8k4fhQSBSTSVGhM1oP3ZCq9wzyG7FkK5y/gZNV4xm4ZnEqeb+eiRg2wMpKxguVpsXHWJmQ==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:622a:49:b0:412:6df4:736 with SMTP id
+ y9-20020a05622a004900b004126df40736mr306165qtw.12.1693920185089; Tue, 05 Sep
+ 2023 06:23:05 -0700 (PDT)
+Date: Tue,  5 Sep 2023 13:23:03 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230905131103.67f41c13@wsk>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
+Message-ID: <20230905132303.1927206-1-edumazet@google.com>
+Subject: [PATCH net] xfrm: interface: use DEV_STATS_INC()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>, 
+	Steffen Klassert <steffen.klassert@secunet.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Sep 05, 2023 at 01:11:03PM +0200, Lukasz Majewski wrote:
-> > > +/* The KSZ9477 provides following HW features to accelerate
-> > > + * HSR frames handling:
-> > > + *
-> > > + * 1. TX PACKET DUPLICATION FROM HOST TO SWITCH
-> > > + * 2. RX PACKET DUPLICATION DISCARDING
-> > > + * 3. PREVENTING PACKET LOOP IN THE RING BY SELF-ADDRESS FILTERING
-> > > + *
-> > > + * Only one from point 1. has the NETIF_F* flag available.
-> > > + *
-> > > + * Ones from point 2 and 3 are "best effort" - i.e. those will
-> > > + * work correctly most of the time, but it may happen that some
-> > > + * frames will not be caught. Hence, the SW needs to handle those
-> > > + * special cases. However, the speed up gain is considerable when
-> > > + * above features are used.
-> > > + *
-> > > + * Moreover, the NETIF_F_HW_HSR_FWD feature is also enabled, as HSR frames
-> > > + * can be forwarded in the switch fabric between HSR ports.  
-> > 
-> > How do these 2 concepts (autonomous forwarding + software-based
-> > elimination of some frames) work together? If software is not the sole
-> > receiver of traffic which needs to be filtered further, and duplicates
-> > also get forwarded to the network, does this not break the HSR ring?
-> > 
-> 
-> Autonomous forwarding is based on KSZ9477, having the HSR ports
-> "bridged" to send frames between them.
-> 
-> Then, there is also based on HSR tag, and SA in-KSZ9477 feature RX
-> packet duplication discarding which will discard duplicated frames.
-> 
-> Last but not least the - packet loop prevention.
-> 
-> My understanding is as follows:
-> 
-> 1. RX packet duplication removes copy of a frame, which is addressed to
-> cpu port of switch.
+syzbot/KCSAN reported data-races in xfrm whenever dev->stats fields
+are updated.
 
-Does the duplicate elimination function only do that, as you say, or is
-it supposed to also eliminate duplicates for packets flooded to 2 ports
-as well (the host port, and the other ring port)?
+It appears all of these updates can happen from multiple cpus.
 
-If the latter, then it will fail to eliminate duplicates for packets
-that didn't visit the CPU. So the ring will rely on the self-address
-filtering capability of the other devices, in order not to collapse.
-I see that the software implementation also offers self-address
-filtering in hsr_handle_frame() -> hsr_addr_is_self(), but I don't see
-anything making that mandatory in IEC 62439-3:2018. Can we assume that
-the other ring members will know how to deal with it?
+Adopt SMP safe DEV_STATS_INC() to update dev->stats fields.
 
-> 2. The "bridge" of HSR passes frames in-KSZ9477, which are not
-> addressed to this cpu host (between other HSR nodes).
+BUG: KCSAN: data-race in xfrmi_xmit / xfrmi_xmit
 
-How is the switch supposed to know which packets are addressed to this
-CPU port and which are not? I expect separate answers for unicast,
-multicast and broadcast.
+read-write to 0xffff88813726b160 of 8 bytes by task 23986 on cpu 1:
+xfrmi_xmit+0x74e/0xb20 net/xfrm/xfrm_interface_core.c:583
+__netdev_start_xmit include/linux/netdevice.h:4889 [inline]
+netdev_start_xmit include/linux/netdevice.h:4903 [inline]
+xmit_one net/core/dev.c:3544 [inline]
+dev_hard_start_xmit+0x11b/0x3f0 net/core/dev.c:3560
+__dev_queue_xmit+0xeee/0x1de0 net/core/dev.c:4340
+dev_queue_xmit include/linux/netdevice.h:3082 [inline]
+neigh_connected_output+0x231/0x2a0 net/core/neighbour.c:1581
+neigh_output include/net/neighbour.h:542 [inline]
+ip_finish_output2+0x74a/0x850 net/ipv4/ip_output.c:230
+ip_finish_output+0xf4/0x240 net/ipv4/ip_output.c:318
+NF_HOOK_COND include/linux/netfilter.h:293 [inline]
+ip_output+0xe5/0x1b0 net/ipv4/ip_output.c:432
+dst_output include/net/dst.h:458 [inline]
+ip_local_out net/ipv4/ip_output.c:127 [inline]
+ip_send_skb+0x72/0xe0 net/ipv4/ip_output.c:1487
+udp_send_skb+0x6a4/0x990 net/ipv4/udp.c:963
+udp_sendmsg+0x1249/0x12d0 net/ipv4/udp.c:1246
+inet_sendmsg+0x63/0x80 net/ipv4/af_inet.c:840
+sock_sendmsg_nosec net/socket.c:730 [inline]
+sock_sendmsg net/socket.c:753 [inline]
+____sys_sendmsg+0x37c/0x4d0 net/socket.c:2540
+___sys_sendmsg net/socket.c:2594 [inline]
+__sys_sendmmsg+0x269/0x500 net/socket.c:2680
+__do_sys_sendmmsg net/socket.c:2709 [inline]
+__se_sys_sendmmsg net/socket.c:2706 [inline]
+__x64_sys_sendmmsg+0x57/0x60 net/socket.c:2706
+do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+entry_SYSCALL_64_after_hwframe+0x63/0xcd
 
-> 3. Packet loop prevention - the HSR packet with SA of note which sent
-> it - is not further forwarded.
-> 
-> > What are the causes due to which self-address filtering and duplicate
-> > elimination only work "most of the time"?
-> 
-> Please refer to section "KSZ9477 CHIP LIMITATIONS" in:
-> https://ww1.microchip.com/downloads/en/Appnotes/AN3474-KSZ9477-High-Availability-Seamless-Redundancy-Application-Note-00003474A.pdf
+read-write to 0xffff88813726b160 of 8 bytes by task 23987 on cpu 0:
+xfrmi_xmit+0x74e/0xb20 net/xfrm/xfrm_interface_core.c:583
+__netdev_start_xmit include/linux/netdevice.h:4889 [inline]
+netdev_start_xmit include/linux/netdevice.h:4903 [inline]
+xmit_one net/core/dev.c:3544 [inline]
+dev_hard_start_xmit+0x11b/0x3f0 net/core/dev.c:3560
+__dev_queue_xmit+0xeee/0x1de0 net/core/dev.c:4340
+dev_queue_xmit include/linux/netdevice.h:3082 [inline]
+neigh_connected_output+0x231/0x2a0 net/core/neighbour.c:1581
+neigh_output include/net/neighbour.h:542 [inline]
+ip_finish_output2+0x74a/0x850 net/ipv4/ip_output.c:230
+ip_finish_output+0xf4/0x240 net/ipv4/ip_output.c:318
+NF_HOOK_COND include/linux/netfilter.h:293 [inline]
+ip_output+0xe5/0x1b0 net/ipv4/ip_output.c:432
+dst_output include/net/dst.h:458 [inline]
+ip_local_out net/ipv4/ip_output.c:127 [inline]
+ip_send_skb+0x72/0xe0 net/ipv4/ip_output.c:1487
+udp_send_skb+0x6a4/0x990 net/ipv4/udp.c:963
+udp_sendmsg+0x1249/0x12d0 net/ipv4/udp.c:1246
+inet_sendmsg+0x63/0x80 net/ipv4/af_inet.c:840
+sock_sendmsg_nosec net/socket.c:730 [inline]
+sock_sendmsg net/socket.c:753 [inline]
+____sys_sendmsg+0x37c/0x4d0 net/socket.c:2540
+___sys_sendmsg net/socket.c:2594 [inline]
+__sys_sendmmsg+0x269/0x500 net/socket.c:2680
+__do_sys_sendmmsg net/socket.c:2709 [inline]
+__se_sys_sendmmsg net/socket.c:2706 [inline]
+__x64_sys_sendmmsg+0x57/0x60 net/socket.c:2706
+do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+entry_SYSCALL_64_after_hwframe+0x63/0xcd
 
-Ok, so the limitation is a race condition in hardware such that, when
-duplicate packets are received on member ports very close in time to
-each other, the hardware fails to detect that they're duplicates.
+value changed: 0x00000000000010d7 -> 0x00000000000010d8
 
-> > > +	/* Enable discarding of received HSR frames */
-> > > +	ksz_read8(dev, REG_HSR_ALU_CTRL_0__1, &data);
-> > > +	data |= HSR_DUPLICATE_DISCARD;
-> > > +	data &= ~HSR_NODE_UNICAST;
-> > > +	ksz_write8(dev, REG_HSR_ALU_CTRL_0__1, data);
-> > > +
-> > > +	/* Self MAC address filtering for HSR frames to avoid
-> > > +	 * traverse of the HSR ring more than once.
-> > > +	 *
-> > > +	 * The HSR port (i.e. hsr0) MAC address is used.
-> > > +	 */
-> > > +	for (i = 0; i < ETH_ALEN; i++) {
-> > > +		ret = ksz_write8(dev, REG_SW_MAC_ADDR_0 + i, hsr->dev_addr[i]);
-> > > +		if (ret)
-> > > +			return ret;  
-> > 
-> > FWIW:
-> > https://lore.kernel.org/netdev/155ff37f-43d5-5fe0-6de4-c4639909553d@gmail.com/
-> > Some coordination will be required regarding the MAC address that the
-> > switch driver needs to program to these registers. 
-> 
-> Writing of this MAC address is _required_ for PREVENTING PACKET LOOP IN
-> THE RING BY SELF-ADDRESS FILTERING feature.
+Reported by Kernel Concurrency Sanitizer on:
+CPU: 0 PID: 23987 Comm: syz-executor.5 Not tainted 6.5.0-syzkaller-10885-g0468be89b3fa #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
 
-In case it was not clear, I was talking about coordination between you
-and Oleksij. He needs to program the same register for Wake on LAN.
+Fixes: f203b76d7809 ("xfrm: Add virtual xfrm interfaces")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+---
+ net/xfrm/xfrm_interface_core.c | 22 ++++++++++------------
+ 1 file changed, 10 insertions(+), 12 deletions(-)
 
-> In the ifconfig output - the lan1, lan2 and hsr0 shall all have the
-> same MAC address assigned.
-> 
-> I simply take the hsr0 mac address.
-> 
-> > It seems that it is not single purpose.
-> 
-> At least in the case of HSR it looks like single purpose (for the loop
-> prevention).
+diff --git a/net/xfrm/xfrm_interface_core.c b/net/xfrm/xfrm_interface_core.c
+index b864740846902db7f0ab60c6d72465a51b96b1d7..e21cc71095bb27012f774f50ace5e3c2c52e243d 100644
+--- a/net/xfrm/xfrm_interface_core.c
++++ b/net/xfrm/xfrm_interface_core.c
+@@ -380,8 +380,8 @@ static int xfrmi_rcv_cb(struct sk_buff *skb, int err)
+ 	skb->dev = dev;
+ 
+ 	if (err) {
+-		dev->stats.rx_errors++;
+-		dev->stats.rx_dropped++;
++		DEV_STATS_INC(dev, rx_errors);
++		DEV_STATS_INC(dev, rx_dropped);
+ 
+ 		return 0;
+ 	}
+@@ -426,7 +426,6 @@ static int
+ xfrmi_xmit2(struct sk_buff *skb, struct net_device *dev, struct flowi *fl)
+ {
+ 	struct xfrm_if *xi = netdev_priv(dev);
+-	struct net_device_stats *stats = &xi->dev->stats;
+ 	struct dst_entry *dst = skb_dst(skb);
+ 	unsigned int length = skb->len;
+ 	struct net_device *tdev;
+@@ -473,7 +472,7 @@ xfrmi_xmit2(struct sk_buff *skb, struct net_device *dev, struct flowi *fl)
+ 	tdev = dst->dev;
+ 
+ 	if (tdev == dev) {
+-		stats->collisions++;
++		DEV_STATS_INC(dev, collisions);
+ 		net_warn_ratelimited("%s: Local routing loop detected!\n",
+ 				     dev->name);
+ 		goto tx_err_dst_release;
+@@ -512,13 +511,13 @@ xfrmi_xmit2(struct sk_buff *skb, struct net_device *dev, struct flowi *fl)
+ 	if (net_xmit_eval(err) == 0) {
+ 		dev_sw_netstats_tx_add(dev, 1, length);
+ 	} else {
+-		stats->tx_errors++;
+-		stats->tx_aborted_errors++;
++		DEV_STATS_INC(dev, tx_errors);
++		DEV_STATS_INC(dev, tx_aborted_errors);
+ 	}
+ 
+ 	return 0;
+ tx_err_link_failure:
+-	stats->tx_carrier_errors++;
++	DEV_STATS_INC(dev, tx_carrier_errors);
+ 	dst_link_failure(skb);
+ tx_err_dst_release:
+ 	dst_release(dst);
+@@ -528,7 +527,6 @@ xfrmi_xmit2(struct sk_buff *skb, struct net_device *dev, struct flowi *fl)
+ static netdev_tx_t xfrmi_xmit(struct sk_buff *skb, struct net_device *dev)
+ {
+ 	struct xfrm_if *xi = netdev_priv(dev);
+-	struct net_device_stats *stats = &xi->dev->stats;
+ 	struct dst_entry *dst = skb_dst(skb);
+ 	struct flowi fl;
+ 	int ret;
+@@ -545,7 +543,7 @@ static netdev_tx_t xfrmi_xmit(struct sk_buff *skb, struct net_device *dev)
+ 			dst = ip6_route_output(dev_net(dev), NULL, &fl.u.ip6);
+ 			if (dst->error) {
+ 				dst_release(dst);
+-				stats->tx_carrier_errors++;
++				DEV_STATS_INC(dev, tx_carrier_errors);
+ 				goto tx_err;
+ 			}
+ 			skb_dst_set(skb, dst);
+@@ -561,7 +559,7 @@ static netdev_tx_t xfrmi_xmit(struct sk_buff *skb, struct net_device *dev)
+ 			fl.u.ip4.flowi4_flags |= FLOWI_FLAG_ANYSRC;
+ 			rt = __ip_route_output_key(dev_net(dev), &fl.u.ip4);
+ 			if (IS_ERR(rt)) {
+-				stats->tx_carrier_errors++;
++				DEV_STATS_INC(dev, tx_carrier_errors);
+ 				goto tx_err;
+ 			}
+ 			skb_dst_set(skb, &rt->dst);
+@@ -580,8 +578,8 @@ static netdev_tx_t xfrmi_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	return NETDEV_TX_OK;
+ 
+ tx_err:
+-	stats->tx_errors++;
+-	stats->tx_dropped++;
++	DEV_STATS_INC(dev, tx_errors);
++	DEV_STATS_INC(dev, tx_dropped);
+ 	kfree_skb(skb);
+ 	return NETDEV_TX_OK;
+ }
+-- 
+2.42.0.283.g2d96d420d3-goog
 
-And for WoL, REG_SW_MAC_ADDR_0 is also single purpose. And for the MAC SA
-in the generated PAUSE frames, also single purpose. Single + single + single = ?
-
-Being a common register for multiple functions, I hope that it won't be
-the users who discover than when multiple functionalities are used in
-tandem (like WoL+HSR), they partially overwrite what the other has done.
-
-So, by coordination, I mean something like a cohesive way of thinking
-out the driver.
-
-For WoL/pause frames, the linked discussion suggested that the switch
-MAC address could be kept in sync with the DSA master's MAC address.
-
-Could that also work here, and could we add a restriction to say
-"Offload not supported for HSR device with a MAC address different from the DSA master"
-and return -EOPNOTSUPP in ksz_hsr_join()? Then ksz9477_hsr_join() would
-not modify this register.
-
-> > > +	/* Enable per port self-address filtering */
-> > > +	ksz_port_cfg(dev, port, REG_PORT_LUE_CTRL,
-> > > PORT_SRC_ADDR_FILTER, true);
-> > > +	ksz_port_cfg(dev, partner->index, REG_PORT_LUE_CTRL,
-> > > +		     PORT_SRC_ADDR_FILTER, true);
-> > > +
-> > > +	/* Setup HW supported features for lan HSR ports */
-> > > +	slave = dsa_to_port(ds, port)->slave;
-> > > +	slave->features |= KSZ9477_SUPPORTED_HSR_FEATURES;
-> > > +
-> > > +	slave = dsa_to_port(ds, partner->index)->slave;
-> > > +	slave->features |= KSZ9477_SUPPORTED_HSR_FEATURES;  
-> > 
-> > Can the code that is duplicated for the partner port be moved to the
-> > caller?
-> 
-> I've followed the convention from xrs700x driver, where we only make
-> setup when we are sure that on both HSR ports the "join" has been
-> called.
-
-If code that is duplicated for both member ports can be moved to code
-paths that get executed for each individual port, then the resulting
-driver code may turn out to be less complex.
-
-It's not a big deal if it can't, and maintaining a sane operating mode
-in that transient state (HSR device with a single member port) is
-obviously much more important. But the question was if it can, and I
-don't think you've answered that?
 
