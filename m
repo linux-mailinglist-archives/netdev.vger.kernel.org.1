@@ -1,112 +1,80 @@
-Return-Path: <netdev+bounces-32008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1DA37920F8
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 10:22:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CEC97920FA
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 10:23:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B56951C2031E
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 08:22:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 35D921C208CA
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 08:23:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7D4DA38;
-	Tue,  5 Sep 2023 08:22:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 589582117;
+	Tue,  5 Sep 2023 08:23:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62AE12115
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 08:22:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEC4EC433C7;
-	Tue,  5 Sep 2023 08:22:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 472D81FA4
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 08:23:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 134FBC433C9;
+	Tue,  5 Sep 2023 08:23:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693902165;
-	bh=o+ZGlAMObEDJBIPsyoWsE0YE8FuZ4lKzyNTKvi6BMhY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KiSwNP5L91KskXMYDz3YRi1JHcGLqINOPP0MoeZW2Ditw67Og9uAxojKUEGP2v0kR
-	 ILHhtv5oU/ERoIO8Ix4RY2bxpfNhEPq1ub08HBXfBP4cnAWSfToHK/glteix06dbZk
-	 m34yk8I9QEphfPGJjFUqkAktXyImdVdq7RCc2O10SC8m5xqwMO2aQzLQ+asam2TSm5
-	 1desbj3jzAQTgPoQZWwaCg2IUvi3bmtViwi3KCe8RA48qp+Pe3Tma8TzLEPGJ0yqul
-	 v2j2PN00SB5kdRVNFORgg330GvyvOcnEzbZ91RdrZu8xvgxfjIYg4iaScwjoLT+Usb
-	 CmTrZzaGjtmhQ==
+	s=k20201202; t=1693902230;
+	bh=lXgtoW/7ZdWLp7FupnW2/nPdUn4Mb393H1EvaAlnsTA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=SUUG93egXO/DO13piGEm1UfiUSBNgLW9xLH8XL50Un5yjkOG0XZfJEzUrFxeRv+Ad
+	 5LYN0R8VFlFRc+VDGsFU4BBHcWK3MZ/vDa1+LDJ8sfoyWqx+3Ljv1s2xMFf+epM5Gr
+	 9I+Txcr5KyysFjenjHXeXYwtzjBP/iuHoY7OvYBikaMZdsfuAZKPgGRr3D0jCMsk0m
+	 A7mqQ23SpwnSG1jKZ7bjibXOZvdjoiuQTVnYbe4beFd5h6/v1Gu5ATaJAqcq6eUX3U
+	 XgUl49oR7ydL4yF2tUsV5g52erS2v4qCgeZnD2WnaQHVeE4ErfumS/58lRjCjCYqDo
+	 U1sl3Kxtk1YTA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E9AADC2BBF6;
+	Tue,  5 Sep 2023 08:23:49 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Tue, 05 Sep 2023 10:22:40 +0200
-From: Michael Walle <mwalle@kernel.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Yisen
- Zhuang <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>,
- Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal kernel
- review list <bcm-kernel-feedback-list@broadcom.com>, =?UTF-8?Q?Marek_B?=
- =?UTF-8?Q?eh=C3=BAn?= <kabel@kernel.org>, Xu Liang <lxu@maxlinear.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Simon Horman
- <simon.horman@corigine.com>
-Subject: Re: [PATCH net-next v3 02/11] net: phy: introduce
- phy_has_c45_registers()
-In-Reply-To: <ZMrYcbY65yOZyaxo@shell.armlinux.org.uk>
-References: <7be8b305-f287-4e99-bddd-55646285c427@lunn.ch>
- <867ae3cc05439599d63e4712bca79e27@kernel.org>
- <cf999a14e51b7f2001d9830cc5e11016@kernel.org>
- <ZMkddjabRonGe7Eu@shell.armlinux.org.uk>
- <bce942b71db8c4b9bf741db517e7ca5f@kernel.org>
- <ZMkraPZvWWKhY8lT@shell.armlinux.org.uk>
- <b0e5fbe28757d755d814727181c09f32@kernel.org>
- <7c29bfa7-b4a6-49c9-9369-d98bae98f135@lunn.ch>
- <ZMqOA+NblHun1hbo@shell.armlinux.org.uk>
- <cdd97217-d5e5-429b-bcda-2248f0de12ce@lunn.ch>
- <ZMrYcbY65yOZyaxo@shell.armlinux.org.uk>
-Message-ID: <e7ecdbc54d55316735cd1d39dd31cc77@kernel.org>
-X-Sender: mwalle@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] kcm: Destroy mutex in kcm_exit_net()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169390222995.8228.1309168830800797310.git-patchwork-notify@kernel.org>
+Date: Tue, 05 Sep 2023 08:23:49 +0000
+References: <20230902170708.1727999-1-syoshida@redhat.com>
+In-Reply-To: <20230902170708.1727999-1-syoshida@redhat.com>
+To: Shigeru Yoshida <syoshida@redhat.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi,
+Hello:
 
-> Hence why I disagree with your suggestion.
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-So how can we make progress here? I tried Russells suggestion using
-phy_supports_c45_transfers() and phy_has_c22_registers(). You can find
-a possible v4 of this series on my github [1].
+On Sun,  3 Sep 2023 02:07:08 +0900 you wrote:
+> kcm_exit_net() should call mutex_destroy() on knet->mutex. This is especially
+> needed if CONFIG_DEBUG_MUTEXES is enabled.
+> 
+> Fixes: ab7ac4eb9832 ("kcm: Kernel Connection Multiplexor module")
+> Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+> ---
+>  net/kcm/kcmsock.c | 2 ++
+>  1 file changed, 2 insertions(+)
 
-Some uses of .is_c45 seem to be to test whether the c45_ids are valid. 
-E.g.
-from the phy.h:
-* @c45_ids: 802.3-c45 Device Identifiers if is_c45.
+Here is the summary with links:
+  - [net] kcm: Destroy mutex in kcm_exit_net()
+    https://git.kernel.org/netdev/net/c/6ad40b36cd3b
 
-But if you test if a bit is set, you can skip that. For the opposite 
-test
-you'd need to have some kind of indication whether c45_ids was populated
-in the first place.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-If you convert all these uses of is_c45, there will only be a handful
-of uses left. And replacing these by phy_supports_c45_transfers() sounds
-sane to me except for for these two:
-(1) drivers/net/ethernet/hisilicon/hns/hns_ethtool.c
-(2) drivers/net/phy/mxl-gpy.c
 
-(2) will eventually replaced by my phy_promote_to_c45(). I might reorder
-the patches, so I'll get rid of the .is_c45 use there before the
-conversion to phy_supports_c45_transfers().
-
-But honestly, for (1) I don't have any idea whats going on. If I look
-at the very first commit, it seems that the is_c45 property is used
-to distinguish loopback handling between a gigabit and a 10g PHY (?).
-
-Btw, Russell, I've noticed that phy_restart_aneg() and phy_config_aneg()
-will test for c22 registers, but phy_aneg_done() tests just for .is_c45.
-Is that correct?
-
--michael
-
-[1] https://github.com/mwalle/linux/tree/feature-c45-over-c22-v4
-[2] 
-https://git.kernel.org/torvalds/c/b5996f11ea5496d0445078f47d22c987888ed467
 
