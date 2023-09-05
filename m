@@ -1,124 +1,215 @@
-Return-Path: <netdev+bounces-32154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E1A57931C2
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 00:01:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C66377931D4
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 00:15:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEF441C20A70
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 22:01:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABFFD1C20A60
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 22:15:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B569F101D3;
-	Tue,  5 Sep 2023 22:01:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85AEC101D7;
+	Tue,  5 Sep 2023 22:15:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A6E101CF
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 22:01:43 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5CBDE6;
-	Tue,  5 Sep 2023 15:01:40 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1qde6u-0002RP-0z; Wed, 06 Sep 2023 00:01:24 +0200
-Date: Wed, 6 Sep 2023 00:01:24 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Wander Lairson Costa <wander@redhat.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Fernando Fernandez Mancera <ffmancera@riseup.net>,
-	"open list:NETFILTER" <netfilter-devel@vger.kernel.org>,
-	"open list:NETFILTER" <coreteam@netfilter.org>,
-	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	Lucas Leong <wmliang@infosec.exchange>, stable@kernel.org
-Subject: Re: [PATH nf v3] netfilter/osf: avoid OOB read
-Message-ID: <20230905220124.GD28379@breakpoint.cc>
-References: <20230901135021.30252-1-wander@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC59FFC0F
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 22:15:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A97CC433CA;
+	Tue,  5 Sep 2023 22:15:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1693952110;
+	bh=K7DoqPi5LWEMcJo8SKG1rmXcL9ak2qlpFw7Z0l+lF3I=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=T5jnBzgvd+7vurX4i5cqqzDRUyJQboLYrKaawD0ClNWOuMD3gu6HHwwBXLJqG8vez
+	 +y1Av3v6SmQmUFuM8SZB02YzZEnGakwmvz5JTzdiYeFCCAwl08lLAZ2B4vypE3tgLu
+	 jIck7CHKmeNIT7VYPNlWm0Rci++Y8cT+2y0UwDL3TR8OpP2J/V0hITgFGi2JdRVHBS
+	 vyLc2kReEzNEhYC3kiueTh933NcsiAyP+TxZhrqGquh308ptCuGhrjLPx3diruuqnh
+	 oGTRTQjwG/TApZKRl4knfH7TD0JFcZw7oy+L8+Hi3SOwhgybpkBK2qu75DqH0Wmbve
+	 JMI8+6PfGFZYQ==
+Date: Tue, 5 Sep 2023 15:15:09 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+Cc: <piergiorgio.beruto@gmail.com>, <davem@davemloft.net>,
+ <edumazet@google.com>, <pabeni@redhat.co>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <horatiu.vultur@microchip.com>,
+ <Woojung.Huh@microchip.com>, <Nicolas.Ferre@microchip.com>,
+ <Thorsten.Kummermehr@microchip.com>
+Subject: Re: [PATCH net-next] ethtool: plca: fix plca enable data type while
+ parsing the value
+Message-ID: <20230905151509.5208ee63@kernel.org>
+In-Reply-To: <20230831104523.7178-1-Parthiban.Veerasooran@microchip.com>
+References: <20230831104523.7178-1-Parthiban.Veerasooran@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230901135021.30252-1-wander@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Wander Lairson Costa <wander@redhat.com> wrote:
-> The opt_num field is controlled by user mode and is not currently
-> validated inside the kernel. An attacker can take advantage of this to
-> trigger an OOB read and potentially leak information.
-> 
-> Also add validation to genre, subtype and version fields.
+On Thu, 31 Aug 2023 16:15:23 +0530 Parthiban Veerasooran wrote:
+> Subject: [PATCH net-next] ethtool: plca: fix plca enable data type while parsing the value
 
-I was about to apply this but your patch misses the Signed-off-by line.
+Since this is a fix the subject should say net instead of net-next.
+[PATCH net v2] for the next revision.
 
-> Reproducer:
-> 
-> void install_filter_for_leak()
-> {
+> The ETHTOOL_A_PLCA_ENABLED data type is u8. But while parsing the
+> value from the attribute, nla_get_u32() is used in the plca_update_sint()
+> function instead of nla_get_u8(). So plca_cfg.enabled variable is updated
+> with some garbage value instead of 0 or 1 and always enables plca even
+> though plca is disabled through ethtool application. This bug has been
+> fixed by implementing plca_update_sint_from_u8() function which uses
+> nla_get_u8() function to extract the plca_cfg.enabled value and the
+> function plca_update_sint_from_u32() is used for extracting the other
+> values using nla_get_u32() function.
 
-Please remove this for v4, it only clutters the changelog.
+Hm, yes, that seems like the best of the available options.
 
-> KASAN report:
-> 
-> ==================================================================
-> BUG: KASAN: slab-out-of-bounds in nf_osf_match_one+0xbed/0xd10 linux-6.0-rc4/net/netfilter/nfnetlink_osf.c:88
-> Read of size 2 at addr ffff88804bc64272 by task poc/6431
-> 
-> CPU: 1 PID: 6431 Comm: poc Not tainted 6.0.0-rc4 #1
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
-> Call Trace:
->  <IRQ>
->  __dump_stack linux-6.0-rc4/lib/dump_stack.c:88
->  dump_stack_lvl+0xcd/0x134 linux-6.0-rc4/lib/dump_stack.c:106
->  print_address_description linux-6.0-rc4/mm/kasan/report.c:317
->  print_report.cold+0x2ba/0x6e9 linux-6.0-rc4/mm/kasan/report.c:433
->  kasan_report+0xb1/0x1e0 linux-6.0-rc4/mm/kasan/report.c:495
->  nf_osf_match_one+0xbed/0xd10 linux-6.0-rc4/net/netfilter/nfnetlink_osf.c:88
->  nf_osf_find+0x186/0x2f0 linux-6.0-rc4/net/netfilter/nfnetlink_osf.c:281
->  nft_osf_eval+0x37f/0x590 linux-6.0-rc4/net/netfilter/nft_osf.c:47
->  expr_call_ops_eval linux-6.0-rc4/net/netfilter/nf_tables_core.c:214
->  nft_do_chain+0x2b0/0x1490 linux-6.0-rc4/net/netfilter/nf_tables_core.c:264
->  nft_do_chain_ipv4+0x17c/0x1f0 linux-6.0-rc4/net/netfilter/nft_chain_filter.c:23
->  nf_hook_entry_hookfn linux-6.0-rc4/./include/linux/netfilter.h:142
->  nf_hook_slow+0xc5/0x1f0 linux-6.0-rc4/net/netfilter/core.c:620
+> Fixes: 8580e16c28f3 ("net/ethtool: add netlink interface for the PLCA RS")
 
-You can keep the KASAN splat but please trim it down, anything below
-here
-doesn't add much value and neither does print_address_description etc.
-above.
+Please make sure you CC all the people who signed off the commit under
+Fixes. You missed pabeni@redhat.com and andrew@lunn.ch 
 
->  ffff88804bc64300: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-> 
+> Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
 > ---
-
-git-am chopped everything below off, so
-
+>  net/ethtool/plca.c | 34 ++++++++++++++++++++++++----------
+>  1 file changed, 24 insertions(+), 10 deletions(-)
 > 
-> Fixes: f9324952088f ("netfilter: nfnetlink_osf: extract nfnetlink_subsystem code from xt_osf.c")
-> Reported-by: Lucas Leong <wmliang@infosec.exchange>
-> Cc: stable@kernel.org
-> Signed-off-by: Wander Lairson Costa <wander@redhat.com>
+> diff --git a/net/ethtool/plca.c b/net/ethtool/plca.c
+> index b238a1afe9ae..b4e80dd33590 100644
+> --- a/net/ethtool/plca.c
+> +++ b/net/ethtool/plca.c
+> @@ -21,8 +21,8 @@ struct plca_reply_data {
+>  #define PLCA_REPDATA(__reply_base) \
+>  	container_of(__reply_base, struct plca_reply_data, base)
+>  
+> -static void plca_update_sint(int *dst, const struct nlattr *attr,
+> -			     bool *mod)
+> +static void plca_update_sint_from_u32(int *dst, const struct nlattr *attr,
+> +				      bool *mod)
+>  {
+>  	if (!attr)
+>  		return;
+> @@ -31,6 +31,16 @@ static void plca_update_sint(int *dst, const struct nlattr *attr,
+>  	*mod = true;
+>  }
+>  
+> +static void plca_update_sint_from_u8(int *dst, const struct nlattr *attr,
+> +				     bool *mod)
+> +{
+> +	if (!attr)
+> +		return;
+> +
+> +	*dst = nla_get_u8(attr);
+> +	*mod = true;
+> +}
+> +
+>  // PLCA get configuration message ------------------------------------------- //
+>  
+>  const struct nla_policy ethnl_plca_get_cfg_policy[] = {
+> @@ -144,14 +154,18 @@ ethnl_set_plca(struct ethnl_req_info *req_info, struct genl_info *info)
+>  		return -EOPNOTSUPP;
+>  
+>  	memset(&plca_cfg, 0xff, sizeof(plca_cfg));
+> -	plca_update_sint(&plca_cfg.enabled, tb[ETHTOOL_A_PLCA_ENABLED], &mod);
+> -	plca_update_sint(&plca_cfg.node_id, tb[ETHTOOL_A_PLCA_NODE_ID], &mod);
+> -	plca_update_sint(&plca_cfg.node_cnt, tb[ETHTOOL_A_PLCA_NODE_CNT], &mod);
+> -	plca_update_sint(&plca_cfg.to_tmr, tb[ETHTOOL_A_PLCA_TO_TMR], &mod);
+> -	plca_update_sint(&plca_cfg.burst_cnt, tb[ETHTOOL_A_PLCA_BURST_CNT],
+> -			 &mod);
+> -	plca_update_sint(&plca_cfg.burst_tmr, tb[ETHTOOL_A_PLCA_BURST_TMR],
+> -			 &mod);
+> +	plca_update_sint_from_u8(&plca_cfg.enabled, tb[ETHTOOL_A_PLCA_ENABLED],
+> +				 &mod);
+> +	plca_update_sint_from_u32(&plca_cfg.node_id, tb[ETHTOOL_A_PLCA_NODE_ID],
+> +				  &mod);
+> +	plca_update_sint_from_u32(&plca_cfg.node_cnt,
+> +				  tb[ETHTOOL_A_PLCA_NODE_CNT], &mod);
+> +	plca_update_sint_from_u32(&plca_cfg.to_tmr, tb[ETHTOOL_A_PLCA_TO_TMR],
+> +				  &mod);
+> +	plca_update_sint_from_u32(&plca_cfg.burst_cnt,
+> +				  tb[ETHTOOL_A_PLCA_BURST_CNT], &mod);
+> +	plca_update_sint_from_u32(&plca_cfg.burst_tmr,
+> +				  tb[ETHTOOL_A_PLCA_BURST_TMR], &mod);
 
-The above wasn't there when I looked at 'git log'.
+This looks error prone. We still need to maintain the types in multiple
+places. How about we use the policy to decide the type? Something along
+the lines of (untested):
 
-I will fix this up locally, no need to resend,
-but please keep this in mind next time.
-
-Thanks!
+diff --git a/net/ethtool/plca.c b/net/ethtool/plca.c
+index b238a1afe9ae..aed30665e9c0 100644
+--- a/net/ethtool/plca.c
++++ b/net/ethtool/plca.c
+@@ -21,16 +21,6 @@ struct plca_reply_data {
+ #define PLCA_REPDATA(__reply_base) \
+ 	container_of(__reply_base, struct plca_reply_data, base)
+ 
+-static void plca_update_sint(int *dst, const struct nlattr *attr,
+-			     bool *mod)
+-{
+-	if (!attr)
+-		return;
+-
+-	*dst = nla_get_u32(attr);
+-	*mod = true;
+-}
+-
+ // PLCA get configuration message ------------------------------------------- //
+ 
+ const struct nla_policy ethnl_plca_get_cfg_policy[] = {
+@@ -125,6 +115,29 @@ const struct nla_policy ethnl_plca_set_cfg_policy[] = {
+ 	[ETHTOOL_A_PLCA_BURST_TMR]	= NLA_POLICY_MAX(NLA_U32, 255),
+ };
+ 
++static void
++plca_update_sint(int *dst, const struct nlattr **tb, u32 attrid, bool *mod)
++{
++	const struct nlattr *attr = tb[attrid];
++
++	if (!attr ||
++	    WARN_ON_ONCE(attrid >= ARRAY_SIZE(ethnl_plca_set_cfg_policy)))
++		return;
++
++	switch (ethnl_plca_set_cfg_policy[attrid].type) {
++	case NLA_U8:
++		*dst = nla_get_u8(attr);
++		break;
++	case NLA_U32:
++		*dst = nla_get_u32(attr);
++		break;
++	default:
++		WARN_ON_ONCE(1);
++	}
++
++	*mod = true;
++}
++
+ static int
+ ethnl_set_plca(struct ethnl_req_info *req_info, struct genl_info *info)
+ {
+@@ -144,13 +157,13 @@ ethnl_set_plca(struct ethnl_req_info *req_info, struct genl_info *info)
+ 		return -EOPNOTSUPP;
+ 
+ 	memset(&plca_cfg, 0xff, sizeof(plca_cfg));
+-	plca_update_sint(&plca_cfg.enabled, tb[ETHTOOL_A_PLCA_ENABLED], &mod);
+-	plca_update_sint(&plca_cfg.node_id, tb[ETHTOOL_A_PLCA_NODE_ID], &mod);
+-	plca_update_sint(&plca_cfg.node_cnt, tb[ETHTOOL_A_PLCA_NODE_CNT], &mod);
+-	plca_update_sint(&plca_cfg.to_tmr, tb[ETHTOOL_A_PLCA_TO_TMR], &mod);
+-	plca_update_sint(&plca_cfg.burst_cnt, tb[ETHTOOL_A_PLCA_BURST_CNT],
++	plca_update_sint(&plca_cfg.enabled, tb, ETHTOOL_A_PLCA_ENABLED, &mod);
++	plca_update_sint(&plca_cfg.node_id, tb, ETHTOOL_A_PLCA_NODE_ID, &mod);
++	plca_update_sint(&plca_cfg.node_cnt, tb, ETHTOOL_A_PLCA_NODE_CNT, &mod);
++	plca_update_sint(&plca_cfg.to_tmr, tb, ETHTOOL_A_PLCA_TO_TMR, &mod);
++	plca_update_sint(&plca_cfg.burst_cnt, tb, ETHTOOL_A_PLCA_BURST_CNT,
+ 			 &mod);
+-	plca_update_sint(&plca_cfg.burst_tmr, tb[ETHTOOL_A_PLCA_BURST_TMR],
++	plca_update_sint(&plca_cfg.burst_tmr, tb, ETHTOOL_A_PLCA_BURST_TMR,
+ 			 &mod);
+ 	if (!mod)
+ 		return 0;
 
