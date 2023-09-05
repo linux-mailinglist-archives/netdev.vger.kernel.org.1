@@ -1,153 +1,112 @@
-Return-Path: <netdev+bounces-32007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 934527920F1
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 10:11:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1DA37920F8
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 10:22:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7DB1281049
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 08:11:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B56951C2031E
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 08:22:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40E2F20F5;
-	Tue,  5 Sep 2023 08:11:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7D4DA38;
+	Tue,  5 Sep 2023 08:22:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33CD920EC
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 08:11:08 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F17D31AD;
-	Tue,  5 Sep 2023 01:11:06 -0700 (PDT)
-Received: from canpemm500006.china.huawei.com (unknown [172.30.72.55])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Rfylw0HxmzGpts;
-	Tue,  5 Sep 2023 16:07:24 +0800 (CST)
-Received: from localhost.localdomain (10.175.104.82) by
- canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Tue, 5 Sep 2023 16:11:03 +0800
-From: Ziyang Xuan <william.xuanziyang@huawei.com>
-To: <jiri@resnulli.us>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<liuhangbin@gmail.com>
-CC: <linux-kernel@vger.kernel.org>
-Subject: [PATCH net v3] team: fix null-ptr-deref when team device type is changed
-Date: Tue, 5 Sep 2023 16:10:56 +0800
-Message-ID: <20230905081056.3365013-1-william.xuanziyang@huawei.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62AE12115
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 08:22:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEC4EC433C7;
+	Tue,  5 Sep 2023 08:22:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1693902165;
+	bh=o+ZGlAMObEDJBIPsyoWsE0YE8FuZ4lKzyNTKvi6BMhY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=KiSwNP5L91KskXMYDz3YRi1JHcGLqINOPP0MoeZW2Ditw67Og9uAxojKUEGP2v0kR
+	 ILHhtv5oU/ERoIO8Ix4RY2bxpfNhEPq1ub08HBXfBP4cnAWSfToHK/glteix06dbZk
+	 m34yk8I9QEphfPGJjFUqkAktXyImdVdq7RCc2O10SC8m5xqwMO2aQzLQ+asam2TSm5
+	 1desbj3jzAQTgPoQZWwaCg2IUvi3bmtViwi3KCe8RA48qp+Pe3Tma8TzLEPGJ0yqul
+	 v2j2PN00SB5kdRVNFORgg330GvyvOcnEzbZ91RdrZu8xvgxfjIYg4iaScwjoLT+Usb
+	 CmTrZzaGjtmhQ==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.175.104.82]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- canpemm500006.china.huawei.com (7.192.105.130)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Date: Tue, 05 Sep 2023 10:22:40 +0200
+From: Michael Walle <mwalle@kernel.org>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Yisen
+ Zhuang <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>,
+ Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal kernel
+ review list <bcm-kernel-feedback-list@broadcom.com>, =?UTF-8?Q?Marek_B?=
+ =?UTF-8?Q?eh=C3=BAn?= <kabel@kernel.org>, Xu Liang <lxu@maxlinear.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Simon Horman
+ <simon.horman@corigine.com>
+Subject: Re: [PATCH net-next v3 02/11] net: phy: introduce
+ phy_has_c45_registers()
+In-Reply-To: <ZMrYcbY65yOZyaxo@shell.armlinux.org.uk>
+References: <7be8b305-f287-4e99-bddd-55646285c427@lunn.ch>
+ <867ae3cc05439599d63e4712bca79e27@kernel.org>
+ <cf999a14e51b7f2001d9830cc5e11016@kernel.org>
+ <ZMkddjabRonGe7Eu@shell.armlinux.org.uk>
+ <bce942b71db8c4b9bf741db517e7ca5f@kernel.org>
+ <ZMkraPZvWWKhY8lT@shell.armlinux.org.uk>
+ <b0e5fbe28757d755d814727181c09f32@kernel.org>
+ <7c29bfa7-b4a6-49c9-9369-d98bae98f135@lunn.ch>
+ <ZMqOA+NblHun1hbo@shell.armlinux.org.uk>
+ <cdd97217-d5e5-429b-bcda-2248f0de12ce@lunn.ch>
+ <ZMrYcbY65yOZyaxo@shell.armlinux.org.uk>
+Message-ID: <e7ecdbc54d55316735cd1d39dd31cc77@kernel.org>
+X-Sender: mwalle@kernel.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
 
-Get a null-ptr-deref bug as follows with reproducer [1].
+Hi,
 
-BUG: kernel NULL pointer dereference, address: 0000000000000228
-...
-RIP: 0010:vlan_dev_hard_header+0x35/0x140 [8021q]
-...
-Call Trace:
- <TASK>
- ? __die+0x24/0x70
- ? page_fault_oops+0x82/0x150
- ? exc_page_fault+0x69/0x150
- ? asm_exc_page_fault+0x26/0x30
- ? vlan_dev_hard_header+0x35/0x140 [8021q]
- ? vlan_dev_hard_header+0x8e/0x140 [8021q]
- neigh_connected_output+0xb2/0x100
- ip6_finish_output2+0x1cb/0x520
- ? nf_hook_slow+0x43/0xc0
- ? ip6_mtu+0x46/0x80
- ip6_finish_output+0x2a/0xb0
- mld_sendpack+0x18f/0x250
- mld_ifc_work+0x39/0x160
- process_one_work+0x1e6/0x3f0
- worker_thread+0x4d/0x2f0
- ? __pfx_worker_thread+0x10/0x10
- kthread+0xe5/0x120
- ? __pfx_kthread+0x10/0x10
- ret_from_fork+0x34/0x50
- ? __pfx_kthread+0x10/0x10
- ret_from_fork_asm+0x1b/0x30
+> Hence why I disagree with your suggestion.
 
-[1]
-$ teamd -t team0 -d -c '{"runner": {"name": "loadbalance"}}'
-$ ip link add name t-dummy type dummy
-$ ip link add link t-dummy name t-dummy.100 type vlan id 100
-$ ip link add name t-nlmon type nlmon
-$ ip link set t-nlmon master team0
-$ ip link set t-nlmon nomaster
-$ ip link set t-dummy up
-$ ip link set team0 up
-$ ip link set t-dummy.100 down
-$ ip link set t-dummy.100 master team0
+So how can we make progress here? I tried Russells suggestion using
+phy_supports_c45_transfers() and phy_has_c22_registers(). You can find
+a possible v4 of this series on my github [1].
 
-When enslave a vlan device to team device and team device type is changed
-from non-ether to ether, header_ops of team device is changed to
-vlan_header_ops. That is incorrect and will trigger null-ptr-deref
-for vlan->real_dev in vlan_dev_hard_header() because team device is not
-a vlan device.
+Some uses of .is_c45 seem to be to test whether the c45_ids are valid. 
+E.g.
+from the phy.h:
+* @c45_ids: 802.3-c45 Device Identifiers if is_c45.
 
-Assign eth_header_ops to header_ops of team device when its type is changed
-from non-ether to ether to fix the bug.
+But if you test if a bit is set, you can skip that. For the opposite 
+test
+you'd need to have some kind of indication whether c45_ids was populated
+in the first place.
 
-Fixes: 1d76efe1577b ("team: add support for non-ethernet devices")
-Suggested-by: Hangbin Liu <liuhangbin@gmail.com>
-Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
----
-v3:
-  - Export eth_header_ops to fix modpost error.
-v2:
-  - Just modify header_ops to eth_header_ops not use ether_setup().
----
- drivers/net/team/team.c | 5 ++++-
- net/ethernet/eth.c      | 1 +
- 2 files changed, 5 insertions(+), 1 deletion(-)
+If you convert all these uses of is_c45, there will only be a handful
+of uses left. And replacing these by phy_supports_c45_transfers() sounds
+sane to me except for for these two:
+(1) drivers/net/ethernet/hisilicon/hns/hns_ethtool.c
+(2) drivers/net/phy/mxl-gpy.c
 
-diff --git a/drivers/net/team/team.c b/drivers/net/team/team.c
-index d3dc22509ea5..12fb5f4cff06 100644
---- a/drivers/net/team/team.c
-+++ b/drivers/net/team/team.c
-@@ -2127,7 +2127,10 @@ static const struct ethtool_ops team_ethtool_ops = {
- static void team_setup_by_port(struct net_device *dev,
- 			       struct net_device *port_dev)
- {
--	dev->header_ops	= port_dev->header_ops;
-+	if (port_dev->type == ARPHRD_ETHER)
-+		dev->header_ops	= &eth_header_ops;
-+	else
-+		dev->header_ops	= port_dev->header_ops;
- 	dev->type = port_dev->type;
- 	dev->hard_header_len = port_dev->hard_header_len;
- 	dev->needed_headroom = port_dev->needed_headroom;
-diff --git a/net/ethernet/eth.c b/net/ethernet/eth.c
-index 2edc8b796a4e..157833509adb 100644
---- a/net/ethernet/eth.c
-+++ b/net/ethernet/eth.c
-@@ -347,6 +347,7 @@ const struct header_ops eth_header_ops ____cacheline_aligned = {
- 	.cache_update	= eth_header_cache_update,
- 	.parse_protocol	= eth_header_parse_protocol,
- };
-+EXPORT_SYMBOL(eth_header_ops);
- 
- /**
-  * ether_setup - setup Ethernet network device
--- 
-2.25.1
+(2) will eventually replaced by my phy_promote_to_c45(). I might reorder
+the patches, so I'll get rid of the .is_c45 use there before the
+conversion to phy_supports_c45_transfers().
 
+But honestly, for (1) I don't have any idea whats going on. If I look
+at the very first commit, it seems that the is_c45 property is used
+to distinguish loopback handling between a gigabit and a 10g PHY (?).
+
+Btw, Russell, I've noticed that phy_restart_aneg() and phy_config_aneg()
+will test for c22 registers, but phy_aneg_done() tests just for .is_c45.
+Is that correct?
+
+-michael
+
+[1] https://github.com/mwalle/linux/tree/feature-c45-over-c22-v4
+[2] 
+https://git.kernel.org/torvalds/c/b5996f11ea5496d0445078f47d22c987888ed467
 
