@@ -1,195 +1,272 @@
-Return-Path: <netdev+bounces-32090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED73E792320
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 15:40:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CC2B792325
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 15:48:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B4331C2099E
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 13:40:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 341E41C209A5
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 13:48:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35784D512;
-	Tue,  5 Sep 2023 13:40:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24AD9D519;
+	Tue,  5 Sep 2023 13:48:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B4F63D9
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 13:40:50 +0000 (UTC)
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7924D191
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 06:40:48 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59501b014f4so23889657b3.0
-        for <netdev@vger.kernel.org>; Tue, 05 Sep 2023 06:40:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1693921247; x=1694526047; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=yyA+SVJNJFjACAZiWGyLHWyeBZHQWKbJeVhT+xqP1lE=;
-        b=v5TnexvZZCuWvvzCTgfBWCuePa0siVIHWlShfCRiYxO2bOTVxVNqaZhF7fXUXolb7u
-         kdQT54VltJmA9voXiz1rgn486LNJ/yxJD3xNFhEZdo1v1i+TLnPKyOJw9WZPlzvLEw/V
-         yXrMJyy4XIt/Da3CNzWIxuZiZV62VZQ2SPC8K5NET88LkqO8CnDFEvhEUyLtnXV48duT
-         bHiModcxokVh6SsHEHuBOmnzbn2AuR9Ptq0+ExuHBlp93O3b05CyHFj5nodyjGiI9j1W
-         KK3gNVap1wb+XBxSAkz89rS3ljT1k7Wqtx9SJa34dQhClGC5UQWbsupviANumthNE4MP
-         DQqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693921247; x=1694526047;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yyA+SVJNJFjACAZiWGyLHWyeBZHQWKbJeVhT+xqP1lE=;
-        b=aanZtpOJsjqku4Q6+XqWuqAHir86GoktgNmtM+2oJCsf2sxdbZxV7VIzCGeqFsikuq
-         5pExqRm18KI8zjrGAadRaqqSox53w0caMPWIQ3BHdYv3MWtUHEkgjhwb4WbV70R06XVe
-         XV7AX2Zr2GY3tFFZgUsiGFsxMi28BxMUMJbGiJ+oV73Ph++rsOcQ9yXfm3NEDzwjNioe
-         OlVP2vDYTDzO2LldKVysv2dcUwNp/3fGJYUg7YhWXITnVppfzix6bInpq/kWW7Med+Of
-         VX2RGwTYDtwhsQln3t7rRekIgpvyc9vHxF8rYmvSLbrrjNWseV0oHK4AA2eOaJ1dcxbZ
-         SOBA==
-X-Gm-Message-State: AOJu0YyIuqGNCYigywwYorBdMkS4agES+t6hDubztQatLh+fh8VZmz9E
-	QN4hQyx3RbYs9MlAhFWQJcyLHgMaclp+Ng==
-X-Google-Smtp-Source: AGHT+IEt6CGOVrdR2dhmnr9DYJemcwlI0g1fqaDOgArm5JHmJef57M/ZnoTA549bd/PDwwZnXJ5caxzSKN6D+A==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a81:451d:0:b0:58c:6ddd:d27c with SMTP id
- s29-20020a81451d000000b0058c6dddd27cmr339150ywa.6.1693921247774; Tue, 05 Sep
- 2023 06:40:47 -0700 (PDT)
-Date: Tue,  5 Sep 2023 13:40:46 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14994CA57
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 13:47:59 +0000 (UTC)
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 233B3191;
+	Tue,  5 Sep 2023 06:47:55 -0700 (PDT)
+Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 4041A86575;
+	Tue,  5 Sep 2023 15:47:52 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1693921672;
+	bh=FEDFXScdTgxVh47ZYyWs06//HWJO6IlGc0m4jNQNqUQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Tkr2EcB1EqH0pMA3M4fk8QgrS84FOjxpcc00UfIFH7GHt5RXf7rneRiTg7xfncdML
+	 Y0JjjyuzJl0WKkPKYnTWuStCPS0PB7aL6s0UGbMBP2tBuy3RKpS11ZjkbXq4Kgk7ca
+	 Mm9J0Fu/8jao1q4MVn9jnkDPL8iaWdYh+AoC+yVfPlOLp71RDro75OB+5QKYvKK4D0
+	 3PNsCLf8cUrxzbJYsYWrvWHO+A4G3HB8k8GPw9enGpN5Zoaxi8yvhTp23AX07Iqovx
+	 SsoAANiFAF0Dm9pJFSCKBIB687aTbuoGsX25gt4CtYTyZFYc1Uo0uO6pCcN14GtXBR
+	 Cw2b1ETKZ5aGA==
+Date: Tue, 5 Sep 2023 15:47:44 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
+ davem@davemloft.net, Paolo Abeni <pabeni@redhat.com>, Woojung Huh
+ <woojung.huh@microchip.com>, Tristram.Ha@microchip.com, Florian Fainelli
+ <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ UNGLinuxDriver@microchip.com, George McCollister
+ <george.mccollister@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 RFC 4/4] net: dsa: hsr: Provide generic HSR
+ ksz_hsr_{join|leave} functions
+Message-ID: <20230905154744.648c1a8b@wsk>
+In-Reply-To: <20230905120501.tvkrrzcneq4fdzqa@skbuf>
+References: <20230904120209.741207-1-lukma@denx.de>
+	<20230904120209.741207-1-lukma@denx.de>
+	<20230904120209.741207-5-lukma@denx.de>
+	<20230904120209.741207-5-lukma@denx.de>
+	<20230905104725.zy3lwbxjhqhqyzdj@skbuf>
+	<20230905132351.2e129d53@wsk>
+	<20230905120501.tvkrrzcneq4fdzqa@skbuf>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
-Message-ID: <20230905134046.2050443-1-edumazet@google.com>
-Subject: [PATCH net] ip_tunnels: use DEV_STATS_INC()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/+hut5hP6N6FM.lYbJUHQWJL";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-syzbot/KCSAN reported data-races in iptunnel_xmit_stats() [1]
+--Sig_/+hut5hP6N6FM.lYbJUHQWJL
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-This can run from multiple cpus without mutual exclusion.
+Hi Vladimir,
 
-Adopt SMP safe DEV_STATS_INC() to update dev->stats fields.
+> On Tue, Sep 05, 2023 at 01:23:51PM +0200, Lukasz Majewski wrote:
+> > > Should be squashed into patch 3/4. The split does not make the
+> > > code easier to review for me. =20
+> >=20
+> > So you recommend to have only one patch in which the hsr_join{leave}
+> > function from ksz_common.c and ksz9477_hsr_join{leave} from
+> > ksz9477.c are added? =20
+>=20
+> Correct. In addition, patch 1/4 will be dropped. So there will be 2
+> patches, one on net/dsa/tag_ksz.c and the other on
+> drivers/net/dsa/microchip/.
 
-[1]
-BUG: KCSAN: data-race in iptunnel_xmit / iptunnel_xmit
+Ok.
 
-read-write to 0xffff8881353df170 of 8 bytes by task 30263 on cpu 1:
-iptunnel_xmit_stats include/net/ip_tunnels.h:493 [inline]
-iptunnel_xmit+0x432/0x4a0 net/ipv4/ip_tunnel_core.c:87
-ip_tunnel_xmit+0x1477/0x1750 net/ipv4/ip_tunnel.c:831
-__gre_xmit net/ipv4/ip_gre.c:469 [inline]
-ipgre_xmit+0x516/0x570 net/ipv4/ip_gre.c:662
-__netdev_start_xmit include/linux/netdevice.h:4889 [inline]
-netdev_start_xmit include/linux/netdevice.h:4903 [inline]
-xmit_one net/core/dev.c:3544 [inline]
-dev_hard_start_xmit+0x11b/0x3f0 net/core/dev.c:3560
-__dev_queue_xmit+0xeee/0x1de0 net/core/dev.c:4340
-dev_queue_xmit include/linux/netdevice.h:3082 [inline]
-__bpf_tx_skb net/core/filter.c:2129 [inline]
-__bpf_redirect_no_mac net/core/filter.c:2159 [inline]
-__bpf_redirect+0x723/0x9c0 net/core/filter.c:2182
-____bpf_clone_redirect net/core/filter.c:2453 [inline]
-bpf_clone_redirect+0x16c/0x1d0 net/core/filter.c:2425
-___bpf_prog_run+0xd7d/0x41e0 kernel/bpf/core.c:1954
-__bpf_prog_run512+0x74/0xa0 kernel/bpf/core.c:2195
-bpf_dispatcher_nop_func include/linux/bpf.h:1181 [inline]
-__bpf_prog_run include/linux/filter.h:609 [inline]
-bpf_prog_run include/linux/filter.h:616 [inline]
-bpf_test_run+0x15d/0x3d0 net/bpf/test_run.c:423
-bpf_prog_test_run_skb+0x77b/0xa00 net/bpf/test_run.c:1045
-bpf_prog_test_run+0x265/0x3d0 kernel/bpf/syscall.c:3996
-__sys_bpf+0x3af/0x780 kernel/bpf/syscall.c:5353
-__do_sys_bpf kernel/bpf/syscall.c:5439 [inline]
-__se_sys_bpf kernel/bpf/syscall.c:5437 [inline]
-__x64_sys_bpf+0x43/0x50 kernel/bpf/syscall.c:5437
-do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
-entry_SYSCALL_64_after_hwframe+0x63/0xcd
+>=20
+> > > I don't see any restriction to allow offloading a single HSR
+> > > device. =20
+> >=20
+> > As I've written in the other response - I've followed the xrs700x.c
+> > convention.  =20
+>=20
+> "the xrs700x.c convention"
+>=20
+> xrs700x_hsr_join():
+>=20
+> 	/* Only ports 1 and 2 can be HSR/PRP redundant ports. */
+> 	if (port !=3D 1 && port !=3D 2)
+> 		return -EOPNOTSUPP;
+>=20
+> So, checking for ports 1 and 2 is a stronger condition than the one
+> I'm asking you to enforce.
+>=20
+> The KSZ9477 is more flexible. It can enable HSR offload on any 2
+> ports, not just on ports 1 and 2. But it can still be 2 ports max, no
+> more. You haven't copied the xrs700x convention, but you haven't
+> adapted it, either.
 
-read-write to 0xffff8881353df170 of 8 bytes by task 30249 on cpu 0:
-iptunnel_xmit_stats include/net/ip_tunnels.h:493 [inline]
-iptunnel_xmit+0x432/0x4a0 net/ipv4/ip_tunnel_core.c:87
-ip_tunnel_xmit+0x1477/0x1750 net/ipv4/ip_tunnel.c:831
-__gre_xmit net/ipv4/ip_gre.c:469 [inline]
-ipgre_xmit+0x516/0x570 net/ipv4/ip_gre.c:662
-__netdev_start_xmit include/linux/netdevice.h:4889 [inline]
-netdev_start_xmit include/linux/netdevice.h:4903 [inline]
-xmit_one net/core/dev.c:3544 [inline]
-dev_hard_start_xmit+0x11b/0x3f0 net/core/dev.c:3560
-__dev_queue_xmit+0xeee/0x1de0 net/core/dev.c:4340
-dev_queue_xmit include/linux/netdevice.h:3082 [inline]
-__bpf_tx_skb net/core/filter.c:2129 [inline]
-__bpf_redirect_no_mac net/core/filter.c:2159 [inline]
-__bpf_redirect+0x723/0x9c0 net/core/filter.c:2182
-____bpf_clone_redirect net/core/filter.c:2453 [inline]
-bpf_clone_redirect+0x16c/0x1d0 net/core/filter.c:2425
-___bpf_prog_run+0xd7d/0x41e0 kernel/bpf/core.c:1954
-__bpf_prog_run512+0x74/0xa0 kernel/bpf/core.c:2195
-bpf_dispatcher_nop_func include/linux/bpf.h:1181 [inline]
-__bpf_prog_run include/linux/filter.h:609 [inline]
-bpf_prog_run include/linux/filter.h:616 [inline]
-bpf_test_run+0x15d/0x3d0 net/bpf/test_run.c:423
-bpf_prog_test_run_skb+0x77b/0xa00 net/bpf/test_run.c:1045
-bpf_prog_test_run+0x265/0x3d0 kernel/bpf/syscall.c:3996
-__sys_bpf+0x3af/0x780 kernel/bpf/syscall.c:5353
-__do_sys_bpf kernel/bpf/syscall.c:5439 [inline]
-__se_sys_bpf kernel/bpf/syscall.c:5437 [inline]
-__x64_sys_bpf+0x43/0x50 kernel/bpf/syscall.c:5437
-do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
-entry_SYSCALL_64_after_hwframe+0x63/0xcd
+Ok. I've misuderstood your suggestion. You were asking about having one
+hsr offloaded setup (hsr0 =3D> lan1 + lan2) and in the same time
+non-offloaded setup (hsr1 =3D> lan3 + lan4).
 
-value changed: 0x0000000000018830 -> 0x0000000000018831
+>=20
+> > Moreover, for me it seems more natural, that we only allow full HSR
+> > support for 2 ports or none. Please be aware, that HSR supposed to
+> > support only 2 ports, and having only one working is not
+> > recommended by vendor. =20
+>=20
+> And where is it enforced that full HSR offload is only applied to 2
+> ports or none?
 
-Reported by Kernel Concurrency Sanitizer on:
-CPU: 0 PID: 30249 Comm: syz-executor.4 Not tainted 6.5.0-syzkaller-11704-g3f86ed6ec0b3 #0
+In the ksz_jsr_join() at ksz_common.c -> we exit from this function
+when !partner.
 
-Fixes: 039f50629b7f ("ip_tunnel: Move stats update to iptunnel_xmit()")
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/net/ip_tunnels.h | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+>=20
+> > > Looking at patch 3/4, that will obviously not work due to some
+> > > hardware registers which are global and would be overwritten by
+> > > the second HSR device. =20
+> >=20
+> > I cannot guarantee that there will not be any "side effects" with
+> > this approach. And to be honest - I would prefer to spent time on
+> > testing recommended setups. =20
+>=20
+> Please read my reply again, keeping in mind that by "HSR device" I
+> mean "hsr0" in the commands below, and not the member ports as you've
+> assumed when responding.
 
-diff --git a/include/net/ip_tunnels.h b/include/net/ip_tunnels.h
-index e8750b4ef7e17ad85c88ec1db73242795ede0281..f346b4efbc307bcca8893775d9bd4c12f5917293 100644
---- a/include/net/ip_tunnels.h
-+++ b/include/net/ip_tunnels.h
-@@ -483,15 +483,14 @@ static inline void iptunnel_xmit_stats(struct net_device *dev, int pkt_len)
- 		u64_stats_inc(&tstats->tx_packets);
- 		u64_stats_update_end(&tstats->syncp);
- 		put_cpu_ptr(tstats);
-+		return;
-+	}
-+
-+	if (pkt_len < 0) {
-+		DEV_STATS_INC(dev, tx_errors);
-+		DEV_STATS_INC(dev, tx_aborted_errors);
- 	} else {
--		struct net_device_stats *err_stats = &dev->stats;
--
--		if (pkt_len < 0) {
--			err_stats->tx_errors++;
--			err_stats->tx_aborted_errors++;
--		} else {
--			err_stats->tx_dropped++;
--		}
-+		DEV_STATS_INC(dev, tx_dropped);
- 	}
- }
- 
--- 
-2.42.0.283.g2d96d420d3-goog
+Yes. I do get your point.
 
+>=20
+> > >=20
+> > > For example, a5psw_port_bridge_join() has a similar restriction to
+> > > offload a single bridge device. =20
+> >=20
+> > HSR is IMHO a bit different than plain "bridge" offloading. =20
+>=20
+> Maybe this was not clear, but by "similar" I mean: if you replace the
+> "bridge" word with "hsr", and you copy that code snippet from a5psw,
+> you get the desired outcome.
+>=20
+> static int ksz_hsr_join(struct dsa_switch *ds, int port, struct
+> net_device *hsr, /* optionally pass the extack argument from the
+> caller */) {
+> 	struct ksz_device *dev =3D ds->priv;
+>=20
+> 	/* We only support 1 HSR device */
+> 	if (dev->hsr_dev && hsr !=3D dev->hsr_dev) {
+> 		NL_SET_ERR_MSG_MOD(extack,
+> 				   "Offload supported for a single
+> HSR"); return -EOPNOTSUPP;
+> 	}
+>=20
+
+Ok.
+
+> 	dev->hsr_dev =3D hsr;
+>=20
+> 	...
+>=20
+> 	return 0;
+> }
+>=20
+> I did not imply that HSR is not different than bridge offloading.
+> I don't see how that is even related to the discussion.
+>=20
+> > > If you return -EOPNOTSUPP, then DSA should fall back to an
+> > > unoffloaded, 100% software-based HSR device, and that should work
+> > > too.  =20
+> >=20
+> > And then we would have one port with SW HSR and another one with HW
+> > HSR? =20
+>=20
+> No. One HSR device (hsr0, with 2 member ports) with offload and one
+> HSR device (hsr1, with 2 member ports) without offload (see (b)
+> below).
+>=20
+> > >It would be good if you could verify that the unoffloaded HSR
+> > > works well after the changes too. =20
+> >=20
+> > I've tested on KSZ9477-EVB the SW HSR operation with two ports (and
+> > two or three boards) and HW HSR offloading. Results are presented
+> > in the cover-letter. =20
+>=20
+> "results in the cover letter"
+>=20
+> Results:
+> With KSZ9477 offloading support added: RX: 100 Mbps TX: 98 Mbps
+> With no offloading                     RX: 63 Mbps  TX: 63 Mbps
+>=20
+> What was the setup for the "no offloading" case?
+>=20
+
+I used two boards. I've used the same kernel with and without HSR
+offloading patches.
+
+Cables were connected to port1 and port2 on each board. Non HSR network
+was connected to port3.
+
+> (a) kernel did not contain the offloading patch set
+>=20
+
+Yes.
+
+> (b) the testing was on hsr1, in the situation below:
+>=20
+> ip link add name hsr0 type hsr slave1 lan1 slave2 lan2 supervision 45
+> version 1 # offloaded ip link add name hsr1 type hsr slave1 lan3
+> slave2 lan4 supervision 45 version 1 # unoffloaded
+>=20
+
+I did not setup two hsr devices on the same board. I've used two boards
+with hsr0 setup on each.
+
+> (d) in some other way (please detail)
+>=20
+> I was specifically asking about situation (b).
+
+I did not tested the hsr0, hsr1 as my (real) use case is with KSZ9477
+having only 3 ports available for connection (port 1,2,3).
+
+
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/+hut5hP6N6FM.lYbJUHQWJL
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmT3MYAACgkQAR8vZIA0
+zr2hOwgAioIh83U/59WvQqS+Np2hIQOO/+Fjb8jR+dIhbk7ABdzEndeoZ31nJ8AA
+6NGzoeZIZs5QiEGIOM4fhmSjt7n0Crz8KmEyjckLRtIhQROTYk1LOOK9RZKBuaiF
+a6hm+voY2d6cSMg8rU754y2Rs9RuCoprHn4LZ2vKnfohw6TwdASPePrXJ4CYNFEU
+12OcDfKKPpc374j+DG5u0NlhSFj9ExIMP3eCJBJjvchNM+G6Fo0taInB0fB8rZSi
+vKJiW5jURQbShxviCUo4iDDXLYSaYtnIKoJtuXBJGachDJjBK6BOSOC1SX6wxfhA
+GsOwHeCsPRD1KcwZUmS7xnsOv53y4A==
+=AMD3
+-----END PGP SIGNATURE-----
+
+--Sig_/+hut5hP6N6FM.lYbJUHQWJL--
 
