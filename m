@@ -1,169 +1,99 @@
-Return-Path: <netdev+bounces-32020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5ADA5792154
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 11:13:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 406FF79215E
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 11:18:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7A0628107F
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 09:13:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D73331C20908
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 09:18:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A51B63A7;
-	Tue,  5 Sep 2023 09:13:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC76F63B5;
+	Tue,  5 Sep 2023 09:18:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A29B1C2F
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 09:13:01 +0000 (UTC)
-Received: from phobos.denx.de (phobos.denx.de [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB29DDA;
-	Tue,  5 Sep 2023 02:12:59 -0700 (PDT)
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 17FBF8653D;
-	Tue,  5 Sep 2023 11:12:56 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1693905176;
-	bh=BR/Zgf6gM+aK4Rpc+OxCgQx8h+FpEmUgs5GKhVdx3Po=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tq3lQyDy8e/VMKCf0W4txJ0mIzWnKR4lsZWdFTH5EQ4gqLcqjjPmgsieDNBDteMHu
-	 Dq7+H2IKUaisHciwWdFNcHOqwZ4TD5qH13zitOG7gdLHOxJX7p6rTkwR8KmtqSTdOO
-	 192X5mlkk97P1NLUF6EamsK9P10j+1b8Dgz0P6CMZDeFZQYcvXQWsTbbDAhkM5kW5q
-	 dYF9ETmiZYaeAuMne2IlYjwvEHPnnLNaAQv/FnFKmtSKbSnk9zIwiHeWQDM78ldp4/
-	 bHeFAE+bzHo30P0ZJviNbBpSdiQsyGifoba3DFiKvOJ4ORHphiqIKhF7pshmFLMXl4
-	 Tv+eZjWQYZzPA==
-Date: Tue, 5 Sep 2023 11:12:48 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
- davem@davemloft.net, Paolo Abeni <pabeni@redhat.com>, Woojung Huh
- <woojung.huh@microchip.com>, Tristram.Ha@microchip.com, Florian Fainelli
- <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- UNGLinuxDriver@microchip.com, George McCollister
- <george.mccollister@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 RFC 4/4] net: dsa: hsr: Provide generic HSR
- ksz_hsr_{join|leave} functions
-Message-ID: <20230905111248.0d3c8ed9@wsk>
-In-Reply-To: <20230904205304.h3fdjqcijytztlpb@skbuf>
-References: <20230904120209.741207-1-lukma@denx.de>
-	<20230904120209.741207-5-lukma@denx.de>
-	<20230904205304.h3fdjqcijytztlpb@skbuf>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C14663A7
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 09:18:10 +0000 (UTC)
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D3FBDD
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 02:18:09 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-3fef56f7248so22663055e9.3
+        for <netdev@vger.kernel.org>; Tue, 05 Sep 2023 02:18:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1693905487; x=1694510287; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+f/34xL4509tmCMOHOJaLbB6o2+MQeuh0A3vjS1emho=;
+        b=atBi4EfV2sBQp3f8832ApGpOkqL+sV9qW8HXn6R+HxhlJK3ZViEmiexk9aVje+35fh
+         XcykB6mpvqI9dLclgNhhvfGE83abIHRLpZmpMgK/c31oGaXbxkbMzhhffiNHjP2bp52j
+         l6rGqCd+d9T3t8GEe8836AAtOjgsGjQ6RFRtN98tJTPtPGmbKK6iZ4puDsYtjI86u2OC
+         E7RLP4Y20bHFi0vzkKLFBG0TC2JjWyNLy/IBELyk2xJYVXBmUehMfQXtFmHW5yryEkc9
+         xqh1iaWgDxnmfipNsJRcOYv4HsYcxCba8lEL6jBTbj44CJDMZFznz1HelCVVMtlTtZVC
+         EXfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693905487; x=1694510287;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+f/34xL4509tmCMOHOJaLbB6o2+MQeuh0A3vjS1emho=;
+        b=HoMb0qKbhNtrb2eOkiXJhzi0hDId8b/Ye2Fg4xqiOSIpOf/xB/e8SWQLl9px7P+cAj
+         jr8RnpNmT4YSIaeioSNNnff7ZPhAEbB4MHRLCmrwrYUdsY8eCfQPl80bwpUdIE61qVd4
+         Qn/TkUSIbAr8hoazsGHjr/z5SGnsAypDHqex3r1en/Tm5XjpnpB15UAOA38Abaq3OjrL
+         10E8wSUtHz0VhZfBZ873/HP6sU+yid4FVbTNNsnzfu/oRGUZF784uRM+xMvcnTY7a/0+
+         j/5DdmMp1805thApUe2v3mzjI5DA9LGH+9bNjro35FK+cgXq9TkVqEp/tj+mbGZ/cLvl
+         Qtxw==
+X-Gm-Message-State: AOJu0YwGxp7irR5ICQcF/lWtVRy4XjdkWYjE+JyOVFIrZ3pFSnyJpNjA
+	OqEVABRXgu55v/GyfjTKlKmIrOePeBXFzZFVWwM=
+X-Google-Smtp-Source: AGHT+IHH9jpCWYxNpePnrwZHsdEGi2mdGsBk5wiS8QXgAmYEIGDvnCW8GOnCZDQK04PbuRR8HpJrDg==
+X-Received: by 2002:a05:600c:21d2:b0:3fe:2b76:3d7 with SMTP id x18-20020a05600c21d200b003fe2b7603d7mr8615998wmj.10.1693905487564;
+        Tue, 05 Sep 2023 02:18:07 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id l7-20020a1c7907000000b003fed8e12d62sm16359042wme.27.2023.09.05.02.18.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Sep 2023 02:18:07 -0700 (PDT)
+Date: Tue, 5 Sep 2023 12:18:04 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Simon Horman <horms@kernel.org>,
+	Linux Kernel Network Developers <netdev@vger.kernel.org>
+Subject: Re: Weird sparse error WAS( [PATCH net-next v2 3/3] net/sched:
+ act_blockcast: Introduce blockcast tc action
+Message-ID: <e4de8720-e4bb-477d-ad80-55c8060cba2e@kadam.mountain>
+References: <20230819163515.2266246-1-victor@mojatatu.com>
+ <20230819163515.2266246-4-victor@mojatatu.com>
+ <CAM0EoMnXUSkE2XjWusrkUgyQqaokT8BEnt+9_cAeNMXa8fd61w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/N02/Ma2Yt09=3DGVRL4akQi";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAM0EoMnXUSkE2XjWusrkUgyQqaokT8BEnt+9_cAeNMXa8fd61w@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---Sig_/N02/Ma2Yt09=3DGVRL4akQi
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Thu, Aug 24, 2023 at 10:30:18AM -0400, Jamal Hadi Salim wrote:
+> Dan/Simon,
+> Can someone help explain this error on the code below:
+> 
+> ../net/sched/act_blockcast.c:213:9: warning: context imbalance in
+> 'tcf_blockcast_init' - different lock contexts for basic block
+> 
+> Looks like a false positive ...
 
-Hi Vladimir,
+I maintain Smatch and not Sparse.  It is a false positive.  Smatch will
+parse that code correctly.  ;)
 
-> On Mon, Sep 04, 2023 at 02:02:09PM +0200, Lukasz Majewski wrote:
-> > This patch provides the common KSZ (i.e. Microchip) DSA code with
-> > support for HSR aware devices.
-> >=20
-> > To be more specific - generic ksz_hsr_{join|leave} functions are
-> > provided, now only supporting KSZ9477 IC.
-> >=20
-> > Signed-off-by: Lukasz Majewski <lukma@denx.de>
-> > ---
-> > Changes for v2:
-> > - None
-> >=20
-> > Changes for v3:
-> > - Do not return -EOPNOTSUPP for only PRP_V1 (as v2 will not be
-> > caught) ---
-> >  drivers/net/dsa/microchip/ksz_common.c | 69
-> > ++++++++++++++++++++++++++ 1 file changed, 69 insertions(+)
-> >=20
-> > diff --git a/drivers/net/dsa/microchip/ksz_common.c
-> > b/drivers/net/dsa/microchip/ksz_common.c index
-> > 579fde54d1e1..91d1acaf4494 100644 ---
-> > a/drivers/net/dsa/microchip/ksz_common.c +++
-> > b/drivers/net/dsa/microchip/ksz_common.c @@ -16,6 +16,7 @@
-> >  #include <linux/etherdevice.h>
-> >  #include <linux/if_bridge.h>
-> >  #include <linux/if_vlan.h>
-> > +#include <linux/if_hsr.h>
-> >  #include <linux/irq.h>
-> >  #include <linux/irqdomain.h>
-> >  #include <linux/of_mdio.h> =20
->=20
-> This conflicts with commit f44a90104ee5 ("net: dsa: Explicitly include
-> correct DT includes") from July, merged through net-next.
->=20
-> "New features" material for networking goes through this tree, please
-> submit patches that were formatted (and tested) on top of the most
-> recent version of the "main" branch, and use git-send-email
-> --subject-prefix "[RFC PATCH vN net-next]" to denote that.
->=20
-> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/log/
->=20
-> If patches fail to apply to the target kernel, you lose the benefit of
-> automatic build testing (which would have highlighted a problem that
-> exists since v3). With RFC patches, the kbuild test robot sends build
-> breakage reports only to you - with normal patches it sends them to
-> everybody.
+regards,
+dan carpenter
 
-Thanks for the info.
-
->=20
-> Please wait for more feedback before posting RFC v5. I will review in
-> more detail, but it will take some time.
-
-Ok. I will wait for your feedback and then sent RFC v4.
-
->=20
-> Thanks.
-
-
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/N02/Ma2Yt09=3DGVRL4akQi
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmT28REACgkQAR8vZIA0
-zr3ofAf/VsqyC6fNByFdfaeUZyLGDANPQztAF4Jc4ATfbwd4bRCZgM+SIiwDEgeB
-3r/SuACh3g5uNMlyApeXEEhVDinvAhW1WLZg9mQfgRtEmr+iCSSnVfXihcZYS4tA
-HycYd8z+SHAlVsWzBt6hyCpXZdJ+WBT/xeoQbBlRLWCgnplX9MXOV5O8nIcNAXMP
-dDgOPMZfuUwCTJHQT2neYWLLooxPVkn3ooAZwzwkG4Q6Y6jCooC3l3r0QX7qNs4h
-9Dl4POA4iqAY7fej1MCGwXg+G6YWLaZjz+8Hcw/ShW6qnV2YfdMOSgKGmkhSzJ53
-OGaDFEyWofRfpEaSkYSpk2YrVta+Sg==
-=m7df
------END PGP SIGNATURE-----
-
---Sig_/N02/Ma2Yt09=3DGVRL4akQi--
 
