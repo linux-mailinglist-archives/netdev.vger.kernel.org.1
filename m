@@ -1,145 +1,85 @@
-Return-Path: <netdev+bounces-32001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C78E0792099
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 08:48:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A24987920B1
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 09:22:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC2D01C208FA
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 06:48:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 471D8280ED8
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 07:22:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAC897F9;
-	Tue,  5 Sep 2023 06:48:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84302A5D;
+	Tue,  5 Sep 2023 07:22:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B1BD379
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 06:48:41 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5612B1B4;
-	Mon,  4 Sep 2023 23:48:40 -0700 (PDT)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 384LrkRT017196;
-	Mon, 4 Sep 2023 23:48:24 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-type; s=pfpt0220;
- bh=I7QsQtpzfUbZvSXNhaojvmUw6Aywv2VTTH6a9TUm1Zk=;
- b=W/n0J9MXtnnBYMg8wmq2mbkQLstpNC2pA+7GcwQR8eoZUM+zhj1oOQtZr1lNdaVDmjYH
- FOh84XotrW8WVCMAVvCJmwfgpms9WXND0gqkD+S8yS+dPH3GUUzoRJezmjTIwN7nrPpt
- QbVHeKA6UqIZnXBR6aLqOZs6A+hgCTGlxYQE65cYqlhp+P4WtFPiGmmY9wDZ5E9cR94S
- sfTAV4I03R8gbwCgpqqdoUFwNBAsCcOEMH/+EuqmqRu/8J5XDyguEa8edgXZPSR5SV2/
- XbhsLUs67chjuRi5xKUU4w35sHUYZ98lD0S7NFAJWLxElr68bFkkQupdWxN4kaU7f/UN Dg== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3swdqyk31y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Mon, 04 Sep 2023 23:48:24 -0700
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 4 Sep
- 2023 23:48:22 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Mon, 4 Sep 2023 23:48:22 -0700
-Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id AEFB85B6977;
-	Mon,  4 Sep 2023 23:48:18 -0700 (PDT)
-From: Geetha sowjanya <gakula@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-        <pabeni@redhat.com>, <sgoutham@marvell.com>, <lcherian@marvell.com>,
-        <gakula@marvell.com>, <jerinj@marvell.com>, <sbhatta@marvell.com>,
-        <hkelam@marvell.com>
-Subject: [net PATCH] octeontx2-af: Fix truncation of smq in CN10K NIX AQ enqueue  mbox handler
-Date: Tue, 5 Sep 2023 12:18:16 +0530
-Message-ID: <20230905064816.27514-1-gakula@marvell.com>
-X-Mailer: git-send-email 2.17.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33617A38
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 07:22:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 96758C433C8;
+	Tue,  5 Sep 2023 07:22:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1693898546;
+	bh=Qn0ZuiuZ584j+M27My7PDHOjHFp7OTTOs/3NCqIxlbE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=dei12qf4+JrNPGPZS3K8KRqumt6gbk7OwejxKI4S8KOfB6DqAfqNyYxJvTfUocjju
+	 b/5H/eC4xjvyjzd4wJOGTsNqgA4ZeV8jOwp9XR1XY28IGX/FsR4VcBMbQJEiypC32F
+	 8faVFQbqRSlM/yrOr1QTjDOohCUQ11t1wb65Vf1JogL0H1ExTMY+KAx1p9xdLyi8Le
+	 4uRs73zjeBCkXyv+XG/U8W8MgQP/qpeOi66feCvtK/TgLmrwg9v8DK0UhmNs11HP0a
+	 PVGwoDHm3QNbK7O3ntM9cDcmMt+ulyycIJVhw41wGLYqcsNZ0D5wrwNG/GTyMKAOa/
+	 /Z9PU8AF8TWJA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7F208C595C5;
+	Tue,  5 Sep 2023 07:22:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-GUID: WCwObZb_LfVJD2NlAB9YbwEo5u6J-il7
-X-Proofpoint-ORIG-GUID: WCwObZb_LfVJD2NlAB9YbwEo5u6J-il7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-09-05_05,2023-08-31_01,2023-05-22_02
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 1/1] net: sched: sch_qfq: Fix UAF in qfq_dequeue()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169389854651.13349.10095337484077645366.git-patchwork-notify@kernel.org>
+Date: Tue, 05 Sep 2023 07:22:26 +0000
+References: <20230901162237.11525-1-jhs@mojatatu.com>
+In-Reply-To: <20230901162237.11525-1-jhs@mojatatu.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, jiri@resnulli.us, xiyou.wangcong@gmail.com,
+ netdev@vger.kernel.org, sec@valis.email, paolo.valente@unimore.it
 
-The smq value used in the CN10K NIX AQ instruction enqueue mailbox
-handler was truncated to 9-bit value from 10-bit value because of
-typecasting the CN10K mbox request structure to the CN9K structure.
-Though this hasn't caused any problems when programming the NIX SQ
-context to the HW because the context structure is the same size.
-However, this causes a problem when accessing the structure parameters.
-This patch reads the right smq value for each platform.
+Hello:
 
-Fixes: 30077d210c83 ("octeontx2-af: cn10k: Update NIX/NPA context structure")
-Signed-off-by: Geetha sowjanya <gakula@marvell.com>
-Signed-off-by: Sunil Kovvuri Goutham <sgoutham@marvell.com>
----
- .../ethernet/marvell/octeontx2/af/rvu_nix.c   | 21 +++++++++++++++++--
- 1 file changed, 19 insertions(+), 2 deletions(-)
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-index c2f68678e947..23c2f2ed2fb8 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-@@ -846,6 +846,21 @@ static int nix_aq_enqueue_wait(struct rvu *rvu, struct rvu_block *block,
- 	return 0;
- }
- 
-+static void nix_get_aq_req_smq(struct rvu *rvu, struct nix_aq_enq_req *req,
-+			       u16 *smq, u16 *smq_mask)
-+{
-+	struct nix_cn10k_aq_enq_req *aq_req;
-+
-+	if (!is_rvu_otx2(rvu)) {
-+		aq_req = (struct nix_cn10k_aq_enq_req *)req;
-+		*smq = aq_req->sq.smq;
-+		*smq_mask = aq_req->sq_mask.smq;
-+	} else {
-+		*smq = req->sq.smq;
-+		*smq_mask = req->sq_mask.smq;
-+	}
-+}
-+
- static int rvu_nix_blk_aq_enq_inst(struct rvu *rvu, struct nix_hw *nix_hw,
- 				   struct nix_aq_enq_req *req,
- 				   struct nix_aq_enq_rsp *rsp)
-@@ -857,6 +872,7 @@ static int rvu_nix_blk_aq_enq_inst(struct rvu *rvu, struct nix_hw *nix_hw,
- 	struct rvu_block *block;
- 	struct admin_queue *aq;
- 	struct rvu_pfvf *pfvf;
-+	u16 smq, smq_mask;
- 	void *ctx, *mask;
- 	bool ena;
- 	u64 cfg;
-@@ -928,13 +944,14 @@ static int rvu_nix_blk_aq_enq_inst(struct rvu *rvu, struct nix_hw *nix_hw,
- 	if (rc)
- 		return rc;
- 
-+	nix_get_aq_req_smq(rvu, req, &smq, &smq_mask);
- 	/* Check if SQ pointed SMQ belongs to this PF/VF or not */
- 	if (req->ctype == NIX_AQ_CTYPE_SQ &&
- 	    ((req->op == NIX_AQ_INSTOP_INIT && req->sq.ena) ||
- 	     (req->op == NIX_AQ_INSTOP_WRITE &&
--	      req->sq_mask.ena && req->sq_mask.smq && req->sq.ena))) {
-+	      req->sq_mask.ena && req->sq.ena && smq_mask))) {
- 		if (!is_valid_txschq(rvu, blkaddr, NIX_TXSCH_LVL_SMQ,
--				     pcifunc, req->sq.smq))
-+				     pcifunc, smq))
- 			return NIX_AF_ERR_AQ_ENQUEUE;
- 	}
- 
+On Fri,  1 Sep 2023 12:22:37 -0400 you wrote:
+> From: valis <sec@valis.email>
+> 
+> When the plug qdisc is used as a class of the qfq qdisc it could trigger a
+> UAF. This issue can be reproduced with following commands:
+> 
+>   tc qdisc add dev lo root handle 1: qfq
+>   tc class add dev lo parent 1: classid 1:1 qfq weight 1 maxpkt 512
+>   tc qdisc add dev lo parent 1:1 handle 2: plug
+>   tc filter add dev lo parent 1: basic classid 1:1
+>   ping -c1 127.0.0.1
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,1/1] net: sched: sch_qfq: Fix UAF in qfq_dequeue()
+    https://git.kernel.org/netdev/net/c/8fc134fee27f
+
+You are awesome, thank you!
 -- 
-2.25.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
