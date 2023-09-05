@@ -1,204 +1,142 @@
-Return-Path: <netdev+bounces-31988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-31989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B490791FAD
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 01:49:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C52279200D
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 04:42:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FE1C1C208CB
-	for <lists+netdev@lfdr.de>; Mon,  4 Sep 2023 23:49:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 467561C2042F
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 02:42:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C58ECA5E;
-	Mon,  4 Sep 2023 23:49:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D8B936A;
+	Tue,  5 Sep 2023 02:42:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E0333212
-	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 23:49:31 +0000 (UTC)
-Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ECCCCC4
-	for <netdev@vger.kernel.org>; Mon,  4 Sep 2023 16:49:29 -0700 (PDT)
-Received: by mail-oi1-x233.google.com with SMTP id 5614622812f47-3a7f4f7a8easo849972b6e.2
-        for <netdev@vger.kernel.org>; Mon, 04 Sep 2023 16:49:29 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FE7C633
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 02:42:34 +0000 (UTC)
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63563CC6;
+	Mon,  4 Sep 2023 19:42:33 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2bc63e0d8cdso29990031fa.2;
+        Mon, 04 Sep 2023 19:42:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693871368; x=1694476168; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=abHLT3d1RGEEopUvtvKDJ6jwaSIlNgPS7xX/aiEkia4=;
-        b=cfMISGZlTRtWrpxqCx5/AU7QJIphv+l3jKpryEDo1pMchXjtn15ty8Lsp7RxHYKx58
-         e4C9iktAy9uROolD6ewsZHGLohlReunPKvgp8luWpe93aBljzTKTJTYFzDhpP0QtYrS0
-         7nnqZ/AuuWzzRG8Da0UlJGdTqg4Nhc3cG56jlvuPXP1CNnmdzJW5MAlqV7+iVnwoblUl
-         8ZS5MBT/ej/r5rBIUY4ChgeuIMZ8TSroAtwxiofs6cxx/8BKgNOE44IJHVy2R583O2HA
-         2szQ8DdcfXiYfAhVPHoRauhn1hJ9QyPl04i4KiaMB2XJ0QT8hAfWcOZU+FotKO0tFApm
-         G+Rw==
+        d=gmail.com; s=20221208; t=1693881751; x=1694486551; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Nt6ay0ilUmrNIrakmOthvuLnYKcSlh/71zqVmBj/MNI=;
+        b=eAVqggZ4SYFDQkPgn4YOQuLjtL7pkRlt9fAwagRklY3YslyBOUJG5lhAAN2Xtqw6qe
+         mkkICwFL0xcSiR5qoSjXYHIYxDPNJR2+5SK38n46QfsU/9bkMTISu7cYWL5FgZLyfrKB
+         UI7oMix7gM55h7WuxDA39BjAGydhYLVAOHOAPIjuBxSYTJdbRa9lAQVxmpcH4TOxkUkQ
+         HMzCqo7fPHWjUw4+gUBup7+Rd33BmvqztccMDfGruovD1I1nif/0ewizy9Bl5a9/rYkA
+         +60GB4YNC9haEOc2eeTy2+1RjWcXVGYY7K6RADPh3uHfLycVypM1tjgzAxEjvXXTDxAw
+         /hXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693871368; x=1694476168;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=abHLT3d1RGEEopUvtvKDJ6jwaSIlNgPS7xX/aiEkia4=;
-        b=btlX6APDmtqC+AiKDM1twE4ITjirx/bcS4QuISCokW2RkC/hCxLbLUdXtffG2SUh1a
-         eYlQRXRRRaTg5/3WTXMc6NTbf4V1ioMm7O685nBxmZJYoyl2qEHG1BZV5tP9dr8ExOZC
-         XYqLA8Of1OfMkK8uWWTeFZcA4WP/q+ccgtC8QKVJAqyQmk34uDGktvhp05HOtnDX5Bk9
-         WALSIFHfGXDFFVrd4OKvtGPG3+SXClPekug0bFuiJsEZDlBUsRaugNeRhuvmlWIhmDSo
-         CqkCL0t9uhrwNEc+k6zfVyk4GyBwLPnI72OIYw93GDzwVkfGDPFXRjWHUFUyKwcNVQGo
-         u16Q==
-X-Gm-Message-State: AOJu0Yz/Il7tbFnrxakaX+CpS+4Yx33qmygedN6D/0PeanrIMfPKJtrp
-	qiBTXuYj2FaWEgv9lpumTuc=
-X-Google-Smtp-Source: AGHT+IGyhsXo6CgoIDwFcf9o+V2IGrm2rSTt1UjN4PlmEeZ04huZzydIdC8fQB4w2cdsuwl8ZdFByg==
-X-Received: by 2002:a54:4714:0:b0:3a7:8e2a:6173 with SMTP id k20-20020a544714000000b003a78e2a6173mr11649145oik.2.1693871368527;
-        Mon, 04 Sep 2023 16:49:28 -0700 (PDT)
-Received: from westworld (209-147-138-147.nat.asu.edu. [209.147.138.147])
-        by smtp.gmail.com with ESMTPSA id bg26-20020a056a02011a00b0055c178a8df1sm7207556pgb.94.2023.09.04.16.49.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Sep 2023 16:49:28 -0700 (PDT)
-Date: Mon, 4 Sep 2023 16:49:25 -0700
-From: Kyle Zeng <zengyhkyle@gmail.com>
-To: David Laight <David.Laight@aculab.com>
-Cc: 'Eric Dumazet' <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"eric.dumazet@gmail.com" <eric.dumazet@gmail.com>,
-	syzbot <syzkaller@googlegroups.com>,
-	Kees Cook <keescook@chromium.org>, Vlastimil Babka <vbabka@suse.cz>
-Subject: Re: [PATCH net] net: deal with integer overflows in kmalloc_reserve()
-Message-ID: <ZPZtBWm06f321Tp/@westworld>
-References: <20230831183750.2952307-1-edumazet@google.com>
- <d273628df80f45428e739274ab9ecb72@AcuMS.aculab.com>
- <CANn89iJY4=Q0edL-mf2JrRiz8Ld7bQcogOrc4ozLEVD8qz8o2A@mail.gmail.com>
- <837a03d12d8345bfa7e9874c1e7d9156@AcuMS.aculab.com>
+        d=1e100.net; s=20221208; t=1693881751; x=1694486551;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Nt6ay0ilUmrNIrakmOthvuLnYKcSlh/71zqVmBj/MNI=;
+        b=OVZAxkqjlUzQjiM22yszhNMPifMACktdH/Soke8zBmF42UNgtN1ipJE4iptpUDhYgG
+         R8tF9b63VqCmglZ2TnDy4t2TzJj1bxjFHTw5RslWqQNoIPfoAvfSHd+r27koGZ2HpIIn
+         XEy0MKm/rX33roKUSjcC+PKGrHpI35xUwY1hNwL1qtl2bb8cAyAlH9VjJIRQcUwNR9Mx
+         offW5AUK2+iUiy7nD71SFsH3gsg4nMToNd4CX/xkOIcZukN3JxRaO3L8W5nRThbV4ikB
+         3waKQ506FahqWsZRSlEeL7pe119sp5RIrmxOlLumdmvaEat1TVbMFPAl4FRZlNbUd2NO
+         eS1Q==
+X-Gm-Message-State: AOJu0Yxm7POxbvV6TipWyU1PFT/mBaMHLoOxMeyNgs02kJYWXK2TWq+i
+	yRbrjMJ/dGWF76AOT2kiStfbNds4vCK8uO5vwQhczOTOvvH5Gg==
+X-Google-Smtp-Source: AGHT+IGDYEM/D+VjDs53lbJVDTyoT0Bkv7iXApFmItzvgobWbxVZW0eXbIPiwJUhubc08jbCg8gVCb4oxy8r4PLOtqU=
+X-Received: by 2002:a2e:980a:0:b0:2bd:1ea9:f0fc with SMTP id
+ a10-20020a2e980a000000b002bd1ea9f0fcmr8939737ljj.21.1693881751359; Mon, 04
+ Sep 2023 19:42:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="irr8lLNCOaxgr3yC"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <837a03d12d8345bfa7e9874c1e7d9156@AcuMS.aculab.com>
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,FREEMAIL_REPLY,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=no
+References: <20230812091708.34665-3-arinc.unal@arinc9.com> <abc44324-454c-4524-b05e-fe989755ea47@arinc9.com>
+ <47b61929-5c2d-4906-b153-2046a94858c8@arinc9.com> <20230813112026.ohsx6srbt2staxma@skbuf>
+ <8a8e14f1-0493-4298-a2cc-6e7ae7929334@arinc9.com> <20230813190157.4y3zoro53qsz43pe@skbuf>
+ <f5f468c1-b5a2-4336-b1d9-fd82da95b21d@arinc9.com> <20230814143601.mnpxtcm2zybnbvoh@skbuf>
+ <0cee0928-74c9-4048-8cd8-70bfbfafd9b2@arinc9.com> <20230827121235.zog4c3ehu2cyd3jy@skbuf>
+ <676d1a2b-6ffa-4aff-8bed-a749c373f5b3@arinc9.com>
+In-Reply-To: <676d1a2b-6ffa-4aff-8bed-a749c373f5b3@arinc9.com>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Mon, 4 Sep 2023 23:42:19 -0300
+Message-ID: <CAJq09z6eghuHY+b2y-kGmjKnLiEEOABXGKhjnB-PxJ=-GtYD4w@mail.gmail.com>
+Subject: Re: [PATCH 2/4] dt-bindings: net: dsa: document internal MDIO bus
+To: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Florian Fainelli <f.fainelli@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
+	Linus Walleij <linus.walleij@linaro.org>, =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+	Daniel Golle <daniel@makrotopia.org>, Landen Chao <Landen.Chao@mediatek.com>, 
+	DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, mithat.guner@xeront.com, 
+	erkin.bozoglu@xeront.com, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mediatek@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+> > [1] ...this. The SMI-controlled and MDIO-controlled Realtek switches are
+> > otherwise the same, right? So why would they have different dt-bindings?
+>
+> Honestly, I'm wondering the answer to this as well. For some reason, when
+> probing the SMI controlled Realtek switches, instead of just letting
+> dsa_switch_setup() populate ds->slave_mii_bus, on realtek_smi_setup_mdio()
+> on realtek-smi.c:
+>
+> - priv->slave_mii_bus is allocated.
+> - mdio_np = of_get_compatible_child(priv->dev->of_node, "realtek,smi-mdio");
+> - priv->slave_mii_bus->dev.of_node = mdio_np;
+> - ds->slave_mii_bus = priv->slave_mii_bus;
 
---irr8lLNCOaxgr3yC
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+I might be able to help here. The Realtek SMI version created a custom
+slave_mii driver because it was the only way to associate it with an
+MDIO DT node. And that DT node was required to specify the interrupts
+for each phy0.
+It would work without that mdio node, letting DSA setup handle the
+slave bus, but it would rely only on polling for port status.
 
-On Mon, Sep 04, 2023 at 09:27:28AM +0000, David Laight wrote:
-> From: Eric Dumazet <edumazet@google.com>
-> > Sent: 04 September 2023 10:06
-> > To: David Laight <David.Laight@ACULAB.COM>
-> > Cc: David S . Miller <davem@davemloft.net>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni
-> > <pabeni@redhat.com>; netdev@vger.kernel.org; eric.dumazet@gmail.com; syzbot
-> > <syzkaller@googlegroups.com>; Kyle Zeng <zengyhkyle@gmail.com>; Kees Cook <keescook@chromium.org>;
-> > Vlastimil Babka <vbabka@suse.cz>
-> > Subject: Re: [PATCH net] net: deal with integer overflows in kmalloc_reserve()
-> > 
-> > On Mon, Sep 4, 2023 at 10:41 AM David Laight <David.Laight@aculab.com> wrote:
-> > >
-> > > From: Eric Dumazet
-> > > > Sent: 31 August 2023 19:38
-> > > >
-> > > > Blamed commit changed:
-> > > >     ptr = kmalloc(size);
-> > > >     if (ptr)
-> > > >       size = ksize(ptr);
-> > > >
-> > > > to:
-> > > >     size = kmalloc_size_roundup(size);
-> > > >     ptr = kmalloc(size);
-> > > >
-> > > > This allowed various crash as reported by syzbot [1]
-> > > > and Kyle Zeng.
-> > > >
-> > > > Problem is that if @size is bigger than 0x80000001,
-> > > > kmalloc_size_roundup(size) returns 2^32.
-> > > >
-> > > > kmalloc_reserve() uses a 32bit variable (obj_size),
-> > > > so 2^32 is truncated to 0.
-> > >
-> > > Can this happen on 32bit arch?
-> > > In that case kmalloc_size_roundup() will return 0.
-> > 
-> > Maybe, but this would be a bug in kmalloc_size_roundup()
-> 
-> That contains:
-> 	/* Short-circuit saturated "too-large" case. */
-> 	if (unlikely(size == SIZE_MAX))
-> 		return SIZE_MAX;
-> 
-> It can also return 0 on failure, I can't remember if kmalloc(0)
-> is guaranteed to be NULL (malloc(0) can do 'other things').
-> 
-> Which is entirely hopeless since MAX_SIZE is (size_t)-1.
-> 
-> IIRC kmalloc() has a size limit (max 'order' of pages) so
-> kmalloc_size_roundup() ought check for that (or its max value).
-> 
-> The final:
-> 	/* The flags don't matter since size_index is common to all. */
-> 	c = kmalloc_slab(size, GFP_KERNEL);
-> 	return c ? c->object_size : 0;
-> probably ought to return size if c is even NULL.
-> 
-> 	David
-> 
-> -
-> Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-> Registration No: 1397386 (Wales)
+As we only have a single internal MDIO, the compatible string
+"realtek,smi-mdio" would not be necessary if the driver checks for a
+"mdio"-named child node. Maybe the code was just inspired by another
+DSA driver that uses more MDIO buses or external ones. The "mdio" name
+is suggested by docs since it was committed
+(https://www.kernel.org/doc/Documentation/devicetree/bindings/net/dsa/realtek-smi.txt).
+That name was also kept in the YAML translation
+(https://www.kernel.org/doc/Documentation/devicetree/bindings/net/dsa/realtek.yaml).
 
-> It can also return 0 on failure, I can't remember if kmalloc(0)
-> is guaranteed to be NULL (malloc(0) can do 'other things').
-kmalloc(0) returns ZERO_SIZE_PTR (16).
+The Realtek MDIO driver was merged at the same release that included
+the change that allows dsa_switch_setup() to reference the "mdio"
+OF-node if present. That way, it could avoid creating a custom
+slave_mii_bus driver.
 
-My proposed patch is to check the return value of kmalloc, making sure it is neither NULL or ZERO_SIZE_PTR. The patch is attached. It should work for both 32bit and 64bit systems.
+I submitted a small series of patches to unify that behavior between
+those two drivers:
 
---irr8lLNCOaxgr3yC
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment;
-	filename="0001-properly-check-for-integer-overflow-in-__alloc_skb.patch"
+https://lore.kernel.org/netdev/CAJq09z44SNGFkCi_BCpQ+3DuXhKfGVsMubRYE7AezJsGGOboVA@mail.gmail.com/
+(This is my answer to the series opening message to include the first
+paragraph ate by the editor)
 
-From 034ac600c639bfa93c54e317ea3712538c749de6 Mon Sep 17 00:00:00 2001
-From: Kyle Zeng <zengyhkyle@gmail.com>
-Date: Mon, 28 Aug 2023 17:53:40 -0700
-Subject: [PATCH] properly check for integer overflow in __alloc_skb
+There was some discussion but not NAC, ACK or RFC. It would have
+dropped some lines of code. I can revive it if there is interest.
 
-kmalloc_reserve may return ZERO_SIZE_PTR(0x10) when integer overflow
-happens since size is controlled by users.
-Make sure we handle this case properly.
+Regards,
 
-Signed-off-by: Kyle Zeng <zengyhkyle@gmail.com>
----
- net/core/skbuff.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index a298992060e..f219fef5a16 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -642,7 +642,7 @@ struct sk_buff *__alloc_skb(unsigned int size, gfp_t gfp_mask,
- 	 * Both skb->head and skb_shared_info are cache line aligned.
- 	 */
- 	data = kmalloc_reserve(&size, gfp_mask, node, &pfmemalloc);
--	if (unlikely(!data))
-+	if (unlikely(ZERO_OR_NULL_PTR(data)))
- 		goto nodata;
- 	/* kmalloc_size_roundup() might give us more room than requested.
- 	 * Put skb_shared_info exactly at the end of allocated zone,
--- 
-2.34.1
-
-
---irr8lLNCOaxgr3yC--
+Luiz
 
