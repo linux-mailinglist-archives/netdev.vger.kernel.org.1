@@ -1,66 +1,76 @@
-Return-Path: <netdev+bounces-32096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9F8979233B
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 16:01:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D24A9792343
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 16:04:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A27611C209B8
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 14:01:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 170D3281209
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 14:04:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 610E8D527;
-	Tue,  5 Sep 2023 14:01:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AD7ED529;
+	Tue,  5 Sep 2023 14:04:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F51ED51F
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 14:01:00 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB206197
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 07:00:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=MkGH9dqOj1JGHR8MKUGPeijOi4+2Yf0aUnPnT6G1g/4=; b=SbtMkLevzN/6/riyAImnTLElA8
-	Wc5WRpeOdB0f1ZKmtVDR7F0PA5F3DRo5eIr1vOvfkRwVavNpLPWlPHIjzMebLm9gi7XaAoKlI7zFg
-	HW1mvLWLWj9danrFJ9lFWeWuN/B+LKs7E23cgxOugnf/x95Sr1qZsGxjK6I7pOh5OycCqG2vmwDKs
-	mhaV1x/50W6smXp91lv3emHHL24weJKpLJSWzFpoO0tSv7pRmHCxqHqdPsASgvGmnQZ7UTBxkpGWe
-	mXUyUfTJwwRvV1N/PeUoPkg5l7draiY6N8i94e68CnwQEUNIjST0Xid584sVg+PjKDKGyYZpTEapx
-	xyNPQCyg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54536)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qdWbo-0007w6-21;
-	Tue, 05 Sep 2023 15:00:48 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qdWbo-0003jZ-LM; Tue, 05 Sep 2023 15:00:48 +0100
-Date: Tue, 5 Sep 2023 15:00:48 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jijie Shao <shaojijie@huawei.com>, f.fainelli@gmail.com,
-	davem@davemloft.net, edumazet@google.com, hkallweit1@gmail.com,
-	kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
-	"shenjian15@huawei.com" <shenjian15@huawei.com>,
-	"liuyonglong@huawei.com" <liuyonglong@huawei.com>,
-	wangjie125@huawei.com, chenhao418@huawei.com,
-	Hao Lan <lanhao@huawei.com>,
-	"wangpeiyang1@huawei.com" <wangpeiyang1@huawei.com>
-Subject: Re: [PATCH net-next] net: phy: avoid kernel warning dump when
- stopping an errored PHY
-Message-ID: <ZPc0kHHMrNr0cgp/@shell.armlinux.org.uk>
-References: <aed0bc3b-2d48-2fd9-9587-5910ad68c180@gmail.com>
- <8e7e02d8-2b2a-8619-e607-fbac50706252@huawei.com>
- <fd08a80d-c70b-4943-8cca-b038f54f8eaa@lunn.ch>
- <29917acb-bd80-10e5-b1ae-c844ea0e9cbb@huawei.com>
- <99eade9d-a580-4519-8399-832e196d335a@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D456D2F0
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 14:04:29 +0000 (UTC)
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3EC4198;
+	Tue,  5 Sep 2023 07:04:28 -0700 (PDT)
+Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-52a250aa012so3541393a12.3;
+        Tue, 05 Sep 2023 07:04:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693922667; x=1694527467; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=L9psAb430jC90VCdqe63QauPmlT/EpRgnVSmF0m3boE=;
+        b=VH5HTP5wmcyWJl/2LQM5GmBBP9jl9m3EAhcre0cuhma5VOw4vBgxRrkdw8x3O72fao
+         CpiCFbgFAz5iqJDXG3LR7Z2bHAuJ31zvqvtHSRYFH9u0JEWdTSac17/Z1BL903qXSVRo
+         Yfuw7Ezujc0YWIeDF/lBF4PjQB1PIvo5cvzhZ/d7a1jO0qRvDumbKiZyDujWEgUoPYOa
+         1G5WXfO9pyrOYVQc20/xtidsOUj46c/5zVW+mK8Ud4fGUHRO6xU66dudqxcSoa0GLibp
+         aVLYP0D5ncKP3AQRewD2T39zMvFZ+kPg7vcxJRhnyk7MIY7XefN/VBMg2OO5EFZkNqsl
+         xHDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693922667; x=1694527467;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=L9psAb430jC90VCdqe63QauPmlT/EpRgnVSmF0m3boE=;
+        b=I/YX/cg5ee4uw6EOWCixhGwNglR+ejp2XhVf324GCc9rRZYlqpdH1/BJVTxGwT5I3L
+         y0W6u2pH1i5vCagG/FZn85g/uWP+oAxfcd6/jUDp/vu8Um7tllOEM6IcSedRzd/1s8Ls
+         mRBhyZNCPq/y789oaWMfmzDrDZltvu7DBQQLl9likR6UlfVq8iOki2bWL1BC6BM+2cTk
+         sO++tSqMdH4luy/xCS0pGRvX8qFogmS2vQuHUlr6LOXTRD1Ulg9z556WFG5azqIgBbfj
+         eHehq2IUbtDNMHuRmmEBRevlRzYKrd19zGnZQdtfcLX1Ldm29AKygBerC4VdLN0LrYRK
+         mHrA==
+X-Gm-Message-State: AOJu0YwhUdng2clnEz4y29Olu0+hwxF/okyA6pU6KUzPbIUmhcDTUjPz
+	t3e0UQ/GeG+mFZcSQU4/mdk=
+X-Google-Smtp-Source: AGHT+IE21Z/EFgzhQDzJSm0Hu31eOBpIi92vifw4CNSyPJg4tSrU3ibqgWuetSCsKEXTAorFGPQjjg==
+X-Received: by 2002:aa7:c3d4:0:b0:523:4bfa:b450 with SMTP id l20-20020aa7c3d4000000b005234bfab450mr9349362edr.27.1693922666576;
+        Tue, 05 Sep 2023 07:04:26 -0700 (PDT)
+Received: from skbuf ([188.26.57.165])
+        by smtp.gmail.com with ESMTPSA id c24-20020a056402121800b005256d4d58a6sm7129550edw.18.2023.09.05.07.04.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Sep 2023 07:04:26 -0700 (PDT)
+Date: Tue, 5 Sep 2023 17:04:23 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
+	davem@davemloft.net, Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>, Tristram.Ha@microchip.com,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, UNGLinuxDriver@microchip.com,
+	George McCollister <george.mccollister@gmail.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 RFC 4/4] net: dsa: hsr: Provide generic HSR
+ ksz_hsr_{join|leave} functions
+Message-ID: <20230905140423.weisoaygc2tjvezb@skbuf>
+References: <20230904120209.741207-1-lukma@denx.de>
+ <20230904120209.741207-5-lukma@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,53 +79,77 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <99eade9d-a580-4519-8399-832e196d335a@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <20230904120209.741207-5-lukma@denx.de>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Sep 05, 2023 at 02:09:29PM +0200, Andrew Lunn wrote:
-> > When we do a phy_stop(), hardware might be error and we can't access to
-> > mdio.And our process is read/write mdio failed first, then do phy_stop(),
-> > reset hardware and call phy_start() finally.
-> 
-> If the hardware/fimrware is already dead, you have to expect a stack
-> trace, because the once a second poll can happen, before you notice
-> the hardware/firmware is dead and call phy_stop().
-> 
-> You might want to also disconnect the PHY and reconnect it after the
-> reset.
+On Mon, Sep 04, 2023 at 02:02:09PM +0200, Lukasz Majewski wrote:
+> +static int ksz_hsr_leave(struct dsa_switch *ds, int port,
+> +			 struct net_device *hsr)
+> +{
+> +	struct dsa_port *partner = NULL, *dp;
+> +	struct ksz_device *dev = ds->priv;
+> +
+> +	dsa_hsr_foreach_port(dp, ds, hsr) {
+> +		if (dp->index != port) {
+> +			partner = dp;
+> +			break;
+> +		}
+> +	}
+> +
+> +	if (!partner)
+> +		return 0;
+> +
+> +	switch (dev->chip_id) {
+> +	case KSZ9477_CHIP_ID:
+> +		return ksz9477_hsr_leave(ds, port, hsr, partner);
+> +	default:
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+> +	return 0;
+> +}
 
-Andrew,
+It's hard for me to put this in the proper perspective in this email,
+since ksz9477_hsr_leave() is implemented in a different patch, so I'm
+just going to reproduce it here:
 
-I think that's what is being tried here, but there's a race between
-phy_stop() and phy_state_machine() which is screwing up phydev->state.
+int ksz9477_hsr_leave(struct dsa_switch *ds, int port, struct net_device *hsr,
+		      struct dsa_port *partner)
+{
+	struct ksz_device *dev = ds->priv;
 
-Honestly, the locking in phy_state_machine() is insane, allows this
-race to happen, and really needs fixing... and I think that the
-phydev->lock usage has become really insane over the years. We have
-some driver methods now which are always called with the lock held,
-others where the lock may or may not be held, and others where the
-lock isn't held - and none of this is documented.
+	/* Clear ports HSR support */
+	ksz_write32(dev, REG_HSR_PORT_MAP__4, 0);
 
-Please can you have a look at the four patches I've just posted as
-attached to my previous email. I think we need to start sorting out
-some of this crazyness and santising the locking.
+	/* Disable forwarding frames between HSR ports */
+	ksz_prmw32(dev, port, REG_PORT_VLAN_MEMBERSHIP__4, dev->hsr_ports, 0);
+	ksz_prmw32(dev, partner->index, REG_PORT_VLAN_MEMBERSHIP__4,
+		   dev->hsr_ports, 0);
 
-My four patches address most of it, except the call to phy_suspend().
-If that can be solved, then we can improve the locking more, and
-eliminate the race entirely.
+	/* Disable per port self-address filtering */
+	ksz_port_cfg(dev, port, REG_PORT_LUE_CTRL, PORT_SRC_ADDR_FILTER, false);
+	ksz_port_cfg(dev, partner->index, REG_PORT_LUE_CTRL,
+		     PORT_SRC_ADDR_FILTER, false);
 
-If we held the lock over the entire state machine function, then the
-problem that has been reported here would not exist - phy_stop()
-would not be able to "nip in" during the middle of the PHY state
-machine running, and thus we would not see the PHY_HALTED state
-overwritten by PHY_ERROR unexpectedly.
+	return 0;
+}
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+The code pattern from ksz_hsr_leave() is to disable HSR offload in both
+member ports, after *both* member ports have left the HSR device, correct?
+
+So it means that after this set of commands:
+
+ip link add name hsr0 type hsr slave1 lan1 slave2 lan2 supervision 45 version 1
+ip link set dev lan1 up
+ip link set dev lan2 up
+ip link set lan1 nomaster
+
+lan1 will still have HSR offload enabled, and forwarding enabled towards
+lan2, correct? That's not good, because lan1 is now a standalone port
+and should operate as such.
 
