@@ -1,95 +1,110 @@
-Return-Path: <netdev+bounces-32017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BF71792126
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 10:49:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2997379212E
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 10:52:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85FC41C2030B
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 08:49:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5151D28107C
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 08:52:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BE99566D;
-	Tue,  5 Sep 2023 08:49:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 302706135;
+	Tue,  5 Sep 2023 08:52:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D79028F8
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 08:49:36 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78659AA
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 01:49:35 -0700 (PDT)
-Received: from kwepemm600007.china.huawei.com (unknown [172.30.72.54])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RfzcJ50w7zGprd;
-	Tue,  5 Sep 2023 16:45:52 +0800 (CST)
-Received: from [10.69.136.139] (10.69.136.139) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Tue, 5 Sep 2023 16:49:31 +0800
-Message-ID: <29917acb-bd80-10e5-b1ae-c844ea0e9cbb@huawei.com>
-Date: Tue, 5 Sep 2023 16:49:31 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23A891C02
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 08:52:51 +0000 (UTC)
+Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BE73BF;
+	Tue,  5 Sep 2023 01:52:49 -0700 (PDT)
+Received: by mail-oi1-x236.google.com with SMTP id 5614622812f47-3a76d882052so1674888b6e.0;
+        Tue, 05 Sep 2023 01:52:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693903968; x=1694508768; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qKlFBdT69991S4JouznjRtmsXJ6kfeTl4DK2mPOKTKw=;
+        b=DZz/4IeaamMpxVBjZCugIsu7B7msWvnnsljoszWagQY7hsGxJ9kjtNNTTHmqCu8lNs
+         zF1foPNBbKEQyDFV5Ubb+IlkWTLCcAYHxMNhSIlc6llUyAv9cL/R6PuHKH+Cf/b4f1Xx
+         h/9vXkxKkVf6QBPdUgSd/Dc6CmnYpXGxlS4X4q0UjJo1eJW0DZacj2B8qKlFtu7dqzNZ
+         I9qtpBTfws8GwPcu7WQkHn+RFqxUSaxJxQHnJWFHjK5I3O1SlGmz1OTlQiOnjroN6RdS
+         NDz216kyB9BU1J4JRaFcdDP/Vk6zvZEUcO5fN73Y1IyxcWSDEjCsn5fFxTSP7jN5cXbK
+         3uyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693903968; x=1694508768;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qKlFBdT69991S4JouznjRtmsXJ6kfeTl4DK2mPOKTKw=;
+        b=ZhQw1iKJUBwUYEaZB6kbMxHV3nseo+f+7/dLimcOawygH8hxBV7FbOqy6rOBSOOsxb
+         f46w2HRisJ5GNu7yaqlXu5W2xQaCQ9PypO1vSIaBpntYvK2LY/BZtnNkjEQrnSf4EIyU
+         ENArEe2YbpJ0ZZuuIKiuwxXnnkDAf3ULE0IuEOoLTUvrV9TAZJcC6kU93bo4QQS6DgBp
+         jzZXRGnCct8+aN8aJSb88uTASk3zJTQjL42YVy4l9h+ehZpO6K5SSsOxU8DKE3M2EuAx
+         3a07r5QyqfIvvONuY4ojQ1Twxt/UcDIdSMQdZSPP98golIUTq8VxeKa8i9cQVBtJeDDh
+         Mfuw==
+X-Gm-Message-State: AOJu0YywrcKhfUhVoaJXm7dQYFvplRTSfg4b/l3NA6wz0FfQmt/KlZJH
+	gpSPArlKOS5p3dhmlgoLP/4=
+X-Google-Smtp-Source: AGHT+IGKsBYD96Y9PIesIV969naQHZRiGscrONh4e6FH/zoYp/Qr77D6jcDFGDxUve00lLjI5RAUhQ==
+X-Received: by 2002:a05:6358:3994:b0:13e:bd8d:c2a2 with SMTP id b20-20020a056358399400b0013ebd8dc2a2mr11467833rwe.23.1693903968280;
+        Tue, 05 Sep 2023 01:52:48 -0700 (PDT)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id x52-20020a056a000bf400b0063b898b3502sm8606742pfu.153.2023.09.05.01.52.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Sep 2023 01:52:47 -0700 (PDT)
+Date: Tue, 5 Sep 2023 16:52:43 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Ziyang Xuan <william.xuanziyang@huawei.com>
+Cc: jiri@resnulli.us, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2] team: fix null-ptr-deref when team device type is
+ changed
+Message-ID: <ZPbsW/bOGeO9Ww8+@Laptop-X1>
+References: <20230905074638.3304732-1-william.xuanziyang@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <f.fainelli@gmail.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <hkallweit1@gmail.com>, <kuba@kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <rmk+kernel@armlinux.org.uk>,
-	"shenjian15@huawei.com" <shenjian15@huawei.com>, "liuyonglong@huawei.com"
-	<liuyonglong@huawei.com>, <wangjie125@huawei.com>, <chenhao418@huawei.com>,
-	Hao Lan <lanhao@huawei.com>, "wangpeiyang1@huawei.com"
-	<wangpeiyang1@huawei.com>
-Subject: Re: [PATCH net-next] net: phy: avoid kernel warning dump when
- stopping an errored PHY
-To: Andrew Lunn <andrew@lunn.ch>
-References: <aed0bc3b-2d48-2fd9-9587-5910ad68c180@gmail.com>
- <8e7e02d8-2b2a-8619-e607-fbac50706252@huawei.com>
- <fd08a80d-c70b-4943-8cca-b038f54f8eaa@lunn.ch>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <fd08a80d-c70b-4943-8cca-b038f54f8eaa@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.69.136.139]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm600007.china.huawei.com (7.193.23.208)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230905074638.3304732-1-william.xuanziyang@huawei.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Tue, Sep 05, 2023 at 03:46:38PM +0800, Ziyang Xuan wrote:
+> diff --git a/drivers/net/team/team.c b/drivers/net/team/team.c
+> index d3dc22509ea5..12fb5f4cff06 100644
+> --- a/drivers/net/team/team.c
+> +++ b/drivers/net/team/team.c
+> @@ -2127,7 +2127,10 @@ static const struct ethtool_ops team_ethtool_ops = {
+>  static void team_setup_by_port(struct net_device *dev,
+>  			       struct net_device *port_dev)
+>  {
+> -	dev->header_ops	= port_dev->header_ops;
+> +	if (port_dev->type == ARPHRD_ETHER)
+> +		dev->header_ops	= &eth_header_ops;
+> +	else
+> +		dev->header_ops	= port_dev->header_ops;
+>  	dev->type = port_dev->type;
+>  	dev->hard_header_len = port_dev->hard_header_len;
+>  	dev->needed_headroom = port_dev->needed_headroom;
 
-on 2023/9/4 21:43, Andrew Lunn wrote:
-> On Mon, Sep 04, 2023 at 05:50:32PM +0800, Jijie Shao wrote:
->> Hi all,
->> We encountered an issue when resetting our netdevice recently, it seems
->> related to this patch.
->>
->> During our process, we stop phy first and call phy_start() later.
->> phy_check_link_status returns error because it read mdio failed. The
->> reason why it happened is that the cmdq is unusable when we reset and we
->> can't access to mdio.
-> At what point in the flow below do you apply the reset which stops
-> access to the MDIO bus? Ideally you want to do phy_stop(), then apply
-> the reset, get the hardware working again, and then do a phy_start().
->
+Hmm.. Do we need to export eth_header_ops? I got error like
+ERROR: modpost: "eth_header_ops" [drivers/net/team/team.ko] undefined!
 
-When we do a phy_stop(), hardware might be error and we can't access to
-mdio.And our process is read/write mdio failed first, then do phy_stop(),
-reset hardware and call phy_start() finally.
+But I saw function loopback_setup() could reference this. Not sure what
+I missed here.
 
-We note there are several times lock during phy_state_machine(). The first
-is to handle phydev state. It's noting that a competition of phydev lock
-happend again if phy_check_link_status() returns an error. Why we don't
-held lock until changing state to PHY_ERROR if phy_check_link_status()
-returns an error?
-
-Jijie Shao
-
+Thanks
+Hangbin
 
