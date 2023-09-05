@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-32112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52815792CB8
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 19:48:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC8D4792CB9
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 19:49:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CA681C209CA
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 17:48:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87E2F2811FB
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 17:49:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40869DDB2;
-	Tue,  5 Sep 2023 17:48:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29092DDBC;
+	Tue,  5 Sep 2023 17:48:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7645CA7D
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 17:48:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06B6FC433C8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9808CDDB0
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 17:48:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E41D3C433C9;
 	Tue,  5 Sep 2023 17:48:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693936128;
-	bh=kR9BQTLsggdv2cDgnEPwaNqdQIrxJs5taW7mou0zPsE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=YOU1oNLQlgeBMLjgcTPGDV05EZNEuXGQISq+/OL19+OPluWMv1CWB9YQwR/RD3b2e
-	 +7eUSRUw2ciZECm9nO/PUmTWNgIjwQFMPv8e374zFOImoRWZz8ykRO1plUG1AMlexH
-	 DFt1+XaxFnEqVGncKVTd/wevpQRn1b6qM9Ygv2hM6KBCEYrK0tZh+DPSFcHpeMQnoX
-	 WeqU1j/0wgAP2K9Eq7rPqktTq0oTzlcBqqWOniVv31mDJSKuElSGVRRfGuQJgPOKXt
-	 xnR+HHQJbIAiF4F08yIE/jmdxqf+GeVl5V8JGJW+uo9vbRPqayqAblRmp1AIsY5moM
-	 TxEMXJaRgeEtQ==
+	s=k20201202; t=1693936129;
+	bh=BB8SGk1oflsAIsNYnjk5FTtlvzpq0nOvXRrJvmd7exo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Bwq/I8PWm78lze1v0l2GpFRm0RiF3IVHRhdqxyVYeEmzVTNr+/1mEsuON13n6T4Z+
+	 Xootk+RxJmsLFwI9CvCLKmnq00ziFi315ik9CFoapCOuEB91rVlU/t/FA0vCBxlOgX
+	 /Lk6WVKEPo7tCTYLqh1YCt1lYC/FwoQPjHuChc///CaLinst9Hx4DD6GVeyOaFjWig
+	 4d60uCdZnhM8/XBY5RLAJ5kffF8TmcXR+ejaPJs3Y8lRKbTQrQb+nezMxHNa7lnzxh
+	 2fuuBznqGaWhOzofJARhZEfyhe6jDF7+VFUv3HcbK4M0CMyOXQBOZhhC5O1J4gQsSR
+	 GUxYph860D0zQ==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -38,12 +38,14 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Jianbo Liu <jianbol@nvidia.com>,
-	Vlad Buslov <vladbu@nvidia.com>
-Subject: [PATCH net 1/2] net/mlx5e: Clear mirred devices array if the rule is split
-Date: Tue,  5 Sep 2023 10:48:45 -0700
-Message-ID: <20230905174846.24124-1-saeed@kernel.org>
+	Bodong Wang <bodong@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>
+Subject: [PATCH net 2/2] mlx5/core: E-Switch, Create ACL FT for eswitch manager in switchdev mode
+Date: Tue,  5 Sep 2023 10:48:46 -0700
+Message-ID: <20230905174846.24124-2-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230905174846.24124-1-saeed@kernel.org>
+References: <20230905174846.24124-1-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,134 +54,171 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jianbo Liu <jianbol@nvidia.com>
+From: Bodong Wang <bodong@nvidia.com>
 
-In the cited commit, the mirred devices are recorded and checked while
-parsing the actions. In order to avoid system crash, the duplicate
-action in a single rule is not allowed.
+ACL flow table is required in switchdev mode when metadata is enabled,
+driver creates such table when loading each vport. However, not every
+vport is loaded in switchdev mode. Such as ECPF if it's the eswitch manager.
+In this case, ACL flow table is still needed.
 
-But the rule is actually break down into several FTEs in different
-tables, for either mirroring, or the specified types of actions which
-use post action infrastructure.
+To make it modularized, create ACL flow table for eswitch manager as
+default and skip such operations when loading manager vport.
 
-It will reject certain action list by mistake, for example:
-    actions:enp8s0f0_1,set(ipv4(ttl=63)),enp8s0f0_0,enp8s0f0_1.
-Here the rule is split to two FTEs because of pedit action.
+Also, there is no need to load the eswitch manager vport in switchdev mode.
+This means there is no need to load it on regular connect-x HCAs where
+the PF is the eswitch manager. This will avoid creating duplicate ACL
+flow table for host PF vport.
 
-To fix this issue, when parsing the rule actions, reset if_count to
-clear the mirred devices array if the rule is split to multiple
-FTEs, and then the duplicate checking is restarted.
-
-Fixes: 554fe75c1b3f ("net/mlx5e: Avoid duplicating rule destinations")
-Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
-Reviewed-by: Vlad Buslov <vladbu@nvidia.com>
+Fixes: 29bcb6e4fe70 ("net/mlx5e: E-Switch, Use metadata for vport matching in send-to-vport rules")
+Fixes: eb8e9fae0a22 ("mlx5/core: E-Switch, Allocate ECPF vport if it's an eswitch manager")
+Fixes: 5019833d661f ("net/mlx5: E-switch, Introduce helper function to enable/disable vports")
+Signed-off-by: Bodong Wang <bodong@nvidia.com>
+Reviewed-by: Mark Bloch <mbloch@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/ct.c        | 4 +++-
- drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/mirred.c    | 1 +
- drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/pedit.c     | 4 +++-
- .../ethernet/mellanox/mlx5/core/en/tc/act/redirect_ingress.c  | 1 +
- drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/vlan.c      | 1 +
- .../net/ethernet/mellanox/mlx5/core/en/tc/act/vlan_mangle.c   | 4 +++-
- drivers/net/ethernet/mellanox/mlx5/core/en_tc.c               | 1 +
- 7 files changed, 13 insertions(+), 3 deletions(-)
+ .../net/ethernet/mellanox/mlx5/core/eswitch.c | 21 ++++++--
+ .../mellanox/mlx5/core/eswitch_offloads.c     | 49 +++++++++++++------
+ 2 files changed, 51 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/ct.c b/drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/ct.c
-index 92d3952dfa8b..feeb41693c17 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/ct.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/ct.c
-@@ -17,8 +17,10 @@ tc_act_parse_ct(struct mlx5e_tc_act_parse_state *parse_state,
- 	if (err)
- 		return err;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
+index 6cd7d6497e10..d4cde6555063 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
+@@ -1276,12 +1276,19 @@ int
+ mlx5_eswitch_enable_pf_vf_vports(struct mlx5_eswitch *esw,
+ 				 enum mlx5_eswitch_vport_event enabled_events)
+ {
++	bool pf_needed;
+ 	int ret;
  
--	if (mlx5e_is_eswitch_flow(parse_state->flow))
-+	if (mlx5e_is_eswitch_flow(parse_state->flow)) {
- 		attr->esw_attr->split_count = attr->esw_attr->out_count;
-+		parse_state->if_count = 0;
++	pf_needed = mlx5_core_is_ecpf_esw_manager(esw->dev) ||
++		    esw->mode == MLX5_ESWITCH_LEGACY;
++
+ 	/* Enable PF vport */
+-	ret = mlx5_eswitch_load_pf_vf_vport(esw, MLX5_VPORT_PF, enabled_events);
+-	if (ret)
+-		return ret;
++	if (pf_needed) {
++		ret = mlx5_eswitch_load_pf_vf_vport(esw, MLX5_VPORT_PF,
++						    enabled_events);
++		if (ret)
++			return ret;
 +	}
  
- 	attr->flags |= MLX5_ATTR_FLAG_CT;
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/mirred.c b/drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/mirred.c
-index 291193f7120d..f63402c48028 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/mirred.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/mirred.c
-@@ -294,6 +294,7 @@ parse_mirred_ovs_master(struct mlx5e_tc_act_parse_state *parse_state,
- 	if (err)
- 		return err;
- 
-+	parse_state->if_count = 0;
- 	esw_attr->out_count++;
- 	return 0;
+ 	/* Enable external host PF HCA */
+ 	ret = host_pf_enable_hca(esw->dev);
+@@ -1317,7 +1324,8 @@ mlx5_eswitch_enable_pf_vf_vports(struct mlx5_eswitch *esw,
+ ecpf_err:
+ 	host_pf_disable_hca(esw->dev);
+ pf_hca_err:
+-	mlx5_eswitch_unload_pf_vf_vport(esw, MLX5_VPORT_PF);
++	if (pf_needed)
++		mlx5_eswitch_unload_pf_vf_vport(esw, MLX5_VPORT_PF);
+ 	return ret;
  }
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/pedit.c b/drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/pedit.c
-index 3b272bbf4c53..368a95fa77d3 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/pedit.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/pedit.c
-@@ -98,8 +98,10 @@ tc_act_parse_pedit(struct mlx5e_tc_act_parse_state *parse_state,
  
- 	attr->action |= MLX5_FLOW_CONTEXT_ACTION_MOD_HDR;
+@@ -1335,7 +1343,10 @@ void mlx5_eswitch_disable_pf_vf_vports(struct mlx5_eswitch *esw)
+ 	}
  
--	if (ns_type == MLX5_FLOW_NAMESPACE_FDB)
-+	if (ns_type == MLX5_FLOW_NAMESPACE_FDB) {
- 		esw_attr->split_count = esw_attr->out_count;
-+		parse_state->if_count = 0;
+ 	host_pf_disable_hca(esw->dev);
+-	mlx5_eswitch_unload_pf_vf_vport(esw, MLX5_VPORT_PF);
++
++	if (mlx5_core_is_ecpf_esw_manager(esw->dev) ||
++	    esw->mode == MLX5_ESWITCH_LEGACY)
++		mlx5_eswitch_unload_pf_vf_vport(esw, MLX5_VPORT_PF);
+ }
+ 
+ static void mlx5_eswitch_get_devlink_param(struct mlx5_eswitch *esw)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
+index 752fb0dfb111..b296ac52a439 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
+@@ -3216,26 +3216,47 @@ esw_vport_destroy_offloads_acl_tables(struct mlx5_eswitch *esw,
+ 	esw_acl_ingress_ofld_cleanup(esw, vport);
+ }
+ 
+-static int esw_create_uplink_offloads_acl_tables(struct mlx5_eswitch *esw)
++static int esw_create_offloads_acl_tables(struct mlx5_eswitch *esw)
+ {
+-	struct mlx5_vport *vport;
++	struct mlx5_vport *uplink, *manager;
++	int ret;
+ 
+-	vport = mlx5_eswitch_get_vport(esw, MLX5_VPORT_UPLINK);
+-	if (IS_ERR(vport))
+-		return PTR_ERR(vport);
++	uplink = mlx5_eswitch_get_vport(esw, MLX5_VPORT_UPLINK);
++	if (IS_ERR(uplink))
++		return PTR_ERR(uplink);
++
++	ret = esw_vport_create_offloads_acl_tables(esw, uplink);
++	if (ret)
++		return ret;
++
++	manager = mlx5_eswitch_get_vport(esw, esw->manager_vport);
++	if (IS_ERR(manager)) {
++		ret = PTR_ERR(manager);
++		goto err_manager;
 +	}
  
- 	return 0;
+-	return esw_vport_create_offloads_acl_tables(esw, vport);
++	ret = esw_vport_create_offloads_acl_tables(esw, manager);
++	if (ret)
++		goto err_manager;
++
++	return 0;
++
++err_manager:
++	esw_vport_destroy_offloads_acl_tables(esw, uplink);
++	return ret;
  }
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/redirect_ingress.c b/drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/redirect_ingress.c
-index ad09a8a5f36e..2d1d4a04501b 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/redirect_ingress.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/redirect_ingress.c
-@@ -66,6 +66,7 @@ tc_act_parse_redirect_ingress(struct mlx5e_tc_act_parse_state *parse_state,
+ 
+-static void esw_destroy_uplink_offloads_acl_tables(struct mlx5_eswitch *esw)
++static void esw_destroy_offloads_acl_tables(struct mlx5_eswitch *esw)
+ {
+ 	struct mlx5_vport *vport;
+ 
+-	vport = mlx5_eswitch_get_vport(esw, MLX5_VPORT_UPLINK);
+-	if (IS_ERR(vport))
+-		return;
++	vport = mlx5_eswitch_get_vport(esw, esw->manager_vport);
++	if (!IS_ERR(vport))
++		esw_vport_destroy_offloads_acl_tables(esw, vport);
+ 
+-	esw_vport_destroy_offloads_acl_tables(esw, vport);
++	vport = mlx5_eswitch_get_vport(esw, MLX5_VPORT_UPLINK);
++	if (!IS_ERR(vport))
++		esw_vport_destroy_offloads_acl_tables(esw, vport);
+ }
+ 
+ int mlx5_eswitch_reload_reps(struct mlx5_eswitch *esw)
+@@ -3280,7 +3301,7 @@ static int esw_offloads_steering_init(struct mlx5_eswitch *esw)
+ 	}
+ 	esw->fdb_table.offloads.indir = indir;
+ 
+-	err = esw_create_uplink_offloads_acl_tables(esw);
++	err = esw_create_offloads_acl_tables(esw);
  	if (err)
- 		return err;
+ 		goto create_acl_err;
  
-+	parse_state->if_count = 0;
- 	esw_attr->out_count++;
- 
- 	return 0;
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/vlan.c b/drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/vlan.c
-index c8a3eaf189f6..a13c5e707b83 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/vlan.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/vlan.c
-@@ -166,6 +166,7 @@ tc_act_parse_vlan(struct mlx5e_tc_act_parse_state *parse_state,
- 		return err;
- 
- 	esw_attr->split_count = esw_attr->out_count;
-+	parse_state->if_count = 0;
- 
- 	return 0;
+@@ -3321,7 +3342,7 @@ static int esw_offloads_steering_init(struct mlx5_eswitch *esw)
+ create_restore_err:
+ 	esw_destroy_offloads_table(esw);
+ create_offloads_err:
+-	esw_destroy_uplink_offloads_acl_tables(esw);
++	esw_destroy_offloads_acl_tables(esw);
+ create_acl_err:
+ 	mlx5_esw_indir_table_destroy(esw->fdb_table.offloads.indir);
+ create_indir_err:
+@@ -3337,7 +3358,7 @@ static void esw_offloads_steering_cleanup(struct mlx5_eswitch *esw)
+ 	esw_destroy_offloads_fdb_tables(esw);
+ 	esw_destroy_restore_table(esw);
+ 	esw_destroy_offloads_table(esw);
+-	esw_destroy_uplink_offloads_acl_tables(esw);
++	esw_destroy_offloads_acl_tables(esw);
+ 	mlx5_esw_indir_table_destroy(esw->fdb_table.offloads.indir);
+ 	mutex_destroy(&esw->fdb_table.offloads.vports.lock);
  }
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/vlan_mangle.c b/drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/vlan_mangle.c
-index 310b99230760..f17575b09788 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/vlan_mangle.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/vlan_mangle.c
-@@ -65,8 +65,10 @@ tc_act_parse_vlan_mangle(struct mlx5e_tc_act_parse_state *parse_state,
- 	if (err)
- 		return err;
- 
--	if (ns_type == MLX5_FLOW_NAMESPACE_FDB)
-+	if (ns_type == MLX5_FLOW_NAMESPACE_FDB) {
- 		attr->esw_attr->split_count = attr->esw_attr->out_count;
-+		parse_state->if_count = 0;
-+	}
- 
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-index 318083690fcd..c24828b688ac 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-@@ -3936,6 +3936,7 @@ parse_tc_actions(struct mlx5e_tc_act_parse_state *parse_state,
- 			}
- 
- 			i_split = i + 1;
-+			parse_state->if_count = 0;
- 			list_add(&attr->list, &flow->attrs);
- 		}
- 
 -- 
 2.41.0
 
