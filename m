@@ -1,272 +1,381 @@
-Return-Path: <netdev+bounces-32091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CC2B792325
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 15:48:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3676792327
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 15:48:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 341E41C209A5
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 13:48:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01A622811B4
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 13:48:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24AD9D519;
-	Tue,  5 Sep 2023 13:48:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F7E2D51D;
+	Tue,  5 Sep 2023 13:48:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14994CA57
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 13:47:59 +0000 (UTC)
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 233B3191;
-	Tue,  5 Sep 2023 06:47:55 -0700 (PDT)
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 4041A86575;
-	Tue,  5 Sep 2023 15:47:52 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1693921672;
-	bh=FEDFXScdTgxVh47ZYyWs06//HWJO6IlGc0m4jNQNqUQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Tkr2EcB1EqH0pMA3M4fk8QgrS84FOjxpcc00UfIFH7GHt5RXf7rneRiTg7xfncdML
-	 Y0JjjyuzJl0WKkPKYnTWuStCPS0PB7aL6s0UGbMBP2tBuy3RKpS11ZjkbXq4Kgk7ca
-	 Mm9J0Fu/8jao1q4MVn9jnkDPL8iaWdYh+AoC+yVfPlOLp71RDro75OB+5QKYvKK4D0
-	 3PNsCLf8cUrxzbJYsYWrvWHO+A4G3HB8k8GPw9enGpN5Zoaxi8yvhTp23AX07Iqovx
-	 SsoAANiFAF0Dm9pJFSCKBIB687aTbuoGsX25gt4CtYTyZFYc1Uo0uO6pCcN14GtXBR
-	 Cw2b1ETKZ5aGA==
-Date: Tue, 5 Sep 2023 15:47:44 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
- davem@davemloft.net, Paolo Abeni <pabeni@redhat.com>, Woojung Huh
- <woojung.huh@microchip.com>, Tristram.Ha@microchip.com, Florian Fainelli
- <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- UNGLinuxDriver@microchip.com, George McCollister
- <george.mccollister@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 RFC 4/4] net: dsa: hsr: Provide generic HSR
- ksz_hsr_{join|leave} functions
-Message-ID: <20230905154744.648c1a8b@wsk>
-In-Reply-To: <20230905120501.tvkrrzcneq4fdzqa@skbuf>
-References: <20230904120209.741207-1-lukma@denx.de>
-	<20230904120209.741207-1-lukma@denx.de>
-	<20230904120209.741207-5-lukma@denx.de>
-	<20230904120209.741207-5-lukma@denx.de>
-	<20230905104725.zy3lwbxjhqhqyzdj@skbuf>
-	<20230905132351.2e129d53@wsk>
-	<20230905120501.tvkrrzcneq4fdzqa@skbuf>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62034D517
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 13:48:31 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F716191
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 06:48:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=18jntY8SRDdOKiJZsjQk5aSWqdopr2e4UMzV5sK8Pvs=; b=QQMIPSehMIVy0GUK4dzzZwb1Tt
+	So00TgDx7244R3beSmoVrm/TbSidcmlJ3k+UNbSQzoytTkvR1csi1T6p5Svsz2HZV/fEByCFiFaKq
+	tRv95n0fDE9lWCwoWHO7ODaRnUpgYUWk8aELWwgINLgfn16KA/pPb8VqEI0mlmCwF+3C5SSnTmfsu
+	kjiQGFynajpFUFJlSpafCMLE6kcWijlMAf0OymOHJDCV/ei7ltCcxI0ytIbxrzvfOCoojSCu7Jf7q
+	vy5rbE7RIgG8O2qRkG+JWUha9ncaqxWoHOSWJWq+419vilrZKCl4qwm0YRRIYh5r64GN2huc0QDJF
+	F90b/CVA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53228)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qdWPf-0007vH-2g;
+	Tue, 05 Sep 2023 14:48:15 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qdWPc-0003jQ-UP; Tue, 05 Sep 2023 14:48:12 +0100
+Date: Tue, 5 Sep 2023 14:48:12 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, f.fainelli@gmail.com, davem@davemloft.net,
+	edumazet@google.com, hkallweit1@gmail.com, kuba@kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com,
+	"shenjian15@huawei.com" <shenjian15@huawei.com>,
+	"liuyonglong@huawei.com" <liuyonglong@huawei.com>,
+	wangjie125@huawei.com, chenhao418@huawei.com,
+	Hao Lan <lanhao@huawei.com>,
+	"wangpeiyang1@huawei.com" <wangpeiyang1@huawei.com>
+Subject: Re: [PATCH net-next] net: phy: avoid kernel warning dump when
+ stopping an errored PHY
+Message-ID: <ZPcxnHjDJIMe3xt5@shell.armlinux.org.uk>
+References: <aed0bc3b-2d48-2fd9-9587-5910ad68c180@gmail.com>
+ <8e7e02d8-2b2a-8619-e607-fbac50706252@huawei.com>
+ <fd08a80d-c70b-4943-8cca-b038f54f8eaa@lunn.ch>
+ <29917acb-bd80-10e5-b1ae-c844ea0e9cbb@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/+hut5hP6N6FM.lYbJUHQWJL";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/mixed; boundary="Y86eQW0HPYCMXbQD"
+Content-Disposition: inline
+In-Reply-To: <29917acb-bd80-10e5-b1ae-c844ea0e9cbb@huawei.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
+	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---Sig_/+hut5hP6N6FM.lYbJUHQWJL
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
 
-Hi Vladimir,
+--Y86eQW0HPYCMXbQD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> On Tue, Sep 05, 2023 at 01:23:51PM +0200, Lukasz Majewski wrote:
-> > > Should be squashed into patch 3/4. The split does not make the
-> > > code easier to review for me. =20
-> >=20
-> > So you recommend to have only one patch in which the hsr_join{leave}
-> > function from ksz_common.c and ksz9477_hsr_join{leave} from
-> > ksz9477.c are added? =20
->=20
-> Correct. In addition, patch 1/4 will be dropped. So there will be 2
-> patches, one on net/dsa/tag_ksz.c and the other on
-> drivers/net/dsa/microchip/.
+On Tue, Sep 05, 2023 at 04:49:31PM +0800, Jijie Shao wrote:
+> We note there are several times lock during phy_state_machine(). The first
+> is to handle phydev state. It's noting that a competition of phydev lock
+> happend again if phy_check_link_status() returns an error. Why we don't
+> held lock until changing state to PHY_ERROR if phy_check_link_status()
+> returns an error?
 
-Ok.
+You are quite correct that isn't very good. We can easily get rid of
+some of this mess, but I don't think all which leaves it still open to
+the race you describe.
 
->=20
-> > > I don't see any restriction to allow offloading a single HSR
-> > > device. =20
-> >=20
-> > As I've written in the other response - I've followed the xrs700x.c
-> > convention.  =20
->=20
-> "the xrs700x.c convention"
->=20
-> xrs700x_hsr_join():
->=20
-> 	/* Only ports 1 and 2 can be HSR/PRP redundant ports. */
-> 	if (port !=3D 1 && port !=3D 2)
-> 		return -EOPNOTSUPP;
->=20
-> So, checking for ports 1 and 2 is a stronger condition than the one
-> I'm asking you to enforce.
->=20
-> The KSZ9477 is more flexible. It can enable HSR offload on any 2
-> ports, not just on ports 1 and 2. But it can still be 2 ports max, no
-> more. You haven't copied the xrs700x convention, but you haven't
-> adapted it, either.
+The problem is phy_suspend().
 
-Ok. I've misuderstood your suggestion. You were asking about having one
-hsr offloaded setup (hsr0 =3D> lan1 + lan2) and in the same time
-non-offloaded setup (hsr1 =3D> lan3 + lan4).
+First, it calls phy_ethtool_get_wol() which takes the phydev lock. This
+can be dealt with if we save the state at probe time, and then update
+the state when phy_ethtool_set_wol() is called.
 
->=20
-> > Moreover, for me it seems more natural, that we only allow full HSR
-> > support for 2 ports or none. Please be aware, that HSR supposed to
-> > support only 2 ports, and having only one working is not
-> > recommended by vendor. =20
->=20
-> And where is it enforced that full HSR offload is only applied to 2
-> ports or none?
+Second, phy_suspend() calls ->suspend without holding the phydev lock,
+and holding the lock while calling that may not be safe. Having had a
+brief look over the implementations (but not delving into any PTP
+function they may call) does seem to suggest that shouldn't be a big
+problem, but I don't know whether holding the phydev lock while calling
+PTP functions is likely to cause issues.
 
-In the ksz_jsr_join() at ksz_common.c -> we exit from this function
-when !partner.
+However, looking at that has lead me to the conclusion that there is a
+lot of duplication of WoL condition testing. phy_suspend() already
+avoids calling ->suspend() if either phy_ethtool_get_wol() indicates
+that WoL is enabled, or if the netdev says WoL is enabled.
 
->=20
-> > > Looking at patch 3/4, that will obviously not work due to some
-> > > hardware registers which are global and would be overwritten by
-> > > the second HSR device. =20
-> >=20
-> > I cannot guarantee that there will not be any "side effects" with
-> > this approach. And to be honest - I would prefer to spent time on
-> > testing recommended setups. =20
->=20
-> Please read my reply again, keeping in mind that by "HSR device" I
-> mean "hsr0" in the commands below, and not the member ports as you've
-> assumed when responding.
+Many of the ->suspend() implementations, for example,
+lan88xx_suspend(), dp83822_suspend(), etc test some kind of flag to
+determine whether WoL is enabled and thus seem to be re-implementing
+what phy_suspend() is already doing. I think there is scope to delete
+this code from several drivers.
 
-Yes. I do get your point.
+The easy bits are the patches I've attached to this email. These
+won't on their own be sufficient to close the race you've identified
+due to the phy_suspend() issue, but are the best we can do until we
+can work out what to do about that.
 
->=20
-> > >=20
-> > > For example, a5psw_port_bridge_join() has a similar restriction to
-> > > offload a single bridge device. =20
-> >=20
-> > HSR is IMHO a bit different than plain "bridge" offloading. =20
->=20
-> Maybe this was not clear, but by "similar" I mean: if you replace the
-> "bridge" word with "hsr", and you copy that code snippet from a5psw,
-> you get the desired outcome.
->=20
-> static int ksz_hsr_join(struct dsa_switch *ds, int port, struct
-> net_device *hsr, /* optionally pass the extack argument from the
-> caller */) {
-> 	struct ksz_device *dev =3D ds->priv;
->=20
-> 	/* We only support 1 HSR device */
-> 	if (dev->hsr_dev && hsr !=3D dev->hsr_dev) {
-> 		NL_SET_ERR_MSG_MOD(extack,
-> 				   "Offload supported for a single
-> HSR"); return -EOPNOTSUPP;
-> 	}
->=20
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
-Ok.
+--Y86eQW0HPYCMXbQD
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-net-phy-always-call-phy_process_state_change-under-l.patch"
 
-> 	dev->hsr_dev =3D hsr;
->=20
-> 	...
->=20
-> 	return 0;
-> }
->=20
-> I did not imply that HSR is not different than bridge offloading.
-> I don't see how that is even related to the discussion.
->=20
-> > > If you return -EOPNOTSUPP, then DSA should fall back to an
-> > > unoffloaded, 100% software-based HSR device, and that should work
-> > > too.  =20
-> >=20
-> > And then we would have one port with SW HSR and another one with HW
-> > HSR? =20
->=20
-> No. One HSR device (hsr0, with 2 member ports) with offload and one
-> HSR device (hsr1, with 2 member ports) without offload (see (b)
-> below).
->=20
-> > >It would be good if you could verify that the unoffloaded HSR
-> > > works well after the changes too. =20
-> >=20
-> > I've tested on KSZ9477-EVB the SW HSR operation with two ports (and
-> > two or three boards) and HW HSR offloading. Results are presented
-> > in the cover-letter. =20
->=20
-> "results in the cover letter"
->=20
-> Results:
-> With KSZ9477 offloading support added: RX: 100 Mbps TX: 98 Mbps
-> With no offloading                     RX: 63 Mbps  TX: 63 Mbps
->=20
-> What was the setup for the "no offloading" case?
->=20
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Subject: [PATCH net-next 1/3] net: phy: always call phy_process_state_change()
+ under lock
 
-I used two boards. I've used the same kernel with and without HSR
-offloading patches.
+phy_stop() calls phy_process_state_change() while holding the phydev
+lock, so also arrange for phy_state_machine() to do the same, so that
+this function is called with consistent locking.
 
-Cables were connected to port1 and port2 on each board. Non HSR network
-was connected to port3.
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/phy/phy.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> (a) kernel did not contain the offloading patch set
->=20
-
-Yes.
-
-> (b) the testing was on hsr1, in the situation below:
->=20
-> ip link add name hsr0 type hsr slave1 lan1 slave2 lan2 supervision 45
-> version 1 # offloaded ip link add name hsr1 type hsr slave1 lan3
-> slave2 lan4 supervision 45 version 1 # unoffloaded
->=20
-
-I did not setup two hsr devices on the same board. I've used two boards
-with hsr0 setup on each.
-
-> (d) in some other way (please detail)
->=20
-> I was specifically asking about situation (b).
-
-I did not tested the hsr0, hsr1 as my (real) use case is with KSZ9477
-having only 3 ports available for connection (port 1,2,3).
+diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+index df54c137c5f5..1e5218935eb3 100644
+--- a/drivers/net/phy/phy.c
++++ b/drivers/net/phy/phy.c
+@@ -1506,6 +1506,7 @@ void phy_state_machine(struct work_struct *work)
+ 	if (err < 0)
+ 		phy_error_precise(phydev, func, err);
+ 
++	mutex_lock(&phydev->lock);
+ 	phy_process_state_change(phydev, old_state);
+ 
+ 	/* Only re-schedule a PHY state machine change if we are polling the
+@@ -1516,7 +1517,6 @@ void phy_state_machine(struct work_struct *work)
+ 	 * state machine would be pointless and possibly error prone when
+ 	 * called from phy_disconnect() synchronously.
+ 	 */
+-	mutex_lock(&phydev->lock);
+ 	if (phy_polling_mode(phydev) && phy_is_started(phydev))
+ 		phy_queue_state_machine(phydev, PHY_STATE_TIME);
+ 	mutex_unlock(&phydev->lock);
+-- 
+2.30.2
 
 
-Best regards,
+--Y86eQW0HPYCMXbQD
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0002-net-phy-call-phy_error_precise-while-holding-the-loc.patch"
 
-Lukasz Majewski
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Subject: [PATCH net-next 2/3] net: phy: call phy_error_precise() while holding
+ the lock
 
---
+Move the locking out of phy_error_precise() and to its only call site,
+merging with the locked region that has already been taken.
 
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/phy/phy.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
---Sig_/+hut5hP6N6FM.lYbJUHQWJL
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+index 1e5218935eb3..990d387b31bd 100644
+--- a/drivers/net/phy/phy.c
++++ b/drivers/net/phy/phy.c
+@@ -1231,9 +1231,7 @@ static void phy_error_precise(struct phy_device *phydev,
+ 			      const void *func, int err)
+ {
+ 	WARN(1, "%pS: returned: %d\n", func, err);
+-	mutex_lock(&phydev->lock);
+ 	phy_process_error(phydev);
+-	mutex_unlock(&phydev->lock);
+ }
+ 
+ /**
+@@ -1503,10 +1501,10 @@ void phy_state_machine(struct work_struct *work)
+ 	if (err == -ENODEV)
+ 		return;
+ 
++	mutex_lock(&phydev->lock);
+ 	if (err < 0)
+ 		phy_error_precise(phydev, func, err);
+ 
+-	mutex_lock(&phydev->lock);
+ 	phy_process_state_change(phydev, old_state);
+ 
+ 	/* Only re-schedule a PHY state machine change if we are polling the
+-- 
+2.30.2
 
------BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmT3MYAACgkQAR8vZIA0
-zr2hOwgAioIh83U/59WvQqS+Np2hIQOO/+Fjb8jR+dIhbk7ABdzEndeoZ31nJ8AA
-6NGzoeZIZs5QiEGIOM4fhmSjt7n0Crz8KmEyjckLRtIhQROTYk1LOOK9RZKBuaiF
-a6hm+voY2d6cSMg8rU754y2Rs9RuCoprHn4LZ2vKnfohw6TwdASPePrXJ4CYNFEU
-12OcDfKKPpc374j+DG5u0NlhSFj9ExIMP3eCJBJjvchNM+G6Fo0taInB0fB8rZSi
-vKJiW5jURQbShxviCUo4iDDXLYSaYtnIKoJtuXBJGachDJjBK6BOSOC1SX6wxfhA
-GsOwHeCsPRD1KcwZUmS7xnsOv53y4A==
-=AMD3
------END PGP SIGNATURE-----
+--Y86eQW0HPYCMXbQD
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0003-net-phy-move-call-to-start-aneg.patch"
 
---Sig_/+hut5hP6N6FM.lYbJUHQWJL--
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Subject: [PATCH net-next 3/3] net: phy: move call to start aneg
+
+Move the call to start auto-negotiation inside the lock in the PHYLIB
+state machine, calling the locked variant _phy_start_aneg(). This
+avoids unnecessarily releasing and re-acquiring the lock.
+
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/phy/phy.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+index 990d387b31bd..5bb33af2a4cb 100644
+--- a/drivers/net/phy/phy.c
++++ b/drivers/net/phy/phy.c
+@@ -1489,14 +1489,15 @@ void phy_state_machine(struct work_struct *work)
+ 		break;
+ 	}
+ 
++	if (needs_aneg) {
++		err = _phy_start_aneg(phydev);
++		func = &_phy_start_aneg;
++	}
++
+ 	mutex_unlock(&phydev->lock);
+ 
+-	if (needs_aneg) {
+-		err = phy_start_aneg(phydev);
+-		func = &phy_start_aneg;
+-	} else if (do_suspend) {
++	if (do_suspend)
+ 		phy_suspend(phydev);
+-	}
+ 
+ 	if (err == -ENODEV)
+ 		return;
+-- 
+2.30.2
+
+
+--Y86eQW0HPYCMXbQD
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0004-net-phy-track-PHY-WoL-enable-state.patch"
+
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Subject: [PATCH net-next 4/4] net: phy: track PHY WoL enable state
+
+Track the PHY Wake-on-LAN enable state so we don't need to call
+phy_ethtool_get_wol() in phy_suspend(), thus taking the phydev lock.
+
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/phy/phy.c        | 10 ++++++++++
+ drivers/net/phy/phy_device.c | 17 ++++++++++++++---
+ include/linux/phy.h          |  2 ++
+ 3 files changed, 26 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+index 5bb33af2a4cb..2324544aae0d 100644
+--- a/drivers/net/phy/phy.c
++++ b/drivers/net/phy/phy.c
+@@ -1644,11 +1644,21 @@ EXPORT_SYMBOL(phy_ethtool_set_eee);
+  */
+ int phy_ethtool_set_wol(struct phy_device *phydev, struct ethtool_wolinfo *wol)
+ {
++	struct ethtool_wolinfo w = { .cmd = ETHTOOL_GWOL };
+ 	int ret;
+ 
+ 	if (phydev->drv && phydev->drv->set_wol) {
+ 		mutex_lock(&phydev->lock);
+ 		ret = phydev->drv->set_wol(phydev, wol);
++
++		/* Read back the WoL enabled state for the PHY and update
++		 * our saved state.
++		 */
++		if (phydev->drv->get_wol) {
++			phydev->drv->get_wol(phydev, &w);
++			phydev->phy_wol_enabled = w.wolopts;
++		}
++
+ 		mutex_unlock(&phydev->lock);
+ 
+ 		return ret;
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 2ce74593d6e4..c874c1ec5ada 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -1850,7 +1850,6 @@ EXPORT_SYMBOL(phy_detach);
+ 
+ int phy_suspend(struct phy_device *phydev)
+ {
+-	struct ethtool_wolinfo wol = { .cmd = ETHTOOL_GWOL };
+ 	struct net_device *netdev = phydev->attached_dev;
+ 	struct phy_driver *phydrv = phydev->drv;
+ 	int ret;
+@@ -1858,8 +1857,9 @@ int phy_suspend(struct phy_device *phydev)
+ 	if (phydev->suspended)
+ 		return 0;
+ 
+-	phy_ethtool_get_wol(phydev, &wol);
+-	phydev->wol_enabled = wol.wolopts || (netdev && netdev->wol_enabled);
++	phydev->wol_enabled = phydev->phy_wol_enabled ||
++			      (netdev && netdev->wol_enabled);
++
+ 	/* If the device has WOL enabled, we cannot suspend the PHY */
+ 	if (phydev->wol_enabled && !(phydrv->flags & PHY_ALWAYS_CALL_SUSPEND))
+ 		return -EBUSY;
+@@ -3251,6 +3251,14 @@ struct fwnode_handle *fwnode_get_phy_node(const struct fwnode_handle *fwnode)
+ }
+ EXPORT_SYMBOL_GPL(fwnode_get_phy_node);
+ 
++static void phy_update_wol_state(struct phy_device *phydev)
++{
++	struct ethtool_wolinfo wol = { .cmd = ETHTOOL_GWOL };
++
++	phy_ethtool_get_wol(phydev, &wol);
++	phydev->phy_wol_enabled = wol.wolopts;
++}
++
+ /**
+  * phy_probe - probe and init a PHY device
+  * @dev: device to probe and init
+@@ -3364,6 +3372,9 @@ static int phy_probe(struct device *dev)
+ 	/* Set the state to READY by default */
+ 	phydev->state = PHY_READY;
+ 
++	/* Initialise phydev->wol_enabled state */
++	phy_update_wol_state(phydev);
++
+ 	/* Get the LEDs from the device tree, and instantiate standard
+ 	 * LEDs for them.
+ 	 */
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index 5dcab361a220..514c1d077bb9 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -557,6 +557,7 @@ struct macsec_ops;
+  * @downshifted_rate: Set true if link speed has been downshifted.
+  * @is_on_sfp_module: Set true if PHY is located on an SFP module.
+  * @mac_managed_pm: Set true if MAC driver takes of suspending/resuming PHY
++ * @phy_wol_enabled: Set to true if the PHY has Wake-on-Lan enabled.
+  * @wol_enabled: Set to true if the PHY or the attached MAC have Wake-on-LAN
+  * 		 enabled.
+  * @state: State of the PHY for management purposes
+@@ -655,6 +656,7 @@ struct phy_device {
+ 	unsigned downshifted_rate:1;
+ 	unsigned is_on_sfp_module:1;
+ 	unsigned mac_managed_pm:1;
++	unsigned phy_wol_enabled:1;
+ 	unsigned wol_enabled:1;
+ 
+ 	unsigned autoneg:1;
+-- 
+2.30.2
+
+
+--Y86eQW0HPYCMXbQD--
 
