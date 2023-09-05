@@ -1,287 +1,231 @@
-Return-Path: <netdev+bounces-32051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32052-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33D74792217
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 13:24:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FCA9792219
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 13:27:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1246281143
-	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 11:24:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB39828110E
+	for <lists+netdev@lfdr.de>; Tue,  5 Sep 2023 11:27:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0B91CA68;
-	Tue,  5 Sep 2023 11:24:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01BCBCA66;
+	Tue,  5 Sep 2023 11:27:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04F8C2F7
-	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 11:24:03 +0000 (UTC)
-Received: from phobos.denx.de (phobos.denx.de [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5FC41AB;
-	Tue,  5 Sep 2023 04:24:00 -0700 (PDT)
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id A3CD286983;
-	Tue,  5 Sep 2023 13:23:58 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1693913039;
-	bh=aZiQZIfHLo3V1mQBP/zVuNU3lXX/EfHt55H4rQrKfWI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ynjI/KrWLk/BSEy0qaXEUjUyx72215WxB9GkIfuDgMCsyGTxuWFysPMy+p5xjbnRd
-	 stG6/PF9Q3fQcR3ztY9Zmo/bhGkTCIWm84g9xgm18VIQM0lyCB4i0t1egeYxmG42uv
-	 xGWibY1tIlu5TIplcpBqX8kxqaT4kzENaYOy/wyOjxJTnW14zN57e/u78f2drgXhWR
-	 w5xJN3GnAAiAkGhDNQY9Qwp5cx87vhWT7xKiNNma/wYwpFsH9TH2MtljB8HdLLSDMa
-	 T9tzJBJP2BHTdX67YT9hrxTTSqk8v8eG4DIy5Pf6deYk49KMOiQnXbJMAqmj34oxRg
-	 Z0xlGDGCsKi6Q==
-Date: Tue, 5 Sep 2023 13:23:51 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
- davem@davemloft.net, Paolo Abeni <pabeni@redhat.com>, Woojung Huh
- <woojung.huh@microchip.com>, Tristram.Ha@microchip.com, Florian Fainelli
- <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- UNGLinuxDriver@microchip.com, George McCollister
- <george.mccollister@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 RFC 4/4] net: dsa: hsr: Provide generic HSR
- ksz_hsr_{join|leave} functions
-Message-ID: <20230905132351.2e129d53@wsk>
-In-Reply-To: <20230905104725.zy3lwbxjhqhqyzdj@skbuf>
-References: <20230904120209.741207-1-lukma@denx.de>
-	<20230904120209.741207-1-lukma@denx.de>
-	<20230904120209.741207-5-lukma@denx.de>
-	<20230904120209.741207-5-lukma@denx.de>
-	<20230905104725.zy3lwbxjhqhqyzdj@skbuf>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E20C8883E
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 11:27:23 +0000 (UTC)
+Received: from AUS01-SY4-obe.outbound.protection.outlook.com (mail-sy4aus01olkn2174.outbound.protection.outlook.com [40.92.62.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C3121BE;
+	Tue,  5 Sep 2023 04:27:21 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jFXjT1l/YT3oFX7gtyQvmUtCu72D1W0/i5pGPokDUgA40lWvWAHcGZgnI7R/QsOrYFULRg/4y9EmnZex574NPV6R14MHVPoX+pawIA/iMdxTWTC/ww0NNCOFaBDcSO+1g9lXnqEii7r7CYkBkJdeha8RE2SjzX7jABbMZAE/ToeHLl8U3RCmo1OERQRZlUnUq5KKMhgvx4yQYjy2HHEtmIPyI8kGjpdhsjY4WVCupfdke0LcOLaOJCdVGdqTmOS1HKW0ONajsk+f9MXI+M9QMN5rvE1oOGtfiowxLLOeUuDiwTdAuubo5tMC8H4/yMWju6Z6Z3S5Sv2wHIJTQjw7Zg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LgT+/ItCgKV5iqqbKWGsCzs2Q6+PfD37ivhEOy1uiqA=;
+ b=DYkEYhpoLhwtBBLzI3lUzCOb2WXjylc6/cMWPcjwA8jJobGUWGM9ASNUAfdxv8C2KUreo1tiXPfGHU9jNRipa9TQkwgPdRSjfxGIRTKrinQAGk3rm03smNSm0hoOp9SmgIVk7NsSj1b9BE432c0t2X3bwdIa3o4njU5iulKGrW6v9R1aWRzg1k2rRzc0aSv0y0HJy58OHltTcvDnjA+oyShelzSDIHc42OZnSsHdJrNvQOSU7T4U8h9gPIe4yYgG1uPmG0jOkDZ3752AIOCXEucAVZz6ZFZWyJ/pFS8oqYiU+J6OxyE/DD0/M+M8vDLzg1KTMj1bRv5sUbjN+hIAIQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LgT+/ItCgKV5iqqbKWGsCzs2Q6+PfD37ivhEOy1uiqA=;
+ b=N+2RstP3JaJLm0phLvE+9ThraupngBiCJCZ5Vh6Xx5t/IpwfV7x3IA3kUl8BFRWqohHQ8+0uflCmmk69J0Fuo4x7F4zK9nFWdZNhvkoeq3el2b663N9DOmmt++tarA/rIHOdrmGwCBbDY0ZVggl/1F/e+RdCbzoSX6W14fDShyO0LAcQlUgbZn5YREt94vZpIkLaXkfC8qXMjOefF+tZ/fkvLzvTWX22mkVD1o9QoXYFNfKiERPp7ScAlA6MeOUqJ4oll3j5XDzknYYG6z2DmjIdbi9GUPIAdb43S5IDXo0lUNMwxbZKzkY7QvGU9aZwR14p8rx8cYipS3mziroJpQ==
+Received: from MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM (2603:10c6:220:14c::12)
+ by SY6P282MB3213.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:164::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.33; Tue, 5 Sep
+ 2023 11:27:14 +0000
+Received: from MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM
+ ([fe80::beb:8e33:17b1:a347]) by MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM
+ ([fe80::beb:8e33:17b1:a347%4]) with mapi id 15.20.6745.030; Tue, 5 Sep 2023
+ 11:27:13 +0000
+From: Jinjian Song <songjinjian@hotmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	corbet@lwn.net,
+	loic.poulain@linaro.org,
+	ryazanov.s.a@gmail.com
+Cc: jiri@resnulli.us,
+	johannes@sipsolutions.net,
+	chandrashekar.devegowda@intel.com,
+	linuxwwan@intel.com,
+	chiranjeevi.rapolu@linux.intel.com,
+	haijun.liu@mediatek.com,
+	m.chetan.kumar@linux.intel.com,
+	ricardo.martinez@linux.intel.com,
+	netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	nmarupaka@google.com,
+	vsankar@lenovo.com,
+	danielwinkler@google.com,
+	Jinjian Song <songjinjian@hotmail.com>
+Subject: [net-next v3 0/5] net: wwan: t7xx: fw flashing & coredump support
+Date: Tue,  5 Sep 2023 19:26:32 +0800
+Message-ID:
+ <MEYP282MB2697DB3C2C854F72A78BE7F4BBE8A@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [pnkax81OKd+/ZQkHPwuJyHYSzva5LGyj]
+X-ClientProxiedBy: SGAP274CA0006.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b6::18)
+ To MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM (2603:10c6:220:14c::12)
+X-Microsoft-Original-Message-ID:
+ <20230905112637.18877-1-songjinjian@hotmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/ubD0zOjY3M9hPEvv5dRxPU0";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MEYP282MB2697:EE_|SY6P282MB3213:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6b38c148-ea4a-4956-d141-08dbae030d36
+X-MS-Exchange-SLBlob-MailProps:
+	0wLWl8rLpvtTivgWW+sCOa5Ki5B5X387drGJ7Jcymve7vktlkPrU1QZhxi6KEdEcB1YLh5FQXFXSt8+y9Lsi5EW69O7HXOZm2L7ZZNUvQQFWxESpNMaps/jAiHTyv5tmvj5gr46UhObgvQ15C2mtVTxDuJBPSBklgYM1bpl/XGRVHY/xFDA1+8EUjZlWxO24E9jTkibBKeOc0zeGqKdXTFzFccSSu7gLD84wucWxTW2vxpHl/IeqkNVTQX9RQa/bcoJw4rNPi6CXOU9ciAYZILJaQRo8drMrq36MrCY5JiQyIYNElrFyo3j3cLpGq0b7GFz1rvqTO8BXVuHgCdMyqj7so9/CTaJKmCN+2IOsnswrKGBN7P7M0d+7dQIWJCwJjRVUgUyppo8ppAwO/PkjSp8CiK4Yo6bqoJk24GKo0VGgi3QTa7cW7eGDT8Vz0fB705c6rihgZ/9vN+8gOMmd52u3O97pWgjFKHe2pVm7WTp0Oxlr1HFtPjI5wXv2i2IkZOaD5c/ExWlV01EdyJoWOLXRxVFh+Y4yxMM2MuCRUpdAv/wlESgSA8SjJivTj6oj/6TNCFo5RM4YrzmF/fJ69xnShy6qrIY6Kh7Ar6r7fTDYuqQkuI0phl7AywX5KDeCIKwLeUhT9kLN75j+vTuyXgBCbvGq7Mm2AcoP3NwRaUkSl64fST9Z7RaOSyaR23YWu8gSie4+XsIAdraHZe/nDN04pJvcnTuLF7kaa0mSofbc0bue3coFCUgMUPTcpvfXdvSJs8Eyblg=
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	bRS2U2DzhlgIaiLhzXrRvZaM7prP8o+N8xi/vxPIjYWQWBEnwihYlW9RPhDxMuGeind5Bokdl2iTu+Czqy2EnuKB3g5xAW/PJBa3APoyt99rcV/ArjCeui1Ej442UqPZIQ131pHjEvEZiJ4YjLDQZI20R9+yeRveadJTqzQ6Rb1cVwmDPwQKM2CPiJnkd6CPdJtPNWXcILT2Qu/KxtWgCYmg9kqtU85yGE1ZhFEmYrzqDxQcE/6U96v1SoZu+Mgdgxv3Ks7zmE1qp0A4NFVZSKge4B2g9dytTdjr4LYr9p5pd94fqz4h1Dv9C8evWb+VJxoi0bpLwUW/bvBru+DN+qgYhLH0cTTS0IHwjAvQYgdINj8fSDzeOC9Ch/Irx+KLUDhTAn0abX8HewNX8j9Jci78ETVXLd4NIA6R5SETq5VzAaqv/anL6IJpa7k/E++Dd0pXU9KZi2Oyf6Usw6UYkwrr5IwDLKy9dZ/KyOqSpMtKRboXXgSuSP/EQb4AMncOj79+o+Am+f2lcNCDA55ISEgTj5Y29ORqMcAYbs4d9qmS/qvZbU0VTW1NgejSfzXYF6mXVtoRvvgKCuVhxbp2qbG9nD3eae0Vjbriyf5fUoYh0AlznEXzESBJe5h0R6Gw
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?pQ9PgG51kVtm81qmPCyPOGgwFUo5h2Fb/G+By6ntKFGt9ilayBhUIks1Qla3?=
+ =?us-ascii?Q?k1eCMDQHwXlB/z8jqrSPygReVQ289jWerTIa17m1Lpax+aDUwWcIPZ+kRZJM?=
+ =?us-ascii?Q?W4ctSDomJG1JQoSBiTP+WqiscYlXo5Ldx+yJ7EWFqL2Jy/iX133sP4mCR4cj?=
+ =?us-ascii?Q?FSPCMwmoqvFUuL/x4kLQZD4ziwDNkfF3wxv08NJLKliE3B5gOkz0P4u0EIC1?=
+ =?us-ascii?Q?PsA2dCa2Uy2UgV/ljTnfGKlD0+inyI0Nl91X8YTUjCOn4zC/QDQPAFjerlRm?=
+ =?us-ascii?Q?Ip/j6En37ullVCGCrETUaZBpevcrLaSloEpZXbPzZTf5B65vNtS9gzbUVFiK?=
+ =?us-ascii?Q?mOpr86D+ZNxWyv3Kc2yqqdRUXAKNtIWZtRqQHQvt1IPzNKD15PP6fzkJhqTT?=
+ =?us-ascii?Q?NO/cKh2j81wg7q6909lEfIBXlzduRfhpVLnPatkfDK52LeFFNJGpvy2l3OB/?=
+ =?us-ascii?Q?Tf0DAmYW8dK1DxLJDaUD1oMvUC3BleB/qTWz9inzK0nHCbkvuNoLNlvHIqfE?=
+ =?us-ascii?Q?gQ7P91+tUCxoBBbdR+oKohMiWyRqqThE8zB1/Bw+eEKWmxPOSD78gnD086m6?=
+ =?us-ascii?Q?LeAu9RBnzsXgqf8IZY3uNU9RKYNtjbA/EMZyEsbNzG2IsEUhWUOVWNUQn+3W?=
+ =?us-ascii?Q?KfgyoaPYR3f6IIjTELIpJpUBwkUdfjpJ2l5z6zdBGnmjfHcM6gLDNKO1KhqS?=
+ =?us-ascii?Q?ixCEsovhs0OwEk5CFP20xkpk9mu7lCbg/SgixvMnXPoICoAqD8ZJZe/Scws0?=
+ =?us-ascii?Q?M9k9Z0FP8gcKPmWWHj2dgvpESbrZnj2pRIxfAs0rbc99RsOv01hCK1BIqJEN?=
+ =?us-ascii?Q?VvkzBqG0o9zEhoCMcAONjJo2NIUGmXigm77uc3X0aV2Qpd97D8cqfCzIZcGO?=
+ =?us-ascii?Q?RWEgH0OkyKAetcsa8x8z/gmT5o2Dz77N+5kBLfx1zZBZuVkysp6NHsol9KqF?=
+ =?us-ascii?Q?w6Be5eEuAPuTvpNeGmOT5mcIa8mEKG0CxRtIWI8CkVyyxP7rfWp1ghGViowT?=
+ =?us-ascii?Q?EXJFt9SyjqidGEg5nfZ6gIAt6TUP9Fm/ZkiAnV2wPr871ndyfKzXKLDtj6t3?=
+ =?us-ascii?Q?Qsm402SagV4JK5O4CWsH1E+oNvwIwI7IMmnLWWbIuWobZpWUEmeZ8Iv+SBI7?=
+ =?us-ascii?Q?IauY4waipvSKA3Tyiy/59+5HkHFz55vn8UOKSkYSgEIWbB4MsTeYf7tH9EIC?=
+ =?us-ascii?Q?GhXXH2u8ZapDG37TPeKttG70ej2r/EXHUyxkuECFQMbBm7AKLqemclbFM2w?=
+ =?us-ascii?Q?=3D?=
+X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-746f3.templateTenant
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6b38c148-ea4a-4956-d141-08dbae030d36
+X-MS-Exchange-CrossTenant-AuthSource: MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Sep 2023 11:27:13.8625
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SY6P282MB3213
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---Sig_/ubD0zOjY3M9hPEvv5dRxPU0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Adds support for t7xx wwan device firmware flashing & coredump collection
+using devlink.
 
-Hi Vladimir,
+On early detection of wwan device in fastboot mode driver sets up CLDMA0 HW
+tx/rx queues for raw data transfer and then registers to devlink framework.
+On user space application issuing command for firmware update the driver
+sends fastboot flash command & firmware to program NAND.
 
-> On Mon, Sep 04, 2023 at 02:02:09PM +0200, Lukasz Majewski wrote:
-> > This patch provides the common KSZ (i.e. Microchip) DSA code with
-> > support for HSR aware devices.
-> >=20
-> > To be more specific - generic ksz_hsr_{join|leave} functions are
-> > provided, now only supporting KSZ9477 IC.
-> >=20
-> > Signed-off-by: Lukasz Majewski <lukma@denx.de>
-> > ---
-> > Changes for v2:
-> > - None
-> >=20
-> > Changes for v3:
-> > - Do not return -EOPNOTSUPP for only PRP_V1 (as v2 will not be
-> > caught) =20
->=20
-> Should be squashed into patch 3/4. The split does not make the code
-> easier to review for me.
+In flashing procedure the fastboot command & response are exchanged between
+driver and device. Once firmware flashing is success, user space application
+get modem event by sysfs interface.
 
-So you recommend to have only one patch in which the hsr_join{leave}
-function from ksz_common.c and ksz9477_hsr_join{leave} from ksz9477.c
-are added?
+The devlink param fastboot is set to true via devlink param command.
 
->=20
-> > ---
-> >  drivers/net/dsa/microchip/ksz_common.c | 69
-> > ++++++++++++++++++++++++++ 1 file changed, 69 insertions(+)
-> >=20
-> > diff --git a/drivers/net/dsa/microchip/ksz_common.c
-> > b/drivers/net/dsa/microchip/ksz_common.c index
-> > 579fde54d1e1..91d1acaf4494 100644 ---
-> > a/drivers/net/dsa/microchip/ksz_common.c +++
-> > b/drivers/net/dsa/microchip/ksz_common.c @@ -16,6 +16,7 @@
-> >  #include <linux/etherdevice.h>
-> >  #include <linux/if_bridge.h>
-> >  #include <linux/if_vlan.h>
-> > +#include <linux/if_hsr.h>
-> >  #include <linux/irq.h>
-> >  #include <linux/irqdomain.h>
-> >  #include <linux/of_mdio.h>
-> > @@ -3433,6 +3434,72 @@ u16 ksz_hsr_get_ports(struct dsa_switch *ds)
-> >  	return 0;
-> >  }
-> > =20
-> > +static int ksz_hsr_join(struct dsa_switch *ds, int port, struct
-> > net_device *hsr) +{
-> > +	struct dsa_port *partner =3D NULL, *dp;
-> > +	struct ksz_device *dev =3D ds->priv;
-> > +	enum hsr_version ver;
-> > +	int ret;
-> > +
-> > +	ret =3D hsr_get_version(hsr, &ver);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	switch (dev->chip_id) {
-> > +	case KSZ9477_CHIP_ID:
-> > +		if (!(ver =3D=3D HSR_V0 || ver =3D=3D HSR_V1))
-> > +			return -EOPNOTSUPP; =20
->=20
-> move the "default: return -EOPNOTSUPP" statement from below here.
->=20
+$ devlink dev param set pci/0000:bdf name fastboot value 1 cmode driverinit
 
-Ok, I will add default statement with -EOPNOTSUPP.
+The wwan device is put into fastboot mode via devlink reload command, by
+passing `driver_reinit`.
 
-> > +	} =20
->=20
-> I don't see any restriction to allow offloading a single HSR device.
+$ devlink dev reload pci/0000:$bdf action driver_reinit
 
-As I've written in the other response - I've followed the xrs700x.c
-convention.=20
+Note: user space application get the fastboot download event of devcie
+from /sys/bus/pci/devices/${bdf}/t7xx_event then do remove(echo 1 >
+/sys/bus/pci/devices/${bdf}/remove) and rescan(echo 1 > /sys/bus/pci/rescan)
+to let driver goes to firmware flash process.
 
-Moreover, for me it seems more natural, that we only allow full HSR
-support for 2 ports or none. Please be aware, that HSR supposed to
-support only 2 ports, and having only one working is not recommended by
-vendor.
+Below is the devlink command usage for firmware flashing
 
-> Looking at patch 3/4, that will obviously not work due to some
-> hardware registers which are global and would be overwritten by the
-> second HSR device.
+$ devlink dev flash pci/$BDF file ABC.img component ABC
 
-I cannot guarantee that there will not be any "side effects" with this
-approach. And to be honest - I would prefer to spent time on testing
-recommended setups.
+Note: ABC.img is the firmware to be programmed to "ABC" partition.
 
->=20
-> For example, a5psw_port_bridge_join() has a similar restriction to
-> offload a single bridge device.
+In case of coredump collection when wwan device encounters an exception
+it reboots & stays in fastboot mode for coredump collection by host driver.
+On detecting exception state driver collects the core dump, creates the
+devlink region & reports an event to user space application for dump
+collection. The user space application invokes devlink region read command
+for dump collection.
 
-HSR is IMHO a bit different than plain "bridge" offloading.
+Below are the devlink commands used for coredump collection.
 
->=20
-> If you return -EOPNOTSUPP, then DSA should fall back to an
-> unoffloaded, 100% software-based HSR device, and that should work
-> too.=20
+$ devlink region new pci/$BDF/mr_dump
+$ devlink region read pci/$BDF/mr_dump snapshot $ID address $ADD length $LEN
+$ devlink region del pci/$BDF/mr_dump snapshot $ID
 
-And then we would have one port with SW HSR and another one with HW
-HSR?
+Upon completion of firmware flashing or coredump collection the wwan device
+is reset to normal mode using devlink reload command, by passing `fw_activate`.
 
->It would be good if you could verify that the unoffloaded HSR
-> works well after the changes too.
+$ devlink dev reload pci/0000:$bdf action fw_activate
 
-I've tested on KSZ9477-EVB the SW HSR operation with two ports (and two
-or three boards) and HW HSR offloading. Results are presented in the
-cover-letter.
+Note: user space application get the reset event of devcie
+from /sys/bus/pci/devices/${bdf}/t7xx_event then do remove(echo 1 >
+/sys/bus/pci/devices/${bdf}/remove) and rescan(echo 1 > /sys/bus/pci/rescan)
+to let driver goes to normal process.
 
->=20
-> > +
-> > +	/* We can't enable redundancy on the switch until both
-> > +	 * redundant ports have signed up.
-> > +	 */
-> > +	dsa_hsr_foreach_port(dp, ds, hsr) {
-> > +		if (dp->index !=3D port) {
-> > +			partner =3D dp;
-> > +			break;
-> > +		}
-> > +	}
-> > +
-> > +	if (!partner)
-> > +		return 0;
-> > +
-> > +	switch (dev->chip_id) {
-> > +	case KSZ9477_CHIP_ID:
-> > +		return ksz9477_hsr_join(ds, port, hsr, partner);
-> > +	default:
-> > +		return -EOPNOTSUPP;
-> > +	}
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static int ksz_hsr_leave(struct dsa_switch *ds, int port,
-> > +			 struct net_device *hsr)
-> > +{
-> > +	struct dsa_port *partner =3D NULL, *dp;
-> > +	struct ksz_device *dev =3D ds->priv;
-> > +
-> > +	dsa_hsr_foreach_port(dp, ds, hsr) {
-> > +		if (dp->index !=3D port) {
-> > +			partner =3D dp;
-> > +			break;
-> > +		}
-> > +	}
-> > +
-> > +	if (!partner)
-> > +		return 0;
-> > +
-> > +	switch (dev->chip_id) {
-> > +	case KSZ9477_CHIP_ID:
-> > +		return ksz9477_hsr_leave(ds, port, hsr, partner);
-> > +	default:
-> > +		return -EOPNOTSUPP;
-> > +	}
-> > +
-> > +	return 0;
-> > +}
-> > +
-> >  static const struct dsa_switch_ops ksz_switch_ops =3D {
-> >  	.get_tag_protocol	=3D ksz_get_tag_protocol,
-> >  	.connect_tag_protocol   =3D ksz_connect_tag_protocol,
-> > @@ -3452,6 +3519,8 @@ static const struct dsa_switch_ops
-> > ksz_switch_ops =3D { .get_sset_count		=3D ksz_sset_count,
-> >  	.port_bridge_join	=3D ksz_port_bridge_join,
-> >  	.port_bridge_leave	=3D ksz_port_bridge_leave,
-> > +	.port_hsr_join		=3D ksz_hsr_join,
-> > +	.port_hsr_leave		=3D ksz_hsr_leave,
-> >  	.port_stp_state_set	=3D ksz_port_stp_state_set,
-> >  	.port_pre_bridge_flags	=3D ksz_port_pre_bridge_flags,
-> >  	.port_bridge_flags	=3D ksz_port_bridge_flags,
-> > --=20
-> > 2.20.1
-> >  =20
->=20
+Jinjian Song (5):
+  net: wwan: t7xx: Infrastructure for early port configuration
+  net: wwan: t7xx: Register with devlink and implement firmware flashing
+  net: wwan: t7xx: Creates region & snapshot for coredump log collection
+  net: wwan: t7xx: Adds sysfs attribute of modem event
+  net: wwan: t7xx: Devlink documentation
 
+ Documentation/networking/devlink/index.rst   |   1 +
+ Documentation/networking/devlink/t7xx.rst    | 232 +++++++
+ drivers/net/wwan/Kconfig                     |   1 +
+ drivers/net/wwan/t7xx/Makefile               |   4 +-
+ drivers/net/wwan/t7xx/t7xx_hif_cldma.c       |  47 +-
+ drivers/net/wwan/t7xx/t7xx_hif_cldma.h       |  18 +-
+ drivers/net/wwan/t7xx/t7xx_modem_ops.c       |   5 +-
+ drivers/net/wwan/t7xx/t7xx_pci.c             |  79 ++-
+ drivers/net/wwan/t7xx/t7xx_pci.h             |  19 +
+ drivers/net/wwan/t7xx/t7xx_port.h            |   6 +
+ drivers/net/wwan/t7xx/t7xx_port_ap_msg.c     |  78 +++
+ drivers/net/wwan/t7xx/t7xx_port_ap_msg.h     |  11 +
+ drivers/net/wwan/t7xx/t7xx_port_flash_dump.c | 695 +++++++++++++++++++
+ drivers/net/wwan/t7xx/t7xx_port_flash_dump.h |  85 +++
+ drivers/net/wwan/t7xx/t7xx_port_proxy.c      | 118 +++-
+ drivers/net/wwan/t7xx/t7xx_port_proxy.h      |  14 +
+ drivers/net/wwan/t7xx/t7xx_port_wwan.c       |  27 +-
+ drivers/net/wwan/t7xx/t7xx_reg.h             |  28 +-
+ drivers/net/wwan/t7xx/t7xx_state_monitor.c   | 137 +++-
+ drivers/net/wwan/t7xx/t7xx_state_monitor.h   |   1 +
+ 20 files changed, 1528 insertions(+), 78 deletions(-)
+ create mode 100644 Documentation/networking/devlink/t7xx.rst
+ create mode 100644 drivers/net/wwan/t7xx/t7xx_port_ap_msg.c
+ create mode 100644 drivers/net/wwan/t7xx/t7xx_port_ap_msg.h
+ create mode 100644 drivers/net/wwan/t7xx/t7xx_port_flash_dump.c
+ create mode 100644 drivers/net/wwan/t7xx/t7xx_port_flash_dump.h
 
+-- 
+2.34.1
 
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/ubD0zOjY3M9hPEvv5dRxPU0
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmT3D8cACgkQAR8vZIA0
-zr1RLQf/c8BX2Odp4/YRH8NivGg1j3Pae6ZQRbFB3I3UUaa1NJBUy/7S1DDxNrJu
-zt1M/ACnfuurVIThp5CY3FfzY13Ig36uq+bCSX4t2P2vHQgwsRkXyaG/WEW4dMHl
-EaT2nLFB/RcWTkDMklYV8jy+BA8d3M6Iejd5No9Ui+ICxuEemH6jBbEFXdsUl9pJ
-b7TS+Q0eyoiO/2U3g0laSmVM2UiIBPMU7STXYg+TbyQYkoRMQHlsQpcaYjOBzPvt
-jYSzJM2VifAMM8BFPqZuXJQUJB7WKr6wAMqFVNE/kjjN3W+8FTdjYbd4K0oGW3Dp
-Xmv6CHd1XLWYBaPCkOxJQjj4RwGIig==
-=tlXv
------END PGP SIGNATURE-----
-
---Sig_/ubD0zOjY3M9hPEvv5dRxPU0--
 
