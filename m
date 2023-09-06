@@ -1,33 +1,33 @@
-Return-Path: <netdev+bounces-32186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD66C793626
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 09:24:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6814E79362D
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 09:24:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBF001C209C1
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 07:23:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24238281282
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 07:24:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A884A54;
-	Wed,  6 Sep 2023 07:23:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2875CED3;
+	Wed,  6 Sep 2023 07:23:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88EDFA4A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AE08ECB
 	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 07:23:57 +0000 (UTC)
 Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DC60E41;
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BF43E43;
 	Wed,  6 Sep 2023 00:23:55 -0700 (PDT)
 Received: from kwepemm600007.china.huawei.com (unknown [172.30.72.55])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RgYhD2VlCzTlP8;
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RgYhD60qrzTlkL;
 	Wed,  6 Sep 2023 15:21:16 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.2) by
  kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Wed, 6 Sep 2023 15:23:52 +0800
+ 15.1.2507.31; Wed, 6 Sep 2023 15:23:53 +0800
 From: Jijie Shao <shaojijie@huawei.com>
 To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
 	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
@@ -35,10 +35,12 @@ To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
 CC: <shenjian15@huawei.com>, <wangjie125@huawei.com>,
 	<liuyonglong@huawei.com>, <shaojijie@huawei.com>, <chenhao418@huawei.com>,
 	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH net 0/7] There are some bugfix for the HNS3 ethernet driver
-Date: Wed, 6 Sep 2023 15:20:11 +0800
-Message-ID: <20230906072018.3020671-1-shaojijie@huawei.com>
+Subject: [PATCH net 1/7] net: hns3: fix tx timeout issue
+Date: Wed, 6 Sep 2023 15:20:12 +0800
+Message-ID: <20230906072018.3020671-2-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.30.0
+In-Reply-To: <20230906072018.3020671-1-shaojijie@huawei.com>
+References: <20230906072018.3020671-1-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,36 +59,73 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-There are some bugfix for the HNS3 ethernet driver
+From: Jian Shen <shenjian15@huawei.com>
 
-Hao Chen (2):
-  net: hns3: fix byte order conversion issue in hclge_dbg_fd_tcam_read()
-  net: hns3: fix debugfs concurrency issue between kfree buffer and read
+Currently, the driver knocks the ring doorbell before updating
+the ring->last_to_use in tx flow. if the hardware transmiting
+packet and napi poll scheduling are fast enough, it may get
+the old ring->last_to_use in drivers' napi poll.
+In this case, the driver will think the tx is not completed, and
+return directly without clear the flag __QUEUE_STATE_STACK_XOFF,
+which may cause tx timeout.
 
-Jian Shen (1):
-  net: hns3: fix tx timeout issue
+Fixes: 20d06ca2679c ("net: hns3: optimize the tx clean process")
+Signed-off-by: Jian Shen <shenjian15@huawei.com>
+Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+---
+ drivers/net/ethernet/hisilicon/hns3/hns3_enet.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
-Jie Wang (1):
-  net: hns3: remove GSO partial feature bit
-
-Jijie Shao (2):
-  net: hns3: Support query tx timeout threshold by debugfs
-  net: hns3: fix invalid mutex between tc qdisc and dcb ets command
-    issue
-
-Yisen Zhuang (1):
-  net: hns3: fix the port information display when sfp is absent
-
- drivers/net/ethernet/hisilicon/hns3/hnae3.h   |  1 +
- .../ethernet/hisilicon/hns3/hns3_debugfs.c    | 11 +++++++---
- .../net/ethernet/hisilicon/hns3/hns3_enet.c   | 19 +++++++++++-------
- .../ethernet/hisilicon/hns3/hns3_ethtool.c    |  4 +++-
- .../hisilicon/hns3/hns3pf/hclge_dcb.c         | 20 +++++--------------
- .../hisilicon/hns3/hns3pf/hclge_debugfs.c     | 14 ++++++-------
- .../hisilicon/hns3/hns3pf/hclge_main.c        |  5 +++--
- .../hisilicon/hns3/hns3pf/hclge_main.h        |  2 --
- 8 files changed, 39 insertions(+), 37 deletions(-)
-
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+index eac2d0573241..81947c4e5100 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+@@ -2103,8 +2103,12 @@ static void hns3_tx_doorbell(struct hns3_enet_ring *ring, int num,
+ 	 */
+ 	if (test_bit(HNS3_NIC_STATE_TX_PUSH_ENABLE, &priv->state) && num &&
+ 	    !ring->pending_buf && num <= HNS3_MAX_PUSH_BD_NUM && doorbell) {
++		/* This smp_store_release() pairs with smp_load_aquire() in
++		 * hns3_nic_reclaim_desc(). Ensure that the BD valid bit
++		 * is updated.
++		 */
++		smp_store_release(&ring->last_to_use, ring->next_to_use);
+ 		hns3_tx_push_bd(ring, num);
+-		WRITE_ONCE(ring->last_to_use, ring->next_to_use);
+ 		return;
+ 	}
+ 
+@@ -2115,6 +2119,11 @@ static void hns3_tx_doorbell(struct hns3_enet_ring *ring, int num,
+ 		return;
+ 	}
+ 
++	/* This smp_store_release() pairs with smp_load_aquire() in
++	 * hns3_nic_reclaim_desc(). Ensure that the BD valid bit is updated.
++	 */
++	smp_store_release(&ring->last_to_use, ring->next_to_use);
++
+ 	if (ring->tqp->mem_base)
+ 		hns3_tx_mem_doorbell(ring);
+ 	else
+@@ -2122,7 +2131,6 @@ static void hns3_tx_doorbell(struct hns3_enet_ring *ring, int num,
+ 		       ring->tqp->io_base + HNS3_RING_TX_RING_TAIL_REG);
+ 
+ 	ring->pending_buf = 0;
+-	WRITE_ONCE(ring->last_to_use, ring->next_to_use);
+ }
+ 
+ static void hns3_tsyn(struct net_device *netdev, struct sk_buff *skb,
+@@ -3563,9 +3571,8 @@ static void hns3_reuse_buffer(struct hns3_enet_ring *ring, int i)
+ static bool hns3_nic_reclaim_desc(struct hns3_enet_ring *ring,
+ 				  int *bytes, int *pkts, int budget)
+ {
+-	/* pair with ring->last_to_use update in hns3_tx_doorbell(),
+-	 * smp_store_release() is not used in hns3_tx_doorbell() because
+-	 * the doorbell operation already have the needed barrier operation.
++	/* This smp_load_acquire() pairs with smp_store_release() in
++	 * hns3_tx_doorbell().
+ 	 */
+ 	int ltu = smp_load_acquire(&ring->last_to_use);
+ 	int ntc = ring->next_to_clean;
 -- 
 2.30.0
 
