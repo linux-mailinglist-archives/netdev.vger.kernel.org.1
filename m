@@ -1,68 +1,64 @@
-Return-Path: <netdev+bounces-32289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89CBC793E8A
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 16:16:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF0D0793E8C
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 16:17:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4E51281392
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 14:16:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A71581C20AE1
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 14:17:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 464CE10799;
-	Wed,  6 Sep 2023 14:16:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80014107A0;
+	Wed,  6 Sep 2023 14:17:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3144ED513
-	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 14:16:36 +0000 (UTC)
-Received: from EUR02-AM0-obe.outbound.protection.outlook.com (mail-am0eur02on2073.outbound.protection.outlook.com [40.107.247.73])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1E3AE77;
-	Wed,  6 Sep 2023 07:16:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CB29D513
+	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 14:17:01 +0000 (UTC)
+Received: from EUR02-AM0-obe.outbound.protection.outlook.com (mail-am0eur02on2085.outbound.protection.outlook.com [40.107.247.85])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5C1910D5
+	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 07:16:57 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Q2WpI29mUTY9F8175s/Tp0POh2Z6hG6nHPahkBtTVNDnbcfN6Z183mEj6tf5cib6sEVTNtZnzqjJ/jqHZ+B5wv3Eyojrk1VF4Jv0vwClRHQeL7e9u9sL3E+HBKZt85hS9dzhVynDGYE5PaV+ACp99+EyGabx+zIYu/Wez399YTQ3wsmQU6n2D1P9UlVbql0TWUWY6YJrlCLy3JvQN2pIIiSUUXsGCItWzJ6HrJQqOR8me+5tA7XODuXUK18hxV4uZlJYveZGm+b9+RvY2cv5kkFgMKz3pL8u+cHQNDN9dHxTVPiIiwH42F8ayWDeM+k7NbFg1YuVg96Xknlgv2AOAg==
+ b=PMxxAmH+gyob+ddhMaPNYpM7Wmzq64Sqzw8dcDHNiU8eAom94dvKRZAkiNSANdWkd7T2CCdI/mi+847jXpECCSMkOZwJPCswWlb/NLVxMesUAdAZhK1cQIL7TnwhN+hPw3RP2WembAya4I/60As+18xB740kMmOSkNb0IqVGQnXTjBdckuEZ1e75V7OhuzvruE6fEqiGzZBVxKQcSoQaJnitYFV4E/NakmOTNPiq5CbcQ8Su745PIBiCxIu77QvOMnBI+8JlvOKbpUvMJhmtoU9OLAT+Na4hjcR2aj3/4nVosa7Aa8/QbRrIOZw8b4GkGrDVdEPJfXGVYMGkWWknQQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ND99i3z84ZiOeDEnaM57wSjeLHmjY5I44oirMiMw8SE=;
- b=Yi95FL7ssBNoAlkHeCHYwMcG++LDRj/8Djw9j3nZXZYvN0k0oKXtUcbIpS8elfDMd7huSedPg8Q1ob0LzO/8U0IsRTbQhaXdd68kfVgQq5YyeKYYN4n3VD9AAOUO8E0rigWkgQPCr7MfFs8HPzxNwKj9vBVGE1GArlHI2zeFHCwkGVaqhl6xJ1Wt5sNZscvkYfWstH/S7F8/m4kpdslGV1Q0dhuyIBYwEIQES/9O/N5GoSmLmSRhftC5cfMJqtf85MHvwHpQU99BnA0R2eX+V00fRg8k7ofuZ0u/zYLubp7V8HL/dwPK9vmsIJU3VTPicqWiPLh6TPsom67ZMghTwg==
+ bh=2L89Q14dWqKTtp9JcyyGN2SFDW+XcFR6hVi3WqsEcRY=;
+ b=SNJl9L2hGATInAHAPAUz0qFBgiDoV+F1DLHaDSq9I+Q8pi5R10lpRB6x3e/STBSN5AU2cN7oG9TggP0YP1tmRR9fezq9gC/Y561w5a8hzWpsR0lq+AXBbn9uaF0sxg3wYFJfOBfr0vMC3jCMfAf4/mAEX4UTwbhxYe88kpP9ADsm44fiHKLgw/yPe9gkvtbYiLkHgoI8PobqL+1mq9biYL9xH+IEz2B8Uhlp1ORPR7KSj5nobgWxK/RQqOCTwjIq5fNqNXkIRo0+OmFVLtUQed4T8XJy5DG5ntVAcqXaHbJWqdpO6MOBQhps3Gt4ozZNaoodDHOxO0+C4U85Gzn0yw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ND99i3z84ZiOeDEnaM57wSjeLHmjY5I44oirMiMw8SE=;
- b=P2SYdfhZ2LhnFfkcHgo48xuzTI9Gvi3amtx1lQhUSMICCfV50GgzuR0eKtbjbRthzdqhFKCERYY1Jp976ITGsNecpPt8RNy5/2mfMk2yF1Z1F9rnz3ox0VHWcwGHkcXKrLy80+rhB6WWpAMDkjxAqn2mUEiFeE4F2McPSSHajTo=
+ bh=2L89Q14dWqKTtp9JcyyGN2SFDW+XcFR6hVi3WqsEcRY=;
+ b=B1hlspqUM5ZwPf/J4SwkFOfNg1qWL8keg++pjhvHIAT0gTRUGAKPC5godYSd4UJ+A4JVqqjQS9vvNaPXHFTM5J6gyoIqMyX/xWq0QvsguZPRAjcxPYqDTRrPKbnJ6dLkud0rxxseugeEc2z3IzOJ1Nl6pzr4EwLnloDfnlnW280=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
  by PAXPR04MB8375.eurprd04.prod.outlook.com (2603:10a6:102:1be::5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.33; Wed, 6 Sep
- 2023 14:16:30 +0000
+ 2023 14:16:55 +0000
 Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
  ([fe80::568a:57ee:35b5:e454]) by AM0PR04MB6452.eurprd04.prod.outlook.com
  ([fe80::568a:57ee:35b5:e454%3]) with mapi id 15.20.6745.030; Wed, 6 Sep 2023
- 14:16:30 +0000
+ 14:16:55 +0000
+Date: Wed, 6 Sep 2023 17:16:52 +0300
 From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: netdev@vger.kernel.org,
-	Claudiu Manoil <claudiu.manoil@nxp.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	Dan Carpenter <dan.carpenter@linaro.org>
-Subject: [PATCH net] net: enetc: distinguish error from valid pointers in enetc_fixup_clear_rss_rfs()
-Date: Wed,  6 Sep 2023 17:16:09 +0300
-Message-Id: <20230906141609.247579-1-vladimir.oltean@nxp.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM0PR05CA0077.eurprd05.prod.outlook.com
- (2603:10a6:208:136::17) To AM0PR04MB6452.eurprd04.prod.outlook.com
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: netdev@vger.kernel.org
+Subject: Re: [bug report] net: enetc: reimplement RFS/RSS memory clearing as
+ PCI quirk
+Message-ID: <20230906141652.a4dschg2jbobzcoj@skbuf>
+References: <582183ef-e03b-402b-8e2d-6d9bb3c83bd9@moroto.mountain>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <582183ef-e03b-402b-8e2d-6d9bb3c83bd9@moroto.mountain>
+X-ClientProxiedBy: AM9P195CA0028.EURP195.PROD.OUTLOOK.COM
+ (2603:10a6:20b:21f::33) To AM0PR04MB6452.eurprd04.prod.outlook.com
  (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -72,92 +68,95 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|PAXPR04MB8375:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4450e2d1-c1ac-4915-1ace-08dbaee3dda8
+X-MS-Office365-Filtering-Correlation-Id: aa04c17c-5970-4c8d-b0b3-08dbaee3eca1
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	6g9+VIsk5nmawL5lsN0EeqgphlpVhW/jldGxlJP13A7GboKCBQyKaWnichwjhjFoHpC/nFeWjokbsHRfhlEWaYCJOgVGcb48eDG+2wvHISjZnDEmuJG8ctMUM6XNcAMUrtSFc/5+uAwqF2nxux5o/bmneBjnJJ/IPB4cLdhibyqt96sftLlWvlOBXUGsFqi3683jaj1K9VbsA2O0KhGzcuYP4ZaKbS0a16pufsKJVhux564VdGLTVaBmaUJ7WD+Fw/mQqWw459lNVeqbqT30ek3t4/eFYC8Lv8vOvAxN+LID2nwEo5Cvj28w8QwW+VGA4pYMZE8h01lSalEWU3KXlGxsltd0A8c18F4EMRVjobEq2pOdS2K17NOBblK9d18pBvopgT+NbaJSwqlQCxa57puD7vXX73U9udLAReakUCOOFzQE939APZkGEfR16iMIjwPBj1KiPv+rCtG3fMNZP6828jG2fLcnL8zYDl1m1pxgvtO04+HQMpoTHGxnVD4XHJ574eQcfRCUFfLE8zGVg8dRmbUDVMksRBm8Covc0v0BTP9gadn1yhLE4GN3X8Pv03HwozuEGnBPxWbjPnbZSpB1ndVxPhYuB3MBWx9gQtE=
+	s52zl3XneTyqZ8WNlapMrOMekl6YKosLh/B1bcRGzFYGMgzBP2ReDEv0erIBb7p+fdvBdOC7mI+R1tg93veBJfwccaRBq9tAi2SA2J7xWoBnUmRsSuPVN4XhRR1yLHgWTnnctXtEzLRGs17q8QO/FR1y4iYiMJPpHWeX63A1UvnztNCP2g+8biB8mnnwCzZYkHDahX56qoOaYHD+Sd0EPgLWCt4/7yoE+tJggClQRhMaHdlrXFHUnN59bIfBpnR0nX36M0jdfg+cyQIpv9egSvk0mkl0DH2HEwtgsa7HSvOzaagaf3yQMANo0EBfE0PmEBZpSLOnx2LjFAKb1Ef3AuMWsDAMbguWjuBHDjSj92XeUqEjwNRxxyfUn+IRdsUbfb5nyYkpa9isT+2B+sNl+q5SDtgIEYiDYRosyK1b3CR+vVXPr+LwlrE5bbyc+9HcycpzcavScCbmUFX0Qa9C5gWvxXbMWAoFG9wKJ6VeWY9KDXN+qMszDnQ29YEi/uvtJIDGbHEMUZ6ZMQiIBDs2tAEJovFme7TfJdDHz6hA1nsMWnBWeCnKax16F9yqMHEV
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(346002)(396003)(366004)(136003)(186009)(451199024)(1800799009)(41300700001)(38100700002)(86362001)(6666004)(2616005)(38350700002)(83380400001)(966005)(478600001)(1076003)(26005)(6512007)(6486002)(52116002)(6506007)(36756003)(66946007)(66476007)(6636002)(2906002)(37006003)(66556008)(54906003)(316002)(5660300002)(8936002)(6862004)(8676002)(4326008)(44832011);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(376002)(39860400002)(346002)(396003)(366004)(136003)(186009)(451199024)(1800799009)(41300700001)(38100700002)(33716001)(86362001)(6666004)(83380400001)(478600001)(1076003)(26005)(6512007)(9686003)(6486002)(6506007)(66946007)(66476007)(6916009)(2906002)(66556008)(316002)(5660300002)(8936002)(8676002)(4326008)(44832011);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?YFWcQkW3aXegdu6ExEhrIPwHrHnw050VryURKh+f4/JkG9As+WWsX2HwuR4b?=
- =?us-ascii?Q?OhkkeD9Zk9bziFAtNGpNtMHOHaJQ3jmiaZFFOCPkp23wdcI7C0V9VvmrAU20?=
- =?us-ascii?Q?mSqt91SLe8ZZro/98+e4eaPn0ghajrAF34+oGYJ2U16GOgZY2PPWow84/GWb?=
- =?us-ascii?Q?jnegEWPgqUSRS7Gae0ON7N1TfVGSV4aczCMbSFMGGJyj20RD3xtG9m7IBS/t?=
- =?us-ascii?Q?vyVrdSyumievh3yDVVBm3QN2xoVps1suZecTn+J4EHRWCKZtUWUqj4nay7t/?=
- =?us-ascii?Q?2ZRpsxHM1q36SbMeovCWkIEsb4pZAkQPnh6mooHhzene0ZkrtHriltmJdZQP?=
- =?us-ascii?Q?vKnpiHCYr69gQDW5bMxKoVNwxdhD5aD2EZ/LnDLMJwSV7YeQZVniJwnT/qH5?=
- =?us-ascii?Q?axArjYwD+DpaR2YDLsl7M65pHHiIGlWyrYxIvnesZ0745mBARCwaJpBY/rdL?=
- =?us-ascii?Q?IwMWseksSC+vCSqYtb8ylEIwHChwseAS7qBL2VeIpQe2YLfgXMc4NAXWL9tS?=
- =?us-ascii?Q?G9NVlR/u+iqbnx9UuPJJK2cPUS2tNM0M2xaCSz0NFirX8vXIgqXNv1QOCMS8?=
- =?us-ascii?Q?ABM+L+BEkMcRapowBBVkV5w2qRn52K7VUnBWgnXC3XwtNTxmRPCAkyeVMhMr?=
- =?us-ascii?Q?IvMaGJcOfgoIobgHPzuNfjsxGt258TuQzo44/fGf5CMMvASCMNpYvFfYhA1e?=
- =?us-ascii?Q?+zJ5luZx7EVqBueOpMZSfT7a9f7lwf4OYUYsHhSpx4nEOrBRq7czddB0c4Wl?=
- =?us-ascii?Q?DQ3oAoa23g+VZ71jmyXIG8Q5U+EyLZZPZ9ebP/43cbmy5PzuDSBbRZ/4WYWd?=
- =?us-ascii?Q?PbtnAEvHhQAH0wtUVaw2jPHfKgGbfuPIKXrnCADvgqma/fx4tpolXXwGqI6e?=
- =?us-ascii?Q?KQD3R6r58lpwTWoq9AjHITRlr11Rbl3qosMcm02EoRDEjrsTtbV9KZjKuiq/?=
- =?us-ascii?Q?zxoJlOGGedfaRfdRIYQYBMBL+wJhk8zvXKz1NHBHpjuGscVYWx1AZPXpAjt7?=
- =?us-ascii?Q?wc7ozlj854C9bqiC7QQJC28rVNidqmMYiwMEXRVDJBJkExVy3e8a/tMAdjB6?=
- =?us-ascii?Q?/jJcyxEiVpD0lQkxK/lCx9PNi1BaZ4cqZZUFAU6w58eeKzRWeQwMuhQUffsq?=
- =?us-ascii?Q?ZIr6d8uckLOCw8ttmHc9GXDipkOdk3hDYL4OFx7nU+EQDREDKPK9fNbbyVG4?=
- =?us-ascii?Q?7jjcvNEXKEooE9nLHfnHcF4EOt/VM2vy1RZ1IncWYiZfDdi0IUK0OYE3xOiB?=
- =?us-ascii?Q?3EuN0VqiKx1xrULdb1CZoPT/IX0ObkY3lBhz/iiGrU3j2hjysEGsEdfG31tC?=
- =?us-ascii?Q?ftEnp9gN1B5o4L5zVZHEsqQPMtGXVMofGzb6k8wisinM+JNQyMusPuQpzBg+?=
- =?us-ascii?Q?IJPR4T/03PcARbz9hc2Rnm1TU8UHXeuVE+/KAJjl//G8MT8+VUnjl8pWQwsq?=
- =?us-ascii?Q?PFu0g6/W//nVr+/xxHLazfsysmqTQQ6zP+28yV7FBAHZuPVJIhw0O/HB3AS2?=
- =?us-ascii?Q?tAZqJO3GLWcEak1Wh9evYDCWmIssyUkicM5zjdOfaKG7uOUHlHnrc3h3pwP0?=
- =?us-ascii?Q?zNSqfdZgDM7Bg2kQCh/vAhU+tD4YK/v/N7W3uQ9ACH77E4j7ugvCGO0urnAB?=
- =?us-ascii?Q?Vg=3D=3D?=
+	=?us-ascii?Q?Cv4uK4xyGWNE7ztLWz4eBLFuI6NlMARk4j0sq5tG7btiMuv2IfY8k96+6MbE?=
+ =?us-ascii?Q?yN0zz/JF8Pu0Bi+MQ/QQ4dTrp028TVTG4k/FNILmst5UMkoeAuWO3kuUBuW0?=
+ =?us-ascii?Q?sQxIHs2Drlc4SUcnRnfGixykrVXL9RFNpVT4t9o+Ek3wAC9Xj2ZXmQT25EC9?=
+ =?us-ascii?Q?kmCVLYVQZtXAU+4kGttx9RTUpljhYOPs7MqcIVC+sy4nABIoxSCK4D3ESXqa?=
+ =?us-ascii?Q?130E1DzkCEXHGvdStbKZBdGTOWf0mg6eiT9J3auHmseKK8ErIaF/yGg7sFOn?=
+ =?us-ascii?Q?ik3NjdJe0DLsXEeYick9wfsHJXldzgUUbjdRetK8/e0+OCRToJGK7O3knnEK?=
+ =?us-ascii?Q?889hDbpNZDtMkjom2y7PV5ZqhkwUafBxKBpr36ls7KBLM86KlHhNRQSTG6T0?=
+ =?us-ascii?Q?zrq2PJZM5Z2j6hcCrXvRNh57PwRwO/Is+MRrHL8IjUjeMF4LzTItdPofB1+S?=
+ =?us-ascii?Q?YvKyA+J2dGCwqUCeo2045Mc9wPMQ7CwCrnveL2xeCbKbRsKJWl+c2JshcevA?=
+ =?us-ascii?Q?N4s1ES/hbuX+4mAjtC5kn7RGNz3Jkr547a9WelZJyNtOzwLSYuD5J0viUhbI?=
+ =?us-ascii?Q?MPefCxjT0bgWBv+mMDnPM4L2EU4Gl79qMlSF9w+Dk9TQvH9whTTBhSxgIRCy?=
+ =?us-ascii?Q?KBeaLAxci4OSAz64ssy694i8/+uatEQfLab5+Z3NRZsY3GaCjy7i9Sc9lfYF?=
+ =?us-ascii?Q?7pd5kwvOx4svNlEE2gGAzLjPoMHMmn83uQXntq54f82gehEXyYvCnE79zjzX?=
+ =?us-ascii?Q?5Q7S/TKUS7l5FJcIUVFTH/hq9EDYrkeFWMS/4QAlaN973t7zkNxgbAWhmJDn?=
+ =?us-ascii?Q?DLmQEWx6m7EyvTvZQhEY5bAhLIKsw9TBdrRopaPT0FEP9JcFJsNQSMlO7gK0?=
+ =?us-ascii?Q?AUZql+QfrzKGaMd2bs25ThLhWZGTzydOKiAQ9/aiOuTqmTNT5J97tsly4U6r?=
+ =?us-ascii?Q?M4SopyBq+H1Vz3uqEISD16YSQ9rqFs1gT+sMlf0Ra//Ht9yIV/+Q8Oi3r0rF?=
+ =?us-ascii?Q?4RaRH0fByKIRrXsAdVWLhq8aAF/aCR/QfwG7FJpM39VqHReUNf2WRykzAN4k?=
+ =?us-ascii?Q?GMwZ0Q4yaMFH39UhOA6d6UhNCL9zlVIi9pyX8kQe5IfZpUzkaBHGZiq4VEdw?=
+ =?us-ascii?Q?lIytfMf4VR9t70AIP58DRZk7cwv4M34JDr072FyquFHmj1DdNk40h++lGjuo?=
+ =?us-ascii?Q?hpt2Ik3g0i6Hukwm++XBVgSHAwRduxVHV+t5AEMJw8k38cy8FOGy7yVsgW2y?=
+ =?us-ascii?Q?AbDID90qq1q97FumgZGvrGAlnzgySyjtnHm5EmCYwnkGG9HWX1ovtA4Vu9kV?=
+ =?us-ascii?Q?WFcazFBLc2PH+uHWdzrrvn7LyxXt3oANsGKmUABXMS9kCnX3eC7u7F0pjmvT?=
+ =?us-ascii?Q?XkXScS8IjYR75xhZMzziimEho2EtLdvZIZ0zperJ+kkvgkVeP5xg7uE3F/3j?=
+ =?us-ascii?Q?oJtfN7a2EzaZ0X3dwrq21lFvAxMRARoI4rq5kUwgZCEIb3oBq2yAlT+YHGpB?=
+ =?us-ascii?Q?X8UkdgencTTQMaBHR/JACP4u4H9lNQACfJIKxU2+8XCpYgeoiPShYNUBrzjn?=
+ =?us-ascii?Q?/L6rTHG2Lm/d5VHlmyZ9dE3in9AE4uAVvrUAC9ZGTD68JxLZ2ErUU160QSrJ?=
+ =?us-ascii?Q?mQ=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4450e2d1-c1ac-4915-1ace-08dbaee3dda8
+X-MS-Exchange-CrossTenant-Network-Message-Id: aa04c17c-5970-4c8d-b0b3-08dbaee3eca1
 X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2023 14:16:30.4600
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2023 14:16:55.5316
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: DXrh8bd66LgxThVtbS50QrcQl+gIPoHKlDccFJH54iXnwiKO7p2EtLmiBXp7kmfaGJNwY8rGAa7LqdrLgxj+vA==
+X-MS-Exchange-CrossTenant-UserPrincipalName: Wfjk87NUrx/LS7Dsfpf32+mzNqqnXMoq2cwBR1LiOOUW7+5qcimP6jwjp+TkozPRvndiiM03feGEHdbE75mjpg==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8375
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
 	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-enetc_psi_create() returns an ERR_PTR() or a valid station interface
-pointer, but checking for the non-NULL quality of the return code blurs
-that difference away. So if enetc_psi_create() fails, we call
-enetc_psi_destroy() when we shouldn't. This will likely result in
-crashes, since enetc_psi_create() cleans up everything after itself when
-it returns an ERR_PTR().
+On Wed, Sep 06, 2023 at 02:48:20PM +0300, Dan Carpenter wrote:
+> Hello Vladimir Oltean,
+> 
+> The patch f0168042a212: "net: enetc: reimplement RFS/RSS memory
+> clearing as PCI quirk" from Aug 3, 2023 (linux-next), leads to the
+> following Smatch static checker warning:
+> 
+> 	drivers/net/ethernet/freescale/enetc/enetc_pf.c:1405 enetc_fixup_clear_rss_rfs()
+> 	warn: 'si' is an error pointer or valid
+> 
+> drivers/net/ethernet/freescale/enetc/enetc_pf.c
+>     1393 static void enetc_fixup_clear_rss_rfs(struct pci_dev *pdev)
+>     1394 {
+>     1395         struct device_node *node = pdev->dev.of_node;
+>     1396         struct enetc_si *si;
+>     1397 
+>     1398         /* Only apply quirk for disabled functions. For the ones
+>     1399          * that are enabled, enetc_pf_probe() will apply it.
+>     1400          */
+>     1401         if (node && of_device_is_available(node))
+>     1402                 return;
+>     1403 
+>     1404         si = enetc_psi_create(pdev);
+> --> 1405         if (si)
+> 
+> I guess this should be if (!IS_ERR(si)) {?
+> 
+>     1406                 enetc_psi_destroy(pdev);
+>     1407 }
+> 
+> regards,
+> dan carpenter
 
-Fixes: f0168042a212 ("net: enetc: reimplement RFS/RSS memory clearing as PCI quirk")
-Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-Closes: https://lore.kernel.org/netdev/582183ef-e03b-402b-8e2d-6d9bb3c83bd9@moroto.mountain/
-Suggested-by: Dan Carpenter <dan.carpenter@linaro.org>
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
----
- drivers/net/ethernet/freescale/enetc/enetc_pf.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf.c b/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-index e0a4cb7e3f50..c153dc083aff 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pf.c
-@@ -1402,7 +1402,7 @@ static void enetc_fixup_clear_rss_rfs(struct pci_dev *pdev)
- 		return;
- 
- 	si = enetc_psi_create(pdev);
--	if (si)
-+	if (!IS_ERR(si))
- 		enetc_psi_destroy(pdev);
- }
- DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_FREESCALE, ENETC_DEV_ID_PF,
--- 
-2.34.1
-
+Thanks. I've submitted a patch based on this suggestion
+(Message-ID: 20230906141609.247579-1-vladimir.oltean@nxp.com).
 
