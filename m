@@ -1,111 +1,115 @@
-Return-Path: <netdev+bounces-32332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEFE47942F4
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 20:18:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C2F279432D
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 20:35:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E0C628155A
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 18:18:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC520281596
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 18:35:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5186C11197;
-	Wed,  6 Sep 2023 18:18:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D4331119E;
+	Wed,  6 Sep 2023 18:35:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C02E11182
-	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 18:18:54 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A243EE6A
-	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 11:18:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694024333; x=1725560333;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=MGNaPyfct9ZA6Jx8Fm3wIdCt4INUWzy/QTzzBAziiG4=;
-  b=df/N/Suuexq9xB8Y/NoeggrTc9F/Pjrr2tZChm5T603JJBNbMOcqy3ed
-   Wnw5B1yXBd/eqbrKScTcdhIUmbkvB7rltyYv/McHW++oIZqr8z7EIzoqc
-   A0gj9b+OGIGpIJYn0L92OUzy7xhiWPYbBlfjqD1uauTSDhWojTQrSflPA
-   OjCRcq3Ngs8xLThTzpX7nh9mpaNoe2/rBKdJ/198EbAaXisz5z7RpRBr9
-   sqMuQfZANi9PR0ogXRPR3imU91GfNTA8rYbYJ7e7vA/MP+a5JNDmD+rvA
-   UWT4ZsO9hLLRD1kGcQqsMeE8kWTiawoHnmmBtZ6JUV+1CaFWFDZIf0kSn
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10825"; a="367367956"
-X-IronPort-AV: E=Sophos;i="6.02,232,1688454000"; 
-   d="scan'208";a="367367956"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2023 11:18:53 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10825"; a="718368596"
-X-IronPort-AV: E=Sophos;i="6.02,232,1688454000"; 
-   d="scan'208";a="718368596"
-Received: from lkp-server01.sh.intel.com (HELO 59b3c6e06877) ([10.239.97.150])
-  by orsmga006.jf.intel.com with ESMTP; 06 Sep 2023 11:18:50 -0700
-Received: from kbuild by 59b3c6e06877 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qdx72-0000U3-0K;
-	Wed, 06 Sep 2023 18:18:48 +0000
-Date: Thu, 7 Sep 2023 02:18:07 +0800
-From: kernel test robot <lkp@intel.com>
-To: Xabier Marquiegui <reibax@gmail.com>, richardcochran@gmail.com
-Cc: oe-kbuild-all@lists.linux.dev, chrony-dev@chrony.tuxfamily.org,
-	mlichvar@redhat.com, netdev@vger.kernel.org,
-	ntp-lists@mattcorallo.com, reibax@gmail.com
-Subject: Re: [PATCH 3/3] ptp: support event queue reader channel masks
-Message-ID: <202309070203.1o2AVeeS-lkp@intel.com>
-References: <20230906104754.1324412-4-reibax@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20E0710954
+	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 18:35:31 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0824426A0
+	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 11:35:03 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59263889eacso1622597b3.3
+        for <netdev@vger.kernel.org>; Wed, 06 Sep 2023 11:35:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1694025281; x=1694630081; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hJltTaOgL5jEO4WF+/Vz9Gw2r17/bIVfgXIk3gpklQ0=;
+        b=ZBkElbtxY8+7TLIrlgLpWVdSV0K+mkpw6JYmfN41F7Wn3XAvD7IQoOx0RxFQ9erVNR
+         3ReSgxlDWPfPbH14qJ+zNpVtJgm7a7lpQ73zeKvFs567ceYu+cdSOjrTwx4lycdzEMky
+         ufE0kTwnCdtn8jLEohVW+ULhALXbTAD+PAkuhiec5/ScwsUp7AiBJVDG6mEOQ7sLVvw4
+         aNAa1b8XdFyRu87ho7hFb2nVVdKjB8NVrQNZdZkUBTL+aFOiC4bQOlcTJyIocH60pqyD
+         jNBtF0Rxt2DYWoCMfKZc4ayXjmJz/cF2nBvxXgAdUAbdyyfpl7Jh/ngPtV9CaqDpt6gi
+         XLwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1694025281; x=1694630081;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hJltTaOgL5jEO4WF+/Vz9Gw2r17/bIVfgXIk3gpklQ0=;
+        b=elp9IsXotJgt3QqDNRDmAkU3IrnqSnJA0XLeWdq1zyfuEqnbpT76nap87TzumbIZwC
+         zHOeGHGp920eRByroBKIzPcCESZONAVQItjoiltRK8VjQrUivV4581QjQ1JKAnxt4nAH
+         9SdLhHzvH8pYG+mVi9iEkgdXBoo70hOgI+br7UpYQ26i+VQbFfI3ZTEsuIzFEoelxHvm
+         Npe7Ov0zbocDas+HxTh7QWig1/Lr90oW3gRMiB73Z0hxhtjEH0q+XKO+PnXL4PtiKydO
+         FCHiD5R+zVsCHXc+f/BcDYOF9o1dMeR4uA0oY9mzKNVT3l1AGhKPBAX8wtCSKH8rezZW
+         EfJg==
+X-Gm-Message-State: AOJu0Yy+TpG/tSlt/nxMPYFLC//6nTFn8HzWiJVhhhQKtph4ZTnL8H3O
+	+kTnh2hZIkN04/y9+9LgfYnP+sY=
+X-Google-Smtp-Source: AGHT+IFhuu2m/WV5JV2cBMSFsDFG5jxjHWU+oNXD57WJzhNfO2v6ypwJ2+8P7l5k9Yg1Ux0KHyvAtdw=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a25:e0c7:0:b0:d63:8364:328 with SMTP id
+ x190-20020a25e0c7000000b00d6383640328mr424401ybg.5.1694025280934; Wed, 06 Sep
+ 2023 11:34:40 -0700 (PDT)
+Date: Wed, 6 Sep 2023 11:34:38 -0700
+In-Reply-To: <c7f9db8879a9342080e74b9270e9925132b02f59.camel@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230906104754.1324412-4-reibax@gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+Mime-Version: 1.0
+References: <000000000000d97f3c060479c4f8@google.com> <ef4b96a75ff8fa87a82a35d4d050338d0bd9cce1.camel@gmail.com>
+ <f3eacce9566d14141cb591dc8364123b809841cb.camel@gmail.com>
+ <20230906075730.6d61420a@kernel.org> <c7f9db8879a9342080e74b9270e9925132b02f59.camel@gmail.com>
+Message-ID: <ZPjGPjbxazLkRkEW@google.com>
+Subject: Re: [syzbot] [bpf?] general protection fault in bpf_prog_offload_verifier_prep
+From: Stanislav Fomichev <sdf@google.com>
+To: Eduard Zingerman <eddyz87@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, 
+	syzbot <syzbot+291100dcb32190ec02a8@syzkaller.appspotmail.com>, andrii@kernel.org, 
+	ast@kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net, 
+	davem@davemloft.net, haoluo@google.com, hawk@kernel.org, 
+	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
+	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
+	song@kernel.org, syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+Content-Type: text/plain; charset="utf-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Xabier,
+On 09/06, Eduard Zingerman wrote:
+> On Wed, 2023-09-06 at 07:57 -0700, Jakub Kicinski wrote:
+> > On Wed, 06 Sep 2023 16:50:23 +0300 Eduard Zingerman wrote:
+> > > diff --git a/kernel/bpf/offload.c b/kernel/bpf/offload.c
+> > > index 3e4f2ec1af06..302e38bffffa 100644
+> > > --- a/kernel/bpf/offload.c
+> > > +++ b/kernel/bpf/offload.c
+> > > @@ -199,12 +199,11 @@ static int __bpf_prog_dev_bound_init(struct bpf_prog *prog, struct net_device *n
+> > >         offload->netdev = netdev;
+> > >  
+> > >         ondev = bpf_offload_find_netdev(offload->netdev);
+> > > +       if (bpf_prog_is_offloaded(prog->aux) && (!ondev || !ondev->offdev)) {
+> > > +               err = -EINVAL;
+> > > +               goto err_free;
+> > > +       }
+> > >         if (!ondev) {
+> > > -               if (bpf_prog_is_offloaded(prog->aux)) {
+> > > -                       err = -EINVAL;
+> > > -                       goto err_free;
+> > > -               }
+> > > -
+> > >                 /* When only binding to the device, explicitly
+> > >                  * create an entry in the hashtable.
+> > >                  */
+> > 
+> > LGTM, FWIW.
+> 
+> Thanks, I'll wrap it up as a proper patch with a test.
 
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on net/main]
-[also build test ERROR on net-next/main linus/master next-20230906]
-[cannot apply to shuah-kselftest/next shuah-kselftest/fixes horms-ipvs/master v6.5]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Xabier-Marquiegui/ptp-support-multiple-timestamp-event-readers/20230906-194848
-base:   net/main
-patch link:    https://lore.kernel.org/r/20230906104754.1324412-4-reibax%40gmail.com
-patch subject: [PATCH 3/3] ptp: support event queue reader channel masks
-config: i386-randconfig-005-20230906 (https://download.01.org/0day-ci/archive/20230907/202309070203.1o2AVeeS-lkp@intel.com/config)
-compiler: gcc-9 (Debian 9.3.0-22) 9.3.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230907/202309070203.1o2AVeeS-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202309070203.1o2AVeeS-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from <command-line>:32:
->> ./usr/include/linux/ptp_clock.h:109:2: error: unknown type name 'pid_t'
-     109 |  pid_t reader_pid; /* PID of process reading the timestamp event queue */
-         |  ^~~~~
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+LGTM as well, thanks!
 
