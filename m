@@ -1,489 +1,121 @@
-Return-Path: <netdev+bounces-32231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEACB793A85
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 13:00:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E381793A95
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 13:03:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9ED81281149
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 11:00:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F23282812C1
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 11:03:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A63D6126;
-	Wed,  6 Sep 2023 10:59:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0C9B111E;
+	Wed,  6 Sep 2023 11:03:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5897C7E
-	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 10:59:39 +0000 (UTC)
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 720BBCF1
-	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 03:59:34 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qdqFX-0002n0-SN; Wed, 06 Sep 2023 12:59:07 +0200
-Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qdqFW-004PCu-By; Wed, 06 Sep 2023 12:59:06 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qdqFV-006CFe-1q;
-	Wed, 06 Sep 2023 12:59:05 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	devicetree@vger.kernel.org
-Subject: [RFC net-next v2 2/2] net: dsa: microchip: Add drive strength configuration
-Date: Wed,  6 Sep 2023 12:59:04 +0200
-Message-Id: <20230906105904.1477021-3-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230906105904.1477021-1-o.rempel@pengutronix.de>
-References: <20230906105904.1477021-1-o.rempel@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C34A57E
+	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 11:03:01 +0000 (UTC)
+Received: from us-smtp-delivery-44.mimecast.com (unknown [207.211.30.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E60F3F9
+	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 04:02:59 -0700 (PDT)
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-257-v5yco5_CMvqNho2P1iiCJQ-1; Wed, 06 Sep 2023 07:02:41 -0400
+X-MC-Unique: v5yco5_CMvqNho2P1iiCJQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 732A28030A9;
+	Wed,  6 Sep 2023 11:02:40 +0000 (UTC)
+Received: from hog (unknown [10.45.224.12])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id DD725200BC49;
+	Wed,  6 Sep 2023 11:02:38 +0000 (UTC)
+Date: Wed, 6 Sep 2023 13:02:37 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Liu Jian <liujian56@huawei.com>
+Cc: borisp@nvidia.com, john.fastabend@gmail.com, kuba@kernel.org,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	vfedorenko@novek.ru, netdev@vger.kernel.org
+Subject: Re: [PATCH net] tls: do not return error when the tls_bigint
+ overflows in tls_advance_record_sn()
+Message-ID: <ZPhcTQ3mFQYmTHet@hog>
+References: <20230906065237.2180187-1-liujian56@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
+In-Reply-To: <20230906065237.2180187-1-liujian56@huawei.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=0.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_VALIDITY_RPBL,RDNS_NONE,SPF_HELO_NONE,SPF_NONE autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add device tree based drive strength configuration support. It is needed to
-pass EMI validation on our hardware.
+2023-09-06, 14:52:37 +0800, Liu Jian wrote:
+> This is because the value of rec_seq of tls_crypto_info configured by the
+> user program is too large, for example, 0xffffffffffffff. In addition, TL=
+S
+> is asynchronously accelerated. When tls_do_encryption() returns
+> -EINPROGRESS and sk->sk_err is set to EBADMSG due to rec_seq overflow,
+> skmsg is released before the asynchronous encryption process ends. As a
+> result, the UAF problem occurs during the asynchronous processing of the
+> encryption module.
+>=20
+> I didn't see the rec_seq overflow causing other problems, so let's get ri=
+d
+> of the overflow error here.
+>=20
+> Fixes: 635d93981786 ("net/tls: free record only on encryption error")
+> Signed-off-by: Liu Jian <liujian56@huawei.com>
+> ---
+>  net/tls/tls.h | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>=20
+> diff --git a/net/tls/tls.h b/net/tls/tls.h
+> index 28a8c0e80e3c..3f0e10df8053 100644
+> --- a/net/tls/tls.h
+> +++ b/net/tls/tls.h
+> @@ -304,8 +304,7 @@ static inline void
+>  tls_advance_record_sn(struct sock *sk, struct tls_prot_info *prot,
+>  =09=09      struct cipher_context *ctx)
+>  {
+> -=09if (tls_bigint_increment(ctx->rec_seq, prot->rec_seq_size))
+> -=09=09tls_err_abort(sk, -EBADMSG);
+> +=09tls_bigint_increment(ctx->rec_seq, prot->rec_seq_size);
 
-Configuration values are based on the vendor's reference driver.
+That seems wrong. We can't allow the record number to wrap, if breaks
+the crypto. See for example:
+https://datatracker.ietf.org/doc/html/rfc5288#section-6.1
 
-Tested on KSZ9563R.
+The real fix would be to stop the caller from freeing the skmsg and
+record if we go async. Once we go through async crypto, the record etc
+don't belong to the caller anymore, they've been transfered to the
+async callback. I'd say we need both tests in bpf_exec_tx_verdict:
+-EINPROGRESS (from before 635d93981786) and EBADMSG (from
+635d93981786).
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
- drivers/net/dsa/microchip/ksz8795_reg.h |  14 --
- drivers/net/dsa/microchip/ksz9477_reg.h |  13 --
- drivers/net/dsa/microchip/ksz_common.c  | 286 ++++++++++++++++++++++++
- drivers/net/dsa/microchip/ksz_common.h  |  20 ++
- 4 files changed, 306 insertions(+), 27 deletions(-)
+Actually we need to check for both -EINPROGRESS and -EBUSY as I've
+recently found out.
 
-diff --git a/drivers/net/dsa/microchip/ksz8795_reg.h b/drivers/net/dsa/microchip/ksz8795_reg.h
-index 7a57c6088f809..d33db4f86c642 100644
---- a/drivers/net/dsa/microchip/ksz8795_reg.h
-+++ b/drivers/net/dsa/microchip/ksz8795_reg.h
-@@ -442,20 +442,6 @@
- #define TOS_PRIO_M			KS_PRIO_M
- #define TOS_PRIO_S			KS_PRIO_S
- 
--#define REG_SW_CTRL_20			0xA3
--
--#define SW_GMII_DRIVE_STRENGTH_S	4
--#define SW_DRIVE_STRENGTH_M		0x7
--#define SW_DRIVE_STRENGTH_2MA		0
--#define SW_DRIVE_STRENGTH_4MA		1
--#define SW_DRIVE_STRENGTH_8MA		2
--#define SW_DRIVE_STRENGTH_12MA		3
--#define SW_DRIVE_STRENGTH_16MA		4
--#define SW_DRIVE_STRENGTH_20MA		5
--#define SW_DRIVE_STRENGTH_24MA		6
--#define SW_DRIVE_STRENGTH_28MA		7
--#define SW_MII_DRIVE_STRENGTH_S		0
--
- #define REG_SW_CTRL_21			0xA4
- 
- #define SW_IPV6_MLD_OPTION		BIT(3)
-diff --git a/drivers/net/dsa/microchip/ksz9477_reg.h b/drivers/net/dsa/microchip/ksz9477_reg.h
-index cba3dba58bc37..504e085aab522 100644
---- a/drivers/net/dsa/microchip/ksz9477_reg.h
-+++ b/drivers/net/dsa/microchip/ksz9477_reg.h
-@@ -112,19 +112,6 @@
- 
- #define REG_SW_IBA_SYNC__1		0x010C
- 
--#define REG_SW_IO_STRENGTH__1		0x010D
--#define SW_DRIVE_STRENGTH_M		0x7
--#define SW_DRIVE_STRENGTH_2MA		0
--#define SW_DRIVE_STRENGTH_4MA		1
--#define SW_DRIVE_STRENGTH_8MA		2
--#define SW_DRIVE_STRENGTH_12MA		3
--#define SW_DRIVE_STRENGTH_16MA		4
--#define SW_DRIVE_STRENGTH_20MA		5
--#define SW_DRIVE_STRENGTH_24MA		6
--#define SW_DRIVE_STRENGTH_28MA		7
--#define SW_HI_SPEED_DRIVE_STRENGTH_S	4
--#define SW_LO_SPEED_DRIVE_STRENGTH_S	0
--
- #define REG_SW_IBA_STATUS__4		0x0110
- 
- #define SW_IBA_REQ			BIT(31)
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 6673122266b7a..dd452ad94bc47 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -186,6 +186,60 @@ static const struct ksz_mib_names ksz9477_mib_names[] = {
- 	{ 0x83, "tx_discards" },
- };
- 
-+struct ksz_driver_strength_prop {
-+	const char *name;
-+	int offset;
-+	int value;
-+};
-+
-+enum ksz_driver_strength_type {
-+	KSZ_DRIVER_STRENGTH_HI,
-+	KSZ_DRIVER_STRENGTH_LO,
-+	KSZ_DRIVER_STRENGTH_IO,
-+};
-+
-+/**
-+ * struct ksz9477_drive_strength - drive strength mapping
-+ * @reg_val:	register value
-+ * @milliamp:	milliamp value
-+ */
-+struct ksz9477_drive_strength {
-+	u32 reg_val;
-+	u32 milliamp;
-+};
-+
-+/* ksz9477_drive_strengths - Drive strength mapping for KSZ9477 variants
-+ *
-+ * This values are not documented in KSZ9477 variants.
-+ * Documentation in KSZ8795CLX provides more information with some
-+ * recommendations:
-+ * - for high speed signals
-+ *   1. 4 mA or 8 mA is often used for MII, RMII, and SPI interface with using
-+ *      2.5V or 3.3V VDDIO.
-+ *   2. 12 mA or 16 mA is often used for MII, RMII, and SPI interface with
-+ *      using 1.8V VDDIO.
-+ *   3. 20 mA or 24 mA is often used for GMII/RGMII interface with using 2.5V
-+ *      or 3.3V VDDIO.
-+ *   4. 28 mA is often used for GMII/RGMII interface with using 1.8V VDDIO.
-+ *   5. In same interface, the heavy loading should use higher one of the
-+ *      drive current strength.
-+ * - for low speed signals
-+ *   1. 3.3V VDDIO, use either 4 mA or 8 mA.
-+ *   2. 2.5V VDDIO, use either 8 mA or 12 mA.
-+ *   3. 1.8V VDDIO, use either 12 mA or 16 mA.
-+ *   4. If it is heavy loading, can use higher drive current strength.
-+ */
-+static const struct ksz9477_drive_strength ksz9477_drive_strengths[] = {
-+	{ SW_DRIVE_STRENGTH_2MA,  2000 },
-+	{ SW_DRIVE_STRENGTH_4MA,  4000 },
-+	{ SW_DRIVE_STRENGTH_8MA,  8000 },
-+	{ SW_DRIVE_STRENGTH_12MA, 12000 },
-+	{ SW_DRIVE_STRENGTH_16MA, 16000 },
-+	{ SW_DRIVE_STRENGTH_20MA, 20000 },
-+	{ SW_DRIVE_STRENGTH_24MA, 24000 },
-+	{ SW_DRIVE_STRENGTH_28MA, 28000 },
-+};
-+
- static const struct ksz_dev_ops ksz8_dev_ops = {
- 	.setup = ksz8_setup,
- 	.get_port_addr = ksz8_get_port_addr,
-@@ -3516,6 +3570,234 @@ static void ksz_parse_rgmii_delay(struct ksz_device *dev, int port_num,
- 	dev->ports[port_num].rgmii_tx_val = tx_delay;
- }
- 
-+/**
-+ * ksz9477_drive_strength_to_reg() - Convert drive strength value to
-+ *				     corresponding register value for KSZ9477
-+ *				     compatible switches.
-+ * @milliamp: The drive strength value in milliamp to be converted.
-+ *
-+ * This function searches the predefined ksz9477_drive_strengths array for a
-+ * match with the provided milliamp value.
-+ *
-+ * Returns: If found, the corresponding register value for that drive strength
-+ * is returned. Otherwise, -EINVAL is returned indicating an invalid value.
-+ */
-+static int ksz9477_drive_strength_to_reg(int milliamp)
-+{
-+	size_t array_size = ARRAY_SIZE(ksz9477_drive_strengths);
-+	int i;
-+
-+	for (i = 0; i < array_size; i++) {
-+		if (ksz9477_drive_strengths[i].milliamp == milliamp)
-+			return ksz9477_drive_strengths[i].reg_val;
-+	}
-+
-+	return -EINVAL;
-+}
-+
-+/**
-+ * ksz9477_drive_strength_error() - Report invalid drive strength value for the
-+ *				    KSZ9477 chip variants.
-+ * @dev:       ksz device
-+ * @milliamp:  Invalid drive strength value in milliamp
-+ *
-+ * This function logs an error message when an unsupported drive strength value
-+ * is detected for a KSZ9477 chip variant. It lists out all the supported drive
-+ * strength values for reference in the error message.
-+ */
-+static void ksz9477_drive_strength_error(struct ksz_device *dev, int milliamp)
-+{
-+	size_t array_size = ARRAY_SIZE(ksz9477_drive_strengths);
-+	char supported_values[100];
-+	int i;
-+
-+	for (i = 0; i < array_size; i++) {
-+		if (i == 0)
-+			snprintf(supported_values, sizeof(supported_values),
-+				 "%d", ksz9477_drive_strengths[i].milliamp);
-+		else
-+			snprintf(supported_values, sizeof(supported_values),
-+				 "%s, %d", supported_values,
-+				 ksz9477_drive_strengths[i].milliamp);
-+	}
-+
-+	dev_err(dev->dev, "Invalid drive strength %d, supported values are %s\n",
-+		milliamp, supported_values);
-+}
-+
-+/**
-+ * ksz9477_drive_strength_write() - Set the drive strength for specific KSZ9477
-+ *				    chip variants.
-+ * @dev:       ksz device
-+ * @props:     Array of drive strength properties to be applied
-+ * @num_props: Number of properties in the array
-+ *
-+ * This function configures the drive strength for various KSZ9477 chip variants
-+ * based on the provided properties. It handles chip-specific nuances and
-+ * ensures only valid drive strengths are written to the respective chip.
-+ *
-+ * Return: 0 on successful configuration, a negative error code on failure.
-+ */
-+static int ksz9477_drive_strength_write(struct ksz_device *dev,
-+					struct ksz_driver_strength_prop *props,
-+					int num_props)
-+{
-+	int i, ret, reg;
-+	u8 val;
-+
-+	if (props[KSZ_DRIVER_STRENGTH_IO].value != -1)
-+		dev_warn(dev->dev, "%s is not supported by this chip variant\n",
-+			 props[KSZ_DRIVER_STRENGTH_IO].name);
-+
-+	if (dev->chip_id == KSZ8795_CHIP_ID ||
-+	    dev->chip_id == KSZ8794_CHIP_ID ||
-+	    dev->chip_id == KSZ8765_CHIP_ID)
-+		reg = KSZ8795_REG_SW_CTRL_20;
-+	else
-+		reg = KSZ9477_REG_SW_IO_STRENGTH;
-+
-+	ret = ksz_read8(dev, reg, &val);
-+	if (ret)
-+		return ret;
-+
-+	for (i = 0; i < num_props; i++) {
-+		if (props[i].value == -1)
-+			continue;
-+
-+		ret = ksz9477_drive_strength_to_reg(props[i].value);
-+		if (ret < 0) {
-+			ksz9477_drive_strength_error(dev, props[i].value);
-+			return ret;
-+		}
-+
-+		val &= ~(SW_DRIVE_STRENGTH_M << props[i].offset);
-+		val |= ret << props[i].offset;
-+	}
-+
-+	return ksz_write8(dev, reg, val);
-+}
-+
-+/**
-+ * ksz8830_drive_strength_write() - Set the drive strength configuration for
-+ *				    KSZ8830 compatible chip variants.
-+ * @dev:       ksz device
-+ * @props:     Array of drive strength properties to be set
-+ * @num_props: Number of properties in the array
-+ *
-+ * This function applies the specified drive strength settings to KSZ8830 chip
-+ * variants (KSZ8873, KSZ8863).
-+ * It ensures the configurations align with what the chip variant supports and
-+ * warns or errors out on unsupported settings.
-+ *
-+ * Return: 0 on success, error code otherwise
-+ */
-+static int ksz8830_drive_strength_write(struct ksz_device *dev,
-+					struct ksz_driver_strength_prop *props,
-+					int num_props)
-+{
-+	u8 val;
-+	int i;
-+
-+	for (i = 0; i < num_props; i++) {
-+		if (props[i].value == -1 || i == KSZ_DRIVER_STRENGTH_IO)
-+			continue;
-+
-+		dev_warn(dev->dev, "%s is not supported by this chip variant\n",
-+			 props[i].name);
-+	}
-+
-+	if (props[KSZ_DRIVER_STRENGTH_IO].value == 16000) {
-+		val = KSZ8873_DRIVE_STRENGTH_16MA;
-+	} else if (props[KSZ_DRIVER_STRENGTH_IO].value == 8000) {
-+		val = 0;
-+	} else {
-+		dev_err(dev->dev, "Invalid drive strength %d, supported values are: 16000, 8000\n",
-+			props[KSZ_DRIVER_STRENGTH_IO].value);
-+		return -EINVAL;
-+	}
-+
-+	return ksz_rmw8(dev, KSZ8873_REG_GLOBAL_CTRL_12,
-+			KSZ8873_DRIVE_STRENGTH_16MA, val);
-+}
-+
-+/**
-+ * ksz_parse_drive_strength() - Extract and apply drive strength configurations
-+ *				from device tree properties.
-+ * @dev:	ksz device
-+ *
-+ * This function reads the specified drive strength properties from the
-+ * device tree, validates against the supported chip variants, and sets
-+ * them accordingly.
-+ *
-+ * Return: 0 on success, error code otherwise
-+ */
-+static int ksz_parse_drive_strength(struct ksz_device *dev)
-+{
-+	struct ksz_driver_strength_prop of_props[] = {
-+		[KSZ_DRIVER_STRENGTH_HI] = {
-+			.name = "microchip,hi-drive-strength-microamp",
-+			.offset = SW_HI_SPEED_DRIVE_STRENGTH_S,
-+			.value = -1
-+		},
-+		[KSZ_DRIVER_STRENGTH_LO] = {
-+			.name = "microchip,lo-drive-strength-microamp",
-+			.offset = SW_LO_SPEED_DRIVE_STRENGTH_S,
-+			.value = -1
-+		},
-+		[KSZ_DRIVER_STRENGTH_IO] = {
-+			.name = "microchip,io-drive-strength-microamp",
-+			.offset = 0, /* don't care */
-+			.value = -1
-+		},
-+	};
-+	struct device_node *np = dev->dev->of_node;
-+	bool found = false;
-+	int i, ret;
-+
-+	for (i = 0; i < ARRAY_SIZE(of_props); i++) {
-+		ret = of_property_read_u32(np, of_props[i].name,
-+					   &of_props[i].value);
-+		if (ret && ret != -EINVAL)
-+			dev_warn(dev->dev, "Failed to read %s\n",
-+				 of_props[i].name);
-+		if (ret)
-+			continue;
-+
-+		found = true;
-+	}
-+
-+	if (!found)
-+		return 0;
-+
-+	switch (dev->chip_id) {
-+	case KSZ8830_CHIP_ID:
-+		return ksz8830_drive_strength_write(dev, of_props,
-+						    ARRAY_SIZE(of_props));
-+	case KSZ8795_CHIP_ID:
-+	case KSZ8794_CHIP_ID:
-+	case KSZ8765_CHIP_ID:
-+	case KSZ8563_CHIP_ID:
-+	case KSZ9477_CHIP_ID:
-+	case KSZ9563_CHIP_ID:
-+	case KSZ9567_CHIP_ID:
-+	case KSZ9893_CHIP_ID:
-+	case KSZ9896_CHIP_ID:
-+	case KSZ9897_CHIP_ID:
-+		return ksz9477_drive_strength_write(dev, of_props,
-+						    ARRAY_SIZE(of_props));
-+	default:
-+		for (i = 0; i < ARRAY_SIZE(of_props); i++) {
-+			if (of_props[i].value == -1)
-+				continue;
-+
-+			dev_warn(dev->dev, "%s is not supported by this chip variant\n",
-+				 of_props[i].name);
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- int ksz_switch_register(struct ksz_device *dev)
- {
- 	const struct ksz_chip_data *info;
-@@ -3598,6 +3880,10 @@ int ksz_switch_register(struct ksz_device *dev)
- 	for (port_num = 0; port_num < dev->info->port_cnt; ++port_num)
- 		dev->ports[port_num].interface = PHY_INTERFACE_MODE_NA;
- 	if (dev->dev->of_node) {
-+		ret = ksz_parse_drive_strength(dev);
-+		if (ret)
-+			return ret;
-+
- 		ret = of_get_phy_mode(dev->dev->of_node, &interface);
- 		if (ret == 0)
- 			dev->compat_interface = interface;
-diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-index a4de58847deab..ca37b5b879464 100644
---- a/drivers/net/dsa/microchip/ksz_common.h
-+++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -689,6 +689,26 @@ static inline int is_lan937x(struct ksz_device *dev)
- #define KSZ8_LEGAL_PACKET_SIZE		1518
- #define KSZ9477_MAX_FRAME_SIZE		9000
- 
-+#define KSZ8873_REG_GLOBAL_CTRL_12	0x0e
-+/* Drive Strength of I/O Pad
-+ * 0: 8mA, 1: 16mA
-+ */
-+#define KSZ8873_DRIVE_STRENGTH_16MA	BIT(6)
-+
-+#define KSZ8795_REG_SW_CTRL_20		0xa3
-+#define KSZ9477_REG_SW_IO_STRENGTH	0x010d
-+#define SW_DRIVE_STRENGTH_M		0x7
-+#define SW_DRIVE_STRENGTH_2MA		0
-+#define SW_DRIVE_STRENGTH_4MA		1
-+#define SW_DRIVE_STRENGTH_8MA		2
-+#define SW_DRIVE_STRENGTH_12MA		3
-+#define SW_DRIVE_STRENGTH_16MA		4
-+#define SW_DRIVE_STRENGTH_20MA		5
-+#define SW_DRIVE_STRENGTH_24MA		6
-+#define SW_DRIVE_STRENGTH_28MA		7
-+#define SW_HI_SPEED_DRIVE_STRENGTH_S	4
-+#define SW_LO_SPEED_DRIVE_STRENGTH_S	0
-+
- #define KSZ9477_REG_PORT_OUT_RATE_0	0x0420
- #define KSZ9477_OUT_RATE_NO_LIMIT	0
- 
--- 
-2.39.2
+I've been running the selftests with async crypto and have collected a
+few fixes that I was going to post this week (but not this one, since
+we don't have a selftest for wrapping rec_seq). One of the patches
+adds -EBUSY checks for all existing -EINPROGRESS, since the crypto API
+can return -EBUSY as well if we're going through the backlog queue.
+
+--=20
+Sabrina
 
 
