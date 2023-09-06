@@ -1,71 +1,74 @@
-Return-Path: <netdev+bounces-32221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BDF1793A00
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 12:35:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B183793A4C
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 12:48:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 613841C20A84
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 10:35:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 229631C20A78
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 10:48:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66E810FE;
-	Wed,  6 Sep 2023 10:35:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDF2E10FD;
+	Wed,  6 Sep 2023 10:48:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D95D67E
-	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 10:35:29 +0000 (UTC)
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6390CF2
-	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 03:35:26 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-68a56401c12so2432626b3a.2
-        for <netdev@vger.kernel.org>; Wed, 06 Sep 2023 03:35:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB0D77E
+	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 10:48:10 +0000 (UTC)
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A48C170E
+	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 03:47:59 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2bcc187e0b5so55650891fa.1
+        for <netdev@vger.kernel.org>; Wed, 06 Sep 2023 03:47:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693996526; x=1694601326; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=10itrWSaGTKK84gZw2IR049sq0WOgrZENzWvQit+BlI=;
-        b=Vn78BmVRJxUNCY6WEBeRyAjqvCuHkVL9Tn84amqrHBLCuUcb5bWL24u+4RU7yY6733
-         Ktz4fNIQN37o6LFT3sQzZ0RJ8kJ8pE6rTCqnthqBrFOlhc7VlOn0Ui6CsZ7nXI5W/w37
-         OGM1UU+6ubqri0VTlxUtsWZZnhMQVqz/RItE0ZfiLnTIIqttj88SwP08lwg4/wDduNfp
-         U2oehUVDk6s3YnHR7+Oh9aFlVtGhJALww8ZQ3/GW/I+LoLwQ7xvAxa9GGQwFicXCWhIK
-         lW3aeFPXdNCI7xWENJzmTHwGpmZJbof1en1IEAfkSHkJZJVNVqK/7a0jOTtjW20fUa8r
-         VaCQ==
+        d=gmail.com; s=20221208; t=1693997278; x=1694602078; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oLyCL7xfksawPaVIRY4PEBqjrincEleWhjGbBohkPjM=;
+        b=YJI0u1910IMwPW41ZWNc63ucA22h/QZyIgq6aalHv7sZE5j+6kHtPsfcxSsiL9DWNj
+         YqlHUlTKMvrjNKi5BU0CEPqSEb3NESC7Avv/cvKBn9/T6Ldvh/fEhGYIh7ztbxebxjlM
+         vDlWTAUwZ8ivxZ+StHRKDVsMcxZeVxL4icetxNWqzC7KnPkVitoO07bjCc9vQjYt1bOr
+         PLRRpW48qKC5IBp4MTQFOaOGVeyErOyKzrkHdyRbEHLbF+QpeU/tUmw4GJH4U08txUAI
+         tBwVdHTJFz3c7990IDmb1POo4Vr4GpnyRcyTwvJQGW0o02jGiEkfNQcr2SsiZC7V/jai
+         W16Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693996526; x=1694601326;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=10itrWSaGTKK84gZw2IR049sq0WOgrZENzWvQit+BlI=;
-        b=J8fp1oN+goR+m9vX3+K6rwaIWaJIYlKd9rFCxSG9MdI875vth27EufojWyAs5FLroo
-         bb8dvJCupl6CJ6ZGLnnOBMNerw72jVRnNXZnlEIeXRJwqh+YfhYDrIvU2CFV4gl1Yhvw
-         f2YBZRNbcdQDLtJzX1y7+pBf4FjHeL7R5CyuMrJ+TKPgSymJ/FG1mlEwvTqIhwnFfq1K
-         VMuuG6EKKn8EQa0qQ25CC1RSCghYPOu93Fx4sdwB2tiEqjNzFgDidyDDpVsFny7V4yMk
-         eGrPrR4i6s8MFagK7OUBTFiry+Op8WokB28pmLKWRFNkC/q8UmaSSbmPPXNPGzD95Apq
-         DwsA==
-X-Gm-Message-State: AOJu0YwzW8WSA2l8Nl6R9QYWwJx9EkrLLBe2jIoUeUI1OMxH49y+ZDeD
-	FxbWISTOLPgR0ENhz8Q1UzU=
-X-Google-Smtp-Source: AGHT+IHOgVIagstlepBJtXOm1nFySSqX90I20/C5wYx2GcrNG4hZ+xQQqtZkctK56K0qtgg/nrJ53w==
-X-Received: by 2002:a05:6a21:66c7:b0:14d:792:aaf8 with SMTP id ze7-20020a056a2166c700b0014d0792aaf8mr12366762pzb.25.1693996526199;
-        Wed, 06 Sep 2023 03:35:26 -0700 (PDT)
-Received: from localhost.localdomain ([96.44.161.4])
-        by smtp.gmail.com with ESMTPSA id c5-20020aa781c5000000b0068a3dd6c1dasm10923246pfn.142.2023.09.06.03.35.19
+        d=1e100.net; s=20221208; t=1693997278; x=1694602078;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oLyCL7xfksawPaVIRY4PEBqjrincEleWhjGbBohkPjM=;
+        b=PsuEybdneRYeT/xVWR38ZBX3VZ3td6KoZ6yc5Q3qoD2rRRuEDJhvgqAUUbAS4QuPL3
+         Z0m2Xxyjljw8PzRf1vdy3u5K9AFwwSGnR8ur3FJx062ssMJaNhQyQwNcU84ZgYvmPApq
+         J7dBwz7Ma0vMuvbmqSZGLzy+PZY28odYpPxbEOPBAAwMo7YTjIXnSTcZhv9WL24oMrQX
+         GqS0UgqWaHuLN8B0jTfPfgrLEGGDr5bkwaA2XVNd2QSwxxN8pGB9hNWMLVLLMDCg1ufk
+         rF8LRY3u+JgyXOgZmylv4I8yotqVoY48PCZ77U/vynwgBbd1C9RPpyZW2pOzZA7R+eVv
+         lHHQ==
+X-Gm-Message-State: AOJu0Yy5g8kqzEtubNeZzEIo7JWarY846/I51BWqTzJJX8Xs8NrkfUtE
+	lUj2Hk+JEF7QGSlhJbp9XBxGRoFC/do=
+X-Google-Smtp-Source: AGHT+IE6r/H5eFT1M+exDeXXLni5kl1DZ4DHVXVDl3sV6/tOBvsFAAA2krH/77cKQnJ5XIJMDmd8IQ==
+X-Received: by 2002:a2e:900e:0:b0:2bc:de11:453b with SMTP id h14-20020a2e900e000000b002bcde11453bmr2098736ljg.1.1693997277607;
+        Wed, 06 Sep 2023 03:47:57 -0700 (PDT)
+Received: from xmarquiegui-HP-ZBook-15-G6.internal.ainguraiiot.com (210.212-55-6.static.clientes.euskaltel.es. [212.55.6.210])
+        by smtp.gmail.com with ESMTPSA id l7-20020a7bc447000000b003fe1fe56202sm19508728wmi.33.2023.09.06.03.47.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Sep 2023 03:35:23 -0700 (PDT)
-From: Liang Chen <liangchen.linux@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	liangchen.linux@gmail.com
-Subject: [RFC PATCH net-next] pktgen: Introducing a parameter for non-shared skb testing
-Date: Wed,  6 Sep 2023 18:35:08 +0800
-Message-Id: <20230906103508.6789-1-liangchen.linux@gmail.com>
-X-Mailer: git-send-email 2.31.1
+        Wed, 06 Sep 2023 03:47:57 -0700 (PDT)
+From: Xabier Marquiegui <reibax@gmail.com>
+To: richardcochran@gmail.com
+Cc: chrony-dev@chrony.tuxfamily.org,
+	mlichvar@redhat.com,
+	netdev@vger.kernel.org,
+	ntp-lists@mattcorallo.com,
+	reibax@gmail.com
+Subject: 
+Date: Wed,  6 Sep 2023 12:47:51 +0200
+Message-Id: <20230906104754.1324412-1-reibax@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <ZO+8Mlk0yMxz7Tn+@hoboy.vegasvil.org>
+References: <ZO+8Mlk0yMxz7Tn+@hoboy.vegasvil.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,127 +83,13 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Currently, skbs generated by pktgen always have their reference count
-incremented before transmission, leading to two issues:
-  1. Only the code paths for shared skbs can be tested.
-  2. Skbs can only be released by pktgen.
-To enhance testing comprehensiveness, introducing the "skb_single_user"
-parameter, which allows skbs with a reference count of 1 to be
-transmitted. So we can test non-shared skbs and code paths where skbs
-are released within the network stack.
 
-Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
----
- net/core/pktgen.c | 39 ++++++++++++++++++++++++++++++++++++---
- 1 file changed, 36 insertions(+), 3 deletions(-)
+Thank you for your patience Richard, and thank you for guiding me. Let's
+see if I got closer to what we want this time.
 
-diff --git a/net/core/pktgen.c b/net/core/pktgen.c
-index f56b8d697014..8f48272b9d4b 100644
---- a/net/core/pktgen.c
-+++ b/net/core/pktgen.c
-@@ -423,6 +423,7 @@ struct pktgen_dev {
- 	__u32 skb_priority;	/* skb priority field */
- 	unsigned int burst;	/* number of duplicated packets to burst */
- 	int node;               /* Memory node */
-+	int skb_single_user;	/* allow single user skb for transmission */
- 
- #ifdef CONFIG_XFRM
- 	__u8	ipsmode;		/* IPSEC mode (config) */
-@@ -1805,6 +1806,17 @@ static ssize_t pktgen_if_write(struct file *file,
- 		return count;
- 	}
- 
-+	if (!strcmp(name, "skb_single_user")) {
-+		len = num_arg(&user_buffer[i], 1, &value);
-+		if (len < 0)
-+			return len;
-+
-+		i += len;
-+		pkt_dev->skb_single_user = value;
-+		sprintf(pg_result, "OK: skb_single_user=%u", pkt_dev->skb_single_user);
-+		return count;
-+	}
-+
- 	sprintf(pkt_dev->result, "No such parameter \"%s\"", name);
- 	return -EINVAL;
- }
-@@ -3460,6 +3472,14 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
- 		return;
- 	}
- 
-+	/* If clone_skb, burst, or count parameters are configured,
-+	 * it implies the need for skb reuse, hence single user skb
-+	 * transmission is not allowed.
-+	 */
-+	if (pkt_dev->skb_single_user && (pkt_dev->clone_skb ||
-+					 burst > 1 || pkt_dev->count))
-+		pkt_dev->skb_single_user = 0;
-+
- 	/* If no skb or clone count exhausted then get new one */
- 	if (!pkt_dev->skb || (pkt_dev->last_ok &&
- 			      ++pkt_dev->clone_count >= pkt_dev->clone_skb)) {
-@@ -3483,7 +3503,8 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
- 	if (pkt_dev->xmit_mode == M_NETIF_RECEIVE) {
- 		skb = pkt_dev->skb;
- 		skb->protocol = eth_type_trans(skb, skb->dev);
--		refcount_add(burst, &skb->users);
-+		if (!pkt_dev->skb_single_user)
-+			refcount_add(burst, &skb->users);
- 		local_bh_disable();
- 		do {
- 			ret = netif_receive_skb(skb);
-@@ -3491,6 +3512,12 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
- 				pkt_dev->errors++;
- 			pkt_dev->sofar++;
- 			pkt_dev->seq_num++;
-+
-+			if (pkt_dev->skb_single_user) {
-+				pkt_dev->skb = NULL;
-+				break;
-+			}
-+
- 			if (refcount_read(&skb->users) != burst) {
- 				/* skb was queued by rps/rfs or taps,
- 				 * so cannot reuse this skb
-@@ -3509,7 +3536,8 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
- 		goto out; /* Skips xmit_mode M_START_XMIT */
- 	} else if (pkt_dev->xmit_mode == M_QUEUE_XMIT) {
- 		local_bh_disable();
--		refcount_inc(&pkt_dev->skb->users);
-+		if (!pkt_dev->skb_single_user)
-+			refcount_inc(&pkt_dev->skb->users);
- 
- 		ret = dev_queue_xmit(pkt_dev->skb);
- 		switch (ret) {
-@@ -3517,6 +3545,8 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
- 			pkt_dev->sofar++;
- 			pkt_dev->seq_num++;
- 			pkt_dev->tx_bytes += pkt_dev->last_pkt_size;
-+			if (pkt_dev->skb_single_user)
-+				pkt_dev->skb = NULL;
- 			break;
- 		case NET_XMIT_DROP:
- 		case NET_XMIT_CN:
-@@ -3549,7 +3579,8 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
- 		pkt_dev->last_ok = 0;
- 		goto unlock;
- 	}
--	refcount_add(burst, &pkt_dev->skb->users);
-+	if (!pkt_dev->skb_single_user)
-+		refcount_add(burst, &pkt_dev->skb->users);
- 
- xmit_more:
- 	ret = netdev_start_xmit(pkt_dev->skb, odev, txq, --burst > 0);
-@@ -3560,6 +3591,8 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
- 		pkt_dev->sofar++;
- 		pkt_dev->seq_num++;
- 		pkt_dev->tx_bytes += pkt_dev->last_pkt_size;
-+		if (pkt_dev->skb_single_user)
-+			pkt_dev->skb = NULL;
- 		if (burst > 0 && !netif_xmit_frozen_or_drv_stopped(txq))
- 			goto xmit_more;
- 		break;
--- 
-2.31.1
+Let me know what you thing about these patches, please.
+
+Thanks,
+Xabier
 
 
