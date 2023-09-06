@@ -1,421 +1,190 @@
-Return-Path: <netdev+bounces-32218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4823C7939CC
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 12:26:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84DAC7939E6
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 12:30:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67B752813F8
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 10:26:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F455281416
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 10:30:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C3D246B9;
-	Wed,  6 Sep 2023 10:26:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F081ECB;
+	Wed,  6 Sep 2023 10:30:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 719B91C3A
-	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 10:26:27 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4016A10F9;
-	Wed,  6 Sep 2023 03:26:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1693995984; x=1725531984;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=WMhnAR1sbMmFu0U79lTBLHtF+yfuj4+7qrkTt5Ldtpg=;
-  b=YZa+YDLDhdUA7bZip8fMVO4maHI1W3J+wFkykV6tQqJ2o2tjXMKJTQun
-   N7/02s2mm8MFxHcFuaWt7mqlLOWZCbdvLQDbO5LHsqpxLpX/HvnzVKt1V
-   YXxc0yA8ESBZmi2PqYtJs3RY4/Wiry+dHlspx2vzCMRyS5TxQ3zryPbMz
-   j/18hjhRhXVG6MimXQCfAEk/xadVK4jrjgpV7AGqOC3QHY6WP32bX/orA
-   1DF1CeE8rYxo0sIYBZY0EC3XGuN5xlXcFjnK1SaB9d6a3Og4kO0Ytywji
-   RSPrEwabMBdtYfTiw3j2oq2leIEZGwBHTPNZI1umCVRGbN9+o2/GMUb9t
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10824"; a="380828955"
-X-IronPort-AV: E=Sophos;i="6.02,231,1688454000"; 
-   d="scan'208";a="380828955"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2023 03:26:22 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10824"; a="884639834"
-X-IronPort-AV: E=Sophos;i="6.02,231,1688454000"; 
-   d="scan'208";a="884639834"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmsmga001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Sep 2023 03:26:11 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Wed, 6 Sep 2023 03:26:20 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Wed, 6 Sep 2023 03:26:20 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.43) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Wed, 6 Sep 2023 03:26:19 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NHvtfsCcOlZGFcznxZDD6YhwyAUkQ4OJQ1MKCrP7iU7tl1OEA2zVUm9E54EnuQ8Eu0BQ2Ah+f+hdtCMK/uLqkGj6FJUBCSeNPzvS/puya0pXduyuRbCsy0rHQJoPuiSg7snJvbgR96SUEStYd4QkFoGq3n6oTnki4AKNIBCFEHt6d6tUoeMWS3zUNHWIEXci9vPsEI2mCOPbsb2d6wLfP4KcR7GYrHhTGpnbBXrUdziZVnYIBNwB/kjRdqOjXdOAM/QAhT/+0RPUla8bv5eskiErhSRz8t1vNnqyeJgx1kWyJPxmcq0TDe0X1DSQgcuALgr62KOAlpALIKBkv4VSgA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fuxLw9neIWnPIG4fSJBWdfdL5hAZUmVcwVHzyvRjSfw=;
- b=QUhy8f2UkNvkE8Vo4643dVfBgdjAaxVRU6zqFbhPk1unz7XiF/Pl0bfebw+9DYMI5UaxK9kmoltS4ae94BOEZOCHS9IZDyCx3rOL9iSQtei9QVbc3Soh+OJplJEdXVaoETofXslxITNRKtpOH17QMU7kiRUvGP6ZjM4TS2hcdpL1UDS+/HjcB7qUZ/N5F568iWJrCGvOyPbAkzI1tJcEGeXFftwa+6cAByvPPSMwUwN5wBVkv8KJm4KIetljk9ke+MYj/Cgaa+hMpY31NJMdnlhSsHQLJzN6Pn3V7DEo8FYf7feIPeM8miuSbod8/Bm+vxzwfuYg6rx9+6GJKatAtA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DM6PR11MB4657.namprd11.prod.outlook.com (2603:10b6:5:2a6::7) by
- DS7PR11MB6246.namprd11.prod.outlook.com (2603:10b6:8:99::15) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6745.34; Wed, 6 Sep 2023 10:26:16 +0000
-Received: from DM6PR11MB4657.namprd11.prod.outlook.com
- ([fe80::c3cd:b8d0:5231:33a8]) by DM6PR11MB4657.namprd11.prod.outlook.com
- ([fe80::c3cd:b8d0:5231:33a8%5]) with mapi id 15.20.6745.034; Wed, 6 Sep 2023
- 10:26:15 +0000
-From: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
-To: "Drewek, Wojciech" <wojciech.drewek@intel.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "jiri@resnulli.us" <jiri@resnulli.us>,
-	"jonathan.lemon@gmail.com" <jonathan.lemon@gmail.com>, "pabeni@redhat.com"
-	<pabeni@redhat.com>, "vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>
-CC: "bvanassche@acm.org" <bvanassche@acm.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>, "linux-clk@vger.kernel.org"
-	<linux-clk@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>
-Subject: RE: [Intel-wired-lan] [PATCH net-next 3/4] dpll: netlink/core: add
- support for pin-dpll signal phase offset/adjust
-Thread-Topic: [Intel-wired-lan] [PATCH net-next 3/4] dpll: netlink/core: add
- support for pin-dpll signal phase offset/adjust
-Thread-Index: AQHZ4FDCw1mHMtCJKkeJmPewpnRyjLANcEiAgAAhq0A=
-Date: Wed, 6 Sep 2023 10:26:15 +0000
-Message-ID: <DM6PR11MB4657497B4D1446F62E3BC5C89BEFA@DM6PR11MB4657.namprd11.prod.outlook.com>
-References: <20230905232610.1403647-1-arkadiusz.kubalewski@intel.com>
- <20230905232610.1403647-4-arkadiusz.kubalewski@intel.com>
- <MW4PR11MB577647EAF2272B22A73131D4FDEFA@MW4PR11MB5776.namprd11.prod.outlook.com>
-In-Reply-To: <MW4PR11MB577647EAF2272B22A73131D4FDEFA@MW4PR11MB5776.namprd11.prod.outlook.com>
-Accept-Language: pl-PL, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR11MB4657:EE_|DS7PR11MB6246:EE_
-x-ms-office365-filtering-correlation-id: bc99a86c-1ca4-4d97-4979-08dbaec3b369
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ZNCJ4XJRa4aV29QO8OH4/rr2dnPdg7u3y6jNx+evwB1RFlaE+KOIStS/DaCY6sSOz8HytTU2WMCYhWfwhik8kOqid37g0KM709UeiSUguscyLMn8iirh/6tu5y4HP/cajG2ckeo1yrY3bhARYQ8fFvgTPXlpxzttUfie/haDT1NKuIFvBnTz4yeVhhIbiOKXEqJ9eyX1IY0BfRZjDc/HKnOgCj0KbJsXwPziOyFiaey27E5bZrIt+Gu9C+pTe2LVULQMgf0fUEaAJzQcK2XQqMU8IeZ+ZzYyWqg9gGeT1aFvMMM3ChZaKZz6ygCAWhxPnGvyO+6+sSGn0AAvD4x1s7u2jckRI5NXezP/sQ6wUhvbZVQOOMbfdmyRnLZF+yOpG5e01OGNrBiWiuyzBIHpuv5rwkL0ZQTDoPLgk4DYzk0CrYDITkoJO8J+aO7m+uOPCAGO2Hi2/Wn1QDkuNslnlllRbhdtoQUcFD20yQxlwHj68V7IwM2tj3p29EuVqL+u/RkBZOPnYT0utGd1NEms5ntcjBfPZB+74hx9vIkK9Zv0QT7a+j7ymCpgItnf/kRILSfdfo9MhmE0rS2hj98UWABzH9c3bjk9ABtXdneGKFI=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB4657.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(396003)(39860400002)(376002)(366004)(451199024)(186009)(1800799009)(122000001)(9686003)(53546011)(7696005)(6506007)(71200400001)(52536014)(33656002)(82960400001)(55016003)(38100700002)(38070700005)(86362001)(2906002)(966005)(83380400001)(478600001)(110136005)(66946007)(316002)(76116006)(8676002)(8936002)(4326008)(5660300002)(7416002)(41300700001)(54906003)(66476007)(66446008)(64756008)(66556008);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?osmYYq5bZzNUfYPKMK689rhHHdwc+fkJ64BGEW4qcOS2N68st42J6qmNg8C1?=
- =?us-ascii?Q?Z+sPL+9FayNwda/+n+HMt6FeSPzwbtWHNSOPAJMZZnSDV8OLnZfNQQ/ob8xy?=
- =?us-ascii?Q?Uqc1EpIzT88bUuSfjspzeq3L81BjRg6ngiLeTG6HfmHHHZXazfCacAt8d/3h?=
- =?us-ascii?Q?s+cFIZ4cHIVVDKfuQR9pMWwMG49coYbaLr6XWUIFob7t9BBsI5PdtTmOJUrL?=
- =?us-ascii?Q?HKqWLAccc7LGtW7YH0yLvlRiyhWtTONcEnoHen+nbMMWRLjO/B56hjMSkBWW?=
- =?us-ascii?Q?XPY9pJTa0/hOCUEoGq01brdNptQ7KrMMmfMpmoEIqW+KZwXeumuPvRO/rV4i?=
- =?us-ascii?Q?djILAt6+gy6dS3DlNEZc5kGD45Xh4CGlV2Z4/8CczLTvfUtB+POwiXLSQbU0?=
- =?us-ascii?Q?S/eXDfdXGButRhzed2zkCI7g18TyyhnVOnBrpsg4JT9/OTlMYp4nbtBk07es?=
- =?us-ascii?Q?Q85MlcAGOVh+UfC6aUxsX4csobtUsT/SfBUa9NBPFO5AN6jQ5gJe3kjxI775?=
- =?us-ascii?Q?4jU8zFGcqdNfQUPNpu3xuJlJQIE6AZ+nkxtq6nvpZLwH710/a9g/q5EUtKP6?=
- =?us-ascii?Q?KWkVI9aO3cDIcI1ouXA2NdLDGeBY/ZUFMzOG7PVQuzVOghKL2qGcLakyIw44?=
- =?us-ascii?Q?5No6EZ7Gk2G75O5fubHGGVaVLt7POWodJ+3tY+GpnSXxj7I/FTSlk8Xdln3V?=
- =?us-ascii?Q?FX2EJx9xw/ph1LE8RVR07pPzOBMTxHK7YMxRpt7JZMtR4ruKVNusBQwcxDOf?=
- =?us-ascii?Q?Rdwv8rxLaYcwDOuOCCEaKjVGPsYkwEVRuzgloZSQ5kQzs8k6b+oGfz60f4C7?=
- =?us-ascii?Q?x0pkqrT00Uc3s2kbEMonxfQJ/MMVWNOm6oi9r9EDMn3gI+JFBvlub4T7X4Nm?=
- =?us-ascii?Q?ll034kcBRxCg3IRajlluOatuOTh5PKN+FKMU9xAWGG3i2/QSkLQfpdEYGFhL?=
- =?us-ascii?Q?7T41AMm7ATFWl3Ht3zdUI7r2et2hVcavzOXlMNtPlFeffWWxG/ImtYEt38WK?=
- =?us-ascii?Q?FpDI/uaDwJy2/UINgsdpxEEsisXkCsLXNoBP0k71pj5ZmrEQe1SGcRuSur6K?=
- =?us-ascii?Q?Etpl/SfOc30XKRauTXkjh6qfNuyO+uBZh6odPOjI8ZhFhqnkecyM0LXsSdG/?=
- =?us-ascii?Q?3wbt/XlS0kQIyVGDkHvqJMnxpRnxvYviGqjJrcnHCiZCM4a/mEXEE5Zoev2S?=
- =?us-ascii?Q?i24icFhbhu+ia4n60CUu+gJKlkSYis0J+Sibz6VgkkyQTos+oZvtKMIypz5C?=
- =?us-ascii?Q?wE9q6b4EhY8YTo2KNDoVCByLtvmo/auOXKhHryFhUiaOQmT/87v0VcgYxaAR?=
- =?us-ascii?Q?AUvVJKbJtayv792rdt7Qr0T1gwSSGotcdu8hbKakF7elIt1n7iOYUJYT29H6?=
- =?us-ascii?Q?bJz3W7bLnaup6gfiYq9dQmEZmtA0FRhWEiuRBt2zVWIRb/foaLgor81WoUiI?=
- =?us-ascii?Q?3yRKBKS48hnekyG0zycJuv5ARthLlueSAtpKE8oVE1rqDy7xxT1fS2hnFdlL?=
- =?us-ascii?Q?a8AIyfTDmywMLTCpGiPbW79ImiFhr10z5TiZQiF7fpQ2bAdTL4herSWqZ2wO?=
- =?us-ascii?Q?wJzWls/L4kyW7EMfw9FEi7hSflpI0lQMIHf7gVfygf2QDXjGGSTOFfVENUi1?=
- =?us-ascii?Q?+RC05syHjvtXuSQghJS7J5FP8yO97p8IdK/1JjQpHcdDK2kTHW257vMXTXUN?=
- =?us-ascii?Q?NZsJ3A=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 803176AB7
+	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 10:30:32 +0000 (UTC)
+Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34B211734
+	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 03:30:27 -0700 (PDT)
+Received: from mg.bb.i.ssi.bg (localhost [127.0.0.1])
+	by mg.bb.i.ssi.bg (Proxmox) with ESMTP id 24CA0184CB;
+	Wed,  6 Sep 2023 13:30:24 +0300 (EEST)
+Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
+	by mg.bb.i.ssi.bg (Proxmox) with ESMTPS id 0C9651870B;
+	Wed,  6 Sep 2023 13:30:24 +0300 (EEST)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by ink.ssi.bg (Postfix) with ESMTPSA id 23F2E3C0439;
+	Wed,  6 Sep 2023 13:30:21 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
+	t=1693996221; bh=ebVU1+X+mNAiSt1BbY6BxCt/GOLxee8r0cQHhUmYg78=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References;
+	b=IpvLD8LdV2GnU8DTI61Pyx1uzQU+x0THk1NQQ+fCy50HFjWoXFtyZ8NjPjn3J5tss
+	 HGOZaisSxPdKVKVe9zKS4Vz9jQ4b11P9MwyYRwyT6FKlwMk0if+Oje8tVnlIWSI6OL
+	 9h7EM4Hvz1+y96S+NZVe0ljcv/qHsvSKbPBTOa9g=
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.17.1/8.17.1) with ESMTP id 386AUI19046421;
+	Wed, 6 Sep 2023 13:30:19 +0300
+Date: Wed, 6 Sep 2023 13:30:18 +0300 (EEST)
+From: Julian Anastasov <ja@ssi.bg>
+To: "liujian (CE)" <liujian56@huawei.com>
+cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, hadi@cyberus.ca,
+        netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: ipv4: fix one memleak in __inet_del_ifa()
+In-Reply-To: <cbe579bd-4aff-8239-0e32-6acb79b11bca@huawei.com>
+Message-ID: <734181f9-b340-daa2-0772-7ed220eee150@ssi.bg>
+References: <20230905135554.1958156-1-liujian56@huawei.com> <bcb0e791-37ab-3fff-9da6-a86883924205@ssi.bg> <cbe579bd-4aff-8239-0e32-6acb79b11bca@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB4657.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bc99a86c-1ca4-4d97-4979-08dbaec3b369
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Sep 2023 10:26:15.4907
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: YbAYrgd2iFGn7e7HGx3XjSsiJbKH9/yvVhVjji+v7rMcO1Z75/P91OMdd5BvVSSjzWeadHceKWPseLrwpxyf4fF9tfvqf/xo17f/32VSgEI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB6246
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
->From: Drewek, Wojciech <wojciech.drewek@intel.com>
->Sent: Wednesday, September 6, 2023 10:02 AM
->
->> -----Original Message-----
->> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
->> Arkadiusz Kubalewski
->> Sent: Wednesday, September 6, 2023 1:26 AM
->> To: kuba@kernel.org; jiri@resnulli.us; jonathan.lemon@gmail.com;
->> pabeni@redhat.com; vadim.fedorenko@linux.dev
->> Cc: bvanassche@acm.org; netdev@vger.kernel.org; intel-wired-
->> lan@lists.osuosl.org; linux-clk@vger.kernel.org; linux-arm-
->> kernel@lists.infradead.org
->> Subject: [Intel-wired-lan] [PATCH net-next 3/4] dpll: netlink/core: add
->> support
->> for pin-dpll signal phase offset/adjust
->>
->> Add callback ops for pin-dpll phase measurment.
->> Add callback for pin signal phase adjustment.
->> Add min and max phase adjustment values to pin proprties.
->> Invoke callbacks in dpll_netlink.c when filling the pin details to
->> provide user with phase related attribute values.
->>
->> Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
->> ---
->>  drivers/dpll/dpll_netlink.c | 99
->> ++++++++++++++++++++++++++++++++++++-
->>  include/linux/dpll.h        | 18 +++++++
->>  2 files changed, 116 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
->> index 764437a0661b..548517d9ca4c 100644
->> --- a/drivers/dpll/dpll_netlink.c
->> +++ b/drivers/dpll/dpll_netlink.c
->> @@ -212,6 +212,53 @@ dpll_msg_add_pin_direction(struct sk_buff *msg,
->> struct dpll_pin *pin,
->>  	return 0;
->>  }
->>
->> +static int
->> +dpll_msg_add_pin_phase_adjust(struct sk_buff *msg, struct dpll_pin *pin=
-,
->> +			      struct dpll_pin_ref *ref,
->> +			      struct netlink_ext_ack *extack)
->> +{
->> +	const struct dpll_pin_ops *ops =3D dpll_pin_ops(ref);
->> +	struct dpll_device *dpll =3D ref->dpll;
->> +	s32 phase_adjust;
->> +	int ret;
->> +
->> +	if (!ops->phase_adjust_get)
->> +		return 0;
->
->Why 0 is returned here? If it's intended, I would put a comment stating
->why.
->Same thing in dpll_msg_add_phase_offset.
 
-The callback is optional, any driver implementing dpll interface doesn't
-have to implement this callback and it must not be seen as an error.
-Callback that are required are pointed out in documentation:
-Documentation/driver-api/dpll.rst
+	Hello,
 
-All the optional callbacks are returning this way, I don't see a point
-in adding extra comment here.
+On Wed, 6 Sep 2023, liujian (CE) wrote:
 
-Thank you!
-Arkadiusz
+> On 2023/9/6 1:20, Julian Anastasov wrote:
+> > 
+> > On Tue, 5 Sep 2023, Liu Jian wrote:
+> > 
+> >> I got the below warning when do fuzzing test:
+> >> unregister_netdevice: waiting for bond0 to become free. Usage count = 2
+> >>
+> >> It can be repoduced via:
+> >>
+> >> ip link add bond0 type bond
+> >> sysctl -w net.ipv4.conf.bond0.promote_secondaries=1
+> >> ip addr add 4.117.174.103/0 scope 0x40 dev bond0
+> >> ip addr add 192.168.100.111/255.255.255.254 scope 0 dev bond0
+> >> ip addr add 0.0.0.4/0 scope 0x40 secondary dev bond0
+> >> ip addr del 4.117.174.103/0 scope 0x40 dev bond0
+> >> ip link delete bond0 type bond
+> >>
+> >> In this reproduction test case, an incorrect 'last_prim' is found in
+> >> __inet_del_ifa(), as a result, the secondary address(0.0.0.4/0 scope 0x40)
+> >> is lost. The memory of the secondary address is leaked and the reference of
+> >> in_device and net_device is leaked.
 
->
->> +	ret =3D ops->phase_adjust_get(pin, dpll_pin_on_dpll_priv(dpll, pin),
->> +				    dpll, dpll_priv(dpll),
->> +				    &phase_adjust, extack);
->> +	if (ret)
->> +		return ret;
->> +	if (nla_put_s32(msg, DPLL_A_PIN_PHASE_ADJUST, phase_adjust))
->> +		return -EMSGSIZE;
->> +
->> +	return 0;
->> +}
->> +
->> +static int
->> +dpll_msg_add_phase_offset(struct sk_buff *msg, struct dpll_pin *pin,
->> +			  struct dpll_pin_ref *ref,
->> +			  struct netlink_ext_ack *extack)
->> +{
->> +	const struct dpll_pin_ops *ops =3D dpll_pin_ops(ref);
->> +	struct dpll_device *dpll =3D ref->dpll;
->> +	s64 phase_offset;
->> +	int ret;
->> +
->> +	if (!ops->phase_offset_get)
->> +		return 0;
->> +	ret =3D ops->phase_offset_get(pin, dpll_pin_on_dpll_priv(dpll, pin),
->> +				    dpll, dpll_priv(dpll), &phase_offset,
->> +				    extack);
->> +	if (ret)
->> +		return ret;
->> +	if (nla_put_64bit(msg, DPLL_A_PIN_PHASE_OFFSET,
->> sizeof(phase_offset),
->> +			  &phase_offset, DPLL_A_PIN_PAD))
->> +		return -EMSGSIZE;
->> +
->> +	return 0;
->> +}
->> +
->>  static int
->>  dpll_msg_add_pin_freq(struct sk_buff *msg, struct dpll_pin *pin,
->>  		      struct dpll_pin_ref *ref, struct netlink_ext_ack *extack)
->> @@ -330,6 +377,9 @@ dpll_msg_add_pin_dplls(struct sk_buff *msg, struct
->> dpll_pin *pin,
->>  		if (ret)
->>  			goto nest_cancel;
->>  		ret =3D dpll_msg_add_pin_direction(msg, pin, ref, extack);
->> +		if (ret)
->> +			goto nest_cancel;
->> +		ret =3D dpll_msg_add_phase_offset(msg, pin, ref, extack);
->>  		if (ret)
->>  			goto nest_cancel;
->>  		nla_nest_end(msg, attr);
->> @@ -377,6 +427,15 @@ dpll_cmd_pin_get_one(struct sk_buff *msg, struct
->> dpll_pin *pin,
->>  	if (nla_put_u32(msg, DPLL_A_PIN_CAPABILITIES, prop->capabilities))
->>  		return -EMSGSIZE;
->>  	ret =3D dpll_msg_add_pin_freq(msg, pin, ref, extack);
->> +	if (ret)
->> +		return ret;
->> +	if (nla_put_s32(msg, DPLL_A_PIN_PHASE_ADJUST_MIN,
->> +			prop->phase_range.min))
->> +		return -EMSGSIZE;
->> +	if (nla_put_s32(msg, DPLL_A_PIN_PHASE_ADJUST_MAX,
->> +			prop->phase_range.max))
->> +		return -EMSGSIZE;
->> +	ret =3D dpll_msg_add_pin_phase_adjust(msg, pin, ref, extack);
->>  	if (ret)
->>  		return ret;
->>  	if (xa_empty(&pin->parent_refs))
->> @@ -416,7 +475,7 @@ dpll_device_get_one(struct dpll_device *dpll, struct
->> sk_buff *msg,
->>  	if (nla_put_u32(msg, DPLL_A_TYPE, dpll->type))
->>  		return -EMSGSIZE;
->>
->> -	return ret;
->> +	return 0;
->>  }
->>
->>  static int
->> @@ -705,6 +764,39 @@ dpll_pin_direction_set(struct dpll_pin *pin, struct
->> dpll_device *dpll,
->>  	return 0;
->>  }
->>
->> +static int
->> +dpll_pin_phase_adj_set(struct dpll_pin *pin, struct nlattr
->> *phase_adj_attr,
->> +		       struct netlink_ext_ack *extack)
->> +{
->> +	struct dpll_pin_ref *ref;
->> +	unsigned long i;
->> +	s32 phase_adj;
->> +	int ret;
->> +
->> +	phase_adj =3D nla_get_s32(phase_adj_attr);
->> +	if (phase_adj > pin->prop->phase_range.max ||
->> +	    phase_adj < pin->prop->phase_range.min) {
->> +		NL_SET_ERR_MSG(extack, "phase adjust value not
->> supported");
->> +		return -EINVAL;
->> +	}
->> +	xa_for_each(&pin->dpll_refs, i, ref) {
->> +		const struct dpll_pin_ops *ops =3D dpll_pin_ops(ref);
->> +		struct dpll_device *dpll =3D ref->dpll;
->> +
->> +		if (!ops->phase_adjust_set)
->> +			return -EOPNOTSUPP;
->> +		ret =3D ops->phase_adjust_set(pin,
->> +					    dpll_pin_on_dpll_priv(dpll, pin),
->> +					    dpll, dpll_priv(dpll), phase_adj,
->> +					    extack);
->> +		if (ret)
->> +			return ret;
->> +	}
->> +	__dpll_pin_change_ntf(pin);
->> +
->> +	return 0;
->> +}
->> +
->>  static int
->>  dpll_pin_parent_device_set(struct dpll_pin *pin, struct nlattr
->> *parent_nest,
->>  			   struct netlink_ext_ack *extack)
->> @@ -793,6 +885,11 @@ dpll_pin_set_from_nlattr(struct dpll_pin *pin,
->> struct
->> genl_info *info)
->>  			if (ret)
->>  				return ret;
->>  			break;
->> +		case DPLL_A_PIN_PHASE_ADJUST:
->> +			ret =3D dpll_pin_phase_adj_set(pin, a, info->extack);
->> +			if (ret)
->> +				return ret;
->> +			break;
->>  		case DPLL_A_PIN_PARENT_DEVICE:
->>  			ret =3D dpll_pin_parent_device_set(pin, a, info->extack);
->>  			if (ret)
->> diff --git a/include/linux/dpll.h b/include/linux/dpll.h
->> index bbc480cd2932..578fc5fa3750 100644
->> --- a/include/linux/dpll.h
->> +++ b/include/linux/dpll.h
->> @@ -68,6 +68,18 @@ struct dpll_pin_ops {
->>  	int (*prio_set)(const struct dpll_pin *pin, void *pin_priv,
->>  			const struct dpll_device *dpll, void *dpll_priv,
->>  			const u32 prio, struct netlink_ext_ack *extack);
->> +	int (*phase_offset_get)(const struct dpll_pin *pin, void *pin_priv,
->> +				const struct dpll_device *dpll, void *dpll_priv,
->> +				s64 *phase_offset,
->> +				struct netlink_ext_ack *extack);
->> +	int (*phase_adjust_get)(const struct dpll_pin *pin, void *pin_priv,
->> +				const struct dpll_device *dpll, void *dpll_priv,
->> +				s32 *phase_adjust,
->> +				struct netlink_ext_ack *extack);
->> +	int (*phase_adjust_set)(const struct dpll_pin *pin, void *pin_priv,
->> +				const struct dpll_device *dpll, void *dpll_priv,
->> +				const s32 phase_adjust,
->> +				struct netlink_ext_ack *extack);
->>  };
->>
->>  struct dpll_pin_frequency {
->> @@ -91,6 +103,11 @@ struct dpll_pin_frequency {
->>  #define DPLL_PIN_FREQUENCY_DCF77 \
->>  	DPLL_PIN_FREQUENCY(DPLL_PIN_FREQUENCY_77_5_KHZ)
->>
->> +struct dpll_pin_phase_adjust_range {
->> +	s32 min;
->> +	s32 max;
->> +};
->> +
->>  struct dpll_pin_properties {
->>  	const char *board_label;
->>  	const char *panel_label;
->> @@ -99,6 +116,7 @@ struct dpll_pin_properties {
->>  	unsigned long capabilities;
->>  	u32 freq_supported_num;
->>  	struct dpll_pin_frequency *freq_supported;
->> +	struct dpll_pin_phase_adjust_range phase_range;
->>  };
->>
->>  #if IS_ENABLED(CONFIG_DPLL)
->> --
->> 2.38.1
->>
->> _______________________________________________
->> Intel-wired-lan mailing list
->> Intel-wired-lan@osuosl.org
->> https://lists.osuosl.org/mailman/listinfo/intel-wired-lan
+	We can also explain that the problem occurs when we delete
+the first primary address and the promoted address is leaked because
+it is attached to the to-be-freed primary address instead of to ifa_list.
+
+> >> Fix this problem by modifying the PROMOTE_SECONDANCE behavior as follows:
+> >> 1. Traverse in_dev->ifa_list to search for the actual 'last_prim'.
+> >> 2. When last_prim is empty, move 'promote' to the in_dev->ifa_list header.
+> > 
+> > 	So, the problem is that last_prim initially points to the
+> > first primary address that we are actually removing. Looks like with
+> > last_prim we try to promote the secondary IP after all primaries with
+> > scope >= our scope, i.e. simulating a new IP insert. As the secondary IPs
+> > have same scope as their primary, why just not remove the last_prim
+> > var/code and to insert the promoted secondary at the same place as the
+> > deleted primary? May be your patch does the same: insert at same pos?
+> > 
+> > Before deletion:
+> > 1. primary1 scope global (to be deleted)
+> > 2. primary2 scope global
+> > 3. promoted_secondary
+> > 
+> > After deletion (old way, promote as a new insertion):
+> > 1. primary2 scope global
+> > 2. promoted_secondary scope global (inserted as new primary)
+> > 
+> It is :
+> After deletion (old way, promoted_secondary lost):
+> 1. primary2 scope global
+
+	Yes, that is what happens :)
+
+> > After deletion (new way, promote at same place):
+> > 1. promoted_secondary scope global (now primary, inserted at same place)
+> > 2. primary2 scope global
+> > 
+> >  What I mean is to use ifap as last_prim, not tested:
+> > 
+> Yes, This is better and it can work also. Thanks.
+> Tested-by: Liu Jian <liujian56@huawei.com>
+
+	But let me propose another version. It is a minimal
+bugfix that does not change the place where the promoted address
+is added and just converts last_prim to be rcu ptr to insert
+position. last_prim will start from ifap because the promoted
+address can not be added before this position. It is better
+not to reorder the IPs because scripts may depend on the
+old behavior to add the promoted IP after all others for
+the scope. If you find this version better you can post it
+as v2 and I'll sign it too.
+
+diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
+index 5deac0517ef7..37be82496322 100644
+--- a/net/ipv4/devinet.c
++++ b/net/ipv4/devinet.c
+@@ -355,14 +355,14 @@ static void __inet_del_ifa(struct in_device *in_dev,
+ {
+ 	struct in_ifaddr *promote = NULL;
+ 	struct in_ifaddr *ifa, *ifa1;
+-	struct in_ifaddr *last_prim;
++	struct in_ifaddr __rcu **last_prim;
+ 	struct in_ifaddr *prev_prom = NULL;
+ 	int do_promote = IN_DEV_PROMOTE_SECONDARIES(in_dev);
+ 
+ 	ASSERT_RTNL();
+ 
+ 	ifa1 = rtnl_dereference(*ifap);
+-	last_prim = rtnl_dereference(in_dev->ifa_list);
++	last_prim = ifap;
+ 	if (in_dev->dead)
+ 		goto no_promotions;
+ 
+@@ -376,7 +376,7 @@ static void __inet_del_ifa(struct in_device *in_dev,
+ 		while ((ifa = rtnl_dereference(*ifap1)) != NULL) {
+ 			if (!(ifa->ifa_flags & IFA_F_SECONDARY) &&
+ 			    ifa1->ifa_scope <= ifa->ifa_scope)
+-				last_prim = ifa;
++				last_prim = &ifa->ifa_next;
+ 
+ 			if (!(ifa->ifa_flags & IFA_F_SECONDARY) ||
+ 			    ifa1->ifa_mask != ifa->ifa_mask ||
+@@ -440,9 +440,9 @@ static void __inet_del_ifa(struct in_device *in_dev,
+ 
+ 			rcu_assign_pointer(prev_prom->ifa_next, next_sec);
+ 
+-			last_sec = rtnl_dereference(last_prim->ifa_next);
++			last_sec = rtnl_dereference(*last_prim);
+ 			rcu_assign_pointer(promote->ifa_next, last_sec);
+-			rcu_assign_pointer(last_prim->ifa_next, promote);
++			rcu_assign_pointer(*last_prim, promote);
+ 		}
+ 
+ 		promote->ifa_flags &= ~IFA_F_SECONDARY;
+
+Regards
+
+--
+Julian Anastasov <ja@ssi.bg>
+
 
