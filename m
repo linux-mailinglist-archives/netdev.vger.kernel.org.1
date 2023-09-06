@@ -1,63 +1,69 @@
-Return-Path: <netdev+bounces-32343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08ED3794608
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 00:14:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 05C76794632
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 00:32:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9D261C20957
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 22:14:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 307C01C209BF
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 22:32:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F820125B2;
-	Wed,  6 Sep 2023 22:14:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC04C10941;
+	Wed,  6 Sep 2023 22:32:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F8D011CB8
-	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 22:14:10 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44D7919BA
-	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 15:14:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694038449; x=1725574449;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Zpsofr5YQS7XviEdlyUuI4LanVZQY/6bAIVyEtREdJE=;
-  b=kx7EPKuQpX4Z4MqfkoFYXdeq+u+oVA9KX1+W6hjIsmm06WyS7MSOC+yw
-   +TBjnRjX1XbdgPS366RULNOadiJ7ilJxX4+7M1tT5F5TefWyxiRiVALCX
-   KuTa4Kl9YniYCcR60U2irW2+0CuOO6+mmoSs6lnievepXg+oFbczTL3mr
-   Z5i7+sGaczDni8b/j6b6eLB0t2C/r9UQTVlhJFQqj0giiY5wvGfbKBQ4A
-   pi2mNhm+bjAve1WkaATeQloKbCuGH6gbMvELGOF3pOA/F6yeRjnb8iA2k
-   bUbAVhzWwwdejEwM9wx1X9sP52loQcyGXBudVwf+81Jni+v+fhO240qYd
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10825"; a="377110541"
-X-IronPort-AV: E=Sophos;i="6.02,233,1688454000"; 
-   d="scan'208";a="377110541"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2023 15:14:08 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10825"; a="741744354"
-X-IronPort-AV: E=Sophos;i="6.02,233,1688454000"; 
-   d="scan'208";a="741744354"
-Received: from lkp-server01.sh.intel.com (HELO 59b3c6e06877) ([10.239.97.150])
-  by orsmga002.jf.intel.com with ESMTP; 06 Sep 2023 15:14:06 -0700
-Received: from kbuild by 59b3c6e06877 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qe0mi-0000dP-17;
-	Wed, 06 Sep 2023 22:14:04 +0000
-Date: Thu, 7 Sep 2023 06:13:51 +0800
-From: kernel test robot <lkp@intel.com>
-To: Xabier Marquiegui <reibax@gmail.com>, richardcochran@gmail.com
-Cc: oe-kbuild-all@lists.linux.dev, chrony-dev@chrony.tuxfamily.org,
-	mlichvar@redhat.com, netdev@vger.kernel.org,
-	ntp-lists@mattcorallo.com, reibax@gmail.com
-Subject: Re: [PATCH 2/3] ptp: support multiple timestamp event readers
-Message-ID: <202309070650.eysYMNnu-lkp@intel.com>
-References: <20230906104754.1324412-3-reibax@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E02A06131
+	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 22:32:20 +0000 (UTC)
+Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4A9619B6
+	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 15:32:19 -0700 (PDT)
+Received: by mail-qk1-x735.google.com with SMTP id af79cd13be357-76f0807acb6so21205085a.1
+        for <netdev@vger.kernel.org>; Wed, 06 Sep 2023 15:32:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694039539; x=1694644339; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7pwTqtbc0SRtCc8sodvt2GgE2trx1vmLPyIifmTblUg=;
+        b=P3AUlqh205Sms2ju7VThmoqyetbAqhKAPAngIJ/78CtZwNSEJi14dj/0liTPmlC881
+         yaz/L6rnKvAX5Awpw51iRz6UEXO+UN1w9aqqyepCGPrirnn4rtt4fxDiBVk0Vu8QAubt
+         gdlkCR8YQ7GHhLYGPNTVW52cZxUrwPIN793OUZ4ewnMhGWSV8CjVKk0TKYr3GH9/d5Xx
+         LVDKidPkKfoN8YvSl8BDEYLBxJVuPhUDPOQZ/RAZeCDIApXjFqQRHkAFz+u4oX8tolNH
+         m7YmEI/OekYGE53YHcfxP6mHEVS5GqqBo9mImbQ/hiKeHU9n2mL4sLr/qZv5ipJ0dqNf
+         Q6Pw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1694039539; x=1694644339;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7pwTqtbc0SRtCc8sodvt2GgE2trx1vmLPyIifmTblUg=;
+        b=FJqJb5NKjhAR0dvRrxTRyOU7gDUewpujeh4UUk/0YcTC5VSFU7jjkr7yOTENiWHMHj
+         nSq2HQDM56ke6PHK1fqNeH+twUSGZqOo08DnDVGBeixFA8qdUKZp65NtjAy2+hRB2gzY
+         lNt5go/l/HkwEwKR5M2XjXQXoVh0JcZcGLOID/TYF+F8FUds1SFL42wNyvLPBny7chRI
+         omK4j6czuUXQV85fkJt1taQQkQUCvB9Vs1L+OougOinmOXd9amwC6RTzjzn59cS9rdpy
+         W7ZFVfEI4kU99FTZZw2WRO0DaaqhSD+ary3BU9jQR6wEppBWW5GtymBl8CDQGIC6XZCF
+         YWTA==
+X-Gm-Message-State: AOJu0YzgbtJ6QO/lOrmwDbrdZ2W71Rj5NAE1du0bFepJfmHJGh/zuTqS
+	mI8PEBd4ivEuWCB4ElOytOU=
+X-Google-Smtp-Source: AGHT+IHZ/rZ98Rcpybhw3OJHzPptwRjMxQK3iwyJ+KWF3eO4yNMjyL8h2G/FcjAS+rjqFIZY4XlDSA==
+X-Received: by 2002:a05:620a:3954:b0:770:96a1:5580 with SMTP id qs20-20020a05620a395400b0077096a15580mr2163717qkn.14.1694039538733;
+        Wed, 06 Sep 2023 15:32:18 -0700 (PDT)
+Received: from localhost (modemcable065.128-200-24.mc.videotron.ca. [24.200.128.65])
+        by smtp.gmail.com with ESMTPSA id y2-20020a37e302000000b0076effd9809fsm5273004qki.110.2023.09.06.15.32.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Sep 2023 15:32:18 -0700 (PDT)
+Date: Wed, 6 Sep 2023 18:32:17 -0400
+From: Benjamin Poirier <benjamin.poirier@gmail.com>
+To: Liang Chen <liangchen.linux@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org
+Subject: Re: [RFC PATCH net-next] pktgen: Introducing a parameter for
+ non-shared skb testing
+Message-ID: <ZPj98UXjJdsEsVJQ@d3>
+References: <20230906103508.6789-1-liangchen.linux@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,75 +72,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230906104754.1324412-3-reibax@gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+In-Reply-To: <20230906103508.6789-1-liangchen.linux@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Xabier,
+On 2023-09-06 18:35 +0800, Liang Chen wrote:
+> Currently, skbs generated by pktgen always have their reference count
+> incremented before transmission, leading to two issues:
+>   1. Only the code paths for shared skbs can be tested.
+>   2. Skbs can only be released by pktgen.
+> To enhance testing comprehensiveness, introducing the "skb_single_user"
+> parameter, which allows skbs with a reference count of 1 to be
+> transmitted. So we can test non-shared skbs and code paths where skbs
+> are released within the network stack.
 
-kernel test robot noticed the following build warnings:
+If my understanding of the code is correct, pktgen operates in the same
+way with parameter clone_skb = 0 and clone_skb = 1.
 
-[auto build test WARNING on net/main]
-[also build test WARNING on net-next/main linus/master horms-ipvs/master v6.5 next-20230906]
-[cannot apply to shuah-kselftest/next shuah-kselftest/fixes]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+clone_skb = 0 is already meant to work on devices that don't support
+shared skbs (see IFF_TX_SKB_SHARING check in pktgen_if_write()). Instead
+of introducing a new option for your purpose, how about changing
+pktgen_xmit() to send "not shared" skbs when clone_skb == 0?
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Xabier-Marquiegui/ptp-support-multiple-timestamp-event-readers/20230906-194848
-base:   net/main
-patch link:    https://lore.kernel.org/r/20230906104754.1324412-3-reibax%40gmail.com
-patch subject: [PATCH 2/3] ptp: support multiple timestamp event readers
-config: i386-randconfig-061-20230906 (https://download.01.org/0day-ci/archive/20230907/202309070650.eysYMNnu-lkp@intel.com/config)
-compiler: gcc-9 (Debian 9.3.0-22) 9.3.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230907/202309070650.eysYMNnu-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202309070650.eysYMNnu-lkp@intel.com/
-
-sparse warnings: (new ones prefixed by >>)
->> drivers/ptp/ptp_chardev.c:487:24: sparse: sparse: incorrect type in return expression (different base types) @@     expected restricted __poll_t @@     got int @@
-   drivers/ptp/ptp_chardev.c:487:24: sparse:     expected restricted __poll_t
-   drivers/ptp/ptp_chardev.c:487:24: sparse:     got int
-
-vim +487 drivers/ptp/ptp_chardev.c
-
-   464	
-   465	__poll_t ptp_poll(struct posix_clock *pc, struct file *fp, poll_table *wait)
-   466	{
-   467		struct ptp_clock *ptp = container_of(pc, struct ptp_clock, clock);
-   468		struct timestamp_event_queue *queue;
-   469		struct list_head *pos, *n;
-   470		bool found = false;
-   471		pid_t reader_pid = task_pid_nr(current);
-   472	
-   473		poll_wait(fp, &ptp->tsev_wq, wait);
-   474	
-   475		/*
-   476		 * Extract only the desired element in the queue list
-   477		 */
-   478		list_for_each_safe(pos, n, &ptp->tsevqs) {
-   479			queue = list_entry(pos, struct timestamp_event_queue, qlist);
-   480			if (queue->reader_pid == reader_pid) {
-   481				found = true;
-   482				break;
-   483			}
-   484		}
-   485	
-   486		if (!found)
- > 487			return -EINVAL;
-   488	
-   489		return queue_cnt(queue) ? EPOLLIN : 0;
-   490	}
-   491	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Note that for devices without IFF_TX_SKB_SHARING, it would no longer be
+possible to have pktgen free skbs. Is that important?
 
