@@ -1,29 +1,29 @@
-Return-Path: <netdev+bounces-32189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E22CB79362F
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 09:24:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A7B7793630
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 09:25:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9756C28124C
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 07:24:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2B181C20A18
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 07:25:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D6671366;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D40FC10FC;
 	Wed,  6 Sep 2023 07:23:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FC3D1110
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9802138F
 	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 07:23:58 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79FF8E4D;
-	Wed,  6 Sep 2023 00:23:56 -0700 (PDT)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33A39E4F;
+	Wed,  6 Sep 2023 00:23:57 -0700 (PDT)
 Received: from kwepemm600007.china.huawei.com (unknown [172.30.72.55])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RgYhF5mTDzTlt7;
-	Wed,  6 Sep 2023 15:21:17 +0800 (CST)
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RgYjB6zXfzrSc2;
+	Wed,  6 Sep 2023 15:22:06 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.2) by
  kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
@@ -35,9 +35,9 @@ To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
 CC: <shenjian15@huawei.com>, <wangjie125@huawei.com>,
 	<liuyonglong@huawei.com>, <shaojijie@huawei.com>, <chenhao418@huawei.com>,
 	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH net 3/7] net: hns3: fix byte order conversion issue in hclge_dbg_fd_tcam_read()
-Date: Wed, 6 Sep 2023 15:20:14 +0800
-Message-ID: <20230906072018.3020671-4-shaojijie@huawei.com>
+Subject: [PATCH net 4/7] net: hns3: fix debugfs concurrency issue between kfree buffer and read
+Date: Wed, 6 Sep 2023 15:20:15 +0800
+Message-ID: <20230906072018.3020671-5-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20230906072018.3020671-1-shaojijie@huawei.com>
 References: <20230906072018.3020671-1-shaojijie@huawei.com>
@@ -61,61 +61,53 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Hao Chen <chenhao418@huawei.com>
 
-req1->tcam_data is defined as "u8 tcam_data[8]", and we convert it as
-(u32 *) without considerring byte order conversion,
-it may result in printing wrong data for tcam_data.
+Now in hns3_dbg_uninit(), there may be concurrency between
+kfree buffer and read, it may result in memory error.
 
-Convert tcam_data to (__le32 *) first to fix it.
+Moving debugfs_remove_recursive() in front of kfree buffer to ensure
+they don't happen at the same time.
 
-Fixes: b5a0b70d77b9 ("net: hns3: refactor dump fd tcam of debugfs")
+Fixes: 5e69ea7ee2a6 ("net: hns3: refactor the debugfs process")
 Signed-off-by: Hao Chen <chenhao418@huawei.com>
 Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 ---
- .../ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
-index f01a7a9ee02c..ff3f8f424ad9 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
-@@ -1519,7 +1519,7 @@ static int hclge_dbg_fd_tcam_read(struct hclge_dev *hdev, bool sel_x,
- 	struct hclge_desc desc[3];
- 	int pos = 0;
- 	int ret, i;
--	u32 *req;
-+	__le32 *req;
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
+index 8086722a56c0..b8508533878b 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
+@@ -1415,9 +1415,9 @@ int hns3_dbg_init(struct hnae3_handle *handle)
+ 	return 0;
  
- 	hclge_cmd_setup_basic_desc(&desc[0], HCLGE_OPC_FD_TCAM_OP, true);
- 	desc[0].flag |= cpu_to_le16(HCLGE_COMM_CMD_FLAG_NEXT);
-@@ -1544,22 +1544,22 @@ static int hclge_dbg_fd_tcam_read(struct hclge_dev *hdev, bool sel_x,
- 			 tcam_msg.loc);
- 
- 	/* tcam_data0 ~ tcam_data1 */
--	req = (u32 *)req1->tcam_data;
-+	req = (__le32 *)req1->tcam_data;
- 	for (i = 0; i < 2; i++)
- 		pos += scnprintf(tcam_buf + pos, HCLGE_DBG_TCAM_BUF_SIZE - pos,
--				 "%08x\n", *req++);
-+				 "%08x\n", le32_to_cpu(*req++));
- 
- 	/* tcam_data2 ~ tcam_data7 */
--	req = (u32 *)req2->tcam_data;
-+	req = (__le32 *)req2->tcam_data;
- 	for (i = 0; i < 6; i++)
- 		pos += scnprintf(tcam_buf + pos, HCLGE_DBG_TCAM_BUF_SIZE - pos,
--				 "%08x\n", *req++);
-+				 "%08x\n", le32_to_cpu(*req++));
- 
- 	/* tcam_data8 ~ tcam_data12 */
--	req = (u32 *)req3->tcam_data;
-+	req = (__le32 *)req3->tcam_data;
- 	for (i = 0; i < 5; i++)
- 		pos += scnprintf(tcam_buf + pos, HCLGE_DBG_TCAM_BUF_SIZE - pos,
--				 "%08x\n", *req++);
-+				 "%08x\n", le32_to_cpu(*req++));
- 
+ out:
+-	mutex_destroy(&handle->dbgfs_lock);
+ 	debugfs_remove_recursive(handle->hnae3_dbgfs);
+ 	handle->hnae3_dbgfs = NULL;
++	mutex_destroy(&handle->dbgfs_lock);
  	return ret;
  }
+ 
+@@ -1425,6 +1425,9 @@ void hns3_dbg_uninit(struct hnae3_handle *handle)
+ {
+ 	u32 i;
+ 
++	debugfs_remove_recursive(handle->hnae3_dbgfs);
++	handle->hnae3_dbgfs = NULL;
++
+ 	for (i = 0; i < ARRAY_SIZE(hns3_dbg_cmd); i++)
+ 		if (handle->dbgfs_buf[i]) {
+ 			kvfree(handle->dbgfs_buf[i]);
+@@ -1432,8 +1435,6 @@ void hns3_dbg_uninit(struct hnae3_handle *handle)
+ 		}
+ 
+ 	mutex_destroy(&handle->dbgfs_lock);
+-	debugfs_remove_recursive(handle->hnae3_dbgfs);
+-	handle->hnae3_dbgfs = NULL;
+ }
+ 
+ void hns3_dbg_register_debugfs(const char *debugfs_dir_name)
 -- 
 2.30.0
 
