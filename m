@@ -1,144 +1,145 @@
-Return-Path: <netdev+bounces-32170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DCCA793373
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 03:43:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6D617933AD
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 04:17:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFEF31C20971
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 01:43:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C47651C20932
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 02:17:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 942B863F;
-	Wed,  6 Sep 2023 01:43:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB95F652;
+	Wed,  6 Sep 2023 02:17:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 803EF63D
-	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 01:43:35 +0000 (UTC)
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63C991B3;
-	Tue,  5 Sep 2023 18:43:34 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-68a529e1974so2076628b3a.3;
-        Tue, 05 Sep 2023 18:43:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693964614; x=1694569414; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZuAvo1OT8MVuKgjI6ukMWZxsj7IgNKAT9aZUnqZFr+M=;
-        b=HWDKeArknQ8lKh4B5IlikzudXXAU/+hd4x5blE+B4duwznr4rX3c0dwnVrHGsK4dYM
-         upDDC/HFGkvUHjPC+kpOdpSiHGkRuW911lDPQr9oXN8/KvejaeYzav0KbvGdzPpC10rV
-         0zll7m0WPzpDfGXdYpSEC6//hgfZrBIrTSJg7OBGlhQSeP4botSLHS2rbu+cHrwK65KB
-         0Ii889PpkVb7jlPcKxXw2SZwsprYv4Y4S2Df19xVHrggJhNrY4ffSVbvubGw8OpZVgPh
-         zouxvsriskLiYJkuhkXBavzr8V9vAvT2CxF0rOJ11ri+wjFpfc0ZxNE78L02CIg9/uFG
-         6igA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693964614; x=1694569414;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZuAvo1OT8MVuKgjI6ukMWZxsj7IgNKAT9aZUnqZFr+M=;
-        b=QpdOT1eSGMw5OqrtbY7se1XtOHvWYwptKWNFJsovQVqHQkS+x1Fd6Lvh4IJIkfvF0n
-         /eCuJCtXPuHGk2Kjqyc78C0hRR+CgMVMn/konBig3f7hEwS11oLiHwdQ+3gtYOCT6Rb4
-         eJE+hG9ESRX7XsG3dIe71OGvBgYEblRXLHOibP3Z63d1sxrXbri1o8VzO6WTsE0MAJcY
-         UpKVy9edAXt2/cON93OXD7OaYK2PFmHJknB+xqTBzM37azAQ39C1D/4OPoxTlE+186Kk
-         eo3thv7m6XEQI5XF9t4N3SDhBqvA6w5JAOU785nQKtXs0TBB9UywAFoS9sRJar08i82+
-         ir8g==
-X-Gm-Message-State: AOJu0Yw/pMWx7H/b3aKhrFH3X7JI8GSNZiIC2UdfDxTYGzRLNRWsPm2y
-	jIb2HW2Tp13WRTg2LyBpMuc=
-X-Google-Smtp-Source: AGHT+IFJJjPDphBBacjDJiqviaz4pVna35tTXOevm3qYLzXqSDsvWahohLQ/fQC29TrRqgfpt1HLiQ==
-X-Received: by 2002:a05:6a21:184:b0:153:353e:5e39 with SMTP id le4-20020a056a21018400b00153353e5e39mr2437695pzb.51.1693964613758;
-        Tue, 05 Sep 2023 18:43:33 -0700 (PDT)
-Received: from debian.me ([103.124.138.83])
-        by smtp.gmail.com with ESMTPSA id v6-20020a170902b7c600b001c0a4146961sm9935388plz.19.2023.09.05.18.43.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Sep 2023 18:43:33 -0700 (PDT)
-Received: by debian.me (Postfix, from userid 1000)
-	id 69C1995FE069; Wed,  6 Sep 2023 08:43:30 +0700 (WIB)
-Date: Wed, 6 Sep 2023 08:43:30 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Sergio Callegari <sergio.callegari@gmail.com>, netdev@vger.kernel.org
-Cc: Linux Kernel Mailing list <linux-kernel@vger.kernel.org>,
-	Linux Regressions <regressions@lists.linux.dev>,
-	Oliver Neukum <oliver@neukum.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: Regression with AX88179A: can't manually set MAC address anymore
-Message-ID: <ZPfZQsLKG9LKGR1G@debian.me>
-References: <54cb50af-b8e7-397b-ff7e-f6933b01a4b9@gmail.com>
- <ZPcfsd_QcJwQq0dK@debian.me>
- <6315027e-d1ab-4dec-acf2-0a77bb948807@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A1F662B
+	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 02:17:50 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72A1D1B4
+	for <netdev@vger.kernel.org>; Tue,  5 Sep 2023 19:17:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1693966668;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FD+vLjAAIdNk4teegrZeS0DQ5lQFiDJrgRy8bBiAJTA=;
+	b=NM4En8Rh2bD5jwcep1QEuhAAp319eoS7ym24iYXt+8qWc9NtdJgydqPWxvG/JoJUAXUVH0
+	ct7PYdpeYTsmkvY3Ym+w0WQjEa5V3Soy4Nsw/N8TPnT5ZpMKd4Bw7ixijoE8e3cFBLXfuc
+	pTuQssavqGAK3v+oWz7Nru6NDAyXRbg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-551-96-5Oc00MgOm89IiuGTfIg-1; Tue, 05 Sep 2023 22:17:44 -0400
+X-MC-Unique: 96-5Oc00MgOm89IiuGTfIg-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A3B4418DA722;
+	Wed,  6 Sep 2023 02:17:43 +0000 (UTC)
+Received: from [10.22.16.120] (unknown [10.22.16.120])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id DF3C8493110;
+	Wed,  6 Sep 2023 02:17:42 +0000 (UTC)
+Message-ID: <6ee54d73-d838-bbd9-b3a2-2eac276a05ea@redhat.com>
+Date: Tue, 5 Sep 2023 22:17:42 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="scPX1xTjP0AyGKKl"
-Content-Disposition: inline
-In-Reply-To: <6315027e-d1ab-4dec-acf2-0a77bb948807@gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: ARM BCM53573 SoC hangs/lockups caused by locks/clock/random
+ changes
+To: Florian Fainelli <f.fainelli@gmail.com>,
+ "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
+ Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Will Deacon <will@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
+ Daniel Lezcano <daniel.lezcano@linaro.org>,
+ Thomas Gleixner <tglx@linutronix.de>, linux-clk@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, openwrt-devel@lists.openwrt.org,
+ bcm-kernel-feedback-list@broadcom.com
+References: <a03a6e1d-e99c-40a3-bdac-0075b5339beb@gmail.com>
+ <c98e6c5b-d334-075f-71b8-1c2a3b73b205@redhat.com>
+ <ZPX6W6q4+ECPbBmq@shell.armlinux.org.uk>
+ <3e573810-d50c-9b54-7ea3-f1d82a7ca5b5@gmail.com>
+Content-Language: en-US
+From: Waiman Long <longman@redhat.com>
+In-Reply-To: <3e573810-d50c-9b54-7ea3-f1d82a7ca5b5@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On 9/5/23 16:07, Florian Fainelli wrote:
+>
+>
+> On 9/4/2023 8:40 AM, Russell King (Oracle) wrote:
+>> On Mon, Sep 04, 2023 at 11:25:57AM -0400, Waiman Long wrote:
+>>>
+>>> On 9/4/23 04:33, Rafał Miłecki wrote:
+>>>> As those hangs/lockups are related to so many different changes it's
+>>>> really hard to debug them.
+>>>>
+>>>> This bug seems to be specific to the slow arch clock that affects
+>>>> stability only when kernel locking code and symbols layout trigger 
+>>>> some
+>>>> very specific timing.
+>>>>
+>>>> Enabling CONFIG_PROVE_LOCKING seems to make issue go away but it 
+>>>> affects
+>>>> so much code it's hard to tell why it actually matters.
+>>>>
+>>>> Same for disabling CONFIG_SMP. I noticed Broadcom's SDK keeps it
+>>>> disabled. I tried it and it improves stability (I had 3 devices with 6
+>>>> days of uptime and counting) indeed. Again it affects a lot of kernel
+>>>> parts so it's hard to tell why it helps.
+>>>>
+>>>> Unless someone comes up with some magic solution I'll probably try
+>>>> building BCM53573 images without CONFIG_SMP for my personal needs.
+>>>
+>>> All the locking operations rely on the fact that the instruction to 
+>>> acquire
+>>> or release a lock is atomic. Is it possible that it may not be the case
+>>> under certain circumstances for this ARM BCM53573 SoC? Or maybe some 
+>>> Kconfig
+>>> options are not set correctly like missing some errata that are needed.
+>>>
+>>> I don't know enough about the 32-bit arm architecture to say whether 
+>>> this is
+>>> the case or not, but that is my best guess.
+>>
+>> So, BCM53573 is Cortex-A7, which is ARMv7, which has the exclusive
+>> load/store instructions. Whether the SoC has the necessary exclusive
+>> monitors to support these instructions is another matter, and I
+>> suspect someone with documentation would need to check that.
+>
+> Finding documentation about this SoC has been very difficult 
+> unfortunately...
+>
+> Would any of the lock or mutex debugging self test catch hardware 
+> designed without proper support for exclusive monitors in the DRAM 
+> controller? Keep in mind this is an uni-processor system however, does 
+> that mean we may have issues in our SMP_ON_UP alternative patching?
 
---scPX1xTjP0AyGKKl
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Usually this kind of locking problem is timing related and it happens 
+once in a while. It is not easy to have a test to reliably figure out if 
+there is a problem. I am not sure about the SMP_ON_UP thing.
 
-On Tue, Sep 05, 2023 at 09:34:53PM +0200, Sergio Callegari wrote:
-> On 05/09/2023 14:31, Bagas Sanjaya wrote:
-> > On Tue, Sep 05, 2023 at 01:02:22PM +0200, Sergio Callegari wrote:
-> > > More details:
-> > >=20
-> > > - before the kernel changes, the interface was supported by a dedicat=
-ed
-> > > kernel driver. The driver had glitches but was more or less working. =
-The
-> > > main issue was that after some usage the driver stopped working. Coul=
-d fix
-> > > these glitches with the driver at
-> > > https://github.com/nothingstopsme/AX88179_178A_Linux_Driver
-> > Did you mean that you use out-of-tree module?
->=20
-> I mean that with kernel 5.15 I could use the in-tree module with some
-> glitches (interface occasionally stopping on teleconferencing) as well as
-> the indicated out of tree module with no glitches.
->=20
-> With current kernels (certainly from 6.2 on) manually setting a MAC addre=
-ss
-> breaks the interface. Furthermore, even if it compiles and loads fine, it=
- is
-> impossible to use the out of tree module because it does not create the e=
-th
-> device anymore (the eth device now appears with the cdc_ncn module). Being
-> this an out of tree module, this is not very important, though.
+Cheers,
+Longman
 
-Then can you please file issue against your external module on that
-GH link?
 
---=20
-An old man doll... just what I always wanted! - Clara
-
---scPX1xTjP0AyGKKl
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZPfZPQAKCRD2uYlJVVFO
-o//WAP4lyG53jKCrxpFwKR6vkhX9eKlN3PbxPE6IOf/+0JpEYwD/R9J0ekHq+OVw
-fDL8cHsBGOk6KtZEFRJoTNbldcmwewc=
-=YfY7
------END PGP SIGNATURE-----
-
---scPX1xTjP0AyGKKl--
 
