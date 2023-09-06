@@ -1,166 +1,310 @@
-Return-Path: <netdev+bounces-32213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49F8279388B
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 11:42:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B08517938D0
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 11:48:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FB9D1C20A2C
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 09:42:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A0F521C209D1
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 09:48:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 268941C3B;
-	Wed,  6 Sep 2023 09:42:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77F841FCF;
+	Wed,  6 Sep 2023 09:48:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A61DED6
-	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 09:42:43 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E250171A
-	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 02:42:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1693993360;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FVp7a7K3f5Dla3U4bqJQu6oFrZiBEOge2h0GYL+p8bs=;
-	b=JZJ3um+GNoZUhyHt1V32K7Et05yYMGKp17jcPySnNQyOzteyMYisT1lvv/toEmkkiJ3ev7
-	mFFnMHVFh2F9xRsjlEc6g5C9rLEyfbIhPJSCUnBESrgIjCW71GK+C//QKBSf01MwfU+wJS
-	SviunqmtayPydDUHuxcyzUsdc5ZYNvk=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-581-OKgXsU86PnyLwTDrV3rgCg-1; Wed, 06 Sep 2023 05:42:38 -0400
-X-MC-Unique: OKgXsU86PnyLwTDrV3rgCg-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-402cba95486so19510615e9.0
-        for <netdev@vger.kernel.org>; Wed, 06 Sep 2023 02:42:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693993356; x=1694598156;
-        h=content-transfer-encoding:in-reply-to:subject:organization:from
-         :references:cc:to:content-language:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FVp7a7K3f5Dla3U4bqJQu6oFrZiBEOge2h0GYL+p8bs=;
-        b=S/JvCQl7ruh4UCxCjDqxBEQek5s033lQ2EhrXiq/uIo6xuFF6XfVR3c9XHNnRvWERc
-         pnTFu9TrxtmLxiOwlgmviQUjVT1vsnVRyB1PY+RLHTZEDwjMKbVw+TlxbOkexof8nOES
-         b7ZtTua4ep3hyMOb7PfdIXZL3uHeNgbpUXHoH82RbB4IUPT+1A6Nb03Onsrc5u64rnH6
-         sND2a9lE6WwP1BWQDiX11zMOoxq+0XefKMld+g286D/NsURuDVpCbwsu8Do+oBBPcm5q
-         hbRQazqrp+mMbmt3eBk3ps5NHrBUBQ3gAwvbUvnUNvo3cbr2gEHm+A7vmPUOSSiHtKfu
-         e4Yg==
-X-Gm-Message-State: AOJu0YzPlzw/tM2W/px+qGwo5JXNdE8S78Ke07UlbLCiOKGfSuKTwjJp
-	k6A1+KXFHeA3AzbwVzQqOlyVaiqsQvDMT6ztCOdxZiSU1RjC0id/0r97imm5y5i+n6/GuzENMB0
-	80LAWD8XuG1aDt0EU
-X-Received: by 2002:a7b:c457:0:b0:3fe:238e:b23b with SMTP id l23-20020a7bc457000000b003fe238eb23bmr1759253wmi.36.1693993355960;
-        Wed, 06 Sep 2023 02:42:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEm59ghFt9D38dbkF6LH1whBObd7ER9cWes//aSpkd/gk6Lh0jZNpZxRdXykeg2PgJmqp9G1w==
-X-Received: by 2002:a7b:c457:0:b0:3fe:238e:b23b with SMTP id l23-20020a7bc457000000b003fe238eb23bmr1759213wmi.36.1693993355580;
-        Wed, 06 Sep 2023 02:42:35 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c70c:6c00:92a4:6f8:ff7e:6853? (p200300cbc70c6c0092a406f8ff7e6853.dip0.t-ipconnect.de. [2003:cb:c70c:6c00:92a4:6f8:ff7e:6853])
-        by smtp.gmail.com with ESMTPSA id hn8-20020a05600ca38800b003fee6e170f9sm19270240wmb.45.2023.09.06.02.42.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Sep 2023 02:42:35 -0700 (PDT)
-Message-ID: <0240468f-3cc5-157b-9b10-f0cd7979daf0@redhat.com>
-Date: Wed, 6 Sep 2023 11:42:33 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CC661103
+	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 09:48:46 +0000 (UTC)
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2067.outbound.protection.outlook.com [40.107.93.67])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8A68CFA;
+	Wed,  6 Sep 2023 02:48:31 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TukSxJi1UuiJ3PZM0dahEVLXEfoFIW0DjKjrj0FjWQWnr3arN4JH5Avwy3qvFBM3X3wkRsw3WNzAEywggST1PmsiyrnfHxj/yfkQmjHFkqGreTT96OepclcSW3BPWvCkYijyxk4RNAgLzxMgTNEX3zei/+LFPdIDJAnguhx6qIMvWmZqzhU8darZfez5duy6twxHIwyIOwBunkPwhMlgApF3fOk4XNSiOYGUhw/SG0Vpi2SAF1ZQEd0DYNoGQxwP7+9p2fmXitHSPRbeSUjYQez4szClYGD7ANEasVQf6qk2AyYMMSN3x3PKDpbwRjvj1nbV9qVndiV6V2F/GzB5DA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tK/P2b2h/QqOVjOZcTR4yHVwpND2KJCrHRWZx5oZf6s=;
+ b=B+UXjXFSRnF3I6CdWXeOT2ivVrz4UgMaTCp0VR4IXJGYYMFBf6lfZ8rL/67RGEkJnYBTlrxjiQwNKdGRTfpoFugQEWtxkO8Wi4g47Xjz3Axo6ISvsXop5fMy3L6fPoqh2bJcs+TJKkJeig5iPYK/f9j0sagWJE3ntMOzaq64BLd/GF+8IBNzPfq5/GVzS+P3ev59cNt4gfo4lSj6znakXsqxYYnbfbXEEvXV3fYYFOxARIZFIMLFxjZ4tU9Yjctz8+E/uXu/YhvZhTXp4kcEbb6KQd6YPWfycBfHNIixVxVI1RKz2db/Oj4Km/772HuPYQQCQvqHVz85TyxBRUfN9g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=kaod.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tK/P2b2h/QqOVjOZcTR4yHVwpND2KJCrHRWZx5oZf6s=;
+ b=VQHb8JX7TV1Hw0GT2vHfZxaXtGLatogCxupCU3hayp6T9Nr/V30K9XFSgQd6t+8Rfpo60Vg7yodZZ+hmsQ300cMciPnFUffyZZ8MQ7lIKnrX7quluAwi6s832sgz4AVMBl+hvthIKBb3CSI8GoctALM9wDxBhe7/gzfhhoWqDVhR5VlsqIvqyiaQzdlva4v5e3AvkuaFG+zRGgR5RJ29wtavBwn9Hvs/zpe8sfT+czE8FZD16EtVebXqGpL9dyTlpuOkLCt7PPk5gO8B3dT/u0plTiB+EyWKBwcDyiZZCTlerUk4U8Q1jRoG3wAgIzylis0J4dohgJ3tzSG0ZJgjgQ==
+Received: from CY5PR04CA0024.namprd04.prod.outlook.com (2603:10b6:930:1e::15)
+ by MW5PR12MB5599.namprd12.prod.outlook.com (2603:10b6:303:194::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.34; Wed, 6 Sep
+ 2023 09:48:29 +0000
+Received: from CY4PEPF0000EE34.namprd05.prod.outlook.com
+ (2603:10b6:930:1e:cafe::19) by CY5PR04CA0024.outlook.office365.com
+ (2603:10b6:930:1e::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.34 via Frontend
+ Transport; Wed, 6 Sep 2023 09:48:29 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CY4PEPF0000EE34.mail.protection.outlook.com (10.167.242.40) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6768.25 via Frontend Transport; Wed, 6 Sep 2023 09:48:29 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Wed, 6 Sep 2023
+ 02:48:18 -0700
+Received: from [172.27.14.125] (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Wed, 6 Sep 2023
+ 02:48:13 -0700
+Message-ID: <1b60d2d3-e8b3-b47e-ad4b-e157bcd4bf18@nvidia.com>
+Date: Wed, 6 Sep 2023 12:48:05 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.0
+Subject: Re: [PATCH V7 vfio 07/10] vfio/mlx5: Create and destroy page tracker
+ object
+To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+	<alex.williamson@redhat.com>, <jgg@nvidia.com>
+CC: <saeedm@nvidia.com>, <kvm@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<kuba@kernel.org>, <kevin.tian@intel.com>, <joao.m.martins@oracle.com>,
+	<leonro@nvidia.com>, <maorg@nvidia.com>, <cohuck@redhat.com>, 'Avihai Horon'
+	<avihaih@nvidia.com>, Tarun Gupta <targupta@nvidia.com>
+References: <20220908183448.195262-1-yishaih@nvidia.com>
+ <20220908183448.195262-8-yishaih@nvidia.com>
+ <9a4ddb8c-a48a-67b0-b8ad-428ee936454e@kaod.org>
 Content-Language: en-US
-To: Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
- David Howells <dhowells@redhat.com>, Peter Xu <peterx@redhat.com>
-Cc: Lei Huang <lei.huang@linux.intel.com>, miklos@szeredi.hu,
- Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
- Jeff Layton <jlayton@kernel.org>,
- Trond Myklebust <trond.myklebust@hammerspace.com>,
- Anna Schumaker <anna@kernel.org>, Latchesar Ionkov <lucho@ionkov.net>,
- Dominique Martinet <asmadeus@codewreck.org>,
- Christian Schoenebeck <linux_oss@crudebyte.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- John Fastabend <john.fastabend@gmail.com>,
- Jakub Sitnicki <jakub@cloudflare.com>, Boris Pismenny <borisp@nvidia.com>,
- linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- ceph-devel@vger.kernel.org, linux-mm@kvack.org, v9fs@lists.linux.dev,
- netdev@vger.kernel.org
-References: <20230905141604.GA27370@lst.de>
-From: David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Subject: Re: getting rid of the last memory modifitions through gup(FOLL_GET)
-In-Reply-To: <20230905141604.GA27370@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+From: Yishai Hadas <yishaih@nvidia.com>
+In-Reply-To: <9a4ddb8c-a48a-67b0-b8ad-428ee936454e@kaod.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.126.231.35]
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE34:EE_|MW5PR12MB5599:EE_
+X-MS-Office365-Filtering-Correlation-Id: 53cd6d07-a906-4273-83db-08dbaebe6cd0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	AmNweysRZQWIv4WjXr8GcjidF0MUqZ3G8xwJkpS64NpE6Lfs8m5t3lNSXSo27kpn8INJRnfgmC7iVMal328GjykHrS/b70BfoNvARg4PAJTASAaecpn8oB7cZ19qOvfS7ik7VPQ9kB1Xonr1BhRnw1kHgS4DDlS22D+8UwwS2u8i38+BsfcPQmTXNKKSjvVa09QVngA58dyNzxrNXS3xs7skr6jAXgwsOiAw5rcCCdfBd7rl7bMhuCgYChluR+IOhB/Jt5uiNaFgrM8r0cza/EhCGvpp95YN4o6QWyJPSch/iPNXpok9+je+T3qCTSOhtsX9gigizxZCZNKn+Y4hmuTEUC3v4i5b8i7ElBqXBeYMH1FJkik1cemUUj0HpUPKrVziGpPLBO+9bI1+tSkrLp0uCLSQOiQ6M//PQrzMFoF15UFcgBZE6XvVbDw3K0YPIrha90PBUFlogbRQFZ12wfxABDMvYplYNcFfmF9h4sb/FSUmIfXFyX2COWLjrgTEfmZuZREN+8aUBaua05Ot46nj4E1F59OPliiC7U0L/aeMBBAelbho5TmNy/yvQv2btuXopX/ZtJWAVHw1fxnfT1UvOq197BR9i1xrYxk/8OM2unokhOOGzxL/RioWI031Vpst70cVpidqjFkFUrMb97od8H+6jg3hzX65hdPQmccYl/4fcPTWjQPyUQv72EW5pkBIHRlW4xUoYXxdEqZ6XQ5+Ed8EuDtUu4/lF/1sbwjNLbpGgVenIF8ZHr9U3/wUiprFKW6OjOuiLgDnDen6dg==
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(376002)(39860400002)(396003)(136003)(346002)(186009)(1800799009)(82310400011)(451199024)(46966006)(36840700001)(40470700004)(31696002)(82740400003)(36756003)(86362001)(40480700001)(40460700003)(6666004)(53546011)(478600001)(83380400001)(26005)(336012)(107886003)(426003)(16526019)(2616005)(5660300002)(8936002)(8676002)(41300700001)(4326008)(31686004)(2906002)(316002)(6636002)(110136005)(54906003)(16576012)(70586007)(70206006)(356005)(7636003)(36860700001)(47076005)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2023 09:48:29.4431
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 53cd6d07-a906-4273-83db-08dbaebe6cd0
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EE34.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR12MB5599
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 05.09.23 16:16, Christoph Hellwig wrote:
-> Hi all,
+On 06/09/2023 11:55, Cédric Le Goater wrote:
+> Hello,
+>
+> On 9/8/22 20:34, Yishai Hadas wrote:
+>> Add support for creating and destroying page tracker object.
+>>
+>> This object is used to control/report the device dirty pages.
+>>
+>> As part of creating the tracker need to consider the device capabilities
+>> for max ranges and adapt/combine ranges accordingly.
+>>
+>> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+>> ---
+>>   drivers/vfio/pci/mlx5/cmd.c | 147 ++++++++++++++++++++++++++++++++++++
+>>   drivers/vfio/pci/mlx5/cmd.h |   1 +
+>>   2 files changed, 148 insertions(+)
+>>
+>> diff --git a/drivers/vfio/pci/mlx5/cmd.c b/drivers/vfio/pci/mlx5/cmd.c
+>> index 0a362796d567..f1cad96af6ab 100644
+>> --- a/drivers/vfio/pci/mlx5/cmd.c
+>> +++ b/drivers/vfio/pci/mlx5/cmd.c
+>> @@ -410,6 +410,148 @@ int mlx5vf_cmd_load_vhca_state(struct 
+>> mlx5vf_pci_core_device *mvdev,
+>>       return err;
+>>   }
+>>   +static void combine_ranges(struct rb_root_cached *root, u32 
+>> cur_nodes,
+>> +               u32 req_nodes)
+>> +{
+>> +    struct interval_tree_node *prev, *curr, *comb_start, *comb_end;
+>> +    unsigned long min_gap;
+>> +    unsigned long curr_gap;
+>> +
+>> +    /* Special shortcut when a single range is required */
+>> +    if (req_nodes == 1) {
+>> +        unsigned long last;
+>> +
+>> +        curr = comb_start = interval_tree_iter_first(root, 0, 
+>> ULONG_MAX);
+>> +        while (curr) {
+>> +            last = curr->last;
+>> +            prev = curr;
+>> +            curr = interval_tree_iter_next(curr, 0, ULONG_MAX);
+>> +            if (prev != comb_start)
+>> +                interval_tree_remove(prev, root);
+>> +        }
+>> +        comb_start->last = last;
+>> +        return;
+>> +    }
+>> +
+>> +    /* Combine ranges which have the smallest gap */
+>> +    while (cur_nodes > req_nodes) {
+>> +        prev = NULL;
+>> +        min_gap = ULONG_MAX;
+>> +        curr = interval_tree_iter_first(root, 0, ULONG_MAX);
+>> +        while (curr) {
+>> +            if (prev) {
+>> +                curr_gap = curr->start - prev->last;
+>> +                if (curr_gap < min_gap) {
+>> +                    min_gap = curr_gap;
+>> +                    comb_start = prev;
+>> +                    comb_end = curr;
+>> +                }
+>> +            }
+>> +            prev = curr;
+>> +            curr = interval_tree_iter_next(curr, 0, ULONG_MAX);
+>> +        }
+>> +        comb_start->last = comb_end->last;
+>> +        interval_tree_remove(comb_end, root);
+>> +        cur_nodes--;
+>> +    }
+>> +}
+>> +
+>> +static int mlx5vf_create_tracker(struct mlx5_core_dev *mdev,
+>> +                 struct mlx5vf_pci_core_device *mvdev,
+>> +                 struct rb_root_cached *ranges, u32 nnodes)
+>> +{
+>> +    int max_num_range =
+>> +        MLX5_CAP_ADV_VIRTUALIZATION(mdev, pg_track_max_num_range);
+>> +    struct mlx5_vhca_page_tracker *tracker = &mvdev->tracker;
+>> +    int record_size = MLX5_ST_SZ_BYTES(page_track_range);
+>> +    u32 out[MLX5_ST_SZ_DW(general_obj_out_cmd_hdr)] = {};
+>> +    struct interval_tree_node *node = NULL;
+>> +    u64 total_ranges_len = 0;
+>> +    u32 num_ranges = nnodes;
+>> +    u8 log_addr_space_size;
+>> +    void *range_list_ptr;
+>> +    void *obj_context;
+>> +    void *cmd_hdr;
+>> +    int inlen;
+>> +    void *in;
+>> +    int err;
+>> +    int i;
+>> +
+>> +    if (num_ranges > max_num_range) {
+>> +        combine_ranges(ranges, nnodes, max_num_range);
+>> +        num_ranges = max_num_range;
+>> +    }
+>> +
+>> +    inlen = MLX5_ST_SZ_BYTES(create_page_track_obj_in) +
+>> +                 record_size * num_ranges;
+>> +    in = kzalloc(inlen, GFP_KERNEL);
+>> +    if (!in)
+>> +        return -ENOMEM;
+>> +
+>> +    cmd_hdr = MLX5_ADDR_OF(create_page_track_obj_in, in,
+>> +                   general_obj_in_cmd_hdr);
+>> +    MLX5_SET(general_obj_in_cmd_hdr, cmd_hdr, opcode,
+>> +         MLX5_CMD_OP_CREATE_GENERAL_OBJECT);
+>> +    MLX5_SET(general_obj_in_cmd_hdr, cmd_hdr, obj_type,
+>> +         MLX5_OBJ_TYPE_PAGE_TRACK);
+>> +    obj_context = MLX5_ADDR_OF(create_page_track_obj_in, in, 
+>> obj_context);
+>> +    MLX5_SET(page_track, obj_context, vhca_id, mvdev->vhca_id);
+>> +    MLX5_SET(page_track, obj_context, track_type, 1);
+>> +    MLX5_SET(page_track, obj_context, log_page_size,
+>> +         ilog2(tracker->host_qp->tracked_page_size));
+>> +    MLX5_SET(page_track, obj_context, log_msg_size,
+>> +         ilog2(tracker->host_qp->max_msg_size));
+>> +    MLX5_SET(page_track, obj_context, reporting_qpn, 
+>> tracker->fw_qp->qpn);
+>> +    MLX5_SET(page_track, obj_context, num_ranges, num_ranges);
+>> +
+>> +    range_list_ptr = MLX5_ADDR_OF(page_track, obj_context, 
+>> track_range);
+>> +    node = interval_tree_iter_first(ranges, 0, ULONG_MAX);
+>> +    for (i = 0; i < num_ranges; i++) {
+>> +        void *addr_range_i_base = range_list_ptr + record_size * i;
+>> +        unsigned long length = node->last - node->start;
+>> +
+>> +        MLX5_SET64(page_track_range, addr_range_i_base, start_address,
+>> +               node->start);
+>> +        MLX5_SET64(page_track_range, addr_range_i_base, length, 
+>> length);
+>> +        total_ranges_len += length;
+>> +        node = interval_tree_iter_next(node, 0, ULONG_MAX);
+>> +    }
+>> +
+>> +    WARN_ON(node);
+>> +    log_addr_space_size = ilog2(total_ranges_len);
+>> +    if (log_addr_space_size <
+>> +        (MLX5_CAP_ADV_VIRTUALIZATION(mdev, 
+>> pg_track_log_min_addr_space)) ||
+>> +        log_addr_space_size >
+>> +        (MLX5_CAP_ADV_VIRTUALIZATION(mdev, 
+>> pg_track_log_max_addr_space))) {
+>> +        err = -EOPNOTSUPP;
+>> +        goto out;
+>> +    }
+>
+>
+> We are seeing an issue with dirty page tracking when doing migration
+> of an OVMF VM guest. The vfio-pci variant driver for the MLX5 VF
+> device complains when dirty page tracking is initialized from QEMU :
+>
+>   qemu-kvm: 0000:b1:00.2: Failed to start DMA logging, err -95 
+> (Operation not supported)
+>
+> The 64-bit computed range is  :
+>
+>   vfio_device_dirty_tracking_start nr_ranges 2 32:[0x0 - 0x807fffff], 
+> 64:[0x100000000 - 0x3838000fffff]
+>
+> which seems to be too large for the HW. AFAICT, the MLX5 HW has a 42
+> bits address space limitation for dirty tracking (min is 12). Is it a
+> FW tunable or a strict limitation ?
 
-Hi,
+It's mainly a FW limitation.
 
-> 
-> we've made some nice progress on converting code that modifies user
-> memory to the pin_user_pages interface, especially though the work
-> from David Howells on iov_iter_extract_pages.  This thread tries to
-> coordinate on how to finish off this work.
-> 
-> The obvious next step is the remaining users of iov_iter_get_pages2
-> and iov_iter_get_pages_alloc2.  We have three file system direct I/O
-> users of those left: ceph, fuse and nfs.  Lei Huang has sent patches
-> to convert fuse to iov_iter_extract_pages which I'd love to see merged,
-> and we'd need equivalent work for ceph and nfs.
-> 
-> The non-file system uses are in the vmsplice code, which only reads
+Tracking larger address space than 2^42 might take a lot of time in FW 
+to allocate the required resources which might end-up in command 
+timeout, etc.
 
-vmsplice really has to be fixed to specify FOLL_PIN|FOLL_LONGTERM for 
-good; I recall that David Howells had patches for that at one point. (at 
-least to use FOLL_PIN)
+>
+> We should probably introduce more ranges to overcome the issue.
 
-> from the pages (but would still benefit from an iov_iter_extract_pages
-> conversion), and in net.  Out of the users in net, all but the 9p code
-> appear to be for reads from memory, so they don't pin even if a
-> conversion would be nice to retire iov_iter_get_pages* APIs.
-> 
-> After that we might have to do an audit of the raw get_user_pages APIs,
-> but there probably aren't many that modify file backed memory.
+More ranges can help only if the total address space of the given ranges 
+is < 2^42.
 
-ptrace should apply that ends up doing a FOLL_GET|FOLL_WRITE.
+So, if there are some areas that don't require tracking (why?), breaking 
+into more ranges with smaller total size can help.
 
-Further, KVM ends up using FOLL_GET|FOLL_WRITE to populate the 
-second-level page tables for VMs, and uses MMU notifiers to synchronize 
-the second-level page tables with process page table changes. So once a 
-PTE goes from writable -> r/o in the process page table, the second 
-level page tables for the VM will get updated. Such MMU users are quite 
-different from ordinary GUP users.
-
-Converting the latter to FOLL_PIN is not desired (as it would implicitly 
-  trigger COW-unsharing on KSM pages -- but GUP+MMU notifiers is 
-different to ordinary GUP+read/write where there is no such 
-synchronization).
-
-Converting ptrace might not be desired/required as well (the reference 
-is dropped immediately after the read/write access).
-
-The end goal as discussed a couple of times would be the to limit 
-FOLL_GET in general only to a couple of users that can be audited and 
-keep using it for a good reason. Arbitrary drivers that perform DMA 
-should stop using it (and ideally be prevented from using it) and switch 
-to FOLL_PIN.
-
--- 
-Cheers,
-
-David / dhildenb
+Yishai
 
 
