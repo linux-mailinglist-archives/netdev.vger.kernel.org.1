@@ -1,87 +1,109 @@
-Return-Path: <netdev+bounces-32285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32291-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B4BE793E4C
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 16:02:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 09347793E98
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 16:18:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44B452814BF
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 14:02:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DCAA28136D
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 14:18:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58983DF61;
-	Wed,  6 Sep 2023 14:02:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87B9F107A4;
+	Wed,  6 Sep 2023 14:18:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40A616131
-	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 14:02:19 +0000 (UTC)
-Received: from EUR02-AM0-obe.outbound.protection.outlook.com (mail-am0eur02on2077.outbound.protection.outlook.com [40.107.247.77])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A545710C9;
-	Wed,  6 Sep 2023 07:02:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A895D513;
+	Wed,  6 Sep 2023 14:18:34 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D291710D5;
+	Wed,  6 Sep 2023 07:18:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694009912; x=1725545912;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=LougLevJKfX93euw/aixI39zK/pmyR+MMsS0sddzAGU=;
+  b=kGEMEhH8HCaO3TCjeRY43TuPlANS/hfjvXUW/eeoCoy6eZO/giO9fl6/
+   L09XwDYAItPy335J+5ff9ZsaV/cb84CKLi4Q3FAY+qYzYTTPW4wA9gUtF
+   R1gZNutneZ761CYeW42UIZat0Ywf5uWxRyXUKDrZdRuMx4Kp6UrJOPlMt
+   TrBYTeDRc1H8XxDaiO1ASa7nasZNxT2F9iwzovWWURu5ZlMpuf5qNqbwZ
+   V6DscWvGrkYRJxS30Kkj2FlLZU/npQ10seMeqeXNZlQrkYHfSAvpEo03Z
+   P/u2Ppiv3PfXEbmWhz6OcvhB92qlqH20I9R1snQ7/YU9lzIl/uAkIN9MC
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10825"; a="441051927"
+X-IronPort-AV: E=Sophos;i="6.02,232,1688454000"; 
+   d="scan'208";a="441051927"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2023 07:18:32 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10825"; a="811673312"
+X-IronPort-AV: E=Sophos;i="6.02,232,1688454000"; 
+   d="scan'208";a="811673312"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmsmga004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Sep 2023 07:18:31 -0700
+Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Wed, 6 Sep 2023 07:18:30 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Wed, 6 Sep 2023 07:18:30 -0700
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.40) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Wed, 6 Sep 2023 07:18:30 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=S8BZSPLqWpr2T62IjOTgffmKktebZwcFRkQnK4DJ5s75qK7YYcnq4XtusYL9VglS9ffrRJcPEZTXt1brWJlQCNAT9y9iYwY92ZdNryeWPmEgI1iIeLsodbchNyGSRF11x0o4esYcHV/tvD775GAZMM1UlR8/hVmvw4gMm6kAGzgAGtupg5LywaDZFHfLBH3dvrKIFRYeL9WdH3GEtd82Lf2EX2UXNRR/fk8f25bxZPfNAdSrJFKvLdz0vv2acX8p7DuRXrJCGtS2TAH0UujuWR375hL6wDBEQ20N5MiEDpWmaOSac8Fu+JtJRnd9tNw23D91Tk/SVsMb4Sc8dI+IiQ==
+ b=nAJoHn1i3FZBPZ4KyE+1EfZc+o8txPBn1ihkE5qR8/tBWGyX1ckmaDorwz58mNOHCvK7SwrjF9XlfFTlAqUykZfIZzmyysXh0NoAe2Gq1QI6LaNBfx3TsN1aNQVmRn94V435n6puDtBPf85+FAQGZeONA3Cn5hxwEZYuUFstXQOG/uYBlUWdX+5/WooTWLTrSJjv9dFa0at+lsPbT48MxXKfzUMcb4P3gw9vVbXKswPrUiger+vBRlOm7jS6azfltVyo/6bUmWU1LbjGUKmHLn5bsulIdqXU+A7P7004M4NFPYxvglWOSEXqZF4kljgg2y597PMei2dy5i4uVDbNYw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UGJUnIOkeNJDbpWjARJOz+tVomHpjTm1tUQszGQNHqc=;
- b=CuuONi6/W1+gA90r4By2U1aAq/5ewH2fitN8oPC8BNwNJgg2x9oOHXveHh5s/Mx4vuC6r6AqOJHPHWp1kVQE6SocN5bvFnbJXFJLX7qioPFntNSisjN+jkXQs/H0o4vIcpqUq8RN7NywTUFR97YOU8eetGZfS1PhPr0GA1WSNdKdynCuTZA2kl84v161LwhtoFrG6PeIdAdGiuNeB0II+k8p6T94twDsizWK7H/2q3TY4izEWmdAY2AI1ULeRH63sEimrW1Bh0DauUZj/g1HMjPuyhmgi1tLT8SYl8OmkECfygBSX9xpoljTR018T1HqcrgH34rLuKqWNXdIqvsGSg==
+ bh=ZxQrzG3qji5zZ621N/DZ0PKjYTgpkm7da0B2fY6rf9M=;
+ b=Ehu2VQgc9BBBPDZ5niXvBQFhdL8FUGx0Oq9kFR5kxykQhLFw2yFQiBpPYeDO4o8TQ9CZf7lCRRmF9hPZ/HB5s/AFOzDtP8hYKplE1w74afqF/1s+4dVY15PO3ixwtupFtfCekbJzNK3IBBHPfVywU/5QUBCw5VxfsYQWAeSYZOyfDFM2O5aGYBopFfy0jEsWTyVoibsrw9bv4LLgzEUCTSErkTwSt3lHwKIt2XDFJqh+gHeWjBKklfdmyj8KjO+bEoaHbjpnDkmzmZR3Q84nlBCHlMeyZAH4s7pamLMlUJbfjum24NoAYtOif07UUD8xoZwK2mTlS8ZEqodg8B+uRQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UGJUnIOkeNJDbpWjARJOz+tVomHpjTm1tUQszGQNHqc=;
- b=gxY+9D19Q1luLacnoKEgUPM1i176mglkOO5812UbhnCcZs/Wba/degdvSrlQ54IUehPs+lnrP0r2H+tKl2bA/DWeIr00gFISL2a/CQtrd22+rqMPo9iTkYUZQzo4drYl6gQKsgMnL2SRljERNlm/qgbDAp9WHEX1wjRIfuET1BA=
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by AM8PR04MB7939.eurprd04.prod.outlook.com (2603:10a6:20b:241::16) with
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
+ by PH7PR11MB5984.namprd11.prod.outlook.com (2603:10b6:510:1e3::15) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.34; Wed, 6 Sep
- 2023 14:02:15 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::568a:57ee:35b5:e454]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::568a:57ee:35b5:e454%3]) with mapi id 15.20.6745.030; Wed, 6 Sep 2023
- 14:02:15 +0000
-Date: Wed, 6 Sep 2023 17:02:10 +0300
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Rob Herring <robh@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-phy@lists.infradead.org,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Madalin Bucur <madalin.bucur@nxp.com>,
-	Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Camelia Groza <camelia.groza@nxp.com>, Li Yang <leoyang.li@nxp.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor@kernel.org>,
-	Sean Anderson <sean.anderson@seco.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>
-Subject: Re: [RFC PATCH net-next 8/8] dt-bindings: net: fsl,backplane-anlt:
- new binding document
-Message-ID: <20230906140210.sfyiohp3cxf3epuc@skbuf>
-References: <20230817150644.3605105-1-vladimir.oltean@nxp.com>
- <20230817150644.3605105-9-vladimir.oltean@nxp.com>
- <20230821195840.GA2181626-robh@kernel.org>
- <20230821201146.hudnk5v2zugz726p@skbuf>
- <e3afb3d5-6efe-46de-81ca-7f0163c4b04d@lunn.ch>
- <20230821203433.ysulh2bixfypbhsk@skbuf>
- <842f7ff0-d376-4f55-b72d-2db7ea827792@lunn.ch>
- <20230821215500.oap7ze73pu237pof@skbuf>
- <36bb7d51-2fca-4d06-b78d-e411f67ecf56@lunn.ch>
-Content-Type: text/plain; charset=us-ascii
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.30; Wed, 6 Sep
+ 2023 14:18:25 +0000
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::10f1:d83:9ee2:bf5d]) by SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::10f1:d83:9ee2:bf5d%3]) with mapi id 15.20.6745.030; Wed, 6 Sep 2023
+ 14:18:25 +0000
+Date: Wed, 6 Sep 2023 16:09:52 +0200
+From: Larysa Zaremba <larysa.zaremba@intel.com>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+CC: <bpf@vger.kernel.org>, <ast@kernel.org>, <daniel@iogearbox.net>,
+	<andrii@kernel.org>, <martin.lau@linux.dev>, <song@kernel.org>, <yhs@fb.com>,
+	<john.fastabend@gmail.com>, <kpsingh@kernel.org>, <sdf@google.com>,
+	<haoluo@google.com>, <jolsa@kernel.org>, David Ahern <dsahern@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Willem de Bruijn <willemb@google.com>,
+	Jesper Dangaard Brouer <brouer@redhat.com>, Anatoly Burakov
+	<anatoly.burakov@intel.com>, Alexander Lobakin <alexandr.lobakin@intel.com>,
+	Magnus Karlsson <magnus.karlsson@gmail.com>, Maryam Tahhan
+	<mtahhan@redhat.com>, <xdp-hints@xdp-project.net>, <netdev@vger.kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Alexei Starovoitov
+	<alexei.starovoitov@gmail.com>, Simon Horman <simon.horman@corigine.com>,
+	Tariq Toukan <tariqt@mellanox.com>, Saeed Mahameed <saeedm@mellanox.com>
+Subject: Re: [xdp-hints] [RFC bpf-next 00/23] XDP metadata via kfuncs for ice
+ + mlx5
+Message-ID: <ZPiIMPKDEadvX2oI@lincoln>
+References: <20230824192703.712881-1-larysa.zaremba@intel.com>
+ <ZPYAm9oq0SZ7VEvO@boxer>
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <36bb7d51-2fca-4d06-b78d-e411f67ecf56@lunn.ch>
-X-ClientProxiedBy: AS4P190CA0017.EURP190.PROD.OUTLOOK.COM
- (2603:10a6:20b:5d0::7) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+In-Reply-To: <ZPYAm9oq0SZ7VEvO@boxer>
+X-ClientProxiedBy: DB8PR09CA0023.eurprd09.prod.outlook.com
+ (2603:10a6:10:a0::36) To SN7PR11MB7540.namprd11.prod.outlook.com
+ (2603:10b6:806:340::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,123 +111,85 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AM8PR04MB7939:EE_
-X-MS-Office365-Filtering-Correlation-Id: f7255700-f0e0-4a39-1a17-08dbaee1e031
-X-LD-Processed: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635,ExtAddr
+X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|PH7PR11MB5984:EE_
+X-MS-Office365-Filtering-Correlation-Id: 75d9834a-33aa-4012-e368-08dbaee420e7
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
- rPbkehm04mVs8/CIS6LUHJy3nng8g9KJ/jmBdHFdB4fCwgaAUnEP2DOPoDr4G0ANZpEYizR7oksGW3ll0PorA0jDzWMqR8BEQ4A1fi+fWnmKex90a9ZDwEzjx+kyE8ctu9kQ4ORzjXGYn+/f4r2jzOfvrASP1lC/nHG+CTPj746cGvQVFzPSS4fs6fZD+OqIoSPsDdKwJt1ScbLTbLhXYycw1QtnH+1sb4nRZKrNHLaeg5rmoBLgf2dTcfeaqXC8gY8XA+2Qy9FROBaG4y0nu9hAyoWZobsSmLDww0cHoa6E/flbRYuKJgqKgQWwrG2aatcfyxo/B0+0DOToqG8tUai788AOAH/CzIdPcfMYgyBkdLhc6gxiduTgB43m/cvIBU5E03X49pK5mfTC7iZ+2b2KdBrb21NpxIRLK8PMW1fzGsvuNjJgZfcHqOTALXK8abYAyn0VPuxb7Jd732qu0YRFHWoaVZhxmiFEUg9TlcWOzb4hmmgcwo926MLzw4+WpfOOjLBv0CDSP+GJ7fKkg2hjr49brzL1VMuSYzBa05kDFqPRj2HOdzdYtGViC6IS
-X-Forefront-Antispam-Report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(346002)(396003)(376002)(39860400002)(136003)(451199024)(186009)(1800799009)(41300700001)(33716001)(4326008)(8676002)(8936002)(86362001)(66556008)(38100700002)(6916009)(66476007)(54906003)(44832011)(66946007)(316002)(7416002)(5660300002)(478600001)(2906002)(6666004)(6512007)(9686003)(6506007)(6486002)(26005)(83380400001)(1076003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: j95s0fdno32wEKwN+uBzAYBiOntN4CIR166TdCOCN9sv8koKk7/rLtAymZz14/VDvjZ6Fj3vcJQcEznjFOIa9dSO9PjcXP4TAdNm7RMo94mZFan4wHh0wm0Xj+okk/iVFGl8aHKCQ5rhzYFJWNSbIQRIisEO7fjrc+VfqSDjPDm18QCHi52cJD25Nn8jElcUs/SptcDBwdM+hSe5EyAUtuy2HNJnIaQMJ4w+Y8Syev7VvuSLTpZWsNKx9MD7rzVkgF4nc196EomW4lEDdTY3jripICEZbFLTSf9Klxxr4roz5tPn7lCH6BZmtwQ6gu4rw5lWRmNFSVIsTpmvoLPvkErJgAzSwP6/oWEncWj0w5Np2HTh2hYVXAqecNqGvZYFGocYvRolstReebBQ0s3wiV2QNUTKVp4L45COPiPqx711VhbbcAY+Aj3lgPfH/l599cuH0wikBeJlO/5NeyOlAFhrLmiidZmckH6E/6ZQbLjO2gGUyoBBoFczh71zZRkPc8VZdYQzf4LbPWK+4sILV8aL76ZBkilBK8JFVq5WAR1h2CImedHv6TftSl6z26tx
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(136003)(376002)(39860400002)(396003)(346002)(366004)(451199024)(1800799009)(186009)(8676002)(5660300002)(6862004)(316002)(66556008)(2906002)(54906003)(66946007)(66476007)(6636002)(8936002)(4326008)(44832011)(7416002)(41300700001)(6486002)(6506007)(9686003)(6512007)(26005)(33716001)(6666004)(82960400001)(86362001)(478600001)(83380400001)(38100700002);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
- =?us-ascii?Q?d27DwJKJOZd5pdMkouXwP0hPGsvxosrOakXnN7tueUZ7R+Riq0/SyKmSxKwH?=
- =?us-ascii?Q?E6SDQ3CYfLM0jAh2bJQBOvqvqrshVQmZj4l7MoWr2PlhwT2UKBaZJUPpjRGH?=
- =?us-ascii?Q?znNire3WkCG+0DfkLvJWf0F+588NvURtsMwzbdRRa2lc1PMUoYxZFzdvIb6Q?=
- =?us-ascii?Q?ni9AswjWfn8oYKHgwm7w5pqzL0LGHhgkt9dquOR7XsDN1YhyROtF5AjVuom7?=
- =?us-ascii?Q?O/NPKz8TJVvaYN6fxNGbjZXe146sT4LX9q6cvy8lLSuURbJg0lMBYKqLcZ/3?=
- =?us-ascii?Q?29gcJmaOAR6w39xtI8s2SGC2oFsDGW0awhl/X7zJBQLIdNj9ocbwzYbKGPUX?=
- =?us-ascii?Q?IHa5Pxav2ouSy39H7XxziiuCEee8KSOLBtV6QQYf/mTVScOze2nF0SZMR6je?=
- =?us-ascii?Q?7pkTcOHtqbUCwsT/Yvc3IbLRYFSPo5QEbGG8Dv7Pe8hwXH/lbZjOUVR8jO/B?=
- =?us-ascii?Q?U6VEmFU7zG/ZmVFGVh+AFsmmJm8D/HQBDfDOHJ3BvhuGSc0fqSoVRQdUDVfX?=
- =?us-ascii?Q?/Q83smKGAlZlMWro66CUL0Ue2QTOGP3gscjpfOe5m3dYjXTe/CJ9ZkZhwONL?=
- =?us-ascii?Q?j2XkeNknwaDScyyjhCAjRSlLxk4jh6RynEzO1cIq6xkASkZQi6GplQNSwj/n?=
- =?us-ascii?Q?lfUfYQV2h5LQN7uO/MT/vKnXUozVa+orC8RGcgza45UrXMOGT2/HxMIyh902?=
- =?us-ascii?Q?2I3y835eEKWQUfu8M0bB7L0W0tyU18ahutxFkWyV6zlab7CSFTQcaPzQA7qo?=
- =?us-ascii?Q?auKtyMh3hdkq6tVMaez5mdklGW0o8arjjrkGkIU4RDFVCYeGjVvvzgVVB3wU?=
- =?us-ascii?Q?jLsbpQ1IcwuSn9vr3/w5wEmjDWsRZbrWc+L9KVaAjUaeRaL0OKYYdpjQjLex?=
- =?us-ascii?Q?No8PCCQsLi1NgEAmvYJZHj0by59vhUKXLdu1JRixfXCLUOv9oKm/4jS84fSR?=
- =?us-ascii?Q?C40gFit1x0x5NfI1YFwUZO/B671uibgEVIeWGOBDQimX18UnxCHizozW9ZG+?=
- =?us-ascii?Q?yOwHkTodmGuHYfgu7irAV765vQ2NbI7NlHKmrF/ago6XDwPZGuscAYR7FYyH?=
- =?us-ascii?Q?+4qnIIqUvVnLGidZecyDZtTUlPO+bWuHmVYnJ1z44kMD2rNbXqjRiTOFfZpy?=
- =?us-ascii?Q?SPxlRIBfbYftC9roYfNr2zcwu/gpK5OEEs7S/lhPGrLTdmkRRaDOcHSGh7va?=
- =?us-ascii?Q?C3oPFoon/86O8A/goeSZBydrrc74r0B0DswGwgGvM/m2xCSaVyCCd/Pi4mjw?=
- =?us-ascii?Q?MKzw+936pLRvUfuYg4QHjupYMElfOXZdf0NypKbOeDlZgUl6OF4f8saiFHgN?=
- =?us-ascii?Q?8LiTEyKJfQWTh8BUiU5QYwWUBjP3//TZ/SOSH62R8O9oFRblnRJSasCFjlKB?=
- =?us-ascii?Q?7s3tmttyTOAuJLy7MTrMLfdhqGPaZtHYIJP3cn9B1uuGM2FBYp78D7DS4UHo?=
- =?us-ascii?Q?bOALyEJ6yiTTN9mMYuONP16CwLQn4d25XiKXAXIdyz+yJy2Iju6AWy/SQfrs?=
- =?us-ascii?Q?LYJkMuJJqewR0EapWruBJYg/U7C9mulf3uullAqLN7UhDK5pQFjgx12GpxUb?=
- =?us-ascii?Q?ZBURo8P3WFc6MdrYaJso2Hwi82NAqXsvKBayfd6tNttn7VZrZgGUcNiQDqll?=
- =?us-ascii?Q?xg=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f7255700-f0e0-4a39-1a17-08dbaee1e031
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?FQTz4ZHQe6nNu0Md+o+1IDvWN1iqJZfYanDVkjnVPaibhqVVrMwAp/d6VcJh?=
+ =?us-ascii?Q?m63FyjPm4V8nIJIyEJSvqlViWQ+kuMfk4Qz3c3+4wdtIzIE8syVnp7NygI52?=
+ =?us-ascii?Q?BWynwS6oexjI++kQ6PRi34R+5dvJjx1hvM0ulmxCSjC1jwrSoSLodBi18cSN?=
+ =?us-ascii?Q?R4/17ysastJRgHj6Z+q+xh+DRZG1FzXDMsHId97NJ4AWnVeef+LfffJGSSNU?=
+ =?us-ascii?Q?eXHg/N/uizdtXcinxSuarsQXFdGU63pP8HIDAdQzNLlpTzzgLaK9g5iKE5c7?=
+ =?us-ascii?Q?1ddv0ADOamqgznSLYhqaY4m/CyNKa1vtWb6rueY34nreKQWx/uM/u3cA1PrG?=
+ =?us-ascii?Q?KA8k2wkjlEqdAoQsnQwYy6SaHtsJFjBOloh/VqlNBPt3dtTMd0KzbHgNtekr?=
+ =?us-ascii?Q?71mlTplOOfc0r1GZM5b2kFa3p42SAZ1RD8kQE+nP2Z6h+ttRs0qWBehzEn99?=
+ =?us-ascii?Q?X3Sz/ZmKlp8Z+IxliogSJM3Yg/v64jEsj1nk8IZHNY0N8AF6s5NXe1uJMda1?=
+ =?us-ascii?Q?SXbVyUh5PAPHFpmGaXlFlwgOleLqHigNk/P0wmXzTL5iqHfl0gUIEywb+Yny?=
+ =?us-ascii?Q?CQ3ZOdOWwMNHVQQ2Ky1XH8ajpmkK/+VDxZnZSAwVsIs4ojxgKJ15/CYgEtBO?=
+ =?us-ascii?Q?rjQxnMzXjHkvI8K81Bzw/yqtaI8/3LbkAM1ds2fNpIdxy9YorGWYzIJt/QOK?=
+ =?us-ascii?Q?6nNSVLdQls+HNp3fYHUbham+hAQIWiMeEcizG7sDpClxgd1BVvbxilcqc7jC?=
+ =?us-ascii?Q?gsXsFLcm44cYrNXgVJt2vAtWUvbqWpz0oDFtSJzzOol6l/GsfNo5q2Yu6GnI?=
+ =?us-ascii?Q?A/Fc3QqWOht3pet++olA0SFdlEk5OPxaNmrkALLcKZ+WBCcR9Is3O/o6UYY7?=
+ =?us-ascii?Q?uwT/bRrEbgyrNOqJ+g+85+kGuM4H1QkZ1SDn6EmK7tkS0G5gwh8ppaEvRTFF?=
+ =?us-ascii?Q?T+31ZhnW97Fd3RHCuFTg3NxHXEVcHcjWT4ubdnkH3GHD09AJh3MFOBZXqk1J?=
+ =?us-ascii?Q?inn41Uqo7rDaFLEN4D8eG7OeDq2n8Llr4odgbqnqaDTKtp9p05m1qIdmASUh?=
+ =?us-ascii?Q?4F6JqbFQ1vRtVtEemhUgaK5FKHWVLNzXDvAXnHX7RygkDxUzIYFMxG8R5juU?=
+ =?us-ascii?Q?yqd6Omz7bHO1Y4Uw+EZwkoGbxMYHT3y4B1ZTyO19XnI1NZW1su/1et/gYPgd?=
+ =?us-ascii?Q?t07NhmWgb+zjl+ASW8QbvenQ5HixvV9RuuRi16GUZiT5g2N2+tnVD4h+o06S?=
+ =?us-ascii?Q?4dt14vpG+kj2By+j7CvSmtGK0iycTbn1qVHip2+hwYVyr+eL1EHAHevAbtq2?=
+ =?us-ascii?Q?XXWww19aw6FM1ASoT5rG1voPz1dPgpzGdYIsdz/wftVgFxnrsUbBkmdRwEka?=
+ =?us-ascii?Q?7ixfY0EqKt40qu6pSgyzAV0kAWlyAoVbzcnHTYO9K1CeDKKR8bsCLNZb28np?=
+ =?us-ascii?Q?hT3+dNUyWGz21Jxjqb6iQjzHr2rSP0upPiaOqaq1iezhRTn9BNzfz4cS3nnA?=
+ =?us-ascii?Q?0IxrXR4uqiglb2Kt7sGuUpU1TavP9Xa4DzBjlZ50F8K7155B4xoW9w+cFnkJ?=
+ =?us-ascii?Q?658/Yo6nO8ITZnMdlhbu/syd0NaABo6y3RvVkDF7IWbm3Uz+Z5gFi7yrCG5F?=
+ =?us-ascii?Q?3g=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 75d9834a-33aa-4012-e368-08dbaee420e7
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2023 14:02:15.7832
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2023 14:18:25.3515
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gS+fCe3UehV1kITwJXzdmuFAcCRt2QalyggLo3rGh1czFKPir56dZYZUwm7PkutSGohWKYdvoxcH2VUMBQo98w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR04MB7939
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-UserPrincipalName: XwqDn14cklYj3PaMKHrB2o8bzNWDtwJ+/Go5MtkuPq++0MjhfSHtk5V6MbEkdJYcO2faPR3j1VC2lcocnQC2ou/otagKS4y9lo0guc/xrV8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB5984
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Andrew and phylib/phylink maintainers in general,
+On Mon, Sep 04, 2023 at 06:06:51PM +0200, Maciej Fijalkowski wrote:
+> On Thu, Aug 24, 2023 at 09:26:39PM +0200, Larysa Zaremba wrote:
+> > Alexei has requested an implementation of VLAN and checksum XDP hints
+> > for one more driver [0].
+> > 
+> > This series is exactly the v5 of "XDP metadata via kfuncs for ice" [1]
+> > with 2 additional patches for mlx5.
+> > 
+> > Firstly, there is a VLAN hint implementation. I am pretty sure this
+> > one works and would not object adding it to the main series, if someone
+> > from nvidia ACKs it.
+> > 
+> > The second patch is a checksum hint implementation and it is very rough.
+> > There is logic duplication and some missing features, but I am sure it
+> > captures the main points of the potential end implementation.
+> > 
+> > I think it is unrealistic for me to provide a fully working mlx5 checksum
+> > hint implementation (complex logic, no HW), so would much rather prefer
+> > not having it in my main series. My main intension with this RFC is
+> > to prove proposed hints functions are suitable for non-intel HW.
+> 
+> I went through ice patches mostly, can you provide performance numbers for
+> XDP workloads without metadata in picture? I'd like to see whether
+> standard 64b traffic gets affected or not since you're modifying
+> ice_rx_ring layout.
 
-On Tue, Aug 22, 2023 at 04:10:45PM +0200, Andrew Lunn wrote:
-> For C22 PHYs, the ID registers are only used to ask user space to load
-> a driver which supports that ID, and then used to match a device to a
-> driver. We often say that if the ID registers don't actually contain
-> an ID, or the wrong ID, use ethernet-phy-id[a-f0-9]{4}\\.[a-f0-9]{4}$
-> to let the subsystem know the correct ID.
-> 
-> The device you are trying to support has the same problem, invalid
-> IDs, but its C45.
-> 
-> C45 IDs however work slightly differently. An C45 package can have
-> multiple devices in it, up to 32. Each device has its own ID
-> registers. So there can be up to 32 different IDs for one package. The
-> core will try to determine which of the 32 devices are actually in the
-> package, and if they are, what the ID is. It then asks user space to
-> load a driver for all the IDs it finds. And when matching devices to
-> drivers, it sees if any of the ID of the package matches the IDs the
-> driver says it supports. If a match is found, that one driver is
-> expected to drive all the devices in that one package.
-> 
-> I don't see a need for ethernet-phy-ieee802.3-c45-idXXXX.XXXX,
-> ethernet-phy-ieee802.3-idXXXX.XXXX should be sufficient, since all you
-> are doing it matching the ID against the driver. That matching does
-> not differ between C22 and C45. 
-> 
-> Saying "ethernet-phy-ieee802.3-c45" might be useful, because at the
-> moment we have a mixup between C45 register space and C45 bus
-> transactions. The drive is free to access C22 and/or C45 registers,
-> since it should know what the device actually has. But some of the
-> core might get the wrong idea without "ethernet-phy-ieee802.3-c45".
-> 
-> O.K, that the background now:
-> 
-> > First: Compatible strings per C45 MMD? Drivers per C45 MMD
-> 
-> So far, nobody has needed that. All current drivers are package
-> drivers, they drive all the devices in the package. At least for a
-> PHY, there is close integration between devices in a package. Russell
-> has commented that the Marvell 10G PHY does appear to contain a number
-> of licensed devices, but so far, we have not noticed the same licensed
-> device used by multiple vendors. So there has not been any need to
-> reuse code.
-> 
-> However, it sounds like the package you are trying to support does
-> contain multiple independent devices. So from an architecture
-> perspective, having multiple drivers would make sense, even if there
-> is no reuse. But are the devices PHY? Everything i've said so far
-> applies to PHYs. It does not apply to a PCS, etc.
-> 
-> 	Andrew
-
-I don't know if the devices qualify as phy_device structures according
-to the opinion of the maintainers, and that is one of the fundamental
-aspects I would like this RFC to clarify, before I proceed to request
-NXP to allocate a new PHY ID that I can put in the compatible string.
-
-If the backplane AN/LT block is not a phy_device structure, my
-imagination will need a bit of help on how to integrate it, as a raw
-mdio_device, with phylink or with the consumer MAC drivers directly.
+Thank you for the review, I will send the next version with performance numbers.
 
