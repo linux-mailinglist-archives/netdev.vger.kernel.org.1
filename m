@@ -1,44 +1,88 @@
-Return-Path: <netdev+bounces-32206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C8397937D2
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 11:13:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3239D7937F7
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 11:22:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3571C1C209E4
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 09:13:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCC70281268
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 09:22:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37550111A;
-	Wed,  6 Sep 2023 09:13:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 238851378;
+	Wed,  6 Sep 2023 09:22:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B4B0EC2
-	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 09:13:49 +0000 (UTC)
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB671CF;
-	Wed,  6 Sep 2023 02:13:47 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 34134FF813;
-	Wed,  6 Sep 2023 09:13:43 +0000 (UTC)
-From: Remi Pommarel <repk@triplefau.lt>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>
-Cc: netdev@vger.kernel.org,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 133A110F4
+	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 09:22:01 +0000 (UTC)
+Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BB03E53;
+	Wed,  6 Sep 2023 02:21:59 -0700 (PDT)
+Received: by mail-pj1-x1043.google.com with SMTP id 98e67ed59e1d1-2684e225a6cso553927a91.1;
+        Wed, 06 Sep 2023 02:21:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693992118; x=1694596918; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5mkTCP1wwaR9YuY5H6Ulmq36vtFFoJH9HnExkyxKpno=;
+        b=lRHlt686bQaQVoVWyCv7F2ELUs/ftHzTVdHgKunyeza+8Pr80dNlrTXM2TRin3pOim
+         kli+mwqmuASMTgJto9DsdLG8F6gcuQbLOTGrlmoh06zoch2TIKxHXjwTP6LvWnT0vDFw
+         lNOBI7n0g9gpks4KpEpsQDVKkrOO++v2/rjXyGKAJdDStJJtwfHBuXYNIsqqvhG/O+5H
+         ju3n+OX4Ej0bCZgCvt9IBJozqT7As8j1FjbmOGXrAQvqKZSHdLdLLE9DZkBK33h505+W
+         8QnKj8fO249NDpDxkHdhlEZMZrZoc51lTGnO0XW+j78QmtCR3IOZyt/oj8xjmrldnhbk
+         c87w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693992118; x=1694596918;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5mkTCP1wwaR9YuY5H6Ulmq36vtFFoJH9HnExkyxKpno=;
+        b=BWcq9LF/hSKmRcJMCWDXkCJBW09iPXlugY16XjSQES/ob8KhAk8ESpNM6lBdQbMo/S
+         Ha1q5o4ZYFDBqhMhwhCD1ijmOTz4eEfE3+EseqC8Q5JYu/HUD9d85H+l9GERwhxFaEmE
+         nH7Zk/YzPzuXhQhmc91HdW8H2ZROhdWwUQoKKRoyb5u+z+4rMVUKg+qPnBJU9DccDq3b
+         O8RDAtWURJx+yAi/1zvmJ8ntFnzzKcnsOFsSoleDThv0QErn3w/6V4G+/6VxxZRON3Cz
+         h8NrWD9BFhPj1/G7epwhZ3dpwx4xNDQ1yt+jctVlLRO3weB8hdDHegWctkH2j9okU1u+
+         7ZJg==
+X-Gm-Message-State: AOJu0YwACf0WMqOm0bADAjo9ryM4lzWbXiAdRxXQ6bj47eh8IjapopfA
+	kFx3CBmVNEuwfKZL5yTFyik=
+X-Google-Smtp-Source: AGHT+IGumS01xDzHXnzIBN0/ozMrBV2bEocZTQWgT9l9f/ywNuBPFlMEot9zOWbNCsaAOm4ZDvXC+A==
+X-Received: by 2002:a17:90a:1050:b0:26b:5fad:e71c with SMTP id y16-20020a17090a105000b0026b5fade71cmr13211092pjd.2.1693992118570;
+        Wed, 06 Sep 2023 02:21:58 -0700 (PDT)
+Received: from hbh25y.mshome.net ([103.114.158.1])
+        by smtp.gmail.com with ESMTPSA id ft15-20020a17090b0f8f00b002684b837d88sm10679242pjb.14.2023.09.06.02.21.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Sep 2023 02:21:57 -0700 (PDT)
+From: Hangyu Hua <hbh25y@gmail.com>
+To: justin.chen@broadcom.com,
+	florian.fainelli@broadcom.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	mw@semihalf.com,
+	linux@armlinux.org.uk,
+	nbd@nbd.name,
+	john@phrozen.org,
+	sean.wang@mediatek.com,
+	Mark-MC.Lee@mediatek.com,
+	lorenzo@kernel.org,
+	matthias.bgg@gmail.com,
+	angelogioacchino.delregno@collabora.com,
+	maxime.chevallier@bootlin.com,
+	nelson.chang@mediatek.com
+Cc: bcm-kernel-feedback-list@broadcom.com,
+	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Remi Pommarel <repk@triplefau.lt>,
-	stable@vger.kernel.org
-Subject: [PATCH net v2] net: stmmac: remove unneeded stmmac_poll_controller
-Date: Wed,  6 Sep 2023 11:13:30 +0200
-Message-Id: <20230906091330.6817-1-repk@triplefau.lt>
-X-Mailer: git-send-email 2.40.0
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Hangyu Hua <hbh25y@gmail.com>
+Subject: [PATCH 0/3] Fix possible OOB write when using rule_buf 
+Date: Wed,  6 Sep 2023 17:21:04 +0800
+Message-Id: <20230906092107.19063-1-hbh25y@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -46,113 +90,31 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: repk@triplefau.lt
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Using netconsole netpoll_poll_dev could be called from interrupt
-context, thus using disable_irq() would cause the following kernel
-warning with CONFIG_DEBUG_ATOMIC_SLEEP enabled:
+ADD bounds checks in bcmasp_netfilt_get_all_active and 
+mvpp2_ethtool_get_rxnfc and mtk_hwlro_get_fdir_all when
+using rule_buf from ethtool_get_rxnfc.
 
-  BUG: sleeping function called from invalid context at kernel/irq/manage.c:137
-  in_atomic(): 1, irqs_disabled(): 128, non_block: 0, pid: 10, name: ksoftirqd/0
-  CPU: 0 PID: 10 Comm: ksoftirqd/0 Tainted: G        W         5.15.42-00075-g816b502b2298-dirty #117
-  Hardware name: aml (r1) (DT)
-  Call trace:
-   dump_backtrace+0x0/0x270
-   show_stack+0x14/0x20
-   dump_stack_lvl+0x8c/0xac
-   dump_stack+0x18/0x30
-   ___might_sleep+0x150/0x194
-   __might_sleep+0x64/0xbc
-   synchronize_irq+0x8c/0x150
-   disable_irq+0x2c/0x40
-   stmmac_poll_controller+0x140/0x1a0
-   netpoll_poll_dev+0x6c/0x220
-   netpoll_send_skb+0x308/0x390
-   netpoll_send_udp+0x418/0x760
-   write_msg+0x118/0x140 [netconsole]
-   console_unlock+0x404/0x500
-   vprintk_emit+0x118/0x250
-   dev_vprintk_emit+0x19c/0x1cc
-   dev_printk_emit+0x90/0xa8
-   __dev_printk+0x78/0x9c
-   _dev_warn+0xa4/0xbc
-   ath10k_warn+0xe8/0xf0 [ath10k_core]
-   ath10k_htt_txrx_compl_task+0x790/0x7fc [ath10k_core]
-   ath10k_pci_napi_poll+0x98/0x1f4 [ath10k_pci]
-   __napi_poll+0x58/0x1f4
-   net_rx_action+0x504/0x590
-   _stext+0x1b8/0x418
-   run_ksoftirqd+0x74/0xa4
-   smpboot_thread_fn+0x210/0x3c0
-   kthread+0x1fc/0x210
-   ret_from_fork+0x10/0x20
+Hangyu Hua (3):
+  net: ethernet: bcmasp: fix possible OOB write in
+    bcmasp_netfilt_get_all_active()
+  net: ethernet: mvpp2_main: fix possible OOB write in
+    mvpp2_ethtool_get_rxnfc()
+  net: ethernet: mtk_eth_soc: fix possible NULL pointer dereference in
+    mtk_hwlro_get_fdir_all()
 
-Since [0] .ndo_poll_controller is only needed if driver doesn't or
-partially use NAPI. Because stmmac does so, stmmac_poll_controller
-can be removed fixing the above warning.
+ drivers/net/ethernet/broadcom/asp2/bcmasp.c     | 3 +++
+ drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c | 5 +++++
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c     | 4 ++++
+ 3 files changed, 12 insertions(+)
 
-[0] commit ac3d9dd034e5 ("netpoll: make ndo_poll_controller() optional")
-
-Cc: <stable@vger.kernel.org> # 5.15.x
-Signed-off-by: Remi Pommarel <repk@triplefau.lt>
----
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 30 -------------------
- 1 file changed, 30 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 9a3182b9e767..8d76334fff49 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -5991,33 +5991,6 @@ static irqreturn_t stmmac_msi_intr_rx(int irq, void *data)
- 	return IRQ_HANDLED;
- }
- 
--#ifdef CONFIG_NET_POLL_CONTROLLER
--/* Polling receive - used by NETCONSOLE and other diagnostic tools
-- * to allow network I/O with interrupts disabled.
-- */
--static void stmmac_poll_controller(struct net_device *dev)
--{
--	struct stmmac_priv *priv = netdev_priv(dev);
--	int i;
--
--	/* If adapter is down, do nothing */
--	if (test_bit(STMMAC_DOWN, &priv->state))
--		return;
--
--	if (priv->plat->flags & STMMAC_FLAG_MULTI_MSI_EN) {
--		for (i = 0; i < priv->plat->rx_queues_to_use; i++)
--			stmmac_msi_intr_rx(0, &priv->dma_conf.rx_queue[i]);
--
--		for (i = 0; i < priv->plat->tx_queues_to_use; i++)
--			stmmac_msi_intr_tx(0, &priv->dma_conf.tx_queue[i]);
--	} else {
--		disable_irq(dev->irq);
--		stmmac_interrupt(dev->irq, dev);
--		enable_irq(dev->irq);
--	}
--}
--#endif
--
- /**
-  *  stmmac_ioctl - Entry point for the Ioctl
-  *  @dev: Device pointer.
-@@ -6978,9 +6951,6 @@ static const struct net_device_ops stmmac_netdev_ops = {
- 	.ndo_get_stats64 = stmmac_get_stats64,
- 	.ndo_setup_tc = stmmac_setup_tc,
- 	.ndo_select_queue = stmmac_select_queue,
--#ifdef CONFIG_NET_POLL_CONTROLLER
--	.ndo_poll_controller = stmmac_poll_controller,
--#endif
- 	.ndo_set_mac_address = stmmac_set_mac_address,
- 	.ndo_vlan_rx_add_vid = stmmac_vlan_rx_add_vid,
- 	.ndo_vlan_rx_kill_vid = stmmac_vlan_rx_kill_vid,
 -- 
-2.40.0
+2.34.1
 
 
