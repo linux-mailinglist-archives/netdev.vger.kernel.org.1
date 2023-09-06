@@ -1,87 +1,64 @@
-Return-Path: <netdev+bounces-32204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F21F7937C5
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 11:10:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D9497937CF
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 11:13:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC05A281282
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 09:10:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 580D31C20998
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 09:13:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33F64EC2;
-	Wed,  6 Sep 2023 09:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 458151113;
+	Wed,  6 Sep 2023 09:13:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05D1A110D;
-	Wed,  6 Sep 2023 09:10:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7F589C433CC;
-	Wed,  6 Sep 2023 09:10:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693991422;
-	bh=Pg5P5w70D/0sYqWVupcpHLssw2eK1+o374nOt3wVL34=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=CIpjAbeu4rwEpyl37ZzRTXPakps6nehrMOebuDQpFW3xL1ltHAsjbNz04xAy05dRO
-	 2T0c/FhcdpQHVN5Gk+rpinbIoQPiZBFme73alBfNOvhXpj35zshICqRAulo7djAEzt
-	 bk0XlO6NODt4YnVcK09yND+/WedkHV1hhJ6VOouUj3dmf7GSQB9UZQjJLJZipdpf3d
-	 UuSkESigOOUewBCiZ6Nd4CpfVHwzoGgLyW428T2MZFS7AwEyYVYMQs6oZi9lwGMQQ7
-	 HyQ9o/2UmuSywi22ZfMm89XPLyiHCNEaY55QnHvutEeQfEW1m1XeIazhs7417Z3ePH
-	 5/7aEWARm3E9g==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 654C9E22B00;
-	Wed,  6 Sep 2023 09:10:22 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA6062B
+	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 09:13:18 +0000 (UTC)
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AF0395;
+	Wed,  6 Sep 2023 02:13:16 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 654EF60013;
+	Wed,  6 Sep 2023 09:13:12 +0000 (UTC)
+Date: Wed, 6 Sep 2023 11:13:16 +0200
+From: Remi Pommarel <repk@triplefau.lt>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net] net: stmmac: remove unneeded stmmac_poll_controller
+Message-ID: <ZPhCrPlFzBDaco0f@pilgrim>
+References: <20230831120004.6919-1-repk@triplefau.lt>
+ <20230905151751.1b2148ad@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf 0/3] bpf: Fixes for bpf_sk_storage
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169399142241.26603.13283011863319569534.git-patchwork-notify@kernel.org>
-Date: Wed, 06 Sep 2023 09:10:22 +0000
-References: <20230901231129.578493-1-martin.lau@linux.dev>
-In-Reply-To: <20230901231129.578493-1-martin.lau@linux.dev>
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: bpf@vger.kernel.org, ast@kernel.org, andrii@kernel.org,
- daniel@iogearbox.net, netdev@vger.kernel.org, kernel-team@meta.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230905151751.1b2148ad@kernel.org>
+X-GND-Sasl: repk@triplefau.lt
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
-
-This series was applied to bpf/bpf.git (master)
-by Daniel Borkmann <daniel@iogearbox.net>:
-
-On Fri,  1 Sep 2023 16:11:26 -0700 you wrote:
-> From: Martin KaFai Lau <martin.lau@kernel.org>
+On Tue, Sep 05, 2023 at 03:17:51PM -0700, Jakub Kicinski wrote:
+> On Thu, 31 Aug 2023 14:00:04 +0200 Remi Pommarel wrote:
+> > Using netconsole netpoll_poll_dev could be called from interrupt
+> > context, thus using disable_irq() would cause the following kernel
+> > warning with CONFIG_DEBUG_ATOMIC_SLEEP enabled:
 > 
-> This set has two fixes for bpf_sk_storage. Please see the individual
-> patch for details.
-> 
-> Martin KaFai Lau (3):
->   bpf: bpf_sk_storage: Fix invalid wait context lockdep report
->   bpf: bpf_sk_storage: Fix the missing uncharge in sk_omem_alloc
->   selftests/bpf: Check bpf_sk_storage has uncharged sk_omem_alloc
-> 
-> [...]
+> Could you rebase this on top of netdev/net? It does not apply:
 
-Here is the summary with links:
-  - [bpf,1/3] bpf: bpf_sk_storage: Fix invalid wait context lockdep report
-    https://git.kernel.org/bpf/bpf/c/a96a44aba556
-  - [bpf,2/3] bpf: bpf_sk_storage: Fix the missing uncharge in sk_omem_alloc
-    https://git.kernel.org/bpf/bpf/c/55d49f750b1c
-  - [bpf,3/3] selftests/bpf: Check bpf_sk_storage has uncharged sk_omem_alloc
-    https://git.kernel.org/bpf/bpf/c/a96d1cfb2da0
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Sure will do, thanks.
 
