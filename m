@@ -1,143 +1,132 @@
-Return-Path: <netdev+bounces-32329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 063C179421C
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 19:39:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BCCD79429D
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 20:00:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91FCB280EC7
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 17:39:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CA4E2812A9
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 18:00:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D31FF1097A;
-	Wed,  6 Sep 2023 17:39:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1364B1118F;
+	Wed,  6 Sep 2023 18:00:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F31C1095C
-	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 17:39:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91714C433C7;
-	Wed,  6 Sep 2023 17:39:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694021989;
-	bh=woGQ3GBTdrvaqUWY294SsWX6BIxtB6DjopSTav8HuTs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rAmRXM1HkdREq/ViK+DGlAO09uz3GkksK3AX3TN9DIPeYudb+hm0PIOzprHI6Gcb8
-	 u70lT0NW439n3+WdmU7z+tiJixkLjFjysEhDhz+uP0t8l9iaoe9D5T4mgBkPwsCeBc
-	 Lzxp79blVpSk11xaqe51AouZ5yt8JVkjdjHxjQ6E3WzOoZGeo7/VHmQGMahRFV8I52
-	 gQ7IRwYdfwP7k/w9JkOWnE2GOUBWmqUlirC5akBAgsvKW9ZNSRue64pohPeocdtWVD
-	 DUOlOCYxNp5sxJNkiHigrmp5THOQd+BH7MuwQoCV7B1Pgeyx+dZfnOV41GYEAWq19q
-	 wwDnEHRyMczvg==
-Date: Wed, 6 Sep 2023 19:39:46 +0200
-From: Simon Horman <horms@kernel.org>
-To: Min Li <lnimi@hotmail.com>
-Cc: richardcochran@gmail.com, lee@kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Min Li <min.li.xe@renesas.com>
-Subject: Re: [PATCH net 1/1] ptp: clockmatrix: support 32-bit address space
-Message-ID: <20230906173946.GD270386@kernel.org>
-References: <MW5PR03MB6932BFFE31583BBF02CD9488A0EFA@MW5PR03MB6932.namprd03.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED7201094E;
+	Wed,  6 Sep 2023 18:00:43 +0000 (UTC)
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8E1119AA;
+	Wed,  6 Sep 2023 11:00:41 -0700 (PDT)
+Received: by mail-lf1-x131.google.com with SMTP id 2adb3069b0e04-501be2d45e0so56765e87.3;
+        Wed, 06 Sep 2023 11:00:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694023240; x=1694628040; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=jBgTcuweOSdxAt78rjk31W7FbaJq9OxXi+LN0LW4j3I=;
+        b=Lv5V9z7uwmmlxTfYD4ZbjUpaw+YNtKchGAfdP+y4aQqb8eCVQTA71KUWQjzeqLBBdK
+         GUeDEh7kAYjo59ZcYfbDvXRz7pTQ97HnNdrf+9at75ajulwMcvfupD6WidABMXEBBNBN
+         oTEmLn9eJBOWZaSsidNxyqAHqvXfuypkP0E8ejQuwUYqEGRhETsXazJamhh/w0XH0E+J
+         OWh47+6imN2ytXGHgBKZDVZbBFcIzJ0XIpgk0PeGvLUVR8Hj5qdu4nohkfxUJl3NWAfR
+         /pb0wJZpBq+3NDh1NvFCSUmLkVZBbmCmJdwf4lQy0Jse8XhaUaQ/82K3gh2Ld84WYgyb
+         i4LA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1694023240; x=1694628040;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jBgTcuweOSdxAt78rjk31W7FbaJq9OxXi+LN0LW4j3I=;
+        b=jsencCDufSH8Zne3H3/llbllIE5oqemUmpnzS0vDGwtsmSvgdnNz8gY5ujAfsE1bsG
+         xz1YbUmTSuOIi7SzL29ey1KpiQfaJ+H6Jn5nurn7eu2uhE0kIUehx0Qt1xQyuDdNkR52
+         ZdD4G6HRWjPWp/ejzBREIQMeGYsooqPcCWK7OT4UBCX5PHfk+svjWKCjPs3/TmuFDCvH
+         edj1iMk6ZDoXW2nI2D7wK7Mie8sar6zqkNRZuo4ok47gSG5fxDJjKw/KilbysOJFG0xr
+         PRNziZbfZNb6fHRTdjkLozo8X99g/KLf4GHufG9teyYLsvzmvG0GjJ1G6pAhOEyjDmt7
+         feQw==
+X-Gm-Message-State: AOJu0YzSL+5BQF6a1H/c0k7Qe+gbLmUdRYsn3YKIvP5VRJAwUjTj0Ctn
+	1/hMsbMIP0/ASX2D37jpP5g=
+X-Google-Smtp-Source: AGHT+IFkyU7EgVhPjzf6MonOxLpVL2r9D5B+9nJyXSdu3smQNk5NapaZVQ+wMSlMQgeEvxexfLwn7w==
+X-Received: by 2002:a05:6512:324e:b0:500:94c3:8e3b with SMTP id c14-20020a056512324e00b0050094c38e3bmr2610126lfr.57.1694023239455;
+        Wed, 06 Sep 2023 11:00:39 -0700 (PDT)
+Received: from [192.168.1.95] (host-176-36-0-241.b024.la.net.ua. [176.36.0.241])
+        by smtp.gmail.com with ESMTPSA id ay9-20020a056402202900b0052a198d8a4dsm8715532edb.52.2023.09.06.11.00.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Sep 2023 11:00:38 -0700 (PDT)
+Message-ID: <c7f9db8879a9342080e74b9270e9925132b02f59.camel@gmail.com>
+Subject: Re: [syzbot] [bpf?] general protection fault in
+ bpf_prog_offload_verifier_prep
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: syzbot <syzbot+291100dcb32190ec02a8@syzkaller.appspotmail.com>, 
+ andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+ daniel@iogearbox.net,  davem@davemloft.net, haoluo@google.com,
+ hawk@kernel.org, john.fastabend@gmail.com,  jolsa@kernel.org,
+ kpsingh@kernel.org, linux-kernel@vger.kernel.org,  martin.lau@linux.dev,
+ netdev@vger.kernel.org, sdf@google.com, song@kernel.org, 
+ syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+Date: Wed, 06 Sep 2023 21:00:37 +0300
+In-Reply-To: <20230906075730.6d61420a@kernel.org>
+References: <000000000000d97f3c060479c4f8@google.com>
+	 <ef4b96a75ff8fa87a82a35d4d050338d0bd9cce1.camel@gmail.com>
+	 <f3eacce9566d14141cb591dc8364123b809841cb.camel@gmail.com>
+	 <20230906075730.6d61420a@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <MW5PR03MB6932BFFE31583BBF02CD9488A0EFA@MW5PR03MB6932.namprd03.prod.outlook.com>
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, Sep 06, 2023 at 12:54:05PM -0400, Min Li wrote:
-> From: Min Li <min.li.xe@renesas.com>
+On Wed, 2023-09-06 at 07:57 -0700, Jakub Kicinski wrote:
+> On Wed, 06 Sep 2023 16:50:23 +0300 Eduard Zingerman wrote:
+> > diff --git a/kernel/bpf/offload.c b/kernel/bpf/offload.c
+> > index 3e4f2ec1af06..302e38bffffa 100644
+> > --- a/kernel/bpf/offload.c
+> > +++ b/kernel/bpf/offload.c
+> > @@ -199,12 +199,11 @@ static int __bpf_prog_dev_bound_init(struct bpf_p=
+rog *prog, struct net_device *n
+> >         offload->netdev =3D netdev;
+> > =20
+> >         ondev =3D bpf_offload_find_netdev(offload->netdev);
+> > +       if (bpf_prog_is_offloaded(prog->aux) && (!ondev || !ondev->offd=
+ev)) {
+> > +               err =3D -EINVAL;
+> > +               goto err_free;
+> > +       }
+> >         if (!ondev) {
+> > -               if (bpf_prog_is_offloaded(prog->aux)) {
+> > -                       err =3D -EINVAL;
+> > -                       goto err_free;
+> > -               }
+> > -
+> >                 /* When only binding to the device, explicitly
+> >                  * create an entry in the hashtable.
+> >                  */
+>=20
+> LGTM, FWIW.
 
-Hi Min Li,
+Thanks, I'll wrap it up as a proper patch with a test.
 
-A patch description should go here, describing the motivation for the
-change.
+>=20
+> > With the following reasoning: for offloaded programs offload device
+> > should exist and it should not be a fake device create in !ondev branch=
+.
+> >=20
+> > Stanislav, could you please take a look? I think this is related to com=
+mit:
+> > 2b3486bc2d23 ("bpf: Introduce device-bound XDP programs")
 
-It does seem to me that this is an enhancement rather than a bug fix.
-And as such is more appropriate for 'net-next' rather than 'net'.
-i.e. Subject: [PATCH net-next] ...
-
-If the patch is for net-next then it will need to be resubmitted,
-as per the form letter below. If, on the other hand it is for net,
-a Fixes tag is most likely warranted.
-
-## Form letter - net-next-closed
-
-The merge window for v6.6 has begun and therefore net-next is closed
-for new drivers, features, code refactoring and optimizations.
-We are currently accepting bug fixes only.
-
-Please repost when net-next reopens after Sept 11th.
-
-RFC patches sent for review only are obviously welcome at any time.
-
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
-
-> 
-> Signed-off-by: Min Li <min.li.xe@renesas.com>
-> ---
->  drivers/ptp/ptp_clockmatrix.c    |  72 ++--
->  drivers/ptp/ptp_clockmatrix.h    |  33 +-
->  include/linux/mfd/idt8a340_reg.h | 542 ++++++++++++++++---------------
->  3 files changed, 340 insertions(+), 307 deletions(-)
-> 
-> diff --git a/drivers/ptp/ptp_clockmatrix.c b/drivers/ptp/ptp_clockmatrix.c
-> index f6f9d4adce04..875841892842 100644
-> --- a/drivers/ptp/ptp_clockmatrix.c
-> +++ b/drivers/ptp/ptp_clockmatrix.c
-> @@ -41,7 +41,7 @@ module_param(firmware, charp, 0);
->  static int _idtcm_adjfine(struct idtcm_channel *channel, long scaled_ppm);
->  
->  static inline int idtcm_read(struct idtcm *idtcm,
-> -			     u16 module,
-> +			     u32 module,
->  			     u16 regaddr,
->  			     u8 *buf,
->  			     u16 count)
-> @@ -50,7 +50,7 @@ static inline int idtcm_read(struct idtcm *idtcm,
->  }
->  
->  static inline int idtcm_write(struct idtcm *idtcm,
-> -			      u16 module,
-> +			      u32 module,
->  			      u16 regaddr,
->  			      u8 *buf,
->  			      u16 count)
-> @@ -62,7 +62,8 @@ static int contains_full_configuration(struct idtcm *idtcm,
->  				       const struct firmware *fw)
->  {
->  	struct idtcm_fwrc *rec = (struct idtcm_fwrc *)fw->data;
-> -	u16 scratch = IDTCM_FW_REG(idtcm->fw_ver, V520, SCRATCH);
-> +	u16 scratch = SCSR_ADDR(IDTCM_FW_REG(idtcm->fw_ver, V520, SCRATCH));
-
-I think you also need a similar change in idtcm_load_firmware().
-
-diff --git a/drivers/ptp/ptp_clockmatrix.c b/drivers/ptp/ptp_clockmatrix.c
-index 875841892842..69c170133a25 100644
---- a/drivers/ptp/ptp_clockmatrix.c
-+++ b/drivers/ptp/ptp_clockmatrix.c
-@@ -1254,7 +1254,7 @@ static void display_pll_and_masks(struct idtcm *idtcm)
- static int idtcm_load_firmware(struct idtcm *idtcm,
- 			       struct device *dev)
- {
--	u16 scratch = IDTCM_FW_REG(idtcm->fw_ver, V520, SCRATCH);
-+	u16 scratch = SCSR_ADDR(IDTCM_FW_REG(idtcm->fw_ver, V520, SCRATCH));
- 	char fname[128] = FW_FILENAME;
- 	const struct firmware *fw;
- 	struct idtcm_fwrc *rec;
-
-As flagged by Smatch and clang-16 W=1.
-
-> +	u16 gpio_control = SCSR_ADDR(GPIO_USER_CONTROL);
->  	s32 full_count;
->  	s32 count = 0;
->  	u16 regaddr;
-
-...
-
--- 
-pw-bot: defer
 
