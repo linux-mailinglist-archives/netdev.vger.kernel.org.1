@@ -1,198 +1,163 @@
-Return-Path: <netdev+bounces-32317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55FB779417B
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 18:27:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15EA9794190
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 18:37:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EC8C2814A5
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 16:27:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0CDF1C20A75
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 16:37:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A109010957;
-	Wed,  6 Sep 2023 16:27:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6B461079A;
+	Wed,  6 Sep 2023 16:37:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F3B51078F
-	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 16:27:01 +0000 (UTC)
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05olkn2016.outbound.protection.outlook.com [40.92.89.16])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00D0619A4;
-	Wed,  6 Sep 2023 09:26:54 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ap9xZT8C0wcp8zAzAn8IusW9Jfa7s+Kz0McCl/7ZwQB08/aufAhTD4B0ASVx32JS2G8M69TvTszLBCG3u6TzycdH3He/pEuU7ZBPyi1wg8fWgBduTZIP7U+mPegsWnHWfY2BW8u+64cSSopO3RYifDCFbdGPUgffQhzpZfuO5M4pBGPMrZiQXHn818AUtCvTR+2bKJxT12To84IZ4dTD/RSwDuDJjKV/yEaqlW4XhSJqFSqqVwqc81Ibq7O04y/oHUZVixqfO22O+F/qbeXf5fIRPiGMT0Ouc8m4xcS+X+Q8EHBl3QbZDHLPeK/xHzBKcogRGEJHnFDi8DWaFSmbPw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rQIRpvEvZq96oNilEKRjEap2z/x0mbnKcQboRvYOG0w=;
- b=ChMa7OwKgSvYC0uKDRGxRvpTgib0rRcLWa0xw94Q7ywMP/h1xCVTP5rs/d07oWyBZJb+Ik5mTbr960EwhldAczkhHe9IoS36r+/Lt8wRJ/P75870KNadgWAMgywCSm8suEmQNooD/DQbarumT6WFrlu00J2C3QPRyt/eUs/9sTNOG111Ux45SMCbJMQwHkUVEGyvyKJriHVcYjaemZlHIVz1FM4Fm91VPLStxhXfKo5X5pwoycsqYZixPWRPX0so3dvrYbBQrxPNVA6w7F5Baft1YVe2/eLFi8qMIg8wl8b8SPcb6i7/KkxfKxhzHJZ6O7cnqLdH6aOFSDSIysW2nw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rQIRpvEvZq96oNilEKRjEap2z/x0mbnKcQboRvYOG0w=;
- b=Dgbq8yMT5SihhH7R1/GHV33Cp665T5/V+AHMFOk0h/sW/eYkYvlavVQjbHjdizwn9g9WNU1zVnVvY2C2UhvXBMQyjzy8uo+CkWARjnU0h+P+N0DD9AJTgGgDxTR7mw48lT6b3hzRE5+2SCPpXdb1Hi4HLe4Fae27WKrRcpdiMHGxMvFFXfGCduV4EWyi6MxOaTByw9tqVATGgGDiZRx1TJ+xFy/pMWOp0bVh1FCeGPfVUb79p4Ec4S5h+EcBXUa/P8kYXitMtbjzMAAEoqoEq3kr2b3AF74Bb5nhXNksVPyuuAkD7sJ3Mzh56jk+ajo2dZucHZonFKNh+rkVkg2WuA==
-Received: from VI1P193MB0752.EURP193.PROD.OUTLOOK.COM (2603:10a6:800:32::19)
- by PR3P193MB0863.EURP193.PROD.OUTLOOK.COM (2603:10a6:102:96::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.34; Wed, 6 Sep
- 2023 16:26:52 +0000
-Received: from VI1P193MB0752.EURP193.PROD.OUTLOOK.COM
- ([fe80::3d3c:61f2:146f:b3b4]) by VI1P193MB0752.EURP193.PROD.OUTLOOK.COM
- ([fe80::3d3c:61f2:146f:b3b4%7]) with mapi id 15.20.6745.034; Wed, 6 Sep 2023
- 16:26:52 +0000
-From: Juntong Deng <juntong.deng@outlook.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kernel-mentees@lists.linuxfoundation.org
-Subject: [PATCH] selftests/net: Improve bind_bhash.sh to accommodate predictable network interface names
-Date: Thu,  7 Sep 2023 00:26:03 +0800
-Message-ID:
- <VI1P193MB0752FDA6D89743CF57FB600599EFA@VI1P193MB0752.EURP193.PROD.OUTLOOK.COM>
-X-Mailer: git-send-email 2.39.2
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN: [tmtn26axAYFWXmjQPhaFAMbyQyBbR6qw]
-X-ClientProxiedBy: AM8P190CA0025.EURP190.PROD.OUTLOOK.COM
- (2603:10a6:20b:219::30) To VI1P193MB0752.EURP193.PROD.OUTLOOK.COM
- (2603:10a6:800:32::19)
-X-Microsoft-Original-Message-ID:
- <20230906162603.10809-1-juntong.deng@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95FED46A2
+	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 16:37:08 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C923C1738;
+	Wed,  6 Sep 2023 09:37:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=kC/adOmPdO89VH7yR1A+ieJSp6e/4jhkrzrqxAYoq4Q=; b=ZY0B0RFpQ9y8GWbA9R1g80J8/y
+	hq2amJhTIfAWWLb6RhZOQ5JA0WTlW/XesbFOKLHVntcVrs0tNjeOdAEWFTx5/fmLKbMQsi8CwIgPr
+	K6R/e0qNrDNLyPh/E8TdRgvBikMlyhvgty0NVpQ/Rang/PEgjJM1/co4cnipew1rHxi80ZKnLM/vY
+	dZ7/fxDY02anS2XW9XTymJELpm7I+xMMWDCYvlbW/X16N9ZNctFKNuZ1zoYVpfuajY6J0FJgsYDAl
+	JOUb1EQYzNnpe49NJQRoVa2m+6rSuJ86VuqVp5mRnmmqxnv4kBCfO+ESkwxUJNkF3kcFMRI4JWnGr
+	tnuPALbw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54168)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qdvWL-0000pm-0k;
+	Wed, 06 Sep 2023 17:36:49 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qdvWJ-0004vb-TO; Wed, 06 Sep 2023 17:36:47 +0100
+Date: Wed, 6 Sep 2023 17:36:47 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com, devicetree@vger.kernel.org
+Subject: Re: [RFC net-next v2 2/2] net: dsa: microchip: Add drive strength
+ configuration
+Message-ID: <ZPiqn94YbJXCqpT8@shell.armlinux.org.uk>
+References: <20230906105904.1477021-1-o.rempel@pengutronix.de>
+ <20230906105904.1477021-3-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: VI1P193MB0752:EE_|PR3P193MB0863:EE_
-X-MS-Office365-Filtering-Correlation-Id: edbd6582-4e21-4b7b-ca39-08dbaef6138d
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	JHBL16qWDGxmpXARnIUoq+HYZOkPzufQ/BxPstTtczMLfUwAbB7DYDTAHKqG591bU3i8zI8fwWwqNNfKyXddzKQgJQtweo2DFM1b5uhxp7Rncw8fBaTiM6J18jrsTJHwAD/YLkWX9H28euQiwXyNTinzkJ6wQF32GwBTQQtb4numbloVZEFb/rY+v4cbzgOTuctarz0SkeDhUwa/8YSLeqzycIV1epfn8JEN4Rl+JUTORocMB7l7mDzIoVDSAK8/HtblaAkUr3pHIOQ6qliRVT3RHTKsoEH4QfXOhX5hgJVTxiQnNvVhFLPdMrabl9h0DcPdWdTjeRn9rquNv6plug3R31lOOFtRvd0r6t1MxEo6fIbOhzw7nkjzWJyT5/3dle7oVJMwVfnZGJL/G/4SsmIT35zEhRM2/VdVWuwjknkOnWffXuC8ttNbEieG8v6cUkBPEolOQFGhrQT0wRyt9d74REDBs/KXG9zJfSVCJ0UYWN9CBOoPaxThBIgyd02EqczRQJw8Hfs5xHQixKQDBn2iTeOZsXrLfJ4dodLePVwYWOLaCKtJ4zPYDdPp49IU
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?amDBA5k9uY0bD84vgUkvwWEUIoz23BCavkMRfwqpxSo3019pMg2pyzw/yCdF?=
- =?us-ascii?Q?tHatx4wruFAupdaOMojjK0F9980s21CmDC7mKx4ntZdE6ihXJeZxjv6LFiel?=
- =?us-ascii?Q?3rZxwWDV9y5Cic4xbz8jDFkH14ctZIer1KDchKNBQGe7fcJRnWFq0GUEZMXQ?=
- =?us-ascii?Q?TVprFQcWqQuTIJsH6AbYROsGOKCe+C1kj2eXrc6cXLhtwXBVJzBLlHFitKBo?=
- =?us-ascii?Q?8AsRqIEEbJvBiH407Er1v69UmFs1oLPzbmve07cXxuuglDEY2UWjhD9gf6dZ?=
- =?us-ascii?Q?esUMfR91J44B4aMXSfn73roeE7sEtu7eYHC13jCnSM0yVfNoMV/jGTI754jQ?=
- =?us-ascii?Q?9yVKBv1bmKmwl0Dtg56s7a/hUy/FkFk2R8JLrqc2njHHe2pfamv828jcx31R?=
- =?us-ascii?Q?bp7kLp8clJGpxzdd+jXuujo782NSdegKWwTfKsItLFyGVnJEMFudiBOYP4wX?=
- =?us-ascii?Q?a+93MyRqSh/sddTKdqRCo9v1IUqmFzh1RNm3mret2/aL5FjWaO0Zlz0dxORz?=
- =?us-ascii?Q?WgbRHoEJ1+YqrGAI1F89A2i1wRsp+/3BkvT8cX0xmDdVtMI2+bRz8goxhu27?=
- =?us-ascii?Q?DUA1qBL/Y4hdPR6jbp8mdJAKJHpTKovWXYbn+a7DozukNZLfwacSG9aMT7HB?=
- =?us-ascii?Q?ZM38trt2uew23l/PgWegy3xigl0VNO9P3finmjLDl0EkL0cUSoADz0Oi5gLz?=
- =?us-ascii?Q?wmjJ3IzKR4Yy/Dni6bd2fYyBaLO8JvzjLYhyq/5mIZsdqyEscI50LNnts1PZ?=
- =?us-ascii?Q?b+DyL9COkACDg+p9i8iNuwAxZlrcKPSBcGCorkCsMs9CS1n3TBhl/CDPbVbP?=
- =?us-ascii?Q?0kLZMiZDJ+0Sm8rL2Qv43x03Gr2UyqU2dXCaq4tbfjU6mFphZS9yPs/O1VeP?=
- =?us-ascii?Q?cXe5PktvO7swOxCni5t9Z27IFiW97p5sZMDLndj6x63Wt25s8dZUb/RevnKL?=
- =?us-ascii?Q?gekBghQHYLCU65osf/RCv5aRcVewK5T/6GyezVj/YtRAQcVoOZPyRB+WkLnH?=
- =?us-ascii?Q?sqEScsRBAR1LtAvYe7RBn8sNG21yFDS1y9JDcYnz3zfW4jhIO5XWDbNeBAGg?=
- =?us-ascii?Q?DytDjd5bCpjdUzlVf2jEhfWt3wei3rhk0J5qOwWUTlmuqr2NaWsO1Qpz16Fw?=
- =?us-ascii?Q?DHp79ytiWy9Mxt+LRfYbN1EbUxctK+chz2j56+BiLkng+9PIB3bDPVs25tkx?=
- =?us-ascii?Q?rZS9ipCTgrViJml3C5VJC9DoIirpi8cWxzy+HxQaBk9r1s9Kk/LaF/1Xppw?=
- =?us-ascii?Q?=3D?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: edbd6582-4e21-4b7b-ca39-08dbaef6138d
-X-MS-Exchange-CrossTenant-AuthSource: VI1P193MB0752.EURP193.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2023 16:26:52.8524
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR3P193MB0863
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230906105904.1477021-3-o.rempel@pengutronix.de>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
+	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Starting with v197, systemd uses predictable interface network names,
-the traditional interface naming scheme (eth0) is deprecated, therefore
-it cannot be assumed that the eth0 interface exists on the host.
+On Wed, Sep 06, 2023 at 12:59:04PM +0200, Oleksij Rempel wrote:
+> +static void ksz9477_drive_strength_error(struct ksz_device *dev, int milliamp)
+> +{
+> +	size_t array_size = ARRAY_SIZE(ksz9477_drive_strengths);
+> +	char supported_values[100];
+> +	int i;
+> +
+> +	for (i = 0; i < array_size; i++) {
+> +		if (i == 0)
+> +			snprintf(supported_values, sizeof(supported_values),
+> +				 "%d", ksz9477_drive_strengths[i].milliamp);
+> +		else
+> +			snprintf(supported_values, sizeof(supported_values),
+> +				 "%s, %d", supported_values,
+> +				 ksz9477_drive_strengths[i].milliamp);
 
-This modification makes the bind_bhash test program run in a separate
-network namespace and no longer needs to consider the name of the
-network interface on the host.
+That's an interesting way to append... I note that snprintf(3) has a
+note about this, suggesting that (a) the standards make this undefined
+and (b) that depending on the gcc version used, this may not produce
+the expected results. Taking both together seems sufficient
+justification to stay away from attempting this method of appending
+a string.
 
-Signed-off-by: Juntong Deng <juntong.deng@outlook.com>
----
- tools/testing/selftests/net/bind_bhash.sh | 26 ++++++++++++-----------
- 1 file changed, 14 insertions(+), 12 deletions(-)
+> +static int ksz9477_drive_strength_write(struct ksz_device *dev,
+> +					struct ksz_driver_strength_prop *props,
+> +					int num_props)
+> +{
+> +	int i, ret, reg;
+> +	u8 val;
+	u8 val, mask;
 
-diff --git a/tools/testing/selftests/net/bind_bhash.sh b/tools/testing/selftests/net/bind_bhash.sh
-index ca0292d4b441..a28563bdaae0 100755
---- a/tools/testing/selftests/net/bind_bhash.sh
-+++ b/tools/testing/selftests/net/bind_bhash.sh
-@@ -2,7 +2,7 @@
- # SPDX-License-Identifier: GPL-2.0
- 
- NR_FILES=32768
--SAVED_NR_FILES=$(ulimit -n)
-+readonly NETNS="ns-$(mktemp -u XXXXXX)"
- 
- # default values
- port=443
-@@ -36,21 +36,21 @@ while getopts "ha:p:64" opt; do
- done
- 
- setup() {
-+    ip netns add "${NETNS}"
-+    ip -netns "${NETNS}" link add veth0 type veth peer name veth1
-+    ip -netns "${NETNS}" link set lo up
-+    ip -netns "${NETNS}" link set veth0 up
-+    ip -netns "${NETNS}" link set veth1 up
-+
-     if [[ "$use_v6" == true ]]; then
--	ip addr add $addr_v6 nodad dev eth0
-+        ip -netns "${NETNS}" addr add $addr_v6 nodad dev veth0
-     else
--	ip addr add $addr_v4 dev lo
-+        ip -netns "${NETNS}" addr add $addr_v4 dev lo
-     fi
--	ulimit -n $NR_FILES
- }
- 
- cleanup() {
--    if [[ "$use_v6" == true ]]; then
--	ip addr del $addr_v6 dev eth0
--    else
--	ip addr del $addr_v4/32 dev lo
--    fi
--    ulimit -n $SAVED_NR_FILES
-+    ip netns del "${NETNS}"
- }
- 
- if [[ "$addr" != "" ]]; then
-@@ -59,8 +59,10 @@ if [[ "$addr" != "" ]]; then
- fi
- setup
- if [[ "$use_v6" == true ]] ; then
--    ./bind_bhash $port "ipv6" $addr_v6
-+    ip netns exec "${NETNS}" sh -c \
-+        "ulimit -n ${NR_FILES};./bind_bhash ${port} ipv6 ${addr_v6}"
- else
--    ./bind_bhash $port "ipv4" $addr_v4
-+    ip netns exec "${NETNS}" sh -c \
-+        "ulimit -n ${NR_FILES};./bind_bhash ${port} ipv4 ${addr_v4}"
- fi
- cleanup
+> +
+> +	if (props[KSZ_DRIVER_STRENGTH_IO].value != -1)
+> +		dev_warn(dev->dev, "%s is not supported by this chip variant\n",
+> +			 props[KSZ_DRIVER_STRENGTH_IO].name);
+> +
+> +	if (dev->chip_id == KSZ8795_CHIP_ID ||
+> +	    dev->chip_id == KSZ8794_CHIP_ID ||
+> +	    dev->chip_id == KSZ8765_CHIP_ID)
+> +		reg = KSZ8795_REG_SW_CTRL_20;
+> +	else
+> +		reg = KSZ9477_REG_SW_IO_STRENGTH;
+> +
+
+> +	ret = ksz_read8(dev, reg, &val);
+> +	if (ret)
+> +		return ret;
+> +
+Remote this.
+
+	val = mask = 0;
+
+> +	for (i = 0; i < num_props; i++) {
+> +		if (props[i].value == -1)
+> +			continue;
+> +
+> +		ret = ksz9477_drive_strength_to_reg(props[i].value);
+> +		if (ret < 0) {
+> +			ksz9477_drive_strength_error(dev, props[i].value);
+> +			return ret;
+> +		}
+> +
+> +		val &= ~(SW_DRIVE_STRENGTH_M << props[i].offset);
+
+		mask |= SW_DRIVE_STRENGTH_M << props[i].offset;
+
+> +		val |= ret << props[i].offset;
+
+		val |= ret << props[i].offset;
+
+> +	}
+> +
+> +	return ksz_write8(dev, reg, val);
+
+	return ksz_rmw8(dev, reg, mask, val);
+
+maybe safer?
+
+
 -- 
-2.39.2
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
