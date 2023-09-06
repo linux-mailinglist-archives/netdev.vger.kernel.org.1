@@ -1,130 +1,148 @@
-Return-Path: <netdev+bounces-32349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6D44796DA0
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 01:34:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C23BB796DA6
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 01:37:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06DE01C209D7
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 23:34:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C8CF281481
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 23:37:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D78C4125D1;
-	Wed,  6 Sep 2023 23:34:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B36F2125D8;
+	Wed,  6 Sep 2023 23:37:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C836D11CBE
-	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 23:34:08 +0000 (UTC)
-Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCC1EE66;
-	Wed,  6 Sep 2023 16:34:06 -0700 (PDT)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-	by mailout.nyi.internal (Postfix) with ESMTP id 916C65C00E3;
-	Wed,  6 Sep 2023 19:34:03 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute3.internal (MEProxy); Wed, 06 Sep 2023 19:34:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jcline.org; h=cc
-	:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:message-id:mime-version:reply-to:sender:subject
-	:subject:to:to; s=fm1; t=1694043243; x=1694129643; bh=vBTjdMfz1C
-	O5+QvldXBB+2bQ59B3jeU81T91GJRZKcc=; b=lCbZbYYS3BAZ5uNKthMk1f2xTa
-	Fai2IZ8aUGUTKsBa07bR8OklHlqG2i35GZqaBndYGzq2G+s6q+wh3gpiypHMHkv0
-	VgUeQbWrCOuMtmTlFY+iWtQhvgGiwunlAghInQvPUhsdvRQkEtCVsU+dw/9oieLG
-	DcmrWC7/mZ3exbfVNeXuPpO9FoLprv+YZTmtxWll8OTgpdUBMEPNXrWjLRtwYWot
-	dGnDJibx0k/kIXpr5WDpT37RWKJGjQg1ciEiTB19qgb8lqRMstyk2xgz7FHODibE
-	eq9X79czzYlxXsF7+WMVQbdS9i/SuC8TDgOC5qYNahPRBugZr8WP7uUGvgJQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm1; t=1694043243; x=1694129643; bh=vBTjdMfz1CO5+
-	QvldXBB+2bQ59B3jeU81T91GJRZKcc=; b=gJHjU750+HzSv7RYPPkd3G/rLMEs+
-	obWwwh3TAzL5rtFQUCV16ciho2lwUcRbnM8Kf20i+iX4PPyN/AI9exx7FKFV5Wxe
-	1O5I9QMItyY4P4L88Pz5ndQ8iojAMB0PpD3ugJDL4iFVTxeWFk7Shd88cND8j9SA
-	5qWHdHVeGUK9kIIvUxxuDWRbyJhqASjjvcIOF7ieJSY1rJKS05O3LUFJ9AB0KSDE
-	k+nEwnR4zJAiyeslbr5OkrHZflH91oTKfp54dv+wEnBBhy4ZL1Zv7ity0qhjZNZg
-	RvvDAxP4hBcmA98u70lmdCYzEFjN6PU6NEgiIIYawfUImSYTzbJ2mmbCw==
-X-ME-Sender: <xms:awz5ZHVaOqD9lcWDPTi_5fWYXVXlWA5za_46Oh_wEfwGB5P1-jbfNA>
-    <xme:awz5ZPm978cA7CcbVMSmnyxDr6pSJ_uY7GZQQ5K5J8Nn6MPsmbYTSY75MI74qzC_6
-    qyDYDJW_cl1IDwegFI>
-X-ME-Received: <xmr:awz5ZDbxrYyWYpBt4jKImwjtBwyuJ8dKXYddV3RAKMhDrMXe38FsrWa_k0ffxqyuSrsMFKYAzCL7VEYTBCJWGAzkAD8858VBgjTM>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrudehgedgvdegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomheplfgvrhgvmhih
-    ucevlhhinhgvuceojhgvrhgvmhihsehjtghlihhnvgdrohhrgheqnecuggftrfgrthhtvg
-    hrnhepveelveefheeuhffhieduvefgudefiedvfeduteejlefflefggfekvdeuhffgteev
-    necuffhomhgrihhnpehshiiikhgrlhhlvghrrdgrphhpshhpohhtrdgtohhmnecuvehluh
-    hsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepjhgvrhgvmhihsehj
-    tghlihhnvgdrohhrgh
-X-ME-Proxy: <xmx:awz5ZCWkcaO4bFiFIqcNguTg5QVtNZpml3xrudyffiVQANXvJ6TGIw>
-    <xmx:awz5ZBnmO1WZbve-7Kao0jbyCz3doiZDJlqaqU_H9Gf3lLNT8MW5Lw>
-    <xmx:awz5ZPcKLml0D4C33e2VA_h6ck9VTOOUnhfolkO4_S0oYZDd2hVUbg>
-    <xmx:awz5ZHW4mAojt2U5mb3yGZm_1dDMnahEI9etx0iBQEMIACpmSQtelw>
-Feedback-ID: i7a7146c5:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 6 Sep 2023 19:34:02 -0400 (EDT)
-From: Jeremy Cline <jeremy@jcline.org>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jeremy Cline <jeremy@jcline.org>,
-	syzbot+0839b78e119aae1fec78@syzkaller.appspotmail.com
-Subject: [PATCH] nfc: nci: assert requested protocol is valid
-Date: Wed,  6 Sep 2023 19:33:47 -0400
-Message-ID: <20230906233347.823171-1-jeremy@jcline.org>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A50F411CB5
+	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 23:37:38 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7883994;
+	Wed,  6 Sep 2023 16:37:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694043457; x=1725579457;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=WbYu9Oe2D0TTa+maLk3z8eDFJ1OYmdIYH7jQnzRHx8k=;
+  b=RyTXkiKKRXNfYK1rNDWESObfDMl9iV9TdBfW8VHRvMa7SGfJpsqgdePD
+   zVGc2rD8S5wZq8ZQfKAyayKd0rCu83ryY7nW6Es/xDJwtSilnEvAbcQ13
+   ZiBsczUp640WThkZ17sRfp2rnT/pXN0EfmThUfN0mTCOOsHYaFlFesKgM
+   4fES/NOMnF3ivI6tFp/UcDm1COKb/60fUV4Ryhu4Fsf31TzWa50aQC2fa
+   OHfbG0bIOqJ7zCCqPtqa9vsVbXalnQmjiTOdLo+O/nsGDurxboVuiR7P/
+   EgUt5fTFtl9BEeqIuz9w6oFPWWpnWo9HfsqruXDVI8IXyhR/1aV1ugEjV
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10825"; a="377124927"
+X-IronPort-AV: E=Sophos;i="6.02,233,1688454000"; 
+   d="scan'208";a="377124927"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2023 16:37:35 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10825"; a="865361694"
+X-IronPort-AV: E=Sophos;i="6.02,233,1688454000"; 
+   d="scan'208";a="865361694"
+Received: from mcewe-mobl1.amr.corp.intel.com (HELO vcostago-mobl3) ([10.251.10.12])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2023 16:37:34 -0700
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, sasha.neftin@intel.com, Ferenc Fejes
+ <ferenc.fejes@ericsson.com>, Jesse Brandeburg
+ <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jithu Joseph <jithu.joseph@intel.com>, Vedang Patel
+ <vedang.patel@intel.com>, Andre Guedes <andre.guedes@intel.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH iwl-net v1] igc: Fix infinite initialization loop with
+ early XDP redirect
+In-Reply-To: <ZPkDaLo4ubFRpPg3@boxer>
+References: <20230905213753.697461-1-vinicius.gomes@intel.com>
+ <ZPkDaLo4ubFRpPg3@boxer>
+Date: Wed, 06 Sep 2023 16:37:34 -0700
+Message-ID: <877cp2rhz5.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The protocol is used in a bit mask to determine if the protocol is
-supported. Assert the provided protocol is less than the maximum
-defined so it doesn't potentially perform a shift-out-of-bounds and
-provide a clearer error for undefined protocols vs unsupported ones.
+Maciej Fijalkowski <maciej.fijalkowski@intel.com> writes:
 
-Fixes: 6a2968aaf50c ("NFC: basic NCI protocol implementation")
-Reported-and-tested-by: syzbot+0839b78e119aae1fec78@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=0839b78e119aae1fec78
-Signed-off-by: Jeremy Cline <jeremy@jcline.org>
----
- net/nfc/nci/core.c | 5 +++++
- 1 file changed, 5 insertions(+)
+> On Tue, Sep 05, 2023 at 02:37:52PM -0700, Vinicius Costa Gomes wrote:
+>> When a XDP redirect happens before the link is ready, that
+>
+> When exactly link was 'ready' in your setup? You said it was enough to
+> launch traffic towards igc iface before running xdp-bench. Was the iface
+> down or up or?
 
-diff --git a/net/nfc/nci/core.c b/net/nfc/nci/core.c
-index fff755dde30d..6c9592d05120 100644
---- a/net/nfc/nci/core.c
-+++ b/net/nfc/nci/core.c
-@@ -909,6 +909,11 @@ static int nci_activate_target(struct nfc_dev *nfc_dev,
- 		return -EINVAL;
- 	}
- 
-+	if (protocol >= NFC_PROTO_MAX) {
-+		pr_err("the requested nfc protocol is invalid\n");
-+		return -EINVAL;
-+	}
-+
- 	if (!(nci_target->supported_protocols & (1 << protocol))) {
- 		pr_err("target does not support the requested protocol 0x%x\n",
- 		       protocol);
+In short, the interface was up and it was brought down "externally".
+
+I should have explained my test better: A is the system under test, B is
+the monitor; 1. initially the link between systems A and B is up; 2. I
+setup the vlans and xdp-bench; 3. I start sending traffic; 4. on system
+B, I brind the NIC connected to A down; 5. infinite initialization loop.
+
+>
+>> transmission will not finish and will timeout, causing an adapter
+>> reset. If the redirects do not stop, the adapter will not stop
+>> resetting.
+>
+> Please highlight that this driver shares tx resources with netstack. I
+> believe the source of this bug is that the watchdog is responsible to call
+> netif_carrier_on() from a workqueue which happens to be scheduled *after*
+> clearing __IGC_DOWN in igc_up().
+>
+
+Sure, will add this information to the commit message and send a v2.
+
+>> 
+>> Wait for the driver to signal that there's a carrier before allowing
+>> transmissions to proceed.
+>> 
+>> Fixes: 4ff320361092 ("igc: Add support for XDP_REDIRECT action")
+>> Reported-by: Ferenc Fejes <ferenc.fejes@ericsson.com>
+>> Closes: https://lore.kernel.org/netdev/0caf33cf6adb3a5bf137eeaa20e89b167c9986d5.camel@ericsson.com/
+>> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+>> Tested-by: Ferenc Fejes <ferenc.fejes@ericsson.com>
+>> ---
+>>  drivers/net/ethernet/intel/igc/igc_main.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>> 
+>> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+>> index 293b45717683..98de34d0ce07 100644
+>> --- a/drivers/net/ethernet/intel/igc/igc_main.c
+>> +++ b/drivers/net/ethernet/intel/igc/igc_main.c
+>> @@ -6491,7 +6491,7 @@ static int igc_xdp_xmit(struct net_device *dev, int num_frames,
+>>  	struct igc_ring *ring;
+>>  	int i, drops;
+>>  
+>> -	if (unlikely(test_bit(__IGC_DOWN, &adapter->state)))
+>> +	if (unlikely(!netif_carrier_ok(dev)))
+>>  		return -ENETDOWN;
+>
+> I thought about keeping the bit check as well but given what i wrote above
+> it is probably redundant, so:
+>
+> Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+>
+>>  
+>>  	if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
+>> -- 
+>> 2.41.0
+>> 
+
+
+Cheers,
 -- 
-2.41.0
-
+Vinicius
 
