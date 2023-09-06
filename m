@@ -1,156 +1,198 @@
-Return-Path: <netdev+bounces-32316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 398AF794177
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 18:27:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55FB779417B
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 18:27:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9503281368
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 16:27:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EC8C2814A5
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 16:27:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD8CB1095B;
-	Wed,  6 Sep 2023 16:25:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A109010957;
+	Wed,  6 Sep 2023 16:27:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C279E1119E
-	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 16:25:58 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A214199A;
-	Wed,  6 Sep 2023 09:25:57 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@breakpoint.cc>)
-	id 1qdvLl-0007wk-IH; Wed, 06 Sep 2023 18:25:53 +0200
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	<netfilter-devel@vger.kernel.org>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Phil Sutter <phil@nwl.cc>
-Subject: [PATCH net 6/6] netfilter: nf_tables: Unbreak audit log reset
-Date: Wed,  6 Sep 2023 18:25:12 +0200
-Message-ID: <20230906162525.11079-7-fw@strlen.de>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230906162525.11079-1-fw@strlen.de>
-References: <20230906162525.11079-1-fw@strlen.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F3B51078F
+	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 16:27:01 +0000 (UTC)
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05olkn2016.outbound.protection.outlook.com [40.92.89.16])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00D0619A4;
+	Wed,  6 Sep 2023 09:26:54 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ap9xZT8C0wcp8zAzAn8IusW9Jfa7s+Kz0McCl/7ZwQB08/aufAhTD4B0ASVx32JS2G8M69TvTszLBCG3u6TzycdH3He/pEuU7ZBPyi1wg8fWgBduTZIP7U+mPegsWnHWfY2BW8u+64cSSopO3RYifDCFbdGPUgffQhzpZfuO5M4pBGPMrZiQXHn818AUtCvTR+2bKJxT12To84IZ4dTD/RSwDuDJjKV/yEaqlW4XhSJqFSqqVwqc81Ibq7O04y/oHUZVixqfO22O+F/qbeXf5fIRPiGMT0Ouc8m4xcS+X+Q8EHBl3QbZDHLPeK/xHzBKcogRGEJHnFDi8DWaFSmbPw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rQIRpvEvZq96oNilEKRjEap2z/x0mbnKcQboRvYOG0w=;
+ b=ChMa7OwKgSvYC0uKDRGxRvpTgib0rRcLWa0xw94Q7ywMP/h1xCVTP5rs/d07oWyBZJb+Ik5mTbr960EwhldAczkhHe9IoS36r+/Lt8wRJ/P75870KNadgWAMgywCSm8suEmQNooD/DQbarumT6WFrlu00J2C3QPRyt/eUs/9sTNOG111Ux45SMCbJMQwHkUVEGyvyKJriHVcYjaemZlHIVz1FM4Fm91VPLStxhXfKo5X5pwoycsqYZixPWRPX0so3dvrYbBQrxPNVA6w7F5Baft1YVe2/eLFi8qMIg8wl8b8SPcb6i7/KkxfKxhzHJZ6O7cnqLdH6aOFSDSIysW2nw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rQIRpvEvZq96oNilEKRjEap2z/x0mbnKcQboRvYOG0w=;
+ b=Dgbq8yMT5SihhH7R1/GHV33Cp665T5/V+AHMFOk0h/sW/eYkYvlavVQjbHjdizwn9g9WNU1zVnVvY2C2UhvXBMQyjzy8uo+CkWARjnU0h+P+N0DD9AJTgGgDxTR7mw48lT6b3hzRE5+2SCPpXdb1Hi4HLe4Fae27WKrRcpdiMHGxMvFFXfGCduV4EWyi6MxOaTByw9tqVATGgGDiZRx1TJ+xFy/pMWOp0bVh1FCeGPfVUb79p4Ec4S5h+EcBXUa/P8kYXitMtbjzMAAEoqoEq3kr2b3AF74Bb5nhXNksVPyuuAkD7sJ3Mzh56jk+ajo2dZucHZonFKNh+rkVkg2WuA==
+Received: from VI1P193MB0752.EURP193.PROD.OUTLOOK.COM (2603:10a6:800:32::19)
+ by PR3P193MB0863.EURP193.PROD.OUTLOOK.COM (2603:10a6:102:96::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.34; Wed, 6 Sep
+ 2023 16:26:52 +0000
+Received: from VI1P193MB0752.EURP193.PROD.OUTLOOK.COM
+ ([fe80::3d3c:61f2:146f:b3b4]) by VI1P193MB0752.EURP193.PROD.OUTLOOK.COM
+ ([fe80::3d3c:61f2:146f:b3b4%7]) with mapi id 15.20.6745.034; Wed, 6 Sep 2023
+ 16:26:52 +0000
+From: Juntong Deng <juntong.deng@outlook.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	shuah@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kernel-mentees@lists.linuxfoundation.org
+Subject: [PATCH] selftests/net: Improve bind_bhash.sh to accommodate predictable network interface names
+Date: Thu,  7 Sep 2023 00:26:03 +0800
+Message-ID:
+ <VI1P193MB0752FDA6D89743CF57FB600599EFA@VI1P193MB0752.EURP193.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.39.2
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [tmtn26axAYFWXmjQPhaFAMbyQyBbR6qw]
+X-ClientProxiedBy: AM8P190CA0025.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:20b:219::30) To VI1P193MB0752.EURP193.PROD.OUTLOOK.COM
+ (2603:10a6:800:32::19)
+X-Microsoft-Original-Message-ID:
+ <20230906162603.10809-1-juntong.deng@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: VI1P193MB0752:EE_|PR3P193MB0863:EE_
+X-MS-Office365-Filtering-Correlation-Id: edbd6582-4e21-4b7b-ca39-08dbaef6138d
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	JHBL16qWDGxmpXARnIUoq+HYZOkPzufQ/BxPstTtczMLfUwAbB7DYDTAHKqG591bU3i8zI8fwWwqNNfKyXddzKQgJQtweo2DFM1b5uhxp7Rncw8fBaTiM6J18jrsTJHwAD/YLkWX9H28euQiwXyNTinzkJ6wQF32GwBTQQtb4numbloVZEFb/rY+v4cbzgOTuctarz0SkeDhUwa/8YSLeqzycIV1epfn8JEN4Rl+JUTORocMB7l7mDzIoVDSAK8/HtblaAkUr3pHIOQ6qliRVT3RHTKsoEH4QfXOhX5hgJVTxiQnNvVhFLPdMrabl9h0DcPdWdTjeRn9rquNv6plug3R31lOOFtRvd0r6t1MxEo6fIbOhzw7nkjzWJyT5/3dle7oVJMwVfnZGJL/G/4SsmIT35zEhRM2/VdVWuwjknkOnWffXuC8ttNbEieG8v6cUkBPEolOQFGhrQT0wRyt9d74REDBs/KXG9zJfSVCJ0UYWN9CBOoPaxThBIgyd02EqczRQJw8Hfs5xHQixKQDBn2iTeOZsXrLfJ4dodLePVwYWOLaCKtJ4zPYDdPp49IU
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?amDBA5k9uY0bD84vgUkvwWEUIoz23BCavkMRfwqpxSo3019pMg2pyzw/yCdF?=
+ =?us-ascii?Q?tHatx4wruFAupdaOMojjK0F9980s21CmDC7mKx4ntZdE6ihXJeZxjv6LFiel?=
+ =?us-ascii?Q?3rZxwWDV9y5Cic4xbz8jDFkH14ctZIer1KDchKNBQGe7fcJRnWFq0GUEZMXQ?=
+ =?us-ascii?Q?TVprFQcWqQuTIJsH6AbYROsGOKCe+C1kj2eXrc6cXLhtwXBVJzBLlHFitKBo?=
+ =?us-ascii?Q?8AsRqIEEbJvBiH407Er1v69UmFs1oLPzbmve07cXxuuglDEY2UWjhD9gf6dZ?=
+ =?us-ascii?Q?esUMfR91J44B4aMXSfn73roeE7sEtu7eYHC13jCnSM0yVfNoMV/jGTI754jQ?=
+ =?us-ascii?Q?9yVKBv1bmKmwl0Dtg56s7a/hUy/FkFk2R8JLrqc2njHHe2pfamv828jcx31R?=
+ =?us-ascii?Q?bp7kLp8clJGpxzdd+jXuujo782NSdegKWwTfKsItLFyGVnJEMFudiBOYP4wX?=
+ =?us-ascii?Q?a+93MyRqSh/sddTKdqRCo9v1IUqmFzh1RNm3mret2/aL5FjWaO0Zlz0dxORz?=
+ =?us-ascii?Q?WgbRHoEJ1+YqrGAI1F89A2i1wRsp+/3BkvT8cX0xmDdVtMI2+bRz8goxhu27?=
+ =?us-ascii?Q?DUA1qBL/Y4hdPR6jbp8mdJAKJHpTKovWXYbn+a7DozukNZLfwacSG9aMT7HB?=
+ =?us-ascii?Q?ZM38trt2uew23l/PgWegy3xigl0VNO9P3finmjLDl0EkL0cUSoADz0Oi5gLz?=
+ =?us-ascii?Q?wmjJ3IzKR4Yy/Dni6bd2fYyBaLO8JvzjLYhyq/5mIZsdqyEscI50LNnts1PZ?=
+ =?us-ascii?Q?b+DyL9COkACDg+p9i8iNuwAxZlrcKPSBcGCorkCsMs9CS1n3TBhl/CDPbVbP?=
+ =?us-ascii?Q?0kLZMiZDJ+0Sm8rL2Qv43x03Gr2UyqU2dXCaq4tbfjU6mFphZS9yPs/O1VeP?=
+ =?us-ascii?Q?cXe5PktvO7swOxCni5t9Z27IFiW97p5sZMDLndj6x63Wt25s8dZUb/RevnKL?=
+ =?us-ascii?Q?gekBghQHYLCU65osf/RCv5aRcVewK5T/6GyezVj/YtRAQcVoOZPyRB+WkLnH?=
+ =?us-ascii?Q?sqEScsRBAR1LtAvYe7RBn8sNG21yFDS1y9JDcYnz3zfW4jhIO5XWDbNeBAGg?=
+ =?us-ascii?Q?DytDjd5bCpjdUzlVf2jEhfWt3wei3rhk0J5qOwWUTlmuqr2NaWsO1Qpz16Fw?=
+ =?us-ascii?Q?DHp79ytiWy9Mxt+LRfYbN1EbUxctK+chz2j56+BiLkng+9PIB3bDPVs25tkx?=
+ =?us-ascii?Q?rZS9ipCTgrViJml3C5VJC9DoIirpi8cWxzy+HxQaBk9r1s9Kk/LaF/1Xppw?=
+ =?us-ascii?Q?=3D?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: edbd6582-4e21-4b7b-ca39-08dbaef6138d
+X-MS-Exchange-CrossTenant-AuthSource: VI1P193MB0752.EURP193.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2023 16:26:52.8524
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR3P193MB0863
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Pablo Neira Ayuso <pablo@netfilter.org>
+Starting with v197, systemd uses predictable interface network names,
+the traditional interface naming scheme (eth0) is deprecated, therefore
+it cannot be assumed that the eth0 interface exists on the host.
 
-Deliver audit log from __nf_tables_dump_rules(), table dereference at
-the end of the table list loop might point to the list head, leading to
-this crash.
+This modification makes the bind_bhash test program run in a separate
+network namespace and no longer needs to consider the name of the
+network interface on the host.
 
-[ 4137.407349] BUG: unable to handle page fault for address: 00000000001f3c50
-[ 4137.407357] #PF: supervisor read access in kernel mode
-[ 4137.407359] #PF: error_code(0x0000) - not-present page
-[ 4137.407360] PGD 0 P4D 0
-[ 4137.407363] Oops: 0000 [#1] PREEMPT SMP PTI
-[ 4137.407365] CPU: 4 PID: 500177 Comm: nft Not tainted 6.5.0+ #277
-[ 4137.407369] RIP: 0010:string+0x49/0xd0
-[ 4137.407374] Code: ff 77 36 45 89 d1 31 f6 49 01 f9 66 45 85 d2 75 19 eb 1e 49 39 f8 76 02 88 07 48 83 c7 01 83 c6 01 48 83 c2 01 4c 39 cf 74 07 <0f> b6 02 84 c0 75 e2 4c 89 c2 e9 58 e5 ff ff 48 c7 c0 0e b2 ff 81
-[ 4137.407377] RSP: 0018:ffff8881179737f0 EFLAGS: 00010286
-[ 4137.407379] RAX: 00000000001f2c50 RBX: ffff888117973848 RCX: ffff0a00ffffff04
-[ 4137.407380] RDX: 00000000001f3c50 RSI: 0000000000000000 RDI: 0000000000000000
-[ 4137.407381] RBP: 0000000000000000 R08: 0000000000000000 R09: 00000000ffffffff
-[ 4137.407383] R10: ffffffffffffffff R11: ffff88813584d200 R12: 0000000000000000
-[ 4137.407384] R13: ffffffffa15cf709 R14: 0000000000000000 R15: ffffffffa15cf709
-[ 4137.407385] FS:  00007fcfc18bb580(0000) GS:ffff88840e700000(0000) knlGS:0000000000000000
-[ 4137.407387] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[ 4137.407388] CR2: 00000000001f3c50 CR3: 00000001055b2001 CR4: 00000000001706e0
-[ 4137.407390] Call Trace:
-[ 4137.407392]  <TASK>
-[ 4137.407393]  ? __die+0x1b/0x60
-[ 4137.407397]  ? page_fault_oops+0x6b/0xa0
-[ 4137.407399]  ? exc_page_fault+0x60/0x120
-[ 4137.407403]  ? asm_exc_page_fault+0x22/0x30
-[ 4137.407408]  ? string+0x49/0xd0
-[ 4137.407410]  vsnprintf+0x257/0x4f0
-[ 4137.407414]  kvasprintf+0x3e/0xb0
-[ 4137.407417]  kasprintf+0x3e/0x50
-[ 4137.407419]  nf_tables_dump_rules+0x1c0/0x360 [nf_tables]
-[ 4137.407439]  ? __alloc_skb+0xc3/0x170
-[ 4137.407442]  netlink_dump+0x170/0x330
-[ 4137.407447]  __netlink_dump_start+0x227/0x300
-[ 4137.407449]  nf_tables_getrule+0x205/0x390 [nf_tables]
-
-Deliver audit log only once at the end of the rule dump+reset for
-consistency with the set dump+reset.
-
-Ensure audit reset access to table under rcu read side lock. The table
-list iteration holds rcu read lock side, but recent audit code
-dereferences table object out of the rcu read lock side.
-
-Fixes: ea078ae9108e ("netfilter: nf_tables: Audit log rule reset")
-Fixes: 7e9be1124dbe ("netfilter: nf_tables: Audit log setelem reset")
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
-Acked-by: Phil Sutter <phil@nwl.cc>
-Signed-off-by: Florian Westphal <fw@strlen.de>
+Signed-off-by: Juntong Deng <juntong.deng@outlook.com>
 ---
- net/netfilter/nf_tables_api.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ tools/testing/selftests/net/bind_bhash.sh | 26 ++++++++++++-----------
+ 1 file changed, 14 insertions(+), 12 deletions(-)
 
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index 2c81cee858d6..e429ebba74b3 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -3480,6 +3480,10 @@ static int __nf_tables_dump_rules(struct sk_buff *skb,
- cont_skip:
- 		(*idx)++;
- 	}
+diff --git a/tools/testing/selftests/net/bind_bhash.sh b/tools/testing/selftests/net/bind_bhash.sh
+index ca0292d4b441..a28563bdaae0 100755
+--- a/tools/testing/selftests/net/bind_bhash.sh
++++ b/tools/testing/selftests/net/bind_bhash.sh
+@@ -2,7 +2,7 @@
+ # SPDX-License-Identifier: GPL-2.0
+ 
+ NR_FILES=32768
+-SAVED_NR_FILES=$(ulimit -n)
++readonly NETNS="ns-$(mktemp -u XXXXXX)"
+ 
+ # default values
+ port=443
+@@ -36,21 +36,21 @@ while getopts "ha:p:64" opt; do
+ done
+ 
+ setup() {
++    ip netns add "${NETNS}"
++    ip -netns "${NETNS}" link add veth0 type veth peer name veth1
++    ip -netns "${NETNS}" link set lo up
++    ip -netns "${NETNS}" link set veth0 up
++    ip -netns "${NETNS}" link set veth1 up
 +
-+	if (reset && *idx)
-+		audit_log_rule_reset(table, cb->seq, *idx);
-+
- 	return 0;
+     if [[ "$use_v6" == true ]]; then
+-	ip addr add $addr_v6 nodad dev eth0
++        ip -netns "${NETNS}" addr add $addr_v6 nodad dev veth0
+     else
+-	ip addr add $addr_v4 dev lo
++        ip -netns "${NETNS}" addr add $addr_v4 dev lo
+     fi
+-	ulimit -n $NR_FILES
  }
  
-@@ -3540,9 +3544,6 @@ static int nf_tables_dump_rules(struct sk_buff *skb,
- done:
- 	rcu_read_unlock();
- 
--	if (reset && idx > cb->args[0])
--		audit_log_rule_reset(table, cb->seq, idx - cb->args[0]);
--
- 	cb->args[0] = idx;
- 	return skb->len;
+ cleanup() {
+-    if [[ "$use_v6" == true ]]; then
+-	ip addr del $addr_v6 dev eth0
+-    else
+-	ip addr del $addr_v4/32 dev lo
+-    fi
+-    ulimit -n $SAVED_NR_FILES
++    ip netns del "${NETNS}"
  }
-@@ -5760,8 +5761,6 @@ static int nf_tables_dump_set(struct sk_buff *skb, struct netlink_callback *cb)
- 	if (!args.iter.err && args.iter.count == cb->args[0])
- 		args.iter.err = nft_set_catchall_dump(net, skb, set,
- 						      reset, cb->seq);
--	rcu_read_unlock();
--
- 	nla_nest_end(skb, nest);
- 	nlmsg_end(skb, nlh);
  
-@@ -5769,6 +5768,8 @@ static int nf_tables_dump_set(struct sk_buff *skb, struct netlink_callback *cb)
- 		audit_log_nft_set_reset(table, cb->seq,
- 					args.iter.count - args.iter.skip);
- 
-+	rcu_read_unlock();
-+
- 	if (args.iter.err && args.iter.err != -EMSGSIZE)
- 		return args.iter.err;
- 	if (args.iter.count == cb->args[0])
+ if [[ "$addr" != "" ]]; then
+@@ -59,8 +59,10 @@ if [[ "$addr" != "" ]]; then
+ fi
+ setup
+ if [[ "$use_v6" == true ]] ; then
+-    ./bind_bhash $port "ipv6" $addr_v6
++    ip netns exec "${NETNS}" sh -c \
++        "ulimit -n ${NR_FILES};./bind_bhash ${port} ipv6 ${addr_v6}"
+ else
+-    ./bind_bhash $port "ipv4" $addr_v4
++    ip netns exec "${NETNS}" sh -c \
++        "ulimit -n ${NR_FILES};./bind_bhash ${port} ipv4 ${addr_v4}"
+ fi
+ cleanup
 -- 
-2.41.0
+2.39.2
 
 
