@@ -1,57 +1,81 @@
-Return-Path: <netdev+bounces-32215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73C2B7938DD
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 11:51:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B8BC57938ED
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 11:52:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C47F281373
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 09:51:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBA7728133D
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 09:52:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F5AB469F;
-	Wed,  6 Sep 2023 09:51:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51E7046A0;
+	Wed,  6 Sep 2023 09:52:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED0D7ED6;
-	Wed,  6 Sep 2023 09:51:21 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EEB1CFF;
-	Wed,  6 Sep 2023 02:51:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=VShVyvDE81pUc6DastFwuDdrUE7FLRfbrH8EYlvmp+c=; b=ig7KeUlEDfW97pHu7HfKOBQ+7f
-	ZVTOA/f3vIvL5pJLQzPTAuebyDoLSDdmjO+GUVWuqiQO8ysXYR9wkPbxuRKnsueebbClZNfLdAAHZ
-	TTljTOFpz29SLTXq9h8aSnGjrYemBz8Prmjgf18MJm/9pPmujkYSMdyWi+yGyDfDOa+Wp26X1N0wJ
-	QrZ+4H51lsJLT8fLcSqBCQOrIGEIrG5LSCX3QC+EP4zzKsQebVk6x4B53VA/zL0Z1b0XB+W2kyu/H
-	HJTWPnEhQkAHnAfRivt8kTAy/wIjG1suF14XIzHnxGASSQcm0oRck01x7iEdegqJIRJTv+BST+gtB
-	Fisr0MdQ==;
-Received: from 226.206.1.85.dynamic.wline.res.cust.swisscom.ch ([85.1.206.226] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qdpBt-000N2k-G4; Wed, 06 Sep 2023 11:51:17 +0200
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: davem@davemloft.net
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	daniel@iogearbox.net,
-	ast@kernel.org,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: pull-request: bpf 2023-09-06
-Date: Wed,  6 Sep 2023 11:51:17 +0200
-Message-Id: <20230906095117.16941-1-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.21.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 467FC3FC7
+	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 09:52:33 +0000 (UTC)
+Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41AB41982;
+	Wed,  6 Sep 2023 02:52:28 -0700 (PDT)
+Received: by mail-io1-xd32.google.com with SMTP id ca18e2360f4ac-7928dc54896so132277639f.3;
+        Wed, 06 Sep 2023 02:52:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693993947; x=1694598747; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0LsnxtJChRuEyVRG9ko08TVlT1rSSwwc12RXGyr/Ymo=;
+        b=UscDoiEax0oaXrQIGMNKp7dsA0K7NdyhrilY7gUYqnuZmaajjzmJ8fROx8p4kI3uYo
+         HhnCM4WyuV8b50Cu5kUfNk3BZ5oOKCdNM4+Sz7QOeToFt0M0uLCvEc23vgorbNTt07HI
+         Yd/b86Yq9RAUUvpfdorUsV3gwu6X320B6462XcOGHZHl6Yqonb7TX7oe5x1EuVNfqda0
+         A1RAPXUxuUG1kRS/eYKJU02tvnkqFK2U+JSsoS7516E6gFqZlMDK0PaKDFlQK4GoLuh6
+         UEWTT5LsOiu/AMnp9YcVgZ9G/iiJonPM8YpaICPbYQSlNTBkZZolFZtyy/uoewTBy+JG
+         Ymvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693993947; x=1694598747;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0LsnxtJChRuEyVRG9ko08TVlT1rSSwwc12RXGyr/Ymo=;
+        b=Qad46r1F8Aj0QT7CpQ3CSa1EtpyDy18Y61tPWr2TxBdASIp4nI7ypolg5nVmHuVbLZ
+         oBSWrdvkFL28putZpdqAZLCqMqwmQRu+DgwySV6rXpmD4BB4GJEP26tGFgpveh937mzf
+         NgC7AtvaX7ZZVHZ8qqt0uWXL5BcMwGyAs7qr1kqa9U9ASVx5WvH1Hmxrc4eIDBC24Syv
+         izyv5fIRqy8SVkfUDnkuOjz64ytRETgDnbfCRiJTwTwD6ivitKxN/aoGA9jj3nXb4I4b
+         TNu8O7h4E+7vauZSfBVRQLHqRo7s0ro0iQBaYR1TNNdnbvow8YVMiWv+KbR/Wu81eR+W
+         hp+Q==
+X-Gm-Message-State: AOJu0Yz1ddrHEhSBpcSPI3Jk/u/2kucYMVPHxzlaWTALKsYd6nOAMT1p
+	RCbRUqoSGyMWWfa5xhLXsvY2Y0Imx2Y=
+X-Google-Smtp-Source: AGHT+IGM8yoIsIbDbOiurHN299qtQHq27Z7zBM/Q22b3U9VWVOKETLQ0SXTeR9mi5otFEEf8j8VdAA==
+X-Received: by 2002:a6b:680b:0:b0:795:183b:1e3 with SMTP id d11-20020a6b680b000000b00795183b01e3mr16612042ioc.6.1693993947107;
+        Wed, 06 Sep 2023 02:52:27 -0700 (PDT)
+Received: from aford-B741.lan ([2601:447:d001:897f:b68d:99e6:78c9:f0e6])
+        by smtp.gmail.com with ESMTPSA id i23-20020a5d9e57000000b007836a9ca101sm4794744ioi.22.2023.09.06.02.52.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Sep 2023 02:52:26 -0700 (PDT)
+From: Adam Ford <aford173@gmail.com>
+To: linux-omap@vger.kernel.org
+Cc: aford@beaconembedded.com,
+	Adam Ford <aford173@gmail.com>,
+	=?UTF-8?q?Beno=C3=AEt=20Cousson?= <bcousson@baylibre.com>,
+	Tony Lindgren <tony@atomide.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Grygorii Strashko <grygorii.strashko@ti.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH 1/2] net: ethernet: davinci_emac: Use MAC Address from Device Tree
+Date: Wed,  6 Sep 2023 04:51:42 -0500
+Message-Id: <20230906095143.99806-1-aford173@gmail.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,100 +83,66 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.8/27023/Wed Sep  6 09:38:27 2023)
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi David, hi Jakub, hi Paolo, hi Eric,
+Currently there is a device tree entry called "local-mac-address"
+which can be filled by the bootloader or manually set.This is
+useful when the user does not want to use the MAC address
+programmed into the SoC.
 
-The following pull-request contains BPF updates for your *net* tree.
+Currently, the davinci_emac reads the MAC from the DT, copies
+it from pdata->mac_addr to priv->mac_addr, then blindly overwrites
+it by reading from registers in the SoC, and falls back to a
+random MAC if it's still not valid.  This completely ignores any
+MAC address in the device tree.
 
-We've added 9 non-merge commits during the last 6 day(s) which contain
-a total of 12 files changed, 189 insertions(+), 44 deletions(-).
+In order to use the local-mac-address, check to see if the contents
+of priv->mac_addr are valid before falling back to reading from the
+SoC when the MAC address is not valid.
 
-The main changes are:
+Signed-off-by: Adam Ford <aford173@gmail.com>
 
-1) Fix bpf_sk_storage to address an invalid wait context lockdep report and
-   another one to address missing omem uncharge, from Martin KaFai Lau.
+diff --git a/drivers/net/ethernet/ti/davinci_emac.c b/drivers/net/ethernet/ti/davinci_emac.c
+index 2eb9d5a32588..994ddd756782 100644
+--- a/drivers/net/ethernet/ti/davinci_emac.c
++++ b/drivers/net/ethernet/ti/davinci_emac.c
+@@ -1934,18 +1934,20 @@ static int davinci_emac_probe(struct platform_device *pdev)
+ 		goto err_free_rxchan;
+ 	ndev->irq = rc;
+ 
+-	rc = davinci_emac_try_get_mac(pdev, res_ctrl ? 0 : 1, priv->mac_addr);
+-	if (!rc)
+-		eth_hw_addr_set(ndev, priv->mac_addr);
+-
++	/* If the MAC address is not present, read the registers from the SoC */
+ 	if (!is_valid_ether_addr(priv->mac_addr)) {
+-		/* Use random MAC if still none obtained. */
+-		eth_hw_addr_random(ndev);
+-		memcpy(priv->mac_addr, ndev->dev_addr, ndev->addr_len);
+-		dev_warn(&pdev->dev, "using random MAC addr: %pM\n",
+-			 priv->mac_addr);
++		rc = davinci_emac_try_get_mac(pdev, res_ctrl ? 0 : 1, priv->mac_addr);
++		if (!rc)
++			eth_hw_addr_set(ndev, priv->mac_addr);
++
++		if (!is_valid_ether_addr(priv->mac_addr)) {
++			/* Use random MAC if still none obtained. */
++			eth_hw_addr_random(ndev);
++			memcpy(priv->mac_addr, ndev->dev_addr, ndev->addr_len);
++			dev_warn(&pdev->dev, "using random MAC addr: %pM\n",
++				 priv->mac_addr);
++		}
+ 	}
+-
+ 	ndev->netdev_ops = &emac_netdev_ops;
+ 	ndev->ethtool_ops = &ethtool_ops;
+ 	netif_napi_add(ndev, &priv->napi, emac_poll);
+-- 
+2.39.2
 
-2) Two BPF recursion detection related fixes, from Sebastian Andrzej Siewior.
-
-3) Fix tailcall limit enforcement in trampolines for s390 JIT, from Ilya Leoshkevich.
-
-4) Fix a sockmap refcount race where skbs in sk_psock_backlog can be referenced
-   after user space side has already skb_consumed them, from John Fastabend.
-
-5) Fix BPF CI flake/race wrt sockmap vsock write test where the transport
-   endpoint is not connected, from Xu Kuohai.
-
-6) Follow-up doc fix to address a cross-link warning, from Eduard Zingerman.
-
-Please consider pulling these changes from:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
-
-Thanks a lot!
-
-Also thanks to reporters, reviewers and testers of commits in this pull-request:
-
-Jiri Olsa, kernel test robot, Leon Hwang, Xu Kuohai
-
-----------------------------------------------------------------
-
-The following changes since commit ae074e2b2fd410bf54d56509a7e48fb83873af3b:
-
-  sfc: check for zero length in EF10 RX prefix (2023-09-01 08:14:57 +0100)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
-
-for you to fetch changes up to a96d1cfb2da040bdf692d22022371b249742abb2:
-
-  selftests/bpf: Check bpf_sk_storage has uncharged sk_omem_alloc (2023-09-06 11:08:47 +0200)
-
-----------------------------------------------------------------
-bpf-for-netdev
-
-----------------------------------------------------------------
-Eduard Zingerman (1):
-      docs/bpf: Fix "file doesn't exist" warnings in {llvm_reloc,btf}.rst
-
-Ilya Leoshkevich (1):
-      s390/bpf: Pass through tail call counter in trampolines
-
-John Fastabend (1):
-      bpf, sockmap: Fix skb refcnt race after locking changes
-
-Martin KaFai Lau (3):
-      bpf: bpf_sk_storage: Fix invalid wait context lockdep report
-      bpf: bpf_sk_storage: Fix the missing uncharge in sk_omem_alloc
-      selftests/bpf: Check bpf_sk_storage has uncharged sk_omem_alloc
-
-Sebastian Andrzej Siewior (2):
-      bpf: Invoke __bpf_prog_exit_sleepable_recur() on recursion in kern_sys_bpf().
-      bpf: Assign bpf_tramp_run_ctx::saved_run_ctx before recursion check.
-
-Xu Kuohai (1):
-      selftests/bpf: Fix a CI failure caused by vsock write
-
- Documentation/bpf/btf.rst                          |  2 +-
- Documentation/bpf/llvm_reloc.rst                   |  2 +-
- arch/s390/net/bpf_jit_comp.c                       | 10 ++++
- kernel/bpf/bpf_local_storage.c                     | 49 ++++++-----------
- kernel/bpf/syscall.c                               |  2 +-
- kernel/bpf/trampoline.c                            |  5 +-
- net/core/skmsg.c                                   | 12 +++--
- .../bpf/prog_tests/sk_storage_omem_uncharge.c      | 56 ++++++++++++++++++++
- .../selftests/bpf/prog_tests/sockmap_helpers.h     | 26 +++++++++
- .../selftests/bpf/prog_tests/sockmap_listen.c      |  7 +++
- .../testing/selftests/bpf/progs/bpf_tracing_net.h  |  1 +
- .../selftests/bpf/progs/sk_storage_omem_uncharge.c | 61 ++++++++++++++++++++++
- 12 files changed, 189 insertions(+), 44 deletions(-)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/sk_storage_omem_uncharge.c
- create mode 100644 tools/testing/selftests/bpf/progs/sk_storage_omem_uncharge.c
 
