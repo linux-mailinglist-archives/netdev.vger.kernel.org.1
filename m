@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-32177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1949F7934BC
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 07:10:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4453C7934CD
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 07:20:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 076841C2096D
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 05:10:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00ED0281212
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 05:20:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9C7EA3C;
-	Wed,  6 Sep 2023 05:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21029809;
+	Wed,  6 Sep 2023 05:20:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 535B0808
-	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 05:10:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D2289C433CB;
-	Wed,  6 Sep 2023 05:10:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34C2F653
+	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 05:20:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A7275C433C8;
+	Wed,  6 Sep 2023 05:20:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1693977022;
-	bh=qT/y5R9fBn1NeTGnJI8nbaXj2qg7qzFGbubGB+tg3Sg=;
+	s=k20201202; t=1693977622;
+	bh=p90tZ2sPqK5OQT5Ny/mdHHYWJuQJQeVb5LPNbCFAQsU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=nrUqxu1iUAhpkD1yEoMkiIAziUwxl0YqGZ5Pa0bip6wqDQLMvoAoN/hlWcLmA0B5Y
-	 GtYPuQ/YwY1H6VvDvfgzVuRa74Vsi7AB0p1WSVtbohQuM2N3rbzxpkfYGmqg/YPRVo
-	 Jej7oV5LsUxjeHaiYiYKirgi9y3OgY6SuY+T6x3qbnSPYA5NotYcoI4rVQdyTsFs95
-	 eH7+pzZuuzDxWawetuka30UC3qWHyM/odtQPW5gv4UQMaxhM7GshTq9AnrO6+p0xkp
-	 xzVXiMGw27/PnQY6F3wIT8GdwUMFMJjWS8OK1wIo+bs757u6jUeR5IYMyiG55eR/Rk
-	 GB/votDSMLP8w==
+	b=OH2OOI+lJ+SZfpOoy/4Vr9WpD6levT7nlTr3JVyO6MqCLSkhhLILUcoakrUg30H4Y
+	 rXiwanrFdh4f0I1hjFlgmjZh7XkOuS94p4ycHKti1bShYU2B3YoaU5bh7OWKE71n4D
+	 /eOeAphBtaa2Q6Tn69Tx7qtNCIqstOR/deIZr2ui72We6MB/RGiyOdF2a1pvChfq0/
+	 Vn3Wr6UalVU10ehuH2VfcYgyp9qLJPuBqh1LLoFWeQNLBXrLu3W+hzIM35eKOkpErr
+	 Ps1F21RxJh7aD2A0a3U+1GcusaJNhPMxswGx/D2T2s1vrPlNjt1DrLpsu5fBrMw7xB
+	 15SEuJ0qaTANw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B8704E22B00;
-	Wed,  6 Sep 2023 05:10:22 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 91A6DC04D3F;
+	Wed,  6 Sep 2023 05:20:22 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -41,39 +41,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net/ipv6: SKB symmetric hash should incorporate
- transport ports
+Subject: Re: [PATCH net 1/2] net/mlx5e: Clear mirred devices array if the rule is
+ split
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169397702275.22023.11705389195236834744.git-patchwork-notify@kernel.org>
-Date: Wed, 06 Sep 2023 05:10:22 +0000
-References: <20230905103610.3087983-1-qtian@vmware.com>
-In-Reply-To: <20230905103610.3087983-1-qtian@vmware.com>
-To: Quan Tian <qtian@vmware.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- uablrek@gmail.com
+ <169397762259.26821.10788455717619544046.git-patchwork-notify@kernel.org>
+Date: Wed, 06 Sep 2023 05:20:22 +0000
+References: <20230905174846.24124-1-saeed@kernel.org>
+In-Reply-To: <20230905174846.24124-1-saeed@kernel.org>
+To: Saeed Mahameed <saeed@kernel.org>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, saeedm@nvidia.com, netdev@vger.kernel.org,
+ tariqt@nvidia.com, jianbol@nvidia.com, vladbu@nvidia.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Tue,  5 Sep 2023 10:36:10 +0000 you wrote:
-> __skb_get_hash_symmetric() was added to compute a symmetric hash over
-> the protocol, addresses and transport ports, by commit eb70db875671
-> ("packet: Use symmetric hash for PACKET_FANOUT_HASH."). It uses
-> flow_keys_dissector_symmetric_keys as the flow_dissector to incorporate
-> IPv4 addresses, IPv6 addresses and ports. However, it should not specify
-> the flag as FLOW_DISSECTOR_F_STOP_AT_FLOW_LABEL, which stops further
-> dissection when an IPv6 flow label is encountered, making transport
-> ports not being incorporated in such case.
+On Tue,  5 Sep 2023 10:48:45 -0700 you wrote:
+> From: Jianbo Liu <jianbol@nvidia.com>
+> 
+> In the cited commit, the mirred devices are recorded and checked while
+> parsing the actions. In order to avoid system crash, the duplicate
+> action in a single rule is not allowed.
+> 
+> But the rule is actually break down into several FTEs in different
+> tables, for either mirroring, or the specified types of actions which
+> use post action infrastructure.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] net/ipv6: SKB symmetric hash should incorporate transport ports
-    https://git.kernel.org/netdev/net/c/a5e2151ff9d5
+  - [net,1/2] net/mlx5e: Clear mirred devices array if the rule is split
+    https://git.kernel.org/netdev/net/c/b7558a77529f
+  - [net,2/2] mlx5/core: E-Switch, Create ACL FT for eswitch manager in switchdev mode
+    https://git.kernel.org/netdev/net/c/344134609a56
 
 You are awesome, thank you!
 -- 
