@@ -1,163 +1,191 @@
-Return-Path: <netdev+bounces-32318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15EA9794190
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 18:37:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 274CE794194
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 18:39:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0CDF1C20A75
-	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 16:37:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A316281469
+	for <lists+netdev@lfdr.de>; Wed,  6 Sep 2023 16:39:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6B461079A;
-	Wed,  6 Sep 2023 16:37:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F2C4107B7;
+	Wed,  6 Sep 2023 16:39:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95FED46A2
-	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 16:37:08 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C923C1738;
-	Wed,  6 Sep 2023 09:37:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=kC/adOmPdO89VH7yR1A+ieJSp6e/4jhkrzrqxAYoq4Q=; b=ZY0B0RFpQ9y8GWbA9R1g80J8/y
-	hq2amJhTIfAWWLb6RhZOQ5JA0WTlW/XesbFOKLHVntcVrs0tNjeOdAEWFTx5/fmLKbMQsi8CwIgPr
-	K6R/e0qNrDNLyPh/E8TdRgvBikMlyhvgty0NVpQ/Rang/PEgjJM1/co4cnipew1rHxi80ZKnLM/vY
-	dZ7/fxDY02anS2XW9XTymJELpm7I+xMMWDCYvlbW/X16N9ZNctFKNuZ1zoYVpfuajY6J0FJgsYDAl
-	JOUb1EQYzNnpe49NJQRoVa2m+6rSuJ86VuqVp5mRnmmqxnv4kBCfO+ESkwxUJNkF3kcFMRI4JWnGr
-	tnuPALbw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54168)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qdvWL-0000pm-0k;
-	Wed, 06 Sep 2023 17:36:49 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qdvWJ-0004vb-TO; Wed, 06 Sep 2023 17:36:47 +0100
-Date: Wed, 6 Sep 2023 17:36:47 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com, devicetree@vger.kernel.org
-Subject: Re: [RFC net-next v2 2/2] net: dsa: microchip: Add drive strength
- configuration
-Message-ID: <ZPiqn94YbJXCqpT8@shell.armlinux.org.uk>
-References: <20230906105904.1477021-1-o.rempel@pengutronix.de>
- <20230906105904.1477021-3-o.rempel@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FBD31079A
+	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 16:39:22 +0000 (UTC)
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE74F10F9
+	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 09:39:20 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1c35ee3b0d2so7910535ad.2
+        for <netdev@vger.kernel.org>; Wed, 06 Sep 2023 09:39:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1694018360; x=1694623160; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:subject:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=PD8rvz2Pu9RKRgVPiGKcLS2/XE15AismgCd3JB4z9+U=;
+        b=lB14sG3ISn6seSAnrW/rJJ9E5hcBh4cQHl4f00ALnyzxOmt5EcAZjYnDbWpLfrSri9
+         YWyR2R6I/ygnvOBL++tao9GZkrZGL3BlfYG4cyrbSXDnvXyvIHzgMDh7fYoznX5ng6Il
+         JpvOaZY44leF86yRBPNdnWZ+6zs6aKZNhlahJIIf1SnGttdo1c1kgVfscH6ZUQxkL9Ht
+         5TFt9ZFVvA5lB8umtljgflAGt7Esk75Ups/oENRLR+M8X53Q36hjciLtg5ZlpeqLXDak
+         TivCtU2GBsNEYEf+x1lAWjUgagr9vZNUG3FWU/WzVYRdcfh2K/mAVxznIAsC6M08AJcp
+         n0wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1694018360; x=1694623160;
+        h=content-transfer-encoding:mime-version:message-id:subject:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PD8rvz2Pu9RKRgVPiGKcLS2/XE15AismgCd3JB4z9+U=;
+        b=UX14/NBUGf0bVgx89zhmQ/rjrS4XBtSJf+DRy7+hj3xT4py8bxOt8wGMkHx5CdirUC
+         MN9XA9dPdtELbqXSqkmBPDTWZhjvAyC11fJy8kXUQ9QXX+Dx9bGdobNCH8DytPQhKgV+
+         HQuCNWUHBJt1YiV3SLFpN6T/T87MXKqMNkimWZjEHtyo7cxsZ1Cftm2ULIRhlqifcAYG
+         c4svTx0NssMU9xx0qmynJMhTa9hcwf3zGXTfM+qcXj993UTH0Aso4AF93VL/TRH3r15g
+         HGWQhC9PvjO2GtZYHogdArrWl0n6zkShoB04KMx0L2P4tHRokzpyHh9KJRyc4Zdgl5pl
+         o6kQ==
+X-Gm-Message-State: AOJu0YyHEkNC89PsYOy1wvDEtk8hAW9HzkzCwHvFUXTelmWVovlSktNI
+	KnrP+9b9iqcRjQizqViZHcWVOKgrT/Xlomr7iYw=
+X-Google-Smtp-Source: AGHT+IGH7N21OE+BP/Pu19bmHfSbAYDZYrLJaYbut14KktqnaAjDFL2rRArjVWX3E9NQtuREkwoAPg==
+X-Received: by 2002:a17:903:2642:b0:1bc:4f04:17f9 with SMTP id je2-20020a170903264200b001bc4f0417f9mr12506129plb.9.1694018359876;
+        Wed, 06 Sep 2023 09:39:19 -0700 (PDT)
+Received: from hermes.local (204-195-112-131.wavecable.com. [204.195.112.131])
+        by smtp.gmail.com with ESMTPSA id jb17-20020a170903259100b001bb28b9a40dsm11292527plb.11.2023.09.06.09.39.19
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Sep 2023 09:39:19 -0700 (PDT)
+Date: Wed, 6 Sep 2023 09:39:18 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: netdev@vger.kernel.org
+Subject: [ANNNOUNCE] iproute2 6.5 release
+Message-ID: <20230906093918.394a1b1d@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230906105904.1477021-3-o.rempel@pengutronix.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Sep 06, 2023 at 12:59:04PM +0200, Oleksij Rempel wrote:
-> +static void ksz9477_drive_strength_error(struct ksz_device *dev, int milliamp)
-> +{
-> +	size_t array_size = ARRAY_SIZE(ksz9477_drive_strengths);
-> +	char supported_values[100];
-> +	int i;
-> +
-> +	for (i = 0; i < array_size; i++) {
-> +		if (i == 0)
-> +			snprintf(supported_values, sizeof(supported_values),
-> +				 "%d", ksz9477_drive_strengths[i].milliamp);
-> +		else
-> +			snprintf(supported_values, sizeof(supported_values),
-> +				 "%s, %d", supported_values,
-> +				 ksz9477_drive_strengths[i].milliamp);
+This is the release of iproute2 corresponding to the 6.5 kernel.
+Nothing major here, dcb received most of the changes.
 
-That's an interesting way to append... I note that snprintf(3) has a
-note about this, suggesting that (a) the standards make this undefined
-and (b) that depending on the gcc version used, this may not produce
-the expected results. Taking both together seems sufficient
-justification to stay away from attempting this method of appending
-a string.
+Download:
+    https://www.kernel.org/pub/linux/utils/net/iproute2/iproute2-6.5.0.tar.gz
 
-> +static int ksz9477_drive_strength_write(struct ksz_device *dev,
-> +					struct ksz_driver_strength_prop *props,
-> +					int num_props)
-> +{
-> +	int i, ret, reg;
-> +	u8 val;
-	u8 val, mask;
+Repository for current release
+    https://github.com/shemminger/iproute2.git
+    git://git.kernel.org/pub/scm/network/iproute2/iproute2.git
 
-> +
-> +	if (props[KSZ_DRIVER_STRENGTH_IO].value != -1)
-> +		dev_warn(dev->dev, "%s is not supported by this chip variant\n",
-> +			 props[KSZ_DRIVER_STRENGTH_IO].name);
-> +
-> +	if (dev->chip_id == KSZ8795_CHIP_ID ||
-> +	    dev->chip_id == KSZ8794_CHIP_ID ||
-> +	    dev->chip_id == KSZ8765_CHIP_ID)
-> +		reg = KSZ8795_REG_SW_CTRL_20;
-> +	else
-> +		reg = KSZ9477_REG_SW_IO_STRENGTH;
-> +
+And future release (net-next):
+    git://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git
 
-> +	ret = ksz_read8(dev, reg, &val);
-> +	if (ret)
-> +		return ret;
-> +
-Remote this.
+Contributions:
 
-	val = mask = 0;
+Andrea Claudi (2):
+      mptcp: add support for implicit flag
+      treewide: fix indentation
 
-> +	for (i = 0; i < num_props; i++) {
-> +		if (props[i].value == -1)
-> +			continue;
-> +
-> +		ret = ksz9477_drive_strength_to_reg(props[i].value);
-> +		if (ret < 0) {
-> +			ksz9477_drive_strength_error(dev, props[i].value);
-> +			return ret;
-> +		}
-> +
-> +		val &= ~(SW_DRIVE_STRENGTH_M << props[i].offset);
+Chander Govindarajan (2):
+      misc/ifstat: fix incorrect output data in json mode
+      misc/ifstat: fix incorrect output data in json mode
 
-		mask |= SW_DRIVE_STRENGTH_M << props[i].offset;
+Daniel Machon (12):
+      dcb: app: add new dcbnl attribute field
+      dcb: app: replace occurrences of %d with %u for printing unsigned int
+      dcb: app: move colon printing out of callbacks
+      dcb: app: rename dcb_app_print_key_*() functions
+      dcb: app: modify dcb_app_print_filtered() for dcb-rewr reuse
+      dcb: app: modify dcb_app_table_remove_replaced() for dcb-rewr reuse
+      dcb: app: expose functions required by dcb-rewr
+      dcb: rewr: add new dcb-rewr subcommand
+      dcb: rewr: add symbol for max DSCP value
+      man: dcb-rewr: add new manpage for dcb-rewr
+      man: dcb: add additional references under 'SEE ALSO'
+      man: dcb-app: clean up a few mistakes
 
-> +		val |= ret << props[i].offset;
+David Ahern (2):
+      Update kernel headers
+      Update kernel headers
 
-		val |= ret << props[i].offset;
+Edwin Peer (1):
+      iplink: filter stats using RTEXT_FILTER_SKIP_STATS
 
-> +	}
-> +
-> +	return ksz_write8(dev, reg, val);
+Gioele Barabucci (1):
+      Read configuration files from /etc and /usr
 
-	return ksz_rmw8(dev, reg, mask, val);
+Hangbin Liu (1):
+      iplink_bridge: fix incorrect root id dump
 
-maybe safer?
+Ido Schimmel (2):
+      f_flower: Add l2_miss support
+      f_flower: Treat port 0 as valid
 
+Jakub Kicinski (2):
+      ip: error out if iplink does not consume all options
+      ss: report when the RxNoPad optimization is set on TLS sockets
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Jiri Pirko (1):
+      devlink: spell out STATE in devlink port function help
+
+Kamal Heib (1):
+      rdma: Report device protocol
+
+Masatake YAMATO (2):
+      tc: fix a wrong file name in comment
+      man: (ss) fix wrong margin
+
+Matthieu Baerts (3):
+      ss: mptcp: display info counters as unsigned
+      ss: mptcp: display seq related counters as decimal
+      ss: mptcp: print missing info counters
+
+Maximilian Bosch (1):
+      ip-vrf: recommend using CAP_BPF rather than CAP_SYS_ADMIN
+
+Nicolas Escande (2):
+      bridge: link: allow filtering on bridge name
+      man: bridge: update bridge link show
+
+Paolo Lungaroni (1):
+      seg6: man: ip-link.8: add description of NEXT-C-SID flavor for SRv6 End.X behavior
+
+Phil Sutter (1):
+      ss: Fix socket type check in packet_show_line()
+
+Stephen Hemminger (10):
+      dcb: fully initialize flag table
+      fix fallthrough warnings
+      ss: fix warning about empty if()
+      ct: check for invalid proto
+      ifstat: fix warning about conditional
+      uapi: update headers to 6.5-rc1
+      include: dual license the bpf helper includes
+      Add missing SPDX headers
+      uapi: update headers
+      v6.5.0
+
+Trevor Gamblin (1):
+      bridge/mdb.c: include limits.h
+
+Vladimir Nikishkin (1):
+      ip-link: add support for nolocalbypass in vxlan
+
+Vladimir Oltean (4):
+      tc/taprio: print the offload xstats
+      tc/taprio: fix parsing of "fp" option when it doesn't appear last
+      tc/taprio: don't print netlink attributes which weren't reported by the kernel
+      tc/taprio: fix JSON output when TCA_TAPRIO_ATTR_ADMIN_SCHED is present
+
+Zahari Doychev (2):
+      f_flower: add cfm support
+      f_flower: simplify cfm dump function
+
 
