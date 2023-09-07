@@ -1,466 +1,196 @@
-Return-Path: <netdev+bounces-32488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BE8E797E7E
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 00:01:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6952B797ED6
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 00:53:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C6BB2817C6
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 22:01:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8142D1C20B5C
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 22:53:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFE2214287;
-	Thu,  7 Sep 2023 22:01:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3FFC14271;
+	Thu,  7 Sep 2023 22:53:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE6C863A3
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 22:01:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA4FDC433C8;
-	Thu,  7 Sep 2023 22:01:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694124064;
-	bh=k7mlEL3gaSbyri3qEsjgQyvY6i0fSzCbyaQ8oVx5bgE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=qZwObeqEQiCGyqZP0IriP8UuhFmj50ByHI2IFay/iEL8fvLQ1d5kn4A97T6AYzv37
-	 JpG+fDdXlGL5vjwxbi/UcjsSilo67AQR1PSItcSoiW207iOPllSlB65jPOeNHcAcj/
-	 hvNp5RpRpmXxnz0CNjFm2dCzIl8HscEw+N1bDghTkhm2bc7xtsPXvAJ4K4MZ/ElmZZ
-	 GJEWg7BeOt7XxXXyEFyU4tLc8JQlnDBMU+AWqhLHFzsvYqVpgQce1XJvkrcgvgCxxe
-	 j+DspGJ62eNOoFYb9hcJGFGDPkvhVoUZBg3e1+fnvPA7Mha9OrGz93IFea25fYRtG0
-	 aD+ITdNdNWw+g==
-From: Jakub Kicinski <kuba@kernel.org>
-To: torvalds@linux-foundation.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	pabeni@redhat.com
-Subject: [GIT PULL] Networking for v6.6-rc1
-Date: Thu,  7 Sep 2023 15:01:03 -0700
-Message-ID: <20230907220103.3900219-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E67E229A8
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 22:53:55 +0000 (UTC)
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4ED091BCD
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 15:53:54 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1bf5c314a57so11909965ad.1
+        for <netdev@vger.kernel.org>; Thu, 07 Sep 2023 15:53:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694127234; x=1694732034; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Tw/rCGtK366XeodUhFoL+9MhzcffDRTkb0f987EC2rk=;
+        b=H7Lm1N5Jq72wEyv0FCmZE5TmlOlZ9m2uBK5H7qST1dm44L1m6JFQQvCsx3FT8CdkTg
+         nZ3XwupT+08wiypfyG33PYW/AjrZz9066idal8aj/qmgwuMrZmxPs0Zg0YS6v1sX8OHq
+         xwiH2BTpoqhSmuQliSvuzpgRzcX/kgKFzbOAse3OKpXOO0nzGZJw6W3aTmKm/hW6x2C/
+         hlaANUNfnwaHvymWLNGr5LhbmEXDWdMTJXdtp4C3XwLgQwErdVP03QoDYkjxAMAX4ju5
+         bTTELw5hdFj4Gyf53i4DR0iemXtxNnJ2elwRsRkQOqbvmJTaXWvkws3QSrlMAPuBHsgg
+         O7/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694127234; x=1694732034;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Tw/rCGtK366XeodUhFoL+9MhzcffDRTkb0f987EC2rk=;
+        b=Ge5ii+Jx6Ut8gXnGIN0tWPgI2q96JulGg8WyzLd1ZEPcIfah6FGfrYFkZCU9Ihebde
+         Vy6Id+bYFCl4dtAL1/LI8Ihn0PvC1maShtlydxXuaoCXUQV1estVsytlOAWr+4IAUtvt
+         9TzINUPLxRXrOt3cdJXdZu/yOV7lbU5/zMm+5AvWxQ4BZgUfyyAnO2Ehhe3g7zkPDlTp
+         pJRAq6grOD/cIbtwoGSbZuFMc5QabtUcGmgu9EILZWu08SSXPB1YZnmK3iGpzsRlsIKK
+         KiLYtkINHSqy2bu2X78exEnX+JylfpMHKb2y/ZDbrNfqfQmpuguSYJGOG7s3QpAn50Uc
+         1G/g==
+X-Gm-Message-State: AOJu0YwvsEVV5qWRSGLzDe8vkVSvIYjTq5a9lQZLF4C3HVWSQy4ndios
+	9M3gwEYQ91SutZl7iQczF4M=
+X-Google-Smtp-Source: AGHT+IF8kYX75/ije8gHfr0McbME6t5bSBGTS1bvG1CxCF6OHZuW4cv111FXdOw/POpl5ZEJMXbUbg==
+X-Received: by 2002:a17:902:d505:b0:1bd:f71c:3af3 with SMTP id b5-20020a170902d50500b001bdf71c3af3mr992446plg.32.1694127233674;
+        Thu, 07 Sep 2023 15:53:53 -0700 (PDT)
+Received: from westworld (209-147-138-147.nat.asu.edu. [209.147.138.147])
+        by smtp.gmail.com with ESMTPSA id jj14-20020a170903048e00b001bdb8c0b578sm248770plb.192.2023.09.07.15.53.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Sep 2023 15:53:52 -0700 (PDT)
+Date: Thu, 7 Sep 2023 15:53:50 -0700
+From: Kyle Zeng <zengyhkyle@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>, dsahern@kernel.org
+Cc: davem@davemloft.net, netdev@vger.kernel.org, ssuryaextr@gmail.com
+Subject: Re: [PATCH] don't assume the existence of skb->dev when trying to
+ reset ip_options in ipv4_send_dest_unreach
+Message-ID: <ZPpUfm/HhFet3ejH@westworld>
+References: <ZPk41vtxHK/YnFUs@westworld>
+ <ecde5e34c6f3a8182f588b3c1352bf78b69ff206.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: multipart/mixed; boundary="TdKnvOL5LAdAXmmY"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ecde5e34c6f3a8182f588b3c1352bf78b69ff206.camel@redhat.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
+
+
+--TdKnvOL5LAdAXmmY
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 
-Hi Linus!
+On Thu, Sep 07, 2023 at 01:03:52PM +0200, Paolo Abeni wrote:
+> On Wed, 2023-09-06 at 19:43 -0700, Kyle Zeng wrote:
+> > Currently, we assume the skb is associated with a device before calling __ip_options_compile, which is not always the case if it is re-routed by ipvs.
+> > When skb->dev is NULL, dev_net(skb->dev) will become null-dereference.
+> > Since we know that all the options will be set to IPOPT_END, which does
+> > not depend on struct net, we pass NULL to it.
+> 
+> It's not clear to me why we can infer the above. Possibly would be more
+> safe to skip entirely the __ip_options_compile() call?!?
+> 
+> Please at least clarify the changelog and trim it to 72 chars. 
+> 
+> Additionally trim the subj to the same len and include the target tree
+> (net) into the subj prefix.
+> 
+> Thanks!
+> 
+> Paolo
+> 
+
+Hi Paolo,
+
+> It's not clear to me why we can infer the above. Possibly would be more
+> safe to skip entirely the __ip_options_compile() call?!?
+Sorry, after you pointed it out, I realized that I misunderstood the
+code. Initially I thought `memset(&opt, 0, sizeof(opt));` would reset all
+the option to OPOPT_END. But after carefully reading the code, it seems
+that it only resets the io_options struct and the `optptr` is still the
+original one. 
+
+Do you think it is better to do:
+`struct net = skb->dev ? dev_net(skb->dev) : NULL` ?
+
+> Please at least clarify the changelog and trim it to 72 chars. 
+> 
+> Additionally trim the subj to the same len and include the target tree
+> (net) into the subj prefix.
+Sorry for that. I'm new to the Linux kernel community and I wonder whether
+I should initiate a different patch or send another patch in this thread
+in this case.
+
+Hi David,
+
+> ipv4_send_dest_unreach is called from ipv4_link_failure which might have
+> an rtable (dst_entry) which has a device which is in a net namespace.
+> That is better than blindly ignoring the namepsace.
+Following your suggestion, I drafted another patch which is attached to
+this email. I verified that the crash does not happen anymore. Can you
+please advise whether it is a correct patch?
+
+Thanks,
+Kyle Zeng
+
+--TdKnvOL5LAdAXmmY
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-fix-null-deref-in-ipv4_link_failure.patch"
+
+From ddf42a72bd2aabc7b66529ddadd90df420a73610 Mon Sep 17 00:00:00 2001
+From: Kyle Zeng <zengyhkyle@gmail.com>
+Date: Thu, 7 Sep 2023 15:49:46 -0700
+Subject: [PATCH] fix null-deref in ipv4_link_failure
+
+Currently, we assume the skb is associated with a device before calling
+__ip_options_compile, which is not always the case if it is re-routed by
+ipvs.
+When skb->dev is NULL, dev_net(skb->dev) will become null-dereference.
+This patch adds a check for the edge case and switch to use the net_device
+from the rtable when skb->dev is NULL.
+
+Suggested-by: Paolo Abeni<pabeni@redhat.com>
+Suggested-by: David Ahern <dsahern@kernel.org>
+Signed-off-by: Kyle Zeng <zengyhkyle@gmail.com>
+Cc: Stephen Suryaputra <ssuryaextr@gmail.com>
+---
+ net/ipv4/route.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+index d8c99bdc617..735a491e1ff 100644
+--- a/net/ipv4/route.c
++++ b/net/ipv4/route.c
+@@ -1215,6 +1215,7 @@ static void ipv4_send_dest_unreach(struct sk_buff *skb)
+ {
+ 	struct ip_options opt;
+ 	int res;
++	struct net_device *dev;
+ 
+ 	/* Recompile ip options since IPCB may not be valid anymore.
+ 	 * Also check we have a reasonable ipv4 header.
+@@ -1230,7 +1231,8 @@ static void ipv4_send_dest_unreach(struct sk_buff *skb)
+ 		opt.optlen = ip_hdr(skb)->ihl * 4 - sizeof(struct iphdr);
+ 
+ 		rcu_read_lock();
+-		res = __ip_options_compile(dev_net(skb->dev), &opt, skb, NULL);
++		dev = skb->dev ? skb->dev : skb_rtable(skb)->dst.dev;
++		res = __ip_options_compile(dev_net(net), &opt, skb, NULL);
+ 		rcu_read_unlock();
+ 
+ 		if (res)
+-- 
+2.34.1
 
-The following changes since commit bd6c11bc43c496cddfc6cf603b5d45365606dbd5:
 
-  Merge tag 'net-next-6.6' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next (2023-08-29 11:33:01 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.6-rc1
-
-for you to fetch changes up to 1b36955cc048c8ff6ba448dbf4be0e52f59f2963:
-
-  net: enetc: distinguish error from valid pointers in enetc_fixup_clear_rss_rfs() (2023-09-07 11:19:42 -0700)
-
-----------------------------------------------------------------
-Including fixes from netfilter and bpf.
-
-Current release - regressions:
-
- - eth: stmmac: fix failure to probe without MAC interface specified
-
-Current release - new code bugs:
-
- - docs: netlink: fix missing classic_netlink doc reference
-
-Previous releases - regressions:
-
- - deal with integer overflows in kmalloc_reserve()
-
- - use sk_forward_alloc_get() in sk_get_meminfo()
-
- - bpf_sk_storage: fix the missing uncharge in sk_omem_alloc
-
- - fib: avoid warn splat in flow dissector after packet mangling
-
- - skb_segment: call zero copy functions before using skbuff frags
-
- - eth: sfc: check for zero length in EF10 RX prefix
-
-Previous releases - always broken:
-
- - af_unix: fix msg_controllen test in scm_pidfd_recv() for
-   MSG_CMSG_COMPAT
-
- - xsk: fix xsk_build_skb() dereferencing possible ERR_PTR()
-
- - netfilter:
-   - nft_exthdr: fix non-linear header modification
-   - xt_u32, xt_sctp: validate user space input
-   - nftables: exthdr: fix 4-byte stack OOB write
-   - nfnetlink_osf: avoid OOB read
-   - one more fix for the garbage collection work from last release
-
- - igmp: limit igmpv3_newpack() packet size to IP_MAX_MTU
-
- - bpf, sockmap: fix preempt_rt splat when using raw_spin_lock_t
-
- - handshake: fix null-deref in handshake_nl_done_doit()
-
- - ip: ignore dst hint for multipath routes to ensure packets
-   are hashed across the nexthops
-
- - phy: micrel:
-   - correct bit assignments for cable test errata
-   - disable EEE according to the KSZ9477 errata
-
-Misc:
-
- - docs/bpf: document compile-once-run-everywhere (CO-RE) relocations
-
- - Revert "net: macsec: preserve ingress frame ordering", it appears
-   to have been developed against an older kernel, problem doesn't
-   exist upstream
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-
-----------------------------------------------------------------
-Alex Henrie (1):
-      net: ipv6/addrconf: avoid integer underflow in ipv6_create_tempaddr
-
-BjÃ¶rn TÃ¶pel (1):
-      selftests/bpf: Include build flavors for install target
-
-Bodong Wang (1):
-      mlx5/core: E-Switch, Create ACL FT for eswitch manager in switchdev mode
-
-Corinna Vinschen (1):
-      igb: disable virtualization features on 82580
-
-Daniel Borkmann (1):
-      bpf: Annotate bpf_long_memcpy with data_race
-
-David S. Miller (5):
-      Merge branch 'net-data-race-annotations'
-      Merge branch 'dst-hint-multipath'
-      Merge branch 'af_unix-data-races'
-      Merge branch '1GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
-      Merge branch 'sja1105-fixes'
-
-David Vernet (3):
-      bpf, docs: Move linux-notes.rst to root bpf docs tree
-      bpf, docs: Add abi.rst document to standardization subdirectory
-      bpf, docs: s/eBPF/BPF in standards documents
-
-Donald Hunter (1):
-      doc/netlink: Fix missing classic_netlink doc reference
-
-Eduard Zingerman (2):
-      docs/bpf: Add description for CO-RE relocations
-      docs/bpf: Fix "file doesn't exist" warnings in {llvm_reloc,btf}.rst
-
-Edward Cree (1):
-      sfc: check for zero length in EF10 RX prefix
-
-Eric Dumazet (14):
-      net/sched: fq_pie: avoid stalls in fq_pie_timer()
-      sctp: annotate data-races around sk->sk_wmem_queued
-      ipv4: annotate data-races around fi->fib_dead
-      net: read sk->sk_family once in sk_mc_loop()
-      net/handshake: fix null-ptr-deref in handshake_nl_done_doit()
-      net: use sk_forward_alloc_get() in sk_get_meminfo()
-      net: annotate data-races around sk->sk_forward_alloc
-      mptcp: annotate data-races around msk->rmem_fwd_alloc
-      net: annotate data-races around sk->sk_tsflags
-      net: annotate data-races around sk->sk_bind_phc
-      net: deal with integer overflows in kmalloc_reserve()
-      gve: fix frag_list chaining
-      igmp: limit igmpv3_newpack() packet size to IP_MAX_MTU
-      ip_tunnels: use DEV_STATS_INC()
-
-Florian Westphal (2):
-      net: fib: avoid warn splat in flow dissector
-      netfilter: nftables: exthdr: fix 4-byte stack OOB write
-
-Geetha sowjanya (1):
-      octeontx2-af: Fix truncation of smq in CN10K NIX AQ enqueue mbox handler
-
-Hao Chen (2):
-      net: hns3: fix byte order conversion issue in hclge_dbg_fd_tcam_read()
-      net: hns3: fix debugfs concurrency issue between kfree buffer and read
-
-Heng Guo (1):
-      net: ipv4, ipv6: fix IPSTATS_MIB_OUTOCTETS increment duplicated
-
-Ilya Leoshkevich (1):
-      s390/bpf: Pass through tail call counter in trampolines
-
-Jakub Kicinski (7):
-      Merge tag 'nf-23-08-31' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
-      Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf
-      docs: netdev: document patchwork patch states
-      docs: netdev: update the netdev infra URLs
-      net: phylink: fix sphinx complaint about invalid literal
-      Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf
-      Revert "net: team: do not use dynamic lockdep key"
-
-Jian Shen (1):
-      net: hns3: fix tx timeout issue
-
-Jianbo Liu (1):
-      net/mlx5e: Clear mirred devices array if the rule is split
-
-Jie Wang (1):
-      net: hns3: remove GSO partial feature bit
-
-Jijie Shao (2):
-      net: hns3: Support query tx timeout threshold by debugfs
-      net: hns3: fix invalid mutex between tc qdisc and dcb ets command issue
-
-Jiri Olsa (1):
-      selftests/bpf: Fix d_path test
-
-John Fastabend (2):
-      bpf, sockmap: Fix preempt_rt splat when using raw_spin_lock_t
-      bpf, sockmap: Fix skb refcnt race after locking changes
-
-Kuniyuki Iwashima (5):
-      af_unix: Fix msg_controllen test in scm_pidfd_recv() for MSG_CMSG_COMPAT.
-      af_unix: Fix data-races around user->unix_inflight.
-      af_unix: Fix data-race around unix_tot_inflight.
-      af_unix: Fix data-races around sk->sk_shutdown.
-      af_unix: Fix data race around sk->sk_err.
-
-Kyle Zeng (1):
-      netfilter: ipset: add the missing IP_SET_HASH_WITH_NET0 macro for ip_set_hash_netportnet.c
-
-Liang Chen (1):
-      veth: Fixing transmit return status for dropped packets
-
-Lukasz Majewski (1):
-      net: phy: Provide Module 4 KSZ9477 errata (DS80000754C)
-
-Magnus Karlsson (1):
-      xsk: Fix xsk_diag use-after-free error during socket cleanup
-
-Martin KaFai Lau (3):
-      bpf: bpf_sk_storage: Fix invalid wait context lockdep report
-      bpf: bpf_sk_storage: Fix the missing uncharge in sk_omem_alloc
-      selftests/bpf: Check bpf_sk_storage has uncharged sk_omem_alloc
-
-Mohamed Khalfella (1):
-      skbuff: skb_segment, Call zero copy functions before using skbuff frags
-
-Oleksij Rempel (1):
-      net: phy: micrel: Correct bit assignments for phy_device flags
-
-Olga Zaborska (3):
-      igc: Change IGC_MIN to allow set rx/tx value between 64 and 80
-      igbvf: Change IGBVF_MIN to allow set rx/tx value between 64 and 80
-      igb: Change IGB_MIN to allow set rx/tx value between 64 and 80
-
-Oliver Neukum (1):
-      NFC: nxp: add NXP1002
-
-Pablo Neira Ayuso (2):
-      netfilter: nft_set_rbtree: skip sync GC for new elements in this transaction
-      netfilter: nf_tables: Unbreak audit log reset
-
-Paolo Abeni (2):
-      Merge branch 'there-are-some-bugfix-for-the-hns3-ethernet-driver'
-      Merge tag 'nf-23-09-06' of https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
-
-Phil Sutter (3):
-      netfilter: nf_tables: Audit log setelem reset
-      netfilter: nf_tables: Audit log rule reset
-      netfilter: nf_tables: uapi: Describe NFTA_RULE_CHAIN_ID
-
-Quan Tian (1):
-      net/ipv6: SKB symmetric hash should incorporate transport ports
-
-Russell King (Oracle) (1):
-      net: stmmac: failure to probe without MAC interface specified
-
-Sabrina Dubroca (1):
-      Revert "net: macsec: preserve ingress frame ordering"
-
-Sebastian Andrzej Siewior (2):
-      bpf: Invoke __bpf_prog_exit_sleepable_recur() on recursion in kern_sys_bpf().
-      bpf: Assign bpf_tramp_run_ctx::saved_run_ctx before recursion check.
-
-Shigeru Yoshida (1):
-      kcm: Destroy mutex in kcm_exit_net()
-
-Sriram Yagnaraman (3):
-      ipv4: ignore dst hint for multipath routes
-      ipv6: ignore dst hint for multipath routes
-      selftests: fib_tests: Add multipath list receive tests
-
-Taehee Yoo (1):
-      net: team: do not use dynamic lockdep key
-
-Tirthendu Sarkar (1):
-      xsk: Fix xsk_build_skb() error: 'skb' dereferencing possible ERR_PTR()
-
-Vishal Chourasia (1):
-      bpf, docs: Fix invalid escape sequence warnings in bpf_doc.py
-
-Vladimir Oltean (4):
-      net: dsa: sja1105: fix bandwidth discrepancy between tc-cbs software and offload
-      net: dsa: sja1105: fix -ENOSPC when replacing the same tc-cbs too many times
-      net: dsa: sja1105: complete tc-cbs offload support on SJA1110
-      net: enetc: distinguish error from valid pointers in enetc_fixup_clear_rss_rfs()
-
-Wander Lairson Costa (3):
-      netfilter: xt_sctp: validate the flag_info count
-      netfilter: xt_u32: validate user space input
-      netfilter: nfnetlink_osf: avoid OOB read
-
-Will Hawkins (1):
-      bpf, docs: Correct source of offset for program-local call
-
-Xiao Liang (1):
-      netfilter: nft_exthdr: Fix non-linear header modification
-
-Xu Kuohai (1):
-      selftests/bpf: Fix a CI failure caused by vsock write
-
-Yafang Shao (1):
-      bpftool: Fix build warnings with -Wtype-limits
-
-Yisen Zhuang (1):
-      net: hns3: fix the port information display when sfp is absent
-
-Yonghong Song (2):
-      bpf: Prevent inlining of bpf_fentry_test7()
-      selftests/bpf: Fix flaky cgroup_iter_sleepable subtest
-
-valis (1):
-      net: sched: sch_qfq: Fix UAF in qfq_dequeue()
-
- Documentation/bpf/btf.rst                          |  31 ++-
- Documentation/bpf/index.rst                        |   1 +
- .../bpf/{standardization => }/linux-notes.rst      |   0
- Documentation/bpf/llvm_reloc.rst                   | 304 +++++++++++++++++++++
- Documentation/bpf/standardization/abi.rst          |  25 ++
- Documentation/bpf/standardization/index.rst        |   2 +-
- .../bpf/standardization/instruction-set.rst        |  44 +--
- Documentation/process/maintainer-netdev.rst        |  36 ++-
- Documentation/userspace-api/netlink/intro.rst      |   2 +
- arch/s390/net/bpf_jit_comp.c                       |  10 +
- drivers/net/dsa/microchip/ksz_common.c             |  16 +-
- drivers/net/dsa/sja1105/sja1105.h                  |   2 +
- drivers/net/dsa/sja1105/sja1105_main.c             |  51 +++-
- drivers/net/dsa/sja1105/sja1105_spi.c              |   4 +
- drivers/net/ethernet/freescale/enetc/enetc_pf.c    |   2 +-
- drivers/net/ethernet/google/gve/gve_rx_dqo.c       |   5 +-
- drivers/net/ethernet/hisilicon/hns3/hnae3.h        |   1 +
- drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c |  11 +-
- drivers/net/ethernet/hisilicon/hns3/hns3_enet.c    |  19 +-
- drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c |   4 +-
- .../net/ethernet/hisilicon/hns3/hns3pf/hclge_dcb.c |  20 +-
- .../ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c |  14 +-
- .../ethernet/hisilicon/hns3/hns3pf/hclge_main.c    |   5 +-
- .../ethernet/hisilicon/hns3/hns3pf/hclge_main.h    |   2 -
- drivers/net/ethernet/intel/igb/igb.h               |   4 +-
- drivers/net/ethernet/intel/igb/igb_main.c          |   5 +-
- drivers/net/ethernet/intel/igbvf/igbvf.h           |   4 +-
- drivers/net/ethernet/intel/igc/igc.h               |   4 +-
- .../net/ethernet/marvell/octeontx2/af/rvu_nix.c    |  21 +-
- .../net/ethernet/mellanox/mlx5/core/en/tc/act/ct.c |   4 +-
- .../ethernet/mellanox/mlx5/core/en/tc/act/mirred.c |   1 +
- .../ethernet/mellanox/mlx5/core/en/tc/act/pedit.c  |   4 +-
- .../mlx5/core/en/tc/act/redirect_ingress.c         |   1 +
- .../ethernet/mellanox/mlx5/core/en/tc/act/vlan.c   |   1 +
- .../mellanox/mlx5/core/en/tc/act/vlan_mangle.c     |   4 +-
- drivers/net/ethernet/mellanox/mlx5/core/en_tc.c    |   1 +
- drivers/net/ethernet/mellanox/mlx5/core/eswitch.c  |  21 +-
- .../ethernet/mellanox/mlx5/core/eswitch_offloads.c |  49 +++-
- drivers/net/ethernet/sfc/rx.c                      |  20 +-
- .../net/ethernet/stmicro/stmmac/stmmac_platform.c  |   5 +-
- drivers/net/macsec.c                               |   3 +-
- drivers/net/phy/micrel.c                           |   9 +-
- drivers/net/veth.c                                 |   4 +-
- drivers/nfc/nxp-nci/i2c.c                          |   1 +
- include/linux/audit.h                              |   2 +
- include/linux/bpf.h                                |   2 +-
- include/linux/ipv6.h                               |   1 +
- include/linux/micrel_phy.h                         |   7 +-
- include/linux/phylink.h                            |   4 +-
- include/net/ip.h                                   |   3 +-
- include/net/ip6_fib.h                              |   5 +-
- include/net/ip_fib.h                               |   5 +-
- include/net/ip_tunnels.h                           |  15 +-
- include/net/scm.h                                  |  14 +-
- include/net/sock.h                                 |  29 +-
- include/uapi/linux/netfilter/nf_tables.h           |   1 +
- kernel/auditsc.c                                   |   2 +
- kernel/bpf/bpf_local_storage.c                     |  49 +---
- kernel/bpf/syscall.c                               |   2 +-
- kernel/bpf/trampoline.c                            |   5 +-
- net/bpf/test_run.c                                 |   1 +
- net/can/j1939/socket.c                             |  10 +-
- net/core/flow_dissector.c                          |   3 +-
- net/core/skbuff.c                                  |  54 ++--
- net/core/skmsg.c                                   |  12 +-
- net/core/sock.c                                    |  27 +-
- net/core/sock_map.c                                |  36 +--
- net/handshake/netlink.c                            |  18 +-
- net/ipv4/fib_semantics.c                           |   5 +-
- net/ipv4/fib_trie.c                                |   3 +-
- net/ipv4/igmp.c                                    |   3 +-
- net/ipv4/ip_forward.c                              |   1 -
- net/ipv4/ip_input.c                                |   3 +-
- net/ipv4/ip_output.c                               |   9 +-
- net/ipv4/ip_sockglue.c                             |   2 +-
- net/ipv4/ipmr.c                                    |   1 -
- net/ipv4/route.c                                   |   1 +
- net/ipv4/tcp.c                                     |   4 +-
- net/ipv4/tcp_output.c                              |   2 +-
- net/ipv4/udp.c                                     |   6 +-
- net/ipv6/addrconf.c                                |   2 +-
- net/ipv6/ip6_input.c                               |   3 +-
- net/ipv6/ip6_output.c                              |   3 +-
- net/ipv6/ip6mr.c                                   |   2 -
- net/ipv6/ping.c                                    |   2 +-
- net/ipv6/raw.c                                     |   2 +-
- net/ipv6/route.c                                   |   3 +
- net/ipv6/udp.c                                     |   2 +-
- net/kcm/kcmsock.c                                  |   2 +
- net/mptcp/protocol.c                               |  23 +-
- net/netfilter/ipset/ip_set_hash_netportnet.c       |   1 +
- net/netfilter/nf_tables_api.c                      |  54 +++-
- net/netfilter/nfnetlink_osf.c                      |   8 +
- net/netfilter/nft_exthdr.c                         |  42 +--
- net/netfilter/nft_set_rbtree.c                     |   8 +-
- net/netfilter/xt_sctp.c                            |   2 +
- net/netfilter/xt_u32.c                             |  21 ++
- net/sched/sch_fq_pie.c                             |  27 +-
- net/sched/sch_plug.c                               |   2 +-
- net/sched/sch_qfq.c                                |  22 +-
- net/sctp/proc.c                                    |   2 +-
- net/sctp/socket.c                                  |  10 +-
- net/socket.c                                       |  15 +-
- net/unix/af_unix.c                                 |   2 +-
- net/unix/scm.c                                     |   6 +-
- net/xdp/xsk.c                                      |  22 +-
- net/xdp/xsk_diag.c                                 |   3 +
- scripts/bpf_doc.py                                 |  56 ++--
- tools/bpf/bpftool/link.c                           |   2 +-
- tools/testing/selftests/bpf/Makefile               |  12 +
- .../selftests/bpf/prog_tests/bpf_obj_pinning.c     |   5 +-
- tools/testing/selftests/bpf/prog_tests/d_path.c    |  19 +-
- .../bpf/prog_tests/sk_storage_omem_uncharge.c      |  56 ++++
- .../selftests/bpf/prog_tests/sockmap_helpers.h     |  26 ++
- .../selftests/bpf/prog_tests/sockmap_listen.c      |   7 +
- .../testing/selftests/bpf/progs/bpf_tracing_net.h  |   1 +
- .../selftests/bpf/progs/sk_storage_omem_uncharge.c |  61 +++++
- tools/testing/selftests/net/fib_tests.sh           | 155 ++++++++++-
- 118 files changed, 1405 insertions(+), 410 deletions(-)
- rename Documentation/bpf/{standardization => }/linux-notes.rst (100%)
- create mode 100644 Documentation/bpf/standardization/abi.rst
- create mode 100644 tools/testing/selftests/bpf/prog_tests/sk_storage_omem_uncharge.c
- create mode 100644 tools/testing/selftests/bpf/progs/sk_storage_omem_uncharge.c
+--TdKnvOL5LAdAXmmY--
 
