@@ -1,100 +1,118 @@
-Return-Path: <netdev+bounces-32483-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15E7F797CE1
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 21:40:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DBFA797B25
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 20:05:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 159101C20B24
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 19:40:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B99B928155F
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 18:05:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D453114017;
-	Thu,  7 Sep 2023 19:40:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8C1413FE3;
+	Thu,  7 Sep 2023 18:05:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C806A125DB
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 19:40:15 +0000 (UTC)
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 255441BD0
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 12:40:14 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 93CC720860;
-	Thu,  7 Sep 2023 12:03:46 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id uJcI929LY2R3; Thu,  7 Sep 2023 12:03:45 +0200 (CEST)
-Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id EBDB42085A;
-	Thu,  7 Sep 2023 12:03:45 +0200 (CEST)
-Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
-	by mailout1.secunet.com (Postfix) with ESMTP id E57D180004A;
-	Thu,  7 Sep 2023 12:03:45 +0200 (CEST)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Thu, 7 Sep 2023 12:03:45 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.32; Thu, 7 Sep
- 2023 12:03:45 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 33BD23182CBA; Thu,  7 Sep 2023 12:03:45 +0200 (CEST)
-Date: Thu, 7 Sep 2023 12:03:45 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Eric Dumazet <edumazet@google.com>
-CC: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<eric.dumazet@gmail.com>, syzbot <syzkaller@googlegroups.com>
-Subject: Re: [PATCH net] xfrm: interface: use DEV_STATS_INC()
-Message-ID: <ZPmgATtllOhTe2IU@gauss3.secunet.de>
-References: <20230905132303.1927206-1-edumazet@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 896B713AC3
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 18:05:18 +0000 (UTC)
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81A791710;
+	Thu,  7 Sep 2023 11:04:55 -0700 (PDT)
+Date: Thu, 7 Sep 2023 12:15:27 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1694081728;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Cq8rae8UZhseve8ECsfKS9IcW0y6Ca5VZnDm6gs+Jes=;
+	b=MdkPSIZ/ynC2raAdMlJZvDo2L3P/3lIogpcaDXFrLH9+JudFvEqpMKSdQQNkfHsUposgoZ
+	5mgUStkvFDTFQNRBbBdZf/gVnHVza23KbQtvVuNdg6adnK6afucoW2iAva9UM1D6BrUXLe
+	06PyA+kdFWPCXBEacA7RvklmkkYr2F5sFrJLtocpwTyqMDARS0m3P7ldhsJcf7S2sNiR0L
+	SHREku/NK+p6Cb2+Chl5DM70I1wHAJ2ErkbU94thVcOgkfC0n3My34oEWqocLqRRAbz4sh
+	+7X/dvC2SM/nN8t9R6mIBP5uLk9QA2mR68GUoneVQ4vPdaSAZAcujY6C7RxpuQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1694081728;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Cq8rae8UZhseve8ECsfKS9IcW0y6Ca5VZnDm6gs+Jes=;
+	b=OvnOiF36jjpXi1C6cMeCm/YLONfshth+JYHRtDt94iVOW2dW6MJz21RlxSjf38BkHlqMqE
+	tnbJZ/2en32SHZBw==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+	Geethasowjanya Akula <gakula@marvell.com>,
+	Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
+	Hariprasad Kelam <hkelam@marvell.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"hawk@kernel.org" <hawk@kernel.org>,
+	"alexander.duyck@gmail.com" <alexander.duyck@gmail.com>,
+	"ilias.apalodimas@linaro.org" <ilias.apalodimas@linaro.org>,
+	"linyunsheng@huawei.com" <linyunsheng@huawei.com>
+Subject: Re: RE: [EXT] Re: [PATCH net v2] octeontx2-pf: Fix page pool cache
+ index corruption.
+Message-ID: <20230907101527.45YwOJcG@linutronix.de>
+References: <20230907014711.3869840-1-rkannoth@marvell.com>
+ <20230907070955.0kdmjXbB@linutronix.de>
+ <MWHPR1801MB19187A03AF45B0E23B534B6BD3EEA@MWHPR1801MB1918.namprd18.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230905132303.1927206-1-edumazet@google.com>
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <MWHPR1801MB19187A03AF45B0E23B534B6BD3EEA@MWHPR1801MB1918.namprd18.prod.outlook.com>
+X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DATE_IN_PAST_06_12,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Sep 05, 2023 at 01:23:03PM +0000, Eric Dumazet wrote:
-> syzbot/KCSAN reported data-races in xfrm whenever dev->stats fields
-> are updated.
-> 
-> It appears all of these updates can happen from multiple cpus.
-> 
-> Adopt SMP safe DEV_STATS_INC() to update dev->stats fields.
-> 
-> BUG: KCSAN: data-race in xfrmi_xmit / xfrmi_xmit
-> 
+On 2023-09-07 08:15:58 [+0000], Ratheesh Kannoth wrote:
+> > From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> > Subject: [EXT] Re: [PATCH net v2] octeontx2-pf: Fix page pool cache ind=
+ex
+> > corruption.
+> > >  	cq->refill_task_sched =3D false;
+> > > +
+> > > +	local_bh_disable();
+> > > +	napi_schedule(wrk->napi);
+> > > +	local_bh_enable();
+> >=20
+> > This is a nitpick since I haven't look how it works exactly: Is it poss=
+ible that the
+> > wrk->napi pointer gets overwritten by
+> > otx2_napi_handler() since you cleared cq->refill_task_sched() earlier?
+> I don=E2=80=99t see any issue here.  As NAPI and workqueue execution is s=
+erialized (as interrupt is disabled when=20
+> Workqueue is scheduled).  I don=E2=80=99t think we can move "refill_task_=
+sched =3D false" after local_bh_enable().=20
+> But we can move refill_task_sched =3D false as below . but I don=E2=80=99=
+t see a need.=20
 
-...
+Right, there might be no issue I was just asking. I don't know how the
+cq <-> NAPI mapping is working. If you say that there is no race/issue,
+okay ;)
 
-> 
-> Reported by Kernel Concurrency Sanitizer on:
-> CPU: 0 PID: 23987 Comm: syz-executor.5 Not tainted 6.5.0-syzkaller-10885-g0468be89b3fa #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
-> 
-> Fixes: f203b76d7809 ("xfrm: Add virtual xfrm interfaces")
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Steffen Klassert <steffen.klassert@secunet.com>
+>  +
+>  +	local_bh_disable();
+>  +	napi_schedule(wrk->napi);
+>   +	cq->refill_task_sched =3D false;
+>  +	local_bh_enable();
 
-Applied to the ipsec tree, thanks Eric!
+Sebastian
 
