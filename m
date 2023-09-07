@@ -1,128 +1,116 @@
-Return-Path: <netdev+bounces-32473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32466-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACBD9797BF2
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 20:33:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FB81797B50
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 20:12:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E51C1C20C03
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 18:33:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB4571C20B8B
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 18:12:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47E6C12B85;
-	Thu,  7 Sep 2023 18:33:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4C7613FEF;
+	Thu,  7 Sep 2023 18:12:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C1681400D
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 18:33:25 +0000 (UTC)
-X-Greylist: delayed 1536 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 07 Sep 2023 11:33:03 PDT
-Received: from rtits2.realtek.com.tw (211-75-126-66.hinet-ip.hinet.net [211.75.126.66])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 56D5F1BE6;
-	Thu,  7 Sep 2023 11:33:02 -0700 (PDT)
-X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 3877GN1m8002884, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 3877GN1m8002884
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 7 Sep 2023 15:16:23 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B917413FEE
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 18:12:15 +0000 (UTC)
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 186FD10FB;
+	Thu,  7 Sep 2023 11:12:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1694110322; x=1725646322;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=IA9Szt83UA+m0xuMf7Hdrsj2dhOmdjzYfCrJsm9w51E=;
+  b=fVu7wj3f1hnA1dOUbR4bw4dm9BnFUzOMmiiefk20U3vP/uxRD9WZZVCb
+   Ozmmx14rCdsYex85todn+nfwHK4PGKU3oBdqZDj1YtYT4TE4n8eS7XwlQ
+   y8XJg1tHhnlJGdeOCgtc6Md8GgoSKkNboP9jFS2OlwBQjlQpUcb/J7qPT
+   IaLAYavVfl8g4IryeVwlCYA5+Pee72CBQnSJCHiLrh3/LOpjHrztD/uKd
+   Z9GHCfBXXq+/90V6MEIpGEW6V9SrbnYlf7YIssdBu1se8tUblJILbipiu
+   OdlZcxN04vC0Px78LTtKw+zJnLt56NuNVK36UyfBhrjXYMqxk4CmeTmbh
+   Q==;
+X-CSE-ConnectionGUID: NjtuykKFSRKJP7/JrDLGDA==
+X-CSE-MsgGUID: cLUS/A1sTIyYCRatn2B8EQ==
+X-ThreatScanner-Verdict: Negative
+X-IronPort-AV: E=Sophos;i="6.02,234,1688454000"; 
+   d="scan'208";a="233886851"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 07 Sep 2023 02:57:26 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.17; Thu, 7 Sep 2023 15:16:51 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.7; Thu, 7 Sep 2023 15:16:50 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::7445:d92b:d0b3:f79c]) by
- RTEXMBS04.realtek.com.tw ([fe80::7445:d92b:d0b3:f79c%5]) with mapi id
- 15.01.2375.007; Thu, 7 Sep 2023 15:16:50 +0800
-From: Hayes Wang <hayeswang@realtek.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "davem@davemloft.net" <davem@davemloft.net>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        nic_swsd <nic_swsd@realtek.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>
-Subject: RE: [PATCH net v2] r8152: avoid the driver drops a lot of packets
-Thread-Topic: [PATCH net v2] r8152: avoid the driver drops a lot of packets
-Thread-Index: AQHZ4G/uLCHLeDMawES5jAj/REiJSrAN/YuAgADpM2A=
-Date: Thu, 7 Sep 2023 07:16:50 +0000
-Message-ID: <7f8b32a91f5849c99609f78520b23535@realtek.com>
-References: <20230906031148.16774-421-nic_swsd@realtek.com>
- <20230906172847.2b3b749a@kernel.org>
-In-Reply-To: <20230906172847.2b3b749a@kernel.org>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-originating-ip: [172.22.228.6]
-x-kse-serverinfo: RTEXMBS04.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ 15.1.2507.21; Thu, 7 Sep 2023 02:56:56 -0700
+Received: from che-dk-unglab44lx.microchip.com (10.10.85.11) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
+ 15.1.2507.21 via Frontend Transport; Thu, 7 Sep 2023 02:56:53 -0700
+From: Pavithra Sathyanarayanan <Pavithra.Sathyanarayanan@microchip.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <bryan.whitehead@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+Subject: [RFC net-next v1] net: microchip: lan743x: add fixed phy unregister support
+Date: Thu, 7 Sep 2023 15:26:26 +0530
+Message-ID: <20230907095626.2216929-1-Pavithra.Sathyanarayanan@microchip.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-Spam-Status: No, score=-0.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RDNS_DYNAMIC,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Jakub Kicinski <kuba@kernel.org>
-> Sent: Thursday, September 7, 2023 8:29 AM
-[...]
-> Good to see that you can repro the problem.
+When operating in fixed phy mode and if there is repeated open/close
+phy test cases, everytime the fixed phy is registered as a new phy
+which leads to overrun after 32 iterations. It is solved by adding
+fixed_phy_unregister() in the phy_close path.
 
-I don't reproduce the problem. I just find some information about it.
+In phy_close path, netdev->phydev cannot be used directly in
+fixed_phy_unregister() due to two reasons,
+    - netdev->phydev is set to NULL in phy_disconnect()
+    - fixed_phy_unregister() can be called only after phy_disconnect()
+So saving the netdev->phydev in local variable 'phydev' and
+passing it to phy_disconnect().
 
-> Before we tweak the heuristics let's make sure rx_bottom() behaves
-> correctly. Could you make sure that
->  - we don't perform _any_ rx processing when budget is 0
->    (see the NAPI documentation under Documentation/networking)
+Signed-off-by: Pavithra Sathyanarayanan <Pavithra.Sathyanarayanan@microchip.com>
+---
+ drivers/net/ethernet/microchip/lan743x_main.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-The work_done would be 0, and napi_complete_done() wouldn't be called.
-However, skb_queue_len(&tp->rx_queue) may be increased. I think it is
-not acceptable, right?
-
->  - finish the current aggregate even if budget run out, return
->    work_done =3D budget in that case.
->    With this change the rx_queue thing should be gone completely.
-
-Excuse me. I don't understand this part. I know that when the packets are
-more than budget, the maximum packets which could be handled is budget.
-That is, return work_done =3D budget. However, the extra packets would be q=
-ueued
-to rx_queue. I don't understand what you mean about " the rx_queue thing
-should be gone completely". I think the current driver would return
-work_done =3D budget, and queue the other packets. I don't sure what you
-want me to change.
-
->  - instead of copying the head use napi_get_frags() + napi_gro_frags()
->    it gives you an skb, you just attach the page to it as a frag and
->    hand it back to GRO. This makes sure you never pull data into head
->    rather than just headers.
-
-I would study about them. Thanks.
-
-Should I include above changes for this patch?
-I think I have to submit another patches for above.
-
-> Please share the performance results with those changes.
-
-I couldn't reproduce the problem, so I couldn't provide the result
-with the differences.
-
-
-Best Regards,
-Hayes
+diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
+index c81cdeb4d4e7..f940895b14e8 100644
+--- a/drivers/net/ethernet/microchip/lan743x_main.c
++++ b/drivers/net/ethernet/microchip/lan743x_main.c
+@@ -1466,9 +1466,15 @@ static void lan743x_phy_link_status_change(struct net_device *netdev)
+ static void lan743x_phy_close(struct lan743x_adapter *adapter)
+ {
+ 	struct net_device *netdev = adapter->netdev;
++	struct phy_device *phydev = netdev->phydev;
+ 
+ 	phy_stop(netdev->phydev);
+ 	phy_disconnect(netdev->phydev);
++
++	/* using phydev here as phy_disconnect NULLs netdev->phydev */
++	if (phy_is_pseudo_fixed_link(phydev))
++		fixed_phy_unregister(phydev);
++
+ }
+ 
+ static void lan743x_phy_interface_select(struct lan743x_adapter *adapter)
+-- 
+2.25.1
 
 
