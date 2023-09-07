@@ -1,50 +1,54 @@
-Return-Path: <netdev+bounces-32461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A15A797B07
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 20:00:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 68CAC797B9F
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 20:22:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A8A8F1C20B45
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 18:00:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70C011C20B55
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 18:22:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F40D13AFF;
-	Thu,  7 Sep 2023 18:00:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C8AB14003;
+	Thu,  7 Sep 2023 18:22:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9871134B2
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 18:00:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB26AC433C8;
-	Thu,  7 Sep 2023 18:00:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694109616;
-	bh=vMxdVhu77OgE3zvcI/BpW7/MVDaKTSjHlSue+4KdRds=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bWWN+Tg4o1j47GXln1jE+mtTX3doYxOvjIj1qUvwqS9f3nd4Zqjjq9oqh/y6EAP8l
-	 znM0bSJ7kgr67TP1bRNUqJvixYUNe80xZhM+MYfNrBYvXDXfM2BsHfyXqTXhAtK4t1
-	 cLvljLo3hYVLCsdyFjSyRkZ86WZcbcz00nBrdsEe4CIciVCX+lWRIREH1yi88jbno1
-	 mETYwmaQImjDTABZr0xgS+gR36Vw9MSGF4oVgZdW8uJrflRmKHRW56PQVGUcUSxNap
-	 qyHiR/K1apMGxKCDlwF5tU2B5/PrTPYNmcAr2MR8jvz+IlD1i8RcczEikO/rEy11/7
-	 ptJtFYPRjDvQA==
-Date: Thu, 7 Sep 2023 11:00:15 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, Soheil
- Hassas Yeganeh <soheil@google.com>, Neal Cardwell <ncardwell@google.com>,
- Yuchung Cheng <ycheng@google.com>
-Subject: Re: [RFC net-next 4/4] tcp: defer regular ACK while processing
- socket backlog
-Message-ID: <20230907110015.75fdcc5c@kernel.org>
-In-Reply-To: <CANn89iJY8UypOGqSOJo531ny4isPSiTg2xW-rO_xNmnYVVovQw@mail.gmail.com>
-References: <20230906201046.463236-1-edumazet@google.com>
-	<20230906201046.463236-5-edumazet@google.com>
-	<20230907100932.58daf8e5@kernel.org>
-	<CANn89iJY8UypOGqSOJo531ny4isPSiTg2xW-rO_xNmnYVVovQw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E22D134DD
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 18:22:15 +0000 (UTC)
+Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 777B9B9
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 11:22:08 -0700 (PDT)
+Received: from mg.bb.i.ssi.bg (localhost [127.0.0.1])
+	by mg.bb.i.ssi.bg (Proxmox) with ESMTP id 634241CE0E;
+	Thu,  7 Sep 2023 08:57:05 +0300 (EEST)
+Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
+	by mg.bb.i.ssi.bg (Proxmox) with ESMTPS id 493AC1CE0D;
+	Thu,  7 Sep 2023 08:57:05 +0300 (EEST)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by ink.ssi.bg (Postfix) with ESMTPSA id 256643C0439;
+	Thu,  7 Sep 2023 08:57:02 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
+	t=1694066223; bh=Nr7L0X1CSqRwD5JbJ86atDo045oNSIx4pVamgZyf6ms=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References;
+	b=cI9JbXJCBw+dR69f6fJXvkPYnQMhHomz26vqUaPvKp/u6X3+dnz7qP2y2owCoXwe6
+	 ohKMo+VrisIYKsDSW2hF3bKydcnVJ09Wq1cRdAuUpru63+Ar/x0n82R6wvABuR6Pw6
+	 jqoKJJVuZe4noqvGmooc+hGP9+NfsMKGCRi9CDiM=
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.17.1/8.17.1) with ESMTP id 3875urGA005192;
+	Thu, 7 Sep 2023 08:56:54 +0300
+Date: Thu, 7 Sep 2023 08:56:53 +0300 (EEST)
+From: Julian Anastasov <ja@ssi.bg>
+To: Liu Jian <liujian56@huawei.com>
+cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, hadi@cyberus.ca,
+        netdev@vger.kernel.org
+Subject: Re: [PATCH net v2] net: ipv4: fix one memleak in __inet_del_ifa()
+In-Reply-To: <20230907025709.3409515-1-liujian56@huawei.com>
+Message-ID: <a52a9eed-decf-d180-5c7a-8da41b82cf23@ssi.bg>
+References: <20230907025709.3409515-1-liujian56@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,30 +56,100 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, 7 Sep 2023 19:16:01 +0200 Eric Dumazet wrote:
-> > Is it okay if I asked why quickack?
-> > Is it related to delay-based CC?  
-> 
-> Note the patch is also helping the 'regular' mode, without "quickack 1" .
-> 
-> This is CC related in any way, but some TCP tx zerocopy workload, sending
-> one chunk at a time, waiting for the TCP tx zerocopy completion in
-> order to proceed for the next chunk,
-> because the 'next chunk'  is re-using the memory.
-> 
-> The receiver application is not sending back a message (otherwise the
-> 'delayed ack' would be piggybacked in the reply),
-> and it also does not know what size of the message was expected (so no
-> SO_RCVLOWAT or anything could be attempted)
-> 
-> For this kind of workload, it is crucial the last ACK is not delayed, at all.
 
-Interesting. Some folks at Meta were recently looking into parsing RPCs
-in the kernel to avoid unnecessary wakeups. Poor man's KCM using BPF
-sockmaps. Passing message size hints from the sender would solve so
-many problems..
+	Hello,
 
-In any case, I don't mean to question the patch :)
+On Thu, 7 Sep 2023, Liu Jian wrote:
+
+> I got the below warning when do fuzzing test:
+> unregister_netdevice: waiting for bond0 to become free. Usage count = 2
+> 
+> It can be repoduced via:
+> 
+> ip link add bond0 type bond
+> sysctl -w net.ipv4.conf.bond0.promote_secondaries=1
+> ip addr add 4.117.174.103/0 scope 0x40 dev bond0
+> ip addr add 192.168.100.111/255.255.255.254 scope 0 dev bond0
+> ip addr add 0.0.0.4/0 scope 0x40 secondary dev bond0
+> ip addr del 4.117.174.103/0 scope 0x40 dev bond0
+> ip link delete bond0 type bond
+> 
+> In this reproduction test case, an incorrect 'last_prim' is found in
+> __inet_del_ifa(), as a result, the secondary address(0.0.0.4/0 scope 0x40)
+> is lost. The memory of the secondary address is leaked and the reference of
+> in_device and net_device is leaked.
+> 
+> Fix this problem:
+> Look for 'last_prim' starting at location of the deleted IP and inserting
+> the promoted IP into the location of 'last_prim'.
+> 
+> Fixes: 0ff60a45678e ("[IPV4]: Fix secondary IP addresses after promotion")
+> Signed-off-by: Liu Jian <liujian56@huawei.com>
+
+	Looks good to me, thanks!
+
+Signed-off-by: Julian Anastasov <ja@ssi.bg>
+
+> ---
+> v1->v2: Change the implementation to Julian's.
+> 	The commit message is modified.
+>  net/ipv4/devinet.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
+> index 9cf64ee47dd2..ca0ff15dc8fa 100644
+> --- a/net/ipv4/devinet.c
+> +++ b/net/ipv4/devinet.c
+> @@ -355,14 +355,14 @@ static void __inet_del_ifa(struct in_device *in_dev,
+>  {
+>  	struct in_ifaddr *promote = NULL;
+>  	struct in_ifaddr *ifa, *ifa1;
+> -	struct in_ifaddr *last_prim;
+> +	struct in_ifaddr __rcu **last_prim;
+>  	struct in_ifaddr *prev_prom = NULL;
+>  	int do_promote = IN_DEV_PROMOTE_SECONDARIES(in_dev);
+>  
+>  	ASSERT_RTNL();
+>  
+>  	ifa1 = rtnl_dereference(*ifap);
+> -	last_prim = rtnl_dereference(in_dev->ifa_list);
+> +	last_prim = ifap;
+>  	if (in_dev->dead)
+>  		goto no_promotions;
+>  
+> @@ -376,7 +376,7 @@ static void __inet_del_ifa(struct in_device *in_dev,
+>  		while ((ifa = rtnl_dereference(*ifap1)) != NULL) {
+>  			if (!(ifa->ifa_flags & IFA_F_SECONDARY) &&
+>  			    ifa1->ifa_scope <= ifa->ifa_scope)
+> -				last_prim = ifa;
+> +				last_prim = &ifa->ifa_next;
+>  
+>  			if (!(ifa->ifa_flags & IFA_F_SECONDARY) ||
+>  			    ifa1->ifa_mask != ifa->ifa_mask ||
+> @@ -440,9 +440,9 @@ static void __inet_del_ifa(struct in_device *in_dev,
+>  
+>  			rcu_assign_pointer(prev_prom->ifa_next, next_sec);
+>  
+> -			last_sec = rtnl_dereference(last_prim->ifa_next);
+> +			last_sec = rtnl_dereference(*last_prim);
+>  			rcu_assign_pointer(promote->ifa_next, last_sec);
+> -			rcu_assign_pointer(last_prim->ifa_next, promote);
+> +			rcu_assign_pointer(*last_prim, promote);
+>  		}
+>  
+>  		promote->ifa_flags &= ~IFA_F_SECONDARY;
+> -- 
+> 2.34.1
+
+Regards
+
+--
+Julian Anastasov <ja@ssi.bg>
+
 
