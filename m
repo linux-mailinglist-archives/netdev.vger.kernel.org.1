@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-32371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2495C79723B
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 14:20:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B0E3797240
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 14:23:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6877B2814F5
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 12:20:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA67C1C20B12
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 12:23:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A97B8569E;
-	Thu,  7 Sep 2023 12:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A07BA63A3;
+	Thu,  7 Sep 2023 12:23:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A65363A3
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 12:20:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0889BC32785;
-	Thu,  7 Sep 2023 12:20:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D871613A
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 12:23:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 337F7C32789;
+	Thu,  7 Sep 2023 12:23:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694089210;
-	bh=/knj0cY9pD418AkfsvYT3H54+KzQoQzdGurHAgnQcsQ=;
+	s=k20201202; t=1694089398;
+	bh=+FPqQmfAEDH5QfVgXOSft5l8Wk2lgGmonNPo5dQtgkk=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=j3YQcBv+nTe637rwvoD9/L7K8cUFoWNS1cRLESGlkHLvhVBpU9nC/hPjHDr0/cNP4
-	 qGtSeu4IdTAM/K2tZ+pcQw7MqLbujx3gBTemGFImJYF2XNzou/WX7y4tdy/PG3zN0w
-	 77UStc42wrE6d8sfgn6oxKpOQBoi44KB0kn2m+cw7si0OLLzPpDxd79zxYk1a3Bks6
-	 bt/9zVQkskhX18x8ibrskrsCb0ONjbiMmFV7wUYAIlwnz42+OavIuwfXpinjL4eLmP
-	 iuXTkZExF+eyuEwjg4vPc72jA0Ip2GwjoyaQv6zoX5vd3z+EaiGWsFbkq5dzqhmG/y
-	 1EvMSi8AuIe5w==
-Message-ID: <5f762b3b-c4f2-d0e8-aba7-2cd184465d12@kernel.org>
-Date: Thu, 7 Sep 2023 15:20:04 +0300
+	b=p6TovHQoK75xbCZAbDXTiuzaPnPDvFNW4ptU5QeWO5JBkYrkm+921EcY0qy57QuRU
+	 Vml45MUlRp8LJTDSLxIOVicjFwIaxMYE+oFXKbHUua4V1RLjnwxLCBxs+/rhPfltgW
+	 Q1kCuBvSit25sxc9HcUSzmkM0Rg6Bt0RHxDDtrl5ozG6BiiLqt6REi3k4CAL9n/Ps7
+	 T1I4LNCimaP5Nca6JL0wofylQZDvH3B/o47M0TAI7aOyDuDpXXf8eKeH/Ytc5mYO9o
+	 +DE6Yk4VsX3JPF6mLmnc+oJEKSngJhMgSamon8o+ZxJP5znp/B6MGgTGRxEgOnrkiw
+	 PO7hKnsSEtVHg==
+Message-ID: <d492bdeb-6bb6-4891-ba5e-7658a6e5e6ec@kernel.org>
+Date: Thu, 7 Sep 2023 15:23:12 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -40,60 +40,161 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.15.0
-Subject: Re: [RFC PATCH net-next 0/2] Add Half Duplex support for ICSSG Driver
+Subject: Re: [RFC PATCH net-next 4/4] net: ti: icssg_prueth: add TAPRIO
+ offload support
 Content-Language: en-US
-To: MD Danish Anwar <danishanwar@ti.com>, Andrew Lunn <andrew@lunn.ch>,
+To: MD Danish Anwar <danishanwar@ti.com>, Simon Horman <horms@kernel.org>,
  Vignesh Raghavendra <vigneshr@ti.com>,
- Jacob Keller <jacob.e.keller@intel.com>, Simon Horman <horms@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Rob Herring <robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jacob Keller <jacob.e.keller@intel.com>, Andrew Lunn <andrew@lunn.ch>,
+ Richard Cochran <richardcochran@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
  Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
  "David S. Miller" <davem@davemloft.net>
-Cc: linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
- netdev@vger.kernel.org, srk@ti.com, r-gunasekaran@ti.com
-References: <20230830113134.1226970-1-danishanwar@ti.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, srk@ti.com,
+ r-gunasekaran@ti.com
+References: <20230830110847.1219515-1-danishanwar@ti.com>
+ <20230830110847.1219515-5-danishanwar@ti.com>
 From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20230830113134.1226970-1-danishanwar@ti.com>
+In-Reply-To: <20230830110847.1219515-5-danishanwar@ti.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
 
 
-On 30/08/2023 14:31, MD Danish Anwar wrote:
-> This series adds support for half duplex operation for ICSSG driver.
+On 30/08/2023 14:08, MD Danish Anwar wrote:
+> From: Roger Quadros <rogerq@kernel.org>
 > 
-> In order to support half-duplex operation at 10M and 100M link speeds, the
-> PHY collision detection signal (COL) should be routed to ICSSG
-> GPIO pin (PRGx_PRU0/1_GPI10) so that firmware can detect collision signal
-> and apply the CSMA/CD algorithm applicable for half duplex operation. A DT
-> property, "ti,half-duplex-capable" is introduced for this purpose in the
-> first patch of the series. If board has PHY COL pin conencted to
-> PRGx_PRU1_GPIO10, this DT property can be added to eth node of ICSSG, MII
-> port to support half duplex operation at that port.
+> ICSSG dual-emac f/w supports Enhanced Scheduled Traffic (EST – defined
+> in P802.1Qbv/D2.2 that later got included in IEEE 802.1Q-2018)
+> configuration. EST allows express queue traffic to be scheduled
+> (placed) on the wire at specific repeatable time intervals. In
+> Linux kernel, EST configuration is done through tc command and
+> the taprio scheduler in the net core implements a software only
+> scheduler (SCH_TAPRIO). If the NIC is capable of EST configuration,
+> user indicate "flag 2" in the command which is then parsed by
+> taprio scheduler in net core and indicate that the command is to
+> be offloaded to h/w. taprio then offloads the command to the
+> driver by calling ndo_setup_tc() ndo ops. This patch implements
+> ndo_setup_tc() to offload EST configuration to ICSSG.
 > 
-> Second patch of the series configures driver to support half-duplex
-> operation if the DT property "ti,half-duplex-capable" is enabled.
+> Signed-off-by: Roger Quadros <rogerq@ti.com>
+> Signed-off-by: Vignesh Raghavendra <vigneshr@ti.com>
+> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+> ---
+>  drivers/net/ethernet/ti/Makefile             |   3 +-
+>  drivers/net/ethernet/ti/icssg/icssg_prueth.c |   5 +-
+>  drivers/net/ethernet/ti/icssg/icssg_prueth.h |   7 +
+>  drivers/net/ethernet/ti/icssg/icssg_qos.c    | 294 +++++++++++++++++++
+>  drivers/net/ethernet/ti/icssg/icssg_qos.h    | 119 ++++++++
+>  5 files changed, 426 insertions(+), 2 deletions(-)
+>  create mode 100644 drivers/net/ethernet/ti/icssg/icssg_qos.c
+>  create mode 100644 drivers/net/ethernet/ti/icssg/icssg_qos.h
 > 
-> This series depends on [1] which is posted as RFC.
-> 
-> [1] https://lore.kernel.org/all/20230830110847.1219515-1-danishanwar@ti.com/
-> 
-> Thanks and Regards,
-> Md Danish Anwar
-> 
-> MD Danish Anwar (2):
->   dt-bindings: net: Add documentation for Half duplex support.
->   net: ti: icssg-prueth: Add support for half duplex operation
-> 
->  .../bindings/net/ti,icssg-prueth.yaml           |  7 +++++++
->  drivers/net/ethernet/ti/icssg/icssg_config.c    | 14 ++++++++++++++
->  drivers/net/ethernet/ti/icssg/icssg_prueth.c    | 17 +++++++++++++++--
->  drivers/net/ethernet/ti/icssg/icssg_prueth.h    |  2 ++
->  4 files changed, 38 insertions(+), 2 deletions(-)
-> 
+> diff --git a/drivers/net/ethernet/ti/Makefile b/drivers/net/ethernet/ti/Makefile
+> index 3adceff760ce..de348c20eff9 100644
+> --- a/drivers/net/ethernet/ti/Makefile
+> +++ b/drivers/net/ethernet/ti/Makefile
+> @@ -38,5 +38,6 @@ icssg-prueth-y := k3-cppi-desc-pool.o \
+>  		  icssg/icssg_mii_cfg.o \
+>  		  icssg/icssg_stats.o \
+>  		  icssg/icssg_ethtool.o \
+> -		  icssg/icssg_switchdev.o
+> +		  icssg/icssg_switchdev.o \
+> +		  icssg/icssg_qos.o
+>  obj-$(CONFIG_TI_ICSS_IEP) += icssg/icss_iep.o
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> index 5b7e7297ce23..3236af45aa4e 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> @@ -1179,7 +1179,7 @@ static int emac_phy_connect(struct prueth_emac *emac)
+>  	return 0;
+>  }
+>  
+> -static u64 prueth_iep_gettime(void *clockops_data, struct ptp_system_timestamp *sts)
+> +u64 prueth_iep_gettime(void *clockops_data, struct ptp_system_timestamp *sts)
+>  {
+>  	u32 hi_rollover_count, hi_rollover_count_r;
+>  	struct prueth_emac *emac = clockops_data;
+> @@ -1416,6 +1416,8 @@ static int emac_ndo_open(struct net_device *ndev)
+>  		napi_enable(&emac->tx_chns[i].napi_tx);
+>  	napi_enable(&emac->napi_rx);
+>  
+> +	icssg_qos_init(ndev);
+> +
+>  	/* start PHY */
+>  	phy_start(ndev->phydev);
+>  
+> @@ -1695,6 +1697,7 @@ static const struct net_device_ops emac_netdev_ops = {
+>  	.ndo_set_rx_mode = emac_ndo_set_rx_mode,
+>  	.ndo_eth_ioctl = emac_ndo_ioctl,
+>  	.ndo_get_stats64 = emac_ndo_get_stats64,
+> +	.ndo_setup_tc = icssg_qos_ndo_setup_tc,
+>  };
+>  
+>  /* get emac_port corresponding to eth_node name */
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+> index 6e18da06c786..43b67213d8c7 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+> @@ -37,6 +37,7 @@
+>  #include "icssg_config.h"
+>  #include "icss_iep.h"
+>  #include "icssg_switch_map.h"
+> +#include "icssg_qos.h"
+>  
+>  #define PRUETH_MAX_MTU          (2000 - ETH_HLEN - ETH_FCS_LEN)
+>  #define PRUETH_MIN_PKT_SIZE     (VLAN_ETH_ZLEN)
+> @@ -186,6 +187,9 @@ struct prueth_emac {
+>  	struct devlink_port devlink_port;
+>  	int port_vlan;
+>  
+> +	struct prueth_qos qos;
+> +	struct work_struct ts_work;
+> +
+>  	struct delayed_work stats_work;
+>  	u64 stats[ICSSG_NUM_STATS];
+>  };
+> @@ -331,4 +335,7 @@ void icssg_set_pvid(struct prueth *prueth, u8 vid, u8 port);
+>  void emac_stats_work_handler(struct work_struct *work);
+>  void emac_update_hardware_stats(struct prueth_emac *emac);
+>  int emac_get_stat_by_name(struct prueth_emac *emac, char *stat_name);
+> +
+> +u64 prueth_iep_gettime(void *clockops_data, struct ptp_system_timestamp *sts);
+> +
+>  #endif /* __NET_TI_ICSSG_PRUETH_H */
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_qos.c b/drivers/net/ethernet/ti/icssg/icssg_qos.c
+> new file mode 100644
+> index 000000000000..e8102703e257
+> --- /dev/null
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_qos.c
+> @@ -0,0 +1,294 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Texas Instruments ICSSG PRUETH QoS submodule
+> + * Copyright (C) 2020 Texas Instruments Incorporated - http://www.ti.com/
 
-For this series:
+2023 here and rest of series.
 
-Reviewed-by: Roger Quadros <rogerq@kernel.org>
+> + */
+> +
+> +#include <linux/printk.h>
+> +#include "icssg_prueth.h"
+> +#include "icssg_switch_map.h"
+> +
+> +static void icssg_qos_tas_init(struct net_device *ndev);
+> +
+> +void icssg_qos_init(struct net_device *ndev)
+> +{
+> +	icssg_qos_tas_init(ndev);
+> +
+> +	/* IET init goes here */
+
+Please drop this comment.
+
+> +}
+> +
+
+<snip>
+
+-- 
+cheers,
+-roger
 
