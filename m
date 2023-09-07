@@ -1,125 +1,241 @@
-Return-Path: <netdev+bounces-32423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C06D797708
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 18:20:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D44BE7977AB
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 18:31:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5BE21C20B5C
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 16:20:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD8281C20D22
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 16:31:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FBFF134BB;
-	Thu,  7 Sep 2023 16:20:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB7E56D22;
+	Thu,  7 Sep 2023 16:30:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34FF5134A8
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 16:20:02 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D487493CB;
-	Thu,  7 Sep 2023 09:19:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=F7vSpfCfYCvODMAyXRt6Ug4ZFfLol/1tefnPrblJooA=; b=fMOtER0Kc3s0dWOOXdWUtzuoWA
-	dWl8L35t9P5Oddj5gWtY8xsnKWUvCkbc/D1Ac/S/bGTbqaQBUZeF225T2faMESNfQYx+alM5b26cp
-	2Zd6OJJ660Y9ofKMEWwcBhxl29S77LF5hhkur4SX1RKv25PGVCNnh92l4JzJ+xVRAnd680jY5Ojwj
-	x8pg96Xg6igE69LQ0fWlmaiomAI+vapPlLtSf3cgAUY4xvbC62dX13Cdl4Nyrgvagtc7KUxUDIPTV
-	vzWxJTxfivuKIOOvk8UfxrknCPUVQz8sZmTH29NDO7EyhS7oU8WYc9CGZoEZfAqfDq0tCIAlpFmM/
-	qMfs6kww==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48762)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qeAWl-0001ci-0Q;
-	Thu, 07 Sep 2023 09:38:15 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qeAWd-0005ft-Ce; Thu, 07 Sep 2023 09:38:07 +0100
-Date: Thu, 7 Sep 2023 09:38:07 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Bo Liu <liubo03@inspur.com>
-Cc: iyappan@os.amperecomputing.com, keyur@os.amperecomputing.com,
-	quan@os.amperecomputing.com, andrew@lunn.ch, hkallweit1@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: mdio: Use helper function IS_ERR_OR_NULL()
-Message-ID: <ZPmL72ShZz4gq2na@shell.armlinux.org.uk>
-References: <20230907071705.3907-1-liubo03@inspur.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D423C134C2
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 16:30:59 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D37D3C3C
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 09:30:37 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <sha@pengutronix.de>)
+	id 1qeAfn-0005jK-EF; Thu, 07 Sep 2023 10:47:35 +0200
+Received: from [2a0a:edc0:0:1101:1d::28] (helo=dude02.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
+	(envelope-from <sha@pengutronix.de>)
+	id 1qeAfm-004c0b-82; Thu, 07 Sep 2023 10:47:34 +0200
+Received: from sha by dude02.red.stw.pengutronix.de with local (Exim 4.94.2)
+	(envelope-from <sha@pengutronix.de>)
+	id 1qeAfl-0099Tl-9z; Thu, 07 Sep 2023 10:47:33 +0200
+From: Sascha Hauer <s.hauer@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-kernel@vger.kernel.org,
+	kernel@pengutronix.de,
+	Michael Riesch <michael.riesch@wolfvision.net>,
+	Sascha Hauer <s.hauer@pengutronix.de>
+Subject: [PATCH] net: phy: dp83867: Add support for hardware blinking LEDs
+Date: Thu,  7 Sep 2023 10:47:31 +0200
+Message-Id: <20230907084731.2181381-1-s.hauer@pengutronix.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230907071705.3907-1-liubo03@inspur.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: sha@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Sep 07, 2023 at 03:17:05AM -0400, Bo Liu wrote:
-> Use IS_ERR_OR_NULL() to detect an error pointer or a null pointer
-> open-coding to simplify the code.
-> 
-> Signed-off-by: Bo Liu <liubo03@inspur.com>
+This implements the led_hw_* hooks to support hardware blinking LEDs on
+the DP83867 phy. The driver supports all LED modes that have a
+corresponding TRIGGER_NETDEV_* define. Error and collision do not have
+a TRIGGER_NETDEV_* define, so these modes are currently not supported.
 
-Please do a more thorough review of the code before proposing changes
-to discover what the correct solution should be.
+Signed-off-by: Sascha Hauer <s.hauer@pengutronix.de>
+---
+ drivers/net/phy/dp83867.c | 137 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 137 insertions(+)
 
-> diff --git a/drivers/net/mdio/mdio-xgene.c b/drivers/net/mdio/mdio-xgene.c
-> index 1190a793555a..1518abfc3e22 100644
-> --- a/drivers/net/mdio/mdio-xgene.c
-> +++ b/drivers/net/mdio/mdio-xgene.c
-> @@ -263,7 +263,7 @@ struct phy_device *xgene_enet_phy_register(struct mii_bus *bus, int phy_addr)
->  	struct phy_device *phy_dev;
->  
->  	phy_dev = get_phy_device(bus, phy_addr, false);
-> -	if (!phy_dev || IS_ERR(phy_dev))
-> +	if (IS_ERR_OR_NULL(phy_dev))
-
-Looking at get_phy_device(), the returns from this function are either:
-
-        if (r)
-                return ERR_PTR(r);
-
-which can't return NULL, or the return value from phy_device_create().
-
-Looking at phy_device_create(), the returns from this function are:
-
-        if (!dev)
-                return ERR_PTR(-ENOMEM);
-
-        if (ret) {
-...
-                dev = ERR_PTR(ret);
-...
-        return dev;
-
-so I don't see any of this being able to return NULL either. Therefore,
-the code that you are modifying should be:
-
-
--	if (!phy_dev || IS_ERR(phy_dev))
-+	if (IS_ERR(phy_dev))
-
-and the commit description needs to be updated to state that
-get_phy_device() does not return NULL.
-
-Thanks.
-
+diff --git a/drivers/net/phy/dp83867.c b/drivers/net/phy/dp83867.c
+index e397e7d642d92..5f08f9d38bd7a 100644
+--- a/drivers/net/phy/dp83867.c
++++ b/drivers/net/phy/dp83867.c
+@@ -159,6 +159,23 @@
+ #define DP83867_LED_DRV_EN(x)	BIT((x) * 4)
+ #define DP83867_LED_DRV_VAL(x)	BIT((x) * 4 + 1)
+ 
++#define DP83867_LED_FN(idx, val)	(((val) & 0xf) << ((idx) * 4))
++#define DP83867_LED_FN_MASK(idx)	(0xf << ((idx) * 4))
++#define DP83867_LED_FN_RX_ERR		0xe /* Receive Error */
++#define DP83867_LED_FN_RX_TX_ERR	0xd /* Receive Error or Transmit Error */
++#define DP83867_LED_FN_LINK_RX_TX	0xb /* Link established, blink for rx or tx activity */
++#define DP83867_LED_FN_FULL_DUPLEX	0xa /* Full duplex */
++#define DP83867_LED_FN_LINK_100_1000_BT	0x9 /* 100/1000BT link established */
++#define DP83867_LED_FN_LINK_10_100_BT	0x8 /* 10/100BT link established */
++#define DP83867_LED_FN_LINK_10_BT	0x7 /* 10BT link established */
++#define DP83867_LED_FN_LINK_100_BTX	0x6 /* 100 BTX link established */
++#define DP83867_LED_FN_LINK_1000_BT	0x5 /* 1000 BT link established */
++#define DP83867_LED_FN_COLLISION	0x4 /* Collision detected */
++#define DP83867_LED_FN_RX		0x3 /* Receive activity */
++#define DP83867_LED_FN_TX		0x2 /* Transmit activity */
++#define DP83867_LED_FN_RX_TX		0x1 /* Receive or Transmit activity */
++#define DP83867_LED_FN_LINK		0x0 /* Link established */
++
+ enum {
+ 	DP83867_PORT_MIRROING_KEEP,
+ 	DP83867_PORT_MIRROING_EN,
+@@ -1018,6 +1035,123 @@ dp83867_led_brightness_set(struct phy_device *phydev,
+ 			  val);
+ }
+ 
++static int dp83867_led_mode(u8 index, unsigned long rules)
++{
++	if (index >= DP83867_LED_COUNT)
++		return -EINVAL;
++
++	switch (rules) {
++	case BIT(TRIGGER_NETDEV_LINK):
++		return DP83867_LED_FN_LINK;
++	case BIT(TRIGGER_NETDEV_LINK_10):
++		return DP83867_LED_FN_LINK_10_BT;
++	case BIT(TRIGGER_NETDEV_LINK_100):
++		return DP83867_LED_FN_LINK_100_BTX;
++	case BIT(TRIGGER_NETDEV_FULL_DUPLEX):
++		return DP83867_LED_FN_FULL_DUPLEX;
++	case BIT(TRIGGER_NETDEV_TX):
++		return DP83867_LED_FN_TX;
++	case BIT(TRIGGER_NETDEV_RX):
++		return DP83867_LED_FN_RX;
++	case BIT(TRIGGER_NETDEV_LINK_1000):
++		return DP83867_LED_FN_LINK_1000_BT;
++	case BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX):
++		return DP83867_LED_FN_RX_TX;
++	case BIT(TRIGGER_NETDEV_LINK_100) | BIT(TRIGGER_NETDEV_LINK_1000):
++		return DP83867_LED_FN_LINK_100_1000_BT;
++	case BIT(TRIGGER_NETDEV_LINK_10) | BIT(TRIGGER_NETDEV_LINK_100):
++		return DP83867_LED_FN_LINK_10_100_BT;
++	case BIT(TRIGGER_NETDEV_LINK) | BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX):
++		return DP83867_LED_FN_LINK_RX_TX;
++	default:
++		return -EOPNOTSUPP;
++	}
++}
++
++static int dp83867_led_hw_is_supported(struct phy_device *phydev, u8 index,
++				       unsigned long rules)
++{
++	int ret;
++
++	ret = dp83867_led_mode(index, rules);
++	if (ret < 0)
++		return ret;
++
++	return 0;
++}
++
++static int dp83867_led_hw_control_set(struct phy_device *phydev, u8 index,
++				      unsigned long rules)
++{
++	int mode, ret;
++
++	mode = dp83867_led_mode(index, rules);
++	if (mode < 0)
++		return mode;
++
++	ret = phy_modify(phydev, DP83867_LEDCR1, DP83867_LED_FN_MASK(index),
++			 DP83867_LED_FN(index, mode));
++	if (ret)
++		return ret;
++
++	return phy_modify(phydev, DP83867_LEDCR2, DP83867_LED_DRV_EN(index), 0);
++}
++
++static int dp83867_led_hw_control_get(struct phy_device *phydev, u8 index,
++				      unsigned long *rules)
++{
++	int val;
++
++	val = phy_read(phydev, DP83867_LEDCR1);
++	if (val < 0)
++		return val;
++
++	val &= DP83867_LED_FN_MASK(index);
++	val >>= index * 4;
++
++	switch (val) {
++	case DP83867_LED_FN_LINK:
++		*rules = BIT(TRIGGER_NETDEV_LINK);
++		break;
++	case DP83867_LED_FN_LINK_10_BT:
++		*rules = BIT(TRIGGER_NETDEV_LINK_10);
++		break;
++	case DP83867_LED_FN_LINK_100_BTX:
++		*rules = BIT(TRIGGER_NETDEV_LINK_100);
++		break;
++	case DP83867_LED_FN_FULL_DUPLEX:
++		*rules = BIT(TRIGGER_NETDEV_FULL_DUPLEX);
++		break;
++	case DP83867_LED_FN_TX:
++		*rules = BIT(TRIGGER_NETDEV_TX);
++		break;
++	case DP83867_LED_FN_RX:
++		*rules = BIT(TRIGGER_NETDEV_RX);
++		break;
++	case DP83867_LED_FN_LINK_1000_BT:
++		*rules = BIT(TRIGGER_NETDEV_LINK_1000);
++		break;
++	case DP83867_LED_FN_RX_TX:
++		*rules = BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX);
++		break;
++	case DP83867_LED_FN_LINK_100_1000_BT:
++		*rules = BIT(TRIGGER_NETDEV_LINK_100) | BIT(TRIGGER_NETDEV_LINK_1000);
++		break;
++	case DP83867_LED_FN_LINK_10_100_BT:
++		*rules = BIT(TRIGGER_NETDEV_LINK_10) | BIT(TRIGGER_NETDEV_LINK_100);
++		break;
++	case DP83867_LED_FN_LINK_RX_TX:
++		*rules = BIT(TRIGGER_NETDEV_LINK) | BIT(TRIGGER_NETDEV_TX) |
++			 BIT(TRIGGER_NETDEV_RX);
++		break;
++	default:
++		*rules = 0;
++		break;
++	}
++
++	return 0;
++}
++
+ static struct phy_driver dp83867_driver[] = {
+ 	{
+ 		.phy_id		= DP83867_PHY_ID,
+@@ -1047,6 +1181,9 @@ static struct phy_driver dp83867_driver[] = {
+ 		.set_loopback	= dp83867_loopback,
+ 
+ 		.led_brightness_set = dp83867_led_brightness_set,
++		.led_hw_is_supported = dp83867_led_hw_is_supported,
++		.led_hw_control_set = dp83867_led_hw_control_set,
++		.led_hw_control_get = dp83867_led_hw_control_get,
+ 	},
+ };
+ module_phy_driver(dp83867_driver);
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.39.2
+
 
