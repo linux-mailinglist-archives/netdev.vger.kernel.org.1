@@ -1,135 +1,147 @@
-Return-Path: <netdev+bounces-32378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2056F79732F
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 17:01:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B390797394
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 17:28:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 511A92815D2
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 15:01:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BF0A1C20B04
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 15:28:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 763517462;
-	Thu,  7 Sep 2023 15:01:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A3BD11CBD;
+	Thu,  7 Sep 2023 15:28:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A62A87461
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 15:01:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA035C4AF78;
-	Thu,  7 Sep 2023 15:01:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694098863;
-	bh=jMRaB1zToyVwAnrRSqUPWODNdMLHdXs6mibSqgmFpbk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=s05r2K0QrK0edOGzCiGfwbFtY1VtHeYVcRkwk4JV665nIVdPCOIOshegPBP1dFcTp
-	 fRQ6mXkeX88q4dkSbESsgjnUwHWPRJDFQ9t0tsd/2NuYV6kkGy/m0bnk8F/OCv4Q/3
-	 /V26QVRLpyLP/Eu/LnnhQ304L+U9IfimH0dTbxmaqVS0TywOBewNPPe9Y27wP0W1e7
-	 +DnfRWrBEhmqXr5Rx4+fXLtF2/f5Yc1UMJhav/1sCQ6NgXXG0egTQEXsD6aoE7iDH8
-	 sbAScY+yeWpmG4ov6b/1dimV0dKNqy/ZHUCeW3ErJtY0DBtvq5IF1R6xHD5sNeKXdi
-	 4g+RXzYnMwTzA==
-Date: Thu, 7 Sep 2023 17:00:58 +0200
-From: Simon Horman <horms@kernel.org>
-To: "Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, richardcochran@gmail.com, sd@queasysnail.net,
-	sebastian.tobuschat@nxp.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC net-next v3 4/6] net: phy: nxp-c45-tja11xx: add MACsec
- support
-Message-ID: <20230907150058.GD434333@kernel.org>
-References: <20230906160134.311993-1-radu-nicolae.pirea@oss.nxp.com>
- <20230906160134.311993-5-radu-nicolae.pirea@oss.nxp.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DFEE8BEE
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 15:28:29 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E2311FF3
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 08:28:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1694100422;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=9rvVTHxHPu3jCEmZFnxNYmQ4533N1br4tWGmYhjmcAM=;
+	b=JUx7Z+f1e9jePk800ER+gN1n4SnsljQ41h1GeZvHkbmmyWLGt8wXLM1ZaIVHeehIp5MeFs
+	gllXNkdLB3AwDlT+D1ZRLoYSMiZSkbEkFPdk6qB3FQbjgr4xaV/oVWBJFmL9sVDqXPT1ug
+	SjUX5d75gshKQSBEvg7AarqnhCk9xm4=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-264-nXPTVc1lMa6f_E6D82BHYw-1; Thu, 07 Sep 2023 11:05:14 -0400
+X-MC-Unique: nXPTVc1lMa6f_E6D82BHYw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8735393F408;
+	Thu,  7 Sep 2023 15:02:53 +0000 (UTC)
+Received: from swamp.redhat.com (unknown [10.45.225.164])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B614463F6C;
+	Thu,  7 Sep 2023 15:02:51 +0000 (UTC)
+From: Petr Oros <poros@redhat.com>
+To: netdev@vger.kernel.org
+Cc: jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	intel-wired-lan@lists.osuosl.org,
+	linux-kernel@vger.kernel.org,
+	mschmidt@redhat.com,
+	ivecera@redhat.com,
+	ahmed.zaki@intel.com,
+	horms@kernel.org
+Subject: [PATCH net v2 1/2] iavf: add iavf_schedule_aq_request() helper
+Date: Thu,  7 Sep 2023 17:02:50 +0200
+Message-ID: <20230907150251.224931-1-poros@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230906160134.311993-5-radu-nicolae.pirea@oss.nxp.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, Sep 06, 2023 at 07:01:32PM +0300, Radu Pirea (NXP OSS) wrote:
-> Add MACsec support.
-> The MACsec block has four TX SCs and four RX SCs. The driver supports up
-> to four SecY. Each SecY with one TX SC and one RX SC.
-> The RX SCs can have two keys, key A and key B, written in hardware and
-> enabled at the same time.
-> The TX SCs can have two keys written in hardware, but only one can be
-> active at a given time.
-> On TX, the SC is selected using the MAC source address. Due of this
-> selection mechanism, each offloaded netdev must have a unique MAC
-> address.
-> On RX, the SC is selected by SCI(found in SecTAG or calculated using MAC
-> SA), or using RX SC 0 as implicit.
-> 
-> Signed-off-by: Radu Pirea (NXP OSS) <radu-nicolae.pirea@oss.nxp.com>
+Add helper for set iavf aq request AVF_FLAG_AQ_* and immediately
+schedule watchdog_task. Helper will be used in cases where it is
+necessary to run aq requests asap
 
-...
+Signed-off-by: Petr Oros <poros@redhat.com>
+Co-developed-by: Michal Schmidt <mschmidt@redhat.com>
+Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
+Co-developed-by: Ivan Vecera <ivecera@redhat.com>
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+---
+ drivers/net/ethernet/intel/iavf/iavf.h         |  2 +-
+ drivers/net/ethernet/intel/iavf/iavf_ethtool.c |  2 +-
+ drivers/net/ethernet/intel/iavf/iavf_main.c    | 10 ++++------
+ 3 files changed, 6 insertions(+), 8 deletions(-)
 
-> +static struct nxp_c45_sa *nxp_c45_find_sa(struct list_head *sa_list,
-> +					  enum nxp_c45_sa_type sa_type, u8 an)
-> +{
-> +	struct nxp_c45_sa *pos, *tmp;
-> +
-> +	list_for_each_entry_safe(pos, tmp, sa_list, list)
-> +		if (pos->an == an && pos->type == sa_type)
-> +			return pos;
-> +
-> +	return ERR_PTR(-EINVAL);
-> +}
+diff --git a/drivers/net/ethernet/intel/iavf/iavf.h b/drivers/net/ethernet/intel/iavf/iavf.h
+index 85fba85fbb232b..e110ba3461857b 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf.h
++++ b/drivers/net/ethernet/intel/iavf/iavf.h
+@@ -521,7 +521,7 @@ void iavf_down(struct iavf_adapter *adapter);
+ int iavf_process_config(struct iavf_adapter *adapter);
+ int iavf_parse_vf_resource_msg(struct iavf_adapter *adapter);
+ void iavf_schedule_reset(struct iavf_adapter *adapter, u64 flags);
+-void iavf_schedule_request_stats(struct iavf_adapter *adapter);
++void iavf_schedule_aq_request(struct iavf_adapter *adapter, u64 flags);
+ void iavf_schedule_finish_config(struct iavf_adapter *adapter);
+ void iavf_reset(struct iavf_adapter *adapter);
+ void iavf_set_ethtool_ops(struct net_device *netdev);
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_ethtool.c b/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
+index a34303ad057d00..90397293525f71 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_ethtool.c
+@@ -362,7 +362,7 @@ static void iavf_get_ethtool_stats(struct net_device *netdev,
+ 	unsigned int i;
+ 
+ 	/* Explicitly request stats refresh */
+-	iavf_schedule_request_stats(adapter);
++	iavf_schedule_aq_request(adapter, IAVF_FLAG_AQ_REQUEST_STATS);
+ 
+ 	iavf_add_ethtool_stats(&data, adapter, iavf_gstrings_stats);
+ 
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
+index 7b300c86ceda73..86d472dfdbc10c 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_main.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
+@@ -314,15 +314,13 @@ void iavf_schedule_reset(struct iavf_adapter *adapter, u64 flags)
+ }
+ 
+ /**
+- * iavf_schedule_request_stats - Set the flags and schedule statistics request
++ * iavf_schedule_aq_request - Set the flags and schedule aq request
+  * @adapter: board private structure
+- *
+- * Sets IAVF_FLAG_AQ_REQUEST_STATS flag so iavf_watchdog_task() will explicitly
+- * request and refresh ethtool stats
++ * @flags: requested aq flags
+  **/
+-void iavf_schedule_request_stats(struct iavf_adapter *adapter)
++void iavf_schedule_aq_request(struct iavf_adapter *adapter, u64 flags)
+ {
+-	adapter->aq_required |= IAVF_FLAG_AQ_REQUEST_STATS;
++	adapter->aq_required |= flags;
+ 	mod_delayed_work(adapter->wq, &adapter->watchdog_task, 0);
+ }
+ 
+-- 
+2.42.0
 
-...
-
-> +void nxp_c45_handle_macsec_interrupt(struct phy_device *phydev,
-> +				     irqreturn_t *ret)
-> +{
-> +	struct nxp_c45_phy *priv = phydev->priv;
-> +	struct nxp_c45_secy *pos, *tmp;
-> +	struct nxp_c45_sa *sa;
-> +	u8 encoding_sa;
-> +	int secy_id;
-> +	u32 reg = 0;
-> +
-> +	if (!phydev->macsec_ops)
-> +		return;
-> +
-> +	do {
-> +		nxp_c45_macsec_read(phydev, MACSEC_EVR, &reg);
-> +		if (!reg)
-> +			return;
-> +
-> +		secy_id = MACSEC_REG_SIZE - ffs(reg);
-> +		list_for_each_entry_safe(pos, tmp, &priv->macsec->secy_list,
-> +					 list)
-> +			if (pos->secy_id == secy_id)
-> +				break;
-> +
-> +		encoding_sa = pos->secy->tx_sc.encoding_sa;
-> +		phydev_dbg(phydev, "pn_wrapped: TX SC %d, encoding_sa %u\n",
-> +			   pos->secy_id, encoding_sa);
-> +
-> +		sa = nxp_c45_find_sa(&pos->sa_list, TX_SA, encoding_sa);
-> +		if (!IS_ERR(sa))
-> +			macsec_pn_wrapped(pos->secy, sa->sa);
-> +		else
-> +			WARN_ON(!sa);
-
-Hi Radu,
-
-Smatch doesn't seem to think that sa can be NULL: it is either a valid
-pointer or an error pointer.
-
-> +
-> +		nxp_c45_macsec_write(phydev, MACSEC_EVR,
-> +				     TX_SC_BIT(pos->secy_id));
-> +		*ret = IRQ_HANDLED;
-> +	} while (reg);
-> +}
-
-...
 
