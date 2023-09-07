@@ -1,146 +1,91 @@
-Return-Path: <netdev+bounces-32367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 150BA797177
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 12:26:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97529797185
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 12:40:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79C13281472
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 10:26:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6AF4281451
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 10:40:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 608545677;
-	Thu,  7 Sep 2023 10:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC7E33C38;
+	Thu,  7 Sep 2023 10:40:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98618566C;
-	Thu,  7 Sep 2023 10:26:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2CC0C116B5;
-	Thu,  7 Sep 2023 10:26:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1013E23DC
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 10:40:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6F010C4163C;
+	Thu,  7 Sep 2023 10:40:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694082390;
-	bh=Jf43CePeMB/IHVQj7NAnYc9eiEbnhyFThi5aBu2GxZQ=;
-	h=From:To:Subject:In-Reply-To:References:Date:From;
-	b=K6rspdVed2uda7EyL9F1SENUhK2bvhih44kuOULQ7utH9Q0xtoRZaRNJB9+dyc9Tv
-	 ir1ONXzVGRQIsLVL5IYnwQl5zMLhJM5JSlfQgrsNLh6MVQuijX4OFVsBPIqdo40Kj+
-	 lP1rY6k9be1J+Da6zT8ovdSy0lJYwKDih4zo6Nhpiz6DRicYkiH3qn1+GgE6hnqfC4
-	 qTflWJAms1FgYOMNt06QFGF7u0U1HBU7OwIaRi3wyVuCVuvgwzh9ySMyw+00PZtZ7h
-	 2stQaGZK0DeT/sN5d1GfmucfV/D1rMwg3oxM54cr3Y9gsGJCTcqq0zrMTpFMDcBVEH
-	 dwAq98SbIfkAg==
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 47DCBDC67D3; Thu,  7 Sep 2023 12:26:27 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
-To: Hsin-Wei Hung <hsinweih@uci.edu>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
- <andrii@kernel.org>, Martin KaFai Lau <kafai@fb.com>, Song Liu
- <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>, John Fastabend
- <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- netdev@vger.kernel.org, bpf@vger.kernel.org, Arnaldo Carvalho de Melo
- <acme@kernel.org>
-Subject: Re: Possible deadlock in bpf queue map
-In-Reply-To: <CABcoxUbYwuZUL-xm1+5juO42nJMgpQX7cNyQELYz+g2XkZi9TQ@mail.gmail.com>
-References: <CABcoxUbYwuZUL-xm1+5juO42nJMgpQX7cNyQELYz+g2XkZi9TQ@mail.gmail.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Thu, 07 Sep 2023 12:26:27 +0200
-Message-ID: <87o7ienuss.fsf@toke.dk>
+	s=k20201202; t=1694083223;
+	bh=21RQWXpD02TqS/zvxOy7m9s2aew4LtFlQ1gyV19ttEY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=IgNs5oYqwpwZb5e1uUlRRGApxXIAGIG4DNJsaCoJPBaW7Ix/P0ZCaTizkeX7ZccBi
+	 bxQ2DmkK+mEW+6/csnDtJ+4zooo35ZQk8m6ZKoamNtsaCL3P/y6NVdIO/dPELyPdxj
+	 Wy0EJezKcTPCgzIShSwq3ba+bRzCyZIQj6pwgbpHDHwRtyUpq6XVCKMIM3kllJ4Nas
+	 ge2xSwmYET9NkkDs/uOJj6MfNgIHZ0tqycGFcFfZtzkL8+bORPzuznASzkMRePAdyq
+	 Ax84thvbTI3tvALaUzvi0XdhkcABrKnCTApejz8louYLtZvZtxDlYEr0OBZIdBxlQw
+	 MQNXP0akxImMQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 551C5C4166F;
+	Thu,  7 Sep 2023 10:40:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 1/6] netfilter: nftables: exthdr: fix 4-byte stack OOB
+ write
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169408322334.9013.1006951814262380531.git-patchwork-notify@kernel.org>
+Date: Thu, 07 Sep 2023 10:40:23 +0000
+References: <20230906162525.11079-2-fw@strlen.de>
+In-Reply-To: <20230906162525.11079-2-fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, netfilter-devel@vger.kernel.org
 
-+Arnaldo
+Hello:
 
-> Hi,
->
-> Our bpf fuzzer, a customized Syzkaller, triggered a lockdep warning in
-> the bpf queue map in v5.15. Since queue_stack_maps.c has no major changes
-> since v5.15, we think this should still exist in the latest kernel.
-> The bug can be occasionally triggered, and we suspect one of the
-> eBPF programs involved to be the following one. We also attached the lockdep
-> warning at the end.
->
-> #define DEFINE_BPF_MAP_NO_KEY(the_map, TypeOfMap, MapFlags,
-> TypeOfValue, MaxEntries) \
->         struct {                                                        \
->             __uint(type, TypeOfMap);                                    \
->             __uint(map_flags, (MapFlags));                              \
->             __uint(max_entries, (MaxEntries));                          \
->             __type(value, TypeOfValue);                                 \
->         } the_map SEC(".maps");
->
-> DEFINE_BPF_MAP_NO_KEY(map_0, BPF_MAP_TYPE_QUEUE, 0 | BPF_F_WRONLY,
-> struct_0, 162);
-> SEC("perf_event")
-> int func(struct bpf_perf_event_data *ctx) {
->         char v0[96] = {};
->         uint64_t v1 = 0;
->         v1 = bpf_map_pop_elem(&map_0, v0);
->         return 163819661;
-> }
->
->
-> The program is attached to the following perf event.
->
-> struct perf_event_attr attr_type_hw = {
->         .type = PERF_TYPE_HARDWARE,
->         .config = PERF_COUNT_HW_CPU_CYCLES,
->         .sample_freq = 50,
->         .inherit = 1,
->         .freq = 1,
-> };
->
-> ================================WARNING: inconsistent lock state
-> 5.15.26+ #2 Not tainted
-> --------------------------------
-> inconsistent {INITIAL USE} -> {IN-NMI} usage.
-> syz-executor.5/19749 [HC1[1]:SC0[0]:HE0:SE1] takes:
-> ffff88804c9fc198 (&qs->lock){..-.}-{2:2}, at: __queue_map_get+0x31/0x250
-> {INITIAL USE} state was registered at:
->   lock_acquire+0x1a3/0x4b0
->   _raw_spin_lock_irqsave+0x48/0x60
->   __queue_map_get+0x31/0x250
->   bpf_prog_577904e86c81dead_func+0x12/0x4b4
->   trace_call_bpf+0x262/0x5d0
->   perf_trace_run_bpf_submit+0x91/0x1c0
->   perf_trace_sched_switch+0x46c/0x700
->   __schedule+0x11b5/0x24a0
->   schedule+0xd4/0x270
->   futex_wait_queue_me+0x25f/0x520
->   futex_wait+0x1e0/0x5f0
->   do_futex+0x395/0x1890
->   __x64_sys_futex+0x1cb/0x480
->   do_syscall_64+0x3b/0xc0
->   entry_SYSCALL_64_after_hwframe+0x44/0xae
-> irq event stamp: 13640
-> hardirqs last  enabled at (13639): [<ffffffff95eb2bf4>]
-> _raw_spin_unlock_irq+0x24/0x40
-> hardirqs last disabled at (13640): [<ffffffff95eb2d4d>]
-> _raw_spin_lock_irqsave+0x5d/0x60
-> softirqs last  enabled at (13464): [<ffffffff93e26de5>] __sys_bpf+0x3e15/0x4e80
-> softirqs last disabled at (13462): [<ffffffff93e26da3>] __sys_bpf+0x3dd3/0x4e80
->
-> other info that might help us debug this:
->  Possible unsafe locking scenario:
->
->        CPU0
->        ----
->   lock(&qs->lock);
->   <Interrupt>
->     lock(&qs->lock);
+This series was applied to netdev/net.git (main)
+by Florian Westphal <fw@strlen.de>:
 
-Hmm, so that lock() uses raw_spin_lock_irqsave(), which *should* be
-disabling interrupts entirely for the critical section. But I guess a
-Perf hardware event can still trigger? Which seems like it would
-potentially wreak havoc with lots of things, not just this queue map
-function?
+On Wed,  6 Sep 2023 18:25:07 +0200 you wrote:
+> If priv->len is a multiple of 4, then dst[len / 4] can write past
+> the destination array which leads to stack corruption.
+> 
+> This construct is necessary to clean the remainder of the register
+> in case ->len is NOT a multiple of the register size, so make it
+> conditional just like nft_payload.c does.
+> 
+> [...]
 
-No idea how to protect against this, though. Hoping Arnaldo knows? :)
+Here is the summary with links:
+  - [net,1/6] netfilter: nftables: exthdr: fix 4-byte stack OOB write
+    https://git.kernel.org/netdev/net/c/fd94d9dadee5
+  - [net,2/6] netfilter: nfnetlink_osf: avoid OOB read
+    https://git.kernel.org/netdev/net/c/f4f8a7803119
+  - [net,3/6] netfilter: nf_tables: uapi: Describe NFTA_RULE_CHAIN_ID
+    https://git.kernel.org/netdev/net/c/fdc04cc2d5fd
+  - [net,4/6] netfilter: nft_set_rbtree: skip sync GC for new elements in this transaction
+    https://git.kernel.org/netdev/net/c/2ee52ae94baa
+  - [net,5/6] netfilter: ipset: add the missing IP_SET_HASH_WITH_NET0 macro for ip_set_hash_netportnet.c
+    https://git.kernel.org/netdev/net/c/050d91c03b28
+  - [net,6/6] netfilter: nf_tables: Unbreak audit log reset
+    https://git.kernel.org/netdev/net/c/9b5ba5c9c510
 
--Toke
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
