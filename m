@@ -1,109 +1,82 @@
-Return-Path: <netdev+bounces-32433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3675F7978D0
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 18:55:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F76A79793D
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 19:08:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 515BE28197C
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 16:55:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E428F280C92
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 17:08:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4734B134CE;
-	Thu,  7 Sep 2023 16:55:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E711A134DB;
+	Thu,  7 Sep 2023 17:08:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BFC34C7C
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 16:55:37 +0000 (UTC)
-Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC7401700
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 09:55:14 -0700 (PDT)
-Received: by mail-qt1-x82f.google.com with SMTP id d75a77b69052e-414dff0a8ecso9691cf.0
-        for <netdev@vger.kernel.org>; Thu, 07 Sep 2023 09:55:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1694105653; x=1694710453; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RgZJbPEqgAz1aHRlOIydr0AYU4FXrCo7iXQy/qE6vFg=;
-        b=zAwrJiH4Usv0qoLjLcYDxpsdPKFVgLLXRpBygK+Od9R8E6Dd5jDS4rVPK1DPt+i6y+
-         UBLeqXY/kRH9v0oZ0/R2xUQCLEfeX/A1pB8yM0jSe64U1KaYEHAwQr7pvUFFFVg6aS4F
-         r1Bs8H8aumLAwYuV0FQ2D+pB0V886pCnyU3iBH9HNaL4UeiLtob7XAtj2vxW/tuYJQSm
-         hejSfzrlQi7jE/OLcQydMLNcKHXrUq06lmIV14jnmGX8Ye4mHwPpOPi5vpbDN5zR6qYj
-         VoskKMhJjElDwPFSR429wqE5Vft4+MAolaI0WoSbvmFCprTCuT8LLAsUxWh4G1uA9XXw
-         6I4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1694105653; x=1694710453;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RgZJbPEqgAz1aHRlOIydr0AYU4FXrCo7iXQy/qE6vFg=;
-        b=GjQxlKFeW6fzZxOz/LJEM3k8w6bbkUQ3CESl0B5bmH+rqWi47JnQE3SsEIufKEdny/
-         FsxTB57Kip8A3umqh08Kb4mANbT3WFCaZc6KQLVWdq7PCtF6kpF+C93Rjv9u4uZkgcSI
-         c+zzTZfq9nPxBgIYwyrVQj1mf43Mfmaidl1fYu1wUBd/9DUKXzRHzO4ohIeMhP7hRA+v
-         n/q8Qdw3aWT4p7C+2zytqLpiavPX65fkAsiMLlPG9f5aP4NAOOkcyOBAi1qKIjKpQapG
-         vCdtm0MH6EDgnT07etD7AU3mmdYOwqvYbRdow7SeUMa9+KxlTPEkFp6gSMrViQ2BSFik
-         JlMA==
-X-Gm-Message-State: AOJu0YwsDzohRMg/2ZpVu/3SAG6amzFoV0Y+JspkYRUL5ecOgHyvKV0j
-	rJDS7qbT8iTq3atSzGwY3fhVFlr/XUBVJ4ZPkW2+Tg==
-X-Google-Smtp-Source: AGHT+IGPxru9qr9gVhn9FENPhMmRA9dagHheTPKHXR55uNSYIr+oDKV9XcH6AxAUvHTb3ghloYwbsPwuOtqsL8Tp7OY=
-X-Received: by 2002:a05:622a:1816:b0:403:b6ff:c0b with SMTP id
- t22-20020a05622a181600b00403b6ff0c0bmr372qtc.6.1694105653133; Thu, 07 Sep
- 2023 09:54:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99BD46D22
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 17:08:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFEFFC43391;
+	Thu,  7 Sep 2023 17:08:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694106508;
+	bh=8jO1W9mwUvUnadY4KgpKhvkbf1MemC0e4uimo5BuJz4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=AzM0rQmCUMf0ZFSbEc1BwCzm2ypPlMdLo+R3MwnzGaQfYMWxZPCg8PMOBVC3VmpKm
+	 XSSKdE0Wo0nEYM1GywOuLT1mNoM1sEg7oKwu6GsvQKlYbqaINM14SREVdLNa4TzhS4
+	 0FR4lPmLWg72nwQonPuXArq0XwiLF/pVV9V6Mj5AFweGMpIBA9vo+0gGJiykdwKsYl
+	 sm7hputKL1xNXybZ1MXGbdUifhWdul43/c9pJGsQss7B04avGXVIdTDPhToceDJ6nZ
+	 jX8vPpEy3+QcCH1eeaXan6D61X6uBk4b6ChhXcmh5lpW1N28rUB4733qtDsrDUQsS/
+	 Gaa40gi2hCf2Q==
+Date: Thu, 7 Sep 2023 10:08:27 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org, Dave
+ Watson <davejwatson@fb.com>, Vakul Garg <vakul.garg@nxp.com>, Boris
+ Pismenny <borisp@nvidia.com>, John Fastabend <john.fastabend@gmail.com>
+Subject: Re: [PATCH net 5/5] tls: don't decrypt the next record if it's of a
+ different type
+Message-ID: <20230907100827.7c3553ec@kernel.org>
+In-Reply-To: <ZPm__x5TcsmqagBH@hog>
+References: <cover.1694018970.git.sd@queasysnail.net>
+	<be8519564777b3a40eeb63002041576f9009a733.1694018970.git.sd@queasysnail.net>
+	<20230906204727.08a79e00@kernel.org>
+	<ZPm__x5TcsmqagBH@hog>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230906201046.463236-1-edumazet@google.com> <20230906201046.463236-5-edumazet@google.com>
- <CAA93jw7Fuov-vmxiZdW7My-AVWCOFQo4XVm9bNwAg4Td2CUNCA@mail.gmail.com>
-In-Reply-To: <CAA93jw7Fuov-vmxiZdW7My-AVWCOFQo4XVm9bNwAg4Td2CUNCA@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 7 Sep 2023 18:54:01 +0200
-Message-ID: <CANn89iLZF5Me4isAqXe+cptAOwiunMyHVeOy7Xfz_FdhFoiaqw@mail.gmail.com>
-Subject: Re: [RFC net-next 4/4] tcp: defer regular ACK while processing socket backlog
-To: Dave Taht <dave.taht@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Soheil Hassas Yeganeh <soheil@google.com>, Neal Cardwell <ncardwell@google.com>, 
-	Yuchung Cheng <ycheng@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Sep 7, 2023 at 6:50=E2=80=AFPM Dave Taht <dave.taht@gmail.com> wrot=
-e:
+On Thu, 7 Sep 2023 14:21:59 +0200 Sabrina Dubroca wrote:
+> I wonder if the way we're using ctx->async_wait here is correct. I'm
+> observing crypto_wait_req return 0 even though the decryption hasn't
+> run yet (and it should return -EBADMSG, not 0). I guess
+> tls_decrypt_done calls the completion (since we only had one
+> decrypt_pending), and then crypto_wait_req thinks everything is
+> already done.
+> 
+> Adding a fresh crypto_wait in tls_do_decryption (DECLARE_CRYPTO_WAIT)
+> and using it in the !darg->async case also seems to fix the UAF (but
+> makes the bad_cmsg test case fail in the same way as what I wrote in
+> the cover letter for bad_in_large_read -- not decrypting the next
+> message at all makes the selftest pass).
+> 
+> Herbert, WDYT? We're calling tls_do_decryption twice from the same
+> tls_sw_recvmsg invocation, first with darg->async = true, then with
+> darg->async = false. Is it ok to use ctx->async_wait for both, or do
+> we need a fresh one as in this patch?
 
-> When you once said you were going to find a way to reduce the number of a=
-cks, I did not expect this.
-> Has this been tested on arm or at lower rates, such as a gigabit? Or agai=
-nst WiFi?
->
+I think you're right, we need a fresh one. The "non-async" call to
+tls_do_decryption() will see the completion that the "async" call
+queued and think it can progress. Then at the end of recv we check
+->decrypt_pending and think we're good to exit. But the "non-async"
+call is still crypt'ing.
 
-Not yet, but my guess is that it could benefit wifi drivers that are
-not using GRO,
-particularly if the TCP payload is in skb->head instead of a page fragment,
-defeating tcp_try_coalesce() ability to 'pretend GRO was there in the
-first place'.
-
-I sent an RFC so that others could perform tests ;)
-
-> Regardless:
->
-> Acked-by: Dave Taht <dave.taht@gmail.com>
->
-> --
-> Oct 30: https://netdevconf.info/0x17/news/the-maestro-and-the-music-bof.h=
-tml
-> Dave T=C3=A4ht CSO, LibreQos
+All makes sense.
 
