@@ -1,155 +1,128 @@
-Return-Path: <netdev+bounces-32471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68CAC797B9F
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 20:22:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACBD9797BF2
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 20:33:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70C011C20B55
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 18:22:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E51C1C20C03
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 18:33:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C8AB14003;
-	Thu,  7 Sep 2023 18:22:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47E6C12B85;
+	Thu,  7 Sep 2023 18:33:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E22D134DD
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 18:22:15 +0000 (UTC)
-Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 777B9B9
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 11:22:08 -0700 (PDT)
-Received: from mg.bb.i.ssi.bg (localhost [127.0.0.1])
-	by mg.bb.i.ssi.bg (Proxmox) with ESMTP id 634241CE0E;
-	Thu,  7 Sep 2023 08:57:05 +0300 (EEST)
-Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
-	by mg.bb.i.ssi.bg (Proxmox) with ESMTPS id 493AC1CE0D;
-	Thu,  7 Sep 2023 08:57:05 +0300 (EEST)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by ink.ssi.bg (Postfix) with ESMTPSA id 256643C0439;
-	Thu,  7 Sep 2023 08:57:02 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
-	t=1694066223; bh=Nr7L0X1CSqRwD5JbJ86atDo045oNSIx4pVamgZyf6ms=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References;
-	b=cI9JbXJCBw+dR69f6fJXvkPYnQMhHomz26vqUaPvKp/u6X3+dnz7qP2y2owCoXwe6
-	 ohKMo+VrisIYKsDSW2hF3bKydcnVJ09Wq1cRdAuUpru63+Ar/x0n82R6wvABuR6Pw6
-	 jqoKJJVuZe4noqvGmooc+hGP9+NfsMKGCRi9CDiM=
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.17.1/8.17.1) with ESMTP id 3875urGA005192;
-	Thu, 7 Sep 2023 08:56:54 +0300
-Date: Thu, 7 Sep 2023 08:56:53 +0300 (EEST)
-From: Julian Anastasov <ja@ssi.bg>
-To: Liu Jian <liujian56@huawei.com>
-cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, hadi@cyberus.ca,
-        netdev@vger.kernel.org
-Subject: Re: [PATCH net v2] net: ipv4: fix one memleak in __inet_del_ifa()
-In-Reply-To: <20230907025709.3409515-1-liujian56@huawei.com>
-Message-ID: <a52a9eed-decf-d180-5c7a-8da41b82cf23@ssi.bg>
-References: <20230907025709.3409515-1-liujian56@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C1681400D
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 18:33:25 +0000 (UTC)
+X-Greylist: delayed 1536 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 07 Sep 2023 11:33:03 PDT
+Received: from rtits2.realtek.com.tw (211-75-126-66.hinet-ip.hinet.net [211.75.126.66])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 56D5F1BE6;
+	Thu,  7 Sep 2023 11:33:02 -0700 (PDT)
+X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 3877GN1m8002884, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 3877GN1m8002884
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 7 Sep 2023 15:16:23 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.17; Thu, 7 Sep 2023 15:16:51 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.7; Thu, 7 Sep 2023 15:16:50 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::7445:d92b:d0b3:f79c]) by
+ RTEXMBS04.realtek.com.tw ([fe80::7445:d92b:d0b3:f79c%5]) with mapi id
+ 15.01.2375.007; Thu, 7 Sep 2023 15:16:50 +0800
+From: Hayes Wang <hayeswang@realtek.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "davem@davemloft.net" <davem@davemloft.net>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        nic_swsd <nic_swsd@realtek.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>
+Subject: RE: [PATCH net v2] r8152: avoid the driver drops a lot of packets
+Thread-Topic: [PATCH net v2] r8152: avoid the driver drops a lot of packets
+Thread-Index: AQHZ4G/uLCHLeDMawES5jAj/REiJSrAN/YuAgADpM2A=
+Date: Thu, 7 Sep 2023 07:16:50 +0000
+Message-ID: <7f8b32a91f5849c99609f78520b23535@realtek.com>
+References: <20230906031148.16774-421-nic_swsd@realtek.com>
+ <20230906172847.2b3b749a@kernel.org>
+In-Reply-To: <20230906172847.2b3b749a@kernel.org>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-originating-ip: [172.22.228.6]
+x-kse-serverinfo: RTEXMBS04.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-Spam-Status: No, score=-0.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RDNS_DYNAMIC,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Jakub Kicinski <kuba@kernel.org>
+> Sent: Thursday, September 7, 2023 8:29 AM
+[...]
+> Good to see that you can repro the problem.
 
-	Hello,
+I don't reproduce the problem. I just find some information about it.
 
-On Thu, 7 Sep 2023, Liu Jian wrote:
+> Before we tweak the heuristics let's make sure rx_bottom() behaves
+> correctly. Could you make sure that
+>  - we don't perform _any_ rx processing when budget is 0
+>    (see the NAPI documentation under Documentation/networking)
 
-> I got the below warning when do fuzzing test:
-> unregister_netdevice: waiting for bond0 to become free. Usage count = 2
-> 
-> It can be repoduced via:
-> 
-> ip link add bond0 type bond
-> sysctl -w net.ipv4.conf.bond0.promote_secondaries=1
-> ip addr add 4.117.174.103/0 scope 0x40 dev bond0
-> ip addr add 192.168.100.111/255.255.255.254 scope 0 dev bond0
-> ip addr add 0.0.0.4/0 scope 0x40 secondary dev bond0
-> ip addr del 4.117.174.103/0 scope 0x40 dev bond0
-> ip link delete bond0 type bond
-> 
-> In this reproduction test case, an incorrect 'last_prim' is found in
-> __inet_del_ifa(), as a result, the secondary address(0.0.0.4/0 scope 0x40)
-> is lost. The memory of the secondary address is leaked and the reference of
-> in_device and net_device is leaked.
-> 
-> Fix this problem:
-> Look for 'last_prim' starting at location of the deleted IP and inserting
-> the promoted IP into the location of 'last_prim'.
-> 
-> Fixes: 0ff60a45678e ("[IPV4]: Fix secondary IP addresses after promotion")
-> Signed-off-by: Liu Jian <liujian56@huawei.com>
+The work_done would be 0, and napi_complete_done() wouldn't be called.
+However, skb_queue_len(&tp->rx_queue) may be increased. I think it is
+not acceptable, right?
 
-	Looks good to me, thanks!
+>  - finish the current aggregate even if budget run out, return
+>    work_done =3D budget in that case.
+>    With this change the rx_queue thing should be gone completely.
 
-Signed-off-by: Julian Anastasov <ja@ssi.bg>
+Excuse me. I don't understand this part. I know that when the packets are
+more than budget, the maximum packets which could be handled is budget.
+That is, return work_done =3D budget. However, the extra packets would be q=
+ueued
+to rx_queue. I don't understand what you mean about " the rx_queue thing
+should be gone completely". I think the current driver would return
+work_done =3D budget, and queue the other packets. I don't sure what you
+want me to change.
 
-> ---
-> v1->v2: Change the implementation to Julian's.
-> 	The commit message is modified.
->  net/ipv4/devinet.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
-> index 9cf64ee47dd2..ca0ff15dc8fa 100644
-> --- a/net/ipv4/devinet.c
-> +++ b/net/ipv4/devinet.c
-> @@ -355,14 +355,14 @@ static void __inet_del_ifa(struct in_device *in_dev,
->  {
->  	struct in_ifaddr *promote = NULL;
->  	struct in_ifaddr *ifa, *ifa1;
-> -	struct in_ifaddr *last_prim;
-> +	struct in_ifaddr __rcu **last_prim;
->  	struct in_ifaddr *prev_prom = NULL;
->  	int do_promote = IN_DEV_PROMOTE_SECONDARIES(in_dev);
->  
->  	ASSERT_RTNL();
->  
->  	ifa1 = rtnl_dereference(*ifap);
-> -	last_prim = rtnl_dereference(in_dev->ifa_list);
-> +	last_prim = ifap;
->  	if (in_dev->dead)
->  		goto no_promotions;
->  
-> @@ -376,7 +376,7 @@ static void __inet_del_ifa(struct in_device *in_dev,
->  		while ((ifa = rtnl_dereference(*ifap1)) != NULL) {
->  			if (!(ifa->ifa_flags & IFA_F_SECONDARY) &&
->  			    ifa1->ifa_scope <= ifa->ifa_scope)
-> -				last_prim = ifa;
-> +				last_prim = &ifa->ifa_next;
->  
->  			if (!(ifa->ifa_flags & IFA_F_SECONDARY) ||
->  			    ifa1->ifa_mask != ifa->ifa_mask ||
-> @@ -440,9 +440,9 @@ static void __inet_del_ifa(struct in_device *in_dev,
->  
->  			rcu_assign_pointer(prev_prom->ifa_next, next_sec);
->  
-> -			last_sec = rtnl_dereference(last_prim->ifa_next);
-> +			last_sec = rtnl_dereference(*last_prim);
->  			rcu_assign_pointer(promote->ifa_next, last_sec);
-> -			rcu_assign_pointer(last_prim->ifa_next, promote);
-> +			rcu_assign_pointer(*last_prim, promote);
->  		}
->  
->  		promote->ifa_flags &= ~IFA_F_SECONDARY;
-> -- 
-> 2.34.1
+>  - instead of copying the head use napi_get_frags() + napi_gro_frags()
+>    it gives you an skb, you just attach the page to it as a frag and
+>    hand it back to GRO. This makes sure you never pull data into head
+>    rather than just headers.
 
-Regards
+I would study about them. Thanks.
 
---
-Julian Anastasov <ja@ssi.bg>
+Should I include above changes for this patch?
+I think I have to submit another patches for above.
+
+> Please share the performance results with those changes.
+
+I couldn't reproduce the problem, so I couldn't provide the result
+with the differences.
+
+
+Best Regards,
+Hayes
 
 
