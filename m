@@ -1,50 +1,62 @@
-Return-Path: <netdev+bounces-32425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D44BE7977AB
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 18:31:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 49A9C797937
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 19:06:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD8281C20D22
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 16:31:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D87F1C20B85
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 17:06:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB7E56D22;
-	Thu,  7 Sep 2023 16:30:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD66D134D9;
+	Thu,  7 Sep 2023 17:06:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D423C134C2
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 16:30:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B15BB12B9D
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 17:06:37 +0000 (UTC)
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D37D3C3C
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 09:30:37 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F069D1BFD
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 10:06:08 -0700 (PDT)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
-	(envelope-from <sha@pengutronix.de>)
-	id 1qeAfn-0005jK-EF; Thu, 07 Sep 2023 10:47:35 +0200
-Received: from [2a0a:edc0:0:1101:1d::28] (helo=dude02.red.stw.pengutronix.de)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qeB1H-0004gk-2t; Thu, 07 Sep 2023 11:09:47 +0200
+Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
-	(envelope-from <sha@pengutronix.de>)
-	id 1qeAfm-004c0b-82; Thu, 07 Sep 2023 10:47:34 +0200
-Received: from sha by dude02.red.stw.pengutronix.de with local (Exim 4.94.2)
-	(envelope-from <sha@pengutronix.de>)
-	id 1qeAfl-0099Tl-9z; Thu, 07 Sep 2023 10:47:33 +0200
-From: Sascha Hauer <s.hauer@pengutronix.de>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-kernel@vger.kernel.org,
+	(envelope-from <ore@pengutronix.de>)
+	id 1qeB1F-004c5l-5S; Thu, 07 Sep 2023 11:09:45 +0200
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qeB1E-00A0Vo-3A;
+	Thu, 07 Sep 2023 11:09:44 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
 	kernel@pengutronix.de,
-	Michael Riesch <michael.riesch@wolfvision.net>,
-	Sascha Hauer <s.hauer@pengutronix.de>
-Subject: [PATCH] net: phy: dp83867: Add support for hardware blinking LEDs
-Date: Thu,  7 Sep 2023 10:47:31 +0200
-Message-Id: <20230907084731.2181381-1-s.hauer@pengutronix.de>
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	devicetree@vger.kernel.org
+Subject: [RFC net-next v3 0/2] net: dsa: microchip: add drive strength support 
+Date: Thu,  7 Sep 2023 11:09:41 +0200
+Message-Id: <20230907090943.2385053-1-o.rempel@pengutronix.de>
 X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,189 +64,44 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: sha@pengutronix.de
+X-SA-Exim-Mail-From: ore@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This implements the led_hw_* hooks to support hardware blinking LEDs on
-the DP83867 phy. The driver supports all LED modes that have a
-corresponding TRIGGER_NETDEV_* define. Error and collision do not have
-a TRIGGER_NETDEV_* define, so these modes are currently not supported.
+changes v3:
+- yaml: use enum instead of min/max
+- do not use snprintf() on overlapenden buffer.
+- unify ksz_drive_strength_to_reg() and ksz_drive_strength_error(). Make
+  it usable for KSZ9477 and KSZ8830 variants.
+- use ksz_rmw8() in ksz9477_drive_strength_write()
 
-Signed-off-by: Sascha Hauer <s.hauer@pengutronix.de>
----
- drivers/net/phy/dp83867.c | 137 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 137 insertions(+)
+changes v2:
+- make it work on all know KSZÜ variants except of undocumented LAN*
+  switches
+- add io-drive-strength compatible for ksz88xx chips
+- test exact drive strength instead of nearest closest.
+- add comment and refactor the code
 
-diff --git a/drivers/net/phy/dp83867.c b/drivers/net/phy/dp83867.c
-index e397e7d642d92..5f08f9d38bd7a 100644
---- a/drivers/net/phy/dp83867.c
-+++ b/drivers/net/phy/dp83867.c
-@@ -159,6 +159,23 @@
- #define DP83867_LED_DRV_EN(x)	BIT((x) * 4)
- #define DP83867_LED_DRV_VAL(x)	BIT((x) * 4 + 1)
- 
-+#define DP83867_LED_FN(idx, val)	(((val) & 0xf) << ((idx) * 4))
-+#define DP83867_LED_FN_MASK(idx)	(0xf << ((idx) * 4))
-+#define DP83867_LED_FN_RX_ERR		0xe /* Receive Error */
-+#define DP83867_LED_FN_RX_TX_ERR	0xd /* Receive Error or Transmit Error */
-+#define DP83867_LED_FN_LINK_RX_TX	0xb /* Link established, blink for rx or tx activity */
-+#define DP83867_LED_FN_FULL_DUPLEX	0xa /* Full duplex */
-+#define DP83867_LED_FN_LINK_100_1000_BT	0x9 /* 100/1000BT link established */
-+#define DP83867_LED_FN_LINK_10_100_BT	0x8 /* 10/100BT link established */
-+#define DP83867_LED_FN_LINK_10_BT	0x7 /* 10BT link established */
-+#define DP83867_LED_FN_LINK_100_BTX	0x6 /* 100 BTX link established */
-+#define DP83867_LED_FN_LINK_1000_BT	0x5 /* 1000 BT link established */
-+#define DP83867_LED_FN_COLLISION	0x4 /* Collision detected */
-+#define DP83867_LED_FN_RX		0x3 /* Receive activity */
-+#define DP83867_LED_FN_TX		0x2 /* Transmit activity */
-+#define DP83867_LED_FN_RX_TX		0x1 /* Receive or Transmit activity */
-+#define DP83867_LED_FN_LINK		0x0 /* Link established */
-+
- enum {
- 	DP83867_PORT_MIRROING_KEEP,
- 	DP83867_PORT_MIRROING_EN,
-@@ -1018,6 +1035,123 @@ dp83867_led_brightness_set(struct phy_device *phydev,
- 			  val);
- }
- 
-+static int dp83867_led_mode(u8 index, unsigned long rules)
-+{
-+	if (index >= DP83867_LED_COUNT)
-+		return -EINVAL;
-+
-+	switch (rules) {
-+	case BIT(TRIGGER_NETDEV_LINK):
-+		return DP83867_LED_FN_LINK;
-+	case BIT(TRIGGER_NETDEV_LINK_10):
-+		return DP83867_LED_FN_LINK_10_BT;
-+	case BIT(TRIGGER_NETDEV_LINK_100):
-+		return DP83867_LED_FN_LINK_100_BTX;
-+	case BIT(TRIGGER_NETDEV_FULL_DUPLEX):
-+		return DP83867_LED_FN_FULL_DUPLEX;
-+	case BIT(TRIGGER_NETDEV_TX):
-+		return DP83867_LED_FN_TX;
-+	case BIT(TRIGGER_NETDEV_RX):
-+		return DP83867_LED_FN_RX;
-+	case BIT(TRIGGER_NETDEV_LINK_1000):
-+		return DP83867_LED_FN_LINK_1000_BT;
-+	case BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX):
-+		return DP83867_LED_FN_RX_TX;
-+	case BIT(TRIGGER_NETDEV_LINK_100) | BIT(TRIGGER_NETDEV_LINK_1000):
-+		return DP83867_LED_FN_LINK_100_1000_BT;
-+	case BIT(TRIGGER_NETDEV_LINK_10) | BIT(TRIGGER_NETDEV_LINK_100):
-+		return DP83867_LED_FN_LINK_10_100_BT;
-+	case BIT(TRIGGER_NETDEV_LINK) | BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX):
-+		return DP83867_LED_FN_LINK_RX_TX;
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+
-+static int dp83867_led_hw_is_supported(struct phy_device *phydev, u8 index,
-+				       unsigned long rules)
-+{
-+	int ret;
-+
-+	ret = dp83867_led_mode(index, rules);
-+	if (ret < 0)
-+		return ret;
-+
-+	return 0;
-+}
-+
-+static int dp83867_led_hw_control_set(struct phy_device *phydev, u8 index,
-+				      unsigned long rules)
-+{
-+	int mode, ret;
-+
-+	mode = dp83867_led_mode(index, rules);
-+	if (mode < 0)
-+		return mode;
-+
-+	ret = phy_modify(phydev, DP83867_LEDCR1, DP83867_LED_FN_MASK(index),
-+			 DP83867_LED_FN(index, mode));
-+	if (ret)
-+		return ret;
-+
-+	return phy_modify(phydev, DP83867_LEDCR2, DP83867_LED_DRV_EN(index), 0);
-+}
-+
-+static int dp83867_led_hw_control_get(struct phy_device *phydev, u8 index,
-+				      unsigned long *rules)
-+{
-+	int val;
-+
-+	val = phy_read(phydev, DP83867_LEDCR1);
-+	if (val < 0)
-+		return val;
-+
-+	val &= DP83867_LED_FN_MASK(index);
-+	val >>= index * 4;
-+
-+	switch (val) {
-+	case DP83867_LED_FN_LINK:
-+		*rules = BIT(TRIGGER_NETDEV_LINK);
-+		break;
-+	case DP83867_LED_FN_LINK_10_BT:
-+		*rules = BIT(TRIGGER_NETDEV_LINK_10);
-+		break;
-+	case DP83867_LED_FN_LINK_100_BTX:
-+		*rules = BIT(TRIGGER_NETDEV_LINK_100);
-+		break;
-+	case DP83867_LED_FN_FULL_DUPLEX:
-+		*rules = BIT(TRIGGER_NETDEV_FULL_DUPLEX);
-+		break;
-+	case DP83867_LED_FN_TX:
-+		*rules = BIT(TRIGGER_NETDEV_TX);
-+		break;
-+	case DP83867_LED_FN_RX:
-+		*rules = BIT(TRIGGER_NETDEV_RX);
-+		break;
-+	case DP83867_LED_FN_LINK_1000_BT:
-+		*rules = BIT(TRIGGER_NETDEV_LINK_1000);
-+		break;
-+	case DP83867_LED_FN_RX_TX:
-+		*rules = BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX);
-+		break;
-+	case DP83867_LED_FN_LINK_100_1000_BT:
-+		*rules = BIT(TRIGGER_NETDEV_LINK_100) | BIT(TRIGGER_NETDEV_LINK_1000);
-+		break;
-+	case DP83867_LED_FN_LINK_10_100_BT:
-+		*rules = BIT(TRIGGER_NETDEV_LINK_10) | BIT(TRIGGER_NETDEV_LINK_100);
-+		break;
-+	case DP83867_LED_FN_LINK_RX_TX:
-+		*rules = BIT(TRIGGER_NETDEV_LINK) | BIT(TRIGGER_NETDEV_TX) |
-+			 BIT(TRIGGER_NETDEV_RX);
-+		break;
-+	default:
-+		*rules = 0;
-+		break;
-+	}
-+
-+	return 0;
-+}
-+
- static struct phy_driver dp83867_driver[] = {
- 	{
- 		.phy_id		= DP83867_PHY_ID,
-@@ -1047,6 +1181,9 @@ static struct phy_driver dp83867_driver[] = {
- 		.set_loopback	= dp83867_loopback,
- 
- 		.led_brightness_set = dp83867_led_brightness_set,
-+		.led_hw_is_supported = dp83867_led_hw_is_supported,
-+		.led_hw_control_set = dp83867_led_hw_control_set,
-+		.led_hw_control_get = dp83867_led_hw_control_get,
- 	},
- };
- module_phy_driver(dp83867_driver);
+Oleksij Rempel (2):
+  dt-bindings: net: dsa: microchip: Update ksz device tree bindings for
+    drive strength
+  net: dsa: microchip: Add drive strength configuration
+
+ .../bindings/net/dsa/microchip,ksz.yaml       |  20 ++
+ drivers/net/dsa/microchip/ksz8795_reg.h       |  14 -
+ drivers/net/dsa/microchip/ksz9477_reg.h       |  13 -
+ drivers/net/dsa/microchip/ksz_common.c        | 306 ++++++++++++++++++
+ drivers/net/dsa/microchip/ksz_common.h        |  20 ++
+ 5 files changed, 346 insertions(+), 27 deletions(-)
+
 -- 
 2.39.2
 
