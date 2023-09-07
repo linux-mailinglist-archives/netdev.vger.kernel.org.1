@@ -1,311 +1,236 @@
-Return-Path: <netdev+bounces-32457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE605797ACE
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 19:49:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B47A797A1E
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 19:31:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C94E281779
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 17:49:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BCF12816C8
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 17:31:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC22613AEF;
-	Thu,  7 Sep 2023 17:49:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 864CA13AE3;
+	Thu,  7 Sep 2023 17:31:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90F6F134D2
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 17:49:52 +0000 (UTC)
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71A8F1717;
-	Thu,  7 Sep 2023 10:49:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1694108969; x=1725644969;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=fC1G6rXQP21aspf8XvF9vh0YQUhVdFXAzeRmM12T0EI=;
-  b=muNswKWIzYfJbKZqex3g68e8ZYRtHRkfpqZFpj/L0OaqCe9V6TluzDlo
-   bsYk4CwsEopp3xUaiJrvyqPjWgM9sJ9niKfrR9vXCSL2QfUVtQ2ZeE+J7
-   qCRrTFnA/mu4Zg9FX/iwy+uHVYH+nGH165HHcq1l6pjSGCBMOFsI4glzm
-   ImWmIcgjBiT4ueW89wRJwj3qQQXLao8sgru+w++phRmgRZoKl8xliWnxm
-   2snnAiHPuOwlJD6M3rV9u9Do/igS1EwJQEqXsAV0JeM4wV6FQS+j7W4JG
-   aq+QNYJznjJVPKQMxAqF/6IRXsDgnF9Ea6Eklh9EGHFeRyPjRFLUnwh84
-   Q==;
-X-CSE-ConnectionGUID: CJ4HFPQ6Ty+fWZ4fhVNqlA==
-X-CSE-MsgGUID: n1+GmR+rTcSOp4qgnT68yg==
-X-ThreatScanner-Verdict: Negative
-X-IronPort-AV: E=Sophos;i="6.02,235,1688454000"; 
-   d="scan'208";a="3438651"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 07 Sep 2023 06:38:17 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Thu, 7 Sep 2023 06:38:16 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (10.10.215.89) by
- email.microchip.com (10.10.87.72) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21 via Frontend
- Transport; Thu, 7 Sep 2023 06:38:16 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aNZveM5cQBfx/iUunIdGfXckWVmt0nLZ+p7cFQrJyT8WzTgUXhmkMraZRtvJURGTHvuR6QA2fmxNmerEYSKF2eicoDTW5RupFjVdvkwsAbTtu6dgIGdWNK6GJw9QGU0X8LedNrdGoOS22GYyD8W49g33YMGFMdyeQr+7SXjtE7HL2DODa8ItibxSIDqH3grWZIg48Jc9DAK2OFmwXtp5ppwSaHxKGDXWXdLz4iFmFxpbA4LwG/kvDBbuhra2x/5+PbGspL7cGVmAigw+sm7oZkV7WIV8LiCKluziwR1hCr5P/nz/9CoqVRLqLZy1XpiMEBLvWDOWUFQm7vPSnfnjdA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fC1G6rXQP21aspf8XvF9vh0YQUhVdFXAzeRmM12T0EI=;
- b=CouNUcMZWvVzjJyWsaGxbWF7hGwJ0IxyPzGkkRycYhepgx2rD0MmPDGJ0ysxJG/4aR96C48zixuGnltfygFoSWhM3QwRBOT2StFpgDLOAunQwPgLOCP5C0XiIEHmWxJeaw0OObPhaL4SIBJjQ2uefor0PHICl8OC0cmKO3l0cXK5WhB3TMdu+LZ1KHB3gRQtAXCXY803LKAIKJCUkwbJEUxZn+MRV2ViE3vUz567SfHoYa0UFkMCE8LeHN47JVAVQ+m2pnJO8Pno75jYD3L3nTdVChz4r9ONs9mAfqZ1HQtWKDLdSw4KOuyZQBPhicjARPcYL4cUVaA2dkBYvbt9PQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=microchiptechnology.onmicrosoft.com;
- s=selector2-microchiptechnology-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fC1G6rXQP21aspf8XvF9vh0YQUhVdFXAzeRmM12T0EI=;
- b=qPNe9ZT9ZaxBG+cjTS1aCd7PiGBnMHDmMkfDaae3W9aD37eg2Wys+vzA2UbjS3sGNzVeKCfHrmxJealfm37jxl+gwXp4MYqA/TikqUU0ncnOOzwq8revDfMA+MYJusrcTGkouOrwsOsajKlwd1qUoqM/31DVJmW2FpaY/O7K3HM=
-Received: from DM6PR11MB3532.namprd11.prod.outlook.com (2603:10b6:5:70::25) by
- LV3PR11MB8742.namprd11.prod.outlook.com (2603:10b6:408:212::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.34; Thu, 7 Sep
- 2023 13:38:14 +0000
-Received: from DM6PR11MB3532.namprd11.prod.outlook.com
- ([fe80::eb5d:6623:d0cf:d5e9]) by DM6PR11MB3532.namprd11.prod.outlook.com
- ([fe80::eb5d:6623:d0cf:d5e9%3]) with mapi id 15.20.6745.034; Thu, 7 Sep 2023
- 13:38:14 +0000
-From: <Parthiban.Veerasooran@microchip.com>
-To: <kuba@kernel.org>
-CC: <piergiorgio.beruto@gmail.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <pabeni@redhat.co>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <Horatiu.Vultur@microchip.com>,
-	<Woojung.Huh@microchip.com>, <Nicolas.Ferre@microchip.com>,
-	<Thorsten.Kummermehr@microchip.com>, <pabeni@redhat.com>, <andrew@lunn.ch>
-Subject: Re: [PATCH net-next] ethtool: plca: fix plca enable data type while
- parsing the value
-Thread-Topic: [PATCH net-next] ethtool: plca: fix plca enable data type while
- parsing the value
-Thread-Index: AQHZ2/hbVBhaEK9Pu0ej7yoOkFFlbbAM1OyAgAQmgQA=
-Date: Thu, 7 Sep 2023 13:38:14 +0000
-Message-ID: <1082c55b-5e98-7994-016c-1b5ab7575673@microchip.com>
-References: <20230831104523.7178-1-Parthiban.Veerasooran@microchip.com>
- <20230905151509.5208ee63@kernel.org>
-In-Reply-To: <20230905151509.5208ee63@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR11MB3532:EE_|LV3PR11MB8742:EE_
-x-ms-office365-filtering-correlation-id: c09397e7-53c2-4a1d-b148-08dbafa7af70
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: fT4kvRSTW0Kl+rQDDsVY8eX649Gilr6nGoIThCl8UXR8WYH1nk93GHwoE66qteSzfFmO8VGsskZBir4uDt+w5Pw2+Ockx/LhZ5roA6M/nUcuHzymuM9Dvs4caNl8NXxieVXOqB381d/JQL8kYath6c77DTRX+1IUAsin7EpuOMUm+TBgjP8YmrVcaQuT5JzB/T+/LyiARH6+inEOx544Wes9E0+P4pw4TMKnFNSMMfbtULOSbfVY3mXri981q88H+4gDwMYub6iQ5oeHj8taPkZcOhDtZewFte3YzIif4Qr5f6rpnDBmO6r6S9NOgWu5uqx+4reAsvswkxLlqkjiMWNWK65702llL1xCeXUf1+zdyn1FiDkQNFikQXoZsIZ1kpW/zORbVqhSrZ8VI3rZvCfXcRmu72Vul9agLSKuZhZI+mRLfaOt43I4fTrvSL2ytNWJGbQJmcZqmq+tMR5ifih3PdiywI+FbUndcf658qNVUPbRWPjaXyIN0udSOPgZFYulL0G2HTcuJnJ7pGpblePkZ8PBNzgQXLrP3jNA7zgHzCmTl3YcZpAqE2RdQAbxBVFyd7Hr/aImJ8SJxfIV8AqqbwIPOshZxRsqGGxWasWxlAfWmi0o5KgCQd7+iznGnf1n1HZTfd/+6e+CmL/vnEhPA5djx+P+eZvHHW393KiCsEBEbjHYzll6ukRX0C55
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3532.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(346002)(39860400002)(366004)(136003)(376002)(1800799009)(451199024)(186009)(2906002)(31686004)(64756008)(76116006)(54906003)(66946007)(66556008)(316002)(6916009)(66446008)(8676002)(66476007)(41300700001)(8936002)(36756003)(4326008)(5660300002)(122000001)(2616005)(86362001)(71200400001)(53546011)(6512007)(6486002)(6506007)(38070700005)(91956017)(83380400001)(38100700002)(31696002)(26005)(478600001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?SjFWdXVrb05CTW45T01LQnJpTzkwSXpUQ3pqY2g3azJSM3kxbmVJYmJ2WWZJ?=
- =?utf-8?B?Q0pkUjRGVDNHaXhRWXV2RWl1ODVFZExCQVY4NWdNcit2Y3dOMXBMTTM1YW5P?=
- =?utf-8?B?UkNtMGZFaFJQVXVScWQvbzRTR2MwZThPRmRsMFVwcnJFNk4zTTEzdHliOFlH?=
- =?utf-8?B?UTJOL3VuVThxRG9uS2dXWk1VSDhVZTJndzF2UUdIaktFRkN5cktDdnZzVHR0?=
- =?utf-8?B?QS9XeFdWTlpJMTBvWW9ZbUVIV2FucEVDY04rYzlnOTUzRkx3dkFUdURCT3JB?=
- =?utf-8?B?UXlzWU5mQWRMd2l3TWExVUYrb05Bb3l3TUJWeWNPRzJleXF1c04zMjBLejRp?=
- =?utf-8?B?cXkyMm81VFFSaXNMVVhjOUlhLys2WTZkOWNMcy96RVByU1p4cGpBTVBPSWJS?=
- =?utf-8?B?T2JCSlRNTFF5a0VlYmx5MDVZNGVzVVAwNldzT0VueVdlVTRKeHBsNE9uZzZt?=
- =?utf-8?B?VXppZEhUajdSQ2lYQ1QyTjRoVHo0RjVZckxCOTE2UCt1UWhPckZaUVRydmtT?=
- =?utf-8?B?QytQMjMwZlhXcVp4UExpQXY1WFVrMWRaS0oyUEUzOUk2UkQ1UmlxWS9Bb3RP?=
- =?utf-8?B?WUJCV3FqNTlKbkFsNXJ6NHRCZzdwR2RqVzNTd2g1cXhVOHE1K2d4MVFpV3F3?=
- =?utf-8?B?RTY1Y1FybXNRZTZaaUMwNjZrYUlmaGt0NmdaYjlJcVlTN3YrL2dNM2gySWZE?=
- =?utf-8?B?MVNpSHhXbUpXY3U0TDVZa0xhR1VhYjJQQStqcmVEa3crcU10TVYwaU9wRmFQ?=
- =?utf-8?B?N3EwSmw1QjU3SnExNGRwSlRCSjErNjBVRjVGbEN0dU4wZXFCRHc1S1JBMmRY?=
- =?utf-8?B?WXV5ZGk5K0NNc3dyNUx6U0l6a0Z5SndnNVhEZzlMZVF0V0JaU1RBQlhnR0t5?=
- =?utf-8?B?bW9uL1BFRmR4Mlo1Zk1NU2JBTWpVNW1Wb2VFR2tnazRqbGVTRnhId0d6dW8x?=
- =?utf-8?B?ZnpoL0ZGSFpPWmtLK3dEVmxPN2NRUFlnOU96cHBxQW9XYmMzN29pYkZ6M25i?=
- =?utf-8?B?Yjl3YzlmNUdLenMyWUp5b2Y0V2ZSN05tTmhFYWVmeE9Pa1AxbmdYSTBzSkNz?=
- =?utf-8?B?eGFyUmVIc2JMalhjWlU3T2xrR2JxQkxyWElLU2dWWks5MDQ3Mld0SEdXMWFE?=
- =?utf-8?B?K1RQcnN2V2pnUm82cE9uSzc3RFJGV3NHMkt3SGhmd3hYZ2ZDWisxQllkWVFV?=
- =?utf-8?B?ZFllQTE0eWRTeFlLdkxGTnhZUy8xQjgxUlRZRUt4UUd3WkZ2RTJRdlBUS09x?=
- =?utf-8?B?T2xFU2gwTXY0ZTB3QXZUbGJRUHF2aG9ad0RYYjZmWWZuRFpFTXMvUHZOMXkw?=
- =?utf-8?B?em5veEtWSnRlTWFzMkI3UEZ3UTZtYzRPMVlPVnZ1RytSYnJtRWxXZEFlMEVn?=
- =?utf-8?B?cEtEMHppRmd6eG42bHgvL3hFQ25OZlhwU0FGeEZtWThnQm9FVmxRQmJTVmFC?=
- =?utf-8?B?YmFLWlZIRkhZVkVNTFpMbkl4ZTdmZStoYVBFQUdFYjJlS00zQ2lyMTJ5VHM1?=
- =?utf-8?B?OEoyc29NWmwwVTFCY0luUmtNQmhORkJqWUcvakdFNlZ4Y0gvL2tSdUJiNkJO?=
- =?utf-8?B?bGNrZVBJYitaMjV6ZHZuaHVTdEhIdzI0RDgvT0g1cHNWVnZ0U0hYVG85NHYr?=
- =?utf-8?B?V21HK1k4OWxSRUNlcEV4dGhKNnNTQWpPL2pZZFpaSDFwRkszMzVCczVPTDJI?=
- =?utf-8?B?S2ovZjBEZ1J0cDhNOFJGYkVINkxYZUNXMC9vU0dlU2NubWY0M3BKNjI5SHZz?=
- =?utf-8?B?cXY1UkYwSmFUTDk3MSsrQzRKc1VHVHJ1QWpkQ2diNzFFazhlN1o5NFBRN1ow?=
- =?utf-8?B?bU90RUFwdjIrdEdEWG9KVXpoUUhpd1dFc0VVOHlBeEFGb0p6dUlvaS9MTTRu?=
- =?utf-8?B?aFNVN1hrZTNxQVVEQzE4QWphUktweldFME5pcHZ5ZDN6WkxUZDRZd2FZS2pX?=
- =?utf-8?B?REJ0bm9oSWMva0hWak4wNUdOdk9JTnp6aVRaYmRpUlR6anJBMTJFa1dyeGZN?=
- =?utf-8?B?enNUcmRTdU80aFVhNjZjZmh1eHFFYnlJNEhrc2x2MUpYaWErenhMTUJwNXBh?=
- =?utf-8?B?VDcrUGN1ZlJSQkJ5L0lYNEZSVEZzaHZSNGJ6SVQ1d1VVWTJRZG1pdVZIMFk3?=
- =?utf-8?B?YUF2d29Ha3N4ZmFnSkRwQTErcjNYNzRrU0ZSVTAxenA1Yis2dklKSkllb1Ar?=
- =?utf-8?B?WUE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <57B61E7824930044B7B0DE0225CCF85F@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 756A8134D0
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 17:31:08 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29308BC
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 10:30:41 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <sha@pengutronix.de>)
+	id 1qeFbL-0005Px-Dm; Thu, 07 Sep 2023 16:03:19 +0200
+Received: from [2a0a:edc0:2:b01:1d::c0] (helo=ptx.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <sha@pengutronix.de>)
+	id 1qeFbK-004fNB-J4; Thu, 07 Sep 2023 16:03:18 +0200
+Received: from sha by ptx.whiteo.stw.pengutronix.de with local (Exim 4.92)
+	(envelope-from <sha@pengutronix.de>)
+	id 1qeFbK-002pFg-5m; Thu, 07 Sep 2023 16:03:18 +0200
+Date: Thu, 7 Sep 2023 16:03:18 +0200
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>, Christian Marangi <ansuelsmth@gmail.com>
+Subject: possible circular locking dependency in netdev LED trigger
+Message-ID: <20230907140318.GB637806@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3532.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c09397e7-53c2-4a1d-b148-08dbafa7af70
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Sep 2023 13:38:14.0426
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 13vADyH0wntrQqnw+eJaHGI8ytNrNI3SW6tPSk+hAMawmfDAl2X2M8L8Wfcx1QSLDXeV/3jl/1pIXX9Xs0WY+u8pBqliZwdvUl+oYlvr/2ih6x3Rv6lRoZLBT+8jGIrk
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR11MB8742
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+User-Agent: Mutt/1.10.1 (2018-07-13)
+From: Sascha Hauer <sha@pengutronix.de>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: sha@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-SGkgSmFrdWIsDQoNCk9uIDA2LzA5LzIzIDM6NDUgYW0sIEpha3ViIEtpY2luc2tpIHdyb3RlOg0K
-PiBFWFRFUk5BTCBFTUFJTDogRG8gbm90IGNsaWNrIGxpbmtzIG9yIG9wZW4gYXR0YWNobWVudHMg
-dW5sZXNzIHlvdSBrbm93IHRoZSBjb250ZW50IGlzIHNhZmUNCj4gDQo+IE9uIFRodSwgMzEgQXVn
-IDIwMjMgMTY6MTU6MjMgKzA1MzAgUGFydGhpYmFuIFZlZXJhc29vcmFuIHdyb3RlOg0KPj4gU3Vi
-amVjdDogW1BBVENIIG5ldC1uZXh0XSBldGh0b29sOiBwbGNhOiBmaXggcGxjYSBlbmFibGUgZGF0
-YSB0eXBlIHdoaWxlIHBhcnNpbmcgdGhlIHZhbHVlDQo+IA0KPiBTaW5jZSB0aGlzIGlzIGEgZml4
-IHRoZSBzdWJqZWN0IHNob3VsZCBzYXkgbmV0IGluc3RlYWQgb2YgbmV0LW5leHQuDQo+IFtQQVRD
-SCBuZXQgdjJdIGZvciB0aGUgbmV4dCByZXZpc2lvbi4NClN1cmUsIHdpbGwgY29ycmVjdCBpdCBp
-biB0aGUgdjIuDQo+IA0KPj4gVGhlIEVUSFRPT0xfQV9QTENBX0VOQUJMRUQgZGF0YSB0eXBlIGlz
-IHU4LiBCdXQgd2hpbGUgcGFyc2luZyB0aGUNCj4+IHZhbHVlIGZyb20gdGhlIGF0dHJpYnV0ZSwg
-bmxhX2dldF91MzIoKSBpcyB1c2VkIGluIHRoZSBwbGNhX3VwZGF0ZV9zaW50KCkNCj4+IGZ1bmN0
-aW9uIGluc3RlYWQgb2YgbmxhX2dldF91OCgpLiBTbyBwbGNhX2NmZy5lbmFibGVkIHZhcmlhYmxl
-IGlzIHVwZGF0ZWQNCj4+IHdpdGggc29tZSBnYXJiYWdlIHZhbHVlIGluc3RlYWQgb2YgMCBvciAx
-IGFuZCBhbHdheXMgZW5hYmxlcyBwbGNhIGV2ZW4NCj4+IHRob3VnaCBwbGNhIGlzIGRpc2FibGVk
-IHRocm91Z2ggZXRodG9vbCBhcHBsaWNhdGlvbi4gVGhpcyBidWcgaGFzIGJlZW4NCj4+IGZpeGVk
-IGJ5IGltcGxlbWVudGluZyBwbGNhX3VwZGF0ZV9zaW50X2Zyb21fdTgoKSBmdW5jdGlvbiB3aGlj
-aCB1c2VzDQo+PiBubGFfZ2V0X3U4KCkgZnVuY3Rpb24gdG8gZXh0cmFjdCB0aGUgcGxjYV9jZmcu
-ZW5hYmxlZCB2YWx1ZSBhbmQgdGhlDQo+PiBmdW5jdGlvbiBwbGNhX3VwZGF0ZV9zaW50X2Zyb21f
-dTMyKCkgaXMgdXNlZCBmb3IgZXh0cmFjdGluZyB0aGUgb3RoZXINCj4+IHZhbHVlcyB1c2luZyBu
-bGFfZ2V0X3UzMigpIGZ1bmN0aW9uLg0KPiANCj4gSG0sIHllcywgdGhhdCBzZWVtcyBsaWtlIHRo
-ZSBiZXN0IG9mIHRoZSBhdmFpbGFibGUgb3B0aW9ucy4NCj4gDQo+PiBGaXhlczogODU4MGUxNmMy
-OGYzICgibmV0L2V0aHRvb2w6IGFkZCBuZXRsaW5rIGludGVyZmFjZSBmb3IgdGhlIFBMQ0EgUlMi
-KQ0KPiANCj4gUGxlYXNlIG1ha2Ugc3VyZSB5b3UgQ0MgYWxsIHRoZSBwZW9wbGUgd2hvIHNpZ25l
-ZCBvZmYgdGhlIGNvbW1pdCB1bmRlcg0KPiBGaXhlcy4gWW91IG1pc3NlZCBwYWJlbmlAcmVkaGF0
-LmNvbSBhbmQgYW5kcmV3QGx1bm4uY2gNCkFoIHllcywgd2lsbCBpbmNsdWRlIHRoZW0gaW4gdGhl
-IHYyLg0KPiANCj4+IFNpZ25lZC1vZmYtYnk6IFBhcnRoaWJhbiBWZWVyYXNvb3JhbiA8UGFydGhp
-YmFuLlZlZXJhc29vcmFuQG1pY3JvY2hpcC5jb20+DQo+PiAtLS0NCj4+ICAgbmV0L2V0aHRvb2wv
-cGxjYS5jIHwgMzQgKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLQ0KPj4gICAxIGZp
-bGUgY2hhbmdlZCwgMjQgaW5zZXJ0aW9ucygrKSwgMTAgZGVsZXRpb25zKC0pDQo+Pg0KPj4gZGlm
-ZiAtLWdpdCBhL25ldC9ldGh0b29sL3BsY2EuYyBiL25ldC9ldGh0b29sL3BsY2EuYw0KPj4gaW5k
-ZXggYjIzOGExYWZlOWFlLi5iNGU4MGRkMzM1OTAgMTAwNjQ0DQo+PiAtLS0gYS9uZXQvZXRodG9v
-bC9wbGNhLmMNCj4+ICsrKyBiL25ldC9ldGh0b29sL3BsY2EuYw0KPj4gQEAgLTIxLDggKzIxLDgg
-QEAgc3RydWN0IHBsY2FfcmVwbHlfZGF0YSB7DQo+PiAgICNkZWZpbmUgUExDQV9SRVBEQVRBKF9f
-cmVwbHlfYmFzZSkgXA0KPj4gICAgICAgIGNvbnRhaW5lcl9vZihfX3JlcGx5X2Jhc2UsIHN0cnVj
-dCBwbGNhX3JlcGx5X2RhdGEsIGJhc2UpDQo+Pg0KPj4gLXN0YXRpYyB2b2lkIHBsY2FfdXBkYXRl
-X3NpbnQoaW50ICpkc3QsIGNvbnN0IHN0cnVjdCBubGF0dHIgKmF0dHIsDQo+PiAtICAgICAgICAg
-ICAgICAgICAgICAgICAgICBib29sICptb2QpDQo+PiArc3RhdGljIHZvaWQgcGxjYV91cGRhdGVf
-c2ludF9mcm9tX3UzMihpbnQgKmRzdCwgY29uc3Qgc3RydWN0IG5sYXR0ciAqYXR0ciwNCj4+ICsg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJvb2wgKm1vZCkNCj4+ICAgew0KPj4g
-ICAgICAgIGlmICghYXR0cikNCj4+ICAgICAgICAgICAgICAgIHJldHVybjsNCj4+IEBAIC0zMSw2
-ICszMSwxNiBAQCBzdGF0aWMgdm9pZCBwbGNhX3VwZGF0ZV9zaW50KGludCAqZHN0LCBjb25zdCBz
-dHJ1Y3QgbmxhdHRyICphdHRyLA0KPj4gICAgICAgICptb2QgPSB0cnVlOw0KPj4gICB9DQo+Pg0K
-Pj4gK3N0YXRpYyB2b2lkIHBsY2FfdXBkYXRlX3NpbnRfZnJvbV91OChpbnQgKmRzdCwgY29uc3Qg
-c3RydWN0IG5sYXR0ciAqYXR0ciwNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgYm9vbCAqbW9kKQ0KPj4gK3sNCj4+ICsgICAgIGlmICghYXR0cikNCj4+ICsgICAgICAgICAg
-ICAgcmV0dXJuOw0KPj4gKw0KPj4gKyAgICAgKmRzdCA9IG5sYV9nZXRfdTgoYXR0cik7DQo+PiAr
-ICAgICAqbW9kID0gdHJ1ZTsNCj4+ICt9DQo+PiArDQo+PiAgIC8vIFBMQ0EgZ2V0IGNvbmZpZ3Vy
-YXRpb24gbWVzc2FnZSAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-IC8vDQo+Pg0KPj4gICBjb25zdCBzdHJ1Y3QgbmxhX3BvbGljeSBldGhubF9wbGNhX2dldF9jZmdf
-cG9saWN5W10gPSB7DQo+PiBAQCAtMTQ0LDE0ICsxNTQsMTggQEAgZXRobmxfc2V0X3BsY2Eoc3Ry
-dWN0IGV0aG5sX3JlcV9pbmZvICpyZXFfaW5mbywgc3RydWN0IGdlbmxfaW5mbyAqaW5mbykNCj4+
-ICAgICAgICAgICAgICAgIHJldHVybiAtRU9QTk9UU1VQUDsNCj4+DQo+PiAgICAgICAgbWVtc2V0
-KCZwbGNhX2NmZywgMHhmZiwgc2l6ZW9mKHBsY2FfY2ZnKSk7DQo+PiAtICAgICBwbGNhX3VwZGF0
-ZV9zaW50KCZwbGNhX2NmZy5lbmFibGVkLCB0YltFVEhUT09MX0FfUExDQV9FTkFCTEVEXSwgJm1v
-ZCk7DQo+PiAtICAgICBwbGNhX3VwZGF0ZV9zaW50KCZwbGNhX2NmZy5ub2RlX2lkLCB0YltFVEhU
-T09MX0FfUExDQV9OT0RFX0lEXSwgJm1vZCk7DQo+PiAtICAgICBwbGNhX3VwZGF0ZV9zaW50KCZw
-bGNhX2NmZy5ub2RlX2NudCwgdGJbRVRIVE9PTF9BX1BMQ0FfTk9ERV9DTlRdLCAmbW9kKTsNCj4+
-IC0gICAgIHBsY2FfdXBkYXRlX3NpbnQoJnBsY2FfY2ZnLnRvX3RtciwgdGJbRVRIVE9PTF9BX1BM
-Q0FfVE9fVE1SXSwgJm1vZCk7DQo+PiAtICAgICBwbGNhX3VwZGF0ZV9zaW50KCZwbGNhX2NmZy5i
-dXJzdF9jbnQsIHRiW0VUSFRPT0xfQV9QTENBX0JVUlNUX0NOVF0sDQo+PiAtICAgICAgICAgICAg
-ICAgICAgICAgICZtb2QpOw0KPj4gLSAgICAgcGxjYV91cGRhdGVfc2ludCgmcGxjYV9jZmcuYnVy
-c3RfdG1yLCB0YltFVEhUT09MX0FfUExDQV9CVVJTVF9UTVJdLA0KPj4gLSAgICAgICAgICAgICAg
-ICAgICAgICAmbW9kKTsNCj4+ICsgICAgIHBsY2FfdXBkYXRlX3NpbnRfZnJvbV91OCgmcGxjYV9j
-ZmcuZW5hYmxlZCwgdGJbRVRIVE9PTF9BX1BMQ0FfRU5BQkxFRF0sDQo+PiArICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgJm1vZCk7DQo+PiArICAgICBwbGNhX3VwZGF0ZV9zaW50X2Zyb21f
-dTMyKCZwbGNhX2NmZy5ub2RlX2lkLCB0YltFVEhUT09MX0FfUExDQV9OT0RFX0lEXSwNCj4+ICsg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJm1vZCk7DQo+PiArICAgICBwbGNhX3VwZGF0
-ZV9zaW50X2Zyb21fdTMyKCZwbGNhX2NmZy5ub2RlX2NudCwNCj4+ICsgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgdGJbRVRIVE9PTF9BX1BMQ0FfTk9ERV9DTlRdLCAmbW9kKTsNCj4+ICsg
-ICAgIHBsY2FfdXBkYXRlX3NpbnRfZnJvbV91MzIoJnBsY2FfY2ZnLnRvX3RtciwgdGJbRVRIVE9P
-TF9BX1BMQ0FfVE9fVE1SXSwNCj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJm1v
-ZCk7DQo+PiArICAgICBwbGNhX3VwZGF0ZV9zaW50X2Zyb21fdTMyKCZwbGNhX2NmZy5idXJzdF9j
-bnQsDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRiW0VUSFRPT0xfQV9QTENB
-X0JVUlNUX0NOVF0sICZtb2QpOw0KPj4gKyAgICAgcGxjYV91cGRhdGVfc2ludF9mcm9tX3UzMigm
-cGxjYV9jZmcuYnVyc3RfdG1yLA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB0
-YltFVEhUT09MX0FfUExDQV9CVVJTVF9UTVJdLCAmbW9kKTsNCj4gDQo+IFRoaXMgbG9va3MgZXJy
-b3IgcHJvbmUuIFdlIHN0aWxsIG5lZWQgdG8gbWFpbnRhaW4gdGhlIHR5cGVzIGluIG11bHRpcGxl
-DQo+IHBsYWNlcy4gSG93IGFib3V0IHdlIHVzZSB0aGUgcG9saWN5IHRvIGRlY2lkZSB0aGUgdHlw
-ZT8gU29tZXRoaW5nIGFsb25nDQo+IHRoZSBsaW5lcyBvZiAodW50ZXN0ZWQpOg0KSG1tIG9rLCBJ
-IGNvbXBpbGVkIGFuZCB0ZXN0ZWQgeW91ciBwcm9wb3NhbC4gQmVsb3cgaXMgdGhlIG1pbm9yIGNo
-YW5nZSANCm9iZXJ2ZWQgZHVyaW5nIGNvbXBpbGF0aW9uLg0KPiANCj4gZGlmZiAtLWdpdCBhL25l
-dC9ldGh0b29sL3BsY2EuYyBiL25ldC9ldGh0b29sL3BsY2EuYw0KPiBpbmRleCBiMjM4YTFhZmU5
-YWUuLmFlZDMwNjY1ZTljMCAxMDA2NDQNCj4gLS0tIGEvbmV0L2V0aHRvb2wvcGxjYS5jDQo+ICsr
-KyBiL25ldC9ldGh0b29sL3BsY2EuYw0KPiBAQCAtMjEsMTYgKzIxLDYgQEAgc3RydWN0IHBsY2Ff
-cmVwbHlfZGF0YSB7DQo+ICAgI2RlZmluZSBQTENBX1JFUERBVEEoX19yZXBseV9iYXNlKSBcDQo+
-ICAgICAgICAgIGNvbnRhaW5lcl9vZihfX3JlcGx5X2Jhc2UsIHN0cnVjdCBwbGNhX3JlcGx5X2Rh
-dGEsIGJhc2UpDQo+IA0KPiAtc3RhdGljIHZvaWQgcGxjYV91cGRhdGVfc2ludChpbnQgKmRzdCwg
-Y29uc3Qgc3RydWN0IG5sYXR0ciAqYXR0ciwNCj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICBib29sICptb2QpDQo+IC17DQo+IC0gICAgICAgaWYgKCFhdHRyKQ0KPiAtICAgICAgICAgICAg
-ICAgcmV0dXJuOw0KPiAtDQo+IC0gICAgICAgKmRzdCA9IG5sYV9nZXRfdTMyKGF0dHIpOw0KPiAt
-ICAgICAgICptb2QgPSB0cnVlOw0KPiAtfQ0KPiAtDQo+ICAgLy8gUExDQSBnZXQgY29uZmlndXJh
-dGlvbiBtZXNzYWdlIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0g
-Ly8NCj4gDQo+ICAgY29uc3Qgc3RydWN0IG5sYV9wb2xpY3kgZXRobmxfcGxjYV9nZXRfY2ZnX3Bv
-bGljeVtdID0gew0KPiBAQCAtMTI1LDYgKzExNSwyOSBAQCBjb25zdCBzdHJ1Y3QgbmxhX3BvbGlj
-eSBldGhubF9wbGNhX3NldF9jZmdfcG9saWN5W10gPSB7DQo+ICAgICAgICAgIFtFVEhUT09MX0Ff
-UExDQV9CVVJTVF9UTVJdICAgICAgPSBOTEFfUE9MSUNZX01BWChOTEFfVTMyLCAyNTUpLA0KPiAg
-IH07DQo+IA0KPiArc3RhdGljIHZvaWQNCj4gK3BsY2FfdXBkYXRlX3NpbnQoaW50ICpkc3QsIGNv
-bnN0IHN0cnVjdCBubGF0dHIgKip0YiwgdTMyIGF0dHJpZCwgYm9vbCAqbW9kKQ0KcGxjYV91cGRh
-dGVfc2ludChpbnQgKmRzdCwgc3RydWN0IG5sYXR0ciAqKnRiLCB1MzIgYXR0cmlkLCBib29sICpt
-b2QpDQoNCldpbGwgcHJlcGFyZSBhbmQgc2VuZCB0aGUgdjIgd2l0aCB0aGlzIHByb3Bvc2FsLg0K
-DQpCZXN0IFJlZ2FyZHMsDQpQYXJ0aGliYW4gVg0KDQo+ICt7DQo+ICsgICAgICAgY29uc3Qgc3Ry
-dWN0IG5sYXR0ciAqYXR0ciA9IHRiW2F0dHJpZF07DQo+ICsNCj4gKyAgICAgICBpZiAoIWF0dHIg
-fHwNCj4gKyAgICAgICAgICAgV0FSTl9PTl9PTkNFKGF0dHJpZCA+PSBBUlJBWV9TSVpFKGV0aG5s
-X3BsY2Ffc2V0X2NmZ19wb2xpY3kpKSkNCj4gKyAgICAgICAgICAgICAgIHJldHVybjsNCj4gKw0K
-PiArICAgICAgIHN3aXRjaCAoZXRobmxfcGxjYV9zZXRfY2ZnX3BvbGljeVthdHRyaWRdLnR5cGUp
-IHsNCj4gKyAgICAgICBjYXNlIE5MQV9VODoNCj4gKyAgICAgICAgICAgICAgICpkc3QgPSBubGFf
-Z2V0X3U4KGF0dHIpOw0KPiArICAgICAgICAgICAgICAgYnJlYWs7DQo+ICsgICAgICAgY2FzZSBO
-TEFfVTMyOg0KPiArICAgICAgICAgICAgICAgKmRzdCA9IG5sYV9nZXRfdTMyKGF0dHIpOw0KPiAr
-ICAgICAgICAgICAgICAgYnJlYWs7DQo+ICsgICAgICAgZGVmYXVsdDoNCj4gKyAgICAgICAgICAg
-ICAgIFdBUk5fT05fT05DRSgxKTsNCj4gKyAgICAgICB9DQo+ICsNCj4gKyAgICAgICAqbW9kID0g
-dHJ1ZTsNCj4gK30NCj4gKw0KPiAgIHN0YXRpYyBpbnQNCj4gICBldGhubF9zZXRfcGxjYShzdHJ1
-Y3QgZXRobmxfcmVxX2luZm8gKnJlcV9pbmZvLCBzdHJ1Y3QgZ2VubF9pbmZvICppbmZvKQ0KPiAg
-IHsNCj4gQEAgLTE0NCwxMyArMTU3LDEzIEBAIGV0aG5sX3NldF9wbGNhKHN0cnVjdCBldGhubF9y
-ZXFfaW5mbyAqcmVxX2luZm8sIHN0cnVjdCBnZW5sX2luZm8gKmluZm8pDQo+ICAgICAgICAgICAg
-ICAgICAgcmV0dXJuIC1FT1BOT1RTVVBQOw0KPiANCj4gICAgICAgICAgbWVtc2V0KCZwbGNhX2Nm
-ZywgMHhmZiwgc2l6ZW9mKHBsY2FfY2ZnKSk7DQo+IC0gICAgICAgcGxjYV91cGRhdGVfc2ludCgm
-cGxjYV9jZmcuZW5hYmxlZCwgdGJbRVRIVE9PTF9BX1BMQ0FfRU5BQkxFRF0sICZtb2QpOw0KPiAt
-ICAgICAgIHBsY2FfdXBkYXRlX3NpbnQoJnBsY2FfY2ZnLm5vZGVfaWQsIHRiW0VUSFRPT0xfQV9Q
-TENBX05PREVfSURdLCAmbW9kKTsNCj4gLSAgICAgICBwbGNhX3VwZGF0ZV9zaW50KCZwbGNhX2Nm
-Zy5ub2RlX2NudCwgdGJbRVRIVE9PTF9BX1BMQ0FfTk9ERV9DTlRdLCAmbW9kKTsNCj4gLSAgICAg
-ICBwbGNhX3VwZGF0ZV9zaW50KCZwbGNhX2NmZy50b190bXIsIHRiW0VUSFRPT0xfQV9QTENBX1RP
-X1RNUl0sICZtb2QpOw0KPiAtICAgICAgIHBsY2FfdXBkYXRlX3NpbnQoJnBsY2FfY2ZnLmJ1cnN0
-X2NudCwgdGJbRVRIVE9PTF9BX1BMQ0FfQlVSU1RfQ05UXSwNCj4gKyAgICAgICBwbGNhX3VwZGF0
-ZV9zaW50KCZwbGNhX2NmZy5lbmFibGVkLCB0YiwgRVRIVE9PTF9BX1BMQ0FfRU5BQkxFRCwgJm1v
-ZCk7DQo+ICsgICAgICAgcGxjYV91cGRhdGVfc2ludCgmcGxjYV9jZmcubm9kZV9pZCwgdGIsIEVU
-SFRPT0xfQV9QTENBX05PREVfSUQsICZtb2QpOw0KPiArICAgICAgIHBsY2FfdXBkYXRlX3NpbnQo
-JnBsY2FfY2ZnLm5vZGVfY250LCB0YiwgRVRIVE9PTF9BX1BMQ0FfTk9ERV9DTlQsICZtb2QpOw0K
-PiArICAgICAgIHBsY2FfdXBkYXRlX3NpbnQoJnBsY2FfY2ZnLnRvX3RtciwgdGIsIEVUSFRPT0xf
-QV9QTENBX1RPX1RNUiwgJm1vZCk7DQo+ICsgICAgICAgcGxjYV91cGRhdGVfc2ludCgmcGxjYV9j
-ZmcuYnVyc3RfY250LCB0YiwgRVRIVE9PTF9BX1BMQ0FfQlVSU1RfQ05ULA0KPiAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICZtb2QpOw0KPiAtICAgICAgIHBsY2FfdXBkYXRlX3NpbnQoJnBsY2Ff
-Y2ZnLmJ1cnN0X3RtciwgdGJbRVRIVE9PTF9BX1BMQ0FfQlVSU1RfVE1SXSwNCj4gKyAgICAgICBw
-bGNhX3VwZGF0ZV9zaW50KCZwbGNhX2NmZy5idXJzdF90bXIsIHRiLCBFVEhUT09MX0FfUExDQV9C
-VVJTVF9UTVIsDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgJm1vZCk7DQo+ICAgICAgICAg
-IGlmICghbW9kKQ0KPiAgICAgICAgICAgICAgICAgIHJldHVybiAwOw0KPiANCg0K
+I am very happy that phy LED trigger support is finally merged. Thanks
+Andrew and Christion for making this happen :)
+
+I am currently giving the LED support on the dp83867 phy a try. I got
+the following log splat when doing a "echo netdev > /sys/class/leds/.../trigger"
+on one of the DP83867 provided phy LEDs.
+
+In the netdevice open path we first take &rtnl_mutex in devinet_ioctl()
+and afterwards &triggers_list_lock in led_trigger_register().
+The other path takes the locks in the opposite order: First it takes
+&triggers_list_lock first in led_trigger_write() and then &rtnl_mutex
+in register_netdevice_notifier(), so a classical ABBA deadlock. At least
+that's what I see from looking at the code, I am a bit confused by the
+lockdep output.
+
+Any idea how we can solve this?
+
+Sascha
+
+-------------------------------8<---------------------------------------
+
+[   53.942317] ======================================================
+[   53.948607] WARNING: possible circular locking dependency detected
+[   53.954898] 6.5.0-11704-g3f86ed6ec0b3 #367 Not tainted
+[   53.960136] ------------------------------------------------------
+[   53.966426] sh/579 is trying to acquire lock:
+[   53.970872] ffff800082354af8 (pernet_ops_rwsem){+.+.}-{4:4}, at: register_netdevice_notifier+0x30/0x12c
+[   53.980539]
+[   53.980539] but task is already holding lock:
+[   53.986485] ffff000004f2de68 (&led_cdev->trigger_lock){+.+.}-{4:4}, at: led_trigger_write+0x100/0x14c
+[   53.995959]
+[   53.995959] which lock already depends on the new lock.
+[   53.995959]
+[   54.004282]
+[   54.004282] the existing dependency chain (in reverse order) is:
+[   54.011898]
+[   54.011898] -> #3 (&led_cdev->trigger_lock){+.+.}-{4:4}:
+[   54.018877]        down_write+0x5c/0x120
+[   54.022911]        led_trigger_set_default+0x40/0xd0
+[   54.028001]        led_classdev_register_ext+0x2b8/0x3c8
+[   54.033442]        __sdhci_add_host+0x1e4/0x368
+[   54.038083]        sdhci_add_host+0x3c/0x50
+[   54.042375]        sdhci_arasan_probe+0x9dc/0xaa4
+[   54.047191]        platform_probe+0x68/0xc4
+[   54.051481]        really_probe+0x148/0x2ac
+[   54.055768]        __driver_probe_device+0x78/0x12c
+[   54.060759]        driver_probe_device+0xd8/0x160
+[   54.065574]        __device_attach_driver+0xb8/0x138
+[   54.070657]        bus_for_each_drv+0x80/0xdc
+[   54.075118]        __device_attach_async_helper+0xb0/0xd4
+[   54.080635]        async_run_entry_fn+0x34/0xe0
+[   54.085274]        process_one_work+0x1ec/0x51c
+[   54.089920]        worker_thread+0x1ec/0x3e4
+[   54.094300]        kthread+0x120/0x124
+[   54.098147]        ret_from_fork+0x10/0x20
+[   54.102343]
+[   54.102343] -> #2 (triggers_list_lock){++++}-{4:4}:
+[   54.108880]        down_write+0x5c/0x120
+[   54.112915]        led_trigger_register+0x50/0x1b4
+[   54.117822]        phy_led_triggers_register+0xa4/0x244
+[   54.123167]        phy_attach_direct+0x158/0x378
+[   54.127906]        phylink_fwnode_phy_connect+0x8c/0x10c
+[   54.133331]        phylink_of_phy_connect+0x1c/0x28
+[   54.138316]        macb_phylink_connect+0x48/0x120
+[   54.143220]        macb_open+0x214/0x34c
+[   54.147235]        __dev_open+0x100/0x1e0
+[   54.151351]        __dev_change_flags+0x19c/0x21c
+[   54.156167]        dev_change_flags+0x24/0x6c
+[   54.160632]        devinet_ioctl+0x488/0x7d8
+[   54.165007]        inet_ioctl+0x1e8/0x1f8
+[   54.169117]        sock_do_ioctl+0x48/0xf8
+[   54.173317]        sock_ioctl+0x250/0x374
+[   54.177433]        __arm64_sys_ioctl+0xac/0xf0
+[   54.181989]        invoke_syscall+0x48/0x114
+[   54.186370]        el0_svc_common.constprop.0+0xc0/0xe0
+[   54.191719]        do_el0_svc+0x1c/0x28
+[   54.195660]        el0_svc+0x58/0x114
+[   54.199413]        el0t_64_sync_handler+0x100/0x12c
+[   54.204403]        el0t_64_sync+0x190/0x194
+[   54.208685]
+[   54.208685] -> #1 (rtnl_mutex){+.+.}-{4:4}:
+[   54.214515]        __mutex_lock+0xa0/0x7b0
+[   54.218717]        mutex_lock_nested+0x24/0x30
+[   54.223270]        rtnl_lock+0x1c/0x28
+[   54.227115]        register_netdevice_notifier+0x38/0x12c
+[   54.232640]        rtnetlink_init+0x2c/0x50c
+[   54.237016]        netlink_proto_init+0x148/0x1e0
+[   54.241832]        do_one_initcall+0x74/0x2f8
+[   54.246287]        kernel_init_freeable+0x290/0x4d0
+[   54.251278]        kernel_init+0x24/0x1dc
+[   54.255389]        ret_from_fork+0x10/0x20
+[   54.259581]
+[   54.259581] -> #0 (pernet_ops_rwsem){+.+.}-{4:4}:
+[   54.265943]        __lock_acquire+0x1358/0x1f64
+[   54.270578]        lock_acquire+0x1ec/0x30c
+[   54.274860]        down_write+0x5c/0x120
+[   54.278893]        register_netdevice_notifier+0x30/0x12c
+[   54.284426]        netdev_trig_activate+0x178/0x1dc
+[   54.289418]        led_trigger_set+0x130/0x260
+[   54.293978]        led_trigger_write+0x10c/0x14c
+[   54.298709]        sysfs_kf_bin_write+0x68/0x88
+[   54.303353]        kernfs_fop_write_iter+0x120/0x1b0
+[   54.308437]        vfs_write+0x194/0x2a8
+[   54.312458]        ksys_write+0x6c/0x100
+[   54.316477]        __arm64_sys_write+0x1c/0x28
+[   54.321024]        invoke_syscall+0x48/0x114
+[   54.325405]        el0_svc_common.constprop.0+0xc0/0xe0
+[   54.330756]        do_el0_svc+0x1c/0x28
+[   54.334695]        el0_svc+0x58/0x114
+[   54.338451]        el0t_64_sync_handler+0x100/0x12c
+[   54.343442]        el0t_64_sync+0x190/0x194
+[   54.347721]
+[   54.347721] other info that might help us debug this:
+[   54.347721]
+[   54.355873] Chain exists of:
+[   54.355873]   pernet_ops_rwsem --> triggers_list_lock --> &led_cdev->trigger_lock
+[   54.355873]
+[   54.367981]  Possible unsafe locking scenario:
+[   54.367981]
+[   54.374013]        CPU0                    CPU1
+[   54.378633]        ----                    ----
+[   54.383251]   lock(&led_cdev->trigger_lock);
+[   54.387629]                                lock(triggers_list_lock);
+[   54.394126]                                lock(&led_cdev->trigger_lock);
+[   54.401056]   lock(pernet_ops_rwsem);
+[   54.404827]
+[   54.404827]  *** DEADLOCK ***
+[   54.404827]
+[   54.410856] 6 locks held by sh/579:
+[   54.414425]  #0: ffff00000549f418 (sb_writers#5){.+.+}-{0:0}, at: vfs_write+0xa4/0x2a8
+[   54.422598]  #1: ffff000007e90890 (&of->mutex){+.+.}-{4:4}, at: kernfs_fop_write_iter+0xf0/0x1b0
+[   54.431637]  #2: ffff000004f69f28 (kn->active#39){.+.+}-{0:0}, at: kernfs_fop_write_iter+0xf8/0x1b0
+[   54.440963]  #3: ffff000004f2df70 (&led_cdev->led_access){+.+.}-{4:4}, at: led_trigger_write+0x3c/0x14c
+[   54.450629]  #4: ffff800082340c08 (triggers_list_lock){++++}-{4:4}, at: led_trigger_write+0x94/0x14c
+[   54.460026]  #5: ffff000004f2de68 (&led_cdev->trigger_lock){+.+.}-{4:4}, at: led_trigger_write+0x100/0x14c
+[   54.469953]
+[   54.469953] stack backtrace:
+[   54.474405] CPU: 1 PID: 579 Comm: sh Not tainted 6.5.0-11704-g3f86ed6ec0b3 #367
+[   54.481865] Hardware name: Wolfvision ZynqMP PF4 (DT)
+[   54.487012] Call trace:
+[   54.489520]  dump_backtrace+0x98/0xf0
+[   54.493276]  show_stack+0x18/0x24
+[   54.496674]  dump_stack_lvl+0x60/0xac
+[   54.500429]  dump_stack+0x18/0x24
+[   54.503826]  print_circular_bug+0x284/0x364
+[   54.508108]  check_noncircular+0x158/0x16c
+[   54.512299]  __lock_acquire+0x1358/0x1f64
+[   54.516405]  lock_acquire+0x1ec/0x30c
+[   54.520158]  down_write+0x5c/0x120
+[   54.523662]  register_netdevice_notifier+0x30/0x12c
+[   54.528665]  netdev_trig_activate+0x178/0x1dc
+[   54.533127]  led_trigger_set+0x130/0x260
+[   54.537158]  led_trigger_write+0x10c/0x14c
+[   54.541361]  sysfs_kf_bin_write+0x68/0x88
+[   54.545474]  kernfs_fop_write_iter+0x120/0x1b0
+[   54.550029]  vfs_write+0x194/0x2a8
+[   54.553521]  ksys_write+0x6c/0x100
+[   54.557008]  __arm64_sys_write+0x1c/0x28
+[   54.561028]  invoke_syscall+0x48/0x114
+[   54.564878]  el0_svc_common.constprop.0+0xc0/0xe0
+[   54.569701]  do_el0_svc+0x1c/0x28
+[   54.573110]  el0_svc+0x58/0x114
+[   54.576337]  el0t_64_sync_handler+0x100/0x12c
+[   54.580798]  el0t_64_sync+0x190/0x194
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
