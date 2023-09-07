@@ -1,192 +1,121 @@
-Return-Path: <netdev+bounces-32393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32389-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC2A17973B6
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 17:30:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19F927973A0
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 17:29:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECF0C1C20B88
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 15:30:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABAA028165A
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 15:29:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D841125CE;
-	Thu,  7 Sep 2023 15:29:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7661F125D1;
+	Thu,  7 Sep 2023 15:28:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1304E11731;
-	Thu,  7 Sep 2023 15:29:46 +0000 (UTC)
-Received: from mail-ed1-x541.google.com (mail-ed1-x541.google.com [IPv6:2a00:1450:4864:20::541])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9A2810DF;
-	Thu,  7 Sep 2023 08:29:20 -0700 (PDT)
-Received: by mail-ed1-x541.google.com with SMTP id 4fb4d7f45d1cf-5230a22cfd1so1448020a12.1;
-        Thu, 07 Sep 2023 08:29:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694100517; x=1694705317; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a+iQnvoR9WIvvuphk/xb2y7jezozNmyXY5BuGK/6FCk=;
-        b=QT0T5PVV6crUy32yYSeb2fNcVirjKNrqwn3fGxj9zooVxcoFmbb3N1r0LwyFgrMity
-         wpsnJIdPUDM11iKltMPmV3dyGXkWWFE4JwjwTNT2iB/OeTdfkSj9E4oOOZSZfcDvsuZb
-         U1nGEj/DoYruezOELVvNITFBM7UBW99+U0ThcjI4kxfZ4YWtU2PBuAY+3UpqLJGEkgHP
-         yyQjV9RW+WiC1JPVf3OfU6mSeimnrVINx7cjCdn2YfsjdXbe6se2atZyEOqOacIKITUw
-         3G3vAbBAS9Cx1nl2rY8F+nOP+zcS0eLQk6HomScvgAsD4H2mSbjB9u2PAk4JUGU+x6Jx
-         SYwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1694100517; x=1694705317;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=a+iQnvoR9WIvvuphk/xb2y7jezozNmyXY5BuGK/6FCk=;
-        b=biuhGWGYnZoKkw8jcoNBXu9wUv9hbdJu8/eyhXJlI35/EgFb9ugWXhJhZp42Q3hxdE
-         b915ln9FPiIxvN/WS+gz1uj5PJJWoxGq7zCrnAqxRvA1pZ+quqXncGIwpsxR5Qt8TvYP
-         AdhvRPkSRLt8EhVZhVNMsLpyzIR3/owHAAjZGd4hmulCxDDOF9GyZzQZo6BCglpZa0rn
-         KSS0tMhHEkY2oWEURWxQSxfVHCPnELebt83ZKiZH7v5duZIrsPWp1E2Jvb4tELlA3Yme
-         SAqF63ta/zxSnvWLDWJS86Se5prnEQgxjmn9qBbLhllGlAQijNF2PqPfSVWrTOu3CWgX
-         GI8Q==
-X-Gm-Message-State: AOJu0YzIMpD3NsfviubL6CVX0lHvcMEGM/Zpqc5dS5CxSU+uaFf2545e
-	RffcfqzhWNlI4WudFh40wZQlw6aFZ1QHBUlpfmY+sev3yrw=
-X-Google-Smtp-Source: AGHT+IHvMG7BHxfBuEv/VtwE4M7iBZo1MCLbCeCOoLZE5hIc0qenbVkKo7iV8ndNJxlJRBVF8lgdOHhtNmiXXh4bKeY=
-X-Received: by 2002:a17:906:23e9:b0:9a2:276d:d84c with SMTP id
- j9-20020a17090623e900b009a2276dd84cmr4313287ejg.12.1694085243622; Thu, 07 Sep
- 2023 04:14:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BE8F12B67
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 15:28:50 +0000 (UTC)
+Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [217.70.178.240])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B42FC1FD2;
+	Thu,  7 Sep 2023 08:28:26 -0700 (PDT)
+Received: from relay4-d.mail.gandi.net (unknown [217.70.183.196])
+	by mslow1.mail.gandi.net (Postfix) with ESMTP id C78CCCECB4;
+	Thu,  7 Sep 2023 12:17:00 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 0A117E0014;
+	Thu,  7 Sep 2023 12:16:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1694089000;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eS0v+VHUqtxVc+8EW+fjSWrwzAlhi5oKaoIMevibDZ0=;
+	b=KAqGlJaXSIaZnrnz9oXNudMAE5iHcxC9BzVRFnvhJOErcm1AX/IBpE/sgmEmXiQARYcghU
+	GnVXquFWR0YTKisVkAWoJyIMZ9R2cE4BXdrrO/H+VZ79joIqcX3GtPmkEBNfuwWDKP0xGg
+	45UcPlexSUbur2WUWfdGCWcaBVeyfRcpvI/blfJC5PEUxsRJflcpWj4qeGd2V2HnSygHgC
+	YMckGmXObOnDS4CG6FPYMvBmIDvjRYs95n9VRFoXi6MoKD6KTjfV8ZUUmiFoWBNkexyubP
+	rkTxi1yhRsBQsves4FNJriZ1ZbYdWhyHmKN9UbYhuPlRKFt1P3lFAxYpob/jew==
+Date: Thu, 7 Sep 2023 14:16:35 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
+ <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Florian Fainelli <f.fainelli@gmail.com>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Oleksij Rempel <linux@rempel-privat.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
+ <nicveronese@gmail.com>, thomas.petazzoni@bootlin.com, Christophe Leroy
+ <christophe.leroy@csgroup.eu>
+Subject: Re: [RFC PATCH net-next 4/7] net: ethtool: add a netlink command to
+ list PHYs
+Message-ID: <20230907141635.20bcaa59@pc-7.home>
+In-Reply-To: <ZPmfOOsqoO02AcBH@shell.armlinux.org.uk>
+References: <20230907092407.647139-1-maxime.chevallier@bootlin.com>
+	<20230907092407.647139-5-maxime.chevallier@bootlin.com>
+	<ZPmfOOsqoO02AcBH@shell.armlinux.org.uk>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CABcoxUbYwuZUL-xm1+5juO42nJMgpQX7cNyQELYz+g2XkZi9TQ@mail.gmail.com>
- <87o7ienuss.fsf@toke.dk>
-In-Reply-To: <87o7ienuss.fsf@toke.dk>
-From: Kumar Kartikeya Dwivedi <memxor@gmail.com>
-Date: Thu, 7 Sep 2023 13:13:27 +0200
-Message-ID: <CAP01T76Ce2KHQqTGsqs5K9RM5qSv07rNxnV+-=q_J25i9NkqxA@mail.gmail.com>
-Subject: Re: Possible deadlock in bpf queue map
-To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@kernel.org>
-Cc: Hsin-Wei Hung <hsinweih@uci.edu>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <kafai@fb.com>, Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, netdev@vger.kernel.org, 
-	bpf@vger.kernel.org, Arnaldo Carvalho de Melo <acme@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-0.5 required=5.0 tests=BAYES_00,DATE_IN_PAST_03_06,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, 7 Sept 2023 at 12:26, Toke H=C3=B8iland-J=C3=B8rgensen <toke@kernel=
-.org> wrote:
->
-> +Arnaldo
->
-> > Hi,
-> >
-> > Our bpf fuzzer, a customized Syzkaller, triggered a lockdep warning in
-> > the bpf queue map in v5.15. Since queue_stack_maps.c has no major chang=
-es
-> > since v5.15, we think this should still exist in the latest kernel.
-> > The bug can be occasionally triggered, and we suspect one of the
-> > eBPF programs involved to be the following one. We also attached the lo=
-ckdep
-> > warning at the end.
-> >
-> > #define DEFINE_BPF_MAP_NO_KEY(the_map, TypeOfMap, MapFlags,
-> > TypeOfValue, MaxEntries) \
-> >         struct {                                                       =
- \
-> >             __uint(type, TypeOfMap);                                   =
- \
-> >             __uint(map_flags, (MapFlags));                             =
- \
-> >             __uint(max_entries, (MaxEntries));                         =
- \
-> >             __type(value, TypeOfValue);                                =
- \
-> >         } the_map SEC(".maps");
-> >
-> > DEFINE_BPF_MAP_NO_KEY(map_0, BPF_MAP_TYPE_QUEUE, 0 | BPF_F_WRONLY,
-> > struct_0, 162);
-> > SEC("perf_event")
-> > int func(struct bpf_perf_event_data *ctx) {
-> >         char v0[96] =3D {};
-> >         uint64_t v1 =3D 0;
-> >         v1 =3D bpf_map_pop_elem(&map_0, v0);
-> >         return 163819661;
-> > }
-> >
-> >
-> > The program is attached to the following perf event.
-> >
-> > struct perf_event_attr attr_type_hw =3D {
-> >         .type =3D PERF_TYPE_HARDWARE,
-> >         .config =3D PERF_COUNT_HW_CPU_CYCLES,
-> >         .sample_freq =3D 50,
-> >         .inherit =3D 1,
-> >         .freq =3D 1,
-> > };
-> >
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3DWARNING: inconsistent lock state
-> > 5.15.26+ #2 Not tainted
-> > --------------------------------
-> > inconsistent {INITIAL USE} -> {IN-NMI} usage.
-> > syz-executor.5/19749 [HC1[1]:SC0[0]:HE0:SE1] takes:
-> > ffff88804c9fc198 (&qs->lock){..-.}-{2:2}, at: __queue_map_get+0x31/0x25=
-0
-> > {INITIAL USE} state was registered at:
-> >   lock_acquire+0x1a3/0x4b0
-> >   _raw_spin_lock_irqsave+0x48/0x60
-> >   __queue_map_get+0x31/0x250
-> >   bpf_prog_577904e86c81dead_func+0x12/0x4b4
-> >   trace_call_bpf+0x262/0x5d0
-> >   perf_trace_run_bpf_submit+0x91/0x1c0
-> >   perf_trace_sched_switch+0x46c/0x700
-> >   __schedule+0x11b5/0x24a0
-> >   schedule+0xd4/0x270
-> >   futex_wait_queue_me+0x25f/0x520
-> >   futex_wait+0x1e0/0x5f0
-> >   do_futex+0x395/0x1890
-> >   __x64_sys_futex+0x1cb/0x480
-> >   do_syscall_64+0x3b/0xc0
-> >   entry_SYSCALL_64_after_hwframe+0x44/0xae
-> > irq event stamp: 13640
-> > hardirqs last  enabled at (13639): [<ffffffff95eb2bf4>]
-> > _raw_spin_unlock_irq+0x24/0x40
-> > hardirqs last disabled at (13640): [<ffffffff95eb2d4d>]
-> > _raw_spin_lock_irqsave+0x5d/0x60
-> > softirqs last  enabled at (13464): [<ffffffff93e26de5>] __sys_bpf+0x3e1=
-5/0x4e80
-> > softirqs last disabled at (13462): [<ffffffff93e26da3>] __sys_bpf+0x3dd=
-3/0x4e80
-> >
-> > other info that might help us debug this:
-> >  Possible unsafe locking scenario:
-> >
-> >        CPU0
-> >        ----
-> >   lock(&qs->lock);
-> >   <Interrupt>
-> >     lock(&qs->lock);
->
-> Hmm, so that lock() uses raw_spin_lock_irqsave(), which *should* be
-> disabling interrupts entirely for the critical section. But I guess a
-> Perf hardware event can still trigger? Which seems like it would
-> potentially wreak havoc with lots of things, not just this queue map
-> function?
->
-> No idea how to protect against this, though. Hoping Arnaldo knows? :)
->
+Hello Russell,
 
-The locking should probably be protected by a percpu integer counter,
-incremented and decremented before and after the lock is taken,
-respectively. If it is already non-zero, then -EBUSY should be
-returned. It is similar to what htab_lock_bucket protects against in
-hashtab.c.
+On Thu, 7 Sep 2023 11:00:24 +0100
+"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+
+> On Thu, Sep 07, 2023 at 11:24:02AM +0200, Maxime Chevallier wrote:
+> > +#define PHY_MAX_ENTRIES	16
+> > +
+> > +struct phy_list_reply_data {
+> > +	struct ethnl_reply_data		base;
+> > +	u8 n_phys;
+> > +	u32 phy_indices[PHY_MAX_ENTRIES];  
+> 
+> Please could you detail the decision making behind 16 entries - is this
+> arbitary or based on something?
+> 
+> Also, please consider what we should do if we happen to have more than
+> 16 entries.
+
+Ah indeed it was totally arbitrary, the idea was to have a fixed-size
+reply struct, so that we can populate the
+ethnl_request_ops.reply_data_size field and not do any manual memory
+management. But I can store a pointer to the array of phy devices,
+dynamically allocated and we won't have to deal with this fixed,
+arbitrary-sized array anymore.
+
+Sorry for not documenting this.
+
+> Finally, using u8 before an array of u32 can leave 3 bytes of padding.
+> It would be better to use u32 for n_phys to avoid that padding.
+
+Sure thing, I'll change this
+
+> > +	mutex_lock(&phy_ns->ns_lock);
+> > +	list_for_each_entry(phydev, &phy_ns->phys, node)
+> > +		data->phy_indices[data->n_phys++] = phydev->phyindex;  
+> 
+> I think this loop should limit its iterations to ensure that the
+> array can't overflow.
+
+Thanks,
+
+Maxime
+
+
 
