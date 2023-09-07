@@ -1,343 +1,466 @@
-Return-Path: <netdev+bounces-32487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC19E797DE1
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 23:21:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BE8E797E7E
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 00:01:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AF5E2817DD
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 21:21:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C6BB2817C6
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 22:01:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B014214280;
-	Thu,  7 Sep 2023 21:21:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFE2214287;
+	Thu,  7 Sep 2023 22:01:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9309013AEA
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 21:21:46 +0000 (UTC)
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2121.outbound.protection.outlook.com [40.107.237.121])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AF951FC6;
-	Thu,  7 Sep 2023 14:21:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=M8I8Qk8DFXIJxLKEYHg9RAlt3APbznnsSaOZo/eTHsLB0/AnWlCrus3MQsCaG3RioxesdzVL9pwcm/nt47GExN26xz/35lNl230h0v7zea01jkAesrhcsfcpWOc332NDOKgubqHDqjQivhWJgH4UImTYre99/BZWfL3ukzo5vCHMIKWdrJI3/AZIKzLbKnZU9cGpXcv/OB3J4kkEtbLUKbQEe0YNONSp5y/5MURmqAiRoHz1rQOOWro+0ie5KR27aMBpAWMDIxmrTS5KQKT2R/ui5nG91CdV8kr4+PCBcIy/bchTKBsVF6STYf5lDq75FXTNkdKxF3jQp04A73WCqA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=911DNzM5uLWYKaJtUSrzEGKC1+YT22WzLdu/2lCBleQ=;
- b=iz5VHjXO9NlVhHl5iCDgWJ3l8AAQ781wcckZC8jxcBJAnq6GjCTqx4+N0zCQTk0dCgjVbRJ6pYh8/hqBih2+4pCMLy5zDRzuHfG/pc2m2bJTmezHof0QGg25rOzO0ZJzC+/0iHPm5DTkGVg7K3GEQ2aLb+B3Pee4vA37zhNYDwLsqQ4dJi+arbGsYOhEYnWdNt3wRp2UOz2qEtaEEmK93S58m+O5Xw2kBnDa/tJ7CeT96Y4QbMrGUI0NUp4w/gpfDQE8ursAHYuW8LylFCbwkXhIV+O9Vxq8LQgvepeTgddxkDg+9q8KGu1i0AIzJY5wZlfxkTTLvK7+WFklgeAuIg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=ucf.edu; dmarc=pass action=none header.from=ucf.edu; dkim=pass
- header.d=ucf.edu; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ucf.onmicrosoft.com;
- s=selector2-ucf-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=911DNzM5uLWYKaJtUSrzEGKC1+YT22WzLdu/2lCBleQ=;
- b=XnLAOY+95l/gwwiXixLB2RTOSsz9T8ToL/Pu2uZ4vBsvA++FbkEVDtebQxvoZn/zQ4rttIzJqHi6st6LsvAKK4eAqiDy4E1fpoRlvoYQuRjTIv4v06DnAwsqD0Gtnhzpw4IKKhbA17QoYmtHY5URYgtdKYPjv2LfCLbZ0w8Czkw=
-Received: from BL0PR11MB3106.namprd11.prod.outlook.com (2603:10b6:208:7a::11)
- by LV8PR11MB8558.namprd11.prod.outlook.com (2603:10b6:408:1ed::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.34; Thu, 7 Sep
- 2023 21:21:32 +0000
-Received: from BL0PR11MB3106.namprd11.prod.outlook.com
- ([fe80::c89f:4b16:5fd5:11bb]) by BL0PR11MB3106.namprd11.prod.outlook.com
- ([fe80::c89f:4b16:5fd5:11bb%7]) with mapi id 15.20.6768.029; Thu, 7 Sep 2023
- 21:21:32 +0000
-From: Sanan Hasanov <Sanan.Hasanov@ucf.edu>
-To: "marcel@holtmann.org" <marcel@holtmann.org>, "johan.hedberg@gmail.com"
-	<johan.hedberg@gmail.com>, "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-CC: "syzkaller@googlegroups.com" <syzkaller@googlegroups.com>,
-	"contact@pgazz.com" <contact@pgazz.com>
-Subject: KASAN: slab-use-after-free Write in sco_sock_timeout
-Thread-Topic: KASAN: slab-use-after-free Write in sco_sock_timeout
-Thread-Index: AQHZ4cqv3/m4OMjg/k6ruZ/VN+OO9w==
-Date: Thu, 7 Sep 2023 21:21:32 +0000
-Message-ID:
- <BL0PR11MB310671097F01D8AF2EA0DB0BE1EEA@BL0PR11MB3106.namprd11.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=ucf.edu;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL0PR11MB3106:EE_|LV8PR11MB8558:EE_
-x-ms-office365-filtering-correlation-id: 074eac3b-aef1-4476-f6fd-08dbafe868c2
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- eKDx0D2PbatpFIHrfO9RJtxrga7r/bOPRNczeOEieP2tcTXFBQTPILy5Zw8EA/nfGcEXvbS9Hp0bj0AXa2ORe84AoOv6w0qZckNJDTolRz0zj8Bhp4QphTDg9iyzTlKpIcuJMn7sCu2WomZo0WuloKIs5LQBeYkjST09d4UyLkVhIYPmb5CwwZjsVPcUw6vo99YiqVooXXEsS5BEG71wgWn25ybtU7r39NRgjHpX6znnUqmzzmlcCquVAPJBAki2MOHNvceWD0GHDCC7yDf8o+W4IV2y+lLmt01AJhxByZW/ewFmXiUgbbYeZh4SmGZB6jwOvAo+lJcWQObWz+UMI+blqegP4fcCUie5pZ1QseTItcYP399ub46TmI9wSimzgdcoUL+oOC/NI8tApN4Dr3HKSLd6pECKdlVJGiOpyqQs1/8mSouriC74d02eJ4evNPGeYgjm8RPBs1kA+rZMmK323mxtpI/W7mtW40a8tBL0o8Vtan76ur07Gey2HVkc18U7Fag+Rw4QwtWaQt66124FoX1R8ClezXayyha9PONCKYLHOFTcvaWuItCUJePJt3IBCgpsdOrFgRm4LxHkBjSBD270efSFIwxKpgJvcqdvw1ieH6AibU35TJhqVlDExgsagaBOQupluXLaLjA8FyzTZ877UpX94sbghce4q6Fe99MJb7T5gRZKbFZHx3MZ
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB3106.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(346002)(39860400002)(136003)(366004)(376002)(451199024)(186009)(1800799009)(91956017)(76116006)(66556008)(66946007)(66446008)(66476007)(64756008)(4326008)(5930299018)(5660300002)(52536014)(316002)(786003)(54906003)(7696005)(8676002)(41300700001)(8936002)(75432002)(9686003)(6506007)(83380400001)(110136005)(26005)(71200400001)(55016003)(966005)(45080400002)(478600001)(7416002)(2906002)(921005)(86362001)(33656002)(38070700005)(38100700002)(122000001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?FMueV/DDM2cIHGqSwW20H/9mvHk7UtjC3hXweAkSsDN9x7VpstR+bu9GfN?=
- =?iso-8859-1?Q?bGLBAhFi7zi4d1ZrYl1K7Xf0Gy1wJKedHo3xKnZQ5ba8fkYVg4+ncFNvK4?=
- =?iso-8859-1?Q?0VIvD/wfa9igszwewjchTBoDSNAIy7rliVVy+gLFThfkmYWBk/fQID+etH?=
- =?iso-8859-1?Q?nmfIZBNgUbhu5Xufc2yrG6YzVwu8OOa5Vl6hXia4EEIWlOBXHXmsabj+OV?=
- =?iso-8859-1?Q?0UXirUMFrD4FgJdPnjVht5vlER6TuZYBqDQWCdPWbsxk1jbvEFBTBIrdKI?=
- =?iso-8859-1?Q?c8fOltkBhDp0FixoZ9HSpszGzx7VaCRpCHjSaQC2sOVnvVATkfhw4LKp7N?=
- =?iso-8859-1?Q?LrMMnUA31wV9IprgcbGB9p9G6LNgc6i9yTVxtPIrb9GVaAqTwmFitsvFEK?=
- =?iso-8859-1?Q?JMzg72p/VtTYTodmKRnfhLPzektaft+vooo7BApxU5kIRSeP7/TUnGtaWX?=
- =?iso-8859-1?Q?x7cslkFtMqKZb9PBedDEf9ZD9r9WmctvEFVDCVDcgFlLtJ10OeuhKDk7ls?=
- =?iso-8859-1?Q?81ORfxHSPipoLXMl4QUppZnWILs8eGo1IEfn3KNFwZUFg61Tb2PfSKY9Wq?=
- =?iso-8859-1?Q?B3oCANceGJxjY26IvEnnlHAWFui1yMJIdkJDI9IsZepGZ+LaeskfqHX95l?=
- =?iso-8859-1?Q?sH1MkfxTsXaDH9JAu5YEqTXeDq7Drvfb8KgfwtN//+N7YkWKVxSgEt5jIN?=
- =?iso-8859-1?Q?jSZ4PXUrxUn9sPNhfXjN0cT4Qt43QkSWc7FHxEZZI8DJmredifi2uARC5J?=
- =?iso-8859-1?Q?sLqTNfP9i+H5ldlDQIFlXpfkFoNeIe2lrXR8RxRK0+G0XAJ0SFNl6k8kjs?=
- =?iso-8859-1?Q?4zoWPLNOOIlSxbbThrPwd/5/XQ98cMXYPeAo+F0jQ7LthFOf4ppG0oO1d6?=
- =?iso-8859-1?Q?vA7FLNkBNpVSUcqJ2hO2KilVxMTjn6YMnfegww0ncA3ari5ww4+0SHKeHe?=
- =?iso-8859-1?Q?6bUhr03pNRY8B9Kov/eEnBGPQkXDleJMGfAr0ELWHFB3lOnzk4lhpJVCf9?=
- =?iso-8859-1?Q?+WaFRMCwBRLhXn2wM08TImbX1xJYpV7zUzAUK4Eo1LnA6ltfSi/2ZRQ0ro?=
- =?iso-8859-1?Q?qRqhAIb7/Aay8KVpgHhqYCKi8dLHbVyAp9Cn2QpPwkzNOU2RyRRs5ywmf9?=
- =?iso-8859-1?Q?EBTq3LXQagR65aajttmN4TxhZrEvJK8OD1pZBSaB1++kPmaQq/s425P1Ap?=
- =?iso-8859-1?Q?ZCzpalOmgjD3DrSi+YtzA+MW0wfM6vAIB150wdL4oOU47WVYkyqSvqdYuU?=
- =?iso-8859-1?Q?7Ti0b+/s+iWoPZezkmDClPtdptvF5jBijIJDD/gqxMjQiqACoyzhKYbhtU?=
- =?iso-8859-1?Q?lDJ4w+o6/CGOgTKdp4BTC0c66PqI1z5vagvBIY2I25yczABFuBkPYbfc4+?=
- =?iso-8859-1?Q?7lNxnK60vJk5EbutVTHms1l/OcH4ceMFLYxfBJwYENIcJhrLluggptpK8Z?=
- =?iso-8859-1?Q?qsrTHwYFDCgA3j6lqjJ4zRdsYLRzXMY+FvStne8YtHkw5/dxDbHRRN8sbB?=
- =?iso-8859-1?Q?E1kIfRuJb61ozcM9BEgpwvqDjyUJKTZz4XVIQLH+IdKI9u/KCZIQwsOzjB?=
- =?iso-8859-1?Q?/HGqeOsKUapeyjYykCPLbZwZk3pOOXl6aIvkV0YiZVu7zIPyFGQe553W14?=
- =?iso-8859-1?Q?aZWqPsBirSsrI=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE6C863A3
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 22:01:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA4FDC433C8;
+	Thu,  7 Sep 2023 22:01:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694124064;
+	bh=k7mlEL3gaSbyri3qEsjgQyvY6i0fSzCbyaQ8oVx5bgE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=qZwObeqEQiCGyqZP0IriP8UuhFmj50ByHI2IFay/iEL8fvLQ1d5kn4A97T6AYzv37
+	 JpG+fDdXlGL5vjwxbi/UcjsSilo67AQR1PSItcSoiW207iOPllSlB65jPOeNHcAcj/
+	 hvNp5RpRpmXxnz0CNjFm2dCzIl8HscEw+N1bDghTkhm2bc7xtsPXvAJ4K4MZ/ElmZZ
+	 GJEWg7BeOt7XxXXyEFyU4tLc8JQlnDBMU+AWqhLHFzsvYqVpgQce1XJvkrcgvgCxxe
+	 j+DspGJ62eNOoFYb9hcJGFGDPkvhVoUZBg3e1+fnvPA7Mha9OrGz93IFea25fYRtG0
+	 aD+ITdNdNWw+g==
+From: Jakub Kicinski <kuba@kernel.org>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	pabeni@redhat.com
+Subject: [GIT PULL] Networking for v6.6-rc1
+Date: Thu,  7 Sep 2023 15:01:03 -0700
+Message-ID: <20230907220103.3900219-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: ucf.edu
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB3106.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 074eac3b-aef1-4476-f6fd-08dbafe868c2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Sep 2023 21:21:32.7924
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bb932f15-ef38-42ba-91fc-f3c59d5dd1f1
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: v5HpjcccTwhzBZcJqVkCIKbaobVofFAr5SNxQKPrwpp7wNEex+mAxZl/s52PWeffdBB2PWyd7iUryBTZphhZPA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR11MB8558
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Good day, dear maintainers,=0A=
-=0A=
-We found a bug using a modified kernel configuration file used by syzbot.=
-=0A=
-=0A=
-We enhanced the coverage of the configuration file using our tool, klocaliz=
-er.=0A=
-=0A=
-Kernel Branch: 6.3.0-next-20230426=0A=
-Kernel Config: https://drive.google.com/file/d/1hdxgrCVVhxsp3XFWi046VSKx14Y=
--QCR7/view?usp=3Dsharing=0A=
-Reproducer: https://drive.google.com/file/d/1Pm-DN-CF7AeFnocccO1lg8Qa5JIkeC=
-aA/view?usp=3Dsharing=0A=
-=0A=
-Thank you!=0A=
-=0A=
-Best regards,=0A=
-Sanan Hasanov=0A=
-=0A=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=0A=
-BUG: KASAN: slab-use-after-free in sco_sock_timeout+0x6e/0x240=0A=
-Write of size 4 at addr ffff88801df87080 by task kworker/4:8/14653=0A=
-=0A=
-CPU: 4 PID: 14653 Comm: kworker/4:8 Not tainted 6.3.0-next-20230426 #1=0A=
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/=
-2014=0A=
-Workqueue: events sco_sock_timeout=0A=
-Call Trace:=0A=
- <TASK>=0A=
- dump_stack_lvl+0x17f/0x260=0A=
- print_report+0xc5/0x5e0=0A=
- kasan_report+0xd7/0x110=0A=
- kasan_check_range+0x153/0x1a0=0A=
- __kasan_check_write+0x18/0x20=0A=
- sco_sock_timeout+0x6e/0x240=0A=
- process_one_work+0x9f0/0x16c0=0A=
- worker_thread+0x68e/0x10f0=0A=
- kthread+0x356/0x460=0A=
- ret_from_fork+0x1f/0x30=0A=
- </TASK>=0A=
-=0A=
-Allocated by task 10149:=0A=
- kasan_save_stack+0x2a/0x50=0A=
- kasan_set_track+0x29/0x40=0A=
- kasan_save_alloc_info+0x1f/0x30=0A=
- __kasan_kmalloc+0x84/0x90=0A=
- __kmalloc+0x61/0x190=0A=
- sk_prot_alloc+0x163/0x2b0=0A=
- sk_alloc+0x3d/0x7c0=0A=
- sco_sock_alloc.constprop.0+0x37/0x330=0A=
- sco_sock_create+0xd5/0x160=0A=
- bt_sock_create+0x16d/0x2d0=0A=
- __sock_create+0x354/0x7e0=0A=
- __sys_socket+0x152/0x270=0A=
- __x64_sys_socket+0x76/0xb0=0A=
- do_syscall_64+0x39/0x80=0A=
- entry_SYSCALL_64_after_hwframe+0x63/0xcd=0A=
-=0A=
-Last potentially related work creation:=0A=
- kasan_save_stack+0x2a/0x50=0A=
- __kasan_record_aux_stack+0x66/0x70=0A=
- kasan_record_aux_stack_noalloc+0xf/0x20=0A=
- __call_rcu_common.constprop.0+0x9e/0x820=0A=
- call_rcu+0xd/0x10=0A=
- netlink_release+0xcd0/0x1e90=0A=
- __sock_release+0xce/0x290=0A=
- sock_close+0x22/0x30=0A=
- __fput+0x279/0xa40=0A=
- ____fput+0x1a/0x20=0A=
- task_work_run+0x196/0x2b0=0A=
- do_exit+0xbf6/0x2d00=0A=
- do_group_exit+0xe0/0x2c0=0A=
- get_signal+0x2562/0x2610=0A=
- arch_do_signal_or_restart+0x84/0x600=0A=
- exit_to_user_mode_prepare+0x130/0x1f0=0A=
- syscall_exit_to_user_mode+0x1f/0x50=0A=
- do_syscall_64+0x46/0x80=0A=
- entry_SYSCALL_64_after_hwframe+0x63/0xcd=0A=
-=0A=
-Second to last potentially related work creation:=0A=
- kasan_save_stack+0x2a/0x50=0A=
- __kasan_record_aux_stack+0x66/0x70=0A=
- kasan_record_aux_stack_noalloc+0xf/0x20=0A=
- __call_rcu_common.constprop.0+0x9e/0x820=0A=
- call_rcu+0xd/0x10=0A=
- netlink_release+0xcd0/0x1e90=0A=
- __sock_release+0xce/0x290=0A=
- sock_close+0x22/0x30=0A=
- __fput+0x279/0xa40=0A=
- ____fput+0x1a/0x20=0A=
- task_work_run+0x196/0x2b0=0A=
- exit_to_user_mode_prepare+0x1e3/0x1f0=0A=
- syscall_exit_to_user_mode+0x1f/0x50=0A=
- do_syscall_64+0x46/0x80=0A=
- entry_SYSCALL_64_after_hwframe+0x63/0xcd=0A=
-=0A=
-The buggy address belongs to the object at ffff88801df87000=0A=
- which belongs to the cache kmalloc-2k of size 2048=0A=
-The buggy address is located 128 bytes inside of=0A=
- freed 2048-byte region [ffff88801df87000, ffff88801df87800)=0A=
-=0A=
-The buggy address belongs to the physical page:=0A=
-page:00000000f6d79403 refcount:1 mapcount:0 mapping:0000000000000000 index:=
-0x0 pfn:0x1df87=0A=
-flags: 0xfffe0000000200(slab|node=3D0|zone=3D1|lastcpupid=3D0x3fff)=0A=
-page_type: 0x1()=0A=
-raw: 00fffe0000000200 ffff888100040800 ffffea000127c210 ffffea00045ad310=0A=
-raw: 0000000000000000 ffff88801df87000 0000000100000001 0000000000000000=0A=
-page dumped because: kasan: bad access detected=0A=
-=0A=
-Memory state around the buggy address:=0A=
- ffff88801df86f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc=0A=
- ffff88801df87000: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb=0A=
->ffff88801df87080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb=0A=
-                   ^=0A=
- ffff88801df87100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb=0A=
- ffff88801df87180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb=0A=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=0A=
-------------[ cut here ]------------=0A=
-refcount_t: addition on 0; use-after-free.=0A=
-WARNING: CPU: 4 PID: 14653 at lib/refcount.c:25 refcount_warn_saturate+0x18=
-5/0x200=0A=
-Modules linked in:=0A=
-CPU: 4 PID: 14653 Comm: kworker/4:8 Tainted: G    B              6.3.0-next=
--20230426 #1=0A=
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/=
-2014=0A=
-Workqueue: events sco_sock_timeout=0A=
-RIP: 0010:refcount_warn_saturate+0x185/0x200=0A=
-Code: 07 31 ff 89 de e8 6b 98 92 fd 84 db 0f 85 2b ff ff ff e8 9e 9c 92 fd =
-48 c7 c7 40 73 7b 89 c6 05 b6 95 eb 07 01 e8 4b 1c 5b fd <0f> 0b e9 0c ff f=
-f ff e8 7f 9c 92 fd 0f b6 1d a0 95 eb 07 31 ff 89=0A=
-RSP: 0018:ffffc90009e97cb8 EFLAGS: 00010292=0A=
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000=0A=
-RDX: ffff8880465de1c0 RSI: ffffffff814f0e8b RDI: ffffffff814f0e7e=0A=
-RBP: ffffc90009e97cc8 R08: 0000000000000001 R09: 0000000000000000=0A=
-R10: 0000000000000000 R11: 00000000000c2550 R12: ffff88801df87080=0A=
-R13: ffff888044fddc08 R14: ffff88801df87080 R15: ffff88811a43d100=0A=
-FS:  0000000000000000(0000) GS:ffff88811a400000(0000) knlGS:000000000000000=
-0=0A=
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033=0A=
-CR2: 0000000000000000 CR3: 000000000ab45000 CR4: 0000000000350ee0=0A=
-Call Trace:=0A=
- <TASK>=0A=
- sco_sock_timeout+0x1e1/0x240=0A=
- process_one_work+0x9f0/0x16c0=0A=
- worker_thread+0x68e/0x10f0=0A=
- kthread+0x356/0x460=0A=
- ret_from_fork+0x1f/0x30=0A=
- </TASK>=0A=
-irq event stamp: 821585=0A=
-hardirqs last  enabled at (821585): [<ffffffff88f8f95e>] irqentry_exit+0x3e=
-/0x90=0A=
-hardirqs last disabled at (821584): [<ffffffff88f8e534>] sysvec_apic_timer_=
-interrupt+0x14/0xc0=0A=
-softirqs last  enabled at (821420): [<ffffffff8554fefd>] wg_packet_tx_worke=
-r+0x33d/0x780=0A=
-softirqs last disabled at (821416): [<ffffffff8554fdf5>] wg_packet_tx_worke=
-r+0x235/0x780=0A=
----[ end trace 0000000000000000 ]---=0A=
-------------[ cut here ]------------=0A=
-refcount_t: underflow; use-after-free.=0A=
-WARNING: CPU: 4 PID: 14653 at lib/refcount.c:28 refcount_warn_saturate+0x11=
-0/0x200=0A=
-Modules linked in:=0A=
-CPU: 4 PID: 14653 Comm: kworker/4:8 Tainted: G    B   W          6.3.0-next=
--20230426 #1=0A=
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/=
-2014=0A=
-Workqueue: events sco_sock_timeout=0A=
-RIP: 0010:refcount_warn_saturate+0x110/0x200=0A=
-Code: 1d 4a 96 eb 07 31 ff 89 de e8 dc 98 92 fd 84 db 75 a0 e8 13 9d 92 fd =
-48 c7 c7 a0 73 7b 89 c6 05 2a 96 eb 07 01 e8 c0 1c 5b fd <0f> 0b eb 84 e8 f=
-7 9c 92 fd 0f b6 1d 13 96 eb 07 31 ff 89 de e8 a7=0A=
-RSP: 0018:ffffc90009e97cb8 EFLAGS: 00010292=0A=
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000=0A=
-RDX: ffff8880465de1c0 RSI: ffffffff814f0e8b RDI: ffffffff814f0e7e=0A=
-RBP: ffffc90009e97cc8 R08: 0000000000000001 R09: 0000000000000000=0A=
-R10: 0000000000000000 R11: 00000000000c2e38 R12: ffff88801df87080=0A=
-R13: ffff888044fddc08 R14: ffff88801df87080 R15: ffff88811a43d100=0A=
-FS:  0000000000000000(0000) GS:ffff88811a400000(0000) knlGS:000000000000000=
-0=0A=
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033=0A=
-CR2: 0000000000000000 CR3: 000000000ab45000 CR4: 0000000000350ee0=0A=
-Call Trace:=0A=
- <TASK>=0A=
- sco_sock_timeout+0x1f8/0x240=0A=
- process_one_work+0x9f0/0x16c0=0A=
- worker_thread+0x68e/0x10f0=0A=
- kthread+0x356/0x460=0A=
- ret_from_fork+0x1f/0x30=0A=
- </TASK>=0A=
-irq event stamp: 821585=0A=
-hardirqs last  enabled at (821585): [<ffffffff88f8f95e>] irqentry_exit+0x3e=
-/0x90=0A=
-hardirqs last disabled at (821584): [<ffffffff88f8e534>] sysvec_apic_timer_=
-interrupt+0x14/0xc0=0A=
-softirqs last  enabled at (821420): [<ffffffff8554fefd>] wg_packet_tx_worke=
-r+0x33d/0x780=0A=
-softirqs last disabled at (821416): [<ffffffff8554fdf5>] wg_packet_tx_worke=
-r+0x235/0x780=0A=
----[ end trace 0000000000000000 ]---=0A=
+Hi Linus!
+
+The following changes since commit bd6c11bc43c496cddfc6cf603b5d45365606dbd5:
+
+  Merge tag 'net-next-6.6' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next (2023-08-29 11:33:01 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.6-rc1
+
+for you to fetch changes up to 1b36955cc048c8ff6ba448dbf4be0e52f59f2963:
+
+  net: enetc: distinguish error from valid pointers in enetc_fixup_clear_rss_rfs() (2023-09-07 11:19:42 -0700)
+
+----------------------------------------------------------------
+Including fixes from netfilter and bpf.
+
+Current release - regressions:
+
+ - eth: stmmac: fix failure to probe without MAC interface specified
+
+Current release - new code bugs:
+
+ - docs: netlink: fix missing classic_netlink doc reference
+
+Previous releases - regressions:
+
+ - deal with integer overflows in kmalloc_reserve()
+
+ - use sk_forward_alloc_get() in sk_get_meminfo()
+
+ - bpf_sk_storage: fix the missing uncharge in sk_omem_alloc
+
+ - fib: avoid warn splat in flow dissector after packet mangling
+
+ - skb_segment: call zero copy functions before using skbuff frags
+
+ - eth: sfc: check for zero length in EF10 RX prefix
+
+Previous releases - always broken:
+
+ - af_unix: fix msg_controllen test in scm_pidfd_recv() for
+   MSG_CMSG_COMPAT
+
+ - xsk: fix xsk_build_skb() dereferencing possible ERR_PTR()
+
+ - netfilter:
+   - nft_exthdr: fix non-linear header modification
+   - xt_u32, xt_sctp: validate user space input
+   - nftables: exthdr: fix 4-byte stack OOB write
+   - nfnetlink_osf: avoid OOB read
+   - one more fix for the garbage collection work from last release
+
+ - igmp: limit igmpv3_newpack() packet size to IP_MAX_MTU
+
+ - bpf, sockmap: fix preempt_rt splat when using raw_spin_lock_t
+
+ - handshake: fix null-deref in handshake_nl_done_doit()
+
+ - ip: ignore dst hint for multipath routes to ensure packets
+   are hashed across the nexthops
+
+ - phy: micrel:
+   - correct bit assignments for cable test errata
+   - disable EEE according to the KSZ9477 errata
+
+Misc:
+
+ - docs/bpf: document compile-once-run-everywhere (CO-RE) relocations
+
+ - Revert "net: macsec: preserve ingress frame ordering", it appears
+   to have been developed against an older kernel, problem doesn't
+   exist upstream
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+----------------------------------------------------------------
+Alex Henrie (1):
+      net: ipv6/addrconf: avoid integer underflow in ipv6_create_tempaddr
+
+Björn Töpel (1):
+      selftests/bpf: Include build flavors for install target
+
+Bodong Wang (1):
+      mlx5/core: E-Switch, Create ACL FT for eswitch manager in switchdev mode
+
+Corinna Vinschen (1):
+      igb: disable virtualization features on 82580
+
+Daniel Borkmann (1):
+      bpf: Annotate bpf_long_memcpy with data_race
+
+David S. Miller (5):
+      Merge branch 'net-data-race-annotations'
+      Merge branch 'dst-hint-multipath'
+      Merge branch 'af_unix-data-races'
+      Merge branch '1GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
+      Merge branch 'sja1105-fixes'
+
+David Vernet (3):
+      bpf, docs: Move linux-notes.rst to root bpf docs tree
+      bpf, docs: Add abi.rst document to standardization subdirectory
+      bpf, docs: s/eBPF/BPF in standards documents
+
+Donald Hunter (1):
+      doc/netlink: Fix missing classic_netlink doc reference
+
+Eduard Zingerman (2):
+      docs/bpf: Add description for CO-RE relocations
+      docs/bpf: Fix "file doesn't exist" warnings in {llvm_reloc,btf}.rst
+
+Edward Cree (1):
+      sfc: check for zero length in EF10 RX prefix
+
+Eric Dumazet (14):
+      net/sched: fq_pie: avoid stalls in fq_pie_timer()
+      sctp: annotate data-races around sk->sk_wmem_queued
+      ipv4: annotate data-races around fi->fib_dead
+      net: read sk->sk_family once in sk_mc_loop()
+      net/handshake: fix null-ptr-deref in handshake_nl_done_doit()
+      net: use sk_forward_alloc_get() in sk_get_meminfo()
+      net: annotate data-races around sk->sk_forward_alloc
+      mptcp: annotate data-races around msk->rmem_fwd_alloc
+      net: annotate data-races around sk->sk_tsflags
+      net: annotate data-races around sk->sk_bind_phc
+      net: deal with integer overflows in kmalloc_reserve()
+      gve: fix frag_list chaining
+      igmp: limit igmpv3_newpack() packet size to IP_MAX_MTU
+      ip_tunnels: use DEV_STATS_INC()
+
+Florian Westphal (2):
+      net: fib: avoid warn splat in flow dissector
+      netfilter: nftables: exthdr: fix 4-byte stack OOB write
+
+Geetha sowjanya (1):
+      octeontx2-af: Fix truncation of smq in CN10K NIX AQ enqueue mbox handler
+
+Hao Chen (2):
+      net: hns3: fix byte order conversion issue in hclge_dbg_fd_tcam_read()
+      net: hns3: fix debugfs concurrency issue between kfree buffer and read
+
+Heng Guo (1):
+      net: ipv4, ipv6: fix IPSTATS_MIB_OUTOCTETS increment duplicated
+
+Ilya Leoshkevich (1):
+      s390/bpf: Pass through tail call counter in trampolines
+
+Jakub Kicinski (7):
+      Merge tag 'nf-23-08-31' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
+      Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf
+      docs: netdev: document patchwork patch states
+      docs: netdev: update the netdev infra URLs
+      net: phylink: fix sphinx complaint about invalid literal
+      Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf
+      Revert "net: team: do not use dynamic lockdep key"
+
+Jian Shen (1):
+      net: hns3: fix tx timeout issue
+
+Jianbo Liu (1):
+      net/mlx5e: Clear mirred devices array if the rule is split
+
+Jie Wang (1):
+      net: hns3: remove GSO partial feature bit
+
+Jijie Shao (2):
+      net: hns3: Support query tx timeout threshold by debugfs
+      net: hns3: fix invalid mutex between tc qdisc and dcb ets command issue
+
+Jiri Olsa (1):
+      selftests/bpf: Fix d_path test
+
+John Fastabend (2):
+      bpf, sockmap: Fix preempt_rt splat when using raw_spin_lock_t
+      bpf, sockmap: Fix skb refcnt race after locking changes
+
+Kuniyuki Iwashima (5):
+      af_unix: Fix msg_controllen test in scm_pidfd_recv() for MSG_CMSG_COMPAT.
+      af_unix: Fix data-races around user->unix_inflight.
+      af_unix: Fix data-race around unix_tot_inflight.
+      af_unix: Fix data-races around sk->sk_shutdown.
+      af_unix: Fix data race around sk->sk_err.
+
+Kyle Zeng (1):
+      netfilter: ipset: add the missing IP_SET_HASH_WITH_NET0 macro for ip_set_hash_netportnet.c
+
+Liang Chen (1):
+      veth: Fixing transmit return status for dropped packets
+
+Lukasz Majewski (1):
+      net: phy: Provide Module 4 KSZ9477 errata (DS80000754C)
+
+Magnus Karlsson (1):
+      xsk: Fix xsk_diag use-after-free error during socket cleanup
+
+Martin KaFai Lau (3):
+      bpf: bpf_sk_storage: Fix invalid wait context lockdep report
+      bpf: bpf_sk_storage: Fix the missing uncharge in sk_omem_alloc
+      selftests/bpf: Check bpf_sk_storage has uncharged sk_omem_alloc
+
+Mohamed Khalfella (1):
+      skbuff: skb_segment, Call zero copy functions before using skbuff frags
+
+Oleksij Rempel (1):
+      net: phy: micrel: Correct bit assignments for phy_device flags
+
+Olga Zaborska (3):
+      igc: Change IGC_MIN to allow set rx/tx value between 64 and 80
+      igbvf: Change IGBVF_MIN to allow set rx/tx value between 64 and 80
+      igb: Change IGB_MIN to allow set rx/tx value between 64 and 80
+
+Oliver Neukum (1):
+      NFC: nxp: add NXP1002
+
+Pablo Neira Ayuso (2):
+      netfilter: nft_set_rbtree: skip sync GC for new elements in this transaction
+      netfilter: nf_tables: Unbreak audit log reset
+
+Paolo Abeni (2):
+      Merge branch 'there-are-some-bugfix-for-the-hns3-ethernet-driver'
+      Merge tag 'nf-23-09-06' of https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
+
+Phil Sutter (3):
+      netfilter: nf_tables: Audit log setelem reset
+      netfilter: nf_tables: Audit log rule reset
+      netfilter: nf_tables: uapi: Describe NFTA_RULE_CHAIN_ID
+
+Quan Tian (1):
+      net/ipv6: SKB symmetric hash should incorporate transport ports
+
+Russell King (Oracle) (1):
+      net: stmmac: failure to probe without MAC interface specified
+
+Sabrina Dubroca (1):
+      Revert "net: macsec: preserve ingress frame ordering"
+
+Sebastian Andrzej Siewior (2):
+      bpf: Invoke __bpf_prog_exit_sleepable_recur() on recursion in kern_sys_bpf().
+      bpf: Assign bpf_tramp_run_ctx::saved_run_ctx before recursion check.
+
+Shigeru Yoshida (1):
+      kcm: Destroy mutex in kcm_exit_net()
+
+Sriram Yagnaraman (3):
+      ipv4: ignore dst hint for multipath routes
+      ipv6: ignore dst hint for multipath routes
+      selftests: fib_tests: Add multipath list receive tests
+
+Taehee Yoo (1):
+      net: team: do not use dynamic lockdep key
+
+Tirthendu Sarkar (1):
+      xsk: Fix xsk_build_skb() error: 'skb' dereferencing possible ERR_PTR()
+
+Vishal Chourasia (1):
+      bpf, docs: Fix invalid escape sequence warnings in bpf_doc.py
+
+Vladimir Oltean (4):
+      net: dsa: sja1105: fix bandwidth discrepancy between tc-cbs software and offload
+      net: dsa: sja1105: fix -ENOSPC when replacing the same tc-cbs too many times
+      net: dsa: sja1105: complete tc-cbs offload support on SJA1110
+      net: enetc: distinguish error from valid pointers in enetc_fixup_clear_rss_rfs()
+
+Wander Lairson Costa (3):
+      netfilter: xt_sctp: validate the flag_info count
+      netfilter: xt_u32: validate user space input
+      netfilter: nfnetlink_osf: avoid OOB read
+
+Will Hawkins (1):
+      bpf, docs: Correct source of offset for program-local call
+
+Xiao Liang (1):
+      netfilter: nft_exthdr: Fix non-linear header modification
+
+Xu Kuohai (1):
+      selftests/bpf: Fix a CI failure caused by vsock write
+
+Yafang Shao (1):
+      bpftool: Fix build warnings with -Wtype-limits
+
+Yisen Zhuang (1):
+      net: hns3: fix the port information display when sfp is absent
+
+Yonghong Song (2):
+      bpf: Prevent inlining of bpf_fentry_test7()
+      selftests/bpf: Fix flaky cgroup_iter_sleepable subtest
+
+valis (1):
+      net: sched: sch_qfq: Fix UAF in qfq_dequeue()
+
+ Documentation/bpf/btf.rst                          |  31 ++-
+ Documentation/bpf/index.rst                        |   1 +
+ .../bpf/{standardization => }/linux-notes.rst      |   0
+ Documentation/bpf/llvm_reloc.rst                   | 304 +++++++++++++++++++++
+ Documentation/bpf/standardization/abi.rst          |  25 ++
+ Documentation/bpf/standardization/index.rst        |   2 +-
+ .../bpf/standardization/instruction-set.rst        |  44 +--
+ Documentation/process/maintainer-netdev.rst        |  36 ++-
+ Documentation/userspace-api/netlink/intro.rst      |   2 +
+ arch/s390/net/bpf_jit_comp.c                       |  10 +
+ drivers/net/dsa/microchip/ksz_common.c             |  16 +-
+ drivers/net/dsa/sja1105/sja1105.h                  |   2 +
+ drivers/net/dsa/sja1105/sja1105_main.c             |  51 +++-
+ drivers/net/dsa/sja1105/sja1105_spi.c              |   4 +
+ drivers/net/ethernet/freescale/enetc/enetc_pf.c    |   2 +-
+ drivers/net/ethernet/google/gve/gve_rx_dqo.c       |   5 +-
+ drivers/net/ethernet/hisilicon/hns3/hnae3.h        |   1 +
+ drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c |  11 +-
+ drivers/net/ethernet/hisilicon/hns3/hns3_enet.c    |  19 +-
+ drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c |   4 +-
+ .../net/ethernet/hisilicon/hns3/hns3pf/hclge_dcb.c |  20 +-
+ .../ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c |  14 +-
+ .../ethernet/hisilicon/hns3/hns3pf/hclge_main.c    |   5 +-
+ .../ethernet/hisilicon/hns3/hns3pf/hclge_main.h    |   2 -
+ drivers/net/ethernet/intel/igb/igb.h               |   4 +-
+ drivers/net/ethernet/intel/igb/igb_main.c          |   5 +-
+ drivers/net/ethernet/intel/igbvf/igbvf.h           |   4 +-
+ drivers/net/ethernet/intel/igc/igc.h               |   4 +-
+ .../net/ethernet/marvell/octeontx2/af/rvu_nix.c    |  21 +-
+ .../net/ethernet/mellanox/mlx5/core/en/tc/act/ct.c |   4 +-
+ .../ethernet/mellanox/mlx5/core/en/tc/act/mirred.c |   1 +
+ .../ethernet/mellanox/mlx5/core/en/tc/act/pedit.c  |   4 +-
+ .../mlx5/core/en/tc/act/redirect_ingress.c         |   1 +
+ .../ethernet/mellanox/mlx5/core/en/tc/act/vlan.c   |   1 +
+ .../mellanox/mlx5/core/en/tc/act/vlan_mangle.c     |   4 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_tc.c    |   1 +
+ drivers/net/ethernet/mellanox/mlx5/core/eswitch.c  |  21 +-
+ .../ethernet/mellanox/mlx5/core/eswitch_offloads.c |  49 +++-
+ drivers/net/ethernet/sfc/rx.c                      |  20 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_platform.c  |   5 +-
+ drivers/net/macsec.c                               |   3 +-
+ drivers/net/phy/micrel.c                           |   9 +-
+ drivers/net/veth.c                                 |   4 +-
+ drivers/nfc/nxp-nci/i2c.c                          |   1 +
+ include/linux/audit.h                              |   2 +
+ include/linux/bpf.h                                |   2 +-
+ include/linux/ipv6.h                               |   1 +
+ include/linux/micrel_phy.h                         |   7 +-
+ include/linux/phylink.h                            |   4 +-
+ include/net/ip.h                                   |   3 +-
+ include/net/ip6_fib.h                              |   5 +-
+ include/net/ip_fib.h                               |   5 +-
+ include/net/ip_tunnels.h                           |  15 +-
+ include/net/scm.h                                  |  14 +-
+ include/net/sock.h                                 |  29 +-
+ include/uapi/linux/netfilter/nf_tables.h           |   1 +
+ kernel/auditsc.c                                   |   2 +
+ kernel/bpf/bpf_local_storage.c                     |  49 +---
+ kernel/bpf/syscall.c                               |   2 +-
+ kernel/bpf/trampoline.c                            |   5 +-
+ net/bpf/test_run.c                                 |   1 +
+ net/can/j1939/socket.c                             |  10 +-
+ net/core/flow_dissector.c                          |   3 +-
+ net/core/skbuff.c                                  |  54 ++--
+ net/core/skmsg.c                                   |  12 +-
+ net/core/sock.c                                    |  27 +-
+ net/core/sock_map.c                                |  36 +--
+ net/handshake/netlink.c                            |  18 +-
+ net/ipv4/fib_semantics.c                           |   5 +-
+ net/ipv4/fib_trie.c                                |   3 +-
+ net/ipv4/igmp.c                                    |   3 +-
+ net/ipv4/ip_forward.c                              |   1 -
+ net/ipv4/ip_input.c                                |   3 +-
+ net/ipv4/ip_output.c                               |   9 +-
+ net/ipv4/ip_sockglue.c                             |   2 +-
+ net/ipv4/ipmr.c                                    |   1 -
+ net/ipv4/route.c                                   |   1 +
+ net/ipv4/tcp.c                                     |   4 +-
+ net/ipv4/tcp_output.c                              |   2 +-
+ net/ipv4/udp.c                                     |   6 +-
+ net/ipv6/addrconf.c                                |   2 +-
+ net/ipv6/ip6_input.c                               |   3 +-
+ net/ipv6/ip6_output.c                              |   3 +-
+ net/ipv6/ip6mr.c                                   |   2 -
+ net/ipv6/ping.c                                    |   2 +-
+ net/ipv6/raw.c                                     |   2 +-
+ net/ipv6/route.c                                   |   3 +
+ net/ipv6/udp.c                                     |   2 +-
+ net/kcm/kcmsock.c                                  |   2 +
+ net/mptcp/protocol.c                               |  23 +-
+ net/netfilter/ipset/ip_set_hash_netportnet.c       |   1 +
+ net/netfilter/nf_tables_api.c                      |  54 +++-
+ net/netfilter/nfnetlink_osf.c                      |   8 +
+ net/netfilter/nft_exthdr.c                         |  42 +--
+ net/netfilter/nft_set_rbtree.c                     |   8 +-
+ net/netfilter/xt_sctp.c                            |   2 +
+ net/netfilter/xt_u32.c                             |  21 ++
+ net/sched/sch_fq_pie.c                             |  27 +-
+ net/sched/sch_plug.c                               |   2 +-
+ net/sched/sch_qfq.c                                |  22 +-
+ net/sctp/proc.c                                    |   2 +-
+ net/sctp/socket.c                                  |  10 +-
+ net/socket.c                                       |  15 +-
+ net/unix/af_unix.c                                 |   2 +-
+ net/unix/scm.c                                     |   6 +-
+ net/xdp/xsk.c                                      |  22 +-
+ net/xdp/xsk_diag.c                                 |   3 +
+ scripts/bpf_doc.py                                 |  56 ++--
+ tools/bpf/bpftool/link.c                           |   2 +-
+ tools/testing/selftests/bpf/Makefile               |  12 +
+ .../selftests/bpf/prog_tests/bpf_obj_pinning.c     |   5 +-
+ tools/testing/selftests/bpf/prog_tests/d_path.c    |  19 +-
+ .../bpf/prog_tests/sk_storage_omem_uncharge.c      |  56 ++++
+ .../selftests/bpf/prog_tests/sockmap_helpers.h     |  26 ++
+ .../selftests/bpf/prog_tests/sockmap_listen.c      |   7 +
+ .../testing/selftests/bpf/progs/bpf_tracing_net.h  |   1 +
+ .../selftests/bpf/progs/sk_storage_omem_uncharge.c |  61 +++++
+ tools/testing/selftests/net/fib_tests.sh           | 155 ++++++++++-
+ 118 files changed, 1405 insertions(+), 410 deletions(-)
+ rename Documentation/bpf/{standardization => }/linux-notes.rst (100%)
+ create mode 100644 Documentation/bpf/standardization/abi.rst
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/sk_storage_omem_uncharge.c
+ create mode 100644 tools/testing/selftests/bpf/progs/sk_storage_omem_uncharge.c
 
