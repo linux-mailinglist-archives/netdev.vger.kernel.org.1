@@ -1,148 +1,143 @@
-Return-Path: <netdev+bounces-32403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94B76797491
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 17:40:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79F9E7973D4
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 17:32:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D8BD281731
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 15:40:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F91F2816E3
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 15:32:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B59012B78;
-	Thu,  7 Sep 2023 15:40:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C121512B64;
+	Thu,  7 Sep 2023 15:32:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C4D229B4
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 15:40:03 +0000 (UTC)
-Received: from us-smtp-delivery-44.mimecast.com (unknown [207.211.30.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BD0A26B2
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 08:39:45 -0700 (PDT)
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-647-h97T8BI5Pq69vsJa3vL-vg-1; Thu, 07 Sep 2023 08:22:01 -0400
-X-MC-Unique: h97T8BI5Pq69vsJa3vL-vg-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 60E88800888;
-	Thu,  7 Sep 2023 12:22:01 +0000 (UTC)
-Received: from hog (unknown [10.45.224.12])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 41167404119;
-	Thu,  7 Sep 2023 12:22:00 +0000 (UTC)
-Date: Thu, 7 Sep 2023 14:21:59 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Jakub Kicinski <kuba@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: netdev@vger.kernel.org, Dave Watson <davejwatson@fb.com>,
-	Vakul Garg <vakul.garg@nxp.com>, Boris Pismenny <borisp@nvidia.com>,
-	John Fastabend <john.fastabend@gmail.com>
-Subject: Re: [PATCH net 5/5] tls: don't decrypt the next record if it's of a
- different type
-Message-ID: <ZPm__x5TcsmqagBH@hog>
-References: <cover.1694018970.git.sd@queasysnail.net>
- <be8519564777b3a40eeb63002041576f9009a733.1694018970.git.sd@queasysnail.net>
- <20230906204727.08a79e00@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA1A125D8
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 15:32:19 +0000 (UTC)
+Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 844001FC1;
+	Thu,  7 Sep 2023 08:31:55 -0700 (PDT)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+	by mailout.nyi.internal (Postfix) with ESMTP id 41C535C00B0;
+	Thu,  7 Sep 2023 08:42:18 -0400 (EDT)
+Received: from imap42 ([10.202.2.92])
+  by compute6.internal (MEProxy); Thu, 07 Sep 2023 08:42:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jcline.org; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:sender
+	:subject:subject:to:to; s=fm1; t=1694090538; x=1694176938; bh=UI
+	lscQB4tPzAVE0ptc61SxJC9os7aFiFRvMXeXkTLIM=; b=DwP7eSFhMrJJjUmX3h
+	l1OXxKsGNJp4ATvgVOMuhS7AnL3ONEopuBO2W/0CUYwrkZ94CWlVxN4AXTpbYoY1
+	9u69NY5vCJTVty3tRZ8iWTjerJb1GTdB+s8XMO4RiPa6v+FuHuinkRRT7lccOlTT
+	T9TqHYWhnx8TrOhK+DxU7PFjaYWi5fDCjcDlz9P0+PDl6eZnE2XlHGfhKUXzpG+M
+	l/L2JTRoKm7QZdxdk4KYV8Jep1JJs7w3d/K40tGx+8AKLGK3qiyW47fIVAZ6noWP
+	RwTyESVsvQQX48bIoU+TNxBVbLSxwQf41Uq2pUeA58bGSvJcJ5M5HikanT0pFHKR
+	gEIg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm1; t=1694090538; x=1694176938; bh=UIlscQB4tPzAV
+	E0ptc61SxJC9os7aFiFRvMXeXkTLIM=; b=ckZjZP98rzW/Hpq7CqnvHeePkkOuh
+	ESD2C1NhsZ45uV1SHSkTHdwgsa3mebqYsk5N1UOdBBFh3U8uPE4wku83TYeONSE2
+	Ty2nxHWY4SagAxI3Ta21gOsiPYYmNELkeEAXmbWo5N4csNAP0YqxvzoU10t1LYLa
+	n5tf3BfiAsoRGUlEZ/BcOCM9XNDd7xoc6fBeMgI9XeHSNGBam+D2LMZ+roP8hD6D
+	LUSiaD1WpLEmbFCS/A/sLGmOCfPX65XRWQg1v2Xsn8YsD5/PrDOTT2aduNbWE4Mu
+	N9uqmZ4STGkVNH3izf+MFJRVjeq/q/H5ESq0L27bf32btZSAeAfuof39w==
+X-ME-Sender: <xms:KcX5ZO71UeN7P_8q6Y6JP85apDu3MaKU3ua21J-A6M41qKugW1ZqaQ>
+    <xme:KcX5ZH6mN9BkbH_XIQGsaHDSSiiBXN100MU7Ndk3IsQt3eRXy7iTuNx-TKorD_OGo
+    vrp-WYkpTSq2CQIDWg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrudehhedgheegucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedflfgv
+    rhgvmhihucevlhhinhgvfdcuoehjvghrvghmhiesjhgtlhhinhgvrdhorhhgqeenucggtf
+    frrghtthgvrhhnpeeuvedthfdttedttedvgeelleevvdehveejhefgheefuedtleelueek
+    vdeggfeiveenucffohhmrghinhepshihiihkrghllhgvrhdrrghpphhsphhothdrtghomh
+    enucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehjvghr
+    vghmhiesjhgtlhhinhgvrdhorhhg
+X-ME-Proxy: <xmx:KcX5ZNdvz16s5UQpurybmsQSrmVqGg3Q0Us33NTuDBax5lpCu5EUAw>
+    <xmx:KcX5ZLI05Y3FcEGg0_klIK65_cesxI9HH8Yb06k1OIj1h4Vwl0IWHQ>
+    <xmx:KcX5ZCIgS4Q8rxAkaLBk_OgGTH05DofANLfA37dNWNa5pUGdGZsvRw>
+    <xmx:KsX5ZK-yALfukI5ggs_Wl3rqgsWkwG8cRPK8oP4g1nT7C_6reVVySA>
+Feedback-ID: i7a7146c5:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 6B618BC007C; Thu,  7 Sep 2023 08:42:17 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-711-g440737448e-fm-20230828.001-g44073744
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20230906204727.08a79e00@kernel.org>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=0.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_VALIDITY_RPBL,RDNS_NONE,SPF_HELO_NONE,SPF_NONE autolearn=no
-	autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+Message-Id: <cb4fa1f4-2250-4aad-823f-7cd286f30ccc@app.fastmail.com>
+In-Reply-To: <ccf7072c-cebb-0491-f07e-8c781a2f4664@linaro.org>
+References: <20230906233347.823171-1-jeremy@jcline.org>
+ <ccf7072c-cebb-0491-f07e-8c781a2f4664@linaro.org>
+Date: Thu, 07 Sep 2023 08:41:56 -0400
+From: "Jeremy Cline" <jeremy@jcline.org>
+To: "Krzysztof Kozlowski" <krzysztof.kozlowski@linaro.org>
+Cc: "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ syzbot <syzbot+0839b78e119aae1fec78@syzkaller.appspotmail.com>,
+ "Hillf Danton" <hdanton@sina.com>
+Subject: Re: [PATCH] nfc: nci: assert requested protocol is valid
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-2023-09-06, 20:47:27 -0700, Jakub Kicinski wrote:
-> On Wed,  6 Sep 2023 19:08:35 +0200 Sabrina Dubroca wrote:
-> > If the next record is of a different type, we won't copy it to
-> > userspace in this round, tls_record_content_type will stop us just
-> > after decryption. Skip decryption until the next recvmsg() call.
-> >=20
-> > This fixes a use-after-free when a data record is decrypted
-> > asynchronously but doesn't fill the userspace buffer, and the next
-> > record is non-data, for example in the bad_cmsg selftest.
->=20
-> What's the UAF on?
+Hi,
 
-It doesn't always happen unless I set cryptd_delay_ms from my debug
-patch (10 is enough):
-https://patchwork.kernel.org/project/linux-crypto/patch/9d664093b1bf7f47497=
-b2c40b3a085b45f3274a2.1694021240.git.sd@queasysnail.net/
+On Thu, Sep 7, 2023, at 2:24 AM, Krzysztof Kozlowski wrote:
+> On 07/09/2023 01:33, Jeremy Cline wrote:
+>> The protocol is used in a bit mask to determine if the protocol is
+>> supported. Assert the provided protocol is less than the maximum
+>> defined so it doesn't potentially perform a shift-out-of-bounds and
+>> provide a clearer error for undefined protocols vs unsupported ones.
+>> 
+>> Fixes: 6a2968aaf50c ("NFC: basic NCI protocol implementation")
+>> Reported-and-tested-by: syzbot+0839b78e119aae1fec78@syzkaller.appspotmail.com
+>> Closes: https://syzkaller.appspot.com/bug?extid=0839b78e119aae1fec78
+>> Signed-off-by: Jeremy Cline <jeremy@jcline.org>
+>> ---
+>>  net/nfc/nci/core.c | 5 +++++
+>>  1 file changed, 5 insertions(+)
+>> 
+>> diff --git a/net/nfc/nci/core.c b/net/nfc/nci/core.c
+>> index fff755dde30d..6c9592d05120 100644
+>> --- a/net/nfc/nci/core.c
+>> +++ b/net/nfc/nci/core.c
+>> @@ -909,6 +909,11 @@ static int nci_activate_target(struct nfc_dev *nfc_dev,
+>>  		return -EINVAL;
+>>  	}
+>>  
+>> +	if (protocol >= NFC_PROTO_MAX) {
+>> +		pr_err("the requested nfc protocol is invalid\n");
+>> +		return -EINVAL;
+>> +	}
+>
+> This looks OK, but I wonder if protocol 0 (so BIT(0) in the
+> supported_protocols) is a valid protocol. I looked at the code and it
+> was nowhere handled.
+>
 
-UAF is on the crypto_async_request (part of the aead_request,
-allocated in the big kmalloc in tls_decrypt_sg), mostly caught when
-cryptd_queue_worker calls crypto_request_complete, but sometimes a bit
-earlier (in crypto_dequeue_request).
+I did notice that the protocols started at 1, but I was not particularly confident in adding a check for 0 since I was concerned I might miss a subtle existing case of 0 being used somewhere, or that some time in the future a protocol 0 would be added (which seems weird, but weird things happen I suppose). If it is added in the future and there's a check here marking it invalid explicitly, it will trip up the developer briefly.
 
-I'll admit this patch is papering over the issue a bit, but decrypting
-a record we know we won't read within this recv() call seems a bit
-pointless.
+Since the next check in this function should still reject 0 with an -EINVAL the only downside to not checking is the different error message.
 
+I personally lean towards letting the second check catch the 0 case, but as I'm not likely to be the person who has to deal with any of the downsides, I'm happy to do whatever you think is best.
 
-I wonder if the way we're using ctx->async_wait here is correct. I'm
-observing crypto_wait_req return 0 even though the decryption hasn't
-run yet (and it should return -EBADMSG, not 0). I guess
-tls_decrypt_done calls the completion (since we only had one
-decrypt_pending), and then crypto_wait_req thinks everything is
-already done.
-
-Adding a fresh crypto_wait in tls_do_decryption (DECLARE_CRYPTO_WAIT)
-and using it in the !darg->async case also seems to fix the UAF (but
-makes the bad_cmsg test case fail in the same way as what I wrote in
-the cover letter for bad_in_large_read -- not decrypting the next
-message at all makes the selftest pass).
-
-Herbert, WDYT? We're calling tls_do_decryption twice from the same
-tls_sw_recvmsg invocation, first with darg->async =3D true, then with
-darg->async =3D false. Is it ok to use ctx->async_wait for both, or do
-we need a fresh one as in this patch?
-
--------- 8< --------
-diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index 86b835b15872..ad51960f2864 100644
---- a/net/tls/tls_sw.c
-+++ b/net/tls/tls_sw.c
-@@ -246,6 +246,7 @@ static int tls_do_decryption(struct sock *sk,
- =09struct tls_context *tls_ctx =3D tls_get_ctx(sk);
- =09struct tls_prot_info *prot =3D &tls_ctx->prot_info;
- =09struct tls_sw_context_rx *ctx =3D tls_sw_ctx_rx(tls_ctx);
-+=09DECLARE_CRYPTO_WAIT(wait);
- =09int ret;
-=20
- =09aead_request_set_tfm(aead_req, ctx->aead_recv);
-@@ -262,7 +263,7 @@ static int tls_do_decryption(struct sock *sk,
- =09} else {
- =09=09aead_request_set_callback(aead_req,
- =09=09=09=09=09  CRYPTO_TFM_REQ_MAY_BACKLOG,
--=09=09=09=09=09  crypto_req_done, &ctx->async_wait);
-+=09=09=09=09=09  crypto_req_done, &wait);
- =09}
-=20
- =09ret =3D crypto_aead_decrypt(aead_req);
-@@ -270,7 +271,7 @@ static int tls_do_decryption(struct sock *sk,
- =09=09if (darg->async)
- =09=09=09return 0;
-=20
--=09=09ret =3D crypto_wait_req(ret, &ctx->async_wait);
-+=09=09ret =3D crypto_wait_req(ret, &wait);
- =09}
- =09darg->async =3D false;
-=20
---=20
-Sabrina
-
+Thanks,
+Jeremy
 
