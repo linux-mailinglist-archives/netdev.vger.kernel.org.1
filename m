@@ -1,75 +1,121 @@
-Return-Path: <netdev+bounces-32360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88331796F63
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 05:47:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6A25796F6C
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 05:54:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7D5928145D
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 03:47:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E74D01C20A05
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 03:54:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01190EC0;
-	Thu,  7 Sep 2023 03:47:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0173CEC6;
+	Thu,  7 Sep 2023 03:54:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E58B8EA9
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 03:47:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E988C433C8;
-	Thu,  7 Sep 2023 03:47:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694058448;
-	bh=PJhSTVotcMcqXadbS1gofWvsbo02DtFYT7yrRxBf81g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=I4XfHJ/RojsN6nLgAg5KrsWLAZvXPYG/KNZ/Bw3Uve3wimaEHGCtW2+Y3RYOANRRQ
-	 o7g0j67WKs4RLM0j/QfLUDIkkQAcdxX4YvGfjSVT/vtcAc6/EndPJf1l0f+HtwFBYw
-	 fSm7hCursaouEM0Brl1LvsabfsdbdcaBmlNUhFC4ybx/qZ7Z44HrXIJvbJMM/bThFn
-	 XMNbKz9MdZ99nUsCYQBHM7TsiUZ6RZlEu1+nyfef0G1HSXlPEDzm5eYYqOv4+tyx+Z
-	 8Lj9BucPD7xRVBcBjtWabAwUo7T2c0mRyL1ygQBNeXk3kGAK/zwDHmK4xaqHMyu9xs
-	 tQm/avw+q4poQ==
-Date: Wed, 6 Sep 2023 20:47:27 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Dave Watson <davejwatson@fb.com>, Vakul Garg
- <vakul.garg@nxp.com>, Boris Pismenny <borisp@nvidia.com>, John Fastabend
- <john.fastabend@gmail.com>
-Subject: Re: [PATCH net 5/5] tls: don't decrypt the next record if it's of a
- different type
-Message-ID: <20230906204727.08a79e00@kernel.org>
-In-Reply-To: <be8519564777b3a40eeb63002041576f9009a733.1694018970.git.sd@queasysnail.net>
-References: <cover.1694018970.git.sd@queasysnail.net>
-	<be8519564777b3a40eeb63002041576f9009a733.1694018970.git.sd@queasysnail.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E89EA9
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 03:54:18 +0000 (UTC)
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB75811B
+	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 20:54:16 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2b9c907bc68so8682561fa.2
+        for <netdev@vger.kernel.org>; Wed, 06 Sep 2023 20:54:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694058855; x=1694663655; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=g6VgDm0nScbT3j0XrwP0EdvXq7ohJK6jgdKHy8P6PSk=;
+        b=iH4NfCHbflEFEybtpedWHWK8MZrzsl55cUdZfmFNbXoNgcJM6VJqyeqN16TKPed9CP
+         m+Cj+9ckJmeLeagec8yHOHi5Vplc/zNRrBKQCrGNcZdOAba7qNI6pi/sqeOuFShQp/Ba
+         ney4TaiTDLwKLLqCcJnNM+kSJrKDFZASzg9/A9nfgPcpHyRI2d059SA1dM12xWTKRRyx
+         dWaefxPg+2wbOpuqBkE9rDXCIm5Rirns3mpTOxsDVCcufSJ3ZFyiplwvqZZFeBT8rkok
+         ueMYZMe91YzMedpgOHl1uwn2MGLhn6pFJKt4aQNRvLvIQm74XGDbGbnp/JFwcmNmd1lq
+         S9Kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1694058855; x=1694663655;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=g6VgDm0nScbT3j0XrwP0EdvXq7ohJK6jgdKHy8P6PSk=;
+        b=FRINmVqLCTCR+ffdzUF1bwy+99TtrPvxsJESHqViseX4Rz3ymrDBUQdEqbcLLO/KBc
+         QlnJUupxGakZ09fUHfln8UZE8PWxtRXXlW3C6k2i7K3qYi5hRBrdt00eALftO10Jztdn
+         k3fnh9NiVb0eOBmMCQIZERL9YwQ6ooHJOccTn8r12phxSh9k2SaFjvrQUtEcd+pEOteQ
+         oQ5acplYJW7rnVe0SNSkomb5gNpsUli5K1PhRC3ckTzlNMckYiX1239cPYMHPz1A3/Cd
+         oW47l6gRJeg1Q/oQhT0ehiZjNcLuFsZJgTzeoV2/SC3NmHscSKL7bJEN7PtHmo7di844
+         BbcQ==
+X-Gm-Message-State: AOJu0YxWb1+8INfvNdfeCTSkwwl8TCUZBuDmaWGf4vGMMuqmQ+jd7fHr
+	n6LsLyC6lt46AXNAcc+L6Q1aakn1XTEJMcDiQ0X7uV/+T8hE1Q==
+X-Google-Smtp-Source: AGHT+IHdeR7atgzR+UsfKT5dLQVfJattYnUGzCmHEe/mBY814NXBmI+rD66LowNAy14CTt/wyYU8W8PyesZm1VQbgjc=
+X-Received: by 2002:a05:651c:21b:b0:2b9:e230:25ce with SMTP id
+ y27-20020a05651c021b00b002b9e23025cemr3768083ljn.12.1694058854617; Wed, 06
+ Sep 2023 20:54:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20230906103508.6789-1-liangchen.linux@gmail.com> <ZPj98UXjJdsEsVJQ@d3>
+In-Reply-To: <ZPj98UXjJdsEsVJQ@d3>
+From: Liang Chen <liangchen.linux@gmail.com>
+Date: Thu, 7 Sep 2023 11:54:02 +0800
+Message-ID: <CAKhg4tL+stODiv8hG0YWmU8zCKR4CsDOEvv7XD-S9PMdas5i_w@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next] pktgen: Introducing a parameter for
+ non-shared skb testing
+To: Benjamin Poirier <benjamin.poirier@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed,  6 Sep 2023 19:08:35 +0200 Sabrina Dubroca wrote:
-> If the next record is of a different type, we won't copy it to
-> userspace in this round, tls_record_content_type will stop us just
-> after decryption. Skip decryption until the next recvmsg() call.
-> 
-> This fixes a use-after-free when a data record is decrypted
-> asynchronously but doesn't fill the userspace buffer, and the next
-> record is non-data, for example in the bad_cmsg selftest.
+On Thu, Sep 7, 2023 at 6:32=E2=80=AFAM Benjamin Poirier
+<benjamin.poirier@gmail.com> wrote:
+>
+> On 2023-09-06 18:35 +0800, Liang Chen wrote:
+> > Currently, skbs generated by pktgen always have their reference count
+> > incremented before transmission, leading to two issues:
+> >   1. Only the code paths for shared skbs can be tested.
+> >   2. Skbs can only be released by pktgen.
+> > To enhance testing comprehensiveness, introducing the "skb_single_user"
+> > parameter, which allows skbs with a reference count of 1 to be
+> > transmitted. So we can test non-shared skbs and code paths where skbs
+> > are released within the network stack.
+>
+> If my understanding of the code is correct, pktgen operates in the same
+> way with parameter clone_skb =3D 0 and clone_skb =3D 1.
+>
 
-What's the UAF on?
+Yeah. pktgen seems to treat user count of 2 as not shared, as long as
+the skb is not reused for burst or clone_skb. In that case the only
+thing left to do with the skb is to check if user count is
+decremented.
 
-> diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-> index f80a2ea1dd7e..86b835b15872 100644
-> --- a/net/tls/tls_sw.c
-> +++ b/net/tls/tls_sw.c
-> @@ -2010,6 +2010,9 @@ int tls_sw_recvmsg(struct sock *sk,
->  		else
->  			darg.async = false;
->  
-> +		if (ctx->async_capable && control && tlm->control != control)
-> +			goto recv_end;
+> clone_skb =3D 0 is already meant to work on devices that don't support
+> shared skbs (see IFF_TX_SKB_SHARING check in pktgen_if_write()). Instead
+> of introducing a new option for your purpose, how about changing
+> pktgen_xmit() to send "not shared" skbs when clone_skb =3D=3D 0?
+>
+
+Using clone_skb =3D 0 to enforce non-sharing makes sense to me. However,
+we are a bit concerned that such a change would affect existing users
+who have been assuming the current behavior.
+
+> Note that for devices without IFF_TX_SKB_SHARING, it would no longer be
+> possible to have pktgen free skbs. Is that important?
+
+It seems that only the "count" capability depends on that. In fact,
+this patch is attempting to allow skb release within the network stack
+when possible. BTW, to strictly obey the IFF_TX_SKB_SHARING flag,
+perhaps the "count" capability can be implemented by supplying a
+destructor to skbs.
 
