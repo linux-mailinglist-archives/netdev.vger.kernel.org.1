@@ -1,105 +1,146 @@
-Return-Path: <netdev+bounces-32366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBB91797134
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 11:25:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 150BA797177
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 12:26:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B5DB281337
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 09:25:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79C13281472
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 10:26:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B244620E8;
-	Thu,  7 Sep 2023 09:25:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 608545677;
+	Thu,  7 Sep 2023 10:26:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B8120E4
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 09:25:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B04C7C433AD;
-	Thu,  7 Sep 2023 09:25:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98618566C;
+	Thu,  7 Sep 2023 10:26:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2CC0C116B5;
+	Thu,  7 Sep 2023 10:26:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694078718;
-	bh=ofrREB+XRbUYVS5Sh20JAfhhFAJ49iPxwIALV7BFZUU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hzRT/Gb9kx8nzgECyIcfiRkD2AdsyIVnMTBz9cQ27fJUfdlg1iooQk7r/6WpR34t0
-	 HCDlqYGGyBjosugpXaUcBnJ+eeS4r1PAa+L5iTtN962KVlv5C3P2bCjfBAjCMGzBCm
-	 u32uZQTdd2mBdzStbWxHi3rwHmb8OVb3jNeLZ0x6yMpHhOkSYKQO1mALmcpyfA2Aoh
-	 7uSvAF/GdMZu34z4xCcMxqNEqfFofBGxJ7gTx2BGggBqwt4ECDXuw6wYp+uWDCAjJt
-	 cHoiuOWo3YhSdk67dQQXUmY15b+IwwOnd/j+VM/Bn/rjSA1KXHBpl7ge3JOl0gWa/6
-	 e8cuMErprpgNA==
-Date: Thu, 7 Sep 2023 10:25:13 +0100
-From: Will Deacon <will@kernel.org>
-To: Robin Murphy <robin.murphy@arm.com>
-Cc: syzbot <syzbot+4a9f9820bd8d302e22f7@syzkaller.appspotmail.com>,
-	catalin.marinas@arm.com, fw@strlen.de, kadlec@netfilter.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	pablo@netfilter.org, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [arm?] [netfilter?] KASAN: slab-out-of-bounds Read in
- do_csum
-Message-ID: <20230907092511.GB5731@willie-the-truck>
-References: <000000000000e0e94c0603f8d213@google.com>
- <20230905143711.GB3322@willie-the-truck>
- <0dea99d9-3334-3fd3-3776-074ecace0259@arm.com>
+	s=k20201202; t=1694082390;
+	bh=Jf43CePeMB/IHVQj7NAnYc9eiEbnhyFThi5aBu2GxZQ=;
+	h=From:To:Subject:In-Reply-To:References:Date:From;
+	b=K6rspdVed2uda7EyL9F1SENUhK2bvhih44kuOULQ7utH9Q0xtoRZaRNJB9+dyc9Tv
+	 ir1ONXzVGRQIsLVL5IYnwQl5zMLhJM5JSlfQgrsNLh6MVQuijX4OFVsBPIqdo40Kj+
+	 lP1rY6k9be1J+Da6zT8ovdSy0lJYwKDih4zo6Nhpiz6DRicYkiH3qn1+GgE6hnqfC4
+	 qTflWJAms1FgYOMNt06QFGF7u0U1HBU7OwIaRi3wyVuCVuvgwzh9ySMyw+00PZtZ7h
+	 2stQaGZK0DeT/sN5d1GfmucfV/D1rMwg3oxM54cr3Y9gsGJCTcqq0zrMTpFMDcBVEH
+	 dwAq98SbIfkAg==
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 47DCBDC67D3; Thu,  7 Sep 2023 12:26:27 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
+To: Hsin-Wei Hung <hsinweih@uci.edu>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
+ <andrii@kernel.org>, Martin KaFai Lau <kafai@fb.com>, Song Liu
+ <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>, John Fastabend
+ <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, Arnaldo Carvalho de Melo
+ <acme@kernel.org>
+Subject: Re: Possible deadlock in bpf queue map
+In-Reply-To: <CABcoxUbYwuZUL-xm1+5juO42nJMgpQX7cNyQELYz+g2XkZi9TQ@mail.gmail.com>
+References: <CABcoxUbYwuZUL-xm1+5juO42nJMgpQX7cNyQELYz+g2XkZi9TQ@mail.gmail.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Thu, 07 Sep 2023 12:26:27 +0200
+Message-ID: <87o7ienuss.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0dea99d9-3334-3fd3-3776-074ecace0259@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain
 
-On Tue, Sep 05, 2023 at 04:02:19PM +0100, Robin Murphy wrote:
-> On 05/09/2023 3:37 pm, Will Deacon wrote:
-> > On Mon, Aug 28, 2023 at 03:04:44AM -0700, syzbot wrote:
-> > > HEAD commit:    908f31f2a05b Merge branch 'for-next/core', remote-tracking..
-> > > git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-> > > console output: https://syzkaller.appspot.com/x/log.txt?x=155e0463280000
-> > > kernel config:  https://syzkaller.appspot.com/x/.config?x=c1058fe68f4b7b2c
-> > > dashboard link: https://syzkaller.appspot.com/bug?extid=4a9f9820bd8d302e22f7
-> > > compiler:       Debian clang version 15.0.7, GNU ld (GNU Binutils for Debian) 2.35.2
-> > > userspace arch: arm64
-> > > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16bc548d280000
-> > > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=135bba3b280000
-> > > 
-> > > Downloadable assets:
-> > > disk image: https://storage.googleapis.com/syzbot-assets/87d095820229/disk-908f31f2.raw.xz
-> > > vmlinux: https://storage.googleapis.com/syzbot-assets/a1bf67af9675/vmlinux-908f31f2.xz
-> > > kernel image: https://storage.googleapis.com/syzbot-assets/7784a88b37e8/Image-908f31f2.gz.xz
-> > > 
-> > > IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> > > Reported-by: syzbot+4a9f9820bd8d302e22f7@syzkaller.appspotmail.com
-> > > 
-> > > netdevsim netdevsim0 netdevsim2: set [1, 0] type 2 family 0 port 6081 - 0
-> > > netdevsim netdevsim0 netdevsim3: set [1, 0] type 2 family 0 port 6081 - 0
-> > > ==================================================================
-> > > BUG: KASAN: slab-out-of-bounds in do_csum+0x44/0x254 arch/arm64/lib/csum.c:39
-> > > Read of size 4294966928 at addr ffff0000d7ac0170 by task syz-executor412/5975
-> 
-> Yup, that looks suspiciously "-368"-shaped...
-> 
-> > Judging by the UBSAN errors:
-> > 
-> > | shift exponent 3008 is too large for 64-bit type 'u64' (aka 'unsigned long long')
-> > 
-> > We're probably being passed a negative 'len' argument. It looks like the
-> > generic version in lib/checksum.c rejects that early, so maybe we should
-> > do the same in the arch code?
-> 
-> Hmm, indeed I can offer no explanation as to why I put "if (len == 0)" there
-> rather than "if (len <= 0)" like literally every other C implementation* :/
++Arnaldo
 
-I've made that change:
+> Hi,
+>
+> Our bpf fuzzer, a customized Syzkaller, triggered a lockdep warning in
+> the bpf queue map in v5.15. Since queue_stack_maps.c has no major changes
+> since v5.15, we think this should still exist in the latest kernel.
+> The bug can be occasionally triggered, and we suspect one of the
+> eBPF programs involved to be the following one. We also attached the lockdep
+> warning at the end.
+>
+> #define DEFINE_BPF_MAP_NO_KEY(the_map, TypeOfMap, MapFlags,
+> TypeOfValue, MaxEntries) \
+>         struct {                                                        \
+>             __uint(type, TypeOfMap);                                    \
+>             __uint(map_flags, (MapFlags));                              \
+>             __uint(max_entries, (MaxEntries));                          \
+>             __type(value, TypeOfValue);                                 \
+>         } the_map SEC(".maps");
+>
+> DEFINE_BPF_MAP_NO_KEY(map_0, BPF_MAP_TYPE_QUEUE, 0 | BPF_F_WRONLY,
+> struct_0, 162);
+> SEC("perf_event")
+> int func(struct bpf_perf_event_data *ctx) {
+>         char v0[96] = {};
+>         uint64_t v1 = 0;
+>         v1 = bpf_map_pop_elem(&map_0, v0);
+>         return 163819661;
+> }
+>
+>
+> The program is attached to the following perf event.
+>
+> struct perf_event_attr attr_type_hw = {
+>         .type = PERF_TYPE_HARDWARE,
+>         .config = PERF_COUNT_HW_CPU_CYCLES,
+>         .sample_freq = 50,
+>         .inherit = 1,
+>         .freq = 1,
+> };
+>
+> ================================WARNING: inconsistent lock state
+> 5.15.26+ #2 Not tainted
+> --------------------------------
+> inconsistent {INITIAL USE} -> {IN-NMI} usage.
+> syz-executor.5/19749 [HC1[1]:SC0[0]:HE0:SE1] takes:
+> ffff88804c9fc198 (&qs->lock){..-.}-{2:2}, at: __queue_map_get+0x31/0x250
+> {INITIAL USE} state was registered at:
+>   lock_acquire+0x1a3/0x4b0
+>   _raw_spin_lock_irqsave+0x48/0x60
+>   __queue_map_get+0x31/0x250
+>   bpf_prog_577904e86c81dead_func+0x12/0x4b4
+>   trace_call_bpf+0x262/0x5d0
+>   perf_trace_run_bpf_submit+0x91/0x1c0
+>   perf_trace_sched_switch+0x46c/0x700
+>   __schedule+0x11b5/0x24a0
+>   schedule+0xd4/0x270
+>   futex_wait_queue_me+0x25f/0x520
+>   futex_wait+0x1e0/0x5f0
+>   do_futex+0x395/0x1890
+>   __x64_sys_futex+0x1cb/0x480
+>   do_syscall_64+0x3b/0xc0
+>   entry_SYSCALL_64_after_hwframe+0x44/0xae
+> irq event stamp: 13640
+> hardirqs last  enabled at (13639): [<ffffffff95eb2bf4>]
+> _raw_spin_unlock_irq+0x24/0x40
+> hardirqs last disabled at (13640): [<ffffffff95eb2d4d>]
+> _raw_spin_lock_irqsave+0x5d/0x60
+> softirqs last  enabled at (13464): [<ffffffff93e26de5>] __sys_bpf+0x3e15/0x4e80
+> softirqs last disabled at (13462): [<ffffffff93e26da3>] __sys_bpf+0x3dd3/0x4e80
+>
+> other info that might help us debug this:
+>  Possible unsafe locking scenario:
+>
+>        CPU0
+>        ----
+>   lock(&qs->lock);
+>   <Interrupt>
+>     lock(&qs->lock);
 
-https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git/commit/?h=for-next/fixes&id=8bd795fedb8450ecbef18eeadbd23ed8fc7630f5
+Hmm, so that lock() uses raw_spin_lock_irqsave(), which *should* be
+disabling interrupts entirely for the critical section. But I guess a
+Perf hardware event can still trigger? Which seems like it would
+potentially wreak havoc with lots of things, not just this queue map
+function?
 
-Cheers,
+No idea how to protect against this, though. Hoping Arnaldo knows? :)
 
-Will
+-Toke
 
