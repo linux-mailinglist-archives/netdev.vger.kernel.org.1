@@ -1,231 +1,118 @@
-Return-Path: <netdev+bounces-32459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E02FA797AEB
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 19:57:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B02F1797AD1
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 19:50:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE0011C20B60
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 17:57:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EABE51C20B66
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 17:50:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E9F413AFD;
-	Thu,  7 Sep 2023 17:57:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29D5613AF2;
+	Thu,  7 Sep 2023 17:50:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AD54134B2
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 17:57:38 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 314B7E6B
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 10:57:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694109437; x=1725645437;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Xj80fusXQQDszIF1IMR3KPbsEouV2mwMTty6+zmRLG8=;
-  b=PMsrna2qjmONEbAzRTVeDAPKaZ/zES8Qe3hAFHEWw/9kvF32N9pO/AN3
-   chZjSL2zr1Bt2hOX79V5ZbVFdTjTo8UmSKwL5vme2Ut9ddi2kcLGR0LEe
-   T21fPKzBN7O1aVUpuLnA8bZynH0Dfd4rJUMi1DArZE1UA63nSNoDEwqOw
-   3yvtil69IdtUgwnzEj2MAgTeJRGDc41tVMG08n5t8vOIBc3u3FydurFvk
-   25R1+SiogCeLyRYxOc4gLEUfijjYDomhSfZBkiX8cXsOouFiH/iBDMRhF
-   vSc24SskjHcjU2CNxD6tHDMe/Ikloj4FsI/Kdg5OE/nFz5hcSGZtJ2aBM
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10825"; a="367495139"
-X-IronPort-AV: E=Sophos;i="6.02,234,1688454000"; 
-   d="scan'208";a="367495139"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2023 23:39:50 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10825"; a="691650407"
-X-IronPort-AV: E=Sophos;i="6.02,234,1688454000"; 
-   d="scan'208";a="691650407"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orsmga003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Sep 2023 23:39:50 -0700
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Wed, 6 Sep 2023 23:39:50 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Wed, 6 Sep 2023 23:39:50 -0700
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.46) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Wed, 6 Sep 2023 23:39:49 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WSHk0j8+PdePp6YvvGI+icVp1GnlUG9LI9+26WnD0yqrew9a8uXXdgd4JoD76QRA6TcKNz9Do8t4Q30X/VlWnAzq11avT9SQxKmKQCzJPNg7FCcCRojwq3064LtzgI/FWAPOtb13dFo0Ow012SnLCs4/a89JTpso04RtblukuICeTEObjTOrxkWbWhEFN+AE8JVpliBFPLHsmVxFj85PZnhBE1DPyM5V6hEHFFn7y16epsuy5hEsNVPBqc7PBky1i5jQ0brVt/KtVQinZxKnQkcnk0iKeGu8van6xVl6fIbtm3wna9r48NmUDAB2eddhj8fYSDqmVNoP8uo/GQN0BQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Xv7tUwRikuMep0CAfHKFymfJW1chCQicvZXVOMYIS3k=;
- b=ij3DuT3dbYbOEEBKn9Xu2BzIP5LXrxba4UQBAFqFiGeSRHt3nXf41onDCVCZET9AecPEhiEsxtWXQN5bsUiwFPC0fCW8BUN633YtWKQIM2Tsixz14NWepLVGzQr4GejPt1B814B8xboyfgU+fBWD5WNnQZFO9aklWP5HolXIveFm08RztEpyWO68PX3wVRIpbDq/v+uIdWlFaqWp/tNnOJHkZpSKmaWNvFqvjbN/p2j3K+ZDi+MiZqOfx3PCRLnklUIUt0G/aOwm/2NrOTJy9HLgZEKoUIs/HEiP74A6QSnABZisa4mVu4ZWZ4/PKGAPqf54kY2gVi8tQHpJ5uJ5TQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL0PR11MB3122.namprd11.prod.outlook.com (2603:10b6:208:75::32)
- by MN6PR11MB8244.namprd11.prod.outlook.com (2603:10b6:208:470::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.34; Thu, 7 Sep
- 2023 06:39:47 +0000
-Received: from BL0PR11MB3122.namprd11.prod.outlook.com
- ([fe80::4960:928f:8f06:7479]) by BL0PR11MB3122.namprd11.prod.outlook.com
- ([fe80::4960:928f:8f06:7479%4]) with mapi id 15.20.6745.035; Thu, 7 Sep 2023
- 06:39:47 +0000
-From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, "Brandeburg, Jesse"
-	<jesse.brandeburg@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, Jakub Kicinski <kuba@kernel.org>, "Alexander
- Duyck" <alexander.duyck@gmail.com>, "Rustad, Mark D"
-	<mark.d.rustad@intel.com>, Darin Miller <darin.j.miller@intel.com>, "Jeff
- Kirsher" <jeffrey.t.kirsher@intel.com>, Richard Cochran
-	<richardcochran@gmail.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-Subject: RE: [Intel-wired-lan] [PATCH net] ixgbe: fix timestamp configuration
- code
-Thread-Topic: [Intel-wired-lan] [PATCH net] ixgbe: fix timestamp configuration
- code
-Thread-Index: AQHZ1g+ASmiBu+CN/kawX/lH5NF/RrAO/8mw
-Date: Thu, 7 Sep 2023 06:39:46 +0000
-Message-ID: <BL0PR11MB312234CFC9973CC38C2C1A7FBDEEA@BL0PR11MB3122.namprd11.prod.outlook.com>
-References: <20230823221537.816541-1-vadim.fedorenko@linux.dev>
-In-Reply-To: <20230823221537.816541-1-vadim.fedorenko@linux.dev>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL0PR11MB3122:EE_|MN6PR11MB8244:EE_
-x-ms-office365-filtering-correlation-id: c28fe49f-7a8d-44d5-08d2-08dbaf6d3a1a
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: M81pA2YE5Ki/vlH0REzgVi6VC9SdGxtQti5d0AbMuyC17yZU52YRmJLakwdcPvolMKyAs0BSY7axxxAiKuvgxFbc7xKU+2n+JKsWMYJjBaIbOr/EBxHgRPTafnw8l6r7bnwiozO3wBKqC9H0mFrXTNoH9dTPMjEvVteqMDxU9/D345JuK0S7FnQ/jFa5i60p5jX3TOhqN+wJu0PfEYrhf43cRqC47rghJGuDf2blhGhbxCMn1zkGToBmaFs/UiV0oAIguFkwhqwdkt1Kj2wQDVu8tTCy+CjMxO2sKu7sHDLmoNo1QuY9dRiROz3bFNWEd80+sdfqOSWDP65L233ULMxQh3xhMV/dyP9JonvvJpXqj3ooZS3JziL/dvy8vCPCeBxOiD3IIyAfdFqzIe37f9hB/0Nhr8jIALLKrzmuB1JD4RlWDPBtwgcK+G98jh9ZvMMpgtUdg7kgDRKnMhSFj6wbcCoJ5Uk67qjuFNBgqxoGipiOcskZLrxE2GI9VonWQkzWRxgLLwGudAzhygZWInmyUfj9pvDejcJhOK1RXWmpP+Qw/a2hIIAIxLtTwfRFglcNz/b5br7yjZchTSgI5Bq6dYSzp/dOJZOlgJ4mmeFPxJjx3K4emvDqdcGainJ2
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB3122.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(39860400002)(366004)(346002)(136003)(1800799009)(451199024)(186009)(122000001)(921005)(53546011)(6506007)(7696005)(71200400001)(9686003)(38070700005)(86362001)(55016003)(38100700002)(82960400001)(33656002)(2906002)(26005)(55236004)(83380400001)(110136005)(478600001)(66946007)(8676002)(76116006)(52536014)(8936002)(4326008)(66556008)(5660300002)(316002)(66476007)(64756008)(54906003)(41300700001)(66446008);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?S9wOlQEjUNId/LxvrE3iwqDfQbMg0tIyFAdh4KLHQyG+C992QU79QwSFMSp4?=
- =?us-ascii?Q?JDphgJ418b1hvyAwqzKu2sUP0THw1yrplUkg3QrXGNyV3vDmTDoXbNhTwsMe?=
- =?us-ascii?Q?oqDunUwYo4vnp7IMbh0N50F8dBXuZRs+Y7bdPlRAVxsaAQgdD7DcnHlt76jl?=
- =?us-ascii?Q?/UpaV6xn4Xd4S2WRvMpCMRCLLZaveYr1gxrv7wugfmJXbAOcK2m1bM0pVoIb?=
- =?us-ascii?Q?GY2a3lNFa8V9j+jhAO8tn2ENDiqeyWdBoSaH4Hhoc/GZ7y1Ee0vUaug7GSx/?=
- =?us-ascii?Q?+DS4Hp7ZTNfiGrSqYHBv6vfEFqXfeMJz3JL0nncFT5RtZIasjFVkOJJHtkdY?=
- =?us-ascii?Q?0gN/evo+VOdAfBXTLDiIyI64DRbYMdO5DrkptMwHTOKmcPtsli8bE56d0kwL?=
- =?us-ascii?Q?ETv6JWNmnQ1Y84N2xEqYf+GKjge95MV+s55+P5qExmjdP+TIkLIudQagGTUE?=
- =?us-ascii?Q?93/K5I4iaD2TxE5JIAEUud7o3LFR7Jq+gsIlBEbNdyFCpgMn2YW4271HTQ6Q?=
- =?us-ascii?Q?2F2+q8lpYKQpJy5hLDlOYJFmyqd970WIwSvx3iHVmpZyYrDwtZvdygFWVzKV?=
- =?us-ascii?Q?p+SB6xmvp5WpNcKiJ2+JZAy/77X11rI8G4DX2mpyMN2sOlOBWMlLD8SFfs5j?=
- =?us-ascii?Q?ZNneT/XKLN1O8t8mezKWgDiEVwTiV7ZmHtdDToxyZF5XikxBjSlxQ6bKbp9a?=
- =?us-ascii?Q?OIJbvBJ8kMmCE598Zhp//UFcvUet0to/9bTpK468fAyNRod4eSjjUiiw3f4s?=
- =?us-ascii?Q?4cWMonZCvSUngvFhjdxEhZqNHDi+jUu6iy6KzDd1GtbdLQwzD115I323UibO?=
- =?us-ascii?Q?Jbd6rxqsKFqVqKz7K4TCloCu0pTJOhkAw4TS7BoXqZxkDqe8i0qSKUJQ8NY4?=
- =?us-ascii?Q?c6TMy7ePS4zvef/HpY0mb0MRv7dK31Y9ZdWAYogTwTs03hMUhS7SPU1MP33X?=
- =?us-ascii?Q?lAoNL3EC1ehZL7aHQNPC06bbJtBjZbNIKZKyRCzd9TPr1XL3iLeyhYh/lDqp?=
- =?us-ascii?Q?960ztay00HEK6sNU4nQL9pOLlSfLwf9KDsdOXWXRsH1nPiHP/wgziRHCmdG2?=
- =?us-ascii?Q?8os6HV/ebTA4ef5b4tymFs6n1Ec8jkFeDhNqgbs9txqp6LLPuEXNv4iJByJ9?=
- =?us-ascii?Q?IgbdfGndAVl/4NITmDjJvt+K2/iwHDuK65SxYyYIfP/O65owoTNZSEsATlky?=
- =?us-ascii?Q?7DQP2JutJ89Ijn5MplKrWSXuX/S0t5LHdVP3e0VQIVYw/fR6xKGyn8n7OW94?=
- =?us-ascii?Q?EDXUfjF/IgoWBVz6VFoyvYo8EWy0teAMbT3r21DFxfHiv997sXKOKekiAL14?=
- =?us-ascii?Q?nPCG11kHor1gfni4RK+7AuOyRKzB/HcSDYJI8OiYxHgVidRunEtgkuZIoUOY?=
- =?us-ascii?Q?Zu6l5drQH4Z+aqb7RLGKxQGh7mbUOjqWdnaJxArzApQXz4vxBeTCF3NobJi9?=
- =?us-ascii?Q?2f8hq44wtpwDaQSIpXKVJWhn+K+Uq2ElnsTOw7/GlMl23BlTTDDLiEbca9mH?=
- =?us-ascii?Q?NLUV/LevPdiNQuMOe2Y9edWy7yL2L199GgocSkEVyIom0sXqbd2afgkLSOqI?=
- =?us-ascii?Q?tz1BU4qd3UKd1q5xWzVJnIJd41ouOJ8sY1z8V6QX+E4mv6sRLo4eelkz8FTl?=
- =?us-ascii?Q?9w=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D94113AEF
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 17:50:09 +0000 (UTC)
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C3661FF9;
+	Thu,  7 Sep 2023 10:49:48 -0700 (PDT)
+Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-5007f3d3235so2047198e87.2;
+        Thu, 07 Sep 2023 10:49:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694108957; x=1694713757; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ukwWb4lAr/3M8hE9KXN4tPWduEYh1NIPGybMurdhdDs=;
+        b=qsRWpcCS5N8Rz+HEwqZslRyOAj5prWejgUrBOtImOu4TKYFJxv3dkbQHu7+9MEVGSe
+         uqOcPSnE2iaRzXvhdUF+uINntol4+D8FixkAO9MyETDDkODcTep8YQb4eSk3ONO4vt3p
+         XuHEfSMnzctnTahj9AxbhNhBYV8OP4kljDa1xPcce5o6mgYEdsa+HOs59XMt+WfEON9G
+         w7k6gPA1yha5Gi24K5072mVcZzgShFyxVnOINXzzSmSoZvCogS+n187MPQPwhtAXWIOW
+         dOA28ba0uLLIInQk0gqwsNAee9J0zlILhucMF0E0rxRMUqqTAyeQ5aC98h7861uWg6zL
+         1HcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694108957; x=1694713757;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ukwWb4lAr/3M8hE9KXN4tPWduEYh1NIPGybMurdhdDs=;
+        b=iIgrEaRSNEZAu/Gb+HyUSBG8ZENfCGpQ/g/Ilj17qmv3zOUuZQDGajAr7N60vCyst8
+         slJfm8tQskC56g98lI6JekmgdSbC74js2FVSKhOLyeV26Qq+au2ngvKgo9iS/2ttd0T8
+         uCkRZ6ZdIgV3wmA1VHDwgrMiLulawVpMXVMcfK8cyuDt09AsVLQPsDd+OXKC6oEvIk+b
+         8/a5uEgHeXJQH5JeEls1mOqnnAWE6A1YEo33NWCrm0NKKHbYQ5Hjc820vjndWanTms86
+         BmeHluYaoJyjU4/vZHQPB0sJojRLKxXJ+aIWe9/OMv40dEhl3yoKO8ElqT0yhh2w4lXJ
+         ++oQ==
+X-Gm-Message-State: AOJu0Yxv7QhD76FutZ1qrj43KfpcJCPZvc8ebTGKegHohxmtKFivXgvt
+	WiZ96n5B+g5QJ19hLFI4fzJa5TUwtExCiQ==
+X-Google-Smtp-Source: AGHT+IHzD3+7U/HMiG0HNnmS8wQfLyYxkOxPsIA17E+zzuw8hfcSZKf9zcGA32rVbqmD7IIsU/pYUQ==
+X-Received: by 2002:a17:907:2cec:b0:9a2:292d:ea60 with SMTP id hz12-20020a1709072cec00b009a2292dea60mr4229274ejc.40.1694069805206;
+        Wed, 06 Sep 2023 23:56:45 -0700 (PDT)
+Received: from [192.168.10.127] (net-188-216-175-96.cust.vodafonedsl.it. [188.216.175.96])
+        by smtp.gmail.com with ESMTPSA id qw14-20020a170906fcae00b0099b7276235esm10092169ejb.93.2023.09.06.23.56.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 Sep 2023 23:56:44 -0700 (PDT)
+Message-ID: <51c98bc8-b9df-4cd8-adf8-55c1f2790b08@gmail.com>
+Date: Thu, 7 Sep 2023 08:56:42 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB3122.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c28fe49f-7a8d-44d5-08d2-08dbaf6d3a1a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Sep 2023 06:39:46.3748
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vZRsQ18UhLnB6IqoQCQaQxsXoJ3fI2YOxKOzFqZzb/0Ay3O8PUZZG8fFXBu1MdJxXVNdRBBrsETwJWtADu7JfB70LzrxTaW558KxwRFES06LByHl/OJcWVKE4bOgW3nA
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR11MB8244
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: Regression with AX88179A: can't manually set MAC address anymore
+Content-Language: en-US, it-IT
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Bagas Sanjaya <bagasdotme@gmail.com>, netdev@vger.kernel.org,
+ Linux Kernel Mailing list <linux-kernel@vger.kernel.org>,
+ Linux Regressions <regressions@lists.linux.dev>,
+ Oliver Neukum <oliver@neukum.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+References: <54cb50af-b8e7-397b-ff7e-f6933b01a4b9@gmail.com>
+ <ZPcfsd_QcJwQq0dK@debian.me> <6315027e-d1ab-4dec-acf2-0a77bb948807@gmail.com>
+ <ZPfZQsLKG9LKGR1G@debian.me> <075308b2-7768-40b2-9c00-a5a14df62678@gmail.com>
+ <d6777bc1-46ad-4ad9-a7e3-655dbe4f6317@lunn.ch>
+From: Sergio Callegari <sergio.callegari@gmail.com>
+In-Reply-To: <d6777bc1-46ad-4ad9-a7e3-655dbe4f6317@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of V=
-adim Fedorenko
-> Sent: Thursday, August 24, 2023 3:46 AM
-> To: Brandeburg, Jesse <jesse.brandeburg@intel.com>; Nguyen, Anthony L <an=
-thony.l.nguyen@intel.com>; Jakub Kicinski <kuba@kernel.org>; Alexander Duyc=
-k <alexander.duyck@gmail.com>; Rustad, Mark D <mark.d.rustad@intel.com>; Da=
-rin Miller <darin.j.miller@intel.com>; Jeff Kirsher <jeffrey.t.kirsher@inte=
-l.com>; Richard Cochran <richardcochran@gmail.com>
-> Cc: netdev@vger.kernel.org; intel-wired-lan@lists.osuosl.org; Vadim Fedor=
-enko <vadim.fedorenko@linux.dev>
-> Subject: [Intel-wired-lan] [PATCH net] ixgbe: fix timestamp configuration=
- code
->
-> The commit in fixes introduced flags to control the status of hardware
-> configuration while processing packets. At the same time another structur=
-e
-> is used to provide configuration of timestamper to user-space application=
-s.
-> The way it was coded makes this structures go out of sync easily. The
-> repro is easy for 82599 chips:
->
-> [root@hostname ~]# hwstamp_ctl -i eth0 -r 12 -t 1
-> current settings:
-> tx_type 0
-> rx_filter 0
-> new settings:
-> tx_type 1
-> rx_filter 12
->
-> The eth0 device is properly configured to timestamp any PTPv2 events.
->=20
-> [root@hostname ~]# hwstamp_ctl -i eth0 -r 1 -t 1
-> current settings:
-> tx_type 1
-> rx_filter 12
-> SIOCSHWTSTAMP failed: Numerical result out of range
-> The requested time stamping mode is not supported by the hardware.
->
-> The error is properly returned because HW doesn't support all packets
-> timestamping. But the adapter->flags is cleared of timestamp flags
-> even though no HW configuration was done. From that point no RX timestamp=
-s
-> are received by user-space application. But configuration shows good
-> values:
->
-> [root@hostname ~]# hwstamp_ctl -i eth0
-> current settings:
-> tx_type 1
-> rx_filter 12
->
-> Fix the issue by applying new flags only when the HW was actually
-> configured.
->
-> Fixes: a9763f3cb54c ("ixgbe: Update PTP to support X550EM_x devices")
-> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-> ---
->  drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c | 28 +++++++++++---------
->  1 file changed, 15 insertions(+), 13 deletions(-)
->
+For the time being having AX88179A error out on attempts to set an 
+hardware address would possibly be useful, though.
 
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
-ntingent worker at Intel)
+Sergio
 
+On 06/09/2023 14:31, Andrew Lunn wrote:
+>> So if the in-tree driver could be fixed to correctly support the manual
+>> configuration of the hardware (MAC) address as it used to be that would be
+>> the best. I hope that Andrew Lunn's hypothesis is correct, and that cdc_ncm
+>> can be extended to work with AX88179A even when a manual MAC addr is
+>> configured.
+> I think it can, but it looks like it needs a different
+> implementation. The CDC NCM standard is publicly available. It
+> documents an optional call to set the MAC address, and there appears
+> to be a capability bit to indicate if its implemented in a specific
+> device. Ideally if the bit is not set -EOPNOTSUPP should be returned
+> when trying to set the MAC address, otherwise make the call to let the
+> hardware know of the new MAC address.
+>
+> Sorry, i don't have the time or the hardware to actually implement
+> this. But i can review patches and help with processes.
+>
+>        Andrew
+>
+> 	
 
