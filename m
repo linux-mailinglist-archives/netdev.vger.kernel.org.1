@@ -1,172 +1,130 @@
-Return-Path: <netdev+bounces-32392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 379AF7973B5
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 17:30:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4441F79760A
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 18:01:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3B00280CCE
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 15:30:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7D85281776
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 16:01:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 532A3125D2;
-	Thu,  7 Sep 2023 15:29:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A0A912B9E;
+	Thu,  7 Sep 2023 16:01:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 467B329B4
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 15:29:32 +0000 (UTC)
-Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [217.70.178.240])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32769CC;
-	Thu,  7 Sep 2023 08:29:07 -0700 (PDT)
-Received: from relay2-d.mail.gandi.net (unknown [IPv6:2001:4b98:dc4:8::222])
-	by mslow1.mail.gandi.net (Postfix) with ESMTP id C6D36D67E2;
-	Thu,  7 Sep 2023 09:24:45 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 85E5140033;
-	Thu,  7 Sep 2023 09:24:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1694078664;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PP4qFU6v/2wbsuMME7GJXKWzRSZTU8obLf77vj2Y764=;
-	b=KqPlFH8SpLqr71N8Xu1HKLtjul2/9Zjh9V+XSbwUv+4bkMcaaxQgyK/zWNqrQmmEC1U31r
-	oTwSSBadbMkgeIe6Kh6NIuP0EFiQEAqDyCltAn3BwaSw6PBeTspPkn8PGURCXoMaOiA8LY
-	Ey0h4PsgDjnehE0cddYMXLOMwq0aTr+ww4YJCBh3LGcjm5vZy2WuHidQqEPKoFkYmVV+v1
-	Lu1VVhJWMBweukhP35zrcRzSzg7vhzDJGnbTy64T/Ugz4GPp6kgBAJg807ss4BF8njg8MV
-	M5DC0oH9L1hZlu/AgD8wbrRYn/cOwCWlG19EAEQ+uygoee5FhVGexPNyEXVh9w==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Oleksij Rempel <linux@rempel-privat.de>,
-	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
-	thomas.petazzoni@bootlin.com,
-	Christophe Leroy <christophe.leroy@csgroup.eu>
-Subject: [RFC PATCH net-next 7/7] netlink: specs: add command to show individual phy information
-Date: Thu,  7 Sep 2023 11:24:05 +0200
-Message-ID: <20230907092407.647139-8-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230907092407.647139-1-maxime.chevallier@bootlin.com>
-References: <20230907092407.647139-1-maxime.chevallier@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E95A28E7
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 16:01:06 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44B405261
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 09:00:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=iW9qexjhy8+LyUL+K3aytg7/qTwPeKlLpqIkH3ZXji0=; b=jGG0c1D10CSnKpz1tY7DxglbkW
+	7aRSvKvH8L3bTau3Dm3hy94mbC7jpzBPi66IOog4PXyZ9qIf9OVm4Mpi1AzT+C8nxTrrDygbHzk4G
+	htPbFECv05h8bZMPoLqH2imjz0FODQ2azZHsn7cDyH6ouDeb85bxtb6tabZivfuRdppvlF1qTdmET
+	ezb70l1qY/TC8UOqq1TdB26+hG5y3F2B+0LdyZEqmOWH7CFil6FHD7YI4EFTaIiGWnL4QnTcizBSl
+	3LYFQP+gU33vypEfoI24Uzv1vjhebAn3tm/TujXEIoXeb7U8Z970QRfGPJyhnfG8rtjkOrsHeFtHo
+	Kut3IM/Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54310)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qeBKW-0001qD-2B;
+	Thu, 07 Sep 2023 10:29:40 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qeBKW-0005iw-1R; Thu, 07 Sep 2023 10:29:40 +0100
+Date: Thu, 7 Sep 2023 10:29:39 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
+	glipus@gmail.com, maxime.chevallier@bootlin.com,
+	vadim.fedorenko@linux.dev, gerhard@engleder-embedded.com,
+	thomas.petazzoni@bootlin.com, krzysztof.kozlowski+dt@linaro.org,
+	robh+dt@kernel.org
+Subject: Re: [PATCH net-next RFC v4 2/5] net: Expose available time stamping
+ layers to user space.
+Message-ID: <ZPmYAwb0Gz++XCAA@shell.armlinux.org.uk>
+References: <20230511161625.2e3f0161@kernel.org>
+ <20230512102911.qnosuqnzwbmlupg6@skbuf>
+ <20230512103852.64fd608b@kernel.org>
+ <20230517121925.518473aa@kernel.org>
+ <2f89e35e-b1c9-4e08-9f60-73a96cc6e51a@lunn.ch>
+ <20230517130706.3432203b@kernel.org>
+ <20230904172245.1fa149fd@kmaincent-XPS-13-7390>
+ <ZPYYFFxhALYnmXrx@hoboy.vegasvil.org>
+ <20230905114717.4a166f79@kernel.org>
+ <8fd9f2bc-f8a2-4290-8e52-17a39175b3d7@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8fd9f2bc-f8a2-4290-8e52-17a39175b3d7@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
+	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-With the ETHTOOL_CMD_PHY_LIST_GET command, we can obtain a list of PHYs
-on a link, addressable through their phyindex. This index can be used to
-issue PHY-specific commands. The phy_get command allows querying per-PHY
-information. The information reported so-far is minimal (driver name,
-phy id (for C22), upstream PHY type (real PHY, SFP phy), but we can
-imagine extending this in the future to report PHY offloading
-capabilities, status, and much more.
+On Tue, Sep 05, 2023 at 10:29:51PM +0200, Andrew Lunn wrote:
+> > Maybe we should try to enumerate the use cases, I don't remember now
+> > but I think the concern was that there may be multiple PHYs?
+> 
+> You often see a Marvell 10G PHY between a MAC and an SFP cage. You can
+> then get a copper SFP module which has a PHY in it.
+> 
+> So:
+> 
+> "Linux" NIC: [DMA MAC][PHY][PHY] 
 
-Example usage :
+Let's be clear - one of the reasons that this whole topic was triggered
+was because of mvpp2 plus Marvell 1G PHYs. mvpp2 has a good PTP
+implementation, where as Marvell 1G PHYs are not quite as good. With
+the code as it stood, merely adding PTP support to Marvell PHYs would
+result in setups that use a Marvell 1G PHY with mvpp2 to break - some
+PTP API calls would end up going to one PTP implementation while other
+PTP API calls end up going to the other.
 
-./cli.py --spec specs/ethtool.yaml --schema genetlink-legacy.yaml \
-         --do phy-list-get --json '{"header" : {"dev-name" : "eth0"}}'
-{'header': {'dev-index': 2, 'dev-name': 'eth0'},
- 'phy-count': 2,
- 'phy-indices': b'\x02\x00\x00\x00\x01\x00\x00\x00'}
+Once this gets solved properly, then I can think about sending the
+patches that add support for PTP in Marvell 1G PHYs, and then we will
+have the situation where we have a MAC and a PHY on the *same* network
+interface that are PTP capable.
 
-./cli.py --spec specs/ethtool.yaml --schema genetlink-legacy.yaml \
-         --do phy-get \
-	 --json '{"header" : {"dev-name" : "eth0"}, "phy-index" : 1}'
-{'drvname': 'mv88x3310',
- 'header': {'dev-index': 2, 'dev-name': 'eth0'},
- 'phy-id': 0,
- 'phy-index': 1,
- 'phy-upstream-type': 0}
+People have been asking me about the Marvell PHY PTP patches - and I
+have had to tell them that they can't be merged because of the PTP
+API crazyness.
 
-./cli.py --spec specs/ethtool.yaml --schema genetlink-legacy.yaml \
-	 --do phy-get \
-	 --json '{"header" : {"dev-name" : "eth0"}, "phy-index" : 2}'
-{'drvname': 'Marvell 88E1111',
- 'header': {'dev-index': 2, 'dev-name': 'eth0'},
- 'phy-id': 21040322,
- 'phy-index': 2,
- 'phy-upstream-type': 2}
+So... it would be entirely possible, if PTP were to be implemented for
+the Marvell 10G PHYs, that there would be _three_ points with a SFP
+module to do PTP, although it probably does not make much sense to
+attempt to do so on the SFP PHY. In any case, before we get to that
+point, we first need to work out how to support multiple ethernet PHYs
+on one MAC.
 
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
- Documentation/netlink/specs/ethtool.yaml | 37 ++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+Even with that solved, the situation you describe above is likely to be
+problematical. PHYs that connect to SFPs generally only support fibre
+interface modes and not SGMII on that port which limits the usefulness
+of copper SFPs - they won't be able to do 10M / 100M unless they're one
+of those PHYs that does rate adaption which seem fairly rare at the
+moment.
 
-diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-index 1139c88ed65c..708a77423286 100644
---- a/Documentation/netlink/specs/ethtool.yaml
-+++ b/Documentation/netlink/specs/ethtool.yaml
-@@ -955,6 +955,25 @@ attribute-sets:
-       -
-         name: phy-indices
-         type: binary
-+  -
-+    name: phy
-+    attributes:
-+      -
-+        name: header
-+        type: nest
-+        nested-attributes: header
-+      -
-+        name: phy-index
-+        type: u32
-+      -
-+        name: drvname
-+        type: string
-+      -
-+        name: phy-upstream-type
-+        type: u8
-+      -
-+        name: phy-id
-+        type: u32
- 
- operations:
-   enum-model: directional
-@@ -1720,3 +1739,21 @@ operations:
-             - header
-             - phy-count
-             - phy-indices
-+    -
-+      name: phy-get
-+      doc: Get a PHY's information
-+
-+      attribute-set: phy
-+
-+      do: &phy-get-op
-+        request:
-+          attributes:
-+            - header
-+            - phy-index
-+        reply:
-+          attributes:
-+            - header
-+            - phy-index
-+            - drvname
-+            - phy-upstream-type
-+            - phy-id
 -- 
-2.41.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
