@@ -1,252 +1,247 @@
-Return-Path: <netdev+bounces-32485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56599797D52
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 22:19:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 75FB1797D7C
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 22:42:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0EC21C20B94
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 20:19:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D1701C20B43
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 20:41:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F39B1426E;
-	Thu,  7 Sep 2023 20:19:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C45C13AEA;
+	Thu,  7 Sep 2023 20:41:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DC7814008
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 20:19:39 +0000 (UTC)
-Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75ADEA1
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 13:19:38 -0700 (PDT)
-Received: by mail-qv1-xf29.google.com with SMTP id 6a1803df08f44-6515d44b562so8370346d6.3
-        for <netdev@vger.kernel.org>; Thu, 07 Sep 2023 13:19:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71E2763A3
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 20:41:56 +0000 (UTC)
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A2221BCA
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 13:41:52 -0700 (PDT)
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 387KXwYp031306;
+	Thu, 7 Sep 2023 20:41:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ to : cc : references : subject : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2023-03-30;
+ bh=A4ddccH1b4z+1PgeFOXmWKMr/jW+MvhMeCUv+FxORQw=;
+ b=PTuFM5xI5W7i5vh7e76EV45XnvOl+Bd0Dsh2E2iQ72Ge/qd+U9OOMwPbWUrFfmN/u6tC
+ vyHtm30Jm1x4AAuuJ2dpKGGu2vvzpQn2pITlnvl/9QI245E62ddKxzbCqfDyjF7KnIG7
+ s4wvWAkWGmOGgj4J0+K9s52eS4LlqvoHpblLFlhJ9UD6sm1ZiJchkJ2vYKU6s20UZHQk
+ IewTCaTRgRcQ2b0AjtDGcT2n3jTfM/IMZIT76QlosxloaIFSYmhB+iuomxK2/RKbTYe6
+ Cu779Wf0hgMGJnaWK2LNtvnATS8ud/f7pNLF1miOne6ZgJXN3Rz0+2AbKZMjusz1EvgC Ug== 
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3syng2816c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 07 Sep 2023 20:41:41 +0000
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 387J4s0c009287;
+	Thu, 7 Sep 2023 20:41:41 GMT
+Received: from nam02-bn1-obe.outbound.protection.outlook.com (mail-bn1nam02lp2040.outbound.protection.outlook.com [104.47.51.40])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3syfy0f208-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 07 Sep 2023 20:41:41 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LzY1JswVlxwPNdfwEj/fAyxt6lUnA5kl3hOEMn19j2Q4z0l5fnw9kMAvmPphOqoS1tNdF4pxE7oWKZjepza13ioZSMH18lNbkXPiOCbkM2Yfe2Wb9meYG6Deu7921Ll1YrSCk3tgkJAPJb/Kjvg2h/2zitRHN5RT6mCLwUsUGKL8hWZPiqPQBbWyz9CvJYuMcwhZG3OiWC/uElRUqKdmd4LC2TPerZWHtOJ4VuE/hpfH9m/9nMoILAWfJpW9bg1jQIV1Dd86rvDAsFGve2bvDSSKFNLF/2Oj2C+AwBQKVntFa8u+Jz2Me35wngLiflhe73v9nIcuVJwEeumaQBKAgg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=A4ddccH1b4z+1PgeFOXmWKMr/jW+MvhMeCUv+FxORQw=;
+ b=BPigcZYT33DQPrl2McUeXpD0WQg6NvhPL5ZlRn+S4ns7gQnSCycRWvJ13ajcLVg7DaYWw2GzziCgnJXft5qsQO7hpWqDG2aJ3qTepSM7GO8OwZamZUcvvHfHaDNVHPCfTM/gMjYF47fiZP+sxY8CTPJTa4WSokF/u7zr6Sextgno0OeJsYRagbdmo7nK0MM1WTwLAU2w7vwYmvH26Cb7mCkkFNsEGmnYsGmhz6EBDIOX/8jmLGp/nr+Trd2AX30Pn1awlz4oTrQIwiXrrFwADIkxQx6RTBgvvRtWT4kYTBhLhRLk6XxvEj2w9n5gCEGjjL/7rhbR4KzueLFuWs9MmQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694117977; x=1694722777; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=5qbxzNwBZdjLBCxSr+IDYuuDQoa4QRZ33zJOVLqRkBE=;
-        b=Iv08RcBqTsx5AaKZy/5vTorc7JvKYg+nqUrDy1hkSA9N94llQj8A4zCTBFA7r/5sOU
-         DaweUvgi31fJYh8E0YmtmhG6kGPSqGKEcLRYllAjFL9NPAWVvmx+/1BHS7q67KGMh4x0
-         6Kl6LbXSxhGTptxBSGHm0lDkjecL+JQkjvd92AIAX96zBaz/n5aZpD1rLwdZ6fFS0yrD
-         b/9Y2/6kB8S8Nn5Hb7mMPvhmmYI5JygW6H8Q1u2d1SKqUW4IM0c3Vc1++SWcaCae/L7K
-         aTIADvzEHnghQ4CLxzLja0y0MZBvTS6GU6Sra8PwBR+4aZth2L9/IdHIvK3fjjs91gqu
-         Su4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694117977; x=1694722777;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5qbxzNwBZdjLBCxSr+IDYuuDQoa4QRZ33zJOVLqRkBE=;
-        b=C3WA7hG5Sy5dVnP/V+OgjR/RQOQw0BSPPA9a/tjLxwC8M84BqZ6zUHKKtFQo3uwvmm
-         xpI5sb5jYAGb4aTF4W670BmkJC0aHFxo5suyMZ7Q7oV/mdQTM1VjUoPPYMMK1G5Jh7Ja
-         SSrFXI33uynL2eg0ee8Ej6vwkgVNv0quFHSeCN50XFeHSkPKn8PC8u25jhajhX0mHfnu
-         cmBtUtBtQX5/0B1ht6/Jn2dzJq4mCOiGxzDDIyzIUD7Ppl1d+E+ob+zij3MJNEW94Q/n
-         e91uG+Wcab7zhNde0MVqQvRwM/FMSDdQBiQawTWSv6hSUXbvUmymb82Ejpx+jaJz8gYD
-         F3zA==
-X-Gm-Message-State: AOJu0YzdGkQOo4o9dYi++ac8ceugrAk93IqarrTn3GXJXSWuNo0O9KcU
-	/4QWmDA7woFpr7vCh9GBnWU=
-X-Google-Smtp-Source: AGHT+IGBX0hG+VcXgr08Ws9mySf4ayqwxCEdokZh8UVmNv7hnWg9fXFsRzGYuJgQG9be2hcQ67uJiA==
-X-Received: by 2002:a0c:dd13:0:b0:631:f9ad:1d43 with SMTP id u19-20020a0cdd13000000b00631f9ad1d43mr315539qvk.14.1694117977387;
-        Thu, 07 Sep 2023 13:19:37 -0700 (PDT)
-Received: from localhost (modemcable065.128-200-24.mc.videotron.ca. [24.200.128.65])
-        by smtp.gmail.com with ESMTPSA id p17-20020a0ce191000000b0064f4d3bc78csm69852qvl.61.2023.09.07.13.19.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Sep 2023 13:19:36 -0700 (PDT)
-Date: Thu, 7 Sep 2023 16:19:35 -0400
-From: Benjamin Poirier <benjamin.poirier@gmail.com>
-To: Liang Chen <liangchen.linux@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org
-Subject: Re: [RFC PATCH net-next] pktgen: Introducing a parameter for
- non-shared skb testing
-Message-ID: <ZPowVxHPwe+Dvn0i@d3>
-References: <20230906103508.6789-1-liangchen.linux@gmail.com>
- <ZPj98UXjJdsEsVJQ@d3>
- <CAKhg4tL+stODiv8hG0YWmU8zCKR4CsDOEvv7XD-S9PMdas5i_w@mail.gmail.com>
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=A4ddccH1b4z+1PgeFOXmWKMr/jW+MvhMeCUv+FxORQw=;
+ b=SsTaBiwyPo8arAoXA0oKLId9nXWc87NIKKI1WabPwcNPle2Q/wK/bKNdEjlpSmEpscv8uRiXfbXCU9sws+Sl3zPsjfb06blpb/NpL3QMHyLYMOTAhSOvUbrbpfmZR/WyWhHU5Fnfb40uUP7H7lp1HbZYtB2Z27OVerUuS1fgJEk=
+Received: from MW4PR10MB6535.namprd10.prod.outlook.com (2603:10b6:303:225::12)
+ by CO1PR10MB4449.namprd10.prod.outlook.com (2603:10b6:303:9d::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.34; Thu, 7 Sep
+ 2023 20:41:39 +0000
+Received: from MW4PR10MB6535.namprd10.prod.outlook.com
+ ([fe80::9971:d29e:d131:cdc8]) by MW4PR10MB6535.namprd10.prod.outlook.com
+ ([fe80::9971:d29e:d131:cdc8%3]) with mapi id 15.20.6745.035; Thu, 7 Sep 2023
+ 20:41:39 +0000
+Message-ID: <b4eeb1b9-1e65-3ef5-1a19-ecd0b14d29e9@oracle.com>
+Date: Thu, 7 Sep 2023 13:41:37 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+To: dsahern@kernel.org
+Cc: allen.hubbe@amd.com, drivers@pensando.io, jasowang@redhat.com,
+        mst@redhat.com, netdev@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, shannon.nelson@amd.com
+References: <29db10bca7e5ef6b1137282292660fc337a4323a.1683907102.git.allen.hubbe@amd.com>
+Subject: Re: [PATCH] vdpa: consume device_features parameter
+Content-Language: en-US
+From: Si-Wei Liu <si-wei.liu@oracle.com>
+Organization: Oracle Corporation
+In-Reply-To: <29db10bca7e5ef6b1137282292660fc337a4323a.1683907102.git.allen.hubbe@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: PH8PR20CA0023.namprd20.prod.outlook.com
+ (2603:10b6:510:23c::29) To MW4PR10MB6535.namprd10.prod.outlook.com
+ (2603:10b6:303:225::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKhg4tL+stODiv8hG0YWmU8zCKR4CsDOEvv7XD-S9PMdas5i_w@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR10MB6535:EE_|CO1PR10MB4449:EE_
+X-MS-Office365-Filtering-Correlation-Id: 28be031b-0b5f-4e21-086b-08dbafe2d655
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 
+	m0ufMsAxtYp5h1jb+sLG1bB74VWZd93fdVIRzBGDiEJPV2KHcBq7E0fE/luI91rAnWaEA5attPRKmO5SclyvxlrY3tsFvdWy2vNEtDbguM8I824Llym7DgHwuvvYrXo2asD1xu/thSmdpJXRSn8B6WAAbd3K6lhJPtemc8zsNlxdQx/9L2vvOsj4R22PAZbuH2lPbfyFXTyiNRw1srjCKCrZ5gLG74lPLyAdvBU695L3I6NGMcbspOoPSoiuMWJzuFWdeH2ozEckqOmlPFO9wUK3F1uVoMVUkWKHV9VQXKxu0vAeFucRxng/d9+t7Y0YK6jUqKpC5BSxxdxWZwd1/jCAr5QjMUT0rP4MpRgj6pYXrRPT/azM8OGz0eYV2DZPIID4IrBMbbO8PxBV6F1cceYvZR3VTGCuED/1GxlA3icIdSghG00vN/gInjszlNKIxcZvTwnnWFP/eD4bvrtdCWaCb0abuNN8srvWxTZy1TsG3pipFHqLAa4U9x9m2czdJA6jjdkqGPrw39YCuACt3VjKfXCsC/9TiBPeRW3Hat92OCAvq5eHdG/eZfQKjLhhAznsGATMMP/j/Uh5Hs7tfm7RRu7kW1QDOrY3cXFOCZFe7uo8JI8AKvXOhEkM7M9Tt2kazmLGGW0gYLkSSQ+JCA==
+X-Forefront-Antispam-Report: 
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR10MB6535.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(376002)(136003)(366004)(396003)(39860400002)(186009)(1800799009)(451199024)(86362001)(31696002)(36756003)(38100700002)(478600001)(2906002)(53546011)(36916002)(6506007)(316002)(4326008)(6486002)(8936002)(8676002)(6512007)(5660300002)(41300700001)(66556008)(6916009)(31686004)(66946007)(26005)(66476007)(2616005)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: 
+	=?utf-8?B?WWpMRnR5MUJoNmpQZ3g4bFg1MGkvZEJncWtZTHloOUZXZDVNRTdIOWdYZ1NM?=
+ =?utf-8?B?bXBUTnlDNUg0YXMxRXJTSEx4cVR1K0ZucXJ0TlpCVksxc2ZKUnpKc0VrbG9i?=
+ =?utf-8?B?MEx5OXNaWVFlUUM5Wm1YTjVEYUhRV3greldjbGxwOEZyNkJ6K1BESkgwTG5y?=
+ =?utf-8?B?OTlQNHo2S0FNZFlCMHhZamUzMnZyZVlTZUJqdWEvTjNmdGlGSDdjenZPZ2VG?=
+ =?utf-8?B?Yk1sRzliRkhFS1QwUVcrNy91Um1JL0dRTVc1NVFwTnBod1NaUTlkU2JLVE1m?=
+ =?utf-8?B?Q0d6QS9pYnRySUFEMldNaEU0eWpxWXdNNW94endkUDhQdWhZcjFqNXRJRWZR?=
+ =?utf-8?B?ZWYyTFA1L3VOTWJCQ29EajAyUGRibmZjNzFmc0cybjN3ZlZ0VEpaWUY4OE1z?=
+ =?utf-8?B?RkZoL2dsN3NuckdVbk5JTDBxQ29YbWtpMm9lOFBZcEd0a3ZXZmxVUU1RQkVU?=
+ =?utf-8?B?ZFFhMmVNajhVd0RiOUJOdytkQ1BISnJhbGRzK3R2Y0NwNGNoblc2eWRwNmZL?=
+ =?utf-8?B?dmtlLzZOem9SeDA0RTAyaEpOWHZRZllhazk4RDVka1ZrQnZwTmRjdzMrekxW?=
+ =?utf-8?B?bVIvWENuRFZWODVnZVM4STFOQ1BUQ01OcUZlc3pJQ1QyOFZMNlVUTk5td21r?=
+ =?utf-8?B?N2puTHJvMGtBZ0RwUnhSZVE5SGRVYVhKOEE5M1lFMVIrOURKNFJRbU42b1JJ?=
+ =?utf-8?B?dmhwR2w5VjdTaW1VZGMxTXFCVUxNS25ybE00MFc4ajZrOGgwWXlqeURseXd4?=
+ =?utf-8?B?di9mT3NJdzUxQnMzaXY2N0pWZ0ZRSnBOY3hERmY3aWx5Z2xqSjQwZy92TEpz?=
+ =?utf-8?B?dmZqSExhK21HN0wzenRyRUVwTXFSdmgwV2c5Z2kydWUvSTZYRWhPaXVJT01M?=
+ =?utf-8?B?WnhsNmVRV3V0V01Pamt5bUNkeVV0U1pXVnZOaUxjTVF0Q0x0VTNFbGw3WnM1?=
+ =?utf-8?B?NkEwTnFSZCtIbjBhSnlFQlVIaTdsT2R3Zm5qMGgzaEJMS3pUQ3ZRbCtPdDQx?=
+ =?utf-8?B?S05vS2tvODdaN3lZcXYxWlRXc255WUlrZGNpbi9EYzFVRDhqVVV1ckt2YjZ5?=
+ =?utf-8?B?alRHWVdIamJNbFQ5N0dYRzNLcmFWcGRlcXlmOEk1UVIwdmV6djJKQk1YYkgv?=
+ =?utf-8?B?MmFXNFJxa0hBei9pb1ZJZFVLYnk4MXYycEFSY0toczVYRWtwRjFaMUlsU2dr?=
+ =?utf-8?B?Q3dYd3lzemZpTEdBZHMxR2gxeVRnRUtTMTlLQWR2ZlNjWkp1dzFKeFpCeGdX?=
+ =?utf-8?B?MDJmVjR5N0Z6L0FEaTFlSTVWSVgrZVRlMXhwSHh6Y0FrcGVKb2FienFEb3k1?=
+ =?utf-8?B?ZXF5ZG5nWFN1eTRCM1JuOWIrV284Qk9KQUk5Ny9ab1h5djdCOG9aSmhGMGFq?=
+ =?utf-8?B?czZEdUxIZkVqajJQcTZ5R25OMUZKOFBRTHhHSkJhek9tT2hrNHEzVTQ1cXJ4?=
+ =?utf-8?B?M1JLTk9RMEdSRkRsMEI0R3NZRExDOWhCQ3NKVU4rVUswT3VYcTZkOE9GWFRj?=
+ =?utf-8?B?YlVseXZnTDBqQW5tV1RPNGJJZjBnd0hhdnR1cjZTbzh2YTN4eGR1TERYRnpT?=
+ =?utf-8?B?dWRGR3lValQvNm9HaUJzbjRjeUxKZ0tBdE0vTlJXTDFhOFdtN2lxcUZtQlp6?=
+ =?utf-8?B?cFd3UjZWRjJBNlYxQldZdEJIQndyNWQ2RS96akhVNFhOSzRBRC8yQTM5YTBi?=
+ =?utf-8?B?TlJoVU5hMjY3ZkxFUG9uZkZEMTVFaDBNVnI4NWRWRlJJbStsNVEwV1hiOTZX?=
+ =?utf-8?B?bnFscEdUdTJBdXByWlZFdVMxRTZhb3FjMG41dW5SajFyNDJNaXpzU1R5cjZz?=
+ =?utf-8?B?NStaWE92VDkxaE5YaTZHeTVSenhKUnFRKytFK2gzajZCUUdrUnN6SHBscXhp?=
+ =?utf-8?B?VnZxN0krN2NaWHFZVkg5RGtYWGNGY2ptNCt5QUxZZ3dHczhYbDVEUitVelMv?=
+ =?utf-8?B?NTkreWtNWmJ1NjZpSmxSQWc1RVlON1RvSm5PakNZbVRhQ3ErZVVGZzk0UFNC?=
+ =?utf-8?B?aWEremlydmp3MWZ0RDU0UzFJaHI2Rm8yZ1hGWVJleS9oQm1lM0djUUNWRnpH?=
+ =?utf-8?B?VVo2ZTFDT0dHNTFjekhLUEJjNjNCVFNOaE12TENpWFQ1WG1lbmJ0SWx6T3py?=
+ =?utf-8?Q?KwB4VnQgG7PfWZIPQft03B9UE?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
+	=?utf-8?B?ZTFtVHpUSWowL2tla2RGSGVCRTQ5VnAzdFRySXU5empyUzNUUGQ4Y1A3TUtU?=
+ =?utf-8?B?V0N1Q2NuVTBLNitaZi9nWkUzeWl0UytiV0pwSUd3QUZvUlRRT202MjZ2bVI3?=
+ =?utf-8?B?N0hnSnFUYXVMM0phS1g4U3hOT2NFWmROVFdGdDdiQ0VRUGxXbjhIU0xlek8z?=
+ =?utf-8?B?QTVLVHhUTERFNVRxYXUyY2cxSy9NeHdqWW85cFVPdy8zMkVVazNwNGFGUERu?=
+ =?utf-8?B?eDdiM1NtM3V5UG9rU2hYcUxsTGpSYmlNNFluc1ZJNmJBNk9vOFRsa202NE1H?=
+ =?utf-8?B?alNOQWVwbmdnWGswV21CZnk2MHM4TGp6MDIyZlJoTUdqcnNXQmtWRHM1cml4?=
+ =?utf-8?B?Nkc0eE4rYmIxb0gwRk9aYWFFQnh6MmpwRXUwb1AwSnczRmtCWWc4SFAyZGJy?=
+ =?utf-8?B?ekc0MkZxdHBGVEZBSDRVZndZQVUzU1VOQ0hwSmtFYUlPc09RUUdlZWhCVHBo?=
+ =?utf-8?B?Tnp5Ym4vQ0lzaW4yUm8zYUVVdEhEOGVsOUlVQXZNRVkwWUJobDFDQjlaS1FI?=
+ =?utf-8?B?cm15M3hmZ2ZJNEpXUzRDcGxmZG84WXlkUFQ0d0xmTktKL09pM09rMldEV0th?=
+ =?utf-8?B?M0RJa1l5bFNJNDhsMTJsdEJpdUxod0pzWU5TbUFYMFBNVURmMHp4RVZvYk41?=
+ =?utf-8?B?STZvaEZVbW9yaXBoU0ttWFRoS2xsMm9HUFk5YU1mT09tSG5tQmkvRlZxcU5X?=
+ =?utf-8?B?Y25SekJuUithRjJWU3RmZkVQdnpwQkZOeThydm5hb0pOOXZLSTUvVW0wQnRZ?=
+ =?utf-8?B?b0ZXNE5YQVhvSnlHbFlaN3BRVnp2dkE2Rm96eWJpRzFTNmFXY2tINW4yVm8y?=
+ =?utf-8?B?ZkgwMmFmaEtmbElDSExTNHBmSll5dGowZG5UZnBZWDR1Y3BXcktWQWFIaENn?=
+ =?utf-8?B?R0JOK1BGYjd1ZTJQNXZUSGswSTV5dmxwbEZFUDNPSFl0UDZuWHBWOFA5ZHBL?=
+ =?utf-8?B?a0d5K0kySG00bHk4UXRHYXRMTUdqWDM3cHBwU0FuQUZNZ2RRUTQvWnlhQlFa?=
+ =?utf-8?B?ZUxEcmxpZUVjUE5hdjUvaVZqR21VQjNYK2FqeUoyUlhreGFDK0Y2dGRQQWgy?=
+ =?utf-8?B?VE95THlWRkRNdnR6SzdxdEhyRTg0U3pEY0FKemRFYURzaXhuRzI3YTFTNDE1?=
+ =?utf-8?B?OGlDck1Qa0FiVkdjTWtMSVhidHp5aUxHZk5Ta1BUZjVRakp3dGRiOVAva0dw?=
+ =?utf-8?B?UnZPUXgvOE9LWmVORHJFQkNFOWxtM3NSZHlUWjFoY3RGYWRSem9jWGhSRTIx?=
+ =?utf-8?Q?L/jkXXy77XETpUN?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 28be031b-0b5f-4e21-086b-08dbafe2d655
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR10MB6535.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Sep 2023 20:41:39.8209
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: glPSwyavKsqo09A4j44jh7FOBb+VF027KfwwGbho2a8tQtRzK9F8kyw9TIYGgCJ0exm4kQ70jdHgdg3iiRit4w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR10MB4449
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-09-07_13,2023-09-05_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 bulkscore=0 mlxlogscore=999
+ suspectscore=0 phishscore=0 spamscore=0 malwarescore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2308100000
+ definitions=main-2309070183
+X-Proofpoint-GUID: Y6bBMsZj8BVMWEAmsTFLLfYfZY2iN-CF
+X-Proofpoint-ORIG-GUID: Y6bBMsZj8BVMWEAmsTFLLfYfZY2iN-CF
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023-09-07 11:54 +0800, Liang Chen wrote:
-> On Thu, Sep 7, 2023 at 6:32 AM Benjamin Poirier
-> <benjamin.poirier@gmail.com> wrote:
-> >
-> > On 2023-09-06 18:35 +0800, Liang Chen wrote:
-> > > Currently, skbs generated by pktgen always have their reference count
-> > > incremented before transmission, leading to two issues:
-> > >   1. Only the code paths for shared skbs can be tested.
-> > >   2. Skbs can only be released by pktgen.
-> > > To enhance testing comprehensiveness, introducing the "skb_single_user"
-> > > parameter, which allows skbs with a reference count of 1 to be
-> > > transmitted. So we can test non-shared skbs and code paths where skbs
-> > > are released within the network stack.
-> >
-> > If my understanding of the code is correct, pktgen operates in the same
-> > way with parameter clone_skb = 0 and clone_skb = 1.
-> >
-> 
-> Yeah. pktgen seems to treat user count of 2 as not shared, as long as
-> the skb is not reused for burst or clone_skb. In that case the only
-> thing left to do with the skb is to check if user count is
-> decremented.
-> 
-> > clone_skb = 0 is already meant to work on devices that don't support
-> > shared skbs (see IFF_TX_SKB_SHARING check in pktgen_if_write()). Instead
-> > of introducing a new option for your purpose, how about changing
-> > pktgen_xmit() to send "not shared" skbs when clone_skb == 0?
-> >
-> 
-> Using clone_skb = 0 to enforce non-sharing makes sense to me. However,
-> we are a bit concerned that such a change would affect existing users
-> who have been assuming the current behavior.
+Hi David,
 
-I looked into it more and mode netif_receive only supports clone_skb = 0
-and normally reuses the same skb all the time. In order to support
-shared/non-shared, I think a new parameter is needed, indeed.
+Why this patch doesn't get picked in the last 4 months? Maybe the 
+subject is not clear, but this is an iproute2 patch. Would it be 
+possible to merge at your earliest convenience?
 
-Here are some comments on the rest of the patch:
+PS, adding my R-b to the patch.
 
-> ---
->  net/core/pktgen.c | 39 ++++++++++++++++++++++++++++++++++++---
->  1 file changed, 36 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/core/pktgen.c b/net/core/pktgen.c
-> index f56b8d697014..8f48272b9d4b 100644
-> --- a/net/core/pktgen.c
-> +++ b/net/core/pktgen.c
-> @@ -423,6 +423,7 @@ struct pktgen_dev {
->  	__u32 skb_priority;	/* skb priority field */
->  	unsigned int burst;	/* number of duplicated packets to burst */
->  	int node;               /* Memory node */
-> +	int skb_single_user;	/* allow single user skb for transmission */
->  
->  #ifdef CONFIG_XFRM
->  	__u8	ipsmode;		/* IPSEC mode (config) */
-> @@ -1805,6 +1806,17 @@ static ssize_t pktgen_if_write(struct file *file,
->  		return count;
->  	}
->  
-> +	if (!strcmp(name, "skb_single_user")) {
-> +		len = num_arg(&user_buffer[i], 1, &value);
-> +		if (len < 0)
-> +			return len;
-> +
-> +		i += len;
-> +		pkt_dev->skb_single_user = value;
-> +		sprintf(pg_result, "OK: skb_single_user=%u", pkt_dev->skb_single_user);
-> +		return count;
-> +	}
-> +
+Thanks,
+-Siwei
 
-Since skb_single_user is a boolean, it seems that it should be a flag
-(pkt_dev->flags), not a parameter.
 
-Since "non shared" skbs don't really have a name, I would suggest to
-avoid inventing a new name and instead call the flag "SHARED" and make
-it on by default. So the user would unset the flag to enable the new
-behavior.
+On Sat, May 13, 2023 at 12:42 AM Shannon Nelson <shannon.nelson@amd.com> 
+wrote:
+ >
+ > From: Allen Hubbe <allen.hubbe@amd.com>
+ >
+ > Consume the parameter to device_features when parsing command line
+ > options.  Otherwise the parameter may be used again as an option name.
+ >
+ >  # vdpa dev add ... device_features 0xdeadbeef mac 00:11:22:33:44:55
+ >  Unknown option "0xdeadbeef"
+ >
+ > Fixes: a4442ce58ebb ("vdpa: allow provisioning device features")
+ > Signed-off-by: Allen Hubbe <allen.hubbe@amd.com>
+ > Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
 
-This patch should also document the new option in 
-Documentation/networking/pktgen.rst
+Reviewed-by: Si-Wei Liu <si-wei.liu@oracle.com>
 
->  	sprintf(pkt_dev->result, "No such parameter \"%s\"", name);
->  	return -EINVAL;
->  }
-> @@ -3460,6 +3472,14 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
->  		return;
->  	}
->  
-> +	/* If clone_skb, burst, or count parameters are configured,
-> +	 * it implies the need for skb reuse, hence single user skb
-> +	 * transmission is not allowed.
-> +	 */
-> +	if (pkt_dev->skb_single_user && (pkt_dev->clone_skb ||
-> +					 burst > 1 || pkt_dev->count))
-> +		pkt_dev->skb_single_user = 0;
-> +
+ > ---
+ >  vdpa/vdpa.c | 2 ++
+ >  1 file changed, 2 insertions(+)
+ >
+ > diff --git a/vdpa/vdpa.c b/vdpa/vdpa.c
+ > index 27647d73d498..8a2fca8647b6 100644
+ > --- a/vdpa/vdpa.c
+ > +++ b/vdpa/vdpa.c
+ > @@ -353,6 +353,8 @@ static int vdpa_argv_parse(struct vdpa *vdpa, int 
+argc, char **argv,
+ > &opts->device_features);
+ >                         if (err)
+ >                                 return err;
+ > +
+ > +                       NEXT_ARG_FWD();
+ >                         o_found |= VDPA_OPT_VDEV_FEATURES;
+ >                 } else {
+ >                         fprintf(stderr, "Unknown option \"%s\"\n", 
+*argv);
+ > --
+ > 2.17.1
+ >
 
-count > 0 does not imply reuse. That restriction can be lifted.
-
-Instead of silently disabling the option, how about adding these checks
-to pktgen_if_write()? The "clone_skb" parameter works that way, for
-example.
-
->  	/* If no skb or clone count exhausted then get new one */
->  	if (!pkt_dev->skb || (pkt_dev->last_ok &&
->  			      ++pkt_dev->clone_count >= pkt_dev->clone_skb)) {
-> @@ -3483,7 +3503,8 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
->  	if (pkt_dev->xmit_mode == M_NETIF_RECEIVE) {
->  		skb = pkt_dev->skb;
->  		skb->protocol = eth_type_trans(skb, skb->dev);
-> -		refcount_add(burst, &skb->users);
-> +		if (!pkt_dev->skb_single_user)
-> +			refcount_add(burst, &skb->users);
->  		local_bh_disable();
->  		do {
->  			ret = netif_receive_skb(skb);
-> @@ -3491,6 +3512,12 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
->  				pkt_dev->errors++;
->  			pkt_dev->sofar++;
->  			pkt_dev->seq_num++;
-> +
-> +			if (pkt_dev->skb_single_user) {
-> +				pkt_dev->skb = NULL;
-> +				break;
-> +			}
-> +
-
-The assignment can be moved out of the loop, with the other 'if' in the
-previous hunk.
-
->  			if (refcount_read(&skb->users) != burst) {
->  				/* skb was queued by rps/rfs or taps,
->  				 * so cannot reuse this skb
-> @@ -3509,7 +3536,8 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
->  		goto out; /* Skips xmit_mode M_START_XMIT */
->  	} else if (pkt_dev->xmit_mode == M_QUEUE_XMIT) {
->  		local_bh_disable();
-> -		refcount_inc(&pkt_dev->skb->users);
-> +		if (!pkt_dev->skb_single_user)
-> +			refcount_inc(&pkt_dev->skb->users);
->  
->  		ret = dev_queue_xmit(pkt_dev->skb);
->  		switch (ret) {
-> @@ -3517,6 +3545,8 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
->  			pkt_dev->sofar++;
->  			pkt_dev->seq_num++;
->  			pkt_dev->tx_bytes += pkt_dev->last_pkt_size;
-> +			if (pkt_dev->skb_single_user)
-> +				pkt_dev->skb = NULL;
-
->  			break;
->  		case NET_XMIT_DROP:
->  		case NET_XMIT_CN:
-
-This code can lead to a use after free of pkt_dev->skb when
-dev_queue_xmit() returns ex. NET_XMIT_DROP. The skb has been freed by
-the stack but pkt_dev->skb is still set.
-
-It can be triggered like this:
-ip link add dummy0 up type dummy
-tc qdisc add dev dummy0 clsact
-tc filter add dev dummy0 egress matchall action drop
-And then run pktgen on dummy0 with "skb_single_user 1" and "xmit_mode
-queue_xmit"
 
