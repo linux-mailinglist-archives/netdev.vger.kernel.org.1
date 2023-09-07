@@ -1,111 +1,192 @@
-Return-Path: <netdev+bounces-32385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 670A579734A
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 17:22:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC2A17973B6
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 17:30:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2095E2815FF
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 15:22:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECF0C1C20B88
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 15:30:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF5BD11C97;
-	Thu,  7 Sep 2023 15:22:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D841125CE;
+	Thu,  7 Sep 2023 15:29:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E333C23C3
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 15:22:33 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A5DFCC
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 08:22:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1694100127;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cmpf61eV7S1do3E0eIiuu766NL4mEhMYhw2v0xFldvo=;
-	b=FwdlOaj74qs5TVLYx8tawHGJ7nOysX7osakG0pMR3Es51XU+kWOZ/SQUJOt7iUq09kwTkf
-	QPB+1JwNjtFrR3Gp5+yWEO9iayCKCBJ/xYQ9uUGEEWnHwn96GnY+Cu3HSR58k1bMR5gPgG
-	L8j/iVKo/pFBI1DrHB2vZjMYGUD6PHg=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-157-XrkK-wvQM1SjFm4XywlqTQ-1; Thu, 07 Sep 2023 07:03:56 -0400
-X-MC-Unique: XrkK-wvQM1SjFm4XywlqTQ-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-9a5c5f0364dso18736666b.0
-        for <netdev@vger.kernel.org>; Thu, 07 Sep 2023 04:03:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1304E11731;
+	Thu,  7 Sep 2023 15:29:46 +0000 (UTC)
+Received: from mail-ed1-x541.google.com (mail-ed1-x541.google.com [IPv6:2a00:1450:4864:20::541])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9A2810DF;
+	Thu,  7 Sep 2023 08:29:20 -0700 (PDT)
+Received: by mail-ed1-x541.google.com with SMTP id 4fb4d7f45d1cf-5230a22cfd1so1448020a12.1;
+        Thu, 07 Sep 2023 08:29:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694100517; x=1694705317; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=a+iQnvoR9WIvvuphk/xb2y7jezozNmyXY5BuGK/6FCk=;
+        b=QT0T5PVV6crUy32yYSeb2fNcVirjKNrqwn3fGxj9zooVxcoFmbb3N1r0LwyFgrMity
+         wpsnJIdPUDM11iKltMPmV3dyGXkWWFE4JwjwTNT2iB/OeTdfkSj9E4oOOZSZfcDvsuZb
+         U1nGEj/DoYruezOELVvNITFBM7UBW99+U0ThcjI4kxfZ4YWtU2PBuAY+3UpqLJGEkgHP
+         yyQjV9RW+WiC1JPVf3OfU6mSeimnrVINx7cjCdn2YfsjdXbe6se2atZyEOqOacIKITUw
+         3G3vAbBAS9Cx1nl2rY8F+nOP+zcS0eLQk6HomScvgAsD4H2mSbjB9u2PAk4JUGU+x6Jx
+         SYwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1694084635; x=1694689435;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cmpf61eV7S1do3E0eIiuu766NL4mEhMYhw2v0xFldvo=;
-        b=NAk6R7mCVDo6LVfN+H+RKd+BRpYUJ+ABDwR+7w4ny3WALKzpLF+7FCX/CERsL6eKiE
-         YspWrNWKzSSm13Bv8176j8PVZ/J83KWIhuLYRj+hH1dLQRZ72rUIKfQnNyxiRTaDv7SC
-         0aD0D6HQNF16MOAe3p4EgSpiQ6yntbCiOWThj0drahg0piuO0Iapv8zwwQjuNIcb82Cv
-         2etmG+i06jEW5IAh87Z4kuNe6BofruPK25b9lpBEpELBoWEZAME8F1S7WdWtbLK2u21j
-         oAOXCaOuzzOPCx9i78z1V83HcK5J8mXVbeTgZG5Y22shHbINBKgvOrWE/3McDr3/JOfy
-         AlTA==
-X-Gm-Message-State: AOJu0YzH88Qmjf6X5et9R6N9NGEONzHNJxCeJDZm/j5kvfSNKb6Ex2NQ
-	1J0NDgK4LHawJZqVp001O0aSOdq67pn0U1FQeRii95B02975vh+l5C7TNVdULtIiOmNJ4nZLa0L
-	vZunokVwreUWuns9/
-X-Received: by 2002:a17:906:db:b0:9a5:9038:b1e1 with SMTP id 27-20020a17090600db00b009a59038b1e1mr14440954eji.2.1694084635124;
-        Thu, 07 Sep 2023 04:03:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEvNO4RadGZXmyyuXnU5lWN3oiVC1Z2/ox8TFnQe9Oc3q/2wn5hkuRR27s1AMrzP3vnGg9Tfw==
-X-Received: by 2002:a17:906:db:b0:9a5:9038:b1e1 with SMTP id 27-20020a17090600db00b009a59038b1e1mr14440930eji.2.1694084634759;
-        Thu, 07 Sep 2023 04:03:54 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-251-112.dyn.eolo.it. [146.241.251.112])
-        by smtp.gmail.com with ESMTPSA id l23-20020a1709060e1700b00991e2b5a27dsm10214501eji.37.2023.09.07.04.03.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Sep 2023 04:03:54 -0700 (PDT)
-Message-ID: <ecde5e34c6f3a8182f588b3c1352bf78b69ff206.camel@redhat.com>
-Subject: Re: [PATCH] don't assume the existence of skb->dev when trying to
- reset ip_options in ipv4_send_dest_unreach
-From: Paolo Abeni <pabeni@redhat.com>
-To: Kyle Zeng <zengyhkyle@gmail.com>, davem@davemloft.net,
- dsahern@kernel.org,  netdev@vger.kernel.org
-Cc: ssuryaextr@gmail.com
-Date: Thu, 07 Sep 2023 13:03:52 +0200
-In-Reply-To: <ZPk41vtxHK/YnFUs@westworld>
-References: <ZPk41vtxHK/YnFUs@westworld>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        d=1e100.net; s=20221208; t=1694100517; x=1694705317;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=a+iQnvoR9WIvvuphk/xb2y7jezozNmyXY5BuGK/6FCk=;
+        b=biuhGWGYnZoKkw8jcoNBXu9wUv9hbdJu8/eyhXJlI35/EgFb9ugWXhJhZp42Q3hxdE
+         b915ln9FPiIxvN/WS+gz1uj5PJJWoxGq7zCrnAqxRvA1pZ+quqXncGIwpsxR5Qt8TvYP
+         AdhvRPkSRLt8EhVZhVNMsLpyzIR3/owHAAjZGd4hmulCxDDOF9GyZzQZo6BCglpZa0rn
+         KSS0tMhHEkY2oWEURWxQSxfVHCPnELebt83ZKiZH7v5duZIrsPWp1E2Jvb4tELlA3Yme
+         SAqF63ta/zxSnvWLDWJS86Se5prnEQgxjmn9qBbLhllGlAQijNF2PqPfSVWrTOu3CWgX
+         GI8Q==
+X-Gm-Message-State: AOJu0YzIMpD3NsfviubL6CVX0lHvcMEGM/Zpqc5dS5CxSU+uaFf2545e
+	RffcfqzhWNlI4WudFh40wZQlw6aFZ1QHBUlpfmY+sev3yrw=
+X-Google-Smtp-Source: AGHT+IHvMG7BHxfBuEv/VtwE4M7iBZo1MCLbCeCOoLZE5hIc0qenbVkKo7iV8ndNJxlJRBVF8lgdOHhtNmiXXh4bKeY=
+X-Received: by 2002:a17:906:23e9:b0:9a2:276d:d84c with SMTP id
+ j9-20020a17090623e900b009a2276dd84cmr4313287ejg.12.1694085243622; Thu, 07 Sep
+ 2023 04:14:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <CABcoxUbYwuZUL-xm1+5juO42nJMgpQX7cNyQELYz+g2XkZi9TQ@mail.gmail.com>
+ <87o7ienuss.fsf@toke.dk>
+In-Reply-To: <87o7ienuss.fsf@toke.dk>
+From: Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Date: Thu, 7 Sep 2023 13:13:27 +0200
+Message-ID: <CAP01T76Ce2KHQqTGsqs5K9RM5qSv07rNxnV+-=q_J25i9NkqxA@mail.gmail.com>
+Subject: Re: Possible deadlock in bpf queue map
+To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@kernel.org>
+Cc: Hsin-Wei Hung <hsinweih@uci.edu>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <kafai@fb.com>, Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>, 
+	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, netdev@vger.kernel.org, 
+	bpf@vger.kernel.org, Arnaldo Carvalho de Melo <acme@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-0.5 required=5.0 tests=BAYES_00,DATE_IN_PAST_03_06,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, 2023-09-06 at 19:43 -0700, Kyle Zeng wrote:
-> Currently, we assume the skb is associated with a device before calling _=
-_ip_options_compile, which is not always the case if it is re-routed by ipv=
-s.
-> When skb->dev is NULL, dev_net(skb->dev) will become null-dereference.
-> Since we know that all the options will be set to IPOPT_END, which does
-> not depend on struct net, we pass NULL to it.
+On Thu, 7 Sept 2023 at 12:26, Toke H=C3=B8iland-J=C3=B8rgensen <toke@kernel=
+.org> wrote:
+>
+> +Arnaldo
+>
+> > Hi,
+> >
+> > Our bpf fuzzer, a customized Syzkaller, triggered a lockdep warning in
+> > the bpf queue map in v5.15. Since queue_stack_maps.c has no major chang=
+es
+> > since v5.15, we think this should still exist in the latest kernel.
+> > The bug can be occasionally triggered, and we suspect one of the
+> > eBPF programs involved to be the following one. We also attached the lo=
+ckdep
+> > warning at the end.
+> >
+> > #define DEFINE_BPF_MAP_NO_KEY(the_map, TypeOfMap, MapFlags,
+> > TypeOfValue, MaxEntries) \
+> >         struct {                                                       =
+ \
+> >             __uint(type, TypeOfMap);                                   =
+ \
+> >             __uint(map_flags, (MapFlags));                             =
+ \
+> >             __uint(max_entries, (MaxEntries));                         =
+ \
+> >             __type(value, TypeOfValue);                                =
+ \
+> >         } the_map SEC(".maps");
+> >
+> > DEFINE_BPF_MAP_NO_KEY(map_0, BPF_MAP_TYPE_QUEUE, 0 | BPF_F_WRONLY,
+> > struct_0, 162);
+> > SEC("perf_event")
+> > int func(struct bpf_perf_event_data *ctx) {
+> >         char v0[96] =3D {};
+> >         uint64_t v1 =3D 0;
+> >         v1 =3D bpf_map_pop_elem(&map_0, v0);
+> >         return 163819661;
+> > }
+> >
+> >
+> > The program is attached to the following perf event.
+> >
+> > struct perf_event_attr attr_type_hw =3D {
+> >         .type =3D PERF_TYPE_HARDWARE,
+> >         .config =3D PERF_COUNT_HW_CPU_CYCLES,
+> >         .sample_freq =3D 50,
+> >         .inherit =3D 1,
+> >         .freq =3D 1,
+> > };
+> >
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3DWARNING: inconsistent lock state
+> > 5.15.26+ #2 Not tainted
+> > --------------------------------
+> > inconsistent {INITIAL USE} -> {IN-NMI} usage.
+> > syz-executor.5/19749 [HC1[1]:SC0[0]:HE0:SE1] takes:
+> > ffff88804c9fc198 (&qs->lock){..-.}-{2:2}, at: __queue_map_get+0x31/0x25=
+0
+> > {INITIAL USE} state was registered at:
+> >   lock_acquire+0x1a3/0x4b0
+> >   _raw_spin_lock_irqsave+0x48/0x60
+> >   __queue_map_get+0x31/0x250
+> >   bpf_prog_577904e86c81dead_func+0x12/0x4b4
+> >   trace_call_bpf+0x262/0x5d0
+> >   perf_trace_run_bpf_submit+0x91/0x1c0
+> >   perf_trace_sched_switch+0x46c/0x700
+> >   __schedule+0x11b5/0x24a0
+> >   schedule+0xd4/0x270
+> >   futex_wait_queue_me+0x25f/0x520
+> >   futex_wait+0x1e0/0x5f0
+> >   do_futex+0x395/0x1890
+> >   __x64_sys_futex+0x1cb/0x480
+> >   do_syscall_64+0x3b/0xc0
+> >   entry_SYSCALL_64_after_hwframe+0x44/0xae
+> > irq event stamp: 13640
+> > hardirqs last  enabled at (13639): [<ffffffff95eb2bf4>]
+> > _raw_spin_unlock_irq+0x24/0x40
+> > hardirqs last disabled at (13640): [<ffffffff95eb2d4d>]
+> > _raw_spin_lock_irqsave+0x5d/0x60
+> > softirqs last  enabled at (13464): [<ffffffff93e26de5>] __sys_bpf+0x3e1=
+5/0x4e80
+> > softirqs last disabled at (13462): [<ffffffff93e26da3>] __sys_bpf+0x3dd=
+3/0x4e80
+> >
+> > other info that might help us debug this:
+> >  Possible unsafe locking scenario:
+> >
+> >        CPU0
+> >        ----
+> >   lock(&qs->lock);
+> >   <Interrupt>
+> >     lock(&qs->lock);
+>
+> Hmm, so that lock() uses raw_spin_lock_irqsave(), which *should* be
+> disabling interrupts entirely for the critical section. But I guess a
+> Perf hardware event can still trigger? Which seems like it would
+> potentially wreak havoc with lots of things, not just this queue map
+> function?
+>
+> No idea how to protect against this, though. Hoping Arnaldo knows? :)
+>
 
-It's not clear to me why we can infer the above. Possibly would be more
-safe to skip entirely the __ip_options_compile() call?!?
-
-Please at least clarify the changelog and trim it to 72 chars.=C2=A0
-
-Additionally trim the subj to the same len and include the target tree
-(net) into the subj prefix.
-
-Thanks!
-
-Paolo
-
+The locking should probably be protected by a percpu integer counter,
+incremented and decremented before and after the lock is taken,
+respectively. If it is already non-zero, then -EBUSY should be
+returned. It is similar to what htab_lock_bucket protects against in
+hashtab.c.
 
