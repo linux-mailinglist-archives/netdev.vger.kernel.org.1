@@ -1,154 +1,129 @@
-Return-Path: <netdev+bounces-32407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45474797519
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 17:46:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D61187977F3
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 18:38:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26E7C1C20B52
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 15:46:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77F85281759
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 16:38:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1310F12B7F;
-	Thu,  7 Sep 2023 15:46:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6459212B8D;
+	Thu,  7 Sep 2023 16:38:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0708633FA
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 15:46:52 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFF8D678A5
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 08:46:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1694101503;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=7+VK+VR2m38+xEZzYiAj3ASuAJ4XHaCJV5htNfCsfmI=;
-	b=RI8+eTYVemjYA2aKjRC3Moa/FZ1MSG6oLQdYlaMzMr2XADk4opJ5kLUqf6RgTHZoOzrxZX
-	3QN+yKQ82WlGyoCm0B/8zksJDgFn7/eytX6Zw/RPrEQag6ixEQdCe2116aKgBBg+SHwER4
-	lKu0uqNve0XlWXn+06cOlMHg98HH6Uo=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-563-EPwSvFjgNLWT4x29tG7TyQ-1; Thu, 07 Sep 2023 11:45:01 -0400
-X-MC-Unique: EPwSvFjgNLWT4x29tG7TyQ-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3B8B090B242;
-	Thu,  7 Sep 2023 15:45:00 +0000 (UTC)
-Received: from p1.luc.cera.cz (unknown [10.45.226.90])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 4548C493112;
-	Thu,  7 Sep 2023 15:44:58 +0000 (UTC)
-From: Ivan Vecera <ivecera@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jeff Kirsher <jeffrey.t.kirsher@intel.com>,
-	Catherine Sullivan <catherine.sullivan@intel.com>,
-	Greg Rose <gregory.v.rose@intel.com>,
-	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net] i40e: Fix VF VLAN offloading when port VLAN is configured
-Date: Thu,  7 Sep 2023 17:44:57 +0200
-Message-ID: <20230907154457.3861711-1-ivecera@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 596B42C80
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 16:38:32 +0000 (UTC)
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54B4F4EEC
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 09:38:07 -0700 (PDT)
+Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-500d13a8fafso1955948e87.1
+        for <netdev@vger.kernel.org>; Thu, 07 Sep 2023 09:38:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1694104604; x=1694709404; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=avnDsHqUUU8nyVyXtMluY3OgsN1wqY/4LcZavOrvsJU=;
+        b=yyUTQ2vE+GjPAkZ9QxsgnolNVoH5axFzop3GuXnaLFDncGtc6KXK5Jef9UVRHZj/mf
+         nLqs+AGcdIwEghn1Eq4ya0ukntYKjEjuuOU6bFsCy5A4G3AB8nNvqiSMQWjXHH1JN0TV
+         +E8g36yU69PErmzwwi5jqDMtiQnuVMz6m0mo5AOYR5kNvbU8rAABf8oOhabdOa8QAIj4
+         I2K81jpJxTHtbnD32RPJajxMjXzpe8FHkg9y+v3gpmMHvFCMVkSc83bpTfGybIhRfs9S
+         OM8s8Aasw9n0vEauX+ZYb9yMMVYom8a9jp0OlaBx5ikCYYLFMuS1DymzpQkz80q3H//V
+         H54A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1694104604; x=1694709404;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=avnDsHqUUU8nyVyXtMluY3OgsN1wqY/4LcZavOrvsJU=;
+        b=FtOnqfUZ6+UmUS7kcyBP4RQf58OhsdeMeH0yjfFmfVKpzvlI6xOkdhAgadkiZGJIvj
+         7pMY6W7uikbGvOeAFRA3UVpt1xw95gbQ5TIg/OdXg+p7yklmU4UmZ3sTPUc5qToGNpJP
+         SUsGm1gg8EPK29ucKZIhPWSVektVV196c8ycf0P23oMO6439xpzPNbMn0teZQWSud64P
+         xw2y+UBjntKiRBC5Asv8ATJmkaZ/8eQb2vEE0HuBuQgb1vrdvDoV5X1IS1sQ27mmPN0r
+         WJ1WRlJxcbJx60N4FUd5EZGM6g6LFL0GCrrhMEwWsM8YCKpF/D++kmux0QKGzPI9zeaE
+         imZg==
+X-Gm-Message-State: AOJu0YyDIW9i5vOx3xrFjHl7VA8e0M1efYIpwyReDe02ICcwB48nqnCT
+	StL77aR8YcFzybugTnbzJxwKlz9xwq5gk1I+qhSvCw==
+X-Google-Smtp-Source: AGHT+IGQOLrWJEjGdkCr3Uovctlsb1sNon+44j0+R+x4O42FhjDtR6v0GBKKLVG6mZLLz1c6Fl+Q5Q==
+X-Received: by 2002:a2e:9044:0:b0:2bd:10b4:c3e1 with SMTP id n4-20020a2e9044000000b002bd10b4c3e1mr4375344ljg.19.1694067859321;
+        Wed, 06 Sep 2023 23:24:19 -0700 (PDT)
+Received: from [192.168.0.22] (77-252-46-238.static.ip.netia.com.pl. [77.252.46.238])
+        by smtp.gmail.com with ESMTPSA id lo6-20020a170906fa0600b0099bd1ce18fesm10060916ejb.10.2023.09.06.23.24.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 Sep 2023 23:24:18 -0700 (PDT)
+Message-ID: <ccf7072c-cebb-0491-f07e-8c781a2f4664@linaro.org>
+Date: Thu, 7 Sep 2023 08:24:17 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.0
+Subject: Re: [PATCH] nfc: nci: assert requested protocol is valid
+Content-Language: en-US
+To: Jeremy Cline <jeremy@jcline.org>
+Cc: "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ syzbot+0839b78e119aae1fec78@syzkaller.appspotmail.com,
+ Hillf Danton <hdanton@sina.com>
+References: <20230906233347.823171-1-jeremy@jcline.org>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230906233347.823171-1-jeremy@jcline.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-If port VLAN is configured on a VF then any other VLANs on top of this VF
-are broken.
+On 07/09/2023 01:33, Jeremy Cline wrote:
+> The protocol is used in a bit mask to determine if the protocol is
+> supported. Assert the provided protocol is less than the maximum
+> defined so it doesn't potentially perform a shift-out-of-bounds and
+> provide a clearer error for undefined protocols vs unsupported ones.
+> 
+> Fixes: 6a2968aaf50c ("NFC: basic NCI protocol implementation")
+> Reported-and-tested-by: syzbot+0839b78e119aae1fec78@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=0839b78e119aae1fec78
+> Signed-off-by: Jeremy Cline <jeremy@jcline.org>
+> ---
+>  net/nfc/nci/core.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/net/nfc/nci/core.c b/net/nfc/nci/core.c
+> index fff755dde30d..6c9592d05120 100644
+> --- a/net/nfc/nci/core.c
+> +++ b/net/nfc/nci/core.c
+> @@ -909,6 +909,11 @@ static int nci_activate_target(struct nfc_dev *nfc_dev,
+>  		return -EINVAL;
+>  	}
+>  
+> +	if (protocol >= NFC_PROTO_MAX) {
+> +		pr_err("the requested nfc protocol is invalid\n");
+> +		return -EINVAL;
+> +	}
 
-During i40e_ndo_set_vf_port_vlan() call the i40e driver reset the VF and
-iavf driver asks PF (using VIRTCHNL_OP_GET_VF_RESOURCES) for VF capabilities
-but this reset occurs too early, prior setting of vf->info.pvid field
-and because this field can be zero during i40e_vc_get_vf_resources_msg()
-then VIRTCHNL_VF_OFFLOAD_VLAN capability is reported to iavf driver.
+This looks OK, but I wonder if protocol 0 (so BIT(0) in the
+supported_protocols) is a valid protocol. I looked at the code and it
+was nowhere handled.
 
-This is wrong because iavf driver should not report VLAN offloading
-capability when port VLAN is configured as i40e does not support QinQ
-offloading.
+Original patch from Hilf Danton was also handling it (I wonder why Hilf
+did not send his patch...)
 
-Fix the issue by moving VF reset after setting of vf->port_vlan_id
-field.
+https://syzkaller.appspot.com/bug?extid=0839b78e119aae1fec78
 
-Without this patch:
-$ echo 1 > /sys/class/net/enp2s0f0/device/sriov_numvfs
-$ ip link set enp2s0f0 vf 0 vlan 3
-$ ip link set enp2s0f0v0 up
-$ ip link add link enp2s0f0v0 name vlan4 type vlan id 4
-$ ip link set vlan4 up
-...
-$ ethtool -k enp2s0f0v0 | grep vlan-offload
-rx-vlan-offload: on
-tx-vlan-offload: on
-$ dmesg -l err | grep iavf
-[1292500.742914] iavf 0000:02:02.0: Failed to add VLAN filter, error IAVF_ERR_INVALID_QP_ID
-
-With this patch:
-$ echo 1 > /sys/class/net/enp2s0f0/device/sriov_numvfs
-$ ip link set enp2s0f0 vf 0 vlan 3
-$ ip link set enp2s0f0v0 up
-$ ip link add link enp2s0f0v0 name vlan4 type vlan id 4
-$ ip link set vlan4 up
-...
-$ ethtool -k enp2s0f0v0 | grep vlan-offload
-rx-vlan-offload: off [requested on]
-tx-vlan-offload: off [requested on]
-$ dmesg -l err | grep iavf
-
-Fixes: f9b4b6278d51ff ("i40e: Reset the VF upon conflicting VLAN configuration")
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
- drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-index 8ea1a238dcefe1..d3d6415553ed67 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-@@ -4475,9 +4475,7 @@ int i40e_ndo_set_vf_port_vlan(struct net_device *netdev, int vf_id,
- 		goto error_pvid;
- 
- 	i40e_vlan_stripping_enable(vsi);
--	i40e_vc_reset_vf(vf, true);
--	/* During reset the VF got a new VSI, so refresh a pointer. */
--	vsi = pf->vsi[vf->lan_vsi_idx];
-+
- 	/* Locked once because multiple functions below iterate list */
- 	spin_lock_bh(&vsi->mac_filter_hash_lock);
- 
-@@ -4563,6 +4561,10 @@ int i40e_ndo_set_vf_port_vlan(struct net_device *netdev, int vf_id,
- 	 */
- 	vf->port_vlan_id = le16_to_cpu(vsi->info.pvid);
- 
-+	i40e_vc_reset_vf(vf, true);
-+	/* During reset the VF got a new VSI, so refresh a pointer. */
-+	vsi = pf->vsi[vf->lan_vsi_idx];
-+
- 	ret = i40e_config_vf_promiscuous_mode(vf, vsi->id, allmulti, alluni);
- 	if (ret) {
- 		dev_err(&pf->pdev->dev, "Unable to config vf promiscuous mode\n");
--- 
-2.41.0
+Best regards,
+Krzysztof
 
 
