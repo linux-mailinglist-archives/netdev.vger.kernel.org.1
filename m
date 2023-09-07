@@ -1,129 +1,231 @@
-Return-Path: <netdev+bounces-32427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D61187977F3
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 18:38:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E02FA797AEB
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 19:57:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77F85281759
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 16:38:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE0011C20B60
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 17:57:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6459212B8D;
-	Thu,  7 Sep 2023 16:38:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E9F413AFD;
+	Thu,  7 Sep 2023 17:57:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 596B42C80
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 16:38:32 +0000 (UTC)
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54B4F4EEC
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 09:38:07 -0700 (PDT)
-Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-500d13a8fafso1955948e87.1
-        for <netdev@vger.kernel.org>; Thu, 07 Sep 2023 09:38:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1694104604; x=1694709404; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=avnDsHqUUU8nyVyXtMluY3OgsN1wqY/4LcZavOrvsJU=;
-        b=yyUTQ2vE+GjPAkZ9QxsgnolNVoH5axFzop3GuXnaLFDncGtc6KXK5Jef9UVRHZj/mf
-         nLqs+AGcdIwEghn1Eq4ya0ukntYKjEjuuOU6bFsCy5A4G3AB8nNvqiSMQWjXHH1JN0TV
-         +E8g36yU69PErmzwwi5jqDMtiQnuVMz6m0mo5AOYR5kNvbU8rAABf8oOhabdOa8QAIj4
-         I2K81jpJxTHtbnD32RPJajxMjXzpe8FHkg9y+v3gpmMHvFCMVkSc83bpTfGybIhRfs9S
-         OM8s8Aasw9n0vEauX+ZYb9yMMVYom8a9jp0OlaBx5ikCYYLFMuS1DymzpQkz80q3H//V
-         H54A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1694104604; x=1694709404;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=avnDsHqUUU8nyVyXtMluY3OgsN1wqY/4LcZavOrvsJU=;
-        b=FtOnqfUZ6+UmUS7kcyBP4RQf58OhsdeMeH0yjfFmfVKpzvlI6xOkdhAgadkiZGJIvj
-         7pMY6W7uikbGvOeAFRA3UVpt1xw95gbQ5TIg/OdXg+p7yklmU4UmZ3sTPUc5qToGNpJP
-         SUsGm1gg8EPK29ucKZIhPWSVektVV196c8ycf0P23oMO6439xpzPNbMn0teZQWSud64P
-         xw2y+UBjntKiRBC5Asv8ATJmkaZ/8eQb2vEE0HuBuQgb1vrdvDoV5X1IS1sQ27mmPN0r
-         WJ1WRlJxcbJx60N4FUd5EZGM6g6LFL0GCrrhMEwWsM8YCKpF/D++kmux0QKGzPI9zeaE
-         imZg==
-X-Gm-Message-State: AOJu0YyDIW9i5vOx3xrFjHl7VA8e0M1efYIpwyReDe02ICcwB48nqnCT
-	StL77aR8YcFzybugTnbzJxwKlz9xwq5gk1I+qhSvCw==
-X-Google-Smtp-Source: AGHT+IGQOLrWJEjGdkCr3Uovctlsb1sNon+44j0+R+x4O42FhjDtR6v0GBKKLVG6mZLLz1c6Fl+Q5Q==
-X-Received: by 2002:a2e:9044:0:b0:2bd:10b4:c3e1 with SMTP id n4-20020a2e9044000000b002bd10b4c3e1mr4375344ljg.19.1694067859321;
-        Wed, 06 Sep 2023 23:24:19 -0700 (PDT)
-Received: from [192.168.0.22] (77-252-46-238.static.ip.netia.com.pl. [77.252.46.238])
-        by smtp.gmail.com with ESMTPSA id lo6-20020a170906fa0600b0099bd1ce18fesm10060916ejb.10.2023.09.06.23.24.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Sep 2023 23:24:18 -0700 (PDT)
-Message-ID: <ccf7072c-cebb-0491-f07e-8c781a2f4664@linaro.org>
-Date: Thu, 7 Sep 2023 08:24:17 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AD54134B2
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 17:57:38 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 314B7E6B
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 10:57:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694109437; x=1725645437;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Xj80fusXQQDszIF1IMR3KPbsEouV2mwMTty6+zmRLG8=;
+  b=PMsrna2qjmONEbAzRTVeDAPKaZ/zES8Qe3hAFHEWw/9kvF32N9pO/AN3
+   chZjSL2zr1Bt2hOX79V5ZbVFdTjTo8UmSKwL5vme2Ut9ddi2kcLGR0LEe
+   T21fPKzBN7O1aVUpuLnA8bZynH0Dfd4rJUMi1DArZE1UA63nSNoDEwqOw
+   3yvtil69IdtUgwnzEj2MAgTeJRGDc41tVMG08n5t8vOIBc3u3FydurFvk
+   25R1+SiogCeLyRYxOc4gLEUfijjYDomhSfZBkiX8cXsOouFiH/iBDMRhF
+   vSc24SskjHcjU2CNxD6tHDMe/Ikloj4FsI/Kdg5OE/nFz5hcSGZtJ2aBM
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10825"; a="367495139"
+X-IronPort-AV: E=Sophos;i="6.02,234,1688454000"; 
+   d="scan'208";a="367495139"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2023 23:39:50 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10825"; a="691650407"
+X-IronPort-AV: E=Sophos;i="6.02,234,1688454000"; 
+   d="scan'208";a="691650407"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orsmga003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Sep 2023 23:39:50 -0700
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Wed, 6 Sep 2023 23:39:50 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Wed, 6 Sep 2023 23:39:50 -0700
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.46) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Wed, 6 Sep 2023 23:39:49 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WSHk0j8+PdePp6YvvGI+icVp1GnlUG9LI9+26WnD0yqrew9a8uXXdgd4JoD76QRA6TcKNz9Do8t4Q30X/VlWnAzq11avT9SQxKmKQCzJPNg7FCcCRojwq3064LtzgI/FWAPOtb13dFo0Ow012SnLCs4/a89JTpso04RtblukuICeTEObjTOrxkWbWhEFN+AE8JVpliBFPLHsmVxFj85PZnhBE1DPyM5V6hEHFFn7y16epsuy5hEsNVPBqc7PBky1i5jQ0brVt/KtVQinZxKnQkcnk0iKeGu8van6xVl6fIbtm3wna9r48NmUDAB2eddhj8fYSDqmVNoP8uo/GQN0BQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Xv7tUwRikuMep0CAfHKFymfJW1chCQicvZXVOMYIS3k=;
+ b=ij3DuT3dbYbOEEBKn9Xu2BzIP5LXrxba4UQBAFqFiGeSRHt3nXf41onDCVCZET9AecPEhiEsxtWXQN5bsUiwFPC0fCW8BUN633YtWKQIM2Tsixz14NWepLVGzQr4GejPt1B814B8xboyfgU+fBWD5WNnQZFO9aklWP5HolXIveFm08RztEpyWO68PX3wVRIpbDq/v+uIdWlFaqWp/tNnOJHkZpSKmaWNvFqvjbN/p2j3K+ZDi+MiZqOfx3PCRLnklUIUt0G/aOwm/2NrOTJy9HLgZEKoUIs/HEiP74A6QSnABZisa4mVu4ZWZ4/PKGAPqf54kY2gVi8tQHpJ5uJ5TQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL0PR11MB3122.namprd11.prod.outlook.com (2603:10b6:208:75::32)
+ by MN6PR11MB8244.namprd11.prod.outlook.com (2603:10b6:208:470::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.34; Thu, 7 Sep
+ 2023 06:39:47 +0000
+Received: from BL0PR11MB3122.namprd11.prod.outlook.com
+ ([fe80::4960:928f:8f06:7479]) by BL0PR11MB3122.namprd11.prod.outlook.com
+ ([fe80::4960:928f:8f06:7479%4]) with mapi id 15.20.6745.035; Thu, 7 Sep 2023
+ 06:39:47 +0000
+From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, "Brandeburg, Jesse"
+	<jesse.brandeburg@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, Jakub Kicinski <kuba@kernel.org>, "Alexander
+ Duyck" <alexander.duyck@gmail.com>, "Rustad, Mark D"
+	<mark.d.rustad@intel.com>, Darin Miller <darin.j.miller@intel.com>, "Jeff
+ Kirsher" <jeffrey.t.kirsher@intel.com>, Richard Cochran
+	<richardcochran@gmail.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+Subject: RE: [Intel-wired-lan] [PATCH net] ixgbe: fix timestamp configuration
+ code
+Thread-Topic: [Intel-wired-lan] [PATCH net] ixgbe: fix timestamp configuration
+ code
+Thread-Index: AQHZ1g+ASmiBu+CN/kawX/lH5NF/RrAO/8mw
+Date: Thu, 7 Sep 2023 06:39:46 +0000
+Message-ID: <BL0PR11MB312234CFC9973CC38C2C1A7FBDEEA@BL0PR11MB3122.namprd11.prod.outlook.com>
+References: <20230823221537.816541-1-vadim.fedorenko@linux.dev>
+In-Reply-To: <20230823221537.816541-1-vadim.fedorenko@linux.dev>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL0PR11MB3122:EE_|MN6PR11MB8244:EE_
+x-ms-office365-filtering-correlation-id: c28fe49f-7a8d-44d5-08d2-08dbaf6d3a1a
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: M81pA2YE5Ki/vlH0REzgVi6VC9SdGxtQti5d0AbMuyC17yZU52YRmJLakwdcPvolMKyAs0BSY7axxxAiKuvgxFbc7xKU+2n+JKsWMYJjBaIbOr/EBxHgRPTafnw8l6r7bnwiozO3wBKqC9H0mFrXTNoH9dTPMjEvVteqMDxU9/D345JuK0S7FnQ/jFa5i60p5jX3TOhqN+wJu0PfEYrhf43cRqC47rghJGuDf2blhGhbxCMn1zkGToBmaFs/UiV0oAIguFkwhqwdkt1Kj2wQDVu8tTCy+CjMxO2sKu7sHDLmoNo1QuY9dRiROz3bFNWEd80+sdfqOSWDP65L233ULMxQh3xhMV/dyP9JonvvJpXqj3ooZS3JziL/dvy8vCPCeBxOiD3IIyAfdFqzIe37f9hB/0Nhr8jIALLKrzmuB1JD4RlWDPBtwgcK+G98jh9ZvMMpgtUdg7kgDRKnMhSFj6wbcCoJ5Uk67qjuFNBgqxoGipiOcskZLrxE2GI9VonWQkzWRxgLLwGudAzhygZWInmyUfj9pvDejcJhOK1RXWmpP+Qw/a2hIIAIxLtTwfRFglcNz/b5br7yjZchTSgI5Bq6dYSzp/dOJZOlgJ4mmeFPxJjx3K4emvDqdcGainJ2
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB3122.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(39860400002)(366004)(346002)(136003)(1800799009)(451199024)(186009)(122000001)(921005)(53546011)(6506007)(7696005)(71200400001)(9686003)(38070700005)(86362001)(55016003)(38100700002)(82960400001)(33656002)(2906002)(26005)(55236004)(83380400001)(110136005)(478600001)(66946007)(8676002)(76116006)(52536014)(8936002)(4326008)(66556008)(5660300002)(316002)(66476007)(64756008)(54906003)(41300700001)(66446008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?S9wOlQEjUNId/LxvrE3iwqDfQbMg0tIyFAdh4KLHQyG+C992QU79QwSFMSp4?=
+ =?us-ascii?Q?JDphgJ418b1hvyAwqzKu2sUP0THw1yrplUkg3QrXGNyV3vDmTDoXbNhTwsMe?=
+ =?us-ascii?Q?oqDunUwYo4vnp7IMbh0N50F8dBXuZRs+Y7bdPlRAVxsaAQgdD7DcnHlt76jl?=
+ =?us-ascii?Q?/UpaV6xn4Xd4S2WRvMpCMRCLLZaveYr1gxrv7wugfmJXbAOcK2m1bM0pVoIb?=
+ =?us-ascii?Q?GY2a3lNFa8V9j+jhAO8tn2ENDiqeyWdBoSaH4Hhoc/GZ7y1Ee0vUaug7GSx/?=
+ =?us-ascii?Q?+DS4Hp7ZTNfiGrSqYHBv6vfEFqXfeMJz3JL0nncFT5RtZIasjFVkOJJHtkdY?=
+ =?us-ascii?Q?0gN/evo+VOdAfBXTLDiIyI64DRbYMdO5DrkptMwHTOKmcPtsli8bE56d0kwL?=
+ =?us-ascii?Q?ETv6JWNmnQ1Y84N2xEqYf+GKjge95MV+s55+P5qExmjdP+TIkLIudQagGTUE?=
+ =?us-ascii?Q?93/K5I4iaD2TxE5JIAEUud7o3LFR7Jq+gsIlBEbNdyFCpgMn2YW4271HTQ6Q?=
+ =?us-ascii?Q?2F2+q8lpYKQpJy5hLDlOYJFmyqd970WIwSvx3iHVmpZyYrDwtZvdygFWVzKV?=
+ =?us-ascii?Q?p+SB6xmvp5WpNcKiJ2+JZAy/77X11rI8G4DX2mpyMN2sOlOBWMlLD8SFfs5j?=
+ =?us-ascii?Q?ZNneT/XKLN1O8t8mezKWgDiEVwTiV7ZmHtdDToxyZF5XikxBjSlxQ6bKbp9a?=
+ =?us-ascii?Q?OIJbvBJ8kMmCE598Zhp//UFcvUet0to/9bTpK468fAyNRod4eSjjUiiw3f4s?=
+ =?us-ascii?Q?4cWMonZCvSUngvFhjdxEhZqNHDi+jUu6iy6KzDd1GtbdLQwzD115I323UibO?=
+ =?us-ascii?Q?Jbd6rxqsKFqVqKz7K4TCloCu0pTJOhkAw4TS7BoXqZxkDqe8i0qSKUJQ8NY4?=
+ =?us-ascii?Q?c6TMy7ePS4zvef/HpY0mb0MRv7dK31Y9ZdWAYogTwTs03hMUhS7SPU1MP33X?=
+ =?us-ascii?Q?lAoNL3EC1ehZL7aHQNPC06bbJtBjZbNIKZKyRCzd9TPr1XL3iLeyhYh/lDqp?=
+ =?us-ascii?Q?960ztay00HEK6sNU4nQL9pOLlSfLwf9KDsdOXWXRsH1nPiHP/wgziRHCmdG2?=
+ =?us-ascii?Q?8os6HV/ebTA4ef5b4tymFs6n1Ec8jkFeDhNqgbs9txqp6LLPuEXNv4iJByJ9?=
+ =?us-ascii?Q?IgbdfGndAVl/4NITmDjJvt+K2/iwHDuK65SxYyYIfP/O65owoTNZSEsATlky?=
+ =?us-ascii?Q?7DQP2JutJ89Ijn5MplKrWSXuX/S0t5LHdVP3e0VQIVYw/fR6xKGyn8n7OW94?=
+ =?us-ascii?Q?EDXUfjF/IgoWBVz6VFoyvYo8EWy0teAMbT3r21DFxfHiv997sXKOKekiAL14?=
+ =?us-ascii?Q?nPCG11kHor1gfni4RK+7AuOyRKzB/HcSDYJI8OiYxHgVidRunEtgkuZIoUOY?=
+ =?us-ascii?Q?Zu6l5drQH4Z+aqb7RLGKxQGh7mbUOjqWdnaJxArzApQXz4vxBeTCF3NobJi9?=
+ =?us-ascii?Q?2f8hq44wtpwDaQSIpXKVJWhn+K+Uq2ElnsTOw7/GlMl23BlTTDDLiEbca9mH?=
+ =?us-ascii?Q?NLUV/LevPdiNQuMOe2Y9edWy7yL2L199GgocSkEVyIom0sXqbd2afgkLSOqI?=
+ =?us-ascii?Q?tz1BU4qd3UKd1q5xWzVJnIJd41ouOJ8sY1z8V6QX+E4mv6sRLo4eelkz8FTl?=
+ =?us-ascii?Q?9w=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-Subject: Re: [PATCH] nfc: nci: assert requested protocol is valid
-Content-Language: en-US
-To: Jeremy Cline <jeremy@jcline.org>
-Cc: "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- syzbot+0839b78e119aae1fec78@syzkaller.appspotmail.com,
- Hillf Danton <hdanton@sina.com>
-References: <20230906233347.823171-1-jeremy@jcline.org>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230906233347.823171-1-jeremy@jcline.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB3122.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c28fe49f-7a8d-44d5-08d2-08dbaf6d3a1a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Sep 2023 06:39:46.3748
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vZRsQ18UhLnB6IqoQCQaQxsXoJ3fI2YOxKOzFqZzb/0Ay3O8PUZZG8fFXBu1MdJxXVNdRBBrsETwJWtADu7JfB70LzrxTaW558KxwRFES06LByHl/OJcWVKE4bOgW3nA
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR11MB8244
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 07/09/2023 01:33, Jeremy Cline wrote:
-> The protocol is used in a bit mask to determine if the protocol is
-> supported. Assert the provided protocol is less than the maximum
-> defined so it doesn't potentially perform a shift-out-of-bounds and
-> provide a clearer error for undefined protocols vs unsupported ones.
-> 
-> Fixes: 6a2968aaf50c ("NFC: basic NCI protocol implementation")
-> Reported-and-tested-by: syzbot+0839b78e119aae1fec78@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=0839b78e119aae1fec78
-> Signed-off-by: Jeremy Cline <jeremy@jcline.org>
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of V=
+adim Fedorenko
+> Sent: Thursday, August 24, 2023 3:46 AM
+> To: Brandeburg, Jesse <jesse.brandeburg@intel.com>; Nguyen, Anthony L <an=
+thony.l.nguyen@intel.com>; Jakub Kicinski <kuba@kernel.org>; Alexander Duyc=
+k <alexander.duyck@gmail.com>; Rustad, Mark D <mark.d.rustad@intel.com>; Da=
+rin Miller <darin.j.miller@intel.com>; Jeff Kirsher <jeffrey.t.kirsher@inte=
+l.com>; Richard Cochran <richardcochran@gmail.com>
+> Cc: netdev@vger.kernel.org; intel-wired-lan@lists.osuosl.org; Vadim Fedor=
+enko <vadim.fedorenko@linux.dev>
+> Subject: [Intel-wired-lan] [PATCH net] ixgbe: fix timestamp configuration=
+ code
+>
+> The commit in fixes introduced flags to control the status of hardware
+> configuration while processing packets. At the same time another structur=
+e
+> is used to provide configuration of timestamper to user-space application=
+s.
+> The way it was coded makes this structures go out of sync easily. The
+> repro is easy for 82599 chips:
+>
+> [root@hostname ~]# hwstamp_ctl -i eth0 -r 12 -t 1
+> current settings:
+> tx_type 0
+> rx_filter 0
+> new settings:
+> tx_type 1
+> rx_filter 12
+>
+> The eth0 device is properly configured to timestamp any PTPv2 events.
+>=20
+> [root@hostname ~]# hwstamp_ctl -i eth0 -r 1 -t 1
+> current settings:
+> tx_type 1
+> rx_filter 12
+> SIOCSHWTSTAMP failed: Numerical result out of range
+> The requested time stamping mode is not supported by the hardware.
+>
+> The error is properly returned because HW doesn't support all packets
+> timestamping. But the adapter->flags is cleared of timestamp flags
+> even though no HW configuration was done. From that point no RX timestamp=
+s
+> are received by user-space application. But configuration shows good
+> values:
+>
+> [root@hostname ~]# hwstamp_ctl -i eth0
+> current settings:
+> tx_type 1
+> rx_filter 12
+>
+> Fix the issue by applying new flags only when the HW was actually
+> configured.
+>
+> Fixes: a9763f3cb54c ("ixgbe: Update PTP to support X550EM_x devices")
+> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 > ---
->  net/nfc/nci/core.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/net/nfc/nci/core.c b/net/nfc/nci/core.c
-> index fff755dde30d..6c9592d05120 100644
-> --- a/net/nfc/nci/core.c
-> +++ b/net/nfc/nci/core.c
-> @@ -909,6 +909,11 @@ static int nci_activate_target(struct nfc_dev *nfc_dev,
->  		return -EINVAL;
->  	}
->  
-> +	if (protocol >= NFC_PROTO_MAX) {
-> +		pr_err("the requested nfc protocol is invalid\n");
-> +		return -EINVAL;
-> +	}
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c | 28 +++++++++++---------
+>  1 file changed, 15 insertions(+), 13 deletions(-)
+>
 
-This looks OK, but I wonder if protocol 0 (so BIT(0) in the
-supported_protocols) is a valid protocol. I looked at the code and it
-was nowhere handled.
-
-Original patch from Hilf Danton was also handling it (I wonder why Hilf
-did not send his patch...)
-
-https://syzkaller.appspot.com/bug?extid=0839b78e119aae1fec78
-
-Best regards,
-Krzysztof
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
+ntingent worker at Intel)
 
 
