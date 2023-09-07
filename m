@@ -1,196 +1,207 @@
-Return-Path: <netdev+bounces-32489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6952B797ED6
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 00:53:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41872797EEA
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 01:02:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8142D1C20B5C
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 22:53:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D6732817AD
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 23:02:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3FFC14271;
-	Thu,  7 Sep 2023 22:53:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C97A614296;
+	Thu,  7 Sep 2023 23:02:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E67E229A8
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 22:53:55 +0000 (UTC)
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4ED091BCD
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 15:53:54 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1bf5c314a57so11909965ad.1
-        for <netdev@vger.kernel.org>; Thu, 07 Sep 2023 15:53:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694127234; x=1694732034; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Tw/rCGtK366XeodUhFoL+9MhzcffDRTkb0f987EC2rk=;
-        b=H7Lm1N5Jq72wEyv0FCmZE5TmlOlZ9m2uBK5H7qST1dm44L1m6JFQQvCsx3FT8CdkTg
-         nZ3XwupT+08wiypfyG33PYW/AjrZz9066idal8aj/qmgwuMrZmxPs0Zg0YS6v1sX8OHq
-         xwiH2BTpoqhSmuQliSvuzpgRzcX/kgKFzbOAse3OKpXOO0nzGZJw6W3aTmKm/hW6x2C/
-         hlaANUNfnwaHvymWLNGr5LhbmEXDWdMTJXdtp4C3XwLgQwErdVP03QoDYkjxAMAX4ju5
-         bTTELw5hdFj4Gyf53i4DR0iemXtxNnJ2elwRsRkQOqbvmJTaXWvkws3QSrlMAPuBHsgg
-         O7/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694127234; x=1694732034;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Tw/rCGtK366XeodUhFoL+9MhzcffDRTkb0f987EC2rk=;
-        b=Ge5ii+Jx6Ut8gXnGIN0tWPgI2q96JulGg8WyzLd1ZEPcIfah6FGfrYFkZCU9Ihebde
-         Vy6Id+bYFCl4dtAL1/LI8Ihn0PvC1maShtlydxXuaoCXUQV1estVsytlOAWr+4IAUtvt
-         9TzINUPLxRXrOt3cdJXdZu/yOV7lbU5/zMm+5AvWxQ4BZgUfyyAnO2Ehhe3g7zkPDlTp
-         pJRAq6grOD/cIbtwoGSbZuFMc5QabtUcGmgu9EILZWu08SSXPB1YZnmK3iGpzsRlsIKK
-         KiLYtkINHSqy2bu2X78exEnX+JylfpMHKb2y/ZDbrNfqfQmpuguSYJGOG7s3QpAn50Uc
-         1G/g==
-X-Gm-Message-State: AOJu0YwvsEVV5qWRSGLzDe8vkVSvIYjTq5a9lQZLF4C3HVWSQy4ndios
-	9M3gwEYQ91SutZl7iQczF4M=
-X-Google-Smtp-Source: AGHT+IF8kYX75/ije8gHfr0McbME6t5bSBGTS1bvG1CxCF6OHZuW4cv111FXdOw/POpl5ZEJMXbUbg==
-X-Received: by 2002:a17:902:d505:b0:1bd:f71c:3af3 with SMTP id b5-20020a170902d50500b001bdf71c3af3mr992446plg.32.1694127233674;
-        Thu, 07 Sep 2023 15:53:53 -0700 (PDT)
-Received: from westworld (209-147-138-147.nat.asu.edu. [209.147.138.147])
-        by smtp.gmail.com with ESMTPSA id jj14-20020a170903048e00b001bdb8c0b578sm248770plb.192.2023.09.07.15.53.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Sep 2023 15:53:52 -0700 (PDT)
-Date: Thu, 7 Sep 2023 15:53:50 -0700
-From: Kyle Zeng <zengyhkyle@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>, dsahern@kernel.org
-Cc: davem@davemloft.net, netdev@vger.kernel.org, ssuryaextr@gmail.com
-Subject: Re: [PATCH] don't assume the existence of skb->dev when trying to
- reset ip_options in ipv4_send_dest_unreach
-Message-ID: <ZPpUfm/HhFet3ejH@westworld>
-References: <ZPk41vtxHK/YnFUs@westworld>
- <ecde5e34c6f3a8182f588b3c1352bf78b69ff206.camel@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB81614294
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 23:02:11 +0000 (UTC)
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2066.outbound.protection.outlook.com [40.107.223.66])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBED3CF3
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 16:02:08 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Zokx/VU556Zti0FdPDI+Ktg4KKi/hznrzlHrDo06oW8LX/7ZfmOBJnXCsapLuYb9b36EfsqYwRRTet2kgxoS90Zzl3zDEo0civNZf2QFy5kdCId2VHSjE/sMbJjzpAo5KVWN+dti+ZbUU5/wEOwCP1FpuIU8Pq3ZdMm9CAxwasoHnrJ419FZRG25jM+ARnJuZcbIj/TrvS55OHTks76p4Vvz0xdAlroOOkeCGzTz2dhJ8Yc0gehGvqXHxcja3L+fwlwpcXg1A2hV4xzSnsaRMHtOz8Q0C4UJSdwTUGn6+oKiodjSbMuYuQiIJ9EUk+dYAU69v8Gh8vgi8TnUBDgawA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7nJqGfjaSFm/kmP5MlA7Y1xw8FqIycMk7c8sSa9vw88=;
+ b=DgTKv6XRi6rKQZkBZ4FvBQAVUdwq6lcSZoqhTlblNmeR5zPphONes4h8+Zocmua/sTo/3WLAtW4AgZagyRUgHtkMaaRVdhs8WueNWAxelPkQ7El1uj0YPYV08sLmey1wdthx0yxq5h65DE/O+Czc47G3BlTKLbVv13SkYuf2fYOWum26gB7UZQ7sdhUXudhMek65bQ/oZwyE276Sr8c85M5OIXoxiuKgJQ7TIUPlnr3mcq/uw4skKlNUD7OacjTXryWMV+emIRfm4UbRPHl7E7dXFodNFvwzrmooP1W4Istn1o53BS4lbyuVY/UCfGWjKmPEzFWWcMBgCa1SRY6ARA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7nJqGfjaSFm/kmP5MlA7Y1xw8FqIycMk7c8sSa9vw88=;
+ b=Lwk13P6myPc0WildK8oWWT6NNCQrgMKWQBhClFVjFesImyOgKFP3RxeHopVl4RXrbUEBiNcQ1YKmxthuXTIPfDc/Rc2i2EboPFuYK3TvdHBL7/MVG1Uhz05KI9y9Roy/k61IJA14NQHX68fba36uB73JkyDocbp2e2NNSumwHXU=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
+ DM4PR12MB8500.namprd12.prod.outlook.com (2603:10b6:8:190::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6768.30; Thu, 7 Sep 2023 23:02:06 +0000
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::5c9:9a26:e051:ddd2]) by DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::5c9:9a26:e051:ddd2%7]) with mapi id 15.20.6745.034; Thu, 7 Sep 2023
+ 23:02:06 +0000
+Message-ID: <71c187a5-337c-46e9-8d88-35d288795fc8@amd.com>
+Date: Thu, 7 Sep 2023 16:02:04 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] vdpa: consume device_features parameter
+To: Si-Wei Liu <si-wei.liu@oracle.com>, dsahern@kernel.org,
+ stephen@networkplumber.org
+Cc: allen.hubbe@amd.com, drivers@pensando.io, jasowang@redhat.com,
+ mst@redhat.com, netdev@vger.kernel.org,
+ virtualization@lists.linux-foundation.org
+References: <29db10bca7e5ef6b1137282292660fc337a4323a.1683907102.git.allen.hubbe@amd.com>
+ <b4eeb1b9-1e65-3ef5-1a19-ecd0b14d29e9@oracle.com>
+Content-Language: en-US
+From: "Nelson, Shannon" <shannon.nelson@amd.com>
+In-Reply-To: <b4eeb1b9-1e65-3ef5-1a19-ecd0b14d29e9@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SJ0PR05CA0210.namprd05.prod.outlook.com
+ (2603:10b6:a03:330::35) To DS0PR12MB6583.namprd12.prod.outlook.com
+ (2603:10b6:8:d1::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="TdKnvOL5LAdAXmmY"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ecde5e34c6f3a8182f588b3c1352bf78b69ff206.camel@redhat.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|DM4PR12MB8500:EE_
+X-MS-Office365-Filtering-Correlation-Id: bee4d1ed-43c4-4eb0-75bc-08dbaff674ed
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	4dW24+3jv43Ggwc0AiY5MHGVsMBt6yt8ikI5vfW4IN7gTcQ//pB1phVlI7zCr6B8xC8kCghT36HzFQ4Rsth5bl3YxkuSp+pcWwbrKaHodSGPQKPet/+X+oUpnv9sW7CA0rt0AmS+p2dFyoVyIGhKB4R6BOJZ4LOMpoh+c0MBFlRXJnAPJ/ONQU/O9bcZQ0oYjNWl70vh7H9Z0uZpt0ezm4s4sTLm+14xZ/ZzErEZFLfie8kgdnxCCU/VefFWmwEtKIFJVl3bCRs+9lW0NNS7IKUl1Eo6WeqxlreSEDwKbUx+sbjG10kqnuLmO5ZPvTOL0695vxLHHDkOvOuini73GtKUCNst7t06t7FvN5TvnKRDR20cL4VikEdEwxv/vm1Y2atYdsZVWT+rV8JzIqxPQaAX6HOtNGBhGWKs6UPC/03n9LT97w9mrdX+KBRsT82WjTQOoQkvm6dndwOwV+53R6/uzRuA29p+1XQMgw0hfvF055LPf8mxbgj2w6nSJaputq/RjILKvOnh1o+EDvs9k+2AdB7B9KNUKpr/xfIpX3xyTJgP4Tm81/q9QQcLIRPI+485RlimdyfgwrQX2QJg2tPwHiSYOTsQaylJalUDsnYbzTJl/TxGFmyRTMFyitd/XU0FplSHvYsFm1U5Gr7Npg==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(39860400002)(346002)(366004)(376002)(186009)(1800799009)(451199024)(6486002)(6506007)(53546011)(966005)(478600001)(2616005)(26005)(2906002)(66946007)(316002)(41300700001)(66556008)(66476007)(8936002)(5660300002)(4326008)(8676002)(6512007)(31696002)(36756003)(86362001)(38100700002)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?ZnhaOFJBaTlsZHV0KzBGS3orNmkrSnFXTkIyT1M5d3VyVXZ5aVk1UkxmZjBj?=
+ =?utf-8?B?RDVIcEFKT0swWWRrYUp2RnUwSkNWNWJJeDZ4bmtlR0oxdHdOYWI1WC9McHY1?=
+ =?utf-8?B?RmtjLzhqUFpZc3lvSUZOQWg0am9BVE5SS0Qzd01memxkaXY1dWlUeTBPaEdx?=
+ =?utf-8?B?ZG5aRGtLMGRGTjNyd2ZyWG10LzczMlNOakg0a2QzZGhURXNRT3hONGxOLzIy?=
+ =?utf-8?B?WC9Ka0ZrUmR2WmR6dUhhQWxXVVpZbm9tZWE3elFTdVJqS0RuTmlzYW0zNVNt?=
+ =?utf-8?B?UlZ1S0FhdnBYb0IrMnY1QXpYQVZOQUpOUzk3aFN0SDBXbVlwb2pEdENTVFU4?=
+ =?utf-8?B?WFk3dnBPZWtqaGM3UnpocUNxaDNsa3p2S3lranhGa1JCWUVCbG1wbmJwb3Bl?=
+ =?utf-8?B?eWlTTFk5SExzd3NOa0p3OGpKZ1ovdGdCNmtlb2tQcVFPSWxhZkE0aTNIUGlB?=
+ =?utf-8?B?ek1XTFhXMTc2VXdHRzVqQWpYbktzRVk0Mk9wbitqaHV6cW1wTlBqbTRXVldJ?=
+ =?utf-8?B?LzNqbW9tUjF0VkJ3bXVNUzFTZjBOb3dtYk1ZRXM4NWNlVXZvU3F4KzAwcnZK?=
+ =?utf-8?B?NVZwQzNadHRmb2xneUo3c1BXQ0JBci92WWNGU2tZUkJYaG9YY0U2ODgraUpG?=
+ =?utf-8?B?Nk5qK2RpUVNTb1hDVUJpb2J6OVY0dGE4ZVhGaHFmVFZyWWZna09jTVZQWTEz?=
+ =?utf-8?B?MmNuQlJHaG5yM3VmVk43aXk3NUk4MWcwNkZIWktwaUFKbFlZK1pmSnlOd1ZU?=
+ =?utf-8?B?L2Z5d3Bpb01MeUZqdjRGc0FWY3Z0dmdQWCtoQTZzVHU2THlJNzhEeWUzYk9W?=
+ =?utf-8?B?ODhhRnNtMGV2aXRrdEVrcEJ6aW43VmZPVlhTRFdlbFJOaUdpb3M5NGJ5R1pT?=
+ =?utf-8?B?L0pCNnUwRW5DR2w4bHpFTlM4cXptcWpiMGhRc1FaTVRmVk1vcDIyNWdHWE8v?=
+ =?utf-8?B?RVNpVlcwN2lwUnJuUFRGQkpxMEJLWlhmNTBjaXNuanpaSjF5WWxHNzErazNY?=
+ =?utf-8?B?OFNoVk5ZeExsSXdxc0lGZDdkYXhTQ3dOdk8zdDI5dzFYNTdSV3NraktydlpH?=
+ =?utf-8?B?cm1lU3dXWHIxbG9YcVVtNEpxSTU4U3ZNL3RpQnFNUDh5ZzgzS1d1RzJwbjd3?=
+ =?utf-8?B?dndBNkNuY25iRXNoY3NzQWFETVZJVGpkb2Erd0M5YmF1d0tocmJqcmFsTnlL?=
+ =?utf-8?B?WGlESm1EZW9LT21kTkxKSTN2d3VCK0lNMmZVcmtoazJLQ3FYUlE0cGptNndJ?=
+ =?utf-8?B?SGJ1c1BQVHJ6Q2RkajZkTnNXUDkwcnEvbWdnQzFRdUg3Q3ZydE5VWGtSMVNt?=
+ =?utf-8?B?cys0dEp2TFNxbzlOSTloQ095TVM5SVpIT3ppanRsejF1TStvSVpnR0JDc2tX?=
+ =?utf-8?B?cFJqZUVJd0tDV1hST09keVp3L1RtNU5SMXRrOTlOVlMrQ1R6cUc1VWpEeVUr?=
+ =?utf-8?B?S1F6aXU3SG9OQU5MekdFTFFNc3B6blB2Y1F2QnFjWXhYOTNsclYwNDFFRkQ2?=
+ =?utf-8?B?MFdURDlkZE4vL25ZNFZpSXdvNXplSkZuMlJnVDdKRXBHVEZ3Vm5sWEV6b1pi?=
+ =?utf-8?B?TkRDTm1uWnpXMW1iTU5hZ2xwTWVyUm5qUHRjZVhGSTVYaEc3UnJwUjVsNndC?=
+ =?utf-8?B?RS9BM0VIb0tXUEczWHBXN1RmQVphenlvZHZvVGlNSXRaaDRFN3RjWlJZYWZ5?=
+ =?utf-8?B?VFVUR0tUcWM3TG1qdmNubEVTV1RXcEpvZ2NkMWpKWGx3a3BkWFl6OURIVG42?=
+ =?utf-8?B?aW9qQ3VpYXJ6aE15YmZyWjVsTkRBT1p0SUFKKzlOdk16UlN3VzhhVDZMcjRC?=
+ =?utf-8?B?RDk0bVFxREhjQmdYcE91a2xkS3k5dUwrR09KUkJyWDRoL2lxb0VoWkY0emht?=
+ =?utf-8?B?SHRqeFdHVUdJOGV0S0poUnBWaWtaSlp5ZzV5YmZxbUtKbVdIVmtJbWtWTXZN?=
+ =?utf-8?B?MmhWWkw5OGZoMWROcHFCNUtQUVRQNzdodEw4ekhCV1VpWlNUVUVscE91TlBO?=
+ =?utf-8?B?YjBJcldILy9TM2czUlVFeVFRMG1Xam55K0Y1RFNsb01YYWx4OFVRTnAvTmZP?=
+ =?utf-8?B?SjJYZjMrNzEra21aVURYYlE4VVIxdmozdzdHbWZDZ1VuZmxMSlRFMEhZeFVM?=
+ =?utf-8?Q?Bi05LR0PQHtjzJy9cI27uTNkO?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bee4d1ed-43c4-4eb0-75bc-08dbaff674ed
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Sep 2023 23:02:06.3298
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: TQqZxwyVLwLwVCn8PJnfrchfgqx0QOwiMqGGDqiN8+i4S/1pOfhzzICWoht3W98hZttmOFgThPbvtXArGHHhGQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB8500
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
---TdKnvOL5LAdAXmmY
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-
-On Thu, Sep 07, 2023 at 01:03:52PM +0200, Paolo Abeni wrote:
-> On Wed, 2023-09-06 at 19:43 -0700, Kyle Zeng wrote:
-> > Currently, we assume the skb is associated with a device before calling __ip_options_compile, which is not always the case if it is re-routed by ipvs.
-> > When skb->dev is NULL, dev_net(skb->dev) will become null-dereference.
-> > Since we know that all the options will be set to IPOPT_END, which does
-> > not depend on struct net, we pass NULL to it.
+On 9/7/2023 1:41 PM, Si-Wei Liu wrote:
 > 
-> It's not clear to me why we can infer the above. Possibly would be more
-> safe to skip entirely the __ip_options_compile() call?!?
+> Hi David,
 > 
-> Please at least clarify the changelog and trim it to 72 chars.�
+> Why this patch doesn't get picked in the last 4 months? Maybe the
+> subject is not clear, but this is an iproute2 patch. Would it be
+> possible to merge at your earliest convenience?
 > 
-> Additionally trim the subj to the same len and include the target tree
-> (net) into the subj prefix.
-> 
-> Thanks!
-> 
-> Paolo
-> 
+> PS, adding my R-b to the patch.
 
-Hi Paolo,
+Maybe I aimed this at the wrong person?  I see that Stephen just 
+announced the latest iproute2
+https://lore.kernel.org/netdev/20230906093918.394a1b1d@hermes.local/
 
-> It's not clear to me why we can infer the above. Possibly would be more
-> safe to skip entirely the __ip_options_compile() call?!?
-Sorry, after you pointed it out, I realized that I misunderstood the
-code. Initially I thought `memset(&opt, 0, sizeof(opt));` would reset all
-the option to OPOPT_END. But after carefully reading the code, it seems
-that it only resets the io_options struct and the `optptr` is still the
-original one. 
+I probably also should have made sure that "iproute2" was in the subject 
+prefix.
 
-Do you think it is better to do:
-`struct net = skb->dev ? dev_net(skb->dev) : NULL` ?
-
-> Please at least clarify the changelog and trim it to 72 chars.�
-> 
-> Additionally trim the subj to the same len and include the target tree
-> (net) into the subj prefix.
-Sorry for that. I'm new to the Linux kernel community and I wonder whether
-I should initiate a different patch or send another patch in this thread
-in this case.
-
-Hi David,
-
-> ipv4_send_dest_unreach is called from ipv4_link_failure which might have
-> an rtable (dst_entry) which has a device which is in a net namespace.
-> That is better than blindly ignoring the namepsace.
-Following your suggestion, I drafted another patch which is attached to
-this email. I verified that the crash does not happen anymore. Can you
-please advise whether it is a correct patch?
+Hi Stephen, perhaps you can help with this?
 
 Thanks,
-Kyle Zeng
-
---TdKnvOL5LAdAXmmY
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment;
-	filename="0001-fix-null-deref-in-ipv4_link_failure.patch"
-
-From ddf42a72bd2aabc7b66529ddadd90df420a73610 Mon Sep 17 00:00:00 2001
-From: Kyle Zeng <zengyhkyle@gmail.com>
-Date: Thu, 7 Sep 2023 15:49:46 -0700
-Subject: [PATCH] fix null-deref in ipv4_link_failure
-
-Currently, we assume the skb is associated with a device before calling
-__ip_options_compile, which is not always the case if it is re-routed by
-ipvs.
-When skb->dev is NULL, dev_net(skb->dev) will become null-dereference.
-This patch adds a check for the edge case and switch to use the net_device
-from the rtable when skb->dev is NULL.
-
-Suggested-by: Paolo Abeni<pabeni@redhat.com>
-Suggested-by: David Ahern <dsahern@kernel.org>
-Signed-off-by: Kyle Zeng <zengyhkyle@gmail.com>
-Cc: Stephen Suryaputra <ssuryaextr@gmail.com>
----
- net/ipv4/route.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-index d8c99bdc617..735a491e1ff 100644
---- a/net/ipv4/route.c
-+++ b/net/ipv4/route.c
-@@ -1215,6 +1215,7 @@ static void ipv4_send_dest_unreach(struct sk_buff *skb)
- {
- 	struct ip_options opt;
- 	int res;
-+	struct net_device *dev;
- 
- 	/* Recompile ip options since IPCB may not be valid anymore.
- 	 * Also check we have a reasonable ipv4 header.
-@@ -1230,7 +1231,8 @@ static void ipv4_send_dest_unreach(struct sk_buff *skb)
- 		opt.optlen = ip_hdr(skb)->ihl * 4 - sizeof(struct iphdr);
- 
- 		rcu_read_lock();
--		res = __ip_options_compile(dev_net(skb->dev), &opt, skb, NULL);
-+		dev = skb->dev ? skb->dev : skb_rtable(skb)->dst.dev;
-+		res = __ip_options_compile(dev_net(net), &opt, skb, NULL);
- 		rcu_read_unlock();
- 
- 		if (res)
--- 
-2.34.1
+sln
 
 
---TdKnvOL5LAdAXmmY--
+> 
+> Thanks,
+> -Siwei
+> 
+> 
+> On Sat, May 13, 2023 at 12:42 AM Shannon Nelson <shannon.nelson@amd.com>
+> wrote:
+>  >
+>  > From: Allen Hubbe <allen.hubbe@amd.com>
+>  >
+>  > Consume the parameter to device_features when parsing command line
+>  > options.  Otherwise the parameter may be used again as an option name.
+>  >
+>  >  # vdpa dev add ... device_features 0xdeadbeef mac 00:11:22:33:44:55
+>  >  Unknown option "0xdeadbeef"
+>  >
+>  > Fixes: a4442ce58ebb ("vdpa: allow provisioning device features")
+>  > Signed-off-by: Allen Hubbe <allen.hubbe@amd.com>
+>  > Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
+> 
+> Reviewed-by: Si-Wei Liu <si-wei.liu@oracle.com>
+> 
+>  > ---
+>  >  vdpa/vdpa.c | 2 ++
+>  >  1 file changed, 2 insertions(+)
+>  >
+>  > diff --git a/vdpa/vdpa.c b/vdpa/vdpa.c
+>  > index 27647d73d498..8a2fca8647b6 100644
+>  > --- a/vdpa/vdpa.c
+>  > +++ b/vdpa/vdpa.c
+>  > @@ -353,6 +353,8 @@ static int vdpa_argv_parse(struct vdpa *vdpa, int
+> argc, char **argv,
+>  > &opts->device_features);
+>  >                         if (err)
+>  >                                 return err;
+>  > +
+>  > +                       NEXT_ARG_FWD();
+>  >                         o_found |= VDPA_OPT_VDEV_FEATURES;
+>  >                 } else {
+>  >                         fprintf(stderr, "Unknown option \"%s\"\n",
+> *argv);
+>  > --
+>  > 2.17.1
+>  >
+> 
 
