@@ -1,121 +1,85 @@
-Return-Path: <netdev+bounces-32361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6A25796F6C
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 05:54:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33AA2796F74
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 06:00:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E74D01C20A05
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 03:54:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F4632814F8
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 04:00:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0173CEC6;
-	Thu,  7 Sep 2023 03:54:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98E37EC6;
+	Thu,  7 Sep 2023 04:00:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E89EA9
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 03:54:18 +0000 (UTC)
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB75811B
-	for <netdev@vger.kernel.org>; Wed,  6 Sep 2023 20:54:16 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2b9c907bc68so8682561fa.2
-        for <netdev@vger.kernel.org>; Wed, 06 Sep 2023 20:54:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694058855; x=1694663655; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=g6VgDm0nScbT3j0XrwP0EdvXq7ohJK6jgdKHy8P6PSk=;
-        b=iH4NfCHbflEFEybtpedWHWK8MZrzsl55cUdZfmFNbXoNgcJM6VJqyeqN16TKPed9CP
-         m+Cj+9ckJmeLeagec8yHOHi5Vplc/zNRrBKQCrGNcZdOAba7qNI6pi/sqeOuFShQp/Ba
-         ney4TaiTDLwKLLqCcJnNM+kSJrKDFZASzg9/A9nfgPcpHyRI2d059SA1dM12xWTKRRyx
-         dWaefxPg+2wbOpuqBkE9rDXCIm5Rirns3mpTOxsDVCcufSJ3ZFyiplwvqZZFeBT8rkok
-         ueMYZMe91YzMedpgOHl1uwn2MGLhn6pFJKt4aQNRvLvIQm74XGDbGbnp/JFwcmNmd1lq
-         S9Kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1694058855; x=1694663655;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=g6VgDm0nScbT3j0XrwP0EdvXq7ohJK6jgdKHy8P6PSk=;
-        b=FRINmVqLCTCR+ffdzUF1bwy+99TtrPvxsJESHqViseX4Rz3ymrDBUQdEqbcLLO/KBc
-         QlnJUupxGakZ09fUHfln8UZE8PWxtRXXlW3C6k2i7K3qYi5hRBrdt00eALftO10Jztdn
-         k3fnh9NiVb0eOBmMCQIZERL9YwQ6ooHJOccTn8r12phxSh9k2SaFjvrQUtEcd+pEOteQ
-         oQ5acplYJW7rnVe0SNSkomb5gNpsUli5K1PhRC3ckTzlNMckYiX1239cPYMHPz1A3/Cd
-         oW47l6gRJeg1Q/oQhT0ehiZjNcLuFsZJgTzeoV2/SC3NmHscSKL7bJEN7PtHmo7di844
-         BbcQ==
-X-Gm-Message-State: AOJu0YxWb1+8INfvNdfeCTSkwwl8TCUZBuDmaWGf4vGMMuqmQ+jd7fHr
-	n6LsLyC6lt46AXNAcc+L6Q1aakn1XTEJMcDiQ0X7uV/+T8hE1Q==
-X-Google-Smtp-Source: AGHT+IHdeR7atgzR+UsfKT5dLQVfJattYnUGzCmHEe/mBY814NXBmI+rD66LowNAy14CTt/wyYU8W8PyesZm1VQbgjc=
-X-Received: by 2002:a05:651c:21b:b0:2b9:e230:25ce with SMTP id
- y27-20020a05651c021b00b002b9e23025cemr3768083ljn.12.1694058854617; Wed, 06
- Sep 2023 20:54:14 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C0E3EA9
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 04:00:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8E174C433C9;
+	Thu,  7 Sep 2023 04:00:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694059222;
+	bh=NADXZdSMWL5mBGyP7H8DbhP5et9pbjydx3mogHSjfZI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ixWBjpyOyL/fidDlAQKwflDQv21LcuaSMop0UKFV52oSpjYN8zS5AhfFyJmjmwzxQ
+	 Yq+tmDRnRKZGNaGju/3wKfMzM8oIxAuJzLAF0rGadBbsDQHdpW7nv8nnSDgZSY4BG/
+	 O5RIAC0a5JgbwNzt70mwHm1z/OaYQqCFhS0Leyo0mTKh36iYYEn4sFCIvbfYEsNzCd
+	 8fXFIy7rXmOEyJ3uBlg0IhN8sWroq0qqoUAK6fZNKKoCe2Xkjfw4a+T5mILF1oifq1
+	 ZvPQFAcDh3wgO29lA4W1wL/7tuy4vAlC/22wv9rdAxikik04jVTE8PsJGL6gc72O69
+	 jGAhQHfQI/bsA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 70768E22AFC;
+	Thu,  7 Sep 2023 04:00:22 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230906103508.6789-1-liangchen.linux@gmail.com> <ZPj98UXjJdsEsVJQ@d3>
-In-Reply-To: <ZPj98UXjJdsEsVJQ@d3>
-From: Liang Chen <liangchen.linux@gmail.com>
-Date: Thu, 7 Sep 2023 11:54:02 +0800
-Message-ID: <CAKhg4tL+stODiv8hG0YWmU8zCKR4CsDOEvv7XD-S9PMdas5i_w@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next] pktgen: Introducing a parameter for
- non-shared skb testing
-To: Benjamin Poirier <benjamin.poirier@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [net v4] net: phy: Provide Module 4 KSZ9477 errata (DS80000754C)
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169405922245.5293.2774617542441865085.git-patchwork-notify@kernel.org>
+Date: Thu, 07 Sep 2023 04:00:22 +0000
+References: <20230905093315.784052-1-lukma@denx.de>
+In-Reply-To: <20230905093315.784052-1-lukma@denx.de>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Tristram.Ha@microchip.com, edumazet@google.com, andrew@lunn.ch,
+ davem@davemloft.net, woojung.huh@microchip.com, olteanv@gmail.com,
+ o.rempel@pengutronix.de, f.fainelli@gmail.com, kuba@kernel.org,
+ pabeni@redhat.com, UNGLinuxDriver@microchip.com, linux@armlinux.org.uk,
+ hkallweit1@gmail.com, michael@walle.cc, horatiu.vultur@microchip.com,
+ arun.ramadoss@microchip.com, linux@rempel-privat.de, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-On Thu, Sep 7, 2023 at 6:32=E2=80=AFAM Benjamin Poirier
-<benjamin.poirier@gmail.com> wrote:
->
-> On 2023-09-06 18:35 +0800, Liang Chen wrote:
-> > Currently, skbs generated by pktgen always have their reference count
-> > incremented before transmission, leading to two issues:
-> >   1. Only the code paths for shared skbs can be tested.
-> >   2. Skbs can only be released by pktgen.
-> > To enhance testing comprehensiveness, introducing the "skb_single_user"
-> > parameter, which allows skbs with a reference count of 1 to be
-> > transmitted. So we can test non-shared skbs and code paths where skbs
-> > are released within the network stack.
->
-> If my understanding of the code is correct, pktgen operates in the same
-> way with parameter clone_skb =3D 0 and clone_skb =3D 1.
->
+Hello:
 
-Yeah. pktgen seems to treat user count of 2 as not shared, as long as
-the skb is not reused for burst or clone_skb. In that case the only
-thing left to do with the skb is to check if user count is
-decremented.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> clone_skb =3D 0 is already meant to work on devices that don't support
-> shared skbs (see IFF_TX_SKB_SHARING check in pktgen_if_write()). Instead
-> of introducing a new option for your purpose, how about changing
-> pktgen_xmit() to send "not shared" skbs when clone_skb =3D=3D 0?
->
+On Tue,  5 Sep 2023 11:33:15 +0200 you wrote:
+> The KSZ9477 errata points out (in 'Module 4') the link up/down problems
+> when EEE (Energy Efficient Ethernet) is enabled in the device to which
+> the KSZ9477 tries to auto negotiate.
+> 
+> The suggested workaround is to clear advertisement of EEE for PHYs in
+> this chip driver.
+> 
+> [...]
 
-Using clone_skb =3D 0 to enforce non-sharing makes sense to me. However,
-we are a bit concerned that such a change would affect existing users
-who have been assuming the current behavior.
+Here is the summary with links:
+  - [net,v4] net: phy: Provide Module 4 KSZ9477 errata (DS80000754C)
+    https://git.kernel.org/netdev/net/c/08c6d8bae48c
 
-> Note that for devices without IFF_TX_SKB_SHARING, it would no longer be
-> possible to have pktgen free skbs. Is that important?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-It seems that only the "count" capability depends on that. In fact,
-this patch is attempting to allow skb release within the network stack
-when possible. BTW, to strictly obey the IFF_TX_SKB_SHARING flag,
-perhaps the "count" capability can be implemented by supplying a
-destructor to skbs.
+
 
