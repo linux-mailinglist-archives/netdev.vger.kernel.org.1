@@ -1,53 +1,56 @@
-Return-Path: <netdev+bounces-32646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EC42798E08
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 20:26:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5C62798E09
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 20:27:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B701B281D6F
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 18:26:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F6601C20D27
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 18:27:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AC8415ADF;
-	Fri,  8 Sep 2023 18:18:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED18215495;
+	Fri,  8 Sep 2023 18:18:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD0BA16406
-	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 18:18:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A01FC43140;
-	Fri,  8 Sep 2023 18:18:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1775E14F9F
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 18:18:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CF6FC116B0;
+	Fri,  8 Sep 2023 18:18:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694197123;
-	bh=5IUt5jOw0j/GAMErOaqocmM4IXD72TvXgoHe9eInHFk=;
+	s=k20201202; t=1694197134;
+	bh=ABid5GLF7TJKWdBPD1jaCbioZ38+N5u7J50pbD5GxJg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=J7R5Ump92ahHhk8v4HdJdTKKiI7WijaU2+P+K9LY65V+3Hlluk4xD6qha4KYFB2WS
-	 pOwxmeGYstHV4F3Gm5cWF5qbZmEvmzfGiT71lozBozZtzbBFe4Vm1WeXT/dHfE4kYx
-	 t6BhMKv6E2zgD68yv32LcJL9mfT1h765xdVZVIgZRSt+Rj1v1XdoMvfBgOhmvDXGi3
-	 5MnXd8dCw9/lyLRmrsNMwXRwtqN4dxQkK7Vholfvj91GKcr4miPOfP2i+H72IsPbz7
-	 wBYWVTpvk02k5Q4uLHO0f+DWae4oVFUAqLYd2Iu97IBodarZQoHHPfLn/tM3CeNPEX
-	 UwwRaS6Jqdjeg==
+	b=msM3V68GOHpvigDx3r/cvgJ6088gMDg66QLmKa/ud6Ydn6hLPBPk2UJqvLS1DVO/h
+	 OIlyrspSzG7NLOQj57/E2ZKmqx5FWkRyRgYySBKGH+q0ClRYUXdP9uNp753CAaenNQ
+	 TFV+QTG4e/Tr4L7/jUTllvdUNnltHuouYTrflOgPRC/PFf/JxycwBpjXHMlc04ThrI
+	 Y2i+t4Ol1K2XnTsd9ATVKyFFbY/KdB4n31eURwN+5F85XOcTYWEPWFBPrjIeqQZx5C
+	 n6YpqUvgVn3LIkJXa2VDTjOhjrvmiEvudRldC6djyUxLG4LNDjOB9UDm7bI4P5zVuc
+	 TwfcBuOBj/LFA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: xu xin <xu.xin16@zte.com.cn>,
-	Yang Yang <yang.yang29@zte.com.cn>,
-	Si Hao <si.hao@zte.com.cn>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Eric Dumazet <edumazet@google.com>,
+	syzbot <syzkaller@googlegroups.com>,
+	Simon Horman <horms@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
+	kuba@kernel.org,
 	pabeni@redhat.com,
+	keescook@chromium.org,
+	anjali.k.kulkarni@oracle.com,
+	pctammela@mojatatu.com,
+	Jason@zx2c4.com,
+	kuniyu@amazon.com,
+	Liam.Howlett@oracle.com,
+	fw@strlen.de,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 12/26] net/ipv4: return the real errno instead of -EINVAL
-Date: Fri,  8 Sep 2023 14:17:50 -0400
-Message-Id: <20230908181806.3460164-12-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 15/26] netlink: convert nlk->flags to atomic flags
+Date: Fri,  8 Sep 2023 14:17:53 -0400
+Message-Id: <20230908181806.3460164-15-sashal@kernel.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230908181806.3460164-1-sashal@kernel.org>
 References: <20230908181806.3460164-1-sashal@kernel.org>
@@ -62,45 +65,349 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.1.52
 Content-Transfer-Encoding: 8bit
 
-From: xu xin <xu.xin16@zte.com.cn>
+From: Eric Dumazet <edumazet@google.com>
 
-[ Upstream commit c67180efc507e04a87f22aa68bd7dd832db006b7 ]
+[ Upstream commit 8fe08d70a2b61b35a0a1235c78cf321e7528351f ]
 
-For now, No matter what error pointer ip_neigh_for_gw() returns,
-ip_finish_output2() always return -EINVAL, which may mislead the upper
-users.
+sk_diag_put_flags(), netlink_setsockopt(), netlink_getsockopt()
+and others use nlk->flags without correct locking.
 
-For exemple, an application uses sendto to send an UDP packet, but when the
-neighbor table overflows, sendto() will get a value of -EINVAL, and it will
-cause users to waste a lot of time checking parameters for errors.
+Use set_bit(), clear_bit(), test_bit(), assign_bit() to remove
+data-races.
 
-Return the real errno instead of -EINVAL.
-
-Signed-off-by: xu xin <xu.xin16@zte.com.cn>
-Reviewed-by: Yang Yang <yang.yang29@zte.com.cn>
-Cc: Si Hao <si.hao@zte.com.cn>
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Link: https://lore.kernel.org/r/20230807015408.248237-1-xu.xin16@zte.com.cn
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/ipv4/ip_output.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/netlink/af_netlink.c | 90 ++++++++++++++--------------------------
+ net/netlink/af_netlink.h | 22 ++++++----
+ net/netlink/diag.c       | 10 ++---
+ 3 files changed, 48 insertions(+), 74 deletions(-)
 
-diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-index acfe58d2f1dd7..831c627e03ff8 100644
---- a/net/ipv4/ip_output.c
-+++ b/net/ipv4/ip_output.c
-@@ -234,7 +234,7 @@ static int ip_finish_output2(struct net *net, struct sock *sk, struct sk_buff *s
- 	net_dbg_ratelimited("%s: No header cache and no neighbour!\n",
- 			    __func__);
- 	kfree_skb_reason(skb, SKB_DROP_REASON_NEIGH_CREATEFAIL);
--	return -EINVAL;
-+	return PTR_ERR(neigh);
+diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
+index ed123cf462afe..387e430a35ccc 100644
+--- a/net/netlink/af_netlink.c
++++ b/net/netlink/af_netlink.c
+@@ -84,7 +84,7 @@ struct listeners {
+ 
+ static inline int netlink_is_kernel(struct sock *sk)
+ {
+-	return nlk_sk(sk)->flags & NETLINK_F_KERNEL_SOCKET;
++	return nlk_test_bit(KERNEL_SOCKET, sk);
  }
  
- static int ip_finish_output_gso(struct net *net, struct sock *sk,
+ struct netlink_table *nl_table __read_mostly;
+@@ -349,9 +349,7 @@ static void netlink_deliver_tap_kernel(struct sock *dst, struct sock *src,
+ 
+ static void netlink_overrun(struct sock *sk)
+ {
+-	struct netlink_sock *nlk = nlk_sk(sk);
+-
+-	if (!(nlk->flags & NETLINK_F_RECV_NO_ENOBUFS)) {
++	if (!nlk_test_bit(RECV_NO_ENOBUFS, sk)) {
+ 		if (!test_and_set_bit(NETLINK_S_CONGESTED,
+ 				      &nlk_sk(sk)->state)) {
+ 			sk->sk_err = ENOBUFS;
+@@ -1391,9 +1389,7 @@ EXPORT_SYMBOL_GPL(netlink_has_listeners);
+ 
+ bool netlink_strict_get_check(struct sk_buff *skb)
+ {
+-	const struct netlink_sock *nlk = nlk_sk(NETLINK_CB(skb).sk);
+-
+-	return nlk->flags & NETLINK_F_STRICT_CHK;
++	return nlk_test_bit(STRICT_CHK, NETLINK_CB(skb).sk);
+ }
+ EXPORT_SYMBOL_GPL(netlink_strict_get_check);
+ 
+@@ -1437,7 +1433,7 @@ static void do_one_broadcast(struct sock *sk,
+ 		return;
+ 
+ 	if (!net_eq(sock_net(sk), p->net)) {
+-		if (!(nlk->flags & NETLINK_F_LISTEN_ALL_NSID))
++		if (!nlk_test_bit(LISTEN_ALL_NSID, sk))
+ 			return;
+ 
+ 		if (!peernet_has_id(sock_net(sk), p->net))
+@@ -1470,7 +1466,7 @@ static void do_one_broadcast(struct sock *sk,
+ 		netlink_overrun(sk);
+ 		/* Clone failed. Notify ALL listeners. */
+ 		p->failure = 1;
+-		if (nlk->flags & NETLINK_F_BROADCAST_SEND_ERROR)
++		if (nlk_test_bit(BROADCAST_SEND_ERROR, sk))
+ 			p->delivery_failure = 1;
+ 		goto out;
+ 	}
+@@ -1485,7 +1481,7 @@ static void do_one_broadcast(struct sock *sk,
+ 	val = netlink_broadcast_deliver(sk, p->skb2);
+ 	if (val < 0) {
+ 		netlink_overrun(sk);
+-		if (nlk->flags & NETLINK_F_BROADCAST_SEND_ERROR)
++		if (nlk_test_bit(BROADCAST_SEND_ERROR, sk))
+ 			p->delivery_failure = 1;
+ 	} else {
+ 		p->congested |= val;
+@@ -1565,7 +1561,7 @@ static int do_one_set_err(struct sock *sk, struct netlink_set_err_data *p)
+ 	    !test_bit(p->group - 1, nlk->groups))
+ 		goto out;
+ 
+-	if (p->code == ENOBUFS && nlk->flags & NETLINK_F_RECV_NO_ENOBUFS) {
++	if (p->code == ENOBUFS && nlk_test_bit(RECV_NO_ENOBUFS, sk)) {
+ 		ret = 1;
+ 		goto out;
+ 	}
+@@ -1632,7 +1628,7 @@ static int netlink_setsockopt(struct socket *sock, int level, int optname,
+ 	struct sock *sk = sock->sk;
+ 	struct netlink_sock *nlk = nlk_sk(sk);
+ 	unsigned int val = 0;
+-	int err;
++	int nr = -1;
+ 
+ 	if (level != SOL_NETLINK)
+ 		return -ENOPROTOOPT;
+@@ -1643,14 +1639,12 @@ static int netlink_setsockopt(struct socket *sock, int level, int optname,
+ 
+ 	switch (optname) {
+ 	case NETLINK_PKTINFO:
+-		if (val)
+-			nlk->flags |= NETLINK_F_RECV_PKTINFO;
+-		else
+-			nlk->flags &= ~NETLINK_F_RECV_PKTINFO;
+-		err = 0;
++		nr = NETLINK_F_RECV_PKTINFO;
+ 		break;
+ 	case NETLINK_ADD_MEMBERSHIP:
+ 	case NETLINK_DROP_MEMBERSHIP: {
++		int err;
++
+ 		if (!netlink_allowed(sock, NL_CFG_F_NONROOT_RECV))
+ 			return -EPERM;
+ 		err = netlink_realloc_groups(sk);
+@@ -1670,61 +1664,38 @@ static int netlink_setsockopt(struct socket *sock, int level, int optname,
+ 		if (optname == NETLINK_DROP_MEMBERSHIP && nlk->netlink_unbind)
+ 			nlk->netlink_unbind(sock_net(sk), val);
+ 
+-		err = 0;
+ 		break;
+ 	}
+ 	case NETLINK_BROADCAST_ERROR:
+-		if (val)
+-			nlk->flags |= NETLINK_F_BROADCAST_SEND_ERROR;
+-		else
+-			nlk->flags &= ~NETLINK_F_BROADCAST_SEND_ERROR;
+-		err = 0;
++		nr = NETLINK_F_BROADCAST_SEND_ERROR;
+ 		break;
+ 	case NETLINK_NO_ENOBUFS:
++		assign_bit(NETLINK_F_RECV_NO_ENOBUFS, &nlk->flags, val);
+ 		if (val) {
+-			nlk->flags |= NETLINK_F_RECV_NO_ENOBUFS;
+ 			clear_bit(NETLINK_S_CONGESTED, &nlk->state);
+ 			wake_up_interruptible(&nlk->wait);
+-		} else {
+-			nlk->flags &= ~NETLINK_F_RECV_NO_ENOBUFS;
+ 		}
+-		err = 0;
+ 		break;
+ 	case NETLINK_LISTEN_ALL_NSID:
+ 		if (!ns_capable(sock_net(sk)->user_ns, CAP_NET_BROADCAST))
+ 			return -EPERM;
+-
+-		if (val)
+-			nlk->flags |= NETLINK_F_LISTEN_ALL_NSID;
+-		else
+-			nlk->flags &= ~NETLINK_F_LISTEN_ALL_NSID;
+-		err = 0;
++		nr = NETLINK_F_LISTEN_ALL_NSID;
+ 		break;
+ 	case NETLINK_CAP_ACK:
+-		if (val)
+-			nlk->flags |= NETLINK_F_CAP_ACK;
+-		else
+-			nlk->flags &= ~NETLINK_F_CAP_ACK;
+-		err = 0;
++		nr = NETLINK_F_CAP_ACK;
+ 		break;
+ 	case NETLINK_EXT_ACK:
+-		if (val)
+-			nlk->flags |= NETLINK_F_EXT_ACK;
+-		else
+-			nlk->flags &= ~NETLINK_F_EXT_ACK;
+-		err = 0;
++		nr = NETLINK_F_EXT_ACK;
+ 		break;
+ 	case NETLINK_GET_STRICT_CHK:
+-		if (val)
+-			nlk->flags |= NETLINK_F_STRICT_CHK;
+-		else
+-			nlk->flags &= ~NETLINK_F_STRICT_CHK;
+-		err = 0;
++		nr = NETLINK_F_STRICT_CHK;
+ 		break;
+ 	default:
+-		err = -ENOPROTOOPT;
++		return -ENOPROTOOPT;
+ 	}
+-	return err;
++	if (nr >= 0)
++		assign_bit(nr, &nlk->flags, val);
++	return 0;
+ }
+ 
+ static int netlink_getsockopt(struct socket *sock, int level, int optname,
+@@ -1791,7 +1762,7 @@ static int netlink_getsockopt(struct socket *sock, int level, int optname,
+ 		return -EINVAL;
+ 
+ 	len = sizeof(int);
+-	val = nlk->flags & flag ? 1 : 0;
++	val = test_bit(flag, &nlk->flags);
+ 
+ 	if (put_user(len, optlen) ||
+ 	    copy_to_user(optval, &val, len))
+@@ -1968,9 +1939,9 @@ static int netlink_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+ 		msg->msg_namelen = sizeof(*addr);
+ 	}
+ 
+-	if (nlk->flags & NETLINK_F_RECV_PKTINFO)
++	if (nlk_test_bit(RECV_PKTINFO, sk))
+ 		netlink_cmsg_recv_pktinfo(msg, skb);
+-	if (nlk->flags & NETLINK_F_LISTEN_ALL_NSID)
++	if (nlk_test_bit(LISTEN_ALL_NSID, sk))
+ 		netlink_cmsg_listen_all_nsid(sk, msg, skb);
+ 
+ 	memset(&scm, 0, sizeof(scm));
+@@ -2047,7 +2018,7 @@ __netlink_kernel_create(struct net *net, int unit, struct module *module,
+ 		goto out_sock_release;
+ 
+ 	nlk = nlk_sk(sk);
+-	nlk->flags |= NETLINK_F_KERNEL_SOCKET;
++	set_bit(NETLINK_F_KERNEL_SOCKET, &nlk->flags);
+ 
+ 	netlink_table_grab();
+ 	if (!nl_table[unit].registered) {
+@@ -2183,7 +2154,7 @@ static int netlink_dump_done(struct netlink_sock *nlk, struct sk_buff *skb,
+ 	nl_dump_check_consistent(cb, nlh);
+ 	memcpy(nlmsg_data(nlh), &nlk->dump_done_errno, sizeof(nlk->dump_done_errno));
+ 
+-	if (extack->_msg && nlk->flags & NETLINK_F_EXT_ACK) {
++	if (extack->_msg && test_bit(NETLINK_F_EXT_ACK, &nlk->flags)) {
+ 		nlh->nlmsg_flags |= NLM_F_ACK_TLVS;
+ 		if (!nla_put_string(skb, NLMSGERR_ATTR_MSG, extack->_msg))
+ 			nlmsg_end(skb, nlh);
+@@ -2312,8 +2283,8 @@ int __netlink_dump_start(struct sock *ssk, struct sk_buff *skb,
+ 			 const struct nlmsghdr *nlh,
+ 			 struct netlink_dump_control *control)
+ {
+-	struct netlink_sock *nlk, *nlk2;
+ 	struct netlink_callback *cb;
++	struct netlink_sock *nlk;
+ 	struct sock *sk;
+ 	int ret;
+ 
+@@ -2348,8 +2319,7 @@ int __netlink_dump_start(struct sock *ssk, struct sk_buff *skb,
+ 	cb->min_dump_alloc = control->min_dump_alloc;
+ 	cb->skb = skb;
+ 
+-	nlk2 = nlk_sk(NETLINK_CB(skb).sk);
+-	cb->strict_check = !!(nlk2->flags & NETLINK_F_STRICT_CHK);
++	cb->strict_check = nlk_test_bit(STRICT_CHK, NETLINK_CB(skb).sk);
+ 
+ 	if (control->start) {
+ 		ret = control->start(cb);
+@@ -2391,7 +2361,7 @@ netlink_ack_tlv_len(struct netlink_sock *nlk, int err,
+ {
+ 	size_t tlvlen;
+ 
+-	if (!extack || !(nlk->flags & NETLINK_F_EXT_ACK))
++	if (!extack || !test_bit(NETLINK_F_EXT_ACK, &nlk->flags))
+ 		return 0;
+ 
+ 	tlvlen = 0;
+@@ -2463,7 +2433,7 @@ void netlink_ack(struct sk_buff *in_skb, struct nlmsghdr *nlh, int err,
+ 	 * requests to cap the error message, and get extra error data if
+ 	 * requested.
+ 	 */
+-	if (err && !(nlk->flags & NETLINK_F_CAP_ACK))
++	if (err && !test_bit(NETLINK_F_CAP_ACK, &nlk->flags))
+ 		payload += nlmsg_len(nlh);
+ 	else
+ 		flags |= NLM_F_CAPPED;
+diff --git a/net/netlink/af_netlink.h b/net/netlink/af_netlink.h
+index 5f454c8de6a4d..b30b8fc760f71 100644
+--- a/net/netlink/af_netlink.h
++++ b/net/netlink/af_netlink.h
+@@ -8,14 +8,16 @@
+ #include <net/sock.h>
+ 
+ /* flags */
+-#define NETLINK_F_KERNEL_SOCKET		0x1
+-#define NETLINK_F_RECV_PKTINFO		0x2
+-#define NETLINK_F_BROADCAST_SEND_ERROR	0x4
+-#define NETLINK_F_RECV_NO_ENOBUFS	0x8
+-#define NETLINK_F_LISTEN_ALL_NSID	0x10
+-#define NETLINK_F_CAP_ACK		0x20
+-#define NETLINK_F_EXT_ACK		0x40
+-#define NETLINK_F_STRICT_CHK		0x80
++enum {
++	NETLINK_F_KERNEL_SOCKET,
++	NETLINK_F_RECV_PKTINFO,
++	NETLINK_F_BROADCAST_SEND_ERROR,
++	NETLINK_F_RECV_NO_ENOBUFS,
++	NETLINK_F_LISTEN_ALL_NSID,
++	NETLINK_F_CAP_ACK,
++	NETLINK_F_EXT_ACK,
++	NETLINK_F_STRICT_CHK,
++};
+ 
+ #define NLGRPSZ(x)	(ALIGN(x, sizeof(unsigned long) * 8) / 8)
+ #define NLGRPLONGS(x)	(NLGRPSZ(x)/sizeof(unsigned long))
+@@ -23,10 +25,10 @@
+ struct netlink_sock {
+ 	/* struct sock has to be the first member of netlink_sock */
+ 	struct sock		sk;
++	unsigned long		flags;
+ 	u32			portid;
+ 	u32			dst_portid;
+ 	u32			dst_group;
+-	u32			flags;
+ 	u32			subscriptions;
+ 	u32			ngroups;
+ 	unsigned long		*groups;
+@@ -54,6 +56,8 @@ static inline struct netlink_sock *nlk_sk(struct sock *sk)
+ 	return container_of(sk, struct netlink_sock, sk);
+ }
+ 
++#define nlk_test_bit(nr, sk) test_bit(NETLINK_F_##nr, &nlk_sk(sk)->flags)
++
+ struct netlink_table {
+ 	struct rhashtable	hash;
+ 	struct hlist_head	mc_list;
+diff --git a/net/netlink/diag.c b/net/netlink/diag.c
+index e4f21b1067bcc..9c4f231be2757 100644
+--- a/net/netlink/diag.c
++++ b/net/netlink/diag.c
+@@ -27,15 +27,15 @@ static int sk_diag_put_flags(struct sock *sk, struct sk_buff *skb)
+ 
+ 	if (nlk->cb_running)
+ 		flags |= NDIAG_FLAG_CB_RUNNING;
+-	if (nlk->flags & NETLINK_F_RECV_PKTINFO)
++	if (nlk_test_bit(RECV_PKTINFO, sk))
+ 		flags |= NDIAG_FLAG_PKTINFO;
+-	if (nlk->flags & NETLINK_F_BROADCAST_SEND_ERROR)
++	if (nlk_test_bit(BROADCAST_SEND_ERROR, sk))
+ 		flags |= NDIAG_FLAG_BROADCAST_ERROR;
+-	if (nlk->flags & NETLINK_F_RECV_NO_ENOBUFS)
++	if (nlk_test_bit(RECV_NO_ENOBUFS, sk))
+ 		flags |= NDIAG_FLAG_NO_ENOBUFS;
+-	if (nlk->flags & NETLINK_F_LISTEN_ALL_NSID)
++	if (nlk_test_bit(LISTEN_ALL_NSID, sk))
+ 		flags |= NDIAG_FLAG_LISTEN_ALL_NSID;
+-	if (nlk->flags & NETLINK_F_CAP_ACK)
++	if (nlk_test_bit(CAP_ACK, sk))
+ 		flags |= NDIAG_FLAG_CAP_ACK;
+ 
+ 	return nla_put_u32(skb, NETLINK_DIAG_FLAGS, flags);
 -- 
 2.40.1
 
