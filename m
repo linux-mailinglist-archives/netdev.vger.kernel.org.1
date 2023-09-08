@@ -1,336 +1,180 @@
-Return-Path: <netdev+bounces-32494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BACC797FE9
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 02:57:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C42B7797FF1
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 03:01:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78FD928195B
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 00:56:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0E5828196F
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 01:01:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBD2DA4C;
-	Fri,  8 Sep 2023 00:56:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58A53A3D;
+	Fri,  8 Sep 2023 01:01:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAE46628;
-	Fri,  8 Sep 2023 00:56:56 +0000 (UTC)
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D89C51BD3;
-	Thu,  7 Sep 2023 17:56:52 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Rhd3g4RDsz4f3lgK;
-	Fri,  8 Sep 2023 08:56:47 +0800 (CST)
-Received: from [10.174.176.117] (unknown [10.174.176.117])
-	by APP2 (Coremail) with SMTP id Syh0CgAHcmZPcfpkSBNtCg--.51986S2;
-	Fri, 08 Sep 2023 08:56:49 +0800 (CST)
-Subject: Re: Possible deadlock in bpf queue map
-To: =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?= <toke@kernel.org>,
- Kumar Kartikeya Dwivedi <memxor@gmail.com>
-Cc: Hsin-Wei Hung <hsinweih@uci.edu>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <kafai@fb.com>, Song Liu <songliubraving@fb.com>,
- Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>,
- KP Singh <kpsingh@kernel.org>, netdev@vger.kernel.org, bpf@vger.kernel.org,
- Arnaldo Carvalho de Melo <acme@kernel.org>
-References: <CABcoxUbYwuZUL-xm1+5juO42nJMgpQX7cNyQELYz+g2XkZi9TQ@mail.gmail.com>
- <87o7ienuss.fsf@toke.dk>
- <CAP01T76Ce2KHQqTGsqs5K9RM5qSv07rNxnV+-=q_J25i9NkqxA@mail.gmail.com>
- <87fs3qnnh4.fsf@toke.dk>
-From: Hou Tao <houtao@huaweicloud.com>
-Message-ID: <71a03505-6ec4-8f1d-09c6-fff78f4880d0@huaweicloud.com>
-Date: Fri, 8 Sep 2023 08:56:47 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E1FA628
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 01:01:13 +0000 (UTC)
+Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15CF81BCD;
+	Thu,  7 Sep 2023 18:01:12 -0700 (PDT)
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+	by mailout.nyi.internal (Postfix) with ESMTP id E4DD25C01BA;
+	Thu,  7 Sep 2023 21:01:08 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute1.internal (MEProxy); Thu, 07 Sep 2023 21:01:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jcline.org; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:sender
+	:subject:subject:to:to; s=fm1; t=1694134868; x=1694221268; bh=mq
+	UbAARvEzLFdOXXw6WmrK9ZPi5BZyESCJj+vsEamq8=; b=BJoUUIYEy5JlLjPwOp
+	KaNhJ4wM6/Je4U444aRSSKz/2ibisXqR5exso9IjGRcAZqZr0qFHRNU3lWru5Uuy
+	fluuXUoXpvUyA8KIS0YmB5HIHB5xv4lCoFE6viVsXqH7zHN/BsRUizyXL27Alem8
+	6H52NDuMNrJqiuZ4hT9j/f1f7HlcO8A1sSFvXNXUQaTD+FadpM5zhO/IBroFp4P8
+	XLyQ7OOObFHsAsXh52t2xtNJY+l840Nv+VRR2A0N1NRECtPN8qbW7o9Q0ZYjUHnL
+	Z5QJe3UYkeJdD8demUvaHXoRIOEfkGSNbE8IBgRhFhecFSEjzau1xqKX20tpEgYv
+	ulWQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm1; t=1694134868; x=1694221268; bh=mqUbAARvEzLFd
+	OXXw6WmrK9ZPi5BZyESCJj+vsEamq8=; b=r1ugy3ZDH0yy5uj+DpTq/B3Ujqi/9
+	nWRAl50p6vZgKmZ8ZZKl3SrGOU3NSG6ohf+HXTpA6Itt2qq2CDA5zO4EP/fChno7
+	Khmol+b4btIF5BwpHJx7+fH1hOyVOrtiuuvWOh1dbFFBYsJbAySOTYevdR9Yd9tA
+	ktrARV8yfMNnXaf9OywEonH287K9TLZnP1YjpvGLbRhIwRuSBwiWpUoDZtAiDc3p
+	wOY/y1VBWF4jWnP6tfcFL7+5z8J/egS1sb6SWYaBJB/NJZ6LBbsD1+KQ9K8Vi/wG
+	Nl5xohop6FrwJWSAAfNYXUK1+510N5HuM6M2dKjBiNn79JoEV9siwdv/g==
+X-ME-Sender: <xms:VHL6ZHzHwPyPwVLO5I7FNbWnH1MdDvaIPRfCfhTcCUvfclBzsDyxvg>
+    <xme:VHL6ZPRzlIfuygLYDrHAMalFkT0hRz0QXrNo6-AdtKy22nIwVGIkMXMBXw_r8DXCd
+    1F2fsS_E2O8qHjevH4>
+X-ME-Received: <xmr:VHL6ZBXvso7G3Jdhhx7fPAL9ene7sGXgcfG1DeuPL0CHmcaW7i-Bz8U6hqv4Dd4U-wX7TCidq52zN7bSkZrKqw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrudehiedggeefucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomheplfgvrhgv
+    mhihucevlhhinhgvuceojhgvrhgvmhihsehjtghlihhnvgdrohhrgheqnecuggftrfgrth
+    htvghrnhephfefjeejueelueevveelvdehffeufeffvdejkeevteekieduudeludevgeeu
+    vdeinecuffhomhgrihhnpehshiiikhgrlhhlvghrrdgrphhpshhpohhtrdgtohhmnecuve
+    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepjhgvrhgvmhih
+    sehjtghlihhnvgdrohhrgh
+X-ME-Proxy: <xmx:VHL6ZBgWPGekxjdIx23-3Hj7iw6hui6aeytIaYskReirpsyrPBXOjQ>
+    <xmx:VHL6ZJC80lqDqsV2j3NC_g2Ws1Q1KLBe38LgrN1DXOEc7mBDC0UkZA>
+    <xmx:VHL6ZKJFyjbXM8X5fDTLE_puDIG4wtOI93MtRYxmW2_oGt0hpyLsNw>
+    <xmx:VHL6ZOIE5Qkwq89Lt4kNOJPEGNtJVaHcuDfdMxxM63dNNAxy_UuB_w>
+Feedback-ID: i7a7146c5:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 7 Sep 2023 21:01:07 -0400 (EDT)
+Date: Thu, 7 Sep 2023 21:01:06 -0400
+From: Jeremy Cline <jeremy@jcline.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	syzbot+0839b78e119aae1fec78@syzkaller.appspotmail.com,
+	"John W. Linville" <linville@tuxdriver.com>,
+	Ilan Elias <ilane@ti.com>, Dmitry Vyukov <dvyukov@google.com>,
+	Lin Ma <linma@zju.edu.cn>
+Subject: Re: [PATCH] nfc: nci: assert requested protocol is valid
+Message-ID: <ZPpyUryqAT9PJ/qd@dev>
+References: <20230906233347.823171-1-jeremy@jcline.org>
+ <20230907144112.GB434333@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <87fs3qnnh4.fsf@toke.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-CM-TRANSID:Syh0CgAHcmZPcfpkSBNtCg--.51986S2
-X-Coremail-Antispam: 1UD129KBjvJXoW3XFyfXrWUWFyxXry3ArWfGrg_yoW3uw1UpF
-	ZxJa97CF40qrWjqrWYgw45XF17Kws0g347uFZ5Ka48AF9FqrnrXr18tFWI9rWF9r1kAanr
-	AF4jqrZ3u3y8ArDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUv2b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7I2V7IY0VAS
-	07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c
-	02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_
-	GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7
-	CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAF
-	wI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa
-	7IU1zuWJUUUUU==
-X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230907144112.GB434333@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+On Thu, Sep 07, 2023 at 04:41:12PM +0200, Simon Horman wrote:
+> Cc "John W. Linville" <linville@tuxdriver.com>
+>    Ilan Elias <ilane@ti.com>
+>    Dmitry Vyukov <dvyukov@google.com>
+>    Lin Ma <linma@zju.edu.cn>
+> 
+> On Wed, Sep 06, 2023 at 07:33:47PM -0400, Jeremy Cline wrote:
+> > The protocol is used in a bit mask to determine if the protocol is
+> > supported. Assert the provided protocol is less than the maximum
+> > defined so it doesn't potentially perform a shift-out-of-bounds and
+> > provide a clearer error for undefined protocols vs unsupported ones.
+> > 
+> > Fixes: 6a2968aaf50c ("NFC: basic NCI protocol implementation")
+> > Reported-and-tested-by: syzbot+0839b78e119aae1fec78@syzkaller.appspotmail.com
+> > Closes: https://syzkaller.appspot.com/bug?extid=0839b78e119aae1fec78
+> > Signed-off-by: Jeremy Cline <jeremy@jcline.org>
+> 
+> Hi Jeremy,
+> 
+> As a bug fix, with a Fixes tag, I'm assuming that this targets 'net'.
+> As opposed to 'net-next'.
 
-On 9/7/2023 9:04 PM, Toke Høiland-Jørgensen wrote:
-> Kumar Kartikeya Dwivedi <memxor@gmail.com> writes:
->
->> On Thu, 7 Sept 2023 at 12:26, Toke Høiland-Jørgensen <toke@kernel.org> wrote:
->>> +Arnaldo
->>>
->>>> Hi,
->>>>
->>>> Our bpf fuzzer, a customized Syzkaller, triggered a lockdep warning in
->>>> the bpf queue map in v5.15. Since queue_stack_maps.c has no major changes
->>>> since v5.15, we think this should still exist in the latest kernel.
->>>> The bug can be occasionally triggered, and we suspect one of the
->>>> eBPF programs involved to be the following one. We also attached the lockdep
->>>> warning at the end.
->>>>
->>>> #define DEFINE_BPF_MAP_NO_KEY(the_map, TypeOfMap, MapFlags,
->>>> TypeOfValue, MaxEntries) \
->>>>         struct {                                                        \
->>>>             __uint(type, TypeOfMap);                                    \
->>>>             __uint(map_flags, (MapFlags));                              \
->>>>             __uint(max_entries, (MaxEntries));                          \
->>>>             __type(value, TypeOfValue);                                 \
->>>>         } the_map SEC(".maps");
->>>>
->>>> DEFINE_BPF_MAP_NO_KEY(map_0, BPF_MAP_TYPE_QUEUE, 0 | BPF_F_WRONLY,
->>>> struct_0, 162);
->>>> SEC("perf_event")
->>>> int func(struct bpf_perf_event_data *ctx) {
->>>>         char v0[96] = {};
->>>>         uint64_t v1 = 0;
->>>>         v1 = bpf_map_pop_elem(&map_0, v0);
->>>>         return 163819661;
->>>> }
->>>>
->>>>
->>>> The program is attached to the following perf event.
->>>>
->>>> struct perf_event_attr attr_type_hw = {
->>>>         .type = PERF_TYPE_HARDWARE,
->>>>         .config = PERF_COUNT_HW_CPU_CYCLES,
->>>>         .sample_freq = 50,
->>>>         .inherit = 1,
->>>>         .freq = 1,
->>>> };
->>>>
->>>> ================================WARNING: inconsistent lock state
->>>> 5.15.26+ #2 Not tainted
->>>> --------------------------------
->>>> inconsistent {INITIAL USE} -> {IN-NMI} usage.
->>>> syz-executor.5/19749 [HC1[1]:SC0[0]:HE0:SE1] takes:
->>>> ffff88804c9fc198 (&qs->lock){..-.}-{2:2}, at: __queue_map_get+0x31/0x250
->>>> {INITIAL USE} state was registered at:
->>>>   lock_acquire+0x1a3/0x4b0
->>>>   _raw_spin_lock_irqsave+0x48/0x60
->>>>   __queue_map_get+0x31/0x250
->>>>   bpf_prog_577904e86c81dead_func+0x12/0x4b4
->>>>   trace_call_bpf+0x262/0x5d0
->>>>   perf_trace_run_bpf_submit+0x91/0x1c0
->>>>   perf_trace_sched_switch+0x46c/0x700
->>>>   __schedule+0x11b5/0x24a0
->>>>   schedule+0xd4/0x270
->>>>   futex_wait_queue_me+0x25f/0x520
->>>>   futex_wait+0x1e0/0x5f0
->>>>   do_futex+0x395/0x1890
->>>>   __x64_sys_futex+0x1cb/0x480
->>>>   do_syscall_64+0x3b/0xc0
->>>>   entry_SYSCALL_64_after_hwframe+0x44/0xae
->>>> irq event stamp: 13640
->>>> hardirqs last  enabled at (13639): [<ffffffff95eb2bf4>]
->>>> _raw_spin_unlock_irq+0x24/0x40
->>>> hardirqs last disabled at (13640): [<ffffffff95eb2d4d>]
->>>> _raw_spin_lock_irqsave+0x5d/0x60
->>>> softirqs last  enabled at (13464): [<ffffffff93e26de5>] __sys_bpf+0x3e15/0x4e80
->>>> softirqs last disabled at (13462): [<ffffffff93e26da3>] __sys_bpf+0x3dd3/0x4e80
->>>>
->>>> other info that might help us debug this:
->>>>  Possible unsafe locking scenario:
->>>>
->>>>        CPU0
->>>>        ----
->>>>   lock(&qs->lock);
->>>>   <Interrupt>
->>>>     lock(&qs->lock);
->>> Hmm, so that lock() uses raw_spin_lock_irqsave(), which *should* be
->>> disabling interrupts entirely for the critical section. But I guess a
->>> Perf hardware event can still trigger? Which seems like it would
->>> potentially wreak havoc with lots of things, not just this queue map
->>> function?
->>>
->>> No idea how to protect against this, though. Hoping Arnaldo knows? :)
->>>
+Yeah, that's fine, whatever the maintainers think is best works for me.
+I'm an infrequent contributor, at best.
 
-It seems my reply from last night was dropped by mail-list.
+> 
+> There is probably no need to repost for this, but in future please
+> bear in mind the practice of specifying the target tree in
+> the subject of Networking patches.
+> 
+>    Subject: [PATCH net] ...
+> 
 
->> The locking should probably be protected by a percpu integer counter,
->> incremented and decremented before and after the lock is taken,
->> respectively. If it is already non-zero, then -EBUSY should be
->> returned. It is similar to what htab_lock_bucket protects against in
->> hashtab.c.
-> Ah, neat! Okay, seems straight-forward enough to replicate. Hsin, could
-> you please check if the patch below gets rid of the splat?
+I'll try to keep that in mind if I send other Networking patches.
 
-The fixes could fix the potential dead-lock, but I think the lockdep
-warning will be there, because lockdep thinks it is only safe to call
-try_lock under NMI-contex. So using raw_spin_trylock() for NMI context
-will both fix the potential dead-lock and the lockdep splat.
+> Also, please include addresses indicated by the following in the CC list.
+> 
+>    get_maintainer.pl --min-percent 25 x.patch
+> 
 
->
-> -Toke
->
->
-> diff --git a/kernel/bpf/queue_stack_maps.c b/kernel/bpf/queue_stack_maps.c
-> index 8d2ddcb7566b..f96945311eec 100644
-> --- a/kernel/bpf/queue_stack_maps.c
-> +++ b/kernel/bpf/queue_stack_maps.c
-> @@ -16,6 +16,7 @@
->  struct bpf_queue_stack {
->  	struct bpf_map map;
->  	raw_spinlock_t lock;
-> +	int __percpu *map_locked;
->  	u32 head, tail;
->  	u32 size; /* max_entries + 1 */
->  
-> @@ -66,6 +67,7 @@ static struct bpf_map *queue_stack_map_alloc(union bpf_attr *attr)
->  	int numa_node = bpf_map_attr_numa_node(attr);
->  	struct bpf_queue_stack *qs;
->  	u64 size, queue_size;
-> +	int err = -ENOMEM;
->  
->  	size = (u64) attr->max_entries + 1;
->  	queue_size = sizeof(*qs) + size * attr->value_size;
-> @@ -80,7 +82,18 @@ static struct bpf_map *queue_stack_map_alloc(union bpf_attr *attr)
->  
->  	raw_spin_lock_init(&qs->lock);
->  
-> +	qs->map_locked = bpf_map_alloc_percpu(&qs->map,
-> +					      sizeof(*qs->map_locked),
-> +					      sizeof(*qs->map_locked),
-> +					      GFP_USER);
-> +	if (!qs->map_locked)
-> +		goto free_map;
-> +
->  	return &qs->map;
-> +
-> +free_map:
-> +	bpf_map_area_free(qs);
-> +	return ERR_PTR(err);
->  }
->  
->  /* Called when map->refcnt goes to zero, either from workqueue or from syscall */
-> @@ -88,9 +101,37 @@ static void queue_stack_map_free(struct bpf_map *map)
->  {
->  	struct bpf_queue_stack *qs = bpf_queue_stack(map);
->  
-> +	free_percpu(qs->map_locked);
->  	bpf_map_area_free(qs);
->  }
->  
-> +static inline int queue_stack_map_lock(struct bpf_queue_stack *qs,
-> +				       unsigned long *pflags)
-> +{
-> +	unsigned long flags;
-> +
-> +	preempt_disable();
-> +	if (unlikely(__this_cpu_inc_return(*qs->map_locked) != 1)) {
-> +		__this_cpu_dec(*qs->map_locked);
-> +		preempt_enable();
-> +		return -EBUSY;
-> +	}
-> +
-> +	raw_spin_lock_irqsave(&qs->lock, flags);
-> +	*pflags = flags;
-> +
-> +	return 0;
-> +}
-> +
-> +
-> +static inline void queue_stack_map_unlock(struct bpf_queue_stack *qs,
-> +					  unsigned long flags)
-> +{
-> +	raw_spin_unlock_irqrestore(&qs->lock, flags);
-> +	__this_cpu_dec(*qs->map_locked);
-> +	preempt_enable();
-> +}
-> +
->  static long __queue_map_get(struct bpf_map *map, void *value, bool delete)
->  {
->  	struct bpf_queue_stack *qs = bpf_queue_stack(map);
-> @@ -98,7 +139,9 @@ static long __queue_map_get(struct bpf_map *map, void *value, bool delete)
->  	int err = 0;
->  	void *ptr;
->  
-> -	raw_spin_lock_irqsave(&qs->lock, flags);
-> +	err = queue_stack_map_lock(qs, &flags);
-> +	if (err)
-> +		return err;
->  
->  	if (queue_stack_map_is_empty(qs)) {
->  		memset(value, 0, qs->map.value_size);
-> @@ -115,7 +158,7 @@ static long __queue_map_get(struct bpf_map *map, void *value, bool delete)
->  	}
->  
->  out:
-> -	raw_spin_unlock_irqrestore(&qs->lock, flags);
-> +	queue_stack_map_unlock(qs, flags);
->  	return err;
->  }
->  
-> @@ -128,7 +171,9 @@ static long __stack_map_get(struct bpf_map *map, void *value, bool delete)
->  	void *ptr;
->  	u32 index;
->  
-> -	raw_spin_lock_irqsave(&qs->lock, flags);
-> +	err = queue_stack_map_lock(qs, &flags);
-> +	if (err)
-> +		return err;
->  
->  	if (queue_stack_map_is_empty(qs)) {
->  		memset(value, 0, qs->map.value_size);
-> @@ -147,7 +192,7 @@ static long __stack_map_get(struct bpf_map *map, void *value, bool delete)
->  		qs->head = index;
->  
->  out:
-> -	raw_spin_unlock_irqrestore(&qs->lock, flags);
-> +	queue_stack_map_unlock(qs, flags);
->  	return err;
->  }
->  
-> @@ -193,7 +238,9 @@ static long queue_stack_map_push_elem(struct bpf_map *map, void *value,
->  	if (flags & BPF_NOEXIST || flags > BPF_EXIST)
->  		return -EINVAL;
->  
-> -	raw_spin_lock_irqsave(&qs->lock, irq_flags);
-> +	err = queue_stack_map_lock(qs, &irq_flags);
-> +	if (err)
-> +		return err;
->  
->  	if (queue_stack_map_is_full(qs)) {
->  		if (!replace) {
-> @@ -212,7 +259,7 @@ static long queue_stack_map_push_elem(struct bpf_map *map, void *value,
->  		qs->head = 0;
->  
->  out:
-> -	raw_spin_unlock_irqrestore(&qs->lock, irq_flags);
-> +	queue_stack_map_unlock(qs, irq_flags);
->  	return err;
->  }
->  
->
-> .
+Likewise I'll try to remember this particular version if I send any more
+network patches.
 
+> The above notwithstanding, this looks good to me.
+> 
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> 
+
+Thanks!
+
+- Jeremy
+
+> > ---
+> >  net/nfc/nci/core.c | 5 +++++
+> >  1 file changed, 5 insertions(+)
+> > 
+> > diff --git a/net/nfc/nci/core.c b/net/nfc/nci/core.c
+> > index fff755dde30d..6c9592d05120 100644
+> > --- a/net/nfc/nci/core.c
+> > +++ b/net/nfc/nci/core.c
+> > @@ -909,6 +909,11 @@ static int nci_activate_target(struct nfc_dev *nfc_dev,
+> >  		return -EINVAL;
+> >  	}
+> >  
+> > +	if (protocol >= NFC_PROTO_MAX) {
+> > +		pr_err("the requested nfc protocol is invalid\n");
+> > +		return -EINVAL;
+> > +	}
+> > +
+> >  	if (!(nci_target->supported_protocols & (1 << protocol))) {
+> >  		pr_err("target does not support the requested protocol 0x%x\n",
+> >  		       protocol);
+> > -- 
+> > 2.41.0
+> > 
+> > 
 
