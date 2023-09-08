@@ -1,208 +1,173 @@
-Return-Path: <netdev+bounces-32544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16AB17983E6
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 10:19:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E11797983E0
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 10:18:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D8671C20C28
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 08:19:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87CD02819B5
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 08:18:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 994FE1C3D;
-	Fri,  8 Sep 2023 08:19:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D6531C39;
+	Fri,  8 Sep 2023 08:18:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8890515B6
-	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 08:19:08 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E54C31FC4
-	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 01:19:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694161141; x=1725697141;
-  h=from:to:cc:subject:date:message-id;
-  bh=AURspU3F76W2cee+nFjq4Ps1mpWQnJyFzP2jJXded+c=;
-  b=Q1ExqXWWWVDyVlZAwTJjpQAv1mx5iTxAY8WKQx+EkJ2grB/Er9jfsXMI
-   yNFNSfw2GsAMIVmANdiGfAmg2qKsuNSQHt9bi08HBZUkR1+bF3igY+5QG
-   OikFMUJutRQuN9uqMyJbJMn6lwFCqHgXQ+F4Le3mhEsjI3UZBIRbYT8yT
-   /bAKe6x4QPiZ6BtsyJX0+omqJhj7hWxekeMoTetIknvk9vbC9fsQR7pKO
-   KGL7mYlgwxbrFjEUdJpGSy8uU139iVVmJXr8QGFN7gH6T8pkQZAJ8EobK
-   w+NhQut5mRwHdMnyGtQrjtF100SW022WOwqMewta9YqVfUS1L0RuBykSr
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10826"; a="362655518"
-X-IronPort-AV: E=Sophos;i="6.02,236,1688454000"; 
-   d="scan'208";a="362655518"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2023 01:18:49 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10826"; a="735878681"
-X-IronPort-AV: E=Sophos;i="6.02,236,1688454000"; 
-   d="scan'208";a="735878681"
-Received: from zulkifl3-ilbpg0.png.intel.com ([10.88.229.82])
-  by orsmga007.jf.intel.com with ESMTP; 08 Sep 2023 01:18:46 -0700
-From: Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>
-To: intel-wired-lan@osuosl.org
-Cc: sasha.neftin@intel.com,
-	bcreeley@amd.com,
-	horms@kernel.org,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	muhammad.husaini.zulkifli@intel.com,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org,
-	naamax.meir@linux.intel.com,
-	anthony.l.nguyen@intel.com,
-	husainizulkifli@gmail.com
-Subject: [PATCH iwl-net v5] igc: Expose tx-usecs coalesce setting to user
-Date: Fri,  8 Sep 2023 16:17:34 +0800
-Message-Id: <20230908081734.28205-1-muhammad.husaini.zulkifli@intel.com>
-X-Mailer: git-send-email 2.17.1
-X-Spam-Status: No, score=-2.1 required=5.0 tests=AC_FROM_MANY_DOTS,BAYES_00,
-	DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 217161C35
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 08:18:25 +0000 (UTC)
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CCB41BD8;
+	Fri,  8 Sep 2023 01:18:23 -0700 (PDT)
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 3888HfJG039718;
+	Fri, 8 Sep 2023 03:17:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1694161061;
+	bh=K71WI9mp10JYb5ovj+wQf7OlxXHiCf6W8ulWxKvqAcU=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=Mq3BrZIqJV3r8sxZJb9CqHrpaNu69r1E+u0zQ4uqkWTR5pKeKGPwYBcxl++VVe9Cv
+	 ShnEOI9We+Io84lOj744y1DrqqUXUP7UJ2SH57FDrMYNS4f2660VvYJFNTmUfRF1cc
+	 oNvkp5GgMyqi1i8EppnOJ8/88eCCS5bfKMBCjnBE=
+Received: from DFLE102.ent.ti.com (dfle102.ent.ti.com [10.64.6.23])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 3888Hfdr126132
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Fri, 8 Sep 2023 03:17:41 -0500
+Received: from DFLE104.ent.ti.com (10.64.6.25) by DFLE102.ent.ti.com
+ (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 8
+ Sep 2023 03:17:40 -0500
+Received: from lelv0327.itg.ti.com (10.180.67.183) by DFLE104.ent.ti.com
+ (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Fri, 8 Sep 2023 03:17:40 -0500
+Received: from [10.24.69.199] (ileaxei01-snat2.itg.ti.com [10.180.69.6])
+	by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id 3888HZGm052641;
+	Fri, 8 Sep 2023 03:17:35 -0500
+Message-ID: <3fbf9514-8f9f-d362-9006-1fd435540e67@ti.com>
+Date: Fri, 8 Sep 2023 13:47:34 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.0
+Subject: Re: [RFC PATCH net-next 3/4] net: ti: icssg-prueth: Add support for
+ ICSSG switch firmware on AM654 PG2.0 EVM
+Content-Language: en-US
+To: Roger Quadros <rogerq@kernel.org>, Andrew Lunn <andrew@lunn.ch>
+CC: Simon Horman <horms@kernel.org>, Vignesh Raghavendra <vigneshr@ti.com>,
+        Jacob Keller <jacob.e.keller@intel.com>,
+        Richard Cochran
+	<richardcochran@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <srk@ti.com>,
+        <r-gunasekaran@ti.com>, Pekka Varis
+	<p-varis@ti.com>
+References: <20230830110847.1219515-1-danishanwar@ti.com>
+ <20230830110847.1219515-4-danishanwar@ti.com>
+ <1fb683f4-d762-427b-98b7-8567ca1f797c@lunn.ch>
+ <0d70cebf-8fd0-cf04-ccc2-6f240b27ecca@ti.com>
+ <12c11462-5449-b100-5f92-f66c775237fa@kernel.org>
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <12c11462-5449-b100-5f92-f66c775237fa@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-When users attempt to obtain the coalesce setting using the
-ethtool command, current code always returns 0 for tx-usecs.
-This is because I225/6 always uses a queue pair setting, hence
-tx_coalesce_usecs does not return a value during the
-igc_ethtool_get_coalesce() callback process. The pair queue
-condition checking in igc_ethtool_get_coalesce() is removed by
-this patch so that the user gets information of the value of tx-usecs.
+On 08/09/23 13:16, Roger Quadros wrote:
+> 
+> 
+> On 05/09/2023 11:43, MD Danish Anwar wrote:
+>> On 04/09/23 19:38, Andrew Lunn wrote:
+>>>> Switch mode requires loading of new firmware into ICSSG cores. This
+>>>> means interfaces have to taken down and then reconfigured to switch mode
+>>>> using devlink.
+>>>
+>>> Can you always run it in switch mode, just not have the ports in a
+>>> bridge?
+>>>
+>>> 	Andrew
+>>
+>> No, we can't always run it in switch mode. Switch mode requires loading
+>> of different firmware. The switch firmware only supports switch
+>> operations. If the ports are not in a bridge in switch mode, the normal
+>> functionalities will not work. We will not be able to send / receive /
+>> forward packets in switch mode without bridge.
+>>
+>> When device is booted up, the dual EMAC firmware is loaded and ICSSG
+>> works in dual EMAC mode with both ports doing independent TX / RX.
+>>
+>> When switch mode is enabled, dual EMAC firmware is unloaded and switch
+>> firmware is loaded. The ports become part of the bridge and the two port
+>> together acts as a switch.
+>>
+> 
+> Since we are loading the switch firmware and the switch logic is in firmware,
+> it means we don't really need Linux help to do basic switching on the external
+> ports.
+> 
+> I suppose Andrews question was, can it work as a switch after switching
+> from dual-emac to switch mode and not setting up the Linux bridge.
+> 
 
-Even if i225/6 is using queue pair setting, there is no harm in
-notifying the user of the tx-usecs. The implementation of the current
-code may have previously been a copy of the legacy code i210.
-Since I225 has the queue pair setting enabled, tx-usecs will always adhere
-to the user-set rx-usecs value. An error message will appear when the user
-attempts to set the tx-usecs value for the input parameters because,
-by default, they should only set the rx-usecs value.
+I did some further testing on switch mode. The basic functionality would
+work without a bridge as well. This will need one modification in driver
+but even without bridge switching will work.
 
-This patch also adds the helper function to get the
-previous rx coalesce value similar to tx coalesce.
+When enabling switch mode the driver sets the HOST_MAC_ADDR to the
+bridge's addr. If bridge is not there, this will result in KERNEL NULL
+POINTER crash.
 
-How to test:
-User can get the coalesce value using ethtool command.
+icssg_class_set_host_mac_addr(prueth->miig_rt,
+prueth->hw_bridge_dev->dev_addr);
 
-Example command:
-Get: ethtool -c <interface>
+However if we change this to only set when bridge is there, it works
 
-Previous output:
+if (prueth->hw_bridge_dev)
+	icssg_class_set_host_mac_addr(prueth->miig_rt,
+prueth->hw_bridge_dev->dev_addr);
 
-rx-usecs: 3
-rx-frames: n/a
-rx-usecs-irq: n/a
-rx-frames-irq: n/a
+With this change forwarding works in switch mode without setting up the
+bridge. Just loading the switch firmware is enough.
 
-tx-usecs: 0
-tx-frames: n/a
-tx-usecs-irq: n/a
-tx-frames-irq: n/a
 
-New output:
+> e.g. Looking at your command list
+> 
+>> Switch to ICSSG Switch mode:
+>>  ip link set dev eth1 down
+>>  ip link set dev eth2 down
+>>  devlink dev param set platform/icssg2-eth name \
+>>  switch_mode value 1 cmode runtime
+> 
+> At this point, can it work as a switch. If not, why?>
 
-rx-usecs: 3
-rx-frames: n/a
-rx-usecs-irq: n/a
-rx-frames-irq: n/a
+To summarize, yes it can work at this point.
 
-tx-usecs: 3
-tx-frames: n/a
-tx-usecs-irq: n/a
-tx-frames-irq: n/a
+>>  ip link add name br0 type bridge
+>>  ip link set dev eth1 master br0
+>>  ip link set dev eth2 master br0
+>>  ip link set dev br0 up
+>>  ip link set dev eth1 up
+>>  ip link set dev eth2 up
+>>  bridge vlan add dev br0 vid 1 pvid untagged self
+> 
 
-Fixes: 8c5ad0dae93c ("igc: Add ethtool support")
-Signed-off-by: Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>
-Tested-by: Naama Meir <naamax.meir@linux.intel.com>
----
-V4 -> V5:
-- Squash patch for set/get together as recommended by Jakub.
-- Fix unstabilize value when user insert both tx and rx params
-together.
-- Add error message for unsupported config.
-
-V3 -> V4:
-- Implement the helper function, as recommended by Brett Creely.
-- Fix typo in cover letter.
-
-V2 -> V3:
-- Refactor the code, as Simon suggested, to make it more readable.
-
-V1 -> V2:
-- Split the patch file into two, like Anthony suggested.
----
- drivers/net/ethernet/intel/igc/igc_ethtool.c | 31 ++++++++++++--------
- 1 file changed, 19 insertions(+), 12 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-index 93bce729be76..7ab6dd58e400 100644
---- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
-+++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-@@ -868,6 +868,18 @@ static void igc_ethtool_get_stats(struct net_device *netdev,
- 	spin_unlock(&adapter->stats64_lock);
- }
- 
-+static int igc_ethtool_get_previous_rx_coalesce(struct igc_adapter *adapter)
-+{
-+	return (adapter->rx_itr_setting <= 3) ?
-+		adapter->rx_itr_setting : adapter->rx_itr_setting >> 2;
-+}
-+
-+static int igc_ethtool_get_previous_tx_coalesce(struct igc_adapter *adapter)
-+{
-+	return (adapter->tx_itr_setting <= 3) ?
-+		adapter->tx_itr_setting : adapter->tx_itr_setting >> 2;
-+}
-+
- static int igc_ethtool_get_coalesce(struct net_device *netdev,
- 				    struct ethtool_coalesce *ec,
- 				    struct kernel_ethtool_coalesce *kernel_coal,
-@@ -875,17 +887,8 @@ static int igc_ethtool_get_coalesce(struct net_device *netdev,
- {
- 	struct igc_adapter *adapter = netdev_priv(netdev);
- 
--	if (adapter->rx_itr_setting <= 3)
--		ec->rx_coalesce_usecs = adapter->rx_itr_setting;
--	else
--		ec->rx_coalesce_usecs = adapter->rx_itr_setting >> 2;
--
--	if (!(adapter->flags & IGC_FLAG_QUEUE_PAIRS)) {
--		if (adapter->tx_itr_setting <= 3)
--			ec->tx_coalesce_usecs = adapter->tx_itr_setting;
--		else
--			ec->tx_coalesce_usecs = adapter->tx_itr_setting >> 2;
--	}
-+	ec->rx_coalesce_usecs = igc_ethtool_get_previous_rx_coalesce(adapter);
-+	ec->tx_coalesce_usecs = igc_ethtool_get_previous_tx_coalesce(adapter);
- 
- 	return 0;
- }
-@@ -910,8 +913,12 @@ static int igc_ethtool_set_coalesce(struct net_device *netdev,
- 	    ec->tx_coalesce_usecs == 2)
- 		return -EINVAL;
- 
--	if ((adapter->flags & IGC_FLAG_QUEUE_PAIRS) && ec->tx_coalesce_usecs)
-+	if ((adapter->flags & IGC_FLAG_QUEUE_PAIRS) &&
-+	    ec->tx_coalesce_usecs != igc_ethtool_get_previous_tx_coalesce(adapter)) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Queue Pair mode enabled, both Rx and Tx coalescing controlled by rx-usecs");
- 		return -EINVAL;
-+	}
- 
- 	/* If ITR is disabled, disable DMAC */
- 	if (ec->rx_coalesce_usecs == 0) {
 -- 
-2.17.1
-
+Thanks and Regards,
+Danish
 
