@@ -1,179 +1,126 @@
-Return-Path: <netdev+bounces-32668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 084BC798E4E
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 20:37:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68808798E1D
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 20:29:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE9B128125E
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 18:37:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 969A61C20E13
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 18:29:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF748179B5;
-	Fri,  8 Sep 2023 18:34:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56459154A7;
+	Fri,  8 Sep 2023 18:19:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3B4F179B2
-	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 18:34:12 +0000 (UTC)
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80044E4B
-	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 11:33:44 -0700 (PDT)
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-58dfe2d5b9aso32280267b3.1
-        for <netdev@vger.kernel.org>; Fri, 08 Sep 2023 11:33:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1694197854; x=1694802654; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:date:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=9DIksM6myeoWeDBcpXYOMBk+NYMmdWPc+5HOrctp+9s=;
-        b=UTqy57tAt6Rm4z+wNpMHc2sBi3fWLtVGVQycPDYCweEaee8kk9Tvom8Bpi7G3PjI4h
-         i1gJnYdrB8am0loXyeX4Sf/PWddM5E9E4OjBqt0/VkdNe2DSNmYJs6v6T2S4dH8tsxVo
-         O04/ynKPkaTO7DZiLIwYJ41un1ok3tKi2mNM4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694197854; x=1694802654;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:date:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9DIksM6myeoWeDBcpXYOMBk+NYMmdWPc+5HOrctp+9s=;
-        b=EqQeATlTD8aJik9T348c67MwZjJVY/bE3wuu6+nKy4kFLYOybo6Ss7y6ypKLSz65f6
-         vpCn5065/NzdiocGRUZCeXaLEVPKtWF2oiic/Ztszfpe8J7haWHf/rHXDjVcrefboX4A
-         DQWFs5LTtaU5f8726k+E7c4nuE6N5otskbfAxGoFXIon/dmiRtwteU+78502T8R0V8BF
-         XozyuLUc8PkEMrhzDKeHfwebUNtmT82UxDvuGrS2PaaGLzLCFiqwMgmBTdT2RZpVmBrQ
-         ZTozw/kcVQo9a0EcgoJqVHmVB+vgs4Hr4+aSNMFArVhlX3/uRgKfBUXCNu2lPOUUNtaz
-         gu3g==
-X-Gm-Message-State: AOJu0YxdcTzD8G1tqUrBL/fWbhjilW9ole4bEVn8lm7kG6Dw8LCQoVhC
-	GWmABsImpro5lX+hSaK5wekuozlxZr54lRNmQuQ=
-X-Google-Smtp-Source: AGHT+IEL011BEfLSNoZ0VWbsnUu9K98As3uc78Y5lkcy50J2yjnTrkBn7oLeFhQDR9RIQZU4AK+E0w==
-X-Received: by 2002:a05:6a20:7d9b:b0:13e:debc:3657 with SMTP id v27-20020a056a207d9b00b0013edebc3657mr3555227pzj.30.1694197133598;
-        Fri, 08 Sep 2023 11:18:53 -0700 (PDT)
-Received: from C02YVCJELVCG.dhcp.broadcom.net ([192.19.144.250])
-        by smtp.gmail.com with ESMTPSA id w25-20020a63af19000000b00563da87a52dsm1470280pge.40.2023.09.08.11.18.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Sep 2023 11:18:53 -0700 (PDT)
-From: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-X-Google-Original-From: Andy Gospodarek <gospo@broadcom.com>
-Date: Fri, 8 Sep 2023 14:18:45 -0400
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	netdev@vger.kernel.org, bpf@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Eric Dumazet <edumazet@google.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACF55154A4
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 18:19:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 090F3C433C8;
+	Fri,  8 Sep 2023 18:19:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694197163;
+	bh=qa8M34DwL+aeAx+Hhe8xMA9eIpcdQo/yjxwGIaV7TX0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=QC3kwgu4RN3ZExiFD6v9yX/40DfoFoKke09kemgkB9wQulme82jDV3GIBBGE828Sj
+	 r0v23i5ltnFIheYEspIfb/RWdeEn0sGGdgYWWRaJ5ze8xdsxaeK9kButMtwOqrPBhO
+	 OMy2Wo+U+9QQR5Z90BeUnY9eJWZPPXJaNhG6tGSmEfQAmUWSrUYbhTiJEUg9Ff4/gC
+	 mgL94msqXvAhZQ8UTi0hCaKQXVLB60NUHd16V/vySdYm6symEud7PD0YMFUnVnLb2c
+	 kgdN2cOI5O4ulBAgImMpuddhrb1/wbw/mpe2rsdh92+S6cdCygs3iM9z2f6n8paUAJ
+	 CbVln8Dq6q4gg==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Jiri Pirko <jiri@nvidia.com>,
+	Ido Schimmel <idosch@nvidia.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH net 2/4] bnxt_en: Flush XDP for bnxt_poll_nitroa0()'s NAPI
-Message-ID: <ZPtlhSywT5cBTj8u@C02YVCJELVCG.dhcp.broadcom.net>
-References: <20230908135748.794163-1-bigeasy@linutronix.de>
- <20230908135748.794163-3-bigeasy@linutronix.de>
- <CALs4sv2=ox6ZWj3FUY=0-Zj3uNAOpCLM_vf_dmsVx+ju2S9UUA@mail.gmail.com>
- <CACKFLin+1whPs0qeM5xBb1yXx8FkFS_vGrW6PaGy41_XVH=SGg@mail.gmail.com>
+	"David S . Miller" <davem@davemloft.net>,
+	Sasha Levin <sashal@kernel.org>,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	jiri@resnulli.us,
+	jacob.e.keller@intel.com,
+	michal.wilczynski@intel.com,
+	shayd@nvidia.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.15 01/15] devlink: remove reload failed checks in params get/set callbacks
+Date: Fri,  8 Sep 2023 14:19:04 -0400
+Message-Id: <20230908181920.3460520-1-sashal@kernel.org>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 5.15.131
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACKFLin+1whPs0qeM5xBb1yXx8FkFS_vGrW6PaGy41_XVH=SGg@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-	autolearn=unavailable autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Fri, Sep 08, 2023 at 10:57:13AM -0700, Michael Chan wrote:
-> On Fri, Sep 8, 2023 at 9:30 AM Pavan Chebbi <pavan.chebbi@broadcom.com> wrote:
-> >
-> > On Fri, Sep 8, 2023 at 7:29 PM Sebastian Andrzej Siewior
-> > <bigeasy@linutronix.de> wrote:
-> > >
-> > > bnxt_poll_nitroa0() invokes bnxt_rx_pkt() which can run a XDP program
-> > > which in turn can return XDP_REDIRECT. bnxt_rx_pkt() is also used by
-> > > __bnxt_poll_work() which flushes (xdp_do_flush()) the packets after each
-> > > round. bnxt_poll_nitroa0() lacks this feature.
-> > > xdp_do_flush() should be invoked before leaving the NAPI callback.
-> > >
-> > > Invoke xdp_do_flush() after a redirect in bnxt_poll_nitroa0() NAPI.
-> > >
-> > > Cc: Michael Chan <michael.chan@broadcom.com>
-> > > Fixes: f18c2b77b2e4e ("bnxt_en: optimized XDP_REDIRECT support")
-> > > Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> > > ---
-> > >  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 5 +++++
-> > >  1 file changed, 5 insertions(+)
-> > >
-> > > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> > > index 5cc0dbe121327..7551aa8068f8f 100644
-> > > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> > > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> > > @@ -2614,6 +2614,7 @@ static int bnxt_poll_nitroa0(struct napi_struct *napi, int budget)
-> > >         struct rx_cmp_ext *rxcmp1;
-> > >         u32 cp_cons, tmp_raw_cons;
-> > >         u32 raw_cons = cpr->cp_raw_cons;
-> > > +       bool flush_xdp = false;
-> >
-> > Michael can confirm but I don't think we need this additional variable.
-> > Since the event is always ORed, we could directly check if (event &
-> > BNXT_REDIRECT_EVENT) just like is done in __bnxt_poll_work().
-> 
-> If we have a mix of XDP_TX and XDP_REDIRECT during NAPI, event can be
-> cleared by XDP_TX.  So this patch looks correct to me because of that.
+From: Jiri Pirko <jiri@nvidia.com>
 
-Agreed
+[ Upstream commit 633d76ad01ad0321a1ace3e5cc4fed06753d7ac4 ]
 
-> Or we can make it consistent with __bnxt_poll_work() and assume that
-> XDP_TX won't mix with XDP_REDIRECT.
+The checks in question were introduced by:
+commit 6b4db2e528f6 ("devlink: Fix use-after-free after a failed reload").
+That fixed an issue of reload with mlxsw driver.
 
-Unfortunately we probably cannot guarantee that or maybe more to point
-we do not want to guarantee that.
+Back then, that was a valid fix, because there was a limitation
+in place that prevented drivers from registering/unregistering params
+when devlink instance was registered.
 
-Thanks for this patch.
+It was possible to do the fix differently by changing drivers to
+register/unregister params in appropriate places making sure the ops
+operate only on memory which is allocated and initialized. But that,
+as a dependency, would require to remove the limitation mentioned above.
 
-Reviewed-by: Andy Gospodarek <gospo@broadcom.com>
+Eventually, this limitation was lifted by:
+commit 1d18bb1a4ddd ("devlink: allow registering parameters after the instance")
 
+Also, the alternative fix (which also fixed another issue) was done by:
+commit 74cbc3c03c82 ("mlxsw: spectrum_acl_tcam: Move devlink param to TCAM code").
 
-> Handling a mix of XDP actions needs to be looked at separately.  The
-> driver currently won't work well when that happens.  I am working on
-> an internal patch to address that and will post it when it's ready.
-> Thanks.
-> 
-> >
-> > >         u32 rx_pkts = 0;
-> > >         u8 event = 0;
-> > >
-> > > @@ -2648,6 +2649,8 @@ static int bnxt_poll_nitroa0(struct napi_struct *napi, int budget)
-> > >                                 rx_pkts++;
-> > >                         else if (rc == -EBUSY)  /* partial completion */
-> > >                                 break;
-> > > +                       if (event & BNXT_REDIRECT_EVENT)
-> > > +                               flush_xdp = true;
-> > >                 } else if (unlikely(TX_CMP_TYPE(txcmp) ==
-> > >                                     CMPL_BASE_TYPE_HWRM_DONE)) {
-> > >                         bnxt_hwrm_handler(bp, txcmp);
-> > > @@ -2667,6 +2670,8 @@ static int bnxt_poll_nitroa0(struct napi_struct *napi, int budget)
-> > >
-> > >         if (event & BNXT_AGG_EVENT)
-> > >                 bnxt_db_write(bp, &rxr->rx_agg_db, rxr->rx_agg_prod);
-> > > +       if (flush_xdp)
-> > > +               xdp_do_flush();
-> > >
-> > >         if (!bnxt_has_work(bp, cpr) && rx_pkts < budget) {
-> > >                 napi_complete_done(napi, rx_pkts);
-> > > --
-> > > 2.40.1
-> > >
-> > >
+Therefore, the checks are no longer relevant. Each driver should make
+sure to have the params registered only when the memory the ops
+are working with is allocated and initialized.
 
+So remove the checks.
+
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/core/devlink.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/core/devlink.c b/net/core/devlink.c
+index b4d7a7f749c18..db76c55e1a6d7 100644
+--- a/net/core/devlink.c
++++ b/net/core/devlink.c
+@@ -4413,7 +4413,7 @@ static int devlink_param_get(struct devlink *devlink,
+ 			     const struct devlink_param *param,
+ 			     struct devlink_param_gset_ctx *ctx)
+ {
+-	if (!param->get || devlink->reload_failed)
++	if (!param->get)
+ 		return -EOPNOTSUPP;
+ 	return param->get(devlink, param->id, ctx);
+ }
+@@ -4422,7 +4422,7 @@ static int devlink_param_set(struct devlink *devlink,
+ 			     const struct devlink_param *param,
+ 			     struct devlink_param_gset_ctx *ctx)
+ {
+-	if (!param->set || devlink->reload_failed)
++	if (!param->set)
+ 		return -EOPNOTSUPP;
+ 	return param->set(devlink, param->id, ctx);
+ }
+-- 
+2.40.1
 
 
