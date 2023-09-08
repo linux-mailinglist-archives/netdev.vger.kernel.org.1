@@ -1,175 +1,110 @@
-Return-Path: <netdev+bounces-32680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42C5D799260
-	for <lists+netdev@lfdr.de>; Sat,  9 Sep 2023 00:47:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 954BD79928B
+	for <lists+netdev@lfdr.de>; Sat,  9 Sep 2023 00:58:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 253CB1C20C8A
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 22:47:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B68E81C20CB2
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 22:58:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD7DB1FBC;
-	Fri,  8 Sep 2023 22:47:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4524A6FB2;
+	Fri,  8 Sep 2023 22:58:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99F0B1C16;
-	Fri,  8 Sep 2023 22:47:03 +0000 (UTC)
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A31751FEA;
-	Fri,  8 Sep 2023 15:47:01 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-52683da3f5cso3331531a12.3;
-        Fri, 08 Sep 2023 15:47:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 357271C16
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 22:58:10 +0000 (UTC)
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4F361FEA
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 15:58:09 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d7e857a3fd5so2657870276.3
+        for <netdev@vger.kernel.org>; Fri, 08 Sep 2023 15:58:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694213220; x=1694818020; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s6K2rJP//kcnmnnyrCr1AR1/fYTmbA+UgN7K0TAwTbo=;
-        b=MR/3j7m/vJ8aHVBj92IpXVQFVdPrnoECwXZc7a1Dv0jvXNfwjHXwxFSoerd9Gngd3/
-         LPjyvVmsEPR42Y7hvgSUWsmkIj5iQdd30kqjChFl6YBdaKfNBdifmCjbP9ohIiBvcyUA
-         djl17zgTZnDThU3l7TYmzlZ+VK/MCD4MkF65cssyoE4nGI68+xmWlcrnT8ulW9GX+UjA
-         5azoCzjk5NrS/C2PYUfMMbXQkyRbiaQ921Z8pTgAOAW739LEMgACyNWjNm3ebDl49ii+
-         +EEnEKSOCls6Gd/BKVdXVpiIQWCN2t3jC9opgbUC96qgUpnzYqVYVX03SKrdqAAq59eL
-         c5WA==
+        d=google.com; s=20221208; t=1694213889; x=1694818689; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=5vtcfBbKqQeR2NL5yHx5os/nTJeJCveHJ565EoPZims=;
+        b=Op07wZPKXWLvFXqiLGX3vPkssp1KYBORTx7PNclJjJ8410ctBbszBJmQKZv1VL+rV5
+         mQWZTfWtXhnp40/rMLT8nRdkYtp42fl3H74+eP3VolfN5eb5vrInlJOor/KNWUz6tqO6
+         Nm8Y6AofN8Vjw01OgcRX2ncUzj7TPxbIfSJ6jccLHZTjgwJ3g8EhKYhGjaWDVLu3qwnV
+         7I1thDqqStESEKdAQV7Ouc8iejmtkc6MZpRMi3gFqB01Cp2gAByNPbdQPYvvlXtTQVpS
+         RQrz1JsQRFfayvhFyI7N38NK808l2+y+7I5mVfgP6j+Z1K4CnlbrfYTXImf7RnzIdDal
+         CMMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694213220; x=1694818020;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=s6K2rJP//kcnmnnyrCr1AR1/fYTmbA+UgN7K0TAwTbo=;
-        b=ER/OcoYT0lrdWI4AsUE+j5R2NRzuZwreou+bLMm2t+yigToqJl4nseFR6gNoNH/qsx
-         upVgMz7VXunzCazKah67M9wdJUIpkDyL865jq9zPbTdYTNV84qWZk/CIA9NheUk/T8zQ
-         I0uLdazuZCS2i1YsK1HsIv5Gv1l+QZx9RpOaQnVL7rlW+PW8CF+vuoDbdrkaIordZXo1
-         xkb2fGqOgbBbKhL6qgckz08L31ZqWmtdOFrFtpFN+fU97kRh/rtiJAS2AHumADjE57n6
-         YKzyKIOJ83isWaZRDIhsFgF5Oft4wOLwzUwyTJpJABI1VJGWJ4YrHExjD27yGMgbWMVz
-         525w==
-X-Gm-Message-State: AOJu0YybhX94H81E1Ff8MD7B9a2t/at2aZ+gvpRck3gfvxOPSOH12w57
-	kdB//CgP3PJfzGgRl4hKzlYKudDZ+B58PN2RKW4=
-X-Google-Smtp-Source: AGHT+IHqEecVp6hLJrqRZvxJExq6jVx1Pmb89B9U7CmxDdJHY2g1AA3ODPBmEc69vC+/abGYE3Um1zsqrIKM+ympEx0=
-X-Received: by 2002:a05:6402:493:b0:523:100b:462b with SMTP id
- k19-20020a056402049300b00523100b462bmr3127005edv.5.1694213219801; Fri, 08 Sep
- 2023 15:46:59 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1694213889; x=1694818689;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5vtcfBbKqQeR2NL5yHx5os/nTJeJCveHJ565EoPZims=;
+        b=qcloH+QyY/1pVFCWKShmEAe9GdSJdRPPz7E76xv41FL5KK2tOsOUrKavkftkl5y2LG
+         WSl/iPKcGhTfsaD4/tpYL4PK2/HjeBOZ7wQhkm+8NbRAT1HOZpUmJf+F5w9tJ73pTsCg
+         o7/tlKtPnYKGtyEnu42c69afIGP43UG7iL1aGF7/YApIEgzIiyApfFzxsWBAfXpxfi3y
+         WC2rYBSgCDPoetzX+fOEHtR2G/MGwpQ2x3E/sl16bxKVBPk3GIKWOznE5PU0Wk+jVHD0
+         85ucMayHXRHqsDN4Y6QjP7qaGE+Nd+RsFJklSLzJyBCZeZKASA9RDlf5TuE0+DnR8h8f
+         70zQ==
+X-Gm-Message-State: AOJu0YxLoBsT9Hqh2Y32KJ+QTx3a9VC3QVLsawZKgWsIGSO5fRAV18cs
+	VV1ThcFgaAwdUcXAbJtHK7rP97o=
+X-Google-Smtp-Source: AGHT+IFMr8kDef6fP6VHllz0ktFC++4PEzH4rR9MyQ8wKQ7UYoHbD8BrZzjuJnnWPWrDSN0AbAuzrDU=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a25:adc3:0:b0:d01:60ec:d0e with SMTP id
+ d3-20020a25adc3000000b00d0160ec0d0emr91876ybe.9.1694213888955; Fri, 08 Sep
+ 2023 15:58:08 -0700 (PDT)
+Date: Fri,  8 Sep 2023 15:58:04 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <CAEf4BzYMAAhwscTWWTenvyr-PQ7E5tMg_iqXsPj_dyZEMVCrKg@mail.gmail.com>
- <64b4c5891096b_2b67208f@john.notmuch>
-In-Reply-To: <64b4c5891096b_2b67208f@john.notmuch>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Fri, 8 Sep 2023 15:46:48 -0700
-Message-ID: <CAEf4Bzb2=p3nkaTctDcMAabzL41JjCkTso-aFrfv21z7Y0C48w@mail.gmail.com>
-Subject: Re: Sockmap's parser/verdict programs and epoll notifications
-To: John Fastabend <john.fastabend@gmail.com>
-Cc: bpf <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>, 
-	"davidhwei@meta.com" <davidhwei@meta.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
+Message-ID: <20230908225807.1780455-1-sdf@google.com>
+Subject: [PATCH bpf-next 0/3] bpf: expose information about netdev
+ xdp-metadata kfunc support
+From: Stanislav Fomichev <sdf@google.com>
+To: bpf@vger.kernel.org
+Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	martin.lau@linux.dev, song@kernel.org, yhs@fb.com, john.fastabend@gmail.com, 
+	kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org, 
+	netdev@vger.kernel.org, Willem de Bruijn <willemb@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, Jul 16, 2023 at 9:37=E2=80=AFPM John Fastabend <john.fastabend@gmai=
-l.com> wrote:
->
-> Andrii Nakryiko wrote:
-> > Hey John,
->
-> Sorry missed this while I was on PTO that week.
+Extend netdev netlink family to expose the bitmask with the
+kfuncs that the device implements. The source of truth is the
+device's xdp_metadata_ops. There is some amount of auto-generated
+netlink boilerplate; the change itself is super minimal.
 
-yeah, vacations tend to cause missing things :)
+Cc: netdev@vger.kernel.org
+Cc: Willem de Bruijn <willemb@google.com>
 
->
-> >
-> > We've been recently experimenting with using BPF_SK_SKB_STREAM_PARSER
-> > and BPF_SK_SKB_STREAM_VERDICT with sockmap/sockhash to perform
-> > in-kernel parsing of RSocket frames. A very simple format ([0]) where
-> > the first 3 bytes specify the size of the frame payload. The idea was
-> > to collect the entire frame in the kernel before notifying user-space
-> > that data is available. This is meant to minimize unnecessary wakeups
-> > due to incomplete logical frames, saving CPU.
->
-> Nice.
->
-> >
-> > You can find the BPF source code I've used at [1], it has lots of
-> > extra logging and stuff, but the idea is to read the first 3 bytes of
-> > each logical frame, and return the expected full frame size from the
-> > parser program. The verdict program always just returns SK_PASS.
-> >
-> > This seems to work exactly as expected in manual simulations of
-> > various packet size distributions, and even for a bunch of
-> > ping/pong-like benchmark (which are very sensitive to correct frame
-> > length determination, so I'm reasonably confident we don't screw that
-> > up much). And yet, when benchmarking sending multiple logical RPC
-> > streams over the same single socket (so many interleaving RSocket
-> > frames on single socket, but in terms of logical frames nothing should
-> > change), we often see that while full frame hasn't been accumulated in
-> > socket receive buffer yet, epoll_wait() for that socket would return
-> > with success notifying user space that there is data on socket.
-> > Subsequent recvfrom() call would immediately return -EAGAIN and no
-> > data, and our benchmark would go on this loop of useless
-> > epoll_wait()+recvfrom() calls back to back, many times over.
->
-> Aha yes this sounds bad.
->
-> >
-> > So I have a few questions:
-> >   - is the above use case something that was meant to be handled by
-> > sockmap+parser/verdict?
->
-> We shouldn't wake up user space if there is nothing to read. So
-> yes this seems like a valid use case to me.
->
-> >   - is it correct to assume that epoll won't wake up until amount of
-> > bytes requested by parser program is accumulated (this seems to be the
-> > case from manually experimenting with various "packet delays");
->
-> Seems there is some bug that races and causes it to wake up
-> user space. I'm aware of a couple bugs in the stream parser
-> that I wanted to fix. Not sure I can get to them this week
-> but should have time next week. We have a couple more fixes
-> to resolve a few HTTPS server compliance tests as well.
->
-> >   - is there some known bug or race in how sockmap and strparser
-> > framework interacts with epoll subsystem that could cause this weird
-> > epoll_wait() behavior?
->
-> Yes I know of some races in strparser. I'll elaborate later
-> probably with patches as I don't recall them readily at the
-> moment.
+Stanislav Fomichev (3):
+  bpf: make it easier to add new metadata kfunc
+  bpf: expose information about supported xdp metadata kfunc
+  tools: ynl: extend netdev sample to dump xdp-rx-metadata-features
 
-So I missed a good chunk of BPF mailing list traffic while I was on my
-PTO. Did you end up getting to these bugs in strparser logic? Should I
-try running the latest bpf-next/net-next on our production workload to
-see if this is still happening?
+ Documentation/netlink/specs/netdev.yaml      | 21 ++++++++++++++++++++
+ Documentation/networking/xdp-rx-metadata.rst |  7 +++++++
+ include/net/xdp.h                            | 19 ++++++++++++++----
+ include/uapi/linux/netdev.h                  | 16 +++++++++++++++
+ kernel/bpf/offload.c                         |  9 +++++----
+ net/core/netdev-genl.c                       | 12 ++++++++++-
+ net/core/xdp.c                               |  4 ++--
+ tools/include/uapi/linux/netdev.h            | 16 +++++++++++++++
+ tools/net/ynl/generated/netdev-user.c        | 19 ++++++++++++++++++
+ tools/net/ynl/generated/netdev-user.h        |  3 +++
+ tools/net/ynl/samples/Makefile               |  2 +-
+ tools/net/ynl/samples/netdev.c               |  8 +++++++-
+ 12 files changed, 123 insertions(+), 13 deletions(-)
 
->
-> >
-> > It does seem like some sort of timing issue, but I couldn't pin down
-> > exactly what are the conditions that this happens in. But it's quite
-> > reproducible with a pretty high frequency using our internal benchmark
-> > when multiple logical streams are involved.
-> >
-> > Any thoughts or suggestions?
->
-> Seems like a bug we should fix it. I'm aware of a couple
-> issues with the stream parser that we plan to fix so could
-> be one of those or a new one I'm not aware of. I'll take
-> a look more closely next week.
->
-> >   [0] https://rsocket.io/about/protocol/#framing-format
-> >   [1] https://github.com/anakryiko/libbpf-bootstrap/blob/thrift-coalesc=
-e-rcvlowat/examples/c/bootstrap.bpf.c
-> >
-> > -- Andrii
+-- 
+2.42.0.283.g2d96d420d3-goog
+
 
