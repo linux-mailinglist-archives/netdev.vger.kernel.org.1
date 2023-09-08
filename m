@@ -1,202 +1,190 @@
-Return-Path: <netdev+bounces-32497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32498-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D147F798051
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 03:40:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73456798057
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 03:45:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16DE01C20C5D
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 01:40:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 004FD1C20C48
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 01:45:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 817A5EA4;
-	Fri,  8 Sep 2023 01:40:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FB89EBB;
+	Fri,  8 Sep 2023 01:45:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71C4FEA0
-	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 01:40:53 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C4D81BE1
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 18:40:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694137247; x=1725673247;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=worUBMND55vJNbyBeHPqUxOWqBelkEKW/vFbtwAy0vY=;
-  b=MgAbUbBoEbTZp7m2YfNmObIVUqkh1p4HxFaauQxlfDGeXXo+kHlgXVaE
-   9vsgdtS1EielLxptuOsKTch9T2Mf2fC/yVkF/4QC3QZh3WNjndvzpsulc
-   d6rtSYQ8ockM3ttrn263ojKwXv0qeSqN2SjVZ0Q9eBrBEJwhOdNNtwFYB
-   JAjVVehuCtJqZzOcn7J8vB33EiM9jmGZaLRwoS/xuO7OqCk7axfJAgzOe
-   83Z2bD6hPKNCWhORbKisiWdASLLA/5kXmHWposyAPLX1ey+OXfKE4V/tP
-   Xk3SVgLV2SUGqs1pfepOdrJyb96Y6qLplnfFvuxe5Fn5dbxPyj9+M+YFF
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10826"; a="380261305"
-X-IronPort-AV: E=Sophos;i="6.02,236,1688454000"; 
-   d="scan'208";a="380261305"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Sep 2023 18:40:47 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10826"; a="807771527"
-X-IronPort-AV: E=Sophos;i="6.02,236,1688454000"; 
-   d="scan'208";a="807771527"
-Received: from lkp-server01.sh.intel.com (HELO 59b3c6e06877) ([10.239.97.150])
-  by fmsmga008.fm.intel.com with ESMTP; 07 Sep 2023 18:40:43 -0700
-Received: from kbuild by 59b3c6e06877 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qeQUD-0001nh-0N;
-	Fri, 08 Sep 2023 01:40:41 +0000
-Date: Fri, 8 Sep 2023 09:40:36 +0800
-From: kernel test robot <lkp@intel.com>
-To: Kyle Zeng <zengyhkyle@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
-	dsahern@kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	davem@davemloft.net, netdev@vger.kernel.org, ssuryaextr@gmail.com
-Subject: Re: [PATCH] fix null-deref in ipv4_link_failure
-Message-ID: <202309080905.JnJFQ6YN-lkp@intel.com>
-References: <ZPpUfm/HhFet3ejH@westworld>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42B09EA0
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 01:45:43 +0000 (UTC)
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 436111BDD
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 18:45:41 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-9a21b6d105cso195177766b.3
+        for <netdev@vger.kernel.org>; Thu, 07 Sep 2023 18:45:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694137540; x=1694742340; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=UW7+a7tXpeEAZxVIZ+dmlSSTRPuRpH8sTuYBLqEcEUo=;
+        b=dlu1ur3sIf8BDnnD8Oldpa/aQ/UD0stXQcq7JchHSHHnzEmFgwtB91wemnyQGRkFe6
+         /JQqstiNDnNDMX6omMY5My+z1WcWxlRe1kGlY1wm8+U5HeRWXUF7uIIaZwT+Jaek7wRn
+         haObU7ofQFIjoqDP1Nx5vw6j0rLqUn1A6btCXGZxk3n7sj84NFcWv8Zo5ySf1WzNxQxw
+         CvEYuNaPHb0Hd3tTrTEhBKIvCOFvCuHuQlUh52/8JGWKQnD3JHt8OMjvWP223nOt0UGO
+         J3Mp5p3a0QR1ghQPyounmR0SBcja2r9f8hOTDRqmZzmubo7hIqWJom6v2Cu70l++OFKT
+         Jc7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694137540; x=1694742340;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UW7+a7tXpeEAZxVIZ+dmlSSTRPuRpH8sTuYBLqEcEUo=;
+        b=VONClldosiZI7PRJ3rpdYvVjp+MHAhXM7Er0nd5C6DF5YvOYTD1oxHGFyvOF1db9dY
+         xnDy8DhpWxDMUMd9KziZIBRxTiV545NWQ5ryzBDpRJZOqIU/iP+qh/blubG5A9DpKZpQ
+         ZFKMJLkAnyoht17O7WUfp5hzTj0ypf289cPaRcZkOnXtbyjzspWUT/qX5UYlL4+r/x4H
+         fxNWt6hXdi+lZ7JG5foMP0+QKDUXt4Odv0n19Y13G9d/3s5DkKqSBze31uVyj4WRADwo
+         2qmEaQEVyhWDvrEFmZLmqqxFFFt7QxoaD1C+m6hw7ozEsx3zM5awGASsW0Jt3bgV7dq0
+         KvtQ==
+X-Gm-Message-State: AOJu0YwML9FxyJrDPFW9upzfJIWyOdcm25pDEz/jxWnjVGjrj7ywfOfE
+	Aq1B20wFd7ucmvo04Az4DCX/RlnTj9SM/IrrceTq9RkpmbMcFpce
+X-Google-Smtp-Source: AGHT+IHCXgYfZOgF5wzfNTwCoXBHB3evIzLE0UW/qqhmYiJna/qOxbKhiS66SjkN7gmJdmUpqNvVnJ59GXpvrL/UI6o=
+X-Received: by 2002:a17:906:cc5c:b0:9a6:426f:7dfd with SMTP id
+ mm28-20020a170906cc5c00b009a6426f7dfdmr627297ejb.66.1694137539376; Thu, 07
+ Sep 2023 18:45:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <ZPk41vtxHK/YnFUs@westworld> <ecde5e34c6f3a8182f588b3c1352bf78b69ff206.camel@redhat.com>
+ <ZPpUfm/HhFet3ejH@westworld>
 In-Reply-To: <ZPpUfm/HhFet3ejH@westworld>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+From: Kyle Zeng <zengyhkyle@gmail.com>
+Date: Thu, 7 Sep 2023 18:45:03 -0700
+Message-ID: <CADW8OBuq2y8txXKXkVJSbKFFs5B3LDX667OAJHn-p0BeOZDy5Q@mail.gmail.com>
+Subject: Re: [PATCH] don't assume the existence of skb->dev when trying to
+ reset ip_options in ipv4_send_dest_unreach
+To: Paolo Abeni <pabeni@redhat.com>, dsahern@kernel.org
+Cc: davem@davemloft.net, netdev@vger.kernel.org, ssuryaextr@gmail.com
+Content-Type: multipart/mixed; boundary="0000000000003c5fa80604cf220c"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Kyle,
+--0000000000003c5fa80604cf220c
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-kernel test robot noticed the following build errors:
+On Thu, Sep 7, 2023 at 3:53=E2=80=AFPM Kyle Zeng <zengyhkyle@gmail.com> wro=
+te:
+>
+> On Thu, Sep 07, 2023 at 01:03:52PM +0200, Paolo Abeni wrote:
+> > On Wed, 2023-09-06 at 19:43 -0700, Kyle Zeng wrote:
+> > > Currently, we assume the skb is associated with a device before calli=
+ng __ip_options_compile, which is not always the case if it is re-routed by=
+ ipvs.
+> > > When skb->dev is NULL, dev_net(skb->dev) will become null-dereference=
+.
+> > > Since we know that all the options will be set to IPOPT_END, which do=
+es
+> > > not depend on struct net, we pass NULL to it.
+> >
+> > It's not clear to me why we can infer the above. Possibly would be more
+> > safe to skip entirely the __ip_options_compile() call?!?
+> >
+> > Please at least clarify the changelog and trim it to 72 chars.
+> >
+> > Additionally trim the subj to the same len and include the target tree
+> > (net) into the subj prefix.
+> >
+> > Thanks!
+> >
+> > Paolo
+> >
+>
+> Hi Paolo,
+>
+> > It's not clear to me why we can infer the above. Possibly would be more
+> > safe to skip entirely the __ip_options_compile() call?!?
+> Sorry, after you pointed it out, I realized that I misunderstood the
+> code. Initially I thought `memset(&opt, 0, sizeof(opt));` would reset all
+> the option to OPOPT_END. But after carefully reading the code, it seems
+> that it only resets the io_options struct and the `optptr` is still the
+> original one.
+>
+> Do you think it is better to do:
+> `struct net =3D skb->dev ? dev_net(skb->dev) : NULL` ?
+>
+> > Please at least clarify the changelog and trim it to 72 chars.
+> >
+> > Additionally trim the subj to the same len and include the target tree
+> > (net) into the subj prefix.
+> Sorry for that. I'm new to the Linux kernel community and I wonder whethe=
+r
+> I should initiate a different patch or send another patch in this thread
+> in this case.
+>
+> Hi David,
+>
+> > ipv4_send_dest_unreach is called from ipv4_link_failure which might hav=
+e
+> > an rtable (dst_entry) which has a device which is in a net namespace.
+> > That is better than blindly ignoring the namepsace.
+> Following your suggestion, I drafted another patch which is attached to
+> this email. I verified that the crash does not happen anymore. Can you
+> please advise whether it is a correct patch?
+>
+> Thanks,
+> Kyle Zeng
 
-[auto build test ERROR on linus/master]
-[also build test ERROR on v6.5 next-20230907]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Sorry for the typo in the previous patch. I fixed it and tested it.
+My proof-of-concept code can no longer trigger the crash.
+The patch is attached to this email.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Kyle-Zeng/fix-null-deref-in-ipv4_link_failure/20230908-065510
-base:   linus/master
-patch link:    https://lore.kernel.org/r/ZPpUfm%2FHhFet3ejH%40westworld
-patch subject: [PATCH] fix null-deref in ipv4_link_failure
-config: um-allnoconfig (https://download.01.org/0day-ci/archive/20230908/202309080905.JnJFQ6YN-lkp@intel.com/config)
-compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230908/202309080905.JnJFQ6YN-lkp@intel.com/reproduce)
+Thanks,
+Kyle Zeng
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202309080905.JnJFQ6YN-lkp@intel.com/
+--0000000000003c5fa80604cf220c
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="0001-fix-null-deref-in-ipv4_link_failure.patch"
+Content-Disposition: attachment; 
+	filename="0001-fix-null-deref-in-ipv4_link_failure.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_lm9xq4so0>
+X-Attachment-Id: f_lm9xq4so0
 
-All errors (new ones prefixed by >>):
-
-   In file included from net/ipv4/route.c:67:
-   In file included from include/linux/memblock.h:13:
-   In file included from arch/um/include/asm/dma.h:5:
-   In file included from arch/um/include/asm/io.h:24:
-   include/asm-generic/io.h:547:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     547 |         val = __raw_readb(PCI_IOBASE + addr);
-         |                           ~~~~~~~~~~ ^
-   include/asm-generic/io.h:560:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     560 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
-      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
-         |                                                   ^
-   In file included from net/ipv4/route.c:67:
-   In file included from include/linux/memblock.h:13:
-   In file included from arch/um/include/asm/dma.h:5:
-   In file included from arch/um/include/asm/io.h:24:
-   include/asm-generic/io.h:573:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     573 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
-      35 | #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
-         |                                                   ^
-   In file included from net/ipv4/route.c:67:
-   In file included from include/linux/memblock.h:13:
-   In file included from arch/um/include/asm/dma.h:5:
-   In file included from arch/um/include/asm/io.h:24:
-   include/asm-generic/io.h:584:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     584 |         __raw_writeb(value, PCI_IOBASE + addr);
-         |                             ~~~~~~~~~~ ^
-   include/asm-generic/io.h:594:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     594 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:604:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     604 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:692:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     692 |         readsb(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:700:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     700 |         readsw(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:708:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     708 |         readsl(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:717:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     717 |         writesb(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
-   include/asm-generic/io.h:726:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     726 |         writesw(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
-   include/asm-generic/io.h:735:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     735 |         writesl(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
-   net/ipv4/route.c:880:6: warning: variable 'log_martians' set but not used [-Wunused-but-set-variable]
-     880 |         int log_martians;
-         |             ^
->> net/ipv4/route.c:1235:38: error: use of undeclared identifier 'net'
-    1235 |                 res = __ip_options_compile(dev_net(net), &opt, skb, NULL);
-         |                                                    ^
-   13 warnings and 1 error generated.
-
-
-vim +/net +1235 net/ipv4/route.c
-
-  1213	
-  1214	static void ipv4_send_dest_unreach(struct sk_buff *skb)
-  1215	{
-  1216		struct ip_options opt;
-  1217		int res;
-  1218		struct net_device *dev;
-  1219	
-  1220		/* Recompile ip options since IPCB may not be valid anymore.
-  1221		 * Also check we have a reasonable ipv4 header.
-  1222		 */
-  1223		if (!pskb_network_may_pull(skb, sizeof(struct iphdr)) ||
-  1224		    ip_hdr(skb)->version != 4 || ip_hdr(skb)->ihl < 5)
-  1225			return;
-  1226	
-  1227		memset(&opt, 0, sizeof(opt));
-  1228		if (ip_hdr(skb)->ihl > 5) {
-  1229			if (!pskb_network_may_pull(skb, ip_hdr(skb)->ihl * 4))
-  1230				return;
-  1231			opt.optlen = ip_hdr(skb)->ihl * 4 - sizeof(struct iphdr);
-  1232	
-  1233			rcu_read_lock();
-  1234			dev = skb->dev ? skb->dev : skb_rtable(skb)->dst.dev;
-> 1235			res = __ip_options_compile(dev_net(net), &opt, skb, NULL);
-  1236			rcu_read_unlock();
-  1237	
-  1238			if (res)
-  1239				return;
-  1240		}
-  1241		__icmp_send(skb, ICMP_DEST_UNREACH, ICMP_HOST_UNREACH, 0, &opt);
-  1242	}
-  1243	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+RnJvbSBkNGFlODljNjc2MzczYmVjOWU5MjJlYjNhZGUwNDEyODYyNDYxNWUwIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBLeWxlIFplbmcgPHplbmd5aGt5bGVAZ21haWwuY29tPgpEYXRl
+OiBUaHUsIDcgU2VwIDIwMjMgMTg6MTk6MDAgLTA3MDAKU3ViamVjdDogW1BBVENIXSBmaXggbnVs
+bC1kZXJlZiBpbiBpcHY0X2xpbmtfZmFpbHVyZQoKQ3VycmVudGx5LCB3ZSBhc3N1bWUgdGhlIHNr
+YiBpcyBhc3NvY2lhdGVkIHdpdGggYSBkZXZpY2UgYmVmb3JlIGNhbGxpbmcKX19pcF9vcHRpb25z
+X2NvbXBpbGUsIHdoaWNoIGlzIG5vdCBhbHdheXMgdGhlIGNhc2UgaWYgaXQgaXMgcmUtcm91dGVk
+IGJ5CmlwdnMuCldoZW4gc2tiLT5kZXYgaXMgTlVMTCwgZGV2X25ldChza2ItPmRldikgd2lsbCBi
+ZWNvbWUgbnVsbC1kZXJlZmVyZW5jZS4KVGhpcyBwYXRjaCBhZGRzIGEgY2hlY2sgZm9yIHRoZSBl
+ZGdlIGNhc2UgYW5kIHN3aXRjaCB0byB1c2UgdGhlIG5ldF9kZXZpY2UKZnJvbSB0aGUgcnRhYmxl
+IHdoZW4gc2tiLT5kZXYgaXMgTlVMTC4KClN1Z2dlc3RlZC1ieTogUGFvbG8gQWJlbmk8cGFiZW5p
+QHJlZGhhdC5jb20+ClN1Z2dlc3RlZC1ieTogRGF2aWQgQWhlcm4gPGRzYWhlcm5Aa2VybmVsLm9y
+Zz4KU2lnbmVkLW9mZi1ieTogS3lsZSBaZW5nIDx6ZW5neWhreWxlQGdtYWlsLmNvbT4KQ2M6IFN0
+ZXBoZW4gU3VyeWFwdXRyYSA8c3N1cnlhZXh0ckBnbWFpbC5jb20+Ci0tLQogbmV0L2lwdjQvcm91
+dGUuYyB8IDQgKysrLQogMSBmaWxlIGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlv
+bigtKQoKZGlmZiAtLWdpdCBhL25ldC9pcHY0L3JvdXRlLmMgYi9uZXQvaXB2NC9yb3V0ZS5jCmlu
+ZGV4IGQ4Yzk5YmRjNjE3Li4xYmUzNGU1ZWVhMSAxMDA2NDQKLS0tIGEvbmV0L2lwdjQvcm91dGUu
+YworKysgYi9uZXQvaXB2NC9yb3V0ZS5jCkBAIC0xMjE0LDYgKzEyMTQsNyBAQCBFWFBPUlRfSU5E
+SVJFQ1RfQ0FMTEFCTEUoaXB2NF9kc3RfY2hlY2spOwogc3RhdGljIHZvaWQgaXB2NF9zZW5kX2Rl
+c3RfdW5yZWFjaChzdHJ1Y3Qgc2tfYnVmZiAqc2tiKQogewogCXN0cnVjdCBpcF9vcHRpb25zIG9w
+dDsKKwlzdHJ1Y3QgbmV0X2RldmljZSAqZGV2OwogCWludCByZXM7CiAKIAkvKiBSZWNvbXBpbGUg
+aXAgb3B0aW9ucyBzaW5jZSBJUENCIG1heSBub3QgYmUgdmFsaWQgYW55bW9yZS4KQEAgLTEyMzAs
+NyArMTIzMSw4IEBAIHN0YXRpYyB2b2lkIGlwdjRfc2VuZF9kZXN0X3VucmVhY2goc3RydWN0IHNr
+X2J1ZmYgKnNrYikKIAkJb3B0Lm9wdGxlbiA9IGlwX2hkcihza2IpLT5paGwgKiA0IC0gc2l6ZW9m
+KHN0cnVjdCBpcGhkcik7CiAKIAkJcmN1X3JlYWRfbG9jaygpOwotCQlyZXMgPSBfX2lwX29wdGlv
+bnNfY29tcGlsZShkZXZfbmV0KHNrYi0+ZGV2KSwgJm9wdCwgc2tiLCBOVUxMKTsKKwkJZGV2ID0g
+c2tiLT5kZXYgPyBza2ItPmRldiA6IHNrYl9ydGFibGUoc2tiKS0+ZHN0LmRldjsKKwkJcmVzID0g
+X19pcF9vcHRpb25zX2NvbXBpbGUoZGV2X25ldChkZXYpLCAmb3B0LCBza2IsIE5VTEwpOwogCQly
+Y3VfcmVhZF91bmxvY2soKTsKIAogCQlpZiAocmVzKQotLSAKMi4zNC4xCgo=
+--0000000000003c5fa80604cf220c--
 
