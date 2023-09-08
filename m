@@ -1,100 +1,101 @@
-Return-Path: <netdev+bounces-32607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 317A5798B16
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 18:56:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A929798B48
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 19:10:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF341281C2C
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 16:55:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A48E1281C3B
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 17:10:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B4B213AF4;
-	Fri,  8 Sep 2023 16:55:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E99813AFA;
+	Fri,  8 Sep 2023 17:10:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CA3814262;
-	Fri,  8 Sep 2023 16:55:55 +0000 (UTC)
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6514D2680;
-	Fri,  8 Sep 2023 09:55:22 -0700 (PDT)
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-501bd6f7d11so3717994e87.1;
-        Fri, 08 Sep 2023 09:55:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694192117; x=1694796917;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=S7URpEOHyiyMnwkk7ulREI14OY8DCzbtRusyfBiWSJI=;
-        b=JX9O/7ttTg/xcwDACP4i8TiPwkW72lCHbJBUpidhcG3J0uhcHeQ3YXmfHKiF27E+6D
-         VgqenuePm878MxAAlnZOlzt7k1suf9K20AFk3mN9bpves/xorl7yCyMXUBmiWb8R28JW
-         AkGd9A2cXnPoGrFHoYL5EM4H+x3XfHjEjozu1su5C2+5/69os4mV0HSdA+2wcfLqp+7H
-         Su3aFYh0tAQ2h2cekOQRT/+MtDiVH8PQR4zKJodDq4xkkq9s4RQx+7mPOSChJOwc6Mhp
-         SlC+FDuCi0wpEY+pxCK7BbGfYHPKKd+Ys63nfCOvc/eBSu34vh24ErcY6DE3TnIUclNo
-         /hDg==
-X-Gm-Message-State: AOJu0YxxLaZk5f/7H/iYU2WgVWgBscNQZA8QUZuYAKn8qfFqb1Wu6aR/
-	S3VANbOEuIOcQSN7Dyw35QM=
-X-Google-Smtp-Source: AGHT+IGHljrhvnrA7HLF8GAewGPNt9+isjVnu7yHq1p/pbkFl2qUisWBb7baIwcEX4XP0OE7pSgnyA==
-X-Received: by 2002:a05:6512:3f15:b0:500:aa41:9d67 with SMTP id y21-20020a0565123f1500b00500aa419d67mr3016978lfa.8.1694192116925;
-        Fri, 08 Sep 2023 09:55:16 -0700 (PDT)
-Received: from gmail.com (fwdproxy-cln-118.fbsv.net. [2a03:2880:31ff:76::face:b00c])
-        by smtp.gmail.com with ESMTPSA id z7-20020a1709060ac700b0099bc08862b6sm1276320ejf.171.2023.09.08.09.55.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Sep 2023 09:55:16 -0700 (PDT)
-Date: Fri, 8 Sep 2023 09:55:11 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: sdf@google.com, axboe@kernel.dk, asml.silence@gmail.com,
-	willemdebruijn.kernel@gmail.com, martin.lau@linux.dev,
-	krisman@suse.de, bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, io-uring@vger.kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH v4 00/10] io_uring: Initial support for {s,g}etsockopt
- commands
-Message-ID: <ZPtR7+8YOWmtZHuD@gmail.com>
-References: <20230904162504.1356068-1-leitao@debian.org>
- <20230905154951.0d0d3962@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3838B63AB
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 17:10:54 +0000 (UTC)
+X-Greylist: delayed 526 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 08 Sep 2023 10:10:50 PDT
+Received: from iam.tj (yes.iam.tj [109.74.197.121])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 927C2CE6
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 10:10:50 -0700 (PDT)
+Received: from [IPV6:2a01:7e00:e001:ee80:145d:5eff:feb1:1df1] (unknown [IPv6:2a01:7e00:e001:ee80:145d:5eff:feb1:1df1])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+	(No client certificate requested)
+	by iam.tj (Postfix) with ESMTPSA id B1AE6347B9
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 18:02:00 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=iam.tj; s=2019;
+	t=1694192520; bh=7IriNvaZOGEoRGJTO700UsAz9snUm/tlg1knkCA6pcU=;
+	h=Date:To:From:Subject:From;
+	b=VlX9LRqXsXgJXL8aT55d901JIZOoBtOLeBZ9gtnbCNYxqr4Km9HzLIzxsXYxnTR8Q
+	 nPOMSafkfIRO+HXw2npGUaU97uRTWw6bOe03Iy5RNMq044emBBvU1PFUFae8dCq7uR
+	 sf8FvCz7sTvKdiUIRvf0drPfWiCG8kLrKFQ/M7DYtblRABJuXcoqYBIK6zferx7BbM
+	 IxrvfEOlyoPI41r54ZM4lafGFAnYiqW6GLwnIDEjpKcmEqZzJ6Vvhlq/+Xm1dAs1vP
+	 7+2cLs7W5aCfDblWSojB2tPaqhPpBOqVn8rFaKEybJI4C9cFSN2HnLyKNhZTidQ+Tf
+	 q2FlLABJ3Stww==
+Message-ID: <f878ef3c-d11b-b1de-fa02-d9617308d460@iam.tj>
+Date: Fri, 8 Sep 2023 18:02:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230905154951.0d0d3962@kernel.org>
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.0
+Content-Language: en-GB
+To: netdev@vger.kernel.org
+From: Tj <linux@iam.tj>
+Subject: IPv6 address scope not set to operator-configured value
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Sep 05, 2023 at 03:49:51PM -0700, Jakub Kicinski wrote:
-> On Mon,  4 Sep 2023 09:24:53 -0700 Breno Leitao wrote:
-> > Patches 1-2: Modify the BPF hooks to support sockptr_t, so, these functions
-> > become flexible enough to accept user or kernel pointers for optval/optlen.
-> 
-> Have you seen:
-> 
-> https://lore.kernel.org/all/CAHk-=wgGV61xrG=gO0=dXH64o2TDWWrXn1mx-CX885JZ7h84Og@mail.gmail.com/
+Using iproute2 and kernel v6.5.0 with Debian 12 Bookworm amd64 (tested also with v6.136 nixos) setting scope on an IPv6 fails silently with no indications as to why and the address is configured with what appears to be a scope based on the prefix (usually 0 but for fe80::/16 addresses scope is set to 253). Doesn't matter whether using scope names (from /etc/iproute2/rt_scopes) or numbers. Similar command for IPv4 succeeds.
 
-I haven't but I think it will not affect *much* this patchset.
+ip address add fddc::2/64 scope 200 dev PUBLIC
+ip -N -6 address show dev PUBLIC
+...
+inet6 fddc::2/64 scope 0
 
-> ? I wasn't aware that Linus felt this way, now I wonder if having
-> sockptr_t spread will raise any red flags as this code flows back
-> to him.
+I used `gdb` to trace this expecting somehow the scope was not being read correctly but it is:
 
-I can change the io_uring API in a way that we can avoid these
-sockptr_t changes completely.
+2577            if (!scoped && cmd != RTM_DELADDR)
+(gdb) p scoped
+$22 = <optimized out>
+(gdb) p cmd
+$23 = <optimized out>
+(gdb) n
+2580            req.ifa.ifa_index = ll_name_to_index(d);
+(gdb) p req.ifa.ifa_scope
+$24 = 200 '\310'
+...
+2607            if (echo_request)
+(gdb) n
+2610                    ret = rtnl_talk(&rth, &req.n, NULL);
+(gdb) p req.n
+$25 = {nlmsg_len = 64, nlmsg_type = 20, nlmsg_flags = 1537, nlmsg_seq = 0, nlmsg_pid = 0}
+(gdb) p rth
+$26 = {fd = 3, local = {nl_family = 16, nl_pad = 0, nl_pid = 2381950, nl_groups = 0}, peer = {nl_family = 0, nl_pad = 0, nl_pid = 0, nl_groups = 0}, seq = 1694191286,
+   dump = 0, proto = 0, dump_fp = 0x0, flags = 4}
+(gdb) s
+rtnl_talk (rtnl=0x5555555f7020 <rth>, n=n@entry=0x7fffffffe140, answer=answer@entry=0x0) at ./lib/libnetlink.c:1170
+1170    {
+...
+ipaddr_modify (cmd=<optimized out>, flags=<optimized out>, argc=<optimized out>, argv=0x7fffffffe478) at ./ip/ipaddress.c:2612
+2612            if (ret)
+(gdb) p ret
+$27 = 0
 
-My plan is to mimic what getsockopt(2) is doing in io_uring cmd path, in
-regard to optlen being an userpointer, instead of a value - which is
-then translated to a KERNEL_SOCKPTR.
 
-In this way, this change don't need to touch any sockptr field.
 
-Thanks for the heads-up
+
+
 
