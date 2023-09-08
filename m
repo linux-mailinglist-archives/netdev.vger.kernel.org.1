@@ -1,361 +1,135 @@
-Return-Path: <netdev+bounces-32503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32504-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B77797980B2
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 04:54:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 920567980C0
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 04:59:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00CDD28182E
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 02:54:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 191A92818F6
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 02:59:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B69C7EDD;
-	Fri,  8 Sep 2023 02:53:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1A891106;
+	Fri,  8 Sep 2023 02:59:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0B31627
-	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 02:53:58 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8CB01BD8;
-	Thu,  7 Sep 2023 19:53:56 -0700 (PDT)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3880afE4005194;
-	Thu, 7 Sep 2023 19:53:17 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=pfpt0220; bh=vC62usGi6hDa55cg6SegWyZWCeHVCdEk3PpJexgD4lM=;
- b=btJeU9yymzBCgpXDEGfbwQhxmFMLBc934YWhgWCspq7oxHFrU444mGlZm+aZjhmYF9cW
- 4zB5/hW5PEBPn5XjzSkS9xRi7/8WUqptqih3V0Wr+P08z23h448ADfA3VZW9t+ExkzEI
- sdLf5aaagC4qP9UTTs10+35m9o+jelDU1qaETM4c2x9Uy1NqhbPnqGNZ1MM9TWYnp4lj
- dW/Mx1ssd6lakfQTipMknDUQfjMnUc+lESFWaMcWWU0+ZLseERNljSBMiZzg/hZa5PHj
- plLs49bWwEGn1msxlpGaO8/qIWCtq/C2/k/WxMiMYo6/rlhLIJl9OH2PGTbWdWdveAtO 5A== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3sxu7cqj28-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Thu, 07 Sep 2023 19:53:17 -0700
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 7 Sep
- 2023 19:53:15 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Thu, 7 Sep 2023 19:53:15 -0700
-Received: from marvell-OptiPlex-7090.marvell.com (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id 4CA615B692E;
-	Thu,  7 Sep 2023 19:53:11 -0700 (PDT)
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
-        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <rkannoth@marvell.com>,
-        <hawk@kernel.org>, <alexander.duyck@gmail.com>,
-        <ilias.apalodimas@linaro.org>, <linyunsheng@huawei.com>,
-        <bigeasy@linutronix.de>
-Subject: [PATCH net v3] octeontx2-pf: Fix page pool cache index corruption.
-Date: Fri, 8 Sep 2023 08:23:09 +0530
-Message-ID: <20230908025309.45096-1-rkannoth@marvell.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E09C8EDD
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 02:59:28 +0000 (UTC)
+Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CADED1BD8;
+	Thu,  7 Sep 2023 19:59:27 -0700 (PDT)
+Received: by mail-pl1-x641.google.com with SMTP id d9443c01a7336-1b89b0c73d7so3011845ad.1;
+        Thu, 07 Sep 2023 19:59:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694141967; x=1694746767; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nIIuQrovYE14MZMA9DrHJROcuwkTTSSF0MTAzbwwxMQ=;
+        b=RNSV8RE2U3OrpWB8kI35fDi/JDGLG/2K9SQvL6qzBWvHiGryKozmaF1GomucXs2Da0
+         2KOhg9oSDF8KB0VHFl6pgYABdfohXV6FA6Q7IgwuQbwjvpgFeUp2i1IUgiCZHk0gGBWR
+         73mJio/1rq7yyPt7Q3zWAuKBTB82/2Di2lw+MO0Mpea/eyqSawNsic8Z45Y4yKf7899J
+         GRBdj7at+hI7VtfLJfuO2Txf9Hum5dmUxsQzEIb5/yh/RadgvgXmFbQbHta4KXPP63uh
+         b0yGw/eUdX22t0e04IdbBR9IJyGQTmGVbqRtBICR1+KxqVs9sAEef81q2L7RPGOqjN8H
+         RP7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694141967; x=1694746767;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nIIuQrovYE14MZMA9DrHJROcuwkTTSSF0MTAzbwwxMQ=;
+        b=wDSvBO6VW17XSW6g3fb9qOPKi/Ml4GOWH/d90rCp3vBftbuOlSbWshclNzVEfwXd5h
+         2ose/oAZP2xW3Jbai74TXQQEjjoOvHjnSHx1peGnua81yHpSeb4u+XW0IodLoecOBixC
+         hXIvSCtHstDjjK7gFwzmSVSoVCqizl1GmMzJLinpbr0CeKLsCnowhziqHj2EhuNVPT3+
+         FICnF3wXfR/rayIkPSBqVsnSbZwIXhq9Uw1MQT4wwUllys8SgSuZU2rcQstq8unK8vcE
+         ASieW+c4OxHQ/iJCXN3vlIguY1635SA3jrGuvdKWsMKw8y8bA2b9P/K2ZF1haua2YEyU
+         r4ug==
+X-Gm-Message-State: AOJu0YwCpR5j0yjH1qZFg3hTYNkSdq3OAG9oRsEqQ46veRP0xE3Zuz1w
+	mCur3xig1tY5bPAnxbo0K+M=
+X-Google-Smtp-Source: AGHT+IFtDC1Jp8gX6StfUbJQiFJnDW8ht3WRhsEhN8WdX7ZAkgSoUp1PWMSH0rS5G/V1kdEbxtYroA==
+X-Received: by 2002:a17:902:ecd2:b0:1bb:ac37:384b with SMTP id a18-20020a170902ecd200b001bbac37384bmr1422259plh.6.1694141967190;
+        Thu, 07 Sep 2023 19:59:27 -0700 (PDT)
+Received: from [127.0.0.1] ([103.152.220.17])
+        by smtp.gmail.com with ESMTPSA id p3-20020a170902e74300b001b8b4730355sm428470plf.287.2023.09.07.19.59.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 07 Sep 2023 19:59:26 -0700 (PDT)
+Message-ID: <94d077db-01e3-404e-1027-fb7532dc3c5c@gmail.com>
+Date: Fri, 8 Sep 2023 10:59:12 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: h2SybtKjxNIpAAdRveH3eizWbCB7ps0f
-X-Proofpoint-ORIG-GUID: h2SybtKjxNIpAAdRveH3eizWbCB7ps0f
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-09-07_15,2023-09-05_01,2023-05-22_02
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.0
+Subject: Re: [PATCH 1/3] net: ethernet: bcmasp: fix possible OOB write in
+ bcmasp_netfilt_get_all_active()
+To: Paolo Abeni <pabeni@redhat.com>, justin.chen@broadcom.com,
+ florian.fainelli@broadcom.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, mw@semihalf.com, linux@armlinux.org.uk, nbd@nbd.name,
+ john@phrozen.org, sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
+ lorenzo@kernel.org, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, maxime.chevallier@bootlin.com,
+ nelson.chang@mediatek.com
+Cc: bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20230906092107.19063-1-hbh25y@gmail.com>
+ <20230906092107.19063-2-hbh25y@gmail.com>
+ <7b42e1ca549f8d7d18a4df9d74a93cf527071a4d.camel@redhat.com>
+Content-Language: en-US
+From: Hangyu Hua <hbh25y@gmail.com>
+In-Reply-To: <7b42e1ca549f8d7d18a4df9d74a93cf527071a4d.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The access to page pool `cache' array and the `count' variable
-is not locked. Page pool cache access is fine as long as there
-is only one consumer per pool.
+On 7/9/2023 17:44, Paolo Abeni wrote:
+> On Wed, 2023-09-06 at 17:21 +0800, Hangyu Hua wrote:
+>> rule_locs is allocated in ethtool_get_rxnfc and the size is determined by
+>> rule_cnt from user space. So rule_cnt needs to be check before using
+>> rule_locs to avoid OOB writing or NULL pointer dereference.
+>>
+>> Fixes: c5d511c49587 ("net: bcmasp: Add support for wake on net filters")
+>> Signed-off-by: Hangyu Hua <hbh25y@gmail.com>
+>> ---
+>>   drivers/net/ethernet/broadcom/asp2/bcmasp.c | 3 +++
+>>   1 file changed, 3 insertions(+)
+>>
+>> diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.c b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
+>> index d63d321f3e7b..4df2ca871af8 100644
+>> --- a/drivers/net/ethernet/broadcom/asp2/bcmasp.c
+>> +++ b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
+>> @@ -535,6 +535,9 @@ void bcmasp_netfilt_get_all_active(struct bcmasp_intf *intf, u32 *rule_locs,
+>>   	int j = 0, i;
+>>   
+>>   	for (i = 0; i < NUM_NET_FILTERS; i++) {
+>> +		if (j == *rule_cnt)
+>> +			break;
+> 
+> Side note: it's a bit unfortunate/confusing that the drivers can
+> arbitrary return  -EMSGSIZE or silently truncate the list. I think it
+> would be clearer if we could stick to single behavior - and I'll vote
+> for -EMSGSIZE.
 
-octeontx2 driver fills in rx buffers from page pool in NAPI context.
-If system is stressed and could not allocate buffers, refiiling work
-will be delegated to a delayed workqueue. This means that there are
-two cosumers to the page pool cache.
+I see. I used break directly here beacause this function is defined as
+void. But since you mentioned this I will fix this out.
 
-Either workqueue or IRQ/NAPI can be run on other CPU. This will lead
-to lock less access, hence corruption of cache pool indexes.
+Thanks,
+Hangyu
 
-To fix this issue, NAPI is rescheduled from workqueue context to refill
-rx buffers.
-
-Fixes: b2e3406a38f0 ("octeontx2-pf: Add support for page pool")
-Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
-
----
-ChangeLogs
-v2 -> v3: Reverse xmas tree fixes for local variables.
-v1 -> v2: Added local_bh_disable() to be precise on napi scheduling.
-
-v0 -> v1: udelay will waste CPU cycles in UP. So call napi_schedule from
-	  delayed work queue context.
-
----
----
- .../ethernet/marvell/octeontx2/nic/cn10k.c    |  6 ++-
- .../ethernet/marvell/octeontx2/nic/cn10k.h    |  2 +-
- .../marvell/octeontx2/nic/otx2_common.c       | 43 +++----------------
- .../marvell/octeontx2/nic/otx2_common.h       |  3 +-
- .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |  7 +--
- .../marvell/octeontx2/nic/otx2_txrx.c         | 30 ++++++++++---
- .../marvell/octeontx2/nic/otx2_txrx.h         |  4 +-
- 7 files changed, 44 insertions(+), 51 deletions(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c
-index 826f691de259..a4a258da8dd5 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c
-@@ -107,12 +107,13 @@ int cn10k_sq_aq_init(void *dev, u16 qidx, u16 sqb_aura)
- }
- 
- #define NPA_MAX_BURST 16
--void cn10k_refill_pool_ptrs(void *dev, struct otx2_cq_queue *cq)
-+int cn10k_refill_pool_ptrs(void *dev, struct otx2_cq_queue *cq)
- {
- 	struct otx2_nic *pfvf = dev;
-+	int cnt = cq->pool_ptrs;
- 	u64 ptrs[NPA_MAX_BURST];
--	int num_ptrs = 1;
- 	dma_addr_t bufptr;
-+	int num_ptrs = 1;
- 
- 	/* Refill pool with new buffers */
- 	while (cq->pool_ptrs) {
-@@ -131,6 +132,7 @@ void cn10k_refill_pool_ptrs(void *dev, struct otx2_cq_queue *cq)
- 			num_ptrs = 1;
- 		}
- 	}
-+	return cnt - cq->pool_ptrs;
- }
- 
- void cn10k_sqe_flush(void *dev, struct otx2_snd_queue *sq, int size, int qidx)
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.h b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.h
-index 8ae96815865e..c1861f7de254 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.h
-@@ -24,7 +24,7 @@ static inline int mtu_to_dwrr_weight(struct otx2_nic *pfvf, int mtu)
- 	return weight;
- }
- 
--void cn10k_refill_pool_ptrs(void *dev, struct otx2_cq_queue *cq);
-+int cn10k_refill_pool_ptrs(void *dev, struct otx2_cq_queue *cq);
- void cn10k_sqe_flush(void *dev, struct otx2_snd_queue *sq, int size, int qidx);
- int cn10k_sq_aq_init(void *dev, u16 qidx, u16 sqb_aura);
- int cn10k_lmtst_init(struct otx2_nic *pfvf);
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-index 8511906cb4e2..997fedac3a98 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-@@ -574,20 +574,8 @@ int otx2_alloc_rbuf(struct otx2_nic *pfvf, struct otx2_pool *pool,
- int otx2_alloc_buffer(struct otx2_nic *pfvf, struct otx2_cq_queue *cq,
- 		      dma_addr_t *dma)
- {
--	if (unlikely(__otx2_alloc_rbuf(pfvf, cq->rbpool, dma))) {
--		struct refill_work *work;
--		struct delayed_work *dwork;
--
--		work = &pfvf->refill_wrk[cq->cq_idx];
--		dwork = &work->pool_refill_work;
--		/* Schedule a task if no other task is running */
--		if (!cq->refill_task_sched) {
--			cq->refill_task_sched = true;
--			schedule_delayed_work(dwork,
--					      msecs_to_jiffies(100));
--		}
-+	if (unlikely(__otx2_alloc_rbuf(pfvf, cq->rbpool, dma)))
- 		return -ENOMEM;
--	}
- 	return 0;
- }
- 
-@@ -1082,39 +1070,20 @@ static int otx2_cq_init(struct otx2_nic *pfvf, u16 qidx)
- static void otx2_pool_refill_task(struct work_struct *work)
- {
- 	struct otx2_cq_queue *cq;
--	struct otx2_pool *rbpool;
- 	struct refill_work *wrk;
--	int qidx, free_ptrs = 0;
- 	struct otx2_nic *pfvf;
--	dma_addr_t bufptr;
-+	int qidx;
- 
- 	wrk = container_of(work, struct refill_work, pool_refill_work.work);
- 	pfvf = wrk->pf;
- 	qidx = wrk - pfvf->refill_wrk;
- 	cq = &pfvf->qset.cq[qidx];
--	rbpool = cq->rbpool;
--	free_ptrs = cq->pool_ptrs;
- 
--	while (cq->pool_ptrs) {
--		if (otx2_alloc_rbuf(pfvf, rbpool, &bufptr)) {
--			/* Schedule a WQ if we fails to free atleast half of the
--			 * pointers else enable napi for this RQ.
--			 */
--			if (!((free_ptrs - cq->pool_ptrs) > free_ptrs / 2)) {
--				struct delayed_work *dwork;
--
--				dwork = &wrk->pool_refill_work;
--				schedule_delayed_work(dwork,
--						      msecs_to_jiffies(100));
--			} else {
--				cq->refill_task_sched = false;
--			}
--			return;
--		}
--		pfvf->hw_ops->aura_freeptr(pfvf, qidx, bufptr + OTX2_HEAD_ROOM);
--		cq->pool_ptrs--;
--	}
- 	cq->refill_task_sched = false;
-+
-+	local_bh_disable();
-+	napi_schedule(wrk->napi);
-+	local_bh_enable();
- }
- 
- int otx2_config_nix_queues(struct otx2_nic *pfvf)
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-index 4c6032ee7800..c04a8ee53a82 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-@@ -302,6 +302,7 @@ struct flr_work {
- struct refill_work {
- 	struct delayed_work pool_refill_work;
- 	struct otx2_nic *pf;
-+	struct napi_struct *napi;
- };
- 
- /* PTPv2 originTimestamp structure */
-@@ -370,7 +371,7 @@ struct dev_hw_ops {
- 	int	(*sq_aq_init)(void *dev, u16 qidx, u16 sqb_aura);
- 	void	(*sqe_flush)(void *dev, struct otx2_snd_queue *sq,
- 			     int size, int qidx);
--	void	(*refill_pool_ptrs)(void *dev, struct otx2_cq_queue *cq);
-+	int	(*refill_pool_ptrs)(void *dev, struct otx2_cq_queue *cq);
- 	void	(*aura_freeptr)(void *dev, int aura, u64 buf);
- };
- 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-index 70b9065f7d10..6daf4d58c25d 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-@@ -1943,6 +1943,10 @@ int otx2_stop(struct net_device *netdev)
- 
- 	netif_tx_disable(netdev);
- 
-+	for (wrk = 0; wrk < pf->qset.cq_cnt; wrk++)
-+		cancel_delayed_work_sync(&pf->refill_wrk[wrk].pool_refill_work);
-+	devm_kfree(pf->dev, pf->refill_wrk);
-+
- 	otx2_free_hw_resources(pf);
- 	otx2_free_cints(pf, pf->hw.cint_cnt);
- 	otx2_disable_napi(pf);
-@@ -1950,9 +1954,6 @@ int otx2_stop(struct net_device *netdev)
- 	for (qidx = 0; qidx < netdev->num_tx_queues; qidx++)
- 		netdev_tx_reset_queue(netdev_get_tx_queue(netdev, qidx));
- 
--	for (wrk = 0; wrk < pf->qset.cq_cnt; wrk++)
--		cancel_delayed_work_sync(&pf->refill_wrk[wrk].pool_refill_work);
--	devm_kfree(pf->dev, pf->refill_wrk);
- 
- 	kfree(qset->sq);
- 	kfree(qset->cq);
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-index e369baf11530..e77d43848955 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-@@ -424,9 +424,10 @@ static int otx2_rx_napi_handler(struct otx2_nic *pfvf,
- 	return processed_cqe;
- }
- 
--void otx2_refill_pool_ptrs(void *dev, struct otx2_cq_queue *cq)
-+int otx2_refill_pool_ptrs(void *dev, struct otx2_cq_queue *cq)
- {
- 	struct otx2_nic *pfvf = dev;
-+	int cnt = cq->pool_ptrs;
- 	dma_addr_t bufptr;
- 
- 	while (cq->pool_ptrs) {
-@@ -435,6 +436,8 @@ void otx2_refill_pool_ptrs(void *dev, struct otx2_cq_queue *cq)
- 		otx2_aura_freeptr(pfvf, cq->cq_idx, bufptr + OTX2_HEAD_ROOM);
- 		cq->pool_ptrs--;
- 	}
-+
-+	return cnt - cq->pool_ptrs;
- }
- 
- static int otx2_tx_napi_handler(struct otx2_nic *pfvf,
-@@ -521,6 +524,7 @@ int otx2_napi_handler(struct napi_struct *napi, int budget)
- 	struct otx2_cq_queue *cq;
- 	struct otx2_qset *qset;
- 	struct otx2_nic *pfvf;
-+	int filled_cnt = -1;
- 
- 	cq_poll = container_of(napi, struct otx2_cq_poll, napi);
- 	pfvf = (struct otx2_nic *)cq_poll->dev;
-@@ -541,7 +545,7 @@ int otx2_napi_handler(struct napi_struct *napi, int budget)
- 	}
- 
- 	if (rx_cq && rx_cq->pool_ptrs)
--		pfvf->hw_ops->refill_pool_ptrs(pfvf, rx_cq);
-+		filled_cnt = pfvf->hw_ops->refill_pool_ptrs(pfvf, rx_cq);
- 	/* Clear the IRQ */
- 	otx2_write64(pfvf, NIX_LF_CINTX_INT(cq_poll->cint_idx), BIT_ULL(0));
- 
-@@ -561,9 +565,25 @@ int otx2_napi_handler(struct napi_struct *napi, int budget)
- 				otx2_config_irq_coalescing(pfvf, i);
- 		}
- 
--		/* Re-enable interrupts */
--		otx2_write64(pfvf, NIX_LF_CINTX_ENA_W1S(cq_poll->cint_idx),
--			     BIT_ULL(0));
-+		if (unlikely(!filled_cnt)) {
-+			struct refill_work *work;
-+			struct delayed_work *dwork;
-+
-+			work = &pfvf->refill_wrk[cq->cq_idx];
-+			dwork = &work->pool_refill_work;
-+			/* Schedule a task if no other task is running */
-+			if (!cq->refill_task_sched) {
-+				work->napi = napi;
-+				cq->refill_task_sched = true;
-+				schedule_delayed_work(dwork,
-+						      msecs_to_jiffies(100));
-+			}
-+		} else {
-+			/* Re-enable interrupts */
-+			otx2_write64(pfvf,
-+				     NIX_LF_CINTX_ENA_W1S(cq_poll->cint_idx),
-+				     BIT_ULL(0));
-+		}
- 	}
- 	return workdone;
- }
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
-index 9e3bfbe5c480..a82ffca8ce1b 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
-@@ -170,6 +170,6 @@ void cn10k_sqe_flush(void *dev, struct otx2_snd_queue *sq,
- 		     int size, int qidx);
- void otx2_sqe_flush(void *dev, struct otx2_snd_queue *sq,
- 		    int size, int qidx);
--void otx2_refill_pool_ptrs(void *dev, struct otx2_cq_queue *cq);
--void cn10k_refill_pool_ptrs(void *dev, struct otx2_cq_queue *cq);
-+int otx2_refill_pool_ptrs(void *dev, struct otx2_cq_queue *cq);
-+int cn10k_refill_pool_ptrs(void *dev, struct otx2_cq_queue *cq);
- #endif /* OTX2_TXRX_H */
--- 
-2.25.1
-
+> 
+> Cheers,
+> 
+> Paolo
+> 
 
