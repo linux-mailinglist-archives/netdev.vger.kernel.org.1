@@ -1,124 +1,103 @@
-Return-Path: <netdev+bounces-32658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D147D798E2D
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 20:31:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87174798E40
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 20:31:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F175B1C20323
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 18:31:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B024281DE4
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 18:31:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D80E14F6B;
-	Fri,  8 Sep 2023 18:20:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EF3414F75;
+	Fri,  8 Sep 2023 18:20:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EC6A14F68
-	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 18:20:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8BE7C433C8;
-	Fri,  8 Sep 2023 18:20:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0BD14AAF
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 18:20:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E8DDC43397;
+	Fri,  8 Sep 2023 18:20:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694197207;
-	bh=vl8D4oQAw0mqM40vnYFpYuKkvUGrTYB/DPxTsm85OTM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=RfvdqMRXJ1IAH4P1cPqpDoBD3HP+zaaoEgEp99cDBjhzGNTTXk50/EYIHEkLGuBII
-	 ja2LQMigvknmeby1Hxkdta5cq/SM8kpKQNa1Ove4o7XH01oQ9Qxn4j3HbkSoobxRLi
-	 FwNAtRFAVcXip97hXhO/XnOJ9OaL3gi3Fm8lwNdGA7aEVC1DCkqRNkaHBUKf/MG300
-	 ihb1hvMqfE5cjIAuzlbquz9vzcVQ26GfoNFwh8/84VnkFfBSmJkCP+WTS2CHkGJQyW
-	 s+1BzbXK0poBh0emN+1IP3SKZ5wTbMyAVjCpNASnb5MH79rvGLfyoYWvv6pPaKOupz
-	 +k2+83nq2eKdQ==
+	s=k20201202; t=1694197235;
+	bh=hD5njIcyf2lCixVvKUZXY/u9nTKEI62ubS16D3oz5Vc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=qn0wzgJx+ySTpY2Cz/camjcoKJCspGqcAPEVA3Ys2WTGEO/umhcFXNg3fC0m+v4xM
+	 jOcb74DVNU/OTNc/qxLFQw7oG85/GpW9exF0wHaUG/9ppntmveI5mn4A+VUknIqyv0
+	 X3EC2dYI3oiIisZv5mEHvK/XgNXqu8u7lReY2O/6cZLjLrA2WVqs3DSk85vLPxoQUe
+	 Ow0ab6JUP3RD6XHKK4g8neAbufj08yXCwSEC9iBVnprkI2UgzVleAc9sqraj7v6gh5
+	 Y9lchzpPnzqjzFzXtjQfWsg/ARBDaNgK40+IPx9MhsSUHZnxqV1flVnQTwVnLvYDKg
+	 vF4r4XCQvWa6Q==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Jiri Pirko <jiri@nvidia.com>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Sasha Levin <sashal@kernel.org>,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	jiri@resnulli.us,
-	jacob.e.keller@intel.com,
-	michal.wilczynski@intel.com,
-	shayd@nvidia.com,
+Cc: "GONG, Ruiqi" <gongruiqi1@huawei.com>, GONG@web.codeaurora.org,
+	Simon Horman <horms@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Sasha Levin <sashal@kernel.org>, chris.snook@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 01/14] devlink: remove reload failed checks in params get/set callbacks
-Date: Fri,  8 Sep 2023 14:19:48 -0400
-Message-Id: <20230908182003.3460721-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 10/14] alx: fix OOB-read compiler warning
+Date: Fri,  8 Sep 2023 14:19:57 -0400
+Message-Id: <20230908182003.3460721-10-sashal@kernel.org>
 X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20230908182003.3460721-1-sashal@kernel.org>
+References: <20230908182003.3460721-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.10.194
 Content-Transfer-Encoding: 8bit
 
-From: Jiri Pirko <jiri@nvidia.com>
+From: "GONG, Ruiqi" <gongruiqi1@huawei.com>
 
-[ Upstream commit 633d76ad01ad0321a1ace3e5cc4fed06753d7ac4 ]
+[ Upstream commit 3a198c95c95da10ad844cbeade2fe40bdf14c411 ]
 
-The checks in question were introduced by:
-commit 6b4db2e528f6 ("devlink: Fix use-after-free after a failed reload").
-That fixed an issue of reload with mlxsw driver.
+The following message shows up when compiling with W=1:
 
-Back then, that was a valid fix, because there was a limitation
-in place that prevented drivers from registering/unregistering params
-when devlink instance was registered.
+In function ‘fortify_memcpy_chk’,
+    inlined from ‘alx_get_ethtool_stats’ at drivers/net/ethernet/atheros/alx/ethtool.c:297:2:
+./include/linux/fortify-string.h:592:4: error: call to ‘__read_overflow2_field’
+declared with attribute warning: detected read beyond size of field (2nd parameter);
+maybe use struct_group()? [-Werror=attribute-warning]
+  592 |    __read_overflow2_field(q_size_field, size);
+      |    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-It was possible to do the fix differently by changing drivers to
-register/unregister params in appropriate places making sure the ops
-operate only on memory which is allocated and initialized. But that,
-as a dependency, would require to remove the limitation mentioned above.
+In order to get alx stats altogether, alx_get_ethtool_stats() reads
+beyond hw->stats.rx_ok. Fix this warning by directly copying hw->stats,
+and refactor the unnecessarily complicated BUILD_BUG_ON btw.
 
-Eventually, this limitation was lifted by:
-commit 1d18bb1a4ddd ("devlink: allow registering parameters after the instance")
-
-Also, the alternative fix (which also fixed another issue) was done by:
-commit 74cbc3c03c82 ("mlxsw: spectrum_acl_tcam: Move devlink param to TCAM code").
-
-Therefore, the checks are no longer relevant. Each driver should make
-sure to have the params registered only when the memory the ops
-are working with is allocated and initialized.
-
-So remove the checks.
-
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: GONG, Ruiqi <gongruiqi1@huawei.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Link: https://lore.kernel.org/r/20230821013218.1614265-1-gongruiqi@huaweicloud.com
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/core/devlink.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/atheros/alx/ethtool.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/net/core/devlink.c b/net/core/devlink.c
-index 00c6944ed6342..38666dde89340 100644
---- a/net/core/devlink.c
-+++ b/net/core/devlink.c
-@@ -3620,7 +3620,7 @@ static int devlink_param_get(struct devlink *devlink,
- 			     const struct devlink_param *param,
- 			     struct devlink_param_gset_ctx *ctx)
- {
--	if (!param->get || devlink->reload_failed)
-+	if (!param->get)
- 		return -EOPNOTSUPP;
- 	return param->get(devlink, param->id, ctx);
- }
-@@ -3629,7 +3629,7 @@ static int devlink_param_set(struct devlink *devlink,
- 			     const struct devlink_param *param,
- 			     struct devlink_param_gset_ctx *ctx)
- {
--	if (!param->set || devlink->reload_failed)
-+	if (!param->set)
- 		return -EOPNOTSUPP;
- 	return param->set(devlink, param->id, ctx);
+diff --git a/drivers/net/ethernet/atheros/alx/ethtool.c b/drivers/net/ethernet/atheros/alx/ethtool.c
+index 2f4eabf652e80..51e5aa2c74b34 100644
+--- a/drivers/net/ethernet/atheros/alx/ethtool.c
++++ b/drivers/net/ethernet/atheros/alx/ethtool.c
+@@ -281,9 +281,8 @@ static void alx_get_ethtool_stats(struct net_device *netdev,
+ 	spin_lock(&alx->stats_lock);
+ 
+ 	alx_update_hw_stats(hw);
+-	BUILD_BUG_ON(sizeof(hw->stats) - offsetof(struct alx_hw_stats, rx_ok) <
+-		     ALX_NUM_STATS * sizeof(u64));
+-	memcpy(data, &hw->stats.rx_ok, ALX_NUM_STATS * sizeof(u64));
++	BUILD_BUG_ON(sizeof(hw->stats) != ALX_NUM_STATS * sizeof(u64));
++	memcpy(data, &hw->stats, sizeof(hw->stats));
+ 
+ 	spin_unlock(&alx->stats_lock);
  }
 -- 
 2.40.1
