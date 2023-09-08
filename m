@@ -1,389 +1,333 @@
-Return-Path: <netdev+bounces-32569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B16B7986BB
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 14:07:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EDB7798706
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 14:31:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF7B71C20CDC
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 12:07:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C6241C20C0F
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 12:31:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66E74524F;
-	Fri,  8 Sep 2023 12:06:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0D4E5398;
+	Fri,  8 Sep 2023 12:31:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 533EE567F
-	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 12:06:49 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA7BC1BC5
-	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 05:06:47 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@breakpoint.cc>)
-	id 1qeaG6-00062u-BY; Fri, 08 Sep 2023 14:06:46 +0200
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au,
-	Florian Westphal <fw@strlen.de>
-Subject: [RFC ipsec-next 3/3] xfrm: policy: replace session decode with flow dissector
-Date: Fri,  8 Sep 2023 14:06:20 +0200
-Message-ID: <20230908120628.26164-4-fw@strlen.de>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230908120628.26164-1-fw@strlen.de>
-References: <20230908120628.26164-1-fw@strlen.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBFCA5386
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 12:31:08 +0000 (UTC)
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03A1A1BEE
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 05:31:02 -0700 (PDT)
+Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-99c1d03e124so250771066b.2
+        for <netdev@vger.kernel.org>; Fri, 08 Sep 2023 05:31:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google; t=1694176261; x=1694781061; darn=vger.kernel.org;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=i8MKrJNm8Y9rpAzWjXq+MxTzvYBLtE7VqGoTUkyI/+w=;
+        b=Hjaz00jmGceZYBCryJ0GOxUGhxW4j/MJaYz2bnfsLrcbSm5GZgpTkQsoyX+cdgRTpE
+         /xE/2zgp9vp7iNNZj3AoJc2uMfUC9vEvCzzyh6ShDvdImsIB8wL4OTX/QCZh7qBOzfoz
+         fbktw5S0vRFfzKF/Ig9Zw3iCdLjf3YQWh1cGc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694176261; x=1694781061;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i8MKrJNm8Y9rpAzWjXq+MxTzvYBLtE7VqGoTUkyI/+w=;
+        b=RDTfvzmlWHAuU0G9hVg7crf+z/197k/7696bXaLerbCR/Bg1vlCeU9ww6tSbHhnswT
+         Uj777VypY0aSusOl28YmeQaW4DylIDb5J7o/cnqtAYU4ejl9hUD25IL91MjfuKQZf+D/
+         g5e4UCYL/ScgKqVrdG0jGeRkL07t775meCuU0SkvivTKc488hCBuo0it990kyNbZndqE
+         ncwx9E+EuUG6osco+3qtH9TiKGgQbqGeCY0XSNxcFyfhTMeLvOx2XtwkTMU60oLHrKvh
+         fpeiTcueEh/Xloqnq8eoWhCx7ANZxS4JiCCA/sG/khaIxfot7cYTA5qfZx0/I87RWcQa
+         hWww==
+X-Gm-Message-State: AOJu0YwsMm+Kot9Z5/OYb1wWIanoslJQTnQNwVJUcL8h05vHPeYeUers
+	pSKav4IxQCDe9gkcHWmeNI7q/Q==
+X-Google-Smtp-Source: AGHT+IFPF1vi86ZEJSjDKf7baOwConcsjR4XzDItksy5mjCO/rHqSnTTGRqwGh8SwUzymzVBhCJuUg==
+X-Received: by 2002:a17:907:77c3:b0:9a1:f2d3:ade9 with SMTP id kz3-20020a17090777c300b009a1f2d3ade9mr1665830ejc.42.1694176261376;
+        Fri, 08 Sep 2023 05:31:01 -0700 (PDT)
+Received: from cloudflare.com (79.184.211.77.ipv4.supernova.orange.pl. [79.184.211.77])
+        by smtp.gmail.com with ESMTPSA id os10-20020a170906af6a00b0099b921de301sm973415ejb.159.2023.09.08.05.31.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Sep 2023 05:31:00 -0700 (PDT)
+References: <20230902100744.2687785-1-liujian56@huawei.com>
+User-agent: mu4e 1.6.10; emacs 28.2
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Liu Jian <liujian56@huawei.com>
+Cc: john.fastabend@gmail.com, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
+ yonghong.song@linux.dev, kpsingh@kernel.org, sdf@google.com,
+ haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ dsahern@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH bpf-next v4 0/7] add BPF_F_PERMANENT flag for sockmap
+ skmsg redirect
+Date: Fri, 08 Sep 2023 14:29:11 +0200
+In-reply-to: <20230902100744.2687785-1-liujian56@huawei.com>
+Message-ID: <87o7ickfss.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-xfrm needs to populate ipv4/v6 flow struct for route lookup.
-In the past there were several bugs in this code:
+On Sat, Sep 02, 2023 at 06:07 PM +08, Liu Jian wrote:
+> v3->v4: Change the two helpers's description.
+> 	Let BPF_F_PERMANENT takes precedence over apply/cork_bytes.
 
-- callers that forget to reload header pointers after
-   xfrm_decode_session() (it may pull headers).
-- access past the linear header area
+Sorry, will need some more time to review this.
 
-Meanwhile network core gained a packet dissector as well.
-This switches xfrm to the generic flow dissector.
+I wanted to test it and noticed we have a regression in sockamp in
+bpf-next @ 831c4b3f39c7:
 
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- net/xfrm/xfrm_policy.c | 266 +++++++++++++++++------------------------
- 1 file changed, 108 insertions(+), 158 deletions(-)
+# ./test_progs -t sockmap_listen
+[   17.941468] bpf_testmod: loading out-of-tree module taints kernel.
+[   17.941888] bpf_testmod: module verification failed: signature and/or required key missing - tainting kernel
+#213/1   sockmap_listen/sockmap IPv4 TCP test_insert_invalid:OK
+#213/2   sockmap_listen/sockmap IPv4 TCP test_insert_opened:OK
+#213/3   sockmap_listen/sockmap IPv4 TCP test_insert_bound:OK
+#213/4   sockmap_listen/sockmap IPv4 TCP test_insert:OK
+#213/5   sockmap_listen/sockmap IPv4 TCP test_delete_after_insert:OK
+#213/6   sockmap_listen/sockmap IPv4 TCP test_delete_after_close:OK
+#213/7   sockmap_listen/sockmap IPv4 TCP test_lookup_after_insert:OK
+#213/8   sockmap_listen/sockmap IPv4 TCP test_lookup_after_delete:OK
+#213/9   sockmap_listen/sockmap IPv4 TCP test_lookup_32_bit_value:OK
+#213/10  sockmap_listen/sockmap IPv4 TCP test_update_existing:OK
+#213/11  sockmap_listen/sockmap IPv4 TCP test_destroy_orphan_child:OK
+#213/12  sockmap_listen/sockmap IPv4 TCP test_syn_recv_insert_delete:OK
+#213/13  sockmap_listen/sockmap IPv4 TCP test_race_insert_listen:OK
+#213/14  sockmap_listen/sockmap IPv4 TCP test_clone_after_delete:OK
+#213/15  sockmap_listen/sockmap IPv4 TCP test_accept_after_delete:OK
+#213/16  sockmap_listen/sockmap IPv4 TCP test_accept_before_delete:OK
+#213/17  sockmap_listen/sockmap IPv4 UDP test_insert_invalid:OK
+#213/18  sockmap_listen/sockmap IPv4 UDP test_insert_opened:OK
+#213/19  sockmap_listen/sockmap IPv4 UDP test_insert:OK
+#213/20  sockmap_listen/sockmap IPv4 UDP test_delete_after_insert:OK
+#213/21  sockmap_listen/sockmap IPv4 UDP test_delete_after_close:OK
+#213/22  sockmap_listen/sockmap IPv4 UDP test_lookup_after_insert:OK
+#213/23  sockmap_listen/sockmap IPv4 UDP test_lookup_after_delete:OK
+#213/24  sockmap_listen/sockmap IPv4 UDP test_lookup_32_bit_value:OK
+#213/25  sockmap_listen/sockmap IPv4 UDP test_update_existing:OK
+#213/26  sockmap_listen/sockmap IPv4 test_skb_redir_to_connected:OK
+#213/27  sockmap_listen/sockmap IPv4 test_skb_redir_to_listening:OK
+#213/28  sockmap_listen/sockmap IPv4 test_skb_redir_partial:OK
+#213/29  sockmap_listen/sockmap IPv4 test_msg_redir_to_connected:OK
+#213/30  sockmap_listen/sockmap IPv4 test_msg_redir_to_listening:OK
+#213/31  sockmap_listen/sockmap IPv4 TCP test_reuseport_select_listening:OK
+#213/32  sockmap_listen/sockmap IPv4 TCP test_reuseport_select_connected:OK
+#213/33  sockmap_listen/sockmap IPv4 TCP test_reuseport_mixed_groups:OK
+#213/34  sockmap_listen/sockmap IPv4 UDP test_reuseport_select_listening:OK
+#213/35  sockmap_listen/sockmap IPv4 UDP test_reuseport_select_connected:OK
+#213/36  sockmap_listen/sockmap IPv4 UDP test_reuseport_mixed_groups:OK
+#213/37  sockmap_listen/sockmap IPv4 test_udp_redir:OK
+#213/38  sockmap_listen/sockmap IPv4 test_udp_unix_redir:OK
+#213/39  sockmap_listen/sockmap IPv6 TCP test_insert_invalid:OK
+#213/40  sockmap_listen/sockmap IPv6 TCP test_insert_opened:OK
+#213/41  sockmap_listen/sockmap IPv6 TCP test_insert_bound:OK
+#213/42  sockmap_listen/sockmap IPv6 TCP test_insert:OK
+#213/43  sockmap_listen/sockmap IPv6 TCP test_delete_after_insert:OK
+#213/44  sockmap_listen/sockmap IPv6 TCP test_delete_after_close:OK
+#213/45  sockmap_listen/sockmap IPv6 TCP test_lookup_after_insert:OK
+#213/46  sockmap_listen/sockmap IPv6 TCP test_lookup_after_delete:OK
+#213/47  sockmap_listen/sockmap IPv6 TCP test_lookup_32_bit_value:OK
+#213/48  sockmap_listen/sockmap IPv6 TCP test_update_existing:OK
+#213/49  sockmap_listen/sockmap IPv6 TCP test_destroy_orphan_child:OK
+#213/50  sockmap_listen/sockmap IPv6 TCP test_syn_recv_insert_delete:OK
+#213/51  sockmap_listen/sockmap IPv6 TCP test_race_insert_listen:OK
+#213/52  sockmap_listen/sockmap IPv6 TCP test_clone_after_delete:OK
+#213/53  sockmap_listen/sockmap IPv6 TCP test_accept_after_delete:OK
+#213/54  sockmap_listen/sockmap IPv6 TCP test_accept_before_delete:OK
+#213/55  sockmap_listen/sockmap IPv6 UDP test_insert_invalid:OK
+#213/56  sockmap_listen/sockmap IPv6 UDP test_insert_opened:OK
+#213/57  sockmap_listen/sockmap IPv6 UDP test_insert:OK
+#213/58  sockmap_listen/sockmap IPv6 UDP test_delete_after_insert:OK
+#213/59  sockmap_listen/sockmap IPv6 UDP test_delete_after_close:OK
+#213/60  sockmap_listen/sockmap IPv6 UDP test_lookup_after_insert:OK
+#213/61  sockmap_listen/sockmap IPv6 UDP test_lookup_after_delete:OK
+#213/62  sockmap_listen/sockmap IPv6 UDP test_lookup_32_bit_value:OK
+#213/63  sockmap_listen/sockmap IPv6 UDP test_update_existing:OK
+#213/64  sockmap_listen/sockmap IPv6 test_skb_redir_to_connected:OK
+#213/65  sockmap_listen/sockmap IPv6 test_skb_redir_to_listening:OK
+#213/66  sockmap_listen/sockmap IPv6 test_skb_redir_partial:OK
+#213/67  sockmap_listen/sockmap IPv6 test_msg_redir_to_connected:OK
+#213/68  sockmap_listen/sockmap IPv6 test_msg_redir_to_listening:OK
+#213/69  sockmap_listen/sockmap IPv6 TCP test_reuseport_select_listening:OK
+#213/70  sockmap_listen/sockmap IPv6 TCP test_reuseport_select_connected:OK
+#213/71  sockmap_listen/sockmap IPv6 TCP test_reuseport_mixed_groups:OK
+#213/72  sockmap_listen/sockmap IPv6 UDP test_reuseport_select_listening:OK
+#213/73  sockmap_listen/sockmap IPv6 UDP test_reuseport_select_connected:OK
+#213/74  sockmap_listen/sockmap IPv6 UDP test_reuseport_mixed_groups:OK
+#213/75  sockmap_listen/sockmap IPv6 test_udp_redir:OK
+#213/76  sockmap_listen/sockmap IPv6 test_udp_unix_redir:OK
+#213/77  sockmap_listen/sockmap Unix test_unix_redir:OK
+#213/78  sockmap_listen/sockmap Unix test_unix_redir:OK
+./test_progs:vsock_unix_redir_connectible:1501: egress: write: Transport endpoint is not connected
+vsock_unix_redir_connectible:FAIL:1501
+#213/79  sockmap_listen/sockmap VSOCK test_vsock_redir:FAIL
+#213/80  sockmap_listen/sockhash IPv4 TCP test_insert_invalid:OK
+#213/81  sockmap_listen/sockhash IPv4 TCP test_insert_opened:OK
+#213/82  sockmap_listen/sockhash IPv4 TCP test_insert_bound:OK
+#213/83  sockmap_listen/sockhash IPv4 TCP test_insert:OK
+#213/84  sockmap_listen/sockhash IPv4 TCP test_delete_after_insert:OK
+#213/85  sockmap_listen/sockhash IPv4 TCP test_delete_after_close:OK
+#213/86  sockmap_listen/sockhash IPv4 TCP test_lookup_after_insert:OK
+#213/87  sockmap_listen/sockhash IPv4 TCP test_lookup_after_delete:OK
+#213/88  sockmap_listen/sockhash IPv4 TCP test_lookup_32_bit_value:OK
+#213/89  sockmap_listen/sockhash IPv4 TCP test_update_existing:OK
+#213/90  sockmap_listen/sockhash IPv4 TCP test_destroy_orphan_child:OK
+#213/91  sockmap_listen/sockhash IPv4 TCP test_syn_recv_insert_delete:OK
+#213/92  sockmap_listen/sockhash IPv4 TCP test_race_insert_listen:OK
+#213/93  sockmap_listen/sockhash IPv4 TCP test_clone_after_delete:OK
+#213/94  sockmap_listen/sockhash IPv4 TCP test_accept_after_delete:OK
+#213/95  sockmap_listen/sockhash IPv4 TCP test_accept_before_delete:OK
+#213/96  sockmap_listen/sockhash IPv4 UDP test_insert_invalid:OK
+#213/97  sockmap_listen/sockhash IPv4 UDP test_insert_opened:OK
+#213/98  sockmap_listen/sockhash IPv4 UDP test_insert:OK
+#213/99  sockmap_listen/sockhash IPv4 UDP test_delete_after_insert:OK
+#213/100 sockmap_listen/sockhash IPv4 UDP test_delete_after_close:OK
+#213/101 sockmap_listen/sockhash IPv4 UDP test_lookup_after_insert:OK
+#213/102 sockmap_listen/sockhash IPv4 UDP test_lookup_after_delete:OK
+#213/103 sockmap_listen/sockhash IPv4 UDP test_lookup_32_bit_value:OK
+#213/104 sockmap_listen/sockhash IPv4 UDP test_update_existing:OK
+#213/105 sockmap_listen/sockhash IPv4 test_skb_redir_to_connected:OK
+#213/106 sockmap_listen/sockhash IPv4 test_skb_redir_to_listening:OK
+#213/107 sockmap_listen/sockhash IPv4 test_skb_redir_partial:OK
+#213/108 sockmap_listen/sockhash IPv4 test_msg_redir_to_connected:OK
+#213/109 sockmap_listen/sockhash IPv4 test_msg_redir_to_listening:OK
+#213/110 sockmap_listen/sockhash IPv4 TCP test_reuseport_select_listening:OK
+#213/111 sockmap_listen/sockhash IPv4 TCP test_reuseport_select_connected:OK
+#213/112 sockmap_listen/sockhash IPv4 TCP test_reuseport_mixed_groups:OK
+#213/113 sockmap_listen/sockhash IPv4 UDP test_reuseport_select_listening:OK
+#213/114 sockmap_listen/sockhash IPv4 UDP test_reuseport_select_connected:OK
+#213/115 sockmap_listen/sockhash IPv4 UDP test_reuseport_mixed_groups:OK
+#213/116 sockmap_listen/sockhash IPv4 test_udp_redir:OK
+#213/117 sockmap_listen/sockhash IPv4 test_udp_unix_redir:OK
+#213/118 sockmap_listen/sockhash IPv6 TCP test_insert_invalid:OK
+#213/119 sockmap_listen/sockhash IPv6 TCP test_insert_opened:OK
+#213/120 sockmap_listen/sockhash IPv6 TCP test_insert_bound:OK
+#213/121 sockmap_listen/sockhash IPv6 TCP test_insert:OK
+#213/122 sockmap_listen/sockhash IPv6 TCP test_delete_after_insert:OK
+#213/123 sockmap_listen/sockhash IPv6 TCP test_delete_after_close:OK
+#213/124 sockmap_listen/sockhash IPv6 TCP test_lookup_after_insert:OK
+#213/125 sockmap_listen/sockhash IPv6 TCP test_lookup_after_delete:OK
+#213/126 sockmap_listen/sockhash IPv6 TCP test_lookup_32_bit_value:OK
+#213/127 sockmap_listen/sockhash IPv6 TCP test_update_existing:OK
+#213/128 sockmap_listen/sockhash IPv6 TCP test_destroy_orphan_child:OK
+#213/129 sockmap_listen/sockhash IPv6 TCP test_syn_recv_insert_delete:OK
+#213/130 sockmap_listen/sockhash IPv6 TCP test_race_insert_listen:OK
+#213/131 sockmap_listen/sockhash IPv6 TCP test_clone_after_delete:OK
+#213/132 sockmap_listen/sockhash IPv6 TCP test_accept_after_delete:OK
+#213/133 sockmap_listen/sockhash IPv6 TCP test_accept_before_delete:OK
+#213/134 sockmap_listen/sockhash IPv6 UDP test_insert_invalid:OK
+#213/135 sockmap_listen/sockhash IPv6 UDP test_insert_opened:OK
+#213/136 sockmap_listen/sockhash IPv6 UDP test_insert:OK
+#213/137 sockmap_listen/sockhash IPv6 UDP test_delete_after_insert:OK
+#213/138 sockmap_listen/sockhash IPv6 UDP test_delete_after_close:OK
+#213/139 sockmap_listen/sockhash IPv6 UDP test_lookup_after_insert:OK
+#213/140 sockmap_listen/sockhash IPv6 UDP test_lookup_after_delete:OK
+#213/141 sockmap_listen/sockhash IPv6 UDP test_lookup_32_bit_value:OK
+#213/142 sockmap_listen/sockhash IPv6 UDP test_update_existing:OK
+#213/143 sockmap_listen/sockhash IPv6 test_skb_redir_to_connected:OK
+#213/144 sockmap_listen/sockhash IPv6 test_skb_redir_to_listening:OK
+#213/145 sockmap_listen/sockhash IPv6 test_skb_redir_partial:OK
+#213/146 sockmap_listen/sockhash IPv6 test_msg_redir_to_connected:OK
+#213/147 sockmap_listen/sockhash IPv6 test_msg_redir_to_listening:OK
+#213/148 sockmap_listen/sockhash IPv6 TCP test_reuseport_select_listening:OK
+#213/149 sockmap_listen/sockhash IPv6 TCP test_reuseport_select_connected:OK
+#213/150 sockmap_listen/sockhash IPv6 TCP test_reuseport_mixed_groups:OK
+#213/151 sockmap_listen/sockhash IPv6 UDP test_reuseport_select_listening:OK
+#213/152 sockmap_listen/sockhash IPv6 UDP test_reuseport_select_connected:OK
+#213/153 sockmap_listen/sockhash IPv6 UDP test_reuseport_mixed_groups:OK
+#213/154 sockmap_listen/sockhash IPv6 test_udp_redir:OK
+#213/155 sockmap_listen/sockhash IPv6 test_udp_unix_redir:OK
+#213/156 sockmap_listen/sockhash Unix test_unix_redir:OK
+#213/157 sockmap_listen/sockhash Unix test_unix_redir:OK
+./test_progs:vsock_unix_redir_connectible:1501: egress: write: Transport endpoint is not connected
+vsock_unix_redir_connectible:FAIL:1501
+./test_progs:vsock_unix_redir_connectible:1501: egress: write: Transport endpoint is not connected
+vsock_unix_redir_connectible:FAIL:1501
+./test_progs:vsock_unix_redir_connectible:1501: ingress: write: Transport endpoint is not connected
+vsock_unix_redir_connectible:FAIL:1501
+#213/158 sockmap_listen/sockhash VSOCK test_vsock_redir:FAIL
+#213     sockmap_listen:FAIL
 
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index 5efdd20a4fb6..2d90eb4e2d31 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -149,6 +149,23 @@ struct xfrm_pol_inexact_candidates {
- 	struct hlist_head *res[XFRM_POL_CAND_MAX];
- };
- 
-+struct xfrm_flow_keys {
-+	struct flow_dissector_key_basic basic;
-+	struct flow_dissector_key_control control;
-+	union {
-+		struct flow_dissector_key_ipv4_addrs ipv4;
-+		struct flow_dissector_key_ipv6_addrs ipv6;
-+	} addrs;
-+	struct flow_dissector_key_ip ip;
-+	struct flow_dissector_key_tags tags;
-+	struct flow_dissector_key_icmp icmp;
-+	struct flow_dissector_key_ports ports;
-+	struct flow_dissector_key_keyid gre;
-+	struct flow_dissector_ipv6_mh ipv6mh;
-+};
-+
-+static struct flow_dissector xfrm_session_dissector __ro_after_init;
-+
- static DEFINE_SPINLOCK(xfrm_if_cb_lock);
- static struct xfrm_if_cb const __rcu *xfrm_if_cb __read_mostly;
- 
-@@ -3367,191 +3384,77 @@ xfrm_policy_ok(const struct xfrm_tmpl *tmpl, const struct sec_path *sp, int star
- }
- 
- static void
--decode_session4(struct sk_buff *skb, struct flowi *fl, bool reverse)
-+decode_session4(const struct xfrm_flow_keys *flkeys, struct flowi *fl, bool reverse)
- {
--	const struct iphdr *iph = ip_hdr(skb);
--	int ihl = iph->ihl;
--	u8 *xprth = skb_network_header(skb) + ihl * 4;
- 	struct flowi4 *fl4 = &fl->u.ip4;
- 
- 	memset(fl4, 0, sizeof(struct flowi4));
- 
--	fl4->flowi4_proto = iph->protocol;
--	fl4->daddr = reverse ? iph->saddr : iph->daddr;
--	fl4->saddr = reverse ? iph->daddr : iph->saddr;
--	fl4->flowi4_tos = iph->tos & ~INET_ECN_MASK;
--
--	if (!ip_is_fragment(iph)) {
--		switch (iph->protocol) {
--		case IPPROTO_UDP:
--		case IPPROTO_UDPLITE:
--		case IPPROTO_TCP:
--		case IPPROTO_SCTP:
--		case IPPROTO_DCCP:
--			if (xprth + 4 < skb->data ||
--			    pskb_may_pull(skb, xprth + 4 - skb->data)) {
--				__be16 *ports;
--
--				xprth = skb_network_header(skb) + ihl * 4;
--				ports = (__be16 *)xprth;
--
--				fl4->fl4_sport = ports[!!reverse];
--				fl4->fl4_dport = ports[!reverse];
--			}
--			break;
--		case IPPROTO_ICMP:
--			if (xprth + 2 < skb->data ||
--			    pskb_may_pull(skb, xprth + 2 - skb->data)) {
--				u8 *icmp;
--
--				xprth = skb_network_header(skb) + ihl * 4;
--				icmp = xprth;
--
--				fl4->fl4_icmp_type = icmp[0];
--				fl4->fl4_icmp_code = icmp[1];
--			}
--			break;
--		case IPPROTO_GRE:
--			if (xprth + 12 < skb->data ||
--			    pskb_may_pull(skb, xprth + 12 - skb->data)) {
--				__be16 *greflags;
--				__be32 *gre_hdr;
--
--				xprth = skb_network_header(skb) + ihl * 4;
--				greflags = (__be16 *)xprth;
--				gre_hdr = (__be32 *)xprth;
--
--				if (greflags[0] & GRE_KEY) {
--					if (greflags[0] & GRE_CSUM)
--						gre_hdr++;
--					fl4->fl4_gre_key = gre_hdr[1];
--				}
--			}
--			break;
--		default:
--			break;
--		}
-+	if (reverse) {
-+		fl4->saddr = flkeys->addrs.ipv4.dst;
-+		fl4->daddr = flkeys->addrs.ipv4.src;
-+		fl4->fl4_sport = flkeys->ports.dst;
-+		fl4->fl4_dport = flkeys->ports.src;
-+	} else {
-+		fl4->saddr = flkeys->addrs.ipv4.src;
-+		fl4->daddr = flkeys->addrs.ipv4.dst;
-+		fl4->fl4_sport = flkeys->ports.src;
-+		fl4->fl4_dport = flkeys->ports.dst;
- 	}
-+
-+	fl4->flowi4_proto = flkeys->basic.ip_proto;
-+	fl4->flowi4_tos = flkeys->ip.tos;
-+	fl4->fl4_icmp_type = flkeys->icmp.type;
-+	fl4->fl4_icmp_type = flkeys->icmp.code;
-+	fl4->fl4_gre_key = flkeys->gre.keyid;
- }
- 
- #if IS_ENABLED(CONFIG_IPV6)
- static void
--decode_session6(struct sk_buff *skb, struct flowi *fl, bool reverse)
-+decode_session6(const struct xfrm_flow_keys *flkeys, struct flowi *fl, bool reverse)
- {
- 	struct flowi6 *fl6 = &fl->u.ip6;
--	int onlyproto = 0;
--	const struct ipv6hdr *hdr = ipv6_hdr(skb);
--	u32 offset = sizeof(*hdr);
--	struct ipv6_opt_hdr *exthdr;
--	const unsigned char *nh = skb_network_header(skb);
--	u16 nhoff = IP6CB(skb)->nhoff;
--	u8 nexthdr;
--
--	if (!nhoff)
--		nhoff = offsetof(struct ipv6hdr, nexthdr);
--
--	nexthdr = nh[nhoff];
- 
- 	memset(fl6, 0, sizeof(struct flowi6));
- 
--	fl6->daddr = reverse ? hdr->saddr : hdr->daddr;
--	fl6->saddr = reverse ? hdr->daddr : hdr->saddr;
--
--	while (nh + offset + sizeof(*exthdr) < skb->data ||
--	       pskb_may_pull(skb, nh + offset + sizeof(*exthdr) - skb->data)) {
--		nh = skb_network_header(skb);
--		exthdr = (struct ipv6_opt_hdr *)(nh + offset);
--
--		switch (nexthdr) {
--		case NEXTHDR_FRAGMENT:
--			onlyproto = 1;
--			fallthrough;
--		case NEXTHDR_ROUTING:
--		case NEXTHDR_HOP:
--		case NEXTHDR_DEST:
--			offset += ipv6_optlen(exthdr);
--			nexthdr = exthdr->nexthdr;
--			break;
--		case IPPROTO_UDP:
--		case IPPROTO_UDPLITE:
--		case IPPROTO_TCP:
--		case IPPROTO_SCTP:
--		case IPPROTO_DCCP:
--			if (!onlyproto && (nh + offset + 4 < skb->data ||
--			     pskb_may_pull(skb, nh + offset + 4 - skb->data))) {
--				__be16 *ports;
--
--				nh = skb_network_header(skb);
--				ports = (__be16 *)(nh + offset);
--				fl6->fl6_sport = ports[!!reverse];
--				fl6->fl6_dport = ports[!reverse];
--			}
--			fl6->flowi6_proto = nexthdr;
--			return;
--		case IPPROTO_ICMPV6:
--			if (!onlyproto && (nh + offset + 2 < skb->data ||
--			    pskb_may_pull(skb, nh + offset + 2 - skb->data))) {
--				u8 *icmp;
--
--				nh = skb_network_header(skb);
--				icmp = (u8 *)(nh + offset);
--				fl6->fl6_icmp_type = icmp[0];
--				fl6->fl6_icmp_code = icmp[1];
--			}
--			fl6->flowi6_proto = nexthdr;
--			return;
--		case IPPROTO_GRE:
--			if (!onlyproto &&
--			    (nh + offset + 12 < skb->data ||
--			     pskb_may_pull(skb, nh + offset + 12 - skb->data))) {
--				struct gre_base_hdr *gre_hdr;
--				__be32 *gre_key;
--
--				nh = skb_network_header(skb);
--				gre_hdr = (struct gre_base_hdr *)(nh + offset);
--				gre_key = (__be32 *)(gre_hdr + 1);
--
--				if (gre_hdr->flags & GRE_KEY) {
--					if (gre_hdr->flags & GRE_CSUM)
--						gre_key++;
--					fl6->fl6_gre_key = *gre_key;
--				}
--			}
--			fl6->flowi6_proto = nexthdr;
--			return;
--
--#if IS_ENABLED(CONFIG_IPV6_MIP6)
--		case IPPROTO_MH:
--			offset += ipv6_optlen(exthdr);
--			if (!onlyproto && (nh + offset + 3 < skb->data ||
--			    pskb_may_pull(skb, nh + offset + 3 - skb->data))) {
--				struct ip6_mh *mh;
--
--				nh = skb_network_header(skb);
--				mh = (struct ip6_mh *)(nh + offset);
--				fl6->fl6_mh_type = mh->ip6mh_type;
--			}
--			fl6->flowi6_proto = nexthdr;
--			return;
--#endif
--		default:
--			fl6->flowi6_proto = nexthdr;
--			return;
--		}
-+	if (reverse) {
-+		fl6->saddr = flkeys->addrs.ipv6.dst;
-+		fl6->daddr = flkeys->addrs.ipv6.src;
-+		fl6->fl6_sport = flkeys->ports.dst;
-+		fl6->fl6_dport = flkeys->ports.src;
-+	} else {
-+		fl6->saddr = flkeys->addrs.ipv6.src;
-+		fl6->daddr = flkeys->addrs.ipv6.dst;
-+		fl6->fl6_sport = flkeys->ports.src;
-+		fl6->fl6_dport = flkeys->ports.dst;
- 	}
-+
-+	fl6->flowi6_proto = flkeys->basic.ip_proto;
-+	fl6->flowlabel = flkeys->tags.flow_label;
-+
-+	fl6->fl6_icmp_type = flkeys->icmp.type;
-+	fl6->fl6_icmp_type = flkeys->icmp.code;
-+	fl6->fl6_gre_key = flkeys->gre.keyid;
-+	fl6->fl6_mh_type = flkeys->ipv6mh.mh_type;
- }
- #endif
- 
- int __xfrm_decode_session(struct sk_buff *skb, struct flowi *fl,
- 			  unsigned int family, int reverse)
- {
-+	struct xfrm_flow_keys flkeys;
-+
-+	memset(&flkeys, 0, sizeof(flkeys));
-+
-+	skb_flow_dissect(skb, &xfrm_session_dissector, &flkeys, FLOW_DISSECTOR_F_STOP_AT_ENCAP);
-+
- 	switch (family) {
- 	case AF_INET:
--		decode_session4(skb, fl, reverse);
-+		decode_session4(&flkeys, fl, reverse);
- 		break;
- #if IS_ENABLED(CONFIG_IPV6)
- 	case AF_INET6:
--		decode_session6(skb, fl, reverse);
-+		decode_session6(&flkeys, fl, reverse);
- 		break;
- #endif
- 	default:
-@@ -4253,8 +4156,55 @@ static struct pernet_operations __net_initdata xfrm_net_ops = {
- 	.exit = xfrm_net_exit,
- };
- 
-+static const struct flow_dissector_key xfrm_flow_dissector_keys[] = {
-+	{
-+		.key_id = FLOW_DISSECTOR_KEY_CONTROL,
-+		.offset = offsetof(struct xfrm_flow_keys, control),
-+	},
-+	{
-+		.key_id = FLOW_DISSECTOR_KEY_BASIC,
-+		.offset = offsetof(struct xfrm_flow_keys, basic),
-+	},
-+	{
-+		.key_id = FLOW_DISSECTOR_KEY_IPV4_ADDRS,
-+		.offset = offsetof(struct xfrm_flow_keys, addrs.ipv4),
-+	},
-+	{
-+		.key_id = FLOW_DISSECTOR_KEY_IPV6_ADDRS,
-+		.offset = offsetof(struct xfrm_flow_keys, addrs.ipv6),
-+	},
-+	{
-+		.key_id = FLOW_DISSECTOR_KEY_PORTS,
-+		.offset = offsetof(struct xfrm_flow_keys, ports),
-+	},
-+	{
-+		.key_id = FLOW_DISSECTOR_KEY_FLOW_LABEL,
-+		.offset = offsetof(struct xfrm_flow_keys, tags),
-+	},
-+	{
-+		.key_id = FLOW_DISSECTOR_KEY_GRE_KEYID,
-+		.offset = offsetof(struct xfrm_flow_keys, gre),
-+	},
-+	{
-+		.key_id = FLOW_DISSECTOR_KEY_IP,
-+		.offset = offsetof(struct xfrm_flow_keys, ip),
-+	},
-+	{
-+		.key_id = FLOW_DISSECTOR_KEY_ICMP,
-+		.offset = offsetof(struct xfrm_flow_keys, icmp),
-+	},
-+	{
-+		.key_id = FLOW_DISSECTOR_KEY_IPV6MH,
-+		.offset = offsetof(struct xfrm_flow_keys, ipv6mh),
-+	},
-+};
-+
- void __init xfrm_init(void)
- {
-+	skb_flow_dissector_init(&xfrm_session_dissector,
-+				xfrm_flow_dissector_keys,
-+				ARRAY_SIZE(xfrm_flow_dissector_keys));
-+
- 	register_pernet_subsys(&xfrm_net_ops);
- 	xfrm_dev_init();
- 	xfrm_input_init();
--- 
-2.41.0
-
+All error logs:
+./test_progs:vsock_unix_redir_connectible:1501: egress: write: Transport endpoint is not connected
+vsock_unix_redir_connectible:FAIL:1501
+#213/79  sockmap_listen/sockmap VSOCK test_vsock_redir:FAIL
+./test_progs:vsock_unix_redir_connectible:1501: egress: write: Transport endpoint is not connected
+vsock_unix_redir_connectible:FAIL:1501
+./test_progs:vsock_unix_redir_connectible:1501: egress: write: Transport endpoint is not connected
+vsock_unix_redir_connectible:FAIL:1501
+./test_progs:vsock_unix_redir_connectible:1501: ingress: write: Transport endpoint is not connected
+vsock_unix_redir_connectible:FAIL:1501
+#213/158 sockmap_listen/sockhash VSOCK test_vsock_redir:FAIL
+#213     sockmap_listen:FAIL
+Summary: 0/156 PASSED, 0 SKIPPED, 1 FAILED
+[   18.853649] BUG: kernel NULL pointer dereference, address: 0000000000000008
+[   18.854041] #PF: supervisor write access in kernel mode
+[   18.854337] #PF: error_code(0x0002) - not-present page
+[   18.854605] PGD 104826067 P4D 104826067 PUD 104825067 PMD 0
+[   18.854918] Oops: 0002 [#1] PREEMPT SMP NOPTI
+[   18.855171] CPU: 3 PID: 50 Comm: kworker/3:1 Tainted: G           OE      6.5.0+ #8
+[   18.855592] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.fc38 04/01/2014
+[   18.856051] Workqueue: events sk_psock_destroy
+[   18.856294] RIP: 0010:skb_dequeue+0x4b/0x70
+[   18.856524] Code: 74 45 4d 85 e4 74 40 8b 43 10 83 e8 01 89 43 10 49 8b 14 24 49 8b 44 24 08 49 c7 04 24 00 00 00 00 49 c7 44 24 08 00 00 00 00 <48> 89 42 08 48 89 10 4c 89 ef e8 e6 24 3b 00 4c 89 e0 5b 41 5c 41
+[   18.857516] RSP: 0018:ffffc900002cbdc0 EFLAGS: 00010097
+[   18.857798] RAX: 0000000000000000 RBX: ffff88810685e1b8 RCX: 363a88e2d5498366
+[   18.858186] RDX: 0000000000000000 RSI: 0000000000000282 RDI: ffff88810685e1d0
+[   18.858568] RBP: ffffc900002cbdd8 R08: 0000000000000000 R09: 0000000000080000
+[   18.858961] R10: 0000000000000394 R11: 0000000000000001 R12: ffff888102468b00
+[   18.859346] R13: ffff88810685e1d0 R14: ffff8881003da000 R15: ffff88810685e438
+[   18.859735] FS:  0000000000000000(0000) GS:ffff88813bd80000(0000) knlGS:0000000000000000
+[   18.860177] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   18.860486] CR2: 0000000000000008 CR3: 000000010480e005 CR4: 0000000000770ea0
+[   18.860868] PKRU: 55555554
+[   18.861017] Call Trace:
+[   18.861155]  <TASK>
+[   18.861273]  ? show_regs+0x60/0x70
+[   18.861468]  ? __die+0x1f/0x70
+[   18.861633]  ? page_fault_oops+0x80/0x160
+[   18.861845]  ? do_user_addr_fault+0x320/0x7b0
+[   18.862084]  ? __this_cpu_preempt_check+0x13/0x20
+[   18.862348]  ? exc_page_fault+0x70/0x1c0
+[   18.862562]  ? asm_exc_page_fault+0x27/0x30
+[   18.862785]  ? skb_dequeue+0x4b/0x70
+[   18.862986]  sk_psock_destroy+0x88/0x2e0
+[   18.863205]  process_one_work+0x264/0x550
+[   18.863420]  worker_thread+0x4d/0x3c0
+[   18.863624]  ? process_one_work+0x550/0x550
+[   18.863855]  kthread+0x106/0x140
+[   18.864031]  ? kthread_complete_and_exit+0x20/0x20
+[   18.864281]  ret_from_fork+0x35/0x60
+[   18.864480]  ? kthread_complete_and_exit+0x20/0x20
+[   18.864730]  ret_from_fork_asm+0x11/0x20
+[   18.864948]  </TASK>
+[   18.865075] Modules linked in: bpf_testmod(OE)
+[   18.865320] CR2: 0000000000000008
+[   18.865493] ---[ end trace 0000000000000000 ]---
+[   18.865746] RIP: 0010:skb_dequeue+0x4b/0x70
+[   18.865976] Code: 74 45 4d 85 e4 74 40 8b 43 10 83 e8 01 89 43 10 49 8b 14 24 49 8b 44 24 08 49 c7 04 24 00 00 00 00 49 c7 44 24 08 00 00 00 00 <48> 89 42 08 48 89 10 4c 89 ef e8 e6 24 3b 00 4c 89 e0 5b 41 5c 41
+[   18.866968] RSP: 0018:ffffc900002cbdc0 EFLAGS: 00010097
+[   18.867246] RAX: 0000000000000000 RBX: ffff88810685e1b8 RCX: 363a88e2d5498366
+[   18.867638] RDX: 0000000000000000 RSI: 0000000000000282 RDI: ffff88810685e1d0
+[   18.868028] RBP: ffffc900002cbdd8 R08: 0000000000000000 R09: 0000000000080000
+[   18.868407] R10: 0000000000000394 R11: 0000000000000001 R12: ffff888102468b00
+[   18.868801] R13: ffff88810685e1d0 R14: ffff8881003da000 R15: ffff88810685e438
+[   18.869190] FS:  0000000000000000(0000) GS:ffff88813bd80000(0000) knlGS:0000000000000000
+[   18.869624] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   18.869944] CR2: 0000000000000008 CR3: 000000010480e005 CR4: 0000000000770ea0
+[   18.870327] PKRU: 55555554
+[   18.870486] Kernel panic - not syncing: Fatal exception
+[   18.870856] Kernel Offset: disabled
 
