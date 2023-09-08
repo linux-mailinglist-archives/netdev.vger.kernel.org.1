@@ -1,170 +1,82 @@
-Return-Path: <netdev+bounces-32592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94EBD7988D2
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 16:32:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13BED7988DB
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 16:34:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BF5D1C20E8E
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 14:32:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9EAF281E8D
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 14:34:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B24DF513;
-	Fri,  8 Sep 2023 14:31:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55AB0F4F8;
+	Fri,  8 Sep 2023 14:33:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C946134BD
-	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 14:31:37 +0000 (UTC)
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D5AB211C;
-	Fri,  8 Sep 2023 07:31:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1694183459; x=1725719459;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=TeHB0y9kfzmaAN0kkVn5rf9xamWzRSUzTry5VZYVrXg=;
-  b=yGkGgXfVJ85d/6qW39ne3e/tnsETkfd4NWedguo5PVSbFI5LYW1G793f
-   nBJOAGTu/mSliRhrSxVMjPgwczgqgfeTMvMB3KSV7nPVSlbJyeACzpTE2
-   b05fcYBsLZ5hVPjFBkt2B4DtDESTlj/SbJim/K5/kUUAP+YUQ0+lCsHCz
-   wuT519fd85JVMGnae5uFjEAka/WNQ3P/CQJeIJdPQZ7xDp1f2h485sr5y
-   BsxhgAZVXfO3tbWJSLk3PULin9j0CfXOkWvoYD87zfEIIcwDWlukVCPdz
-   4pjT3BXsjdGBGhPuVT6PL2Xap38zJwTaa2Czaa5a4zeTqTiEYPkMbkKRx
-   g==;
-X-CSE-ConnectionGUID: BfdJWj6dSkej858jQph4IQ==
-X-CSE-MsgGUID: urbI0jbkRtODixBn6MAIdw==
-X-ThreatScanner-Verdict: Negative
-X-IronPort-AV: E=Sophos;i="6.02,237,1688454000"; 
-   d="scan'208";a="170641889"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 08 Sep 2023 07:30:53 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Fri, 8 Sep 2023 07:30:39 -0700
-Received: from CHE-LT-I17164LX.microchip.com (10.10.85.11) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.21 via Frontend Transport; Fri, 8 Sep 2023 07:30:32 -0700
-From: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <robh+dt@kernel.org>,
-	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>, <corbet@lwn.net>,
-	<steen.hegelund@microchip.com>, <rdunlap@infradead.org>, <horms@kernel.org>,
-	<casper.casan@gmail.com>, <andrew@lunn.ch>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<horatiu.vultur@microchip.com>, <Woojung.Huh@microchip.com>,
-	<Nicolas.Ferre@microchip.com>, <UNGLinuxDriver@microchip.com>,
-	<Thorsten.Kummermehr@microchip.com>, Parthiban Veerasooran
-	<Parthiban.Veerasooran@microchip.com>
-Subject: [RFC PATCH net-next 6/6] microchip: lan865x: add device-tree support for Microchip's LAN865X MACPHY
-Date: Fri, 8 Sep 2023 19:59:19 +0530
-Message-ID: <20230908142919.14849-7-Parthiban.Veerasooran@microchip.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230908142919.14849-1-Parthiban.Veerasooran@microchip.com>
-References: <20230908142919.14849-1-Parthiban.Veerasooran@microchip.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4338EF4F5;
+	Fri,  8 Sep 2023 14:33:37 +0000 (UTC)
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBFEA1FED;
+	Fri,  8 Sep 2023 07:33:04 -0700 (PDT)
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1694183572;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=URRWTsW4TtIT5wfkYL9+JVktSdhRDc5xo7+E/okpbiU=;
+	b=bbM1/iSZ2ChtXqdW8EQhlC59jjHwtgYVLsfsZG2PxoVwQhSmvIMBBNxOpaa57CyQQ9bslJ
+	nEZJywVDwMW/fX1LPaRghuBlZXneNu/gMGWALLRGYU+Pz+0Ho/ulA1p6mSNmylKSNYCauY
+	P2G7Q36EpluZW9T3rc858xz6v+ninvH/fFUYVV9E/7lbeCSoVLFubHiRiDuheI7oqRly9N
+	7Mx3fixyLMkpWhdEBV5PpHjN8gOIDDJjeJkH64MWKEfrECbWJ4nGIgNtFxaoEI0FYQ3NPH
+	Gn0EbRrfDC8SezKSXqB0jspTTRMW1K21AWCwH2pI+rrIRh7lu63qDS8QbL9SXw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1694183572;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=URRWTsW4TtIT5wfkYL9+JVktSdhRDc5xo7+E/okpbiU=;
+	b=mCVX0plpgShq+D+Jr+kXiy1aXcMGtT1VoQHQer2xUBcJ9fbEWmGA2Hoz7g2GfXXnz1KHAo
+	aNk8L7C1gNh5gCDA==
+To: netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>
+Subject: [PATCH net-next 0/2] bpf: Remove xdp_do_flush_map().
+Date: Fri,  8 Sep 2023 16:32:13 +0200
+Message-Id: <20230908143215.869913-1-bigeasy@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add device-tree support for Microchip's LAN865X MACPHY for configuring
-the OPEN Alliance 10BASE-T1x MACPHY Serial Interface parameters.
+Hi,
 
-Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
----
- .../bindings/net/microchip,lan865x.yaml       | 54 +++++++++++++++++++
- MAINTAINERS                                   |  1 +
- 2 files changed, 55 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/microchip,lan865x.yaml
+#1 is a s/xdp_do_flush_map/xdp_do_flush/ on all drivers.
+#2 follows as the removal of xdp_do_flush_map from the API.
 
-diff --git a/Documentation/devicetree/bindings/net/microchip,lan865x.yaml b/Documentation/devicetree/bindings/net/microchip,lan865x.yaml
-new file mode 100644
-index 000000000000..3465b2c97690
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/microchip,lan865x.yaml
-@@ -0,0 +1,54 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/microchip,lan865x.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Microchip LAN8650/1 10BASE-T1S MACPHY Ethernet Controllers
-+
-+maintainers:
-+  - Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
-+
-+description: |
-+  Device tree properties for LAN8650/1 10BASE-T1S MACPHY Ethernet
-+  controller.
-+
-+allOf:
-+  - $ref: ethernet-controller.yaml#
-+
-+properties:
-+  compatible:
-+    items:
-+      - enum:
-+          - microchip,lan865x
-+  reg:
-+    maxItems: 1
-+
-+  local-mac-address: true
-+  oa-chunk-size: true
-+  oa-tx-cut-through: true
-+  oa-rx-cut-through: true
-+  oa-protected: true
-+
-+required:
-+  - compatible
-+  - reg
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    spi {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+
-+        ethernet@1{
-+            compatible = "microchip,lan865x";
-+            reg = <1>; /* CE0 */
-+            local-mac-address = [04 05 06 01 02 03];
-+            oa-chunk-size = <64>;
-+            oa-tx-cut-through;
-+            oa-rx-cut-through;
-+            oa-protected;
-+       };
-+    };
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 666c042a15b2..2bbb7f17d74e 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -13883,6 +13883,7 @@ MICROCHIP LAN8650/1 10BASE-T1S MACPHY ETHERNET DRIVER
- M:	Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
- L:	netdev@vger.kernel.org
- S:	Maintained
-+F:	Documentation/devicetree/bindings/net/microchip,lan865x.yaml
- F:	drivers/net/ethernet/microchip/lan865x.c
- 
- MICROCHIP LAN87xx/LAN937x T1 PHY DRIVER
--- 
-2.34.1
+I had #1 split in several patches per vendor and then decided to merge
+it. I can repost it with one patch per vendor if this preferred.
+
+Sebastian
+
 
 
