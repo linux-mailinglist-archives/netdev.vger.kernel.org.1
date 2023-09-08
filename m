@@ -1,155 +1,167 @@
-Return-Path: <netdev+bounces-32484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 508A4797D15
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 21:57:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B523797B5D
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 20:15:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 368831C20B8E
-	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 19:57:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B59D2816EA
+	for <lists+netdev@lfdr.de>; Thu,  7 Sep 2023 18:15:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D18C14263;
-	Thu,  7 Sep 2023 19:57:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5731F13FF5;
+	Thu,  7 Sep 2023 18:15:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72FF314018;
-	Thu,  7 Sep 2023 19:57:12 +0000 (UTC)
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id B86311BF9;
-	Thu,  7 Sep 2023 12:56:54 -0700 (PDT)
-Received: from linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net (linux.microsoft.com [13.77.154.182])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 0C7E1212B5B8;
-	Thu,  7 Sep 2023 12:56:54 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 0C7E1212B5B8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1694116614;
-	bh=we32LNTD31JAaI4joLSzHVlHvTwsLPOQVQi+KGcP0Ck=;
-	h=From:To:Cc:Subject:Date:From;
-	b=D7kjwtypiukw0cvciYcq3iZ1Es2EvUVHJlxjaCdKjRE0zQon0K+5wyFJwO2x7gcj7
-	 3pVB3Q1EG+bVUR2vK1SGt62ajcyFNc0TqTug/9K7/66pkET40sGsUHx/x38gsf3eFw
-	 Lm+FeZbbzdqoqL2c82Y6QxeQVFce08i/38EDSMT8=
-From: Sonia Sharma <sosha@linux.microsoft.com>
-To: linux-kernel@vger.kernel.org
-Cc: linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	sosha@microsoft.com,
-	kys@microsoft.com,
-	mikelley@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	longli@microsoft.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Subject: [PATCH v4 net] net: hv_netvsc: fix netvsc_send_completion to avoid multiple message length checks
-Date: Thu,  7 Sep 2023 12:56:47 -0700
-Message-Id: <1694116607-24755-1-git-send-email-sosha@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
-X-Spam-Status: No, score=-17.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45B20134DD
+	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 18:15:06 +0000 (UTC)
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DA011710;
+	Thu,  7 Sep 2023 11:14:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1694110495; x=1725646495;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=0TnSY7Dj57kDvwS7MSema5/mPzlAoA5MTHNSNEab8U8=;
+  b=XPOdpMtBCI+ubajZ7i8BuwLCennOttM0P23YAC2PyoKYxpQOdvlMgHlk
+   gw7vb9XwTZ+6ISczpAeWM2blISohk3eJaVgeJ5WEF7MmaFFDG67iDEN1I
+   3aiRGrJN0oXDTG2MGeO0YNxQdBmwrcMDDeJj4hXFi3zvVXRsdX/1P6wlG
+   d0NrHetQqkCwHxO0cV7BkW9QmsT3zR9p8Rm5ieAibONw3C0LbpgP92bW4
+   4JKpRJvGYjWE/bQBymOoGMLCqLUd0BWMeD7MQnG/M7l4WFLcT2/ief7mY
+   cvo/o6adhCkmXUiUGgvp+tD30BWmKTHrc0aD+/D0Tmah6ujSKCjHneZBP
+   A==;
+X-CSE-ConnectionGUID: D0ayf4mnRCeKEpW5OwqQLA==
+X-CSE-MsgGUID: WcRlAeYdS+aCrUDu6oTEyQ==
+X-ThreatScanner-Verdict: Negative
+X-IronPort-AV: E=Sophos;i="6.02,235,1688454000"; 
+   d="scan'208";a="3553050"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 07 Sep 2023 07:04:08 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Thu, 7 Sep 2023 07:04:07 -0700
+Received: from CHE-LT-I17164LX.microchip.com (10.10.85.11) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
+ 15.1.2507.21 via Frontend Transport; Thu, 7 Sep 2023 07:04:03 -0700
+From: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+To: <kuba@kernel.org>, <piergiorgio.beruto@gmail.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <pabeni@redhat.com>, <andrew@lunn.ch>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <horatiu.vultur@microchip.com>, <Woojung.Huh@microchip.com>,
+	<Nicolas.Ferre@microchip.com>, <Thorsten.Kummermehr@microchip.com>,
+	<UNGLinuxDriver@microchip.com>, Parthiban Veerasooran
+	<Parthiban.Veerasooran@microchip.com>
+Subject: [PATCH net v2] ethtool: plca: fix plca enable data type while parsing the value
+Date: Fri, 8 Sep 2023 19:33:46 +0530
+Message-ID: <20230908140346.40680-1-Parthiban.Veerasooran@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Spam-Status: No, score=1.1 required=5.0 tests=BAYES_00,DATE_IN_FUTURE_12_24,
+	DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: *
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Sonia Sharma <sonia.sharma@linux.microsoft.com>
+The ETHTOOL_A_PLCA_ENABLED data type is u8. But while parsing the
+value from the attribute, nla_get_u32() is used in the plca_update_sint()
+function instead of nla_get_u8(). So plca_cfg.enabled variable is updated
+with some garbage value instead of 0 or 1 and always enables plca even
+though plca is disabled through ethtool application. This bug has been
+fixed by parsing the values based on the attributes type in the policy.
 
-The switch statement in netvsc_send_completion() is incorrectly validating
-the length of incoming network packets by falling through to the next case.
-Avoid the fallthrough. Instead break after a case match and then process
-the complete() call.
-The current code has not caused any known failures. But nonetheless, the
-code should be corrected as a different ordering of the switch cases might
-cause a length check to fail when it should not.
-
-Fixes: 44144185951a0f ("hv_netvsc: Add validation for untrusted Hyper-V values")
-Signed-off-by: Sonia Sharma <sonia.sharma@linux.microsoft.com>
-
+Fixes: 8580e16c28f3 ("net/ethtool: add netlink interface for the PLCA RS")
+Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
 ---
-Changes in v3:
-* added return statement in default case as pointed by Michael Kelley.
-Changes in v4:
-* added fixes tag
-* modified commit message to explain the issue fixed by patch.
----
- drivers/net/hyperv/netvsc.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
+ net/ethtool/plca.c | 45 +++++++++++++++++++++++++++++----------------
+ 1 file changed, 29 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/net/hyperv/netvsc.c b/drivers/net/hyperv/netvsc.c
-index 82e9796c8f5e..0f7e4d377776 100644
---- a/drivers/net/hyperv/netvsc.c
-+++ b/drivers/net/hyperv/netvsc.c
-@@ -851,7 +851,7 @@ static void netvsc_send_completion(struct net_device *ndev,
- 				   msglen);
- 			return;
- 		}
--		fallthrough;
-+		break;
+diff --git a/net/ethtool/plca.c b/net/ethtool/plca.c
+index b238a1afe9ae..b1e2e3b5027f 100644
+--- a/net/ethtool/plca.c
++++ b/net/ethtool/plca.c
+@@ -21,16 +21,6 @@ struct plca_reply_data {
+ #define PLCA_REPDATA(__reply_base) \
+ 	container_of(__reply_base, struct plca_reply_data, base)
  
- 	case NVSP_MSG1_TYPE_SEND_RECV_BUF_COMPLETE:
- 		if (msglen < sizeof(struct nvsp_message_header) +
-@@ -860,7 +860,7 @@ static void netvsc_send_completion(struct net_device *ndev,
- 				   msglen);
- 			return;
- 		}
--		fallthrough;
-+		break;
+-static void plca_update_sint(int *dst, const struct nlattr *attr,
+-			     bool *mod)
+-{
+-	if (!attr)
+-		return;
+-
+-	*dst = nla_get_u32(attr);
+-	*mod = true;
+-}
+-
+ // PLCA get configuration message ------------------------------------------- //
  
- 	case NVSP_MSG1_TYPE_SEND_SEND_BUF_COMPLETE:
- 		if (msglen < sizeof(struct nvsp_message_header) +
-@@ -869,7 +869,7 @@ static void netvsc_send_completion(struct net_device *ndev,
- 				   msglen);
- 			return;
- 		}
--		fallthrough;
-+		break;
+ const struct nla_policy ethnl_plca_get_cfg_policy[] = {
+@@ -38,6 +28,29 @@ const struct nla_policy ethnl_plca_get_cfg_policy[] = {
+ 		NLA_POLICY_NESTED(ethnl_header_policy),
+ };
  
- 	case NVSP_MSG5_TYPE_SUBCHANNEL:
- 		if (msglen < sizeof(struct nvsp_message_header) +
-@@ -878,10 +878,6 @@ static void netvsc_send_completion(struct net_device *ndev,
- 				   msglen);
- 			return;
- 		}
--		/* Copy the response back */
--		memcpy(&net_device->channel_init_pkt, nvsp_packet,
--		       sizeof(struct nvsp_message));
--		complete(&net_device->channel_init_wait);
- 		break;
- 
- 	case NVSP_MSG1_TYPE_SEND_RNDIS_PKT_COMPLETE:
-@@ -904,13 +900,19 @@ static void netvsc_send_completion(struct net_device *ndev,
- 
- 		netvsc_send_tx_complete(ndev, net_device, incoming_channel,
- 					desc, budget);
--		break;
-+		return;
- 
- 	default:
- 		netdev_err(ndev,
- 			   "Unknown send completion type %d received!!\n",
- 			   nvsp_packet->hdr.msg_type);
-+		return;
- 	}
++static void plca_update_sint(int *dst, struct nlattr **tb, u32 attrid,
++			     bool *mod)
++{
++	const struct nlattr *attr = tb[attrid];
 +
-+	/* Copy the response back */
-+	memcpy(&net_device->channel_init_pkt, nvsp_packet,
-+			sizeof(struct nvsp_message));
-+	complete(&net_device->channel_init_wait);
- }
++	if (!attr ||
++	    WARN_ON_ONCE(attrid >= ARRAY_SIZE(ethnl_plca_set_cfg_policy)))
++		return;
++
++	switch (ethnl_plca_set_cfg_policy[attrid].type) {
++	case NLA_U8:
++		*dst = nla_get_u8(attr);
++		break;
++	case NLA_U32:
++		*dst = nla_get_u32(attr);
++		break;
++	default:
++		WARN_ON_ONCE(1);
++	}
++
++	*mod = true;
++}
++
+ static int plca_get_cfg_prepare_data(const struct ethnl_req_info *req_base,
+ 				     struct ethnl_reply_data *reply_base,
+ 				     const struct genl_info *info)
+@@ -144,13 +157,13 @@ ethnl_set_plca(struct ethnl_req_info *req_info, struct genl_info *info)
+ 		return -EOPNOTSUPP;
  
- static u32 netvsc_get_next_send_section(struct netvsc_device *net_device)
+ 	memset(&plca_cfg, 0xff, sizeof(plca_cfg));
+-	plca_update_sint(&plca_cfg.enabled, tb[ETHTOOL_A_PLCA_ENABLED], &mod);
+-	plca_update_sint(&plca_cfg.node_id, tb[ETHTOOL_A_PLCA_NODE_ID], &mod);
+-	plca_update_sint(&plca_cfg.node_cnt, tb[ETHTOOL_A_PLCA_NODE_CNT], &mod);
+-	plca_update_sint(&plca_cfg.to_tmr, tb[ETHTOOL_A_PLCA_TO_TMR], &mod);
+-	plca_update_sint(&plca_cfg.burst_cnt, tb[ETHTOOL_A_PLCA_BURST_CNT],
++	plca_update_sint(&plca_cfg.enabled, tb, ETHTOOL_A_PLCA_ENABLED, &mod);
++	plca_update_sint(&plca_cfg.node_id, tb, ETHTOOL_A_PLCA_NODE_ID, &mod);
++	plca_update_sint(&plca_cfg.node_cnt, tb, ETHTOOL_A_PLCA_NODE_CNT, &mod);
++	plca_update_sint(&plca_cfg.to_tmr, tb, ETHTOOL_A_PLCA_TO_TMR, &mod);
++	plca_update_sint(&plca_cfg.burst_cnt, tb, ETHTOOL_A_PLCA_BURST_CNT,
+ 			 &mod);
+-	plca_update_sint(&plca_cfg.burst_tmr, tb[ETHTOOL_A_PLCA_BURST_TMR],
++	plca_update_sint(&plca_cfg.burst_tmr, tb, ETHTOOL_A_PLCA_BURST_TMR,
+ 			 &mod);
+ 	if (!mod)
+ 		return 0;
 -- 
-2.25.1
+2.34.1
 
 
