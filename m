@@ -1,126 +1,166 @@
-Return-Path: <netdev+bounces-32573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0368798781
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 14:59:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7798F7987F0
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 15:34:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7E6D1C20C2D
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 12:59:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9572E1C20C59
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 13:34:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 200395397;
-	Fri,  8 Sep 2023 12:59:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11DA453B2;
+	Fri,  8 Sep 2023 13:34:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119DB5254
-	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 12:59:30 +0000 (UTC)
-Received: from mx0a-00128a01.pphosted.com (mx0a-00128a01.pphosted.com [148.163.135.77])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C73B71FD8;
-	Fri,  8 Sep 2023 05:59:25 -0700 (PDT)
-Received: from pps.filterd (m0167088.ppops.net [127.0.0.1])
-	by mx0a-00128a01.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 388AY4Ew022890;
-	Fri, 8 Sep 2023 08:58:56 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-00128a01.pphosted.com (PPS) with ESMTPS id 3sycfuqtjc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 08 Sep 2023 08:58:56 -0400 (EDT)
-Received: from m0167088.ppops.net (m0167088.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.22/8.17.1.22) with ESMTP id 388CsWYv028495;
-	Fri, 8 Sep 2023 08:58:55 -0400
-Received: from nwd2mta3.analog.com ([137.71.173.56])
-	by mx0a-00128a01.pphosted.com (PPS) with ESMTPS id 3sycfuqtj8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 08 Sep 2023 08:58:55 -0400 (EDT)
-Received: from ASHBMBX8.ad.analog.com (ASHBMBX8.ad.analog.com [10.64.17.5])
-	by nwd2mta3.analog.com (8.14.7/8.14.7) with ESMTP id 388CwsHl034591
-	(version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 8 Sep 2023 08:58:54 -0400
-Received: from ASHBMBX9.ad.analog.com (10.64.17.10) by ASHBMBX8.ad.analog.com
- (10.64.17.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.14; Fri, 8 Sep 2023
- 08:58:53 -0400
-Received: from zeus.spd.analog.com (10.66.68.11) by ashbmbx9.ad.analog.com
- (10.64.17.10) with Microsoft SMTP Server id 15.2.986.14 via Frontend
- Transport; Fri, 8 Sep 2023 08:58:53 -0400
-Received: from debian.ad.analog.com ([10.48.65.137])
-	by zeus.spd.analog.com (8.15.1/8.15.1) with ESMTP id 388CwW6g008873;
-	Fri, 8 Sep 2023 08:58:35 -0400
-From: Ciprian Regus <ciprian.regus@analog.com>
-To: <linux-kernel@vger.kernel.org>
-CC: Ciprian Regus <ciprian.regus@analog.com>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Alexandru Tachici
-	<alexandru.tachici@analog.com>,
-        Yang Yingliang <yangyingliang@huawei.com>,
-        Amit Kumar Mahapatra <amit.kumar-mahapatra@amd.com>,
-        Andrew Lunn
-	<andrew@lunn.ch>, Lennart Franzen <lennart@lfdomain.com>,
-        <netdev@vger.kernel.org>
-Subject: [net] net:ethernet:adi:adin1110: Fix forwarding offload
-Date: Fri, 8 Sep 2023 15:58:08 +0300
-Message-ID: <20230908125813.1715706-1-ciprian.regus@analog.com>
-X-Mailer: git-send-email 2.39.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF1DB2FB6
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 13:34:12 +0000 (UTC)
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2040.outbound.protection.outlook.com [40.107.22.40])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBCDA1FD0;
+	Fri,  8 Sep 2023 06:34:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=M4xZdYPFLNtKyvUkTT+aByqCNWggxW+zCYVg5i01Elb8KV0eYL6sKveNJysAPp8YoM23u4auzeJoxWokgzHW40UvxzoEC3h/G7AzXKYmuM9GJ7gdgb6C55Zdr0tsC6ySbOHUm6Qmuec8LexhRIVfgAyUqj81MtL2UA2hIjsQYtkbBdrB0NhVR/hUR1MsGM5l65A55l1PH1ey1nqG1lZ4fF1fywdMkzh8gEplzY+05R3TQwXVNCaHjs0FdmuTAgD/xUqQn/VVLKolh5tAK638s9AnT/utZzNwIaXtY783Hf/Q3oots9ZF7NCzINkNxDu6UTDy514Tsn2/ZgcpKyUSeg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FfRCwM/U35hSsAtCOa4WQ8WoLPqqrD9RsWsa8QHdcfs=;
+ b=ePcxh2Anw2DAGdItHheP8T2FBmKPT9qmC7IqQU6GYT38jAV1d0Z5qdc/cIRFuda6R7VpavIIUWbYp+0SmWPQTSCyFAbqMeY3u8rvh2h/Np8LUohZkmuB0FufB8YvdqCmVQN7BcLU/A8TPbH3OfUQn4xXhLYdQ18aUrdqi1vyeTBNytYVmdO58luQmlIpl01fcwJZssgsr9sxbAU6HaKtyKL0EwuHs8l6jl1Tys12b+dwzlIot11SmZ1Us+9chq2JPYmavI5tQMONNymkDdiiiK761rzGQj23MWyh58eqNhRt4RiDRGfREeiGmO+3COuaeJhlNB/9Bl9d2+71y0QFkw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FfRCwM/U35hSsAtCOa4WQ8WoLPqqrD9RsWsa8QHdcfs=;
+ b=eIsZQcSkWdhtWgwPOwkcTOn6QAqsasACImXDc/4Z3gJ/JuEy8rHOxV7CobP4UoHrHXN/40Jdf0Tx09YNF4GTYIPDWZtYOI3ky3/PqIW+6W4BEMIEdX1fXW/x818VkYJCNV7Nm5pP9mgC7TwtYX2gZ/lPg1Ja2GNJlb4z3TmpieE=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by PAWPR04MB9718.eurprd04.prod.outlook.com (2603:10a6:102:381::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.34; Fri, 8 Sep
+ 2023 13:34:03 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::568a:57ee:35b5:e454]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::568a:57ee:35b5:e454%3]) with mapi id 15.20.6745.034; Fri, 8 Sep 2023
+ 13:34:03 +0000
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: netdev@vger.kernel.org
+Cc: Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Xiaoliang Yang <xiaoliang.yang_1@nxp.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Yanan Yang <yanan.yang@nxp.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net 0/5] Fixes for SJA1105 DSA FDB regressions
+Date: Fri,  8 Sep 2023 16:33:47 +0300
+Message-Id: <20230908133352.2007218-1-vladimir.oltean@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: FR2P281CA0036.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:14::23) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ADIRuleOP-NewSCL: Rule Triggered
-X-Proofpoint-ORIG-GUID: _HiZIgaNSr2uD9kivUrSlWd7IYvjb2ZL
-X-Proofpoint-GUID: wcHIv9gNUWl0snVUWcd2QKSMn_wz7r-v
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-09-08_09,2023-09-05_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 suspectscore=0
- mlxscore=0 malwarescore=0 bulkscore=0 lowpriorityscore=0 spamscore=0
- adultscore=0 phishscore=0 impostorscore=0 priorityscore=1501
- mlxlogscore=965 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2309080120
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|PAWPR04MB9718:EE_
+X-MS-Office365-Filtering-Correlation-Id: e71182b5-d7a1-4b3e-361e-08dbb0704438
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	sZR2nWgCtRnqH1Wd+NS9tTHrpOBIXE/EzeF/1uN1XGOrWB5FlMD8syEHD/35RRZ8cZUmO15DLIIhPEG5vCjDjEjVFXCYfuKRN+sRAanbysmAKVkIC8InjPi9fvl7RU9FpZjNWiqUgRPWJwNkoqG7xTGzlfxcPRSbkYCRvj+S1Zt25Nv4GlRS9sFFNmUikSiXUp1WV6gUTbxPr2esQHPMVR6GVCtlQ8xsIaJYZ5BtuX7Qe8AD0ubOq+zFhwp2KXZGewllmvUPsVQyrrZvj5tX3adGv6+xsoPtR29m5G6cF02pC1iHXNAWx1hEkiCydfMA1IIgcgdVBSAMnPx3oJBWDW/nLEIrfSMKja/nG3CuGVvB7UrEc4AgyelKpDiTlUpJnWql26AssPGgRJjDJuPQE2jJe6hZkWs3k4nakMK8IZ9QW1O+zu+Q2a84j2A4Re5JxKL0GfhosgVaUgXciMhjDSvtTVG0r/D5ojNMGuJVjqQVRpgvua37Sklhbbb32OscfLtYEG6SybGAgZIWtLR649ir2/zooBXz4eV7vRqCyfiNeovivoMZPOEX6op5pvd1aGtHu97F2j8NcSKkqokSBhi//oHbcW/yH2GNlkbySfc=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(366004)(346002)(39860400002)(376002)(1800799009)(186009)(451199024)(2906002)(38350700002)(38100700002)(36756003)(6506007)(41300700001)(6512007)(6486002)(52116002)(66556008)(54906003)(2616005)(66946007)(66476007)(6916009)(316002)(1076003)(86362001)(8676002)(8936002)(4326008)(966005)(6666004)(478600001)(5660300002)(26005)(83380400001)(44832011);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?bMLsKtQgNDupTWMQklugsa3ZziyuY2fhuFdfzHufAWt1Z7hldgo9NYCK6vi1?=
+ =?us-ascii?Q?hdwriZIhnCWONRM5p6pfzpHrQRmaLDhpkedv53mSfTuPkjmwKIM0ridkV9Jj?=
+ =?us-ascii?Q?PqFcutFgC2U5JVZVakwo0alySjiF6kIoJw9pErF2nvgtmqE7COT6xEPDykze?=
+ =?us-ascii?Q?L0Fs8L3W+6uvRgdow/84dHnkPbKN0dXZLFq3D6zNIi7c/snzvoacMgjmTTnV?=
+ =?us-ascii?Q?tPVy3cbpnM+ItLnBOzKad5xpWyYSzHhrdLsIDL2yxmLXHj0O7322u5FRxehb?=
+ =?us-ascii?Q?Q17EIRcp/E8FED0Zf9LBACzIqG1ODlmd/VB4ANW7KhrL5svFqsiNvph2sKfL?=
+ =?us-ascii?Q?KevXov3WB+9UekkFuxI/+qDupcm6Idf2BlhoEMrBZeiw1uArElBjzA7lR9QD?=
+ =?us-ascii?Q?uMi1l5nkWLTKWWdFB05TqPiJlFXxKEh/Mpr0C7fPS9lP6G2UFovRMQ9dqcO8?=
+ =?us-ascii?Q?L81Y+6btWopY6sUoVfcMP2ypXcR1wdAR6AbxGV+8GEFK6jzjrJvkRKKafltv?=
+ =?us-ascii?Q?5/Qye9J2i4iye7EPEf9BZXXO+zdu24ET4IJhEpP2UF6EaMb5bzF3ocKBEwri?=
+ =?us-ascii?Q?hcwCJD1LVqTE1fIPr1lIGw59WOs5QukgLxlYNLII9QFTO+BUAJNC/fO4s9wR?=
+ =?us-ascii?Q?ILRV5HWD6S9Lq2pJsJjw6mZLnYz31PAD+c3nPjoc/bwD3TQR7I8i/RbeeS5E?=
+ =?us-ascii?Q?ga+EV/uWUdJzIuQcfVxYueO6z4ROTPGiNK69AmujijHWSsTAxQBrt7zR8Ifb?=
+ =?us-ascii?Q?opgEtmKaTgmiyedKPbCLTkr/+aueLS4eZr1SqPud9yqNmrJDKG+Vx0+CiS74?=
+ =?us-ascii?Q?oFsHGulUaqYQ+zd7uX5Qp77mrwF+EY46jN0akfINOfyFmGJE24juf1TBK+Hj?=
+ =?us-ascii?Q?EjV37vhQoYC9eWB60lMgLYgImmE02Oe0lFvL/dpCzVg6P87LAirM00gXlbON?=
+ =?us-ascii?Q?5mYdOXcl5LcHi5uL+WuAtFZDfrDFkpStZQyuUyhVM3anC9FSJF61KsNeLQGq?=
+ =?us-ascii?Q?r76kaZJodKJCjsUeBfDKs89/Z+fbtOcjBqZgtU/K5PdiSgeisksI7lvBjZeN?=
+ =?us-ascii?Q?M4S57tw+7XqNvWb7KTnzoSERq5YvnNr1ioldAYV5gw0M1JM60vK450QO83aW?=
+ =?us-ascii?Q?d5JDphsoPArtobOwsh/Unp6Xc4qp/7uX0YkQMzJI8KnHo1nnLB191TcGJUla?=
+ =?us-ascii?Q?F20Bkqc2jtzsXKLSHypOLcHRfnSjyTov/ZtogzXI4OPC2/GVHx6xsodanLXv?=
+ =?us-ascii?Q?ZsGN6CAQbqvIdYXNGO3nMSpNrfx4LUls15j3kMIRd3NIQ9i8hT5wk/xnb2x8?=
+ =?us-ascii?Q?kWIH/cA9VexMGv18OC6qHcJqmR0wEaoXxEHOxsi0PIokmmyLUBKZEu94EAQK?=
+ =?us-ascii?Q?J/85qzLUHqDLr5lNfhWEXV1W1gvjDBQYGy5UFusDvzENtKFMrZbh4goTR98o?=
+ =?us-ascii?Q?dMwvQMe9nQNtHP+ABVmIiuT4Hx9k+cSeuZqgUvY9r08DZ8BqwR7Gaa3411EA?=
+ =?us-ascii?Q?5mwGfYONoPNZgClGSRHMHV0gtMuIKGWbPIPPrwS782V7iMbYNmdM8Wh3rMmN?=
+ =?us-ascii?Q?0ZNQYAOHV6KOhC1osVZ0oOTWPscN4vA7ZmObDOXEbRNTk+OMH/aGIl38Tk9E?=
+ =?us-ascii?Q?2Q=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e71182b5-d7a1-4b3e-361e-08dbb0704438
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Sep 2023 13:34:03.1922
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: InF4H1JBRNEAfruYM61k+CnTWpMRoaaJXaZUD7qRE+8i4StYRjwHs8GTlarAYshDv9IjYFvbLBVhQvP6slFkcw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR04MB9718
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Currently, when a new fdb entry is added (with both ports of the
-ADIN2111 bridged), the driver configures the MAC filters for the wrong
-port, which results in the forwarding being done by the host, and not
-actually hardware offloaded.
+A report by Yanan Yang has prompted an investigation into the sja1105
+driver's behavior w.r.t. multicast. The report states that when adding
+multicast L2 addresses with "bridge mdb add", only the most recently
+added address works - the others seem to be overwritten. This is solved
+by patch 3/5 (with patch 2/5 as a dependency for it).
 
-The ADIN2111 offloads the forwarding by setting filters on the
-destination MAC address of incoming frames. Based on these, they may be
-routed to the other port. Thus, if a frame has to be forwarded from port
-1 to port 2, the required configuration for the ADDR_FILT_UPRn register
-should set the APPLY2PORT1 bit (instead of APPLY2PORT2, as it's
-currently the case).
+Patches 4/5 and 5/5 fix a series of race conditions introduced during
+the same patch set as the bug above, namely this one:
+https://patchwork.kernel.org/project/netdevbpf/cover/20211024171757.3753288-1-vladimir.oltean@nxp.com/
 
-Fixes: bc93e19d088b ("net: ethernet: adi: Add ADIN1110 support")
-Signed-off-by: Ciprian Regus <ciprian.regus@analog.com>
----
- drivers/net/ethernet/adi/adin1110.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Finally, patch 1/5 fixes an issue found ever since the introduction of
+multicast forwarding offload in sja1105, which is that the multicast
+addresses are visible (with the "self" flag) in "bridge fdb show".
 
-diff --git a/drivers/net/ethernet/adi/adin1110.c b/drivers/net/ethernet/adi/adin1110.c
-index 1c009b485188..ca66b747b7c5 100644
---- a/drivers/net/ethernet/adi/adin1110.c
-+++ b/drivers/net/ethernet/adi/adin1110.c
-@@ -1387,3 +1387,3 @@ static int adin1110_fdb_add(struct adin1110_port_priv *port_priv,
- 	other_port = priv->ports[!port_priv->nr];
--	port_rules = adin1110_port_rules(port_priv, false, true);
-+	port_rules = adin1110_port_rules(other_port, false, true);
- 	eth_broadcast_addr(mask);
+Vladimir Oltean (5):
+  net: dsa: sja1105: hide all multicast addresses from "bridge fdb show"
+  net: dsa: sja1105: propagate exact error code from
+    sja1105_dynamic_config_poll_valid()
+  net: dsa: sja1105: fix multicast forwarding working only for last
+    added mdb entry
+  net: dsa: sja1105: serialize sja1105_port_mcast_flood() with other FDB
+    accesses
+  net: dsa: sja1105: block FDB accesses that are concurrent with a
+    switch reset
+
+ drivers/net/dsa/sja1105/sja1105.h             |  2 +
+ .../net/dsa/sja1105/sja1105_dynamic_config.c  | 93 +++++++++----------
+ drivers/net/dsa/sja1105/sja1105_main.c        | 69 ++++++++++----
+ 3 files changed, 97 insertions(+), 67 deletions(-)
+
 -- 
-2.39.2
+2.34.1
 
 
