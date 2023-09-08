@@ -1,117 +1,179 @@
-Return-Path: <netdev+bounces-32653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4536A798E1A
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 20:29:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 084BC798E4E
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 20:37:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E318A281DB4
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 18:29:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE9B128125E
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 18:37:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92C3E1643A;
-	Fri,  8 Sep 2023 18:19:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF748179B5;
+	Fri,  8 Sep 2023 18:34:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20230168AB
-	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 18:19:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8E7AC116A7;
-	Fri,  8 Sep 2023 18:19:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694197153;
-	bh=0YXk5J/NyZx5HU6ntAlvQZ93TdO00vwCrjzDesKa/gM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=oV/uEfKo0e2e5wErv1J/aI7d05JK2AN6Iv/bXrTTBnIDebQqGrTMOQN6UJECvBLMO
-	 sMS7RiepuTsRQNCy0yKYyUtabVB5eojvQ0gAP14d78FTj2gWRKtUaS+eWhgiaLFmcK
-	 jKP+/zNqjc+WObFEo+Dof8be5rNReYMmrbnScepyTWRbr6ZnYb6SU3EUFjQzDk8cfP
-	 KBaHna6L3l25i/suEFkjaE1HjmNpZu3ODD90vdQTt7bIVJ1BDywrundko4Y/7BOonb
-	 10hFzCzg9ly4xsboW3mM5UgstHbTCADD6aapVZqgjQAGdia6vvS4VCojO38pLsfh6w
-	 dhAaJyPsbAHjg==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Johannes Berg <johannes.berg@intel.com>,
-	syzbot+999fac712d84878a7379@syzkaller.appspotmail.com,
-	Sasha Levin <sashal@kernel.org>,
-	johannes@sipsolutions.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 23/26] wifi: mac80211: check for station first in client probe
-Date: Fri,  8 Sep 2023 14:18:01 -0400
-Message-Id: <20230908181806.3460164-23-sashal@kernel.org>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230908181806.3460164-1-sashal@kernel.org>
-References: <20230908181806.3460164-1-sashal@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3B4F179B2
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 18:34:12 +0000 (UTC)
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80044E4B
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 11:33:44 -0700 (PDT)
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-58dfe2d5b9aso32280267b3.1
+        for <netdev@vger.kernel.org>; Fri, 08 Sep 2023 11:33:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1694197854; x=1694802654; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:date:from:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=9DIksM6myeoWeDBcpXYOMBk+NYMmdWPc+5HOrctp+9s=;
+        b=UTqy57tAt6Rm4z+wNpMHc2sBi3fWLtVGVQycPDYCweEaee8kk9Tvom8Bpi7G3PjI4h
+         i1gJnYdrB8am0loXyeX4Sf/PWddM5E9E4OjBqt0/VkdNe2DSNmYJs6v6T2S4dH8tsxVo
+         O04/ynKPkaTO7DZiLIwYJ41un1ok3tKi2mNM4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694197854; x=1694802654;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:date:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9DIksM6myeoWeDBcpXYOMBk+NYMmdWPc+5HOrctp+9s=;
+        b=EqQeATlTD8aJik9T348c67MwZjJVY/bE3wuu6+nKy4kFLYOybo6Ss7y6ypKLSz65f6
+         vpCn5065/NzdiocGRUZCeXaLEVPKtWF2oiic/Ztszfpe8J7haWHf/rHXDjVcrefboX4A
+         DQWFs5LTtaU5f8726k+E7c4nuE6N5otskbfAxGoFXIon/dmiRtwteU+78502T8R0V8BF
+         XozyuLUc8PkEMrhzDKeHfwebUNtmT82UxDvuGrS2PaaGLzLCFiqwMgmBTdT2RZpVmBrQ
+         ZTozw/kcVQo9a0EcgoJqVHmVB+vgs4Hr4+aSNMFArVhlX3/uRgKfBUXCNu2lPOUUNtaz
+         gu3g==
+X-Gm-Message-State: AOJu0YxdcTzD8G1tqUrBL/fWbhjilW9ole4bEVn8lm7kG6Dw8LCQoVhC
+	GWmABsImpro5lX+hSaK5wekuozlxZr54lRNmQuQ=
+X-Google-Smtp-Source: AGHT+IEL011BEfLSNoZ0VWbsnUu9K98As3uc78Y5lkcy50J2yjnTrkBn7oLeFhQDR9RIQZU4AK+E0w==
+X-Received: by 2002:a05:6a20:7d9b:b0:13e:debc:3657 with SMTP id v27-20020a056a207d9b00b0013edebc3657mr3555227pzj.30.1694197133598;
+        Fri, 08 Sep 2023 11:18:53 -0700 (PDT)
+Received: from C02YVCJELVCG.dhcp.broadcom.net ([192.19.144.250])
+        by smtp.gmail.com with ESMTPSA id w25-20020a63af19000000b00563da87a52dsm1470280pge.40.2023.09.08.11.18.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Sep 2023 11:18:53 -0700 (PDT)
+From: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+X-Google-Original-From: Andy Gospodarek <gospo@broadcom.com>
+Date: Fri, 8 Sep 2023 14:18:45 -0400
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	netdev@vger.kernel.org, bpf@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH net 2/4] bnxt_en: Flush XDP for bnxt_poll_nitroa0()'s NAPI
+Message-ID: <ZPtlhSywT5cBTj8u@C02YVCJELVCG.dhcp.broadcom.net>
+References: <20230908135748.794163-1-bigeasy@linutronix.de>
+ <20230908135748.794163-3-bigeasy@linutronix.de>
+ <CALs4sv2=ox6ZWj3FUY=0-Zj3uNAOpCLM_vf_dmsVx+ju2S9UUA@mail.gmail.com>
+ <CACKFLin+1whPs0qeM5xBb1yXx8FkFS_vGrW6PaGy41_XVH=SGg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.52
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACKFLin+1whPs0qeM5xBb1yXx8FkFS_vGrW6PaGy41_XVH=SGg@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+	autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Johannes Berg <johannes.berg@intel.com>
+On Fri, Sep 08, 2023 at 10:57:13AM -0700, Michael Chan wrote:
+> On Fri, Sep 8, 2023 at 9:30 AM Pavan Chebbi <pavan.chebbi@broadcom.com> wrote:
+> >
+> > On Fri, Sep 8, 2023 at 7:29 PM Sebastian Andrzej Siewior
+> > <bigeasy@linutronix.de> wrote:
+> > >
+> > > bnxt_poll_nitroa0() invokes bnxt_rx_pkt() which can run a XDP program
+> > > which in turn can return XDP_REDIRECT. bnxt_rx_pkt() is also used by
+> > > __bnxt_poll_work() which flushes (xdp_do_flush()) the packets after each
+> > > round. bnxt_poll_nitroa0() lacks this feature.
+> > > xdp_do_flush() should be invoked before leaving the NAPI callback.
+> > >
+> > > Invoke xdp_do_flush() after a redirect in bnxt_poll_nitroa0() NAPI.
+> > >
+> > > Cc: Michael Chan <michael.chan@broadcom.com>
+> > > Fixes: f18c2b77b2e4e ("bnxt_en: optimized XDP_REDIRECT support")
+> > > Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> > > ---
+> > >  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 5 +++++
+> > >  1 file changed, 5 insertions(+)
+> > >
+> > > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> > > index 5cc0dbe121327..7551aa8068f8f 100644
+> > > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> > > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> > > @@ -2614,6 +2614,7 @@ static int bnxt_poll_nitroa0(struct napi_struct *napi, int budget)
+> > >         struct rx_cmp_ext *rxcmp1;
+> > >         u32 cp_cons, tmp_raw_cons;
+> > >         u32 raw_cons = cpr->cp_raw_cons;
+> > > +       bool flush_xdp = false;
+> >
+> > Michael can confirm but I don't think we need this additional variable.
+> > Since the event is always ORed, we could directly check if (event &
+> > BNXT_REDIRECT_EVENT) just like is done in __bnxt_poll_work().
+> 
+> If we have a mix of XDP_TX and XDP_REDIRECT during NAPI, event can be
+> cleared by XDP_TX.  So this patch looks correct to me because of that.
 
-[ Upstream commit 67dfa589aa8806c7959cbca2f4613b8d41c75a06 ]
+Agreed
 
-When probing a client, first check if we have it, and then
-check for the channel context, otherwise you can trigger
-the warning there easily by probing when the AP isn't even
-started yet. Since a client existing means the AP is also
-operating, we can then keep the warning.
+> Or we can make it consistent with __bnxt_poll_work() and assume that
+> XDP_TX won't mix with XDP_REDIRECT.
 
-Also simplify the moved code a bit.
+Unfortunately we probably cannot guarantee that or maybe more to point
+we do not want to guarantee that.
 
-Reported-by: syzbot+999fac712d84878a7379@syzkaller.appspotmail.com
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- net/mac80211/cfg.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+Thanks for this patch.
 
-diff --git a/net/mac80211/cfg.c b/net/mac80211/cfg.c
-index 23a44edcb11f7..cf3453b532d67 100644
---- a/net/mac80211/cfg.c
-+++ b/net/mac80211/cfg.c
-@@ -3991,19 +3991,20 @@ static int ieee80211_probe_client(struct wiphy *wiphy, struct net_device *dev,
- 	mutex_lock(&local->mtx);
- 
- 	rcu_read_lock();
-+	sta = sta_info_get_bss(sdata, peer);
-+	if (!sta) {
-+		ret = -ENOLINK;
-+		goto unlock;
-+	}
-+
-+	qos = sta->sta.wme;
-+
- 	chanctx_conf = rcu_dereference(sdata->vif.bss_conf.chanctx_conf);
- 	if (WARN_ON(!chanctx_conf)) {
- 		ret = -EINVAL;
- 		goto unlock;
- 	}
- 	band = chanctx_conf->def.chan->band;
--	sta = sta_info_get_bss(sdata, peer);
--	if (sta) {
--		qos = sta->sta.wme;
--	} else {
--		ret = -ENOLINK;
--		goto unlock;
--	}
- 
- 	if (qos) {
- 		fc = cpu_to_le16(IEEE80211_FTYPE_DATA |
--- 
-2.40.1
+Reviewed-by: Andy Gospodarek <gospo@broadcom.com>
+
+
+> Handling a mix of XDP actions needs to be looked at separately.  The
+> driver currently won't work well when that happens.  I am working on
+> an internal patch to address that and will post it when it's ready.
+> Thanks.
+> 
+> >
+> > >         u32 rx_pkts = 0;
+> > >         u8 event = 0;
+> > >
+> > > @@ -2648,6 +2649,8 @@ static int bnxt_poll_nitroa0(struct napi_struct *napi, int budget)
+> > >                                 rx_pkts++;
+> > >                         else if (rc == -EBUSY)  /* partial completion */
+> > >                                 break;
+> > > +                       if (event & BNXT_REDIRECT_EVENT)
+> > > +                               flush_xdp = true;
+> > >                 } else if (unlikely(TX_CMP_TYPE(txcmp) ==
+> > >                                     CMPL_BASE_TYPE_HWRM_DONE)) {
+> > >                         bnxt_hwrm_handler(bp, txcmp);
+> > > @@ -2667,6 +2670,8 @@ static int bnxt_poll_nitroa0(struct napi_struct *napi, int budget)
+> > >
+> > >         if (event & BNXT_AGG_EVENT)
+> > >                 bnxt_db_write(bp, &rxr->rx_agg_db, rxr->rx_agg_prod);
+> > > +       if (flush_xdp)
+> > > +               xdp_do_flush();
+> > >
+> > >         if (!bnxt_has_work(bp, cpr) && rx_pkts < budget) {
+> > >                 napi_complete_done(napi, rx_pkts);
+> > > --
+> > > 2.40.1
+> > >
+> > >
+
 
 
