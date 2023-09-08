@@ -1,46 +1,51 @@
-Return-Path: <netdev+bounces-32663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32664-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66BCD798E47
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 20:34:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D38DD798E48
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 20:34:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 812141C20EB2
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 18:34:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05F681C20EB2
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 18:34:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC2A5156C3;
-	Fri,  8 Sep 2023 18:21:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDF70171C9;
+	Fri,  8 Sep 2023 18:21:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D901913FF8
-	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 18:21:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56704C433CB;
-	Fri,  8 Sep 2023 18:21:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BB08156C1
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 18:21:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25A99C116AD;
+	Fri,  8 Sep 2023 18:21:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694197283;
-	bh=hD5njIcyf2lCixVvKUZXY/u9nTKEI62ubS16D3oz5Vc=;
+	s=k20201202; t=1694197285;
+	bh=M1SEUboSPYiiB6UY60gtnV2aLHbrgmGINt3ZwQqz7ZQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PPGoH5QMpw6r8CPh9ENhzvKpqmuhG/8W0pQpd+074btcSy3dYD+V1CrscSXEim009
-	 zLCTA3t5+N4jz7fbWqhkVJH2oSjQAYrh3xcMt6g+RGDD+0HKwzdjVfqUOAym+eALEC
-	 BRxFpdS+Nc4/ZWfa3ckEho4wxwiApf+0GzNhdVcP2nYXQpzNTAJrZcEAMPV/Hml8OG
-	 z6aZeka7dHwSiz0pD8saZbbh0qhFoh/s9cmInJ798oVNzyPklZkPXgM8KUoSiNCyn9
-	 DoSvQmRfFSGmhx9ots2epM0O2IbuaEVNWHi0puz2qvmNdYDhIqpuLnMpyiMkqzm75F
-	 U6m1nbwxWq9Tg==
+	b=O+0dNQv/KBPtflM6lIAt/P+CypY82xMjk4i3106L6VyB1iW9p5PEG7/myHLxjTU8w
+	 sT3GwP2sCy9CWrUSIgm5/U5KDtE9j6iODH0Ksl0yTKuqnQDdNIf7PQpMCO1X7TNNg4
+	 HQw0/3G5wOE5qoJuvVXjhNdHcu+qiCCvxPMpkg57tshu9tkjuybgw5H/jBAJWn2RMk
+	 HpDWFElmltNyVbljVNXNDc1n5lcO/dmr9hEaSyBmNfDApvRN2aGzptemNnsJZRi2IF
+	 GrmHzjLQFOy3qiiJKQIYKE+50JZlUdJ7O41T5IMgU8+PJIQ4qJEUT95pj762l59IAY
+	 lYfQA26g2G62w==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: "GONG, Ruiqi" <gongruiqi1@huawei.com>, GONG@web.codeaurora.org,
-	Simon Horman <horms@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Sasha Levin <sashal@kernel.org>, chris.snook@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+Cc: Johannes Berg <johannes.berg@intel.com>,
+	syzbot+09d1cd2f71e6dd3bfd2c@syzkaller.appspotmail.com,
+	Sasha Levin <sashal@kernel.org>,
+	johannes@sipsolutions.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-wireless@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 5/7] alx: fix OOB-read compiler warning
-Date: Fri,  8 Sep 2023 14:21:07 -0400
-Message-Id: <20230908182109.3461101-5-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 6/7] wifi: cfg80211: ocb: don't leave if not joined
+Date: Fri,  8 Sep 2023 14:21:08 -0400
+Message-Id: <20230908182109.3461101-6-sashal@kernel.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230908182109.3461101-1-sashal@kernel.org>
 References: <20230908182109.3461101-1-sashal@kernel.org>
@@ -50,55 +55,40 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 4.19.294
 Content-Transfer-Encoding: 8bit
 
-From: "GONG, Ruiqi" <gongruiqi1@huawei.com>
+From: Johannes Berg <johannes.berg@intel.com>
 
-[ Upstream commit 3a198c95c95da10ad844cbeade2fe40bdf14c411 ]
+[ Upstream commit abc76cf552e13cfa88a204b362a86b0e08e95228 ]
 
-The following message shows up when compiling with W=1:
+If there's no OCB state, don't ask the driver/mac80211 to
+leave, since that's just confusing. Since set/clear the
+chandef state, that's a simple check.
 
-In function ‘fortify_memcpy_chk’,
-    inlined from ‘alx_get_ethtool_stats’ at drivers/net/ethernet/atheros/alx/ethtool.c:297:2:
-./include/linux/fortify-string.h:592:4: error: call to ‘__read_overflow2_field’
-declared with attribute warning: detected read beyond size of field (2nd parameter);
-maybe use struct_group()? [-Werror=attribute-warning]
-  592 |    __read_overflow2_field(q_size_field, size);
-      |    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-In order to get alx stats altogether, alx_get_ethtool_stats() reads
-beyond hw->stats.rx_ok. Fix this warning by directly copying hw->stats,
-and refactor the unnecessarily complicated BUILD_BUG_ON btw.
-
-Signed-off-by: GONG, Ruiqi <gongruiqi1@huawei.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Link: https://lore.kernel.org/r/20230821013218.1614265-1-gongruiqi@huaweicloud.com
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Reported-by: syzbot+09d1cd2f71e6dd3bfd2c@syzkaller.appspotmail.com
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/atheros/alx/ethtool.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ net/wireless/ocb.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/net/ethernet/atheros/alx/ethtool.c b/drivers/net/ethernet/atheros/alx/ethtool.c
-index 2f4eabf652e80..51e5aa2c74b34 100644
---- a/drivers/net/ethernet/atheros/alx/ethtool.c
-+++ b/drivers/net/ethernet/atheros/alx/ethtool.c
-@@ -281,9 +281,8 @@ static void alx_get_ethtool_stats(struct net_device *netdev,
- 	spin_lock(&alx->stats_lock);
+diff --git a/net/wireless/ocb.c b/net/wireless/ocb.c
+index e64dbf16330c4..73dd44e77a1a3 100644
+--- a/net/wireless/ocb.c
++++ b/net/wireless/ocb.c
+@@ -70,6 +70,9 @@ int __cfg80211_leave_ocb(struct cfg80211_registered_device *rdev,
+ 	if (!rdev->ops->leave_ocb)
+ 		return -EOPNOTSUPP;
  
- 	alx_update_hw_stats(hw);
--	BUILD_BUG_ON(sizeof(hw->stats) - offsetof(struct alx_hw_stats, rx_ok) <
--		     ALX_NUM_STATS * sizeof(u64));
--	memcpy(data, &hw->stats.rx_ok, ALX_NUM_STATS * sizeof(u64));
-+	BUILD_BUG_ON(sizeof(hw->stats) != ALX_NUM_STATS * sizeof(u64));
-+	memcpy(data, &hw->stats, sizeof(hw->stats));
- 
- 	spin_unlock(&alx->stats_lock);
- }
++	if (!wdev->u.ocb.chandef.chan)
++		return -ENOTCONN;
++
+ 	err = rdev_leave_ocb(rdev, dev);
+ 	if (!err)
+ 		memset(&wdev->chandef, 0, sizeof(wdev->chandef));
 -- 
 2.40.1
 
