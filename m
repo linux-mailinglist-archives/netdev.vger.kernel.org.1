@@ -1,112 +1,208 @@
-Return-Path: <netdev+bounces-32542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C850C7983D5
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 10:15:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 16AB17983E6
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 10:19:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B600E1C20BE4
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 08:15:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D8671C20C28
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 08:19:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96EAE1C39;
-	Fri,  8 Sep 2023 08:15:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 994FE1C3D;
+	Fri,  8 Sep 2023 08:19:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A6A1C35
-	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 08:15:52 +0000 (UTC)
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 123E01BD3;
-	Fri,  8 Sep 2023 01:15:51 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id D265168B05; Fri,  8 Sep 2023 10:15:44 +0200 (CEST)
-Date: Fri, 8 Sep 2023 10:15:44 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: David Hildenbrand <david@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
-	David Howells <dhowells@redhat.com>, Peter Xu <peterx@redhat.com>,
-	Lei Huang <lei.huang@linux.intel.com>, miklos@szeredi.hu,
-	Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Trond Myklebust <trond.myklebust@hammerspace.com>,
-	Anna Schumaker <anna@kernel.org>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jakub Sitnicki <jakub@cloudflare.com>,
-	Boris Pismenny <borisp@nvidia.com>, linux-nfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, ceph-devel@vger.kernel.org,
-	linux-mm@kvack.org, v9fs@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: getting rid of the last memory modifitions through
- gup(FOLL_GET)
-Message-ID: <20230908081544.GB8240@lst.de>
-References: <20230905141604.GA27370@lst.de> <0240468f-3cc5-157b-9b10-f0cd7979daf0@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8890515B6
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 08:19:08 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E54C31FC4
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 01:19:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694161141; x=1725697141;
+  h=from:to:cc:subject:date:message-id;
+  bh=AURspU3F76W2cee+nFjq4Ps1mpWQnJyFzP2jJXded+c=;
+  b=Q1ExqXWWWVDyVlZAwTJjpQAv1mx5iTxAY8WKQx+EkJ2grB/Er9jfsXMI
+   yNFNSfw2GsAMIVmANdiGfAmg2qKsuNSQHt9bi08HBZUkR1+bF3igY+5QG
+   OikFMUJutRQuN9uqMyJbJMn6lwFCqHgXQ+F4Le3mhEsjI3UZBIRbYT8yT
+   /bAKe6x4QPiZ6BtsyJX0+omqJhj7hWxekeMoTetIknvk9vbC9fsQR7pKO
+   KGL7mYlgwxbrFjEUdJpGSy8uU139iVVmJXr8QGFN7gH6T8pkQZAJ8EobK
+   w+NhQut5mRwHdMnyGtQrjtF100SW022WOwqMewta9YqVfUS1L0RuBykSr
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10826"; a="362655518"
+X-IronPort-AV: E=Sophos;i="6.02,236,1688454000"; 
+   d="scan'208";a="362655518"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2023 01:18:49 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10826"; a="735878681"
+X-IronPort-AV: E=Sophos;i="6.02,236,1688454000"; 
+   d="scan'208";a="735878681"
+Received: from zulkifl3-ilbpg0.png.intel.com ([10.88.229.82])
+  by orsmga007.jf.intel.com with ESMTP; 08 Sep 2023 01:18:46 -0700
+From: Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>
+To: intel-wired-lan@osuosl.org
+Cc: sasha.neftin@intel.com,
+	bcreeley@amd.com,
+	horms@kernel.org,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	muhammad.husaini.zulkifli@intel.com,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org,
+	naamax.meir@linux.intel.com,
+	anthony.l.nguyen@intel.com,
+	husainizulkifli@gmail.com
+Subject: [PATCH iwl-net v5] igc: Expose tx-usecs coalesce setting to user
+Date: Fri,  8 Sep 2023 16:17:34 +0800
+Message-Id: <20230908081734.28205-1-muhammad.husaini.zulkifli@intel.com>
+X-Mailer: git-send-email 2.17.1
+X-Spam-Status: No, score=-2.1 required=5.0 tests=AC_FROM_MANY_DOTS,BAYES_00,
+	DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0240468f-3cc5-157b-9b10-f0cd7979daf0@redhat.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Wed, Sep 06, 2023 at 11:42:33AM +0200, David Hildenbrand wrote:
->> and iov_iter_get_pages_alloc2.  We have three file system direct I/O
->> users of those left: ceph, fuse and nfs.  Lei Huang has sent patches
->> to convert fuse to iov_iter_extract_pages which I'd love to see merged,
->> and we'd need equivalent work for ceph and nfs.
->>
->> The non-file system uses are in the vmsplice code, which only reads
->
-> vmsplice really has to be fixed to specify FOLL_PIN|FOLL_LONGTERM for good; 
-> I recall that David Howells had patches for that at one point. (at least to 
-> use FOLL_PIN)
+When users attempt to obtain the coalesce setting using the
+ethtool command, current code always returns 0 for tx-usecs.
+This is because I225/6 always uses a queue pair setting, hence
+tx_coalesce_usecs does not return a value during the
+igc_ethtool_get_coalesce() callback process. The pair queue
+condition checking in igc_ethtool_get_coalesce() is removed by
+this patch so that the user gets information of the value of tx-usecs.
 
-Hmm, unless I'm misreading the code vmsplace is only using
-iov_iter_get_pages2 for reading from the user address space anyway.
-Or am I missing something?
+Even if i225/6 is using queue pair setting, there is no harm in
+notifying the user of the tx-usecs. The implementation of the current
+code may have previously been a copy of the legacy code i210.
+Since I225 has the queue pair setting enabled, tx-usecs will always adhere
+to the user-set rx-usecs value. An error message will appear when the user
+attempts to set the tx-usecs value for the input parameters because,
+by default, they should only set the rx-usecs value.
 
->> After that we might have to do an audit of the raw get_user_pages APIs,
->> but there probably aren't many that modify file backed memory.
->
-> ptrace should apply that ends up doing a FOLL_GET|FOLL_WRITE.
+This patch also adds the helper function to get the
+previous rx coalesce value similar to tx coalesce.
 
-Yes, if that ends up on file backed shared mappings we also need a pin.
+How to test:
+User can get the coalesce value using ethtool command.
 
-> Further, KVM ends up using FOLL_GET|FOLL_WRITE to populate the second-level 
-> page tables for VMs, and uses MMU notifiers to synchronize the second-level 
-> page tables with process page table changes. So once a PTE goes from 
-> writable -> r/o in the process page table, the second level page tables for 
-> the VM will get updated. Such MMU users are quite different from ordinary 
-> GUP users.
+Example command:
+Get: ethtool -c <interface>
 
-Can KVM page tables use file backed shared mappings?
+Previous output:
 
-> Converting ptrace might not be desired/required as well (the reference is 
-> dropped immediately after the read/write access).
+rx-usecs: 3
+rx-frames: n/a
+rx-usecs-irq: n/a
+rx-frames-irq: n/a
 
-But the pin is needed to make sure the file system can account for
-dirtying the pages.  Something we fundamentally can't do with get.
+tx-usecs: 0
+tx-frames: n/a
+tx-usecs-irq: n/a
+tx-frames-irq: n/a
 
-> The end goal as discussed a couple of times would be the to limit FOLL_GET 
-> in general only to a couple of users that can be audited and keep using it 
-> for a good reason. Arbitrary drivers that perform DMA should stop using it 
-> (and ideally be prevented from using it) and switch to FOLL_PIN.
+New output:
 
-Agreed, that's where I'd like to get to.  Preferably with the non-pin
-API not even beeing epxorted to modules.
+rx-usecs: 3
+rx-frames: n/a
+rx-usecs-irq: n/a
+rx-frames-irq: n/a
+
+tx-usecs: 3
+tx-frames: n/a
+tx-usecs-irq: n/a
+tx-frames-irq: n/a
+
+Fixes: 8c5ad0dae93c ("igc: Add ethtool support")
+Signed-off-by: Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>
+Tested-by: Naama Meir <naamax.meir@linux.intel.com>
+---
+V4 -> V5:
+- Squash patch for set/get together as recommended by Jakub.
+- Fix unstabilize value when user insert both tx and rx params
+together.
+- Add error message for unsupported config.
+
+V3 -> V4:
+- Implement the helper function, as recommended by Brett Creely.
+- Fix typo in cover letter.
+
+V2 -> V3:
+- Refactor the code, as Simon suggested, to make it more readable.
+
+V1 -> V2:
+- Split the patch file into two, like Anthony suggested.
+---
+ drivers/net/ethernet/intel/igc/igc_ethtool.c | 31 ++++++++++++--------
+ 1 file changed, 19 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
+index 93bce729be76..7ab6dd58e400 100644
+--- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
++++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
+@@ -868,6 +868,18 @@ static void igc_ethtool_get_stats(struct net_device *netdev,
+ 	spin_unlock(&adapter->stats64_lock);
+ }
+ 
++static int igc_ethtool_get_previous_rx_coalesce(struct igc_adapter *adapter)
++{
++	return (adapter->rx_itr_setting <= 3) ?
++		adapter->rx_itr_setting : adapter->rx_itr_setting >> 2;
++}
++
++static int igc_ethtool_get_previous_tx_coalesce(struct igc_adapter *adapter)
++{
++	return (adapter->tx_itr_setting <= 3) ?
++		adapter->tx_itr_setting : adapter->tx_itr_setting >> 2;
++}
++
+ static int igc_ethtool_get_coalesce(struct net_device *netdev,
+ 				    struct ethtool_coalesce *ec,
+ 				    struct kernel_ethtool_coalesce *kernel_coal,
+@@ -875,17 +887,8 @@ static int igc_ethtool_get_coalesce(struct net_device *netdev,
+ {
+ 	struct igc_adapter *adapter = netdev_priv(netdev);
+ 
+-	if (adapter->rx_itr_setting <= 3)
+-		ec->rx_coalesce_usecs = adapter->rx_itr_setting;
+-	else
+-		ec->rx_coalesce_usecs = adapter->rx_itr_setting >> 2;
+-
+-	if (!(adapter->flags & IGC_FLAG_QUEUE_PAIRS)) {
+-		if (adapter->tx_itr_setting <= 3)
+-			ec->tx_coalesce_usecs = adapter->tx_itr_setting;
+-		else
+-			ec->tx_coalesce_usecs = adapter->tx_itr_setting >> 2;
+-	}
++	ec->rx_coalesce_usecs = igc_ethtool_get_previous_rx_coalesce(adapter);
++	ec->tx_coalesce_usecs = igc_ethtool_get_previous_tx_coalesce(adapter);
+ 
+ 	return 0;
+ }
+@@ -910,8 +913,12 @@ static int igc_ethtool_set_coalesce(struct net_device *netdev,
+ 	    ec->tx_coalesce_usecs == 2)
+ 		return -EINVAL;
+ 
+-	if ((adapter->flags & IGC_FLAG_QUEUE_PAIRS) && ec->tx_coalesce_usecs)
++	if ((adapter->flags & IGC_FLAG_QUEUE_PAIRS) &&
++	    ec->tx_coalesce_usecs != igc_ethtool_get_previous_tx_coalesce(adapter)) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "Queue Pair mode enabled, both Rx and Tx coalescing controlled by rx-usecs");
+ 		return -EINVAL;
++	}
+ 
+ 	/* If ITR is disabled, disable DMAC */
+ 	if (ec->rx_coalesce_usecs == 0) {
+-- 
+2.17.1
+
 
