@@ -1,277 +1,140 @@
-Return-Path: <netdev+bounces-32549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 133067984C2
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 11:23:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E30977984F2
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 11:42:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E6002818C6
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 09:23:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C2E628196C
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 09:42:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E89120F6;
-	Fri,  8 Sep 2023 09:23:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D1E8210F;
+	Fri,  8 Sep 2023 09:42:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 341127E9
-	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 09:23:08 +0000 (UTC)
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BD9719B0;
-	Fri,  8 Sep 2023 02:23:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1694164986; x=1725700986;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Egkw+WH5fFJ5kSX2OdPLD5E87Kh/cobubBZXv1R2/WA=;
-  b=Tg4QEX0lozi8IrbG0YPf1kVq9T+avVNE3QDcGu6D7iCM61mtQLhQRYhQ
-   C1Z8ft7zRSGeDJZdvQmAr6XFBYpnz2WCWt3cH5tGUCGed2FFaKTnmH3oI
-   wgP5TeuIrIfvWYNv65UaguqtKRdVlnNMYrWrEi7DlFUq2nrHJ1LqiVhp/
-   QzrPzdCYc2AkfRS4wFRfBx0Sy18Jv17i7dKPsR8U/5G4RYuObj6jmWu1t
-   GvvdoJTaVnI/0Xce0DZkONd2BngJrCVmA9EV1A6VVRRP2uXNAPPM4fME/
-   jlIj2FmJqmcMb2P+vcHjFwqqYBa1njMHIkkZVMwShPupuI3rUd97UbUP7
-   g==;
-X-IronPort-AV: E=Sophos;i="6.02,236,1688421600"; 
-   d="scan'208";a="32852030"
-Received: from vtuxmail01.tq-net.de ([10.115.0.20])
-  by mx1.tq-group.com with ESMTP; 08 Sep 2023 11:23:04 +0200
-Received: from steina-w.localnet (steina-w.tq-net.de [10.123.53.21])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by vtuxmail01.tq-net.de (Postfix) with ESMTPSA id 863FF28007F;
-	Fri,  8 Sep 2023 11:23:04 +0200 (CEST)
-From: Alexander Stein <alexander.stein@ew.tq-group.com>
-To: netdev@vger.kernel.org, Sascha Hauer <s.hauer@pengutronix.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org, kernel@pengutronix.de, Michael Riesch <michael.riesch@wolfvision.net>, Sascha Hauer <s.hauer@pengutronix.de>
-Subject: Re: [PATCH] net: phy: dp83867: Add support for hardware blinking LEDs
-Date: Fri, 08 Sep 2023 11:23:05 +0200
-Message-ID: <2239338.iZASKD2KPV@steina-w>
-Organization: TQ-Systems GmbH
-In-Reply-To: <20230907084731.2181381-1-s.hauer@pengutronix.de>
-References: <20230907084731.2181381-1-s.hauer@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 319301FC4
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 09:42:47 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1702D19A8;
+	Fri,  8 Sep 2023 02:42:47 -0700 (PDT)
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3889cXQD031752;
+	Fri, 8 Sep 2023 09:42:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=6MGczS6Yh85U4Nu66lvBdcsqE1SDsXC6dQIdLvw11KE=;
+ b=B0pBctTDp+LeUJoqSJL9+YKsn3AdbRk23IjeqfcMWrTI7GIijq4h1nz5mjLhDl+4iR71
+ 7rh4CMhlGOciss9AxJ3G5E7Ks5j05ikbhvIC7QMppzvxtkfng5U2C1JRelvqcnQBCcBC
+ XoHSYxc4pcCf/nyC5D4dJq7JBz8rz6GI6sm38kDve4qhZ8dNFBuarUupn6sb15/+fH2D
+ sg+4W3/qGTObU3WhTv/n4hQrnQap31yvPxFlp2DtnPntW7NcktHl+eLRJiwQrZQTCrx+
+ aArEhG6EdNYoLucTQI0OPQFuAQKcswPD1qodtU8UOd92LeYHnaB3owRllJZBpqkU3XUl Qg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t00xfgaey-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 08 Sep 2023 09:42:42 +0000
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3889e2wc007022;
+	Fri, 8 Sep 2023 09:42:41 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t00xfgaef-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 08 Sep 2023 09:42:41 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3889Ssfk001598;
+	Fri, 8 Sep 2023 09:42:40 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3svfctb1q8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 08 Sep 2023 09:42:40 +0000
+Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
+	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3889gdgj65667386
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 8 Sep 2023 09:42:39 GMT
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 65F895804E;
+	Fri,  8 Sep 2023 09:42:39 +0000 (GMT)
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 08BF95803F;
+	Fri,  8 Sep 2023 09:42:37 +0000 (GMT)
+Received: from [9.179.12.78] (unknown [9.179.12.78])
+	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  8 Sep 2023 09:42:36 +0000 (GMT)
+Message-ID: <be086da3-061d-8f39-6e79-0e5d21771453@linux.ibm.com>
+Date: Fri, 8 Sep 2023 11:42:36 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.0
+Subject: Re: [PATCH net 1/2] net/smc: bugfix for smcr v2 server connect
+ success statistic
+To: Guangguan Wang <guangguan.wang@linux.alibaba.com>, jaka@linux.ibm.com,
+        kgraul@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com
+Cc: tonylu@linux.alibaba.com, alibuda@linux.alibaba.com,
+        guwen@linux.alibaba.com, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20230908033143.89489-1-guangguan.wang@linux.alibaba.com>
+ <20230908033143.89489-2-guangguan.wang@linux.alibaba.com>
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <20230908033143.89489-2-guangguan.wang@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 2qYvur1I44TmMN5WPEEjbUnTQayqm5n2
+X-Proofpoint-GUID: t6H5re0ezIwEuW5nJIQkuuFW31qx8AN8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-09-08_06,2023-09-05_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
+ priorityscore=1501 malwarescore=0 mlxlogscore=999 lowpriorityscore=0
+ bulkscore=0 mlxscore=0 spamscore=0 suspectscore=0 clxscore=1015
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2308100000 definitions=main-2309080088
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Sascha,
 
-thanks for the patch.
 
-Am Donnerstag, 7. September 2023, 10:47:31 CEST schrieb Sascha Hauer:
-> This implements the led_hw_* hooks to support hardware blinking LEDs on
-> the DP83867 phy. The driver supports all LED modes that have a
-> corresponding TRIGGER_NETDEV_* define. Error and collision do not have
-> a TRIGGER_NETDEV_* define, so these modes are currently not supported.
->=20
-> Signed-off-by: Sascha Hauer <s.hauer@pengutronix.de>
-
-This works as intended so far. Unfortunately this driver and the PHY LED=20
-framework do not support active-low LEDs (yet).
-
-Tested-by: Alexander Stein <alexander.stein@ew.tq-group.com> #TQMa8MxML/MBa=
-8Mx
-
+On 08.09.23 05:31, Guangguan Wang wrote:
+> In the macro SMC_STAT_SERV_SUCC_INC, the smcd_version is used
+> to determin whether to increase the v1 statistic or the v2
+> statistic. It is correct for SMCD. But for SMCR, smcr_version
+> should be used.
+> 
+> Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
 > ---
->  drivers/net/phy/dp83867.c | 137 ++++++++++++++++++++++++++++++++++++++
->  1 file changed, 137 insertions(+)
->=20
-> diff --git a/drivers/net/phy/dp83867.c b/drivers/net/phy/dp83867.c
-> index e397e7d642d92..5f08f9d38bd7a 100644
-> --- a/drivers/net/phy/dp83867.c
-> +++ b/drivers/net/phy/dp83867.c
-> @@ -159,6 +159,23 @@
->  #define DP83867_LED_DRV_EN(x)	BIT((x) * 4)
->  #define DP83867_LED_DRV_VAL(x)	BIT((x) * 4 + 1)
->=20
-> +#define DP83867_LED_FN(idx, val)	(((val) & 0xf) << ((idx) * 4))
-> +#define DP83867_LED_FN_MASK(idx)	(0xf << ((idx) * 4))
-> +#define DP83867_LED_FN_RX_ERR		0xe /* Receive Error */
-> +#define DP83867_LED_FN_RX_TX_ERR	0xd /* Receive Error or Transmit=20
-Error */
-> +#define DP83867_LED_FN_LINK_RX_TX	0xb /* Link established, blink for rx=
-=20
-or
-> tx activity */ +#define DP83867_LED_FN_FULL_DUPLEX	0xa /* Full=20
-duplex */
-> +#define DP83867_LED_FN_LINK_100_1000_BT	0x9 /* 100/1000BT link=20
-established
-> */ +#define DP83867_LED_FN_LINK_10_100_BT	0x8 /* 10/100BT link=20
-established
-> */ +#define DP83867_LED_FN_LINK_10_BT	0x7 /* 10BT link established */
-> +#define DP83867_LED_FN_LINK_100_BTX	0x6 /* 100 BTX link established */
-> +#define DP83867_LED_FN_LINK_1000_BT	0x5 /* 1000 BT link established */
-> +#define DP83867_LED_FN_COLLISION	0x4 /* Collision detected */
-> +#define DP83867_LED_FN_RX		0x3 /* Receive activity */
-> +#define DP83867_LED_FN_TX		0x2 /* Transmit activity */
-> +#define DP83867_LED_FN_RX_TX		0x1 /* Receive or Transmit=20
-activity */
-> +#define DP83867_LED_FN_LINK		0x0 /* Link established */
-> +
->  enum {
->  	DP83867_PORT_MIRROING_KEEP,
->  	DP83867_PORT_MIRROING_EN,
-> @@ -1018,6 +1035,123 @@ dp83867_led_brightness_set(struct phy_device
-> *phydev, val);
->  }
->=20
-> +static int dp83867_led_mode(u8 index, unsigned long rules)
-> +{
-> +	if (index >=3D DP83867_LED_COUNT)
-> +		return -EINVAL;
-> +
-> +	switch (rules) {
-> +	case BIT(TRIGGER_NETDEV_LINK):
-> +		return DP83867_LED_FN_LINK;
-> +	case BIT(TRIGGER_NETDEV_LINK_10):
-> +		return DP83867_LED_FN_LINK_10_BT;
-> +	case BIT(TRIGGER_NETDEV_LINK_100):
-> +		return DP83867_LED_FN_LINK_100_BTX;
-> +	case BIT(TRIGGER_NETDEV_FULL_DUPLEX):
-> +		return DP83867_LED_FN_FULL_DUPLEX;
-> +	case BIT(TRIGGER_NETDEV_TX):
-> +		return DP83867_LED_FN_TX;
-> +	case BIT(TRIGGER_NETDEV_RX):
-> +		return DP83867_LED_FN_RX;
-> +	case BIT(TRIGGER_NETDEV_LINK_1000):
-> +		return DP83867_LED_FN_LINK_1000_BT;
-> +	case BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX):
-> +		return DP83867_LED_FN_RX_TX;
-> +	case BIT(TRIGGER_NETDEV_LINK_100) | BIT(TRIGGER_NETDEV_LINK_1000):
-> +		return DP83867_LED_FN_LINK_100_1000_BT;
-> +	case BIT(TRIGGER_NETDEV_LINK_10) | BIT(TRIGGER_NETDEV_LINK_100):
-> +		return DP83867_LED_FN_LINK_10_100_BT;
-> +	case BIT(TRIGGER_NETDEV_LINK) | BIT(TRIGGER_NETDEV_TX) |
-> BIT(TRIGGER_NETDEV_RX): +		return DP83867_LED_FN_LINK_RX_TX;
-> +	default:
-> +		return -EOPNOTSUPP;
-> +	}
-> +}
-> +
-> +static int dp83867_led_hw_is_supported(struct phy_device *phydev, u8 ind=
-ex,
-> +				       unsigned long rules)
-> +{
-> +	int ret;
-> +
-> +	ret =3D dp83867_led_mode(index, rules);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	return 0;
-> +}
-> +
-> +static int dp83867_led_hw_control_set(struct phy_device *phydev, u8 inde=
-x,
-> +				      unsigned long rules)
-> +{
-> +	int mode, ret;
-> +
-> +	mode =3D dp83867_led_mode(index, rules);
-> +	if (mode < 0)
-> +		return mode;
-> +
-> +	ret =3D phy_modify(phydev, DP83867_LEDCR1, DP83867_LED_FN_MASK(index),
-> +			 DP83867_LED_FN(index, mode));
-> +	if (ret)
-> +		return ret;
-> +
-> +	return phy_modify(phydev, DP83867_LEDCR2, DP83867_LED_DRV_EN(index),=20
-0);
-> +}
-> +
-> +static int dp83867_led_hw_control_get(struct phy_device *phydev, u8 inde=
-x,
-> +				      unsigned long *rules)
-> +{
-> +	int val;
-> +
-> +	val =3D phy_read(phydev, DP83867_LEDCR1);
-> +	if (val < 0)
-> +		return val;
-> +
-> +	val &=3D DP83867_LED_FN_MASK(index);
-> +	val >>=3D index * 4;
-> +
-> +	switch (val) {
-> +	case DP83867_LED_FN_LINK:
-> +		*rules =3D BIT(TRIGGER_NETDEV_LINK);
-> +		break;
-> +	case DP83867_LED_FN_LINK_10_BT:
-> +		*rules =3D BIT(TRIGGER_NETDEV_LINK_10);
-> +		break;
-> +	case DP83867_LED_FN_LINK_100_BTX:
-> +		*rules =3D BIT(TRIGGER_NETDEV_LINK_100);
-> +		break;
-> +	case DP83867_LED_FN_FULL_DUPLEX:
-> +		*rules =3D BIT(TRIGGER_NETDEV_FULL_DUPLEX);
-> +		break;
-> +	case DP83867_LED_FN_TX:
-> +		*rules =3D BIT(TRIGGER_NETDEV_TX);
-> +		break;
-> +	case DP83867_LED_FN_RX:
-> +		*rules =3D BIT(TRIGGER_NETDEV_RX);
-> +		break;
-> +	case DP83867_LED_FN_LINK_1000_BT:
-> +		*rules =3D BIT(TRIGGER_NETDEV_LINK_1000);
-> +		break;
-> +	case DP83867_LED_FN_RX_TX:
-> +		*rules =3D BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX);
-> +		break;
-> +	case DP83867_LED_FN_LINK_100_1000_BT:
-> +		*rules =3D BIT(TRIGGER_NETDEV_LINK_100) |=20
-BIT(TRIGGER_NETDEV_LINK_1000);
-> +		break;
-> +	case DP83867_LED_FN_LINK_10_100_BT:
-> +		*rules =3D BIT(TRIGGER_NETDEV_LINK_10) |=20
-BIT(TRIGGER_NETDEV_LINK_100);
-> +		break;
-> +	case DP83867_LED_FN_LINK_RX_TX:
-> +		*rules =3D BIT(TRIGGER_NETDEV_LINK) | BIT(TRIGGER_NETDEV_TX)=20
-|
-> +			 BIT(TRIGGER_NETDEV_RX);
-> +		break;
-> +	default:
-> +		*rules =3D 0;
-> +		break;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static struct phy_driver dp83867_driver[] =3D {
->  	{
->  		.phy_id		=3D DP83867_PHY_ID,
-> @@ -1047,6 +1181,9 @@ static struct phy_driver dp83867_driver[] =3D {
->  		.set_loopback	=3D dp83867_loopback,
->=20
->  		.led_brightness_set =3D dp83867_led_brightness_set,
-> +		.led_hw_is_supported =3D dp83867_led_hw_is_supported,
-> +		.led_hw_control_set =3D dp83867_led_hw_control_set,
-> +		.led_hw_control_get =3D dp83867_led_hw_control_get,
->  	},
->  };
->  module_phy_driver(dp83867_driver);
+>   net/smc/smc_stats.h | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/smc/smc_stats.h b/net/smc/smc_stats.h
+> index b60fe1eb37ab..aa8928975cc6 100644
+> --- a/net/smc/smc_stats.h
+> +++ b/net/smc/smc_stats.h
+> @@ -243,8 +243,9 @@ while (0)
+>   #define SMC_STAT_SERV_SUCC_INC(net, _ini) \
+>   do { \
+>   	typeof(_ini) i = (_ini); \
+> -	bool is_v2 = (i->smcd_version & SMC_V2); \
+>   	bool is_smcd = (i->is_smcd); \
+> +	u8 version = is_smcd ? i->smcd_version : i->smcr_version; \
+> +	bool is_v2 = (version & SMC_V2); \
+>   	typeof(net->smc.smc_stats) smc_stats = (net)->smc.smc_stats; \
+>   	if (is_v2 && is_smcd) \
+>   		this_cpu_inc(smc_stats->smc[SMC_TYPE_D].srv_v2_succ_cnt); \
 
-
-=2D-=20
-TQ-Systems GmbH | M=FChlstra=DFe 2, Gut Delling | 82229 Seefeld, Germany
-Amtsgericht M=FCnchen, HRB 105018
-Gesch=E4ftsf=FChrer: Detlef Schneider, R=FCdiger Stahl, Stefan Schneider
-http://www.tq-group.com/
-
-
+ohje, that is because the statistic was implemented first, then SMCR_v2. 
+Good catch! Thank you!
 
