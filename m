@@ -1,616 +1,336 @@
-Return-Path: <netdev+bounces-32493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9655797FD8
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 02:48:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BACC797FE9
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 02:57:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C48211C20C3A
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 00:48:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78FD928195B
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 00:56:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1996B64B;
-	Fri,  8 Sep 2023 00:48:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBD2DA4C;
+	Fri,  8 Sep 2023 00:56:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02DC7628
-	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 00:48:04 +0000 (UTC)
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1B7F1BD6
-	for <netdev@vger.kernel.org>; Thu,  7 Sep 2023 17:48:02 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1c09673b006so11792135ad.1
-        for <netdev@vger.kernel.org>; Thu, 07 Sep 2023 17:48:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1694134082; x=1694738882; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8CN2bMdaZb0aAVGEP2PYIwhTV4otwHmZXTPwLRyPKws=;
-        b=rLWec+Kw4bdgM1ALqRF1xSp2Vfw4eXXs/D305UDVFjnBmN8gLXZvfTg6ZDXFHoqzXc
-         GL8E11RBU+p01QMFQ+zYP9F7IRBxaJAncXKqWA6AiwiCyk/rKSQqX7EM/h5KM59MuxEo
-         ToZi/kHeMUHemZDAMolLvjKVt62iMed412RTUOmksBm5yrrT1AD2vymMW/SiXgrO3dPs
-         9XanaTgy66FGys4uHKXqU0H6aGaMalBHS/kb8H5XPzrfRvQRrlLyXtwi/NhtYWOehMA9
-         r3S2rxBF/uZ49m66enugnhGBQ8sYRa9LynGcP+Jk+uncmL1JBEKbiqwZjZsdmso4/DT0
-         OPwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694134082; x=1694738882;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=8CN2bMdaZb0aAVGEP2PYIwhTV4otwHmZXTPwLRyPKws=;
-        b=tvsmR+Yma5zQufmsxskqyeK5THd7Vj4aw68oV496Hfhdgvr+q0Ju3rAjQaeF04K4FC
-         He6kwogcQm63bdWq4EiyjZ0YbI407y6nTZ5QwGSeuWAledmk9d9ewkiYcaTlRvagmAli
-         06g2uqKEV8qIiq26olahwtueMyqS4slyXT0htPUvAiOoBW+LcYgC4OlgdOK2wrk1EOyd
-         4DT+dw2exW0ItQrSWhLe3zz7Tqg3VSx8oLGm4aMA1RGXUaKdnWQrWejmcT4hQPpHw7fu
-         2wnZUpNRb41IFRAEs+ItJTeikkYQMjphU+CukjKZGpexY7ukRYWJGpx1n2eUwKCmY7nd
-         Isug==
-X-Gm-Message-State: AOJu0YxTpxcX8MuFyfB5QEEuqe/gyQZdm//tih/BILvFFTdarQbzK5vI
-	/U7r8bYpDM4wnl3XlhqLNESkig==
-X-Google-Smtp-Source: AGHT+IErqQyiwInovuOn6RCz96wVwGbsIlZN3/D5WbgzgOmws9AnPjo58ycdKgMhTT50+7Vo98ByGw==
-X-Received: by 2002:a17:903:18a:b0:1bf:728:7458 with SMTP id z10-20020a170903018a00b001bf07287458mr1464259plg.58.1694134082012;
-        Thu, 07 Sep 2023 17:48:02 -0700 (PDT)
-Received: from ?IPV6:2a03:83e0:1151:15:40a:5eb5:8916:33a4? ([2620:10d:c090:500::7:4620])
-        by smtp.gmail.com with ESMTPSA id ix13-20020a170902f80d00b001b5247cac3dsm335876plb.110.2023.09.07.17.48.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Sep 2023 17:48:01 -0700 (PDT)
-Message-ID: <3413efe8-159b-1ee9-5cff-d3c8df0b4c8e@davidwei.uk>
-Date: Thu, 7 Sep 2023 17:47:59 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAE46628;
+	Fri,  8 Sep 2023 00:56:56 +0000 (UTC)
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D89C51BD3;
+	Thu,  7 Sep 2023 17:56:52 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Rhd3g4RDsz4f3lgK;
+	Fri,  8 Sep 2023 08:56:47 +0800 (CST)
+Received: from [10.174.176.117] (unknown [10.174.176.117])
+	by APP2 (Coremail) with SMTP id Syh0CgAHcmZPcfpkSBNtCg--.51986S2;
+	Fri, 08 Sep 2023 08:56:49 +0800 (CST)
+Subject: Re: Possible deadlock in bpf queue map
+To: =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?= <toke@kernel.org>,
+ Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Cc: Hsin-Wei Hung <hsinweih@uci.edu>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <kafai@fb.com>, Song Liu <songliubraving@fb.com>,
+ Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>,
+ KP Singh <kpsingh@kernel.org>, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ Arnaldo Carvalho de Melo <acme@kernel.org>
+References: <CABcoxUbYwuZUL-xm1+5juO42nJMgpQX7cNyQELYz+g2XkZi9TQ@mail.gmail.com>
+ <87o7ienuss.fsf@toke.dk>
+ <CAP01T76Ce2KHQqTGsqs5K9RM5qSv07rNxnV+-=q_J25i9NkqxA@mail.gmail.com>
+ <87fs3qnnh4.fsf@toke.dk>
+From: Hou Tao <houtao@huaweicloud.com>
+Message-ID: <71a03505-6ec4-8f1d-09c6-fff78f4880d0@huaweicloud.com>
+Date: Fri, 8 Sep 2023 08:56:47 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.14.0
-Subject: Re: [RFC PATCH v2 02/11] netdev: implement netlink api to bind
- dma-buf to netdevice
-To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann
- <arnd@arndb.de>, David Ahern <dsahern@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Hari Ramakrishnan <rharix@google.com>,
- Dan Williams <dan.j.williams@intel.com>, Andy Lutomirski <luto@kernel.org>,
- stephen@networkplumber.org, sdf@google.com,
- Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-References: <20230810015751.3297321-1-almasrymina@google.com>
- <20230810015751.3297321-3-almasrymina@google.com>
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20230810015751.3297321-3-almasrymina@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE
+In-Reply-To: <87fs3qnnh4.fsf@toke.dk>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID:Syh0CgAHcmZPcfpkSBNtCg--.51986S2
+X-Coremail-Antispam: 1UD129KBjvJXoW3XFyfXrWUWFyxXry3ArWfGrg_yoW3uw1UpF
+	ZxJa97CF40qrWjqrWYgw45XF17Kws0g347uFZ5Ka48AF9FqrnrXr18tFWI9rWF9r1kAanr
+	AF4jqrZ3u3y8ArDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUv2b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7I2V7IY0VAS
+	07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c
+	02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_
+	GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7
+	CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAF
+	wI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa
+	7IU1zuWJUUUUU==
+X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 09/08/2023 18:57, Mina Almasry wrote:
-> Add a netdev_dmabuf_binding struct which represents the
-> dma-buf-to-netdevice binding. The netlink API will bind the dma-buf to
-> an rx queue on the netdevice. On the binding, the dma_buf_attach
-> & dma_buf_map_attachment will occur. The entries in the sg_table from
-> mapping will be inserted into a genpool to make it ready
-> for allocation.
-> 
-> The chunks in the genpool are owned by a dmabuf_chunk_owner struct which
-> holds the dma-buf offset of the base of the chunk and the dma_addr of
-> the chunk. Both are needed to use allocations that come from this chunk.
-> 
-> We create a new type that represents an allocation from the genpool:
-> page_pool_iov. We setup the page_pool_iov allocation size in the
-> genpool to PAGE_SIZE for simplicity: to match the PAGE_SIZE normally
-> allocated by the page pool and given to the drivers.
-> 
-> The user can unbind the dmabuf from the netdevice by closing the netlink
-> socket that established the binding. We do this so that the binding is
-> automatically unbound even if the userspace process crashes.
-> 
-> The binding and unbinding leaves an indicator in struct netdev_rx_queue
-> that the given queue is bound, but the binding doesn't take effect until
-> the driver actually reconfigures its queues, and re-initializes its page
-> pool. This issue/weirdness is highlighted in the memory provider
-> proposal[1], and I'm hoping that some generic solution for all
-> memory providers will be discussed; this patch doesn't address that
-> weirdness again.
-> 
-> The netdev_dmabuf_binding struct is refcounted, and releases its
-> resources only when all the refs are released.
-> 
-> [1] https://lore.kernel.org/netdev/20230707183935.997267-1-kuba@kernel.org/
-> 
-> Signed-off-by: Willem de Bruijn <willemb@google.com>
-> Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
-> 
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
-> ---
->  include/linux/netdevice.h |  57 ++++++++++++
->  include/net/page_pool.h   |  27 ++++++
->  net/core/dev.c            | 178 ++++++++++++++++++++++++++++++++++++++
->  net/core/netdev-genl.c    | 101 ++++++++++++++++++++-
->  4 files changed, 361 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index 3800d0479698..1b7c5966d2ca 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -53,6 +53,8 @@
->  #include <net/net_trackers.h>
->  #include <net/net_debug.h>
->  #include <net/dropreason-core.h>
-> +#include <linux/xarray.h>
-> +#include <linux/refcount.h>
-> 
->  struct netpoll_info;
->  struct device;
-> @@ -782,6 +784,55 @@ bool rps_may_expire_flow(struct net_device *dev, u16 rxq_index, u32 flow_id,
->  #endif
->  #endif /* CONFIG_RPS */
-> 
-> +struct netdev_dmabuf_binding {
-> +	struct dma_buf *dmabuf;
-> +	struct dma_buf_attachment *attachment;
-> +	struct sg_table *sgt;
-> +	struct net_device *dev;
-> +	struct gen_pool *chunk_pool;
-> +
-> +	/* The user holds a ref (via the netlink API) for as long as they want
-> +	 * the binding to remain alive. Each page pool using this binding holds
-> +	 * a ref to keep the binding alive. Each allocated page_pool_iov holds a
-> +	 * ref.
-> +	 *
-> +	 * The binding undos itself and unmaps the underlying dmabuf once all
-> +	 * those refs are dropped and the binding is no longer desired or in
-> +	 * use.
-> +	 */
-> +	refcount_t ref;
-> +
-> +	/* The portid of the user that owns this binding. Used for netlink to
-> +	 * notify us of the user dropping the bind.
-> +	 */
-> +	u32 owner_nlportid;
-> +
-> +	/* The list of bindings currently active. Used for netlink to notify us
-> +	 * of the user dropping the bind.
-> +	 */
-> +	struct list_head list;
-> +
-> +	/* rxq's this binding is active on. */
-> +	struct xarray bound_rxq_list;
-> +};
-> +
-> +void __netdev_devmem_binding_free(struct netdev_dmabuf_binding *binding);
-> +
-> +static inline void
-> +netdev_devmem_binding_get(struct netdev_dmabuf_binding *binding)
-> +{
-> +	refcount_inc(&binding->ref);
-> +}
-> +
-> +static inline void
-> +netdev_devmem_binding_put(struct netdev_dmabuf_binding *binding)
-> +{
-> +	if (!refcount_dec_and_test(&binding->ref))
-> +		return;
-> +
-> +	__netdev_devmem_binding_free(binding);
-> +}
-> +
->  /* This structure contains an instance of an RX queue. */
->  struct netdev_rx_queue {
->  	struct xdp_rxq_info		xdp_rxq;
-> @@ -796,6 +847,7 @@ struct netdev_rx_queue {
->  #ifdef CONFIG_XDP_SOCKETS
->  	struct xsk_buff_pool            *pool;
->  #endif
-> +	struct netdev_dmabuf_binding	*binding;
->  } ____cacheline_aligned_in_smp;
-> 
->  /*
-> @@ -5026,6 +5078,11 @@ void netif_set_tso_max_segs(struct net_device *dev, unsigned int segs);
->  void netif_inherit_tso_max(struct net_device *to,
->  			   const struct net_device *from);
-> 
-> +void netdev_unbind_dmabuf_to_queue(struct netdev_dmabuf_binding *binding);
-> +int netdev_bind_dmabuf_to_queue(struct net_device *dev, unsigned int dmabuf_fd,
-> +				u32 rxq_idx,
-> +				struct netdev_dmabuf_binding **out);
-> +
->  static inline bool netif_is_macsec(const struct net_device *dev)
->  {
->  	return dev->priv_flags & IFF_MACSEC;
-> diff --git a/include/net/page_pool.h b/include/net/page_pool.h
-> index 364fe6924258..61b2066d32b5 100644
-> --- a/include/net/page_pool.h
-> +++ b/include/net/page_pool.h
-> @@ -170,6 +170,33 @@ extern const struct pp_memory_provider_ops hugesp_ops;
->  extern const struct pp_memory_provider_ops huge_ops;
->  extern const struct pp_memory_provider_ops huge_1g_ops;
-> 
-> +/* page_pool_iov support */
-> +
-> +/* Owner of the dma-buf chunks inserted into the gen pool. Each scatterlist
-> + * entry from the dmabuf is inserted into the genpool as a chunk, and needs
-> + * this owner struct to keep track of some metadata necessary to create
-> + * allocations from this chunk.
-> + */
-> +struct dmabuf_genpool_chunk_owner {
-> +	/* Offset into the dma-buf where this chunk starts.  */
-> +	unsigned long base_virtual;
-> +
-> +	/* dma_addr of the start of the chunk.  */
-> +	dma_addr_t base_dma_addr;
-> +
-> +	/* Array of page_pool_iovs for this chunk. */
-> +	struct page_pool_iov *ppiovs;
-> +	size_t num_ppiovs;
-> +
-> +	struct netdev_dmabuf_binding *binding;
-> +};
-> +
-> +struct page_pool_iov {
-> +	struct dmabuf_genpool_chunk_owner *owner;
-> +
-> +	refcount_t refcount;
-> +};
-> +
+Hi,
 
-Hi Mina, we're working on ZC RX to host memory [1] and have a similar need for
-a page pool memory provider (backed by userspace host memory instead of GPU
-memory) that hands out generic page_pool_iov buffers. The current differences
-are that we hold a page ptr and its dma_addr_t directly as we are backed by
-real pages; we still need a refcount for lifetime management. See struct
-io_zc_rx_buf in [2].
+On 9/7/2023 9:04 PM, Toke Høiland-Jørgensen wrote:
+> Kumar Kartikeya Dwivedi <memxor@gmail.com> writes:
+>
+>> On Thu, 7 Sept 2023 at 12:26, Toke Høiland-Jørgensen <toke@kernel.org> wrote:
+>>> +Arnaldo
+>>>
+>>>> Hi,
+>>>>
+>>>> Our bpf fuzzer, a customized Syzkaller, triggered a lockdep warning in
+>>>> the bpf queue map in v5.15. Since queue_stack_maps.c has no major changes
+>>>> since v5.15, we think this should still exist in the latest kernel.
+>>>> The bug can be occasionally triggered, and we suspect one of the
+>>>> eBPF programs involved to be the following one. We also attached the lockdep
+>>>> warning at the end.
+>>>>
+>>>> #define DEFINE_BPF_MAP_NO_KEY(the_map, TypeOfMap, MapFlags,
+>>>> TypeOfValue, MaxEntries) \
+>>>>         struct {                                                        \
+>>>>             __uint(type, TypeOfMap);                                    \
+>>>>             __uint(map_flags, (MapFlags));                              \
+>>>>             __uint(max_entries, (MaxEntries));                          \
+>>>>             __type(value, TypeOfValue);                                 \
+>>>>         } the_map SEC(".maps");
+>>>>
+>>>> DEFINE_BPF_MAP_NO_KEY(map_0, BPF_MAP_TYPE_QUEUE, 0 | BPF_F_WRONLY,
+>>>> struct_0, 162);
+>>>> SEC("perf_event")
+>>>> int func(struct bpf_perf_event_data *ctx) {
+>>>>         char v0[96] = {};
+>>>>         uint64_t v1 = 0;
+>>>>         v1 = bpf_map_pop_elem(&map_0, v0);
+>>>>         return 163819661;
+>>>> }
+>>>>
+>>>>
+>>>> The program is attached to the following perf event.
+>>>>
+>>>> struct perf_event_attr attr_type_hw = {
+>>>>         .type = PERF_TYPE_HARDWARE,
+>>>>         .config = PERF_COUNT_HW_CPU_CYCLES,
+>>>>         .sample_freq = 50,
+>>>>         .inherit = 1,
+>>>>         .freq = 1,
+>>>> };
+>>>>
+>>>> ================================WARNING: inconsistent lock state
+>>>> 5.15.26+ #2 Not tainted
+>>>> --------------------------------
+>>>> inconsistent {INITIAL USE} -> {IN-NMI} usage.
+>>>> syz-executor.5/19749 [HC1[1]:SC0[0]:HE0:SE1] takes:
+>>>> ffff88804c9fc198 (&qs->lock){..-.}-{2:2}, at: __queue_map_get+0x31/0x250
+>>>> {INITIAL USE} state was registered at:
+>>>>   lock_acquire+0x1a3/0x4b0
+>>>>   _raw_spin_lock_irqsave+0x48/0x60
+>>>>   __queue_map_get+0x31/0x250
+>>>>   bpf_prog_577904e86c81dead_func+0x12/0x4b4
+>>>>   trace_call_bpf+0x262/0x5d0
+>>>>   perf_trace_run_bpf_submit+0x91/0x1c0
+>>>>   perf_trace_sched_switch+0x46c/0x700
+>>>>   __schedule+0x11b5/0x24a0
+>>>>   schedule+0xd4/0x270
+>>>>   futex_wait_queue_me+0x25f/0x520
+>>>>   futex_wait+0x1e0/0x5f0
+>>>>   do_futex+0x395/0x1890
+>>>>   __x64_sys_futex+0x1cb/0x480
+>>>>   do_syscall_64+0x3b/0xc0
+>>>>   entry_SYSCALL_64_after_hwframe+0x44/0xae
+>>>> irq event stamp: 13640
+>>>> hardirqs last  enabled at (13639): [<ffffffff95eb2bf4>]
+>>>> _raw_spin_unlock_irq+0x24/0x40
+>>>> hardirqs last disabled at (13640): [<ffffffff95eb2d4d>]
+>>>> _raw_spin_lock_irqsave+0x5d/0x60
+>>>> softirqs last  enabled at (13464): [<ffffffff93e26de5>] __sys_bpf+0x3e15/0x4e80
+>>>> softirqs last disabled at (13462): [<ffffffff93e26da3>] __sys_bpf+0x3dd3/0x4e80
+>>>>
+>>>> other info that might help us debug this:
+>>>>  Possible unsafe locking scenario:
+>>>>
+>>>>        CPU0
+>>>>        ----
+>>>>   lock(&qs->lock);
+>>>>   <Interrupt>
+>>>>     lock(&qs->lock);
+>>> Hmm, so that lock() uses raw_spin_lock_irqsave(), which *should* be
+>>> disabling interrupts entirely for the critical section. But I guess a
+>>> Perf hardware event can still trigger? Which seems like it would
+>>> potentially wreak havoc with lots of things, not just this queue map
+>>> function?
+>>>
+>>> No idea how to protect against this, though. Hoping Arnaldo knows? :)
+>>>
 
-It would be great to align on page_pool_iov such that it will work for both of
-us. Would a union work here?
+It seems my reply from last night was dropped by mail-list.
 
-[1] https://lore.kernel.org/io-uring/20230826011954.1801099-1-dw@davidwei.uk/
-[2] https://lore.kernel.org/io-uring/20230826011954.1801099-6-dw@davidwei.uk/
+>> The locking should probably be protected by a percpu integer counter,
+>> incremented and decremented before and after the lock is taken,
+>> respectively. If it is already non-zero, then -EBUSY should be
+>> returned. It is similar to what htab_lock_bucket protects against in
+>> hashtab.c.
+> Ah, neat! Okay, seems straight-forward enough to replicate. Hsin, could
+> you please check if the patch below gets rid of the splat?
 
->  struct page_pool {
->  	struct page_pool_params p;
-> 
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 8e7d0cb540cd..02a25ccf771a 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -151,6 +151,8 @@
->  #include <linux/pm_runtime.h>
->  #include <linux/prandom.h>
->  #include <linux/once_lite.h>
-> +#include <linux/genalloc.h>
-> +#include <linux/dma-buf.h>
-> 
->  #include "dev.h"
->  #include "net-sysfs.h"
-> @@ -2037,6 +2039,182 @@ static int call_netdevice_notifiers_mtu(unsigned long val,
->  	return call_netdevice_notifiers_info(val, &info.info);
+The fixes could fix the potential dead-lock, but I think the lockdep
+warning will be there, because lockdep thinks it is only safe to call
+try_lock under NMI-contex. So using raw_spin_trylock() for NMI context
+will both fix the potential dead-lock and the lockdep splat.
+
+>
+> -Toke
+>
+>
+> diff --git a/kernel/bpf/queue_stack_maps.c b/kernel/bpf/queue_stack_maps.c
+> index 8d2ddcb7566b..f96945311eec 100644
+> --- a/kernel/bpf/queue_stack_maps.c
+> +++ b/kernel/bpf/queue_stack_maps.c
+> @@ -16,6 +16,7 @@
+>  struct bpf_queue_stack {
+>  	struct bpf_map map;
+>  	raw_spinlock_t lock;
+> +	int __percpu *map_locked;
+>  	u32 head, tail;
+>  	u32 size; /* max_entries + 1 */
+>  
+> @@ -66,6 +67,7 @@ static struct bpf_map *queue_stack_map_alloc(union bpf_attr *attr)
+>  	int numa_node = bpf_map_attr_numa_node(attr);
+>  	struct bpf_queue_stack *qs;
+>  	u64 size, queue_size;
+> +	int err = -ENOMEM;
+>  
+>  	size = (u64) attr->max_entries + 1;
+>  	queue_size = sizeof(*qs) + size * attr->value_size;
+> @@ -80,7 +82,18 @@ static struct bpf_map *queue_stack_map_alloc(union bpf_attr *attr)
+>  
+>  	raw_spin_lock_init(&qs->lock);
+>  
+> +	qs->map_locked = bpf_map_alloc_percpu(&qs->map,
+> +					      sizeof(*qs->map_locked),
+> +					      sizeof(*qs->map_locked),
+> +					      GFP_USER);
+> +	if (!qs->map_locked)
+> +		goto free_map;
+> +
+>  	return &qs->map;
+> +
+> +free_map:
+> +	bpf_map_area_free(qs);
+> +	return ERR_PTR(err);
 >  }
-> 
-> +/* Device memory support */
-> +
-> +static void netdev_devmem_free_chunk_owner(struct gen_pool *genpool,
-> +					   struct gen_pool_chunk *chunk,
-> +					   void *not_used)
+>  
+>  /* Called when map->refcnt goes to zero, either from workqueue or from syscall */
+> @@ -88,9 +101,37 @@ static void queue_stack_map_free(struct bpf_map *map)
+>  {
+>  	struct bpf_queue_stack *qs = bpf_queue_stack(map);
+>  
+> +	free_percpu(qs->map_locked);
+>  	bpf_map_area_free(qs);
+>  }
+>  
+> +static inline int queue_stack_map_lock(struct bpf_queue_stack *qs,
+> +				       unsigned long *pflags)
 > +{
-> +	struct dmabuf_genpool_chunk_owner *owner = chunk->owner;
+> +	unsigned long flags;
 > +
-> +	kvfree(owner->ppiovs);
-> +	kfree(owner);
-> +}
-> +
-> +void __netdev_devmem_binding_free(struct netdev_dmabuf_binding *binding)
-> +{
-> +	size_t size, avail;
-> +
-> +	gen_pool_for_each_chunk(binding->chunk_pool,
-> +				netdev_devmem_free_chunk_owner, NULL);
-> +
-> +	size = gen_pool_size(binding->chunk_pool);
-> +	avail = gen_pool_avail(binding->chunk_pool);
-> +
-> +	if (!WARN(size != avail, "can't destroy genpool. size=%lu, avail=%lu",
-> +		  size, avail))
-> +		gen_pool_destroy(binding->chunk_pool);
-> +
-> +	dma_buf_unmap_attachment(binding->attachment, binding->sgt,
-> +				 DMA_BIDIRECTIONAL);
-> +	dma_buf_detach(binding->dmabuf, binding->attachment);
-> +	dma_buf_put(binding->dmabuf);
-> +	kfree(binding);
-> +}
-> +
-> +void netdev_unbind_dmabuf_to_queue(struct netdev_dmabuf_binding *binding)
-> +{
-> +	struct netdev_rx_queue *rxq;
-> +	unsigned long xa_idx;
-> +
-> +	list_del_rcu(&binding->list);
-> +
-> +	xa_for_each(&binding->bound_rxq_list, xa_idx, rxq)
-> +		if (rxq->binding == binding)
-> +			rxq->binding = NULL;
-> +
-> +	netdev_devmem_binding_put(binding);
-> +}
-> +
-> +int netdev_bind_dmabuf_to_queue(struct net_device *dev, unsigned int dmabuf_fd,
-> +				u32 rxq_idx, struct netdev_dmabuf_binding **out)
-> +{
-> +	struct netdev_dmabuf_binding *binding;
-> +	struct netdev_rx_queue *rxq;
-> +	struct scatterlist *sg;
-> +	struct dma_buf *dmabuf;
-> +	unsigned int sg_idx, i;
-> +	unsigned long virtual;
-> +	u32 xa_idx;
-> +	int err;
-> +
-> +	rxq = __netif_get_rx_queue(dev, rxq_idx);
-> +
-> +	if (rxq->binding)
-> +		return -EEXIST;
-> +
-> +	dmabuf = dma_buf_get(dmabuf_fd);
-> +	if (IS_ERR_OR_NULL(dmabuf))
-> +		return -EBADFD;
-> +
-> +	binding = kzalloc_node(sizeof(*binding), GFP_KERNEL,
-> +			       dev_to_node(&dev->dev));
-> +	if (!binding) {
-> +		err = -ENOMEM;
-> +		goto err_put_dmabuf;
+> +	preempt_disable();
+> +	if (unlikely(__this_cpu_inc_return(*qs->map_locked) != 1)) {
+> +		__this_cpu_dec(*qs->map_locked);
+> +		preempt_enable();
+> +		return -EBUSY;
 > +	}
 > +
-> +	xa_init_flags(&binding->bound_rxq_list, XA_FLAGS_ALLOC);
-> +
-> +	refcount_set(&binding->ref, 1);
-> +
-> +	binding->dmabuf = dmabuf;
-> +
-> +	binding->attachment = dma_buf_attach(binding->dmabuf, dev->dev.parent);
-> +	if (IS_ERR(binding->attachment)) {
-> +		err = PTR_ERR(binding->attachment);
-> +		goto err_free_binding;
-> +	}
-> +
-> +	binding->sgt = dma_buf_map_attachment(binding->attachment,
-> +					      DMA_BIDIRECTIONAL);
-> +	if (IS_ERR(binding->sgt)) {
-> +		err = PTR_ERR(binding->sgt);
-> +		goto err_detach;
-> +	}
-> +
-> +	/* For simplicity we expect to make PAGE_SIZE allocations, but the
-> +	 * binding can be much more flexible than that. We may be able to
-> +	 * allocate MTU sized chunks here. Leave that for future work...
-> +	 */
-> +	binding->chunk_pool = gen_pool_create(PAGE_SHIFT,
-> +					      dev_to_node(&dev->dev));
-> +	if (!binding->chunk_pool) {
-> +		err = -ENOMEM;
-> +		goto err_unmap;
-> +	}
-> +
-> +	virtual = 0;
-> +	for_each_sgtable_dma_sg(binding->sgt, sg, sg_idx) {
-> +		dma_addr_t dma_addr = sg_dma_address(sg);
-> +		struct dmabuf_genpool_chunk_owner *owner;
-> +		size_t len = sg_dma_len(sg);
-> +		struct page_pool_iov *ppiov;
-> +
-> +		owner = kzalloc_node(sizeof(*owner), GFP_KERNEL,
-> +				     dev_to_node(&dev->dev));
-> +		owner->base_virtual = virtual;
-> +		owner->base_dma_addr = dma_addr;
-> +		owner->num_ppiovs = len / PAGE_SIZE;
-> +		owner->binding = binding;
-> +
-> +		err = gen_pool_add_owner(binding->chunk_pool, dma_addr,
-> +					 dma_addr, len, dev_to_node(&dev->dev),
-> +					 owner);
-> +		if (err) {
-> +			err = -EINVAL;
-> +			goto err_free_chunks;
-> +		}
-> +
-> +		owner->ppiovs = kvmalloc_array(owner->num_ppiovs,
-> +					       sizeof(*owner->ppiovs),
-> +					       GFP_KERNEL);
-> +		if (!owner->ppiovs) {
-> +			err = -ENOMEM;
-> +			goto err_free_chunks;
-> +		}
-> +
-> +		for (i = 0; i < owner->num_ppiovs; i++) {
-> +			ppiov = &owner->ppiovs[i];
-> +			ppiov->owner = owner;
-> +			refcount_set(&ppiov->refcount, 1);
-> +		}
-> +
-> +		dma_addr += len;
-> +		virtual += len;
-> +	}
-> +
-> +	/* TODO: need to be able to bind to multiple rx queues on the same
-> +	 * netdevice. The code should already be able to handle that with
-> +	 * minimal changes, but the netlink API currently allows for 1 rx
-> +	 * queue.
-> +	 */
-> +	err = xa_alloc(&binding->bound_rxq_list, &xa_idx, rxq, xa_limit_32b,
-> +		       GFP_KERNEL);
-> +	if (err)
-> +		goto err_free_chunks;
-> +
-> +	rxq->binding = binding;
-> +	*out = binding;
+> +	raw_spin_lock_irqsave(&qs->lock, flags);
+> +	*pflags = flags;
 > +
 > +	return 0;
-> +
-> +err_free_chunks:
-> +	gen_pool_for_each_chunk(binding->chunk_pool,
-> +				netdev_devmem_free_chunk_owner, NULL);
-> +	gen_pool_destroy(binding->chunk_pool);
-> +err_unmap:
-> +	dma_buf_unmap_attachment(binding->attachment, binding->sgt,
-> +				 DMA_BIDIRECTIONAL);
-> +err_detach:
-> +	dma_buf_detach(dmabuf, binding->attachment);
-> +err_free_binding:
-> +	kfree(binding);
-> +err_put_dmabuf:
-> +	dma_buf_put(dmabuf);
-> +	return err;
 > +}
 > +
->  #ifdef CONFIG_NET_INGRESS
->  static DEFINE_STATIC_KEY_FALSE(ingress_needed_key);
-> 
-> diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-> index bf7324dd6c36..288ed0112995 100644
-> --- a/net/core/netdev-genl.c
-> +++ b/net/core/netdev-genl.c
-> @@ -141,10 +141,74 @@ int netdev_nl_dev_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
->  	return skb->len;
->  }
-> 
-> -/* Stub */
-> +static LIST_HEAD(netdev_rbinding_list);
 > +
->  int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
->  {
-> -	return 0;
-> +	struct netdev_dmabuf_binding *out_binding;
-> +	u32 ifindex, dmabuf_fd, rxq_idx;
-> +	struct net_device *netdev;
-> +	struct sk_buff *rsp;
-> +	int err = 0;
-> +	void *hdr;
-> +
-> +	if (GENL_REQ_ATTR_CHECK(info, NETDEV_A_DEV_IFINDEX) ||
-> +	    GENL_REQ_ATTR_CHECK(info, NETDEV_A_BIND_DMABUF_DMABUF_FD) ||
-> +	    GENL_REQ_ATTR_CHECK(info, NETDEV_A_BIND_DMABUF_QUEUE_IDX))
-> +		return -EINVAL;
-> +
-> +	ifindex = nla_get_u32(info->attrs[NETDEV_A_DEV_IFINDEX]);
-> +	dmabuf_fd = nla_get_u32(info->attrs[NETDEV_A_BIND_DMABUF_DMABUF_FD]);
-> +	rxq_idx = nla_get_u32(info->attrs[NETDEV_A_BIND_DMABUF_QUEUE_IDX]);
-> +
-> +	rtnl_lock();
-> +
-> +	netdev = __dev_get_by_index(genl_info_net(info), ifindex);
-> +	if (!netdev) {
-> +		err = -ENODEV;
-> +		goto err_unlock;
-> +	}
-> +
-> +	if (rxq_idx >= netdev->num_rx_queues) {
-> +		err = -ERANGE;
-> +		goto err_unlock;
-> +	}
-> +
-> +	if (netdev_bind_dmabuf_to_queue(netdev, dmabuf_fd, rxq_idx,
-> +					&out_binding)) {
-> +		err = -EINVAL;
-> +		goto err_unlock;
-> +	}
-> +
-> +	out_binding->owner_nlportid = info->snd_portid;
-> +	list_add_rcu(&out_binding->list, &netdev_rbinding_list);
-> +
-> +	rsp = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
-> +	if (!rsp) {
-> +		err = -ENOMEM;
-> +		goto err_unbind;
-> +	}
-> +
-> +	hdr = genlmsg_put(rsp, info->snd_portid, info->snd_seq,
-> +			  &netdev_nl_family, 0, info->genlhdr->cmd);
-> +	if (!hdr) {
-> +		err = -EMSGSIZE;
-> +		goto err_genlmsg_free;
-> +	}
-> +
-> +	genlmsg_end(rsp, hdr);
-> +
-> +	rtnl_unlock();
-> +
-> +	return genlmsg_reply(rsp, info);
-> +
-> +err_genlmsg_free:
-> +	nlmsg_free(rsp);
-> +err_unbind:
-> +	netdev_unbind_dmabuf_to_queue(out_binding);
-> +err_unlock:
-> +	rtnl_unlock();
-> +	return err;
->  }
-> 
->  static int netdev_genl_netdevice_event(struct notifier_block *nb,
-> @@ -167,10 +231,37 @@ static int netdev_genl_netdevice_event(struct notifier_block *nb,
->  	return NOTIFY_OK;
->  }
-> 
-> +static int netdev_netlink_notify(struct notifier_block *nb, unsigned long state,
-> +				 void *_notify)
+> +static inline void queue_stack_map_unlock(struct bpf_queue_stack *qs,
+> +					  unsigned long flags)
 > +{
-> +	struct netlink_notify *notify = _notify;
-> +	struct netdev_dmabuf_binding *rbinding;
-> +
-> +	if (state != NETLINK_URELEASE || notify->protocol != NETLINK_GENERIC)
-> +		return NOTIFY_DONE;
-> +
-> +	rcu_read_lock();
-> +
-> +	list_for_each_entry_rcu(rbinding, &netdev_rbinding_list, list) {
-> +		if (rbinding->owner_nlportid == notify->portid) {
-> +			netdev_unbind_dmabuf_to_queue(rbinding);
-> +			break;
-> +		}
-> +	}
-> +
-> +	rcu_read_unlock();
-> +
-> +	return NOTIFY_OK;
+> +	raw_spin_unlock_irqrestore(&qs->lock, flags);
+> +	__this_cpu_dec(*qs->map_locked);
+> +	preempt_enable();
 > +}
 > +
->  static struct notifier_block netdev_genl_nb = {
->  	.notifier_call	= netdev_genl_netdevice_event,
->  };
-> 
-> +static struct notifier_block netdev_netlink_notifier = {
-> +	.notifier_call = netdev_netlink_notify,
-> +};
-> +
->  static int __init netdev_genl_init(void)
+>  static long __queue_map_get(struct bpf_map *map, void *value, bool delete)
 >  {
->  	int err;
-> @@ -183,8 +274,14 @@ static int __init netdev_genl_init(void)
->  	if (err)
->  		goto err_unreg_ntf;
-> 
-> +	err = netlink_register_notifier(&netdev_netlink_notifier);
+>  	struct bpf_queue_stack *qs = bpf_queue_stack(map);
+> @@ -98,7 +139,9 @@ static long __queue_map_get(struct bpf_map *map, void *value, bool delete)
+>  	int err = 0;
+>  	void *ptr;
+>  
+> -	raw_spin_lock_irqsave(&qs->lock, flags);
+> +	err = queue_stack_map_lock(qs, &flags);
 > +	if (err)
-> +		goto err_unreg_family;
-> +
->  	return 0;
-> 
-> +err_unreg_family:
-> +	genl_unregister_family(&netdev_nl_family);
->  err_unreg_ntf:
->  	unregister_netdevice_notifier(&netdev_genl_nb);
+> +		return err;
+>  
+>  	if (queue_stack_map_is_empty(qs)) {
+>  		memset(value, 0, qs->map.value_size);
+> @@ -115,7 +158,7 @@ static long __queue_map_get(struct bpf_map *map, void *value, bool delete)
+>  	}
+>  
+>  out:
+> -	raw_spin_unlock_irqrestore(&qs->lock, flags);
+> +	queue_stack_map_unlock(qs, flags);
 >  	return err;
-> --
-> 2.41.0.640.ga95def55d0-goog
+>  }
+>  
+> @@ -128,7 +171,9 @@ static long __stack_map_get(struct bpf_map *map, void *value, bool delete)
+>  	void *ptr;
+>  	u32 index;
+>  
+> -	raw_spin_lock_irqsave(&qs->lock, flags);
+> +	err = queue_stack_map_lock(qs, &flags);
+> +	if (err)
+> +		return err;
+>  
+>  	if (queue_stack_map_is_empty(qs)) {
+>  		memset(value, 0, qs->map.value_size);
+> @@ -147,7 +192,7 @@ static long __stack_map_get(struct bpf_map *map, void *value, bool delete)
+>  		qs->head = index;
+>  
+>  out:
+> -	raw_spin_unlock_irqrestore(&qs->lock, flags);
+> +	queue_stack_map_unlock(qs, flags);
+>  	return err;
+>  }
+>  
+> @@ -193,7 +238,9 @@ static long queue_stack_map_push_elem(struct bpf_map *map, void *value,
+>  	if (flags & BPF_NOEXIST || flags > BPF_EXIST)
+>  		return -EINVAL;
+>  
+> -	raw_spin_lock_irqsave(&qs->lock, irq_flags);
+> +	err = queue_stack_map_lock(qs, &irq_flags);
+> +	if (err)
+> +		return err;
+>  
+>  	if (queue_stack_map_is_full(qs)) {
+>  		if (!replace) {
+> @@ -212,7 +259,7 @@ static long queue_stack_map_push_elem(struct bpf_map *map, void *value,
+>  		qs->head = 0;
+>  
+>  out:
+> -	raw_spin_unlock_irqrestore(&qs->lock, irq_flags);
+> +	queue_stack_map_unlock(qs, irq_flags);
+>  	return err;
+>  }
+>  
+>
+> .
 
 
