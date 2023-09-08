@@ -1,133 +1,167 @@
-Return-Path: <netdev+bounces-32528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B05E579824A
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 08:22:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C81E7982DE
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 08:56:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E17D01C20BC6
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 06:22:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDC131C20B6D
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 06:56:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F14BF1852;
-	Fri,  8 Sep 2023 06:21:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C7F71389;
+	Fri,  8 Sep 2023 06:56:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4A1615C8
-	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 06:21:49 +0000 (UTC)
-Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE9FC1FCF;
-	Thu,  7 Sep 2023 23:21:42 -0700 (PDT)
-Received: by mail-pl1-x642.google.com with SMTP id d9443c01a7336-1c0a4333e03so3965505ad.0;
-        Thu, 07 Sep 2023 23:21:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694154102; x=1694758902; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Wpl/wrF03hm1k33VtCn3Pp91tnDEn9HNqN0mbE6woR8=;
-        b=F1TGyEr2w5SCtlnmOCcZga4UJAxD9AvFqNe0j6CQjgzM0U3KVGnwVwVyKmDA7vEbbg
-         qZv4yQkcnyT65wPdRilNY9dNGeWsR/53LCoL2nVMe8Wi59k6ngJ6EjV/4cQt/oR6OXwb
-         UxabhuHYM/FkGCU3+ELBEmoZR77KLmJ+1Vd7kn//vgV73zbZ3msWJJIPbmMa0hbBFNtb
-         U0IlX/CcA/SJY/PCNo8qtbTtunHuXqApRvBgWe68QehBNQ/ibMKcAAM+aZoJ+Ldirn7L
-         s3V9Gt01uUf3EOIiklYnis5OyYjlWSyxc9TceQORaQv8ZLAVvwDkQ0XzlyR0xrhUiDzK
-         i9Qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694154102; x=1694758902;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Wpl/wrF03hm1k33VtCn3Pp91tnDEn9HNqN0mbE6woR8=;
-        b=Kg8/7x7K4Ngd+3qY7YplJSVvSrqlucuO6jN12oRU6hRNmSZGGEyYY3aP5K2ETszvfQ
-         2fkzrMxGg/neDLOX1mK72+CTqZdaohEn2cuGXWM1HXvd/QUHTCOqQRtWJRaC5b51rj9f
-         J76TjfYQBe2v6j2Niq9fAKuivh/3tDeKVyd6rgZlwA/LW7RznVvLknsagdS8wIakcSUP
-         ZkwbCUjytBhJeZBB0kezvd9PbWClgMO/+Jluw74UzsJJbQU0RbB+8yS+Dn1SUMSbwpgS
-         v228XNypltyGjxaOHgOZ281D2HnHm0AJNms44O7Kd1hke7yAIYwgVFQ5tImq6vdBFBAq
-         KiSQ==
-X-Gm-Message-State: AOJu0Yz/IA+EgzQsEdHL2eRSq8bzBPH9R3E9daw2ItVxSsLtgWHyuc5E
-	0FsWifxYH3cyQcPoj+St2L8=
-X-Google-Smtp-Source: AGHT+IEqN3LuOZvVGW/cDz1gygxDQXajdyrBxp5NvEo7QNyxpkquntuPCrDtubFkejvWG2NvFCobKg==
-X-Received: by 2002:a17:902:e54b:b0:1bb:d7d4:e2b with SMTP id n11-20020a170902e54b00b001bbd7d40e2bmr1895592plf.0.1694154101997;
-        Thu, 07 Sep 2023 23:21:41 -0700 (PDT)
-Received: from hbh25y.mshome.net ([103.114.158.1])
-        by smtp.gmail.com with ESMTPSA id l7-20020a170902f68700b001b8c6890623sm768620plg.7.2023.09.07.23.21.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Sep 2023 23:21:41 -0700 (PDT)
-From: Hangyu Hua <hbh25y@gmail.com>
-To: justin.chen@broadcom.com,
-	florian.fainelli@broadcom.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	mw@semihalf.com,
-	linux@armlinux.org.uk,
-	nbd@nbd.name,
-	john@phrozen.org,
-	sean.wang@mediatek.com,
-	Mark-MC.Lee@mediatek.com,
-	lorenzo@kernel.org,
-	matthias.bgg@gmail.com,
-	angelogioacchino.delregno@collabora.com,
-	maxime.chevallier@bootlin.com,
-	nelson.chang@mediatek.com
-Cc: bcm-kernel-feedback-list@broadcom.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Hangyu Hua <hbh25y@gmail.com>
-Subject: [PATCH v2 3/3] net: ethernet: mtk_eth_soc: fix possible NULL pointer dereference in mtk_hwlro_get_fdir_all()
-Date: Fri,  8 Sep 2023 14:19:50 +0800
-Message-Id: <20230908061950.20287-4-hbh25y@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230908061950.20287-1-hbh25y@gmail.com>
-References: <20230908061950.20287-1-hbh25y@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11AF415B6
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 06:56:46 +0000 (UTC)
+Received: from EUR01-VE1-obe.outbound.protection.outlook.com (mail-ve1eur01on2074.outbound.protection.outlook.com [40.107.14.74])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D16A61FFC;
+	Thu,  7 Sep 2023 23:56:01 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZdV78nE7QConi0cjFVO5oHN8z99UZgVFy9pTE07gbtQoCACZuTCK4wyqrTIH6U2ac94mtR7H+U4a5zscqktWdfJD/RDBVLy56IRUP+eAifgHg9XFkQiH+tSAxOvZSKdlSNk3LQ4a77tIc5ePaQuFOlygSUEMoO0X3Qfci/T6sjTN0gPwKcKDEHIVwDDJKLIgug/jwYLmNyQdkKM2eLscdUtpdsmHi473FMbK5HpaKWeEFg8SN2BtI3RaawFdZxw24RcOgxJE7/lmGjkamGAYM8see+DOaQIPpgtmm6H0jPAmqPGQZTVVNaNkLAsftSZnFkBqfHW9tVGqt7lmBdt38Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XkOO8XVtS/IPeePw9uxGxNMkkxWKIANN5NJtxh1X7LQ=;
+ b=PZ4GEWx7LwfSxUwTWVvsErVmZv53pMo5fkQnkxbgG5ka7cv0LZcPaypolHArYbRJdOIC1wuYjrv9b5zBxH5l7fitHStkZJHLWXm0KQE+NGdhIK2P4kVxABe2xVCy1albRD/4eMBpW444pdDNkxLuw/SCAVv7EcFcqz/oFSowybFqFOMni/TQlj/NMrEb8KCCeZGmYYJW3MiqXAEqQ2KQpUuFQPN+5QUxqWXzF34UI1NmpTy9BKtzoWGg/Q5BNlFCHztuRCBzKe2nYxrXqLeVGkcyDgPLablIB4RzfXXPvi+FksctZWCpvEIs9eYB6TC2no6cAW6XoNZdhSM/llX08Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector2-NXP1-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XkOO8XVtS/IPeePw9uxGxNMkkxWKIANN5NJtxh1X7LQ=;
+ b=JFcHC+BUl0L5Ma1xV+e0ymYCIThS6KP1gBkTXPICc5mtQoYkaCYLhxZ7Y9rAjHTeTFLW/9sE+Q0Vtjjqgov1b2USMLqzS9nS1q5b/ns0zev+TCkU49RlwvfcxYnKY2Fmtie+rk8yOVGVSimt07Pg9cU3aF0j2Qclyetbpch/r0c=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=oss.nxp.com;
+Received: from AM9PR04MB8954.eurprd04.prod.outlook.com (2603:10a6:20b:409::7)
+ by DB9PR04MB8153.eurprd04.prod.outlook.com (2603:10a6:10:245::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.30; Fri, 8 Sep
+ 2023 06:55:57 +0000
+Received: from AM9PR04MB8954.eurprd04.prod.outlook.com
+ ([fe80::e109:7026:7d76:5617]) by AM9PR04MB8954.eurprd04.prod.outlook.com
+ ([fe80::e109:7026:7d76:5617%6]) with mapi id 15.20.6745.034; Fri, 8 Sep 2023
+ 06:55:57 +0000
+Message-ID: <0825855e-4cff-31d9-82e9-2e428397111d@oss.nxp.com>
+Date: Fri, 8 Sep 2023 09:55:44 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.0
+Subject: Re: [RFC net-next v3 4/6] net: phy: nxp-c45-tja11xx: add MACsec
+ support
+Content-Language: en-US
+To: Simon Horman <horms@kernel.org>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, richardcochran@gmail.com, sd@queasysnail.net,
+ sebastian.tobuschat@nxp.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20230906160134.311993-1-radu-nicolae.pirea@oss.nxp.com>
+ <20230906160134.311993-5-radu-nicolae.pirea@oss.nxp.com>
+ <20230907150058.GD434333@kernel.org>
+From: "Radu Pirea (OSS)" <radu-nicolae.pirea@oss.nxp.com>
+In-Reply-To: <20230907150058.GD434333@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: VI1PR0202CA0030.eurprd02.prod.outlook.com
+ (2603:10a6:803:14::43) To AM9PR04MB8954.eurprd04.prod.outlook.com
+ (2603:10a6:20b:409::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8954:EE_|DB9PR04MB8153:EE_
+X-MS-Office365-Filtering-Correlation-Id: 395a7913-a528-4ee0-afd5-08dbb038a6e8
+X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	iyY2L4BQ5fbAm4bo6ozeahbo0IGZ69l3h02GO8FqN5kljdrLEA8aU0GVsiVEVAVUgBgFv2PFfb9oCR345t7ccSmuFy+c74DlgArDrAb28ujJ5dTa9NAcPI9q5b7CD04SANqHMGepVTB2sfLomYbotZr1im+Y+1V+AVzk4di2tik8FBCk4xWd0WRiGQS3HFZ0NevUwEOuFBgA0skMq27u3IHidzu3jCOVZgTkBRsL01IPpJcN3vGp8UwqveksDinewXJKq83hufndCRm7SXj2uiUedP7hpZbVpNRJqv67Q45gy2Qg9Y2kqXIOGf5oLf6JLydyQA/7L8uhwk0UrgtT8kngJm7+I+MG+TWmU0MIMI9pPpxWeLAwalPqSUcl2el5mkhS/N3PE6s/ect5F9ptY1GyFBoBJ/CMr6S2ZRunM468WUXmGGthhqaBgFhBAaRDvaPtHRXOvzQi60AkO1KYHXnGr/OKSr/9B7OVZKLFOm13xs/S0O/8RiiVPt8Jt/iCmYL1wzQGaS1F1c1wmi/c+RzYCeGCm5oIdy0xmlhRi2nIWRrYjMpce5FH9Sy0MYrcQupQ1VKHOTKQlZ/9mHrYfIoRgf8UC+eVC8yY+mrZAcK01cQRiUH5OzyuffZu11SeFMh5rSuk4/rI09MANgAURA==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8954.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(346002)(376002)(396003)(366004)(136003)(1800799009)(186009)(451199024)(5660300002)(4326008)(8676002)(8936002)(41300700001)(66556008)(66476007)(66946007)(4744005)(31686004)(7416002)(316002)(6916009)(2906002)(38100700002)(6512007)(53546011)(2616005)(26005)(31696002)(86362001)(478600001)(6486002)(6506007)(6666004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?RmNaNkUzL0I4a0VFb0llVDdSNkpjL3ArMVpzSENiVXVBczFrUTF1bDFzaTgy?=
+ =?utf-8?B?MGx1a3YxN0NKOGM2VzBCY3lIaTFTWTR3cGxwM2sxZ3hiKzlUQVhic3FTMUZE?=
+ =?utf-8?B?SEl6L1BUb2FURmljTERWaHdsdnZjVXpQTkttd3ZROVVNbHRac2tDQ1JHVFhN?=
+ =?utf-8?B?VmxVMmpMcVEwWVUySHp6dVJsNGJXVkJYNkRvUkVHc29Fa3dGT0JWMlZHcFZk?=
+ =?utf-8?B?K3daRjJsbTJENi84aDMzV2tOSDhucVd2TDlTUThkOGR2a3VxNXdHbkdMR1Qr?=
+ =?utf-8?B?aml6V1N4RVhnNnQ5QWtDT0I1d1VndWtraEhVOWJESmIzejc4K2FTT1ZvdHht?=
+ =?utf-8?B?bmt3VnkzOGxiOVpaWjExTGh0eTJ4OVhjTlRnMm1uZDVoSVZmWFRPYzMrYTZY?=
+ =?utf-8?B?alJETXR1dDZ6YW4vZDRIcXVuUS9weFM1aUdFM1Q4WXV0U0NXZXVQR21ZekNC?=
+ =?utf-8?B?U1c2L3BzTU1mNkpzczV0TExoN21aZkFIbnZJcUhSeEZjMTY3WG1hM0k0UFhi?=
+ =?utf-8?B?VHl2V1NINERiOUVldXVydUZPdG5rcGIvaGlTWjFZbEVBTVdRRkV0UWlGdjFt?=
+ =?utf-8?B?SVZVK1hFRklEVnI3VnhsN1BTeS9BZXNxeFNOZE0zMGdXSUtJWFNEU3oydzBF?=
+ =?utf-8?B?ekk1cDZIb2ZHcmw5OFhLcjBheDFJV1ZHWk9sNUJGZ2lnVFhGaXBEOElpVGda?=
+ =?utf-8?B?ZmVGNGoydFJRY2RTQWpzc2xMYk12UitsR0VBV0FNLzdhdWJId2lhMkM0R2Y2?=
+ =?utf-8?B?WDdEUXlSa3piYVM0T1NNN2xYVWplMm54K3AvS2JkaTdJN21VQjM0V0tsQitr?=
+ =?utf-8?B?aUVuT2E0ZjRDR1NlQjNIQVV5MituWUVsN09vKzlzSnVRMXdDenZlOG4xNHMr?=
+ =?utf-8?B?Y3FyRUl1SzRHbW1lT3lPYld6U09qQ1B1ZjNUUHZJYnV6M1hiRWg4S0VQb3hr?=
+ =?utf-8?B?Q1JlWGdFTTRiY3Z3djE0cHAwK0Rkb1hLQW1UbzBPMVpRNCsvWVVLWXdCaVV2?=
+ =?utf-8?B?RER2Y25VdHQyS2FRUWt2eko4ZDdKNDRtZzQvMVBQQU55cFQ2dGR3endtVWUv?=
+ =?utf-8?B?cDRTQ1YrWTBROVRXMTY5YkgvK2NSRityTkdmQVBCTm4xU3VZUW9sczd1bjNh?=
+ =?utf-8?B?cHcyNlZqMzBRMEluRVdFaGR4Y1F5WG1IMyt6eFNRQUpzS0tGeUgvT2p3cWVo?=
+ =?utf-8?B?aER0VkNSUU9tS2NZdDVkRWM5clcwbDVDRHZaVEQ4Zy9oZ0FaZGs4RnNTcEV6?=
+ =?utf-8?B?Q09ZMHlUdHRBRnhHVUViME9NUURyb1VrQ04yZ0JhcmhPeW81amVWeXpkV2xX?=
+ =?utf-8?B?VHluRHZYM29qMXZ4VUprdlZJZzN4S0FuR01MRDBEb3J1MDdNTjhBWnlSdEh4?=
+ =?utf-8?B?WFROV3RuQlMxM2FQcFNOUmdWK3grMFNUWlp4UGdYa3N6bXI1RU1lUG5FQXY0?=
+ =?utf-8?B?QUFINVJCbDNVemwwSG1CdlpYVmZieTZ5eEZpblM3YlhtZktZRUozSlJTTmRD?=
+ =?utf-8?B?QnlxL0dWWStCKzRreEVpMUZzaDVteUViRDRXK3RWUkphN3A4WFE1QkNqSlM2?=
+ =?utf-8?B?RERSbVhYamNBNUVqMDFQWmdQRE5sSklJeVAwaXJVNUFNRU9IWU05MHZ6VEhY?=
+ =?utf-8?B?d2s5a1JCc0g0cUl6dy9USFZNU3NaZ2Nmd25keGZGM1FJTVBPelZUcjVaRWRB?=
+ =?utf-8?B?LzJkVzVjTGhDMlM2UXorOVhKTTJjZUYyV0FwWnJKaE1KK0duOUhxVXhaSDd5?=
+ =?utf-8?B?VTZjMTE2SmZ1SExhdmV4ejExdTEwdU9ZeEgzQW1SdXZKTExCV0VHSFlkc2Vw?=
+ =?utf-8?B?aW05eVlFNmNxcHhkV2pTN25IR3E5STVrOVQrUWRpZkl4TkJjRmNJM0xEc2pK?=
+ =?utf-8?B?bU1hbmRsKzdTNTdGb2E0NVZuL1EzdS9oWndhSzB3cmxLVjcrVG56bW5LQWFX?=
+ =?utf-8?B?RWFjSTdQY2NEa09KZnU1YldKNjVYWnEzdmJKSEE0UFJkL21wWlhlbStEZVRy?=
+ =?utf-8?B?VGt2Q2FyeThEQ0FTRUkrdG9kVEovUm8vU3lIbTN1d3M2TFh2WmJQV1QrMFhL?=
+ =?utf-8?B?NWk0MjRHdEtnQy80VWlUVk9tbmtLYVQxZzl3bkNXaVE1bndFSnN5N1VibTgw?=
+ =?utf-8?B?ZjZyRlpjM2JvK040d04xbkFlM0pCMjVTTDBSMjlJbzFQWXErTVg0cldMZk1t?=
+ =?utf-8?B?bUE9PQ==?=
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 395a7913-a528-4ee0-afd5-08dbb038a6e8
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8954.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Sep 2023 06:55:57.1181
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: AVHWgcMcp+r+N2QuMG/UAd/lShh6pZOlNq+4a177Zaq5xYj6gHgpsoL+PonCf79Y9AmPSZufp+ydWibBsmO39ggGwSKwvM7RQkVJ4w/RxX4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB8153
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-rule_locs is allocated in ethtool_get_rxnfc and the size is determined by
-rule_cnt from user space. So rule_cnt needs to be check before using
-rule_locs to avoid NULL pointer dereference.
 
-Fixes: 7aab747e5563 ("net: ethernet: mediatek: add ethtool functions to configure RX flows of HW LRO")
-Signed-off-by: Hangyu Hua <hbh25y@gmail.com>
----
+On 07.09.2023 18:00, Simon Horman wrote:
+> On Wed, Sep 06, 2023 at 07:01:32PM +0300, Radu Pirea (NXP OSS) wrote:
+>> +		sa = nxp_c45_find_sa(&pos->sa_list, TX_SA, encoding_sa);
+>> +		if (!IS_ERR(sa))
+>> +			macsec_pn_wrapped(pos->secy, sa->sa);
+>> +		else
+>> +			WARN_ON(!sa);
+> 
+> Hi Radu,
+> 
+> Smatch doesn't seem to think that sa can be NULL: it is either a valid
+> pointer or an error pointer.
 
-	v2: drop the brackets.
+Thank you.
+I was not able to reproduce the issue using smatch 1.73. With the master 
+version worked.
 
- drivers/net/ethernet/mediatek/mtk_eth_soc.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index 6ad42e3b488f..2372ce8c2580 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-@@ -2994,6 +2994,9 @@ static int mtk_hwlro_get_fdir_all(struct net_device *dev,
- 	int i;
- 
- 	for (i = 0; i < MTK_MAX_LRO_IP_CNT; i++) {
-+		if (cnt == cmd->rule_cnt)
-+			return -EMSGSIZE;
-+
- 		if (mac->hwlro_ip[i]) {
- 			rule_locs[cnt] = i;
- 			cnt++;
 -- 
-2.34.1
-
+Radu P.
 
