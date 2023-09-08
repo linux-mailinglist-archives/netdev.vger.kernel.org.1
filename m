@@ -1,123 +1,70 @@
-Return-Path: <netdev+bounces-32509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A01A7980FD
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 05:32:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1FF0798107
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 05:44:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41A1F1C20BDF
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 03:32:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09C391C20B43
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 03:44:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D3E31373;
-	Fri,  8 Sep 2023 03:32:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72F6F137B;
+	Fri,  8 Sep 2023 03:44:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91F6D1852
-	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 03:32:03 +0000 (UTC)
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 692801BDB;
-	Thu,  7 Sep 2023 20:32:01 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=guangguan.wang@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0Vrb2bZF_1694143917;
-Received: from localhost.localdomain(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0Vrb2bZF_1694143917)
-          by smtp.aliyun-inc.com;
-          Fri, 08 Sep 2023 11:31:57 +0800
-From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-To: wenjia@linux.ibm.com,
-	jaka@linux.ibm.com,
-	kgraul@linux.ibm.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: tonylu@linux.alibaba.com,
-	alibuda@linux.alibaba.com,
-	guwen@linux.alibaba.com,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net 2/2] net/smc: use smc_lgr_list.lock to protect smc_lgr_list.list iterate in smcr_port_add
-Date: Fri,  8 Sep 2023 11:31:43 +0800
-Message-Id: <20230908033143.89489-3-guangguan.wang@linux.alibaba.com>
-X-Mailer: git-send-email 2.24.3 (Apple Git-128)
-In-Reply-To: <20230908033143.89489-1-guangguan.wang@linux.alibaba.com>
-References: <20230908033143.89489-1-guangguan.wang@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 241D8111B
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 03:44:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28373C433C8;
+	Fri,  8 Sep 2023 03:44:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694144691;
+	bh=NO6h5OcHwHsI0o1lcWAQvbgEh5BLlbaPObg41/h+1VE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Ms53MSfrw40om2BbrDYkVeylRGWZ69/gSBVDp9HobzwJjjyMThAQs7FZCn07G5cwf
+	 CWegrmdW/vdYNPcooCasjlFz0fxYKJNupgk9C7eleq9hsUaHMCaKoHwlhpQv0T8YUw
+	 J8VUmRpyEClm7gIcX6CoJ4dSytflHEYoWUoLiqevMjxpc3MLCtkZaNqnAEzLE6psEB
+	 bGTNCmW/bxL5AzHB9sBAAnd2/92+Ldh0xxk+64rGPMAz/1HMnn93KsQpyAP511lWhl
+	 yE/dGaz0UhU7Y+uaFsmzIS1l1wwxuWzTkbOKRR0y6AuEh9n/tqj5IotZIHspDujHMq
+	 c6ovhaxJEjmiw==
+Date: Thu, 7 Sep 2023 20:44:50 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+Cc: <piergiorgio.beruto@gmail.com>, <davem@davemloft.net>,
+ <edumazet@google.com>, <pabeni@redhat.com>, <andrew@lunn.ch>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <horatiu.vultur@microchip.com>, <Woojung.Huh@microchip.com>,
+ <Nicolas.Ferre@microchip.com>, <Thorsten.Kummermehr@microchip.com>,
+ <UNGLinuxDriver@microchip.com>
+Subject: Re: [PATCH net v2] ethtool: plca: fix plca enable data type while
+ parsing the value
+Message-ID: <20230907204450.6b9e63df@kernel.org>
+In-Reply-To: <20230908140346.40680-1-Parthiban.Veerasooran@microchip.com>
+References: <20230908140346.40680-1-Parthiban.Veerasooran@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-While doing smcr_port_add, there maybe linkgroup add into or delete
-from smc_lgr_list.list at the same time, which may result kernel crash.
-So, use smc_lgr_list.lock to protect smc_lgr_list.list iterate in
-smcr_port_add.
+On Fri, 8 Sep 2023 19:33:46 +0530 Parthiban Veerasooran wrote:
+> The ETHTOOL_A_PLCA_ENABLED data type is u8. But while parsing the
+> value from the attribute, nla_get_u32() is used in the plca_update_sint()
+> function instead of nla_get_u8(). So plca_cfg.enabled variable is updated
+> with some garbage value instead of 0 or 1 and always enables plca even
+> though plca is disabled through ethtool application. This bug has been
+> fixed by parsing the values based on the attributes type in the policy.
+> 
+> Fixes: 8580e16c28f3 ("net/ethtool: add netlink interface for the PLCA RS")
+> Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
 
-The crash calltrace show below:
-BUG: kernel NULL pointer dereference, address: 0000000000000000
-PGD 0 P4D 0
-Oops: 0000 [#1] SMP NOPTI
-CPU: 0 PID: 559726 Comm: kworker/0:92 Kdump: loaded Tainted: G
-Hardware name: Alibaba Cloud Alibaba Cloud ECS, BIOS 449e491 04/01/2014
-Workqueue: events smc_ib_port_event_work [smc]
-RIP: 0010:smcr_port_add+0xa6/0xf0 [smc]
-RSP: 0000:ffffa5a2c8f67de0 EFLAGS: 00010297
-RAX: 0000000000000001 RBX: ffff9935e0650000 RCX: 0000000000000000
-RDX: 0000000000000010 RSI: ffff9935e0654290 RDI: ffff9935c8560000
-RBP: 0000000000000000 R08: 0000000000000000 R09: ffff9934c0401918
-R10: 0000000000000000 R11: ffffffffb4a5c278 R12: ffff99364029aae4
-R13: ffff99364029aa00 R14: 00000000ffffffed R15: ffff99364029ab08
-FS:  0000000000000000(0000) GS:ffff994380600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 0000000f06a10003 CR4: 0000000002770ef0
-PKRU: 55555554
-Call Trace:
- smc_ib_port_event_work+0x18f/0x380 [smc]
- process_one_work+0x19b/0x340
- worker_thread+0x30/0x370
- ? process_one_work+0x340/0x340
- kthread+0x114/0x130
- ? __kthread_cancel_work+0x50/0x50
- ret_from_fork+0x1f/0x30
-
-Fixes: 1f90a05d9ff9 ("net/smc: add smcr_port_add() and smcr_link_up() processing")
-Signed-off-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
----
- net/smc/smc_core.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
-index 3f465faf2b68..6aa3db47a956 100644
---- a/net/smc/smc_core.c
-+++ b/net/smc/smc_core.c
-@@ -1654,6 +1654,7 @@ void smcr_port_add(struct smc_ib_device *smcibdev, u8 ibport)
- {
- 	struct smc_link_group *lgr, *n;
- 
-+	spin_lock_bh(&smc_lgr_list.lock);
- 	list_for_each_entry_safe(lgr, n, &smc_lgr_list.list, list) {
- 		struct smc_link *link;
- 
-@@ -1669,6 +1670,7 @@ void smcr_port_add(struct smc_ib_device *smcibdev, u8 ibport)
- 		if (link)
- 			smc_llc_add_link_local(link);
- 	}
-+	spin_unlock_bh(&smc_lgr_list.lock);
- }
- 
- /* link is down - switch connections to alternate link,
--- 
-2.24.3 (Apple Git-128)
-
+One second look you need to fix the date on your system and resend.
+The patch came to us with a date 24h in the future it will confuse
+patchwork.
 
