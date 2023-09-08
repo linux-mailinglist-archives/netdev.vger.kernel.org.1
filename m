@@ -1,68 +1,69 @@
-Return-Path: <netdev+bounces-32681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 954BD79928B
-	for <lists+netdev@lfdr.de>; Sat,  9 Sep 2023 00:58:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E61179928D
+	for <lists+netdev@lfdr.de>; Sat,  9 Sep 2023 00:58:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B68E81C20CB2
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 22:58:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CC161C20D4C
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 22:58:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4524A6FB2;
-	Fri,  8 Sep 2023 22:58:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5529E1FB7;
+	Fri,  8 Sep 2023 22:58:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 357271C16
-	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 22:58:10 +0000 (UTC)
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4F361FEA
-	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 15:58:09 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d7e857a3fd5so2657870276.3
-        for <netdev@vger.kernel.org>; Fri, 08 Sep 2023 15:58:09 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 425D76FDB
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 22:58:13 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA6C81FEA
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 15:58:11 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59b6083fa00so9765347b3.0
+        for <netdev@vger.kernel.org>; Fri, 08 Sep 2023 15:58:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1694213889; x=1694818689; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=5vtcfBbKqQeR2NL5yHx5os/nTJeJCveHJ565EoPZims=;
-        b=Op07wZPKXWLvFXqiLGX3vPkssp1KYBORTx7PNclJjJ8410ctBbszBJmQKZv1VL+rV5
-         mQWZTfWtXhnp40/rMLT8nRdkYtp42fl3H74+eP3VolfN5eb5vrInlJOor/KNWUz6tqO6
-         Nm8Y6AofN8Vjw01OgcRX2ncUzj7TPxbIfSJ6jccLHZTjgwJ3g8EhKYhGjaWDVLu3qwnV
-         7I1thDqqStESEKdAQV7Ouc8iejmtkc6MZpRMi3gFqB01Cp2gAByNPbdQPYvvlXtTQVpS
-         RQrz1JsQRFfayvhFyI7N38NK808l2+y+7I5mVfgP6j+Z1K4CnlbrfYTXImf7RnzIdDal
-         CMMQ==
+        d=google.com; s=20221208; t=1694213891; x=1694818691; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=w/AfsWqTsY33pj6en+LuS4ONjftbdwS42oVsfuILkVY=;
+        b=erqVLWXuveiH69YMmc0+Soj+KnzXjg4TCdltw+X6bVgM86GoSZqkQWCvN8Diydqb3G
+         VAtKO4/lc8LfZKJ72wdvLVkBZWWgsHF4jArdpWcqvT0QMcm3vNbrYqqU8je96cW0dxD9
+         RhbVg3P/HTgjsx6354YOOUobGQj+xjUCTM5fpxn2vRwvhPMnTxqZQherpDOJQunw9+QN
+         5wjX98lVXuf0EjhjE8YlrMg76d7Q9AiqKGRGnkZDlhqvI9Q9xr5vbax4DGUvxEWX/ZRb
+         LtHWtNzhtIvVDXjEqn6Bi+mw2V9lPIN6StCoqkIkXJIbgIlq1pwmf14kwmTw7q2vHPZ6
+         0qwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694213889; x=1694818689;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5vtcfBbKqQeR2NL5yHx5os/nTJeJCveHJ565EoPZims=;
-        b=qcloH+QyY/1pVFCWKShmEAe9GdSJdRPPz7E76xv41FL5KK2tOsOUrKavkftkl5y2LG
-         WSl/iPKcGhTfsaD4/tpYL4PK2/HjeBOZ7wQhkm+8NbRAT1HOZpUmJf+F5w9tJ73pTsCg
-         o7/tlKtPnYKGtyEnu42c69afIGP43UG7iL1aGF7/YApIEgzIiyApfFzxsWBAfXpxfi3y
-         WC2rYBSgCDPoetzX+fOEHtR2G/MGwpQ2x3E/sl16bxKVBPk3GIKWOznE5PU0Wk+jVHD0
-         85ucMayHXRHqsDN4Y6QjP7qaGE+Nd+RsFJklSLzJyBCZeZKASA9RDlf5TuE0+DnR8h8f
-         70zQ==
-X-Gm-Message-State: AOJu0YxLoBsT9Hqh2Y32KJ+QTx3a9VC3QVLsawZKgWsIGSO5fRAV18cs
-	VV1ThcFgaAwdUcXAbJtHK7rP97o=
-X-Google-Smtp-Source: AGHT+IFMr8kDef6fP6VHllz0ktFC++4PEzH4rR9MyQ8wKQ7UYoHbD8BrZzjuJnnWPWrDSN0AbAuzrDU=
+        d=1e100.net; s=20230601; t=1694213891; x=1694818691;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=w/AfsWqTsY33pj6en+LuS4ONjftbdwS42oVsfuILkVY=;
+        b=rUMnpEtruuNUHIRLpIHJyPGRVcgzhxiR+tWdnDtqu5giBtijj3HSD1I7VenUpZlhEz
+         2SqrcuiA5eelX0zbT2W2qs/b8aSHzpdLHSatTzzkSs7umbPkoFGKqMwgCe0no+kklfOS
+         CemXWPnoLe+4bTz+7BFtMXP/M3XB7LUGe/zHDWJGPj0p2/PQByYRA4SGF6oOuyE/qo/p
+         kidjvG3zi1G/cVpyIbnsxhKxQpzWKcH2r9LFbNkPF+JvobZGaidzSOYHzgKsEU0yeJnk
+         NNilpbhd8nYo52zoSwAMctzy21LbYNUE6mj3QwWNHq4+u/LgSyw03iOkMP6rZJyGswgz
+         CrkQ==
+X-Gm-Message-State: AOJu0YzMlaldqdovraqZhsuL9kqJYXL4GT0zP9rNPg9k8pMdnFMyvDXF
+	YVjQvnMQTbg7FJ5pm0wNxfVF6YA=
+X-Google-Smtp-Source: AGHT+IFjX8JEC8XEveMpC8MYE49/Aul0kPR9Anr1gzBFnau2FsPE2dM2D68XwCvM0958Aqy/ISyUJnw=
 X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a25:adc3:0:b0:d01:60ec:d0e with SMTP id
- d3-20020a25adc3000000b00d0160ec0d0emr91876ybe.9.1694213888955; Fri, 08 Sep
- 2023 15:58:08 -0700 (PDT)
-Date: Fri,  8 Sep 2023 15:58:04 -0700
+ (user=sdf job=sendgmr) by 2002:a81:ca0b:0:b0:58c:9fda:d043 with SMTP id
+ p11-20020a81ca0b000000b0058c9fdad043mr99015ywi.10.1694213891119; Fri, 08 Sep
+ 2023 15:58:11 -0700 (PDT)
+Date: Fri,  8 Sep 2023 15:58:05 -0700
+In-Reply-To: <20230908225807.1780455-1-sdf@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20230908225807.1780455-1-sdf@google.com>
 X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
-Message-ID: <20230908225807.1780455-1-sdf@google.com>
-Subject: [PATCH bpf-next 0/3] bpf: expose information about netdev
- xdp-metadata kfunc support
+Message-ID: <20230908225807.1780455-2-sdf@google.com>
+Subject: [PATCH bpf-next 1/3] bpf: make it easier to add new metadata kfunc
 From: Stanislav Fomichev <sdf@google.com>
 To: bpf@vger.kernel.org
 Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
@@ -77,33 +78,98 @@ X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Extend netdev netlink family to expose the bitmask with the
-kfuncs that the device implements. The source of truth is the
-device's xdp_metadata_ops. There is some amount of auto-generated
-netlink boilerplate; the change itself is super minimal.
+No functional changes.
+
+Instead of having hand-crafted code in bpf_dev_bound_resolve_kfunc,
+move kfunc <> xmo handler relationship into XDP_METADATA_KFUNC_xxx.
+This way, any time new kfunc is added, we don't have to touch
+bpf_dev_bound_resolve_kfunc.
+
+Also document XDP_METADATA_KFUNC_xxx arguments since we now have
+more than two and it might be confusing what is what.
 
 Cc: netdev@vger.kernel.org
 Cc: Willem de Bruijn <willemb@google.com>
+Signed-off-by: Stanislav Fomichev <sdf@google.com>
+---
+ include/net/xdp.h    | 16 ++++++++++++----
+ kernel/bpf/offload.c |  9 +++++----
+ net/core/xdp.c       |  4 ++--
+ 3 files changed, 19 insertions(+), 10 deletions(-)
 
-Stanislav Fomichev (3):
-  bpf: make it easier to add new metadata kfunc
-  bpf: expose information about supported xdp metadata kfunc
-  tools: ynl: extend netdev sample to dump xdp-rx-metadata-features
-
- Documentation/netlink/specs/netdev.yaml      | 21 ++++++++++++++++++++
- Documentation/networking/xdp-rx-metadata.rst |  7 +++++++
- include/net/xdp.h                            | 19 ++++++++++++++----
- include/uapi/linux/netdev.h                  | 16 +++++++++++++++
- kernel/bpf/offload.c                         |  9 +++++----
- net/core/netdev-genl.c                       | 12 ++++++++++-
- net/core/xdp.c                               |  4 ++--
- tools/include/uapi/linux/netdev.h            | 16 +++++++++++++++
- tools/net/ynl/generated/netdev-user.c        | 19 ++++++++++++++++++
- tools/net/ynl/generated/netdev-user.h        |  3 +++
- tools/net/ynl/samples/Makefile               |  2 +-
- tools/net/ynl/samples/netdev.c               |  8 +++++++-
- 12 files changed, 123 insertions(+), 13 deletions(-)
-
+diff --git a/include/net/xdp.h b/include/net/xdp.h
+index de08c8e0d134..d59e12f8f311 100644
+--- a/include/net/xdp.h
++++ b/include/net/xdp.h
+@@ -383,14 +383,22 @@ void xdp_attachment_setup(struct xdp_attachment_info *info,
+ 
+ #define DEV_MAP_BULK_SIZE XDP_BULK_QUEUE_SIZE
+ 
++/* Define the relationship between xdp-rx-metadata kfunc and
++ * various other entities:
++ * - xdp_rx_metadata enum
++ * - kfunc name
++ * - xdp_metadata_ops field
++ */
+ #define XDP_METADATA_KFUNC_xxx	\
+ 	XDP_METADATA_KFUNC(XDP_METADATA_KFUNC_RX_TIMESTAMP, \
+-			   bpf_xdp_metadata_rx_timestamp) \
++			   bpf_xdp_metadata_rx_timestamp, \
++			   xmo_rx_timestamp) \
+ 	XDP_METADATA_KFUNC(XDP_METADATA_KFUNC_RX_HASH, \
+-			   bpf_xdp_metadata_rx_hash) \
++			   bpf_xdp_metadata_rx_hash, \
++			   xmo_rx_hash) \
+ 
+-enum {
+-#define XDP_METADATA_KFUNC(name, _) name,
++enum xdp_rx_metadata {
++#define XDP_METADATA_KFUNC(name, _, __) name,
+ XDP_METADATA_KFUNC_xxx
+ #undef XDP_METADATA_KFUNC
+ MAX_XDP_METADATA_KFUNC,
+diff --git a/kernel/bpf/offload.c b/kernel/bpf/offload.c
+index 3e4f2ec1af06..6aa6de8d715d 100644
+--- a/kernel/bpf/offload.c
++++ b/kernel/bpf/offload.c
+@@ -845,10 +845,11 @@ void *bpf_dev_bound_resolve_kfunc(struct bpf_prog *prog, u32 func_id)
+ 	if (!ops)
+ 		goto out;
+ 
+-	if (func_id == bpf_xdp_metadata_kfunc_id(XDP_METADATA_KFUNC_RX_TIMESTAMP))
+-		p = ops->xmo_rx_timestamp;
+-	else if (func_id == bpf_xdp_metadata_kfunc_id(XDP_METADATA_KFUNC_RX_HASH))
+-		p = ops->xmo_rx_hash;
++#define XDP_METADATA_KFUNC(name, _, xmo) \
++	if (func_id == bpf_xdp_metadata_kfunc_id(name)) p = ops->xmo;
++	XDP_METADATA_KFUNC_xxx
++#undef XDP_METADATA_KFUNC
++
+ out:
+ 	up_read(&bpf_devs_lock);
+ 
+diff --git a/net/core/xdp.c b/net/core/xdp.c
+index a70670fe9a2d..bab563b2f812 100644
+--- a/net/core/xdp.c
++++ b/net/core/xdp.c
+@@ -741,7 +741,7 @@ __bpf_kfunc int bpf_xdp_metadata_rx_hash(const struct xdp_md *ctx, u32 *hash,
+ __diag_pop();
+ 
+ BTF_SET8_START(xdp_metadata_kfunc_ids)
+-#define XDP_METADATA_KFUNC(_, name) BTF_ID_FLAGS(func, name, KF_TRUSTED_ARGS)
++#define XDP_METADATA_KFUNC(_, name, __) BTF_ID_FLAGS(func, name, KF_TRUSTED_ARGS)
+ XDP_METADATA_KFUNC_xxx
+ #undef XDP_METADATA_KFUNC
+ BTF_SET8_END(xdp_metadata_kfunc_ids)
+@@ -752,7 +752,7 @@ static const struct btf_kfunc_id_set xdp_metadata_kfunc_set = {
+ };
+ 
+ BTF_ID_LIST(xdp_metadata_kfunc_ids_unsorted)
+-#define XDP_METADATA_KFUNC(name, str) BTF_ID(func, str)
++#define XDP_METADATA_KFUNC(name, str, _) BTF_ID(func, str)
+ XDP_METADATA_KFUNC_xxx
+ #undef XDP_METADATA_KFUNC
+ 
 -- 
 2.42.0.283.g2d96d420d3-goog
 
