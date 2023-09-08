@@ -1,212 +1,132 @@
-Return-Path: <netdev+bounces-32540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D641279839C
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 09:55:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 17A807983C1
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 10:10:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A5D02818DF
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 07:55:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5959D2819AB
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 08:10:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 176CB1C10;
-	Fri,  8 Sep 2023 07:55:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 044511C32;
+	Fri,  8 Sep 2023 08:10:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04C971867
-	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 07:55:31 +0000 (UTC)
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E30381BD3
-	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 00:55:29 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1c0d0bf18d7so14389415ad.0
-        for <netdev@vger.kernel.org>; Fri, 08 Sep 2023 00:55:29 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5839187A
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 08:10:52 +0000 (UTC)
+Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 976171BE9
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 01:10:50 -0700 (PDT)
+Received: by mail-yb1-xb2e.google.com with SMTP id 3f1490d57ef6-d7e87b4a0f2so1646766276.0
+        for <netdev@vger.kernel.org>; Fri, 08 Sep 2023 01:10:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1694159729; x=1694764529; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=giUUe/jnEGyFiEmywWHcEaYFSDUdG775ovtenAQnoSM=;
-        b=D8DLSOEL+VfBhBDdhZ00kTjMu2+kTZ5Bg7EA7YvHiAoUm6ReXoh0JmNGX9gfTg4fW0
-         UzHZWR7cWyURV6kN7cbu9RjoHQjdxVnmDImmbiqrqacKovPEqM3FYwTHa6quxCp+jA2z
-         NyOwqFVpQfMCzng7FehfNtZln8aBxGy50xOe6cUXvz2+XMotON0RlWQmKUWsH1bwPIXy
-         fnrvhzChtldvOzmfX9m5WN4gemcqj9L+qsgJqptGWt8Wt6POYxhtwP1tdztmURzof5wL
-         IBZCwnjadtnukvMYYrWqFhGRuMPHo52917aAQ21waYZp1s4gHQ8PTT4+YyL7k6158atR
-         AtXg==
+        d=linaro.org; s=google; t=1694160650; x=1694765450; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LX8a9RtwGTkNLy+xzOfITbjsoPIkf7czyOLexbXeC30=;
+        b=Ta0p6zxQby92DMNhDSTt1AvTBovOoRn8asPZr1gk8V+gWfRAw2lZ8kV6N2h5VheLA9
+         JTwBoy+SlBso8p8yiQeZw9m8VIslhXrjcvZ5E2UZym2iFFPZRUZ19C2h6TFQcteH11vf
+         tCWseemtS2uDnmZUvC5Xigx02zT3ivXvtqF0lUjngafAifpN9hdj6jNDqYqLTE2gaMBu
+         iytiWf5lqdP3in57u48TCk3CgK/d/Em9rG3zXv15NAbtJ7j+4oUTFyWueOaeLjTW0u68
+         rBdsg0qwP0Cvh4Mrxlp0yxGPAiscP+VSfYH4+kJmZCpGHS0cI2peLG93YXdqz4+8AHmr
+         5rqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694159729; x=1694764529;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=giUUe/jnEGyFiEmywWHcEaYFSDUdG775ovtenAQnoSM=;
-        b=oOgxITN/61v4BJnaJK/omRq9P6GPEFMfvCzkHvs9peQfzbLDq2V9T0KZXG5voWbm6t
-         K4YsD9rKglJIVoUJMYrHcPjz4BE1kRxmQesQXPWYYjOc+8HGgCFgaV0clV7GJ7u4WpZv
-         Uqiw4cDj3iv1NRQVefvoADlhhHhCFEZHOiLXJtLH2NDSw8aH6l54nWyHjRF2rIYCLqKN
-         VdvJ/YlKUHDWz/JR/v3DU0+tlCVKpJ+5St4MMNb20liiDRA4S8S5Bk17uKUuUX5kQ5Mz
-         4ZS+h0E7QMARyq5Cz8cRzcF27JtEuw0fyek46c4OOI3K0HQEr0QmS0GwreRSjvDhVxMZ
-         1nLw==
-X-Gm-Message-State: AOJu0YxoaFXaRPXNVOBN/rZCllnOrdCoSyXdVUQJLV1LahnAcTCs9WQA
-	j9wTwUF6r8ao0ijYygRZCvFp9Q==
-X-Google-Smtp-Source: AGHT+IHC8wA/VzAMER8S/VGcxkWCjFOqx3Y1pqK7rOci8309HoiJlbcULqFpPT0Baw4zZygiJXHgpQ==
-X-Received: by 2002:a17:903:2302:b0:1bc:2c58:ad97 with SMTP id d2-20020a170903230200b001bc2c58ad97mr1803370plh.22.1694159729351;
-        Fri, 08 Sep 2023 00:55:29 -0700 (PDT)
-Received: from [10.84.152.163] ([203.208.167.147])
-        by smtp.gmail.com with ESMTPSA id i9-20020a1709026ac900b001bde877a7casm942099plt.264.2023.09.08.00.55.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Sep 2023 00:55:28 -0700 (PDT)
-Message-ID: <1d935bfc-50b0-54f3-22f0-d360f8a7c1ac@bytedance.com>
-Date: Fri, 8 Sep 2023 15:55:18 +0800
+        d=1e100.net; s=20230601; t=1694160650; x=1694765450;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LX8a9RtwGTkNLy+xzOfITbjsoPIkf7czyOLexbXeC30=;
+        b=P+sstHbfxdPaeB1jUzwr9OdcRQMAHI4f6NFWgWGscDfwdAPv5W0sY0/2cY3K23Fnae
+         9fyVIMEKRHhOfdt/ee+iXzdiToNMi3jXfLr4ZJr3Kli1vVsLOnJ/pGFDzfTzrlOcOO5d
+         T99jQqZfSC5nmQA5LyrZZ5kMHtEUJRs6XBS5EmhtLGIfNrtcUOH2N8K2oe/dgHVfkc+p
+         UyEX0gkacZwtEm4dxdN9fKYPKBESGS6z2SSc4IfKYe4zubHbQMCsU0TUWvtOtutk1CNp
+         SVO9tKzIU7nZ4ccSLvB+oueV0Ns/1YrvnVuDK752PYtAo/9EeFhDPgh4wxGXo+TtvYRj
+         bqLQ==
+X-Gm-Message-State: AOJu0YwCbLfB1F+Smz/2FktrGQhzGihOw4Gn5WT9ZzJpSj/JqCPISw9W
+	SGWpC+BU0j4qR3eCDVY4B1VKKnJ0imGA497NA98dHQ==
+X-Google-Smtp-Source: AGHT+IEIhWm+dbLokHs4WzlKU9nNAycGL1sYfhy4ej/rUnehmE6v6eMqoNyWh18rq8tDXFFLvVdbX78B2EnbokZq5wM=
+X-Received: by 2002:a5b:c4d:0:b0:d80:14ed:d294 with SMTP id
+ d13-20020a5b0c4d000000b00d8014edd294mr1579706ybr.36.1694160649746; Fri, 08
+ Sep 2023 01:10:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.0
-Subject: Re: [RFC PATCH net-next 0/3] sock: Be aware of memcg pressure on
- alloc
-To: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Morton <akpm@linux-foundation.org>,
- Shakeel Butt <shakeelb@google.com>, Roman Gushchin
- <roman.gushchin@linux.dev>, Michal Hocko <mhocko@suse.com>,
- Johannes Weiner <hannes@cmpxchg.org>, Yosry Ahmed <yosryahmed@google.com>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>, Yu Zhao
- <yuzhao@google.com>, Kefeng Wang <wangkefeng.wang@huawei.com>,
- Yafang Shao <laoar.shao@gmail.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
- Martin KaFai Lau <martin.lau@kernel.org>, Breno Leitao <leitao@debian.org>,
- Alexander Mikhalitsyn <alexander@mihalicyn.com>,
- David Howells <dhowells@redhat.com>, Jason Xing <kernelxing@tencent.com>
-Cc: open list <linux-kernel@vger.kernel.org>,
- "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
- "open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>
-References: <20230901062141.51972-1-wuyun.abel@bytedance.com>
-Content-Language: en-US
-From: Abel Wu <wuyun.abel@bytedance.com>
-In-Reply-To: <20230901062141.51972-1-wuyun.abel@bytedance.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-	autolearn_force=no version=3.4.6
+References: <a03a6e1d-e99c-40a3-bdac-0075b5339beb@gmail.com>
+In-Reply-To: <a03a6e1d-e99c-40a3-bdac-0075b5339beb@gmail.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Fri, 8 Sep 2023 10:10:37 +0200
+Message-ID: <CACRpkdahWm9aP+UasDx=s3th+vyjAfuWrKB5HS9BKEbz90ZmKw@mail.gmail.com>
+Subject: Re: ARM BCM53573 SoC hangs/lockups caused by locks/clock/random changes
+To: =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
+	Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, Daniel Lezcano <daniel.lezcano@linaro.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Florian Fainelli <f.fainelli@gmail.com>, linux-clk@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, openwrt-devel@lists.openwrt.org, 
+	bcm-kernel-feedback-list@broadcom.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Friendly ping :)
+Hi Rafal,
 
-On 9/1/23 2:21 PM, Abel Wu wrote:
-> As a cloud service provider, we encountered a problem in our production
-> environment during the transition from cgroup v1 to v2 (partly due to the
-> heavy taxes of accounting socket memory in v1). Say one workload behaves
-> fine in cgroupv1 with memcg limit configured to 10GB memory and another
-> 1GB tcpmem, but will suck (or even be OOM-killed) in v2 with 11GB memory
-> due to burst memory usage on socket, since there is no specific limit for
-> socket memory in cgroupv2 and relies largely on workloads doing traffic
-> control themselves.
-> 
-> It's rational for the workloads to build some traffic control to better
-> utilize the resources they bought, but from kernel's point of view it's
-> also reasonable to suppress the allocation of socket memory once there is
-> a shortage of free memory, given that performance degradation is usually
-> better than failure.
-> 
-> This patchset aims to be more conservative on alloc for pressure-aware
-> sockets under global and/or memcg pressure, to avoid further memstall or
-> possibly OOM in such case. The patchset includes:
-> 
->    1/3: simple code cleanup, no functional change intended.
->    2/3: record memcg pressure level to enable fine-grained control.
->    3/3: throttle alloc for pressure-aware sockets under pressure.
-> 
-> The whole patchset focuses on the pressure-aware protocols, and should
-> have no/little impact on pressure-unaware protocols like UDP etc.
-> 
-> Tested on Intel Xeon(R) Platinum 8260, a dual socket machine containing 2
-> NUMA nodes each of which has 24C/48T. All the benchmarks are done inside a
-> separate memcg in a clean host.
-> 
->    baseline:	net-next c639a708a0b8
->    compare:	baseline + patchset
-> 
-> case            	load    	baseline(std%)	compare%( std%)
-> tbench-loopback        	thread-24	 1.00 (  0.50)	 -0.98 (  0.87)
-> tbench-loopback        	thread-48	 1.00 (  0.76)	 -0.29 (  0.92)
-> tbench-loopback        	thread-72	 1.00 (  0.75)	 +1.51 (  0.14)
-> tbench-loopback        	thread-96	 1.00 (  4.11)	 +1.29 (  3.73)
-> tbench-loopback        	thread-192	 1.00 (  3.52)	 +1.44 (  3.30)
-> TCP_RR          	thread-24	 1.00 (  1.87)	 -0.87 (  2.40)
-> TCP_RR          	thread-48	 1.00 (  0.92)	 -0.22 (  1.61)
-> TCP_RR          	thread-72	 1.00 (  2.35)	 +2.42 (  2.27)
-> TCP_RR          	thread-96	 1.00 (  2.66)	 -1.37 (  3.02)
-> TCP_RR          	thread-192	 1.00 ( 13.25)	 +0.29 ( 11.80)
-> TCP_STREAM      	thread-24	 1.00 (  1.26)	 -0.75 (  0.87)
-> TCP_STREAM      	thread-48	 1.00 (  0.29)	 -1.55 (  0.14)
-> TCP_STREAM      	thread-72	 1.00 (  0.05)	 -1.59 (  0.05)
-> TCP_STREAM      	thread-96	 1.00 (  0.19)	 -0.06 (  0.29)
-> TCP_STREAM      	thread-192	 1.00 (  0.23)	 -0.01 (  0.28)
-> UDP_RR          	thread-24	 1.00 (  2.27)	 +0.33 (  2.82)
-> UDP_RR          	thread-48	 1.00 (  1.25)	 -0.30 (  1.21)
-> UDP_RR          	thread-72	 1.00 (  2.54)	 +2.99 (  2.34)
-> UDP_RR          	thread-96	 1.00 (  4.76)	 +2.49 (  2.19)
-> UDP_RR          	thread-192	 1.00 ( 14.43)	 -0.02 ( 12.98)
-> UDP_STREAM      	thread-24	 1.00 (107.41)	 -0.48 (106.93)
-> UDP_STREAM      	thread-48	 1.00 (100.85)	 +1.38 (100.59)
-> UDP_STREAM      	thread-72	 1.00 (103.43)	 +1.40 (103.48)
-> UDP_STREAM      	thread-96	 1.00 ( 99.91)	 -0.25 (100.06)
-> UDP_STREAM      	thread-192	 1.00 (109.83)	 -3.67 (104.12)
-> 
-> As patch 3 moves forward traversal of cgroup hierarchy for pressure-aware
-> protocols, which could turn a conditional overhead into constant, tests
-> running inside 5-level-depth cgroups are also performed.
-> 
-> case            	load    	baseline(std%)	compare%( std%)
-> tbench-loopback        	thread-24	 1.00 (  0.59)	 +0.68 (  0.09)
-> tbench-loopback        	thread-48	 1.00 (  0.16)	 +0.01 (  0.26)
-> tbench-loopback        	thread-72	 1.00 (  0.34)	 -0.67 (  0.48)
-> tbench-loopback        	thread-96	 1.00 (  4.40)	 -3.27 (  4.84)
-> tbench-loopback        	thread-192	 1.00 (  0.49)	 -1.07 (  1.18)
-> TCP_RR          	thread-24	 1.00 (  2.40)	 -0.34 (  2.49)
-> TCP_RR          	thread-48	 1.00 (  1.62)	 -0.48 (  1.35)
-> TCP_RR          	thread-72	 1.00 (  1.26)	 +0.46 (  0.95)
-> TCP_RR          	thread-96	 1.00 (  2.98)	 +0.13 (  2.64)
-> TCP_RR          	thread-192	 1.00 ( 13.75)	 -0.20 ( 15.42)
-> TCP_STREAM      	thread-24	 1.00 (  0.21)	 +0.68 (  1.02)
-> TCP_STREAM      	thread-48	 1.00 (  0.20)	 -1.41 (  0.01)
-> TCP_STREAM      	thread-72	 1.00 (  0.09)	 -1.23 (  0.19)
-> TCP_STREAM      	thread-96	 1.00 (  0.01)	 +0.01 (  0.01)
-> TCP_STREAM      	thread-192	 1.00 (  0.20)	 -0.02 (  0.25)
-> UDP_RR          	thread-24	 1.00 (  2.20)	 +0.84 ( 17.45)
-> UDP_RR          	thread-48	 1.00 (  1.34)	 -0.73 (  1.12)
-> UDP_RR          	thread-72	 1.00 (  2.32)	 +0.49 (  2.11)
-> UDP_RR          	thread-96	 1.00 (  2.36)	 +0.53 (  2.42)
-> UDP_RR          	thread-192	 1.00 ( 16.34)	 -0.67 ( 14.06)
-> UDP_STREAM      	thread-24	 1.00 (106.55)	 -0.70 (107.13)
-> UDP_STREAM      	thread-48	 1.00 (105.11)	 +1.60 (103.48)
-> UDP_STREAM      	thread-72	 1.00 (100.60)	 +1.98 (101.13)
-> UDP_STREAM      	thread-96	 1.00 ( 99.91)	 +2.59 (101.04)
-> UDP_STREAM      	thread-192	 1.00 (135.39)	 -2.51 (108.00)
-> 
-> As expected, no obvious performance gain or loss observed. As for the
-> issue we encountered, this patchset provides better worst-case behavior
-> that such OOM cases are reduced at some extent. While further fine-
-> grained traffic control is what the workloads need to think about.
-> 
-> Comments are welcomed! Thanks!
-> 
-> Abel Wu (3):
->    sock: Code cleanup on __sk_mem_raise_allocated()
->    net-memcg: Record pressure level when under pressure
->    sock: Throttle pressure-aware sockets under pressure
-> 
->   include/linux/memcontrol.h | 39 +++++++++++++++++++++++++----
->   include/net/sock.h         |  2 +-
->   include/net/tcp.h          |  2 +-
->   mm/vmpressure.c            |  9 ++++++-
->   net/core/sock.c            | 51 +++++++++++++++++++++++++++++---------
->   5 files changed, 83 insertions(+), 20 deletions(-)
-> 
+On Mon, Sep 4, 2023 at 10:34=E2=80=AFAM Rafa=C5=82 Mi=C5=82ecki <zajec5@gma=
+il.com> wrote:
+
+> I'm clueless at this point.
+> Maybe someone can come up with an idea of actual issue & ideally a
+> solution.
+
+Damn this is frustrating.
+
+> 2. Clock (arm,armv7-timer)
+>
+> While comparing main clock in Broadcom's SDK with upstream one I noticed
+> a tiny difference: mask value. I don't know it it makes any sense but
+> switching from CLOCKSOURCE_MASK(56) to CLOCKSOURCE_MASK(64) in
+> arm_arch_timer.c (to match SDK) increases average uptime (time before a
+> hang/lockup happens) from 4 minutes to 36 minutes.
+
+This could be related to how often the system goes to idle.
+
+> +       if (cpu_idle_force_poll =3D=3D 1234)
+> +               arch_cpu_idle();
+> +       if (cpu_idle_force_poll =3D=3D 5678)
+> +               arch_cpu_idle();
+> +       if (cpu_idle_force_poll =3D=3D 1234)
+> +               arch_cpu_idle();
+> +       if (cpu_idle_force_poll =3D=3D 5678)
+> +               arch_cpu_idle();
+> +       if (cpu_idle_force_poll =3D=3D 1234)
+> +               arch_cpu_idle();
+> +       if (cpu_idle_force_poll =3D=3D 5678)
+> +               arch_cpu_idle();
+> +       if (cpu_idle_force_poll =3D=3D 1234)
+> +               arch_cpu_idle();
+
+Idle again.
+
+I would have tried to see what arch_cpu_idle() is doing.
+
+arm_pm_idle() or cpu_do_idle()?
+
+What happens if you just put return in arch_cpu_idle()
+so it does nothing?
+
+Yours,
+Linus Walleij
 
