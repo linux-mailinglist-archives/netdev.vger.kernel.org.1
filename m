@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-32652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF367798E18
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 20:28:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4536A798E1A
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 20:29:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE6061C20E52
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 18:28:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E318A281DB4
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 18:29:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDB7E16438;
-	Fri,  8 Sep 2023 18:19:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92C3E1643A;
+	Fri,  8 Sep 2023 18:19:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CED11643A
-	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 18:19:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF950C433CD;
-	Fri,  8 Sep 2023 18:19:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20230168AB
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 18:19:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8E7AC116A7;
+	Fri,  8 Sep 2023 18:19:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694197151;
-	bh=u9dEwrOvXbjzBfCMU9FaZiUDZQVrozxBy7cifxEB0KQ=;
+	s=k20201202; t=1694197153;
+	bh=0YXk5J/NyZx5HU6ntAlvQZ93TdO00vwCrjzDesKa/gM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YNtplmLSmAG0+H4Uob6/GTu/Snkde286SocE8gnVae02Kub1+jMTpOPbB0YkgExAt
-	 ZA4+OAS8OWYJ7REUgNhUbIkwCjRirq1n2sSPmsCu4ngyLUVS1+JxCX5NA29DQ7IIaB
-	 81QPTt/neGTgAPLGHONSguESqp0Z+Obs2MHgraBXxQCKMSdvU8ney/jLdfu8/h8SMz
-	 cCiGpLtskkqNcTLmwC/EMjuKos91pgDHXwKqEvea0kcHc5aPWcDq6M1jTcTAQ31OUr
-	 SFrV0n9IOq/UeMjBpjawJixS3RV+WPdT2om7OBoQ6EPcWtVAHetM17xkRhMbGabKtf
-	 dFDeFvfd7I46A==
+	b=oV/uEfKo0e2e5wErv1J/aI7d05JK2AN6Iv/bXrTTBnIDebQqGrTMOQN6UJECvBLMO
+	 sMS7RiepuTsRQNCy0yKYyUtabVB5eojvQ0gAP14d78FTj2gWRKtUaS+eWhgiaLFmcK
+	 jKP+/zNqjc+WObFEo+Dof8be5rNReYMmrbnScepyTWRbr6ZnYb6SU3EUFjQzDk8cfP
+	 KBaHna6L3l25i/suEFkjaE1HjmNpZu3ODD90vdQTt7bIVJ1BDywrundko4Y/7BOonb
+	 10hFzCzg9ly4xsboW3mM5UgstHbTCADD6aapVZqgjQAGdia6vvS4VCojO38pLsfh6w
+	 dhAaJyPsbAHjg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
 Cc: Johannes Berg <johannes.berg@intel.com>,
-	syzbot+09d1cd2f71e6dd3bfd2c@syzkaller.appspotmail.com,
+	syzbot+999fac712d84878a7379@syzkaller.appspotmail.com,
 	Sasha Levin <sashal@kernel.org>,
 	johannes@sipsolutions.net,
 	davem@davemloft.net,
@@ -43,9 +43,9 @@ Cc: Johannes Berg <johannes.berg@intel.com>,
 	pabeni@redhat.com,
 	linux-wireless@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 22/26] wifi: cfg80211: ocb: don't leave if not joined
-Date: Fri,  8 Sep 2023 14:18:00 -0400
-Message-Id: <20230908181806.3460164-22-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 23/26] wifi: mac80211: check for station first in client probe
+Date: Fri,  8 Sep 2023 14:18:01 -0400
+Message-Id: <20230908181806.3460164-23-sashal@kernel.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230908181806.3460164-1-sashal@kernel.org>
 References: <20230908181806.3460164-1-sashal@kernel.org>
@@ -62,33 +62,55 @@ Content-Transfer-Encoding: 8bit
 
 From: Johannes Berg <johannes.berg@intel.com>
 
-[ Upstream commit abc76cf552e13cfa88a204b362a86b0e08e95228 ]
+[ Upstream commit 67dfa589aa8806c7959cbca2f4613b8d41c75a06 ]
 
-If there's no OCB state, don't ask the driver/mac80211 to
-leave, since that's just confusing. Since set/clear the
-chandef state, that's a simple check.
+When probing a client, first check if we have it, and then
+check for the channel context, otherwise you can trigger
+the warning there easily by probing when the AP isn't even
+started yet. Since a client existing means the AP is also
+operating, we can then keep the warning.
 
-Reported-by: syzbot+09d1cd2f71e6dd3bfd2c@syzkaller.appspotmail.com
+Also simplify the moved code a bit.
+
+Reported-by: syzbot+999fac712d84878a7379@syzkaller.appspotmail.com
 Signed-off-by: Johannes Berg <johannes.berg@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/wireless/ocb.c | 3 +++
- 1 file changed, 3 insertions(+)
+ net/mac80211/cfg.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/net/wireless/ocb.c b/net/wireless/ocb.c
-index 27a1732264f95..29afaf3da54f3 100644
---- a/net/wireless/ocb.c
-+++ b/net/wireless/ocb.c
-@@ -68,6 +68,9 @@ int __cfg80211_leave_ocb(struct cfg80211_registered_device *rdev,
- 	if (!rdev->ops->leave_ocb)
- 		return -EOPNOTSUPP;
+diff --git a/net/mac80211/cfg.c b/net/mac80211/cfg.c
+index 23a44edcb11f7..cf3453b532d67 100644
+--- a/net/mac80211/cfg.c
++++ b/net/mac80211/cfg.c
+@@ -3991,19 +3991,20 @@ static int ieee80211_probe_client(struct wiphy *wiphy, struct net_device *dev,
+ 	mutex_lock(&local->mtx);
  
-+	if (!wdev->u.ocb.chandef.chan)
-+		return -ENOTCONN;
+ 	rcu_read_lock();
++	sta = sta_info_get_bss(sdata, peer);
++	if (!sta) {
++		ret = -ENOLINK;
++		goto unlock;
++	}
 +
- 	err = rdev_leave_ocb(rdev, dev);
- 	if (!err)
- 		memset(&wdev->u.ocb.chandef, 0, sizeof(wdev->u.ocb.chandef));
++	qos = sta->sta.wme;
++
+ 	chanctx_conf = rcu_dereference(sdata->vif.bss_conf.chanctx_conf);
+ 	if (WARN_ON(!chanctx_conf)) {
+ 		ret = -EINVAL;
+ 		goto unlock;
+ 	}
+ 	band = chanctx_conf->def.chan->band;
+-	sta = sta_info_get_bss(sdata, peer);
+-	if (sta) {
+-		qos = sta->sta.wme;
+-	} else {
+-		ret = -ENOLINK;
+-		goto unlock;
+-	}
+ 
+ 	if (qos) {
+ 		fc = cpu_to_le16(IEEE80211_FTYPE_DATA |
 -- 
 2.40.1
 
