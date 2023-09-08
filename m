@@ -1,69 +1,54 @@
-Return-Path: <netdev+bounces-32619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED5A1798C6A
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 20:16:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF03D798C81
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 20:16:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDA961C20C40
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 18:16:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F30641C20C8A
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 18:16:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B9F114F75;
-	Fri,  8 Sep 2023 18:14:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F54B14F84;
+	Fri,  8 Sep 2023 18:14:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0389F14F61;
-	Fri,  8 Sep 2023 18:14:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A49D0C43140;
-	Fri,  8 Sep 2023 18:14:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 979FD14A91
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 18:14:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC91EC116AC;
+	Fri,  8 Sep 2023 18:14:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694196867;
-	bh=Q+Kkr+ZYm11zYNlNwZDS25MAglr6vzBpgws0ioLKZS0=;
+	s=k20201202; t=1694196888;
+	bh=4JmxbAUsuRrP9gb+kWwxBR1iJlzniaNx3cPF0ae/ooc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bPmryIPg5gRGnNrSjKMNpmiV0nf7CADMeJGAyovOvc+/yvIH8VxWPUdoXJ0AfpQDZ
-	 T9E7YhoVgCgiSUK0aBPCrmj0rhxhxdU8HQHY9rfklj7C16yybifgz4t+o6n2+5RPLU
-	 3B/uWEK9w5VYkqzR/JrSeshmT86e/xooT0czoJN5e3aU5pZO2NODcZfxJ5xIruR70S
-	 4rlWlSq3efVZpr9NQb8E863MySw7Ot5Ye/qv0Np8kCm0L/0RXpcT2En8lytNg2t8Ha
-	 2d4KbjQBqU07NqKFVU3T9Gi+oiYYyROGhgGKylZBhvF8woIH4ble8ytXDhsv+MRiRx
-	 O4g9QmMDFjwjA==
+	b=HS/0UR5W+Dze+ca3upouHT1AF3jDE3KTS8niWprYdRgxKt+ZyNKJ6Kg8PhmsH2Qy2
+	 hTurfafGpLdBcx0tCzAnQ9HeEF5Q0isFb4Fe3cscV+vovAD67vItUHJoxuBcvWlIwd
+	 dPr4b5kEtUjqMRE7eY8pSooLDwzNySQqsZstsOTaReik720cvOdiQm7Ta6/WRXJ7BG
+	 wqVR7LvxRCHgbA0gnr7HHwdurpAVAjIn4/It2SIXtXTe6mPd8PwDlj+KqT3QFcWEgB
+	 N78R1E5vkK/W5gX1TKoFjfRc/UTamxFe1EL1CL1M7T1GRCqnE6hZ1+1qnQsSq7nuI7
+	 Fa+ObZY3jMCog==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
 Cc: Eric Dumazet <edumazet@google.com>,
 	syzbot <syzkaller@googlegroups.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	davem@davemloft.net,
+	kuba@kernel.org,
 	pabeni@redhat.com,
-	ericvh@kernel.org,
-	lucho@ionkov.net,
-	asmadeus@codewreck.org,
-	john.fastabend@gmail.com,
-	jakub@cloudflare.com,
-	dsahern@kernel.org,
-	matthieu.baerts@tessares.net,
-	martineau@kernel.org,
-	kevin.brodsky@arm.com,
-	alexander@mihalicyn.com,
-	leitao@debian.org,
-	lucien.xin@gmail.com,
-	dhowells@redhat.com,
-	kernelxing@tencent.com,
+	keescook@chromium.org,
+	anjali.k.kulkarni@oracle.com,
 	andriy.shevchenko@linux.intel.com,
-	axboe@kernel.dk,
-	asml.silence@gmail.com,
-	netdev@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	bpf@vger.kernel.org,
-	mptcp@lists.linux.dev
-Subject: [PATCH AUTOSEL 6.5 19/45] net: annotate data-races around sock->ops
-Date: Fri,  8 Sep 2023 14:13:00 -0400
-Message-Id: <20230908181327.3459042-19-sashal@kernel.org>
+	kuniyu@amazon.com,
+	fw@strlen.de,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.5 27/45] netlink: convert nlk->flags to atomic flags
+Date: Fri,  8 Sep 2023 14:13:08 -0400
+Message-Id: <20230908181327.3459042-27-sashal@kernel.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230908181327.3459042-1-sashal@kernel.org>
 References: <20230908181327.3459042-1-sashal@kernel.org>
@@ -80,775 +65,347 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Dumazet <edumazet@google.com>
 
-[ Upstream commit 1ded5e5a5931bb8b31e15b63b655fe232e3416b2 ]
+[ Upstream commit 8fe08d70a2b61b35a0a1235c78cf321e7528351f ]
 
-IPV6_ADDRFORM socket option is evil, because it can change sock->ops
-while other threads might read it. Same issue for sk->sk_family
-being set to AF_INET.
+sk_diag_put_flags(), netlink_setsockopt(), netlink_getsockopt()
+and others use nlk->flags without correct locking.
 
-Adding READ_ONCE() over sock->ops reads is needed for sockets
-that might be impacted by IPV6_ADDRFORM.
-
-Note that mptcp_is_tcpsk() can also overwrite sock->ops.
-
-Adding annotations for all sk->sk_family reads will require
-more patches :/
-
-BUG: KCSAN: data-race in ____sys_sendmsg / do_ipv6_setsockopt
-
-write to 0xffff888109f24ca0 of 8 bytes by task 4470 on cpu 0:
-do_ipv6_setsockopt+0x2c5e/0x2ce0 net/ipv6/ipv6_sockglue.c:491
-ipv6_setsockopt+0x57/0x130 net/ipv6/ipv6_sockglue.c:1012
-udpv6_setsockopt+0x95/0xa0 net/ipv6/udp.c:1690
-sock_common_setsockopt+0x61/0x70 net/core/sock.c:3663
-__sys_setsockopt+0x1c3/0x230 net/socket.c:2273
-__do_sys_setsockopt net/socket.c:2284 [inline]
-__se_sys_setsockopt net/socket.c:2281 [inline]
-__x64_sys_setsockopt+0x66/0x80 net/socket.c:2281
-do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
-entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-read to 0xffff888109f24ca0 of 8 bytes by task 4469 on cpu 1:
-sock_sendmsg_nosec net/socket.c:724 [inline]
-sock_sendmsg net/socket.c:747 [inline]
-____sys_sendmsg+0x349/0x4c0 net/socket.c:2503
-___sys_sendmsg net/socket.c:2557 [inline]
-__sys_sendmmsg+0x263/0x500 net/socket.c:2643
-__do_sys_sendmmsg net/socket.c:2672 [inline]
-__se_sys_sendmmsg net/socket.c:2669 [inline]
-__x64_sys_sendmmsg+0x57/0x60 net/socket.c:2669
-do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
-entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-value changed: 0xffffffff850e32b8 -> 0xffffffff850da890
-
-Reported by Kernel Concurrency Sanitizer on:
-CPU: 1 PID: 4469 Comm: syz-executor.1 Not tainted 6.4.0-rc5-syzkaller-00313-g4c605260bc60 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/25/2023
+Use set_bit(), clear_bit(), test_bit(), assign_bit() to remove
+data-races.
 
 Reported-by: syzbot <syzkaller@googlegroups.com>
 Signed-off-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-Link: https://lore.kernel.org/r/20230808135809.2300241-1-edumazet@google.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- include/linux/net.h      |   2 +-
- net/9p/trans_fd.c        |   4 +-
- net/core/scm.c           |   3 +-
- net/core/skmsg.c         |   8 ++-
- net/core/sock.c          |  24 +++++--
- net/ipv6/ipv6_sockglue.c |   8 +--
- net/mptcp/protocol.c     |   8 +--
- net/socket.c             | 136 +++++++++++++++++++++++----------------
- net/unix/scm.c           |   3 +-
- 9 files changed, 118 insertions(+), 78 deletions(-)
+ net/netlink/af_netlink.c | 90 ++++++++++++++--------------------------
+ net/netlink/af_netlink.h | 22 ++++++----
+ net/netlink/diag.c       | 10 ++---
+ 3 files changed, 48 insertions(+), 74 deletions(-)
 
-diff --git a/include/linux/net.h b/include/linux/net.h
-index 41c608c1b02c2..c9b4a63791a45 100644
---- a/include/linux/net.h
-+++ b/include/linux/net.h
-@@ -123,7 +123,7 @@ struct socket {
+diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
+index 3836318737483..20082171f24a3 100644
+--- a/net/netlink/af_netlink.c
++++ b/net/netlink/af_netlink.c
+@@ -84,7 +84,7 @@ struct listeners {
  
- 	struct file		*file;
- 	struct sock		*sk;
--	const struct proto_ops	*ops;
-+	const struct proto_ops	*ops; /* Might change with IPV6_ADDRFORM or MPTCP. */
- 
- 	struct socket_wq	wq;
- };
-diff --git a/net/9p/trans_fd.c b/net/9p/trans_fd.c
-index 00b684616e8d9..c4015f30f9fa7 100644
---- a/net/9p/trans_fd.c
-+++ b/net/9p/trans_fd.c
-@@ -1019,7 +1019,7 @@ p9_fd_create_tcp(struct p9_client *client, const char *addr, char *args)
- 		}
- 	}
- 
--	err = csocket->ops->connect(csocket,
-+	err = READ_ONCE(csocket->ops)->connect(csocket,
- 				    (struct sockaddr *)&sin_server,
- 				    sizeof(struct sockaddr_in), 0);
- 	if (err < 0) {
-@@ -1060,7 +1060,7 @@ p9_fd_create_unix(struct p9_client *client, const char *addr, char *args)
- 
- 		return err;
- 	}
--	err = csocket->ops->connect(csocket, (struct sockaddr *)&sun_server,
-+	err = READ_ONCE(csocket->ops)->connect(csocket, (struct sockaddr *)&sun_server,
- 			sizeof(struct sockaddr_un) - 1, 0);
- 	if (err < 0) {
- 		pr_err("%s (%d): problem connecting socket: %s: %d\n",
-diff --git a/net/core/scm.c b/net/core/scm.c
-index 3cd7dd377e53f..880027ecf5165 100644
---- a/net/core/scm.c
-+++ b/net/core/scm.c
-@@ -130,6 +130,7 @@ EXPORT_SYMBOL(__scm_destroy);
- 
- int __scm_send(struct socket *sock, struct msghdr *msg, struct scm_cookie *p)
+ static inline int netlink_is_kernel(struct sock *sk)
  {
-+	const struct proto_ops *ops = READ_ONCE(sock->ops);
- 	struct cmsghdr *cmsg;
- 	int err;
+-	return nlk_sk(sk)->flags & NETLINK_F_KERNEL_SOCKET;
++	return nlk_test_bit(KERNEL_SOCKET, sk);
+ }
  
-@@ -153,7 +154,7 @@ int __scm_send(struct socket *sock, struct msghdr *msg, struct scm_cookie *p)
- 		switch (cmsg->cmsg_type)
- 		{
- 		case SCM_RIGHTS:
--			if (!sock->ops || sock->ops->family != PF_UNIX)
-+			if (!ops || ops->family != PF_UNIX)
- 				goto error;
- 			err=scm_fp_copy(cmsg, &p->fp);
- 			if (err<0)
-diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-index ef1a2eb6520bf..a0659fc29bcca 100644
---- a/net/core/skmsg.c
-+++ b/net/core/skmsg.c
-@@ -1204,13 +1204,17 @@ static int sk_psock_verdict_recv(struct sock *sk, struct sk_buff *skb)
- static void sk_psock_verdict_data_ready(struct sock *sk)
+ struct netlink_table *nl_table __read_mostly;
+@@ -349,9 +349,7 @@ static void netlink_deliver_tap_kernel(struct sock *dst, struct sock *src,
+ 
+ static void netlink_overrun(struct sock *sk)
  {
- 	struct socket *sock = sk->sk_socket;
-+	const struct proto_ops *ops;
- 	int copied;
- 
- 	trace_sk_data_ready(sk);
- 
--	if (unlikely(!sock || !sock->ops || !sock->ops->read_skb))
-+	if (unlikely(!sock))
- 		return;
--	copied = sock->ops->read_skb(sk, sk_psock_verdict_recv);
-+	ops = READ_ONCE(sock->ops);
-+	if (!ops || !ops->read_skb)
-+		return;
-+	copied = ops->read_skb(sk, sk_psock_verdict_recv);
- 	if (copied >= 0) {
- 		struct sk_psock *psock;
- 
-diff --git a/net/core/sock.c b/net/core/sock.c
-index a80b6b8633edc..9d4560db7c26e 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -1283,14 +1283,19 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
- 		break;
- 
- 	case SO_RCVLOWAT:
-+		{
-+		int (*set_rcvlowat)(struct sock *sk, int val) = NULL;
-+
- 		if (val < 0)
- 			val = INT_MAX;
--		if (sock && sock->ops->set_rcvlowat)
--			ret = sock->ops->set_rcvlowat(sk, val);
-+		if (sock)
-+			set_rcvlowat = READ_ONCE(sock->ops)->set_rcvlowat;
-+		if (set_rcvlowat)
-+			ret = set_rcvlowat(sk, val);
- 		else
- 			WRITE_ONCE(sk->sk_rcvlowat, val ? : 1);
- 		break;
+-	struct netlink_sock *nlk = nlk_sk(sk);
 -
-+		}
- 	case SO_RCVTIMEO_OLD:
- 	case SO_RCVTIMEO_NEW:
- 		ret = sock_set_timeout(&sk->sk_rcvtimeo, optval,
-@@ -1388,11 +1393,16 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
- 		break;
+-	if (!(nlk->flags & NETLINK_F_RECV_NO_ENOBUFS)) {
++	if (!nlk_test_bit(RECV_NO_ENOBUFS, sk)) {
+ 		if (!test_and_set_bit(NETLINK_S_CONGESTED,
+ 				      &nlk_sk(sk)->state)) {
+ 			sk->sk_err = ENOBUFS;
+@@ -1402,9 +1400,7 @@ EXPORT_SYMBOL_GPL(netlink_has_listeners);
  
- 	case SO_PEEK_OFF:
--		if (sock->ops->set_peek_off)
--			ret = sock->ops->set_peek_off(sk, val);
-+		{
-+		int (*set_peek_off)(struct sock *sk, int val);
-+
-+		set_peek_off = READ_ONCE(sock->ops)->set_peek_off;
-+		if (set_peek_off)
-+			ret = set_peek_off(sk, val);
- 		else
- 			ret = -EOPNOTSUPP;
- 		break;
-+		}
+ bool netlink_strict_get_check(struct sk_buff *skb)
+ {
+-	const struct netlink_sock *nlk = nlk_sk(NETLINK_CB(skb).sk);
+-
+-	return nlk->flags & NETLINK_F_STRICT_CHK;
++	return nlk_test_bit(STRICT_CHK, NETLINK_CB(skb).sk);
+ }
+ EXPORT_SYMBOL_GPL(netlink_strict_get_check);
  
- 	case SO_NOFCS:
- 		sock_valbool_flag(sk, SOCK_NOFCS, valbool);
-@@ -1825,7 +1835,7 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
- 	{
- 		struct sockaddr_storage address;
+@@ -1448,7 +1444,7 @@ static void do_one_broadcast(struct sock *sk,
+ 		return;
  
--		lv = sock->ops->getname(sock, (struct sockaddr *)&address, 2);
-+		lv = READ_ONCE(sock->ops)->getname(sock, (struct sockaddr *)&address, 2);
- 		if (lv < 0)
- 			return -ENOTCONN;
- 		if (lv < len)
-@@ -1867,7 +1877,7 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
- 		break;
+ 	if (!net_eq(sock_net(sk), p->net)) {
+-		if (!(nlk->flags & NETLINK_F_LISTEN_ALL_NSID))
++		if (!nlk_test_bit(LISTEN_ALL_NSID, sk))
+ 			return;
  
- 	case SO_PEEK_OFF:
--		if (!sock->ops->set_peek_off)
-+		if (!READ_ONCE(sock->ops)->set_peek_off)
- 			return -EOPNOTSUPP;
- 
- 		v.val = READ_ONCE(sk->sk_peek_off);
-diff --git a/net/ipv6/ipv6_sockglue.c b/net/ipv6/ipv6_sockglue.c
-index ae818ff462248..ca377159967c8 100644
---- a/net/ipv6/ipv6_sockglue.c
-+++ b/net/ipv6/ipv6_sockglue.c
-@@ -474,8 +474,8 @@ int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
- 				WRITE_ONCE(sk->sk_prot, &tcp_prot);
- 				/* Paired with READ_ONCE() in tcp_(get|set)sockopt() */
- 				WRITE_ONCE(icsk->icsk_af_ops, &ipv4_specific);
--				sk->sk_socket->ops = &inet_stream_ops;
--				sk->sk_family = PF_INET;
-+				WRITE_ONCE(sk->sk_socket->ops, &inet_stream_ops);
-+				WRITE_ONCE(sk->sk_family, PF_INET);
- 				tcp_sync_mss(sk, icsk->icsk_pmtu_cookie);
- 			} else {
- 				struct proto *prot = &udp_prot;
-@@ -488,8 +488,8 @@ int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
- 
- 				/* Paired with READ_ONCE(sk->sk_prot) in inet6_dgram_ops */
- 				WRITE_ONCE(sk->sk_prot, prot);
--				sk->sk_socket->ops = &inet_dgram_ops;
--				sk->sk_family = PF_INET;
-+				WRITE_ONCE(sk->sk_socket->ops, &inet_dgram_ops);
-+				WRITE_ONCE(sk->sk_family, PF_INET);
- 			}
- 
- 			/* Disable all options not to allocate memory anymore,
-diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index d80658547836f..a7d1130dfe329 100644
---- a/net/mptcp/protocol.c
-+++ b/net/mptcp/protocol.c
-@@ -67,11 +67,11 @@ static bool mptcp_is_tcpsk(struct sock *sk)
- 		 * Hand the socket over to tcp so all further socket ops
- 		 * bypass mptcp.
- 		 */
--		sock->ops = &inet_stream_ops;
-+		WRITE_ONCE(sock->ops, &inet_stream_ops);
- 		return true;
- #if IS_ENABLED(CONFIG_MPTCP_IPV6)
- 	} else if (unlikely(sk->sk_prot == &tcpv6_prot)) {
--		sock->ops = &inet6_stream_ops;
-+		WRITE_ONCE(sock->ops, &inet6_stream_ops);
- 		return true;
- #endif
+ 		if (!peernet_has_id(sock_net(sk), p->net))
+@@ -1481,7 +1477,7 @@ static void do_one_broadcast(struct sock *sk,
+ 		netlink_overrun(sk);
+ 		/* Clone failed. Notify ALL listeners. */
+ 		p->failure = 1;
+-		if (nlk->flags & NETLINK_F_BROADCAST_SEND_ERROR)
++		if (nlk_test_bit(BROADCAST_SEND_ERROR, sk))
+ 			p->delivery_failure = 1;
+ 		goto out;
  	}
-@@ -3684,7 +3684,7 @@ static int mptcp_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
- 		goto unlock;
+@@ -1496,7 +1492,7 @@ static void do_one_broadcast(struct sock *sk,
+ 	val = netlink_broadcast_deliver(sk, p->skb2);
+ 	if (val < 0) {
+ 		netlink_overrun(sk);
+-		if (nlk->flags & NETLINK_F_BROADCAST_SEND_ERROR)
++		if (nlk_test_bit(BROADCAST_SEND_ERROR, sk))
+ 			p->delivery_failure = 1;
+ 	} else {
+ 		p->congested |= val;
+@@ -1576,7 +1572,7 @@ static int do_one_set_err(struct sock *sk, struct netlink_set_err_data *p)
+ 	    !test_bit(p->group - 1, nlk->groups))
+ 		goto out;
+ 
+-	if (p->code == ENOBUFS && nlk->flags & NETLINK_F_RECV_NO_ENOBUFS) {
++	if (p->code == ENOBUFS && nlk_test_bit(RECV_NO_ENOBUFS, sk)) {
+ 		ret = 1;
+ 		goto out;
+ 	}
+@@ -1643,7 +1639,7 @@ static int netlink_setsockopt(struct socket *sock, int level, int optname,
+ 	struct sock *sk = sock->sk;
+ 	struct netlink_sock *nlk = nlk_sk(sk);
+ 	unsigned int val = 0;
+-	int err;
++	int nr = -1;
+ 
+ 	if (level != SOL_NETLINK)
+ 		return -ENOPROTOOPT;
+@@ -1654,14 +1650,12 @@ static int netlink_setsockopt(struct socket *sock, int level, int optname,
+ 
+ 	switch (optname) {
+ 	case NETLINK_PKTINFO:
+-		if (val)
+-			nlk->flags |= NETLINK_F_RECV_PKTINFO;
+-		else
+-			nlk->flags &= ~NETLINK_F_RECV_PKTINFO;
+-		err = 0;
++		nr = NETLINK_F_RECV_PKTINFO;
+ 		break;
+ 	case NETLINK_ADD_MEMBERSHIP:
+ 	case NETLINK_DROP_MEMBERSHIP: {
++		int err;
++
+ 		if (!netlink_allowed(sock, NL_CFG_F_NONROOT_RECV))
+ 			return -EPERM;
+ 		err = netlink_realloc_groups(sk);
+@@ -1681,61 +1675,38 @@ static int netlink_setsockopt(struct socket *sock, int level, int optname,
+ 		if (optname == NETLINK_DROP_MEMBERSHIP && nlk->netlink_unbind)
+ 			nlk->netlink_unbind(sock_net(sk), val);
+ 
+-		err = 0;
+ 		break;
+ 	}
+ 	case NETLINK_BROADCAST_ERROR:
+-		if (val)
+-			nlk->flags |= NETLINK_F_BROADCAST_SEND_ERROR;
+-		else
+-			nlk->flags &= ~NETLINK_F_BROADCAST_SEND_ERROR;
+-		err = 0;
++		nr = NETLINK_F_BROADCAST_SEND_ERROR;
+ 		break;
+ 	case NETLINK_NO_ENOBUFS:
++		assign_bit(NETLINK_F_RECV_NO_ENOBUFS, &nlk->flags, val);
+ 		if (val) {
+-			nlk->flags |= NETLINK_F_RECV_NO_ENOBUFS;
+ 			clear_bit(NETLINK_S_CONGESTED, &nlk->state);
+ 			wake_up_interruptible(&nlk->wait);
+-		} else {
+-			nlk->flags &= ~NETLINK_F_RECV_NO_ENOBUFS;
+ 		}
+-		err = 0;
+ 		break;
+ 	case NETLINK_LISTEN_ALL_NSID:
+ 		if (!ns_capable(sock_net(sk)->user_ns, CAP_NET_BROADCAST))
+ 			return -EPERM;
+-
+-		if (val)
+-			nlk->flags |= NETLINK_F_LISTEN_ALL_NSID;
+-		else
+-			nlk->flags &= ~NETLINK_F_LISTEN_ALL_NSID;
+-		err = 0;
++		nr = NETLINK_F_LISTEN_ALL_NSID;
+ 		break;
+ 	case NETLINK_CAP_ACK:
+-		if (val)
+-			nlk->flags |= NETLINK_F_CAP_ACK;
+-		else
+-			nlk->flags &= ~NETLINK_F_CAP_ACK;
+-		err = 0;
++		nr = NETLINK_F_CAP_ACK;
+ 		break;
+ 	case NETLINK_EXT_ACK:
+-		if (val)
+-			nlk->flags |= NETLINK_F_EXT_ACK;
+-		else
+-			nlk->flags &= ~NETLINK_F_EXT_ACK;
+-		err = 0;
++		nr = NETLINK_F_EXT_ACK;
+ 		break;
+ 	case NETLINK_GET_STRICT_CHK:
+-		if (val)
+-			nlk->flags |= NETLINK_F_STRICT_CHK;
+-		else
+-			nlk->flags &= ~NETLINK_F_STRICT_CHK;
+-		err = 0;
++		nr = NETLINK_F_STRICT_CHK;
+ 		break;
+ 	default:
+-		err = -ENOPROTOOPT;
++		return -ENOPROTOOPT;
+ 	}
+-	return err;
++	if (nr >= 0)
++		assign_bit(nr, &nlk->flags, val);
++	return 0;
+ }
+ 
+ static int netlink_getsockopt(struct socket *sock, int level, int optname,
+@@ -1802,7 +1773,7 @@ static int netlink_getsockopt(struct socket *sock, int level, int optname,
+ 		return -EINVAL;
+ 
+ 	len = sizeof(int);
+-	val = nlk->flags & flag ? 1 : 0;
++	val = test_bit(flag, &nlk->flags);
+ 
+ 	if (put_user(len, optlen) ||
+ 	    copy_to_user(optval, &val, len))
+@@ -1979,9 +1950,9 @@ static int netlink_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+ 		msg->msg_namelen = sizeof(*addr);
  	}
  
--	err = ssock->ops->bind(ssock, uaddr, addr_len);
-+	err = READ_ONCE(ssock->ops)->bind(ssock, uaddr, addr_len);
- 	if (!err)
- 		mptcp_copy_inaddrs(sock->sk, ssock->sk);
+-	if (nlk->flags & NETLINK_F_RECV_PKTINFO)
++	if (nlk_test_bit(RECV_PKTINFO, sk))
+ 		netlink_cmsg_recv_pktinfo(msg, skb);
+-	if (nlk->flags & NETLINK_F_LISTEN_ALL_NSID)
++	if (nlk_test_bit(LISTEN_ALL_NSID, sk))
+ 		netlink_cmsg_listen_all_nsid(sk, msg, skb);
  
-@@ -3718,7 +3718,7 @@ static int mptcp_listen(struct socket *sock, int backlog)
- 	inet_sk_state_store(sk, TCP_LISTEN);
- 	sock_set_flag(sk, SOCK_RCU_FREE);
+ 	memset(&scm, 0, sizeof(scm));
+@@ -2058,7 +2029,7 @@ __netlink_kernel_create(struct net *net, int unit, struct module *module,
+ 		goto out_sock_release;
  
--	err = ssock->ops->listen(ssock, backlog);
-+	err = READ_ONCE(ssock->ops)->listen(ssock, backlog);
- 	inet_sk_state_store(sk, inet_sk_state_load(ssock->sk));
- 	if (!err) {
- 		sock_prot_inuse_add(sock_net(sk), sk->sk_prot, 1);
-diff --git a/net/socket.c b/net/socket.c
-index 2b0e54b2405c8..5d4e37595e9aa 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -136,9 +136,10 @@ static void sock_splice_eof(struct file *file);
- static void sock_show_fdinfo(struct seq_file *m, struct file *f)
+ 	nlk = nlk_sk(sk);
+-	nlk->flags |= NETLINK_F_KERNEL_SOCKET;
++	set_bit(NETLINK_F_KERNEL_SOCKET, &nlk->flags);
+ 
+ 	netlink_table_grab();
+ 	if (!nl_table[unit].registered) {
+@@ -2192,7 +2163,7 @@ static int netlink_dump_done(struct netlink_sock *nlk, struct sk_buff *skb,
+ 	nl_dump_check_consistent(cb, nlh);
+ 	memcpy(nlmsg_data(nlh), &nlk->dump_done_errno, sizeof(nlk->dump_done_errno));
+ 
+-	if (extack->_msg && nlk->flags & NETLINK_F_EXT_ACK) {
++	if (extack->_msg && test_bit(NETLINK_F_EXT_ACK, &nlk->flags)) {
+ 		nlh->nlmsg_flags |= NLM_F_ACK_TLVS;
+ 		if (!nla_put_string(skb, NLMSGERR_ATTR_MSG, extack->_msg))
+ 			nlmsg_end(skb, nlh);
+@@ -2321,8 +2292,8 @@ int __netlink_dump_start(struct sock *ssk, struct sk_buff *skb,
+ 			 const struct nlmsghdr *nlh,
+ 			 struct netlink_dump_control *control)
  {
- 	struct socket *sock = f->private_data;
-+	const struct proto_ops *ops = READ_ONCE(sock->ops);
- 
--	if (sock->ops->show_fdinfo)
--		sock->ops->show_fdinfo(m, sock);
-+	if (ops->show_fdinfo)
-+		ops->show_fdinfo(m, sock);
- }
- #else
- #define sock_show_fdinfo NULL
-@@ -646,12 +647,14 @@ EXPORT_SYMBOL(sock_alloc);
- 
- static void __sock_release(struct socket *sock, struct inode *inode)
- {
--	if (sock->ops) {
--		struct module *owner = sock->ops->owner;
-+	const struct proto_ops *ops = READ_ONCE(sock->ops);
-+
-+	if (ops) {
-+		struct module *owner = ops->owner;
- 
- 		if (inode)
- 			inode_lock(inode);
--		sock->ops->release(sock);
-+		ops->release(sock);
- 		sock->sk = NULL;
- 		if (inode)
- 			inode_unlock(inode);
-@@ -722,7 +725,7 @@ static noinline void call_trace_sock_send_length(struct sock *sk, int ret,
- 
- static inline int sock_sendmsg_nosec(struct socket *sock, struct msghdr *msg)
- {
--	int ret = INDIRECT_CALL_INET(sock->ops->sendmsg, inet6_sendmsg,
-+	int ret = INDIRECT_CALL_INET(READ_ONCE(sock->ops)->sendmsg, inet6_sendmsg,
- 				     inet_sendmsg, sock, msg,
- 				     msg_data_left(msg));
- 	BUG_ON(ret == -EIOCBQUEUED);
-@@ -786,13 +789,14 @@ int kernel_sendmsg_locked(struct sock *sk, struct msghdr *msg,
- 			  struct kvec *vec, size_t num, size_t size)
- {
- 	struct socket *sock = sk->sk_socket;
-+	const struct proto_ops *ops = READ_ONCE(sock->ops);
- 
--	if (!sock->ops->sendmsg_locked)
-+	if (!ops->sendmsg_locked)
- 		return sock_no_sendmsg_locked(sk, msg, size);
- 
- 	iov_iter_kvec(&msg->msg_iter, ITER_SOURCE, vec, num, size);
- 
--	return sock->ops->sendmsg_locked(sk, msg, msg_data_left(msg));
-+	return ops->sendmsg_locked(sk, msg, msg_data_left(msg));
- }
- EXPORT_SYMBOL(kernel_sendmsg_locked);
- 
-@@ -1017,7 +1021,8 @@ static noinline void call_trace_sock_recv_length(struct sock *sk, int ret, int f
- static inline int sock_recvmsg_nosec(struct socket *sock, struct msghdr *msg,
- 				     int flags)
- {
--	int ret = INDIRECT_CALL_INET(sock->ops->recvmsg, inet6_recvmsg,
-+	int ret = INDIRECT_CALL_INET(READ_ONCE(sock->ops)->recvmsg,
-+				     inet6_recvmsg,
- 				     inet_recvmsg, sock, msg,
- 				     msg_data_left(msg), flags);
- 	if (trace_sock_recv_length_enabled())
-@@ -1072,19 +1077,23 @@ static ssize_t sock_splice_read(struct file *file, loff_t *ppos,
- 				unsigned int flags)
- {
- 	struct socket *sock = file->private_data;
-+	const struct proto_ops *ops;
- 
--	if (unlikely(!sock->ops->splice_read))
-+	ops = READ_ONCE(sock->ops);
-+	if (unlikely(!ops->splice_read))
- 		return copy_splice_read(file, ppos, pipe, len, flags);
- 
--	return sock->ops->splice_read(sock, ppos, pipe, len, flags);
-+	return ops->splice_read(sock, ppos, pipe, len, flags);
- }
- 
- static void sock_splice_eof(struct file *file)
- {
- 	struct socket *sock = file->private_data;
-+	const struct proto_ops *ops;
- 
--	if (sock->ops->splice_eof)
--		sock->ops->splice_eof(sock);
-+	ops = READ_ONCE(sock->ops);
-+	if (ops->splice_eof)
-+		ops->splice_eof(sock);
- }
- 
- static ssize_t sock_read_iter(struct kiocb *iocb, struct iov_iter *to)
-@@ -1181,13 +1190,14 @@ EXPORT_SYMBOL(vlan_ioctl_set);
- static long sock_do_ioctl(struct net *net, struct socket *sock,
- 			  unsigned int cmd, unsigned long arg)
- {
-+	const struct proto_ops *ops = READ_ONCE(sock->ops);
- 	struct ifreq ifr;
- 	bool need_copyout;
- 	int err;
- 	void __user *argp = (void __user *)arg;
- 	void __user *data;
- 
--	err = sock->ops->ioctl(sock, cmd, arg);
-+	err = ops->ioctl(sock, cmd, arg);
- 
- 	/*
- 	 * If this ioctl is unknown try to hand it down
-@@ -1216,6 +1226,7 @@ static long sock_do_ioctl(struct net *net, struct socket *sock,
- 
- static long sock_ioctl(struct file *file, unsigned cmd, unsigned long arg)
- {
-+	const struct proto_ops  *ops;
- 	struct socket *sock;
+-	struct netlink_sock *nlk, *nlk2;
+ 	struct netlink_callback *cb;
++	struct netlink_sock *nlk;
  	struct sock *sk;
- 	void __user *argp = (void __user *)arg;
-@@ -1223,6 +1234,7 @@ static long sock_ioctl(struct file *file, unsigned cmd, unsigned long arg)
- 	struct net *net;
+ 	int ret;
  
- 	sock = file->private_data;
-+	ops = READ_ONCE(sock->ops);
- 	sk = sock->sk;
- 	net = sock_net(sk);
- 	if (unlikely(cmd >= SIOCDEVPRIVATE && cmd <= (SIOCDEVPRIVATE + 15))) {
-@@ -1280,23 +1292,23 @@ static long sock_ioctl(struct file *file, unsigned cmd, unsigned long arg)
- 			break;
- 		case SIOCGSTAMP_OLD:
- 		case SIOCGSTAMPNS_OLD:
--			if (!sock->ops->gettstamp) {
-+			if (!ops->gettstamp) {
- 				err = -ENOIOCTLCMD;
- 				break;
- 			}
--			err = sock->ops->gettstamp(sock, argp,
--						   cmd == SIOCGSTAMP_OLD,
--						   !IS_ENABLED(CONFIG_64BIT));
-+			err = ops->gettstamp(sock, argp,
-+					     cmd == SIOCGSTAMP_OLD,
-+					     !IS_ENABLED(CONFIG_64BIT));
- 			break;
- 		case SIOCGSTAMP_NEW:
- 		case SIOCGSTAMPNS_NEW:
--			if (!sock->ops->gettstamp) {
-+			if (!ops->gettstamp) {
- 				err = -ENOIOCTLCMD;
- 				break;
- 			}
--			err = sock->ops->gettstamp(sock, argp,
--						   cmd == SIOCGSTAMP_NEW,
--						   false);
-+			err = ops->gettstamp(sock, argp,
-+					     cmd == SIOCGSTAMP_NEW,
-+					     false);
- 			break;
+@@ -2357,8 +2328,7 @@ int __netlink_dump_start(struct sock *ssk, struct sk_buff *skb,
+ 	cb->min_dump_alloc = control->min_dump_alloc;
+ 	cb->skb = skb;
  
- 		case SIOCGIFCONF:
-@@ -1357,9 +1369,10 @@ EXPORT_SYMBOL(sock_create_lite);
- static __poll_t sock_poll(struct file *file, poll_table *wait)
+-	nlk2 = nlk_sk(NETLINK_CB(skb).sk);
+-	cb->strict_check = !!(nlk2->flags & NETLINK_F_STRICT_CHK);
++	cb->strict_check = nlk_test_bit(STRICT_CHK, NETLINK_CB(skb).sk);
+ 
+ 	if (control->start) {
+ 		cb->extack = control->extack;
+@@ -2402,7 +2372,7 @@ netlink_ack_tlv_len(struct netlink_sock *nlk, int err,
  {
- 	struct socket *sock = file->private_data;
-+	const struct proto_ops *ops = READ_ONCE(sock->ops);
- 	__poll_t events = poll_requested_events(wait), flag = 0;
+ 	size_t tlvlen;
  
--	if (!sock->ops->poll)
-+	if (!ops->poll)
+-	if (!extack || !(nlk->flags & NETLINK_F_EXT_ACK))
++	if (!extack || !test_bit(NETLINK_F_EXT_ACK, &nlk->flags))
  		return 0;
  
- 	if (sk_can_busy_loop(sock->sk)) {
-@@ -1371,14 +1384,14 @@ static __poll_t sock_poll(struct file *file, poll_table *wait)
- 		flag = POLL_BUSY_LOOP;
- 	}
- 
--	return sock->ops->poll(file, sock, wait) | flag;
-+	return ops->poll(file, sock, wait) | flag;
- }
- 
- static int sock_mmap(struct file *file, struct vm_area_struct *vma)
- {
- 	struct socket *sock = file->private_data;
- 
--	return sock->ops->mmap(file, sock, vma);
-+	return READ_ONCE(sock->ops)->mmap(file, sock, vma);
- }
- 
- static int sock_close(struct inode *inode, struct file *filp)
-@@ -1728,7 +1741,7 @@ int __sys_socketpair(int family, int type, int protocol, int __user *usockvec)
- 		goto out;
- 	}
- 
--	err = sock1->ops->socketpair(sock1, sock2);
-+	err = READ_ONCE(sock1->ops)->socketpair(sock1, sock2);
- 	if (unlikely(err < 0)) {
- 		sock_release(sock2);
- 		sock_release(sock1);
-@@ -1789,7 +1802,7 @@ int __sys_bind(int fd, struct sockaddr __user *umyaddr, int addrlen)
- 						   (struct sockaddr *)&address,
- 						   addrlen);
- 			if (!err)
--				err = sock->ops->bind(sock,
-+				err = READ_ONCE(sock->ops)->bind(sock,
- 						      (struct sockaddr *)
- 						      &address, addrlen);
- 		}
-@@ -1823,7 +1836,7 @@ int __sys_listen(int fd, int backlog)
- 
- 		err = security_socket_listen(sock, backlog);
- 		if (!err)
--			err = sock->ops->listen(sock, backlog);
-+			err = READ_ONCE(sock->ops)->listen(sock, backlog);
- 
- 		fput_light(sock->file, fput_needed);
- 	}
-@@ -1843,6 +1856,7 @@ struct file *do_accept(struct file *file, unsigned file_flags,
- 	struct file *newfile;
- 	int err, len;
- 	struct sockaddr_storage address;
-+	const struct proto_ops *ops;
- 
- 	sock = sock_from_file(file);
- 	if (!sock)
-@@ -1851,15 +1865,16 @@ struct file *do_accept(struct file *file, unsigned file_flags,
- 	newsock = sock_alloc();
- 	if (!newsock)
- 		return ERR_PTR(-ENFILE);
-+	ops = READ_ONCE(sock->ops);
- 
- 	newsock->type = sock->type;
--	newsock->ops = sock->ops;
-+	newsock->ops = ops;
- 
- 	/*
- 	 * We don't need try_module_get here, as the listening socket (sock)
- 	 * has the protocol module (sock->ops->owner) held.
+ 	tlvlen = 0;
+@@ -2474,7 +2444,7 @@ void netlink_ack(struct sk_buff *in_skb, struct nlmsghdr *nlh, int err,
+ 	 * requests to cap the error message, and get extra error data if
+ 	 * requested.
  	 */
--	__module_get(newsock->ops->owner);
-+	__module_get(ops->owner);
+-	if (err && !(nlk->flags & NETLINK_F_CAP_ACK))
++	if (err && !test_bit(NETLINK_F_CAP_ACK, &nlk->flags))
+ 		payload += nlmsg_len(nlh);
+ 	else
+ 		flags |= NLM_F_CAPPED;
+diff --git a/net/netlink/af_netlink.h b/net/netlink/af_netlink.h
+index 90a3198a9b7f7..3dbd38aef50a4 100644
+--- a/net/netlink/af_netlink.h
++++ b/net/netlink/af_netlink.h
+@@ -8,14 +8,16 @@
+ #include <net/sock.h>
  
- 	newfile = sock_alloc_file(newsock, flags, sock->sk->sk_prot_creator->name);
- 	if (IS_ERR(newfile))
-@@ -1869,14 +1884,13 @@ struct file *do_accept(struct file *file, unsigned file_flags,
- 	if (err)
- 		goto out_fd;
+ /* flags */
+-#define NETLINK_F_KERNEL_SOCKET		0x1
+-#define NETLINK_F_RECV_PKTINFO		0x2
+-#define NETLINK_F_BROADCAST_SEND_ERROR	0x4
+-#define NETLINK_F_RECV_NO_ENOBUFS	0x8
+-#define NETLINK_F_LISTEN_ALL_NSID	0x10
+-#define NETLINK_F_CAP_ACK		0x20
+-#define NETLINK_F_EXT_ACK		0x40
+-#define NETLINK_F_STRICT_CHK		0x80
++enum {
++	NETLINK_F_KERNEL_SOCKET,
++	NETLINK_F_RECV_PKTINFO,
++	NETLINK_F_BROADCAST_SEND_ERROR,
++	NETLINK_F_RECV_NO_ENOBUFS,
++	NETLINK_F_LISTEN_ALL_NSID,
++	NETLINK_F_CAP_ACK,
++	NETLINK_F_EXT_ACK,
++	NETLINK_F_STRICT_CHK,
++};
  
--	err = sock->ops->accept(sock, newsock, sock->file->f_flags | file_flags,
-+	err = ops->accept(sock, newsock, sock->file->f_flags | file_flags,
- 					false);
- 	if (err < 0)
- 		goto out_fd;
- 
- 	if (upeer_sockaddr) {
--		len = newsock->ops->getname(newsock,
--					(struct sockaddr *)&address, 2);
-+		len = ops->getname(newsock, (struct sockaddr *)&address, 2);
- 		if (len < 0) {
- 			err = -ECONNABORTED;
- 			goto out_fd;
-@@ -1989,8 +2003,8 @@ int __sys_connect_file(struct file *file, struct sockaddr_storage *address,
- 	if (err)
- 		goto out;
- 
--	err = sock->ops->connect(sock, (struct sockaddr *)address, addrlen,
--				 sock->file->f_flags | file_flags);
-+	err = READ_ONCE(sock->ops)->connect(sock, (struct sockaddr *)address,
-+				addrlen, sock->file->f_flags | file_flags);
- out:
- 	return err;
+ #define NLGRPSZ(x)	(ALIGN(x, sizeof(unsigned long) * 8) / 8)
+ #define NLGRPLONGS(x)	(NLGRPSZ(x)/sizeof(unsigned long))
+@@ -23,10 +25,10 @@
+ struct netlink_sock {
+ 	/* struct sock has to be the first member of netlink_sock */
+ 	struct sock		sk;
++	unsigned long		flags;
+ 	u32			portid;
+ 	u32			dst_portid;
+ 	u32			dst_group;
+-	u32			flags;
+ 	u32			subscriptions;
+ 	u32			ngroups;
+ 	unsigned long		*groups;
+@@ -54,6 +56,8 @@ static inline struct netlink_sock *nlk_sk(struct sock *sk)
+ 	return container_of(sk, struct netlink_sock, sk);
  }
-@@ -2039,7 +2053,7 @@ int __sys_getsockname(int fd, struct sockaddr __user *usockaddr,
- 	if (err)
- 		goto out_put;
  
--	err = sock->ops->getname(sock, (struct sockaddr *)&address, 0);
-+	err = READ_ONCE(sock->ops)->getname(sock, (struct sockaddr *)&address, 0);
- 	if (err < 0)
- 		goto out_put;
- 	/* "err" is actually length in this case */
-@@ -2071,13 +2085,15 @@ int __sys_getpeername(int fd, struct sockaddr __user *usockaddr,
- 
- 	sock = sockfd_lookup_light(fd, &err, &fput_needed);
- 	if (sock != NULL) {
-+		const struct proto_ops *ops = READ_ONCE(sock->ops);
++#define nlk_test_bit(nr, sk) test_bit(NETLINK_F_##nr, &nlk_sk(sk)->flags)
 +
- 		err = security_socket_getpeername(sock);
- 		if (err) {
- 			fput_light(sock->file, fput_needed);
- 			return err;
- 		}
+ struct netlink_table {
+ 	struct rhashtable	hash;
+ 	struct hlist_head	mc_list;
+diff --git a/net/netlink/diag.c b/net/netlink/diag.c
+index e4f21b1067bcc..9c4f231be2757 100644
+--- a/net/netlink/diag.c
++++ b/net/netlink/diag.c
+@@ -27,15 +27,15 @@ static int sk_diag_put_flags(struct sock *sk, struct sk_buff *skb)
  
--		err = sock->ops->getname(sock, (struct sockaddr *)&address, 1);
-+		err = ops->getname(sock, (struct sockaddr *)&address, 1);
- 		if (err >= 0)
- 			/* "err" is actually length in this case */
- 			err = move_addr_to_user(&address, err, usockaddr,
-@@ -2227,6 +2243,7 @@ int __sys_setsockopt(int fd, int level, int optname, char __user *user_optval,
- 		int optlen)
- {
- 	sockptr_t optval = USER_SOCKPTR(user_optval);
-+	const struct proto_ops *ops;
- 	char *kernel_optval = NULL;
- 	int err, fput_needed;
- 	struct socket *sock;
-@@ -2255,12 +2272,13 @@ int __sys_setsockopt(int fd, int level, int optname, char __user *user_optval,
+ 	if (nlk->cb_running)
+ 		flags |= NDIAG_FLAG_CB_RUNNING;
+-	if (nlk->flags & NETLINK_F_RECV_PKTINFO)
++	if (nlk_test_bit(RECV_PKTINFO, sk))
+ 		flags |= NDIAG_FLAG_PKTINFO;
+-	if (nlk->flags & NETLINK_F_BROADCAST_SEND_ERROR)
++	if (nlk_test_bit(BROADCAST_SEND_ERROR, sk))
+ 		flags |= NDIAG_FLAG_BROADCAST_ERROR;
+-	if (nlk->flags & NETLINK_F_RECV_NO_ENOBUFS)
++	if (nlk_test_bit(RECV_NO_ENOBUFS, sk))
+ 		flags |= NDIAG_FLAG_NO_ENOBUFS;
+-	if (nlk->flags & NETLINK_F_LISTEN_ALL_NSID)
++	if (nlk_test_bit(LISTEN_ALL_NSID, sk))
+ 		flags |= NDIAG_FLAG_LISTEN_ALL_NSID;
+-	if (nlk->flags & NETLINK_F_CAP_ACK)
++	if (nlk_test_bit(CAP_ACK, sk))
+ 		flags |= NDIAG_FLAG_CAP_ACK;
  
- 	if (kernel_optval)
- 		optval = KERNEL_SOCKPTR(kernel_optval);
-+	ops = READ_ONCE(sock->ops);
- 	if (level == SOL_SOCKET && !sock_use_custom_sol_socket(sock))
- 		err = sock_setsockopt(sock, level, optname, optval, optlen);
--	else if (unlikely(!sock->ops->setsockopt))
-+	else if (unlikely(!ops->setsockopt))
- 		err = -EOPNOTSUPP;
- 	else
--		err = sock->ops->setsockopt(sock, level, optname, optval,
-+		err = ops->setsockopt(sock, level, optname, optval,
- 					    optlen);
- 	kfree(kernel_optval);
- out_put:
-@@ -2285,6 +2303,7 @@ int __sys_getsockopt(int fd, int level, int optname, char __user *optval,
- 		int __user *optlen)
- {
- 	int max_optlen __maybe_unused;
-+	const struct proto_ops *ops;
- 	int err, fput_needed;
- 	struct socket *sock;
- 
-@@ -2299,12 +2318,13 @@ int __sys_getsockopt(int fd, int level, int optname, char __user *optval,
- 	if (!in_compat_syscall())
- 		max_optlen = BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen);
- 
-+	ops = READ_ONCE(sock->ops);
- 	if (level == SOL_SOCKET)
- 		err = sock_getsockopt(sock, level, optname, optval, optlen);
--	else if (unlikely(!sock->ops->getsockopt))
-+	else if (unlikely(!ops->getsockopt))
- 		err = -EOPNOTSUPP;
- 	else
--		err = sock->ops->getsockopt(sock, level, optname, optval,
-+		err = ops->getsockopt(sock, level, optname, optval,
- 					    optlen);
- 
- 	if (!in_compat_syscall())
-@@ -2332,7 +2352,7 @@ int __sys_shutdown_sock(struct socket *sock, int how)
- 
- 	err = security_socket_shutdown(sock, how);
- 	if (!err)
--		err = sock->ops->shutdown(sock, how);
-+		err = READ_ONCE(sock->ops)->shutdown(sock, how);
- 
- 	return err;
- }
-@@ -3324,6 +3344,7 @@ static int compat_sock_ioctl_trans(struct file *file, struct socket *sock,
- 	void __user *argp = compat_ptr(arg);
- 	struct sock *sk = sock->sk;
- 	struct net *net = sock_net(sk);
-+	const struct proto_ops *ops;
- 
- 	if (cmd >= SIOCDEVPRIVATE && cmd <= (SIOCDEVPRIVATE + 15))
- 		return sock_ioctl(file, cmd, (unsigned long)argp);
-@@ -3333,10 +3354,11 @@ static int compat_sock_ioctl_trans(struct file *file, struct socket *sock,
- 		return compat_siocwandev(net, argp);
- 	case SIOCGSTAMP_OLD:
- 	case SIOCGSTAMPNS_OLD:
--		if (!sock->ops->gettstamp)
-+		ops = READ_ONCE(sock->ops);
-+		if (!ops->gettstamp)
- 			return -ENOIOCTLCMD;
--		return sock->ops->gettstamp(sock, argp, cmd == SIOCGSTAMP_OLD,
--					    !COMPAT_USE_64BIT_TIME);
-+		return ops->gettstamp(sock, argp, cmd == SIOCGSTAMP_OLD,
-+				      !COMPAT_USE_64BIT_TIME);
- 
- 	case SIOCETHTOOL:
- 	case SIOCBONDSLAVEINFOQUERY:
-@@ -3417,6 +3439,7 @@ static long compat_sock_ioctl(struct file *file, unsigned int cmd,
- 			      unsigned long arg)
- {
- 	struct socket *sock = file->private_data;
-+	const struct proto_ops *ops = READ_ONCE(sock->ops);
- 	int ret = -ENOIOCTLCMD;
- 	struct sock *sk;
- 	struct net *net;
-@@ -3424,8 +3447,8 @@ static long compat_sock_ioctl(struct file *file, unsigned int cmd,
- 	sk = sock->sk;
- 	net = sock_net(sk);
- 
--	if (sock->ops->compat_ioctl)
--		ret = sock->ops->compat_ioctl(sock, cmd, arg);
-+	if (ops->compat_ioctl)
-+		ret = ops->compat_ioctl(sock, cmd, arg);
- 
- 	if (ret == -ENOIOCTLCMD &&
- 	    (cmd >= SIOCIWFIRST && cmd <= SIOCIWLAST))
-@@ -3449,7 +3472,7 @@ static long compat_sock_ioctl(struct file *file, unsigned int cmd,
- 
- int kernel_bind(struct socket *sock, struct sockaddr *addr, int addrlen)
- {
--	return sock->ops->bind(sock, addr, addrlen);
-+	return READ_ONCE(sock->ops)->bind(sock, addr, addrlen);
- }
- EXPORT_SYMBOL(kernel_bind);
- 
-@@ -3463,7 +3486,7 @@ EXPORT_SYMBOL(kernel_bind);
- 
- int kernel_listen(struct socket *sock, int backlog)
- {
--	return sock->ops->listen(sock, backlog);
-+	return READ_ONCE(sock->ops)->listen(sock, backlog);
- }
- EXPORT_SYMBOL(kernel_listen);
- 
-@@ -3481,6 +3504,7 @@ EXPORT_SYMBOL(kernel_listen);
- int kernel_accept(struct socket *sock, struct socket **newsock, int flags)
- {
- 	struct sock *sk = sock->sk;
-+	const struct proto_ops *ops = READ_ONCE(sock->ops);
- 	int err;
- 
- 	err = sock_create_lite(sk->sk_family, sk->sk_type, sk->sk_protocol,
-@@ -3488,15 +3512,15 @@ int kernel_accept(struct socket *sock, struct socket **newsock, int flags)
- 	if (err < 0)
- 		goto done;
- 
--	err = sock->ops->accept(sock, *newsock, flags, true);
-+	err = ops->accept(sock, *newsock, flags, true);
- 	if (err < 0) {
- 		sock_release(*newsock);
- 		*newsock = NULL;
- 		goto done;
- 	}
- 
--	(*newsock)->ops = sock->ops;
--	__module_get((*newsock)->ops->owner);
-+	(*newsock)->ops = ops;
-+	__module_get(ops->owner);
- 
- done:
- 	return err;
-@@ -3519,7 +3543,7 @@ EXPORT_SYMBOL(kernel_accept);
- int kernel_connect(struct socket *sock, struct sockaddr *addr, int addrlen,
- 		   int flags)
- {
--	return sock->ops->connect(sock, addr, addrlen, flags);
-+	return READ_ONCE(sock->ops)->connect(sock, addr, addrlen, flags);
- }
- EXPORT_SYMBOL(kernel_connect);
- 
-@@ -3534,7 +3558,7 @@ EXPORT_SYMBOL(kernel_connect);
- 
- int kernel_getsockname(struct socket *sock, struct sockaddr *addr)
- {
--	return sock->ops->getname(sock, addr, 0);
-+	return READ_ONCE(sock->ops)->getname(sock, addr, 0);
- }
- EXPORT_SYMBOL(kernel_getsockname);
- 
-@@ -3549,7 +3573,7 @@ EXPORT_SYMBOL(kernel_getsockname);
- 
- int kernel_getpeername(struct socket *sock, struct sockaddr *addr)
- {
--	return sock->ops->getname(sock, addr, 1);
-+	return READ_ONCE(sock->ops)->getname(sock, addr, 1);
- }
- EXPORT_SYMBOL(kernel_getpeername);
- 
-@@ -3563,7 +3587,7 @@ EXPORT_SYMBOL(kernel_getpeername);
- 
- int kernel_sock_shutdown(struct socket *sock, enum sock_shutdown_cmd how)
- {
--	return sock->ops->shutdown(sock, how);
-+	return READ_ONCE(sock->ops)->shutdown(sock, how);
- }
- EXPORT_SYMBOL(kernel_sock_shutdown);
- 
-diff --git a/net/unix/scm.c b/net/unix/scm.c
-index f9152881d77f6..e9dde7176c8a3 100644
---- a/net/unix/scm.c
-+++ b/net/unix/scm.c
-@@ -29,10 +29,11 @@ struct sock *unix_get_socket(struct file *filp)
- 	/* Socket ? */
- 	if (S_ISSOCK(inode->i_mode) && !(filp->f_mode & FMODE_PATH)) {
- 		struct socket *sock = SOCKET_I(inode);
-+		const struct proto_ops *ops = READ_ONCE(sock->ops);
- 		struct sock *s = sock->sk;
- 
- 		/* PF_UNIX ? */
--		if (s && sock->ops && sock->ops->family == PF_UNIX)
-+		if (s && ops && ops->family == PF_UNIX)
- 			u_sock = s;
- 	} else {
- 		/* Could be an io_uring instance */
+ 	return nla_put_u32(skb, NETLINK_DIAG_FLAGS, flags);
 -- 
 2.40.1
 
