@@ -1,103 +1,168 @@
-Return-Path: <netdev+bounces-32547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32548-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38A39798445
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 10:41:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D98D798491
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 11:10:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD11B2819EE
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 08:41:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C4692819B5
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 09:10:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A087F1865;
-	Fri,  8 Sep 2023 08:41:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F31C71FC4;
+	Fri,  8 Sep 2023 09:10:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 930BB1849
-	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 08:41:47 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C88A1BDA
-	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 01:41:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1694162505;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hY8tZO882Jl0E+LR6+k1KutgEB/prW8NTGo4X92b6p4=;
-	b=IfIgBxjCn4BEfAjSzIKGScDH3kdgO007gojKJgd8ou1leFNRVH86B0zsK3DoGxffv8KZ9J
-	9WctpwFn+/X67q+w37CbKNdW7jKLD7Yzihq8FAa1hDZudUT3f5VeN90Vu4690y4L7nWILo
-	eAcchGjPcAdkxC4HfbOTwlZmdOdNrGs=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-367-cb6fuJdoPgeyTvXtnnt2jQ-1; Fri, 08 Sep 2023 04:41:42 -0400
-X-MC-Unique: cb6fuJdoPgeyTvXtnnt2jQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7FCE2817077;
-	Fri,  8 Sep 2023 08:41:41 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.148])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 85397525726;
-	Fri,  8 Sep 2023 08:41:37 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20230905141604.GA27370@lst.de>
-References: <20230905141604.GA27370@lst.de>
-To: Christoph Hellwig <hch@lst.de>
-Cc: dhowells@redhat.com, Jan Kara <jack@suse.cz>,
-    David Hildenbrand <david@redhat.com>, Peter Xu <peterx@redhat.com>,
-    Lei Huang <lei.huang@linux.intel.com>, miklos@szeredi.hu,
-    Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
-    Jeff Layton <jlayton@kernel.org>,
-    Trond Myklebust <trond.myklebust@hammerspace.com>,
-    Anna Schumaker <anna@kernel.org>,
-    Latchesar Ionkov <lucho@ionkov.net>,
-    Dominique Martinet <asmadeus@codewreck.org>,
-    Christian Schoenebeck <linux_oss@crudebyte.com>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>,
-    John Fastabend <john.fastabend@gmail.com>,
-    Jakub Sitnicki <jakub@cloudflare.com>,
-    Boris Pismenny <borisp@nvidia.com>, linux-nfs@vger.kernel.org,
-    linux-fsdevel@vger.kernel.org, ceph-devel@vger.kernel.org,
-    linux-mm@kvack.org, v9fs@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: getting rid of the last memory modifitions through gup(FOLL_GET)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D920C1849
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 09:10:14 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A900A1BF1;
+	Fri,  8 Sep 2023 02:10:05 -0700 (PDT)
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38896c9I022792;
+	Fri, 8 Sep 2023 09:10:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=HSal6POAnTxn4mXSUvG2CN7NaUOa+qNP4LeSP48EDWM=;
+ b=FsqE/aqh4Htlvy5K5IDfkOdm4dNL0HZj8Ont5o9uhPVs5xfS1LrgKqUSHB7mb0qeLDf/
+ NAfrSNZ8q52U5EB9RjGKSPBP8kNu7/VPtmw+QhHqp73TYc6D6Mf3KbAd2Io1liWnKxRV
+ q2XLqpqSFjevqbPgn9WIq++NToAnzApBPZgc/3oPC+mKwCdVQSsE3MOAa1eRI2p6kTwF
+ ixAEQxPoojdIkHWJxKdc614BZlwJhj5dGvfk6xuj7Rttz41wMDREloL4chySSpIFPsJi
+ d0Yy2F+7fQM+8NyJwhWjrTuyXKwlTjitdW7j42tUVezhu3wT2Ue3rzxBsdd3tWZoEFbd eA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t00gw0d2g-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 08 Sep 2023 09:10:01 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38896t9k025091;
+	Fri, 8 Sep 2023 09:08:23 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t00gw0985-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 08 Sep 2023 09:08:22 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3888ipmn006651;
+	Fri, 8 Sep 2023 09:07:41 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3svgvm2ahm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 08 Sep 2023 09:07:41 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38897bJw45351550
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 8 Sep 2023 09:07:37 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CC70920043;
+	Fri,  8 Sep 2023 09:07:37 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4349820040;
+	Fri,  8 Sep 2023 09:07:37 +0000 (GMT)
+Received: from [9.171.2.42] (unknown [9.171.2.42])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  8 Sep 2023 09:07:37 +0000 (GMT)
+Message-ID: <794f9f68-4671-5e5e-45e4-2c8a4de568b3@linux.ibm.com>
+Date: Fri, 8 Sep 2023 11:07:36 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1520559.1694162496.1@warthog.procyon.org.uk>
-Date: Fri, 08 Sep 2023 09:41:36 +0100
-Message-ID: <1520560.1694162496@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.0
+Subject: Re: [RFC net-next 0/2] Optimize the parallelism of SMC-R connections
+To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
+        wenjia@linux.ibm.com, jaka@linux.ibm.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
+References: <1694008530-85087-1-git-send-email-alibuda@linux.alibaba.com>
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <1694008530-85087-1-git-send-email-alibuda@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Ep2os8SGSnpKYVSyUgwoH1m4iVvcnAdH
+X-Proofpoint-GUID: ADbQ_6StDG1LXKn67n6JzCEta4tr6Ga-
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-09-08_06,2023-09-05_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
+ priorityscore=1501 impostorscore=0 malwarescore=0 mlxscore=0 adultscore=0
+ clxscore=1011 bulkscore=0 suspectscore=0 spamscore=0 mlxlogscore=734
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2308100000 definitions=main-2309080083
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Christoph Hellwig <hch@lst.de> wrote:
 
-> we've made some nice progress on converting code that modifies user
-> memory to the pin_user_pages interface, especially though the work
-> from David Howells on iov_iter_extract_pages.  This thread tries to
-> coordinate on how to finish off this work.
 
-Right at this moment, I'm writing some kunit tests for iov_iter and I've found
-at least one bug.
+On 06.09.23 15:55, D. Wythe wrote:
+> From: "D. Wythe" <alibuda@linux.alibaba.com>
+> 
+> This patchset attempts to optimize the parallelism of SMC-R connections
+> in quite a SIMPLE way, reduce unnecessary blocking on locks.
+> 
+> According to Off-CPU statistics, SMC worker's off-CPU statistics
+> as that: 
+> 
+> smc_listen_work 			(48.17%)
+> 	__mutex_lock.isra.11 		(47.96%)
+> 
+> An ideal SMC-R connection process should only block on the IO events
+> of the network, but it's quite clear that the SMC-R connection now is
+> queued on the lock most of the time.
+> 
+> Before creating a connection, we always try to see if it can be
+> successfully created without allowing the creation of an lgr,
+> if so, it means it does not rely on new link group.
+> In other words, locking on xxx_lgr_pending is not necessary
+> any more.
+> 
+> Noted that removing this lock will not have an immediate effect
+> in the current version, as there are still some concurrency issues
+> in the SMC handshake phase. However, regardless, removing this lock
+> is a prerequisite for other optimizations.
+> 
+> If you have any questions or suggestions, please let me know.
+> 
+> D. Wythe (2):
+>   net/smc: refactoring lgr pending lock
+>   net/smc: remove locks smc_client_lgr_pending and
+>     smc_server_lgr_pending
+> 
+>  net/smc/af_smc.c   | 24 ++++++++++++------------
+>  net/smc/smc_clc.h  |  1 +
+>  net/smc/smc_core.c | 28 ++++++++++++++++++++++++++--
+>  net/smc/smc_core.h | 21 +++++++++++++++++++++
+>  4 files changed, 60 insertions(+), 14 deletions(-)
+> 
 
-David
+
+I have to admit that locking in SMC is quite confusing to me, so this is just my thougths.
+
+Your proposal seems to make things even more complex.
+
+I understand the goal to optimize parallelism.
+Today we have the global smc_server/client_lgr_pending AND smc_lgr_list.lock (and more).
+There seems to be some overlpa in scope..
+Maybe there is some way to reduce the length of the locked paths?
+Or use other mechanisms than the big fat smc_server/client_lgr_pending mutex?
+e.g.
+If you think you can unlock after __smc_conn_create in the re-use-existing_LGR case,
+why is the lock needed until after smc_clc_send_confirm in the new-LGR case??
+
+
+Your use of storing the global lock per ini and then double-freeing it sometimes,
+seems a bit homebrewed, though.
+E.g. I'm afraid the existing lock checking algorithms could not verify this pattern.
 
 
