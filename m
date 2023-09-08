@@ -1,93 +1,78 @@
-Return-Path: <netdev+bounces-32580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DFF9798812
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 15:45:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96E8179882B
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 15:58:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 410EE1C20C4C
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 13:45:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B002281AA4
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 13:58:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A397563AB;
-	Fri,  8 Sep 2023 13:45:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2306B63B3;
+	Fri,  8 Sep 2023 13:58:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 898FA5254;
-	Fri,  8 Sep 2023 13:45:38 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D59F31BF6;
-	Fri,  8 Sep 2023 06:45:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=UkfLMtO8fA9PF8uSZuzD5bsvx/rEUFwdpKwoNVFn7eM=; b=RatTUzV8DzA7IgacGyzlKYy6iX
-	yvQ1fUxI4r7SHePbiHaOjIlMyWHbQkqA6rLqVIhkDDwwXncTsii0DWoOdeVZPE/RyZY73gteMlo0q
-	jk376nc8D46bNM7/CPAwpIChPnJ1KXiTqH3vgo4t/oC1B+BhnDFtLJtZeNhnKgStj50CsauNTcHxv
-	obJasEmIlpvuLAx/uIjpJs9Y2ep/uxBfKlADZpdfLLW+/UdF9KRYVsM3ZtKIIY/TKhmYnTS+avcJF
-	7uNwqawKPA0BY60S175hZI6njT+XDtEHaIqQhqoZFQQ3N4Y++vYpLr46KXVjpbPQHdBfbJY8wjjK3
-	CF5UOIDQ==;
-Received: from sslproxy05.your-server.de ([78.46.172.2])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qebnQ-000Ant-Cz; Fri, 08 Sep 2023 15:45:16 +0200
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy05.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qebnP-000SDn-NO; Fri, 08 Sep 2023 15:45:15 +0200
-Subject: Re: [PATCH bpf-next v4 0/7] add BPF_F_PERMANENT flag for sockmap
- skmsg redirect
-To: Jakub Sitnicki <jakub@cloudflare.com>, Liu Jian <liujian56@huawei.com>
-Cc: john.fastabend@gmail.com, ast@kernel.org, andrii@kernel.org,
- martin.lau@linux.dev, song@kernel.org, yonghong.song@linux.dev,
- kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, netdev@vger.kernel.org,
- bpf@vger.kernel.org
-References: <20230902100744.2687785-1-liujian56@huawei.com>
- <87o7ickfss.fsf@cloudflare.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <5b5dd10a-2728-c75b-6c4d-b03cebcaecfe@iogearbox.net>
-Date: Fri, 8 Sep 2023 15:45:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 056715398;
+	Fri,  8 Sep 2023 13:57:59 +0000 (UTC)
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF0321BF1;
+	Fri,  8 Sep 2023 06:57:58 -0700 (PDT)
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1694181477;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=s16VZO539sho6txxYQFjLH537yZjkITAo+TGaFsT1+0=;
+	b=iznq47DGAtHvnc+RXQMCCI2owKELuSFGWprN66xvmbnAlU73imuXwhbexfSLj+rK1MCphb
+	hHBJymArpyas5UYE7Xvn4q0k+9fzRiyCxJP1UQKb7+DgkByTPxIbcaK7VffkrC1KIXzMOO
+	b1rJrgig6PLiNhmYRwG56ESOMP/asTUuLB8Pl+30EQ+RMBN4RfqHFTdDqQQsz9tnokXpSo
+	Pd0bg4hl+q3zqG342A2LwDIhNeCROK3Yw1xZqYRGFwpI7wR22SQs8dwGABpmdqDPBa8HAt
+	9DWULiUUVuhZFvmetUmhG/blDyHQZsi43q0bPKEPcrTQLF7Ea9aQGb4gC2xEcA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1694181477;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=s16VZO539sho6txxYQFjLH537yZjkITAo+TGaFsT1+0=;
+	b=OBGzSt1m1ud7CSFejNDEH9Vcax+tsLGL+VbdP0mZr2geZVUXM6b3Fymmw+3SRXhfOaHSYt
+	XemoGd9Wd6xSVnBg==
+To: netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>
+Subject: [PATCH net 0/4] Add missing xdp_do_flush() invocations.
+Date: Fri,  8 Sep 2023 15:57:44 +0200
+Message-Id: <20230908135748.794163-1-bigeasy@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <87o7ickfss.fsf@cloudflare.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.8/27025/Fri Sep  8 09:37:45 2023)
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 9/8/23 2:29 PM, Jakub Sitnicki wrote:
-> On Sat, Sep 02, 2023 at 06:07 PM +08, Liu Jian wrote:
->> v3->v4: Change the two helpers's description.
->> 	Let BPF_F_PERMANENT takes precedence over apply/cork_bytes.
-> 
-> Sorry, will need some more time to review this.
-> 
-> I wanted to test it and noticed we have a regression in sockamp in
-> bpf-next @ 831c4b3f39c7:
+Hi,
 
-All fixed in bpf, for testing pls use this tree until we have it over in bpf-next.
+I've been looking at the drivers/ XDP users and noticed that some
+XDP_REDIRECT user don't invoke xdp_do_flush() at the end.
 
-Thanks,
-Daniel
+Sebastian
+
 
