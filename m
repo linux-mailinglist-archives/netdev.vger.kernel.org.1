@@ -1,51 +1,57 @@
-Return-Path: <netdev+bounces-32628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E93A4798D17
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 20:20:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 312EF798D2E
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 20:20:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4CA3281C61
-	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 18:20:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FD9E1C20DA2
+	for <lists+netdev@lfdr.de>; Fri,  8 Sep 2023 18:20:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5314714F6B;
-	Fri,  8 Sep 2023 18:16:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CD3114AAF;
+	Fri,  8 Sep 2023 18:16:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E753214F64
-	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 18:15:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90414C433A9;
-	Fri,  8 Sep 2023 18:15:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 488B0154B2
+	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 18:16:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BF49C193E8;
+	Fri,  8 Sep 2023 18:16:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694196958;
-	bh=e2bu/Du+oanq/xK4zd3zpYZOuxg9pZ9QbnGy6r14JvA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=oDjYOYv9vgSOpIRjg8ZnrWN0CW58inucUg6gpBA3xcMVHA7pN4+s4/udw+gi84R4Z
-	 qvga0Xb+hloCO2MCbUeBT7Qluv79ZxjtRz1xhRcaPaWAK7PRVHxjjGryp6D2FBjH3q
-	 aiJWY3q93yKj2fRKZiFeKrTyxEkhgNY1dNMLs2a3A5suvXU0CQ49Fb+0JRMG8Ks5Vb
-	 /HQU+7alEbWTn+9Jyy/iKJyKeo0hlyf9Lw2rZ5FcudjEc1Z3opjgkX413JQ/BhAIcy
-	 IyMFCEADZ1w2racvrfFWmPnxjySLzH6OD26urxErvVpYseM1hmyM8mo9ZPozQfyHPJ
-	 iQr2BM7py59LQ==
+	s=k20201202; t=1694196965;
+	bh=L24/99yFP2SD9mr7M0EzsatIqA9G0bITSVQ1rgNLgfo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=jlISw8rUJfwT2CyUu8cXCyG7tBQbSYEFundCyR0J7H53LR/2I3ETUDMWvxpk4cCRQ
+	 djzMGaFadsXsuJxpHtwm8AbsAmKD7t8DuvuqwQRpWeFLy4kL1nRt/ttiRJYjDsJdJk
+	 w65U54Qy3pVkP+8vHy5ua9G2XxjfQdTvf9lbzcopeRQM7y5PCwlq+3jhvyDd7QvO6R
+	 LWq5lnBmTLshjX4j7ssC0XczFCHCUjUOf7zBAdWGyiY/Qp7rfmL/PoUvxL+sgDYnFa
+	 w3QpPPxrKmh688l2xsbbwnAqgWtKOxrt4xZqRlKQO0rg95mq3Kdq0TmH1u3Y2/+FC8
+	 am/07GUYKT07Q==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Jiri Pirko <jiri@nvidia.com>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
+Cc: Wojciech Drewek <wojciech.drewek@intel.com>,
+	Paul Menzel <pmenzel@molgen.mpg.de>,
+	Simon Horman <simon.horman@corigine.com>,
+	Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
-	jiri@resnulli.us,
+	jesse.brandeburg@intel.com,
+	davem@davemloft.net,
 	edumazet@google.com,
+	kuba@kernel.org,
 	pabeni@redhat.com,
+	intel-wired-lan@lists.osuosl.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.4 01/41] devlink: remove reload failed checks in params get/set callbacks
-Date: Fri,  8 Sep 2023 14:15:15 -0400
-Message-Id: <20230908181555.3459640-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.4 04/41] ice: Don't tx before switchdev is fully configured
+Date: Fri,  8 Sep 2023 14:15:18 -0400
+Message-Id: <20230908181555.3459640-4-sashal@kernel.org>
 X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20230908181555.3459640-1-sashal@kernel.org>
+References: <20230908181555.3459640-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,66 +63,39 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.4.15
 Content-Transfer-Encoding: 8bit
 
-From: Jiri Pirko <jiri@nvidia.com>
+From: Wojciech Drewek <wojciech.drewek@intel.com>
 
-[ Upstream commit 633d76ad01ad0321a1ace3e5cc4fed06753d7ac4 ]
+[ Upstream commit 7aa529a69e92b9aff585e569d5003f7c15d8d60b ]
 
-The checks in question were introduced by:
-commit 6b4db2e528f6 ("devlink: Fix use-after-free after a failed reload").
-That fixed an issue of reload with mlxsw driver.
+There is possibility that ice_eswitch_port_start_xmit might be
+called while some resources are still not allocated which might
+cause NULL pointer dereference. Fix this by checking if switchdev
+configuration was finished.
 
-Back then, that was a valid fix, because there was a limitation
-in place that prevented drivers from registering/unregistering params
-when devlink instance was registered.
-
-It was possible to do the fix differently by changing drivers to
-register/unregister params in appropriate places making sure the ops
-operate only on memory which is allocated and initialized. But that,
-as a dependency, would require to remove the limitation mentioned above.
-
-Eventually, this limitation was lifted by:
-commit 1d18bb1a4ddd ("devlink: allow registering parameters after the instance")
-
-Also, the alternative fix (which also fixed another issue) was done by:
-commit 74cbc3c03c82 ("mlxsw: spectrum_acl_tcam: Move devlink param to TCAM code").
-
-Therefore, the checks are no longer relevant. Each driver should make
-sure to have the params registered only when the memory the ops
-are working with is allocated and initialized.
-
-So remove the checks.
-
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: David S. Miller <davem@davemloft.net>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
+Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
+Tested-by: Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/devlink/leftover.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_eswitch.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/net/devlink/leftover.c b/net/devlink/leftover.c
-index 790e61b2a9404..fa4705e509e3c 100644
---- a/net/devlink/leftover.c
-+++ b/net/devlink/leftover.c
-@@ -3982,7 +3982,7 @@ static int devlink_param_get(struct devlink *devlink,
- 			     const struct devlink_param *param,
- 			     struct devlink_param_gset_ctx *ctx)
- {
--	if (!param->get || devlink->reload_failed)
-+	if (!param->get)
- 		return -EOPNOTSUPP;
- 	return param->get(devlink, param->id, ctx);
- }
-@@ -3991,7 +3991,7 @@ static int devlink_param_set(struct devlink *devlink,
- 			     const struct devlink_param *param,
- 			     struct devlink_param_gset_ctx *ctx)
- {
--	if (!param->set || devlink->reload_failed)
-+	if (!param->set)
- 		return -EOPNOTSUPP;
- 	return param->set(devlink, param->id, ctx);
- }
+diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+index 03e5139849462..eab2481114ef3 100644
+--- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
++++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+@@ -361,6 +361,9 @@ ice_eswitch_port_start_xmit(struct sk_buff *skb, struct net_device *netdev)
+ 	np = netdev_priv(netdev);
+ 	vsi = np->vsi;
+ 
++	if (!vsi || !ice_is_switchdev_running(vsi->back))
++		return NETDEV_TX_BUSY;
++
+ 	if (ice_is_reset_in_progress(vsi->back->state) ||
+ 	    test_bit(ICE_VF_DIS, vsi->back->state))
+ 		return NETDEV_TX_BUSY;
 -- 
 2.40.1
 
