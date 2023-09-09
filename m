@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-32707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32708-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BC027997ED
-	for <lists+netdev@lfdr.de>; Sat,  9 Sep 2023 14:31:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 362D07997EF
+	for <lists+netdev@lfdr.de>; Sat,  9 Sep 2023 14:31:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BCC11C20C41
-	for <lists+netdev@lfdr.de>; Sat,  9 Sep 2023 12:31:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 676B81C202C9
+	for <lists+netdev@lfdr.de>; Sat,  9 Sep 2023 12:31:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F12B03D62;
-	Sat,  9 Sep 2023 12:31:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82E313D62;
+	Sat,  9 Sep 2023 12:31:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E016820E2
-	for <netdev@vger.kernel.org>; Sat,  9 Sep 2023 12:31:18 +0000 (UTC)
-Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A495CD6;
-	Sat,  9 Sep 2023 05:31:16 -0700 (PDT)
-Received: by mail-ot1-x32e.google.com with SMTP id 46e09a7af769-6b9cd6876bbso774154a34.1;
-        Sat, 09 Sep 2023 05:31:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 763D06ABD
+	for <netdev@vger.kernel.org>; Sat,  9 Sep 2023 12:31:23 +0000 (UTC)
+Received: from mail-oa1-x2a.google.com (mail-oa1-x2a.google.com [IPv6:2001:4860:4864:20::2a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96F97CD6;
+	Sat,  9 Sep 2023 05:31:21 -0700 (PDT)
+Received: by mail-oa1-x2a.google.com with SMTP id 586e51a60fabf-1a2dd615ddcso884832fac.0;
+        Sat, 09 Sep 2023 05:31:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694262675; x=1694867475; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JgY7HioxQJzvc3UWMLxwvEq1yQkuAsHwT0/8Xxg7rnM=;
-        b=l88P+m5HXH46LBBai+IRthcKBKjsBHGvZp02JrvhqsdqNYIBxeVQc5L/64T8cpaqOO
-         fMC+ke64BVSMkyylAQwHBBG/gYlGHrmm4Db5cUDm1DT2//Dl4RQJXj2+hR0CBnchZei7
-         TBBWzpCpEiaKjPxMJz+qvR1HbIkkFUvSs6TRaaHfJUuesiZh3OQvD8spwBfrajs72NET
-         OGncuOim+IAm+uTbyaoUJKA4s8ms0jb8LArlq8OF4GpA2ijKmD+cc6EVUJKRZQnNwOOX
-         5VEvpP2FpIorVY8qBiFRZz35tnBGfP5QoIgSz03N/tjgb2722SJEkXFcaVnTnPfT9Dnk
-         oGBQ==
+        d=gmail.com; s=20221208; t=1694262679; x=1694867479; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cgMmkabWLP66Z1pj5QNqLjt25rskW5WM/Dly1iTxQPY=;
+        b=PUFXNQj92RmyhL0CJKJr6dOSEIJr9mkeXwSMiw7IHLhL9O80WG9ZD9tKnguX5nV9MO
+         GJnLUYTPoBbpT2WuiCrIJyTD1VchoPSLjdcrvQynPpPPnSX9XohiV2xVz5DjK9RORtlP
+         /w0GFFF/UaE08wmObQPi6QP9z91rIiTUt456W+H0SbV9owiK4PR0FYECyJkw+fN9h2SJ
+         glQqxGWth04MIiLP+Dnv5xGLAAn52wUox2aPYYchpy7e5XeERwlQRbL+mAPtlX/0saMB
+         LswIiI4/39+QMSnQIuU9Xk7jK3aBL0kYtzKpJHdNkdofdPkM3MhL4ZKTYc0ssvAyEeli
+         cFmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694262675; x=1694867475;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JgY7HioxQJzvc3UWMLxwvEq1yQkuAsHwT0/8Xxg7rnM=;
-        b=jeYl7O73TeKVQUF6jweKj0mpIvuQflon01JVngwwlq1/J70zIpuERKzPTcM/r/QTdj
-         lJFUJihBu2v9+/BpvDkBqugU8nIcHqaeVgzJMBg1WvagOPbXvzoEHwLBWpwRNxM8WcXE
-         on0/AHmrEDjgmKBzjdGc+D7/uhwP0JPME3cv6WvcIw5VFUzC0uJmFqO4vB24d9i74fED
-         hUU1BlF2KKh2SvSVD6+WPp24bS4BXONhzfy4DByuRdVzSxmupZmPb7QEwrI1XLIer2gg
-         0lQUFIODwTpuwgJIAt2qSrLgJCoPLLnojuzWH1a3UyiBP0nGprYW671+iNwa6kUKQSoe
-         UWiQ==
-X-Gm-Message-State: AOJu0Yxs1LHk5WRoWLfd+qDvH6JdfZ+ifGXi9vOPkZllC+4jhGmtYhdk
-	1j99Ykb5MZgh1asqhLJmTPb2hhkUUxE=
-X-Google-Smtp-Source: AGHT+IFGuprHEw5ms/f99s1uQi2ZQFoU2Kt0Dwwja5deMWOKTzHZnqBNFdEOfdU4YjkLNPQq/CV/XQ==
-X-Received: by 2002:a05:6820:a0e:b0:56e:94ed:c098 with SMTP id ch14-20020a0568200a0e00b0056e94edc098mr4681126oob.0.1694262675621;
-        Sat, 09 Sep 2023 05:31:15 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1694262679; x=1694867479;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cgMmkabWLP66Z1pj5QNqLjt25rskW5WM/Dly1iTxQPY=;
+        b=EdGpt+W0dfUy6vnt/OH8I3lZwjog+2QcCsNA+b7pj0xzV8pKsA2BjdLsGJo7F+32o2
+         nIUWOrRQE0iH38ibaDGk7A8234mzVpBOJy6O05PWG595yAeGkmeO8rrRG9ILkztFBCWo
+         7/hiHU81tkV6+G4RLHQMXv//uTn+E+z++gbbi0aALRxufHlxPfwe+Y9ZK4yNPyAzPxOF
+         GfRvwdiOoa8sNDSUsCEDMGya+JTih65DvpD4jZDuHkSixwb8d6gUlido0xuus5IiNrHB
+         CjMDMrbihJTFVum6vDApwE3yVdiAs9awnRZjnTQVf7buPFfGZ1qrZZju/7uPNFP25Dnt
+         Efxw==
+X-Gm-Message-State: AOJu0YxnKMRjeJfqeWH1GbaiwAN+13kJXfWRNAiFP8N73+axSZHdRQCs
+	UeXW9r28D+i+T85PGV85J3o=
+X-Google-Smtp-Source: AGHT+IH+MVpZMgPdoJedG5n6hPfgW5SQIfrJ9UXerZuOi9nyCkvyqy7LBrTm/5k5GMX96n/86q7pFA==
+X-Received: by 2002:a4a:b382:0:b0:573:4a72:6ec with SMTP id p2-20020a4ab382000000b005734a7206ecmr4941817ooo.1.1694262679365;
+        Sat, 09 Sep 2023 05:31:19 -0700 (PDT)
 Received: from fabio-Precision-3551.. ([2804:14c:485:4b61:3785:ad26:cd88:709])
-        by smtp.gmail.com with ESMTPSA id f83-20020a4a5856000000b00573320e1241sm1688320oob.14.2023.09.09.05.31.12
+        by smtp.gmail.com with ESMTPSA id f83-20020a4a5856000000b00573320e1241sm1688320oob.14.2023.09.09.05.31.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 09 Sep 2023 05:31:15 -0700 (PDT)
+        Sat, 09 Sep 2023 05:31:18 -0700 (PDT)
 From: Fabio Estevam <festevam@gmail.com>
 To: shawnguo@kernel.org
 Cc: wei.fang@nxp.com,
@@ -68,10 +69,12 @@ Cc: wei.fang@nxp.com,
 	devicetree@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	Fabio Estevam <festevam@denx.de>
-Subject: [PATCH 1/2] dt-bindings: net: fec: Add imx8dxl description
-Date: Sat,  9 Sep 2023 09:31:06 -0300
-Message-Id: <20230909123107.1048998-1-festevam@gmail.com>
+Subject: [PATCH 2/2] arm64: dts: imx8dxl-ss-conn: Complete the FEC compatibles
+Date: Sat,  9 Sep 2023 09:31:07 -0300
+Message-Id: <20230909123107.1048998-2-festevam@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230909123107.1048998-1-festevam@gmail.com>
+References: <20230909123107.1048998-1-festevam@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,27 +91,41 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Fabio Estevam <festevam@denx.de>
 
-The imx8dl FEC has the same programming model as the one on the imx8qxp.
+Use the full compatible list for the imx8dl FEC as per fsl,fec.yaml. 
 
-Add the imx8dl compatible string.
+This fixes the following schema warning:
+
+imx8dxl-evk.dtb: ethernet@5b040000: compatible: 'oneOf' conditional failed, one must be fixed:
+	['fsl,imx8qm-fec'] is too short
+	'fsl,imx8qm-fec' is not one of ['fsl,imx25-fec', 'fsl,imx27-fec', 'fsl,imx28-fec', 'fsl,imx6q-fec', 'fsl,mvf600-fec', 'fsl,s32v234-fec']
+	'fsl,imx8qm-fec' is not one of ['fsl,imx53-fec', 'fsl,imx6sl-fec']
+	'fsl,imx8qm-fec' is not one of ['fsl,imx35-fec', 'fsl,imx51-fec']
+	'fsl,imx8qm-fec' is not one of ['fsl,imx6ul-fec', 'fsl,imx6sx-fec']
+	'fsl,imx8qm-fec' is not one of ['fsl,imx7d-fec']
+	'fsl,imx8mq-fec' was expected
+	'fsl,imx8qm-fec' is not one of ['fsl,imx8mm-fec', 'fsl,imx8mn-fec', 'fsl,imx8mp-fec', 'fsl,imx93-fec']
+	'fsl,imx8qm-fec' is not one of ['fsl,imx8dxl-fec', 'fsl,imx8qxp-fec']
+	'fsl,imx8qm-fec' is not one of ['fsl,imx8ulp-fec']
+	from schema $id: http://devicetree.org/schemas/net/fsl,fec.yaml#
 
 Signed-off-by: Fabio Estevam <festevam@denx.de>
 ---
- Documentation/devicetree/bindings/net/fsl,fec.yaml | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/boot/dts/freescale/imx8dxl-ss-conn.dtsi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/devicetree/bindings/net/fsl,fec.yaml b/Documentation/devicetree/bindings/net/fsl,fec.yaml
-index b494e009326e..8948a11c994e 100644
---- a/Documentation/devicetree/bindings/net/fsl,fec.yaml
-+++ b/Documentation/devicetree/bindings/net/fsl,fec.yaml
-@@ -59,6 +59,7 @@ properties:
-           - const: fsl,imx6sx-fec
-       - items:
-           - enum:
-+              - fsl,imx8dxl-fec
-               - fsl,imx8qxp-fec
-           - const: fsl,imx8qm-fec
-           - const: fsl,imx6sx-fec
+diff --git a/arch/arm64/boot/dts/freescale/imx8dxl-ss-conn.dtsi b/arch/arm64/boot/dts/freescale/imx8dxl-ss-conn.dtsi
+index b47752a878c9..a414df645351 100644
+--- a/arch/arm64/boot/dts/freescale/imx8dxl-ss-conn.dtsi
++++ b/arch/arm64/boot/dts/freescale/imx8dxl-ss-conn.dtsi
+@@ -118,7 +118,7 @@ &enet0_lpcg {
+ };
+ 
+ &fec1 {
+-	compatible = "fsl,imx8qm-fec";
++	compatible = "fsl,imx8dxl-fec", "fsl,imx8qm-fec", "fsl,imx6sx-fec";
+ 	interrupts = <GIC_SPI 160 IRQ_TYPE_LEVEL_HIGH>,
+ 		     <GIC_SPI 158 IRQ_TYPE_LEVEL_HIGH>,
+ 		     <GIC_SPI 159 IRQ_TYPE_LEVEL_HIGH>,
 -- 
 2.34.1
 
