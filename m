@@ -1,53 +1,66 @@
-Return-Path: <netdev+bounces-32705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC79979979C
-	for <lists+netdev@lfdr.de>; Sat,  9 Sep 2023 13:18:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50D4D7997A3
+	for <lists+netdev@lfdr.de>; Sat,  9 Sep 2023 13:24:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF7041C20959
-	for <lists+netdev@lfdr.de>; Sat,  9 Sep 2023 11:18:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC451281AB0
+	for <lists+netdev@lfdr.de>; Sat,  9 Sep 2023 11:24:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B06B1FD0;
-	Sat,  9 Sep 2023 11:18:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 160421FDC;
+	Sat,  9 Sep 2023 11:24:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 579C81FCC
-	for <netdev@vger.kernel.org>; Sat,  9 Sep 2023 11:18:42 +0000 (UTC)
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 249F4CF2;
-	Sat,  9 Sep 2023 04:18:41 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 54BCD6732D; Sat,  9 Sep 2023 13:18:35 +0200 (CEST)
-Date: Sat, 9 Sep 2023 13:18:34 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: David Hildenbrand <david@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
-	David Howells <dhowells@redhat.com>, Peter Xu <peterx@redhat.com>,
-	Lei Huang <lei.huang@linux.intel.com>, miklos@szeredi.hu,
-	Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Trond Myklebust <trond.myklebust@hammerspace.com>,
-	Anna Schumaker <anna@kernel.org>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jakub Sitnicki <jakub@cloudflare.com>,
-	Boris Pismenny <borisp@nvidia.com>, linux-nfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, ceph-devel@vger.kernel.org,
-	linux-mm@kvack.org, v9fs@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: getting rid of the last memory modifitions through
- gup(FOLL_GET)
-Message-ID: <20230909111834.GA11859@lst.de>
-References: <20230905141604.GA27370@lst.de> <0240468f-3cc5-157b-9b10-f0cd7979daf0@redhat.com> <20230908081544.GB8240@lst.de> <8698ba1f-fc5d-a82e-842b-100dc8957f2f@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03E4D1FD7;
+	Sat,  9 Sep 2023 11:24:19 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC10DCF2;
+	Sat,  9 Sep 2023 04:24:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694258658; x=1725794658;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=lzrI8p99jf5EW/XFvyz0LvPZxlnvgQAHoPR1ihbSpIc=;
+  b=YagF8wIAJoQCWA0hl1FI29hXBRchepyfSnJM/1mz242Ci3ZUKQIUtMqH
+   I6yxE+Lu9VlamQlvafzc/TJn183kwQo/WwN1ZOKtekAWX1e6a5PH7Hw2h
+   uHw2ITdbwsUJ2WNq1YTul8dpCe/QuhPke2/FyeJmtW44jZM19NaHKiwqc
+   cEaiXiC824QaOoPmfDsgo4x/mQtUdDV4/mXpNrxVflYf1Uf3WqR7BBIwj
+   LLjcrcYYd2dns5Arjf/hGRWY5Ur/GAZIwD6EXMLPikVddz2i9rjMs+tyX
+   fvO5bYZkT130q40+KKL5FiORGhuY9IalimsfVx+Ao7N7YbBXypqauob0H
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10827"; a="377724652"
+X-IronPort-AV: E=Sophos;i="6.02,239,1688454000"; 
+   d="scan'208";a="377724652"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2023 04:24:18 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10827"; a="742796870"
+X-IronPort-AV: E=Sophos;i="6.02,239,1688454000"; 
+   d="scan'208";a="742796870"
+Received: from lkp-server01.sh.intel.com (HELO 59b3c6e06877) ([10.239.97.150])
+  by orsmga002.jf.intel.com with ESMTP; 09 Sep 2023 04:24:15 -0700
+Received: from kbuild by 59b3c6e06877 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qew4S-0003PV-2c;
+	Sat, 09 Sep 2023 11:24:12 +0000
+Date: Sat, 9 Sep 2023 19:23:14 +0800
+From: kernel test robot <lkp@intel.com>
+To: Stanislav Fomichev <sdf@google.com>, bpf@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, ast@kernel.org, daniel@iogearbox.net,
+	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
+	yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org,
+	sdf@google.com, haoluo@google.com, jolsa@kernel.org,
+	netdev@vger.kernel.org, Willem de Bruijn <willemb@google.com>
+Subject: Re: [PATCH bpf-next 2/3] bpf: expose information about supported xdp
+ metadata kfunc
+Message-ID: <202309091923.UTfYFF4J-lkp@intel.com>
+References: <20230908225807.1780455-3-sdf@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,69 +69,79 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8698ba1f-fc5d-a82e-842b-100dc8957f2f@redhat.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <20230908225807.1780455-3-sdf@google.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Sep 08, 2023 at 06:48:05PM +0200, David Hildenbrand wrote:
-> vmsplice_to_pipe() -> iter_to_pipe() -> iov_iter_get_pages2()
->
-> So it ends up calling get_user_pages_fast()
->
-> ... and not using FOLL_PIN|FOLL_LONGTERM
->
-> Why FOLL_LONGTERM? Because it's a longterm pin, where unprivileged users 
-> can grab a reference on a page for all eternity, breaking CMA and memory 
-> hotunplug (well, and harming compaction).
->
-> Why FOLL_PIN? Well FOLL_LONGTERM only applies to FOLL_PIN. But for 
-> anonymous memory, this will also take care of the last remaining hugetlb 
-> COW test (trigger COW unsharing) as commented back in:
->
-> https://lore.kernel.org/all/02063032-61e7-e1e5-cd51-a50337405159@redhat.com/
+Hi Stanislav,
 
-Well, I'm not against it.  It just isn't required for deadling with
-file system writeback vs GUP modification race this thread was started
-for. 
+kernel test robot noticed the following build warnings:
 
->> Can KVM page tables use file backed shared mappings?
->
-> Yes, usually shmem and hugetlb. But with things like emulated 
-> NVDIMMs/virtio-pmem for VMs, easily also ordinary files.
->
-> But it's really not ordinary write access through GUP. It's write access 
-> via a secondary page table (secondary MMU), that's synchronized to the 
-> process page table -- just like if the CPU would be writing to the page 
-> using the process page tables (primary MMU).
+[auto build test WARNING on bpf-next/master]
 
-Writing through the process page tables takes a write faul when first
-writing, which calls into ->page_mkwrite in the file system.  Does the
-synchronization take care of that?  If not we need to add or emulate it.
+url:    https://github.com/intel-lab-lkp/linux/commits/Stanislav-Fomichev/bpf-make-it-easier-to-add-new-metadata-kfunc/20230909-070017
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
+patch link:    https://lore.kernel.org/r/20230908225807.1780455-3-sdf%40google.com
+patch subject: [PATCH bpf-next 2/3] bpf: expose information about supported xdp metadata kfunc
+config: i386-randconfig-141-20230909 (https://download.01.org/0day-ci/archive/20230909/202309091923.UTfYFF4J-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20230909/202309091923.UTfYFF4J-lkp@intel.com/reproduce)
 
-> ptrace will find the pagecache page writable in the page table (PTE write 
-> bit set), if it intends to write to the page (FOLL_WRITE). If it is not 
-> writable, it will trigger a page fault that informs the file system.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202309091923.UTfYFF4J-lkp@intel.com/
 
-Yes, that case is (mostly) fine.
+smatch warnings:
+net/core/netdev-genl.c:26 netdev_nl_dev_fill() warn: inconsistent indenting
 
->
-> With an FS that wants writenotify, we will not map a page writable (PTE 
-> write bit not set) unless it is dirty (PTE dirty bit set) IIRC.
->
-> So are we concerned about a race between the filesystem removing the PTE 
-> write bit (to catch next write access before it gets dirtied again) and 
-> ptrace marking the page dirty?
+vim +26 net/core/netdev-genl.c
 
-Yes.  This is the race that we've run into with various GUP users.
+    11	
+    12	static int
+    13	netdev_nl_dev_fill(struct net_device *netdev, struct sk_buff *rsp,
+    14			   const struct genl_info *info)
+    15	{
+    16		u64 xdp_rx_meta = 0;
+    17		void *hdr;
+    18	
+    19		hdr = genlmsg_iput(rsp, info);
+    20		if (!hdr)
+    21			return -EMSGSIZE;
+    22	
+    23	#define XDP_METADATA_KFUNC(_, flag, __, xmo) \
+    24		if (netdev->xdp_metadata_ops->xmo) \
+    25			xdp_rx_meta |= flag;
+  > 26	XDP_METADATA_KFUNC_xxx
+    27	#undef XDP_METADATA_KFUNC
+    28	
+    29		if (nla_put_u32(rsp, NETDEV_A_DEV_IFINDEX, netdev->ifindex) ||
+    30		    nla_put_u64_64bit(rsp, NETDEV_A_DEV_XDP_FEATURES,
+    31				      netdev->xdp_features, NETDEV_A_DEV_PAD) ||
+    32		    nla_put_u64_64bit(rsp, NETDEV_A_DEV_XDP_RX_METADATA_FEATURES,
+    33				      xdp_rx_meta, NETDEV_A_DEV_PAD)) {
+    34			genlmsg_cancel(rsp, hdr);
+    35			return -EINVAL;
+    36		}
+    37	
+    38		if (netdev->xdp_features & NETDEV_XDP_ACT_XSK_ZEROCOPY) {
+    39			if (nla_put_u32(rsp, NETDEV_A_DEV_XDP_ZC_MAX_SEGS,
+    40					netdev->xdp_zc_max_segs)) {
+    41				genlmsg_cancel(rsp, hdr);
+    42				return -EINVAL;
+    43			}
+    44		}
+    45	
+    46		genlmsg_end(rsp, hdr);
+    47	
+    48		return 0;
+    49	}
+    50	
 
-> Yes. However, secondary MMU users (like KVM) would need some way to keep 
-> making use of that; ideally, using a proper separate interface instead of 
-> (ab)using plain GUP and confusing people :)
-
-I'mm all for that.
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
