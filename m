@@ -1,39 +1,38 @@
-Return-Path: <netdev+bounces-32710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 668C57998AA
-	for <lists+netdev@lfdr.de>; Sat,  9 Sep 2023 15:34:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5118F7998B3
+	for <lists+netdev@lfdr.de>; Sat,  9 Sep 2023 15:39:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A1B8281A1D
-	for <lists+netdev@lfdr.de>; Sat,  9 Sep 2023 13:34:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8FC2281A54
+	for <lists+netdev@lfdr.de>; Sat,  9 Sep 2023 13:39:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 028876D1B;
-	Sat,  9 Sep 2023 13:34:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F9A26FA8;
+	Sat,  9 Sep 2023 13:39:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5E1C3D62
-	for <netdev@vger.kernel.org>; Sat,  9 Sep 2023 13:33:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 734912919
+	for <netdev@vger.kernel.org>; Sat,  9 Sep 2023 13:39:11 +0000 (UTC)
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4901A12B;
-	Sat,  9 Sep 2023 06:33:58 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E45712B;
+	Sat,  9 Sep 2023 06:39:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=HLK9WSdvnIOm43j0Wk61tr1UBJcZPuI7msFKk865x3I=; b=xI
-	6HeIEcC3jghYxgGvxB6sryYMu4YuUAjB+2aQKD+nvfLkOswmx3jiK7T+DaQ/3y23knOIo9dtk7uyn
-	2OyqfSX7sqz6Q4/Ij/V59Fw2adbEznZdjoztrSnhBPvABn++MsbdSY5ODLfjaPlv3FvQa7HZvfLS2
-	WFrtr9wMXFajq/c=;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=HEzpc/wFNtRlWx6dkkmtUTFN1AjVgvA0xk6/OPsxd3c=; b=BpA4xifNkYPuvrRG3hyTzjeRul
+	5VAmhZmyO6AWr1/WrivFYeu/c/Pi5jFyJA7HOj6WWeAcAUAw56YjblNLVDnUoIP8vKW7dxTYwv3Sk
+	V9ajccPPDpG4F3weWsBTFt7xthiSiF0/6FyUvVe7fZpuQvgLMliZ99oVHfiVAKMgMz/g=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1qey5k-0063t4-7T; Sat, 09 Sep 2023 15:33:40 +0200
-Date: Sat, 9 Sep 2023 15:33:40 +0200
+	id 1qeyAu-0063u2-4W; Sat, 09 Sep 2023 15:39:00 +0200
+Date: Sat, 9 Sep 2023 15:39:00 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
@@ -45,64 +44,32 @@ Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 	linux-doc@vger.kernel.org, horatiu.vultur@microchip.com,
 	Woojung.Huh@microchip.com, Nicolas.Ferre@microchip.com,
 	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com
-Subject: Re: [RFC PATCH net-next 1/6] net: ethernet: implement OPEN Alliance
- control transaction interface
-Message-ID: <74a6cd9c-fb30-46eb-a50f-861d9ff5bf37@lunn.ch>
+Subject: Re: [RFC PATCH net-next 2/6] net: ethernet: add mac-phy interrupt
+ support with reset complete handling
+Message-ID: <28dce908-3a87-48c8-b181-d859697c0152@lunn.ch>
 References: <20230908142919.14849-1-Parthiban.Veerasooran@microchip.com>
- <20230908142919.14849-2-Parthiban.Veerasooran@microchip.com>
+ <20230908142919.14849-3-Parthiban.Veerasooran@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230908142919.14849-2-Parthiban.Veerasooran@microchip.com>
+In-Reply-To: <20230908142919.14849-3-Parthiban.Veerasooran@microchip.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
 	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Sep 08, 2023 at 07:59:14PM +0530, Parthiban Veerasooran wrote:
-> Implement register read/write interface according to the control
-> communication specified in the OPEN Alliance 10BASE-T1x MACPHY Serial
-> Interface document. Control transactions consist of one or more control
-> commands. Control commands are used by the SPI host to read and write
-> registers within the MAC-PHY. Each control commands are composed of a
-> 32-bit control command header followed by register data.
-> 
-> Control write commands can write either a single register or multiple
-> consecutive registers. When multiple consecutive registers are written,
-> the address is automatically post-incremented by the MAC-PHY. The write
-> command and data is also echoed from the MAC-PHY back to the SPI host to
-> enable the SPI host to identify which register write failed in the case
-> of any bus errors.
-> 
-> Control read commands can read either a single register or multiple
-> consecutive registers. When multiple consecutive registers are read, the
-> address is automatically post-incremented by the MAC-PHY.
-> 
-> The register data being read or written can be protected against simple
-> bit errors. When enabled by setting the Protection Enable (PROTE) bit in
-> the CONFIG0 register, protection is accomplished by duplication of each
-> 32-bit word containing register data with its ones’ complement. Errors
-> are detected at the receiver by performing a simple exclusive-OR (XOR) of
-> each received 32-bit word containing register data with its received
-> complement and detecting if there are any zeros in the result.
-> 
-> Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-> ---
->  Documentation/networking/oa-tc6-framework.rst | 231 ++++++++++++++++++
->  MAINTAINERS                                   |   8 +
->  drivers/net/ethernet/oa_tc6.c                 | 222 +++++++++++++++++
->  include/linux/oa_tc6.h                        |  31 +++
+> +	/* Register MAC-PHY interrupt service routine */
+> +	ret = devm_request_irq(&spi->dev, spi->irq, macphy_irq, 0, "macphy int",
+> +			       tc6);
 
-I'm surprised there is no kconfig and Makefile changes here. I would
-expect this is compiled as a module, which the vendor code can then
-make use of. 
+It looks like using threaded interrupts could save a lot of
+complexity. Let the IRQ core handle all the tasklet stuff for you.
 
-     Andrew
+	Andrew
 
