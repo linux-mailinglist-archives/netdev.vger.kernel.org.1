@@ -1,118 +1,72 @@
-Return-Path: <netdev+bounces-32687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83D10799595
-	for <lists+netdev@lfdr.de>; Sat,  9 Sep 2023 03:27:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 571BB79954D
+	for <lists+netdev@lfdr.de>; Sat,  9 Sep 2023 03:10:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A2E91C20A0C
-	for <lists+netdev@lfdr.de>; Sat,  9 Sep 2023 01:26:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3E9C281B71
+	for <lists+netdev@lfdr.de>; Sat,  9 Sep 2023 01:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92E1A110A;
-	Sat,  9 Sep 2023 01:26:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A99F1101;
+	Sat,  9 Sep 2023 01:10:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8505D1101
-	for <netdev@vger.kernel.org>; Sat,  9 Sep 2023 01:26:54 +0000 (UTC)
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 665D61FE9
-	for <netdev@vger.kernel.org>; Fri,  8 Sep 2023 18:26:50 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1qemF1-00CEWY-Rm; Sat, 09 Sep 2023 08:54:28 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 09 Sep 2023 08:54:30 +0800
-Date: Sat, 9 Sep 2023 08:54:30 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com,
-	syzbot <syzkaller@googlegroups.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [PATCH net] xfrm: fix a data-race in xfrm_gen_index()
-Message-ID: <ZPvCRpBwUVEN1GyU@gondor.apana.org.au>
-References: <20230908181359.1889304-1-edumazet@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E62457E5
+	for <netdev@vger.kernel.org>; Sat,  9 Sep 2023 01:10:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE70CC433C7;
+	Sat,  9 Sep 2023 01:10:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694221827;
+	bh=kML9hZ7IDaG4XktJeZe7x8+x5w4mrLeBCCe8e1QV/lA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=aEY6pwn2Yeo9yuQW7sBAUzeurEYWQEbrf1TSbgln+HHTWG2SjmzWtPJWHaHU99PfG
+	 1BLtxCba3iXLP+xbQMnKCeyxTW3DGV38psO0doZlALLot6WZQrHgVjPr0A/nX2aSar
+	 4rgXfcrn0IGyPPCM4E04o9hO62JO06oAISyEMBma7xcryXYfRcNsX+nmtQ26/Gw+fe
+	 AMmzV+Wh/Ld+j2+sJKSPVkaHZ26G1h+CSZgJI0tADDe+HUuxk9/LWAy6Kzw9zNjhKP
+	 NMvEbS3Qz1JqlBcTo9LtxPyeffaLqkoYq3X3XFif28aWLJXAxL1Pg8bPGDEyKJjBoJ
+	 s4JnLD6DaGwqg==
+Date: Fri, 8 Sep 2023 18:10:25 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Felix Fietkau <nbd@nbd.name>
+Cc: Vincent Whitchurch <vincent.whitchurch@axis.com>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Maxim Mikityanskiy <maxtram95@gmail.com>, <netdev@vger.kernel.org>,
+ <linux-stm32@st-md-mailman.stormreply.com>,
+ <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+ <kernel@axis.com>
+Subject: Re: [PATCH net v2] net: stmmac: fix handling of zero coalescing
+ tx-usecs
+Message-ID: <20230908181025.5a38c4f5@kernel.org>
+In-Reply-To: <20230907-stmmac-coaloff-v2-1-38ccfac548b9@axis.com>
+References: <20230907-stmmac-coaloff-v2-1-38ccfac548b9@axis.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230908181359.1889304-1-edumazet@google.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Sep 08, 2023 at 06:13:59PM +0000, Eric Dumazet wrote:
-> xfrm_gen_index() mutual exclusion uses net->xfrm.xfrm_policy_lock.
+On Thu, 7 Sep 2023 12:46:31 +0200 Vincent Whitchurch wrote:
+> Setting ethtool -C eth0 tx-usecs 0 is supposed to disable the use of the
+> coalescing timer but currently it gets programmed with zero delay
+> instead.
 > 
-> This means we must use a per-netns idx_generator variable,
-> instead of a static one.
-> Alternative would be to use an atomic variable.
+> Disable the use of the coalescing timer if tx-usecs is zero by
+> preventing it from being restarted.  Note that to keep things simple we
+> don't start/stop the timer when the coalescing settings are changed, but
+> just let that happen on the next transmit or timer expiry.
 > 
-> syzbot reported:
-> 
-> BUG: KCSAN: data-race in xfrm_sk_policy_insert / xfrm_sk_policy_insert
-> 
-> write to 0xffffffff87005938 of 4 bytes by task 29466 on cpu 0:
-> xfrm_gen_index net/xfrm/xfrm_policy.c:1385 [inline]
-> xfrm_sk_policy_insert+0x262/0x640 net/xfrm/xfrm_policy.c:2347
-> xfrm_user_policy+0x413/0x540 net/xfrm/xfrm_state.c:2639
-> do_ipv6_setsockopt+0x1317/0x2ce0 net/ipv6/ipv6_sockglue.c:943
-> ipv6_setsockopt+0x57/0x130 net/ipv6/ipv6_sockglue.c:1012
-> rawv6_setsockopt+0x21e/0x410 net/ipv6/raw.c:1054
-> sock_common_setsockopt+0x61/0x70 net/core/sock.c:3697
-> __sys_setsockopt+0x1c9/0x230 net/socket.c:2263
-> __do_sys_setsockopt net/socket.c:2274 [inline]
-> __se_sys_setsockopt net/socket.c:2271 [inline]
-> __x64_sys_setsockopt+0x66/0x80 net/socket.c:2271
-> do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
-> entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> 
-> read to 0xffffffff87005938 of 4 bytes by task 29460 on cpu 1:
-> xfrm_sk_policy_insert+0x13e/0x640
-> xfrm_user_policy+0x413/0x540 net/xfrm/xfrm_state.c:2639
-> do_ipv6_setsockopt+0x1317/0x2ce0 net/ipv6/ipv6_sockglue.c:943
-> ipv6_setsockopt+0x57/0x130 net/ipv6/ipv6_sockglue.c:1012
-> rawv6_setsockopt+0x21e/0x410 net/ipv6/raw.c:1054
-> sock_common_setsockopt+0x61/0x70 net/core/sock.c:3697
-> __sys_setsockopt+0x1c9/0x230 net/socket.c:2263
-> __do_sys_setsockopt net/socket.c:2274 [inline]
-> __se_sys_setsockopt net/socket.c:2271 [inline]
-> __x64_sys_setsockopt+0x66/0x80 net/socket.c:2271
-> do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
-> entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> 
-> value changed: 0x00006ad8 -> 0x00006b18
-> 
-> Reported by Kernel Concurrency Sanitizer on:
-> CPU: 1 PID: 29460 Comm: syz-executor.1 Not tainted 6.5.0-rc5-syzkaller-00243-g9106536c1aa3 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
-> 
-> Fixes: 1121994c803f ("netns xfrm: policy insertion in netns")
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Steffen Klassert <steffen.klassert@secunet.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> ---
->  include/net/netns/xfrm.h | 1 +
->  net/xfrm/xfrm_policy.c   | 6 ++----
->  2 files changed, 3 insertions(+), 4 deletions(-)
+> Fixes: 8fce33317023 ("net: stmmac: Rework coalesce timer and fix multi-queue races")
+> Signed-off-by: Vincent Whitchurch <vincent.whitchurch@axis.com>
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Felix, good enough?
 
