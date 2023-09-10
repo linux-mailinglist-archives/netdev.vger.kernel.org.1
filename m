@@ -1,108 +1,200 @@
-Return-Path: <netdev+bounces-32723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98258799D86
-	for <lists+netdev@lfdr.de>; Sun, 10 Sep 2023 11:39:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5FA4799DBB
+	for <lists+netdev@lfdr.de>; Sun, 10 Sep 2023 12:55:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6DEA1C2085B
-	for <lists+netdev@lfdr.de>; Sun, 10 Sep 2023 09:39:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C148A1C202E8
+	for <lists+netdev@lfdr.de>; Sun, 10 Sep 2023 10:55:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2164A23BC;
-	Sun, 10 Sep 2023 09:39:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4835C2574;
+	Sun, 10 Sep 2023 10:55:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93169A49
-	for <netdev@vger.kernel.org>; Sun, 10 Sep 2023 09:39:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83C6CC433C8;
-	Sun, 10 Sep 2023 09:39:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694338783;
-	bh=ysgPsq9QspCHPdVZ1NaI1wqrQYbL59Pa0hwTYZh34Nk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=T3i5HiRGNxsKaTMRC+nDxaeScpBzQq2QvqVKltUakavvPuMPRD8hp82/gdKep768f
-	 S7omkx2VlYsBPhWdmbCgIRVEwPfsQkZxCEcBOYYJbhfkx3anVlHgXSDgy/upQY23F2
-	 f0SbrOOc7v/H9zLOHoxM3sg88rhmJHbV/658hNtsxI30jJtoDyRHw7Jr4ha6Ksh7Ud
-	 y5OJl+X/RFb9pnHqDkoS/Z7Mx1BaAf/Dg0JV6cjP4kPkgh/3Vrz4hkQ1evME/SPWfC
-	 KxIu+9XFxu7tWBgEhzvKiNQoq4CaQ04SAnY4kgixGGBkFZDm8s4Mjb0bYhxBMFXUm5
-	 NuvAaUogKpa/A==
-Date: Sun, 10 Sep 2023 10:39:38 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Fabio Estevam <festevam@gmail.com>
-Cc: shawnguo@kernel.org, wei.fang@nxp.com, shenwei.wang@nxp.com,
-	xiaoning.wang@nxp.com, kuba@kernel.org, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Fabio Estevam <festevam@denx.de>
-Subject: Re: [PATCH 1/2] dt-bindings: net: fec: Add imx8dxl description
-Message-ID: <20230910-isotope-uncured-53d69b025137@spud>
-References: <20230909123107.1048998-1-festevam@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CB1920F1
+	for <netdev@vger.kernel.org>; Sun, 10 Sep 2023 10:55:20 +0000 (UTC)
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF253CD1
+	for <netdev@vger.kernel.org>; Sun, 10 Sep 2023 03:55:18 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-52c88a03f99so4268337a12.2
+        for <netdev@vger.kernel.org>; Sun, 10 Sep 2023 03:55:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1694343316; x=1694948116; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=puTyiF7lSO91f2hx49Y8uu9bTlDZQ2heMks8xKH0qYk=;
+        b=JlBgVMIode+Sh1KsqhI1qHSaK3enqKRveA//ohv30Q5fPEevcBCP6HXmIdTGiDFx1T
+         AXP/HUuUwhVIn2K2dXQ2EwYPju0/xf8FN2cPfrDvWJgXcQ67A5GTmR+cMkp4WXyrxhq+
+         kHhZCpDntsLPGSyJ4OiDo5wndeZ1nFFspLogSThe8tqW5nOR2mMBbNryADvZB3dm6aNq
+         tEnuEpiOnSftigX2THx6Plfs7P2+PDrR6rg116A4Dai76zXvRinoknzpL4Ed4geKUbL4
+         FTaTRK0A4rO8Bv2WNEazf7eLjFoHsoWoOXRfOjn0kT65zBIDkoIjThR54XGwFDm1h7NH
+         SdZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694343316; x=1694948116;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=puTyiF7lSO91f2hx49Y8uu9bTlDZQ2heMks8xKH0qYk=;
+        b=rPOo5pvojJQbKG9U7DLx7VIO0qC3ogKiKZTCk2rCHyfXP0Fxvf/+Y5W+xEKSjMU+4p
+         Y9wlwlb3fbOhShmD1cfz1KkBmtfQ6fMdA/6gZU7Xm3Kw1HQRcKV0chybEkcLmQtszcKO
+         QFcYmeOJMmO7n2Ld4zhiQ3ViU587clbblgRmEgPupdGx4IlLwKDV/AJSLS6BrjPs3OIk
+         eGjg0Bb+JQYmJbEagnKQO/9UwziCNwA35/ivH3patybaJK7CfFUSoZALuYLHsT/Nz2hD
+         g2cehbNa+zToFK8cUOPgiY3ryoUYJBNSlw3S/QyhjRvbJ0W50+3l2t3x9P2aA/jy0mhG
+         f57A==
+X-Gm-Message-State: AOJu0YwdZ2RsxMr4OruISrSCELDKnT5Z7ZhbDVgQonYu6OZHZlFcSyPh
+	nT5/HIloZDzYub57FSgS7lsz3Q==
+X-Google-Smtp-Source: AGHT+IHM0sRwrwHDiGd+MkKBFN1EjjQ3cC0NYWTn5BzqqBklD9R01Xykug8EJN7zERNVsImMivnFUQ==
+X-Received: by 2002:a50:ee89:0:b0:529:fa63:ef7d with SMTP id f9-20020a50ee89000000b00529fa63ef7dmr5063892edr.7.1694343315732;
+        Sun, 10 Sep 2023 03:55:15 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.214.188])
+        by smtp.gmail.com with ESMTPSA id j8-20020aa7c0c8000000b00525503fac84sm3240460edp.25.2023.09.10.03.55.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 10 Sep 2023 03:55:15 -0700 (PDT)
+Message-ID: <feb8eaeb-954c-416d-6e30-acb4b92764e0@linaro.org>
+Date: Sun, 10 Sep 2023 12:55:12 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="i7DpLp73U/PzOMoT"
-Content-Disposition: inline
-In-Reply-To: <20230909123107.1048998-1-festevam@gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.0
+Subject: Re: [RFC PATCH net-next 6/6] microchip: lan865x: add device-tree
+ support for Microchip's LAN865X MACPHY
+Content-Language: en-US
+To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+ conor+dt@kernel.org, corbet@lwn.net, steen.hegelund@microchip.com,
+ rdunlap@infradead.org, horms@kernel.org, casper.casan@gmail.com,
+ andrew@lunn.ch
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ horatiu.vultur@microchip.com, Woojung.Huh@microchip.com,
+ Nicolas.Ferre@microchip.com, UNGLinuxDriver@microchip.com,
+ Thorsten.Kummermehr@microchip.com
+References: <20230908142919.14849-1-Parthiban.Veerasooran@microchip.com>
+ <20230908142919.14849-7-Parthiban.Veerasooran@microchip.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230908142919.14849-7-Parthiban.Veerasooran@microchip.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
+On 08/09/2023 16:29, Parthiban Veerasooran wrote:
+> Add device-tree support for Microchip's LAN865X MACPHY for configuring
+> the OPEN Alliance 10BASE-T1x MACPHY Serial Interface parameters.
 
---i7DpLp73U/PzOMoT
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Please use subject prefixes matching the subsystem. You can get them for
+example with `git log --oneline -- DIRECTORY_OR_FILE` on the directory
+your patch is touching.
 
-On Sat, Sep 09, 2023 at 09:31:06AM -0300, Fabio Estevam wrote:
-> From: Fabio Estevam <festevam@denx.de>
->=20
-> The imx8dl FEC has the same programming model as the one on the imx8qxp.
->=20
-> Add the imx8dl compatible string.
->=20
-> Signed-off-by: Fabio Estevam <festevam@denx.de>
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
-
-Thanks,
-Conor.
-
+> 
+> Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
 > ---
->  Documentation/devicetree/bindings/net/fsl,fec.yaml | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/Documentation/devicetree/bindings/net/fsl,fec.yaml b/Documen=
-tation/devicetree/bindings/net/fsl,fec.yaml
-> index b494e009326e..8948a11c994e 100644
-> --- a/Documentation/devicetree/bindings/net/fsl,fec.yaml
-> +++ b/Documentation/devicetree/bindings/net/fsl,fec.yaml
-> @@ -59,6 +59,7 @@ properties:
->            - const: fsl,imx6sx-fec
->        - items:
->            - enum:
-> +              - fsl,imx8dxl-fec
->                - fsl,imx8qxp-fec
->            - const: fsl,imx8qm-fec
->            - const: fsl,imx6sx-fec
-> --=20
-> 2.34.1
->=20
+>  .../bindings/net/microchip,lan865x.yaml       | 54 +++++++++++++++++++
+>  MAINTAINERS                                   |  1 +
+>  2 files changed, 55 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/microchip,lan865x.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/net/microchip,lan865x.yaml b/Documentation/devicetree/bindings/net/microchip,lan865x.yaml
+> new file mode 100644
+> index 000000000000..3465b2c97690
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/microchip,lan865x.yaml
+> @@ -0,0 +1,54 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/microchip,lan865x.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Microchip LAN8650/1 10BASE-T1S MACPHY Ethernet Controllers
+> +
+> +maintainers:
+> +  - Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
+> +
+> +description: |
+> +  Device tree properties for LAN8650/1 10BASE-T1S MACPHY Ethernet
 
---i7DpLp73U/PzOMoT
-Content-Type: application/pgp-signature; name="signature.asc"
+Drop "Device tree properties for" and instead describe the hardware.
 
------BEGIN PGP SIGNATURE-----
+> +  controller.
+> +
+> +allOf:
+> +  - $ref: ethernet-controller.yaml#
+> +
+> +properties:
+> +  compatible:
+> +    items:
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZP2O2gAKCRB4tDGHoIJi
-0jpyAP0dvclFyo0iMw+7wMHdalTWBEOGqHTHl9OEZMugJPfSGgD/UmJBuWlsafdS
-Tx9lrExixAw10OvS1Ygi/Wl7VGduQQM=
-=dscV
------END PGP SIGNATURE-----
+No need for items. Just enum.
 
---i7DpLp73U/PzOMoT--
+
+> +      - enum:
+> +          - microchip,lan865x
+
+No wildcards in compatibles.
+
+Missing blank line.
+
+
+
+> +  reg:
+> +    maxItems: 1
+> +
+> +  local-mac-address: true
+> +  oa-chunk-size: true
+> +  oa-tx-cut-through: true
+> +  oa-rx-cut-through: true
+> +  oa-protected: true
+
+What are all these? Where are they defined that you skip description,
+type and vendor prefix?
+
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    spi {
+> +        #address-cells = <1>;
+> +        #size-cells = <0>;
+> +
+> +        ethernet@1{
+
+Missing space
+
+> +            compatible = "microchip,lan865x";
+> +            reg = <1>; /* CE0 */
+
+CE0? chip-select? What does this comment mean in this context?
+
+> +            local-mac-address = [04 05 06 01 02 03];
+> +            oa-chunk-size = <64>;
+> +            oa-tx-cut-through;
+> +            oa-rx-cut-through;
+> +            oa-protected;
+
+
+
+Best regards,
+Krzysztof
+
 
