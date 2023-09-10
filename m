@@ -1,47 +1,46 @@
-Return-Path: <netdev+bounces-32728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00688799E97
-	for <lists+netdev@lfdr.de>; Sun, 10 Sep 2023 16:01:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3772A799EA4
+	for <lists+netdev@lfdr.de>; Sun, 10 Sep 2023 16:24:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3BC21C20828
-	for <lists+netdev@lfdr.de>; Sun, 10 Sep 2023 14:01:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AFEA1C20850
+	for <lists+netdev@lfdr.de>; Sun, 10 Sep 2023 14:24:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C2866FBF;
-	Sun, 10 Sep 2023 14:01:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 722087484;
+	Sun, 10 Sep 2023 14:24:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 723711C3F;
-	Sun, 10 Sep 2023 14:01:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 467F1C433C8;
-	Sun, 10 Sep 2023 14:01:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDCA32586
+	for <netdev@vger.kernel.org>; Sun, 10 Sep 2023 14:24:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2363AC433C8;
+	Sun, 10 Sep 2023 14:24:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694354500;
-	bh=4feami3dBSptyUGt9mIvJ79AWuoLTMKWWCgPgrZt3z4=;
+	s=k20201202; t=1694355861;
+	bh=TBS4jjVKj31VWrF/oBXKhtvtrtiG5o+BNyPunPTFvmY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RfDELed6MzYoBnaSAcTE7etwAsApCxpkWvitqBw5AuZz1FIkZUm4vOQJHTcbApFBq
-	 zp4F8GHEhwstnKStqq8WQKsX750DBHHQKXffhpR1fLYbRdU2vk2GdsEz/yy9yIYDDS
-	 vur+HGtA+os56SKO+hBwf9C2nlGqEMDU1iTSKMaB4jDDgEQCjJx7ZfeFgfqLH3/WS1
-	 bSHM+TdvrVcvMnyTwc61c6rgr4U6JP3WBXakJ5y+2jOlGdT7A9dkxPLvAhb7BU8U5I
-	 JTJt8PGUNf9BMuEDJyqeatNI0wHDkJ9GnP42M6Aw75x4q4we0nn8N3QXAkSp9kzDjb
-	 2HZghvgwVG+FA==
-Date: Sun, 10 Sep 2023 16:01:35 +0200
+	b=TpojpTMqg9l1uHIi9VfwG6NZqwPS9z1jin5cN0syCzbdo2FZoV6crGKBQOnkL23Ki
+	 QTZ3uAclB4kD/aI46/VJXtkZN5njGFcvwV7WADdO68ulJyBBDVe0neNrW/+++wvg5R
+	 LRNPOrKWxXmr1Y12bAqyNRldo53DFlJXRW+R88Y9VvQY1WMcYz0mN9EEppodIWqeEq
+	 yqcb7zCZ53/BTprrtSP8LnZDwLIlcyA3wjXwwGjaGRk8LMGGN4ZQqM6JkzVUWqpMPI
+	 FJzZ+thgB7TyB9h7Ez8alJs3IiKJNKhNq0GC9nMIdnMLw+q7qaMjFMip+ZVZahIslF
+	 3LQdJusQ+zURw==
+Date: Sun, 10 Sep 2023 16:24:16 +0200
 From: Simon Horman <horms@kernel.org>
-To: Sonia Sharma <sosha@linux.microsoft.com>
-Cc: linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org, sosha@microsoft.com, kys@microsoft.com,
-	mikelley@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, longli@microsoft.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH v4 net] net: hv_netvsc: fix netvsc_send_completion to
- avoid multiple message length checks
-Message-ID: <20230910140135.GC775887@kernel.org>
-References: <1694116607-24755-1-git-send-email-sosha@linux.microsoft.com>
+To: Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>
+Cc: intel-wired-lan@osuosl.org, sasha.neftin@intel.com, bcreeley@amd.com,
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, netdev@vger.kernel.org,
+	naamax.meir@linux.intel.com, anthony.l.nguyen@intel.com,
+	husainizulkifli@gmail.com
+Subject: Re: [PATCH iwl-net v5] igc: Expose tx-usecs coalesce setting to user
+Message-ID: <20230910142416.GD775887@kernel.org>
+References: <20230908081734.28205-1-muhammad.husaini.zulkifli@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,108 +49,50 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1694116607-24755-1-git-send-email-sosha@linux.microsoft.com>
+In-Reply-To: <20230908081734.28205-1-muhammad.husaini.zulkifli@intel.com>
 
-On Thu, Sep 07, 2023 at 12:56:47PM -0700, Sonia Sharma wrote:
-> From: Sonia Sharma <sonia.sharma@linux.microsoft.com>
+On Fri, Sep 08, 2023 at 04:17:34PM +0800, Muhammad Husaini Zulkifli wrote:
+> When users attempt to obtain the coalesce setting using the
+> ethtool command, current code always returns 0 for tx-usecs.
+> This is because I225/6 always uses a queue pair setting, hence
+> tx_coalesce_usecs does not return a value during the
+> igc_ethtool_get_coalesce() callback process. The pair queue
+> condition checking in igc_ethtool_get_coalesce() is removed by
+> this patch so that the user gets information of the value of tx-usecs.
 > 
-> The switch statement in netvsc_send_completion() is incorrectly validating
-> the length of incoming network packets by falling through to the next case.
-> Avoid the fallthrough. Instead break after a case match and then process
-> the complete() call.
-> The current code has not caused any known failures. But nonetheless, the
-> code should be corrected as a different ordering of the switch cases might
-> cause a length check to fail when it should not.
-> 
-> Fixes: 44144185951a0f ("hv_netvsc: Add validation for untrusted Hyper-V values")
+> Even if i225/6 is using queue pair setting, there is no harm in
+> notifying the user of the tx-usecs. The implementation of the current
+> code may have previously been a copy of the legacy code i210.
+> Since I225 has the queue pair setting enabled, tx-usecs will always adhere
+> to the user-set rx-usecs value. An error message will appear when the user
+> attempts to set the tx-usecs value for the input parameters because,
+> by default, they should only set the rx-usecs value.
 
-As the current code is correct - it works - I feel that this is more of a
-clean-up than a fix. As such I suggest dropping the fixes tag and
-retargeting at net-next (which is due to re-open in the coming days).
+Hi Muhammad,
 
-> Signed-off-by: Sonia Sharma <sonia.sharma@linux.microsoft.com>
-> 
-> ---
-> Changes in v3:
-> * added return statement in default case as pointed by Michael Kelley.
-> Changes in v4:
-> * added fixes tag
-> * modified commit message to explain the issue fixed by patch.
-> ---
->  drivers/net/hyperv/netvsc.c | 18 ++++++++++--------
->  1 file changed, 10 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/net/hyperv/netvsc.c b/drivers/net/hyperv/netvsc.c
-> index 82e9796c8f5e..0f7e4d377776 100644
-> --- a/drivers/net/hyperv/netvsc.c
-> +++ b/drivers/net/hyperv/netvsc.c
-> @@ -851,7 +851,7 @@ static void netvsc_send_completion(struct net_device *ndev,
->  				   msglen);
->  			return;
->  		}
-> -		fallthrough;
-> +		break;
->  
->  	case NVSP_MSG1_TYPE_SEND_RECV_BUF_COMPLETE:
->  		if (msglen < sizeof(struct nvsp_message_header) +
-> @@ -860,7 +860,7 @@ static void netvsc_send_completion(struct net_device *ndev,
->  				   msglen);
->  			return;
->  		}
-> -		fallthrough;
-> +		break;
->  
->  	case NVSP_MSG1_TYPE_SEND_SEND_BUF_COMPLETE:
->  		if (msglen < sizeof(struct nvsp_message_header) +
-> @@ -869,7 +869,7 @@ static void netvsc_send_completion(struct net_device *ndev,
->  				   msglen);
->  			return;
->  		}
-> -		fallthrough;
-> +		break;
->  
->  	case NVSP_MSG5_TYPE_SUBCHANNEL:
->  		if (msglen < sizeof(struct nvsp_message_header) +
-> @@ -878,10 +878,6 @@ static void netvsc_send_completion(struct net_device *ndev,
->  				   msglen);
->  			return;
->  		}
-> -		/* Copy the response back */
-> -		memcpy(&net_device->channel_init_pkt, nvsp_packet,
-> -		       sizeof(struct nvsp_message));
-> -		complete(&net_device->channel_init_wait);
->  		break;
->  
->  	case NVSP_MSG1_TYPE_SEND_RNDIS_PKT_COMPLETE:
-> @@ -904,13 +900,19 @@ static void netvsc_send_completion(struct net_device *ndev,
->  
->  		netvsc_send_tx_complete(ndev, net_device, incoming_channel,
->  					desc, budget);
-> -		break;
-> +		return;
->  
->  	default:
->  		netdev_err(ndev,
->  			   "Unknown send completion type %d received!!\n",
->  			   nvsp_packet->hdr.msg_type);
-> +		return;
->  	}
-> +
-> +	/* Copy the response back */
-> +	memcpy(&net_device->channel_init_pkt, nvsp_packet,
-> +			sizeof(struct nvsp_message));
+Most likely I'm misunderstanding things. And even if that is not the
+case perhaps this is as good as it gets. But my reading is that
+an error will not be raised if a user provides an input value for
+tx-usecs that matches the current value of tx-usecs, even if a different
+value is provided for rx-usecs (which will also be applied to tx-usecs).
 
-nit: the indentation of the line above is not correct.
+e.g. (untested!)
 
-	memcpy(&net_device->channel_init_pkt, nvsp_packet,
-	       sizeof(struct nvsp_message));
+  # ethool -c <interface>
+  ...
+  rx-usecs: 3
+  ...
+  tx-usecs: 3
+  ...
 
-> +	complete(&net_device->channel_init_wait);
->  }
->  
->  static u32 netvsc_get_next_send_section(struct netvsc_device *net_device)
-> -- 
-> 2.25.1
-> 
-> 
+  # ethool -C <interface> tx-usecs 3 rx-usecs 4
+
+  # ethool -c <interface>
+  ...
+  rx-usecs: 4
+  ...
+  tx-usecs: 4
+  ...
+
+...
 
