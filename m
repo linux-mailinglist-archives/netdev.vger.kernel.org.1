@@ -1,90 +1,84 @@
-Return-Path: <netdev+bounces-32738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EE43799F35
-	for <lists+netdev@lfdr.de>; Sun, 10 Sep 2023 19:58:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09B0C799F45
+	for <lists+netdev@lfdr.de>; Sun, 10 Sep 2023 20:01:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE91C1C2084B
-	for <lists+netdev@lfdr.de>; Sun, 10 Sep 2023 17:58:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8D3B28112D
+	for <lists+netdev@lfdr.de>; Sun, 10 Sep 2023 18:01:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19D208482;
-	Sun, 10 Sep 2023 17:58:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A40838498;
+	Sun, 10 Sep 2023 18:00:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D39E1257E
-	for <netdev@vger.kernel.org>; Sun, 10 Sep 2023 17:58:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65527C433C7;
-	Sun, 10 Sep 2023 17:58:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D784257F
+	for <netdev@vger.kernel.org>; Sun, 10 Sep 2023 18:00:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CBAE2C433C9;
+	Sun, 10 Sep 2023 18:00:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694368710;
-	bh=NH8cClsBXDOEH39n3025iXsEaUUDx0eXXxKoTLrsTfo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nw1169OdRDD27uQy6uZv9dnITBYxHgo+JW2YfIRjTb+SrKxvk96R7dhKWXFTuUuOd
-	 QzvFa0FU0aXP0Dn5dSxdHGMRSqn9HXJo9qq6E6sLqHeUdwaCN4m/Fc18dsV9+nx8aF
-	 vrvYUky2hIb0H7BnGLutaJUrtREANLGqLLlZm+lcpX/tGrEZsPgPOAK74+cqia7KZI
-	 jNYY2BtRk7UZ47V3lMrsFaJVUdB+430XAv23IDypced/r1ARFcP7I07J0hn+Lb4uq/
-	 TvJQLpjtvL6cbxp1jIrqFm3GDqlbrN637P51Q88Kj0oJ/p6x3FZ2/Pr/B27wN43zMB
-	 si7gR6HPyzOqg==
-Date: Sun, 10 Sep 2023 19:58:24 +0200
-From: Simon Horman <horms@kernel.org>
-To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	corbet@lwn.net, steen.hegelund@microchip.com, rdunlap@infradead.org,
-	casper.casan@gmail.com, andrew@lunn.ch, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, horatiu.vultur@microchip.com,
-	Woojung.Huh@microchip.com, Nicolas.Ferre@microchip.com,
-	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com
-Subject: Re: [RFC PATCH net-next 4/6] net: ethernet: implement data
- transaction interface
-Message-ID: <20230910175824.GL775887@kernel.org>
-References: <20230908142919.14849-1-Parthiban.Veerasooran@microchip.com>
- <20230908142919.14849-5-Parthiban.Veerasooran@microchip.com>
+	s=k20201202; t=1694368821;
+	bh=aB2UE18ifINeruLLLa2U/ieX/8koQ+oI9z8xxKyuIvQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=MvVSVRjqFOB3eCa3WcubwQYCaCUPa8zQFD7ptrdEGSvNLrohKfmSPe/ZoqVIpfsza
+	 JWpKaY2Y0z+Pj+aCXosA6wD2Jvq0w/hcp76ns+3cKuCwl8HMIFsy/t48QvymK0LV4j
+	 RfIMhUPofSTMLj8+c0JhugcTC6NZsHF5HPclEAeoPLPV8/WCvmJq6cuT8ofOei38iX
+	 Wogu5cxMObHF2bGyD31jaLAW/e7G8XUnJE3/xL6wIanepGr3H8Ndp9YywQAZd4Ekid
+	 NuBFJPRx5MF0YtvlMfpkht8e6j54EwLmd0nOZd8QZsZhbfai1OZWiRlzVUS7B7tHhD
+	 a8Els9WHw2rpg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B0E2EE505B7;
+	Sun, 10 Sep 2023 18:00:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230908142919.14849-5-Parthiban.Veerasooran@microchip.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] selftests/net: Improve bind_bhash.sh to accommodate
+ predictable network interface names
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169436882172.20878.148707165455399821.git-patchwork-notify@kernel.org>
+Date: Sun, 10 Sep 2023 18:00:21 +0000
+References: <VI1P193MB0752FDA6D89743CF57FB600599EFA@VI1P193MB0752.EURP193.PROD.OUTLOOK.COM>
+In-Reply-To: <VI1P193MB0752FDA6D89743CF57FB600599EFA@VI1P193MB0752.EURP193.PROD.OUTLOOK.COM>
+To: Juntong Deng <juntong.deng@outlook.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kernel-mentees@lists.linuxfoundation.org
 
-On Fri, Sep 08, 2023 at 07:59:17PM +0530, Parthiban Veerasooran wrote:
-> The ethernet frame to be sent to MAC-PHY is converted into multiple
-> transmit data chunks. A transmit data chunk consists of a 4-byte data
-> header followed by the transmit data chunk payload.
-> 
-> The received ethernet frame from the network is converted into multiple
-> receive data chunks by the MAC-PHY and a receive data chunk consists of
-> the receive data chunk payload followed by a 4-byte data footer at the
-> end.
-> 
-> The MAC-PHY shall support a default data chunk payload size of 64 bytes.
-> Data chunk payload sizes of 32, 16, or 8 bytes may also be supported. The
-> data chunk payload is always a multiple of 4 bytes.
-> 
-> The 4-byte data header occurs at the beginning of each transmit data
-> chunk on MOSI and the 4-byte data footer occurs at the end of each
-> receive data chunk on MISO. The data header and footer contain the
-> information needed to determine the validity and location of the transmit
-> and receive frame data within the data chunk payload. Ethernet frames
-> shall be aligned to a 32-bit boundary within the data chunk payload.
-> 
-> Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+Hello:
 
-Hi Parthiban,
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-this patch seems to introduce new Sparse warnings.
-Please consider addressing those, and ideally the warnings
-flagged in the existing oa_tc6.c code.
+On Thu,  7 Sep 2023 00:26:03 +0800 you wrote:
+> Starting with v197, systemd uses predictable interface network names,
+> the traditional interface naming scheme (eth0) is deprecated, therefore
+> it cannot be assumed that the eth0 interface exists on the host.
+> 
+> This modification makes the bind_bhash test program run in a separate
+> network namespace and no longer needs to consider the name of the
+> network interface on the host.
+> 
+> [...]
 
-Thanks in advance!
+Here is the summary with links:
+  - selftests/net: Improve bind_bhash.sh to accommodate predictable network interface names
+    https://git.kernel.org/netdev/net/c/ced33ca07d8d
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
