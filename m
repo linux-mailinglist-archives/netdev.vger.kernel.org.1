@@ -1,49 +1,47 @@
-Return-Path: <netdev+bounces-32727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F303799E88
-	for <lists+netdev@lfdr.de>; Sun, 10 Sep 2023 15:49:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00688799E97
+	for <lists+netdev@lfdr.de>; Sun, 10 Sep 2023 16:01:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A839281052
-	for <lists+netdev@lfdr.de>; Sun, 10 Sep 2023 13:49:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3BC21C20828
+	for <lists+netdev@lfdr.de>; Sun, 10 Sep 2023 14:01:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C84996FBD;
-	Sun, 10 Sep 2023 13:49:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C2866FBF;
+	Sun, 10 Sep 2023 14:01:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 314442586
-	for <netdev@vger.kernel.org>; Sun, 10 Sep 2023 13:49:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76D0FC433C8;
-	Sun, 10 Sep 2023 13:49:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 723711C3F;
+	Sun, 10 Sep 2023 14:01:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 467F1C433C8;
+	Sun, 10 Sep 2023 14:01:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694353782;
-	bh=IAqYcnKPzNeIDqtgIjazLW2Yv7D0oebDNR4aro3tFR8=;
+	s=k20201202; t=1694354500;
+	bh=4feami3dBSptyUGt9mIvJ79AWuoLTMKWWCgPgrZt3z4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CwVw6uy4xBOyPC7qVHVIFToy35ARWHf379d+0HzdxNvsXYwH1v+eY1MvBRhL7oYdo
-	 hW/oawjpRjhEPSSVEzxX3YisDq+Jj0P4bGzpnMNZZgm0ajODZLwEg5136pVjUfTgem
-	 5SWaweMjWsFxjta5iIwUvjQNib4Upzjz2Q7cj492mahxKd6VRfeqCvwDfDNCHYFYK7
-	 WsFGKucXwBEWljBB60m3P88mjdVLA1oV4HByBNPrTYUDayOwZ453Fo27VRUb921im3
-	 PZ/7ZTSMCnEIPmOHNggCCcjLLA7caGXZ+sefborg1PEnkXMa6ttMbzrDbZbnq9xZut
-	 eRCzJ3cu2fWtw==
-Date: Sun, 10 Sep 2023 15:49:37 +0200
+	b=RfDELed6MzYoBnaSAcTE7etwAsApCxpkWvitqBw5AuZz1FIkZUm4vOQJHTcbApFBq
+	 zp4F8GHEhwstnKStqq8WQKsX750DBHHQKXffhpR1fLYbRdU2vk2GdsEz/yy9yIYDDS
+	 vur+HGtA+os56SKO+hBwf9C2nlGqEMDU1iTSKMaB4jDDgEQCjJx7ZfeFgfqLH3/WS1
+	 bSHM+TdvrVcvMnyTwc61c6rgr4U6JP3WBXakJ5y+2jOlGdT7A9dkxPLvAhb7BU8U5I
+	 JTJt8PGUNf9BMuEDJyqeatNI0wHDkJ9GnP42M6Aw75x4q4we0nn8N3QXAkSp9kzDjb
+	 2HZghvgwVG+FA==
+Date: Sun, 10 Sep 2023 16:01:35 +0200
 From: Simon Horman <horms@kernel.org>
-To: Julia Lawall <Julia.Lawall@inria.fr>
-Cc: Justin Chen <justin.chen@broadcom.com>, kernel-janitors@vger.kernel.org,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 02/11] net: bcmasp: add missing of_node_put
-Message-ID: <20230910134937.GB775887@kernel.org>
-References: <20230907095521.14053-1-Julia.Lawall@inria.fr>
- <20230907095521.14053-3-Julia.Lawall@inria.fr>
+To: Sonia Sharma <sosha@linux.microsoft.com>
+Cc: linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org, sosha@microsoft.com, kys@microsoft.com,
+	mikelley@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, longli@microsoft.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH v4 net] net: hv_netvsc: fix netvsc_send_completion to
+ avoid multiple message length checks
+Message-ID: <20230910140135.GC775887@kernel.org>
+References: <1694116607-24755-1-git-send-email-sosha@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,18 +50,108 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230907095521.14053-3-Julia.Lawall@inria.fr>
+In-Reply-To: <1694116607-24755-1-git-send-email-sosha@linux.microsoft.com>
 
-On Thu, Sep 07, 2023 at 11:55:12AM +0200, Julia Lawall wrote:
-> for_each_available_child_of_node performs an of_node_get
-> on each iteration, so a break out of the loop requires an
-> of_node_put.
+On Thu, Sep 07, 2023 at 12:56:47PM -0700, Sonia Sharma wrote:
+> From: Sonia Sharma <sonia.sharma@linux.microsoft.com>
 > 
-> This was done using the Coccinelle semantic patch
-> iterators/for_each_child.cocci
+> The switch statement in netvsc_send_completion() is incorrectly validating
+> the length of incoming network packets by falling through to the next case.
+> Avoid the fallthrough. Instead break after a case match and then process
+> the complete() call.
+> The current code has not caused any known failures. But nonetheless, the
+> code should be corrected as a different ordering of the switch cases might
+> cause a length check to fail when it should not.
 > 
-> Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
+> Fixes: 44144185951a0f ("hv_netvsc: Add validation for untrusted Hyper-V values")
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+As the current code is correct - it works - I feel that this is more of a
+clean-up than a fix. As such I suggest dropping the fixes tag and
+retargeting at net-next (which is due to re-open in the coming days).
 
+> Signed-off-by: Sonia Sharma <sonia.sharma@linux.microsoft.com>
+> 
+> ---
+> Changes in v3:
+> * added return statement in default case as pointed by Michael Kelley.
+> Changes in v4:
+> * added fixes tag
+> * modified commit message to explain the issue fixed by patch.
+> ---
+>  drivers/net/hyperv/netvsc.c | 18 ++++++++++--------
+>  1 file changed, 10 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/net/hyperv/netvsc.c b/drivers/net/hyperv/netvsc.c
+> index 82e9796c8f5e..0f7e4d377776 100644
+> --- a/drivers/net/hyperv/netvsc.c
+> +++ b/drivers/net/hyperv/netvsc.c
+> @@ -851,7 +851,7 @@ static void netvsc_send_completion(struct net_device *ndev,
+>  				   msglen);
+>  			return;
+>  		}
+> -		fallthrough;
+> +		break;
+>  
+>  	case NVSP_MSG1_TYPE_SEND_RECV_BUF_COMPLETE:
+>  		if (msglen < sizeof(struct nvsp_message_header) +
+> @@ -860,7 +860,7 @@ static void netvsc_send_completion(struct net_device *ndev,
+>  				   msglen);
+>  			return;
+>  		}
+> -		fallthrough;
+> +		break;
+>  
+>  	case NVSP_MSG1_TYPE_SEND_SEND_BUF_COMPLETE:
+>  		if (msglen < sizeof(struct nvsp_message_header) +
+> @@ -869,7 +869,7 @@ static void netvsc_send_completion(struct net_device *ndev,
+>  				   msglen);
+>  			return;
+>  		}
+> -		fallthrough;
+> +		break;
+>  
+>  	case NVSP_MSG5_TYPE_SUBCHANNEL:
+>  		if (msglen < sizeof(struct nvsp_message_header) +
+> @@ -878,10 +878,6 @@ static void netvsc_send_completion(struct net_device *ndev,
+>  				   msglen);
+>  			return;
+>  		}
+> -		/* Copy the response back */
+> -		memcpy(&net_device->channel_init_pkt, nvsp_packet,
+> -		       sizeof(struct nvsp_message));
+> -		complete(&net_device->channel_init_wait);
+>  		break;
+>  
+>  	case NVSP_MSG1_TYPE_SEND_RNDIS_PKT_COMPLETE:
+> @@ -904,13 +900,19 @@ static void netvsc_send_completion(struct net_device *ndev,
+>  
+>  		netvsc_send_tx_complete(ndev, net_device, incoming_channel,
+>  					desc, budget);
+> -		break;
+> +		return;
+>  
+>  	default:
+>  		netdev_err(ndev,
+>  			   "Unknown send completion type %d received!!\n",
+>  			   nvsp_packet->hdr.msg_type);
+> +		return;
+>  	}
+> +
+> +	/* Copy the response back */
+> +	memcpy(&net_device->channel_init_pkt, nvsp_packet,
+> +			sizeof(struct nvsp_message));
+
+nit: the indentation of the line above is not correct.
+
+	memcpy(&net_device->channel_init_pkt, nvsp_packet,
+	       sizeof(struct nvsp_message));
+
+> +	complete(&net_device->channel_init_wait);
+>  }
+>  
+>  static u32 netvsc_get_next_send_section(struct netvsc_device *net_device)
+> -- 
+> 2.25.1
+> 
+> 
 
