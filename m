@@ -1,108 +1,138 @@
-Return-Path: <netdev+bounces-32725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B90A799DC1
-	for <lists+netdev@lfdr.de>; Sun, 10 Sep 2023 12:55:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49F78799E75
+	for <lists+netdev@lfdr.de>; Sun, 10 Sep 2023 15:21:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B04D328125A
-	for <lists+netdev@lfdr.de>; Sun, 10 Sep 2023 10:55:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE90B1C20852
+	for <lists+netdev@lfdr.de>; Sun, 10 Sep 2023 13:21:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A99C32586;
-	Sun, 10 Sep 2023 10:55:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14B7863C8;
+	Sun, 10 Sep 2023 13:21:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D79620F1
-	for <netdev@vger.kernel.org>; Sun, 10 Sep 2023 10:55:55 +0000 (UTC)
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AA34CD5
-	for <netdev@vger.kernel.org>; Sun, 10 Sep 2023 03:55:53 -0700 (PDT)
-Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-9a21b6d105cso439771666b.3
-        for <netdev@vger.kernel.org>; Sun, 10 Sep 2023 03:55:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1694343352; x=1694948152; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IeB+N3WcU8ZB3iIjHrTen1Ywk3DzscLepUtpPK7KYFU=;
-        b=eK/bA1G4SHuERl8nEor0tUdtKM/jLqtVrLBzdl/+4+1nldkN1u/5eRh2IJ/h/xCntj
-         x9GFk8vLLiy6nYsIjqWNIiNa+8raziTeaXBhshWg+k2NALAOQon5uvtBkF+7jIR94+ge
-         KcBLNnbZUg/oMuWfycnI4lgzv04h7uGhVCybfgFRMGSA07qozXy1l/pUUbFPPku7atOl
-         7TDf4JQ7GyoAYaX0GF/aVMrzsebsnxgr5erOaEMutaS/EESZ+36RoE88mtP2SHufpstE
-         tjcD8IPu95+kp08PHWSOgtwPZz2GWrQLJni6Pf9fPv0QJ+YKMolvlvUxy1Igh+rTSRxf
-         ISpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694343352; x=1694948152;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IeB+N3WcU8ZB3iIjHrTen1Ywk3DzscLepUtpPK7KYFU=;
-        b=Q0AxH5tL5/OpAMmsxnD5zokuCCd7JUgeY2kbFFK8NuhRY+Dacq+ipt4qpRfCUnShmM
-         ClWKnth+MrO0bTBM58uRGaCgJJkkIdiXT65F79InZ8IlpQaKp15RMB8shpYDEiNGdWBz
-         XY22ShRobq7tWqYkWxXx9uWCyUFJl2Ze3qSSdaPbp/keVwibYMFM8dTS0h5xbycFfmen
-         V4AOrsBzfXEMMm4Jn6c2Lw8beofZpn2sXGHC0g0bED4UncDesI3Qz5DX90anzAVYGFWF
-         qlNYvaxy1DR+MUuRtdPYaopNrNFFOCf1Xysa+64Cah18i5W/SGkkwaS9CLJIAYYmwfOh
-         Dsrg==
-X-Gm-Message-State: AOJu0YxMhKclawyZ+Q1w8CfV3nL7UdV2/2U8ksRGIbvBpullH3uOqsx7
-	/Kxvj3fP4NMTTbVMwFzajhgoQAyHeX47usShrKs=
-X-Google-Smtp-Source: AGHT+IEtlK6pD6SAm1xa6VHOQmOUl0ygy8p84MgTWmEPdv60Cc5CbO6und2cQ+jM2C8A71j2VvjCZQ==
-X-Received: by 2002:a17:906:7393:b0:9aa:1e32:46da with SMTP id f19-20020a170906739300b009aa1e3246damr1818685ejl.37.1694343351858;
-        Sun, 10 Sep 2023 03:55:51 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.214.188])
-        by smtp.gmail.com with ESMTPSA id d16-20020a17090694d000b00982be08a9besm3692965ejy.172.2023.09.10.03.55.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 10 Sep 2023 03:55:51 -0700 (PDT)
-Message-ID: <eef69aa5-73c2-9789-9f6d-c3300553c44d@linaro.org>
-Date: Sun, 10 Sep 2023 12:55:48 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE7F1C3F
+	for <netdev@vger.kernel.org>; Sun, 10 Sep 2023 13:21:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AC90C433C7;
+	Sun, 10 Sep 2023 13:21:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694352094;
+	bh=CY5nGdT16EpT3JKL0/13IgnKQD+cRVWOFlMEjZruoMI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LWDFuQj7E3gGpVdoNEVbl1XXUC0GrlM6/DtR1ujXBzJsTJspDb8NK1m/lb1U5NZZv
+	 s/TgXeUm2/c3lGGJKh7J9GYFFpc4xs8wMH5WZ1rOVQU1DaabpukOFBA9l0XXTpMGlb
+	 GzPgyC9mJo0ltuwSI2d7lJHPYCJdRr5RoyR3PlJ/oLjDhGLDDKX/YxRvxPp1RCRhM2
+	 sa9EfJ4UDZsJa+TG5ouYPBZj6n80dSjr/jYEp+mRPuk/Gczp4HDVyRjx8CYlf0ZNl0
+	 /up+5btFb83PG+8TKGhgR28Wcur1u+OnkE2sw5zJvva3+864hcE1/scBJQO/Pvt0+X
+	 ujuzP2SUSXHUw==
+Date: Sun, 10 Sep 2023 15:21:30 +0200
+From: Simon Horman <horms@kernel.org>
+To: Jinjie Ruan <ruanjinjie@huawei.com>
+Cc: linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>
+Subject: Re: [PATCH net] net: microchip: vcap api: Fix possible memory leak
+ for vcap_dup_rule()
+Message-ID: <20230910132130.GA775887@kernel.org>
+References: <20230907140359.2399646-1-ruanjinjie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-Subject: Re: [RFC PATCH net-next 0/6] Add support for OPEN Alliance 10BASE-T1x
- MACPHY Serial Interface
-Content-Language: en-US
-To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
- conor+dt@kernel.org, corbet@lwn.net, steen.hegelund@microchip.com,
- rdunlap@infradead.org, horms@kernel.org, casper.casan@gmail.com,
- andrew@lunn.ch
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- horatiu.vultur@microchip.com, Woojung.Huh@microchip.com,
- Nicolas.Ferre@microchip.com, UNGLinuxDriver@microchip.com,
- Thorsten.Kummermehr@microchip.com
-References: <20230908142919.14849-1-Parthiban.Veerasooran@microchip.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230908142919.14849-1-Parthiban.Veerasooran@microchip.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230907140359.2399646-1-ruanjinjie@huawei.com>
 
-On 08/09/2023 16:29, Parthiban Veerasooran wrote:
-> This patch series contain the below updates,
-> - Adds support for OPEN Alliance 10BASE-T1x MACPHY Serial Interface in the
->   net/ethernet/oa_tc6.c.
-> - Adds driver support for Microchip LAN8650/1 Rev.B0 10BASE-T1S MACPHY
->   Ethernet driver in the net/ethernet/microchip/lan865x.c.
+On Thu, Sep 07, 2023 at 10:03:58PM +0800, Jinjie Ruan wrote:
+> Inject fault When select CONFIG_VCAP_KUNIT_TEST, the below memory leak
+> occurs. If kzalloc() for duprule succeeds, but the following
+> kmemdup() fails, the duprule, ckf and caf memory will be leaked. So kfree
+> them in the error path.
+> 
+> unreferenced object 0xffff122744c50600 (size 192):
+>   comm "kunit_try_catch", pid 346, jiffies 4294896122 (age 911.812s)
+>   hex dump (first 32 bytes):
+>     10 27 00 00 04 00 00 00 1e 00 00 00 2c 01 00 00  .'..........,...
+>     00 00 00 00 00 00 00 00 18 06 c5 44 27 12 ff ff  ...........D'...
+>   backtrace:
+>     [<00000000394b0db8>] __kmem_cache_alloc_node+0x274/0x2f8
+>     [<0000000001bedc67>] kmalloc_trace+0x38/0x88
+>     [<00000000b0612f98>] vcap_dup_rule+0x50/0x460
+>     [<000000005d2d3aca>] vcap_add_rule+0x8cc/0x1038
+>     [<00000000eef9d0f8>] test_vcap_xn_rule_creator.constprop.0.isra.0+0x238/0x494
+>     [<00000000cbda607b>] vcap_api_rule_remove_in_front_test+0x1ac/0x698
+>     [<00000000c8766299>] kunit_try_run_case+0xe0/0x20c
+>     [<00000000c4fe9186>] kunit_generic_run_threadfn_adapter+0x50/0x94
+>     [<00000000f6864acf>] kthread+0x2e8/0x374
+>     [<0000000022e639b3>] ret_from_fork+0x10/0x20
+> 
+> Fixes: 814e7693207f ("net: microchip: vcap api: Add a storage state to a VCAP rule")
+> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+> ---
+>  drivers/net/ethernet/microchip/vcap/vcap_api.c | 18 ++++++++++++++++--
+>  1 file changed, 16 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/microchip/vcap/vcap_api.c b/drivers/net/ethernet/microchip/vcap/vcap_api.c
+> index 300fe1a93dce..ef980e4e5bc2 100644
+> --- a/drivers/net/ethernet/microchip/vcap/vcap_api.c
+> +++ b/drivers/net/ethernet/microchip/vcap/vcap_api.c
+> @@ -1021,18 +1021,32 @@ static struct vcap_rule_internal *vcap_dup_rule(struct vcap_rule_internal *ri,
+>  	list_for_each_entry(ckf, &ri->data.keyfields, ctrl.list) {
+>  		newckf = kmemdup(ckf, sizeof(*newckf), GFP_KERNEL);
+>  		if (!newckf)
+> -			return ERR_PTR(-ENOMEM);
+> +			goto err;
+>  		list_add_tail(&newckf->ctrl.list, &duprule->data.keyfields);
+>  	}
+>  
+>  	list_for_each_entry(caf, &ri->data.actionfields, ctrl.list) {
+>  		newcaf = kmemdup(caf, sizeof(*newcaf), GFP_KERNEL);
+>  		if (!newcaf)
+> -			return ERR_PTR(-ENOMEM);
+> +			goto err;
+>  		list_add_tail(&newcaf->ctrl.list, &duprule->data.actionfields);
+>  	}
+>  
+>  	return duprule;
+> +
+> +err:
 
-And why is this RFC? Do you mean by that it is buggy and not finished,
-so we should not review?
+Hi Jinjie Ruan,
 
-Best regards,
-Krzysztof
+I think it would be slightly more idiomatic, and in keeping with the
+prevailing style of this file to call the label out_free. But I don't feel
+strongly about that. And clearly it would have no effect on the logic.
 
+That not withstanding, this looks good to me.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+> +	list_for_each_entry_safe(ckf, newckf, &duprule->data.keyfields, ctrl.list) {
+> +		list_del(&ckf->ctrl.list);
+> +		kfree(ckf);
+> +	}
+> +
+> +	list_for_each_entry_safe(caf, newcaf, &duprule->data.actionfields, ctrl.list) {
+> +		list_del(&caf->ctrl.list);
+> +		kfree(caf);
+> +	}
+> +
+> +	kfree(duprule);
+> +	return ERR_PTR(-ENOMEM);
+>  }
+>  
+>  static void vcap_apply_width(u8 *dst, int width, int bytes)
 
