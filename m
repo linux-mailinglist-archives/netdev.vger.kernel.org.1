@@ -1,96 +1,87 @@
-Return-Path: <netdev+bounces-32744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC5E079A07F
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 00:01:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5E7979A098
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 01:06:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0B4B2810EC
-	for <lists+netdev@lfdr.de>; Sun, 10 Sep 2023 22:01:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6CF21C20833
+	for <lists+netdev@lfdr.de>; Sun, 10 Sep 2023 23:06:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66ADB8BF8;
-	Sun, 10 Sep 2023 22:01:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34A488C01;
+	Sun, 10 Sep 2023 23:06:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6478BE2
-	for <netdev@vger.kernel.org>; Sun, 10 Sep 2023 22:01:32 +0000 (UTC)
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51BDF19B
-	for <netdev@vger.kernel.org>; Sun, 10 Sep 2023 15:01:29 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-68fb6fd2836so844478b3a.0
-        for <netdev@vger.kernel.org>; Sun, 10 Sep 2023 15:01:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1694383288; x=1694988088; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EyybjuBSw2AsBAibBPVqGccWs6P0JtTeGBB0Kwx90Dw=;
-        b=b1Q+Djrc6DRgK0lSMIXf6OVmm1S98Rb1dJdV/4AjeMobXYoqxa/k4Xb7XAYcmCuvbB
-         T8pFPhiJHk/Ig8CcU4is+jZGfReesXQjqK7ULjc+VZz110Uqhy1NjrWTu4Ej2kgb1UEn
-         ZHgnS7dDfuM0nrDuRkgBy+D/YOBtPecXxWCyUh6h/0/NlsJyyOwKHQwSKYYxfVY7xjkS
-         7I+QxdaDiDVRMV8qekGuV48jZlbOlbc6skR8a29kp5hS8zsrhWfeCv9XIJ/gwMURSkPX
-         Ncgzq9d3+KaDgvRq3XsvmeqBjcqt9Lc7ewxeY00IZtUnccPI4WIduUYqP2aDlo+H2VFl
-         7yRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694383288; x=1694988088;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EyybjuBSw2AsBAibBPVqGccWs6P0JtTeGBB0Kwx90Dw=;
-        b=qfN8K0NfNXXjnd5iiehz2XabBIx/t44MZIgx0vH9wvzMJbPOOv+fxA9mqReF8B/J1A
-         eeERQr9H0Ab53syLTSrEb6lUG43cHkPHtOyyzVts3Woz41ff+OXNnUFzjOcAPw3AcSmK
-         LnFUEuT90HekmMja6b1+BQ3ZZOOWVYX8P45q2EmKyW7W8IZAZXIFwQRnWuIF/jnFFxw5
-         XYA2DtiTK3pGweSa1xJnFY+kbU1lWYkCYp9VYP4Lcy3z/V5ujneu6JaMhmgDNw8mHgj2
-         hRhmfkUppYilY2/SkCy/X6nz5RiWZZ8PnFuDV2fSXZF9LbwPyqG6k6hAWcnDq5Nb0VSr
-         hVCw==
-X-Gm-Message-State: AOJu0Yzh6obzTASjdN0emWdia8EGKjyn0SaHfa1K5L0mISsl0Sr8j/SV
-	O6vKhOsr9QIZXNLhrs3uq2FK2g==
-X-Google-Smtp-Source: AGHT+IHSYFPf3w2qdTZr9bikkzuSsvPYQjYYZyW+Zfc616rQWXs3Eeo2BzwinmhhOfJVOtnHj1lBTA==
-X-Received: by 2002:a05:6a00:1a0c:b0:68c:57c7:1eb0 with SMTP id g12-20020a056a001a0c00b0068c57c71eb0mr9371853pfv.11.1694383287795;
-        Sun, 10 Sep 2023 15:01:27 -0700 (PDT)
-Received: from dread.disaster.area (pa49-195-66-88.pa.nsw.optusnet.com.au. [49.195.66.88])
-        by smtp.gmail.com with ESMTPSA id u10-20020a62ed0a000000b0068a3dd6c1dasm4403641pfh.142.2023.09.10.15.01.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 10 Sep 2023 15:01:27 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-	(envelope-from <david@fromorbit.com>)
-	id 1qfSUe-00DWBA-0u;
-	Mon, 11 Sep 2023 08:01:24 +1000
-Date: Mon, 11 Sep 2023 08:01:24 +1000
-From: Dave Chinner <david@fromorbit.com>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Hao Xu <hao.xu@linux.dev>, Matthew Wilcox <willy@infradead.org>,
-	io-uring@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Stefan Roesch <shr@fb.com>, Clay Harris <bugs@claycon.org>,
-	"Darrick J . Wong" <djwong@kernel.org>,
-	linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-ext4@vger.kernel.org, linux-cachefs@redhat.com,
-	ecryptfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-	linux-unionfs@vger.kernel.org, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, codalist@coda.cs.cmu.edu,
-	linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-	linux-mm@kvack.org, linux-nilfs@vger.kernel.org,
-	devel@lists.orangefs.org, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-mtd@lists.infradead.org,
-	Wanpeng Li <wanpengli@tencent.com>
-Subject: Re: [PATCH 07/11] vfs: add nowait parameter for file_accessed()
-Message-ID: <ZP48tAg2iS0UzKQf@dread.disaster.area>
-References: <20230827132835.1373581-1-hao.xu@linux.dev>
- <20230827132835.1373581-8-hao.xu@linux.dev>
- <ZOvA5DJDZN0FRymp@casper.infradead.org>
- <c728bf3f-d9db-4865-8473-058b26c11c06@linux.dev>
- <ZO3cI+DkotHQo3md@casper.infradead.org>
- <642de4e6-801d-fcad-a7ce-bfc6dec3b6e5@linux.dev>
- <ZPUJHAKzxvXiEDYA@dread.disaster.area>
- <6489b8cb-7d54-1e29-f192-a3449ed87fa1@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23A528488
+	for <netdev@vger.kernel.org>; Sun, 10 Sep 2023 23:06:28 +0000 (UTC)
+Received: from wout2-smtp.messagingengine.com (wout2-smtp.messagingengine.com [64.147.123.25])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A8EE106;
+	Sun, 10 Sep 2023 16:06:26 -0700 (PDT)
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+	by mailout.west.internal (Postfix) with ESMTP id 9EE963200564;
+	Sun, 10 Sep 2023 19:06:21 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute2.internal (MEProxy); Sun, 10 Sep 2023 19:06:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jcline.org; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:sender
+	:subject:subject:to:to; s=fm1; t=1694387181; x=1694473581; bh=M2
+	YbSJshShWvUhnLY8g4xtG6YDWHsJHJ87/h7S3BeSU=; b=G3kwH7/v/ywICkCB+T
+	TdSKSIlZgSEPGKfTH8Xjj2n7qgv4YWYDtob+ttK71dVVWaokIJZwI4ibMCo1yjts
+	rVsc6gXrAHpGzFGpvOt5bAddtwy2Dqko3C+R5BmlNuUrXNK6Kl00jPckh0H/OktF
+	EeoG3Qd3mlTS9uja/mm1JckvnfdWRj2Kzyn96pqg/QPhySm+XNdheM3IYDtVRL3g
+	NVHxy7CgLTixQ/wK83cNSgNUEAoK2c1ShDM+rBNYXPfyXdeqHh2PAB1WVPkM+te1
+	gxhzEG4u0Bk4IsC4ZWe8eHKhhrdNTgQ5CVVNdu6ARWQ8Sw32jxlzcbDDHh8C80jY
+	eU8g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm1; t=1694387181; x=1694473581; bh=M2YbSJshShWvU
+	hnLY8g4xtG6YDWHsJHJ87/h7S3BeSU=; b=ekL1wOQmTOQEioSQbMLE9R1Y3M89A
+	vxjmlpSpnq4iPpoL2PFloSBaCm8X4s5l318uVAr9smqQ+YgLm4cCcOAqbnNFeiM0
+	XdAWH5tKlbgl1yxEEVzIHkSsw4W1XUDr4xRNVsJpB1i9Ll2j9iHr7CxAZHsZrerp
+	l3Bz4LnKWftwb8FebVCVjpdD+KID0B6H/MRpfpUJzYNwpRKFuRttz8M0FUCI0/1z
+	WhZkSW5Si11lWllXV8+TYGAWIxpOTgxRmgmH+d+kzlmY7biN348sHNmIb0NKuBwL
+	OyvHzxclv0IqaeuMmsJjLwDvfRqwja5L60TzPBgVZHkrx0dRSYhBILilg==
+X-ME-Sender: <xms:7Ev-ZAmwVuRuUUnTYjadhWx6HkJ1hyW05alxAJWqkMBK2L17sAmXyw>
+    <xme:7Ev-ZP0lU3m3dk1HfxbCK_3hJ4CsfDPWP0y0983WamsaON3erNmlADMDRO_OBUb8U
+    VsroE79EjeI1FGQQ1s>
+X-ME-Received: <xmr:7Ev-ZOrSJL_HW5bqRd8eYV3RzTF3qOB0udcfwOSIHbm6SRanPv6nw8Do-97WOcPeJqN0wjCk2m9VPMsCFDkLYA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrudeifedgudekucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomheplfgvrhgv
+    mhihucevlhhinhgvuceojhgvrhgvmhihsehjtghlihhnvgdrohhrgheqnecuggftrfgrth
+    htvghrnhephfefjeejueelueevveelvdehffeufeffvdejkeevteekieduudeludevgeeu
+    vdeinecuffhomhgrihhnpehshiiikhgrlhhlvghrrdgrphhpshhpohhtrdgtohhmnecuve
+    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepjhgvrhgvmhih
+    sehjtghlihhnvgdrohhrgh
+X-ME-Proxy: <xmx:7Ev-ZMl1xxiEPh1ki9w--L0dpLusU-UvFeZG_tUnsI0TN9C8iLErWw>
+    <xmx:7Ev-ZO2AT-DTPbLnGgwK3P5dv7JxYpaFH5wDeTggDHN_vxbzQ18Emw>
+    <xmx:7Ev-ZDtvEdGQ1Ge0roRP1cfEagXVJDmv_iGWsGgvAowol_s5H0BKUw>
+    <xmx:7Uv-ZHkpdn0r2XK6FYO4RTumPGb6Uuzd9fYxrXEKWs79xMfMzExGmw>
+Feedback-ID: i7a7146c5:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 10 Sep 2023 19:06:20 -0400 (EDT)
+Date: Sun, 10 Sep 2023 19:06:19 -0400
+From: Jeremy Cline <jeremy@jcline.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	syzbot+c1d0a03d305972dbbe14@syzkaller.appspotmail.com
+Subject: Re: [PATCH net] net: nfc: llcp: Add lock when modifying device list
+Message-ID: <ZP5L6/zF6fE+ogbz@dev>
+References: <20230908235853.1319596-1-jeremy@jcline.org>
+ <20230910152812.GJ775887@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,77 +90,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6489b8cb-7d54-1e29-f192-a3449ed87fa1@gmail.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.6
+In-Reply-To: <20230910152812.GJ775887@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Sep 08, 2023 at 01:29:55AM +0100, Pavel Begunkov wrote:
-> On 9/3/23 23:30, Dave Chinner wrote:
-> > On Wed, Aug 30, 2023 at 02:11:31PM +0800, Hao Xu wrote:
-> > > On 8/29/23 19:53, Matthew Wilcox wrote:
-> > > > On Tue, Aug 29, 2023 at 03:46:13PM +0800, Hao Xu wrote:
-> > > > > On 8/28/23 05:32, Matthew Wilcox wrote:
-> > > > > > On Sun, Aug 27, 2023 at 09:28:31PM +0800, Hao Xu wrote:
-> > > > > > > From: Hao Xu <howeyxu@tencent.com>
-> > > > > > > 
-> > > > > > > Add a boolean parameter for file_accessed() to support nowait semantics.
-> > > > > > > Currently it is true only with io_uring as its initial caller.
-> > > > > > 
-> > > > > > So why do we need to do this as part of this series?  Apparently it
-> > > > > > hasn't caused any problems for filemap_read().
-> > > > > > 
-> > > > > 
-> > > > > We need this parameter to indicate if nowait semantics should be enforced in
-> > > > > touch_atime(), There are locks and maybe IOs in it.
-> > > > 
-> > > > That's not my point.  We currently call file_accessed() and
-> > > > touch_atime() for nowait reads and nowait writes.  You haven't done
-> > > > anything to fix those.
-> > > > 
-> > > > I suspect you can trim this patchset down significantly by avoiding
-> > > > fixing the file_accessed() problem.  And then come back with a later
-> > > > patchset that fixes it for all nowait i/o.  Or do a separate prep series
-> > > 
-> > > I'm ok to do that.
-> > > 
-> > > > first that fixes it for the existing nowait users, and then a second
-> > > > series to do all the directory stuff.
-> > > > 
-> > > > I'd do the first thing.  Just ignore the problem.  Directory atime
-> > > > updates cause I/O so rarely that you can afford to ignore it.  Almost
-> > > > everyone uses relatime or nodiratime.
-> > > 
-> > > Hi Matthew,
-> > > The previous discussion shows this does cause issues in real
-> > > producations: https://lore.kernel.org/io-uring/2785f009-2ebb-028d-8250-d5f3a30510f0@gmail.com/#:~:text=fwiw%2C%20we%27ve%20just%20recently%20had%20similar%20problems%20with%20io_uring%20read/write
-> > > 
+On Sun, Sep 10, 2023 at 05:28:12PM +0200, Simon Horman wrote:
+> On Fri, Sep 08, 2023 at 07:58:53PM -0400, Jeremy Cline wrote:
+> > The device list needs its associated lock held when modifying it, or the
+> > list could become corrupted, as syzbot discovered.
 > > 
-> > Then separate it out into it's own patch set so we can have a
-> > discussion on the merits of requiring using noatime, relatime or
-> > lazytime for really latency sensitive IO applications. Changing code
-> > is not always the right solution...
+> > Reported-and-tested-by: syzbot+c1d0a03d305972dbbe14@syzkaller.appspotmail.com
+> > Closes: https://syzkaller.appspot.com/bug?extid=c1d0a03d305972dbbe14
+> > Signed-off-by: Jeremy Cline <jeremy@jcline.org>
 > 
-> Separation sounds reasonable, but it can hardly be said that only
-> latency sensitive apps would care about >1s nowait/async submission
-> delays. Presumably, btrfs can improve on that, but it still looks
-> like it's perfectly legit for filesystems do heavy stuff in
-> timestamping like waiting for IO. Right?
+> Hi Jeremy,
+> 
+> thanks for your patch.
+> 
+> I don't think you need to resubmit for this,
+> I think this patch warrants a fixes tag:
+> 
+> Fixes: d646960f7986 ("NFC: Initial LLCP support")
+> 
 
-Yes, it is, no-one is denying that. And some filesystems are worse
-than others, but none of that means it has to be fixed so getdents
-can be converted to NOWAIT semantics.
+My bad, indeed. The lock in question looks to have been added in
+6709d4b7bc2e ("net: nfc: Fix use-after-free caused by
+nfc_llcp_find_local") which itself includes a couple fix tags, should
+this reference that commit instead as it won't backport without that
+one?
 
-ie. this patchset is about the getdents NOWAIT machinery, and
-fiddling around with timestamps has much, much wider scope than just
-NOWAIT getdents machinery. We'll have this discussion about NOWAIT
-timestamp updates when a RFC is proposed to address the wider
-problem of how timestamp updates should behave in NOWAIT context.
+> Otherwise, this looks good to me.
+> 
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> 
 
--Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+Thanks,
+Jeremy
 
