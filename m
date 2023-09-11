@@ -1,152 +1,112 @@
-Return-Path: <netdev+bounces-32958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34BD979AC07
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 00:24:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0344479AC0E
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 00:52:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7AD71C209A0
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 22:24:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E7AA1C209F6
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 22:52:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F7C08F43;
-	Mon, 11 Sep 2023 22:24:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 271D88F4D;
+	Mon, 11 Sep 2023 22:52:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C44023D9
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 22:24:41 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 429DA47BD4
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 15:22:41 -0700 (PDT)
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38BMC1pF003337;
-	Mon, 11 Sep 2023 22:22:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=MIysLhStdiujWuzi46a+Vs2E8oNICriG5rIiN72H/2A=;
- b=IWZj4a+VWegjehBAdPD8JvtK1SVqTaaRJMgtV3neiED31VKs5THzZhZcpJTWoKyvrLsF
- 5HMlPyVE5Qyh4DyCR+7+RyYtTYM1+6pQ9IDplEgDNCgku70NcZfXgj5shxI6RuHLQE2t
- 5XoeokTzfc+e59llKqvOe/Jo1Yk1xMwlQFkDLHjbnsYeAeA24QqiF69ndNJzxZhy40Yy
- BoNeYYCFQGXxcqnRiftMbBOz4k+c7JHNFVZPXVtX7C9u2iMMJY6mHNiaBOz6B+1kfVlT
- nbRVApB0yI55Zy73UFb7RO2Y5Bbl6jsJ9rOgGwRzyVaSlQ9nxJHZV652Kzp+8Q5Ek/QP 8w== 
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t2bfpr64k-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Sep 2023 22:22:21 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38BMKASd002779;
-	Mon, 11 Sep 2023 22:22:20 GMT
-Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3t14hkp2d2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Sep 2023 22:22:20 +0000
-Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
-	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38BMMJqF8585852
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 11 Sep 2023 22:22:19 GMT
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6456058043;
-	Mon, 11 Sep 2023 22:22:19 +0000 (GMT)
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 10A5C58055;
-	Mon, 11 Sep 2023 22:22:19 +0000 (GMT)
-Received: from ltc19u30.ibm.com (unknown [9.114.224.51])
-	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 11 Sep 2023 22:22:18 +0000 (GMT)
-From: David Christensen <drc@linux.vnet.ibm.com>
-To: shannon.nelson@amd.com, brett.creeley@amd.com, drivers@pensando.io
-Cc: netdev@vger.kernel.org, David Christensen <drc@linux.vnet.ibm.com>
-Subject: [PATCH] ionic: fix 16bit math issue when PAGE_SIZE >= 64KB
-Date: Mon, 11 Sep 2023 18:22:12 -0400
-Message-Id: <20230911222212.103406-1-drc@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.39.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 142FD23D9
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 22:52:13 +0000 (UTC)
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8FD99543B
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 15:50:29 -0700 (PDT)
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-68fbd5cd0ceso1416439b3a.1
+        for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 15:50:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1694472503; x=1695077303; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Fx0gR2ESc4lJCkHeNwni0JEpr6/GKNTWX/V+qZxf4Do=;
+        b=hzWTqB5X/Bi5k5EvWa8491eGxeOAJ9Hw6T0nUI9on7X8sv3Q4PD4Vuc1XqEyYzM7sj
+         AaO4zIwtstbW8W+pqSGIvKUZRM7h+bCI40PQmFAedjLqZnPimRBlPjRZoe3CiYe5slYS
+         6uUfS5/hhryahS/IG/PcF2KNLmGvb42dpI8cm8iTreZ206bQpPHVztjeWoKE8/EG2JD0
+         IiXUN6NXskrWzN7MNHo6KkdLDT127vZXbrCCnyLswvLyhkUSIsXXPZOgsDabmE9vwvEN
+         8NUvWQTGYo7tkRCxGwRfyDIKCRjbAn3UQ9qCQbZk5HjeH2UIgaLxrQwg1C350ezYKHz/
+         svGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694472503; x=1695077303;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Fx0gR2ESc4lJCkHeNwni0JEpr6/GKNTWX/V+qZxf4Do=;
+        b=o+ZFaywhiw7pV+9HjUxoF9YfWWKQI/cRfS8/nORGE1y6o8/ft6YZs1V9rrkCRlydMV
+         un4YxUqoK96UNH+rfhgohrPpTptqhpAOK1VE/1LYpawgoqcxd2PEEqlAhgnJuFoqBaGs
+         5/ldXTLUNqkrIL/ryA5LiY8f4gx4TmHE+j9kmx33SE4Tk7woisVlGZ9nuBoJxt+QolAm
+         5hQnRi2bLyhnoLLNose9TpEO9vyMAbehOOvcsStwacE09LYT9s4V8XyZmjypLFLNSB/S
+         VBMU1suvNsDBniCjIANWRi+wGOQK8KjFOMA3jFs71gbVSLPQAGXUQKsnvgxD+gOS9fwh
+         b4Zw==
+X-Gm-Message-State: AOJu0Yz9CgenmodjtI3qBjVT18a7rUbaBZ6Ja+hPjR5r31YUr4NnXEI0
+	GtHxFcGhtFAmsFD0VMC9ZnUFESzzR8sWHWlhLj+unA==
+X-Google-Smtp-Source: AGHT+IHHfIWUIjIzBE6AKQx2HgmCouux51fozxiALlTAf6+prejD6RO4cCCYO4UujkzNTsNXYdatZHi0Ok3aRyWfiC4=
+X-Received: by 2002:a05:6a00:c95:b0:68a:51dc:50c0 with SMTP id
+ a21-20020a056a000c9500b0068a51dc50c0mr13544622pfv.32.1694472502737; Mon, 11
+ Sep 2023 15:48:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 4dFKLqIn8DpNhlm6ED2WCCj3j70diaEG
-X-Proofpoint-ORIG-GUID: 4dFKLqIn8DpNhlm6ED2WCCj3j70diaEG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-09-11_17,2023-09-05_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 malwarescore=0
- suspectscore=0 adultscore=0 lowpriorityscore=0 phishscore=0 mlxscore=0
- impostorscore=0 spamscore=0 mlxlogscore=999 priorityscore=1501 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2308100000
- definitions=main-2309110203
-X-Spam-Status: No, score=-0.1 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_NONE autolearn=unavailable autolearn_force=no version=3.4.6
+References: <20230908225807.1780455-1-sdf@google.com> <20230908225807.1780455-3-sdf@google.com>
+ <6c275fdc-4468-7573-a33c-35fc442c61c5@linux.dev>
+In-Reply-To: <6c275fdc-4468-7573-a33c-35fc442c61c5@linux.dev>
+From: Stanislav Fomichev <sdf@google.com>
+Date: Mon, 11 Sep 2023 15:48:10 -0700
+Message-ID: <CAKH8qBv78jTrktfThFK=Ze12tjgAsgYXyNaRy-3m8QE8J-xwuQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 2/3] bpf: expose information about supported xdp
+ metadata kfunc
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, song@kernel.org, yhs@fb.com, john.fastabend@gmail.com, 
+	kpsingh@kernel.org, haoluo@google.com, jolsa@kernel.org, 
+	netdev@vger.kernel.org, Willem de Bruijn <willemb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
+	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The function ionic_rx_fill() uses 16bit math when calculating the
-the number of pages required for an RX descriptor given an interface
-MTU setting. If the system PAGE_SIZE >= 64KB, the frag_len and
-remain_len values will always be 0, causing unnecessary scatter-
-gather elements to be assigned to the RX descriptor, up to the
-maximum number of scatter-gather elements per descriptor.
+On Mon, Sep 11, 2023 at 3:11=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.=
+dev> wrote:
+>
+> On 9/8/23 3:58 PM, Stanislav Fomichev wrote:
+> > @@ -12,15 +13,24 @@ static int
+> >   netdev_nl_dev_fill(struct net_device *netdev, struct sk_buff *rsp,
+> >                  const struct genl_info *info)
+> >   {
+> > +     u64 xdp_rx_meta =3D 0;
+> >       void *hdr;
+> >
+> >       hdr =3D genlmsg_iput(rsp, info);
+> >       if (!hdr)
+> >               return -EMSGSIZE;
+> >
+> > +#define XDP_METADATA_KFUNC(_, flag, __, xmo) \
+> > +     if (netdev->xdp_metadata_ops->xmo) \
+>
+> A NULL check is needed for netdev->xdp_metadata_ops.
 
-A similar change in ionic_rx_frags() is implemented for symmetry,
-but has not been observed as an issue since scatter-gather
-elements are not necessary for such larger page sizes.
+Oh, sure, will add, thanks!
 
-Fixes: 4b0a7539a372 ("ionic: implement Rx page reuse")
-Signed-off-by: David Christensen <drc@linux.vnet.ibm.com>
----
- drivers/net/ethernet/pensando/ionic/ionic_txrx.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-index 26798fc635db..56502bc80e01 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-@@ -182,8 +182,8 @@ static struct sk_buff *ionic_rx_frags(struct ionic_queue *q,
- 	struct device *dev = q->dev;
- 	struct sk_buff *skb;
- 	unsigned int i;
--	u16 frag_len;
--	u16 len;
-+	u32 frag_len;
-+	u32 len;
- 
- 	stats = q_to_rx_stats(q);
- 
-@@ -207,7 +207,7 @@ static struct sk_buff *ionic_rx_frags(struct ionic_queue *q,
- 			return NULL;
- 		}
- 
--		frag_len = min_t(u16, len, IONIC_PAGE_SIZE - buf_info->page_offset);
-+		frag_len = min_t(u32, len, IONIC_PAGE_SIZE - buf_info->page_offset);
- 		len -= frag_len;
- 
- 		dma_sync_single_for_cpu(dev,
-@@ -452,7 +452,7 @@ void ionic_rx_fill(struct ionic_queue *q)
- 
- 		/* fill main descriptor - buf[0] */
- 		desc->addr = cpu_to_le64(buf_info->dma_addr + buf_info->page_offset);
--		frag_len = min_t(u16, len, IONIC_PAGE_SIZE - buf_info->page_offset);
-+		frag_len = min_t(u32, len, IONIC_PAGE_SIZE - buf_info->page_offset);
- 		desc->len = cpu_to_le16(frag_len);
- 		remain_len -= frag_len;
- 		buf_info++;
-@@ -471,7 +471,7 @@ void ionic_rx_fill(struct ionic_queue *q)
- 			}
- 
- 			sg_elem->addr = cpu_to_le64(buf_info->dma_addr + buf_info->page_offset);
--			frag_len = min_t(u16, remain_len, IONIC_PAGE_SIZE - buf_info->page_offset);
-+			frag_len = min_t(u32, remain_len, IONIC_PAGE_SIZE - buf_info->page_offset);
- 			sg_elem->len = cpu_to_le16(frag_len);
- 			remain_len -= frag_len;
- 			buf_info++;
--- 
-2.39.1
-
+> > +             xdp_rx_meta |=3D flag;
+> > +XDP_METADATA_KFUNC_xxx
+> > +#undef XDP_METADATA_KFUNC
+> > +
+>
 
