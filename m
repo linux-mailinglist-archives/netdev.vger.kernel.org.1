@@ -1,194 +1,80 @@
-Return-Path: <netdev+bounces-32766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4C7279A50E
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 09:53:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3815579A570
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 10:06:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50BB9281171
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 07:53:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69AAD1C20911
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 08:06:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58A123D87;
-	Mon, 11 Sep 2023 07:52:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EB5DA95C;
+	Mon, 11 Sep 2023 08:06:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47E56188
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 07:52:59 +0000 (UTC)
-Received: from mail-pg1-f207.google.com (mail-pg1-f207.google.com [209.85.215.207])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B23612C
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 00:52:57 -0700 (PDT)
-Received: by mail-pg1-f207.google.com with SMTP id 41be03b00d2f7-56fb25fdf06so4087453a12.1
-        for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 00:52:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694418777; x=1695023577;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tTOmsNMmeuo/1lVCyFK6ytK+wyTlVjQh3D5BzagJTY0=;
-        b=eRGr04cCLvVxrFFiqnC6NcYet72OFpVYw9q7ZIcl30bXoisV0nqmwVtXwYEXBwDEiW
-         6I6qIOA6SVnl3NSZ/w7Ra0n3RsrlC5DxTCTwa3njCBTCBTDwVWF6tm8qTvReBVenQ/YO
-         2P2GRx9WzUYFjDVPNpeQPVyG1GGWVkFosvOc+YWI0I4iqbN0SvKsYMxerJ4KqSnCyMnF
-         bho0oMKtS4oPOisUQrZqutQXSIlJp8c6Vd4DLpalxAVDrT4yhuRwnt2NVEr9xp6JRbnT
-         yVeqbHKvEP4xc06848020jMwx+SDPAXPnXLP+AZt25NpOilDNR1JwTFBadHI98XpJAcS
-         ub/g==
-X-Gm-Message-State: AOJu0YxtXvQCtV4oj4TM4dYeV1yYbh2GJ6y4prUoCBNMrIWhVApQLmuo
-	NboCH8jhfOjzfYi4PGs6iVxBqef6uZk/DWZFbuAdgn2WbC3d
-X-Google-Smtp-Source: AGHT+IGO4oHtxOHXTtaMmFViq0Bf5Wn0QVGwfZaYZiWGKmbsylTvyfQTP/5byY6HS/I0G04Ep3uop8qYQAyIFjEXZf+m8WdKuwnR
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63E26A950
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 08:06:20 +0000 (UTC)
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F37F2E51;
+	Mon, 11 Sep 2023 01:06:06 -0700 (PDT)
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 38B85kadE982372, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/2.92/5.92) with ESMTPS id 38B85kadE982372
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 11 Sep 2023 16:05:46 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.17; Mon, 11 Sep 2023 16:05:46 +0800
+Received: from fc38.localdomain (172.22.228.98) by RTEXMBS04.realtek.com.tw
+ (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.7; Mon, 11 Sep
+ 2023 16:05:45 +0800
+From: Hayes Wang <hayeswang@realtek.com>
+To: <kuba@kernel.org>, <davem@davemloft.net>
+CC: <netdev@vger.kernel.org>, <nic_swsd@realtek.com>,
+        <linux-kernel@vger.kernel.org>, <linux-usb@vger.kernel.org>,
+        Hayes Wang
+	<hayeswang@realtek.com>
+Subject: [PATCH net-next 0/2] r8152: modify rx_bottom
+Date: Mon, 11 Sep 2023 16:05:02 +0800
+Message-ID: <20230911080504.5513-423-nic_swsd@realtek.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a65:6a8c:0:b0:564:e80e:81c0 with SMTP id
- q12-20020a656a8c000000b00564e80e81c0mr1978864pgu.2.1694418776901; Mon, 11 Sep
- 2023 00:52:56 -0700 (PDT)
-Date: Mon, 11 Sep 2023 00:52:56 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000004c51dd0605109d19@google.com>
-Subject: [syzbot] [bluetooth?] general protection fault in lock_sock_nested
-From: syzbot <syzbot+d3ccfb78a0dc16ffebe3@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, luiz.von.dentz@intel.com, 
-	marcel@holtmann.org, netdev@vger.kernel.org, pav@iki.fi, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
-	SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [172.22.228.98]
+X-ClientProxiedBy: RTEXH36506.realtek.com.tw (172.21.6.27) To
+ RTEXMBS04.realtek.com.tw (172.21.6.97)
+X-KSE-ServerInfo: RTEXMBS04.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello,
+These patches are used to improve rx_bottom().
 
-syzbot found the following issue on:
+Hayes Wang (2):
+  r8152: remove queuing rx packets in driver
+  r8152: use napi_gro_frags
 
-HEAD commit:    ae074e2b2fd4 sfc: check for zero length in EF10 RX prefix
-git tree:       net
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=17d9e78fa80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=634e05b4025da9da
-dashboard link: https://syzkaller.appspot.com/bug?extid=d3ccfb78a0dc16ffebe3
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13075977a80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1012d447a80000
+ drivers/net/usb/r8152.c | 80 +++++++++++++++++------------------------
+ 1 file changed, 32 insertions(+), 48 deletions(-)
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/36dca89ab8e3/disk-ae074e2b.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/935bb2b8e325/vmlinux-ae074e2b.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/d5ab72169cc9/bzImage-ae074e2b.xz
+-- 
+2.41.0
 
-The issue was bisected to:
-
-commit 94d9ba9f9888b748d4abd2aa1547af56ae85f772
-Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Date:   Wed Aug 9 23:49:33 2023 +0000
-
-    Bluetooth: hci_sync: Fix UAF in hci_disconnect_all_sync
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10a8c6bfa80000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=12a8c6bfa80000
-console output: https://syzkaller.appspot.com/x/log.txt?x=14a8c6bfa80000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+d3ccfb78a0dc16ffebe3@syzkaller.appspotmail.com
-Fixes: 94d9ba9f9888 ("Bluetooth: hci_sync: Fix UAF in hci_disconnect_all_sync")
-
-general protection fault, probably for non-canonical address 0xdffffc0000000026: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000130-0x0000000000000137]
-CPU: 0 PID: 918 Comm: kworker/0:2 Not tainted 6.5.0-syzkaller-04011-gae074e2b2fd4 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
-Workqueue: events l2cap_info_timeout
-RIP: 0010:__lock_acquire+0x109/0x5de0 kernel/locking/lockdep.c:5012
-Code: 45 85 c9 0f 84 cc 0e 00 00 44 8b 05 a1 14 23 0b 45 85 c0 0f 84 be 0d 00 00 48 ba 00 00 00 00 00 fc ff df 4c 89 d1 48 c1 e9 03 <80> 3c 11 00 0f 85 e8 40 00 00 49 81 3a a0 a9 3e 90 0f 84 96 0d 00
-RSP: 0018:ffffc90004c8f8e8 EFLAGS: 00010002
-RAX: ffff8880206d8000 RBX: 1ffff92000991f4d RCX: 0000000000000026
-RDX: dffffc0000000000 RSI: 0000000000000000 RDI: 0000000000000130
-RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000001
-R10: 0000000000000130 R11: 0000000000000001 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f0da069df50 CR3: 000000007a80d000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- lock_acquire kernel/locking/lockdep.c:5761 [inline]
- lock_acquire+0x1ae/0x510 kernel/locking/lockdep.c:5726
- lock_sock_nested+0x3a/0xf0 net/core/sock.c:3505
- lock_sock include/net/sock.h:1722 [inline]
- l2cap_sock_ready_cb+0x41/0x160 net/bluetooth/l2cap_sock.c:1630
- l2cap_chan_ready net/bluetooth/l2cap_core.c:1365 [inline]
- l2cap_conn_start+0x15c/0xa40 net/bluetooth/l2cap_core.c:1640
- process_one_work+0xaa2/0x16f0 kernel/workqueue.c:2600
- worker_thread+0x687/0x1110 kernel/workqueue.c:2751
- kthread+0x33a/0x430 kernel/kthread.c:389
- ret_from_fork+0x2c/0x70 arch/x86/kernel/process.c:145
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:__lock_acquire+0x109/0x5de0 kernel/locking/lockdep.c:5012
-Code: 45 85 c9 0f 84 cc 0e 00 00 44 8b 05 a1 14 23 0b 45 85 c0 0f 84 be 0d 00 00 48 ba 00 00 00 00 00 fc ff df 4c 89 d1 48 c1 e9 03 <80> 3c 11 00 0f 85 e8 40 00 00 49 81 3a a0 a9 3e 90 0f 84 96 0d 00
-RSP: 0018:ffffc90004c8f8e8 EFLAGS: 00010002
-RAX: ffff8880206d8000 RBX: 1ffff92000991f4d RCX: 0000000000000026
-RDX: dffffc0000000000 RSI: 0000000000000000 RDI: 0000000000000130
-RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000001
-R10: 0000000000000130 R11: 0000000000000001 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f0da069df50 CR3: 000000007a80d000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	45 85 c9             	test   %r9d,%r9d
-   3:	0f 84 cc 0e 00 00    	je     0xed5
-   9:	44 8b 05 a1 14 23 0b 	mov    0xb2314a1(%rip),%r8d        # 0xb2314b1
-  10:	45 85 c0             	test   %r8d,%r8d
-  13:	0f 84 be 0d 00 00    	je     0xdd7
-  19:	48 ba 00 00 00 00 00 	movabs $0xdffffc0000000000,%rdx
-  20:	fc ff df
-  23:	4c 89 d1             	mov    %r10,%rcx
-  26:	48 c1 e9 03          	shr    $0x3,%rcx
-* 2a:	80 3c 11 00          	cmpb   $0x0,(%rcx,%rdx,1) <-- trapping instruction
-  2e:	0f 85 e8 40 00 00    	jne    0x411c
-  34:	49 81 3a a0 a9 3e 90 	cmpq   $0xffffffff903ea9a0,(%r10)
-  3b:	0f                   	.byte 0xf
-  3c:	84                   	.byte 0x84
-  3d:	96                   	xchg   %eax,%esi
-  3e:	0d                   	.byte 0xd
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
