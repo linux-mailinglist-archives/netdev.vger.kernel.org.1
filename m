@@ -1,110 +1,73 @@
-Return-Path: <netdev+bounces-32746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A153B79A17B
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 04:46:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 930DB79A289
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 06:36:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AE662810B7
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 02:46:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7D87280F89
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 04:36:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A027517F3;
-	Mon, 11 Sep 2023 02:46:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47A791FB8;
+	Mon, 11 Sep 2023 04:36:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91D6B630
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 02:46:40 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA9C1B0;
-	Sun, 10 Sep 2023 19:46:38 -0700 (PDT)
-Received: from kwepemm600007.china.huawei.com (unknown [172.30.72.57])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RkWGj60jyzNnHc;
-	Mon, 11 Sep 2023 10:42:53 +0800 (CST)
-Received: from [10.69.136.139] (10.69.136.139) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Mon, 11 Sep 2023 10:46:35 +0800
-Message-ID: <110c02bf-3133-971c-750b-4a2d18bc9bf9@huawei.com>
-Date: Mon, 11 Sep 2023 10:46:35 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23F43185D
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 04:36:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA63FC433C7;
+	Mon, 11 Sep 2023 04:36:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694406963;
+	bh=rG/sI+5ITI+pB89QHOpT9Yg4BxVB/RgnoEWfLQh/9KM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=RRGxxhmnJnLznt/6vjDWWnS8t0Q8k6yVVDhGKSuxfiDTeIPjkDW2tNUUo0FXYH12R
+	 JV8QYu7nmV4iI4esnvFkZdXjA7f1RmHwrF5ePfdmzZzdZL64I4f1+8jjtScnx1pGCa
+	 BEpMo14VoUSBWKpIjBagH8WhY03Xc1Mc5wMkhz2xq7nQ6b0Lw0Vz08BO49+c1pSlXt
+	 zfz3g5YUK9KGPcZTgsC3b6kQ7xWcDoRyuSPjjkfTyQJVWGjOe37f4kWqslQm0UmbsT
+	 dI7mdTMGwidHsG5RNd3hiBNQ01aadVhbYZwQvR7NI2LDFF8PjPbYsrpkijzDwLIQ6N
+	 czVX4xZbTKaOA==
+Message-ID: <46139141-90f5-820e-2124-0c9fa80e755d@kernel.org>
+Date: Sun, 10 Sep 2023 22:36:01 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <shenjian15@huawei.com>, <wangjie125@huawei.com>,
-	<liuyonglong@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH V2 ethtool] hns3: add support dump registers for hns3
- driver
-To: <mkubecek@suse.cz>
-References: <20230829065656.2725081-1-shaojijie@huawei.com>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20230829065656.2725081-1-shaojijie@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.69.136.139]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemm600007.china.huawei.com (7.193.23.208)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.0
+Subject: Re: [PATCH net] fix null-deref in ipv4_link_failure
+Content-Language: en-US
+To: Kyle Zeng <zengyhkyle@gmail.com>, pabeni@redhat.com
+Cc: davem@davemloft.net, netdev@vger.kernel.org, ssuryaextr@gmail.com
+References: <ZPqSfGGAwa1I69Sm@westworld>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <ZPqSfGGAwa1I69Sm@westworld>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-
-on 2023/8/29 14:56, Jijie Shao wrote:
-> Add support pretty printer for the registers of hns3 driver.
-> This printer supports PF and VF, and is compatible with hns3
-> drivers of earlier versions.
->
-> Sample output:
->
-> $ ethtool -d eth1
-> [cmdq_regs]
->    comm_nic_csq_baseaddr_l : 0x48168000
->    comm_nic_csq_baseaddr_h : 0x00000000
->    comm_nic_csq_depth      : 0x00000080
->    comm_nic_csq_tail       : 0x00000050
->    comm_nic_csq_head       : 0x00000050
->    comm_nic_crq_baseaddr_l : 0x48170000
->    comm_nic_crq_baseaddr_h : 0x00000000
->    comm_nic_crq_depth      : 0x00000080
->    comm_nic_crq_tail       : 0x00000000
->    comm_nic_crq_head       : 0x00000000
->    comm_vector0_cmdq_src   : 0x00000000
->    comm_cmdq_intr_sts      : 0x00000000
->    comm_cmdq_intr_en       : 0x00000002
->    comm_cmdq_intr_gen      : 0x00000000
-> [common_regs]
->    misc_vector_base    : 0x00000001
->    pf_other_int        : 0x00000040
->    misc_reset_sts      : 0x00000000
->    misc_vector_int_sts : 0x00000000
->    global_reset        : 0x00000000
->    fun_rst_ing         : 0x00000000
->    gro_en              : 0x00000001
-> ...
->
-> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+On 9/7/23 9:18 PM, Kyle Zeng wrote:
+> Currently, we assume the skb is associated with a device before calling
+> __ip_options_compile, which is not always the case if it is re-routed by
+> ipvs.
+> When skb->dev is NULL, dev_net(skb->dev) will become null-dereference.
+> This patch adds a check for the edge case and switch to use the net_device
+> from the rtable when skb->dev is NULL.
+> 
+> Suggested-by: Paolo Abeni<pabeni@redhat.com>
+> Suggested-by: David Ahern <dsahern@kernel.org>
+> Signed-off-by: Kyle Zeng <zengyhkyle@gmail.com>
+> Cc: Stephen Suryaputra <ssuryaextr@gmail.com>
 > ---
-> changeLog:
->    v2: remove #pragma suggested by Michal
->    v1: https://lore.kernel.org/all/20230818085611.2483909-1-shaojijie@huawei.com/
-> ---
+>  net/ipv4/route.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
 
-Hi Michal:
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-   This patch has been uploaded for more than 10 days and has not been merged.
-   Please review this patch. and if you have any problems, please inform me in time.
-
-  Thanks！
-  Jijie Shao
 
 
