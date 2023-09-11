@@ -1,67 +1,69 @@
-Return-Path: <netdev+bounces-32880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B1F779AA6C
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 19:06:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94A1A79AA6D
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 19:06:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 861251C208F6
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 17:06:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E26028105F
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 17:06:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5AEC154B9;
-	Mon, 11 Sep 2023 17:05:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D2D8156C7;
+	Mon, 11 Sep 2023 17:06:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D790C3D86
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 17:05:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F9C3156C6
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 17:06:01 +0000 (UTC)
 Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5D14123
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 10:05:58 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-58d799aa369so55566227b3.0
-        for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 10:05:58 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABCD2123
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 10:06:00 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-58c8b2d6784so51847227b3.3
+        for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 10:06:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1694451958; x=1695056758; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=yRZQAg6gcr1eC0o0X81WDrP9iXly0xSSsKh3yHFL4mA=;
-        b=aTR+GTsUyHaonpQu33EtfV8vY09u3A1zykJg10kv1FLK51FXOjbi+A1CQy+KEUcdW2
-         vG24dpP9VSqsViIXhRc9133WHIJ2XPvRBAfJ8iof/pC3yn6VjAn3Nco+IhI1mPVGMSq4
-         8DSct+goW8mMLGXGMoY6qTg+qGwSXioGt+EbriwQJkDGAiZEyO7MLc31PjbcJyr64R1S
-         FzFzvCwENT7IEl1aEB9jwjgyKnZZEjCE9XOv49SUYL6MPVTFNwAbdgWI8oE8JD8ShRWy
-         zIOW2EpC2lt5ei4Kr3EOxhCIsl9ThIcqKBKCUcZ9uCMI8SofJuzlRIGk6YTdndoSvc5c
-         Y1vg==
+        d=google.com; s=20230601; t=1694451960; x=1695056760; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fLLHXKagUp75BI6OdSs0vVw5ugFWeBckDK23IiluvXQ=;
+        b=g4Lk1FsflyksG7bI3qBgroJdZ3ELXP61YnG1Cg+43EjrDkoqEAwrRZatzjnlfPsByE
+         r1OIyX5bdVVKUO+a0//d3w44k9uFfzozVMpCDFV3cdFTCAWJB75PAUKGWndnMwfvja4l
+         EcVWKm0MURK70g05GwUp3Hn4/2qv6lgCwBqBzWDpxcZEP6NWohFSqrOusTPrVYO1K/8a
+         J2fJYKbAvOF1KIy9LMsguoKDp/+/2qUmKTs01pRL5QcNZvAOwk7+isW7BQzI4pL/wzHK
+         sa/Edspw1rQepLSmOgSw8ADXsTqUHjvMJtRULDme6qivBaJr5ME7Oai39hXW6eMPvPVo
+         G31Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694451958; x=1695056758;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yRZQAg6gcr1eC0o0X81WDrP9iXly0xSSsKh3yHFL4mA=;
-        b=GWz96hrfEy0HYlYMHvnE14W8K6Sei6vEWVYbRZT3VhyswKzZ2OJw546WfN0mcTJET5
-         tG71WzfbdsfGIkpxRLbuWOtphy+P84aNL2QATpg9pI0wP6rNxDtiox/19pC9XZhKeL5g
-         08+AchNjNALJRt6z26N1Lar7iAQFJrxpvkUUoykI0n7cS+v+pLOkZNfbVanCecHU/q9z
-         WH+VOc+EL45R1Pu8n5B2kFaTEUE/USsQJAgRoGzV57ay7FGFOQBRWEbMM+YJWkDTAQIl
-         vb6KzPe54db6eeO0smcl/JGbi6Xpa4CoWgjl9ONzGyrMvWLOrdzB7uFsrR3WwiUxQcbL
-         9Znw==
-X-Gm-Message-State: AOJu0YxBGENblJf+fNEXkin9/WwY3zAaFe3cs8TcWSnXQjlD4xfb4UWo
-	XSr6lVS7PZg2AS5WQInaBDUR12pOgwaS4Q==
-X-Google-Smtp-Source: AGHT+IE+x9af9c6W1HW4DAfp8+66duch0ArD2Gr8JUeWu8Mn/xG2lB+lMz2/NeJCP4t8tu32ejCbt+dWMQsqHg==
+        d=1e100.net; s=20230601; t=1694451960; x=1695056760;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fLLHXKagUp75BI6OdSs0vVw5ugFWeBckDK23IiluvXQ=;
+        b=vg4DCgAvB0o8Ejjg0H5WCeOj5X1fPahrWWZt/jUqAgWYvQuMplnyHZh7aj7qsZMR0n
+         nwoBo2NBgqneuWyg3isM7zROARurNzhnCcLFHEipwk62qyApe5IIzhOiELd+WWLj190V
+         horcatOLIL33r+8Ssb3nCP+lw4wu4YwDFTDuqk1xgxuGtCDfQsV9Tku60FZQY5hRwFVV
+         aMnjLAbR//kHnZKku5nwTyAB9fqrGWov7QbKDa0fCftWDj63aULqoif/DT6n4+rSXSsi
+         6miJP1UHDYfmDrDPwgAD7/P8/O2pyoEHFHjykNmIshF4jG5NztmxcIwTIxzTccaLiqQp
+         y7pQ==
+X-Gm-Message-State: AOJu0YzAhhpQdOrOc4f7bDOLxViVaCZJe/ZgaOaMYvbLzzA2DMGHtS5w
+	HS+i9fZcZUIyTBJM+rrK1rEB2k5qT64jVg==
+X-Google-Smtp-Source: AGHT+IH+Us4sb6bMYjui8jq2nzxsq/mwS5uyitanrC9xt0s5OwbGjT4ZkAZj2sjKxWywuIHW5+Qa2VznoVghhQ==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a81:eb12:0:b0:586:b332:8618 with SMTP id
- n18-20020a81eb12000000b00586b3328618mr263734ywm.7.1694451957932; Mon, 11 Sep
- 2023 10:05:57 -0700 (PDT)
-Date: Mon, 11 Sep 2023 17:05:27 +0000
+ (user=edumazet job=sendgmr) by 2002:a81:8b54:0:b0:58f:b749:a50b with SMTP id
+ e20-20020a818b54000000b0058fb749a50bmr242162ywk.4.1694451959883; Mon, 11 Sep
+ 2023 10:05:59 -0700 (PDT)
+Date: Mon, 11 Sep 2023 17:05:28 +0000
+In-Reply-To: <20230911170531.828100-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20230911170531.828100-1-edumazet@google.com>
 X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
-Message-ID: <20230911170531.828100-1-edumazet@google.com>
-Subject: [PATCH net-next 0/4] tcp: backlog processing optims
+Message-ID: <20230911170531.828100-2-edumazet@google.com>
+Subject: [PATCH net-next 1/4] tcp: no longer release socket ownership in tcp_release_cb()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -76,31 +78,59 @@ X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-First patches are mostly preparing the ground for the last one.
+This partially reverts c3f9b01849ef ("tcp: tcp_release_cb()
+should release socket ownership").
 
-Last patch of the series implements sort of ACK reduction
-only for the cases a TCP receiver is under high stress,
-which happens for high throughput flows.
+prequeue has been removed by Florian in commit e7942d0633c4
+("tcp: remove prequeue support")
 
-This gives us a ~20% increase of single TCP flow (100Gbit -> 120Gbit)
+__tcp_checksum_complete_user() being gone, we no longer
+have to release socket ownership in tcp_release_cb().
 
-Eric Dumazet (4):
-  tcp: no longer release socket ownership in tcp_release_cb()
-  net: sock_release_ownership() cleanup
-  net: call prot->release_cb() when processing backlog
-  tcp: defer regular ACK while processing socket backlog
+This is a prereq for third patch in the series
+("net: call prot->release_cb() when processing backlog").
 
- Documentation/networking/ip-sysctl.rst |  7 +++++++
- include/linux/tcp.h                    | 14 ++++++++------
- include/net/netns/ipv4.h               |  1 +
- include/net/sock.h                     |  9 ++++-----
- net/core/sock.c                        |  6 +++---
- net/ipv4/sysctl_net_ipv4.c             |  9 +++++++++
- net/ipv4/tcp_input.c                   |  8 ++++++++
- net/ipv4/tcp_ipv4.c                    |  1 +
- net/ipv4/tcp_output.c                  | 15 ++++-----------
- 9 files changed, 45 insertions(+), 25 deletions(-)
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/core/sock.c       |  3 ---
+ net/ipv4/tcp_output.c | 10 ----------
+ 2 files changed, 13 deletions(-)
 
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 16584e2dd6481a3fc28d796db785439f0446703b..21610e3845a5042f7c648ccb3e0d90126df20a0b 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -3519,9 +3519,6 @@ void release_sock(struct sock *sk)
+ 	if (sk->sk_backlog.tail)
+ 		__release_sock(sk);
+ 
+-	/* Warning : release_cb() might need to release sk ownership,
+-	 * ie call sock_release_ownership(sk) before us.
+-	 */
+ 	if (sk->sk_prot->release_cb)
+ 		sk->sk_prot->release_cb(sk);
+ 
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index ccfc8bbf745586cd23dcf02d755d6981dc92742e..b4cac12d0e6348aaa3a3957b0091ea7fe6553731 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -1101,16 +1101,6 @@ void tcp_release_cb(struct sock *sk)
+ 		tcp_tsq_write(sk);
+ 		__sock_put(sk);
+ 	}
+-	/* Here begins the tricky part :
+-	 * We are called from release_sock() with :
+-	 * 1) BH disabled
+-	 * 2) sk_lock.slock spinlock held
+-	 * 3) socket owned by us (sk->sk_lock.owned == 1)
+-	 *
+-	 * But following code is meant to be called from BH handlers,
+-	 * so we should keep BH disabled, but early release socket ownership
+-	 */
+-	sock_release_ownership(sk);
+ 
+ 	if (flags & TCPF_WRITE_TIMER_DEFERRED) {
+ 		tcp_write_timer_handler(sk);
 -- 
 2.42.0.283.g2d96d420d3-goog
 
