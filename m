@@ -1,155 +1,92 @@
-Return-Path: <netdev+bounces-32840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32841-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4A9079A943
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 16:58:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CD3A79A950
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 17:01:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A60B01C209B2
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 14:58:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D7891C209C4
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 15:01:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A56D011721;
-	Mon, 11 Sep 2023 14:58:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7B6511725;
+	Mon, 11 Sep 2023 15:01:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97B1F11719
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 14:58:53 +0000 (UTC)
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68893E40;
-	Mon, 11 Sep 2023 07:58:51 -0700 (PDT)
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 5071486D90;
-	Mon, 11 Sep 2023 16:58:49 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1694444329;
-	bh=NlBBt43y5lcwH7fnaA3d3KUuzCDKemg3sKPBS708Mrw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=He1TXX+EAZe1usILniqW6VQSOdzi7OYtwLssN1I1Nrmb9c46eT6pMyoaU9CCxq0OX
-	 68XjhamzGoIUblIkeUnyVMqfs6m4kdt0uQsJgq9kcGCIHoGYeJ9sGDgfEnzYRUm3Pe
-	 uIKiNvglsoee6/t4XMVP7PoiayhT4Hgffy4UgDAFYncB3kd/vSkLPkdjO+taGW008R
-	 J2+drsi2egK2QPoCbhF+hXZEYlFarleswdnE6dxtcTBq4JucFI8sN+cNOVWhBeo/Aw
-	 MVXhddKIMyZ9sEtRh7aKO9JrzaHrNGdN22Ld26UXDRrhda//iVXzUfhkoQantP+U0n
-	 0Rn6q4wPy855Q==
-Date: Mon, 11 Sep 2023 16:58:48 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Tristram.Ha@microchip.com, Eric Dumazet <edumazet@google.com>, Andrew
- Lunn <andrew@lunn.ch>, davem@davemloft.net, Woojung Huh
- <woojung.huh@microchip.com>, Vladimir Oltean <olteanv@gmail.com>, Oleksij
- Rempel <o.rempel@pengutronix.de>
-Cc: Florian Fainelli <f.fainelli@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- UNGLinuxDriver@microchip.com, Oleksij Rempel <linux@rempel-privat.de>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [[RFC PATCH v4 net-next] 0/2] net: dsa: hsr: Enable HSR HW
- offloading for KSZ9477
-Message-ID: <20230911165848.0741c03c@wsk>
-In-Reply-To: <20230906152801.921664-1-lukma@denx.de>
-References: <20230906152801.921664-1-lukma@denx.de>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC9B71171B
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 15:01:50 +0000 (UTC)
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C8A9125;
+	Mon, 11 Sep 2023 08:01:49 -0700 (PDT)
+Date: Mon, 11 Sep 2023 17:01:44 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1694444507;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hmtb7inBfN9yXnfv6q7DROjKL4bqbMgCux9ZhSeiIQs=;
+	b=DRVy5+d1O/qYZ/B9tsOCtlyHj9HMbQFTR0+QYAYk8xLu+TM98PycdU2p2De7DupP4HjoGc
+	hqWLZHnWDatKHG77b/Ald3gip4AR5lTiMgA17mbPXe0NSVZWsQYkt8/n/GeLmJo8uHLXcI
+	IQkxDcwn4AYO/OlU8ya/cq9BQZ5y3deQefiIVRnnw+eW+e8SXugVQVNPatYs0mCGdAspqA
+	F7j1qUT3RucjjRBlumVudUtjTwXYnUnfx9SpkwKHyds/DhS88dhbyOLTI5Iln7Hf3TMnwp
+	8y0jrJOGpm2jXzShu0elZYtUX4JR065tMSVUWJsyO8Sp1AExlf6mia7WW6Ra+A==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1694444507;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hmtb7inBfN9yXnfv6q7DROjKL4bqbMgCux9ZhSeiIQs=;
+	b=Z50ZZcZC0GsPfc1bExnGheRaWqEM9Hj5agGmTmwuv8gxhOuOkmYpSo5q2nOzpRFBDgMOkG
+	tLptfM7GimhI0zCg==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Tristram.Ha@microchip.com, Eric Dumazet <edumazet@google.com>,
+	davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Kristian Overskeid <koverskeid@gmail.com>,
+	Matthieu Baerts <matthieu.baerts@tessares.net>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Andreas Oetken <ennoerlangen@gmail.com>
+Subject: Re: [PATCH] net: hsr : Provide fix for HSRv1 supervisor frames
+ decoding
+Message-ID: <20230911150144.cG1ZHTCC@linutronix.de>
+References: <20230825153111.228768-1-lukma@denx.de>
+ <20230905080614.ImjTS6iw@linutronix.de>
+ <20230905115512.3ac6649c@wsk>
+ <20230911165708.0bc32e3c@wsk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/l1xVNpnAFR9tiKENrOB14ys";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20230911165708.0bc32e3c@wsk>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---Sig_/l1xVNpnAFR9tiKENrOB14ys
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 2023-09-11 16:57:08 [+0200], Lukasz Majewski wrote:
+> Hi Sebastian,
+Hi,
 
-Dear Community,
-
-> This patch series provides support for HSR HW offloading in KSZ9477
-> switch IC.
 >=20
-> To test this feature:
-> ip link add name hsr0 type hsr slave1 lan1 slave2 lan2 supervision 45
-> version 1 ip link set dev lan1 up
-> ip link set dev lan2 up
-> ip a add 192.168.0.1/24 dev hsr0
-> ip link set dev hsr0 up
->=20
-> To remove HSR network device:
-> ip link del hsr0
->=20
-> It is also possible to create another HSR interface, but it will
-> only support HSR is software - e.g.
-> ip link add name hsr1 type hsr slave1 lan3 slave2 lan4 supervision 45
-> version 1
->=20
-> Test HW:
-> Two KSZ9477-EVB boards with HSR ports set to "Port1" and "Port2".
->=20
-> Performance SW used:
-> nuttcp -S --nofork
-> nuttcp -vv -T 60 -r 192.168.0.2
-> nuttcp -vv -T 60 -t 192.168.0.2
->=20
-> Code: v6.5-rc7 Linux repository
-> Tested HSR v0 and v1
-> Results:
-> With KSZ9477 offloading support added: RX: 100 Mbps TX: 98 Mbps
-> With no offloading 		       RX: 63 Mbps  TX: 63 Mbps
->=20
->=20
-> Lukasz Majewski (2):
->   net: dsa: Extend ksz9477 TAG setup to support HSR frames duplication
->   net: dsa: hsr: Enable in KSZ9477 switch HW HSR offloading
->=20
->  drivers/net/dsa/microchip/ksz9477.c    | 81
-> ++++++++++++++++++++++++++ drivers/net/dsa/microchip/ksz9477.h    |
-> 2 + drivers/net/dsa/microchip/ksz_common.c | 76
-> ++++++++++++++++++++++++ drivers/net/dsa/microchip/ksz_common.h |  3 +
->  net/dsa/tag_ksz.c                      |  8 +++
->  5 files changed, 170 insertions(+)
->=20
+> Have you had time to review this patch?
 
+got distracted a few times. I need a quiet moment=E2=80=A6 Will do this wee=
+k=E2=80=A6
 
-Are there any comments regarding this new revision of the HSR support
-for KSZ9477 switch?
+> Your comments are more than welcome.
 
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/l1xVNpnAFR9tiKENrOB14ys
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmT/KygACgkQAR8vZIA0
-zr3D9gf/b+7FlEt0P70xpGzznuBH+xSxzGUPSwSHARy2wlLTNLTPM5RdP8qFIS8B
-j82vP1JNb+nb/AqLlr61kgASyyo7NVdWSmXq+1F68UqfsChS714O6zgt1w2Hl3YI
-3kPpR0ZYTMv1r3G0iiLIXmhTzKUBJ7lshxADI5vMlWdG8qhaSnS/X6KlQ/rtO5UJ
-pnwdn4rfZtti0YU6UNBHeqltF25tPlot0Se2z6sAIisp6hNjhKF3cItHF4M646Z/
-tbLJAd3S607I2QmhFKuAN1rhHk5Hd9UiMQvwEtCw/jS0jp0aD6wuxc/FX8P/sAqg
-EKofoXbT8NvfQFtOf3YWW0b50TUeBw==
-=9srb
------END PGP SIGNATURE-----
-
---Sig_/l1xVNpnAFR9tiKENrOB14ys--
+Sebastian
 
