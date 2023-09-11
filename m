@@ -1,73 +1,187 @@
-Return-Path: <netdev+bounces-32838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A369079A916
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 16:53:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CF79279A932
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 16:57:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D79102812AA
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 14:53:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F8B12812AA
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 14:57:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1696C1171B;
-	Mon, 11 Sep 2023 14:53:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAFE61171F;
+	Mon, 11 Sep 2023 14:57:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 991CC11706
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 14:53:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F83AC433C9;
-	Mon, 11 Sep 2023 14:53:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694443993;
-	bh=r9uAvsPMKBSoSZ444LBXcq13Ir5ZTBEHNT1xJjzBGFg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hiv8gQ/ZYufnMz2KaRZus5/1orM/jtGnWu5LVFSbHJ954tPfsmPbHTIMqpgUuiugV
-	 qF5A8hVnABogiH+bNSNyzHV8LnEF6gR9EkVqyAZpMaR/lYUBzHjliH1npBvhJbJim2
-	 DZeKzgrqAFjbhE3r8UkoDZ4lsv68/b2nJXLBqQWhHTitFZsZrKRN1kEZIJK4MrfxcM
-	 8/OLxe6fzLQgqDvTDTGxachfQjgs7QryIGdbkwum6FKbjosVVH6D8ygk+bDwEGVenu
-	 OcFovyIxw403Mr+x5YiqRhr/g7zdmjPbbFkam8H25zwVDnU+XDVxIxxmhvGb6sN/Gv
-	 52z0vfn5QJROQ==
-Received: (nullmailer pid 1240952 invoked by uid 1000);
-	Mon, 11 Sep 2023 14:53:10 -0000
-Date: Mon, 11 Sep 2023 09:53:10 -0500
-From: Rob Herring <robh@kernel.org>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, kernel@pengutronix.de, Eric Dumazet <edumazet@google.com>, Rob Herring <robh+dt@kernel.org>, Woojung Huh <woojung.huh@microchip.com>, Florian Fainelli <f.fainelli@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Conor Dooley <conor+dt@kernel.org>, linux-kernel@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Arun Ramadoss <arun.ramadoss@microchip.com>, devicetree@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, UNGLinuxDriver@microchip.com
-Subject: Re: [RFC net-next v3 1/2] dt-bindings: net: dsa: microchip: Update
- ksz device tree bindings for drive strength
-Message-ID: <169444399004.1240880.4980375902161136424.robh@kernel.org>
-References: <20230907090943.2385053-1-o.rempel@pengutronix.de>
- <20230907090943.2385053-2-o.rempel@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFF7B11719
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 14:57:20 +0000 (UTC)
+Received: from phobos.denx.de (phobos.denx.de [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80608E50;
+	Mon, 11 Sep 2023 07:57:17 -0700 (PDT)
+Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 84AFD86E45;
+	Mon, 11 Sep 2023 16:57:14 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1694444235;
+	bh=6BZTCrbY7JIU/gU/FlcDi4amb+9Cj/ty4qoviSaIi+E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=pT6Sc/K4H/1XmsroChmNBpxkv8EhRLWOL+hRJgdcgLGx1Kqo3JBNXLAXDYMosw4fq
+	 xd3TXXyDwG/wjGhw8YqhNHJAv6pD2OF+nysaOocG0RhPBJ4pJrcUIqs6cYcQhXQ1s9
+	 UuDRvpHaesTkZQfdG4iN2Y/erJOp1+AEIyZV5HVMTFCJkdPzUmSL7n8dfSeiqvKhS2
+	 Sq+bXVzne1grSJu3SOAb0uKe7WUfG6TbVh8meKEgDf48CfaGDVhtunF7x08d0YiTHG
+	 dcXv623q+LZVoUXwgYnkZ0Y3sk/bg4EIw7Ord7VWBYm6FLZoSHHZpbwcVwZ6uuqEwq
+	 NZvHOW2uPeJ6Q==
+Date: Mon, 11 Sep 2023 16:57:08 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Tristram.Ha@microchip.com, Eric Dumazet <edumazet@google.com>,
+ davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Florian Fainelli
+ <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Kristian Overskeid <koverskeid@gmail.com>, Matthieu
+ Baerts <matthieu.baerts@tessares.net>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Andreas Oetken <ennoerlangen@gmail.com>
+Subject: Re: [PATCH] net: hsr : Provide fix for HSRv1 supervisor frames
+ decoding
+Message-ID: <20230911165708.0bc32e3c@wsk>
+In-Reply-To: <20230905115512.3ac6649c@wsk>
+References: <20230825153111.228768-1-lukma@denx.de>
+	<20230905080614.ImjTS6iw@linutronix.de>
+	<20230905115512.3ac6649c@wsk>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230907090943.2385053-2-o.rempel@pengutronix.de>
+Content-Type: multipart/signed; boundary="Sig_/8XSE7au7Lm0FPJDKb+ziwHb";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
+
+--Sig_/8XSE7au7Lm0FPJDKb+ziwHb
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+Hi Sebastian,
+
+> Hi Sebastian,
+>=20
+> > On 2023-08-25 17:31:11 [+0200], Lukasz Majewski wrote: =20
+> > > Provide fix to decode correctly supervisory frames when HSRv1
+> > > version of the HSR protocol is used.
+> > >=20
+> > > Without this patch console is polluted with:
+> > > ksz-switch spi1.0 lan1: hsr_addr_subst_dest: Unknown node
+> > >=20
+> > > as a result of destination node's A MAC address equals to:
+> > > 00:00:00:00:00:00.
+> > >=20
+> > > cat /sys/kernel/debug/hsr/hsr0/node_table
+> > > Node Table entries for (HSR) device
+> > > MAC-Address-A,    MAC-Address-B,    time_in[A], time_in[B],
+> > > Address-B 00:00:00:00:00:00 00:10:a1:94:77:30      400bf,
+> > > 399c,	        0
+> > >=20
+> > > It was caused by wrong frames decoding in the
+> > > hsr_handle_sup_frame().
+> > >=20
+> > > As the supervisor frame is encapsulated in HSRv1 frame:
+> > >=20
+> > > SKB_I100000000: 01 15 4e 00 01 2d 00 10 a1 94 77 30 89 2f 00 34
+> > > SKB_I100000010: 02 59 88 fb 00 01 84 15 17 06 00 10 a1 94 77 30
+> > > SKB_I100000020: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> > > SKB_I100000030: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> > > SKB_I100000040: 00 00
+> > >=20
+> > > The code had to be adjusted accordingly and the MAC-Address-A now
+> > > has the proper address (the MAC-Address-B now has all 0's).   =20
+> >=20
+> > Was this broken by commit
+> > 	eafaa88b3eb7f ("net: hsr: Add support for redbox supervision
+> > frames")
+> >  =20
+>=20
+> Yes, it seems so.
+>=20
+> > ? Is this frame somehow special? I don't remember this=E2=80=A6
+> >  =20
+>=20
+> Please refer to the whole thread - I've described this issue
+> thoroughly (including hex dump of frames):
+> https://lore.kernel.org/lkml/20230904175419.7bed196b@wsk/T/#m35cbfa4f1b89=
+01d341fbc39659ace6a041f84c98
+>=20
+> In short - the HSRv1 is not recognized correctly anymore:
+>=20
+> HSR v0:
+>     [Protocols in frame: eth:ethertype:hsr_prp_supervision]
+>                                                                        =20
+> HSR v1:
+>     [Protocols in frame: eth:ethertype:hsr:hsr_prp_supervision]
+>=20
+
+Have you had time to review this patch?
+
+Your comments are more than welcome.
+
+>=20
+> > > Signed-off-by: Lukasz Majewski <lukma@denx.de>   =20
+> >=20
+> > Sebastian =20
+>=20
+>=20
+> Best regards,
+>=20
+> Lukasz Majewski
+>=20
+> --
+>=20
+> DENX Software Engineering GmbH,      Managing Director: Erika Unter
+> HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+> Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email:
+> lukma@denx.de
 
 
-On Thu, 07 Sep 2023 11:09:42 +0200, Oleksij Rempel wrote:
-> Extend device tree bindings to support drive strength configuration for the
-> ksz* switches. Introduced properties:
-> - microchip,hi-drive-strength-microamp: Controls the drive strength for
->   high-speed interfaces like GMII/RGMII and more.
-> - microchip,lo-drive-strength-microamp: Governs the drive strength for
->   low-speed interfaces such as LEDs, PME_N, and others.
-> - microchip,io-drive-strength-microamp: Controls the drive strength for
->   for undocumented Pads on KSZ88xx variants.
-> 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> ---
->  .../bindings/net/dsa/microchip,ksz.yaml       | 20 +++++++++++++++++++
->  1 file changed, 20 insertions(+)
-> 
 
-Reviewed-by: Rob Herring <robh@kernel.org>
 
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/8XSE7au7Lm0FPJDKb+ziwHb
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmT/KsQACgkQAR8vZIA0
+zr0AOAgAs0CIwM+g7skUkQ97pRHdo5AVv17Btzofx6gypvJfnFb0gf1tQcoRpmDh
+vh7xIAPxf+eByxARu8e487m8zNfkMi367BZAtQr9gebklH17ghEZTNEkzUs0P9LU
+9PMUP7MWQvCskLQMFHxVvZJVnQAFWEZOZbm6gWvYmVH6JzxriLh0rtcu5DWHl2mB
+o6SX1iykaQmQceGSb7eW4Cfu5KecLIG156g9bC9uZ5/3jOq2JHHGilgtwU6+CGHA
+rFKlLqpXouABuUWUmM9+O/sMBryOAGb4r7cASRBzAsBFDCuXpu4q/oyCT+it8fTl
+jiOqJvCj0NqkE3TcaLDary8ujR/hIw==
+=rYMm
+-----END PGP SIGNATURE-----
+
+--Sig_/8XSE7au7Lm0FPJDKb+ziwHb--
 
