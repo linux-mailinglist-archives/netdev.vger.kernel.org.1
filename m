@@ -1,206 +1,151 @@
-Return-Path: <netdev+bounces-32793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32803-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99E7279A723
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 12:13:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E89E179A751
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 12:39:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8269D1C208CB
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 10:13:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 265361C209AE
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 10:39:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EEE4C15F;
-	Mon, 11 Sep 2023 10:13:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7D8AC2D4;
+	Mon, 11 Sep 2023 10:35:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93EB0BE55
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 10:13:31 +0000 (UTC)
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B413EE5F;
-	Mon, 11 Sep 2023 03:13:28 -0700 (PDT)
-Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.200])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4RkjDj4R36z6HJpM;
-	Mon, 11 Sep 2023 18:11:49 +0800 (CST)
-Received: from [10.123.123.126] (10.123.123.126) by
- lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Mon, 11 Sep 2023 11:13:25 +0100
-Message-ID: <239800f3-baf4-1c7d-047f-8ba90b097bee@huawei.com>
-Date: Mon, 11 Sep 2023 13:13:24 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF7D81172E
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 10:35:01 +0000 (UTC)
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A8CB120
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 03:35:00 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NXJ6x51a4NYrFdnaFWKBOYO+vF7QS0qj+PBXspbyUZl/dg+XEN6gJjptbQtK3AZG9e8M29inWTHthHNnt6Xidt9wCTlb8QYQXMDTNPeaHeXuCbDhTQbG1IFtrYTT9Y5BnC+aXwNluMFrCIIECksIoxBfh4EqVRBGCPDMTVWoa7dhDZVjvKc2CtySAuR3L5C/BtJHIg4DYWys2wI3hSe/pJblQEHKKQLDrOxh9viJMXrBFT3g2botj4lQu91XsBhVSHBYq+K2YGqrePiozMTH1px5GIeNKKkJcAZo53r3dRkHAdL4TC9k2MAo0Eu/UJEsKeUGjIqwxEDr5njJyUbEaw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=07GR6IsZYJZKDqXbSRJYrs/EwVEfLE77Crh/MJ381Bc=;
+ b=HhIwdmCMXxaodO+R5xAr56uNf832aDbB7EfdMSa0orb7A4xFKmRuEb2yDYCJkpusW7ILJCgqtlmCy5F2iOTniKQTk8y5udhiGqHJuPp8DO0YGDupDh7hP8yNIb9dPy2LSS3ksuVQjoSlyTPsNWb1jGHHvG6KKm02in9WjcF0lwhoFeulG05aMxsx1947mfOUq7nsBAU3CnsLbkcB124sE4Nhkv9wUBq2GGC2r2YxdPL+bSvn7DKqqyw952dWJ58BCmGfURaHXJG0n3VsiuEnl22CcHrx2/wZZ7U3sZ7dMRqYyMItNHjMqrhFsm7DkyCTaa6p+j0WUbki1v1oFwAG2g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=07GR6IsZYJZKDqXbSRJYrs/EwVEfLE77Crh/MJ381Bc=;
+ b=R1567OWSDEgcwJxYb57S9M6CQi3JLYx7aqfJ2VimJ9N6Tr/JmTXWV3GSAKzwk/jUzteRbKuPfys+oc4XLCmbsM90jZvddnrGcOwLkvxS4JgndtZiGFH0CvasVAJziPkHdIC8gxpLGsZad5Q5MRfIG+cjDoNAwVa3lvtrcEeiKF8Yx0I+NiAJVVLmf4UkJvRiv3EcQ/2GIDjeo46OAZFlKvwyzJItVi8mpIMFCFy2y+9FmwcR0a2OAa9tziiGFolmLd5yZo6q1G/BZ52507FXADzZPwumF9uUhxfRsjXD84QbkzotplI/Ho4SqIpE3W0afPUNBHmdpNodc8gaD15G7A==
+Received: from SA9P221CA0014.NAMP221.PROD.OUTLOOK.COM (2603:10b6:806:25::19)
+ by PH7PR12MB8428.namprd12.prod.outlook.com (2603:10b6:510:243::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.35; Mon, 11 Sep
+ 2023 10:34:57 +0000
+Received: from SN1PEPF0002636A.namprd02.prod.outlook.com
+ (2603:10b6:806:25:cafe::74) by SA9P221CA0014.outlook.office365.com
+ (2603:10b6:806:25::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.35 via Frontend
+ Transport; Mon, 11 Sep 2023 10:34:57 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ SN1PEPF0002636A.mail.protection.outlook.com (10.167.241.135) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6792.16 via Frontend Transport; Mon, 11 Sep 2023 10:34:57 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Mon, 11 Sep 2023
+ 03:34:38 -0700
+Received: from yaviefel (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Mon, 11 Sep
+ 2023 03:34:37 -0700
+References: <20230911044440.49366-1-elasticvine@protonmail.com>
+User-agent: mu4e 1.8.11; emacs 28.2
+From: Petr Machata <petrm@nvidia.com>
+To: Sam Foxman <elasticvine@protonmail.com>
+CC: <netdev@vger.kernel.org>
+Subject: Re: [PATCH iproute2-next] Enable automatic color output by default.
+Date: Mon, 11 Sep 2023 12:20:02 +0200
+In-Reply-To: <20230911044440.49366-1-elasticvine@protonmail.com>
+Message-ID: <87sf7l3sn8.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Subject: Re: [PATCH v11.1] selftests/landlock: Add 11 new test suites
- dedicated to network
-Content-Language: ru
-To: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>, Paul Moore
-	<paul@paul-moore.com>
-CC: <artem.kuzin@huawei.com>, <gnoack3000@gmail.com>,
-	<willemdebruijn.kernel@gmail.com>, <yusongping@huawei.com>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>
-References: <20230515161339.631577-11-konstantin.meskhidze@huawei.com>
- <20230706145543.1284007-1-mic@digikod.net>
- <3db64cf8-6a45-a361-aa57-9bfbaf866ef8@digikod.net>
- <b2a94da1-f9df-b684-7666-1c63060f68f1@huawei.com>
- <20230817.koh5see0eaLa@digikod.net>
-From: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
-In-Reply-To: <20230817.koh5see0eaLa@digikod.net>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.123.123.126]
-X-ClientProxiedBy: lhrpeml500003.china.huawei.com (7.191.162.67) To
- lhrpeml500004.china.huawei.com (7.191.163.9)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.126.231.35]
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF0002636A:EE_|PH7PR12MB8428:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5837db07-e347-4490-71c1-08dbb2b2be92
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	U1iatqRSrMg+2XSQnAlX8o9dxySH91onNthPWuBtR9wpxO++2Uu6lPA9D8VwYPAhBoSTuQ79QTX0BgO2gmKY8DRPF0+axwI8jYrVv8kC/aua3EdKjlwzxbBNE88wasdGWIEKSo9kgXuNgXoMk9EaMBUWw1eAxoRHABZOA/7VK2WEhschpyFgP1Al9+qlsXU9EdwGdpQaB3tyw7iOclM5iRfq5LhhQKXUwOW77lxjpKuhcILLqp3FV8EMOSobS/IHQl9AUh1pbLlXc2v1YBBuAWVO592Py6nUbGkzstv2L7QBV0CTm2Q3iwkjToht09n2OXuPjS720Xk6N8lgr1AM1pQ7kuvm1kYRvAy6aC9q5SgejQrOpqsxODZh1JZtuxTa1l0uxrXXSrKnO87IAXkvEBWrN8sQLgccC0e+sFd91vgsN7bRLtKTso8DhtTI2Zm5S2YC9Jz/FEu6K1QCaX/s5ajBK9fhzbLYO0lguUcCihDWYSTQCpB2LkbOf60r8yAggnrgQNoKGwd2GXrv/dg5WfYBGJRpmrv6TVYmfERTGAZQ110T2EnyWSyV9GxPSkInbGWlEj+AGQ+/hxSeOK+8jYYLnf/izmskJJanWS+gc8fV1pt4qBgMU9Bm7raqbnWMPLFRe6cwD4ntDYADO0WDhC/tgOS8bkq7OknkzMxo2EB+tYDzrd1xvxuHw0YjUrnZ2iQKbMhmyYtW9inVUZlG4g0wmPbaocOkrpkM8gzvEAOpYbkri5AX73askTXsaZxN
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(39860400002)(346002)(396003)(376002)(1800799009)(186009)(82310400011)(451199024)(40470700004)(36840700001)(46966006)(40460700003)(2906002)(86362001)(26005)(336012)(426003)(16526019)(2616005)(6666004)(36756003)(36860700001)(82740400003)(83380400001)(7636003)(356005)(47076005)(40480700001)(478600001)(6916009)(316002)(4326008)(41300700001)(5660300002)(8936002)(8676002)(70206006)(70586007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Sep 2023 10:34:57.2842
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5837db07-e347-4490-71c1-08dbb2b2be92
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF0002636A.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB8428
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
+Sam Foxman <elasticvine@protonmail.com> writes:
 
-8/17/2023 6:08 PM, Mickaël Salaün пишет:
-> On Sat, Aug 12, 2023 at 05:37:00PM +0300, Konstantin Meskhidze (A) wrote:
->> 
->> 
->> 7/12/2023 10:02 AM, Mickaël Salaün пишет:
->> > 
->> > On 06/07/2023 16:55, Mickaël Salaün wrote:
->> > > From: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
->> > > 
->> > > This patch is a revamp of the v11 tests [1] with new tests (see the
->> > > "Changes since v11" description).  I (Mickaël) only added the following
->> > > todo list and the "Changes since v11" sections in this commit message.
->> > > I think this patch is good but it would appreciate reviews.
->> > > You can find the diff of my changes here but it is not really readable:
->> > > https://git.kernel.org/mic/c/78edf722fba5 (landlock-net-v11 branch)
->> > > [1] https://lore.kernel.org/all/20230515161339.631577-11-konstantin.meskhidze@huawei.com/
->> > > TODO:
->> > > - Rename all "net_service" to "net_port".
->> > > - Fix the two kernel bugs found with the new tests.
->> > > - Update this commit message with a small description of all tests.
->> > 
->> > [...]
-> 
->> > We should also add a test to make sure errno is the same with and
->> > without sandboxing when using port 0 for connect and consistent with
->> > bind (using an available port). The test fixture and variants should be
->> > quite similar to the "ipv4" ones, but we can also add AF_INET6 variants,
->> > which will result in 8 "ip" variants:
->> > 
->> > TEST_F(ip, port_zero)
->> > {
->> > 	if (variant->sandbox == TCP_SANDBOX) {
->> > 		/* Denies any connect and bind. */
->> > 	}
->> > 	/* Checks errno for port 0. */
->> > }
->> As I understand the would be the next test cases:
->> 
->> 	1. ip4, sandboxed, bind port 0 -> should return EACCES (denied by
->> landlock).
-> 
-> Without any allowed port, yes. This test case is useful.
-> 
-> By tuning /proc/sys/net/ipv4/ip_local_port_range (see
-> inet_csk_find_open_port call) we should be able to pick a specific
-> allowed port and test it.  We can also test for the EADDRINUSE error to
-> make sure error ordering is correct (compared with -EACCES).
-   Sorry, did not get this case. Could please explain it with more details?
-> 
-> However, I think the current LSM API don't enable to infer this random
-> port because the LSM hook is called before a port is picked.  If this is
-> correct, the best way to control port binding would be to always deny
-> binding on port zero/random (when restricting port binding, whatever
-> exception rules are in place). This explanation should be part of a
-> comment for this specific exception.
+> Automatic color should be enabled by default because it makes command
+> output much easier to read, especially `ip addr` with many interfaces.
+> Color is enabled only in interactive use, scripts are not affected.
 
-   Yep, if some LSM rule (for bind) has been applied a with specific 
-port, other attemps to bind with zero/random ports would be refused by 
-LSM security checks.
-> 
-> Cc Paul
-> 
->> 	2. ip4, non-sandboxed, bind port 0 -> should return 0 (should be bounded to
->> random port).
-> 
-> I think so but we need to make sure the random port cannot be < 1024, I
-> guess with /proc/sys/net/ipv4/ip_local_port_range but I don't know for
-> IPv6.
+tc and bridge should do the same.
 
-   For ipv4 when connecting to a server a client binds to a random port 
-within /proc/sys/net/ipv4/ip_local_port_range, by default one my machine
-this range is: cat /proc/sys/net/ipv4/ip_local_port_range
-32768   60999.
-But for ipv6 there is no such tuning range.
+FWIW, `ls' on Fedora is aliased to `ls --color=auto' by default. My
+guess is that the reason that it's not auto by default was the
+performance hit resulting from having to stat every file.
 
-> 
->> 	3. ip6, sandboxed, bind port 0 -> should return EACCES (denied by
->> landlock).
->> 	4. ip6, non-sandboxed, bind port 0 -> should return 0 (should be bounded to
->> random port).
->> 	5. ip4, sandboxed, bind some available port, connect port 0 -> should
->> return -EACCES (denied by landlock).
-> 
-> Yes, but don't need to bind to anything (same for the next ones).
-> 
->> 	6. ip4, non-sandboxed, bind some available port, connect port 0 -> should
->> return ECONNREFUSED.
-> 
-> Yes, but without any binding.
-> 
->> 	7. ip6, sandboxed, bind some available port, connect port 0 -> should
->> return -EACCES (denied by landlock)
->> 	8. ip6, non-sandboxed, some bind available port, connect port 0 -> should
->> return ECONNREFUSED.
->> 
->> Correct?
-> 
-> Thinking more about this case, being able to add a rule with port zero
-> *for a connect action* looks legitimate.  A rule with both connect and
-> bind actions on port zero should then be denied.  We should fix
-> add_rule_net_service() and test that (with a first layer allowing port
-> zero, and a second without rule, for connect).
+iproute2 tools do not have that issue -- overhead from those escape
+sequences must surely be noise? So it would IMHO make sense to default
+to color output for iproute2 tools.
 
-  So with first rule allowing port 0 connect action, the second rule 
-with some another port and connect action, as a result test should allow 
-that. Correct?
-> 
-> 
->> 
->> > 
->> > [...]
->> > 
->> > > +FIXTURE(inet)
->> > > +{
->> > > +	struct service_fixture srv0, srv1;
->> > > +};
->> > 
->> > The "inet" variants are useless and should be removed. The "inet"
->> > fixture can then be renamed to "ipv4_tcp".
->> > 
->>   So inet should be changed to ipv4_tcp and ipv6_tcp with next variants:
->> 
->>   - ipv4_tcp.no_sandbox_with_ipv4.port_endianness
->>   - ipv4_tcp.sandbox_with_ipv4.port_endianness
->>   - ipv6_tcp.no_sandbox_with_ipv6.port_endianness
->>   - ipv6_tcp.sandbox_with_ipv6.port_endianness
->> ????
->> 
->>    in this case we need double copy of TEST_F(inet, port_endianness) :
->> 	TEST_F(ipv4_tcp, port_endianness)
->> 	TEST_F(ipv6_tcp, port_endianness)
-> 
-> There is no need for any variant for the port_endianness test. You can
-> rename "inet" to "ipv4_tcp" (and not "inet_tcp" like I said before).
-> .
+> ---
+>  ip/ip.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/ip/ip.c b/ip/ip.c
+> index 8c046ef1..aad6b6d7 100644
+> --- a/ip/ip.c
+> +++ b/ip/ip.c
+> @@ -168,7 +168,7 @@ int main(int argc, char **argv)
+>  	const char *libbpf_version;
+>  	char *batch_file = NULL;
+>  	char *basename;
+> -	int color = 0;
+> +	int color = COLOR_OPT_AUTO;
+>  
+>  	/* to run vrf exec without root, capabilities might be set, drop them
+>  	 * if not needed as the first thing.
+
 
