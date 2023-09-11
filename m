@@ -1,160 +1,206 @@
-Return-Path: <netdev+bounces-32792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63BBB79A71F
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 12:10:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99E7279A723
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 12:13:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2683280CAC
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 10:10:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8269D1C208CB
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 10:13:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28FA1C157;
-	Mon, 11 Sep 2023 10:10:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EEE4C15F;
+	Mon, 11 Sep 2023 10:13:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AC80C129
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 10:10:05 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C25C6101
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 03:10:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694427003; x=1725963003;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=cWQCr6326rcQV0Ctr+xviO22iHTuRxhc6Uks+r6hMDw=;
-  b=XLKyUMRLIBCrIfiFXFP3isysI1Xvs5OSZsszw0liF3bNhoRMpIYW8Mr3
-   eC7nIrq0+idJdrjddmzJlr9eP4lqCnAmFqaqn0DEriEblfp+cmymUBDsJ
-   IFNZ03aeeJMPudwHCMw8S03Lb/PQ9ihGbmE709dBBEulHhipm/3j4Xs92
-   3+BQYzjutTQycnJYym5JMYPt9RC1aJhkx4vEnl/SMMYveejQUPdIQJn4K
-   P2WNw3qTGX18dO5VGjHZwtYCNG3GwSrLCrRds1EFskBX0tWHIRNI7rIdy
-   oDPVcr0kpfLFpbpCxYJ76o3SSdJhXmojTvR3hVxuUtJ4MrP2eXuzQVRLR
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10829"; a="358347446"
-X-IronPort-AV: E=Sophos;i="6.02,243,1688454000"; 
-   d="scan'208";a="358347446"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2023 03:10:01 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10829"; a="778333529"
-X-IronPort-AV: E=Sophos;i="6.02,243,1688454000"; 
-   d="scan'208";a="778333529"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by orsmga001.jf.intel.com with ESMTP; 11 Sep 2023 03:09:58 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1001)
-	id DCD7F988; Mon, 11 Sep 2023 13:09:56 +0300 (EEST)
-Date: Mon, 11 Sep 2023 13:09:56 +0300
-From: Mika Westerberg <mika.westerberg@linux.intel.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Michael Jamet <michael.jamet@intel.com>,
-	Yehezkel Bernat <YehezkelShB@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alex Balcanquall <alex@alexbal.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH] net: thunderbolt: Fix TCP/UDPv6 GSO checksum calculation
-Message-ID: <20230911100956.GZ1599918@black.fi.intel.com>
-References: <20230911095039.3611113-1-mika.westerberg@linux.intel.com>
- <CANn89i+RbD3Dr+ca1+HErkW099DgZXQ7VF=vcY3zAd-xViFusg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93EB0BE55
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 10:13:31 +0000 (UTC)
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B413EE5F;
+	Mon, 11 Sep 2023 03:13:28 -0700 (PDT)
+Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.200])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4RkjDj4R36z6HJpM;
+	Mon, 11 Sep 2023 18:11:49 +0800 (CST)
+Received: from [10.123.123.126] (10.123.123.126) by
+ lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Mon, 11 Sep 2023 11:13:25 +0100
+Message-ID: <239800f3-baf4-1c7d-047f-8ba90b097bee@huawei.com>
+Date: Mon, 11 Sep 2023 13:13:24 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Subject: Re: [PATCH v11.1] selftests/landlock: Add 11 new test suites
+ dedicated to network
+Content-Language: ru
+To: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>, Paul Moore
+	<paul@paul-moore.com>
+CC: <artem.kuzin@huawei.com>, <gnoack3000@gmail.com>,
+	<willemdebruijn.kernel@gmail.com>, <yusongping@huawei.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>
+References: <20230515161339.631577-11-konstantin.meskhidze@huawei.com>
+ <20230706145543.1284007-1-mic@digikod.net>
+ <3db64cf8-6a45-a361-aa57-9bfbaf866ef8@digikod.net>
+ <b2a94da1-f9df-b684-7666-1c63060f68f1@huawei.com>
+ <20230817.koh5see0eaLa@digikod.net>
+From: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
+In-Reply-To: <20230817.koh5see0eaLa@digikod.net>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89i+RbD3Dr+ca1+HErkW099DgZXQ7VF=vcY3zAd-xViFusg@mail.gmail.com>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Originating-IP: [10.123.123.126]
+X-ClientProxiedBy: lhrpeml500003.china.huawei.com (7.191.162.67) To
+ lhrpeml500004.china.huawei.com (7.191.163.9)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
 
-On Mon, Sep 11, 2023 at 12:03:06PM +0200, Eric Dumazet wrote:
-> On Mon, Sep 11, 2023 at 11:50 AM Mika Westerberg
-> <mika.westerberg@linux.intel.com> wrote:
-> >
-> > Alex reported that running ssh over IPv6 does not work with
-> > Thunderbolt/USB4 networking driver. The reason for that is that driver
-> > should call skb_is_gso() before calling skb_is_gso_v6(), and it should
-> > not return false after calculates the checksum successfully. This probably
-> > was a copy paste error from the original driver where it was done
-> > properly.
-> >
-> > While there add checksum calculation for UDPv6 GSO packets as well.
+
+8/17/2023 6:08 PM, Mickaël Salaün пишет:
+> On Sat, Aug 12, 2023 at 05:37:00PM +0300, Konstantin Meskhidze (A) wrote:
+>> 
+>> 
+>> 7/12/2023 10:02 AM, Mickaël Salaün пишет:
+>> > 
+>> > On 06/07/2023 16:55, Mickaël Salaün wrote:
+>> > > From: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+>> > > 
+>> > > This patch is a revamp of the v11 tests [1] with new tests (see the
+>> > > "Changes since v11" description).  I (Mickaël) only added the following
+>> > > todo list and the "Changes since v11" sections in this commit message.
+>> > > I think this patch is good but it would appreciate reviews.
+>> > > You can find the diff of my changes here but it is not really readable:
+>> > > https://git.kernel.org/mic/c/78edf722fba5 (landlock-net-v11 branch)
+>> > > [1] https://lore.kernel.org/all/20230515161339.631577-11-konstantin.meskhidze@huawei.com/
+>> > > TODO:
+>> > > - Rename all "net_service" to "net_port".
+>> > > - Fix the two kernel bugs found with the new tests.
+>> > > - Update this commit message with a small description of all tests.
+>> > 
+>> > [...]
 > 
-> This part does not belong to this patch, and should be submitted for net-next.
+>> > We should also add a test to make sure errno is the same with and
+>> > without sandboxing when using port 0 for connect and consistent with
+>> > bind (using an available port). The test fixture and variants should be
+>> > quite similar to the "ipv4" ones, but we can also add AF_INET6 variants,
+>> > which will result in 8 "ip" variants:
+>> > 
+>> > TEST_F(ip, port_zero)
+>> > {
+>> > 	if (variant->sandbox == TCP_SANDBOX) {
+>> > 		/* Denies any connect and bind. */
+>> > 	}
+>> > 	/* Checks errno for port 0. */
+>> > }
+>> As I understand the would be the next test cases:
+>> 
+>> 	1. ip4, sandboxed, bind port 0 -> should return EACCES (denied by
+>> landlock).
 > 
-> Note that this driver is not supposed to receive UDP GSO packets.
-
-Ah, indeed.
-
-I took this part from the original driver that was submitted
-around 2016-2017 timeframe but was never merged. This current driver is
-reworked version but I missed the skb_is_gso() and the rest.
-
-> >
-> > Cc: stable@vger.kernel.org
+> Without any allowed port, yes. This test case is useful.
 > 
-> What would be the Fixes: tag for this patch ?
-
-It would be the initial commit:
-
-Fixes: e69b6c02b4c3 ("net: Add support for networking over Thunderbolt cable")
-
-But I was not sure if it is really practical here. I can add it to v2.
-
-> > Reported-by: Alex Balcanquall <alex@alexbal.com>
-> > Signed-off-by: Mika Westerberg <mika.westerberg@linux.intel.com>
-> > ---
-> >  drivers/net/thunderbolt/main.c | 21 +++++++++++++++------
-> >  1 file changed, 15 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/drivers/net/thunderbolt/main.c b/drivers/net/thunderbolt/main.c
-> > index 0c1e8970ee58..ba50a554478f 100644
-> > --- a/drivers/net/thunderbolt/main.c
-> > +++ b/drivers/net/thunderbolt/main.c
-> > @@ -1049,12 +1049,21 @@ static bool tbnet_xmit_csum_and_map(struct tbnet *net, struct sk_buff *skb,
-> >                 *tucso = ~csum_tcpudp_magic(ip_hdr(skb)->saddr,
-> >                                             ip_hdr(skb)->daddr, 0,
-> >                                             ip_hdr(skb)->protocol, 0);
-> > -       } else if (skb_is_gso_v6(skb)) {
-> > -               tucso = dest + ((void *)&(tcp_hdr(skb)->check) - data);
-> > -               *tucso = ~csum_ipv6_magic(&ipv6_hdr(skb)->saddr,
-> > -                                         &ipv6_hdr(skb)->daddr, 0,
-> > -                                         IPPROTO_TCP, 0);
-> > -               return false;
-> > +       } else if (skb_is_gso(skb)) {
-> > +               if (skb_is_gso_v6(skb)) {
-> > +                       tucso = dest + ((void *)&(tcp_hdr(skb)->check) - data);
-> > +                       *tucso = ~csum_ipv6_magic(&ipv6_hdr(skb)->saddr,
-> > +                                                 &ipv6_hdr(skb)->daddr, 0,
-> > +                                                 IPPROTO_TCP, 0);
-> > +               } else if (protocol == htons(ETH_P_IPV6) &&
-> > +                          (skb_shinfo(skb)->gso_type & SKB_GSO_UDP)) {
-> > +                       tucso = dest + ((void *)&(udp_hdr(skb)->check) - data);
-> > +                       *tucso = ~csum_ipv6_magic(&ipv6_hdr(skb)->saddr,
-> > +                                                 &ipv6_hdr(skb)->daddr, 0,
-> > +                                                 IPPROTO_UDP, 0);
+> By tuning /proc/sys/net/ipv4/ip_local_port_range (see
+> inet_csk_find_open_port call) we should be able to pick a specific
+> allowed port and test it.  We can also test for the EADDRINUSE error to
+> make sure error ordering is correct (compared with -EACCES).
+   Sorry, did not get this case. Could please explain it with more details?
 > 
-> This is dead code in the current state of this driver.
+> However, I think the current LSM API don't enable to infer this random
+> port because the LSM hook is called before a port is picked.  If this is
+> correct, the best way to control port binding would be to always deny
+> binding on port zero/random (when restricting port binding, whatever
+> exception rules are in place). This explanation should be part of a
+> comment for this specific exception.
 
-Thanks! I will submit v2 with that dropped.
+   Yep, if some LSM rule (for bind) has been applied a with specific 
+port, other attemps to bind with zero/random ports would be refused by 
+LSM security checks.
+> 
+> Cc Paul
+> 
+>> 	2. ip4, non-sandboxed, bind port 0 -> should return 0 (should be bounded to
+>> random port).
+> 
+> I think so but we need to make sure the random port cannot be < 1024, I
+> guess with /proc/sys/net/ipv4/ip_local_port_range but I don't know for
+> IPv6.
 
-> > +               } else {
-> > +                       return false;
-> > +               }
-> >         } else if (protocol == htons(ETH_P_IPV6)) {
-> >                 tucso = dest + skb_checksum_start_offset(skb) + skb->csum_offset;
-> >                 *tucso = ~csum_ipv6_magic(&ipv6_hdr(skb)->saddr,
-> > --
-> > 2.40.1
-> >
+   For ipv4 when connecting to a server a client binds to a random port 
+within /proc/sys/net/ipv4/ip_local_port_range, by default one my machine
+this range is: cat /proc/sys/net/ipv4/ip_local_port_range
+32768   60999.
+But for ipv6 there is no such tuning range.
+
+> 
+>> 	3. ip6, sandboxed, bind port 0 -> should return EACCES (denied by
+>> landlock).
+>> 	4. ip6, non-sandboxed, bind port 0 -> should return 0 (should be bounded to
+>> random port).
+>> 	5. ip4, sandboxed, bind some available port, connect port 0 -> should
+>> return -EACCES (denied by landlock).
+> 
+> Yes, but don't need to bind to anything (same for the next ones).
+> 
+>> 	6. ip4, non-sandboxed, bind some available port, connect port 0 -> should
+>> return ECONNREFUSED.
+> 
+> Yes, but without any binding.
+> 
+>> 	7. ip6, sandboxed, bind some available port, connect port 0 -> should
+>> return -EACCES (denied by landlock)
+>> 	8. ip6, non-sandboxed, some bind available port, connect port 0 -> should
+>> return ECONNREFUSED.
+>> 
+>> Correct?
+> 
+> Thinking more about this case, being able to add a rule with port zero
+> *for a connect action* looks legitimate.  A rule with both connect and
+> bind actions on port zero should then be denied.  We should fix
+> add_rule_net_service() and test that (with a first layer allowing port
+> zero, and a second without rule, for connect).
+
+  So with first rule allowing port 0 connect action, the second rule 
+with some another port and connect action, as a result test should allow 
+that. Correct?
+> 
+> 
+>> 
+>> > 
+>> > [...]
+>> > 
+>> > > +FIXTURE(inet)
+>> > > +{
+>> > > +	struct service_fixture srv0, srv1;
+>> > > +};
+>> > 
+>> > The "inet" variants are useless and should be removed. The "inet"
+>> > fixture can then be renamed to "ipv4_tcp".
+>> > 
+>>   So inet should be changed to ipv4_tcp and ipv6_tcp with next variants:
+>> 
+>>   - ipv4_tcp.no_sandbox_with_ipv4.port_endianness
+>>   - ipv4_tcp.sandbox_with_ipv4.port_endianness
+>>   - ipv6_tcp.no_sandbox_with_ipv6.port_endianness
+>>   - ipv6_tcp.sandbox_with_ipv6.port_endianness
+>> ????
+>> 
+>>    in this case we need double copy of TEST_F(inet, port_endianness) :
+>> 	TEST_F(ipv4_tcp, port_endianness)
+>> 	TEST_F(ipv6_tcp, port_endianness)
+> 
+> There is no need for any variant for the port_endianness test. You can
+> rename "inet" to "ipv4_tcp" (and not "inet_tcp" like I said before).
+> .
 
