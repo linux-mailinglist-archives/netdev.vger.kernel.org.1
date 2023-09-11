@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-32944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFD1179AB71
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 23:07:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 869B579AB84
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 23:19:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBE591C208E9
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 21:07:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2FDF1C20918
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 21:19:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D89887484;
-	Mon, 11 Sep 2023 21:06:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68AA58C0A;
+	Mon, 11 Sep 2023 21:18:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F4D8837
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 21:06:46 +0000 (UTC)
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3A1849D0
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 14:06:10 -0700 (PDT)
-Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-401da71b85eso53931665e9.1
-        for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 14:06:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53A9F8839
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 21:18:56 +0000 (UTC)
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6D0A1DC88
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 14:18:24 -0700 (PDT)
+Received: by mail-ed1-x536.google.com with SMTP id 4fb4d7f45d1cf-52e828ad46bso6427630a12.1
+        for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 14:18:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1694466246; x=1695071046; darn=vger.kernel.org;
+        d=arista.com; s=google; t=1694467008; x=1695071808; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0XeIaI6JMPz6gB9/VfArwDM94E4pYdDqW8l1BPHNLuQ=;
-        b=flOexepWkdxHcSWGSplKw5BGgdLrpoo2Y2SYA8tl7OiXmGKK5KvMtADroVTj7UEA4e
-         DbzzFNTWdLEEl8Ne3bGjn7sdmKc7ok0zbs3IuR8mLURfvtTwr6Ha71UKVqH0UuGUz0Im
-         Ulyxq0Jn5ZdLMk19l6miV6eywx75sDaD5AAxUhPaiQuVGqCFISW24e7977MvpVFxe0Lv
-         K1Q+qxgst2k5x2m+hO0EridSK+894RG7wkg5a1g+dLJSrJhjSe+SuspviP+N2omWG0Mb
-         4V2C7MXV0iL5lrd/PXOXe4KSLMeOv/0OBwrTA/XECmRMTfyisobXFMYgQ5f0S2pXPfJW
-         6edA==
+        bh=CBuY7MDqPmao7prnVABDWQ2lBAzUimYetEI+YRWy55A=;
+        b=gkCHhPj8jiNmtwonoNPGqlm9tnMVKUbcdVkaL5xU4PKcA0yaxk/syOmzdR1TSQ4IGW
+         5aRMjGnMuAtaKEXKk7DEYTyPzIPC1fIFbg+l2otiloFC2lJNJtRIbFZ6N9V9fQ4FbV1S
+         wQXM3hDmz6oyD9+6lpFHN1isBQTPFclsXnNUkKmUGxZbmLlTn/mUq6MJSrI5XTATGKkP
+         X3kQplrYGiVF6MvRYAYSrImSaThkiUUZ3tVCOrKcwFIAtxLQLdFqa2HmSucklP9t2dy0
+         KmkyM1U7YUN/urBKKQp+jHsGg0yBq8x8M/QkUCMm7f0CBb+g7Hw/HW1JHLjID1s3qi5o
+         dRHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694466246; x=1695071046;
+        d=1e100.net; s=20230601; t=1694467008; x=1695071808;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0XeIaI6JMPz6gB9/VfArwDM94E4pYdDqW8l1BPHNLuQ=;
-        b=fduXpHqn2QZ0cjTP65L1RTIoFlM/FzofJ2aqTR8aJ7PhpUSnWe5tzd0ovbssCr6IdE
-         FIh08j/W4ok2E+jLXzYOMNw7GDSGovw6qFmTgCkgBAC271zf310NgK3KCPT2w+wvHgsB
-         uHJQcVbWCC9tw7kBkqKBSb7YmEmKDRauY/cFPD/wU+OmHEWy6tyQRrs+hLcK7ojJqCmI
-         5jDTdvZCpFYY4z1aR7tr+YLzpmDcZVM91tcVw9K6IWK6KYARLtS/VYZdHSfxaO0Rmdgm
-         BWi5Wra/nSHC1d+6pDJFQ8ETEU/JRHCPGl1L2Hggwi07UrszjZUXZtKN28OkICHiGGkL
-         lsoA==
-X-Gm-Message-State: AOJu0Yx7A1RSPgZngozyxe/3xGPPwrhyCORxROydrrASXabpfEExQJ3Y
-	RAUJlM97XoV5RHq4ZWMKzj2X3g==
-X-Google-Smtp-Source: AGHT+IGUZ+PGvG1xvoQqkzl3PnUxMyLnxw7TBXnqz4vG27IY9mGbsSFmxY4ICgvn6pJaUcTCWpxt0Q==
-X-Received: by 2002:a05:600c:2946:b0:3f9:c82e:9d87 with SMTP id n6-20020a05600c294600b003f9c82e9d87mr9188152wmd.13.1694466245650;
-        Mon, 11 Sep 2023 14:04:05 -0700 (PDT)
+        bh=CBuY7MDqPmao7prnVABDWQ2lBAzUimYetEI+YRWy55A=;
+        b=XjcBCBXNGFBRAsNCddepOQfaKY5CwLe76q2TUurbnrUIIPOQjXodUUUjuP78semcZ/
+         HnwWKAu+4x0UPWl/6542oKt38c2a0jildOR8DA9nBmb0xKYm5Ge+Q7L6dOE8hOg7aQiF
+         tSXYNZcG4XjNYRIF7pELZDLJvU2JBsM2XEo8EpAVo3lLWvCXULPz+Ay5wF111gFuWZgB
+         B2FEH4EartaG68ugyEiNmh+7SK9wkmrk5mz1gCmkju174aRsFliHDVQoOurMv+sSbyn3
+         QMP9FEchnjXI3ZtnjRgro9du9ZZNhU6Bxp9HemTf/EdsqzvnRx+ltNRNrWj67I4Okoed
+         A7HA==
+X-Gm-Message-State: AOJu0YzLchMRorDBzYljlQ0TeSNEZIyWR1QiaGeRaH54dWaUyF2zM+gt
+	EDiqynhq8KiQjTxIY/pyAu1/dviukByaV2Kgcd0=
+X-Google-Smtp-Source: AGHT+IGKOOUJ5FdiZHtGoAJOAYyzI9aNAXl5lGO68+NkM4rxuS/z05wJoNFW1oF3647ace9O47mlVg==
+X-Received: by 2002:a7b:c8c3:0:b0:401:b2c7:3497 with SMTP id f3-20020a7bc8c3000000b00401b2c73497mr9468510wml.11.1694466247711;
+        Mon, 11 Sep 2023 14:04:07 -0700 (PDT)
 Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id z20-20020a1c4c14000000b00402e942561fsm14261699wmf.38.2023.09.11.14.04.04
+        by smtp.gmail.com with ESMTPSA id z20-20020a1c4c14000000b00402e942561fsm14261699wmf.38.2023.09.11.14.04.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Sep 2023 14:04:05 -0700 (PDT)
+        Mon, 11 Sep 2023 14:04:07 -0700 (PDT)
 From: Dmitry Safonov <dima@arista.com>
 To: David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
@@ -84,9 +84,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Simon Horman <simon.horman@corigine.com>,
 	"Tetreault, Francois" <ftetreau@ciena.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH v11 net-next 06/23] net/tcp: Add TCP-AO sign to outgoing packets
-Date: Mon, 11 Sep 2023 22:03:26 +0100
-Message-ID: <20230911210346.301750-7-dima@arista.com>
+Subject: [PATCH v11 net-next 07/23] net/tcp: Add tcp_parse_auth_options()
+Date: Mon, 11 Sep 2023 22:03:27 +0100
+Message-ID: <20230911210346.301750-8-dima@arista.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230911210346.301750-1-dima@arista.com>
 References: <20230911210346.301750-1-dima@arista.com>
@@ -98,31 +98,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Using precalculated traffic keys, sign TCP segments as prescribed by
-RFC5925. Per RFC, TCP header options are included in sign calculation:
-"The TCP header, by default including options, and where the TCP
-checksum and TCP-AO MAC fields are set to zero, all in network-
-byte order." (5.1.3)
-
-tcp_ao_hash_header() has exclude_options parameter to optionally exclude
-TCP header from hash calculation, as described in RFC5925 (9.1), this is
-needed for interaction with middleboxes that may change "some TCP
-options". This is wired up to AO key flags and setsockopt() later.
-
-Similarly to TCP-MD5 hash TCP segment fragments.
-
-From this moment a user can start sending TCP-AO signed segments with
-one of crypto ahash algorithms from supported by Linux kernel. It can
-have a user-specified MAC length, to either save TCP option header space
-or provide higher protection using a longer signature.
-The inbound segments are not yet verified, TCP-AO option is ignored and
-they are accepted.
+Introduce a helper that:
+(1) shares the common code with TCP-MD5 header options parsing
+(2) looks for hash signature only once for both TCP-MD5 and TCP-AO
+(3) fails with -EEXIST if any TCP sign option is present twice, see
+    RFC5925 (2.2):
+    ">> A single TCP segment MUST NOT have more than one TCP-AO in its
+    options sequence. When multiple TCP-AOs appear, TCP MUST discard
+    the segment."
 
 Co-developed-by: Francesco Ruggeri <fruggeri@arista.com>
 Signed-off-by: Francesco Ruggeri <fruggeri@arista.com>
@@ -131,556 +120,301 @@ Signed-off-by: Salam Noureddine <noureddine@arista.com>
 Signed-off-by: Dmitry Safonov <dima@arista.com>
 Acked-by: David Ahern <dsahern@kernel.org>
 ---
- include/net/tcp.h     |   4 +
- include/net/tcp_ao.h  |  13 ++++
- net/ipv4/tcp_ao.c     | 165 ++++++++++++++++++++++++++++++++++++++++++
- net/ipv4/tcp_ipv4.c   |   1 +
- net/ipv4/tcp_output.c | 111 +++++++++++++++++++++++++---
- net/ipv6/tcp_ao.c     |  28 +++++++
- net/ipv6/tcp_ipv6.c   |   2 +
- 7 files changed, 315 insertions(+), 9 deletions(-)
+ include/net/dropreason-core.h |  6 ++++++
+ include/net/tcp.h             | 24 ++++++++++++++++++++-
+ include/net/tcp_ao.h          | 17 ++++++++++++++-
+ net/ipv4/tcp.c                |  3 ++-
+ net/ipv4/tcp_input.c          | 39 ++++++++++++++++++++++++++---------
+ net/ipv4/tcp_ipv4.c           | 15 +++++++++-----
+ net/ipv6/tcp_ipv6.c           | 11 ++++++----
+ 7 files changed, 93 insertions(+), 22 deletions(-)
 
+diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
+index a587e83fc169..216cde184db1 100644
+--- a/include/net/dropreason-core.h
++++ b/include/net/dropreason-core.h
+@@ -20,6 +20,7 @@
+ 	FN(IP_NOPROTO)			\
+ 	FN(SOCKET_RCVBUFF)		\
+ 	FN(PROTO_MEM)			\
++	FN(TCP_AUTH_HDR)		\
+ 	FN(TCP_MD5NOTFOUND)		\
+ 	FN(TCP_MD5UNEXPECTED)		\
+ 	FN(TCP_MD5FAILURE)		\
+@@ -141,6 +142,11 @@ enum skb_drop_reason {
+ 	 * drop out of udp_memory_allocated.
+ 	 */
+ 	SKB_DROP_REASON_PROTO_MEM,
++	/**
++	 * @SKB_DROP_REASON_TCP_AUTH_HDR: TCP-MD5 or TCP-AO hashes are met
++	 * twice or set incorrectly.
++	 */
++	SKB_DROP_REASON_TCP_AUTH_HDR,
+ 	/**
+ 	 * @SKB_DROP_REASON_TCP_MD5NOTFOUND: no MD5 hash and one expected,
+ 	 * corresponding to LINUX_MIB_TCPMD5NOTFOUND
 diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 45df08b5ad28..9d6da2e19dd9 100644
+index 9d6da2e19dd9..b372764a33ea 100644
 --- a/include/net/tcp.h
 +++ b/include/net/tcp.h
-@@ -185,6 +185,7 @@ void tcp_time_wait(struct sock *sk, int state, int timeo);
- #define TCPOPT_SACK             5       /* SACK Block */
- #define TCPOPT_TIMESTAMP	8	/* Better RTT estimations/PAWS */
- #define TCPOPT_MD5SIG		19	/* MD5 Signature (RFC2385) */
-+#define TCPOPT_AO		29	/* Authentication Option (RFC5925) */
- #define TCPOPT_MPTCP		30	/* Multipath TCP (RFC6824) */
- #define TCPOPT_FASTOPEN		34	/* Fast open (RFC7413) */
- #define TCPOPT_EXP		254	/* Experimental */
-@@ -2158,6 +2159,9 @@ struct tcp_sock_af_ops {
- 	int (*ao_calc_key_sk)(struct tcp_ao_key *mkt, u8 *key,
- 			      const struct sock *sk,
- 			      __be32 sisn, __be32 disn, bool send);
-+	int (*calc_ao_hash)(char *location, struct tcp_ao_key *ao,
-+			    const struct sock *sk, const struct sk_buff *skb,
-+			    const u8 *tkey, int hash_offset, u32 sne);
- #endif
- };
+@@ -426,7 +426,6 @@ int tcp_mmap(struct file *file, struct socket *sock,
+ void tcp_parse_options(const struct net *net, const struct sk_buff *skb,
+ 		       struct tcp_options_received *opt_rx,
+ 		       int estab, struct tcp_fastopen_cookie *foc);
+-const u8 *tcp_parse_md5sig_option(const struct tcphdr *th);
  
+ /*
+  *	BPF SKB-less helpers
+@@ -2573,6 +2572,29 @@ static inline u64 tcp_transmit_time(const struct sock *sk)
+ 	return 0;
+ }
+ 
++static inline int tcp_parse_auth_options(const struct tcphdr *th,
++		const u8 **md5_hash, const struct tcp_ao_hdr **aoh)
++{
++	const u8 *md5_tmp, *ao_tmp;
++	int ret;
++
++	ret = tcp_do_parse_auth_options(th, &md5_tmp, &ao_tmp);
++	if (ret)
++		return ret;
++
++	if (md5_hash)
++		*md5_hash = md5_tmp;
++
++	if (aoh) {
++		if (!ao_tmp)
++			*aoh = NULL;
++		else
++			*aoh = (struct tcp_ao_hdr *)(ao_tmp - 2);
++	}
++
++	return 0;
++}
++
+ static inline bool tcp_ao_required(struct sock *sk, const void *saddr,
+ 				   int family)
+ {
 diff --git a/include/net/tcp_ao.h b/include/net/tcp_ao.h
-index 7e0ce45d9934..cd85d292f78e 100644
+index cd85d292f78e..e685ad9db949 100644
 --- a/include/net/tcp_ao.h
 +++ b/include/net/tcp_ao.h
-@@ -111,6 +111,10 @@ struct tcp6_ao_context {
- 
- struct tcp_sigpool;
- 
-+int tcp_ao_hash_skb(unsigned short int family,
-+		    char *ao_hash, struct tcp_ao_key *key,
-+		    const struct sock *sk, const struct sk_buff *skb,
-+		    const u8 *tkey, int hash_offset, u32 sne);
- int tcp_parse_ao(struct sock *sk, int cmd, unsigned short int family,
- 		 sockptr_t optval, int optlen);
- int tcp_ao_calc_traffic_key(struct tcp_ao_key *mkt, u8 *key, void *ctx,
-@@ -126,12 +130,21 @@ struct tcp_ao_key *tcp_v4_ao_lookup(const struct sock *sk, struct sock *addr_sk,
- int tcp_v4_ao_calc_key_sk(struct tcp_ao_key *mkt, u8 *key,
- 			  const struct sock *sk,
- 			  __be32 sisn, __be32 disn, bool send);
-+int tcp_v4_ao_hash_skb(char *ao_hash, struct tcp_ao_key *key,
-+		       const struct sock *sk, const struct sk_buff *skb,
-+		       const u8 *tkey, int hash_offset, u32 sne);
- /* ipv6 specific functions */
-+int tcp_v6_ao_hash_pseudoheader(struct tcp_sigpool *hp,
-+				const struct in6_addr *daddr,
-+				const struct in6_addr *saddr, int nbytes);
- int tcp_v6_ao_calc_key_sk(struct tcp_ao_key *mkt, u8 *key,
- 			  const struct sock *sk, __be32 sisn,
- 			  __be32 disn, bool send);
- struct tcp_ao_key *tcp_v6_ao_lookup(const struct sock *sk,
- 				    struct sock *addr_sk, int sndid, int rcvid);
-+int tcp_v6_ao_hash_skb(char *ao_hash, struct tcp_ao_key *key,
-+		       const struct sock *sk, const struct sk_buff *skb,
-+		       const u8 *tkey, int hash_offset, u32 sne);
+@@ -148,7 +148,9 @@ int tcp_v6_ao_hash_skb(char *ao_hash, struct tcp_ao_key *key,
  int tcp_v6_parse_ao(struct sock *sk, int cmd, sockptr_t optval, int optlen);
  void tcp_ao_finish_connect(struct sock *sk, struct sk_buff *skb);
  void tcp_ao_connect_init(struct sock *sk);
-diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
-index fc7a6aa1936e..d10daee79fe6 100644
---- a/net/ipv4/tcp_ao.c
-+++ b/net/ipv4/tcp_ao.c
-@@ -262,6 +262,171 @@ static int tcp_ao_calc_key_sk(struct tcp_ao_key *mkt, u8 *key,
- 		return -EOPNOTSUPP;
+-
++void tcp_ao_syncookie(struct sock *sk, const struct sk_buff *skb,
++		      struct tcp_request_sock *treq,
++		      unsigned short int family);
+ #else /* CONFIG_TCP_AO */
+ 
+ static inline struct tcp_ao_key *tcp_ao_do_lookup(const struct sock *sk,
+@@ -170,4 +172,17 @@ static inline void tcp_ao_connect_init(struct sock *sk)
+ }
+ #endif
+ 
++#if defined(CONFIG_TCP_MD5SIG) || defined(CONFIG_TCP_AO)
++int tcp_do_parse_auth_options(const struct tcphdr *th,
++			      const u8 **md5_hash, const u8 **ao_hash);
++#else
++static inline int tcp_do_parse_auth_options(const struct tcphdr *th,
++		const u8 **md5_hash, const u8 **ao_hash)
++{
++	*md5_hash = NULL;
++	*ao_hash = NULL;
++	return 0;
++}
++#endif
++
+ #endif /* _TCP_AO_H */
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index fad58dd85be7..f3de3615f414 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -4382,7 +4382,8 @@ tcp_inbound_md5_hash(const struct sock *sk, const struct sk_buff *skb,
+ 	l3index = sdif ? dif : 0;
+ 
+ 	hash_expected = tcp_md5_do_lookup(sk, l3index, saddr, family);
+-	hash_location = tcp_parse_md5sig_option(th);
++	if (tcp_parse_auth_options(th, &hash_location, NULL))
++		return SKB_DROP_REASON_TCP_AUTH_HDR;
+ 
+ 	/* We've parsed the options - do we have a hash? */
+ 	if (!hash_expected && !hash_location)
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index 36f9046772eb..df806262a385 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -4211,39 +4211,58 @@ static bool tcp_fast_parse_options(const struct net *net,
+ 	return true;
  }
  
-+static int tcp_v4_ao_hash_pseudoheader(struct tcp_sigpool *hp,
-+				       __be32 daddr, __be32 saddr,
-+				       int nbytes)
-+{
-+	struct tcp4_pseudohdr *bp;
-+	struct scatterlist sg;
-+
-+	bp = hp->scratch;
-+	bp->saddr = saddr;
-+	bp->daddr = daddr;
-+	bp->pad = 0;
-+	bp->protocol = IPPROTO_TCP;
-+	bp->len = cpu_to_be16(nbytes);
-+
-+	sg_init_one(&sg, bp, sizeof(*bp));
-+	ahash_request_set_crypt(hp->req, &sg, NULL, sizeof(*bp));
-+	return crypto_ahash_update(hp->req);
-+}
-+
-+static int tcp_ao_hash_pseudoheader(unsigned short int family,
-+				    const struct sock *sk,
-+				    const struct sk_buff *skb,
-+				    struct tcp_sigpool *hp, int nbytes)
-+{
-+	const struct tcphdr *th = tcp_hdr(skb);
-+
-+	/* TODO: Can we rely on checksum being zero to mean outbound pkt? */
-+	if (!th->check) {
-+		if (family == AF_INET)
-+			return tcp_v4_ao_hash_pseudoheader(hp, sk->sk_daddr,
-+					sk->sk_rcv_saddr, skb->len);
-+#if IS_ENABLED(CONFIG_IPV6)
-+		else if (family == AF_INET6)
-+			return tcp_v6_ao_hash_pseudoheader(hp, &sk->sk_v6_daddr,
-+					&sk->sk_v6_rcv_saddr, skb->len);
-+#endif
-+		else
-+			return -EAFNOSUPPORT;
-+	}
-+
-+	if (family == AF_INET) {
-+		const struct iphdr *iph = ip_hdr(skb);
-+
-+		return tcp_v4_ao_hash_pseudoheader(hp, iph->daddr,
-+				iph->saddr, skb->len);
-+#if IS_ENABLED(CONFIG_IPV6)
-+	} else if (family == AF_INET6) {
-+		const struct ipv6hdr *iph = ipv6_hdr(skb);
-+
-+		return tcp_v6_ao_hash_pseudoheader(hp, &iph->daddr,
-+				&iph->saddr, skb->len);
-+#endif
-+	}
-+	return -EAFNOSUPPORT;
-+}
-+
-+/* tcp_ao_hash_sne(struct tcp_sigpool *hp)
-+ * @hp	- used for hashing
-+ * @sne - sne value
-+ */
-+static int tcp_ao_hash_sne(struct tcp_sigpool *hp, u32 sne)
-+{
-+	struct scatterlist sg;
-+	__be32 *bp;
-+
-+	bp = (__be32 *)hp->scratch;
-+	*bp = htonl(sne);
-+
-+	sg_init_one(&sg, bp, sizeof(*bp));
-+	ahash_request_set_crypt(hp->req, &sg, NULL, sizeof(*bp));
-+	return crypto_ahash_update(hp->req);
-+}
-+
-+static int tcp_ao_hash_header(struct tcp_sigpool *hp,
-+			      const struct tcphdr *th,
-+			      bool exclude_options, u8 *hash,
-+			      int hash_offset, int hash_len)
-+{
-+	int err, len = th->doff << 2;
-+	struct scatterlist sg;
-+	u8 *hdr = hp->scratch;
-+
-+	/* We are not allowed to change tcphdr, make a local copy */
-+	if (exclude_options) {
-+		len = sizeof(*th) + sizeof(struct tcp_ao_hdr) + hash_len;
-+		memcpy(hdr, th, sizeof(*th));
-+		memcpy(hdr + sizeof(*th),
-+		       (u8 *)th + hash_offset - sizeof(struct tcp_ao_hdr),
-+		       sizeof(struct tcp_ao_hdr));
-+		memset(hdr + sizeof(*th) + sizeof(struct tcp_ao_hdr),
-+		       0, hash_len);
-+		((struct tcphdr *)hdr)->check = 0;
-+	} else {
-+		len = th->doff << 2;
-+		memcpy(hdr, th, len);
-+		/* zero out tcp-ao hash */
-+		((struct tcphdr *)hdr)->check = 0;
-+		memset(hdr + hash_offset, 0, hash_len);
-+	}
-+
-+	sg_init_one(&sg, hdr, len);
-+	ahash_request_set_crypt(hp->req, &sg, NULL, len);
-+	err = crypto_ahash_update(hp->req);
-+	WARN_ON_ONCE(err != 0);
-+	return err;
-+}
-+
-+int tcp_ao_hash_skb(unsigned short int family,
-+		    char *ao_hash, struct tcp_ao_key *key,
-+		    const struct sock *sk, const struct sk_buff *skb,
-+		    const u8 *tkey, int hash_offset, u32 sne)
-+{
-+	const struct tcphdr *th = tcp_hdr(skb);
-+	int tkey_len = tcp_ao_digest_size(key);
-+	struct tcp_sigpool hp;
-+	void *hash_buf = NULL;
-+
-+	hash_buf = kmalloc(tkey_len, GFP_ATOMIC);
-+	if (!hash_buf)
-+		goto clear_hash_noput;
-+
-+	if (tcp_sigpool_start(key->tcp_sigpool_id, &hp))
-+		goto clear_hash_noput;
-+
-+	if (crypto_ahash_setkey(crypto_ahash_reqtfm(hp.req), tkey, tkey_len))
-+		goto clear_hash;
-+
-+	/* For now use sha1 by default. Depends on alg in tcp_ao_key */
-+	if (crypto_ahash_init(hp.req))
-+		goto clear_hash;
-+
-+	if (tcp_ao_hash_sne(&hp, sne))
-+		goto clear_hash;
-+	if (tcp_ao_hash_pseudoheader(family, sk, skb, &hp, skb->len))
-+		goto clear_hash;
-+	if (tcp_ao_hash_header(&hp, th, false,
-+			       ao_hash, hash_offset, tcp_ao_maclen(key)))
-+		goto clear_hash;
-+	if (tcp_sigpool_hash_skb_data(&hp, skb, th->doff << 2))
-+		goto clear_hash;
-+	ahash_request_set_crypt(hp.req, NULL, hash_buf, 0);
-+	if (crypto_ahash_final(hp.req))
-+		goto clear_hash;
-+
-+	memcpy(ao_hash, hash_buf, tcp_ao_maclen(key));
-+	tcp_sigpool_end(&hp);
-+	kfree(hash_buf);
-+	return 0;
-+
-+clear_hash:
-+	tcp_sigpool_end(&hp);
-+clear_hash_noput:
-+	memset(ao_hash, 0, tcp_ao_maclen(key));
-+	kfree(hash_buf);
-+	return 1;
-+}
-+
-+int tcp_v4_ao_hash_skb(char *ao_hash, struct tcp_ao_key *key,
-+		       const struct sock *sk, const struct sk_buff *skb,
-+		       const u8 *tkey, int hash_offset, u32 sne)
-+{
-+	return tcp_ao_hash_skb(AF_INET, ao_hash, key, sk, skb,
-+			       tkey, hash_offset, sne);
-+}
-+
- struct tcp_ao_key *tcp_v4_ao_lookup(const struct sock *sk, struct sock *addr_sk,
- 				    int sndid, int rcvid)
+-#ifdef CONFIG_TCP_MD5SIG
++#if defined(CONFIG_TCP_MD5SIG) || defined(CONFIG_TCP_AO)
+ /*
+- * Parse MD5 Signature option
++ * Parse Signature options
+  */
+-const u8 *tcp_parse_md5sig_option(const struct tcphdr *th)
++int tcp_do_parse_auth_options(const struct tcphdr *th,
++			      const u8 **md5_hash, const u8 **ao_hash)
  {
+ 	int length = (th->doff << 2) - sizeof(*th);
+ 	const u8 *ptr = (const u8 *)(th + 1);
++	unsigned int minlen = TCPOLEN_MD5SIG;
++
++	if (IS_ENABLED(CONFIG_TCP_AO))
++		minlen = sizeof(struct tcp_ao_hdr) + 1;
++
++	*md5_hash = NULL;
++	*ao_hash = NULL;
+ 
+ 	/* If not enough data remaining, we can short cut */
+-	while (length >= TCPOLEN_MD5SIG) {
++	while (length >= minlen) {
+ 		int opcode = *ptr++;
+ 		int opsize;
+ 
+ 		switch (opcode) {
+ 		case TCPOPT_EOL:
+-			return NULL;
++			return 0;
+ 		case TCPOPT_NOP:
+ 			length--;
+ 			continue;
+ 		default:
+ 			opsize = *ptr++;
+ 			if (opsize < 2 || opsize > length)
+-				return NULL;
+-			if (opcode == TCPOPT_MD5SIG)
+-				return opsize == TCPOLEN_MD5SIG ? ptr : NULL;
++				return -EINVAL;
++			if (opcode == TCPOPT_MD5SIG) {
++				if (opsize != TCPOLEN_MD5SIG)
++					return -EINVAL;
++				if (unlikely(*md5_hash || *ao_hash))
++					return -EEXIST;
++				*md5_hash = ptr;
++			} else if (opcode == TCPOPT_AO) {
++				if (opsize <= sizeof(struct tcp_ao_hdr))
++					return -EINVAL;
++				if (unlikely(*md5_hash || *ao_hash))
++					return -EEXIST;
++				*ao_hash = ptr;
++			}
+ 		}
+ 		ptr += opsize - 2;
+ 		length -= opsize;
+ 	}
+-	return NULL;
++	return 0;
+ }
+-EXPORT_SYMBOL(tcp_parse_md5sig_option);
++EXPORT_SYMBOL(tcp_do_parse_auth_options);
+ #endif
+ 
+ /* Sorry, PAWS as specified is broken wrt. pure-ACKs -DaveM
 diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index d63970b3d375..ed26676735a5 100644
+index ed26676735a5..d781b7f946cb 100644
 --- a/net/ipv4/tcp_ipv4.c
 +++ b/net/ipv4/tcp_ipv4.c
-@@ -2284,6 +2284,7 @@ static const struct tcp_sock_af_ops tcp_sock_ipv4_specific = {
- #endif
- #ifdef CONFIG_TCP_AO
- 	.ao_lookup		= tcp_v4_ao_lookup,
-+	.calc_ao_hash		= tcp_v4_ao_hash_skb,
- 	.ao_parse		= tcp_v4_parse_ao,
- 	.ao_calc_key_sk		= tcp_v4_ao_calc_key_sk,
- #endif
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 705eeb623269..01424b82845a 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -423,6 +423,7 @@ static inline bool tcp_urg_mode(const struct tcp_sock *tp)
- #define OPTION_FAST_OPEN_COOKIE	BIT(8)
- #define OPTION_SMC		BIT(9)
- #define OPTION_MPTCP		BIT(10)
-+#define OPTION_AO		BIT(11)
- 
- static void smc_options_write(__be32 *ptr, u16 *options)
- {
-@@ -615,7 +616,8 @@ static void bpf_skops_write_hdr_opt(struct sock *sk, struct sk_buff *skb,
-  * (but it may well be that other scenarios fail similarly).
+@@ -669,7 +669,9 @@ EXPORT_SYMBOL(tcp_v4_send_check);
+  *	Exception: precedence violation. We do not implement it in any case.
   */
- static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
--			      struct tcp_out_options *opts)
-+			      struct tcp_out_options *opts,
-+			      struct tcp_ao_key *ao_key)
- {
- 	__be32 *ptr = (__be32 *)(th + 1);
- 	u16 options = opts->options;	/* mungable copy */
-@@ -627,7 +629,33 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
- 		opts->hash_location = (__u8 *)ptr;
- 		ptr += 4;
- 	}
+ 
+-#ifdef CONFIG_TCP_MD5SIG
 +#ifdef CONFIG_TCP_AO
-+	if (unlikely(OPTION_AO & options)) {
-+		struct tcp_ao_key *rnext_key;
-+		struct tcp_ao_info *ao_info;
-+		u8 maclen;
- 
-+		if (WARN_ON_ONCE(!ao_key))
-+			goto out_ao;
-+		ao_info = rcu_dereference_check(tp->ao_info,
-+				lockdep_sock_is_held(&tp->inet_conn.icsk_inet.sk));
-+		rnext_key = READ_ONCE(ao_info->rnext_key);
-+		if (WARN_ON_ONCE(!rnext_key))
-+			goto out_ao;
-+		maclen = tcp_ao_maclen(ao_key);
-+		*ptr++ = htonl((TCPOPT_AO << 24) |
-+				(tcp_ao_len(ao_key) << 16) |
-+				(ao_key->sndid << 8) |
-+				(rnext_key->rcvid));
-+		opts->hash_location = (__u8 *)ptr;
-+		ptr += maclen / sizeof(*ptr);
-+		if (unlikely(maclen % sizeof(*ptr))) {
-+			memset(ptr, TCPOPT_NOP, sizeof(*ptr));
-+			ptr++;
-+		}
-+	}
-+out_ao:
-+#endif
- 	if (unlikely(opts->mss)) {
- 		*ptr++ = htonl((TCPOPT_MSS << 24) |
- 			       (TCPOLEN_MSS << 16) |
-@@ -768,7 +796,8 @@ static void mptcp_set_option_cond(const struct request_sock *req,
-  */
- static unsigned int tcp_syn_options(struct sock *sk, struct sk_buff *skb,
- 				struct tcp_out_options *opts,
--				struct tcp_md5sig_key **md5)
-+				struct tcp_md5sig_key **md5,
-+				struct tcp_ao_key *ao_key)
- {
- 	struct tcp_sock *tp = tcp_sk(sk);
- 	unsigned int remaining = MAX_TCP_OPTION_SPACE;
-@@ -785,6 +814,12 @@ static unsigned int tcp_syn_options(struct sock *sk, struct sk_buff *skb,
- 		}
- 	}
- #endif
-+#ifdef CONFIG_TCP_AO
-+	if (ao_key) {
-+		opts->options |= OPTION_AO;
-+		remaining -= tcp_ao_len(ao_key);
-+	}
-+#endif
- 
- 	/* We always get an MSS option.  The option bytes which will be seen in
- 	 * normal data packets should timestamps be used, must be in the MSS
-@@ -922,7 +957,8 @@ static unsigned int tcp_synack_options(const struct sock *sk,
-  */
- static unsigned int tcp_established_options(struct sock *sk, struct sk_buff *skb,
- 					struct tcp_out_options *opts,
--					struct tcp_md5sig_key **md5)
-+					struct tcp_md5sig_key **md5,
-+					struct tcp_ao_key *ao_key)
- {
- 	struct tcp_sock *tp = tcp_sk(sk);
- 	unsigned int size = 0;
-@@ -941,6 +977,12 @@ static unsigned int tcp_established_options(struct sock *sk, struct sk_buff *skb
- 		}
- 	}
- #endif
-+#ifdef CONFIG_TCP_AO
-+	if (ao_key) {
-+		opts->options |= OPTION_AO;
-+		size += tcp_ao_len(ao_key);
-+	}
-+#endif
- 
- 	if (likely(tp->rx_opt.tstamp_ok)) {
- 		opts->options |= OPTION_TS;
-@@ -1245,6 +1287,7 @@ static int __tcp_transmit_skb(struct sock *sk, struct sk_buff *skb,
- 			      int clone_it, gfp_t gfp_mask, u32 rcv_nxt)
- {
- 	const struct inet_connection_sock *icsk = inet_csk(sk);
-+	struct tcp_ao_key *ao_key = NULL;
- 	struct inet_sock *inet;
- 	struct tcp_sock *tp;
- 	struct tcp_skb_cb *tcb;
-@@ -1252,6 +1295,9 @@ static int __tcp_transmit_skb(struct sock *sk, struct sk_buff *skb,
- 	unsigned int tcp_options_size, tcp_header_size;
- 	struct sk_buff *oskb = NULL;
- 	struct tcp_md5sig_key *md5;
-+#ifdef CONFIG_TCP_AO
-+	struct tcp_ao_info *ao;
-+#endif
- 	struct tcphdr *th;
- 	u64 prior_wstamp;
- 	int err;
-@@ -1283,11 +1329,17 @@ static int __tcp_transmit_skb(struct sock *sk, struct sk_buff *skb,
- 	tcb = TCP_SKB_CB(skb);
- 	memset(&opts, 0, sizeof(opts));
- 
-+#ifdef CONFIG_TCP_AO
-+	ao = rcu_dereference_protected(tcp_sk(sk)->ao_info,
-+				       lockdep_sock_is_held(sk));
-+	if (ao)
-+		ao_key = READ_ONCE(ao->current_key);
-+#endif
- 	if (unlikely(tcb->tcp_flags & TCPHDR_SYN)) {
--		tcp_options_size = tcp_syn_options(sk, skb, &opts, &md5);
-+		tcp_options_size = tcp_syn_options(sk, skb, &opts, &md5, ao_key);
- 	} else {
- 		tcp_options_size = tcp_established_options(sk, skb, &opts,
--							   &md5);
-+							   &md5, ao_key);
- 		/* Force a PSH flag on all (GSO) packets to expedite GRO flush
- 		 * at receiver : This slightly improve GRO performance.
- 		 * Note that we do not force the PSH flag for non GSO packets,
-@@ -1368,7 +1420,7 @@ static int __tcp_transmit_skb(struct sock *sk, struct sk_buff *skb,
- 		th->window	= htons(min(tp->rcv_wnd, 65535U));
- 	}
- 
--	tcp_options_write(th, tp, &opts);
-+	tcp_options_write(th, tp, &opts, ao_key);
- 
++#define OPTION_BYTES MAX_TCP_OPTION_SPACE
++#elif defined(CONFIG_TCP_MD5SIG)
+ #define OPTION_BYTES TCPOLEN_MD5SIG_ALIGNED
+ #else
+ #define OPTION_BYTES sizeof(__be32)
+@@ -684,8 +686,8 @@ static void tcp_v4_send_reset(const struct sock *sk, struct sk_buff *skb)
+ 	} rep;
+ 	struct ip_reply_arg arg;
  #ifdef CONFIG_TCP_MD5SIG
- 	/* Calculate the MD5 hash, as we have all we need now */
-@@ -1378,6 +1430,34 @@ static int __tcp_transmit_skb(struct sock *sk, struct sk_buff *skb,
- 					       md5, sk, skb);
++	const __u8 *md5_hash_location = NULL;
+ 	struct tcp_md5sig_key *key = NULL;
+-	const __u8 *hash_location = NULL;
+ 	unsigned char newhash[16];
+ 	int genhash;
+ 	struct sock *sk1 = NULL;
+@@ -726,8 +728,11 @@ static void tcp_v4_send_reset(const struct sock *sk, struct sk_buff *skb)
+ 
+ 	net = sk ? sock_net(sk) : dev_net(skb_dst(skb)->dev);
+ #ifdef CONFIG_TCP_MD5SIG
++	/* Invalid TCP option size or twice included auth */
++	if (tcp_parse_auth_options(tcp_hdr(skb), &md5_hash_location, NULL))
++		return;
++
+ 	rcu_read_lock();
+-	hash_location = tcp_parse_md5sig_option(th);
+ 	if (sk && sk_fullsock(sk)) {
+ 		const union tcp_md5_addr *addr;
+ 		int l3index;
+@@ -738,7 +743,7 @@ static void tcp_v4_send_reset(const struct sock *sk, struct sk_buff *skb)
+ 		l3index = tcp_v4_sdif(skb) ? inet_iif(skb) : 0;
+ 		addr = (union tcp_md5_addr *)&ip_hdr(skb)->saddr;
+ 		key = tcp_md5_do_lookup(sk, l3index, addr, AF_INET);
+-	} else if (hash_location) {
++	} else if (md5_hash_location) {
+ 		const union tcp_md5_addr *addr;
+ 		int sdif = tcp_v4_sdif(skb);
+ 		int dif = inet_iif(skb);
+@@ -770,7 +775,7 @@ static void tcp_v4_send_reset(const struct sock *sk, struct sk_buff *skb)
+ 
+ 
+ 		genhash = tcp_v4_md5_hash_skb(newhash, key, NULL, skb);
+-		if (genhash || memcmp(hash_location, newhash, 16) != 0)
++		if (genhash || memcmp(md5_hash_location, newhash, 16) != 0)
+ 			goto out;
+ 
  	}
- #endif
-+#ifdef CONFIG_TCP_AO
-+	if (ao) {
-+		u8 *traffic_key;
-+		void *tkey_buf = NULL;
-+		__be32 disn;
-+
-+		sk_gso_disable(sk);
-+		if (unlikely(tcb->tcp_flags & TCPHDR_SYN)) {
-+			if (tcb->tcp_flags & TCPHDR_ACK)
-+				disn = ao->risn;
-+			else
-+				disn = 0;
-+
-+			tkey_buf = kmalloc(tcp_ao_digest_size(ao_key), GFP_ATOMIC);
-+			if (!tkey_buf)
-+				return -ENOMEM;
-+			traffic_key = tkey_buf;
-+			tp->af_specific->ao_calc_key_sk(ao_key, traffic_key,
-+							sk, ao->lisn, disn, true);
-+		} else {
-+			traffic_key = snd_other_key(ao_key);
-+		}
-+		tp->af_specific->calc_ao_hash(opts.hash_location, ao_key, sk, skb,
-+					      traffic_key,
-+					      opts.hash_location - (u8 *)th, 0);
-+		kfree(tkey_buf);
-+	}
-+#endif
- 
- 	/* BPF prog is the last one writing header option */
- 	bpf_skops_write_hdr_opt(sk, skb, NULL, NULL, 0, &opts);
-@@ -1825,10 +1905,14 @@ unsigned int tcp_current_mss(struct sock *sk)
- {
- 	const struct tcp_sock *tp = tcp_sk(sk);
- 	const struct dst_entry *dst = __sk_dst_get(sk);
-+	struct tcp_ao_key *ao_key = NULL;
- 	u32 mss_now;
- 	unsigned int header_len;
- 	struct tcp_out_options opts;
- 	struct tcp_md5sig_key *md5;
-+#ifdef CONFIG_TCP_AO
-+	struct tcp_ao_info *ao_info;
-+#endif
- 
- 	mss_now = tp->mss_cache;
- 
-@@ -1837,8 +1921,17 @@ unsigned int tcp_current_mss(struct sock *sk)
- 		if (mtu != inet_csk(sk)->icsk_pmtu_cookie)
- 			mss_now = tcp_sync_mss(sk, mtu);
- 	}
--
--	header_len = tcp_established_options(sk, NULL, &opts, &md5) +
-+#ifdef CONFIG_TCP_AO
-+	ao_info = rcu_dereference_check(tp->ao_info, lockdep_sock_is_held(sk));
-+	if (ao_info)
-+		/* TODO: verify if we can access current_key or we need to pass
-+		 * it from every caller of tcp_current_mss instead. The reason
-+		 * is that the current_key pointer can change asynchronously
-+		 * from the rx path.
-+		 */
-+		ao_key = READ_ONCE(ao_info->current_key);
-+#endif
-+	header_len = tcp_established_options(sk, NULL, &opts, &md5, ao_key) +
- 		     sizeof(struct tcphdr);
- 	/* The mss_cache is sized based on tp->tcp_header_len, which assumes
- 	 * some common options. If this is an odd packet (because we have SACK
-@@ -3700,7 +3793,7 @@ struct sk_buff *tcp_make_synack(const struct sock *sk, struct dst_entry *dst,
- 
- 	/* RFC1323: The window in SYN & SYN/ACK segments is never scaled. */
- 	th->window = htons(min(req->rsk_rcv_wnd, 65535U));
--	tcp_options_write(th, NULL, &opts);
-+	tcp_options_write(th, NULL, &opts, NULL);
- 	th->doff = (tcp_header_size >> 2);
- 	TCP_INC_STATS(sock_net(sk), TCP_MIB_OUTSEGS);
- 
-diff --git a/net/ipv6/tcp_ao.c b/net/ipv6/tcp_ao.c
-index 9ab594fadbd9..d08735b6f3c5 100644
---- a/net/ipv6/tcp_ao.c
-+++ b/net/ipv6/tcp_ao.c
-@@ -7,6 +7,7 @@
-  *		Francesco Ruggeri <fruggeri@arista.com>
-  *		Salam Noureddine <noureddine@arista.com>
-  */
-+#include <crypto/hash.h>
- #include <linux/tcp.h>
- 
- #include <net/tcp.h>
-@@ -79,6 +80,33 @@ struct tcp_ao_key *tcp_v6_ao_lookup(const struct sock *sk,
- 	return tcp_v6_ao_do_lookup(sk, addr, sndid, rcvid);
- }
- 
-+int tcp_v6_ao_hash_pseudoheader(struct tcp_sigpool *hp,
-+				const struct in6_addr *daddr,
-+				const struct in6_addr *saddr, int nbytes)
-+{
-+	struct tcp6_pseudohdr *bp;
-+	struct scatterlist sg;
-+
-+	bp = hp->scratch;
-+	/* 1. TCP pseudo-header (RFC2460) */
-+	bp->saddr = *saddr;
-+	bp->daddr = *daddr;
-+	bp->len = cpu_to_be32(nbytes);
-+	bp->protocol = cpu_to_be32(IPPROTO_TCP);
-+
-+	sg_init_one(&sg, bp, sizeof(*bp));
-+	ahash_request_set_crypt(hp->req, &sg, NULL, sizeof(*bp));
-+	return crypto_ahash_update(hp->req);
-+}
-+
-+int tcp_v6_ao_hash_skb(char *ao_hash, struct tcp_ao_key *key,
-+		       const struct sock *sk, const struct sk_buff *skb,
-+		       const u8 *tkey, int hash_offset, u32 sne)
-+{
-+	return tcp_ao_hash_skb(AF_INET6, ao_hash, key, sk, skb, tkey,
-+			hash_offset, sne);
-+}
-+
- int tcp_v6_parse_ao(struct sock *sk, int cmd,
- 		    sockptr_t optval, int optlen)
- {
 diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 70a3f12a94a5..146b586839f5 100644
+index 146b586839f5..5c1880d5f5bc 100644
 --- a/net/ipv6/tcp_ipv6.c
 +++ b/net/ipv6/tcp_ipv6.c
-@@ -1917,6 +1917,7 @@ static const struct tcp_sock_af_ops tcp_sock_ipv6_specific = {
+@@ -989,7 +989,7 @@ static void tcp_v6_send_reset(const struct sock *sk, struct sk_buff *skb)
+ 	u32 seq = 0, ack_seq = 0;
+ 	struct tcp_md5sig_key *key = NULL;
+ #ifdef CONFIG_TCP_MD5SIG
+-	const __u8 *hash_location = NULL;
++	const __u8 *md5_hash_location = NULL;
+ 	unsigned char newhash[16];
+ 	int genhash;
+ 	struct sock *sk1 = NULL;
+@@ -1011,8 +1011,11 @@ static void tcp_v6_send_reset(const struct sock *sk, struct sk_buff *skb)
+ 
+ 	net = sk ? sock_net(sk) : dev_net(skb_dst(skb)->dev);
+ #ifdef CONFIG_TCP_MD5SIG
++	/* Invalid TCP option size or twice included auth */
++	if (tcp_parse_auth_options(th, &md5_hash_location, NULL))
++		return;
++
+ 	rcu_read_lock();
+-	hash_location = tcp_parse_md5sig_option(th);
+ 	if (sk && sk_fullsock(sk)) {
+ 		int l3index;
+ 
+@@ -1021,7 +1024,7 @@ static void tcp_v6_send_reset(const struct sock *sk, struct sk_buff *skb)
+ 		 */
+ 		l3index = tcp_v6_sdif(skb) ? tcp_v6_iif_l3_slave(skb) : 0;
+ 		key = tcp_v6_md5_do_lookup(sk, &ipv6h->saddr, l3index);
+-	} else if (hash_location) {
++	} else if (md5_hash_location) {
+ 		int dif = tcp_v6_iif_l3_slave(skb);
+ 		int sdif = tcp_v6_sdif(skb);
+ 		int l3index;
+@@ -1050,7 +1053,7 @@ static void tcp_v6_send_reset(const struct sock *sk, struct sk_buff *skb)
+ 			goto out;
+ 
+ 		genhash = tcp_v6_md5_hash_skb(newhash, key, NULL, skb);
+-		if (genhash || memcmp(hash_location, newhash, 16) != 0)
++		if (genhash || memcmp(md5_hash_location, newhash, 16) != 0)
+ 			goto out;
+ 	}
  #endif
- #ifdef CONFIG_TCP_AO
- 	.ao_lookup	=	tcp_v6_ao_lookup,
-+	.calc_ao_hash	=	tcp_v6_ao_hash_skb,
- 	.ao_parse	=	tcp_v6_parse_ao,
- 	.ao_calc_key_sk	=	tcp_v6_ao_calc_key_sk,
- #endif
-@@ -1950,6 +1951,7 @@ static const struct tcp_sock_af_ops tcp_sock_ipv6_mapped_specific = {
- #endif
- #ifdef CONFIG_TCP_AO
- 	.ao_lookup	=	tcp_v6_ao_lookup,
-+	.calc_ao_hash	=	tcp_v4_ao_hash_skb,
- 	.ao_parse	=	tcp_v6_parse_ao,
- #endif
- };
 -- 
 2.41.0
 
