@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-32881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94A1A79AA6D
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 19:06:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 408A979AA6E
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 19:06:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E26028105F
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 17:06:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF466281201
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 17:06:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D2D8156C7;
-	Mon, 11 Sep 2023 17:06:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78CF9156D2;
+	Mon, 11 Sep 2023 17:06:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F9C3156C6
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 17:06:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B2A4156C6
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 17:06:04 +0000 (UTC)
 Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABCD2123
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 10:06:00 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-58c8b2d6784so51847227b3.3
-        for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 10:06:00 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37B78CCD
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 10:06:02 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59b50b45481so40097167b3.1
+        for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 10:06:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1694451960; x=1695056760; darn=vger.kernel.org;
+        d=google.com; s=20221208; t=1694451961; x=1695056761; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fLLHXKagUp75BI6OdSs0vVw5ugFWeBckDK23IiluvXQ=;
-        b=g4Lk1FsflyksG7bI3qBgroJdZ3ELXP61YnG1Cg+43EjrDkoqEAwrRZatzjnlfPsByE
-         r1OIyX5bdVVKUO+a0//d3w44k9uFfzozVMpCDFV3cdFTCAWJB75PAUKGWndnMwfvja4l
-         EcVWKm0MURK70g05GwUp3Hn4/2qv6lgCwBqBzWDpxcZEP6NWohFSqrOusTPrVYO1K/8a
-         J2fJYKbAvOF1KIy9LMsguoKDp/+/2qUmKTs01pRL5QcNZvAOwk7+isW7BQzI4pL/wzHK
-         sa/Edspw1rQepLSmOgSw8ADXsTqUHjvMJtRULDme6qivBaJr5ME7Oai39hXW6eMPvPVo
-         G31Q==
+        bh=yMc1SrA9sdtPR5mLF/Tme9KoRwgcO3km2zNvZk7WqGU=;
+        b=TL451cVEJ8kFzuPvs3fBWeARgBrlHLQPBlZlaeXt0CclaT2wij31Ynm4WstRLZveA3
+         XDoKfqBSipUij2ZT15HYOzQBKEAMNz9QZurORbhn0t68JoZGHzVW94Z7+AqiwSsmliMS
+         FMkdO6P6S1ZYb6tm8xRajZkkfZtt7EXCVj2BrB9blfEM5KjtMjh+K4AWIIpWy/89jyFl
+         pl+3HMSh8ftoO93Tm8ag5xc52ewZDjNQPEeSw+3T8UqYjjtaTmPUJb1Su4FwMwn1r+3K
+         eIrla2LthZ5iQI64G5vI3msARgQwKS+VDfNwzqgy+oF534H4ZO1oGhtvZ6ina8cIsgDR
+         1RIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694451960; x=1695056760;
+        d=1e100.net; s=20230601; t=1694451961; x=1695056761;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fLLHXKagUp75BI6OdSs0vVw5ugFWeBckDK23IiluvXQ=;
-        b=vg4DCgAvB0o8Ejjg0H5WCeOj5X1fPahrWWZt/jUqAgWYvQuMplnyHZh7aj7qsZMR0n
-         nwoBo2NBgqneuWyg3isM7zROARurNzhnCcLFHEipwk62qyApe5IIzhOiELd+WWLj190V
-         horcatOLIL33r+8Ssb3nCP+lw4wu4YwDFTDuqk1xgxuGtCDfQsV9Tku60FZQY5hRwFVV
-         aMnjLAbR//kHnZKku5nwTyAB9fqrGWov7QbKDa0fCftWDj63aULqoif/DT6n4+rSXSsi
-         6miJP1UHDYfmDrDPwgAD7/P8/O2pyoEHFHjykNmIshF4jG5NztmxcIwTIxzTccaLiqQp
-         y7pQ==
-X-Gm-Message-State: AOJu0YzAhhpQdOrOc4f7bDOLxViVaCZJe/ZgaOaMYvbLzzA2DMGHtS5w
-	HS+i9fZcZUIyTBJM+rrK1rEB2k5qT64jVg==
-X-Google-Smtp-Source: AGHT+IH+Us4sb6bMYjui8jq2nzxsq/mwS5uyitanrC9xt0s5OwbGjT4ZkAZj2sjKxWywuIHW5+Qa2VznoVghhQ==
+        bh=yMc1SrA9sdtPR5mLF/Tme9KoRwgcO3km2zNvZk7WqGU=;
+        b=H8r22KdwxcnD6EZaqglS5D8dr/wfHwyubYkVhX6yNEYuyVdIfnkGz/eHAuU7e5sfZn
+         heEB7Xv4Jb9EyPOnZdKy3ryIQZ+aT5AShB1GrtdrZCrFm+a5h+sRfXgle3DALxz+AuLo
+         8owLlv4vc7eo83IpO6ZgE2ir9mmjAfIgIbFe0idjdyvIGOm9Jsm/vwxLr5n2PD9Ghvl2
+         ff3BK2+lTcnJy4eCJa5OFy0R4J5lZkSXVDTEAqzyN83j5AnoqF870i2To8uOptzhLs1u
+         tKea7gHmShcFl3Sb3X8Su/eSsf43kFA3pkQIgCq9m9SogQS3PPQER9ooDqW/CCevJpju
+         cDDg==
+X-Gm-Message-State: AOJu0Yy/ZDVxF3AvlgpPrYHhDlal7zaiQ9DZ64cOLiMPWh9eF172q8wu
+	g5MwX4iaNPNtsUNqDHNLlCYH6AoTW/5+cQ==
+X-Google-Smtp-Source: AGHT+IEvxh9q48HRd0K80M/H4hhkxUdbSZuqznewsut/6uWvXMNZj3RfIFhWnz1ALMs9UQYhZY8L71joC+/fTw==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a81:8b54:0:b0:58f:b749:a50b with SMTP id
- e20-20020a818b54000000b0058fb749a50bmr242162ywk.4.1694451959883; Mon, 11 Sep
- 2023 10:05:59 -0700 (PDT)
-Date: Mon, 11 Sep 2023 17:05:28 +0000
+ (user=edumazet job=sendgmr) by 2002:a25:a2c8:0:b0:d77:984e:c770 with SMTP id
+ c8-20020a25a2c8000000b00d77984ec770mr236451ybn.5.1694451961408; Mon, 11 Sep
+ 2023 10:06:01 -0700 (PDT)
+Date: Mon, 11 Sep 2023 17:05:29 +0000
 In-Reply-To: <20230911170531.828100-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -62,8 +62,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20230911170531.828100-1-edumazet@google.com>
 X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
-Message-ID: <20230911170531.828100-2-edumazet@google.com>
-Subject: [PATCH net-next 1/4] tcp: no longer release socket ownership in tcp_release_cb()
+Message-ID: <20230911170531.828100-3-edumazet@google.com>
+Subject: [PATCH net-next 2/4] net: sock_release_ownership() cleanup
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -78,59 +78,37 @@ X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This partially reverts c3f9b01849ef ("tcp: tcp_release_cb()
-should release socket ownership").
+sock_release_ownership() should only be called by user
+owning the socket lock.
 
-prequeue has been removed by Florian in commit e7942d0633c4
-("tcp: remove prequeue support")
-
-__tcp_checksum_complete_user() being gone, we no longer
-have to release socket ownership in tcp_release_cb().
-
-This is a prereq for third patch in the series
-("net: call prot->release_cb() when processing backlog").
+After prior commit, we can remove one condition.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/core/sock.c       |  3 ---
- net/ipv4/tcp_output.c | 10 ----------
- 2 files changed, 13 deletions(-)
+ include/net/sock.h | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 16584e2dd6481a3fc28d796db785439f0446703b..21610e3845a5042f7c648ccb3e0d90126df20a0b 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -3519,9 +3519,6 @@ void release_sock(struct sock *sk)
- 	if (sk->sk_backlog.tail)
- 		__release_sock(sk);
+diff --git a/include/net/sock.h b/include/net/sock.h
+index b770261fbdaf59d4d1c0b30adb2592c56442e9e3..676146e9d18117e3a04fbbfb0a06e511a80d537c 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -1823,12 +1823,11 @@ static inline bool sock_owned_by_user_nocheck(const struct sock *sk)
  
--	/* Warning : release_cb() might need to release sk ownership,
--	 * ie call sock_release_ownership(sk) before us.
--	 */
- 	if (sk->sk_prot->release_cb)
- 		sk->sk_prot->release_cb(sk);
+ static inline void sock_release_ownership(struct sock *sk)
+ {
+-	if (sock_owned_by_user_nocheck(sk)) {
+-		sk->sk_lock.owned = 0;
++	DEBUG_NET_WARN_ON_ONCE(!sock_owned_by_user_nocheck(sk));
++	sk->sk_lock.owned = 0;
  
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index ccfc8bbf745586cd23dcf02d755d6981dc92742e..b4cac12d0e6348aaa3a3957b0091ea7fe6553731 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -1101,16 +1101,6 @@ void tcp_release_cb(struct sock *sk)
- 		tcp_tsq_write(sk);
- 		__sock_put(sk);
- 	}
--	/* Here begins the tricky part :
--	 * We are called from release_sock() with :
--	 * 1) BH disabled
--	 * 2) sk_lock.slock spinlock held
--	 * 3) socket owned by us (sk->sk_lock.owned == 1)
--	 *
--	 * But following code is meant to be called from BH handlers,
--	 * so we should keep BH disabled, but early release socket ownership
--	 */
--	sock_release_ownership(sk);
+-		/* The sk_lock has mutex_unlock() semantics: */
+-		mutex_release(&sk->sk_lock.dep_map, _RET_IP_);
+-	}
++	/* The sk_lock has mutex_unlock() semantics: */
++	mutex_release(&sk->sk_lock.dep_map, _RET_IP_);
+ }
  
- 	if (flags & TCPF_WRITE_TIMER_DEFERRED) {
- 		tcp_write_timer_handler(sk);
+ /* no reclassification while locks are held */
 -- 
 2.42.0.283.g2d96d420d3-goog
 
