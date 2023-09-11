@@ -1,181 +1,152 @@
-Return-Path: <netdev+bounces-32933-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 323D879AB37
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 22:30:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E84FB79AB3F
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 22:38:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF255281389
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 20:30:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D91C81C20928
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 20:38:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9608A1640D;
-	Mon, 11 Sep 2023 20:29:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43B382F44;
+	Mon, 11 Sep 2023 20:38:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89D7D15AE3
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 20:29:01 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37989185
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 13:29:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694464140; x=1726000140;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=fdrvQfmRxQknU+dczfycNt7x+lgPOiem3g1uCHkWU7E=;
-  b=MikQtSISs1edHwl9DEpYboEyTq37DK3hQbEVcsBsJu4ID5PBrIk9rGjS
-   K85m0EG8YYXsB1nMHCAVJjwhPrQlJ28tQAG5OgXm1fOE2rs+jgMEbB/CP
-   NBe5Qr2fsqLubjakCtyfxxEGMYj3zoujxT37AAN4mHOVgEXuEOynF53mD
-   W6GzP7aw4fWHipgS1khVnmSO4Xrhhhyn3GfeQy/5TKkYyHFvEBM9Uvrxg
-   1EzBvASrDC/J+6//J0fSmtnVz/nTP57TXrKAgn2fUzG58XlW604P5FMuw
-   YiDkTh3rRMzMyCHtOpfBWWXuIaDIP4XpjheMmxaLKRdiu7yqZapM0d56V
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10830"; a="409156988"
-X-IronPort-AV: E=Sophos;i="6.02,244,1688454000"; 
-   d="scan'208";a="409156988"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2023 13:28:59 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10830"; a="772718598"
-X-IronPort-AV: E=Sophos;i="6.02,244,1688454000"; 
-   d="scan'208";a="772718598"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orsmga008.jf.intel.com with ESMTP; 11 Sep 2023 13:28:59 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Corinna Vinschen <vinschen@redhat.com>,
-	anthony.l.nguyen@intel.com,
-	Akihiko Odaki <akihiko.odaki@daynix.com>,
-	Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: [PATCH net] igb: clean up in all error paths when enabling SR-IOV
-Date: Mon, 11 Sep 2023 13:28:49 -0700
-Message-Id: <20230911202849.147504-1-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.38.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F99423D9
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 20:38:09 +0000 (UTC)
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2070.outbound.protection.outlook.com [40.107.212.70])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65BAF1A7
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 13:38:08 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=F2BQ6mPics2gGWNd+TgdceshfA+QagnVVd04MsxCtgHZR1jHc/1IZMR8K6VxmgW2fnqONMmWt4myrazV/b4CkqdGpjy4mslW+uoZLlEkoXXoShy8k4J0S3a4/pYvrB/LONwgIJQkoD5+/2xSYcCVWy32JZe6EwCs2xY5x7U19HmeTf+2RbG3BmZ3h9mFlRPAiUEWI0XteX2fd05oVOVUjOy8vHhWTMzZ7Yrq3ZKZNvWU2A5bPiTn5/16xMQA81g7U/KNZEMUqXjzlbFEWXft+BKnvoTCA3iqbJESpL4wznHW2IpyPb8DO0Noih5ZuEnBpRq4z/kcUAH+VoZzL4bhWQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6iqauZXULQoMqYZlpL/ux2THZxr0YFOHB6S4LIKIkJE=;
+ b=QcObVXggdZWAytSuIQjlYLSZDKpPvAlWykW8X+SA6sjJ5wNddkrN1U9ZtwxpntzsWZoPPCYwRLMR8mueuDP2l1Dz5pzXXAVB4w8jV7TLXyQ07vBbsCGiSJ3hxMVS0qhAv9/SxQt8VDToA0IEUEx+2gpHMRJrW2eOO4qpTbsGdUvQQ1bP8C6z7Q59EaYy2vK3b0CJ1/2uX1ehffjI3JGV8zxvVQ/t7hl36HsnksdZMn6vCM04AfRpMs1n/Wd2Jg8xxwiui1OIWb9z7Fx8nLhJjCJEfGEwAHl0rHM4mXCtcVfU/aUhJypW3x4y3ZmenHfeCjLu1roAgEjnGZqCb85qvQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6iqauZXULQoMqYZlpL/ux2THZxr0YFOHB6S4LIKIkJE=;
+ b=XdP/BDXf2Bn1w9CL3b1fZP5kuJY6jf6eJyfhx7HWOdEpg7s1JwS/4WySZ15+QRRd3s+l/cpxIeSxsc6wL+F1wJREJadjCffwvXxke0tUv5SNgoR2raMOozuQbtJFjYIGL4/5kapd1GNGyT0zFmSUt9XEXD20n1c+VqSkkiL4R8U=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
+ SJ1PR12MB6051.namprd12.prod.outlook.com (2603:10b6:a03:48a::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.30; Mon, 11 Sep
+ 2023 20:38:05 +0000
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::5c9:9a26:e051:ddd2]) by DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::5c9:9a26:e051:ddd2%7]) with mapi id 15.20.6745.034; Mon, 11 Sep 2023
+ 20:38:05 +0000
+Message-ID: <1781241b-cdf0-4389-a49e-53da456160e7@amd.com>
+Date: Mon, 11 Sep 2023 13:38:02 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [ANN] net-next is OPEN
+To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+References: <71ddaadcbcca1dcf3cb38b3e29ba5b0b1027c281.camel@redhat.com>
+Content-Language: en-US
+From: "Nelson, Shannon" <shannon.nelson@amd.com>
+In-Reply-To: <71ddaadcbcca1dcf3cb38b3e29ba5b0b1027c281.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BY5PR16CA0016.namprd16.prod.outlook.com
+ (2603:10b6:a03:1a0::29) To DS0PR12MB6583.namprd12.prod.outlook.com
+ (2603:10b6:8:d1::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|SJ1PR12MB6051:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8147091b-4594-4374-8a71-08dbb3070036
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	+AyzjAgP/qT9cIzm+YCAtyk9TNbpnUzgBlzbmvGRcNxLiAW8cYpJXpGb08rcS4SI4F2Qu/CrxJgX/Zb/RSKPASqMtXqNEPJGIhIfwB4ldvwdYarMXFnmFcvURZOvIo7PNckit0NR5SXZ1vJoR1TIvcFQ1XLBpOEnddS8Lccn+qsoA9v4LCVzytg6InueIb+SozmVw2HyUzmmU+lSlOfwhQ4DYupNBr03i1/wgXIMON6gIt7gCdeDmwfvrA46SXyg1h0lrh+X1OPxtEer3RD/iGJmHci6c0Olov4T0dcKPXN93j39Mq5oAFSohB7GD4tTSn1f73m2uIot2r6NfY9OgJYLZMaLxmFovvbuWYbOadgZN0EVsfeIgqsI0R0BwoQ32CwYuLE7Xgnq57N5hOrzAAwxY1uwkGSgugXn6Eu4/1NW/PToh6gliawc63k0c3iQfMoxnKjdn4CndCslX1BA510LQY1kUxQiLxwal5TF2p8wrYRzrF2wWm4VC6JlKDT6VmwPx6Br4nXroswKsvHxSCSQ3DNftYaSPncruTf7MkCBslLY7TezsSHTKHMQ9ccf3nNbjxAQLxnE0122zNVldQSdr+74z9dPqNRA8cyUhI395pZuFgzvHxlC3CR7rux3BPn+Nb5r3PQQWSG2dzRkxA==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(39860400002)(376002)(346002)(366004)(186009)(1800799009)(451199024)(6666004)(53546011)(6506007)(6486002)(478600001)(26005)(2906002)(966005)(4744005)(41300700001)(316002)(66556008)(66946007)(66476007)(8676002)(5660300002)(8936002)(36756003)(2616005)(6512007)(38100700002)(86362001)(31696002)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VVhOSEhXa0NBeHZTMisvdStqZnY0WGdndUNtckpDRjF5UGVrZWFNb0szY2Fl?=
+ =?utf-8?B?TUFsYnpFMk5Qbk1xQ1Jzd3daVURFUGhvblZHTFhKMW03VjhOYlhCZUJGZ3Jv?=
+ =?utf-8?B?ZnUrckZjRUdjaE0vRHVEVUsreG1kekUvYXVQL2l6TTJYNVRYVGlyQnNzaWRD?=
+ =?utf-8?B?SkwxOC9vL3BudFNSWTBmenNZMDZUandFYVJXdXRSS2RERG1TNUIyTEVuWUZ5?=
+ =?utf-8?B?Rkl2UHJnWFVFMXptaVFLSmNxWUNKWUdFNSs0dGtGN0c0YXBpbS9FOUxTMXRk?=
+ =?utf-8?B?ZzhPb1B6TzBQMFN0Y3Y5bmMvVXgzV3FqYllqMmMyMmZkVDMxaUNmeCtGTS81?=
+ =?utf-8?B?Rndmc1BCR2lNbEw3SWdrR0VJU0R5VlFUOXhieEI3MkpZb1VGaHpXa3p3MGJJ?=
+ =?utf-8?B?b3RCbTRsR1lPY085bll5bXVTMWc5bWg3VDJjbk5RWVd1bXAzMERHZE8vMC9J?=
+ =?utf-8?B?d2hlMWFlSVhlU25ib1djQ3RRQ3d4Y0ovcVoxcXlPWnh1MnNHQW03eFBmelR3?=
+ =?utf-8?B?cDJRekhoSHlhbWE0bXBCZmJlcGdNM3piandjbWlSNzIxeUk1VFE3b2RNUXgz?=
+ =?utf-8?B?U3lQbUR5UXFNa1UrMUV3OC9zTmtwYTdITnExYWdNcm9NU1NpVnBCWHlUQWc3?=
+ =?utf-8?B?Y3JlUUViRTAzSjlHdElPeEh4MWRjT0NZUFdyTlRuMk0zWk5TVVl4TTl0cnNT?=
+ =?utf-8?B?SnhrcndEemZidkFDK1JXR1ZzY2h2cnc1VjhJYmNrU2FGWjdMQ3pPMG1MLzZD?=
+ =?utf-8?B?cFdJR0w2UjcwSnpsM3ozS29KOEVKRHNOY2RMeHFTY3FQTHFaVk5kVHlwTVdx?=
+ =?utf-8?B?Wm14bS80RHhaeG1sRXFVNXlOSzA4eUZtaENYS053bDN5MTBrYlpWSm5FcE5s?=
+ =?utf-8?B?K2MrKzBibDYvc1RJanlxdm5IVldMT01ITnpheUdSdHpDSXVubmQrQ0FYSmx4?=
+ =?utf-8?B?dCtCS1lXeEU4SVhIZkh4aUMxNGhVTjlXZGkrOWxXWElYbW1uY01paWIvUHRM?=
+ =?utf-8?B?M3FudTZQbFplOXRtcjRkWXVQVitKUTNMM1FSUEowWW9lRGdhWE16RkVNSlJ2?=
+ =?utf-8?B?VDg2dFF5cVFLUm10TkN1OVhaZHZmMUh0UTI5UHdxa3Y0Z3lVWkx5SU9UZjF0?=
+ =?utf-8?B?WFg2TExYam5lRjNIOUdEcExpd20wN2JFTVBxeDJHQmgyLzYxRDF0bVoxQ3Zh?=
+ =?utf-8?B?eGJyZG1FaE0wYVhhRmNpYm9qSGg0aS9TVVI3c0VoQ0ZjanJwcHBHWTA4a2VU?=
+ =?utf-8?B?L2V3SDZTNXdwOEVpK2JYTWlSL25TNndONXZPeFJ1VXhKVk14QVFySEFWVURl?=
+ =?utf-8?B?Z2o0SWpmVGRXZDhoTnM3Mm5pcm0wdGpLWXFDa1VqV1dLdDB0bmpJYWRNL3JJ?=
+ =?utf-8?B?M2N5cU5YenhLVjZIVE9OWTU0SENwN1ZvUDEzeHNYM2tabytUbmZHN2w5aXRR?=
+ =?utf-8?B?MkFIZiswQTc5WFk4T29oY0w4WExDSWdtVFBaM3grNjZ1MzJ0Q09OOTFCVWcw?=
+ =?utf-8?B?MnpsejdRM1JwSzBDeHpqUjV3OVd0WVFSQ1VQY3ZXV01tNzlDVlRsRGlFSTlD?=
+ =?utf-8?B?N25NRTRSUnpJVTVLQ0hkQ0tVOFljYWduazFXMmxiMFdkUTlqMllGMXpBamh0?=
+ =?utf-8?B?RkNaSDB1S3dxUlNRSERmejRjV29iRjk5alQrTVNQaUswZlF2N0dwWWg4QkFH?=
+ =?utf-8?B?bFNoeXhOWkpxUDhueHlocXBJTFppSG1QemF3NXJmZElJMm9JU0kzTkRVODEr?=
+ =?utf-8?B?dWttS2t6dTF4ZW1sUUJJano0Z0RIRitRNXBackRIQVhRekxoeWFrTytoSGVl?=
+ =?utf-8?B?aWZtUVVrR0V5THhrK00rMm9UZkYwazh4NXhWOVVrTWg2d0VLb2ptd0t6dlpL?=
+ =?utf-8?B?VEt0MGlzQzFjbWxDZ0tWTmx1eTB6MHBIc3NxWjl5R0dET1MwSm4ycjhxaUZ4?=
+ =?utf-8?B?NGlsVkhtSjV5cW1MVDhqaVhXYlBCc0pWcWdrWXB3cE9wVENXM2FmVmluVE1M?=
+ =?utf-8?B?RVdaZUVnQm56NEVPbkoyOS84dzRUdmdERFRyN2dWa01zTWE0ejdqMFovc0xS?=
+ =?utf-8?B?cThvb1krOTZXOWlUR0M0TjlIbm1MY3NlenUyNDdjZzltQkZnNFRlNVAxUjNt?=
+ =?utf-8?Q?fpdKmO98LA6XJqG+sWjC9ROj0?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8147091b-4594-4374-8a71-08dbb3070036
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Sep 2023 20:38:05.4746
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1UP0x0EjRrSin898MN5lE48uEyuiWMH0RZFzUm7uInts1scthOZYt/LgjamCr10xaHcw2UfqBtUfbOJWBjVHng==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6051
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Corinna Vinschen <vinschen@redhat.com>
+On 9/11/2023 1:17 PM, Paolo Abeni wrote:
+> 
+> Hi,
+> 
+> net-next is open again, and accepting changes for v6.7.
+> 
+> Please note that the location of the "status" page is:
+> https://patchwork.hopto.org/net-next.html
+> 
+> 
 
-After commit 50f303496d92 ("igb: Enable SR-IOV after reinit"), removing
-the igb module could hang or crash (depending on the machine) when the
-module has been loaded with the max_vfs parameter set to some value != 0.
+Thanks!
 
-In case of one test machine with a dual port 82580, this hang occurred:
+Also, https://netdev.bots.linux.dev/net-next.html works much better for 
+us with strict corporate filters.
 
-[  232.480687] igb 0000:41:00.1: removed PHC on enp65s0f1
-[  233.093257] igb 0000:41:00.1: IOV Disabled
-[  233.329969] pcieport 0000:40:01.0: AER: Multiple Uncorrected (Non-Fatal) err0
-[  233.340302] igb 0000:41:00.0: PCIe Bus Error: severity=Uncorrected (Non-Fata)
-[  233.352248] igb 0000:41:00.0:   device [8086:1516] error status/mask=00100000
-[  233.361088] igb 0000:41:00.0:    [20] UnsupReq               (First)
-[  233.368183] igb 0000:41:00.0: AER:   TLP Header: 40000001 0000040f cdbfc00c c
-[  233.376846] igb 0000:41:00.1: PCIe Bus Error: severity=Uncorrected (Non-Fata)
-[  233.388779] igb 0000:41:00.1:   device [8086:1516] error status/mask=00100000
-[  233.397629] igb 0000:41:00.1:    [20] UnsupReq               (First)
-[  233.404736] igb 0000:41:00.1: AER:   TLP Header: 40000001 0000040f cdbfc00c c
-[  233.538214] pci 0000:41:00.1: AER: can't recover (no error_detected callback)
-[  233.538401] igb 0000:41:00.0: removed PHC on enp65s0f0
-[  233.546197] pcieport 0000:40:01.0: AER: device recovery failed
-[  234.157244] igb 0000:41:00.0: IOV Disabled
-[  371.619705] INFO: task irq/35-aerdrv:257 blocked for more than 122 seconds.
-[  371.627489]       Not tainted 6.4.0-dirty #2
-[  371.632257] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this.
-[  371.641000] task:irq/35-aerdrv   state:D stack:0     pid:257   ppid:2      f0
-[  371.650330] Call Trace:
-[  371.653061]  <TASK>
-[  371.655407]  __schedule+0x20e/0x660
-[  371.659313]  schedule+0x5a/0xd0
-[  371.662824]  schedule_preempt_disabled+0x11/0x20
-[  371.667983]  __mutex_lock.constprop.0+0x372/0x6c0
-[  371.673237]  ? __pfx_aer_root_reset+0x10/0x10
-[  371.678105]  report_error_detected+0x25/0x1c0
-[  371.682974]  ? __pfx_report_normal_detected+0x10/0x10
-[  371.688618]  pci_walk_bus+0x72/0x90
-[  371.692519]  pcie_do_recovery+0xb2/0x330
-[  371.696899]  aer_process_err_devices+0x117/0x170
-[  371.702055]  aer_isr+0x1c0/0x1e0
-[  371.705661]  ? __set_cpus_allowed_ptr+0x54/0xa0
-[  371.710723]  ? __pfx_irq_thread_fn+0x10/0x10
-[  371.715496]  irq_thread_fn+0x20/0x60
-[  371.719491]  irq_thread+0xe6/0x1b0
-[  371.723291]  ? __pfx_irq_thread_dtor+0x10/0x10
-[  371.728255]  ? __pfx_irq_thread+0x10/0x10
-[  371.732731]  kthread+0xe2/0x110
-[  371.736243]  ? __pfx_kthread+0x10/0x10
-[  371.740430]  ret_from_fork+0x2c/0x50
-[  371.744428]  </TASK>
-
-The reproducer was a simple script:
-
-  #!/bin/sh
-  for i in `seq 1 5`; do
-    modprobe -rv igb
-    modprobe -v igb max_vfs=1
-    sleep 1
-    modprobe -rv igb
-  done
-
-It turned out that this could only be reproduce on 82580 (quad and
-dual-port), but not on 82576, i350 and i210.  Further debugging showed
-that igb_enable_sriov()'s call to pci_enable_sriov() is failing, because
-dev->is_physfn is 0 on 82580.
-
-Prior to commit 50f303496d92 ("igb: Enable SR-IOV after reinit"),
-igb_enable_sriov() jumped into the "err_out" cleanup branch.  After this
-commit it only returned the error code.
-
-So the cleanup didn't take place, and the incorrect VF setup in the
-igb_adapter structure fooled the igb driver into assuming that VFs have
-been set up where no VF actually existed.
-
-Fix this problem by cleaning up again if pci_enable_sriov() fails.
-
-Fixes: 50f303496d92 ("igb: Enable SR-IOV after reinit")
-Signed-off-by: Corinna Vinschen <vinschen@redhat.com>
-Reviewed-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/igb/igb_main.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
-index 13ba9c74bd84..76b34cee1da3 100644
---- a/drivers/net/ethernet/intel/igb/igb_main.c
-+++ b/drivers/net/ethernet/intel/igb/igb_main.c
-@@ -3827,8 +3827,11 @@ static int igb_enable_sriov(struct pci_dev *pdev, int num_vfs, bool reinit)
- 	}
- 
- 	/* only call pci_enable_sriov() if no VFs are allocated already */
--	if (!old_vfs)
-+	if (!old_vfs) {
- 		err = pci_enable_sriov(pdev, adapter->vfs_allocated_count);
-+		if (err)
-+			goto err_out;
-+	}
- 
- 	goto out;
- 
--- 
-2.38.1
-
+sln
 
