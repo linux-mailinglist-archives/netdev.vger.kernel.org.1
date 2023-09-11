@@ -1,186 +1,143 @@
-Return-Path: <netdev+bounces-32890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B05E679AAB1
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 20:05:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E3C079AAB5
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 20:08:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1837A28137A
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 18:05:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22B5B2812A5
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 18:08:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98D23156E3;
-	Mon, 11 Sep 2023 18:05:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DE58156E5;
+	Mon, 11 Sep 2023 18:08:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 845C4AD2E
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 18:05:26 +0000 (UTC)
-Received: from smtp-fw-9103.amazon.com (smtp-fw-9103.amazon.com [207.171.188.200])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DC69103
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 11:05:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1694455525; x=1725991525;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=e3HOPvm9ivWd3LMjjSsdKnEcLSvXAqB/AXMmmqLhdZk=;
-  b=r7Ug4Yb4O8WCQMbCDGKD5aLAHf2kADXL64ZE7Lu4V9gTHDhvCYMQW9aF
-   iweAXqYJYBYocQWoAGg4cuzGLLhiamTHAbfjyqFCkMNONo2LpCSpdoQ22
-   D8K0hHJdwvqK1IL8YlZi9tdaG0bTyuRDRAKQfDK4g0qvB9ogCMR9TgvpI
-   M=;
-X-IronPort-AV: E=Sophos;i="6.02,244,1688428800"; 
-   d="scan'208";a="1153583988"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-9fe6ad2f.us-east-1.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9103.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2023 18:05:18 +0000
-Received: from EX19MTAUWB001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-	by email-inbound-relay-iad-1a-m6i4x-9fe6ad2f.us-east-1.amazon.com (Postfix) with ESMTPS id 23BF8815E0;
-	Mon, 11 Sep 2023 18:05:14 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Mon, 11 Sep 2023 18:05:14 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.171.14) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Mon, 11 Sep 2023 18:05:11 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <edumazet@google.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <joannelkoong@gmail.com>,
-	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH v1 net 2/5] tcp: Fix bind() regression for v4-mapped-v6 non-wildcard address.
-Date: Mon, 11 Sep 2023 11:05:03 -0700
-Message-ID: <20230911180503.50024-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <CANn89iLGDTb0FFL7=+e9zXz156+RZk0dSJXatgFmMx0vakOAAQ@mail.gmail.com>
-References: <CANn89iLGDTb0FFL7=+e9zXz156+RZk0dSJXatgFmMx0vakOAAQ@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8905C154B4
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 18:08:49 +0000 (UTC)
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2053.outbound.protection.outlook.com [40.107.220.53])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D207E103
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 11:08:46 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hnwfws7lpPWCliH38N9pYvgxhwGvridMbxaxuidFU3TNxd3J+CtGRP6BNi36CRet9wcbNittZRO6KxHKsHxhMI0GkVQrQbWShygkkP+qRfJy1UFAJ7RlllJfRiS3ljGsurbhyhXSGPT4tTP5OiE1Z8VpD8kH1W23m1nquqAGXAIIYaP66faONQ3nSgHPgZOCBzKrCcs5qCs7WYGtnJpaS1OOyyqaD1fDeTjpyXxYkB8pb5gGD04Y6Hc938NwhqWEEkLU3m2Qpk68UH8dBFBEMFB8ocylQL9tK4qxeHgE2Wqh+AQHQJmyESBu1ypB1p4PNU/JlOXiGcNf/0pvPm/ckg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=aYADXVh8AoDrBaOSCw4BG1YtLJ4KlKykx/FaHOrKAOk=;
+ b=dKEuy/LkyOppsROduW4/Fifa9k5NXbLLbcrDBLbw04UH1NVX0DzUbzirxJbuBcwytz3MlnQXKmOG63nTLOnVW+ss2UK1OR922Lqs8mlyjwiQy+qSe5bjB7530R8qZqLoRc88HcEPyWcN3JtCvXlTjv7WH+8bO4tRyAXVynD+aLGiF9cvKBmSgx8pqf34paxKOypkDG+DeQYQmGX6GkmVJHKWOntzVOR7DKBqj50CpVvMhbkmtkUYEugQQRF6Yqy7LaxTJt9WYmWZqH3H39Zi1g9h+Z3iFU1al3lCMVrPCEdMxzyjps+UD9qDF3LMrbP5Qvwr++I1k89CI2z4VQvXTQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aYADXVh8AoDrBaOSCw4BG1YtLJ4KlKykx/FaHOrKAOk=;
+ b=Y6HCRWor6C6HD2wX6xz+W7SZxnCEKsLRAjKr3RlCuvyEDORmA6wW9/BmIsG9nK+3BD8FjPAGFW0NptKDEtBSoyTR/GZEKqmHSZHJIbTSAJChurNVw2nVqvtNa63/Fo/QFSnPvnANV7tkaX8PvGNZREa8K6jDIZwirEHWvtFaEho=
+Received: from MW4P220CA0012.NAMP220.PROD.OUTLOOK.COM (2603:10b6:303:115::17)
+ by BL1PR12MB5753.namprd12.prod.outlook.com (2603:10b6:208:390::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.35; Mon, 11 Sep
+ 2023 18:08:42 +0000
+Received: from MWH0EPF000989E7.namprd02.prod.outlook.com
+ (2603:10b6:303:115:cafe::97) by MW4P220CA0012.outlook.office365.com
+ (2603:10b6:303:115::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.35 via Frontend
+ Transport; Mon, 11 Sep 2023 18:08:42 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ MWH0EPF000989E7.mail.protection.outlook.com (10.167.241.134) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6792.16 via Frontend Transport; Mon, 11 Sep 2023 18:08:42 +0000
+Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 11 Sep
+ 2023 13:08:40 -0500
+From: Shannon Nelson <shannon.nelson@amd.com>
+To: <dsahern@kernel.org>
+CC: <netdev@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+	<mst@redhat.com>, <jasowang@redhat.com>, <si-wei.liu@oracle.com>,
+	<shannon.nelson@amd.com>, <allen.hubbe@amd.com>, <drivers@pensando.io>
+Subject: [PATCH iproute2] vdpa: consume device_features parameter
+Date: Mon, 11 Sep 2023 11:08:15 -0700
+Message-ID: <20230911180815.820-1-shannon.nelson@amd.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.187.171.14]
-X-ClientProxiedBy: EX19D031UWC004.ant.amazon.com (10.13.139.246) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,T_SPF_PERMERROR autolearn=no autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MWH0EPF000989E7:EE_|BL1PR12MB5753:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5532a399-ccb8-45e1-6476-08dbb2f22214
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	mYuBiOCTIV3/xmFo44X9mBmnBV2FTII6Skx+tQni4IXqvj9+g84UwhCi0JXX/89a1X4EXmSjgPakbThrH8O2HwnATM+G+gQOQm2zx3d6eeDRAMAH7DbCl9+/pU44+v1Xu6fJq7NtJvbIy7wbtgnPNFZETSQmACbm4SLT3nOFNfJDWGLf1/Z3jnw6jSEPcmxPr40SMLEYVUOIaAVU7+58EuHuIHrYKclxfMp3COS5BhPslmwzq1XMiFg8I7RZjNpIjNEmdFzsY/jk9nPv2ajeEklY/W+lh7d3GlNnXsqNPXqIiRIy5bq4oLTpWktyFF9YAVCiwHSJxiT1fWt8eEGtOzdvgc7/G/UOCkOTDycedRu80/ZOisvj1xxiDWzEZr5WpbnSSmn+Jvj2JDscKmwIdkwLvWmSJ4ieASqZz1PymQ6t5v9D5b4hCbyGGDsCtB2IIhrPE8hxSZgFkn92wWXFt40LNf7kbDPyBPgr76Qj57FhnzdTwe7bA7zvQGu1lMJ9QS9j7ej00bLNXjcQdx/jsTHh0T01jW7lUH1XtdGR/5nZtXzxD/rbI+nkmvMgi74oGpOOptUwdo9bA3vltfRzLG/K9mUy4hhI9E8NFYeSCHegHwHVLhh5juJZH50vGVZCmAIvN8whneu+cPtXwS9+LnjyZynJ0h8q8zm3yLtxLWnOdEphtsfE6KLQCeM6qttoPFY2d3/oj3onCpGuhmX/huwBgDy7JUfHTYqho/7Ak9lbJLRSzhYdC73Z7TYB/LDSLd3wKyksTxIeIJahtg+J7A==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(396003)(376002)(136003)(346002)(39860400002)(1800799009)(82310400011)(451199024)(186009)(46966006)(36840700001)(40470700004)(5660300002)(4326008)(8676002)(54906003)(41300700001)(44832011)(8936002)(70206006)(316002)(6916009)(70586007)(40460700003)(81166007)(47076005)(478600001)(36756003)(40480700001)(2616005)(6666004)(86362001)(4744005)(16526019)(336012)(26005)(426003)(1076003)(2906002)(82740400003)(356005)(36860700001)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Sep 2023 18:08:42.5086
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5532a399-ccb8-45e1-6476-08dbb2f22214
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MWH0EPF000989E7.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5753
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 11 Sep 2023 19:51:44 +0200
-> On Mon, Sep 11, 2023 at 6:52 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
-> >
-> > Since bhash2 was introduced, the example below does now work as expected.
-> > These two bind() should conflict, but the 2nd bind() now succeeds.
-> >
-> >   from socket import *
-> >
-> >   s1 = socket(AF_INET6, SOCK_STREAM)
-> >   s1.bind(('::ffff:127.0.0.1', 0))
-> >
-> >   s2 = socket(AF_INET, SOCK_STREAM)
-> >   s2.bind(('127.0.0.1', s1.getsockname()[1]))
-> >
-> > During the 2nd bind() in inet_csk_get_port(), inet_bind2_bucket_find()
-> > fails to find the 1st socket's tb2, so inet_bind2_bucket_create() allocates
-> > a new tb2 for the 2nd socket.  Then, we call inet_csk_bind_conflict() that
-> > checks conflicts in the new tb2 by inet_bhash2_conflict().  However, the
-> > new tb2 does not include the 1st socket, thus the bind() finally succeeds.
-> >
-> > In this case, inet_bind2_bucket_match() must check if AF_INET6 tb2 has
-> > the conflicting v4-mapped-v6 address so that inet_bind2_bucket_find()
-> > returns the 1st socket's tb2.
-> >
-> > Note that if we bind two sockets to 127.0.0.1 and then ::FFFF:127.0.0.1,
-> > the 2nd bind() fails properly for the same reason mentinoed in the previous
-> > commit.
-> >
-> > Fixes: 28044fc1d495 ("net: Add a bhash2 table hashed by port and address")
-> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > ---
-> >  net/ipv4/inet_hashtables.c | 9 ++++++++-
-> >  1 file changed, 8 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-> > index 0a9b20eb81c4..54505100c914 100644
-> > --- a/net/ipv4/inet_hashtables.c
-> > +++ b/net/ipv4/inet_hashtables.c
-> > @@ -816,8 +816,15 @@ static bool inet_bind2_bucket_match(const struct inet_bind2_bucket *tb,
-> >                                     int l3mdev, const struct sock *sk)
-> >  {
-> >  #if IS_ENABLED(CONFIG_IPV6)
-> > -       if (sk->sk_family != tb->family)
-> > +       if (sk->sk_family != tb->family) {
-> > +               if (sk->sk_family == AF_INET)
-> > +                       return net_eq(ib2_net(tb), net) && tb->port == port &&
-> > +                               tb->l3mdev == l3mdev &&
-> > +                               ipv6_addr_v4mapped(&tb->v6_rcv_saddr) &&
-> > +                               tb->v6_rcv_saddr.s6_addr32[3] == sk->sk_rcv_saddr;
-> > +
-> >                 return false;
-> > +       }
-> >
-> >         if (sk->sk_family == AF_INET6)
-> >                 return net_eq(ib2_net(tb), net) && tb->port == port &&
-> > --
-> 
-> Could we first factorize all these "net_eq(ib2_net(tb), net) &&
-> tb->port == port" checks ?
+From: Allen Hubbe <allen.hubbe@amd.com>
 
-That's much cleaner :)
-I'll add a prep patch first in v2.
+Consume the parameter to device_features when parsing command line
+options.  Otherwise the parameter may be used again as an option name.
 
-Thanks!
+ # vdpa dev add ... device_features 0xdeadbeef mac 00:11:22:33:44:55
+ Unknown option "0xdeadbeef"
 
-> 
-> diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-> index 7876b7d703cb5647086c45ca547c4caadc00c091..6240c802ed772272028e6e65bf90f345dd2d1619
-> 100644
-> --- a/net/ipv4/inet_hashtables.c
-> +++ b/net/ipv4/inet_hashtables.c
-> @@ -832,24 +832,24 @@ static bool inet_bind2_bucket_match(const struct
-> inet_bind2_bucket *tb,
->  bool inet_bind2_bucket_match_addr_any(const struct inet_bind2_bucket
-> *tb, const struct net *net,
->                                       unsigned short port, int l3mdev,
-> const struct sock *sk)
->  {
-> +       if (!net_eq(ib2_net(tb), net) || tb->port != port)
-> +               return false;
-> +
->  #if IS_ENABLED(CONFIG_IPV6)
->         if (sk->sk_family != tb->family) {
->                 if (sk->sk_family == AF_INET)
-> -                       return net_eq(ib2_net(tb), net) && tb->port == port &&
-> -                               tb->l3mdev == l3mdev &&
-> +                       return  tb->l3mdev == l3mdev &&
->                                 ipv6_addr_any(&tb->v6_rcv_saddr);
-> 
->                 return false;
->         }
-> 
->         if (sk->sk_family == AF_INET6)
-> -               return net_eq(ib2_net(tb), net) && tb->port == port &&
-> -                       tb->l3mdev == l3mdev &&
-> +               return  tb->l3mdev == l3mdev &&
->                         ipv6_addr_any(&tb->v6_rcv_saddr);
->         else
->  #endif
-> -               return net_eq(ib2_net(tb), net) && tb->port == port &&
-> -                       tb->l3mdev == l3mdev && tb->rcv_saddr == 0;
-> +               return tb->l3mdev == l3mdev && tb->rcv_saddr == 0;
->  }
-> 
->  /* The socket's bhash2 hashbucket spinlock must be held when this is called */
+Fixes: a4442ce58ebb ("vdpa: allow provisioning device features")
+Signed-off-by: Allen Hubbe <allen.hubbe@amd.com>
+Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
+Reviewed-by: Si-Wei Liu <si-wei.liu@oracle.com>
+---
+ vdpa/vdpa.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/vdpa/vdpa.c b/vdpa/vdpa.c
+index 8bbe452c..6e4a9c11 100644
+--- a/vdpa/vdpa.c
++++ b/vdpa/vdpa.c
+@@ -353,6 +353,8 @@ static int vdpa_argv_parse(struct vdpa *vdpa, int argc, char **argv,
+ 						&opts->device_features);
+ 			if (err)
+ 				return err;
++
++			NEXT_ARG_FWD();
+ 			o_found |= VDPA_OPT_VDEV_FEATURES;
+ 		} else {
+ 			fprintf(stderr, "Unknown option \"%s\"\n", *argv);
+-- 
+2.17.1
+
 
