@@ -1,147 +1,184 @@
-Return-Path: <netdev+bounces-32808-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D931C79A7BA
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 13:54:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 898DF79A7C4
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 14:01:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F4D91C208DF
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 11:54:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B95531C208EE
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 12:01:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85C53C8EC;
-	Mon, 11 Sep 2023 11:54:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D92EC8F8;
+	Mon, 11 Sep 2023 12:01:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774FCC8E3
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 11:54:32 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07AA5E40;
-	Mon, 11 Sep 2023 04:54:30 -0700 (PDT)
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38BB7fEA011377;
-	Mon, 11 Sep 2023 11:54:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=6zAtbOPLTprDp5l7a3xBBQM94y0SgE+eMjbCRCMbzIQ=;
- b=JLN5RrouLe82dpApYqPuGsE594lDoDu5EmAF/495hcmALP0d7EnL/hRlmyS0r4mJd52D
- /L+OG25knQuEVzINCmGB7jSF2tENrljlEVBRWl3csgzN8tvKm5YmUUWe3PqDYS5Unx7i
- EmjouTBTPxJQo4DnVi8ENKLWL5xXH4NpeF4xHOcQ3X+ufkGAFgguCqniWs9luegi44JK
- wTFCRw8s77Ep03NlDbYfozSsLd9j7yVlGWt7ga7onmh4XNdtVRGmcrlSgA6CUUcNYqwQ
- Ssq0CS3xgniphTh7dNCd9BNjauRJNLGmDNe23vxUBNim4Hb5mpot2xspqe7ra8rqW9J/ 8w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t20gp2w4h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Sep 2023 11:54:25 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38BBb5tU023469;
-	Mon, 11 Sep 2023 11:54:25 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t20gp2w44-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Sep 2023 11:54:25 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38B9UCVw012083;
-	Mon, 11 Sep 2023 11:54:24 GMT
-Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3t13dyadxm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Sep 2023 11:54:24 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38BBsN2820185526
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 11 Sep 2023 11:54:23 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 12FB65805C;
-	Mon, 11 Sep 2023 11:54:23 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6ECA75805A;
-	Mon, 11 Sep 2023 11:54:17 +0000 (GMT)
-Received: from [9.171.51.126] (unknown [9.171.51.126])
-	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 11 Sep 2023 11:54:16 +0000 (GMT)
-Message-ID: <2b1d129c-06e2-0161-7c8a-1e930150d797@linux.ibm.com>
-Date: Mon, 11 Sep 2023 13:54:15 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 808B6E550
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 12:01:09 +0000 (UTC)
+Received: from us-smtp-delivery-44.mimecast.com (unknown [207.211.30.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id D296DCEB
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 05:01:07 -0700 (PDT)
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-627-uiqJIlB3N3-lBQCaTQUkBg-1; Mon, 11 Sep 2023 08:00:35 -0400
+X-MC-Unique: uiqJIlB3N3-lBQCaTQUkBg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 423408279AB;
+	Mon, 11 Sep 2023 12:00:34 +0000 (UTC)
+Received: from hog (unknown [10.39.192.47])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 827F940C2009;
+	Mon, 11 Sep 2023 12:00:32 +0000 (UTC)
+Date: Mon, 11 Sep 2023 14:00:31 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: "Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, richardcochran@gmail.com,
+	sebastian.tobuschat@nxp.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC net-next v3 4/6] net: phy: nxp-c45-tja11xx: add MACsec
+ support
+Message-ID: <ZP8BXxD0WZtdJ913@hog>
+References: <20230906160134.311993-1-radu-nicolae.pirea@oss.nxp.com>
+ <20230906160134.311993-5-radu-nicolae.pirea@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.0
-Subject: Re: [RFC PATCH net-next] net/smc: Introduce SMC-related proc files
-To: Wen Gu <guwen@linux.alibaba.com>, kgraul@linux.ibm.com, jaka@linux.ibm.com,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com
-Cc: alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <1694416820-60340-1-git-send-email-guwen@linux.alibaba.com>
-From: Wenjia Zhang <wenjia@linux.ibm.com>
-In-Reply-To: <1694416820-60340-1-git-send-email-guwen@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: zZ85GoqsMvyzF1GYSDC44WzjAXuOsqnB
-X-Proofpoint-ORIG-GUID: tVcKMCzZtJNKN0HX0ekLoduII0CImiOx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-09-11_06,2023-09-05_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1011
- mlxlogscore=700 priorityscore=1501 malwarescore=0 spamscore=0 adultscore=0
- phishscore=0 impostorscore=0 mlxscore=0 lowpriorityscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2308100000
- definitions=main-2309110105
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230906160134.311993-5-radu-nicolae.pirea@oss.nxp.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+X-Spam-Status: No, score=-0.5 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+	RCVD_IN_VALIDITY_RPBL,RDNS_NONE,SPF_HELO_NONE,SPF_NONE autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+2023-09-06, 19:01:32 +0300, Radu Pirea (NXP OSS) wrote:
+> Changes in v3:
+> - removed struct nxp_c45_rx_sc
+> - replaced struct nxp_c45_tx_sa with struct nxp_c45_sa
+> - reworked the implementation around struct nxp_c45_sa
+> - various renamings
+> - tried to better group the functions by SA type/SC type
+> - no key is stored in the driver
+> - TX SAs limited to 2 insted of 4(no key in the driver consequence)
+> - used sci_to_cpu where in various functions
+> - improved debug information
+> - nxp_c45_secy_valid function reworked
+> - merged TX/RX SA set key functions
+> - merged TX/RX SA set pn functions
+> - tried to stick to tx_sa/rx_sa/rx_sc/tx_sc function naming. 
+> - nxp_c45_macsec_config_init will return an error if a write fails.
+> - MACSEC_TXSC_CFG_SCI renamed to MACSEC_TXSC_CFG_SCB
+> - return -ENOSPC if no SC/SA available in the hardware
+> - phydev->macsec_ops allocated using devm_kzalloc
+
+nit: not macsec_ops
 
 
-On 11.09.23 09:20, Wen Gu wrote:
-> This patch introduces /proc/net/smc4 and /proc/net/smc6 files to report
-> statistic information of SMC connections.
-> 
-> Compared with 'smcss' command in smc-tools, getting SMC connections via
-> proc files is not efficient. However, in some container scenarios, some
-> dependencies are lacked for compiling and using smc-tools. In this case,
-> using proc files to check SMC connections becomes a simple and fast way.
-> 
-> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
-> ---
->   include/net/smc.h  |   5 +-
->   net/smc/Makefile   |   2 +-
->   net/smc/af_smc.c   |  22 ++++-
->   net/smc/smc_diag.c |  29 +++---
->   net/smc/smc_proc.c | 283 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->   net/smc/smc_proc.h |  35 +++++++
->   6 files changed, 355 insertions(+), 21 deletions(-)
->   create mode 100644 net/smc/smc_proc.c
->   create mode 100644 net/smc/smc_proc.h
-> 
+[...]
+> +static void nxp_c45_set_sci(struct phy_device *phydev, u16 sci_base_addr,
+> +			    sci_t sci)
+> +{
+> +	u64 lsci = sci_to_cpu(sci);
+> +
+> +	nxp_c45_macsec_write(phydev, sci_base_addr, lsci >> 32);
+> +	nxp_c45_macsec_write(phydev, sci_base_addr + 4, lsci);
+> +}
+> +
+> +static bool nxp_c45_sci_valid(sci_t sci, bool scb)
+> +{
+> +	u16 port = sci_to_cpu(sci);
+> +
+> +	if (scb && port != 0)
+> +		return false;
+> +	if (!scb && port != 1)
+> +		return false;
 
-Hi Wen,
+For non-SCB (ie normal case), only port 1 is allowed? That doesn't
+seem to match what nxp_c45_rx_sc_valid was doing in v2, but it is also
+called from nxp_c45_mdo_add_rxsc..
 
-I can understand your problem and frustration. However, there are two 
-reasons I'm not really convinced by the proc file method:
-1) AFAI, the proc method could consume many CPU time especially in case 
-with a log of sockets to read the pseudo files.
-2) We have already implemented the complex netlink method on the same 
-purpose. I see the double expense to main the code.
+> +
+> +	return true;
+> +}
+> +
 
-Then the question is if the lack of dependency issue can be handle 
-somehow, or the proc method is the only way to achieve this purpose?
+[...]
+> +static void nxp_c45_tx_sa_next(struct nxp_c45_secy *phy_secy,
+> +			       struct nxp_c45_sa *next_sa, u8 encoding_sa)
+> +{
+> +	struct nxp_c45_sa *sa;
+> +
+> +	sa = nxp_c45_find_sa(&phy_secy->sa_list, TX_SA, encoding_sa);
+> +	if (!IS_ERR(sa)) {
+> +		memcpy(next_sa, sa, sizeof(*sa));
+> +	} else {
+> +		next_sa->is_key_a = true;
+> +		next_sa->an = encoding_sa;
+> +	}
+> +}
 
-Any opinion is welcome!
+What is this doing? Why are you filling a fake SA struct when none is
+currently configured?
 
-Thanks,
-Wenjia
+
+
+> +static int nxp_c45_mdo_upd_txsa(struct macsec_context *ctx)
+> +{
+> +	struct macsec_tx_sa *tx_sa = ctx->sa.tx_sa;
+> +	struct phy_device *phydev = ctx->phydev;
+> +	struct nxp_c45_phy *priv = phydev->priv;
+> +	struct nxp_c45_secy *phy_secy;
+> +	u8 an = ctx->sa.assoc_num;
+> +	struct nxp_c45_sa *sa;
+> +
+> +	phydev_dbg(phydev, "update TX SA %u %s to TX SC %016llx\n",
+> +		   an, ctx->sa.tx_sa->active ? "enabled" : "disabled",
+> +		   sci_to_cpu(ctx->secy->sci));
+> +
+> +	phy_secy = nxp_c45_find_secy(&priv->macsec->secy_list, ctx->secy->sci);
+> +	if (IS_ERR(phy_secy))
+> +		return PTR_ERR(phy_secy);
+> +
+> +	sa = nxp_c45_find_sa(&phy_secy->sa_list, TX_SA, an);
+> +	if (IS_ERR(sa))
+> +		return PTR_ERR(sa);
+> +
+> +	nxp_c45_select_secy(phydev, phy_secy->secy_id);
+> +	nxp_c45_sa_set_pn(phydev, sa, tx_sa->next_pn, 0);
+
+The macsec core doesn't increment its PN when we're offloading. If
+userspace didn't pass a new PN, aren't we resetting the HW's PN back
+to its initial value here? That would cause replay protection to fail,
+and the PN reuse would break GCM.
+
+Could you check by inspecting the sequence numbers sent by the device
+before and after this:
+
+    ip macsec set macsec0 tx sa 0 on
+
+
+And same for nxp_c45_mdo_upd_rxsa -> nxp_c45_sa_set_pn. Testing would
+require enabling replay protection and making the PN go backward on
+the TX side.
+
+> +	nxp_c45_tx_sa_update(phydev, sa, ctx->secy->tx_sc.encoding_sa,
+> +			     tx_sa->active);
+> +	return 0;
+> +}
+
+-- 
+Sabrina
+
 
