@@ -1,94 +1,128 @@
-Return-Path: <netdev+bounces-32863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E2F579A9F9
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 17:50:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EABBB79A9FE
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 17:54:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43EB2281419
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 15:50:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9F751C20AB5
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 15:54:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7D8C125C9;
-	Mon, 11 Sep 2023 15:50:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 285F111CBA;
+	Mon, 11 Sep 2023 15:54:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67E05F51E
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 15:50:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E7270C433C7;
-	Mon, 11 Sep 2023 15:50:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694447410;
-	bh=RZzm4E4YvE2bOozyX9wws+URswMnykw6R3Mwj4h8OyE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tEtIhdn1Q/Pcu0sw8n1pn+swYc6Kdg7vIEqE8UWnugihaAYgpVIADiSSGKuQIpcdr
-	 Kzw5zDE8k5qWEk/quH6Pf2yqt/4jLTQVsaILSlLBhKHptAbW3mu2kRY6DNVYtAQJXb
-	 mYfxshMyiVwSEZAbzizUknKAxCD1cK+oT95OuTa1Y8TTA+/tG/tnuD+LBoQH70mMVi
-	 5+VuQvNm5oXIE+T5cCfZMUq0l38uJNtoZbSj6N2DHx3xFfuGtjtER9/C/dXbiqKjnI
-	 bmr3r2Dmppq2xbfXGzBAed6ahElbKLXJHwnL79EHXN8n98pNPJcw8eC2XAOsNn/Xqd
-	 wPLG7kHT7fDmA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C7C50C00446;
-	Mon, 11 Sep 2023 15:50:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 108FE11C80;
+	Mon, 11 Sep 2023 15:54:02 +0000 (UTC)
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 221B4193;
+	Mon, 11 Sep 2023 08:54:01 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id D02C021858;
+	Mon, 11 Sep 2023 15:53:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1694447639; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=w1hU2rySzchPvfa0Wrv+/KzNAllK1m5RVyNxjuW0p78=;
+	b=P/ihoVSGa95xiemo3MTPD96SZx5qps7CdKbeHaotHJ6dKb/WrX1hQ8UmJu5t30xLUrQkdf
+	ZaMsiNXgVEyNOHEQYTMGlkEz/CaYvaoXL2hK56fFN8mlphFYmgk8/f+oxK8saKV1VYUsju
+	E0zpK/64S1G4tobdIazXal9MXF+1ar8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1694447639;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=w1hU2rySzchPvfa0Wrv+/KzNAllK1m5RVyNxjuW0p78=;
+	b=hz1uI0y1MedAGwyeWiiY5Eh+W+SEWc3LQ//38EsqFtkHMtSJe2vSwvuhfRefgC/GZIaKTR
+	D4LHrr/4TDlgi8Ag==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9920013780;
+	Mon, 11 Sep 2023 15:53:59 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+	by imap2.suse-dmz.suse.de with ESMTPSA
+	id kmfoHxc4/2S/dwAAMHmgww
+	(envelope-from <krisman@suse.de>); Mon, 11 Sep 2023 15:53:59 +0000
+From: Gabriel Krisman Bertazi <krisman@suse.de>
+To: Breno Leitao <leitao@debian.org>
+Cc: sdf@google.com,  axboe@kernel.dk,  asml.silence@gmail.com,
+  willemdebruijn.kernel@gmail.com,  kuba@kernel.org,  martin.lau@linux.dev,
+  bpf@vger.kernel.org,  linux-kernel@vger.kernel.org,
+  netdev@vger.kernel.org,  io-uring@vger.kernel.org,  pabeni@redhat.com
+Subject: Re: [PATCH v5 5/8] io_uring/cmd: return -EOPNOTSUPP if net is disabled
+In-Reply-To: <20230911103407.1393149-6-leitao@debian.org> (Breno Leitao's
+	message of "Mon, 11 Sep 2023 03:34:04 -0700")
+Organization: SUSE
+References: <20230911103407.1393149-1-leitao@debian.org>
+	<20230911103407.1393149-6-leitao@debian.org>
+Date: Mon, 11 Sep 2023 11:53:58 -0400
+Message-ID: <87ledc904p.fsf@suse.de>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [patch iproute2-next v2 0/6] devlink: implement dump selector for
- devlink objects show commands
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169444741081.23759.6950166979935469469.git-patchwork-notify@kernel.org>
-Date: Mon, 11 Sep 2023 15:50:10 +0000
-References: <20230906111113.690815-1-jiri@resnulli.us>
-In-Reply-To: <20230906111113.690815-1-jiri@resnulli.us>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, stephen@networkplumber.org, dsahern@gmail.com
+Content-Type: text/plain
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Breno Leitao <leitao@debian.org> writes:
 
-This series was applied to iproute2/iproute2-next.git (main)
-by David Ahern <dsahern@kernel.org>:
+> Protect io_uring_cmd_sock() to be called if CONFIG_NET is not set. If
+> network is not enabled, but io_uring is, then we want to return
+> -EOPNOTSUPP for any possible socket operation.
+>
+> This is helpful because io_uring_cmd_sock() can now call functions that
+> only exits if CONFIG_NET is enabled without having #ifdef CONFIG_NET
+> inside the function itself.
+>
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> ---
+>  io_uring/uring_cmd.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>
+> diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
+> index 60f843a357e0..a7d6a7d112b7 100644
+> --- a/io_uring/uring_cmd.c
+> +++ b/io_uring/uring_cmd.c
+> @@ -167,6 +167,7 @@ int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
+>  }
+>  EXPORT_SYMBOL_GPL(io_uring_cmd_import_fixed);
+>  
+> +#if defined(CONFIG_NET)
+>  int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags)
+>  {
+>  	struct socket *sock = cmd->file->private_data;
+> @@ -193,3 +194,10 @@ int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags)
+>  	}
+>  }
+>  EXPORT_SYMBOL_GPL(io_uring_cmd_sock);
+> +#else
+> +int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +#endif
+> +
 
-On Wed,  6 Sep 2023 13:11:07 +0200 you wrote:
-> From: Jiri Pirko <jiri@nvidia.com>
-> 
-> First 5 patches are preparations for the last one.
-> 
-> Motivation:
-> 
-> For SFs, one devlink instance per SF is created. There might be
-> thousands of these on a single host. When a user needs to know port
-> handle for specific SF, he needs to dump all devlink ports on the host
-> which does not scale good.
-> 
-> [...]
+Is net/socket.c even built without CONFIG_NET? if not, you don't even need
+the alternative EOPNOTSUPP implementation.
 
-Here is the summary with links:
-  - [iproute2-next,v2,1/6] devlink: move DL_OPT_SB into required options
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=158215c53677
-  - [iproute2-next,v2,2/6] devlink: make parsing of handle non-destructive to argv
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=5d9f42124ccd
-  - [iproute2-next,v2,3/6] devlink: implement command line args dry parsing
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=8eb894eda67d
-  - [iproute2-next,v2,4/6] devlink: return -ENOENT if argument is missing
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=fd1c2af8cbaa
-  - [iproute2-next,v2,5/6] mnl_utils: introduce a helper to check if dump policy exists for command
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=20b299a3ec35
-  - [iproute2-next,v2,6/6] devlink: implement dump selector for devlink objects show commands
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=70faecdca8f5
-
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Gabriel Krisman Bertazi
 
