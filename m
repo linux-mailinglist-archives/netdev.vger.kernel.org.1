@@ -1,407 +1,111 @@
-Return-Path: <netdev+bounces-32917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B801B79AB15
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 21:43:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EFA2079AB1D
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 21:51:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B82C61C20952
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 19:43:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FD101C20924
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 19:51:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E447915AD2;
-	Mon, 11 Sep 2023 19:43:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6079015AD9;
+	Mon, 11 Sep 2023 19:51:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37046154AE
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 19:43:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20BE8C433C7;
-	Mon, 11 Sep 2023 19:43:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694461428;
-	bh=GK1Vk2yaOnZ7VRkPajM/kx5HjhJtYu3cu1Z6F4nbK1g=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=uHUqudTx1qLsdnESyhJeufIZLsDGegygD8EdNPB6CFcb+zAh/Ps48aj7CPw4MVuRr
-	 GZd0mqJqARVTRlASQj7cMlY6HNOpOkmun33A2tzY5SrG514fWKmJnJiw9dB7R2FbKl
-	 FrrDuNkMVoY5EhW4uU07Na7cbQoqJYVwV0/3HbbJkb3addngDGLyNzzEog/IS3wfMl
-	 mSRFKwRY6pXX/Io540PEck8guyjtRcEeyOL7sasbn7iwnocg122J8NtzmvNwbQIfmL
-	 NlJguKdMfPUHrkshvXUAcjeddy0IIfr1OMjvWt4qI5edgEptGc6VQ4EBgTcO/P7/Rd
-	 Z/VizjJfFz9hA==
-Message-ID: <90ab03d77c59f6a3dd66b2abf25292bba781642c.camel@kernel.org>
-Subject: Re: [PATCH v8 3/3] NFSD: add rpc_status netlink support
-From: Jeff Layton <jlayton@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>, linux-nfs@vger.kernel.org
-Cc: lorenzo.bianconi@redhat.com, chuck.lever@oracle.com, neilb@suse.de, 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53CFF15ACA
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 19:51:10 +0000 (UTC)
+Received: from smtp.smtpout.orange.fr (smtp-30.smtpout.orange.fr [80.12.242.30])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8701B1B6
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 12:51:05 -0700 (PDT)
+Received: from pop-os.home ([86.243.2.178])
+	by smtp.orange.fr with ESMTPA
+	id fmvuqjtZmmTYjfmvuqYQl7; Mon, 11 Sep 2023 21:50:58 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1694461858;
+	bh=ZamjEVZ18uTTJvONVpJjngq/DbdaPZNJa1qgQbQpoRw=;
+	h=From:To:Cc:Subject:Date;
+	b=K9obfdGdVxHS2CYE7BBNg4g3et6obL90MC7iMj/0IaUB/W1GHPqeBy0547TCtk0Iw
+	 g5LmkU8HegOrtKi97dK0zjIG9bSiHQWs8hIPYY6463Wr7wTTzGdtM5CGN5pTErkKCi
+	 sSU1I8z/XVqwSJQvVZ32XUEWF+EG/3+5YkKkT/F3/s2KUYc0qpSr6DDwwnqZOe7Au0
+	 baUiJYEtIre5X/neoTE++KjllhD7DVruxTVCUYmzdRurnS0pdY3MC1BYmQ8IJfmS5W
+	 HZ7dDI5LChMHgZnfld0y35Y6zsXM0JA1ZhUrEtpEH2MEneNJN/hP6F14EHSm32bFYw
+	 QwF6I7ZXfBUQQ==
+X-ME-Helo: pop-os.home
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Mon, 11 Sep 2023 21:50:58 +0200
+X-ME-IP: 86.243.2.178
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To: Cai Huoqing <cai.huoqing@linux.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
 	netdev@vger.kernel.org
-Date: Mon, 11 Sep 2023 15:43:46 -0400
-In-Reply-To: <ac18892ea3f718c63f0a12e39aeaac812c081515.1694436263.git.lorenzo@kernel.org>
-References: <cover.1694436263.git.lorenzo@kernel.org>
-	 <ac18892ea3f718c63f0a12e39aeaac812c081515.1694436263.git.lorenzo@kernel.org>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+Subject: [PATCH net-next] net: hinic: Use devm_kasprintf()
+Date: Mon, 11 Sep 2023 21:50:52 +0200
+Message-Id: <198375f3b77b4a6bae4fdaefff7630414c0c89fe.1694461804.git.christophe.jaillet@wanadoo.fr>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, 2023-09-11 at 14:49 +0200, Lorenzo Bianconi wrote:
-> Introduce rpc_status netlink support for NFSD in order to dump pending
-> RPC requests debugging information from userspace.
->=20
-> Tested-by: Jeff Layton <jlayton@kernel.org>
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> ---
->  fs/nfsd/nfsctl.c           | 192 ++++++++++++++++++++++++++++++++++++-
->  fs/nfsd/nfsd.h             |  16 ++++
->  fs/nfsd/nfssvc.c           |  15 +++
->  fs/nfsd/state.h            |   2 -
->  include/linux/sunrpc/svc.h |   1 +
->  5 files changed, 222 insertions(+), 4 deletions(-)
->=20
-> diff --git a/fs/nfsd/nfsctl.c b/fs/nfsd/nfsctl.c
-> index 1be66088849c..b862a759ea15 100644
-> --- a/fs/nfsd/nfsctl.c
-> +++ b/fs/nfsd/nfsctl.c
-> @@ -26,6 +26,7 @@
->  #include "pnfs.h"
->  #include "filecache.h"
->  #include "trace.h"
-> +#include "nfs_netlink_gen.h"
-> =20
->  /*
->   *	We have a single directory with several nodes in it.
-> @@ -1497,17 +1498,199 @@ unsigned int nfsd_net_id;
-> =20
->  int nfsd_server_nl_rpc_status_get_start(struct netlink_callback *cb)
->  {
-> -	return 0;
-> +	struct nfsd_net *nn =3D net_generic(sock_net(cb->skb->sk), nfsd_net_id)=
-;
-> +	int ret =3D -ENODEV;
-> +
-> +	mutex_lock(&nfsd_mutex);
-> +	if (nn->nfsd_serv) {
-> +		svc_get(nn->nfsd_serv);
-> +		ret =3D 0;
-> +	}
-> +	mutex_unlock(&nfsd_mutex);
-> +
-> +	return ret;
->  }
-> =20
-> -int nfsd_server_nl_rpc_status_get_done(struct netlink_callback *cb)
-> +static int nfsd_genl_rpc_status_compose_msg(struct sk_buff *skb,
-> +					    struct netlink_callback *cb,
-> +					    struct nfsd_genl_rqstp *rqstp)
->  {
-> +	void *hdr;
-> +	int i;
-> +
-> +	hdr =3D genlmsg_put(skb, NETLINK_CB(cb->skb).portid, cb->nlh->nlmsg_seq=
-,
-> +			  &nfsd_server_nl_family, NLM_F_MULTI,
-> +			  NFSD_CMD_RPC_STATUS_GET);
-> +	if (!hdr)
-> +		return -ENOBUFS;
-> +
-> +	if (nla_put_be32(skb, NFSD_ATTR_RPC_STATUS_XID, rqstp->rq_xid) ||
-> +	    nla_put_u32(skb, NFSD_ATTR_RPC_STATUS_FLAGS, rqstp->rq_flags) ||
-> +	    nla_put_u32(skb, NFSD_ATTR_RPC_STATUS_PROG, rqstp->rq_prog) ||
-> +	    nla_put_u32(skb, NFSD_ATTR_RPC_STATUS_PROC, rqstp->rq_proc) ||
-> +	    nla_put_u8(skb, NFSD_ATTR_RPC_STATUS_VERSION, rqstp->rq_vers) ||
-> +	    nla_put_s64(skb, NFSD_ATTR_RPC_STATUS_SERVICE_TIME,
-> +			ktime_to_us(rqstp->rq_stime),
-> +			NFSD_ATTR_RPC_STATUS_PAD))
-> +		return -ENOBUFS;
-> +
-> +	switch (rqstp->saddr.sa_family) {
-> +	case AF_INET: {
-> +		const struct sockaddr_in *s_in, *d_in;
-> +
-> +		s_in =3D (const struct sockaddr_in *)&rqstp->saddr;
-> +		d_in =3D (const struct sockaddr_in *)&rqstp->daddr;
-> +		if (nla_put_in_addr(skb, NFSD_ATTR_RPC_STATUS_SADDR4,
-> +				    s_in->sin_addr.s_addr) ||
-> +		    nla_put_in_addr(skb, NFSD_ATTR_RPC_STATUS_DADDR4,
-> +				    d_in->sin_addr.s_addr) ||
-> +		    nla_put_be16(skb, NFSD_ATTR_RPC_STATUS_SPORT,
-> +				 s_in->sin_port) ||
-> +		    nla_put_be16(skb, NFSD_ATTR_RPC_STATUS_DPORT,
-> +				 d_in->sin_port))
-> +			return -ENOBUFS;
-> +		break;
-> +	}
-> +	case AF_INET6: {
-> +		const struct sockaddr_in6 *s_in, *d_in;
-> +
-> +		s_in =3D (const struct sockaddr_in6 *)&rqstp->saddr;
-> +		d_in =3D (const struct sockaddr_in6 *)&rqstp->daddr;
-> +		if (nla_put_in6_addr(skb, NFSD_ATTR_RPC_STATUS_SADDR6,
-> +				     &s_in->sin6_addr) ||
-> +		    nla_put_in6_addr(skb, NFSD_ATTR_RPC_STATUS_DADDR6,
-> +				     &d_in->sin6_addr) ||
-> +		    nla_put_be16(skb, NFSD_ATTR_RPC_STATUS_SPORT,
-> +				 s_in->sin6_port) ||
-> +		    nla_put_be16(skb, NFSD_ATTR_RPC_STATUS_DPORT,
-> +				 d_in->sin6_port))
-> +			return -ENOBUFS;
-> +		break;
-> +	}
-> +	default:
-> +		break;
-> +	}
-> +
-> +	if (rqstp->opcnt) {
+Use devm_kasprintf() instead of hand writing it.
+This is less verbose and less error prone.
 
-It may be that we always have an opcount of 0 whenever we're running
-something besides NFSv4 COMPOUND, but it may be best not to count on
-that. I'd test for prog =3D=3D NFS_PROGRAM, vers =3D=3D 4, and that the pro=
-c =3D=3D
-COMPOUND and then for the opcnt.
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+---
+ drivers/net/ethernet/huawei/hinic/hinic_tx.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-> +		struct nlattr *attr;
-> +
-> +		attr =3D nla_nest_start(skb, NFSD_ATTR_RPC_STATUS_COMPOND_OP);
-> +		if (!attr)
-> +			return -ENOBUFS;
-> +
-> +		for (i =3D 0; i < rqstp->opcnt; i++) {
-> +			struct nlattr *op_attr;
-> +
-> +			op_attr =3D nla_nest_start(skb, i);
-> +			if (!op_attr)
-> +				return -ENOBUFS;
-> +
-> +			if (nla_put_u32(skb, NFSD_ATTR_RPC_STATUS_COMP_OP,
-> +					rqstp->opnum[i]))
-> +				return -ENOBUFS;
-> +
-> +			nla_nest_end(skb, op_attr);
-> +		}
-> +
-> +		nla_nest_end(skb, attr);
-> +	}
-> +
-> +	genlmsg_end(skb, hdr);
-> +
->  	return 0;
->  }
-> =20
->  int nfsd_server_nl_rpc_status_get_dumpit(struct sk_buff *skb,
->  					 struct netlink_callback *cb)
->  {
-> +	struct nfsd_net *nn =3D net_generic(sock_net(skb->sk), nfsd_net_id);
-> +	int i, ret, rqstp_index;
-> +
-> +	rcu_read_lock();
-> +
-> +	for (i =3D 0; i < nn->nfsd_serv->sv_nrpools; i++) {
-> +		struct svc_rqst *rqstp;
-> +
-> +		if (i < cb->args[0]) /* already consumed */
-> +			continue;
-> +
-> +		rqstp_index =3D 0;
-> +		list_for_each_entry_rcu(rqstp,
-> +				&nn->nfsd_serv->sv_pools[i].sp_all_threads,
-> +				rq_all) {
-> +			struct nfsd_genl_rqstp genl_rqstp;
-> +			unsigned int status_counter;
-> +
-> +			if (rqstp_index++ < cb->args[1]) /* already consumed */
-> +				continue;
-> +			/*
-> +			 * Acquire rq_status_counter before parsing the rqst
-> +			 * fields. rq_status_counter is set to an odd value in
-> +			 * order to notify the consumers the rqstp fields are
-> +			 * meaningful.
-> +			 */
-> +			status_counter =3D
-> +				smp_load_acquire(&rqstp->rq_status_counter);
-> +			if (!(status_counter & 1))
-> +				continue;
-> +
-> +			genl_rqstp.rq_xid =3D rqstp->rq_xid;
-> +			genl_rqstp.rq_flags =3D rqstp->rq_flags;
-> +			genl_rqstp.rq_vers =3D rqstp->rq_vers;
-> +			genl_rqstp.rq_prog =3D rqstp->rq_prog;
-> +			genl_rqstp.rq_proc =3D rqstp->rq_proc;
-> +			genl_rqstp.rq_stime =3D rqstp->rq_stime;
-> +			genl_rqstp.opcnt =3D 0;
-> +			memcpy(&genl_rqstp.daddr, svc_daddr(rqstp),
-> +			       sizeof(struct sockaddr));
-> +			memcpy(&genl_rqstp.saddr, svc_addr(rqstp),
-> +			       sizeof(struct sockaddr));
-> +
-> +#ifdef CONFIG_NFSD_V4
-> +			if (rqstp->rq_vers =3D=3D NFS4_VERSION &&
-> +			    rqstp->rq_proc =3D=3D NFSPROC4_COMPOUND) {
-> +				/* NFSv4 compund */
-> +				struct nfsd4_compoundargs *args;
-> +				int j;
-> +
-> +				args =3D rqstp->rq_argp;
-> +				genl_rqstp.opcnt =3D args->opcnt;
-> +				for (j =3D 0; j < genl_rqstp.opcnt; j++)
-> +					genl_rqstp.opnum[j] =3D
-> +						args->ops[j].opnum;
-> +			}
-> +#endif /* CONFIG_NFSD_V4 */
-> +
-> +			/*
-> +			 * Acquire rq_status_counter before reporting the rqst
-> +			 * fields to the user.
-> +			 */
-> +			if (smp_load_acquire(&rqstp->rq_status_counter) !=3D
-> +			    status_counter)
-> +				continue;
-> +
-> +			ret =3D nfsd_genl_rpc_status_compose_msg(skb, cb,
-> +							       &genl_rqstp);
-> +			if (ret)
-> +				goto out;
-> +		}
-> +	}
-> +
-> +	cb->args[0] =3D i;
-> +	cb->args[1] =3D rqstp_index;
-> +	ret =3D skb->len;
-> +out:
-> +	rcu_read_unlock();
-> +
-> +	return ret;
-> +}
-> +
-> +int nfsd_server_nl_rpc_status_get_done(struct netlink_callback *cb)
-> +{
-> +	mutex_lock(&nfsd_mutex);
-> +	nfsd_put(sock_net(cb->skb->sk));
-> +	mutex_unlock(&nfsd_mutex);
-> +
->  	return 0;
->  }
-> =20
-> @@ -1605,6 +1788,10 @@ static int __init init_nfsd(void)
->  	retval =3D register_filesystem(&nfsd_fs_type);
->  	if (retval)
->  		goto out_free_all;
-> +	retval =3D genl_register_family(&nfsd_server_nl_family);
-> +	if (retval)
-> +		goto out_free_all;
-> +
->  	return 0;
->  out_free_all:
->  	nfsd4_destroy_laundry_wq();
-> @@ -1629,6 +1816,7 @@ static int __init init_nfsd(void)
-> =20
->  static void __exit exit_nfsd(void)
->  {
-> +	genl_unregister_family(&nfsd_server_nl_family);
->  	unregister_filesystem(&nfsd_fs_type);
->  	nfsd4_destroy_laundry_wq();
->  	unregister_cld_notifier();
-> diff --git a/fs/nfsd/nfsd.h b/fs/nfsd/nfsd.h
-> index 11c14faa6c67..d787bd38c053 100644
-> --- a/fs/nfsd/nfsd.h
-> +++ b/fs/nfsd/nfsd.h
-> @@ -62,6 +62,22 @@ struct readdir_cd {
->  	__be32			err;	/* 0, nfserr, or nfserr_eof */
->  };
-> =20
-> +/* Maximum number of operations per session compound */
-> +#define NFSD_MAX_OPS_PER_COMPOUND	50
-> +
-> +struct nfsd_genl_rqstp {
-> +	struct sockaddr daddr;
-> +	struct sockaddr saddr;
-> +	unsigned long rq_flags;
-> +	ktime_t rq_stime;
-> +	__be32 rq_xid;
-> +	u32 rq_vers;
-> +	u32 rq_prog;
-> +	u32 rq_proc;
-> +	/* NFSv4 compund */
-> +	u32 opnum[NFSD_MAX_OPS_PER_COMPOUND];
-> +	u16 opcnt;
-> +};
-> =20
+diff --git a/drivers/net/ethernet/huawei/hinic/hinic_tx.c b/drivers/net/ethernet/huawei/hinic/hinic_tx.c
+index ad47ac51a139..9b60966736db 100644
+--- a/drivers/net/ethernet/huawei/hinic/hinic_tx.c
++++ b/drivers/net/ethernet/huawei/hinic/hinic_tx.c
+@@ -861,7 +861,7 @@ int hinic_init_txq(struct hinic_txq *txq, struct hinic_sq *sq,
+ 	struct hinic_qp *qp = container_of(sq, struct hinic_qp, sq);
+ 	struct hinic_dev *nic_dev = netdev_priv(netdev);
+ 	struct hinic_hwdev *hwdev = nic_dev->hwdev;
+-	int err, irqname_len;
++	int err;
+ 
+ 	txq->netdev = netdev;
+ 	txq->sq = sq;
+@@ -882,15 +882,13 @@ int hinic_init_txq(struct hinic_txq *txq, struct hinic_sq *sq,
+ 		goto err_alloc_free_sges;
+ 	}
+ 
+-	irqname_len = snprintf(NULL, 0, "%s_txq%d", netdev->name, qp->q_id) + 1;
+-	txq->irq_name = devm_kzalloc(&netdev->dev, irqname_len, GFP_KERNEL);
++	txq->irq_name = devm_kasprintf(&netdev->dev, GFP_KERNEL, "%s_txq%d",
++				       netdev->name, qp->q_id);
+ 	if (!txq->irq_name) {
+ 		err = -ENOMEM;
+ 		goto err_alloc_irqname;
+ 	}
+ 
+-	sprintf(txq->irq_name, "%s_txq%d", netdev->name, qp->q_id);
+-
+ 	err = hinic_hwdev_hw_ci_addr_set(hwdev, sq, CI_UPDATE_NO_PENDING,
+ 					 CI_UPDATE_NO_COALESC);
+ 	if (err)
+-- 
+2.34.1
 
-Again, I'm wondering, is there a way to pass down some sort context-
-specific value with netlink? It might be nice to make the two NFSv4
-specific fields into a union if that can be done with netlink.
-
->  extern struct svc_program	nfsd_program;
->  extern const struct svc_version	nfsd_version2, nfsd_version3, nfsd_versi=
-on4;
-> diff --git a/fs/nfsd/nfssvc.c b/fs/nfsd/nfssvc.c
-> index 1582af33e204..fad34a7325b3 100644
-> --- a/fs/nfsd/nfssvc.c
-> +++ b/fs/nfsd/nfssvc.c
-> @@ -998,6 +998,15 @@ int nfsd_dispatch(struct svc_rqst *rqstp)
->  	if (!proc->pc_decode(rqstp, &rqstp->rq_arg_stream))
->  		goto out_decode_err;
-> =20
-> +	/*
-> +	 * Release rq_status_counter setting it to an odd value after the rpc
-> +	 * request has been properly parsed. rq_status_counter is used to
-> +	 * notify the consumers if the rqstp fields are stable
-> +	 * (rq_status_counter is odd) or not meaningful (rq_status_counter
-> +	 * is even).
-> +	 */
-> +	smp_store_release(&rqstp->rq_status_counter, rqstp->rq_status_counter |=
- 1);
-> +
->  	rp =3D NULL;
->  	switch (nfsd_cache_lookup(rqstp, &rp)) {
->  	case RC_DOIT:
-> @@ -1015,6 +1024,12 @@ int nfsd_dispatch(struct svc_rqst *rqstp)
->  	if (!proc->pc_encode(rqstp, &rqstp->rq_res_stream))
->  		goto out_encode_err;
-> =20
-> +	/*
-> +	 * Release rq_status_counter setting it to an even value after the rpc
-> +	 * request has been properly processed.
-> +	 */
-> +	smp_store_release(&rqstp->rq_status_counter, rqstp->rq_status_counter +=
- 1);
-> +
->  	nfsd_cache_update(rqstp, rp, rqstp->rq_cachetype, statp + 1);
->  out_cached_reply:
->  	return 1;
-> diff --git a/fs/nfsd/state.h b/fs/nfsd/state.h
-> index cbddcf484dba..41bdc913fa71 100644
-> --- a/fs/nfsd/state.h
-> +++ b/fs/nfsd/state.h
-> @@ -174,8 +174,6 @@ static inline struct nfs4_delegation *delegstateid(st=
-ruct nfs4_stid *s)
-> =20
->  /* Maximum number of slots per session. 160 is useful for long haul TCP =
-*/
->  #define NFSD_MAX_SLOTS_PER_SESSION     160
-> -/* Maximum number of operations per session compound */
-> -#define NFSD_MAX_OPS_PER_COMPOUND	50
->  /* Maximum  session per slot cache size */
->  #define NFSD_SLOT_CACHE_SIZE		2048
->  /* Maximum number of NFSD_SLOT_CACHE_SIZE slots per session */
-> diff --git a/include/linux/sunrpc/svc.h b/include/linux/sunrpc/svc.h
-> index dbf5b21feafe..caa20defd255 100644
-> --- a/include/linux/sunrpc/svc.h
-> +++ b/include/linux/sunrpc/svc.h
-> @@ -251,6 +251,7 @@ struct svc_rqst {
->  						 * net namespace
->  						 */
->  	void **			rq_lease_breaker; /* The v4 client breaking a lease */
-> +	unsigned int		rq_status_counter; /* RPC processing counter */
->  };
-> =20
->  /* bits for rq_flags */
-
---=20
-Jeff Layton <jlayton@kernel.org>
 
