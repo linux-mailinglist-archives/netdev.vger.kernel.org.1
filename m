@@ -1,128 +1,174 @@
-Return-Path: <netdev+bounces-32789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7FE779A702
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 11:51:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FC2479A709
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 11:51:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D80BA1C20A04
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 09:51:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A3B228132E
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 09:51:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06D24C139;
-	Mon, 11 Sep 2023 09:50:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 267F9C154;
+	Mon, 11 Sep 2023 09:50:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE91DC131
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 09:50:53 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EE82E44
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 02:50:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694425852; x=1725961852;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=aeffaYIurTUmMJRqaKyoTRyPRno8JH6s95RpemK9j/s=;
-  b=dZ4w29Ho3oyltb4v2K0heINP0S8qA+d6QhZjXrqzk+RGJo47pQXtrPnp
-   o4SoFVeVUaqXKNwFNXsVEyPoAND5/p8hz8tHFkOXzyB6MkI4WgkZtMWjP
-   bi7/D0jv2wG1wJGMeYsFDHcc2UovWWRxTuh6pLc3Rkq/izM5TGmU9hZYD
-   bdJOwfdFe1JnuYbppcKu9RKwwZDTLlGLwQQ6xYc+x36gwxhjlWt0IlHI4
-   Mj3HrANGc+8G5Izw8xHGVUGb78QuEJFuc54KVIm5yx+UBeO4aaw3M8iOz
-   jrZ+sdJ714eQ7+GMthzS5xTxStwfCW8+anG8WSaX7jMU5A88oThxOVQuP
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10829"; a="377957108"
-X-IronPort-AV: E=Sophos;i="6.02,243,1688454000"; 
-   d="scan'208";a="377957108"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2023 02:50:44 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10829"; a="693032162"
-X-IronPort-AV: E=Sophos;i="6.02,243,1688454000"; 
-   d="scan'208";a="693032162"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by orsmga003.jf.intel.com with ESMTP; 11 Sep 2023 02:50:41 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1001)
-	id 30BF3988; Mon, 11 Sep 2023 12:50:39 +0300 (EEST)
-From: Mika Westerberg <mika.westerberg@linux.intel.com>
-To: Michael Jamet <michael.jamet@intel.com>,
-	Yehezkel Bernat <YehezkelShB@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alex Balcanquall <alex@alexbal.com>,
-	Mika Westerberg <mika.westerberg@linux.intel.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH] net: thunderbolt: Fix TCP/UDPv6 GSO checksum calculation
-Date: Mon, 11 Sep 2023 12:50:39 +0300
-Message-Id: <20230911095039.3611113-1-mika.westerberg@linux.intel.com>
-X-Mailer: git-send-email 2.40.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A934C2C7
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 09:50:57 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DF41ED;
+	Mon, 11 Sep 2023 02:50:56 -0700 (PDT)
+Received: from canpemm500006.china.huawei.com (unknown [172.30.72.54])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RkhhJ1BGZzNnL7;
+	Mon, 11 Sep 2023 17:47:12 +0800 (CST)
+Received: from [10.174.179.200] (10.174.179.200) by
+ canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Mon, 11 Sep 2023 17:50:54 +0800
+Subject: Re: [PATCH net v3] team: fix null-ptr-deref when team device type is
+ changed
+To: Hangbin Liu <liuhangbin@gmail.com>
+CC: <jiri@resnulli.us>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20230905081056.3365013-1-william.xuanziyang@huawei.com>
+ <ZP7Fdq1wgzzTftnE@Laptop-X1>
+From: "Ziyang Xuan (William)" <william.xuanziyang@huawei.com>
+Message-ID: <6cebaa19-bf09-173e-4f44-fae5f874895a@huawei.com>
+Date: Mon, 11 Sep 2023 17:50:53 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <ZP7Fdq1wgzzTftnE@Laptop-X1>
+Content-Type: text/plain; charset="gbk"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.179.200]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ canpemm500006.china.huawei.com (7.192.105.130)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Alex reported that running ssh over IPv6 does not work with
-Thunderbolt/USB4 networking driver. The reason for that is that driver
-should call skb_is_gso() before calling skb_is_gso_v6(), and it should
-not return false after calculates the checksum successfully. This probably
-was a copy paste error from the original driver where it was done
-properly.
+> Hi Ziyang,
+> 
+> You patch status is Changes Requested[1]. I think you need to repost this
+> patch.
+> 
+> [1] https://patchwork.kernel.org/project/netdevbpf/patch/20230905081056.3365013-1-william.xuanziyang@huawei.com/
+> 
+Thanks for reminding. Patch v4 is sent.
 
-While there add checksum calculation for UDPv6 GSO packets as well.
-
-Cc: stable@vger.kernel.org
-Reported-by: Alex Balcanquall <alex@alexbal.com>
-Signed-off-by: Mika Westerberg <mika.westerberg@linux.intel.com>
----
- drivers/net/thunderbolt/main.c | 21 +++++++++++++++------
- 1 file changed, 15 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/thunderbolt/main.c b/drivers/net/thunderbolt/main.c
-index 0c1e8970ee58..ba50a554478f 100644
---- a/drivers/net/thunderbolt/main.c
-+++ b/drivers/net/thunderbolt/main.c
-@@ -1049,12 +1049,21 @@ static bool tbnet_xmit_csum_and_map(struct tbnet *net, struct sk_buff *skb,
- 		*tucso = ~csum_tcpudp_magic(ip_hdr(skb)->saddr,
- 					    ip_hdr(skb)->daddr, 0,
- 					    ip_hdr(skb)->protocol, 0);
--	} else if (skb_is_gso_v6(skb)) {
--		tucso = dest + ((void *)&(tcp_hdr(skb)->check) - data);
--		*tucso = ~csum_ipv6_magic(&ipv6_hdr(skb)->saddr,
--					  &ipv6_hdr(skb)->daddr, 0,
--					  IPPROTO_TCP, 0);
--		return false;
-+	} else if (skb_is_gso(skb)) {
-+		if (skb_is_gso_v6(skb)) {
-+			tucso = dest + ((void *)&(tcp_hdr(skb)->check) - data);
-+			*tucso = ~csum_ipv6_magic(&ipv6_hdr(skb)->saddr,
-+						  &ipv6_hdr(skb)->daddr, 0,
-+						  IPPROTO_TCP, 0);
-+		} else if (protocol == htons(ETH_P_IPV6) &&
-+			   (skb_shinfo(skb)->gso_type & SKB_GSO_UDP)) {
-+			tucso = dest + ((void *)&(udp_hdr(skb)->check) - data);
-+			*tucso = ~csum_ipv6_magic(&ipv6_hdr(skb)->saddr,
-+						  &ipv6_hdr(skb)->daddr, 0,
-+						  IPPROTO_UDP, 0);
-+		} else {
-+			return false;
-+		}
- 	} else if (protocol == htons(ETH_P_IPV6)) {
- 		tucso = dest + skb_checksum_start_offset(skb) + skb->csum_offset;
- 		*tucso = ~csum_ipv6_magic(&ipv6_hdr(skb)->saddr,
--- 
-2.40.1
-
+> Thanks
+> Hangbin
+> On Tue, Sep 05, 2023 at 04:10:56PM +0800, Ziyang Xuan wrote:
+>> Get a null-ptr-deref bug as follows with reproducer [1].
+>>
+>> BUG: kernel NULL pointer dereference, address: 0000000000000228
+>> ...
+>> RIP: 0010:vlan_dev_hard_header+0x35/0x140 [8021q]
+>> ...
+>> Call Trace:
+>>  <TASK>
+>>  ? __die+0x24/0x70
+>>  ? page_fault_oops+0x82/0x150
+>>  ? exc_page_fault+0x69/0x150
+>>  ? asm_exc_page_fault+0x26/0x30
+>>  ? vlan_dev_hard_header+0x35/0x140 [8021q]
+>>  ? vlan_dev_hard_header+0x8e/0x140 [8021q]
+>>  neigh_connected_output+0xb2/0x100
+>>  ip6_finish_output2+0x1cb/0x520
+>>  ? nf_hook_slow+0x43/0xc0
+>>  ? ip6_mtu+0x46/0x80
+>>  ip6_finish_output+0x2a/0xb0
+>>  mld_sendpack+0x18f/0x250
+>>  mld_ifc_work+0x39/0x160
+>>  process_one_work+0x1e6/0x3f0
+>>  worker_thread+0x4d/0x2f0
+>>  ? __pfx_worker_thread+0x10/0x10
+>>  kthread+0xe5/0x120
+>>  ? __pfx_kthread+0x10/0x10
+>>  ret_from_fork+0x34/0x50
+>>  ? __pfx_kthread+0x10/0x10
+>>  ret_from_fork_asm+0x1b/0x30
+>>
+>> [1]
+>> $ teamd -t team0 -d -c '{"runner": {"name": "loadbalance"}}'
+>> $ ip link add name t-dummy type dummy
+>> $ ip link add link t-dummy name t-dummy.100 type vlan id 100
+>> $ ip link add name t-nlmon type nlmon
+>> $ ip link set t-nlmon master team0
+>> $ ip link set t-nlmon nomaster
+>> $ ip link set t-dummy up
+>> $ ip link set team0 up
+>> $ ip link set t-dummy.100 down
+>> $ ip link set t-dummy.100 master team0
+>>
+>> When enslave a vlan device to team device and team device type is changed
+>> from non-ether to ether, header_ops of team device is changed to
+>> vlan_header_ops. That is incorrect and will trigger null-ptr-deref
+>> for vlan->real_dev in vlan_dev_hard_header() because team device is not
+>> a vlan device.
+>>
+>> Assign eth_header_ops to header_ops of team device when its type is changed
+>> from non-ether to ether to fix the bug.
+>>
+>> Fixes: 1d76efe1577b ("team: add support for non-ethernet devices")
+>> Suggested-by: Hangbin Liu <liuhangbin@gmail.com>
+>> Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
+>> ---
+>> v3:
+>>   - Export eth_header_ops to fix modpost error.
+>> v2:
+>>   - Just modify header_ops to eth_header_ops not use ether_setup().
+>> ---
+>>  drivers/net/team/team.c | 5 ++++-
+>>  net/ethernet/eth.c      | 1 +
+>>  2 files changed, 5 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/net/team/team.c b/drivers/net/team/team.c
+>> index d3dc22509ea5..12fb5f4cff06 100644
+>> --- a/drivers/net/team/team.c
+>> +++ b/drivers/net/team/team.c
+>> @@ -2127,7 +2127,10 @@ static const struct ethtool_ops team_ethtool_ops = {
+>>  static void team_setup_by_port(struct net_device *dev,
+>>  			       struct net_device *port_dev)
+>>  {
+>> -	dev->header_ops	= port_dev->header_ops;
+>> +	if (port_dev->type == ARPHRD_ETHER)
+>> +		dev->header_ops	= &eth_header_ops;
+>> +	else
+>> +		dev->header_ops	= port_dev->header_ops;
+>>  	dev->type = port_dev->type;
+>>  	dev->hard_header_len = port_dev->hard_header_len;
+>>  	dev->needed_headroom = port_dev->needed_headroom;
+>> diff --git a/net/ethernet/eth.c b/net/ethernet/eth.c
+>> index 2edc8b796a4e..157833509adb 100644
+>> --- a/net/ethernet/eth.c
+>> +++ b/net/ethernet/eth.c
+>> @@ -347,6 +347,7 @@ const struct header_ops eth_header_ops ____cacheline_aligned = {
+>>  	.cache_update	= eth_header_cache_update,
+>>  	.parse_protocol	= eth_header_parse_protocol,
+>>  };
+>> +EXPORT_SYMBOL(eth_header_ops);
+>>  
+>>  /**
+>>   * ether_setup - setup Ethernet network device
+>> -- 
+>> 2.25.1
+>>
+> 
+> .
+> 
 
