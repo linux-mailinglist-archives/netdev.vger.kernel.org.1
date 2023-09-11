@@ -1,213 +1,190 @@
-Return-Path: <netdev+bounces-32982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FADA79C1A6
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 03:28:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52BE079C13F
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 02:44:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1EF42813FB
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 01:28:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BD9D28162B
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 00:44:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8479417E8;
-	Tue, 12 Sep 2023 01:28:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F1E71C04;
+	Tue, 12 Sep 2023 00:43:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 716FA1382
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 01:28:52 +0000 (UTC)
-Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F1C61B470F;
-	Mon, 11 Sep 2023 18:28:51 -0700 (PDT)
-Received: from pps.filterd (m0150244.ppops.net [127.0.0.1])
-	by mx0b-002e3701.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38BIOcVr029738;
-	Mon, 11 Sep 2023 21:13:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
- : date : message-id : references : in-reply-to : content-type : content-id
- : content-transfer-encoding : mime-version; s=pps0720;
- bh=BuAVc2HOCGp25QCta9Ohq8WIcaILQhb4U694dmymVnI=;
- b=NtWNHqpqX0r8o0lHaQV5NXm3ZHaaijNHo1uYR0eL677dPLTwIHnwuJfbQUo5KQMFgxs6
- /i6vmZbIBF7TT7oO4brKxDAc4f0VS6cDp11x2RL8D/VjGKBiyKZ4izO423SCDkCTeB2M
- KxRjyeBxvesX48R+4pAsHbzaItayaiTOY5w1jmo+wD0w8dy8BU0f7VwxFq+gfWnreK6l
- W1CZhbmvLLR0mgmA0QTOErRPgqkDGpWKvZGGg6Lh4TYPG+GQC15m4hOW9PDAkh3jrbOc
- MwQ9Ds7WzYjZqb0hEmehkDtorHZ8qVz0VP45MJ5IhGEUIFjVHt/iY1qOwJshfrmYEzD6 Eg== 
-Received: from p1lg14881.it.hpe.com ([16.230.97.202])
-	by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3t21eywe4q-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 11 Sep 2023 21:13:01 +0000
-Received: from p1wg14924.americas.hpqcorp.net (unknown [10.119.18.113])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by p1lg14881.it.hpe.com (Postfix) with ESMTPS id BDC1D805E5F;
-	Mon, 11 Sep 2023 21:12:57 +0000 (UTC)
-Received: from p1wg14924.americas.hpqcorp.net (10.119.18.113) by
- p1wg14924.americas.hpqcorp.net (10.119.18.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.42; Mon, 11 Sep 2023 09:12:57 -1200
-Received: from p1wg14919.americas.hpqcorp.net (16.230.19.122) by
- p1wg14924.americas.hpqcorp.net (10.119.18.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.42
- via Frontend Transport; Mon, 11 Sep 2023 09:12:57 -1200
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (192.58.206.35)
- by edge.it.hpe.com (16.230.19.122) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.42; Mon, 11 Sep 2023 09:12:57 -1200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F04F917FC
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 00:43:18 +0000 (UTC)
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on20616.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe59::616])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33778172FA3
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 17:11:41 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AIVWvzScNBVTk4TmQ59HKSPelQtBLsoB74ICU96dsbcalEUKQNuXMQj8ldw8eoJXEfezxYLrxWej7d30CTAnlT/WJ6OA51u2N1QOR30FQ+AAvP/peOUOdZHMF9ZNwTmTwK1KGzRrjKUww0ctgXDKfhNm/HQQF5x/ugKsugZBVA8EZlkzImetriYCI5HY8biZyXS3y8LzLjw9Buvtd624ZBBVEk0lu27CW9yhCByWMWFXstOYxLbMqbX7epo86CHYEfRAdyHWD7y/jaqU/CCwqG1wJeQErIN3gJ7NfJK7uicP/z9s7T6aZP0MohA6NPo3b3udeTl27zvqT3N9YOQG6g==
+ b=BixUlfvJW0ufmE4o6cKgjF/GmV6OcvGzs0dPvDMFmTpjngCLXD3Q8v+BJ7UEcIWzNDROV469QrTBKAx4KH1palFhVCkh/8yE2JTtwfOJ8d+4+Hup1SKFMijBJSuSs6IT3RCV7crTZMeE6d5aBNhC2lMC2iza750MDEaJaCTowewhJ5ggQscAvfF/EbgQikTFtDI7wbSNrh9+0xZILI8P5NelhdO3P5qyNz5sAEHNQkIG6TAAGPIC+S8oX5r0u6BlJ8p7SUT9Fpu7W4AngB8lSMspX7TPrWs675aACO53LTEvR26mqRNie7H+3Hr2vP83lq7BBp+bUxGnvBF9Tiv0lQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BuAVc2HOCGp25QCta9Ohq8WIcaILQhb4U694dmymVnI=;
- b=WxC77qYjgEcGoEqpG1wShZN/cFgaTdxnfl90lEDXKyVb1m7Vt+J+/JGIqkvkDyKuQ5gM3QiXTy0TFXwdxx5yyKy+zOesGqcsZdQIt/2YUXpLqI5qOFei7LCmEDpT6zT911tajBQjsag72iUyVNjEWGfrc3+5mCvtCKx5kBHuWRZiOqiBAhEcxqHBFruXWJZKDbBBJhVxRbCA7NNh2Pduxnt9R+Y4vuEqMqTk8cb+KMqo9i+9BddGRIvnbJqTozOcKmcijj3MSPCW+4Bo+6vkt4FHnNNZ1QdRabxCVXARwnrP6eI62c7RxdYegGYtzXxYtar8YM5JtILDESv9bsDFjA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=hpe.com; dmarc=pass action=none header.from=hpe.com; dkim=pass
- header.d=hpe.com; arc=none
-Received: from DM4PR84MB1927.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:8:4e::10) by
- PH7PR84MB1510.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:510:151::11) with
+ bh=Mkfu1o04vCr8kvLFl2xTueC5ioaW4YOYTn00cIw5cyU=;
+ b=WtX/VXwGl7PQ1h5b2WK8fTjEjOj+EHri7pOMBmiA1XH7EI9uLHJpuVq+A8GTrz7rogGwbBNUZWvRR1v5dZ42HJYoiY9ChFy1Ej5Vh744WHeDmlfVkK9NRv+MH0RljxEBF5a9VJoMApXy5jKpKlXjOCEKmuVZmtuNIk7jNHwqkjRXpwxwgOfu1o0ksqQyZ878BVTtvKrEifByhXARc9VCelvQHwAuNbnb2HS/WWR7XnqYuVevkTwwnnpuYrj7/1R0eoiztqQxPNIFhwtbdyFS23yKWa3npVNDvddpLv7mBf8fFWbPs8Gt44lOOEuLttanoyIB9UjLdUxtNbS6uA1QwA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Mkfu1o04vCr8kvLFl2xTueC5ioaW4YOYTn00cIw5cyU=;
+ b=f3hwnXvKZug0wXkdtvwRQuB5pkVju6s9UCxw57NhdDn38cJTxriTjtYLDpyj8+m2kAaCtmsT+oR9ReZkq+dI48CYKq4fJFHnWI/+LHabUeuVPJfuPVz3zRwkd7bN2+X//s5xajzUUX3hjly5VMb3zb/SdTA7/3WE9u41t6UFPhQ=
+Received: from MW4PR04CA0194.namprd04.prod.outlook.com (2603:10b6:303:86::19)
+ by SJ2PR12MB8063.namprd12.prod.outlook.com (2603:10b6:a03:4d1::17) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.35; Mon, 11 Sep
- 2023 21:12:55 +0000
-Received: from DM4PR84MB1927.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::20b7:769e:3974:f17e]) by DM4PR84MB1927.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::20b7:769e:3974:f17e%4]) with mapi id 15.20.6768.029; Mon, 11 Sep 2023
- 21:12:54 +0000
-From: "Hawkins, Nick" <nick.hawkins@hpe.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "christophe.jaillet@wanadoo.fr" <christophe.jaillet@wanadoo.fr>,
-        "simon.horman@corigine.com" <simon.horman@corigine.com>,
-        "Verdun, Jean-Marie"
-	<verdun@hpe.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "kuba@kernel.org"
-	<kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "robh+dt@kernel.org" <robh+dt@kernel.org>,
-        "krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
-        "conor+dt@kernel.org" <conor+dt@kernel.org>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v3 4/5] net: hpe: Add GXP UMAC Driver
-Thread-Topic: [PATCH v3 4/5] net: hpe: Add GXP UMAC Driver
-Thread-Index: AQHZ0Ixvto7vnAASrEiTAeghAafYu6/tuDUAgAJzHICAAGX0gIAFz7wAgABkmgCABKKvcIAOvqCAgAvNn4A=
-Date: Mon, 11 Sep 2023 21:12:54 +0000
-Message-ID: <3DB6DD63-C8AB-4009-8AF8-79290054AC5C@hpe.com>
-References: <20230816215220.114118-1-nick.hawkins@hpe.com>
- <20230816215220.114118-5-nick.hawkins@hpe.com>
- <01e96219-4f0c-4259-9398-bc2e6bc1794f@lunn.ch>
- <88B3833C-19FB-4E4C-A398-E7EF3143ED02@hpe.com>
- <1b8058e1-6e7f-4a4a-a191-09a9b8010e0a@lunn.ch>
- <CF9BD927-B788-4554-B246-D5CC6D06258F@hpe.com>
- <befbee5a-7b11-4948-a837-6311dd4d7276@lunn.ch>
- <DM4PR84MB1927E85827B5450F1952E58A88E3A@DM4PR84MB1927.NAMPRD84.PROD.OUTLOOK.COM>
- <729dcda6-2d2c-4054-a570-17cdf6e4e57b@lunn.ch>
-In-Reply-To: <729dcda6-2d2c-4054-a570-17cdf6e4e57b@lunn.ch>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Microsoft-MacOutlook/16.76.23082700
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM4PR84MB1927:EE_|PH7PR84MB1510:EE_
-x-ms-office365-filtering-correlation-id: f748c2c3-0aaf-4e54-3b61-08dbb30bdd81
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ENYm97tm+JzNMDnsXrF1veZH8jI1aokCDbzTDH/CdiTP3MwWvEIOtEP1MpoDZkOsUgTBOT/apI/o32Y32V0IF9DDJvi3AjEPYv8wR+9g2G1OTHm9u4Nq576XEUHC9/PdidBru9gajB0dHjhBsrPJfcg0peFvnS4CsOs0swR9zxTwTj5Mfi0HD6t+z9Np/G/1OXw6eNdehh4UcuHqnqATz8VktgBQO6GLuBUB1Ue/cmj7+0h8AFIJRaLyUxKMyXiFhpJi2pHru9axcEU+44qj7W6x51ui05PscvjnGzfwHkz6exFsYMWZemTLC++GX+d83KCrz6QDHESp/Dv9Yeq+0f5ya8H0smrwPs4lpUEWc9+9PLz5WQtVPF4Ds77yJphsQASwGZf/ps5KpI4+GVW+uVEidMNr7f+pMQDY7wK9QmC8RybvfU+msZNp1XgtlM1eJomsGpOWalU3y+/aE58qWa8YW9fLMxBLld0VPMSBGrWTU2+hQUyUbm5gCVMY/spl8Tida+mkxJ44x4lSLNAjZ7q84TKi1V+0BfAnDFZb9eB/4cOPGW39OzJkkBfc6dPfmZGlrc6oB42s05mmGKcNYjDVlwcpZH3TYIHqib/BSurOZj8syed3W2bjmOcpcvxxTpZPNDeMqcPBBnMYbSWfCA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR84MB1927.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(366004)(376002)(136003)(396003)(39860400002)(346002)(1800799009)(451199024)(186009)(5660300002)(64756008)(54906003)(66446008)(41300700001)(4326008)(8676002)(8936002)(66476007)(6916009)(66946007)(316002)(66556008)(91956017)(76116006)(122000001)(478600001)(36756003)(71200400001)(2616005)(33656002)(7416002)(6486002)(6506007)(2906002)(86362001)(82960400001)(38070700005)(38100700002)(6512007)(45980500001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?Q1RVR0xjWTdPU1BQT2Z5Vkxza1lldy9EVmJ0bERjVElSMnZCSmZ5a0tockxH?=
- =?utf-8?B?UkxOZ1NqdjhZUlRFNWI0dzlZSG81R1BOaFEvZmo3MmFqclVtbW51aDFlMHpJ?=
- =?utf-8?B?MFRzcXgvN1AwNm41eHVHQWlGcVV3bE9NUXhSMnpSZTM5OVExOStQSk04ZENV?=
- =?utf-8?B?SlhiWHp1eGw2UVgraXVVWm9jWWhRWW9ZRFlqWkIyZ056dTN3dFZlbXZjcjBr?=
- =?utf-8?B?eGx3TVJwT0JpNVFPYVE1SGNwNUJBN3FHcnZaa2s1Z2xrR0tXYldSMlV2TzU5?=
- =?utf-8?B?Q3E3YytRNGR3TkREOWIwNHVWN3FpdVZIeHhLRDlqSmJKQk4vMTZ3NWVUT2Y0?=
- =?utf-8?B?MFErTDd1SkhCcTZ3L0puR0dxYmxIT01nVTZKeE9TOXEyMFF6Z1JxaDRwTVgx?=
- =?utf-8?B?bmQ3WXhIZGFpdmYzVTlzTDZ0Z2xvMm1DYUFGbnFlS1ZsM0Z3VXRtTUtFa0VR?=
- =?utf-8?B?L2JqYUpsbUxhckdZSDk5V3VRK2xITk9yUHUzMXY0T29WRThWTHNzN2lqcU9P?=
- =?utf-8?B?aloxRnBYNnJ5MEZrWGJ5S3gzY21IanYrMnhnVWhLeWtFZ2I3WTFUVG1YWnNS?=
- =?utf-8?B?SFNic2xucDJBU2VKc2VaMEw4eEc4ZzB2LzdZRmdNWWh2SnlKNWVYNSt3U2Zm?=
- =?utf-8?B?RkV3WERYUmloTlExajFOUTQxYnRNMGRSeVgyL1NMa0VkcTBORENqNUhYZ1NN?=
- =?utf-8?B?bTB6QnFIcVplbzBiL2ZKTldiN0IrNHRZQVo1Szl2K1d6NTFxVVd3alNyNWNF?=
- =?utf-8?B?b3VLSmRlOUpiVHV1VTZZSEpINlFVM3phNVdZU1NKR0hwdWVKRGtlc0hZM1Nt?=
- =?utf-8?B?Qkl3QU1MZFNsTGc1cktVbUtpUXJTVDVaZWppR2gyZHd0eDN1OFJjWDRycnov?=
- =?utf-8?B?dGNJcnNDSkVUT3RCSlRheXRJUEVXdUQzcGR1T2Z1MkN5QXVnZHVPcnRVZHpQ?=
- =?utf-8?B?alNVeEdpS3lISVZ1WkJ4bVIvQUl5NSt1KzRpUDNhdW5PRzdjSlBRZDZSa29v?=
- =?utf-8?B?K3poQVI2Ym1wdSs0Mk1WZ1NyYitwVGE2SWVBcmJlVGxqek1kV29ZUGNJN1R0?=
- =?utf-8?B?VGg3R3laTmlqMHdUL0F3dGJKSmQ3bUZEVHUxTUhJaU80bXJJMFZLdEQxdElV?=
- =?utf-8?B?Qkx1ZksrWUxQU1pJUnpSSDBicUNidUg1aEo2aEQwK0svT1JsZWR2TkYxUTdK?=
- =?utf-8?B?SnVQVll6Q0xERmQ0WnJQM0VGa25hbVc0NS8ycDdCZnFyR2dONGRFRjBMUEhv?=
- =?utf-8?B?bTZpenlINXlvTm9ITGhPOWlud3dNclRKeStZNkhqQjAxcnlxQzcvVmlSS3Az?=
- =?utf-8?B?NzNqcjJsK2NGUGdPWTZtZjdicTVjbGMwRkxySElLcHdlNktqQThZM3dUanJY?=
- =?utf-8?B?NU1iVEhGczF1TldQTFpuSjU1Z3p1N1cyOG4rK0VvcFJvRFpybGx4c1JiZU9u?=
- =?utf-8?B?ZEVCaEYwMlpHcXJjbmZEUW5vMzZKQmZpaFkwVC9TdWxmWGRuRWVQNkRISkZB?=
- =?utf-8?B?UmR0bGdta2xnc3BzU3ZKVXhQZFBwNmZnMUxWL0NBVEhjUkZ0aUxnV3V3aTYw?=
- =?utf-8?B?dzgwNnE2VDVoYnpuUlFHcXpWVVlFejNsQ2s3R2hVMTNNR0h0Y0VsdllqSFR6?=
- =?utf-8?B?ZTVsTkc1ME1xZzhQRU1HZS9FZ1hBM0dPdXo4M0syaXhRMk5Ec3BSYWdMcDll?=
- =?utf-8?B?ZHJkalk0d1dCNXNYMm1ONCtuTnNUb2dkU3VoeTM4Vnl3c0Y0UE40aE5lQ2Rw?=
- =?utf-8?B?anNUUmtXb3ZpZUEyRFYrenQ2clRqelNiMjIrbUtzemRIY2orRkRON0JWZkQr?=
- =?utf-8?B?MU9zTWZTdXZhWUpNZXpKdHFTUWk1ZEtlME9FZm1LV1BKRTJOZklnSXM2dU1w?=
- =?utf-8?B?djdYc25ZU2hYMnQ5WmY2aXFkTW1YVEZpcmpPSyszaUtqYXp2N3ZsTm5vN0tU?=
- =?utf-8?B?VjZCdTFFZis5K0gzdG02RE1pSG9SZkVML3hONzF6UmVNQ2JWQXNIZk8wZ1F4?=
- =?utf-8?B?RitlajRTaE1zVUxaMElkSkJRbGcxL3BTVENtZE44MktER3lZL0VJS1U4Yk51?=
- =?utf-8?B?Tk1RYmdPdVpReFM3RDdZNmZ1TXdkbEc0R0VsQlRpbkk2cUlCZjkwWTRXQTZn?=
- =?utf-8?B?Tm5NSWdWY0NIZE9kZXRVaERWMnh6U2Q4aHZSWnQ1eEtvVDJGZUlaYzdFRk9S?=
- =?utf-8?B?aEE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <07F20AC5ADBEC54882DCA75D5A39E07D@NAMPRD84.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: base64
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.31; Mon, 11 Sep
+ 2023 21:31:27 +0000
+Received: from CO1PEPF000044F8.namprd21.prod.outlook.com
+ (2603:10b6:303:86:cafe::f4) by MW4PR04CA0194.outlook.office365.com
+ (2603:10b6:303:86::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.35 via Frontend
+ Transport; Mon, 11 Sep 2023 21:31:27 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CO1PEPF000044F8.mail.protection.outlook.com (10.167.241.198) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6792.1 via Frontend Transport; Mon, 11 Sep 2023 21:31:27 +0000
+Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 11 Sep
+ 2023 16:31:25 -0500
+From: Shannon Nelson <shannon.nelson@amd.com>
+To: <kuba@kernel.org>, <davem@davemloft.net>, <jasowang@redhat.com>,
+	<mst@redhat.com>, <virtualization@lists.linux-foundation.org>,
+	<shannon.nelson@amd.com>, <brett.creeley@amd.com>, <netdev@vger.kernel.org>
+CC: <simon.horman@corigine.com>, <eperezma@redhat.com>, <drivers@pensando.io>
+Subject: [PATCH net-next] virtio: kdoc for struct virtio_pci_modern_device
+Date: Mon, 11 Sep 2023 14:31:04 -0700
+Message-ID: <20230911213104.14391-1-shannon.nelson@amd.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR84MB1927.NAMPRD84.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: f748c2c3-0aaf-4e54-3b61-08dbb30bdd81
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Sep 2023 21:12:54.4720
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044F8:EE_|SJ2PR12MB8063:EE_
+X-MS-Office365-Filtering-Correlation-Id: c240b2d0-4c49-4c28-d77f-08dbb30e74e0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	iqsnC0hVH3yrfx+tQ/NPp4cQomv/MkQx+9sf2KdiC+cbpkJNnTtouIXqbHVAZt4u6xW5A5miOdkrapUlGfimypvH1xzqmioOlQfTJZypvbnjvrZv0RI2tjWlMVG5Z+SFUOID8oOabVH4XM+QtEZz6kSOWvsfNCeObsYM/zXb10lHfXPUzgZErwZlUFBZiLtJJjsxs59XZoktIVOR8op397s+o9ARYCVh2u9hNTk7YxvGrEFubtbZOrUnGUFWFltcHw/0rXkwaKP0XCOUEGg5ziks8q2e5OUBxIT9SEV3v+KSZbNU+jcnS1Iu7FAeUIv0fRpv8aAEz8+SP9qpzSJeyyzmWtp7Vwe++/4deS2+xLRK3bs++UdotO6FkFjHDgkT/VCr1wb307rfFqPDFTwfZijVUZ8CELygHU/SWkjQ+2+Mkxgu5tIwyeMFmlQzbJnz5bl+LRXg4GrmBkz25lwiOanxueJS+UcEJyDWbjSjc6UHn+eN3Qh9OhpSXET96oWAsO3hMKqDm0DG3vmswKtmFIBbUAJC8hAPvKR+8RCD6hhDKhaPaumTYDBlKg6buCzGo0zgiGfbrYZbF2c7u2hsNRnEDmcHAtr/svusUqTdsmiEFjoC9wFBfNXQbAtHXRIR7VHSlB9ifGeAcAGbFwXWHCNLSOBG3eDkHhPymZrKOgmSXjZBg2IFRLPlPn18NnJiwnYGzaWL0p/dwclwVU8vXkE7+5BR5Q9Gb3oU6SwaKKuIDpqAAUOIaD/LUp7zkjBWLITJCeV7wdfqqjiYMstp4w==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(396003)(376002)(136003)(346002)(82310400011)(186009)(1800799009)(451199024)(36840700001)(40470700004)(46966006)(426003)(40460700003)(2906002)(336012)(83380400001)(1076003)(16526019)(26005)(36860700001)(66574015)(5660300002)(6666004)(2616005)(8676002)(47076005)(54906003)(316002)(4326008)(70206006)(110136005)(8936002)(44832011)(70586007)(41300700001)(478600001)(966005)(82740400003)(81166007)(356005)(36756003)(86362001)(40480700001)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Sep 2023 21:31:27.3457
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 105b2061-b669-4b31-92ac-24d304d195dc
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 1Jt4DOw/H5J6MX/Pa6HaLQPqjRxB7D5HT1lGZjgWY7gt4r8V7TDLLikIm6U7fKl3aWuqgyxoV0YAtx+2y2q/Ew==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR84MB1510
-X-OriginatorOrg: hpe.com
-X-Proofpoint-ORIG-GUID: 6d6DOpJOC_NqLeoy-PKjDpbfi_7-uL_9
-X-Proofpoint-GUID: 6d6DOpJOC_NqLeoy-PKjDpbfi_7-uL_9
-X-HPE-SCL: -1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-09-11_16,2023-09-05_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- clxscore=1011 suspectscore=0 adultscore=0 spamscore=0 bulkscore=0
- mlxscore=0 impostorscore=0 priorityscore=1501 phishscore=0 malwarescore=0
- mlxlogscore=876 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2308100000 definitions=main-2309110195
+X-MS-Exchange-CrossTenant-Network-Message-Id: c240b2d0-4c49-4c28-d77f-08dbb30e74e0
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000044F8.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8063
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_NONE autolearn=no
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-DQo+ID4gSSBoYXZlIGJlZW4gdHJ5aW5nIHRvIGZpZ3VyZSBvdXQgaG93IGV4YWN0bHkgSSBjYW4g
-dHJhbnNsYXRlIHRoZSBjdXJyZW50IGNvZGUNCj4gPiBvdmVyIHRvIHVzaW5nIHRoZSBwYWdlIHBv
-b2wgYXBpIG92ZXIgdGhlIHBhc3Qgd2Vlay4gSXQgc2VlbXMgbGlrZSBpdCBpcyBxdWlldA0KPiA+
-IGEgY29tcGxleCBjaGFuZ2UuIEFzIHRoZSBkcml2ZXIgc2VlbXMgdG8gYmUga2VlcGluZyB1cCB3
-aXRoIG91cg0KPiA+IHBlcmZvcm1hbmNlIHJlcXVpcmVtZW50cyB3b3VsZCBpdCBiZSBhY2NlcHRh
-YmxlIHRvIG1hcmsgdGhpcyBhcyBhDQoNCg0KPiBJdHMgbm90IGp1c3QgcGVyZm9ybWFuY2UuIFVz
-aW5nIHdlbGwgZGVidWdnZWQgYW5kIHNoYXJlZCBjb3JlIGNvZGUNCj4gbWVhbnMgbGVzcyBidWdz
-IGluIHlvdXIgZHJpdmVyLiBJdCBtYWtlcyBtYWludGVuYW5jZSBzaW1wbGVyIHNpbmNlDQo+IHRo
-ZXJlIGFyZSBtb3JlIHBlb3BsZSB3aG8gdW5kZXJzdGFuZCB0aGUgcGFnZSBwb29sIGNvZGUgdGhh
-biB3aGF0IHlvdQ0KPiBoYXZlIGluIHlvdXIgZHJpdmVyIGFuZCBpdCBtYWtlcyB5b3VyIGRyaXZl
-ciBtb3JlIGxpa2Ugb3RoZXIgZHJpdmVycy4NCg0KDQo+IFNvIG92ZXJhbGwgeW91IHdpbGwgZW5k
-IHVwIHdpdGggYSBiZXR0ZXIgcXVhbGl0eSBkcml2ZXIgYnkgYWRhcHRpbmcNCj4gdGhlIHBhZ2Ug
-cG9vbCBjb2RlLg0KDQpHcmVldGluZ3MgQW5kcmV3LA0KDQpJbiB0aGF0IGNhc2UgSSB3aWxsIGNv
-bnRpbnVlIHRvIGF0dGVtcHQgdG8gdHJ5IGFuZCBhZG9wdCB0aGUgcGFnZSBwb29sDQpBUEkuIElu
-IGFsbCB0aGUgZXhhbXBsZXMgd2l0aCBwYWdlIHBvb2wgSFcgcmluZ3MgaXQgYXBwZWFycyB0aGV5
-IGFyZQ0KdXNpbmcgYWxsb2NfZXRoZXJkZXZfbXFzLiBBcmUgdGhlcmUgYW55IEhXIHJlcXVpcmVt
-ZW50cyB0byB1c2UgdGhpcw0KbGlicmFyeT8gSWYgdGhlcmUgYXJlIG5vbmUgd2hhdCBpcyB0aGUg
-dHlwaWNhbCBudW1iZXIgZm9yIHJ4IGFuZCB0eA0KcXVldWVzPw0KDQpUaGFuayB5b3UgZm9yIHRo
-ZSBhc3Npc3RhbmNlLA0KDQotTmljayBIYXdraW5zDQoNCg0KDQo=
+Finally following up to Simon's suggestion for some kdoc attention
+on struct virtio_pci_modern_device.
+
+Link: https://lore.kernel.org/netdev/ZE%2FQS0lnUvxFacjf@corigine.com/
+Cc: Simon Horman <simon.horman@corigine.com>
+Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+Acked-by: Eugenio Pérez <eperezma@redhat.com>
+---
+ include/linux/virtio_pci_modern.h | 34 ++++++++++++++++++++-----------
+ 1 file changed, 22 insertions(+), 12 deletions(-)
+
+diff --git a/include/linux/virtio_pci_modern.h b/include/linux/virtio_pci_modern.h
+index 067ac1d789bc..a38c729d1973 100644
+--- a/include/linux/virtio_pci_modern.h
++++ b/include/linux/virtio_pci_modern.h
+@@ -12,37 +12,47 @@ struct virtio_pci_modern_common_cfg {
+ 	__le16 queue_reset;		/* read-write */
+ };
+ 
++/**
++ * struct virtio_pci_modern_device - info for modern PCI virtio
++ * @pci_dev:	    Ptr to the PCI device struct
++ * @common:	    Position of the common capability in the PCI config
++ * @device:	    Device-specific data (non-legacy mode)
++ * @notify_base:    Base of vq notifications (non-legacy mode)
++ * @notify_pa:	    Physical base of vq notifications
++ * @isr:	    Where to read and clear interrupt
++ * @notify_len:	    So we can sanity-check accesses
++ * @device_len:	    So we can sanity-check accesses
++ * @notify_map_cap: Capability for when we need to map notifications per-vq
++ * @notify_offset_multiplier: Multiply queue_notify_off by this value
++ *                            (non-legacy mode).
++ * @modern_bars:    Bitmask of BARs
++ * @id:		    Device and vendor id
++ * @device_id_check: Callback defined before vp_modern_probe() to be used to
++ *		    verify the PCI device is a vendor's expected device rather
++ *		    than the standard virtio PCI device
++ *		    Returns the found device id or ERRNO
++ * @dma_mask:	    Optional mask instead of the traditional DMA_BIT_MASK(64),
++ *		    for vendor devices with DMA space address limitations
++ */
+ struct virtio_pci_modern_device {
+ 	struct pci_dev *pci_dev;
+ 
+ 	struct virtio_pci_common_cfg __iomem *common;
+-	/* Device-specific data (non-legacy mode)  */
+ 	void __iomem *device;
+-	/* Base of vq notifications (non-legacy mode). */
+ 	void __iomem *notify_base;
+-	/* Physical base of vq notifications */
+ 	resource_size_t notify_pa;
+-	/* Where to read and clear interrupt */
+ 	u8 __iomem *isr;
+ 
+-	/* So we can sanity-check accesses. */
+ 	size_t notify_len;
+ 	size_t device_len;
+ 
+-	/* Capability for when we need to map notifications per-vq. */
+ 	int notify_map_cap;
+ 
+-	/* Multiply queue_notify_off by this value. (non-legacy mode). */
+ 	u32 notify_offset_multiplier;
+-
+ 	int modern_bars;
+-
+ 	struct virtio_device_id id;
+ 
+-	/* optional check for vendor virtio device, returns dev_id or -ERRNO */
+ 	int (*device_id_check)(struct pci_dev *pdev);
+-
+-	/* optional mask for devices with limited DMA space */
+ 	u64 dma_mask;
+ };
+ 
+-- 
+2.17.1
+
 
