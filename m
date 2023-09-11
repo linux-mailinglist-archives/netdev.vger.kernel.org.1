@@ -1,190 +1,210 @@
-Return-Path: <netdev+bounces-32974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52BE079C13F
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 02:44:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88DCF79C165
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 02:58:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BD9D28162B
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 00:44:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D24B2816E2
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 00:58:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F1E71C04;
-	Tue, 12 Sep 2023 00:43:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFC9763E;
+	Tue, 12 Sep 2023 00:58:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F04F917FC
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 00:43:18 +0000 (UTC)
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on20616.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe59::616])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33778172FA3
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 17:11:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BixUlfvJW0ufmE4o6cKgjF/GmV6OcvGzs0dPvDMFmTpjngCLXD3Q8v+BJ7UEcIWzNDROV469QrTBKAx4KH1palFhVCkh/8yE2JTtwfOJ8d+4+Hup1SKFMijBJSuSs6IT3RCV7crTZMeE6d5aBNhC2lMC2iza750MDEaJaCTowewhJ5ggQscAvfF/EbgQikTFtDI7wbSNrh9+0xZILI8P5NelhdO3P5qyNz5sAEHNQkIG6TAAGPIC+S8oX5r0u6BlJ8p7SUT9Fpu7W4AngB8lSMspX7TPrWs675aACO53LTEvR26mqRNie7H+3Hr2vP83lq7BBp+bUxGnvBF9Tiv0lQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Mkfu1o04vCr8kvLFl2xTueC5ioaW4YOYTn00cIw5cyU=;
- b=WtX/VXwGl7PQ1h5b2WK8fTjEjOj+EHri7pOMBmiA1XH7EI9uLHJpuVq+A8GTrz7rogGwbBNUZWvRR1v5dZ42HJYoiY9ChFy1Ej5Vh744WHeDmlfVkK9NRv+MH0RljxEBF5a9VJoMApXy5jKpKlXjOCEKmuVZmtuNIk7jNHwqkjRXpwxwgOfu1o0ksqQyZ878BVTtvKrEifByhXARc9VCelvQHwAuNbnb2HS/WWR7XnqYuVevkTwwnnpuYrj7/1R0eoiztqQxPNIFhwtbdyFS23yKWa3npVNDvddpLv7mBf8fFWbPs8Gt44lOOEuLttanoyIB9UjLdUxtNbS6uA1QwA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Mkfu1o04vCr8kvLFl2xTueC5ioaW4YOYTn00cIw5cyU=;
- b=f3hwnXvKZug0wXkdtvwRQuB5pkVju6s9UCxw57NhdDn38cJTxriTjtYLDpyj8+m2kAaCtmsT+oR9ReZkq+dI48CYKq4fJFHnWI/+LHabUeuVPJfuPVz3zRwkd7bN2+X//s5xajzUUX3hjly5VMb3zb/SdTA7/3WE9u41t6UFPhQ=
-Received: from MW4PR04CA0194.namprd04.prod.outlook.com (2603:10b6:303:86::19)
- by SJ2PR12MB8063.namprd12.prod.outlook.com (2603:10b6:a03:4d1::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.31; Mon, 11 Sep
- 2023 21:31:27 +0000
-Received: from CO1PEPF000044F8.namprd21.prod.outlook.com
- (2603:10b6:303:86:cafe::f4) by MW4PR04CA0194.outlook.office365.com
- (2603:10b6:303:86::19) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.35 via Frontend
- Transport; Mon, 11 Sep 2023 21:31:27 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1PEPF000044F8.mail.protection.outlook.com (10.167.241.198) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6792.1 via Frontend Transport; Mon, 11 Sep 2023 21:31:27 +0000
-Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Mon, 11 Sep
- 2023 16:31:25 -0500
-From: Shannon Nelson <shannon.nelson@amd.com>
-To: <kuba@kernel.org>, <davem@davemloft.net>, <jasowang@redhat.com>,
-	<mst@redhat.com>, <virtualization@lists.linux-foundation.org>,
-	<shannon.nelson@amd.com>, <brett.creeley@amd.com>, <netdev@vger.kernel.org>
-CC: <simon.horman@corigine.com>, <eperezma@redhat.com>, <drivers@pensando.io>
-Subject: [PATCH net-next] virtio: kdoc for struct virtio_pci_modern_device
-Date: Mon, 11 Sep 2023 14:31:04 -0700
-Message-ID: <20230911213104.14391-1-shannon.nelson@amd.com>
-X-Mailer: git-send-email 2.17.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E6111369
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 00:58:22 +0000 (UTC)
+Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B62719C365;
+	Mon, 11 Sep 2023 17:53:46 -0700 (PDT)
+Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-9a64619d8fbso639726966b.0;
+        Mon, 11 Sep 2023 17:53:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694479944; x=1695084744; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=XWTcwow2et7upqcwf54DyK1wVNFfm6M3zpWLMMZDCl4=;
+        b=o2Oh1/rCeX8rHZN2WMmHEjVvCGzUaQ3zbPowULhStxfYG86nXYTXFteHCt4b/7iK4E
+         L3PLr5uecXIsd9czgMEevISeSbbCC0NVI2VreFmnm1QTgosD67J8GQjD8fq8YfmYSD7M
+         PC9DQxnXvp8Z0yhhorq2Eel+Ept6ObM1h6nrbCABx3H7bNkMqmKA6ouXHRK7taPouSBh
+         45klUpwTcfQ76xuOdKLbMnLS+ISTcCrGx7F5AUTFcuiEyjiYOcoBCgDKJKC+Mgu+vxWp
+         m+bT2LRZ22o3nWpggkpnPKYz8dUfVnwPYRgkMccFhc9nuQgUcb1mBoCGaiAa1OafJjih
+         5AvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694479944; x=1695084744;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XWTcwow2et7upqcwf54DyK1wVNFfm6M3zpWLMMZDCl4=;
+        b=o66WqNv1R0eX6fUQvkk8P+Nz397cBzAjV98qsMgzxQGoBoFL+sSFsDTqE1ihVe7k4k
+         GkAS4TrTOx/uSbaOHBO0+FC3TRixsjSKPNmOTURBFJAEK3htUJWI1e5+4pb3kZZ/qpM/
+         7Z6s79pgtMtgZu3DZe8nN6xzPln9Es5nzGdrR0DEHzpqAkPyioC+jlnmowhQc5qszRqv
+         E3RDhxXgWFoJCzH3YagxULsCSCkaKesLmdYCL/CrvIMLZ12blT2STMrNKw04J+yUUHiG
+         /iCvVNY6vstSGX1eOq2gOwC7/iJ7JQVF2O+aU813ISID0yIUeQejV71WS94lpiclMH4s
+         us9A==
+X-Gm-Message-State: AOJu0YxRJF7M0m+mBNxwsbTW3O0JIFqtJhnT0C4fKmCAvtJcpwakgeIX
+	oBUxbCOQrENpeAnofWWuxbtw1Y4WLwN7Xw==
+X-Google-Smtp-Source: AGHT+IG4neBUt+ie4pzDoZiQeWUSKTNp1+XgRuVaZj4s2RJQC3CdsSSnlnDEU6xXFuAqvt2am5jxOw==
+X-Received: by 2002:a17:906:30da:b0:99d:fc31:242f with SMTP id b26-20020a17090630da00b0099dfc31242fmr9012606ejb.66.1694472689910;
+        Mon, 11 Sep 2023 15:51:29 -0700 (PDT)
+Received: from skbuf ([188.26.56.202])
+        by smtp.gmail.com with ESMTPSA id dx22-20020a170906a85600b0099d959f9536sm6023945ejb.12.2023.09.11.15.51.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Sep 2023 15:51:29 -0700 (PDT)
+Date: Tue, 12 Sep 2023 01:51:26 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH 2/4] dt-bindings: net: dsa: document internal MDIO bus
+Message-ID: <20230911225126.rk23g3u3bzo3agby@skbuf>
+References: <47b61929-5c2d-4906-b153-2046a94858c8@arinc9.com>
+ <20230813112026.ohsx6srbt2staxma@skbuf>
+ <8a8e14f1-0493-4298-a2cc-6e7ae7929334@arinc9.com>
+ <20230813190157.4y3zoro53qsz43pe@skbuf>
+ <f5f468c1-b5a2-4336-b1d9-fd82da95b21d@arinc9.com>
+ <20230814143601.mnpxtcm2zybnbvoh@skbuf>
+ <0cee0928-74c9-4048-8cd8-70bfbfafd9b2@arinc9.com>
+ <20230827121235.zog4c3ehu2cyd3jy@skbuf>
+ <676d1a2b-6ffa-4aff-8bed-a749c373f5b3@arinc9.com>
+ <87325ce9-595a-4dda-a6a1-b5927d25719b@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000044F8:EE_|SJ2PR12MB8063:EE_
-X-MS-Office365-Filtering-Correlation-Id: c240b2d0-4c49-4c28-d77f-08dbb30e74e0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	iqsnC0hVH3yrfx+tQ/NPp4cQomv/MkQx+9sf2KdiC+cbpkJNnTtouIXqbHVAZt4u6xW5A5miOdkrapUlGfimypvH1xzqmioOlQfTJZypvbnjvrZv0RI2tjWlMVG5Z+SFUOID8oOabVH4XM+QtEZz6kSOWvsfNCeObsYM/zXb10lHfXPUzgZErwZlUFBZiLtJJjsxs59XZoktIVOR8op397s+o9ARYCVh2u9hNTk7YxvGrEFubtbZOrUnGUFWFltcHw/0rXkwaKP0XCOUEGg5ziks8q2e5OUBxIT9SEV3v+KSZbNU+jcnS1Iu7FAeUIv0fRpv8aAEz8+SP9qpzSJeyyzmWtp7Vwe++/4deS2+xLRK3bs++UdotO6FkFjHDgkT/VCr1wb307rfFqPDFTwfZijVUZ8CELygHU/SWkjQ+2+Mkxgu5tIwyeMFmlQzbJnz5bl+LRXg4GrmBkz25lwiOanxueJS+UcEJyDWbjSjc6UHn+eN3Qh9OhpSXET96oWAsO3hMKqDm0DG3vmswKtmFIBbUAJC8hAPvKR+8RCD6hhDKhaPaumTYDBlKg6buCzGo0zgiGfbrYZbF2c7u2hsNRnEDmcHAtr/svusUqTdsmiEFjoC9wFBfNXQbAtHXRIR7VHSlB9ifGeAcAGbFwXWHCNLSOBG3eDkHhPymZrKOgmSXjZBg2IFRLPlPn18NnJiwnYGzaWL0p/dwclwVU8vXkE7+5BR5Q9Gb3oU6SwaKKuIDpqAAUOIaD/LUp7zkjBWLITJCeV7wdfqqjiYMstp4w==
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(396003)(376002)(136003)(346002)(82310400011)(186009)(1800799009)(451199024)(36840700001)(40470700004)(46966006)(426003)(40460700003)(2906002)(336012)(83380400001)(1076003)(16526019)(26005)(36860700001)(66574015)(5660300002)(6666004)(2616005)(8676002)(47076005)(54906003)(316002)(4326008)(70206006)(110136005)(8936002)(44832011)(70586007)(41300700001)(478600001)(966005)(82740400003)(81166007)(356005)(36756003)(86362001)(40480700001)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Sep 2023 21:31:27.3457
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c240b2d0-4c49-4c28-d77f-08dbb30e74e0
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000044F8.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8063
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_NONE autolearn=no
+In-Reply-To: <87325ce9-595a-4dda-a6a1-b5927d25719b@arinc9.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Finally following up to Simon's suggestion for some kdoc attention
-on struct virtio_pci_modern_device.
+On Sat, Sep 09, 2023 at 11:53:50AM +0300, Arınç ÜNAL wrote:
+> What to do:
+> - For mscc,vsc7514-switch, enforce phylink bindings for ports.
+> - For mscc,vsc7512-switch, enforce phylink bindings for user ports.
 
-Link: https://lore.kernel.org/netdev/ZE%2FQS0lnUvxFacjf@corigine.com/
-Cc: Simon Horman <simon.horman@corigine.com>
-Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
-Acked-by: Eugenio Pérez <eperezma@redhat.com>
----
- include/linux/virtio_pci_modern.h | 34 ++++++++++++++++++++-----------
- 1 file changed, 22 insertions(+), 12 deletions(-)
+you can also look at dsa_switches_apply_workarounds[], and if the switch
+isn't there, then you can replace "user ports" with "ports" here and
+everywhere.
 
-diff --git a/include/linux/virtio_pci_modern.h b/include/linux/virtio_pci_modern.h
-index 067ac1d789bc..a38c729d1973 100644
---- a/include/linux/virtio_pci_modern.h
-+++ b/include/linux/virtio_pci_modern.h
-@@ -12,37 +12,47 @@ struct virtio_pci_modern_common_cfg {
- 	__le16 queue_reset;		/* read-write */
- };
- 
-+/**
-+ * struct virtio_pci_modern_device - info for modern PCI virtio
-+ * @pci_dev:	    Ptr to the PCI device struct
-+ * @common:	    Position of the common capability in the PCI config
-+ * @device:	    Device-specific data (non-legacy mode)
-+ * @notify_base:    Base of vq notifications (non-legacy mode)
-+ * @notify_pa:	    Physical base of vq notifications
-+ * @isr:	    Where to read and clear interrupt
-+ * @notify_len:	    So we can sanity-check accesses
-+ * @device_len:	    So we can sanity-check accesses
-+ * @notify_map_cap: Capability for when we need to map notifications per-vq
-+ * @notify_offset_multiplier: Multiply queue_notify_off by this value
-+ *                            (non-legacy mode).
-+ * @modern_bars:    Bitmask of BARs
-+ * @id:		    Device and vendor id
-+ * @device_id_check: Callback defined before vp_modern_probe() to be used to
-+ *		    verify the PCI device is a vendor's expected device rather
-+ *		    than the standard virtio PCI device
-+ *		    Returns the found device id or ERRNO
-+ * @dma_mask:	    Optional mask instead of the traditional DMA_BIT_MASK(64),
-+ *		    for vendor devices with DMA space address limitations
-+ */
- struct virtio_pci_modern_device {
- 	struct pci_dev *pci_dev;
- 
- 	struct virtio_pci_common_cfg __iomem *common;
--	/* Device-specific data (non-legacy mode)  */
- 	void __iomem *device;
--	/* Base of vq notifications (non-legacy mode). */
- 	void __iomem *notify_base;
--	/* Physical base of vq notifications */
- 	resource_size_t notify_pa;
--	/* Where to read and clear interrupt */
- 	u8 __iomem *isr;
- 
--	/* So we can sanity-check accesses. */
- 	size_t notify_len;
- 	size_t device_len;
- 
--	/* Capability for when we need to map notifications per-vq. */
- 	int notify_map_cap;
- 
--	/* Multiply queue_notify_off by this value. (non-legacy mode). */
- 	u32 notify_offset_multiplier;
--
- 	int modern_bars;
--
- 	struct virtio_device_id id;
- 
--	/* optional check for vendor virtio device, returns dev_id or -ERRNO */
- 	int (*device_id_check)(struct pci_dev *pdev);
--
--	/* optional mask for devices with limited DMA space */
- 	u64 dma_mask;
- };
- 
--- 
-2.17.1
+> - renesas,rzn1-a5psw.yaml
+>   - renesas,r9a06g032-a5psw, renesas,rzn1-a5psw
+> 
+> What to do:
+> - Document "mdio".
 
+Not clear here and for all the schemas quoted below.. is "mdio" not documented already?
+
+> - realtek.yaml
+>   - realtek,rtl8365mb
+>   - realtek,rtl8366rb
+> 
+> drivers/net/dsa/realtek/realtek-mdio.c:
+> - The DSA subdriver lets the DSA driver register the bus.
+> 
+> What to do:
+> - Document "mdio".
+>   - Require "mdio". (Can't do because it's not required for MDIO controlled
+>     switches that share the compatible string with SMI controlled switches.
+>     This is why I would like Luiz to unify the bus registeration process.)
+> - Document compatible string "realtek,smi-mdio" on "mdio" child node.
+>   - Require compatible. (Can't do because the same as above.)
+> - Enforce phylink bindings for user ports. (Can't do because the same as
+>   above.)
+>   - Enforce phylink bindings for user ports if "mdio" is defined.
+> 
+> ---
+> 
+> - qca8k.yaml
+>   - qca,qca8327
+>   - qca,qca8328
+>   - qca,qca8334
+>   - qca,qca8337
+> 
+> drivers/net/dsa/qca/qca8k-8xxx.c:
+> - The DSA subdriver won't let the DSA driver register the bus.
+>   - No ds->ops->phy_read() or ds->ops->phy_write().
+> - Registers the bus non-OF-based or OF-based. Registers OF-based if "mdio"
+>   child node is defined.
+>   - mdio = of_get_child_by_name(priv->dev->of_node, "mdio");
+> 
+> What to do:
+> - Document "mdio".
+> - Enforce phylink bindings for user ports if "mdio" is defined.
+> 
+> ---
+> 
+> - nxp,sja1105.yaml
+>   - nxp,sja1105e
+>   - nxp,sja1105t
+>   - nxp,sja1105p
+>   - nxp,sja1105q
+>   - nxp,sja1105r
+>   - nxp,sja1105s
+>   - nxp,sja1110a
+>   - nxp,sja1110b
+>   - nxp,sja1110c
+>   - nxp,sja1110d
+> 
+> What to do:
+> - Document "mdios".
+>   - Document child node pattern property under "mdios".
+>     - Document "nxp,sja1110-base-tx-mdio" and "nxp,sja1110-base-t1-mdio"
+>       compatible strings.
+> ---
+> 
+> - microchip,lan937x.yaml
+>   - microchip,lan9370
+>   - microchip,lan9371
+>   - microchip,lan9372
+>   - microchip,lan9373
+>   - microchip,lan9374
+> - microchip,ksz.yaml
+>   - microchip,ksz8765
+>   - microchip,ksz8794
+>   - microchip,ksz8795
+>   - microchip,ksz8863
+>   - microchip,ksz8873
+>   - microchip,ksz9477
+>   - microchip,ksz9897
+>   - microchip,ksz9896
+>   - microchip,ksz9567
+>   - microchip,ksz8565
+>   - microchip,ksz9893
+>   - microchip,ksz9563
+>   - microchip,ksz8563
+> 
+> What to do:
+> - Document "mdio".
 
