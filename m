@@ -1,188 +1,186 @@
-Return-Path: <netdev+bounces-32905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43F2A79AAC4
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 20:14:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B05E679AAB1
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 20:05:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 511041C20971
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 18:14:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1837A28137A
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 18:05:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A58916434;
-	Mon, 11 Sep 2023 18:11:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98D23156E3;
+	Mon, 11 Sep 2023 18:05:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F27A1642B
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 18:11:08 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ED79103
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 11:11:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694455867; x=1725991867;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 845C4AD2E
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 18:05:26 +0000 (UTC)
+Received: from smtp-fw-9103.amazon.com (smtp-fw-9103.amazon.com [207.171.188.200])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DC69103
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 11:05:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1694455525; x=1725991525;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=76UztqOnV3K3QuR8ZLB2YzODBta1EWovXEP7yhZ51gU=;
-  b=Q5RcWscSN/1AxLl9CdN0tvyHdwcT/VoOv5K1LcreOS4wzDhq7djuHMyg
-   +dn+GZjXkuIIqvFLgsnh3EDVSdnY/cZ3dQdMo5orhTlQKdqWYFSo9+AjF
-   uJ9ZttAp7gWzimvUgTdOim4fxVvVdHEiHBkzO7veH9meiKsEnBweRJTXC
-   lFgnrg6cZ1mFYp23IuPZ1sLurXGFq01UrdcF83SJS22bnQt6XZZXE9PS+
-   wb0KnUWIZUhemEKcd1ddLdCLcgae1xUaSoT3kSFj6sRFZvG22eRmw3ioF
-   ToMQYBLNEykipOOuqln/Q6Fti6P1BDK9qs0g8BBaPHZmyjTQyLI1z+R0b
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10830"; a="378075684"
-X-IronPort-AV: E=Sophos;i="6.02,244,1688454000"; 
-   d="scan'208";a="378075684"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2023 11:11:03 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10830"; a="917129963"
-X-IronPort-AV: E=Sophos;i="6.02,244,1688454000"; 
-   d="scan'208";a="917129963"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orsmga005.jf.intel.com with ESMTP; 11 Sep 2023 11:11:02 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Jacob Keller <jacob.e.keller@intel.com>,
-	anthony.l.nguyen@intel.com,
-	richardcochran@gmail.com,
-	Sunitha Mekala <sunithax.d.mekala@intel.com>
-Subject: [PATCH net-next 13/13] ice: check netlist before enabling ICE_F_GNSS
-Date: Mon, 11 Sep 2023 11:03:14 -0700
-Message-Id: <20230911180314.4082659-14-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20230911180314.4082659-1-anthony.l.nguyen@intel.com>
-References: <20230911180314.4082659-1-anthony.l.nguyen@intel.com>
+  bh=e3HOPvm9ivWd3LMjjSsdKnEcLSvXAqB/AXMmmqLhdZk=;
+  b=r7Ug4Yb4O8WCQMbCDGKD5aLAHf2kADXL64ZE7Lu4V9gTHDhvCYMQW9aF
+   iweAXqYJYBYocQWoAGg4cuzGLLhiamTHAbfjyqFCkMNONo2LpCSpdoQ22
+   D8K0hHJdwvqK1IL8YlZi9tdaG0bTyuRDRAKQfDK4g0qvB9ogCMR9TgvpI
+   M=;
+X-IronPort-AV: E=Sophos;i="6.02,244,1688428800"; 
+   d="scan'208";a="1153583988"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-9fe6ad2f.us-east-1.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-9103.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2023 18:05:18 +0000
+Received: from EX19MTAUWB001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+	by email-inbound-relay-iad-1a-m6i4x-9fe6ad2f.us-east-1.amazon.com (Postfix) with ESMTPS id 23BF8815E0;
+	Mon, 11 Sep 2023 18:05:14 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Mon, 11 Sep 2023 18:05:14 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.171.14) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Mon, 11 Sep 2023 18:05:11 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <joannelkoong@gmail.com>,
+	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH v1 net 2/5] tcp: Fix bind() regression for v4-mapped-v6 non-wildcard address.
+Date: Mon, 11 Sep 2023 11:05:03 -0700
+Message-ID: <20230911180503.50024-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <CANn89iLGDTb0FFL7=+e9zXz156+RZk0dSJXatgFmMx0vakOAAQ@mail.gmail.com>
+References: <CANn89iLGDTb0FFL7=+e9zXz156+RZk0dSJXatgFmMx0vakOAAQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Originating-IP: [10.187.171.14]
+X-ClientProxiedBy: EX19D031UWC004.ant.amazon.com (10.13.139.246) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,T_SPF_PERMERROR autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Jacob Keller <jacob.e.keller@intel.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 11 Sep 2023 19:51:44 +0200
+> On Mon, Sep 11, 2023 at 6:52 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
+> >
+> > Since bhash2 was introduced, the example below does now work as expected.
+> > These two bind() should conflict, but the 2nd bind() now succeeds.
+> >
+> >   from socket import *
+> >
+> >   s1 = socket(AF_INET6, SOCK_STREAM)
+> >   s1.bind(('::ffff:127.0.0.1', 0))
+> >
+> >   s2 = socket(AF_INET, SOCK_STREAM)
+> >   s2.bind(('127.0.0.1', s1.getsockname()[1]))
+> >
+> > During the 2nd bind() in inet_csk_get_port(), inet_bind2_bucket_find()
+> > fails to find the 1st socket's tb2, so inet_bind2_bucket_create() allocates
+> > a new tb2 for the 2nd socket.  Then, we call inet_csk_bind_conflict() that
+> > checks conflicts in the new tb2 by inet_bhash2_conflict().  However, the
+> > new tb2 does not include the 1st socket, thus the bind() finally succeeds.
+> >
+> > In this case, inet_bind2_bucket_match() must check if AF_INET6 tb2 has
+> > the conflicting v4-mapped-v6 address so that inet_bind2_bucket_find()
+> > returns the 1st socket's tb2.
+> >
+> > Note that if we bind two sockets to 127.0.0.1 and then ::FFFF:127.0.0.1,
+> > the 2nd bind() fails properly for the same reason mentinoed in the previous
+> > commit.
+> >
+> > Fixes: 28044fc1d495 ("net: Add a bhash2 table hashed by port and address")
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > ---
+> >  net/ipv4/inet_hashtables.c | 9 ++++++++-
+> >  1 file changed, 8 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
+> > index 0a9b20eb81c4..54505100c914 100644
+> > --- a/net/ipv4/inet_hashtables.c
+> > +++ b/net/ipv4/inet_hashtables.c
+> > @@ -816,8 +816,15 @@ static bool inet_bind2_bucket_match(const struct inet_bind2_bucket *tb,
+> >                                     int l3mdev, const struct sock *sk)
+> >  {
+> >  #if IS_ENABLED(CONFIG_IPV6)
+> > -       if (sk->sk_family != tb->family)
+> > +       if (sk->sk_family != tb->family) {
+> > +               if (sk->sk_family == AF_INET)
+> > +                       return net_eq(ib2_net(tb), net) && tb->port == port &&
+> > +                               tb->l3mdev == l3mdev &&
+> > +                               ipv6_addr_v4mapped(&tb->v6_rcv_saddr) &&
+> > +                               tb->v6_rcv_saddr.s6_addr32[3] == sk->sk_rcv_saddr;
+> > +
+> >                 return false;
+> > +       }
+> >
+> >         if (sk->sk_family == AF_INET6)
+> >                 return net_eq(ib2_net(tb), net) && tb->port == port &&
+> > --
+> 
+> Could we first factorize all these "net_eq(ib2_net(tb), net) &&
+> tb->port == port" checks ?
 
-Similar to the change made for ICE_F_SMA_CTRL, check the netlist before
-enabling support for ICE_F_GNSS. This ensures that the driver only enables
-the GNSS feature on devices which actually have the feature enabled in the
-firmware device configuration.
+That's much cleaner :)
+I'll add a prep patch first in v2.
 
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Tested-by: Sunitha Mekala <sunithax.d.mekala@intel.com> (A Contingent worker at Intel)
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_adminq_cmd.h |  2 ++
- drivers/net/ethernet/intel/ice/ice_common.c     | 15 +++++++++++++++
- drivers/net/ethernet/intel/ice/ice_common.h     |  1 +
- drivers/net/ethernet/intel/ice/ice_gnss.c       |  3 +++
- drivers/net/ethernet/intel/ice/ice_lib.c        |  6 ++----
- 5 files changed, 23 insertions(+), 4 deletions(-)
+Thanks!
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-index 674be406cc7a..293c1d664772 100644
---- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-+++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-@@ -1368,6 +1368,7 @@ struct ice_aqc_link_topo_params {
- #define ICE_AQC_LINK_TOPO_NODE_TYPE_MEZZ	7
- #define ICE_AQC_LINK_TOPO_NODE_TYPE_ID_EEPROM	8
- #define ICE_AQC_LINK_TOPO_NODE_TYPE_CLK_MUX	10
-+#define ICE_AQC_LINK_TOPO_NODE_TYPE_GPS		11
- #define ICE_AQC_LINK_TOPO_NODE_CTX_S		4
- #define ICE_AQC_LINK_TOPO_NODE_CTX_M		\
- 				(0xF << ICE_AQC_LINK_TOPO_NODE_CTX_S)
-@@ -1407,6 +1408,7 @@ struct ice_aqc_get_link_topo {
- #define ICE_AQC_GET_LINK_TOPO_NODE_NR_PCA9575			0x21
- #define ICE_AQC_GET_LINK_TOPO_NODE_NR_C827			0x31
- #define ICE_AQC_GET_LINK_TOPO_NODE_NR_GEN_CLK_MUX		0x47
-+#define ICE_AQC_GET_LINK_TOPO_NODE_NR_GEN_GPS			0x48
- 	u8 rsvd[9];
- };
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index e38feb61492c..57fc63e2fa8a 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -2777,6 +2777,21 @@ bool ice_is_clock_mux_in_netlist(struct ice_hw *hw)
- 	return true;
- }
- 
-+/**
-+ * ice_is_gps_in_netlist
-+ * @hw: pointer to the hw struct
-+ *
-+ * Check if the GPS generic device is present in the netlist
-+ */
-+bool ice_is_gps_in_netlist(struct ice_hw *hw)
-+{
-+	if (ice_find_netlist_node(hw, ICE_AQC_LINK_TOPO_NODE_TYPE_GPS,
-+				  ICE_AQC_GET_LINK_TOPO_NODE_NR_GEN_GPS, NULL))
-+		return false;
-+
-+	return true;
-+}
-+
- /**
-  * ice_aq_list_caps - query function/device capabilities
-  * @hw: pointer to the HW struct
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
-index 52bb7f4bbb74..626ee08cc23a 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.h
-+++ b/drivers/net/ethernet/intel/ice/ice_common.h
-@@ -94,6 +94,7 @@ ice_aq_get_phy_caps(struct ice_port_info *pi, bool qual_mods, u8 report_mode,
- 		    struct ice_sq_cd *cd);
- bool ice_is_pf_c827(struct ice_hw *hw);
- bool ice_is_clock_mux_in_netlist(struct ice_hw *hw);
-+bool ice_is_gps_in_netlist(struct ice_hw *hw);
- int
- ice_aq_list_caps(struct ice_hw *hw, void *buf, u16 buf_size, u32 *cap_count,
- 		 enum ice_adminq_opc opc, struct ice_sq_cd *cd);
-diff --git a/drivers/net/ethernet/intel/ice/ice_gnss.c b/drivers/net/ethernet/intel/ice/ice_gnss.c
-index 75c9de675f20..c8ea1af51ad3 100644
---- a/drivers/net/ethernet/intel/ice/ice_gnss.c
-+++ b/drivers/net/ethernet/intel/ice/ice_gnss.c
-@@ -389,6 +389,9 @@ bool ice_gnss_is_gps_present(struct ice_hw *hw)
- 	if (!hw->func_caps.ts_func_info.src_tmr_owned)
- 		return false;
- 
-+	if (!ice_is_gps_in_netlist(hw))
-+		return false;
-+
- #if IS_ENABLED(CONFIG_PTP_1588_CLOCK)
- 	if (ice_is_e810t(hw)) {
- 		int err;
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index b8849518120d..8da025f59999 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -3991,10 +3991,8 @@ void ice_init_feature_support(struct ice_pf *pf)
- 			break;
- 		if (ice_is_clock_mux_in_netlist(&pf->hw))
- 			ice_set_feature_support(pf, ICE_F_SMA_CTRL);
--		if (ice_is_e810t(&pf->hw)) {
--			if (ice_gnss_is_gps_present(&pf->hw))
--				ice_set_feature_support(pf, ICE_F_GNSS);
--		}
-+		if (ice_gnss_is_gps_present(&pf->hw))
-+			ice_set_feature_support(pf, ICE_F_GNSS);
- 		break;
- 	default:
- 		break;
--- 
-2.38.1
-
+> 
+> diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
+> index 7876b7d703cb5647086c45ca547c4caadc00c091..6240c802ed772272028e6e65bf90f345dd2d1619
+> 100644
+> --- a/net/ipv4/inet_hashtables.c
+> +++ b/net/ipv4/inet_hashtables.c
+> @@ -832,24 +832,24 @@ static bool inet_bind2_bucket_match(const struct
+> inet_bind2_bucket *tb,
+>  bool inet_bind2_bucket_match_addr_any(const struct inet_bind2_bucket
+> *tb, const struct net *net,
+>                                       unsigned short port, int l3mdev,
+> const struct sock *sk)
+>  {
+> +       if (!net_eq(ib2_net(tb), net) || tb->port != port)
+> +               return false;
+> +
+>  #if IS_ENABLED(CONFIG_IPV6)
+>         if (sk->sk_family != tb->family) {
+>                 if (sk->sk_family == AF_INET)
+> -                       return net_eq(ib2_net(tb), net) && tb->port == port &&
+> -                               tb->l3mdev == l3mdev &&
+> +                       return  tb->l3mdev == l3mdev &&
+>                                 ipv6_addr_any(&tb->v6_rcv_saddr);
+> 
+>                 return false;
+>         }
+> 
+>         if (sk->sk_family == AF_INET6)
+> -               return net_eq(ib2_net(tb), net) && tb->port == port &&
+> -                       tb->l3mdev == l3mdev &&
+> +               return  tb->l3mdev == l3mdev &&
+>                         ipv6_addr_any(&tb->v6_rcv_saddr);
+>         else
+>  #endif
+> -               return net_eq(ib2_net(tb), net) && tb->port == port &&
+> -                       tb->l3mdev == l3mdev && tb->rcv_saddr == 0;
+> +               return tb->l3mdev == l3mdev && tb->rcv_saddr == 0;
+>  }
+> 
+>  /* The socket's bhash2 hashbucket spinlock must be held when this is called */
 
