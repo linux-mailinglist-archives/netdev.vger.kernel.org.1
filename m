@@ -1,46 +1,63 @@
-Return-Path: <netdev+bounces-32869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A86179AA4E
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 18:46:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E00279AA4F
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 18:47:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F1B11C209FF
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 16:46:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACBA11C20A96
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 16:47:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FFDC1171A;
-	Mon, 11 Sep 2023 16:46:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DE4A1172E;
+	Mon, 11 Sep 2023 16:46:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F8F33EE
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 16:46:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8753EC433C8;
-	Mon, 11 Sep 2023 16:46:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694450791;
-	bh=bXMZzVKRSbTQ/tVE5TIgh9LKsYdFg9X0N5cunHPB9j0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RrqRAapx6rfpDgr5AfSPR8MVEVwBkQnvoEqOhbj/VqqcDUUHpXzpCz59YYlSENlkg
-	 iKlMdjuQ6siqk7FSEfPNa4BF3WsSjYi7qAfv4ADi5fOlSHNvm9QQQHmFLQwHGcS5UJ
-	 qV0xoww4MfjFOp1xTtat3YZ9FsEJG5s+qu7gUbqGYhQGNvE2ZUxFVswowCpZB+/XJZ
-	 J3rG73eCRzjZ/ZH4ULRiTkPPGpy2seiTnLAQjUC1VS6yE3S47F5O81nkjIZiDr/icy
-	 1iZh+v1Kk9bZYbHlzKr05hmnughsJ7XcwcwrSBf8pjrWvRyqEM7qrAeZnRhDGRISmR
-	 +6G53cx1f4Dxw==
-Received: (nullmailer pid 1357324 invoked by uid 1000);
-	Mon, 11 Sep 2023 16:46:28 -0000
-Date: Mon, 11 Sep 2023 11:46:28 -0500
-From: Rob Herring <robh@kernel.org>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Roger Quadros <rogerq@ti.com>, Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, Vignesh Raghavendra <vigneshr@ti.com>, Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, netdev@vger.kernel.org, srk@ti.com, r-gunasekaran@ti.com, Roger Quadros <rogerq@kernel.org>
-Subject: Re: [PATCH net-next v2 1/2] dt-bindings: net: Add documentation for
- Half duplex support.
-Message-ID: <20230911164628.GA1295856-robh@kernel.org>
-References: <20230911060200.2164771-1-danishanwar@ti.com>
- <20230911060200.2164771-2-danishanwar@ti.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D5A211704;
+	Mon, 11 Sep 2023 16:46:55 +0000 (UTC)
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 315DEE3;
+	Mon, 11 Sep 2023 09:46:54 -0700 (PDT)
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-52e297c7c39so5868206a12.2;
+        Mon, 11 Sep 2023 09:46:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694450812; x=1695055612;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fz0qgG1xAQKjyAXZ1F3HGmELYa8PYKoGe3IryD6lsZo=;
+        b=s5RVSmQLJqz8+OiqDIN1LxVChoA5KOHTVWvtEZPg2RyF+bBuNP94pnUquLrSWAaDJk
+         fZvZ7jA7mYsaSAYDA/2tdV/xzrICaOJLlBGGCs0gamcpdPgZybrGYotZppsL7A/jpTlh
+         yMdm53+MeZBKx2Tk8KRKkLQyhm8lNPuKqI5HsmByi2RLXFnppWdF8nqhJkcNlQZaTpiD
+         U3PGWTZAl5fhzwebX9ycxBThtvkzAmwRbv5nvCEyeMDNfAnO+smSntP6y3q/RdNyuwgu
+         szpp+vMx2E2dPBxaMgctmL8LbgngyS23uYpxAA59nkave2vR7cvypaTpJbZLQxFQetHK
+         ZXgA==
+X-Gm-Message-State: AOJu0Yzlg7DgwwyP5whvYAqsZnowsF4Rp7C8hw3OmPk/hwgAM2l3wcWw
+	ylBp9qBby5JnmD2LcMB6iCk=
+X-Google-Smtp-Source: AGHT+IGbKXR5utsZSAcjo25hC+LWL6BmnRTWGZSSZF/5ZDH7OKutTBo9ihUXtpcWszGOcfOQii6Fxg==
+X-Received: by 2002:aa7:c1d5:0:b0:522:2f8c:8953 with SMTP id d21-20020aa7c1d5000000b005222f8c8953mr7573057edp.39.1694450812406;
+        Mon, 11 Sep 2023 09:46:52 -0700 (PDT)
+Received: from gmail.com (fwdproxy-cln-017.fbsv.net. [2a03:2880:31ff:11::face:b00c])
+        by smtp.gmail.com with ESMTPSA id i23-20020a0564020f1700b0052f8c67a399sm538287eda.37.2023.09.11.09.46.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Sep 2023 09:46:51 -0700 (PDT)
+Date: Mon, 11 Sep 2023 09:46:50 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Gabriel Krisman Bertazi <krisman@suse.de>
+Cc: sdf@google.com, axboe@kernel.dk, asml.silence@gmail.com,
+	willemdebruijn.kernel@gmail.com, kuba@kernel.org,
+	martin.lau@linux.dev, bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	io-uring@vger.kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH v5 5/8] io_uring/cmd: return -EOPNOTSUPP if net is
+ disabled
+Message-ID: <ZP9EeunfcbWos80w@gmail.com>
+References: <20230911103407.1393149-1-leitao@debian.org>
+ <20230911103407.1393149-6-leitao@debian.org>
+ <87ledc904p.fsf@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,46 +66,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230911060200.2164771-2-danishanwar@ti.com>
+In-Reply-To: <87ledc904p.fsf@suse.de>
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, Sep 11, 2023 at 11:31:59AM +0530, MD Danish Anwar wrote:
-> In order to support half-duplex operation at 10M and 100M link speeds, the
-> PHY collision detection signal (COL) should be routed to ICSSG
-> GPIO pin (PRGx_PRU0/1_GPI10) so that firmware can detect collision signal
-> and apply the CSMA/CD algorithm applicable for half duplex operation. A DT
-> property, "ti,half-duplex-capable" is introduced for this purpose. If
-> board has PHY COL pin conencted to PRGx_PRU1_GPIO10, this DT property can
-> be added to eth node of ICSSG, MII port to support half duplex operation at
-> that port.
+On Mon, Sep 11, 2023 at 11:53:58AM -0400, Gabriel Krisman Bertazi wrote:
+> Breno Leitao <leitao@debian.org> writes:
 > 
-> Reviewed-by: Roger Quadros <rogerq@kernel.org>
-> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
-> ---
->  Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml | 7 +++++++
->  1 file changed, 7 insertions(+)
+> > Protect io_uring_cmd_sock() to be called if CONFIG_NET is not set. If
+> > network is not enabled, but io_uring is, then we want to return
+> > -EOPNOTSUPP for any possible socket operation.
+> >
+> > This is helpful because io_uring_cmd_sock() can now call functions that
+> > only exits if CONFIG_NET is enabled without having #ifdef CONFIG_NET
+> > inside the function itself.
+> >
+> > Signed-off-by: Breno Leitao <leitao@debian.org>
+> > ---
+> >  io_uring/uring_cmd.c | 8 ++++++++
+> >  1 file changed, 8 insertions(+)
+> >
+> > diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
+> > index 60f843a357e0..a7d6a7d112b7 100644
+> > --- a/io_uring/uring_cmd.c
+> > +++ b/io_uring/uring_cmd.c
+> > @@ -167,6 +167,7 @@ int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
+> >  }
+> >  EXPORT_SYMBOL_GPL(io_uring_cmd_import_fixed);
+> >  
+> > +#if defined(CONFIG_NET)
+> >  int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags)
+> >  {
+> >  	struct socket *sock = cmd->file->private_data;
+> > @@ -193,3 +194,10 @@ int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags)
+> >  	}
+> >  }
+> >  EXPORT_SYMBOL_GPL(io_uring_cmd_sock);
+> > +#else
+> > +int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags)
+> > +{
+> > +	return -EOPNOTSUPP;
+> > +}
+> > +#endif
+> > +
 > 
-> diff --git a/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml b/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
-> index 311c570165f9..bba17d4d5874 100644
-> --- a/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
-> +++ b/Documentation/devicetree/bindings/net/ti,icssg-prueth.yaml
-> @@ -106,6 +106,13 @@ properties:
->                phandle to system controller node and register offset
->                to ICSSG control register for RGMII transmit delay
->  
-> +          ti,half-duplex-capable:
-> +            type: boolean
-> +            description:
-> +              Enable half duplex operation on ICSSG MII port. This requires
+> Is net/socket.c even built without CONFIG_NET? if not, you don't even need
+> the alternative EOPNOTSUPP implementation.
 
-Still have capable vs. enable confusion. Please reword the description.
+It seems so. net/socket.o is part of obj-y:
 
-> +              PHY output pin (COL) to be routed to ICSSG GPIO pin
-> +              (PRGx_PRU0/1_GPIO10) as input.
-> +
->          required:
->            - reg
->      anyOf:
-> -- 
-> 2.34.1
-> 
+https://github.com/torvalds/linux/blob/master/net/Makefile#L9
 
