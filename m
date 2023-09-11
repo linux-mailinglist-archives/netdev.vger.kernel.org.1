@@ -1,163 +1,107 @@
-Return-Path: <netdev+bounces-32856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32857-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE46979A9CF
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 17:34:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0D2679A9E1
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 17:42:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC3A41C2098B
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 15:34:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6D971C2083F
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 15:42:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF62E11C9E;
-	Mon, 11 Sep 2023 15:29:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AD201173F;
+	Mon, 11 Sep 2023 15:42:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFC7615497;
-	Mon, 11 Sep 2023 15:29:43 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AF3FE4;
-	Mon, 11 Sep 2023 08:29:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=dXrJls0KWbEugGzjnIOny5aYJAM0fzmrBdmbDeg7HCA=; b=GW2t32hFPeEyNgoQFTqWEfL/DX
-	t+PzvKDl1IsKj/WzzIe7GK7wcJ6Vxy5IJBlJPclQzHy+O97aZGosvg9pmoHJBbgMHQTdwzsadCyzS
-	5/hRN3awfrq7xI1HfmHKz65cw3AuVf3Z6veeVE3DcmGnPPU3p2/Fhashhjy2QAuNoq+r9P0JiS7LA
-	B27UHX7tCeykDWkZ7raGVHOmZ89TGCNZvOldYzvBJM3B2/e+vxvTXxE4qp9e0ohAA1eAAR1f/gvQC
-	wbj52whrDXNRJUesOBMLUfWiCU6w7XU9/15yLYGUCrTQytSjgbUPwHcZBEsLFecqFEGWWakxRegzF
-	7GDNoOOQ==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:43984 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1qfir2-0008Fp-0z;
-	Mon, 11 Sep 2023 16:29:36 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1qfir2-007TPt-Uw; Mon, 11 Sep 2023 16:29:37 +0100
-In-Reply-To: <ZP8yEFWn0Ml3ALWq@shell.armlinux.org.uk>
-References: <ZP8yEFWn0Ml3ALWq@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	 Jose Abreu <joabreu@synopsys.com>
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	bpf@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Emil Renner Berthing <kernel@esmil.dk>,
-	Eric Dumazet <edumazet@google.com>,
-	Fabio Estevam <festevam@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	NXP Linux Team <linux-imx@nxp.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Samin Guo <samin.guo@starfivetech.com>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Shawn Guo <shawnguo@kernel.org>
-Subject: [PATCH net-next 6/6] net: stmmac: qos-eth: use
- dwmac_set_tx_clk_gmii()
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D892FBE6
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 15:42:16 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C270FB
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 08:42:15 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59b6a51f360so28370257b3.1
+        for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 08:42:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1694446935; x=1695051735; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=1vxv9qCiBDdaz18BBwgf7/xe/GHeAWJxF6E4VjWi49o=;
+        b=hLCxEne7np34rZa0jVtSxs2LddCr9L+cDynXS0fZyAgzS+JCqWoCsehl5b8c+3FANk
+         /J2k1AGAFdvxlGRprL7DejgVdAEWwQDWneWGvC93qNEqv09g7EkpCpp5vgjfiw0ektap
+         NzzX2FRiCjqu8DI83FZzOHptNXKykSLnR+RAFJF/ceczMArYMaBKgyR7Kgb38sX/vf2C
+         Tpsrs/mxGRSWFe3nCCjE6+T8AkkUvN4vm+U8otJ0riu8D6oCnje6DduYD2acIpiuE0oK
+         ZjI/fqLqzqB6hiv/PTkPFHG3/Yg5xcP1zQwal8E6FyFa5te/pP3i7BAj2goD8Aiv1FPx
+         fFSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694446935; x=1695051735;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1vxv9qCiBDdaz18BBwgf7/xe/GHeAWJxF6E4VjWi49o=;
+        b=Dh7zIVAOCy7kdUG+SdDiOTiYcMuuTazatUHurXHbntq3noleRXBPKaAMxTbWIKFDwY
+         1gbbhb2MBlOauKV3ygfgeOuBaKjrNAc8m7vUd0h0Eyg76Sdvg2ANlvwOyNzsKF9b0WQL
+         dRGjmXReX08wDXwrU0HmRRS0QGqUAjXiZ6r40kvaUBDpntIopXYw7i/NI8MZc74QNuI1
+         Fz6KneWNHN1tweLEHnp0nCBjFH6wwdVty6zta7QWogAAM5lyOaNYKEoJwNt/8Lgot31x
+         nTuyGFvBX42VzDDGPjXUT1EZAGozFlHNW6pXl0+F/9mD+MM3Cxt980ohJQW1I6AFZTUc
+         IySQ==
+X-Gm-Message-State: AOJu0YyzP/OZ7+m9AYOlTOxiuEsW37Onx6d6Ga4RXUhO5XF2Dxa8nhX0
+	pKw/+y0g8P+MZdIReOoP3vRZwnATyhKcIQ==
+X-Google-Smtp-Source: AGHT+IGuRan1QSMFIS0suu2RNYYvCaSf3PSirm4sqYkdPxDGUK0XjywhPdJ8d90V6kbofwqfeZj3g4BNTMnrXw==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a25:fc19:0:b0:d63:8364:328 with SMTP id
+ v25-20020a25fc19000000b00d6383640328mr205097ybd.5.1694446934779; Mon, 11 Sep
+ 2023 08:42:14 -0700 (PDT)
+Date: Mon, 11 Sep 2023 15:42:13 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1qfir2-007TPt-Uw@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Mon, 11 Sep 2023 16:29:36 +0100
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
-	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
+Message-ID: <20230911154213.713941-1-edumazet@google.com>
+Subject: [PATCH net] ipv6: fix ip6_sock_set_addr_preferences() typo
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, Christoph Hellwig <hch@lst.de>, Chuck Lever <chuck.lever@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- .../stmicro/stmmac/dwmac-dwc-qos-eth.c        | 37 ++++++-------------
- 1 file changed, 11 insertions(+), 26 deletions(-)
+ip6_sock_set_addr_preferences() second argument should be an integer.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
-index 61ebf36da13d..a8fae37b9858 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
-@@ -22,6 +22,7 @@
- #include <linux/stmmac.h>
- 
- #include "stmmac_platform.h"
-+#include "stmmac_plat_lib.h"
- #include "dwmac4.h"
- 
- struct tegra_eqos {
-@@ -181,32 +182,10 @@ static void dwc_qos_remove(struct platform_device *pdev)
- static void tegra_eqos_fix_speed(void *priv, unsigned int speed, unsigned int mode)
- {
- 	struct tegra_eqos *eqos = priv;
--	unsigned long rate = 125000000;
--	bool needs_calibration = false;
- 	u32 value;
- 	int err;
- 
--	switch (speed) {
--	case SPEED_1000:
--		needs_calibration = true;
--		rate = 125000000;
--		break;
--
--	case SPEED_100:
--		needs_calibration = true;
--		rate = 25000000;
--		break;
--
--	case SPEED_10:
--		rate = 2500000;
--		break;
--
--	default:
--		dev_err(eqos->dev, "invalid speed %u\n", speed);
--		break;
--	}
--
--	if (needs_calibration) {
-+	if (speed == SPEED_1000 || speed == SPEED_100) {
- 		/* calibrate */
- 		value = readl(eqos->regs + SDMEMCOMPPADCTRL);
- 		value |= SDMEMCOMPPADCTRL_PAD_E_INPUT_OR_E_PWRD;
-@@ -246,9 +225,15 @@ static void tegra_eqos_fix_speed(void *priv, unsigned int speed, unsigned int mo
- 		writel(value, eqos->regs + AUTO_CAL_CONFIG);
- 	}
- 
--	err = clk_set_rate(eqos->clk_tx, rate);
--	if (err < 0)
--		dev_err(eqos->dev, "failed to set TX rate: %d\n", err);
-+	err = dwmac_set_tx_clk_gmii(eqos->clk_tx, speed);
-+	if (err == -ENOTSUPP) {
-+		dev_err(eqos->dev, "invalid speed %dMbps\n", speed);
-+		err = dwmac_set_tx_clk_gmii(eqos->clk_tx, SPEED_1000);
-+	} else if (err) {
-+		dev_err(eqos->dev,
-+			"failed to set tx rate for speed %dMbps: %pe\n",
-+			speed, ERR_PTR(err));
-+	}
+SUNRPC attempts to set IPV6_PREFER_SRC_PUBLIC were
+translated to IPV6_PREFER_SRC_TMP
+
+Fixes: 18d5ad623275 ("ipv6: add ip6_sock_set_addr_preferences")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Chuck Lever <chuck.lever@oracle.com>
+---
+ include/net/ipv6.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/net/ipv6.h b/include/net/ipv6.h
+index 0675be0f3fa0efc55575bb5b2569dc8a1dbb9f24..fe274c122a563ce3a11b03e49ee71780b3dbda96 100644
+--- a/include/net/ipv6.h
++++ b/include/net/ipv6.h
+@@ -1360,7 +1360,7 @@ static inline int __ip6_sock_set_addr_preferences(struct sock *sk, int val)
+ 	return 0;
  }
  
- static int tegra_eqos_init(struct platform_device *pdev, void *priv)
+-static inline int ip6_sock_set_addr_preferences(struct sock *sk, bool val)
++static inline int ip6_sock_set_addr_preferences(struct sock *sk, int val)
+ {
+ 	int ret;
+ 
 -- 
-2.30.2
+2.42.0.283.g2d96d420d3-goog
 
 
