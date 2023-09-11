@@ -1,123 +1,103 @@
-Return-Path: <netdev+bounces-32870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E00279AA4F
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 18:47:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3B9F79AA55
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 18:51:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACBA11C20A96
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 16:47:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D6CB2811B0
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 16:51:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DE4A1172E;
-	Mon, 11 Sep 2023 16:46:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1771CAD2E;
+	Mon, 11 Sep 2023 16:51:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D5A211704;
-	Mon, 11 Sep 2023 16:46:55 +0000 (UTC)
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 315DEE3;
-	Mon, 11 Sep 2023 09:46:54 -0700 (PDT)
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-52e297c7c39so5868206a12.2;
-        Mon, 11 Sep 2023 09:46:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694450812; x=1695055612;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fz0qgG1xAQKjyAXZ1F3HGmELYa8PYKoGe3IryD6lsZo=;
-        b=s5RVSmQLJqz8+OiqDIN1LxVChoA5KOHTVWvtEZPg2RyF+bBuNP94pnUquLrSWAaDJk
-         fZvZ7jA7mYsaSAYDA/2tdV/xzrICaOJLlBGGCs0gamcpdPgZybrGYotZppsL7A/jpTlh
-         yMdm53+MeZBKx2Tk8KRKkLQyhm8lNPuKqI5HsmByi2RLXFnppWdF8nqhJkcNlQZaTpiD
-         U3PGWTZAl5fhzwebX9ycxBThtvkzAmwRbv5nvCEyeMDNfAnO+smSntP6y3q/RdNyuwgu
-         szpp+vMx2E2dPBxaMgctmL8LbgngyS23uYpxAA59nkave2vR7cvypaTpJbZLQxFQetHK
-         ZXgA==
-X-Gm-Message-State: AOJu0Yzlg7DgwwyP5whvYAqsZnowsF4Rp7C8hw3OmPk/hwgAM2l3wcWw
-	ylBp9qBby5JnmD2LcMB6iCk=
-X-Google-Smtp-Source: AGHT+IGbKXR5utsZSAcjo25hC+LWL6BmnRTWGZSSZF/5ZDH7OKutTBo9ihUXtpcWszGOcfOQii6Fxg==
-X-Received: by 2002:aa7:c1d5:0:b0:522:2f8c:8953 with SMTP id d21-20020aa7c1d5000000b005222f8c8953mr7573057edp.39.1694450812406;
-        Mon, 11 Sep 2023 09:46:52 -0700 (PDT)
-Received: from gmail.com (fwdproxy-cln-017.fbsv.net. [2a03:2880:31ff:11::face:b00c])
-        by smtp.gmail.com with ESMTPSA id i23-20020a0564020f1700b0052f8c67a399sm538287eda.37.2023.09.11.09.46.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Sep 2023 09:46:51 -0700 (PDT)
-Date: Mon, 11 Sep 2023 09:46:50 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Gabriel Krisman Bertazi <krisman@suse.de>
-Cc: sdf@google.com, axboe@kernel.dk, asml.silence@gmail.com,
-	willemdebruijn.kernel@gmail.com, kuba@kernel.org,
-	martin.lau@linux.dev, bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	io-uring@vger.kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH v5 5/8] io_uring/cmd: return -EOPNOTSUPP if net is
- disabled
-Message-ID: <ZP9EeunfcbWos80w@gmail.com>
-References: <20230911103407.1393149-1-leitao@debian.org>
- <20230911103407.1393149-6-leitao@debian.org>
- <87ledc904p.fsf@suse.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B9198F4A
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 16:51:25 +0000 (UTC)
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF077EB
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 09:51:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1694451086; x=1725987086;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=2aDSyiTKFdvbMWvr53F8uz13ixFKRPUMyCnsNPJlUrk=;
+  b=veLsRvg2fp9ahTu1VJ6jA4jwFyHbU+H3j4IIeuLLLV+X4FnWtlYWuJYM
+   WujOcPPINYixrm7faIjFdNvc8KwmVwHCRDQGX3A9U5qbgMllwr6zoWErU
+   Zrxq199/G9uhvch0sF3YddvTKGNh4gisJQvVB3uxfQccbPDp01wU7WMlO
+   E=;
+X-IronPort-AV: E=Sophos;i="6.02,244,1688428800"; 
+   d="scan'208";a="603852977"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-ed19f671.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2023 16:51:23 +0000
+Received: from EX19MTAUWA002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+	by email-inbound-relay-pdx-2b-m6i4x-ed19f671.us-west-2.amazon.com (Postfix) with ESMTPS id 484968072B;
+	Mon, 11 Sep 2023 16:51:21 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Mon, 11 Sep 2023 16:51:20 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.171.14) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Mon, 11 Sep 2023 16:51:18 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
+CC: Joanne Koong <joannelkoong@gmail.com>, Kuniyuki Iwashima
+	<kuniyu@amazon.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+	<netdev@vger.kernel.org>
+Subject: [PATCH v1 net 0/5] tcp: Fix bind() regression for v4-mapped-v6 address
+Date: Mon, 11 Sep 2023 09:51:01 -0700
+Message-ID: <20230911165106.39384-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87ledc904p.fsf@suse.de>
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.187.171.14]
+X-ClientProxiedBy: EX19D046UWB002.ant.amazon.com (10.13.139.181) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,T_SPF_PERMERROR autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Sep 11, 2023 at 11:53:58AM -0400, Gabriel Krisman Bertazi wrote:
-> Breno Leitao <leitao@debian.org> writes:
-> 
-> > Protect io_uring_cmd_sock() to be called if CONFIG_NET is not set. If
-> > network is not enabled, but io_uring is, then we want to return
-> > -EOPNOTSUPP for any possible socket operation.
-> >
-> > This is helpful because io_uring_cmd_sock() can now call functions that
-> > only exits if CONFIG_NET is enabled without having #ifdef CONFIG_NET
-> > inside the function itself.
-> >
-> > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > ---
-> >  io_uring/uring_cmd.c | 8 ++++++++
-> >  1 file changed, 8 insertions(+)
-> >
-> > diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
-> > index 60f843a357e0..a7d6a7d112b7 100644
-> > --- a/io_uring/uring_cmd.c
-> > +++ b/io_uring/uring_cmd.c
-> > @@ -167,6 +167,7 @@ int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
-> >  }
-> >  EXPORT_SYMBOL_GPL(io_uring_cmd_import_fixed);
-> >  
-> > +#if defined(CONFIG_NET)
-> >  int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags)
-> >  {
-> >  	struct socket *sock = cmd->file->private_data;
-> > @@ -193,3 +194,10 @@ int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags)
-> >  	}
-> >  }
-> >  EXPORT_SYMBOL_GPL(io_uring_cmd_sock);
-> > +#else
-> > +int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags)
-> > +{
-> > +	return -EOPNOTSUPP;
-> > +}
-> > +#endif
-> > +
-> 
-> Is net/socket.c even built without CONFIG_NET? if not, you don't even need
-> the alternative EOPNOTSUPP implementation.
 
-It seems so. net/socket.o is part of obj-y:
+Since bhash2 was introduced, bind() is broken in two cases related
+to v4-mapped-v6 address.
 
-https://github.com/torvalds/linux/blob/master/net/Makefile#L9
+This series fixes the regression and adds test to cover the cases.
+
+
+Kuniyuki Iwashima (5):
+  tcp: Fix bind() regression for v4-mapped-v6 wildcard address.
+  tcp: Fix bind() regression for v4-mapped-v6 non-wildcard address.
+  selftest: tcp: Fix address length in bind_wildcard.c.
+  selftest: tcp: Move expected_errno into each test case in
+    bind_wildcard.c.
+  selftest: tcp: Add v4-mapped-v6 cases in bind_wildcard.c.
+
+ include/net/ipv6.h                          |  5 ++
+ net/ipv4/inet_hashtables.c                  | 12 +++-
+ tools/testing/selftests/net/bind_wildcard.c | 68 +++++++++++++++++----
+ 3 files changed, 72 insertions(+), 13 deletions(-)
+
+-- 
+2.30.2
+
 
