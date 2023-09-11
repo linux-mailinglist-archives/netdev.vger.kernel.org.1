@@ -1,210 +1,171 @@
-Return-Path: <netdev+bounces-32977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88DCF79C165
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 02:58:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FD7679B6DB
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 02:06:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D24B2816E2
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 00:58:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26AB2281610
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 00:05:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFC9763E;
-	Tue, 12 Sep 2023 00:58:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE7E317E;
+	Tue, 12 Sep 2023 00:05:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E6111369
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 00:58:22 +0000 (UTC)
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B62719C365;
-	Mon, 11 Sep 2023 17:53:46 -0700 (PDT)
-Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-9a64619d8fbso639726966b.0;
-        Mon, 11 Sep 2023 17:53:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B29B8160
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 00:05:56 +0000 (UTC)
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 840CFEA089
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 16:37:06 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id 98e67ed59e1d1-26f7f71b9a7so4063790a91.0
+        for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 16:37:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694479944; x=1695084744; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=XWTcwow2et7upqcwf54DyK1wVNFfm6M3zpWLMMZDCl4=;
-        b=o2Oh1/rCeX8rHZN2WMmHEjVvCGzUaQ3zbPowULhStxfYG86nXYTXFteHCt4b/7iK4E
-         L3PLr5uecXIsd9czgMEevISeSbbCC0NVI2VreFmnm1QTgosD67J8GQjD8fq8YfmYSD7M
-         PC9DQxnXvp8Z0yhhorq2Eel+Ept6ObM1h6nrbCABx3H7bNkMqmKA6ouXHRK7taPouSBh
-         45klUpwTcfQ76xuOdKLbMnLS+ISTcCrGx7F5AUTFcuiEyjiYOcoBCgDKJKC+Mgu+vxWp
-         m+bT2LRZ22o3nWpggkpnPKYz8dUfVnwPYRgkMccFhc9nuQgUcb1mBoCGaiAa1OafJjih
-         5AvA==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1694475366; x=1695080166; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wyXUIwp6sVh3PG94YfifNJCLsmaUNVImTDsvvHizJGM=;
+        b=aGVCV7mWEeZNqwqjvX0wg7DAsFFQyuDqH9kxfompG4CQOzzAsLrWUXitD5x5Am+tuo
+         Cqr2hdwqIumL9jkHaUvtzhI0mWaDHiGpBHdrQrKfM4cIa1sbMqWZijpphA2m3zFoqB+T
+         YBxDa2/Oqok6XJ2Gdx/Yu02J7c/mlLhuHE32dDqexHWx3dbCSKxl2kgIrgpC0Up0HOvr
+         Wt7jkltc2icHWfWoA1pajXFhDMD+YsS7Jru4X522L6uPrQ5XYRhQK7c/mfz6aipYWKOq
+         mBwA4RNdI0vk6yt6T5vZYylgV7vxXiYGNzBL9cQWJhajdCa//YkuJlvEowG3jBwxnfc+
+         CraQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694479944; x=1695084744;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XWTcwow2et7upqcwf54DyK1wVNFfm6M3zpWLMMZDCl4=;
-        b=o66WqNv1R0eX6fUQvkk8P+Nz397cBzAjV98qsMgzxQGoBoFL+sSFsDTqE1ihVe7k4k
-         GkAS4TrTOx/uSbaOHBO0+FC3TRixsjSKPNmOTURBFJAEK3htUJWI1e5+4pb3kZZ/qpM/
-         7Z6s79pgtMtgZu3DZe8nN6xzPln9Es5nzGdrR0DEHzpqAkPyioC+jlnmowhQc5qszRqv
-         E3RDhxXgWFoJCzH3YagxULsCSCkaKesLmdYCL/CrvIMLZ12blT2STMrNKw04J+yUUHiG
-         /iCvVNY6vstSGX1eOq2gOwC7/iJ7JQVF2O+aU813ISID0yIUeQejV71WS94lpiclMH4s
-         us9A==
-X-Gm-Message-State: AOJu0YxRJF7M0m+mBNxwsbTW3O0JIFqtJhnT0C4fKmCAvtJcpwakgeIX
-	oBUxbCOQrENpeAnofWWuxbtw1Y4WLwN7Xw==
-X-Google-Smtp-Source: AGHT+IG4neBUt+ie4pzDoZiQeWUSKTNp1+XgRuVaZj4s2RJQC3CdsSSnlnDEU6xXFuAqvt2am5jxOw==
-X-Received: by 2002:a17:906:30da:b0:99d:fc31:242f with SMTP id b26-20020a17090630da00b0099dfc31242fmr9012606ejb.66.1694472689910;
-        Mon, 11 Sep 2023 15:51:29 -0700 (PDT)
-Received: from skbuf ([188.26.56.202])
-        by smtp.gmail.com with ESMTPSA id dx22-20020a170906a85600b0099d959f9536sm6023945ejb.12.2023.09.11.15.51.27
+        d=1e100.net; s=20230601; t=1694475366; x=1695080166;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wyXUIwp6sVh3PG94YfifNJCLsmaUNVImTDsvvHizJGM=;
+        b=JyLSOpY8gW0KgPGmA/p1xCUmwCUrRR/qAJzpyz23eDajZNAXuoJFE/lxSMFknEDgTI
+         KIpXA53Z9xn9VBvDNMvx4PdsaMOM+Rx/FtM/+Nwdx8nGuwOOp6IerQsYezFPW11bPrcS
+         OWyze5aKcKoiw1v7TAI8EIGqIjiFRJAqKn1Q+HfSkkDFWbFFwODGRXoQrc+Mlt8YlLb4
+         UnmLHgCfykCBAoV7TV75NluO34BUqOnnvwQ5TUJtdKnrKgV23H87fgyIpLLUCYUYYTg4
+         I5H4e47f1B+ZSbhaTFopvup+in8lBO1GcDBzx4R85nsi8HZF5WMYbZkDHkhCa63kLaXx
+         7xDg==
+X-Gm-Message-State: AOJu0YzWInCmJRmq4qw9k5YCBQANLi3As+qp/EmzkY6x5wN6jyIA1mvR
+	FB5GQwBBGOhcThXrGiPagQY+EjJy6S1EtLpQ3Og=
+X-Google-Smtp-Source: AGHT+IH1CsV1nRDf/Nzvb1mlH9/A1rqIb7TyG3QAR04zEypM2gqM+BzGmFfkpNkRZPST1atGfzODKg==
+X-Received: by 2002:a05:6830:1da:b0:6bf:60a:f79f with SMTP id r26-20020a05683001da00b006bf060af79fmr10331952ota.22.1694474887736;
+        Mon, 11 Sep 2023 16:28:07 -0700 (PDT)
+Received: from localhost.localdomain ([2804:7f1:e2c2:424f:fdef:90d5:8e0:d9])
+        by smtp.gmail.com with ESMTPSA id l10-20020a9d7a8a000000b006b8c87551e8sm3534293otn.35.2023.09.11.16.28.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Sep 2023 15:51:29 -0700 (PDT)
-Date: Tue, 12 Sep 2023 01:51:26 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH 2/4] dt-bindings: net: dsa: document internal MDIO bus
-Message-ID: <20230911225126.rk23g3u3bzo3agby@skbuf>
-References: <47b61929-5c2d-4906-b153-2046a94858c8@arinc9.com>
- <20230813112026.ohsx6srbt2staxma@skbuf>
- <8a8e14f1-0493-4298-a2cc-6e7ae7929334@arinc9.com>
- <20230813190157.4y3zoro53qsz43pe@skbuf>
- <f5f468c1-b5a2-4336-b1d9-fd82da95b21d@arinc9.com>
- <20230814143601.mnpxtcm2zybnbvoh@skbuf>
- <0cee0928-74c9-4048-8cd8-70bfbfafd9b2@arinc9.com>
- <20230827121235.zog4c3ehu2cyd3jy@skbuf>
- <676d1a2b-6ffa-4aff-8bed-a749c373f5b3@arinc9.com>
- <87325ce9-595a-4dda-a6a1-b5927d25719b@arinc9.com>
+        Mon, 11 Sep 2023 16:28:07 -0700 (PDT)
+From: Victor Nogueira <victor@mojatatu.com>
+To: jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: mleitner@redhat.com,
+	vladbu@nvidia.com,
+	horms@kernel.org,
+	pctammela@mojatatu.com,
+	netdev@vger.kernel.org,
+	kernel@mojatatu.com
+Subject: [PATCH net-next v3 0/3] net/sched: Introduce tc block ports tracking and use
+Date: Mon, 11 Sep 2023 20:27:46 -0300
+Message-ID: <20230911232749.14959-1-victor@mojatatu.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <87325ce9-595a-4dda-a6a1-b5927d25719b@arinc9.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Sep 09, 2023 at 11:53:50AM +0300, Arınç ÜNAL wrote:
-> What to do:
-> - For mscc,vsc7514-switch, enforce phylink bindings for ports.
-> - For mscc,vsc7512-switch, enforce phylink bindings for user ports.
+__context__
+The "tc block" is a collection of netdevs/ports which allow qdiscs to share
+match-action block instances (as opposed to the traditional tc filter per
+netdev/port)[1].
 
-you can also look at dsa_switches_apply_workarounds[], and if the switch
-isn't there, then you can replace "user ports" with "ports" here and
-everywhere.
+Example setup:
+$ tc qdisc add dev ens7 ingress block 22
+$ tc qdisc add dev ens8 ingress block 22
 
-> - renesas,rzn1-a5psw.yaml
->   - renesas,r9a06g032-a5psw, renesas,rzn1-a5psw
-> 
-> What to do:
-> - Document "mdio".
+Once the block is created we can add a filter using the block index:
+$ tc filter add block 22 protocol ip pref 25 \
+  flower dst_ip 192.168.0.0/16 action drop
 
-Not clear here and for all the schemas quoted below.. is "mdio" not documented already?
+A packet with dst IP matching 192.168.0.0/16 arriving on the ingress of
+either ens7 or ens8 is dropped.
 
-> - realtek.yaml
->   - realtek,rtl8365mb
->   - realtek,rtl8366rb
-> 
-> drivers/net/dsa/realtek/realtek-mdio.c:
-> - The DSA subdriver lets the DSA driver register the bus.
-> 
-> What to do:
-> - Document "mdio".
->   - Require "mdio". (Can't do because it's not required for MDIO controlled
->     switches that share the compatible string with SMI controlled switches.
->     This is why I would like Luiz to unify the bus registeration process.)
-> - Document compatible string "realtek,smi-mdio" on "mdio" child node.
->   - Require compatible. (Can't do because the same as above.)
-> - Enforce phylink bindings for user ports. (Can't do because the same as
->   above.)
->   - Enforce phylink bindings for user ports if "mdio" is defined.
-> 
-> ---
-> 
-> - qca8k.yaml
->   - qca,qca8327
->   - qca,qca8328
->   - qca,qca8334
->   - qca,qca8337
-> 
-> drivers/net/dsa/qca/qca8k-8xxx.c:
-> - The DSA subdriver won't let the DSA driver register the bus.
->   - No ds->ops->phy_read() or ds->ops->phy_write().
-> - Registers the bus non-OF-based or OF-based. Registers OF-based if "mdio"
->   child node is defined.
->   - mdio = of_get_child_by_name(priv->dev->of_node, "mdio");
-> 
-> What to do:
-> - Document "mdio".
-> - Enforce phylink bindings for user ports if "mdio" is defined.
-> 
-> ---
-> 
-> - nxp,sja1105.yaml
->   - nxp,sja1105e
->   - nxp,sja1105t
->   - nxp,sja1105p
->   - nxp,sja1105q
->   - nxp,sja1105r
->   - nxp,sja1105s
->   - nxp,sja1110a
->   - nxp,sja1110b
->   - nxp,sja1110c
->   - nxp,sja1110d
-> 
-> What to do:
-> - Document "mdios".
->   - Document child node pattern property under "mdios".
->     - Document "nxp,sja1110-base-tx-mdio" and "nxp,sja1110-base-t1-mdio"
->       compatible strings.
-> ---
-> 
-> - microchip,lan937x.yaml
->   - microchip,lan9370
->   - microchip,lan9371
->   - microchip,lan9372
->   - microchip,lan9373
->   - microchip,lan9374
-> - microchip,ksz.yaml
->   - microchip,ksz8765
->   - microchip,ksz8794
->   - microchip,ksz8795
->   - microchip,ksz8863
->   - microchip,ksz8873
->   - microchip,ksz9477
->   - microchip,ksz9897
->   - microchip,ksz9896
->   - microchip,ksz9567
->   - microchip,ksz8565
->   - microchip,ksz9893
->   - microchip,ksz9563
->   - microchip,ksz8563
-> 
-> What to do:
-> - Document "mdio".
+__this patchset__
+Up to this point in the implementation, the block is unaware of its ports.
+This patch fixes that and makes the tc block ports available to the
+datapath.
+
+For the datapath we provide a use case of the tc block in an action
+we call "blockcast" in patch 3. This action can be used in an example as
+such:
+
+$ tc qdisc add dev ens7 ingress block 22
+$ tc qdisc add dev ens8 ingress block 22
+$ tc qdisc add dev ens9 ingress block 22
+$ tc filter add block 22 protocol ip pref 25 \
+  flower dst_ip 192.168.0.0/16 action blockcast
+
+When a packet(matching dst IP 192.168.0.0/16) arrives on the ingress of any
+of ens7, ens8 or ens9 it will be copied to all ports other than itself.
+For example, if it arrives on ens8 then a copy of the packet will be
+"blockcasted";-> to both ens7 and ens9 (unmodified), but not to ens7.
+
+Patch 1 introduces the required infra. Patch 2 exposes the tc block to the
+tc datapath and patch 3 implements datapath usage via a new tc action
+"blockcast".
+
+__Acknowledgements__
+Suggestions from Vlad Buslov and Marcelo Ricardo Leitner made this patchset
+better. The idea of integrating the ports into the tc block was suggested
+by Jiri Pirko.
+
+[1] See commit ca46abd6f89f ("Merge branch 'net-sched-allow-qdiscs-to-share-filter-block-instances'")
+
+Changes in v2:
+  - Remove RFC tag
+  - Add more details in patch 0(Jiri)
+  - When CONFIG_NET_TC_SKB_EXT is selected we have unused qdisc_cb
+    Reported-by: kernel test robot <lkp@intel.com> (and horms@kernel.org)
+  - Fix bad dev dereference in printk of blockcast action (Simon)
+
+Changes in v3:
+  - Add missing xa_destroy (pointed out by Vlad)
+  - Remove bugfix pointed by Vlad (will send in separate patch)
+  - Removed ports from subject in patch #2 and typos (suggested by Marcelo)
+  - Remove net_notice_ratelimited debug messages in error
+    cases (suggested by Marcelo)
+  - Minor changes to appease sparse's lock context warning
+
+Victor Nogueira (3):
+  net/sched: Introduce tc block netdev tracking infra
+  net/sched: cls_api: Expose tc block to the datapath
+  net/sched: act_blockcast: Introduce blockcast tc action
+
+ include/net/sch_generic.h    |   8 +
+ include/net/tc_wrapper.h     |   5 +
+ include/uapi/linux/pkt_cls.h |   1 +
+ net/sched/Kconfig            |  13 ++
+ net/sched/Makefile           |   1 +
+ net/sched/act_blockcast.c    | 300 +++++++++++++++++++++++++++++++++++
+ net/sched/cls_api.c          |  12 +-
+ net/sched/sch_api.c          |  71 +++++++++
+ net/sched/sch_generic.c      |  34 +++-
+ 9 files changed, 442 insertions(+), 3 deletions(-)
+ create mode 100644 net/sched/act_blockcast.c
+
+-- 
+2.25.1
+
 
