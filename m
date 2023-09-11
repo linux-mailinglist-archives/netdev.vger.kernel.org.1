@@ -1,58 +1,57 @@
-Return-Path: <netdev+bounces-32839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32840-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF79279A932
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 16:57:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4A9079A943
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 16:58:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F8B12812AA
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 14:57:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A60B01C209B2
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 14:58:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAFE61171F;
-	Mon, 11 Sep 2023 14:57:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A56D011721;
+	Mon, 11 Sep 2023 14:58:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFF7B11719
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 14:57:20 +0000 (UTC)
-Received: from phobos.denx.de (phobos.denx.de [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80608E50;
-	Mon, 11 Sep 2023 07:57:17 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97B1F11719
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 14:58:53 +0000 (UTC)
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68893E40;
+	Mon, 11 Sep 2023 07:58:51 -0700 (PDT)
 Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
 	(No client certificate requested)
 	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 84AFD86E45;
-	Mon, 11 Sep 2023 16:57:14 +0200 (CEST)
+	by phobos.denx.de (Postfix) with ESMTPSA id 5071486D90;
+	Mon, 11 Sep 2023 16:58:49 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1694444235;
-	bh=6BZTCrbY7JIU/gU/FlcDi4amb+9Cj/ty4qoviSaIi+E=;
+	s=phobos-20191101; t=1694444329;
+	bh=NlBBt43y5lcwH7fnaA3d3KUuzCDKemg3sKPBS708Mrw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pT6Sc/K4H/1XmsroChmNBpxkv8EhRLWOL+hRJgdcgLGx1Kqo3JBNXLAXDYMosw4fq
-	 xd3TXXyDwG/wjGhw8YqhNHJAv6pD2OF+nysaOocG0RhPBJ4pJrcUIqs6cYcQhXQ1s9
-	 UuDRvpHaesTkZQfdG4iN2Y/erJOp1+AEIyZV5HVMTFCJkdPzUmSL7n8dfSeiqvKhS2
-	 Sq+bXVzne1grSJu3SOAb0uKe7WUfG6TbVh8meKEgDf48CfaGDVhtunF7x08d0YiTHG
-	 dcXv623q+LZVoUXwgYnkZ0Y3sk/bg4EIw7Ord7VWBYm6FLZoSHHZpbwcVwZ6uuqEwq
-	 NZvHOW2uPeJ6Q==
-Date: Mon, 11 Sep 2023 16:57:08 +0200
+	b=He1TXX+EAZe1usILniqW6VQSOdzi7OYtwLssN1I1Nrmb9c46eT6pMyoaU9CCxq0OX
+	 68XjhamzGoIUblIkeUnyVMqfs6m4kdt0uQsJgq9kcGCIHoGYeJ9sGDgfEnzYRUm3Pe
+	 uIKiNvglsoee6/t4XMVP7PoiayhT4Hgffy4UgDAFYncB3kd/vSkLPkdjO+taGW008R
+	 J2+drsi2egK2QPoCbhF+hXZEYlFarleswdnE6dxtcTBq4JucFI8sN+cNOVWhBeo/Aw
+	 MVXhddKIMyZ9sEtRh7aKO9JrzaHrNGdN22Ld26UXDRrhda//iVXzUfhkoQantP+U0n
+	 0Rn6q4wPy855Q==
+Date: Mon, 11 Sep 2023 16:58:48 +0200
 From: Lukasz Majewski <lukma@denx.de>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Tristram.Ha@microchip.com, Eric Dumazet <edumazet@google.com>,
- davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Florian Fainelli
- <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Kristian Overskeid <koverskeid@gmail.com>, Matthieu
- Baerts <matthieu.baerts@tessares.net>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Andreas Oetken <ennoerlangen@gmail.com>
-Subject: Re: [PATCH] net: hsr : Provide fix for HSRv1 supervisor frames
- decoding
-Message-ID: <20230911165708.0bc32e3c@wsk>
-In-Reply-To: <20230905115512.3ac6649c@wsk>
-References: <20230825153111.228768-1-lukma@denx.de>
-	<20230905080614.ImjTS6iw@linutronix.de>
-	<20230905115512.3ac6649c@wsk>
+To: Tristram.Ha@microchip.com, Eric Dumazet <edumazet@google.com>, Andrew
+ Lunn <andrew@lunn.ch>, davem@davemloft.net, Woojung Huh
+ <woojung.huh@microchip.com>, Vladimir Oltean <olteanv@gmail.com>, Oleksij
+ Rempel <o.rempel@pengutronix.de>
+Cc: Florian Fainelli <f.fainelli@gmail.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ UNGLinuxDriver@microchip.com, Oleksij Rempel <linux@rempel-privat.de>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [[RFC PATCH v4 net-next] 0/2] net: dsa: hsr: Enable HSR HW
+ offloading for KSZ9477
+Message-ID: <20230911165848.0741c03c@wsk>
+In-Reply-To: <20230906152801.921664-1-lukma@denx.de>
+References: <20230906152801.921664-1-lukma@denx.de>
 Organization: denx.de
 X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
@@ -61,7 +60,7 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/8XSE7au7Lm0FPJDKb+ziwHb";
+Content-Type: multipart/signed; boundary="Sig_/l1xVNpnAFR9tiKENrOB14ys";
  protocol="application/pgp-signature"; micalg=pgp-sha512
 X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
 X-Virus-Status: Clean
@@ -71,91 +70,60 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---Sig_/8XSE7au7Lm0FPJDKb+ziwHb
-Content-Type: text/plain; charset=UTF-8
+--Sig_/l1xVNpnAFR9tiKENrOB14ys
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-Hi Sebastian,
+Dear Community,
 
-> Hi Sebastian,
+> This patch series provides support for HSR HW offloading in KSZ9477
+> switch IC.
 >=20
-> > On 2023-08-25 17:31:11 [+0200], Lukasz Majewski wrote: =20
-> > > Provide fix to decode correctly supervisory frames when HSRv1
-> > > version of the HSR protocol is used.
-> > >=20
-> > > Without this patch console is polluted with:
-> > > ksz-switch spi1.0 lan1: hsr_addr_subst_dest: Unknown node
-> > >=20
-> > > as a result of destination node's A MAC address equals to:
-> > > 00:00:00:00:00:00.
-> > >=20
-> > > cat /sys/kernel/debug/hsr/hsr0/node_table
-> > > Node Table entries for (HSR) device
-> > > MAC-Address-A,    MAC-Address-B,    time_in[A], time_in[B],
-> > > Address-B 00:00:00:00:00:00 00:10:a1:94:77:30      400bf,
-> > > 399c,	        0
-> > >=20
-> > > It was caused by wrong frames decoding in the
-> > > hsr_handle_sup_frame().
-> > >=20
-> > > As the supervisor frame is encapsulated in HSRv1 frame:
-> > >=20
-> > > SKB_I100000000: 01 15 4e 00 01 2d 00 10 a1 94 77 30 89 2f 00 34
-> > > SKB_I100000010: 02 59 88 fb 00 01 84 15 17 06 00 10 a1 94 77 30
-> > > SKB_I100000020: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> > > SKB_I100000030: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> > > SKB_I100000040: 00 00
-> > >=20
-> > > The code had to be adjusted accordingly and the MAC-Address-A now
-> > > has the proper address (the MAC-Address-B now has all 0's).   =20
-> >=20
-> > Was this broken by commit
-> > 	eafaa88b3eb7f ("net: hsr: Add support for redbox supervision
-> > frames")
-> >  =20
+> To test this feature:
+> ip link add name hsr0 type hsr slave1 lan1 slave2 lan2 supervision 45
+> version 1 ip link set dev lan1 up
+> ip link set dev lan2 up
+> ip a add 192.168.0.1/24 dev hsr0
+> ip link set dev hsr0 up
 >=20
-> Yes, it seems so.
+> To remove HSR network device:
+> ip link del hsr0
 >=20
-> > ? Is this frame somehow special? I don't remember this=E2=80=A6
-> >  =20
+> It is also possible to create another HSR interface, but it will
+> only support HSR is software - e.g.
+> ip link add name hsr1 type hsr slave1 lan3 slave2 lan4 supervision 45
+> version 1
 >=20
-> Please refer to the whole thread - I've described this issue
-> thoroughly (including hex dump of frames):
-> https://lore.kernel.org/lkml/20230904175419.7bed196b@wsk/T/#m35cbfa4f1b89=
-01d341fbc39659ace6a041f84c98
+> Test HW:
+> Two KSZ9477-EVB boards with HSR ports set to "Port1" and "Port2".
 >=20
-> In short - the HSRv1 is not recognized correctly anymore:
+> Performance SW used:
+> nuttcp -S --nofork
+> nuttcp -vv -T 60 -r 192.168.0.2
+> nuttcp -vv -T 60 -t 192.168.0.2
 >=20
-> HSR v0:
->     [Protocols in frame: eth:ethertype:hsr_prp_supervision]
->                                                                        =20
-> HSR v1:
->     [Protocols in frame: eth:ethertype:hsr:hsr_prp_supervision]
+> Code: v6.5-rc7 Linux repository
+> Tested HSR v0 and v1
+> Results:
+> With KSZ9477 offloading support added: RX: 100 Mbps TX: 98 Mbps
+> With no offloading 		       RX: 63 Mbps  TX: 63 Mbps
+>=20
+>=20
+> Lukasz Majewski (2):
+>   net: dsa: Extend ksz9477 TAG setup to support HSR frames duplication
+>   net: dsa: hsr: Enable in KSZ9477 switch HW HSR offloading
+>=20
+>  drivers/net/dsa/microchip/ksz9477.c    | 81
+> ++++++++++++++++++++++++++ drivers/net/dsa/microchip/ksz9477.h    |
+> 2 + drivers/net/dsa/microchip/ksz_common.c | 76
+> ++++++++++++++++++++++++ drivers/net/dsa/microchip/ksz_common.h |  3 +
+>  net/dsa/tag_ksz.c                      |  8 +++
+>  5 files changed, 170 insertions(+)
 >=20
 
-Have you had time to review this patch?
 
-Your comments are more than welcome.
-
->=20
-> > > Signed-off-by: Lukasz Majewski <lukma@denx.de>   =20
-> >=20
-> > Sebastian =20
->=20
->=20
-> Best regards,
->=20
-> Lukasz Majewski
->=20
-> --
->=20
-> DENX Software Engineering GmbH,      Managing Director: Erika Unter
-> HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-> Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email:
-> lukma@denx.de
-
-
-
+Are there any comments regarding this new revision of the HSR support
+for KSZ9477 switch?
 
 Best regards,
 
@@ -167,21 +135,21 @@ DENX Software Engineering GmbH,      Managing Director: Erika Unter
 HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
 Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
 
---Sig_/8XSE7au7Lm0FPJDKb+ziwHb
+--Sig_/l1xVNpnAFR9tiKENrOB14ys
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmT/KsQACgkQAR8vZIA0
-zr0AOAgAs0CIwM+g7skUkQ97pRHdo5AVv17Btzofx6gypvJfnFb0gf1tQcoRpmDh
-vh7xIAPxf+eByxARu8e487m8zNfkMi367BZAtQr9gebklH17ghEZTNEkzUs0P9LU
-9PMUP7MWQvCskLQMFHxVvZJVnQAFWEZOZbm6gWvYmVH6JzxriLh0rtcu5DWHl2mB
-o6SX1iykaQmQceGSb7eW4Cfu5KecLIG156g9bC9uZ5/3jOq2JHHGilgtwU6+CGHA
-rFKlLqpXouABuUWUmM9+O/sMBryOAGb4r7cASRBzAsBFDCuXpu4q/oyCT+it8fTl
-jiOqJvCj0NqkE3TcaLDary8ujR/hIw==
-=rYMm
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmT/KygACgkQAR8vZIA0
+zr3D9gf/b+7FlEt0P70xpGzznuBH+xSxzGUPSwSHARy2wlLTNLTPM5RdP8qFIS8B
+j82vP1JNb+nb/AqLlr61kgASyyo7NVdWSmXq+1F68UqfsChS714O6zgt1w2Hl3YI
+3kPpR0ZYTMv1r3G0iiLIXmhTzKUBJ7lshxADI5vMlWdG8qhaSnS/X6KlQ/rtO5UJ
+pnwdn4rfZtti0YU6UNBHeqltF25tPlot0Se2z6sAIisp6hNjhKF3cItHF4M646Z/
+tbLJAd3S607I2QmhFKuAN1rhHk5Hd9UiMQvwEtCw/jS0jp0aD6wuxc/FX8P/sAqg
+EKofoXbT8NvfQFtOf3YWW0b50TUeBw==
+=9srb
 -----END PGP SIGNATURE-----
 
---Sig_/8XSE7au7Lm0FPJDKb+ziwHb--
+--Sig_/l1xVNpnAFR9tiKENrOB14ys--
 
