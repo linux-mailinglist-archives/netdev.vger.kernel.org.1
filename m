@@ -1,92 +1,112 @@
-Return-Path: <netdev+bounces-32843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3244179A96D
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 17:08:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C76B879A99D
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 17:28:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 613731C20961
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 15:08:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B61321C20837
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 15:28:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58C3B1172C;
-	Mon, 11 Sep 2023 15:08:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA27D11733;
+	Mon, 11 Sep 2023 15:28:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 336C11172B
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 15:08:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BA0AC433C9;
-	Mon, 11 Sep 2023 15:08:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694444901;
-	bh=QQhUsR8kda3/hj6CcImnvWnHoUxICmdWDtUfw+d0L2k=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=oMnmqdvCbB/b9eUNHcCKrZgBIXAfEa4l3Ut8F+Krr/A+TO4Qp5xFRdmhtzOYMkOQW
-	 98qwiW7ihtvdhmXn9/JMY3cAkCWfkf2RS329FQiqevC0xj5zMYEDcJaG1IoD/tdcm4
-	 kpZWOr1Vyd7e3Vmm3u4QL91seR/p4ZlqPgFodnlHBoxj1eBGPhSgK/yrDWOIq40+f5
-	 aUnUpUTw2aMPaIA27iibLEyT3mePx5Lnjot6mQy4HcSMzruUmZLyKo9qd8lzteD46Z
-	 2M1fvO80IowMc9BrQIeMCwHpPKkPdDJZ3fzLDWpXm32vUmqUZe+eAU80MyQvPY7gmH
-	 AOdhADl4GZdow==
-From: Mark Brown <broonie@kernel.org>
-To: alsa-devel@alsa-project.org, Julia Lawall <Julia.Lawall@inria.fr>
-Cc: kernel-janitors@vger.kernel.org, Zhang Rui <rui.zhang@intel.com>, 
- Amit Kucheria <amitk@kernel.org>, linux-pm@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
- bcm-kernel-feedback-list@broadcom.com, linux-kernel@vger.kernel.org, 
- Nicholas Piggin <npiggin@gmail.com>, 
- Christophe Leroy <christophe.leroy@csgroup.eu>, 
- linuxppc-dev@lists.ozlabs.org, linux-mmc@vger.kernel.org, 
- dri-devel@lists.freedesktop.org, linux-mediatek@lists.infradead.org, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
- linux-media@vger.kernel.org
-In-Reply-To: <20230907095521.14053-1-Julia.Lawall@inria.fr>
-References: <20230907095521.14053-1-Julia.Lawall@inria.fr>
-Subject: Re: (subset) [PATCH 00/11] add missing of_node_put
-Message-Id: <169444489227.1851820.10212594180854433279.b4-ty@kernel.org>
-Date: Mon, 11 Sep 2023 16:08:12 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7653211728;
+	Mon, 11 Sep 2023 15:28:36 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (unknown [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 913F4E4;
+	Mon, 11 Sep 2023 08:28:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=L3aWAk1k0F3xbo0PvehavMWBi8SSBtH1rAKg3ce9DIM=; b=ty7Ypls+BHIWlRgl2wrP6P562d
+	bKwZytfMDIWEq0e/K6fz5pSdCicwgf+cJmbBsSj/WJ1875CYuX3zbVDxuJJEtgtQiie413huwdi4I
+	ignBXctM0Gofrr8PcOcPw7hIintSS/3Btb3q/PL1GrLSDUqIZOLLcMS2yAoSw4N2vTkuIslrJhI5v
+	sN1adAX3lnSC1UOtWY4vqRv0350qh7E9zzoPKH3gLaYwiWWuqiMKMqFpDXe2vo3U+AgPtYeyn9OGz
+	9MwLNkCTS3CSaKj1GAS9Bgat9ACvjkeQJltC7ae7avK7b0fRnUBf3zb0OuX3riHKYLYu2NqX2w1Ip
+	gEhfeuvQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53518)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qfipq-0008BR-2W;
+	Mon, 11 Sep 2023 16:28:22 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qfipk-0001m7-Vh; Mon, 11 Sep 2023 16:28:16 +0100
+Date: Mon, 11 Sep 2023 16:28:16 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, bpf@vger.kernel.org,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Eric Dumazet <edumazet@google.com>,
+	Fabio Estevam <festevam@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	NXP Linux Team <linux-imx@nxp.com>, Paolo Abeni <pabeni@redhat.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Samin Guo <samin.guo@starfivetech.com>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Shawn Guo <shawnguo@kernel.org>
+Subject: [PATCH net-next 0/6] net: stmmac: add and use library for setting
+ clock
+Message-ID: <ZP8yEFWn0Ml3ALWq@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13-dev-099c9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
+	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, 07 Sep 2023 11:55:10 +0200, Julia Lawall wrote:
-> Add of_node_put on a break out of an of_node loop.
-> 
+Hi,
 
-Applied to
+There is a common theme throughout several "bsps" in the stmmac driver
+which all code up the same thing: for 10M, 100M and 1G, select the
+appropriate 2.5MHz, 25MHz, or 125MHz clock.
 
-   https://git.kernel.org/pub/scm/linux/kernel/git/broonie/sound.git for-next
+Rather than having every BSP implement the same thing but slightly
+differently, let's provide a single implementation which is passed
+the struct clk and the speed, and have that do the speed to clock
+rate decode.
 
-Thanks!
+Note: only build tested.
 
-[10/11] ASoC: rsnd: add missing of_node_put
-        commit: 28115b1c4f2bb76e786436bf6597c5eb27638a5c
+ drivers/net/ethernet/stmicro/stmmac/Makefile       |  2 +-
+ .../ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c    | 37 ++++---------
+ drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c    | 27 +++-------
+ .../net/ethernet/stmicro/stmmac/dwmac-intel-plat.c | 35 ++++---------
+ drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c     | 61 ++++++----------------
+ .../net/ethernet/stmicro/stmmac/dwmac-starfive.c   | 29 +++-------
+ .../net/ethernet/stmicro/stmmac/stmmac_plat_lib.c  | 29 ++++++++++
+ .../net/ethernet/stmicro/stmmac/stmmac_plat_lib.h  |  8 +++
+ 8 files changed, 91 insertions(+), 137 deletions(-)
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/stmmac_plat_lib.c
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/stmmac_plat_lib.h
 
-All being well this means that it will be integrated into the linux-next
-tree (usually sometime in the next 24 hours) and sent to Linus during
-the next merge window (or sooner if it is a bug fix), however if
-problems are discovered then the patch may be dropped or reverted.
-
-You may get further e-mails resulting from automated or manual testing
-and review of the tree, please engage with people reporting problems and
-send followup patches addressing any issues that are reported if needed.
-
-If any updates are required or you are submitting further changes they
-should be sent as incremental updates against current git, existing
-patches will not be replaced.
-
-Please add any relevant lists and maintainers to the CCs when replying
-to this mail.
-
-Thanks,
-Mark
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
