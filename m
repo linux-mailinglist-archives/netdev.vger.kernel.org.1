@@ -1,87 +1,85 @@
-Return-Path: <netdev+bounces-32782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C840B79A6CA
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 11:38:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BE8B79A6CC
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 11:40:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3DE41C209D6
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 09:38:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C890F2811AC
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 09:40:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF24CC120;
-	Mon, 11 Sep 2023 09:38:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F152BC120;
+	Mon, 11 Sep 2023 09:40:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E3D4BE7C
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 09:38:33 +0000 (UTC)
-Received: from jabberwock.ucw.cz (jabberwock.ucw.cz [46.255.230.98])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B8BDEE;
-	Mon, 11 Sep 2023 02:38:32 -0700 (PDT)
-Received: by jabberwock.ucw.cz (Postfix, from userid 1017)
-	id B75581C0006; Mon, 11 Sep 2023 11:38:30 +0200 (CEST)
-Date: Mon, 11 Sep 2023 11:38:30 +0200
-From: Pavel Machek <pavel@denx.de>
-To: Sasha Levin <sashal@kernel.org>
-Cc: linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-	Johannes Berg <johannes.berg@intel.com>,
-	syzbot+09d1cd2f71e6dd3bfd2c@syzkaller.appspotmail.com,
-	johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH AUTOSEL 4.14 7/8] wifi: cfg80211: ocb: don't leave if not
- joined
-Message-ID: <ZP7gFtW+U07CpC/K@duo.ucw.cz>
-References: <20230908182127.3461199-1-sashal@kernel.org>
- <20230908182127.3461199-7-sashal@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89B83BE5C
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 09:40:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id F2922C433C9;
+	Mon, 11 Sep 2023 09:40:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694425226;
+	bh=VexeRoFIErq8J/8XR03dPblD5jykwUeFBd2AKAgeJqM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=iD8Gs+/zUl7AJMEAIqzv4fLwwsC/hjuq+KuN7Yjv3QLFuQmkjZLawgQUGB/P6UAnC
+	 GlsV01t+ReHoEO5R23c4od0MQA4mS58cI7Mio6nU++NieWhV3xKLAMHUN2hfgQbDBM
+	 5fM8ghU0AMeSNGQcvkkCfjo56KwB994dDDJXRoLrzIEy9Fa2Z42+7svf+CT/5cV5bV
+	 PsEtAOqX8+5elt/qZxW/PTIxSG2zNL4UZy/b1tG/W6fakeDbh9UYCRl42oaZ3r624z
+	 63oNifE/zTko5AqRQIPfAJyXDluxsx6KYcn/lsNKRZQ2GybM0oA2h1ygKVnbJBtcLD
+	 zGsGnsAj4DIsA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D6F1BC00446;
+	Mon, 11 Sep 2023 09:40:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="4zZsMGIhynDkbXF0"
-Content-Disposition: inline
-In-Reply-To: <20230908182127.3461199-7-sashal@kernel.org>
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_NEUTRAL autolearn=no
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] net: ethernet: mtk_eth_soc: fix uninitialized variable
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169442522587.29871.12263337568524186830.git-patchwork-notify@kernel.org>
+Date: Mon, 11 Sep 2023 09:40:25 +0000
+References: <30044cf16ff83f73e5ef852c25682e9fde63af51.1694376191.git.daniel@makrotopia.org>
+In-Reply-To: <30044cf16ff83f73e5ef852c25682e9fde63af51.1694376191.git.daniel@makrotopia.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: dan.carpenter@linaro.org, nbd@nbd.name, john@phrozen.org,
+ sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com, lorenzo@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Sun, 10 Sep 2023 22:40:30 +0100 you wrote:
+> Variable dma_addr in function mtk_poll_rx can be uninitialized on
+> some of the error paths. In practise this doesn't matter, even random
+> data present in uninitialized stack memory can safely be used in the
+> way it happens in the error path.
+> 
+> However, in order to make Smatch happy make sure the variable is
+> always initialized.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2] net: ethernet: mtk_eth_soc: fix uninitialized variable
+    https://git.kernel.org/netdev/net/c/e10a35abb3da
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---4zZsMGIhynDkbXF0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Hi!
-
-> If there's no OCB state, don't ask the driver/mac80211 to
-> leave, since that's just confusing. Since set/clear the
-> chandef state, that's a simple check.
-
-This is not queued for 5.10. Mistake?
-
-Best regards,
-								Pavel
---=20
-DENX Software Engineering GmbH,        Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-
---4zZsMGIhynDkbXF0
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EABECAB0WIQRPfPO7r0eAhk010v0w5/Bqldv68gUCZP7gFgAKCRAw5/Bqldv6
-8tPKAJ0ZLwIUgSYRZlbf8Uohwr5HVJ6hQACgwgVm1eyNnOoNGQRa72F8vHVKJWc=
-=p2UP
------END PGP SIGNATURE-----
-
---4zZsMGIhynDkbXF0--
 
