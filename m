@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-32953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0493979ABA9
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 23:47:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DF8079AB83
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 23:18:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A803A281442
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 21:47:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07E5728148D
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 21:18:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15D588C0A;
-	Mon, 11 Sep 2023 21:47:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C5E68839;
+	Mon, 11 Sep 2023 21:18:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3B5B2F44
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 21:47:06 +0000 (UTC)
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F57DF898
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 14:46:28 -0700 (PDT)
-Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-401da71b85eso54246805e9.1
-        for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 14:46:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BABC53AC
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 21:18:49 +0000 (UTC)
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8FFA40F79
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 14:18:10 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-502b0d23f28so3361440e87.2
+        for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 14:18:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1694468662; x=1695073462; darn=vger.kernel.org;
+        d=arista.com; s=google; t=1694467000; x=1695071800; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5ayM+GqClHSZi3YYuQv7vb2e3VKIXVHqsyFGh4ddchE=;
-        b=Cw2HjuXW0OFOCqjP/VwJOJFr2JRtC3zfEqMYAZJQy1hELWmfRmdDwXrnMv41qPw5Qh
-         ey6i0qfWlPByOA9po/mvabH7F49yJ2/ZsVHj9vC88cmcPSTRZKPQNY9c4dnwFr5+O1Iv
-         3RunuhWF3zJitnszeD2B6I9yL33+abPn9RRnPxpHJCDbFYGiP2ePC+/F+pRRE3mYlhe/
-         kL8JWChac22Br90MR3Ve7LGTvScP1ysylpRAaMy0As8LdWEFcSrYTFzYDexOq3RHlAj9
-         8+5x5MMKquH7NsyiESnyIcUjspDPADgwOGbEHkipB90ix3dJpnwjAIWhgd8Yt5/ZlQ4V
-         ZpKQ==
+        bh=lY5+w3zHLpQMtha6G2wxwVMjZb3xhnHQxjgtdMvKME8=;
+        b=lAIcRecGYV9DMwsqQFX2F3Y0CvSgp+e1VxoO7x++3bI5foVhaDRRUlUo2AS4axF+nl
+         jZI9JRJw8mV6RtYejeLhqgvPM4tDc4o3KgD+3XimmbpHa4iRF9c0H1S51ApRm9Wkf0F8
+         Tet/z1AezLa/I15txau2dkZlBzbr3blJ8erOJeT4LplfpL5vipiN6fepwTROh23nB/YK
+         KH/MJK30tX2fjgQNEnvBqpUq9SvXM4Lsd75fP+3oRk4IemcETYoO89GZrQH8opnA7d8+
+         waHy/wMabrpYjGghvdGi9TSjR7e79kEEiSR1qZXZxyzFWcLTU9OFTYLc5G5WQEvTyHSU
+         swqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694468662; x=1695073462;
+        d=1e100.net; s=20230601; t=1694467000; x=1695071800;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5ayM+GqClHSZi3YYuQv7vb2e3VKIXVHqsyFGh4ddchE=;
-        b=ZPv2G5viZ5ERqG0ZfijikEDGSM/PQyuZ1oFdeoQCSRzdGD3WAkZwTQCNpXFTKSn74B
-         EfwI2DwKCG8+LYq+b0EfryCDFZnXogUfI34zW0UCdbJ2QIq9P5uZWO1U94q2IhCxibat
-         QldOpnQ9RENJjAcY+DTSy1NVOe5PyGYC1my+C3wTYc1m56ratVbVC/Ghfvd9heMTd0VW
-         jaQJWm67TzFQmH2RhY+H54E1QEWQq6s4RAUGPuTfiYNGh0lqtQDLztbylFiweyB+1m7f
-         0xeqa/2fxTBKV5ngIrE1wa11Egk3CTG4gimT93KJ0LJGPPhvKUmTWVv6kckwhY+MMYRp
-         RQrw==
-X-Gm-Message-State: AOJu0Yx/ovCnDBt5sH4XzJrnLkGZyOSK/8gBaH/LNFEEasXOO9bI5ebH
-	Jrn5s3UaNAbcC5Jcbpt9fHNaZpKGAVy0tqSy8a0=
-X-Google-Smtp-Source: AGHT+IHdGtKrZwS1C7NjCMTBaiAn9HXSj4fCbs0QdNYYSW0+AHlKkQpFVnHWL1U3KPhdbA11Bkb8hg==
-X-Received: by 2002:a05:600c:290a:b0:402:e6a2:c8c7 with SMTP id i10-20020a05600c290a00b00402e6a2c8c7mr9718979wmd.7.1694466270134;
-        Mon, 11 Sep 2023 14:04:30 -0700 (PDT)
+        bh=lY5+w3zHLpQMtha6G2wxwVMjZb3xhnHQxjgtdMvKME8=;
+        b=vAm+CYCQchQVCcXN1Ojq0Sadt0YIzWZlwoYnABscygryWadQe0bqcLI/usrl+K/yhn
+         IPRS9Xz2r7qZ/WO4XYxQq6EwgJUPhl4p40IH+70vnt8H1JiYj7ik/ItQlSY+ejZ4k4mc
+         a2bQBV6U0uitFlb/XWiMH0mgnZ2A1SeQwAnCIKM2skuyJDwnlPO5RpY8A6TNIRGFMQiD
+         +RhkyiDeHx54RFCY3RAyIV5uyVLFiygokIFLQgmovBC4q0YRgPTeaphaNBUa2hs3U5TU
+         ZQ3rDpl/IoaAPeBB0qwQUQYIFzLg3WcLkCisgHxSvjtRa/wiiFp2JvssYN5vZCTmWobT
+         JDPA==
+X-Gm-Message-State: AOJu0Yxl8CB8A3hqYiuBtrkkz/Th3zAiLtOiDyALF8Ny4v9pWr164Tnr
+	oCZ3ZVYiXR3IufisDg5qq3lkRjlL0eQrVbRL0Kg=
+X-Google-Smtp-Source: AGHT+IFosSzK/6/8XLIEqJeQOnUh1Boq9ttvMK23r5j3Tzvzybr1M8AlgogSzDTu9AQAvBWEEqBa8A==
+X-Received: by 2002:a05:600c:1d85:b0:403:50:a61e with SMTP id p5-20020a05600c1d8500b004030050a61emr6600415wms.24.1694466275556;
+        Mon, 11 Sep 2023 14:04:35 -0700 (PDT)
 Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id z20-20020a1c4c14000000b00402e942561fsm14261699wmf.38.2023.09.11.14.04.28
+        by smtp.gmail.com with ESMTPSA id z20-20020a1c4c14000000b00402e942561fsm14261699wmf.38.2023.09.11.14.04.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Sep 2023 14:04:29 -0700 (PDT)
+        Mon, 11 Sep 2023 14:04:35 -0700 (PDT)
 From: Dmitry Safonov <dima@arista.com>
 To: David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
@@ -84,9 +84,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Simon Horman <simon.horman@corigine.com>,
 	"Tetreault, Francois" <ftetreau@ciena.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH v11 net-next 19/23] net/tcp: Allow asynchronous delete for TCP-AO keys (MKTs)
-Date: Mon, 11 Sep 2023 22:03:39 +0100
-Message-ID: <20230911210346.301750-20-dima@arista.com>
+Subject: [PATCH v11 net-next 22/23] net/tcp: Add TCP_AO_REPAIR
+Date: Mon, 11 Sep 2023 22:03:42 +0100
+Message-ID: <20230911210346.301750-23-dima@arista.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230911210346.301750-1-dima@arista.com>
 References: <20230911210346.301750-1-dima@arista.com>
@@ -104,101 +104,248 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Delete becomes very, very fast - almost free, but after setsockopt()
-syscall returns, the key is still alive until next RCU grace period.
-Which is fine for listen sockets as userspace needs to be aware of
-setsockopt(TCP_AO) and accept() race and resolve it with verification
-by getsockopt() after TCP connection was accepted.
+Add TCP_AO_REPAIR setsockopt(), getsockopt(). They let a user to repair
+TCP-AO ISNs/SNEs. Also let the user hack around when (tp->repair) is on
+and add ao_info on a socket in any supported state.
+As SNEs now can be read/written at any moment, use
+WRITE_ONCE()/READ_ONCE() to set/read them.
 
-The benchmark results (on non-loaded box, worse with more RCU work pending):
-> ok 33    Worst case delete    16384 keys: min=5ms max=10ms mean=6.93904ms stddev=0.263421
-> ok 34        Add a new key    16384 keys: min=1ms max=4ms mean=2.17751ms stddev=0.147564
-> ok 35 Remove random-search    16384 keys: min=5ms max=10ms mean=6.50243ms stddev=0.254999
-> ok 36         Remove async    16384 keys: min=0ms max=0ms mean=0.0296107ms stddev=0.0172078
-
-Co-developed-by: Francesco Ruggeri <fruggeri@arista.com>
-Signed-off-by: Francesco Ruggeri <fruggeri@arista.com>
-Co-developed-by: Salam Noureddine <noureddine@arista.com>
-Signed-off-by: Salam Noureddine <noureddine@arista.com>
 Signed-off-by: Dmitry Safonov <dima@arista.com>
 Acked-by: David Ahern <dsahern@kernel.org>
 ---
- include/uapi/linux/tcp.h |  3 ++-
- net/ipv4/tcp_ao.c        | 21 ++++++++++++++++++---
- 2 files changed, 20 insertions(+), 4 deletions(-)
+ include/net/tcp_ao.h     | 14 +++++++
+ include/uapi/linux/tcp.h |  8 ++++
+ net/ipv4/tcp.c           | 24 +++++++----
+ net/ipv4/tcp_ao.c        | 90 ++++++++++++++++++++++++++++++++++++++--
+ 4 files changed, 125 insertions(+), 11 deletions(-)
 
+diff --git a/include/net/tcp_ao.h b/include/net/tcp_ao.h
+index da04efa1aaa5..dfdd980c5d87 100644
+--- a/include/net/tcp_ao.h
++++ b/include/net/tcp_ao.h
+@@ -197,6 +197,8 @@ void tcp_ao_time_wait(struct tcp_timewait_sock *tcptw, struct tcp_sock *tp);
+ bool tcp_ao_ignore_icmp(const struct sock *sk, int type, int code);
+ int tcp_ao_get_mkts(struct sock *sk, sockptr_t optval, sockptr_t optlen);
+ int tcp_ao_get_sock_info(struct sock *sk, sockptr_t optval, sockptr_t optlen);
++int tcp_ao_get_repair(struct sock *sk, sockptr_t optval, sockptr_t optlen);
++int tcp_ao_set_repair(struct sock *sk, sockptr_t optval, unsigned int optlen);
+ enum skb_drop_reason tcp_inbound_ao_hash(struct sock *sk,
+ 			const struct sk_buff *skb, unsigned short int family,
+ 			const struct request_sock *req, int l3index,
+@@ -315,6 +317,18 @@ static inline int tcp_ao_get_sock_info(struct sock *sk, sockptr_t optval, sockpt
+ {
+ 	return -ENOPROTOOPT;
+ }
++
++static inline int tcp_ao_get_repair(struct sock *sk,
++				    sockptr_t optval, sockptr_t optlen)
++{
++	return -ENOPROTOOPT;
++}
++
++static inline int tcp_ao_set_repair(struct sock *sk,
++				    sockptr_t optval, unsigned int optlen)
++{
++	return -ENOPROTOOPT;
++}
+ #endif
+ 
+ #if defined(CONFIG_TCP_MD5SIG) || defined(CONFIG_TCP_AO)
 diff --git a/include/uapi/linux/tcp.h b/include/uapi/linux/tcp.h
-index 1109093bbb24..979ff960fddb 100644
+index 979ff960fddb..624198fa170d 100644
 --- a/include/uapi/linux/tcp.h
 +++ b/include/uapi/linux/tcp.h
-@@ -383,7 +383,8 @@ struct tcp_ao_del { /* setsockopt(TCP_AO_DEL_KEY) */
- 	__s32	ifindex;		/* L3 dev index for VRF */
- 	__u32   set_current	:1,	/* corresponding ::current_key */
- 		set_rnext	:1,	/* corresponding ::rnext */
--		reserved	:30;	/* must be 0 */
-+		del_async	:1,	/* only valid for listen sockets */
-+		reserved	:29;	/* must be 0 */
- 	__u16	reserved2;		/* padding, must be 0 */
- 	__u8	prefix;			/* peer's address prefix */
- 	__u8	sndid;			/* SendID for outgoing segments */
+@@ -133,6 +133,7 @@ enum {
+ #define TCP_AO_DEL_KEY		39	/* Delete MKT */
+ #define TCP_AO_INFO		40	/* Set/list TCP-AO per-socket options */
+ #define TCP_AO_GET_KEYS		41	/* List MKT(s) */
++#define TCP_AO_REPAIR		42	/* Get/Set SNEs and ISNs */
+ 
+ #define TCP_REPAIR_ON		1
+ #define TCP_REPAIR_OFF		0
+@@ -445,6 +446,13 @@ struct tcp_ao_getsockopt { /* getsockopt(TCP_AO_GET_KEYS) */
+ 	__u64	pkt_bad;		/* out: segments that failed verification */
+ } __attribute__((aligned(8)));
+ 
++struct tcp_ao_repair { /* {s,g}etsockopt(TCP_AO_REPAIR) */
++	__be32			snt_isn;
++	__be32			rcv_isn;
++	__u32			snd_sne;
++	__u32			rcv_sne;
++} __attribute__((aligned(8)));
++
+ /* setsockopt(fd, IPPROTO_TCP, TCP_ZEROCOPY_RECEIVE, ...) */
+ 
+ #define TCP_RECEIVE_ZEROCOPY_FLAG_TLB_CLEAN_HINT 0x1
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index aa252a138082..06b80d53165f 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -3597,20 +3597,28 @@ int do_tcp_setsockopt(struct sock *sk, int level, int optname,
+ 		__tcp_sock_set_quickack(sk, val);
+ 		break;
+ 
++	case TCP_AO_REPAIR:
++		err = tcp_ao_set_repair(sk, optval, optlen);
++		break;
+ #ifdef CONFIG_TCP_AO
+ 	case TCP_AO_ADD_KEY:
+ 	case TCP_AO_DEL_KEY:
+ 	case TCP_AO_INFO: {
+ 		/* If this is the first TCP-AO setsockopt() on the socket,
+-		 * sk_state has to be LISTEN or CLOSE
++		 * sk_state has to be LISTEN or CLOSE. Allow TCP_REPAIR
++		 * in any state.
+ 		 */
+-		if (((1 << sk->sk_state) & (TCPF_LISTEN | TCPF_CLOSE)) ||
+-		    rcu_dereference_protected(tcp_sk(sk)->ao_info,
++		if ((1 << sk->sk_state) & (TCPF_LISTEN | TCPF_CLOSE))
++			goto ao_parse;
++		if (rcu_dereference_protected(tcp_sk(sk)->ao_info,
+ 					      lockdep_sock_is_held(sk)))
+-			err = tp->af_specific->ao_parse(sk, optname, optval,
+-							optlen);
+-		else
+-			err = -EISCONN;
++			goto ao_parse;
++		if (tp->repair)
++			goto ao_parse;
++		err = -EISCONN;
++		break;
++ao_parse:
++		err = tp->af_specific->ao_parse(sk, optname, optval, optlen);
+ 		break;
+ 	}
+ #endif
+@@ -4268,6 +4276,8 @@ int do_tcp_getsockopt(struct sock *sk, int level,
+ 		return err;
+ 	}
+ #endif
++	case TCP_AO_REPAIR:
++		return tcp_ao_get_repair(sk, optval, optlen);
+ 	case TCP_AO_GET_KEYS:
+ 	case TCP_AO_INFO: {
+ 		int err;
 diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
-index edb881f90075..c5bde089916d 100644
+index 522d3c84ac96..8a5c2824a9b4 100644
 --- a/net/ipv4/tcp_ao.c
 +++ b/net/ipv4/tcp_ao.c
-@@ -1577,7 +1577,7 @@ static int tcp_ao_add_cmd(struct sock *sk, unsigned short int family,
+@@ -1439,6 +1439,16 @@ static struct tcp_ao_info *setsockopt_ao_info(struct sock *sk)
+ 	return ERR_PTR(-ESOCKTNOSUPPORT);
  }
  
- static int tcp_ao_delete_key(struct sock *sk, struct tcp_ao_info *ao_info,
--			     struct tcp_ao_key *key,
-+			     bool del_async, struct tcp_ao_key *key,
- 			     struct tcp_ao_key *new_current,
- 			     struct tcp_ao_key *new_rnext)
- {
-@@ -1585,11 +1585,24 @@ static int tcp_ao_delete_key(struct sock *sk, struct tcp_ao_info *ao_info,
++static struct tcp_ao_info *getsockopt_ao_info(struct sock *sk)
++{
++	if (sk_fullsock(sk))
++		return rcu_dereference(tcp_sk(sk)->ao_info);
++	else if (sk->sk_state == TCP_TIME_WAIT)
++		return rcu_dereference(tcp_twsk(sk)->ao_info);
++
++	return ERR_PTR(-ESOCKTNOSUPPORT);
++}
++
+ #define TCP_AO_KEYF_ALL (TCP_AO_KEYF_IFINDEX | TCP_AO_KEYF_EXCLUDE_OPT)
+ #define TCP_AO_GET_KEYF_VALID	(TCP_AO_KEYF_IFINDEX)
  
- 	hlist_del_rcu(&key->node);
+@@ -1620,11 +1630,13 @@ static int tcp_ao_add_cmd(struct sock *sk, unsigned short int family,
+ 	if (ret < 0)
+ 		goto err_free_sock;
  
-+	/* Support for async delete on listening sockets: as they don't
-+	 * need current_key/rnext_key maintaining, we don't need to check
-+	 * them and we can just free all resources in RCU fashion.
-+	 */
-+	if (del_async) {
-+		atomic_sub(tcp_ao_sizeof_key(key), &sk->sk_omem_alloc);
-+		call_rcu(&key->rcu, tcp_ao_key_free_rcu);
-+		return 0;
+-	/* Change this condition if we allow adding keys in states
+-	 * like close_wait, syn_sent or fin_wait...
+-	 */
+-	if (sk->sk_state == TCP_ESTABLISHED)
++	if (!((1 << sk->sk_state) & (TCPF_LISTEN | TCPF_CLOSE))) {
+ 		tcp_ao_cache_traffic_keys(sk, ao_info, key);
++		if (first) {
++			ao_info->current_key = key;
++			ao_info->rnext_key = key;
++		}
++	}
+ 
+ 	tcp_ao_link_mkt(ao_info, key);
+ 	if (first) {
+@@ -1875,6 +1887,8 @@ static int tcp_ao_info_cmd(struct sock *sk, unsigned short int family,
+ 	if (IS_ERR(ao_info))
+ 		return PTR_ERR(ao_info);
+ 	if (!ao_info) {
++		if (!((1 << sk->sk_state) & (TCPF_LISTEN | TCPF_CLOSE)))
++			return -EINVAL;
+ 		ao_info = tcp_ao_alloc_info(GFP_KERNEL);
+ 		if (!ao_info)
+ 			return -ENOMEM;
+@@ -2257,3 +2271,71 @@ int tcp_ao_get_sock_info(struct sock *sk, sockptr_t optval, sockptr_t optlen)
+ 	return 0;
+ }
+ 
++int tcp_ao_set_repair(struct sock *sk, sockptr_t optval, unsigned int optlen)
++{
++	struct tcp_sock *tp = tcp_sk(sk);
++	struct tcp_ao_repair cmd;
++	struct tcp_ao_key *key;
++	struct tcp_ao_info *ao;
++	int err;
++
++	if (optlen < sizeof(cmd))
++		return -EINVAL;
++
++	err = copy_struct_from_sockptr(&cmd, sizeof(cmd), optval, optlen);
++	if (err)
++		return err;
++
++	if (!tp->repair)
++		return -EPERM;
++
++	ao = setsockopt_ao_info(sk);
++	if (IS_ERR(ao))
++		return PTR_ERR(ao);
++	if (!ao)
++		return -ENOENT;
++
++	WRITE_ONCE(ao->lisn, cmd.snt_isn);
++	WRITE_ONCE(ao->risn, cmd.rcv_isn);
++	WRITE_ONCE(ao->snd_sne, cmd.snd_sne);
++	WRITE_ONCE(ao->rcv_sne, cmd.rcv_sne);
++
++	hlist_for_each_entry_rcu(key, &ao->head, node)
++		tcp_ao_cache_traffic_keys(sk, ao, key);
++
++	return 0;
++}
++
++int tcp_ao_get_repair(struct sock *sk, sockptr_t optval, sockptr_t optlen)
++{
++	struct tcp_sock *tp = tcp_sk(sk);
++	struct tcp_ao_repair opt;
++	struct tcp_ao_info *ao;
++	int len;
++
++	if (copy_from_sockptr(&len, optlen, sizeof(int)))
++		return -EFAULT;
++
++	if (len <= 0)
++		return -EINVAL;
++
++	if (!tp->repair)
++		return -EPERM;
++
++	rcu_read_lock();
++	ao = getsockopt_ao_info(sk);
++	if (IS_ERR_OR_NULL(ao)) {
++		rcu_read_unlock();
++		return ao ? PTR_ERR(ao) : -ENOENT;
 +	}
 +
- 	/* At this moment another CPU could have looked this key up
- 	 * while it was unlinked from the list. Wait for RCU grace period,
- 	 * after which the key is off-list and can't be looked up again;
- 	 * the rx path [just before RCU came] might have used it and set it
- 	 * as current_key (very unlikely).
-+	 * Free the key with next RCU grace period (in case it was
-+	 * current_key before tcp_ao_current_rnext() might have
-+	 * changed it in forced-delete).
- 	 */
- 	synchronize_rcu();
- 	if (new_current)
-@@ -1660,6 +1673,8 @@ static int tcp_ao_del_cmd(struct sock *sk, unsigned short int family,
- 		if (!new_rnext)
- 			return -ENOENT;
- 	}
-+	if (cmd.del_async && sk->sk_state != TCP_LISTEN)
-+		return -EINVAL;
- 
- 	if (family == AF_INET) {
- 		struct sockaddr_in *sin = (struct sockaddr_in *)&cmd.addr;
-@@ -1707,8 +1722,8 @@ static int tcp_ao_del_cmd(struct sock *sk, unsigned short int family,
- 		if (key == new_current || key == new_rnext)
- 			continue;
- 
--		return tcp_ao_delete_key(sk, ao_info, key,
--					  new_current, new_rnext);
-+		return tcp_ao_delete_key(sk, ao_info, cmd.del_async, key,
-+					 new_current, new_rnext);
- 	}
- 	return -ENOENT;
- }
++	opt.snt_isn	= ao->lisn;
++	opt.rcv_isn	= ao->risn;
++	opt.snd_sne	= READ_ONCE(ao->snd_sne);
++	opt.rcv_sne	= READ_ONCE(ao->rcv_sne);
++	rcu_read_unlock();
++
++	if (copy_to_sockptr(optval, &opt, min_t(int, len, sizeof(opt))))
++		return -EFAULT;
++	return 0;
++}
 -- 
 2.41.0
 
