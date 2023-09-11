@@ -1,218 +1,138 @@
-Return-Path: <netdev+bounces-32757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2A1079A342
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 08:04:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96CFD79A354
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 08:09:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DEC5E1C20621
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 06:04:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DC071C20847
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 06:09:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5340823CD;
-	Mon, 11 Sep 2023 06:03:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D09023CF;
+	Mon, 11 Sep 2023 06:09:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 410313D76
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 06:03:31 +0000 (UTC)
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68C1C1B8;
-	Sun, 10 Sep 2023 23:02:48 -0700 (PDT)
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 38B62MV3032449;
-	Mon, 11 Sep 2023 01:02:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1694412142;
-	bh=PqCk36zd1ArgBmbJorVXLrlQP4/2RI28rsxTy1PC71k=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=ZrXZQ0XY0uOvkyws4MC9H9YpJjPr53n2pow6E4U5CR/yZt6cb9Cf5c1rC7p3N1EV3
-	 enDQJyeeUOTTjGLNEwpvrhtiLq7O9HXToN1jF64QE+Je7mHiyl/JyR3uI6UaxZudjZ
-	 smZmVr2HQhS5SzjcDHIKlnFeHFFzkhqcMiujNutY=
-Received: from DFLE115.ent.ti.com (dfle115.ent.ti.com [10.64.6.36])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 38B62MqY013088
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Mon, 11 Sep 2023 01:02:22 -0500
-Received: from DFLE104.ent.ti.com (10.64.6.25) by DFLE115.ent.ti.com
- (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 11
- Sep 2023 01:02:22 -0500
-Received: from lelv0327.itg.ti.com (10.180.67.183) by DFLE104.ent.ti.com
- (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Mon, 11 Sep 2023 01:02:22 -0500
-Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
-	by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id 38B62M5u037605;
-	Mon, 11 Sep 2023 01:02:22 -0500
-Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.199])
-	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 38B62LkV000534;
-	Mon, 11 Sep 2023 01:02:22 -0500
-From: MD Danish Anwar <danishanwar@ti.com>
-To: Andrew Lunn <andrew@lunn.ch>, Roger Quadros <rogerq@ti.com>,
-        MD Danish
- Anwar <danishanwar@ti.com>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Rob Herring
-	<robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Jakub Kicinski
-	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Simon Horman
-	<horms@kernel.org>
-CC: <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <srk@ti.com>, <r-gunasekaran@ti.com>,
-        Roger Quadros
-	<rogerq@kernel.org>
-Subject: [PATCH net-next v2 2/2] net: ti: icssg-prueth: Add support for half duplex operation
-Date: Mon, 11 Sep 2023 11:32:00 +0530
-Message-ID: <20230911060200.2164771-3-danishanwar@ti.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230911060200.2164771-1-danishanwar@ti.com>
-References: <20230911060200.2164771-1-danishanwar@ti.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFE3423CE
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 06:09:30 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3B17126
+	for <netdev@vger.kernel.org>; Sun, 10 Sep 2023 23:09:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1694412567;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Hhw6H1r3eKnafn3hUCZd2q6G4h9A2hT4AZD8u0TVs7o=;
+	b=Ut8dQIYRv5gY2PAeW5r8sUQbHJsVAxZ/dbKvY+zYle4mOKLHMqbzqyFDjA4SD8cAzZFRdD
+	NoAFO71AMLGYW6CrJUDxYOS7lo+Fmm375pUgCLcLJi2fbiQpPHCaXZygSKFv6gt7Jzcik8
+	puZSf1JUOLzC/ojVEtWb5WwkS1/WDCM=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-321-dcBBtsxnNkuvRmsxynHqZg-1; Mon, 11 Sep 2023 02:09:25 -0400
+X-MC-Unique: dcBBtsxnNkuvRmsxynHqZg-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-9aa25791fc7so19945266b.1
+        for <netdev@vger.kernel.org>; Sun, 10 Sep 2023 23:09:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694412564; x=1695017364;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Hhw6H1r3eKnafn3hUCZd2q6G4h9A2hT4AZD8u0TVs7o=;
+        b=Ix0EN/DhFadzV88Ork+chKYxoR14hzRjr8UvyQ49Q7vZDRWqILBuixyg1/qoca+Wjv
+         ub+NRz6elJGay+Le1zFivehcaeKQzQZ6llBtG9V54HJjQq5JEdr6HPwZJSH5cdq6UIKf
+         71P4t8wyhWoEGbMUxeyERZQ4UbRReAYzyLF4RHGaF+2qi0BcMFMBQHLTHyhWjWmSqlOR
+         yjfV7dlXYBDfJgwkwJk0Njzo0+hyxD5OyWnoIuBp9cxrQbNiL3lSmPvTLVhJYAP8Jf5a
+         t9AkqR7mrOyQzsh68aF2Vw7t2VJfPSpIAnYUQnCtQrxI4SXVVpnvkzgWhv/SU8GX67FX
+         rt9A==
+X-Gm-Message-State: AOJu0YxQRP+x9QyIsLkl1MoJ5sN0mojFofzPPSxumRm0v2YN0iO31BsR
+	549GbO61kaWjU8OgtUtRAsECXy873FxoWuV8YkHhsTaQ4DRjUwTe6VmtdcqbiU5MQm5NS5Gxpq9
+	VThfYMk8ifiajemd40/Ys6VDW
+X-Received: by 2002:a17:906:d8:b0:9a1:aea8:d7d1 with SMTP id 24-20020a17090600d800b009a1aea8d7d1mr6663996eji.4.1694412564352;
+        Sun, 10 Sep 2023 23:09:24 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFeETDunHStUQ9A4LhidF5vq5fHdxxWZOA6yRW0zlaSmyXswo8x3TW2JE+ZoSRY8hcKyhIstA==
+X-Received: by 2002:a17:906:d8:b0:9a1:aea8:d7d1 with SMTP id 24-20020a17090600d800b009a1aea8d7d1mr6663988eji.4.1694412564079;
+        Sun, 10 Sep 2023 23:09:24 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-243-166.dyn.eolo.it. [146.241.243.166])
+        by smtp.gmail.com with ESMTPSA id z19-20020a170906715300b009a2202bfce5sm4772472ejj.118.2023.09.10.23.09.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 10 Sep 2023 23:09:23 -0700 (PDT)
+Message-ID: <4033fcc4e96bc478af551a8ffb6c1b18b9c4fe68.camel@redhat.com>
+Subject: Re: [PATCH net] fix null-deref in ipv4_link_failure
+From: Paolo Abeni <pabeni@redhat.com>
+To: Kyle Zeng <zengyhkyle@gmail.com>, dsahern@kernel.org
+Cc: davem@davemloft.net, netdev@vger.kernel.org, ssuryaextr@gmail.com
+Date: Mon, 11 Sep 2023 08:09:22 +0200
+In-Reply-To: <ZPqSfGGAwa1I69Sm@westworld>
+References: <ZPqSfGGAwa1I69Sm@westworld>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This patch adds support for half duplex operation at 10M and 100M link
-speeds for AM654x/AM64x devices.
-- Driver configures rand_seed, a random number, in DMEM HD_RAND_SEED_OFFSET
-field, which will be used by firmware for Back off time calculation.
-- Driver informs FW about half duplex link operation in DMEM
-PORT_LINK_SPEED_OFFSET field by setting bit 7 for 10/100M HD.
+On Thu, 2023-09-07 at 20:18 -0700, Kyle Zeng wrote:
+> Currently, we assume the skb is associated with a device before calling
+> __ip_options_compile, which is not always the case if it is re-routed by
+> ipvs.
+> When skb->dev is NULL, dev_net(skb->dev) will become null-dereference.
+> This patch adds a check for the edge case and switch to use the net_devic=
+e
+> from the rtable when skb->dev is NULL.
+>=20
+> Suggested-by: Paolo Abeni<pabeni@redhat.com>
+> Suggested-by: David Ahern <dsahern@kernel.org>
+> Signed-off-by: Kyle Zeng <zengyhkyle@gmail.com>
+> Cc: Stephen Suryaputra <ssuryaextr@gmail.com>
+> ---
+>  net/ipv4/route.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+> index d8c99bdc617..1be34e5eea1 100644
+> --- a/net/ipv4/route.c
+> +++ b/net/ipv4/route.c
+> @@ -1214,6 +1214,7 @@ EXPORT_INDIRECT_CALLABLE(ipv4_dst_check);
+>  static void ipv4_send_dest_unreach(struct sk_buff *skb)
+>  {
+>  	struct ip_options opt;
+> +	struct net_device *dev;
+>  	int res;
+> =20
+>  	/* Recompile ip options since IPCB may not be valid anymore.
+> @@ -1230,7 +1231,8 @@ static void ipv4_send_dest_unreach(struct sk_buff *=
+skb)
+>  		opt.optlen =3D ip_hdr(skb)->ihl * 4 - sizeof(struct iphdr);
+> =20
+>  		rcu_read_lock();
+> -		res =3D __ip_options_compile(dev_net(skb->dev), &opt, skb, NULL);
+> +		dev =3D skb->dev ? skb->dev : skb_rtable(skb)->dst.dev;
+> +		res =3D __ip_options_compile(dev_net(dev), &opt, skb, NULL);
+>  		rcu_read_unlock();
+> =20
+>  		if (res)
 
-Hence, the half duplex operation depends on board design the
-"ti,half-duplex-capable" property has to be enabled for ICSS-G ports if HW
-is capable to perform half duplex.
+The patch LGTM, but if you are going to re-post to address Vadim's
+feedback, please additionally drop my Suggested-by. I only reviewed a
+previous revision.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Reviewed-by: Roger Quadros <rogerq@kernel.org>
-Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
----
- drivers/net/ethernet/ti/icssg/icssg_config.c | 14 ++++++++++++++
- drivers/net/ethernet/ti/icssg/icssg_prueth.c | 17 +++++++++++++++--
- drivers/net/ethernet/ti/icssg/icssg_prueth.h |  2 ++
- 3 files changed, 31 insertions(+), 2 deletions(-)
+Thanks!
 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
-index 933b84666574..c1da70f247d4 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_config.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
-@@ -433,6 +433,17 @@ int emac_set_port_state(struct prueth_emac *emac,
- 	return ret;
- }
- 
-+void icssg_config_half_duplex(struct prueth_emac *emac)
-+{
-+	u32 val;
-+
-+	if (!emac->half_duplex)
-+		return;
-+
-+	val = get_random_u32();
-+	writel(val, emac->dram.va + HD_RAND_SEED_OFFSET);
-+}
-+
- void icssg_config_set_speed(struct prueth_emac *emac)
- {
- 	u8 fw_speed;
-@@ -453,5 +464,8 @@ void icssg_config_set_speed(struct prueth_emac *emac)
- 		return;
- 	}
- 
-+	if (emac->duplex == DUPLEX_HALF)
-+		fw_speed |= FW_LINK_SPEED_HD;
-+
- 	writeb(fw_speed, emac->dram.va + PORT_LINK_SPEED_OFFSET);
- }
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-index 410612f43cbd..e736652567cd 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-@@ -1029,6 +1029,8 @@ static void emac_adjust_link(struct net_device *ndev)
- 		 * values
- 		 */
- 		if (emac->link) {
-+			if (emac->duplex == DUPLEX_HALF)
-+				icssg_config_half_duplex(emac);
- 			/* Set the RGMII cfg for gig en and full duplex */
- 			icssg_update_rgmii_cfg(prueth->miig_rt, emac);
- 
-@@ -1147,9 +1149,13 @@ static int emac_phy_connect(struct prueth_emac *emac)
- 		return -ENODEV;
- 	}
- 
-+	if (!emac->half_duplex) {
-+		dev_dbg(prueth->dev, "half duplex mode is not supported\n");
-+		phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_10baseT_Half_BIT);
-+		phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_100baseT_Half_BIT);
-+	}
-+
- 	/* remove unsupported modes */
--	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_10baseT_Half_BIT);
--	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_100baseT_Half_BIT);
- 	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_1000baseT_Half_BIT);
- 	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_Pause_BIT);
- 	phy_remove_link_mode(ndev->phydev, ETHTOOL_LINK_MODE_Asym_Pause_BIT);
-@@ -2113,6 +2119,10 @@ static int prueth_probe(struct platform_device *pdev)
- 				      eth0_node->name);
- 			goto exit_iep;
- 		}
-+
-+		if (of_find_property(eth0_node, "ti,half-duplex-capable", NULL))
-+			prueth->emac[PRUETH_MAC0]->half_duplex = 1;
-+
- 		prueth->emac[PRUETH_MAC0]->iep = prueth->iep0;
- 	}
- 
-@@ -2124,6 +2134,9 @@ static int prueth_probe(struct platform_device *pdev)
- 			goto netdev_exit;
- 		}
- 
-+		if (of_find_property(eth1_node, "ti,half-duplex-capable", NULL))
-+			prueth->emac[PRUETH_MAC1]->half_duplex = 1;
-+
- 		prueth->emac[PRUETH_MAC1]->iep = prueth->iep0;
- 	}
- 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-index 3fe80a8758d3..8b6d6b497010 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-@@ -145,6 +145,7 @@ struct prueth_emac {
- 	struct icss_iep *iep;
- 	unsigned int rx_ts_enabled : 1;
- 	unsigned int tx_ts_enabled : 1;
-+	unsigned int half_duplex : 1;
- 
- 	/* DMA related */
- 	struct prueth_tx_chn tx_chns[PRUETH_MAX_TX_QUEUES];
-@@ -271,6 +272,7 @@ int icssg_config(struct prueth *prueth, struct prueth_emac *emac,
- int emac_set_port_state(struct prueth_emac *emac,
- 			enum icssg_port_state_cmd state);
- void icssg_config_set_speed(struct prueth_emac *emac);
-+void icssg_config_half_duplex(struct prueth_emac *emac);
- 
- /* Buffer queue helpers */
- int icssg_queue_pop(struct prueth *prueth, u8 queue);
--- 
-2.34.1
+Paolo
 
 
