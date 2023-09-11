@@ -1,63 +1,71 @@
-Return-Path: <netdev+bounces-32807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FF2179A76C
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 12:48:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D931C79A7BA
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 13:54:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62AD628112C
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 10:48:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F4D91C208DF
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 11:54:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7F21C2D8;
-	Mon, 11 Sep 2023 10:48:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85C53C8EC;
+	Mon, 11 Sep 2023 11:54:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9838BBE67
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 10:48:12 +0000 (UTC)
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08044EB
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 03:48:11 -0700 (PDT)
-Received: by mail-lj1-x229.google.com with SMTP id 38308e7fff4ca-2bc63e0d8cdso67552131fa.2
-        for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 03:48:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1694429289; x=1695034089; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=j0NJnWblCqOTP51XSAQK8tnzGeOeFatQIb5bjkiY0jA=;
-        b=v+MMXu9/Q1EbdaSF3eYLtAp3lF94CqGqA3sve3d/m1Fd/mygRY+QeGZN3sgYRRagnZ
-         K0e9BPcvxCOPoD22avX4y5W5KithIUurrMk9RwSrMndiVj2WSWMPfgvfeaIIaSbRvmdp
-         UdY7Vmx0jKbDo3+4Qyn+KlzgA128jSSpnfXCDksBuUhg2qNT6SHQ1bz/2vgWQYnBStTa
-         Nk651GUm6xGq0Z99Lbz3Wtun6+vt/Sd1Y7tcqf0sikLI6/UKs4AdWXAFLkJVtDFzZr3Z
-         ekM+gkToHm3Z/GJ8Q75rDI/oRAM68QWJu5bowbMVjEmshCHnhql/fO1/ix/lkFOU5sqD
-         51+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694429289; x=1695034089;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=j0NJnWblCqOTP51XSAQK8tnzGeOeFatQIb5bjkiY0jA=;
-        b=vVwpNaSl9lHG1jiTToRWIgXNeJ5Qa7wxS0jDNBkGa0Xv/iecWXdcHJUE9PS/WkqT4d
-         JBxU0qRr+ofJ9dthg/gcfZxLrsV/RMWVNOiybS4x6gimBHmYBJpa2Cz7rBUbx5SekkhD
-         0H2fjsFo/X8/PygBhhgywzBP9rI7D2e3Oy+c1q7OBOmUQPR0X1l1GGpUwd2PK/0DNvw3
-         8yjyF/Abc4OWiLkT6tSdH570RZimg6DGKiO9XVrbKGKN+/Tl8gCyaTNO9QHvu6k+zR8F
-         iY2/wsGbquX+6vwjjSUmTpDIdETR7SJwRSpTd59euanbdTgnHG57VcXrwatmI3utumJ0
-         l+/w==
-X-Gm-Message-State: AOJu0YyWUnwb33UdaMuExFeNAG8jG8RPF3U6hWK0w7kne+dJItGsK41d
-	GDW70UZuQrWUXgWgmBqzxBfspg==
-X-Google-Smtp-Source: AGHT+IF1kWFgjhTcfyqVhPg4mnrxV5lAVUVkKc0L/x88oGcAPqEy+maF7vc3htIrGNZH5i4r3ZmbAQ==
-X-Received: by 2002:a2e:9a86:0:b0:2b9:d28c:9c2d with SMTP id p6-20020a2e9a86000000b002b9d28c9c2dmr7295461lji.23.1694429289253;
-        Mon, 11 Sep 2023 03:48:09 -0700 (PDT)
-Received: from [192.168.69.115] (tfy62-h01-176-171-221-76.dsl.sta.abo.bbox.fr. [176.171.221.76])
-        by smtp.gmail.com with ESMTPSA id rp26-20020a170906d97a00b00988be3c1d87sm5122443ejb.116.2023.09.11.03.48.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Sep 2023 03:48:08 -0700 (PDT)
-Message-ID: <c94138d2-1bfa-2815-a766-b7904e35a86f@linaro.org>
-Date: Mon, 11 Sep 2023 12:48:05 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774FCC8E3
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 11:54:32 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07AA5E40;
+	Mon, 11 Sep 2023 04:54:30 -0700 (PDT)
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38BB7fEA011377;
+	Mon, 11 Sep 2023 11:54:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=6zAtbOPLTprDp5l7a3xBBQM94y0SgE+eMjbCRCMbzIQ=;
+ b=JLN5RrouLe82dpApYqPuGsE594lDoDu5EmAF/495hcmALP0d7EnL/hRlmyS0r4mJd52D
+ /L+OG25knQuEVzINCmGB7jSF2tENrljlEVBRWl3csgzN8tvKm5YmUUWe3PqDYS5Unx7i
+ EmjouTBTPxJQo4DnVi8ENKLWL5xXH4NpeF4xHOcQ3X+ufkGAFgguCqniWs9luegi44JK
+ wTFCRw8s77Ep03NlDbYfozSsLd9j7yVlGWt7ga7onmh4XNdtVRGmcrlSgA6CUUcNYqwQ
+ Ssq0CS3xgniphTh7dNCd9BNjauRJNLGmDNe23vxUBNim4Hb5mpot2xspqe7ra8rqW9J/ 8w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t20gp2w4h-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 Sep 2023 11:54:25 +0000
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38BBb5tU023469;
+	Mon, 11 Sep 2023 11:54:25 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t20gp2w44-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 Sep 2023 11:54:25 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38B9UCVw012083;
+	Mon, 11 Sep 2023 11:54:24 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3t13dyadxm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 Sep 2023 11:54:24 +0000
+Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
+	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38BBsN2820185526
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 11 Sep 2023 11:54:23 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 12FB65805C;
+	Mon, 11 Sep 2023 11:54:23 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6ECA75805A;
+	Mon, 11 Sep 2023 11:54:17 +0000 (GMT)
+Received: from [9.171.51.126] (unknown [9.171.51.126])
+	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 11 Sep 2023 11:54:16 +0000 (GMT)
+Message-ID: <2b1d129c-06e2-0161-7c8a-1e930150d797@linux.ibm.com>
+Date: Mon, 11 Sep 2023 13:54:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,79 +74,74 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
  Gecko/20100101 Thunderbird/102.15.0
-Subject: Re: [PATCH v4 3/4] net: stmmac: Add glue layer for Loongson-1 SoC
-Content-Language: en-US
-To: Keguang Zhang <keguang.zhang@gmail.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-mips@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Serge Semin <Sergey.Semin@baikalelectronics.ru>
-References: <20230830134241.506464-1-keguang.zhang@gmail.com>
- <20230830134241.506464-4-keguang.zhang@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
-In-Reply-To: <20230830134241.506464-4-keguang.zhang@gmail.com>
+Subject: Re: [RFC PATCH net-next] net/smc: Introduce SMC-related proc files
+To: Wen Gu <guwen@linux.alibaba.com>, kgraul@linux.ibm.com, jaka@linux.ibm.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com
+Cc: alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <1694416820-60340-1-git-send-email-guwen@linux.alibaba.com>
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <1694416820-60340-1-git-send-email-guwen@linux.alibaba.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: zZ85GoqsMvyzF1GYSDC44WzjAXuOsqnB
+X-Proofpoint-ORIG-GUID: tVcKMCzZtJNKN0HX0ekLoduII0CImiOx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-09-11_06,2023-09-05_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1011
+ mlxlogscore=700 priorityscore=1501 malwarescore=0 spamscore=0 adultscore=0
+ phishscore=0 impostorscore=0 mlxscore=0 lowpriorityscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2308100000
+ definitions=main-2309110105
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 30/8/23 15:42, Keguang Zhang wrote:
-> This glue driver is created based on the arch-code
-> implemented earlier with the platform-specific settings.
+
+
+On 11.09.23 09:20, Wen Gu wrote:
+> This patch introduces /proc/net/smc4 and /proc/net/smc6 files to report
+> statistic information of SMC connections.
 > 
-> Use syscon for SYSCON register access.
+> Compared with 'smcss' command in smc-tools, getting SMC connections via
+> proc files is not efficient. However, in some container scenarios, some
+> dependencies are lacked for compiling and using smc-tools. In this case,
+> using proc files to check SMC connections becomes a simple and fast way.
 > 
-> Partially based on the previous work by Serge Semin.
-> 
-> Signed-off-by: Keguang Zhang <keguang.zhang@gmail.com>
+> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
 > ---
-> V3 -> V4: Drop ls1x_dwmac_syscon definition and its instances
->            Drop three redundant fields from the ls1x_dwmac structure
->            Drop the ls1x_dwmac_init() method.
->            Some minor improvements
-> V2 -> V3: Determine the device ID by physical
->            base address(suggested by Serge Semin)
->            Use regmap instead of regmap fields
->            Use syscon_regmap_lookup_by_phandle()
->            Some minor fixes
-> V1 -> V2: Fix the build errors due to CONFIG_OF being unset
->            Change struct reg_field definitions to const
->            Rename the syscon property to "loongson,dwmac-syscon"
->            Add MII PHY mode for LS1C
+>   include/net/smc.h  |   5 +-
+>   net/smc/Makefile   |   2 +-
+>   net/smc/af_smc.c   |  22 ++++-
+>   net/smc/smc_diag.c |  29 +++---
+>   net/smc/smc_proc.c | 283 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>   net/smc/smc_proc.h |  35 +++++++
+>   6 files changed, 355 insertions(+), 21 deletions(-)
+>   create mode 100644 net/smc/smc_proc.c
+>   create mode 100644 net/smc/smc_proc.h
 > 
->   drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 +
->   drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
->   .../ethernet/stmicro/stmmac/dwmac-loongson1.c | 219 ++++++++++++++++++
->   3 files changed, 231 insertions(+)
->   create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c
 
-Squash:
+Hi Wen,
 
--- >8 --
-diff --git a/MAINTAINERS b/MAINTAINERS
-index ff1f273b4f36..2519d06b5aab 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -14344,9 +14344,12 @@ MIPS/LOONGSON1 ARCHITECTURE
-  M:	Keguang Zhang <keguang.zhang@gmail.com>
-  L:	linux-mips@vger.kernel.org
-  S:	Maintained
-  F:	Documentation/devicetree/bindings/*/loongson,ls1x-*.yaml
-  F:	Documentation/devicetree/bindings/net/loongson,ls1*.yaml
-  F:	arch/mips/include/asm/mach-loongson32/
-  F:	arch/mips/loongson32/
-  F:	drivers/*/*loongson1*
-+F:	drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c
----
+I can understand your problem and frustration. However, there are two 
+reasons I'm not really convinced by the proc file method:
+1) AFAI, the proc method could consume many CPU time especially in case 
+with a log of sockets to read the pseudo files.
+2) We have already implemented the complex netlink method on the same 
+purpose. I see the double expense to main the code.
+
+Then the question is if the lack of dependency issue can be handle 
+somehow, or the proc method is the only way to achieve this purpose?
+
+Any opinion is welcome!
+
+Thanks,
+Wenjia
 
