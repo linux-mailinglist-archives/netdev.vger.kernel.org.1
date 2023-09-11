@@ -1,260 +1,309 @@
-Return-Path: <netdev+bounces-32814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E3B079A801
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 14:47:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C3ECF79A80A
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 14:51:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F02D1C20433
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 12:47:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 013791C20866
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 12:51:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE570F9D3;
-	Mon, 11 Sep 2023 12:47:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C98B5F9EB;
+	Mon, 11 Sep 2023 12:51:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D0E24432
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 12:47:42 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 292F6CEB
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 05:47:40 -0700 (PDT)
-Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.57])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RkmdK00zjzTmJf;
-	Mon, 11 Sep 2023 20:44:52 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
- (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Mon, 11 Sep
- 2023 20:47:36 +0800
-From: Zhengchao Shao <shaozhengchao@huawei.com>
-To: <netdev@vger.kernel.org>, <dev@openvswitch.org>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<dsahern@kernel.org>, <pshelar@ovn.org>, <jhs@mojatatu.com>,
-	<xiyou.wangcong@gmail.com>, <jiri@resnulli.us>,
-	<steffen.klassert@secunet.com>, <herbert@gondor.apana.org.au>
-CC: <jmaxwell37@gmail.com>, <tglx@linutronix.de>, <mbizon@freebox.fr>,
-	<joel@joelfernandes.org>, <eyal.birger@gmail.com>, <weiyongjun1@huawei.com>,
-	<yuehaibing@huawei.com>, <shaozhengchao@huawei.com>
-Subject: [PATCH net-next] net: dst: remove unnecessary input parameter in dst_alloc and dst_init
-Date: Mon, 11 Sep 2023 20:50:45 +0800
-Message-ID: <20230911125045.346390-1-shaozhengchao@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE238C8DB
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 12:51:47 +0000 (UTC)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5F9ACEB;
+	Mon, 11 Sep 2023 05:51:44 -0700 (PDT)
+Received: from canpemm500006.china.huawei.com (unknown [172.30.72.53])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RkmjD48PWzMlH2;
+	Mon, 11 Sep 2023 20:48:16 +0800 (CST)
+Received: from [10.174.179.200] (10.174.179.200) by
+ canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Mon, 11 Sep 2023 20:51:41 +0800
+Subject: Re: [RFC PATCH net-next 2/6] net: ethernet: add mac-phy interrupt
+ support with reset complete handling
+To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <robh+dt@kernel.org>,
+	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>, <corbet@lwn.net>,
+	<steen.hegelund@microchip.com>, <rdunlap@infradead.org>, <horms@kernel.org>,
+	<casper.casan@gmail.com>, <andrew@lunn.ch>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+	<horatiu.vultur@microchip.com>, <Woojung.Huh@microchip.com>,
+	<Nicolas.Ferre@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	<Thorsten.Kummermehr@microchip.com>
+References: <20230908142919.14849-1-Parthiban.Veerasooran@microchip.com>
+ <20230908142919.14849-3-Parthiban.Veerasooran@microchip.com>
+From: "Ziyang Xuan (William)" <william.xuanziyang@huawei.com>
+Message-ID: <5f434392-0e87-ecbc-9c9a-ad08a809206a@huawei.com>
+Date: Mon, 11 Sep 2023 20:51:40 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.175.101.6]
+In-Reply-To: <20230908142919.14849-3-Parthiban.Veerasooran@microchip.com>
+Content-Type: text/plain; charset="gbk"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.179.200]
 X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpeml500026.china.huawei.com (7.185.36.106)
+ canpemm500006.china.huawei.com (7.192.105.130)
 X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-5.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Since commit 1202cdd66531("Remove DECnet support from kernel") has been
-merged, all callers pass in the initial_ref value of 1 when they call
-dst_alloc(). Therefore, remove initial_ref when the dst_alloc() is
-declared and replace initial_ref with 1 in dst_alloc().
-Also when all callers call dst_init(), the value of initial_ref is 1.
-Therefore, remove the input parameter initial_ref of the dst_init() and
-replace initial_ref with the value 1 in dst_init.
+> Register MAC-PHY interrupt and handle reset complete interrupt. Reset
+> complete bit is set when the MAC-PHY reset complete and ready for
+> configuration. When it is set, it will generate a non-maskable interrupt
+> to alert the SPI host. Additionally reset complete bit in the STS0
+> register has to be written by one upon reset complete to clear the
+> interrupt.
+> 
+> Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+> ---
+>  drivers/net/ethernet/oa_tc6.c | 141 ++++++++++++++++++++++++++++++++--
+>  include/linux/oa_tc6.h        |  16 +++-
+>  2 files changed, 150 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/oa_tc6.c b/drivers/net/ethernet/oa_tc6.c
+> index 613cf034430a..0019f70345b6 100644
+> --- a/drivers/net/ethernet/oa_tc6.c
+> +++ b/drivers/net/ethernet/oa_tc6.c
+> @@ -6,6 +6,7 @@
+>   */
+>  
+>  #include <linux/bitfield.h>
+> +#include <linux/interrupt.h>
+>  #include <linux/oa_tc6.h>
+>  
+>  static int oa_tc6_spi_transfer(struct spi_device *spi, u8 *ptx, u8 *prx,
+> @@ -160,10 +161,16 @@ int oa_tc6_perform_ctrl(struct oa_tc6 *tc6, u32 addr, u32 val[], u8 len,
+>  	if (ret)
+>  		goto err_ctrl;
+>  
+> -	/* Check echoed/received control reply */
+> -	ret = oa_tc6_check_control(tc6, tx_buf, rx_buf, len, wnr, ctrl_prot);
+> -	if (ret)
+> -		goto err_ctrl;
+> +	/* In case of reset write, the echoed control command doesn't have any
+> +	 * valid data. So no need to check for error.
+> +	 */
+> +	if (addr != OA_TC6_RESET) {
+> +		/* Check echoed/received control reply */
+> +		ret = oa_tc6_check_control(tc6, tx_buf, rx_buf, len, wnr,
+> +					   ctrl_prot);
+> +		if (ret)
+> +			goto err_ctrl;
+> +	}
+>  
+>  	if (!wnr) {
+>  		/* Copy read data from the rx data in case of ctrl read */
+> @@ -186,6 +193,88 @@ int oa_tc6_perform_ctrl(struct oa_tc6 *tc6, u32 addr, u32 val[], u8 len,
+>  	return ret;
+>  }
+>  
+> +static int oa_tc6_handler(void *data)
+> +{
+> +	struct oa_tc6 *tc6 = data;
+> +	u32 regval;
+> +	int ret;
+> +
+> +	while (likely(!kthread_should_stop())) {
+> +		wait_event_interruptible(tc6->tc6_wq, tc6->int_flag ||
+> +					 kthread_should_stop());
+> +		if (tc6->int_flag) {
+> +			tc6->int_flag = false;
+> +			ret = oa_tc6_perform_ctrl(tc6, OA_TC6_STS0, &regval, 1,
+> +						  false, false);
+> +			if (ret) {
+> +				dev_err(&tc6->spi->dev, "Failed to read STS0\n");
+> +				continue;
+> +			}
+> +			/* Check for reset complete interrupt status */
+> +			if (regval & RESETC) {
+> +				regval = RESETC;
+> +				/* SPI host should write RESETC bit with one to
+> +				 * clear the reset interrupt status.
+> +				 */
+> +				ret = oa_tc6_perform_ctrl(tc6, OA_TC6_STS0,
+> +							  &regval, 1, true,
+> +							  false);
+> +				if (ret) {
+> +					dev_err(&tc6->spi->dev,
+> +						"Failed to write STS0\n");
+> +					continue;
+> +				}
+> +				complete(&tc6->rst_complete);
+> +			}
+> +		}
+> +	}
+> +	return 0;
+> +}
+> +
+> +static irqreturn_t macphy_irq(int irq, void *dev_id)
+> +{
+> +	struct oa_tc6 *tc6 = dev_id;
+> +
+> +	/* Wake tc6 task to perform interrupt action */
+> +	tc6->int_flag = true;
+> +	wake_up_interruptible(&tc6->tc6_wq);
+> +
+> +	return IRQ_HANDLED;
+> +}
+> +
+> +static int oa_tc6_sw_reset(struct oa_tc6 *tc6)
+> +{
+> +	long timeleft;
+> +	u32 regval;
+> +	int ret;
+> +
+> +	/* Perform software reset with both protected and unprotected control
+> +	 * commands because the driver doesn't know the current status of the
+> +	 * MAC-PHY.
+> +	 */
+> +	regval = SW_RESET;
+> +	reinit_completion(&tc6->rst_complete);
+> +	ret = oa_tc6_perform_ctrl(tc6, OA_TC6_RESET, &regval, 1, true, false);
+> +	if (ret) {
+> +		dev_err(&tc6->spi->dev, "RESET register write failed\n");
+> +		return ret;
+> +	}
+> +
+> +	ret = oa_tc6_perform_ctrl(tc6, OA_TC6_RESET, &regval, 1, true, true);
+> +	if (ret) {
+> +		dev_err(&tc6->spi->dev, "RESET register write failed\n");
+> +		return ret;
+> +	}
+> +	timeleft = wait_for_completion_interruptible_timeout(&tc6->rst_complete,
+> +							     msecs_to_jiffies(1));
+> +	if (timeleft <= 0) {
+> +		dev_err(&tc6->spi->dev, "MAC-PHY reset failed\n");
+> +		return -ENODEV;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  int oa_tc6_write_register(struct oa_tc6 *tc6, u32 addr, u32 val[], u8 len)
+>  {
+>  	return oa_tc6_perform_ctrl(tc6, addr, val, len, true, tc6->ctrl_prot);
+> @@ -201,6 +290,7 @@ EXPORT_SYMBOL_GPL(oa_tc6_read_register);
+>  struct oa_tc6 *oa_tc6_init(struct spi_device *spi)
+>  {
+>  	struct oa_tc6 *tc6;
+> +	int ret;
+>  
+>  	if (!spi)
+>  		return NULL;
+> @@ -211,12 +301,51 @@ struct oa_tc6 *oa_tc6_init(struct spi_device *spi)
+>  
+>  	tc6->spi = spi;
+>  
+> +	/* Used for triggering the OA TC6 task */
+> +	init_waitqueue_head(&tc6->tc6_wq);
+> +
+> +	init_completion(&tc6->rst_complete);
+> +
+> +	/* This task performs the SPI transfer */
+> +	tc6->tc6_task = kthread_run(oa_tc6_handler, tc6, "OA TC6 Task");
+> +	if (IS_ERR(tc6->tc6_task))
+> +		goto err_tc6_task;
+> +
+> +	/* Set the highest priority to the tc6 task as it is time critical */
+> +	sched_set_fifo(tc6->tc6_task);
+> +
+> +	/* Register MAC-PHY interrupt service routine */
+> +	ret = devm_request_irq(&spi->dev, spi->irq, macphy_irq, 0, "macphy int",
+> +			       tc6);
+> +	if ((ret != -ENOTCONN) && ret < 0) {
+> +		dev_err(&spi->dev, "Error attaching macphy irq %d\n", ret);
+> +		goto err_macphy_irq;
+> +	}
+> +
+> +	/* Perform MAC-PHY software reset */
+> +	if (oa_tc6_sw_reset(tc6))
+> +		goto err_macphy_reset;
+> +
+>  	return tc6;
+> +
+> +err_macphy_reset:
+> +	devm_free_irq(&tc6->spi->dev, tc6->spi->irq, tc6);
+> +err_macphy_irq:
+> +	kthread_stop(tc6->tc6_task);
+> +err_tc6_task:
+> +	kfree(tc6);
+> +	return NULL;
+>  }
+>  EXPORT_SYMBOL_GPL(oa_tc6_init);
+>  
+> -void oa_tc6_deinit(struct oa_tc6 *tc6)
+> +int oa_tc6_deinit(struct oa_tc6 *tc6)
+>  {
+> -	kfree(tc6);
+> +	int ret;
+> +
+> +	devm_free_irq(&tc6->spi->dev, tc6->spi->irq, tc6);
+> +	ret = kthread_stop(tc6->tc6_task);
 
-Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
----
- include/net/dst.h         |  4 ++--
- net/core/dst.c            | 10 +++++-----
- net/ipv4/route.c          |  6 +++---
- net/ipv6/route.c          |  4 ++--
- net/openvswitch/actions.c |  4 ++--
- net/sched/sch_frag.c      |  4 ++--
- net/xfrm/xfrm_policy.c    |  2 +-
- 7 files changed, 17 insertions(+), 17 deletions(-)
+kthread_stop() will the result of threadfn(). Here mean that if threadfn()
+return non-zero, deinit() will fail. But the KTHREAD_SHOULD_STOP already be set.
+And oa_tc6_handler() will end. Please check it is what you want.
 
-diff --git a/include/net/dst.h b/include/net/dst.h
-index 78884429deed..f8b8599a0600 100644
---- a/include/net/dst.h
-+++ b/include/net/dst.h
-@@ -392,10 +392,10 @@ static inline int dst_discard(struct sk_buff *skb)
- {
- 	return dst_discard_out(&init_net, skb->sk, skb);
- }
--void *dst_alloc(struct dst_ops *ops, struct net_device *dev, int initial_ref,
-+void *dst_alloc(struct dst_ops *ops, struct net_device *dev,
- 		int initial_obsolete, unsigned short flags);
- void dst_init(struct dst_entry *dst, struct dst_ops *ops,
--	      struct net_device *dev, int initial_ref, int initial_obsolete,
-+	      struct net_device *dev, int initial_obsolete,
- 	      unsigned short flags);
- struct dst_entry *dst_destroy(struct dst_entry *dst);
- void dst_dev_put(struct dst_entry *dst);
-diff --git a/net/core/dst.c b/net/core/dst.c
-index 980e2fd2f013..6838d3212c37 100644
---- a/net/core/dst.c
-+++ b/net/core/dst.c
-@@ -45,7 +45,7 @@ const struct dst_metrics dst_default_metrics = {
- EXPORT_SYMBOL(dst_default_metrics);
- 
- void dst_init(struct dst_entry *dst, struct dst_ops *ops,
--	      struct net_device *dev, int initial_ref, int initial_obsolete,
-+	      struct net_device *dev, int initial_obsolete,
- 	      unsigned short flags)
- {
- 	dst->dev = dev;
-@@ -66,7 +66,7 @@ void dst_init(struct dst_entry *dst, struct dst_ops *ops,
- 	dst->tclassid = 0;
- #endif
- 	dst->lwtstate = NULL;
--	rcuref_init(&dst->__rcuref, initial_ref);
-+	rcuref_init(&dst->__rcuref, 1);
- 	INIT_LIST_HEAD(&dst->rt_uncached);
- 	dst->__use = 0;
- 	dst->lastuse = jiffies;
-@@ -77,7 +77,7 @@ void dst_init(struct dst_entry *dst, struct dst_ops *ops,
- EXPORT_SYMBOL(dst_init);
- 
- void *dst_alloc(struct dst_ops *ops, struct net_device *dev,
--		int initial_ref, int initial_obsolete, unsigned short flags)
-+		int initial_obsolete, unsigned short flags)
- {
- 	struct dst_entry *dst;
- 
-@@ -90,7 +90,7 @@ void *dst_alloc(struct dst_ops *ops, struct net_device *dev,
- 	if (!dst)
- 		return NULL;
- 
--	dst_init(dst, ops, dev, initial_ref, initial_obsolete, flags);
-+	dst_init(dst, ops, dev, initial_obsolete, flags);
- 
- 	return dst;
- }
-@@ -270,7 +270,7 @@ static void __metadata_dst_init(struct metadata_dst *md_dst,
- 	struct dst_entry *dst;
- 
- 	dst = &md_dst->dst;
--	dst_init(dst, &dst_blackhole_ops, NULL, 1, DST_OBSOLETE_NONE,
-+	dst_init(dst, &dst_blackhole_ops, NULL, DST_OBSOLETE_NONE,
- 		 DST_METADATA | DST_NOCOUNT);
- 	memset(dst + 1, 0, sizeof(*md_dst) + optslen - sizeof(*dst));
- 	md_dst->type = type;
-diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-index 66f419e7f9a7..fb3045692b99 100644
---- a/net/ipv4/route.c
-+++ b/net/ipv4/route.c
-@@ -1630,7 +1630,7 @@ struct rtable *rt_dst_alloc(struct net_device *dev,
- {
- 	struct rtable *rt;
- 
--	rt = dst_alloc(&ipv4_dst_ops, dev, 1, DST_OBSOLETE_FORCE_CHK,
-+	rt = dst_alloc(&ipv4_dst_ops, dev, DST_OBSOLETE_FORCE_CHK,
- 		       (noxfrm ? DST_NOXFRM : 0));
- 
- 	if (rt) {
-@@ -1658,7 +1658,7 @@ struct rtable *rt_dst_clone(struct net_device *dev, struct rtable *rt)
- {
- 	struct rtable *new_rt;
- 
--	new_rt = dst_alloc(&ipv4_dst_ops, dev, 1, DST_OBSOLETE_FORCE_CHK,
-+	new_rt = dst_alloc(&ipv4_dst_ops, dev, DST_OBSOLETE_FORCE_CHK,
- 			   rt->dst.flags);
- 
- 	if (new_rt) {
-@@ -2832,7 +2832,7 @@ struct dst_entry *ipv4_blackhole_route(struct net *net, struct dst_entry *dst_or
- 	struct rtable *ort = (struct rtable *) dst_orig;
- 	struct rtable *rt;
- 
--	rt = dst_alloc(&ipv4_dst_blackhole_ops, NULL, 1, DST_OBSOLETE_DEAD, 0);
-+	rt = dst_alloc(&ipv4_dst_blackhole_ops, NULL, DST_OBSOLETE_DEAD, 0);
- 	if (rt) {
- 		struct dst_entry *new = &rt->dst;
- 
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index 9c687b357e6a..9d8dfc7423e4 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -341,7 +341,7 @@ struct rt6_info *ip6_dst_alloc(struct net *net, struct net_device *dev,
- 			       int flags)
- {
- 	struct rt6_info *rt = dst_alloc(&net->ipv6.ip6_dst_ops, dev,
--					1, DST_OBSOLETE_FORCE_CHK, flags);
-+					DST_OBSOLETE_FORCE_CHK, flags);
- 
- 	if (rt) {
- 		rt6_info_init(rt);
-@@ -2655,7 +2655,7 @@ struct dst_entry *ip6_blackhole_route(struct net *net, struct dst_entry *dst_ori
- 	struct net_device *loopback_dev = net->loopback_dev;
- 	struct dst_entry *new = NULL;
- 
--	rt = dst_alloc(&ip6_dst_blackhole_ops, loopback_dev, 1,
-+	rt = dst_alloc(&ip6_dst_blackhole_ops, loopback_dev,
- 		       DST_OBSOLETE_DEAD, 0);
- 	if (rt) {
- 		rt6_info_init(rt);
-diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-index fd66014d8a76..5f8094acd056 100644
---- a/net/openvswitch/actions.c
-+++ b/net/openvswitch/actions.c
-@@ -873,7 +873,7 @@ static void ovs_fragment(struct net *net, struct vport *vport,
- 
- 		prepare_frag(vport, skb, orig_network_offset,
- 			     ovs_key_mac_proto(key));
--		dst_init(&ovs_rt.dst, &ovs_dst_ops, NULL, 1,
-+		dst_init(&ovs_rt.dst, &ovs_dst_ops, NULL,
- 			 DST_OBSOLETE_NONE, DST_NOCOUNT);
- 		ovs_rt.dst.dev = vport->dev;
- 
-@@ -890,7 +890,7 @@ static void ovs_fragment(struct net *net, struct vport *vport,
- 		prepare_frag(vport, skb, orig_network_offset,
- 			     ovs_key_mac_proto(key));
- 		memset(&ovs_rt, 0, sizeof(ovs_rt));
--		dst_init(&ovs_rt.dst, &ovs_dst_ops, NULL, 1,
-+		dst_init(&ovs_rt.dst, &ovs_dst_ops, NULL,
- 			 DST_OBSOLETE_NONE, DST_NOCOUNT);
- 		ovs_rt.dst.dev = vport->dev;
- 
-diff --git a/net/sched/sch_frag.c b/net/sched/sch_frag.c
-index a9bd0a235890..ce63414185fd 100644
---- a/net/sched/sch_frag.c
-+++ b/net/sched/sch_frag.c
-@@ -96,7 +96,7 @@ static int sch_fragment(struct net *net, struct sk_buff *skb,
- 		unsigned long orig_dst;
- 
- 		sch_frag_prepare_frag(skb, xmit);
--		dst_init(&sch_frag_rt.dst, &sch_frag_dst_ops, NULL, 1,
-+		dst_init(&sch_frag_rt.dst, &sch_frag_dst_ops, NULL,
- 			 DST_OBSOLETE_NONE, DST_NOCOUNT);
- 		sch_frag_rt.dst.dev = skb->dev;
- 
-@@ -112,7 +112,7 @@ static int sch_fragment(struct net *net, struct sk_buff *skb,
- 
- 		sch_frag_prepare_frag(skb, xmit);
- 		memset(&sch_frag_rt, 0, sizeof(sch_frag_rt));
--		dst_init(&sch_frag_rt.dst, &sch_frag_dst_ops, NULL, 1,
-+		dst_init(&sch_frag_rt.dst, &sch_frag_dst_ops, NULL,
- 			 DST_OBSOLETE_NONE, DST_NOCOUNT);
- 		sch_frag_rt.dst.dev = skb->dev;
- 
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index 113fb7e9cdaf..d33af072df39 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -2568,7 +2568,7 @@ static inline struct xfrm_dst *xfrm_alloc_dst(struct net *net, int family)
- 	default:
- 		BUG();
- 	}
--	xdst = dst_alloc(dst_ops, NULL, 1, DST_OBSOLETE_NONE, 0);
-+	xdst = dst_alloc(dst_ops, NULL, DST_OBSOLETE_NONE, 0);
- 
- 	if (likely(xdst)) {
- 		memset_after(xdst, 0, u.dst);
--- 
-2.34.1
-
+> +	if (!ret)
+> +		kfree(tc6);
+> +	return ret;
+>  }
+>  EXPORT_SYMBOL_GPL(oa_tc6_deinit);
+> diff --git a/include/linux/oa_tc6.h b/include/linux/oa_tc6.h
+> index 5e0a58ab1dcd..315f061c2dfe 100644
+> --- a/include/linux/oa_tc6.h
+> +++ b/include/linux/oa_tc6.h
+> @@ -17,15 +17,29 @@
+>  #define CTRL_HDR_LEN	GENMASK(7, 1)	/* Length */
+>  #define CTRL_HDR_P	BIT(0)		/* Parity Bit */
+>  
+> +/* Open Alliance TC6 Standard Control and Status Registers */
+> +#define OA_TC6_RESET	0x0003		/* Reset Control and Status Register */
+> +#define OA_TC6_STS0	0x0008		/* Status Register #0 */
+> +
+> +/* RESET register field */
+> +#define SW_RESET	BIT(0)		/* Software Reset */
+> +
+> +/* STATUS0 register field */
+> +#define RESETC		BIT(6)		/* Reset Complete */
+> +
+>  #define TC6_HDR_SIZE	4		/* Ctrl command header size as per OA */
+>  #define TC6_FTR_SIZE	4		/* Ctrl command footer size ss per OA */
+>  
+>  struct oa_tc6 {
+>  	struct spi_device *spi;
+>  	bool ctrl_prot;
+> +	struct task_struct *tc6_task;
+> +	wait_queue_head_t tc6_wq;
+> +	bool int_flag;
+> +	struct completion rst_complete;
+>  };
+>  
+>  struct oa_tc6 *oa_tc6_init(struct spi_device *spi);
+> -void oa_tc6_deinit(struct oa_tc6 *tc6);
+> +int oa_tc6_deinit(struct oa_tc6 *tc6);
+>  int oa_tc6_write_register(struct oa_tc6 *tc6, u32 addr, u32 value[], u8 len);
+>  int oa_tc6_read_register(struct oa_tc6 *tc6, u32 addr, u32 value[], u8 len);
+> 
 
