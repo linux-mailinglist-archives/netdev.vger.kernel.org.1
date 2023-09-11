@@ -1,152 +1,193 @@
-Return-Path: <netdev+bounces-32836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15AD879A877
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 16:03:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 981BF79A8CD
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 16:43:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4467A281167
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 14:03:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 010A128107F
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 14:43:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A012111BE;
-	Mon, 11 Sep 2023 14:03:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36BD311719;
+	Mon, 11 Sep 2023 14:43:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E32B11715
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 14:03:38 +0000 (UTC)
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F3E2CF0;
-	Mon, 11 Sep 2023 07:03:36 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1qfhVk-0001JK-HG; Mon, 11 Sep 2023 16:03:32 +0200
-Message-ID: <96bcfe54-fcee-4c14-9772-b8191ee10c03@leemhuis.info>
-Date: Mon, 11 Sep 2023 16:03:31 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B4C611705;
+	Mon, 11 Sep 2023 14:43:29 +0000 (UTC)
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD8B812A;
+	Mon, 11 Sep 2023 07:43:28 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1bdc19b782aso31397545ad.0;
+        Mon, 11 Sep 2023 07:43:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694443408; x=1695048208; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RqXyW/gPoreQyo+NfRWBlaJ2aGgysVke39049lpotsw=;
+        b=swQSn3nN9UW3J9rsZW+J11buO4V53xkHTZW4/k9ob1H2x6xy01z7YLTA7VX757wiGs
+         P/vzryWDJC3bshDOL0W0uUGjP0/Ee/yGHiIlw1+ewTOf5mopRaZ2THHmiAeKA2dnLYbC
+         +emE8sbkJYOk17ZM1LSjrtTosDJREpjic5PpJmKmiGtluStnQPF850U9EHKJ3BkjGA3/
+         g5wDdpOgvhAWJCsZK2a1tfEbONDkXlf4nPdHZAYF8melF4umCJm0uMh60d7UtsQ6azE4
+         DNJC0CxMLzxU4pmDPKZiSLiUqJoH4HlIqJFB7zw7o4OdYgoMpuTNNBqFvprCZVWodzEV
+         Mdag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694443408; x=1695048208;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=RqXyW/gPoreQyo+NfRWBlaJ2aGgysVke39049lpotsw=;
+        b=th/gjEqyNXkPPuOvV7PucIBoZJzg6TJjSUeXa/pr8I74X8DYAB6vfWTVgiKmNh14ke
+         iz9jmcpdcAIdOG/bTGte3TF//can6+lI32Hnfxg7e0W/+kkE4a2mK936nnf6jtX2Cy6M
+         Yu2gTzh200NSd657dT8sNq5blIz0JnS/6Rv1fTK4HtYv1qOdQrSdqtDWniVO0ppix3XN
+         hrUparEl6jfKzLnJ4tq5yYZ7coWeoqgprxQJDUO5LYtEAGbzwBQ9gg9At/mOxIu4upWu
+         G6ZMiJ5yEu8569Am3a9INZnZYM5dUAbG/O+/OcwK+yl9LAIGW+8z+k2+cHMdUr0VuZgq
+         YuLg==
+X-Gm-Message-State: AOJu0YwC9udFriGUggAmQjVAaBDn/sU7772MxPyvmpIu18qfPtQw4JF7
+	LOn2J+TJPmuZB2NxR6ZoKSIEQVP4dSQ=
+X-Google-Smtp-Source: AGHT+IEcOMJZkKhFlQiJSmp7LplEa5M510v7Ujc2fi8Ky4Q46RI+bU+iNxaB56kWGX7YSHOdAlKkpg==
+X-Received: by 2002:a17:903:1248:b0:1c2:36a:52aa with SMTP id u8-20020a170903124800b001c2036a52aamr9345941plh.30.1694443408122;
+        Mon, 11 Sep 2023 07:43:28 -0700 (PDT)
+Received: from localhost ([98.97.37.198])
+        by smtp.gmail.com with ESMTPSA id v11-20020a170902d68b00b001bc676df6a9sm6541433ply.132.2023.09.11.07.43.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Sep 2023 07:43:27 -0700 (PDT)
+Date: Mon, 11 Sep 2023 07:43:26 -0700
+From: John Fastabend <john.fastabend@gmail.com>
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>, 
+ John Fastabend <john.fastabend@gmail.com>
+Cc: bpf <bpf@vger.kernel.org>, 
+ Networking <netdev@vger.kernel.org>, 
+ "davidhwei@meta.com" <davidhwei@meta.com>
+Message-ID: <64ff278e16f06_2e8f2083a@john.notmuch>
+In-Reply-To: <CAEf4Bzb2=p3nkaTctDcMAabzL41JjCkTso-aFrfv21z7Y0C48w@mail.gmail.com>
+References: <CAEf4BzYMAAhwscTWWTenvyr-PQ7E5tMg_iqXsPj_dyZEMVCrKg@mail.gmail.com>
+ <64b4c5891096b_2b67208f@john.notmuch>
+ <CAEf4Bzb2=p3nkaTctDcMAabzL41JjCkTso-aFrfv21z7Y0C48w@mail.gmail.com>
+Subject: Re: Sockmap's parser/verdict programs and epoll notifications
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Fwd: Unexplainable packet drop starting at v6.4
-Content-Language: en-US, de-DE
-From: Thorsten Leemhuis <regressions@leemhuis.info>
-To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Tirthendu Sarkar <tirthendu.sarkar@intel.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Regressions <regressions@lists.linux.dev>,
- Linux Networking <netdev@vger.kernel.org>,
- Linux Intel Ethernet Drivers <intel-wired-lan@lists.osuosl.org>,
- Bagas Sanjaya <bagasdotme@gmail.com>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-References: <e79edb0f-de89-5041-186f-987d30e0187c@gmail.com>
- <e9644f38-57be-5d26-0c08-08a74eee7cb1@leemhuis.info>
-In-Reply-To: <e9644f38-57be-5d26-0c08-08a74eee7cb1@leemhuis.info>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1694441016;a1c8c64e;
-X-HE-SMSGID: 1qfhVk-0001JK-HG
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 30.08.23 12:07, Linux regression tracking (Thorsten Leemhuis) wrote:
-> [replying with a heavily adjust set of recipients]
-> 
-> On 18.07.23 02:51, Bagas Sanjaya wrote:
->>
->> I notice a regression report on Bugzilla [1]. Quoting from it:
-> 
-> Tirthendu Sarkar, turned out this regressions reported in
-> https://bugzilla.kernel.org/show_bug.cgi?id=217678 is caused by your
-> change e9031f2da1a ("i40e: introduce next_to_process to i40e_ring")
-> [v6.4-rc1] that Tony applied in March.
-> 
-> Could you (or someone else) please take a look? The bugzilla ticket has
-> details and a comment from a second person that seems to be affected by
-> the same problem. And 6.5 seems to still show the problem.
+Andrii Nakryiko wrote:
+> On Sun, Jul 16, 2023 at 9:37=E2=80=AFPM John Fastabend <john.fastabend@=
+gmail.com> wrote:
+> >
+> > Andrii Nakryiko wrote:
+> > > Hey John,
+> >
+> > Sorry missed this while I was on PTO that week.
+> =
 
-Hey i40e developers, did you see that message reg this regression in
-your driver I sent one and a half week ago? It would be good to get at
-least some progress here, as this report is around for quite some time
-already, as it was misdirected first. :-/ Two people are apparently
-affected by this, one re-confirmed today that this is still happening.
+> yeah, vacations tend to cause missing things :)
+> =
 
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-If I did something stupid, please tell me, as explained on that page.
+> >
+> > >
+> > > We've been recently experimenting with using BPF_SK_SKB_STREAM_PARS=
+ER
+> > > and BPF_SK_SKB_STREAM_VERDICT with sockmap/sockhash to perform
+> > > in-kernel parsing of RSocket frames. A very simple format ([0]) whe=
+re
+> > > the first 3 bytes specify the size of the frame payload. The idea w=
+as
+> > > to collect the entire frame in the kernel before notifying user-spa=
+ce
+> > > that data is available. This is meant to minimize unnecessary wakeu=
+ps
+> > > due to incomplete logical frames, saving CPU.
+> >
+> > Nice.
+> >
+> > >
+> > > You can find the BPF source code I've used at [1], it has lots of
+> > > extra logging and stuff, but the idea is to read the first 3 bytes =
+of
+> > > each logical frame, and return the expected full frame size from th=
+e
+> > > parser program. The verdict program always just returns SK_PASS.
+> > >
+> > > This seems to work exactly as expected in manual simulations of
+> > > various packet size distributions, and even for a bunch of
+> > > ping/pong-like benchmark (which are very sensitive to correct frame=
 
-#regzbot poke
+> > > length determination, so I'm reasonably confident we don't screw th=
+at
+> > > up much). And yet, when benchmarking sending multiple logical RPC
+> > > streams over the same single socket (so many interleaving RSocket
+> > > frames on single socket, but in terms of logical frames nothing sho=
+uld
+> > > change), we often see that while full frame hasn't been accumulated=
+ in
+> > > socket receive buffer yet, epoll_wait() for that socket would retur=
+n
+> > > with success notifying user space that there is data on socket.
+> > > Subsequent recvfrom() call would immediately return -EAGAIN and no
+> > > data, and our benchmark would go on this loop of useless
+> > > epoll_wait()+recvfrom() calls back to back, many times over.
+> >
+> > Aha yes this sounds bad.
+> >
+> > >
+> > > So I have a few questions:
+> > >   - is the above use case something that was meant to be handled by=
 
->>> Hi,
->>>
->>> After I updated to 6.4 through Archlinux kernel update, suddenly I noticed random packet losses on my routers like nodes. I have these networking relevant config on my nodes
->>>
->>> 1. Using archlinux
->>> 2. Network config through systemd-networkd
->>> 3. Using bird2 for BGP routing, but not relevant to this bug.
->>> 4. Using nftables for traffic control, but seems not relevant to this bug. 
->>> 5. Not using fail2ban like dymanic filtering tools, at least at L3/L4 level
->>>
->>> After I ruled out systemd-networkd, nftables related issues. I tracked down issues to kernel.
->>>
->>> Here's the tcpdump I'm seeing on one side of my node ""
->>>
->>> ```
->>> sudo tcpdump -i fios_wan port 38851
->>> tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
->>> listening on fios_wan, link-type EN10MB (Ethernet), snapshot length 262144 bytes
->>> 10:33:06.073236 IP [BOS1_NODE].38851 > [REDACTED_PUBLIC_IPv4_1].38851: UDP, length 148
->>> 10:33:11.406607 IP [BOS1_NODE].38851 > [REDACTED_PUBLIC_IPv4_1].38851: UDP, length 148
->>> 10:33:16.739969 IP [BOS1_NODE].38851 > [REDACTED_PUBLIC_IPv4_1].38851: UDP, length 148
->>> 10:33:21.859856 IP [BOS1_NODE].38851 > [REDACTED_PUBLIC_IPv4_1].38851: UDP, length 148
->>> 10:33:27.193176 IP [BOS1_NODE].38851 > [REDACTED_PUBLIC_IPv4_1].38851: UDP, length 148
->>> 5 packets captured
->>> 5 packets received by filter
->>> 0 packets dropped by kernel
->>> ```
->>>
->>> But on the other side "[REDACTED_PUBLIC_IPv4_1]", tcpdump is replying packets in this wireguard stream. So packet is lost somewhere in the link.
->>>
->>> From the otherside, I can do "mtr" to "[BOS1_NODE]"'s public IP and found the moment the link got lost is right at "[BOS1_NODE]", that means "[BOS1_NODE]"'s networking stack completely drop the inbound packets from specific ip addresses.
->>>
->>> Some more digging
->>>
->>> 1. This situation began after booting in different delays. Sometimes can trigger after 30 seconds after booting, and sometimes will be after 18 hours or more.
->>> 2. It can envolve into worse case that when I do "ip neigh show", the ipv4 ARP table and ipv6 neighbor discovery start to appear as "invalid", meaning the internet is completely loss.
->>> 3. When this happened to wan facing interface, it seems OK with lan facing interfaces. WAN interface was using Intel X710-T4L using i40e and lan side was using virtio
->>> 4. I tried to bisect in between 6.3 and 6.4, and the first bad commit it reports was "a3efabee5878b8d7b1863debb78cb7129d07a346". But this is not relevant to networking at all, maybe it's the wrong commit to look at. At the meantime, because I haven't found a reproducible way of 100% trigger the issue, it may be the case during bisect some "good" commits are actually bad. 
->>> 5. I also tried to look at "dmesg", nothing interesting pop up. But I'll make it available upon request.
->>>
->>> This is my first bug reports. Sorry for any confusion it may lead to and thanks for reading.
->>
->> See Bugzilla for the full thread.
->>
->> Thorsten: The reporter had a bad bisect (some bad commits were marked as good
->> instead), hence SoB chain for culprit (unrelated) ipvu commit is in To:
->> list. I also asked the reporter (also in To:) to provide dmesg and request
->> rerunning bisection, but he doesn't currently have a reliable reproducer.
->> Is it the best I can do?
->>
->> Anyway, I'm adding this regression to be tracked in regzbot:
->>
->> #regzbot introduced: a3efabee5878b8 https://bugzilla.kernel.org/show_bug.cgi?id=217678
->> #regzbot title: packet drop on Intel X710-T4L due to ipvu boot fix
->>
->> Thanks.
->>
->> [1]: https://bugzilla.kernel.org/show_bug.cgi?id=217678
->>
-> 
-> #regzbot introduced: e9031f2da1a
-> #regzbot poke
+> > > sockmap+parser/verdict?
+> >
+> > We shouldn't wake up user space if there is nothing to read. So
+> > yes this seems like a valid use case to me.
+> >
+> > >   - is it correct to assume that epoll won't wake up until amount o=
+f
+> > > bytes requested by parser program is accumulated (this seems to be =
+the
+> > > case from manually experimenting with various "packet delays");
+> >
+> > Seems there is some bug that races and causes it to wake up
+> > user space. I'm aware of a couple bugs in the stream parser
+> > that I wanted to fix. Not sure I can get to them this week
+> > but should have time next week. We have a couple more fixes
+> > to resolve a few HTTPS server compliance tests as well.
+> >
+> > >   - is there some known bug or race in how sockmap and strparser
+> > > framework interacts with epoll subsystem that could cause this weir=
+d
+> > > epoll_wait() behavior?
+> >
+> > Yes I know of some races in strparser. I'll elaborate later
+> > probably with patches as I don't recall them readily at the
+> > moment.
+> =
+
+> So I missed a good chunk of BPF mailing list traffic while I was on my
+> PTO. Did you end up getting to these bugs in strparser logic? Should I
+> try running the latest bpf-next/net-next on our production workload to
+> see if this is still happening?
+
+You will likely still hit there error I haven't got it out of my queue
+yet. I just knocked off a couple things last week so could probably
+take a look at flushing my queue this week. Then it would make sense
+to retest to see if its something new or not.
+
+I'll at least send an RFC with the idea even if I don't get to testing
+it yet.
+
+Thanks,
+John=
 
