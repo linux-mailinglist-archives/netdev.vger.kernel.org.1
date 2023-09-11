@@ -1,110 +1,128 @@
-Return-Path: <netdev+bounces-32921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C741D79AB24
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 22:01:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 164A179AB25
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 22:06:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D88F31C20961
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 20:01:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F390D28134A
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 20:06:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13F9A15AE4;
-	Mon, 11 Sep 2023 20:01:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB5BC15AE6;
+	Mon, 11 Sep 2023 20:06:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06E8EC2E9
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 20:01:13 +0000 (UTC)
-Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CEFF9F
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 13:01:11 -0700 (PDT)
-Received: by mail-qt1-x835.google.com with SMTP id d75a77b69052e-414b3da2494so29915511cf.3
-        for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 13:01:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF01E156C3
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 20:06:18 +0000 (UTC)
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE799CC
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 13:06:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1694462470; x=1695067270; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/FpMmKl0bse3BMDgaQ2W2l2B7MkeGt45cjIQaol/41k=;
-        b=DX9zfjjItB2OgggGfugQ9crDxu2DSXD0SPVU4PNzH+vBMvDcj8xbApFt9NKEAawxz1
-         bTtQUhD2Hsqct4916Ua3TM4yBBHFSZqlovA02bRawFmMIlUPMzzIPWc7L5Pj6GtrLQe3
-         FGX51R5aiRGp1nL3QXLs5UWxlDQVW1tXH0ejE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694462470; x=1695067270;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/FpMmKl0bse3BMDgaQ2W2l2B7MkeGt45cjIQaol/41k=;
-        b=jHNjtyX0u6NAgBglhzTv7WBK8wnmrOdrot2Fw9SgQZKO3rMb34EA1QunNcdNgOMFoU
-         VFPpkIMnaYgLmP/sfEcueuwq5h9RCgU+qlInkxohS3GoLJltS6CO2UYqXWlRQ9HoTeAd
-         7CP6X3QeT382KOvujNlpXNZ7cS8Qq1syetIiAANIHPMEjHAIAXKvwziT2uVA2Zj2qzGb
-         c898hzAK7vizNy9bbkzhKB4mHIHCbstsxpRmjnaUfv/vMh6PToWpGL0Qh5ZV+HFx78d5
-         k/4MPOlVc0J8oBd/Q0E7/hupl8Pm0UvitG1MIyFlKuHrgdy4UL6z1wWCMdT/AWuAkTTa
-         Zlzg==
-X-Gm-Message-State: AOJu0Yy4KqFwUWjHrTKxZ38aGGPbYZFsaoQUiqH06yXrdDTgCgCLowUs
-	EtIRYWYhTEggsbpOWtxzGtGhVXB0yZ42FcPB+G9ysyQ/yTSbHmTRdHDB1MX17IQcFnY0RMvnfz9
-	hpTeLxQL0A8x/w25xwV/gOMKx8yQsQZhjrI73xa492pC1hDHIWJZ2/92GH5PykCKJUxztvXI9Tb
-	3Tzf6xxOR3rHw=
-X-Google-Smtp-Source: AGHT+IGMuKpzVNcdHOp7QnJviKsxjhfzJKsrEda/K0F+Y7aKZacSYzyAS++cG9/oGorj1kJUqnzWIw==
-X-Received: by 2002:ac8:7e82:0:b0:403:b9c4:b5de with SMTP id w2-20020ac87e82000000b00403b9c4b5demr12473934qtj.21.1694462470217;
-        Mon, 11 Sep 2023 13:01:10 -0700 (PDT)
-Received: from mail-ash-it-01.broadcom.com ([136.54.24.230])
-        by smtp.gmail.com with ESMTPSA id jk10-20020a05622a748a00b004109b0f06c3sm959952qtb.36.2023.09.11.13.01.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Sep 2023 13:01:09 -0700 (PDT)
-From: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-X-Google-Original-From: Andy Gospodarek <gospo@broadcom.com>
-To: netdev@vger.kernel.org
-Cc: Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	Andy Gospodarek <gospo@broadcom.com>,
-	Siva Reddy Kallam <siva.kallam@broadcom.com>,
-	Prashant Sreedharan <prashant.sreedharan@broadcom.com>,
-	Michael Chan <mchan@broadcom.com>
-Subject: [PATCH net-next] MAINTAINERS: update tg3 maintainer list
-Date: Mon, 11 Sep 2023 16:00:59 -0400
-Message-ID: <20230911200059.7246-1-gospo@broadcom.com>
-X-Mailer: git-send-email 2.41.0
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1694462777; x=1725998777;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=rlvDfjpAo/wPnER6RvRmh8oXtLNDP/gcO1+v9ZP931g=;
+  b=n3WNQ9szo5KCuleZ2Xl+/vHca33SROHVqoKTHSBakh8ZxZDCP1/64dPo
+   9acEvbu6UIVqyTZ4kSyQWGgKvSz11AeS60zzgnRapHuF72kBYy7rtrqEQ
+   Yr90dJ4jBLqJlvxBY0gyv2u3XiC5Mr7usW5cN+D/gEUsEoIIYDAH6EOFu
+   s=;
+X-IronPort-AV: E=Sophos;i="6.02,244,1688428800"; 
+   d="scan'208";a="670851223"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-245b69b1.us-east-1.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2023 20:06:09 +0000
+Received: from EX19MTAUWC002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+	by email-inbound-relay-iad-1e-m6i4x-245b69b1.us-east-1.amazon.com (Postfix) with ESMTPS id 75A5F35C451;
+	Mon, 11 Sep 2023 20:06:03 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Mon, 11 Sep 2023 20:05:54 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.171.14) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Mon, 11 Sep 2023 20:05:51 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <avagin@google.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<joannelkoong@gmail.com>, <kuba@kernel.org>, <kuni1840@gmail.com>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH v1 net 1/5] tcp: Fix bind() regression for v4-mapped-v6 wildcard address.
+Date: Mon, 11 Sep 2023 13:05:43 -0700
+Message-ID: <20230911200543.78783-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <CAEWA0a5t+XfrP6BvWCVg2P8e05Bpu2hd7OpmKnB2NVYLwRmcAg@mail.gmail.com>
+References: <CAEWA0a5t+XfrP6BvWCVg2P8e05Bpu2hd7OpmKnB2NVYLwRmcAg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Originating-IP: [10.187.171.14]
+X-ClientProxiedBy: EX19D038UWB004.ant.amazon.com (10.13.139.177) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SORTED_RECIPS,SPF_HELO_NONE,T_SPF_PERMERROR autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+From: Andrei Vagin <avagin@google.com>
+Date: Mon, 11 Sep 2023 13:00:19 -0700
+> On Mon, Sep 11, 2023 at 9:52 AM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
+> >
+> > Andrei Vagin reported bind() regression with strace logs.
+> >
+> > If we bind() a TCPv6 socket to ::FFFF:0.0.0.0 and then bind() a TCPv4
+> > socket to 127.0.0.1, the 2nd bind() should fail but now succeeds.
+> >
+> >   from socket import *
+> >
+> >   s1 = socket(AF_INET6, SOCK_STREAM)
+> >   s1.bind(('::ffff:0.0.0.0', 0))
+> >
+> >   s2 = socket(AF_INET, SOCK_STREAM)
+> >   s2.bind(('127.0.0.1', s1.getsockname()[1]))
+> >
+> > During the 2nd bind(), if tb->family is AF_INET6 and sk->sk_family is
+> > AF_INET in inet_bind2_bucket_match_addr_any(), we still need to check
+> > if tb has the v4-mapped-v6 wildcard address.
+> >
+> > The example above does not work after commit 5456262d2baa ("net: Fix
+> > incorrect address comparison when searching for a bind2 bucket"), but
+> > the blamed change is not the commit.
+> >
+> > Before the commit, the leading zeros of ::FFFF:0.0.0.0 were treated
+> > as 0.0.0.0, and the sequence above worked by chance.  Technically, this
+> > case has been broken since bhash2 was introduced.
+> >
+> > Note that if we bind() two sockets to 127.0.0.1 and then ::FFFF:0.0.0.0,
+> > the 2nd bind() fails properly because we fall back to using bhash to
+> > detect conflicts for the v4-mapped-v6 address.
+> 
+> I think we have one more issue here:
+> 
+> socket(AF_INET6, SOCK_STREAM|SOCK_CLOEXEC, IPPROTO_IP) = 3
+> socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC, IPPROTO_IP) = 4
+> bind(3, {sa_family=AF_INET6, sin6_port=htons(9999),
+> sin6_flowinfo=htonl(0), inet_pton(AF_INET6, "::ffff:127.0.0.1",
+> &sin6_addr), sin6_scope_id=0}, 28) = 0
+> bind(4, {sa_family=AF_INET, sin_port=htons(9999),
+> sin_addr=inet_addr("127.0.0.1")}, 16) = 0
+> 
+> I think the second bind has to return EADDRINUSE, doesn't it?
 
-Signed-off-by: Andy Gospodarek <gospo@broadcom.com>
-Signed-off-by: Pavan Chebbi pavan.chebbi@broadcom.com
-Signed-off-by: Siva Reddy Kallam <siva.kallam@broadcom.com>
-Signed-off-by: Prashant Sreedharan <prashant.sreedharan@broadcom.com>
-Reviewed-by: Michael Chan <mchan@broadcom.com>
----
- MAINTAINERS | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 612d6d1dbf36..5f52b2c47615 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -4320,8 +4320,7 @@ F:	drivers/net/ethernet/broadcom/bcmsysport.*
- F:	drivers/net/ethernet/broadcom/unimac.h
- 
- BROADCOM TG3 GIGABIT ETHERNET DRIVER
--M:	Siva Reddy Kallam <siva.kallam@broadcom.com>
--M:	Prashant Sreedharan <prashant@broadcom.com>
-+M:	Pavan Chebbi <pavan.chebbi@broadcom.com>
- M:	Michael Chan <mchan@broadcom.com>
- L:	netdev@vger.kernel.org
- S:	Supported
--- 
-2.41.0
-
+Correct, and the following patch fixes it separately.
+Sorry, I forgot to add you in CC of the entire series.
+https://lore.kernel.org/netdev/20230911183700.60878-4-kuniyu@amazon.com/
 
