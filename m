@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-32878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A041579AA68
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 19:02:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CDE3779AA6A
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 19:03:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E26F4281336
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 17:02:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 875FA281351
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 17:03:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F1D1154B1;
-	Mon, 11 Sep 2023 17:02:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 771D5154B3;
+	Mon, 11 Sep 2023 17:03:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D5683D86
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 17:02:30 +0000 (UTC)
-Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3F7A123;
-	Mon, 11 Sep 2023 10:02:28 -0700 (PDT)
-Received: by mail-ed1-x536.google.com with SMTP id 4fb4d7f45d1cf-52713d2c606so6135845a12.2;
-        Mon, 11 Sep 2023 10:02:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 687F6A950
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 17:03:52 +0000 (UTC)
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FDB6121;
+	Mon, 11 Sep 2023 10:03:51 -0700 (PDT)
+Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-9a648f9d8e3so595595166b.1;
+        Mon, 11 Sep 2023 10:03:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694451747; x=1695056547; darn=vger.kernel.org;
+        d=gmail.com; s=20221208; t=1694451829; x=1695056629; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bx7Z3G6TG2avGQh5qW28D9cnQGBkHNI8APKRcgvj8pQ=;
-        b=nzuNuEfgJoaZ8ctfulG9O+a/kGh8zC6E9VJUaiPDATak0p9ytn7SKAFK8xH8pkpGUD
-         Ca+U21EH4GczWFII6EUbOH3DluQoVgEBjeyqMpV3Lxh3A29C6O6F7rrvsJKjrOx42s/g
-         gvCPYS5tkrAVqofszHR1y+UwLWz+q+54ofzcc9BA7VzgUa2sx9EpcilPQ/TuvhLa3NUD
-         l4SKENpu2UUw8uftvPk2ZQY/lnKhdkAe83MB1WxHYElekbOIyWvb5mN9y+72BI8wUnKs
-         vExRWHvfYzjFvszEOUJQHvOtQaCiPg5cV1o1Er+pBnmpsAyxBosgZ/H8PQkHce+N12Xl
-         Zq7g==
+        bh=Bh45NkM6d8BWFe6aEYm+B4fjovxJAqk+P+SIzP9SdD8=;
+        b=T6Li1t32k1m2HUrwlhsbuVr1SCIsqzc2211QQRswKqP7vfmYdIb0MPas44CJ58mBpk
+         Q/YKQpg8Ihzl/ShLq6th8HZvleEv4EZfqN3NDge8K/gQ6EGZSVM3JvV9lJya7ZLDK/sj
+         bSMKaVzTPX1dAbJfEuuJBCICYa1ZJX1PNsKYQaMCM/srmU4N2Ck3A8/tedFy/x1995yZ
+         Cb8T6HGEi6fuV60/NhRPnDB0eHx4NgTT/6+JNoqfVjVs4888UqDETQJyjSTQzyxPQ0Gs
+         u7dZ1JVHP/+yhA9e1jStrzvxMnOfqVe7cI8YVuGzXBKO7NwSU4tM4ZqPvef50B79OX8p
+         HBZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694451747; x=1695056547;
+        d=1e100.net; s=20230601; t=1694451829; x=1695056629;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Bx7Z3G6TG2avGQh5qW28D9cnQGBkHNI8APKRcgvj8pQ=;
-        b=WIQfsHcVkN3VTZECugZFar3+5VceFekPx1yWowjZ+OzP2gINwzB6xYt01bBHFFTC3z
-         SC5TwNOdgmsT10kgkhHC3jpwX2SYHdLyd68kgbJsDD1fHsJ6qvXGgHt3GBwRhTdwwLew
-         Pt/uqaMBhi0+zTh+XkVkdNYz9bJtlxuxgovRQEF4krIZh1MFT9LcLIMqsC8Aavd2irHH
-         TFmzGa7tjH3xkAMi7mQica/6fIoN/GGjyX5JqeYbmy0pTPktrkiKfgqoYZ92MSGbDezf
-         5np7jcGESja+izxuL1guvkv3tx7E6zCb/EMliPykrvAIp9VBd2Y4ZmDn3eXruwZ30rkT
-         GlJA==
-X-Gm-Message-State: AOJu0YyenXBsUkfD8cvrPKN2JCaXxMLNGn8iD2c5fKdrfD823Y2dCsax
-	r6shksHHISnfgKITbul9pbY=
-X-Google-Smtp-Source: AGHT+IFdN1FH5jz8hi8cj7z87DfB50l9K9XRcmjaFnVCZO7Htji79T4QMjFEDfv19+SOFie1FB70MA==
-X-Received: by 2002:a17:906:8475:b0:9a1:b5fc:8c56 with SMTP id hx21-20020a170906847500b009a1b5fc8c56mr8914915ejc.55.1694451746889;
-        Mon, 11 Sep 2023 10:02:26 -0700 (PDT)
+        bh=Bh45NkM6d8BWFe6aEYm+B4fjovxJAqk+P+SIzP9SdD8=;
+        b=QYNXftLiLTJe9bqzzP1wHM1YqvHuTt03kov7MDTelcbpV93lPN32S2360YdU0S+XIS
+         nLB3AIs4OaMjs/ElSgeexRs+tuI9w0faR6W/qujOBjL5q6FyGW81xtkznUROHcsOK1hz
+         E60r/qay4WjrzX/qZZ9PtuY095g+YIuUkFNKz3Ve602tXRkJeMyEYHbbYtOxxWtf6alY
+         PfBsQl3ISVR9M7zkJt5EbsYOeD/+00vI3E5spaWGdpMx9o7qhTfUxuEe0A08W10O0Xet
+         RMI2V8vKNXp345jhvIAAnBU2DTZQB/7iY4qBHSzpFecFW7TDbHIA4GL9/5JcWGTaG6wa
+         DvGw==
+X-Gm-Message-State: AOJu0YwsXjgYd8kUbkSgvDXU6PPo2pjdRb/tYjdQvGyJU1DpoAm1g58U
+	KD06JA756HPS9bohjuAUuCw=
+X-Google-Smtp-Source: AGHT+IGIYCw4aLZaESMFDF/Tq0rdFzvqK0OG6gkCpZ8qHvDPE4Q2Nd8YyjWfadMSs3/mvmX0pisycA==
+X-Received: by 2002:a17:906:301b:b0:9a1:c39a:8bfd with SMTP id 27-20020a170906301b00b009a1c39a8bfdmr8262550ejz.57.1694451829504;
+        Mon, 11 Sep 2023 10:03:49 -0700 (PDT)
 Received: from skbuf ([188.26.56.202])
-        by smtp.gmail.com with ESMTPSA id se22-20020a170906ce5600b009920e9a3a73sm5674085ejb.115.2023.09.11.10.02.23
+        by smtp.gmail.com with ESMTPSA id n16-20020a170906379000b009930308425csm5646857ejc.31.2023.09.11.10.03.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Sep 2023 10:02:24 -0700 (PDT)
-Date: Mon, 11 Sep 2023 20:02:22 +0300
+        Mon, 11 Sep 2023 10:03:49 -0700 (PDT)
+Date: Mon, 11 Sep 2023 20:03:46 +0300
 From: Vladimir Oltean <olteanv@gmail.com>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Tristram.Ha@microchip.com, Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net,
-	Woojung Huh <woojung.huh@microchip.com>,
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Lukasz Majewski <lukma@denx.de>, Tristram.Ha@microchip.com,
+	Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
+	davem@davemloft.net, Woojung Huh <woojung.huh@microchip.com>,
 	Oleksij Rempel <o.rempel@pengutronix.de>,
 	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	UNGLinuxDriver@microchip.com,
+	Paolo Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com,
 	Oleksij Rempel <linux@rempel-privat.de>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Subject: Re: [[RFC PATCH v4 net-next] 0/2] net: dsa: hsr: Enable HSR HW
  offloading for KSZ9477
-Message-ID: <20230911170222.hip2pcyzbfu3olau@skbuf>
+Message-ID: <20230911170346.wm2ph3dspayplwd5@skbuf>
 References: <20230906152801.921664-1-lukma@denx.de>
  <20230911165848.0741c03c@wsk>
  <20230911160501.5vc4nttz6fnww56h@skbuf>
+ <20230911170222.hip2pcyzbfu3olau@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,94 +81,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230911160501.5vc4nttz6fnww56h@skbuf>
+In-Reply-To: <20230911170222.hip2pcyzbfu3olau@skbuf>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Sep 11, 2023 at 07:05:01PM +0300, Vladimir Oltean wrote:
-> Actually, the reason why I haven't yet said anything is because it made
-> me realize that there is a pre-existing bug in net/dsa/slave.c where we
-> have this pattern:
-> 
-> 	if (!ether_addr_equal(dev->dev_addr, master->dev_addr))
-> 		dev_uc_add(master, dev->dev_addr);
-> 
-> but there is no replay of the dev_uc_add() call when the master->dev_addr
-> changes. This really results in RX packet loss, as I have tested. I don't
-> know what is the best way to solve it.
+On Mon, Sep 11, 2023 at 08:02:22PM +0300, Vladimir Oltean wrote:
+> Hi @Jakub, I remember you fixed some issues with the dev->dev_addr writes,
 
-Hi @Jakub, I remember you fixed some issues with the dev->dev_addr writes,
-after dev_addr_lists.c was changed to a rbtree. Is it easy for you to
-tell if the change below is safe from an API perspective?
-
-Is the answer "yes, because dev_uc_add() uses an addr_type of NETDEV_HW_ADDR_T_UNICAST,
-and dev->dev_addr uses NETDEV_HW_ADDR_T_LAN, so they never share a struct netdev_hw_addr
-for the same MAC address, and thus, they never collide"?
-
-The DSA and 8021q drivers currently have this pattern, from around 2008.
-But 8021q also tracks NETDEV_CHANGEADDR events on the real_dev, which is
-absent in DSA. If the change below is safe, it would be a simpler solution.
-
-diff --git a/net/dsa/slave.c b/net/dsa/slave.c
-index 48db91b33390..e40474e13660 100644
---- a/net/dsa/slave.c
-+++ b/net/dsa/slave.c
-@@ -374,11 +374,9 @@ static int dsa_slave_open(struct net_device *dev)
- 			goto out;
- 	}
-
--	if (!ether_addr_equal(dev->dev_addr, master->dev_addr)) {
--		err = dev_uc_add(master, dev->dev_addr);
--		if (err < 0)
--			goto del_host_addr;
--	}
-+	err = dev_uc_add(master, dev->dev_addr);
-+	if (err < 0)
-+		goto del_host_addr;
-
- 	err = dsa_port_enable_rt(dp, dev->phydev);
- 	if (err)
-@@ -387,8 +385,7 @@ static int dsa_slave_open(struct net_device *dev)
- 	return 0;
-
- del_unicast:
--	if (!ether_addr_equal(dev->dev_addr, master->dev_addr))
--		dev_uc_del(master, dev->dev_addr);
-+	dev_uc_del(master, dev->dev_addr);
- del_host_addr:
- 	if (dsa_switch_supports_uc_filtering(ds))
- 		dsa_port_standalone_host_fdb_del(dp, dev->dev_addr, 0);
-@@ -404,8 +401,7 @@ static int dsa_slave_close(struct net_device *dev)
-
- 	dsa_port_disable_rt(dp);
-
--	if (!ether_addr_equal(dev->dev_addr, master->dev_addr))
--		dev_uc_del(master, dev->dev_addr);
-+	dev_uc_del(master, dev->dev_addr);
-
- 	if (dsa_switch_supports_uc_filtering(ds))
- 		dsa_port_standalone_host_fdb_del(dp, dev->dev_addr, 0);
-@@ -469,14 +465,11 @@ static int dsa_slave_set_mac_address(struct net_device *dev, void *a)
- 			return err;
- 	}
-
--	if (!ether_addr_equal(addr->sa_data, master->dev_addr)) {
--		err = dev_uc_add(master, addr->sa_data);
--		if (err < 0)
--			goto del_unicast;
--	}
-+	err = dev_uc_add(master, addr->sa_data);
-+	if (err < 0)
-+		goto del_unicast;
-
--	if (!ether_addr_equal(dev->dev_addr, master->dev_addr))
--		dev_uc_del(master, dev->dev_addr);
-+	dev_uc_del(master, dev->dev_addr);
-
- 	if (dsa_switch_supports_uc_filtering(ds))
- 		dsa_port_standalone_host_fdb_del(dp, dev->dev_addr, 0);
+I should have changed To: Jakub.. did that now.
 
