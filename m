@@ -1,961 +1,213 @@
-Return-Path: <netdev+bounces-32991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E739E79C1FD
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 03:51:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FADA79C1A6
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 03:28:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75E8E2810E4
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 01:51:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1EF42813FB
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 01:28:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C85A1845;
-	Tue, 12 Sep 2023 01:51:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8479417E8;
+	Tue, 12 Sep 2023 01:28:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B54E17C4
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 01:51:19 +0000 (UTC)
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CF3F76892
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 18:51:19 -0700 (PDT)
-Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-4013454fa93so58077235e9.0
-        for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 18:51:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1694483477; x=1695088277; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QKlDSaR7kEjJyElfNrfNLMwIoMT0aPpyXq2ScNAmSW0=;
-        b=dyfU7RBozBdk7kZakR4R3nuCVq7d50o5uk0U2sTL9a4Kq7CjltK9pg1aPBpNmVTs0l
-         XA48A9Ue3iRJWm+Kd9SBjP0MWW9vUspzBmclEyuyT2+CqTIRmvrKNFbVg1cpM49mSoy8
-         oWXYrIfb8RCLtppWN+P2UNYAY+ONf5VAVW8FFhy+sKW3Fkbvxz5EBcpo3xnIanTNfSTN
-         v5auPEPJxj/fJZURv6QSnKMKS8EVJP1Lwb279+WgqAbQb81YbeahL/dOCPJqaJajOh3i
-         3ZqAczIOYgKFV6qCPs+WJt/GFKyfUoq8MjYRiWsIr9e00yY3nEaEWbsKpn1uXYpgqX6k
-         P+2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694483477; x=1695088277;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QKlDSaR7kEjJyElfNrfNLMwIoMT0aPpyXq2ScNAmSW0=;
-        b=R6LUNKRNhUWzj617bh2AQ5uiPmVV89dXky5/B8ydMg2yI9hUW81TTCpDavcIygpqrK
-         ray9IAKiOjRVSbCaBEL3cYjo1PsoSX1ZLinQZ0zOmSiPBRLHjzVucv4D+BCcPsscV8Um
-         avH2M75dOj6o4zE134qM+XOMi2feL6yfxBp5ZQHUnahMLElDdGKGCVetUh3bfgeQpT4/
-         NdfZeePWcKSxsdTzY0e20/55CtwXmX7p8rbKGcV/QNZoHdqKbXjFCJ8kKv2IXaZddaMt
-         uWOClc2b2jq2dZkvF/dEnhV0osXYKI4gRM7NmKhIsMz2brrYmt5TO36eWtyCEfEjqbFR
-         MO1g==
-X-Gm-Message-State: AOJu0YzXphtOnx6mDOAY3W2EwVlR/58euE1Sf/sq0PWTe34fz09WNjSM
-	SE16vSxSV/eEAhlby2ozBLyMP6E6ZKsHUPMf8tU=
-X-Google-Smtp-Source: AGHT+IHYZ1GeKGzW+13hZqPf/rG8UnBUDfL9cYRuTbN5tNyz6t4RNgx6ACNQO2iiv25HblWpDvqTMA==
-X-Received: by 2002:a1c:7415:0:b0:401:b652:b6cf with SMTP id p21-20020a1c7415000000b00401b652b6cfmr8950299wmc.13.1694466273781;
-        Mon, 11 Sep 2023 14:04:33 -0700 (PDT)
-Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id z20-20020a1c4c14000000b00402e942561fsm14261699wmf.38.2023.09.11.14.04.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Sep 2023 14:04:33 -0700 (PDT)
-From: Dmitry Safonov <dima@arista.com>
-To: David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: linux-kernel@vger.kernel.org,
-	Dmitry Safonov <dima@arista.com>,
-	Andy Lutomirski <luto@amacapital.net>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Bob Gilligan <gilligan@arista.com>,
-	Dan Carpenter <error27@gmail.com>,
-	David Laight <David.Laight@aculab.com>,
-	Dmitry Safonov <0x7f454c46@gmail.com>,
-	Donald Cassidy <dcassidy@redhat.com>,
-	Eric Biggers <ebiggers@kernel.org>,
-	"Eric W. Biederman" <ebiederm@xmission.com>,
-	Francesco Ruggeri <fruggeri05@gmail.com>,
-	"Gaillardetz, Dominik" <dgaillar@ciena.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-	Ivan Delalande <colona@arista.com>,
-	Leonard Crestez <cdleonard@gmail.com>,
-	"Nassiri, Mohammad" <mnassiri@ciena.com>,
-	Salam Noureddine <noureddine@arista.com>,
-	Simon Horman <simon.horman@corigine.com>,
-	"Tetreault, Francois" <ftetreau@ciena.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH v11 net-next 21/23] net/tcp: Wire up l3index to TCP-AO
-Date: Mon, 11 Sep 2023 22:03:41 +0100
-Message-ID: <20230911210346.301750-22-dima@arista.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230911210346.301750-1-dima@arista.com>
-References: <20230911210346.301750-1-dima@arista.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 716FA1382
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 01:28:52 +0000 (UTC)
+Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F1C61B470F;
+	Mon, 11 Sep 2023 18:28:51 -0700 (PDT)
+Received: from pps.filterd (m0150244.ppops.net [127.0.0.1])
+	by mx0b-002e3701.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38BIOcVr029738;
+	Mon, 11 Sep 2023 21:13:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from : to : cc : subject
+ : date : message-id : references : in-reply-to : content-type : content-id
+ : content-transfer-encoding : mime-version; s=pps0720;
+ bh=BuAVc2HOCGp25QCta9Ohq8WIcaILQhb4U694dmymVnI=;
+ b=NtWNHqpqX0r8o0lHaQV5NXm3ZHaaijNHo1uYR0eL677dPLTwIHnwuJfbQUo5KQMFgxs6
+ /i6vmZbIBF7TT7oO4brKxDAc4f0VS6cDp11x2RL8D/VjGKBiyKZ4izO423SCDkCTeB2M
+ KxRjyeBxvesX48R+4pAsHbzaItayaiTOY5w1jmo+wD0w8dy8BU0f7VwxFq+gfWnreK6l
+ W1CZhbmvLLR0mgmA0QTOErRPgqkDGpWKvZGGg6Lh4TYPG+GQC15m4hOW9PDAkh3jrbOc
+ MwQ9Ds7WzYjZqb0hEmehkDtorHZ8qVz0VP45MJ5IhGEUIFjVHt/iY1qOwJshfrmYEzD6 Eg== 
+Received: from p1lg14881.it.hpe.com ([16.230.97.202])
+	by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3t21eywe4q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 Sep 2023 21:13:01 +0000
+Received: from p1wg14924.americas.hpqcorp.net (unknown [10.119.18.113])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by p1lg14881.it.hpe.com (Postfix) with ESMTPS id BDC1D805E5F;
+	Mon, 11 Sep 2023 21:12:57 +0000 (UTC)
+Received: from p1wg14924.americas.hpqcorp.net (10.119.18.113) by
+ p1wg14924.americas.hpqcorp.net (10.119.18.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.42; Mon, 11 Sep 2023 09:12:57 -1200
+Received: from p1wg14919.americas.hpqcorp.net (16.230.19.122) by
+ p1wg14924.americas.hpqcorp.net (10.119.18.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.42
+ via Frontend Transport; Mon, 11 Sep 2023 09:12:57 -1200
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (192.58.206.35)
+ by edge.it.hpe.com (16.230.19.122) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.42; Mon, 11 Sep 2023 09:12:57 -1200
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AIVWvzScNBVTk4TmQ59HKSPelQtBLsoB74ICU96dsbcalEUKQNuXMQj8ldw8eoJXEfezxYLrxWej7d30CTAnlT/WJ6OA51u2N1QOR30FQ+AAvP/peOUOdZHMF9ZNwTmTwK1KGzRrjKUww0ctgXDKfhNm/HQQF5x/ugKsugZBVA8EZlkzImetriYCI5HY8biZyXS3y8LzLjw9Buvtd624ZBBVEk0lu27CW9yhCByWMWFXstOYxLbMqbX7epo86CHYEfRAdyHWD7y/jaqU/CCwqG1wJeQErIN3gJ7NfJK7uicP/z9s7T6aZP0MohA6NPo3b3udeTl27zvqT3N9YOQG6g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BuAVc2HOCGp25QCta9Ohq8WIcaILQhb4U694dmymVnI=;
+ b=WxC77qYjgEcGoEqpG1wShZN/cFgaTdxnfl90lEDXKyVb1m7Vt+J+/JGIqkvkDyKuQ5gM3QiXTy0TFXwdxx5yyKy+zOesGqcsZdQIt/2YUXpLqI5qOFei7LCmEDpT6zT911tajBQjsag72iUyVNjEWGfrc3+5mCvtCKx5kBHuWRZiOqiBAhEcxqHBFruXWJZKDbBBJhVxRbCA7NNh2Pduxnt9R+Y4vuEqMqTk8cb+KMqo9i+9BddGRIvnbJqTozOcKmcijj3MSPCW+4Bo+6vkt4FHnNNZ1QdRabxCVXARwnrP6eI62c7RxdYegGYtzXxYtar8YM5JtILDESv9bsDFjA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=hpe.com; dmarc=pass action=none header.from=hpe.com; dkim=pass
+ header.d=hpe.com; arc=none
+Received: from DM4PR84MB1927.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:8:4e::10) by
+ PH7PR84MB1510.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:510:151::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.35; Mon, 11 Sep
+ 2023 21:12:55 +0000
+Received: from DM4PR84MB1927.NAMPRD84.PROD.OUTLOOK.COM
+ ([fe80::20b7:769e:3974:f17e]) by DM4PR84MB1927.NAMPRD84.PROD.OUTLOOK.COM
+ ([fe80::20b7:769e:3974:f17e%4]) with mapi id 15.20.6768.029; Mon, 11 Sep 2023
+ 21:12:54 +0000
+From: "Hawkins, Nick" <nick.hawkins@hpe.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "christophe.jaillet@wanadoo.fr" <christophe.jaillet@wanadoo.fr>,
+        "simon.horman@corigine.com" <simon.horman@corigine.com>,
+        "Verdun, Jean-Marie"
+	<verdun@hpe.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "kuba@kernel.org"
+	<kuba@kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "robh+dt@kernel.org" <robh+dt@kernel.org>,
+        "krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+        "conor+dt@kernel.org" <conor+dt@kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "devicetree@vger.kernel.org"
+	<devicetree@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3 4/5] net: hpe: Add GXP UMAC Driver
+Thread-Topic: [PATCH v3 4/5] net: hpe: Add GXP UMAC Driver
+Thread-Index: AQHZ0Ixvto7vnAASrEiTAeghAafYu6/tuDUAgAJzHICAAGX0gIAFz7wAgABkmgCABKKvcIAOvqCAgAvNn4A=
+Date: Mon, 11 Sep 2023 21:12:54 +0000
+Message-ID: <3DB6DD63-C8AB-4009-8AF8-79290054AC5C@hpe.com>
+References: <20230816215220.114118-1-nick.hawkins@hpe.com>
+ <20230816215220.114118-5-nick.hawkins@hpe.com>
+ <01e96219-4f0c-4259-9398-bc2e6bc1794f@lunn.ch>
+ <88B3833C-19FB-4E4C-A398-E7EF3143ED02@hpe.com>
+ <1b8058e1-6e7f-4a4a-a191-09a9b8010e0a@lunn.ch>
+ <CF9BD927-B788-4554-B246-D5CC6D06258F@hpe.com>
+ <befbee5a-7b11-4948-a837-6311dd4d7276@lunn.ch>
+ <DM4PR84MB1927E85827B5450F1952E58A88E3A@DM4PR84MB1927.NAMPRD84.PROD.OUTLOOK.COM>
+ <729dcda6-2d2c-4054-a570-17cdf6e4e57b@lunn.ch>
+In-Reply-To: <729dcda6-2d2c-4054-a570-17cdf6e4e57b@lunn.ch>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Microsoft-MacOutlook/16.76.23082700
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM4PR84MB1927:EE_|PH7PR84MB1510:EE_
+x-ms-office365-filtering-correlation-id: f748c2c3-0aaf-4e54-3b61-08dbb30bdd81
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ENYm97tm+JzNMDnsXrF1veZH8jI1aokCDbzTDH/CdiTP3MwWvEIOtEP1MpoDZkOsUgTBOT/apI/o32Y32V0IF9DDJvi3AjEPYv8wR+9g2G1OTHm9u4Nq576XEUHC9/PdidBru9gajB0dHjhBsrPJfcg0peFvnS4CsOs0swR9zxTwTj5Mfi0HD6t+z9Np/G/1OXw6eNdehh4UcuHqnqATz8VktgBQO6GLuBUB1Ue/cmj7+0h8AFIJRaLyUxKMyXiFhpJi2pHru9axcEU+44qj7W6x51ui05PscvjnGzfwHkz6exFsYMWZemTLC++GX+d83KCrz6QDHESp/Dv9Yeq+0f5ya8H0smrwPs4lpUEWc9+9PLz5WQtVPF4Ds77yJphsQASwGZf/ps5KpI4+GVW+uVEidMNr7f+pMQDY7wK9QmC8RybvfU+msZNp1XgtlM1eJomsGpOWalU3y+/aE58qWa8YW9fLMxBLld0VPMSBGrWTU2+hQUyUbm5gCVMY/spl8Tida+mkxJ44x4lSLNAjZ7q84TKi1V+0BfAnDFZb9eB/4cOPGW39OzJkkBfc6dPfmZGlrc6oB42s05mmGKcNYjDVlwcpZH3TYIHqib/BSurOZj8syed3W2bjmOcpcvxxTpZPNDeMqcPBBnMYbSWfCA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR84MB1927.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(366004)(376002)(136003)(396003)(39860400002)(346002)(1800799009)(451199024)(186009)(5660300002)(64756008)(54906003)(66446008)(41300700001)(4326008)(8676002)(8936002)(66476007)(6916009)(66946007)(316002)(66556008)(91956017)(76116006)(122000001)(478600001)(36756003)(71200400001)(2616005)(33656002)(7416002)(6486002)(6506007)(2906002)(86362001)(82960400001)(38070700005)(38100700002)(6512007)(45980500001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?Q1RVR0xjWTdPU1BQT2Z5Vkxza1lldy9EVmJ0bERjVElSMnZCSmZ5a0tockxH?=
+ =?utf-8?B?UkxOZ1NqdjhZUlRFNWI0dzlZSG81R1BOaFEvZmo3MmFqclVtbW51aDFlMHpJ?=
+ =?utf-8?B?MFRzcXgvN1AwNm41eHVHQWlGcVV3bE9NUXhSMnpSZTM5OVExOStQSk04ZENV?=
+ =?utf-8?B?SlhiWHp1eGw2UVgraXVVWm9jWWhRWW9ZRFlqWkIyZ056dTN3dFZlbXZjcjBr?=
+ =?utf-8?B?eGx3TVJwT0JpNVFPYVE1SGNwNUJBN3FHcnZaa2s1Z2xrR0tXYldSMlV2TzU5?=
+ =?utf-8?B?Q3E3YytRNGR3TkREOWIwNHVWN3FpdVZIeHhLRDlqSmJKQk4vMTZ3NWVUT2Y0?=
+ =?utf-8?B?MFErTDd1SkhCcTZ3L0puR0dxYmxIT01nVTZKeE9TOXEyMFF6Z1JxaDRwTVgx?=
+ =?utf-8?B?bmQ3WXhIZGFpdmYzVTlzTDZ0Z2xvMm1DYUFGbnFlS1ZsM0Z3VXRtTUtFa0VR?=
+ =?utf-8?B?L2JqYUpsbUxhckdZSDk5V3VRK2xITk9yUHUzMXY0T29WRThWTHNzN2lqcU9P?=
+ =?utf-8?B?aloxRnBYNnJ5MEZrWGJ5S3gzY21IanYrMnhnVWhLeWtFZ2I3WTFUVG1YWnNS?=
+ =?utf-8?B?SFNic2xucDJBU2VKc2VaMEw4eEc4ZzB2LzdZRmdNWWh2SnlKNWVYNSt3U2Zm?=
+ =?utf-8?B?RkV3WERYUmloTlExajFOUTQxYnRNMGRSeVgyL1NMa0VkcTBORENqNUhYZ1NN?=
+ =?utf-8?B?bTB6QnFIcVplbzBiL2ZKTldiN0IrNHRZQVo1Szl2K1d6NTFxVVd3alNyNWNF?=
+ =?utf-8?B?b3VLSmRlOUpiVHV1VTZZSEpINlFVM3phNVdZU1NKR0hwdWVKRGtlc0hZM1Nt?=
+ =?utf-8?B?Qkl3QU1MZFNsTGc1cktVbUtpUXJTVDVaZWppR2gyZHd0eDN1OFJjWDRycnov?=
+ =?utf-8?B?dGNJcnNDSkVUT3RCSlRheXRJUEVXdUQzcGR1T2Z1MkN5QXVnZHVPcnRVZHpQ?=
+ =?utf-8?B?alNVeEdpS3lISVZ1WkJ4bVIvQUl5NSt1KzRpUDNhdW5PRzdjSlBRZDZSa29v?=
+ =?utf-8?B?K3poQVI2Ym1wdSs0Mk1WZ1NyYitwVGE2SWVBcmJlVGxqek1kV29ZUGNJN1R0?=
+ =?utf-8?B?VGg3R3laTmlqMHdUL0F3dGJKSmQ3bUZEVHUxTUhJaU80bXJJMFZLdEQxdElV?=
+ =?utf-8?B?Qkx1ZksrWUxQU1pJUnpSSDBicUNidUg1aEo2aEQwK0svT1JsZWR2TkYxUTdK?=
+ =?utf-8?B?SnVQVll6Q0xERmQ0WnJQM0VGa25hbVc0NS8ycDdCZnFyR2dONGRFRjBMUEhv?=
+ =?utf-8?B?bTZpenlINXlvTm9ITGhPOWlud3dNclRKeStZNkhqQjAxcnlxQzcvVmlSS3Az?=
+ =?utf-8?B?NzNqcjJsK2NGUGdPWTZtZjdicTVjbGMwRkxySElLcHdlNktqQThZM3dUanJY?=
+ =?utf-8?B?NU1iVEhGczF1TldQTFpuSjU1Z3p1N1cyOG4rK0VvcFJvRFpybGx4c1JiZU9u?=
+ =?utf-8?B?ZEVCaEYwMlpHcXJjbmZEUW5vMzZKQmZpaFkwVC9TdWxmWGRuRWVQNkRISkZB?=
+ =?utf-8?B?UmR0bGdta2xnc3BzU3ZKVXhQZFBwNmZnMUxWL0NBVEhjUkZ0aUxnV3V3aTYw?=
+ =?utf-8?B?dzgwNnE2VDVoYnpuUlFHcXpWVVlFejNsQ2s3R2hVMTNNR0h0Y0VsdllqSFR6?=
+ =?utf-8?B?ZTVsTkc1ME1xZzhQRU1HZS9FZ1hBM0dPdXo4M0syaXhRMk5Ec3BSYWdMcDll?=
+ =?utf-8?B?ZHJkalk0d1dCNXNYMm1ONCtuTnNUb2dkU3VoeTM4Vnl3c0Y0UE40aE5lQ2Rw?=
+ =?utf-8?B?anNUUmtXb3ZpZUEyRFYrenQ2clRqelNiMjIrbUtzemRIY2orRkRON0JWZkQr?=
+ =?utf-8?B?MU9zTWZTdXZhWUpNZXpKdHFTUWk1ZEtlME9FZm1LV1BKRTJOZklnSXM2dU1w?=
+ =?utf-8?B?djdYc25ZU2hYMnQ5WmY2aXFkTW1YVEZpcmpPSyszaUtqYXp2N3ZsTm5vN0tU?=
+ =?utf-8?B?VjZCdTFFZis5K0gzdG02RE1pSG9SZkVML3hONzF6UmVNQ2JWQXNIZk8wZ1F4?=
+ =?utf-8?B?RitlajRTaE1zVUxaMElkSkJRbGcxL3BTVENtZE44MktER3lZL0VJS1U4Yk51?=
+ =?utf-8?B?Tk1RYmdPdVpReFM3RDdZNmZ1TXdkbEc0R0VsQlRpbkk2cUlCZjkwWTRXQTZn?=
+ =?utf-8?B?Tm5NSWdWY0NIZE9kZXRVaERWMnh6U2Q4aHZSWnQ1eEtvVDJGZUlaYzdFRk9S?=
+ =?utf-8?B?aEE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <07F20AC5ADBEC54882DCA75D5A39E07D@NAMPRD84.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR84MB1927.NAMPRD84.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: f748c2c3-0aaf-4e54-3b61-08dbb30bdd81
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Sep 2023 21:12:54.4720
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 105b2061-b669-4b31-92ac-24d304d195dc
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 1Jt4DOw/H5J6MX/Pa6HaLQPqjRxB7D5HT1lGZjgWY7gt4r8V7TDLLikIm6U7fKl3aWuqgyxoV0YAtx+2y2q/Ew==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR84MB1510
+X-OriginatorOrg: hpe.com
+X-Proofpoint-ORIG-GUID: 6d6DOpJOC_NqLeoy-PKjDpbfi_7-uL_9
+X-Proofpoint-GUID: 6d6DOpJOC_NqLeoy-PKjDpbfi_7-uL_9
+X-HPE-SCL: -1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-09-11_16,2023-09-05_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ clxscore=1011 suspectscore=0 adultscore=0 spamscore=0 bulkscore=0
+ mlxscore=0 impostorscore=0 priorityscore=1501 phishscore=0 malwarescore=0
+ mlxlogscore=876 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2308100000 definitions=main-2309110195
 
-Similarly how TCP_MD5SIG_FLAG_IFINDEX works for TCP-MD5,
-TCP_AO_KEYF_IFINDEX is an AO-key flag that binds that MKT to a specified
-by L3 ifinndex. Similarly, without this flag the key will work in
-the default VRF l3index = 0 for connections.
-To prevent AO-keys from overlapping, it's restricted to add key B for a
-socket that has key A, which have the same sndid/rcvid and one of
-the following is true:
-- !(A.keyflags & TCP_AO_KEYF_IFINDEX) or !(B.keyflags & TCP_AO_KEYF_IFINDEX)
-  so that any key is non-bound to a VRF
-- A.l3index == B.l3index
-  both want to work for the same VRF
-
-Additionally, it's restricted to match TCP-MD5 keys for the same peer
-the following way:
-|--------------|--------------------|----------------|---------------|
-|              | MD5 key without    |     MD5 key    |    MD5 key    |
-|              |     l3index        |    l3index=0   |   l3index=N   |
-|--------------|--------------------|----------------|---------------|
-|  TCP-AO key  |                    |                |               |
-|  without     |       reject       |    reject      |   reject      |
-|  l3index     |                    |                |               |
-|--------------|--------------------|----------------|---------------|
-|  TCP-AO key  |                    |                |               |
-|  l3index=0   |       reject       |    reject      |   allow       |
-|--------------|--------------------|----------------|---------------|
-|  TCP-AO key  |                    |                |               |
-|  l3index=N   |       reject       |    allow       |   reject      |
-|--------------|--------------------|----------------|---------------|
-
-This is done with the help of tcp_md5_do_lookup_any_l3index() to reject
-adding AO key without TCP_AO_KEYF_IFINDEX if there's TCP-MD5 in any VRF.
-This is important for case where sysctl_tcp_l3mdev_accept = 1
-Similarly, for TCP-AO lookups tcp_ao_do_lookup() may be used with
-l3index < 0, so that __tcp_ao_key_cmp() will match TCP-AO key in any VRF.
-
-Signed-off-by: Dmitry Safonov <dima@arista.com>
-Acked-by: David Ahern <dsahern@kernel.org>
----
- include/net/tcp.h     |  11 +--
- include/net/tcp_ao.h  |  18 ++---
- net/ipv4/syncookies.c |   6 +-
- net/ipv4/tcp_ao.c     | 170 +++++++++++++++++++++++++++++++-----------
- net/ipv4/tcp_ipv4.c   |  14 ++--
- net/ipv6/syncookies.c |   5 +-
- net/ipv6/tcp_ao.c     |  21 +++---
- net/ipv6/tcp_ipv6.c   |  15 +++-
- 8 files changed, 178 insertions(+), 82 deletions(-)
-
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index fa100e4f2cde..7aa5c5d81178 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -2605,7 +2605,7 @@ static inline int tcp_parse_auth_options(const struct tcphdr *th,
- }
- 
- static inline bool tcp_ao_required(struct sock *sk, const void *saddr,
--				   int family, bool stat_inc)
-+				   int family, int l3index, bool stat_inc)
- {
- #ifdef CONFIG_TCP_AO
- 	struct tcp_ao_info *ao_info;
-@@ -2619,7 +2619,7 @@ static inline bool tcp_ao_required(struct sock *sk, const void *saddr,
- 	if (!ao_info)
- 		return false;
- 
--	ao_key = tcp_ao_do_lookup(sk, saddr, family, -1, -1);
-+	ao_key = tcp_ao_do_lookup(sk, l3index, saddr, family, -1, -1);
- 	if (ao_info->ao_required || ao_key) {
- 		if (stat_inc) {
- 			NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPAOREQUIRED);
-@@ -2672,21 +2672,22 @@ tcp_inbound_hash(struct sock *sk, const struct request_sock *req,
- 		 * the last key is impossible to remove, so there's
- 		 * always at least one current_key.
- 		 */
--		if (tcp_ao_required(sk, saddr, family, true)) {
-+		if (tcp_ao_required(sk, saddr, family, l3index, true)) {
- 			tcp_hash_fail("AO hash is required, but not found",
- 					family, skb, "L3 index %d", l3index);
- 			return SKB_DROP_REASON_TCP_AONOTFOUND;
- 		}
- 		if (unlikely(tcp_md5_do_lookup(sk, l3index, saddr, family))) {
- 			NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPMD5NOTFOUND);
--			tcp_hash_fail("MD5 Hash not found", family, skb, "");
-+			tcp_hash_fail("MD5 Hash not found",
-+				      family, skb, "L3 index %d", l3index);
- 			return SKB_DROP_REASON_TCP_MD5NOTFOUND;
- 		}
- 		return SKB_NOT_DROPPED_YET;
- 	}
- 
- 	if (aoh)
--		return tcp_inbound_ao_hash(sk, skb, family, req, aoh);
-+		return tcp_inbound_ao_hash(sk, skb, family, req, l3index, aoh);
- 
- 	return tcp_inbound_md5_hash(sk, skb, saddr, daddr, family,
- 				    l3index, md5_location);
-diff --git a/include/net/tcp_ao.h b/include/net/tcp_ao.h
-index b97e1b3c6448..da04efa1aaa5 100644
---- a/include/net/tcp_ao.h
-+++ b/include/net/tcp_ao.h
-@@ -33,6 +33,7 @@ struct tcp_ao_key {
- 	u8			key[TCP_AO_MAXKEYLEN] __tcp_ao_key_align;
- 	unsigned int		tcp_sigpool_id;
- 	unsigned int		digest_size;
-+	int			l3index;
- 	u8			prefixlen;
- 	u8			family;
- 	u8			keylen;
-@@ -198,10 +199,10 @@ int tcp_ao_get_mkts(struct sock *sk, sockptr_t optval, sockptr_t optlen);
- int tcp_ao_get_sock_info(struct sock *sk, sockptr_t optval, sockptr_t optlen);
- enum skb_drop_reason tcp_inbound_ao_hash(struct sock *sk,
- 			const struct sk_buff *skb, unsigned short int family,
--			const struct request_sock *req,
-+			const struct request_sock *req, int l3index,
- 			const struct tcp_ao_hdr *aoh);
- u32 tcp_ao_compute_sne(u32 next_sne, u32 next_seq, u32 seq);
--struct tcp_ao_key *tcp_ao_do_lookup(const struct sock *sk,
-+struct tcp_ao_key *tcp_ao_do_lookup(const struct sock *sk, int l3index,
- 				    const union tcp_ao_addr *addr,
- 				    int family, int sndid, int rcvid);
- int tcp_ao_hash_hdr(unsigned short family, char *ao_hash,
-@@ -243,9 +244,6 @@ int tcp_v6_ao_calc_key_sk(struct tcp_ao_key *mkt, u8 *key,
- 			  __be32 disn, bool send);
- int tcp_v6_ao_calc_key_rsk(struct tcp_ao_key *mkt, u8 *key,
- 			   struct request_sock *req);
--struct tcp_ao_key *tcp_v6_ao_do_lookup(const struct sock *sk,
--				       const struct in6_addr *addr,
--				       int sndid, int rcvid);
- struct tcp_ao_key *tcp_v6_ao_lookup(const struct sock *sk,
- 				    struct sock *addr_sk, int sndid, int rcvid);
- struct tcp_ao_key *tcp_v6_ao_lookup_rsk(const struct sock *sk,
-@@ -262,12 +260,12 @@ void tcp_ao_finish_connect(struct sock *sk, struct sk_buff *skb);
- void tcp_ao_connect_init(struct sock *sk);
- void tcp_ao_syncookie(struct sock *sk, const struct sk_buff *skb,
- 		      struct tcp_request_sock *treq,
--		      unsigned short int family);
-+		      unsigned short int family, int l3index);
- #else /* CONFIG_TCP_AO */
- 
- static inline void tcp_ao_syncookie(struct sock *sk, const struct sk_buff *skb,
- 				    struct tcp_request_sock *treq,
--				    unsigned short int family)
-+				    unsigned short int family, int l3index)
- {
- }
- 
-@@ -278,13 +276,15 @@ static inline bool tcp_ao_ignore_icmp(const struct sock *sk, int type, int code)
- 
- static inline enum skb_drop_reason tcp_inbound_ao_hash(struct sock *sk,
- 		const struct sk_buff *skb, unsigned short int family,
--		const struct request_sock *req, const struct tcp_ao_hdr *aoh)
-+		const struct request_sock *req, int l3index,
-+		const struct tcp_ao_hdr *aoh)
- {
- 	return SKB_NOT_DROPPED_YET;
- }
- 
- static inline struct tcp_ao_key *tcp_ao_do_lookup(const struct sock *sk,
--		const union tcp_ao_addr *addr, int family, int sndid, int rcvid)
-+		int l3index, const union tcp_ao_addr *addr,
-+		int family, int sndid, int rcvid)
- {
- 	return NULL;
- }
-diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
-index 23fca22bc992..40b7f4c659f8 100644
---- a/net/ipv4/syncookies.c
-+++ b/net/ipv4/syncookies.c
-@@ -338,6 +338,7 @@ struct sock *cookie_v4_check(struct sock *sk, struct sk_buff *skb)
- 	__u8 rcv_wscale;
- 	struct flowi4 fl4;
- 	u32 tsoff = 0;
-+	int l3index;
- 
- 	if (!READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_syncookies) ||
- 	    !th->ack || th->rst)
-@@ -394,13 +395,14 @@ struct sock *cookie_v4_check(struct sock *sk, struct sk_buff *skb)
- 	treq->snt_synack	= 0;
- 	treq->tfo_listener	= false;
- 
--	tcp_ao_syncookie(sk, skb, treq, AF_INET);
--
- 	if (IS_ENABLED(CONFIG_SMC))
- 		ireq->smc_ok = 0;
- 
- 	ireq->ir_iif = inet_request_bound_dev_if(sk, skb);
- 
-+	l3index = l3mdev_master_ifindex_by_index(sock_net(sk), ireq->ir_iif);
-+	tcp_ao_syncookie(sk, skb, treq, AF_INET, l3index);
-+
- 	/* We throwed the options of the initial SYN away, so we hope
- 	 * the ACK carries the same options again (see RFC1122 4.2.3.8)
- 	 */
-diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
-index 24fd8772deea..522d3c84ac96 100644
---- a/net/ipv4/tcp_ao.c
-+++ b/net/ipv4/tcp_ao.c
-@@ -136,7 +136,7 @@ static int ipv4_prefix_cmp(const struct in_addr *addr1,
- 	return memcmp(&a1, &a2, sizeof(a1));
- }
- 
--static int __tcp_ao_key_cmp(const struct tcp_ao_key *key,
-+static int __tcp_ao_key_cmp(const struct tcp_ao_key *key, int l3index,
- 			    const union tcp_ao_addr *addr, u8 prefixlen,
- 			    int family, int sndid, int rcvid)
- {
-@@ -144,6 +144,10 @@ static int __tcp_ao_key_cmp(const struct tcp_ao_key *key,
- 		return (key->sndid > sndid) ? 1 : -1;
- 	if (rcvid >= 0 && key->rcvid != rcvid)
- 		return (key->rcvid > rcvid) ? 1 : -1;
-+	if (l3index >= 0 && (key->keyflags & TCP_AO_KEYF_IFINDEX)) {
-+		if (key->l3index != l3index)
-+			return (key->l3index > l3index) ? 1 : -1;
-+	}
- 
- 	if (family == AF_UNSPEC)
- 		return 0;
-@@ -168,7 +172,7 @@ static int __tcp_ao_key_cmp(const struct tcp_ao_key *key,
- 	return -1;
- }
- 
--static int tcp_ao_key_cmp(const struct tcp_ao_key *key,
-+static int tcp_ao_key_cmp(const struct tcp_ao_key *key, int l3index,
- 			  const union tcp_ao_addr *addr, u8 prefixlen,
- 			  int family, int sndid, int rcvid)
- {
-@@ -176,14 +180,16 @@ static int tcp_ao_key_cmp(const struct tcp_ao_key *key,
- 	if (family == AF_INET6 && ipv6_addr_v4mapped(&addr->a6)) {
- 		__be32 addr4 = addr->a6.s6_addr32[3];
- 
--		return __tcp_ao_key_cmp(key, (union tcp_ao_addr *)&addr4,
-+		return __tcp_ao_key_cmp(key, l3index,
-+					(union tcp_ao_addr *)&addr4,
- 					prefixlen, AF_INET, sndid, rcvid);
- 	}
- #endif
--	return __tcp_ao_key_cmp(key, addr, prefixlen, family, sndid, rcvid);
-+	return __tcp_ao_key_cmp(key, l3index, addr,
-+				prefixlen, family, sndid, rcvid);
- }
- 
--static struct tcp_ao_key *__tcp_ao_do_lookup(const struct sock *sk,
-+static struct tcp_ao_key *__tcp_ao_do_lookup(const struct sock *sk, int l3index,
- 		const union tcp_ao_addr *addr, int family, u8 prefix,
- 		int sndid, int rcvid)
- {
-@@ -201,17 +207,18 @@ static struct tcp_ao_key *__tcp_ao_do_lookup(const struct sock *sk,
- 	hlist_for_each_entry_rcu(key, &ao->head, node) {
- 		u8 prefixlen = min(prefix, key->prefixlen);
- 
--		if (!tcp_ao_key_cmp(key, addr, prefixlen, family, sndid, rcvid))
-+		if (!tcp_ao_key_cmp(key, l3index, addr, prefixlen,
-+				    family, sndid, rcvid))
- 			return key;
- 	}
- 	return NULL;
- }
- 
--struct tcp_ao_key *tcp_ao_do_lookup(const struct sock *sk,
-+struct tcp_ao_key *tcp_ao_do_lookup(const struct sock *sk, int l3index,
- 				    const union tcp_ao_addr *addr,
- 				    int family, int sndid, int rcvid)
- {
--	return __tcp_ao_do_lookup(sk, addr, family, U8_MAX, sndid, rcvid);
-+	return __tcp_ao_do_lookup(sk, l3index, addr, family, U8_MAX, sndid, rcvid);
- }
- 
- static struct tcp_ao_info *tcp_ao_alloc_info(gfp_t flags)
-@@ -677,18 +684,22 @@ struct tcp_ao_key *tcp_v4_ao_lookup_rsk(const struct sock *sk,
- 					struct request_sock *req,
- 					int sndid, int rcvid)
- {
--	union tcp_ao_addr *addr =
--			(union tcp_ao_addr *)&inet_rsk(req)->ir_rmt_addr;
-+	struct inet_request_sock *ireq = inet_rsk(req);
-+	union tcp_ao_addr *addr = (union tcp_ao_addr *)&ireq->ir_rmt_addr;
-+	int l3index;
- 
--	return tcp_ao_do_lookup(sk, addr, AF_INET, sndid, rcvid);
-+	l3index = l3mdev_master_ifindex_by_index(sock_net(sk), ireq->ir_iif);
-+	return tcp_ao_do_lookup(sk, l3index, addr, AF_INET, sndid, rcvid);
- }
- 
- struct tcp_ao_key *tcp_v4_ao_lookup(const struct sock *sk, struct sock *addr_sk,
- 				    int sndid, int rcvid)
- {
-+	int l3index = l3mdev_master_ifindex_by_index(sock_net(sk),
-+						     addr_sk->sk_bound_dev_if);
- 	union tcp_ao_addr *addr = (union tcp_ao_addr *)&addr_sk->sk_daddr;
- 
--	return tcp_ao_do_lookup(sk, addr, AF_INET, sndid, rcvid);
-+	return tcp_ao_do_lookup(sk, l3index, addr, AF_INET, sndid, rcvid);
- }
- 
- int tcp_ao_prepare_reset(const struct sock *sk, struct sk_buff *skb,
-@@ -739,7 +750,8 @@ int tcp_ao_prepare_reset(const struct sock *sk, struct sk_buff *skb,
- 		ao_info = rcu_dereference(tcp_sk(sk)->ao_info);
- 		if (!ao_info)
- 			return -ENOENT;
--		*key = tcp_ao_do_lookup(sk, addr, family, -1, aoh->rnext_keyid);
-+		*key = tcp_ao_do_lookup(sk, l3index, addr, family,
-+					-1, aoh->rnext_keyid);
- 		if (!*key)
- 			return -ENOENT;
- 		*traffic_key = kmalloc(tcp_ao_digest_size(*key), GFP_ATOMIC);
-@@ -778,24 +790,26 @@ int tcp_ao_prepare_reset(const struct sock *sk, struct sk_buff *skb,
- 
- static struct tcp_ao_key *tcp_ao_inbound_lookup(unsigned short int family,
- 		const struct sock *sk, const struct sk_buff *skb,
--		int sndid, int rcvid)
-+		int sndid, int rcvid, int l3index)
- {
- 	if (family == AF_INET) {
- 		const struct iphdr *iph = ip_hdr(skb);
- 
--		return tcp_ao_do_lookup(sk, (union tcp_ao_addr *)&iph->saddr,
--				AF_INET, sndid, rcvid);
-+		return tcp_ao_do_lookup(sk, l3index,
-+					(union tcp_ao_addr *)&iph->saddr,
-+					AF_INET, sndid, rcvid);
- 	} else {
- 		const struct ipv6hdr *iph = ipv6_hdr(skb);
- 
--		return tcp_ao_do_lookup(sk, (union tcp_ao_addr *)&iph->saddr,
--				AF_INET6, sndid, rcvid);
-+		return tcp_ao_do_lookup(sk, l3index,
-+					(union tcp_ao_addr *)&iph->saddr,
-+					AF_INET6, sndid, rcvid);
- 	}
- }
- 
- void tcp_ao_syncookie(struct sock *sk, const struct sk_buff *skb,
- 		      struct tcp_request_sock *treq,
--		      unsigned short int family)
-+		      unsigned short int family, int l3index)
- {
- 	const struct tcphdr *th = tcp_hdr(skb);
- 	const struct tcp_ao_hdr *aoh;
-@@ -806,7 +820,7 @@ void tcp_ao_syncookie(struct sock *sk, const struct sk_buff *skb,
- 	if (tcp_parse_auth_options(th, NULL, &aoh) || !aoh)
- 		return;
- 
--	key = tcp_ao_inbound_lookup(family, sk, skb, -1, aoh->keyid);
-+	key = tcp_ao_inbound_lookup(family, sk, skb, -1, aoh->keyid, l3index);
- 	if (!key)
- 		/* Key not found, continue without TCP-AO */
- 		return;
-@@ -820,7 +834,7 @@ static enum skb_drop_reason
- tcp_ao_verify_hash(const struct sock *sk, const struct sk_buff *skb,
- 		   unsigned short int family, struct tcp_ao_info *info,
- 		   const struct tcp_ao_hdr *aoh, struct tcp_ao_key *key,
--		   u8 *traffic_key, u8 *phash, u32 sne)
-+		   u8 *traffic_key, u8 *phash, u32 sne, int l3index)
- {
- 	u8 maclen = aoh->length - sizeof(struct tcp_ao_hdr);
- 	const struct tcphdr *th = tcp_hdr(skb);
-@@ -831,7 +845,8 @@ tcp_ao_verify_hash(const struct sock *sk, const struct sk_buff *skb,
- 		atomic64_inc(&info->counters.pkt_bad);
- 		atomic64_inc(&key->pkt_bad);
- 		tcp_hash_fail("AO hash wrong length", family, skb,
--			      "%u != %d", maclen, tcp_ao_maclen(key));
-+			      "%u != %d L3index: %d", maclen,
-+			      tcp_ao_maclen(key), l3index);
- 		return SKB_DROP_REASON_TCP_AOFAILURE;
- 	}
- 
-@@ -846,7 +861,8 @@ tcp_ao_verify_hash(const struct sock *sk, const struct sk_buff *skb,
- 		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPAOBAD);
- 		atomic64_inc(&info->counters.pkt_bad);
- 		atomic64_inc(&key->pkt_bad);
--		tcp_hash_fail("AO hash mismatch", family, skb, "");
-+		tcp_hash_fail("AO hash mismatch", family, skb,
-+			      "L3index: %d", l3index);
- 		kfree(hash_buf);
- 		return SKB_DROP_REASON_TCP_AOFAILURE;
- 	}
-@@ -860,7 +876,7 @@ tcp_ao_verify_hash(const struct sock *sk, const struct sk_buff *skb,
- enum skb_drop_reason
- tcp_inbound_ao_hash(struct sock *sk, const struct sk_buff *skb,
- 		    unsigned short int family, const struct request_sock *req,
--		    const struct tcp_ao_hdr *aoh)
-+		    int l3index, const struct tcp_ao_hdr *aoh)
- {
- 	const struct tcphdr *th = tcp_hdr(skb);
- 	u8 *phash = (u8 *)(aoh + 1); /* hash goes just after the header */
-@@ -875,7 +891,7 @@ tcp_inbound_ao_hash(struct sock *sk, const struct sk_buff *skb,
- 	if (!info) {
- 		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPAOKEYNOTFOUND);
- 		tcp_hash_fail("AO key not found", family, skb,
--			      "keyid: %u", aoh->keyid);
-+			      "keyid: %u L3index: %d", aoh->keyid, l3index);
- 		return SKB_DROP_REASON_TCP_AOUNEXPECTED;
- 	}
- 
-@@ -910,7 +926,7 @@ tcp_inbound_ao_hash(struct sock *sk, const struct sk_buff *skb,
- 		/* Established socket, traffic key are cached */
- 		traffic_key = rcv_other_key(key);
- 		err = tcp_ao_verify_hash(sk, skb, family, info, aoh, key,
--					 traffic_key, phash, sne);
-+					 traffic_key, phash, sne, l3index);
- 		if (err)
- 			return err;
- 		current_key = READ_ONCE(info->current_key);
-@@ -931,7 +947,7 @@ tcp_inbound_ao_hash(struct sock *sk, const struct sk_buff *skb,
- 	 * - request sockets would race on those key pointers
- 	 * - tcp_ao_del_cmd() allows async key removal
- 	 */
--	key = tcp_ao_inbound_lookup(family, sk, skb, -1, aoh->keyid);
-+	key = tcp_ao_inbound_lookup(family, sk, skb, -1, aoh->keyid, l3index);
- 	if (!key)
- 		goto key_not_found;
- 
-@@ -971,7 +987,7 @@ tcp_inbound_ao_hash(struct sock *sk, const struct sk_buff *skb,
- 		return SKB_DROP_REASON_NOT_SPECIFIED;
- 	tcp_ao_calc_key_skb(key, traffic_key, skb, sisn, disn, family);
- 	ret = tcp_ao_verify_hash(sk, skb, family, info, aoh, key,
--				 traffic_key, phash, sne);
-+				 traffic_key, phash, sne, l3index);
- 	kfree(traffic_key);
- 	return ret;
- 
-@@ -979,7 +995,7 @@ tcp_inbound_ao_hash(struct sock *sk, const struct sk_buff *skb,
- 	NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPAOKEYNOTFOUND);
- 	atomic64_inc(&info->counters.key_not_found);
- 	tcp_hash_fail("Requested by the peer AO key id not found",
--		      family, skb, "");
-+		      family, skb, "L3index: %d", l3index);
- 	return SKB_DROP_REASON_TCP_AOKEYNOTFOUND;
- }
- 
-@@ -1007,7 +1023,7 @@ void tcp_ao_connect_init(struct sock *sk)
- 	struct tcp_ao_info *ao_info;
- 	union tcp_ao_addr *addr;
- 	struct tcp_ao_key *key;
--	int family;
-+	int family, l3index;
- 
- 	ao_info = rcu_dereference_protected(tp->ao_info,
- 					    lockdep_sock_is_held(sk));
-@@ -1024,9 +1040,11 @@ void tcp_ao_connect_init(struct sock *sk)
- #endif
- 	else
- 		return;
-+	l3index = l3mdev_master_ifindex_by_index(sock_net(sk),
-+						 sk->sk_bound_dev_if);
- 
- 	hlist_for_each_entry_rcu(key, &ao_info->head, node) {
--		if (!tcp_ao_key_cmp(key, addr, key->prefixlen, family, -1, -1))
-+		if (!tcp_ao_key_cmp(key, l3index, addr, key->prefixlen, family, -1, -1))
- 			continue;
- 
- 		if (key == ao_info->current_key)
-@@ -1083,9 +1101,9 @@ int tcp_ao_copy_all_matching(const struct sock *sk, struct sock *newsk,
- 	struct tcp_ao_key *key, *new_key, *first_key;
- 	struct tcp_ao_info *new_ao, *ao;
- 	struct hlist_node *key_head;
-+	int l3index, ret = -ENOMEM;
- 	union tcp_ao_addr *addr;
- 	bool match = false;
--	int ret = -ENOMEM;
- 
- 	ao = rcu_dereference(tcp_sk(sk)->ao_info);
- 	if (!ao)
-@@ -1113,9 +1131,11 @@ int tcp_ao_copy_all_matching(const struct sock *sk, struct sock *newsk,
- 		ret = -EAFNOSUPPORT;
- 		goto free_ao;
- 	}
-+	l3index = l3mdev_master_ifindex_by_index(sock_net(newsk),
-+						 newsk->sk_bound_dev_if);
- 
- 	hlist_for_each_entry_rcu(key, &ao->head, node) {
--		if (tcp_ao_key_cmp(key, addr, key->prefixlen, family, -1, -1))
-+		if (tcp_ao_key_cmp(key, l3index, addr, key->prefixlen, family, -1, -1))
- 			continue;
- 
- 		new_key = tcp_ao_copy_key(newsk, key);
-@@ -1419,7 +1439,8 @@ static struct tcp_ao_info *setsockopt_ao_info(struct sock *sk)
- 	return ERR_PTR(-ESOCKTNOSUPPORT);
- }
- 
--#define TCP_AO_KEYF_ALL		(TCP_AO_KEYF_EXCLUDE_OPT)
-+#define TCP_AO_KEYF_ALL (TCP_AO_KEYF_IFINDEX | TCP_AO_KEYF_EXCLUDE_OPT)
-+#define TCP_AO_GET_KEYF_VALID	(TCP_AO_KEYF_IFINDEX)
- 
- static struct tcp_ao_key *tcp_ao_key_alloc(struct sock *sk,
- 					   struct tcp_ao_add *cmd)
-@@ -1483,8 +1504,8 @@ static int tcp_ao_add_cmd(struct sock *sk, unsigned short int family,
- 	union tcp_ao_addr *addr;
- 	struct tcp_ao_key *key;
- 	struct tcp_ao_add cmd;
-+	int ret, l3index = 0;
- 	bool first = false;
--	int ret;
- 
- 	if (optlen < sizeof(cmd))
- 		return -EINVAL;
-@@ -1514,9 +1535,46 @@ static int tcp_ao_add_cmd(struct sock *sk, unsigned short int family,
- 			return -EINVAL;
- 	}
- 
-+	if (cmd.ifindex && !(cmd.keyflags & TCP_AO_KEYF_IFINDEX))
-+		return -EINVAL;
-+
-+	/* For cmd.tcp_ifindex = 0 the key will apply to the default VRF */
-+	if (cmd.keyflags & TCP_AO_KEYF_IFINDEX && cmd.ifindex) {
-+		int bound_dev_if = READ_ONCE(sk->sk_bound_dev_if);
-+		struct net_device *dev;
-+
-+		rcu_read_lock();
-+		dev = dev_get_by_index_rcu(sock_net(sk), cmd.ifindex);
-+		if (dev && netif_is_l3_master(dev))
-+			l3index = dev->ifindex;
-+		rcu_read_unlock();
-+
-+		if (!dev || !l3index)
-+			return -EINVAL;
-+
-+		/* It's still possible to bind after adding keys or even
-+		 * re-bind to a different dev (with CAP_NET_RAW).
-+		 * So, no reason to return error here, rather try to be
-+		 * nice and warn the user.
-+		 */
-+		if (bound_dev_if && bound_dev_if != cmd.ifindex)
-+			net_warn_ratelimited("AO key ifindex %d != sk bound ifindex %d\n",
-+					     cmd.ifindex, bound_dev_if);
-+	}
-+
- 	/* Don't allow keys for peers that have a matching TCP-MD5 key */
--	if (tcp_md5_do_lookup_any_l3index(sk, addr, family))
--		return -EKEYREJECTED;
-+	if (cmd.keyflags & TCP_AO_KEYF_IFINDEX) {
-+		/* Non-_exact version of tcp_md5_do_lookup() will
-+		 * as well match keys that aren't bound to a specific VRF
-+		 * (that will make them match AO key with
-+		 * sysctl_tcp_l3dev_accept = 1
-+		 */
-+		if (tcp_md5_do_lookup(sk, l3index, addr, family))
-+			return -EKEYREJECTED;
-+	} else {
-+		if (tcp_md5_do_lookup_any_l3index(sk, addr, family))
-+			return -EKEYREJECTED;
-+	}
- 
- 	ao_info = setsockopt_ao_info(sk);
- 	if (IS_ERR(ao_info))
-@@ -1533,10 +1591,9 @@ static int tcp_ao_add_cmd(struct sock *sk, unsigned short int family,
- 		 * > The IDs of MKTs MUST NOT overlap where their
- 		 * > TCP connection identifiers overlap.
- 		 */
--		if (__tcp_ao_do_lookup(sk, addr, family,
--				       cmd.prefix, -1, cmd.rcvid))
-+		if (__tcp_ao_do_lookup(sk, l3index, addr, family, cmd.prefix, -1, cmd.rcvid))
- 			return -EEXIST;
--		if (__tcp_ao_do_lookup(sk, addr, family,
-+		if (__tcp_ao_do_lookup(sk, l3index, addr, family,
- 				       cmd.prefix, cmd.sndid, -1))
- 			return -EEXIST;
- 	}
-@@ -1555,6 +1612,7 @@ static int tcp_ao_add_cmd(struct sock *sk, unsigned short int family,
- 	key->keyflags	= cmd.keyflags;
- 	key->sndid	= cmd.sndid;
- 	key->rcvid	= cmd.rcvid;
-+	key->l3index	= l3index;
- 	atomic64_set(&key->pkt_good, 0);
- 	atomic64_set(&key->pkt_bad, 0);
- 
-@@ -1643,17 +1701,17 @@ static int tcp_ao_delete_key(struct sock *sk, struct tcp_ao_info *ao_info,
- 	return err;
- }
- 
-+#define TCP_AO_DEL_KEYF_ALL (TCP_AO_KEYF_IFINDEX)
- static int tcp_ao_del_cmd(struct sock *sk, unsigned short int family,
- 			  sockptr_t optval, int optlen)
- {
- 	struct tcp_ao_key *key, *new_current = NULL, *new_rnext = NULL;
-+	int err, addr_len, l3index = 0;
- 	struct tcp_ao_info *ao_info;
- 	union tcp_ao_addr *addr;
- 	struct tcp_ao_del cmd;
--	int addr_len;
- 	__u8 prefix;
- 	u16 port;
--	int err;
- 
- 	if (optlen < sizeof(cmd))
- 		return -EINVAL;
-@@ -1670,6 +1728,17 @@ static int tcp_ao_del_cmd(struct sock *sk, unsigned short int family,
- 			return -EINVAL;
- 	}
- 
-+	if (cmd.keyflags & ~TCP_AO_DEL_KEYF_ALL)
-+		return -EINVAL;
-+
-+	/* No sanity check for TCP_AO_KEYF_IFINDEX as if a VRF
-+	 * was destroyed, there still should be a way to delete keys,
-+	 * that were bound to that l3intf. So, fail late at lookup stage
-+	 * if there is no key for that ifindex.
-+	 */
-+	if (cmd.ifindex && !(cmd.keyflags & TCP_AO_KEYF_IFINDEX))
-+		return -EINVAL;
-+
- 	ao_info = setsockopt_ao_info(sk);
- 	if (IS_ERR(ao_info))
- 		return PTR_ERR(ao_info);
-@@ -1737,6 +1806,13 @@ static int tcp_ao_del_cmd(struct sock *sk, unsigned short int family,
- 		    memcmp(addr, &key->addr, addr_len))
- 			continue;
- 
-+		if ((cmd.keyflags & TCP_AO_KEYF_IFINDEX) !=
-+		    (key->keyflags & TCP_AO_KEYF_IFINDEX))
-+			continue;
-+
-+		if (key->l3index != l3index)
-+			continue;
-+
- 		if (key == new_current || key == new_rnext)
- 			continue;
- 
-@@ -1922,10 +1998,10 @@ static int tcp_ao_copy_mkts_to_user(struct tcp_ao_info *ao_info,
- 	struct tcp_ao_key *key, *current_key;
- 	bool do_address_matching = true;
- 	union tcp_ao_addr *addr = NULL;
-+	int err, l3index, user_len;
- 	unsigned int max_keys;	/* maximum number of keys to copy to user */
- 	size_t out_offset = 0;
- 	size_t bytes_to_write;	/* number of bytes to write to user level */
--	int err, user_len;
- 	u32 matched_keys;	/* keys from ao_info matched so far */
- 	int optlen_out;
- 	__be16 port = 0;
-@@ -1944,11 +2020,16 @@ static int tcp_ao_copy_mkts_to_user(struct tcp_ao_info *ao_info,
- 
- 	if (opt_in.pkt_good || opt_in.pkt_bad)
- 		return -EINVAL;
-+	if (opt_in.keyflags & ~TCP_AO_GET_KEYF_VALID)
-+		return -EINVAL;
-+	if (opt_in.ifindex && !(opt_in.keyflags & TCP_AO_KEYF_IFINDEX))
-+		return -EINVAL;
- 
- 	if (opt_in.reserved != 0)
- 		return -EINVAL;
- 
- 	max_keys = opt_in.nkeys;
-+	l3index = (opt_in.keyflags & TCP_AO_KEYF_IFINDEX) ? opt_in.ifindex : -1;
- 
- 	if (opt_in.get_all || opt_in.is_current || opt_in.is_rnext) {
- 		if (opt_in.get_all && (opt_in.is_current || opt_in.is_rnext))
-@@ -2050,7 +2131,7 @@ static int tcp_ao_copy_mkts_to_user(struct tcp_ao_info *ao_info,
- 			continue;
- 		}
- 
--		if (tcp_ao_key_cmp(key, addr, opt_in.prefix,
-+		if (tcp_ao_key_cmp(key, l3index, addr, opt_in.prefix,
- 				   opt_in.addr.ss_family,
- 				   opt_in.sndid, opt_in.rcvid) != 0)
- 			continue;
-@@ -2083,6 +2164,7 @@ static int tcp_ao_copy_mkts_to_user(struct tcp_ao_info *ao_info,
- 		opt_out.nkeys = 0;
- 		opt_out.maclen = key->maclen;
- 		opt_out.keylen = key->keylen;
-+		opt_out.ifindex = key->l3index;
- 		opt_out.pkt_good = atomic64_read(&key->pkt_good);
- 		opt_out.pkt_bad = atomic64_read(&key->pkt_bad);
- 		memcpy(&opt_out.key, key->key, key->keylen);
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index a4aef27b0f72..8976152ece66 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -1078,6 +1078,7 @@ static void tcp_v4_reqsk_send_ack(const struct sock *sk, struct sk_buff *skb,
- 	const union tcp_md5_addr *addr;
- 	u8 *traffic_key = NULL;
- 	u8 keyid = 0;
-+	int l3index;
- #ifdef CONFIG_TCP_AO
- 	const struct tcp_ao_hdr *aoh;
- #endif
-@@ -1088,6 +1089,7 @@ static void tcp_v4_reqsk_send_ack(const struct sock *sk, struct sk_buff *skb,
- 	u32 seq = (sk->sk_state == TCP_LISTEN) ? tcp_rsk(req)->snt_isn + 1 :
- 					     tcp_sk(sk)->snd_nxt;
- 	addr = (union tcp_md5_addr *)&ip_hdr(skb)->saddr;
-+	l3index = tcp_v4_sdif(skb) ? inet_iif(skb) : 0;
- 
- 	if (tcp_rsk_used_ao(req)) {
- #ifdef CONFIG_TCP_AO
-@@ -1098,10 +1100,11 @@ static void tcp_v4_reqsk_send_ack(const struct sock *sk, struct sk_buff *skb,
- 		if (!aoh)
- 			return;
- 
--		ao_key = tcp_ao_do_lookup(sk, addr, AF_INET, aoh->rnext_keyid, -1);
-+		ao_key = tcp_ao_do_lookup(sk, l3index, addr, AF_INET,
-+					  aoh->rnext_keyid, -1);
- 		if (unlikely(!ao_key)) {
- 			/* Send ACK with any matching MKT for the peer */
--			ao_key = tcp_ao_do_lookup(sk, addr, AF_INET, -1, -1);
-+			ao_key = tcp_ao_do_lookup(sk, l3index, addr, AF_INET, -1, -1);
- 			/* Matching key disappeared (user removed the key?)
- 			 * let the handshake timeout.
- 			 */
-@@ -1122,9 +1125,6 @@ static void tcp_v4_reqsk_send_ack(const struct sock *sk, struct sk_buff *skb,
- 		tcp_v4_ao_calc_key_rsk(ao_key, traffic_key, req);
- #endif
- 	} else {
--		int l3index;
--
--		l3index = tcp_v4_sdif(skb) ? inet_iif(skb) : 0;
- 		md5_key = tcp_md5_do_lookup(sk, l3index, addr, AF_INET);
- 	}
- 	/* RFC 7323 2.3
-@@ -1484,6 +1484,7 @@ static int tcp_v4_parse_md5_keys(struct sock *sk, int optname,
- 	const union tcp_md5_addr *addr;
- 	u8 prefixlen = 32;
- 	int l3index = 0;
-+	bool l3flag;
- 	u8 flags;
- 
- 	if (optlen < sizeof(cmd))
-@@ -1496,6 +1497,7 @@ static int tcp_v4_parse_md5_keys(struct sock *sk, int optname,
- 		return -EINVAL;
- 
- 	flags = cmd.tcpm_flags & TCP_MD5SIG_FLAG_IFINDEX;
-+	l3flag = cmd.tcpm_flags & TCP_MD5SIG_FLAG_IFINDEX;
- 
- 	if (optname == TCP_MD5SIG_EXT &&
- 	    cmd.tcpm_flags & TCP_MD5SIG_FLAG_PREFIX) {
-@@ -1533,7 +1535,7 @@ static int tcp_v4_parse_md5_keys(struct sock *sk, int optname,
- 	/* Don't allow keys for peers that have a matching TCP-AO key.
- 	 * See the comment in tcp_ao_add_cmd()
- 	 */
--	if (tcp_ao_required(sk, addr, AF_INET, false))
-+	if (tcp_ao_required(sk, addr, AF_INET, l3flag ? l3index : -1, false))
- 		return -EKEYREJECTED;
- 
- 	return tcp_md5_do_add(sk, addr, AF_INET, prefixlen, l3index, flags,
-diff --git a/net/ipv6/syncookies.c b/net/ipv6/syncookies.c
-index ad7a8caa7b2a..500f6ed3b8cf 100644
---- a/net/ipv6/syncookies.c
-+++ b/net/ipv6/syncookies.c
-@@ -140,6 +140,7 @@ struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb)
- 	struct dst_entry *dst;
- 	__u8 rcv_wscale;
- 	u32 tsoff = 0;
-+	int l3index;
- 
- 	if (!READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_syncookies) ||
- 	    !th->ack || th->rst)
-@@ -214,7 +215,9 @@ struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb)
- 	treq->snt_isn = cookie;
- 	treq->ts_off = 0;
- 	treq->txhash = net_tx_rndhash();
--	tcp_ao_syncookie(sk, skb, treq, AF_INET6);
-+
-+	l3index = l3mdev_master_ifindex_by_index(sock_net(sk), ireq->ir_iif);
-+	tcp_ao_syncookie(sk, skb, treq, AF_INET6, l3index);
- 
- 	if (IS_ENABLED(CONFIG_SMC))
- 		ireq->smc_ok = 0;
-diff --git a/net/ipv6/tcp_ao.c b/net/ipv6/tcp_ao.c
-index 8b04611c9078..3c09ac26206e 100644
---- a/net/ipv6/tcp_ao.c
-+++ b/net/ipv6/tcp_ao.c
-@@ -87,30 +87,29 @@ int tcp_v6_ao_calc_key_rsk(struct tcp_ao_key *mkt, u8 *key,
- 			htonl(tcp_rsk(req)->rcv_isn));
- }
- 
--struct tcp_ao_key *tcp_v6_ao_do_lookup(const struct sock *sk,
--				       const struct in6_addr *addr,
--				       int sndid, int rcvid)
--{
--	return tcp_ao_do_lookup(sk, (union tcp_ao_addr *)addr, AF_INET6,
--				sndid, rcvid);
--}
--
- struct tcp_ao_key *tcp_v6_ao_lookup(const struct sock *sk,
- 				    struct sock *addr_sk,
- 				    int sndid, int rcvid)
- {
-+	int l3index = l3mdev_master_ifindex_by_index(sock_net(sk),
-+						     addr_sk->sk_bound_dev_if);
- 	struct in6_addr *addr = &addr_sk->sk_v6_daddr;
- 
--	return tcp_v6_ao_do_lookup(sk, addr, sndid, rcvid);
-+	return tcp_ao_do_lookup(sk, l3index, (union tcp_ao_addr *)addr,
-+				AF_INET6, sndid, rcvid);
- }
- 
- struct tcp_ao_key *tcp_v6_ao_lookup_rsk(const struct sock *sk,
- 					struct request_sock *req,
- 					int sndid, int rcvid)
- {
--	struct in6_addr *addr = &inet_rsk(req)->ir_v6_rmt_addr;
-+	struct inet_request_sock *ireq = inet_rsk(req);
-+	struct in6_addr *addr = &ireq->ir_v6_rmt_addr;
-+	int l3index;
- 
--	return tcp_v6_ao_do_lookup(sk, addr, sndid, rcvid);
-+	l3index = l3mdev_master_ifindex_by_index(sock_net(sk), ireq->ir_iif);
-+	return tcp_ao_do_lookup(sk, l3index, (union tcp_ao_addr *)addr,
-+				AF_INET6, sndid, rcvid);
- }
- 
- int tcp_v6_ao_hash_pseudoheader(struct tcp_sigpool *hp,
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 60c2129890ec..cb83985dd602 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -609,6 +609,7 @@ static int tcp_v6_parse_md5_keys(struct sock *sk, int optname,
- 	union tcp_ao_addr *addr;
- 	int l3index = 0;
- 	u8 prefixlen;
-+	bool l3flag;
- 	u8 flags;
- 
- 	if (optlen < sizeof(cmd))
-@@ -621,6 +622,7 @@ static int tcp_v6_parse_md5_keys(struct sock *sk, int optname,
- 		return -EINVAL;
- 
- 	flags = cmd.tcpm_flags & TCP_MD5SIG_FLAG_IFINDEX;
-+	l3flag = cmd.tcpm_flags & TCP_MD5SIG_FLAG_IFINDEX;
- 
- 	if (optname == TCP_MD5SIG_EXT &&
- 	    cmd.tcpm_flags & TCP_MD5SIG_FLAG_PREFIX) {
-@@ -667,7 +669,8 @@ static int tcp_v6_parse_md5_keys(struct sock *sk, int optname,
- 		/* Don't allow keys for peers that have a matching TCP-AO key.
- 		 * See the comment in tcp_ao_add_cmd()
- 		 */
--		if (tcp_ao_required(sk, addr, AF_INET, false))
-+		if (tcp_ao_required(sk, addr, AF_INET,
-+				    l3flag ? l3index : -1, false))
- 			return -EKEYREJECTED;
- 		return tcp_md5_do_add(sk, addr,
- 				      AF_INET, prefixlen, l3index, flags,
-@@ -679,7 +682,7 @@ static int tcp_v6_parse_md5_keys(struct sock *sk, int optname,
- 	/* Don't allow keys for peers that have a matching TCP-AO key.
- 	 * See the comment in tcp_ao_add_cmd()
- 	 */
--	if (tcp_ao_required(sk, addr, AF_INET6, false))
-+	if (tcp_ao_required(sk, addr, AF_INET6, l3flag ? l3index : -1, false))
- 		return -EKEYREJECTED;
- 
- 	return tcp_md5_do_add(sk, addr, AF_INET6, prefixlen, l3index, flags,
-@@ -1226,10 +1229,14 @@ static void tcp_v6_reqsk_send_ack(const struct sock *sk, struct sk_buff *skb,
- 			return;
- 		if (!aoh)
- 			return;
--		ao_key = tcp_v6_ao_do_lookup(sk, addr, aoh->rnext_keyid, -1);
-+		ao_key = tcp_ao_do_lookup(sk, l3index,
-+					  (union tcp_ao_addr *)addr, AF_INET6,
-+					  aoh->rnext_keyid, -1);
- 		if (unlikely(!ao_key)) {
- 			/* Send ACK with any matching MKT for the peer */
--			ao_key = tcp_v6_ao_do_lookup(sk, addr, -1, -1);
-+			ao_key = tcp_ao_do_lookup(sk, l3index,
-+						  (union tcp_ao_addr *)addr,
-+						  AF_INET6, -1, -1);
- 			/* Matching key disappeared (user removed the key?)
- 			 * let the handshake timeout.
- 			 */
--- 
-2.41.0
-
+DQo+ID4gSSBoYXZlIGJlZW4gdHJ5aW5nIHRvIGZpZ3VyZSBvdXQgaG93IGV4YWN0bHkgSSBjYW4g
+dHJhbnNsYXRlIHRoZSBjdXJyZW50IGNvZGUNCj4gPiBvdmVyIHRvIHVzaW5nIHRoZSBwYWdlIHBv
+b2wgYXBpIG92ZXIgdGhlIHBhc3Qgd2Vlay4gSXQgc2VlbXMgbGlrZSBpdCBpcyBxdWlldA0KPiA+
+IGEgY29tcGxleCBjaGFuZ2UuIEFzIHRoZSBkcml2ZXIgc2VlbXMgdG8gYmUga2VlcGluZyB1cCB3
+aXRoIG91cg0KPiA+IHBlcmZvcm1hbmNlIHJlcXVpcmVtZW50cyB3b3VsZCBpdCBiZSBhY2NlcHRh
+YmxlIHRvIG1hcmsgdGhpcyBhcyBhDQoNCg0KPiBJdHMgbm90IGp1c3QgcGVyZm9ybWFuY2UuIFVz
+aW5nIHdlbGwgZGVidWdnZWQgYW5kIHNoYXJlZCBjb3JlIGNvZGUNCj4gbWVhbnMgbGVzcyBidWdz
+IGluIHlvdXIgZHJpdmVyLiBJdCBtYWtlcyBtYWludGVuYW5jZSBzaW1wbGVyIHNpbmNlDQo+IHRo
+ZXJlIGFyZSBtb3JlIHBlb3BsZSB3aG8gdW5kZXJzdGFuZCB0aGUgcGFnZSBwb29sIGNvZGUgdGhh
+biB3aGF0IHlvdQ0KPiBoYXZlIGluIHlvdXIgZHJpdmVyIGFuZCBpdCBtYWtlcyB5b3VyIGRyaXZl
+ciBtb3JlIGxpa2Ugb3RoZXIgZHJpdmVycy4NCg0KDQo+IFNvIG92ZXJhbGwgeW91IHdpbGwgZW5k
+IHVwIHdpdGggYSBiZXR0ZXIgcXVhbGl0eSBkcml2ZXIgYnkgYWRhcHRpbmcNCj4gdGhlIHBhZ2Ug
+cG9vbCBjb2RlLg0KDQpHcmVldGluZ3MgQW5kcmV3LA0KDQpJbiB0aGF0IGNhc2UgSSB3aWxsIGNv
+bnRpbnVlIHRvIGF0dGVtcHQgdG8gdHJ5IGFuZCBhZG9wdCB0aGUgcGFnZSBwb29sDQpBUEkuIElu
+IGFsbCB0aGUgZXhhbXBsZXMgd2l0aCBwYWdlIHBvb2wgSFcgcmluZ3MgaXQgYXBwZWFycyB0aGV5
+IGFyZQ0KdXNpbmcgYWxsb2NfZXRoZXJkZXZfbXFzLiBBcmUgdGhlcmUgYW55IEhXIHJlcXVpcmVt
+ZW50cyB0byB1c2UgdGhpcw0KbGlicmFyeT8gSWYgdGhlcmUgYXJlIG5vbmUgd2hhdCBpcyB0aGUg
+dHlwaWNhbCBudW1iZXIgZm9yIHJ4IGFuZCB0eA0KcXVldWVzPw0KDQpUaGFuayB5b3UgZm9yIHRo
+ZSBhc3Npc3RhbmNlLA0KDQotTmljayBIYXdraW5zDQoNCg0KDQo=
 
