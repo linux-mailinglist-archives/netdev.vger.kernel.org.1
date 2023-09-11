@@ -1,249 +1,125 @@
-Return-Path: <netdev+bounces-32802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3AFF79A74F
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 12:38:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 526D779A753
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 12:39:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D61641C20854
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 10:38:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 763631C208F7
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 10:39:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D542F11719;
-	Mon, 11 Sep 2023 10:34:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 910D8BE6F;
+	Mon, 11 Sep 2023 10:39:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C28CAC2D4;
-	Mon, 11 Sep 2023 10:34:48 +0000 (UTC)
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D8FE120;
-	Mon, 11 Sep 2023 03:34:47 -0700 (PDT)
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-9a64619d8fbso538062766b.0;
-        Mon, 11 Sep 2023 03:34:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694428485; x=1695033285;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=f1vGDg0uCtdiqjKqDiwFtuGhRJ18xP0o/QuRB7i2CeI=;
-        b=RRs/t1JazOZS4/jgQq2jQjDx4LDbMPqL1zI0BTFaJrcDkRUzIWjG1x6ZdZOEogKVRd
-         jz/pAJuHMynH8MaGc2HKOUf8yP4oGvsSWiqqtmkSHp2zPDYGqqu0cHCwCMtOsHiB/Wyk
-         tTmMNavKDvlvs2QuFUBOfz0Bq9oMmErIXpNZpLM/DP0Dr9EPG8T8JTPU1RRkqcyT6r/n
-         jHk+gaIsQQKUxr5HdIw3a471GbByqqPdwkFBpof0ni0qQ+XsqxEbypx24OalDWySdHuP
-         K3looho0TZRJalPHYkdOgL23cnRwaUlAO7x4bwdya2jsXY6poa7+MfaUQHgFA1o+reau
-         3u9w==
-X-Gm-Message-State: AOJu0YxS8OLJQusa3UXHwbDSByLHE7l6FHYcbQ78Hh3SZXDdL/tJy4HV
-	A2D6Cqg8tok1ejrPnbCLzH4=
-X-Google-Smtp-Source: AGHT+IHmWj5YVmmZsKaZvOCXIKXs0u+o/kNMeqe3Amwqnpk8GDcWPj4dCCdlfGnRy9cLjYIk7DkVTg==
-X-Received: by 2002:a17:907:b18:b0:99c:e38d:e484 with SMTP id h24-20020a1709070b1800b0099ce38de484mr6984550ejl.6.1694428485510;
-        Mon, 11 Sep 2023 03:34:45 -0700 (PDT)
-Received: from localhost (fwdproxy-cln-013.fbsv.net. [2a03:2880:31ff:d::face:b00c])
-        by smtp.gmail.com with ESMTPSA id v14-20020a17090690ce00b0099c53c44083sm5131989ejw.79.2023.09.11.03.34.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Sep 2023 03:34:45 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-To: sdf@google.com,
-	axboe@kernel.dk,
-	asml.silence@gmail.com,
-	willemdebruijn.kernel@gmail.com,
-	kuba@kernel.org,
-	martin.lau@linux.dev,
-	krisman@suse.de,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Shuah Khan <shuah@kernel.org>
-Cc: bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	io-uring@vger.kernel.org,
-	pabeni@redhat.com,
-	Wang Yufen <wangyufen@huawei.com>,
-	=?UTF-8?q?Daniel=20M=C3=BCller?= <deso@posteo.net>,
-	linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK)
-Subject: [PATCH v5 8/8] selftests/bpf/sockopt: Add io_uring support
-Date: Mon, 11 Sep 2023 03:34:07 -0700
-Message-Id: <20230911103407.1393149-9-leitao@debian.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230911103407.1393149-1-leitao@debian.org>
-References: <20230911103407.1393149-1-leitao@debian.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F181291E
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 10:39:39 +0000 (UTC)
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2071.outbound.protection.outlook.com [40.107.220.71])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91641E69
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 03:39:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mgA3PaS2mtcgUkTSWMndoXLqOSpCyFkPL0A0WIJh7u2s3ZDkumlsR7L9aJm5ScBeDyjSi7fJT0K8A4xl8Fn+xxaoaCmODsKyGb69YDxfBO6L1S3O0bXIxQ0G3Jv4Pm6+pPaA8bdwyivVuhqjBYyU+EJCOM9O/N0+T3VORI/fSr2Wj59biTgKZMo5bT/23OucHLZieCpTSaIaPZTfJlBDKdov1Yp441C2BQk5bWXtrG3q9ag1nmTwcD25LM8UtUzyhw09lM1ELiSZgqEx8WorsZIsDmdSnBWErGrZYWhSvjPTbfo1Sgvpfkjf1DcosDAzDJDcs1IQ6pm+ttSUgOG1Eg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=637qcsIS9XlQ8LGt6E3Yke4VYBx51KXm54EYHXWrKNQ=;
+ b=l+QYOvoDpnMOE+DBUeoBnJ9m3F6JIljiIR1KU/VoNfWih8lGRxRvpmJwgXsxCDGah723Qp2hAbgt61PkVAJ7pTizmpJcPpZx9d37VVSbVgpxSFfZEm3//hu/31yBklzJBiTHgkLkCaHvmIsaVr4Nz+PMJ3i0pYVjlrNLZjr1b+VDL2sAUsDGyvWVM7mTjZ6TtwdlutpXie90OUv0NZ2GuaqAoRk2Pq3ILnup5qKKclrQnFHW89g7iXucP12Oc+FIlrrD3XGRFGT2dK7+G2WklTMkl1V0ZQU1mFQr3Sb5dWKqFAcEn/M6+5q70B2JrLmPTgTOgxn466xJH0W1I4oj0g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=637qcsIS9XlQ8LGt6E3Yke4VYBx51KXm54EYHXWrKNQ=;
+ b=Nv9G8jK/qLXB82/8MSNg6CO5kDSySwk0JukwQsrFF0Fd2XQqHenFFDHjuwXo/DFhe3g00RYB5z55PDs700ljoGrouNBxkvUlKpwXtJLBGIgFjrx+msetsqei7x3nt9BI3VbUwMlAIKApUndRUlTY3PWfPgGMzdwi0YaC6zk/D/s3u2klfUBZYVEuiJtbvkNn4P9/kLzk0L2hzFysYE7XgrA7yXXQ/iCOIW/eV0a8N6SDO7fIVQMJTAogIadM4r2u9O9kG1WoDQHe7itG419Zc+p04FjFefvozUIzvDm2tAhteq7mj9p7v5Rn3Jz9soLWVTOfOPcwda6SP3XNUcnwKA==
+Received: from BL1PR13CA0128.namprd13.prod.outlook.com (2603:10b6:208:2bb::13)
+ by SA1PR12MB7270.namprd12.prod.outlook.com (2603:10b6:806:2b9::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.34; Mon, 11 Sep
+ 2023 10:39:36 +0000
+Received: from BL6PEPF0001AB57.namprd02.prod.outlook.com
+ (2603:10b6:208:2bb:cafe::37) by BL1PR13CA0128.outlook.office365.com
+ (2603:10b6:208:2bb::13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.11 via Frontend
+ Transport; Mon, 11 Sep 2023 10:39:36 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BL6PEPF0001AB57.mail.protection.outlook.com (10.167.241.9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6792.17 via Frontend Transport; Mon, 11 Sep 2023 10:39:36 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Mon, 11 Sep 2023
+ 03:39:22 -0700
+Received: from yaviefel (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Mon, 11 Sep
+ 2023 03:39:21 -0700
+References: <20230911044440.49366-1-elasticvine@protonmail.com>
+User-agent: mu4e 1.8.11; emacs 28.2
+From: Petr Machata <petrm@nvidia.com>
+To: Sam Foxman <elasticvine@protonmail.com>
+CC: <netdev@vger.kernel.org>
+Subject: Re: [PATCH iproute2-next] Enable automatic color output by default.
+Date: Mon, 11 Sep 2023 12:35:36 +0200
+In-Reply-To: <20230911044440.49366-1-elasticvine@protonmail.com>
+Message-ID: <87o7i93sfc.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.126.230.35]
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB57:EE_|SA1PR12MB7270:EE_
+X-MS-Office365-Filtering-Correlation-Id: d020477b-6830-46d0-3028-08dbb2b364ca
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	iWwr2Ndu8xZJ7416c0g5Xxu0pRmMFQdg5l+3qyjrVKfkUcu9XUng9d1Osl6U6U0O2Vg5KYe2Ri2yNs2v3cXFwg2hK5USoo2WKoXzkh2+SmC6Ms4t46iqVAvTUMvjZ8rLbkMb9vYS1Q8bFV695+wNznmicmPvo+1jEszw8f17/lJQlfCGUZKxEyB56waSpSwlsd17md6WOoANDePPpCxpydk1jaXmFEwWQx1okGpv8NR8Nc69AUJcExaC3jwzSxjBY3smabETSLklamFulxyOH3COkpRBxB+QqOYtfJ+iic9mjm8NPQJ1b2jdyeqfJGksRiGa8qAa5PkS6jRG5WcxMt8c1y+pn2RvaFCI+jY35L/+iyhh5ZzzsjRVUgyimqxw7Pf1rEuyMtpsbC3RQOwgFFUfludUr6CkoZUWBHg58LMrWrqDDv40xpFrrOVuHN+vYFFY3xVZpMO8mVz1aJXUxpe7rPWO2DKcEgxuirWCgSX4CnhkZdA+EDXAE8EWNo3cswopXBybkKKqW/4W5ueYrxNxagTvnIy1gqI24Oojo3Y3xP0XhPG4f45PbsXmjeYuwnggC9LhaFKPVQmz8EBwjdpMrJPlBmj/RvJAk6d/8gzi2djic+GmjywRtQ6UCWUi/hwraiqi8U90pvmoAXCW3t3uvR4YGkVIu11y3YIokKDaZP2PHLQ6Jt/Q9/DvxSiZxmNU3ohLahhyAJ0cN1JrQhBNSsYReLWoVMQvFYQoRQPReVx8gzQp/s7iMj7VMVjH
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(346002)(396003)(39860400002)(136003)(376002)(82310400011)(186009)(1800799009)(451199024)(46966006)(40470700004)(36840700001)(40480700001)(36860700001)(86362001)(40460700003)(36756003)(82740400003)(7636003)(356005)(478600001)(70586007)(4326008)(6666004)(426003)(8936002)(2906002)(41300700001)(316002)(4744005)(5660300002)(70206006)(6916009)(47076005)(8676002)(16526019)(26005)(336012)(2616005);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Sep 2023 10:39:36.0888
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: d020477b-6830-46d0-3028-08dbb2b364ca
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF0001AB57.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7270
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Expand the BPF sockopt test to use also check for io_uring
-{g,s}etsockopt commands operations.
 
-Create infrastructure to run io_uring tests using the mini_liburing
-helpers, so, the {g,s}etsockopt operation could either be called from
-system calls, or, via io_uring.
+Sam Foxman <elasticvine@protonmail.com> writes:
 
-Add a 'use_io_uring' parameter to run_test(), to specify if the test
-should be run using io_uring if the parameter is set, or via the regular
-system calls if false.
+> Automatic color should be enabled by default because it makes command
+> output much easier to read, especially `ip addr` with many interfaces.
+> Color is enabled only in interactive use, scripts are not affected.
 
-Call *all* tests twice, using the regular io_uring path, and the new
-io_uring path.
-
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- .../selftests/bpf/prog_tests/sockopt.c        | 95 +++++++++++++++++--
- 1 file changed, 89 insertions(+), 6 deletions(-)
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/sockopt.c b/tools/testing/selftests/bpf/prog_tests/sockopt.c
-index 9e6a5e3ed4de..40fb4c315ad9 100644
---- a/tools/testing/selftests/bpf/prog_tests/sockopt.c
-+++ b/tools/testing/selftests/bpf/prog_tests/sockopt.c
-@@ -1,5 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0
- #include <test_progs.h>
-+#include <io_uring/mini_liburing.h>
- #include "cgroup_helpers.h"
- 
- static char bpf_log_buf[4096];
-@@ -940,7 +941,85 @@ static int load_prog(const struct bpf_insn *insns,
- 	return fd;
- }
- 
--static int run_test(int cgroup_fd, struct sockopt_test *test)
-+/* Core function that handles io_uring ring initialization,
-+ * sending SQE with sockopt command and waiting for the CQE.
-+ */
-+static int uring_sockopt(int op, int fd, int level, int optname,
-+			 const void *optval, socklen_t *optlen)
-+{
-+	struct io_uring_cqe *cqe;
-+	struct io_uring_sqe *sqe;
-+	struct io_uring ring;
-+	int err;
-+
-+	err = io_uring_queue_init(1, &ring, 0);
-+	if (!ASSERT_OK(err, "Initialize io_uring ring"))
-+		return err;
-+
-+	sqe = io_uring_get_sqe(&ring);
-+	if (!ASSERT_NEQ(sqe, NULL, "Get an SQE")) {
-+		err = -1;
-+		goto fail;
-+	}
-+
-+	if (op == SOCKET_URING_OP_GETSOCKOPT)
-+		io_uring_prep_cmd_get(sqe, op, fd, level, optname, optval,
-+				      optlen);
-+	else
-+		io_uring_prep_cmd(sqe, op, fd, level, optname, optval,
-+				  *optlen);
-+
-+	err = io_uring_submit(&ring);
-+	if (!ASSERT_EQ(err, 1, "Submit SQE"))
-+		goto fail;
-+
-+	err = io_uring_wait_cqe(&ring, &cqe);
-+	if (!ASSERT_OK(err, "Wait for CQE"))
-+		goto fail;
-+
-+	err = cqe->res;
-+
-+fail:
-+	io_uring_queue_exit(&ring);
-+
-+	return err;
-+}
-+
-+static int uring_setsockopt(int fd, int level, int optname, const void *optval,
-+			    socklen_t *optlen)
-+{
-+	return uring_sockopt(SOCKET_URING_OP_SETSOCKOPT, fd, level, optname,
-+			     optval, optlen);
-+}
-+
-+static int uring_getsockopt(int fd, int level, int optname, void *optval,
-+			    socklen_t *optlen)
-+{
-+	return uring_sockopt(SOCKET_URING_OP_GETSOCKOPT, fd, level, optname,
-+			     optval, optlen);
-+}
-+
-+/* Execute the setsocktopt operation */
-+static int call_setsockopt(bool use_io_uring, int fd, int level, int optname,
-+			   const void *optval, socklen_t optlen)
-+{
-+	if (use_io_uring)
-+		return uring_setsockopt(fd, level, optname, optval, &optlen);
-+
-+	return setsockopt(fd, level, optname, optval, optlen);
-+}
-+
-+/* Execute the getsocktopt operation */
-+static int call_getsockopt(bool use_io_uring, int fd, int level, int optname,
-+			   void *optval, socklen_t *optlen)
-+{
-+	if (use_io_uring)
-+		return uring_getsockopt(fd, level, optname, optval, optlen);
-+
-+	return getsockopt(fd, level, optname, optval, optlen);
-+}
-+
-+static int run_test(int cgroup_fd, struct sockopt_test *test, bool use_io_uring)
- {
- 	int sock_fd, err, prog_fd;
- 	void *optval = NULL;
-@@ -980,8 +1059,9 @@ static int run_test(int cgroup_fd, struct sockopt_test *test)
- 			test->set_optlen = num_pages * sysconf(_SC_PAGESIZE) + remainder;
- 		}
- 
--		err = setsockopt(sock_fd, test->set_level, test->set_optname,
--				 test->set_optval, test->set_optlen);
-+		err = call_setsockopt(use_io_uring, sock_fd, test->set_level,
-+				      test->set_optname, test->set_optval,
-+				      test->set_optlen);
- 		if (err) {
- 			if (errno == EPERM && test->error == EPERM_SETSOCKOPT)
- 				goto close_sock_fd;
-@@ -1008,8 +1088,8 @@ static int run_test(int cgroup_fd, struct sockopt_test *test)
- 		socklen_t expected_get_optlen = test->get_optlen_ret ?:
- 			test->get_optlen;
- 
--		err = getsockopt(sock_fd, test->get_level, test->get_optname,
--				 optval, &optlen);
-+		err = call_getsockopt(use_io_uring, sock_fd, test->get_level,
-+				      test->get_optname, optval, &optlen);
- 		if (err) {
- 			if (errno == EOPNOTSUPP && test->error == EOPNOTSUPP_GETSOCKOPT)
- 				goto free_optval;
-@@ -1063,7 +1143,10 @@ void test_sockopt(void)
- 		if (!test__start_subtest(tests[i].descr))
- 			continue;
- 
--		ASSERT_OK(run_test(cgroup_fd, &tests[i]), tests[i].descr);
-+		ASSERT_OK(run_test(cgroup_fd, &tests[i], false),
-+			  tests[i].descr);
-+		ASSERT_OK(run_test(cgroup_fd, &tests[i], true),
-+			  tests[i].descr);
- 	}
- 
- 	close(cgroup_fd);
--- 
-2.34.1
-
+And BTW for v2, if any, please ditch the terminating period on the
+subject line.
 
