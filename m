@@ -1,39 +1,62 @@
-Return-Path: <netdev+bounces-32924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32934-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDE3779AB29
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 22:20:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 129EC79AB38
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 22:30:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CF4C2812F4
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 20:20:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4EF31C2094C
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 20:30:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7398515AF4;
-	Mon, 11 Sep 2023 20:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B83E16417;
+	Mon, 11 Sep 2023 20:29:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F040E15AE6
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 20:20:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7DA65C433C8;
-	Mon, 11 Sep 2023 20:20:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694463628;
-	bh=X5xlf3ivtp7jN1PQvuP0qrKFqZ41kIddDxu1O9Hi9Jc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GTBzNeGaG/PMEEo5s8v29bc0qgyd+T5rPl4pm5x9/ghcgsd04BMh/nBGMRlUX8ST3
-	 XWbaWszYc468OmviyOtacXf0Ta2bTdrsSWifZCxu4HzRl72ErpYIe4+jkxN1PBgF5q
-	 f9cK9dhJQfxgaXW81mX7cLG4sl7F9Hy3tDeON7IpmHkxSCscsju5qjrJUFccFFDv2E
-	 1zCPxU2HLIM3LXS5qWVq9n4XLcB8ecVphDmIP+gCV74gX+2Rbc+W29UCOUJDFjrKl8
-	 vx4SkT+6xKXTVmkoe4qA07oeQz7XOgTnPF0g0cm69EVao67OYt9hIqbyAHPNf3ySbJ
-	 Uf0H6p2jKR10w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5FE4EC64459;
-	Mon, 11 Sep 2023 20:20:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87DF415AE3
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 20:29:35 +0000 (UTC)
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB5501AB;
+	Mon, 11 Sep 2023 13:29:33 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 42316100008;
+	Mon, 11 Sep 2023 23:29:32 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 42316100008
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1694464172;
+	bh=PPup1iy6Pk59YU23frjAokTVyJxaZrQB5U26AeX9NCA=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+	b=r/C4NCtUY4moJNGHfW9lYtEPyR0Hxxm12ud/sBicojm5+2Z/CmooKyhaWJOj0sHeP
+	 QyYlq0BkoS8j3MdZZ4A+5sHj+oHQg18GtEfilQlXPpJHUQVf+isy+WKg41SBbe6yHb
+	 E/ouy8449O9vqWilsOp52A1FkjvoDCHdgsOpnHgSpDwYdEJH2DiuIBfg56XR8PavDq
+	 gbgaBVDrObEJo/IMjyP+pBAAohzhQf69EwqFPd7/CFBXj9NNhJ7mSbe7Yyt+4o06jq
+	 rjlG022DLShkUotKIAbDEgA3ROqTwHGrE6BYzd9MIVqQYisXMGHa7lT1yZVsYKblLH
+	 qdMJrwf8ofBDw==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Mon, 11 Sep 2023 23:29:32 +0300 (MSK)
+Received: from localhost.localdomain (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Mon, 11 Sep 2023 23:29:31 +0300
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
+	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
+	<jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>
+CC: <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<kernel@sberdevices.ru>, <oxffffaa@gmail.com>, <avkrasnov@salutedevices.com>
+Subject: [PATCH net-next v8 0/4] vsock/virtio/vhost: MSG_ZEROCOPY preparations
+Date: Mon, 11 Sep 2023 23:22:30 +0300
+Message-ID: <20230911202234.1932024-1-avkrasnov@salutedevices.com>
+X-Mailer: git-send-email 2.35.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,42 +64,100 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 ethtool] rxclass: fix a bug in rmgr when searching for
- empty slot
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169446362838.25976.13688801336520865450.git-patchwork-notify@kernel.org>
-Date: Mon, 11 Sep 2023 20:20:28 +0000
-References: <20230901065203.125150-1-yinjun.zhang@corigine.com>
-In-Reply-To: <20230901065203.125150-1-yinjun.zhang@corigine.com>
-To: Yinjun Zhang <yinjun.zhang@corigine.com>
-Cc: mkubecek@suse.cz, oss-drivers@corigine.com, netdev@vger.kernel.org,
- alexanderduyck@meta.com, niklas.soderlund@corigine.com
+Content-Type: text/plain
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 179791 [Sep 11 2023]
+X-KSMG-AntiSpam-Version: 5.9.59.0
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 530 530 ecb1547b3f72d1df4c71c0b60e67ba6b4aea5432, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;lore.kernel.org:7.1.1;git.kernel.org:7.1.1;100.64.160.123:7.1.2;127.0.0.199:7.1.2;salutedevices.com:7.1.1;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2023/09/11 13:14:00
+X-KSMG-LinksScanning: Clean, bases: 2023/09/11 15:43:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/09/11 15:53:00 #21884588
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Hello,
 
-This patch was applied to ethtool/ethtool.git (master)
-by Michal Kubecek <mkubecek@suse.cz>:
+this patchset is first of three parts of another big patchset for
+MSG_ZEROCOPY flag support:
+https://lore.kernel.org/netdev/20230701063947.3422088-1-AVKrasnov@sberdevices.ru/
 
-On Fri,  1 Sep 2023 14:52:03 +0800 you wrote:
-> When reverse searching the list in rmgr for a free location the last
-> slot (first slot searched) in the list needs special care as it might
-> not span the full word length. This is done by building a bit-mask
-> covering the not-active parts of the last word and using that to judge
-> if there is a free location in the last word or not. Once that is known
-> searching in the last slot, or to skip it, can be done by the same
-> algorithm as for the other slots in the list.
-> 
-> [...]
+During review of this series, Stefano Garzarella <sgarzare@redhat.com>
+suggested to split it for three parts to simplify review and merging:
 
-Here is the summary with links:
-  - [v2,ethtool] rxclass: fix a bug in rmgr when searching for empty slot
-    https://git.kernel.org/pub/scm/network/ethtool/ethtool.git/commit/?id=7fd525f67cf5
+1) virtio and vhost updates (for fragged skbs) <--- this patchset
+2) AF_VSOCK updates (allows to enable MSG_ZEROCOPY mode and read
+   tx completions) and update for Documentation/.
+3) Updates for tests and utils.
 
-You are awesome, thank you!
+This series enables handling of fragged skbs in virtio and vhost parts.
+Newly logic won't be triggered, because SO_ZEROCOPY options is still
+impossible to enable at this moment (next bunch of patches from big
+set above will enable it).
+
+I've included changelog to some patches anyway, because there were some
+comments during review of last big patchset from the link above.
+
+Head for this patchset is:
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=73be7fb14e83d24383f840a22f24d3ed222ca319
+
+Link to v1:
+https://lore.kernel.org/netdev/20230717210051.856388-1-AVKrasnov@sberdevices.ru/
+Link to v2:
+https://lore.kernel.org/netdev/20230718180237.3248179-1-AVKrasnov@sberdevices.ru/
+Link to v3:
+https://lore.kernel.org/netdev/20230720214245.457298-1-AVKrasnov@sberdevices.ru/
+Link to v4:
+https://lore.kernel.org/netdev/20230727222627.1895355-1-AVKrasnov@sberdevices.ru/
+Link to v5:
+https://lore.kernel.org/netdev/20230730085905.3420811-1-AVKrasnov@sberdevices.ru/
+Link to v6:
+https://lore.kernel.org/netdev/20230814212720.3679058-1-AVKrasnov@sberdevices.ru/
+Link to v7:
+https://lore.kernel.org/netdev/20230827085436.941183-1-avkrasnov@salutedevices.com/
+
+Changelog:
+ v3 -> v4:
+ * Patchset rebased and tested on new HEAD of net-next (see hash above).
+ v4 -> v5:
+ * See per-patch changelog after ---.
+ v5 -> v6:
+ * Patchset rebased and tested on new HEAD of net-next (see hash above).
+ * See per-patch changelog after ---.
+ v6 -> v7:
+ * Patchset rebased and tested on new HEAD of net-next (see hash above).
+ * See per-patch changelog after ---.
+ v7 -> v8:
+ * Patchset rebased and tested on new HEAD of net-next (see hash above).
+ * See per-patch changelog after ---.
+
+Arseniy Krasnov (4):
+  vsock/virtio/vhost: read data from non-linear skb
+  vsock/virtio: support to send non-linear skb
+  vsock/virtio: non-linear skb handling for tap
+  vsock/virtio: MSG_ZEROCOPY flag support
+
+ drivers/vhost/vsock.c                   |  14 +-
+ include/linux/virtio_vsock.h            |  10 +
+ net/vmw_vsock/virtio_transport.c        |  92 ++++++-
+ net/vmw_vsock/virtio_transport_common.c | 309 ++++++++++++++++++------
+ 4 files changed, 344 insertions(+), 81 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.25.1
 
 
