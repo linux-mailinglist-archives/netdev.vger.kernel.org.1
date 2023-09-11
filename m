@@ -1,155 +1,157 @@
-Return-Path: <netdev+bounces-32784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 834E179A6DE
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 11:47:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A14879A6E0
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 11:47:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 660631C2096B
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 09:47:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11AE4281303
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 09:47:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 421C7C12A;
-	Mon, 11 Sep 2023 09:47:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D868C12F;
+	Mon, 11 Sep 2023 09:47:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 356FF3D8C
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 09:47:07 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6F6FE4A
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 02:47:05 -0700 (PDT)
-Received: from canpemm500006.china.huawei.com (unknown [172.30.72.56])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Rkhcy5H0CzTmG5;
-	Mon, 11 Sep 2023 17:44:18 +0800 (CST)
-Received: from localhost.localdomain (10.175.104.82) by
- canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Mon, 11 Sep 2023 17:47:02 +0800
-From: Ziyang Xuan <william.xuanziyang@huawei.com>
-To: <jiri@resnulli.us>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<leon@kernel.org>, <ye.xingchen@zte.com.cn>, <liuhangbin@gmail.com>
-Subject: [PATCH net v4] team: fix null-ptr-deref when team device type is changed
-Date: Mon, 11 Sep 2023 17:46:36 +0800
-Message-ID: <20230911094636.3256542-1-william.xuanziyang@huawei.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52A0B8F47
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 09:47:33 +0000 (UTC)
+Received: from jabberwock.ucw.cz (jabberwock.ucw.cz [46.255.230.98])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 695A4E50;
+	Mon, 11 Sep 2023 02:47:31 -0700 (PDT)
+Received: by jabberwock.ucw.cz (Postfix, from userid 1017)
+	id 109AC1C0004; Mon, 11 Sep 2023 11:47:30 +0200 (CEST)
+Date: Mon, 11 Sep 2023 11:47:29 +0200
+From: Pavel Machek <pavel@denx.de>
+To: Sasha Levin <sashal@kernel.org>
+Cc: linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+	John Watts <contact@jookia.org>,
+	Marc Kleine-Budde <mkl@pengutronix.de>, wg@grandegger.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, wens@csie.org, jernej.skrabec@gmail.com,
+	samuel@sholland.org, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-sunxi@lists.linux.dev
+Subject: Re: [PATCH AUTOSEL 6.1 10/26] can: sun4i_can: Add support for the
+ Allwinner D1
+Message-ID: <ZP7iMa8xv7RhxWU7@duo.ucw.cz>
+References: <20230908181806.3460164-1-sashal@kernel.org>
+ <20230908181806.3460164-10-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.175.104.82]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- canpemm500006.china.huawei.com (7.192.105.130)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="W6zyC+oVbfVKM7Mx"
+Content-Disposition: inline
+In-Reply-To: <20230908181806.3460164-10-sashal@kernel.org>
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_NEUTRAL autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Get a null-ptr-deref bug as follows with reproducer [1].
 
-BUG: kernel NULL pointer dereference, address: 0000000000000228
-...
-RIP: 0010:vlan_dev_hard_header+0x35/0x140 [8021q]
-...
-Call Trace:
- <TASK>
- ? __die+0x24/0x70
- ? page_fault_oops+0x82/0x150
- ? exc_page_fault+0x69/0x150
- ? asm_exc_page_fault+0x26/0x30
- ? vlan_dev_hard_header+0x35/0x140 [8021q]
- ? vlan_dev_hard_header+0x8e/0x140 [8021q]
- neigh_connected_output+0xb2/0x100
- ip6_finish_output2+0x1cb/0x520
- ? nf_hook_slow+0x43/0xc0
- ? ip6_mtu+0x46/0x80
- ip6_finish_output+0x2a/0xb0
- mld_sendpack+0x18f/0x250
- mld_ifc_work+0x39/0x160
- process_one_work+0x1e6/0x3f0
- worker_thread+0x4d/0x2f0
- ? __pfx_worker_thread+0x10/0x10
- kthread+0xe5/0x120
- ? __pfx_kthread+0x10/0x10
- ret_from_fork+0x34/0x50
- ? __pfx_kthread+0x10/0x10
- ret_from_fork_asm+0x1b/0x30
+--W6zyC+oVbfVKM7Mx
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-[1]
-$ teamd -t team0 -d -c '{"runner": {"name": "loadbalance"}}'
-$ ip link add name t-dummy type dummy
-$ ip link add link t-dummy name t-dummy.100 type vlan id 100
-$ ip link add name t-nlmon type nlmon
-$ ip link set t-nlmon master team0
-$ ip link set t-nlmon nomaster
-$ ip link set t-dummy up
-$ ip link set team0 up
-$ ip link set t-dummy.100 down
-$ ip link set t-dummy.100 master team0
+Hi!
 
-When enslave a vlan device to team device and team device type is changed
-from non-ether to ether, header_ops of team device is changed to
-vlan_header_ops. That is incorrect and will trigger null-ptr-deref
-for vlan->real_dev in vlan_dev_hard_header() because team device is not
-a vlan device.
+> From: John Watts <contact@jookia.org>
+>=20
+> [ Upstream commit 8abb95250ae6af2d51993da8fcae18da2ce24cc4 ]
+>=20
+> The controllers present in the D1 are extremely similar to the R40
+> and require the same reset quirks, but An extra quirk is needed to support
+> receiving packets.
 
-Assign eth_header_ops to header_ops of team device when its type is changed
-from non-ether to ether to fix the bug.
+Well, we are not adding the rest of support to 6.1, so we don't need
+this, either. It will be unused.
 
-Fixes: 1d76efe1577b ("team: add support for non-ethernet devices")
-Suggested-by: Hangbin Liu <liuhangbin@gmail.com>
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
-Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
----
-v4:
-  - Add Reviewed-by tag.
-v3:
-  - Export eth_header_ops to fix modpost error.
-v2:
-  - Just modify header_ops to eth_header_ops not use ether_setup().
----
- drivers/net/team/team.c | 5 ++++-
- net/ethernet/eth.c      | 1 +
- 2 files changed, 5 insertions(+), 1 deletion(-)
+BR,
+								Pavel
 
-diff --git a/drivers/net/team/team.c b/drivers/net/team/team.c
-index d3dc22509ea5..12fb5f4cff06 100644
---- a/drivers/net/team/team.c
-+++ b/drivers/net/team/team.c
-@@ -2127,7 +2127,10 @@ static const struct ethtool_ops team_ethtool_ops = {
- static void team_setup_by_port(struct net_device *dev,
- 			       struct net_device *port_dev)
- {
--	dev->header_ops	= port_dev->header_ops;
-+	if (port_dev->type == ARPHRD_ETHER)
-+		dev->header_ops	= &eth_header_ops;
-+	else
-+		dev->header_ops	= port_dev->header_ops;
- 	dev->type = port_dev->type;
- 	dev->hard_header_len = port_dev->hard_header_len;
- 	dev->needed_headroom = port_dev->needed_headroom;
-diff --git a/net/ethernet/eth.c b/net/ethernet/eth.c
-index 2edc8b796a4e..157833509adb 100644
---- a/net/ethernet/eth.c
-+++ b/net/ethernet/eth.c
-@@ -347,6 +347,7 @@ const struct header_ops eth_header_ops ____cacheline_aligned = {
- 	.cache_update	= eth_header_cache_update,
- 	.parse_protocol	= eth_header_parse_protocol,
- };
-+EXPORT_SYMBOL(eth_header_ops);
- 
- /**
-  * ether_setup - setup Ethernet network device
--- 
-2.25.1
+> +++ b/drivers/net/can/Kconfig
+> @@ -174,10 +174,10 @@ config CAN_SLCAN
+> =20
+>  config CAN_SUN4I
+>  	tristate "Allwinner A10 CAN controller"
+> -	depends on MACH_SUN4I || MACH_SUN7I || COMPILE_TEST
+> +	depends on MACH_SUN4I || MACH_SUN7I || RISCV || COMPILE_TEST
+>  	help
+>  	  Say Y here if you want to use CAN controller found on Allwinner
+> -	  A10/A20 SoCs.
+> +	  A10/A20/D1 SoCs.
+> =20
+>  	  To compile this driver as a module, choose M here: the module will
+>  	  be called sun4i_can.
+> diff --git a/drivers/net/can/sun4i_can.c b/drivers/net/can/sun4i_can.c
+> index dd0c6cd76c5f5..c3a6b028ea4d6 100644
+> --- a/drivers/net/can/sun4i_can.c
+> +++ b/drivers/net/can/sun4i_can.c
+> @@ -91,6 +91,8 @@
+>  #define SUN4I_REG_BUF12_ADDR	0x0070	/* CAN Tx/Rx Buffer 12 */
+>  #define SUN4I_REG_ACPC_ADDR	0x0040	/* CAN Acceptance Code 0 */
+>  #define SUN4I_REG_ACPM_ADDR	0x0044	/* CAN Acceptance Mask 0 */
+> +#define SUN4I_REG_ACPC_ADDR_D1	0x0028	/* CAN Acceptance Code 0 on the D1=
+ */
+> +#define SUN4I_REG_ACPM_ADDR_D1	0x002C	/* CAN Acceptance Mask 0 on the D1=
+ */
+>  #define SUN4I_REG_RBUF_RBACK_START_ADDR	0x0180	/* CAN transmit buffer st=
+art */
+>  #define SUN4I_REG_RBUF_RBACK_END_ADDR	0x01b0	/* CAN transmit buffer end =
+*/
+> =20
+> @@ -779,6 +781,11 @@ static const struct sun4ican_quirks sun4ican_quirks_=
+r40 =3D {
+>  	.acp_offset =3D 0,
+>  };
+> =20
+> +static const struct sun4ican_quirks sun4ican_quirks_d1 =3D {
+> +	.has_reset =3D true,
+> +	.acp_offset =3D (SUN4I_REG_ACPC_ADDR_D1 - SUN4I_REG_ACPC_ADDR),
+> +};
+> +
+>  static const struct of_device_id sun4ican_of_match[] =3D {
+>  	{
+>  		.compatible =3D "allwinner,sun4i-a10-can",
+> @@ -789,6 +796,9 @@ static const struct of_device_id sun4ican_of_match[] =
+=3D {
+>  	}, {
+>  		.compatible =3D "allwinner,sun8i-r40-can",
+>  		.data =3D &sun4ican_quirks_r40
+> +	}, {
+> +		.compatible =3D "allwinner,sun20i-d1-can",
+> +		.data =3D &sun4ican_quirks_d1
+>  	}, {
+>  		/* sentinel */
+>  	},
+> @@ -915,4 +925,4 @@ module_platform_driver(sun4i_can_driver);
+>  MODULE_AUTHOR("Peter Chen <xingkongcp@gmail.com>");
+>  MODULE_AUTHOR("Gerhard Bertelsmann <info@gerhard-bertelsmann.de>");
+>  MODULE_LICENSE("Dual BSD/GPL");
+> -MODULE_DESCRIPTION("CAN driver for Allwinner SoCs (A10/A20)");
+> +MODULE_DESCRIPTION("CAN driver for Allwinner SoCs (A10/A20/D1)");
 
+--=20
+DENX Software Engineering GmbH,        Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+
+--W6zyC+oVbfVKM7Mx
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EABECAB0WIQRPfPO7r0eAhk010v0w5/Bqldv68gUCZP7iMQAKCRAw5/Bqldv6
+8iNHAKCr9iGC2Pae585vS5gdFDGcVzZNgQCgouu4FKM/lvI8gqIRrcpjyUG7DsQ=
+=22Uz
+-----END PGP SIGNATURE-----
+
+--W6zyC+oVbfVKM7Mx--
 
