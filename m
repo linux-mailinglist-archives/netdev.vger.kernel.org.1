@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-32896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98A0079AABB
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 20:12:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A367479AABC
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 20:12:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F3C31C209C9
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 18:12:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC9EE1C209D4
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 18:12:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 995F9156F7;
-	Mon, 11 Sep 2023 18:11:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1671E15AD8;
+	Mon, 11 Sep 2023 18:11:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 829A515AD1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02CA915AD5
 	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 18:11:05 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3D5E103
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 11:11:03 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23F5310D
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 11:11:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694455863; x=1725991863;
+  t=1694455864; x=1725991864;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=S0IYqdEnPAY0K2ZlxE1BnknG1N6HJWqJLl0/gn0L278=;
-  b=foFcDo/OL69D7lUBQv0uTT0g87GWnX5Zh7nkd2XHz62c45I0fgAtDLNE
-   kTngfSSGtxdBHXJXJjkDcid2raMmzx5kveNu2XihWZ/IQQT+ZWzSqNCbw
-   Jqk0vCNW+F1taJOCDTsfQ9UmBEVadXTlbh5QdmOABL61XI04TzmAdWCcN
-   fAVYCZPj6eypbW/wPLIOZe8P/9KFWN41FKSjYXaiE4hLWyTaDbprmk5US
-   DCnhDbr9LgKcwL1Qw5KDYfGVQkzcbfatHfnfmnRaJORnKEMCY0UFhh4mz
-   pOJaUowRKWpwE+HckzFffPgSbDkCk/PP9big9wafSvvy2yYt5f2y/IrLC
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10830"; a="378075616"
+  bh=poKHfIjto8McijNi4Ov/9lI/A53hAFVwlWwQwEKXN5Q=;
+  b=aJyI48iTml3RUPExDjX7wS5LENn1Uvajjo5d3yKgzWzP+EuzUwwEdjXS
+   TQt7194+2qXKzwjfmfFlA6fBO9Rl/r/K+ExxykOeBfMoI5q/2jCRpRnXk
+   3XsFiYq0hE61KMnY54JjCkWBioDhoQ44kgWa775nWXjjtW7X6FzPtevBm
+   klFzG7LszHjlSQnbN48xuiiS6qwpGDtDYf5d+mlN7UHdYRf1afsUIEoTm
+   dWlCyUzhH1BZHij+9275vOJ5UxVUBpsna5316N99ga686noEIkFDMRTIs
+   s1PT1yKa0WKjCyIvH1XDdDsdxxIxOctvy0rjLVmmNkQ4sjARckDFK7oQ7
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10830"; a="378075627"
 X-IronPort-AV: E=Sophos;i="6.02,244,1688454000"; 
-   d="scan'208";a="378075616"
+   d="scan'208";a="378075627"
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
   by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2023 11:11:01 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10830"; a="917129929"
+X-IronPort-AV: E=McAfee;i="6600,9927,10830"; a="917129932"
 X-IronPort-AV: E=Sophos;i="6.02,244,1688454000"; 
-   d="scan'208";a="917129929"
+   d="scan'208";a="917129932"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orsmga005.jf.intel.com with ESMTP; 11 Sep 2023 11:11:01 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -54,11 +54,10 @@ To: davem@davemloft.net,
 Cc: Jacob Keller <jacob.e.keller@intel.com>,
 	anthony.l.nguyen@intel.com,
 	richardcochran@gmail.com,
-	Sergey Temerkhanov <sergey.temerkhanov@intel.com>,
 	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: [PATCH net-next 03/13] ice: Support cross-timestamping for E823 devices
-Date: Mon, 11 Sep 2023 11:03:04 -0700
-Message-Id: <20230911180314.4082659-4-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 04/13] ice: introduce hw->phy_model for handling PTP PHY differences
+Date: Mon, 11 Sep 2023 11:03:05 -0700
+Message-Id: <20230911180314.4082659-5-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20230911180314.4082659-1-anthony.l.nguyen@intel.com>
 References: <20230911180314.4082659-1-anthony.l.nguyen@intel.com>
@@ -78,161 +77,339 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Jacob Keller <jacob.e.keller@intel.com>
 
-The E822 hardware has cross timestamping support using a device feature
-termed "Hammock Harbor" by the data sheet. This device feature is similar
-to PCIe PTM, and captures the Always Running Timer (ART) simultaneously
-with the PTP hardware clock time.
+The ice driver has PTP support which works across a couple of different
+device families. The device families each have different PHY hardware which
+have unique requirements for programming.
 
-This functionality also exists on E823 devices, but is not currently
-enabled.
+Today, there is E810-based hardware, and E822-based hardware. To handle
+this, the driver checks the ice_is_e810() function to separate between the
+two existing families of hardware.
 
-Rename the cross-timestamp functions to use the _e82x postfix, indicating
-that the support works across the E82x family of devices and not just the
-E822 hardware.
+Future development is going to add new hardware designs which have further
+unique requirements. To make this easier, introduce a phy_model field to
+the HW structure. This field represents what PHY model the current device
+has, and is used to allow distinguishing which logic a particular device
+needs.
 
-The flow for capturing a cross-timestamp requires an additional step on
-E823 devices. The GLTSYN_CMD register must be programmed with the READ_TIME
-command. Otherwise, the cross timestamp will always report a value of zero
-for the PTP hardware clock time.
+This will make supporting future upcoming hardware easier, by providing an
+obvious place to initialize the PHY model, and by already using switch/case
+statements instead of the previous if statements.
 
-To fix this, call ice_ptp_src_cmd() prior to initiating the cross timestamp
-logic. Once the cross timestamp has completed, call ice_ptp_src_cmd() with
-ICE_PTP_OP to ensure that the timer command registers are cleared.
+Astute reviewers may notice that there are a handful of remaining checks
+for ice_is_e810() left in ice_ptp.c  These conflict with some other
+cleanup patches in development, and will be fixed in the near future.
 
-Co-developed-by: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
-Signed-off-by: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_ptp.c    | 29 ++++++++++++++-------
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c |  2 +-
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h |  1 +
- 3 files changed, 21 insertions(+), 11 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_ptp.c    |  32 ++++--
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 102 ++++++++++++++++----
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h |   2 +
+ drivers/net/ethernet/intel/ice/ice_type.h   |   8 ++
+ 4 files changed, 117 insertions(+), 27 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index e75bb6e7d680..cda674645a7b 100644
+index cda674645a7b..a91acba0606f 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
 +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -1993,6 +1993,9 @@ ice_ptp_get_syncdevicetime(ktime_t *device,
- 		return -EBUSY;
- 	}
+@@ -1366,6 +1366,7 @@ ice_ptp_port_phy_restart(struct ice_ptp_port *ptp_port)
+ void ice_ptp_link_change(struct ice_pf *pf, u8 port, bool linkup)
+ {
+ 	struct ice_ptp_port *ptp_port;
++	struct ice_hw *hw = &pf->hw;
  
-+	/* Program cmd to master timer */
-+	ice_ptp_src_cmd(hw, ICE_PTP_READ_TIME);
-+
- 	/* Start the ART and device clock sync sequence */
- 	hh_art_ctl = rd32(hw, GLHH_ART_CTL);
- 	hh_art_ctl = hh_art_ctl | GLHH_ART_CTL_ACTIVE_M;
-@@ -2022,6 +2025,10 @@ ice_ptp_get_syncdevicetime(ktime_t *device,
- 			break;
- 		}
- 	}
-+
-+	/* Clear the master timer */
-+	ice_ptp_src_cmd(hw, ICE_PTP_NOP);
-+
- 	/* Release HW lock */
- 	hh_lock = rd32(hw, PFHH_SEM + (PFTSYN_SEM_BYTES * hw->pf_id));
- 	hh_lock = hh_lock & ~PFHH_SEM_BUSY_M;
-@@ -2034,7 +2041,7 @@ ice_ptp_get_syncdevicetime(ktime_t *device,
+ 	if (!test_bit(ICE_FLAG_PTP, pf->flags))
+ 		return;
+@@ -1380,11 +1381,16 @@ void ice_ptp_link_change(struct ice_pf *pf, u8 port, bool linkup)
+ 	/* Update cached link status for this port immediately */
+ 	ptp_port->link_up = linkup;
+ 
+-	/* E810 devices do not need to reconfigure the PHY */
+-	if (ice_is_e810(&pf->hw))
++	switch (hw->phy_model) {
++	case ICE_PHY_E810:
++		/* Do not reconfigure E810 PHY */
+ 		return;
+-
+-	ice_ptp_port_phy_restart(ptp_port);
++	case ICE_PHY_E822:
++		ice_ptp_port_phy_restart(ptp_port);
++		return;
++	default:
++		dev_warn(ice_pf_to_dev(pf), "%s: Unknown PHY type\n", __func__);
++	}
  }
  
  /**
-- * ice_ptp_getcrosststamp_e822 - Capture a device cross timestamp
-+ * ice_ptp_getcrosststamp_e82x - Capture a device cross timestamp
-  * @info: the driver's PTP info structure
-  * @cts: The memory to fill the cross timestamp info
-  *
-@@ -2042,14 +2049,14 @@ ice_ptp_get_syncdevicetime(ktime_t *device,
-  * clock. Fill the cross timestamp information and report it back to the
-  * caller.
-  *
-- * This is only valid for E822 devices which have support for generating the
-- * cross timestamp via PCIe PTM.
-+ * This is only valid for E822 and E823 devices which have support for
-+ * generating the cross timestamp via PCIe PTM.
-  *
-  * In order to correctly correlate the ART timestamp back to the TSC time, the
-  * CPU must have X86_FEATURE_TSC_KNOWN_FREQ.
+@@ -2702,14 +2708,22 @@ static int ice_ptp_init_work(struct ice_pf *pf, struct ice_ptp *ptp)
   */
- static int
--ice_ptp_getcrosststamp_e822(struct ptp_clock_info *info,
-+ice_ptp_getcrosststamp_e82x(struct ptp_clock_info *info,
- 			    struct system_device_crosststamp *cts)
+ static int ice_ptp_init_port(struct ice_pf *pf, struct ice_ptp_port *ptp_port)
  {
- 	struct ice_pf *pf = ptp_info_to_pf(info);
-@@ -2283,22 +2290,22 @@ ice_ptp_setup_pins_e823(struct ice_pf *pf, struct ptp_clock_info *info)
- }
- 
- /**
-- * ice_ptp_set_funcs_e822 - Set specialized functions for E822 support
-+ * ice_ptp_set_funcs_e82x - Set specialized functions for E82x support
-  * @pf: Board private structure
-  * @info: PTP info to fill
-  *
-- * Assign functions to the PTP capabiltiies structure for E822 devices.
-+ * Assign functions to the PTP capabiltiies structure for E82x devices.
-  * Functions which operate across all device families should be set directly
-- * in ice_ptp_set_caps. Only add functions here which are distinct for E822
-+ * in ice_ptp_set_caps. Only add functions here which are distinct for E82x
-  * devices.
-  */
- static void
--ice_ptp_set_funcs_e822(struct ice_pf *pf, struct ptp_clock_info *info)
-+ice_ptp_set_funcs_e82x(struct ice_pf *pf, struct ptp_clock_info *info)
- {
- #ifdef CONFIG_ICE_HWTS
- 	if (boot_cpu_has(X86_FEATURE_ART) &&
- 	    boot_cpu_has(X86_FEATURE_TSC_KNOWN_FREQ))
--		info->getcrosststamp = ice_ptp_getcrosststamp_e822;
-+		info->getcrosststamp = ice_ptp_getcrosststamp_e82x;
- #endif /* CONFIG_ICE_HWTS */
- }
- 
-@@ -2332,6 +2339,8 @@ ice_ptp_set_funcs_e810(struct ice_pf *pf, struct ptp_clock_info *info)
- static void
- ice_ptp_set_funcs_e823(struct ice_pf *pf, struct ptp_clock_info *info)
- {
-+	ice_ptp_set_funcs_e82x(pf, info);
++	struct ice_hw *hw = &pf->hw;
 +
- 	info->enable = ice_ptp_gpio_enable_e823;
- 	ice_ptp_setup_pins_e823(pf, info);
- }
-@@ -2359,7 +2368,7 @@ static void ice_ptp_set_caps(struct ice_pf *pf)
- 	else if (ice_is_e823(&pf->hw))
- 		ice_ptp_set_funcs_e823(pf, info);
- 	else
--		ice_ptp_set_funcs_e822(pf, info);
-+		ice_ptp_set_funcs_e82x(pf, info);
+ 	mutex_init(&ptp_port->ps_lock);
+ 
+-	if (ice_is_e810(&pf->hw))
++	switch (hw->phy_model) {
++	case ICE_PHY_E810:
+ 		return ice_ptp_init_tx_e810(pf, &ptp_port->tx);
++	case ICE_PHY_E822:
++		kthread_init_delayed_work(&ptp_port->ov_work,
++					  ice_ptp_wait_for_offsets);
+ 
+-	kthread_init_delayed_work(&ptp_port->ov_work,
+-				  ice_ptp_wait_for_offsets);
+-	return ice_ptp_init_tx_e822(pf, &ptp_port->tx, ptp_port->port_num);
++		return ice_ptp_init_tx_e822(pf, &ptp_port->tx,
++					    ptp_port->port_num);
++	default:
++		return -ENODEV;
++	}
  }
  
  /**
+@@ -2730,6 +2744,8 @@ void ice_ptp_init(struct ice_pf *pf)
+ 	struct ice_hw *hw = &pf->hw;
+ 	int err;
+ 
++	ice_ptp_init_phy_model(hw);
++
+ 	/* If this function owns the clock hardware, it must allocate and
+ 	 * configure the PTP clock device to represent it.
+ 	 */
 diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index d62016111c84..39cf1e734113 100644
+index 39cf1e734113..9b55897b0682 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
 +++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -107,7 +107,7 @@ static u64 ice_ptp_read_src_incval(struct ice_hw *hw)
-  *
-  * Prepare the source timer for an upcoming timer sync command.
+@@ -3150,6 +3150,21 @@ void ice_ptp_unlock(struct ice_hw *hw)
+ 	wr32(hw, PFTSYN_SEM + (PFTSYN_SEM_BYTES * hw->pf_id), 0);
+ }
+ 
++/**
++ * ice_ptp_init_phy_model - Initialize hw->phy_model based on device type
++ * @hw: pointer to the HW structure
++ *
++ * Determine the PHY model for the device, and initialize hw->phy_model
++ * for use by other functions.
++ */
++void ice_ptp_init_phy_model(struct ice_hw *hw)
++{
++	if (ice_is_e810(hw))
++		hw->phy_model = ICE_PHY_E810;
++	else
++		hw->phy_model = ICE_PHY_E822;
++}
++
+ /**
+  * ice_ptp_tmr_cmd - Prepare and trigger a timer sync command
+  * @hw: pointer to HW struct
+@@ -3168,10 +3183,17 @@ static int ice_ptp_tmr_cmd(struct ice_hw *hw, enum ice_ptp_tmr_cmd cmd)
+ 	ice_ptp_src_cmd(hw, cmd);
+ 
+ 	/* Next, prepare the ports */
+-	if (ice_is_e810(hw))
++	switch (hw->phy_model) {
++	case ICE_PHY_E810:
+ 		err = ice_ptp_port_cmd_e810(hw, cmd);
+-	else
++		break;
++	case ICE_PHY_E822:
+ 		err = ice_ptp_port_cmd_e822(hw, cmd);
++		break;
++	default:
++		err = -EOPNOTSUPP;
++	}
++
+ 	if (err) {
+ 		ice_debug(hw, ICE_DBG_PTP, "Failed to prepare PHY ports for timer command %u, err %d\n",
+ 			  cmd, err);
+@@ -3213,10 +3235,17 @@ int ice_ptp_init_time(struct ice_hw *hw, u64 time)
+ 
+ 	/* PHY timers */
+ 	/* Fill Rx and Tx ports and send msg to PHY */
+-	if (ice_is_e810(hw))
++	switch (hw->phy_model) {
++	case ICE_PHY_E810:
+ 		err = ice_ptp_prep_phy_time_e810(hw, time & 0xFFFFFFFF);
+-	else
++		break;
++	case ICE_PHY_E822:
+ 		err = ice_ptp_prep_phy_time_e822(hw, time & 0xFFFFFFFF);
++		break;
++	default:
++		err = -EOPNOTSUPP;
++	}
++
+ 	if (err)
+ 		return err;
+ 
+@@ -3248,10 +3277,17 @@ int ice_ptp_write_incval(struct ice_hw *hw, u64 incval)
+ 	wr32(hw, GLTSYN_SHADJ_L(tmr_idx), lower_32_bits(incval));
+ 	wr32(hw, GLTSYN_SHADJ_H(tmr_idx), upper_32_bits(incval));
+ 
+-	if (ice_is_e810(hw))
++	switch (hw->phy_model) {
++	case ICE_PHY_E810:
+ 		err = ice_ptp_prep_phy_incval_e810(hw, incval);
+-	else
++		break;
++	case ICE_PHY_E822:
+ 		err = ice_ptp_prep_phy_incval_e822(hw, incval);
++		break;
++	default:
++		err = -EOPNOTSUPP;
++	}
++
+ 	if (err)
+ 		return err;
+ 
+@@ -3307,10 +3343,17 @@ int ice_ptp_adj_clock(struct ice_hw *hw, s32 adj)
+ 	wr32(hw, GLTSYN_SHADJ_L(tmr_idx), 0);
+ 	wr32(hw, GLTSYN_SHADJ_H(tmr_idx), adj);
+ 
+-	if (ice_is_e810(hw))
++	switch (hw->phy_model) {
++	case ICE_PHY_E810:
+ 		err = ice_ptp_prep_phy_adj_e810(hw, adj);
+-	else
++		break;
++	case ICE_PHY_E822:
+ 		err = ice_ptp_prep_phy_adj_e822(hw, adj);
++		break;
++	default:
++		err = -EOPNOTSUPP;
++	}
++
+ 	if (err)
+ 		return err;
+ 
+@@ -3330,10 +3373,14 @@ int ice_ptp_adj_clock(struct ice_hw *hw, s32 adj)
   */
--static void ice_ptp_src_cmd(struct ice_hw *hw, enum ice_ptp_tmr_cmd cmd)
-+void ice_ptp_src_cmd(struct ice_hw *hw, enum ice_ptp_tmr_cmd cmd)
+ int ice_read_phy_tstamp(struct ice_hw *hw, u8 block, u8 idx, u64 *tstamp)
  {
- 	u32 cmd_val;
- 	u8 tmr_idx;
+-	if (ice_is_e810(hw))
++	switch (hw->phy_model) {
++	case ICE_PHY_E810:
+ 		return ice_read_phy_tstamp_e810(hw, block, idx, tstamp);
+-	else
++	case ICE_PHY_E822:
+ 		return ice_read_phy_tstamp_e822(hw, block, idx, tstamp);
++	default:
++		return -EOPNOTSUPP;
++	}
+ }
+ 
+ /**
+@@ -3348,10 +3395,14 @@ int ice_read_phy_tstamp(struct ice_hw *hw, u8 block, u8 idx, u64 *tstamp)
+  */
+ int ice_clear_phy_tstamp(struct ice_hw *hw, u8 block, u8 idx)
+ {
+-	if (ice_is_e810(hw))
++	switch (hw->phy_model) {
++	case ICE_PHY_E810:
+ 		return ice_clear_phy_tstamp_e810(hw, block, idx);
+-	else
++	case ICE_PHY_E822:
+ 		return ice_clear_phy_tstamp_e822(hw, block, idx);
++	default:
++		return -EOPNOTSUPP;
++	}
+ }
+ 
+ /**
+@@ -3360,10 +3411,14 @@ int ice_clear_phy_tstamp(struct ice_hw *hw, u8 block, u8 idx)
+  */
+ void ice_ptp_reset_ts_memory(struct ice_hw *hw)
+ {
+-	if (ice_is_e810(hw))
++	switch (hw->phy_model) {
++	case ICE_PHY_E822:
++		ice_ptp_reset_ts_memory_e822(hw);
++		break;
++	case ICE_PHY_E810:
++	default:
+ 		return;
+-
+-	ice_ptp_reset_ts_memory_e822(hw);
++	}
+ }
+ 
+ /**
+@@ -3382,10 +3437,14 @@ int ice_ptp_init_phc(struct ice_hw *hw)
+ 	/* Clear event err indications for auxiliary pins */
+ 	(void)rd32(hw, GLTSYN_STAT(src_idx));
+ 
+-	if (ice_is_e810(hw))
++	switch (hw->phy_model) {
++	case ICE_PHY_E810:
+ 		return ice_ptp_init_phc_e810(hw);
+-	else
++	case ICE_PHY_E822:
+ 		return ice_ptp_init_phc_e822(hw);
++	default:
++		return -EOPNOTSUPP;
++	}
+ }
+ 
+ /**
+@@ -3401,10 +3460,15 @@ int ice_ptp_init_phc(struct ice_hw *hw)
+  */
+ int ice_get_phy_tx_tstamp_ready(struct ice_hw *hw, u8 block, u64 *tstamp_ready)
+ {
+-	if (ice_is_e810(hw))
++	switch (hw->phy_model) {
++	case ICE_PHY_E810:
+ 		return ice_get_phy_tx_tstamp_ready_e810(hw, block,
+ 							tstamp_ready);
+-	else
++	case ICE_PHY_E822:
+ 		return ice_get_phy_tx_tstamp_ready_e822(hw, block,
+ 							tstamp_ready);
++		break;
++	default:
++		return -EOPNOTSUPP;
++	}
+ }
 diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-index 3e4e91322c72..dc1d398da7a8 100644
+index dc1d398da7a8..51e77887aad6 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
 +++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-@@ -131,6 +131,7 @@ extern const struct ice_vernier_info_e822 e822_vernier[NUM_ICE_PTP_LNK_SPD];
- u8 ice_get_ptp_src_clock_index(struct ice_hw *hw);
- bool ice_ptp_lock(struct ice_hw *hw);
- void ice_ptp_unlock(struct ice_hw *hw);
-+void ice_ptp_src_cmd(struct ice_hw *hw, enum ice_ptp_tmr_cmd cmd);
- int ice_ptp_init_time(struct ice_hw *hw, u64 time);
- int ice_ptp_write_incval(struct ice_hw *hw, u64 incval);
- int ice_ptp_write_incval_locked(struct ice_hw *hw, u64 incval);
+@@ -199,6 +199,8 @@ int ice_read_sma_ctrl_e810t(struct ice_hw *hw, u8 *data);
+ int ice_write_sma_ctrl_e810t(struct ice_hw *hw, u8 data);
+ int ice_read_pca9575_reg_e810t(struct ice_hw *hw, u8 offset, u8 *data);
+ 
++void ice_ptp_init_phy_model(struct ice_hw *hw);
++
+ #define PFTSYN_SEM_BYTES	4
+ 
+ #define ICE_PTP_CLOCK_INDEX_0	0x00
+diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
+index 5e353b0cbe6f..86165d388f34 100644
+--- a/drivers/net/ethernet/intel/ice/ice_type.h
++++ b/drivers/net/ethernet/intel/ice/ice_type.h
+@@ -822,6 +822,13 @@ struct ice_mbx_data {
+ 	u16 async_watermark_val;
+ };
+ 
++/* PHY model */
++enum ice_phy_model {
++	ICE_PHY_UNSUP = -1,
++	ICE_PHY_E810  = 1,
++	ICE_PHY_E822,
++};
++
+ /* Port hardware description */
+ struct ice_hw {
+ 	u8 __iomem *hw_addr;
+@@ -843,6 +850,7 @@ struct ice_hw {
+ 	u8 revision_id;
+ 
+ 	u8 pf_id;		/* device profile info */
++	enum ice_phy_model phy_model;
+ 
+ 	u16 max_burst_size;	/* driver sets this value */
+ 
 -- 
 2.38.1
 
