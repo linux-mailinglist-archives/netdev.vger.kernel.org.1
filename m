@@ -1,188 +1,132 @@
-Return-Path: <netdev+bounces-32889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 595C179AAAE
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 20:01:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF9C679AAB8
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 20:11:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 677BE1C20938
-	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 18:01:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79301281329
+	for <lists+netdev@lfdr.de>; Mon, 11 Sep 2023 18:11:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D757156E2;
-	Mon, 11 Sep 2023 18:01:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09D56156EA;
+	Mon, 11 Sep 2023 18:11:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67254156DF;
-	Mon, 11 Sep 2023 18:01:45 +0000 (UTC)
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66C9A103;
-	Mon, 11 Sep 2023 11:01:43 -0700 (PDT)
-Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-99c136ee106so594030566b.1;
-        Mon, 11 Sep 2023 11:01:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694455302; x=1695060102; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Wuqr/SJlcmFyZdXtrVtsbFVis4YJvJcZZ7ZjftUCRXA=;
-        b=U4XusRWPM5v03KUhor84USo1pxV9zsPfLPmAW0hrwttpO8gKL+FWDFiz0XmeCYt8IF
-         5Jz07dNG0lsPuTyYjaly8DFnF73DXv95FssTfBxPSNSBz6IY29NSBHpLBJLDWukKtDOU
-         rv5VE/f2xkhTjMYOq7iRNo5QrF59a5B9n9NTxqvX05HylPW59Hk3uKADMa15AISBC2yr
-         IkQWDtOvaOeSQOqnvx6rDWFrRfyS9OJSz1WuYUTsq4ppHXKxwJBrvImz2UqtYG0xGrMA
-         FFVBaHmGBfBigtbUL757I5RV0D0KsJrC50pFxjAjwnfcN1AdVvigS6YfUum4o0O+ED+/
-         v/Kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694455302; x=1695060102;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Wuqr/SJlcmFyZdXtrVtsbFVis4YJvJcZZ7ZjftUCRXA=;
-        b=en2rMpMX2h2FyBCfM/37jtvjl9et5PYQn0TELJN9kWdJUWZppmMiPN4PN2dFtltRA7
-         aO8D84f6cbVNgc5++hb05VPFTXFsUuuLOEwazFOjhMRxaWAWbLyojHXxHnAqH9O8KxpE
-         YrXEWiDmoCEFOO1XUqWcxJG+83G85P+bx6of+dSfTObvo+GQZphUPwI90z93zlBxz6VG
-         U2xD0o3HT5MXCoDblubOl+Md20BXsxOIzlKIz6WSGEsuzl+dNRAYMT66s5ChATGJwqfx
-         Nx3LVPWGUw4/jkbWIA1ijr5I0GHQlKW70CDnBG8dLdEdBR78aPxL8ESwgb2LhXC50Fxa
-         mQIg==
-X-Gm-Message-State: AOJu0YyP9lbcL25YLUllltquwMeKKsPiuyY27k6vWIvdW+0irXx7cPrV
-	ZtLxY+Z79z4t3pjuorlZGbiT1prf2U+UJ5dsCJY=
-X-Google-Smtp-Source: AGHT+IGghJcloW80Nv5Dqafuj5HzFfwihzzeHCX+C3d5DH/bEXzhpxWZvYSVapoxVJaOYmfJoVaem72fCNNyAARLPlk=
-X-Received: by 2002:a17:906:74c5:b0:9a1:eb67:c0ce with SMTP id
- z5-20020a17090674c500b009a1eb67c0cemr9421769ejl.50.1694455301555; Mon, 11 Sep
- 2023 11:01:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2523156E4
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 18:11:02 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C385F103
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 11:11:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694455861; x=1725991861;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=E8SViSF5zkCh5m4hEqrpOE+M9sJQnwggns897f8RsQk=;
+  b=J+Tl7LK7mf7Ml0SOQoZ9bwJHTsLTycdz2f/T2LWkxC+umE4ODyBiL4GP
+   R0IHsaxNNYGFax8KkNbP/P/tC1ZchNi32vyqW4+iGfSkIwQ7tjz5/yz5L
+   ql9hjFj4hVXNIE4ve6XZjvehwRDh5YpA0TWjknczSguBMj5t1mpMdrIZ/
+   PTW328mVCSDZyMs6ZkAygFf4CBVScdueVxVHXuWD6la0or4H9EBy75xKO
+   bqZDheDDxPFAJ3QvAYV8Z3WiudHfbiMA5yLh3Aya0Liu7EByrg/G6SyW7
+   2p/S1CQDDOnxB0Ck0ZAKXcfKeFiWHhF1fsh+3lj9tN2htkNhYVt9olUey
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10830"; a="378075595"
+X-IronPort-AV: E=Sophos;i="6.02,244,1688454000"; 
+   d="scan'208";a="378075595"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2023 11:11:01 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10830"; a="917129919"
+X-IronPort-AV: E=Sophos;i="6.02,244,1688454000"; 
+   d="scan'208";a="917129919"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orsmga005.jf.intel.com with ESMTP; 11 Sep 2023 11:11:00 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	jacob.e.keller@intel.com,
+	richardcochran@gmail.com
+Subject: [PATCH net-next 00/13][pull request] Intel Wired LAN Driver Updates 2023-09-11 (ice)
+Date: Mon, 11 Sep 2023 11:03:01 -0700
+Message-Id: <20230911180314.4082659-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAEf4BzYMAAhwscTWWTenvyr-PQ7E5tMg_iqXsPj_dyZEMVCrKg@mail.gmail.com>
- <64b4c5891096b_2b67208f@john.notmuch> <CAEf4Bzb2=p3nkaTctDcMAabzL41JjCkTso-aFrfv21z7Y0C48w@mail.gmail.com>
- <64ff278e16f06_2e8f2083a@john.notmuch>
-In-Reply-To: <64ff278e16f06_2e8f2083a@john.notmuch>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Mon, 11 Sep 2023 11:01:29 -0700
-Message-ID: <CAEf4Bzb1fMy5beHKxCjvoeCqaYmQFvnjnMi9bgWoML0v27n3SQ@mail.gmail.com>
-Subject: Re: Sockmap's parser/verdict programs and epoll notifications
-To: John Fastabend <john.fastabend@gmail.com>
-Cc: bpf <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>, 
-	"davidhwei@meta.com" <davidhwei@meta.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Sep 11, 2023 at 7:43=E2=80=AFAM John Fastabend <john.fastabend@gmai=
-l.com> wrote:
->
-> Andrii Nakryiko wrote:
-> > On Sun, Jul 16, 2023 at 9:37=E2=80=AFPM John Fastabend <john.fastabend@=
-gmail.com> wrote:
-> > >
-> > > Andrii Nakryiko wrote:
-> > > > Hey John,
-> > >
-> > > Sorry missed this while I was on PTO that week.
-> >
-> > yeah, vacations tend to cause missing things :)
-> >
-> > >
-> > > >
-> > > > We've been recently experimenting with using BPF_SK_SKB_STREAM_PARS=
-ER
-> > > > and BPF_SK_SKB_STREAM_VERDICT with sockmap/sockhash to perform
-> > > > in-kernel parsing of RSocket frames. A very simple format ([0]) whe=
-re
-> > > > the first 3 bytes specify the size of the frame payload. The idea w=
-as
-> > > > to collect the entire frame in the kernel before notifying user-spa=
-ce
-> > > > that data is available. This is meant to minimize unnecessary wakeu=
-ps
-> > > > due to incomplete logical frames, saving CPU.
-> > >
-> > > Nice.
-> > >
-> > > >
-> > > > You can find the BPF source code I've used at [1], it has lots of
-> > > > extra logging and stuff, but the idea is to read the first 3 bytes =
-of
-> > > > each logical frame, and return the expected full frame size from th=
-e
-> > > > parser program. The verdict program always just returns SK_PASS.
-> > > >
-> > > > This seems to work exactly as expected in manual simulations of
-> > > > various packet size distributions, and even for a bunch of
-> > > > ping/pong-like benchmark (which are very sensitive to correct frame
-> > > > length determination, so I'm reasonably confident we don't screw th=
-at
-> > > > up much). And yet, when benchmarking sending multiple logical RPC
-> > > > streams over the same single socket (so many interleaving RSocket
-> > > > frames on single socket, but in terms of logical frames nothing sho=
-uld
-> > > > change), we often see that while full frame hasn't been accumulated=
- in
-> > > > socket receive buffer yet, epoll_wait() for that socket would retur=
-n
-> > > > with success notifying user space that there is data on socket.
-> > > > Subsequent recvfrom() call would immediately return -EAGAIN and no
-> > > > data, and our benchmark would go on this loop of useless
-> > > > epoll_wait()+recvfrom() calls back to back, many times over.
-> > >
-> > > Aha yes this sounds bad.
-> > >
-> > > >
-> > > > So I have a few questions:
-> > > >   - is the above use case something that was meant to be handled by
-> > > > sockmap+parser/verdict?
-> > >
-> > > We shouldn't wake up user space if there is nothing to read. So
-> > > yes this seems like a valid use case to me.
-> > >
-> > > >   - is it correct to assume that epoll won't wake up until amount o=
-f
-> > > > bytes requested by parser program is accumulated (this seems to be =
-the
-> > > > case from manually experimenting with various "packet delays");
-> > >
-> > > Seems there is some bug that races and causes it to wake up
-> > > user space. I'm aware of a couple bugs in the stream parser
-> > > that I wanted to fix. Not sure I can get to them this week
-> > > but should have time next week. We have a couple more fixes
-> > > to resolve a few HTTPS server compliance tests as well.
-> > >
-> > > >   - is there some known bug or race in how sockmap and strparser
-> > > > framework interacts with epoll subsystem that could cause this weir=
-d
-> > > > epoll_wait() behavior?
-> > >
-> > > Yes I know of some races in strparser. I'll elaborate later
-> > > probably with patches as I don't recall them readily at the
-> > > moment.
-> >
-> > So I missed a good chunk of BPF mailing list traffic while I was on my
-> > PTO. Did you end up getting to these bugs in strparser logic? Should I
-> > try running the latest bpf-next/net-next on our production workload to
-> > see if this is still happening?
->
-> You will likely still hit there error I haven't got it out of my queue
-> yet. I just knocked off a couple things last week so could probably
-> take a look at flushing my queue this week. Then it would make sense
-> to retest to see if its something new or not.
->
-> I'll at least send an RFC with the idea even if I don't get to testing
-> it yet.
+This series contains updates to ice driver only.
 
-Sounds good, thanks a lot!
+Sergey prepends ICE_ to PTP timer commands to clearly convey namespace
+of commands.
 
->
-> Thanks,
-> John
+Karol adds retrying to acquire hardware semaphore for cross-timestamping
+and avoids writing to timestamp registers on E822 devices. He also
+renames some defines to be more clear and align with the data sheet.
+Additionally, a range check is moved in order to reduce duplicated code.
+
+Jake adds cross-timestamping support for E823 devices as well as adds
+checks against netlist to aid in determining support for SMA and GNSS.
+He also corrects improper pin assignment for certain E810-T devices and
+refactors/cleanups PTP related code such as adding PHY model to ease checks
+for different needed implementations, removing unneeded EXTTS flag, and
+adding macro to check for source timer owner.
+
+The following are changes since commit 73be7fb14e83d24383f840a22f24d3ed222ca319:
+  Merge tag 'net-6.6-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 100GbE
+
+Jacob Keller (8):
+  ice: Support cross-timestamping for E823 devices
+  ice: introduce hw->phy_model for handling PTP PHY differences
+  ice: remove ICE_F_PTP_EXTTS feature flag
+  ice: fix pin assignment for E810-T without SMA control
+  ice: introduce ice_pf_src_tmr_owned
+  ice: don't enable PTP related capabilities on non-owner PFs
+  ice: check the netlist before enabling ICE_F_SMA_CTRL
+  ice: check netlist before enabling ICE_F_GNSS
+
+Karol Kolacinski (4):
+  ice: retry acquiring hardware semaphore during cross-timestamp request
+  ice: PTP: Clean up timestamp registers correctly
+  ice: PTP: Rename macros used for PHY/QUAD port definitions
+  ice: PTP: move quad value check inside ice_fill_phy_msg_e822
+
+Sergey Temerkhanov (1):
+  ice: prefix clock timer command enumeration values with ICE_PTP
+
+ drivers/net/ethernet/intel/ice/ice.h          |   3 +-
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |   8 +-
+ drivers/net/ethernet/intel/ice/ice_common.c   |  77 +++++
+ drivers/net/ethernet/intel/ice/ice_common.h   |   2 +
+ drivers/net/ethernet/intel/ice/ice_gnss.c     |   3 +
+ drivers/net/ethernet/intel/ice/ice_lib.c      |  11 +-
+ drivers/net/ethernet/intel/ice/ice_main.c     |   2 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.c      | 101 ++++--
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c   | 294 ++++++++++++------
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |  13 +-
+ drivers/net/ethernet/intel/ice/ice_type.h     |  22 +-
+ 11 files changed, 380 insertions(+), 156 deletions(-)
+
+-- 
+2.38.1
+
 
