@@ -1,77 +1,88 @@
-Return-Path: <netdev+bounces-33180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DE6A79CE33
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 12:27:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B89A79CE3C
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 12:27:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E3361C20D59
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 10:27:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C7D41C20D52
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 10:27:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4FDF1799A;
-	Tue, 12 Sep 2023 10:26:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CA1C179AF;
+	Tue, 12 Sep 2023 10:27:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8BFC1775E
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 10:26:58 +0000 (UTC)
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1856DE6C
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 03:26:57 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 619E12000A;
-	Tue, 12 Sep 2023 10:26:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1694514416;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=k0GogBf+GJNfsaEKvwOAbpyy2BfHHxm9ybOBAoeGqzQ=;
-	b=WrYk7xnXYEpOgNgEIKcNlQj8YYF8X6k91/8H/+3a4Jj+vc/ptCn8ERMue9+lMk2+IZadcc
-	9pGCtOnVmmmbEcXtIRDznXKCqb9y2Qzlz0lWuWqcXySTcqRlXpZmW1u8YbKuOUFG9EwQbF
-	UeUsR2Sf27qltQH8uVdfKuQ4kaOifOtsO/w5pFEu8q2hP4Fr2fECm5A0/9uQsHIOt/yXwg
-	XKPW3EgwcomKZgVpP042zZ7p24nkLhUYQeK126H139F2HdPophICizeESj3EGk4PdQeCao
-	i2QYjS7pesWu4SL+L7DbJYWFhrCmBPGB1sJ9Nr6ZJYZpgatwDh1GTAGJ9EFs1A==
-Date: Tue, 12 Sep 2023 12:26:55 +0200
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>, Jakub Kicinski
- <kuba@kernel.org>
-Cc: <netdev@vger.kernel.org>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>
-Subject: PoE support
-Message-ID: <20230912122655.391e2c86@kmaincent-XPS-13-7390>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9250A1775A
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 10:27:14 +0000 (UTC)
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DFEE1705;
+	Tue, 12 Sep 2023 03:27:13 -0700 (PDT)
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1qg0bl-000440-S5; Tue, 12 Sep 2023 12:27:01 +0200
+Date: Tue, 12 Sep 2023 12:27:01 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Linux regressions mailing list <regressions@lists.linux.dev>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Timo Sigurdsson <public_timo.s@silentcreek.de>,
+	kadlec@netfilter.org, fw@strlen.de, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org, sashal@kernel.org, carnil@debian.org,
+	1051592@bugs.debian.org
+Subject: Re: Regression: Commit "netfilter: nf_tables: disallow rule addition
+ to bound chain via NFTA_RULE_CHAIN_ID" breaks ruleset loading in
+ linux-stable
+Message-ID: <20230912102701.GA13516@breakpoint.cc>
+References: <20230911213750.5B4B663206F5@dd20004.kasserver.com>
+ <ZP+bUpxJiFcmTWhy@calendula>
+ <b30a81fa-6b59-4bac-b109-99a4dca689de@leemhuis.info>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b30a81fa-6b59-4bac-b109-99a4dca689de@leemhuis.info>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-Hello,
+Linux regression tracking (Thorsten Leemhuis) <regressions@leemhuis.info> wrote:
+> On 12.09.23 00:57, Pablo Neira Ayuso wrote:
+> > Userspace nftables v1.0.6 generates incorrect bytecode that hits a new
+> > kernel check that rejects adding rules to bound chains. The incorrect
+> > bytecode adds the chain binding, attach it to the rule and it adds the
+> > rules to the chain binding. I have cherry-picked these three patches
+> > for nftables v1.0.6 userspace and your ruleset restores fine.
+> > [...]
+> 
+> Hmmmm. Well, this sounds like a kernel regression to me that normally
+> should be dealt with on the kernel level, as users after updating the
+> kernel should never have to update any userspace stuff to continue what
+> they have been doing before the kernel update.
 
-I am working on the PoE support and I am facing few questioning.
-I would like to use the same commands and core as PoDL, but non generic
-development raised questions.
+This is a combo of a userspace bug and this new sanity check that
+rejects the incorrect ordering (adding rules to the already-bound
+anonymous chain).
 
-The admin_state and admin_control are the same therefore I will use the
-ethtool_podl_pse_admin_state enumeration.
-The power detection status have few differences, I thought that adding PoE
-specific states to ethtool_podl_pse_pw_d_status rather than adding a new
-ethtool_pse_pw_d_status enum is the best way to avoid breaking the old API.
+nf_tables uses a transaction allor-nothing model, this means that any
+error that occurs during a transaction has to be reverse/undo all the
+pending changes.  This has caused a myriad of bugs already.
 
-I also would like to remove PoDL reference to ethtool but keep
-"podl-pse-admin-control" command for old compatibility alongside a new
-"pse-admin-control" command.
+So while this can be theoretically fixed in the kernel I don't see
+a sane way to do it.  Error unwinding / recovery from deeply nested
+errors is already too complex for my taste.
 
-What do you think? Do you think of a better way?
+> Can't the kernel somehow detect the incorrect bytecode and do the right
+> thing(tm) somehow?
 
-K=C3=B6ry
+Theoretically yes, but I don't feel competent enough to do it, just look
+at all the UaF bugs of the past month.
 
 
