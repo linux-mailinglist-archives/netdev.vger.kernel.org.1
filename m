@@ -1,246 +1,168 @@
-Return-Path: <netdev+bounces-33380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EDCB79DA3F
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 22:49:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4F4C79DA4A
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 22:53:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C7D71C20CF5
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 20:49:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39CD1281799
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 20:53:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01C3BAD55;
-	Tue, 12 Sep 2023 20:49:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74267AD4F;
+	Tue, 12 Sep 2023 20:53:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1E5A8F4B
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 20:49:04 +0000 (UTC)
-Received: from mail-vs1-xe32.google.com (mail-vs1-xe32.google.com [IPv6:2607:f8b0:4864:20::e32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B833199
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 13:49:04 -0700 (PDT)
-Received: by mail-vs1-xe32.google.com with SMTP id ada2fe7eead31-45088c95591so2895437137.3
-        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 13:49:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694551743; x=1695156543; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vqUoNDg8mtKfTCDS6D7uwoNxyp9g9WwIHoet9NtlqA8=;
-        b=bIB5i1Va3aKxTVI5uhXPmyntuv0jm8zY6NOrxF6A08gf9mvkOlp6NJ5rRbXpAEYpB/
-         voVN1x26r9zrAMhUmib7WX0SsQvM8sutGukbu9iEPtjNo4EWDzxhVTcqH45lzpAO2Dm4
-         oUgT4LKFPPU3kJ4l+LtxovuC6mg4dus4corki/LUmjtxL3PwqdIOVwPOG5d1SAuZBAIH
-         NLL/Mo9Svc/xLZ60NH6+XG//tPDLvuzujq5Z0MXY8wqtQfciS/zcVqPCgxXNLZNgnQKI
-         TXjluqNlQ+blfRtxzcxvw7zyaaIX/91m6i4/XCnaVuc053/mAUTRcxg51/RlrIByUuqB
-         Yx8Q==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0E5A959
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 20:53:54 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id B45DF199
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 13:53:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1694552031;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=h7gqxsWGxYdMmHjhvfD7Qqc8EetmHcPGV2O7WRpaBLQ=;
+	b=LnBDizzfL++gZ96TAcmaG2Mb1uWsdecdatM4J3/1Q2bWFpxkDyIH/bgpzwJCQ2PJseYPLP
+	W1apgB7K3iljEcpTCtPALdOEwV4V7p/DLiSahuSRR67eumrNeNF3es7P+nDv3w4u8J/1nB
+	s2jAahtnsLBrFyXXE8iKb8+xVOoa8HY=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-163-dr-DxHYvPX2ZMxI2jC0Iug-1; Tue, 12 Sep 2023 16:53:50 -0400
+X-MC-Unique: dr-DxHYvPX2ZMxI2jC0Iug-1
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-52c6f3886e3so4175145a12.1
+        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 13:53:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694551743; x=1695156543;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vqUoNDg8mtKfTCDS6D7uwoNxyp9g9WwIHoet9NtlqA8=;
-        b=tWHCMj+tJHETsS3jnoHJCEMmptOWDOrMoK9qB8qBwU2x2iFI4A6dEY5Ez5lAZmVqL9
-         RIsXREwJ4h3HLRXPEDZgQBufWQQq2OEp9ljC289Kea9KoLGQbRU6pW/cO+KClIOPxvJE
-         l/x1xUE4Ykcojr4yduhIOvmc0MUWkklBfTTEv8LsDX1eytgPBldkAN8Z0qTg2fMqIvjr
-         PpR9WDwtI0THpb7ioFsPuAvFlaV4ufj9W0viKEInNll/h0k7FdL1IKDft7fC/cj5e9iG
-         Qu7uSQcC4lFsLLf9nCCynn3ETvzbFKXJ+0pA+7vUQZSnXwldJOxTcaAYYMzRmlJOp7Nc
-         HA2Q==
-X-Gm-Message-State: AOJu0YwLFWBDWSr6aGt3/wQTFZLBdx4X1aR6OjjG47NNpfS0kma6pZvf
-	fOdMENVPUoi5hEYscmMFx34TtJSv5eNqbACf7ieXVTvy
-X-Google-Smtp-Source: AGHT+IFm+Ezo9mIZ5fne0lPyQiF06l6mTsKBYvpJdKaADXts68Z3LzvDT2LRfl88qFZxnxbxAGX0h6nOcqswCDRr3JU=
-X-Received: by 2002:a67:e35a:0:b0:44d:482a:5444 with SMTP id
- s26-20020a67e35a000000b0044d482a5444mr555171vsm.21.1694551743041; Tue, 12 Sep
- 2023 13:49:03 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1694552028; x=1695156828;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=h7gqxsWGxYdMmHjhvfD7Qqc8EetmHcPGV2O7WRpaBLQ=;
+        b=rR9/rhZ8mmSp16hFPHInK+lalYpdDYr7kQE/3AsrJzw6g4Jpme3VnxoTDT5oBbYEoD
+         bc1SWhT0k4dmBIWK8V4Y/SDQE9C3Bm9GnsMCCuqANa6AwCw0g/EtV9NJzfvuSYogUF57
+         eBXcaaI5Xu+740wKbkecRBM5fbB43IWbIqql0p9NuHi+S/8NqCcDoECg0Vc7GYCLG/wH
+         lh0GGB5Bqz8/elk2X3D0f58Jt887kUtz37Zj9CX2YrHd9sNCC1GAblNjTPAhprK5pcfV
+         xHedLtM9raoh8IuHsMouHSTfQRT3xK8KjaHWPjdhzlOvuheRHBn5DsHxdae1Oi9zZdPh
+         UegA==
+X-Gm-Message-State: AOJu0YwZO/YqqqdFymwr1O2Kh3vD753Q4mpm0grfJudNcOv9a6ahJUPp
+	0eC/l6yDZ6R/D3kQ9RyfPTigB5JxER5gJ289O4zp34lGs3JyU8oq4bBUE7LOIkSh1mAVLuH/aA4
+	nLjWng2laHXxKyxybA2TeXC85
+X-Received: by 2002:a05:6402:6d0:b0:521:a4bb:374f with SMTP id n16-20020a05640206d000b00521a4bb374fmr725829edy.5.1694552028477;
+        Tue, 12 Sep 2023 13:53:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGc2BLxKU/ksq/+8WwZzj4E5STO0xOwYElcI4SSFgQhPbX048/Lcnncc+nW3pYUPefRnpegTA==
+X-Received: by 2002:a05:6402:6d0:b0:521:a4bb:374f with SMTP id n16-20020a05640206d000b00521a4bb374fmr725815edy.5.1694552028183;
+        Tue, 12 Sep 2023 13:53:48 -0700 (PDT)
+Received: from redhat.com ([2.52.10.100])
+        by smtp.gmail.com with ESMTPSA id bc3-20020a056402204300b0052348d74865sm6224540edb.61.2023.09.12.13.53.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Sep 2023 13:53:47 -0700 (PDT)
+Date: Tue, 12 Sep 2023 16:53:43 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Shannon Nelson <shannon.nelson@amd.com>
+Cc: kuba@kernel.org, davem@davemloft.net, jasowang@redhat.com,
+	virtualization@lists.linux-foundation.org, brett.creeley@amd.com,
+	netdev@vger.kernel.org, simon.horman@corigine.com,
+	eperezma@redhat.com, drivers@pensando.io
+Subject: Re: [PATCH net-next] virtio: kdoc for struct virtio_pci_modern_device
+Message-ID: <20230912165335-mutt-send-email-mst@kernel.org>
+References: <20230911213104.14391-1-shannon.nelson@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230912013332.2048422-1-jrife@google.com> <65006891779ed_25e754294b8@willemb.c.googlers.com.notmuch>
- <1ca3ca8a-6185-bc55-de74-53991ffc6f91@iogearbox.net> <CADKFtnTOD2+7B5tH8YMHEnxubiG+Cs+t8EhTft+q51YwxjW9xw@mail.gmail.com>
- <CAF=yD-KKGYhKjxio9om1rz7pPe1uiRgODuXWvoLqrGrRbtWNkA@mail.gmail.com> <CADKFtnSgBZcpYBYRwr6WgnS6j9xH+U0W7bxSqt9ge5aumu4QQg@mail.gmail.com>
-In-Reply-To: <CADKFtnSgBZcpYBYRwr6WgnS6j9xH+U0W7bxSqt9ge5aumu4QQg@mail.gmail.com>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Tue, 12 Sep 2023 16:48:25 -0400
-Message-ID: <CAF=yD-JW+Gs+EeJk2jknU6ZL0prjRO41Q3EpVTOTpTD8sEOh6A@mail.gmail.com>
-Subject: Re: [PATCH net] net: prevent address overwrite in connect() and sendmsg()
-To: Jordan Rife <jrife@google.com>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, davem@davemloft.net, 
-	Eric Dumazet <edumazet@google.com>, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, dborkman@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230911213104.14391-1-shannon.nelson@amd.com>
 
-On Tue, Sep 12, 2023 at 4:07=E2=80=AFPM Jordan Rife <jrife@google.com> wrot=
-e:
->
-> > Ideally these all would use the proper kernel-internal APIs.
-> > I care less about new code. If all examples are clear, that will do the=
- right thing, or is a simple fix-up worst case.
->
-> Fair enough.
->
-> > The changes do seem like trivial one liners?
->
-> Looks like it. Still, it's going to take some time to patch+test each
-> of these. I'll start with NFS (SUNRPC), SMB, and Ceph, since I can
-> easily test them.
->
-> > Question is if changing all these callers is suitable for a patch targe=
-ting net.
-> One patch to net will be needed to add an address copy to
-> kernel_sendmsg(), but I guess I'll need to send some other patches to
-> the appropriate subsystem maintainers for SUNRPC, SMB, and Ceph to
-> swap out calls.
+On Mon, Sep 11, 2023 at 02:31:04PM -0700, Shannon Nelson wrote:
+> Finally following up to Simon's suggestion for some kdoc attention
+> on struct virtio_pci_modern_device.
+> 
+> Link: https://lore.kernel.org/netdev/ZE%2FQS0lnUvxFacjf@corigine.com/
+> Cc: Simon Horman <simon.horman@corigine.com>
+> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+> Acked-by: Eugenio Pérez <eperezma@redhat.com>
 
-If we take this path, it could be a single patch. The subsystem
-maintainers should be CC:ed so that they can (N)ACK it.
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-But I do not mean to ask to split it up and test each one separately.
+> ---
+>  include/linux/virtio_pci_modern.h | 34 ++++++++++++++++++++-----------
+>  1 file changed, 22 insertions(+), 12 deletions(-)
+> 
+> diff --git a/include/linux/virtio_pci_modern.h b/include/linux/virtio_pci_modern.h
+> index 067ac1d789bc..a38c729d1973 100644
+> --- a/include/linux/virtio_pci_modern.h
+> +++ b/include/linux/virtio_pci_modern.h
+> @@ -12,37 +12,47 @@ struct virtio_pci_modern_common_cfg {
+>  	__le16 queue_reset;		/* read-write */
+>  };
+>  
+> +/**
+> + * struct virtio_pci_modern_device - info for modern PCI virtio
+> + * @pci_dev:	    Ptr to the PCI device struct
+> + * @common:	    Position of the common capability in the PCI config
+> + * @device:	    Device-specific data (non-legacy mode)
+> + * @notify_base:    Base of vq notifications (non-legacy mode)
+> + * @notify_pa:	    Physical base of vq notifications
+> + * @isr:	    Where to read and clear interrupt
+> + * @notify_len:	    So we can sanity-check accesses
+> + * @device_len:	    So we can sanity-check accesses
+> + * @notify_map_cap: Capability for when we need to map notifications per-vq
+> + * @notify_offset_multiplier: Multiply queue_notify_off by this value
+> + *                            (non-legacy mode).
+> + * @modern_bars:    Bitmask of BARs
+> + * @id:		    Device and vendor id
+> + * @device_id_check: Callback defined before vp_modern_probe() to be used to
+> + *		    verify the PCI device is a vendor's expected device rather
+> + *		    than the standard virtio PCI device
+> + *		    Returns the found device id or ERRNO
+> + * @dma_mask:	    Optional mask instead of the traditional DMA_BIT_MASK(64),
+> + *		    for vendor devices with DMA space address limitations
+> + */
+>  struct virtio_pci_modern_device {
+>  	struct pci_dev *pci_dev;
+>  
+>  	struct virtio_pci_common_cfg __iomem *common;
+> -	/* Device-specific data (non-legacy mode)  */
+>  	void __iomem *device;
+> -	/* Base of vq notifications (non-legacy mode). */
+>  	void __iomem *notify_base;
+> -	/* Physical base of vq notifications */
+>  	resource_size_t notify_pa;
+> -	/* Where to read and clear interrupt */
+>  	u8 __iomem *isr;
+>  
+> -	/* So we can sanity-check accesses. */
+>  	size_t notify_len;
+>  	size_t device_len;
+>  
+> -	/* Capability for when we need to map notifications per-vq. */
+>  	int notify_map_cap;
+>  
+> -	/* Multiply queue_notify_off by this value. (non-legacy mode). */
+>  	u32 notify_offset_multiplier;
+> -
+>  	int modern_bars;
+> -
+>  	struct virtio_device_id id;
+>  
+> -	/* optional check for vendor virtio device, returns dev_id or -ERRNO */
+>  	int (*device_id_check)(struct pci_dev *pdev);
+> -
+> -	/* optional mask for devices with limited DMA space */
+>  	u64 dma_mask;
+>  };
+>  
+> -- 
+> 2.17.1
 
-The change from sock->ops->connect to kernel_connect is certainly
-trivial enough that compile testing should suffice.
-
-Note that kernel_connect actually uses READ_ONCE(sock->ops) because of
-a data race. All callers that call a socket that may be subject to
-IPV6_ADDRFORM should do that. Likely some of those open coded examples
-are affected, and do not. This is another example why using a single
-interface is preferable.
-
-> > Similarly, this could call kernel_sendmsg, and the extra copy handled i=
-n that wrapper.
->
-> Would it make more sense to do the address copy in sock_sendmsg()
-> instead? Are kernel callers "supposed" to use kernel_sendmsg() or is
-> it valid for them to use sock_sendmsg() as many of them seem to want
-> to do today. Seeing as sock_sendmsg() is called by kernel_sendmsg(),
-> adding the copy in sock_sendmsg() fixes this problem for callers to
-> both of these and avoids the need for patching all modules that call
-> sock_sendmsg().
-
-I think it is "supposed" to be the API for these cases. But as you
-show, clearly it isn't today. Practice trumps theory.
-
-The only question is whether we should pursue your original patch and
-accept that this will continue, or one that improves the situation,
-but touches more files and thus has a higher risk of merge conflicts.
-
-I'd like to give others some time to chime in. I've given my opinion,
-but it's only one.
-
-
-
-> -Jordan
->
-> On Tue, Sep 12, 2023 at 12:36=E2=80=AFPM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > On Tue, Sep 12, 2023 at 2:31=E2=80=AFPM Jordan Rife <jrife@google.com> =
-wrote:
-> > >
-> > > > These should probably call kernel_connect instead.
-> > > > Similarly, this could call kernel_sendmsg, and the extra copy handl=
-ed in that wrapper.
-> > >
-> > > I was considering this approach initially, but one concern I had was
-> > > that there are other instances I see of modules calling ops->connect(=
-)
-> > > directly (bypassing kernel_connect()):
-> > >
-> > > - net/netfilter/ipvs/ip_vs_sync.c: make_send_sock()
-> > > - drivers/block/drbd/drbd_receiver.c: drbd_try_connect()
-> > > - drivers/infiniband/hw/erdma/erdma_cm.c: kernel_bindconnect()
-> > > - drivers/infiniband/sw/siw/siw_cm.c: kernel_bindconnect()
-> > > - fs/ocfs2/cluster/tcp.c: o2net_start_connect()
-> > > - net/rds/tcp_connect.c: rds_tcp_conn_path_connect()
-> > >
-> > > and ops->sendmsg():
-> > >
-> > > - net/smc/af_smc.c: smc_sendmsg()
-> > > - drivers/vhost/net.c: vhost_tx_batch(), handle_tx_copy(), handle_tx_=
-zerocopy()
-> > > - drivers/target/iscsi/iscsi_target_util.c: iscsit_fe_sendpage_sg()
-> > >
-> > > which (at least in theory) leaves them open to the same problem I'm
-> > > seeing with NFS/SMB right now. I worry that even if all these
-> > > instances were swapped out with kernel_sendmsg() and kernel_connect()=
-,
-> > > it would turn into a game of whac-a-mole in the future as new changes
-> > > or new modules may reintroduce direct calls to sock->ops->connect() o=
-r
-> > > sock->ops->sendmsg().
-> >
-> > Ideally these all would use the proper kernel-internal APIs.
-> >
-> > I care less about new code. If all examples are clear, that
-> > will do the right thing, or is a simple fix-up worst case.
-> >
-> > Question is if changing all these callers is suitable for a patch
-> > targeting net.
-> >
-> > The changes do seem like trivial one liners?
-> >
-> > > -Jordan
-> > >
-> > >
-> > >
-> > > On Tue, Sep 12, 2023 at 7:22=E2=80=AFAM Daniel Borkmann <daniel@iogea=
-rbox.net> wrote:
-> > > >
-> > > > On 9/12/23 3:33 PM, Willem de Bruijn wrote:
-> > > > > Jordan Rife wrote:
-> > > > >> commit 0bdf399342c5 ("net: Avoid address overwrite in kernel_con=
-nect")
-> > > > >> ensured that kernel_connect() will not overwrite the address par=
-ameter
-> > > > >> in cases where BPF connect hooks perform an address rewrite. How=
-ever,
-> > > > >> there remain other cases where BPF hooks can overwrite an addres=
-s held
-> > > > >> by a kernel client.
-> > > > >>
-> > > > >> =3D=3DScenarios Tested=3D=3D
-> > > > >>
-> > > > >> * Code in the SMB and Ceph modules calls sock->ops->connect() di=
-rectly,
-> > > > >>    allowing the address overwrite to occur. In the case of SMB, =
-this can
-> > > > >>    lead to broken mounts.
-> > > > >
-> > > > > These should probably call kernel_connect instead.
-> > > > >
-> > > > >> * NFS v3 mounts with proto=3Dudp call sock_sendmsg() for each RP=
-C call,
-> > > > >>    passing a pointer to the mount address in msg->msg_name which=
- is
-> > > > >>    later overwritten by a BPF sendmsg hook. This can lead to bro=
-ken NFS
-> > > > >>    mounts.
-> > > > >
-> > > > > Similarly, this could call kernel_sendmsg, and the extra copy han=
-dled
-> > > > > in that wrapper. The arguments are not exacty the same, so not 10=
-0%
-> > > > > this is feasible.
-> > > > >
-> > > > > But it's preferable if in-kernel callers use the kernel_.. API ra=
-ther
-> > > > > than bypass it. Exactly for issues like the one you report.
-> > > >
-> > > > Fully agree, if it's feasible it would be better to convert them ov=
-er to
-> > > > in-kernel API.
-> > > >
-> > > > >> In order to more comprehensively fix this class of problems, thi=
-s patch
-> > > > >> pushes the address copy deeper into the stack and introduces an =
-address
-> > > > >> copy to both udp_sendmsg() and udpv6_sendmsg() to insulate all c=
-allers
-> > > > >> from address rewrites.
-> > > > >>
-> > > > >> Signed-off-by: Jordan Rife <jrife@google.com>
 
