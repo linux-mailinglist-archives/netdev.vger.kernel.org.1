@@ -1,253 +1,134 @@
-Return-Path: <netdev+bounces-33208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9389479D082
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 13:59:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A114E79D07D
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 13:58:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48F02281C22
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 11:59:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 278DC281C4E
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 11:58:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1322F18032;
-	Tue, 12 Sep 2023 11:59:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E31B618038;
+	Tue, 12 Sep 2023 11:58:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08EA69443
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 11:59:09 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 532AC1981
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 04:59:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694519949; x=1726055949;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=bjAkhDvOyHj2BVvYeMiuQ2BaHhDZaB2jI5iM2AguytE=;
-  b=FLLJrfxz5pjj3kmkTPs7L+1Pb4yM9wxBJi7eo5ulnuIqEgrUF9SlT/rC
-   LZN42yYxN4dFmzr4ND1+Gei18YpiV/7PtKNCOcUxNeQJTmLpBGFe6CiPK
-   H3LXxPZkbY2yoBZbQ24sM7YNn+SWHPhPdqbOFKn/WPsSRhGgXSzMNbk91
-   8v62vNLS8kH7gR18+e+awS4rgWnJaDrHsztqIlGRWjfM9gqEVI+WXstno
-   ggqXWYW7ILMIZSRMm/X/ocs7aDk2noAUMCyjpzurXk3PGR7o2heEyrJia
-   syyAji+VjbbINA+61Lec5UuLvMHNxDVwAPsSoWtQq82AzSw8YZPL6d2ct
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10830"; a="378263748"
-X-IronPort-AV: E=Sophos;i="6.02,139,1688454000"; 
-   d="scan'208";a="378263748"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2023 04:59:07 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10830"; a="867343275"
-X-IronPort-AV: E=Sophos;i="6.02,139,1688454000"; 
-   d="scan'208";a="867343275"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by orsmga004.jf.intel.com with ESMTP; 12 Sep 2023 04:59:04 -0700
-Received: from fedora.igk.intel.com (Metan_eth.igk.intel.com [10.123.220.124])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 0A69D332B7;
-	Tue, 12 Sep 2023 12:59:03 +0100 (IST)
-From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	leon@kernel.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Subject: [PATCH] [Intel-wired-lan][PATCH iwl-next v2] ice: store VF's pci_dev ptr in ice_vf
-Date: Tue, 12 Sep 2023 07:56:26 -0400
-Message-Id: <20230912115626.105828-1-mateusz.polchlopek@intel.com>
-X-Mailer: git-send-email 2.38.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8C5818032
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 11:58:29 +0000 (UTC)
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [IPv6:2001:780:45:1d:225:90ff:fe52:c662])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D655E1717;
+	Tue, 12 Sep 2023 04:58:27 -0700 (PDT)
+Received: from [46.6.227.206] (port=6296 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1qg224-00CtNF-Px; Tue, 12 Sep 2023 13:58:23 +0200
+Date: Tue, 12 Sep 2023 13:58:13 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Timo Sigurdsson <public_timo.s@silentcreek.de>
+Cc: kadlec@netfilter.org, fw@strlen.de, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org, regressions@lists.linux.dev,
+	sashal@kernel.org, carnil@debian.org, 1051592@bugs.debian.org
+Subject: Re: Regression: Commit "netfilter: nf_tables: disallow rule addition
+ to bound chain via NFTA_RULE_CHAIN_ID" breaks ruleset loading in
+ linux-stable
+Message-ID: <ZQBSVTCxyi+zH9qG@calendula>
+References: <20230911213750.5B4B663206F5@dd20004.kasserver.com>
+ <ZP+bUpxJiFcmTWhy@calendula>
+ <20230912113959.8F8B26321005@dd20004.kasserver.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230912113959.8F8B26321005@dd20004.kasserver.com>
+X-Spam-Score: -1.9 (-)
 
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+On Tue, Sep 12, 2023 at 01:39:59PM +0200, Timo Sigurdsson wrote:
+> Hi Pablo,
+> 
+> Pablo Neira Ayuso schrieb am 12.09.2023 00:57 (GMT +02:00):
+> 
+> > Hi Timo,
+> > 
+> > On Mon, Sep 11, 2023 at 11:37:50PM +0200, Timo Sigurdsson wrote:
+> >> Hi,
+> >> 
+> >> recently, Debian updated their stable kernel from 6.1.38 to 6.1.52
+> >> which broke nftables ruleset loading on one of my machines with lots
+> >> of "Operation not supported" errors. I've reported this to the
+> >> Debian project (see link below) and Salvatore Bonaccorso and I
+> >> identified "netfilter: nf_tables: disallow rule addition to bound
+> >> chain via NFTA_RULE_CHAIN_ID" (0ebc1064e487) as the offending commit
+> >> that introduced the regression. Salvatore also found that this issue
+> >> affects the 5.10 stable tree as well (observed in 5.10.191), but he
+> >> cannot reproduce it on 6.4.13 and 6.5.2.
+> >> 
+> >> The issue only occurs with some rulesets. While I can't trigger it
+> >> with simple/minimal rulesets that I use on some machines, it does
+> >> occur with a more complex ruleset that has been in use for months
+> >> (if not years, for large parts of it). I'm attaching a somewhat
+> >> stripped down version of the ruleset from the machine I originally
+> >> observed this issue on. It's still not a small or simple ruleset,
+> >> but I'll try to reduce it further when I have more time.
+> >> 
+> >> The error messages shown when trying to load the ruleset don't seem
+> >> to be helpful. Just two simple examples: Just to give two simple
+> >> examples from the log when nftables fails to start:
+> >> /etc/nftables.conf:99:4-44: Error: Could not process rule: Operation not
+> >> supported
+> >>                         tcp option maxseg size 1-500 counter drop
+> >>                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> >> /etc/nftables.conf:308:4-27: Error: Could not process rule: Operation not
+> >> supported
+> >>                         tcp dport sip-tls accept
+> >>                         ^^^^^^^^^^^^^^^^^^^^^^^^
+> > 
+> > I can reproduce this issue with 5.10.191 and 6.1.52 and nftables v1.0.6,
+> > this is not reproducible with v1.0.7 and v1.0.8.
+> > 
+> >> Since the issue only affects some stable trees, Salvatore thought it
+> >> might be an incomplete backport that causes this.
+> >> 
+> >> If you need further information, please let me know.
+> > 
+> > Userspace nftables v1.0.6 generates incorrect bytecode that hits a new
+> > kernel check that rejects adding rules to bound chains. The incorrect
+> > bytecode adds the chain binding, attach it to the rule and it adds the
+> > rules to the chain binding. I have cherry-picked these three patches
+> > for nftables v1.0.6 userspace and your ruleset restores fine.
+> 
+> hmm, that doesn't explain why Salvatore didn't observe this with
+> more recent kernels.
+>
+> Salvatore, did you use newer userspace components when you tested
+> your 6.4.13 and 6.5.2 builds?
+> 
+> As for the regression and how it be dealt with: Personally, I don't
+> really care whether the regression is solved in the kernel or
+> userspace. If everybody agrees that this is the best or only viable
+> option and Debian decides to push a nftables update to fix this,
+> that works for me. But I do feel the burden to justify this should
+> be high. A kernel change that leaves users without a working packet
+> filter after upgrading their machines is serious, if you ask me. And
+> since it affects several stable/longterm trees, I would assume this
+> will hit other stable (non-rolling) distributions as well, since
+> they will also use older userspace components (unless this is
+> behavior specific to nftables 1.0.6 but not older versions). They
+> probably should get a heads up then.
 
-Extend struct ice_vf by vfdev.
-Calculation of vfdev falls more nicely into ice_create_vf_entries().
-
-Caching of vfdev enables simplification of ice_restore_all_vfs_msi_state().
-
-Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Co-developed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_main.c   |  2 +-
- drivers/net/ethernet/intel/ice/ice_sriov.c  | 50 +++++++++++----------
- drivers/net/ethernet/intel/ice/ice_sriov.h  |  4 +-
- drivers/net/ethernet/intel/ice/ice_vf_lib.c |  2 +
- drivers/net/ethernet/intel/ice/ice_vf_lib.h |  2 +-
- 5 files changed, 32 insertions(+), 28 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index a5997008bb98..38adffbe0edf 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -5561,7 +5561,7 @@ static void ice_pci_err_resume(struct pci_dev *pdev)
- 		return;
- 	}
- 
--	ice_restore_all_vfs_msi_state(pdev);
-+	ice_restore_all_vfs_msi_state(pf);
- 
- 	ice_do_reset(pf, ICE_RESET_PFR);
- 	ice_service_task_restart(pf);
-diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
-index 31314e7540f8..4ae59c59e22b 100644
---- a/drivers/net/ethernet/intel/ice/ice_sriov.c
-+++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
-@@ -789,14 +789,19 @@ static const struct ice_vf_ops ice_sriov_vf_ops = {
-  */
- static int ice_create_vf_entries(struct ice_pf *pf, u16 num_vfs)
- {
-+	struct pci_dev *pdev = pf->pdev;
- 	struct ice_vfs *vfs = &pf->vfs;
-+	struct pci_dev *vfdev = NULL;
- 	struct ice_vf *vf;
--	u16 vf_id;
--	int err;
-+	u16 vf_pdev_id;
-+	int err, pos;
- 
- 	lockdep_assert_held(&vfs->table_lock);
- 
--	for (vf_id = 0; vf_id < num_vfs; vf_id++) {
-+	pos = pci_find_ext_capability(pdev, PCI_EXT_CAP_ID_SRIOV);
-+	pci_read_config_word(pdev, pos + PCI_SRIOV_VF_DID, &vf_pdev_id);
-+
-+	for (u16 vf_id = 0; vf_id < num_vfs; vf_id++) {
- 		vf = kzalloc(sizeof(*vf), GFP_KERNEL);
- 		if (!vf) {
- 			err = -ENOMEM;
-@@ -812,11 +817,23 @@ static int ice_create_vf_entries(struct ice_pf *pf, u16 num_vfs)
- 
- 		ice_initialize_vf_entry(vf);
- 
-+		do {
-+			vfdev = pci_get_device(pdev->vendor, vf_pdev_id, vfdev);
-+		} while (vfdev && vfdev->physfn != pdev);
-+		vf->vfdev = vfdev;
- 		vf->vf_sw_id = pf->first_sw;
- 
-+		pci_dev_get(vfdev);
-+
- 		hash_add_rcu(vfs->table, &vf->entry, vf_id);
- 	}
- 
-+	/* Decrement of refcount done by pci_get_device() inside the loop does
-+	 * not touch the last iteration's vfdev, so it has to be done manually
-+	 * to balance pci_dev_get() added within the loop.
-+	 */
-+	pci_dev_put(vfdev);
-+
- 	return 0;
- 
- err_free_entries:
-@@ -1709,31 +1726,16 @@ void ice_print_vfs_mdd_events(struct ice_pf *pf)
- 
- /**
-  * ice_restore_all_vfs_msi_state - restore VF MSI state after PF FLR
-- * @pdev: pointer to a pci_dev structure
-+ * @pf: pointer to the PF structure
-  *
-  * Called when recovering from a PF FLR to restore interrupt capability to
-  * the VFs.
-  */
--void ice_restore_all_vfs_msi_state(struct pci_dev *pdev)
-+void ice_restore_all_vfs_msi_state(struct ice_pf *pf)
- {
--	u16 vf_id;
--	int pos;
--
--	if (!pci_num_vf(pdev))
--		return;
-+	struct ice_vf *vf;
-+	u32 bkt;
- 
--	pos = pci_find_ext_capability(pdev, PCI_EXT_CAP_ID_SRIOV);
--	if (pos) {
--		struct pci_dev *vfdev;
--
--		pci_read_config_word(pdev, pos + PCI_SRIOV_VF_DID,
--				     &vf_id);
--		vfdev = pci_get_device(pdev->vendor, vf_id, NULL);
--		while (vfdev) {
--			if (vfdev->is_virtfn && vfdev->physfn == pdev)
--				pci_restore_msi_state(vfdev);
--			vfdev = pci_get_device(pdev->vendor, vf_id,
--					       vfdev);
--		}
--	}
-+	ice_for_each_vf(pf, bkt, vf)
-+		pci_restore_msi_state(vf->vfdev);
- }
-diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.h b/drivers/net/ethernet/intel/ice/ice_sriov.h
-index 346cb2666f3a..06829443d540 100644
---- a/drivers/net/ethernet/intel/ice/ice_sriov.h
-+++ b/drivers/net/ethernet/intel/ice/ice_sriov.h
-@@ -33,7 +33,7 @@ int
- ice_get_vf_cfg(struct net_device *netdev, int vf_id, struct ifla_vf_info *ivi);
- 
- void ice_free_vfs(struct ice_pf *pf);
--void ice_restore_all_vfs_msi_state(struct pci_dev *pdev);
-+void ice_restore_all_vfs_msi_state(struct ice_pf *pf);
- 
- int
- ice_set_vf_port_vlan(struct net_device *netdev, int vf_id, u16 vlan_id, u8 qos,
-@@ -67,7 +67,7 @@ static inline
- void ice_vf_lan_overflow_event(struct ice_pf *pf, struct ice_rq_event_info *event) { }
- static inline void ice_print_vfs_mdd_events(struct ice_pf *pf) { }
- static inline void ice_print_vf_rx_mdd_event(struct ice_vf *vf) { }
--static inline void ice_restore_all_vfs_msi_state(struct pci_dev *pdev) { }
-+static inline void ice_restore_all_vfs_msi_state(struct ice_pf *pf) { }
- 
- static inline int
- ice_sriov_configure(struct pci_dev __always_unused *pdev,
-diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.c b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-index 24e4f4d897b6..aca1f2ea5034 100644
---- a/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-@@ -56,6 +56,8 @@ static void ice_release_vf(struct kref *ref)
- {
- 	struct ice_vf *vf = container_of(ref, struct ice_vf, refcnt);
- 
-+	pci_dev_put(vf->vfdev);
-+
- 	vf->vf_ops->free(vf);
- }
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.h b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
-index 31a082e8a827..628396aa4a04 100644
---- a/drivers/net/ethernet/intel/ice/ice_vf_lib.h
-+++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
-@@ -82,7 +82,7 @@ struct ice_vf {
- 	struct rcu_head rcu;
- 	struct kref refcnt;
- 	struct ice_pf *pf;
--
-+	struct pci_dev *vfdev;
- 	/* Used during virtchnl message handling and NDO ops against the VF
- 	 * that will trigger a VFR
- 	 */
--- 
-2.38.1
-
----------------------------------------------------------------------
-Intel Technology Poland sp. z o.o.
-ul. Slowackiego 173 | 80-298 Gdansk | Sad Rejonowy Gdansk Polnoc | VII Wydzial Gospodarczy Krajowego Rejestru Sadowego - KRS 101882 | NIP 957-07-52-316 | Kapital zakladowy 200.000 PLN.
-Spolka oswiadcza, ze posiada status duzego przedsiebiorcy w rozumieniu ustawy z dnia 8 marca 2013 r. o przeciwdzialaniu nadmiernym opoznieniom w transakcjach handlowych.
-
-Ta wiadomosc wraz z zalacznikami jest przeznaczona dla okreslonego adresata i moze zawierac informacje poufne. W razie przypadkowego otrzymania tej wiadomosci, prosimy o powiadomienie nadawcy oraz trwale jej usuniecie; jakiekolwiek przegladanie lub rozpowszechnianie jest zabronione.
-This e-mail and any attachments may contain confidential material for the sole use of the intended recipient(s). If you are not the intended recipient, please contact the sender and delete all copies; any review or distribution by others is strictly prohibited.
-
+There is coverage for the chain binding feature in our tests
+infrastructure, but unfortunately the bug did not trigger with newer
+nftables versions. In the future, I will keep an eye with running our
+tests on older userspace nftables versions when working on stable
+trees.
 
