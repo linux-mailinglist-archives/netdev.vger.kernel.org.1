@@ -1,138 +1,246 @@
-Return-Path: <netdev+bounces-33379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AD5C79DA3B
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 22:48:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EDCB79DA3F
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 22:49:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D997281E22
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 20:48:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C7D71C20CF5
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 20:49:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A209EAD49;
-	Tue, 12 Sep 2023 20:48:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01C3BAD55;
+	Tue, 12 Sep 2023 20:49:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 965779470
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 20:48:23 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5108E64
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 13:48:22 -0700 (PDT)
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38CKcZjP012289;
-	Tue, 12 Sep 2023 20:48:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=oOSKy2fXEKU4kke+jvAtbOQZHSrsPXPADKhFi8+T9dU=;
- b=TGymTd1uDwUMxJEqfI4YHsHCNkHsAV7VVKBPKaHSnPB/sU+1DkWZhTksZnmR8ChH8wVx
- WN+AU6akFkCGEXSAVNi6uzOs034MxMndMXeOam6DHZqqLKizFCVWwHO1vAlwjbqzcBAr
- Qm169hnWHclxKfa/7ZYKTVHtKc0LpoCLhUxETDr7wSLY7gGoKd4usxmIgWJ4BFl/jO1y
- KFovB98w/ZOrtRSIrpP5H4+uxpIL1jirQhb2Icv2+B+9UVJlImQpNkEac5HkJ8zHZ8Cy
- bSQqqHMD0YPineJVcv+qAE0MPIOElATYllTNAnpxOZcvWU3O52T0wo9L5AfokRoX8lp8 Xw== 
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t2x2j25b2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 12 Sep 2023 20:48:18 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38CJegF8024080;
-	Tue, 12 Sep 2023 20:48:17 GMT
-Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3t131t6f79-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 12 Sep 2023 20:48:17 +0000
-Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
-	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38CKmGGE5964484
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 12 Sep 2023 20:48:16 GMT
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 76A0458059;
-	Tue, 12 Sep 2023 20:48:16 +0000 (GMT)
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1644158055;
-	Tue, 12 Sep 2023 20:48:16 +0000 (GMT)
-Received: from [9.61.27.31] (unknown [9.61.27.31])
-	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTPS;
-	Tue, 12 Sep 2023 20:48:15 +0000 (GMT)
-Message-ID: <331b81ab-7a19-0055-088f-d2f595c26303@linux.vnet.ibm.com>
-Date: Tue, 12 Sep 2023 13:48:15 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1E5A8F4B
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 20:49:04 +0000 (UTC)
+Received: from mail-vs1-xe32.google.com (mail-vs1-xe32.google.com [IPv6:2607:f8b0:4864:20::e32])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B833199
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 13:49:04 -0700 (PDT)
+Received: by mail-vs1-xe32.google.com with SMTP id ada2fe7eead31-45088c95591so2895437137.3
+        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 13:49:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694551743; x=1695156543; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vqUoNDg8mtKfTCDS6D7uwoNxyp9g9WwIHoet9NtlqA8=;
+        b=bIB5i1Va3aKxTVI5uhXPmyntuv0jm8zY6NOrxF6A08gf9mvkOlp6NJ5rRbXpAEYpB/
+         voVN1x26r9zrAMhUmib7WX0SsQvM8sutGukbu9iEPtjNo4EWDzxhVTcqH45lzpAO2Dm4
+         oUgT4LKFPPU3kJ4l+LtxovuC6mg4dus4corki/LUmjtxL3PwqdIOVwPOG5d1SAuZBAIH
+         NLL/Mo9Svc/xLZ60NH6+XG//tPDLvuzujq5Z0MXY8wqtQfciS/zcVqPCgxXNLZNgnQKI
+         TXjluqNlQ+blfRtxzcxvw7zyaaIX/91m6i4/XCnaVuc053/mAUTRcxg51/RlrIByUuqB
+         Yx8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694551743; x=1695156543;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vqUoNDg8mtKfTCDS6D7uwoNxyp9g9WwIHoet9NtlqA8=;
+        b=tWHCMj+tJHETsS3jnoHJCEMmptOWDOrMoK9qB8qBwU2x2iFI4A6dEY5Ez5lAZmVqL9
+         RIsXREwJ4h3HLRXPEDZgQBufWQQq2OEp9ljC289Kea9KoLGQbRU6pW/cO+KClIOPxvJE
+         l/x1xUE4Ykcojr4yduhIOvmc0MUWkklBfTTEv8LsDX1eytgPBldkAN8Z0qTg2fMqIvjr
+         PpR9WDwtI0THpb7ioFsPuAvFlaV4ufj9W0viKEInNll/h0k7FdL1IKDft7fC/cj5e9iG
+         Qu7uSQcC4lFsLLf9nCCynn3ETvzbFKXJ+0pA+7vUQZSnXwldJOxTcaAYYMzRmlJOp7Nc
+         HA2Q==
+X-Gm-Message-State: AOJu0YwLFWBDWSr6aGt3/wQTFZLBdx4X1aR6OjjG47NNpfS0kma6pZvf
+	fOdMENVPUoi5hEYscmMFx34TtJSv5eNqbACf7ieXVTvy
+X-Google-Smtp-Source: AGHT+IFm+Ezo9mIZ5fne0lPyQiF06l6mTsKBYvpJdKaADXts68Z3LzvDT2LRfl88qFZxnxbxAGX0h6nOcqswCDRr3JU=
+X-Received: by 2002:a67:e35a:0:b0:44d:482a:5444 with SMTP id
+ s26-20020a67e35a000000b0044d482a5444mr555171vsm.21.1694551743041; Tue, 12 Sep
+ 2023 13:49:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.0
-Subject: Re: [PATCH] ionic: fix 16bit math issue when PAGE_SIZE >= 64KB
-Content-Language: en-US
-To: Jacob Keller <jacob.e.keller@intel.com>, shannon.nelson@amd.com,
-        brett.creeley@amd.com, drivers@pensando.io
-Cc: netdev@vger.kernel.org
-References: <20230911222212.103406-1-drc@linux.vnet.ibm.com>
- <943d2f39-b933-b77e-fb18-4c695c1c4bf8@intel.com>
-From: David Christensen <drc@linux.vnet.ibm.com>
-In-Reply-To: <943d2f39-b933-b77e-fb18-4c695c1c4bf8@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: CviwL6cztTYgKMeZd1KcyFUGGO5s1d_u
-X-Proofpoint-ORIG-GUID: CviwL6cztTYgKMeZd1KcyFUGGO5s1d_u
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-09-12_19,2023-09-05_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 clxscore=1011
- phishscore=0 lowpriorityscore=0 priorityscore=1501 impostorscore=0
- bulkscore=0 mlxscore=0 suspectscore=0 spamscore=0 mlxlogscore=999
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2308100000 definitions=main-2309120174
+References: <20230912013332.2048422-1-jrife@google.com> <65006891779ed_25e754294b8@willemb.c.googlers.com.notmuch>
+ <1ca3ca8a-6185-bc55-de74-53991ffc6f91@iogearbox.net> <CADKFtnTOD2+7B5tH8YMHEnxubiG+Cs+t8EhTft+q51YwxjW9xw@mail.gmail.com>
+ <CAF=yD-KKGYhKjxio9om1rz7pPe1uiRgODuXWvoLqrGrRbtWNkA@mail.gmail.com> <CADKFtnSgBZcpYBYRwr6WgnS6j9xH+U0W7bxSqt9ge5aumu4QQg@mail.gmail.com>
+In-Reply-To: <CADKFtnSgBZcpYBYRwr6WgnS6j9xH+U0W7bxSqt9ge5aumu4QQg@mail.gmail.com>
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Tue, 12 Sep 2023 16:48:25 -0400
+Message-ID: <CAF=yD-JW+Gs+EeJk2jknU6ZL0prjRO41Q3EpVTOTpTD8sEOh6A@mail.gmail.com>
+Subject: Re: [PATCH net] net: prevent address overwrite in connect() and sendmsg()
+To: Jordan Rife <jrife@google.com>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, davem@davemloft.net, 
+	Eric Dumazet <edumazet@google.com>, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, dborkman@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Sep 12, 2023 at 4:07=E2=80=AFPM Jordan Rife <jrife@google.com> wrot=
+e:
+>
+> > Ideally these all would use the proper kernel-internal APIs.
+> > I care less about new code. If all examples are clear, that will do the=
+ right thing, or is a simple fix-up worst case.
+>
+> Fair enough.
+>
+> > The changes do seem like trivial one liners?
+>
+> Looks like it. Still, it's going to take some time to patch+test each
+> of these. I'll start with NFS (SUNRPC), SMB, and Ceph, since I can
+> easily test them.
+>
+> > Question is if changing all these callers is suitable for a patch targe=
+ting net.
+> One patch to net will be needed to add an address copy to
+> kernel_sendmsg(), but I guess I'll need to send some other patches to
+> the appropriate subsystem maintainers for SUNRPC, SMB, and Ceph to
+> swap out calls.
+
+If we take this path, it could be a single patch. The subsystem
+maintainers should be CC:ed so that they can (N)ACK it.
+
+But I do not mean to ask to split it up and test each one separately.
+
+The change from sock->ops->connect to kernel_connect is certainly
+trivial enough that compile testing should suffice.
+
+Note that kernel_connect actually uses READ_ONCE(sock->ops) because of
+a data race. All callers that call a socket that may be subject to
+IPV6_ADDRFORM should do that. Likely some of those open coded examples
+are affected, and do not. This is another example why using a single
+interface is preferable.
+
+> > Similarly, this could call kernel_sendmsg, and the extra copy handled i=
+n that wrapper.
+>
+> Would it make more sense to do the address copy in sock_sendmsg()
+> instead? Are kernel callers "supposed" to use kernel_sendmsg() or is
+> it valid for them to use sock_sendmsg() as many of them seem to want
+> to do today. Seeing as sock_sendmsg() is called by kernel_sendmsg(),
+> adding the copy in sock_sendmsg() fixes this problem for callers to
+> both of these and avoids the need for patching all modules that call
+> sock_sendmsg().
+
+I think it is "supposed" to be the API for these cases. But as you
+show, clearly it isn't today. Practice trumps theory.
+
+The only question is whether we should pursue your original patch and
+accept that this will continue, or one that improves the situation,
+but touches more files and thus has a higher risk of merge conflicts.
+
+I'd like to give others some time to chime in. I've given my opinion,
+but it's only one.
 
 
 
-On 9/11/23 5:14 PM, Jacob Keller wrote:
-> 
-> 
-> On 9/11/2023 3:22 PM, David Christensen wrote:
->> The function ionic_rx_fill() uses 16bit math when calculating the
->> the number of pages required for an RX descriptor given an interface
->> MTU setting. If the system PAGE_SIZE >= 64KB, the frag_len and
->> remain_len values will always be 0, causing unnecessary scatter-
->> gather elements to be assigned to the RX descriptor, up to the
->> maximum number of scatter-gather elements per descriptor.
->>
->> A similar change in ionic_rx_frags() is implemented for symmetry,
->> but has not been observed as an issue since scatter-gather
->> elements are not necessary for such larger page sizes.
->>
->> Fixes: 4b0a7539a372 ("ionic: implement Rx page reuse")
->> Signed-off-by: David Christensen <drc@linux.vnet.ibm.com>
->> ---
-> 
-> Given this is a bug fix, it should probably have a subject of [PATCH
-> net] or [net] to indicate its targeting the net tree.
-
-Will resend v2 with updated Subject line.
-
-> 
-> I'm not sure I follow the logic for frag_len and remain_len always being
-> zero, since typecasting unsigned values truncates the higher bytes
-> (technically its guaranteed by the standard to result in the smallest
-> value congruent modulo 2^16 for a 16bit typecast), so if page_offset was
-> non-zero then the resulting with the typecast should be as well.. but
-> either way its definitely not going to work as desired.
-
-Sorry, tried condensing the explanation too much. I'm not sure how 
-frequently buf_info->page_offset is non-zero, but when 
-ionic_rx_page_alloc() allocates a new page, as happens during initial 
-driver load, it explicitly sets buf_info->page_offset to 0.  As a 
-result, the remain_len value never decreases from the original frame 
-size (e.g. 1522) while frag_len is always calculated as 0 ((min_t(u16, 
-0x5F2, (0x1_0000 - 0) -> 0).
-
-I'll update the the description in v2.
-
-Dave
+> -Jordan
+>
+> On Tue, Sep 12, 2023 at 12:36=E2=80=AFPM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
+> >
+> > On Tue, Sep 12, 2023 at 2:31=E2=80=AFPM Jordan Rife <jrife@google.com> =
+wrote:
+> > >
+> > > > These should probably call kernel_connect instead.
+> > > > Similarly, this could call kernel_sendmsg, and the extra copy handl=
+ed in that wrapper.
+> > >
+> > > I was considering this approach initially, but one concern I had was
+> > > that there are other instances I see of modules calling ops->connect(=
+)
+> > > directly (bypassing kernel_connect()):
+> > >
+> > > - net/netfilter/ipvs/ip_vs_sync.c: make_send_sock()
+> > > - drivers/block/drbd/drbd_receiver.c: drbd_try_connect()
+> > > - drivers/infiniband/hw/erdma/erdma_cm.c: kernel_bindconnect()
+> > > - drivers/infiniband/sw/siw/siw_cm.c: kernel_bindconnect()
+> > > - fs/ocfs2/cluster/tcp.c: o2net_start_connect()
+> > > - net/rds/tcp_connect.c: rds_tcp_conn_path_connect()
+> > >
+> > > and ops->sendmsg():
+> > >
+> > > - net/smc/af_smc.c: smc_sendmsg()
+> > > - drivers/vhost/net.c: vhost_tx_batch(), handle_tx_copy(), handle_tx_=
+zerocopy()
+> > > - drivers/target/iscsi/iscsi_target_util.c: iscsit_fe_sendpage_sg()
+> > >
+> > > which (at least in theory) leaves them open to the same problem I'm
+> > > seeing with NFS/SMB right now. I worry that even if all these
+> > > instances were swapped out with kernel_sendmsg() and kernel_connect()=
+,
+> > > it would turn into a game of whac-a-mole in the future as new changes
+> > > or new modules may reintroduce direct calls to sock->ops->connect() o=
+r
+> > > sock->ops->sendmsg().
+> >
+> > Ideally these all would use the proper kernel-internal APIs.
+> >
+> > I care less about new code. If all examples are clear, that
+> > will do the right thing, or is a simple fix-up worst case.
+> >
+> > Question is if changing all these callers is suitable for a patch
+> > targeting net.
+> >
+> > The changes do seem like trivial one liners?
+> >
+> > > -Jordan
+> > >
+> > >
+> > >
+> > > On Tue, Sep 12, 2023 at 7:22=E2=80=AFAM Daniel Borkmann <daniel@iogea=
+rbox.net> wrote:
+> > > >
+> > > > On 9/12/23 3:33 PM, Willem de Bruijn wrote:
+> > > > > Jordan Rife wrote:
+> > > > >> commit 0bdf399342c5 ("net: Avoid address overwrite in kernel_con=
+nect")
+> > > > >> ensured that kernel_connect() will not overwrite the address par=
+ameter
+> > > > >> in cases where BPF connect hooks perform an address rewrite. How=
+ever,
+> > > > >> there remain other cases where BPF hooks can overwrite an addres=
+s held
+> > > > >> by a kernel client.
+> > > > >>
+> > > > >> =3D=3DScenarios Tested=3D=3D
+> > > > >>
+> > > > >> * Code in the SMB and Ceph modules calls sock->ops->connect() di=
+rectly,
+> > > > >>    allowing the address overwrite to occur. In the case of SMB, =
+this can
+> > > > >>    lead to broken mounts.
+> > > > >
+> > > > > These should probably call kernel_connect instead.
+> > > > >
+> > > > >> * NFS v3 mounts with proto=3Dudp call sock_sendmsg() for each RP=
+C call,
+> > > > >>    passing a pointer to the mount address in msg->msg_name which=
+ is
+> > > > >>    later overwritten by a BPF sendmsg hook. This can lead to bro=
+ken NFS
+> > > > >>    mounts.
+> > > > >
+> > > > > Similarly, this could call kernel_sendmsg, and the extra copy han=
+dled
+> > > > > in that wrapper. The arguments are not exacty the same, so not 10=
+0%
+> > > > > this is feasible.
+> > > > >
+> > > > > But it's preferable if in-kernel callers use the kernel_.. API ra=
+ther
+> > > > > than bypass it. Exactly for issues like the one you report.
+> > > >
+> > > > Fully agree, if it's feasible it would be better to convert them ov=
+er to
+> > > > in-kernel API.
+> > > >
+> > > > >> In order to more comprehensively fix this class of problems, thi=
+s patch
+> > > > >> pushes the address copy deeper into the stack and introduces an =
+address
+> > > > >> copy to both udp_sendmsg() and udpv6_sendmsg() to insulate all c=
+allers
+> > > > >> from address rewrites.
+> > > > >>
+> > > > >> Signed-off-by: Jordan Rife <jrife@google.com>
 
