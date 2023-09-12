@@ -1,189 +1,102 @@
-Return-Path: <netdev+bounces-33112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F69579CBCA
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 11:30:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93EF079CBCF
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 11:30:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65F791C20AB7
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 09:30:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C50D28171C
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 09:30:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D279F16428;
-	Tue, 12 Sep 2023 09:30:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7835416428;
+	Tue, 12 Sep 2023 09:30:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C433514F84
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 09:30:26 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14553AA
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 02:30:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694511026; x=1726047026;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=az/P5VcS7y6RnLURzuxIdD/CGde1PcjrEtLTetl36xE=;
-  b=cvIKWARDDHcxwuWVhPl3/bzTMF1EG3MAYCOqjwbWm08fgYxsN8PIwH27
-   EvpMMYJGQrvAb6jLrvPlTWG3n/kItA7/aiqqsgsH5AT2DNcC9fhJU3jNd
-   H1AevEUTGICa1CgSPj/judANbG7KQIk/Lc361+mJEQDU+oi4QSn/mJuzR
-   vZrTIqNZ+7T/VVZsfMJ559LfMeHjV5W4x0draQy7W1Vsveba+tytpLSxT
-   naj9Sllxvw2CNUgOcc+esoEhIGWDKncGUseU0vjR01j4fgDoNZb7JAGql
-   qcEGghjfy8BJq8Sp1mo7mnbJ0C3sn3AXFQHRCGdDlHNn9o1tw5lL1snc5
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10830"; a="375655200"
-X-IronPort-AV: E=Sophos;i="6.02,245,1688454000"; 
-   d="scan'208";a="375655200"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2023 02:29:56 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10830"; a="809170420"
-X-IronPort-AV: E=Sophos;i="6.02,245,1688454000"; 
-   d="scan'208";a="809170420"
-Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
-  by fmsmga008.fm.intel.com with ESMTP; 12 Sep 2023 02:29:55 -0700
-From: Andrii Staikov <andrii.staikov@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Andrii Staikov <andrii.staikov@intel.com>
-Subject: [PATCH iwl-next  v2] ice: Add support for packet mirroring using hardware in switchdev mode
-Date: Tue, 12 Sep 2023 11:29:52 +0200
-Message-Id: <20230912092952.2814966-1-andrii.staikov@intel.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BFDE168A6
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 09:30:29 +0000 (UTC)
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EE18AA;
+	Tue, 12 Sep 2023 02:30:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=66b1dQizWW+fC+qmJ4SM+GQt1e88uQ9iq/5zT3+gwsg=;
+	t=1694511029; x=1695720629; b=VoDvG1EvU00rHRt+YnhGzMFmb2Y11gXcqsejiqev8loU+dv
+	nLr2b94EH9jKDpEbXKBwsafqRKDFLbBsxbKo3HvlXsB7dv9jeUUeygnnQfWeDywO0xCedoLh6wIxw
+	CWYdNy4Ctq9v3Xmidi44qke8GDWK9OD+2TQBog+nUkEDxmFfZaE3CRi+rB3i4DNnXYSonz7Zn78YT
+	DoVoBnmVNxTW7uKV4fC38Vd3TbDqJXEdrlA33SBf+0D1dhM6XOb7ikxUrnxQBNbvFzBDw3a3b2hMK
+	Ldo0FSMvfUQOa/SeFn9ocUIFl30vYF/EvhgnbwaksfVWQ+RlTCWqVAZMCBeRq0zw==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1qfzit-00CWw1-1f;
+	Tue, 12 Sep 2023 11:30:19 +0200
+Message-ID: <2fcc9fb0e40ceff8ea4ae55cca3ce0aff75a20ca.camel@sipsolutions.net>
+Subject: Re: [REGRESSION] [PATCH net-next v5 2/2] net: stmmac: use per-queue
+ 64 bit statistics where necessary
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>, 
+	Lucas Stach <l.stach@pengutronix.de>, Jisheng Zhang <jszhang@kernel.org>
+Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>, Eric Dumazet
+ <edumazet@google.com>, Samuel Holland <samuel@sholland.org>, 
+ netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, Alexandre
+ Torgue <alexandre.torgue@foss.st.com>, Jernej Skrabec
+ <jernej.skrabec@gmail.com>,  linux-kernel@vger.kernel.org, Chen-Yu Tsai
+ <wens@csie.org>, Jose Abreu <joabreu@synopsys.com>, kernel@pengutronix.de,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-sunxi@lists.linux.dev,  linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org
+Date: Tue, 12 Sep 2023 11:30:14 +0200
+In-Reply-To: <20230912092411.pprnpvrbxwz77x6a@pengutronix.de>
+References: <20230717160630.1892-1-jszhang@kernel.org>
+	 <20230717160630.1892-3-jszhang@kernel.org>
+	 <20230911171102.cwieugrpthm7ywbm@pengutronix.de> <ZQAa3277GC4c9W1D@xhacker>
+	 <99695befef06b025de2c457ea5f861aa81a0883c.camel@pengutronix.de>
+	 <20230912092411.pprnpvrbxwz77x6a@pengutronix.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-malware-bazaar: not-scanned
 
-Switchdev mode allows to add mirroring rules to mirror
-incoming and outgoing packets to the interface's port
-representor. Previously, this was available only using
-software functionality. Add possibility to offload this
-functionality to the NIC hardware.
+On Tue, 2023-09-12 at 11:24 +0200, Uwe Kleine-K=C3=B6nig wrote:
+> >=20
+> > The newly added "struct u64_stats_sync syncp" uses a seqlock
+> > internally, which is broken into multiple words on 32bit machines, and
+> > needs to be initialized properly. You need to call u64_stats_init on
+> > syncp before first usage.
+>=20
+> This is done. The problematic thing is that in stmmac_open() ->
+> __stmmac_open() the syncp initialized before is overwritten by
+>=20
+> 	memcpy(&priv->dma_conf, dma_conf, sizeof(*dma_conf));
+>=20
+> Do I need to point out that this is ugly?
 
-Introduce ICE_MIRROR_PACKET filter action to the
-ice_sw_fwd_act_type enum to identify the desired action
-and pass it to the hardware as well as the VSI to mirror.
+I think it also leaks the (lockdep) state since it reinits the syncp
+(and a lot of other state) doing this. This is also called when the MTU
+changes.
 
-Example of tc mirror command using hardware:
-tc filter add dev ens1f0np0 ingress protocol ip prio 1 flower
-src_mac b4:96:91:a5:c7:a7 skip_sw action mirred egress mirror dev eth1
+Also, I couldn't convince myself that it's even race-free? Even if it
+is, it's not really obvious, IMHO.
 
-ens1f0np0 - PF
-b4:96:91:a5:c7:a7 - source MAC address
-eth1 - PR of a VF to mirror to
+So it seems to me that really this needs to be split into data that
+actually should be reinitialized, and data that shouldn't, or just not
+use memcpy() here but copy only the relevant state?
 
-Signed-off-by: Andrii Staikov <andrii.staikov@intel.com>
----
-v1 -> v2: no need for changes in ice_add_tc_flower_adv_fltr()
----
- drivers/net/ethernet/intel/ice/ice_switch.c | 25 +++++++++++++++------
- drivers/net/ethernet/intel/ice/ice_tc_lib.c | 13 +++++++++++
- drivers/net/ethernet/intel/ice/ice_type.h   |  1 +
- 3 files changed, 32 insertions(+), 7 deletions(-)
+But anyway, I have no skin in this game - just reviewing this because I
+was trying to help out Uwe.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c b/drivers/net/ethernet/intel/ice/ice_switch.c
-index 2f77b684ff76..d915b72e8dbb 100644
---- a/drivers/net/ethernet/intel/ice/ice_switch.c
-+++ b/drivers/net/ethernet/intel/ice/ice_switch.c
-@@ -6100,6 +6100,7 @@ ice_add_adv_rule(struct ice_hw *hw, struct ice_adv_lkup_elem *lkups,
- 	      rinfo->sw_act.fltr_act == ICE_FWD_TO_Q ||
- 	      rinfo->sw_act.fltr_act == ICE_FWD_TO_QGRP ||
- 	      rinfo->sw_act.fltr_act == ICE_DROP_PACKET ||
-+	      rinfo->sw_act.fltr_act == ICE_MIRROR_PACKET ||
- 	      rinfo->sw_act.fltr_act == ICE_NOP)) {
- 		status = -EIO;
- 		goto free_pkt_profile;
-@@ -6112,9 +6113,11 @@ ice_add_adv_rule(struct ice_hw *hw, struct ice_adv_lkup_elem *lkups,
- 	}
- 
- 	if (rinfo->sw_act.fltr_act == ICE_FWD_TO_VSI ||
--	    rinfo->sw_act.fltr_act == ICE_NOP)
-+	    rinfo->sw_act.fltr_act == ICE_MIRROR_PACKET ||
-+	    rinfo->sw_act.fltr_act == ICE_NOP) {
- 		rinfo->sw_act.fwd_id.hw_vsi_id =
- 			ice_get_hw_vsi_num(hw, vsi_handle);
-+	}
- 
- 	if (rinfo->src_vsi)
- 		rinfo->sw_act.src = ice_get_hw_vsi_num(hw, rinfo->src_vsi);
-@@ -6150,12 +6153,15 @@ ice_add_adv_rule(struct ice_hw *hw, struct ice_adv_lkup_elem *lkups,
- 		status = -ENOMEM;
- 		goto free_pkt_profile;
- 	}
--	if (!rinfo->flags_info.act_valid) {
--		act |= ICE_SINGLE_ACT_LAN_ENABLE;
--		act |= ICE_SINGLE_ACT_LB_ENABLE;
--	} else {
--		act |= rinfo->flags_info.act & (ICE_SINGLE_ACT_LAN_ENABLE |
--						ICE_SINGLE_ACT_LB_ENABLE);
-+
-+	if (rinfo->sw_act.fltr_act != ICE_MIRROR_PACKET) {
-+		if (!rinfo->flags_info.act_valid) {
-+			act |= ICE_SINGLE_ACT_LAN_ENABLE;
-+			act |= ICE_SINGLE_ACT_LB_ENABLE;
-+		} else {
-+			act |= rinfo->flags_info.act & (ICE_SINGLE_ACT_LAN_ENABLE |
-+							ICE_SINGLE_ACT_LB_ENABLE);
-+		}
- 	}
- 
- 	switch (rinfo->sw_act.fltr_act) {
-@@ -6182,6 +6188,11 @@ ice_add_adv_rule(struct ice_hw *hw, struct ice_adv_lkup_elem *lkups,
- 		act |= ICE_SINGLE_ACT_VSI_FORWARDING | ICE_SINGLE_ACT_DROP |
- 		       ICE_SINGLE_ACT_VALID_BIT;
- 		break;
-+	case ICE_MIRROR_PACKET:
-+		act |= ICE_SINGLE_ACT_OTHER_ACTS;
-+		act |= (rinfo->sw_act.fwd_id.hw_vsi_id << ICE_SINGLE_ACT_MIRROR_VSI_ID_S) &
-+		       ICE_SINGLE_ACT_MIRROR_VSI_ID_M;
-+		break;
- 	case ICE_NOP:
- 		act |= FIELD_PREP(ICE_SINGLE_ACT_VSI_ID_M,
- 				  rinfo->sw_act.fwd_id.hw_vsi_id);
-diff --git a/drivers/net/ethernet/intel/ice/ice_tc_lib.c b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-index 37b54db91df2..db34df1890f7 100644
---- a/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-@@ -659,6 +659,19 @@ ice_eswitch_tc_parse_action(struct ice_tc_flower_fltr *fltr,
- 
- 		break;
- 
-+	case FLOW_ACTION_MIRRED:
-+		fltr->action.fltr_act = ICE_MIRROR_PACKET;
-+
-+		if (ice_is_port_repr_netdev(act->dev)) {
-+			repr = ice_netdev_to_repr(act->dev);
-+
-+			fltr->dest_vsi = repr->src_vsi;
-+		} else {
-+			NL_SET_ERR_MSG_MOD(fltr->extack, "Provided netdevice doesn't support mirroring");
-+			return -EINVAL;
-+		}
-+		break;
-+
- 	default:
- 		NL_SET_ERR_MSG_MOD(fltr->extack, "Unsupported action in switchdev mode");
- 		return -EINVAL;
-diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
-index 02db9e5810e6..f5c35dc8766f 100644
---- a/drivers/net/ethernet/intel/ice/ice_type.h
-+++ b/drivers/net/ethernet/intel/ice/ice_type.h
-@@ -1047,6 +1047,7 @@ enum ice_sw_fwd_act_type {
- 	ICE_FWD_TO_Q,
- 	ICE_FWD_TO_QGRP,
- 	ICE_DROP_PACKET,
-+	ICE_MIRROR_PACKET,
- 	ICE_NOP,
- 	ICE_INVAL_ACT
- };
--- 
-2.25.1
-
+johannes
 
