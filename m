@@ -1,111 +1,157 @@
-Return-Path: <netdev+bounces-33127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89D4B79CC6F
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 11:52:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71E8879C99F
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 10:18:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B90BC1C20DBC
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 09:52:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A7391C20AC4
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 08:18:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1D05168C3;
-	Tue, 12 Sep 2023 09:52:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0C5A1773D;
+	Tue, 12 Sep 2023 08:17:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A45B115495
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 09:52:03 +0000 (UTC)
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::221])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D66DE6A;
-	Tue, 12 Sep 2023 02:52:02 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPA id 5A722240009;
-	Tue, 12 Sep 2023 09:39:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1694512320;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ScPjzuZaLLYh2lcosF7mjC3LbbKogbqWDUhQ8RkAceU=;
-	b=K+nnYXVgVTeIYLV1BYZk8yVPM7a2nPu/2JA6GWMyyv0Za8enlurHjBH7plSt2lkrUaQgFx
-	0f+eic3JBBgKxtWXmU15F2NOL2ZoHFXm8dROGgnxxRWdTKbO53xzFHJjRrH2cKPixxWiIQ
-	X0H50mqA/O7gee/qxhpcScSAQrz6oC5amb4tHHTsy3EQ30w3liig4hh60CmVmm0cSjrsOm
-	3+A4lbr4FIsGWAyRl0hBgn4ip8FNO3Untij7ggUFAU3Q5C3z+B+ux/Tq3eCFHsmlxJXwfW
-	EQItj5FZbLmxsodLOd0QDPWT6RUBUWUp7yQWKgN05HapEUcrPwoojI25LbtKJQ==
-From: Herve Codina <herve.codina@bootlin.com>
-To: Herve Codina <herve.codina@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Lee Jones <lee@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Qiang Zhao <qiang.zhao@nxp.com>,
-	Li Yang <leoyang.li@nxp.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>,
-	Shengjiu Wang <shengjiu.wang@gmail.com>,
-	Xiubo Li <Xiubo.Lee@gmail.com>,
-	Fabio Estevam <festevam@gmail.com>,
-	Nicolin Chen <nicoleotsuka@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Randy Dunlap <rdunlap@infradead.org>
-Cc: netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	alsa-devel@alsa-project.org,
-	Simon Horman <horms@kernel.org>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: [PATCH v5 07/31] dt-bindings: soc: fsl: cpm_qe: cpm1-scc-qmc: Add 'additionalProperties: false' in child nodes
-Date: Tue, 12 Sep 2023 10:14:58 +0200
-Message-ID: <20230912081527.208499-8-herve.codina@bootlin.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230912081527.208499-1-herve.codina@bootlin.com>
-References: <20230912081527.208499-1-herve.codina@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1F62154A9
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 08:17:59 +0000 (UTC)
+Received: from phobos.denx.de (phobos.denx.de [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4ECDE73;
+	Tue, 12 Sep 2023 01:17:58 -0700 (PDT)
+Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 6C25486A49;
+	Tue, 12 Sep 2023 10:17:55 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1694506676;
+	bh=DtoeluLm01NnQZKGYOEwCpPPjDcwpgfZ+EHpQIgHa3o=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=zitroCYos6925tU//kpUU62WzBI9L3cRs6GaHr8j/q4LpefEJIth0dmobbQtxY6yn
+	 VjAd3BTcJaxrM2RNV1dvA7Xz6lmIfMtHydErLVJ3baOIJGrooemB1+vvldEjv2S+y2
+	 GhBq6Kl61vNkuhSiGv8q88HspjusyW/maBE5KoCLQHYIHtjeSX4qVyT+yukdxIlsJd
+	 GhuEiYX86mt/82BTN81uMneHj+YD8sxfriccy14GT+OH5RhVtpYaFgMhSs76m0y/ma
+	 vHM4rfyLv4mxMc0OZiPfr1xKBguD1nhoVOrTisj94r590pRFUE7QqRCXaLuixw5+zf
+	 MCbuigDnNe7wg==
+Date: Tue, 12 Sep 2023 10:17:48 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Tristram.Ha@microchip.com, Eric Dumazet <edumazet@google.com>, Andrew
+ Lunn <andrew@lunn.ch>, davem@davemloft.net, Woojung Huh
+ <woojung.huh@microchip.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ Florian Fainelli <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com, Oleksij
+ Rempel <linux@rempel-privat.de>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [[RFC PATCH v4 net-next] 0/2] net: dsa: hsr: Enable HSR HW
+ offloading for KSZ9477
+Message-ID: <20230912101748.0ca4eec8@wsk>
+In-Reply-To: <20230911160501.5vc4nttz6fnww56h@skbuf>
+References: <20230906152801.921664-1-lukma@denx.de>
+	<20230911165848.0741c03c@wsk>
+	<20230911160501.5vc4nttz6fnww56h@skbuf>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+Content-Type: multipart/signed; boundary="Sig_/bwRV6NUh6F=O0WEHRBFibVB";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-Additional properties in child node should not be allowed.
+--Sig_/bwRV6NUh6F=O0WEHRBFibVB
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Prevent them adding 'additionalProperties: false'
+Hi Vladimir,
 
-Signed-off-by: Herve Codina <herve.codina@bootlin.com>
----
- .../devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml     | 1 +
- 1 file changed, 1 insertion(+)
+> On Mon, Sep 11, 2023 at 04:58:48PM +0200, Lukasz Majewski wrote:
+> > Dear Community,
+> >=20
+> > Are there any comments regarding this new revision of the HSR
+> > support for KSZ9477 switch?
+> >=20
+> > Best regards,
+> >=20
+> > Lukasz Majewski =20
+>=20
+> Yeah, the integration with the DSA master's MAC address is not quite
+> what I was expecting to see.
+>=20
+> See, both the DSA master's MAC address, as well as the HSR device's
+> MAC address, can be changed at runtime with:
+>=20
+> ip link set eth0 address AA:BB:CC:DD:EE:FF # DSA master
+> ip link set lan1 address AA:BB:CC:DD:EE:FF # indirectly changes the
+> HSR's address too
 
-diff --git a/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml b/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml
-index 450a0354cb1d..82d9beb48e00 100644
---- a/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml
-+++ b/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml
-@@ -64,6 +64,7 @@ patternProperties:
-     description:
-       A channel managed by this controller
-     type: object
-+    additionalProperties: false
- 
-     properties:
-       reg:
--- 
-2.41.0
+IMHO, somebody who will use HSR will not fiddle with mac addresses of
+LAN1 and ETH0. It will be setup by savvy user once at boot up.
 
+>=20
+> which is problematic because the hardware does not get updated in that
+> case, but the address change is not refused either.
+>=20
+> Actually, the reason why I haven't yet said anything is because it
+> made me realize that there is a pre-existing bug in net/dsa/slave.c
+> where we have this pattern:
+>=20
+> 	if (!ether_addr_equal(dev->dev_addr, master->dev_addr))
+> 		dev_uc_add(master, dev->dev_addr);
+>=20
+> but there is no replay of the dev_uc_add() call when the
+> master->dev_addr changes. This really results in RX packet loss, as I
+> have tested. I don't know what is the best way to solve it.
+>=20
+> Anyway, programming the MAC address of the DSA master or of the HSR
+> device to hardware seems to require tracking the NETDEV_CHANGEADDR and
+> NETDEV_PRE_CHANGEADDR events, even if only to reject those changes.
+
+Please correct me if I'm wrong, but the above issue (with lack of sync
+of mac address change in DSA master and its ports) seems to be
+affecting HSR support in a minimal way (when considering the above).
+
+If I may ask - what is your suggestion to have the HSR join feature
+merged for KSZ9477 SoC ?
+
+Will the above problem block the HSR offloading support mainlining,
+even when the self mac address filtering is one of four HW based
+features for this SoC?
+
+
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/bwRV6NUh6F=O0WEHRBFibVB
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmUAHqwACgkQAR8vZIA0
+zr3IyQf/brMDtjdKMvUTCOs5kkNPIHCYms3dezF4itq3jM5N47duldHVXKhZ8o9V
+oDZrpOA+5SNQz41tHOdsUNEHF8Cw1GF1nGn68UYtvVJYQ8xXiiLhQb3qUOEoxCCi
+8RaPOx+a00JekyLPgp7i3tqsCakqx5SAWjqdwWkwJzvaLnGANLeRrmdne9PPUbcI
+UfiE3jA9PO5qib7p7E8DePY4hL3iHcbfvoF/Xs9IlcByAR2V8/lEn3vpZSMpqHyC
+M6a73XyAcIl8zv+jyPCZOXxMedyzEU2h2w0VoVeeX32EvXway9zpLxE/TDvTVdvE
+PQziSTtAdi2zhLu2cMH/2GVkA60EQg==
+=EbJK
+-----END PGP SIGNATURE-----
+
+--Sig_/bwRV6NUh6F=O0WEHRBFibVB--
 
