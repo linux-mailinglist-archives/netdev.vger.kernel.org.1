@@ -1,113 +1,99 @@
-Return-Path: <netdev+bounces-33397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33398-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60E4979DBE6
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 00:32:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3208779DBE9
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 00:33:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 158B22820A0
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 22:32:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC1A21C21046
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 22:33:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DADF361;
-	Tue, 12 Sep 2023 22:32:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB48B946B;
+	Tue, 12 Sep 2023 22:33:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F6DC17C2
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 22:32:17 +0000 (UTC)
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18B5D10C8;
-	Tue, 12 Sep 2023 15:32:17 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-991c786369cso818214866b.1;
-        Tue, 12 Sep 2023 15:32:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694557935; x=1695162735; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=oHGhnV3TjdN0FnFldEVPz9KrEFKfvPykYPDqTHVGIBs=;
-        b=Trr1Il/48N2AqFH7HSNkZXISlg/q0dXCkK8hscNnv2XEnDQYx9w3kFAdKWPFr642jr
-         BTl78G87AdIDFdH7LesPfoN9YviNjzOJYO4Iz9NPG3j8G23GW1dQazQesJqeGnsymbr6
-         mHbt0V64m2Pw58gRvB0OG7r91ZuSW/2aixJqXst9TiMAAW1skJsSekSCVSUvh2/qe9Oo
-         Ji+L43q+kYrueX2rHCR1XANaK+sSpZmzpORhO40MCBym7IDM4MhPDHaBOBbVWWLFRiBL
-         oSrOMI99dpIe/RcPEYxz24F38rUuNFkmciUjITx7WAfE29tIHGWDqjQAiWvt8Au8ixmz
-         DIxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694557935; x=1695162735;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oHGhnV3TjdN0FnFldEVPz9KrEFKfvPykYPDqTHVGIBs=;
-        b=lL6TKoBXmX6YBRgw8fovimVZPs9E7KnzgtnzlP0kwxNB/RmExxo6512v5CJ79pFMPj
-         91I7Xeb+QVunkKJ0r0ElJqr+JFWoICt5qaLy/PqnSgQ9uZqyOVjtu1UyORdkFv5gQq8l
-         j/KGfZ9fA8s/z8/mp/XNqLunz7SjSt1W2eUZpDWmGdvAx8azUY91uVaVtFtrLZ8s8gsS
-         gOZ7G+y2tkKEisz4QLl0Hw1q1jn5Vz6+bo8xZ87gZy6bGtIMAiZgjn3oUEIpJ6ubnzkn
-         b+Bur8Lhd4vRSphTumagnOLUFOAm5mQWVprgjVFH0UNJbgdAE+rN3k1d9DWTC6XILlrw
-         dOZw==
-X-Gm-Message-State: AOJu0YyGY1/F5SyIhZR/FPNQsV6GIK9pS75/LFWZI1NXCUPlvvO0OROv
-	9TA1qhEQ7znXDbzp0bpKQ4Q=
-X-Google-Smtp-Source: AGHT+IFoFjvI5+2n0TYglHgn435yeXiMScCnLmeQ+gvlW6z4mDjsLd0Mij4yOQbqByz17gmPvANBNA==
-X-Received: by 2002:a17:907:763c:b0:9a9:e5bb:eddc with SMTP id jy28-20020a170907763c00b009a9e5bbeddcmr472712ejc.16.1694557935294;
-        Tue, 12 Sep 2023 15:32:15 -0700 (PDT)
-Received: from skbuf ([188.25.254.186])
-        by smtp.gmail.com with ESMTPSA id n12-20020a17090695cc00b00993928e4d1bsm7405814ejy.24.2023.09.12.15.32.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Sep 2023 15:32:15 -0700 (PDT)
-Date: Wed, 13 Sep 2023 01:32:12 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v4 2/2] net: dsa: microchip: Add drive strength
- configuration
-Message-ID: <20230912223212.5allvc62okewwcym@skbuf>
-References: <20230912045459.1864085-1-o.rempel@pengutronix.de>
- <20230912045459.1864085-1-o.rempel@pengutronix.de>
- <20230912045459.1864085-3-o.rempel@pengutronix.de>
- <20230912045459.1864085-3-o.rempel@pengutronix.de>
- <20230912113553.fselyj2v5ynddme2@skbuf>
- <35c1c9ee-357f-4ba5-dd47-95d4c064e69b@wanadoo.fr>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E543361
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 22:33:38 +0000 (UTC)
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4CFB10C8
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 15:33:37 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+	by smtp-out1.suse.de (Postfix) with ESMTP id 4C22221220
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 22:33:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1694558016; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type;
+	bh=07N8ZbZYDIOzmoE4ChCu2Vv60/7Dq8I529mdMvCQEpU=;
+	b=ZLlb4es9PsDP/rfe+lQkzvUuF0VdCPJ9o4eFPvPumV+BaZXvz4JF9BQ5hAlfgDfNiae0Of
+	2lrVoul/EMqx9aapKsDwPO3hQlnogaVrVzbua6CrMhT8Dw5Sponi08IkOTcvYj0Q8Q+OOK
+	brCfbSlvF/j1DL/0DzFVIBnRzcGtb6M=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1694558016;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:content-type:content-type;
+	bh=07N8ZbZYDIOzmoE4ChCu2Vv60/7Dq8I529mdMvCQEpU=;
+	b=NnZZIHnubfy4K2T17Lh1f+U0nFo0h/7B9zOrg2zCO5WC45sMrDUo5v/dTrZXGcVIOBMDm0
+	+8cOm7QmLhAstMAQ==
+Received: from lion.mk-sys.cz (mkubecek.udp.ovpn1.prg.suse.de [10.100.225.114])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by relay2.suse.de (Postfix) with ESMTPS id 38D972C142
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 22:33:36 +0000 (UTC)
+Received: by lion.mk-sys.cz (Postfix, from userid 1000)
+	id 1932E2016B; Wed, 13 Sep 2023 00:33:36 +0200 (CEST)
+Date: Wed, 13 Sep 2023 00:33:36 +0200
+From: Michal Kubecek <mkubecek@suse.cz>
+To: netdev@vger.kernel.org
+Subject: ethtool 6.5 released
+Message-ID: <20230912223336.zywfpavr3ln3trp3@lion.mk-sys.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="3jop7z3dzqscgx2h"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <35c1c9ee-357f-4ba5-dd47-95d4c064e69b@wanadoo.fr>
 
-On Tue, Sep 12, 2023 at 08:38:05PM +0200, Christophe JAILLET wrote:
-> Le 12/09/2023 à 13:35, Vladimir Oltean a écrit :
-> > > +	if (!found)
-> > > +		return 0;
-> > 
-> > Maybe "have_any_prop" would be a better name to avoid Christophe's confusion?
-> 
-> Not sure it worth it.
-> 
-> Christophe should learn to read code or avoid some quick feed-back before
-> morning coffee :)
-> 
-> 'found' looks good enough.
 
-Maybe I should have said "Christophe's (expressed) and my (unexpressed) confusion"?
-Actually I had no time to be confused because I saw your comment first,
-but I would have likely made the same suggestion regardless.
+--3jop7z3dzqscgx2h
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+Hello,
+
+ethtool 6.5 has been released.
+
+Home page: https://www.kernel.org/pub/software/network/ethtool/
+Download link:
+https://www.kernel.org/pub/software/network/ethtool/ethtool-6.5.tar.xz
+
+Release notes:
+	* Feature: register dump for hns3 driver (-d)
+	* Fix: fix fallback to ioctl for sset (-s)
+	* Fix: fix empty slot search in rmgr (-N)
+
+Michal
+
+--3jop7z3dzqscgx2h
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmUA5zsACgkQ538sG/LR
+dpXnQwf/dCw/Cp1gVpxdoDnUTTyunmC44L+BD83x1Rf0PvBDpC8e/XK4xiGjHyYD
++fyB6a5VghcCgsvaJ5HlMa0UYtEU81Wpz57LMBC+s9Whvh8iqlvK06MzSx8ulKQ0
+zIrk2mIrHUVdpUsvSroUmshob/l02Sr2Sr244wpTEyDdeDW76j5v5jsxAoNyWvUG
+l0+ERnIn0n075NuQaQ9H9qq5+v4hm7aZktFQHJzjK044qXzJH8kvsf50IUBdD4GQ
+1IJIcf7xxsB0RAQssThu2YrfFDtcRoqiNc3kdc49bMbG7s9Ip7JewMwyqhj9Teyg
+cId4SExxQlPagpgIcIiOzhkY8Yukng==
+=80Bx
+-----END PGP SIGNATURE-----
+
+--3jop7z3dzqscgx2h--
 
