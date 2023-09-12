@@ -1,123 +1,92 @@
-Return-Path: <netdev+bounces-33072-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92C1779CA2A
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 10:37:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 250C979C9DB
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 10:26:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C917281C96
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 08:37:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FA83281705
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 08:26:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3D091843;
-	Tue, 12 Sep 2023 08:35:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A50E1774B;
+	Tue, 12 Sep 2023 08:26:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F5617EF;
-	Tue, 12 Sep 2023 08:35:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61821C433C9;
-	Tue, 12 Sep 2023 08:35:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15786E54B
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 08:26:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18B33C433C8;
+	Tue, 12 Sep 2023 08:26:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694507713;
-	bh=kNlewa3yEJmphIOpPB7B1g/AA9EWzeGvAITRxrDFzeY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nmKX93rdLncAS3a8Dk1FhPWhoocfn4ar1ps2ikGOwfciw1WvSW7sad6fCbg7Udkj6
-	 mDh/BkMpWlM/MJoNccj56NmfW5U/fgYCZUEcTENrTBgBtit4VzGzGUuIZ5v0z8ObHy
-	 Ghl5o7iMB3VZYL+ZLUryR4pWDYStnRfnD1TdHpNar+6RVcvwNE6otgpB8IRrX2ZZdU
-	 lkKXKg/KPrvq+URXpujmKkgsyF+TdMFBPWa2nmfOAbQhMmnIl7j8y7zzI8JGuc/Bys
-	 In2DcClRuRJWvu5AwhmjHWUWRgj063x1ORkXZ/4r5QI9idygD6anZdz4V8VW7OLSQa
-	 //7qtQWczNnQg==
-Date: Tue, 12 Sep 2023 16:23:16 +0800
-From: Jisheng Zhang <jszhang@kernel.org>
-To: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-sunxi@lists.linux.dev, kernel@pengutronix.de
-Subject: Re: [REGRESSION] [PATCH net-next v5 2/2] net: stmmac: use per-queue
- 64 bit statistics where necessary
-Message-ID: <ZQAf9ArWfRkY/yPR@xhacker>
-References: <20230717160630.1892-1-jszhang@kernel.org>
- <20230717160630.1892-3-jszhang@kernel.org>
- <20230911171102.cwieugrpthm7ywbm@pengutronix.de>
+	s=k20201202; t=1694507197;
+	bh=w6mkmT4o+VVd0a/iR68vRz/nzAF+BMxy6VTKdAws6b0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=pQIxE33Fl4/7Aw26ULpRgTvEJQIKWqhWfeIoMUR5adsYKTa7b905cbqB00qKteXAz
+	 42KDgskDJFywD+y6HftX2xPPG/F7ktXmxPj+/XRynZ65k2c5XZkBeNOlLkSNRb2MGu
+	 ESpdE+E3+zxpVgUXb4+tfJAk6QtWssTu101wOVJys5mGzigLV2byPK4W2bIoxXPLvI
+	 Gu/1d6sGMU/EN3TnJ2aucco4oj4Tggcado+mLTgAiBJTk6oFFOIXCpSxYQqgEJk4YE
+	 gGKkqE6mxb0w7TbXVEiERwqUWbEHMvaUJVyRAWvGD4PBVyT/3GEfEY9mTrhWCQRC+W
+	 lPDQUbHi9XAAg==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: netdev@vger.kernel.org
+Cc: lorenzo.bianconi@redhat.com,
+	nbd@nbd.name,
+	john@phrozen.org,
+	sean.wang@mediatek.com,
+	Mark-MC.Lee@mediatek.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Subject: [PATCH net-next] net: ethernet: mtk_wed: do not assume offload callbacks are always set
+Date: Tue, 12 Sep 2023 10:26:07 +0200
+Message-ID: <cedc0a98fb419f3d520a38271628e5d35a01be97.1694507095.git.lorenzo@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230911171102.cwieugrpthm7ywbm@pengutronix.de>
 
-On Mon, Sep 11, 2023 at 07:11:02PM +0200, Uwe Kleine-König wrote:
-> Hello,
-> 
-> this patch became commit 133466c3bbe171f826294161db203f7670bb30c8 and is
-> part of v6.6-rc1.
-> 
-> On my arm/stm32mp157 based machine using NFS root this commit makes the
-> following appear in the kernel log:
-> 
-> 	INFO: trying to register non-static key.
-> 	The code is fine but needs lockdep annotation, or maybe
-> 	you didn't initialize this object before use?
-> 	turning off the locking correctness validator.
-> 	CPU: 0 PID: 1 Comm: swapper/0 Not tainted 6.5.0-rc1-00449-g133466c3bbe1-dirty #21
+Check if wlan.offload_enable and wlan.offload_disable callbacks are set
+in mtk_wed_flow_add/mtk_wed_flow_remove since mt7996 will not rely
+on them.
 
-Hi,
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+ drivers/net/ethernet/mediatek/mtk_wed.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-Which kernel version are you using? The latest linus tree? But why here
-say 6.5.0-rc1?
-
-Thanks
-> 	Hardware name: STM32 (Device Tree Support)
-> 	 unwind_backtrace from show_stack+0x18/0x1c
-> 	 show_stack from dump_stack_lvl+0x60/0x90
-> 	 dump_stack_lvl from register_lock_class+0x98c/0x99c
-> 	 register_lock_class from __lock_acquire+0x74/0x293c
-> 	 __lock_acquire from lock_acquire+0x134/0x398
-> 	 lock_acquire from stmmac_get_stats64+0x2ac/0x2fc
-> 	 stmmac_get_stats64 from dev_get_stats+0x44/0x130
-> 	 dev_get_stats from rtnl_fill_stats+0x38/0x120
-> 	 rtnl_fill_stats from rtnl_fill_ifinfo+0x834/0x17f4
-> 	 rtnl_fill_ifinfo from rtmsg_ifinfo_build_skb+0xc0/0x144
-> 	 rtmsg_ifinfo_build_skb from rtmsg_ifinfo+0x50/0x88
-> 	 rtmsg_ifinfo from __dev_notify_flags+0xc0/0xec
-> 	 __dev_notify_flags from dev_change_flags+0x50/0x5c
-> 	 dev_change_flags from ip_auto_config+0x2f4/0x1260
-> 	 ip_auto_config from do_one_initcall+0x70/0x35c
-> 	 do_one_initcall from kernel_init_freeable+0x2ac/0x308
-> 	 kernel_init_freeable from kernel_init+0x1c/0x138
-> 	 kernel_init from ret_from_fork+0x14/0x2c
-> 	Exception stack(0xe0815fb0 to 0xe0815ff8)
-> 	5fa0:                                     00000000 00000000 00000000 00000000
-> 	5fc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-> 	5fe0: 00000000 00000000 00000000 00000000 00000013 00000000
-> 	dwc2 49000000.usb-otg: new device is high-speed
-> 
-> I didn't try understand this problem, it's too close to quitting time
-> :-)
-> 
-> Best regards
-> Uwe
-> 
-> -- 
-> Pengutronix e.K.                           | Uwe Kleine-König            |
-> Industrial Linux Solutions                 | https://www.pengutronix.de/ |
-
+diff --git a/drivers/net/ethernet/mediatek/mtk_wed.c b/drivers/net/ethernet/mediatek/mtk_wed.c
+index 94376aa2b34c..d8cd59f44401 100644
+--- a/drivers/net/ethernet/mediatek/mtk_wed.c
++++ b/drivers/net/ethernet/mediatek/mtk_wed.c
+@@ -1718,6 +1718,9 @@ int mtk_wed_flow_add(int index)
+ 	if (!hw || !hw->wed_dev)
+ 		return -ENODEV;
+ 
++	if (!hw->wed_dev->wlan.offload_enable)
++		return 0;
++
+ 	if (hw->num_flows) {
+ 		hw->num_flows++;
+ 		return 0;
+@@ -1747,6 +1750,9 @@ void mtk_wed_flow_remove(int index)
+ 	if (!hw)
+ 		return;
+ 
++	if (!hw->wed_dev->wlan.offload_disable)
++		return;
++
+ 	if (--hw->num_flows)
+ 		return;
+ 
+-- 
+2.41.0
 
 
