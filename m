@@ -1,169 +1,109 @@
-Return-Path: <netdev+bounces-33382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3E5279DA4D
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 22:54:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B5A979DA8A
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 23:04:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7D651C20BFD
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 20:54:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CE481C20BFD
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 21:04:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE381B64C;
-	Tue, 12 Sep 2023 20:54:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1189B658;
+	Tue, 12 Sep 2023 21:04:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E359470
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 20:54:25 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id A14BE199
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 13:54:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1694552063;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ijWxXQrMbFDRYhu2hkP5ViJPf81XjON2E0T1RctinI0=;
-	b=CM02FocD+cj6WPX2nTeL0EINIg3MMMFi7ImOSmL7FgAe05sYIkzZ4VQIz0HRGu2LL0hmBm
-	HC/5zsnlFvzs79+XJgoGDiTnAeKM9ocNoF6fdCNO67uIghi4TnCsdZLrfRnOUeRFPSsoDF
-	xRZelhG1ui1ylOUzHZ2xENDi0p2jBmE=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-449-mOqN_m-AMneK7l7p9Qf-dQ-1; Tue, 12 Sep 2023 16:54:21 -0400
-X-MC-Unique: mOqN_m-AMneK7l7p9Qf-dQ-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-9a9e3f703dfso375424166b.1
-        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 13:54:21 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53E3B64F
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 21:04:44 +0000 (UTC)
+Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5B9110D
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 14:04:43 -0700 (PDT)
+Received: by mail-yb1-xb30.google.com with SMTP id 3f1490d57ef6-d7bae413275so386702276.0
+        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 14:04:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1694552683; x=1695157483; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Vn/+r9lrRj3XCF0f1OgbLrVWHe/dDEBlspgHejgs8pM=;
+        b=fMSSJ0qri0r5tAepnqQqd83GYy4wwjiPil6XH8Lcz5rDe7THJjuwVDmS3VSI9xwaQw
+         hKBdCjxsQjkQrpHhHykDYLJMs5aCE1i9kI896wS9gUWWV2Ys/W3OAAAhXOoowqWQsYJl
+         vs5kiLrExDpQR9Anh8X6v2M6vf0HyN6kbIyMN4EYjAQv0/2BD2KfIlSlOaDiFYvqzexa
+         Ur3BAb+BIyttYH5T9gDHSKAIVOro/ACb01bC1BmFMNrPucJiLSDeZWnxzMlgcO6malur
+         ObhVsB6oU2SBB/6KI3GNwj+Bw28kV6KJ2JsyWpm4Zwh517kUgj9//UfslK+7jQCFNrWl
+         CNUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694552060; x=1695156860;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ijWxXQrMbFDRYhu2hkP5ViJPf81XjON2E0T1RctinI0=;
-        b=HOqACCJsbhBKjZYEWnjjoF8Z61mKkNMcaExFTNNdBUk2gAR7RBm5+i518fUKEClOFX
-         jJVCUrKZHmaptY8GStK5jY18GcgEosOlkFxaXm3I81YXvRI6/421Tn6zUCzTG3pMuC01
-         APY4SbOa372FTmZCkOu5gERbiVYnZ9ONlY4AZONTHFO7TJXoYsXxCR+FTTpNt+02IQ34
-         YEOR4EbHN1U9nSMEcUsqztOynChwCQDD/FHxb486jcuOjIWCFU+UFqMk/p+R5QtLfz53
-         pvWFKUhiKIbzOMXfyAv3xO2U2LAQ7MBma7YKYVCYfcS1pUijQnqPAK+V829WKw9SwTWt
-         HcKg==
-X-Gm-Message-State: AOJu0YzEJE8m/V2A/I7JvY/qTJWsbSdgfW2y/Zlcl8CBzjViBxDCh9g0
-	djKGf2CKuQH9zSsYlKtEu3P4g+6fNuNz5BxqJWTtqIKG7HoAdRme5Sxc0CGfMY2c1EkeVgDp+qv
-	mz7645fcd+G939co+
-X-Received: by 2002:a17:907:762d:b0:9a1:edfd:73b2 with SMTP id jy13-20020a170907762d00b009a1edfd73b2mr333968ejc.2.1694552060374;
-        Tue, 12 Sep 2023 13:54:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEnYBJkuLhJzI88PFNoikAiC6EDSv3wLMLb4ZDAGoRXLAyQXdTnHGROIdoQ7FcDxEiAcFo9rQ==
-X-Received: by 2002:a17:907:762d:b0:9a1:edfd:73b2 with SMTP id jy13-20020a170907762d00b009a1edfd73b2mr333957ejc.2.1694552060112;
-        Tue, 12 Sep 2023 13:54:20 -0700 (PDT)
-Received: from redhat.com ([2.52.10.100])
-        by smtp.gmail.com with ESMTPSA id h10-20020a1709063b4a00b009737b8d47b6sm7203807ejf.203.2023.09.12.13.54.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Sep 2023 13:54:19 -0700 (PDT)
-Date: Tue, 12 Sep 2023 16:54:15 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Shannon Nelson <shannon.nelson@amd.com>
-Cc: kuba@kernel.org, davem@davemloft.net, jasowang@redhat.com,
-	virtualization@lists.linux-foundation.org, brett.creeley@amd.com,
-	netdev@vger.kernel.org, simon.horman@corigine.com,
-	eperezma@redhat.com, drivers@pensando.io
-Subject: Re: [PATCH net-next] virtio: kdoc for struct virtio_pci_modern_device
-Message-ID: <20230912165357-mutt-send-email-mst@kernel.org>
-References: <20230911213104.14391-1-shannon.nelson@amd.com>
+        d=1e100.net; s=20230601; t=1694552683; x=1695157483;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Vn/+r9lrRj3XCF0f1OgbLrVWHe/dDEBlspgHejgs8pM=;
+        b=kLKrKFg0DDIQVrUlEEpfYBOLzkVgKbbiUizvYwdXonmj5R2NUXryv3MQfzFR19229x
+         Hut8g3E5L9qzaob/DQznZPRuR+YTZxBhCrv0d8M0UfXJOWVZsNRALZSj8g4dW6PcU0bX
+         59OHKHBjE/RPfwZs+USpL7qoYHiDNBKyETokunjB2b+1rjYJszCbjREdQaQymdHwMv3C
+         cmVB8LSGdm1cgLWuxgIxgqJCVw8L+AZJM48W/Nj4HwasGZXEq9+fokTF+zsF4U+syaw8
+         yeDKL1eYQKhO5ut4MXsWVGonzfKOjb+yskfy4w2N1wmYar0pvZJARiOSrCFCs2dpRYrX
+         fQ1w==
+X-Gm-Message-State: AOJu0YyJUcE8jGVrfTYW4zCkajlCN10tglyAXxKHujAGTwoBcKmEvPHJ
+	7ZL1iz8bDYX99arFoobp3NuX5AGJQQtpuVLRf39Gtw==
+X-Google-Smtp-Source: AGHT+IGQDuLaoE4eOyZT+Z8hNNsgfwvWorKJwQ3GNnopbwgh3VM6Y+HWcMTMFBMaepKaqB0s4OiEEYQ95/LJVmcUlZY=
+X-Received: by 2002:a25:aa6f:0:b0:d78:414d:1910 with SMTP id
+ s102-20020a25aa6f000000b00d78414d1910mr4091514ybi.25.1694552683091; Tue, 12
+ Sep 2023 14:04:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230911213104.14391-1-shannon.nelson@amd.com>
+References: <20230912081527.208499-1-herve.codina@bootlin.com>
+ <20230912101505.225899-1-herve.codina@bootlin.com> <CACRpkdbxdMZt4E1SF1v9as-jw=TpvS1mk2TQqAgywMBLbKaNoA@mail.gmail.com>
+ <71761f94-14ea-4e2a-a079-c74dfa32387a@sirena.org.uk>
+In-Reply-To: <71761f94-14ea-4e2a-a079-c74dfa32387a@sirena.org.uk>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Tue, 12 Sep 2023 23:04:24 +0200
+Message-ID: <CACRpkdbZK8GUgOcLA2D=7nDejK9cT=bxwP+HcC0GOKr-0yCJ4w@mail.gmail.com>
+Subject: Re: [PATCH v5 28/31] pinctrl: Add support for the Lantic PEF2256 pinmux
+To: Mark Brown <broonie@kernel.org>
+Cc: Herve Codina <herve.codina@bootlin.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Lee Jones <lee@kernel.org>, Qiang Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, 
+	Liam Girdwood <lgirdwood@gmail.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+	Shengjiu Wang <shengjiu.wang@gmail.com>, Xiubo Li <Xiubo.Lee@gmail.com>, 
+	Fabio Estevam <festevam@gmail.com>, Nicolin Chen <nicoleotsuka@gmail.com>, 
+	Christophe Leroy <christophe.leroy@csgroup.eu>, Randy Dunlap <rdunlap@infradead.org>, 
+	netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	alsa-devel@alsa-project.org, Simon Horman <horms@kernel.org>, 
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 11, 2023 at 02:31:04PM -0700, Shannon Nelson wrote:
-> Finally following up to Simon's suggestion for some kdoc attention
-> on struct virtio_pci_modern_device.
-> 
-> Link: https://lore.kernel.org/netdev/ZE%2FQS0lnUvxFacjf@corigine.com/
-> Cc: Simon Horman <simon.horman@corigine.com>
-> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
-> Acked-by: Eugenio Pérez <eperezma@redhat.com>
+On Tue, Sep 12, 2023 at 4:31=E2=80=AFPM Mark Brown <broonie@kernel.org> wro=
+te:
+> On Tue, Sep 12, 2023 at 01:04:56PM +0200, Linus Walleij wrote:
+> > On Tue, Sep 12, 2023 at 12:15=E2=80=AFPM Herve Codina <herve.codina@boo=
+tlin.com> wrote:
+>
+> > > +/* SPDX-License-Identifier: GPL-2.0 */
+> > > +/*
+>
+> > I think SPDX mandates that you start the tag with C99 comments
+>
+> > // SPDX-License-Identifier: GPL-2.0-only
+>
+> Not for headers, they should use C style since they might be included in
+> contexts where C++ isn't supported.
 
-not sure why this is net material though.
-I think I will take it in virtio tree.
+Oh right. Thanks Mark!
 
-> ---
->  include/linux/virtio_pci_modern.h | 34 ++++++++++++++++++++-----------
->  1 file changed, 22 insertions(+), 12 deletions(-)
-> 
-> diff --git a/include/linux/virtio_pci_modern.h b/include/linux/virtio_pci_modern.h
-> index 067ac1d789bc..a38c729d1973 100644
-> --- a/include/linux/virtio_pci_modern.h
-> +++ b/include/linux/virtio_pci_modern.h
-> @@ -12,37 +12,47 @@ struct virtio_pci_modern_common_cfg {
->  	__le16 queue_reset;		/* read-write */
->  };
->  
-> +/**
-> + * struct virtio_pci_modern_device - info for modern PCI virtio
-> + * @pci_dev:	    Ptr to the PCI device struct
-> + * @common:	    Position of the common capability in the PCI config
-> + * @device:	    Device-specific data (non-legacy mode)
-> + * @notify_base:    Base of vq notifications (non-legacy mode)
-> + * @notify_pa:	    Physical base of vq notifications
-> + * @isr:	    Where to read and clear interrupt
-> + * @notify_len:	    So we can sanity-check accesses
-> + * @device_len:	    So we can sanity-check accesses
-> + * @notify_map_cap: Capability for when we need to map notifications per-vq
-> + * @notify_offset_multiplier: Multiply queue_notify_off by this value
-> + *                            (non-legacy mode).
-> + * @modern_bars:    Bitmask of BARs
-> + * @id:		    Device and vendor id
-> + * @device_id_check: Callback defined before vp_modern_probe() to be used to
-> + *		    verify the PCI device is a vendor's expected device rather
-> + *		    than the standard virtio PCI device
-> + *		    Returns the found device id or ERRNO
-> + * @dma_mask:	    Optional mask instead of the traditional DMA_BIT_MASK(64),
-> + *		    for vendor devices with DMA space address limitations
-> + */
->  struct virtio_pci_modern_device {
->  	struct pci_dev *pci_dev;
->  
->  	struct virtio_pci_common_cfg __iomem *common;
-> -	/* Device-specific data (non-legacy mode)  */
->  	void __iomem *device;
-> -	/* Base of vq notifications (non-legacy mode). */
->  	void __iomem *notify_base;
-> -	/* Physical base of vq notifications */
->  	resource_size_t notify_pa;
-> -	/* Where to read and clear interrupt */
->  	u8 __iomem *isr;
->  
-> -	/* So we can sanity-check accesses. */
->  	size_t notify_len;
->  	size_t device_len;
->  
-> -	/* Capability for when we need to map notifications per-vq. */
->  	int notify_map_cap;
->  
-> -	/* Multiply queue_notify_off by this value. (non-legacy mode). */
->  	u32 notify_offset_multiplier;
-> -
->  	int modern_bars;
-> -
->  	struct virtio_device_id id;
->  
-> -	/* optional check for vendor virtio device, returns dev_id or -ERRNO */
->  	int (*device_id_check)(struct pci_dev *pdev);
-> -
-> -	/* optional mask for devices with limited DMA space */
->  	u64 dma_mask;
->  };
->  
-> -- 
-> 2.17.1
-
+Yours,
+Linus Walleij
 
