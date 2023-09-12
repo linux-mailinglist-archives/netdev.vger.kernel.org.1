@@ -1,124 +1,84 @@
-Return-Path: <netdev+bounces-33058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B61AC79C9A1
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 10:18:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D650279C9BF
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 10:23:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A1FD281A1B
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 08:18:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A4301C20AB4
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 08:23:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0CA01773E;
-	Tue, 12 Sep 2023 08:18:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E45E17741;
+	Tue, 12 Sep 2023 08:23:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6032E54B
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 08:18:31 +0000 (UTC)
-Received: from phobos.denx.de (phobos.denx.de [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73814E73;
-	Tue, 12 Sep 2023 01:18:31 -0700 (PDT)
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id B5CCE86579;
-	Tue, 12 Sep 2023 10:18:29 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1694506710;
-	bh=9wb5FeWubky1oIAbeo9edOrsVfoQdXCFNWMwrsrUg9A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qSK5Uh7ssG23jMK4Y6G801yywaMGez2TrqRS7/BS1GC5ix5D1NbcMV8NTqsK7DQ6q
-	 HGPlby9zwJA3LZaQ+QO9xV0eOfIT4IzdfKFvmCVqckupTdROuYStjDNojGU6RpNj9U
-	 feLawE00B+m4TVMemyU8ujyr4oQLQ4VPlAHSuenulHdgxrwwqXxjTjTXIotI8mo7sX
-	 nw1r7BGTH3xdkKfRyhoFwydVZTv0ud2x4hAFoQ1rkCZvgBjxEGmEOlne1NcbOtgU6e
-	 sAjsjZMDtmptEW3XJIcAzZQl4PhQ9S5q8y/nJozvpAz5CDigT8Yy10cf9jX/Xx7ubd
-	 w/9cBeDDb2luw==
-Date: Tue, 12 Sep 2023 10:18:28 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Tristram.Ha@microchip.com, Eric Dumazet <edumazet@google.com>,
- davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Florian Fainelli
- <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Kristian Overskeid <koverskeid@gmail.com>, Matthieu
- Baerts <matthieu.baerts@tessares.net>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Andreas Oetken <ennoerlangen@gmail.com>
-Subject: Re: [PATCH] net: hsr : Provide fix for HSRv1 supervisor frames
- decoding
-Message-ID: <20230912101828.06cb403d@wsk>
-In-Reply-To: <20230911150144.cG1ZHTCC@linutronix.de>
-References: <20230825153111.228768-1-lukma@denx.de>
-	<20230905080614.ImjTS6iw@linutronix.de>
-	<20230905115512.3ac6649c@wsk>
-	<20230911165708.0bc32e3c@wsk>
-	<20230911150144.cG1ZHTCC@linutronix.de>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C3F3154A9
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 08:23:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60C23C433C7;
+	Tue, 12 Sep 2023 08:23:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694506985;
+	bh=Eo9G/osr66isoQRSTOM583/A3H1yDzHwJkukyfLtq+U=;
+	h=From:To:Cc:Subject:Date:From;
+	b=omzgJ9/t//dkbFYezvGxCGD7JWuttTv1LEb2mtLacrfbNbCMOMwDUF4kAQAz1fpC2
+	 QXT2/f/VejJ8KLadVSru40u5XlO/UQNg6MHbDH27h6OLJQ0axIzO9qvJcCoFz+UoHs
+	 YvmyPV+m0PkH5tehy1Q/X8n0pDHlb7V0gq+/DMSntaG38fvU/Q7bFPC3SvoFzvNUAJ
+	 ZRLut1rVYuZHer8x02wkugWgdn31p9npBkOwQGzjsh/h8YAYQROqeWnOEGIUcdLBXn
+	 dOg0bP8ij61+I8vZ1TUKUSbKTpNFv7o98v1Dvf9Bos7sQJATg8jrxvggI0+u8tK14K
+	 Cmd4u5s+uEuPA==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: netdev@vger.kernel.org
+Cc: lorenzo.bianconi@redhat.com,
+	nbd@nbd.name,
+	john@phrozen.org,
+	sean.wang@mediatek.com,
+	Mark-MC.Lee@mediatek.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Subject: [PATCH net-next] net: ethernet: mtk_eth_soc: rely on mtk_pse_port definitions in mtk_flow_set_output_device
+Date: Tue, 12 Sep 2023 10:22:56 +0200
+Message-ID: <b86bdb717e963e3246c1dec5f736c810703cf056.1694506814.git.lorenzo@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/w1cpGf5uIBTaYfp_sMHo70t";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Transfer-Encoding: 8bit
 
---Sig_/w1cpGf5uIBTaYfp_sMHo70t
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Similar to ethernet ports, rely on mtk_pse_port definitions for
+pse wdma ports as well.
 
-Hi Sebastian,
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+ drivers/net/ethernet/mediatek/mtk_ppe_offload.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> On 2023-09-11 16:57:08 [+0200], Lukasz Majewski wrote:
-> > Hi Sebastian, =20
-> Hi,
->=20
-> >=20
-> > Have you had time to review this patch? =20
->=20
-> got distracted a few times. I need a quiet moment=E2=80=A6 Will do this w=
-eek=E2=80=A6
->=20
+diff --git a/drivers/net/ethernet/mediatek/mtk_ppe_offload.c b/drivers/net/ethernet/mediatek/mtk_ppe_offload.c
+index a4efbeb16208..ef3980840695 100644
+--- a/drivers/net/ethernet/mediatek/mtk_ppe_offload.c
++++ b/drivers/net/ethernet/mediatek/mtk_ppe_offload.c
+@@ -196,10 +196,10 @@ mtk_flow_set_output_device(struct mtk_eth *eth, struct mtk_foe_entry *foe,
+ 		if (mtk_is_netsys_v2_or_greater(eth)) {
+ 			switch (info.wdma_idx) {
+ 			case 0:
+-				pse_port = 8;
++				pse_port = PSE_WDMA0_PORT;
+ 				break;
+ 			case 1:
+-				pse_port = 9;
++				pse_port = PSE_WDMA1_PORT;
+ 				break;
+ 			default:
+ 				return -EINVAL;
+-- 
+2.41.0
 
-Ok. No problem. Thanks for the information.
-
-> > Your comments are more than welcome. =20
->=20
-> Sebastian
-
-
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/w1cpGf5uIBTaYfp_sMHo70t
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmUAHtQACgkQAR8vZIA0
-zr30XAgA3NOG4MD0rN/IH6TpqM+cORRax7QUIJr2dL93JsYwV+XoljCH9R2NXrOh
-HJ7XzNzaF5p6baUgpKs2qtocwYSrd4UPHUZlSYG8+uLCwSSeBZlRtCi6gHmBeFbH
-8XeOR5ZXME5y0KI6TX69IcvaqsH0WNWNa22r1XMeICV7dEvYf7cfLqCfoWqQ/FVh
-C8FEzBfahpmYu8PHI/ELoVQDHOAEQ9vA4wtzLc4qaf2E4MZ+IciOBavzjFjaK3Hk
-bFvPpGGiC3Xq1Ppovqm3URYZ8V3NKyHkVREkhX/1/742ZcHLRHRSKZdIKmEu1Dq7
-L8nLHuMIwSp6yw3Cr5qwdjcOYb/iAQ==
-=Zt4n
------END PGP SIGNATURE-----
-
---Sig_/w1cpGf5uIBTaYfp_sMHo70t--
 
