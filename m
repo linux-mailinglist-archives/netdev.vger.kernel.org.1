@@ -1,407 +1,145 @@
-Return-Path: <netdev+bounces-33124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92B7479CC65
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 11:51:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA9F679CC66
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 11:51:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F136280B98
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 09:51:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06F291C20E49
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 09:51:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C795168C8;
-	Tue, 12 Sep 2023 09:50:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4047168C0;
+	Tue, 12 Sep 2023 09:50:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 660ED17737
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 09:50:01 +0000 (UTC)
-Received: from AUS01-SY4-obe.outbound.protection.outlook.com (mail-sy4aus01olkn2178.outbound.protection.outlook.com [40.92.62.178])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D19E0E6B;
-	Tue, 12 Sep 2023 02:50:00 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lTd2H2FilmVbvA2rd1f2/KmvmGu7inD6/KHQEtCAhERPATS/WxL5UEPbM7dKPddY7GcmAkwAiPFCg2+OI1KRJT40cMK1+cGhhys0d5mYu0YFj45U1CsuPGfdZH3cSul1PGSJp5d7Z2NlgPrHw7QILrP1nVEtsaiQ9TxvtPI2Kl3Vnb8tqCdVXt5BIpGCWoNBWflSbttLmRnt5sJcTuULZ1OTY1gzkm7j0sTTipQr1WFKG4YnWz3n2jiPEhtYYR8x+dQUeu11PTyNco4D5WxeYnuOQnbQ1emhnXxdew6NkgUNk3Kkz3lLWxP2aMcy+mbWX3hG7B3CXNCQqg8uPHs3zQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=11PJmNmcYjmj5VVgJ7K0q+adbrpE0xocLu9jecU+ClE=;
- b=UssN1aGIpprEQH3IlKZguXJ7Gzlr9ok2Mqx7qyuC57P0at1RyvNLrFno7fmVUJ0yASL2vCgu/2a57qgo31RYfOIrZHNOBx2JgoVeyDB99kNeD92aHs+Og9xHKrC4ZZPr76RsJkMSriNEmZewDQ7f8Ytr0VeVj2YRTo2L8RIUJPqO9TMMmG77jg+5HMsKW/F41bhBkDY0+a8jtk2KVpJ3laqysUr7ek4KUDoWZF9XCaMzk0xH0T4e1AOGwamLtc5tKZYL2pmB2oW9jqun7c+36T9//KiqjgQt19YPSY4W3Gvc9WyuNhdzi5zHggk/3qECcl7wfcmKK99WsVkQ5SZiDg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=11PJmNmcYjmj5VVgJ7K0q+adbrpE0xocLu9jecU+ClE=;
- b=DmhjbxhDwFmxEcSRRetIMfuePjRjiADfp+V3ohRu7Lu6z4+CKorrJtHeOn5WZsefPpXmEyQu07PHheCRd3yU6D/UE5T6dHX6LcUPYGFTVdPcaXd1jWEI+BbfobCOZGs8RptlsjNbPZVZeMqiD+0khij0lQWeeEU+8fa+tamFFvGO+CoqaHmWC/D5lczBVhDQz7KStvh2t7nsE5olhLKeZmywD+yeief+VaMEJHL5r6U7lAGWn1XHcltrKPPUgo+6gvCkE+h1jyIhAsjBDCr1Susvb998YLUAd8k/Gv+zuLwIjtA7XZuq6YWEvouG24ba9Jd0DfZev7PKB5+ab+NCkg==
-Received: from ME3P282MB2703.AUSP282.PROD.OUTLOOK.COM (2603:10c6:220:16b::5)
- by SY4P282MB2981.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:15c::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.35; Tue, 12 Sep
- 2023 09:49:53 +0000
-Received: from ME3P282MB2703.AUSP282.PROD.OUTLOOK.COM
- ([fe80::68b4:6263:97f:9a45]) by ME3P282MB2703.AUSP282.PROD.OUTLOOK.COM
- ([fe80::68b4:6263:97f:9a45%3]) with mapi id 15.20.6768.036; Tue, 12 Sep 2023
- 09:49:53 +0000
-From: Jinjian Song <songjinjian@hotmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	corbet@lwn.net,
-	loic.poulain@linaro.org,
-	ryazanov.s.a@gmail.com
-Cc: jiri@resnulli.us,
-	johannes@sipsolutions.net,
-	chandrashekar.devegowda@intel.com,
-	linuxwwan@intel.com,
-	chiranjeevi.rapolu@linux.intel.com,
-	haijun.liu@mediatek.com,
-	m.chetan.kumar@linux.intel.com,
-	ricardo.martinez@linux.intel.com,
-	netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	nmarupaka@google.com,
-	vsankar@lenovo.com,
-	danielwinkler@google.com,
-	Jinjian Song <jinjian.song@fibocom.com>
-Subject: [net-next v4 5/5] net: wwan: t7xx: Devlink documentation
-Date: Tue, 12 Sep 2023 17:48:45 +0800
-Message-ID:
- <ME3P282MB27037E574DB3685216A0DF56BBF1A@ME3P282MB2703.AUSP282.PROD.OUTLOOK.COM>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230912094845.11233-1-songjinjian@hotmail.com>
-References: <20230912094845.11233-1-songjinjian@hotmail.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN: [0tyZKwlvml3QWeml2v5sWNFNmeExt5Z6]
-X-ClientProxiedBy: SI2PR01CA0048.apcprd01.prod.exchangelabs.com
- (2603:1096:4:193::17) To ME3P282MB2703.AUSP282.PROD.OUTLOOK.COM
- (2603:10c6:220:16b::5)
-X-Microsoft-Original-Message-ID:
- <20230912094845.11233-6-songjinjian@hotmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D847B168B4
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 09:50:21 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 518D610D1
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 02:50:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1694512220;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ybhEwqUaCIlKWS1bect2pWaHzY1Og7UtHvV2q1VDcqg=;
+	b=Cy/IPqvg7omt2BG2VQsPaiqMYsmc6HPlZYJAeIHauNgPeVv6RG2t0KTsZGSh3X1OwTW9Dg
+	Kf7ZhXD+cItUyjmEzg1QzHh7zxWVqQpa0Ceg8dKVdqp5yx3h6WBcWfckkN3xoxWkdGtdlb
+	V6oxU7A7o84m75RiRzwuKC/iLssQ99U=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-214-w7-QzarmMRClFcVESy0Dww-1; Tue, 12 Sep 2023 05:50:19 -0400
+X-MC-Unique: w7-QzarmMRClFcVESy0Dww-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-2f2981b8364so3582555f8f.1
+        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 02:50:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694512217; x=1695117017;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ybhEwqUaCIlKWS1bect2pWaHzY1Og7UtHvV2q1VDcqg=;
+        b=SdSkSDB9u+hrI7FJ/IZRK9LMOEtlwN3lM6U9OuLNF0ZBqTleUURWmj5Ckpg84VamV/
+         mref07oMb/jiufGQ8vDT94bib6DRNJt/+fmQBVrFFT02+y1SC8tQl2JOAAftUh4pVkAH
+         dqDbR4QoBWoCX+LszETwKmf97Z95JOuik99MRZRkhlGhvgEa7Pxn27zRgkeCV5MxwGve
+         4B/mlDlGPa6UhgYEi+yk2EtiRSRB4KrmgAsfq6mU3paaAeZQ7PATrBJjr34VWUvJT8ei
+         IsJtybBeTrgjOoQGMIb8JoHQKAJ3hPHPKv6ASXA52+KQxv1qeoKmQYBnKQGSXVyJxlmC
+         obNg==
+X-Gm-Message-State: AOJu0Yzb5bQbiq0MBKa9pIpiCe89EzTyPBxvmZY7eT3GP0h0PYga26L7
+	XVET/sH8HjFy4y5z7g4w4d/+rl/IGllMNPQT0uELHcj0wuhYwmNHNEsry6vFyBeg3yOPpxOdf1b
+	8vHcT3PaHPdi3WUJtlWHEk0c+
+X-Received: by 2002:a5d:4309:0:b0:317:ef76:b773 with SMTP id h9-20020a5d4309000000b00317ef76b773mr8616014wrq.45.1694512217703;
+        Tue, 12 Sep 2023 02:50:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGS3z+qx7QqCGr69WMu1UhKSZqeOS+/Y9UpYmjmP/FKx7vkNna5tM7mBG2iBfXVe2TBUTetGQ==
+X-Received: by 2002:a5d:4309:0:b0:317:ef76:b773 with SMTP id h9-20020a5d4309000000b00317ef76b773mr8616005wrq.45.1694512217390;
+        Tue, 12 Sep 2023 02:50:17 -0700 (PDT)
+Received: from debian (2a01cb058918ce00679c89a1e344d998.ipv6.abo.wanadoo.fr. [2a01:cb05:8918:ce00:679c:89a1:e344:d998])
+        by smtp.gmail.com with ESMTPSA id q6-20020a05600000c600b00317f29ad113sm12290520wrx.32.2023.09.12.02.50.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Sep 2023 02:50:17 -0700 (PDT)
+Date: Tue, 12 Sep 2023 11:50:15 +0200
+From: Guillaume Nault <gnault@redhat.com>
+To: Tj <linux@iam.tj>
+Cc: netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>
+Subject: Re: IPv6 address scope not set to operator-configured value
+Message-ID: <ZQA0VxB1hVqH2o/9@debian>
+References: <f878ef3c-d11b-b1de-fa02-d9617308d460@iam.tj>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: ME3P282MB2703:EE_|SY4P282MB2981:EE_
-X-MS-Office365-Filtering-Correlation-Id: 45576c39-06a7-4af6-2ce8-08dbb3759d1c
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	Zs7oW/5CfsiKFabRl24+0Mi/CGOJ4ksvAjNX09hdzBF2txwEZ7zH3Zkp0HJeSOMRGvds8VXGKvE5J9K6mw3zYOEWVsMa2Rw6wSfBKyL7S7YyKXeO2/DpEUKQfT9ho/HsODpnyWoeTknJmUmY59+oHG9gqMTqJ0Bgy84K9rN6t39ZEDCtFubdb3QlkekCnkcEVtaUc/V7Qte/ZjPa23OXRrCPzzDPmuZqcZ+3p0RbjMxeme4jTwNFxNXHNIagfr3T3aVEfvUYCGSiCGLPDJbh9TjKQpdVuuVbKECdGXHbc1Qc+MjIqwHVPw/oUb90IzEXgHiNaAOolYacSN31fxUxEblVEm4kaptsniwR2+ypbTk5p3V7MPGqWCIuQVEThlY+vxkkEwJL3jffeXtBLWwaHIlTn3EYaEdi4OUr6jHWgUaosB9mT3cRSXlX+IaWLl9UEdnZG+i+vzVLoZN930GNHLsuh5XZqBw4FwQSt5ZwxBTKPSL+HaycjBkl4Xiup/QBuNOrnEDEETz3MhrIFj2kQolqUZgBjQGNBoJ/FL+pROhFUSeSwmGLfjtCajPgJ8zbCTNy/rKPjxZupyDesxMVPi8wTGzckm924sGn4ll+VyQ=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?/e/BXWVkX3l6xpYIsxjYLimsrssC+hmIVJMqmMrzhsmlVTbA5EApM50eM8Pq?=
- =?us-ascii?Q?ikby6HoDRrjcFXCCTEiniGVMDL1LUWUUoiQr/Kr05C8rHufIFHNL4Rh+IA8U?=
- =?us-ascii?Q?CtCgh64Utk0fNYaUDMusfl4H72vD9Cr3T4VISDpoZz5XfPdbc14MphNUvoyb?=
- =?us-ascii?Q?C8g3iBSW//hMjnnThZ3AKNe+X3aUq2tNFpZzC+cjeS749Y50XrZ7lG+P5IQP?=
- =?us-ascii?Q?wBDPNMXjt9EGTrtK07jGc4f69REEDBVozXq4om5dp3HfthNv5IhB7Zl0dSZd?=
- =?us-ascii?Q?6+wKOX3IxmGHUNJuYTcX8cBzPfBFpaKPuz6VLPHGQrX9gZmtVxORfPph/8z8?=
- =?us-ascii?Q?viQtrLE6ytAVNDMsqCpdaXOzwAMd7C8PZMDMst3R77RqyxejWeCkwjKxATQ5?=
- =?us-ascii?Q?BJZoTxScPreiw1vbkwc1YmKOwnuHRTLliu29vq4M9oO6tlXTqAdgIpnuqioO?=
- =?us-ascii?Q?jrNLTksVwyYr2BjrWHPDjQlSh8nwWC/KSfulL32uI+ebtt+tFak3fW865e80?=
- =?us-ascii?Q?UYgbWJKHACQQ76QTEGNoLLiqon0li4lXTquMHy9KJd3DvwzQVO8KnmwxEj8i?=
- =?us-ascii?Q?BfM3lHUarsGXt5bbaKCjmHjpxJkwjhUmY4+NO1mVXL/Le6KkjKeCtMRtNPwv?=
- =?us-ascii?Q?u9oIP/BsFi9sK+OJNHdRtKEqgeT4c0xDWeGt/0GpDhH//SaewEMFRfVHcEVI?=
- =?us-ascii?Q?BU2qjcRNfAIIwS0XEdbn52Oq3PFURA5wEFxq5SKJDUJIiGuLQ7rnMG4oJ89k?=
- =?us-ascii?Q?O3lCeN9YnrcP0AwZdyK3omwcSLUbtwaqEQrbR0MTh13cJe2f3D7z4jsPADHU?=
- =?us-ascii?Q?WW2HK+VV6fwoUByIUZMKOG3EtbLON8XAE32p3CTPgXkAshmxJL/ktOEeUrSJ?=
- =?us-ascii?Q?+VgII3TNF78J9vJMFdcG4CUKachmn9UmWJI6oZINQ7ehvEoDMQzPFqpRdrss?=
- =?us-ascii?Q?Ir1iVkUC4yPnNbpWYo/J1XDM7m4xIUdFXDshrmI8OghPwbRHAQJnMf+qwXph?=
- =?us-ascii?Q?2GuQhEQ3OsPJlTCrTocAnwWJU8ffvqu3PlOxx5n72/Nfc11mFWtHu6El2bGn?=
- =?us-ascii?Q?+a3xu4RhS1FfG9BPDrTq2aC+R3Zl9vqXkZ+cToE0QN4wEi6cN7ly33rZc9wo?=
- =?us-ascii?Q?87FxuVyQR+6ZWSBBNe9xqbjx/Bd/LLf4Q0tVioJqieGl2sgFEbkK4PfGf+pS?=
- =?us-ascii?Q?y9OVnSSYP+5qQrSuvvRc/tcGYsGorPSuzym+REud1iNhv34H2Ul1YITxrD8?=
- =?us-ascii?Q?=3D?=
-X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-746f3.templateTenant
-X-MS-Exchange-CrossTenant-Network-Message-Id: 45576c39-06a7-4af6-2ce8-08dbb3759d1c
-X-MS-Exchange-CrossTenant-AuthSource: ME3P282MB2703.AUSP282.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Sep 2023 09:49:53.4538
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SY4P282MB2981
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f878ef3c-d11b-b1de-fa02-d9617308d460@iam.tj>
 
-From: Jinjian Song <jinjian.song@fibocom.com>
+[ Cc: David Ahern, who might have an opinion on this]
 
-Document the t7xx devlink commands usage for firmware flashing &
-coredump collection.
+On Fri, Sep 08, 2023 at 06:02:00PM +0100, Tj wrote:
+> Using iproute2 and kernel v6.5.0 with Debian 12 Bookworm amd64
+> (tested also with v6.136 nixos) setting scope on an IPv6 fails
+> silently with no indications as to why and the address is configured
+> with what appears to be a scope based on the prefix (usually 0 but
+> for fe80::/16 addresses scope is set to 253). Doesn't matter whether
+> using scope names (from /etc/iproute2/rt_scopes) or numbers. Similar
+> command for IPv4 succeeds.
 
-Base on the v5 patch version of follow series:
-'net: wwan: t7xx: fw flashing & coredump support'
-(https://patchwork.kernel.org/project/netdevbpf/patch/f902d4a0cb807a205687f7e693079fba72ca7341.1674307425.git.m.chetan.kumar@linux.intel.com/)
+I don't think we could let the user manually set the scope of IPv6
+addresses. As you realised, with IPv6, the scope is automatically
+derived from the address.
 
-Signed-off-by: Jinjian Song <jinjian.song@fibocom.com>
----
-v4:
- * no change
-v3:
- * supplementary separator '~'
-v2:
- * no change
----
- Documentation/networking/devlink/index.rst |   1 +
- Documentation/networking/devlink/t7xx.rst  | 232 +++++++++++++++++++++
- 2 files changed, 233 insertions(+)
- create mode 100644 Documentation/networking/devlink/t7xx.rst
+I had a patch to reject IPv6 netlink commands that have a scope
+attribute. I've never sent it though, as I was affraid to break
+existing users. But now that I read your message, I feel that maybe
+we'd better explicitely reject such commands instead of silently
+ignoring the scope. That'd avoid this kind of misunderstanding.
 
-diff --git a/Documentation/networking/devlink/index.rst b/Documentation/networking/devlink/index.rst
-index b49749e2b9a6..f101781105ca 100644
---- a/Documentation/networking/devlink/index.rst
-+++ b/Documentation/networking/devlink/index.rst
-@@ -67,3 +67,4 @@ parameters, info versions, and other features it supports.
-    iosm
-    octeontx2
-    sfc
-+   mtk_t7xx
-diff --git a/Documentation/networking/devlink/t7xx.rst b/Documentation/networking/devlink/t7xx.rst
-new file mode 100644
-index 000000000000..20057bda3923
---- /dev/null
-+++ b/Documentation/networking/devlink/t7xx.rst
-@@ -0,0 +1,232 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+====================
-+t7xx devlink support
-+====================
-+
-+This document describes the devlink features implemented by the ``t7xx``
-+device driver.
-+
-+Parameters
-+==========
-+The ``t7xx`` driver implements the following driver-specific parameters.
-+
-+.. list-table:: Driver-specific parameters
-+   :widths: 5 5 5 85
-+
-+   * - Name
-+     - Type
-+     - Mode
-+     - Description
-+   * - ``fastboot``
-+     - boolean
-+     - driverinit
-+     - Set this param to enter fastboot mode.
-+
-+Flash Update
-+============
-+
-+The ``t7xx`` driver implements the flash update using the ``devlink-flash``
-+interface.
-+
-+The driver uses ``DEVLINK_SUPPORT_FLASH_UPDATE_OVERWRITE_MASK`` to identify the type of
-+firmware image that need to be programmed upon the request by user space application.
-+
-+``t7xx`` driver uses fastboot protocol for firmware flashing. In the firmware
-+flashing procedure, fastboot command & response are exchanged between driver
-+and wwan device.
-+
-+::
-+
-+  $ devlink dev param set pci/0000:bdf name fastboot value 1 cmode driverinit
-+
-+The devlink param fastboot is set to true via devlink param command, by
-+passing name ``fastboot``, value ``1`` and cmode ``driverinit``.
-+
-+::
-+
-+  $ devlink dev reload pci/0000:$bdf action driver_reinit
-+
-+The wwan device is put into fastboot mode via devlink reload command, by
-+passing ``driver_reinit`` action.
-+
-+::
-+
-+  $ devlink dev reload pci/0000:$bdf action fw_activate
-+
-+Upon completion of firmware flashing or coredump collection the wwan device is
-+reset to normal mode using devlink reload command, by passing ``fw_activate``
-+action.
-+
-+Flash Commands
-+--------------
-+
-+::
-+
-+  $ devlink dev flash pci/0000:$bdf file preloader_k6880v1_mdot2_datacard.bin component "preloader"
-+
-+::
-+
-+  $ devlink dev flash pci/0000:$bdf file loader_ext-verified.img component "loader_ext1"
-+
-+::
-+
-+  $ devlink dev flash pci/0000:$bdf file tee-verified.img component "tee1"
-+
-+::
-+
-+  $ devlink dev flash pci/0000:$bdf file lk-verified.img component "lk"
-+
-+::
-+
-+  $ devlink dev flash pci/0000:$bdf file spmfw-verified.img component "spmfw"
-+
-+::
-+
-+  $ devlink dev flash pci/0000:$bdf file sspm-verified.img component "sspm_1"
-+
-+::
-+
-+  $ devlink dev flash pci/0000:$bdf file mcupm-verified.img component "mcupm_1"
-+
-+::
-+
-+  $ devlink dev flash pci/0000:$bdf file dpm-verified.img component "dpm_1"
-+
-+::
-+
-+  $ devlink dev flash pci/0000:$bdf file boot-verified.img component "boot"
-+
-+::
-+
-+  $ devlink dev flash pci/0000:$bdf file root.squashfs component "rootfs"
-+
-+::
-+
-+  $ devlink dev flash pci/0000:$bdf file modem-verified.img component "md1img"
-+
-+::
-+
-+  $ devlink dev flash pci/0000:$bdf file dsp-verified.bin component "md1dsp"
-+
-+::
-+
-+  $ devlink dev flash pci/0000:$bdf file OP_OTA.img component "mcf1"
-+
-+::
-+
-+  $ devlink dev flash pci/0000:$bdf file OEM_OTA.img component "mcf2"
-+
-+::
-+
-+  $ devlink dev flash pci/0000:$bdf file DEV_OTA.img component "mcf3"
-+
-+Note: Component selects the partition type to be programmed.
-+
-+
-+The supported list of firmware image types is described below.
-+
-+.. list-table:: Firmware Image types
-+    :widths: 15 85
-+
-+    * - Name
-+      - Description
-+    * - ``preloader``
-+      - The first-stage bootloader image
-+    * - ``loader_ext1``
-+      - Preloader extension image
-+    * - ``tee1``
-+      - ARM trusted firmware and TEE (Trusted Execution Environment) image
-+    * - ``lk``
-+      - The second-stage bootloader image
-+    * - ``spmfw``
-+      - MediaTek in-house ASIC for power management image
-+    * - ``sspm_1``
-+      - MediaTek in-house ASIC for power management under secure world image
-+    * - ``mcupm_1``
-+      - MediaTek in-house ASIC for cpu power management image
-+    * - ``dpm_1``
-+      - MediaTek in-house ASIC for dram power management image
-+    * - ``boot``
-+      - The kernel and dtb image
-+    * - ``rootfs``
-+      - Root filesystem image
-+    * - ``md1img``
-+      - Modem image
-+    * - ``md1dsp``
-+      - Modem DSP image
-+    * - ``mcf1``
-+      - Modem OTA image (Modem Configuration Framework) for operators
-+    * - ``mcf2``
-+      - Modem OTA image (Modem Configuration Framework) for OEM vendors
-+    * - ``mcf3``
-+      - Modem OTA image (other usage) for OEM configurations
-+
-+
-+Regions
-+=======
-+
-+The ``t7xx`` driver supports core dump collection in exception state and second
-+stage bootloader log collection in fastboot mode. The log snapshot is taken by
-+the driver using fastboot commands.
-+
-+Region commands
-+---------------
-+
-+::
-+
-+  $ devlink region show
-+
-+This command list the regions implemented by driver. These regions are accessed
-+for device internal data. Below table describes the regions.
-+
-+.. list-table:: Regions
-+    :widths: 15 85
-+
-+    * - Name
-+      - Description
-+    * - ``mr_dump``
-+      - The detailed modem component logs are captured in this region
-+    * - ``lk_dump``
-+      - This region dumps the current snapshot of lk
-+
-+Coredump Collection
-+~~~~~~~~~~~~~~~~~~~
-+
-+::
-+
-+  $ devlink region new mr_dump
-+
-+::
-+
-+  $ devlink region read mr_dump snapshot 0 address 0 length $len
-+
-+::
-+
-+  $ devlink region del mr_dump snapshot 0
-+
-+Note: $len is actual len to be dumped.
-+
-+The userspace application uses these commands for obtaining the modem component
-+logs when device encounters an exception.
-+
-+Second Stage Bootloader dump
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+::
-+
-+  $ devlink region new lk_dump
-+
-+::
-+
-+  $ devlink region read lk_dump snapshot 0 address 0 length $len
-+
-+::
-+
-+  $ devlink region del lk_dump snapshot 0
-+
-+Note: $len is actual len to be dumped.
-+
-+In fastboot mode the userspace application uses these commands for obtaining the
-+current snapshot of second stage bootloader.
-+
--- 
-2.34.1
+If anyone feels we should reject the scope attribute when adding
+IPv6 routes or addresses, just let me know and I'll send this patch.
+
+> ip address add fddc::2/64 scope 200 dev PUBLIC
+> ip -N -6 address show dev PUBLIC
+> ...
+> inet6 fddc::2/64 scope 0
+> 
+> I used `gdb` to trace this expecting somehow the scope was not being read correctly but it is:
+> 
+> 2577            if (!scoped && cmd != RTM_DELADDR)
+> (gdb) p scoped
+> $22 = <optimized out>
+> (gdb) p cmd
+> $23 = <optimized out>
+> (gdb) n
+> 2580            req.ifa.ifa_index = ll_name_to_index(d);
+> (gdb) p req.ifa.ifa_scope
+> $24 = 200 '\310'
+> ...
+> 2607            if (echo_request)
+> (gdb) n
+> 2610                    ret = rtnl_talk(&rth, &req.n, NULL);
+> (gdb) p req.n
+> $25 = {nlmsg_len = 64, nlmsg_type = 20, nlmsg_flags = 1537, nlmsg_seq = 0, nlmsg_pid = 0}
+> (gdb) p rth
+> $26 = {fd = 3, local = {nl_family = 16, nl_pad = 0, nl_pid = 2381950, nl_groups = 0}, peer = {nl_family = 0, nl_pad = 0, nl_pid = 0, nl_groups = 0}, seq = 1694191286,
+>   dump = 0, proto = 0, dump_fp = 0x0, flags = 4}
+> (gdb) s
+> rtnl_talk (rtnl=0x5555555f7020 <rth>, n=n@entry=0x7fffffffe140, answer=answer@entry=0x0) at ./lib/libnetlink.c:1170
+> 1170    {
+> ...
+> ipaddr_modify (cmd=<optimized out>, flags=<optimized out>, argc=<optimized out>, argv=0x7fffffffe478) at ./ip/ipaddress.c:2612
+> 2612            if (ret)
+> (gdb) p ret
+> $27 = 0
+> 
+> 
+> 
+> 
+> 
+> 
 
 
