@@ -1,121 +1,109 @@
-Return-Path: <netdev+bounces-33193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85D7579CF59
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 13:08:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65BB779CF69
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 13:08:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54F421C212F3
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 11:07:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39BCD1C20F42
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 11:07:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4CF8168D4;
-	Tue, 12 Sep 2023 11:06:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34A87168A3;
+	Tue, 12 Sep 2023 11:06:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9981AA93B
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 11:06:09 +0000 (UTC)
-Received: from mail-yw1-x112b.google.com (mail-yw1-x112b.google.com [IPv6:2607:f8b0:4864:20::112b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00FFDBE
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 04:06:08 -0700 (PDT)
-Received: by mail-yw1-x112b.google.com with SMTP id 00721157ae682-59b4ec8d9c1so46221867b3.0
-        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 04:06:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1694516768; x=1695121568; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nxeKap40n9N0Jct85TnQoxJYlNgRlyoVOdviavwIIv8=;
-        b=hxq6TJF8HMyjqFW1Zxj5wQy1nlsOBDVUSQnjCPAO0BVV49/32UolcLMMwgtEfQWxyv
-         h4KosWWVPrmcXDdlZOUVS+2dCFfDhBd6Em++i+z2reqCPZrd0ImmfnuMmnfKN6zIvugq
-         2KTPCzv5M24UwOzFIOZx4yi1NQlTPeMw62b7O8oTRekmb/y+bYtpInRDkDnaMlfayAyI
-         neLIU1iQKoa9CjJzkM0Yn0yqAc8Zo2ZeT1aCIRbGTx70HMWniIL08xkUs74lAjyCEAYU
-         z2CnZW5bBcTDJjce7yw4JLl7STtIHtp5lb5ZOvZe6pCnSJwlymassacuIIjo37MwyAJ0
-         rvbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694516768; x=1695121568;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nxeKap40n9N0Jct85TnQoxJYlNgRlyoVOdviavwIIv8=;
-        b=b6BZ0i++2aJy9dV0pXqH/m8FPYQ+fn5bUH2jqv65kwQ/OL2mBKWosOkiWM/kG+jY52
-         eFogc2gCtj6AjMPnpieDJCeEY4T1dHQBfKpMUa+ogcO2N4nHJ615+g6dVYRmtuB82PvI
-         SfJc+RG62F6g9Ju29JsW2yfLgsceRsM74BIRq/YbI8SsbGsaEsuWYrfkbyZFyUoEajlv
-         4HTlle3lh02uoLKIGlYglDNpFLvIvIRYTedNbAhGocs3xgnnY3ewFDD0Ry5T90byJRd7
-         X+QIlMtbEJv0BPC86TAHRV+krViyCnhnQT/NvB+0alUEgEwlvE5ynx/UVeVXOXFnDX1M
-         Ugrw==
-X-Gm-Message-State: AOJu0YyGX6g6QPtRvtsIKZMBnPiLhFGdkpc5AYVd0jYD7kFeaYjP8vIV
-	JoklTBsUBH2cE0CiMazV1Mv5wEzUxn4G/hscWJpS+Q==
-X-Google-Smtp-Source: AGHT+IGyZPp4TVH1sBukbcNRmYX2EySx2o/za6wxn39EVFdbUk9RivbE+m6qOSfkNS/rkWMpLDTgnTAoDhF0TgN1JVo=
-X-Received: by 2002:a5b:743:0:b0:d79:d23f:b49c with SMTP id
- s3-20020a5b0743000000b00d79d23fb49cmr10905306ybq.35.1694516768133; Tue, 12
- Sep 2023 04:06:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 292A81426C
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 11:06:40 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A56129F
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 04:06:39 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qg1E6-0006GO-5r; Tue, 12 Sep 2023 13:06:38 +0200
+Received: from [2a0a:edc0:2:b01:1d::c0] (helo=ptx.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qg1E5-005lSi-Gp; Tue, 12 Sep 2023 13:06:37 +0200
+Received: from ore by ptx.whiteo.stw.pengutronix.de with local (Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qg1E5-005cZt-9B; Tue, 12 Sep 2023 13:06:37 +0200
+Date: Tue, 12 Sep 2023 13:06:37 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: =?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: PoE support
+Message-ID: <20230912110637.GI780075@pengutronix.de>
+References: <20230912122655.391e2c86@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230912081527.208499-1-herve.codina@bootlin.com> <20230912101510.225920-1-herve.codina@bootlin.com>
-In-Reply-To: <20230912101510.225920-1-herve.codina@bootlin.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Tue, 12 Sep 2023 13:05:57 +0200
-Message-ID: <CACRpkdZ2svQJVG4wiJu90X6HhKudMuAerz12zw2nd84ekLaEJA@mail.gmail.com>
-Subject: Re: [PATCH v5 29/31] MAINTAINERS: Add the Lantiq PEF2256 driver entry
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Lee Jones <lee@kernel.org>, Qiang Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, 
-	Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Shengjiu Wang <shengjiu.wang@gmail.com>, 
-	Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>, 
-	Nicolin Chen <nicoleotsuka@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>, 
-	Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org, 
-	Simon Horman <horms@kernel.org>, Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230912122655.391e2c86@kmaincent-XPS-13-7390>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Tue, Sep 12, 2023 at 12:15=E2=80=AFPM Herve Codina <herve.codina@bootlin=
-.com> wrote:
+Hello Köry,
 
-> After contributing the driver, add myself as the maintainer for the
-> Lantiq PEF2256 driver.
->
-> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-> Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-> ---
->  MAINTAINERS | 9 +++++++++
->  1 file changed, 9 insertions(+)
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 8b987f2c8633..dbc5867016bc 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -11876,6 +11876,15 @@ S:     Maintained
->  F:     arch/mips/lantiq
->  F:     drivers/soc/lantiq
->
-> +LANTIQ PEF2256 DRIVER
-> +M:     Herve Codina <herve.codina@bootlin.com>
-> +S:     Maintained
-> +F:     Documentation/devicetree/bindings/net/lantiq,pef2256.yaml
-> +F:     drivers/net/wan/framer/pef2256/
-> +F:     drivers/pinctrl/pinctrl-pef2256-regs.h
-> +F:     drivers/pinctrl/pinctrl-pef2256.c
+On Tue, Sep 12, 2023 at 12:26:55PM +0200, Köry Maincent wrote:
+> Hello,
+> 
+> I am working on the PoE support and I am facing few questioning.
+> I would like to use the same commands and core as PoDL, but non generic
+> development raised questions.
+> 
+> The admin_state and admin_control are the same therefore I will use the
+> ethtool_podl_pse_admin_state enumeration.
+> The power detection status have few differences, I thought that adding PoE
+> specific states to ethtool_podl_pse_pw_d_status rather than adding a new
+> ethtool_pse_pw_d_status enum is the best way to avoid breaking the old API.
+> 
+> I also would like to remove PoDL reference to ethtool but keep
+> "podl-pse-admin-control" command for old compatibility alongside a new
+> "pse-admin-control" command.
+> 
+> What do you think? Do you think of a better way?
 
-Just use a glob expression:
-F:     drivers/pinctrl/pinctrl-pef2256-*
+By defining UAPI for PoDL/PoE I decided to follow IEEE 802.3
+specification as close as possible for following reasons:
+- we should be backwards and forwards compatible. IEEE 802.3 is always
+  extended, some existing objects and name spaces can be extended
+  withing the specification. If we will merge some of them, it may get
+  challenging to make it properly again.
+- PoDL and PoE have separate attributes and actions withing the specification. 
+- If we follow the spec, it is easier to understand for all who need to
+  implement or extend related software
+- I can imagine some industrial device implementing PoDL/PoE on same
+  port. We should be able to see what is actually active.
 
-Yours,
-Linus Walleij
+IMO, it is better not to mix PoDL and PoE name spaces and keep it as
+close as possible to the IEEE 802.3.
+Same is about ethtool interface. 
+
+Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
