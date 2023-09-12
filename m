@@ -1,126 +1,113 @@
-Return-Path: <netdev+bounces-33399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A477B79DBEB
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 00:36:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60E4979DBE6
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 00:32:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 093751C21046
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 22:36:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 158B22820A0
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 22:32:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 753C9A928;
-	Tue, 12 Sep 2023 22:35:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DADF361;
+	Tue, 12 Sep 2023 22:32:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 667F333D2
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 22:35:59 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7E1B10EB
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 15:35:58 -0700 (PDT)
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38CMZuOO012642;
-	Tue, 12 Sep 2023 22:35:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=new/IQaHyzUJ5mbgAi1ELQnpQf++VPnkQVgikm0wU0k=;
- b=o/JhNQTvaliEH1Hna5IPQ433MY/C5DXJ/YdSq9fnNrQOiOOpwxFeiPqYLcwaLUyW7rlY
- lxs57wPEZfsY5C119B4ZKcPcSs/CFyYmpJWvpX/qkm6DYoJ8OmqBD/DNRxrgRB8MoSv4
- koOyzWSiLWaySKHesvPo2xc1FJVIfdcbgYl59L+TqXsITiUdcfZWPfqX1tSSTHWJt5Rm
- 3tDxfk9dvOWsjUSHUb9DQSfrUmjtn9CEFb4vmP6Y0ZgPFXLfmga2+3oV2/FDSmYtyMAc
- zJXa4PXZnBkWkT41VGE9DpcVjaP95nd1JQITefJTioTZ5/vqx6A0KGn05U9g8cZFi0Tk Jg== 
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t304xh040-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 12 Sep 2023 22:35:55 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38CMF5MM011974;
-	Tue, 12 Sep 2023 22:31:32 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3t15r1x1xd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 12 Sep 2023 22:31:32 +0000
-Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
-	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38CMVWvY6423294
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 12 Sep 2023 22:31:32 GMT
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 16CF65805D;
-	Tue, 12 Sep 2023 22:31:32 +0000 (GMT)
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B9F1F58043;
-	Tue, 12 Sep 2023 22:31:31 +0000 (GMT)
-Received: from [9.61.27.31] (unknown [9.61.27.31])
-	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTPS;
-	Tue, 12 Sep 2023 22:31:31 +0000 (GMT)
-Message-ID: <df083cc4-e903-f122-0817-b1313397e89f@linux.vnet.ibm.com>
-Date: Tue, 12 Sep 2023 15:31:31 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F6DC17C2
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 22:32:17 +0000 (UTC)
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18B5D10C8;
+	Tue, 12 Sep 2023 15:32:17 -0700 (PDT)
+Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-991c786369cso818214866b.1;
+        Tue, 12 Sep 2023 15:32:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694557935; x=1695162735; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=oHGhnV3TjdN0FnFldEVPz9KrEFKfvPykYPDqTHVGIBs=;
+        b=Trr1Il/48N2AqFH7HSNkZXISlg/q0dXCkK8hscNnv2XEnDQYx9w3kFAdKWPFr642jr
+         BTl78G87AdIDFdH7LesPfoN9YviNjzOJYO4Iz9NPG3j8G23GW1dQazQesJqeGnsymbr6
+         mHbt0V64m2Pw58gRvB0OG7r91ZuSW/2aixJqXst9TiMAAW1skJsSekSCVSUvh2/qe9Oo
+         Ji+L43q+kYrueX2rHCR1XANaK+sSpZmzpORhO40MCBym7IDM4MhPDHaBOBbVWWLFRiBL
+         oSrOMI99dpIe/RcPEYxz24F38rUuNFkmciUjITx7WAfE29tIHGWDqjQAiWvt8Au8ixmz
+         DIxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694557935; x=1695162735;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oHGhnV3TjdN0FnFldEVPz9KrEFKfvPykYPDqTHVGIBs=;
+        b=lL6TKoBXmX6YBRgw8fovimVZPs9E7KnzgtnzlP0kwxNB/RmExxo6512v5CJ79pFMPj
+         91I7Xeb+QVunkKJ0r0ElJqr+JFWoICt5qaLy/PqnSgQ9uZqyOVjtu1UyORdkFv5gQq8l
+         j/KGfZ9fA8s/z8/mp/XNqLunz7SjSt1W2eUZpDWmGdvAx8azUY91uVaVtFtrLZ8s8gsS
+         gOZ7G+y2tkKEisz4QLl0Hw1q1jn5Vz6+bo8xZ87gZy6bGtIMAiZgjn3oUEIpJ6ubnzkn
+         b+Bur8Lhd4vRSphTumagnOLUFOAm5mQWVprgjVFH0UNJbgdAE+rN3k1d9DWTC6XILlrw
+         dOZw==
+X-Gm-Message-State: AOJu0YyGY1/F5SyIhZR/FPNQsV6GIK9pS75/LFWZI1NXCUPlvvO0OROv
+	9TA1qhEQ7znXDbzp0bpKQ4Q=
+X-Google-Smtp-Source: AGHT+IFoFjvI5+2n0TYglHgn435yeXiMScCnLmeQ+gvlW6z4mDjsLd0Mij4yOQbqByz17gmPvANBNA==
+X-Received: by 2002:a17:907:763c:b0:9a9:e5bb:eddc with SMTP id jy28-20020a170907763c00b009a9e5bbeddcmr472712ejc.16.1694557935294;
+        Tue, 12 Sep 2023 15:32:15 -0700 (PDT)
+Received: from skbuf ([188.25.254.186])
+        by smtp.gmail.com with ESMTPSA id n12-20020a17090695cc00b00993928e4d1bsm7405814ejy.24.2023.09.12.15.32.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Sep 2023 15:32:15 -0700 (PDT)
+Date: Wed, 13 Sep 2023 01:32:12 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v4 2/2] net: dsa: microchip: Add drive strength
+ configuration
+Message-ID: <20230912223212.5allvc62okewwcym@skbuf>
+References: <20230912045459.1864085-1-o.rempel@pengutronix.de>
+ <20230912045459.1864085-1-o.rempel@pengutronix.de>
+ <20230912045459.1864085-3-o.rempel@pengutronix.de>
+ <20230912045459.1864085-3-o.rempel@pengutronix.de>
+ <20230912113553.fselyj2v5ynddme2@skbuf>
+ <35c1c9ee-357f-4ba5-dd47-95d4c064e69b@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.0
-Subject: Re: [PATCH] ionic: fix 16bit math issue when PAGE_SIZE >= 64KB
-Content-Language: en-US
-To: "Nelson, Shannon" <shannon.nelson@amd.com>, brett.creeley@amd.com,
-        drivers@pensando.io
-Cc: netdev@vger.kernel.org
-References: <20230911222212.103406-1-drc@linux.vnet.ibm.com>
- <a7c39c89-c277-4b5f-92c0-690e31c769b5@amd.com>
-From: David Christensen <drc@linux.vnet.ibm.com>
-In-Reply-To: <a7c39c89-c277-4b5f-92c0-690e31c769b5@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: zyXLzvOJdEvtlNW2Qd5-ZRxvWgWYNRWO
-X-Proofpoint-ORIG-GUID: zyXLzvOJdEvtlNW2Qd5-ZRxvWgWYNRWO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-09-12_22,2023-09-05_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
- mlxscore=0 impostorscore=0 mlxlogscore=999 malwarescore=0 phishscore=0
- priorityscore=1501 bulkscore=0 adultscore=0 lowpriorityscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2308100000 definitions=main-2309120192
+In-Reply-To: <35c1c9ee-357f-4ba5-dd47-95d4c064e69b@wanadoo.fr>
 
-
-
-On 9/11/23 5:24 PM, Nelson, Shannon wrote:
-
->> @@ -452,7 +452,7 @@ void ionic_rx_fill(struct ionic_queue *q)
->>
->>                  /* fill main descriptor - buf[0] */
->>                  desc->addr = cpu_to_le64(buf_info->dma_addr + 
->> buf_info->page_offset);
->> -               frag_len = min_t(u16, len, IONIC_PAGE_SIZE - 
->> buf_info->page_offset);
->> +               frag_len = min_t(u32, len, IONIC_PAGE_SIZE - 
->> buf_info->page_offset);
->>                  desc->len = cpu_to_le16(frag_len);
+On Tue, Sep 12, 2023 at 08:38:05PM +0200, Christophe JAILLET wrote:
+> Le 12/09/2023 � 13:35, Vladimir Oltean a �crit�:
+> > > +	if (!found)
+> > > +		return 0;
+> > 
+> > Maybe "have_any_prop" would be a better name to avoid Christophe's confusion?
 > 
-> Hmm... using cpu_to_le16() on a 32-bit value looks suspect - it might 
-> get forced to 16-bit, but looks funky, and might not be as successful in 
-> a BigEndian environment.
+> Not sure it worth it.
 > 
-> Since the descriptor and sg_elem length fields are limited to 16-bit, 
-> there might need to have something that assures that the resulting 
-> lengths are never bigger than 64k - 1.
+> Christophe should learn to read code or avoid some quick feed-back before
+> morning coffee :)
 > 
+> 'found' looks good enough.
 
-What do you think about this:
-
-  frag_len = min_t(u16, len, min_t(u32, 0xFFFF, IONIC_PAGE_SIZE - 
-buf_info->page_offset));
-
-Can you think of a test case where buf_info->page_offset will be 
-non-zero that I can test locally?
-
-Dave
+Maybe I should have said "Christophe's (expressed) and my (unexpressed) confusion"?
+Actually I had no time to be confused because I saw your comment first,
+but I would have likely made the same suggestion regardless.
 
