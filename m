@@ -1,151 +1,281 @@
-Return-Path: <netdev+bounces-33389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 706B479DB3F
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 23:55:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C5BC779DB89
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 00:02:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19C21281EC9
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 21:55:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1741281CB7
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 22:02:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3FC0BA22;
-	Tue, 12 Sep 2023 21:55:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47560BA29;
+	Tue, 12 Sep 2023 22:02:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3F6AB679
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 21:55:29 +0000 (UTC)
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D094E10D3;
-	Tue, 12 Sep 2023 14:55:28 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-52eed139ec2so6242249a12.2;
-        Tue, 12 Sep 2023 14:55:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B134A92D
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 22:02:29 +0000 (UTC)
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AB1E10D9
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 15:02:28 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-403012f276dso40188355e9.0
+        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 15:02:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694555727; x=1695160527; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HWrbkSWP+kAtkw67a80zxrFIa3m1f+KFJ7dhwBT/qlA=;
-        b=bnn6wSy4ch5BaGb8rZPrHh5/US3uxwEjXm96KlOX5Cltt8b+RZlz0uBU3fklX8wXAD
-         RGeq5cuQcps3zqaakzkgXMEJFQemgkJybDGHJwTZIeIR8mECfMVtIl7KQKQGaQzEhQs4
-         7M3jE0CyVIOTiy36BP/iziM0HXgY4oxCWCAdZG9+0lMuAEy7rIABms/E9NFqJNMwtglL
-         uJuQoNlgb8ExSE6M+gDT1LiuexelBMt9I1zxuSayCgBY43pR7ELONqBNyCQg9WPZqQNm
-         8E48El2ij99ikZnhUyf8h474p4E/TOykOFraRsifAype1dZywCbIWdaS1UkPnwEHCpn+
-         8ejA==
+        d=gmail.com; s=20221208; t=1694556146; x=1695160946; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/1zXodHUWWoiS3DLQ0Igs7xvxAHmTbQxFZwMtP1FTBU=;
+        b=QBQCe5P2kDyTfSGlrMfoEN6DLc0WAqaOjzzutXNBJkn7jplHI9yOO4wtLpx4Y45Do2
+         /ngA36KokALiCDlNBI86zDkqPbu5yPtuIgd5r2YmUsVOoWY8LqnLK9kdwCOBSOYkzYPv
+         2sJEFSEyl9GUW2uuWay9QJR/HypH2GHkJxj+hhWC9ta+5LgOuHm2I0ExxWOjsNOWGT6A
+         vzc6KLq5hqsfjR5VbMQ1Jej4EHsFLo8tTZz4tfwhsboknvodAmSQ/07/735FPREJSJDc
+         5QRdnoL5BkRK9GjFxMTjcjx4Ud+aHHA1e31sY6hwkPbq2P8Xp2SVKU7k2+C/UHRgIQff
+         be6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694555727; x=1695160527;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HWrbkSWP+kAtkw67a80zxrFIa3m1f+KFJ7dhwBT/qlA=;
-        b=Pb/JKNFlS5Ub/UrcpdJn/MYXbaASRHF+PkROI6dA5Hvd171tKJ32jY/gM1nxt5oRzY
-         dJb6+jQZ+z7xUuMuMQoHMdKyHNmJDOEPLsNgPV93M2yeHvLA48/0dzderfNcm9RFPecy
-         vTFemoCsNf+cd7g/7gBkxFs/M9OIDW7b1vHlUU8nXBLcIsrqaXSwfHLPI0cmI7hZC8XU
-         GRMdmT6DptLWrOC8ODMTOcr+QkHI0WiI4Dz4EEDeV5pin6/QfAGbg9Ybq1JvjEdWdcXU
-         xmnIKfc2wzeTGrM9Xt3hv/JEVgJGqCVB80wSFBXnN6wSWeYBl+RBrwD+vMBoLtmv511r
-         UN/Q==
-X-Gm-Message-State: AOJu0Yzl02CLx+KO5XKPKPbQwxR7+LwToom2XIdrJIt+7Iejd2iot0qM
-	3pxSq/tutJ17ELdblALR4YQ=
-X-Google-Smtp-Source: AGHT+IEojQmT/R0F2mSzoHiiT2Rph99bNbGnxk23OTYI509L2S5zzsOUuGSMOtwTNcgGnSihIctLwg==
-X-Received: by 2002:a05:6402:74f:b0:523:3889:542a with SMTP id p15-20020a056402074f00b005233889542amr721651edy.34.1694555726411;
-        Tue, 12 Sep 2023 14:55:26 -0700 (PDT)
-Received: from skbuf ([188.25.254.186])
-        by smtp.gmail.com with ESMTPSA id f9-20020a056402194900b0052fc0832e08sm397825edz.1.2023.09.12.14.55.25
+        d=1e100.net; s=20230601; t=1694556146; x=1695160946;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/1zXodHUWWoiS3DLQ0Igs7xvxAHmTbQxFZwMtP1FTBU=;
+        b=k3QKzK42V44Cta64nR25TEzDo6KnDuzmKWti/kn3KPzEvp6+f4p0XqEC7OELYHWy3G
+         +dAKvUXRB1ey8RtE3JWRNJzkJ77O4u6P73vT1UB6GfMOZBDjRv09xd1eHyCK2zomzVut
+         B+vQ7alp+8vx45t4V+f1OE4MjZNLgK2BYkgP6ibQjgZMgJ5HEuthSIRLBvIa/X5wBesH
+         p+foXZXKgSblQNe1wM4V1wT4sxKooahJ8mOYLo/wItnUpm1njPtQNKO2f/Z9Dntp4tEa
+         +ge/LrKMRMaORpsenFY2Vzi0L3dnw7F/GkaJxFxfv5Ye7FaIYNRtNuZWve6IMlLjYpnZ
+         WXRg==
+X-Gm-Message-State: AOJu0Yzv58fYgqIDPisoCa3sDy86Tkp202X4PbYFm9CyT57wW/iG1fcF
+	hUN9HxzFQznv/jyQOjWbvks+OZdxfSSJ8Q==
+X-Google-Smtp-Source: AGHT+IFU7w/n9NI6qorb7JT1l79urAzjW+2sriQpNPvL6lTJ0ZTsFOTGXNzh8YsDrGvlaFRGyqQkIg==
+X-Received: by 2002:a05:600c:24d:b0:3fe:795:712a with SMTP id 13-20020a05600c024d00b003fe0795712amr498555wmj.27.1694556146169;
+        Tue, 12 Sep 2023 15:02:26 -0700 (PDT)
+Received: from xmarquiegui-HP-ZBook-15-G6.internal.ainguraiiot.com (210.212-55-6.static.clientes.euskaltel.es. [212.55.6.210])
+        by smtp.gmail.com with ESMTPSA id a3-20020adfeec3000000b003196e992567sm13799082wrp.115.2023.09.12.15.02.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Sep 2023 14:55:26 -0700 (PDT)
-Date: Wed, 13 Sep 2023 00:55:23 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Tristram.Ha@microchip.com, Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	UNGLinuxDriver@microchip.com,
-	Oleksij Rempel <linux@rempel-privat.de>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [[RFC PATCH v4 net-next] 0/2] net: dsa: hsr: Enable HSR HW
- offloading for KSZ9477
-Message-ID: <20230912215523.as4puqamj65dikip@skbuf>
-References: <20230912092909.4yj4b2b4xrhzdztu@skbuf>
- <20230906152801.921664-1-lukma@denx.de>
- <20230911165848.0741c03c@wsk>
- <20230911160501.5vc4nttz6fnww56h@skbuf>
- <20230912101748.0ca4eec8@wsk>
- <20230912092909.4yj4b2b4xrhzdztu@skbuf>
- <20230912160326.188e1d13@wsk>
- <20230912160326.188e1d13@wsk>
- <20230912142644.u4sdkveei3e5hwaf@skbuf>
- <20230912170641.5bfc3cfe@wsk>
+        Tue, 12 Sep 2023 15:02:25 -0700 (PDT)
+From: Xabier Marquiegui <reibax@gmail.com>
+To: netdev@vger.kernel.org
+Cc: richardcochran@gmail.com,
+	horms@kernel.org,
+	chrony-dev@chrony.tuxfamily.org,
+	mlichvar@redhat.com,
+	reibax@gmail.com,
+	ntp-lists@mattcorallo.com,
+	shuah@kernel.org,
+	davem@davemloft.net,
+	rrameshbabu@nvidia.com,
+	alex.maftei@amd.com
+Subject: [PATCH net-next v2 1/3] ptp: Replace timestamp event queue with linked list
+Date: Wed, 13 Sep 2023 00:02:15 +0200
+Message-Id: <20230912220217.2008895-1-reibax@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230912170641.5bfc3cfe@wsk>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Sep 12, 2023 at 05:06:41PM +0200, Lukasz Majewski wrote:
-> Are we debating about some possible impact on patches which were posted
-> and (in a near future?) would be reposted?
+This is the first of a set of patches to introduce linked lists to the
+timestamp event queue. The final goal is to be able to have multiple
+readers for the timestamp queue.
 
-We are discussing the ways in which a multi-purpose register should be
-programmed. Not "the impact on patches" per se, because Oleksij will
-have to adapt no matter what you do, but rather the options that remain
-available to him, after the first feature that makes use of the
-multi-purpose register makes its way to mainline.
+On this one we maintain the original feature set, and we just introduce
+the linked lists to the data structure.
 
-> > > Considering the above - the HSR implementation is safe (to the
-> > > extend to the whole DSA subsystem current operation). Am I correct?
-> > >  
-> > 
-> > If we exclude the aforementioned bug (which won't be a bug forever),
-> > there still exists the case where the MAC address of a DSA user port
-> > can be changed. The HSR driver has a NETDEV_CHANGEADDR handler for
-> > this as well, and updates its own MAC address to follow the port. If
-> > that is allowed to happen after the offload, currently it will break
-> > the offload.
-> 
-> But then we can have struct ksz_device extended with bitmask -
-> hw_mac_addr_ports, which could be set to ports (WoL or HSR) when
-> REG_MAC_ADDR_0 is written.
-> 
-> If WoL would like to alter it after it was written by HSR, then the
-> error is presented (printed) to the user and we return.
-> 
-> The same would be with HSR altering the WoL's MAC in-device setup.
-> 
-> 
-> The HSR or WoL can be added without issues (the first one which is
-> accepted).
-> 
-> Then the second feature would need to implement this check.
+Signed-off-by: Xabier Marquiegui <reibax@gmail.com>
+Suggested-by: Richard Cochran <richardcochran@gmail.com>
+---
+v2:
+  - Style changes to comform to checkpatch strict suggestions
+v1: https://lore.kernel.org/netdev/20230906104754.1324412-2-reibax@gmail.com/
 
-This is more or less a rehash of what I proposed as option 2, except for
-the fact that you suggest a port mask and I suggest a proper refcount_t.
-And the reason why I suggest that is to allow the "WoL+HSR on the same
-port" to work. With your proposal, both the HSR and WoL code paths would
-set the same bit in hw_mac_addr_ports, which would become problematic
-when the time comes to unset it. Not so much when every port calls
-refcount_inc() per feature. With WoL+HSR on the same port, the MAC
-address would have a refcount of 2, and you could call port_hsr_leave()
-and that refcount would just drop to 1 instead of letting go.
+ drivers/ptp/ptp_chardev.c | 16 ++++++++++++++--
+ drivers/ptp/ptp_clock.c   | 30 ++++++++++++++++++++++++++++--
+ drivers/ptp/ptp_private.h |  4 +++-
+ drivers/ptp/ptp_sysfs.c   |  6 +++++-
+ 4 files changed, 50 insertions(+), 6 deletions(-)
 
-There are probably hundreds of implementations of this idea in the
-kernel, but the one that comes to my mind is ocelot_mirror_get() +
-ocelot_mirror_put(). Again, I need to mention that I know that port
-mirroring != HSR - I'm just talking about the technique.
+diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
+index 362bf756e6b7..197edf1179f1 100644
+--- a/drivers/ptp/ptp_chardev.c
++++ b/drivers/ptp/ptp_chardev.c
+@@ -435,10 +435,16 @@ long ptp_ioctl(struct posix_clock *pc, unsigned int cmd, unsigned long arg)
+ __poll_t ptp_poll(struct posix_clock *pc, struct file *fp, poll_table *wait)
+ {
+ 	struct ptp_clock *ptp = container_of(pc, struct ptp_clock, clock);
++	struct timestamp_event_queue *queue;
+ 
+ 	poll_wait(fp, &ptp->tsev_wq, wait);
+ 
+-	return queue_cnt(&ptp->tsevq) ? EPOLLIN : 0;
++	/* Extract only the first element in the queue list
++	 * TODO: Identify the relevant queue
++	 */
++	queue = list_entry(&ptp->tsevqs, struct timestamp_event_queue, qlist);
++
++	return queue_cnt(queue) ? EPOLLIN : 0;
+ }
+ 
+ #define EXTTS_BUFSIZE (PTP_BUF_TIMESTAMPS * sizeof(struct ptp_extts_event))
+@@ -447,12 +453,18 @@ ssize_t ptp_read(struct posix_clock *pc,
+ 		 uint rdflags, char __user *buf, size_t cnt)
+ {
+ 	struct ptp_clock *ptp = container_of(pc, struct ptp_clock, clock);
+-	struct timestamp_event_queue *queue = &ptp->tsevq;
++	struct timestamp_event_queue *queue;
+ 	struct ptp_extts_event *event;
+ 	unsigned long flags;
+ 	size_t qcnt, i;
+ 	int result;
+ 
++	/* Extract only the first element in the queue list
++	 * TODO: Identify the relevant queue
++	 */
++	queue = list_first_entry(&ptp->tsevqs, struct timestamp_event_queue,
++				 qlist);
++
+ 	if (cnt % sizeof(struct ptp_extts_event) != 0)
+ 		return -EINVAL;
+ 
+diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+index 80f74e38c2da..7ac04a282ec5 100644
+--- a/drivers/ptp/ptp_clock.c
++++ b/drivers/ptp/ptp_clock.c
+@@ -166,6 +166,18 @@ static struct posix_clock_operations ptp_clock_ops = {
+ 	.read		= ptp_read,
+ };
+ 
++static void ptp_clean_queue_list(struct ptp_clock *ptp)
++{
++	struct timestamp_event_queue *element;
++	struct list_head *pos;
++
++	list_for_each(pos, &ptp->tsevqs) {
++		element = list_entry(pos, struct timestamp_event_queue, qlist);
++		list_del(pos);
++		kfree(element);
++	}
++}
++
+ static void ptp_clock_release(struct device *dev)
+ {
+ 	struct ptp_clock *ptp = container_of(dev, struct ptp_clock, dev);
+@@ -175,6 +187,7 @@ static void ptp_clock_release(struct device *dev)
+ 	mutex_destroy(&ptp->tsevq_mux);
+ 	mutex_destroy(&ptp->pincfg_mux);
+ 	mutex_destroy(&ptp->n_vclocks_mux);
++	ptp_clean_queue_list(ptp);
+ 	ida_free(&ptp_clocks_map, ptp->index);
+ 	kfree(ptp);
+ }
+@@ -206,6 +219,7 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+ 				     struct device *parent)
+ {
+ 	struct ptp_clock *ptp;
++	struct timestamp_event_queue *queue = NULL;
+ 	int err = 0, index, major = MAJOR(ptp_devt);
+ 	size_t size;
+ 
+@@ -228,7 +242,13 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+ 	ptp->info = info;
+ 	ptp->devid = MKDEV(major, index);
+ 	ptp->index = index;
+-	spin_lock_init(&ptp->tsevq.lock);
++	INIT_LIST_HEAD(&ptp->tsevqs);
++	queue = kzalloc(sizeof(*queue), GFP_KERNEL);
++	if (!queue)
++		goto no_memory_queue;
++	spin_lock_init(&queue->lock);
++	list_add_tail(&queue->qlist, &ptp->tsevqs);
++	/* TODO - Transform or delete this mutex */
+ 	mutex_init(&ptp->tsevq_mux);
+ 	mutex_init(&ptp->pincfg_mux);
+ 	mutex_init(&ptp->n_vclocks_mux);
+@@ -333,6 +353,8 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+ 	mutex_destroy(&ptp->tsevq_mux);
+ 	mutex_destroy(&ptp->pincfg_mux);
+ 	mutex_destroy(&ptp->n_vclocks_mux);
++	ptp_clean_queue_list(ptp);
++no_memory_queue:
+ 	ida_free(&ptp_clocks_map, index);
+ no_slot:
+ 	kfree(ptp);
+@@ -375,6 +397,7 @@ EXPORT_SYMBOL(ptp_clock_unregister);
+ 
+ void ptp_clock_event(struct ptp_clock *ptp, struct ptp_clock_event *event)
+ {
++	struct timestamp_event_queue *tsevq, *tsevq_alt;
+ 	struct pps_event_time evt;
+ 
+ 	switch (event->type) {
+@@ -383,7 +406,10 @@ void ptp_clock_event(struct ptp_clock *ptp, struct ptp_clock_event *event)
+ 		break;
+ 
+ 	case PTP_CLOCK_EXTTS:
+-		enqueue_external_timestamp(&ptp->tsevq, event);
++		/* Enqueue timestamp on all other queues */
++		list_for_each_entry_safe(tsevq, tsevq_alt, &ptp->tsevqs, qlist) {
++			enqueue_external_timestamp(tsevq, event);
++		}
+ 		wake_up_interruptible(&ptp->tsev_wq);
+ 		break;
+ 
+diff --git a/drivers/ptp/ptp_private.h b/drivers/ptp/ptp_private.h
+index 75f58fc468a7..314c21c39f6a 100644
+--- a/drivers/ptp/ptp_private.h
++++ b/drivers/ptp/ptp_private.h
+@@ -15,6 +15,7 @@
+ #include <linux/ptp_clock.h>
+ #include <linux/ptp_clock_kernel.h>
+ #include <linux/time.h>
++#include <linux/list.h>
+ 
+ #define PTP_MAX_TIMESTAMPS 128
+ #define PTP_BUF_TIMESTAMPS 30
+@@ -25,6 +26,7 @@ struct timestamp_event_queue {
+ 	int head;
+ 	int tail;
+ 	spinlock_t lock;
++	struct list_head qlist;
+ };
+ 
+ struct ptp_clock {
+@@ -35,7 +37,7 @@ struct ptp_clock {
+ 	int index; /* index into clocks.map */
+ 	struct pps_device *pps_source;
+ 	long dialed_frequency; /* remembers the frequency adjustment */
+-	struct timestamp_event_queue tsevq; /* simple fifo for time stamps */
++	struct list_head tsevqs; /* timestamp fifo list */
+ 	struct mutex tsevq_mux; /* one process at a time reading the fifo */
+ 	struct mutex pincfg_mux; /* protect concurrent info->pin_config access */
+ 	wait_queue_head_t tsev_wq;
+diff --git a/drivers/ptp/ptp_sysfs.c b/drivers/ptp/ptp_sysfs.c
+index 6e4d5456a885..2675f383cd0a 100644
+--- a/drivers/ptp/ptp_sysfs.c
++++ b/drivers/ptp/ptp_sysfs.c
+@@ -75,12 +75,16 @@ static ssize_t extts_fifo_show(struct device *dev,
+ 			       struct device_attribute *attr, char *page)
+ {
+ 	struct ptp_clock *ptp = dev_get_drvdata(dev);
+-	struct timestamp_event_queue *queue = &ptp->tsevq;
++	struct timestamp_event_queue *queue;
+ 	struct ptp_extts_event event;
+ 	unsigned long flags;
+ 	size_t qcnt;
+ 	int cnt = 0;
+ 
++	/* The sysfs fifo will always draw from the fist queue */
++	queue = list_first_entry(&ptp->tsevqs, struct timestamp_event_queue,
++				 qlist);
++
+ 	memset(&event, 0, sizeof(event));
+ 
+ 	if (mutex_lock_interruptible(&ptp->tsevq_mux))
+-- 
+2.34.1
 
-There is one more thing that your reply to my observation fails to
-address. Even with this refcount thing, you will still need to add code
-to dsa_slave_set_mac_address() which notifies the ksz driver, so that
-the driver can refuse MAC address changes, which would break the
-offloads. Ack?
-
-In principle it sounds like a plan. It just needs to be implemented.
 
