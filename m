@@ -1,153 +1,179 @@
-Return-Path: <netdev+bounces-33344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1440B79D781
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 19:26:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 330C779D787
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 19:29:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1D01282032
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 17:25:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE546282131
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 17:29:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FE8A8F56;
-	Tue, 12 Sep 2023 17:25:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6169F8F54;
+	Tue, 12 Sep 2023 17:29:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 328A53D70
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 17:25:55 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7103B10F2
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 10:25:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1694539553;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ITgoIWLjrCTnPogKL1G4MPNVe08xbouyawnvHOqvqwk=;
-	b=TJJF+fPITJXZCBWULr9uqbAGDaypbmLdxJ2LLY4lKvEx9/zaYzvsjj85nuF+YTkqVJ+qiP
-	xnmeOd0JmyGf9SiVGLUeRgyC31K0Z0eY4w5EDN1hLEeEffBa0atDbIu7CdvAINRwv6nqY3
-	mrLUpJtitU1gW/aySyzoEi/kQ2yu+6o=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-333-_GLMMxrDPQaC3yl94CoqlQ-1; Tue, 12 Sep 2023 13:25:52 -0400
-X-MC-Unique: _GLMMxrDPQaC3yl94CoqlQ-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-9a1aaaf6460so130704166b.1
-        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 10:25:51 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 538055CAC
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 17:29:03 +0000 (UTC)
+Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7014710F2
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 10:29:02 -0700 (PDT)
+Received: by mail-qt1-x836.google.com with SMTP id d75a77b69052e-41513d2cca7so26641cf.0
+        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 10:29:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1694539741; x=1695144541; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=C68JmHetf6csZ7uaIOcZ347VMnT6195vMOibg6ebhPk=;
+        b=icRgmMOZ1JamHxs7ch4TprRDtsyQ6w3whnhRDbhHRWL4kDhOtCeVotQJn1AnTIpU8g
+         x/MePSsvDeWTTh7RdoI/X0LGiXEaAOlquEspn6oZnRswziZsminwZCqqKdtoNzyWpw+H
+         XC1Yip8GgcQ7bBg4A1IWb8TvvkNpDOqsyDb+622qXzgCbUUOlryj6zouWh9FSzusaG0q
+         P7fBOC2M0P/t+KlkJYfeHd7eJ5B7j3MSs2PvkjusxZDP+jw6w0cOgcm/AWhbGlki818G
+         cWGJTb2fowKJTry25/xkvHWXU1mjPrcdTXyiv8ASHXR4zv1c3xNuxFdSvwpqzV97lMYx
+         TPWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694539551; x=1695144351;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ITgoIWLjrCTnPogKL1G4MPNVe08xbouyawnvHOqvqwk=;
-        b=g8uIsBtggv163gnrLYUBf5L1sVHuPtg38TRi17wyIQ+E52csNHwlohRuvPlu/g8Ygw
-         +BrpIKKngQeeBq0HbABInox4+CbIDd8jSFY2dJxvAvG1mycnHzOn0/JF8DoD7JeUtMYt
-         TReI2WMppv6wE2PNQZAof84PRyv21FDTzMaUE3DZ5bpb2rqFNBgSvrzaTSavGCcLLavK
-         JFWXcB/Vn01qukybnjXGlmjcoFhqPf5XVVDbrxCVTp5zhX3mUQtIOQwwKAgISWAkEgbZ
-         cq3O2EZbEtM5zazLsESlIR5NMAumyNVwu+J+RR27LjAyv50teEkQOwxiojUg58k4bWR0
-         thgA==
-X-Gm-Message-State: AOJu0YxYBFnRDLpYNOsAGrKiUIXxmcpbNdLaZPmW8Inbzzd/b0m8kqkf
-	alQaKy9GyAoNeVipGImknBcbM0SrnldMb79ZHknDURcrOmLikYTIDjtedM5Hk3CAyhlbzsN2l3I
-	402QumRRuCPbXIRL2
-X-Received: by 2002:a17:907:7817:b0:9a9:f7c3:c178 with SMTP id la23-20020a170907781700b009a9f7c3c178mr9063587ejc.7.1694539550889;
-        Tue, 12 Sep 2023 10:25:50 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEjWsSi4r6zPsRAGz2JlJmvUW1iHKo5jRoGzLpuhxy30ingNuuICP4j4pOrh1ukiGFoBi/ABw==
-X-Received: by 2002:a17:907:7817:b0:9a9:f7c3:c178 with SMTP id la23-20020a170907781700b009a9f7c3c178mr9063576ejc.7.1694539550493;
-        Tue, 12 Sep 2023 10:25:50 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-249-231.dyn.eolo.it. [146.241.249.231])
-        by smtp.gmail.com with ESMTPSA id gs9-20020a170906f18900b0099bd5d28dc4sm7186063ejb.195.2023.09.12.10.25.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Sep 2023 10:25:50 -0700 (PDT)
-Message-ID: <32a8715a63b686aa0ac19fdae22b5d605d47ae35.camel@redhat.com>
-Subject: Re: [PATCH net-next v1 2/2] net: core: Sort headers alphabetically
-From: Paolo Abeni <pabeni@redhat.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org, "David S. Miller"
-	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	 <kuba@kernel.org>
-Date: Tue, 12 Sep 2023 19:25:48 +0200
-In-Reply-To: <ZQCaMHBHp/Ha29ao@smile.fi.intel.com>
-References: <20230911154534.4174265-1-andriy.shevchenko@linux.intel.com>
-	 <20230911154534.4174265-2-andriy.shevchenko@linux.intel.com>
-	 <20230912152031.GI401982@kernel.org> <ZQCTXkZcJLvzNL4F@smile.fi.intel.com>
-	 <20f57b1309b6df60b08ce71f2d7711fa3d6b6b44.camel@redhat.com>
-	 <ZQCaMHBHp/Ha29ao@smile.fi.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        d=1e100.net; s=20230601; t=1694539741; x=1695144541;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=C68JmHetf6csZ7uaIOcZ347VMnT6195vMOibg6ebhPk=;
+        b=kKlNSTranXwijB8G6EJpJQ4nrkRNc7ZzMKq+R/Mpeyj0iF318fcej3BE5/T4Gdk+uU
+         6au/ofS29zlOrbAs1cONJyYLFDIIt86ZUKiG1H9AuCcGXEPBhwy9dIe6Pc5tdpMFa+4L
+         TIwtz0NxYM1jg3eTtpQt8f6ElrJjZXoN5GreMHZiyyXeC1RWHvUD2LT5e3i2l4/Nberu
+         1WSvOLud600tIuVa15OmIbwMYz6zN+SdKhYVUDoiq5EoKT1HtDtEPH80gT7yX52W4MLY
+         vuvxVD3szSOjbwAAO5Nmd2HyIgVS2y0if6elM4nA7x9vZiW1QQPQHOrjg/zDY8iCfCA6
+         n8sA==
+X-Gm-Message-State: AOJu0Yxto5ycgCnVILVkw/96ynZIuGc5khDI2KReGXSx57A7Fa941ulT
+	nVCYduQ/9qfCZUvu6UZUQX/hYM4ZyX3JpcsUY+mCSgKaF5MGi0wzn7c=
+X-Google-Smtp-Source: AGHT+IFQsLvdANwfSgZAFEuZYncS5OyKbw/svHb1e7cq5kBKaXzbwRraAgtp/jHHozBU2dyWJsJiSiICFMZrXJHEVLo=
+X-Received: by 2002:a05:622a:1914:b0:410:4845:8d37 with SMTP id
+ w20-20020a05622a191400b0041048458d37mr253844qtc.29.1694539741427; Tue, 12 Sep
+ 2023 10:29:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20230911082016.3694700-1-yajun.deng@linux.dev>
+ <CANn89i+W1iAQmOhunLbqpvHu8EUO6uawv6Uvx7qimyBa_PBNCg@mail.gmail.com>
+ <f3e84a37-3218-0d52-e7ed-2d215fed58e3@intel.com> <CANn89i+AwmpjM-bNuYRS26v-GRrVoucewxgmkvv25PNM4VWPGA@mail.gmail.com>
+ <39c906f6-910d-01c7-404a-8fe6a161ef2e@intel.com>
+In-Reply-To: <39c906f6-910d-01c7-404a-8fe6a161ef2e@intel.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 12 Sep 2023 19:28:50 +0200
+Message-ID: <CANn89i+QSPoXphaLzfKCqCHxjsD20ifr8YPJM_fZ_H5kFZ7dwQ@mail.gmail.com>
+Subject: Re: [PATCH] net/core: Export dev_core_stats_rx_dropped_inc sets
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Yajun Deng <yajun.deng@linux.dev>, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2023-09-12 at 20:04 +0300, Andy Shevchenko wrote:
-> On Tue, Sep 12, 2023 at 06:53:23PM +0200, Paolo Abeni wrote:
-> > On Tue, 2023-09-12 at 19:35 +0300, Andy Shevchenko wrote:
-> > > On Tue, Sep 12, 2023 at 05:20:31PM +0200, Simon Horman wrote:
-> > > > On Mon, Sep 11, 2023 at 06:45:34PM +0300, Andy Shevchenko wrote:
-> > > > > It's rather a gigantic list of heards that is very hard to follow=
-.
-> > > > > Sorting helps to see what's already included and what's not.
-> > > > > It improves a maintainability in a long term.
-> > > > >=20
-> > > > > Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com=
+On Tue, Sep 12, 2023 at 7:16=E2=80=AFPM Alexander Lobakin
+<aleksander.lobakin@intel.com> wrote:
 >
-> > > >=20
-> > > > Hi Andy,
-> > > >=20
-> > > > At the risk of bike shedding, the sort function of Vim, when operat=
-ing
-> > > > with the C locale, gives a slightly different order, as experssed b=
-y
-> > > > this incremental diff.
-> > > >=20
-> > > > I have no objections to your oder, but I'm slightly curious as
-> > > > to how it came about.
-> > >=20
-> > > !sort which is external command.
-> > >=20
-> > > $ locale -k LC_COLLATE
-> > > collate-nrules=3D4
-> > > collate-rulesets=3D""
-> > > collate-symb-hash-sizemb=3D1303
-> > > collate-codeset=3D"UTF-8"
-> >=20
-> > I'm unsure this change is worthy. It will make any later fix touching
-> > the header list more difficult to backport, and I don't see a great
-> > direct advantage.
->=20
-> As Rasmus put it here
-> https://lore.kernel.org/lkml/5eca0ab5-84be-2d8f-e0b3-c9fdfa961826@rasmusv=
-illemoes.dk/
-> In short term you can argue that it's not beneficial, but in long term it=
-'s given
-> less conflicts.
->=20
-> > Please repost the first patch standalone.
->=20
-> Why to repost, what did I miss? It's available via lore, just run
->=20
->   b4 am -slt -P _ 20230911154534.4174265-1-andriy.shevchenko@linux.intel.=
-com
->=20
-> to get it :-)
+> From: Eric Dumazet <edumazet@google.com>
+> Date: Tue, 12 Sep 2023 18:04:44 +0200
+>
+> > On Tue, Sep 12, 2023 at 5:58=E2=80=AFPM Alexander Lobakin
+> > <aleksander.lobakin@intel.com> wrote:
+> >>
+> >> From: Eric Dumazet <edumazet@google.com>
+> >> Date: Tue, 12 Sep 2023 06:23:24 +0200
+> >>
+> >>> On Mon, Sep 11, 2023 at 10:20=E2=80=AFAM Yajun Deng <yajun.deng@linux=
+.dev> wrote:
+> >>>>
+> >>>> Although there is a kfree_skb_reason() helper function that can be u=
+sed
+> >>>> to find the reason for dropped packets, but most callers didn't incr=
+ease
+> >>>> one of rx_dropped, tx_dropped, rx_nohandler and rx_otherhost_dropped=
+.
+> >>
+> >> [...]
+> >>
+> >>>>  EXPORT_SYMBOL(netdev_stats_to_stats64);
+> >>>>
+> >>>> -struct net_device_core_stats __percpu *netdev_core_stats_alloc(stru=
+ct net_device *dev)
+> >>>> +static struct net_device_core_stats __percpu *netdev_core_stats_all=
+oc(struct net_device *dev)
+> >>>>  {
+> >>>>         struct net_device_core_stats __percpu *p;
+> >>>>
+> >>>> @@ -10488,7 +10488,33 @@ struct net_device_core_stats __percpu *netd=
+ev_core_stats_alloc(struct net_device
+> >>>>         /* This READ_ONCE() pairs with the cmpxchg() above */
+> >>>>         return READ_ONCE(dev->core_stats);
+> >>>>  }
+> >>>> -EXPORT_SYMBOL(netdev_core_stats_alloc);
+> >>>> +
+> >>>> +static inline struct net_device_core_stats __percpu *dev_core_stats=
+(struct net_device *dev)
+> >>>
+> >>> Please remove this inline attritbute. Consider using __cold instead.
+> >>
+> >> __cold? O_o I thought the author's inlining it as it's a couple
+> >> locs/intstructions, while the compilers would most likely keep it
+> >> non-inlined as it's referenced 4 times. __cold will for sure keep it
+> >> standalone and place it in .text.cold, i.e. far away from the call sit=
+es.
+> >> I realize dev_core_stats_*() aren't called frequently, but why making
+> >> only one small helper cold rather than all of them then?
+> >>
+> >
+> > This helper is used at least one time per netdevice lifetime.
+> > This is definitely cold.
+>
+> But then each dev_stats_*_inc() (not cold) has to call it from a
+> completely different piece of .text far from their. I either don't
+> understand the idea or dunno. Why not make them cold as well then?
+>
 
-It's fairly better if actions (changes) on patches are taken by the
-submitter: it scales way better, and if the other path take places we
-can be easily flooded with small (but likely increasingly less smaller)
-requests that will soon prevent any other activity from being taken.
+The __cold attribute is only applied to the helper _allocating_ the
+memory, once.
 
-Please, repost the single patch, it would be easier to me.
+Not on the functions actually incrementing the stats.
 
-Thanks!
+There are situations where they can be called thousands/millions of
+times per second (incast flood).
+If this situation happens, the _allocation_ still happens once.
 
-Paolo
 
+
+> > Forcing an inline makes no sense, this would duplicate the code four ti=
+mes,
+> > for absolutely no gain.
+>
+> I'd love to see bloat-o-meter numbers, I suspect we're talking about
+> 20-30 bytes.
+>
+> >
+> >>>
+> >>>> +{
+> >>>> +       /* This READ_ONCE() pairs with the write in netdev_core_stat=
+s_alloc() */
+> >>>> +       struct net_device_core_stats __percpu *p =3D READ_ONCE(dev->=
+core_stats);
+> >>>> +
+> >>>> +       if (likely(p))
+> >>>> +               return p;
+> >>>> +
+> >>>> +       return netdev_core_stats_alloc(dev);
+> >>>> +}
+> >>
+> >> [...]
+> >>
+> >> Thanks,
+> >> Olek
+>
+> Thanks,
+> Olek
 
