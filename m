@@ -1,160 +1,86 @@
-Return-Path: <netdev+bounces-33319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE99879D63A
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 18:27:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CF51B79D64E
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 18:29:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19EB6281B04
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 16:27:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8928C2816CD
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 16:29:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D823518C3F;
-	Tue, 12 Sep 2023 16:27:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D84D19BBF;
+	Tue, 12 Sep 2023 16:29:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6489AD49
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 16:27:14 +0000 (UTC)
-Received: from smtp-fw-9103.amazon.com (smtp-fw-9103.amazon.com [207.171.188.200])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A0ED10E5
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 09:27:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1694536034; x=1726072034;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=arDrHgXlq5TWmThsRmjX5SIzcAkGMAjRoCDv8stogV4=;
-  b=IwRkRwTbp/JEz6OqLFOG/IO7HChpxXbd0JlLWqawWgdpMwZYyHBj195n
-   LK8fR1WGyCQl1Aw7fDQC2FM12mhoCNJCgvjX3kMVn2FcEBVfmuSgAtZsa
-   K9uPtz2ZSXSetHugfgXjXSd0AU13tJwjrgoMzSwVHFtzkEQ6Wxl4FhcoS
-   E=;
-X-IronPort-AV: E=Sophos;i="6.02,139,1688428800"; 
-   d="scan'208";a="1153786450"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-3554bfcf.us-east-1.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9103.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2023 16:27:05 +0000
-Received: from EX19MTAUWB001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-	by email-inbound-relay-iad-1e-m6i4x-3554bfcf.us-east-1.amazon.com (Postfix) with ESMTPS id 2711780543;
-	Tue, 12 Sep 2023 16:27:02 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Tue, 12 Sep 2023 16:26:54 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.171.20) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Tue, 12 Sep 2023 16:26:52 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <jbaron@akamai.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<kuba@kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<kuniyu@amazon.com>
-Subject: Re: [net-next 1/2] inet_diag: export SO_REUSEADDR and SO_REUSEPORT sockopts
-Date: Tue, 12 Sep 2023 09:26:44 -0700
-Message-ID: <20230912162644.60787-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <0b1deb44b8401042542a112e8235e039fc0a5f65.1694523876.git.jbaron@akamai.com>
-References: <0b1deb44b8401042542a112e8235e039fc0a5f65.1694523876.git.jbaron@akamai.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 917CD18C3F
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 16:29:46 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCC33137;
+	Tue, 12 Sep 2023 09:29:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=mtkXtIv3OUtKqJKyazqR9g5lFZj/7Eeun1nxUSl1J7Y=; b=iCv/aWLXL5VPfYV2B2qrnGPIYU
+	zYLjJvgBWf+losG8UneSRGCfycDkV6omw+JbZCsxZMhnIWVl7euKI6oKyZQb0hhAOmnYxk4TDDpvV
+	QpFasjd1rhRueVvv/EOwSVJOuAdDFqsuPyiininZK9zKDMyd2DAB92KbmPadKRI1N1sU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qg6Gi-006FSj-N1; Tue, 12 Sep 2023 18:29:40 +0200
+Date: Tue, 12 Sep 2023 18:29:40 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Oleksij Rempel <linux@rempel-privat.de>,
+	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
+	thomas.petazzoni@bootlin.com,
+	Christophe Leroy <christophe.leroy@csgroup.eu>
+Subject: Re: [RFC PATCH net-next 4/7] net: ethtool: add a netlink command to
+ list PHYs
+Message-ID: <df90eb1f-fab1-408d-af8d-fc620f505522@lunn.ch>
+References: <20230907092407.647139-1-maxime.chevallier@bootlin.com>
+ <20230907092407.647139-5-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.187.171.20]
-X-ClientProxiedBy: EX19D044UWA002.ant.amazon.com (10.13.139.11) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230907092407.647139-5-maxime.chevallier@bootlin.com>
 
-From: Jason Baron <jbaron@akamai.com>
-Date: Tue, 12 Sep 2023 10:31:48 -0400
-> Add the ability to monitor SO_REUSEADDR and SO_REUSEPORT for an inet
-> socket. These settings are currently readable via getsockopt().
-> We have an app that will sometimes fail to bind() and it's helpful to
-> understand what other apps are causing the bind() conflict.
-
-If bind() fails with -EADDRINUSE, you can find the conflicting sockets
-with just the failing 2-tuple, no ?
-
-Also, BPF iterator and bpf_sk_getsockopt() has the same functionality
-with more flexibility.  (See: sol_socket_sockopt() in net/core/filter.c)
-
-
-> 
-> Signed-off-by: Jason Baron <jbaron@akamai.com>
-> ---
->  include/linux/inet_diag.h      | 2 ++
->  include/uapi/linux/inet_diag.h | 7 +++++++
->  net/ipv4/inet_diag.c           | 7 +++++++
->  3 files changed, 16 insertions(+)
-> 
-> diff --git a/include/linux/inet_diag.h b/include/linux/inet_diag.h
-> index 84abb30a3fbb..d05a4c26b13d 100644
-> --- a/include/linux/inet_diag.h
-> +++ b/include/linux/inet_diag.h
-> @@ -77,6 +77,8 @@ static inline size_t inet_diag_msg_attrs_size(void)
->  #endif
->  		+ nla_total_size(sizeof(struct inet_diag_sockopt))
->  						     /* INET_DIAG_SOCKOPT */
-> +		+ nla_total_size(sizeof(struct inet_diag_reuse))
-> +						    /* INET_DIAG_REUSE */
->  		;
->  }
->  int inet_diag_msg_attrs_fill(struct sock *sk, struct sk_buff *skb,
-> diff --git a/include/uapi/linux/inet_diag.h b/include/uapi/linux/inet_diag.h
-> index 50655de04c9b..f93eeea1faba 100644
-> --- a/include/uapi/linux/inet_diag.h
-> +++ b/include/uapi/linux/inet_diag.h
-> @@ -161,6 +161,7 @@ enum {
->  	INET_DIAG_SK_BPF_STORAGES,
->  	INET_DIAG_CGROUP_ID,
->  	INET_DIAG_SOCKOPT,
-> +	INET_DIAG_REUSE,
->  	__INET_DIAG_MAX,
->  };
->  
-> @@ -201,6 +202,12 @@ struct inet_diag_sockopt {
->  		unused:5;
->  };
->  
-> +struct inet_diag_reuse {
-> +	__u8	reuse:4,
-> +		reuseport:1,
-> +		unused:3;
-> +};
+> +static int phy_list_fill_reply(struct sk_buff *skb,
+> +			       const struct ethnl_req_info *req_base,
+> +			       const struct ethnl_reply_data *reply_base)
+> +{
+> +	const struct phy_list_reply_data *data = PHY_LIST_REPDATA(reply_base);
 > +
->  /* INET_DIAG_VEGASINFO */
->  
->  struct tcpvegas_info {
-> diff --git a/net/ipv4/inet_diag.c b/net/ipv4/inet_diag.c
-> index e13a84433413..d6ebb1e612fc 100644
-> --- a/net/ipv4/inet_diag.c
-> +++ b/net/ipv4/inet_diag.c
-> @@ -125,6 +125,7 @@ int inet_diag_msg_attrs_fill(struct sock *sk, struct sk_buff *skb,
->  			     bool net_admin)
->  {
->  	const struct inet_sock *inet = inet_sk(sk);
-> +	struct inet_diag_reuse inet_reuse = {};
->  	struct inet_diag_sockopt inet_sockopt;
->  
->  	if (nla_put_u8(skb, INET_DIAG_SHUTDOWN, sk->sk_shutdown))
-> @@ -197,6 +198,12 @@ int inet_diag_msg_attrs_fill(struct sock *sk, struct sk_buff *skb,
->  		    &inet_sockopt))
->  		goto errout;
->  
-> +	inet_reuse.reuse = sk->sk_reuse;
-> +	inet_reuse.reuseport = sk->sk_reuseport;
-> +	if (nla_put(skb, INET_DIAG_REUSE, sizeof(inet_reuse),
-> +		    &inet_reuse))
-> +		goto errout;
+> +	if (nla_put_u8(skb, ETHTOOL_A_PHY_LIST_COUNT, data->n_phys))
+> +		return -EMSGSIZE;
 > +
->  	return 0;
->  errout:
->  	return 1;
-> -- 
-> 2.25.1
+> +	if (!data->n_phys)
+> +		return 0;
+> +
+> +	if (nla_put(skb, ETHTOOL_A_PHY_LIST_INDEX, sizeof(u32) * data->n_phys,
+> +		    data->phy_indices))
+> +		return -EMSGSIZE;
+> +
+
+Can we add additional information here to allow mapping to what is
+under /sys ? A PHY has an struct device, so has a name. So maybe that
+can be included?
+
+	Andrew
 
