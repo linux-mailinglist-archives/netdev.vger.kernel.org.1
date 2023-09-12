@@ -1,111 +1,119 @@
-Return-Path: <netdev+bounces-33268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C17679D3B6
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 16:31:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C43B79D48D
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 17:14:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 522D11C20FA9
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 14:31:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CA1C281E34
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 15:14:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2263215AEA;
-	Tue, 12 Sep 2023 14:31:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA13018B1E;
+	Tue, 12 Sep 2023 15:14:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3291FB24
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 14:31:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C545DC433C7;
-	Tue, 12 Sep 2023 14:31:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694529113;
-	bh=nCDXCDraqsGo2IZGYAIOuK+jrylfUNs1NltItNEvSsQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IzfFF5eS0jKjFYDvO5isyKITSFx9Gnoou/xv7WTkxJg7qowQ87WM6A8bDeU4fZUs1
-	 v+AU3kBJHoO/qvhkLBzY1LHIpY+mFTnKXIPiUxYl/w3RS3wkGKbFB69UBKlSVcpHoO
-	 R9UMiesRBocyKoVCX9r61gVBb0m6a5HpXfKUD+oA6NSEynLpVPIsfvefLOWbcbq1lx
-	 JGxEqnf0JXnj8shzNl1oXaeaaONd/2cX0VDR3d3YkhmkxsgAFwQcbMbGIsdIR/eV5I
-	 SgC7qCUyKhiuK2IY0LWMINLlX//w2erE1Q9rltkmWhDbYoOgH/htDJbxJx4vH1fshy
-	 XtHNCvawzd3Vg==
-Date: Tue, 12 Sep 2023 15:31:44 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Herve Codina <herve.codina@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Lee Jones <lee@kernel.org>,
-	Qiang Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	Shengjiu Wang <shengjiu.wang@gmail.com>,
-	Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>,
-	Nicolin Chen <nicoleotsuka@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org,
-	Simon Horman <horms@kernel.org>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v5 28/31] pinctrl: Add support for the Lantic PEF2256
- pinmux
-Message-ID: <71761f94-14ea-4e2a-a079-c74dfa32387a@sirena.org.uk>
-References: <20230912081527.208499-1-herve.codina@bootlin.com>
- <20230912101505.225899-1-herve.codina@bootlin.com>
- <CACRpkdbxdMZt4E1SF1v9as-jw=TpvS1mk2TQqAgywMBLbKaNoA@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE6AA31
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 15:14:32 +0000 (UTC)
+Received: from mx0a-00190b01.pphosted.com (mx0a-00190b01.pphosted.com [IPv6:2620:100:9001:583::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3587812E
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 08:14:32 -0700 (PDT)
+Received: from pps.filterd (m0050095.ppops.net [127.0.0.1])
+	by m0050095.ppops.net-00190b01. (8.17.1.22/8.17.1.22) with ESMTP id 38CCNJsg024362;
+	Tue, 12 Sep 2023 15:32:32 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=akamai.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding; s=jan2016.eng; bh=Yy7J6FfBHcAMmcbuO0
+	fAomlqUlzxIeM96fI1Ys+xQRk=; b=Hj1olO3NP0hIVYsOa3+4UxJprbqL4a5NuX
+	j8Px/a8AP49D+r3BlrvUcYRICPfyFUIrj/cuVa+a2XQeiF8IVmJy1nihUg8HNJTX
+	/0xk+r+jJPECA+QD+qCeje3fgooytZkAR0Fxuha26p1lGEre4/NcTI+iSDdQ+E0L
+	uZxgCnGFsLiPwZvRAs1y7MixhC/F3EagGJk1eZ63PWnbeb1lAPKfe5oBEO8q2nHX
+	B1t0JX3CfPn3qqB6fLvsYKDKDe/i3SSICDpanC5SL0TrviWtMSojmPWmh7FW6/ol
+	lqcBQt7eZGiFlpvXdgnBBt/Ui6zWIUKhfmeY/nLvzuDYMw/WaPyg==
+Received: from prod-mail-ppoint6 (prod-mail-ppoint6.akamai.com [184.51.33.61] (may be forged))
+	by m0050095.ppops.net-00190b01. (PPS) with ESMTPS id 3t0g858tqt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 12 Sep 2023 15:32:31 +0100 (BST)
+Received: from pps.filterd (prod-mail-ppoint6.akamai.com [127.0.0.1])
+	by prod-mail-ppoint6.akamai.com (8.17.1.19/8.17.1.19) with ESMTP id 38CCWRFR010133;
+	Tue, 12 Sep 2023 10:32:30 -0400
+Received: from prod-mail-relay10.akamai.com ([172.27.118.251])
+	by prod-mail-ppoint6.akamai.com (PPS) with ESMTP id 3t0m1xgjw7-1;
+	Tue, 12 Sep 2023 10:32:29 -0400
+Received: from bos-lhv9ol.bos01.corp.akamai.com (bos-lhv9ol.bos01.corp.akamai.com [172.28.122.140])
+	by prod-mail-relay10.akamai.com (Postfix) with ESMTP id 2A5D2627C9;
+	Tue, 12 Sep 2023 14:32:19 +0000 (GMT)
+From: Jason Baron <jbaron@akamai.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org
+Subject: [net-next 0/2] export SO_REUSEADDR and SO_REUSEPORT via sock_diag
+Date: Tue, 12 Sep 2023 10:31:47 -0400
+Message-Id: <cover.1694523876.git.jbaron@akamai.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="rHoxlvq7D/pkDAXf"
-Content-Disposition: inline
-In-Reply-To: <CACRpkdbxdMZt4E1SF1v9as-jw=TpvS1mk2TQqAgywMBLbKaNoA@mail.gmail.com>
-X-Cookie: Mickey Mouse wears a Spiro Agnew watch.
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-09-12_13,2023-09-05_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 malwarescore=0
+ mlxlogscore=669 adultscore=0 mlxscore=0 suspectscore=0 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2308100000 definitions=main-2309120121
+X-Proofpoint-ORIG-GUID: KoGTMVIFN04Q5IM-B0S6sGtAnQyjloHk
+X-Proofpoint-GUID: KoGTMVIFN04Q5IM-B0S6sGtAnQyjloHk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-09-12_13,2023-09-05_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 clxscore=1015
+ spamscore=0 adultscore=0 mlxscore=0 bulkscore=0 lowpriorityscore=0
+ suspectscore=0 phishscore=0 impostorscore=0 mlxlogscore=617 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2308100000
+ definitions=main-2309120121
 
+Hi,
 
---rHoxlvq7D/pkDAXf
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+We've found it useful to have SO_REUSEADDR and SO_REUSEPORT
+available to understand when apps cannot bind() to specific
+ports. I think this would be nice to have available as part
+of monitoring tools as well. I can add this to 'ss' if this
+series is accepted.
 
-On Tue, Sep 12, 2023 at 01:04:56PM +0200, Linus Walleij wrote:
-> On Tue, Sep 12, 2023 at 12:15=E2=80=AFPM Herve Codina <herve.codina@bootl=
-in.com> wrote:
+Thanks,
 
-> > +/* SPDX-License-Identifier: GPL-2.0 */
-> > +/*
+-Jason
 
-> I think SPDX mandates that you start the tag with C99 comments
+Jason Baron (2):
+  inet_diag: export SO_REUSEADDR and SO_REUSEPORT sockopts
+  sock: add SO_REUSEADDR values to include/uapi/linux/socket.h
 
-> // SPDX-License-Identifier: GPL-2.0-only
+ drivers/block/drbd/drbd_receiver.c |  6 +++---
+ drivers/scsi/iscsi_tcp.c           |  2 +-
+ fs/ocfs2/cluster/tcp.c             |  2 +-
+ include/linux/inet_diag.h          |  2 ++
+ include/net/sock.h                 | 11 -----------
+ include/uapi/linux/inet_diag.h     |  7 +++++++
+ include/uapi/linux/socket.h        | 11 +++++++++++
+ net/core/sock.c                    |  4 ++--
+ net/ipv4/af_inet.c                 |  2 +-
+ net/ipv4/inet_connection_sock.c    |  4 ++--
+ net/ipv4/inet_diag.c               |  7 +++++++
+ net/ipv4/tcp.c                     |  6 +++---
+ net/ipv6/af_inet6.c                |  2 +-
+ net/netfilter/ipvs/ip_vs_sync.c    |  2 +-
+ net/rds/tcp_listen.c               |  2 +-
+ net/sunrpc/svcsock.c               |  2 +-
+ 16 files changed, 44 insertions(+), 28 deletions(-)
 
-Not for headers, they should use C style since they might be included in
-contexts where C++ isn't supported.
+-- 
+2.25.1
 
---rHoxlvq7D/pkDAXf
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmUAdlAACgkQJNaLcl1U
-h9AGMQf/fLsnOOVZlCeXkVRLWX87qtu4s7nr7P5jfwyYxnA4Bhl8MwftHW5rxDOf
-TJcMOnHaQLx46ThWnYrWFopJsLO9g5x+NTP78wZTRCXJaJp4usJtpbNzUm4JAgfr
-wJ7T2LLNlVFW5eJfODg+A+sL23DKqJ0B6MwZDixKhNM0tRYibE5ULV+DGzqxyvgz
-yBkeRf5GWl9c4qVLP9Qg2VGx/9jbeOjiYGTd3LWeqJ6HxR8EItWZvKS72fGhOw+t
-dp3VMrMnK9/HtTllRrE+m9GWdtkjG+FjaBGfp8LhzJ1IvYZb+Hyic+EVrTIQ+aC3
-xmRd5GYPdrIG1w50Eci2Fa5Zqd4N4A==
-=vkfj
------END PGP SIGNATURE-----
-
---rHoxlvq7D/pkDAXf--
 
