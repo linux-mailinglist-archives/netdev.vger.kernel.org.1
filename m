@@ -1,141 +1,221 @@
-Return-Path: <netdev+bounces-32973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2786D79C136
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 02:44:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0D3279C16C
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 03:11:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5D8828165E
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 00:44:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0AE11C209EA
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 01:11:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C17D15A2;
-	Tue, 12 Sep 2023 00:43:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 726CFA55;
+	Tue, 12 Sep 2023 01:11:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74119138E;
-	Tue, 12 Sep 2023 00:43:18 +0000 (UTC)
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1AB618B8B4;
-	Mon, 11 Sep 2023 17:21:35 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id B6F732185A;
-	Tue, 12 Sep 2023 00:20:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1694478004; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=miCkGFoxKxVBRFGfrRVmp7107zCZ87ZsGupuJ8/qi4I=;
-	b=y+XJ5licnv6p4VsbMaYCCmjo88xpeuPolvb06IFTBaohmZvi/sfa6ct/tsx/rT903MwHja
-	feieLTBbRrr7hs0PQAhssAyrPqBBQWX4zmAHc8gS4JuL7um1lHz3M+ZofnVQg4X0c7oJa6
-	zntywi97zFwmCzO4Bh5EOVScVd7Yopo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1694478004;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=miCkGFoxKxVBRFGfrRVmp7107zCZ87ZsGupuJ8/qi4I=;
-	b=gWiZ8WawDBD37dgffca3X5PwhwfGLc4J5xDCDY4r5blSjYZHqemjX9l8+4vwn4kc0fSi9z
-	aQgqVsD/spaBrZAQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7F699139DB;
-	Tue, 12 Sep 2023 00:20:04 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-	by imap2.suse-dmz.suse.de with ESMTPSA
-	id 3zaDGbSu/2StUQAAMHmgww
-	(envelope-from <krisman@suse.de>); Tue, 12 Sep 2023 00:20:04 +0000
-From: Gabriel Krisman Bertazi <krisman@suse.de>
-To: Breno Leitao <leitao@debian.org>
-Cc: sdf@google.com,  axboe@kernel.dk,  asml.silence@gmail.com,
-  willemdebruijn.kernel@gmail.com,  kuba@kernel.org,  martin.lau@linux.dev,
-  bpf@vger.kernel.org,  linux-kernel@vger.kernel.org,
-  netdev@vger.kernel.org,  io-uring@vger.kernel.org,  pabeni@redhat.com
-Subject: Re: [PATCH v5 5/8] io_uring/cmd: return -EOPNOTSUPP if net is disabled
-In-Reply-To: <ZP9EeunfcbWos80w@gmail.com> (Breno Leitao's message of "Mon, 11
-	Sep 2023 09:46:50 -0700")
-Organization: SUSE
-References: <20230911103407.1393149-1-leitao@debian.org>
-	<20230911103407.1393149-6-leitao@debian.org> <87ledc904p.fsf@suse.de>
-	<ZP9EeunfcbWos80w@gmail.com>
-Date: Mon, 11 Sep 2023 20:20:03 -0400
-Message-ID: <87jzsw5jkc.fsf@suse.de>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FAD263E
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 01:11:20 +0000 (UTC)
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on20600.outbound.protection.outlook.com [IPv6:2a01:111:f400:7eae::600])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 970FE1A2CBD
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 18:04:44 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QfH8BnZIrQI044lKszVp5tJISo4clVOw+ttJdy2N+yKe8aXYIUOTr41Aks4OjY6AJyIyyYdysVUxoeALI71PWfW33ZmvqJa9/S6vABl0Qs/B3Vpzvw3JBFIQx3SBohqQ8qOLQhA0Haia9OmL/hqH0VyxnN8B+T9Og4BewWr/3ATBd7qMDtPa1Sq5uojN9glXq9IkR1npsYoNLUY31XEuW7ympo0IgDPWAG/rnYKQZ1T2UFvL7aPvdDkNmuzPVNAoATMnt6Qk9N6piQgCuMtNMzbnFKuNGdILEOcjpbR6ETkM8MkjcX/Ab/aJvwLwhB9aWhQmvRsYG/zCWXgTQ1HToA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=OL5cwb9VNZK0euohevK02toSqQyw8w1FZGeXGbKTNpM=;
+ b=dxIbPo0Cv2IRr9TKZNV7HaxiYqq5+obeuTWzfKQFcRyZg1nvjAbdksLUyRLMz21ihzjdQvOkvHFkfQLeZJ8RwZAvg9qP0NwTe8axYIfXfY54g7MDW1UeO0pxMQHUpYvUJmFnb26Mdk26Llx5N9DKaMiAgKdkj5IVl8Qewu+gGcY/XeXcim04ZeRhanhUNQfzInp0tqclbULijIjtjzuUGZMXBCId+RAB0RwL/mKQOJ3fF5NxB5r3143WSRyITm9LNbJtd/RrJO+G9fFbMXfzcw1h2ozjSxRunYvl6t4C5rAq+ZdYWwDNRkJotwxMycbdnn/jQrPcK3qviQLqebU/bQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=OL5cwb9VNZK0euohevK02toSqQyw8w1FZGeXGbKTNpM=;
+ b=2Y9ga+B7CqA7RHac05eiOrD7+xDNlkP5kKJMbru4TiPMDYLmcmQ+tUNThMjYDZAUcl5z6pE1VRUK7gK0q32jHMl7oSJOWqauuzohxUzOn4rR5Ukc7xZXMz1xrk5p0EGJ+NHEkf4VlnkU86zysXMzKqzkS3pKdm0qNp+NzdXneQ4=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
+ MW6PR12MB8865.namprd12.prod.outlook.com (2603:10b6:303:23b::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.35; Tue, 12 Sep
+ 2023 00:24:31 +0000
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::5c9:9a26:e051:ddd2]) by DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::5c9:9a26:e051:ddd2%7]) with mapi id 15.20.6745.034; Tue, 12 Sep 2023
+ 00:24:31 +0000
+Message-ID: <a7c39c89-c277-4b5f-92c0-690e31c769b5@amd.com>
+Date: Mon, 11 Sep 2023 17:24:27 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] ionic: fix 16bit math issue when PAGE_SIZE >= 64KB
+To: David Christensen <drc@linux.vnet.ibm.com>, brett.creeley@amd.com,
+ drivers@pensando.io
+Cc: netdev@vger.kernel.org
+References: <20230911222212.103406-1-drc@linux.vnet.ibm.com>
+Content-Language: en-US
+From: "Nelson, Shannon" <shannon.nelson@amd.com>
+In-Reply-To: <20230911222212.103406-1-drc@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SJ0PR13CA0137.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c6::22) To DS0PR12MB6583.namprd12.prod.outlook.com
+ (2603:10b6:8:d1::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|MW6PR12MB8865:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7f49a232-ed1c-4bac-7703-08dbb326a1d5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	pDSZ1QWBEnaOhXXE/MVxr2C7nAB737826I4uvW/qNGi8FkNZt9OyJWRmQdFw7Ck/xat/vpfE1Zj97hRNW2/tEQcN3LgYFfC+j9te3GbF99ybzTFbzYsdJAeayVmXyqoF5bQXelXCQXggirGXXc+8/3voiYmT6O2gULR/1gBd9ZDprxMb8gcExmYjtcqig/xA7WaapH50XkJCN2wbh7ZdCMoM9x51NjvMrFPAYxf8IebeGsVqRh+sJUMdnY2SYRgAYkHVRl7MMqfd+J/CShNgXoYusT8mEEYaQnd3vGFlhlUCBZR53ZVI/51xWvwbKDqKrp2KHu5E9B86pFyzKXphvJGDDnDytIzfUQ9pnMiMC5+DoomDj6o87lBP/FZQMDMtBQAxMnKBq/ePSG3Ui/DMdZ93qJe17XmQKnjFkQzzn9u3ZfJn/kyRh/eWE8o9RnjYxctC6Il7AUqrXHpM+jOTZKA2YCxHQ3f2IRpI+k5delRn6IB1/lay0u1u09POoGPrNvG/IXd1AEWN0eZ+Br1wIpNPSUtb1djrDK5FsJri4vKREX/NOssT3awW5CDZr4+f3II1t+ixUdtOXbxSjnr3UnzkRfFKxGrjJwahVHzxalwb7/ghgC3knKnQYsDJWvuL+Z7pzu82GoAg5L0Prv36Fw==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(136003)(366004)(396003)(346002)(39860400002)(186009)(451199024)(1800799009)(5660300002)(66946007)(41300700001)(66476007)(4326008)(66556008)(8676002)(8936002)(31686004)(316002)(36756003)(478600001)(6666004)(26005)(2616005)(6506007)(6486002)(53546011)(86362001)(83380400001)(2906002)(31696002)(38100700002)(6512007)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?WDZUVndwY3NZRG1GZ0ZTN0FRV29VMEx1ZE95OWtsbFpCc2dMelFzZ1Bvc1FW?=
+ =?utf-8?B?MDZic2NDajh1ZzFqNHcwWjBUaFhIR1JMTHN4cDdLVEJOTGxVV1ZCYmFPNFhr?=
+ =?utf-8?B?M3JEdG1HemJUNGx1VzZ3aXRkRnZicHQ5eUs2dDZxc3F1azltRmdlQzVUTlk4?=
+ =?utf-8?B?SDhobFJYWmFMYlZ1TllxeGpIY0lKZDAzNThjQWJQbytmOWR2S1hlQy9wbUw2?=
+ =?utf-8?B?MEEvTUdZS1NnVlUxTjNTRUNmanFVU28vYTBZTERBTkNDV0pUTm1ERmJ2ZHdl?=
+ =?utf-8?B?clhzWW9vSnQyMnRlZkFCTE1iQ3pvVFJwQ25acEtUWGovQjEyT2hSanJIbFFG?=
+ =?utf-8?B?Uzh5NEJ4eWptSkgvSU1Oc3psdWtwSkFCb29oZ2ZZSVFXT0VtWGJDYXBlNXIr?=
+ =?utf-8?B?SjNMeWZYRUt4N3pTUGtyL05NZ003ODdMMllrcUN6VUdlckFkVjcvRzFzOHNQ?=
+ =?utf-8?B?cThWejA2aElVNTJIQUxvYTJsMWprSHZWUGZ0ZDdzVEt6NE9GU0lGMmpIQmdo?=
+ =?utf-8?B?bVQ2RWxBR1ZMSGhBZ1BSVkphb3NwNW93N1g5bmh5aGVHb3duWExmUWhNRCtM?=
+ =?utf-8?B?V3VjdkIrOElZNXRLVjl3N3JlZ1o2SkZMbWp2OGJycVN5VGxkNTMwWWVKNGk3?=
+ =?utf-8?B?emVHZVhHS2U4dlQzcXFxMGY3VVdPTWk2MXpuVnlrRGpSUlNybHVpV1oxcFVD?=
+ =?utf-8?B?QzZhZFlma0tjRUJGdnR0U1RDV3hISjN2Z3pCdzc1ajZHU2swbFIvN3ZLNEky?=
+ =?utf-8?B?MGd6aWZwV25wQnVnZGtRYTFkcU1KdWl0UmNtSENuYTVTdkNDMXJ3Z3FxaTY5?=
+ =?utf-8?B?TTFOYllNbTd4cE9rS0V3N05ha3h6Nmkwb3NBblM5UmNWOGdWbFlzUkZMS0Zu?=
+ =?utf-8?B?clQ1NGZtY3FqbXBrbmlJbkU3dndGc1NyWTVNMVNOaTZ5N1RybWJlOCs1VUZx?=
+ =?utf-8?B?KzNVNDhiSVRuNUxPVlF0VE5tKzNodnRaRTdWT3pEZ3I2ZGVvaVR6L0NpUnYv?=
+ =?utf-8?B?TUJiRFZPam9WRk16d3JiWXdOczdIZU1mYklFVjcyd2lQb2RKWlpXSGNYbncx?=
+ =?utf-8?B?YnNHaFd6K1pjZ2FQQzVuV29IVU03VzB0MGQ2ZXNzb1BGNFh3MHBXdmUrMnk0?=
+ =?utf-8?B?NXBJeGs5MG9SZk43MHQ3TEFiNzlWMDhKTndub1VFZXZzMGF0TXVXRWtWZ2F4?=
+ =?utf-8?B?QmxNSHljSDYyajF1TjE3M3ZLRDBEWkh6dnFZc1Jnci9nTUNwekx5VmFNT3I5?=
+ =?utf-8?B?dVBEb2pmQzk5bnZVWFpuVmd2VUxLRHNNSEVyTzJhbCtGVGFuZWI4S1djenpo?=
+ =?utf-8?B?eWg3bjRsTkxUMVhxNHhPSXFNR3pCa0c2MnUyUzU4VlB0V29NZjNRdXRTVXdq?=
+ =?utf-8?B?K3o3TithOEhGTHl6WllUWGp0NXJ0MEVNa2RrcUtidjVYbVVDU2JDbiswTVhD?=
+ =?utf-8?B?VzBVcXQxK2NYS1JTcXAxZ1RJL3M1bGdPeEl0alY5MEQ5VTVNQll1RXdBVUM3?=
+ =?utf-8?B?ckwydWVma2hCN1VtU05Jdm8veGh2VFFuN2czaWVkQ21FeXJib0s1bUNEMDJm?=
+ =?utf-8?B?a0c2Y3F4QUN5SGx4VEQ0QkNTOUlnN3V4aDRnQlVOQ2dGU20wdDNyM0tWZmhD?=
+ =?utf-8?B?aUFCVGxlVW5MaklTRUdsU1BWYU8xZy9kaldFb0VMWWJBNTl6a0MxSE9ybGtp?=
+ =?utf-8?B?UFU5UGtuTmlnYVEwWStMdWMzTWZIY0hYTW55VDdSckFkTTlJQU5ZNFVydkMw?=
+ =?utf-8?B?L3RUdmcwekFDSDJvd0hPUXBjVUltMys5Sm82S1FNTjh3cEl6Y1FvNSt2VDln?=
+ =?utf-8?B?RmlVb05YeXd1eWRrUG5oaDNtZm0zam9ZU1Z4djRSSDFqT2FCY2dlRmpDL1d0?=
+ =?utf-8?B?NjRRbWNjNDN6QW5OVFh4bFZKVGdGUzZWUEpVZHhVVXIxc0FVeXBBT2puTlhY?=
+ =?utf-8?B?T0RrVm9rNWFSOFpINStzNjhqV0c2WHRSSS9sN0VSNzhGM1l3QVhjMHhSU0tP?=
+ =?utf-8?B?Mzg1WVJxaDBURTRvRmJxbVMrYWFjbDhidjc0R3F0czZIbWFPcUFySkxKaUhr?=
+ =?utf-8?B?S3BJdUxpdGdTVkpzMHF3SmpDcDluNkcrRFRId0NGWVVHRURZdEgrK1BEOTdQ?=
+ =?utf-8?Q?mnDDfzX+vSVlPWGXrHKS4BMh2?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7f49a232-ed1c-4bac-7703-08dbb326a1d5
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Sep 2023 00:24:31.0121
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 64GV4RXvpxgkvwo4RK8fqCrNderadrrZtdVXuNQPbAQ2r3MmtIea/ENtjIeiwWxBHzXrxs7Ikp/l+Xvm72AWPQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB8865
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_NONE autolearn=no
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Breno Leitao <leitao@debian.org> writes:
+On 9/11/2023 3:22 PM, David Christensen wrote:
+> 
+> The function ionic_rx_fill() uses 16bit math when calculating the
+> the number of pages required for an RX descriptor given an interface
+> MTU setting. If the system PAGE_SIZE >= 64KB, the frag_len and
+> remain_len values will always be 0, causing unnecessary scatter-
+> gather elements to be assigned to the RX descriptor, up to the
+> maximum number of scatter-gather elements per descriptor.
+> 
+> A similar change in ionic_rx_frags() is implemented for symmetry,
+> but has not been observed as an issue since scatter-gather
+> elements are not necessary for such larger page sizes.
+> 
+> Fixes: 4b0a7539a372 ("ionic: implement Rx page reuse")
+> Signed-off-by: David Christensen <drc@linux.vnet.ibm.com>
 
-> On Mon, Sep 11, 2023 at 11:53:58AM -0400, Gabriel Krisman Bertazi wrote:
->> Breno Leitao <leitao@debian.org> writes:
->> 
->> > Protect io_uring_cmd_sock() to be called if CONFIG_NET is not set. If
->> > network is not enabled, but io_uring is, then we want to return
->> > -EOPNOTSUPP for any possible socket operation.
->> >
->> > This is helpful because io_uring_cmd_sock() can now call functions that
->> > only exits if CONFIG_NET is enabled without having #ifdef CONFIG_NET
->> > inside the function itself.
->> >
->> > Signed-off-by: Breno Leitao <leitao@debian.org>
->> > ---
->> >  io_uring/uring_cmd.c | 8 ++++++++
->> >  1 file changed, 8 insertions(+)
->> >
->> > diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
->> > index 60f843a357e0..a7d6a7d112b7 100644
->> > --- a/io_uring/uring_cmd.c
->> > +++ b/io_uring/uring_cmd.c
->> > @@ -167,6 +167,7 @@ int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
->> >  }
->> >  EXPORT_SYMBOL_GPL(io_uring_cmd_import_fixed);
->> >  
->> > +#if defined(CONFIG_NET)
->> >  int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags)
->> >  {
->> >  	struct socket *sock = cmd->file->private_data;
->> > @@ -193,3 +194,10 @@ int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags)
->> >  	}
->> >  }
->> >  EXPORT_SYMBOL_GPL(io_uring_cmd_sock);
->> > +#else
->> > +int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags)
->> > +{
->> > +	return -EOPNOTSUPP;
->> > +}
->> > +#endif
->> > +
->> 
->> Is net/socket.c even built without CONFIG_NET? if not, you don't even need
->> the alternative EOPNOTSUPP implementation.
->
-> It seems so. net/socket.o is part of obj-y:
->
-> https://github.com/torvalds/linux/blob/master/net/Makefile#L9
+The subject line prefix should have "net" in it to target the bug fix at 
+the right tree.
 
-Yes. But also:
+> ---
+>   drivers/net/ethernet/pensando/ionic/ionic_txrx.c | 10 +++++-----
+>   1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
+> index 26798fc635db..56502bc80e01 100644
+> --- a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
+> +++ b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
+> @@ -182,8 +182,8 @@ static struct sk_buff *ionic_rx_frags(struct ionic_queue *q,
+>          struct device *dev = q->dev;
+>          struct sk_buff *skb;
+>          unsigned int i;
+> -       u16 frag_len;
+> -       u16 len;
+> +       u32 frag_len;
+> +       u32 len;
+> 
+>          stats = q_to_rx_stats(q);
+> 
+> @@ -207,7 +207,7 @@ static struct sk_buff *ionic_rx_frags(struct ionic_queue *q,
+>                          return NULL;
+>                  }
+> 
+> -               frag_len = min_t(u16, len, IONIC_PAGE_SIZE - buf_info->page_offset);
+> +               frag_len = min_t(u32, len, IONIC_PAGE_SIZE - buf_info->page_offset);
+>                  len -= frag_len;
+> 
+>                  dma_sync_single_for_cpu(dev,
+> @@ -452,7 +452,7 @@ void ionic_rx_fill(struct ionic_queue *q)
+> 
+>                  /* fill main descriptor - buf[0] */
+>                  desc->addr = cpu_to_le64(buf_info->dma_addr + buf_info->page_offset);
+> -               frag_len = min_t(u16, len, IONIC_PAGE_SIZE - buf_info->page_offset);
+> +               frag_len = min_t(u32, len, IONIC_PAGE_SIZE - buf_info->page_offset);
+>                  desc->len = cpu_to_le16(frag_len);
 
-[0:cartola linux]$ grep 'net/' Kbuild
-obj-$(CONFIG_NET)       += net/
+Hmm... using cpu_to_le16() on a 32-bit value looks suspect - it might 
+get forced to 16-bit, but looks funky, and might not be as successful in 
+a BigEndian environment.
 
-I doubled checked and it should build fine without it.  Technically, you
-also want to also guard the declaration in the header file, IMO, even if
-it compiles fine.  Also, there is an extra blank line warning when applying
-the patch but, surprisingly, checkpatch.pl seems to miss it.
+Since the descriptor and sg_elem length fields are limited to 16-bit, 
+there might need to have something that assures that the resulting 
+lengths are never bigger than 64k - 1.
 
--- 
-Gabriel Krisman Bertazi
+
+>                  remain_len -= frag_len;
+>                  buf_info++;
+> @@ -471,7 +471,7 @@ void ionic_rx_fill(struct ionic_queue *q)
+>                          }
+> 
+>                          sg_elem->addr = cpu_to_le64(buf_info->dma_addr + buf_info->page_offset);
+> -                       frag_len = min_t(u16, remain_len, IONIC_PAGE_SIZE - buf_info->page_offset);
+> +                       frag_len = min_t(u32, remain_len, IONIC_PAGE_SIZE - buf_info->page_offset);
+>                          sg_elem->len = cpu_to_le16(frag_len);
+
+ditto
+
+>                          remain_len -= frag_len;
+>                          buf_info++;
+> --
+> 2.39.1
+> 
+
+
+
 
