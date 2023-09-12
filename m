@@ -1,113 +1,120 @@
-Return-Path: <netdev+bounces-33338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33339-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C800279D737
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 19:08:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E87E579D739
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 19:09:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 815C728202B
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 17:08:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F24881C2109C
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 17:09:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 538C0523C;
-	Tue, 12 Sep 2023 17:08:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E96DD8BEA;
+	Tue, 12 Sep 2023 17:08:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 452062106
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 17:08:36 +0000 (UTC)
-Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E022110;
-	Tue, 12 Sep 2023 10:08:35 -0700 (PDT)
-Received: by mail-qk1-x734.google.com with SMTP id af79cd13be357-76de9c23e5cso363397285a.3;
-        Tue, 12 Sep 2023 10:08:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694538514; x=1695143314; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4otOjvr3R3E7logGWkXFy9+KYYJe3UIuAQ28yWhDj8Y=;
-        b=h+ZtrU+neS7QDoRm57I8MIf0u03+11/XgCcGvjT9lKZ0hUwNsU8kB3IpYiX5KOBhzJ
-         6kw+2FpqvIERbgyiXFYtv2DdHRWBubPR1fHe00eWr6zsRNflCK3cWDqw2TsCrxWombev
-         jZ9ALqizCQp6JBy4Mwma/A060QGsyqV+XHlsG6ASNRAtHeS/Zh6efw2pt46UnuMW2dM8
-         4DxGuieSVFe4wtME+ZiJ2Hoyv9KmPZ6Ah4Mb8IXm6Lir+mj4M/4OWobQcWfl137YskSU
-         hYzuCq6FRAtoWD2hg74N0qkijg9+PZlMG2Iwd4pt1iBCHlWAXWwtVBqaXkYsymB6g7hh
-         PlVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694538514; x=1695143314;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4otOjvr3R3E7logGWkXFy9+KYYJe3UIuAQ28yWhDj8Y=;
-        b=LaV8gmEHDpIWQqsBkhroKzhJ7ToBN1ATsHhp2ExYj1co50Jeax0SE4ZpNYkQps6G61
-         fyySYl0Z5DFfhWmvfvu5Gj4xvGrxngagySv27GKOtRjySeoSl9DwhtSLXgJxh/50j9Qp
-         1duTIe9IBmrNCT8uAx/FM7Gy3Y5pcABpY5Vg0UJKDKohh6OGITI7XcyLIOdH3U6fvDy9
-         90bWrHETUdCt8ixJN31h26CU1AKvA9YXWHT7T5FwMTiLp5RPVMjA05gC3PCOq0h6QMw+
-         HjqJEJFh0GggsSPpYANdS+eo8NPamj8Xvhlz7H2RG4e7Pt2CzbXGdpZFyIzYaTgarFf+
-         xTeg==
-X-Gm-Message-State: AOJu0Yw5ND5HDlodzEse4u/1zFAAWHmnCw29wxUlwQrXX5GC1B4MkSZt
-	HVuGDJ3DsTMYvt5VC3i8GX9eK7x+L8LoNA==
-X-Google-Smtp-Source: AGHT+IH0YlRsKUwbUPupJzN/kK/Mrv09y8VEdwhCA23jNg+rGsU/96R8koDbmRSm5P9eNc4G/NxG4g==
-X-Received: by 2002:a05:620a:2908:b0:765:9f15:c324 with SMTP id m8-20020a05620a290800b007659f15c324mr7586qkp.48.1694538514537;
-        Tue, 12 Sep 2023 10:08:34 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id k7-20020a05620a142700b0076c89639526sm3305782qkj.93.2023.09.12.10.08.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Sep 2023 10:08:32 -0700 (PDT)
-Message-ID: <4da2f97e-5bfe-fd94-0540-a10ca65d0b58@gmail.com>
-Date: Tue, 12 Sep 2023 10:08:23 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9FA68488;
+	Tue, 12 Sep 2023 17:08:39 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16967E7A;
+	Tue, 12 Sep 2023 10:08:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=okqCnYbVQy91IAARHaNw8z0HLkZIzOCxSpKxVhlRnDE=; b=ikwUZiOidDIBI0VTVnEZezBfPj
+	X2vSR01jJ6MEKD9FSvtk2tVycPlBwXdDNVb8nMyFbVlW+GCQ9cKJqzuXDyQ1SEvStlISB3iY4zFyO
+	nArg86HQoEAOCulQDUCN3Tzn+Nt9su/nwR37Su4OI3k7TlPHeeRkAanZSJyzurAF28GVg+yrgHSsd
+	5WQcUXmyZDRGF0k6FRVDgJowMJzgah+XOVdj+UjeeEsMcWqT0e8Bn8L2TcefZVHYz5nwhmRxf9Qbw
+	Rcwqp1/FwfrBkyDVBKLW5Gvm1TSGdGiPNm1K/Lcec55E8JPSfbuzOyD2YN+x4ZsYXMhCH1TKrAapn
+	JyeT2wGQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50484)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qg6sG-0001Ud-27;
+	Tue, 12 Sep 2023 18:08:28 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qg6sB-0002sJ-PK; Tue, 12 Sep 2023 18:08:23 +0100
+Date: Tue, 12 Sep 2023 18:08:23 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Jose Abreu <Jose.Abreu@synopsys.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Eric Dumazet <edumazet@google.com>,
+	Fabio Estevam <festevam@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	NXP Linux Team <linux-imx@nxp.com>, Paolo Abeni <pabeni@redhat.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Samin Guo <samin.guo@starfivetech.com>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Shawn Guo <shawnguo@kernel.org>
+Subject: Re: [PATCH net-next 1/6] net: stmmac: add platform library
+Message-ID: <ZQCbB3qZlTvIM7rf@shell.armlinux.org.uk>
+References: <E1qfiq8-007TOe-9F@rmk-PC.armlinux.org.uk>
+ <DM4PR12MB5088F83CE829184956147E6BD3F1A@DM4PR12MB5088.namprd12.prod.outlook.com>
+ <u7sabfdqk7i6wlv2j4cxuyb6psjwqs2kukdkafhcpq2zc766m3@m6iqexqjrvkv>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-Subject: Re: [RFC PATCH net-next 1/7] net: phy: introduce phy numbering and
- phy namespaces
-Content-Language: en-US
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Andrew Lunn <andrew@lunn.ch>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- Oleksij Rempel <linux@rempel-privat.de>,
- =?UTF-8?Q?Nicol=c3=b2_Veronese?= <nicveronese@gmail.com>,
- thomas.petazzoni@bootlin.com, Christophe Leroy <christophe.leroy@csgroup.eu>
-References: <20230907092407.647139-1-maxime.chevallier@bootlin.com>
- <20230907092407.647139-2-maxime.chevallier@bootlin.com>
- <d0a4c2c5-2d2b-42b6-a15c-06f9dc3c1e04@lunn.ch>
- <20230912181010.615d6b79@fedora>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20230912181010.615d6b79@fedora>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <u7sabfdqk7i6wlv2j4cxuyb6psjwqs2kukdkafhcpq2zc766m3@m6iqexqjrvkv>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 9/12/23 09:10, Maxime Chevallier wrote:
-> Hello,
+On Tue, Sep 12, 2023 at 12:32:40PM +0300, Serge Semin wrote:
+> On Tue, Sep 12, 2023 at 07:59:49AM +0000, Jose Abreu wrote:
+> > From: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > Date: Mon, Sep 11, 2023 at 16:28:40
+> > 
+> > > Add a platform library of helper functions for common traits in the
+> > > platform drivers. Currently, this is setting the tx clock.
+> > > 
+> > > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > > ---
 > 
-> On Tue, 12 Sep 2023 17:41:31 +0200
-> Andrew Lunn <andrew@lunn.ch> wrote:
+> > >  drivers/net/ethernet/stmicro/stmmac/Makefile  |  2 +-
+> > >  .../ethernet/stmicro/stmmac/stmmac_plat_lib.c | 29 +++++++++++++++++++
+> > >  .../ethernet/stmicro/stmmac/stmmac_plat_lib.h |  8 +++++
+> > 
+> > Wouldn't it be better to just call it "stmmac_lib{.c,.h}" in case we need to add
+> > more helpers on the future that are not only for platform-based drivers?
 > 
->>> Introduce a numbering scheme allowing to enumerate PHY devices that
->>> belong to any netdev, which can in turn allow userspace to take more
->>> precise decisions with regard to each PHY's configuration.
->>
->> A minor point, and i know naming is hard, but i keep reading _ns_ and
->> think namespace, as in ip netns. Maybe we should think of something
->> other than ns.
+> What is the difference between stmmac_platform.{c,h} and
+> stmmac_plat_lib.{c,h} files? It isn't clear really. In perspective it
+> may cause confusions like mixed definitions in both of these files.
 > 
-> Yeah that was the initial idea, to imply that the numering is
-> independent between netdevices... I thought about "phy_list", "phys",
-> "phy_devices" but none of that felt correct :(
+> Why not to use the stmmac_platform.{c,h} instead of adding one more
+> file?
 
-How about phy_devices_list?
+Is stmmac_platform.{c,h} used by all the drivers that are making use of
+this? I'm not entirely sure.
+
+If it is, then yes, it can go in stmmac_platform.[ch]. If not, then I
+don't think we'd want the bloat of forcing all of stmmac_platform.[ch]
+onto drivers that only want to use this one function.
+
 -- 
-Florian
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
