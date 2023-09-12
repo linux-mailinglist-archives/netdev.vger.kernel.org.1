@@ -1,276 +1,222 @@
-Return-Path: <netdev+bounces-33384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E69179DA92
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 23:09:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C95779DA97
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 23:13:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7CA7281989
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 21:09:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9975281A03
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 21:13:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4A89B65B;
-	Tue, 12 Sep 2023 21:09:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FE6BB65C;
+	Tue, 12 Sep 2023 21:13:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0072B64C
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 21:09:14 +0000 (UTC)
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7710FB3
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 14:09:13 -0700 (PDT)
-Received: by mail-lj1-x232.google.com with SMTP id 38308e7fff4ca-2bcb0b973a5so98729041fa.3
-        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 14:09:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1694552952; x=1695157752; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UpTQdutdLK5Js9H2W0UE2cCg2oR4DGbstl+LxtXKOOQ=;
-        b=EEy5P0kTya/tuY2zlfjYtIUPV3cWKSFuA+0rPP6gs8Dcu8iD+zd5uVFpobcbu9WOrT
-         AYE5q8uHSbN7QPhNQjWlyMEtYRSZDAC/QpX8D3wXriEVg11LatBRRh62CwUP7TRIgjR2
-         2Sc8CIWiHnZLLCBbFpWWwjNW3sv+5nj108Xw01d9ByB+jKPkqtdRtmxCA/ewnKQZ6N2A
-         784ooSAvpl4j8Vldo/XSjtq8DHbMzh1g5dM513MSntVoNChnAsSvCREZIr5Xyqbepts9
-         WNbkiWCUrJ7/VRMUdjoWYvmeDJuD2lE1aG6lJ9hDJdWUulUkiOkk+UNQ0mKgSZztKde/
-         5N8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694552952; x=1695157752;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UpTQdutdLK5Js9H2W0UE2cCg2oR4DGbstl+LxtXKOOQ=;
-        b=pLkxD1dClSYi75ZhIj4cuFjfKHsLJX0Bw8xnAYn7iyKptztqAPmzOtNUtIhDC/T46D
-         OYrvCbMqa8etqLYedS9mOUFJ3x3lwrBfPziM2EWZcOzdGh8C3WjjwQg67YiSyxlAjy31
-         bvjQrKDxLED3yEw3Gb+E1cBsv7/JVx8ypIF8aJdiNkQbwpetuPh6WdohZLm2ue+Zy93l
-         tYE+KdrRY1Ivd4fVTv0ThPI0/kqjyNnxX81Nf7WKvf95eSDShfeTt5VPH6c6Katw6OzR
-         JXOH/XVM8vEEoviMq8o8+co03aceAxSldwirVxHO3ydJqSlJy4b2nBhKtlgSXULcm3gF
-         RKmw==
-X-Gm-Message-State: AOJu0YxxBOr10N9BZhjQ7C+QDQj9+TNHbl+ioumjk9oqgQDP4tCCLMSb
-	t9ii+FYHHV0TG7nOJB1/wdttRLbAsUl2LVuAieb6fw==
-X-Google-Smtp-Source: AGHT+IH6ALN+jLAuuvtH7WvAWXtXGU78jVYn5RSJp0h3TfCcTKe6fX9uZ72Znyr+gx+kjgZozdWZq3XLfdfBxaNSWd8=
-X-Received: by 2002:a2e:8181:0:b0:2bc:d6a8:1ef2 with SMTP id
- e1-20020a2e8181000000b002bcd6a81ef2mr728515ljg.12.1694552951525; Tue, 12 Sep
- 2023 14:09:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 539F333E9
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 21:13:39 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F5F910D0
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 14:13:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694553217; x=1726089217;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=kAMepv+eFtbFP39DGVk1hRLDF3WkUIPsA3t9pWX4IwE=;
+  b=dpRVV8MAXoUIA+5GsxcHthX9QyuAXNLKf25ZxhK6pw4JwbNSTDOAyhXv
+   hdnmaH8YANrDLa8Y2EtI6oW+0KbeOXLlFfyUusuap6uYEsj7E5Hzi+VIt
+   XKrGnH/zlp3HJ7/AVE2xQ0gOQ34sjQLZXHjsVp0cpxfSyy7PNsyCFvNnz
+   9HYZBga6AeBFdRK7hYoC4i8eEjzQmg0FBo/EQMnlu4ubkxF1J7rY+RN04
+   LoMc5MKBdZD7SHOqrqRfnFhFAe4g/J6Qix1IJ7VceFX+zLTI9l+16tF/X
+   sXGiwC9H3ZIGgGWTahegJOnE8/pTbMM8j4JC7j49jj+y+JpAk4uQmgTh9
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="382301941"
+X-IronPort-AV: E=Sophos;i="6.02,141,1688454000"; 
+   d="scan'208";a="382301941"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2023 14:13:35 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="743858552"
+X-IronPort-AV: E=Sophos;i="6.02,141,1688454000"; 
+   d="scan'208";a="743858552"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orsmga002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Sep 2023 14:13:36 -0700
+Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Tue, 12 Sep 2023 14:13:36 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Tue, 12 Sep 2023 14:13:36 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.168)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Tue, 12 Sep 2023 14:13:35 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JL3OH172ksZi7ix0igpfhS0hZuyTpkuapzF5vJ8J9kWhYWQLu2nnJPG+ykB8rd8N/1WwaRUqQTmvxCJFi7PJIZ2AWNga6wQY5edUxn/OwOUdSc1p6KLxJd+69i3+z2jFqj6pDYeuq0k4oEZ2bN2A1XR15WQVXJ77K4fWYu3mWKkCV6czbu3WBFqMcfJXq6oV2h/fHVqXRU33bidUHEp8Pc2ZqYRetRiiNzMrS/je9TvwS7DV7nf+66g8mgbcbk/01u/1JNr1a7BuS7h3Qe8qqoXzP8dFTuqWCbfqb9ex5AeEpH9oWqXJ8WQgqjpwk9NaDPL2QfJ6xV0x3WZTbl57uQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zjaDYLO7JcgUFTX9AdU/WVw46nmnL6AUjeRPHdG56bI=;
+ b=AO0SwWIAjqt6snGAL7vDCyPsU7qUYEDQnAPGgGXQV7HSuWht6l4pEyVwy7sgFBMr0THn9Zds0NAbBLLWKwq7cI/WO2AcWx4bL7GkXbsiRza0tFAHVrD/qxcDnqbJUBhXZIXkUe52FtTxZdpv/6MPy/GJeCOPoeUkh5mNqkrYRGV/tHHhZoIiGbbVP8cT4wgUF7oIi4aof/FYNoO3klzeY+hbovuin3DuTDApmeaTf+zf3tXQvQoM8VIWqb+qZVA7Nj/5K/a5EWSDjnQIvVM2+xuyERXYbPJ75zVwbI4De6prtcJ5+mjx1zG2IRERxekBTR93uAXAwck1VMCUM6GTQw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by SN7PR11MB7116.namprd11.prod.outlook.com (2603:10b6:806:29b::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.34; Tue, 12 Sep
+ 2023 21:13:33 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::6a23:786d:65f7:ef0b]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::6a23:786d:65f7:ef0b%6]) with mapi id 15.20.6768.036; Tue, 12 Sep 2023
+ 21:13:33 +0000
+Message-ID: <37cef70f-e859-23ad-580c-6eefd45c688d@intel.com>
+Date: Tue, 12 Sep 2023 14:13:31 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.0
+Subject: Re: [PATCH] ionic: fix 16bit math issue when PAGE_SIZE >= 64KB
+To: David Christensen <drc@linux.vnet.ibm.com>, <shannon.nelson@amd.com>,
+	<brett.creeley@amd.com>, <drivers@pensando.io>
+CC: <netdev@vger.kernel.org>
+References: <20230911222212.103406-1-drc@linux.vnet.ibm.com>
+ <943d2f39-b933-b77e-fb18-4c695c1c4bf8@intel.com>
+ <331b81ab-7a19-0055-088f-d2f595c26303@linux.vnet.ibm.com>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <331b81ab-7a19-0055-088f-d2f595c26303@linux.vnet.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW3PR06CA0011.namprd06.prod.outlook.com
+ (2603:10b6:303:2a::16) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230912013332.2048422-1-jrife@google.com> <65006891779ed_25e754294b8@willemb.c.googlers.com.notmuch>
- <1ca3ca8a-6185-bc55-de74-53991ffc6f91@iogearbox.net> <CADKFtnTOD2+7B5tH8YMHEnxubiG+Cs+t8EhTft+q51YwxjW9xw@mail.gmail.com>
- <CAF=yD-KKGYhKjxio9om1rz7pPe1uiRgODuXWvoLqrGrRbtWNkA@mail.gmail.com>
- <CADKFtnSgBZcpYBYRwr6WgnS6j9xH+U0W7bxSqt9ge5aumu4QQg@mail.gmail.com> <CAF=yD-JW+Gs+EeJk2jknU6ZL0prjRO41Q3EpVTOTpTD8sEOh6A@mail.gmail.com>
-In-Reply-To: <CAF=yD-JW+Gs+EeJk2jknU6ZL0prjRO41Q3EpVTOTpTD8sEOh6A@mail.gmail.com>
-From: Jordan Rife <jrife@google.com>
-Date: Tue, 12 Sep 2023 14:08:59 -0700
-Message-ID: <CADKFtnTzqLw4F2m9+7BxZZW_QKm_QiduMb6to9mU1WAvbo9MWQ@mail.gmail.com>
-Subject: Re: [PATCH net] net: prevent address overwrite in connect() and sendmsg()
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, davem@davemloft.net, 
-	Eric Dumazet <edumazet@google.com>, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, dborkman@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|SN7PR11MB7116:EE_
+X-MS-Office365-Filtering-Correlation-Id: 771c4605-c819-4691-1ef9-08dbb3d51f36
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: L4NEz2To2G8O1qRiYN3NMnHd/uMXhNE+ZK+8NHeT9PRwei6l5kCmCHh+AdctJMScyO8+7Uc0K9kMRvR1EUHM53/F82nvyo/0R2LWe/hh7/hpaHJXzuvSpCfWZ7EHxMDWL8tZbjDIv/Kv7PSJTu/Mpyatmi5YJP9geJvuGdD/Y5I6LX5ls3KEomhB2Dsee3xuAXr0yWfBNi/eWbSlJvFminpTN9b2BDmikJxbTZhkTpM5tMIgBXjMd6zGl9hqO4szr7T2vkgS1VQujN3viqhJz6NVIk+Usej7545qAS5JFE6g9+t6wFin2T3fA8I23bvt4b56R6L+KzfkZzyMIS6dDnlYvxnpjHgxCMt0tciZishOPMqzlxHpFzG4dYd+oGloUgH0SpcPShIibZLZr+7Zg/emHckpr1TWzxSg8XJuWXhgZORQTvjD7v8ofMbi9e0C4g2SOb6jbj8qLZR4Q1ciBSUzaFj1siK102SIWiSc7neZ0OLLZwQG7L8v1dyKUDlAI/6sLZqPLTy+a0Xmkgl8jwoBZaMN2uNN/hiYs4U6T7IZPJOMSYO/246BhuOQfyA+4iX0o0ITkkNbCs1LhAlcVTu9D9S0X+lGte0IEc/LYYrM050KcV63WTcOuZN8SWaNmq+REo1XiUH12MGHmEyTlg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(346002)(396003)(366004)(39860400002)(136003)(1800799009)(186009)(451199024)(2906002)(83380400001)(66476007)(6512007)(26005)(66946007)(316002)(8936002)(8676002)(4326008)(5660300002)(41300700001)(6486002)(66556008)(6506007)(53546011)(478600001)(82960400001)(38100700002)(2616005)(31696002)(86362001)(36756003)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YWVkRnNNRFNWKzAwZ2M5VjR5N3hjV2JoNFZ1aFdldFpGMEJUaERQWVNxTVZL?=
+ =?utf-8?B?WDVtUUpmdU50MDVRSGlZN05kd3duNzlBQm1UWW84Umdid1htNThyNDNoRkFV?=
+ =?utf-8?B?WXdRRzJFTnN4TWZDc3ZEUldEcHRGUXd1aVM1d2c5V0w3Tk1ab2ZKR25kREh4?=
+ =?utf-8?B?bytTYmNKQjl4dVZrZ0h3NE9rMTU3ODlIVDZrK3RQcEM1cnNuSHV0MmI2bVRT?=
+ =?utf-8?B?Nm9scjdURVZiMUhoWENiRktPZWRaSFRGQStFMnFsdGJpb01HeWIzdmFpNzY4?=
+ =?utf-8?B?L3crMlFod05vaUUwdEh1RUs5MmttdTA5MlJ3OTBtOE1IcWF5Q3NtNDlNZGtt?=
+ =?utf-8?B?TDZvbXVRQXRIMG5DYkFjYllVN1VRb3ByS09aenlXUUs5ajN2TUdldWJQLzlC?=
+ =?utf-8?B?YVUrNGl4dktoblluR2g2eTV0SkMwMHJoWjJiUUw0TW9qanIzZVJnU0RIM2x6?=
+ =?utf-8?B?UHF2SHdiNjR6WlNqYmRmaEtrU0tzaHgyYjVZVW1mWll4Q0ZVTVZDc1EzM0N0?=
+ =?utf-8?B?aEtKKzNuaFUwSENreG1zZGRxeFBXbnI1TkhPQnIrejc1QWFrZ0VVd2pwUk9N?=
+ =?utf-8?B?ZTA0L3drSGhmMGhxeU03UlBFdkZud05VSFVlWXVSOG1XdFVJRURKK1lFVDdW?=
+ =?utf-8?B?bFAzOTFXY1ZQR2lsalJVU2tBY1dqY0NQYzE2Y0hKaHBTQWtxejNZaWljR0lp?=
+ =?utf-8?B?Snl3RHRBSHA2Q1ltclN2dUkrZHExM21jZzAzUVV5L0Zya0xjV3BYMHo1M0Uy?=
+ =?utf-8?B?RE9uUzhzUFBXVE4ra3JIV3hzc3Vvdmk2L2NTNy92TXJ4MzIvUFNKV1E5Z29I?=
+ =?utf-8?B?SEI0MlhzakJZWVh2TzlWL2dRUzRMK2J1R0NjM0lhNmQ5YU42Wmw1U0FVK2Qr?=
+ =?utf-8?B?b3FQaUVDZXpoTm5EdHhKUW9RV1pLMXBUZTdIaG52N0FqWjUrOGxqcStLbUYr?=
+ =?utf-8?B?bkRLa0F1N1JJRStRbXBSTjBPakprZVorcFRZYlJCLytsOExzenFuYS8xQ0k3?=
+ =?utf-8?B?Z25HZUlWZmlEdDJOWnkyWUJrSG5xY0pzcFMvcndCRWJzRGxNMUQ0UG4ydk9O?=
+ =?utf-8?B?NEZoTmhzUGkyOWZnK1hrUVdnZ3oyK0pNTWhQbjl6c1pJWHRMeE94Q1hyTzhQ?=
+ =?utf-8?B?NEJHM3ZaZFdRVENzQlV5Z080TjVrUXJmN0lLcnlXNHZFYm40ZVNsek5OZTcr?=
+ =?utf-8?B?Y29NYklMWmdkdnJaOW1oRG12Z3Z2VDJCOURVNG4xa0NqWVh6RG5oRHB1WUR1?=
+ =?utf-8?B?cm5MQVk1MDdIUVVvWkhEUnVocDhvanhEakI3UHBFTVl1N1A2b0tLUnJUWmFP?=
+ =?utf-8?B?RmEzVitmMkpPV3BydGhPejBWVHZoTVFtUnI5aUhVd3JQdjcwb1NJZGdKSXkx?=
+ =?utf-8?B?dTFSSlRWTFliK3UrNE90QjgyazMvMzZTZVJTd0gvdHBVN0FtMWlWRmphbldY?=
+ =?utf-8?B?dmJuSk9iOW15UnFRbWhocTlhUlJKTkJMODFsZE43TitGelVOREhYWkhKdS8w?=
+ =?utf-8?B?elgzalN2VEtPeWN4bk9DQzZ4ZXd5T1ZsNTJndXVkZ1RRZzlCNEJ0NjArbnR4?=
+ =?utf-8?B?blZsMWk3MFNKMjBidGthNlZhem95TW96Tmg2enlOUkw3UkIzT3dKdWZuK2lk?=
+ =?utf-8?B?aFVMdm9jUTJhYk4wU2Izb0ZqRytKL01aRCtOQmVmbi9uY0NVc0RMNFc4R3ln?=
+ =?utf-8?B?NWNKWDJpS3VydTgrS0hFUzBYdHRvdkU5LytsV0dYdjI5ZkhPTkttR2wwUFVF?=
+ =?utf-8?B?QmJtTXUyaytYM0xQSUR2anlQMjB0TzNEM1hBQ3Z1dWdBT25mUUlKWUp3eVBW?=
+ =?utf-8?B?NXU2RXZzQUVjelhWcFFpakRCOXk1UlY0aWtFUkJqVFJ2S0R6ZlFIUldQc2oy?=
+ =?utf-8?B?RTRpRzdQK2UyTnpORWVEaFVlVU50Z0RvaEtwVUs3OWtNUHZMZEptSlZJYkN3?=
+ =?utf-8?B?cjZyR1ZnRjdmZWRpY2FhWXN6SFNsd0R6SlU5Ni9qSTk4aHZ4aytQa0g3ZXlF?=
+ =?utf-8?B?dk5XeW5ESTJVcFBsT1BjUW5wdU1jZE1wbzF5Z1J0YysyNkxWKzFHdEJHaERq?=
+ =?utf-8?B?K21jQTFDMXZWb2xUcGxFVUZHSmxRYUhqZzROTktqaHlYMldsZWFXV0QzcTBD?=
+ =?utf-8?B?Q0ZxaWNKSlJUWVN6TkszeW1UY0hLVlV3N3h3V00xTVFFSzcrTzc4dlBYUWVL?=
+ =?utf-8?B?SlE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 771c4605-c819-4691-1ef9-08dbb3d51f36
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Sep 2023 21:13:33.7171
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: VFrLHqBGnGiXMIhJIAeUQq+soc2nzp2XAPGKfDKk2qI4aFpRsclOkFG6TTzyWwzkn8+C+x4Hw5//rsmXrHDqNmjOEzcsE+LgA7T273TTyEY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB7116
+X-OriginatorOrg: intel.com
 
-> If we take this path, it could be a single patch. The subsystem
-> maintainers should be CC:ed so that they can (N)ACK it.
->
-> But I do not mean to ask to split it up and test each one separately.
->
-> The change from sock->ops->connect to kernel_connect is certainly
-> trivial enough that compile testing should suffice.
 
-Ack. Thanks for clarifying.
 
-> The only question is whether we should pursue your original patch and
-> accept that this will continue, or one that improves the situation,
-> but touches more files and thus has a higher risk of merge conflicts.
->
-> I'd like to give others some time to chime in. I've given my opinion,
-> but it's only one.
->
-> I'd like to give others some time to chime in. I've given my opinion,
-> but it's only one.
+On 9/12/2023 1:48 PM, David Christensen wrote:
+> 
+> 
+> On 9/11/23 5:14 PM, Jacob Keller wrote:
+>>
+>>
+>> On 9/11/2023 3:22 PM, David Christensen wrote:
+>>> The function ionic_rx_fill() uses 16bit math when calculating the
+>>> the number of pages required for an RX descriptor given an interface
+>>> MTU setting. If the system PAGE_SIZE >= 64KB, the frag_len and
+>>> remain_len values will always be 0, causing unnecessary scatter-
+>>> gather elements to be assigned to the RX descriptor, up to the
+>>> maximum number of scatter-gather elements per descriptor.
+>>>
+>>> A similar change in ionic_rx_frags() is implemented for symmetry,
+>>> but has not been observed as an issue since scatter-gather
+>>> elements are not necessary for such larger page sizes.
+>>>
+>>> Fixes: 4b0a7539a372 ("ionic: implement Rx page reuse")
+>>> Signed-off-by: David Christensen <drc@linux.vnet.ibm.com>
+>>> ---
+>>
+>> Given this is a bug fix, it should probably have a subject of [PATCH
+>> net] or [net] to indicate its targeting the net tree.
+> 
+> Will resend v2 with updated Subject line.
+> 
+>>
+>> I'm not sure I follow the logic for frag_len and remain_len always being
+>> zero, since typecasting unsigned values truncates the higher bytes
+>> (technically its guaranteed by the standard to result in the smallest
+>> value congruent modulo 2^16 for a 16bit typecast), so if page_offset was
+>> non-zero then the resulting with the typecast should be as well.. but
+>> either way its definitely not going to work as desired.
+> 
+> Sorry, tried condensing the explanation too much. I'm not sure how 
+> frequently buf_info->page_offset is non-zero, but when 
+> ionic_rx_page_alloc() allocates a new page, as happens during initial 
+> driver load, it explicitly sets buf_info->page_offset to 0.  As a 
+> result, the remain_len value never decreases from the original frame 
+> size (e.g. 1522) while frag_len is always calculated as 0 ((min_t(u16, 
+> 0x5F2, (0x1_0000 - 0) -> 0).
+> 
 
-Sounds good. I'll wait to hear others' opinions on the best path forward.
+Yea that makes sense. When the page offset is zero this definitely
+results in a zero value (given that PAGE_SIZE is always a power of 2, so
+its congruent value is 0). In either case if PAGE_SIZE > 16bits this
+will produce incorrect and unexpected results regardless.
 
--Jordan
+> I'll update the the description in v2.
+> 
+> Dave
 
-On Tue, Sep 12, 2023 at 1:49=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> On Tue, Sep 12, 2023 at 4:07=E2=80=AFPM Jordan Rife <jrife@google.com> wr=
-ote:
-> >
-> > > Ideally these all would use the proper kernel-internal APIs.
-> > > I care less about new code. If all examples are clear, that will do t=
-he right thing, or is a simple fix-up worst case.
-> >
-> > Fair enough.
-> >
-> > > The changes do seem like trivial one liners?
-> >
-> > Looks like it. Still, it's going to take some time to patch+test each
-> > of these. I'll start with NFS (SUNRPC), SMB, and Ceph, since I can
-> > easily test them.
-> >
-> > > Question is if changing all these callers is suitable for a patch tar=
-geting net.
-> > One patch to net will be needed to add an address copy to
-> > kernel_sendmsg(), but I guess I'll need to send some other patches to
-> > the appropriate subsystem maintainers for SUNRPC, SMB, and Ceph to
-> > swap out calls.
->
-> If we take this path, it could be a single patch. The subsystem
-> maintainers should be CC:ed so that they can (N)ACK it.
->
-> But I do not mean to ask to split it up and test each one separately.
->
-> The change from sock->ops->connect to kernel_connect is certainly
-> trivial enough that compile testing should suffice.
->
-> Note that kernel_connect actually uses READ_ONCE(sock->ops) because of
-> a data race. All callers that call a socket that may be subject to
-> IPV6_ADDRFORM should do that. Likely some of those open coded examples
-> are affected, and do not. This is another example why using a single
-> interface is preferable.
->
-> > > Similarly, this could call kernel_sendmsg, and the extra copy handled=
- in that wrapper.
-> >
-> > Would it make more sense to do the address copy in sock_sendmsg()
-> > instead? Are kernel callers "supposed" to use kernel_sendmsg() or is
-> > it valid for them to use sock_sendmsg() as many of them seem to want
-> > to do today. Seeing as sock_sendmsg() is called by kernel_sendmsg(),
-> > adding the copy in sock_sendmsg() fixes this problem for callers to
-> > both of these and avoids the need for patching all modules that call
-> > sock_sendmsg().
->
-> I think it is "supposed" to be the API for these cases. But as you
-> show, clearly it isn't today. Practice trumps theory.
->
-> The only question is whether we should pursue your original patch and
-> accept that this will continue, or one that improves the situation,
-> but touches more files and thus has a higher risk of merge conflicts.
->
-> I'd like to give others some time to chime in. I've given my opinion,
-> but it's only one.
->
->
->
-> > -Jordan
-> >
-> > On Tue, Sep 12, 2023 at 12:36=E2=80=AFPM Willem de Bruijn
-> > <willemdebruijn.kernel@gmail.com> wrote:
-> > >
-> > > On Tue, Sep 12, 2023 at 2:31=E2=80=AFPM Jordan Rife <jrife@google.com=
-> wrote:
-> > > >
-> > > > > These should probably call kernel_connect instead.
-> > > > > Similarly, this could call kernel_sendmsg, and the extra copy han=
-dled in that wrapper.
-> > > >
-> > > > I was considering this approach initially, but one concern I had wa=
-s
-> > > > that there are other instances I see of modules calling ops->connec=
-t()
-> > > > directly (bypassing kernel_connect()):
-> > > >
-> > > > - net/netfilter/ipvs/ip_vs_sync.c: make_send_sock()
-> > > > - drivers/block/drbd/drbd_receiver.c: drbd_try_connect()
-> > > > - drivers/infiniband/hw/erdma/erdma_cm.c: kernel_bindconnect()
-> > > > - drivers/infiniband/sw/siw/siw_cm.c: kernel_bindconnect()
-> > > > - fs/ocfs2/cluster/tcp.c: o2net_start_connect()
-> > > > - net/rds/tcp_connect.c: rds_tcp_conn_path_connect()
-> > > >
-> > > > and ops->sendmsg():
-> > > >
-> > > > - net/smc/af_smc.c: smc_sendmsg()
-> > > > - drivers/vhost/net.c: vhost_tx_batch(), handle_tx_copy(), handle_t=
-x_zerocopy()
-> > > > - drivers/target/iscsi/iscsi_target_util.c: iscsit_fe_sendpage_sg()
-> > > >
-> > > > which (at least in theory) leaves them open to the same problem I'm
-> > > > seeing with NFS/SMB right now. I worry that even if all these
-> > > > instances were swapped out with kernel_sendmsg() and kernel_connect=
-(),
-> > > > it would turn into a game of whac-a-mole in the future as new chang=
-es
-> > > > or new modules may reintroduce direct calls to sock->ops->connect()=
- or
-> > > > sock->ops->sendmsg().
-> > >
-> > > Ideally these all would use the proper kernel-internal APIs.
-> > >
-> > > I care less about new code. If all examples are clear, that
-> > > will do the right thing, or is a simple fix-up worst case.
-> > >
-> > > Question is if changing all these callers is suitable for a patch
-> > > targeting net.
-> > >
-> > > The changes do seem like trivial one liners?
-> > >
-> > > > -Jordan
-> > > >
-> > > >
-> > > >
-> > > > On Tue, Sep 12, 2023 at 7:22=E2=80=AFAM Daniel Borkmann <daniel@iog=
-earbox.net> wrote:
-> > > > >
-> > > > > On 9/12/23 3:33 PM, Willem de Bruijn wrote:
-> > > > > > Jordan Rife wrote:
-> > > > > >> commit 0bdf399342c5 ("net: Avoid address overwrite in kernel_c=
-onnect")
-> > > > > >> ensured that kernel_connect() will not overwrite the address p=
-arameter
-> > > > > >> in cases where BPF connect hooks perform an address rewrite. H=
-owever,
-> > > > > >> there remain other cases where BPF hooks can overwrite an addr=
-ess held
-> > > > > >> by a kernel client.
-> > > > > >>
-> > > > > >> =3D=3DScenarios Tested=3D=3D
-> > > > > >>
-> > > > > >> * Code in the SMB and Ceph modules calls sock->ops->connect() =
-directly,
-> > > > > >>    allowing the address overwrite to occur. In the case of SMB=
-, this can
-> > > > > >>    lead to broken mounts.
-> > > > > >
-> > > > > > These should probably call kernel_connect instead.
-> > > > > >
-> > > > > >> * NFS v3 mounts with proto=3Dudp call sock_sendmsg() for each =
-RPC call,
-> > > > > >>    passing a pointer to the mount address in msg->msg_name whi=
-ch is
-> > > > > >>    later overwritten by a BPF sendmsg hook. This can lead to b=
-roken NFS
-> > > > > >>    mounts.
-> > > > > >
-> > > > > > Similarly, this could call kernel_sendmsg, and the extra copy h=
-andled
-> > > > > > in that wrapper. The arguments are not exacty the same, so not =
-100%
-> > > > > > this is feasible.
-> > > > > >
-> > > > > > But it's preferable if in-kernel callers use the kernel_.. API =
-rather
-> > > > > > than bypass it. Exactly for issues like the one you report.
-> > > > >
-> > > > > Fully agree, if it's feasible it would be better to convert them =
-over to
-> > > > > in-kernel API.
-> > > > >
-> > > > > >> In order to more comprehensively fix this class of problems, t=
-his patch
-> > > > > >> pushes the address copy deeper into the stack and introduces a=
-n address
-> > > > > >> copy to both udp_sendmsg() and udpv6_sendmsg() to insulate all=
- callers
-> > > > > >> from address rewrites.
-> > > > > >>
-> > > > > >> Signed-off-by: Jordan Rife <jrife@google.com>
+Thanks!
+
+-Jake
 
