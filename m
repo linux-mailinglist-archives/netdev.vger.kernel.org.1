@@ -1,106 +1,134 @@
-Return-Path: <netdev+bounces-33076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07AA179CA7B
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 10:45:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F95B79CB1C
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 11:06:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF4272811AF
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 08:45:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B87B31C20C41
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 09:06:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52E348F5A;
-	Tue, 12 Sep 2023 08:45:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35D358F7F;
+	Tue, 12 Sep 2023 09:06:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4674315AE
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 08:45:28 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9E5AC1736
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 01:45:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1694508326;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3hUC4x3FXZvTagHd2cD4t3OZmFD4EPm/rOhyiGmvo8w=;
-	b=WrJ/Y6QgUDvKbU/AYHnWU2v0sRosX9XKfH5wsqqzQ9SmPY99v6zzAleQlFO/Z/S3SneFiK
-	qxkA1SoCP6vm9vsJuONRGGXj+GePoZf0DYxs4FqM5yQONj6PENxVCGf4cQ2UWyLN3Yn6hp
-	um2ryHmERIU78O911yEhLXWxl1ScZRw=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-493-oZ-bZafMONy-DszK91KYpw-1; Tue, 12 Sep 2023 04:45:25 -0400
-X-MC-Unique: oZ-bZafMONy-DszK91KYpw-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-9a9cd336c9cso133946066b.1
-        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 01:45:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694508324; x=1695113124;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3hUC4x3FXZvTagHd2cD4t3OZmFD4EPm/rOhyiGmvo8w=;
-        b=EztXReJOs3rHffc1KHpYP3bxSCOQjzSY0lG7IhumUl/9wADhHLz59Ze5WzxDLyH/Lj
-         1NsK+EgmCqAEIpbbCgwa+bD8x1hj8SX79Hjh4FNBOBlk/wrX4vCAMswOQShOlWbsnpYR
-         J//q5F8gDvc7yszbWx2b0iEq32Dn5xEX3MQE0l93zh1w4saMLaeEx8L554arbf3Vl2Jl
-         Jy161mfbOD4weOP42cxEtBs67eO3JDzVdG3CD1ymjz9exzhGV/UvmRLp80LCn5uOTASG
-         tWmskzuohCvZ0lqezdEqZmBN/0PGi6FDCL+t01y0h+UGfOy05TyGUppIQVmfeFvOwC+S
-         FYng==
-X-Gm-Message-State: AOJu0Yxwz5jpd5lIQCNSxIjR287nhRMfTiLZ95zQix44VxR+t9qGlqPh
-	yxLVBCdhQ9YLdT0ln9kNk3v76Bak2qdpqdrOhiB99Osx5HWKedMU1rc2OJgAt3+YNzu703dI4NN
-	Vbfc4/qOrFKdjNHVE
-X-Received: by 2002:a17:906:254:b0:9a5:a701:2b94 with SMTP id 20-20020a170906025400b009a5a7012b94mr9196363ejl.7.1694508323972;
-        Tue, 12 Sep 2023 01:45:23 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGpiSb88bPEZUnnVfXGKy7ahcM0UPN8GF+UlMWw3spQWZk++q+dCMlUOm8PacoxmU0GsjVmFg==
-X-Received: by 2002:a17:906:254:b0:9a5:a701:2b94 with SMTP id 20-20020a170906025400b009a5a7012b94mr9196343ejl.7.1694508323670;
-        Tue, 12 Sep 2023 01:45:23 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-249-231.dyn.eolo.it. [146.241.249.231])
-        by smtp.gmail.com with ESMTPSA id y22-20020a170906449600b0099bc8db97bcsm6473980ejo.131.2023.09.12.01.45.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Sep 2023 01:45:23 -0700 (PDT)
-Message-ID: <2c532d4594ca0cacdc0cfc5d1f5d55d5d758dc1b.camel@redhat.com>
-Subject: Re: [net PATCH] octeon_ep: fix tx dma unmap len values in SG
-From: Paolo Abeni <pabeni@redhat.com>
-To: Shinas Rasheed <srasheed@marvell.com>, horms@kernel.org
-Cc: aayarekar@marvell.com, davem@davemloft.net, edumazet@google.com, 
- egallen@redhat.com, hgani@marvell.com, kuba@kernel.org, 
- linux-kernel@vger.kernel.org, mschmidt@redhat.com, netdev@vger.kernel.org, 
- sburla@marvell.com, sedara@marvell.com, vburru@marvell.com,
- vimleshk@marvell.com
-Date: Tue, 12 Sep 2023 10:45:21 +0200
-In-Reply-To: <20230912070400.2136431-1-srasheed@marvell.com>
-References: <20230911180113.GA113013@kernel.org>
-	 <20230912070400.2136431-1-srasheed@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 202975249
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 09:06:54 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA9B810D8
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 02:06:53 -0700 (PDT)
+Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[IPv6:::1])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <l.stach@pengutronix.de>)
+	id 1qfzM4-0001U4-6D; Tue, 12 Sep 2023 11:06:46 +0200
+Message-ID: <99695befef06b025de2c457ea5f861aa81a0883c.camel@pengutronix.de>
+Subject: Re: [REGRESSION] [PATCH net-next v5 2/2] net: stmmac: use per-queue
+ 64 bit statistics where necessary
+From: Lucas Stach <l.stach@pengutronix.de>
+To: Jisheng Zhang <jszhang@kernel.org>, Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?=
+	 <u.kleine-koenig@pengutronix.de>
+Cc: linux-kernel@vger.kernel.org, kernel@pengutronix.de, Samuel Holland
+ <samuel@sholland.org>, netdev@vger.kernel.org, 
+ linux-stm32@st-md-mailman.stormreply.com, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Jernej Skrabec <jernej.skrabec@gmail.com>, 
+ Chen-Yu Tsai <wens@csie.org>, Eric Dumazet <edumazet@google.com>, Jose
+ Abreu <joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Jakub Kicinski <kuba@kernel.org>, Giuseppe Cavallaro
+ <peppe.cavallaro@st.com>, Paolo Abeni <pabeni@redhat.com>,
+ linux-sunxi@lists.linux.dev, "David S . Miller" <davem@davemloft.net>,
+ linux-arm-kernel@lists.infradead.org
+Date: Tue, 12 Sep 2023 11:04:16 +0200
+In-Reply-To: <ZQAa3277GC4c9W1D@xhacker>
+References: <20230717160630.1892-1-jszhang@kernel.org>
+	 <20230717160630.1892-3-jszhang@kernel.org>
+	 <20230911171102.cwieugrpthm7ywbm@pengutronix.de> <ZQAa3277GC4c9W1D@xhacker>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
+X-SA-Exim-Mail-From: l.stach@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Tue, 2023-09-12 at 00:04 -0700, Shinas Rasheed wrote:
-> This change is required in octep_iq_process_completions, as given in the =
-patch,
-> since the scatter gather pointer lengths arrive as big-endian in hardware=
-.
+Am Dienstag, dem 12.09.2023 um 16:01 +0800 schrieb Jisheng Zhang:
+> On Mon, Sep 11, 2023 at 07:11:02PM +0200, Uwe Kleine-K=C3=B6nig wrote:
+> > Hello,
+> >=20
+> > this patch became commit 133466c3bbe171f826294161db203f7670bb30c8 and i=
+s
+> > part of v6.6-rc1.
+> >=20
+> > On my arm/stm32mp157 based machine using NFS root this commit makes the
+> > following appear in the kernel log:
+> >=20
+> > 	INFO: trying to register non-static key.
+> > 	The code is fine but needs lockdep annotation, or maybe
+> > 	you didn't initialize this object before use?
+> > 	turning off the locking correctness validator.
+> > 	CPU: 0 PID: 1 Comm: swapper/0 Not tainted 6.5.0-rc1-00449-g133466c3bbe=
+1-dirty #21
+> > 	Hardware name: STM32 (Device Tree Support)
+> > 	 unwind_backtrace from show_stack+0x18/0x1c
+> > 	 show_stack from dump_stack_lvl+0x60/0x90
+> > 	 dump_stack_lvl from register_lock_class+0x98c/0x99c
+> > 	 register_lock_class from __lock_acquire+0x74/0x293c
+> > 	 __lock_acquire from lock_acquire+0x134/0x398
+> > 	 lock_acquire from stmmac_get_stats64+0x2ac/0x2fc
+> > 	 stmmac_get_stats64 from dev_get_stats+0x44/0x130
+> > 	 dev_get_stats from rtnl_fill_stats+0x38/0x120
+> > 	 rtnl_fill_stats from rtnl_fill_ifinfo+0x834/0x17f4
+> > 	 rtnl_fill_ifinfo from rtmsg_ifinfo_build_skb+0xc0/0x144
+> > 	 rtmsg_ifinfo_build_skb from rtmsg_ifinfo+0x50/0x88
+> > 	 rtmsg_ifinfo from __dev_notify_flags+0xc0/0xec
+> > 	 __dev_notify_flags from dev_change_flags+0x50/0x5c
+> > 	 dev_change_flags from ip_auto_config+0x2f4/0x1260
+> > 	 ip_auto_config from do_one_initcall+0x70/0x35c
+> > 	 do_one_initcall from kernel_init_freeable+0x2ac/0x308
+> > 	 kernel_init_freeable from kernel_init+0x1c/0x138
+> > 	 kernel_init from ret_from_fork+0x14/0x2c
+> > 	Exception stack(0xe0815fb0 to 0xe0815ff8)
+> > 	5fa0:                                     00000000 00000000 00000000 0=
+0000000
+> > 	5fc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 0=
+0000000
+> > 	5fe0: 00000000 00000000 00000000 00000000 00000013 00000000
+> > 	dwc2 49000000.usb-otg: new device is high-speed
+> >=20
+> > I didn't try understand this problem, it's too close to quitting time
+> > :-)
+>=20
+> Thanks for the bug report, I'm checking the code.
 
-I guess Simon intended asking about octep_iq_free_pending(), and AFAICT
-your reply confirm that the change is required there, too.
+The newly added "struct u64_stats_sync syncp" uses a seqlock
+internally, which is broken into multiple words on 32bit machines, and
+needs to be initialized properly. You need to call u64_stats_init on
+syncp before first usage.
 
-Additionally the changelog really need to be expanded. I don't
-understand how this change relates to endianess: if the ring format is
-big endian I expect some be16_to_cpu(len) instead of complement-to-4 of
-indexes.
+Regards,
+Lucas
 
-Please clarify and expand the changelog, thanks!
-
-Paolo
+> >=20
+> > Best regards
+> > Uwe
+> >=20
+> > --=20
+> > Pengutronix e.K.                           | Uwe Kleine-K=C3=B6nig     =
+       |
+> > Industrial Linux Solutions                 | https://www.pengutronix.de=
+/ |
+>=20
+>=20
+>=20
 
 
