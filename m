@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-33299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAC2279D5A2
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 18:02:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 443FC79D5A5
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 18:03:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FEFC281E4F
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 16:02:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F3E71C20B05
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 16:03:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDAF118C3E;
-	Tue, 12 Sep 2023 16:02:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6BDB18C30;
+	Tue, 12 Sep 2023 16:02:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA35918C3C
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 16:02:18 +0000 (UTC)
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D1D01716
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AABD18C2C
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 16:02:28 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 847A01717
 	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 09:02:18 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d7b957fd276so5257909276.0
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-58fc7afa4beso68182107b3.2
         for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 09:02:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1694534536; x=1695139336; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1694534537; x=1695139337; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=18cv7HmUKHtg7YyG5IMUuADgJYGkn4jNiQYrKm573Fw=;
-        b=qxIHXWoXHb4d0E7xtq08OLIoLa+QqT80sbFmd0pcFr9t8zdL/UmqcXyKmbwv2SY0Ch
-         zDmjOQDqSPg4wFnJ60vmI7oTYCjUvldhRAS9ZJR+lV7hN9stqLJEM0vFSMBcKwQqy2OQ
-         2CzILwsUUpKDjKJv2Ft4Om+GmVS79EQPBuvdjBGj5+Rd0S9R3KUdDmdKG8Nx6uL5YOyb
-         9nLkCVodyMozKcVB3uToN2qWjI2q5fDKQwjEuVCKKNdLSLWlgksuQDpxK4hXMpydpQFn
-         b8n8Z8kSz1b7FHYEJdoWKY/B/fQJClPA+Mi8wjTVKJSvzW1ltT7UkW224/N/+r+POHQ6
-         iilg==
+        bh=xPIMxkfXwhhBLTlda7uyveo4ZerWd8hPga+5XhlbL4Y=;
+        b=paO3gpWd+Xdzqiv0cKWFW+wMgO3Lp2/BxFkeENhoWtQBKQ69GhVUovETpTnrjpizK3
+         aoo0je72YagwgOrgKQPVFCpll/6eN28VaGUNlsaZ3zDGQIhi89S98mOkH9AA1qLKE2ns
+         5tYmrl2PAipxBHnFfs3y6jZ0/OY9go9ke4FH2S2KFcvmVaZyG1vY1OEGjxXFAHMAX54y
+         8SZ++Tuy6FM7yyASY5iF12nmd2uo/foZVOg3Um8VdWKuv9xdDaRFcFhSnm4D1u7ceF2r
+         LE3mHezzGuXfsXprQLO+4ySVJiMWfwQCYX3i4AiVDH/mAnKflVyHzNAvYAUJAmpJ96nT
+         6Vrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694534536; x=1695139336;
+        d=1e100.net; s=20230601; t=1694534537; x=1695139337;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=18cv7HmUKHtg7YyG5IMUuADgJYGkn4jNiQYrKm573Fw=;
-        b=NC7vPYa1oJ958AaIKTXYXDc1hXoQDpWBN1hOdRNyQdXzHkzoOx5gcDAYa2aGo6DIeX
-         m35AqQYCYABzUjbdwLQLn0cDIxXmHA6LL8T40+7tadwCJAFsr+Po/qWXqmsJDRF29l3F
-         jFIlFXZwl+8WflUl89QmX3YrDumGjvzsaCz+9vC10Dhpg3fzMDLRfIEF7MWShCsVZuQz
-         ucfhPejRzPE4HO1zLgvsD/XzshMhVXgXiOxyNE4PDzVXBo+V9L/nMncB4wLEbbHqODl8
-         2FpghPcQWjzlP2ULsRT9qes04dLfe+t5TjN6H8vM74zmMtuyGtoU4CrIBXZeW/4W5kgf
-         b51g==
-X-Gm-Message-State: AOJu0Yw+lLiLdS3I4J5n/xrpw4/7/aeDisXg74AF4zqvIjw4wYFoTFrx
-	Ol2qb3pacajB2A+Q8hoUJu7BOKrFuDosmQ==
-X-Google-Smtp-Source: AGHT+IHT0D38REdFhQ21lfkuNw5xGdLfiGGMaSgJVt2+qMaVLw/HZukRfhDby7y3MxniS8HMjCcLIhR4DXXO1A==
+        bh=xPIMxkfXwhhBLTlda7uyveo4ZerWd8hPga+5XhlbL4Y=;
+        b=omaXN0LtVnNo9w1dndkJUW6BSpK0uyN2nU+D1fPynLqDQVDHPBwTj+dqRrytCerdIH
+         PRLU7u6kfMCLDDS2JBFWhg67AykVt+m6/y4wPI6wEvKK4uLm7ULrInYhjazqU5kGIrKk
+         TXPpFPCNL15n/ZkaN2BKqmIrC2lDvosv/f37Hp5VK9fMJ7X7No7Pahh895dNuPk3ySa4
+         fntoL8dt4RXDzzj+Hr+Ghx7CvsnCiMF7zcD8n6B4XGPXy7CNuBZ07A5IudIbKaKawq60
+         zw3daMhUhaUqhQJZVa6sJzghQ10zu7/XKhzKVhLAwaGwGziZ42f2NRtk77gts+wuzTlb
+         Y5Sg==
+X-Gm-Message-State: AOJu0YxXw2JCHhROkLjebcpnj/bltPgiTb8EJZZPgJUTiyvMEy1pMKgm
+	5dZw/y+o3tW7w9fKfcfdEbXAholrgKaOzA==
+X-Google-Smtp-Source: AGHT+IGVHv/hm6HC/BAalptbQxaS+Ki72QJb63zrElxIWQlpjUwNVgsE+nSQpJwWASm9IAHHADuZ9BerLSy3oQ==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:34c3:0:b0:d7b:9185:e23d with SMTP id
- b186-20020a2534c3000000b00d7b9185e23dmr252480yba.6.1694534536318; Tue, 12 Sep
- 2023 09:02:16 -0700 (PDT)
-Date: Tue, 12 Sep 2023 16:01:59 +0000
+ (user=edumazet job=sendgmr) by 2002:a25:8451:0:b0:d4b:df05:3500 with SMTP id
+ r17-20020a258451000000b00d4bdf053500mr297824ybm.11.1694534537809; Tue, 12 Sep
+ 2023 09:02:17 -0700 (PDT)
+Date: Tue, 12 Sep 2023 16:02:00 +0000
 In-Reply-To: <20230912160212.3467976-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -62,8 +62,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20230912160212.3467976-1-edumazet@google.com>
 X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
-Message-ID: <20230912160212.3467976-2-edumazet@google.com>
-Subject: [PATCH net-next 01/14] ipv6: lockless IPV6_UNICAST_HOPS implementation
+Message-ID: <20230912160212.3467976-3-edumazet@google.com>
+Subject: [PATCH net-next 02/14] ipv6: lockless IPV6_MULTICAST_LOOP implementation
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -71,140 +71,206 @@ Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Some np->hop_limit accesses are racy, when socket lock is not held.
+Add inet6_{test|set|clear|assign}_bit() helpers.
 
-Add missing annotations and switch to full lockless implementation.
+Note that I am using bits from inet->inet_flags,
+this might change in the future if we need more flags.
+
+While solving data-races accessing np->mc_loop,
+this patch also allows to implement lockless accesses
+to np->mcast_hops in the following patch.
+
+Also constify sk_mc_loop() argument.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/linux/ipv6.h     | 12 +-----------
- include/net/ipv6.h       |  2 +-
- net/ipv6/ip6_output.c    |  2 +-
- net/ipv6/ipv6_sockglue.c | 20 +++++++++++---------
- net/ipv6/mcast.c         |  2 +-
- net/ipv6/ndisc.c         |  2 +-
- 6 files changed, 16 insertions(+), 24 deletions(-)
+ include/linux/ipv6.h            | 18 ++++++++++++++----
+ include/net/inet_sock.h         |  1 +
+ include/net/sock.h              |  2 +-
+ net/core/sock.c                 |  4 ++--
+ net/ipv6/af_inet6.c             |  2 +-
+ net/ipv6/ipv6_sockglue.c        | 18 ++++++++----------
+ net/ipv6/ndisc.c                |  2 +-
+ net/netfilter/ipvs/ip_vs_sync.c |  8 ++------
+ 8 files changed, 30 insertions(+), 25 deletions(-)
 
 diff --git a/include/linux/ipv6.h b/include/linux/ipv6.h
-index af8a771a053c51eed297516f927a5fd003315ef4..c2e0870713849fbbf1a8ec2d60cca80caab0cb98 100644
+index c2e0870713849fbbf1a8ec2d60cca80caab0cb98..68cf1ca949141e419abf2031db2b42105b821ab0 100644
 --- a/include/linux/ipv6.h
 +++ b/include/linux/ipv6.h
-@@ -213,17 +213,7 @@ struct ipv6_pinfo {
- 	__be32			flow_label;
- 	__u32			frag_size;
- 
--	/*
--	 * Packed in 16bits.
--	 * Omit one shift by putting the signed field at MSB.
--	 */
--#if defined(__BIG_ENDIAN_BITFIELD)
--	__s16			hop_limit:9;
--	__u16			__unused_1:7;
--#else
--	__u16			__unused_1:7;
--	__s16			hop_limit:9;
--#endif
-+	s16			hop_limit;
- 
+@@ -218,11 +218,9 @@ struct ipv6_pinfo {
  #if defined(__BIG_ENDIAN_BITFIELD)
  	/* Packed in 16bits. */
-diff --git a/include/net/ipv6.h b/include/net/ipv6.h
-index 0675be0f3fa0efc55575bb5b2569dc8a1dbb9f24..61007db0036482e27121747add0eec77f912b54a 100644
---- a/include/net/ipv6.h
-+++ b/include/net/ipv6.h
-@@ -911,7 +911,7 @@ static inline int ip6_sk_dst_hoplimit(struct ipv6_pinfo *np, struct flowi6 *fl6,
- 	if (ipv6_addr_is_multicast(&fl6->daddr))
- 		hlimit = np->mcast_hops;
- 	else
--		hlimit = np->hop_limit;
-+		hlimit = READ_ONCE(np->hop_limit);
- 	if (hlimit < 0)
- 		hlimit = ip6_dst_hoplimit(dst);
- 	return hlimit;
-diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index 54fc4c711f2c545f2ca625d6b0e09f2bb8e6d513..1e16d56d8c38ac51bd999038ae4e8478bf2f5f8c 100644
---- a/net/ipv6/ip6_output.c
-+++ b/net/ipv6/ip6_output.c
-@@ -309,7 +309,7 @@ int ip6_xmit(const struct sock *sk, struct sk_buff *skb, struct flowi6 *fl6,
- 	 *	Fill in the IPv6 header
- 	 */
- 	if (np)
--		hlimit = np->hop_limit;
-+		hlimit = READ_ONCE(np->hop_limit);
- 	if (hlimit < 0)
- 		hlimit = ip6_dst_hoplimit(dst);
+ 	__s16			mcast_hops:9;
+-	__u16			__unused_2:6,
+-				mc_loop:1;
++	__u16			__unused_2:7,
+ #else
+-	__u16			mc_loop:1,
+-				__unused_2:6;
++	__u16			__unused_2:7;
+ 	__s16			mcast_hops:9;
+ #endif
+ 	int			ucast_oif;
+@@ -283,6 +281,18 @@ struct ipv6_pinfo {
+ 	struct inet6_cork	cork;
+ };
  
++/* We currently use available bits from inet_sk(sk)->inet_flags,
++ * this could change in the future.
++ */
++#define inet6_test_bit(nr, sk)			\
++	test_bit(INET_FLAGS_##nr, &inet_sk(sk)->inet_flags)
++#define inet6_set_bit(nr, sk)			\
++	set_bit(INET_FLAGS_##nr, &inet_sk(sk)->inet_flags)
++#define inet6_clear_bit(nr, sk)			\
++	clear_bit(INET_FLAGS_##nr, &inet_sk(sk)->inet_flags)
++#define inet6_assign_bit(nr, sk, val)		\
++	assign_bit(INET_FLAGS_##nr, &inet_sk(sk)->inet_flags, val)
++
+ /* WARNING: don't change the layout of the members in {raw,udp,tcp}6_sock! */
+ struct raw6_sock {
+ 	/* inet_sock has to be the first member of raw6_sock */
+diff --git a/include/net/inet_sock.h b/include/net/inet_sock.h
+index 2de0e4d4a027889706323b7ee4b96e406101bff4..b5a9dca92fb45425c032bdf08bfa88cad77926b8 100644
+--- a/include/net/inet_sock.h
++++ b/include/net/inet_sock.h
+@@ -268,6 +268,7 @@ enum {
+ 	INET_FLAGS_NODEFRAG	= 17,
+ 	INET_FLAGS_BIND_ADDRESS_NO_PORT = 18,
+ 	INET_FLAGS_DEFER_CONNECT = 19,
++	INET_FLAGS_MC6_LOOP	= 20,
+ };
+ 
+ /* cmsg flags for inet */
+diff --git a/include/net/sock.h b/include/net/sock.h
+index b770261fbdaf59d4d1c0b30adb2592c56442e9e3..9e1c17e56971f8714d421d58e408bf3face421b0 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -2239,7 +2239,7 @@ static inline void sock_confirm_neigh(struct sk_buff *skb, struct neighbour *n)
+ 	}
+ }
+ 
+-bool sk_mc_loop(struct sock *sk);
++bool sk_mc_loop(const struct sock *sk);
+ 
+ static inline bool sk_can_gso(const struct sock *sk)
+ {
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 16584e2dd6481a3fc28d796db785439f0446703b..b2a9b5630bb513d5e5b99a6b7d3cef54af3a4b6f 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -759,7 +759,7 @@ static int sock_getbindtodevice(struct sock *sk, sockptr_t optval,
+ 	return ret;
+ }
+ 
+-bool sk_mc_loop(struct sock *sk)
++bool sk_mc_loop(const struct sock *sk)
+ {
+ 	if (dev_recursion_level())
+ 		return false;
+@@ -771,7 +771,7 @@ bool sk_mc_loop(struct sock *sk)
+ 		return inet_test_bit(MC_LOOP, sk);
+ #if IS_ENABLED(CONFIG_IPV6)
+ 	case AF_INET6:
+-		return inet6_sk(sk)->mc_loop;
++		return inet6_test_bit(MC6_LOOP, sk);
+ #endif
+ 	}
+ 	WARN_ON_ONCE(1);
+diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
+index 368824fe9719f92b46512f3f78446fe5bc802ef7..bbd4aa1b96d09d346c521dab2194045123e7a5a6 100644
+--- a/net/ipv6/af_inet6.c
++++ b/net/ipv6/af_inet6.c
+@@ -217,7 +217,7 @@ static int inet6_create(struct net *net, struct socket *sock, int protocol,
+ 	inet_sk(sk)->pinet6 = np = inet6_sk_generic(sk);
+ 	np->hop_limit	= -1;
+ 	np->mcast_hops	= IPV6_DEFAULT_MCASTHOPS;
+-	np->mc_loop	= 1;
++	inet6_set_bit(MC6_LOOP, sk);
+ 	np->mc_all	= 1;
+ 	np->pmtudisc	= IPV6_PMTUDISC_WANT;
+ 	np->repflow	= net->ipv6.sysctl.flowlabel_reflect & FLOWLABEL_REFLECT_ESTABLISHED;
 diff --git a/net/ipv6/ipv6_sockglue.c b/net/ipv6/ipv6_sockglue.c
-index 0e2a0847b387f0f6f50211b89f92ac1e00a0b07a..f27993a1470dddd876f34f65c1f171c576eca272 100644
+index f27993a1470dddd876f34f65c1f171c576eca272..755fac85a120de44272f685529b579e7118d306b 100644
 --- a/net/ipv6/ipv6_sockglue.c
 +++ b/net/ipv6/ipv6_sockglue.c
-@@ -415,6 +415,16 @@ int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
- 	if (ip6_mroute_opt(optname))
- 		return ip6_mroute_setsockopt(sk, optname, optval, optlen);
- 
-+	/* Handle options that can be set without locking the socket. */
-+	switch (optname) {
-+	case IPV6_UNICAST_HOPS:
+@@ -424,6 +424,13 @@ int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
+ 			return -EINVAL;
+ 		WRITE_ONCE(np->hop_limit, val);
+ 		return 0;
++	case IPV6_MULTICAST_LOOP:
 +		if (optlen < sizeof(int))
 +			return -EINVAL;
-+		if (val > 255 || val < -1)
++		if (val != valbool)
 +			return -EINVAL;
-+		WRITE_ONCE(np->hop_limit, val);
++		inet6_assign_bit(MC6_LOOP, sk, valbool);
 +		return 0;
-+	}
+ 	}
  	if (needs_rtnl)
  		rtnl_lock();
- 	sockopt_lock_sock(sk);
-@@ -733,14 +743,6 @@ int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
- 		}
+@@ -755,15 +762,6 @@ int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
+ 		retv = 0;
  		break;
- 	}
--	case IPV6_UNICAST_HOPS:
+ 
+-	case IPV6_MULTICAST_LOOP:
 -		if (optlen < sizeof(int))
 -			goto e_inval;
--		if (val > 255 || val < -1)
+-		if (val != valbool)
 -			goto e_inval;
--		np->hop_limit = val;
+-		np->mc_loop = valbool;
 -		retv = 0;
 -		break;
+-
+ 	case IPV6_UNICAST_IF:
+ 	{
+ 		struct net_device *dev = NULL;
+@@ -1367,7 +1365,7 @@ int do_ipv6_getsockopt(struct sock *sk, int level, int optname,
+ 	}
  
- 	case IPV6_MULTICAST_HOPS:
- 		if (sk->sk_type == SOCK_STREAM)
-@@ -1347,7 +1349,7 @@ int do_ipv6_getsockopt(struct sock *sk, int level, int optname,
- 		struct dst_entry *dst;
+ 	case IPV6_MULTICAST_LOOP:
+-		val = np->mc_loop;
++		val = inet6_test_bit(MC6_LOOP, sk);
+ 		break;
  
- 		if (optname == IPV6_UNICAST_HOPS)
--			val = np->hop_limit;
-+			val = READ_ONCE(np->hop_limit);
- 		else
- 			val = np->mcast_hops;
- 
-diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
-index 5ce25bcb9974de97f26635d0d3d54695af3070a7..6a33a50687bcf7201e75574f03e619fe89636068 100644
---- a/net/ipv6/mcast.c
-+++ b/net/ipv6/mcast.c
-@@ -1716,7 +1716,7 @@ static void ip6_mc_hdr(const struct sock *sk, struct sk_buff *skb,
- 
- 	hdr->payload_len = htons(len);
- 	hdr->nexthdr = proto;
--	hdr->hop_limit = inet6_sk(sk)->hop_limit;
-+	hdr->hop_limit = READ_ONCE(inet6_sk(sk)->hop_limit);
- 
- 	hdr->saddr = *saddr;
- 	hdr->daddr = *daddr;
+ 	case IPV6_MULTICAST_IF:
 diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
-index 553c8664e0a7a37d7858393ab6a30616ab13a3bf..b554fd40bdc3787eb3bafa1d9923076d6078217e 100644
+index b554fd40bdc3787eb3bafa1d9923076d6078217e..679443d7ecb586af17fa22f9ecf573318a6ac49d 100644
 --- a/net/ipv6/ndisc.c
 +++ b/net/ipv6/ndisc.c
-@@ -500,7 +500,7 @@ void ndisc_send_skb(struct sk_buff *skb, const struct in6_addr *daddr,
- 					      csum_partial(icmp6h,
- 							   skb->len, 0));
+@@ -1996,7 +1996,7 @@ static int __net_init ndisc_net_init(struct net *net)
+ 	np = inet6_sk(sk);
+ 	np->hop_limit = 255;
+ 	/* Do not loopback ndisc messages */
+-	np->mc_loop = 0;
++	inet6_clear_bit(MC6_LOOP, sk);
  
--	ip6_nd_hdr(skb, saddr, daddr, inet6_sk(sk)->hop_limit, skb->len);
-+	ip6_nd_hdr(skb, saddr, daddr, READ_ONCE(inet6_sk(sk)->hop_limit), skb->len);
+ 	return 0;
+ }
+diff --git a/net/netfilter/ipvs/ip_vs_sync.c b/net/netfilter/ipvs/ip_vs_sync.c
+index da5af28ff57b5254c0ec8976c4180113037c96a0..3c2251cabd0439834ca0fc2b8bbf0ecc6cfe9266 100644
+--- a/net/netfilter/ipvs/ip_vs_sync.c
++++ b/net/netfilter/ipvs/ip_vs_sync.c
+@@ -1298,17 +1298,13 @@ static void set_sock_size(struct sock *sk, int mode, int val)
+ static void set_mcast_loop(struct sock *sk, u_char loop)
+ {
+ 	/* setsockopt(sock, SOL_IP, IP_MULTICAST_LOOP, &loop, sizeof(loop)); */
+-	lock_sock(sk);
+ 	inet_assign_bit(MC_LOOP, sk, loop);
+ #ifdef CONFIG_IP_VS_IPV6
+-	if (sk->sk_family == AF_INET6) {
+-		struct ipv6_pinfo *np = inet6_sk(sk);
+-
++	if (READ_ONCE(sk->sk_family) == AF_INET6) {
+ 		/* IPV6_MULTICAST_LOOP */
+-		np->mc_loop = loop ? 1 : 0;
++		inet6_assign_bit(MC6_LOOP, sk, loop);
+ 	}
+ #endif
+-	release_sock(sk);
+ }
  
- 	rcu_read_lock();
- 	idev = __in6_dev_get(dst->dev);
+ /*
 -- 
 2.42.0.283.g2d96d420d3-goog
 
