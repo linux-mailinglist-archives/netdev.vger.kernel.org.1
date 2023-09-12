@@ -1,272 +1,160 @@
-Return-Path: <netdev+bounces-33321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2F5D79D653
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 18:30:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE99879D63A
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 18:27:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1658A281DA2
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 16:30:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19EB6281B04
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 16:27:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32F7238E;
-	Tue, 12 Sep 2023 16:30:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D823518C3F;
+	Tue, 12 Sep 2023 16:27:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B94519BBC
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 16:30:50 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 934ED10EB;
-	Tue, 12 Sep 2023 09:30:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694536250; x=1726072250;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=FmJI1tMZFYetGMTPohzVeeWVIg6BR+xN+zXL8TedC08=;
-  b=Q/4PRGmKPrV3ofuVPiZzC1bHe6gWFHqBb/wLnECA7x9yX4tCM85477XC
-   ZjgeAel1FBorXVE0/Ab4Caj06dZMTFW6ifdrvsyV7R6EJHdBXPKvrNPpI
-   NqMjWQVne3W7Rrg1/L5acPKr+WrDAFiQF5Lazz5uSEWsxfaTV5w58cIsT
-   jUuLhzyWilW/2uQSK3RzI1vh7k0jnheHUV+Hv2oNzn3YnlU4hd8aB+BwZ
-   Op1Mg2fbVU7KqI/HyG5OiqDeNW336noxFfet8QNkFSHh1YEoR5uTKac4v
-   5jR1sJc1tDXzRpPNiFDMBqLP1XFCJd3Ui4JDbi2eXJWVbVXV/9wbki21L
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="464801691"
-X-IronPort-AV: E=Sophos;i="6.02,139,1688454000"; 
-   d="scan'208";a="464801691"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2023 09:22:48 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="746958824"
-X-IronPort-AV: E=Sophos;i="6.02,139,1688454000"; 
-   d="scan'208";a="746958824"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmsmga007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Sep 2023 09:22:47 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Tue, 12 Sep 2023 09:22:47 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Tue, 12 Sep 2023 09:22:47 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.48) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6489AD49
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 16:27:14 +0000 (UTC)
+Received: from smtp-fw-9103.amazon.com (smtp-fw-9103.amazon.com [207.171.188.200])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A0ED10E5
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 09:27:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1694536034; x=1726072034;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=arDrHgXlq5TWmThsRmjX5SIzcAkGMAjRoCDv8stogV4=;
+  b=IwRkRwTbp/JEz6OqLFOG/IO7HChpxXbd0JlLWqawWgdpMwZYyHBj195n
+   LK8fR1WGyCQl1Aw7fDQC2FM12mhoCNJCgvjX3kMVn2FcEBVfmuSgAtZsa
+   K9uPtz2ZSXSetHugfgXjXSd0AU13tJwjrgoMzSwVHFtzkEQ6Wxl4FhcoS
+   E=;
+X-IronPort-AV: E=Sophos;i="6.02,139,1688428800"; 
+   d="scan'208";a="1153786450"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-3554bfcf.us-east-1.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-9103.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2023 16:27:05 +0000
+Received: from EX19MTAUWB001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+	by email-inbound-relay-iad-1e-m6i4x-3554bfcf.us-east-1.amazon.com (Postfix) with ESMTPS id 2711780543;
+	Tue, 12 Sep 2023 16:27:02 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Tue, 12 Sep 2023 09:22:46 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TXVQNv4eleIbo9W5pCkpa2Kl/45ZCfXpc5x0jP4JYFhF7UVmR3nrKCcsqfhHFwOE33ePHgUL4RWLEXQymfKS/GaqOPUb8ieTL9+HOOacODwSVF34qbteGkepC8GoRAxuy7am76e2GfQIcfJtz6owHE3eo2C07yfC9InSanlx8y4OW1uAXq0Q2ffdoS+GQL6RVh53Bp+kIn/VOLCgupwp3p42RjdkwGVu5AkNgFb+aYrG1EfW7p3kZO3jNSXSt7e+cEIgeMsyfxsfF7JDsCWILtmRL/g2z97ABTbRbid868wV8GNMyKWalVHw2y6AgfJhfrsJS6tfFwCa1PcskaQqLg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PYbkYIEkIBGOpFohQKfHaIypadzP0rqLQsh3Rdaob/w=;
- b=KmK1tueu1+V6MIWe6+YK9jRGdpqnPVJxWMg7hg9El0KTUYg3Sf68oqlomnLnQItWb44lPV9WGNLW4cAsCeNkg2EdhSsnRinKoNSrYRYBhXsBlvj8Dh3bTD0y0bGcGVs5FQ1Js2wsGa2Nf+cnp1ZiXoeY9poqv/TyLSz5jZgoJl/4SOXkBKFmTxM/ysFnmw6EhKk516xcW3gINfoSMbwGBcyIZK+ZsMn9MkVHSaBe299SxIG6lelPD761uNSbUI0CRigv2AbBNz3P1WwJvN/yYDvm+YUambBGgD9VkWTZnJe5HnNfSJAaTNAXGHIw+HETor0PV52SBaR0v71SgunHrg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
- by IA1PR11MB7365.namprd11.prod.outlook.com (2603:10b6:208:423::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.36; Tue, 12 Sep
- 2023 16:22:44 +0000
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::bede:bd20:31e9:fcb4]) by DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::bede:bd20:31e9:fcb4%7]) with mapi id 15.20.6768.029; Tue, 12 Sep 2023
- 16:22:44 +0000
-Message-ID: <9a1de9b3-b3cf-d26b-388e-c98294580bca@intel.com>
-Date: Tue, 12 Sep 2023 18:22:09 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH] net/core: Export dev_core_stats_rx_dropped_inc sets
-Content-Language: en-US
-To: Yajun Deng <yajun.deng@linux.dev>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <horms@kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20230911082016.3694700-1-yajun.deng@linux.dev>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-In-Reply-To: <20230911082016.3694700-1-yajun.deng@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR2P281CA0179.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:9f::15) To DM6PR11MB3625.namprd11.prod.outlook.com
- (2603:10b6:5:13a::21)
+ 15.2.1118.37; Tue, 12 Sep 2023 16:26:54 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.171.20) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Tue, 12 Sep 2023 16:26:52 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <jbaron@akamai.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<kuba@kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<kuniyu@amazon.com>
+Subject: Re: [net-next 1/2] inet_diag: export SO_REUSEADDR and SO_REUSEPORT sockopts
+Date: Tue, 12 Sep 2023 09:26:44 -0700
+Message-ID: <20230912162644.60787-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <0b1deb44b8401042542a112e8235e039fc0a5f65.1694523876.git.jbaron@akamai.com>
+References: <0b1deb44b8401042542a112e8235e039fc0a5f65.1694523876.git.jbaron@akamai.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|IA1PR11MB7365:EE_
-X-MS-Office365-Filtering-Correlation-Id: f620beb1-3356-4303-3d5e-08dbb3ac7ebb
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0+mYsysOOELn/m36EDA2hN+38409nxJRjRRPT6KHlADnP+8kXAYDCJKCHhIOGO/1Q+saPT/DPI6tNOG58qljLPRoKZcKEY9XMDXD0xUapTBvBogDqkLKBD4oMEBHuqn05XtBwo4g8m95R60EvaO4OiWy6kw+r/6u3yRLAMsJkY4ZNkjbY0nFHilWkDPyU16/kbT+npD5f7DhEEvYII0uqee1CrWzcmUn9vcusCjfvIO4DclnifqiJnR9jVwgKIoC/Oz5AywUhsdp3n726559rHGmmKUueNwT+db4R3/rJkhfdpyllsT0bT18uLtWT6PMpIrL75Gb6bmFYvtXi6x1LfCGPo1iX4aktPxJfYtXMOOy4SPK7iw0dCftJREfPxnkvg9kj6lw9i+HHxCOga2HBwKaKZw8EYoXlBrVzZQKAghmN2DRTcT/+2hNIotTQ2mgEmN5f2frFBeg5c6akxCakOKlv28GLNVdVEl/LfXXJT2ZwEMIkvQrV1/p41ZOB0+sqOEib4qLVyB/dPm9nFEt61rb4Kny5/+cMvMKD/tfVeNflGLTu3CnXCbEwkczG0wI+/HfopHv3tLbYeau2SrH9w1597YDyw+aIwAdFlTy/1MU4/CdLxV+S/qsUo6SxlCeY3W00pdK5ixMQAvKF2CX/w==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(376002)(366004)(396003)(136003)(39860400002)(186009)(1800799009)(451199024)(6506007)(6486002)(6512007)(6666004)(66899024)(38100700002)(31696002)(86362001)(82960400001)(36756003)(2616005)(26005)(31686004)(6916009)(41300700001)(316002)(4326008)(66946007)(66476007)(8936002)(8676002)(5660300002)(478600001)(66556008)(2906002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bWZyVzBTaE0zRzRMU095b3lsZVRrU084YkJiUUlCa0JQNlNadDZLZW40L3U2?=
- =?utf-8?B?UjV0aXNjc2ZxOWQxbEZIM0FQZmYyZSszNHBMVzM0Q29JUS9TMDdoWCtTb1J0?=
- =?utf-8?B?VnFyVXNWcnprZFgza25rT2xMNitJVkIwa3o5bWVJeFVJaTVjNE1Nb24zam9r?=
- =?utf-8?B?a0I0MXZsTHVNNEVud3dNbjVRZWRWMU54bTBPalIyYTJsa1FCM2RRUFdzSXhM?=
- =?utf-8?B?RmpGZnB5MWtrZTVjRUZSYU83WHdmMi9UV3NCV2pTVWZtUUtDa1BBdjUzY25p?=
- =?utf-8?B?NXpZZGdrYzdkN2xOREFTaFZuOGhlYTE2UDJrQ3BCM2hQVS9FNzhCL1hrSUVS?=
- =?utf-8?B?azhiK1pJT1Njd3NjWG5qVzhxUytFekFYUStzS1B3cnFrRWZ1VmZwWjZ2anRS?=
- =?utf-8?B?MTdEWXZ5NDl0SGcvSm8ydE5sWVQyTGVrUElIcGRNVlFqcWoyM3o1aHRRYnM2?=
- =?utf-8?B?TkhIUUtmcmRBTFRLK0wwU0RpSm5SVFhCMTNVYi9SaFJ6VGdOWGlMbW96eFpl?=
- =?utf-8?B?Z24zeWJhWU13YUtFRDJBVEhtUHIvUUJmVHowR215dVR2cGFKZ2I5Y1B5NjZT?=
- =?utf-8?B?WFp5V1lkSnRndE5rUkNDQkN3K01oOWVIM0JHSGF3RGJYeXhLZ2ZrdTBydzhw?=
- =?utf-8?B?aHBybkhwNGtVR1dhQ2V1NEN0MGNLUUhPTnNJOUFqeGUraDFtd3k2dDVCbzRX?=
- =?utf-8?B?RjIweXZ3aXRDNTdMaGViTjc3UzJMSjF1dzY3OVIvbFRycFZ3V2lUN3o2U2Jy?=
- =?utf-8?B?eXVGcnQvcnZUMUpTbWc0SVh2cTZrVzhxSEtTSEQycm9HUmMwMVVtNTFTUHJs?=
- =?utf-8?B?TnBIcTUzcnFIam8va1IrUk16Q2h1RllrL3Btck1yYVplNldwZXhualFmRzRt?=
- =?utf-8?B?UjFkcEZSNGJ4Q2pDTCtLUlUxeDcwMkIrbnJvSGRDTnd3TGlKY1JCVVFVMTJY?=
- =?utf-8?B?QVZuR0x6bmllNkozWCsrc04zM3JqTDJsRW8wY2NHakxyL0tnaWNiR0FLS0VU?=
- =?utf-8?B?bE5DRG9rRGZCbzZhRmhCVllSZEhxUFNoWExVOUZzb252czZoQktoZ0I5emJ6?=
- =?utf-8?B?NFlreFhQeXFucWRnNndWSTVHTU5xMGZpZzdoZ2FzOVQ5dDZHUE1YZVpqQ0RT?=
- =?utf-8?B?TjBqT3JsUHoyK2VuSE9lTGh2dVRlaXVQeGw3OE5XY05NNTRMY3pVSHJvUUpE?=
- =?utf-8?B?NzJ6Zm4vSFpCcDA0dTdhWVJaTExFblVBdXgrclY1T2t5QUN5NDF3TUVvb0hv?=
- =?utf-8?B?TEE5NloxSWlPemo4R3ZkcDkzYk9yZlg2YjhWRk9tZllBNVB1Q1I5eG5rNnpo?=
- =?utf-8?B?enNhNDVEZnhBckprT2V1cWE3SHprV2Y1cXQ0cWN1NjdRRmN1aW5WT3RSdVZN?=
- =?utf-8?B?TitHQzJYdG1pWHhhUDlZTFcwMW0zcWZVK2RRSlVJMlh6V1dhVU9FWTZOWis4?=
- =?utf-8?B?QmZEdkl0bDdJS3lteG1vSUVsMkFwaWxiaUt2SCs1TFhOa3NodWp3MlB2YWhz?=
- =?utf-8?B?VlNmNFpzWDVrcHkxeVo4YU1wZEx6SXhLT015Yi9DbTJUdFV1eVA1Tm1jcHor?=
- =?utf-8?B?Kzc3L1RXYURkZ09pd1BEOHk3YUk0TDgzam9ZVDdZMUkwdHVxck4yVnVvU0lW?=
- =?utf-8?B?TENCWGkzVGVyeXV5WVpzelJ5aEJDek4rN2lheUEzN3Q2eFlMeDRJV3pVK1V2?=
- =?utf-8?B?OHVRWFJJb2dEZDhOdnlhWjJyN3UzZnNmVkp1RHQ3QmNidHIrWnlzczB0WXRq?=
- =?utf-8?B?Y25kcjBGc2IyaEdVdXRSeHBLbldKTFd3SzZZUkhjU0pJNmhxRExsOWVFVHJZ?=
- =?utf-8?B?V2VTcXBOV2dnc2FCNEZCZXlGU2gxbmltQ2c1Wk5ERFg3Q0xjOE9QOHFoOXps?=
- =?utf-8?B?M0JqTlY0L1RieUtkajFFV0RjVWgzRitvdHAvVnk4ekEvbkgzR0NvWTYvSkZz?=
- =?utf-8?B?bUVkL2Q2RGpZOHprNXptWVdrVk92SUxTWXRLOUY4bkVCT2hXY3VNOU92RUpu?=
- =?utf-8?B?ZVkxem9kUE9kcDEwdFFNdE43UGdvYUFObGpDQlJrcGNuSC9lMm82ZXc3em9M?=
- =?utf-8?B?Q0J2Y0Nhb2tIUTZjVzJuanRlN1RMZHduNXI3SkhqMnZSWUt6cDFoMUJxMXVS?=
- =?utf-8?B?Y1VoVi9hc3NKcTJhbktDWDNZZDl3UDVQdURwWU11VkdGT0dQZ0RYNVZ4NDF3?=
- =?utf-8?B?RUE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: f620beb1-3356-4303-3d5e-08dbb3ac7ebb
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Sep 2023 16:22:44.7082
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: TlZfC51Uc4kHjX/A4DJrYhr0V9LgPEPjMbdgVeFp9w7N9YhzNqbb2cHnhtNCtbp58+DDa7uGQ/ELVT8j2ioivRde9cYRXPvN8xnlioRqfgo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7365
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.187.171.20]
+X-ClientProxiedBy: EX19D044UWA002.ant.amazon.com (10.13.139.11) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
 
-From: Yajun Deng <yajun.deng@linux.dev>
-Date: Mon, 11 Sep 2023 16:20:16 +0800
+From: Jason Baron <jbaron@akamai.com>
+Date: Tue, 12 Sep 2023 10:31:48 -0400
+> Add the ability to monitor SO_REUSEADDR and SO_REUSEPORT for an inet
+> socket. These settings are currently readable via getsockopt().
+> We have an app that will sometimes fail to bind() and it's helpful to
+> understand what other apps are causing the bind() conflict.
 
-> Although there is a kfree_skb_reason() helper function that can be used
-> to find the reason for dropped packets, but most callers didn't increase
-> one of rx_dropped, tx_dropped, rx_nohandler and rx_otherhost_dropped.
+If bind() fails with -EADDRINUSE, you can find the conflicting sockets
+with just the failing 2-tuple, no ?
 
-[...]
+Also, BPF iterator and bpf_sk_getsockopt() has the same functionality
+with more flexibility.  (See: sol_socket_sockopt() in net/core/filter.c)
 
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index ccff2b6ef958..32ba730405b4 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -10475,7 +10475,7 @@ void netdev_stats_to_stats64(struct rtnl_link_stats64 *stats64,
+
+> 
+> Signed-off-by: Jason Baron <jbaron@akamai.com>
+> ---
+>  include/linux/inet_diag.h      | 2 ++
+>  include/uapi/linux/inet_diag.h | 7 +++++++
+>  net/ipv4/inet_diag.c           | 7 +++++++
+>  3 files changed, 16 insertions(+)
+> 
+> diff --git a/include/linux/inet_diag.h b/include/linux/inet_diag.h
+> index 84abb30a3fbb..d05a4c26b13d 100644
+> --- a/include/linux/inet_diag.h
+> +++ b/include/linux/inet_diag.h
+> @@ -77,6 +77,8 @@ static inline size_t inet_diag_msg_attrs_size(void)
+>  #endif
+>  		+ nla_total_size(sizeof(struct inet_diag_sockopt))
+>  						     /* INET_DIAG_SOCKOPT */
+> +		+ nla_total_size(sizeof(struct inet_diag_reuse))
+> +						    /* INET_DIAG_REUSE */
+>  		;
 >  }
->  EXPORT_SYMBOL(netdev_stats_to_stats64);
+>  int inet_diag_msg_attrs_fill(struct sock *sk, struct sk_buff *skb,
+> diff --git a/include/uapi/linux/inet_diag.h b/include/uapi/linux/inet_diag.h
+> index 50655de04c9b..f93eeea1faba 100644
+> --- a/include/uapi/linux/inet_diag.h
+> +++ b/include/uapi/linux/inet_diag.h
+> @@ -161,6 +161,7 @@ enum {
+>  	INET_DIAG_SK_BPF_STORAGES,
+>  	INET_DIAG_CGROUP_ID,
+>  	INET_DIAG_SOCKOPT,
+> +	INET_DIAG_REUSE,
+>  	__INET_DIAG_MAX,
+>  };
 >  
-> -struct net_device_core_stats __percpu *netdev_core_stats_alloc(struct net_device *dev)
-> +static struct net_device_core_stats __percpu *netdev_core_stats_alloc(struct net_device *dev)
+> @@ -201,6 +202,12 @@ struct inet_diag_sockopt {
+>  		unused:5;
+>  };
+>  
+> +struct inet_diag_reuse {
+> +	__u8	reuse:4,
+> +		reuseport:1,
+> +		unused:3;
+> +};
+> +
+>  /* INET_DIAG_VEGASINFO */
+>  
+>  struct tcpvegas_info {
+> diff --git a/net/ipv4/inet_diag.c b/net/ipv4/inet_diag.c
+> index e13a84433413..d6ebb1e612fc 100644
+> --- a/net/ipv4/inet_diag.c
+> +++ b/net/ipv4/inet_diag.c
+> @@ -125,6 +125,7 @@ int inet_diag_msg_attrs_fill(struct sock *sk, struct sk_buff *skb,
+>  			     bool net_admin)
 >  {
->  	struct net_device_core_stats __percpu *p;
+>  	const struct inet_sock *inet = inet_sk(sk);
+> +	struct inet_diag_reuse inet_reuse = {};
+>  	struct inet_diag_sockopt inet_sockopt;
 >  
-> @@ -10488,7 +10488,33 @@ struct net_device_core_stats __percpu *netdev_core_stats_alloc(struct net_device
->  	/* This READ_ONCE() pairs with the cmpxchg() above */
->  	return READ_ONCE(dev->core_stats);
->  }
-> -EXPORT_SYMBOL(netdev_core_stats_alloc);
-> +
-> +static inline struct net_device_core_stats __percpu *dev_core_stats(struct net_device *dev)
-> +{
-> +	/* This READ_ONCE() pairs with the write in netdev_core_stats_alloc() */
-> +	struct net_device_core_stats __percpu *p = READ_ONCE(dev->core_stats);
-> +
-> +	if (likely(p))
-> +		return p;
-> +
-> +	return netdev_core_stats_alloc(dev);
-> +}
-> +
-> +#define DEV_CORE_STATS_INC(FIELD)				\
-> +void dev_core_stats_##FIELD##_inc(struct net_device *dev)	\
-> +{								\
-> +	struct net_device_core_stats __percpu *p;		\
-> +								\
-> +	p = dev_core_stats(dev);				\
-> +	if (p)							\
-> +		this_cpu_inc(p->FIELD);				\
-> +}								\
-> +EXPORT_SYMBOL(dev_core_stats_##FIELD##_inc)
-> +
-> +DEV_CORE_STATS_INC(rx_dropped);
-> +DEV_CORE_STATS_INC(tx_dropped);
-> +DEV_CORE_STATS_INC(rx_nohandler);
-> +DEV_CORE_STATS_INC(rx_otherhost_dropped);
-
-I realize you need to have an external function to be able to trace it,
-but why don't you make it just 1 function instead of 4+ (will only be
-increasing)?
-
-Define 1 function
-
-void dev_core_stats_inc(struct net_device *dev, u32 offset)
-{
-	struct net_device_core_stats __percpu *p;
-
-	p = dev_core_stats(dev);
-	if (p)
-		this_cpu_inc(*(unsigned long *)(void *)p + offset);
-}
-EXPORT_SYMBOL_GPL(dev_core_stats_inc); // Why not GPL BTW?
-
-And then build inlines:
-
-#define DEV_CORE_STATS_INC(FIELD)				\
-static inline void						\
-dev_core_stats_##FIELD##_inc(struct net_device *dev)		\
-{								\
-	dev_core_stats_inc(dev,					\
-		offsetof(struct net_device_core_stats, FIELD));	\
-}
-
-DEV_CORE_STATS_INC(rx_dropped);
-...
-
-OR even just make them macros
-
-#define __DEV_CORE_STATS_INC(dev, field)			\
-	dev_core_stats_inc(dev,					\
-		offsetof(struct net_device_core_stats, field))
-
-#define dev_core_stats_rx_dropped_inc(dev)			\
-	__DEV_CORE_STATS_INC(dev, rx_dropped)
-...
-
-Just don't copy that awful Thunderbird's line wrap and don't assume this
-code builds and works and that is something finished/polished.
-
-You'll be able to trace functions and you'll be able to understand which
-counter has been incremented by checking the second argument, i.e. the
-field offset (IIRC tracing shows you arguments).
-And that way you wouldn't geometrically increase the number of symbol
-exports and deal with its consequences.
-
+>  	if (nla_put_u8(skb, INET_DIAG_SHUTDOWN, sk->sk_shutdown))
+> @@ -197,6 +198,12 @@ int inet_diag_msg_attrs_fill(struct sock *sk, struct sk_buff *skb,
+>  		    &inet_sockopt))
+>  		goto errout;
 >  
->  /**
->   *	dev_get_stats	- get network device statistics
-
-Thanks,
-Olek
+> +	inet_reuse.reuse = sk->sk_reuse;
+> +	inet_reuse.reuseport = sk->sk_reuseport;
+> +	if (nla_put(skb, INET_DIAG_REUSE, sizeof(inet_reuse),
+> +		    &inet_reuse))
+> +		goto errout;
+> +
+>  	return 0;
+>  errout:
+>  	return 1;
+> -- 
+> 2.25.1
 
