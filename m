@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-33188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47A6B79CF31
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 13:05:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85D7579CF59
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 13:08:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B26A2819CD
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 11:05:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54F421C212F3
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 11:07:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 082A616433;
-	Tue, 12 Sep 2023 11:05:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4CF8168D4;
+	Tue, 12 Sep 2023 11:06:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F070E2F37
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 11:05:09 +0000 (UTC)
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E475219A6
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 04:05:08 -0700 (PDT)
-Received: by mail-yb1-xb31.google.com with SMTP id 3f1490d57ef6-d7b89ae27d3so4746776276.3
-        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 04:05:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9981AA93B
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 11:06:09 +0000 (UTC)
+Received: from mail-yw1-x112b.google.com (mail-yw1-x112b.google.com [IPv6:2607:f8b0:4864:20::112b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00FFDBE
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 04:06:08 -0700 (PDT)
+Received: by mail-yw1-x112b.google.com with SMTP id 00721157ae682-59b4ec8d9c1so46221867b3.0
+        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 04:06:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1694516708; x=1695121508; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1694516768; x=1695121568; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8FMoBWtmvLq6bgdekThyp6v4fhBAV0YiqC8BS8aCPcE=;
-        b=iLR0n9msF80qSSX64CsTjmtDEbEVqWCqg6NehBvvHfXb1Aq89f394kl3CACzlkipkf
-         ENLUWyY5nYtPLe+nrl2Pva6OrMMVsAdFpIUZ4CF6bQYTz4Pu3Z0Z3GscWO4Kbg+cpgYN
-         rXV12aWnx0sn7NHbMnBdtoJsP53wF88Byx7C7kCYXJ7x6oVfr6nD7WTmBpZn1Lz4EPx3
-         iuoQ4Foiuf38imGpcERI+3dcc8qm/ueL2fmHGZZNrDVBnSqJoTEWRKnhqDfOR8WRSHW8
-         E56W/a5cfo/4ghQvCfcyHbZ9xHWMyl8ss94fP52qtUboWFJLwhk13SNdjYKCNe3EuTG6
-         H3bw==
+        bh=nxeKap40n9N0Jct85TnQoxJYlNgRlyoVOdviavwIIv8=;
+        b=hxq6TJF8HMyjqFW1Zxj5wQy1nlsOBDVUSQnjCPAO0BVV49/32UolcLMMwgtEfQWxyv
+         h4KosWWVPrmcXDdlZOUVS+2dCFfDhBd6Em++i+z2reqCPZrd0ImmfnuMmnfKN6zIvugq
+         2KTPCzv5M24UwOzFIOZx4yi1NQlTPeMw62b7O8oTRekmb/y+bYtpInRDkDnaMlfayAyI
+         neLIU1iQKoa9CjJzkM0Yn0yqAc8Zo2ZeT1aCIRbGTx70HMWniIL08xkUs74lAjyCEAYU
+         z2CnZW5bBcTDJjce7yw4JLl7STtIHtp5lb5ZOvZe6pCnSJwlymassacuIIjo37MwyAJ0
+         rvbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694516708; x=1695121508;
+        d=1e100.net; s=20230601; t=1694516768; x=1695121568;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8FMoBWtmvLq6bgdekThyp6v4fhBAV0YiqC8BS8aCPcE=;
-        b=RQSpouNTdcGIsf1nK5sHvSs1V45MNVAc3RbV4GnR46o4IA/dgAWy3N0Ua+PhIB1BDG
-         jFW8RXuQcvbKPGHo4YjUrrhQL1z4Lz3+mrutedxm0ugVnqdCkLk15PvDkf6mSADm5Ad7
-         N70WfiRkBCPXi3Px1sdAaKfR9MBMUQFwiGYF+n+uuT+qsMRXtWXGr8ltjH1k8SNwq4uU
-         UMlYxMY3JJO68qPQ4kMeGm1oa2Zh18qY8PPOPbxRWHYNTX8llnHh0PzsKJ0TqdrGqLfV
-         9mX47SbDbXn1nPF19WPOd1wAbYmJnXHk5Ih6Qlh+SD6HF1+BmluoqnrUU0dcvEV40lF1
-         OCqA==
-X-Gm-Message-State: AOJu0YwgPDYHO87jgQ/I64Lqfk83XLXwqhyUDTWHkUJa+eoRTaEFogax
-	7CPf3qI6oXG5u1O9e338HQ0V/MtxIzfHfS2REo+8IoTcv5eVoPojgUs=
-X-Google-Smtp-Source: AGHT+IHWFG9XShCR9EYCQbjpGN6Qxg22q5tUHNLhGUJSf212PqAwCH8zHTtn0AYfPfJADbtFAnVTC3aGLAvqi8JMMgU=
-X-Received: by 2002:a25:d695:0:b0:d62:6514:45b7 with SMTP id
- n143-20020a25d695000000b00d62651445b7mr11205815ybg.37.1694516708153; Tue, 12
- Sep 2023 04:05:08 -0700 (PDT)
+        bh=nxeKap40n9N0Jct85TnQoxJYlNgRlyoVOdviavwIIv8=;
+        b=b6BZ0i++2aJy9dV0pXqH/m8FPYQ+fn5bUH2jqv65kwQ/OL2mBKWosOkiWM/kG+jY52
+         eFogc2gCtj6AjMPnpieDJCeEY4T1dHQBfKpMUa+ogcO2N4nHJ615+g6dVYRmtuB82PvI
+         SfJc+RG62F6g9Ju29JsW2yfLgsceRsM74BIRq/YbI8SsbGsaEsuWYrfkbyZFyUoEajlv
+         4HTlle3lh02uoLKIGlYglDNpFLvIvIRYTedNbAhGocs3xgnnY3ewFDD0Ry5T90byJRd7
+         X+QIlMtbEJv0BPC86TAHRV+krViyCnhnQT/NvB+0alUEgEwlvE5ynx/UVeVXOXFnDX1M
+         Ugrw==
+X-Gm-Message-State: AOJu0YyGX6g6QPtRvtsIKZMBnPiLhFGdkpc5AYVd0jYD7kFeaYjP8vIV
+	JoklTBsUBH2cE0CiMazV1Mv5wEzUxn4G/hscWJpS+Q==
+X-Google-Smtp-Source: AGHT+IGyZPp4TVH1sBukbcNRmYX2EySx2o/za6wxn39EVFdbUk9RivbE+m6qOSfkNS/rkWMpLDTgnTAoDhF0TgN1JVo=
+X-Received: by 2002:a5b:743:0:b0:d79:d23f:b49c with SMTP id
+ s3-20020a5b0743000000b00d79d23fb49cmr10905306ybq.35.1694516768133; Tue, 12
+ Sep 2023 04:06:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230912081527.208499-1-herve.codina@bootlin.com> <20230912101505.225899-1-herve.codina@bootlin.com>
-In-Reply-To: <20230912101505.225899-1-herve.codina@bootlin.com>
+References: <20230912081527.208499-1-herve.codina@bootlin.com> <20230912101510.225920-1-herve.codina@bootlin.com>
+In-Reply-To: <20230912101510.225920-1-herve.codina@bootlin.com>
 From: Linus Walleij <linus.walleij@linaro.org>
-Date: Tue, 12 Sep 2023 13:04:56 +0200
-Message-ID: <CACRpkdbxdMZt4E1SF1v9as-jw=TpvS1mk2TQqAgywMBLbKaNoA@mail.gmail.com>
-Subject: Re: [PATCH v5 28/31] pinctrl: Add support for the Lantic PEF2256 pinmux
+Date: Tue, 12 Sep 2023 13:05:57 +0200
+Message-ID: <CACRpkdZ2svQJVG4wiJu90X6HhKudMuAerz12zw2nd84ekLaEJA@mail.gmail.com>
+Subject: Re: [PATCH v5 29/31] MAINTAINERS: Add the Lantiq PEF2256 driver entry
 To: Herve Codina <herve.codina@bootlin.com>
 Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, 
@@ -84,106 +84,37 @@ Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Herve,
-
-thanks for your patch!
-
 On Tue, Sep 12, 2023 at 12:15=E2=80=AFPM Herve Codina <herve.codina@bootlin=
 .com> wrote:
 
-> The Lantiq PEF2256 is a framer and line interface component designed to
-> fulfill all required interfacing between an analog E1/T1/J1 line and the
-> digital PCM system highway/H.100 bus.
->
-> This kind of component can be found in old telecommunication system.
-> It was used to digital transmission of many simultaneous telephone calls
-> by time-division multiplexing. Also using HDLC protocol, WAN networks
-> can be reached through the framer.
->
-> This pinmux support handles the pin muxing part (pins RP(A..D) and pins
-> XP(A..D)) of the PEF2256.
+> After contributing the driver, add myself as the maintainer for the
+> Lantiq PEF2256 driver.
 >
 > Signed-off-by: Herve Codina <herve.codina@bootlin.com>
 > Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
 > Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+> ---
+>  MAINTAINERS | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 8b987f2c8633..dbc5867016bc 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -11876,6 +11876,15 @@ S:     Maintained
+>  F:     arch/mips/lantiq
+>  F:     drivers/soc/lantiq
+>
+> +LANTIQ PEF2256 DRIVER
+> +M:     Herve Codina <herve.codina@bootlin.com>
+> +S:     Maintained
+> +F:     Documentation/devicetree/bindings/net/lantiq,pef2256.yaml
+> +F:     drivers/net/wan/framer/pef2256/
+> +F:     drivers/pinctrl/pinctrl-pef2256-regs.h
+> +F:     drivers/pinctrl/pinctrl-pef2256.c
 
-Nice to see this as a proper pin control driver!
-
->  drivers/pinctrl/pinctrl-pef2256-regs.h |  65 ++++++
->  drivers/pinctrl/pinctrl-pef2256.c      | 308 +++++++++++++++++++++++++
-
-Do you really need a separate header just for some registers?
-But it's a matter of taste so I'm not gonna complain if you want
-it this way.
-
-> +config PINCTRL_PEF2256
-> +       tristate "Lantiq PEF2256 (FALC56) pin controller driver"
-> +       depends on OF && FRAMER_PEF2256
-> +       select PINMUX
-
-select PINCONF
-
-> +       select GENERIC_PINCONF
-
-This brings it in implicitly but I prefer that you just select it.
-
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-
-I think SPDX mandates that you start the tag with C99 comments
-
-// SPDX-License-Identifier: GPL-2.0-only
-
-> +       /* We map 1 group <-> 1 pin */
-
-Also known as "the qualcomm trick", but hey: it's fine.
-
-> +static int pef2256_register_pinctrl(struct pef2256_pinctrl *pef2256)
-> +{
-> +       struct pinctrl_dev      *pctrl;
-> +
-> +       pef2256->pctrl_desc.name    =3D dev_name(pef2256->dev);
-> +       pef2256->pctrl_desc.owner   =3D THIS_MODULE;
-> +       pef2256->pctrl_desc.pctlops =3D &pef2256_pctlops;
-> +       pef2256->pctrl_desc.pmxops  =3D &pef2256_pmxops;
-> +       if (pef2256->version =3D=3D PEF2256_VERSION_1_2) {
-> +               pef2256->pctrl_desc.pins  =3D pef2256_v12_pins;
-> +               pef2256->pctrl_desc.npins =3D ARRAY_SIZE(pef2256_v12_pins=
-);
-> +               pef2256->functions  =3D pef2256_v12_functions;
-> +               pef2256->nfunctions =3D ARRAY_SIZE(pef2256_v12_functions)=
-;
-> +       } else {
-> +               pef2256->pctrl_desc.pins  =3D pef2256_v2x_pins;
-> +               pef2256->pctrl_desc.npins =3D ARRAY_SIZE(pef2256_v2x_pins=
-);
-> +               pef2256->functions  =3D pef2256_v2x_functions;
-> +               pef2256->nfunctions =3D ARRAY_SIZE(pef2256_v2x_functions)=
-;
-> +       }
-> +
-> +       pctrl =3D devm_pinctrl_register(pef2256->dev, &pef2256->pctrl_des=
-c, pef2256);
-> +       if (IS_ERR(pctrl)) {
-> +               dev_err(pef2256->dev, "pinctrl driver registration failed=
-\n");
-> +               return PTR_ERR(pctrl);
-> +       }
-> +
-> +       return 0;
-
-You could use
-return dev_err_probe(...);
-
-> +       pef2256_reset_pinmux(pef2256_pinctrl);
-> +       ret =3D pef2256_register_pinctrl(pef2256_pinctrl);
-> +       if (ret)
-> +               return ret;
-
-Or you could use it down here.
-
-With or without these changes (because they are nitpicks)
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+Just use a glob expression:
+F:     drivers/pinctrl/pinctrl-pef2256-*
 
 Yours,
 Linus Walleij
