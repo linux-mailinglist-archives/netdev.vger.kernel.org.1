@@ -1,90 +1,56 @@
-Return-Path: <netdev+bounces-33288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8AE279D51C
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 17:40:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CF93679D526
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 17:41:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F682281DDE
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 15:40:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89283281DC8
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 15:41:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F51F18C18;
-	Tue, 12 Sep 2023 15:40:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C931B18C19;
+	Tue, 12 Sep 2023 15:41:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 804F7AD49
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 15:40:42 +0000 (UTC)
-Received: from out2-smtp.messagingengine.com (out2-smtp.messagingengine.com [66.111.4.26])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DADA10DE;
-	Tue, 12 Sep 2023 08:40:41 -0700 (PDT)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.nyi.internal (Postfix) with ESMTP id 2BEE35C023B;
-	Tue, 12 Sep 2023 11:40:41 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute5.internal (MEProxy); Tue, 12 Sep 2023 11:40:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jcline.org; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:sender
-	:subject:subject:to:to; s=fm1; t=1694533241; x=1694619641; bh=vd
-	xprn+VLunJ+Ba1KePDdQ8b/yp76261BQa2lBK+CxE=; b=AJ7hJV1s7pfeQAa3Qh
-	vNTywaHGJhoVph3GxX4hX98F3+HoybDiAqHP33z67xzU3bXSLghtYkJXxcmhO79J
-	91PITxUkDNeaNUiUayE1aGKxl8nO55oBuZxFEr6fhu3VKUug9JNVI1BLotMMk0AC
-	Vj9F1YJYHBD19nd4gY8d8gTB2LRBhO409+1rXQGz2ghqyzReb03tDE4Bh6hcI4J2
-	t8EszkIKbgSdwk5MPku6nfVI0eKeeAalqRYpAAD46L/M6dvNZJxefhIRsL9NUQ/H
-	5+pyCsPSSlzxKO9cKoPdIID8KaN8Rh6R74u25eoyeC9BI3ro/Z4ZtQX+puXD5a/p
-	Duug==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm1; t=1694533241; x=1694619641; bh=vdxprn+VLunJ+
-	Ba1KePDdQ8b/yp76261BQa2lBK+CxE=; b=Xq4W7g5RYo6XiSHOwOxqSGJOX1kyE
-	yg/PbEVL+mDRmeC18+aKI3ogxnU2gaFFXHUUfN1YIuz/ZeQ32l6vnRx7aCNPnyz6
-	xIoxI2IYK4vjWd0lEDUbomD2PphyLbQ3GyFWDynUJYk42kjKZCcTX/8G8sMEmRr3
-	mW/jJyPRJqUWG3aZpLLN6opktBorzgvmN0Gx6HtXQ9K7eDcz1ZgYhckP1GjcvbK3
-	4gwooD2uhcTVr9aFN2tj1ty0OSiu1QprXCI3AtwpGRHsbCKkHeROL1ZIgIxkjtBd
-	WfoLo+u5/h1v831jfESqrD2/oZ4xYZUIgrsaVJNyt6VJ8IqcbzOUFRqCw==
-X-ME-Sender: <xms:eIYAZbjayQTooKedmvgwajwMg8UhShVmg-wX7AhYYzHGzsjIaS-IVg>
-    <xme:eIYAZYCMCd500kAWs8DOMOBjWAtxoXhYxDzXOo7rjRSYxv2Yw-KzVyH3qDC8SfKGf
-    pKuIvnrgnM5Tkrpz6E>
-X-ME-Received: <xmr:eIYAZbEqrJvcZ-wf1RTdeVbuVvnxgT9xvzSnlgSIPjGQpOHvZ_SOffez48sq4nFdojQmoRiXvudI6VIbraHscw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrudeiiedgledvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomheplfgvrhgv
-    mhihucevlhhinhgvuceojhgvrhgvmhihsehjtghlihhnvgdrohhrgheqnecuggftrfgrth
-    htvghrnhephfefjeejueelueevveelvdehffeufeffvdejkeevteekieduudeludevgeeu
-    vdeinecuffhomhgrihhnpehshiiikhgrlhhlvghrrdgrphhpshhpohhtrdgtohhmnecuve
-    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepjhgvrhgvmhih
-    sehjtghlihhnvgdrohhrgh
-X-ME-Proxy: <xmx:eIYAZYSfuBT8Pt3oyzsIGYa2sJwFnlXBzbsYdgOW776etF6SP1DvvQ>
-    <xmx:eIYAZYxH4HNGutPscgpy_knzwtir7jLWD3R9mqVG20OsZ7eJdJelAw>
-    <xmx:eIYAZe7avLR1qCDRkutJf4t_n9MuY67mLyjyjJbGiY_zcsnqmBDMqQ>
-    <xmx:eYYAZbw27w-pcDSWWxOkCBmq5aw_Eq3BnvsOamsuhQl0dq3WYVUcXQ>
-Feedback-ID: i7a7146c5:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 12 Sep 2023 11:40:40 -0400 (EDT)
-Date: Tue, 12 Sep 2023 11:40:38 -0400
-From: Jeremy Cline <jeremy@jcline.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	syzbot+c1d0a03d305972dbbe14@syzkaller.appspotmail.com
-Subject: Re: [PATCH net] net: nfc: llcp: Add lock when modifying device list
-Message-ID: <ZQCGduvxodv4QQD7@dev>
-References: <20230908235853.1319596-1-jeremy@jcline.org>
- <20230910152812.GJ775887@kernel.org>
- <ZP5L6/zF6fE+ogbz@dev>
- <20230911055904.GN775887@kernel.org>
- <20230911125251.GA23672@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE57418C10
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 15:41:34 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E68110E5;
+	Tue, 12 Sep 2023 08:41:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=jcNhuGiuvlufLMmmJWjXnQrVR4HUnrinAE2kQhhku7Q=; b=Qc9E8cHsgoi7R3CAggnd9UMSC5
+	JAGK+u0XXGAYP8PolDIUPfid98jIAo1WzneEywa6muZHt30lLpxRfr5jqw+ZIHJrd8owon8Sl82RH
+	Sez57piojvzb/yqbr2nKEnlHQ524XnBGn+2IZCJvxTskPkRfcAI1sndv1RBBv6bewVhQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qg5W7-006F8Y-NZ; Tue, 12 Sep 2023 17:41:31 +0200
+Date: Tue, 12 Sep 2023 17:41:31 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Oleksij Rempel <linux@rempel-privat.de>,
+	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
+	thomas.petazzoni@bootlin.com,
+	Christophe Leroy <christophe.leroy@csgroup.eu>
+Subject: Re: [RFC PATCH net-next 1/7] net: phy: introduce phy numbering and
+ phy namespaces
+Message-ID: <d0a4c2c5-2d2b-42b6-a15c-06f9dc3c1e04@lunn.ch>
+References: <20230907092407.647139-1-maxime.chevallier@bootlin.com>
+ <20230907092407.647139-2-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,47 +59,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230911125251.GA23672@kernel.org>
+In-Reply-To: <20230907092407.647139-2-maxime.chevallier@bootlin.com>
 
-On Mon, Sep 11, 2023 at 02:52:51PM +0200, Simon Horman wrote:
-> On Mon, Sep 11, 2023 at 07:59:04AM +0200, Simon Horman wrote:
-> > On Sun, Sep 10, 2023 at 07:06:19PM -0400, Jeremy Cline wrote:
-> > > On Sun, Sep 10, 2023 at 05:28:12PM +0200, Simon Horman wrote:
-> > > > On Fri, Sep 08, 2023 at 07:58:53PM -0400, Jeremy Cline wrote:
-> > > > > The device list needs its associated lock held when modifying it, or the
-> > > > > list could become corrupted, as syzbot discovered.
-> > > > > 
-> > > > > Reported-and-tested-by: syzbot+c1d0a03d305972dbbe14@syzkaller.appspotmail.com
-> > > > > Closes: https://syzkaller.appspot.com/bug?extid=c1d0a03d305972dbbe14
-> > > > > Signed-off-by: Jeremy Cline <jeremy@jcline.org>
-> > > > 
-> > > > Hi Jeremy,
-> > > > 
-> > > > thanks for your patch.
-> > > > 
-> > > > I don't think you need to resubmit for this,
-> > > > I think this patch warrants a fixes tag:
-> > > > 
-> > > > Fixes: d646960f7986 ("NFC: Initial LLCP support")
-> > > > 
-> > > 
-> > > My bad, indeed. The lock in question looks to have been added in
-> > > 6709d4b7bc2e ("net: nfc: Fix use-after-free caused by
-> > > nfc_llcp_find_local") which itself includes a couple fix tags, should
-> > > this reference that commit instead as it won't backport without that
-> > > one?
-> > 
-> > Yes, I think that is likely.
-> > Sorry for not noticing that.
-> 
-> And further, sorry for being vague in my previous email.
-> Having now looked over 6709d4b7bc2e I agree it is
-> the correct commit for a fixes tag for this patch.
-> 
+> Introduce a numbering scheme allowing to enumerate PHY devices that
+> belong to any netdev, which can in turn allow userspace to take more
+> precise decisions with regard to each PHY's configuration.
 
-Super, thanks. If it's helpful I can re-roll the patch, otherwise I'll
-just leave it as-is.
+A minor point, and i know naming is hard, but i keep reading _ns_ and
+think namespace, as in ip netns. Maybe we should think of something
+other than ns.
 
-Thanks,
-Jeremy
+      Andrew
 
