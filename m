@@ -1,143 +1,124 @@
-Return-Path: <netdev+bounces-33071-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5756479CA26
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 10:37:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6227379CA04
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 10:33:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11CB2281C5F
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 08:37:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 922191C20D44
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 08:33:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15C9C1170D;
-	Tue, 12 Sep 2023 08:34:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CA2F15AE;
+	Tue, 12 Sep 2023 08:33:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0677B9457;
-	Tue, 12 Sep 2023 08:34:55 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28B9310DD;
-	Tue, 12 Sep 2023 01:34:54 -0700 (PDT)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.53])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RlGzB35YfzVkfZ;
-	Tue, 12 Sep 2023 16:32:06 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Tue, 12 Sep 2023 16:34:52 +0800
-From: Yunsheng Lin <linyunsheng@huawei.com>
-To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
-	<linyunsheng@huawei.com>, Lorenzo Bianconi <lorenzo@kernel.org>, Alexander
- Duyck <alexander.duyck@gmail.com>, Liang Chen <liangchen.linux@gmail.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>, Eric Dumazet
-	<edumazet@google.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
-	<daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
- Fastabend <john.fastabend@gmail.com>, <bpf@vger.kernel.org>
-Subject: [PATCH net-next v8 6/6] net: veth: use newly added page pool API for veth with xdp
-Date: Tue, 12 Sep 2023 16:31:25 +0800
-Message-ID: <20230912083126.65484-7-linyunsheng@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20230912083126.65484-1-linyunsheng@huawei.com>
-References: <20230912083126.65484-1-linyunsheng@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B05B631
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 08:33:04 +0000 (UTC)
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95389B9;
+	Tue, 12 Sep 2023 01:33:03 -0700 (PDT)
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+	id 1qfypO-0003Kf-NB; Tue, 12 Sep 2023 10:32:58 +0200
+Message-ID: <b30a81fa-6b59-4bac-b109-99a4dca689de@leemhuis.info>
+Date: Tue, 12 Sep 2023 10:32:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.56]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla Thunderbird
+Subject: Re: Regression: Commit "netfilter: nf_tables: disallow rule addition
+ to bound chain via NFTA_RULE_CHAIN_ID" breaks ruleset loading in linux-stable
+Content-Language: en-US, de-DE
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+ Timo Sigurdsson <public_timo.s@silentcreek.de>
+Cc: kadlec@netfilter.org, fw@strlen.de, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org, regressions@lists.linux.dev, sashal@kernel.org,
+ carnil@debian.org, 1051592@bugs.debian.org
+References: <20230911213750.5B4B663206F5@dd20004.kasserver.com>
+ <ZP+bUpxJiFcmTWhy@calendula>
+From: "Linux regression tracking (Thorsten Leemhuis)"
+ <regressions@leemhuis.info>
+Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
+In-Reply-To: <ZP+bUpxJiFcmTWhy@calendula>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1694507583;1f6f9fff;
+X-HE-SMSGID: 1qfypO-0003Kf-NB
 
-Use page_pool[_cache]_alloc() API to allocate memory with
-least memory utilization and performance penalty.
+On 12.09.23 00:57, Pablo Neira Ayuso wrote:
+> On Mon, Sep 11, 2023 at 11:37:50PM +0200, Timo Sigurdsson wrote:
+>>
+>> recently, Debian updated their stable kernel from 6.1.38 to 6.1.52
+>> which broke nftables ruleset loading on one of my machines with lots
+>> of "Operation not supported" errors. I've reported this to the
+>> Debian project (see link below) and Salvatore Bonaccorso and I
+>> identified "netfilter: nf_tables: disallow rule addition to bound
+>> chain via NFTA_RULE_CHAIN_ID" (0ebc1064e487) as the offending commit
+>> that introduced the regression. Salvatore also found that this issue
+>> affects the 5.10 stable tree as well (observed in 5.10.191), but he
+>> cannot reproduce it on 6.4.13 and 6.5.2.
+>>
+>> The issue only occurs with some rulesets. While I can't trigger it
+>> with simple/minimal rulesets that I use on some machines, it does
+>> occur with a more complex ruleset that has been in use for months
+>> (if not years, for large parts of it). I'm attaching a somewhat
+>> stripped down version of the ruleset from the machine I originally
+>> observed this issue on. It's still not a small or simple ruleset,
+>> but I'll try to reduce it further when I have more time.
+>>
+>> The error messages shown when trying to load the ruleset don't seem
+>> to be helpful. Just two simple examples: Just to give two simple
+>> examples from the log when nftables fails to start:
+>> /etc/nftables.conf:99:4-44: Error: Could not process rule: Operation not supported
+>>                         tcp option maxseg size 1-500 counter drop
+>>                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>> /etc/nftables.conf:308:4-27: Error: Could not process rule: Operation not supported
+>>                         tcp dport sip-tls accept
+>>                         ^^^^^^^^^^^^^^^^^^^^^^^^
+> 
+> I can reproduce this issue with 5.10.191 and 6.1.52 and nftables v1.0.6,
+> this is not reproducible with v1.0.7 and v1.0.8.
+> 
+>> Since the issue only affects some stable trees, Salvatore thought it
+>> might be an incomplete backport that causes this.
+>>
+>> If you need further information, please let me know.
+> 
+> Userspace nftables v1.0.6 generates incorrect bytecode that hits a new
+> kernel check that rejects adding rules to bound chains. The incorrect
+> bytecode adds the chain binding, attach it to the rule and it adds the
+> rules to the chain binding. I have cherry-picked these three patches
+> for nftables v1.0.6 userspace and your ruleset restores fine.
+> [...]
 
-Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-CC: Lorenzo Bianconi <lorenzo@kernel.org>
-CC: Alexander Duyck <alexander.duyck@gmail.com>
-CC: Liang Chen <liangchen.linux@gmail.com>
-CC: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- drivers/net/veth.c | 25 ++++++++++++++++---------
- 1 file changed, 16 insertions(+), 9 deletions(-)
+Hmmmm. Well, this sounds like a kernel regression to me that normally
+should be dealt with on the kernel level, as users after updating the
+kernel should never have to update any userspace stuff to continue what
+they have been doing before the kernel update.
 
-diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-index 9c6f4f83f22b..a31a792aa00d 100644
---- a/drivers/net/veth.c
-+++ b/drivers/net/veth.c
-@@ -737,10 +737,11 @@ static int veth_convert_skb_to_xdp_buff(struct veth_rq *rq,
- 	if (skb_shared(skb) || skb_head_is_locked(skb) ||
- 	    skb_shinfo(skb)->nr_frags ||
- 	    skb_headroom(skb) < XDP_PACKET_HEADROOM) {
--		u32 size, len, max_head_size, off;
-+		u32 size, len, max_head_size, off, truesize, page_offset;
- 		struct sk_buff *nskb;
- 		struct page *page;
- 		int i, head_off;
-+		void *data;
- 
- 		/* We need a private copy of the skb and data buffers since
- 		 * the ebpf program can modify it. We segment the original skb
-@@ -753,14 +754,17 @@ static int veth_convert_skb_to_xdp_buff(struct veth_rq *rq,
- 		if (skb->len > PAGE_SIZE * MAX_SKB_FRAGS + max_head_size)
- 			goto drop;
- 
-+		size = min_t(u32, skb->len, max_head_size);
-+		truesize = SKB_HEAD_ALIGN(size) + VETH_XDP_HEADROOM;
-+
- 		/* Allocate skb head */
--		page = page_pool_dev_alloc_pages(rq->page_pool);
--		if (!page)
-+		data = page_pool_dev_cache_alloc(rq->page_pool, &truesize);
-+		if (!data)
- 			goto drop;
- 
--		nskb = napi_build_skb(page_address(page), PAGE_SIZE);
-+		nskb = napi_build_skb(data, truesize);
- 		if (!nskb) {
--			page_pool_put_full_page(rq->page_pool, page, true);
-+			page_pool_cache_free(rq->page_pool, data, true);
- 			goto drop;
- 		}
- 
-@@ -768,7 +772,6 @@ static int veth_convert_skb_to_xdp_buff(struct veth_rq *rq,
- 		skb_copy_header(nskb, skb);
- 		skb_mark_for_recycle(nskb);
- 
--		size = min_t(u32, skb->len, max_head_size);
- 		if (skb_copy_bits(skb, 0, nskb->data, size)) {
- 			consume_skb(nskb);
- 			goto drop;
-@@ -783,14 +786,18 @@ static int veth_convert_skb_to_xdp_buff(struct veth_rq *rq,
- 		len = skb->len - off;
- 
- 		for (i = 0; i < MAX_SKB_FRAGS && off < skb->len; i++) {
--			page = page_pool_dev_alloc_pages(rq->page_pool);
-+			size = min_t(u32, len, PAGE_SIZE);
-+			truesize = size;
-+
-+			page = page_pool_dev_alloc(rq->page_pool, &page_offset,
-+						   &truesize);
- 			if (!page) {
- 				consume_skb(nskb);
- 				goto drop;
- 			}
- 
--			size = min_t(u32, len, PAGE_SIZE);
--			skb_add_rx_frag(nskb, i, page, 0, size, PAGE_SIZE);
-+			skb_add_rx_frag(nskb, i, page, page_offset, size,
-+					truesize);
- 			if (skb_copy_bits(skb, off, page_address(page),
- 					  size)) {
- 				consume_skb(nskb);
--- 
-2.33.0
+Can't the kernel somehow detect the incorrect bytecode and do the right
+thing(tm) somehow?
 
+But yes, don't worry, I know that reality is not black and white and
+that it's crucial that things like package filtering do exactly what the
+user expect it to do; that's why this might be one of those rare
+situations where "user has to update userspace components to support
+newer kernels" might be the better of two bad choices. But I had to ask
+to ensure it's something like that.
+
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+--
+Everything you wanna know about Linux kernel regression tracking:
+https://linux-regtracking.leemhuis.info/about/#tldr
+If I did something stupid, please tell me, as explained on that page.
 
