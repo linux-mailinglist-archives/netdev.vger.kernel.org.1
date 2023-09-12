@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-33305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A01FD79D5BA
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 18:04:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BD8379D5BB
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 18:04:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A48D281BEB
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 16:04:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4BEA28124E
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 16:04:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBC6419BD8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F11B719BDB;
 	Tue, 12 Sep 2023 16:02:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2F2A19BD1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBB7819BD4
 	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 16:02:29 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10D671705
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 09:02:27 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d7e857a3fd5so5666155276.3
-        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 09:02:27 -0700 (PDT)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5379D1706
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 09:02:29 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5924b2aac52so62413687b3.2
+        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 09:02:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1694534547; x=1695139347; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1694534548; x=1695139348; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Go5+halomp0Z0L+lMJKDRIP5UMOR4Xlh0q3IxRvsj58=;
-        b=henzFSaFrLkv+QnQZuZdHrbGL+OBcYTBRzRd476+hTgys209umVgQQvQg5VgIzCSWJ
-         YAChh1SHxKRrDHMQu8yZVmFO3hanGxBeVMlukP4ib/uX7Iu3ic6F6Y1L2ypw7gZR3TVE
-         7KVlPqY7C1v/Fosc2DTQuZdocL9Txr7yeu4tcx4JTGpX9oKucaer6wqn08iPItFx5bh9
-         MV+Y5qBJdRYU87Lpx/8jRL2+aev26KUat5SzQ8hBXRR0nvX54gScYTh3p70bODt6NjWi
-         Rjxvt63uW490Th0md+7MGMfSvI6M/C9UlWEgTGaEJKEH7mS0TtGm9L0+EQsLpSk0X1yd
-         POHw==
+        bh=VNWAOaca+giZHJtnQQIkZMfFaWdbRYP0rHesIhWBqi0=;
+        b=PG9xXb/vFbev8Ot74F1jauP2lynXMcrSm67iYZjY7E5I56Rdxjg+PCEEGbahjdED4T
+         L1osj3IO217WpgJ3oWTzFjKshdBIcuAzC3rYczxSSZh+FHxOICVXxKisXT5HUBVSyJ2U
+         UJE6Y9NFOerfIgxYnriHeb3SEpenrKRuDO1xOiKSvTQvOeUSQX8W8eJ1PtvEG6gn0VHp
+         fuVltIN6j42em2ShpwWnlcNYEzE3U/vDBN6hCKp/fyKoNIPthfSA3JnUEo7z6OQXRekS
+         2MiF4LSjw2BAghItvLLS701p05Y0Q8Rl5xfeF7KO4AjYDnjBQiKCU1hhfg6mMDqfd4mb
+         FBOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694534547; x=1695139347;
+        d=1e100.net; s=20230601; t=1694534548; x=1695139348;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Go5+halomp0Z0L+lMJKDRIP5UMOR4Xlh0q3IxRvsj58=;
-        b=J3eCFG779bH5K9cYfcd32uj946iyACDykLidfcBN+0RlqtJkytEMCIYI4hVXPA5+dr
-         x8sFIips85qNeGpMDWPZLwqYZnhCc0LFbD/bJ/dtRHwAL9q63oKkrQkg9KR8QXjZxltC
-         kk+VENnGqiFqiwWNygFi1PkTXIZ5Wx8mnOFDGXgR+3oMXLKf97rJG1vVJ9AZV36Ig77+
-         V3rWGMeGKDq+YywQaGkmlRsJgmK/pY7v0qTlMUFudspdjiRaYZcm38lWeV8HPUtGgCm1
-         vGTr2QA7wmEqZlepfDrkSgGJchkDuhaoKQg80ScnDeUkZsui/3OWDdX/p5OTjSjyENWx
-         G7Rg==
-X-Gm-Message-State: AOJu0YyIpgjGRGlN36w039KIdioF8fUEDaIuOt/6WfwNBBFiImbcIFsK
-	Ls5QJ6zSi8exhSRWfwOG1oeRZ5u36NM5Bg==
-X-Google-Smtp-Source: AGHT+IGsX3Jk6CYipHSnDi22JwQIArvC4tJKGSL4s2A6Z61vi3z0QV8ZJU2FB8R5maUmGgcBFXdwjc3Wt0R1rw==
+        bh=VNWAOaca+giZHJtnQQIkZMfFaWdbRYP0rHesIhWBqi0=;
+        b=XTIQRcxTXjOAHijPkUBCXf6x9HcmiSxQbgyYVDFnKAhpd6fJT+Ub8ed/0F6wYAYaNI
+         rMZ2vo4FdfulhlCkH5Inc1GPjGPl+MB49PKLlyV5re+dGlos2H3e9Hdh1Q1jiAnDG8c6
+         qwEcvphu8j6GJEyqIMk3tiXCB20E8UHDglQG7InOusqpHYgU5NaCKrbAxCp/vpy9SsfT
+         475bQcpqOgMRqUYIZtZmyPXYlwzh5yENYXpF28mWoz2pQ72ECcTvyRJXGzw5lTh7qtkP
+         tQMCSXMURBBJY861gRTxzNFMkr9pA7c6NW8yvjWvjEdEYnXILw5apxmSufpApT1tY6Ar
+         GN0g==
+X-Gm-Message-State: AOJu0YzG1BVSNMsctBVUORoVQxKdPbUqJh10MSuZFgJmwqjvucbCunLk
+	VzF/Z0UZB9E4Ar2Vm33dXihz6VZV0MecTg==
+X-Google-Smtp-Source: AGHT+IFf3jBkiGyMoeW0HtZKLZbyY09oWi2sWWhO6N5e8+OUoTO5MkybooB9cUoMHJWjWQj98aeyXnIQBkipDw==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:ce0e:0:b0:d7b:9fad:6b9e with SMTP id
- x14-20020a25ce0e000000b00d7b9fad6b9emr279243ybe.1.1694534547106; Tue, 12 Sep
- 2023 09:02:27 -0700 (PDT)
-Date: Tue, 12 Sep 2023 16:02:06 +0000
+ (user=edumazet job=sendgmr) by 2002:a81:ae66:0:b0:58c:6ddd:d27c with SMTP id
+ g38-20020a81ae66000000b0058c6dddd27cmr314004ywk.6.1694534548535; Tue, 12 Sep
+ 2023 09:02:28 -0700 (PDT)
+Date: Tue, 12 Sep 2023 16:02:07 +0000
 In-Reply-To: <20230912160212.3467976-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -62,8 +62,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20230912160212.3467976-1-edumazet@google.com>
 X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
-Message-ID: <20230912160212.3467976-9-edumazet@google.com>
-Subject: [PATCH net-next 08/14] ipv6: lockless IPV6_AUTOFLOWLABEL implementation
+Message-ID: <20230912160212.3467976-10-edumazet@google.com>
+Subject: [PATCH net-next 09/14] ipv6: lockless IPV6_DONTFRAG implementation
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -71,139 +71,201 @@ Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Move np->autoflowlabel and np->autoflowlabel_set in inet->inet_flags,
-to fix data-races.
+Move np->dontfrag flag to inet->inet_flags to fix data-races.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/linux/ipv6.h     |  2 --
- include/net/inet_sock.h  |  2 ++
- include/net/ipv6.h       |  2 +-
- net/ipv6/ip6_output.c    | 12 +++++-------
- net/ipv6/ipv6_sockglue.c | 11 +++++------
- 5 files changed, 13 insertions(+), 16 deletions(-)
+ include/linux/ipv6.h     | 1 -
+ include/net/inet_sock.h  | 1 +
+ include/net/ipv6.h       | 6 +++---
+ include/net/xfrm.h       | 2 +-
+ net/ipv6/icmp.c          | 4 ++--
+ net/ipv6/ip6_output.c    | 2 +-
+ net/ipv6/ipv6_sockglue.c | 9 ++++-----
+ net/ipv6/ping.c          | 2 +-
+ net/ipv6/raw.c           | 2 +-
+ net/ipv6/udp.c           | 2 +-
+ net/l2tp/l2tp_ip6.c      | 2 +-
+ 11 files changed, 16 insertions(+), 17 deletions(-)
 
 diff --git a/include/linux/ipv6.h b/include/linux/ipv6.h
-index d88e91b7f0a319a816488025ef213c4fb90ed359..e3be5dc21b7d27080b398f1425bf11145896a4f3 100644
+index e3be5dc21b7d27080b398f1425bf11145896a4f3..57d563f1d4b1707264f0d79406c4c139cc0fa525 100644
 --- a/include/linux/ipv6.h
 +++ b/include/linux/ipv6.h
-@@ -253,8 +253,6 @@ struct ipv6_pinfo {
+@@ -252,7 +252,6 @@ struct ipv6_pinfo {
+ 						 * 010: prefer public address
  						 * 100: prefer care-of address
  						 */
- 				dontfrag:1,
--				autoflowlabel:1,
--				autoflowlabel_set:1,
+-				dontfrag:1,
  				rtalert_isolate:1;
  	__u8			min_hopcount;
  	__u8			tclass;
 diff --git a/include/net/inet_sock.h b/include/net/inet_sock.h
-index 97e70a97dae888e6ab93c6446f4f3ba58cd8583e..f1af64a4067310258a3bc45b84ad3fd093bddbab 100644
+index f1af64a4067310258a3bc45b84ad3fd093bddbab..ac75324e9e1eafe68cee7b0581e472cbb4f49aa3 100644
 --- a/include/net/inet_sock.h
 +++ b/include/net/inet_sock.h
-@@ -271,6 +271,8 @@ enum {
- 	INET_FLAGS_MC6_LOOP	= 20,
- 	INET_FLAGS_RECVERR6_RFC4884 = 21,
+@@ -273,6 +273,7 @@ enum {
  	INET_FLAGS_MC6_ALL	= 22,
-+	INET_FLAGS_AUTOFLOWLABEL_SET = 23,
-+	INET_FLAGS_AUTOFLOWLABEL = 24,
+ 	INET_FLAGS_AUTOFLOWLABEL_SET = 23,
+ 	INET_FLAGS_AUTOFLOWLABEL = 24,
++	INET_FLAGS_DONTFRAG	= 25,
  };
  
  /* cmsg flags for inet */
 diff --git a/include/net/ipv6.h b/include/net/ipv6.h
-index 0af1a7565a3602e4deb68762267cba454750341e..fe1978a288630a20ba03dc3a36e22938495082e4 100644
+index fe1978a288630a20ba03dc3a36e22938495082e4..d2cf7e176f2b97dac957e65b75d5e69a39c546b5 100644
 --- a/include/net/ipv6.h
 +++ b/include/net/ipv6.h
-@@ -428,7 +428,7 @@ int ipv6_flowlabel_opt_get(struct sock *sk, struct in6_flowlabel_req *freq,
- 			   int flags);
- int ip6_flowlabel_init(void);
- void ip6_flowlabel_cleanup(void);
--bool ip6_autoflowlabel(struct net *net, const struct ipv6_pinfo *np);
-+bool ip6_autoflowlabel(struct net *net, const struct sock *sk);
+@@ -373,12 +373,12 @@ static inline void ipcm6_init(struct ipcm6_cookie *ipc6)
+ }
  
- static inline void fl6_sock_release(struct ip6_flowlabel *fl)
+ static inline void ipcm6_init_sk(struct ipcm6_cookie *ipc6,
+-				 const struct ipv6_pinfo *np)
++				 const struct sock *sk)
  {
+ 	*ipc6 = (struct ipcm6_cookie) {
+ 		.hlimit = -1,
+-		.tclass = np->tclass,
+-		.dontfrag = np->dontfrag,
++		.tclass = inet6_sk(sk)->tclass,
++		.dontfrag = inet6_test_bit(DONTFRAG, sk),
+ 	};
+ }
+ 
+diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+index 363c7d5105542ec7f43f91e5071b877314584bc5..98d7aa78addaab129f7ce060b10b7652fd0acba1 100644
+--- a/include/net/xfrm.h
++++ b/include/net/xfrm.h
+@@ -2166,7 +2166,7 @@ static inline bool xfrm6_local_dontfrag(const struct sock *sk)
+ 
+ 	proto = sk->sk_protocol;
+ 	if (proto == IPPROTO_UDP || proto == IPPROTO_RAW)
+-		return inet6_sk(sk)->dontfrag;
++		return inet6_test_bit(DONTFRAG, sk);
+ 
+ 	return false;
+ }
+diff --git a/net/ipv6/icmp.c b/net/ipv6/icmp.c
+index 93a594a901d12befb754e7035f56726273eead92..8fb4a791881a48d5efcebc990c8829d8f77fe94f 100644
+--- a/net/ipv6/icmp.c
++++ b/net/ipv6/icmp.c
+@@ -588,7 +588,7 @@ void icmp6_send(struct sk_buff *skb, u8 type, u8 code, __u32 info,
+ 	else if (!fl6.flowi6_oif)
+ 		fl6.flowi6_oif = np->ucast_oif;
+ 
+-	ipcm6_init_sk(&ipc6, np);
++	ipcm6_init_sk(&ipc6, sk);
+ 	ipc6.sockc.mark = mark;
+ 	fl6.flowlabel = ip6_make_flowinfo(ipc6.tclass, fl6.flowlabel);
+ 
+@@ -791,7 +791,7 @@ static enum skb_drop_reason icmpv6_echo_reply(struct sk_buff *skb)
+ 	msg.offset = 0;
+ 	msg.type = type;
+ 
+-	ipcm6_init_sk(&ipc6, np);
++	ipcm6_init_sk(&ipc6, sk);
+ 	ipc6.hlimit = ip6_sk_dst_hoplimit(np, &fl6, dst);
+ 	ipc6.tclass = ipv6_get_dsfield(ipv6_hdr(skb));
+ 	ipc6.sockc.mark = mark;
 diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index ab7ede4a731a96fe6dce3205df29b298c923acc7..47aa42f93ccda8b49ed6ecd7a7a07703ae147928 100644
+index 47aa42f93ccda8b49ed6ecd7a7a07703ae147928..8851fe5d45a0781c8b78c995c2c4c6c81e10cd52 100644
 --- a/net/ipv6/ip6_output.c
 +++ b/net/ipv6/ip6_output.c
-@@ -232,12 +232,11 @@ int ip6_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- }
- EXPORT_SYMBOL(ip6_output);
+@@ -2092,7 +2092,7 @@ struct sk_buff *ip6_make_skb(struct sock *sk,
+ 		return ERR_PTR(err);
+ 	}
+ 	if (ipc6->dontfrag < 0)
+-		ipc6->dontfrag = inet6_sk(sk)->dontfrag;
++		ipc6->dontfrag = inet6_test_bit(DONTFRAG, sk);
  
--bool ip6_autoflowlabel(struct net *net, const struct ipv6_pinfo *np)
-+bool ip6_autoflowlabel(struct net *net, const struct sock *sk)
- {
--	if (!np->autoflowlabel_set)
-+	if (!inet6_test_bit(AUTOFLOWLABEL_SET, sk))
- 		return ip6_default_np_autolabel(net);
--	else
--		return np->autoflowlabel;
-+	return inet6_test_bit(AUTOFLOWLABEL, sk);
- }
- 
- /*
-@@ -314,7 +313,7 @@ int ip6_xmit(const struct sock *sk, struct sk_buff *skb, struct flowi6 *fl6,
- 		hlimit = ip6_dst_hoplimit(dst);
- 
- 	ip6_flow_hdr(hdr, tclass, ip6_make_flowlabel(net, skb, fl6->flowlabel,
--				ip6_autoflowlabel(net, np), fl6));
-+				ip6_autoflowlabel(net, sk), fl6));
- 
- 	hdr->payload_len = htons(seg_len);
- 	hdr->nexthdr = proto;
-@@ -1938,7 +1937,6 @@ struct sk_buff *__ip6_make_skb(struct sock *sk,
- 	struct sk_buff *skb, *tmp_skb;
- 	struct sk_buff **tail_skb;
- 	struct in6_addr *final_dst;
--	struct ipv6_pinfo *np = inet6_sk(sk);
- 	struct net *net = sock_net(sk);
- 	struct ipv6hdr *hdr;
- 	struct ipv6_txoptions *opt = v6_cork->opt;
-@@ -1981,7 +1979,7 @@ struct sk_buff *__ip6_make_skb(struct sock *sk,
- 
- 	ip6_flow_hdr(hdr, v6_cork->tclass,
- 		     ip6_make_flowlabel(net, skb, fl6->flowlabel,
--					ip6_autoflowlabel(net, np), fl6));
-+					ip6_autoflowlabel(net, sk), fl6));
- 	hdr->hop_limit = v6_cork->hop_limit;
- 	hdr->nexthdr = proto;
- 	hdr->saddr = fl6->saddr;
+ 	err = __ip6_append_data(sk, &queue, cork, &v6_cork,
+ 				&current->task_frag, getfrag, from,
 diff --git a/net/ipv6/ipv6_sockglue.c b/net/ipv6/ipv6_sockglue.c
-index 7a181831f226c67813446145f8f58fa58908e3ae..d5d428a695f728d96a7d075d86f806cc3f926e0a 100644
+index d5d428a695f728d96a7d075d86f806cc3f926e0a..33dd4dd872e6bca2ee18a634283640007adcc692 100644
 --- a/net/ipv6/ipv6_sockglue.c
 +++ b/net/ipv6/ipv6_sockglue.c
-@@ -474,6 +474,10 @@ int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
- 			return -EINVAL;
- 		inet6_assign_bit(MC6_ALL, sk, valbool);
+@@ -478,6 +478,9 @@ int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
+ 		inet6_assign_bit(AUTOFLOWLABEL, sk, valbool);
+ 		inet6_set_bit(AUTOFLOWLABEL_SET, sk);
  		return 0;
-+	case IPV6_AUTOFLOWLABEL:
-+		inet6_assign_bit(AUTOFLOWLABEL, sk, valbool);
-+		inet6_set_bit(AUTOFLOWLABEL_SET, sk);
++	case IPV6_DONTFRAG:
++		inet6_assign_bit(DONTFRAG, sk, valbool);
 +		return 0;
  	}
  	if (needs_rtnl)
  		rtnl_lock();
-@@ -970,11 +974,6 @@ int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
- 		np->dontfrag = valbool;
- 		retv = 0;
+@@ -970,10 +973,6 @@ int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
+ 			goto e_inval;
+ 		retv = __ip6_sock_set_addr_preferences(sk, val);
  		break;
--	case IPV6_AUTOFLOWLABEL:
--		np->autoflowlabel = valbool;
--		np->autoflowlabel_set = 1;
+-	case IPV6_DONTFRAG:
+-		np->dontfrag = valbool;
 -		retv = 0;
 -		break;
  	case IPV6_RECVFRAGSIZE:
  		np->rxopt.bits.recvfragsize = valbool;
  		retv = 0;
-@@ -1447,7 +1446,7 @@ int do_ipv6_getsockopt(struct sock *sk, int level, int optname,
+@@ -1442,7 +1441,7 @@ int do_ipv6_getsockopt(struct sock *sk, int level, int optname,
+ 		break;
+ 
+ 	case IPV6_DONTFRAG:
+-		val = np->dontfrag;
++		val = inet6_test_bit(DONTFRAG, sk);
  		break;
  
  	case IPV6_AUTOFLOWLABEL:
--		val = ip6_autoflowlabel(sock_net(sk), np);
-+		val = ip6_autoflowlabel(sock_net(sk), sk);
- 		break;
+diff --git a/net/ipv6/ping.c b/net/ipv6/ping.c
+index 5831aaa53d75eae7b764d54ab52da65db4030d73..4444b61eb23bbf483068d2b119a7559e49ba3880 100644
+--- a/net/ipv6/ping.c
++++ b/net/ipv6/ping.c
+@@ -118,7 +118,7 @@ static int ping_v6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 	     l3mdev_master_ifindex_by_index(sock_net(sk), oif) != sk->sk_bound_dev_if))
+ 		return -EINVAL;
  
- 	case IPV6_RECVFRAGSIZE:
+-	ipcm6_init_sk(&ipc6, np);
++	ipcm6_init_sk(&ipc6, sk);
+ 	ipc6.sockc.tsflags = READ_ONCE(sk->sk_tsflags);
+ 	ipc6.sockc.mark = READ_ONCE(sk->sk_mark);
+ 
+diff --git a/net/ipv6/raw.c b/net/ipv6/raw.c
+index 42fcec3ecf5e171a5ebe724b8c971d90885abe41..cc9673c1809fb238f6d9ab6915116cf0dd6eb593 100644
+--- a/net/ipv6/raw.c
++++ b/net/ipv6/raw.c
+@@ -898,7 +898,7 @@ static int rawv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 		ipc6.hlimit = ip6_sk_dst_hoplimit(np, &fl6, dst);
+ 
+ 	if (ipc6.dontfrag < 0)
+-		ipc6.dontfrag = np->dontfrag;
++		ipc6.dontfrag = inet6_test_bit(DONTFRAG, sk);
+ 
+ 	if (msg->msg_flags&MSG_CONFIRM)
+ 		goto do_confirm;
+diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+index 86b5d509a4688cacb2f40667c9ddc10f81ade2fe..d904c5450a07bf1df10d94ee6bb9b2a8fb9381b5 100644
+--- a/net/ipv6/udp.c
++++ b/net/ipv6/udp.c
+@@ -1593,7 +1593,7 @@ int udpv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 
+ do_append_data:
+ 	if (ipc6.dontfrag < 0)
+-		ipc6.dontfrag = np->dontfrag;
++		ipc6.dontfrag = inet6_test_bit(DONTFRAG, sk);
+ 	up->len += ulen;
+ 	err = ip6_append_data(sk, getfrag, msg, ulen, sizeof(struct udphdr),
+ 			      &ipc6, fl6, (struct rt6_info *)dst,
+diff --git a/net/l2tp/l2tp_ip6.c b/net/l2tp/l2tp_ip6.c
+index ed8ebb6f59097ac18bb284d1c48f9e801e9a92c2..40af2431e73aad74ab64e97db8a5ee79dda0879d 100644
+--- a/net/l2tp/l2tp_ip6.c
++++ b/net/l2tp/l2tp_ip6.c
+@@ -621,7 +621,7 @@ static int l2tp_ip6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 		ipc6.hlimit = ip6_sk_dst_hoplimit(np, &fl6, dst);
+ 
+ 	if (ipc6.dontfrag < 0)
+-		ipc6.dontfrag = np->dontfrag;
++		ipc6.dontfrag = inet6_test_bit(DONTFRAG, sk);
+ 
+ 	if (msg->msg_flags & MSG_CONFIRM)
+ 		goto do_confirm;
 -- 
 2.42.0.283.g2d96d420d3-goog
 
