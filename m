@@ -1,118 +1,102 @@
-Return-Path: <netdev+bounces-33183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9315479CE5B
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 12:34:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6900579CEDA
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 12:50:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 478B31C20EF5
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 10:34:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C2381C20D26
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 10:50:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 218E89450;
-	Tue, 12 Sep 2023 10:34:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCD57A955;
+	Tue, 12 Sep 2023 10:50:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 137C617999
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 10:34:06 +0000 (UTC)
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67B5E1FF6;
-	Tue, 12 Sep 2023 03:34:06 -0700 (PDT)
-Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.226])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4RlKZZ4gLPz6J7jc;
-	Tue, 12 Sep 2023 18:29:26 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Tue, 12 Sep
- 2023 11:34:04 +0100
-Date: Tue, 12 Sep 2023 11:34:03 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Ilpo =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
-CC: <linux-pci@vger.kernel.org>, Bjorn Helgaas <helgaas@kernel.org>, "Jesse
- Brandeburg" <jesse.brandeburg@intel.com>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, <intel-wired-lan@lists.osuosl.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 3/8] igb: Use FIELD_GET() to extract Link Width
-Message-ID: <20230912113403.00006c39@Huawei.com>
-In-Reply-To: <20230911121501.21910-4-ilpo.jarvinen@linux.intel.com>
-References: <20230911121501.21910-1-ilpo.jarvinen@linux.intel.com>
-	<20230911121501.21910-4-ilpo.jarvinen@linux.intel.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA39F1FAF
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 10:50:34 +0000 (UTC)
+Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BDFEBE
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 03:50:31 -0700 (PDT)
+Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-58df8cab1f2so56214287b3.3
+        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 03:50:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1694515830; x=1695120630; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=x1zhy1UCOP1ljrKVhLiacaxWhwvSH+VCp0kMLxhoeYk=;
+        b=KGO4rmyNgT3MbvGcXtZJWfne4zfxWs9WFVyf5rMhUGn/hCCcnqfIUVsZgeq+3pFKiE
+         DrSDf0kjuI1eF5fCGr9kfZslf1fd9384ubuxn8E6A6QH2hD2PD62p0G2pfSUju8xk5++
+         Owf14hbibSTMuVTHKGNvBDAV6vmopbe3/fT0ORAzgDJTPSMuox7QRBeoN4coIiBnZwpO
+         gWB9BAwFghuLcW+UKOYW5OMWG9evtCWjTv6VttlH6JTirV1n3VZHPgB0rDB+eZw/8CzY
+         fvsMsQRscD/NEAP8olPTXupS4hWrD2Iz/l/LvnQ0SRaEJutPZhJv62Xltnk7adir0Jr2
+         VNOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694515830; x=1695120630;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=x1zhy1UCOP1ljrKVhLiacaxWhwvSH+VCp0kMLxhoeYk=;
+        b=gXX3iHaLopLeecJ6sUv9dZkcI3feYiL41SIR0NEM/SF0ZvAJLMDLocRyM7h3fDiFlk
+         yaoLgZ/57dHI5jQ3OtaZl/iZM0YnW87fEKvA58iYPD/fNqvpak5wVW0hC7Yzk/l9mGvk
+         jJsF5inX05879CQ6WwqZLhfVp1gHp0s/4cBvn2ATRqMn3+SYOzyrpiOuAL18TgGmvwow
+         Mr2isMpJlkJdONCKAUROrYmKoKlfT2samzKDbU95UgOkzTnYpLY+BtDMHWPkVsWg4EsG
+         YH/7B/AGCJINYyL+yl70d6pk337a/kJcxNWK2CBs0P6O+xap0RV5BxpIq2u8u5YrmdBM
+         lFCw==
+X-Gm-Message-State: AOJu0Yxj7hrkaw+aqipWwgRiT1So3TDwa9kFyLTc6t6p1oY9ozrBT+lk
+	zgU0xk17EIeDOEoyY0sRqUT7RTniBvO3OoRIY8WtsA==
+X-Google-Smtp-Source: AGHT+IF07zf9UK//ddp32dWpF4Y9JXdGQlakVWNajAly9WIIg0061on0AU2876ifTbnQDu3Gsm2uIBLaneAG2d7vX6I=
+X-Received: by 2002:a5b:d05:0:b0:d78:98f:4aa1 with SMTP id y5-20020a5b0d05000000b00d78098f4aa1mr12462208ybp.7.1694515830489;
+ Tue, 12 Sep 2023 03:50:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
+References: <20230912081527.208499-1-herve.codina@bootlin.com> <20230912101458.225870-1-herve.codina@bootlin.com>
+In-Reply-To: <20230912101458.225870-1-herve.codina@bootlin.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Tue, 12 Sep 2023 12:50:18 +0200
+Message-ID: <CACRpkdYFuqQYhB7dOnRnUo8kfRiVZFzYBQuWCpEPLLKVSzKkJg@mail.gmail.com>
+Subject: Re: [PATCH v5 27/31] net: wan: framer: Add support for the Lantiq
+ PEF2256 framer
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Lee Jones <lee@kernel.org>, Qiang Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, 
+	Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Shengjiu Wang <shengjiu.wang@gmail.com>, 
+	Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>, 
+	Nicolin Chen <nicoleotsuka@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>, 
+	Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org, 
+	Simon Horman <horms@kernel.org>, Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [10.202.227.76]
-X-ClientProxiedBy: lhrpeml100003.china.huawei.com (7.191.160.210) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
-X-CFilter-Loop: Reflected
 
-On Mon, 11 Sep 2023 15:14:56 +0300
-Ilpo J=E4rvinen <ilpo.jarvinen@linux.intel.com> wrote:
+On Tue, Sep 12, 2023 at 12:15=E2=80=AFPM Herve Codina <herve.codina@bootlin=
+.com> wrote:
 
-> Use FIELD_GET() to extract PCIe Negotiated Link Width field instead of
-> custom masking and shifting.
->=20
-> Signed-off-by: Ilpo J=E4rvinen <ilpo.jarvinen@linux.intel.com>
-> ---
->  drivers/net/ethernet/intel/igb/e1000_mac.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/igb/e1000_mac.c b/drivers/net/eth=
-ernet/intel/igb/e1000_mac.c
-> index caf91c6f52b4..5a23b9cfec6c 100644
-> --- a/drivers/net/ethernet/intel/igb/e1000_mac.c
-> +++ b/drivers/net/ethernet/intel/igb/e1000_mac.c
-> @@ -1,6 +1,7 @@
->  // SPDX-License-Identifier: GPL-2.0
->  /* Copyright(c) 2007 - 2018 Intel Corporation. */
-> =20
-> +#include <linux/bitfield.h>
->  #include <linux/if_ether.h>
->  #include <linux/delay.h>
->  #include <linux/pci.h>
-> @@ -50,9 +51,8 @@ s32 igb_get_bus_info_pcie(struct e1000_hw *hw)
->  			break;
->  		}
-> =20
-> -		bus->width =3D (enum e1000_bus_width)((pcie_link_status &
-> -						     PCI_EXP_LNKSTA_NLW) >>
-> -						     PCI_EXP_LNKSTA_NLW_SHIFT);
-> +		bus->width =3D (enum e1000_bus_width)FIELD_GET(PCI_EXP_LNKSTA_NLW,
-> +							     pcie_link_status);
+> The Lantiq PEF2256 is a framer and line interface component designed to
+> fulfill all required interfacing between an analog E1/T1/J1 line and the
+> digital PCM system highway/H.100 bus.
+>
+> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+> Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
 
-This cast is a bit ugly given it takes the values 0, 1, 2, 3 and
-we extra a field that the spec says contains 1, 2, 4, 8 etc
-Hence it only works because only 1 and 2 are used I think...  Not nice.
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 
-
-Also, whilst looking at this I note that e1000e has it's own defines
-for PCIE_LINK_WIDTH_MASK and PCIE_LINK_WIDTH_SHIFT=20
-
-Looks like those should be changed to use the standard defines.
-
-For extra giggles there are two e1000_bus_width enum definitions in differe=
-nt
-headers.
-
-Actual patch is good - just 'interesting' stuff noticed whilst looking at i=
-t :)
-
-Jonathan
-
-
->  	}
-> =20
->  	reg =3D rd32(E1000_STATUS);
-
+Yours,
+Linus Walleij
 
