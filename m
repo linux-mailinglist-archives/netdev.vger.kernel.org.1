@@ -1,112 +1,84 @@
-Return-Path: <netdev+bounces-33330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A0BA79D6B8
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 18:49:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11D1C79D6C2
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 18:50:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDD49281E5A
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 16:49:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2356E1C20C07
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 16:50:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CAAC1C04;
-	Tue, 12 Sep 2023 16:49:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A0CF1C14;
+	Tue, 12 Sep 2023 16:50:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00CF6621
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 16:49:40 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54C54110;
-	Tue, 12 Sep 2023 09:49:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=6llGpFBr5L+Q2Nmimc2SvggKuqaRf8GostcQCX30dVo=; b=qZkdGbw6IBcyMcqfQfYzu+oiKn
-	2Xi18pK7v5BZ5bUo7YA0bwRvYON1AsXiy3D2jWQMs1Le5x99fNBlUvACNWghw22S1yjcTYKGrXbyY
-	q6GOPVw9B36X2+VnEHYlpyNZruWcF0JFZGFK7rdRH1kxPeY5ctEskPnrWjT3bCITGzgTyoJYt0R/D
-	W9Ha5kIEXKz6l9Z3VbELaiu3DPNLeWwtL7ceBMl7MiO4VtoB7NHpXDWUsVzr5Hf+TkeD+84BeqyGR
-	j7EcBT4GgAFLQ9IDVXKZ9Ut01TTli/VEfHp+K9soQAW5hXQ+G2lKoReulG6fdqUKvXowzZD0y59j3
-	9PjsUo4g==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42686)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qg6a0-0001TE-1v;
-	Tue, 12 Sep 2023 17:49:36 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qg6a0-0002s6-B0; Tue, 12 Sep 2023 17:49:36 +0100
-Date: Tue, 12 Sep 2023 17:49:36 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Pawel Dembicki <paweldembicki@gmail.com>
-Cc: netdev@vger.kernel.org, Dan Carpenter <dan.carpenter@linaro.org>,
-	Simon Horman <simon.horman@corigine.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 2/8] net: dsa: vsc73xx: convert to PHYLINK
-Message-ID: <ZQCWoIjvAJZ1Qyii@shell.armlinux.org.uk>
-References: <20230912122201.3752918-1-paweldembicki@gmail.com>
- <20230912122201.3752918-3-paweldembicki@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 446357F0
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 16:50:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B0970C433CA;
+	Tue, 12 Sep 2023 16:50:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694537425;
+	bh=ijtyR3u0rQ4mCuDAN600HMX4Nqi7itcM/R8HVDKSWrI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=uOcKwcl+QqmQkTx8/aVSiv2kRimCeZY8jjWaUtgAZ68Dql6tAacaPLGws//vdfO4Q
+	 4FQ69QdDsuaODOvrFTezPQgYg9ln86xhjlS4oRfPKv+7fRYT6Gu6X7q27GZIHJZwbt
+	 2FqQRKdlrb3Y39Qnp4UU9k4z2YhBB98JL9TtPXB0jU+SjgD4tCFqZGQiJBUEyArXOQ
+	 dAkC+u3T53glIXd76HRjZYyB3LwSB0Hh2GmhzzAy8ustWftERw+HAQx5xi/vQHYx0X
+	 aQTiV9HZCG3xGjTqztNl9i2ZUOg4c8HLKCTqQXSCdIwQKXsaR5Fp/zTm3dF13Fhv2R
+	 pnVsSclCDTjyw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9486BE1C280;
+	Tue, 12 Sep 2023 16:50:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230912122201.3752918-3-paweldembicki@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] ipv6: fix ip6_sock_set_addr_preferences() typo
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169453742560.6355.5468481279280127612.git-patchwork-notify@kernel.org>
+Date: Tue, 12 Sep 2023 16:50:25 +0000
+References: <20230911154213.713941-1-edumazet@google.com>
+In-Reply-To: <20230911154213.713941-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, hch@lst.de,
+ chuck.lever@oracle.com
 
-On Tue, Sep 12, 2023 at 02:21:56PM +0200, Pawel Dembicki wrote:
-> +static void vsc73xx_phylink_mac_link_up(struct dsa_switch *ds, int port,
-> +					unsigned int mode,
-> +					phy_interface_t interface,
-> +					struct phy_device *phydev,
-> +					int speed, int duplex,
-> +					bool tx_pause, bool rx_pause)
-> +{
-> +	struct vsc73xx *vsc = ds->priv;
-> +	u32 val;
-> +
-> +	if (speed == SPEED_1000)
-> +		val = VSC73XX_MAC_CFG_GIGA_MODE | VSC73XX_MAC_CFG_TX_IPG_1000M;
-> +	else
-> +		val = VSC73XX_MAC_CFG_TX_IPG_100_10M;
-> +
-> +	if (interface == PHY_INTERFACE_MODE_RGMII)
-> +		val |= VSC73XX_MAC_CFG_CLK_SEL_1000M;
-> +	else
-> +		val |= VSC73XX_MAC_CFG_CLK_SEL_EXT;
+Hello:
 
-I know the original code tested against PHY_INTERFACE_MODE_RGMII, but
-is this correct, or should it be:
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-	if (phy_interface_is_rgmii(interface))
+On Mon, 11 Sep 2023 15:42:13 +0000 you wrote:
+> ip6_sock_set_addr_preferences() second argument should be an integer.
+> 
+> SUNRPC attempts to set IPV6_PREFER_SRC_PUBLIC were
+> translated to IPV6_PREFER_SRC_TMP
+> 
+> Fixes: 18d5ad623275 ("ipv6: add ip6_sock_set_addr_preferences")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Chuck Lever <chuck.lever@oracle.com>
+> 
+> [...]
 
-since the various RGMII* modes are used to determine the delay on the
-PHY side.
+Here is the summary with links:
+  - [net] ipv6: fix ip6_sock_set_addr_preferences() typo
+    https://git.kernel.org/netdev/net/c/8cdd9f1aaedf
 
-Even so, I don't think that is a matter for this patch, but a future
-(or maybe a preceeding patch) to address.
-
-Other than that, I think it looks okay.
-
-Thanks.
-
+You are awesome, thank you!
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
