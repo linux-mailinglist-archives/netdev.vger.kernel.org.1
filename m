@@ -1,220 +1,115 @@
-Return-Path: <netdev+bounces-33241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B66779D1EA
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 15:17:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAA3D79D1F7
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 15:20:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A67E41C20F6A
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 13:17:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95150281F13
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 13:20:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7AAD1803A;
-	Tue, 12 Sep 2023 13:17:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1C911803D;
+	Tue, 12 Sep 2023 13:20:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAE128F60
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 13:17:33 +0000 (UTC)
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9970910CE
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 06:17:32 -0700 (PDT)
-Received: by mail-wr1-x42a.google.com with SMTP id ffacd0b85a97d-31c93d2a24fso5113641f8f.2
-        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 06:17:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1694524651; x=1695129451; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=eVCcTaSbY9rwe8V8Di2XAdZ+iClnwLVfIq169SCBZEA=;
-        b=PR7iuU0BYQQmEucjMMPUMWOjrTO6TWwQLH5Xt0cD7Qk7fICKPMQsV5DbG7c5cqiMSg
-         CFTiWb+KWBWULdvTgZ7Wwxr2Zx0Ya0RvIaZrjry+2oHHmWf94k3kPeiFWld29V9j89+r
-         rjdAfuMDuOvn6irhywEYX4gHzgEkkDCj/9jC2/06hVMGgtCf+ZK7r1HqZM7stPaAgvqT
-         /MFt3AMZn8XeFH9Oc2IY0qyJdtH9z1U4FEYTtagImaZKBtwFI4DQWkIm1lo1q3JIkiWd
-         sJuLZiAnYgwwwwaYfZnEw8jAwxlYeqakp0Ky5qVUbLUHTtmN7kTKIPC6Hct3RRlzSwO3
-         u5MA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694524651; x=1695129451;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eVCcTaSbY9rwe8V8Di2XAdZ+iClnwLVfIq169SCBZEA=;
-        b=s1WGrxEeRP1m2J1hNz2njIwyAQ/v7YYyfMa0j/lkehAbGZexyJL2AykURIDe2sMuSJ
-         0+t7nqrEXoUUWhpI0WN1i7E2yggVaZ+gS4jzdq6pboxVXiwKc6N3BaknUgXtXXfImkih
-         L8fu1qhyFNwRnhNOSyFYnw0ASL1fgTbtASWHsLEEjLUie5wNoZEPPX7JiIhQqP0+xU7L
-         dzOHGSiZ09PKMr5hGIjX9jiEzMehkhTr4vPy6xQQsL83pirx+5dy6+qJNvUI/Vgd/gcJ
-         7JWK7qegMf7Mc3ywHuXGOOmTd+JBnVyDH92F9DK1sgLA5HJwKGDmDQN1r8qMTicGrnNO
-         ZxHQ==
-X-Gm-Message-State: AOJu0Yyxxzmrclh1oqxZFd/bY0LOEiKw67ROR26ET+teUkuGgHGFeyda
-	Ljrcvy7jE9tc4gb8Gi6tAirgsA==
-X-Google-Smtp-Source: AGHT+IFHrdYQ+Sq9vpHXLwlvE6jWB4jziFsIr4mUbMR721FEezxCHK3S5u+XI12b+yFvlUmuc3bs1Q==
-X-Received: by 2002:a5d:69c3:0:b0:319:74b5:b67d with SMTP id s3-20020a5d69c3000000b0031974b5b67dmr9932380wrw.66.1694524650901;
-        Tue, 12 Sep 2023 06:17:30 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.214.188])
-        by smtp.gmail.com with ESMTPSA id z2-20020a5d4c82000000b0031aca6cc69csm12859647wrs.2.2023.09.12.06.17.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Sep 2023 06:17:30 -0700 (PDT)
-Message-ID: <439bf5eb-c146-2f67-1d64-4efa100ee85a@linaro.org>
-Date: Tue, 12 Sep 2023 15:17:26 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15E1E8C18
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 13:20:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7E95BC433C9;
+	Tue, 12 Sep 2023 13:20:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694524825;
+	bh=ifkOKxbXD5+s1MxmPdP70sSy7gLlcMrD2UXr9jXJRtY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=goIjyzndEet7yknzXxDWwSKuL2DHHkfpr/xS7Ll8ShEJMFY93IAXdiGiOgKkHguZS
+	 3goo6MWoHlui7LYPVHLnf8EUCV6+9fzk9KcVVPHp+GO8iP39kz87dxBP3IFKHK/2GF
+	 DlKvTpRqEXMev9DPz0+qX9vIkyV3tgul+lbsIuQQ30A6a9oGxvkPHzzrTPGVsFkVp/
+	 He1eHxDlKBhWutJf+sO8QGojcEIxc3JHAFZi9TE/t26gcLdDR4CCHfFTkgp4HjDB2S
+	 AHTYsyBVJCgwefJm2XS+sIs6qbqGAgkAL2Si567JBPX8Q8l90EwCm/PMPNmIN4hqNz
+	 jtJ17xf7x9fXA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 66E07E1C282;
+	Tue, 12 Sep 2023 13:20:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-Subject: Re: [RFC PATCH net-next 6/6] microchip: lan865x: add device-tree
- support for Microchip's LAN865X MACPHY
-To: Parthiban.Veerasooran@microchip.com
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- Horatiu.Vultur@microchip.com, Woojung.Huh@microchip.com,
- Nicolas.Ferre@microchip.com, UNGLinuxDriver@microchip.com,
- Thorsten.Kummermehr@microchip.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, corbet@lwn.net,
- Steen.Hegelund@microchip.com, rdunlap@infradead.org, horms@kernel.org,
- casper.casan@gmail.com, andrew@lunn.ch
-References: <20230908142919.14849-1-Parthiban.Veerasooran@microchip.com>
- <20230908142919.14849-7-Parthiban.Veerasooran@microchip.com>
- <feb8eaeb-954c-416d-6e30-acb4b92764e0@linaro.org>
- <f429ea93-9cb2-8869-a98d-fb55161cf880@microchip.com>
-Content-Language: en-US
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <f429ea93-9cb2-8869-a98d-fb55161cf880@microchip.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] net: macb: fix sleep inside spinlock
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169452482541.2220.8817186054224273802.git-patchwork-notify@kernel.org>
+Date: Tue, 12 Sep 2023 13:20:25 +0000
+References: <20230908112913.1701766-1-s.hauer@pengutronix.de>
+In-Reply-To: <20230908112913.1701766-1-s.hauer@pengutronix.de>
+To: Sascha Hauer <s.hauer@pengutronix.de>
+Cc: netdev@vger.kernel.org, linux@armlinux.org.uk,
+ linux-kernel@vger.kernel.org, nicolas.ferre@microchip.com,
+ claudiu.beznea@tuxon.dev, kernel@pengutronix.de
 
-On 12/09/2023 14:15, Parthiban.Veerasooran@microchip.com wrote:
-> Hi Krzysztof,
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Fri,  8 Sep 2023 13:29:13 +0200 you wrote:
+> macb_set_tx_clk() is called under a spinlock but itself calls clk_set_rate()
+> which can sleep. This results in:
 > 
-> Thank you for reviewing the patch.
+> | BUG: sleeping function called from invalid context at kernel/locking/mutex.c:580
+> | pps pps1: new PPS source ptp1
+> | in_atomic(): 1, irqs_disabled(): 1, non_block: 0, pid: 40, name: kworker/u4:3
+> | preempt_count: 1, expected: 0
+> | RCU nest depth: 0, expected: 0
+> | 4 locks held by kworker/u4:3/40:
+> |  #0: ffff000003409148
+> | macb ff0c0000.ethernet: gem-ptp-timer ptp clock registered.
+> |  ((wq_completion)events_power_efficient){+.+.}-{0:0}, at: process_one_work+0x14c/0x51c
+> |  #1: ffff8000833cbdd8 ((work_completion)(&pl->resolve)){+.+.}-{0:0}, at: process_one_work+0x14c/0x51c
+> |  #2: ffff000004f01578 (&pl->state_mutex){+.+.}-{4:4}, at: phylink_resolve+0x44/0x4e8
+> |  #3: ffff000004f06f50 (&bp->lock){....}-{3:3}, at: macb_mac_link_up+0x40/0x2ac
+> | irq event stamp: 113998
+> | hardirqs last  enabled at (113997): [<ffff800080e8503c>] _raw_spin_unlock_irq+0x30/0x64
+> | hardirqs last disabled at (113998): [<ffff800080e84478>] _raw_spin_lock_irqsave+0xac/0xc8
+> | softirqs last  enabled at (113608): [<ffff800080010630>] __do_softirq+0x430/0x4e4
+> | softirqs last disabled at (113597): [<ffff80008001614c>] ____do_softirq+0x10/0x1c
+> | CPU: 0 PID: 40 Comm: kworker/u4:3 Not tainted 6.5.0-11717-g9355ce8b2f50-dirty #368
+> | Hardware name: ... ZynqMP ... (DT)
+> | Workqueue: events_power_efficient phylink_resolve
+> | Call trace:
+> |  dump_backtrace+0x98/0xf0
+> |  show_stack+0x18/0x24
+> |  dump_stack_lvl+0x60/0xac
+> |  dump_stack+0x18/0x24
+> |  __might_resched+0x144/0x24c
+> |  __might_sleep+0x48/0x98
+> |  __mutex_lock+0x58/0x7b0
+> |  mutex_lock_nested+0x24/0x30
+> |  clk_prepare_lock+0x4c/0xa8
+> |  clk_set_rate+0x24/0x8c
+> |  macb_mac_link_up+0x25c/0x2ac
+> |  phylink_resolve+0x178/0x4e8
+> |  process_one_work+0x1ec/0x51c
+> |  worker_thread+0x1ec/0x3e4
+> |  kthread+0x120/0x124
+> |  ret_from_fork+0x10/0x20
 > 
-> On 10/09/23 4:25 pm, Krzysztof Kozlowski wrote:
->> EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
->>
->> On 08/09/2023 16:29, Parthiban Veerasooran wrote:
->>> Add device-tree support for Microchip's LAN865X MACPHY for configuring
->>> the OPEN Alliance 10BASE-T1x MACPHY Serial Interface parameters.
->>
->> Please use subject prefixes matching the subsystem. You can get them for
->> example with `git log --oneline -- DIRECTORY_OR_FILE` on the directory
->> your patch is touching.
-> Ok sure, so it will become like,
-> 
-> dt-bindings: net: add device-tree support for Microchip's LAN865X MACPHY
-> 
-> I will correct it in the next revision.
+> [...]
 
-"device-tree support for " is redundant, drop
+Here is the summary with links:
+  - net: macb: fix sleep inside spinlock
+    https://git.kernel.org/netdev/net/c/403f0e771457
 
->>
->>>
->>> Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
->>> ---
->>>   .../bindings/net/microchip,lan865x.yaml       | 54 +++++++++++++++++++
->>>   MAINTAINERS                                   |  1 +
->>>   2 files changed, 55 insertions(+)
->>>   create mode 100644 Documentation/devicetree/bindings/net/microchip,lan865x.yaml
->>>
->>> diff --git a/Documentation/devicetree/bindings/net/microchip,lan865x.yaml b/Documentation/devicetree/bindings/net/microchip,lan865x.yaml
->>> new file mode 100644
->>> index 000000000000..3465b2c97690
->>> --- /dev/null
->>> +++ b/Documentation/devicetree/bindings/net/microchip,lan865x.yaml
->>> @@ -0,0 +1,54 @@
->>> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
->>> +%YAML 1.2
->>> +---
->>> +$id: http://devicetree.org/schemas/net/microchip,lan865x.yaml#
->>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
->>> +
->>> +title: Microchip LAN8650/1 10BASE-T1S MACPHY Ethernet Controllers
->>> +
->>> +maintainers:
->>> +  - Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
->>> +
->>> +description: |
->>> +  Device tree properties for LAN8650/1 10BASE-T1S MACPHY Ethernet
->>
->> Drop "Device tree properties for" and instead describe the hardware.
-> sure, will do it.
->>
->>> +  controller.
->>> +
->>> +allOf:
->>> +  - $ref: ethernet-controller.yaml#
->>> +
->>> +properties:
->>> +  compatible:
->>> +    items:
->>
->> No need for items. Just enum.
-> Ok noted.
->>
->>
->>> +      - enum:
->>> +          - microchip,lan865x
->>
->> No wildcards in compatibles.
-> Yes then we don't need enum also isn't it?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-I don't see correlation between these two. Please read the writing
-bindings guidelines.
-
-
->>
->> Missing blank line.
-> Ok will add it.
->>
->>
->>
->>> +  reg:
->>> +    maxItems: 1
->>> +
->>> +  local-mac-address: true
->>> +  oa-chunk-size: true
->>> +  oa-tx-cut-through: true
->>> +  oa-rx-cut-through: true
->>> +  oa-protected: true
->>
->> What are all these? Where are they defined that you skip description,
->> type and vendor prefix?
-> Ok missed it. Will do it in the next revision.
-
-No, drop them or explain why they are hardware properties.
-
->>
->>> +
->>> +required:
->>> +  - compatible
->>> +  - reg
->>> +
->>> +additionalProperties: false
->>> +
->>> +examples:
->>> +  - |
->>> +    spi {
->>> +        #address-cells = <1>;
->>> +        #size-cells = <0>;
->>> +
->>> +        ethernet@1{
->>
->> Missing space
-> Ok will add it.
->>
->>> +            compatible = "microchip,lan865x";
->>> +            reg = <1>; /* CE0 */
->>
->> CE0? chip-select? What does this comment mean in this context?
-> Yes it is chip-select. Will add proper comment.
-
-Why? isn't reg obvious?
-
-Best regards,
-Krzysztof
 
 
