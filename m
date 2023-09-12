@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-32969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32968-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66F0579C120
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 02:30:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC48B79C119
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 02:28:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A2D31C20432
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 00:30:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DA4C281285
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 00:28:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20E6F440F;
-	Tue, 12 Sep 2023 00:30:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F32B9377;
+	Tue, 12 Sep 2023 00:28:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 084934411
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 00:30:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB226361
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 00:28:11 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34B1A11411E
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 17:17:28 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37D251941C6
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 17:24:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694477848; x=1726013848;
+  t=1694478285; x=1726014285;
   h=message-id:date:subject:to:cc:references:from:
    in-reply-to:content-transfer-encoding:mime-version;
   bh=K6X3b3Lp+T6wU3Mnul22sCB0O4Jqhrga1kc/PyIFBJs=;
-  b=Zb3/GSCoNVOqJOzr9Usb5evXQT7Bkulg1C4Rhk6vUhduoKuln6X+un7k
-   mUTOaEgVrrWRENGfGm28m72o7tmUd9nlYaudYe3GABi32Md9HeAfF+ZTl
-   lkqLrmobX50BGxFcfXlXIAaI2SUcfZsrT/vlACAvX6vi5AZZSPOdp6ki9
-   rnfkQC68b4hJkDl0iEmHnBkeYNrh3asfA3yV3ILCMWisRqdfCR9L3XfMk
-   wJTCwE7Ig1YLNhqBQKLLzHr2ULwFJCuKn2N2G45u8dafK2Re0DPQZGRxJ
-   gHMGh0tD4QPew5Un1DHyyTJOX8R85sgqFFHuR/HeyrIYEoQDjNBBYLNct
-   A==;
+  b=YdeO+kUAL62Hy8sVj1D9iLWHHhhTST5U9ZNhQGd/EIhi2C2L1nNROTSz
+   5bf/Xqnxg9ZC1Cw8dMrVQCEKs9EAKV0Ddk1l4DrMGy/RD3Xxc/za7IqKp
+   Ds9EkkXG+rPEmSvQeMZyU5LpypfaCVSnabGOIFTt8M/mob0bk9J8l4VJS
+   3LHTGN0TYRPKjwHpgVjGHh+0388Yo//k68yDsUZ4LrDxokhhAG4+Z9J7G
+   OTkKjCpG9wX8loA8LXrdlVx6iCnZ8whzsau9153idBc6AnozeNBocYCtR
+   Ae655uYvKe6xGDjWbiqVeDdIC0xJzfwSFWBktYvjssk3Uixojq9EGUTUU
+   g==;
 X-IronPort-AV: E=McAfee;i="6600,9927,10830"; a="378147678"
 X-IronPort-AV: E=Sophos;i="6.02,244,1688454000"; 
    d="scan'208";a="378147678"
@@ -162,6 +162,12 @@ X-MS-Exchange-CrossTenant-MailboxType: HOSTED
 X-MS-Exchange-CrossTenant-UserPrincipalName: J8/SEySHfDLJTvzPH/dRKfttyCoHZICh55fDqEblHp2x3WbCSGFnKRwj0UTLLP7T07jWv1E0npXlUAHjX3Uppr/w2X81fs3tXT+DbHyENas=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR11MB5908
 X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
 
 
