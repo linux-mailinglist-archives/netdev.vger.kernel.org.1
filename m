@@ -1,103 +1,106 @@
-Return-Path: <netdev+bounces-33075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1567379CA62
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 10:43:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07AA179CA7B
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 10:45:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 462571C20D9C
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 08:43:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF4272811AF
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 08:45:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F1398F4E;
-	Tue, 12 Sep 2023 08:42:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52E348F5A;
+	Tue, 12 Sep 2023 08:45:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 739378F40
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 08:42:52 +0000 (UTC)
-Received: from mx0.infotecs.ru (mx0.infotecs.ru [91.244.183.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B51B31713;
-	Tue, 12 Sep 2023 01:42:51 -0700 (PDT)
-Received: from mx0.infotecs-nt (localhost [127.0.0.1])
-	by mx0.infotecs.ru (Postfix) with ESMTP id EFABC1024BAE;
-	Tue, 12 Sep 2023 11:42:49 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx0.infotecs.ru EFABC1024BAE
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=infotecs.ru; s=mx;
-	t=1694508170; bh=ULzrGpftkZgLqATIEQXgFNjR2HUnbe9KTr0sViGMoMQ=;
-	h=From:To:CC:Subject:Date:From;
-	b=gHYTFFAPLdMsPM5Pglhq5rJXFvWAzOtxC5EZCa8JZOq4x9Odxtu3xVLVLZqM4P0Lr
-	 y4Z5sdtACPC9KR2lQQHFnL194uAKs3fmrgeati8dXyHH132EfcmaQfUw8i8P6MTPUR
-	 NxaUXFZp/usuxvfFywNunXhEOexl6wmpzrQC2GSk=
-Received: from msk-exch-01.infotecs-nt (msk-exch-01.infotecs-nt [10.0.7.191])
-	by mx0.infotecs-nt (Postfix) with ESMTP id EDF8E30268F3;
-	Tue, 12 Sep 2023 11:42:49 +0300 (MSK)
-From: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
-To: "David S. Miller" <davem@davemloft.net>
-CC: David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>
-Subject: [PATCH net-next] ipv6: mcast: Remove redundant comparison in
-  igmp6_mcf_get_next()
-Thread-Topic: [PATCH net-next] ipv6: mcast: Remove redundant comparison in
-  igmp6_mcf_get_next()
-Thread-Index: AQHZ5VUc01wdWD2zyUKZD0c8csOa5g==
-Date: Tue, 12 Sep 2023 08:42:49 +0000
-Message-ID: <20230912084100.1502379-1-Ilia.Gavrilov@infotecs.ru>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-originating-ip: [10.17.0.10]
-x-exclaimer-md-config: 208ac3cd-1ed4-4982-a353-bdefac89ac0a
-Content-Type: text/plain; charset="iso-8859-1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4674315AE
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 08:45:28 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9E5AC1736
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 01:45:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1694508326;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3hUC4x3FXZvTagHd2cD4t3OZmFD4EPm/rOhyiGmvo8w=;
+	b=WrJ/Y6QgUDvKbU/AYHnWU2v0sRosX9XKfH5wsqqzQ9SmPY99v6zzAleQlFO/Z/S3SneFiK
+	qxkA1SoCP6vm9vsJuONRGGXj+GePoZf0DYxs4FqM5yQONj6PENxVCGf4cQ2UWyLN3Yn6hp
+	um2ryHmERIU78O911yEhLXWxl1ScZRw=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-493-oZ-bZafMONy-DszK91KYpw-1; Tue, 12 Sep 2023 04:45:25 -0400
+X-MC-Unique: oZ-bZafMONy-DszK91KYpw-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-9a9cd336c9cso133946066b.1
+        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 01:45:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694508324; x=1695113124;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3hUC4x3FXZvTagHd2cD4t3OZmFD4EPm/rOhyiGmvo8w=;
+        b=EztXReJOs3rHffc1KHpYP3bxSCOQjzSY0lG7IhumUl/9wADhHLz59Ze5WzxDLyH/Lj
+         1NsK+EgmCqAEIpbbCgwa+bD8x1hj8SX79Hjh4FNBOBlk/wrX4vCAMswOQShOlWbsnpYR
+         J//q5F8gDvc7yszbWx2b0iEq32Dn5xEX3MQE0l93zh1w4saMLaeEx8L554arbf3Vl2Jl
+         Jy161mfbOD4weOP42cxEtBs67eO3JDzVdG3CD1ymjz9exzhGV/UvmRLp80LCn5uOTASG
+         tWmskzuohCvZ0lqezdEqZmBN/0PGi6FDCL+t01y0h+UGfOy05TyGUppIQVmfeFvOwC+S
+         FYng==
+X-Gm-Message-State: AOJu0Yxwz5jpd5lIQCNSxIjR287nhRMfTiLZ95zQix44VxR+t9qGlqPh
+	yxLVBCdhQ9YLdT0ln9kNk3v76Bak2qdpqdrOhiB99Osx5HWKedMU1rc2OJgAt3+YNzu703dI4NN
+	Vbfc4/qOrFKdjNHVE
+X-Received: by 2002:a17:906:254:b0:9a5:a701:2b94 with SMTP id 20-20020a170906025400b009a5a7012b94mr9196363ejl.7.1694508323972;
+        Tue, 12 Sep 2023 01:45:23 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGpiSb88bPEZUnnVfXGKy7ahcM0UPN8GF+UlMWw3spQWZk++q+dCMlUOm8PacoxmU0GsjVmFg==
+X-Received: by 2002:a17:906:254:b0:9a5:a701:2b94 with SMTP id 20-20020a170906025400b009a5a7012b94mr9196343ejl.7.1694508323670;
+        Tue, 12 Sep 2023 01:45:23 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-249-231.dyn.eolo.it. [146.241.249.231])
+        by smtp.gmail.com with ESMTPSA id y22-20020a170906449600b0099bc8db97bcsm6473980ejo.131.2023.09.12.01.45.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Sep 2023 01:45:23 -0700 (PDT)
+Message-ID: <2c532d4594ca0cacdc0cfc5d1f5d55d5d758dc1b.camel@redhat.com>
+Subject: Re: [net PATCH] octeon_ep: fix tx dma unmap len values in SG
+From: Paolo Abeni <pabeni@redhat.com>
+To: Shinas Rasheed <srasheed@marvell.com>, horms@kernel.org
+Cc: aayarekar@marvell.com, davem@davemloft.net, edumazet@google.com, 
+ egallen@redhat.com, hgani@marvell.com, kuba@kernel.org, 
+ linux-kernel@vger.kernel.org, mschmidt@redhat.com, netdev@vger.kernel.org, 
+ sburla@marvell.com, sedara@marvell.com, vburru@marvell.com,
+ vimleshk@marvell.com
+Date: Tue, 12 Sep 2023 10:45:21 +0200
+In-Reply-To: <20230912070400.2136431-1-srasheed@marvell.com>
+References: <20230911180113.GA113013@kernel.org>
+	 <20230912070400.2136431-1-srasheed@marvell.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KLMS-Rule-ID: 5
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Status: not scanned, disabled by settings
-X-KLMS-AntiSpam-Interceptor-Info: not scanned
-X-KLMS-AntiPhishing: Clean, bases: 2023/09/12 07:28:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2023/09/12 03:38:00 #21880520
-X-KLMS-AntiVirus-Status: Clean, skipped
 
-The 'state->im' value will always be non-zero after
-the 'while' statement, so the check can be removed.
+On Tue, 2023-09-12 at 00:04 -0700, Shinas Rasheed wrote:
+> This change is required in octep_iq_process_completions, as given in the =
+patch,
+> since the scatter gather pointer lengths arrive as big-endian in hardware=
+.
 
-Found by InfoTeCS on behalf of Linux Verification Center
-(linuxtesting.org) with SVACE.
+I guess Simon intended asking about octep_iq_free_pending(), and AFAICT
+your reply confirm that the change is required there, too.
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
----
-Repost according to https://lore.kernel.org/all/cdc2183a-c79a-b4bd-2726-bd3=
-a2d6d5440@kernel.org/
- net/ipv6/mcast.c | 2 --
- 1 file changed, 2 deletions(-)
+Additionally the changelog really need to be expanded. I don't
+understand how this change relates to endianess: if the ring format is
+big endian I expect some be16_to_cpu(len) instead of complement-to-4 of
+indexes.
 
-diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
-index 5ce25bcb9974..421264a69e97 100644
---- a/net/ipv6/mcast.c
-+++ b/net/ipv6/mcast.c
-@@ -3011,8 +3011,6 @@ static struct ip6_sf_list *igmp6_mcf_get_next(struct =
-seq_file *seq, struct ip6_s
- 				continue;
- 			state->im =3D rcu_dereference(state->idev->mc_list);
- 		}
--		if (!state->im)
--			break;
- 		psf =3D rcu_dereference(state->im->mca_sources);
- 	}
- out:
---=20
-2.39.2
+Please clarify and expand the changelog, thanks!
+
+Paolo
+
 
