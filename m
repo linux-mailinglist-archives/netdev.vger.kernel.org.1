@@ -1,124 +1,102 @@
-Return-Path: <netdev+bounces-33064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33074-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6227379CA04
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 10:33:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0872279CA61
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 10:42:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 922191C20D44
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 08:33:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD023280EAB
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 08:42:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CA2F15AE;
-	Tue, 12 Sep 2023 08:33:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F3308F40;
+	Tue, 12 Sep 2023 08:42:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B05B631
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 08:33:04 +0000 (UTC)
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95389B9;
-	Tue, 12 Sep 2023 01:33:03 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1qfypO-0003Kf-NB; Tue, 12 Sep 2023 10:32:58 +0200
-Message-ID: <b30a81fa-6b59-4bac-b109-99a4dca689de@leemhuis.info>
-Date: Tue, 12 Sep 2023 10:32:57 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 833441843
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 08:42:40 +0000 (UTC)
+Received: from mx0.infotecs.ru (mx0.infotecs.ru [91.244.183.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6487A1FE9;
+	Tue, 12 Sep 2023 01:42:38 -0700 (PDT)
+Received: from mx0.infotecs-nt (localhost [127.0.0.1])
+	by mx0.infotecs.ru (Postfix) with ESMTP id D5FF21024CF9;
+	Tue, 12 Sep 2023 11:42:34 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx0.infotecs.ru D5FF21024CF9
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=infotecs.ru; s=mx;
+	t=1694508155; bh=o5pd38GBTQwRmYAzeYxDd/4rQzPh+H8gE2oOiTG2l9k=;
+	h=From:To:CC:Subject:Date:From;
+	b=Cx8QQNHtsV5ufknr8Tny5cX0espXouYTxrAA/U/jNubsYan+ZWF/zWiBe2WEVIM8P
+	 j1tXgqFheYUZsP6p3dJuw3TWQKF6Pd8m20PFSm+r345Ccj8a7y3a20g7ZXL314Fytu
+	 GW70IbIuOTaOhc7srW2JCLpoeuAztQSeZ5m7xk1o=
+Received: from msk-exch-01.infotecs-nt (msk-exch-01.infotecs-nt [10.0.7.191])
+	by mx0.infotecs-nt (Postfix) with ESMTP id D2EB53000095;
+	Tue, 12 Sep 2023 11:42:34 +0300 (MSK)
+From: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
+To: "David S. Miller" <davem@davemloft.net>
+CC: David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>
+Subject: [PATCH net-next] ipv4: igmp: Remove redundant comparison in
+ igmp_mcf_get_next()
+Thread-Topic: [PATCH net-next] ipv4: igmp: Remove redundant comparison in
+ igmp_mcf_get_next()
+Thread-Index: AQHZ5VUTNq1uzE92eEGQ9QqcA3I0wA==
+Date: Tue, 12 Sep 2023 08:42:34 +0000
+Message-ID: <20230912084039.1501984-1-Ilia.Gavrilov@infotecs.ru>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-originating-ip: [10.17.0.10]
+x-exclaimer-md-config: 208ac3cd-1ed4-4982-a353-bdefac89ac0a
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Regression: Commit "netfilter: nf_tables: disallow rule addition
- to bound chain via NFTA_RULE_CHAIN_ID" breaks ruleset loading in linux-stable
-Content-Language: en-US, de-DE
-To: Pablo Neira Ayuso <pablo@netfilter.org>,
- Timo Sigurdsson <public_timo.s@silentcreek.de>
-Cc: kadlec@netfilter.org, fw@strlen.de, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org, regressions@lists.linux.dev, sashal@kernel.org,
- carnil@debian.org, 1051592@bugs.debian.org
-References: <20230911213750.5B4B663206F5@dd20004.kasserver.com>
- <ZP+bUpxJiFcmTWhy@calendula>
-From: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <ZP+bUpxJiFcmTWhy@calendula>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1694507583;1f6f9fff;
-X-HE-SMSGID: 1qfypO-0003Kf-NB
+X-KLMS-Rule-ID: 5
+X-KLMS-Message-Action: clean
+X-KLMS-AntiSpam-Status: not scanned, disabled by settings
+X-KLMS-AntiSpam-Interceptor-Info: not scanned
+X-KLMS-AntiPhishing: Clean, bases: 2023/09/12 07:28:00
+X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2023/09/12 03:38:00 #21880520
+X-KLMS-AntiVirus-Status: Clean, skipped
 
-On 12.09.23 00:57, Pablo Neira Ayuso wrote:
-> On Mon, Sep 11, 2023 at 11:37:50PM +0200, Timo Sigurdsson wrote:
->>
->> recently, Debian updated their stable kernel from 6.1.38 to 6.1.52
->> which broke nftables ruleset loading on one of my machines with lots
->> of "Operation not supported" errors. I've reported this to the
->> Debian project (see link below) and Salvatore Bonaccorso and I
->> identified "netfilter: nf_tables: disallow rule addition to bound
->> chain via NFTA_RULE_CHAIN_ID" (0ebc1064e487) as the offending commit
->> that introduced the regression. Salvatore also found that this issue
->> affects the 5.10 stable tree as well (observed in 5.10.191), but he
->> cannot reproduce it on 6.4.13 and 6.5.2.
->>
->> The issue only occurs with some rulesets. While I can't trigger it
->> with simple/minimal rulesets that I use on some machines, it does
->> occur with a more complex ruleset that has been in use for months
->> (if not years, for large parts of it). I'm attaching a somewhat
->> stripped down version of the ruleset from the machine I originally
->> observed this issue on. It's still not a small or simple ruleset,
->> but I'll try to reduce it further when I have more time.
->>
->> The error messages shown when trying to load the ruleset don't seem
->> to be helpful. Just two simple examples: Just to give two simple
->> examples from the log when nftables fails to start:
->> /etc/nftables.conf:99:4-44: Error: Could not process rule: Operation not supported
->>                         tcp option maxseg size 1-500 counter drop
->>                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
->> /etc/nftables.conf:308:4-27: Error: Could not process rule: Operation not supported
->>                         tcp dport sip-tls accept
->>                         ^^^^^^^^^^^^^^^^^^^^^^^^
-> 
-> I can reproduce this issue with 5.10.191 and 6.1.52 and nftables v1.0.6,
-> this is not reproducible with v1.0.7 and v1.0.8.
-> 
->> Since the issue only affects some stable trees, Salvatore thought it
->> might be an incomplete backport that causes this.
->>
->> If you need further information, please let me know.
-> 
-> Userspace nftables v1.0.6 generates incorrect bytecode that hits a new
-> kernel check that rejects adding rules to bound chains. The incorrect
-> bytecode adds the chain binding, attach it to the rule and it adds the
-> rules to the chain binding. I have cherry-picked these three patches
-> for nftables v1.0.6 userspace and your ruleset restores fine.
-> [...]
+The 'state->im' value will always be non-zero after
+the 'while' statement, so the check can be removed.
 
-Hmmmm. Well, this sounds like a kernel regression to me that normally
-should be dealt with on the kernel level, as users after updating the
-kernel should never have to update any userspace stuff to continue what
-they have been doing before the kernel update.
+Found by InfoTeCS on behalf of Linux Verification Center
+(linuxtesting.org) with SVACE.
 
-Can't the kernel somehow detect the incorrect bytecode and do the right
-thing(tm) somehow?
+Signed-off-by: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
+---
+Repost according to https://lore.kernel.org/all/fea6db56-3a01-b7c8-b800-a6c=
+885e99feb@kernel.org/
+ net/ipv4/igmp.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-But yes, don't worry, I know that reality is not black and white and
-that it's crucial that things like package filtering do exactly what the
-user expect it to do; that's why this might be one of those rare
-situations where "user has to update userspace components to support
-newer kernels" might be the better of two bad choices. But I had to ask
-to ensure it's something like that.
-
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-If I did something stupid, please tell me, as explained on that page.
+diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
+index 418e5fb58fd3..76c3ea75b8dd 100644
+--- a/net/ipv4/igmp.c
++++ b/net/ipv4/igmp.c
+@@ -2944,8 +2944,6 @@ static struct ip_sf_list *igmp_mcf_get_next(struct se=
+q_file *seq, struct ip_sf_l
+ 				continue;
+ 			state->im =3D rcu_dereference(state->idev->mc_list);
+ 		}
+-		if (!state->im)
+-			break;
+ 		spin_lock_bh(&state->im->lock);
+ 		psf =3D state->im->sources;
+ 	}
+--=20
+2.39.2
 
