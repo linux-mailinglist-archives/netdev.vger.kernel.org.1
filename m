@@ -1,114 +1,95 @@
-Return-Path: <netdev+bounces-33006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4801379C30B
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 04:36:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA4A379C381
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 05:00:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DA031C209EA
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 02:36:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2249F1C2095F
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 03:00:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3284B651;
-	Tue, 12 Sep 2023 02:36:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A066114ABE;
+	Tue, 12 Sep 2023 03:00:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6A3617EC
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 02:36:01 +0000 (UTC)
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1CF21DC06
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 19:36:00 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1c3bd829b86so12064045ad.0
-        for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 19:36:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694486160; x=1695090960; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ToE9qlc0hrK/B2lzmWsSf3qcFDaXUdrfslkv/aToLkY=;
-        b=MTndbKx7aFio6dUuBEtGhfOtVJCTZfAtobePmMd5HYCKsFrStw60y+3X49ZWw+wvxC
-         3pQXQR9SlZuDEEASU22IgEII/HKd7nExd/39IXhPXfQY3N/bRVnD5h2yzpMW25yCtT3k
-         6UIQSGaBCPhhWXIegVAQIKULPlJB97DFWnmgMD0AvaNGO3GuLjtyH37hI1TiZqRMbsPd
-         aj3OdrKAKmGi1fGVcytOxbze5NHCVvkeccVLE8WtSK/ZjCmvAyNQepW9AGSYKTRjouAj
-         Jy9Y/8EYbuSvXT7I0lwpY7HiVChFLgQuMfBc00HaFvzZGNR0NEqb8uoL5yTH5/dUANPV
-         8dYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694486160; x=1695090960;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ToE9qlc0hrK/B2lzmWsSf3qcFDaXUdrfslkv/aToLkY=;
-        b=JiDborfVZw8dl9hc1Q06AUW1H8Ao9k+j62EG7hQOKcviXyqSVIE219MhwkvTeuCEXX
-         ksn1Px3pZWRa/2HvHYtn+0T5cZluqkH38HsH60zhp7eSj4qgW3fYuCa5I35esNINY5NV
-         6EkcaXGIx0pGLomnjUEAJyWHdgKtcNIBvSrkg/vUAarRWAV1mEOJcJ1QPU/YWGbFTXwz
-         +NbXLtI5raBzHQlFtfFCwPhBZox1wrXF1euLvDvrWDpf5LNNMV3VB4dEqRlO4/KN2ppr
-         4xcC5Se8QlZOZjr6CtN8gvw4SJ5cZAo+v3rombxtiYXdrWDeGZtkwCaDQ42IZe9+99Ze
-         Angg==
-X-Gm-Message-State: AOJu0YzfBggZiItZIR783Pi1xJjMDoXqPfx8vqfzggGD91tt+09XWyZt
-	eKGJk3FPuDD8B3XAP8Jujes=
-X-Google-Smtp-Source: AGHT+IF0oh06pu5lH/V3ki0+rRjLoe/xTyTJPTUG9lfjMUR2ASwQbPRxbKaiUOenkCIbPsOyEBA45Q==
-X-Received: by 2002:a17:902:ecc4:b0:1c0:d8e8:38cd with SMTP id a4-20020a170902ecc400b001c0d8e838cdmr11667037plh.9.1694486160147;
-        Mon, 11 Sep 2023 19:36:00 -0700 (PDT)
-Received: from westworld (209-147-138-147.nat.asu.edu. [209.147.138.147])
-        by smtp.gmail.com with ESMTPSA id z4-20020a170902ee0400b001bf5e24b2a8sm7189421plb.174.2023.09.11.19.35.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Sep 2023 19:35:59 -0700 (PDT)
-Date: Mon, 11 Sep 2023 19:35:57 -0700
-From: Kyle Zeng <zengyhkyle@gmail.com>
-To: pabeni@redhat.com, dsahern@kernel.org
-Cc: vfedorenko@novek.ru, davem@davemloft.net, netdev@vger.kernel.org,
-	ssuryaextr@gmail.com
-Subject: [PATCH net] fix null-deref in ipv4_link_failure
-Message-ID: <ZP/OjT62OGVxwa3t@westworld>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 949EE5247
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 03:00:25 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id CE1162911B
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 20:00:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1694487624;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=hXx0uPfpQ2OseSGqC6KpCXLbCPjx1dHAmP+3Zup+enc=;
+	b=hGNb8Q9HV3bR2Ure65hm+YKjk2Z4TkPtrymyZzIVl11sa4dxghPrCmxrve+R5t3kTplOgT
+	ZcLjZuXVaisITNZL2voa6BvvWayw75KPhdfUr4RmsXsfDcEPe8xdR5d1UKVdHFW2pHlCBd
+	MeRF/VTS0tP44o0hhThhLUu3CgjSY1k=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-607-dX0xmJGyOVWLsQw3fKnJug-1; Mon, 11 Sep 2023 23:00:20 -0400
+X-MC-Unique: dX0xmJGyOVWLsQw3fKnJug-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 200C13C0D842;
+	Tue, 12 Sep 2023 03:00:20 +0000 (UTC)
+Received: from server.redhat.com (unknown [10.72.112.22])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 044E240C6EA8;
+	Tue, 12 Sep 2023 03:00:15 +0000 (UTC)
+From: Cindy Lu <lulu@redhat.com>
+To: lulu@redhat.com,
+	jasowang@redhat.com,
+	mst@redhat.com,
+	maxime.coquelin@redhat.com,
+	xieyongji@bytedance.com,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org
+Cc: stable@vger.kernel.org
+Subject: [RFC v2 0/4] Support reconnection in vduse
+Date: Tue, 12 Sep 2023 11:00:04 +0800
+Message-Id: <20230912030008.3599514-1-lulu@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 
-Currently, we assume the skb is associated with a device before calling
-__ip_options_compile, which is not always the case if it is re-routed by
-ipvs.
-When skb->dev is NULL, dev_net(skb->dev) will become null-dereference.
-This patch adds a check for the edge case and switch to use the net_device
-from the rtable when skb->dev is NULL.
+These patches add the reconnect support in vduse, The steps
+is map the pages from kernel to userspace, userspace    
+app will sync the reconnection status and vq_info in the pages
+Also, add the new IOCTL VDUSE_GET_RECONNECT_INFO
+userspace app will use this information to mmap the memory
 
-Fixes: ed0de45 ("ipv4: recompile ip options in ipv4_link_failure")
-Suggested-by: David Ahern <dsahern@kernel.org>
-Signed-off-by: Kyle Zeng <zengyhkyle@gmail.com>
-Cc: Stephen Suryaputra <ssuryaextr@gmail.com>
-Cc: Vadim Fedorenko <vfedorenko@novek.ru>
----
- net/ipv4/route.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Will send the patch for DPDK later
 
-diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-index d8c99bdc617..cba0d148c27 100644
---- a/net/ipv4/route.c
-+++ b/net/ipv4/route.c
-@@ -1213,6 +1213,7 @@ EXPORT_INDIRECT_CALLABLE(ipv4_dst_check);
+Tested in vduse + dpdk test-pmd
  
- static void ipv4_send_dest_unreach(struct sk_buff *skb)
- {
-+	struct net_device *dev;
- 	struct ip_options opt;
- 	int res;
- 
-@@ -1230,7 +1231,8 @@ static void ipv4_send_dest_unreach(struct sk_buff *skb)
- 		opt.optlen = ip_hdr(skb)->ihl * 4 - sizeof(struct iphdr);
- 
- 		rcu_read_lock();
--		res = __ip_options_compile(dev_net(skb->dev), &opt, skb, NULL);
-+		dev = skb->dev ? skb->dev : skb_rtable(skb)->dst.dev;
-+		res = __ip_options_compile(dev_net(dev), &opt, skb, NULL);
- 		rcu_read_unlock();
- 
- 		if (res)
+Signed-off-by: Cindy Lu <lulu@redhat.com>
+
+Cindy Lu (4):
+  vduse: Add function to get/free the pages for reconnection
+  vduse: Add file operation for mmap
+  vduse: update the vq_info in ioctl
+  vduse: Add new ioctl VDUSE_GET_RECONNECT_INFO
+
+ drivers/vdpa/vdpa_user/vduse_dev.c | 177 +++++++++++++++++++++++++++++
+ include/uapi/linux/vduse.h         |  21 ++++
+ 2 files changed, 198 insertions(+)
+
 -- 
-2.34.1
+2.34.3
 
 
