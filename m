@@ -1,59 +1,60 @@
-Return-Path: <netdev+bounces-33057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71E8879C99F
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 10:18:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B61AC79C9A1
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 10:18:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A7391C20AC4
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 08:18:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A1FD281A1B
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 08:18:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0C5A1773D;
-	Tue, 12 Sep 2023 08:17:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0CA01773E;
+	Tue, 12 Sep 2023 08:18:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1F62154A9
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 08:17:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6032E54B
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 08:18:31 +0000 (UTC)
 Received: from phobos.denx.de (phobos.denx.de [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4ECDE73;
-	Tue, 12 Sep 2023 01:17:58 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73814E73;
+	Tue, 12 Sep 2023 01:18:31 -0700 (PDT)
 Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
 	(No client certificate requested)
 	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 6C25486A49;
-	Tue, 12 Sep 2023 10:17:55 +0200 (CEST)
+	by phobos.denx.de (Postfix) with ESMTPSA id B5CCE86579;
+	Tue, 12 Sep 2023 10:18:29 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1694506676;
-	bh=DtoeluLm01NnQZKGYOEwCpPPjDcwpgfZ+EHpQIgHa3o=;
+	s=phobos-20191101; t=1694506710;
+	bh=9wb5FeWubky1oIAbeo9edOrsVfoQdXCFNWMwrsrUg9A=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=zitroCYos6925tU//kpUU62WzBI9L3cRs6GaHr8j/q4LpefEJIth0dmobbQtxY6yn
-	 VjAd3BTcJaxrM2RNV1dvA7Xz6lmIfMtHydErLVJ3baOIJGrooemB1+vvldEjv2S+y2
-	 GhBq6Kl61vNkuhSiGv8q88HspjusyW/maBE5KoCLQHYIHtjeSX4qVyT+yukdxIlsJd
-	 GhuEiYX86mt/82BTN81uMneHj+YD8sxfriccy14GT+OH5RhVtpYaFgMhSs76m0y/ma
-	 vHM4rfyLv4mxMc0OZiPfr1xKBguD1nhoVOrTisj94r590pRFUE7QqRCXaLuixw5+zf
-	 MCbuigDnNe7wg==
-Date: Tue, 12 Sep 2023 10:17:48 +0200
+	b=qSK5Uh7ssG23jMK4Y6G801yywaMGez2TrqRS7/BS1GC5ix5D1NbcMV8NTqsK7DQ6q
+	 HGPlby9zwJA3LZaQ+QO9xV0eOfIT4IzdfKFvmCVqckupTdROuYStjDNojGU6RpNj9U
+	 feLawE00B+m4TVMemyU8ujyr4oQLQ4VPlAHSuenulHdgxrwwqXxjTjTXIotI8mo7sX
+	 nw1r7BGTH3xdkKfRyhoFwydVZTv0ud2x4hAFoQ1rkCZvgBjxEGmEOlne1NcbOtgU6e
+	 sAjsjZMDtmptEW3XJIcAzZQl4PhQ9S5q8y/nJozvpAz5CDigT8Yy10cf9jX/Xx7ubd
+	 w/9cBeDDb2luw==
+Date: Tue, 12 Sep 2023 10:18:28 +0200
 From: Lukasz Majewski <lukma@denx.de>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Tristram.Ha@microchip.com, Eric Dumazet <edumazet@google.com>, Andrew
- Lunn <andrew@lunn.ch>, davem@davemloft.net, Woojung Huh
- <woojung.huh@microchip.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
- Florian Fainelli <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com, Oleksij
- Rempel <linux@rempel-privat.de>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [[RFC PATCH v4 net-next] 0/2] net: dsa: hsr: Enable HSR HW
- offloading for KSZ9477
-Message-ID: <20230912101748.0ca4eec8@wsk>
-In-Reply-To: <20230911160501.5vc4nttz6fnww56h@skbuf>
-References: <20230906152801.921664-1-lukma@denx.de>
-	<20230911165848.0741c03c@wsk>
-	<20230911160501.5vc4nttz6fnww56h@skbuf>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Tristram.Ha@microchip.com, Eric Dumazet <edumazet@google.com>,
+ davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Florian Fainelli
+ <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Kristian Overskeid <koverskeid@gmail.com>, Matthieu
+ Baerts <matthieu.baerts@tessares.net>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Andreas Oetken <ennoerlangen@gmail.com>
+Subject: Re: [PATCH] net: hsr : Provide fix for HSRv1 supervisor frames
+ decoding
+Message-ID: <20230912101828.06cb403d@wsk>
+In-Reply-To: <20230911150144.cG1ZHTCC@linutronix.de>
+References: <20230825153111.228768-1-lukma@denx.de>
+	<20230905080614.ImjTS6iw@linutronix.de>
+	<20230905115512.3ac6649c@wsk>
+	<20230911165708.0bc32e3c@wsk>
+	<20230911150144.cG1ZHTCC@linutronix.de>
 Organization: denx.de
 X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
@@ -62,69 +63,35 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/bwRV6NUh6F=O0WEHRBFibVB";
+Content-Type: multipart/signed; boundary="Sig_/w1cpGf5uIBTaYfp_sMHo70t";
  protocol="application/pgp-signature"; micalg=pgp-sha512
 X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
 X-Virus-Status: Clean
 
---Sig_/bwRV6NUh6F=O0WEHRBFibVB
-Content-Type: text/plain; charset=US-ASCII
+--Sig_/w1cpGf5uIBTaYfp_sMHo70t
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-Hi Vladimir,
+Hi Sebastian,
 
-> On Mon, Sep 11, 2023 at 04:58:48PM +0200, Lukasz Majewski wrote:
-> > Dear Community,
+> On 2023-09-11 16:57:08 [+0200], Lukasz Majewski wrote:
+> > Hi Sebastian, =20
+> Hi,
+>=20
 > >=20
-> > Are there any comments regarding this new revision of the HSR
-> > support for KSZ9477 switch?
-> >=20
-> > Best regards,
-> >=20
-> > Lukasz Majewski =20
+> > Have you had time to review this patch? =20
 >=20
-> Yeah, the integration with the DSA master's MAC address is not quite
-> what I was expecting to see.
+> got distracted a few times. I need a quiet moment=E2=80=A6 Will do this w=
+eek=E2=80=A6
 >=20
-> See, both the DSA master's MAC address, as well as the HSR device's
-> MAC address, can be changed at runtime with:
->=20
-> ip link set eth0 address AA:BB:CC:DD:EE:FF # DSA master
-> ip link set lan1 address AA:BB:CC:DD:EE:FF # indirectly changes the
-> HSR's address too
 
-IMHO, somebody who will use HSR will not fiddle with mac addresses of
-LAN1 and ETH0. It will be setup by savvy user once at boot up.
+Ok. No problem. Thanks for the information.
 
+> > Your comments are more than welcome. =20
 >=20
-> which is problematic because the hardware does not get updated in that
-> case, but the address change is not refused either.
->=20
-> Actually, the reason why I haven't yet said anything is because it
-> made me realize that there is a pre-existing bug in net/dsa/slave.c
-> where we have this pattern:
->=20
-> 	if (!ether_addr_equal(dev->dev_addr, master->dev_addr))
-> 		dev_uc_add(master, dev->dev_addr);
->=20
-> but there is no replay of the dev_uc_add() call when the
-> master->dev_addr changes. This really results in RX packet loss, as I
-> have tested. I don't know what is the best way to solve it.
->=20
-> Anyway, programming the MAC address of the DSA master or of the HSR
-> device to hardware seems to require tracking the NETDEV_CHANGEADDR and
-> NETDEV_PRE_CHANGEADDR events, even if only to reject those changes.
+> Sebastian
 
-Please correct me if I'm wrong, but the above issue (with lack of sync
-of mac address change in DSA master and its ports) seems to be
-affecting HSR support in a minimal way (when considering the above).
 
-If I may ask - what is your suggestion to have the HSR join feature
-merged for KSZ9477 SoC ?
-
-Will the above problem block the HSR offloading support mainlining,
-even when the self mac address filtering is one of four HW based
-features for this SoC?
 
 
 Best regards,
@@ -137,21 +104,21 @@ DENX Software Engineering GmbH,      Managing Director: Erika Unter
 HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
 Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
 
---Sig_/bwRV6NUh6F=O0WEHRBFibVB
+--Sig_/w1cpGf5uIBTaYfp_sMHo70t
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmUAHqwACgkQAR8vZIA0
-zr3IyQf/brMDtjdKMvUTCOs5kkNPIHCYms3dezF4itq3jM5N47duldHVXKhZ8o9V
-oDZrpOA+5SNQz41tHOdsUNEHF8Cw1GF1nGn68UYtvVJYQ8xXiiLhQb3qUOEoxCCi
-8RaPOx+a00JekyLPgp7i3tqsCakqx5SAWjqdwWkwJzvaLnGANLeRrmdne9PPUbcI
-UfiE3jA9PO5qib7p7E8DePY4hL3iHcbfvoF/Xs9IlcByAR2V8/lEn3vpZSMpqHyC
-M6a73XyAcIl8zv+jyPCZOXxMedyzEU2h2w0VoVeeX32EvXway9zpLxE/TDvTVdvE
-PQziSTtAdi2zhLu2cMH/2GVkA60EQg==
-=EbJK
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmUAHtQACgkQAR8vZIA0
+zr30XAgA3NOG4MD0rN/IH6TpqM+cORRax7QUIJr2dL93JsYwV+XoljCH9R2NXrOh
+HJ7XzNzaF5p6baUgpKs2qtocwYSrd4UPHUZlSYG8+uLCwSSeBZlRtCi6gHmBeFbH
+8XeOR5ZXME5y0KI6TX69IcvaqsH0WNWNa22r1XMeICV7dEvYf7cfLqCfoWqQ/FVh
+C8FEzBfahpmYu8PHI/ELoVQDHOAEQ9vA4wtzLc4qaf2E4MZ+IciOBavzjFjaK3Hk
+bFvPpGGiC3Xq1Ppovqm3URYZ8V3NKyHkVREkhX/1/742ZcHLRHRSKZdIKmEu1Dq7
+L8nLHuMIwSp6yw3Cr5qwdjcOYb/iAQ==
+=Zt4n
 -----END PGP SIGNATURE-----
 
---Sig_/bwRV6NUh6F=O0WEHRBFibVB--
+--Sig_/w1cpGf5uIBTaYfp_sMHo70t--
 
