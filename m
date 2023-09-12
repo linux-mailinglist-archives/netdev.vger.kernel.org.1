@@ -1,56 +1,66 @@
-Return-Path: <netdev+bounces-33320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF51B79D64E
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 18:29:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BF9F379D668
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 18:35:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8928C2816CD
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 16:29:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82868281DB0
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 16:35:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D84D19BBF;
-	Tue, 12 Sep 2023 16:29:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89FD4621;
+	Tue, 12 Sep 2023 16:35:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 917CD18C3F
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 16:29:46 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCC33137;
-	Tue, 12 Sep 2023 09:29:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=mtkXtIv3OUtKqJKyazqR9g5lFZj/7Eeun1nxUSl1J7Y=; b=iCv/aWLXL5VPfYV2B2qrnGPIYU
-	zYLjJvgBWf+losG8UneSRGCfycDkV6omw+JbZCsxZMhnIWVl7euKI6oKyZQb0hhAOmnYxk4TDDpvV
-	QpFasjd1rhRueVvv/EOwSVJOuAdDFqsuPyiininZK9zKDMyd2DAB92KbmPadKRI1N1sU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qg6Gi-006FSj-N1; Tue, 12 Sep 2023 18:29:40 +0200
-Date: Tue, 12 Sep 2023 18:29:40 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Oleksij Rempel <linux@rempel-privat.de>,
-	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
-	thomas.petazzoni@bootlin.com,
-	Christophe Leroy <christophe.leroy@csgroup.eu>
-Subject: Re: [RFC PATCH net-next 4/7] net: ethtool: add a netlink command to
- list PHYs
-Message-ID: <df90eb1f-fab1-408d-af8d-fc620f505522@lunn.ch>
-References: <20230907092407.647139-1-maxime.chevallier@bootlin.com>
- <20230907092407.647139-5-maxime.chevallier@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F23A38E;
+	Tue, 12 Sep 2023 16:35:49 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97E2ECF;
+	Tue, 12 Sep 2023 09:35:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694536548; x=1726072548;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=59Kay4eKd19BWWzORZ2XFuirPpkJIuD3bk1Rj8gXqp4=;
+  b=iqhAZDajut2U876U1gjkJfaTGVggzgwyq2N1jesK9KkZ/RCVsYFcXztD
+   xkuyzp/FKAb3pU8LGuhSYxQsOvpMyXD0xsQFwYd9rqREslO0tC8jRbojs
+   gxCJ7/F0+Hhm+gWGsPd4Uy8h+SzcxjfUfhOBgW8slwNzAcbiW/+SjEbHU
+   KIxtdVxq4/WPLHt37kJdR4tNeR3CpDdw1Dt5ldsePGKSj0CaEAHUqC846
+   9HRUBG1/djlhO9kwksWQ2BSWqBcxwwVaNYcjDSzzLIMBKxLLoXZmYZSiA
+   g9fbo0KtW3S6V88GMEcelxccmsDZ9UQ4iS+/LDA3TazsthgfEJsUfYaQQ
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="409381349"
+X-IronPort-AV: E=Sophos;i="6.02,139,1688454000"; 
+   d="scan'208";a="409381349"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2023 09:35:48 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="737175502"
+X-IronPort-AV: E=Sophos;i="6.02,139,1688454000"; 
+   d="scan'208";a="737175502"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orsmga007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2023 09:35:45 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.96)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1qg6MY-008dN3-32;
+	Tue, 12 Sep 2023 19:35:42 +0300
+Date: Tue, 12 Sep 2023 19:35:42 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v1 2/2] net: core: Sort headers alphabetically
+Message-ID: <ZQCTXkZcJLvzNL4F@smile.fi.intel.com>
+References: <20230911154534.4174265-1-andriy.shevchenko@linux.intel.com>
+ <20230911154534.4174265-2-andriy.shevchenko@linux.intel.com>
+ <20230912152031.GI401982@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,28 +69,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230907092407.647139-5-maxime.chevallier@bootlin.com>
+In-Reply-To: <20230912152031.GI401982@kernel.org>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-> +static int phy_list_fill_reply(struct sk_buff *skb,
-> +			       const struct ethnl_req_info *req_base,
-> +			       const struct ethnl_reply_data *reply_base)
-> +{
-> +	const struct phy_list_reply_data *data = PHY_LIST_REPDATA(reply_base);
-> +
-> +	if (nla_put_u8(skb, ETHTOOL_A_PHY_LIST_COUNT, data->n_phys))
-> +		return -EMSGSIZE;
-> +
-> +	if (!data->n_phys)
-> +		return 0;
-> +
-> +	if (nla_put(skb, ETHTOOL_A_PHY_LIST_INDEX, sizeof(u32) * data->n_phys,
-> +		    data->phy_indices))
-> +		return -EMSGSIZE;
-> +
+On Tue, Sep 12, 2023 at 05:20:31PM +0200, Simon Horman wrote:
+> On Mon, Sep 11, 2023 at 06:45:34PM +0300, Andy Shevchenko wrote:
+> > It's rather a gigantic list of heards that is very hard to follow.
+> > Sorting helps to see what's already included and what's not.
+> > It improves a maintainability in a long term.
+> > 
+> > Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> 
+> Hi Andy,
+> 
+> At the risk of bike shedding, the sort function of Vim, when operating
+> with the C locale, gives a slightly different order, as experssed by
+> this incremental diff.
+> 
+> I have no objections to your oder, but I'm slightly curious as
+> to how it came about.
 
-Can we add additional information here to allow mapping to what is
-under /sys ? A PHY has an struct device, so has a name. So maybe that
-can be included?
+!sort which is external command.
 
-	Andrew
+$ locale -k LC_COLLATE
+collate-nrules=4
+collate-rulesets=""
+collate-symb-hash-sizemb=1303
+collate-codeset="UTF-8"
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
 
