@@ -1,148 +1,80 @@
-Return-Path: <netdev+bounces-33263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32E9079D38B
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 16:27:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD24079D394
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 16:28:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB52C281E5E
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 14:27:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18EEC1C20EDF
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 14:28:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 673E318B00;
-	Tue, 12 Sep 2023 14:26:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B5B818B00;
+	Tue, 12 Sep 2023 14:28:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5545318AFA
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 14:26:50 +0000 (UTC)
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71B9010D;
-	Tue, 12 Sep 2023 07:26:49 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-52e828ad46bso7421731a12.1;
-        Tue, 12 Sep 2023 07:26:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694528808; x=1695133608; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OJt7Pz2jvPJwNkb0nu9cCOHLFYNPsGlJOODgla0ZsRs=;
-        b=GlJmwkigczfG5MzhWv1z8qkDY6l2txN3q7D+NmIoI7mOA+nzWYscYnVwzQ6kkEimmm
-         OW7zIK8wOUG8Q/NvCqdyjIK85LGgQCnjtgzIpMbRgrZmCPTutgurjRNkSSXoC4+yruwH
-         c2GJmrilba1ZEgcqmqvHOiQK3EglsmabYB5Br2r5KFVs58+SO5/1wHAR3wfRvnYNbuBb
-         VSlztwZ/WtTbKBx0gwCm9u8v8obdIVgIZcGMPirloDozv4sMm7mgkaHkgZSXp36MIGyx
-         7F6m+1gFCFVneAFU/KL2qdYzH9ZIfJIIZom7gymoFKGyg+VkQeFNDBRUrZeBMMspxpbr
-         AXhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694528808; x=1695133608;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OJt7Pz2jvPJwNkb0nu9cCOHLFYNPsGlJOODgla0ZsRs=;
-        b=kG4LTFWWBLRAXjeU1HNI8eqafWnzLOy9lkayHkr+nvcGoXB14ZDSAqeS/XE6Rn+T1n
-         whLjpM4Vbol/uZLf0w5eLNJR7WzHRsu1cXi85R1Kw3oXPY7c4y8IJztwwo/hqMgnJLor
-         askaj8R/wyleKR68yQAAMpXoYsGrwjb3PnIRwnFOmUegyuqpCLt2+OhSrncGed52elQe
-         XrRvjSz+OQiuvG0QmSI9Bh+WgA+50aDtUNwo02sGNd8E78SXK93LzKAMtmm+tk6W5ptJ
-         2/9GDKS0Qaln0Rf7jnOYLh89tDPxqD5kVeKxtwmsGbRAmJ6wYILsUfA4y+jGahNuX8rX
-         ZbGQ==
-X-Gm-Message-State: AOJu0Yxna1L+URQwYSmn/beiOKwDGxH/XEXCt2Rw8LeJnHl/sl+S1iOr
-	GIhCz8GHViIoHAC99pkDNS8rzEOM8EuseQ==
-X-Google-Smtp-Source: AGHT+IHXyRKf3KsQLEP2VBXb4dtzBc4dBytaEvS01woUgkTy3L4yCQjgIh+URLDSqkj5y29kH1cXpw==
-X-Received: by 2002:aa7:c308:0:b0:525:442b:6068 with SMTP id l8-20020aa7c308000000b00525442b6068mr10973126edq.13.1694528807651;
-        Tue, 12 Sep 2023 07:26:47 -0700 (PDT)
-Received: from skbuf ([188.25.254.186])
-        by smtp.gmail.com with ESMTPSA id z26-20020aa7cf9a000000b005232c051605sm5986761edx.19.2023.09.12.07.26.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Sep 2023 07:26:47 -0700 (PDT)
-Date: Tue, 12 Sep 2023 17:26:44 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Tristram.Ha@microchip.com, Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	UNGLinuxDriver@microchip.com,
-	Oleksij Rempel <linux@rempel-privat.de>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [[RFC PATCH v4 net-next] 0/2] net: dsa: hsr: Enable HSR HW
- offloading for KSZ9477
-Message-ID: <20230912142644.u4sdkveei3e5hwaf@skbuf>
-References: <20230911160501.5vc4nttz6fnww56h@skbuf>
- <20230912101748.0ca4eec8@wsk>
- <20230912092909.4yj4b2b4xrhzdztu@skbuf>
- <20230906152801.921664-1-lukma@denx.de>
- <20230911165848.0741c03c@wsk>
- <20230911160501.5vc4nttz6fnww56h@skbuf>
- <20230912101748.0ca4eec8@wsk>
- <20230912092909.4yj4b2b4xrhzdztu@skbuf>
- <20230912160326.188e1d13@wsk>
- <20230912160326.188e1d13@wsk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0F50182CE
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 14:28:51 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2F711CC3
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 07:28:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1694528930;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=oE11JWnC3jUouoGT5MuENSIwomX89P/A74rN4eXouQU=;
+	b=AqGdbi9kVf8fUX4E16DVaLWWCLe7st/KbFUYkchKGD2BEhSQ95cGd4H0ZFd5riDOQN5pY6
+	+uNubr+BYoX+A+eyLOpmTAWQMZyhSxVt+anU5Dkzw0WljdMFCSaGp5HjWFutTvGQP9oryu
+	v1MvOe/zSGgT2YLW9rpmgon6Zp4pUCQ=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-103-Hba1yqqxPFutbKHoWNXJKg-1; Tue, 12 Sep 2023 10:28:47 -0400
+X-MC-Unique: Hba1yqqxPFutbKHoWNXJKg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B7ABB29AB3E3;
+	Tue, 12 Sep 2023 14:28:46 +0000 (UTC)
+Received: from dmendes-thinkpadt14sgen2i.remote.csb (unknown [10.22.18.54])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id C10917B62;
+	Tue, 12 Sep 2023 14:28:44 +0000 (UTC)
+From: Daniel Mendes <dmendes@redhat.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	sd@queasysnail.net
+Subject: [PATCH net-next 0/2] kselftest: rtnetlink: add additional command line options
+Date: Tue, 12 Sep 2023 10:28:34 -0400
+Message-ID: <cover.1694527251.git.dmendes@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230912160326.188e1d13@wsk>
- <20230912160326.188e1d13@wsk>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 
-On Tue, Sep 12, 2023 at 04:03:26PM +0200, Lukasz Majewski wrote:
-> > In any case, as long as it's the DSA master's address that we program
-> > to hardware, then I see it as inevitable to add a new struct
-> > dsa_switch_ops :: master_addr_change() function
-> 
-> Please correct my understanding. The above change would affect the
-> whole DSA subsystem. It would require to have the core DSA modified and
-> would affect its operation?
+Many other tests implement options like verbose, pause, and pause
+on failure. These patches just add these options to rtnetlink.sh.
+The same conventions are used as the tests that already have this
+functionality: eg verbose is 0 or 1 but PAUSE is "yes" or "no".
 
-Uhm, yes, that would be the idea. If we were going to track changes to
-the DSA master's MAC address, we should do it from the DSA framework
-which has the existing netdev notifier listener infrastructure in place.
+Daniel Mendes (2):
+  kselftest: rtnetlink.sh: add verbose flag
+  kselftest: rtnetlink: add pause and pause on fail flag
 
-> > Or you can argue that dragging the DSA master into the discussion
-> > about how we should program REG_SW_MAC_ADDR_0 is a complication.
-> 
-> Yes, it is IMHO the complication.
+ tools/testing/selftests/net/rtnetlink.sh | 981 +++++++++--------------
+ 1 file changed, 400 insertions(+), 581 deletions(-)
 
-Ok, it's a point of view.
+-- 
+2.41.0
 
-> git grep -n "REG_SW_MAC_ADDR_0"
-> drivers/net/dsa/microchip/ksz8795_reg.h:326:#define REG_SW_MAC_ADDR_0
->         0x68 
-> drivers/net/dsa/microchip/ksz9477.c:1194:
->      ksz_write8(dev, REG_SW_MAC_ADDR_0 + i,
-> 
-> drivers/net/dsa/microchip/ksz9477_reg.h:169:#define REG_SW_MAC_ADDR_0
-> 0x0302
-> 
-> In the current net-next the REG_SW_MAC_ADDR_0 is altered used (the only
-> usage are now with mine patches on ksz9477).
-> 
-> To sum up:
-> 
-> 1. Up till now in (net-next) REG_SW_MAC_ADDR_0 is ONLY declared for
-> Microchip switches. No risk for access - other than HSR patches.
-
-I know (except for Oleksij's WoL patches, which will eventually be
-resubmitted).
-
-> 2. The MAC address alteration of DSA master and propagation to slaves
-> is a generic DSA bug.
-
-Which can be/will be fixed. The diff I've included in the question to
-Jakub closes it, in fact.
-
-> Considering the above - the HSR implementation is safe (to the extend
-> to the whole DSA subsystem current operation). Am I correct?
-
-If we exclude the aforementioned bug (which won't be a bug forever),
-there still exists the case where the MAC address of a DSA user port can
-be changed. The HSR driver has a NETDEV_CHANGEADDR handler for this as
-well, and updates its own MAC address to follow the port. If that is
-allowed to happen after the offload, currently it will break the offload.
 
