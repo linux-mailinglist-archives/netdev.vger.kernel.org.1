@@ -1,124 +1,138 @@
-Return-Path: <netdev+bounces-33333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAEBA79D6F7
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 18:59:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C499E79D6FE
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 19:01:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 058161C20B7B
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 16:59:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 991FE1C20C98
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 17:01:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5787E2106;
-	Tue, 12 Sep 2023 16:59:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B6323D81;
+	Tue, 12 Sep 2023 17:01:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4948D1FD8
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 16:59:01 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9AE11110
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 09:59:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1694537939;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E3821C04
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 17:01:34 +0000 (UTC)
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98D66E7A;
+	Tue, 12 Sep 2023 10:01:33 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 8FE2CFF803;
+	Tue, 12 Sep 2023 17:01:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1694538092;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Z+IKhwmAIhUtNi97G0S5r7PUpBk17j0WklS2XFNmBD8=;
-	b=FXVVDiJEus3zKYLQAWmtC2iDG/laSyC9l0dyJrgRDsVp2HWlMsnMbeAugr6P2mHl2CjDGi
-	Ql8qegQkVnYI6vJkhro43FrdQFCb2svSJu4+KjyLsa+io2LyBTguq+hYMneguEXAmFzKEP
-	y4tX2JjuGSi5bvwJZ28e9TunnjT1oqs=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-543-cXGgzhCgNdmgSAKqH2ClDw-1; Tue, 12 Sep 2023 12:58:58 -0400
-X-MC-Unique: cXGgzhCgNdmgSAKqH2ClDw-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2be48142a6cso13521951fa.1
-        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 09:58:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694537936; x=1695142736;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Z+IKhwmAIhUtNi97G0S5r7PUpBk17j0WklS2XFNmBD8=;
-        b=bJh2JNsY21qgM35/Crq6eilmgUuggVZnh89k7zFtNHkOCJaCDo0V0anQ9J6N6P86Iv
-         +v+Q8MYBZfjzTZKbLkPf4B8Y7J8AxFKoEisqOLxO+x8JcI8t9WUfxygNsQ+6R57pVAW6
-         jGC/oEbirL2eP97HV/oPAtDxuwoPn7j6BOflrJx1C1e+gyuOZn+7Cxn0y3KG3GzIhceT
-         cJ8evAlsWjGzFmNS8wIC80IwYWvc9zYnzc3HC+U8l6fy/S55bJzjQuce9Ug/U9AwkctH
-         39L6Ubf24qIztq5WvGNxeTA3ff5NrCApfQJ1RmtFG9Rg5n0WzzFXplIw14SvWTovQ3XN
-         6fdQ==
-X-Gm-Message-State: AOJu0YwYErYFVwjkviF424maqaQc0KpZMsmAfQS0x9k7KJYs3Z84BcU3
-	N7zCiB4u2rhoLoCgjHRwQ224NZhCJu9nG6fBmF+nOl3XkWLed37YWeLvWVyaHYpC0rlHE39nmZC
-	Ji0v38Xwt+pZJTdVd
-X-Received: by 2002:a2e:bc04:0:b0:2be:5485:4a99 with SMTP id b4-20020a2ebc04000000b002be54854a99mr280865ljf.4.1694537936623;
-        Tue, 12 Sep 2023 09:58:56 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH2ODfgfk8c9yOTXUFnewhlGWBMLjAGhiBh3CrBAiA8jQJx0YApRUQ4HJXAfOQFdRAjdnu+2A==
-X-Received: by 2002:a2e:bc04:0:b0:2be:5485:4a99 with SMTP id b4-20020a2ebc04000000b002be54854a99mr280852ljf.4.1694537936283;
-        Tue, 12 Sep 2023 09:58:56 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-249-231.dyn.eolo.it. [146.241.249.231])
-        by smtp.gmail.com with ESMTPSA id mb18-20020a170906eb1200b00997cce73cc7sm7100561ejb.29.2023.09.12.09.58.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Sep 2023 09:58:55 -0700 (PDT)
-Message-ID: <1d9d20d9e41b351114f4e09f2d394c4fa8f03403.camel@redhat.com>
-Subject: Re: [PATCH net-next 3/4] net: call prot->release_cb() when
- processing backlog
-From: Paolo Abeni <pabeni@redhat.com>
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>,  Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Soheil Hassas Yeganeh <soheil@google.com>, Neal
- Cardwell <ncardwell@google.com>, Yuchung Cheng <ycheng@google.com>,
- eric.dumazet@gmail.com
-Date: Tue, 12 Sep 2023 18:58:54 +0200
-In-Reply-To: <20230911170531.828100-4-edumazet@google.com>
-References: <20230911170531.828100-1-edumazet@google.com>
-	 <20230911170531.828100-4-edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	bh=BF1WfBhKL7Vq9HadTvieISmVBsPssfXTIlitcyfw/NQ=;
+	b=cH/VlLUYcZQzyis5KcQzKebZIwSJ3RFbWxrIGXzhAf1p50rImqpdHbmZyToYHvuCDNV7Lx
+	pFrqR/XmpuooYKBCo5qKe4HYrEfbJXSNsoyBM+EdHROf9yagdnBXd0LJqVjWI8LM0rVMHA
+	BvZ4gFQqMiT/KuChrLK+RKtka8BH+hkiv8nOnDcfXSSlnI100ku2eqiJ4YN1ZsB/Wp3Fnu
+	4YEZ8hkeO+72y2qf/3aY57uevBHgA43zZOhs6a8+bk43Hek5y+ZYDwmXnHDWYwghBUT5N7
+	UxMUEF8Q/Pn/wsHp+6gK/pBQ8fhjXTJ/1Xpf77ZRBHG6HoXRdy9Ipses2OaA+w==
+Date: Tue, 12 Sep 2023 19:01:29 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Florian
+ Fainelli <f.fainelli@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Vladimir Oltean
+ <vladimir.oltean@nxp.com>, Oleksij Rempel <linux@rempel-privat.de>,
+ =?UTF-8?B?Tmljb2zDsg==?= Veronese <nicveronese@gmail.com>,
+ thomas.petazzoni@bootlin.com, Christophe Leroy
+ <christophe.leroy@csgroup.eu>
+Subject: Re: [RFC PATCH net-next 1/7] net: phy: introduce phy numbering and
+ phy namespaces
+Message-ID: <20230912190129.21e65690@fedora>
+In-Reply-To: <63bd3a9c-dacd-47e3-a34c-6e2e6a304d6c@lunn.ch>
+References: <20230907092407.647139-1-maxime.chevallier@bootlin.com>
+	<20230907092407.647139-2-maxime.chevallier@bootlin.com>
+	<63bd3a9c-dacd-47e3-a34c-6e2e6a304d6c@lunn.ch>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Mon, 2023-09-11 at 17:05 +0000, Eric Dumazet wrote:
-> __sk_flush_backlog() / sk_flush_backlog() are used
-> when TCP recvmsg()/sendmsg() process large chunks,
-> to not let packets in the backlog too long.
->=20
-> It makes sense to call tcp_release_cb() to also
-> process actions held in sk->sk_tsq_flags for smoother
-> scheduling.
->=20
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
->  net/core/sock.c | 3 +++
->  1 file changed, 3 insertions(+)
->=20
-> diff --git a/net/core/sock.c b/net/core/sock.c
-> index 21610e3845a5042f7c648ccb3e0d90126df20a0b..bb89b88bc1e8a042c4ee40b3c=
-8345dc58cb1b369 100644
-> --- a/net/core/sock.c
-> +++ b/net/core/sock.c
-> @@ -3001,6 +3001,9 @@ void __sk_flush_backlog(struct sock *sk)
->  {
->  	spin_lock_bh(&sk->sk_lock.slock);
->  	__release_sock(sk);
-> +
-> +	if (sk->sk_prot->release_cb)
-> +		sk->sk_prot->release_cb(sk);
+Hello Andrew,
 
-Out of sheer curiosity, I'm wondering if adding an
-indirect_call_wrapper here could make any difference?
+On Tue, 12 Sep 2023 18:15:52 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-I guess not much, and in any case it could be a follow-up.
+> On Thu, Sep 07, 2023 at 11:23:59AM +0200, Maxime Chevallier wrote:
+> > Link topologies containing multiple network PHYs attached to the same
+> > net_device can be found when using a PHY as a media converter for use
+> > with an SFP connector, on which an SFP transceiver containing a PHY can
+> > be used.
+> > 
+> > With the current model, the transceiver's PHY can't be used for
+> > operations such as cable testing, timestamping, macsec offload, etc.
+> > 
+> > The reason being that most of the logic for these configuration, coming
+> > from either ethtool netlink or ioctls tend to use netdev->phydev, which
+> > in multi-phy systems will reference the PHY closest to the MAC.
+> > 
+> > Introduce a numbering scheme allowing to enumerate PHY devices that
+> > belong to any netdev, which can in turn allow userspace to take more
+> > precise decisions with regard to each PHY's configuration.  
+> 
+> I think we need more than a number. Topology needs to be a core
+> concept here, otherwise how is the user supposed to know which PHY to
+> use cable test on, etc.
+> 
+> However, it is not a simple problem. An SFP PHY should be the last in
+> a chain. So you can infer something from that. When we start adding
+> MII muxes, they will need to be part of the modal.
 
-Cheers,
+You raise a good point, we need to set a cursor on the level of detail
+we want to have to describe the topology indeed.
 
-Paolo
+I do have a patch that adds a notion of topology by keeping track of
+the upstream device of each link component (either the ethernet
+controller, another PHY, a mux, and SFP cage), but I got carried away
+trying to find the correct granularity.
+
+For example, say we have a PCS with a dedicated driver in the chain,
+should it be part of the topology ? or do we stick to MAC, PHY, MUX,
+SFP ?
+
+To address the topology and more specifically cable-testing, I relied
+on adding support for a phy_port, that would represent front-facing
+ports, each PHY would have zero, one or more phy_ports, and from
+userspace perspective, we would let user pick which port to use, then
+have kernel-side logic to either deal with PHYs that have 2 ports, or
+an actual mii mux with two single-port PHYs.
+
+All in all for cable-testing, this solves the problem, as we could
+include a way for users to know which PHY is attached to a port, and
+therefore users could know which PHY is the outermost one.
+
+However, it's not sufficient for things like timestamping. I think you
+mentionned in another thread that there can be up to 7 devices that
+could do the timestamping, and here it could be interesting to know
+which is where, so that user can for example pick a PHY that has a
+precise timestamping unit but that is also close-enough to the physical
+port.
+
+In that case, I will include what I have for topology description in
+the next RFC.
+
+Thanks for the insightful feedback,
+
+Maxime
+
+>     Andrew
 
 
