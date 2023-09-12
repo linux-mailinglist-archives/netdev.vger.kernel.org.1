@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-33025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F86679C588
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 06:55:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6073879C59C
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 06:55:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 125DD1C2098A
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 04:55:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2431C281622
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 04:55:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C2CF15484;
-	Tue, 12 Sep 2023 04:55:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B5F7168D0;
+	Tue, 12 Sep 2023 04:55:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DC7920E7
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 04:55:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F8EF168CF
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 04:55:27 +0000 (UTC)
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B00DD5FFD
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 21:55:25 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CFC56188
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 21:55:26 -0700 (PDT)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ore@pengutronix.de>)
-	id 1qfvQV-00040l-B9; Tue, 12 Sep 2023 06:55:03 +0200
+	id 1qfvQV-00040k-BA; Tue, 12 Sep 2023 06:55:03 +0200
 Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
 	(envelope-from <ore@pengutronix.de>)
-	id 1qfvQT-005hVm-JP; Tue, 12 Sep 2023 06:55:01 +0200
+	id 1qfvQT-005hVo-JV; Tue, 12 Sep 2023 06:55:01 +0200
 Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1qfvQS-007owG-2z;
+	id 1qfvQS-007owQ-34;
 	Tue, 12 Sep 2023 06:55:00 +0200
 From: Oleksij Rempel <o.rempel@pengutronix.de>
 To: "David S. Miller" <davem@davemloft.net>,
@@ -48,16 +48,19 @@ To: "David S. Miller" <davem@davemloft.net>,
 	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
 	Rob Herring <robh+dt@kernel.org>
 Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	Rob Herring <robh@kernel.org>,
 	kernel@pengutronix.de,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	UNGLinuxDriver@microchip.com,
 	"Russell King (Oracle)" <linux@armlinux.org.uk>,
 	devicetree@vger.kernel.org
-Subject: [PATCH net-next v4 0/2] net: dsa: microchip: add drive strength support 
-Date: Tue, 12 Sep 2023 06:54:57 +0200
-Message-Id: <20230912045459.1864085-1-o.rempel@pengutronix.de>
+Subject: [PATCH net-next v4 1/2] dt-bindings: net: dsa: microchip: Update ksz device tree bindings for drive strength
+Date: Tue, 12 Sep 2023 06:54:58 +0200
+Message-Id: <20230912045459.1864085-2-o.rempel@pengutronix.de>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230912045459.1864085-1-o.rempel@pengutronix.de>
+References: <20230912045459.1864085-1-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,36 +73,52 @@ X-SA-Exim-Mail-From: ore@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-changes v4:
-- integrate microchip feedback to the ksz9477_drive_strengths comment.
-- add Reviewed-by: Rob Herring <robh@kernel.org>
+Extend device tree bindings to support drive strength configuration for the
+ksz* switches. Introduced properties:
+- microchip,hi-drive-strength-microamp: Controls the drive strength for
+  high-speed interfaces like GMII/RGMII and more.
+- microchip,lo-drive-strength-microamp: Governs the drive strength for
+  low-speed interfaces such as LEDs, PME_N, and others.
+- microchip,io-drive-strength-microamp: Controls the drive strength for
+  for undocumented Pads on KSZ88xx variants.
 
-changes v3:
-- yaml: use enum instead of min/max
-- do not use snprintf() on overlapping buffer.
-- unify ksz_drive_strength_to_reg() and ksz_drive_strength_error(). Make
-  it usable for KSZ9477 and KSZ8830 variants.
-- use ksz_rmw8() in ksz9477_drive_strength_write()
+Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Reviewed-by: Rob Herring <robh@kernel.org>
+---
+ .../bindings/net/dsa/microchip,ksz.yaml       | 20 +++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-changes v2:
-- make it work on all know KSZ* variants except of undocumented LAN*
-  switches
-- add io-drive-strength compatible for ksz88xx chips
-- test exact drive strength instead of nearest closest.
-- add comment and refactor the code
-
-Oleksij Rempel (2):
-  dt-bindings: net: dsa: microchip: Update ksz device tree bindings for
-    drive strength
-  net: dsa: microchip: Add drive strength configuration
-
- .../bindings/net/dsa/microchip,ksz.yaml       |  20 ++
- drivers/net/dsa/microchip/ksz8795_reg.h       |  14 -
- drivers/net/dsa/microchip/ksz9477_reg.h       |  13 -
- drivers/net/dsa/microchip/ksz_common.c        | 309 ++++++++++++++++++
- drivers/net/dsa/microchip/ksz_common.h        |  20 ++
- 5 files changed, 349 insertions(+), 27 deletions(-)
-
+diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+index 03b5567be3897..41014f5c01c42 100644
+--- a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+@@ -49,6 +49,26 @@ properties:
+       Set if the output SYNCLKO clock should be disabled. Do not mix with
+       microchip,synclko-125.
+ 
++  microchip,io-drive-strength-microamp:
++    description:
++      IO Pad Drive Strength
++    enum: [8000, 16000]
++    default: 16000
++
++  microchip,hi-drive-strength-microamp:
++    description:
++      High Speed Drive Strength. Controls drive strength of GMII / RGMII /
++      MII / RMII (except TX_CLK/REFCLKI, COL and CRS) and CLKO_25_125 lines.
++    enum: [2000, 4000, 8000, 12000, 16000, 20000, 24000, 28000]
++    default: 24000
++
++  microchip,lo-drive-strength-microamp:
++    description:
++      Low Speed Drive Strength. Controls drive strength of TX_CLK / REFCLKI,
++      COL, CRS, LEDs, PME_N, NTRP_N, SDO and SDI/SDA/MDIO lines.
++    enum: [2000, 4000, 8000, 12000, 16000, 20000, 24000, 28000]
++    default: 8000
++
+   interrupts:
+     maxItems: 1
+ 
 -- 
 2.39.2
 
