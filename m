@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-33381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4F4C79DA4A
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 22:53:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3E5279DA4D
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 22:54:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39CD1281799
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 20:53:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7D651C20BFD
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 20:54:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74267AD4F;
-	Tue, 12 Sep 2023 20:53:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE381B64C;
+	Tue, 12 Sep 2023 20:54:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0E5A959
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 20:53:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E359470
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 20:54:25 +0000 (UTC)
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id B45DF199
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 13:53:52 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id A14BE199
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 13:54:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1694552031;
+	s=mimecast20190719; t=1694552063;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=h7gqxsWGxYdMmHjhvfD7Qqc8EetmHcPGV2O7WRpaBLQ=;
-	b=LnBDizzfL++gZ96TAcmaG2Mb1uWsdecdatM4J3/1Q2bWFpxkDyIH/bgpzwJCQ2PJseYPLP
-	W1apgB7K3iljEcpTCtPALdOEwV4V7p/DLiSahuSRR67eumrNeNF3es7P+nDv3w4u8J/1nB
-	s2jAahtnsLBrFyXXE8iKb8+xVOoa8HY=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=ijWxXQrMbFDRYhu2hkP5ViJPf81XjON2E0T1RctinI0=;
+	b=CM02FocD+cj6WPX2nTeL0EINIg3MMMFi7ImOSmL7FgAe05sYIkzZ4VQIz0HRGu2LL0hmBm
+	HC/5zsnlFvzs79+XJgoGDiTnAeKM9ocNoF6fdCNO67uIghi4TnCsdZLrfRnOUeRFPSsoDF
+	xRZelhG1ui1ylOUzHZ2xENDi0p2jBmE=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-163-dr-DxHYvPX2ZMxI2jC0Iug-1; Tue, 12 Sep 2023 16:53:50 -0400
-X-MC-Unique: dr-DxHYvPX2ZMxI2jC0Iug-1
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-52c6f3886e3so4175145a12.1
-        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 13:53:49 -0700 (PDT)
+ us-mta-449-mOqN_m-AMneK7l7p9Qf-dQ-1; Tue, 12 Sep 2023 16:54:21 -0400
+X-MC-Unique: mOqN_m-AMneK7l7p9Qf-dQ-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-9a9e3f703dfso375424166b.1
+        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 13:54:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694552028; x=1695156828;
+        d=1e100.net; s=20230601; t=1694552060; x=1695156860;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=h7gqxsWGxYdMmHjhvfD7Qqc8EetmHcPGV2O7WRpaBLQ=;
-        b=rR9/rhZ8mmSp16hFPHInK+lalYpdDYr7kQE/3AsrJzw6g4Jpme3VnxoTDT5oBbYEoD
-         bc1SWhT0k4dmBIWK8V4Y/SDQE9C3Bm9GnsMCCuqANa6AwCw0g/EtV9NJzfvuSYogUF57
-         eBXcaaI5Xu+740wKbkecRBM5fbB43IWbIqql0p9NuHi+S/8NqCcDoECg0Vc7GYCLG/wH
-         lh0GGB5Bqz8/elk2X3D0f58Jt887kUtz37Zj9CX2YrHd9sNCC1GAblNjTPAhprK5pcfV
-         xHedLtM9raoh8IuHsMouHSTfQRT3xK8KjaHWPjdhzlOvuheRHBn5DsHxdae1Oi9zZdPh
-         UegA==
-X-Gm-Message-State: AOJu0YwZO/YqqqdFymwr1O2Kh3vD753Q4mpm0grfJudNcOv9a6ahJUPp
-	0eC/l6yDZ6R/D3kQ9RyfPTigB5JxER5gJ289O4zp34lGs3JyU8oq4bBUE7LOIkSh1mAVLuH/aA4
-	nLjWng2laHXxKyxybA2TeXC85
-X-Received: by 2002:a05:6402:6d0:b0:521:a4bb:374f with SMTP id n16-20020a05640206d000b00521a4bb374fmr725829edy.5.1694552028477;
-        Tue, 12 Sep 2023 13:53:48 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGc2BLxKU/ksq/+8WwZzj4E5STO0xOwYElcI4SSFgQhPbX048/Lcnncc+nW3pYUPefRnpegTA==
-X-Received: by 2002:a05:6402:6d0:b0:521:a4bb:374f with SMTP id n16-20020a05640206d000b00521a4bb374fmr725815edy.5.1694552028183;
-        Tue, 12 Sep 2023 13:53:48 -0700 (PDT)
+        bh=ijWxXQrMbFDRYhu2hkP5ViJPf81XjON2E0T1RctinI0=;
+        b=HOqACCJsbhBKjZYEWnjjoF8Z61mKkNMcaExFTNNdBUk2gAR7RBm5+i518fUKEClOFX
+         jJVCUrKZHmaptY8GStK5jY18GcgEosOlkFxaXm3I81YXvRI6/421Tn6zUCzTG3pMuC01
+         APY4SbOa372FTmZCkOu5gERbiVYnZ9ONlY4AZONTHFO7TJXoYsXxCR+FTTpNt+02IQ34
+         YEOR4EbHN1U9nSMEcUsqztOynChwCQDD/FHxb486jcuOjIWCFU+UFqMk/p+R5QtLfz53
+         pvWFKUhiKIbzOMXfyAv3xO2U2LAQ7MBma7YKYVCYfcS1pUijQnqPAK+V829WKw9SwTWt
+         HcKg==
+X-Gm-Message-State: AOJu0YzEJE8m/V2A/I7JvY/qTJWsbSdgfW2y/Zlcl8CBzjViBxDCh9g0
+	djKGf2CKuQH9zSsYlKtEu3P4g+6fNuNz5BxqJWTtqIKG7HoAdRme5Sxc0CGfMY2c1EkeVgDp+qv
+	mz7645fcd+G939co+
+X-Received: by 2002:a17:907:762d:b0:9a1:edfd:73b2 with SMTP id jy13-20020a170907762d00b009a1edfd73b2mr333968ejc.2.1694552060374;
+        Tue, 12 Sep 2023 13:54:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEnYBJkuLhJzI88PFNoikAiC6EDSv3wLMLb4ZDAGoRXLAyQXdTnHGROIdoQ7FcDxEiAcFo9rQ==
+X-Received: by 2002:a17:907:762d:b0:9a1:edfd:73b2 with SMTP id jy13-20020a170907762d00b009a1edfd73b2mr333957ejc.2.1694552060112;
+        Tue, 12 Sep 2023 13:54:20 -0700 (PDT)
 Received: from redhat.com ([2.52.10.100])
-        by smtp.gmail.com with ESMTPSA id bc3-20020a056402204300b0052348d74865sm6224540edb.61.2023.09.12.13.53.45
+        by smtp.gmail.com with ESMTPSA id h10-20020a1709063b4a00b009737b8d47b6sm7203807ejf.203.2023.09.12.13.54.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Sep 2023 13:53:47 -0700 (PDT)
-Date: Tue, 12 Sep 2023 16:53:43 -0400
+        Tue, 12 Sep 2023 13:54:19 -0700 (PDT)
+Date: Tue, 12 Sep 2023 16:54:15 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: Shannon Nelson <shannon.nelson@amd.com>
 Cc: kuba@kernel.org, davem@davemloft.net, jasowang@redhat.com,
@@ -70,7 +70,7 @@ Cc: kuba@kernel.org, davem@davemloft.net, jasowang@redhat.com,
 	netdev@vger.kernel.org, simon.horman@corigine.com,
 	eperezma@redhat.com, drivers@pensando.io
 Subject: Re: [PATCH net-next] virtio: kdoc for struct virtio_pci_modern_device
-Message-ID: <20230912165335-mutt-send-email-mst@kernel.org>
+Message-ID: <20230912165357-mutt-send-email-mst@kernel.org>
 References: <20230911213104.14391-1-shannon.nelson@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -92,7 +92,8 @@ On Mon, Sep 11, 2023 at 02:31:04PM -0700, Shannon Nelson wrote:
 > Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
 > Acked-by: Eugenio Pérez <eperezma@redhat.com>
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+not sure why this is net material though.
+I think I will take it in virtio tree.
 
 > ---
 >  include/linux/virtio_pci_modern.h | 34 ++++++++++++++++++++-----------
