@@ -1,263 +1,401 @@
-Return-Path: <netdev+bounces-33153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 758ED79CD73
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 12:11:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE37D79CD7F
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 12:12:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2C7D281C96
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 10:11:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E12F11C20ABC
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 10:12:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C5EB168D2;
-	Tue, 12 Sep 2023 10:11:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDC6B171C6;
+	Tue, 12 Sep 2023 10:12:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BA91BE50
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 10:11:23 +0000 (UTC)
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::221])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13BF4CC3;
-	Tue, 12 Sep 2023 03:11:21 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPA id 9D2C0240005;
-	Tue, 12 Sep 2023 10:11:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1694513480;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ACSV41BkWA0fKq39dfPL/AXLiyPkmOTVZUoZxLiKbNE=;
-	b=D1fDjwJZMdQdGNA8G4BVbhsPJQe4l/v5j+KpwP0xsaI78wDAKsWrofUwPLGYYhhu/ml9bt
-	twuqw8T2Ca/eGjLX1nhWl05/++8WCM3DqOqCeQmH8Gc2IwaFLc+iWeRBqWvEVP9wM4e4PU
-	QdYBcnTBhWzVfwjnzn/RnV+pSOE0vVtE1rRyx8bxCs5dq6H4+zaFwpecd+Vbr0ObYj5r1K
-	70nJhxUtv7Apj1rDhModARUSs1Qo988kvftjcIkvSTL9WHv1/DZa8wxyvgAnNQ/pbq9rrF
-	Sdio+O2C7gBexMxwzzPr5TLaygBoo42dI9o+Fe/m5Y69kdNEZGRChlpKdKHalA==
-From: Herve Codina <herve.codina@bootlin.com>
-To: Herve Codina <herve.codina@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Lee Jones <lee@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Qiang Zhao <qiang.zhao@nxp.com>,
-	Li Yang <leoyang.li@nxp.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>,
-	Shengjiu Wang <shengjiu.wang@gmail.com>,
-	Xiubo Li <Xiubo.Lee@gmail.com>,
-	Fabio Estevam <festevam@gmail.com>,
-	Nicolin Chen <nicoleotsuka@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Randy Dunlap <rdunlap@infradead.org>
-Cc: netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	alsa-devel@alsa-project.org,
-	Simon Horman <horms@kernel.org>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: [PATCH v5 09/31] soc: fsl: cpm1: qmc: Add support for child devices
-Date: Tue, 12 Sep 2023 12:11:16 +0200
-Message-ID: <20230912101116.225301-1-herve.codina@bootlin.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230912081527.208499-1-herve.codina@bootlin.com>
-References: <20230912081527.208499-1-herve.codina@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF622168A4
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 10:12:05 +0000 (UTC)
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 906B210E6;
+	Tue, 12 Sep 2023 03:12:04 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-502b1bbe5c3so4054399e87.1;
+        Tue, 12 Sep 2023 03:12:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694513523; x=1695118323; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=iwR4S+bOEUasIfylPWTpEe9JF1kQkAvfhzdUk7480GQ=;
+        b=F5OIB4B4hL8Yq+WwIHqDB4xxPLnXN20rJGwu+3ac8JvdV/2roDzNLxRMQWRGbiyfeB
+         /KSa2PsSh6+GgpIeH6yp4RlR+fZy+Amu6LWomBjJZnjGtUxJNOSIr4acgHhnrpczNm5C
+         xKgkA9XVFJonjmyY1OVz56F5lDG/C3mQR4Uw8M4tATkKTjH1aIzzsbAkRNH543KskYFb
+         uiXBd7V1z03V7pjzu58ZxL4G3oZGxqsWmi262O+wN3ndqiP6/TiK7rH4RMzlZ9RqMdrl
+         JhY6/Q2mqiT3N5AwGmcTp8DWArkGEbqjdNwZf6JZfHL5Fo+2B4TIQwGo0QmvU1Vgjo28
+         ntBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694513523; x=1695118323;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iwR4S+bOEUasIfylPWTpEe9JF1kQkAvfhzdUk7480GQ=;
+        b=K+YaY/PMe/h2cMabtEs9TFCgkGM+6NNdu78ZH0WTFPsjqPtEtQ0fHTOIRiGOU8Lx2I
+         dMd46E7i4MNeL61Hg86gSSvDEkOfxn+rRi4CIaiOUtYEbn/8d/Fh8scRUgzMdrfFRoQH
+         5gjJyBpN2YjLI3YpRyAgGH78PoPeBtbWP/ALLAteJkCKtJoi+LIM1YTYNjxItFRjfgz6
+         xmVepDAv7MaTU/hucWJsBvwoIOBDOroajLE/y1Ls8yL5lwn6NSZ1ZGphwXb81+achPwS
+         3H2FW94wKQlddVNfQTjxEQ6hahEjPgn+BwuUjcNr7Oo1Q4N+fz+JBrvDG5IdEzDX9uCt
+         cKGg==
+X-Gm-Message-State: AOJu0YyjcJk76DYK0P71r8MKj09aV/zdr3yBA6M5ySVNhh9JYGFZc5VU
+	QJSiGfxcv5nW19ms+R7+OBQ=
+X-Google-Smtp-Source: AGHT+IH9ApmnuWjCpcJLgY472BPiImQX5oeai557Qb27uwiP6zkR7/VE+NGYg3d2jfDzlft5ZP7SMw==
+X-Received: by 2002:a05:6512:3a87:b0:4fb:9712:a717 with SMTP id q7-20020a0565123a8700b004fb9712a717mr12327668lfu.13.1694513522368;
+        Tue, 12 Sep 2023 03:12:02 -0700 (PDT)
+Received: from mobilestation ([85.249.16.222])
+        by smtp.gmail.com with ESMTPSA id y10-20020ac2446a000000b004fe951827easm1668672lfl.196.2023.09.12.03.12.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Sep 2023 03:12:01 -0700 (PDT)
+Date: Tue, 12 Sep 2023 13:11:58 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Keguang Zhang <keguang.zhang@gmail.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org, Lee Jones <lee@kernel.org>, 
+	Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+	Conor Dooley <conor+dt@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, Serge Semin <Sergey.Semin@baikalelectronics.ru>
+Subject: Re: [PATCH v4 3/4] net: stmmac: Add glue layer for Loongson-1 SoC
+Message-ID: <g3gm6ibq6skrxjp2dkf4xkz4urjnu43oqyqrtpe7r4e4vy6jfw@rppdi3dmumlj>
+References: <20230830134241.506464-1-keguang.zhang@gmail.com>
+ <20230830134241.506464-4-keguang.zhang@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230830134241.506464-4-keguang.zhang@gmail.com>
 
-QMC child devices support is needed to avoid orphan DT nodes that use a
-simple DT phandle to reference a QMC channel.
+On Wed, Aug 30, 2023 at 09:42:40PM +0800, Keguang Zhang wrote:
+> This glue driver is created based on the arch-code
+> implemented earlier with the platform-specific settings.
+> 
+> Use syscon for SYSCON register access.
+> 
+> Partially based on the previous work by Serge Semin.
+> 
+> Signed-off-by: Keguang Zhang <keguang.zhang@gmail.com>
+> ---
+> V3 -> V4: Drop ls1x_dwmac_syscon definition and its instances
+>           Drop three redundant fields from the ls1x_dwmac structure
+>           Drop the ls1x_dwmac_init() method.
+>           Some minor improvements
+> V2 -> V3: Determine the device ID by physical
+>           base address(suggested by Serge Semin)
+>           Use regmap instead of regmap fields
+>           Use syscon_regmap_lookup_by_phandle()
+>           Some minor fixes
+> V1 -> V2: Fix the build errors due to CONFIG_OF being unset
+>           Change struct reg_field definitions to const
+>           Rename the syscon property to "loongson,dwmac-syscon"
+>           Add MII PHY mode for LS1C
+> 
+>  drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 +
+>  drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
+>  .../ethernet/stmicro/stmmac/dwmac-loongson1.c | 219 ++++++++++++++++++
+>  3 files changed, 231 insertions(+)
+>  create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
+> index 06c6871f8788..a2b9e289aa36 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
+> +++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
+> @@ -239,6 +239,17 @@ config DWMAC_INTEL_PLAT
+>  	  the stmmac device driver. This driver is used for the Intel Keem Bay
+>  	  SoC.
+>  
+> +config DWMAC_LOONGSON1
+> +	tristate "Loongson1 GMAC support"
+> +	default MACH_LOONGSON32
+> +	depends on OF && (MACH_LOONGSON32 || COMPILE_TEST)
+> +	help
+> +	  Support for ethernet controller on Loongson1 SoC.
+> +
+> +	  This selects Loongson1 SoC glue layer support for the stmmac
+> +	  device driver. This driver is used for Loongson1-based boards
+> +	  like Loongson LS1B/LS1C.
+> +
+>  config DWMAC_TEGRA
+>  	tristate "NVIDIA Tegra MGBE support"
+>  	depends on ARCH_TEGRA || COMPILE_TEST
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/Makefile b/drivers/net/ethernet/stmicro/stmmac/Makefile
+> index 5b57aee19267..80e598bd4255 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/Makefile
+> +++ b/drivers/net/ethernet/stmicro/stmmac/Makefile
+> @@ -29,6 +29,7 @@ obj-$(CONFIG_DWMAC_SUNXI)	+= dwmac-sunxi.o
+>  obj-$(CONFIG_DWMAC_SUN8I)	+= dwmac-sun8i.o
+>  obj-$(CONFIG_DWMAC_DWC_QOS_ETH)	+= dwmac-dwc-qos-eth.o
+>  obj-$(CONFIG_DWMAC_INTEL_PLAT)	+= dwmac-intel-plat.o
+> +obj-$(CONFIG_DWMAC_LOONGSON1)	+= dwmac-loongson1.o
+>  obj-$(CONFIG_DWMAC_GENERIC)	+= dwmac-generic.o
+>  obj-$(CONFIG_DWMAC_IMX8)	+= dwmac-imx.o
+>  obj-$(CONFIG_DWMAC_TEGRA)	+= dwmac-tegra.o
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c
+> new file mode 100644
+> index 000000000000..f1732f15ff87
+> --- /dev/null
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c
+> @@ -0,0 +1,219 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + * Loongson-1 DWMAC glue layer
+> + *
+> + * Copyright (C) 2011-2023 Keguang Zhang <keguang.zhang@gmail.com>
+> + */
+> +
+> +#include <linux/mfd/syscon.h>
+> +#include <linux/module.h>
+> +#include <linux/of.h>
+> +#include <linux/phy.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/regmap.h>
+> +
+> +#include "stmmac.h"
+> +#include "stmmac_platform.h"
+> +
 
-Allow to instantiate child devices and also extend the API to get the
-qmc_chan using a child device.
+> +#define LS1B_GMAC0_BASE		(0x1fe10000)
 
-Signed-off-by: Herve Codina <herve.codina@bootlin.com>
----
- drivers/soc/fsl/qe/qmc.c | 91 +++++++++++++++++++++++++++++++---------
- include/soc/fsl/qe/qmc.h |  2 +
- 2 files changed, 73 insertions(+), 20 deletions(-)
+I was talking about the LS1B_GMAC1_BASE macro only. Since both LS1B
+and LS1C have GMAC0 at the same base address I would preserve
+LS1X_GMAC0_BASE name here. But seeing it's unused for the LS1C anyway
+it's not that a big deal.
 
-diff --git a/drivers/soc/fsl/qe/qmc.c b/drivers/soc/fsl/qe/qmc.c
-index 459e0bbd723d..5da15a25600e 100644
---- a/drivers/soc/fsl/qe/qmc.c
-+++ b/drivers/soc/fsl/qe/qmc.c
-@@ -1425,8 +1425,16 @@ static int qmc_probe(struct platform_device *pdev)
- 
- 	platform_set_drvdata(pdev, qmc);
- 
-+	/* Populate channel related devices */
-+	ret = devm_of_platform_populate(qmc->dev);
-+	if (ret)
-+		goto err_disable_txrx;
-+
- 	return 0;
- 
-+err_disable_txrx:
-+	qmc_setbits32(qmc->scc_regs + SCC_GSMRL, 0);
-+
- err_disable_intr:
- 	qmc_write16(qmc->scc_regs + SCC_SCCM, 0);
- 
-@@ -1467,26 +1475,16 @@ static struct platform_driver qmc_driver = {
- };
- module_platform_driver(qmc_driver);
- 
--struct qmc_chan *qmc_chan_get_byphandle(struct device_node *np, const char *phandle_name)
-+static struct qmc_chan *qmc_chan_get_from_qmc(struct device_node *qmc_np, unsigned int chan_index)
- {
--	struct of_phandle_args out_args;
- 	struct platform_device *pdev;
- 	struct qmc_chan *qmc_chan;
- 	struct qmc *qmc;
--	int ret;
- 
--	ret = of_parse_phandle_with_fixed_args(np, phandle_name, 1, 0,
--					       &out_args);
--	if (ret < 0)
--		return ERR_PTR(ret);
--
--	if (!of_match_node(qmc_driver.driver.of_match_table, out_args.np)) {
--		of_node_put(out_args.np);
-+	if (!of_match_node(qmc_driver.driver.of_match_table, qmc_np))
- 		return ERR_PTR(-EINVAL);
--	}
- 
--	pdev = of_find_device_by_node(out_args.np);
--	of_node_put(out_args.np);
-+	pdev = of_find_device_by_node(qmc_np);
- 	if (!pdev)
- 		return ERR_PTR(-ENODEV);
- 
-@@ -1496,17 +1494,12 @@ struct qmc_chan *qmc_chan_get_byphandle(struct device_node *np, const char *phan
- 		return ERR_PTR(-EPROBE_DEFER);
- 	}
- 
--	if (out_args.args_count != 1) {
-+	if (chan_index >= ARRAY_SIZE(qmc->chans)) {
- 		platform_device_put(pdev);
- 		return ERR_PTR(-EINVAL);
- 	}
- 
--	if (out_args.args[0] >= ARRAY_SIZE(qmc->chans)) {
--		platform_device_put(pdev);
--		return ERR_PTR(-EINVAL);
--	}
--
--	qmc_chan = qmc->chans[out_args.args[0]];
-+	qmc_chan = qmc->chans[chan_index];
- 	if (!qmc_chan) {
- 		platform_device_put(pdev);
- 		return ERR_PTR(-ENOENT);
-@@ -1514,8 +1507,44 @@ struct qmc_chan *qmc_chan_get_byphandle(struct device_node *np, const char *phan
- 
- 	return qmc_chan;
- }
-+
-+struct qmc_chan *qmc_chan_get_byphandle(struct device_node *np, const char *phandle_name)
-+{
-+	struct of_phandle_args out_args;
-+	struct qmc_chan *qmc_chan;
-+	int ret;
-+
-+	ret = of_parse_phandle_with_fixed_args(np, phandle_name, 1, 0,
-+					       &out_args);
-+	if (ret < 0)
-+		return ERR_PTR(ret);
-+
-+	if (out_args.args_count != 1) {
-+		of_node_put(out_args.np);
-+		return ERR_PTR(-EINVAL);
-+	}
-+
-+	qmc_chan = qmc_chan_get_from_qmc(out_args.np, out_args.args[0]);
-+	of_node_put(out_args.np);
-+	return qmc_chan;
-+}
- EXPORT_SYMBOL(qmc_chan_get_byphandle);
- 
-+struct qmc_chan *qmc_chan_get_bychild(struct device_node *np)
-+{
-+	struct device_node *qmc_np;
-+	u32 chan_index;
-+	int ret;
-+
-+	qmc_np = np->parent;
-+	ret = of_property_read_u32(np, "reg", &chan_index);
-+	if (ret)
-+		return ERR_PTR(-EINVAL);
-+
-+	return qmc_chan_get_from_qmc(qmc_np, chan_index);
-+}
-+EXPORT_SYMBOL(qmc_chan_get_bychild);
-+
- void qmc_chan_put(struct qmc_chan *chan)
- {
- 	put_device(chan->qmc->dev);
-@@ -1552,6 +1581,28 @@ struct qmc_chan *devm_qmc_chan_get_byphandle(struct device *dev,
- }
- EXPORT_SYMBOL(devm_qmc_chan_get_byphandle);
- 
-+struct qmc_chan *devm_qmc_chan_get_bychild(struct device *dev,
-+					   struct device_node *np)
-+{
-+	struct qmc_chan *qmc_chan;
-+	struct qmc_chan **dr;
-+
-+	dr = devres_alloc(devm_qmc_chan_release, sizeof(*dr), GFP_KERNEL);
-+	if (!dr)
-+		return ERR_PTR(-ENOMEM);
-+
-+	qmc_chan = qmc_chan_get_bychild(np);
-+	if (!IS_ERR(qmc_chan)) {
-+		*dr = qmc_chan;
-+		devres_add(dev, dr);
-+	} else {
-+		devres_free(dr);
-+	}
-+
-+	return qmc_chan;
-+}
-+EXPORT_SYMBOL(devm_qmc_chan_get_bychild);
-+
- MODULE_AUTHOR("Herve Codina <herve.codina@bootlin.com>");
- MODULE_DESCRIPTION("CPM QMC driver");
- MODULE_LICENSE("GPL");
-diff --git a/include/soc/fsl/qe/qmc.h b/include/soc/fsl/qe/qmc.h
-index 6f1d6cebc9fe..166484bb4294 100644
---- a/include/soc/fsl/qe/qmc.h
-+++ b/include/soc/fsl/qe/qmc.h
-@@ -17,9 +17,11 @@ struct device;
- struct qmc_chan;
- 
- struct qmc_chan *qmc_chan_get_byphandle(struct device_node *np, const char *phandle_name);
-+struct qmc_chan *qmc_chan_get_bychild(struct device_node *np);
- void qmc_chan_put(struct qmc_chan *chan);
- struct qmc_chan *devm_qmc_chan_get_byphandle(struct device *dev, struct device_node *np,
- 					     const char *phandle_name);
-+struct qmc_chan *devm_qmc_chan_get_bychild(struct device *dev, struct device_node *np);
- 
- enum qmc_mode {
- 	QMC_TRANSPARENT,
--- 
-2.41.0
+> +#define LS1B_GMAC1_BASE		(0x1fe20000)
+> +
+> +/* Loongson-1 SYSCON Registers */
+> +#define LS1X_SYSCON0		(0x0)
+> +#define LS1X_SYSCON1		(0x4)
+> +
+> +/* Loongson-1B SYSCON Register Bits */
+> +#define GMAC1_USE_UART1		BIT(4)
+> +#define GMAC1_USE_UART0		BIT(3)
+> +
+> +#define GMAC1_SHUT		BIT(13)
+> +#define GMAC0_SHUT		BIT(12)
+> +
+> +#define GMAC1_USE_TXCLK		BIT(3)
+> +#define GMAC0_USE_TXCLK		BIT(2)
+> +#define GMAC1_USE_PWM23		BIT(1)
+> +#define GMAC0_USE_PWM01		BIT(0)
+> +
+> +/* Loongson-1C SYSCON Register Bits */
+> +#define GMAC_SHUT		BIT(6)
+> +
+> +#define PHY_INTF_SELI		GENMASK(30, 28)
+> +#define PHY_INTF_MII		FIELD_PREP(PHY_INTF_SELI, 0)
+> +#define PHY_INTF_RMII		FIELD_PREP(PHY_INTF_SELI, 4)
+> +
+> +struct ls1x_dwmac {
+> +	struct plat_stmmacenet_data *plat_dat;
+> +	struct regmap *regmap;
+> +};
+> +
+> +static int ls1b_dwmac_syscon_init(struct platform_device *pdev, void *priv)
+> +{
+> +	struct ls1x_dwmac *dwmac = priv;
+> +	struct plat_stmmacenet_data *plat = dwmac->plat_dat;
+> +	struct regmap *regmap = dwmac->regmap;
+> +	struct resource *res;
+> +	unsigned long reg_base;
+> +
+> +	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+> +	if (!res) {
+> +		dev_err(&pdev->dev, "Could not get IO_MEM resources\n");
+> +		return -EINVAL;
+> +	}
+> +	reg_base = (unsigned long)res->start;
+> +
+> +	if (reg_base == LS1B_GMAC0_BASE) {
+> +		switch (plat->phy_interface) {
+> +		case PHY_INTERFACE_MODE_RGMII_ID:
+> +			regmap_update_bits(regmap, LS1X_SYSCON0,
+> +					   GMAC0_USE_TXCLK | GMAC0_USE_PWM01,
+> +					   0);
+> +			break;
+> +		case PHY_INTERFACE_MODE_MII:
+> +			regmap_update_bits(regmap, LS1X_SYSCON0,
+> +					   GMAC0_USE_TXCLK | GMAC0_USE_PWM01,
+> +					   GMAC0_USE_TXCLK | GMAC0_USE_PWM01);
+> +			break;
+> +		default:
+> +			dev_err(&pdev->dev, "Unsupported PHY mode %u\n",
+> +				plat->phy_interface);
+> +			return -EOPNOTSUPP;
+> +		}
+> +
+> +		regmap_update_bits(regmap, LS1X_SYSCON0, GMAC0_SHUT, 0);
+> +	} else if (reg_base == LS1B_GMAC1_BASE) {
+> +		regmap_update_bits(regmap, LS1X_SYSCON0,
+> +				   GMAC1_USE_UART1 | GMAC1_USE_UART0,
+> +				   GMAC1_USE_UART1 | GMAC1_USE_UART0);
+> +
+> +		switch (plat->phy_interface) {
+> +		case PHY_INTERFACE_MODE_RGMII_ID:
+> +			regmap_update_bits(regmap, LS1X_SYSCON1,
+> +					   GMAC1_USE_TXCLK | GMAC1_USE_PWM23,
+> +					   0);
+> +
+> +			break;
+> +		case PHY_INTERFACE_MODE_MII:
+> +			regmap_update_bits(regmap, LS1X_SYSCON1,
+> +					   GMAC1_USE_TXCLK | GMAC1_USE_PWM23,
+> +					   GMAC1_USE_TXCLK | GMAC1_USE_PWM23);
+> +			break;
+> +		default:
+> +			dev_err(&pdev->dev, "Unsupported PHY mode %u\n",
+> +				plat->phy_interface);
+> +			return -EOPNOTSUPP;
+> +		}
+> +
+> +		regmap_update_bits(regmap, LS1X_SYSCON1, GMAC1_SHUT, 0);
+> +	} else {
+> +		dev_err(&pdev->dev, "Invalid Ethernet MAC base address %lx",
+> +			reg_base);
+> +		return -EINVAL;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int ls1c_dwmac_syscon_init(struct platform_device *pdev, void *priv)
+> +{
+> +	struct ls1x_dwmac *dwmac = priv;
+> +	struct plat_stmmacenet_data *plat = dwmac->plat_dat;
+> +	struct regmap *regmap = dwmac->regmap;
+> +
+> +	switch (plat->phy_interface) {
+> +	case PHY_INTERFACE_MODE_MII:
+> +		regmap_update_bits(regmap, LS1X_SYSCON1, PHY_INTF_SELI,
+> +				   PHY_INTF_MII);
+> +		break;
+> +	case PHY_INTERFACE_MODE_RMII:
+> +		regmap_update_bits(regmap, LS1X_SYSCON1, PHY_INTF_SELI,
+> +				   PHY_INTF_RMII);
+> +		break;
+> +	default:
+> +		dev_err(&pdev->dev, "Unsupported PHY-mode %u\n",
+> +			plat->phy_interface);
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+> +	regmap_update_bits(regmap, LS1X_SYSCON0, GMAC0_SHUT, 0);
+> +
+> +	return 0;
+> +}
+> +
+> +static int ls1x_dwmac_probe(struct platform_device *pdev)
+> +{
+> +	struct plat_stmmacenet_data *plat_dat;
+> +	struct stmmac_resources stmmac_res;
+> +	struct regmap *regmap;
+> +	struct ls1x_dwmac *dwmac;
+> +	int (*init)(struct platform_device *pdev, void *priv);
+> +	int ret;
+> +
+> +	ret = stmmac_get_platform_resources(pdev, &stmmac_res);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Probe syscon */
+> +	regmap = syscon_regmap_lookup_by_phandle(pdev->dev.of_node,
+> +						 "loongson,ls1-syscon");
+> +	if (IS_ERR(regmap))
+> +		return dev_err_probe(&pdev->dev, PTR_ERR(regmap),
+> +				     "Unable to find syscon\n");
+> +
+> +	init = of_device_get_match_data(&pdev->dev);
+> +	if (!init) {
+> +		dev_err(&pdev->dev, "No of match data provided\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	dwmac = devm_kzalloc(&pdev->dev, sizeof(*dwmac), GFP_KERNEL);
+> +	if (!dwmac)
+> +		return -ENOMEM;
+> +
 
+> +	plat_dat = stmmac_probe_config_dt(pdev, stmmac_res.mac);
+
+This can be replaced with devm_stmmac_probe_config_dt() and ...
+
+> +	if (IS_ERR(plat_dat))
+> +		return dev_err_probe(&pdev->dev, PTR_ERR(plat_dat),
+> +				     "dt configuration failed\n");
+> +
+> +	plat_dat->bsp_priv = dwmac;
+> +	plat_dat->init = init;
+> +	dwmac->plat_dat = plat_dat;
+> +	dwmac->regmap = regmap;
+> +
+
+> +	ret = stmmac_pltfr_probe(pdev, plat_dat, &stmmac_res);
+
+... this can be replaced with devm_stmmac_pltfr_probe() thus ...
+
+> +	if (ret)
+> +		goto err_remove_config_dt;
+> +
+> +	return 0;
+> +
+
+> +err_remove_config_dt:
+> +	stmmac_remove_config_dt(pdev, plat_dat);
+> +
+> +	return ret;
+
+... this could have been omitted and ...
+
+> +}
+> +
+> +static const struct of_device_id ls1x_dwmac_match[] = {
+> +	{
+> +		.compatible = "loongson,ls1b-gmac",
+> +		.data = &ls1b_dwmac_syscon_init,
+> +	},
+> +	{
+> +		.compatible = "loongson,ls1c-emac",
+> +		.data = &ls1c_dwmac_syscon_init,
+> +	},
+> +	{ }
+> +};
+> +MODULE_DEVICE_TABLE(of, ls1x_dwmac_match);
+> +
+> +static struct platform_driver ls1x_dwmac_driver = {
+> +	.probe = ls1x_dwmac_probe,
+
+> +	.remove_new = stmmac_pltfr_remove,
+
+... this could have been dropped.
+
+-Serge(y)
+
+> +	.driver = {
+> +		.name = "loongson1-dwmac",
+> +		.of_match_table = ls1x_dwmac_match,
+> +	},
+> +};
+> +module_platform_driver(ls1x_dwmac_driver);
+> +
+> +MODULE_AUTHOR("Keguang Zhang <keguang.zhang@gmail.com>");
+> +MODULE_DESCRIPTION("Loongson-1 DWMAC glue layer");
+> +MODULE_LICENSE("GPL");
+> -- 
+> 2.39.2
+> 
+> 
 
