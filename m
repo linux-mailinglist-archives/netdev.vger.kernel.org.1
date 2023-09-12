@@ -1,249 +1,220 @@
-Return-Path: <netdev+bounces-33270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33271-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2762E79D3EF
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 16:42:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4CDB79D3FD
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 16:48:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC23E281E61
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 14:42:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61E85281E48
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 14:48:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F240818042;
-	Tue, 12 Sep 2023 14:42:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 290FD18056;
+	Tue, 12 Sep 2023 14:48:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC922A31
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 14:42:29 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2694110D
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 07:42:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694529749; x=1726065749;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=W4UE3ti1HJRmZq1GPwVsXBYDuBtFPTnV42dFxTszgdw=;
-  b=A4KdAU5F332ZbJP6Qq3aIXe7lylIBdfpi0hQgnxD0p6BpzsucDMifxSL
-   JfEbUOlAF4qh5+XTGgl4cqjO4HI2CsONLQZIMq3bfvcEqf1T4MB62ht3q
-   NMcSHN4Oy9hptjup3IjgPVRy/PRXprYzrwnq8cBmt2hAufRC6H2eE9MNM
-   o5kc7kfTdixox2klVfDLKBirw3skSg6eAiXruEBWVFLEqqo6hd4bxN6rn
-   AYnTK1Gm1ch9/mNz5okLDadQRBeW7Uguw4aVqhh0xE2ZDv+t/Yv1RQ2/B
-   FFC/7jA4ylZMytkGh1I/TwrwPMkUNatU0FjQLrphdSYsCxUxmabL007aX
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="442408140"
-X-IronPort-AV: E=Sophos;i="6.02,139,1688454000"; 
-   d="scan'208";a="442408140"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2023 07:42:28 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="746914137"
-X-IronPort-AV: E=Sophos;i="6.02,139,1688454000"; 
-   d="scan'208";a="746914137"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmsmga007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Sep 2023 07:42:28 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Tue, 12 Sep 2023 07:42:27 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Tue, 12 Sep 2023 07:42:27 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Tue, 12 Sep 2023 07:42:27 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.109)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Tue, 12 Sep 2023 07:42:26 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bTspnBgp9VnPhVIIlQ42FySL2oQNLfhfQ+kaWdFxV3GMt+ScCB2JBdPepRHSwCCYvSxlIx/Bl1mZgY91kf9aczDUnrruX7dArhW7+ofT7m/ZDAiwMnW9YkS7LHx1gA0BzHKfDizOBuH3ZJPKWbXaF+HLru4PlPO8nf0MMQ3h/4uQ5ksfUo+sCLh7QfpA04lDPjOs0V4vgFbCVwVEVvw8IebyO1G3fhxJbLyOadNQpeK2l77W7+HvS66cJHVbhfu61OXluewxo6utSkSWkkdYp00aG8H5hjbTCKvElffZs+hIyZVRc6EqWbYOr4vB49OScPg+aiNiqMDOma5oDrzQMQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4VU1dsY1u4XMcUlo1j14Yrpe/Pt4h8zsaqGvDMmAH8k=;
- b=leSA1gKIdZkwfXzNxu0TmkslbcRotco6rcSmGfevTIsNcKRhsJ1k4i/ey8az0U3YoUPGLsJTXJAvjtOhjOWdkqmrGH9qLzbu9gdmsn+Cp8xk0Np6E0oq1C9WjqmbNa5cw8sUBspB91qCpzy1xLxHu4jwEgNGRvsUmeCyG2UD7lWD5s7s/CIlA+EUsfEofGMtbpCepFLs0rL+uU7lKa4UvQ4EY2q5sHwLBeNzQ7X38PZRjdGys3pG+qNgfLZ8plLoy58aYOHhC1zrGY/d8wcEK8NZcNOfYtHaQVtcvWkRCgqplC/ThBycWJbZyrvQmKjW4UhPEc8PxaZbbEGREsCR5A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
- by CO1PR11MB4803.namprd11.prod.outlook.com (2603:10b6:303:95::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.19; Tue, 12 Sep
- 2023 14:42:24 +0000
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::bede:bd20:31e9:fcb4]) by DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::bede:bd20:31e9:fcb4%7]) with mapi id 15.20.6768.029; Tue, 12 Sep 2023
- 14:42:24 +0000
-Message-ID: <ad50a349-11be-36bc-fed4-94f5aab3eabd@intel.com>
-Date: Tue, 12 Sep 2023 16:41:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH iwl-next v2] ice: Add support for packet mirroring using
- hardware in switchdev mode
-Content-Language: en-US
-To: Paolo Abeni <pabeni@redhat.com>
-CC: Andrii Staikov <andrii.staikov@intel.com>,
-	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>
-References: <20230912092952.2814966-1-andrii.staikov@intel.com>
- <0168a988486f4bff08bd186d5aea1cfe4900a2c3.camel@redhat.com>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-In-Reply-To: <0168a988486f4bff08bd186d5aea1cfe4900a2c3.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FRYP281CA0014.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::24)
- To DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 145D5A31
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 14:48:07 +0000 (UTC)
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 007AB115;
+	Tue, 12 Sep 2023 07:48:06 -0700 (PDT)
+Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-9ad749473baso203154566b.1;
+        Tue, 12 Sep 2023 07:48:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694530085; x=1695134885; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9Mh3N+atY6fKlEdWof649s8ajhIo+Yy5qpEAzk5J3lE=;
+        b=AFJgk5nH4gzHb22ZSyZeM5iZyqngU3wRN8WgdaCAJPGH0tpXbZFeozlr3xYCxjo2se
+         t+hV3qdMCWx8cYTojx2tvB8PSC/Mc5m2RT31QCBqtTBvjVWd4lDKSc6y8Jlvo3rJMS4H
+         kyTHD/6niDbOjLndjV5Uqi1gXUhTd/+jbuhwdvZhYOWICEyNxnaD+A++UwCOSIsi8zwT
+         V3jsOX2jFEhuH+xVMLTt4KJimcusDebe0+cLzoQEyNkgbGehLr/JPnXfXgaX+Jfk7J5w
+         k+HT6Ko6NJMvG8TGHfHwpKxlbCFsZU5PgD/p3oPTgsTJkmTuxnuFMW7QgRPh51p0n9Jj
+         hQpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694530085; x=1695134885;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9Mh3N+atY6fKlEdWof649s8ajhIo+Yy5qpEAzk5J3lE=;
+        b=vQz+vCdRtPUKRT6GanFtp9EbaPtVmsSOM6X9MzO607DCzqN8mhJjAiz11K9goAF4aH
+         nAFS8D3dgPdEkRm8nmmlmydZDkv5WH+JSHn4cIbPdxrvonF5R8rm8P80IUu42r1Ek9of
+         GD6ISF4UbfxJasjP3eNIEm+hodDGNTrFOShKsDAukPJkn410qeMs1ekqpoJGOJXYMGZv
+         OWlhysH0F/giD4cClZ7djdq4HqRAVZC3fxXgz1sDiN4HKAcp+UeZYPwG7mWOENlrE6Gp
+         T1aXZIbyZIFXjPZXDbd5Js6apzGJsXWnN2Zp2fhOt29Md4pBuq0jSSBklHzJGhr81aqe
+         npbA==
+X-Gm-Message-State: AOJu0YxZY8JMsHwyDc47g1Mx4Is/xo6r8yni38Rggem9uPxCCvXA1w0m
+	E2eEXFdpYCNP0dIcBXUnLnQ=
+X-Google-Smtp-Source: AGHT+IH9wOTaGkTJFDyjmU8WryOltmH2Q7LMedYMwsNNq2HMT5i2dYmwYWLHYrSxtaajZH2vkJj7Ug==
+X-Received: by 2002:a17:906:295:b0:9a5:da6c:6539 with SMTP id 21-20020a170906029500b009a5da6c6539mr10782887ejf.75.1694530085232;
+        Tue, 12 Sep 2023 07:48:05 -0700 (PDT)
+Received: from skbuf ([188.25.254.186])
+        by smtp.gmail.com with ESMTPSA id q7-20020a170906360700b0098ce63e36e9sm7064813ejb.16.2023.09.12.07.48.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Sep 2023 07:48:04 -0700 (PDT)
+Date: Tue, 12 Sep 2023 17:48:02 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Pawel Dembicki <paweldembicki@gmail.com>
+Cc: netdev@vger.kernel.org, Dan Carpenter <dan.carpenter@linaro.org>,
+	Simon Horman <simon.horman@corigine.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 4/8] net: dsa: vsc73xx: add
+ port_stp_state_set function
+Message-ID: <20230912144802.czdpb6hpn2yiewvf@skbuf>
+References: <20230912122201.3752918-1-paweldembicki@gmail.com>
+ <20230912122201.3752918-5-paweldembicki@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|CO1PR11MB4803:EE_
-X-MS-Office365-Filtering-Correlation-Id: 575178b2-40d0-4dbf-f16f-08dbb39e7a62
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: eS9WybwTJ+PW5EZf2kbcm8puKCOg1IDjrZxB5qV6Lhepi0pyKzRsa3UL5YEIrwRwm4iPIsGrHrtyAWaKyazT9smCuHVz0hZZ2xQgHaT9irK+BLc3IlAEtY8vW5UjSFsj5Y/bKgL05nwMmHlIW/GMhpPwdxsOtSPkeSBkut/RtVFE0HWdfj1dmdFRerpSFC1yuz8WBKnFFOVDS6J9gRzYOX4GvkjKUkJsM+LYj0mrwTLPy+hxDe6+NoToL1h2/xCQ5L9AQGr1gpCX+BIsle2FFogaMFQATlcPBNv4iEtISsVP5knmW/gRyjHGeCrwjE4u7BVihDwT81qchPpMIY8XK2J91rMHIjpAbB76TkztasYAaQGj562lnpASjXWcv92zHNXIeYK3x7NDE1pomvmojWNCGHMzpMRHZqjHY5BUbLi6cCV7T9+az2pLqy2sTi6bHhlcv2DU6brYkG2McYktDOy2mU58vibA2utp5/UQTvnwBdu4O/bgvzhx6yxfe0LQ8Py7ftbfVwmrWsnLwZxeHIYxt6fastUQ/wAZH8t+AFxa2ZmdfUncolegcqkF4xHw2NRFK1m089d3dy1uVSnyOUfs54/DtZYRmyTLsBl/l0ZnL4WJT5lCwcBvyuXbxljp5JPX8i8BIcjg8UVvtEitzg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(346002)(366004)(396003)(136003)(39860400002)(1800799009)(186009)(451199024)(83380400001)(6512007)(26005)(2616005)(316002)(41300700001)(6916009)(66476007)(66556008)(66946007)(5660300002)(6666004)(8676002)(4326008)(8936002)(2906002)(6506007)(6486002)(478600001)(31696002)(86362001)(36756003)(82960400001)(38100700002)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QWJNVDlNeWY4b2hiYVlYNzBBV1BTZTVvTGpPSHBsVEZDNkdMcjlwOVV5MkJK?=
- =?utf-8?B?THN2VHhHcFFncGhHTjV0THdtTVZwVEF0OG9yVlpxWFRpMGF1Z1phc21ORVBu?=
- =?utf-8?B?TzNqdk1MQnp2bWoxM2Q5RmVkUE5ObkJsVStDdjlXUmlvNUlUVHp3bVVKOHZR?=
- =?utf-8?B?NGpJZGNzTnhIaVFicTkyQUJ1ZUZybHBJNzB3azVMNHlZZmNEei9vSDBuWCtq?=
- =?utf-8?B?RTdQUHFQbW1kZG1lckN3dDBORnBwbUxEMm1Na3dWSHlUK3RDNkMwZlQ5RWZB?=
- =?utf-8?B?WTRPOXg2Vk44bXpTNEZzVTZtQzUvaUdBREJUMEdvV1BTY05ZZXlBRE4xQ1BZ?=
- =?utf-8?B?U3hSVy9lc0hTOGRQckc3ejM1WExwWnVNczU4dlB1S1o1WVJKK29oelB5REtR?=
- =?utf-8?B?WVVKVldTWStySDJub2s3aSsxSE1WcmZIQVNUMU1tOFo0Y0dydktQZXp2cGZ5?=
- =?utf-8?B?ZWxzOEJpSTVLZHV1SS9HRXVhQ3ZtdzBIUUJsMjYrcXlqL0RScE5lV20yNkZY?=
- =?utf-8?B?SDBJT3NjQURYY0puL2RpaERPTzlzWksyekwvcVV2U1VtWHJWKzIybDUyUVcw?=
- =?utf-8?B?eGRyUjdiNXZMYm9ML1RHaUxNc2F2Q09ONEJqdjhIMGNDNzk5TXJiaVFFMkpt?=
- =?utf-8?B?TDdBKzZ1azlQelRrWExFL1UvMXRhdXFlSGdOVDdoZ2VSbUF4WDkzcUNCc0JB?=
- =?utf-8?B?dUFOQkEwNnY1bTRXN1BJMjZBL0c1bUh6Z05UalQ2SmhTSEkvZUk3Q3lrOHhR?=
- =?utf-8?B?VGthV0JSTTRKcUk5S3psZjk1SUVJdFpsa0RLWmg3S29hemoxSjBkUHUvNElB?=
- =?utf-8?B?NjZLbFVONGMwSXJjL0FEZXNRc1htYzUyNHNMUmlYY3pMdnZJdnBYdUdEbmZ1?=
- =?utf-8?B?d2hQK0hFaFEyUnIvaTRZUWlvQVNNRnA4MCtBTkpmdDRNMlMwZGZjWVVIa0th?=
- =?utf-8?B?djN6TVZNbXJsbUpyNmN3MnA3N3QyQUNuVEZ5MXh0bTBBbDNaN0FJY3AvdG1y?=
- =?utf-8?B?L280aUJ5YmdiUkhmWi9VNUZOeEhmMWFPVDQwSTV0VFEzaUQ5YWlEMGhTdHlD?=
- =?utf-8?B?Y2JHdlk0ZzJCbG03NnhQQmVkM2grTVRmN0NzUWdXYkpJMlhSZlZ1dmE4cExK?=
- =?utf-8?B?RWVWZUYyc2VCL0xuVzJkZTd4ZG5rSFY2YW9TS2xvSFRnRjNaQXU2NTZhcDZH?=
- =?utf-8?B?TXJabGlmOUp6NTV5SVdBS21MT0ZXZkdoVXZHMHYyb0lqdmZ4VThDeFQyRnZO?=
- =?utf-8?B?WFF6KzRqc2UxdmZRbGJoRG12NjNlY3hLSUVTSWN5dkhSRi9JSC8wTEorN1hr?=
- =?utf-8?B?QVZMbHhNS0srRVJkUWFzbzJ5eC96L3NscDIwTzVXSTMycDlPL1NicWU2TUZh?=
- =?utf-8?B?bDlBVjFvQnptbTBJZXl6eStGc280bTdZYzdmT2Ixczh4WE1zUDUwNjd4RzJ1?=
- =?utf-8?B?MzBnWTk5NEFtK0k0U0J0Mlh5SVlvVS9GVHZIVUg1QzNNUVZCTXBhYiszT3Bs?=
- =?utf-8?B?ODhIRzc4VU5EZ3ZCdDJtUlJsN1JYRHJHd29KTGZKT3JIT2plVUo0VDBWb21v?=
- =?utf-8?B?cnpyNjQ0UkF1L0tEV1ZvNThwaERwY3N1b2UyVnNxYVFxcVNBbGNRbGsrNUt6?=
- =?utf-8?B?YnFtVkthdjVpckJrYzN4NFc4VGVSU082MkprSmZncHNQZU5XL2RuRCtLSith?=
- =?utf-8?B?eEIzdUhKQndCbFYvbDN2a1l1Rm16ZGtuREpPK1IyU0FCZUZkSDFnaDNqVjRT?=
- =?utf-8?B?UUF3RHVRZVBKekJ2cW94RlJvYXJuRGs4aG5MZ1loajByVWpZSjNISGpudU5K?=
- =?utf-8?B?eE1uSUFMdDlDWVZiN3hvcFhINDVOUnBBa1VxL2dIbElKdTc0Y1ljZm5lVzA3?=
- =?utf-8?B?VDUwa3k5bDZjR3FVNXViVHNmbkh4OURsL2pmL1BtZU0wRlBod0lVTGEyWWQx?=
- =?utf-8?B?eU1Kai9xSzY3MHhpMGlKR3pNMENGSnZaSnB2VVNCenZHL3U2bXRoNnA1STY2?=
- =?utf-8?B?UDA2ZXo0c2FvcUZQMlFQcW5VdWtDVU45dER6a29ZMG52Q2Z6dVNueXp2Q0I0?=
- =?utf-8?B?TlFuQjBNdXVyWmpSd0w4eW5XbUtQQmhYSStmSVdCNzdpNUVsMXg2Zlh4VWZW?=
- =?utf-8?B?aUpGTG9GenRlZzNpK0dETjdJMXRYcHdYNTFkSUh6aHl4VXZ4YVczbCtwZnZG?=
- =?utf-8?B?RGc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 575178b2-40d0-4dbf-f16f-08dbb39e7a62
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Sep 2023 14:42:24.4958
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /tcxrDwAzPFuSSeeieDpnRRIp23t4XL/rFE4IJXGKQodJxARsDzwCMxTvoy4pERz4TOlS5U6kXC5gF8gPQ7iI8ai5rzRVGRrPuMLgKhAFF0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB4803
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230912122201.3752918-5-paweldembicki@gmail.com>
 
-From: Paolo Abeni <pabeni@redhat.com>
-Date: Tue, 12 Sep 2023 11:56:15 +0200
+Hi Pawel,
 
-> Hi all,
+On Tue, Sep 12, 2023 at 02:21:58PM +0200, Pawel Dembicki wrote:
+> This isn't a fully functional implementation of 802.1D, but
+> port_stp_state_set is required for a future tag8021q operations.
 > 
-> On Tue, 2023-09-12 at 11:29 +0200, Andrii Staikov wrote:
->> Switchdev mode allows to add mirroring rules to mirror
->> incoming and outgoing packets to the interface's port
->> representor. Previously, this was available only using
->> software functionality. Add possibility to offload this
->> functionality to the NIC hardware.
->>
->> Introduce ICE_MIRROR_PACKET filter action to the
->> ice_sw_fwd_act_type enum to identify the desired action
->> and pass it to the hardware as well as the VSI to mirror.
->>
->> Example of tc mirror command using hardware:
->> tc filter add dev ens1f0np0 ingress protocol ip prio 1 flower
->> src_mac b4:96:91:a5:c7:a7 skip_sw action mirred egress mirror dev eth1
->>
->> ens1f0np0 - PF
->> b4:96:91:a5:c7:a7 - source MAC address
->> eth1 - PR of a VF to mirror to
->>
->> Signed-off-by: Andrii Staikov <andrii.staikov@intel.com>
+> This implementation handles properly all states, but vsc73xx doesn't
+> forward STP packets.
 > 
-> The amount of patches that IMHO should land only into intel-specific
-> MLs and instead reaches also netdev, recently increased.
+> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+> ---
+> diff --git a/drivers/net/dsa/vitesse-vsc73xx-core.c b/drivers/net/dsa/vitesse-vsc73xx-core.c
+> index 8f2285a03e82..541fbc195df1 100644
+> --- a/drivers/net/dsa/vitesse-vsc73xx-core.c
+> +++ b/drivers/net/dsa/vitesse-vsc73xx-core.c
+> @@ -1033,9 +1031,59 @@ static int vsc73xx_get_max_mtu(struct dsa_switch *ds, int port)
+>  	return 9600 - ETH_HLEN - ETH_FCS_LEN;
+>  }
+>  
+> +static int vsc73xx_port_setup(struct dsa_switch *ds, int port)
+> +{
 
-Let's clarify what you mean by "intel-specific MLs".
-Do you mean our internal MLs and review or the open one, IWL?
+For bisectability, the series must build patch by patch.
+Here, you are missing:
 
-IWL is mostly rudimentary. It's open, but almost nobody outside of Intel
-sits there, which means 2/3 of patches doesn't get enough attention and
-reviews. It's used by our validation as well, but that's it.
-Our internal ML for Ethernet patches works as usually. I realize roughly
-half of all patches pass it without a Reviewed-by tag and it's something
-we're actively working on. If all goes well, no patches without a proper
-review will go outside Intel's internal Ethernet MLs.
-Now, the second part,
+	struct vsc73xx *vsc = ds->priv;
 
+../drivers/net/dsa/vitesse-vsc73xx-core.c:1038:3: error: use of undeclared identifier 'vsc'
+                vsc->forward_map[CPU_PORT] = VSC73XX_SRCMASKS_PORTS_MASK &
+                ^
+../drivers/net/dsa/vitesse-vsc73xx-core.c:1041:3: error: use of undeclared identifier 'vsc'
+                vsc->forward_map[port] = VSC73XX_SRCMASKS_PORTS_MASK &
+                ^
+2 errors generated.
+
+> +	/* Configure forward map to CPU <-> port only */
+> +	if (port == CPU_PORT)
+> +		vsc->forward_map[CPU_PORT] = VSC73XX_SRCMASKS_PORTS_MASK &
+> +					     ~BIT(CPU_PORT);
+
+		vsc->forward_map[CPU_PORT] = dsa_user_ports(ds);
+
+> +	else
+> +		vsc->forward_map[port] = VSC73XX_SRCMASKS_PORTS_MASK &
+> +					 BIT(CPU_PORT);
+
+		vsc->forward_map[port] = BIT(CPU_PORT);
+
+> +
+> +	return 0;
+> +}
+> +
+> +/* FIXME: STP frames aren't forwarded at this moment. BPDU frames are
+> + * forwarded only from and to PI/SI interface. For more info see chapter
+> + * 2.7.1 (CPU Forwarding) in datasheet.
+> + * This function is required for tag8021q operations.
+> + */
+> +
+> +static void vsc73xx_port_stp_state_set(struct dsa_switch *ds, int port,
+> +				       u8 state)
+> +{
+> +	struct vsc73xx *vsc = ds->priv;
+> +
+> +	if (state == BR_STATE_BLOCKING || state == BR_STATE_DISABLED)
+> +		vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0,
+> +				    VSC73XX_RECVMASK, BIT(port), 0);
+> +	else
+> +		vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0,
+> +				    VSC73XX_RECVMASK, BIT(port), BIT(port));
+> +
+> +	if (state == BR_STATE_LEARNING || state == BR_STATE_FORWARDING)
+> +		vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0,
+> +				    VSC73XX_LEARNMASK, BIT(port), BIT(port));
+> +	else
+> +		vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0,
+> +				    VSC73XX_LEARNMASK, BIT(port), 0);
+> +
+> +	if (state == BR_STATE_FORWARDING)
+> +		vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0,
+> +				    VSC73XX_SRCMASKS + port,
+> +				    VSC73XX_SRCMASKS_PORTS_MASK,
+> +				    vsc->forward_map[port]);
+
+To forward a packet between port A and port B, both of them must be in
+BR_STATE_FORWARDING, not just A.
+
+> +	else
+> +		vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0,
+> +				    VSC73XX_SRCMASKS + port,
+> +				    VSC73XX_SRCMASKS_PORTS_MASK, 0);
+> +}
+> +
+>  static const struct dsa_switch_ops vsc73xx_ds_ops = {
+>  	.get_tag_protocol = vsc73xx_get_tag_protocol,
+>  	.setup = vsc73xx_setup,
+> +	.port_setup = vsc73xx_port_setup,
+>  	.phy_read = vsc73xx_phy_read,
+>  	.phy_write = vsc73xx_phy_write,
+>  	.phylink_get_caps = vsc73xx_phylink_get_caps,
+> @@ -1049,6 +1097,7 @@ static const struct dsa_switch_ops vsc73xx_ds_ops = {
+>  	.port_disable = vsc73xx_port_disable,
+>  	.port_change_mtu = vsc73xx_change_mtu,
+>  	.port_max_mtu = vsc73xx_get_max_mtu,
+> +	.port_stp_state_set = vsc73xx_port_stp_state_set,
+>  };
+>  
+>  static int vsc73xx_gpio_get(struct gpio_chip *chip, unsigned int offset)
+> diff --git a/drivers/net/dsa/vitesse-vsc73xx.h b/drivers/net/dsa/vitesse-vsc73xx.h
+> index f79d81ef24fb..224e284a5573 100644
+> --- a/drivers/net/dsa/vitesse-vsc73xx.h
+> +++ b/drivers/net/dsa/vitesse-vsc73xx.h
+> @@ -18,6 +18,7 @@
+>  
+>  /**
+>   * struct vsc73xx - VSC73xx state container
+> + * @forward_map: Forward table cache
+
+If you start describing the member fields, shouldn't all be described?
+I think there will be kdoc warnings otherwise.
+
+>   */
+>  struct vsc73xx {
+>  	struct device			*dev;
+> @@ -28,6 +29,7 @@ struct vsc73xx {
+>  	u8				addr[ETH_ALEN];
+>  	const struct vsc73xx_ops	*ops;
+>  	void				*priv;
+> +	u8				forward_map[VSC73XX_MAX_NUM_PORTS];
+>  };
+>  
+>  struct vsc73xx_ops {
+> -- 
+> 2.34.1
 > 
-> Please try harder to apply proper constraints to your traffic, netdev
-> is already busy enough!
-
-Do you want us to stop CCing netdev when we send patches to the outer
-review to IWL?
-This would mean they will once again start missing enough attention from
-the outside. I hope you don't want our patches to be reviewed *only* by
-Intel folks, right? I don't feel this a good idea.
-That's why we started CCing netdev this year. And we do that when we
-send patches to IWL, i.e. outside. It's not like "ok, let's Cc netdev
-instead of going through our internal review process".
-
-Our clients, partners (e.g. Czech RedHat), our developers, want our
-patches to have proper complex review. Dropping netdev would mean that a
-patch of some non-corpo guy will be reviewed more carefully and at the
-end will have better quality than an Intel patch, which "shouldn't
-overburden netdev".
-Saying "we'll see them when Tony sends a PR" also doesn't work well for
-me. A patch gets taken into a PR once it passes internal review, then
-validation, this always do take a while. Imagine waiting for a month for
-your patch to be sent in a PR to get a negative review, so that you have
-to repeat this process again and wait for another month to get some more
-change requests and again :D
-
-In a couple months, no our patches will hit netdev without a proper
-Reviewed-by obtained during the internal review, let's not take corner
-cases and effectively hide our code from the world?
-I don't think you'd like to put a huge banner on netdev's lore saying
-"please also take a look at intel-wired-lan" :z I also don't want ppl to
-behave like Greg KH some time ago when he said "where's your damn
-internal RB, stop abusing LKML" in reply to my early RFC PoC sent only
-for an open discussion xD
-
-> 
-> Thanks,
-> 
-> Paolo
-
-Thanks,
-Olek
 
