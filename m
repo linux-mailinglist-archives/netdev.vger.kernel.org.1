@@ -1,88 +1,106 @@
-Return-Path: <netdev+bounces-33024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33025-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FA9A79C4D1
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 06:48:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F86679C588
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 06:55:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE6542815EF
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 04:48:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 125DD1C2098A
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 04:55:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1D46A94C;
-	Tue, 12 Sep 2023 04:48:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C2CF15484;
+	Tue, 12 Sep 2023 04:55:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92EC723A6
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 04:48:47 +0000 (UTC)
-Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3FB3196
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 21:48:46 -0700 (PDT)
-Received: by mail-il1-x129.google.com with SMTP id e9e14a558f8ab-34f3dd14b66so42505ab.1
-        for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 21:48:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1694494126; x=1695098926; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fCKiXCBnsGLM9/DUGxw3G03F93in1L5QwEZIH8TjhvQ=;
-        b=tjwLoScKdTU4FHi8gEhKgip+VO6CAjnTVyeukeqsxT/ffnA0TFD1QINmn5DnBY0zHF
-         QQzaHH4sMEHyyhr8wAkdOGs13jqeRhE5v+hXw56URly3RJDk/jaQj8+8V2fx6L7lS9BF
-         nXLT2RKzMOc5v3QmIbwwjrrOdrOnhdt3XKnxQJ+NYmncxLRvlZAU1tGS3qo2qXsRSIcf
-         5NfU/XEhLNsiCfazEto//f6x9UA1xbLjkojfE0mk//Z57YkCf9dGOln15dwns1VgbjWu
-         NbHcnhdic9hivhfEcmvclZmaW2A1cWGIRMl9ju8bwsB7zJkif2M9c226OBi2hBwompY9
-         tIiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694494126; x=1695098926;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fCKiXCBnsGLM9/DUGxw3G03F93in1L5QwEZIH8TjhvQ=;
-        b=LE9moPP6nZW62PzPkVPM9odCLkerRCjwV4dFQcirjgjd7Mgm8992yphmHjyDXmUwvX
-         NmfpUy1aMFNfkgVL9+0Fi+7hshGVKeVbFvW5C51ntQ3SHLMAwt3e8QGQF+yaLmuudUlk
-         P/zhJR2dxsKFNjbYAAaSneC2XCJqVJxBCwsyR3BycAvPY4nkW7GZ3X9gXzpc4hiAJjve
-         4KyL1l8tXWGU4+jcs+9wjevlgDlIeoKf61soSBSR8jtHBsV6eM1Y7UQGH3ALJZeurWBX
-         /9PpmXnFeJySvtWU3VyBF6rLipQPxFuQz/T6SSxsuI9/Jg6Ooph69bpwbLg4zGlXob3V
-         Io7w==
-X-Gm-Message-State: AOJu0YzJvH2PzY8TAes8UPX4gZidwwav6r1Tu0S3dxO5IpGo9bip5SWF
-	5kyr59OK76ccClDmJLVS6YJLjg6zaUSvZYI5R0OxyQ==
-X-Google-Smtp-Source: AGHT+IHGkfqYUFGUDhPSS4KI2Q4Hp8z6uCq4kGtYcI969bHFw5Sz2C/efVSgsDpkuasAL8nZt9CFbpFpeeOFcry/Kc8=
-X-Received: by 2002:a92:cdaa:0:b0:348:8674:6706 with SMTP id
- g10-20020a92cdaa000000b0034886746706mr146452ild.10.1694494126029; Mon, 11 Sep
- 2023 21:48:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DC7920E7
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 04:55:26 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B00DD5FFD
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 21:55:25 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qfvQV-00040l-B9; Tue, 12 Sep 2023 06:55:03 +0200
+Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtp (Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qfvQT-005hVm-JP; Tue, 12 Sep 2023 06:55:01 +0200
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qfvQS-007owG-2z;
+	Tue, 12 Sep 2023 06:55:00 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	devicetree@vger.kernel.org
+Subject: [PATCH net-next v4 0/2] net: dsa: microchip: add drive strength support 
+Date: Tue, 12 Sep 2023 06:54:57 +0200
+Message-Id: <20230912045459.1864085-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230911183700.60878-1-kuniyu@amazon.com> <20230911183700.60878-2-kuniyu@amazon.com>
-In-Reply-To: <20230911183700.60878-2-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 12 Sep 2023 06:48:34 +0200
-Message-ID: <CANn89i+Qpgr8FOnoHaThpXs35Ow5Mn2pJHKRkS-mBkTUeNQCww@mail.gmail.com>
-Subject: Re: [PATCH v2 net 1/6] tcp: Factorise sk_family-independent
- comparison in inet_bind2_bucket_match(_addr_any).
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
-	Joanne Koong <joannelkoong@gmail.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Mon, Sep 11, 2023 at 8:37=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
->
-> This is a prep patch to make the following patches cleaner that touch
-> inet_bind2_bucket_match() and inet_bind2_bucket_match_addr_any().
->
-> Both functions have duplicated comparison for netns, port, and l3mdev.
-> Let's factorise them.
->
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+changes v4:
+- integrate microchip feedback to the ksz9477_drive_strengths comment.
+- add Reviewed-by: Rob Herring <robh@kernel.org>
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+changes v3:
+- yaml: use enum instead of min/max
+- do not use snprintf() on overlapping buffer.
+- unify ksz_drive_strength_to_reg() and ksz_drive_strength_error(). Make
+  it usable for KSZ9477 and KSZ8830 variants.
+- use ksz_rmw8() in ksz9477_drive_strength_write()
+
+changes v2:
+- make it work on all know KSZ* variants except of undocumented LAN*
+  switches
+- add io-drive-strength compatible for ksz88xx chips
+- test exact drive strength instead of nearest closest.
+- add comment and refactor the code
+
+Oleksij Rempel (2):
+  dt-bindings: net: dsa: microchip: Update ksz device tree bindings for
+    drive strength
+  net: dsa: microchip: Add drive strength configuration
+
+ .../bindings/net/dsa/microchip,ksz.yaml       |  20 ++
+ drivers/net/dsa/microchip/ksz8795_reg.h       |  14 -
+ drivers/net/dsa/microchip/ksz9477_reg.h       |  13 -
+ drivers/net/dsa/microchip/ksz_common.c        | 309 ++++++++++++++++++
+ drivers/net/dsa/microchip/ksz_common.h        |  20 ++
+ 5 files changed, 349 insertions(+), 27 deletions(-)
+
+-- 
+2.39.2
+
 
