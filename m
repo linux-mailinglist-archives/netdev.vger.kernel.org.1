@@ -1,155 +1,189 @@
-Return-Path: <netdev+bounces-33111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A35CB79CBBF
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 11:29:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F69579CBCA
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 11:30:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D4E62818BF
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 09:29:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65F791C20AB7
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 09:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C74C16426;
-	Tue, 12 Sep 2023 09:29:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D279F16428;
+	Tue, 12 Sep 2023 09:30:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20B348F6D
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 09:29:14 +0000 (UTC)
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A720AA;
-	Tue, 12 Sep 2023 02:29:14 -0700 (PDT)
-Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-52f3ba561d9so5563323a12.1;
-        Tue, 12 Sep 2023 02:29:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694510952; x=1695115752; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vSMVRpWVo+AScRBCa4aVAyCAGCT9RW5LD/2W0PB1Sww=;
-        b=aLshgCO4zTAqOSf1aTbNxFKmCENT+AQ3QQwvmVEkBuHAcaUp5KivXAhX/rlca6Jm9O
-         tE2ZzivHrGNfhZwL+OmYwo+1v3Hs1rHu62gB8haj+MH6qMN3MY08Ngzrn+q2h+TgfqmQ
-         DRvg2eOyDiaffPGSYIRSOelyMCabMAM1eUtDiAoSGPN4dWbTY1UpCMPSxW2LdirNBLJz
-         y5kKsKY9lx0zBlHneWIZLqMg0MHcivALdinFlqhNUseQZoakQ5vE4mFkKArV55FGr/Bo
-         Hz3Hygoo4kFr6OZTqKTEqKThJsChl7h+MaF+fNqjF8pneS8ArMoAnBQ4d1JbZ09wujCJ
-         ihqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694510952; x=1695115752;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vSMVRpWVo+AScRBCa4aVAyCAGCT9RW5LD/2W0PB1Sww=;
-        b=dtIRyfcJTgdzrYoM+EM43Q/Mq7hJth5OQZnMFGJGN8tjGSuwL3LCyG3eVNyfbQt+Nt
-         ri5JS7KFYpiXAAm1yjNO5n0FHF6agxJGArtZvEBjrfHwkxll6DVSqEY3zp5DatzWX58N
-         d/pIeafEw21r/H6YX19dCf2FZR9hfZoKHDoZ2As3ja+QrskQurgG4y6lQPuusezZz3ej
-         aDnlhV9Z73Sta6bOv8tr6++jCi4awmgcUwvLb5j5Yf6rnXseIKwsbRlueMNl9eVOMCDz
-         18+EdRpyrda+WhJjLAmhX5uMBl1gDQQvdYaNHlcC5C4a3m96h9ERSzwboATwjc7UUReT
-         shlw==
-X-Gm-Message-State: AOJu0YxGenIElGSrCM3PCbcyTqsRKvDgWmouxEN6PmCOCvZ6/MUA35kW
-	OyYrhJyeMDDhyMFlEg8cq+4=
-X-Google-Smtp-Source: AGHT+IEUHz0HFujs/1zfbaqG1lnAWE0fsRRg1JorSvF3zU7MZdiOFQnwYVvC/0GHl5ytqK60C5gI4Q==
-X-Received: by 2002:aa7:c652:0:b0:523:2e23:a0bf with SMTP id z18-20020aa7c652000000b005232e23a0bfmr2707895edr.11.1694510952196;
-        Tue, 12 Sep 2023 02:29:12 -0700 (PDT)
-Received: from skbuf ([188.25.254.186])
-        by smtp.gmail.com with ESMTPSA id y22-20020a056402135600b0051e0be09297sm5709984edw.53.2023.09.12.02.29.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Sep 2023 02:29:11 -0700 (PDT)
-Date: Tue, 12 Sep 2023 12:29:09 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Tristram.Ha@microchip.com, Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	UNGLinuxDriver@microchip.com,
-	Oleksij Rempel <linux@rempel-privat.de>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [[RFC PATCH v4 net-next] 0/2] net: dsa: hsr: Enable HSR HW
- offloading for KSZ9477
-Message-ID: <20230912092909.4yj4b2b4xrhzdztu@skbuf>
-References: <20230906152801.921664-1-lukma@denx.de>
- <20230911165848.0741c03c@wsk>
- <20230911160501.5vc4nttz6fnww56h@skbuf>
- <20230912101748.0ca4eec8@wsk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C433514F84
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 09:30:26 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14553AA
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 02:30:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694511026; x=1726047026;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=az/P5VcS7y6RnLURzuxIdD/CGde1PcjrEtLTetl36xE=;
+  b=cvIKWARDDHcxwuWVhPl3/bzTMF1EG3MAYCOqjwbWm08fgYxsN8PIwH27
+   EvpMMYJGQrvAb6jLrvPlTWG3n/kItA7/aiqqsgsH5AT2DNcC9fhJU3jNd
+   H1AevEUTGICa1CgSPj/judANbG7KQIk/Lc361+mJEQDU+oi4QSn/mJuzR
+   vZrTIqNZ+7T/VVZsfMJ559LfMeHjV5W4x0draQy7W1Vsveba+tytpLSxT
+   naj9Sllxvw2CNUgOcc+esoEhIGWDKncGUseU0vjR01j4fgDoNZb7JAGql
+   qcEGghjfy8BJq8Sp1mo7mnbJ0C3sn3AXFQHRCGdDlHNn9o1tw5lL1snc5
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10830"; a="375655200"
+X-IronPort-AV: E=Sophos;i="6.02,245,1688454000"; 
+   d="scan'208";a="375655200"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2023 02:29:56 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10830"; a="809170420"
+X-IronPort-AV: E=Sophos;i="6.02,245,1688454000"; 
+   d="scan'208";a="809170420"
+Received: from amlin-019-225.igk.intel.com ([10.102.19.225])
+  by fmsmga008.fm.intel.com with ESMTP; 12 Sep 2023 02:29:55 -0700
+From: Andrii Staikov <andrii.staikov@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Andrii Staikov <andrii.staikov@intel.com>
+Subject: [PATCH iwl-next  v2] ice: Add support for packet mirroring using hardware in switchdev mode
+Date: Tue, 12 Sep 2023 11:29:52 +0200
+Message-Id: <20230912092952.2814966-1-andrii.staikov@intel.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230912101748.0ca4eec8@wsk>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Sep 12, 2023 at 10:17:48AM +0200, Lukasz Majewski wrote:
-> IMHO, somebody who will use HSR will not fiddle with mac addresses of
-> LAN1 and ETH0. It will be setup by savvy user once at boot up.
+Switchdev mode allows to add mirroring rules to mirror
+incoming and outgoing packets to the interface's port
+representor. Previously, this was available only using
+software functionality. Add possibility to offload this
+functionality to the NIC hardware.
 
-The point is, it has to work in all configurations that are accepted by
-the kernel.
+Introduce ICE_MIRROR_PACKET filter action to the
+ice_sw_fwd_act_type enum to identify the desired action
+and pass it to the hardware as well as the VSI to mirror.
 
-> Please correct me if I'm wrong, but the above issue (with lack of sync
-> of mac address change in DSA master and its ports) seems to be
-> affecting HSR support in a minimal way (when considering the above).
+Example of tc mirror command using hardware:
+tc filter add dev ens1f0np0 ingress protocol ip prio 1 flower
+src_mac b4:96:91:a5:c7:a7 skip_sw action mirred egress mirror dev eth1
 
-It's a different (and very old) bug for sure. But it has impact upon the
-v4 patch set as you've presented it here.
+ens1f0np0 - PF
+b4:96:91:a5:c7:a7 - source MAC address
+eth1 - PR of a VF to mirror to
 
-> If I may ask - what is your suggestion to have the HSR join feature
-> merged for KSZ9477 SoC ?
+Signed-off-by: Andrii Staikov <andrii.staikov@intel.com>
+---
+v1 -> v2: no need for changes in ice_add_tc_flower_adv_fltr()
+---
+ drivers/net/ethernet/intel/ice/ice_switch.c | 25 +++++++++++++++------
+ drivers/net/ethernet/intel/ice/ice_tc_lib.c | 13 +++++++++++
+ drivers/net/ethernet/intel/ice/ice_type.h   |  1 +
+ 3 files changed, 32 insertions(+), 7 deletions(-)
 
-Anything that makes sense and works is worth considering.
+diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c b/drivers/net/ethernet/intel/ice/ice_switch.c
+index 2f77b684ff76..d915b72e8dbb 100644
+--- a/drivers/net/ethernet/intel/ice/ice_switch.c
++++ b/drivers/net/ethernet/intel/ice/ice_switch.c
+@@ -6100,6 +6100,7 @@ ice_add_adv_rule(struct ice_hw *hw, struct ice_adv_lkup_elem *lkups,
+ 	      rinfo->sw_act.fltr_act == ICE_FWD_TO_Q ||
+ 	      rinfo->sw_act.fltr_act == ICE_FWD_TO_QGRP ||
+ 	      rinfo->sw_act.fltr_act == ICE_DROP_PACKET ||
++	      rinfo->sw_act.fltr_act == ICE_MIRROR_PACKET ||
+ 	      rinfo->sw_act.fltr_act == ICE_NOP)) {
+ 		status = -EIO;
+ 		goto free_pkt_profile;
+@@ -6112,9 +6113,11 @@ ice_add_adv_rule(struct ice_hw *hw, struct ice_adv_lkup_elem *lkups,
+ 	}
+ 
+ 	if (rinfo->sw_act.fltr_act == ICE_FWD_TO_VSI ||
+-	    rinfo->sw_act.fltr_act == ICE_NOP)
++	    rinfo->sw_act.fltr_act == ICE_MIRROR_PACKET ||
++	    rinfo->sw_act.fltr_act == ICE_NOP) {
+ 		rinfo->sw_act.fwd_id.hw_vsi_id =
+ 			ice_get_hw_vsi_num(hw, vsi_handle);
++	}
+ 
+ 	if (rinfo->src_vsi)
+ 		rinfo->sw_act.src = ice_get_hw_vsi_num(hw, rinfo->src_vsi);
+@@ -6150,12 +6153,15 @@ ice_add_adv_rule(struct ice_hw *hw, struct ice_adv_lkup_elem *lkups,
+ 		status = -ENOMEM;
+ 		goto free_pkt_profile;
+ 	}
+-	if (!rinfo->flags_info.act_valid) {
+-		act |= ICE_SINGLE_ACT_LAN_ENABLE;
+-		act |= ICE_SINGLE_ACT_LB_ENABLE;
+-	} else {
+-		act |= rinfo->flags_info.act & (ICE_SINGLE_ACT_LAN_ENABLE |
+-						ICE_SINGLE_ACT_LB_ENABLE);
++
++	if (rinfo->sw_act.fltr_act != ICE_MIRROR_PACKET) {
++		if (!rinfo->flags_info.act_valid) {
++			act |= ICE_SINGLE_ACT_LAN_ENABLE;
++			act |= ICE_SINGLE_ACT_LB_ENABLE;
++		} else {
++			act |= rinfo->flags_info.act & (ICE_SINGLE_ACT_LAN_ENABLE |
++							ICE_SINGLE_ACT_LB_ENABLE);
++		}
+ 	}
+ 
+ 	switch (rinfo->sw_act.fltr_act) {
+@@ -6182,6 +6188,11 @@ ice_add_adv_rule(struct ice_hw *hw, struct ice_adv_lkup_elem *lkups,
+ 		act |= ICE_SINGLE_ACT_VSI_FORWARDING | ICE_SINGLE_ACT_DROP |
+ 		       ICE_SINGLE_ACT_VALID_BIT;
+ 		break;
++	case ICE_MIRROR_PACKET:
++		act |= ICE_SINGLE_ACT_OTHER_ACTS;
++		act |= (rinfo->sw_act.fwd_id.hw_vsi_id << ICE_SINGLE_ACT_MIRROR_VSI_ID_S) &
++		       ICE_SINGLE_ACT_MIRROR_VSI_ID_M;
++		break;
+ 	case ICE_NOP:
+ 		act |= FIELD_PREP(ICE_SINGLE_ACT_VSI_ID_M,
+ 				  rinfo->sw_act.fwd_id.hw_vsi_id);
+diff --git a/drivers/net/ethernet/intel/ice/ice_tc_lib.c b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
+index 37b54db91df2..db34df1890f7 100644
+--- a/drivers/net/ethernet/intel/ice/ice_tc_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
+@@ -659,6 +659,19 @@ ice_eswitch_tc_parse_action(struct ice_tc_flower_fltr *fltr,
+ 
+ 		break;
+ 
++	case FLOW_ACTION_MIRRED:
++		fltr->action.fltr_act = ICE_MIRROR_PACKET;
++
++		if (ice_is_port_repr_netdev(act->dev)) {
++			repr = ice_netdev_to_repr(act->dev);
++
++			fltr->dest_vsi = repr->src_vsi;
++		} else {
++			NL_SET_ERR_MSG_MOD(fltr->extack, "Provided netdevice doesn't support mirroring");
++			return -EINVAL;
++		}
++		break;
++
+ 	default:
+ 		NL_SET_ERR_MSG_MOD(fltr->extack, "Unsupported action in switchdev mode");
+ 		return -EINVAL;
+diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
+index 02db9e5810e6..f5c35dc8766f 100644
+--- a/drivers/net/ethernet/intel/ice/ice_type.h
++++ b/drivers/net/ethernet/intel/ice/ice_type.h
+@@ -1047,6 +1047,7 @@ enum ice_sw_fwd_act_type {
+ 	ICE_FWD_TO_Q,
+ 	ICE_FWD_TO_QGRP,
+ 	ICE_DROP_PACKET,
++	ICE_MIRROR_PACKET,
+ 	ICE_NOP,
+ 	ICE_INVAL_ACT
+ };
+-- 
+2.25.1
 
-For example, one can argue that since we already have this pattern in 2
-places in net/dsa/slave.c:
-
-	/* If the port doesn't have its own MAC address and relies on the DSA
-	 * master's one, inherit it again from the new DSA master.
-	 */
-	if (is_zero_ether_addr(dp->mac))
-		eth_hw_addr_inherit(dev, master);
-
-then the consistent way to react to NETDEV_CHANGEADDR events on the
-master is to change the user ports' MAC address yet again, to track the
-master.
-
-In any case, as long as it's the DSA master's address that we program to
-hardware, then I see it as inevitable to add a new struct dsa_switch_ops ::
-master_addr_change() function, similar to master_state_change(). The driver
-would always be notified of the current (even initial) MAC address, and
-it could update the hardware registers (for WoL, pause frames and HSR
-self-address filtering, in this case).
-
-The above 2 changes could be one way to ensure that if a HSR device was
-accepted for offload initially, it will remain in a configuration that
-will keep working.
-
-
-Or you can argue that dragging the DSA master into the discussion about
-how we should program REG_SW_MAC_ADDR_0 is a complication. An API
-internal to the microchip ksz driver could be added, where the user
-ports on which the various specialty features are enabled (HSR, WoL)
-take a reference on the REG_SW_MAC_ADDR_0 with their MAC address.
-If the reference on REG_SW_MAC_ADDR_0 gets bumped from 0 to 1, the
-hardware is programmed with the requesting port's MAC address. If the
-reference is already elevated, then a request to increase it, coming
-from another port, is accepted or denied, depending on whether the MAC
-address of that port is equal to what's programmed into REG_SW_MAC_ADDR_0
-or not. The refusal gets propagated to the user, together with an
-informative extack message. The ports which hold a reference on
-REG_SW_MAC_ADDR_0 cannot have their MAC address changed - and for this,
-you'd have to add a hook to dsa_switch_ops (and thus to the driver) from
-dsa_slave_set_mac_address().
-
-
-So, there are some options to pick from.
-
-> Will the above problem block the HSR offloading support mainlining,
-> even when the self mac address filtering is one of four HW based
-> features for this SoC?
-
-I don't know, that depends on you.
 
