@@ -1,128 +1,122 @@
-Return-Path: <netdev+bounces-33325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2C6879D677
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 18:37:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E3FAC79D688
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 18:40:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C9DD281F48
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 16:37:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D311281837
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 16:40:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29B087F0;
-	Tue, 12 Sep 2023 16:37:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 754357F0;
+	Tue, 12 Sep 2023 16:40:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62A2A621
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 16:37:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35ED1C433C7;
-	Tue, 12 Sep 2023 16:37:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694536632;
-	bh=OJuoXIE82hjK2NBMYhWXwpJGkmlI7rC+5Tx9u3yV2tM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ps2S5DYSbulUYf7oy7lT6QUeIC8SEE8uDrovxyzlP1aFanperwJfPxgxOSDoMicdj
-	 QPhK/QjxkpPvjv2poRuKEjUgTqjp60TdQnRQmmahJid4JusPVASg0K1uVbLr45UAB9
-	 O+q5IVvxkSBtPB4uIoSzebjqIZKeWLsg1NRa9ESumUogVOWqga9FHZ4uTwbMwFliV4
-	 inf0fEeH4WTZISjvzOruneKr+bXI0QcpZaEpr0gdpaoAWUmP+DefmPc84zsLhd9NP2
-	 YObhh1gBw/Dws7ynhREpR3QXWW0o3PhgfgfBYRLDlXE9yJVBmWttawahid5gfYz9Cd
-	 Kjln+OFCXKa7w==
-Date: Tue, 12 Sep 2023 17:37:03 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Lee Jones <lee@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Qiang Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>,
-	Shengjiu Wang <shengjiu.wang@gmail.com>,
-	Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>,
-	Nicolin Chen <nicoleotsuka@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org,
-	Simon Horman <horms@kernel.org>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v5 07/31] dt-bindings: soc: fsl: cpm_qe: cpm1-scc-qmc:
- Add 'additionalProperties: false' in child nodes
-Message-ID: <20230912-pancreas-hacked-ddcaa726fa8e@spud>
-References: <20230912081527.208499-1-herve.codina@bootlin.com>
- <20230912081527.208499-8-herve.codina@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6954A621
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 16:40:32 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B00C3115
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 09:40:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=izkgj7DyBqmPtxp1h8cZ+QdYcmh/+5DF/POXzwEBmd0=; b=Hsei58Fo1pCVSzfuTtDcrrYE5O
+	JNVjpwzDK57snq9eh1dRU2OSbEWDDTzfn1dI+4gXUqs+4xkeBDtuoHhQEYPNbj6aMIvq6Dc2APlrv
+	S0SgVCtOwX+KBEpQR6ZxwK9Eq4h1ePvNu13Kg3C90WFHkQeb5XXq2DdE1zINWjTPsCE751T3euojW
+	IzX5BbkHSKJnedzF5emIHjVZv1plso94JuX9PkdbKP0Pdan5p89M0dX/DoPIpK+rI4Hst3oIojYna
+	2AWFVkoFiRJ9221GT4bMHEbCVTQ086enCDJZSAafPvtsT7rCwEvWGornWyeSDlVQE/kR0ASkXtfB1
+	C8+HCusQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59998)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qg6R7-0001SW-0f;
+	Tue, 12 Sep 2023 17:40:25 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qg6R7-0002rs-38; Tue, 12 Sep 2023 17:40:25 +0100
+Date: Tue, 12 Sep 2023 17:40:25 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: edward.cree@amd.com
+Cc: linux-net-drivers@amd.com, davem@davemloft.net, kuba@kernel.org,
+	edumazet@google.com, pabeni@redhat.com,
+	Edward Cree <ecree.xilinx@gmail.com>, netdev@vger.kernel.org,
+	habetsm.xilinx@gmail.com, sudheer.mogilappagari@intel.com,
+	jdamato@fastly.com, andrew@lunn.ch, mw@semihalf.com,
+	sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
+	hkelam@marvell.com, saeedm@nvidia.com, leon@kernel.org
+Subject: Re: [RFC PATCH v3 net-next 6/7] net: ethtool: add a mutex protecting
+ RSS contexts
+Message-ID: <ZQCUeTrMpmxhlW9C@shell.armlinux.org.uk>
+References: <cover.1694443665.git.ecree.xilinx@gmail.com>
+ <b9bdb464a3fcfcfa7ab01b1cf5e0e312c04752f5.1694443665.git.ecree.xilinx@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="H5/71ZKZWMUncSI5"
-Content-Disposition: inline
-In-Reply-To: <20230912081527.208499-8-herve.codina@bootlin.com>
-
-
---H5/71ZKZWMUncSI5
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <b9bdb464a3fcfcfa7ab01b1cf5e0e312c04752f5.1694443665.git.ecree.xilinx@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, Sep 12, 2023 at 10:14:58AM +0200, Herve Codina wrote:
-> Additional properties in child node should not be allowed.
->=20
-> Prevent them adding 'additionalProperties: false'
->=20
-> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
-
-Thanks,
-Conor.
-
+On Tue, Sep 12, 2023 at 03:21:41PM +0100, edward.cree@amd.com wrote:
+> From: Edward Cree <ecree.xilinx@gmail.com>
+> 
+> While this is not needed to serialise the ethtool entry points (which
+>  are all under RTNL), drivers may have cause to asynchronously access
+>  dev->ethtool->rss_ctx; taking dev->ethtool->rss_lock allows them to
+>  do this safely without needing to take the RTNL.
+> 
+> Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
 > ---
->  .../devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml     | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-sc=
-c-qmc.yaml b/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-=
-qmc.yaml
-> index 450a0354cb1d..82d9beb48e00 100644
-> --- a/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.y=
-aml
-> +++ b/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.y=
-aml
-> @@ -64,6 +64,7 @@ patternProperties:
->      description:
->        A channel managed by this controller
->      type: object
-> +    additionalProperties: false
-> =20
->      properties:
->        reg:
-> --=20
-> 2.41.0
->=20
+>  include/linux/ethtool.h | 3 +++
+>  net/core/dev.c          | 5 +++++
+>  net/ethtool/ioctl.c     | 7 +++++++
+>  3 files changed, 15 insertions(+)
+> 
+> diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+> index 8977aa8523e3..1f8293deebd5 100644
+> --- a/include/linux/ethtool.h
+> +++ b/include/linux/ethtool.h
+> @@ -1026,11 +1026,14 @@ int ethtool_virtdev_set_link_ksettings(struct net_device *dev,
+>  /**
+>   * struct ethtool_netdev_state - per-netdevice state for ethtool features
+>   * @rss_ctx:		IDR storing custom RSS context state
+> + * @rss_lock:		Protects entries in @rss_ctx.  May be taken from
+> + *			within RTNL.
+>   * @rss_ctx_max_id:	maximum (exclusive) supported RSS context ID
+>   * @wol_enabled:	Wake-on-LAN is enabled
+>   */
+>  struct ethtool_netdev_state {
+>  	struct idr		rss_ctx;
+> +	struct mutex		rss_lock;
+>  	u32			rss_ctx_max_id;
+>  	u32			wol_enabled:1;
+>  };
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index f12767466427..2acb4d8cd4c7 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -10054,6 +10054,7 @@ int register_netdevice(struct net_device *dev)
+>  	idr_init_base(&dev->ethtool->rss_ctx, 1);
+>  
+>  	spin_lock_init(&dev->addr_list_lock);
+> +	mutex_init(&dev->ethtool->rss_lock);
 
---H5/71ZKZWMUncSI5
-Content-Type: application/pgp-signature; name="signature.asc"
+Is there a reason to split this from the idr (eventually xarray)
+initialisation above? Surely initialisations for a feature (rss)
+should all be grouped together?
 
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZQCTrwAKCRB4tDGHoIJi
-0n+XAQCw6AgUOq0NyPZHrHWu5ogYxBjVGRRZ4L314GuJF/TwRAEA3G14ilDkYP5o
-3fMneddHCQlNQIVPUgNd/ldquYguZwQ=
-=eFLQ
------END PGP SIGNATURE-----
-
---H5/71ZKZWMUncSI5--
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
