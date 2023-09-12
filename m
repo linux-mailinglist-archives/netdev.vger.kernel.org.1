@@ -1,280 +1,190 @@
-Return-Path: <netdev+bounces-33190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33188-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 577E379CF36
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 13:06:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47A6B79CF31
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 13:05:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F9DE28155D
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 11:06:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B26A2819CD
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 11:05:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D822C1642B;
-	Tue, 12 Sep 2023 11:05:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 082A616433;
+	Tue, 12 Sep 2023 11:05:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B52EFA936
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 11:05:27 +0000 (UTC)
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 436A610EF
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 04:05:25 -0700 (PDT)
-Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.54])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4RlLKX1PBWz1N818;
-	Tue, 12 Sep 2023 19:03:12 +0800 (CST)
-Received: from huawei.com (10.90.53.73) by kwepemi500008.china.huawei.com
- (7.221.188.139) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Tue, 12 Sep
- 2023 19:05:07 +0800
-From: Jinjie Ruan <ruanjinjie@huawei.com>
-To: <lars.povlsen@microchip.com>, <Steen.Hegelund@microchip.com>,
-	<daniel.machon@microchip.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>,
-	<linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
-	<UNGLinuxDriver@microchip.com>
-CC: <ruanjinjie@huawei.com>
-Subject: [PATCH net v3 5/5] net: microchip: sparx5: Fix possible memory leaks in vcap_api_kunit
-Date: Tue, 12 Sep 2023 19:03:10 +0800
-Message-ID: <20230912110310.1540474-6-ruanjinjie@huawei.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230912110310.1540474-1-ruanjinjie@huawei.com>
-References: <20230912110310.1540474-1-ruanjinjie@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F070E2F37
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 11:05:09 +0000 (UTC)
+Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E475219A6
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 04:05:08 -0700 (PDT)
+Received: by mail-yb1-xb31.google.com with SMTP id 3f1490d57ef6-d7b89ae27d3so4746776276.3
+        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 04:05:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1694516708; x=1695121508; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8FMoBWtmvLq6bgdekThyp6v4fhBAV0YiqC8BS8aCPcE=;
+        b=iLR0n9msF80qSSX64CsTjmtDEbEVqWCqg6NehBvvHfXb1Aq89f394kl3CACzlkipkf
+         ENLUWyY5nYtPLe+nrl2Pva6OrMMVsAdFpIUZ4CF6bQYTz4Pu3Z0Z3GscWO4Kbg+cpgYN
+         rXV12aWnx0sn7NHbMnBdtoJsP53wF88Byx7C7kCYXJ7x6oVfr6nD7WTmBpZn1Lz4EPx3
+         iuoQ4Foiuf38imGpcERI+3dcc8qm/ueL2fmHGZZNrDVBnSqJoTEWRKnhqDfOR8WRSHW8
+         E56W/a5cfo/4ghQvCfcyHbZ9xHWMyl8ss94fP52qtUboWFJLwhk13SNdjYKCNe3EuTG6
+         H3bw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694516708; x=1695121508;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8FMoBWtmvLq6bgdekThyp6v4fhBAV0YiqC8BS8aCPcE=;
+        b=RQSpouNTdcGIsf1nK5sHvSs1V45MNVAc3RbV4GnR46o4IA/dgAWy3N0Ua+PhIB1BDG
+         jFW8RXuQcvbKPGHo4YjUrrhQL1z4Lz3+mrutedxm0ugVnqdCkLk15PvDkf6mSADm5Ad7
+         N70WfiRkBCPXi3Px1sdAaKfR9MBMUQFwiGYF+n+uuT+qsMRXtWXGr8ltjH1k8SNwq4uU
+         UMlYxMY3JJO68qPQ4kMeGm1oa2Zh18qY8PPOPbxRWHYNTX8llnHh0PzsKJ0TqdrGqLfV
+         9mX47SbDbXn1nPF19WPOd1wAbYmJnXHk5Ih6Qlh+SD6HF1+BmluoqnrUU0dcvEV40lF1
+         OCqA==
+X-Gm-Message-State: AOJu0YwgPDYHO87jgQ/I64Lqfk83XLXwqhyUDTWHkUJa+eoRTaEFogax
+	7CPf3qI6oXG5u1O9e338HQ0V/MtxIzfHfS2REo+8IoTcv5eVoPojgUs=
+X-Google-Smtp-Source: AGHT+IHWFG9XShCR9EYCQbjpGN6Qxg22q5tUHNLhGUJSf212PqAwCH8zHTtn0AYfPfJADbtFAnVTC3aGLAvqi8JMMgU=
+X-Received: by 2002:a25:d695:0:b0:d62:6514:45b7 with SMTP id
+ n143-20020a25d695000000b00d62651445b7mr11205815ybg.37.1694516708153; Tue, 12
+ Sep 2023 04:05:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.90.53.73]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemi500008.china.huawei.com (7.221.188.139)
-X-CFilter-Loop: Reflected
+References: <20230912081527.208499-1-herve.codina@bootlin.com> <20230912101505.225899-1-herve.codina@bootlin.com>
+In-Reply-To: <20230912101505.225899-1-herve.codina@bootlin.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Tue, 12 Sep 2023 13:04:56 +0200
+Message-ID: <CACRpkdbxdMZt4E1SF1v9as-jw=TpvS1mk2TQqAgywMBLbKaNoA@mail.gmail.com>
+Subject: Re: [PATCH v5 28/31] pinctrl: Add support for the Lantic PEF2256 pinmux
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Lee Jones <lee@kernel.org>, Qiang Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, 
+	Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Shengjiu Wang <shengjiu.wang@gmail.com>, 
+	Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>, 
+	Nicolin Chen <nicoleotsuka@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>, 
+	Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org, 
+	Simon Horman <horms@kernel.org>, Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Inject fault while probing kunit-example-test.ko, the duprule which
-is allocated by kzalloc in vcap_dup_rule() of
-test_vcap_xn_rule_creator() is not freed, and it cause the memory leaks
-below. Use vcap_del_rule() to free them as other functions do it.
+Hi Herve,
 
-unreferenced object 0xffff6eb4846f6180 (size 192):
-  comm "kunit_try_catch", pid 405, jiffies 4294895522 (age 880.004s)
-  hex dump (first 32 bytes):
-    10 27 00 00 04 00 00 00 0a 00 00 00 f4 01 00 00  .'..............
-    00 00 00 00 00 00 00 00 98 61 6f 84 b4 6e ff ff  .........ao..n..
-  backtrace:
-    [<00000000f1b5b86e>] slab_post_alloc_hook+0xb8/0x368
-    [<00000000c56cdd9a>] __kmem_cache_alloc_node+0x174/0x290
-    [<0000000046ef1b64>] kmalloc_trace+0x40/0x164
-    [<000000008565145b>] vcap_dup_rule+0x38/0x210
-    [<00000000bd9e1f12>] vcap_add_rule+0x29c/0x32c
-    [<0000000070a539b1>] test_vcap_xn_rule_creator.constprop.43+0x120/0x330
-    [<00000000d2ac4ccb>] vcap_api_rule_insert_in_order_test+0xa4/0x114
-    [<000000000f88f9cb>] kunit_try_run_case+0x50/0xac
-    [<00000000e848de5a>] kunit_generic_run_threadfn_adapter+0x20/0x2c
-    [<0000000058a88b6b>] kthread+0x124/0x130
-    [<00000000891cf28a>] ret_from_fork+0x10/0x20
-unreferenced object 0xffff6eb4846f6240 (size 192):
-  comm "kunit_try_catch", pid 405, jiffies 4294895524 (age 879.996s)
-  hex dump (first 32 bytes):
-    10 27 00 00 04 00 00 00 14 00 00 00 90 01 00 00  .'..............
-    00 00 00 00 00 00 00 00 58 62 6f 84 b4 6e ff ff  ........Xbo..n..
-  backtrace:
-    [<00000000f1b5b86e>] slab_post_alloc_hook+0xb8/0x368
-    [<00000000c56cdd9a>] __kmem_cache_alloc_node+0x174/0x290
-    [<0000000046ef1b64>] kmalloc_trace+0x40/0x164
-    [<000000008565145b>] vcap_dup_rule+0x38/0x210
-    [<00000000bd9e1f12>] vcap_add_rule+0x29c/0x32c
-    [<0000000070a539b1>] test_vcap_xn_rule_creator.constprop.43+0x120/0x330
-    [<0000000052e6ad35>] vcap_api_rule_insert_in_order_test+0xbc/0x114
-    [<000000000f88f9cb>] kunit_try_run_case+0x50/0xac
-    [<00000000e848de5a>] kunit_generic_run_threadfn_adapter+0x20/0x2c
-    [<0000000058a88b6b>] kthread+0x124/0x130
-    [<00000000891cf28a>] ret_from_fork+0x10/0x20
-unreferenced object 0xffff6eb4846f6300 (size 192):
-  comm "kunit_try_catch", pid 405, jiffies 4294895524 (age 879.996s)
-  hex dump (first 32 bytes):
-    10 27 00 00 04 00 00 00 1e 00 00 00 2c 01 00 00  .'..........,...
-    00 00 00 00 00 00 00 00 18 63 6f 84 b4 6e ff ff  .........co..n..
-  backtrace:
-    [<00000000f1b5b86e>] slab_post_alloc_hook+0xb8/0x368
-    [<00000000c56cdd9a>] __kmem_cache_alloc_node+0x174/0x290
-    [<0000000046ef1b64>] kmalloc_trace+0x40/0x164
-    [<000000008565145b>] vcap_dup_rule+0x38/0x210
-    [<00000000bd9e1f12>] vcap_add_rule+0x29c/0x32c
-    [<0000000070a539b1>] test_vcap_xn_rule_creator.constprop.43+0x120/0x330
-    [<000000001b0895d4>] vcap_api_rule_insert_in_order_test+0xd4/0x114
-    [<000000000f88f9cb>] kunit_try_run_case+0x50/0xac
-    [<00000000e848de5a>] kunit_generic_run_threadfn_adapter+0x20/0x2c
-    [<0000000058a88b6b>] kthread+0x124/0x130
-    [<00000000891cf28a>] ret_from_fork+0x10/0x20
-unreferenced object 0xffff6eb4846f63c0 (size 192):
-  comm "kunit_try_catch", pid 405, jiffies 4294895524 (age 880.012s)
-  hex dump (first 32 bytes):
-    10 27 00 00 04 00 00 00 28 00 00 00 c8 00 00 00  .'......(.......
-    00 00 00 00 00 00 00 00 d8 63 6f 84 b4 6e ff ff  .........co..n..
-  backtrace:
-    [<00000000f1b5b86e>] slab_post_alloc_hook+0xb8/0x368
-    [<00000000c56cdd9a>] __kmem_cache_alloc_node+0x174/0x290
-    [<0000000046ef1b64>] kmalloc_trace+0x40/0x164
-    [<000000008565145b>] vcap_dup_rule+0x38/0x210
-    [<00000000bd9e1f12>] vcap_add_rule+0x29c/0x32c
-    [<0000000070a539b1>] test_vcap_xn_rule_creator.constprop.43+0x120/0x330
-    [<00000000134c151f>] vcap_api_rule_insert_in_order_test+0xec/0x114
-    [<000000000f88f9cb>] kunit_try_run_case+0x50/0xac
-    [<00000000e848de5a>] kunit_generic_run_threadfn_adapter+0x20/0x2c
-    [<0000000058a88b6b>] kthread+0x124/0x130
-    [<00000000891cf28a>] ret_from_fork+0x10/0x20
-unreferenced object 0xffff6eb4845fc180 (size 192):
-  comm "kunit_try_catch", pid 407, jiffies 4294895527 (age 880.000s)
-  hex dump (first 32 bytes):
-    10 27 00 00 04 00 00 00 14 00 00 00 c8 00 00 00  .'..............
-    00 00 00 00 00 00 00 00 98 c1 5f 84 b4 6e ff ff  .........._..n..
-  backtrace:
-    [<00000000f1b5b86e>] slab_post_alloc_hook+0xb8/0x368
-    [<00000000c56cdd9a>] __kmem_cache_alloc_node+0x174/0x290
-    [<0000000046ef1b64>] kmalloc_trace+0x40/0x164
-    [<000000008565145b>] vcap_dup_rule+0x38/0x210
-    [<00000000bd9e1f12>] vcap_add_rule+0x29c/0x32c
-    [<0000000070a539b1>] test_vcap_xn_rule_creator.constprop.43+0x120/0x330
-    [<00000000fa5f64d3>] vcap_api_rule_insert_reverse_order_test+0xc8/0x600
-    [<000000000f88f9cb>] kunit_try_run_case+0x50/0xac
-    [<00000000e848de5a>] kunit_generic_run_threadfn_adapter+0x20/0x2c
-    [<0000000058a88b6b>] kthread+0x124/0x130
-    [<00000000891cf28a>] ret_from_fork+0x10/0x20
-unreferenced object 0xffff6eb4845fc240 (size 192):
-  comm "kunit_try_catch", pid 407, jiffies 4294895527 (age 880.000s)
-  hex dump (first 32 bytes):
-    10 27 00 00 04 00 00 00 1e 00 00 00 2c 01 00 00  .'..........,...
-    00 00 00 00 00 00 00 00 58 c2 5f 84 b4 6e ff ff  ........X._..n..
-  backtrace:
-    [<00000000f1b5b86e>] slab_post_alloc_hook+0xb8/0x368
-    [<00000000c56cdd9a>] __kmem_cache_alloc_node+0x174/0x290
-    [<0000000046ef1b64>] kmalloc_trace+0x40/0x164
-    [<000000008565145b>] vcap_dup_rule+0x38/0x210
-    [<00000000453dcd80>] vcap_add_rule+0x134/0x32c
-    [<0000000070a539b1>] test_vcap_xn_rule_creator.constprop.43+0x120/0x330
-    [<00000000a7db42de>] vcap_api_rule_insert_reverse_order_test+0x108/0x600
-    [<000000000f88f9cb>] kunit_try_run_case+0x50/0xac
-    [<00000000e848de5a>] kunit_generic_run_threadfn_adapter+0x20/0x2c
-    [<0000000058a88b6b>] kthread+0x124/0x130
-    [<00000000891cf28a>] ret_from_fork+0x10/0x20
-unreferenced object 0xffff6eb4845fc300 (size 192):
-  comm "kunit_try_catch", pid 407, jiffies 4294895527 (age 880.000s)
-  hex dump (first 32 bytes):
-    10 27 00 00 04 00 00 00 28 00 00 00 90 01 00 00  .'......(.......
-    00 00 00 00 00 00 00 00 18 c3 5f 84 b4 6e ff ff  .........._..n..
-  backtrace:
-    [<00000000f1b5b86e>] slab_post_alloc_hook+0xb8/0x368
-    [<00000000c56cdd9a>] __kmem_cache_alloc_node+0x174/0x290
-    [<0000000046ef1b64>] kmalloc_trace+0x40/0x164
-    [<000000008565145b>] vcap_dup_rule+0x38/0x210
-    [<00000000453dcd80>] vcap_add_rule+0x134/0x32c
-    [<0000000070a539b1>] test_vcap_xn_rule_creator.constprop.43+0x120/0x330
-    [<00000000ea416c94>] vcap_api_rule_insert_reverse_order_test+0x150/0x600
-    [<000000000f88f9cb>] kunit_try_run_case+0x50/0xac
-    [<00000000e848de5a>] kunit_generic_run_threadfn_adapter+0x20/0x2c
-    [<0000000058a88b6b>] kthread+0x124/0x130
-    [<00000000891cf28a>] ret_from_fork+0x10/0x20
-unreferenced object 0xffff6eb4845fc3c0 (size 192):
-  comm "kunit_try_catch", pid 407, jiffies 4294895527 (age 880.020s)
-  hex dump (first 32 bytes):
-    10 27 00 00 04 00 00 00 32 00 00 00 f4 01 00 00  .'......2.......
-    00 00 00 00 00 00 00 00 d8 c3 5f 84 b4 6e ff ff  .........._..n..
-  backtrace:
-    [<00000000f1b5b86e>] slab_post_alloc_hook+0xb8/0x368
-    [<00000000c56cdd9a>] __kmem_cache_alloc_node+0x174/0x290
-    [<0000000046ef1b64>] kmalloc_trace+0x40/0x164
-    [<000000008565145b>] vcap_dup_rule+0x38/0x210
-    [<00000000453dcd80>] vcap_add_rule+0x134/0x32c
-    [<0000000070a539b1>] test_vcap_xn_rule_creator.constprop.43+0x120/0x330
-    [<00000000764a39b4>] vcap_api_rule_insert_reverse_order_test+0x198/0x600
-    [<000000000f88f9cb>] kunit_try_run_case+0x50/0xac
-    [<00000000e848de5a>] kunit_generic_run_threadfn_adapter+0x20/0x2c
-    [<0000000058a88b6b>] kthread+0x124/0x130
-    [<00000000891cf28a>] ret_from_fork+0x10/0x20
-unreferenced object 0xffff6eb484cd4240 (size 192):
-  comm "kunit_try_catch", pid 413, jiffies 4294895543 (age 879.956s)
-  hex dump (first 32 bytes):
-    10 27 00 00 04 00 00 00 1e 00 00 00 2c 01 00 00  .'..........,...
-    00 00 00 00 00 00 00 00 58 42 cd 84 b4 6e ff ff  ........XB...n..
-  backtrace:
-    [<00000000f1b5b86e>] slab_post_alloc_hook+0xb8/0x368
-    [<00000000c56cdd9a>] __kmem_cache_alloc_node+0x174/0x290
-    [<0000000046ef1b64>] kmalloc_trace+0x40/0x164
-    [<000000008565145b>] vcap_dup_rule+0x38/0x210
-    [<00000000bd9e1f12>] vcap_add_rule+0x29c/0x32c
-    [<0000000070a539b1>] test_vcap_xn_rule_creator.constprop.43+0x120/0x330
-    [<0000000023976dd4>] vcap_api_rule_remove_in_front_test+0x158/0x658
-    [<000000000f88f9cb>] kunit_try_run_case+0x50/0xac
-    [<00000000e848de5a>] kunit_generic_run_threadfn_adapter+0x20/0x2c
-    [<0000000058a88b6b>] kthread+0x124/0x130
-    [<00000000891cf28a>] ret_from_fork+0x10/0x20
-unreferenced object 0xffff6eb484cd4300 (size 192):
-  comm "kunit_try_catch", pid 413, jiffies 4294895543 (age 879.956s)
-  hex dump (first 32 bytes):
-    10 27 00 00 04 00 00 00 28 00 00 00 c8 00 00 00  .'......(.......
-    00 00 00 00 00 00 00 00 18 43 cd 84 b4 6e ff ff  .........C...n..
-  backtrace:
-    [<00000000f1b5b86e>] slab_post_alloc_hook+0xb8/0x368
-    [<00000000c56cdd9a>] __kmem_cache_alloc_node+0x174/0x290
-    [<0000000046ef1b64>] kmalloc_trace+0x40/0x164
-    [<000000008565145b>] vcap_dup_rule+0x38/0x210
-    [<00000000bd9e1f12>] vcap_add_rule+0x29c/0x32c
-    [<0000000070a539b1>] test_vcap_xn_rule_creator.constprop.43+0x120/0x330
-    [<000000000b4760ff>] vcap_api_rule_remove_in_front_test+0x170/0x658
-    [<000000000f88f9cb>] kunit_try_run_case+0x50/0xac
-    [<00000000e848de5a>] kunit_generic_run_threadfn_adapter+0x20/0x2c
-    [<0000000058a88b6b>] kthread+0x124/0x130
-    [<00000000891cf28a>] ret_from_fork+0x10/0x20
+thanks for your patch!
 
-Fixes: dccc30cc4906 ("net: microchip: sparx5: Add KUNIT test of counters and sorted rules")
-Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
----
- .../net/ethernet/microchip/vcap/vcap_api_kunit.c    | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+On Tue, Sep 12, 2023 at 12:15=E2=80=AFPM Herve Codina <herve.codina@bootlin=
+.com> wrote:
 
-diff --git a/drivers/net/ethernet/microchip/vcap/vcap_api_kunit.c b/drivers/net/ethernet/microchip/vcap/vcap_api_kunit.c
-index 99f04a53a442..fe4e166de8a0 100644
---- a/drivers/net/ethernet/microchip/vcap/vcap_api_kunit.c
-+++ b/drivers/net/ethernet/microchip/vcap/vcap_api_kunit.c
-@@ -1597,6 +1597,11 @@ static void vcap_api_rule_insert_in_order_test(struct kunit *test)
- 	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 20, 400, 6, 774);
- 	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 30, 300, 3, 771);
- 	test_vcap_xn_rule_creator(test, 10000, VCAP_USER_QOS, 40, 200, 2, 768);
-+
-+	vcap_del_rule(&test_vctrl, &test_netdev, 200);
-+	vcap_del_rule(&test_vctrl, &test_netdev, 300);
-+	vcap_del_rule(&test_vctrl, &test_netdev, 400);
-+	vcap_del_rule(&test_vctrl, &test_netdev, 500);
- }
- 
- static void vcap_api_rule_insert_reverse_order_test(struct kunit *test)
-@@ -1655,6 +1660,11 @@ static void vcap_api_rule_insert_reverse_order_test(struct kunit *test)
- 		++idx;
- 	}
- 	KUNIT_EXPECT_EQ(test, 768, admin.last_used_addr);
-+
-+	vcap_del_rule(&test_vctrl, &test_netdev, 500);
-+	vcap_del_rule(&test_vctrl, &test_netdev, 400);
-+	vcap_del_rule(&test_vctrl, &test_netdev, 300);
-+	vcap_del_rule(&test_vctrl, &test_netdev, 200);
- }
- 
- static void vcap_api_rule_remove_at_end_test(struct kunit *test)
-@@ -1855,6 +1865,9 @@ static void vcap_api_rule_remove_in_front_test(struct kunit *test)
- 	KUNIT_EXPECT_EQ(test, 786, test_init_start);
- 	KUNIT_EXPECT_EQ(test, 8, test_init_count);
- 	KUNIT_EXPECT_EQ(test, 794, admin.last_used_addr);
-+
-+	vcap_del_rule(&test_vctrl, &test_netdev, 200);
-+	vcap_del_rule(&test_vctrl, &test_netdev, 300);
- }
- 
- static struct kunit_case vcap_api_rule_remove_test_cases[] = {
--- 
-2.34.1
+> The Lantiq PEF2256 is a framer and line interface component designed to
+> fulfill all required interfacing between an analog E1/T1/J1 line and the
+> digital PCM system highway/H.100 bus.
+>
+> This kind of component can be found in old telecommunication system.
+> It was used to digital transmission of many simultaneous telephone calls
+> by time-division multiplexing. Also using HDLC protocol, WAN networks
+> can be reached through the framer.
+>
+> This pinmux support handles the pin muxing part (pins RP(A..D) and pins
+> XP(A..D)) of the PEF2256.
+>
+> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+> Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
 
+Nice to see this as a proper pin control driver!
+
+>  drivers/pinctrl/pinctrl-pef2256-regs.h |  65 ++++++
+>  drivers/pinctrl/pinctrl-pef2256.c      | 308 +++++++++++++++++++++++++
+
+Do you really need a separate header just for some registers?
+But it's a matter of taste so I'm not gonna complain if you want
+it this way.
+
+> +config PINCTRL_PEF2256
+> +       tristate "Lantiq PEF2256 (FALC56) pin controller driver"
+> +       depends on OF && FRAMER_PEF2256
+> +       select PINMUX
+
+select PINCONF
+
+> +       select GENERIC_PINCONF
+
+This brings it in implicitly but I prefer that you just select it.
+
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+
+I think SPDX mandates that you start the tag with C99 comments
+
+// SPDX-License-Identifier: GPL-2.0-only
+
+> +       /* We map 1 group <-> 1 pin */
+
+Also known as "the qualcomm trick", but hey: it's fine.
+
+> +static int pef2256_register_pinctrl(struct pef2256_pinctrl *pef2256)
+> +{
+> +       struct pinctrl_dev      *pctrl;
+> +
+> +       pef2256->pctrl_desc.name    =3D dev_name(pef2256->dev);
+> +       pef2256->pctrl_desc.owner   =3D THIS_MODULE;
+> +       pef2256->pctrl_desc.pctlops =3D &pef2256_pctlops;
+> +       pef2256->pctrl_desc.pmxops  =3D &pef2256_pmxops;
+> +       if (pef2256->version =3D=3D PEF2256_VERSION_1_2) {
+> +               pef2256->pctrl_desc.pins  =3D pef2256_v12_pins;
+> +               pef2256->pctrl_desc.npins =3D ARRAY_SIZE(pef2256_v12_pins=
+);
+> +               pef2256->functions  =3D pef2256_v12_functions;
+> +               pef2256->nfunctions =3D ARRAY_SIZE(pef2256_v12_functions)=
+;
+> +       } else {
+> +               pef2256->pctrl_desc.pins  =3D pef2256_v2x_pins;
+> +               pef2256->pctrl_desc.npins =3D ARRAY_SIZE(pef2256_v2x_pins=
+);
+> +               pef2256->functions  =3D pef2256_v2x_functions;
+> +               pef2256->nfunctions =3D ARRAY_SIZE(pef2256_v2x_functions)=
+;
+> +       }
+> +
+> +       pctrl =3D devm_pinctrl_register(pef2256->dev, &pef2256->pctrl_des=
+c, pef2256);
+> +       if (IS_ERR(pctrl)) {
+> +               dev_err(pef2256->dev, "pinctrl driver registration failed=
+\n");
+> +               return PTR_ERR(pctrl);
+> +       }
+> +
+> +       return 0;
+
+You could use
+return dev_err_probe(...);
+
+> +       pef2256_reset_pinmux(pef2256_pinctrl);
+> +       ret =3D pef2256_register_pinctrl(pef2256_pinctrl);
+> +       if (ret)
+> +               return ret;
+
+Or you could use it down here.
+
+With or without these changes (because they are nitpicks)
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+
+Yours,
+Linus Walleij
 
