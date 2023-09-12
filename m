@@ -1,284 +1,210 @@
-Return-Path: <netdev+bounces-33246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39E9C79D266
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 15:33:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17BEB79D28C
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 15:44:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E32C6281F87
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 13:33:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C38341C20C03
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 13:44:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14639182C3;
-	Tue, 12 Sep 2023 13:33:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C77F8182C7;
+	Tue, 12 Sep 2023 13:44:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0300F377
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 13:33:07 +0000 (UTC)
-Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41BD735B1
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 06:33:07 -0700 (PDT)
-Received: by mail-qk1-x72a.google.com with SMTP id af79cd13be357-76ef8b91a4bso356127085a.2
-        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 06:33:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB28FA952
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 13:44:32 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAC0510CE
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 06:44:31 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59b52554914so50035187b3.0
+        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 06:44:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694525586; x=1695130386; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8DXIfxcA+W4Tii01douSDuJYCKDJaXmQc6RC3kf6JyY=;
-        b=TeFUeEBYX4s1xSO7yfp4lUyWM9nodOUts46jguHoQ19VRRh/dL+hKDsgvBCdGsjNna
-         4Nxa4r7T7eROw5JCkDyck3Mon2O382MfYRDIbuofaKhWfSdq7NUNaKeDsjzjgnXuxCK8
-         JMnVrHc1Tf/WkVw100xltlGeJC6zdchiqVueVwea79NKWy2LzXyOUpoc9/n098HZJLCV
-         MMRPBLTlWfIs1HP4Li93NeStB9m7YC32pJlzBPgQZoQMyw7GVD33GsIU1725J16eO9tf
-         8cV4ebucl5RfPeoto0wuI7E63bv5B0tgeQmi6fFWZA3mb44fK17QhwdbXgH4azY6uOmP
-         RWeg==
+        d=google.com; s=20230601; t=1694526271; x=1695131071; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rueJ3JxHkX3XXlIyOBcnanjjCPXo4cJgvmcjHONI/Yg=;
+        b=Ka8c3Tcu09YWxVeKwgN4oBe1akHOMFS2M9NLQWjcB2YmfTdrcxlP6WJ0BR/Uf4kCKq
+         woQbGOHnS30ykWycVuQR/5iEHFAwSVQw668RJcm05tJ3eTubqSRZapf6lWTjATcXYQEt
+         tZG6GDnz5mksyq2N0QFPq1UL9ycgKgTOGT92D+rCmEnWUmFysb7Zh76xS/1stIvesgve
+         6SD30N8oBYnNk7DSOWuEN5/QOM6PWK4XrWTBf+MjPQvH1W32nvAsRquZHgRYBnkmyaxW
+         F2IIaqgQPGQq7uLjinunkhLILRXd9FgoXpPD9+ZC53aPUuVJOTZLhwoIlrIko3XpZLHY
+         cbuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694525586; x=1695130386;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=8DXIfxcA+W4Tii01douSDuJYCKDJaXmQc6RC3kf6JyY=;
-        b=Yyf+8STgq+JLQ8U/VoqgzZrJi5pcXS2O5h2MDaMachthc2oOPYGplPSgBUU9PdE2eQ
-         eCytKmky/JoFbnp6O9fS3AbhX4RUfrFT7qkAQn8W2S5hY3I7NfGoq6sl/+KrFXoNu44g
-         3VspCTdjPF9a2njXPIj28drVb/aijgK/lMQJpc9CWzLqvt1rsYQBrpQYXCgyPEa/p4TP
-         ZWaNdHTNG1JZL+dmn4sLkV5yQs3ai9vMtv7dmuBFyIBJx6vb5H3In8nMPqISn2FHf0Q2
-         dqwnQQIFQyMHXb2CJ8IPF7kB6/dYT8zJkz+VHq3FUIg66Z3CzkN7mt35KD4LTHytu9ME
-         ZQoQ==
-X-Gm-Message-State: AOJu0YzPmuGS1dpKGhhL2V12kqjzdslanXQzod3pP64y9XwOGGyN8b56
-	8VKrT61qy5/0ID8FfmRch7g=
-X-Google-Smtp-Source: AGHT+IGQH9rwoMcI12A7S5V6Y8G3yAM09A6GUbYnxCLU4YCyas8UER070ke0zTSkzjDd+bQDqVf48Q==
-X-Received: by 2002:a05:620a:ccb:b0:76a:eeb6:dd7b with SMTP id b11-20020a05620a0ccb00b0076aeeb6dd7bmr11219901qkj.75.1694525586179;
-        Tue, 12 Sep 2023 06:33:06 -0700 (PDT)
-Received: from localhost (172.174.245.35.bc.googleusercontent.com. [35.245.174.172])
-        by smtp.gmail.com with ESMTPSA id d5-20020a05620a136500b0076f206cf16fsm3192159qkl.89.2023.09.12.06.33.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Sep 2023 06:33:05 -0700 (PDT)
-Date: Tue, 12 Sep 2023 09:33:05 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jordan Rife <jrife@google.com>, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- netdev@vger.kernel.org
-Cc: dborkman@kernel.org, 
- Jordan Rife <jrife@google.com>
-Message-ID: <65006891779ed_25e754294b8@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20230912013332.2048422-1-jrife@google.com>
-References: <20230912013332.2048422-1-jrife@google.com>
-Subject: Re: [PATCH net] net: prevent address overwrite in connect() and
- sendmsg()
+        d=1e100.net; s=20230601; t=1694526271; x=1695131071;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rueJ3JxHkX3XXlIyOBcnanjjCPXo4cJgvmcjHONI/Yg=;
+        b=UW5948KmjuzKhjeepAk7ML6xd+jmf2zhcfym/9T7Angc9XVIzwC1AZzqOuy8q5Rjhn
+         5qhC2oaVLSvlgbqZG+xVf2UTfdbGlux40c46WiKoZaV3G4aRYSAqVXU48Ci3/0Y+ogWj
+         j+9KQ3w9XgNYaJkMx9Bwe/DRSf/fNQpAz6dHF9dsXb11z65nQ47VOrqpVZAqFXeb2Gp9
+         tSx+lKGLXKTgc88d0XjqN03fLssChcYYEJeQ0+1HhY5Uc9HcMOsmtyQiLhRPCxNMO05D
+         egMfMm8mnB1WkiSyQQYyoZ4Scykvy8FbFzuwQYgNmtdAYuxgs9d/Y4pa9TYxL6BUck0z
+         IYBQ==
+X-Gm-Message-State: AOJu0YwgrqtwVkLjDZgu8HVdinCacuzqevK3nhZ9vsB5s5km61wufNRF
+	f7WS3QPDoncMrFIEkiopt3yZgvjEAQ==
+X-Google-Smtp-Source: AGHT+IG5EKFnKPehZ1W1z5VMWPonhf+FfUC65fc1KkhCZbeJoMludCPnwy7sKW6W00637Pj8gOfqAg3evQ==
+X-Received: from prohr-desktop.mtv.corp.google.com ([2620:15c:211:200:4162:5280:8f7d:b119])
+ (user=prohr job=sendgmr) by 2002:a81:ae66:0:b0:58c:6ddd:d27c with SMTP id
+ g38-20020a81ae66000000b0058c6dddd27cmr304743ywk.6.1694526270938; Tue, 12 Sep
+ 2023 06:44:30 -0700 (PDT)
+Date: Tue, 12 Sep 2023 06:44:25 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
+Message-ID: <20230912134425.4083337-1-prohr@google.com>
+Subject: [PATCH net-next v2] net: add sysctl to disable rfc4862 5.5.3e
+ lifetime handling
+From: Patrick Rohr <prohr@google.com>
+To: "David S. Miller" <davem@davemloft.net>
+Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>, Patrick Rohr <prohr@google.com>, 
+	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, Lorenzo Colitti <lorenzo@google.com>, Jen Linkova <furry@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Jordan Rife wrote:
-> commit 0bdf399342c5 ("net: Avoid address overwrite in kernel_connect")
-> ensured that kernel_connect() will not overwrite the address parameter
-> in cases where BPF connect hooks perform an address rewrite. However,
-> there remain other cases where BPF hooks can overwrite an address held
-> by a kernel client.
-> 
-> ==Scenarios Tested==
-> 
-> * Code in the SMB and Ceph modules calls sock->ops->connect() directly,
->   allowing the address overwrite to occur. In the case of SMB, this can
->   lead to broken mounts.
+This change adds a sysctl to opt-out of RFC4862 section 5.5.3e's valid
+lifetime derivation mechanism.
 
-These should probably call kernel_connect instead.
+RFC4862 section 5.5.3e prescribes that the valid lifetime in a Router
+Advertisement PIO shall be ignored if it less than 2 hours and to reset
+the lifetime of the corresponding address to 2 hours. An in-progress
+6man draft (see draft-ietf-6man-slaac-renum-07 section 4.2) is currently
+looking to remove this mechanism. While this draft has not been moving
+particularly quickly for other reasons, there is widespread consensus on
+section 4.2 which updates RFC4862 section 5.5.3e.
 
-> * NFS v3 mounts with proto=udp call sock_sendmsg() for each RPC call,
->   passing a pointer to the mount address in msg->msg_name which is
->   later overwritten by a BPF sendmsg hook. This can lead to broken NFS
->   mounts.
+Cc: Maciej =C5=BBenczykowski <maze@google.com>
+Cc: Lorenzo Colitti <lorenzo@google.com>
+Cc: Jen Linkova <furry@google.com>
+Signed-off-by: Patrick Rohr <prohr@google.com>
+---
+ Documentation/networking/ip-sysctl.rst | 11 ++++++++
+ include/linux/ipv6.h                   |  1 +
+ net/ipv6/addrconf.c                    | 38 +++++++++++++++++---------
+ 3 files changed, 37 insertions(+), 13 deletions(-)
 
-Similarly, this could call kernel_sendmsg, and the extra copy handled
-in that wrapper. The arguments are not exacty the same, so not 100%
-this is feasible.
-
-But it's preferable if in-kernel callers use the kernel_.. API rather
-than bypass it. Exactly for issues like the one you report.
- 
-> In order to more comprehensively fix this class of problems, this patch
-> pushes the address copy deeper into the stack and introduces an address
-> copy to both udp_sendmsg() and udpv6_sendmsg() to insulate all callers
-> from address rewrites.
-> 
-> Signed-off-by: Jordan Rife <jrife@google.com>
-> ---
->  net/ipv4/af_inet.c | 18 ++++++++++++++++++
->  net/ipv4/udp.c     | 21 ++++++++++++++++-----
->  net/ipv6/udp.c     | 23 +++++++++++++++++------
->  net/socket.c       |  7 +------
->  4 files changed, 52 insertions(+), 17 deletions(-)
-> 
-> diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
-> index 3d2e30e204735..c37d484fbee34 100644
-> --- a/net/ipv4/af_inet.c
-> +++ b/net/ipv4/af_inet.c
-> @@ -568,6 +568,7 @@ int inet_dgram_connect(struct socket *sock, struct sockaddr *uaddr,
->  {
->  	struct sock *sk = sock->sk;
->  	const struct proto *prot;
-> +	struct sockaddr_storage addr;
->  	int err;
->  
->  	if (addr_len < sizeof(uaddr->sa_family))
-> @@ -580,6 +581,14 @@ int inet_dgram_connect(struct socket *sock, struct sockaddr *uaddr,
->  		return prot->disconnect(sk, flags);
->  
->  	if (BPF_CGROUP_PRE_CONNECT_ENABLED(sk)) {
-> +		if (uaddr && addr_len <= sizeof(addr)) {
-> +			/* pre_connect can rewrite uaddr, so make a copy to
-> +			 * insulate the caller.
-> +			 */
-> +			memcpy(&addr, uaddr, addr_len);
-> +			uaddr = (struct sockaddr *)&addr;
-> +		}
-> +
->  		err = prot->pre_connect(sk, uaddr, addr_len);
->  		if (err)
->  			return err;
-> @@ -625,6 +634,7 @@ int __inet_stream_connect(struct socket *sock, struct sockaddr *uaddr,
->  			  int addr_len, int flags, int is_sendmsg)
->  {
->  	struct sock *sk = sock->sk;
-> +	struct sockaddr_storage addr;
->  	int err;
->  	long timeo;
->  
-> @@ -668,6 +678,14 @@ int __inet_stream_connect(struct socket *sock, struct sockaddr *uaddr,
->  			goto out;
->  
->  		if (BPF_CGROUP_PRE_CONNECT_ENABLED(sk)) {
-> +			if (uaddr && addr_len <= sizeof(addr)) {
-> +				/* pre_connect can rewrite uaddr, so make a copy to
-> +				 * insulate the caller.
-> +				 */
-> +				memcpy(&addr, uaddr, addr_len);
-> +				uaddr = (struct sockaddr *)&addr;
-> +			}
-> +
->  			err = sk->sk_prot->pre_connect(sk, uaddr, addr_len);
->  			if (err)
->  				goto out;
-> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> index f39b9c8445808..5f5ee2752eeb7 100644
-> --- a/net/ipv4/udp.c
-> +++ b/net/ipv4/udp.c
-> @@ -1142,18 +1142,29 @@ int udp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
->  	}
->  
->  	if (cgroup_bpf_enabled(CGROUP_UDP4_SENDMSG) && !connected) {
-> +		struct sockaddr_in tmp_addr;
-> +		struct sockaddr_in *addr = usin;
-> +
-> +		/* BPF_CGROUP_RUN_PROG_UDP4_SENDMSG_LOCK can rewrite usin, so make a
-> +		 * copy to insulate the caller.
-> +		 */
-> +		if (usin && msg->msg_namelen <= sizeof(tmp_addr)) {
-> +			memcpy(&tmp_addr, usin, msg->msg_namelen);
-> +			addr = &tmp_addr;
-> +		}
-> +
->  		err = BPF_CGROUP_RUN_PROG_UDP4_SENDMSG_LOCK(sk,
-> -					    (struct sockaddr *)usin, &ipc.addr);
-> +					    (struct sockaddr *)addr, &ipc.addr);
->  		if (err)
->  			goto out_free;
-> -		if (usin) {
-> -			if (usin->sin_port == 0) {
-> +		if (addr) {
-> +			if (addr->sin_port == 0) {
->  				/* BPF program set invalid port. Reject it. */
->  				err = -EINVAL;
->  				goto out_free;
->  			}
-> -			daddr = usin->sin_addr.s_addr;
-> -			dport = usin->sin_port;
-> +			daddr = addr->sin_addr.s_addr;
-> +			dport = addr->sin_port;
->  		}
->  	}
->  
-> diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-> index 86b5d509a4688..cbc1917fad629 100644
-> --- a/net/ipv6/udp.c
-> +++ b/net/ipv6/udp.c
-> @@ -1506,26 +1506,37 @@ int udpv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
->  	fl6->fl6_sport = inet->inet_sport;
->  
->  	if (cgroup_bpf_enabled(CGROUP_UDP6_SENDMSG) && !connected) {
-> +		struct sockaddr_in6 tmp_addr;
-> +		struct sockaddr_in6 *addr = sin6;
-> +
-> +		/* BPF_CGROUP_RUN_PROG_UDP6_SENDMSG_LOCK can rewrite sin6, so make a
-> +		 * copy to insulate the caller.
-> +		 */
-> +		if (sin6 && addr_len <= sizeof(tmp_addr)) {
-> +			memcpy(&tmp_addr, sin6, addr_len);
-> +			addr = &tmp_addr;
-> +		}
-> +
->  		err = BPF_CGROUP_RUN_PROG_UDP6_SENDMSG_LOCK(sk,
-> -					   (struct sockaddr *)sin6,
-> +					   (struct sockaddr *)addr,
->  					   &fl6->saddr);
->  		if (err)
->  			goto out_no_dst;
-> -		if (sin6) {
-> -			if (ipv6_addr_v4mapped(&sin6->sin6_addr)) {
-> +		if (addr) {
-> +			if (ipv6_addr_v4mapped(&addr->sin6_addr)) {
->  				/* BPF program rewrote IPv6-only by IPv4-mapped
->  				 * IPv6. It's currently unsupported.
->  				 */
->  				err = -ENOTSUPP;
->  				goto out_no_dst;
->  			}
-> -			if (sin6->sin6_port == 0) {
-> +			if (addr->sin6_port == 0) {
->  				/* BPF program set invalid port. Reject it. */
->  				err = -EINVAL;
->  				goto out_no_dst;
->  			}
-> -			fl6->fl6_dport = sin6->sin6_port;
-> -			fl6->daddr = sin6->sin6_addr;
-> +			fl6->fl6_dport = addr->sin6_port;
-> +			fl6->daddr = addr->sin6_addr;
->  		}
->  	}
->  
-> diff --git a/net/socket.c b/net/socket.c
-> index c8b08b32f097e..39794d026fa11 100644
-> --- a/net/socket.c
-> +++ b/net/socket.c
-> @@ -3570,12 +3570,7 @@ EXPORT_SYMBOL(kernel_accept);
->  int kernel_connect(struct socket *sock, struct sockaddr *addr, int addrlen,
->  		   int flags)
->  {
-> -	struct sockaddr_storage address;
-> -
-> -	memcpy(&address, addr, addrlen);
-> -
-> -	return READ_ONCE(sock->ops)->connect(sock, (struct sockaddr *)&address,
-> -					     addrlen, flags);
-> +	return READ_ONCE(sock->ops)->connect(sock, addr, addrlen, flags);
->  }
->  EXPORT_SYMBOL(kernel_connect);
->  
-> -- 
-> 2.42.0.283.g2d96d420d3-goog
-> 
-
+diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/network=
+ing/ip-sysctl.rst
+index a66054d0763a..7f21877e3f78 100644
+--- a/Documentation/networking/ip-sysctl.rst
++++ b/Documentation/networking/ip-sysctl.rst
+@@ -2304,6 +2304,17 @@ accept_ra_pinfo - BOOLEAN
+ 		- enabled if accept_ra is enabled.
+ 		- disabled if accept_ra is disabled.
+=20
++ra_pinfo_rfc4862_5_5_3e - BOOLEAN
++	Use RFC4862 Section 5.5.3e to determine the valid lifetime of
++	an address matching a prefix sent in a Router Advertisement
++	Prefix Information Option.
++
++	- If enabled, RFC4862 section 5.5.3e is used to determine
++	  the valid lifetime of the address.
++	- If disabled, the PIO valid lifetime will always be honored.
++
++	Default: 1
++
+ accept_ra_rt_info_min_plen - INTEGER
+ 	Minimum prefix length of Route Information in RA.
+=20
+diff --git a/include/linux/ipv6.h b/include/linux/ipv6.h
+index 5883551b1ee8..f90cf8835ed4 100644
+--- a/include/linux/ipv6.h
++++ b/include/linux/ipv6.h
+@@ -35,6 +35,7 @@ struct ipv6_devconf {
+ 	__s32		accept_ra_min_hop_limit;
+ 	__s32		accept_ra_min_lft;
+ 	__s32		accept_ra_pinfo;
++	__s32		ra_pinfo_rfc4862_5_5_3e;
+ 	__s32		ignore_routes_with_linkdown;
+ #ifdef CONFIG_IPV6_ROUTER_PREF
+ 	__s32		accept_ra_rtr_pref;
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index 47d1dd8501b7..1ac23a37e8eb 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -204,6 +204,7 @@ static struct ipv6_devconf ipv6_devconf __read_mostly =
+=3D {
+ 	.accept_ra_min_hop_limit=3D 1,
+ 	.accept_ra_min_lft	=3D 0,
+ 	.accept_ra_pinfo	=3D 1,
++	.ra_pinfo_rfc4862_5_5_3e =3D 1,
+ #ifdef CONFIG_IPV6_ROUTER_PREF
+ 	.accept_ra_rtr_pref	=3D 1,
+ 	.rtr_probe_interval	=3D 60 * HZ,
+@@ -265,6 +266,7 @@ static struct ipv6_devconf ipv6_devconf_dflt __read_mos=
+tly =3D {
+ 	.accept_ra_min_hop_limit=3D 1,
+ 	.accept_ra_min_lft	=3D 0,
+ 	.accept_ra_pinfo	=3D 1,
++	.ra_pinfo_rfc4862_5_5_3e =3D 1,
+ #ifdef CONFIG_IPV6_ROUTER_PREF
+ 	.accept_ra_rtr_pref	=3D 1,
+ 	.rtr_probe_interval	=3D 60 * HZ,
+@@ -2657,22 +2659,23 @@ int addrconf_prefix_rcv_add_addr(struct net *net, s=
+truct net_device *dev,
+ 			stored_lft =3D ifp->valid_lft - (now - ifp->tstamp) / HZ;
+ 		else
+ 			stored_lft =3D 0;
+-		if (!create && stored_lft) {
++
++		/* RFC4862 Section 5.5.3e:
++		 * "Note that the preferred lifetime of the
++		 *  corresponding address is always reset to
++		 *  the Preferred Lifetime in the received
++		 *  Prefix Information option, regardless of
++		 *  whether the valid lifetime is also reset or
++		 *  ignored."
++		 *
++		 * So we should always update prefered_lft here.
++		 */
++		update_lft =3D !create && stored_lft;
++
++		if (update_lft && in6_dev->cnf.ra_pinfo_rfc4862_5_5_3e) {
+ 			const u32 minimum_lft =3D min_t(u32,
+ 				stored_lft, MIN_VALID_LIFETIME);
+ 			valid_lft =3D max(valid_lft, minimum_lft);
+-
+-			/* RFC4862 Section 5.5.3e:
+-			 * "Note that the preferred lifetime of the
+-			 *  corresponding address is always reset to
+-			 *  the Preferred Lifetime in the received
+-			 *  Prefix Information option, regardless of
+-			 *  whether the valid lifetime is also reset or
+-			 *  ignored."
+-			 *
+-			 * So we should always update prefered_lft here.
+-			 */
+-			update_lft =3D 1;
+ 		}
+=20
+ 		if (update_lft) {
+@@ -6846,6 +6849,15 @@ static const struct ctl_table addrconf_sysctl[] =3D =
+{
+ 		.mode		=3D 0644,
+ 		.proc_handler	=3D proc_dointvec,
+ 	},
++	{
++		.procname	=3D "ra_pinfo_rfc4862_5_5_3e",
++		.data		=3D &ipv6_devconf.ra_pinfo_rfc4862_5_5_3e,
++		.maxlen		=3D sizeof(int),
++		.mode		=3D 0644,
++		.proc_handler	=3D proc_dointvec_minmax,
++		.extra1		=3D SYSCTL_ZERO,
++		.extra2		=3D SYSCTL_ONE,
++	},
+ #ifdef CONFIG_IPV6_ROUTER_PREF
+ 	{
+ 		.procname	=3D "accept_ra_rtr_pref",
+--=20
+2.42.0.283.g2d96d420d3-goog
 
 
