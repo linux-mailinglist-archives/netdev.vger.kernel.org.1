@@ -1,83 +1,97 @@
-Return-Path: <netdev+bounces-33296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C7D279D57A
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 18:00:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7103179D583
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 18:01:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D54752819AA
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 16:00:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 361701C20B8B
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 16:01:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 353E418C2B;
-	Tue, 12 Sep 2023 16:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9864018C2C;
+	Tue, 12 Sep 2023 16:01:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB7718C16
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 16:00:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 29794C433C7;
-	Tue, 12 Sep 2023 16:00:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694534430;
-	bh=7NT2w3TW9la1c0C719JHjAuvB4LTaYPe94tsaPiMO80=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=G3ZEtYn73+/1uj+yjsxvypWCip0BUsU6Jsz5s8s6NZy/gL0KFY7bbtSxtrfjYNjkW
-	 J055SgxMvCGYUCWp5pCi8LxoU0f2yHZHJ4OW1LHC40v6shzwNB1LyDWqwwG/yMgbyb
-	 qL+lW4Nx4rOAGGTmvOc4MfFXDKONgCUebB2HqvPp9xkwlmfZjlWQqWJxgTubHsuB9M
-	 TO4mDJ0jFrf/G7UfIHF5AC+dbSx44pp6s8XXHxGSyWawoC8lBOeiC8wUMNp6azDNcB
-	 NztEwpqzIpd3T+AdRa/oEsbw1CnAemsm+2BsEA54Q+Z2E0geXuiWcrWULdQ97C6v28
-	 O5zfmMkbiPnHg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 094FAE1C280;
-	Tue, 12 Sep 2023 16:00:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C7CB1803C
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 16:01:15 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91F1210DE;
+	Tue, 12 Sep 2023 09:01:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=tq30nNEn1JgDcmHrMM18jbiaohWzwQumlsnaeQ+8IIk=; b=aM2k488CKyE2crSflT163ivYer
+	ciAx3XA8NFqMOpS3fWZf/gpZfPgddwUO38cNtdcHOruuguEPo5weJzALuW5C4Nfcg994puYZ3Lgpv
+	Ui9SkVa9tqB0ajjpMOLyXwbh47S+bDscfdOJNv3FozhdoHOTMsGq2mMDvzMNKdO1HsEc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qg5p8-006FFK-Pb; Tue, 12 Sep 2023 18:01:10 +0200
+Date: Tue, 12 Sep 2023 18:01:10 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, davem@davemloft.net,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Oleksij Rempel <linux@rempel-privat.de>,
+	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
+	thomas.petazzoni@bootlin.com,
+	Christophe Leroy <christophe.leroy@csgroup.eu>
+Subject: Re: [RFC PATCH net-next 4/7] net: ethtool: add a netlink command to
+ list PHYs
+Message-ID: <72a5cd8f-d776-479c-9d7f-191900d19342@lunn.ch>
+References: <20230907092407.647139-1-maxime.chevallier@bootlin.com>
+ <20230907092407.647139-5-maxime.chevallier@bootlin.com>
+ <ZPmfOOsqoO02AcBH@shell.armlinux.org.uk>
+ <20230907141635.20bcaa59@pc-7.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2] vdpa: consume device_features parameter
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169453443003.4554.2781113098793657141.git-patchwork-notify@kernel.org>
-Date: Tue, 12 Sep 2023 16:00:30 +0000
-References: <20230911180815.820-1-shannon.nelson@amd.com>
-In-Reply-To: <20230911180815.820-1-shannon.nelson@amd.com>
-To: Nelson@codeaurora.org, Shannon <shannon.nelson@amd.com>
-Cc: dsahern@kernel.org, netdev@vger.kernel.org,
- virtualization@lists.linux-foundation.org, mst@redhat.com,
- jasowang@redhat.com, si-wei.liu@oracle.com, allen.hubbe@amd.com,
- drivers@pensando.io
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230907141635.20bcaa59@pc-7.home>
 
-Hello:
-
-This patch was applied to iproute2/iproute2-next.git (main)
-by David Ahern <dsahern@kernel.org>:
-
-On Mon, 11 Sep 2023 11:08:15 -0700 you wrote:
-> From: Allen Hubbe <allen.hubbe@amd.com>
+On Thu, Sep 07, 2023 at 02:16:35PM +0200, Maxime Chevallier wrote:
+> Hello Russell,
 > 
-> Consume the parameter to device_features when parsing command line
-> options.  Otherwise the parameter may be used again as an option name.
+> On Thu, 7 Sep 2023 11:00:24 +0100
+> "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
 > 
->  # vdpa dev add ... device_features 0xdeadbeef mac 00:11:22:33:44:55
->  Unknown option "0xdeadbeef"
+> > On Thu, Sep 07, 2023 at 11:24:02AM +0200, Maxime Chevallier wrote:
+> > > +#define PHY_MAX_ENTRIES	16
+> > > +
+> > > +struct phy_list_reply_data {
+> > > +	struct ethnl_reply_data		base;
+> > > +	u8 n_phys;
+> > > +	u32 phy_indices[PHY_MAX_ENTRIES];  
+> > 
+> > Please could you detail the decision making behind 16 entries - is this
+> > arbitary or based on something?
+> > 
+> > Also, please consider what we should do if we happen to have more than
+> > 16 entries.
 > 
-> [...]
+> Ah indeed it was totally arbitrary, the idea was to have a fixed-size
+> reply struct, so that we can populate the
+> ethnl_request_ops.reply_data_size field and not do any manual memory
+> management. But I can store a pointer to the array of phy devices,
+> dynamically allocated and we won't have to deal with this fixed,
+> arbitrary-sized array anymore.
 
-Here is the summary with links:
-  - [iproute2] vdpa: consume device_features parameter
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=92eac7e4bf14
+I think Jakub already commented on this somewhere, but netlink should
+allow for arbitrary long lists.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+      Andrew
 
