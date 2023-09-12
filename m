@@ -1,107 +1,139 @@
-Return-Path: <netdev+bounces-33287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E191079D518
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 17:38:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8AE279D51C
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 17:40:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CBF8281E07
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 15:38:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F682281DDE
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 15:40:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C15ED18C17;
-	Tue, 12 Sep 2023 15:38:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F51F18C18;
+	Tue, 12 Sep 2023 15:40:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3445179A0
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 15:38:03 +0000 (UTC)
-Received: from us-smtp-delivery-44.mimecast.com (unknown [207.211.30.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id AD29B10DE
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 08:38:02 -0700 (PDT)
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-629-8eI8kRsuPQWvNIVeAh8R-w-1; Tue, 12 Sep 2023 11:37:28 -0400
-X-MC-Unique: 8eI8kRsuPQWvNIVeAh8R-w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C68FF101A529;
-	Tue, 12 Sep 2023 15:37:26 +0000 (UTC)
-Received: from hog (unknown [10.39.192.47])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id BC0582156721;
-	Tue, 12 Sep 2023 15:37:25 +0000 (UTC)
-Date: Tue, 12 Sep 2023 17:37:23 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: netdev@vger.kernel.org, davejwatson@fb.com, kuba@kernel.org,
-	vakul.garg@nxp.com, borisp@nvidia.com, john.fastabend@gmail.com
-Subject: Re: [PATCH net 1/5] net: tls: handle -EBUSY on async encrypt/decrypt
- requests
-Message-ID: <ZQCFs61yeFlYsHVX@hog>
-References: <9681d1febfec295449a62300938ed2ae66983f28.1694018970.git.sd@queasysnail.net>
- <ZPq6vSOSkDuzBBDb@gondor.apana.org.au>
- <ZPtED-ZlSEQmPSlr@hog>
- <ZP/sdGHy7LVE3UEc@gondor.apana.org.au>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 804F7AD49
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 15:40:42 +0000 (UTC)
+Received: from out2-smtp.messagingengine.com (out2-smtp.messagingengine.com [66.111.4.26])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DADA10DE;
+	Tue, 12 Sep 2023 08:40:41 -0700 (PDT)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.nyi.internal (Postfix) with ESMTP id 2BEE35C023B;
+	Tue, 12 Sep 2023 11:40:41 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute5.internal (MEProxy); Tue, 12 Sep 2023 11:40:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jcline.org; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:sender
+	:subject:subject:to:to; s=fm1; t=1694533241; x=1694619641; bh=vd
+	xprn+VLunJ+Ba1KePDdQ8b/yp76261BQa2lBK+CxE=; b=AJ7hJV1s7pfeQAa3Qh
+	vNTywaHGJhoVph3GxX4hX98F3+HoybDiAqHP33z67xzU3bXSLghtYkJXxcmhO79J
+	91PITxUkDNeaNUiUayE1aGKxl8nO55oBuZxFEr6fhu3VKUug9JNVI1BLotMMk0AC
+	Vj9F1YJYHBD19nd4gY8d8gTB2LRBhO409+1rXQGz2ghqyzReb03tDE4Bh6hcI4J2
+	t8EszkIKbgSdwk5MPku6nfVI0eKeeAalqRYpAAD46L/M6dvNZJxefhIRsL9NUQ/H
+	5+pyCsPSSlzxKO9cKoPdIID8KaN8Rh6R74u25eoyeC9BI3ro/Z4ZtQX+puXD5a/p
+	Duug==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm1; t=1694533241; x=1694619641; bh=vdxprn+VLunJ+
+	Ba1KePDdQ8b/yp76261BQa2lBK+CxE=; b=Xq4W7g5RYo6XiSHOwOxqSGJOX1kyE
+	yg/PbEVL+mDRmeC18+aKI3ogxnU2gaFFXHUUfN1YIuz/ZeQ32l6vnRx7aCNPnyz6
+	xIoxI2IYK4vjWd0lEDUbomD2PphyLbQ3GyFWDynUJYk42kjKZCcTX/8G8sMEmRr3
+	mW/jJyPRJqUWG3aZpLLN6opktBorzgvmN0Gx6HtXQ9K7eDcz1ZgYhckP1GjcvbK3
+	4gwooD2uhcTVr9aFN2tj1ty0OSiu1QprXCI3AtwpGRHsbCKkHeROL1ZIgIxkjtBd
+	WfoLo+u5/h1v831jfESqrD2/oZ4xYZUIgrsaVJNyt6VJ8IqcbzOUFRqCw==
+X-ME-Sender: <xms:eIYAZbjayQTooKedmvgwajwMg8UhShVmg-wX7AhYYzHGzsjIaS-IVg>
+    <xme:eIYAZYCMCd500kAWs8DOMOBjWAtxoXhYxDzXOo7rjRSYxv2Yw-KzVyH3qDC8SfKGf
+    pKuIvnrgnM5Tkrpz6E>
+X-ME-Received: <xmr:eIYAZbEqrJvcZ-wf1RTdeVbuVvnxgT9xvzSnlgSIPjGQpOHvZ_SOffez48sq4nFdojQmoRiXvudI6VIbraHscw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrudeiiedgledvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomheplfgvrhgv
+    mhihucevlhhinhgvuceojhgvrhgvmhihsehjtghlihhnvgdrohhrgheqnecuggftrfgrth
+    htvghrnhephfefjeejueelueevveelvdehffeufeffvdejkeevteekieduudeludevgeeu
+    vdeinecuffhomhgrihhnpehshiiikhgrlhhlvghrrdgrphhpshhpohhtrdgtohhmnecuve
+    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepjhgvrhgvmhih
+    sehjtghlihhnvgdrohhrgh
+X-ME-Proxy: <xmx:eIYAZYSfuBT8Pt3oyzsIGYa2sJwFnlXBzbsYdgOW776etF6SP1DvvQ>
+    <xmx:eIYAZYxH4HNGutPscgpy_knzwtir7jLWD3R9mqVG20OsZ7eJdJelAw>
+    <xmx:eIYAZe7avLR1qCDRkutJf4t_n9MuY67mLyjyjJbGiY_zcsnqmBDMqQ>
+    <xmx:eYYAZbw27w-pcDSWWxOkCBmq5aw_Eq3BnvsOamsuhQl0dq3WYVUcXQ>
+Feedback-ID: i7a7146c5:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 12 Sep 2023 11:40:40 -0400 (EDT)
+Date: Tue, 12 Sep 2023 11:40:38 -0400
+From: Jeremy Cline <jeremy@jcline.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	syzbot+c1d0a03d305972dbbe14@syzkaller.appspotmail.com
+Subject: Re: [PATCH net] net: nfc: llcp: Add lock when modifying device list
+Message-ID: <ZQCGduvxodv4QQD7@dev>
+References: <20230908235853.1319596-1-jeremy@jcline.org>
+ <20230910152812.GJ775887@kernel.org>
+ <ZP5L6/zF6fE+ogbz@dev>
+ <20230911055904.GN775887@kernel.org>
+ <20230911125251.GA23672@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ZP/sdGHy7LVE3UEc@gondor.apana.org.au>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20230911125251.GA23672@kernel.org>
 
-2023-09-12, 12:43:32 +0800, Herbert Xu wrote:
-> On Fri, Sep 08, 2023 at 05:55:59PM +0200, Sabrina Dubroca wrote:
-> >
-> > Uh, ok, I didn't know that, thanks for explaining. When I was fixing
-> > this code I couldn't find a mention of what the expectations for
-> > MAY_BACKLOG are. Could you add a comment describing this in the
-> > headers (either for #define CRYPTO_TFM_REQ_MAY_BACKLOG or
-> > aead_request_set_callback, wherever is more appropriate). MAY_BACKLOG
-> > is used by both tls and tipc (talking only about networking) and
-> > neither seem to respect this need to back off.
->=20
-> Patches are welcome :)
+On Mon, Sep 11, 2023 at 02:52:51PM +0200, Simon Horman wrote:
+> On Mon, Sep 11, 2023 at 07:59:04AM +0200, Simon Horman wrote:
+> > On Sun, Sep 10, 2023 at 07:06:19PM -0400, Jeremy Cline wrote:
+> > > On Sun, Sep 10, 2023 at 05:28:12PM +0200, Simon Horman wrote:
+> > > > On Fri, Sep 08, 2023 at 07:58:53PM -0400, Jeremy Cline wrote:
+> > > > > The device list needs its associated lock held when modifying it, or the
+> > > > > list could become corrupted, as syzbot discovered.
+> > > > > 
+> > > > > Reported-and-tested-by: syzbot+c1d0a03d305972dbbe14@syzkaller.appspotmail.com
+> > > > > Closes: https://syzkaller.appspot.com/bug?extid=c1d0a03d305972dbbe14
+> > > > > Signed-off-by: Jeremy Cline <jeremy@jcline.org>
+> > > > 
+> > > > Hi Jeremy,
+> > > > 
+> > > > thanks for your patch.
+> > > > 
+> > > > I don't think you need to resubmit for this,
+> > > > I think this patch warrants a fixes tag:
+> > > > 
+> > > > Fixes: d646960f7986 ("NFC: Initial LLCP support")
+> > > > 
+> > > 
+> > > My bad, indeed. The lock in question looks to have been added in
+> > > 6709d4b7bc2e ("net: nfc: Fix use-after-free caused by
+> > > nfc_llcp_find_local") which itself includes a couple fix tags, should
+> > > this reference that commit instead as it won't backport without that
+> > > one?
+> > 
+> > Yes, I think that is likely.
+> > Sorry for not noticing that.
+> 
+> And further, sorry for being vague in my previous email.
+> Having now looked over 6709d4b7bc2e I agree it is
+> the correct commit for a fixes tag for this patch.
+> 
 
-Ok. I thought it'd be better if you wrote that patch since if I write
-it, it'll be a c/p (or rephrase) of what you wrote. But fine, I'll go
-ahead and do that :)
+Super, thanks. If it's helpful I can re-roll the patch, otherwise I'll
+just leave it as-is.
 
-> A bit of history: at the beginning we always dropped requests
-> that we couldn't queue because the only user was IPsec so this
-> is the expected behaviour.
->=20
-> When storage crypto support was added there was a need for reliable
-> handling of resource constraints so that's why MAY_BACKLOG was added.
-> However, the expectation is obviously that you must stop sending new
-> requests once you run into the resource constraint.
->=20
-> > Jakub, I guess we should drop the CRYPTO_TFM_REQ_MAY_BACKLOG for net,
-> > and maybe consider adding it back (with the back off) in
-> > net-next. Probably not urgent considering that nobody seems to have
-> > run into this bug so far.
->=20
-> I think that would be the prudent action.
-
-We'd have to do pretty much what Jakub suggested [1] (handle ENOSPC by
-waiting for all current requests) and then resubmit the failed
-request. So I think keeping the MAY_BACKLOG flag and handling EBUSY
-this way is simpler. With this, we send one request to the backlog,
-then we wait until the queue drains.
-
-[1] https://lore.kernel.org/netdev/20230908142602.2ced0631@kernel.org/
-
---=20
-Sabrina
-
+Thanks,
+Jeremy
 
