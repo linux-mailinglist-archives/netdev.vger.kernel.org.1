@@ -1,236 +1,441 @@
-Return-Path: <netdev+bounces-33199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33200-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEBE679D00F
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 13:34:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D279279D019
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 13:36:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F222F1C20C8F
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 11:34:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3C9A1C20B8B
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 11:36:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 916EC15491;
-	Tue, 12 Sep 2023 11:34:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D94A154A7;
+	Tue, 12 Sep 2023 11:36:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 840099443
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 11:34:33 +0000 (UTC)
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F70410DE
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 04:34:30 -0700 (PDT)
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-52349d93c8aso1122312a12.1
-        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 04:34:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A87714F90
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 11:36:00 +0000 (UTC)
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46487172B;
+	Tue, 12 Sep 2023 04:35:58 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-9aa0495f9cfso799108666b.1;
+        Tue, 12 Sep 2023 04:35:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694518556; x=1695123356; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zofwSNLHzuaFkxU90/ciFQd/cYGOkavRsAzLbHl083k=;
+        b=i1qJgw65hBnGWzVBq1rEyFkqurmOZXPhF10uulFKvOskgeS5NxqUcrOtHM38HoszNz
+         kilGF6xAxV28cq0weI3nod6rATAfNdoVehe6uVFt1JDloK9RiiRDllQVUt2MmeMYyVas
+         PEjDP5CUuzl9VOl+KhMJtmKJ1AzgbsBBd8S+Ub9aDXYcmQMcabu8eATOK8FhQQUBIgxD
+         l00KvfKRW4+uc8CEPjjojTLPgTcYKu6f4B9RjkSoiydVAdl07hp158K7OYWI4VixGsNb
+         zZgiWAp7gnVcgkYnpauvannbredEwr4iVeRvznaAGv1tbNta00Vkq6ikyLzlXhScZ5Un
+         ivpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694518469; x=1695123269;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jIp30WWagQcq95vAHZsEIV4haOheDDmffUDTljoxLrw=;
-        b=E6F+TEttpa8GKHnb6sOnO+bU5pjc+lLHtxbsGIN8iosyJt9/5nRhbUbowmPCNu9J6c
-         agsFEEw2qk1hSlVPaMYaVHcIgPlN1Ku8K5WEe4yOuZB5WAfNbDbtjN3oUeANsxdjprrj
-         Y4YWapSsj/oZIRnXMFsxhVwPlmwYDim4ivIYcBl7/xdhddTd+1IBMU2Jkcuen6Sfvp06
-         96/0PBH5P7jPwoLfU3Bj36NX0BtRxIxi3oLG/1cqQrGeLhUgC3iFoLOfCYROBVMgqTrl
-         Vmv3X1peBb3yswKZJVPnWJKImVsZNxnCGV3BbSWBePydfEXT7CS7CU0PUqO1x765T04I
-         ZPNg==
-X-Gm-Message-State: AOJu0YyyGK4veRs5KnVXZ+fQ0LVCa9hxqAjj/6wmi0zwt8vUu32K3M+W
-	OwoYm5ZvJHjEujlaGPLbSnE=
-X-Google-Smtp-Source: AGHT+IFlhD/vIyJaOoaiePPfWJM32l6QfjzD75VpAA5V4DZLSu/7wGUbWZtrDjtlCl03p2LHT/kXSA==
-X-Received: by 2002:a17:907:971d:b0:9ad:786d:72af with SMTP id jg29-20020a170907971d00b009ad786d72afmr2251349ejc.5.1694518469001;
-        Tue, 12 Sep 2023 04:34:29 -0700 (PDT)
-Received: from [192.168.64.157] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id lc18-20020a170906f91200b0099329b3ab67sm6744347ejb.71.2023.09.12.04.34.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Sep 2023 04:34:27 -0700 (PDT)
-Message-ID: <683554de-5f4f-4adb-4e97-c532f514b352@grimberg.me>
-Date: Tue, 12 Sep 2023 14:34:25 +0300
+        d=1e100.net; s=20230601; t=1694518556; x=1695123356;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zofwSNLHzuaFkxU90/ciFQd/cYGOkavRsAzLbHl083k=;
+        b=ekKk+SiUiqDYc+DWfdf4ODm4IJv8hE5+jGKAidl88E7hPCNXXAT6ja4LNLwwHwUBVR
+         WOmmjc3GlYcA5N3CrKTvQmzJSQoFBXN/cjJg6MgA70kVbjk0i8hd9ZNb5T3lhBynxZN5
+         7ugwkJE/ozMDf+dX2fGxX9MfFY88zsy4TkjGGXAMpStO/5V8uNBuow3Dv2l7Ow6ZEJ6D
+         IEEbjOP660ule0e/7RepMUxUiugxI1i9L2AjSM0VQvpsvkg7fIPXYe+wF+ryYJYhu9Jp
+         5ZBDhuYy/woqi7h26J4KZg4St4Gxb0xUkwdu8lmelkBwZ1NKaTfhMCNHCEzP9S6jbPig
+         IaUQ==
+X-Gm-Message-State: AOJu0YxM3rmAiZC1wq8wbl5/ZAt1eoDmkTEqTwKHR3nFAPc+DQCO2BXN
+	/eGmBhiUHdAN3awJscKrcdc=
+X-Google-Smtp-Source: AGHT+IHghIPteUvhOfKXpxCY0vv/O4O2PFrpEFGx+S8fLorr7TgU4QvXJ3rK4kstsSLVvuM79gTI4A==
+X-Received: by 2002:a17:906:3117:b0:9a2:143e:a070 with SMTP id 23-20020a170906311700b009a2143ea070mr3126895ejx.20.1694518556075;
+        Tue, 12 Sep 2023 04:35:56 -0700 (PDT)
+Received: from skbuf ([188.25.254.186])
+        by smtp.gmail.com with ESMTPSA id rh16-20020a17090720f000b0098e0a937a6asm6654876ejb.69.2023.09.12.04.35.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Sep 2023 04:35:55 -0700 (PDT)
+Date: Tue, 12 Sep 2023 14:35:53 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v4 2/2] net: dsa: microchip: Add drive strength
+ configuration
+Message-ID: <20230912113553.fselyj2v5ynddme2@skbuf>
+References: <20230912045459.1864085-1-o.rempel@pengutronix.de>
+ <20230912045459.1864085-1-o.rempel@pengutronix.de>
+ <20230912045459.1864085-3-o.rempel@pengutronix.de>
+ <20230912045459.1864085-3-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-Subject: Re: [PATCHv11 00/18] nvme: In-kernel TLS support for TCP
-Content-Language: en-US
-To: Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-References: <20230824143925.9098-1-hare@suse.de>
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20230824143925.9098-1-hare@suse.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230912045459.1864085-3-o.rempel@pengutronix.de>
+ <20230912045459.1864085-3-o.rempel@pengutronix.de>
 
+On Tue, Sep 12, 2023 at 06:54:59AM +0200, Oleksij Rempel wrote:
+> Add device tree based drive strength configuration support. It is needed to
+> pass EMI validation on our hardware.
+> 
+> Configuration values are based on the vendor's reference driver.
+> 
+> Tested on KSZ9563R.
+> 
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> ---
+>  drivers/net/dsa/microchip/ksz8795_reg.h |  14 --
+>  drivers/net/dsa/microchip/ksz9477_reg.h |  13 -
+>  drivers/net/dsa/microchip/ksz_common.c  | 309 ++++++++++++++++++++++++
+>  drivers/net/dsa/microchip/ksz_common.h  |  20 ++
+>  4 files changed, 329 insertions(+), 27 deletions(-)
+> 
+> diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+> index 42db7679c3606..ee77c44e99f65 100644
+> --- a/drivers/net/dsa/microchip/ksz_common.c
+> +++ b/drivers/net/dsa/microchip/ksz_common.c
+> @@ -186,6 +186,72 @@ static const struct ksz_mib_names ksz9477_mib_names[] = {
+>  	{ 0x83, "tx_discards" },
+>  };
+>  
+> +struct ksz_driver_strength_prop {
+> +	const char *name;
+> +	int offset;
+> +	int value;
+> +};
+> +
+> +enum ksz_driver_strength_type {
+> +	KSZ_DRIVER_STRENGTH_HI,
+> +	KSZ_DRIVER_STRENGTH_LO,
+> +	KSZ_DRIVER_STRENGTH_IO,
+> +};
+> +
+> +/**
+> + * struct ksz_drive_strength - drive strength mapping
+> + * @reg_val:	register value
+> + * @milliamp:	milliamp value
+> + */
+> +struct ksz_drive_strength {
+> +	u32 reg_val;
+> +	u32 milliamp;
+> +};
+> +
+> +/* ksz9477_drive_strengths - Drive strength mapping for KSZ9477 variants
+> + *
+> + * This values are not documented in KSZ9477 variants but confirmed by
+> + * Microchip that KSZ9477, KSZ9567, KSZ8567, KSZ9897, KSZ9896, KSZ9563, KSZ9893
+> + * and KSZ8563 are using same register (drive strength) settings like KSZ8795.
+> + *
+> + * Documentation in KSZ8795CLX provides more information with some
+> + * recommendations:
+> + * - for high speed signals
+> + *   1. 4 mA or 8 mA is often used for MII, RMII, and SPI interface with using
+> + *      2.5V or 3.3V VDDIO.
+> + *   2. 12 mA or 16 mA is often used for MII, RMII, and SPI interface with
+> + *      using 1.8V VDDIO.
+> + *   3. 20 mA or 24 mA is often used for GMII/RGMII interface with using 2.5V
+> + *      or 3.3V VDDIO.
+> + *   4. 28 mA is often used for GMII/RGMII interface with using 1.8V VDDIO.
+> + *   5. In same interface, the heavy loading should use higher one of the
+> + *      drive current strength.
+> + * - for low speed signals
+> + *   1. 3.3V VDDIO, use either 4 mA or 8 mA.
+> + *   2. 2.5V VDDIO, use either 8 mA or 12 mA.
+> + *   3. 1.8V VDDIO, use either 12 mA or 16 mA.
+> + *   4. If it is heavy loading, can use higher drive current strength.
+> + */
+> +static const struct ksz_drive_strength ksz9477_drive_strengths[] = {
+> +	{ SW_DRIVE_STRENGTH_2MA,  2000 },
+> +	{ SW_DRIVE_STRENGTH_4MA,  4000 },
+> +	{ SW_DRIVE_STRENGTH_8MA,  8000 },
+> +	{ SW_DRIVE_STRENGTH_12MA, 12000 },
+> +	{ SW_DRIVE_STRENGTH_16MA, 16000 },
+> +	{ SW_DRIVE_STRENGTH_20MA, 20000 },
+> +	{ SW_DRIVE_STRENGTH_24MA, 24000 },
+> +	{ SW_DRIVE_STRENGTH_28MA, 28000 },
+> +};
+> +
+> +/* ksz8830_drive_strengths - Drive strength mapping for KSZ8830, KSZ8873, ..
+> + *			     variants.
+> + * This values are documented in KSZ8873 and KSZ8863 datasheets.
+> + */
+> +static const struct ksz_drive_strength ksz8830_drive_strengths[] = {
+> +	{ 0,  8000 },
+> +	{ KSZ8873_DRIVE_STRENGTH_16MA, 16000 },
+> +};
+> +
+>  static const struct ksz_dev_ops ksz8_dev_ops = {
+>  	.setup = ksz8_setup,
+>  	.get_port_addr = ksz8_get_port_addr,
+> @@ -3530,6 +3596,245 @@ static void ksz_parse_rgmii_delay(struct ksz_device *dev, int port_num,
+>  	dev->ports[port_num].rgmii_tx_val = tx_delay;
+>  }
+>  
+> +/**
+> + * ksz_drive_strength_to_reg() - Convert drive strength value to corresponding
+> + *				 register value.
+> + * @array:	The array of drive strength values to search.
+> + * @array_size:	The size of the array.
+> + * @milliamp:	The drive strength value in milliamp to be converted.
+> + *
+> + * This function searches the array of drive strength values for the given
+> + * milliamp value and returns the corresponding register value for that drive.
+> + *
+> + * Returns: If found, the corresponding register value for that drive strength
+> + * is returned. Otherwise, -EINVAL is returned indicating an invalid value.
+> + */
+> +static int ksz_drive_strength_to_reg(const struct ksz_drive_strength *array,
+> +				     size_t array_size, int milliamp)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < array_size; i++) {
+> +		if (array[i].milliamp == milliamp)
+> +			return array[i].reg_val;
+> +	}
+> +
+> +	return -EINVAL;
+> +}
+> +
+> +/**
+> + * ksz_drive_strength_error() - Report invalid drive strength value
+> + * @dev:	ksz device
+> + * @array:	The array of drive strength values to search.
+> + * @array_size:	The size of the array.
+> + * @milliamp:	Invalid drive strength value in milliamp
+> + *
+> + * This function logs an error message when an unsupported drive strength value
+> + * is detected. It lists out all the supported drive strength values for
+> + * reference in the error message.
+> + */
+> +static void ksz_drive_strength_error(struct ksz_device *dev,
+> +				     const struct ksz_drive_strength *array,
+> +				     size_t array_size, int milliamp)
+> +{
+> +	char supported_values[100];
+> +	size_t remaining_size;
+> +	int added_len;
+> +	char *ptr;
+> +	int i;
+> +
+> +	remaining_size = sizeof(supported_values);
+> +	ptr = supported_values;
+> +
+> +	for (i = 0; i < array_size; i++) {
+> +		added_len = snprintf(ptr, remaining_size,
+> +				     i == 0 ? "%d" : ", %d", array[i].milliamp);
+> +
+> +		if (added_len < 0 || added_len >= remaining_size)
+> +			break;
+> +
+> +		ptr += added_len;
+> +		remaining_size -= added_len;
+> +	}
+> +
+> +	dev_err(dev->dev, "Invalid drive strength %d, supported values are %s\n",
+> +		milliamp, supported_values);
+> +}
 
-> Hi all,
+Milliamp or microamp? The dt-binding is in microamps, and I see no micro -> milli
+conversion.
 
-Hannes, I think that this is in decent shape. Assuming that
-the recent reports on the tls tests are resolved, I think this
-is ready for inclusion.
+> +
+> +/**
+> + * ksz9477_drive_strength_write() - Set the drive strength for specific KSZ9477
+> + *				    chip variants.
+> + * @dev:       ksz device
+> + * @props:     Array of drive strength properties to be applied
+> + * @num_props: Number of properties in the array
+> + *
+> + * This function configures the drive strength for various KSZ9477 chip variants
+> + * based on the provided properties. It handles chip-specific nuances and
+> + * ensures only valid drive strengths are written to the respective chip.
+> + *
+> + * Return: 0 on successful configuration, a negative error code on failure.
+> + */
+> +static int ksz9477_drive_strength_write(struct ksz_device *dev,
+> +					struct ksz_driver_strength_prop *props,
+> +					int num_props)
+> +{
+> +	size_t array_size = ARRAY_SIZE(ksz9477_drive_strengths);
+> +	int i, ret, reg;
+> +	u8 mask = 0;
+> +	u8 val = 0;
+> +
+> +	if (props[KSZ_DRIVER_STRENGTH_IO].value != -1)
+> +		dev_warn(dev->dev, "%s is not supported by this chip variant\n",
+> +			 props[KSZ_DRIVER_STRENGTH_IO].name);
+> +
+> +	if (dev->chip_id == KSZ8795_CHIP_ID ||
+> +	    dev->chip_id == KSZ8794_CHIP_ID ||
+> +	    dev->chip_id == KSZ8765_CHIP_ID)
+> +		reg = KSZ8795_REG_SW_CTRL_20;
+> +	else
+> +		reg = KSZ9477_REG_SW_IO_STRENGTH;
+> +
+> +	for (i = 0; i < num_props; i++) {
+> +		if (props[i].value == -1)
+> +			continue;
+> +
+> +		ret = ksz_drive_strength_to_reg(ksz9477_drive_strengths,
+> +						array_size, props[i].value);
+> +		if (ret < 0) {
+> +			ksz_drive_strength_error(dev, ksz9477_drive_strengths,
+> +						 array_size, props[i].value);
+> +			return ret;
+> +		}
+> +
+> +		mask |= SW_DRIVE_STRENGTH_M << props[i].offset;
+> +		val |= ret << props[i].offset;
+> +	}
+> +
+> +	return ksz_rmw8(dev, reg, mask, val);
+> +}
+> +
+> +/**
+> + * ksz8830_drive_strength_write() - Set the drive strength configuration for
+> + *				    KSZ8830 compatible chip variants.
+> + * @dev:       ksz device
+> + * @props:     Array of drive strength properties to be set
+> + * @num_props: Number of properties in the array
+> + *
+> + * This function applies the specified drive strength settings to KSZ8830 chip
+> + * variants (KSZ8873, KSZ8863).
+> + * It ensures the configurations align with what the chip variant supports and
+> + * warns or errors out on unsupported settings.
+> + *
+> + * Return: 0 on success, error code otherwise
+> + */
+> +static int ksz8830_drive_strength_write(struct ksz_device *dev,
+> +					struct ksz_driver_strength_prop *props,
+> +					int num_props)
+> +{
+> +	size_t array_size = ARRAY_SIZE(ksz8830_drive_strengths);
+> +	int milliamp;
+> +	int i, ret;
+> +
+> +	for (i = 0; i < num_props; i++) {
+> +		if (props[i].value == -1 || i == KSZ_DRIVER_STRENGTH_IO)
+> +			continue;
+> +
+> +		dev_warn(dev->dev, "%s is not supported by this chip variant\n",
+> +			 props[i].name);
+> +	}
+> +
+> +	milliamp = props[KSZ_DRIVER_STRENGTH_IO].value;
+> +	ret = ksz_drive_strength_to_reg(ksz8830_drive_strengths, array_size,
+> +					milliamp);
+> +	if (ret < 0) {
+> +		ksz_drive_strength_error(dev, ksz8830_drive_strengths,
+> +					 array_size, milliamp);
+> +		return ret;
+> +	}
+> +
+> +	return ksz_rmw8(dev, KSZ8873_REG_GLOBAL_CTRL_12,
+> +			KSZ8873_DRIVE_STRENGTH_16MA, ret);
+> +}
+> +
+> +/**
+> + * ksz_parse_drive_strength() - Extract and apply drive strength configurations
+> + *				from device tree properties.
+> + * @dev:	ksz device
+> + *
+> + * This function reads the specified drive strength properties from the
+> + * device tree, validates against the supported chip variants, and sets
+> + * them accordingly. An error should be critical here, as the drive strength
+> + * settings are crucial for EMI compliance.
+> + *
+> + * Return: 0 on success, error code otherwise
+> + */
+> +static int ksz_parse_drive_strength(struct ksz_device *dev)
+> +{
+> +	struct ksz_driver_strength_prop of_props[] = {
+> +		[KSZ_DRIVER_STRENGTH_HI] = {
+> +			.name = "microchip,hi-drive-strength-microamp",
+> +			.offset = SW_HI_SPEED_DRIVE_STRENGTH_S,
+> +			.value = -1
 
-I also want to give it some time on the nvme tree.
+nit: it is usual to place a comma even after the last element of an
+array or structure, because it makes future patches cleaner (they don't
+need to touch the previous line to add a comma).
 
-> 
-> with the merge of Chuck Levers handshake upcall mechanism and
-> my tls_read_sock() implementation finally merged with net-next
-> it's now time to restart on the actual issue, namely implementing
-> in-kernel TLS support for nvme-tcp.
-> 
-> The patchset is based on the recent net-next git tree;
-> everything after commit ba4a734e1aa0 ("net/tls: avoid TCP window
-> full during ->read_sock()") should work.
-> You might want to add the patch
-> 'nvmet-tcp: use 'spin_lock_bh' for state_lock()'
-> before applying this patchset; otherwise results might be ...
-> interesting.
-> 
-> It also requires the 'tlshd' userspace daemon
-> (https://github.com/oracle/ktls-utils)
-> for the actual TLS handshake.
-> Changes for nvme-cli are already included in the upstream repository.
-> 
-> Theory of operation:
-> A dedicated '.nvme' keyring is created to hold the pre-shared keys (PSKs)
-> for the TLS handshake. Keys will have to be provisioned before TLS handshake
-> is attempted; that can be done with the 'nvme gen-tls-key' command for nvme-cli
-> (patches are already merged upstream).
-> After connection to the remote TCP port the client side will use the
-> 'best' PSK (as inferred from the NVMe TCP spec) or the PSK specified
-> by the '--tls_key' option to nvme-cli and call the TLS userspace daemon
-> to initiate a TLS handshake.
-> The server side will then invoke the TLS userspace daemon to run the TLS
-> handshake.
-> If the TLS handshake succeeds the userspace daemon will be activating
-> kTLS on the socket, and control is passed back to the kernel.
-> 
-> This implementation currently does not implement the so-called
-> 'secure concatenation' mode from NVMe-TCP; a TPAR is still pending
-> with fixes for it, so I'll wait until it's published before
-> posting patches for that.
-> 
-> Patchset can be found at:
-> git.kernel.org/pub/scm/linux/kernel/git/hare/nvme.git
-> branch tls.v16
-> 
-> For testing I'm using this script, running on a nvme target
-> with NQN 'nqn.test' and using 127.0.0.1 as a port; the port
-> has to set 'addr_tsas' to 'tls1.3':
-> 
-> modprobe nvmet-tcp
-> nvmetcli restore
-> modprobe nvme-tcp
-> ./nvme gen-tls-key --subsysnqn=nqn.test -i
-> ./nvme gen-tls-key --subsysnqn=nqn.2014-08.org.nvmexpress.discovery -i
-> tlshd -c /etc/tlshd.conf
-> 
-> and then one can do a simple:
-> # nvme connect -t tcp -a 127.0.0.1 -s 4420 -n nqn.test --tls
-> to start the connection.
-> 
-> As usual, comments and reviews are welcome.
-> 
-> Changes to v10:
-> - Include reviews from Sagi
-> 
-> Changes to v9:
-> - Close race between done() and timeout()
-> - Add logging message for icreq/icresp failure
-> - Sparse fixes
-> - Restrict TREQ setting to 'not required' or 'required'
->    when TLS is enabled
-> 
-> Changes to v8:
-> - Simplify reference counting as suggested by Sagi
-> - Implement nvmf_parse_key() to simplify options parsing
-> - Add patch to peek at icreq to figure out whether TLS
->    should be started
-> 
-> Changes to v7:
-> - Include reviews from Simon
-> - Do not call sock_release() when sock_alloc_file() fails
-> 
-> Changes to v6:
-> - More reviews from Sagi
-> - Fixup non-tls connections
-> - Fixup nvme options handling
-> - Add reference counting to nvmet-tcp queues
-> 
-> Changes to v5:
-> - Include reviews from Sagi
-> - Split off nvmet tsas/treq handling
-> - Sanitize sock_file handling
-> 
-> Changes to v4:
-> - Split off network patches into a separate
->    patchset
->      - Handle TLS Alert notifications
-> 
-> Changes to v3:
-> - Really handle MSG_EOR for TLS
-> - Fixup MSG_SENDPAGE_NOTLAST handling
-> - Conditionally disable fabric option
-> 
-> Changes to v2:
-> - Included reviews from Sagi
-> - Removed MSG_SENDPAGE_NOTLAST
-> - Improved MSG_EOR handling for TLS
-> - Add config options NVME_TCP_TLS
->    and NVME_TARGET_TCP_TLS
-> 
-> Changes to the original RFC:
-> - Add a CONFIG_NVME_TLS config option
-> - Use a single PSK for the TLS handshake
-> - Make TLS connections mandatory
-> - Do not peek messages for the server
-> - Simplify data_ready callback
-> - Implement read_sock() for TLS
-> 
-> Hannes Reinecke (18):
->    nvme-keyring: register '.nvme' keyring
->    nvme-keyring: define a 'psk' keytype
->    nvme: add TCP TSAS definitions
->    nvme-tcp: add definitions for TLS cipher suites
->    nvme-keyring: implement nvme_tls_psk_default()
->    security/keys: export key_lookup()
->    nvme-tcp: allocate socket file
->    nvme-tcp: enable TLS handshake upcall
->    nvme-tcp: control message handling for recvmsg()
->    nvme-tcp: improve icreq/icresp logging
->    nvme-fabrics: parse options 'keyring' and 'tls_key'
->    nvmet: make TCP sectype settable via configfs
->    nvmet-tcp: make nvmet_tcp_alloc_queue() a void function
->    nvmet-tcp: allocate socket file
->    nvmet: Set 'TREQ' to 'required' when TLS is enabled
->    nvmet-tcp: enable TLS handshake upcall
->    nvmet-tcp: control messages for recvmsg()
->    nvmet-tcp: peek icreq before starting TLS
-> 
->   drivers/nvme/common/Kconfig    |   4 +
->   drivers/nvme/common/Makefile   |   3 +-
->   drivers/nvme/common/keyring.c  | 182 ++++++++++++++++++
->   drivers/nvme/host/Kconfig      |  15 ++
->   drivers/nvme/host/core.c       |  12 +-
->   drivers/nvme/host/fabrics.c    |  67 ++++++-
->   drivers/nvme/host/fabrics.h    |   9 +
->   drivers/nvme/host/nvme.h       |   1 +
->   drivers/nvme/host/sysfs.c      |  21 +++
->   drivers/nvme/host/tcp.c        | 184 ++++++++++++++++--
->   drivers/nvme/target/Kconfig    |  15 ++
->   drivers/nvme/target/configfs.c | 128 ++++++++++++-
->   drivers/nvme/target/nvmet.h    |  11 ++
->   drivers/nvme/target/tcp.c      | 334 ++++++++++++++++++++++++++++++---
->   include/linux/key.h            |   1 +
->   include/linux/nvme-keyring.h   |  36 ++++
->   include/linux/nvme-tcp.h       |   6 +
->   include/linux/nvme.h           |  10 +
->   security/keys/key.c            |   1 +
->   19 files changed, 991 insertions(+), 49 deletions(-)
->   create mode 100644 drivers/nvme/common/keyring.c
->   create mode 100644 include/linux/nvme-keyring.h
-> 
+> +		},
+> +		[KSZ_DRIVER_STRENGTH_LO] = {
+> +			.name = "microchip,lo-drive-strength-microamp",
+> +			.offset = SW_LO_SPEED_DRIVE_STRENGTH_S,
+> +			.value = -1
+> +		},
+> +		[KSZ_DRIVER_STRENGTH_IO] = {
+> +			.name = "microchip,io-drive-strength-microamp",
+> +			.offset = 0, /* don't care */
+> +			.value = -1
+> +		},
+> +	};
+> +	struct device_node *np = dev->dev->of_node;
+> +	bool found = false;
+> +	int i, ret;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(of_props); i++) {
+> +		ret = of_property_read_u32(np, of_props[i].name,
+> +					   &of_props[i].value);
+> +		if (ret && ret != -EINVAL)
+> +			dev_warn(dev->dev, "Failed to read %s\n",
+> +				 of_props[i].name);
+> +		if (ret)
+> +			continue;
+> +
+> +		found = true;
+> +	}
+> +
+> +	if (!found)
+> +		return 0;
+
+Maybe "have_any_prop" would be a better name to avoid Christophe's confusion?
+
+> +
+> +	switch (dev->chip_id) {
+> +	case KSZ8830_CHIP_ID:
+> +		return ksz8830_drive_strength_write(dev, of_props,
+> +						    ARRAY_SIZE(of_props));
+> +	case KSZ8795_CHIP_ID:
+> +	case KSZ8794_CHIP_ID:
+> +	case KSZ8765_CHIP_ID:
+> +	case KSZ8563_CHIP_ID:
+> +	case KSZ9477_CHIP_ID:
+> +	case KSZ9563_CHIP_ID:
+> +	case KSZ9567_CHIP_ID:
+> +	case KSZ9893_CHIP_ID:
+> +	case KSZ9896_CHIP_ID:
+> +	case KSZ9897_CHIP_ID:
+> +		return ksz9477_drive_strength_write(dev, of_props,
+> +						    ARRAY_SIZE(of_props));
+> +	default:
+> +		for (i = 0; i < ARRAY_SIZE(of_props); i++) {
+> +			if (of_props[i].value == -1)
+> +				continue;
+> +
+> +			dev_warn(dev->dev, "%s is not supported by this chip variant\n",
+> +				 of_props[i].name);
+> +		}
+> +	}
+> +
+> +	return 0;
+> +}
+> +
 
