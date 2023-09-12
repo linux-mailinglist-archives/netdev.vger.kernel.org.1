@@ -1,240 +1,258 @@
-Return-Path: <netdev+bounces-32979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-32984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 394CD79C18A
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 03:16:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1698279C1B0
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 03:33:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0DDA2816E5
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 01:16:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B377A281762
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 01:33:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8A64136A;
-	Tue, 12 Sep 2023 01:16:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93C6815A2;
+	Tue, 12 Sep 2023 01:33:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B776963E
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 01:16:37 +0000 (UTC)
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26FFA169C75;
-	Mon, 11 Sep 2023 18:16:37 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id 41be03b00d2f7-573f8afe1d9so3802975a12.0;
-        Mon, 11 Sep 2023 18:16:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80BCD1382
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 01:33:47 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC811161114
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 18:33:46 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59b50b45481so44484567b3.1
+        for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 18:33:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694481396; x=1695086196; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=dZa+8605iI8iTk8htTT2g78DAa5n7BwqlTMzbaFHlJA=;
-        b=asbrDSiRuXTtFpA6q5BKJIIJ5O1Fbu3nL0LR75ayYglhC/VWMfH1RqMtcXt0Z2LVXL
-         5+5GCpasOeWu05/n7HvAKbo2gqYgn3L9t/UirIanCaIYE6t+1/iX/skAGai02P7esxON
-         DSI03qornJMsnBvqgYcymP7D0kNpPnAI4qJQ/s6klq2+cjlxCtuMXQh/1q8GW0w4e+P7
-         U8fo8YWe++273bVsTDCTyI/lDXC13+4Dij3ohaicZ/DztwWcmXJjxCMhrtomtfW0/DeR
-         QY583QXVOzlNtcFNV8tBzwuAB2SfStVWujL16WstuvJcQFXWn+AqUSj+RN3yBYe3mD8Q
-         oyag==
+        d=google.com; s=20230601; t=1694482426; x=1695087226; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=cWUXE3J5lE0Vw3vlpdHWbtqpp4667kXmYY3wN4ZTMxw=;
+        b=Y8PGUpIRv1/mU+bNqdIGS83f/nl+uwdy013YZ4voE7w8rNQMU7f27pDLhd3PmM/Xd6
+         ZDgLFspv5MSTMj48WSZQM77DAJROizqiymkxuGU3RE2vU5F3yr1Vz3LsTKJnnH+SOnZm
+         XR9U+hfLX1owqOASx4aLsy4kLcIBBsrm2b6cqGGX4oMa0DNXfjSU9io4/zSRlF1ozdjh
+         asa/W9QdKnA+60pba38dY2Wx4DhGU2WdbykIh5LcVU4jS52BErC00+eAWlQt6j3MWIgk
+         /eTvMc2o4QGmIh6vRCUCbqYypbBHalkfYv1LEOIlwPhu7ipR/TmLbwjTE0JuTGRWd0gH
+         jgRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694481396; x=1695086196;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dZa+8605iI8iTk8htTT2g78DAa5n7BwqlTMzbaFHlJA=;
-        b=JTS7ljDHtZav3792gmswIwiRoWm3ulOQEYce+kUdXTd0lKrCnUujj4fpW2gGGcjVnB
-         qnt94NduV+hEIb7BoS99sq/wKJ5I9DwhsTmWCXMlF+ngjk3shULPD7eGzBloUsdPcIS9
-         NCwaQfZIft0dMcfPAiktDtUtqzWOBM86Z62uwA4j8SVeako+sx/bXgl9OdgzN+oyc6DW
-         ee9jCodY7ETwF5G5l4zyOEBZpI+/eTiC6Y0pxlDR0SA46Umy+mqdYs+GFgqYeK7l5ZLJ
-         47qqXVfW9HoVQNdxmxuuprcw4l0OexaBJ8QdiBEhBDIsTBrz+d91PGxl0DkaL4UB6FqB
-         xi2A==
-X-Gm-Message-State: AOJu0YyPjIMw81HNSLrNcnkM3M3WsU3eh4xzFuPvHftXjpssBHrn/G3j
-	AY1KrXSnZy21rl2BFXqMSF/2Oa3JtJg=
-X-Google-Smtp-Source: AGHT+IHlRjOnYny+QrGTWy12Sgqhvua3ZOZLt4S0GWSSJfDyWBf5U6tkTMFVukpSfyHrdUfziv0pbA==
-X-Received: by 2002:a05:6a21:a103:b0:148:d5d9:aaa9 with SMTP id aq3-20020a056a21a10300b00148d5d9aaa9mr11443941pzc.33.1694480865627;
-        Mon, 11 Sep 2023 18:07:45 -0700 (PDT)
-Received: from localhost.localdomain ([104.28.194.88])
-        by smtp.gmail.com with ESMTPSA id f23-20020aa782d7000000b0068c90e336ebsm6173237pfn.126.2023.09.11.18.07.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Sep 2023 18:07:45 -0700 (PDT)
-From: Sieng-Piaw Liew <liew.s.piaw@gmail.com>
-To: chris.snook@gmail.com,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	edumazet@google.com,
-	feng.tang@intel.com,
-	linux-kernel@vger.kernel.org
-Cc: Sieng-Piaw Liew <liew.s.piaw@gmail.com>
-Subject: [PATCH net-next] atl1c: Work around the DMA RX overflow issue
-Date: Tue, 12 Sep 2023 09:07:11 +0800
-Message-Id: <20230912010711.12036-1-liew.s.piaw@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1694482426; x=1695087226;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cWUXE3J5lE0Vw3vlpdHWbtqpp4667kXmYY3wN4ZTMxw=;
+        b=F/BNgd9QmAD+kWtoeyNilcUIvSFW5+l/BdDuL4wPM5ueZVzuJO3tUnNlAZBN4MkfPN
+         FZEwfoN3n7wO3FqbFP/cfvJHUtixzh8ZwbDBLRAGxgcYc5zmq9BgyX+4w46I7cBRll3/
+         liT0Oolf1U1Lz9ey5ayCIqTUgz5zqF37Ot+sG0mdMAy1mAiVBmunFYBDvhdGMDPwA4Gi
+         rHdTgbGwPBaqgzoYgOZdIG3rHVOtwpuKMAL3l5mJK9ds/XosDzm3Otgk5HFUNkAhKoL6
+         5lLjsTSfwng6c/TWoFnKPihbnBMizeHICLgGVB65HfuPuFp+sIxWtioM8LeS2ulecJzA
+         KV+g==
+X-Gm-Message-State: AOJu0Yw+5JGF/DmFpn8KeetiKjhnZBuOzplSs0XIyEi3i/Tm1OfWbb+Y
+	NRFbncUJ4xy9jd8hHRyPD+Fi0M44kQ==
+X-Google-Smtp-Source: AGHT+IEJMnX/iZzjHqedLRgWpMYh6kVIsnhc4IKzTsKgfRLNPS5yCgV4I5pqj13qzpazSIdWD+OGYIiN+Q==
+X-Received: from jrife.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:9f])
+ (user=jrife job=sendgmr) by 2002:a25:df03:0:b0:d35:bf85:5aa0 with SMTP id
+ w3-20020a25df03000000b00d35bf855aa0mr264120ybg.4.1694482425954; Mon, 11 Sep
+ 2023 18:33:45 -0700 (PDT)
+Date: Mon, 11 Sep 2023 20:33:31 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
+Message-ID: <20230912013332.2048422-1-jrife@google.com>
+Subject: [PATCH net] net: prevent address overwrite in connect() and sendmsg()
+From: Jordan Rife <jrife@google.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, netdev@vger.kernel.org
+Cc: dborkman@kernel.org, Jordan Rife <jrife@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-This is based on alx driver commit 881d0327db37 ("net: alx: Work around
-the DMA RX overflow issue").
+commit 0bdf399342c5 ("net: Avoid address overwrite in kernel_connect")
+ensured that kernel_connect() will not overwrite the address parameter
+in cases where BPF connect hooks perform an address rewrite. However,
+there remain other cases where BPF hooks can overwrite an address held
+by a kernel client.
 
-The alx and atl1c drivers had RX overflow error which was why a custom
-allocator was created to avoid certain addresses. The simpler workaround
-then created for alx driver, but not for atl1c due to lack of tester.
+==Scenarios Tested==
 
-Instead of using a custom allocator, check the allocated skb address and
-use skb_reserve() to move away from problematic 0x...fc0 address.
+* Code in the SMB and Ceph modules calls sock->ops->connect() directly,
+  allowing the address overwrite to occur. In the case of SMB, this can
+  lead to broken mounts.
+* NFS v3 mounts with proto=udp call sock_sendmsg() for each RPC call,
+  passing a pointer to the mount address in msg->msg_name which is
+  later overwritten by a BPF sendmsg hook. This can lead to broken NFS
+  mounts.
 
-Tested on AR8131 on Acer 4540.
+In order to more comprehensively fix this class of problems, this patch
+pushes the address copy deeper into the stack and introduces an address
+copy to both udp_sendmsg() and udpv6_sendmsg() to insulate all callers
+from address rewrites.
 
-Signed-off-by: Sieng-Piaw Liew <liew.s.piaw@gmail.com>
+Signed-off-by: Jordan Rife <jrife@google.com>
 ---
- drivers/net/ethernet/atheros/atl1c/atl1c.h    |  3 -
- .../net/ethernet/atheros/atl1c/atl1c_main.c   | 67 +++++--------------
- 2 files changed, 16 insertions(+), 54 deletions(-)
+ net/ipv4/af_inet.c | 18 ++++++++++++++++++
+ net/ipv4/udp.c     | 21 ++++++++++++++++-----
+ net/ipv6/udp.c     | 23 +++++++++++++++++------
+ net/socket.c       |  7 +------
+ 4 files changed, 52 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/net/ethernet/atheros/atl1c/atl1c.h b/drivers/net/ethernet/atheros/atl1c/atl1c.h
-index 43d821fe7a54..63ba64dbb731 100644
---- a/drivers/net/ethernet/atheros/atl1c/atl1c.h
-+++ b/drivers/net/ethernet/atheros/atl1c/atl1c.h
-@@ -504,15 +504,12 @@ struct atl1c_rrd_ring {
- 	u16 next_to_use;
- 	u16 next_to_clean;
- 	struct napi_struct napi;
--	struct page *rx_page;
--	unsigned int rx_page_offset;
- };
- 
- /* board specific private data structure */
- struct atl1c_adapter {
- 	struct net_device   *netdev;
- 	struct pci_dev      *pdev;
--	unsigned int	    rx_frag_size;
- 	struct atl1c_hw        hw;
- 	struct atl1c_hw_stats  hw_stats;
- 	struct mii_if_info  mii;    /* MII interface info */
-diff --git a/drivers/net/ethernet/atheros/atl1c/atl1c_main.c b/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
-index 940c5d1ff9cf..74b78164cf74 100644
---- a/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
-+++ b/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
-@@ -483,15 +483,10 @@ static int atl1c_set_mac_addr(struct net_device *netdev, void *p)
- static void atl1c_set_rxbufsize(struct atl1c_adapter *adapter,
- 				struct net_device *dev)
+diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+index 3d2e30e204735..c37d484fbee34 100644
+--- a/net/ipv4/af_inet.c
++++ b/net/ipv4/af_inet.c
+@@ -568,6 +568,7 @@ int inet_dgram_connect(struct socket *sock, struct sockaddr *uaddr,
  {
--	unsigned int head_size;
- 	int mtu = dev->mtu;
+ 	struct sock *sk = sock->sk;
+ 	const struct proto *prot;
++	struct sockaddr_storage addr;
+ 	int err;
  
- 	adapter->rx_buffer_len = mtu > AT_RX_BUF_SIZE ?
- 		roundup(mtu + ETH_HLEN + ETH_FCS_LEN + VLAN_HLEN, 8) : AT_RX_BUF_SIZE;
--
--	head_size = SKB_DATA_ALIGN(adapter->rx_buffer_len + NET_SKB_PAD + NET_IP_ALIGN) +
--		    SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
--	adapter->rx_frag_size = roundup_pow_of_two(head_size);
- }
+ 	if (addr_len < sizeof(uaddr->sa_family))
+@@ -580,6 +581,14 @@ int inet_dgram_connect(struct socket *sock, struct sockaddr *uaddr,
+ 		return prot->disconnect(sk, flags);
  
- static netdev_features_t atl1c_fix_features(struct net_device *netdev,
-@@ -964,7 +959,6 @@ static void atl1c_init_ring_ptrs(struct atl1c_adapter *adapter)
- static void atl1c_free_ring_resources(struct atl1c_adapter *adapter)
- {
- 	struct pci_dev *pdev = adapter->pdev;
--	int i;
- 
- 	dma_free_coherent(&pdev->dev, adapter->ring_header.size,
- 			  adapter->ring_header.desc, adapter->ring_header.dma);
-@@ -977,12 +971,6 @@ static void atl1c_free_ring_resources(struct atl1c_adapter *adapter)
- 		kfree(adapter->tpd_ring[0].buffer_info);
- 		adapter->tpd_ring[0].buffer_info = NULL;
- 	}
--	for (i = 0; i < adapter->rx_queue_count; ++i) {
--		if (adapter->rrd_ring[i].rx_page) {
--			put_page(adapter->rrd_ring[i].rx_page);
--			adapter->rrd_ring[i].rx_page = NULL;
--		}
--	}
- }
- 
- /**
-@@ -1754,48 +1742,11 @@ static inline void atl1c_rx_checksum(struct atl1c_adapter *adapter,
- 	skb_checksum_none_assert(skb);
- }
- 
--static struct sk_buff *atl1c_alloc_skb(struct atl1c_adapter *adapter,
--				       u32 queue, bool napi_mode)
--{
--	struct atl1c_rrd_ring *rrd_ring = &adapter->rrd_ring[queue];
--	struct sk_buff *skb;
--	struct page *page;
--
--	if (adapter->rx_frag_size > PAGE_SIZE) {
--		if (likely(napi_mode))
--			return napi_alloc_skb(&rrd_ring->napi,
--					      adapter->rx_buffer_len);
--		else
--			return netdev_alloc_skb_ip_align(adapter->netdev,
--							 adapter->rx_buffer_len);
--	}
--
--	page = rrd_ring->rx_page;
--	if (!page) {
--		page = alloc_page(GFP_ATOMIC);
--		if (unlikely(!page))
--			return NULL;
--		rrd_ring->rx_page = page;
--		rrd_ring->rx_page_offset = 0;
--	}
--
--	skb = build_skb(page_address(page) + rrd_ring->rx_page_offset,
--			adapter->rx_frag_size);
--	if (likely(skb)) {
--		skb_reserve(skb, NET_SKB_PAD + NET_IP_ALIGN);
--		rrd_ring->rx_page_offset += adapter->rx_frag_size;
--		if (rrd_ring->rx_page_offset >= PAGE_SIZE)
--			rrd_ring->rx_page = NULL;
--		else
--			get_page(page);
--	}
--	return skb;
--}
--
- static int atl1c_alloc_rx_buffer(struct atl1c_adapter *adapter, u32 queue,
- 				 bool napi_mode)
- {
- 	struct atl1c_rfd_ring *rfd_ring = &adapter->rfd_ring[queue];
-+	struct atl1c_rrd_ring *rrd_ring = &adapter->rrd_ring[queue];
- 	struct pci_dev *pdev = adapter->pdev;
- 	struct atl1c_buffer *buffer_info, *next_info;
- 	struct sk_buff *skb;
-@@ -1814,13 +1765,27 @@ static int atl1c_alloc_rx_buffer(struct atl1c_adapter *adapter, u32 queue,
- 	while (next_info->flags & ATL1C_BUFFER_FREE) {
- 		rfd_desc = ATL1C_RFD_DESC(rfd_ring, rfd_next_to_use);
- 
--		skb = atl1c_alloc_skb(adapter, queue, napi_mode);
-+		/* When DMA RX address is set to something like
-+		 * 0x....fc0, it will be very likely to cause DMA
-+		 * RFD overflow issue.
-+		 *
-+		 * To work around it, we apply rx skb with 64 bytes
-+		 * longer space, and offset the address whenever
-+		 * 0x....fc0 is detected.
-+		 */
-+		if (likely(napi_mode))
-+			skb = napi_alloc_skb(&rrd_ring->napi, adapter->rx_buffer_len + 64);
-+		else
-+			skb = netdev_alloc_skb(adapter->netdev, adapter->rx_buffer_len + 64);
- 		if (unlikely(!skb)) {
- 			if (netif_msg_rx_err(adapter))
- 				dev_warn(&pdev->dev, "alloc rx buffer failed\n");
- 			break;
- 		}
- 
-+		if (((unsigned long)skb->data & 0xfff) == 0xfc0)
-+			skb_reserve(skb, 64);
+ 	if (BPF_CGROUP_PRE_CONNECT_ENABLED(sk)) {
++		if (uaddr && addr_len <= sizeof(addr)) {
++			/* pre_connect can rewrite uaddr, so make a copy to
++			 * insulate the caller.
++			 */
++			memcpy(&addr, uaddr, addr_len);
++			uaddr = (struct sockaddr *)&addr;
++		}
 +
- 		/*
- 		 * Make buffer alignment 2 beyond a 16 byte boundary
- 		 * this will result in a 16 byte aligned IP header after
+ 		err = prot->pre_connect(sk, uaddr, addr_len);
+ 		if (err)
+ 			return err;
+@@ -625,6 +634,7 @@ int __inet_stream_connect(struct socket *sock, struct sockaddr *uaddr,
+ 			  int addr_len, int flags, int is_sendmsg)
+ {
+ 	struct sock *sk = sock->sk;
++	struct sockaddr_storage addr;
+ 	int err;
+ 	long timeo;
+ 
+@@ -668,6 +678,14 @@ int __inet_stream_connect(struct socket *sock, struct sockaddr *uaddr,
+ 			goto out;
+ 
+ 		if (BPF_CGROUP_PRE_CONNECT_ENABLED(sk)) {
++			if (uaddr && addr_len <= sizeof(addr)) {
++				/* pre_connect can rewrite uaddr, so make a copy to
++				 * insulate the caller.
++				 */
++				memcpy(&addr, uaddr, addr_len);
++				uaddr = (struct sockaddr *)&addr;
++			}
++
+ 			err = sk->sk_prot->pre_connect(sk, uaddr, addr_len);
+ 			if (err)
+ 				goto out;
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index f39b9c8445808..5f5ee2752eeb7 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -1142,18 +1142,29 @@ int udp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 	}
+ 
+ 	if (cgroup_bpf_enabled(CGROUP_UDP4_SENDMSG) && !connected) {
++		struct sockaddr_in tmp_addr;
++		struct sockaddr_in *addr = usin;
++
++		/* BPF_CGROUP_RUN_PROG_UDP4_SENDMSG_LOCK can rewrite usin, so make a
++		 * copy to insulate the caller.
++		 */
++		if (usin && msg->msg_namelen <= sizeof(tmp_addr)) {
++			memcpy(&tmp_addr, usin, msg->msg_namelen);
++			addr = &tmp_addr;
++		}
++
+ 		err = BPF_CGROUP_RUN_PROG_UDP4_SENDMSG_LOCK(sk,
+-					    (struct sockaddr *)usin, &ipc.addr);
++					    (struct sockaddr *)addr, &ipc.addr);
+ 		if (err)
+ 			goto out_free;
+-		if (usin) {
+-			if (usin->sin_port == 0) {
++		if (addr) {
++			if (addr->sin_port == 0) {
+ 				/* BPF program set invalid port. Reject it. */
+ 				err = -EINVAL;
+ 				goto out_free;
+ 			}
+-			daddr = usin->sin_addr.s_addr;
+-			dport = usin->sin_port;
++			daddr = addr->sin_addr.s_addr;
++			dport = addr->sin_port;
+ 		}
+ 	}
+ 
+diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+index 86b5d509a4688..cbc1917fad629 100644
+--- a/net/ipv6/udp.c
++++ b/net/ipv6/udp.c
+@@ -1506,26 +1506,37 @@ int udpv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 	fl6->fl6_sport = inet->inet_sport;
+ 
+ 	if (cgroup_bpf_enabled(CGROUP_UDP6_SENDMSG) && !connected) {
++		struct sockaddr_in6 tmp_addr;
++		struct sockaddr_in6 *addr = sin6;
++
++		/* BPF_CGROUP_RUN_PROG_UDP6_SENDMSG_LOCK can rewrite sin6, so make a
++		 * copy to insulate the caller.
++		 */
++		if (sin6 && addr_len <= sizeof(tmp_addr)) {
++			memcpy(&tmp_addr, sin6, addr_len);
++			addr = &tmp_addr;
++		}
++
+ 		err = BPF_CGROUP_RUN_PROG_UDP6_SENDMSG_LOCK(sk,
+-					   (struct sockaddr *)sin6,
++					   (struct sockaddr *)addr,
+ 					   &fl6->saddr);
+ 		if (err)
+ 			goto out_no_dst;
+-		if (sin6) {
+-			if (ipv6_addr_v4mapped(&sin6->sin6_addr)) {
++		if (addr) {
++			if (ipv6_addr_v4mapped(&addr->sin6_addr)) {
+ 				/* BPF program rewrote IPv6-only by IPv4-mapped
+ 				 * IPv6. It's currently unsupported.
+ 				 */
+ 				err = -ENOTSUPP;
+ 				goto out_no_dst;
+ 			}
+-			if (sin6->sin6_port == 0) {
++			if (addr->sin6_port == 0) {
+ 				/* BPF program set invalid port. Reject it. */
+ 				err = -EINVAL;
+ 				goto out_no_dst;
+ 			}
+-			fl6->fl6_dport = sin6->sin6_port;
+-			fl6->daddr = sin6->sin6_addr;
++			fl6->fl6_dport = addr->sin6_port;
++			fl6->daddr = addr->sin6_addr;
+ 		}
+ 	}
+ 
+diff --git a/net/socket.c b/net/socket.c
+index c8b08b32f097e..39794d026fa11 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -3570,12 +3570,7 @@ EXPORT_SYMBOL(kernel_accept);
+ int kernel_connect(struct socket *sock, struct sockaddr *addr, int addrlen,
+ 		   int flags)
+ {
+-	struct sockaddr_storage address;
+-
+-	memcpy(&address, addr, addrlen);
+-
+-	return READ_ONCE(sock->ops)->connect(sock, (struct sockaddr *)&address,
+-					     addrlen, flags);
++	return READ_ONCE(sock->ops)->connect(sock, addr, addrlen, flags);
+ }
+ EXPORT_SYMBOL(kernel_connect);
+ 
 -- 
-2.34.1
+2.42.0.283.g2d96d420d3-goog
 
 
