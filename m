@@ -1,126 +1,188 @@
-Return-Path: <netdev+bounces-33366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0806E79D956
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 21:09:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B7CCD79D965
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 21:13:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE3F51C20ECB
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 19:09:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0B831C20C07
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 19:13:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF83DA945;
-	Tue, 12 Sep 2023 19:09:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 977F4A94F;
+	Tue, 12 Sep 2023 19:13:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5762A951
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 19:09:48 +0000 (UTC)
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADB3AE6;
-	Tue, 12 Sep 2023 12:09:47 -0700 (PDT)
-Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2bcda0aaf47so1782691fa.1;
-        Tue, 12 Sep 2023 12:09:47 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82A26A930
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 19:13:53 +0000 (UTC)
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A234EE6;
+	Tue, 12 Sep 2023 12:13:52 -0700 (PDT)
+Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-401b393df02so70420975e9.1;
+        Tue, 12 Sep 2023 12:13:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694545786; x=1695150586; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=n2QKmtHWodHEWcW+VP4XGZgYZ6yzX48HwXCnApPwIfs=;
-        b=POBF48oba/3lNU2t5Gv5zQWVSuvzveI9UMVv2w9Fr7YtDrb+Uby9Sp/sxIeFr33O/l
-         5Rdk2sG+Dlwwp/Lpl0HJWD1eADLN1479V+GUWncBqfGpy7IuSPSI7no9CT/MIZNN9u4K
-         qibG0qGlHVdB177TpmWecO8vlN3oCZrD5ILbL/xxlRqYNbz8bw52iySAvYCtXFPCaIMn
-         hMCU9MgmOIo647oHl4YOYPuuNS2HLqbJ8fTFn24+NGKLOE3PlRMXn6AL6Boigy/gk6IG
-         MqthsyJ1gx1juV9JwV2aV2lTn05p9E+UjVR2UyOfUEwHu6+Unx6SCUkmy73NP0cnhs88
-         yRWA==
+        d=gmail.com; s=20221208; t=1694546031; x=1695150831; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TeoZs7xQmKdzpDag8SbCgUnRAmmiY/rfJsyiwqIz2wg=;
+        b=amX+k6hxuuWY/0W0kWLMTgiY1rofP/kdN25Gl8u7G+buAgZwSHJo/T+rzzYGsdrUKn
+         tZlrppuQzOjosdZ5zpyMyt02bhNSkIRnhvfukQ7hoBPbrMvGpcvhbLX18yJo/TSyukFj
+         so3EOwkrqwNvegdMy/2Gch4iP4iQ+zwdLkBG0jkKATV0HW71uzH43r9apH1nEXtNi7ig
+         VciGEGTo/XEM2pnxH75sqpVoloxKxjTyLwD11mDfFbINOVgKPkfarhgWv2hh9+oeF7eS
+         DZMPAw50jGySl9/2Ajl2wUuu4qNU814sJBC3LfPRC8BV9ybsAHluiLN6UHnCrg2qbQRd
+         osYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694545786; x=1695150586;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1694546031; x=1695150831;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=n2QKmtHWodHEWcW+VP4XGZgYZ6yzX48HwXCnApPwIfs=;
-        b=EniLcUvS69AIWwPk1woRZs57UoBb9sZxlaY0mgvCvdoGQUXz0ySIrVaL6Ij1iRXGxQ
-         EHOD2VZwq2GgBjSxHMvIuU7+1jxAnmP456dp07pUX0A1OvLXIF9isYbH8LXuPHLQCOLY
-         5t7XD+kWJkVEIV+q6z1BCFvblE/xxzbMoVJH/PYqRMToAXv4f9VXjlxlpHPeqw3n4bxB
-         EEChbHDQjyhMdFo2ADL2DVe4LPYrJZN3b8H+eNo/xobVJtAwrO1vaH6OYJ9oGNRxb2BX
-         XOxtqeFEcai93Fb+08vZfm/6qmI2JiIZ485xzX+4LwPh4A2kXXy/8USo64yugs+IMxZE
-         tzVA==
-X-Gm-Message-State: AOJu0Yw88sYYYtBPX67hd/wMf2hpN3NpZF8BKYtwYzSIWCVslSqRbm1A
-	JKIVI6hKjCbMmhizlEIw1kQvteSF8x5qDBbne9s=
-X-Google-Smtp-Source: AGHT+IEOIrNMeNQxPXExf3y0619mpuQ7YipVHakWGYM49/XckJiyVbA5KsHtuC0A5TCAtMojnvXN2l2a7UWmHU64ZNQ=
-X-Received: by 2002:a2e:aa22:0:b0:2bc:d993:5a58 with SMTP id
- bf34-20020a2eaa22000000b002bcd9935a58mr1317419ljb.17.1694545785763; Tue, 12
- Sep 2023 12:09:45 -0700 (PDT)
+        bh=TeoZs7xQmKdzpDag8SbCgUnRAmmiY/rfJsyiwqIz2wg=;
+        b=N55bdneS94k7rNewsV2eyTrgJgOWVHiE+UfzSodO87EHUmDaVgGqcJgzYxtP6EuAV4
+         y1C8JtEW2JXEIkjJPjl6YX17D0A76sRFuSxEICeG/eg2CZEbfH4hGIzT+CuiZPV2NwEx
+         w19FX1Fu/et+iF01XIrwO58IukWTMfcgfqq4T2lu/fSEjDR/v5XFSogNWtlL+5ZDDINO
+         YVE3hF+y7pVz4LWNML36falksH5ztnU/NzwZHIcBpjrYeau5y+vebYO5mOO3k71cBgZ7
+         /IVIwI4IUjpBET0pXeGU8kPhVCZAn2n7FyVu9RFlEY0oPbLpXtMIUHR5Ys2CLsQtxz8B
+         Q+xQ==
+X-Gm-Message-State: AOJu0Yx+Jg3TXf/p32P2h8WgM6+DrjMx1HpkymWWibhmyXosjrr3riOx
+	RYvaELeOhb8Nd0neC0z3BFg=
+X-Google-Smtp-Source: AGHT+IEKiL11zfBDl8yaQlLJxvTC9Xw7ZSCVeIdBcoIFgGvnKVa07dBGn4wXuvlP08eImu0izECGPQ==
+X-Received: by 2002:a05:600c:20c4:b0:3fe:e85b:425d with SMTP id y4-20020a05600c20c400b003fee85b425dmr300453wmm.9.1694546030978;
+        Tue, 12 Sep 2023 12:13:50 -0700 (PDT)
+Received: from eldamar.lan (c-82-192-242-114.customer.ggaweb.ch. [82.192.242.114])
+        by smtp.gmail.com with ESMTPSA id y12-20020a1c4b0c000000b003fee9cdf55esm13409501wma.14.2023.09.12.12.13.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Sep 2023 12:13:50 -0700 (PDT)
+Sender: Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>
+Received: by eldamar.lan (Postfix, from userid 1000)
+	id B695BBE2DE0; Tue, 12 Sep 2023 21:13:49 +0200 (CEST)
+Date: Tue, 12 Sep 2023 21:13:49 +0200
+From: Salvatore Bonaccorso <carnil@debian.org>
+To: Timo Sigurdsson <public_timo.s@silentcreek.de>
+Cc: pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+	regressions@lists.linux.dev, sashal@kernel.org,
+	1051592@bugs.debian.org,
+	Arturo Borrero Gonzalez <arturo@debian.org>
+Subject: Re: Regression: Commit "netfilter: nf_tables: disallow rule addition
+ to bound chain via NFTA_RULE_CHAIN_ID" breaks ruleset loading in
+ linux-stable
+Message-ID: <ZQC4bcVVK99Q8WrO@eldamar.lan>
+References: <20230911213750.5B4B663206F5@dd20004.kasserver.com>
+ <ZP+bUpxJiFcmTWhy@calendula>
+ <20230912113959.8F8B26321005@dd20004.kasserver.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230829205936.766544-1-luiz.dentz@gmail.com> <169343402479.21564.11565149320234658166.git-patchwork-notify@kernel.org>
- <de698d06-9784-43ed-9437-61d6edf9672b@leemhuis.info>
-In-Reply-To: <de698d06-9784-43ed-9437-61d6edf9672b@leemhuis.info>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 12 Sep 2023 12:09:33 -0700
-Message-ID: <CABBYNZK2PPkLra8Au-fdN2nG2YLkfFRmPtEPQL0suLzBv=HHcA@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_sync: Fix handling of HCI_QUIRK_STRICT_DUPLICATE_FILTER
-To: Linux regressions mailing list <regressions@lists.linux.dev>
-Cc: patchwork-bot+bluetooth@kernel.org, linux-bluetooth@vger.kernel.org, 
-	netdev <netdev@vger.kernel.org>, Stefan Agner <stefan@agner.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230912113959.8F8B26321005@dd20004.kasserver.com>
 
-Hi,
+Hi Timo,
 
-On Mon, Sep 11, 2023 at 6:40=E2=80=AFAM Linux regression tracking (Thorsten
-Leemhuis) <regressions@leemhuis.info> wrote:
->
-> On 31.08.23 00:20, patchwork-bot+bluetooth@kernel.org wrote:
-> >
-> > This patch was applied to bluetooth/bluetooth-next.git (master)
-> > by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-> >
-> > On Tue, 29 Aug 2023 13:59:36 -0700 you wrote:
-> >> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> >>
-> >> When HCI_QUIRK_STRICT_DUPLICATE_FILTER is set LE scanning requires
-> >> periodic restarts of the scanning procedure as the controller would
-> >> consider device previously found as duplicated despite of RSSI changes=
-,
-> >> but in order to set the scan timeout properly set le_scan_restart need=
-s
-> >> to be synchronous so it shall not use hci_cmd_sync_queue which defers
-> >> the command processing to cmd_sync_work.
-> >>
-> >> [...]
-> >
-> > Here is the summary with links:
-> >   - Bluetooth: hci_sync: Fix handling of HCI_QUIRK_STRICT_DUPLICATE_FIL=
-TER
-> >     https://git.kernel.org/bluetooth/bluetooth-next/c/52bf4fd43f75
->
-> That is (maybe among others?) a fix for a regression from 6.1, so why
-> was this merged into a "for-next" branch instead of a branch that
-> targets the current cycle?
+On Tue, Sep 12, 2023 at 01:39:59PM +0200, Timo Sigurdsson wrote:
+> Hi Pablo,
+> 
+> Pablo Neira Ayuso schrieb am 12.09.2023 00:57 (GMT +02:00):
+> 
+> > Hi Timo,
+> > 
+> > On Mon, Sep 11, 2023 at 11:37:50PM +0200, Timo Sigurdsson wrote:
+> >> Hi,
+> >> 
+> >> recently, Debian updated their stable kernel from 6.1.38 to 6.1.52
+> >> which broke nftables ruleset loading on one of my machines with lots
+> >> of "Operation not supported" errors. I've reported this to the
+> >> Debian project (see link below) and Salvatore Bonaccorso and I
+> >> identified "netfilter: nf_tables: disallow rule addition to bound
+> >> chain via NFTA_RULE_CHAIN_ID" (0ebc1064e487) as the offending commit
+> >> that introduced the regression. Salvatore also found that this issue
+> >> affects the 5.10 stable tree as well (observed in 5.10.191), but he
+> >> cannot reproduce it on 6.4.13 and 6.5.2.
+> >> 
+> >> The issue only occurs with some rulesets. While I can't trigger it
+> >> with simple/minimal rulesets that I use on some machines, it does
+> >> occur with a more complex ruleset that has been in use for months
+> >> (if not years, for large parts of it). I'm attaching a somewhat
+> >> stripped down version of the ruleset from the machine I originally
+> >> observed this issue on. It's still not a small or simple ruleset,
+> >> but I'll try to reduce it further when I have more time.
+> >> 
+> >> The error messages shown when trying to load the ruleset don't seem
+> >> to be helpful. Just two simple examples: Just to give two simple
+> >> examples from the log when nftables fails to start:
+> >> /etc/nftables.conf:99:4-44: Error: Could not process rule: Operation not
+> >> supported
+> >>                         tcp option maxseg size 1-500 counter drop
+> >>                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> >> /etc/nftables.conf:308:4-27: Error: Could not process rule: Operation not
+> >> supported
+> >>                         tcp dport sip-tls accept
+> >>                         ^^^^^^^^^^^^^^^^^^^^^^^^
+> > 
+> > I can reproduce this issue with 5.10.191 and 6.1.52 and nftables v1.0.6,
+> > this is not reproducible with v1.0.7 and v1.0.8.
+> > 
+> >> Since the issue only affects some stable trees, Salvatore thought it
+> >> might be an incomplete backport that causes this.
+> >> 
+> >> If you need further information, please let me know.
+> > 
+> > Userspace nftables v1.0.6 generates incorrect bytecode that hits a new
+> > kernel check that rejects adding rules to bound chains. The incorrect
+> > bytecode adds the chain binding, attach it to the rule and it adds the
+> > rules to the chain binding. I have cherry-picked these three patches
+> > for nftables v1.0.6 userspace and your ruleset restores fine.
+> 
+> hmm, that doesn't explain why Salvatore didn't observe this with
+> more recent kernels.
+> 
+> Salvatore, did you use newer userspace components when you tested
+> your 6.4.13 and 6.5.2 builds?
 
-We were late for including it to 6.5, that said the regression was
-introduced in 6.4, but I could probably have it marked for stable just
-to make sure it would get backported to affected versions.
+It does explain now because understanding the issue better. While one
+while experinting should only change each one constraint for the
+6.4.13 and 6.5.2 testing I indeed switched to a Debian unstable
+system, which has newer userpace nftables and so not triggering the
+issue. This was missleading for the report.
 
-> Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
-> --
-> Everything you wanna know about Linux kernel regression tracking:
-> https://linux-regtracking.leemhuis.info/about/#tldr
-> If I did something stupid, please tell me, as explained on that page.
->
-> [1] see
-> https://lore.kernel.org/linux-bluetooth/b0b672069ee6a9e43fed1a07406c6dd3@=
-agner.ch/
+> As for the regression and how it be dealt with: Personally, I don't
+> really care whether the regression is solved in the kernel or
+> userspace. If everybody agrees that this is the best or only viable
+> option and Debian decides to push a nftables update to fix this,
+> that works for me. But I do feel the burden to justify this should
+> be high. A kernel change that leaves users without a working packet
+> filter after upgrading their machines is serious, if you ask me. And
+> since it affects several stable/longterm trees, I would assume this
+> will hit other stable (non-rolling) distributions as well, since
+> they will also use older userspace components (unless this is
+> behavior specific to nftables 1.0.6 but not older versions). They
+> probably should get a heads up then.
 
+So if it is generally believed on kernel side there should not happen
+any further changes to work with older userland, I guess in Debian we
+will need to patch nftables. I'm CC'ing Arturo Borrero Gonzalez
+<arturo@debian.org>, maintainer for the package. The update should go
+ideally in the next point releases from October (and maybe released
+earlier as well trough the stable-updates mechanism).
 
+FWIW: In Debian bullseye we have 0.9.8 based nftables, in bookworm
+1.0.6, so both will need those fixes.
 
---=20
-Luiz Augusto von Dentz
+As 0ebc1064e487 is to address CVE-2023-4147 other distros picking the
+fix will likely encounter the problem at some point. It looks Red Hat
+has taken it (some RHSA's were released), I assume Ubuntu will shortly
+as well release USN's containing a fix.
+
+Regards,
+Salvatore
 
