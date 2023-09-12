@@ -1,74 +1,77 @@
-Return-Path: <netdev+bounces-33395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DADC79DBC6
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 00:21:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56CA079DBD4
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 00:23:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 345521C20F78
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 22:21:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CFA21C20F57
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 22:23:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0565FBA45;
-	Tue, 12 Sep 2023 22:21:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 055CEBA46;
+	Tue, 12 Sep 2023 22:23:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6EA8A933;
-	Tue, 12 Sep 2023 22:21:10 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A38210C8;
-	Tue, 12 Sep 2023 15:21:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=J0yxfTWymB169xV/I/6SashaKoLIMch1mt00vHpWz7I=; b=G5AEZG1C4dGZYDR9EdV0zvXIEO
-	OjzevHR9Nsj07ek/oNgYe2EMcfsXQcfjUGlcJziU4VgFtaPpXzsrPVKr9Ssz5K2dIawaqwrPFAMET
-	ISMii6Cr7jc1duPf51ciyzTHGYFWmhOVEXrXfPvQar6L8rdcAqVRAI6lM9UkLoaIvO+1hJWrmu/FQ
-	uHsHONrGPRatPXwRUqm33YTBWiJDS17ehqihLqqLE7crTKO1/nWcouR6lNPKsWxZnRPTqVxMcgRIm
-	AUPgu3vOiXts2VEEqAyVTJgnadzL635iW+7M4R7cZUhDFFtmw7cFYYqiAXbaxP0W/QSBBO4LsjXSx
-	pxU0de+g==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53678)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qgBkh-0001hY-0c;
-	Tue, 12 Sep 2023 23:20:59 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qgBkd-00035r-8O; Tue, 12 Sep 2023 23:20:55 +0100
-Date: Tue, 12 Sep 2023 23:20:55 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Simon Horman <horms@kernel.org>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Alexei Starovoitov <ast@kernel.org>, bpf@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDF3F33D2
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 22:23:07 +0000 (UTC)
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C963810E6;
+	Tue, 12 Sep 2023 15:23:06 -0700 (PDT)
+Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-52bcb8b199aso7937159a12.3;
+        Tue, 12 Sep 2023 15:23:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694557385; x=1695162185; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FL9z8xf3gSxSE5MtV355yS3vcK6eRahCEwpG0o67ud8=;
+        b=X0ZWXS7YcjVlT7ItlCiPs0iCdAtWo04dxE7SRtfdf2RDvz5vpOzNd6QbFd8ZLvMx26
+         gFd+aXtGxx2Aipa0qdDGRhL9ahiOpoLYU/gf7N1+Tr7UjKE4IHytkQk3n0MafVE56T1R
+         CADuLoIbCDXgZLq5g1hZFfkjFKFA92uCY6FNuuqULWwxiIfNKJtL+O93OfMgP/kymBKb
+         FLXEytZgwIdaQfC+bpt94v3564T2PzygnZ6WIhQUVbXHRnECi9aDtOjOwySia7KchcEi
+         Wh4FhtdnnrGD7vhd8VEBDoZRLpysPaIC+mgGE4YDQEajcyV0zj5NgQxLThOHaysVux+g
+         Yy2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694557385; x=1695162185;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FL9z8xf3gSxSE5MtV355yS3vcK6eRahCEwpG0o67ud8=;
+        b=nJtXF5q6ERFC/NCHy1b+S6wkROUpeN2/jrsYEZBBlyYPYqFHFCS5WkS8QUBa0Y2dCO
+         9TmiiUzeSJC075PFSbL8zrtm00Zgk//HoMgdIUF4Qboyhyc8uxGk+fmbXHmtR4N5s96X
+         GgJq5tryCmNZ3Y68wU8ktnQa/VZYGIKfJjADG/BBkWaH1c4XXAYqr93oot7IiyItjsH1
+         MLfrhz8L7GeoAp/QMk3NdMODt7phZaEx3snANehC/kuL5FtSZ3cIovlCDfq6Ntm/X49o
+         +CzqNZTHOyEcI9XPLj1IyIHcJBX4uTrTZm4T4KZFd2DqU58ra+WVf25QZXyGuo4Lk+cJ
+         QCHw==
+X-Gm-Message-State: AOJu0YyY9ncRDmmN7Wgo+lurvZsMR+r5mC8Qc0o8fsPJrwjfdV2AUVuB
+	YKpP7rb2REZkS4bqyOO/Xo0=
+X-Google-Smtp-Source: AGHT+IH/WQiedIfPOq2mCL7puezc84DhJ8gmimrWY8YF84EfM/IffUf2ZWll8QkF9UF2tAlIWR5EZQ==
+X-Received: by 2002:a17:906:5398:b0:9a1:be50:ae61 with SMTP id g24-20020a170906539800b009a1be50ae61mr431077ejo.69.1694557385098;
+        Tue, 12 Sep 2023 15:23:05 -0700 (PDT)
+Received: from skbuf ([188.25.254.186])
+        by smtp.gmail.com with ESMTPSA id o24-20020a1709062e9800b009a19701e7b5sm7367014eji.96.2023.09.12.15.23.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Sep 2023 15:23:04 -0700 (PDT)
+Date: Wed, 13 Sep 2023 01:23:02 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Pawel Dembicki <paweldembicki@gmail.com>
+Cc: netdev@vger.kernel.org, Dan Carpenter <dan.carpenter@linaro.org>,
+	Simon Horman <simon.horman@corigine.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Emil Renner Berthing <kernel@esmil.dk>,
 	Eric Dumazet <edumazet@google.com>,
-	Fabio Estevam <festevam@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	NXP Linux Team <linux-imx@nxp.com>, Paolo Abeni <pabeni@redhat.com>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Samin Guo <samin.guo@starfivetech.com>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Shawn Guo <shawnguo@kernel.org>
-Subject: Re: [PATCH net-next 1/6] net: stmmac: add platform library
-Message-ID: <ZQDkR/YX2HPMKiF5@shell.armlinux.org.uk>
-References: <ZP8yEFWn0Ml3ALWq@shell.armlinux.org.uk>
- <E1qfiqd-007TPL-7K@rmk-PC.armlinux.org.uk>
- <20230912145227.GE401982@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 8/8] net: dsa: vsc73xx: Add bridge support
+Message-ID: <20230912222302.jxolk3t74vbgr35s@skbuf>
+References: <20230912122201.3752918-1-paweldembicki@gmail.com>
+ <20230912122201.3752918-1-paweldembicki@gmail.com>
+ <20230912122201.3752918-9-paweldembicki@gmail.com>
+ <20230912122201.3752918-9-paweldembicki@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,38 +80,162 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230912145227.GE401982@kernel.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20230912122201.3752918-9-paweldembicki@gmail.com>
+ <20230912122201.3752918-9-paweldembicki@gmail.com>
 
-On Tue, Sep 12, 2023 at 04:52:27PM +0200, Simon Horman wrote:
-> On Mon, Sep 11, 2023 at 04:29:11PM +0100, Russell King (Oracle) wrote:
-> > +	default:
-> > +		return -ENOTSUPP;
+On Tue, Sep 12, 2023 at 02:22:02PM +0200, Pawel Dembicki wrote:
+> This patch adds bridge support for vsc73xx driver.
+> It introduce two functions for port_bridge_join and
+> vsc73xx_port_bridge_leave handling.
 > 
-> Checkpatch seems to think that EOPNOTSUPP would be more appropriate
-> as "ENOTSUPP is not a SUSV4 error code".
+> Those functions implement forwarding adjust and use
+> dsa_tag_8021q_bridge_* api for adjust VLAN configuration.
+> 
+> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+> ---
+> v3:
+>   - All vlan commits was reworked
+>   - move VLAN_AWR and VLAN_DBLAWR to port setup in other commit
+>   - drop vlan table upgrade
+> v2:
+>   - no changes done
+> 
+>  drivers/net/dsa/vitesse-vsc73xx-core.c | 72 ++++++++++++++++++++++++++
+>  1 file changed, 72 insertions(+)
+> 
+> diff --git a/drivers/net/dsa/vitesse-vsc73xx-core.c b/drivers/net/dsa/vitesse-vsc73xx-core.c
+> index bf903502bac1..9d0367c2c52c 100644
+> --- a/drivers/net/dsa/vitesse-vsc73xx-core.c
+> +++ b/drivers/net/dsa/vitesse-vsc73xx-core.c
+> @@ -600,6 +600,9 @@ static int vsc73xx_setup(struct dsa_switch *ds)
+>  
+>  	dev_info(vsc->dev, "set up the switch\n");
+>  
+> +	ds->untag_bridge_pvid = true;
+> +	ds->max_num_bridges = 7;
 
-It needs to be an error code that clk_set_rate() below isn't going to
-return - because if clk_set_rate() does return it, then the users are
-going to end up issuing an incorrect error message to the user. I
-suspect clk_set_rate() could quite legitimately return -EOPNOTSUPP
-or -EINVAL.
+Can you please refactor this into DSA_TAG_8021Q_MAX_NUM_BRIDGES and use
+it in sja1105 too?
 
-Sadly, the CCF implementation of clk_set_rate() doesn't detail what
-errors it could return, but it looks like -EBUSY, -EINVAL, or something
-from pm_runtime_resume_and_get().
+> +
+>  	/* Issue RESET */
+>  	vsc73xx_write(vsc, VSC73XX_BLOCK_SYSTEM, 0, VSC73XX_GLORESET,
+>  		      VSC73XX_GLORESET_MASTER_RESET);
+> @@ -1456,6 +1459,73 @@ static int vsc73xx_tag_8021q_vlan_del(struct dsa_switch *ds, int port, u16 vid)
+>  	return vsc73xx_update_vlan_table(vsc, port, vid, 0);
+>  }
+>  
+> +static void vsc73xx_update_forwarding_map(struct vsc73xx *vsc)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < vsc->ds->num_ports; i++) {
+> +		u32 val;
+> +
+> +		vsc73xx_read(vsc, VSC73XX_BLOCK_ANALYZER, 0,
+> +			     VSC73XX_SRCMASKS + i, &val);
+> +		/* update only if port is in forwarding state */
+> +		if (val & VSC73XX_SRCMASKS_PORTS_MASK)
+> +			vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0,
+> +					    VSC73XX_SRCMASKS + i,
+> +					    VSC73XX_SRCMASKS_PORTS_MASK,
+> +					    vsc->forward_map[i]);
+> +	}
+> +}
 
-Interestingly, while looking at this, pm_runtime_resume_and_get() can
-return '1' if e.g. rpm is disabled and the device is active. It looks
-to me like CCF treats that as an error in multiple locations.
+I suspect you'll have to rethink this. If you look at del_nbp() and dsa_port_bridge_leave(),
+you'll see it goes through a few phases. First the bridge calls br_stp_disable_port(p),
+then netdev_upper_dev_unlink(dev, br->dev) which invokes dsa_port_bridge_leave().
+So at this stage, the port is in BR_STATE_DISABLED and ds->ops->port_stp_state_set()
+duly notifies the driver of that.
 
-> > +	}
-> > +
-> > +	return clk_set_rate(tx_clk, rate);
-> > +}
-> > +EXPORT_SYMBOL_GPL(dwmac_set_tx_clk_gmii);
+Then, ds->ops->port_bridge_leave() gets called, and then, ds->ops->port_stp_state_set()
+again, for the standalone port, in BR_STATE_FORWARDING.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+So actually, the last to take effect upon the forwarding map is port_stp_state_set(),
+not port_bridge_leave().
+
+I suspect you can remove the vsc73xx_update_forwarding_map() and just
+rely on the STP implementation, and fix that while you're at it.
+
+On the other switch ports except the one on which the STP state is changing,
+you can look at dp->stp_state. There needs to be an "administrative" forwarding
+mask (determined by port_bridge_join and port_bridge_leave), and an "operational"
+one (determined by STP states).
+
+> +
+> +static int vsc73xx_port_bridge_join(struct dsa_switch *ds, int port,
+> +				    struct dsa_bridge bridge,
+> +				    bool *tx_fwd_offload,
+> +				    struct netlink_ext_ack *extack)
+> +{
+> +	struct vsc73xx *vsc = ds->priv;
+> +	int i;
+> +
+> +	*tx_fwd_offload = true;
+> +
+> +	for (i = 0; i < ds->num_ports; i++) {
+> +		/* Add this port to the forwarding matrix of the
+> +		 * other ports in the same bridge, and viceversa.
+> +		 */
+> +		if (!dsa_is_user_port(ds, i))
+> +			continue;
+
+	dsa_switch_for_each_user_port(other_dp, ds) please
+
+it is a lower-complexity iteration over the port list, which should be
+preferred over a for loop + any dsa_to_port() wrapper like dsa_is_user_port().
+
+> +
+> +		if (i == port)
+> +			continue;
+> +
+> +		if (!dsa_port_offloads_bridge(dsa_to_port(ds, i), &bridge))
+
+and "other_dp" here
+
+> +			continue;
+> +
+> +		vsc->forward_map[port] |= VSC73XX_SRCMASKS_PORTS_MASK & BIT(i);
+> +		vsc->forward_map[i] |= VSC73XX_SRCMASKS_PORTS_MASK & BIT(port);
+> +	}
+> +	vsc73xx_update_forwarding_map(vsc);
+> +
+> +	return dsa_tag_8021q_bridge_join(ds, port, bridge);
+> +}
+> +
+> +static void vsc73xx_port_bridge_leave(struct dsa_switch *ds, int port,
+> +				      struct dsa_bridge bridge)
+> +{
+> +	struct vsc73xx *vsc = ds->priv;
+> +	int i;
+> +
+> +	/* configure forward map to CPU <-> port only */
+> +	for (i = 0; i < vsc->ds->num_ports; i++) {
+> +		if (i == CPU_PORT)
+> +			continue;
+> +		vsc->forward_map[i] &= VSC73XX_SRCMASKS_PORTS_MASK & ~BIT(port);
+> +	}
+> +	vsc->forward_map[port] = VSC73XX_SRCMASKS_PORTS_MASK & BIT(CPU_PORT);
+> +
+> +	vsc73xx_update_forwarding_map(vsc);
+> +	dsa_tag_8021q_bridge_leave(ds, port, bridge);
+> +}
+> +
+>  static int vsc73xx_port_setup(struct dsa_switch *ds, int port)
+>  {
+>  	struct vsc73xx *vsc = ds->priv;
+> @@ -1557,6 +1627,8 @@ static const struct dsa_switch_ops vsc73xx_ds_ops = {
+>  	.get_sset_count = vsc73xx_get_sset_count,
+>  	.port_enable = vsc73xx_port_enable,
+>  	.port_disable = vsc73xx_port_disable,
+> +	.port_bridge_join = vsc73xx_port_bridge_join,
+> +	.port_bridge_leave = vsc73xx_port_bridge_leave,
+>  	.port_change_mtu = vsc73xx_change_mtu,
+>  	.port_max_mtu = vsc73xx_get_max_mtu,
+>  	.port_stp_state_set = vsc73xx_port_stp_state_set,
+> -- 
+> 2.34.1
+> 
+
 
