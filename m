@@ -1,234 +1,91 @@
-Return-Path: <netdev+bounces-33021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 939AB79C4B8
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 06:23:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F27F579C4C9
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 06:38:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 499C42815B8
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 04:23:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5ED8F28161A
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 04:38:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE6EF15484;
-	Tue, 12 Sep 2023 04:23:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C49E443D;
+	Tue, 12 Sep 2023 04:38:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD312210B
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 04:23:37 +0000 (UTC)
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AEB710DE
-	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 21:23:37 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1c3a2ea2816so72175ad.1
-        for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 21:23:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1694492616; x=1695097416; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=e86HSJwRGcmJDcBfAyZUWM/kB+djN8bXOhlNPzJ2TvY=;
-        b=rl0BeNTTjKy1alqEb8IaLKpDZAN+2wg+rg7rHpnpC6Kh4TFS+KldhfQQ+XUYXMmVJM
-         xRhH95K+ysgzAZQjhdD6No3tkmAbzrUG4E6P9D9/oYDMYDyCWy3OJDBv+9hXCZqJTVoV
-         5Vcge3ThzKT2C/15BT/htBnoUgUP62dWtDprvceScOx5ymZjropH9iYcDX3jvzYSQ0iX
-         f8JEE3AmiuEm91TZ8DQCyJ2snAlxpyDZpJBIEWXhjMBCClSzNJVT65I1DqFD6Bh2G0AT
-         dg4P9k8NZCt6wfsOgwt3miMt5sNWi/6ZIJ9GOh23Xt3+lDbTSSl2r2L84qR8AcUJJGYW
-         7fYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694492616; x=1695097416;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=e86HSJwRGcmJDcBfAyZUWM/kB+djN8bXOhlNPzJ2TvY=;
-        b=fLaa8SdfhX0K2oJAHwXpASQwWoZSDKzld2YbjmdxZgvnJ/ji3/+W8WvoRTLo7xBAnn
-         206WoJ2ASXhpcfpJDs1vqMWnSjEMA8i5r2GBgqFulnF8DD62BSY+Nb8QkfUan2em1+28
-         VFBepwTAF1fbaOT/Bh9hu+5GFjOEgTUyxU4/eMfv85RmzXqAG3eRQXBcVBzFm0wcTY+L
-         Ar4Xm5TLUwjpJ7fpdtsu45GR84swRprNa+S3SZNSnDWGn4DZKWqufbXbxS7MD4ONNHJa
-         QZay+al6RZG23TRRjs1wWBa3VLuCE0GttS7CMWmwdSgXZxII3yq20TUmb7v6cA0m6ECV
-         p0JA==
-X-Gm-Message-State: AOJu0Yyi2vK9xRzlIOQewuKsG8SMFYrzZPF31VQswNMfzUejVob4YxvZ
-	lahIO0K2+1xSbgqogK+mzTIYZv9Fe6CzRZR5heZO1w==
-X-Google-Smtp-Source: AGHT+IFvIC6HsjLpFz4Q6lIOwbhumvid2z3YBaaTD9wl9JQPyj/Ib85J15uaWKUQoY/kymlDQXEfO6X4yMqqbou0XGQ=
-X-Received: by 2002:a17:902:c40b:b0:1c0:7dec:e5b2 with SMTP id
- k11-20020a170902c40b00b001c07dece5b2mr171793plk.4.1694492616154; Mon, 11 Sep
- 2023 21:23:36 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 308BE17D0
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 04:38:46 +0000 (UTC)
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC125B8
+	for <netdev@vger.kernel.org>; Mon, 11 Sep 2023 21:38:45 -0700 (PDT)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+	id 1qfvAX-00DAvf-ER; Tue, 12 Sep 2023 12:38:34 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 12 Sep 2023 12:38:35 +0800
+Date: Tue, 12 Sep 2023 12:38:35 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Dave Watson <davejwatson@fb.com>, Vakul Garg <vakul.garg@nxp.com>,
+	Boris Pismenny <borisp@nvidia.com>,
+	John Fastabend <john.fastabend@gmail.com>
+Subject: Re: [PATCH net 5/5] tls: don't decrypt the next record if it's of a
+ different type
+Message-ID: <ZP/rS+NtSbJ3EuWc@gondor.apana.org.au>
+References: <cover.1694018970.git.sd@queasysnail.net>
+ <be8519564777b3a40eeb63002041576f9009a733.1694018970.git.sd@queasysnail.net>
+ <20230906204727.08a79e00@kernel.org>
+ <ZPm__x5TcsmqagBH@hog>
+ <ZPq51KxgmELpTgOs@gondor.apana.org.au>
+ <ZPtACbUa9rQz0uFq@hog>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230911082016.3694700-1-yajun.deng@linux.dev>
-In-Reply-To: <20230911082016.3694700-1-yajun.deng@linux.dev>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 12 Sep 2023 06:23:24 +0200
-Message-ID: <CANn89i+W1iAQmOhunLbqpvHu8EUO6uawv6Uvx7qimyBa_PBNCg@mail.gmail.com>
-Subject: Re: [PATCH] net/core: Export dev_core_stats_rx_dropped_inc sets
-To: Yajun Deng <yajun.deng@linux.dev>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZPtACbUa9rQz0uFq@hog>
 
-On Mon, Sep 11, 2023 at 10:20=E2=80=AFAM Yajun Deng <yajun.deng@linux.dev> =
-wrote:
+On Fri, Sep 08, 2023 at 05:38:49PM +0200, Sabrina Dubroca wrote:
 >
-> Although there is a kfree_skb_reason() helper function that can be used
-> to find the reason for dropped packets, but most callers didn't increase
-> one of rx_dropped, tx_dropped, rx_nohandler and rx_otherhost_dropped.
->
-> For the users, people are more concerned about why the dropped in ifconfi=
-g
-> is increasing. So we can export dev_core_stats_rx_dropped_inc sets,
-> which users would trace them know why rx_dropped is increasing.
->
-> Export dev_core_stats_{rx_dropped, tx_dropped, rx_nohandler,
-> rx_otherhost_dropped}_inc for trace. Also, move dev_core_stats()
-> and netdev_core_stats_alloc() in dev.c, because they are not called
-> externally.
->
-> Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
+> tls_decrypt_done only runs the completion when decrypt_pending drops
+> to 0, so this should be covered.
 
-Okay, but it seems you forgot to say which tree was targeted by this patch.
+That doesn't look very safe.  What if the first decrypt completes
+before the second decrypt even starts? Wouldn't that cause two
+complete calls on ctx->async_wait?
 
-Documentation/process/maintainer-netdev.rst
+> I wonder if this situation could happen:
+> 
+> tls_sw_recvmsg
+>   process first record
+>     decrypt_pending = 1
+>                                   CB runs
+>                                   decrypt_pending = 0
+>                                   complete(&ctx->async_wait.completion);
+> 
+>   process second record
+>     decrypt_pending = 1
+>   tls_sw_recvmsg reaches "recv_end"
+>     decrypt_pending != 0
+>     crypto_wait_req sees the first completion of ctx->async_wait and proceeds
+> 
+>                                   CB runs
+>                                   decrypt_pending = 0
+>                                   complete(&ctx->async_wait.completion);
 
-I would guess net-next, but patch authors are supposed to be explicit.
+Yes that's exactly what I was thinking of.
 
-> ---
->  include/linux/netdevice.h | 32 +++++---------------------------
->  net/core/dev.c            | 30 ++++++++++++++++++++++++++++--
->  2 files changed, 33 insertions(+), 29 deletions(-)
->
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index 0896aaa91dd7..879b01c85ba4 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -3954,6 +3954,11 @@ int dev_forward_skb_nomtu(struct net_device *dev, =
-struct sk_buff *skb);
->  bool is_skb_forwardable(const struct net_device *dev,
->                         const struct sk_buff *skb);
->
-> +void dev_core_stats_rx_dropped_inc(struct net_device *dev);
-> +void dev_core_stats_tx_dropped_inc(struct net_device *dev);
-> +void dev_core_stats_rx_nohandler_inc(struct net_device *dev);
-> +void dev_core_stats_rx_otherhost_dropped_inc(struct net_device *dev);
-> +
->  static __always_inline bool __is_skb_forwardable(const struct net_device=
- *dev,
->                                                  const struct sk_buff *sk=
-b,
->                                                  const bool check_mtu)
-> @@ -3980,33 +3985,6 @@ static __always_inline bool __is_skb_forwardable(c=
-onst struct net_device *dev,
->         return false;
->  }
->
-> -struct net_device_core_stats __percpu *netdev_core_stats_alloc(struct ne=
-t_device *dev);
-> -
-> -static inline struct net_device_core_stats __percpu *dev_core_stats(stru=
-ct net_device *dev)
-> -{
-> -       /* This READ_ONCE() pairs with the write in netdev_core_stats_all=
-oc() */
-> -       struct net_device_core_stats __percpu *p =3D READ_ONCE(dev->core_=
-stats);
-> -
-> -       if (likely(p))
-> -               return p;
-> -
-> -       return netdev_core_stats_alloc(dev);
-> -}
-> -
-> -#define DEV_CORE_STATS_INC(FIELD)                                       =
-       \
-> -static inline void dev_core_stats_##FIELD##_inc(struct net_device *dev) =
-               \
-> -{                                                                       =
-       \
-> -       struct net_device_core_stats __percpu *p;                        =
-       \
-> -                                                                        =
-       \
-> -       p =3D dev_core_stats(dev);                                       =
-         \
-> -       if (p)                                                           =
-       \
-> -               this_cpu_inc(p->FIELD);                                  =
-       \
-> -}
-> -DEV_CORE_STATS_INC(rx_dropped)
-> -DEV_CORE_STATS_INC(tx_dropped)
-> -DEV_CORE_STATS_INC(rx_nohandler)
-> -DEV_CORE_STATS_INC(rx_otherhost_dropped)
-> -
->  static __always_inline int ____dev_forward_skb(struct net_device *dev,
->                                                struct sk_buff *skb,
->                                                const bool check_mtu)
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index ccff2b6ef958..32ba730405b4 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -10475,7 +10475,7 @@ void netdev_stats_to_stats64(struct rtnl_link_sta=
-ts64 *stats64,
->  }
->  EXPORT_SYMBOL(netdev_stats_to_stats64);
->
-> -struct net_device_core_stats __percpu *netdev_core_stats_alloc(struct ne=
-t_device *dev)
-> +static struct net_device_core_stats __percpu *netdev_core_stats_alloc(st=
-ruct net_device *dev)
->  {
->         struct net_device_core_stats __percpu *p;
->
-> @@ -10488,7 +10488,33 @@ struct net_device_core_stats __percpu *netdev_co=
-re_stats_alloc(struct net_device
->         /* This READ_ONCE() pairs with the cmpxchg() above */
->         return READ_ONCE(dev->core_stats);
->  }
-> -EXPORT_SYMBOL(netdev_core_stats_alloc);
-> +
-> +static inline struct net_device_core_stats __percpu *dev_core_stats(stru=
-ct net_device *dev)
+I think this whole thing needs some rethinking and rewriting.
 
-Please remove this inline attritbute. Consider using __cold instead.
-
-> +{
-> +       /* This READ_ONCE() pairs with the write in netdev_core_stats_all=
-oc() */
-> +       struct net_device_core_stats __percpu *p =3D READ_ONCE(dev->core_=
-stats);
-> +
-> +       if (likely(p))
-> +               return p;
-> +
-> +       return netdev_core_stats_alloc(dev);
-> +}
-> +
-> +#define DEV_CORE_STATS_INC(FIELD)                              \
-> +void dev_core_stats_##FIELD##_inc(struct net_device *dev)      \
-> +{                                                              \
-> +       struct net_device_core_stats __percpu *p;               \
-> +                                                               \
-> +       p =3D dev_core_stats(dev);                                \
-> +       if (p)                                                  \
-> +               this_cpu_inc(p->FIELD);                         \
-> +}                                                              \
-> +EXPORT_SYMBOL(dev_core_stats_##FIELD##_inc)
-> +
-> +DEV_CORE_STATS_INC(rx_dropped);
-> +DEV_CORE_STATS_INC(tx_dropped);
-> +DEV_CORE_STATS_INC(rx_nohandler);
-> +DEV_CORE_STATS_INC(rx_otherhost_dropped);
-
-#undef DEV_CORE_STATS_INC
-
->
->  /**
->   *     dev_get_stats   - get network device statistics
-> --
-> 2.25.1
->
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
