@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-33332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A24479D6E1
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 18:53:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EAEBA79D6F7
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 18:59:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8F9C1C20C30
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 16:53:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 058161C20B7B
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 16:59:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3BE33D7B;
-	Tue, 12 Sep 2023 16:53:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5787E2106;
+	Tue, 12 Sep 2023 16:59:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97F141C06
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 16:53:31 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id D7D1E110
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 09:53:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4948D1FD8
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 16:59:01 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9AE11110
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 09:59:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1694537610;
+	s=mimecast20190719; t=1694537939;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Nc4+V5bh6p5NzLv7LF9hSohtp8QcmhcwlRvEw/hU9ug=;
-	b=PdKpxKbgDm6i0Udxwv30EaUf+hLzzRwELyfxvK68vuhAG7WHu6tKcZYPG7pQ6O0Okqhf65
-	KlwrWBGzKYRaIxGyUMEdJ2GtBAedx1W1o/Xzol6+NKsbyIBVTDBrFutuEN6Hs54RgVV9Ys
-	xluCpBznxf/8uNPEe1pIjC/X0l0q8As=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Z+IKhwmAIhUtNi97G0S5r7PUpBk17j0WklS2XFNmBD8=;
+	b=FXVVDiJEus3zKYLQAWmtC2iDG/laSyC9l0dyJrgRDsVp2HWlMsnMbeAugr6P2mHl2CjDGi
+	Ql8qegQkVnYI6vJkhro43FrdQFCb2svSJu4+KjyLsa+io2LyBTguq+hYMneguEXAmFzKEP
+	y4tX2JjuGSi5bvwJZ28e9TunnjT1oqs=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-644-9YdGtUepNNCgOR8yicTabA-1; Tue, 12 Sep 2023 12:53:27 -0400
-X-MC-Unique: 9YdGtUepNNCgOR8yicTabA-1
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-501bef6b33aso966047e87.0
-        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 09:53:27 -0700 (PDT)
+ us-mta-543-cXGgzhCgNdmgSAKqH2ClDw-1; Tue, 12 Sep 2023 12:58:58 -0400
+X-MC-Unique: cXGgzhCgNdmgSAKqH2ClDw-1
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2be48142a6cso13521951fa.1
+        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 09:58:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694537606; x=1695142406;
+        d=1e100.net; s=20230601; t=1694537936; x=1695142736;
         h=mime-version:user-agent:content-transfer-encoding:references
          :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Nc4+V5bh6p5NzLv7LF9hSohtp8QcmhcwlRvEw/hU9ug=;
-        b=PDzw/X6mciYNDaEY5VBKngwgoUP+QsGFNXCKWyRwPsPr85MSbvdj6DL8AK7fY0lsJ7
-         UhCSsTfj54++Ju6NQ5oe+RonyywNJv04XPuNwH0q93HDU/BMeCifoXxTrc7p2WmHZF6w
-         iOSPFA1JSQVyH4/cJX7ovfDSZze4e/WxcS4zHAk0tSdHIs1jYSvgP1T3it/Ybp4IDRh5
-         7wUwXOUQF4VxPvINLrRHVAagfsD+zxLRBkriY1ngrOXOG8tkzmdiy/983BaESnPKNt5i
-         bbZ88g/lmLXoqnJnAEln2Tvutg4vLNzJpS3Cm9v1DkGVJnrx96rCj5bVsK6TAOiQYbPs
-         me1Q==
-X-Gm-Message-State: AOJu0YyfkHmzfKLNnZP5JSwNp/sIWkO8GFRWksK8WaYs33nnl7Qrev+e
-	htEJlM02Abz75NhoXzhcG6ier/wmD5BOKZoOqbrRggMpw7HBThq1cUjhdt08hDNR/pyarN3E6MN
-	t35xAS2beEM70Sw2e
-X-Received: by 2002:a05:6512:14b:b0:502:9b86:7112 with SMTP id m11-20020a056512014b00b005029b867112mr51064lfo.2.1694537605938;
-        Tue, 12 Sep 2023 09:53:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFB9zqEAtYNJs425Tw5xYK7xk5fDmDx97idivW9+AuMvyrKi8iFS4UnFeFpx5tOwp92xSj67w==
-X-Received: by 2002:a05:6512:14b:b0:502:9b86:7112 with SMTP id m11-20020a056512014b00b005029b867112mr51049lfo.2.1694537605588;
-        Tue, 12 Sep 2023 09:53:25 -0700 (PDT)
+        bh=Z+IKhwmAIhUtNi97G0S5r7PUpBk17j0WklS2XFNmBD8=;
+        b=bJh2JNsY21qgM35/Crq6eilmgUuggVZnh89k7zFtNHkOCJaCDo0V0anQ9J6N6P86Iv
+         +v+Q8MYBZfjzTZKbLkPf4B8Y7J8AxFKoEisqOLxO+x8JcI8t9WUfxygNsQ+6R57pVAW6
+         jGC/oEbirL2eP97HV/oPAtDxuwoPn7j6BOflrJx1C1e+gyuOZn+7Cxn0y3KG3GzIhceT
+         cJ8evAlsWjGzFmNS8wIC80IwYWvc9zYnzc3HC+U8l6fy/S55bJzjQuce9Ug/U9AwkctH
+         39L6Ubf24qIztq5WvGNxeTA3ff5NrCApfQJ1RmtFG9Rg5n0WzzFXplIw14SvWTovQ3XN
+         6fdQ==
+X-Gm-Message-State: AOJu0YwYErYFVwjkviF424maqaQc0KpZMsmAfQS0x9k7KJYs3Z84BcU3
+	N7zCiB4u2rhoLoCgjHRwQ224NZhCJu9nG6fBmF+nOl3XkWLed37YWeLvWVyaHYpC0rlHE39nmZC
+	Ji0v38Xwt+pZJTdVd
+X-Received: by 2002:a2e:bc04:0:b0:2be:5485:4a99 with SMTP id b4-20020a2ebc04000000b002be54854a99mr280865ljf.4.1694537936623;
+        Tue, 12 Sep 2023 09:58:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH2ODfgfk8c9yOTXUFnewhlGWBMLjAGhiBh3CrBAiA8jQJx0YApRUQ4HJXAfOQFdRAjdnu+2A==
+X-Received: by 2002:a2e:bc04:0:b0:2be:5485:4a99 with SMTP id b4-20020a2ebc04000000b002be54854a99mr280852ljf.4.1694537936283;
+        Tue, 12 Sep 2023 09:58:56 -0700 (PDT)
 Received: from gerbillo.redhat.com (146-241-249-231.dyn.eolo.it. [146.241.249.231])
-        by smtp.gmail.com with ESMTPSA id sb5-20020a170906edc500b009a1be9c29d7sm7177110ejb.179.2023.09.12.09.53.24
+        by smtp.gmail.com with ESMTPSA id mb18-20020a170906eb1200b00997cce73cc7sm7100561ejb.29.2023.09.12.09.58.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Sep 2023 09:53:25 -0700 (PDT)
-Message-ID: <20f57b1309b6df60b08ce71f2d7711fa3d6b6b44.camel@redhat.com>
-Subject: Re: [PATCH net-next v1 2/2] net: core: Sort headers alphabetically
+        Tue, 12 Sep 2023 09:58:55 -0700 (PDT)
+Message-ID: <1d9d20d9e41b351114f4e09f2d394c4fa8f03403.camel@redhat.com>
+Subject: Re: [PATCH net-next 3/4] net: call prot->release_cb() when
+ processing backlog
 From: Paolo Abeni <pabeni@redhat.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Simon Horman
-	 <horms@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
-Date: Tue, 12 Sep 2023 18:53:23 +0200
-In-Reply-To: <ZQCTXkZcJLvzNL4F@smile.fi.intel.com>
-References: <20230911154534.4174265-1-andriy.shevchenko@linux.intel.com>
-	 <20230911154534.4174265-2-andriy.shevchenko@linux.intel.com>
-	 <20230912152031.GI401982@kernel.org> <ZQCTXkZcJLvzNL4F@smile.fi.intel.com>
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>,  Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Soheil Hassas Yeganeh <soheil@google.com>, Neal
+ Cardwell <ncardwell@google.com>, Yuchung Cheng <ycheng@google.com>,
+ eric.dumazet@gmail.com
+Date: Tue, 12 Sep 2023 18:58:54 +0200
+In-Reply-To: <20230911170531.828100-4-edumazet@google.com>
+References: <20230911170531.828100-1-edumazet@google.com>
+	 <20230911170531.828100-4-edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
@@ -85,39 +85,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-On Tue, 2023-09-12 at 19:35 +0300, Andy Shevchenko wrote:
-> On Tue, Sep 12, 2023 at 05:20:31PM +0200, Simon Horman wrote:
-> > On Mon, Sep 11, 2023 at 06:45:34PM +0300, Andy Shevchenko wrote:
-> > > It's rather a gigantic list of heards that is very hard to follow.
-> > > Sorting helps to see what's already included and what's not.
-> > > It improves a maintainability in a long term.
-> > >=20
-> > > Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> >=20
-> > Hi Andy,
-> >=20
-> > At the risk of bike shedding, the sort function of Vim, when operating
-> > with the C locale, gives a slightly different order, as experssed by
-> > this incremental diff.
-> >=20
-> > I have no objections to your oder, but I'm slightly curious as
-> > to how it came about.
+On Mon, 2023-09-11 at 17:05 +0000, Eric Dumazet wrote:
+> __sk_flush_backlog() / sk_flush_backlog() are used
+> when TCP recvmsg()/sendmsg() process large chunks,
+> to not let packets in the backlog too long.
 >=20
-> !sort which is external command.
+> It makes sense to call tcp_release_cb() to also
+> process actions held in sk->sk_tsq_flags for smoother
+> scheduling.
 >=20
-> $ locale -k LC_COLLATE
-> collate-nrules=3D4
-> collate-rulesets=3D""
-> collate-symb-hash-sizemb=3D1303
-> collate-codeset=3D"UTF-8"
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  net/core/sock.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>=20
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index 21610e3845a5042f7c648ccb3e0d90126df20a0b..bb89b88bc1e8a042c4ee40b3c=
+8345dc58cb1b369 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -3001,6 +3001,9 @@ void __sk_flush_backlog(struct sock *sk)
+>  {
+>  	spin_lock_bh(&sk->sk_lock.slock);
+>  	__release_sock(sk);
+> +
+> +	if (sk->sk_prot->release_cb)
+> +		sk->sk_prot->release_cb(sk);
 
-I'm unsure this change is worthy. It will make any later fix touching
-the header list more difficult to backport, and I don't see a great
-direct advantage.
+Out of sheer curiosity, I'm wondering if adding an
+indirect_call_wrapper here could make any difference?
 
-Please repost the first patch standalone.
+I guess not much, and in any case it could be a follow-up.
 
-Thanks,
+Cheers,
 
 Paolo
 
