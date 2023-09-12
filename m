@@ -1,97 +1,131 @@
-Return-Path: <netdev+bounces-33297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7103179D583
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 18:01:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78E9879D599
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 18:02:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 361701C20B8B
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 16:01:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0350C281AA5
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 16:02:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9864018C2C;
-	Tue, 12 Sep 2023 16:01:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 231D218C2F;
+	Tue, 12 Sep 2023 16:02:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C7CB1803C
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 16:01:15 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91F1210DE;
-	Tue, 12 Sep 2023 09:01:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=tq30nNEn1JgDcmHrMM18jbiaohWzwQumlsnaeQ+8IIk=; b=aM2k488CKyE2crSflT163ivYer
-	ciAx3XA8NFqMOpS3fWZf/gpZfPgddwUO38cNtdcHOruuguEPo5weJzALuW5C4Nfcg994puYZ3Lgpv
-	Ui9SkVa9tqB0ajjpMOLyXwbh47S+bDscfdOJNv3FozhdoHOTMsGq2mMDvzMNKdO1HsEc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qg5p8-006FFK-Pb; Tue, 12 Sep 2023 18:01:10 +0200
-Date: Tue, 12 Sep 2023 18:01:10 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, davem@davemloft.net,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Oleksij Rempel <linux@rempel-privat.de>,
-	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
-	thomas.petazzoni@bootlin.com,
-	Christophe Leroy <christophe.leroy@csgroup.eu>
-Subject: Re: [RFC PATCH net-next 4/7] net: ethtool: add a netlink command to
- list PHYs
-Message-ID: <72a5cd8f-d776-479c-9d7f-191900d19342@lunn.ch>
-References: <20230907092407.647139-1-maxime.chevallier@bootlin.com>
- <20230907092407.647139-5-maxime.chevallier@bootlin.com>
- <ZPmfOOsqoO02AcBH@shell.armlinux.org.uk>
- <20230907141635.20bcaa59@pc-7.home>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16DCC18C2C
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 16:02:15 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77472170F
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 09:02:15 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59b6083fa00so44906627b3.0
+        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 09:02:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1694534534; x=1695139334; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=S9AnJUNYbnVUaMI57dfep9DWypATAvpAdqw2b9QesX4=;
+        b=yRLwZU3xEg41wqDqKJiGbCVgnNNmLiQ7JwAsS6n/2UUU96SSR5iI6pWCMjlJzIWSs/
+         CY0o9oKfxRN+wFG9Eq9Owaixdlf707ekxFn7N5og3pCwyphtw6usew/vT8DUJVrdL0gY
+         19wokOWsL1oPZSSHYUf9SiLmMjvFR0X0SwE+lSb+uCXaU1GOssyg0h0eUOVsWin+hSQh
+         Hk4LKQACr0e5M8bQ8HwCjyfwG+z/OxT1NKLiHqwwLk2hqevsy8Pgmq64qpm/N3y+SxEx
+         U76tRJfQBo3GE5gUwyxkueC2th5VJYPpj6nBPp9VRNSaLVxhHzFqIZurToA/d7NtAN1Y
+         seIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694534534; x=1695139334;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=S9AnJUNYbnVUaMI57dfep9DWypATAvpAdqw2b9QesX4=;
+        b=ifWUw7iHNFAEYkH+Wx6SuLJs8NBn0slhpeASrCJpx2e8eIYT2KpMGjOT6q3bpfFzbG
+         92xeyXHdd7w3UtvqVFvSzmQ1cfozHqjpS3PgFsRLVH6WwSLfbXEgpIftnL5e411No0hC
+         T63HJGVL+fCIq14EeIlc7Vqa+3wU71ogek7hiZ2DUvYn9zdg03miR/gCiwBZ1kOaNgnL
+         Ia8p4YiinfhIzDngdX3YTZ74XiMh7duzQrhcN25NlzhRkb3s+o/lKNq04sPkMXLVVio4
+         v3i/OkuXUmkp1/MbrlxeVgC09A16ioIZ6pBjRbZ9rQj1e3YKgaYuK1c3DAoNqkcCNwn0
+         s3Ng==
+X-Gm-Message-State: AOJu0Yx67im1SLpo5gYviAO+SFEbVsWQzB6168uKTLiMK630rZhZ44zt
+	/WvSC+/y3rrBwSMUnGm+7z1VSQxqbJcFMw==
+X-Google-Smtp-Source: AGHT+IGH9tMEtsQPrXjm+5MqMMR6+P94nVmEZN6MqSU/Q9MMhkuteIrNUa+GoHgTnAYLCYjmWnGsS/eSA61LCQ==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a25:aa73:0:b0:d72:8661:ee25 with SMTP id
+ s106-20020a25aa73000000b00d728661ee25mr277951ybi.2.1694534534637; Tue, 12 Sep
+ 2023 09:02:14 -0700 (PDT)
+Date: Tue, 12 Sep 2023 16:01:58 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230907141635.20bcaa59@pc-7.home>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
+Message-ID: <20230912160212.3467976-1-edumazet@google.com>
+Subject: [PATCH net-next 00/14] ipv6: round of data-races fixes
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Sep 07, 2023 at 02:16:35PM +0200, Maxime Chevallier wrote:
-> Hello Russell,
-> 
-> On Thu, 7 Sep 2023 11:00:24 +0100
-> "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
-> 
-> > On Thu, Sep 07, 2023 at 11:24:02AM +0200, Maxime Chevallier wrote:
-> > > +#define PHY_MAX_ENTRIES	16
-> > > +
-> > > +struct phy_list_reply_data {
-> > > +	struct ethnl_reply_data		base;
-> > > +	u8 n_phys;
-> > > +	u32 phy_indices[PHY_MAX_ENTRIES];  
-> > 
-> > Please could you detail the decision making behind 16 entries - is this
-> > arbitary or based on something?
-> > 
-> > Also, please consider what we should do if we happen to have more than
-> > 16 entries.
-> 
-> Ah indeed it was totally arbitrary, the idea was to have a fixed-size
-> reply struct, so that we can populate the
-> ethnl_request_ops.reply_data_size field and not do any manual memory
-> management. But I can store a pointer to the array of phy devices,
-> dynamically allocated and we won't have to deal with this fixed,
-> arbitrary-sized array anymore.
+This series is inspired by one related syzbot report.
 
-I think Jakub already commented on this somewhere, but netlink should
-allow for arbitrary long lists.
+Many inet6_sk(sk) fields reads or writes are racy.
 
-      Andrew
+Move 1-bit fields to inet->inet_flags to provide
+atomic safety. inet6_{test|set|clear|assign}_bit() helpers
+could be changed later if we need to make room in inet_flags.
+
+Also add missing READ_ONCE()/WRITE_ONCE() when
+lockless readers need access to specific fields.
+
+np->srcprefs will be handled separately to avoid merge conflicts
+because a prior patch was posted for net tree.
+
+Eric Dumazet (14):
+  ipv6: lockless IPV6_UNICAST_HOPS implementation
+  ipv6: lockless IPV6_MULTICAST_LOOP implementation
+  ipv6: lockless IPV6_MULTICAST_HOPS implementation
+  ipv6: lockless IPV6_MTU implementation
+  ipv6: lockless IPV6_MINHOPCOUNT implementation
+  ipv6: lockless IPV6_RECVERR_RFC4884 implementation
+  ipv6: lockless IPV6_MULTICAST_ALL implementation
+  ipv6: lockless IPV6_AUTOFLOWLABEL implementation
+  ipv6: lockless IPV6_DONTFRAG implementation
+  ipv6: lockless IPV6_RECVERR implemetation
+  ipv6: move np->repflow to atomic flags
+  ipv6: lockless IPV6_ROUTER_ALERT_ISOLATE implementation
+  ipv6: lockless IPV6_MTU_DISCOVER implementation
+  ipv6: lockless IPV6_FLOWINFO_SEND implementation
+
+ include/linux/ipv6.h            |  49 +++----
+ include/net/inet_sock.h         |  10 ++
+ include/net/ip6_route.h         |  14 +-
+ include/net/ipv6.h              |  16 +--
+ include/net/sock.h              |   2 +-
+ include/net/xfrm.h              |   2 +-
+ net/core/sock.c                 |   4 +-
+ net/dccp/ipv6.c                 |   8 +-
+ net/ipv4/ping.c                 |   5 +-
+ net/ipv6/af_inet6.c             |   9 +-
+ net/ipv6/datagram.c             |  15 +--
+ net/ipv6/icmp.c                 |   4 +-
+ net/ipv6/ip6_flowlabel.c        |   8 +-
+ net/ipv6/ip6_output.c           |  42 +++---
+ net/ipv6/ipv6_sockglue.c        | 223 +++++++++++++++-----------------
+ net/ipv6/mcast.c                |   4 +-
+ net/ipv6/ndisc.c                |   4 +-
+ net/ipv6/ping.c                 |   4 +-
+ net/ipv6/raw.c                  |  16 +--
+ net/ipv6/tcp_ipv6.c             |  21 ++-
+ net/ipv6/udp.c                  |  12 +-
+ net/l2tp/l2tp_ip6.c             |   6 +-
+ net/netfilter/ipvs/ip_vs_sync.c |  12 +-
+ net/sctp/ipv6.c                 |   7 +-
+ 24 files changed, 238 insertions(+), 259 deletions(-)
+
+-- 
+2.42.0.283.g2d96d420d3-goog
+
 
