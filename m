@@ -1,57 +1,46 @@
-Return-Path: <netdev+bounces-33281-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33282-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A627879D49D
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 17:17:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44B7F79D4AF
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 17:20:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C935D1C20B6E
-	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 15:17:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D2F51C20BA3
+	for <lists+netdev@lfdr.de>; Tue, 12 Sep 2023 15:20:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB0D718C10;
-	Tue, 12 Sep 2023 15:17:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A815218C08;
+	Tue, 12 Sep 2023 15:20:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFDC418C0F
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 15:17:00 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC86E12E;
-	Tue, 12 Sep 2023 08:16:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=jFPJPtOQiBv3IhWxAw0Q5iM0GxNxlqc2wIPcTSRUyiE=; b=J9WfzMRk7vtrOBv9/ivNmDv7cW
-	LnyjxkV9J9oSuK2UzkbrQ8iAWQBeVu4BuJ7fqQ8/FD++F+kAo4aYplVrw5IjeZzHiLHPguQTYg4Pm
-	eXI9hkGCEwtYU9uTYzkRjiOLFlElYlA88AqqvbgHoaN6l7Cy8r+Dn8SI8JVUB1pYtBQo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qg588-006F0K-0q; Tue, 12 Sep 2023 17:16:44 +0200
-Date: Tue, 12 Sep 2023 17:16:44 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: Rob Herring <robh@kernel.org>, Roger Quadros <rogerq@ti.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4B91A31;
+	Tue, 12 Sep 2023 15:20:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 733CCC433C8;
+	Tue, 12 Sep 2023 15:20:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694532036;
+	bh=CyzBP67+/V5pqHwJ0uKs92bHtbAg4F+shcqqbAJgXWs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eGnWVRXtlWgAILYsdIav3nXuMmQ+VX5b/GUXFPNWmwltMafQ7hkSF2ZFlvLYqUHcp
+	 anRxuLJA5ikIr21kILDE9SXrAwtQHeIiQh5zeNeNcpAfipCWABZEfz1t/dreihyzI+
+	 jmOGyYGbWwM79H3Wnarn26MYUkreBqZxqdoNXKo7xQx4uCHiN+oZNYc0ODEdRpOu8D
+	 74sA2R/+EGR1LCF3Qv5kT6n2fbtNQn6wM8DBTn1ZaQUsPPgHzbefAd8OkrsqX6GOjd
+	 M8s5IsR1v7Y/7cnCDKQOFTasA5JDDOjBOIYE2SXBOsKXBY42ik1KEpDPl8h0yCOkEV
+	 Fx94Pgfv6JtDw==
+Date: Tue, 12 Sep 2023 17:20:31 +0200
+From: Simon Horman <horms@kernel.org>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org, netdev@vger.kernel.org, srk@ti.com,
-	r-gunasekaran@ti.com, Roger Quadros <rogerq@kernel.org>
-Subject: Re: [PATCH net-next v2 1/2] dt-bindings: net: Add documentation for
- Half duplex support.
-Message-ID: <90b3e6cc-7246-4d02-bd0f-2ce7847bc261@lunn.ch>
-References: <20230911060200.2164771-1-danishanwar@ti.com>
- <20230911060200.2164771-2-danishanwar@ti.com>
- <20230911164628.GA1295856-robh@kernel.org>
- <0c23d883-0a79-ee7c-332c-c6580f8691df@ti.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v1 2/2] net: core: Sort headers alphabetically
+Message-ID: <20230912152031.GI401982@kernel.org>
+References: <20230911154534.4174265-1-andriy.shevchenko@linux.intel.com>
+ <20230911154534.4174265-2-andriy.shevchenko@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,20 +49,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0c23d883-0a79-ee7c-332c-c6580f8691df@ti.com>
+In-Reply-To: <20230911154534.4174265-2-andriy.shevchenko@linux.intel.com>
 
-> Sure Rob, I will change the description to below.
+On Mon, Sep 11, 2023 at 06:45:34PM +0300, Andy Shevchenko wrote:
+> It's rather a gigantic list of heards that is very hard to follow.
+> Sorting helps to see what's already included and what's not.
+> It improves a maintainability in a long term.
 > 
->     description:
->       Indicates that the PHY output pin (COL) is routed to ICSSG GPIO
+> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 
-The PHY has multiple output pins, so i would not put COL in brackets,
-but make it explicit which pin you are referring to.
+Hi Andy,
 
->       pin (PRGx_PRU0/1_GPIO10) as input and ICSSG MII port is capable
->       of half duplex operations.
+At the risk of bike shedding, the sort function of Vim, when operating
+with the C locale, gives a slightly different order, as experssed by
+this incremental diff.
 
-"input and so the ICSSG MII port is"
+I have no objections to your oder, but I'm slightly curious as
+to how it came about.
 
-       Andrew
+diff --git a/net/core/dev.c b/net/core/dev.c
+index d795a6c5a591..770138babf7e 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -92,9 +92,9 @@
+ #include <linux/if_ether.h>
+ #include <linux/if_macvlan.h>
+ #include <linux/if_vlan.h>
++#include <linux/in.h>
+ #include <linux/indirect_call_wrapper.h>
+ #include <linux/inetdevice.h>
+-#include <linux/in.h>
+ #include <linux/init.h>
+ #include <linux/interrupt.h>
+ #include <linux/ip.h>
+@@ -105,9 +105,9 @@
+ #include <linux/mm.h>
+ #include <linux/module.h>
+ #include <linux/mutex.h>
++#include <linux/net_namespace.h>
+ #include <linux/netdevice.h>
+ #include <linux/netfilter_netdev.h>
+-#include <linux/net_namespace.h>
+ #include <linux/netpoll.h>
+ #include <linux/once_lite.h>
+ #include <linux/pm_runtime.h>
+@@ -142,8 +142,8 @@
+ #include <net/ip.h>
+ #include <net/iw_handler.h>
+ #include <net/mpls.h>
+-#include <net/netdev_rx_queue.h>
+ #include <net/net_namespace.h>
++#include <net/netdev_rx_queue.h>
+ #include <net/pkt_cls.h>
+ #include <net/pkt_sched.h>
+ #include <net/sock.h>
 
