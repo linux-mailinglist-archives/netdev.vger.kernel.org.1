@@ -1,82 +1,76 @@
-Return-Path: <netdev+bounces-33490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3540A79E2C7
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 10:57:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DFC679E308
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 11:10:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C7101C20CDE
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 08:57:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB13B2819AC
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 09:10:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B2E31DA5E;
-	Wed, 13 Sep 2023 08:57:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81C061DDD2;
+	Wed, 13 Sep 2023 09:10:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B4A23D6C
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 08:57:41 +0000 (UTC)
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30926E73
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 01:57:41 -0700 (PDT)
-Received: by mail-wr1-x429.google.com with SMTP id ffacd0b85a97d-31c7912416bso6969610f8f.1
-        for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 01:57:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694595459; x=1695200259; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M3CaJ6AGFMnvXTdUa+Xhn5fiWkcwOHL94b0eWDaYA/A=;
-        b=T6Hbck0uv6UzoGLCNpsE/fgIhV8SX4rIIJx4c/Na++A30OxBKVdSLD9W/mUEuZZsZu
-         bgM5QCMrCNixAmC5MEcLzkc2qvIOPQ5KGP4PrPKdEamoRqnSXUmo0YWjljHDva0KxZCY
-         DqM1bdWtHROGjRyhLmKS3iCvQL7zHymWaRLtDj4vR6PBHNGQ4sBUQm6bJwuvvf2FTMrA
-         kAK+XeuR8erw7WDpiWtjXXShm8/eVHXoUeyJuyfH90Rog9udPsqxAo6UVscCMffi7B+J
-         J1tLIInYxkCO6lQR5a0bFh17dgRgQkbS1tICTG1fCod7a6xdqgzmLQZ5JHBIVpJM9zZX
-         Ftnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694595459; x=1695200259;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:sender:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=M3CaJ6AGFMnvXTdUa+Xhn5fiWkcwOHL94b0eWDaYA/A=;
-        b=AyqfpWJvM0g64IUYqWPeY21FCUz0QN6egOct1DastoDdmxuoNxdZRaHQWL1pjtdSNk
-         Kh8DKJ1gcR5xMBO8CzgGlIEfK8m6j/mfkWA92yq2Yc4asH1T/allgJNTK76CtOHDS79X
-         78KzguUY/Ti9QgZScTb/kix3Cuew3F/LkOKaTH3I4B+WM+MhuRGXyEmcE2nazepjlyhH
-         x/fOXW/wOcM61zJZpz0scrDNWPk5HBDHceK+aAMvnNNmLpIV95anTaBNG9IBjE2wsXHw
-         fO9wGr9C3qLnU1e5DWtHhPxhSP50P4qVRDYzjQ0iaPy5ZAaPgzw6dGtpwhhSEGB1ZPF9
-         d5/A==
-X-Gm-Message-State: AOJu0YzQoiwjl1BQqeGas1WQWSkoWwAhWvmme9qIa6Ww54k+jY9sgkOX
-	WS9wy0GEx9BGWcT8bGwYSbI=
-X-Google-Smtp-Source: AGHT+IHWP86inToGfPb/mMiFGzbdYz48z0lVwFT/mW3wpGz5iTykzq1wg0Uh5etENpsqvm6ilXflFQ==
-X-Received: by 2002:adf:f981:0:b0:317:5182:7b55 with SMTP id f1-20020adff981000000b0031751827b55mr1489978wrr.42.1694595459285;
-        Wed, 13 Sep 2023 01:57:39 -0700 (PDT)
-Received: from xmarquiegui-HP-ZBook-15-G6.internal.ainguraiiot.com (210.212-55-6.static.clientes.euskaltel.es. [212.55.6.210])
-        by smtp.gmail.com with ESMTPSA id n3-20020a5d4203000000b0031c3ee933b5sm14797527wrq.108.2023.09.13.01.57.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Sep 2023 01:57:39 -0700 (PDT)
-Sender: "Xabier M." <reibax@gmail.com>
-From: Xabier Marquiegui <xabier.marquiegui@gmail.com>
-X-Google-Original-From: Xabier Marquiegui <xmarquiegui@ainguraiiot.com>
-To: vinicius.gomes@intel.com
-Cc: alex.maftei@amd.com,
-	chrony-dev@chrony.tuxfamily.org,
-	davem@davemloft.net,
-	horms@kernel.org,
-	mlichvar@redhat.com,
-	netdev@vger.kernel.org,
-	ntp-lists@mattcorallo.com,
-	reibax@gmail.com,
-	richardcochran@gmail.com,
-	rrameshbabu@nvidia.com,
-	shuah@kernel.org
-Subject: [PATCH net-next v2 2/3] ptp: support multiple timestamp event readers
-Date: Wed, 13 Sep 2023 10:57:37 +0200
-Message-Id: <20230913085737.2214180-1-xmarquiegui@ainguraiiot.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76BF61DDD1
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 09:10:33 +0000 (UTC)
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99DC51999;
+	Wed, 13 Sep 2023 02:10:32 -0700 (PDT)
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 38D9AL7o122479;
+	Wed, 13 Sep 2023 04:10:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1694596221;
+	bh=jbpQk+sIiCpU67p3JLXuIRgoFuzXmgtvS7MIJu39eyg=;
+	h=From:To:CC:Subject:Date;
+	b=SuuJTAmGW39J3xbQjwrOoK0s17+MEcBeTgb0iZpi/AWHvcGuiqDxWxSVmdBDVQtAK
+	 ZUqiLcfxR0ctAsqQBpF4sI9AXvPK8CBylecpiGugizIXTzw/RjQE19E9mKPokDAg9r
+	 ebcXK0g9VDNKnjW1eUL2wm98fRNkgiVsmAALvFRk=
+Received: from DLEE115.ent.ti.com (dlee115.ent.ti.com [157.170.170.26])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 38D9ALGD025826
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 13 Sep 2023 04:10:21 -0500
+Received: from DLEE106.ent.ti.com (157.170.170.36) by DLEE115.ent.ti.com
+ (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 13
+ Sep 2023 04:10:20 -0500
+Received: from fllv0039.itg.ti.com (10.64.41.19) by DLEE106.ent.ti.com
+ (157.170.170.36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Wed, 13 Sep 2023 04:10:21 -0500
+Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
+	by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 38D9AKMd074627;
+	Wed, 13 Sep 2023 04:10:20 -0500
+Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.199])
+	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 38D9AK8Z022758;
+	Wed, 13 Sep 2023 04:10:20 -0500
+From: MD Danish Anwar <danishanwar@ti.com>
+To: Andrew Lunn <andrew@lunn.ch>, Roger Quadros <rogerq@ti.com>,
+        MD Danish
+ Anwar <danishanwar@ti.com>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Rob Herring
+	<robh+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Jakub Kicinski
+	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Simon Horman
+	<horms@kernel.org>
+CC: <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <srk@ti.com>, <r-gunasekaran@ti.com>
+Subject: [PATCH net-next v3 0/2] Add Half Duplex support for ICSSG Driver
+Date: Wed, 13 Sep 2023 14:40:09 +0530
+Message-ID: <20230913091011.2808202-1-danishanwar@ti.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <871qf3oru4.fsf@intel.com>
-References: <871qf3oru4.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,29 +78,51 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-> Using the pid of the task will break when using some form of file
-> descriptor passing. e.g. Task A opened the chardev, called the ioctl()
-> with some mask and then passed the fd to Task B, that's actually going
-> to use the fd.
-> 
-> Is this something that we want to support? Am I missing something?
+This series adds support for half duplex operation for ICSSG driver.
 
-Thank you very much for your valuable comments Vinicius,
+In order to support half-duplex operation at 10M and 100M link speeds, the
+PHY collision detection signal (COL) should be routed to ICSSG GPIO pin
+(PRGx_PRU0/1_GPI10) so that firmware can detect collision signal and apply
+the CSMA/CD algorithm applicable for half duplex operation. A DT property,
+"ti,half-duplex-capable" is introduced for this purpose in the first patch
+of the series. If board has PHY COL pin conencted to PRGx_PRU1_GPIO10,
+this DT property can be added to eth node of ICSSG, MII port to support
+half duplex operation at that port.
 
-Let me try to confirm if I understand what you are observing here.
+Second patch of the series configures driver to support half-duplex
+operation if the DT property "ti,half-duplex-capable" is enabled.
 
-Let's say we have a process with two threads. One of them opens the device
-file to do IOCTL operations, and the other one opens the device file to
-read timestamp events. Since both have the same PID, all the operations
-(read,release...) would fail because I designed them under the assumption
-that only one open operation would happen per PID.
+This series addresses comments on [v2]. This series is based on the latest
+net-next/main. This series has no dependency.
 
-This is indeed not as safe as it should be and I should try to improve it.
+Changes from v1 to v2:
+*) Changed the description of "ti,half-duplex-capable" property as asked
+   by Rob and Andrew to avoid confusion between capable and enable.
 
-I am already looking at alternatives, but maybe someone can give me a hint.
-Do you have any suggestions on what I could do to have file operations 
-(read, release...) determine which open instance they belong to?
+Changes from v1 to v2:
+*) Dropped the RFC tag.
+*) Added RB tags of Andrew and Roger.
 
-Cheers.
+[v1] https://lore.kernel.org/all/20230830113134.1226970-1-danishanwar@ti.com/
+[v2] https://lore.kernel.org/all/20230911060200.2164771-1-danishanwar@ti.com/
+
+Thanks and Regards,
+Md Danish Anwar
+
+MD Danish Anwar (2):
+  dt-bindings: net: Add documentation for Half duplex support.
+  net: ti: icssg-prueth: Add support for half duplex operation
+
+ .../bindings/net/ti,icssg-prueth.yaml           |  7 +++++++
+ drivers/net/ethernet/ti/icssg/icssg_config.c    | 14 ++++++++++++++
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c    | 17 +++++++++++++++--
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h    |  2 ++
+ 4 files changed, 38 insertions(+), 2 deletions(-)
+
+-- 
+2.34.1
+
 
