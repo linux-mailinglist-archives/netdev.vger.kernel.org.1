@@ -1,108 +1,277 @@
-Return-Path: <netdev+bounces-33646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A114679F050
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 19:20:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C52879F05D
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 19:25:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2EC5A282454
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 17:20:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2E7B2824C4
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 17:25:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AF981F94C;
-	Wed, 13 Sep 2023 17:20:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C87D31F959;
+	Wed, 13 Sep 2023 17:25:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BF7AAD52
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 17:20:52 +0000 (UTC)
-Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92ED2A3
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 10:20:51 -0700 (PDT)
-Received: by mail-qt1-x835.google.com with SMTP id d75a77b69052e-41513d2cca7so22681cf.0
-        for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 10:20:51 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB5841798E
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 17:25:24 +0000 (UTC)
+Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED3BFA8;
+	Wed, 13 Sep 2023 10:25:23 -0700 (PDT)
+Received: by mail-qk1-x72a.google.com with SMTP id af79cd13be357-770ef0f51ccso5387885a.1;
+        Wed, 13 Sep 2023 10:25:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1694625650; x=1695230450; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20221208; t=1694625923; x=1695230723; darn=vger.kernel.org;
+        h=in-reply-to:from:references:cc:to:content-language:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ti//9ZGJhBhtqdddF2tyMMGGzTfmtiN4qSODnmTcIJY=;
-        b=AQ61RB+EVpi4vLfQBnaRPWOo6P0gySx6Nq0yqBUHhS2V10e8lyUYGGBFaRPm5pYMgj
-         3o4AOxG+Z9k9Mjyq5qY8GN+p0W5ZaSuwvgqUieo/kw6cTiKj7TEGjkRPTs6/d9VY9mMp
-         OhJwUah7QOO3pDuwvDpGokyzcGByjTvqNy5AKLrWg3RsAumKaMqFg5Z7WFk3CbGv+euf
-         TejLILH0CLEf7XLqfjVFDAqq6i/5Rs8ZNvDxdH0enUtXLW5lP7hbRnJoORokgC6s4XrX
-         xQb1m/nDHItYzhcTYifBUAd6fVUIwy3vqfa4Dnd8mXmdUxhZpVeyrj0JLBUTnPMJ713k
-         06zg==
+        bh=94Od8mjjUYzj4mUuSdwYfL18nPkrK5m8B0pD3QkucJI=;
+        b=K8vL83DSsW28u1HLD+qvTlOAOpNHGPg+Ab05oLsFbaJ0VCtOIGwn9E68uMoUSNe7Uz
+         Al4Le/K55+ZK4gE8r/GSJXuGTEMOFt/PldNzwXug/fcs6UxiPII5zNL+pErb/OLQnDbi
+         2Pp5WQmzyKxPgTnesgNEaLGnUHiD2FPX8+pEoSxH1RxTJbSbJBNR0mDSrgRKgRqscZh+
+         6McQpzd4UsF/XCoXBsJ9LZb0+jvaMlXW2wBqMOmWOJrKulPv3xks43K9tVtbMTPEwMLX
+         uv5Upm5rtTVJTgNKY+L3oa5hpHzDeZsvXIcSfBf5FeSK/DfR9FgtFof5UumvXE6NHsq4
+         MbFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694625650; x=1695230450;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ti//9ZGJhBhtqdddF2tyMMGGzTfmtiN4qSODnmTcIJY=;
-        b=DE5D43+rYCotAKQiZcJR7nANQYvfUE5xeOzXeI5tlo0hJ37pnyfgcPCpDW/32oTpNo
-         AL0dWo24rhudsORg0WjGTmuB+Ido7bCIklma1SoBH57Wu24VXaI3E8OuTvz+cnNTaK+x
-         PruABrbA1gNqhWrepBkiElJ70vZFeNUyRufdUKBCTIZDsA4GyDQrEJOJYWLudGRinQ8x
-         D9zWbfG3SiprXTq8hKQrozUTr71iGL+VJ11nlXMAx1aOqPwbF521dDfqNI1rLFJszJrh
-         hji1EmuwvfB5lbhQfvBs1tx1DdMRpDfJPErp4idL0UR+v1gHMss3kfCsrMOGvq3vaLx4
-         ygpQ==
-X-Gm-Message-State: AOJu0YxpFIqINjLSGFJ2ZJg45n1qW05ePeFP+HBgNmV2oNbfe8ljdbby
-	LWQk76zxlZ1o4sOu19qQJ9KKt7Q7E0B3oyT/r088iw==
-X-Google-Smtp-Source: AGHT+IGMpPsHaWpqgZzC8xDyQY6H/p0qXXK9IzOlIPZYpke1Ctb5gvJckVo6lye0RED3x1rT4eI0iWb5hyn6SsurqGM=
-X-Received: by 2002:ac8:5c09:0:b0:410:8ba3:21c7 with SMTP id
- i9-20020ac85c09000000b004108ba321c7mr332206qti.18.1694625650519; Wed, 13 Sep
- 2023 10:20:50 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1694625923; x=1695230723;
+        h=in-reply-to:from:references:cc:to:content-language:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=94Od8mjjUYzj4mUuSdwYfL18nPkrK5m8B0pD3QkucJI=;
+        b=K31jaXwFKtzJvnb1FrJvn5vUwWECKze53DTtz8TUFbSfOZZxvcQnHdOtmmWLnyIgxJ
+         VRGFWbuX8jQyXTHzv8qV6+X4HGNT5ME6B5v5pYLAiHll7WQQ+RjaguU5dH6LcsmH5FfS
+         CcgIBXSE6qi03ERGHEJ0DmofuNApU/hYJ+SXlYm7E2X/nKM9w7hdQpeWQiH125dSFUEu
+         WI4dVo5zvWtPyQwCsYxrBohkpxOZynvaVXThlWf2cunMQ5TrjXtrGfN0/8/dSw1rGhae
+         L01nimbsFSHuGsfds0cQsgpzQYNkQykkkxSEf/+4MsvV/Qq7DNcWmn4EjUIfLmDO2XhE
+         bP6w==
+X-Gm-Message-State: AOJu0Ywh6VYJq/qX8qDD7t1ZG+KuFKG8oiBosPfsAJPnSrjfC33DMjLu
+	wRFbrbqc3XIvmhwFnY++gyOV4BG/SYIyhA==
+X-Google-Smtp-Source: AGHT+IFyozc5ypFGql6xM4j80Lc6C2zh7bY+YdVvilKH1iH8FKCAGmKswJOnkh2KzIuxrqjg27YL7A==
+X-Received: by 2002:a05:620a:1708:b0:76f:272f:46ad with SMTP id az8-20020a05620a170800b0076f272f46admr2578200qkb.49.1694625922940;
+        Wed, 13 Sep 2023 10:25:22 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id ud6-20020a05620a6a8600b0077263636a95sm210054qkn.93.2023.09.13.10.25.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Sep 2023 10:25:21 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="------------OgAGDfKH4BPoE0YZ8jI904SA"
+Message-ID: <ebf7bce8-0856-2a07-0d29-edbcd1b76942@gmail.com>
+Date: Wed, 13 Sep 2023 10:25:18 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230912134425.4083337-1-prohr@google.com> <ZQFu/SXXAhN10jNY@nanopsycho>
- <CAKD1Yr1hzYpAU1jMN964c5U+e2-bGcPBqZsHA7_Lg-rH1iNsow@mail.gmail.com>
-In-Reply-To: <CAKD1Yr1hzYpAU1jMN964c5U+e2-bGcPBqZsHA7_Lg-rH1iNsow@mail.gmail.com>
-From: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
-Date: Wed, 13 Sep 2023 10:20:39 -0700
-Message-ID: <CANP3RGc4q5zWLL_=f4-a1kvqxE2JbX+B=Q86SGQ22Xx9s0_XYQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] net: add sysctl to disable rfc4862 5.5.3e
- lifetime handling
-To: Lorenzo Colitti <lorenzo@google.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, Patrick Rohr <prohr@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, 
-	Linux Network Development Mailing List <netdev@vger.kernel.org>, Jen Linkova <furry@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.0
+Subject: Re: [PATCH v3] workqueue: don't skip lockdep work dependency in
+ cancel_work_sync()
+Content-Language: en-US
+To: Guenter Roeck <linux@roeck-us.net>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+ Heyi Guo <guoheyi@linux.alibaba.com>
+Cc: Lai Jiangshan <jiangshanlai@gmail.com>, Tejun Heo <tj@kernel.org>,
+ Hillf Danton <hdanton@sina.com>, LKML <linux-kernel@vger.kernel.org>,
+ Heyi Guo <guoheyi@linux.alibaba.com>, netdev@vger.kernel.org
+References: <21b9c1ac-64b7-7f4b-1e62-bf2f021fffcd@I-love.SAKURA.ne.jp>
+ <YuK78Jiy12BJG/Tp@slm.duckdns.org>
+ <0ad532b2-df5f-331a-ae7f-21460fc62fe2@I-love.SAKURA.ne.jp>
+ <97cbf8a9-d5e1-376f-6a49-3474871ea6b4@I-love.SAKURA.ne.jp>
+ <afa1ac2c-a023-a91e-e596-60931b38247e@I-love.SAKURA.ne.jp>
+ <7d034f7b-af42-4dbc-0887-60f4bdb3dcca@I-love.SAKURA.ne.jp>
+ <0a85696a-b0b9-0f4a-7c00-cd89edc9304c@I-love.SAKURA.ne.jp>
+ <77d47eed-6a22-7e81-59de-4d45852ca4de@I-love.SAKURA.ne.jp>
+ <e0717628-e436-4091-8b2e-2f4dcb646ec8@roeck-us.net>
+ <6b1c6996da5d215371e164b54e8854541dee0ded.camel@sipsolutions.net>
+ <a50218b6-fc42-7f12-155a-5e01fc8dd1a0@roeck-us.net>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <a50218b6-fc42-7f12-155a-5e01fc8dd1a0@roeck-us.net>
 
-On Wed, Sep 13, 2023 at 1:50=E2=80=AFAM Lorenzo Colitti <lorenzo@google.com=
-> wrote:
-> On Wed, Sep 13, 2023 at 5:12=E2=80=AFPM Jiri Pirko <jiri@resnulli.us> wro=
-te:
-> > >+      - If enabled, RFC4862 section 5.5.3e is used to determine
-> > >+        the valid lifetime of the address.
-> > >+      - If disabled, the PIO valid lifetime will always be honored.
-> >
-> > Can't you reverse the logic and call it something like:
-> > ra_honor_pio_lifetime
->
-> Maybe accept_ra_pinfo_low_lifetime ? Consistent with the existing
-> accept_ra_pinfo which controls whether PIOs are accepted.
+This is a multi-part message in MIME format.
+--------------OgAGDfKH4BPoE0YZ8jI904SA
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-accept_ra... is about whether to accept or drop/ignore an RA or
-portion there-of.
-We considered it and decided it was inappropriate here, as this new
-sysctl doesn't change drop/ignore.
+On 9/13/23 08:59, Guenter Roeck wrote:
+> On 9/13/23 07:41, Johannes Berg wrote:
+>> Hi Guenter,
+>>
+>>> This patch results in the attached lockdep splat when running the
+>>> ast2600-evb emulation in qemu with aspeed_g5_defconfig and lock 
+>>> debugging
+>>> enabled. Reverting this patch fixes the problem.
+>>
+>> Umm ... That's only true if you think the problem is the lockdep splat,
+>> rather than the actual potential deadlock?!
+>>
+> 
+> It was hard for me to say because the workqueue lock doesn't exist
+> in the first place if lockdep debugging is not enabled.
+> 
+>>> [    9.809960] ======================================================
+>>> [    9.810053] WARNING: possible circular locking dependency detected
+>>> [    9.810196] 6.6.0-rc1-00004-g6faca50f629f #1 Tainted: 
+>>> G                 N
+>>
+>> I don't have this exact tree, but on 6.6-rc1,
+>>
+> 
+> Meh, I just included a couple of bug fixes not yet available in 6.6-rc1.
+> 
+>>> [    9.810327] ------------------------------------------------------
+>>> [    9.810406] ip/357 is trying to acquire lock:
+>>> [    9.810501] 83af6c40 
+>>> ((work_completion)(&(&dev->state_queue)->work)){+.+.}-{0:0}, at: 
+>>> __flush_work+0x40/0x550
+>>> [    9.811052]
+>>> [    9.811052] but task is already holding lock:
+>>> [    9.811133] 81639924 (rtnl_mutex){+.+.}-{3:3}, at: 
+>>> rtnetlink_rcv_msg+0x124/0x514
+>>> [    9.811264]
+>>> [    9.811264] which lock already depends on the new lock.
+>>> [    9.811264]
+>>> [    9.811361]
+>>> [    9.811361] the existing dependency chain (in reverse order) is:
+>>> [    9.811466]
+>>> [    9.811466] -> #1 (rtnl_mutex){+.+.}-{3:3}:
+>>> [    9.811616]        lock_acquire+0xfc/0x368
+>>> [    9.811717]        __mutex_lock+0x90/0xf00
+>>> [    9.811782]        mutex_lock_nested+0x24/0x2c
+>>> [    9.811845]        ftgmac100_reset+0x1c/0x1dc
+>>
+>>
+>> This does indeed take the RTNL:
+>>
+>> static void ftgmac100_reset(struct ftgmac100 *priv)
+>> {
+>>          struct net_device *netdev = priv->netdev;
+>>          int err;
+>>
+>>          netdev_dbg(netdev, "Resetting NIC...\n");
+>>
+>>          /* Lock the world */
+>>          rtnl_lock();
+>>
+>> and is called from
+>>
+>>> [    9.811907]        ftgmac100_adjust_link+0xc0/0x13c
+>>> [    9.811972]        phy_link_change+0x30/0x5c
+>>> [    9.812035]        phy_check_link_status+0x9c/0x11c
+>>> [    9.812100]        phy_state_machine+0x1c0/0x2c0
+>>
+>> this work (phy_state_machine is the function), which
+>>
+>>> [    9.812405] -> #0 
+>>> ((work_completion)(&(&dev->state_queue)->work)){+.+.}-{0:0}:
+>>> [    9.812531]        check_prev_add+0x128/0x15ec
+>>> [    9.812594]        __lock_acquire+0x16ec/0x20cc
+>>> [    9.812656]        lock_acquire+0xfc/0x368
+>>> [    9.812712]        __flush_work+0x70/0x550
+>>> [    9.812769]        __cancel_work_timer+0x1e4/0x264
+>>> [    9.812833]        phy_stop+0x78/0x128
+>>
+>> is cancelled by phy_stop() in phy_stop_machine():
+>>
+>> void phy_stop_machine(struct phy_device *phydev)
+>> {
+>>          cancel_delayed_work_sync(&phydev->state_queue);
+>>
+>> but of course that's called by the driver under RTNL:
+>>
+>>> [    9.812889]        ftgmac100_stop+0x5c/0xac
+>>> [    9.812949]        __dev_close_many+0xb8/0x140
+>>
+>> (__dev_close_many requires RTNL)
+>>
+>>
+>> So you have a potential deadlock in this driver. Yes, workqueue items
+>> and RTNL are basically incompatible. Don't do that. Now this bug was
+>> _probably_ added by commit 1baf2e50e48f ("drivers/net/ftgmac100: fix
+>> DHCP potential failure with systemd") which added a call to
+>> ftgmac100_reset() in ftgmac100_adjust_link() which is the thing called
+>> from the PHY state machine in the first place.
+>>
+>> Should that be reverted? I don't know ... maybe it can be fixed
+>> differently.
+>>
+>>
+>> But anyway ... as far as lockdep/workqueue stuff is concerned I'd
+>> definitely call it a win rather than a bug! Yay for making lockdep
+>> useful - it found a deadlock situation for you! :-) No need to blame
+>> lockdep for that :P
+>>
+> 
+> So you are saying that anything running in a workqueue must not
+> acquire rtnl_lock because cancel_[delayed_]work_sync() may be called
+> under rtnl_lock.
+> 
+> Fair point, but is that documented somewhere ? If not, how is anyone
+> supposed to know ? If it is not documented, I might we well argue that
+> cancel_[delayed_]work_sync() should not be called with rtnl_lock held
+> because some worker might hold that lock.
+> 
+> FWIW, it would be nice if the lockdep code would generate some other
+> message in this situation. Complaining about a deadlock involving a
+> lock that doesn't exist if lock debugging isn't enabled is not really
+> helpful and, yes, may result in reporters to falsely assume that this
+> lock is responsible for the potential deadlock.
+> 
+> Reverting 1baf2e50e48f does fix the problem as well.
 
-As such it should be named ra_...
+I would refrain from reverting without giving a fighting chance to the 
+author to address it. It seems a bit strange that we do this locking 
+dance while it might have been simpler to introduce a 
+ftgmac100_reset_unlocked() and ftgmac100_reset() and call both at the 
+intended places, something like the completely untested patch attached 
+maybe?
+-- 
+Florian
 
-ra_honor_pio_lifetime or ra_honor_pio_lft has the problem of seeming
-to be a lifetime (ie. seconds) and not a boolean,
-but does look much better...  (maybe using _lifetime instead of _lft
-makes it sufficiently different from the existing _lft sysctls that it
-being a boolean is ok?)
+--------------OgAGDfKH4BPoE0YZ8jI904SA
+Content-Type: text/x-patch; charset=UTF-8; name="1.patch"
+Content-Disposition: attachment; filename="1.patch"
+Content-Transfer-Encoding: base64
 
-...or... perhaps we do actually make it an actual number of seconds,
+ZGlmZiAtLWdpdCBhL2RyaXZlcnMvbmV0L2V0aGVybmV0L2ZhcmFkYXkvZnRnbWFjMTAwLmMg
+Yi9kcml2ZXJzL25ldC9ldGhlcm5ldC9mYXJhZGF5L2Z0Z21hYzEwMC5jCmluZGV4IGEwMzg3
+OWEyN2IwNC4uMjUzYmY2ZDY2MjgwIDEwMDY0NAotLS0gYS9kcml2ZXJzL25ldC9ldGhlcm5l
+dC9mYXJhZGF5L2Z0Z21hYzEwMC5jCisrKyBiL2RyaXZlcnMvbmV0L2V0aGVybmV0L2ZhcmFk
+YXkvZnRnbWFjMTAwLmMKQEAgLTEyOTksMjQgKzEyOTksMTcgQEAgc3RhdGljIGludCBmdGdt
+YWMxMDBfaW5pdF9hbGwoc3RydWN0IGZ0Z21hYzEwMCAqcHJpdiwgYm9vbCBpZ25vcmVfYWxs
+b2NfZXJyKQogCXJldHVybiBlcnI7CiB9CiAKLXN0YXRpYyB2b2lkIGZ0Z21hYzEwMF9yZXNl
+dChzdHJ1Y3QgZnRnbWFjMTAwICpwcml2KQorc3RhdGljIHZvaWQgZnRnbWFjMTAwX3Jlc2V0
+X3VubG9ja2VkKHN0cnVjdCBmdGdtYWMxMDAgKnByaXYpCiB7CiAJc3RydWN0IG5ldF9kZXZp
+Y2UgKm5ldGRldiA9IHByaXYtPm5ldGRldjsKIAlpbnQgZXJyOwogCiAJbmV0ZGV2X2RiZyhu
+ZXRkZXYsICJSZXNldHRpbmcgTklDLi4uXG4iKTsKIAotCS8qIExvY2sgdGhlIHdvcmxkICov
+Ci0JcnRubF9sb2NrKCk7Ci0JaWYgKG5ldGRldi0+cGh5ZGV2KQotCQltdXRleF9sb2NrKCZu
+ZXRkZXYtPnBoeWRldi0+bG9jayk7Ci0JaWYgKHByaXYtPm1paV9idXMpCi0JCW11dGV4X2xv
+Y2soJnByaXYtPm1paV9idXMtPm1kaW9fbG9jayk7Ci0KIAogCS8qIENoZWNrIGlmIHRoZSBp
+bnRlcmZhY2UgaXMgc3RpbGwgdXAgKi8KIAlpZiAoIW5ldGlmX3J1bm5pbmcobmV0ZGV2KSkK
+LQkJZ290byBiYWlsOworCQlyZXR1cm47CiAKIAkvKiBTdG9wIHRoZSBuZXR3b3JrIHN0YWNr
+ICovCiAJbmV0aWZfdHJhbnNfdXBkYXRlKG5ldGRldik7CkBAIC0xMzM4LDcgKzEzMzEsMTkg
+QEAgc3RhdGljIHZvaWQgZnRnbWFjMTAwX3Jlc2V0KHN0cnVjdCBmdGdtYWMxMDAgKnByaXYp
+CiAJZnRnbWFjMTAwX2luaXRfYWxsKHByaXYsIHRydWUpOwogCiAJbmV0ZGV2X2RiZyhuZXRk
+ZXYsICJSZXNldCBkb25lICFcbiIpOwotIGJhaWw6Cit9CisKK3N0YXRpYyB2b2lkIGZ0Z21h
+YzEwMF9yZXNldChzdHJ1Y3QgZnRnbWFjMTAwICpwcml2KQoreworCXN0cnVjdCBuZXRfZGV2
+aWNlICpuZXRkZXYgPSBwcml2LT5uZXRkZXY7CisKKwlydG5sX2xvY2soKTsKKwkvKiBMb2Nr
+IHRoZSB3b3JsZCAqLworCWlmIChuZXRkZXYtPnBoeWRldikKKwkJbXV0ZXhfbG9jaygmbmV0
+ZGV2LT5waHlkZXYtPmxvY2spOworCWlmIChwcml2LT5taWlfYnVzKQorCQltdXRleF9sb2Nr
+KCZwcml2LT5taWlfYnVzLT5tZGlvX2xvY2spOworCWZ0Z21hYzEwMF9yZXNldF91bmxvY2tl
+ZChwcml2KTsKIAlpZiAocHJpdi0+bWlpX2J1cykKIAkJbXV0ZXhfdW5sb2NrKCZwcml2LT5t
+aWlfYnVzLT5tZGlvX2xvY2spOwogCWlmIChuZXRkZXYtPnBoeWRldikKQEAgLTE0MDUsMTQg
+KzE0MTAsNyBAQCBzdGF0aWMgdm9pZCBmdGdtYWMxMDBfYWRqdXN0X2xpbmsoc3RydWN0IG5l
+dF9kZXZpY2UgKm5ldGRldikKIAkvKiBSZWxlYXNlIHBoeSBsb2NrIHRvIGFsbG93IGZ0Z21h
+YzEwMF9yZXNldCB0byBhcXVpcmUgaXQsIGtlZXBpbmcgbG9jawogCSAqIG9yZGVyIGNvbnNp
+c3RlbnQgdG8gcHJldmVudCBkZWFkIGxvY2suCiAJICovCi0JaWYgKG5ldGRldi0+cGh5ZGV2
+KQotCQltdXRleF91bmxvY2soJm5ldGRldi0+cGh5ZGV2LT5sb2NrKTsKLQotCWZ0Z21hYzEw
+MF9yZXNldChwcml2KTsKLQotCWlmIChuZXRkZXYtPnBoeWRldikKLQkJbXV0ZXhfbG9jaygm
+bmV0ZGV2LT5waHlkZXYtPmxvY2spOwotCisJZnRnbWFjMTAwX3Jlc2V0X3VubG9ja2VkKHBy
+aXYpOwogfQogCiBzdGF0aWMgaW50IGZ0Z21hYzEwMF9taWlfcHJvYmUoc3RydWN0IG5ldF9k
+ZXZpY2UgKm5ldGRldikK
 
-ra_pio_min_valid_lft, and we default it to MIN_VALID_LIFETIME,
-then I believe a value of 0 would get the desired behaviour...
+--------------OgAGDfKH4BPoE0YZ8jI904SA--
 
