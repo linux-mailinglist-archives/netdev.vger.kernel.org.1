@@ -1,148 +1,208 @@
-Return-Path: <netdev+bounces-33426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48CC279DE53
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 04:40:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6C4D79DEA3
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 05:33:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83238280F65
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 02:40:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0FFB281DA2
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 03:33:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03FED803;
-	Wed, 13 Sep 2023 02:40:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7084DA45;
+	Wed, 13 Sep 2023 03:33:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E99607FD
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 02:40:11 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E0371713;
-	Tue, 12 Sep 2023 19:40:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=BXJm/TiqH4AAPAwfc/Qy2jYjA5r7iu+40UTmJpL7FD8=; b=YOctBJGu7AFO85kb3gkWsFXT5l
-	6Hb1ei68Q/4Sosm4kuzQ3VBJi9uFgKjj7ugOoHCxlS/dfY7Ay67gXOYwx/jEsuH66ct79qdvE5lz5
-	CLhHt5WyVcoeM9J3IOVQzgT9cb6p7+xoYbF92JlsBZSZb/YsnxuaIcuZbHDw1IO8Usss=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qgFn3-006H2p-GA; Wed, 13 Sep 2023 04:39:41 +0200
-Date: Wed, 13 Sep 2023 04:39:41 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	corbet@lwn.net, steen.hegelund@microchip.com, rdunlap@infradead.org,
-	horms@kernel.org, casper.casan@gmail.com, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, horatiu.vultur@microchip.com,
-	Woojung.Huh@microchip.com, Nicolas.Ferre@microchip.com,
-	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com
-Subject: Re: [RFC PATCH net-next 2/6] net: ethernet: add mac-phy interrupt
- support with reset complete handling
-Message-ID: <027d8f7b-6932-4d9d-b2f9-5369806a79a3@lunn.ch>
-References: <20230908142919.14849-1-Parthiban.Veerasooran@microchip.com>
- <20230908142919.14849-3-Parthiban.Veerasooran@microchip.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61923A41
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 03:33:15 +0000 (UTC)
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09F42170F;
+	Tue, 12 Sep 2023 20:33:14 -0700 (PDT)
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38D1VVes023409;
+	Wed, 13 Sep 2023 03:32:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=uFJyocmED4hz9zxf654Kw/VEVbsiQNhYNzZor0D7cI4=;
+ b=kdcfk6CBHJEirtPrhb+oIGZax1z1OU+em6Eq6ZrV5oFWju/n1e2TF6lP1ZJOXx4wm0Qu
+ /F5GPLm7uwz0CWC24AMg4MFRDjHGU7Wr/gFnREG3clJw9ScDnzZKZLu+fSCnCXpvrAuN
+ STBJ2ilabS70foGDDalHOojEfyZG1wJDBAehIXYJ2tnHjPejnIraLQypXpRhDWB5EtH/
+ WP1/G2/jnCFZRofGWOmK7nIg2sUR6v6fa+AtyvWftyaQ+6O7+xheg365PEIhZ8Mi6amn
+ I+h8kkcey+kLzM4h44yj7ztus8uboGNSTRXquxfNO9GDJLoRFBct1LSUJ0XxPGQmQplF eg== 
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3t2y7q8mer-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Sep 2023 03:32:30 +0000
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 38D3WT0f004638
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 13 Sep 2023 03:32:29 GMT
+Received: from [10.216.41.52] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.36; Tue, 12 Sep
+ 2023 20:32:21 -0700
+Message-ID: <ef61cef0-fd3a-d89c-b73e-b10e63fa7789@quicinc.com>
+Date: Wed, 13 Sep 2023 09:02:13 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230908142919.14849-3-Parthiban.Veerasooran@microchip.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.0
+Subject: Re: [PATCH V2 6/7] arm64: dts: qcom: ipq9574: Add support for nsscc
+ node
+To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+CC: <andersson@kernel.org>, <agross@kernel.org>, <konrad.dybcio@linaro.org>,
+        <mturquette@baylibre.com>, <sboyd@kernel.org>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <catalin.marinas@arm.com>, <will@kernel.org>, <p.zabel@pengutronix.de>,
+        <richardcochran@gmail.com>, <arnd@arndb.de>, <geert+renesas@glider.be>,
+        <nfraprado@collabora.com>, <rafal@milecki.pl>, <peng.fan@nxp.com>,
+        <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+        <quic_saahtoma@quicinc.com>
+References: <20230825091234.32713-1-quic_devipriy@quicinc.com>
+ <20230825091234.32713-7-quic_devipriy@quicinc.com>
+ <CAA8EJpo75zWLXuF-HC-Xz+6mvu_S1ET-9gzW=mOq+FjKspDwhw@mail.gmail.com>
+Content-Language: en-US
+From: Devi Priya <quic_devipriy@quicinc.com>
+In-Reply-To: <CAA8EJpo75zWLXuF-HC-Xz+6mvu_S1ET-9gzW=mOq+FjKspDwhw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: gApxFy5Cy_uY5wxT9JTOvWBqjExHH7f3
+X-Proofpoint-ORIG-GUID: gApxFy5Cy_uY5wxT9JTOvWBqjExHH7f3
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-09-12_24,2023-09-05_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
+ malwarescore=0 clxscore=1015 spamscore=0 priorityscore=1501
+ mlxlogscore=999 phishscore=0 bulkscore=0 suspectscore=0 adultscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2308100000 definitions=main-2309130027
 
-> +static int oa_tc6_sw_reset(struct oa_tc6 *tc6)
-> +{
-> +	long timeleft;
-> +	u32 regval;
-> +	int ret;
-> +
-> +	/* Perform software reset with both protected and unprotected control
-> +	 * commands because the driver doesn't know the current status of the
-> +	 * MAC-PHY.
-> +	 */
-> +	regval = SW_RESET;
-> +	reinit_completion(&tc6->rst_complete);
-> +	ret = oa_tc6_perform_ctrl(tc6, OA_TC6_RESET, &regval, 1, true, false);
-> +	if (ret) {
-> +		dev_err(&tc6->spi->dev, "RESET register write failed\n");
-> +		return ret;
-> +	}
-> +
-> +	ret = oa_tc6_perform_ctrl(tc6, OA_TC6_RESET, &regval, 1, true, true);
-> +	if (ret) {
-> +		dev_err(&tc6->spi->dev, "RESET register write failed\n");
-> +		return ret;
-> +	}
-> +	timeleft = wait_for_completion_interruptible_timeout(&tc6->rst_complete,
-> +							     msecs_to_jiffies(1));
-> +	if (timeleft <= 0) {
-> +		dev_err(&tc6->spi->dev, "MAC-PHY reset failed\n");
-> +		return -ENODEV;
-> +	}
 
-This seems a bit messy and complex. I assume reset is performed once
-during probe, and never again? So i wonder if it would be cleaner to
-actually just poll for the reset to complete? You can then remove all
-this completion code, and the interrupt handler gets simpler?
 
-> +	/* Register MAC-PHY interrupt service routine */
-> +	ret = devm_request_irq(&spi->dev, spi->irq, macphy_irq, 0, "macphy int",
-> +			       tc6);
-> +	if ((ret != -ENOTCONN) && ret < 0) {
-> +		dev_err(&spi->dev, "Error attaching macphy irq %d\n", ret);
-> +		goto err_macphy_irq;
-> +	}
+On 8/25/2023 4:58 PM, Dmitry Baryshkov wrote:
+> On Fri, 25 Aug 2023 at 12:15, Devi Priya <quic_devipriy@quicinc.com> wrote:
+>>
+>> Add a node for the nss clock controller found on ipq9574 based devices.
+>>
+>> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
+>> ---
+>>   Changes in V2:
+>>          - Dropped the fixed clock node gcc_gpll0_out_aux and added
+>>            support for the same in gcc driver
+>>          - Updated the node name to clock-controller@39b00000
+>>          - Added clock-names to retrieve the nssnoc clocks and add them
+>>            to the list of pm clocks in nss driver
+>>
+>>   arch/arm64/boot/dts/qcom/ipq9574.dtsi | 48 +++++++++++++++++++++++++++
+>>   1 file changed, 48 insertions(+)
+>>
+>> diff --git a/arch/arm64/boot/dts/qcom/ipq9574.dtsi b/arch/arm64/boot/dts/qcom/ipq9574.dtsi
+>> index 51aba071c1eb..903311547e96 100644
+>> --- a/arch/arm64/boot/dts/qcom/ipq9574.dtsi
+>> +++ b/arch/arm64/boot/dts/qcom/ipq9574.dtsi
+>> @@ -10,6 +10,8 @@
+>>   #include <dt-bindings/clock/qcom,ipq9574-gcc.h>
+>>   #include <dt-bindings/interrupt-controller/arm-gic.h>
+>>   #include <dt-bindings/reset/qcom,ipq9574-gcc.h>
+>> +#include <dt-bindings/clock/qcom,ipq9574-nsscc.h>
+>> +#include <dt-bindings/reset/qcom,ipq9574-nsscc.h>
+>>   #include <dt-bindings/thermal/thermal.h>
+>>
+>>   / {
+>> @@ -18,6 +20,24 @@ / {
+>>          #size-cells = <2>;
+>>
+>>          clocks {
+>> +               bias_pll_cc_clk: bias-pll-cc-clk {
+>> +                       compatible = "fixed-clock";
+>> +                       clock-frequency = <1200000000>;
+>> +                       #clock-cells = <0>;
+>> +               };
+>> +
+>> +               bias_pll_nss_noc_clk: bias-pll-nss-noc-clk {
+>> +                       compatible = "fixed-clock";
+>> +                       clock-frequency = <461500000>;
+>> +                       #clock-cells = <0>;
+>> +               };
+>> +
+>> +               bias_pll_ubi_nc_clk: bias-pll-ubi-nc-clk {
+>> +                       compatible = "fixed-clock";
+>> +                       clock-frequency = <353000000>;
+>> +                       #clock-cells = <0>;
+>> +               };
+> 
+> Which part provides these clocks?
+The Bias PLL generates these clocks based on the reference clock.
+> 
+>> +
+>>                  sleep_clk: sleep-clk {
+>>                          compatible = "fixed-clock";
+>>                          #clock-cells = <0>;
+>> @@ -722,6 +742,34 @@ frame@b128000 {
+>>                                  status = "disabled";
+>>                          };
+>>                  };
+>> +
+>> +               nsscc: clock-controller@39b00000 {
+>> +                       compatible = "qcom,ipq9574-nsscc";
+>> +                       reg = <0x39b00000 0x80000>;
+>> +                       clocks = <&gcc GCC_NSSNOC_NSSCC_CLK>,
+>> +                                <&gcc GCC_NSSNOC_SNOC_CLK>,
+>> +                                <&gcc GCC_NSSNOC_SNOC_1_CLK>,
+>> +                                <&bias_pll_cc_clk>,
+>> +                                <&bias_pll_nss_noc_clk>,
+>> +                                <&bias_pll_ubi_nc_clk>,
+>> +                                <&gcc GPLL0_OUT_AUX>,
+>> +                                <0>,
+>> +                                <0>,
+>> +                                <0>,
+>> +                                <0>,
+>> +                                <0>,
+>> +                                <0>,
+>> +                                <&xo_board_clk>;
+> 
+> If you move xo_board closer to the start of the list, it will be
+> slightly easier to review.
+Sure okay
+> 
+>> +                       clock-names = "nssnoc_nsscc", "nssnoc_snoc", "nssnoc_snoc_1",
+>> +                                     "bias_pll_cc_clk", "bias_pll_nss_noc_clk",
+>> +                                     "bias_pll_ubi_nc_clk", "gpll0_out_aux", "uniphy0_nss_rx_clk",
+>> +                                     "uniphy0_nss_tx_clk", "uniphy1_nss_rx_clk",
+>> +                                     "uniphy1_nss_tx_clk", "uniphy2_nss_rx_clk",
+>> +                                     "uniphy2_nss_tx_clk", "xo_board_clk";
+> 
+> You are using clock indices. Please drop clock-names.
+Sure okay
 
-Why is -ENOTCONN special? A comment would be good here.
-
-> -void oa_tc6_deinit(struct oa_tc6 *tc6)
-> +int oa_tc6_deinit(struct oa_tc6 *tc6)
->  {
-> -	kfree(tc6);
-> +	int ret;
-> +
-> +	devm_free_irq(&tc6->spi->dev, tc6->spi->irq, tc6);
-> +	ret = kthread_stop(tc6->tc6_task);
-> +	if (!ret)
-> +		kfree(tc6);
-> +	return ret;
->  }
-
-What is the MAC driver supposed to do if this fails?
-
-But this problem probably goes away once you use a threaded interrupt
-handler.
-
-w> +/* Open Alliance TC6 Standard Control and Status Registers */
-> +#define OA_TC6_RESET	0x0003		/* Reset Control and Status Register */
-> +#define OA_TC6_STS0	0x0008		/* Status Register #0 */
-
-Please use the same name as the standard. It use STATUS0, so
-OA_TC6_STATUS0. Please make sure all your defines follow the standard.
-
-> +
-> +/* RESET register field */
-> +#define SW_RESET	BIT(0)		/* Software Reset */
-
-It is pretty normal to put #defines for a register members after the
-#define for the register itself:
-
-#define OA_TC6_RESET	0x0003		/* Reset Control and Status Register */
-#define OA_TC6_RESET_SWRESET	BIT(0)
-
-#define OA_TC6_STATUS0	0x0008		/* Status Register #0 */
-#define OA_TC6_STATUS0_RESETC		BIT(6)		/* Reset Complete */
-
-The naming like this also helps avoid mixups.
-
-    Andrew
+Thanks,
+Devi Priya
+> 
+>> +                       #clock-cells = <1>;
+>> +                       #reset-cells = <1>;
+>> +                       #power-domain-cells = <1>;
+>> +               };
+>>          };
+>>
+>>          thermal-zones {
+>> --
+>> 2.34.1
+>>
+> 
+> 
 
