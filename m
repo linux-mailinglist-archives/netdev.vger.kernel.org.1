@@ -1,72 +1,66 @@
-Return-Path: <netdev+bounces-33434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7937379DF56
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 07:11:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CA41079DF60
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 07:26:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA51C282044
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 05:11:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 004A1281E9A
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 05:26:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAEB615481;
-	Wed, 13 Sep 2023 05:11:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87DAB1549A;
+	Wed, 13 Sep 2023 05:26:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0F8EA45
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 05:11:06 +0000 (UTC)
-Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0F2B172A
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 22:11:04 -0700 (PDT)
-Received: by mail-qt1-x82d.google.com with SMTP id d75a77b69052e-412137ae07aso39553101cf.2
-        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 22:11:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694581864; x=1695186664; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PNMu3KK2j4TFK6B/dUEfmdMYYjU1IksHT5cn987D80I=;
-        b=AP5Yw+P+s4Uip1BOlE/FHRGy+ULCLaufKYlnammDA5VPZKDE2qBsnc0jZmEt/uJ+Lq
-         3VaJB7jiLn96sah9KCC3bUaJNH48vVcu6+joFxerhn7waBC9SrEHoLLL5VHVxY9zeyZM
-         qelNdC+vPaeNSEoNCA4mHyhWbHZflS+7DRo3ncUz6F09ND3BqjZ41876ALAeis802Bv/
-         JCD7MxtEze3YMMcNrxxJRd3BvPCfyDnOhmaF8otUFjiVhH0btJrsf7vGuIjkjyxYCWKW
-         qHBJeAyCPD8IxPMhSd81N6ITosvxiE0BoSwhkRebCXKWEhkspFed3HbUjWK7ddclJSKp
-         QzOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694581864; x=1695186664;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PNMu3KK2j4TFK6B/dUEfmdMYYjU1IksHT5cn987D80I=;
-        b=LQPnuRmCpBRtOWS3vrp0AEmEFQji4kuGK9xaiinzYr9r7sCL+Xm5lXBhXwDDaeD1vF
-         H3KCRC13EgBDWHqmPciP9jAxqE49uKhVLeqsXD9+BXTTJaGJ/vlGVYFohQbt4hJsfJzB
-         AYKLxsGgtWX+VtVubnja/AQ2A3nT+cKUk4QqtbTbAIIbylu11B50JzBqj1LXnRLPikG/
-         5/kLINs0P9k6HS3OnqpYUct281QwUnMgkIS2tjT/gSjbz7ECV2HtEmIMzAfLM8UM9YUy
-         7iqusL/cbcsrmPbBHxJVspgDYOb0Vs8gKsCB4jZ/2D6dvPoHDNUp9XRldf479POyFmsK
-         r32g==
-X-Gm-Message-State: AOJu0YzTtDCIW0tfVP9y5Ag/PIGbzMiu0ENIWPcYmM9oOzljwoSyFy8G
-	XLGuz+dtv/wfQyAkARo8pRc=
-X-Google-Smtp-Source: AGHT+IE00w9KowCCcjcuiEgxn8jYfCYIPedGJt1rLmm96/5bUIzj8B2UxYZ9NrPQ4ngmUn8hzcVp2A==
-X-Received: by 2002:a05:622a:1aa9:b0:412:2dac:acb9 with SMTP id s41-20020a05622a1aa900b004122dacacb9mr1174557qtc.8.1694581863761;
-        Tue, 12 Sep 2023 22:11:03 -0700 (PDT)
-Received: from localhost.localdomain ([123.116.194.77])
-        by smtp.gmail.com with ESMTPSA id u11-20020a63b54b000000b00563826c66eesm7795517pgo.61.2023.09.12.22.11.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Sep 2023 22:11:02 -0700 (PDT)
-From: Liang Chen <liangchen.linux@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	benjamin.poirier@gmail.com
-Cc: netdev@vger.kernel.org,
-	liangchen.linux@gmail.com
-Subject: [PATCH net-next v2] pktgen: Introducing 'SHARED' flag for testing with non-shared skb
-Date: Wed, 13 Sep 2023 13:10:46 +0800
-Message-Id: <20230913051046.19484-1-liangchen.linux@gmail.com>
-X-Mailer: git-send-email 2.31.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B4E61548E
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 05:26:53 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4477172A
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 22:26:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694582812; x=1726118812;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=SwaB4yCgiUQ8ReRsK0zE6DU85oEym7sghLCN8y5GU1g=;
+  b=hJ7qOgpjg8AsfoI0ZTYe+c/7Vrzkt897EvczqtEq0ggE+z6icgyOTPmO
+   k0Khf4lV+1Xfjarp1o6p5IYBpWc30wbaYUGK7AvljK9XZyyEw1Hxwq26J
+   wAXXL9yJzCIBScje53rpwTklsydycmIVy7HR7Ztb3bfOYxbsvrUkoXYNV
+   PjZAYyTR6IofRDiCaD38AxIMa4WlE5Q3Zr7sGVZRlXVWqvJXTFlJkUtom
+   wQxnlt6ZG1AGiKBUcDLTRcZLwSTQGnT+cxCFiTu26bIf/YP28jIgnn0/P
+   pMKGCZB/UOaetQBk33rmImHYFyjoM0BW2GBwsCRsoLYo2RTjhYbwnEjvY
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="464936441"
+X-IronPort-AV: E=Sophos;i="6.02,142,1688454000"; 
+   d="scan'208";a="464936441"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2023 22:26:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="693728092"
+X-IronPort-AV: E=Sophos;i="6.02,142,1688454000"; 
+   d="scan'208";a="693728092"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by orsmga003.jf.intel.com with ESMTP; 12 Sep 2023 22:26:48 -0700
+Received: by black.fi.intel.com (Postfix, from userid 1001)
+	id D45541E5; Wed, 13 Sep 2023 08:26:47 +0300 (EEST)
+From: Mika Westerberg <mika.westerberg@linux.intel.com>
+To: Michael Jamet <michael.jamet@intel.com>,
+	Yehezkel Bernat <YehezkelShB@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alex Balcanquall <alex@alexbal.com>,
+	Mika Westerberg <mika.westerberg@linux.intel.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH v2] net: thunderbolt: Fix TCPv6 GSO checksum calculation
+Date: Wed, 13 Sep 2023 08:26:47 +0300
+Message-Id: <20230913052647.407420-1-mika.westerberg@linux.intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,215 +69,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Currently, skbs generated by pktgen always have their reference count
-incremented before transmission, causing their reference count to be
-always greater than 1, leading to two issues:
-  1. Only the code paths for shared skbs can be tested.
-  2. In certain situations, skbs can only be released by pktgen.
-To enhance testing comprehensiveness, we are introducing the "SHARED"
-flag to indicate whether an SKB is shared. This flag is enabled by
-default, aligning with the current behavior. However, disabling this
-flag allows skbs with a reference count of 1 to be transmitted.
-So we can test non-shared skbs and code paths where skbs are released
-within the stack.
+Alex reported that running ssh over IPv6 does not work with
+Thunderbolt/USB4 networking driver. The reason for that is that driver
+should call skb_is_gso() before calling skb_is_gso_v6(), and it should
+not return false after calculates the checksum successfully. This probably
+was a copy paste error from the original driver where it was done properly.
 
-Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
+Reported-by: Alex Balcanquall <alex@alexbal.com>
+Fixes: e69b6c02b4c3 ("net: Add support for networking over Thunderbolt cable")
+Cc: stable@vger.kernel.org
+Signed-off-by: Mika Westerberg <mika.westerberg@linux.intel.com>
 ---
- Documentation/networking/pktgen.rst | 13 ++++++++
- net/core/pktgen.c                   | 50 +++++++++++++++++++++++++----
- 2 files changed, 56 insertions(+), 7 deletions(-)
+Previous version of the patch:
 
-diff --git a/Documentation/networking/pktgen.rst b/Documentation/networking/pktgen.rst
-index 1225f0f63ff0..ffd976c0cbf0 100644
---- a/Documentation/networking/pktgen.rst
-+++ b/Documentation/networking/pktgen.rst
-@@ -178,6 +178,7 @@ Examples::
- 			      IPSEC # IPsec encapsulation (needs CONFIG_XFRM)
- 			      NODE_ALLOC # node specific memory allocation
- 			      NO_TIMESTAMP # disable timestamping
-+			      SHARED # enable shared SKB
-  pgset 'flag ![name]'    Clear a flag to determine behaviour.
- 			 Note that you might need to use single quote in
- 			 interactive mode, so that your shell wouldn't expand
-@@ -288,6 +289,17 @@ To avoid breaking existing testbed scripts for using AH type and tunnel mode,
- you can use "pgset spi SPI_VALUE" to specify which transformation mode
- to employ.
- 
-+Disable shared SKB
-+==================
-+By default, SKBs sent by pktgen are shared (user count > 1).
-+If you need to test with non-shared SKBs, you can remove the "SHARED" flag
-+by simply setting::
-+
-+	pg_set "flag !SHARED"
-+
-+However, if the "clone_skb," "burst," or "count" parameters are configured,
-+the skb still needs to be held by pktgen for further access. Hence the skb
-+must be shared.
- 
- Current commands and configuration options
- ==========================================
-@@ -357,6 +369,7 @@ Current commands and configuration options
-     IPSEC
-     NODE_ALLOC
-     NO_TIMESTAMP
-+    SHARED
- 
-     spi (ipsec)
- 
-diff --git a/net/core/pktgen.c b/net/core/pktgen.c
-index f56b8d697014..3cf00090cf09 100644
---- a/net/core/pktgen.c
-+++ b/net/core/pktgen.c
-@@ -200,6 +200,7 @@
- 	pf(VID_RND)		/* Random VLAN ID */			\
- 	pf(SVID_RND)		/* Random SVLAN ID */			\
- 	pf(NODE)		/* Node memory alloc*/			\
-+	pf(SHARED)		/* Shared SKB */			\
- 
- #define pf(flag)		flag##_SHIFT,
- enum pkt_flags {
-@@ -1198,7 +1199,8 @@ static ssize_t pktgen_if_write(struct file *file,
- 		    ((pkt_dev->xmit_mode == M_NETIF_RECEIVE) ||
- 		     !(pkt_dev->odev->priv_flags & IFF_TX_SKB_SHARING)))
- 			return -ENOTSUPP;
--		if (value > 0 && pkt_dev->n_imix_entries > 0)
-+		if (value > 0 && (pkt_dev->n_imix_entries > 0 ||
-+				  !(pkt_dev->flags & F_SHARED)))
- 			return -EINVAL;
- 
- 		i += len;
-@@ -1212,6 +1214,9 @@ static ssize_t pktgen_if_write(struct file *file,
- 		if (len < 0)
- 			return len;
- 
-+		if ((value > 0) && !(pkt_dev->flags & F_SHARED))
-+			return -EINVAL;
-+
- 		i += len;
- 		pkt_dev->count = value;
- 		sprintf(pg_result, "OK: count=%llu",
-@@ -1257,6 +1262,10 @@ static ssize_t pktgen_if_write(struct file *file,
- 		     ((pkt_dev->xmit_mode == M_START_XMIT) &&
- 		     (!(pkt_dev->odev->priv_flags & IFF_TX_SKB_SHARING)))))
- 			return -ENOTSUPP;
-+
-+		if ((value > 1) && !(pkt_dev->flags & F_SHARED))
-+			return -EINVAL;
-+
- 		pkt_dev->burst = value < 1 ? 1 : value;
- 		sprintf(pg_result, "OK: burst=%u", pkt_dev->burst);
- 		return count;
-@@ -1334,10 +1343,18 @@ static ssize_t pktgen_if_write(struct file *file,
- 		flag = pktgen_read_flag(f, &disable);
- 
- 		if (flag) {
--			if (disable)
-+			if (disable) {
-+				/* If "clone_skb", "burst", or "count" parameters are
-+				 * configured, it means that the skb still needs to be
-+				 * referenced by the pktgen, so the skb must be shared.
-+				 */
-+				if (flag == F_SHARED && (pkt_dev->clone_skb ||
-+							 pkt_dev->burst > 1 || pkt_dev->count))
-+					return -EINVAL;
- 				pkt_dev->flags &= ~flag;
--			else
-+			} else {
- 				pkt_dev->flags |= flag;
-+			}
- 		} else {
- 			sprintf(pg_result,
- 				"Flag -:%s:- unknown\nAvailable flags, (prepend ! to un-set flag):\n%s",
-@@ -1350,7 +1367,8 @@ static ssize_t pktgen_if_write(struct file *file,
- #ifdef CONFIG_XFRM
- 				"IPSEC, "
- #endif
--				"NODE_ALLOC\n");
-+				"NODE_ALLOC, "
-+				"SHARED\n");
- 			return count;
- 		}
- 		sprintf(pg_result, "OK: flags=0x%x", pkt_dev->flags);
-@@ -3483,7 +3501,8 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
- 	if (pkt_dev->xmit_mode == M_NETIF_RECEIVE) {
- 		skb = pkt_dev->skb;
- 		skb->protocol = eth_type_trans(skb, skb->dev);
--		refcount_add(burst, &skb->users);
-+		if (pkt_dev->flags & F_SHARED)
-+			refcount_add(burst, &skb->users);
- 		local_bh_disable();
- 		do {
- 			ret = netif_receive_skb(skb);
-@@ -3491,6 +3510,10 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
- 				pkt_dev->errors++;
- 			pkt_dev->sofar++;
- 			pkt_dev->seq_num++;
-+			if (unlikely(!(pkt_dev->flags & F_SHARED))) {
-+				pkt_dev->skb = NULL;
-+				break;
-+			}
- 			if (refcount_read(&skb->users) != burst) {
- 				/* skb was queued by rps/rfs or taps,
- 				 * so cannot reuse this skb
-@@ -3509,7 +3532,8 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
- 		goto out; /* Skips xmit_mode M_START_XMIT */
- 	} else if (pkt_dev->xmit_mode == M_QUEUE_XMIT) {
- 		local_bh_disable();
--		refcount_inc(&pkt_dev->skb->users);
-+		if (pkt_dev->flags & F_SHARED)
-+			refcount_inc(&pkt_dev->skb->users);
- 
- 		ret = dev_queue_xmit(pkt_dev->skb);
- 		switch (ret) {
-@@ -3517,8 +3541,13 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
- 			pkt_dev->sofar++;
- 			pkt_dev->seq_num++;
- 			pkt_dev->tx_bytes += pkt_dev->last_pkt_size;
-+			if (!(pkt_dev->flags & F_SHARED))
-+				pkt_dev->skb = NULL;
- 			break;
- 		case NET_XMIT_DROP:
-+			if (!(pkt_dev->flags & F_SHARED))
-+				pkt_dev->skb = NULL;
-+			fallthrough;
- 		case NET_XMIT_CN:
- 		/* These are all valid return codes for a qdisc but
- 		 * indicate packets are being dropped or will likely
-@@ -3549,7 +3578,8 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
- 		pkt_dev->last_ok = 0;
- 		goto unlock;
- 	}
--	refcount_add(burst, &pkt_dev->skb->users);
-+	if (pkt_dev->flags & F_SHARED)
-+		refcount_add(burst, &pkt_dev->skb->users);
- 
- xmit_more:
- 	ret = netdev_start_xmit(pkt_dev->skb, odev, txq, --burst > 0);
-@@ -3560,10 +3590,15 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
- 		pkt_dev->sofar++;
- 		pkt_dev->seq_num++;
- 		pkt_dev->tx_bytes += pkt_dev->last_pkt_size;
-+		if (!(pkt_dev->flags & F_SHARED))
-+			pkt_dev->skb = NULL;
- 		if (burst > 0 && !netif_xmit_frozen_or_drv_stopped(txq))
- 			goto xmit_more;
- 		break;
- 	case NET_XMIT_DROP:
-+		if (!(pkt_dev->flags & F_SHARED))
-+			pkt_dev->skb = NULL;
-+		fallthrough;
- 	case NET_XMIT_CN:
- 		/* skb has been consumed */
- 		pkt_dev->errors++;
-@@ -3771,6 +3806,7 @@ static int pktgen_add_device(struct pktgen_thread *t, const char *ifname)
- 	pkt_dev->svlan_id = 0xffff;
- 	pkt_dev->burst = 1;
- 	pkt_dev->node = NUMA_NO_NODE;
-+	pkt_dev->flags = F_SHARED;	/* SKB shared by default */
- 
- 	err = pktgen_setup_dev(t->net, pkt_dev, ifname);
- 	if (err)
+https://lore.kernel.org/netdev/20230911095039.3611113-1-mika.westerberg@linux.intel.com/
+
+Changes from v1:
+
+  * Drop UDP v6 GSO checksum
+  * Add Fixes tag
+
+ drivers/net/thunderbolt/main.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/net/thunderbolt/main.c b/drivers/net/thunderbolt/main.c
+index 0c1e8970ee58..0a53ec293d04 100644
+--- a/drivers/net/thunderbolt/main.c
++++ b/drivers/net/thunderbolt/main.c
+@@ -1049,12 +1049,11 @@ static bool tbnet_xmit_csum_and_map(struct tbnet *net, struct sk_buff *skb,
+ 		*tucso = ~csum_tcpudp_magic(ip_hdr(skb)->saddr,
+ 					    ip_hdr(skb)->daddr, 0,
+ 					    ip_hdr(skb)->protocol, 0);
+-	} else if (skb_is_gso_v6(skb)) {
++	} else if (skb_is_gso(skb) && skb_is_gso_v6(skb)) {
+ 		tucso = dest + ((void *)&(tcp_hdr(skb)->check) - data);
+ 		*tucso = ~csum_ipv6_magic(&ipv6_hdr(skb)->saddr,
+ 					  &ipv6_hdr(skb)->daddr, 0,
+ 					  IPPROTO_TCP, 0);
+-		return false;
+ 	} else if (protocol == htons(ETH_P_IPV6)) {
+ 		tucso = dest + skb_checksum_start_offset(skb) + skb->csum_offset;
+ 		*tucso = ~csum_ipv6_magic(&ipv6_hdr(skb)->saddr,
 -- 
 2.40.1
 
