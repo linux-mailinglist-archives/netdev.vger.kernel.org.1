@@ -1,212 +1,158 @@
-Return-Path: <netdev+bounces-33528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33529-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2000A79E5CD
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 13:10:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 219AA79E5D1
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 13:10:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD257280A4E
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 11:10:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 537261C20A96
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 11:10:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 602181E528;
-	Wed, 13 Sep 2023 11:04:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B9681E533;
+	Wed, 13 Sep 2023 11:05:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53AF5210D
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 11:04:57 +0000 (UTC)
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5488419A6
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 04:04:56 -0700 (PDT)
-Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-401da71b85eso72489835e9.1
-        for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 04:04:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F20D210D
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 11:05:38 +0000 (UTC)
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47E0F19AD
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 04:05:38 -0700 (PDT)
+Received: by mail-wr1-x436.google.com with SMTP id ffacd0b85a97d-31f71b25a99so6403985f8f.2
+        for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 04:05:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1694603095; x=1695207895; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=tnu5IidHjjqv1VobjTTgjZWTEl6tsxw73y2R8jLEqMA=;
-        b=J8Ru3oMxrQNjUbkgBSneTSYSeCzXaCzbaDSyMXqwNUcDdNXBBOq5sofysX01ch0OP6
-         PiAI/a9QVOIEsyG4nlaLxlC9YASLtrspuKhCoCFXg0rvOwA3qREPqig5fGOarGx8nFql
-         Y61zrZKbLGyDve/19ZayLKpoE9Q9Tj5v64S+FRYvjo0eHwwltPGRwgXfSNZ7rSzHTcd3
-         HlHmpZUjo1w12kDKdC1sAJ02AN4NQhVW9cq3ygSvlCfqyHnNCQU+WsE1gojfbP7Ha5Qg
-         qpuvVv/5XokNJ4UD9Us8LSXae4+1kZyby72Cc2BbsUchWXHVoHKvp3jj8hgMNer/dfll
-         EpSQ==
+        d=linaro.org; s=google; t=1694603137; x=1695207937; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6omJwKG04MRfh8ce/W0vROun1mNmIJkUPIR7eVcYNSk=;
+        b=QIPNS+W/MYtLStKhXnqRyxb1PpP4+YNbhU1WrBgLFwdgrjK1lcFfPI0OlvX4NbsmKH
+         9vD+gSjbHw1ACwulsfBCBYGaqaV1sBfgP2QPL6wLvQVfHd2uclhFv0OC/jwVJGCyscb3
+         /6+Fkbk5Td6AHLKaLKC1O6E7L4CxZawBQNHm4hi55dYe28MCCWG33NT3rPTTzuYj7Ojw
+         nzM02KtrjZnoDh7PFItdGGxabvXnArFqSjE00VbIYX8TOxQO8Jq0PpMsiQAPdt1fCadV
+         EuYjmBdER32lfm3dGDBXUEHH8pMaNuVg3h1CoGjWkTzxikJARMaMeSMQpaqj2J9dt0v4
+         RcBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694603095; x=1695207895;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1694603137; x=1695207937;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tnu5IidHjjqv1VobjTTgjZWTEl6tsxw73y2R8jLEqMA=;
-        b=jUa1uFbMOtvUP+P2MwvDNwDCoqEsTSLa0gY7TUDyfyrKuHeeLLmHZZDApOONVjixdS
-         1Stc8dm+uLdCrKhE1DW0ixgj7cbYCinsC7uEzRaEasljtKpi33phwuj6KpajSZ+HqVmt
-         o/feU7ofE8zPa8WmUUM/zzX6McJ+5ziyz1GKOC9YGwRQ4mIQq0ZIK4P6L3u7+DFxL8IH
-         Tv019gGqDNimGba8Jy1Mtq9JQfcrCb1m/pAxumbkx0hd6mSRL89/7kcJRMZuEO0oHA5P
-         YY+lkTgLFLvj+HCjfwdE0Bl38QDIQWLxu+qhN8iobFx2pY0TR42abt42QJsCsZwCjAm5
-         RuSA==
-X-Gm-Message-State: AOJu0YxP4/Rl1gqVEhfLbQH4nWtFZB3uuTC/eYtS2vEatAf6w5u/4EfI
-	Fvus6OdnkfEPeObITVR59tecNw==
-X-Google-Smtp-Source: AGHT+IEGhiaLCwkAeW+drA2/U2i92cBb9q0h6wQsIUr/HwSzKpBvqc3DhTdsLR9yKrQouYfDfT+roA==
-X-Received: by 2002:a05:600c:2147:b0:3f9:c82e:9d87 with SMTP id v7-20020a05600c214700b003f9c82e9d87mr1789996wml.13.1694603094658;
-        Wed, 13 Sep 2023 04:04:54 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id y14-20020a7bcd8e000000b004030e8ff964sm1711103wmj.34.2023.09.13.04.04.53
+        bh=6omJwKG04MRfh8ce/W0vROun1mNmIJkUPIR7eVcYNSk=;
+        b=g6e51GCMjpKOOpI7z7Wwt13cOS/bK5jWnKfVPYPglgw/tJbSskJpYuz4o7jk5P0PIr
+         61+NW7HHTKB7MeZ0KW26K1CR/vSispyjqtT8xUK6OBdbtG+/LxfsT0qEt1cRs0BgpF7p
+         oO5yXh2qoKiOlz9jZcRSe1GxxoJM2qXSP0LjqImhsiGLgAsxWUlLND/eSDbxgRUuhE5y
+         2zf6JNeYYiR3wGJdtFjBN4UezdllLxWnPWt+5Pq5ELHGRpYc39EXCmSM7iOQ2gxl5/JD
+         GiMsp0rVxMyWf5eqy07X3iA9Q8jg8LIAvfWvY19XGK3EO15Xd4ZxsArQRv4JB5hQi5R9
+         B8Ww==
+X-Gm-Message-State: AOJu0Yxa5RvCl2g4wcXlT7xAKJ5KS4bSAsXHi4WM2Qe0uDyH1AzpdvsQ
+	ljYG2AIRl4BFnT1TaRULPzHPng==
+X-Google-Smtp-Source: AGHT+IEXvw963JsTDPOanZN+SIxlqgxub+SzbJ+C4Vg1fs62eMeNpEmmVYLL7ktk7xZJxPAuBOOtow==
+X-Received: by 2002:adf:fdca:0:b0:31f:9a0d:167f with SMTP id i10-20020adffdca000000b0031f9a0d167fmr1619996wrs.50.1694603136700;
+        Wed, 13 Sep 2023 04:05:36 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id 12-20020a05600c024c00b003fc06169ab3sm1716067wmj.20.2023.09.13.04.05.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Sep 2023 04:04:54 -0700 (PDT)
-Date: Wed, 13 Sep 2023 13:04:53 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: "Ziyang Xuan (William)" <william.xuanziyang@huawei.com>,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	netdev@vger.kernel.org, leon@kernel.org, ye.xingchen@zte.com.cn,
-	liuhangbin@gmail.com
-Subject: Re: [PATCH net v4] team: fix null-ptr-deref when team device type is
- changed
-Message-ID: <ZQGXVQZ/koVlo4jj@nanopsycho>
-References: <20230911094636.3256542-1-william.xuanziyang@huawei.com>
- <2910908aeafc8ff133168045ee19f290a7bb35e0.camel@redhat.com>
- <2cad19f1-552b-792f-f074-daadd8753a59@huawei.com>
- <06082c443dbaf83495dde16c33884adc30872ec8.camel@redhat.com>
+        Wed, 13 Sep 2023 04:05:36 -0700 (PDT)
+Date: Wed, 13 Sep 2023 14:05:31 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Vignesh Raghavendra <vigneshr@ti.com>,
+	Grygorii Strashko <grygorii.strashko@ti.com>
+Cc: Peter Ujfalusi <peter.ujfalusi@gmail.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Roger Quadros <rogerq@kernel.org>,
+	MD Danish Anwar <danishanwar@ti.com>, Andrew Lunn <andrew@lunn.ch>,
+	dmaengine@vger.kernel.org, netdev@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: [PATCH net] dmaengine: ti: k3-udma-glue: fix
+ k3_udma_glue_tx_get_irq() error checking
+Message-ID: <5b29881f-a11a-4230-a044-a60871d3d38c@kili.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <06082c443dbaf83495dde16c33884adc30872ec8.camel@redhat.com>
+X-Mailer: git-send-email haha only kidding
 
-Wed, Sep 13, 2023 at 08:28:13AM CEST, pabeni@redhat.com wrote:
->On Wed, 2023-09-13 at 14:15 +0800, Ziyang Xuan (William) wrote:
->> > > diff --git a/drivers/net/team/team.c b/drivers/net/team/team.c
->> > > index d3dc22509ea5..12fb5f4cff06 100644
->> > > --- a/drivers/net/team/team.c
->> > > +++ b/drivers/net/team/team.c
->> > > @@ -2127,7 +2127,10 @@ static const struct ethtool_ops
->> > > team_ethtool_ops = {
->> > >  static void team_setup_by_port(struct net_device *dev,
->> > >  			       struct net_device *port_dev)
->> > >  {
->> > > -	dev->header_ops	= port_dev->header_ops;
->> > > +	if (port_dev->type == ARPHRD_ETHER)
->> > > +		dev->header_ops	= &eth_header_ops;
->> > > +	else
->> > > +		dev->header_ops	= port_dev->header_ops;
->> > >  	dev->type = port_dev->type;
->> > >  	dev->hard_header_len = port_dev->hard_header_len;
->> > >  	dev->needed_headroom = port_dev->needed_headroom;
->> > 
->> > If I read correctly, for !vlan_hw_offload_capable() lower dev,
->> > egress
->> > packets going trough the team device will not contain the vlan tag.
->> > 
->> > Additionally, why is vlan special? Why others lower devices with
->> > custom
->> > header_ops do not need any care? 
->> 
->> We have also got ipvlan device problem as following:
->> 
->> BUG: KASAN: slab-out-of-bounds in ipvlan_hard_header+0xd1/0xe0
->> Read of size 8 at addr ffff888018ee1de8 by task syz-executor.1/3469
->> ...
->> Call Trace:
->>  <IRQ>
->>  dump_stack+0xbe/0xfd
->>  print_address_description.constprop.0+0x19/0x170
->>  ? ipvlan_hard_header+0xd1/0xe0
->>  __kasan_report.cold+0x6c/0x84
->>  ? ipvlan_hard_header+0xd1/0xe0
->>  kasan_report+0x3a/0x50
->>  ipvlan_hard_header+0xd1/0xe0
->>  ? ipvlan_get_iflink+0x40/0x40
->>  neigh_resolve_output+0x28f/0x410
->>  ip6_finish_output2+0x762/0xef0
->>  ? ip6_frag_init+0xf0/0xf0
->>  ? nf_nat_icmpv6_reply_translation+0x460/0x460
->>  ? do_add_counters+0x370/0x370
->>  ? do_add_counters+0x370/0x370
->>  ? ipv6_confirm+0x1ee/0x360
->>  ? nf_ct_bridge_unregister+0x50/0x50
->>  __ip6_finish_output.part.0+0x1a8/0x400
->>  ip6_finish_output+0x1a9/0x1e0
->>  ip6_output+0x146/0x2b0
->>  ? ip6_finish_output+0x1e0/0x1e0
->>  ? __ip6_finish_output+0xb0/0xb0
->>  ? __sanitizer_cov_trace_switch+0x50/0x90
->>  ? nf_hook_slow+0xa3/0x150
->>  mld_sendpack+0x3d9/0x670
->>  ? mca_alloc+0x210/0x210
->>  ? add_grhead+0xf5/0x140
->>  ? ipv6_icmp_sysctl_init+0xd0/0xd0
->>  ? add_grec+0x4e1/0xa90
->>  ? _raw_spin_lock_bh+0x85/0xe0
->>  ? _raw_read_unlock_irqrestore+0x30/0x30
->>  mld_send_cr+0x426/0x630
->>  ? migrate_swap_stop+0x400/0x400
->>  mld_ifc_timer_expire+0x22/0x240
->>  ? ipv6_mc_netdev_event+0x80/0x80
->>  call_timer_fn+0x3d/0x230
->>  ? ipv6_mc_netdev_event+0x80/0x80
->>  expire_timers+0x190/0x270
->>  run_timer_softirq+0x22c/0x560
->> 
->> ipvlan problem is slightly different from vlan.
->> 
->> // add ipvlan to team device
->> team_port_add
->>   team_dev_type_check_change
->>     team_setup_by_port // assign ipvlan_header_ops to team_dev-
->> >header_ops	
->>   netdev_rx_handler_register // fail out without restore team_dev-
->> >header_ops
->> 
->> // add other ether type device to team device
->> team_port_add
->>   team_dev_type_check_change // return directly because port_dev-
->> >type and team_dev->type are same
->> 
->> team_dev->head_ops has be assigned to ipvlan_header_ops. That will
->> trigger excption.
->
->To me both cases look the same in the end: the team driver sets and use
->header_ops of a different device that will assume dev_priv() being a
->different struct.
->
->I'm guessing a generic solution could be implementing 'trampoline'
->header_ops that just call into the lower port corresponding op, and
->assigning such ops to the team device every time the lower has non
->ethernet header_ops.
->
->team_dev_type_check_change() should then probably check both dev->type
->and dev->header_ops.
->
->> > Exporting 'eth_header_ops' for team's sake only looks a bit too
->> > much to
->> > me. I think could instead cache the header_ops ptr after the
->> > initial
->> > ether_setup().
->> 
->> Is it possible to use ether_setup() like bonding driver andmodify MTU
->> individually later?
->
->That could be another option to get the eth_header_ops.
->
->Note that in the end both are quite similar, you will have to cache
->some info (the mtu with the latter); ether_setup() possibly will have
->more side effects, as it touches many fields. I personally would use
->the thing I suggested above.
+The problem is that xudma_pktdma_tflow_get_irq() returns zero on error
+and k3_ringacc_get_ring_irq_num() returns negatives.  This complicates
+the error handling.  Change it to always return negative errors.
 
-Agreed. That is why ether_setup() was not used in the first place.
+Both callers have other bugs as well.  The am65_cpsw_nuss_init_tx_chns()
+function doesn't preserve the error code but instead returns success.
+In prueth_init_tx_chns() there is a signedness bug since "tx_chn->irq"
+is unsigned so negative errors are not handled correctly.
 
+Fixes: 93a76530316a ("net: ethernet: ti: introduce am65x/j721e gigabit eth subsystem driver")
+Fixes: 5b65781d06ea ("dmaengine: ti: k3-udma-glue: Add support for K3 PKTDMA")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+The k3_udma_glue_tx_get_irq() function is in dmaengine, but this bug
+affects networking so I think the fix should go through networking.
 
->
->Cheers,
->
->Paolo
->
+ drivers/dma/ti/k3-udma-glue.c                | 3 +++
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c     | 3 ++-
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c | 6 +++---
+ 3 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/dma/ti/k3-udma-glue.c b/drivers/dma/ti/k3-udma-glue.c
+index 789193ed0386..c278d5facf7d 100644
+--- a/drivers/dma/ti/k3-udma-glue.c
++++ b/drivers/dma/ti/k3-udma-glue.c
+@@ -558,6 +558,9 @@ int k3_udma_glue_tx_get_irq(struct k3_udma_glue_tx_channel *tx_chn)
+ 		tx_chn->virq = k3_ringacc_get_ring_irq_num(tx_chn->ringtxcq);
+ 	}
+ 
++	if (!tx_chn->virq)
++		return -ENXIO;
++
+ 	return tx_chn->virq;
+ }
+ EXPORT_SYMBOL_GPL(k3_udma_glue_tx_get_irq);
+diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+index bea6fc0f324c..24120605502f 100644
+--- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
++++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+@@ -1747,9 +1747,10 @@ static int am65_cpsw_nuss_init_tx_chns(struct am65_cpsw_common *common)
+ 		}
+ 
+ 		tx_chn->irq = k3_udma_glue_tx_get_irq(tx_chn->tx_chn);
+-		if (tx_chn->irq <= 0) {
++		if (tx_chn->irq < 0) {
+ 			dev_err(dev, "Failed to get tx dma irq %d\n",
+ 				tx_chn->irq);
++			ret = tx_chn->irq;
+ 			goto err;
+ 		}
+ 
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+index 47b941fb0198..98b061a3f3c1 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+@@ -316,12 +316,12 @@ static int prueth_init_tx_chns(struct prueth_emac *emac)
+ 			goto fail;
+ 		}
+ 
+-		tx_chn->irq = k3_udma_glue_tx_get_irq(tx_chn->tx_chn);
+-		if (tx_chn->irq <= 0) {
+-			ret = -EINVAL;
++		ret = k3_udma_glue_tx_get_irq(tx_chn->tx_chn);
++		if (ret < 0) {
+ 			netdev_err(ndev, "failed to get tx irq\n");
+ 			goto fail;
+ 		}
++		tx_chn->irq = ret;
+ 
+ 		snprintf(tx_chn->name, sizeof(tx_chn->name), "%s-tx%d",
+ 			 dev_name(dev), tx_chn->id);
+-- 
+2.39.2
+
 
