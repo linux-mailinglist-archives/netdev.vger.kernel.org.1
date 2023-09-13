@@ -1,156 +1,88 @@
-Return-Path: <netdev+bounces-33670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4318E79F29F
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 22:12:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5212179F320
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 22:48:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18AB71C20AD0
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 20:12:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E03C51F20F4F
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 20:48:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3387D1F17C;
-	Wed, 13 Sep 2023 20:12:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64A4B200D4;
+	Wed, 13 Sep 2023 20:48:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27A721DA42
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 20:12:24 +0000 (UTC)
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 656A41BC6
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 13:12:24 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1qgWDi-0001jv-1g; Wed, 13 Sep 2023 22:12:18 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1qgWDd-0069Er-3M; Wed, 13 Sep 2023 22:12:13 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1qgWDc-001Q1d-Pi; Wed, 13 Sep 2023 22:12:12 +0200
-Date: Wed, 13 Sep 2023 22:12:12 +0200
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To: Jisheng Zhang <jszhang@kernel.org>
-Cc: Johannes Berg <johannes@sipsolutions.net>,
-	Paolo Abeni <pabeni@redhat.com>, kernel@pengutronix.de,
-	Samuel Holland <samuel@sholland.org>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	linux-kernel@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Chen-Yu Tsai <wens@csie.org>, linux-sunxi@lists.linux.dev,
-	"David S . Miller" <davem@davemloft.net>,
-	linux-arm-kernel@lists.infradead.org,
-	Lucas Stach <l.stach@pengutronix.de>
-Subject: Re: [REGRESSION] [PATCH net-next v5 2/2] net: stmmac: use per-queue
- 64 bit statistics where necessary
-Message-ID: <20230913201212.eiedub5rsztuwaa7@pengutronix.de>
-References: <20230717160630.1892-1-jszhang@kernel.org>
- <20230717160630.1892-3-jszhang@kernel.org>
- <20230911171102.cwieugrpthm7ywbm@pengutronix.de>
- <ZQAa3277GC4c9W1D@xhacker>
- <99695befef06b025de2c457ea5f861aa81a0883c.camel@pengutronix.de>
- <20230912092411.pprnpvrbxwz77x6a@pengutronix.de>
- <2fcc9fb0e40ceff8ea4ae55cca3ce0aff75a20ca.camel@sipsolutions.net>
- <ZQHIgmcnCNoZwtwu@xhacker>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5699037D
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 20:48:21 +0000 (UTC)
+Received: from out-219.mta0.migadu.com (out-219.mta0.migadu.com [IPv6:2001:41d0:1004:224b::db])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA0781BCC
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 13:48:20 -0700 (PDT)
+Message-ID: <77405214-ae42-d58b-1d40-c639683a0cb1@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1694638098;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AwREo+am6jJ9+Xq8BZFdvke2FcjINYzH66vqtX+PkMY=;
+	b=U6yP+KxVDbx6rtpw5f5CSR3ZoGvmldJXz0NCPIybsjJd+xyoTeZNMYs43/xZA2kbod2YuI
+	iZHsYCL/aT/cgd5cQeknemK5X80ETTnnt0pK2hpUt00drdgkbSY60/xpzcdzZey3HW48B+
+	pegXznmpHCLY9DTg87bF8nQnqSLSJc0=
+Date: Wed, 13 Sep 2023 13:48:09 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="dpbv4jds3tisu2kp"
-Content-Disposition: inline
-In-Reply-To: <ZQHIgmcnCNoZwtwu@xhacker>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Subject: Re: [PATCH v6 8/8] selftests/bpf/sockopt: Add io_uring support
+Content-Language: en-US
+To: Breno Leitao <leitao@debian.org>
+Cc: bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, io-uring@vger.kernel.org,
+ =?UTF-8?Q?Daniel_M=c3=bcller?= <deso@posteo.net>,
+ Wang Yufen <wangyufen@huawei.com>,
+ "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
+ sdf@google.com, axboe@kernel.dk, asml.silence@gmail.com,
+ willemdebruijn.kernel@gmail.com, kuba@kernel.org, pabeni@redhat.com,
+ krisman@suse.de, Andrii Nakryiko <andrii@kernel.org>,
+ Mykola Lysenko <mykolal@fb.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ Shuah Khan <shuah@kernel.org>
+References: <20230913152744.2333228-1-leitao@debian.org>
+ <20230913152744.2333228-9-leitao@debian.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20230913152744.2333228-9-leitao@debian.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
+On 9/13/23 8:27 AM, Breno Leitao wrote:
+> Expand the BPF sockopt test to use also check for io_uring
+> {g,s}etsockopt commands operations.
+> 
+> Create infrastructure to run io_uring tests using the mini_liburing
+> helpers, so, the {g,s}etsockopt operation could either be called from
+> system calls, or, via io_uring.
+> 
+> Add a 'use_io_uring' parameter to run_test(), to specify if the test
+> should be run using io_uring if the parameter is set, or via the regular
+> system calls if false.
+> 
+> Call *all* tests twice, using the regular io_uring path, and the new
+> io_uring path.
 
---dpbv4jds3tisu2kp
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The bpf CI failed to compile because of missing some newer enum: 
+https://github.com/kernel-patches/bpf/actions/runs/6176703557/job/16766325932
 
-Hello,
+An option is to copy the io_uring.h to tools/include/uapi/linux/.
 
-On Wed, Sep 13, 2023 at 10:34:42PM +0800, Jisheng Zhang wrote:
-> On Tue, Sep 12, 2023 at 11:30:14AM +0200, Johannes Berg wrote:
-> > On Tue, 2023-09-12 at 11:24 +0200, Uwe Kleine-K=F6nig wrote:
-> > > >=20
-> > > > The newly added "struct u64_stats_sync syncp" uses a seqlock
-> > > > internally, which is broken into multiple words on 32bit machines, =
-and
-> > > > needs to be initialized properly. You need to call u64_stats_init on
-> > > > syncp before first usage.
-> > >=20
-> > > This is done. The problematic thing is that in stmmac_open() ->
-> > > __stmmac_open() the syncp initialized before is overwritten by
-> > >=20
-> > > 	memcpy(&priv->dma_conf, dma_conf, sizeof(*dma_conf));
->=20
-> Thank Johannes and Uwe for pointing out the issue.
->=20
-> > >=20
-> > > Do I need to point out that this is ugly?
-> >=20
-> > I think it also leaks the (lockdep) state since it reinits the syncp
-> > (and a lot of other state) doing this. This is also called when the MTU
-> > changes.
-> >=20
-> > Also, I couldn't convince myself that it's even race-free? Even if it
-> > is, it's not really obvious, IMHO.
-> >=20
-> > So it seems to me that really this needs to be split into data that
-> > actually should be reinitialized, and data that shouldn't, or just not
-> > use memcpy() here but copy only the relevant state?
->=20
-> Since we are in rc1, I need to fix the bug with as small changes as
-> possible. so another solution could be: replace rx/tx stats structure
-> with pointers, then setup pointers in the new allocated dma_conf with
-> the old one as current code did for dma_tx_size/dma_rx_size in
-> stmmac_setup_dma_desc():
->=20
-> dma_conf->dma_tx_size =3D priv->dma_conf.dma_tx_size
->=20
-> Is it acceptable?
-
-I wondered if you can just initialize the data directly in *priv, instead
-of setting up a local copy, initialize that one + copy it over?!
-
-Best regards
-Uwe
-
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
-
---dpbv4jds3tisu2kp
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmUCF5sACgkQj4D7WH0S
-/k5YqAf/QoHjd1H4OMaQOFFZq5Z1GnCqzupN9tFvF4XnK2Y0RUzjcmrLVkjEZSvA
-GbuGtwdxWJr8ixqCzqbfibyZAY7i8nK6se1X4wOUikFWfsd4VVlMAvLwyvZDIeEM
-6EmLYW1jMo6O+PvxapPzIKtKkNuO51/BmZ1pLy40UKINT8txpwMrCLSvCJgGTbhr
-abaJvfJZS2Pel0QVCkYpm7dqX7pNPmLiNlDXwJwatnQrT2FmSxH1ftchDS3KE4Rl
-QSFlKi7cYMQydd8QZp3i4NzQ+xeTWL0WROSxm7p376NFUYItnDXIBmMw0MvkyL82
-XY/qJUJCraljLXTiRlSGhrHVHDMUqQ==
-=fL1E
------END PGP SIGNATURE-----
-
---dpbv4jds3tisu2kp--
 
