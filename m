@@ -1,147 +1,95 @@
-Return-Path: <netdev+bounces-33437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2746979DF8B
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 07:53:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0924879DF94
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 07:56:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A143E28206F
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 05:53:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAAC71C20B83
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 05:56:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 372DE154BA;
-	Wed, 13 Sep 2023 05:53:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BABEE156C5;
+	Wed, 13 Sep 2023 05:56:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 287C82C9C
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 05:53:02 +0000 (UTC)
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4024172D;
-	Tue, 12 Sep 2023 22:53:01 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 341061C0005;
-	Wed, 13 Sep 2023 05:52:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1694584379;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IcDrbEiun23FmVTKvz1/iXIyZVCi6wgj7E5zzmHbx8Q=;
-	b=oJC8AIzhsGWqr5FQ7UGsC69a5dtNg+kdOYIJ/8pFW193rfzUoQNBaeLcBbQAaF8pciVkeS
-	IfWkbbgNW+SlBJ7OSNd+g7u7komltvjIm4HYGhvhX+V18fQJi6ARO9pbFGBcBKN1CkWh3C
-	WkTR2oRVYzZE+Kzm4IscN3Tp5N1JXUmwfRavXFr9O1qf3ioj/w9dS5YIkW0AEBIOk5fnZK
-	+1cGjlew+y+OS0bdyDf1pu4X7RNnF4ogTUg04nYlFr3A7005Pp190vRzaf8ZdO7kTDiTzG
-	Jo+c5RRohaMmWb/6VF9qU2Y8NS9c2wWRcqegWNVfX2VLMIj6k++JkNyrUPjFWw==
-Message-ID: <6cec079e-991e-4222-a76d-d6156de0daca@arinc9.com>
-Date: Wed, 13 Sep 2023 08:52:37 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB69914F92
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 05:56:07 +0000 (UTC)
+Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD16B172A
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 22:56:06 -0700 (PDT)
+Received: by mail-qt1-x836.google.com with SMTP id d75a77b69052e-415155b2796so126691cf.1
+        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 22:56:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1694584566; x=1695189366; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jShndLL7yr7Ah0UGTvVnJYox4eb+w2lvEq2Vv/aeBxg=;
+        b=xI2jIsB65Xa5diZNh/WxGzwSz49E9grMvqjfWeGUkbogkHtLMhj+PCHtwxcLH18E/Q
+         WHWOtDzfoD19cL9OP7VlXNde1EgeqjuJ2weV+4e7A7y4w72rvdMAzNken/Z0GP+6l8md
+         mm4b4/o081M70w0AKzD9lkJg/OyhWlYaUvXO8SJJ7bFOeAPPxSEL0Hgk7NuFKhy5gobF
+         pdNJeTUE8SChXEbnr4o2pr/4d+bIpZAO/4GiHLsPMnHEENaWV+X4vHoTyVjUliSSOwBz
+         Q93cCzH62iOjX8IGszY4biuT7HfLZ8+O0XrzJ2jA3QzCB8DWA+lVuLJKJd2gTyQ6EgRa
+         MhmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694584566; x=1695189366;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jShndLL7yr7Ah0UGTvVnJYox4eb+w2lvEq2Vv/aeBxg=;
+        b=hfFtgMB2d1VcqV+kfMbr1aidkpfqUh28ECZ3LRRFL8N6OXNMngPtLB0FsS+44JhJp1
+         LbHl4olV2U69uLnpTviiZEAL2T24iecpmCwFhDjpf6M8m985F0mEhUtyBRAglCmr0Idl
+         tyIj6ZW7WOA4ZvrHeJJCdI4rr/kPFfTfvGB37xLfdYNX1A62Nu8aMOUZi28swbUU7In+
+         i4iVq9aPKgMahlMb7hfoXi8HwWQ9lnSKO8tI/LXwRKQjU/VxVDzmrYVIXSHW4+EqIc/E
+         WLMxHokY2kYKXv3eDk9T6YUV9tPEbheKQZSYibrfy7dPEv7cPLlWtN+SEHt3Cv14fwOp
+         pt+g==
+X-Gm-Message-State: AOJu0YzZeQR5NgtylOQgObuSVQ4am5CgpjttKcV7LNbTKgbW1XmOTSWe
+	yYmBrOGAMeJfc1JfxBD6CmCWVHQMW/jhVxcVP8SJ9g==
+X-Google-Smtp-Source: AGHT+IEVz0DqnnCMeEYbd31jlnNUeLoDLN9HtQFEjbmB4SylaWaJ0LRWX04ZYfzAKCnzGdU6su4WCTuxqHHCdF2li6g=
+X-Received: by 2002:a05:622a:15ca:b0:40f:c60d:1c79 with SMTP id
+ d10-20020a05622a15ca00b0040fc60d1c79mr179833qty.28.1694584565486; Tue, 12 Sep
+ 2023 22:56:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/4] dt-bindings: net: dsa: document internal MDIO bus
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Woojung Huh <woojung.huh@microchip.com>,
- UNGLinuxDriver@microchip.com, Linus Walleij <linus.walleij@linaro.org>,
- =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
- Daniel Golle <daniel@makrotopia.org>, Landen Chao
- <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Matthias Brugger
- <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-References: <8a8e14f1-0493-4298-a2cc-6e7ae7929334@arinc9.com>
- <20230813190157.4y3zoro53qsz43pe@skbuf>
- <f5f468c1-b5a2-4336-b1d9-fd82da95b21d@arinc9.com>
- <20230814143601.mnpxtcm2zybnbvoh@skbuf>
- <0cee0928-74c9-4048-8cd8-70bfbfafd9b2@arinc9.com>
- <20230827121235.zog4c3ehu2cyd3jy@skbuf>
- <676d1a2b-6ffa-4aff-8bed-a749c373f5b3@arinc9.com>
- <87325ce9-595a-4dda-a6a1-b5927d25719b@arinc9.com>
- <20230911225126.rk23g3u3bzo3agby@skbuf>
- <036c0763-f1b2-49ff-bc82-1ff16eec27ab@arinc9.com>
- <20230912193450.h5s6miubag46z623@skbuf>
-Content-Language: en-US
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <20230912193450.h5s6miubag46z623@skbuf>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
+References: <20230913052647.407420-1-mika.westerberg@linux.intel.com>
+In-Reply-To: <20230913052647.407420-1-mika.westerberg@linux.intel.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 13 Sep 2023 07:55:54 +0200
+Message-ID: <CANn89iLA-iba+D5SYxWKYAR1pbo8+qp5w88Q-Xs2KcdFV9JTyA@mail.gmail.com>
+Subject: Re: [PATCH v2] net: thunderbolt: Fix TCPv6 GSO checksum calculation
+To: Mika Westerberg <mika.westerberg@linux.intel.com>
+Cc: Michael Jamet <michael.jamet@intel.com>, Yehezkel Bernat <YehezkelShB@gmail.com>, 
+	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Alex Balcanquall <alex@alexbal.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12.09.2023 22:34, Vladimir Oltean wrote:
-> On Tue, Sep 12, 2023 at 10:23:51PM +0300, Arınç ÜNAL wrote:
->> The phylink bindings for user ports I ended up making by looking up the
->> existing devicetrees are different than the phylink bindings for the shared
->> (CPU and DSA) ports currently enforced on all switches.
->>
->> My phylink bindings for user ports:
->>
->>              allOf:
->>                - anyOf:
->>                    - required: [ fixed-link ]
->>                    - required: [ phy-handle ]
->>                    - required: [ managed ]
->>
->>                - if:
->>                    required: [ fixed-link ]
->>                  then:
->>                    not:
->>                      required: [ managed ]
-> 
-> Right, it should have been anyOf and not oneOf.. my mistake. It is a bug
-> which should be fixed. It's the same phylink that gets used in both cases,
-> user ports and shared ports :)
+On Wed, Sep 13, 2023 at 7:26=E2=80=AFAM Mika Westerberg
+<mika.westerberg@linux.intel.com> wrote:
+>
+> Alex reported that running ssh over IPv6 does not work with
+> Thunderbolt/USB4 networking driver. The reason for that is that driver
+> should call skb_is_gso() before calling skb_is_gso_v6(), and it should
+> not return false after calculates the checksum successfully. This probabl=
+y
+> was a copy paste error from the original driver where it was done properl=
+y.
+>
+> Reported-by: Alex Balcanquall <alex@alexbal.com>
+> Fixes: e69b6c02b4c3 ("net: Add support for networking over Thunderbolt ca=
+ble")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Mika Westerberg <mika.westerberg@linux.intel.com>
 
-One more thing, I don't recall phy-mode being required to be defined for
-user ports as it will default to GMII. I don't believe this is the same
-case for shared ports so phy-mode is required only for them?
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
-> 
->>
->> The phylink bindings for shared ports enforced on all switches on
->> dsa-port.yaml:
->>
->>    allOf:
->>      - required:
->>          - phy-mode
->>      - oneOf:
->>          - required:
->>              - fixed-link
->>          - required:
->>              - phy-handle
->>          - required:
->>              - managed
->>
->> Here's what I understand:
->>
->> - For switches in dsa_switches_apply_workarounds[]
->>    - Enforce the latter for shared ports.
->>    - Enforce the former for user ports.
->>
->> - For switches not in dsa_switches_apply_workarounds[]
->>    - Enforce the former for all ports.
-> 
-> No, no. We enforce the dt-schema regardless of switch presence in
-> dsa_switches_apply_workarounds[], to encourage users to fix device trees
-> (those who run schema validation). The kernel workaround consists in
-> doing something (skipping phylink) for the device trees where the schema
-> warns on shared ports. But there should be a single sub-schema for
-> validating phylink bindings, whatever port kind it is.
-
-Hmm, like writing phylink.yaml and then referring to it under the port
-pattern node? This could prevent a lot of repetition.
-
-Arınç
+Thanks !
 
