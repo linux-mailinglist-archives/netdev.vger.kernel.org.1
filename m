@@ -1,205 +1,89 @@
-Return-Path: <netdev+bounces-33594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AB8B79EBD8
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 16:59:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29BF479EC36
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 17:11:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3BDD1C20BDB
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 14:59:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B9331C20AB2
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 15:11:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8957B1F185;
-	Wed, 13 Sep 2023 14:59:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 756661F190;
+	Wed, 13 Sep 2023 15:11:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21D541EA74
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 14:59:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5EDBC433C8;
-	Wed, 13 Sep 2023 14:59:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694617189;
-	bh=0AbGKrvHkbfmwX2tPrwgjwFrlaY/UK4+5XEpUO6Hmk4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kTHkg6U2OrOp9s11X766GHIMjWESKKOX2vVpe8mIR0Uj+fuatFjupPtR2QKTXjtvr
-	 yyq629oLWrJZv+fhaxlXXihlD2CL9SRcmFJxZ8ymQ7v8nI9z6dQ/jBBE+k4T0d3kMe
-	 5tQht4mgII3Zt3IH/dXx1sf9mZwYIGqQ4X4/Dln/R5QcTVQP15KQBtU2vb1CRKj3Tm
-	 IU+/n1n/1z40lgmI+EInQ2RPMp8hCqzl+luIqDX7rKrHaQGADi9yhBRcOlIxyoZCoG
-	 cx1xy8qPJKijtLTyaYqY7uoFqT9m+fIg+j0pngkk0UI2/lR0L9uwBTuK8kFzbFhRsL
-	 Ok847V3L9PMGQ==
-Date: Wed, 13 Sep 2023 15:59:41 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Lee Jones <lee@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Qiang Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>,
-	Shengjiu Wang <shengjiu.wang@gmail.com>,
-	Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>,
-	Nicolin Chen <nicoleotsuka@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org,
-	Simon Horman <horms@kernel.org>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v5 08/31] dt-bindings: soc: fsl: cpm_qe: cpm1-scc-qmc:
- Add support for QMC HDLC
-Message-ID: <20230913-unburned-overturn-41b83e1eed25@spud>
-References: <20230912081527.208499-1-herve.codina@bootlin.com>
- <20230912101018.225246-1-herve.codina@bootlin.com>
- <20230912-capable-stash-c7a3e33078ac@spud>
- <20230913092640.76934b31@bootlin.com>
- <20230913-unruly-recite-7dbbbd7e63e0@spud>
- <20230913165250.02bab2ad@bootlin.com>
- <20230913-oversold-delay-05368e5de9fe@spud>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66B94639
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 15:11:14 +0000 (UTC)
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CAA6B7
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 08:11:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=NMDSx8uwFvlmMY5L0U6ZEaRTCFeE2CIiPzpzNKPRxtE=; b=mNxEX3b0AKONjf2p5Jo3vuItkZ
+	eYqVwdcValoxuwp/vw01Mczx+8zHmpPU+JDFVHbCgmRDv+Pmq43wylAtzmZrITuAWg3BfA3whihI/
+	jaEWokcgbYj9IuAMya2gIP6cX6fXV8HvPC2dnWclNQG7TVoKaUwuHoxAkoF5I6vc5X/0M8VnV8Wp2
+	c8HQKq39+Xe4qh/4g8b1M/RIAAyx8Pp4VCRvVzgPWisQb2pizj2U1LpeReAmuIXzfO0rBOtTDQub4
+	zeriT4rm63u0y8VYhIcOzOCl9gc7C9RiB7G+EY8kbrJD3cJL7U8v4E646iEFhPdNNs4eSOEbmVpW9
+	sQTW8ppQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+	id 1qgRVu-00EXrU-3z; Wed, 13 Sep 2023 15:10:46 +0000
+Date: Wed, 13 Sep 2023 16:10:46 +0100
+From: Matthew Wilcox <willy@infradead.org>
+To: Edward Cree <ecree.xilinx@gmail.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, edward.cree@amd.com,
+	linux-net-drivers@amd.com, davem@davemloft.net, kuba@kernel.org,
+	edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
+	habetsm.xilinx@gmail.com, sudheer.mogilappagari@intel.com,
+	jdamato@fastly.com, andrew@lunn.ch, mw@semihalf.com,
+	sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
+	hkelam@marvell.com, saeedm@nvidia.com, leon@kernel.org
+Subject: Re: [RFC PATCH v3 net-next 2/7] net: ethtool: attach an IDR of
+ custom RSS contexts to a netdevice
+Message-ID: <ZQHQ9hLeb0qvhxzS@casper.infradead.org>
+References: <cover.1694443665.git.ecree.xilinx@gmail.com>
+ <9c71d5168e1ee22b40625eec53a8bb00456d60ed.1694443665.git.ecree.xilinx@gmail.com>
+ <ZQCThixvWBoCeT4r@shell.armlinux.org.uk>
+ <b2da6ed4-9475-6e49-709f-db87dcf8c810@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="k94xrof+2xueRHia"
-Content-Disposition: inline
-In-Reply-To: <20230913-oversold-delay-05368e5de9fe@spud>
-
-
---k94xrof+2xueRHia
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <b2da6ed4-9475-6e49-709f-db87dcf8c810@gmail.com>
 
-On Wed, Sep 13, 2023 at 03:56:16PM +0100, Conor Dooley wrote:
-> On Wed, Sep 13, 2023 at 04:52:50PM +0200, Herve Codina wrote:
-> > On Wed, 13 Sep 2023 15:42:45 +0100
-> > Conor Dooley <conor@kernel.org> wrote:
-> >=20
-> > > On Wed, Sep 13, 2023 at 09:26:40AM +0200, Herve Codina wrote:
-> > > > Hi Conor,
-> > > >=20
-> > > > On Tue, 12 Sep 2023 18:21:58 +0100
-> > > > Conor Dooley <conor@kernel.org> wrote:
-> > > >  =20
-> > > > > On Tue, Sep 12, 2023 at 12:10:18PM +0200, Herve Codina wrote: =20
-> > > > > > The QMC (QUICC mutichannel controller) is a controller present =
-in some
-> > > > > > PowerQUICC SoC such as MPC885.
-> > > > > > The QMC HDLC uses the QMC controller to transfer HDLC data.
-> > > > > >=20
-> > > > > > Additionally, a framer can be connected to the QMC HDLC.
-> > > > > > If present, this framer is the interface between the TDM bus us=
-ed by the
-> > > > > > QMC HDLC and the E1/T1 line.
-> > > > > > The QMC HDLC can use this framer to get information about the E=
-1/T1 line
-> > > > > > and configure the E1/T1 line.
-> > > > > >=20
-> > > > > > Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-> > > > > > ---
-> > > > > >  .../bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml   | 13 +++++=
-++++++++
-> > > > > >  1 file changed, 13 insertions(+)
-> > > > > >=20
-> > > > > > diff --git a/Documentation/devicetree/bindings/soc/fsl/cpm_qe/f=
-sl,cpm1-scc-qmc.yaml b/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl=
-,cpm1-scc-qmc.yaml
-> > > > > > index 82d9beb48e00..b5073531f3f1 100644
-> > > > > > --- a/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1=
--scc-qmc.yaml
-> > > > > > +++ b/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1=
--scc-qmc.yaml
-> > > > > > @@ -101,6 +101,16 @@ patternProperties:
-> > > > > >            Channel assigned Rx time-slots within the Rx time-sl=
-ots routed by the
-> > > > > >            TSA to this cell.
-> > > > > > =20
-> > > > > > +      compatible:
-> > > > > > +        const: fsl,qmc-hdlc
-> > > > > > +
-> > > > > > +      fsl,framer:
-> > > > > > +        $ref: /schemas/types.yaml#/definitions/phandle
-> > > > > > +        description:
-> > > > > > +          phandle to the framer node. The framer is in charge =
-of an E1/T1 line
-> > > > > > +          interface connected to the TDM bus. It can be used t=
-o get the E1/T1 line
-> > > > > > +          status such as link up/down.   =20
-> > > > >=20
-> > > > > Sounds like this fsl,framer property should depend on the compati=
-ble
-> > > > > being present, no? =20
-> > > >=20
-> > > > Well from the implementation point of view, only the QMC HDLC drive=
-r uses this
-> > > > property.
-> > > >=20
-> > > > From the hardware description point of view, this property means th=
-at the time slots
-> > > > handled by this channel are connected to the framer. So I think it =
-makes sense for
-> > > > any channel no matter the compatible (even if compatible is not pre=
-sent).
-> > > >=20
-> > > > Should I change and constraint the fsl,framer property to the compa=
-tible presence ?
-> > > > If so, is the following correct for this contraint ?
-> > > >    --- 8< ---
-> > > >    dependencies:
-> > > >      - fsl,framer: [ compatible ];
-> > > >    --- 8< --- =20
-> > >=20
-> > > The regular sort of
-> > > if:
-> > > 	compatible:
-> > > 		contains:
-> > > 			const: foo
-> > > then:
-> > > 	required:
-> > > 		- fsl,framer
-> > > would fit the bill, no?
-> >=20
-> > Not sure.
-> > "fsl,framer" is an optional property (depending on the hardware we can =
-have
-> > a framer or not).
->=20
-> Ah apologies, I had it backwards! Your suggestion seems fair in that
-> case.
+On Wed, Sep 13, 2023 at 12:22:03PM +0100, Edward Cree wrote:
+> On 12/09/2023 17:36, Russell King (Oracle) wrote:
+> > On Tue, Sep 12, 2023 at 03:21:37PM +0100, edward.cree@amd.com wrote:
+> >> +	struct idr		rss_ctx;
+> > 
+> > https://docs.kernel.org/core-api/idr.html
+> > 
+> > "The IDR interface is deprecated; please use the XArray instead."
+> 
+> IDR is a wrapper around XArray these days, right?
 
-Or actually,
-if:
-	compatible:
-		not:
-	 		contains:
-	 			const: foo
- then:
- 	properties:
- 		fsl,framer: false
-? That should do the trick in a more conventional way.
+Yes, but a bad one.
 
---k94xrof+2xueRHia
-Content-Type: application/pgp-signature; name="signature.asc"
+> When I looked into the equivalent to use XArray directly it looked much
+>  more complicated for flexibility that really isn't needed here.
 
------BEGIN PGP SIGNATURE-----
+No, it's no more complex to use.  There are a lot of _other_ things
+you can do with it, but every IDR call has an equivalent XArray call.
+And as a bonus you get a spinlock protecting you!
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZQHOXQAKCRB4tDGHoIJi
-0poQAQDqNLWYV0v7EFgrkPDKkkHvvsg4hXdY0+WRr/xipZ7pfQEAux/D0zjPvPjQ
-t36Kzm5ducMZfS17zQJL3mrN2qrf3gA=
-=C+xz
------END PGP SIGNATURE-----
+> Is there an explanation you can point me at of why this extremely
+>  convenient wrapper is deprecated?
 
---k94xrof+2xueRHia--
+Because why have two APIs for the same thing?  One day, I will be finished
+with important projects and then I'll go back to eradicating the users
+of the IDR.
 
