@@ -1,151 +1,244 @@
-Return-Path: <netdev+bounces-33502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33504-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF07579E457
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 11:55:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C898879E46F
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 12:00:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 785A5281E95
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 09:55:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 399491C20F5C
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 09:59:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 546B41DDCF;
-	Wed, 13 Sep 2023 09:55:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40FFA1DDFB;
+	Wed, 13 Sep 2023 09:59:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4165A179AB
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 09:55:06 +0000 (UTC)
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE1DB1BDC
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 02:55:05 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id 98e67ed59e1d1-26ef24b8e5aso5498058a91.0
-        for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 02:55:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694598905; x=1695203705; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=29S3/dKQUQT8Hg9FfxhLAS3gsFxe94m5pLwVvzvuOBA=;
-        b=So1skdkwHIKxX1F0V7kM/hrFDTdXMXkUkLzV9SbGGkZIhLfNbX32WGhCafk7+MMm7X
-         Bf7C7QDSG+Do41ED/U7b52RLP/lpEJQMXB6ZffWpQUMXBTUvBD+Uae6wNVPCxZGUf1qK
-         8BbclPmSYcQrb9NqHT+EBzWBL0PR57zp0aOKhtKKKmDhxwru7Lf23HD6qlTPX4/vswYj
-         bH6UptrZ+vL0qeEtXSlVz+zHyyvfv17gy8X4pPJTbaZnkwq9BYXZfrOO53+VuYYSV8Ms
-         rCNqkS6OwuDFpxjXbNV9oQllA1CqgeyY5qzH3yAecLbXblSRvWJTsksM+3bgj4znVZTE
-         4p6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694598905; x=1695203705;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=29S3/dKQUQT8Hg9FfxhLAS3gsFxe94m5pLwVvzvuOBA=;
-        b=xO+iFSpJAEFJT4pnzMYELpDmJGmGR0NJ18+hdj4hXWKpYCvZYdgkc19CRsjBYI8Aq0
-         nrUNgFg1FPSrzbFKJ2xfZQvWrnHJNZvfwlDq9Zjrsd0XlnhPk4ICXpIfBEi6kXG8IPJc
-         0dOnNCA/IpAz1xbFVtPIEGhyJbQz5dFHy+x0GaqAT3UNB6JDKANWGKoz2LeeNyu+JsGr
-         vB8ljVfDwU9y0D+NkA3bTfLhi3GyhTSSSlS5i+JrhzIJwK6RCDeTby3SXfos1+nzZEKI
-         80oYaDnFt0DZBuqbSxEsNeHGVISHRpw2q6CAlBAB0k2dgUHg0c/Ugy4GXHcl0YmqkliH
-         vtVw==
-X-Gm-Message-State: AOJu0YwmIFnHx/JJCMSfNgQ7aFhTzLSlVr3BGf0tM8eOBxtLNYSqfA8x
-	WaXUOTJ7f3AKW1fgQ56Z7yk=
-X-Google-Smtp-Source: AGHT+IEC9k9z6vSywDCyQxFvaYthmbXRJquoSBY2Jt+pZD/X38ZjmqlQ6bX5fzJ2TS21OZbh0XBVRw==
-X-Received: by 2002:a17:90b:4c4f:b0:268:1068:4464 with SMTP id np15-20020a17090b4c4f00b0026810684464mr1598924pjb.30.1694598905294;
-        Wed, 13 Sep 2023 02:55:05 -0700 (PDT)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id e4-20020a170902d38400b001b890009634sm10035508pld.139.2023.09.13.02.55.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Sep 2023 02:55:04 -0700 (PDT)
-Date: Wed, 13 Sep 2023 17:54:59 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: Thomas Haller <thaller@redhat.com>,
-	Benjamin Poirier <bpoirier@nvidia.com>,
-	David Ahern <dsahern@kernel.org>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	Ido Schimmel <idosch@idosch.org>, netdev@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next] ipv4/fib: send RTM_DELROUTE notify when flush
- fib
-Message-ID: <ZQGG8xqt8m3IHS4z@Laptop-X1>
-References: <20230724084820.4aa133cc@hermes.local>
- <ZL+F6zUIXfyhevmm@Laptop-X1>
- <20230725093617.44887eb1@hermes.local>
- <6b53e392-ca84-c50b-9d77-4f89e801d4f3@6wind.com>
- <7e08dd3b-726d-3b1b-9db7-eddb21773817@kernel.org>
- <640715e60e92583d08568a604c0ebb215271d99f.camel@redhat.com>
- <8f5d2cae-17a2-f75d-7659-647d0691083b@kernel.org>
- <ZNKQdLAXgfVQxtxP@d3>
- <32d40b75d5589b73e17198eb7915c546ea3ff9b1.camel@redhat.com>
- <cc91aa7d-0707-b64f-e7a9-f5ce97d4f313@6wind.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C62D1DDE5
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 09:59:20 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BDBF19AF;
+	Wed, 13 Sep 2023 02:59:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694599160; x=1726135160;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=HSLJwVgcFCs58MKh1DPh6CnbxJPFFR5byzsU32VD11Q=;
+  b=i4A2OhuCyMOzavRIIjcRFWV4bqfshXhyG5vsaUYt8E5om4Brzr7B2Hqi
+   4+TTef4peOvkSbtfjJA7b/l5rWDR/R4YaOkjA43QNVQugy0oiQNYjJztq
+   3H17yvXmFaJIaAyeG34wky9zZN/xIzJoOTadYXCSqV3DSAMhEnW467vp0
+   uGYjE9s570qNhK7pdmc26Z95KytSzOYS3emRyTWy7Xi8WqSJbyWTmaQVB
+   FlM2wemEt8INcvD+e3E+4deMjfawHKNsCq2kr+5GHxFZXXtSHdQiW99xF
+   lgZH1Qv1XEkkcFuMZL42xLjFcKc5Y2mjV2Muvtfu20jRW7IEQVRffuTeB
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="464985952"
+X-IronPort-AV: E=Sophos;i="6.02,142,1688454000"; 
+   d="scan'208";a="464985952"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 02:59:19 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="747241741"
+X-IronPort-AV: E=Sophos;i="6.02,142,1688454000"; 
+   d="scan'208";a="747241741"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmsmga007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Sep 2023 02:59:19 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Wed, 13 Sep 2023 02:59:19 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Wed, 13 Sep 2023 02:59:18 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Wed, 13 Sep 2023 02:59:18 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Wed, 13 Sep 2023 02:59:17 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=J51MWVdMrgg45lLoebkiLOwhPynKv7QAA5AIX67NAM736j24QbQwaeP9UT5H31YulSHNRWoI2iGoXcM6xhVuwSK23Ztiv2lWtzR0wQcG6Fi8otS2eSI6iRXnBJa+Ij0qZCxuYoSIEgtYs7/r6MPo0Ed+s3+UwZwkf4nSHOqD43LBJZWB5L/LJJICxFJFbKDzE25L2663zk+71/TQpe0u8eR/SSCUyZGSCgqfU8FtDj9zTA/1jkmoxWgqcSLD713yx/AJvm6ZxnHD3YqpIwT+fvBGtcNJWBQZRbWn758ohh8sRWLS41J0ODvgh4n9Ck0dacTLTGhH4CkiK4i8jhSstQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=p4LCOOcylXoKKS0E4mZWNg2Oyxwu9mjLDui4e4wRo5k=;
+ b=nBp2TdYOigg7VoxjbDsc80+719xZGf5baB1ePzpftgNrQDXMk7pyNhxT00Wuh91vlLz4z9tQPGWBBvubW5NJA62w4XkN112UfPbDbdMahSdbA5oiNiQNi2+QxJtcgRO39BBH9R++F5Ji2wo0DrM3eUJnHZGoeoIW+ncBkYr83QCR3gR+SA7a0qC5TvlPBX9oTiRoeFJ31jBMEnidEWHQkOZyoiSH+RO1GIveUse8c+891CIwJlodfdc+hmur9CpKNb8rZr+QK7xJKtS9yKpOeHr8Y5Uw2zm9L5weT0buGvrPhCsPRVfrKfcuwnYhY6f4AmEN6nrMgh1hnoKU8PHGkw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
+ by SN7PR11MB7115.namprd11.prod.outlook.com (2603:10b6:806:29a::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.34; Wed, 13 Sep
+ 2023 09:59:11 +0000
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::bede:bd20:31e9:fcb4]) by DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::bede:bd20:31e9:fcb4%7]) with mapi id 15.20.6768.029; Wed, 13 Sep 2023
+ 09:59:11 +0000
+Message-ID: <e6de7c0b-97cc-090e-a331-dc566019f54e@intel.com>
+Date: Wed, 13 Sep 2023 11:58:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH] net/core: Export dev_core_stats_rx_dropped_inc sets
+Content-Language: en-US
+To: Yajun Deng <yajun.deng@linux.dev>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <horms@kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20230911082016.3694700-1-yajun.deng@linux.dev>
+ <9a1de9b3-b3cf-d26b-388e-c98294580bca@intel.com>
+ <599cdff8-4865-3ade-0439-36e337891ca0@linux.dev>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+In-Reply-To: <599cdff8-4865-3ade-0439-36e337891ca0@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FR0P281CA0050.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:48::13) To DM6PR11MB3625.namprd11.prod.outlook.com
+ (2603:10b6:5:13a::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <cc91aa7d-0707-b64f-e7a9-f5ce97d4f313@6wind.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|SN7PR11MB7115:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8994a53f-d321-4088-ca8c-08dbb4401406
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: U54OdwX6RkC+IbYuhhIlMuURTyjxI5kQ7M0vIW5qVPDHutbScHwPfJ+Y9GLsRPI4ugHYuNb6pHPgfP0Gmp+2WiAzpdKxQahjEjvwAkH9wYcsqC/CIjH1+CzX5lB7TLDzZptChG5YVuEmVmhgR4gKP1qv7N5dQXEd1KL21qNTtcSnTOZEPVRqL1V2Ruh87jx6XF6/SLyavOVGRczBCPHzFBJzuJSeAzSOEtuivekZXAGdviU0MUeK3VMzM8k0Cyg3qg3sGSdyOFEmZ+XAuHIETxZN+Qedn1dzNdLouCZOLJ9Gp9ZBMyhHuW759Ze3hTQVhpBc7pLJyZo9swo1qpxP3I/yx7AjhPy/VvGuJ8ScWpnYzOuIvfIHFD78zCOilSzF+txu4oz/2pDdriLg9JTlEBa9L4YM+m6g752o7wbw/l7A+EOqjj6Om7ovLYQDpkYuGYV0AYHI8jBbWc1uEXxqzrgBbcNqNHZHUMLmD+sGfrdkuEZmo4o0Z15speaXJ3sQWy5gC7Bmmj3WXvD3iGEjNQLzkl/0dbB8epsFUJjYcG6qZLckGQZzSzrsJ/u6Jxz6AFEDE2BEjBMnoCQb5WegjxfxlxVkD9kqw8EIi4bdEnwo12qfE7HO2dk2R0lnxFMuBctaFvCnfU83Ei7kuz3qsw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(346002)(136003)(39860400002)(366004)(451199024)(1800799009)(186009)(6512007)(6486002)(6506007)(53546011)(66899024)(2616005)(26005)(6666004)(8676002)(38100700002)(2906002)(8936002)(5660300002)(4326008)(31696002)(86362001)(66946007)(41300700001)(36756003)(316002)(66476007)(66556008)(6916009)(82960400001)(478600001)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?d2I3c2ZaRzJNSWxjTWpwZmdDWXlVekdIcktUTXRRbURvWnYxNlhrSk5GQjVh?=
+ =?utf-8?B?bHBrMjRxbGZRcXV5ZjdyU2NmSmZ4N214TEJ3OTZicGRUNkhaVi85eGMxV2l0?=
+ =?utf-8?B?ZHZzRW9ST2V2eElrN2xNdWN4eFlvalA5TzRGdWpPREp2cFExTGtQZTEvWFAy?=
+ =?utf-8?B?OHpnUHl1WHlTVTVIM3orUjlIR3dnL3ZrcjAxc3hwd3YwRjhUMEpQQitnRTlj?=
+ =?utf-8?B?VHhLY2E3MTRPV3lSTmU3TG42dmRFdGpkTjhhQTJFOFhSTGR4Nzd0eng0S290?=
+ =?utf-8?B?RHVoTWRaMllwalRqTDROS2pDS3NqYzZ0dDBxejlMcTZrTWs4QWNEQ3NFU0V2?=
+ =?utf-8?B?ZW1kYzNLbmRjWkU5YmRBeVhLYkFaZWlSd2V1VnRIUEVIa2MvLzh6TE5yeGtt?=
+ =?utf-8?B?dWd2ZmpkaXkvYVdqUDU1TVFzNjdjaU1YeUpObkhSVUFsKzlXOTNuVEo5cm1j?=
+ =?utf-8?B?ZzRJeXVhMlZYRllOZW1BV2xldWpsYUhtRWV6enVrTmpRb2RwVm1YT21EVTda?=
+ =?utf-8?B?NUI0alFNVFJUTjNsN0VVZm5BamZCcG1BclErQnZUODBLRXIranNsYVpuUDdz?=
+ =?utf-8?B?Y3llRGc3b05PQ1NlSytRRkNIRVR0QSt3Q2VEaUJYUklpS1E2eXp1TmhKSitX?=
+ =?utf-8?B?OTlxa29ya2Fqcm1HQXA2MUxHaXZxeXVLUlEwZ1E1ZlZVeEl0dzVlQjRwVEll?=
+ =?utf-8?B?NjVKMUlkanpHeUt0TmpVbGhPL3dWRFQ3V29KOG8vZTZ4ZTZUUVRrcjNnbWJy?=
+ =?utf-8?B?V2lCeTZWNTNoNDg3MzhnVFNSbXhwYkYvNmcwYUR2Z2l0Q1lUTFVqL014MnJ6?=
+ =?utf-8?B?anI5OHh2a3FuMDZINktiSyt2djBjbUwweDZabVdscjdRaUlaTm5xOTRpRHRU?=
+ =?utf-8?B?aGVRK3pqakE1cVZjaHhYcVhRTzRLRHR1NTluVTg0MWY1NFZZR0lvMmN2b3Y1?=
+ =?utf-8?B?ZmhCd0o0L2RpWkZhbjR2YlMxMG9VSTg5R0FVejZ5MS9La0J2OEFPeWcvMXNQ?=
+ =?utf-8?B?dE96S3Y2OTRxNUhZYnVEaWJVZDg5MUVZQXpMTGFKcCtZbHFFREFpYWFDalk3?=
+ =?utf-8?B?RjBGdCsrR2R5RXk3bisrR3RxZDFKeHoyOHV0NnJXUldIZ0NiSEh0OVJyT2VR?=
+ =?utf-8?B?WnJHMkl3OGdaYnJzcEZ4aUM4ZHZCbVQwcDBXNnRGc3h4Q0t5WEVLamRMQjRZ?=
+ =?utf-8?B?QUF2TFM2Slhyak1NT2tzZyttV0pncTgrcW4ydXZlb0FVRS9OYStGQS9URVpy?=
+ =?utf-8?B?WG5TZ1FvZ1RCc3VPdS8vQUo3b1ZHNEJlekl1RjlSQ0luS0JOWVp2Q0phcFhh?=
+ =?utf-8?B?cEhVMUpaQktIZmpSdFNFOER4cjZEMFJ1Mlp5RENYUU9LNUxoNW9vTU04UHdl?=
+ =?utf-8?B?NVViRlcwYU51WE40NUdGTHhlN0FpTUY0RlRUbGNtK2l5bXhrMXh5eElLUFJM?=
+ =?utf-8?B?MTBHbitYYUo1VUFaaDgxOEs5YVlNN04rTDFaYUJTeWxQVWt2UE5hV3paWjR2?=
+ =?utf-8?B?Y3ZldlZRV3pWNVZPdWNBcXNtTm90dSt2bm02a2ZBeUhCenAwNTZ0YVV5cnIv?=
+ =?utf-8?B?TkkxV0ZPWjhveGc0U3dIMWxQUXd6ai9UeS92OEpjNHRCY010RWIvSjRmK3VO?=
+ =?utf-8?B?Q0VWemo2RW9xSjJieEMxSFRqbmhxMjdqemJwVi9ROEw1Mnl1aGpNYXZWUHdI?=
+ =?utf-8?B?WlNCaFMreFdkQURGeS9SbU4rM3owNHVjL1M4eW5HS2dLMFNmaDNvZ0o3YlV0?=
+ =?utf-8?B?R0JxblB1dTc2R0NRL0JYVDV3eXB5TmJvVmZpS3Y5L05uOGIxNzEybnFMaHlt?=
+ =?utf-8?B?djdaVk54Q2hRWndjUnhKZE9hR1FqWFM1dThtQlZsVnJSdlQyeE1oVlFnNm90?=
+ =?utf-8?B?T3E2Qk4xbXR4MGdBRGZVSmZNWXBqVGRaOCtYVkhIT2ExSUV4dUp3OTE2Z1lu?=
+ =?utf-8?B?MVBjQ1hXSUlDR3B1N29LU3I1ZmFsdHVRSEZHZW1PeVhvd2M2R1RIYTZJN3cz?=
+ =?utf-8?B?TklLN3h2SlV0RnI1RkhYTW1uSzU1ellBeHF2U2NhOHB3d1V5WGlReVFyUSs5?=
+ =?utf-8?B?UVJQdjZaRkVZWHVqb2JTS2VwYnpVY2hYTk55YzZOTEI2TXk4RmlReHppQ1ZG?=
+ =?utf-8?B?Uk9INkRXNHJkZkFIU2hBUnliUTVibmVMQjM3ZzRHRysyeERKWkxKb21nTFlm?=
+ =?utf-8?B?ZHc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8994a53f-d321-4088-ca8c-08dbb4401406
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Sep 2023 09:59:11.2616
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3HRf8a2FBz8ZDmY+87gW9VQJJUcgY84bTmsZuYQCdREA9LUA5Tdo+DVXhL4toZ9n9TpV9Otb2fMx86TGYdXLj7ZhC+bIZwJjphEMOGh6AkY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB7115
+X-OriginatorOrg: intel.com
 
-On Wed, Sep 13, 2023 at 09:58:08AM +0200, Nicolas Dichtel wrote:
-> Le 11/09/2023 à 11:50, Thomas Haller a écrit :
-> [snip]
-> > - the fact that it isn't fixed in more than a decade, shows IMO that
-> > getting caching right for routes is very hard. Patches that improve the
-> > behavior should not be rejected with "look at libnl3 or FRR".
-> +1
-> 
-> I just hit another corner case:
-> 
-> ip link set ntfp2 up
-> ip address add 10.125.0.1/24 dev ntfp2
-> ip nexthop add id 1234 via 10.125.0.2 dev ntfp2
-> ip route add 10.200.0.0/24 nhid 1234
-> 
-> Check the config:
-> $ ip route
-> <snip>
-> 10.200.0.0/24 nhid 1234 via 10.125.0.2 dev ntfp2
-> $ ip nexthop
-> id 1234 via 10.125.0.2 dev ntfp2 scope link
-> 
-> 
-> Set the carrier off on ntfp2:
-> ip monitor label link route nexthop&
-> ip link set ntfp2 carrier off
-> 
-> $ ip link set ntfp2 carrier off
-> $ [LINK]4: ntfp2: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc mq state
-> DOWN group default
->     link/ether de:ed:02:67:61:1f brd ff:ff:ff:ff:ff:ff
-> 
-> => No nexthop event nor route event (net.ipv4.nexthop_compat_mode = 1)
-> 
-> 'ip nexthop' and 'ip route' show that the nexthop and the route have been deleted.
-> 
-> If the nexthop infra is not used (ip route add 10.200.0.0/24 via 10.125.0.2 dev
-> ntfp2), the route entry is not deleted.
-> 
-> I wondering if it is expected to not have a nexthop event when one is removed
-> due to a carrier lost.
-> At least, a route event should be generated when the compat_mode is enabled.
+From: Yajun Deng <yajun.deng@linux.dev>
+Date: Wed, 13 Sep 2023 10:08:08 +0800
 
-This thread goes to a long discussion.
+> 
+> On 2023/9/13 00:22, Alexander Lobakin wrote:
+>> From: Yajun Deng <yajun.deng@linux.dev>
+>> Date: Mon, 11 Sep 2023 16:20:16 +0800
 
-Ido has bringing up this issue[1]. In my patchv2[2] we skipped to send the
-notification as it is deliberate.
+[...]
 
-BTW, I'm still looking into the questions you asked in my IPv6 patch[3]. Sorry
-for the late response. I was busy with some other stuff recently.
+>> EXPORT_SYMBOL_GPL(dev_core_stats_inc); // Why not GPL BTW?
+> 
+> This may be a better option.
+> 
+> Just because EXPORT_SYMBOL(netdev_core_stats_alloc) before,Â  but I think
+> 
+> EXPORT_SYMBOL_GPL is better.
 
-[1] https://lore.kernel.org/netdev/ZLlE5of1Sw1pMPlM@shredder/
-[2] https://lore.kernel.org/netdev/20230809140234.3879929-3-liuhangbin@gmail.com/
-[3] https://lore.kernel.org/netdev/bf3bb290-25b7-e327-851a-d6a036daab03@6wind.com/
+Ah I see. BTW, if you will still define increment functions as
+externals, there will be no reason to export netdev_core_stats_alloc()
+or even make it non-static at all.
 
-Thanks
-Hangbin
+> 
+> Â 
+>> And then build inlines:
+>>
+>> #define DEV_CORE_STATS_INC(FIELD)				\
+>> static inline void						\
+>> dev_core_stats_##FIELD##_inc(struct net_device *dev)		\
+>> {								\
+>> 	dev_core_stats_inc(dev,					\
+>> 		offsetof(struct net_device_core_stats, FIELD));	\
+>> }
+>>
+>> DEV_CORE_STATS_INC(rx_dropped);
+>> ...
+>>
+>> OR even just make them macros
+>>
+>> #define __DEV_CORE_STATS_INC(dev, field)			\
+>> 	dev_core_stats_inc(dev,					\
+>> 		offsetof(struct net_device_core_stats, field))
+>>
+>> #define dev_core_stats_rx_dropped_inc(dev)			\
+>> 	__DEV_CORE_STATS_INC(dev, rx_dropped)
+>> ...
+> 
+> I would like the former.Â  Keep it the same as before.
+
+By "the former" you mean to build static inlines or externals? Seems
+like the first one, but I got confused by your "the same as before" :D
+
+> 
+> 
+>> Just don't copy that awful Thunderbird's line wrap and don't assume this
+>> code builds and works and that is something finished/polished.
+>>
+>> You'll be able to trace functions and you'll be able to understand which
+>> counter has been incremented by checking the second argument, i.e. the
+>> field offset (IIRC tracing shows you arguments).
+>> And that way you wouldn't geometrically increase the number of symbol
+>> exports and deal with its consequences.
+> I agree that.
+
+Ok, after this one I guess you meant "I'd like to use your approach with
+static inlines".
+
+>>>  
+>>>  /**
+>>>   *	dev_get_stats	- get network device statistics
+>> Thanks,
+>> Olek
+
+Thanks,
+Olek
 
