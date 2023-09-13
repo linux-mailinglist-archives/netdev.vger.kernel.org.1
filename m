@@ -1,147 +1,168 @@
-Return-Path: <netdev+bounces-33466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F16C079E0BD
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 09:19:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E53479E0CA
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 09:26:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB4C8281DF0
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 07:19:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C694A1C20C23
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 07:26:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A7751DA21;
-	Wed, 13 Sep 2023 07:19:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1048A1DA24;
+	Wed, 13 Sep 2023 07:26:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F37D19BDF
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 07:19:28 +0000 (UTC)
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4E861997
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 00:19:27 -0700 (PDT)
-Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-31aec0a1a8bso362804f8f.0
-        for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 00:19:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1694589566; x=1695194366; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OOrhY0fStqbrl1T10xJqj44f9gQdNFyS2zesAVqheNI=;
-        b=b69IApI/loTEGm/VAmX9kwRF1tgSenyRneTv+LAOy1R31cYvgBG+/mmLPNWLIwiekS
-         1AnaZ6itNA4g/EEzvta1rLGGhV2o8NH402S4BLu5zK3qdPsz5rtteVCWuqcjYKfEKPIN
-         zTiSAl8eMl9bHRRXi88/i25popBJjNe4BZhx2IlqsRVH1p3GTRbRzunIA6K31oFkkYwi
-         F5KmJkd0ZySQiHWPLrvZ2AwPTs7ri3PDEWX4pnZ2SpfuSXPZU2M49Y0+uU9pT7TmAMuc
-         Y9WCWdXE2NrlCPdeuNueFqyBYuhBUAldmMA+E+pakIDOcqDYQBkYuptRvaJ6nVD7d3Rk
-         SZ8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694589566; x=1695194366;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OOrhY0fStqbrl1T10xJqj44f9gQdNFyS2zesAVqheNI=;
-        b=jlXFxPalaPKExYFd7fNHFfc0K8hzfnF5RmBmJJhf+ulJ/5/qVctCF8lXw3lYOCbBcr
-         nb/9Ky/OyXOoW90OoJTN5yOecRlp3GLrA+MH3QkHA19bnjiPVyko49Mmt0Rtjwj0S//D
-         zEFCRuwrK66C34Gkviu2R0j4v6FRPgj4LdojS8zepyss4PZ0jgfzTkTc9bfrAKcGr3x4
-         FF6IDzWfHtQqSFcQPFCOTIzeKNNL774hjXwD5K/Ky/UkFKV/pcSvOZwXMKPe0hEkmzDM
-         fsqwzqvWRKkxik7IrkOXi/HFw/Rkh8jLq50lZ8P3XcdjkQZlLNZ/dETHkdSjsaXJpBIg
-         o/3g==
-X-Gm-Message-State: AOJu0YxFOwbauOTabDEWMYuyCng7uGucD9bmqC9nL9+EQZVVPF3s4BYk
-	kyr4r47J2xBKlAXT4SJnHoZSO6SMjwa4otCSo+Q=
-X-Google-Smtp-Source: AGHT+IHsazqIL11PKacyVnf+9RrTt5f9sjed4c0ZffP83n32Xhh80sNv01hOC/lg84FMXdqs2v8RtQ==
-X-Received: by 2002:adf:f7cd:0:b0:31d:db2d:27c6 with SMTP id a13-20020adff7cd000000b0031ddb2d27c6mr3558455wrq.30.1694589566102;
-        Wed, 13 Sep 2023 00:19:26 -0700 (PDT)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id u4-20020a5d6da4000000b0031fb91f23e9sm3773345wrs.43.2023.09.13.00.19.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Sep 2023 00:19:25 -0700 (PDT)
-Date: Wed, 13 Sep 2023 10:19:23 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: oe-kbuild@lists.linux.dev, Jordan Rife <jrife@google.com>,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, dborkman@kernel.org,
-	Jordan Rife <jrife@google.com>
-Subject: Re: [PATCH net] net: prevent address overwrite in connect() and
- sendmsg()
-Message-ID: <f162bcec-7c13-47f0-b784-77e0c3e2c766@kadam.mountain>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04869659
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 07:26:49 +0000 (UTC)
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70ACA1986;
+	Wed, 13 Sep 2023 00:26:48 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 26012E000C;
+	Wed, 13 Sep 2023 07:26:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1694590007;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=O+j8CLkeQqfE/jh3KUACTiWhEVCfAwwkGv+CICyZc1E=;
+	b=id5wBw+5IoW5nrGIWPBxMOPgujgtR6RcLR+FMdrunmLvgVotlzLE4P7GYyysXkHSpptRua
+	AUfDx7XqGPnc1pFdO+2bGGISGvLbBCzyXlMgzpVW7v7AYC53V4Eaa7Giqyjg+JY6+zA/6X
+	ae1i0V0aWjGLBf6bo0hPvjiAFVEw+x3XTs3VCD8PXidN9bityZlJLHPojdkWvSYwfW1nil
+	jAHS1xzlhg0SXt7dGRnbvV2Qsa4Q1uRXGy564WEw0irLFiw0glEyZRzK5O1GQJ3au0virI
+	6//y6UwVKL0i+itAqUc3X0+fgIxkEkCePNW0m4OkaNXvPS+DkPuU9xPTWVApzw==
+Date: Wed, 13 Sep 2023 09:26:40 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: Conor Dooley <conor@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Rob Herring
+ <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Lee Jones <lee@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Qiang
+ Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, Liam Girdwood
+ <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Jaroslav Kysela
+ <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Shengjiu Wang
+ <shengjiu.wang@gmail.com>, Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam
+ <festevam@gmail.com>, Nicolin Chen <nicoleotsuka@gmail.com>, Christophe
+ Leroy <christophe.leroy@csgroup.eu>, Randy Dunlap <rdunlap@infradead.org>,
+ netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ alsa-devel@alsa-project.org, Simon Horman <horms@kernel.org>, Christophe
+ JAILLET <christophe.jaillet@wanadoo.fr>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v5 08/31] dt-bindings: soc: fsl: cpm_qe: cpm1-scc-qmc:
+ Add support for QMC HDLC
+Message-ID: <20230913092640.76934b31@bootlin.com>
+In-Reply-To: <20230912-capable-stash-c7a3e33078ac@spud>
+References: <20230912081527.208499-1-herve.codina@bootlin.com>
+	<20230912101018.225246-1-herve.codina@bootlin.com>
+	<20230912-capable-stash-c7a3e33078ac@spud>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230912013332.2048422-1-jrife@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: herve.codina@bootlin.com
 
-Hi Jordan,
+Hi Conor,
 
-kernel test robot noticed the following build warnings:
+On Tue, 12 Sep 2023 18:21:58 +0100
+Conor Dooley <conor@kernel.org> wrote:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jordan-Rife/net-prevent-address-overwrite-in-connect-and-sendmsg/20230912-093550
-base:   net/main
-patch link:    https://lore.kernel.org/r/20230912013332.2048422-1-jrife%40google.com
-patch subject: [PATCH net] net: prevent address overwrite in connect() and sendmsg()
-config: x86_64-randconfig-161-20230912 (https://download.01.org/0day-ci/archive/20230913/202309131155.MonA0VTS-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce: (https://download.01.org/0day-ci/archive/20230913/202309131155.MonA0VTS-lkp@intel.com/reproduce)
+> On Tue, Sep 12, 2023 at 12:10:18PM +0200, Herve Codina wrote:
+> > The QMC (QUICC mutichannel controller) is a controller present in some
+> > PowerQUICC SoC such as MPC885.
+> > The QMC HDLC uses the QMC controller to transfer HDLC data.
+> >=20
+> > Additionally, a framer can be connected to the QMC HDLC.
+> > If present, this framer is the interface between the TDM bus used by the
+> > QMC HDLC and the E1/T1 line.
+> > The QMC HDLC can use this framer to get information about the E1/T1 line
+> > and configure the E1/T1 line.
+> >=20
+> > Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+> > ---
+> >  .../bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml   | 13 +++++++++++++
+> >  1 file changed, 13 insertions(+)
+> >=20
+> > diff --git a/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-=
+scc-qmc.yaml b/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-sc=
+c-qmc.yaml
+> > index 82d9beb48e00..b5073531f3f1 100644
+> > --- a/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc=
+.yaml
+> > +++ b/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc=
+.yaml
+> > @@ -101,6 +101,16 @@ patternProperties:
+> >            Channel assigned Rx time-slots within the Rx time-slots rout=
+ed by the
+> >            TSA to this cell.
+> > =20
+> > +      compatible:
+> > +        const: fsl,qmc-hdlc
+> > +
+> > +      fsl,framer:
+> > +        $ref: /schemas/types.yaml#/definitions/phandle
+> > +        description:
+> > +          phandle to the framer node. The framer is in charge of an E1=
+/T1 line
+> > +          interface connected to the TDM bus. It can be used to get th=
+e E1/T1 line
+> > +          status such as link up/down. =20
+>=20
+> Sounds like this fsl,framer property should depend on the compatible
+> being present, no?
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-| Closes: https://lore.kernel.org/r/202309131155.MonA0VTS-lkp@intel.com/
+Well from the implementation point of view, only the QMC HDLC driver uses t=
+his
+property.
 
-smatch warnings:
-net/ipv4/af_inet.c:584 inet_dgram_connect() warn: variable dereferenced before check 'uaddr' (see line 580)
+=46rom the hardware description point of view, this property means that the t=
+ime slots
+handled by this channel are connected to the framer. So I think it makes se=
+nse for
+any channel no matter the compatible (even if compatible is not present).
 
-vim +/uaddr +584 net/ipv4/af_inet.c
+Should I change and constraint the fsl,framer property to the compatible pr=
+esence ?
+If so, is the following correct for this contraint ?
+   --- 8< ---
+   dependencies:
+     - fsl,framer: [ compatible ];
+   --- 8< ---
 
-^1da177e4c3f41 Linus Torvalds    2005-04-16  566  int inet_dgram_connect(struct socket *sock, struct sockaddr *uaddr,
-^1da177e4c3f41 Linus Torvalds    2005-04-16  567  		       int addr_len, int flags)
-^1da177e4c3f41 Linus Torvalds    2005-04-16  568  {
-^1da177e4c3f41 Linus Torvalds    2005-04-16  569  	struct sock *sk = sock->sk;
-364f997b5cfe1d Kuniyuki Iwashima 2022-10-06  570  	const struct proto *prot;
-6113a07e1ad512 Jordan Rife       2023-09-11  571  	struct sockaddr_storage addr;
-d74bad4e74ee37 Andrey Ignatov    2018-03-30  572  	int err;
-^1da177e4c3f41 Linus Torvalds    2005-04-16  573  
-6503d96168f891 Changli Gao       2010-03-31  574  	if (addr_len < sizeof(uaddr->sa_family))
-6503d96168f891 Changli Gao       2010-03-31  575  		return -EINVAL;
-364f997b5cfe1d Kuniyuki Iwashima 2022-10-06  576  
-364f997b5cfe1d Kuniyuki Iwashima 2022-10-06  577  	/* IPV6_ADDRFORM can change sk->sk_prot under us. */
-364f997b5cfe1d Kuniyuki Iwashima 2022-10-06  578  	prot = READ_ONCE(sk->sk_prot);
-364f997b5cfe1d Kuniyuki Iwashima 2022-10-06  579  
-^1da177e4c3f41 Linus Torvalds    2005-04-16 @580  	if (uaddr->sa_family == AF_UNSPEC)
-                                                            ^^^^^^^^^^^^^^^^
-"uaddr" better not be NULL
+Regards,
+Herv=C3=A9
 
-364f997b5cfe1d Kuniyuki Iwashima 2022-10-06  581  		return prot->disconnect(sk, flags);
-^1da177e4c3f41 Linus Torvalds    2005-04-16  582  
-d74bad4e74ee37 Andrey Ignatov    2018-03-30  583  	if (BPF_CGROUP_PRE_CONNECT_ENABLED(sk)) {
-6113a07e1ad512 Jordan Rife       2023-09-11 @584  		if (uaddr && addr_len <= sizeof(addr)) {
-                                                                    ^^^^^
-Remove this check?
-
-6113a07e1ad512 Jordan Rife       2023-09-11  585  			/* pre_connect can rewrite uaddr, so make a copy to
-6113a07e1ad512 Jordan Rife       2023-09-11  586  			 * insulate the caller.
-6113a07e1ad512 Jordan Rife       2023-09-11  587  			 */
-6113a07e1ad512 Jordan Rife       2023-09-11  588  			memcpy(&addr, uaddr, addr_len);
-6113a07e1ad512 Jordan Rife       2023-09-11  589  			uaddr = (struct sockaddr *)&addr;
-6113a07e1ad512 Jordan Rife       2023-09-11  590  		}
-6113a07e1ad512 Jordan Rife       2023-09-11  591  
-364f997b5cfe1d Kuniyuki Iwashima 2022-10-06  592  		err = prot->pre_connect(sk, uaddr, addr_len);
-d74bad4e74ee37 Andrey Ignatov    2018-03-30  593  		if (err)
-d74bad4e74ee37 Andrey Ignatov    2018-03-30  594  			return err;
-d74bad4e74ee37 Andrey Ignatov    2018-03-30  595  	}
-d74bad4e74ee37 Andrey Ignatov    2018-03-30  596  
-dcd01eeac14486 Eric Dumazet      2021-06-09  597  	if (data_race(!inet_sk(sk)->inet_num) && inet_autobind(sk))
-^1da177e4c3f41 Linus Torvalds    2005-04-16  598  		return -EAGAIN;
-364f997b5cfe1d Kuniyuki Iwashima 2022-10-06  599  	return prot->connect(sk, uaddr, addr_len);
-^1da177e4c3f41 Linus Torvalds    2005-04-16  600  }
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
-
+>=20
+> Thanks,
+> Conor.
+>=20
+> > +
+> >      required:
+> >        - reg
+> >        - fsl,tx-ts-mask
+> > @@ -159,5 +169,8 @@ examples:
+> >              fsl,operational-mode =3D "hdlc";
+> >              fsl,tx-ts-mask =3D <0x00000000 0x0000ff00>;
+> >              fsl,rx-ts-mask =3D <0x00000000 0x0000ff00>;
+> > +
+> > +            compatible =3D "fsl,qmc-hdlc";
+> > +            fsl,framer =3D <&framer>;
+> >          };
+> >      };
+> > --=20
+> > 2.41.0
+> >  =20
 
