@@ -1,118 +1,107 @@
-Return-Path: <netdev+bounces-33588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEE8E79EB7E
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 16:46:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36F9F79EB36
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 16:36:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4AC41281E7B
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 14:46:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE6BB28206D
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 14:36:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55BD81E53A;
-	Wed, 13 Sep 2023 14:46:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 623268F6E;
+	Wed, 13 Sep 2023 14:36:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FD288F68;
-	Wed, 13 Sep 2023 14:46:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FE9FC433C8;
-	Wed, 13 Sep 2023 14:46:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694616406;
-	bh=MEPRVLhq94lkOpBYdxRoPzKxMTXOzT6mLYuQo0C5GYg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oGLkwU9FWN+uir2AxMWDTeonZoJko3bsyCrAoEwRogRsrKE3tdrx4B9pi8+bKr/rN
-	 YNmj1snrt3z/3uMq8t3XLwRcIdtFeEX4usIBazutl44jkrrsnbzmUi+o/KlszxGhTW
-	 kQ/3EbY9WMqXrWE+yQ0jghLPZaWW+prreEFa455H+PLcHo/nLRU9nYtgaZo3JnKrPj
-	 vFqlFKnCj6MRw+R8ApLZnFn10v9011Amq+LnEVzCYWDd8jZUbGtwzr5m5NpxvdL84/
-	 3VKpgZuZL8GyrJ1R2wgmk36jUw1EttiwIhx9Ix80TmVPWYzmiShvDIdhGPcyxDKqwd
-	 tx3968REAuSrA==
-Date: Wed, 13 Sep 2023 22:34:42 +0800
-From: Jisheng Zhang <jszhang@kernel.org>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
-	Lucas Stach <l.stach@pengutronix.de>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Samuel Holland <samuel@sholland.org>, netdev@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	linux-kernel@vger.kernel.org, Chen-Yu Tsai <wens@csie.org>,
-	Jose Abreu <joabreu@synopsys.com>, kernel@pengutronix.de,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-sunxi@lists.linux.dev,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [REGRESSION] [PATCH net-next v5 2/2] net: stmmac: use per-queue
- 64 bit statistics where necessary
-Message-ID: <ZQHIgmcnCNoZwtwu@xhacker>
-References: <20230717160630.1892-1-jszhang@kernel.org>
- <20230717160630.1892-3-jszhang@kernel.org>
- <20230911171102.cwieugrpthm7ywbm@pengutronix.de>
- <ZQAa3277GC4c9W1D@xhacker>
- <99695befef06b025de2c457ea5f861aa81a0883c.camel@pengutronix.de>
- <20230912092411.pprnpvrbxwz77x6a@pengutronix.de>
- <2fcc9fb0e40ceff8ea4ae55cca3ce0aff75a20ca.camel@sipsolutions.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 537638F68
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 14:36:52 +0000 (UTC)
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AC7D98;
+	Wed, 13 Sep 2023 07:36:50 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id C56931C0005;
+	Wed, 13 Sep 2023 14:36:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1694615809;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kkIQnIuFCF1TTp1ea3vLPJG6FNuTS8tRKjMxldrO4oM=;
+	b=HEBFCtkjbRZFJkev8Pf8mhxM3RpoVAvD4QVoBNYxzrOaDscDxTFNA+yN7T81EUckVol9u4
+	xjgKo9Q2xVQt3oM3BBz7rNoFGOOjvyYNOl0F5adqeTjK0UACKAcGc4926K4ZdnBlqjJ08o
+	TpIrTeJB8xnY7NWS0l094yS+bhkU6fqnQUiGeuRrM2KJxHJwFpeCvR9WyU4wa4Wwh1B6hQ
+	2Qre22XS5evB8RsPzIkTLVjNiZHZfV7EkTDVZUkl8/RjO128yfKq/8wwffdLy05kzQ6GgG
+	m4eAKhrIq4COyT9WCMl2GYyyhWow3rwrabnUMW24Rcu4ES+LLBYao4WeKApkJQ==
+Message-ID: <58b87aea-c7f5-4e7d-9736-74a2ed997306@arinc9.com>
+Date: Wed, 13 Sep 2023 17:36:36 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/4] dt-bindings: net: dsa: document internal MDIO bus
+Content-Language: en-US
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Woojung Huh <woojung.huh@microchip.com>,
+ UNGLinuxDriver@microchip.com, Linus Walleij <linus.walleij@linaro.org>,
+ =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+ Daniel Golle <daniel@makrotopia.org>, Landen Chao
+ <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Matthias Brugger
+ <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+References: <676d1a2b-6ffa-4aff-8bed-a749c373f5b3@arinc9.com>
+ <87325ce9-595a-4dda-a6a1-b5927d25719b@arinc9.com>
+ <20230911225126.rk23g3u3bzo3agby@skbuf>
+ <036c0763-f1b2-49ff-bc82-1ff16eec27ab@arinc9.com>
+ <20230912193450.h5s6miubag46z623@skbuf>
+ <6cec079e-991e-4222-a76d-d6156de0daca@arinc9.com>
+ <20230913074231.5azwxqjuv2wp5nik@skbuf>
+ <89c9b84c-574c-4071-9524-9207597a3f0a@arinc9.com>
+ <20230913110404.co7earmnbzf6hhoe@skbuf>
+ <137fd54d-7d2d-4d0b-a50b-cca69875a814@arinc9.com>
+ <20230913130049.ivvl4vzjcfedsddr@skbuf>
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <20230913130049.ivvl4vzjcfedsddr@skbuf>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <2fcc9fb0e40ceff8ea4ae55cca3ce0aff75a20ca.camel@sipsolutions.net>
+X-GND-Sasl: arinc.unal@arinc9.com
 
-On Tue, Sep 12, 2023 at 11:30:14AM +0200, Johannes Berg wrote:
-> On Tue, 2023-09-12 at 11:24 +0200, Uwe Kleine-König wrote:
-> > > 
-> > > The newly added "struct u64_stats_sync syncp" uses a seqlock
-> > > internally, which is broken into multiple words on 32bit machines, and
-> > > needs to be initialized properly. You need to call u64_stats_init on
-> > > syncp before first usage.
-> > 
-> > This is done. The problematic thing is that in stmmac_open() ->
-> > __stmmac_open() the syncp initialized before is overwritten by
-> > 
-> > 	memcpy(&priv->dma_conf, dma_conf, sizeof(*dma_conf));
-
-Thank Johannes and Uwe for pointing out the issue.
-
-> > 
-> > Do I need to point out that this is ugly?
+On 13.09.2023 16:00, Vladimir Oltean wrote:
+> On Wed, Sep 13, 2023 at 02:35:11PM +0300, Arınç ÜNAL wrote:
+>> On 13.09.2023 14:04, Vladimir Oltean wrote:
+>>> I don't think they're for switch ports only. Any driver which uses
+>>> phylink_fwnode_phy_connect() or its derivatives gets subject to the same
+>>> bindings. But putting the sub-schema in ethernet-controller.yaml makes
+>>> sense, just maybe not naming it "phylink-switch".
+>>
+>> Got it. Should we disallow managed altogether when fixed-link is also
+>> defined, or just with in-band-status value?
 > 
-> I think it also leaks the (lockdep) state since it reinits the syncp
-> (and a lot of other state) doing this. This is also called when the MTU
-> changes.
-> 
-> Also, I couldn't convince myself that it's even race-free? Even if it
-> is, it's not really obvious, IMHO.
-> 
-> So it seems to me that really this needs to be split into data that
-> actually should be reinitialized, and data that shouldn't, or just not
-> use memcpy() here but copy only the relevant state?
+> Just with the "in-band-status" value - just like phylink_parse_mode()
+> implies. If not possible, just leave that condition out.
 
-Since we are in rc1, I need to fix the bug with as small changes as
-possible. so another solution could be: replace rx/tx stats structure
-with pointers, then setup pointers in the new allocated dma_conf with
-the old one as current code did for dma_tx_size/dma_rx_size in
-stmmac_setup_dma_desc():
+I can rewrite the property to allow values other than in-band-status.
 
-dma_conf->dma_tx_size = priv->dma_conf.dma_tx_size
+       - if:
+           required: [ fixed-link ]
+         then:
+           properties:
+             managed:
+               const: auto
 
-Is it acceptable?
-
-Thanks
-
-> 
-> But anyway, I have no skin in this game - just reviewing this because I
-> was trying to help out Uwe.
-> 
-> johannes
+Arınç
 
