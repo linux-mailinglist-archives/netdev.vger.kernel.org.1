@@ -1,176 +1,185 @@
-Return-Path: <netdev+bounces-33526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33527-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9805B79E5CA
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 13:09:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44D7679E5CC
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 13:09:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 903A21C21317
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 11:09:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED8E82825B5
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 11:09:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F4411F934;
-	Wed, 13 Sep 2023 11:03:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E68FF1E519;
+	Wed, 13 Sep 2023 11:04:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2CA61F923;
-	Wed, 13 Sep 2023 11:03:31 +0000 (UTC)
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6031119AD;
-	Wed, 13 Sep 2023 04:03:31 -0700 (PDT)
-Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-402ba03c754so19012705e9.0;
-        Wed, 13 Sep 2023 04:03:31 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D869B1E517
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 11:04:09 +0000 (UTC)
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0ED511726;
+	Wed, 13 Sep 2023 04:04:09 -0700 (PDT)
+Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-98377c5d53eso835943766b.0;
+        Wed, 13 Sep 2023 04:04:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694603010; x=1695207810; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zmpdiDp8WZ2vNU4focnYGseUOqGguV6LAlX3fJfap74=;
-        b=bNqAn0nYo6aOJqhx+3sk+lKRRWgFBAyearAtarr4e5YEM+r0Dk2rCrvvGMo3xdf4n0
-         p9wtXaz2a4REZpWLrgXcIRMwQ2FxQl7obS7sEkad7QiJ+7bx7xY3kTuyZ9gX8lqm9FhR
-         ckXejwMFBuJDat3VJanMEP4eY3HLbCiRHajqhOu5HMAYtKxiwdjP2DSc5VZ9+AZ9illK
-         dKG8EMZyqTQODXufb+LaHp08tzL+82wlMxSUKr+wkod+W4VBGJyC9+umGuhnVsmeQHW1
-         gOQCrUxqkFHz/uuDu6CMU03XHNDxfeQ4FRj9tbX/RAXZhcDDH9IULmZM9TAilyWI2IWr
-         M7dw==
+        d=gmail.com; s=20221208; t=1694603047; x=1695207847; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=XWMdnJsx2d8fiBGvmqe7qu7qVNHb4jJy8Zu53A7Ws4A=;
+        b=SCf0LhkSU0USfus5vVpfJOi54WNnFg+IjBO8vD37nfAIr9B9FAyXYEE4EH+TBw7xw1
+         Q0UK8bqbMPxBxTjfM19Xj4Bs4vYV5+FxqaHV8xICrX2qcNiidfYQEaHhpAnD4XUIU5ED
+         ttIXQk943CWO+OE6z91MSducuzhsTTjlYmWuZMI0ZuCH1/3f2nt4BfiJjPguFhBpbGe8
+         Op9TZy/M+OlXTQM8GufMSJQoridmIGQhxWvEGGQm/YaLYZz99X6/K5x6XiaTJRuyXj1f
+         BbJiwg6HD4S0lnb79kR5EEtBFGY4Bhx4ve7GQpmcCGhnAT6FK2aW3pzNfBabX+VsMZVf
+         MELg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694603010; x=1695207810;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zmpdiDp8WZ2vNU4focnYGseUOqGguV6LAlX3fJfap74=;
-        b=dCjH63fdNOTV/eN4/XoBSA9J6ILQ/+up8lcy/4GlpWZh3B5HhGTf3Y4FxVdtIWnw/A
-         Fzi66Hps6a39oHSRXdlE36mA8m1+NSJ+YbM4fFRL6c8k+rKLfWReQBIFdho03m085eiP
-         ztKCicRNz9qFrCf11377GOEeZjNXPI8yHDlfTFLbUbajojm+035aoGgI9p+bl4ttBBYF
-         xEoeDMS7qXCHK0DsbY4QNK3T7ow63ICh1+uzIfmwrq6lcT/NQyJrFNU7BnyRDGwOQbFY
-         XhQoXLhL1xqg0maPTV5f/tze4BwqC+Htm+fzIXSzoNZnX9xcyrXZwhJFdAStwcbrevfO
-         0GvA==
-X-Gm-Message-State: AOJu0Yytk+jJmWEahkHBEJYBHHUKzMU1OCKGLCHRzKcM0GevYbbDusq6
-	FENw3qfuH2kD0ifUW00Cawg=
-X-Google-Smtp-Source: AGHT+IGvmRpX/iwfC9nYPUE2PiH/g2oLeWnC1Hp1YQ2zI7WEQ+GnJDfDFz9WBCOuIt3Mq9T65a4S/w==
-X-Received: by 2002:a05:600c:34c7:b0:3fe:d637:7b25 with SMTP id d7-20020a05600c34c700b003fed6377b25mr1828413wmq.0.1694603009737;
-        Wed, 13 Sep 2023 04:03:29 -0700 (PDT)
-Received: from localhost.localdomain (h-176-10-144-222.NA.cust.bahnhof.se. [176.10.144.222])
-        by smtp.gmail.com with ESMTPSA id d10-20020a5d538a000000b0031c7682607asm15255289wrv.111.2023.09.13.04.03.28
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 13 Sep 2023 04:03:29 -0700 (PDT)
-From: Magnus Karlsson <magnus.karlsson@gmail.com>
-To: magnus.karlsson@intel.com,
-	bjorn@kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	netdev@vger.kernel.org,
-	maciej.fijalkowski@intel.com,
-	bpf@vger.kernel.org,
-	yhs@fb.com,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	song@kernel.org,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@google.com,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	przemyslaw.kitszel@intel.com
-Subject: [PATCH bpf-next v3 10/10] selftests/xsk: display command line options with -h
-Date: Wed, 13 Sep 2023 13:02:32 +0200
-Message-ID: <20230913110248.30597-11-magnus.karlsson@gmail.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20230913110248.30597-1-magnus.karlsson@gmail.com>
-References: <20230913110248.30597-1-magnus.karlsson@gmail.com>
+        d=1e100.net; s=20230601; t=1694603047; x=1695207847;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XWMdnJsx2d8fiBGvmqe7qu7qVNHb4jJy8Zu53A7Ws4A=;
+        b=mxYwBQ+CX1TYPGAUHpNN6HHrg4nmnjEClBx2O+tGCR8hP5QRhYW9M1s9+ZIb/5vO//
+         ylxLqHO5OmG8RdbyvVpwlCGh9hehnoSSfCJb3SzLpuhspJqGjtIZUiiSQOZxaCDz4yLx
+         f0kDxrKpiDxrY67VgYvpCfPm4p9QdW04R+lr38m2ubnDOs+BqN2MbM9k+BTmTJAte7Iu
+         CkfPiDx3kX0ldj0r4OoyWJgLmKfkWAwRFpbkg+tTqonNAbYNKbg11eX6fVC536XI8fas
+         vxWinQ8FJCKyU+YCXX3/HqY1/cBczBTy4xHVO+cFP9IbAXkUK55HgLTfS6LAWqwYf+jr
+         DONw==
+X-Gm-Message-State: AOJu0YylWRqlEfAItmyC+4HaVojkU4UcWK+x3vpgQpVme8if3xUyeopC
+	/7RWBtrWDg1f9qy2p5cAaIE=
+X-Google-Smtp-Source: AGHT+IENQYSCb1bqP3F1jbQeEwYGGwYsGuq575to5BfuhYNjZDfJ9D1qKsoXbdaMDic7mOraJMeKMA==
+X-Received: by 2002:a17:906:18a2:b0:99d:f0e8:5623 with SMTP id c2-20020a17090618a200b0099df0e85623mr1572105ejf.54.1694603047218;
+        Wed, 13 Sep 2023 04:04:07 -0700 (PDT)
+Received: from skbuf ([188.26.184.93])
+        by smtp.gmail.com with ESMTPSA id qb1-20020a1709077e8100b009ad89697c86sm2352992ejc.144.2023.09.13.04.04.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Sep 2023 04:04:06 -0700 (PDT)
+Date: Wed, 13 Sep 2023 14:04:04 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH 2/4] dt-bindings: net: dsa: document internal MDIO bus
+Message-ID: <20230913110404.co7earmnbzf6hhoe@skbuf>
+References: <0cee0928-74c9-4048-8cd8-70bfbfafd9b2@arinc9.com>
+ <20230827121235.zog4c3ehu2cyd3jy@skbuf>
+ <676d1a2b-6ffa-4aff-8bed-a749c373f5b3@arinc9.com>
+ <87325ce9-595a-4dda-a6a1-b5927d25719b@arinc9.com>
+ <20230911225126.rk23g3u3bzo3agby@skbuf>
+ <036c0763-f1b2-49ff-bc82-1ff16eec27ab@arinc9.com>
+ <20230912193450.h5s6miubag46z623@skbuf>
+ <6cec079e-991e-4222-a76d-d6156de0daca@arinc9.com>
+ <20230913074231.5azwxqjuv2wp5nik@skbuf>
+ <89c9b84c-574c-4071-9524-9207597a3f0a@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <89c9b84c-574c-4071-9524-9207597a3f0a@arinc9.com>
 
-From: Magnus Karlsson <magnus.karlsson@intel.com>
+On Wed, Sep 13, 2023 at 01:59:17PM +0300, Arınç ÜNAL wrote:
+> If I understand correctly, these phylink rules are for switch ports. The
+> fixed-link, phy-handle, and managed properties are described on
+> ethernet-controller.yaml so I thought it would make sense to define the
+> rules there and refer to them where they're needed.
+> 
+> Example:
+> 
+> diff --git a/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml b/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml
+> index 480120469953..7279ab31aea7 100644
+> --- a/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml
+> +++ b/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml
+> @@ -65,16 +65,8 @@ if:
+>      - required: [ ethernet ]
+>      - required: [ link ]
+>  then:
+> -  allOf:
+> -    - required:
+> -        - phy-mode
+> -    - oneOf:
+> -        - required:
+> -            - fixed-link
+> -        - required:
+> -            - phy-handle
+> -        - required:
+> -            - managed
+> +  $ref: /schemas/net/ethernet-controller.yaml#/$defs/phylink-switch
+> +  required: [ phy-mode ]
+>  additionalProperties: true
+> diff --git a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
+> index e532c6b795f4..742aaf1a5ef2 100644
+> --- a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
+> +++ b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
+> @@ -179,6 +179,15 @@ required:
+>    - compatible
+>    - reg
+> +if:
+> +  required: [ mdio ]
+> +then:
+> +  patternProperties:
+> +    "^(ethernet-)?ports$":
+> +      patternProperties:
+> +        "^(ethernet-)?port@[0-9]+$":
+> +          $ref: /schemas/net/ethernet-controller.yaml#/$defs/phylink-switch
+> +
+>  $defs:
+>    mt7530-dsa-port:
+>      patternProperties:
+> diff --git a/Documentation/devicetree/bindings/net/ethernet-controller.yaml b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+> index 9f6a5ccbcefe..d7256f33d946 100644
+> --- a/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+> +++ b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+> @@ -284,6 +284,21 @@ allOf:
+>              controllers that have configurable TX internal delays. If this
+>              property is present then the MAC applies the TX delay.
+> +$defs:
+> +  phylink-switch:
+> +    description: phylink bindings for switch ports
+> +    allOf:
+> +      - anyOf:
+> +          - required: [ fixed-link ]
+> +          - required: [ phy-handle ]
+> +          - required: [ managed ]
+> +
+> +      - if:
+> +          required: [ fixed-link ]
+> +        then:
+> +          not:
+> +            required: [ managed ]
+> +
+>  additionalProperties: true
+>  ...
+> 
+> Arınç
 
-Add the -h option to display all available command line options
-available for test_xsk.sh and xskxceiver.
-
-Signed-off-by: Magnus Karlsson <magnus.karlsson@intel.com>
----
- tools/testing/selftests/bpf/test_xsk.sh  | 11 ++++++++++-
- tools/testing/selftests/bpf/xskxceiver.c |  5 ++++-
- 2 files changed, 14 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/bpf/test_xsk.sh b/tools/testing/selftests/bpf/test_xsk.sh
-index 296006ea6e9c..65aafe0003db 100755
---- a/tools/testing/selftests/bpf/test_xsk.sh
-+++ b/tools/testing/selftests/bpf/test_xsk.sh
-@@ -82,12 +82,15 @@
- #
- # Run a specific test from the test suite
- #   sudo ./test_xsk.sh -t TEST_NAME
-+#
-+# Display the available command line options
-+#   ./test_xsk.sh -h
- 
- . xsk_prereqs.sh
- 
- ETH=""
- 
--while getopts "vi:dm:lt:" flag
-+while getopts "vi:dm:lt:h" flag
- do
- 	case "${flag}" in
- 		v) verbose=1;;
-@@ -96,6 +99,7 @@ do
- 		m) MODE=${OPTARG};;
- 		l) list=1;;
- 		t) TEST=${OPTARG};;
-+		h) help=1;;
- 	esac
- done
- 
-@@ -148,6 +152,11 @@ if [[ $list -eq 1 ]]; then
-         exit
- fi
- 
-+if [[ $help -eq 1 ]]; then
-+	./${XSKOBJ}
-+        exit
-+fi
-+
- if [ ! -z $ETH ]; then
- 	VETH0=${ETH}
- 	VETH1=${ETH}
-diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testing/selftests/bpf/xskxceiver.c
-index 9883e610ff63..86eb70068325 100644
---- a/tools/testing/selftests/bpf/xskxceiver.c
-+++ b/tools/testing/selftests/bpf/xskxceiver.c
-@@ -318,6 +318,7 @@ static struct option long_options[] = {
- 	{"mode", required_argument, 0, 'm'},
- 	{"list", no_argument, 0, 'l'},
- 	{"test", required_argument, 0, 't'},
-+	{"help", no_argument, 0, 'h'},
- 	{0, 0, 0, 0}
- };
- 
-@@ -331,7 +332,8 @@ static void print_usage(char **argv)
- 		"  -b, --busy-poll      Enable busy poll\n"
- 		"  -m, --mode           Run only mode skb, drv, or zc\n"
- 		"  -l, --list           List all available tests\n"
--		"  -t, --test           Run a specific test. Enter number from -l option.\n";
-+		"  -t, --test           Run a specific test. Enter number from -l option.\n"
-+		"  -h, --help           Display this help and exit\n";
- 
- 	ksft_print_msg(str, basename(argv[0]));
- 	ksft_exit_xfail();
-@@ -406,6 +408,7 @@ static void parse_command_line(struct ifobject *ifobj_tx, struct ifobject *ifobj
- 			if (errno)
- 				print_usage(argv);
- 			break;
-+		case 'h':
- 		default:
- 			print_usage(argv);
- 		}
--- 
-2.42.0
-
+I don't think they're for switch ports only. Any driver which uses
+phylink_fwnode_phy_connect() or its derivatives gets subject to the same
+bindings. But putting the sub-schema in ethernet-controller.yaml makes
+sense, just maybe not naming it "phylink-switch".
 
