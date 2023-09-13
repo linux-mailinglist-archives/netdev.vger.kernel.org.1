@@ -1,82 +1,122 @@
-Return-Path: <netdev+bounces-33540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D98FA79E6C6
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 13:30:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A81579E6E9
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 13:35:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA8891C20F7C
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 11:30:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5380D28256B
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 11:35:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41EDA1EA7B;
-	Wed, 13 Sep 2023 11:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BA541EA66;
+	Wed, 13 Sep 2023 11:35:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C31B123A0
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 11:30:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 62B12C433C9;
-	Wed, 13 Sep 2023 11:30:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694604626;
-	bh=vGLdx5+miv3NaNp5Z9q4gW7vd3yb9KGxDb7lNKkksUo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TSl5dN2LZeaw5ofwWJ8612g0A1bu/lm98JFYKLW+ef7W3GyAYahUs4hN8ydaxgMky
-	 wjpeb9ctJpU3GFRZUO2Q+DAG52DWqfJgMjlmoExdQPXi7dvu0YsnI7qHIMkh2R5x1n
-	 DQRI2OGtAPiAs2g6mopa3AHerx0cDxmUHoNJMfbX+NnLNXI+hhfZS8mrFOkyajHsDr
-	 x6ePXDAbbprYhZ2Z6eK5x68u9FBZmj5iHGh7kO4LctNa9HOqV/NdPtO5ICvUBS7KsW
-	 5IY3Ik4n62UjRLO0ZDqQ9q8I6QcLEQSSPgIjDlEBItjCb6dLY2m4v8jnnIUVC/5VIW
-	 fgWVAOdmZX0fg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 41202E1C281;
-	Wed, 13 Sep 2023 11:30:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F1FB1E519
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 11:35:32 +0000 (UTC)
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C44621FC0;
+	Wed, 13 Sep 2023 04:35:31 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 235F224000E;
+	Wed, 13 Sep 2023 11:35:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1694604930;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WbMwXGk6o+lbYJAjbVb82tnFj2aYuAgarBbBqqRuBPc=;
+	b=Z2GShICU3ihvCutupOM5tgMDhIm2mE3jZBu65j1kClIXb2kYp4zA/1kLyRZzGnS+y8zwpF
+	i86FO0SJS5yz1RmHw7lK4RftC4V8Zq87sTEDaeW6ujIFLUgkEcgSneHohDugmA/6dXn9M7
+	l6ri9KtfyFJDfNZa5xmZdwMi4UJUcKqCk4itn8lqSf4uXjh/hLbvGajBUtR+3uqm8KgPyE
+	P0CTMnaxoU9OeECX6sFWp7QiheE76FXBve+lU0I1gknHwXcQtOK6Ujz0RJT34oRYMgMcUy
+	ootEQlkXZFAYcTtHnxCsV1YuntvZx6uKdcTZYTyUsvrhINyUHJiJQGJmuJjvIw==
+Message-ID: <137fd54d-7d2d-4d0b-a50b-cca69875a814@arinc9.com>
+Date: Wed, 13 Sep 2023 14:35:11 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/4] dt-bindings: net: dsa: document internal MDIO bus
+Content-Language: en-US
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Woojung Huh <woojung.huh@microchip.com>,
+ UNGLinuxDriver@microchip.com, Linus Walleij <linus.walleij@linaro.org>,
+ =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+ Daniel Golle <daniel@makrotopia.org>, Landen Chao
+ <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Matthias Brugger
+ <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+References: <0cee0928-74c9-4048-8cd8-70bfbfafd9b2@arinc9.com>
+ <20230827121235.zog4c3ehu2cyd3jy@skbuf>
+ <676d1a2b-6ffa-4aff-8bed-a749c373f5b3@arinc9.com>
+ <87325ce9-595a-4dda-a6a1-b5927d25719b@arinc9.com>
+ <20230911225126.rk23g3u3bzo3agby@skbuf>
+ <036c0763-f1b2-49ff-bc82-1ff16eec27ab@arinc9.com>
+ <20230912193450.h5s6miubag46z623@skbuf>
+ <6cec079e-991e-4222-a76d-d6156de0daca@arinc9.com>
+ <20230913074231.5azwxqjuv2wp5nik@skbuf>
+ <89c9b84c-574c-4071-9524-9207597a3f0a@arinc9.com>
+ <20230913110404.co7earmnbzf6hhoe@skbuf>
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <20230913110404.co7earmnbzf6hhoe@skbuf>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] ixgbe: fix timestamp configuration code
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169460462626.4298.16639828880343505002.git-patchwork-notify@kernel.org>
-Date: Wed, 13 Sep 2023 11:30:26 +0000
-References: <20230911202814.147456-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20230911202814.147456-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, vadim.fedorenko@linux.dev,
- richardcochran@gmail.com, horms@kernel.org, himasekharx.reddy.pucha@intel.com
+X-GND-Sasl: arinc.unal@arinc9.com
 
-Hello:
+On 13.09.2023 14:04, Vladimir Oltean wrote:
+> I don't think they're for switch ports only. Any driver which uses
+> phylink_fwnode_phy_connect() or its derivatives gets subject to the same
+> bindings. But putting the sub-schema in ethernet-controller.yaml makes
+> sense, just maybe not naming it "phylink-switch".
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+Got it. Should we disallow managed altogether when fixed-link is also
+defined, or just with in-band-status value?
 
-On Mon, 11 Sep 2023 13:28:14 -0700 you wrote:
-> From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-> 
-> The commit in fixes introduced flags to control the status of hardware
-> configuration while processing packets. At the same time another structure
-> is used to provide configuration of timestamper to user-space applications.
-> The way it was coded makes this structures go out of sync easily. The
-> repro is easy for 82599 chips:
-> 
-> [...]
+Currently:
 
-Here is the summary with links:
-  - [net] ixgbe: fix timestamp configuration code
-    https://git.kernel.org/netdev/net/c/3c44191dd76c
+diff --git a/Documentation/devicetree/bindings/net/ethernet-controller.yaml b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+index 9f6a5ccbcefe..3b5946a4be34 100644
+--- a/Documentation/devicetree/bindings/net/ethernet-controller.yaml
++++ b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+@@ -284,6 +284,21 @@ allOf:
+              controllers that have configurable TX internal delays. If this
+              property is present then the MAC applies the TX delay.
+  
++$defs:
++  phylink:
++    description: phylink bindings for ethernet controllers
++    allOf:
++      - anyOf:
++          - required: [ fixed-link ]
++          - required: [ phy-handle ]
++          - required: [ managed ]
++
++      - if:
++          required: [ fixed-link ]
++        then:
++          properties:
++            managed: false
++
+  additionalProperties: true
+  
+  ...
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Arınç
 
