@@ -1,75 +1,70 @@
-Return-Path: <netdev+bounces-33491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53B7A79E301
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 11:10:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3D1D79E33A
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 11:12:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 539181C20D3A
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 09:10:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 981211C20DB6
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 09:12:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 508761DDC8;
-	Wed, 13 Sep 2023 09:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17E981DDF1;
+	Wed, 13 Sep 2023 09:10:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C5721DA39
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 09:10:28 +0000 (UTC)
-Received: from repost01.tmes.trendmicro.eu (repost01.tmes.trendmicro.eu [18.185.115.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D00361999
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 02:10:27 -0700 (PDT)
-Received: from 104.47.11.170_.trendmicro.com (unknown [172.21.162.147])
-	by repost01.tmes.trendmicro.eu (Postfix) with SMTP id C3A0710000959;
-	Wed, 13 Sep 2023 09:10:25 +0000 (UTC)
-X-TM-MAIL-RECEIVED-TIME: 1694596224.727000
-X-TM-MAIL-UUID: 25da8eba-f2c2-44c1-bd24-92b6ff1f724f
-Received: from DEU01-FR2-obe.outbound.protection.outlook.com (unknown [104.47.11.170])
-	by repre01.tmes.trendmicro.eu (Trend Micro Email Security) with ESMTPS id B1A361000156A;
-	Wed, 13 Sep 2023 09:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 053841DDEC
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 09:10:44 +0000 (UTC)
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2051.outbound.protection.outlook.com [40.107.93.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74A971BD6
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 02:10:44 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=irF/ziGz7tDK1g1d+e8S3aqTEOFV5OVpaMwwpD0RBd3bxsdVtyymOfnRgE7OUjEeX0K5zm8wS073IbMly6uwiyu51flZZWZZxv9kj/iHVi0rupy9lL6ynCIywhmoasoVml7ReJBGT0en4e3XfZKVf2SquN525vs3jo2Moy+Sdbr525ddbSLjoqQUgdMnWUIp6cc5+tmdDMMp8tz8qRulb5PmWYcutYsQD57Au8jfTz93HpORf179XxPDYaNlzBlHXHXWqVUZRwLOjTlZz3feuCjVWr0JKWNYrde/FJGgUbiwMz7dRAD3qWRBUeReOAr7GHOCCcvSTEBLPsHp9fDw3A==
+ b=NhLDfrJs5obWMlVMxEijOXnSaW6qx8awF5v2/6ShnFI2ruMcuwsFb6JgecBp8P3nf/AiCQloSEdSdJee5oS9fsWuA6ik9PYYXRU6aXNQ+TZ/ChWZzUDge4cWLJyNWb2cswSVV82/6lDYeorQXSfOIqKSSo1gc9XoQbAahDNBEOpeyMAyAlx54B8uv28DQ7vSJoPNGQ1TpKBFfrwNp8xerF1OZF9hE4I5eqX73CH6km7dNo2q1JLpWHA9Y+ehGppYhGwJg4HIXf1ARm2hlGIfGscrxkV756dOxAsiV5ZcTsQ3I+jMCZkYCbVvS0uODKdOgsBoqCpj5BvLkrsg9GRIwA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jhpJlfcXFQ/f1E0AHSa7bkPqGijeEEFbBd9RMVcSLYc=;
- b=UVg6zYMwj1Hd3eHovT/Jz0ofXq+Oy93HwaKTUz0sXPvbU3zT2O9bSslHgAZPvLPvGDNQkFHljuTp67rjnFuPbT1U/XJ6wrgO/evSI0VXLKCa1kkPuMmoJ9oIhwTgk1LimDqa5/veqGAX7SV5rB7YJOEzY2dbh+rQz6FXAsyBXeChubXC1i5gVwjhwfIcU7zXV8zPZlx0CWTUtkN+pnur7/+kPzFRL3MfqczPwWEVHzj3QgbO0Jc6VBpQ9O2pVN6eLcXmMeq2qV1CqW5aPN/vd3nrl80LTAa9niEAV0PyO7G8LgpEcfuF+HTlFbMIR9svyLnzdRHVPFQt2h5c1AjllQ==
+ bh=4dh122PgU/2sIvht2qIiTGX6/bFqvUOQVuK4+eKeeys=;
+ b=Itd6I/t5xboCIELNXZ0AQuUxEl5NXus3HdeFEGAE4SaXJZ7jMPwOM8LTnSnTKwKq5o9nMkJbcdfqVROHTVKNQWktw8c60WeK/G2ydKLbE5+MI+WqPFXKwEYKo1cylfcyQ0Nb7fRVA/OodOkPYF06w6GnmsKtwTVikmhix0gTmVOln6/+QLjaCFIjQKNIboyL61+tK/TasiDyVtzBl360Naj6PSO08Q9NraVB9bkOrMbVnqfeF1mBfn/UI1mzDs77ncbQAcxqOamI9DGRQPwWtYvB1fBLKitn0ZEju+svmNnbLk+fHQGag70nB0kr/EuG1Nx3InAfC90/sm3ZofNtjQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=opensynergy.com; dmarc=pass action=none
- header.from=opensynergy.com; dkim=pass header.d=opensynergy.com; arc=none
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4dh122PgU/2sIvht2qIiTGX6/bFqvUOQVuK4+eKeeys=;
+ b=gGKkxjcIe39rdQJWjBwT5/j+aYVi/ZaE9nzMequuuulK8wG2wiLk/COR8HX6Ey9L6HbOm3o8LIp+VQYI4v6CLOtEzNNCpIq9Zk2TTdL8ATcW4eeASsT0PeyQs/lskA4YR+1zwEKBGYRaN3KP12YDHVW0mTgq/QYiiBsxLZpWcMChFzV3ClALAVBRiv6TyIXLQ+rOhFC5MCACM+P3yIxNUwUiP/Hj+MYnXcTiMjBUa9edjYrmrkfZ+iO6PyI4r8OBpp1wDNXaHZbJYsHOnfnmpIqNBu+MI1m2NyxoSxwzScPL7ocD6E6bzmNqmnqDwcyArNZHhhA3YfhST76vk7aG3w==
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=opensynergy.com;
-Message-ID: <8f669a0b-6d49-4a77-cf2e-692afc2a38e2@opensynergy.com>
-Date: Wed, 13 Sep 2023 11:10:21 +0200
-From: Peter Hilber <peter.hilber@opensynergy.com>
-To: John Stultz <jstultz@google.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Richard Cochran <richardcochran@gmail.com>, Stephen Boyd <sboyd@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>, Vitaly Kuznetsov
- <vkuznets@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
- "x86@kernel.org" <x86@kernel.org>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, Sean Christopherson <seanjc@google.com>
-References: <20230818011256.211078-1-peter.hilber@opensynergy.com>
- <CANDhNCo_Z2_tnuCyvu-j=eqOkvDQ+_n2O-=JKpf2Ndqx1m5GqQ@mail.gmail.com>
-Content-Language: en-US
-Subject: Re: [RFC PATCH 0/4] treewide: Use clocksource id for
- get_device_system_crosststamp()
-In-Reply-To: <CANDhNCo_Z2_tnuCyvu-j=eqOkvDQ+_n2O-=JKpf2Ndqx1m5GqQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: BE1P281CA0268.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:86::13) To BEZP281MB3267.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:77::8)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SJ1PR12MB6075.namprd12.prod.outlook.com (2603:10b6:a03:45e::8)
+ by DM4PR12MB6009.namprd12.prod.outlook.com (2603:10b6:8:69::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.31; Wed, 13 Sep
+ 2023 09:10:42 +0000
+Received: from SJ1PR12MB6075.namprd12.prod.outlook.com
+ ([fe80::968e:999a:9134:766b]) by SJ1PR12MB6075.namprd12.prod.outlook.com
+ ([fe80::968e:999a:9134:766b%7]) with mapi id 15.20.6745.035; Wed, 13 Sep 2023
+ 09:10:42 +0000
+From: Aurelien Aptel <aaptel@nvidia.com>
+To: Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
+ netdev@vger.kernel.org, hch@lst.de, kbusch@kernel.org, axboe@fb.com,
+ chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org
+Cc: Boris Pismenny <borisp@nvidia.com>, aurelien.aptel@gmail.com,
+ smalin@nvidia.com, malin1024@gmail.com, ogerlitz@nvidia.com,
+ yorayz@nvidia.com, galshalom@nvidia.com, mgurtovoy@nvidia.com
+Subject: Re: [PATCH v15 05/20] nvme-tcp: Add DDP offload control path
+In-Reply-To: <db2cbdc2-2a6d-a632-3584-6aeafc5738e2@grimberg.me>
+References: <20230912095949.5474-1-aaptel@nvidia.com>
+ <20230912095949.5474-6-aaptel@nvidia.com>
+ <db2cbdc2-2a6d-a632-3584-6aeafc5738e2@grimberg.me>
+Date: Wed, 13 Sep 2023 12:10:36 +0300
+Message-ID: <253edj2h20j.fsf@mtr-vdi-124.i-did-not-set--mail-host-address--so-tickle-me>
+Content-Type: text/plain
+X-ClientProxiedBy: AM0PR02CA0221.eurprd02.prod.outlook.com
+ (2603:10a6:20b:28f::28) To SJ1PR12MB6075.namprd12.prod.outlook.com
+ (2603:10b6:a03:45e::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,193 +72,112 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BEZP281MB3267:EE_|FR0P281MB2174:EE_
-X-MS-Office365-Filtering-Correlation-Id: fc5b98c8-470b-4caf-9dae-08dbb4394312
+X-MS-TrafficTypeDiagnostic: SJ1PR12MB6075:EE_|DM4PR12MB6009:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7138eb00-7303-43d1-2ae3-08dbb4394e36
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	JvCoaOMkrNbOvx5KDJqBGB8UxoeoQ98wA11IVHVpr5zuC0NTK8HcvTWKDG5uf/L9X6eQHJh7D2VfVKxfuM08b46CYCpomZoYfGG3t6+e6ok8S/OGOmB9G+orGNNmKBv41waPid54yEMTz4ZpjADpp0aPn3U2IETSrrS6kutNqS5P1Wjhn5HiPByNVVB24lrtxWpPyZoPm+SUCb2yclOZJeid/Sxj8KF2B3ELgHQ9l90Mw3pJAV8GesaG2yYkAIvY2uvojnCqtHO6R/hIl8yWvRgzy+rQ4AfaWQQpJr3GkqZ9S4/SGp7Duaje99UUHwEDsfqRmIrpvoLunr/TGrmYyI610k9g0m83px07D9sx3SxMit99Tm3eGEQmkl1Ma7ckYOL6hVyEvTLNRRtN+IIJ2g0rzWFc40pMuj2kq27W8xEwgj+mwqOzk31qVp5cgYYPSkxAxTcJ4wVB3gTynmpouoWFYyvcG8V9NTRV4xcxUqWUDqrY2u7FDGc6kbNiy8mfNSMUwTWVyDphnec7wnpKa1N68PNpBJEffR2w8DkHqdU73+6OZNl7GbEbYo5LICfU8oZleZIcoExZ9CqABdbrWX1pbbhLVUTnmW6rhujLDeydyguhG+o0Sh1nnKRQrJpV
+	OGvgPSsKzpWF0R1aLSlSWoSShvWDlprEcH/8uY48lhxABYqEODKPeUsoZgeTmkmRvRAuOfzV8E04E7awqyVYVDm5bt1fJIHPpTlAbNeSP/nkmCus5ICNOrani5n2ymbpzxjmHPw2rnaoidDbGOOm5/EZUeFbOmYxWFKPNQGAWxDfJyDGj7zTjaoAfpbSwf8DyMSvWbsovi/rdUa9ghurZWKK6DzDNQNfAvm9n0kl46Qn7BTrpQOILa5hteS5fXHbfypFXES9TxGbSblqUvgashz+T4sF2+0scSyG3Ux1la23nmzvJatbz1KNA944S3hD4m9XtsC+MuL7yVbDib9SaN03WQ+KBAJzLsprd9pOZyYzvt7cOnBGo1BVCDzhFrkBkcdu39j39Gp4phBycGc6NeOsqobjtRq+JCJbt3JxDyJwnsewuEi5AokOK8Ss20mXDnnHMK2zxEL8eJRr0e3jEpoWW9xiyE1JnoL4v7KTEtggLoaPNbn/f/w07zLDCgUN/YyEg9kSgZ6czuavqhT09o3v6CT0fa02Oy2plCPcw9x0zz15ZIUBFeeL/Xi6Ek9F
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BEZP281MB3267.DEUP281.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(39840400004)(366004)(396003)(346002)(136003)(376002)(186009)(1800799009)(451199024)(41300700001)(5660300002)(4326008)(44832011)(54906003)(42186006)(31686004)(8676002)(8936002)(66476007)(66556008)(66946007)(6916009)(316002)(2906002)(86362001)(31696002)(7416002)(53546011)(478600001)(966005)(2616005)(36756003)(83380400001)(38100700002);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR12MB6075.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(186009)(451199024)(1800799009)(66899024)(38100700002)(86362001)(498600001)(2906002)(6666004)(7416002)(6486002)(6506007)(107886003)(9686003)(8936002)(4326008)(8676002)(5660300002)(6512007)(66556008)(66476007)(83380400001)(66946007)(26005);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?WGEzYy9jaTZrZEp2WFBvN0hWR3YwSjByeXlKbCtzY2IwN0l6eGpsL2JFaG9X?=
- =?utf-8?B?NHVDV1lwMlcyT2Z1Sm5KVTcveUtSTXhwUXJ4WEtUYW9xYlc0a2NxNGdMZWFK?=
- =?utf-8?B?ZEdaWkJCUjBCdzhhaXJUaVdBS3VvNk10M0x1Vjl0WncvTURDSVBpVXI5L1dw?=
- =?utf-8?B?TG9xWGswdXBRU2hkY3N3ZmM4cHlpS3lvRDdjMDU1N0JDTGtTL2g3UkxiK2FL?=
- =?utf-8?B?V2l3eUxYaGJ5ODFIbzdaaG5BbVkyQW9jcVFZaXRTM3V6RlJjbTF1NnBpTlNj?=
- =?utf-8?B?R21iTFZQa0NzWGtIOEtkN3kzcE13aktycTU0emN1WjVZV3hmMCtWUHlaYkVq?=
- =?utf-8?B?R2Q0a3lWdkRya21IUlppN2VLZVM4QkpmeEVFT0Q4UjFJRGgralg2NHpKbldS?=
- =?utf-8?B?d1d0ZlU0OEE5WE03Mk5zeFB2UXQ3dy9ZM3lxZytZcUpRVTVqdEJrWG0wbWdV?=
- =?utf-8?B?ZWhGR0hId2RraHdlanROcU1uT0ZGVnFVZWI5aXlISGJPLzVxdmZtVnVNQUV3?=
- =?utf-8?B?WnB0NEVkQXhwd0tzUDV2UE5YS2NoNis1ajR6SVkxbjZSb2VqODFqbEJaVzFj?=
- =?utf-8?B?eko3cExjc2Y3RjZJNXNHZmVscDcvOGxBSjIzNERDNFkxbmdnMTIrZzBMSUU1?=
- =?utf-8?B?UjUwVzBXNHZpc21wVXg5ZWxoWmswMjhSWlJvSExsbHBMdjZPWndzMnBIMitB?=
- =?utf-8?B?OXN2YUlNZjBTd0ErUFFVZzlTS2NPZzJ5UnJMaXhCdlVhdG1PUjYyYmFJcG1E?=
- =?utf-8?B?SVBoWHNCTll5VEJqTlJ4Um42aDM0Q01RaWJhS1gyK3pDSCtxeHJlN3hGZlRQ?=
- =?utf-8?B?ekdvS3JVcDYveXlLSElSM2VWZzQ2VkV6Ym83T21iZXZtY2RxK2dsUllncWhY?=
- =?utf-8?B?cnJqYWE0eGRMS2FkSnR6OW85UHBtOXVpMUlkNXE0QTFXcHhWTFZkYW1ONS9z?=
- =?utf-8?B?WEVHUzRXWVllSWpDVVM0ZzBpMXMxUTBmNTNwQTRUUDNFU3FhMnVLS255N0du?=
- =?utf-8?B?TmhnMzhiU2NDOUI4SHExamthL0xmMXFEaE5HQi9tbktWR3duSnhDUkYvWVRT?=
- =?utf-8?B?WlVHNjVEaDlWYVFtV1A2UnkrZUJSYzIrRERubE9kS3pNSFZwM0YwclVRamxo?=
- =?utf-8?B?enBiTnVHaXl4VGxNOERHOFZZalhSWXUwZ2xoM1dYSDlSQUMwY21KV2xuVzRu?=
- =?utf-8?B?Y3dlbHZhakV2WStkUG9rbkF1ZVlKSlJCV2s2RHRJNzUzMXUyYmNEUDQ0a0lz?=
- =?utf-8?B?Y01rVzliSFBVbW96cUI4MjdIZmRpdmZ0U09VWE1TdVdFMkhqK0NCeXVveWxZ?=
- =?utf-8?B?UkxpMUplK3J2WDlJdXFGbVdTejMxLzV2czBGSjdQRmFVRkUrc0VLd3Nhb0VF?=
- =?utf-8?B?K0Y5U1R4OWNxdDA2MDR4TDI0VGpacG1JcTNydEc4aHIxcXJ0YlFWUnFwRXRx?=
- =?utf-8?B?WXdzSk1JNzJTQVEyUjNiUG9XYzJzclBKQXRoam1mcUNJY0M5QUZEWXlxM3M5?=
- =?utf-8?B?b0kyNGpSTUYxc1ZqQkMyOWdnSGsyaHNBS1dzUGFYNmNORmcwb29sQzZEY09w?=
- =?utf-8?B?Nmk4MUNYN0dOUkN6VW1uMkhSN1RtcWk1Z25wT1EzQ05yb294N1o1QUpJaEVJ?=
- =?utf-8?B?bG51ZUV1ZkZmUzQ3eGJucEhhVVRoc3VVanlSOFRCY1JucUFYUXRPQ3l2QTMr?=
- =?utf-8?B?cDFDV3k4WGlBdGpmbENNZG5SczNrOFdCT3U3TVlEZFQzbHpadzRMekFVcHcr?=
- =?utf-8?B?SVdubWVMT3B1SURBYmJZYUU2eFVvcytpN1p2cU1MUC9vUm9LdTJod3lmN3JO?=
- =?utf-8?B?dzd5b1RlemZPSmhoSnh4Uk5mbnNxVlB0VEM4bEdDQ3Z0bHNCRStWRWNuWXc1?=
- =?utf-8?B?QUhQZVNYZjhUd0xZWmMwTVIvZ1hFL3doL0RVRWV3ZDlLSml1bFRVdXZjaW5E?=
- =?utf-8?B?a2U2c1htZCtuZmxsVDNKZURIbmRzNUdYa3pUdnRRNzlnL0k0TWN0M3RKV1pJ?=
- =?utf-8?B?eXBxVUxCL2o2SmZEQzVhR0VLSS9PVTU2ZkllZ0xaZGd3dW96b0wyZVFuZXNu?=
- =?utf-8?B?L3BYZ3Y5d1Q5OFIwQ0hQc0JuZ0JFZWFjdWlLNjA5c2xiNGlBTVp2MlhNajgz?=
- =?utf-8?B?T0NMVlYrTFdJYWFXR2NiaEFKVTFjYnR0UE14YTJHTEtBNzQzZytsNTFTOWdq?=
- =?utf-8?Q?ncP9ulGjoGZcko6emRRJK+DcvEURqZNQ1t2T9QD+QmwE?=
-X-OriginatorOrg: opensynergy.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fc5b98c8-470b-4caf-9dae-08dbb4394312
-X-MS-Exchange-CrossTenant-AuthSource: BEZP281MB3267.DEUP281.PROD.OUTLOOK.COM
+	=?us-ascii?Q?w2vYFlw7yfvJPhS02vPWhUPQ4HEToy8HTnr6WyxGNPy7yY6XI0JXOO0cfZov?=
+ =?us-ascii?Q?iEysD+NpTPflmamIVvVrvYvqFW3yeEkNAiSCW8r02z0QcEw/zaKTTaxJsW1U?=
+ =?us-ascii?Q?vaQ03J2P1Y09Gu1h+Al/g710UhANABYv+NITYd/Fr8tBfKC5NtcmIuBmjNGm?=
+ =?us-ascii?Q?DdBNqdpwBPT1BcVa+QSZ2fdjO/x8/XAj91SMuDCXDqwNtu6uQZ412GgjYjH4?=
+ =?us-ascii?Q?UFXkQnSU1R74XifRyaHaf6/1F5rRpQLgIZYZXnUovWm8CXd6FL8z2loypKND?=
+ =?us-ascii?Q?lMuLlE6jx6uJ7BEYxokfqHiKLLkkNSQen/h8xd2Y5g4s3U1G/85P1rkWDV93?=
+ =?us-ascii?Q?FvpIGKTRlwg2+2Zj+QXbzXefvhkXCGlc3oBexRbYWynIR2Dx3Bqs/WlF9xGY?=
+ =?us-ascii?Q?0cvBqZ06DSJGY2QNwpPmRtR8Iu04XkQUCcgs3DpicYfQDZZ3Nzc9uYirluTe?=
+ =?us-ascii?Q?Fbr3acvIWIncC9IFcR3mL29nCPfaq9/3fhT7qzFQp16Klc1y+enQ3T3n9ZL1?=
+ =?us-ascii?Q?R5c0P2/XpZB+yBRKmBZr+4z0mcXO/u5Pr46odZHD0xvj+VptPpDqY+2xW6sR?=
+ =?us-ascii?Q?mRNXsVkLdaTchNbnSgWsNFmC/lGh635vPD6/6GZoWmKtkuoVEITova30HY1z?=
+ =?us-ascii?Q?9sHKWkCifPi3WJgjS6N9JIIgLFiEvV/XTpcZlNOIkrD2A3ATAycV9WyB30Jk?=
+ =?us-ascii?Q?dJ5WETenPkOUYeOAI3u3YpBGLG23Cle+7izDICxFIg9VvTtof1oiTrLgDU5c?=
+ =?us-ascii?Q?2eO6h6PxELDf0AtgPznmpwBASy40NcfkUWgLcIBQ5KKaN5Cr7eDMUNiVcs8C?=
+ =?us-ascii?Q?OthkTmmCy9gALDJkRRJ7iaM/OHr9Orlkvrb1Z9VDku0t48lXqXuGLsyoSS47?=
+ =?us-ascii?Q?hF/btFqMlBBaeClfaQ60RC+ntK09vjnpPkebSc1axBb6HBbfjrV03xwhXKx9?=
+ =?us-ascii?Q?886BE2CxnMXnURQ37da/xfM96T/o+S9EJYgxxXV9pZTaVpSSK5Nc7bJEQr6V?=
+ =?us-ascii?Q?P1E9o135IqDMysohCe6o6x3L/r21y8wEFG+cJ2shusCS3sa1TrcoSTH/ouo2?=
+ =?us-ascii?Q?GAwVhAaxmWg96oxvgfgqW/4Iu0RxKVr/xWix8VdyytQHJV07pmccgPmNF1C4?=
+ =?us-ascii?Q?a8TnWrGoiXz721DlRdFIFY7E2iZ6pQUwebN+5my95zRv6JES7VltLvxhvOcF?=
+ =?us-ascii?Q?/OP9k+0TgacOrunNtBGWoWdWrPIdmEouhHQ88pdL71L3L8ZhpHd0pMMzyo1h?=
+ =?us-ascii?Q?qkkruTt0dchCy6Fs67Kg5Oeo/YBXImM4x8+4zDNiKETu/rkkhIJuvqeUUVK1?=
+ =?us-ascii?Q?VOUpokUvBtSDkzsVAPsU2VF679kjVs6WPc9E3fcPRvXvyix8ZgxtexgCXk2x?=
+ =?us-ascii?Q?ls4fzgN9pd0uRtrPPqCnCw508fLZHcwKe6vpOK82HXURPaIjGgSnaBeA3Yay?=
+ =?us-ascii?Q?/X0vrMU1s6XgAHp7LRgnj2cHhPp+m+loxcgtF2fyGMqEtskPbC06FPDN1niI?=
+ =?us-ascii?Q?s766l9qNf0y2wbsANRZxiBYne3dAqu4YT6J7yODW45PfTM3mwoYBw6EyqZDs?=
+ =?us-ascii?Q?d8q/pAcyK9Od4WmA8WoCbgLR32yrOR+ySb3yVjF0?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7138eb00-7303-43d1-2ae3-08dbb4394e36
+X-MS-Exchange-CrossTenant-AuthSource: SJ1PR12MB6075.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Sep 2023 09:10:23.6582
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Sep 2023 09:10:42.2856
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 800fae25-9b1b-4edc-993d-c939c4e84a64
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: l5myMFxVP9bXgdGkioG38GcEJ0L2Q0OyvLlmrmQJYUkq1R0iSbGylUgdewlZue0ay6C1v4VFCq/lzo+h5/XvqA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: FR0P281MB2174
-X-TM-AS-ERS: 104.47.11.170-0.0.0.0
-X-TMASE-Version: StarCloud-1.3-9.1.1011-27872.006
-X-TMASE-Result: 10--13.865500-4.000000
-X-TMASE-MatchedRID: vbSD0OnL8/I8JKpd6Kt6Son73EnA6dC3zipu6AMXhRUrwvLze83KAuIa
-	26cVKu7ABf+oLr2yQk0+Q7n7SBm127sAQwsyoP9i0RneM2u5ms/riyrp6RgprerZB6IUDx4zfBy
-	+dxnwrxhrYq2UPKuEJJB3uGqece3UA6J7qwYXtBIeIPbDQDiuhhJFEvBK54PatHyEPgw8ZA/R0y
-	JhnGbpx0mHa2Y1urEIKTLwffkyTWkAsgl6PZgqJIlaRcdIl09ElIhi5GPAGePROZXiimkAmvzC1
-	lcNJt+s0c/H40eLBxa1D3W0JQRvwqiD/iwt7DmUBe3of2xuKvhHIblJJHuYwXOLzPYW+Cj678UG
-	MLhJh5HRXenBNWkRkmwrN+VXzn9BmCU9hDj/cFWUQk7vSq1TtnJ8bM38R9gpJsfJJdVp3fqvngk
-	jHjojpLjxouJb9uKcTWwLp7YEOWY58Sarp97J825FeHtsUoHu65FJey0jmuw65ScPZSDr62fRKm
-	DC4qbM0XbzBFAbQfVfCOKFKuVYGg==
-X-TMASE-XGENCLOUD: bf6034cc-ec33-43f7-9963-3fe3916678c7-0-0-200-0
-X-TM-Deliver-Signature: A6A2F9A313510BCCE2ABCAD8D52129E8
-X-TM-Addin-Auth: beYAjVFrxBfaEb6/lCPDp/kyDDK5nWYXuoYuZTlNVFGjzEu8+zj4r/R9Gos
-	faG4WbfRM6nyuU7OJSSI6vxtTpqmh/eCe1JyGG9I1dQ6zZaILSncmz/+Bywgid1nuYH39zlya8A
-	PuC6xRo5mWAI+eJAtRGEqx2CRPCrC5b1nqLY5bxq6aOQHwLM69XXE8RvDQ+DsO0liD2dldpf7+G
-	VgWgKAKzWyzttvYu37PBXVnp9L8fJbaY6AKFJZk3t1h4zn1nn1pG0NxB2VKM5ZzaUr/gaXbq+kn
-	X7/TrD0AQ4HX+Vw=.w2mWd1qsgE7EB3RJZcscOZ0KsfSaWb5eujvu810SI/dEdIVz8uOL/vnHMv
-	juI+5v0WlqLA73BN3dUj+qDxIjH+cu7j0AGcyOlUjZrchywLwnvOBBfccM3gAfrzfoMWCvzwhUt
-	9gt638jVicfO+LOxbk8M90znKHojGr7LvlkeRBUUP7FzwrVgURMuJL5X63cR+F/JJ6wr67VayoC
-	mLGaE2X+ahHt3B/be8gK5oh2u3+ENEQ9n5tm/Fh+4G8W6trF7dVWdhUk5uNI/q2We6du0wjcrcy
-	tVxiBDLBk0ULxTaUlePBQVI02EQsobLv37Ohn9KIwvsI7bdJ3Efq71RetYQ==
-X-TM-Addin-ProductCode: EMS
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=opensynergy.com;
-	s=TM-DKIM-20210503141657; t=1694596225;
-	bh=2Dn/xxZPfbXZzE09+h7llvwCzPFS48yjmrS+IzNG0ok=; l=4391;
-	h=Date:From:To;
-	b=FIpgL97XA12nfkxJ8Py9CgYg7KbpI/YwE+2p8cD7r1zZuoWdQnoLlL4tvr4FhoTOr
-	 N4GqNcnyAimuyYd4t2ei0PCFrhF2lLnpX+P50yZoo1qQTJNm8oIBO5Ky7OpKf9Xr/P
-	 Yj+TG31imCCVPIZ26/zbHqSrpxYmF4sPdCYJcUcxUZ4WqEjeHYhn8h/7QB6GiUXkme
-	 UaA0/dMgnEwRZOf74a32EneyJNzU3HJjUL/bcfsbX3YdjtbbxoNp4WYucIqKgJpuQO
-	 mOQPrCLq8Fub+gUr7cCMAIjpw8ECZMJ9sqkR42nVP1PLgUK7PBiN4pno5E3Xy8VzOb
-	 OEI4FXq5AaYLw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: sAGT3TRfCQYaLKGOQBw+98SVfpIvV3dv8hSpfP/6ePoii7HQ1yM3x2nrfxJcFIs+gU6fpIyJ0wTuFqZob6UG9g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6009
 
-On Fri, Aug 25, 2023 6:18 John Stultz <jstultz@google.com> wrote:
-> On Thu, Aug 17, 2023 at 6:13 PM Peter Hilber
-> <peter.hilber@opensynergy.com> wrote:
->>
->> This patch series changes struct system_counterval_t to identify the
->> clocksource through enum clocksource_ids, rather than through struct
->> clocksource *. The net effect of the patch series is that
->> get_device_system_crosststamp() callers can supply clocksource ids instead
->> of clocksource pointers, which can be problematic to get hold of.
+Sagi Grimberg <sagi@grimberg.me> writes:
+>> +     if (test_bit(NVME_TCP_Q_OFF_DDP, &queue->flags))
+>> +             nvme_tcp_unoffload_socket(queue);
+>> +#ifdef CONFIG_ULP_DDP
+>> +     if (nvme_tcp_admin_queue(queue) && queue->ctrl->ddp_netdev) {
+>> +             /* put back ref from get_netdev_for_sock() */
+>> +             dev_put(queue->ctrl->ddp_netdev);
+>> +             queue->ctrl->ddp_netdev = NULL;
+>> +     }
+>> +#endif
 >
-> Hey Peter,
->   Thanks for sending this out. I'm a little curious though, can you
-> expand a bit on how clocksource pointers can be problematic to get a
-> hold of? What exactly is the problem that is motivating this change?
-> 
+> Lets avoid spraying these ifdefs in the code.
+> the ddp_netdev struct member can be lifted out of the ifdef I think
+> because its only controller-wide.
+>
 
-Hi John,
+Ok, we will remove the ifdefs.
 
-I'm very sorry for the late reply; there was some unexpected delay.
+>> +#ifdef CONFIG_ULP_DDP
+>> +             /*
+>> +              * Admin queue takes a netdev ref here, and puts it
+>> +              * when the queue is stopped in __nvme_tcp_stop_queue().
+>> +              */
+>> +             ctrl->ddp_netdev = get_netdev_for_sock(queue->sock->sk);
+>> +             if (ctrl->ddp_netdev) {
+>> +                     if (nvme_tcp_ddp_query_limits(ctrl)) {
+>> +                             nvme_tcp_ddp_apply_limits(ctrl);
+>> +                     } else {
+>> +                             dev_put(ctrl->ddp_netdev);
+>> +                             ctrl->ddp_netdev = NULL;
+>> +                     }
+>> +             } else {
+>> +                     dev_info(nctrl->device, "netdev not found\n");
+>
+> Would prefer to not print offload specific messages in non-offload code
+> paths. at best, dev_dbg.
 
-Thank you for the remark; I'll expand on the motivation in the next patch
-series iteration, similar to the explanation below.
+Sure, we will switch to dev_dbg.
 
-The immediate motivation for this patch series is to enable the virtio_rtc
-RFC v2 driver [4] to refer to the Arm Generic Timer without requiring new
-helper functions in the arm_arch_timer driver. Other future
-get_device_system_crosststamp() users may profit from this change as well.
+> If the netdev is derived by the sk, why does the interface need a netdev
+> at all? why not just pass sk and derive the netdev from the sk behind
+> the interface?
+>
+> Or is there a case that I'm not seeing here?
 
-Clocksource structs are normally private to clocksource drivers. Therefore,
-get_device_system_crosststamp() callers require that clocksource drivers
-expose the clocksource of interest in some way.
+If we derive the netdev from the socket, it would be too costly to call
+get_netdev_for_sock() which takes a lock on the data path.
 
-Drivers such as virtio_rtc [4] could obtain all information for calling
-get_device_system_crosststamp() from their bound device, except for
-clocksource identification. Such drivers' only direct relation with the
-clocksource driver is clocksource identification. So using the clocksource
-enum, rather than obtaining pointers in a clocksource driver specific way,
-would reduce the coupling between the get_device_system_crosststamp()
-callers and clocksource drivers.
+We could store it in the existing sk->ulp_ddp_ctx, assigning it in
+sk_add and accessing it in sk_del/setup/teardown/resync.
+But we would run into the problem of not being sure
+get_netdev_for_sock() returned the same device in query_limits() and
+sk_add() because we did not keep a pointer to it.
 
-Next, I provide some details to support the low coupling argument. There
-are two sorts of get_device_system_crosststamp() callers in the current
-kernel:
+We believe it would be more complex to deal with these problems than to
+just keep a reference to the netdev in the nvme-tcp controller.
 
-1) On Intel platforms, some PTP hardware clocks obtain the clocksource
-pointer for get_device_system_crosststamp() using convert_art_to_tsc()
-or convert_art_ns_to_tsc() from arch/x86.
-
-2) The ptp_kvm driver uses kvm_arch_ptp_get_crosststamp(), which is
-implemented for platforms with kvm_clock or arm_arch_timer.
-Amongst other things, kvm_arch_ptp_get_crosststamp() returns a clocksource
-pointer. The Arm implementation is in the arm_arch_timer driver.
-
-When I proposed in the virtio_rtc RFC v1 patch series [3] to obtain the
-clocksource pointer of the arm_arch_timer driver through a generic
-helper function, one of the maintainers wasn't very enthusiastic about
-it and suggested reusing kvm_arch_ptp_get_crosststamp() somehow [1]. But
-to me there seems not to be much in common [2].
-
-Quoting myself from [2]:
-
-> If[!] &clocksource_counter should not be exposed, then I can see two
-> alternatives:
-> 
-> Alternative 1: Put a function of type
-> 
-> 	int (*get_time_fn) (ktime_t *device_time, 
-> 	                    struct system_counterval_t *sys_counterval,
-> 			    void *ctx)
-> 
-> into arm_arch_timer.c, as required by get_device_system_crosststamp()
-> (and include a virtio_rtc header).
-
-This looks inelegant, since it would require virtio_rtc to put part of its
-code into arm_arch_timer.c, and would require including a virtio_rtc header
-in arm_arch_timer.c.
-
-The second alternative is using this patch series to expand the use of the
-clocksource enum to get_device_system_crosststamp(). This should also make
-it easy to use get_device_system_crosststamp() with other clocksources in
-the future, by just extending the clocksource enum.
-
-> I just worry that switching to an enumeration solution might be
-> eventually exposing more than we would like to userland.
-
-ATM the enum is not in a UAPI header. So IMHO exposing this to userland in
-the future would require a pretty explicit change.
-
-Thanks for the review,
-
-Peter
-
-[1] https://lore.kernel.org/all/87ila4qwuw.wl-maz@kernel.org/
-[2] https://lore.kernel.org/all/151befb2-8fbc-b796-47bb-39960a979065@opensynergy.com/
-[3] https://lore.kernel.org/all/20230630171052.985577-1-peter.hilber@opensynergy.com/
-[4] https://lore.kernel.org/all/20230818012014.212155-1-peter.hilber@opensynergy.com/
+Thanks
 
