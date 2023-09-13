@@ -1,170 +1,175 @@
-Return-Path: <netdev+bounces-33585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E33879EB4E
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 16:42:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 426E179EB54
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 16:42:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58C3328172B
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 14:42:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7E58281A1E
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 14:42:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73CE7947D;
-	Wed, 13 Sep 2023 14:42:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1CAC168A2;
+	Wed, 13 Sep 2023 14:42:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67FA99472
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 14:42:25 +0000 (UTC)
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8001C91;
-	Wed, 13 Sep 2023 07:42:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=78e/zywheKAkHCXsMGqm/WMh0+p3InU4SR7PCIbHTG8=;
-	t=1694616144; x=1695825744; b=Uf7KXfSoydcBBTVWdJYApQXm4dUud6XHE4sqWYQJ3XV3tHW
-	iVYc4xxuBbBk65Cy6Yp8UdSS9XVJGlVlDr2S7NWrX8yfbvXYNu75YENVH2QkQofNk2B1xndczsWQV
-	9sWcjwSg46svbJevzg1N59Bc2eUCbNREFlEaoRPBNPcr6ehRSheIIooBW/IUVsv/1yT0QkRHqET2l
-	mn7pNlcCczTK/a/IsobOxl8TRCDvnloGM+TKjPyngQz5Y+tNky/V2ovaUDUrr0YpvsdqOuUqzbsiH
-	xEVku0gq+PpXTvFh2iTYbPrkrAWOATNK3TJmkVnsHUF7p2Df0VPQS8zQGlHXVyMw==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1qgR3z-00F2Np-0G;
-	Wed, 13 Sep 2023 16:41:55 +0200
-Message-ID: <6b1c6996da5d215371e164b54e8854541dee0ded.camel@sipsolutions.net>
-Subject: Re: [PATCH v3] workqueue: don't skip lockdep work dependency in
- cancel_work_sync()
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Guenter Roeck <linux@roeck-us.net>, Tetsuo Handa
-	 <penguin-kernel@i-love.sakura.ne.jp>
-Cc: Lai Jiangshan <jiangshanlai@gmail.com>, Tejun Heo <tj@kernel.org>, Hillf
-	Danton <hdanton@sina.com>, LKML <linux-kernel@vger.kernel.org>, Heyi Guo
-	 <guoheyi@linux.alibaba.com>, netdev@vger.kernel.org
-Date: Wed, 13 Sep 2023 16:41:53 +0200
-In-Reply-To: <e0717628-e436-4091-8b2e-2f4dcb646ec8@roeck-us.net>
-References: <21b9c1ac-64b7-7f4b-1e62-bf2f021fffcd@I-love.SAKURA.ne.jp>
-	 <YuK78Jiy12BJG/Tp@slm.duckdns.org>
-	 <0ad532b2-df5f-331a-ae7f-21460fc62fe2@I-love.SAKURA.ne.jp>
-	 <97cbf8a9-d5e1-376f-6a49-3474871ea6b4@I-love.SAKURA.ne.jp>
-	 <afa1ac2c-a023-a91e-e596-60931b38247e@I-love.SAKURA.ne.jp>
-	 <7d034f7b-af42-4dbc-0887-60f4bdb3dcca@I-love.SAKURA.ne.jp>
-	 <0a85696a-b0b9-0f4a-7c00-cd89edc9304c@I-love.SAKURA.ne.jp>
-	 <77d47eed-6a22-7e81-59de-4d45852ca4de@I-love.SAKURA.ne.jp>
-	 <e0717628-e436-4091-8b2e-2f4dcb646ec8@roeck-us.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6C833D6C
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 14:42:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 904A6C433C8;
+	Wed, 13 Sep 2023 14:42:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694616173;
+	bh=ghmd2vE6l3/YQAYcdHB/Auew4n3efVE8LafRtaXbVHc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YGMCHCaS7LV+IgxR8JwzA2LNP/JAobSO7VFWJqFuLotcrNli1S/nHKVzF//aJ2S6V
+	 oyTmUUNwYQcB2nInr2C8Ez39iVMQmhLWasrm56DXWToBj15FazV/Kl6X9Oqd98l7vq
+	 xYCSySPKPtfqvA4b/JjwavRqFP6IGhDc7F3DFnWpvbrbrOP/iHL2RUh7HiB9Nfi1ae
+	 OAv6grpPZpsAP5EFZJg6+L0GXuBVZ6JskfXUivQah7NoYp1WtIsK8dxArv+axEEnrs
+	 p+KoYbQrGGzwtNfTaPkj8pd6Rp9GlH1mROzy40I5zjPv5zmvE+yp4nzsVVzTdwFELZ
+	 0zorZ83mPn+fA==
+Date: Wed, 13 Sep 2023 15:42:45 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Lee Jones <lee@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Qiang Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>,
+	Shengjiu Wang <shengjiu.wang@gmail.com>,
+	Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>,
+	Nicolin Chen <nicoleotsuka@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org,
+	Simon Horman <horms@kernel.org>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v5 08/31] dt-bindings: soc: fsl: cpm_qe: cpm1-scc-qmc:
+ Add support for QMC HDLC
+Message-ID: <20230913-unruly-recite-7dbbbd7e63e0@spud>
+References: <20230912081527.208499-1-herve.codina@bootlin.com>
+ <20230912101018.225246-1-herve.codina@bootlin.com>
+ <20230912-capable-stash-c7a3e33078ac@spud>
+ <20230913092640.76934b31@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
-
-Hi Guenter,
-
-> This patch results in the attached lockdep splat when running the
-> ast2600-evb emulation in qemu with aspeed_g5_defconfig and lock debugging
-> enabled. Reverting this patch fixes the problem.
-
-Umm ... That's only true if you think the problem is the lockdep splat,
-rather than the actual potential deadlock?!
-
-> [    9.809960] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> [    9.810053] WARNING: possible circular locking dependency detected
-> [    9.810196] 6.6.0-rc1-00004-g6faca50f629f #1 Tainted: G               =
-  N
-
-I don't have this exact tree, but on 6.6-rc1,
-
-> [    9.810327] ------------------------------------------------------
-> [    9.810406] ip/357 is trying to acquire lock:
-> [    9.810501] 83af6c40 ((work_completion)(&(&dev->state_queue)->work)){+=
-.+.}-{0:0}, at: __flush_work+0x40/0x550
-> [    9.811052]=20
-> [    9.811052] but task is already holding lock:
-> [    9.811133] 81639924 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0=
-x124/0x514
-> [    9.811264]=20
-> [    9.811264] which lock already depends on the new lock.
-> [    9.811264]=20
-> [    9.811361]=20
-> [    9.811361] the existing dependency chain (in reverse order) is:
-> [    9.811466]=20
-> [    9.811466] -> #1 (rtnl_mutex){+.+.}-{3:3}:
-> [    9.811616]        lock_acquire+0xfc/0x368
-> [    9.811717]        __mutex_lock+0x90/0xf00
-> [    9.811782]        mutex_lock_nested+0x24/0x2c
-> [    9.811845]        ftgmac100_reset+0x1c/0x1dc
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="D/KR2KGuouPtsCp2"
+Content-Disposition: inline
+In-Reply-To: <20230913092640.76934b31@bootlin.com>
 
 
-This does indeed take the RTNL:
+--D/KR2KGuouPtsCp2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-static void ftgmac100_reset(struct ftgmac100 *priv)
-{
-        struct net_device *netdev =3D priv->netdev;
-        int err;
+On Wed, Sep 13, 2023 at 09:26:40AM +0200, Herve Codina wrote:
+> Hi Conor,
+>=20
+> On Tue, 12 Sep 2023 18:21:58 +0100
+> Conor Dooley <conor@kernel.org> wrote:
+>=20
+> > On Tue, Sep 12, 2023 at 12:10:18PM +0200, Herve Codina wrote:
+> > > The QMC (QUICC mutichannel controller) is a controller present in some
+> > > PowerQUICC SoC such as MPC885.
+> > > The QMC HDLC uses the QMC controller to transfer HDLC data.
+> > >=20
+> > > Additionally, a framer can be connected to the QMC HDLC.
+> > > If present, this framer is the interface between the TDM bus used by =
+the
+> > > QMC HDLC and the E1/T1 line.
+> > > The QMC HDLC can use this framer to get information about the E1/T1 l=
+ine
+> > > and configure the E1/T1 line.
+> > >=20
+> > > Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+> > > ---
+> > >  .../bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml   | 13 +++++++++++=
+++
+> > >  1 file changed, 13 insertions(+)
+> > >=20
+> > > diff --git a/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm=
+1-scc-qmc.yaml b/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-=
+scc-qmc.yaml
+> > > index 82d9beb48e00..b5073531f3f1 100644
+> > > --- a/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-q=
+mc.yaml
+> > > +++ b/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-q=
+mc.yaml
+> > > @@ -101,6 +101,16 @@ patternProperties:
+> > >            Channel assigned Rx time-slots within the Rx time-slots ro=
+uted by the
+> > >            TSA to this cell.
+> > > =20
+> > > +      compatible:
+> > > +        const: fsl,qmc-hdlc
+> > > +
+> > > +      fsl,framer:
+> > > +        $ref: /schemas/types.yaml#/definitions/phandle
+> > > +        description:
+> > > +          phandle to the framer node. The framer is in charge of an =
+E1/T1 line
+> > > +          interface connected to the TDM bus. It can be used to get =
+the E1/T1 line
+> > > +          status such as link up/down. =20
+> >=20
+> > Sounds like this fsl,framer property should depend on the compatible
+> > being present, no?
+>=20
+> Well from the implementation point of view, only the QMC HDLC driver uses=
+ this
+> property.
+>=20
+> From the hardware description point of view, this property means that the=
+ time slots
+> handled by this channel are connected to the framer. So I think it makes =
+sense for
+> any channel no matter the compatible (even if compatible is not present).
+>=20
+> Should I change and constraint the fsl,framer property to the compatible =
+presence ?
+> If so, is the following correct for this contraint ?
+>    --- 8< ---
+>    dependencies:
+>      - fsl,framer: [ compatible ];
+>    --- 8< ---
 
-        netdev_dbg(netdev, "Resetting NIC...\n");
+The regular sort of
+if:
+	compatible:
+		contains:
+			const: foo
+then:
+	required:
+		- fsl,framer
+would fit the bill, no?
 
-        /* Lock the world */
-        rtnl_lock();
+--D/KR2KGuouPtsCp2
+Content-Type: application/pgp-signature; name="signature.asc"
 
-and is called from
+-----BEGIN PGP SIGNATURE-----
 
-> [    9.811907]        ftgmac100_adjust_link+0xc0/0x13c
-> [    9.811972]        phy_link_change+0x30/0x5c
-> [    9.812035]        phy_check_link_status+0x9c/0x11c
-> [    9.812100]        phy_state_machine+0x1c0/0x2c0
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZQHKZQAKCRB4tDGHoIJi
+0jE/AP0awmyeu05CVKleLo13y3Fjt4HP0do7dEhQGNt4rxVmsAEAtTdqxGH2EmC6
+3WhT1AVUi21kX6VzpxFlrQiNmHgB/A4=
+=zHjw
+-----END PGP SIGNATURE-----
 
-this work (phy_state_machine is the function), which
-
-> [    9.812405] -> #0 ((work_completion)(&(&dev->state_queue)->work)){+.+.=
-}-{0:0}:
-> [    9.812531]        check_prev_add+0x128/0x15ec
-> [    9.812594]        __lock_acquire+0x16ec/0x20cc
-> [    9.812656]        lock_acquire+0xfc/0x368
-> [    9.812712]        __flush_work+0x70/0x550
-> [    9.812769]        __cancel_work_timer+0x1e4/0x264
-> [    9.812833]        phy_stop+0x78/0x128
-
-is cancelled by phy_stop() in phy_stop_machine():
-
-void phy_stop_machine(struct phy_device *phydev)
-{
-        cancel_delayed_work_sync(&phydev->state_queue);
-
-but of course that's called by the driver under RTNL:
-
-> [    9.812889]        ftgmac100_stop+0x5c/0xac
-> [    9.812949]        __dev_close_many+0xb8/0x140
-
-(__dev_close_many requires RTNL)
-
-
-So you have a potential deadlock in this driver. Yes, workqueue items
-and RTNL are basically incompatible. Don't do that. Now this bug was
-_probably_ added by commit 1baf2e50e48f ("drivers/net/ftgmac100: fix
-DHCP potential failure with systemd") which added a call to
-ftgmac100_reset() in ftgmac100_adjust_link() which is the thing called
-from the PHY state machine in the first place.
-
-Should that be reverted? I don't know ... maybe it can be fixed
-differently.
-
-
-But anyway ... as far as lockdep/workqueue stuff is concerned I'd
-definitely call it a win rather than a bug! Yay for making lockdep
-useful - it found a deadlock situation for you! :-) No need to blame
-lockdep for that :P
-
-johannes
+--D/KR2KGuouPtsCp2--
 
