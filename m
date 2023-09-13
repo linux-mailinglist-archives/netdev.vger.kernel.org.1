@@ -1,119 +1,170 @@
-Return-Path: <netdev+bounces-33584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33585-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 889E079EB48
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 16:41:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E33879EB4E
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 16:42:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43A1D28178E
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 14:41:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58C3328172B
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 14:42:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E97839473;
-	Wed, 13 Sep 2023 14:41:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73CE7947D;
+	Wed, 13 Sep 2023 14:42:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B25193D6C
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 14:41:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC9BAC433C7;
-	Wed, 13 Sep 2023 14:41:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694616067;
-	bh=wWL+LcAw5WPyJwzia//Gc5ld2vNtPOeVhe23VjXEUZM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=LA/0ZjiB6zbJI1yoJ3Gu7hYOKjBQ5jfnyxitUuH1wSUbLrD+tmSXTZb8n7EzRsDhQ
-	 h6v/aAZrqYlLIWJ97aEb3sr2t22lBXLAQ/gW5XrXy7HngtxLyZXzDjT8S+8EGK+ytT
-	 lK1jNVVdajsq3Eb/vHaY5aEHDJtBDKoky3dWSWgfdV7uq1oHblmzUAnr58MfhSlQzL
-	 wCWEYlNjPQNNFfld0e+SvMm+6RPXnlKluD5jYB2af9slrxHXFSxUfwi8rJF+ht8Io/
-	 PxaSrCXNCoiL8MPs+MI1tuvwHLJuFmBxsmhLUl6yJm6wAXqTr/G9OUEXzyJaT4hu1w
-	 JmKwiqHYLXg7Q==
-Message-ID: <b6837627-27a9-b870-c85b-799c23705a74@kernel.org>
-Date: Wed, 13 Sep 2023 08:41:05 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67FA99472
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 14:42:25 +0000 (UTC)
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8001C91;
+	Wed, 13 Sep 2023 07:42:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=78e/zywheKAkHCXsMGqm/WMh0+p3InU4SR7PCIbHTG8=;
+	t=1694616144; x=1695825744; b=Uf7KXfSoydcBBTVWdJYApQXm4dUud6XHE4sqWYQJ3XV3tHW
+	iVYc4xxuBbBk65Cy6Yp8UdSS9XVJGlVlDr2S7NWrX8yfbvXYNu75YENVH2QkQofNk2B1xndczsWQV
+	9sWcjwSg46svbJevzg1N59Bc2eUCbNREFlEaoRPBNPcr6ehRSheIIooBW/IUVsv/1yT0QkRHqET2l
+	mn7pNlcCczTK/a/IsobOxl8TRCDvnloGM+TKjPyngQz5Y+tNky/V2ovaUDUrr0YpvsdqOuUqzbsiH
+	xEVku0gq+PpXTvFh2iTYbPrkrAWOATNK3TJmkVnsHUF7p2Df0VPQS8zQGlHXVyMw==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1qgR3z-00F2Np-0G;
+	Wed, 13 Sep 2023 16:41:55 +0200
+Message-ID: <6b1c6996da5d215371e164b54e8854541dee0ded.camel@sipsolutions.net>
+Subject: Re: [PATCH v3] workqueue: don't skip lockdep work dependency in
+ cancel_work_sync()
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Guenter Roeck <linux@roeck-us.net>, Tetsuo Handa
+	 <penguin-kernel@i-love.sakura.ne.jp>
+Cc: Lai Jiangshan <jiangshanlai@gmail.com>, Tejun Heo <tj@kernel.org>, Hillf
+	Danton <hdanton@sina.com>, LKML <linux-kernel@vger.kernel.org>, Heyi Guo
+	 <guoheyi@linux.alibaba.com>, netdev@vger.kernel.org
+Date: Wed, 13 Sep 2023 16:41:53 +0200
+In-Reply-To: <e0717628-e436-4091-8b2e-2f4dcb646ec8@roeck-us.net>
+References: <21b9c1ac-64b7-7f4b-1e62-bf2f021fffcd@I-love.SAKURA.ne.jp>
+	 <YuK78Jiy12BJG/Tp@slm.duckdns.org>
+	 <0ad532b2-df5f-331a-ae7f-21460fc62fe2@I-love.SAKURA.ne.jp>
+	 <97cbf8a9-d5e1-376f-6a49-3474871ea6b4@I-love.SAKURA.ne.jp>
+	 <afa1ac2c-a023-a91e-e596-60931b38247e@I-love.SAKURA.ne.jp>
+	 <7d034f7b-af42-4dbc-0887-60f4bdb3dcca@I-love.SAKURA.ne.jp>
+	 <0a85696a-b0b9-0f4a-7c00-cd89edc9304c@I-love.SAKURA.ne.jp>
+	 <77d47eed-6a22-7e81-59de-4d45852ca4de@I-love.SAKURA.ne.jp>
+	 <e0717628-e436-4091-8b2e-2f4dcb646ec8@roeck-us.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.0
-Subject: Re: [PATCH net-next] ipv4/fib: send RTM_DELROUTE notify when flush
- fib
-Content-Language: en-US
-To: nicolas.dichtel@6wind.com, Thomas Haller <thaller@redhat.com>,
- Benjamin Poirier <bpoirier@nvidia.com>
-Cc: Stephen Hemminger <stephen@networkplumber.org>,
- Hangbin Liu <liuhangbin@gmail.com>, Ido Schimmel <idosch@idosch.org>,
- netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-References: <ZLobpQ7jELvCeuoD@Laptop-X1> <ZLzY42I/GjWCJ5Do@shredder>
- <ZL48xbowL8QQRr9s@Laptop-X1> <20230724084820.4aa133cc@hermes.local>
- <ZL+F6zUIXfyhevmm@Laptop-X1> <20230725093617.44887eb1@hermes.local>
- <6b53e392-ca84-c50b-9d77-4f89e801d4f3@6wind.com>
- <7e08dd3b-726d-3b1b-9db7-eddb21773817@kernel.org>
- <640715e60e92583d08568a604c0ebb215271d99f.camel@redhat.com>
- <8f5d2cae-17a2-f75d-7659-647d0691083b@kernel.org> <ZNKQdLAXgfVQxtxP@d3>
- <32d40b75d5589b73e17198eb7915c546ea3ff9b1.camel@redhat.com>
- <cc91aa7d-0707-b64f-e7a9-f5ce97d4f313@6wind.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <cc91aa7d-0707-b64f-e7a9-f5ce97d4f313@6wind.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-malware-bazaar: not-scanned
 
-On 9/13/23 1:58 AM, Nicolas Dichtel wrote:
-> Le 11/09/2023 à 11:50, Thomas Haller a écrit :
-> [snip]
->> - the fact that it isn't fixed in more than a decade, shows IMO that
->> getting caching right for routes is very hard. Patches that improve the
->> behavior should not be rejected with "look at libnl3 or FRR".
-> +1
-> 
-> I just hit another corner case:
-> 
-> ip link set ntfp2 up
-> ip address add 10.125.0.1/24 dev ntfp2
-> ip nexthop add id 1234 via 10.125.0.2 dev ntfp2
-> ip route add 10.200.0.0/24 nhid 1234
-> 
-> Check the config:
-> $ ip route
-> <snip>
-> 10.200.0.0/24 nhid 1234 via 10.125.0.2 dev ntfp2
-> $ ip nexthop
-> id 1234 via 10.125.0.2 dev ntfp2 scope link
-> 
-> 
-> Set the carrier off on ntfp2:
-> ip monitor label link route nexthop&
-> ip link set ntfp2 carrier off
-> 
-> $ ip link set ntfp2 carrier off
-> $ [LINK]4: ntfp2: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc mq state
-> DOWN group default
->     link/ether de:ed:02:67:61:1f brd ff:ff:ff:ff:ff:ff
-> 
-> => No nexthop event nor route event (net.ipv4.nexthop_compat_mode = 1)
+Hi Guenter,
 
-carrier down is a link event and as you show here, link events are sent.
+> This patch results in the attached lockdep splat when running the
+> ast2600-evb emulation in qemu with aspeed_g5_defconfig and lock debugging
+> enabled. Reverting this patch fixes the problem.
 
-> 
-> 'ip nexthop' and 'ip route' show that the nexthop and the route have been deleted.
+Umm ... That's only true if you think the problem is the lockdep splat,
+rather than the actual potential deadlock?!
 
-nexthop objects are removed on the link event; any routes referencing
-those nexthops are removed.
+> [    9.809960] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> [    9.810053] WARNING: possible circular locking dependency detected
+> [    9.810196] 6.6.0-rc1-00004-g6faca50f629f #1 Tainted: G               =
+  N
 
-> 
-> If the nexthop infra is not used (ip route add 10.200.0.0/24 via 10.125.0.2 dev
-> ntfp2), the route entry is not deleted.
-> 
-> I wondering if it is expected to not have a nexthop event when one is removed
-> due to a carrier lost.
-> At least, a route event should be generated when the compat_mode is enabled.
+I don't have this exact tree, but on 6.6-rc1,
 
-compat_mode is about expanding nhid into the full, legacy route
-attributes. See 4f80116d3df3b
+> [    9.810327] ------------------------------------------------------
+> [    9.810406] ip/357 is trying to acquire lock:
+> [    9.810501] 83af6c40 ((work_completion)(&(&dev->state_queue)->work)){+=
+.+.}-{0:0}, at: __flush_work+0x40/0x550
+> [    9.811052]=20
+> [    9.811052] but task is already holding lock:
+> [    9.811133] 81639924 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0=
+x124/0x514
+> [    9.811264]=20
+> [    9.811264] which lock already depends on the new lock.
+> [    9.811264]=20
+> [    9.811361]=20
+> [    9.811361] the existing dependency chain (in reverse order) is:
+> [    9.811466]=20
+> [    9.811466] -> #1 (rtnl_mutex){+.+.}-{3:3}:
+> [    9.811616]        lock_acquire+0xfc/0x368
+> [    9.811717]        __mutex_lock+0x90/0xf00
+> [    9.811782]        mutex_lock_nested+0x24/0x2c
+> [    9.811845]        ftgmac100_reset+0x1c/0x1dc
+
+
+This does indeed take the RTNL:
+
+static void ftgmac100_reset(struct ftgmac100 *priv)
+{
+        struct net_device *netdev =3D priv->netdev;
+        int err;
+
+        netdev_dbg(netdev, "Resetting NIC...\n");
+
+        /* Lock the world */
+        rtnl_lock();
+
+and is called from
+
+> [    9.811907]        ftgmac100_adjust_link+0xc0/0x13c
+> [    9.811972]        phy_link_change+0x30/0x5c
+> [    9.812035]        phy_check_link_status+0x9c/0x11c
+> [    9.812100]        phy_state_machine+0x1c0/0x2c0
+
+this work (phy_state_machine is the function), which
+
+> [    9.812405] -> #0 ((work_completion)(&(&dev->state_queue)->work)){+.+.=
+}-{0:0}:
+> [    9.812531]        check_prev_add+0x128/0x15ec
+> [    9.812594]        __lock_acquire+0x16ec/0x20cc
+> [    9.812656]        lock_acquire+0xfc/0x368
+> [    9.812712]        __flush_work+0x70/0x550
+> [    9.812769]        __cancel_work_timer+0x1e4/0x264
+> [    9.812833]        phy_stop+0x78/0x128
+
+is cancelled by phy_stop() in phy_stop_machine():
+
+void phy_stop_machine(struct phy_device *phydev)
+{
+        cancel_delayed_work_sync(&phydev->state_queue);
+
+but of course that's called by the driver under RTNL:
+
+> [    9.812889]        ftgmac100_stop+0x5c/0xac
+> [    9.812949]        __dev_close_many+0xb8/0x140
+
+(__dev_close_many requires RTNL)
+
+
+So you have a potential deadlock in this driver. Yes, workqueue items
+and RTNL are basically incompatible. Don't do that. Now this bug was
+_probably_ added by commit 1baf2e50e48f ("drivers/net/ftgmac100: fix
+DHCP potential failure with systemd") which added a call to
+ftgmac100_reset() in ftgmac100_adjust_link() which is the thing called
+from the PHY state machine in the first place.
+
+Should that be reverted? I don't know ... maybe it can be fixed
+differently.
+
+
+But anyway ... as far as lockdep/workqueue stuff is concerned I'd
+definitely call it a win rather than a bug! Yay for making lockdep
+useful - it found a deadlock situation for you! :-) No need to blame
+lockdep for that :P
+
+johannes
 
