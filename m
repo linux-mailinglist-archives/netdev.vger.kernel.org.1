@@ -1,280 +1,146 @@
-Return-Path: <netdev+bounces-33414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDF3A79DCF2
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 02:05:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E195C79DCFC
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 02:11:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C957A1C20FAA
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 00:05:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C1422819AB
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 00:11:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BBE937A;
-	Wed, 13 Sep 2023 00:05:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D61737C;
+	Wed, 13 Sep 2023 00:10:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F0C17F
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 00:05:11 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B8F710E6
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 17:05:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694563510; x=1726099510;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=BeRRw9uMA460Bl8pm9R+d0lQVxnJlJGy6Uf6KOOayo0=;
-  b=MKMAXlyJpMAqr4n2BdCVLQD/hL5TDbuXiqHlSqYpjemdAVFjg2GcbTuF
-   5FMvBqUAB/QdmSNd9kYF0k3uThykH+a7RCS88mOeA7Szz/RryHP9vRz6T
-   npjW9KWeKqEmZK+GjjN9CoVPj9qvQoraJwWDaRUzUaGUs/bzL7KY5q2sc
-   vzBs0fna2zK6t6mZ5XEoVi3+7A6NsunVumgUQBk2lsSFRoA/JaiYjPHRc
-   f6Zt5xLXgwmAnt/QvbOQ0wKeMqNqFmHphL13J3ycQjkNrNClPuzEr1DZT
-   NNaAbZQANKhyKbmT9KKPXGJzHQF3ojWCX4W2Frc8urHrizEAzUV2rITb6
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="368793886"
-X-IronPort-AV: E=Sophos;i="6.02,141,1688454000"; 
-   d="scan'208";a="368793886"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2023 17:05:01 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="809454474"
-X-IronPort-AV: E=Sophos;i="6.02,141,1688454000"; 
-   d="scan'208";a="809454474"
-Received: from yizhang6-mobl.amr.corp.intel.com (HELO vcostago-mobl3) ([10.209.67.184])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2023 17:05:01 -0700
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Xabier Marquiegui <reibax@gmail.com>, netdev@vger.kernel.org
-Cc: richardcochran@gmail.com, horms@kernel.org,
- chrony-dev@chrony.tuxfamily.org, mlichvar@redhat.com, reibax@gmail.com,
- ntp-lists@mattcorallo.com, shuah@kernel.org, davem@davemloft.net,
- rrameshbabu@nvidia.com, alex.maftei@amd.com
-Subject: Re: [PATCH net-next v2 1/3] ptp: Replace timestamp event queue with
- linked list
-In-Reply-To: <20230912220217.2008895-1-reibax@gmail.com>
-References: <20230912220217.2008895-1-reibax@gmail.com>
-Date: Tue, 12 Sep 2023 17:05:00 -0700
-Message-ID: <875y4fos43.fsf@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26F8A7F;
+	Wed, 13 Sep 2023 00:10:56 +0000 (UTC)
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74DBD10F2;
+	Tue, 12 Sep 2023 17:10:55 -0700 (PDT)
+Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-5009d4a4897so10577925e87.0;
+        Tue, 12 Sep 2023 17:10:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694563854; x=1695168654; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lDU5pSKkCf+ROG6Vvo9qMmmrl9dENDhQwvux9jW53fk=;
+        b=CVyz6mj2IOl6ZWa3h6yHaDn88UJAmI459eSDxjXlKtaJpQjW8BHLm24w1AgA3xQoMD
+         pHQ1FD5hSRFV4Xh1BKAQwXaXK2jpUHQc6eYZG7jrCtRupzu/fzVFENNDLJxbyGyJ9PPc
+         fH/itVFaXbbnVIg2ipf6s3T4Z3FWpYM5E92nRP5HN4nl4xePNf7aehiFIfDvKHxQe60G
+         KIko1QarmwKnGHdil8Tke9T1AhD8vEqc4nrECcj9FMBCrwUj5MW79lKUvWCEyifkNRLO
+         MZJaljWTb4MWNi7if4UbMmGkK5djCeup7IR0PIM7gvUSojs4fWXXLEJLkHoil9VsfbN2
+         Rw6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694563854; x=1695168654;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lDU5pSKkCf+ROG6Vvo9qMmmrl9dENDhQwvux9jW53fk=;
+        b=l0M+Z+wKqg7JyIRRqf2kZDB9klGYcgIEWQFTkcpD7DCvsGRR+8CeSwSOf9a1WH/cH9
+         LlTGbASgkT1vnXCFzMvA1K9r5ooeFbNCpfeAtJcT8xGhGjnL9+tC44rXafxRVjf/Teoz
+         2Xpf1k69c5FzZ6ji/SYsKjOxL+v57doli++52S9qpIwbL7yT/ECNsMe8g1usQM9TsJmP
+         RZd0pQZSiZsRHCyuuk0BB3DoS0JoFWmh7zbJI9w8tN7bgyNNGxo6lyWX2BXg9H/SBO6I
+         J9quGX1vVKZsYbJ12wOBSgtjCIhJatqOPN7MnEGX6YXHawGl6sVf9Jgno1Z5RUNp1Z+3
+         wLWQ==
+X-Gm-Message-State: AOJu0YxJjhiJybii4mTJt1SajdD7QgAw7Ea6GdpAgu9uOEYk/liR8DW0
+	+r0Fq5Xn+poy7KEypk1YjRPR+eJOYsla0MbC+aA=
+X-Google-Smtp-Source: AGHT+IE0DJ1yIeH5yZxGYgPrqT6xeFSkjh5Zl6R/0fUeOPfMg57L6CIwSvBEee3CSY3IGdEklD5DOU0AfhXdAtHa5js=
+X-Received: by 2002:a19:e012:0:b0:502:9dc3:9c68 with SMTP id
+ x18-20020a19e012000000b005029dc39c68mr597128lfg.63.1694563853416; Tue, 12 Sep
+ 2023 17:10:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20230912224654.6556-1-puranjay12@gmail.com> <20230912224654.6556-6-puranjay12@gmail.com>
+ <ZQDuVTSycDcjDkvi@shell.armlinux.org.uk> <CANk7y0iFdgHgu+RXYJvP3swaRS+-Lr0CgOAdcQWtjs4VkrOzdQ@mail.gmail.com>
+In-Reply-To: <CANk7y0iFdgHgu+RXYJvP3swaRS+-Lr0CgOAdcQWtjs4VkrOzdQ@mail.gmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Tue, 12 Sep 2023 17:10:42 -0700
+Message-ID: <CAADnVQLzbyG3xWVDFyTsDPRSC=fnAskaeyc1erQVLYo_b6Lg_w@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 5/6] bpf, arm32: Always zero extend for LDX with B/H/W
+To: Puranjay Mohan <puranjay12@gmail.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Shubham Bansal <illusionist.neo@gmail.com>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Nicholas Piggin <npiggin@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>, 
+	Luke Nelson <luke.r.nels@gmail.com>, Xi Wang <xi.wang@gmail.com>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Wang YanQing <udknight@gmail.com>, bpf <bpf@vger.kernel.org>, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, LKML <linux-kernel@vger.kernel.org>, 
+	linux-parisc@vger.kernel.org, ppc-dev <linuxppc-dev@lists.ozlabs.org>, 
+	linux-riscv <linux-riscv@lists.infradead.org>, 
+	Network Development <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Xabier Marquiegui <reibax@gmail.com> writes:
-
-> This is the first of a set of patches to introduce linked lists to the
-> timestamp event queue. The final goal is to be able to have multiple
-> readers for the timestamp queue.
+On Tue, Sep 12, 2023 at 4:17=E2=80=AFPM Puranjay Mohan <puranjay12@gmail.co=
+m> wrote:
 >
-> On this one we maintain the original feature set, and we just introduce
-> the linked lists to the data structure.
+> On Wed, Sep 13, 2023 at 1:04=E2=80=AFAM Russell King (Oracle)
+> <linux@armlinux.org.uk> wrote:
+> >
+> > On Tue, Sep 12, 2023 at 10:46:53PM +0000, Puranjay Mohan wrote:
+> > > The JITs should not depend on the verifier for zero extending the upp=
+er
+> > > 32 bits of the destination register when loading a byte, half-word, o=
+r
+> > > word.
+> > >
+> > > A following patch will make the verifier stop patching zext instructi=
+ons
+> > > after LDX.
+> >
+> > This was introduced by:
+> >
+> > 163541e6ba34 ("arm: bpf: eliminate zero extension code-gen")
+> >
+> > along with an additional function. So three points:
+> >
+> > 1) the commit should probably explain why it has now become undesirable
+> > to access this verifier state, whereas it appears it was explicitly
+> > added to permit this optimisation.
 >
-> Signed-off-by: Xabier Marquiegui <reibax@gmail.com>
-> Suggested-by: Richard Cochran <richardcochran@gmail.com>
-> ---
-> v2:
->   - Style changes to comform to checkpatch strict suggestions
-> v1: https://lore.kernel.org/netdev/20230906104754.1324412-2-reibax@gmail.com/
+> I added some details in the cover letter.
 >
->  drivers/ptp/ptp_chardev.c | 16 ++++++++++++++--
->  drivers/ptp/ptp_clock.c   | 30 ++++++++++++++++++++++++++++--
->  drivers/ptp/ptp_private.h |  4 +++-
->  drivers/ptp/ptp_sysfs.c   |  6 +++++-
->  4 files changed, 50 insertions(+), 6 deletions(-)
+> For the complete discussion see: [1]
 >
-> diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
-> index 362bf756e6b7..197edf1179f1 100644
-> --- a/drivers/ptp/ptp_chardev.c
-> +++ b/drivers/ptp/ptp_chardev.c
-> @@ -435,10 +435,16 @@ long ptp_ioctl(struct posix_clock *pc, unsigned int cmd, unsigned long arg)
->  __poll_t ptp_poll(struct posix_clock *pc, struct file *fp, poll_table *wait)
->  {
->  	struct ptp_clock *ptp = container_of(pc, struct ptp_clock, clock);
-> +	struct timestamp_event_queue *queue;
->  
->  	poll_wait(fp, &ptp->tsev_wq, wait);
->  
-> -	return queue_cnt(&ptp->tsevq) ? EPOLLIN : 0;
-> +	/* Extract only the first element in the queue list
-> +	 * TODO: Identify the relevant queue
-> +	 */
-> +	queue = list_entry(&ptp->tsevqs, struct timestamp_event_queue, qlist);
-> +
-> +	return queue_cnt(queue) ? EPOLLIN : 0;
->  }
->  
->  #define EXTTS_BUFSIZE (PTP_BUF_TIMESTAMPS * sizeof(struct ptp_extts_event))
-> @@ -447,12 +453,18 @@ ssize_t ptp_read(struct posix_clock *pc,
->  		 uint rdflags, char __user *buf, size_t cnt)
->  {
->  	struct ptp_clock *ptp = container_of(pc, struct ptp_clock, clock);
-> -	struct timestamp_event_queue *queue = &ptp->tsevq;
-> +	struct timestamp_event_queue *queue;
->  	struct ptp_extts_event *event;
->  	unsigned long flags;
->  	size_t qcnt, i;
->  	int result;
->  
-> +	/* Extract only the first element in the queue list
-> +	 * TODO: Identify the relevant queue
-> +	 */
-> +	queue = list_first_entry(&ptp->tsevqs, struct timestamp_event_queue,
-> +				 qlist);
-> +
->  	if (cnt % sizeof(struct ptp_extts_event) != 0)
->  		return -EINVAL;
->  
-> diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
-> index 80f74e38c2da..7ac04a282ec5 100644
-> --- a/drivers/ptp/ptp_clock.c
-> +++ b/drivers/ptp/ptp_clock.c
-> @@ -166,6 +166,18 @@ static struct posix_clock_operations ptp_clock_ops = {
->  	.read		= ptp_read,
->  };
->  
-> +static void ptp_clean_queue_list(struct ptp_clock *ptp)
-> +{
-> +	struct timestamp_event_queue *element;
-> +	struct list_head *pos;
-> +
-> +	list_for_each(pos, &ptp->tsevqs) {
-
-Here it should be list_for_each_safe().
-
-> +		element = list_entry(pos, struct timestamp_event_queue, qlist);
-> +		list_del(pos);
-> +		kfree(element);
-> +	}
-> +}
-> +
->  static void ptp_clock_release(struct device *dev)
->  {
->  	struct ptp_clock *ptp = container_of(dev, struct ptp_clock, dev);
-> @@ -175,6 +187,7 @@ static void ptp_clock_release(struct device *dev)
->  	mutex_destroy(&ptp->tsevq_mux);
->  	mutex_destroy(&ptp->pincfg_mux);
->  	mutex_destroy(&ptp->n_vclocks_mux);
-> +	ptp_clean_queue_list(ptp);
->  	ida_free(&ptp_clocks_map, ptp->index);
->  	kfree(ptp);
->  }
-> @@ -206,6 +219,7 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
->  				     struct device *parent)
->  {
->  	struct ptp_clock *ptp;
-> +	struct timestamp_event_queue *queue = NULL;
->  	int err = 0, index, major = MAJOR(ptp_devt);
->  	size_t size;
->  
-> @@ -228,7 +242,13 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
->  	ptp->info = info;
->  	ptp->devid = MKDEV(major, index);
->  	ptp->index = index;
-> -	spin_lock_init(&ptp->tsevq.lock);
-> +	INIT_LIST_HEAD(&ptp->tsevqs);
-> +	queue = kzalloc(sizeof(*queue), GFP_KERNEL);
-> +	if (!queue)
-> +		goto no_memory_queue;
-> +	spin_lock_init(&queue->lock);
-> +	list_add_tail(&queue->qlist, &ptp->tsevqs);
-> +	/* TODO - Transform or delete this mutex */
->  	mutex_init(&ptp->tsevq_mux);
->  	mutex_init(&ptp->pincfg_mux);
->  	mutex_init(&ptp->n_vclocks_mux);
-> @@ -333,6 +353,8 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
->  	mutex_destroy(&ptp->tsevq_mux);
->  	mutex_destroy(&ptp->pincfg_mux);
->  	mutex_destroy(&ptp->n_vclocks_mux);
-> +	ptp_clean_queue_list(ptp);
-> +no_memory_queue:
->  	ida_free(&ptp_clocks_map, index);
->  no_slot:
->  	kfree(ptp);
-> @@ -375,6 +397,7 @@ EXPORT_SYMBOL(ptp_clock_unregister);
->  
->  void ptp_clock_event(struct ptp_clock *ptp, struct ptp_clock_event *event)
->  {
-> +	struct timestamp_event_queue *tsevq, *tsevq_alt;
->  	struct pps_event_time evt;
->  
->  	switch (event->type) {
-> @@ -383,7 +406,10 @@ void ptp_clock_event(struct ptp_clock *ptp, struct ptp_clock_event *event)
->  		break;
->  
->  	case PTP_CLOCK_EXTTS:
-> -		enqueue_external_timestamp(&ptp->tsevq, event);
-> +		/* Enqueue timestamp on all other queues */
-> +		list_for_each_entry_safe(tsevq, tsevq_alt, &ptp->tsevqs, qlist) {
-
-The _safe() version is for when the "pos" entry can be removed inside
-the loop. No need to use it here.
-
-> +			enqueue_external_timestamp(tsevq, event);
-> +		}
->  		wake_up_interruptible(&ptp->tsev_wq);
->  		break;
->  
-> diff --git a/drivers/ptp/ptp_private.h b/drivers/ptp/ptp_private.h
-> index 75f58fc468a7..314c21c39f6a 100644
-> --- a/drivers/ptp/ptp_private.h
-> +++ b/drivers/ptp/ptp_private.h
-> @@ -15,6 +15,7 @@
->  #include <linux/ptp_clock.h>
->  #include <linux/ptp_clock_kernel.h>
->  #include <linux/time.h>
-> +#include <linux/list.h>
->  
->  #define PTP_MAX_TIMESTAMPS 128
->  #define PTP_BUF_TIMESTAMPS 30
-> @@ -25,6 +26,7 @@ struct timestamp_event_queue {
->  	int head;
->  	int tail;
->  	spinlock_t lock;
-> +	struct list_head qlist;
->  };
->  
->  struct ptp_clock {
-> @@ -35,7 +37,7 @@ struct ptp_clock {
->  	int index; /* index into clocks.map */
->  	struct pps_device *pps_source;
->  	long dialed_frequency; /* remembers the frequency adjustment */
-> -	struct timestamp_event_queue tsevq; /* simple fifo for time stamps */
-> +	struct list_head tsevqs; /* timestamp fifo list */
->  	struct mutex tsevq_mux; /* one process at a time reading the fifo */
->  	struct mutex pincfg_mux; /* protect concurrent info->pin_config access */
->  	wait_queue_head_t tsev_wq;
-> diff --git a/drivers/ptp/ptp_sysfs.c b/drivers/ptp/ptp_sysfs.c
-> index 6e4d5456a885..2675f383cd0a 100644
-> --- a/drivers/ptp/ptp_sysfs.c
-> +++ b/drivers/ptp/ptp_sysfs.c
-> @@ -75,12 +75,16 @@ static ssize_t extts_fifo_show(struct device *dev,
->  			       struct device_attribute *attr, char *page)
->  {
->  	struct ptp_clock *ptp = dev_get_drvdata(dev);
-> -	struct timestamp_event_queue *queue = &ptp->tsevq;
-> +	struct timestamp_event_queue *queue;
->  	struct ptp_extts_event event;
->  	unsigned long flags;
->  	size_t qcnt;
->  	int cnt = 0;
->  
-> +	/* The sysfs fifo will always draw from the fist queue */
-> +	queue = list_first_entry(&ptp->tsevqs, struct timestamp_event_queue,
-> +				 qlist);
-> +
->  	memset(&event, 0, sizeof(event));
->  
->  	if (mutex_lock_interruptible(&ptp->tsevq_mux))
-> -- 
-> 2.34.1
+> > 2) you state that jits should not depend on this state, but the above
+> > commit adds more references than you're removing, so aren't there still
+> > references to the verifier remaining after this patch? I count a total
+> > of 10, and the patch below removes three.
 >
+> The JITs should not depend on this state for LDX (loading
+> a B/H/W.
+> This patch removes the usage only for LDX.
 >
+> > 3) what about the bpf_jit_needs_zext() function that was added to
+> > support the export of this zext state?
+>
+> That is still applicable, The verifier will still emit zext
+> instructions for other
+> instructions like BPF_ALU / BPF_ALU64
+>
+> >
+> > Essentially, the logic stated in the commit message doesn't seem to be
+> > reflected by the proposed code change.
+>
+> I will try to provide more information.
+> Currently I have asked Alexei if we really need this in [2].
+> I still think this optimization is useful and we should keep it.
 
--- 
-Vinicius
+Right. subreg tracking is indeed functional for narrow loads.
+Let's drop this patch set.
 
