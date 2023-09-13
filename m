@@ -1,126 +1,204 @@
-Return-Path: <netdev+bounces-33483-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33484-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6D9979E24B
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 10:38:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BB4C79E260
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 10:42:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0662E282014
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 08:38:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 673391C20DCF
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 08:42:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E0DA1426C;
-	Wed, 13 Sep 2023 08:38:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA3571798E;
+	Wed, 13 Sep 2023 08:41:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FBAD10F5
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 08:38:41 +0000 (UTC)
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E688A199F;
-	Wed, 13 Sep 2023 01:38:40 -0700 (PDT)
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-59bbdb435bfso6613747b3.3;
-        Wed, 13 Sep 2023 01:38:40 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A26DC4422
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 08:41:54 +0000 (UTC)
+Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A83A5196
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 01:41:53 -0700 (PDT)
+Received: by mail-qt1-x834.google.com with SMTP id d75a77b69052e-414ba610766so247991cf.0
+        for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 01:41:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1694594513; x=1695199313; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8vYkKTZQhnheseFWELcIvsSRa/uxYdJJ6yMzg5vRWAE=;
+        b=2vd0F4oCuk+DtBaN+uD00WDYr86iAhXwNjty5dr+KL/jDtYw8hi8udgjC5U9Vj+JA8
+         qWKGDho+DBBf5r7h3QO/zhtbwV8zISA78O+5nHCrDSg6PKjL705FL4QoUQFGeCDXmyIk
+         STDMq7ABkePe1yLLgIC9YHSX7hs6xZaiG2NEWSuPzvIkzB1MvQy6r6MQ+/GbMX4zAoQ1
+         5dMzADNE6EWzuK5FWGZb6+AJFSn1Q5Q9M5fEcfiPYb6tnc0hnUK3IUuLOzSwJtdHRznE
+         WB2FlViAcWiBYC59LKeiAmoSubwubdrF/oUk50tcOx7UDe9nziXf6U2nd8Cc9JqF4KFW
+         0s/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694594320; x=1695199120;
+        d=1e100.net; s=20230601; t=1694594513; x=1695199313;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=j0APiHDSlu5OFa6XpaHfv4wijVgZqQAKCVQiiG02fVU=;
-        b=c0sVSqYN2GUA/n+vd4t8S9JUXxFHrj4N58hIjjPcaXK6kio5Xm9wNajH5xXAkiLTxU
-         K3usW2hZhariB+uYh9p76gq2AP7jUjTcwCDUBsKPlzM57S7xPWyyw9/dJ9gxMs+R86ae
-         IRf6gkdoSd1yzPcfF7TFsdCp/ckPEkltMM3TbQjvLe6dwxmSc0FNiPbIkk2dXFAIPnFZ
-         pWBpUUgEoF8yCDLEu6JUA1QHjtHGpfHmu9g34QeCBX0aF5DcpVj/QMqgLLHHdZlKk2f2
-         S9VFjepad+aleGqN/g+r9DdUtSvOczcZjhGnqwkWrPLGe/Pwe7FEtnitg0YbgM9SWxLp
-         xnaQ==
-X-Gm-Message-State: AOJu0YwPVNCJUp9VkorwBKNWZzVrEmi0tyNtK7ATpLmOAoTLn+5B10Cz
-	LSpHfEsTgsZY2NYx20QOkTShZKJqPznQUw==
-X-Google-Smtp-Source: AGHT+IHVR1+9XMXuviKpXqSnEBQklVh/VeXvICR2YKqFtFEjdRzIK2Ko+TN+Tgm7CUbabYghun5aNA==
-X-Received: by 2002:a81:65d5:0:b0:595:8e80:30ef with SMTP id z204-20020a8165d5000000b005958e8030efmr1565503ywb.51.1694594319962;
-        Wed, 13 Sep 2023 01:38:39 -0700 (PDT)
-Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com. [209.85.219.174])
-        by smtp.gmail.com with ESMTPSA id h20-20020a81b414000000b00583f8f41cb8sm2917443ywi.63.2023.09.13.01.38.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Sep 2023 01:38:39 -0700 (PDT)
-Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-d7b91422da8so5681095276.2;
-        Wed, 13 Sep 2023 01:38:39 -0700 (PDT)
-X-Received: by 2002:a25:3717:0:b0:d81:4168:3a83 with SMTP id
- e23-20020a253717000000b00d8141683a83mr1659380yba.25.1694594319149; Wed, 13
- Sep 2023 01:38:39 -0700 (PDT)
+        bh=8vYkKTZQhnheseFWELcIvsSRa/uxYdJJ6yMzg5vRWAE=;
+        b=eYjROAIsbd8sMDTB8PPYxP4XpFI66290ZcC2DcPTIZ8iOs7LQeHITzTrRm0yWNmhZN
+         BaHyU/B37g6+cTl5543o3ZqmAr7akdBs+dRri1DSDVB4u681a+megqsJWaeozauLKqHO
+         mA+qcyLTKLQp1Q4zVRE1kMdutJmoc1oL3ey72+eLdA8PDGYgKK2i9oncBJt4mo+WNI33
+         +ocHoH1sH2xH9WtNG8wvg5i5GBSvlx3/+Pqo1JZ00TDfmeahkavDWbeZ2RWu/bq9evZU
+         GU//D/zcCmyD3ouX0UbkEFIi31sf4W3Xh9W4hkQI2zgcU03mgIzgvJmfQRFAbG9mDp8n
+         aQbQ==
+X-Gm-Message-State: AOJu0YxJ5T20o4BcgwSdrE1J2PhdmOeMjOossZB3H4iML+w19Zt91Uzt
+	QwNuTsJJnzD05LC7pl47sW13/kW6YZX+B/Cql/6g+w==
+X-Google-Smtp-Source: AGHT+IEPvPoP/N4UVak/L9vq8/rjuLTHtSXPO7S3/p/Eobnv657JE1/x30F6I/MdThy/U3lOsYs1DTPdAcl+Npdj0bo=
+X-Received: by 2002:a05:622a:547:b0:3f6:97b4:1a4d with SMTP id
+ m7-20020a05622a054700b003f697b41a4dmr150643qtx.23.1694594512584; Wed, 13 Sep
+ 2023 01:41:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230825091234.32713-1-quic_devipriy@quicinc.com>
- <20230825091234.32713-7-quic_devipriy@quicinc.com> <CAA8EJpo75zWLXuF-HC-Xz+6mvu_S1ET-9gzW=mOq+FjKspDwhw@mail.gmail.com>
- <CAMuHMdXx_b-uubonRH5=Tcxo+ddxg2wXvRNQNjhMrfvSFh0Xcw@mail.gmail.com> <daed3270-847e-f4c6-17ad-4d1962ae7d49@linaro.org>
-In-Reply-To: <daed3270-847e-f4c6-17ad-4d1962ae7d49@linaro.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Wed, 13 Sep 2023 10:38:27 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdVxykGwyrKKSHBv9AHy4gAeH7DT7caZarbs-F40zz5Jpw@mail.gmail.com>
-Message-ID: <CAMuHMdVxykGwyrKKSHBv9AHy4gAeH7DT7caZarbs-F40zz5Jpw@mail.gmail.com>
-Subject: Re: [PATCH V2 6/7] arm64: dts: qcom: ipq9574: Add support for nsscc node
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, Devi Priya <quic_devipriy@quicinc.com>, 
-	andersson@kernel.org, agross@kernel.org, konrad.dybcio@linaro.org, 
-	mturquette@baylibre.com, sboyd@kernel.org, robh+dt@kernel.org, 
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, 
-	catalin.marinas@arm.com, will@kernel.org, p.zabel@pengutronix.de, 
-	richardcochran@gmail.com, arnd@arndb.de, geert+renesas@glider.be, 
-	nfraprado@collabora.com, rafal@milecki.pl, peng.fan@nxp.com, 
-	linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
-	quic_saahtoma@quicinc.com
+References: <0000000000001c12b30605378ce8@google.com>
+In-Reply-To: <0000000000001c12b30605378ce8@google.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 13 Sep 2023 10:41:41 +0200
+Message-ID: <CANn89iLwMhOnrmQTZJ+BqZJSbJZ+Q4W6xRknAAr+uSrk5TX-EQ@mail.gmail.com>
+Subject: Re: [syzbot] [net?] WARNING in __ip6_append_data
+To: syzbot <syzbot+62cbf263225ae13ff153@syzkaller.appspotmail.com>, 
+	David Howells <dhowells@redhat.com>
+Cc: bpf@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Krzysztof,
-
-On Wed, Sep 13, 2023 at 10:26=E2=80=AFAM Krzysztof Kozlowski
-<krzysztof.kozlowski@linaro.org> wrote:
-> On 13/09/2023 10:23, Geert Uytterhoeven wrote:
-> >>
-> >>> +                       clock-names =3D "nssnoc_nsscc", "nssnoc_snoc"=
-, "nssnoc_snoc_1",
-> >>> +                                     "bias_pll_cc_clk", "bias_pll_ns=
-s_noc_clk",
-> >>> +                                     "bias_pll_ubi_nc_clk", "gpll0_o=
-ut_aux", "uniphy0_nss_rx_clk",
-> >>> +                                     "uniphy0_nss_tx_clk", "uniphy1_=
-nss_rx_clk",
-> >>> +                                     "uniphy1_nss_tx_clk", "uniphy2_=
-nss_rx_clk",
-> >>> +                                     "uniphy2_nss_tx_clk", "xo_board=
-_clk";
-> >>
-> >> You are using clock indices. Please drop clock-names.
-> >
-> > What do you mean by "using clock indices"?
-> > Note that the "clock-names" property is required according to the DT bi=
-ndings.
+On Wed, Sep 13, 2023 at 8:19=E2=80=AFAM syzbot
+<syzbot+62cbf263225ae13ff153@syzkaller.appspotmail.com> wrote:
 >
-> Indeed, thanks for pointing this out. Probably bindings should be changed=
-.
+> Hello,
+>
+> syzbot found the following issue on:
+>
+> HEAD commit:    65d6e954e378 Merge tag 'gfs2-v6.5-rc5-fixes' of git://git=
+...
+> git tree:       upstream
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=3D142177f468000=
+0
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=3Db273cdfbc13e9=
+a4b
+> dashboard link: https://syzkaller.appspot.com/bug?extid=3D62cbf263225ae13=
+ff153
+> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for D=
+ebian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D11f37a0c680=
+000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D10034f3fa8000=
+0
+>
 
-But what's so great about not having "clock-names"?
-There are _14_ input clocks.
+CC David
 
-Gr{oetje,eeting}s,
+Warning added in
 
-                        Geert
+commit ce650a1663354a6cad7145e7f5131008458b39d4
+Author: David Howells <dhowells@redhat.com>
+Date:   Wed Aug 2 08:36:50 2023 +0100
 
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
+    udp6: Fix __ip6_append_data()'s handling of MSG_SPLICE_PAGES
 
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/74df7181e630/dis=
+k-65d6e954.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/8455d5988dfe/vmlinu=
+x-65d6e954.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/8ee7b79f0dfd/b=
+zImage-65d6e954.xz
+>
+> IMPORTANT: if you fix the issue, please add the following tag to the comm=
+it:
+> Reported-by: syzbot+62cbf263225ae13ff153@syzkaller.appspotmail.com
+>
+> ------------[ cut here ]------------
+> WARNING: CPU: 1 PID: 5042 at net/ipv6/ip6_output.c:1800 __ip6_append_data=
+.isra.0+0x1be8/0x47f0 net/ipv6/ip6_output.c:1800
+> Modules linked in:
+> CPU: 1 PID: 5042 Comm: syz-executor133 Not tainted 6.5.0-syzkaller-11938-=
+g65d6e954e378 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
+oogle 07/26/2023
+> RIP: 0010:__ip6_append_data.isra.0+0x1be8/0x47f0 net/ipv6/ip6_output.c:18=
+00
+> Code: db f6 ff ff e8 09 d5 97 f8 49 8d 44 24 ff 48 89 44 24 60 49 8d 6c 2=
+4 07 e9 c2 f6 ff ff 4c 8b b4 24 90 01 00 00 e8 e8 d4 97 f8 <0f> 0b 48 8b 44=
+ 24 10 45 89 f4 48 8d 98 74 02 00 00 e8 d2 d4 97 f8
+> RSP: 0018:ffffc90003a1f3b8 EFLAGS: 00010293
+> RAX: 0000000000000000 RBX: 0000000000001004 RCX: 0000000000000000
+> RDX: ffff88801fe70000 RSI: ffffffff88efcf18 RDI: 0000000000000006
+> RBP: 0000000000001000 R08: 0000000000000006 R09: 0000000000001004
+> R10: 0000000000001000 R11: 0000000000000000 R12: 0000000000000001
+> R13: dffffc0000000000 R14: 0000000000001004 R15: ffff888019f31000
+> FS:  0000555557280380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000=
+000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 000000000045ad50 CR3: 0000000072666000 CR4: 00000000003506e0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>  ip6_append_data+0x1e6/0x510 net/ipv6/ip6_output.c:1895
+>  l2tp_ip6_sendmsg+0xdf9/0x1cc0 net/l2tp/l2tp_ip6.c:631
+>  inet_sendmsg+0x9d/0xe0 net/ipv4/af_inet.c:840
+>  sock_sendmsg_nosec net/socket.c:730 [inline]
+>  sock_sendmsg+0xd9/0x180 net/socket.c:753
+>  splice_to_socket+0xade/0x1010 fs/splice.c:881
+>  do_splice_from fs/splice.c:933 [inline]
+>  direct_splice_actor+0x118/0x180 fs/splice.c:1142
+>  splice_direct_to_actor+0x347/0xa30 fs/splice.c:1088
+>  do_splice_direct+0x1af/0x280 fs/splice.c:1194
+>  do_sendfile+0xb88/0x1390 fs/read_write.c:1254
+>  __do_sys_sendfile64 fs/read_write.c:1322 [inline]
+>  __se_sys_sendfile64 fs/read_write.c:1308 [inline]
+>  __x64_sys_sendfile64+0x1d6/0x220 fs/read_write.c:1308
+>  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+>  do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+>  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> RIP: 0033:0x7f6b11150469
+> Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f=
+7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff=
+ ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007fffd14e71a8 EFLAGS: 00000246 ORIG_RAX: 0000000000000028
+> RAX: ffffffffffffffda RBX: 00007fffd14e7378 RCX: 00007f6b11150469
+> RDX: 0000000000000000 RSI: 0000000000000004 RDI: 0000000000000005
+> RBP: 00007f6b111c3610 R08: 00007fffd14e7378 R09: 00007fffd14e7378
+> R10: 000000010000a006 R11: 0000000000000246 R12: 0000000000000001
+> R13: 00007fffd14e7368 R14: 0000000000000001 R15: 0000000000000001
+>  </TASK>
+>
+>
+> ---
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+>
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+>
+> If the bug is already fixed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
+>
+> If you want syzbot to run the reproducer, reply with:
+> #syz test: git://repo/address.git branch-or-commit-hash
+> If you attach or paste a git patch, syzbot will apply it before testing.
+>
+> If you want to overwrite bug's subsystems, reply with:
+> #syz set subsystems: new-subsystem
+> (See the list of subsystem names on the web dashboard)
+>
+> If the bug is a duplicate of another bug, reply with:
+> #syz dup: exact-subject-of-another-report
+>
+> If you want to undo deduplication, reply with:
+> #syz undup
 
