@@ -1,129 +1,206 @@
-Return-Path: <netdev+bounces-33478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24E4879E1B6
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 10:12:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF4F479E1E7
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 10:22:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B44FC281EC4
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 08:12:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A36E6281A4C
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 08:22:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3CB41DA44;
-	Wed, 13 Sep 2023 08:12:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BA711DA4A;
+	Wed, 13 Sep 2023 08:22:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B592B28F0
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 08:12:49 +0000 (UTC)
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE43419AC
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 01:12:48 -0700 (PDT)
-Received: by mail-lj1-x231.google.com with SMTP id 38308e7fff4ca-2b703a0453fso111905871fa.3
-        for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 01:12:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1694592767; x=1695197567; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Effk+lusPCVNss8+6kVJxDXnN+qLIdDsbSXn+BntKPU=;
-        b=tFoVEplYjdzJPrTa0YpQemI5Rw0rqjZd1YSleYrYBcF8W85FZX5IELhiShYjT4fzo6
-         6NYsB/L/07mEDke+thYUAWB592enHizW6Ox46I0YtO4awD0QzQG4frBS6CxE2Roqifw1
-         bYMdrveXF1CvRGeZYPVNSOncTkPVl3xlGQe8r4+kJNeY0jI73Zx2po4DTrLN30m2awYC
-         lObnal8zZDK/YGaT9qkHKnx9ra9rog8/YeqAtAsRhuw7sSdNAm69qvWDzuvZoLYECR+w
-         Q0A7f064IQX/fUf/ws4p4uN+Y5kXD5CxPBlctQxPzphHzL8MNcjva4/xtORaRuozxVAZ
-         fWRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694592767; x=1695197567;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Effk+lusPCVNss8+6kVJxDXnN+qLIdDsbSXn+BntKPU=;
-        b=AmQD865rDhQwS/BJOYCMaFF1aOLLBEQ7GdQvttV56Wc361iWcCFKnxYULBEN0XLW2f
-         Lt7Aqs3tF4tm5xAc4yRgygUa0F9fONULdp4wi6FKBLG/eBhYSn0W4G9qDxHrLqBdxd6S
-         wWiC7fW6z0uUVqj6xJojRGsdisBlSm13VVlrdDGcxjRbda99qpzt62nHJoz4jZRM2WLG
-         B5EogCl0smV0zICwPfYrh/L+PkKgpaNbryh+p4BtpTZ1f73lZ5CR3Hg+jrTCyqACn7bo
-         0B4IgUdJys5+69xSTw8UgiUuvBqSYcxSBi6YJTCB+Tacd/e6xn7CZZT3f73GuPWgbpRv
-         Ub3g==
-X-Gm-Message-State: AOJu0Yw2S+nmPdq0J2Eqcm6lEN8t6D9Jk8rs1367ISBybqCa4mKnwGQr
-	RUk4bfB48SpxCBeOLhZDDo5hSq3SwHBZG+cZDcc=
-X-Google-Smtp-Source: AGHT+IGHLnROkY9Nc5lTGJ7J0WsSQ5aWhMGlHVC10cdy4ovpgG40cg4mutcD9l+EYUheHFxu5ila7Q==
-X-Received: by 2002:a2e:7a01:0:b0:2b6:9ed0:46f4 with SMTP id v1-20020a2e7a01000000b002b69ed046f4mr1648810ljc.23.1694592767099;
-        Wed, 13 Sep 2023 01:12:47 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id k20-20020a7bc414000000b003fee9cdf55esm1278080wmi.14.2023.09.13.01.12.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Sep 2023 01:12:46 -0700 (PDT)
-Date: Wed, 13 Sep 2023 10:12:45 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Patrick Rohr <prohr@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Linux Network Development Mailing List <netdev@vger.kernel.org>,
-	Maciej =?utf-8?Q?=C5=BBenczykowski?= <maze@google.com>,
-	Lorenzo Colitti <lorenzo@google.com>,
-	Jen Linkova <furry@google.com>
-Subject: Re: [PATCH net-next v2] net: add sysctl to disable rfc4862 5.5.3e
- lifetime handling
-Message-ID: <ZQFu/SXXAhN10jNY@nanopsycho>
-References: <20230912134425.4083337-1-prohr@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FD8D17758
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 08:22:29 +0000 (UTC)
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 276D4C3;
+	Wed, 13 Sep 2023 01:22:28 -0700 (PDT)
+Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id B0E1586823;
+	Wed, 13 Sep 2023 10:22:25 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1694593346;
+	bh=FfGne0WgsVfqXylHiwFj1ygRcfdEUwRbXoP1KKdbSDU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=z4TsVOpyAqa90KLQUBT5JR2Tn1agpnaARKwbrh9ckZZM+7/CWaZtzLJ0gnULseHsI
+	 5WZ+kF5HZoU2Y9x917A/ON0Qse1GCuwJtc3MK5KxcHsKMRIrnjqHCYhrq66jERgZQQ
+	 XS7OhQhAXSqO9faKT6T/VTFOi0CGxweaVboKN+KJokcxku2LnVG9tdLpwoVwXCnEG2
+	 YICzheb/iWSto8+7Adxdav36JJKd7LCYM0zX0O+vm9RsLfNRGaQFPS0cW7UD90guNz
+	 kYJ/ONzlo7VRTpf44T5Zt0TiwSBkLMmszJjPt0L47crhTNW5EKTF8kC3RdKlRYctXJ
+	 AMjhvontiDAWg==
+Date: Wed, 13 Sep 2023 10:22:19 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>
+Cc: Tristram.Ha@microchip.com, Eric Dumazet <edumazet@google.com>,
+ davem@davemloft.net, Woojung Huh <woojung.huh@microchip.com>, Oleksij
+ Rempel <o.rempel@pengutronix.de>, Florian Fainelli <f.fainelli@gmail.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ UNGLinuxDriver@microchip.com, Oleksij Rempel <linux@rempel-privat.de>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [[RFC PATCH v4 net-next] 0/2] net: dsa: hsr: Enable HSR HW
+ offloading for KSZ9477
+Message-ID: <20230913102219.773e38f8@wsk>
+In-Reply-To: <20230912215523.as4puqamj65dikip@skbuf>
+References: <20230912092909.4yj4b2b4xrhzdztu@skbuf>
+	<20230906152801.921664-1-lukma@denx.de>
+	<20230911165848.0741c03c@wsk>
+	<20230911160501.5vc4nttz6fnww56h@skbuf>
+	<20230912101748.0ca4eec8@wsk>
+	<20230912092909.4yj4b2b4xrhzdztu@skbuf>
+	<20230912160326.188e1d13@wsk>
+	<20230912160326.188e1d13@wsk>
+	<20230912142644.u4sdkveei3e5hwaf@skbuf>
+	<20230912170641.5bfc3cfe@wsk>
+	<20230912215523.as4puqamj65dikip@skbuf>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230912134425.4083337-1-prohr@google.com>
+Content-Type: multipart/signed; boundary="Sig_/VUl7zmoZGIpwqGbfIpDnoV4";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-Tue, Sep 12, 2023 at 03:44:25PM CEST, prohr@google.com wrote:
->This change adds a sysctl to opt-out of RFC4862 section 5.5.3e's valid
->lifetime derivation mechanism.
->
->RFC4862 section 5.5.3e prescribes that the valid lifetime in a Router
->Advertisement PIO shall be ignored if it less than 2 hours and to reset
->the lifetime of the corresponding address to 2 hours. An in-progress
->6man draft (see draft-ietf-6man-slaac-renum-07 section 4.2) is currently
->looking to remove this mechanism. While this draft has not been moving
->particularly quickly for other reasons, there is widespread consensus on
->section 4.2 which updates RFC4862 section 5.5.3e.
->
->Cc: Maciej Żenczykowski <maze@google.com>
->Cc: Lorenzo Colitti <lorenzo@google.com>
->Cc: Jen Linkova <furry@google.com>
->Signed-off-by: Patrick Rohr <prohr@google.com>
->---
-> Documentation/networking/ip-sysctl.rst | 11 ++++++++
-> include/linux/ipv6.h                   |  1 +
-> net/ipv6/addrconf.c                    | 38 +++++++++++++++++---------
-> 3 files changed, 37 insertions(+), 13 deletions(-)
->
->diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
->index a66054d0763a..7f21877e3f78 100644
->--- a/Documentation/networking/ip-sysctl.rst
->+++ b/Documentation/networking/ip-sysctl.rst
->@@ -2304,6 +2304,17 @@ accept_ra_pinfo - BOOLEAN
-> 		- enabled if accept_ra is enabled.
-> 		- disabled if accept_ra is disabled.
-> 
->+ra_pinfo_rfc4862_5_5_3e - BOOLEAN
+--Sig_/VUl7zmoZGIpwqGbfIpDnoV4
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-This is very odd sysctl name.
+Hi Vladimir,
+
+> On Tue, Sep 12, 2023 at 05:06:41PM +0200, Lukasz Majewski wrote:
+> > Are we debating about some possible impact on patches which were
+> > posted and (in a near future?) would be reposted? =20
+>=20
+> We are discussing the ways in which a multi-purpose register should be
+> programmed. Not "the impact on patches" per se, because Oleksij will
+> have to adapt no matter what you do, but rather the options that
+> remain available to him, after the first feature that makes use of the
+> multi-purpose register makes its way to mainline.
+>=20
+> > > > Considering the above - the HSR implementation is safe (to the
+> > > > extend to the whole DSA subsystem current operation). Am I
+> > > > correct?=20
+> > >=20
+> > > If we exclude the aforementioned bug (which won't be a bug
+> > > forever), there still exists the case where the MAC address of a
+> > > DSA user port can be changed. The HSR driver has a
+> > > NETDEV_CHANGEADDR handler for this as well, and updates its own
+> > > MAC address to follow the port. If that is allowed to happen
+> > > after the offload, currently it will break the offload. =20
+> >=20
+> > But then we can have struct ksz_device extended with bitmask -
+> > hw_mac_addr_ports, which could be set to ports (WoL or HSR) when
+> > REG_MAC_ADDR_0 is written.
+> >=20
+> > If WoL would like to alter it after it was written by HSR, then the
+> > error is presented (printed) to the user and we return.
+> >=20
+> > The same would be with HSR altering the WoL's MAC in-device setup.
+> >=20
+> >=20
+> > The HSR or WoL can be added without issues (the first one which is
+> > accepted).
+> >=20
+> > Then the second feature would need to implement this check. =20
+>=20
+> This is more or less a rehash of what I proposed as option 2, except
+> for the fact that you suggest a port mask and I suggest a proper
+> refcount_t. And the reason why I suggest that is to allow the
+> "WoL+HSR on the same port" to work. With your proposal, both the HSR
+> and WoL code paths would set the same bit in hw_mac_addr_ports, which
+> would become problematic when the time comes to unset it. Not so much
+> when every port calls refcount_inc() per feature. With WoL+HSR on the
+> same port, the MAC address would have a refcount of 2, and you could
+> call port_hsr_leave() and that refcount would just drop to 1 instead
+> of letting go.
+>=20
+
+Why we cannot have even simpler solution - in the HSR/Wol code we read
+content of REG_SW_MAC_ADDR_0 (the actually programmed MAC) and:
+
+- If not programmed - use DSA master one (like done in mine patches)
+
+- If already programmed:
+	 - check if equal to DSA master - proceed with HSR.
+	 - if not equal to DSA master (e.g. WoL altered) - exit HSR join
+	   with information that offloading is not possible
+
+Then, the content of REG_SW_MAC_ADDR_X would determine what to do with
+it.
+
+> There are probably hundreds of implementations of this idea in the
+> kernel, but the one that comes to my mind is ocelot_mirror_get() +
+> ocelot_mirror_put(). Again, I need to mention that I know that port
+> mirroring !=3D HSR - I'm just talking about the technique.
+>=20
+> There is one more thing that your reply to my observation fails to
+> address. Even with this refcount thing, you will still need to add
+> code to dsa_slave_set_mac_address() which notifies the ksz driver, so
+> that the driver can refuse MAC address changes, which would break the
+> offloads. Ack?
+
+And the above problem is not related to the DSA slave address change
+discussed earlier?
+
+>=20
+> In principle it sounds like a plan. It just needs to be implemented.
+
+To clarify:
+
+0. It looks like described above prevention from REG_SW_MAC_ADDR_X
+overwriting and DSA slave port MAC address change are needed.
+
+Then questions about time line:
+
+1. The HSR code is accepted without fixes from 0. and then when other
+user (WoL) patches are posted problems from 0. needs to be addressed.
 
 
->+	Use RFC4862 Section 5.5.3e to determine the valid lifetime of
->+	an address matching a prefix sent in a Router Advertisement
->+	Prefix Information Option.
->+
->+	- If enabled, RFC4862 section 5.5.3e is used to determine
->+	  the valid lifetime of the address.
->+	- If disabled, the PIO valid lifetime will always be honored.
+or=20
 
-Can't you reverse the logic and call it something like:
-ra_honor_pio_lifetime
-?
 
+2. To accept the HSR code you (and other community members? Russell,
+Andrew) require the fixes from 0. first.=20
+
+
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/VUl7zmoZGIpwqGbfIpDnoV4
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmUBcTsACgkQAR8vZIA0
+zr0ogAgA0webWRC7J32HSocwpeFgRbKldfCbkZ6uN2y7jBdjlJd+UsXiIlgrIj76
+tepQ8l2geDOQ9PlutvBHLfrCY0EZbvAzcAydb4p9PYuD+H2u6FIy0q6c2xPy0Hf7
+qd8CrcJFQMu9vObKK2oiC1i/H0umcySGnoseb9dYYphAUTJobSvQHjeYzu6PwWdN
+//3AckO3/1eMrYrBhcMapGxAuj+gA5VUdMKVJRWY9+4OOcfO1qLdZvLfa3/5cxx0
+E9CZmzCJI+gwO2bxwLi4+oVjVqBYywKbkON+LRXIIF2S43VIRC8MLBdWCmTmOYyZ
+vkU/ocIGygyX/yqnmiPPsNJ4E28xRQ==
+=6j3Z
+-----END PGP SIGNATURE-----
+
+--Sig_/VUl7zmoZGIpwqGbfIpDnoV4--
 
