@@ -1,360 +1,139 @@
-Return-Path: <netdev+bounces-33416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AF7679DCFE
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 02:11:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4647D79DD47
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 02:56:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43E44282373
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 00:11:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 079AE2820D5
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 00:56:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF17637A;
-	Wed, 13 Sep 2023 00:11:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 454E0387;
+	Wed, 13 Sep 2023 00:56:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D35E57F
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 00:11:02 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32FB4170A
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 17:11:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694563862; x=1726099862;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=xkf7l75g0O3i6EZ0z5UB0ChLZQIhjofCvcNQqKO/UNw=;
-  b=LU0nDZfvJbouU6j3KqL0dwZMuOInaPwwGt9E9M7HhV6H+yXb9zNHeu4s
-   Zvju2t+Ci8EzN8Z6UylRPWDsSIjg5mqVWhuAcORBVVTX5uqZohR7sPlq4
-   AmgRgnm5ev49qj4XJmd/DA7o+pnpyMdv2WoC6m2r8iR7ANXBl2VrlZjms
-   0tPeWXCQzSeTa4nQsLbfGd36bbPvpwdXLCKZCSHN+81EoVBT/eKTTfBAJ
-   1UBvefBRGjzo7koEv7ZNVLwWMMSS9WzeWwqn5x2l0n/BDT9j2Rnj2VgSO
-   KjVhKW10P8vxX1KxfsGx9aoj25HnlU6VpenE+D98H0APVsl9MEe4YtLpn
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="358800253"
-X-IronPort-AV: E=Sophos;i="6.02,141,1688454000"; 
-   d="scan'208";a="358800253"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2023 17:11:01 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="747093104"
-X-IronPort-AV: E=Sophos;i="6.02,141,1688454000"; 
-   d="scan'208";a="747093104"
-Received: from yizhang6-mobl.amr.corp.intel.com (HELO vcostago-mobl3) ([10.209.67.184])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2023 17:11:00 -0700
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Xabier Marquiegui <reibax@gmail.com>, netdev@vger.kernel.org
-Cc: richardcochran@gmail.com, horms@kernel.org,
- chrony-dev@chrony.tuxfamily.org, mlichvar@redhat.com, reibax@gmail.com,
- ntp-lists@mattcorallo.com, shuah@kernel.org, davem@davemloft.net,
- rrameshbabu@nvidia.com, alex.maftei@amd.com
-Subject: Re: [PATCH net-next v2 2/3] ptp: support multiple timestamp event
- readers
-In-Reply-To: <20230912220217.2008895-2-reibax@gmail.com>
-References: <20230912220217.2008895-1-reibax@gmail.com>
- <20230912220217.2008895-2-reibax@gmail.com>
-Date: Tue, 12 Sep 2023 17:10:59 -0700
-Message-ID: <871qf3oru4.fsf@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 266D3384;
+	Wed, 13 Sep 2023 00:56:12 +0000 (UTC)
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6ED010CC;
+	Tue, 12 Sep 2023 17:56:11 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2bcda0aaf47so4815651fa.1;
+        Tue, 12 Sep 2023 17:56:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694566570; x=1695171370; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=TKovJZqebXJbOFUyHFPe+N2WMCwxRV8QMx9N79j3g7c=;
+        b=IoAgAz0kTx4fdYw7nBOQZpigEfY92bAvK6g5rX7JgczIafPa8L5dl/QiEmdHxFyaRR
+         oKAG8BZTixWDh4mmMjklDb+22YQsBGxNQeJRWZQOBTO8jR891dh+AKb5hFSqCGzxe8NY
+         ikoPmsOVMimqyHdfjnXPjfFKKiozrmu8SC64Nb58mwAcWhw+9vc2ZomGA2c2dAmcTMCq
+         cInjlB1Cn54KRYxMjEM5kSs+fs3JauCSka37T8KDc2YmcfzS847OLCZY5QOgTPnpAPva
+         YPWwYWlR5LlQhL9devQIAPbJzvKeVS54sRueRgxBMWdCWgCnLt2ISw8nitQoTBQaoker
+         947Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694566570; x=1695171370;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TKovJZqebXJbOFUyHFPe+N2WMCwxRV8QMx9N79j3g7c=;
+        b=Yrh5QNNRgPp8R/jieDpye85SVMoGieb2qxPv3Nq9aL+/27Mi0Bo8pkKGnRB7m3O0Xz
+         Ziz2YHbIXULPENWZmZH78dwf30JiMOLcgt9oPWDANAj+5QwKfum0SZb/YFPuH15rBGK+
+         RhJU0/v+cbyOgOKZ6w/iUYFWIuobkBuitCg2GHG6lA9RlAc2TtmAnHLgrZNuKQq+jYYW
+         RbS2Y8whyychJySrpGa5vYyfoaST7e7/Dqtkje9jTNbmW56+nPDTpMjuZynu+Ru9o4lt
+         jCaKdXusGgDw0XPeRZJShWQdWwDMc3d7h1gSLoUM1igqy0Mq8bSDVE4QOubRY0TP2mon
+         YeSg==
+X-Gm-Message-State: AOJu0YwQYjUS3JldRBlSkfj3Tw+zFVzQrxMhkEEWlDcgsToMtn1oio60
+	FADMuWh5utQR4RWVe3cW/AY=
+X-Google-Smtp-Source: AGHT+IHUrxU60J1tom9TqtgSJejIbp2hGaIwb6cddhpFYE26qISZmBLljXKw2AjEbpsbuPyzWyUTEg==
+X-Received: by 2002:a2e:6812:0:b0:2bc:ff6c:3018 with SMTP id c18-20020a2e6812000000b002bcff6c3018mr370809lja.21.1694566569782;
+        Tue, 12 Sep 2023 17:56:09 -0700 (PDT)
+Received: from mobilestation ([95.79.219.206])
+        by smtp.gmail.com with ESMTPSA id s10-20020a2e2c0a000000b002b836d8c839sm2151252ljs.40.2023.09.12.17.56.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Sep 2023 17:56:09 -0700 (PDT)
+Date: Wed, 13 Sep 2023 03:56:07 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Jose Abreu <Jose.Abreu@synopsys.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Alexei Starovoitov <ast@kernel.org>, 
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	"David S. Miller" <davem@davemloft.net>, Emil Renner Berthing <kernel@esmil.dk>, 
+	Eric Dumazet <edumazet@google.com>, Fabio Estevam <festevam@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
+	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, NXP Linux Team <linux-imx@nxp.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Pengutronix Kernel Team <kernel@pengutronix.de>, 
+	Samin Guo <samin.guo@starfivetech.com>, Sascha Hauer <s.hauer@pengutronix.de>, 
+	Shawn Guo <shawnguo@kernel.org>
+Subject: Re: [PATCH net-next 1/6] net: stmmac: add platform library
+Message-ID: <okbvyvjjww5mvwj2ogrphfsy66gx2bjn4fl27vywbl52gdgwe5@aps4umive6lk>
+References: <E1qfiq8-007TOe-9F@rmk-PC.armlinux.org.uk>
+ <DM4PR12MB5088F83CE829184956147E6BD3F1A@DM4PR12MB5088.namprd12.prod.outlook.com>
+ <u7sabfdqk7i6wlv2j4cxuyb6psjwqs2kukdkafhcpq2zc766m3@m6iqexqjrvkv>
+ <ZQCbB3qZlTvIM7rf@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZQCbB3qZlTvIM7rf@shell.armlinux.org.uk>
 
-Xabier Marquiegui <reibax@gmail.com> writes:
+On Tue, Sep 12, 2023 at 06:08:23PM +0100, Russell King (Oracle) wrote:
+> On Tue, Sep 12, 2023 at 12:32:40PM +0300, Serge Semin wrote:
+> > On Tue, Sep 12, 2023 at 07:59:49AM +0000, Jose Abreu wrote:
+> > > From: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > > Date: Mon, Sep 11, 2023 at 16:28:40
+> > > 
+> > > > Add a platform library of helper functions for common traits in the
+> > > > platform drivers. Currently, this is setting the tx clock.
+> > > > 
+> > > > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > > > ---
+> > 
+> > > >  drivers/net/ethernet/stmicro/stmmac/Makefile  |  2 +-
+> > > >  .../ethernet/stmicro/stmmac/stmmac_plat_lib.c | 29 +++++++++++++++++++
+> > > >  .../ethernet/stmicro/stmmac/stmmac_plat_lib.h |  8 +++++
+> > > 
+> > > Wouldn't it be better to just call it "stmmac_lib{.c,.h}" in case we need to add
+> > > more helpers on the future that are not only for platform-based drivers?
+> > 
+> > What is the difference between stmmac_platform.{c,h} and
+> > stmmac_plat_lib.{c,h} files? It isn't clear really. In perspective it
+> > may cause confusions like mixed definitions in both of these files.
+> > 
+> > Why not to use the stmmac_platform.{c,h} instead of adding one more
+> > file?
+> 
 
-> Use linked lists to create one event queue per open file. This enables
-> simultaneous readers for timestamp event queues.
->
-> Signed-off-by: Xabier Marquiegui <reibax@gmail.com>
-> Suggested-by: Richard Cochran <richardcochran@gmail.com>
-> ---
-> v2:
->   - fix ptp_poll() return value
->   - Style changes to comform to checkpatch strict suggestions
->   - more coherent ptp_read error exit routines
-> v1: https://lore.kernel.org/netdev/20230906104754.1324412-3-reibax@gmail.com/
->
->  drivers/ptp/ptp_chardev.c | 100 +++++++++++++++++++++++++++++---------
->  drivers/ptp/ptp_clock.c   |   6 +--
->  drivers/ptp/ptp_private.h |   4 +-
->  drivers/ptp/ptp_sysfs.c   |   4 --
->  4 files changed, 82 insertions(+), 32 deletions(-)
->
-> diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
-> index 197edf1179f1..c9da0f27d204 100644
-> --- a/drivers/ptp/ptp_chardev.c
-> +++ b/drivers/ptp/ptp_chardev.c
-> @@ -103,9 +103,39 @@ int ptp_set_pinfunc(struct ptp_clock *ptp, unsigned int pin,
->  
->  int ptp_open(struct posix_clock *pc, fmode_t fmode)
->  {
-> +	struct ptp_clock *ptp = container_of(pc, struct ptp_clock, clock);
-> +	struct timestamp_event_queue *queue;
-> +
-> +	queue = kzalloc(sizeof(*queue), GFP_KERNEL);
-> +	if (!queue)
-> +		return -EINVAL;
-> +	queue->reader_pid = task_pid_nr(current);
+> Is stmmac_platform.{c,h} used by all the drivers that are making use of
+> this? I'm not entirely sure.
+> 
+> If it is, then yes, it can go in stmmac_platform.[ch]. If not, then I
+> don't think we'd want the bloat of forcing all of stmmac_platform.[ch]
+> onto drivers that only want to use this one function.
 
-Using the pid of the task will break when using some form of file
-descriptor passing. e.g. Task A opened the chardev, called the ioctl()
-with some mask and then passed the fd to Task B, that's actually going
-to use the fd.
+With a few exceptions almost all the STMMAC/DW*MAC glue drivers use
+the methods from the stmmac_platform.c module including the bits
+touched by your patchset. AFAICS semantically both stmmac_platform.c
+and stmmac_plat_lib.c look the same. They don't do anything on its own
+but provide some common methods utilized by the glue drivers for some
+platform-specific setups. So basically stmmac_platform.[ch] is already
+a library of the common platform methods. There is no need in creating
+another one.
 
-Is this something that we want to support? Am I missing something?
+-Serge(y)
 
-> +	list_add_tail(&queue->qlist, &ptp->tsevqs);
-> +
->  	return 0;
->  }
->  
-> +int ptp_release(struct posix_clock *pc)
-> +{
-> +	struct ptp_clock *ptp = container_of(pc, struct ptp_clock, clock);
-> +	struct list_head *pos, *n;
-> +	struct timestamp_event_queue *element;
-> +	int found = -1;
-> +	pid_t reader_pid = task_pid_nr(current);
-> +
-> +	list_for_each_safe(pos, n, &ptp->tsevqs) {
-> +		element = list_entry(pos, struct timestamp_event_queue, qlist);
-> +		if (element->reader_pid == reader_pid) {
-> +			list_del(pos);
-> +			kfree(element);
-> +			found = 0;
-> +			return found;
-> +		}
-> +	}
-> +
-> +	return found;
-> +}
-> +
->  long ptp_ioctl(struct posix_clock *pc, unsigned int cmd, unsigned long arg)
->  {
->  	struct ptp_clock *ptp = container_of(pc, struct ptp_clock, clock);
-> @@ -435,14 +465,24 @@ long ptp_ioctl(struct posix_clock *pc, unsigned int cmd, unsigned long arg)
->  __poll_t ptp_poll(struct posix_clock *pc, struct file *fp, poll_table *wait)
->  {
->  	struct ptp_clock *ptp = container_of(pc, struct ptp_clock, clock);
-> +	pid_t reader_pid = task_pid_nr(current);
->  	struct timestamp_event_queue *queue;
-> +	struct list_head *pos, *n;
-> +	bool found = false;
->  
->  	poll_wait(fp, &ptp->tsev_wq, wait);
->  
-> -	/* Extract only the first element in the queue list
-> -	 * TODO: Identify the relevant queue
-> -	 */
-> -	queue = list_entry(&ptp->tsevqs, struct timestamp_event_queue, qlist);
-> +	/* Extract only the desired element in the queue list */
-> +	list_for_each_safe(pos, n, &ptp->tsevqs) {
-> +		queue = list_entry(pos, struct timestamp_event_queue, qlist);
-> +		if (queue->reader_pid == reader_pid) {
-> +			found = true;
-> +			break;
-> +		}
-> +	}
-> +
-> +	if (!found)
-> +		return EPOLLERR;
->  
->  	return queue_cnt(queue) ? EPOLLIN : 0;
->  }
-> @@ -453,44 +493,54 @@ ssize_t ptp_read(struct posix_clock *pc,
->  		 uint rdflags, char __user *buf, size_t cnt)
->  {
->  	struct ptp_clock *ptp = container_of(pc, struct ptp_clock, clock);
-> +	pid_t reader_pid = task_pid_nr(current);
->  	struct timestamp_event_queue *queue;
->  	struct ptp_extts_event *event;
-> +	struct list_head *pos, *n;
->  	unsigned long flags;
-> +	bool found = false;
->  	size_t qcnt, i;
->  	int result;
->  
-> -	/* Extract only the first element in the queue list
-> -	 * TODO: Identify the relevant queue
-> -	 */
-> -	queue = list_first_entry(&ptp->tsevqs, struct timestamp_event_queue,
-> -				 qlist);
-> +	/* Extract only the desired element in the queue list */
-> +	list_for_each_safe(pos, n, &ptp->tsevqs) {
-> +		queue = list_entry(pos, struct timestamp_event_queue, qlist);
-> +		if (queue->reader_pid == reader_pid) {
-> +			found = true;
-> +			break;
-> +		}
-> +	}
->  
-> -	if (cnt % sizeof(struct ptp_extts_event) != 0)
-> -		return -EINVAL;
-> +	if (!found) {
-> +		result = -EINVAL;
-> +		goto exit;
-> +	}
-> +
-> +	if (cnt % sizeof(struct ptp_extts_event) != 0) {
-> +		result = -EINVAL;
-> +		goto exit;
-> +	}
->  
->  	if (cnt > EXTTS_BUFSIZE)
->  		cnt = EXTTS_BUFSIZE;
->  
->  	cnt = cnt / sizeof(struct ptp_extts_event);
->  
-> -	if (mutex_lock_interruptible(&ptp->tsevq_mux))
-> -		return -ERESTARTSYS;
-> -
->  	if (wait_event_interruptible(ptp->tsev_wq,
->  				     ptp->defunct || queue_cnt(queue))) {
-> -		mutex_unlock(&ptp->tsevq_mux);
-> -		return -ERESTARTSYS;
-> +		result = -ERESTARTSYS;
-> +		goto exit;
->  	}
->  
->  	if (ptp->defunct) {
-> -		mutex_unlock(&ptp->tsevq_mux);
-> -		return -ENODEV;
-> +		result = -ENODEV;
-> +		goto exit;
->  	}
->  
->  	event = kmalloc(EXTTS_BUFSIZE, GFP_KERNEL);
->  	if (!event) {
-> -		mutex_unlock(&ptp->tsevq_mux);
-> -		return -ENOMEM;
-> +		result = -ENOMEM;
-> +		goto exit;
->  	}
->  
->  	spin_lock_irqsave(&queue->lock, flags);
-> @@ -509,12 +559,16 @@ ssize_t ptp_read(struct posix_clock *pc,
->  
->  	cnt = cnt * sizeof(struct ptp_extts_event);
->  
-> -	mutex_unlock(&ptp->tsevq_mux);
-> -
->  	result = cnt;
-> -	if (copy_to_user(buf, event, cnt))
-> +	if (copy_to_user(buf, event, cnt)) {
->  		result = -EFAULT;
-> +		goto free_event;
-> +	}
->  
-> +free_event:
->  	kfree(event);
-> +exit:
-> +	if (result < 0)
-> +		ptp_release(pc);
->  	return result;
->  }
-> diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
-> index 7ac04a282ec5..d52fc23e20a8 100644
-> --- a/drivers/ptp/ptp_clock.c
-> +++ b/drivers/ptp/ptp_clock.c
-> @@ -162,6 +162,7 @@ static struct posix_clock_operations ptp_clock_ops = {
->  	.clock_settime	= ptp_clock_settime,
->  	.ioctl		= ptp_ioctl,
->  	.open		= ptp_open,
-> +	.release	= ptp_release,
->  	.poll		= ptp_poll,
->  	.read		= ptp_read,
->  };
-> @@ -184,7 +185,6 @@ static void ptp_clock_release(struct device *dev)
->  
->  	ptp_cleanup_pin_groups(ptp);
->  	kfree(ptp->vclock_index);
-> -	mutex_destroy(&ptp->tsevq_mux);
->  	mutex_destroy(&ptp->pincfg_mux);
->  	mutex_destroy(&ptp->n_vclocks_mux);
->  	ptp_clean_queue_list(ptp);
-> @@ -246,10 +246,9 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
->  	queue = kzalloc(sizeof(*queue), GFP_KERNEL);
->  	if (!queue)
->  		goto no_memory_queue;
-> +	queue->reader_pid = 0;
->  	spin_lock_init(&queue->lock);
->  	list_add_tail(&queue->qlist, &ptp->tsevqs);
-> -	/* TODO - Transform or delete this mutex */
-> -	mutex_init(&ptp->tsevq_mux);
->  	mutex_init(&ptp->pincfg_mux);
->  	mutex_init(&ptp->n_vclocks_mux);
->  	init_waitqueue_head(&ptp->tsev_wq);
-> @@ -350,7 +349,6 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
->  	if (ptp->kworker)
->  		kthread_destroy_worker(ptp->kworker);
->  kworker_err:
-> -	mutex_destroy(&ptp->tsevq_mux);
->  	mutex_destroy(&ptp->pincfg_mux);
->  	mutex_destroy(&ptp->n_vclocks_mux);
->  	ptp_clean_queue_list(ptp);
-> diff --git a/drivers/ptp/ptp_private.h b/drivers/ptp/ptp_private.h
-> index 314c21c39f6a..046d1482bcee 100644
-> --- a/drivers/ptp/ptp_private.h
-> +++ b/drivers/ptp/ptp_private.h
-> @@ -27,6 +27,7 @@ struct timestamp_event_queue {
->  	int tail;
->  	spinlock_t lock;
->  	struct list_head qlist;
-> +	pid_t reader_pid;
->  };
->  
->  struct ptp_clock {
-> @@ -38,7 +39,6 @@ struct ptp_clock {
->  	struct pps_device *pps_source;
->  	long dialed_frequency; /* remembers the frequency adjustment */
->  	struct list_head tsevqs; /* timestamp fifo list */
-> -	struct mutex tsevq_mux; /* one process at a time reading the fifo */
->  	struct mutex pincfg_mux; /* protect concurrent info->pin_config access */
->  	wait_queue_head_t tsev_wq;
->  	int defunct; /* tells readers to go away when clock is being removed */
-> @@ -124,6 +124,8 @@ long ptp_ioctl(struct posix_clock *pc,
->  
->  int ptp_open(struct posix_clock *pc, fmode_t fmode);
->  
-> +int ptp_release(struct posix_clock *pc);
-> +
->  ssize_t ptp_read(struct posix_clock *pc,
->  		 uint flags, char __user *buf, size_t cnt);
->  
-> diff --git a/drivers/ptp/ptp_sysfs.c b/drivers/ptp/ptp_sysfs.c
-> index 2675f383cd0a..512b0164ef18 100644
-> --- a/drivers/ptp/ptp_sysfs.c
-> +++ b/drivers/ptp/ptp_sysfs.c
-> @@ -87,9 +87,6 @@ static ssize_t extts_fifo_show(struct device *dev,
->  
->  	memset(&event, 0, sizeof(event));
->  
-> -	if (mutex_lock_interruptible(&ptp->tsevq_mux))
-> -		return -ERESTARTSYS;
-> -
->  	spin_lock_irqsave(&queue->lock, flags);
->  	qcnt = queue_cnt(queue);
->  	if (qcnt) {
-> @@ -104,7 +101,6 @@ static ssize_t extts_fifo_show(struct device *dev,
->  	cnt = snprintf(page, PAGE_SIZE, "%u %lld %u\n",
->  		       event.index, event.t.sec, event.t.nsec);
->  out:
-> -	mutex_unlock(&ptp->tsevq_mux);
->  	return cnt;
->  }
->  static DEVICE_ATTR(fifo, 0444, extts_fifo_show, NULL);
+> 
 > -- 
-> 2.34.1
->
->
-
-Cheers,
--- 
-Vinicius
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
