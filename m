@@ -1,187 +1,226 @@
-Return-Path: <netdev+bounces-33513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 927A879E57D
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 12:58:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56DAD79E58B
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 12:59:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AAFC281FA8
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 10:58:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3AA941C20DFC
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 10:59:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AAEE1DDCF;
-	Wed, 13 Sep 2023 10:58:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A05A21DDD4;
+	Wed, 13 Sep 2023 10:59:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E2BD210D
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 10:58:11 +0000 (UTC)
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E833819B4;
-	Wed, 13 Sep 2023 03:58:10 -0700 (PDT)
-Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2bc63e0d8cdso106900581fa.2;
-        Wed, 13 Sep 2023 03:58:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694602689; x=1695207489; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q4TLaPjJGYtbUUUt+F/f79z+dkxxZ0mIyqX82iiNHCQ=;
-        b=MdLwo/5VdbXxKQ4WGN7kCw7GubUS/dCRh6cXWzO7BFioKy9ONzVNuScE7Rfxy/98kn
-         YuMWJQhbswTTLYhYBK5Va9nxurRXByj+ywoe50yZtlnq3gvxoK2MMUJbTa1O3FKp+D3V
-         NrMIukbMBnPNtm1sVesegegWFKBKde9g+QAjSiL2qoth0fzxynxehX+vScj/XWzRQ7XP
-         rJoGZJtg0nU3wqmzhtvYqEgJV/CQzg26yV/aCqOBsbup5e23NS8rb6/KR3FSANhjtM06
-         tbe5IOVE8pLph7i27QAHqrlMUeYU53gaLBYSjlAvoW5djPvGXDdyOpTea94tl3+7PEcs
-         LRzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694602689; x=1695207489;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Q4TLaPjJGYtbUUUt+F/f79z+dkxxZ0mIyqX82iiNHCQ=;
-        b=cqFT2hgwZH0K5W939tyPxNUNns1ZOe8CtX+rbzrMUSIhlpKh98jFKp7e3RAJge8Ap7
-         8U3ARWnm9zEL44aIYuoiYDwBKwgMvJnk++yqw96DNuwjLKXEbwdmIuRUVIvYGYIei0r7
-         iaf18WYodqyeR6GVkEPVaXfwkUKG6w8qYtE96qLs+QP5m6E672Mnti8A4ej2Byfu7oFJ
-         CuoJPQM2Q3jOjoG+5BNWNwu4ptn6/FsbOslaxY1gnbUfAtvtJz998f/P0ri2Im2EQc36
-         g3A/l86+757KNbU+opzjZOF/vnMRhl31YayKtXRogPxqUpLS8wrF4vKRxBmphc1hPEC0
-         NK9g==
-X-Gm-Message-State: AOJu0YzD6nXMbMfEyTji+ZbowMgQURDzQDUOBdEERZZJSfQRmEhC/zBV
-	VsGmPqdUP1E91huQ/fbW554=
-X-Google-Smtp-Source: AGHT+IFFyJ3lay9NUjZa8DkRXOc64IKh4AwAlNwAsNz+WvyuperImNu9KHg1tt3Nsri2FStsctBAPA==
-X-Received: by 2002:a2e:8349:0:b0:2bc:be93:6d3c with SMTP id l9-20020a2e8349000000b002bcbe936d3cmr1961460ljh.32.1694602688771;
-        Wed, 13 Sep 2023 03:58:08 -0700 (PDT)
-Received: from skbuf ([188.26.184.93])
-        by smtp.gmail.com with ESMTPSA id ga17-20020a170906b85100b009a1e0349c4csm8211559ejb.23.2023.09.13.03.58.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Sep 2023 03:58:08 -0700 (PDT)
-Date: Wed, 13 Sep 2023 13:58:06 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, Tristram.Ha@microchip.com,
-	Eric Dumazet <edumazet@google.com>, davem@davemloft.net,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	UNGLinuxDriver@microchip.com,
-	Oleksij Rempel <linux@rempel-privat.de>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [[RFC PATCH v4 net-next] 0/2] net: dsa: hsr: Enable HSR HW
- offloading for KSZ9477
-Message-ID: <20230913105806.g5p3wck675gbw5fo@skbuf>
-References: <20230911165848.0741c03c@wsk>
- <20230911160501.5vc4nttz6fnww56h@skbuf>
- <20230912101748.0ca4eec8@wsk>
- <20230912092909.4yj4b2b4xrhzdztu@skbuf>
- <20230912160326.188e1d13@wsk>
- <20230912160326.188e1d13@wsk>
- <20230912142644.u4sdkveei3e5hwaf@skbuf>
- <20230912170641.5bfc3cfe@wsk>
- <20230912215523.as4puqamj65dikip@skbuf>
- <20230913102219.773e38f8@wsk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BE9423A0
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 10:59:45 +0000 (UTC)
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3950019B0;
+	Wed, 13 Sep 2023 03:59:44 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id A857F60007;
+	Wed, 13 Sep 2023 10:59:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1694602782;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZHnJz9vPwCp13/wn71DlKTfF+k8HW1F+qyIl9mxelT0=;
+	b=Pms5pXHS1wOzcaFjC50TNt2mweEv8a15tD8rol45QzcNoY1yhfrMHHh0DTtDSyvZO9xFHC
+	86E4NTgkKKt6UD+4Yy0MVNcgVfR8sPSUjz7iJ8xEhREfI6jaW8eiN2o8DqySlq7f//dIV3
+	hxZ4HjJO7v2D3TGhoViNFUCH16HGHZ4pBocm0rK/Tb51hpYmjQjkxT8Rtvz3E5Y/X52nSo
+	v40h9cDMhyhGvjwn8D8bILflPQcjiQaz8uJwDCZN+UF4QWOu3C9DrZ2sj6n9Zyv/PbF0x0
+	mHLutTjK9GvGr19DG5FDalQBnq/WhHGAtLwljmh/4rC2szWzPFGrr7Gbbyt17g==
+Message-ID: <89c9b84c-574c-4071-9524-9207597a3f0a@arinc9.com>
+Date: Wed, 13 Sep 2023 13:59:17 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230913102219.773e38f8@wsk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/4] dt-bindings: net: dsa: document internal MDIO bus
+Content-Language: en-US
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Woojung Huh <woojung.huh@microchip.com>,
+ UNGLinuxDriver@microchip.com, Linus Walleij <linus.walleij@linaro.org>,
+ =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+ Daniel Golle <daniel@makrotopia.org>, Landen Chao
+ <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Matthias Brugger
+ <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+References: <f5f468c1-b5a2-4336-b1d9-fd82da95b21d@arinc9.com>
+ <20230814143601.mnpxtcm2zybnbvoh@skbuf>
+ <0cee0928-74c9-4048-8cd8-70bfbfafd9b2@arinc9.com>
+ <20230827121235.zog4c3ehu2cyd3jy@skbuf>
+ <676d1a2b-6ffa-4aff-8bed-a749c373f5b3@arinc9.com>
+ <87325ce9-595a-4dda-a6a1-b5927d25719b@arinc9.com>
+ <20230911225126.rk23g3u3bzo3agby@skbuf>
+ <036c0763-f1b2-49ff-bc82-1ff16eec27ab@arinc9.com>
+ <20230912193450.h5s6miubag46z623@skbuf>
+ <6cec079e-991e-4222-a76d-d6156de0daca@arinc9.com>
+ <20230913074231.5azwxqjuv2wp5nik@skbuf>
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <20230913074231.5azwxqjuv2wp5nik@skbuf>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
 
-On Wed, Sep 13, 2023 at 10:22:19AM +0200, Lukasz Majewski wrote:
-> Why we cannot have even simpler solution - in the HSR/Wol code we read
-> content of REG_SW_MAC_ADDR_0 (the actually programmed MAC) and:
+On 13.09.2023 10:42, Vladimir Oltean wrote:
+> On Wed, Sep 13, 2023 at 08:52:37AM +0300, Arınç ÜNAL wrote:
+>> On 12.09.2023 22:34, Vladimir Oltean wrote:
+>>> Right, it should have been anyOf and not oneOf.. my mistake. It is a bug
+>>> which should be fixed. It's the same phylink that gets used in both cases,
+>>> user ports and shared ports :)
+>>
+>> One more thing, I don't recall phy-mode being required to be defined for
+>> user ports as it will default to GMII. I don't believe this is the same
+>> case for shared ports so phy-mode is required only for them?
 > 
-> - If not programmed - use DSA master one (like done in mine patches)
+> phy-mode is not strictly required, but I think there is a strong
+> preference to set it. IIRC, when looking at the DSA device trees, there
+> was no case where phy-mode would be absent on CPU/DSA ports if the other
+> link properties were also present, so we required it too. There were no
+> complaints in 1 year since dsa_shared_port_validate_of() is there. The
+> requirement can be relaxed to just a warning and no error in the kernel,
+> and the removal of "required" in the schema, if it helps making it
+> common with user ports.
 
-You said here https://lore.kernel.org/netdev/20230912160326.188e1d13@wsk/
-that using the DSA master address is a complication that can be avoided,
-no? So why is it now part of the solution that you propose?
+I'd say no need as it doesn't make it complicated that much. See below.
 
-I thought we were in agreement to program the actual DSA user ports' MAC
-addresses to hardware.
-
-> - If already programmed:
-> 	 - check if equal to DSA master - proceed with HSR.
-> 	 - if not equal to DSA master (e.g. WoL altered) - exit HSR join
-> 	   with information that offloading is not possible
-
-With KSZ switches, a single CPU port is supported, so all ports share
-the same DSA master. So if the contents of REG_SW_MAC_ADDR_0 is different
-from the DSA master (the same DSA master that was used for an earlier
-HSR offload), why do you infer that it was altered by WoL? It makes no
-sense.
-
-> Then, the content of REG_SW_MAC_ADDR_X would determine what to do with
-> it.
 > 
-> > There are probably hundreds of implementations of this idea in the
-> > kernel, but the one that comes to my mind is ocelot_mirror_get() +
-> > ocelot_mirror_put(). Again, I need to mention that I know that port
-> > mirroring != HSR - I'm just talking about the technique.
-> > 
-> > There is one more thing that your reply to my observation fails to
-> > address. Even with this refcount thing, you will still need to add
-> > code to dsa_slave_set_mac_address() which notifies the ksz driver, so
-> > that the driver can refuse MAC address changes, which would break the
-> > offloads. Ack?
+> I think that the fallback to PHY_INTERFACE_MODE_GMII applies only if
+> there is a phy_device (phy-handle). But otherwise, I don't remember if
+> the PHY_INTERFACE_MODE_NA passed to phylink_create() will persist at
+> runtime, or cause an error somewhere.
 > 
-> And the above problem is not related to the DSA slave address change
-> discussed earlier?
-
-"Discussed earlier" is a bit imprecise and I don't know what you're
-talking about.
-
-There are 3 netdev kinds at play here: (a) DSA master, (b) DSA user port, (c) HSR device.
-
-- Changing the MAC address of (a) triggers a pre-existing bug. That bug
-  can be separated from the HSR offload discussion if the HSR offload
-  decides to not program the DSA master's MAC address to hardware, but a
-  different MAC address. The pre-existence of the DSA bug is not a strong
-  enough argument per se to avoid programming the DSA master's address to
-  hardware. But there may be others. Like the fact that DSA user ports may
-  inherit the DSA master's MAC address, or they may have their own.
-  Limiting HSR offload and WoL to just the "inherit" case may seem a bit
-  arbitrary, considering that the self-address filtering from
-  hsr_handle_frame() looks at the port_A and port_B MAC addresses.
-
-- Changing the MAC address of (c) does not seem directly possible, but:
-
-- Changing the MAC address of (b) also triggers (c) - see hsr_netdev_notify().
-  This is because the HSR driver makes sure that the addresses of
-  port_A, port_B and the HSR device are equal at all times.
-
-The simple matter is: if you program the MAC address of a netdev (any
-netdev) to hardware, then for a correct and robust implementation, you
-need to make sure that the hardware will always be in sync with that
-address, keeping in mind that the user may change it. Either you deny
-changes, or you update the hardware when the address is updated.
-
-It's not quite clear to me that you're making a distinction between
-changing (a) and (b).
-
-> > In principle it sounds like a plan. It just needs to be implemented.
+>>>> The phylink bindings for shared ports enforced on all switches on
+>>>> dsa-port.yaml:
+>>>>
+>>>>     allOf:
+>>>>       - required:
+>>>>           - phy-mode
+>>>>       - oneOf:
+>>>>           - required:
+>>>>               - fixed-link
+>>>>           - required:
+>>>>               - phy-handle
+>>>>           - required:
+>>>>               - managed
+>>>>
+>>>> Here's what I understand:
+>>>>
+>>>> - For switches in dsa_switches_apply_workarounds[]
+>>>>     - Enforce the latter for shared ports.
+>>>>     - Enforce the former for user ports.
+>>>>
+>>>> - For switches not in dsa_switches_apply_workarounds[]
+>>>>     - Enforce the former for all ports.
+>>>
+>>> No, no. We enforce the dt-schema regardless of switch presence in
+>>> dsa_switches_apply_workarounds[], to encourage users to fix device trees
+>>> (those who run schema validation). The kernel workaround consists in
+>>> doing something (skipping phylink) for the device trees where the schema
+>>> warns on shared ports. But there should be a single sub-schema for
+>>> validating phylink bindings, whatever port kind it is.
+>>
+>> Hmm, like writing phylink.yaml and then referring to it under the port
+>> pattern node? This could prevent a lot of repetition.
+>>
+>> Arınç
 > 
-> To clarify:
-> 
-> 0. It looks like described above prevention from REG_SW_MAC_ADDR_X
-> overwriting and DSA slave port MAC address change are needed.
-> 
-> Then questions about time line:
-> 
-> 1. The HSR code is accepted without fixes from 0. and then when other
-> user (WoL) patches are posted problems from 0. needs to be addressed.
-> 
-> or 
-> 
-> 2. To accept the HSR code you (and other community members? Russell,
-> Andrew) require the fixes from 0. first. 
+> Yes, that would sound good.
 
-If the DSA user port MAC address changes, and REG_SW_MAC_ADDR_0 was
-previously programmed with it, and nothing is done in reaction to this,
-then this is a problem with the HSR offload. So no, it's not just a
-problem with upcoming WoL patches as you imply. You need to integrate a
-solution to that problem as part of your HSR patches.
+If I understand correctly, these phylink rules are for switch ports. The
+fixed-link, phy-handle, and managed properties are described on
+ethernet-controller.yaml so I thought it would make sense to define the
+rules there and refer to them where they're needed.
+
+Example:
+
+diff --git a/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml b/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml
+index 480120469953..7279ab31aea7 100644
+--- a/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml
+@@ -65,16 +65,8 @@ if:
+      - required: [ ethernet ]
+      - required: [ link ]
+  then:
+-  allOf:
+-    - required:
+-        - phy-mode
+-    - oneOf:
+-        - required:
+-            - fixed-link
+-        - required:
+-            - phy-handle
+-        - required:
+-            - managed
++  $ref: /schemas/net/ethernet-controller.yaml#/$defs/phylink-switch
++  required: [ phy-mode ]
+  
+  additionalProperties: true
+  
+diff --git a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
+index e532c6b795f4..742aaf1a5ef2 100644
+--- a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
+@@ -179,6 +179,15 @@ required:
+    - compatible
+    - reg
+  
++if:
++  required: [ mdio ]
++then:
++  patternProperties:
++    "^(ethernet-)?ports$":
++      patternProperties:
++        "^(ethernet-)?port@[0-9]+$":
++          $ref: /schemas/net/ethernet-controller.yaml#/$defs/phylink-switch
++
+  $defs:
+    mt7530-dsa-port:
+      patternProperties:
+diff --git a/Documentation/devicetree/bindings/net/ethernet-controller.yaml b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+index 9f6a5ccbcefe..d7256f33d946 100644
+--- a/Documentation/devicetree/bindings/net/ethernet-controller.yaml
++++ b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+@@ -284,6 +284,21 @@ allOf:
+              controllers that have configurable TX internal delays. If this
+              property is present then the MAC applies the TX delay.
+  
++$defs:
++  phylink-switch:
++    description: phylink bindings for switch ports
++    allOf:
++      - anyOf:
++          - required: [ fixed-link ]
++          - required: [ phy-handle ]
++          - required: [ managed ]
++
++      - if:
++          required: [ fixed-link ]
++        then:
++          not:
++            required: [ managed ]
++
+  additionalProperties: true
+  
+  ...
+
+Arınç
 
