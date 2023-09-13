@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-33451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 235EE79E086
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 09:12:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D54979E087
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 09:13:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 583CE281C88
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 07:12:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 659121C20CC2
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 07:13:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15C7218026;
-	Wed, 13 Sep 2023 07:12:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A9521804A;
+	Wed, 13 Sep 2023 07:12:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 063E7156C5
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 07:12:48 +0000 (UTC)
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7A6A1728
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 00:12:47 -0700 (PDT)
-Received: by mail-wr1-x434.google.com with SMTP id ffacd0b85a97d-31f915c3c42so3944947f8f.0
-        for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 00:12:47 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F4C618049
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 07:12:50 +0000 (UTC)
+Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 381801728
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 00:12:49 -0700 (PDT)
+Received: by mail-wr1-x429.google.com with SMTP id ffacd0b85a97d-31f915c3c42so3944969f8f.0
+        for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 00:12:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1694589166; x=1695193966; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=xhA7D+NexyxGAn+74XDsdY1YOun0EK987erpU9uumqk=;
-        b=J4GrUx2RVunHt3RsESCnKnJghKwZ6ZOR1rHsqr9TqMzp51PyCD2a9FO1KbAy8pr2U1
-         SDmj3wE/TZp0p1YEMWXTEGktBHsVYVIaBJScQHqXPRUz3OKaB0mAPJLBoq8n9XsOzDjs
-         nEAw3l3mHBlRRbIZMKEHX426NB5undidvZ2ZVXexAWeijOdUIYCNencJJyi+a5AOwKh8
-         6MRY2vNwpDByAL6MRnx4pf/WTYdHqlmCGNr8deduN78cCzOMckbtYUmIB4iqquEyKfdf
-         BsKSxgB08E6tx2PV1El8fz7eBZnDTgJ5Cr/fQPTMNZbLiniJz17oWrUuqUfU2NxQFekW
-         vELQ==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1694589167; x=1695193967; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QN8q4XBfm3D9pTOrAcZXoCrCq4gI7qNgVO87RHtcd8Y=;
+        b=ag4Ss4nfYiKDqTR3bpfZz0Ae/1Yu3/C6Nbz/jR7r2SVwoAUn/tZ4naEiEz/TfKur6B
+         +04EcaELG5nuDcvGd1RZqvghtg9pKQ0yiC/HuOMjFRB1GfOnZIOHsQtnRBHWcq6PnVmm
+         YBK7PTUE502Xgrqt7TJE6JO+EyZ2/cUIOxd7sOmleMwBt6d0VdVy6kXsUFLNyomXBm4l
+         bZmVuJDAt9SygdRMhEj1V+NDZDMLeH9mcKwU8J2Y2IqOVb+HMqMInoHh7wMkaEU2B3fz
+         XNlWEQiKHQroxEL+RaFYJO6ZNbS+FSpFDSaKDds9uVXcgGyKfWeEHi9/2Szj65799oLZ
+         zwLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694589166; x=1695193966;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xhA7D+NexyxGAn+74XDsdY1YOun0EK987erpU9uumqk=;
-        b=wwMloidezqyGFsFonf9Ng2Ebky3oqxvf4Rj3HP8idWDa5tzqmsWCDKM70pw0oe41fe
-         pIjR5Y4N/c90U02mf7kDEP4xm6zmBa5hL2yRHS0TO4Efqj17EE4zfHNQYlb72fQs4glz
-         3wQpMCPJ8AWnzL6V5gBn1NySR+9XHdRTwjaGD1H8uQZ2NVm2V/0jOZmA9fYKZwH0UZo0
-         deP8vC9ps53NzEzhclW05N7/gVn2rVHBPesfepQvrhGrmrpw3WJnB9kmSeaiowb9Li76
-         zjwDj9UbnoFiQ+09aCcH17zkkceqUYrzgwZa217Q4QvxeO5tzc/6VI1sZ9/Yeuim4wkw
-         R2uQ==
-X-Gm-Message-State: AOJu0YyIaqm1H5Vn2jhfK92yG3KIIBLFjJA4LiA+qlCYtzS8XXsn1Fwa
-	2nhnoRlAS1SroSWSq0ShAqdUo1dJfY1gdDoJfhU=
-X-Google-Smtp-Source: AGHT+IHv9uqzLGJKVxcS+Rk2e0oQTfVXWBG+UkLo+6F8v+kqpkkTg16iSvMIpnO/VPqd9w/8WtVgZQ==
-X-Received: by 2002:adf:a387:0:b0:31f:c8a0:1134 with SMTP id l7-20020adfa387000000b0031fc8a01134mr466280wrb.32.1694589165979;
-        Wed, 13 Sep 2023 00:12:45 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1694589167; x=1695193967;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QN8q4XBfm3D9pTOrAcZXoCrCq4gI7qNgVO87RHtcd8Y=;
+        b=xI+OrAX0lHu9EFHc7VgLHFLvakhtFPbeouatH7Gm+aQk/uKuQ0VyfqbyZ9sMulIZ6e
+         pwTLZAgSJZHB7fCvjgnNCEIo5XMVNpXYzWgDl1EfU82rTcWQQIrYLMNjOk1UbSlQ2JAo
+         2nZdq72qqjKIfARLjPfV3SKeE2Vh/An9w49q9owFF8nRwIPae6JGWd5E5Bwee20rnvdF
+         5OeiKiNjFcZAmOcnncJMTcXRULD/RQ/1mm7+AeEoSD5TyctxGqb5npy3RYjbi1LbuTgw
+         6LQ6XeclaXBibs5+55g42FR2jXuf5VwNBQUavFmcKYsRQbLBhJxdnjDbVUqWo4LqJi2M
+         s1mg==
+X-Gm-Message-State: AOJu0Yy6UAY/0CkXm8RncxBJW9R1AHToDTvHQ8nTzb617OCehMkRoLHK
+	TqXF+5+LLR0/vTz0L7t40X/ByhKzQsRJQDlFENo=
+X-Google-Smtp-Source: AGHT+IHhK/o9tMnGq9BysiNRfyMeq9z/6sa64HJj0CuN3iVrpsaxCiUlL5hQVBqpNBLVSwMIGJ2+Ww==
+X-Received: by 2002:a5d:55c1:0:b0:31d:d3db:4566 with SMTP id i1-20020a5d55c1000000b0031dd3db4566mr1381572wrw.4.1694589167762;
+        Wed, 13 Sep 2023 00:12:47 -0700 (PDT)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id x14-20020adff0ce000000b00319779ee691sm14480910wro.28.2023.09.13.00.12.44
+        by smtp.gmail.com with ESMTPSA id n6-20020adfe786000000b003197efd1e7bsm14600739wrm.114.2023.09.13.00.12.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Sep 2023 00:12:45 -0700 (PDT)
+        Wed, 13 Sep 2023 00:12:47 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -68,10 +69,12 @@ Cc: kuba@kernel.org,
 	shayd@nvidia.com,
 	saeedm@nvidia.com,
 	horms@kernel.org
-Subject: [patch net-next v2 00/12] expose devlink instances relationships
-Date: Wed, 13 Sep 2023 09:12:31 +0200
-Message-ID: <20230913071243.930265-1-jiri@resnulli.us>
+Subject: [patch net-next v2 01/12] devlink: move linecard struct into linecard.c
+Date: Wed, 13 Sep 2023 09:12:32 +0200
+Message-ID: <20230913071243.930265-2-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230913071243.930265-1-jiri@resnulli.us>
+References: <20230913071243.930265-1-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,96 +85,98 @@ Content-Transfer-Encoding: 8bit
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Currently, the user can instantiate new SF using "devlink port add"
-command. That creates an E-switch representor devlink port.
+Instead of exposing linecard struct, expose a simple helper to get the
+linecard index, which is all is needed outside linecard.c. Move the
+linecard struct to linecard.c and keep it private similar to the rest of
+the devlink objects.
 
-When user activates this SF, there is an auxiliary device created and
-probed for it which leads to SF devlink instance creation.
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+---
+v1->v2:
+- new patch
+---
+ net/devlink/devl_internal.h | 14 +-------------
+ net/devlink/linecard.c      | 19 +++++++++++++++++++
+ net/devlink/port.c          |  4 ++--
+ 3 files changed, 22 insertions(+), 15 deletions(-)
 
-There is 1:1 relationship between E-switch representor devlink port and
-the SF auxiliary device devlink instance.
-
-Also, for example in mlx5, one devlink instance is created for
-PCI device and one is created for an auxiliary device that represents
-the uplink port. The relation between these is invisible to the user.
-
-Patches #1-#3 and #5 are small preparations.
-
-Patch #4 adds netnsid attribute for nested devlink if that in a
-different namespace.
-
-Patch #5 is the main one in this set, introduces the relationship
-tracking infrastructure later on used to track SFs, linecards and
-devlink instance relationships with nested devlink instances.
-
-Expose the relation to the user by introducing new netlink attribute
-DEVLINK_PORT_FN_ATTR_DEVLINK which contains the devlink instance related
-to devlink port function. This is done by patch #8.
-Patch #9 implements this in mlx5 driver.
-
-Patch #10 converts the linecard nested devlink handling to the newly
-introduced rel infrastructure.
-
-Patch #11 benefits from the rel infra and introduces possiblitily to
-have relation between devlink instances.
-Patch #12 implements this in mlx5 driver.
-
-Examples:
-$ devlink dev
-pci/0000:08:00.0: nested_devlink auxiliary/mlx5_core.eth.0
-pci/0000:08:00.1: nested_devlink auxiliary/mlx5_core.eth.1
-auxiliary/mlx5_core.eth.1
-auxiliary/mlx5_core.eth.0
-
-$ devlink port add pci/0000:08:00.0 flavour pcisf pfnum 0 sfnum 106
-pci/0000:08:00.0/32768: type eth netdev eth4 flavour pcisf controller 0 pfnum 0 sfnum 106 splittable false
-  function:
-    hw_addr 00:00:00:00:00:00 state inactive opstate detached roce enable
-$ devlink port function set pci/0000:08:00.0/32768 state active
-$ devlink port show pci/0000:08:00.0/32768
-pci/0000:08:00.0/32768: type eth netdev eth4 flavour pcisf controller 0 pfnum 0 sfnum 106 splittable false
-  function:
-    hw_addr 00:00:00:00:00:00 state active opstate attached roce enable nested_devlink auxiliary/mlx5_core.sf.2
-
-# devlink dev reload auxiliary/mlx5_core.sf.2 netns ns1
-$ devlink port show pci/0000:08:00.0/32768
-pci/0000:08:00.0/32768: type eth netdev eth4 flavour pcisf controller 0 pfnum 0 sfnum 106 splittable false
-  function:
-    hw_addr 00:00:00:00:00:00 state active opstate attached roce enable nested_devlink auxiliary/mlx5_core.sf.2 nested_devlink_netns ns1
-
-Jiri Pirko (12):
-  devlink: move linecard struct into linecard.c
-  net/mlx5: Disable eswitch as the first thing in mlx5_unload()
-  net/mlx5: Lift reload limitation when SFs are present
-  devlink: put netnsid to nested handle
-  devlink: move devlink_nl_put_nested_handle() into netlink.c
-  devlink: extend devlink_nl_put_nested_handle() with attrtype arg
-  devlink: introduce object and nested devlink relationship infra
-  devlink: expose peer SF devlink instance
-  net/mlx5: SF, Implement peer devlink set for SF representor devlink
-    port
-  devlink: convert linecard nested devlink to new rel infrastructure
-  devlink: introduce possibility to expose info about nested devlinks
-  net/mlx5e: Set en auxiliary devlink instance as nested
-
- .../net/ethernet/mellanox/mlx5/core/devlink.c |  11 -
- .../ethernet/mellanox/mlx5/core/en/devlink.c  |   8 +
- .../net/ethernet/mellanox/mlx5/core/main.c    |   2 +-
- .../ethernet/mellanox/mlx5/core/sf/dev/dev.h  |   6 +
- .../mellanox/mlx5/core/sf/dev/driver.c        |  26 +++
- .../ethernet/mellanox/mlx5/core/sf/devlink.c  |  34 +++
- .../mellanox/mlxsw/core_linecard_dev.c        |   9 +-
- include/linux/mlx5/device.h                   |   1 +
- include/net/devlink.h                         |   9 +-
- include/uapi/linux/devlink.h                  |   1 +
- net/devlink/core.c                            | 217 ++++++++++++++++++
- net/devlink/dev.c                             |  50 ++++
- net/devlink/devl_internal.h                   |  34 +--
- net/devlink/linecard.c                        |  80 ++++---
- net/devlink/netlink.c                         |  26 +++
- net/devlink/port.c                            |  55 ++++-
- 16 files changed, 509 insertions(+), 60 deletions(-)
-
+diff --git a/net/devlink/devl_internal.h b/net/devlink/devl_internal.h
+index f6b5fea2e13c..1b05c2c09e27 100644
+--- a/net/devlink/devl_internal.h
++++ b/net/devlink/devl_internal.h
+@@ -206,19 +206,7 @@ int devlink_rate_nodes_check(struct devlink *devlink, u16 mode,
+ 			     struct netlink_ext_ack *extack);
+ 
+ /* Linecards */
+-struct devlink_linecard {
+-	struct list_head list;
+-	struct devlink *devlink;
+-	unsigned int index;
+-	const struct devlink_linecard_ops *ops;
+-	void *priv;
+-	enum devlink_linecard_state state;
+-	struct mutex state_lock; /* Protects state */
+-	const char *type;
+-	struct devlink_linecard_type *types;
+-	unsigned int types_count;
+-	struct devlink *nested_devlink;
+-};
++unsigned int devlink_linecard_index(struct devlink_linecard *linecard);
+ 
+ /* Devlink nl cmds */
+ int devlink_nl_cmd_reload(struct sk_buff *skb, struct genl_info *info);
+diff --git a/net/devlink/linecard.c b/net/devlink/linecard.c
+index 85c32c314b0f..a0210ba56f2d 100644
+--- a/net/devlink/linecard.c
++++ b/net/devlink/linecard.c
+@@ -6,6 +6,25 @@
+ 
+ #include "devl_internal.h"
+ 
++struct devlink_linecard {
++	struct list_head list;
++	struct devlink *devlink;
++	unsigned int index;
++	const struct devlink_linecard_ops *ops;
++	void *priv;
++	enum devlink_linecard_state state;
++	struct mutex state_lock; /* Protects state */
++	const char *type;
++	struct devlink_linecard_type *types;
++	unsigned int types_count;
++	struct devlink *nested_devlink;
++};
++
++unsigned int devlink_linecard_index(struct devlink_linecard *linecard)
++{
++	return linecard->index;
++}
++
+ static struct devlink_linecard *
+ devlink_linecard_get_by_index(struct devlink *devlink,
+ 			      unsigned int linecard_index)
+diff --git a/net/devlink/port.c b/net/devlink/port.c
+index 4763b42885fb..7b300a322ed9 100644
+--- a/net/devlink/port.c
++++ b/net/devlink/port.c
+@@ -483,7 +483,7 @@ static int devlink_nl_port_fill(struct sk_buff *msg,
+ 		goto nla_put_failure;
+ 	if (devlink_port->linecard &&
+ 	    nla_put_u32(msg, DEVLINK_ATTR_LINECARD_INDEX,
+-			devlink_port->linecard->index))
++			devlink_linecard_index(devlink_port->linecard)))
+ 		goto nla_put_failure;
+ 
+ 	genlmsg_end(msg, hdr);
+@@ -1420,7 +1420,7 @@ static int __devlink_port_phys_port_name_get(struct devlink_port *devlink_port,
+ 	case DEVLINK_PORT_FLAVOUR_PHYSICAL:
+ 		if (devlink_port->linecard)
+ 			n = snprintf(name, len, "l%u",
+-				     devlink_port->linecard->index);
++				     devlink_linecard_index(devlink_port->linecard));
+ 		if (n < len)
+ 			n += snprintf(name + n, len - n, "p%u",
+ 				      attrs->phys.port_number);
 -- 
 2.41.0
 
