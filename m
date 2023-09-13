@@ -1,106 +1,148 @@
-Return-Path: <netdev+bounces-33424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CB8D79DE3D
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 04:20:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48CC279DE53
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 04:40:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3040D1C20DB9
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 02:20:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83238280F65
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 02:40:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEC0E396;
-	Wed, 13 Sep 2023 02:20:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03FED803;
+	Wed, 13 Sep 2023 02:40:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3820384
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 02:20:43 +0000 (UTC)
-Received: from out-221.mta1.migadu.com (out-221.mta1.migadu.com [95.215.58.221])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33C3B10FE
-	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 19:20:43 -0700 (PDT)
-Message-ID: <b0278635-2c6f-c316-f7ff-64c6978dac95@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1694571641;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z8wsciRXxC4ZkB77LojSqC5l3QSYtqdqHx5TpDtcjbg=;
-	b=luS8ZCIIDr1Q7HVRMIMRCuClOJm+JpXL7F3OdTGcEpMru6cqNBfyvjBF2mai+fCnUGUo1u
-	+i1RAmE3gJKihn6E9zU7Nn60IWl+2jcAI+SSj2fEE4+TgGgZPYiXHbKGgIrurlQyQEU7GX
-	fEoxe6HEPQ5Ff6NT+5xhxsmYKWcBlCk=
-Date: Wed, 13 Sep 2023 10:20:32 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E99607FD
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 02:40:11 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E0371713;
+	Tue, 12 Sep 2023 19:40:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=BXJm/TiqH4AAPAwfc/Qy2jYjA5r7iu+40UTmJpL7FD8=; b=YOctBJGu7AFO85kb3gkWsFXT5l
+	6Hb1ei68Q/4Sosm4kuzQ3VBJi9uFgKjj7ugOoHCxlS/dfY7Ay67gXOYwx/jEsuH66ct79qdvE5lz5
+	CLhHt5WyVcoeM9J3IOVQzgT9cb6p7+xoYbF92JlsBZSZb/YsnxuaIcuZbHDw1IO8Usss=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qgFn3-006H2p-GA; Wed, 13 Sep 2023 04:39:41 +0200
+Date: Wed, 13 Sep 2023 04:39:41 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	corbet@lwn.net, steen.hegelund@microchip.com, rdunlap@infradead.org,
+	horms@kernel.org, casper.casan@gmail.com, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, horatiu.vultur@microchip.com,
+	Woojung.Huh@microchip.com, Nicolas.Ferre@microchip.com,
+	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com
+Subject: Re: [RFC PATCH net-next 2/6] net: ethernet: add mac-phy interrupt
+ support with reset complete handling
+Message-ID: <027d8f7b-6932-4d9d-b2f9-5369806a79a3@lunn.ch>
+References: <20230908142919.14849-1-Parthiban.Veerasooran@microchip.com>
+ <20230908142919.14849-3-Parthiban.Veerasooran@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] net/core: Export dev_core_stats_rx_dropped_inc sets
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20230911082016.3694700-1-yajun.deng@linux.dev>
- <CANn89i+W1iAQmOhunLbqpvHu8EUO6uawv6Uvx7qimyBa_PBNCg@mail.gmail.com>
- <f3e84a37-3218-0d52-e7ed-2d215fed58e3@intel.com>
- <CANn89i+AwmpjM-bNuYRS26v-GRrVoucewxgmkvv25PNM4VWPGA@mail.gmail.com>
- <39c906f6-910d-01c7-404a-8fe6a161ef2e@intel.com>
- <CANn89i+QSPoXphaLzfKCqCHxjsD20ifr8YPJM_fZ_H5kFZ7dwQ@mail.gmail.com>
- <8bc6c1cd-50bb-44ef-5979-3bb50a70afcb@intel.com>
- <CANn89iL6HVvRegORfP49prJV4EJU2-AbD4YXB-eo_vwU1JG1ew@mail.gmail.com>
- <CANn89iKbn97Rbjc+3uZMpUi0tqCuhj88UdFZhhnqpC6nJRLC=A@mail.gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yajun Deng <yajun.deng@linux.dev>
-In-Reply-To: <CANn89iKbn97Rbjc+3uZMpUi0tqCuhj88UdFZhhnqpC6nJRLC=A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230908142919.14849-3-Parthiban.Veerasooran@microchip.com>
 
+> +static int oa_tc6_sw_reset(struct oa_tc6 *tc6)
+> +{
+> +	long timeleft;
+> +	u32 regval;
+> +	int ret;
+> +
+> +	/* Perform software reset with both protected and unprotected control
+> +	 * commands because the driver doesn't know the current status of the
+> +	 * MAC-PHY.
+> +	 */
+> +	regval = SW_RESET;
+> +	reinit_completion(&tc6->rst_complete);
+> +	ret = oa_tc6_perform_ctrl(tc6, OA_TC6_RESET, &regval, 1, true, false);
+> +	if (ret) {
+> +		dev_err(&tc6->spi->dev, "RESET register write failed\n");
+> +		return ret;
+> +	}
+> +
+> +	ret = oa_tc6_perform_ctrl(tc6, OA_TC6_RESET, &regval, 1, true, true);
+> +	if (ret) {
+> +		dev_err(&tc6->spi->dev, "RESET register write failed\n");
+> +		return ret;
+> +	}
+> +	timeleft = wait_for_completion_interruptible_timeout(&tc6->rst_complete,
+> +							     msecs_to_jiffies(1));
+> +	if (timeleft <= 0) {
+> +		dev_err(&tc6->spi->dev, "MAC-PHY reset failed\n");
+> +		return -ENODEV;
+> +	}
 
-On 2023/9/13 02:05, Eric Dumazet wrote:
-> On Tue, Sep 12, 2023 at 8:03 PM Eric Dumazet <edumazet@google.com> wrote:
->
->> Sure, this was what was suggested (perhaps not _very_ precisely, but
->> the general idea was pretty clear).
->> v2 seems ok, right ?
->>
->> It seems we are all on the same page.
->>
->> +static __cold struct net_device_core_stats __percpu
->> *dev_core_stats(struct net_device *dev)
->> +{
->> +       /* This READ_ONCE() pairs with the write in netdev_core_stats_alloc() */
->> +       struct net_device_core_stats __percpu *p = READ_ONCE(dev->core_stats);
->> +
->> +       if (likely(p))
->> +               return p;
->> +
->> +       return netdev_core_stats_alloc(dev);
->> +}
->> +
->> +#define DEV_CORE_STATS_INC(FIELD)                              \
->> +void dev_core_stats_##FIELD##_inc(struct net_device *dev)      \
->> +{                                                              \
->> +       struct net_device_core_stats __percpu *p;               \
->> +                                                               \
->> +       p = dev_core_stats(dev);                                \
->> +       if (p)                                                  \
->> +               this_cpu_inc(p->FIELD);                         \
->> +}                                                              \
->> +EXPORT_SYMBOL(dev_core_stats_##FIELD##_inc)
-> Oh well, I just read the patch, and it seems wrong indeed.
->
-> netdev_core_stats_alloc() is the one that can be cold.
+This seems a bit messy and complex. I assume reset is performed once
+during probe, and never again? So i wonder if it would be cleaner to
+actually just poll for the reset to complete? You can then remove all
+this completion code, and the interrupt handler gets simpler?
 
-Okay, I would add __cold to netdev_core_stats_alloc() in v3.
+> +	/* Register MAC-PHY interrupt service routine */
+> +	ret = devm_request_irq(&spi->dev, spi->irq, macphy_irq, 0, "macphy int",
+> +			       tc6);
+> +	if ((ret != -ENOTCONN) && ret < 0) {
+> +		dev_err(&spi->dev, "Error attaching macphy irq %d\n", ret);
+> +		goto err_macphy_irq;
+> +	}
 
-Olek suggest that define a new dev_core_stats_inc() function.
+Why is -ENOTCONN special? A comment would be good here.
 
-I hope to see the suggestion in another reply.
+> -void oa_tc6_deinit(struct oa_tc6 *tc6)
+> +int oa_tc6_deinit(struct oa_tc6 *tc6)
+>  {
+> -	kfree(tc6);
+> +	int ret;
+> +
+> +	devm_free_irq(&tc6->spi->dev, tc6->spi->irq, tc6);
+> +	ret = kthread_stop(tc6->tc6_task);
+> +	if (!ret)
+> +		kfree(tc6);
+> +	return ret;
+>  }
 
+What is the MAC driver supposed to do if this fails?
+
+But this problem probably goes away once you use a threaded interrupt
+handler.
+
+w> +/* Open Alliance TC6 Standard Control and Status Registers */
+> +#define OA_TC6_RESET	0x0003		/* Reset Control and Status Register */
+> +#define OA_TC6_STS0	0x0008		/* Status Register #0 */
+
+Please use the same name as the standard. It use STATUS0, so
+OA_TC6_STATUS0. Please make sure all your defines follow the standard.
+
+> +
+> +/* RESET register field */
+> +#define SW_RESET	BIT(0)		/* Software Reset */
+
+It is pretty normal to put #defines for a register members after the
+#define for the register itself:
+
+#define OA_TC6_RESET	0x0003		/* Reset Control and Status Register */
+#define OA_TC6_RESET_SWRESET	BIT(0)
+
+#define OA_TC6_STATUS0	0x0008		/* Status Register #0 */
+#define OA_TC6_STATUS0_RESETC		BIT(6)		/* Reset Complete */
+
+The naming like this also helps avoid mixups.
+
+    Andrew
 
