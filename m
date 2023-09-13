@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-33459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FDB379E097
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 09:15:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE0DA79E09B
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 09:16:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5092B1C20E0D
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 07:15:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41E2A281B02
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 07:16:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55FE018AF2;
-	Wed, 13 Sep 2023 07:13:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B602918C34;
+	Wed, 13 Sep 2023 07:13:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47C5018C22
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 07:13:02 +0000 (UTC)
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8080D1728
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 00:13:01 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-50091b91a83so10604984e87.3
-        for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 00:13:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA9A718C22
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 07:13:03 +0000 (UTC)
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B443D1728
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 00:13:02 -0700 (PDT)
+Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-401f68602a8so70190085e9.3
+        for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 00:13:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1694589180; x=1695193980; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1694589181; x=1695193981; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=V1bT9y8w37q/lqO7jWhPz/MCizYdOi4GhRkpzRZ8STo=;
-        b=H3axmAZzMYVlsDoMA4ai51J+JXwP1MHv9cBYXAeTXCAPIiMEJ5iR5C961+Eqh6dyJa
-         Khei+h3+kF72daKekWqqOv5LSV21LUCVjT+6/cDEYLnJjYgR3QPwguV37rS06dsGLNg8
-         6ffLTdZFD2LbBKLVljM34lLjDvKIgwV2iwGfn5MvjX/F/q5DpbqOdby1xzr3ppmhDqVu
-         qMvpAMDGwL+65k27enlOBwYxW9aBoeV1lUbsiHdOjNLQOl4WO9ruvHtFm5z4wJIwGU9O
-         q5NdSsVLC4nelM/bEHVn7uVfdYTwYkqYR5iBWQBCWe4/aSSp2pWDhkfuX3XGbUZfyj1o
-         +pwA==
+        bh=a8ziZqPNFzCo0A/K8YJyf25Kw4mrfTiAr0OWYfFnf4A=;
+        b=FtPTmgE1SrXOrzWya43pLqMwiYHqbkFOVMSWfxDv1bDVyVjN+PKOlO2hGZfh1PYa2N
+         WR/HHoWP/piXIpJNM/vUibYatdwjXBNXg7r6NTXa1REv5a73xXuitRoqjwyITA7dPGbN
+         DRN1V8q9Hm809FJEo/deRJd2OTab6DJ5g/qwsZsVfkTxF79XdoB9O+EusgJ+si8fufYO
+         6SM71Lb9KlVG30rgIiccPIW/rWtrin/JoufaZYhSIGiAbj08/WwwOH03b6KzlLb+vhmN
+         dA10SdVT3xgPZBrjNKUcZCx0pKcxlUsizEBgxrih7VMfekBN3z0FpzRnJezCT5zQefRF
+         WTXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694589180; x=1695193980;
+        d=1e100.net; s=20230601; t=1694589181; x=1695193981;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=V1bT9y8w37q/lqO7jWhPz/MCizYdOi4GhRkpzRZ8STo=;
-        b=IxBv7nD9xRRaq6EZRFpqZXNG530cWzY593usI0+lAmteVwOATYQzHJIFEKN+Y62Ppb
-         Bt2PZr1ngJXCqIbIekqJ2Ra8j2+CUpRAla34KNEA4ABFMgYRgWFD5PBoB4a0xn1+9zqv
-         dQV9oCkrga1djr9LcBcdrdMhVc4jFJwUasrRDl6PbBur8ZlLk8UrsdAKY0q4GH3fjDl9
-         S7iH/ElWxz61EZ/rYAdozS3tCxW/7D/vJpUtCC7/dHymIEHSsvmWbB8hA7nhgMhyT9Fq
-         cSZRgf1hZLcuSPFOFBMXYTTn3QBnygEGoGA6J1iF7f9KJVxcORvAMen+aMcjDBxuWVsS
-         UMYg==
-X-Gm-Message-State: AOJu0YxGogJZYXTkH1XRwfK/3Oj0C9xAOrF/qs769Skzqr8Nqtik0fj3
-	snwN9KBCEQJQ8mSc7+05c+XfPJBOS16crCteOQ8=
-X-Google-Smtp-Source: AGHT+IGtZHMYbT255bHbYyb1Y1eoVQqwOABQajlX+UkYvc41jFozXUm3VUt+1Y5ij29G9g2icyooWQ==
-X-Received: by 2002:a05:6512:3088:b0:4fe:95e:159a with SMTP id z8-20020a056512308800b004fe095e159amr1659956lfd.23.1694589179608;
-        Wed, 13 Sep 2023 00:12:59 -0700 (PDT)
+        bh=a8ziZqPNFzCo0A/K8YJyf25Kw4mrfTiAr0OWYfFnf4A=;
+        b=DFdFWMgdO8D5jYCVUpf+u4Y2Nxv8koujrue/P5B0N2W54VC2ahZA1qBwUxgv+I9wY1
+         gT9tNruwd0m6w2dcBvbVLq+QFBD3BFOYQB6BjwPu7Fw9+OW8j6PwAuXzfRNzO029Ikgd
+         eQpv+lg+pLPoWUxwvZJj2RnSghLJbE7u2fiywMpQ2TNvzHsFxr7pYwh6LTKcy+EtJ4Cy
+         TR+wU/2WgBPyOYxdzb+T02NvavvpGMqxdLHxyPJSO2j53kQEzP4hIVfWPZ9o2TqQaJa3
+         pJX2XnRh21RPq5azN20CakMKMM5Jh4ar25BzNSSJXoEMPHZJfW+H6TE7BNZeJVCudeVM
+         t2YA==
+X-Gm-Message-State: AOJu0Yz3XTvxco/57UkWdxAJ6WYZSuOROtozfIkbn2vO56FGvDs0KKjP
+	VerwYGLvu2FVktdsF0yrB/VxqgfiKkdtXx7FLLs=
+X-Google-Smtp-Source: AGHT+IEPyJ+Xq23VL7wKfNE4KR2dpfA9us2ADwQNId/OMbHy3H5wzv+Ji43/HvBCvWCgZ8OuJJkllA==
+X-Received: by 2002:a05:600c:1e1d:b0:401:cdc1:ac82 with SMTP id ay29-20020a05600c1e1d00b00401cdc1ac82mr1251221wmb.9.1694589181260;
+        Wed, 13 Sep 2023 00:13:01 -0700 (PDT)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id m7-20020a05600c280700b003fed630f560sm1114662wmb.36.2023.09.13.00.12.58
+        by smtp.gmail.com with ESMTPSA id 24-20020a05600c021800b003fefe70ec9csm1134194wmi.10.2023.09.13.00.13.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Sep 2023 00:12:59 -0700 (PDT)
+        Wed, 13 Sep 2023 00:13:00 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -69,9 +69,9 @@ Cc: kuba@kernel.org,
 	shayd@nvidia.com,
 	saeedm@nvidia.com,
 	horms@kernel.org
-Subject: [patch net-next v2 08/12] devlink: expose peer SF devlink instance
-Date: Wed, 13 Sep 2023 09:12:39 +0200
-Message-ID: <20230913071243.930265-9-jiri@resnulli.us>
+Subject: [patch net-next v2 09/12] net/mlx5: SF, Implement peer devlink set for SF representor devlink port
+Date: Wed, 13 Sep 2023 09:12:40 +0200
+Message-ID: <20230913071243.930265-10-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230913071243.930265-1-jiri@resnulli.us>
 References: <20230913071243.930265-1-jiri@resnulli.us>
@@ -85,135 +85,172 @@ Content-Transfer-Encoding: 8bit
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Introduce a new helper devl_port_fn_devlink_set() to be used by driver
-assigning a devlink instance to the peer devlink port function.
+Benefit from the existence of internal mlx5 notifier and extend it by
+event MLX5_DRIVER_EVENT_SF_PEER_DEVLINK. Use this event from SF
+auxiliary device probe/remove functions to pass the registered SF
+devlink instance to the SF representor.
 
-Expose this to user over new netlink attribute nested under port
-function nest to expose devlink handle related to the port function.
-
-This is particularly helpful for user to understand the relationship
-between devlink instances created for SFs and the port functions
-they belong to.
-
-Note that caller of devlink_port_notify() needs to hold devlink
-instance lock, put the assertion to devl_port_fn_devlink_set() to make
-this requirement explicit. Also note the limitations that only allow to
-make this assignment for registered objects.
+Process the new event in SF representor code and call
+devl_port_fn_devlink_set() to do the assignments. Implement this in work
+to avoid possible deadlock when probe/remove function of SF may be
+called with devlink instance lock held during devlink reload.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
 v1->v2:
-- rebased on top of previous patch
-- utilize newly added rel infra
-- split devlink_nl_put_nested_handle() arg extension into separate patch
+- rebased on top of net-next
+- removed work code as devl_port_fn_devlink_set() could be called
+  without instance lock
+- propagate return code newly returned by devl_port_fn_devlink_set()
 ---
- include/net/devlink.h        |  3 +++
- include/uapi/linux/devlink.h |  1 +
- net/devlink/port.c           | 51 ++++++++++++++++++++++++++++++++++++
- 3 files changed, 55 insertions(+)
+ .../ethernet/mellanox/mlx5/core/sf/dev/dev.h  |  6 ++++
+ .../mellanox/mlx5/core/sf/dev/driver.c        | 26 ++++++++++++++
+ .../ethernet/mellanox/mlx5/core/sf/devlink.c  | 34 +++++++++++++++++++
+ include/linux/mlx5/device.h                   |  1 +
+ 4 files changed, 67 insertions(+)
 
-diff --git a/include/net/devlink.h b/include/net/devlink.h
-index 29fd1b4ee654..2655ab6101ec 100644
---- a/include/net/devlink.h
-+++ b/include/net/devlink.h
-@@ -150,6 +150,7 @@ struct devlink_port {
- 
- 	struct devlink_rate *devlink_rate;
- 	struct devlink_linecard *linecard;
-+	u32 rel_index;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/dev.h b/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/dev.h
+index 2a66a427ef15..b99131e95e37 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/dev.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/dev.h
+@@ -19,6 +19,12 @@ struct mlx5_sf_dev {
+ 	u16 fn_id;
  };
  
- struct devlink_port_new_attrs {
-@@ -1697,6 +1698,8 @@ void devlink_port_attrs_pci_vf_set(struct devlink_port *devlink_port, u32 contro
- void devlink_port_attrs_pci_sf_set(struct devlink_port *devlink_port,
- 				   u32 controller, u16 pf, u32 sf,
- 				   bool external);
-+int devl_port_fn_devlink_set(struct devlink_port *devlink_port,
-+			     struct devlink *fn_devlink);
- struct devlink_rate *
- devl_rate_node_create(struct devlink *devlink, void *priv, char *node_name,
- 		      struct devlink_rate *parent);
-diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
-index 03875e078be8..cd4b82458d1b 100644
---- a/include/uapi/linux/devlink.h
-+++ b/include/uapi/linux/devlink.h
-@@ -680,6 +680,7 @@ enum devlink_port_function_attr {
- 	DEVLINK_PORT_FN_ATTR_STATE,	/* u8 */
- 	DEVLINK_PORT_FN_ATTR_OPSTATE,	/* u8 */
- 	DEVLINK_PORT_FN_ATTR_CAPS,	/* bitfield32 */
-+	DEVLINK_PORT_FN_ATTR_DEVLINK,	/* nested */
- 
- 	__DEVLINK_PORT_FUNCTION_ATTR_MAX,
- 	DEVLINK_PORT_FUNCTION_ATTR_MAX = __DEVLINK_PORT_FUNCTION_ATTR_MAX - 1
-diff --git a/net/devlink/port.c b/net/devlink/port.c
-index 7b300a322ed9..4e9003242448 100644
---- a/net/devlink/port.c
-+++ b/net/devlink/port.c
-@@ -428,6 +428,13 @@ devlink_nl_port_function_attrs_put(struct sk_buff *msg, struct devlink_port *por
- 	if (err)
- 		goto out;
- 	err = devlink_port_fn_state_fill(port, msg, extack, &msg_updated);
-+	if (err)
-+		goto out;
-+	err = devlink_rel_devlink_handle_put(msg, port->devlink,
-+					     port->rel_index,
-+					     DEVLINK_PORT_FN_ATTR_DEVLINK,
-+					     &msg_updated);
++struct mlx5_sf_peer_devlink_event_ctx {
++	u16 fn_id;
++	struct devlink *devlink;
++	int err;
++};
 +
- out:
- 	if (err || !msg_updated)
- 		nla_nest_cancel(msg, function_attr);
-@@ -1392,6 +1399,50 @@ void devlink_port_attrs_pci_sf_set(struct devlink_port *devlink_port, u32 contro
+ void mlx5_sf_dev_table_create(struct mlx5_core_dev *dev);
+ void mlx5_sf_dev_table_destroy(struct mlx5_core_dev *dev);
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/driver.c b/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/driver.c
+index 8fe82f1191bb..169c2c68ed5c 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/driver.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/driver.c
+@@ -8,6 +8,20 @@
+ #include "dev.h"
+ #include "devlink.h"
+ 
++static int mlx5_core_peer_devlink_set(struct mlx5_sf_dev *sf_dev, struct devlink *devlink)
++{
++	struct mlx5_sf_peer_devlink_event_ctx event_ctx = {
++		.fn_id = sf_dev->fn_id,
++		.devlink = devlink,
++	};
++	int ret;
++
++	ret = mlx5_blocking_notifier_call_chain(sf_dev->parent_mdev,
++						MLX5_DRIVER_EVENT_SF_PEER_DEVLINK,
++						&event_ctx);
++	return ret == NOTIFY_OK ? event_ctx.err : 0;
++}
++
+ static int mlx5_sf_dev_probe(struct auxiliary_device *adev, const struct auxiliary_device_id *id)
+ {
+ 	struct mlx5_sf_dev *sf_dev = container_of(adev, struct mlx5_sf_dev, adev);
+@@ -54,9 +68,21 @@ static int mlx5_sf_dev_probe(struct auxiliary_device *adev, const struct auxilia
+ 		mlx5_core_warn(mdev, "mlx5_init_one err=%d\n", err);
+ 		goto init_one_err;
+ 	}
++
++	err = mlx5_core_peer_devlink_set(sf_dev, devlink);
++	if (err) {
++		mlx5_core_warn(mdev, "mlx5_core_peer_devlink_set err=%d\n", err);
++		goto peer_devlink_set_err;
++	}
++
+ 	devlink_register(devlink);
+ 	return 0;
+ 
++peer_devlink_set_err:
++	if (mlx5_dev_is_lightweight(sf_dev->mdev))
++		mlx5_uninit_one_light(sf_dev->mdev);
++	else
++		mlx5_uninit_one(sf_dev->mdev);
+ init_one_err:
+ 	iounmap(mdev->iseg);
+ remap_err:
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/sf/devlink.c b/drivers/net/ethernet/mellanox/mlx5/core/sf/devlink.c
+index e34a8f88c518..964a5b1876f3 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/sf/devlink.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/sf/devlink.c
+@@ -28,6 +28,7 @@ struct mlx5_sf_table {
+ 	struct mutex sf_state_lock; /* Serializes sf state among user cmds & vhca event handler. */
+ 	struct notifier_block esw_nb;
+ 	struct notifier_block vhca_nb;
++	struct notifier_block mdev_nb;
+ };
+ 
+ static struct mlx5_sf *
+@@ -511,6 +512,35 @@ static int mlx5_sf_esw_event(struct notifier_block *nb, unsigned long event, voi
+ 	return 0;
  }
- EXPORT_SYMBOL_GPL(devlink_port_attrs_pci_sf_set);
  
-+static void devlink_port_rel_notify_cb(struct devlink *devlink, u32 port_index)
++static int mlx5_sf_mdev_event(struct notifier_block *nb, unsigned long event, void *data)
 +{
-+	struct devlink_port *devlink_port;
++	struct mlx5_sf_table *table = container_of(nb, struct mlx5_sf_table, mdev_nb);
++	struct mlx5_sf_peer_devlink_event_ctx *event_ctx = data;
++	int ret = NOTIFY_DONE;
++	struct mlx5_sf *sf;
 +
-+	devlink_port = devlink_port_get_by_index(devlink, port_index);
-+	if (!devlink_port)
-+		return;
-+	devlink_port_notify(devlink_port, DEVLINK_CMD_PORT_NEW);
++	if (event != MLX5_DRIVER_EVENT_SF_PEER_DEVLINK)
++		return NOTIFY_DONE;
++
++	table = mlx5_sf_table_try_get(table->dev);
++	if (!table)
++		return NOTIFY_DONE;
++
++	mutex_lock(&table->sf_state_lock);
++	sf = mlx5_sf_lookup_by_function_id(table, event_ctx->fn_id);
++	if (!sf)
++		goto out;
++
++	event_ctx->err = devl_port_fn_devlink_set(&sf->dl_port.dl_port,
++						  event_ctx->devlink);
++
++	ret = NOTIFY_OK;
++out:
++	mutex_unlock(&table->sf_state_lock);
++	mlx5_sf_table_put(table);
++	return ret;
 +}
 +
-+static void devlink_port_rel_cleanup_cb(struct devlink *devlink, u32 port_index,
-+					u32 rel_index)
-+{
-+	struct devlink_port *devlink_port;
+ static bool mlx5_sf_table_supported(const struct mlx5_core_dev *dev)
+ {
+ 	return dev->priv.eswitch && MLX5_ESWITCH_MANAGER(dev) &&
+@@ -544,6 +574,9 @@ int mlx5_sf_table_init(struct mlx5_core_dev *dev)
+ 	if (err)
+ 		goto vhca_err;
+ 
++	table->mdev_nb.notifier_call = mlx5_sf_mdev_event;
++	mlx5_blocking_notifier_register(dev, &table->mdev_nb);
 +
-+	devlink_port = devlink_port_get_by_index(devlink, port_index);
-+	if (devlink_port && devlink_port->rel_index == rel_index)
-+		devlink_port->rel_index = 0;
-+}
-+
-+/**
-+ * devl_port_fn_devlink_set - Attach peer devlink
-+ *			      instance to port function.
-+ * @devlink_port: devlink port
-+ * @fn_devlink: devlink instance to attach
-+ */
-+int devl_port_fn_devlink_set(struct devlink_port *devlink_port,
-+			     struct devlink *fn_devlink)
-+{
-+	ASSERT_DEVLINK_PORT_REGISTERED(devlink_port);
-+
-+	if (WARN_ON(devlink_port->attrs.flavour != DEVLINK_PORT_FLAVOUR_PCI_SF ||
-+		    devlink_port->attrs.pci_sf.external))
-+		return -EINVAL;
-+
-+	return devlink_rel_nested_in_add(&devlink_port->rel_index,
-+					 devlink_port->devlink->index,
-+					 devlink_port->index,
-+					 devlink_port_rel_notify_cb,
-+					 devlink_port_rel_cleanup_cb,
-+					 fn_devlink);
-+}
-+EXPORT_SYMBOL_GPL(devl_port_fn_devlink_set);
-+
- /**
-  *	devlink_port_linecard_set - Link port with a linecard
-  *
+ 	return 0;
+ 
+ vhca_err:
+@@ -562,6 +595,7 @@ void mlx5_sf_table_cleanup(struct mlx5_core_dev *dev)
+ 	if (!table)
+ 		return;
+ 
++	mlx5_blocking_notifier_unregister(dev, &table->mdev_nb);
+ 	mlx5_vhca_event_notifier_unregister(table->dev, &table->vhca_nb);
+ 	mlx5_esw_event_notifier_unregister(dev->priv.eswitch, &table->esw_nb);
+ 	WARN_ON(refcount_read(&table->refcount));
+diff --git a/include/linux/mlx5/device.h b/include/linux/mlx5/device.h
+index 4d5be378fa8c..8fbe22de16ef 100644
+--- a/include/linux/mlx5/device.h
++++ b/include/linux/mlx5/device.h
+@@ -366,6 +366,7 @@ enum mlx5_driver_event {
+ 	MLX5_DRIVER_EVENT_UPLINK_NETDEV,
+ 	MLX5_DRIVER_EVENT_MACSEC_SA_ADDED,
+ 	MLX5_DRIVER_EVENT_MACSEC_SA_DELETED,
++	MLX5_DRIVER_EVENT_SF_PEER_DEVLINK,
+ };
+ 
+ enum {
 -- 
 2.41.0
 
