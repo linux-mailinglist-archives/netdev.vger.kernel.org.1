@@ -1,109 +1,187 @@
-Return-Path: <netdev+bounces-33512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1948F79E56E
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 12:56:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 927A879E57D
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 12:58:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DCA01C20C4D
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 10:56:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AAFC281FA8
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 10:58:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7873D1DA59;
-	Wed, 13 Sep 2023 10:56:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AAEE1DDCF;
+	Wed, 13 Sep 2023 10:58:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AEBF23A0
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 10:56:26 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9625C1726;
-	Wed, 13 Sep 2023 03:56:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694602585; x=1726138585;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=LYSnaNLcsO7YvbC0ChoMxE2UJxhRLP+HoojmUoNAyII=;
-  b=Og9Si3tNCOmb7HU/LVzSGar/jP8Q1qI/6g5hJL62Kd0noNVMvRRrZoyj
-   InnKKhUMAfEHzjsUhz7A3LhtHnmb1iYjb8095JxdZcqrPws/k1XbUR21n
-   V8fzCGdpJHbcX3+Cs6SJqIfnbKHMY4JVajHD73zgyNsVpnaUjo1nXYO2v
-   y4mzXiCA7ybwir6Cg1/b+UUjLlDm05JSiaJjHgIfGOaqRMoAW15Sck8mT
-   iLA2HtbQUekQ7IfvIjjEB9spdKpanIhuowxiHQmfXJ+UIQkc0yBXBOVRa
-   pVYnn7syNligFaZWEKdsKA5yP/2fWdf1Y5PWZIzaiO/eW/FcY27zoFC6I
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="464996469"
-X-IronPort-AV: E=Sophos;i="6.02,143,1688454000"; 
-   d="scan'208";a="464996469"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 03:56:25 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="737453054"
-X-IronPort-AV: E=Sophos;i="6.02,143,1688454000"; 
-   d="scan'208";a="737453054"
-Received: from naamamex-mobl.ger.corp.intel.com (HELO [10.12.48.172]) ([10.12.48.172])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 03:56:19 -0700
-Message-ID: <4f9e7d31-7c73-e5c1-b34c-3924c5d6b100@linux.intel.com>
-Date: Wed, 13 Sep 2023 13:56:10 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E2BD210D
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 10:58:11 +0000 (UTC)
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E833819B4;
+	Wed, 13 Sep 2023 03:58:10 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2bc63e0d8cdso106900581fa.2;
+        Wed, 13 Sep 2023 03:58:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694602689; x=1695207489; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q4TLaPjJGYtbUUUt+F/f79z+dkxxZ0mIyqX82iiNHCQ=;
+        b=MdLwo/5VdbXxKQ4WGN7kCw7GubUS/dCRh6cXWzO7BFioKy9ONzVNuScE7Rfxy/98kn
+         YuMWJQhbswTTLYhYBK5Va9nxurRXByj+ywoe50yZtlnq3gvxoK2MMUJbTa1O3FKp+D3V
+         NrMIukbMBnPNtm1sVesegegWFKBKde9g+QAjSiL2qoth0fzxynxehX+vScj/XWzRQ7XP
+         rJoGZJtg0nU3wqmzhtvYqEgJV/CQzg26yV/aCqOBsbup5e23NS8rb6/KR3FSANhjtM06
+         tbe5IOVE8pLph7i27QAHqrlMUeYU53gaLBYSjlAvoW5djPvGXDdyOpTea94tl3+7PEcs
+         LRzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694602689; x=1695207489;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q4TLaPjJGYtbUUUt+F/f79z+dkxxZ0mIyqX82iiNHCQ=;
+        b=cqFT2hgwZH0K5W939tyPxNUNns1ZOe8CtX+rbzrMUSIhlpKh98jFKp7e3RAJge8Ap7
+         8U3ARWnm9zEL44aIYuoiYDwBKwgMvJnk++yqw96DNuwjLKXEbwdmIuRUVIvYGYIei0r7
+         iaf18WYodqyeR6GVkEPVaXfwkUKG6w8qYtE96qLs+QP5m6E672Mnti8A4ej2Byfu7oFJ
+         CuoJPQM2Q3jOjoG+5BNWNwu4ptn6/FsbOslaxY1gnbUfAtvtJz998f/P0ri2Im2EQc36
+         g3A/l86+757KNbU+opzjZOF/vnMRhl31YayKtXRogPxqUpLS8wrF4vKRxBmphc1hPEC0
+         NK9g==
+X-Gm-Message-State: AOJu0YzD6nXMbMfEyTji+ZbowMgQURDzQDUOBdEERZZJSfQRmEhC/zBV
+	VsGmPqdUP1E91huQ/fbW554=
+X-Google-Smtp-Source: AGHT+IFFyJ3lay9NUjZa8DkRXOc64IKh4AwAlNwAsNz+WvyuperImNu9KHg1tt3Nsri2FStsctBAPA==
+X-Received: by 2002:a2e:8349:0:b0:2bc:be93:6d3c with SMTP id l9-20020a2e8349000000b002bcbe936d3cmr1961460ljh.32.1694602688771;
+        Wed, 13 Sep 2023 03:58:08 -0700 (PDT)
+Received: from skbuf ([188.26.184.93])
+        by smtp.gmail.com with ESMTPSA id ga17-20020a170906b85100b009a1e0349c4csm8211559ejb.23.2023.09.13.03.58.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Sep 2023 03:58:08 -0700 (PDT)
+Date: Wed, 13 Sep 2023 13:58:06 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, Tristram.Ha@microchip.com,
+	Eric Dumazet <edumazet@google.com>, davem@davemloft.net,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	UNGLinuxDriver@microchip.com,
+	Oleksij Rempel <linux@rempel-privat.de>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [[RFC PATCH v4 net-next] 0/2] net: dsa: hsr: Enable HSR HW
+ offloading for KSZ9477
+Message-ID: <20230913105806.g5p3wck675gbw5fo@skbuf>
+References: <20230911165848.0741c03c@wsk>
+ <20230911160501.5vc4nttz6fnww56h@skbuf>
+ <20230912101748.0ca4eec8@wsk>
+ <20230912092909.4yj4b2b4xrhzdztu@skbuf>
+ <20230912160326.188e1d13@wsk>
+ <20230912160326.188e1d13@wsk>
+ <20230912142644.u4sdkveei3e5hwaf@skbuf>
+ <20230912170641.5bfc3cfe@wsk>
+ <20230912215523.as4puqamj65dikip@skbuf>
+ <20230913102219.773e38f8@wsk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net v2] igc: Fix infinite
- initialization loop with early XDP redirect
-Content-Language: en-US
-To: Vinicius Costa Gomes <vinicius.gomes@intel.com>,
- intel-wired-lan@lists.osuosl.org
-Cc: Andre Guedes <andre.guedes@intel.com>, netdev@vger.kernel.org,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Jithu Joseph <jithu.joseph@intel.com>, linux-kernel@vger.kernel.org,
- Ferenc Fejes <ferenc.fejes@ericsson.com>, Eric Dumazet
- <edumazet@google.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Vedang Patel <vedang.patel@intel.com>
-References: <20230907003005.99481-1-vinicius.gomes@intel.com>
-From: "naamax.meir" <naamax.meir@linux.intel.com>
-In-Reply-To: <20230907003005.99481-1-vinicius.gomes@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230913102219.773e38f8@wsk>
 
-On 9/7/2023 03:30, Vinicius Costa Gomes wrote:
-> When a XDP redirect happens before the link is ready, that
-> transmission will not finish and will timeout, causing an adapter
-> reset. If the redirects do not stop, the adapter will not stop
-> resetting.
+On Wed, Sep 13, 2023 at 10:22:19AM +0200, Lukasz Majewski wrote:
+> Why we cannot have even simpler solution - in the HSR/Wol code we read
+> content of REG_SW_MAC_ADDR_0 (the actually programmed MAC) and:
 > 
-> Wait for the driver to signal that there's a carrier before allowing
-> transmissions to proceed.
-> 
-> Previous code was relying that when __IGC_DOWN is cleared, the NIC is
-> ready to transmit as all the queues are ready, what happens is that
-> the carrier presence will only be signaled later, after the watchdog
-> workqueue has a chance to run. And during this interval (between
-> clearing __IGC_DOWN and the watchdog running) if any transmission
-> happens the timeout is emitted (detected by igc_tx_timeout()) which
-> causes the reset, with the potential for the inifite loop.
-> 
-> Fixes: 4ff320361092 ("igc: Add support for XDP_REDIRECT action")
-> Reported-by: Ferenc Fejes <ferenc.fejes@ericsson.com>
-> Closes: https://lore.kernel.org/netdev/0caf33cf6adb3a5bf137eeaa20e89b167c9986d5.camel@ericsson.com/
-> Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-> Tested-by: Ferenc Fejes <ferenc.fejes@ericsson.com>
-> Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> ---
-> v1 -> v2:
->   - Added more information to the commit message (Maciej Fijalkowski)
-> 
-> 
->   drivers/net/ethernet/intel/igc/igc_main.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+> - If not programmed - use DSA master one (like done in mine patches)
 
-Tested-by: Naama Meir <naamax.meir@linux.intel.com>
+You said here https://lore.kernel.org/netdev/20230912160326.188e1d13@wsk/
+that using the DSA master address is a complication that can be avoided,
+no? So why is it now part of the solution that you propose?
+
+I thought we were in agreement to program the actual DSA user ports' MAC
+addresses to hardware.
+
+> - If already programmed:
+> 	 - check if equal to DSA master - proceed with HSR.
+> 	 - if not equal to DSA master (e.g. WoL altered) - exit HSR join
+> 	   with information that offloading is not possible
+
+With KSZ switches, a single CPU port is supported, so all ports share
+the same DSA master. So if the contents of REG_SW_MAC_ADDR_0 is different
+from the DSA master (the same DSA master that was used for an earlier
+HSR offload), why do you infer that it was altered by WoL? It makes no
+sense.
+
+> Then, the content of REG_SW_MAC_ADDR_X would determine what to do with
+> it.
+> 
+> > There are probably hundreds of implementations of this idea in the
+> > kernel, but the one that comes to my mind is ocelot_mirror_get() +
+> > ocelot_mirror_put(). Again, I need to mention that I know that port
+> > mirroring != HSR - I'm just talking about the technique.
+> > 
+> > There is one more thing that your reply to my observation fails to
+> > address. Even with this refcount thing, you will still need to add
+> > code to dsa_slave_set_mac_address() which notifies the ksz driver, so
+> > that the driver can refuse MAC address changes, which would break the
+> > offloads. Ack?
+> 
+> And the above problem is not related to the DSA slave address change
+> discussed earlier?
+
+"Discussed earlier" is a bit imprecise and I don't know what you're
+talking about.
+
+There are 3 netdev kinds at play here: (a) DSA master, (b) DSA user port, (c) HSR device.
+
+- Changing the MAC address of (a) triggers a pre-existing bug. That bug
+  can be separated from the HSR offload discussion if the HSR offload
+  decides to not program the DSA master's MAC address to hardware, but a
+  different MAC address. The pre-existence of the DSA bug is not a strong
+  enough argument per se to avoid programming the DSA master's address to
+  hardware. But there may be others. Like the fact that DSA user ports may
+  inherit the DSA master's MAC address, or they may have their own.
+  Limiting HSR offload and WoL to just the "inherit" case may seem a bit
+  arbitrary, considering that the self-address filtering from
+  hsr_handle_frame() looks at the port_A and port_B MAC addresses.
+
+- Changing the MAC address of (c) does not seem directly possible, but:
+
+- Changing the MAC address of (b) also triggers (c) - see hsr_netdev_notify().
+  This is because the HSR driver makes sure that the addresses of
+  port_A, port_B and the HSR device are equal at all times.
+
+The simple matter is: if you program the MAC address of a netdev (any
+netdev) to hardware, then for a correct and robust implementation, you
+need to make sure that the hardware will always be in sync with that
+address, keeping in mind that the user may change it. Either you deny
+changes, or you update the hardware when the address is updated.
+
+It's not quite clear to me that you're making a distinction between
+changing (a) and (b).
+
+> > In principle it sounds like a plan. It just needs to be implemented.
+> 
+> To clarify:
+> 
+> 0. It looks like described above prevention from REG_SW_MAC_ADDR_X
+> overwriting and DSA slave port MAC address change are needed.
+> 
+> Then questions about time line:
+> 
+> 1. The HSR code is accepted without fixes from 0. and then when other
+> user (WoL) patches are posted problems from 0. needs to be addressed.
+> 
+> or 
+> 
+> 2. To accept the HSR code you (and other community members? Russell,
+> Andrew) require the fixes from 0. first. 
+
+If the DSA user port MAC address changes, and REG_SW_MAC_ADDR_0 was
+previously programmed with it, and nothing is done in reaction to this,
+then this is a problem with the HSR offload. So no, it's not just a
+problem with upcoming WoL patches as you imply. You need to integrate a
+solution to that problem as part of your HSR patches.
 
