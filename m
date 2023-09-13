@@ -1,102 +1,169 @@
-Return-Path: <netdev+bounces-33515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CFD279E595
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 13:00:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA3FE79E5A6
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 13:03:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 524641C20A91
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 11:00:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B1D21C20AF3
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 11:03:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FAC51DDF1;
-	Wed, 13 Sep 2023 11:00:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EFED1E500;
+	Wed, 13 Sep 2023 11:03:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92CEC210D
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 11:00:25 +0000 (UTC)
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFBD81726;
-	Wed, 13 Sep 2023 04:00:24 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-9ad810be221so251996866b.2;
-        Wed, 13 Sep 2023 04:00:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 762F3F9D2;
+	Wed, 13 Sep 2023 11:03:14 +0000 (UTC)
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51A0919B6;
+	Wed, 13 Sep 2023 04:03:13 -0700 (PDT)
+Received: by mail-wr1-x42c.google.com with SMTP id ffacd0b85a97d-31f85854b9eso646859f8f.0;
+        Wed, 13 Sep 2023 04:03:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694602823; x=1695207623; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=au/7PSHEheAOFV6kauhcShIfB51spSoacnx+jNp9SGs=;
-        b=R5kkvVIhbFUE6mCMpOt0PtzC71M4K2heFLKLeFLM9gWgXJZwvtKlNfcJ/SFW5Tc1wf
-         CN9h37jExPXTRxhyTzuW1I0YSuI6cSERb46paJbSOaV37z57nYu/AVjQqqgOyqJrHVGM
-         zywUKxXNwaaftR6Yzwm6e17MknB5ud7ehmmT99zhF5BCPRe6N5jUKS2zZYp1aLTM7kbl
-         tRl3MjFp5HOxtzCxEP/ULsHe3GBb7qeDLHu6HCPP3sp5saVg/yOFFNrro8velw1WKTuJ
-         M8ytU0wjTjvyfIDyoVIfUz0nAYgSislVT/4eKFLECUeNgBY5jE5P76etPUCli+nHZ4vj
-         wn4g==
+        d=gmail.com; s=20221208; t=1694602992; x=1695207792; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=IXPIs2ya3pSrdg08iN/6qvh/HZGuvMQXEGZluQz4UtI=;
+        b=INX/ndZmAPEpT+Mhv0woBsCljYhBjtEYAWpd+Irpnbpt9HMVjNHhK9h3zOVc2v96N9
+         z3UHZr76MdWrJ+FUwPPuSqYC2SMqPI84jxoO/T5tPZ3oRe2lGri/mC3c32dKspbloPvf
+         t3MS2jAJsaq4AyYkqVRxHDY+J5oFi/U/yZ6pCa/wZw8etWKVBMAgouytz/hxKJCrbUGi
+         ZA3IG3fbIZyi05JOUBRq05ZA6EqKML7pUsOiGiGORmz8yZ9Pd4D/YAqPDu7foatmyp1A
+         8W0aBvWTBirjoQljSZolwvXc29EnRpx2yG4fuBWmmSeFpwHFKlkuThwqa+wDViAEGDFL
+         ng8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694602823; x=1695207623;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=au/7PSHEheAOFV6kauhcShIfB51spSoacnx+jNp9SGs=;
-        b=gzDgoONjo2ErDJv8/94orXhHpDT7JbWFpalBeQ7NsmU2ptklRvKmqaUrxtxJYw6Txi
-         W5mv+tnvm/kBo2qWZ+Ooyxq7MyocaPp3eVA5YBGWF0QBYUIDtmlnKRdXnz3zaAueHyZM
-         GMYfnkb0MvULKNorR+sNMhkaR5iySmJ0Bh4BGIk8zULdWiZ3BnLJeBCEgvuGvrZSEuwd
-         X/XzUJ5BlefuKr9WEgPZphaODHo07R9gxqLwcCcbOuREJFKi7PabbC5R2828ohAv2wE3
-         FYRUQQWtiFVlbWHN8T1RWrlSrkhMsI4BYxUdWAvcuzbNI28rWt0XHicN5HjP1WLCcj2E
-         eZ8A==
-X-Gm-Message-State: AOJu0YyJWft5iaHntSZ9OIDw0FUzfiNGnLS9pZSiMaJAvt/EVeMDFWdQ
-	DAmSQtVtVWYK859ez9mJyLw=
-X-Google-Smtp-Source: AGHT+IF7yTclIVJKpeCodlCooHdBEfeammFCCEJq5RHV5EJTUSb/wU6bhojoQGcUcKOMJJpCsd+Jwg==
-X-Received: by 2002:a17:906:51c8:b0:9a1:d915:637a with SMTP id v8-20020a17090651c800b009a1d915637amr1685038ejk.61.1694602822867;
-        Wed, 13 Sep 2023 04:00:22 -0700 (PDT)
-Received: from skbuf ([188.26.184.93])
-        by smtp.gmail.com with ESMTPSA id pv26-20020a170907209a00b00992d122af63sm8199511ejb.89.2023.09.13.04.00.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Sep 2023 04:00:22 -0700 (PDT)
-Date: Wed, 13 Sep 2023 14:00:20 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dsa: rtl8366rb: Implement setting up link
- on CPU port
-Message-ID: <20230913110020.mly455oreyrsyld6@skbuf>
-References: <20230912-rtl8366rb-link-v1-1-216eed63f357@linaro.org>
- <20230912-rtl8366rb-link-v1-1-216eed63f357@linaro.org>
+        d=1e100.net; s=20230601; t=1694602992; x=1695207792;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IXPIs2ya3pSrdg08iN/6qvh/HZGuvMQXEGZluQz4UtI=;
+        b=LV9O7GNlroFbOda0XQX3i63TvS0dmJgOPmKEFCRx7PooKvorobqF6QEEWJl9USwiw3
+         AsOaAVPEuqUDI1YmN1TREoFPIdh0pQTQznY5+CzEIh+FRt5oRdzAlCA7pbSJAaPsDPd1
+         gQUOCgcuCd3T+gEhlJGwMn6rwwbHcNvxsvjGRCOkmAQoQpunZXfDPJ5VmCb4+Tm7ifQX
+         7VnjhERqt/hiRnX0ZKGjsMbJc0HI5gR6GI0qM/hYQj6v4h8w+QddrYRcicoIfUHOcpxJ
+         69nC/5MZ5J6nmt3TOIwLxwrPUx1fHJw/G8BlUdEUhwfSZhBcBmPYy7iuX9J0cxMWvGOj
+         gSsw==
+X-Gm-Message-State: AOJu0YzLFyVAhxeF1ChlgHTYwqjpoPIDhETFlRpCpV78yL4BQLqX8mRk
+	+susOUsh62Tnpr/8dVnZ5yk=
+X-Google-Smtp-Source: AGHT+IEYIy7NmBVyxVn5HiuygX2PoN017HQGSWODznwRYrNva57Csap/tujzPAuLLKYGPA6l0+w+Lw==
+X-Received: by 2002:adf:fa8b:0:b0:317:5eb8:b1c0 with SMTP id h11-20020adffa8b000000b003175eb8b1c0mr1890291wrr.5.1694602991415;
+        Wed, 13 Sep 2023 04:03:11 -0700 (PDT)
+Received: from localhost.localdomain (h-176-10-144-222.NA.cust.bahnhof.se. [176.10.144.222])
+        by smtp.gmail.com with ESMTPSA id d10-20020a5d538a000000b0031c7682607asm15255289wrv.111.2023.09.13.04.03.09
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 13 Sep 2023 04:03:10 -0700 (PDT)
+From: Magnus Karlsson <magnus.karlsson@gmail.com>
+To: magnus.karlsson@intel.com,
+	bjorn@kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	netdev@vger.kernel.org,
+	maciej.fijalkowski@intel.com,
+	bpf@vger.kernel.org,
+	yhs@fb.com,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	song@kernel.org,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	sdf@google.com,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	przemyslaw.kitszel@intel.com
+Cc: Magnus Karlsson <magnus.karlsson@gmail.com>
+Subject: [PATCH bpf-next v3 00/10] seltests/xsk: various improvements to xskxceiver
+Date: Wed, 13 Sep 2023 13:02:22 +0200
+Message-ID: <20230913110248.30597-1-magnus.karlsson@gmail.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230912-rtl8366rb-link-v1-1-216eed63f357@linaro.org>
- <20230912-rtl8366rb-link-v1-1-216eed63f357@linaro.org>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Sep 12, 2023 at 11:24:18PM +0200, Linus Walleij wrote:
-> We auto-negotiate most ports in the RTL8366RB driver, but
-> the CPU port is hard-coded to 1Gbit, full duplex, tx and
-> rx pause.
-> 
-> This isn't very nice. People may configure speed and
-> duplex differently in the device tree.
-> 
-> Actually respect the arguments passed to the function for
-> the CPU port, which get passed properly after Russell's
-> patch "net: dsa: realtek: add phylink_get_caps implementation"
-> 
-> After this the link is still set up properly.
-> 
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
-> ---
 
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+This patch set implements several improvements to the xsk selftests
+test suite that I thought were useful while debugging the xsk
+multi-buffer code and tests. The largest new feature is the ability to
+be able to execute a single test instead of the whole test suite. This
+required some surgery on the current code, details below.
+
+Anatomy of the path set:
+
+1: Print useful info on a per packet basis with the option -v
+
+2: Add a timeout in the transmission loop too. We only used to have
+   one for the Rx thread, but Tx can lock up too waiting for
+   completions.
+
+3: Add an option (-m) to only run the tests (or a single test with a
+   later patch) in a single mode: skb, drv, or zc (zero-copy).
+
+4-5: Preparatory patches to be able to specify a test to run. Need to
+     define the test names in a single structure and their entry
+     points, so we can use this when wanting to run a specific test.
+
+6: Adds a command line option (-l) that lists all the tests.
+
+7: Adds a command line option (-t) that runs a specific test instead
+   of the whole test suite. Can be combined with -m to specify a
+   single mode too.
+
+8: Use ksft_print_msg() uniformly throughout the tests. It was a mix
+   of printf() and ksft_print_msg() before.
+
+9: In some places, we failed the whole test suite instead of a single
+   test in certain circumstances. Fix this so only the test in
+   question is failed and the rest of the test suite continues.
+
+10: Display the available command line options with -h
+
+v2 -> v3:
+* Drop the support for environment variables. Probably not useful. [Maciej]
+* Fixed spelling mistake in patch #9 [Maciej]
+* Fail gracefully if unsupported mode is chosen [Maciej]
+* Simplified test run loop [Maciej]
+
+v1 -> v2:
+
+* Introduce XSKTEST_MODE env variable to be able to set the mode to
+  use [Przemyslaw]
+* Introduce XSKTEST_ETH env variable to be able to set the ethernet
+  interface to use by introducing a new patch (#11) [Magnus]
+* Fixed spelling error in patch #5 [Przemyslaw, Maciej]
+* Fixed confusing documentation in patch #10  [Przemyslaw]
+* The -l option can now be used without being root [Magnus, Maciej]
+* Fixed documentation error in patch #7 [Maciej]
+* Added error handling to the -t option [Maciej]
+* -h now displayed as an option [Maciej]
+
+Thanks: Magnus
+
+Magnus Karlsson (10):
+  selftests/xsk: print per packet info in verbose mode
+  selftests/xsk: add timeout for Tx thread
+  selftests/xsk: add option to only run tests in a single mode
+  selftests/xsk: move all tests to separate functions
+  selftests/xsk: declare test names in struct
+  selftests/xsk: add option that lists all tests
+  selftests/xsk: add option to run single test
+  selftests/xsk: use ksft_print_msg uniformly
+  selftests/xsk: fail single test instead of all tests
+  selftests/xsk: display command line options with -h
+
+ tools/testing/selftests/bpf/test_xsk.sh    |  40 +-
+ tools/testing/selftests/bpf/xsk_prereqs.sh |  10 +-
+ tools/testing/selftests/bpf/xskxceiver.c   | 539 ++++++++++++---------
+ tools/testing/selftests/bpf/xskxceiver.h   |  44 +-
+ 4 files changed, 372 insertions(+), 261 deletions(-)
+
+
+base-commit: 5bbb9e1f08352a381a6e8a17b5180170b2a93685
+--
+2.42.0
 
