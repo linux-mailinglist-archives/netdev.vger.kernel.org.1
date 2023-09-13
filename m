@@ -1,185 +1,105 @@
-Return-Path: <netdev+bounces-33469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 429CB79E10A
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 09:42:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C908679E11B
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 09:48:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 604B71C20CA1
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 07:42:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2FFA5281E54
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 07:48:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B35D21DA2A;
-	Wed, 13 Sep 2023 07:42:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEF131DA2E;
+	Wed, 13 Sep 2023 07:48:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A3B1802E
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 07:42:37 +0000 (UTC)
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D2571729;
-	Wed, 13 Sep 2023 00:42:36 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id a640c23a62f3a-991c786369cso864053966b.1;
-        Wed, 13 Sep 2023 00:42:36 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B18FF1DA2A
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 07:48:18 +0000 (UTC)
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9E0F173E
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 00:48:17 -0700 (PDT)
+Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-31c5c06e8bbso6571497f8f.1
+        for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 00:48:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694590955; x=1695195755; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=iqyPmr2+k/NZVSejvLbli04qwXaMrXe8lYcDTd578VI=;
-        b=SmIOP7yFeienFxV223boXY0wfCGIawhEsGnyu2Sb9e8v+HarxuR0pMQb7ix3hpy42E
-         TOqYTquEvoBEpHE+26nbfMtXvkWVGdEJOTLUB0D1VOY2vOSKNTvQ28UMMtO6i2UYLI8v
-         T3lnQN3X4/GzUF8QFT8poJ9JsIOA+mxtcKOQ9evIbgLT9K67n0sjBOZfxtvy9iJ1ewsU
-         EP3F8zLilVHKgvRiWDNePh/hFlkegJb3+bwWhkQdc7aWUdhudkPRThPb0uTODpVaccra
-         7nLlGFew4rir+TRfzsIAnGgEozXmHwRN2meeq4ORxc9jUmap/bSK8raKnz6u0kfCl7b2
-         gB5w==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1694591296; x=1695196096; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=dWoRpt4IEW8slblIeltP44h6t0NbWFyEN4yQEQghXLw=;
+        b=UZL3+pq0TTX96+MZQa8+st4Qzu5DXRbEqOToj+QoSOLze09L7cSN5KY9DEEdcjzo38
+         E297rgNS14mNixdbvnuHPxIlTKM5m9ashH0G3V3yC5V/wq7nNAWpH2LBnSsY9Yjh5rr9
+         20LV+U+OAHLsKJW8SaD27aoVq8XQj8hZegQxzQHShdGwhrjArBWEgPFA+UKCYCVlWgje
+         xU/23MQnQjFi5DVOno+sEmoqNPk5KSbsL6AYdC3D+X37Y2zloEW4ekX6CFhfF6qyBuVu
+         HKfn6YbmTafbva1A2Osnyj2WljyZQkMXVYxlqPd/appaQApn3ZSSLmsMpaRRU1NnRFN+
+         IwCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694590955; x=1695195755;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iqyPmr2+k/NZVSejvLbli04qwXaMrXe8lYcDTd578VI=;
-        b=EvlXA+FFWQ9jDEzXPVxUz0sI8fFfFwIgiI5lRwsa/1sKyqsTgI4ZXly7pFo0sn07Pa
-         lLdo/ChGGtHGoMjIeZMBuRTfy4Zi3TXU45+MYnE+AzU+qqXTqXj5L2dUROCMTHjciKDp
-         u+7HTfWy0m5LTe8bu51EVkp5Xo7A+lGTMAUWSMIqmJCsxmjH8f/jkMJe85Y7DpFKTub7
-         Au94k65euXCgxSR0TWojmdxOKDZZqRPQGPaDddgVepA2PQBwBCSqNeM0W3fEDzCfikaC
-         /URXlL4ZHSB4nfjgvKf7ySGYHrF5pbxHKtCEQhuEsk9ond2s5emgf6uCkmh1qZno/Kbn
-         4MIQ==
-X-Gm-Message-State: AOJu0Ywnt6Y04QjueJyDEHC5aXfjVXtRYo8L+lefXIyhcjuQ0kXU2vdc
-	3LoAyelDrxcT+JrEHwabgYA=
-X-Google-Smtp-Source: AGHT+IG9wMEyhBjSpRxfH9WcGpwpPQcuKOXyDTvt6JEficQoouj+74NmVu6JoToLxPGIgK4sRqX+TQ==
-X-Received: by 2002:a17:906:74c7:b0:9aa:1020:8c39 with SMTP id z7-20020a17090674c700b009aa10208c39mr1295768ejl.18.1694590954694;
-        Wed, 13 Sep 2023 00:42:34 -0700 (PDT)
-Received: from skbuf ([188.26.184.93])
-        by smtp.gmail.com with ESMTPSA id w5-20020a17090652c500b0099bd453357esm7874749ejn.41.2023.09.13.00.42.33
+        d=1e100.net; s=20230601; t=1694591296; x=1695196096;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dWoRpt4IEW8slblIeltP44h6t0NbWFyEN4yQEQghXLw=;
+        b=JQjfBB8AaFoIAxaqiS0QQJiVqn8SPHU01fTjaLR4cxjUqk/G/FeQeah4VTwV3t91bY
+         5352dC6m+bX4p6ma2/GFF6sNu5uEVvLcYqS28NIuPRLgAGFbU3RVdYy7X3S0c+06Pvhv
+         M0kq1CYtBDmweISKnz5j2QEA6ZFnqP8nrt4LQhRtSRy95UA3Gj6xYp6Z0gEvoYtAL3fV
+         RunIlXFes5gW/jflHk+50J2N+LGMLZQJ3JRz51GF8tRJmeTK0LqO8EMScFmDE1RzphEF
+         7XFWU4saDrCmTsq2L7dEf+WQbD2rSQvjHgt/7dMIJWB0eDbfpoGz6mZZCTYw2EIxLGC3
+         W68g==
+X-Gm-Message-State: AOJu0YzsixofijoeVEaQSxRdnFChk62HuWlSJ9tgLoVqjXyUqoglzhgP
+	c6C9bG18z4Rtk5XqF1lvdOkmCA==
+X-Google-Smtp-Source: AGHT+IFsO8o0Fm3JRzbY7xchfAXEnBAXZC4iqCbOMK2y0sqKyEIpmynvAxwHwCH7aJH5jrYfUsWx3A==
+X-Received: by 2002:adf:f48e:0:b0:319:6d03:13ae with SMTP id l14-20020adff48e000000b003196d0313aemr1514189wro.55.1694591296153;
+        Wed, 13 Sep 2023 00:48:16 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id i9-20020a5d5589000000b003141e629cb6sm14652764wrv.101.2023.09.13.00.48.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Sep 2023 00:42:34 -0700 (PDT)
-Date: Wed, 13 Sep 2023 10:42:31 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH 2/4] dt-bindings: net: dsa: document internal MDIO bus
-Message-ID: <20230913074231.5azwxqjuv2wp5nik@skbuf>
-References: <f5f468c1-b5a2-4336-b1d9-fd82da95b21d@arinc9.com>
- <20230814143601.mnpxtcm2zybnbvoh@skbuf>
- <0cee0928-74c9-4048-8cd8-70bfbfafd9b2@arinc9.com>
- <20230827121235.zog4c3ehu2cyd3jy@skbuf>
- <676d1a2b-6ffa-4aff-8bed-a749c373f5b3@arinc9.com>
- <87325ce9-595a-4dda-a6a1-b5927d25719b@arinc9.com>
- <20230911225126.rk23g3u3bzo3agby@skbuf>
- <036c0763-f1b2-49ff-bc82-1ff16eec27ab@arinc9.com>
- <20230912193450.h5s6miubag46z623@skbuf>
- <6cec079e-991e-4222-a76d-d6156de0daca@arinc9.com>
+        Wed, 13 Sep 2023 00:48:15 -0700 (PDT)
+Date: Wed, 13 Sep 2023 09:48:14 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Sasha Neftin <sasha.neftin@intel.com>
+Cc: netdev@vger.kernel.org, eranbe@nvidia.com, tariqt@nvidia.com,
+	kuba@kernel.org, anthony.l.nguyen@intel.com,
+	vinicius.gomes@intel.com
+Subject: Re: [PATCH net v1 1/1] net/core: Fix ETH_P_1588 flow dissector
+Message-ID: <ZQFpPuplel7+QZwK@nanopsycho>
+References: <20230913063905.1414023-1-sasha.neftin@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <6cec079e-991e-4222-a76d-d6156de0daca@arinc9.com>
+In-Reply-To: <20230913063905.1414023-1-sasha.neftin@intel.com>
 
-On Wed, Sep 13, 2023 at 08:52:37AM +0300, Arınç ÜNAL wrote:
-> On 12.09.2023 22:34, Vladimir Oltean wrote:
-> > On Tue, Sep 12, 2023 at 10:23:51PM +0300, Arınç ÜNAL wrote:
-> > > The phylink bindings for user ports I ended up making by looking up the
-> > > existing devicetrees are different than the phylink bindings for the shared
-> > > (CPU and DSA) ports currently enforced on all switches.
-> > > 
-> > > My phylink bindings for user ports:
-> > > 
-> > >              allOf:
-> > >                - anyOf:
-> > >                    - required: [ fixed-link ]
-> > >                    - required: [ phy-handle ]
-> > >                    - required: [ managed ]
-> > > 
-> > >                - if:
-> > >                    required: [ fixed-link ]
-> > >                  then:
-> > >                    not:
-> > >                      required: [ managed ]
-> > 
-> > Right, it should have been anyOf and not oneOf.. my mistake. It is a bug
-> > which should be fixed. It's the same phylink that gets used in both cases,
-> > user ports and shared ports :)
-> 
-> One more thing, I don't recall phy-mode being required to be defined for
-> user ports as it will default to GMII. I don't believe this is the same
-> case for shared ports so phy-mode is required only for them?
 
-phy-mode is not strictly required, but I think there is a strong
-preference to set it. IIRC, when looking at the DSA device trees, there
-was no case where phy-mode would be absent on CPU/DSA ports if the other
-link properties were also present, so we required it too. There were no
-complaints in 1 year since dsa_shared_port_validate_of() is there. The
-requirement can be relaxed to just a warning and no error in the kernel,
-and the removal of "required" in the schema, if it helps making it
-common with user ports.
+No need to put "1/1" for a single patch.
 
-I think that the fallback to PHY_INTERFACE_MODE_GMII applies only if
-there is a phy_device (phy-handle). But otherwise, I don't remember if
-the PHY_INTERFACE_MODE_NA passed to phylink_create() will persist at
-runtime, or cause an error somewhere.
 
-> > > The phylink bindings for shared ports enforced on all switches on
-> > > dsa-port.yaml:
-> > > 
-> > >    allOf:
-> > >      - required:
-> > >          - phy-mode
-> > >      - oneOf:
-> > >          - required:
-> > >              - fixed-link
-> > >          - required:
-> > >              - phy-handle
-> > >          - required:
-> > >              - managed
-> > > 
-> > > Here's what I understand:
-> > > 
-> > > - For switches in dsa_switches_apply_workarounds[]
-> > >    - Enforce the latter for shared ports.
-> > >    - Enforce the former for user ports.
-> > > 
-> > > - For switches not in dsa_switches_apply_workarounds[]
-> > >    - Enforce the former for all ports.
-> > 
-> > No, no. We enforce the dt-schema regardless of switch presence in
-> > dsa_switches_apply_workarounds[], to encourage users to fix device trees
-> > (those who run schema validation). The kernel workaround consists in
-> > doing something (skipping phylink) for the device trees where the schema
-> > warns on shared ports. But there should be a single sub-schema for
-> > validating phylink bindings, whatever port kind it is.
-> 
-> Hmm, like writing phylink.yaml and then referring to it under the port
-> pattern node? This could prevent a lot of repetition.
-> 
-> Arınç
+Wed, Sep 13, 2023 at 08:39:05AM CEST, sasha.neftin@intel.com wrote:
+>When a PTP ethernet raw frame with a size of more than 256 bytes followed
+>by a 0xff pattern is sent to __skb_flow_dissect, nhoff value calculation
+>is wrong. For example: hdr->message_length takes the wrong value (0xffff)
+>and it does not replicate real header length. In this case, 'nhoff' value
+>was overridden and the PTP header was badly dissected. This leads to a
+>kernel crash.
+>
+>net/core: flow_dissector
+>net/core flow dissector nhoff = 0x0000000e
+>net/core flow dissector hdr->message_length = 0x0000ffff
+>net/core flow dissector nhoff = 0x0001000d (u16 overflow)
+>...
+>skb linear:   00000000: 00 a0 c9 00 00 00 00 a0 c9 00 00 00 88
+>skb frag:     00000000: f7 ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+>
+>Using the size of the ptp_header struct will allow the corrected
+>calculation of the nhoff value.
 
-Yes, that would sound good.
+Should use imperative mood in order to make clear what the patch is
+doing. Anyway,
+
+
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
