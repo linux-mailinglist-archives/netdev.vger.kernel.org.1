@@ -1,60 +1,98 @@
-Return-Path: <netdev+bounces-33476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A12879E14D
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 09:58:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13A9279E14F
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 09:59:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40F941C20E0D
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 07:58:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0B5B281F56
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 07:59:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4224F1DA3B;
-	Wed, 13 Sep 2023 07:58:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CC811DA3E;
+	Wed, 13 Sep 2023 07:58:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 054441DA3A
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 07:58:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1827C433C8;
-	Wed, 13 Sep 2023 07:58:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694591905;
-	bh=iIe/EVJUjeXRzwCh0/Mp/4IVeq58KNtEj6KHNildhCM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fEPppJF4o7yTDveQ3wwMBbd+meHaSYMxJGUNhBGss2DTdWJyJsqGFJPiuzlM0P2rp
-	 2v/qwfrz2AHcjGmMOOoaNNnNlGtLT6axII4vsx/deE7m+OPCa7lrnLjKCxp4HYmc9z
-	 rHg0eAW6bCF+chcYg/KfSO3kVPoRiWovgkVahJbKfCc7+A7+DespEcIunQXYHdDzsW
-	 eaG2VypMrf7j1DhJP4r+/whCYrOiDqzy9JYEIJKMMLsuU6J5yLF1auS9bkteutRlsj
-	 cMQPicHZUsrCvDdWdPTnTOmajRgNJGTswAfsbL96lRquAMfpqsX7cgiQviftDJ6ssP
-	 ctUJC/KivwlFw==
-Date: Wed, 13 Sep 2023 09:58:16 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Teng Wang <wangteng13@nudt.edu.cn>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-	viro@zeniv.linux.org.uk, edumazet@google.com,
-	netdev@vger.kernel.org
-Subject: Re: Bug: rcu detected stall in rtc_dev_ioctl
-Message-ID: <20230913-oberwasser-zustrom-e17237b2e154@brauner>
-References: <5b52187e.3b86.18a8d4953cf.Coremail.wangteng13@nudt.edu.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80DD1154BA
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 07:58:59 +0000 (UTC)
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACBD81989
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 00:58:58 -0700 (PDT)
+Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-31f71b25a99so6236997f8f.2
+        for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 00:58:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1694591937; x=1695196737; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=EkdGZYQrwA4ll/7xTuDvjPfd4MTlNtu+sDVCgPZq2hM=;
+        b=fDj6Pg+QybGFCjKOebH0swOZ+enPGTuJmqrxMxg9BozYR2t35AEvdUCMHsIqzGNHma
+         Kj53e6YM3/CfYAz/G7lLIGUFDWdZ7h5h7vRaUbbu2vxs6CwLV1h2mB8YjPxiCFSJfnRC
+         1kuwY1nwWyw7OHUZrYms+gK6x1Oe8GsTsu+lxmWhLTvZvKbQnH/TTqlTIsBGc7VK8WCd
+         BYXIKxQ1tBBBF8B9oZGtjcoPMfRzIIS1d/luKYyKQbsjdk8lEpyHY3KNNrGQ8SVHcVqS
+         oIG352Hi9ueyP1KkVwm5WLcYxjEQUulQR71iDxHVTSln/ciuqd6B75e0pgDdpMGie4Yj
+         5+hA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694591937; x=1695196737;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EkdGZYQrwA4ll/7xTuDvjPfd4MTlNtu+sDVCgPZq2hM=;
+        b=WfB/M7AMZH4IpCv99lCLVah99YLXC0HX82rcGdSZWJ5V3DciZA7Wjs6bR/OEnA7YPU
+         Q1zIQ87Ba4/+h0g1r9fiWtuvpvTPEIfggE1sb0FN9H+hsTmbJs5AcAMWFlYrYbsySzol
+         u8pxLtOxcpxdpQ8MaFTCGVfMHf+9TYQEKM7Dp3/sUuFUojfW+XvbG/YQB1w0L1ynkCgX
+         vaQ4s+z96SgygJxFQmNXjGCk+ltdHTxjmexXxyWwU2ErbhVesan5WzRCOyckmK1IGxYp
+         IFzGXnTeyF6LdlNH6p0hvY0R7Ftz2k7O5aAvWFe7+jaxZ6TiUgEjghMZ4o6szWzeZifj
+         cq8Q==
+X-Gm-Message-State: AOJu0YwFAGou33h7MA3V1YwdwjL4zayLMmY7TtbGHzeUGB8+DDuAkJA/
+	+h1A0Xk3UvHpcOnYQJBsTfCpkg==
+X-Google-Smtp-Source: AGHT+IEXU002BF4gZvckDLmB/m507XPZeHi5Or79qEm1/eb14IbkNOzOzkoHnUocfn03vmeh+czvxg==
+X-Received: by 2002:adf:f782:0:b0:31a:d551:c2c9 with SMTP id q2-20020adff782000000b0031ad551c2c9mr1382336wrp.6.1694591937140;
+        Wed, 13 Sep 2023 00:58:57 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id y18-20020adfd092000000b003179d5aee67sm14854979wrh.94.2023.09.13.00.58.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Sep 2023 00:58:56 -0700 (PDT)
+Date: Wed, 13 Sep 2023 09:58:55 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Grygorii Strashko <grygorii.strashko@ti.com>,
+	MD Danish Anwar <danishanwar@ti.com>, Roger Quadros <rogerq@ti.com>,
+	Arnd Bergmann <arnd@arndb.de>, Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: ti: icssg-prueth: add PTP dependency
+Message-ID: <ZQFrv4W70ijXWTFZ@nanopsycho>
+References: <20230912185509.2430563-1-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5b52187e.3b86.18a8d4953cf.Coremail.wangteng13@nudt.edu.cn>
+In-Reply-To: <20230912185509.2430563-1-arnd@kernel.org>
 
-On Wed, Sep 13, 2023 at 02:45:07PM +0800, Teng Wang wrote:
-> Dear All,This bug was found in linux Kernel v5.14
+Tue, Sep 12, 2023 at 08:54:51PM CEST, arnd@kernel.org wrote:
+>From: Arnd Bergmann <arnd@arndb.de>
+>
+>The driver can now use PTP if enabled but fails to link built-in
+>if PTP is a loadable module:
+>
+>aarch64-linux-ld: drivers/net/ethernet/ti/icssg/icss_iep.o: in function `icss_iep_get_ptp_clock_idx':
+>icss_iep.c:(.text+0x200): undefined reference to `ptp_clock_index'
+>
+>Add the usual dependency to avoid this.
+>
+>Fixes: 186734c158865 ("net: ti: icssg-prueth: add packet timestamping and ptp support")
+>Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-Familiarize youself with how to report bugs according to our
-documentation. This isn't even minimal effort here.
-
-I'll try this nicely once. Continued dumps of similar low-quality bug
-reports will elicit a much stronger response.
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
