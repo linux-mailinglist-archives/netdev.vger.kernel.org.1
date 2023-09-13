@@ -1,185 +1,212 @@
-Return-Path: <netdev+bounces-33527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44D7679E5CC
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 13:09:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2000A79E5CD
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 13:10:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED8E82825B5
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 11:09:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD257280A4E
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 11:10:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E68FF1E519;
-	Wed, 13 Sep 2023 11:04:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 602181E528;
+	Wed, 13 Sep 2023 11:04:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D869B1E517
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 11:04:09 +0000 (UTC)
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0ED511726;
-	Wed, 13 Sep 2023 04:04:09 -0700 (PDT)
-Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-98377c5d53eso835943766b.0;
-        Wed, 13 Sep 2023 04:04:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53AF5210D
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 11:04:57 +0000 (UTC)
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5488419A6
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 04:04:56 -0700 (PDT)
+Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-401da71b85eso72489835e9.1
+        for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 04:04:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694603047; x=1695207847; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1694603095; x=1695207895; darn=vger.kernel.org;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=XWMdnJsx2d8fiBGvmqe7qu7qVNHb4jJy8Zu53A7Ws4A=;
-        b=SCf0LhkSU0USfus5vVpfJOi54WNnFg+IjBO8vD37nfAIr9B9FAyXYEE4EH+TBw7xw1
-         Q0UK8bqbMPxBxTjfM19Xj4Bs4vYV5+FxqaHV8xICrX2qcNiidfYQEaHhpAnD4XUIU5ED
-         ttIXQk943CWO+OE6z91MSducuzhsTTjlYmWuZMI0ZuCH1/3f2nt4BfiJjPguFhBpbGe8
-         Op9TZy/M+OlXTQM8GufMSJQoridmIGQhxWvEGGQm/YaLYZz99X6/K5x6XiaTJRuyXj1f
-         BbJiwg6HD4S0lnb79kR5EEtBFGY4Bhx4ve7GQpmcCGhnAT6FK2aW3pzNfBabX+VsMZVf
-         MELg==
+        bh=tnu5IidHjjqv1VobjTTgjZWTEl6tsxw73y2R8jLEqMA=;
+        b=J8Ru3oMxrQNjUbkgBSneTSYSeCzXaCzbaDSyMXqwNUcDdNXBBOq5sofysX01ch0OP6
+         PiAI/a9QVOIEsyG4nlaLxlC9YASLtrspuKhCoCFXg0rvOwA3qREPqig5fGOarGx8nFql
+         Y61zrZKbLGyDve/19ZayLKpoE9Q9Tj5v64S+FRYvjo0eHwwltPGRwgXfSNZ7rSzHTcd3
+         HlHmpZUjo1w12kDKdC1sAJ02AN4NQhVW9cq3ygSvlCfqyHnNCQU+WsE1gojfbP7Ha5Qg
+         qpuvVv/5XokNJ4UD9Us8LSXae4+1kZyby72Cc2BbsUchWXHVoHKvp3jj8hgMNer/dfll
+         EpSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694603047; x=1695207847;
+        d=1e100.net; s=20230601; t=1694603095; x=1695207895;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XWMdnJsx2d8fiBGvmqe7qu7qVNHb4jJy8Zu53A7Ws4A=;
-        b=mxYwBQ+CX1TYPGAUHpNN6HHrg4nmnjEClBx2O+tGCR8hP5QRhYW9M1s9+ZIb/5vO//
-         ylxLqHO5OmG8RdbyvVpwlCGh9hehnoSSfCJb3SzLpuhspJqGjtIZUiiSQOZxaCDz4yLx
-         f0kDxrKpiDxrY67VgYvpCfPm4p9QdW04R+lr38m2ubnDOs+BqN2MbM9k+BTmTJAte7Iu
-         CkfPiDx3kX0ldj0r4OoyWJgLmKfkWAwRFpbkg+tTqonNAbYNKbg11eX6fVC536XI8fas
-         vxWinQ8FJCKyU+YCXX3/HqY1/cBczBTy4xHVO+cFP9IbAXkUK55HgLTfS6LAWqwYf+jr
-         DONw==
-X-Gm-Message-State: AOJu0YylWRqlEfAItmyC+4HaVojkU4UcWK+x3vpgQpVme8if3xUyeopC
-	/7RWBtrWDg1f9qy2p5cAaIE=
-X-Google-Smtp-Source: AGHT+IENQYSCb1bqP3F1jbQeEwYGGwYsGuq575to5BfuhYNjZDfJ9D1qKsoXbdaMDic7mOraJMeKMA==
-X-Received: by 2002:a17:906:18a2:b0:99d:f0e8:5623 with SMTP id c2-20020a17090618a200b0099df0e85623mr1572105ejf.54.1694603047218;
-        Wed, 13 Sep 2023 04:04:07 -0700 (PDT)
-Received: from skbuf ([188.26.184.93])
-        by smtp.gmail.com with ESMTPSA id qb1-20020a1709077e8100b009ad89697c86sm2352992ejc.144.2023.09.13.04.04.05
+        bh=tnu5IidHjjqv1VobjTTgjZWTEl6tsxw73y2R8jLEqMA=;
+        b=jUa1uFbMOtvUP+P2MwvDNwDCoqEsTSLa0gY7TUDyfyrKuHeeLLmHZZDApOONVjixdS
+         1Stc8dm+uLdCrKhE1DW0ixgj7cbYCinsC7uEzRaEasljtKpi33phwuj6KpajSZ+HqVmt
+         o/feU7ofE8zPa8WmUUM/zzX6McJ+5ziyz1GKOC9YGwRQ4mIQq0ZIK4P6L3u7+DFxL8IH
+         Tv019gGqDNimGba8Jy1Mtq9JQfcrCb1m/pAxumbkx0hd6mSRL89/7kcJRMZuEO0oHA5P
+         YY+lkTgLFLvj+HCjfwdE0Bl38QDIQWLxu+qhN8iobFx2pY0TR42abt42QJsCsZwCjAm5
+         RuSA==
+X-Gm-Message-State: AOJu0YxP4/Rl1gqVEhfLbQH4nWtFZB3uuTC/eYtS2vEatAf6w5u/4EfI
+	Fvus6OdnkfEPeObITVR59tecNw==
+X-Google-Smtp-Source: AGHT+IEGhiaLCwkAeW+drA2/U2i92cBb9q0h6wQsIUr/HwSzKpBvqc3DhTdsLR9yKrQouYfDfT+roA==
+X-Received: by 2002:a05:600c:2147:b0:3f9:c82e:9d87 with SMTP id v7-20020a05600c214700b003f9c82e9d87mr1789996wml.13.1694603094658;
+        Wed, 13 Sep 2023 04:04:54 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id y14-20020a7bcd8e000000b004030e8ff964sm1711103wmj.34.2023.09.13.04.04.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Sep 2023 04:04:06 -0700 (PDT)
-Date: Wed, 13 Sep 2023 14:04:04 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH 2/4] dt-bindings: net: dsa: document internal MDIO bus
-Message-ID: <20230913110404.co7earmnbzf6hhoe@skbuf>
-References: <0cee0928-74c9-4048-8cd8-70bfbfafd9b2@arinc9.com>
- <20230827121235.zog4c3ehu2cyd3jy@skbuf>
- <676d1a2b-6ffa-4aff-8bed-a749c373f5b3@arinc9.com>
- <87325ce9-595a-4dda-a6a1-b5927d25719b@arinc9.com>
- <20230911225126.rk23g3u3bzo3agby@skbuf>
- <036c0763-f1b2-49ff-bc82-1ff16eec27ab@arinc9.com>
- <20230912193450.h5s6miubag46z623@skbuf>
- <6cec079e-991e-4222-a76d-d6156de0daca@arinc9.com>
- <20230913074231.5azwxqjuv2wp5nik@skbuf>
- <89c9b84c-574c-4071-9524-9207597a3f0a@arinc9.com>
+        Wed, 13 Sep 2023 04:04:54 -0700 (PDT)
+Date: Wed, 13 Sep 2023 13:04:53 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: "Ziyang Xuan (William)" <william.xuanziyang@huawei.com>,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	netdev@vger.kernel.org, leon@kernel.org, ye.xingchen@zte.com.cn,
+	liuhangbin@gmail.com
+Subject: Re: [PATCH net v4] team: fix null-ptr-deref when team device type is
+ changed
+Message-ID: <ZQGXVQZ/koVlo4jj@nanopsycho>
+References: <20230911094636.3256542-1-william.xuanziyang@huawei.com>
+ <2910908aeafc8ff133168045ee19f290a7bb35e0.camel@redhat.com>
+ <2cad19f1-552b-792f-f074-daadd8753a59@huawei.com>
+ <06082c443dbaf83495dde16c33884adc30872ec8.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <89c9b84c-574c-4071-9524-9207597a3f0a@arinc9.com>
+In-Reply-To: <06082c443dbaf83495dde16c33884adc30872ec8.camel@redhat.com>
 
-On Wed, Sep 13, 2023 at 01:59:17PM +0300, ArÄ±nÃ§ ÃœNAL wrote:
-> If I understand correctly, these phylink rules are for switch ports. The
-> fixed-link, phy-handle, and managed properties are described on
-> ethernet-controller.yaml so I thought it would make sense to define the
-> rules there and refer to them where they're needed.
-> 
-> Example:
-> 
-> diff --git a/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml b/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml
-> index 480120469953..7279ab31aea7 100644
-> --- a/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml
-> +++ b/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml
-> @@ -65,16 +65,8 @@ if:
->      - required: [ ethernet ]
->      - required: [ link ]
->  then:
-> -  allOf:
-> -    - required:
-> -        - phy-mode
-> -    - oneOf:
-> -        - required:
-> -            - fixed-link
-> -        - required:
-> -            - phy-handle
-> -        - required:
-> -            - managed
-> +  $ref: /schemas/net/ethernet-controller.yaml#/$defs/phylink-switch
-> +  required: [ phy-mode ]
->  additionalProperties: true
-> diff --git a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
-> index e532c6b795f4..742aaf1a5ef2 100644
-> --- a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
-> +++ b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
-> @@ -179,6 +179,15 @@ required:
->    - compatible
->    - reg
-> +if:
-> +  required: [ mdio ]
-> +then:
-> +  patternProperties:
-> +    "^(ethernet-)?ports$":
-> +      patternProperties:
-> +        "^(ethernet-)?port@[0-9]+$":
-> +          $ref: /schemas/net/ethernet-controller.yaml#/$defs/phylink-switch
-> +
->  $defs:
->    mt7530-dsa-port:
->      patternProperties:
-> diff --git a/Documentation/devicetree/bindings/net/ethernet-controller.yaml b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-> index 9f6a5ccbcefe..d7256f33d946 100644
-> --- a/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-> +++ b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-> @@ -284,6 +284,21 @@ allOf:
->              controllers that have configurable TX internal delays. If this
->              property is present then the MAC applies the TX delay.
-> +$defs:
-> +  phylink-switch:
-> +    description: phylink bindings for switch ports
-> +    allOf:
-> +      - anyOf:
-> +          - required: [ fixed-link ]
-> +          - required: [ phy-handle ]
-> +          - required: [ managed ]
-> +
-> +      - if:
-> +          required: [ fixed-link ]
-> +        then:
-> +          not:
-> +            required: [ managed ]
-> +
->  additionalProperties: true
->  ...
-> 
-> ArÄ±nÃ§
+Wed, Sep 13, 2023 at 08:28:13AM CEST, pabeni@redhat.com wrote:
+>On Wed, 2023-09-13 at 14:15 +0800, Ziyang Xuan (William) wrote:
+>> > > diff --git a/drivers/net/team/team.c b/drivers/net/team/team.c
+>> > > index d3dc22509ea5..12fb5f4cff06 100644
+>> > > --- a/drivers/net/team/team.c
+>> > > +++ b/drivers/net/team/team.c
+>> > > @@ -2127,7 +2127,10 @@ static const struct ethtool_ops
+>> > > team_ethtool_ops = {
+>> > >  static void team_setup_by_port(struct net_device *dev,
+>> > >  			       struct net_device *port_dev)
+>> > >  {
+>> > > -	dev->header_ops	= port_dev->header_ops;
+>> > > +	if (port_dev->type == ARPHRD_ETHER)
+>> > > +		dev->header_ops	= &eth_header_ops;
+>> > > +	else
+>> > > +		dev->header_ops	= port_dev->header_ops;
+>> > >  	dev->type = port_dev->type;
+>> > >  	dev->hard_header_len = port_dev->hard_header_len;
+>> > >  	dev->needed_headroom = port_dev->needed_headroom;
+>> > 
+>> > If I read correctly, for !vlan_hw_offload_capable() lower dev,
+>> > egress
+>> > packets going trough the team device will not contain the vlan tag.
+>> > 
+>> > Additionally, why is vlan special? Why others lower devices with
+>> > custom
+>> > header_ops do not need any care? 
+>> 
+>> We have also got ipvlan device problem as following:
+>> 
+>> BUG: KASAN: slab-out-of-bounds in ipvlan_hard_header+0xd1/0xe0
+>> Read of size 8 at addr ffff888018ee1de8 by task syz-executor.1/3469
+>> ...
+>> Call Trace:
+>>  <IRQ>
+>>  dump_stack+0xbe/0xfd
+>>  print_address_description.constprop.0+0x19/0x170
+>>  ? ipvlan_hard_header+0xd1/0xe0
+>>  __kasan_report.cold+0x6c/0x84
+>>  ? ipvlan_hard_header+0xd1/0xe0
+>>  kasan_report+0x3a/0x50
+>>  ipvlan_hard_header+0xd1/0xe0
+>>  ? ipvlan_get_iflink+0x40/0x40
+>>  neigh_resolve_output+0x28f/0x410
+>>  ip6_finish_output2+0x762/0xef0
+>>  ? ip6_frag_init+0xf0/0xf0
+>>  ? nf_nat_icmpv6_reply_translation+0x460/0x460
+>>  ? do_add_counters+0x370/0x370
+>>  ? do_add_counters+0x370/0x370
+>>  ? ipv6_confirm+0x1ee/0x360
+>>  ? nf_ct_bridge_unregister+0x50/0x50
+>>  __ip6_finish_output.part.0+0x1a8/0x400
+>>  ip6_finish_output+0x1a9/0x1e0
+>>  ip6_output+0x146/0x2b0
+>>  ? ip6_finish_output+0x1e0/0x1e0
+>>  ? __ip6_finish_output+0xb0/0xb0
+>>  ? __sanitizer_cov_trace_switch+0x50/0x90
+>>  ? nf_hook_slow+0xa3/0x150
+>>  mld_sendpack+0x3d9/0x670
+>>  ? mca_alloc+0x210/0x210
+>>  ? add_grhead+0xf5/0x140
+>>  ? ipv6_icmp_sysctl_init+0xd0/0xd0
+>>  ? add_grec+0x4e1/0xa90
+>>  ? _raw_spin_lock_bh+0x85/0xe0
+>>  ? _raw_read_unlock_irqrestore+0x30/0x30
+>>  mld_send_cr+0x426/0x630
+>>  ? migrate_swap_stop+0x400/0x400
+>>  mld_ifc_timer_expire+0x22/0x240
+>>  ? ipv6_mc_netdev_event+0x80/0x80
+>>  call_timer_fn+0x3d/0x230
+>>  ? ipv6_mc_netdev_event+0x80/0x80
+>>  expire_timers+0x190/0x270
+>>  run_timer_softirq+0x22c/0x560
+>> 
+>> ipvlan problem is slightly different from vlan.
+>> 
+>> // add ipvlan to team device
+>> team_port_add
+>>   team_dev_type_check_change
+>>     team_setup_by_port // assign ipvlan_header_ops to team_dev-
+>> >header_ops	
+>>   netdev_rx_handler_register // fail out without restore team_dev-
+>> >header_ops
+>> 
+>> // add other ether type device to team device
+>> team_port_add
+>>   team_dev_type_check_change // return directly because port_dev-
+>> >type and team_dev->type are same
+>> 
+>> team_dev->head_ops has be assigned to ipvlan_header_ops. That will
+>> trigger excption.
+>
+>To me both cases look the same in the end: the team driver sets and use
+>header_ops of a different device that will assume dev_priv() being a
+>different struct.
+>
+>I'm guessing a generic solution could be implementing 'trampoline'
+>header_ops that just call into the lower port corresponding op, and
+>assigning such ops to the team device every time the lower has non
+>ethernet header_ops.
+>
+>team_dev_type_check_change() should then probably check both dev->type
+>and dev->header_ops.
+>
+>> > Exporting 'eth_header_ops' for team's sake only looks a bit too
+>> > much to
+>> > me. I think could instead cache the header_ops ptr after the
+>> > initial
+>> > ether_setup().
+>> 
+>> Is it possible to use ether_setup() like bonding driver andmodify MTU
+>> individually later?
+>
+>That could be another option to get the eth_header_ops.
+>
+>Note that in the end both are quite similar, you will have to cache
+>some info (the mtu with the latter); ether_setup() possibly will have
+>more side effects, as it touches many fields. I personally would use
+>the thing I suggested above.
 
-I don't think they're for switch ports only. Any driver which uses
-phylink_fwnode_phy_connect() or its derivatives gets subject to the same
-bindings. But putting the sub-schema in ethernet-controller.yaml makes
-sense, just maybe not naming it "phylink-switch".
+Agreed. That is why ether_setup() was not used in the first place.
+
+
+>
+>Cheers,
+>
+>Paolo
+>
 
