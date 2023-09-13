@@ -1,89 +1,167 @@
-Return-Path: <netdev+bounces-33595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29BF479EC36
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 17:11:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D41BA79ECCF
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 17:28:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B9331C20AB2
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 15:11:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8DFBE281ACE
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 15:28:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 756661F190;
-	Wed, 13 Sep 2023 15:11:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6131B1F19D;
+	Wed, 13 Sep 2023 15:28:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66B94639
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 15:11:14 +0000 (UTC)
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CAA6B7
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 08:11:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=NMDSx8uwFvlmMY5L0U6ZEaRTCFeE2CIiPzpzNKPRxtE=; b=mNxEX3b0AKONjf2p5Jo3vuItkZ
-	eYqVwdcValoxuwp/vw01Mczx+8zHmpPU+JDFVHbCgmRDv+Pmq43wylAtzmZrITuAWg3BfA3whihI/
-	jaEWokcgbYj9IuAMya2gIP6cX6fXV8HvPC2dnWclNQG7TVoKaUwuHoxAkoF5I6vc5X/0M8VnV8Wp2
-	c8HQKq39+Xe4qh/4g8b1M/RIAAyx8Pp4VCRvVzgPWisQb2pizj2U1LpeReAmuIXzfO0rBOtTDQub4
-	zeriT4rm63u0y8VYhIcOzOCl9gc7C9RiB7G+EY8kbrJD3cJL7U8v4E646iEFhPdNNs4eSOEbmVpW9
-	sQTW8ppQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1qgRVu-00EXrU-3z; Wed, 13 Sep 2023 15:10:46 +0000
-Date: Wed, 13 Sep 2023 16:10:46 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: Edward Cree <ecree.xilinx@gmail.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, edward.cree@amd.com,
-	linux-net-drivers@amd.com, davem@davemloft.net, kuba@kernel.org,
-	edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
-	habetsm.xilinx@gmail.com, sudheer.mogilappagari@intel.com,
-	jdamato@fastly.com, andrew@lunn.ch, mw@semihalf.com,
-	sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
-	hkelam@marvell.com, saeedm@nvidia.com, leon@kernel.org
-Subject: Re: [RFC PATCH v3 net-next 2/7] net: ethtool: attach an IDR of
- custom RSS contexts to a netdevice
-Message-ID: <ZQHQ9hLeb0qvhxzS@casper.infradead.org>
-References: <cover.1694443665.git.ecree.xilinx@gmail.com>
- <9c71d5168e1ee22b40625eec53a8bb00456d60ed.1694443665.git.ecree.xilinx@gmail.com>
- <ZQCThixvWBoCeT4r@shell.armlinux.org.uk>
- <b2da6ed4-9475-6e49-709f-db87dcf8c810@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45A1D1EA8F;
+	Wed, 13 Sep 2023 15:28:02 +0000 (UTC)
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44E581BC6;
+	Wed, 13 Sep 2023 08:28:01 -0700 (PDT)
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-9ad810be221so288255566b.2;
+        Wed, 13 Sep 2023 08:28:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694618880; x=1695223680;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XbHM2NAzX89/YGfOI9fGVWUqll7zX9HRYixE0CiaEic=;
+        b=amrAmVchPnonggk2kwYDAGcR8vpCvpPC+oz9pw5YpwiTf82Apy7CnxBapFOPJdJIjy
+         6m792BQROjRUzYxhR6iYmsPQOKxkk+5HRpLFU6Gdh0wB712bzts9K4XFE1Ya6gPDhJqL
+         66wcLm+T+keajbK7pt1fhUrm1GsrZFjxrAeHME0FlD5elx9t2fk9NYrSbMjZMo/NiV2S
+         xHmfkd/+BG9CZ1RMtnT279diElrH4otrpczBLwf3U8hnxHotRICsenpUKcEa41C62Sl2
+         NRljxSfU9b9gTkYei7CQLgdOxDqS61qP9+20yu/4crqeNdY7q5KIbeZ9ltvob/Tse+Om
+         tNSQ==
+X-Gm-Message-State: AOJu0YzwyZXy5xcq9SnMEGlWa7NJpFaZG5k7zQmT+cqRKGpd90ILQIvk
+	LLsmqMJEv9HpbY/kMmI4EYY=
+X-Google-Smtp-Source: AGHT+IFW/YM3vbwQkx6qo2tVcSp414LxDhv6Kd3ehhhK5r6QzI47TnRjUxS/qD4Yz4lM08Q2AZpoOA==
+X-Received: by 2002:a17:906:18aa:b0:9a1:c42e:5e5e with SMTP id c10-20020a17090618aa00b009a1c42e5e5emr2354685ejf.42.1694618879486;
+        Wed, 13 Sep 2023 08:27:59 -0700 (PDT)
+Received: from localhost (fwdproxy-cln-021.fbsv.net. [2a03:2880:31ff:15::face:b00c])
+        by smtp.gmail.com with ESMTPSA id dx22-20020a170906a85600b0099d959f9536sm8712216ejb.12.2023.09.13.08.27.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Sep 2023 08:27:59 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: sdf@google.com,
+	axboe@kernel.dk,
+	asml.silence@gmail.com,
+	willemdebruijn.kernel@gmail.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	martin.lau@linux.dev,
+	krisman@suse.de
+Cc: bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	io-uring@vger.kernel.org
+Subject: [PATCH v6 0/8] io_uring: Initial support for {s,g}etsockopt commands
+Date: Wed, 13 Sep 2023 08:27:36 -0700
+Message-Id: <20230913152744.2333228-1-leitao@debian.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b2da6ed4-9475-6e49-709f-db87dcf8c810@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Sep 13, 2023 at 12:22:03PM +0100, Edward Cree wrote:
-> On 12/09/2023 17:36, Russell King (Oracle) wrote:
-> > On Tue, Sep 12, 2023 at 03:21:37PM +0100, edward.cree@amd.com wrote:
-> >> +	struct idr		rss_ctx;
-> > 
-> > https://docs.kernel.org/core-api/idr.html
-> > 
-> > "The IDR interface is deprecated; please use the XArray instead."
-> 
-> IDR is a wrapper around XArray these days, right?
+This patchset adds support for getsockopt (SOCKET_URING_OP_GETSOCKOPT)
+and setsockopt (SOCKET_URING_OP_SETSOCKOPT) in io_uring commands.
+SOCKET_URING_OP_SETSOCKOPT and SOCKET_URING_OP_GETSOCKOPT implement generic
+case, covering all levels and optnames.
 
-Yes, but a bad one.
+In order to keep the implementation (and tests) simple, some refactors
+were done prior to the changes, as follows:
 
-> When I looked into the equivalent to use XArray directly it looked much
->  more complicated for flexibility that really isn't needed here.
+Patch 1-2:  Remove the core {s,g}etsockopt() core function from
+__sys_{g,s}etsockopt, so, the code could be reused by other callers,
+such as io_uring.
 
-No, it's no more complex to use.  There are a lot of _other_ things
-you can do with it, but every IDR call has an equivalent XArray call.
-And as a bonus you get a spinlock protecting you!
+Patch 3: Pass compat mode to the file/socket callbacks
 
-> Is there an explanation you can point me at of why this extremely
->  convenient wrapper is deprecated?
+Patch 4: Move io_uring helpers from io_uring_zerocopy_tx to a generic
+io_uring headers. This simplify the test case (last patch)
 
-Because why have two APIs for the same thing?  One day, I will be finished
-with important projects and then I'll go back to eradicating the users
-of the IDR.
+Patch 5: Protect io_uring_cmd_sock() to not be called if CONFIG_NET is
+disabled.
+
+PS: The userspace pointers need to be alive until the operation is
+completed.
+
+These changes were tested with a new test[1] in liburing, LTP sockopt*
+tests, as also with bpf/progs/sockopt test case, which is now adapted to
+run using both system calls and io_uring commands.
+
+[1] Link: https://github.com/leitao/liburing/blob/getsock/test/socket-getsetsock-cmd.c
+
+RFC -> V1:
+	* Copy user memory at io_uring subsystem, and call proto_ops
+	  callbacks using kernel memory
+	* Implement all the cases for SOCKET_URING_OP_SETSOCKOPT
+
+V1 -> V2
+	* Implemented the BPF part
+	* Using user pointers from optval to avoid kmalloc in io_uring part.
+
+V2 -> V3:
+	* Break down __sys_setsockopt and reuse the core code, avoiding
+	  duplicated code. This removed the requirement to expose
+	  sock_use_custom_sol_socket().
+	* Added io_uring test to selftests/bpf/sockopt.
+	* Fixed compat argument, by passing it to the issue_flags.
+
+V3 -> V4:
+	* Rebase on top of commit 1ded5e5a5931b ("net: annotate data-races around sock->ops")
+	* Also broke down __sys_setsockopt() to reuse the core function
+	  from io_uring.
+	* Create a new patch to return -EOPNOTSUPP if CONFIG_NET is
+	  disabled.
+	* Added two SOL_SOCKET tests in bpf/prog_tests/sockopt.
+
+V4 -> V5:
+	* Do not use sockptr anymore, by changing the optlen getsock argument
+	  to be a user pointer (instead of a kernel pointer). This change also drop
+	  the limitation on getsockopt from previous versions, and now all
+	  levels are supported.
+	* Simplified the BPF sockopt test, since there is no more limitation on
+	  the io_uring commands.
+	* No more changes in the BPF subsystem.
+	* Moved the optlen field in the SQE struct. It is now a pointer instead
+	  of u32.
+
+V5 -> V6:
+	* Removed the need for #ifdef CONFIG_NET as suggested by Gabriel
+	  Krisman.
+	* Changed the variable declaration order to respect the reverse
+	  xmas declaration as suggested by Paolo Abeni.
+
+Breno Leitao (8):
+  net/socket: Break down __sys_setsockopt
+  net/socket: Break down __sys_getsockopt
+  io_uring/cmd: Pass compat mode in issue_flags
+  selftests/net: Extract uring helpers to be reusable
+  io_uring/cmd: return -EOPNOTSUPP if net is disabled
+  io_uring/cmd: Introduce SOCKET_URING_OP_GETSOCKOPT
+  io_uring/cmd: Introduce SOCKET_URING_OP_SETSOCKOPT
+  selftests/bpf/sockopt: Add io_uring support
+
+ include/linux/io_uring.h                      |   1 +
+ include/net/sock.h                            |   5 +
+ include/uapi/linux/io_uring.h                 |  10 +
+ io_uring/uring_cmd.c                          |  35 +++
+ net/socket.c                                  |  86 ++++--
+ tools/include/io_uring/mini_liburing.h        | 292 ++++++++++++++++++
+ .../selftests/bpf/prog_tests/sockopt.c        |  95 +++++-
+ tools/testing/selftests/net/Makefile          |   1 +
+ .../selftests/net/io_uring_zerocopy_tx.c      | 268 +---------------
+ 9 files changed, 490 insertions(+), 303 deletions(-)
+ create mode 100644 tools/include/io_uring/mini_liburing.h
+
+-- 
+2.34.1
+
 
