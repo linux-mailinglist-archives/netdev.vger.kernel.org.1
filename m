@@ -1,159 +1,400 @@
-Return-Path: <netdev+bounces-33486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF71879E26E
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 10:43:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B77C279E277
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 10:45:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FFAF1C20FBE
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 08:43:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD8CF1C20F41
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 08:45:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D55E179AA;
-	Wed, 13 Sep 2023 08:43:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E81AB1798E;
+	Wed, 13 Sep 2023 08:45:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 406633D6C
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 08:43:39 +0000 (UTC)
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 750121996
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 01:43:38 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id a640c23a62f3a-99c1c66876aso834736266b.2
-        for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 01:43:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1694594617; x=1695199417; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7VWbnSO3QqQi1sbJoehxyEUytvvrSclKo+E9q29SgaY=;
-        b=j9mPSQFXsaLuexh6o8nfFNRBqWUNtRskjH6vag+wavV+H5hGEno1ZLYzhFTQEyJ5o8
-         0v8ZT9XNtikxrsuvMX8sdvoBSldUyYvQuo7hmakYOooMUlp0bFlFSEFKDTwYuw7HQ+/k
-         YA5dgeU/iq4ohiF7RgCIagvyIwisanDTQQY4DCmJoMIrgCtPHp/VyruoT42USbPim9uu
-         JBkTNnaZHGxssxHhKPWS3U7Bs/I2Sy36sKxNswDUr10Nj7+qpI2oSZtn1gyab8W5uclz
-         do2GwlR2G7fq3FvVQACub4EnUdFoCNgbo1M8vhJLE8sFyLB4AzxKQBfaKnvgeVonF5Sg
-         j5hA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694594617; x=1695199417;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7VWbnSO3QqQi1sbJoehxyEUytvvrSclKo+E9q29SgaY=;
-        b=EzLbKi11vpoF7m1xFL1v0VD4CGQCv00ZrnAHOMdKGN7pHbskRt7Cfq7wkZhHTgRkkU
-         fE1GwJc+5h0HqFfTtW2U1dCs+LOH1x7uV6VBHy+1RTz5ZBpqimIjKHIZffIccMnPO6kz
-         88/d1Kg9qiDzsSTG4n/8255etCSGaV6UGZaFVPHAEP2IhbRhn3CM8RnF7XXn4f5um79M
-         E8y5K6/bDPLY0/ygBuxe0XEZ1OtFczm/RxeBfVyCafuXD88m8UZhOkzB6a/PuAuRU0rK
-         GwS33rP2MAuMz+7O0gDgXLo8fpcmJzonngAhsLJJqaKoYQz/OBoVUpQK1wTn1Bh6VbN2
-         JU/Q==
-X-Gm-Message-State: AOJu0YwkP+3IirH+J0EA1u2vJ242UPZ+isTj1hvXG9KtkQ68hIl+84FZ
-	tXYlS7FICKC4JvB/bEeceY8IKQ==
-X-Google-Smtp-Source: AGHT+IHQhQ4tantOAn3/0fVJr3ybsNR+u4GIF0fRCDA9G6qqdjslm83NMWHFBY3AZ69t5v9qg6zGsQ==
-X-Received: by 2002:a17:906:109a:b0:9a1:c44d:7056 with SMTP id u26-20020a170906109a00b009a1c44d7056mr1640901eju.26.1694594616915;
-        Wed, 13 Sep 2023 01:43:36 -0700 (PDT)
-Received: from [192.168.37.232] (178235177106.dynamic-4-waw-k-1-1-0.vectranet.pl. [178.235.177.106])
-        by smtp.gmail.com with ESMTPSA id pv26-20020a170907209a00b00992d122af63sm8018251ejb.89.2023.09.13.01.43.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Sep 2023 01:43:36 -0700 (PDT)
-Message-ID: <3260f0ca-9e27-4920-8415-7f364dff773d@linaro.org>
-Date: Wed, 13 Sep 2023 10:43:34 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6B9EA92F
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 08:45:10 +0000 (UTC)
+Received: from phobos.denx.de (phobos.denx.de [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C4CF19A7;
+	Wed, 13 Sep 2023 01:45:09 -0700 (PDT)
+Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 508A686545;
+	Wed, 13 Sep 2023 10:45:05 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1694594707;
+	bh=ZlWhPmQz1RldSvKuhGgzm2U7P11OPn+ykHmTOEnCUEI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=V6Y2A9PVmlquHLOQ8EF6Yfvgiy8PKQQFKKTaLThSgRp+qtSbsdseTkgIVpYwAPC98
+	 knY0wJrI3ZDgQpM9Pcc5OqZ+61n+Fi5ioyKa2XnPChG8OZ4AfvuNwH3fysVxsjllJp
+	 EEjLsESz+N67lz5/0K9J454skccedSSF2ixJQvOfoWIOP3mBDctkA3rllVcYzgm0nd
+	 8mmpdj4OuMAzDKMlhmnlGgWxrp0KiS37gY1ewug02EPf2r3JMSB5VNeQjj2mXIsGsH
+	 V1OswQs3CpANNGqewDmBIHN3D0rGVniCmMwccY0ci/q6kKzv7BExXy+l93wIPAqmJy
+	 ZBsrhrkQLIvHw==
+Date: Wed, 13 Sep 2023 10:44:58 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+Cc: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+ <pabeni@redhat.com>, <robh+dt@kernel.org>,
+ <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+ <corbet@lwn.net>, <steen.hegelund@microchip.com>, <rdunlap@infradead.org>,
+ <horms@kernel.org>, <casper.casan@gmail.com>, <andrew@lunn.ch>,
+ <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+ <horatiu.vultur@microchip.com>, <Woojung.Huh@microchip.com>,
+ <Nicolas.Ferre@microchip.com>, <UNGLinuxDriver@microchip.com>,
+ <Thorsten.Kummermehr@microchip.com>
+Subject: Re: [RFC PATCH net-next 2/6] net: ethernet: add mac-phy interrupt
+ support with reset complete handling
+Message-ID: <20230913104458.1d4cdd51@wsk>
+In-Reply-To: <20230908142919.14849-3-Parthiban.Veerasooran@microchip.com>
+References: <20230908142919.14849-1-Parthiban.Veerasooran@microchip.com>
+	<20230908142919.14849-3-Parthiban.Veerasooran@microchip.com>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2 6/7] arm64: dts: qcom: ipq9574: Add support for nsscc
- node
-Content-Language: en-US
-To: Geert Uytterhoeven <geert@linux-m68k.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
- Devi Priya <quic_devipriy@quicinc.com>, andersson@kernel.org,
- agross@kernel.org, mturquette@baylibre.com, sboyd@kernel.org,
- robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- catalin.marinas@arm.com, will@kernel.org, p.zabel@pengutronix.de,
- richardcochran@gmail.com, arnd@arndb.de, geert+renesas@glider.be,
- nfraprado@collabora.com, rafal@milecki.pl, peng.fan@nxp.com,
- linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
- quic_saahtoma@quicinc.com
-References: <20230825091234.32713-1-quic_devipriy@quicinc.com>
- <20230825091234.32713-7-quic_devipriy@quicinc.com>
- <CAA8EJpo75zWLXuF-HC-Xz+6mvu_S1ET-9gzW=mOq+FjKspDwhw@mail.gmail.com>
- <CAMuHMdXx_b-uubonRH5=Tcxo+ddxg2wXvRNQNjhMrfvSFh0Xcw@mail.gmail.com>
- <daed3270-847e-f4c6-17ad-4d1962ae7d49@linaro.org>
- <CAMuHMdVxykGwyrKKSHBv9AHy4gAeH7DT7caZarbs-F40zz5Jpw@mail.gmail.com>
-From: Konrad Dybcio <konrad.dybcio@linaro.org>
-Autocrypt: addr=konrad.dybcio@linaro.org; keydata=
- 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
- izWDgYvmBE8=
-In-Reply-To: <CAMuHMdVxykGwyrKKSHBv9AHy4gAeH7DT7caZarbs-F40zz5Jpw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="Sig_/DJo1IhAiFfHPBz=pE_nTB6W";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-On 13.09.2023 10:38, Geert Uytterhoeven wrote:
-> Hi Krzysztof,
-> 
-> On Wed, Sep 13, 2023 at 10:26 AM Krzysztof Kozlowski
-> <krzysztof.kozlowski@linaro.org> wrote:
->> On 13/09/2023 10:23, Geert Uytterhoeven wrote:
->>>>
->>>>> +                       clock-names = "nssnoc_nsscc", "nssnoc_snoc", "nssnoc_snoc_1",
->>>>> +                                     "bias_pll_cc_clk", "bias_pll_nss_noc_clk",
->>>>> +                                     "bias_pll_ubi_nc_clk", "gpll0_out_aux", "uniphy0_nss_rx_clk",
->>>>> +                                     "uniphy0_nss_tx_clk", "uniphy1_nss_rx_clk",
->>>>> +                                     "uniphy1_nss_tx_clk", "uniphy2_nss_rx_clk",
->>>>> +                                     "uniphy2_nss_tx_clk", "xo_board_clk";
->>>>
->>>> You are using clock indices. Please drop clock-names.
->>>
->>> What do you mean by "using clock indices"?
->>> Note that the "clock-names" property is required according to the DT bindings.
->>
->> Indeed, thanks for pointing this out. Probably bindings should be changed.
-> 
-> But what's so great about not having "clock-names"?
-> There are _14_ input clocks.
-clk_parent_data has an "index" member, which lets us bind
-clocks[n] to parent[n]. With the DT properties being ABI,
-including the order of entries within, that lets us get rid
-of clock-names and the matching is marginally faster.
+--Sig_/DJo1IhAiFfHPBz=pE_nTB6W
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Konrad
+Hi Parthiban,
+
+> Register MAC-PHY interrupt and handle reset complete interrupt. Reset
+> complete bit is set when the MAC-PHY reset complete and ready for
+> configuration. When it is set, it will generate a non-maskable
+> interrupt to alert the SPI host. Additionally reset complete bit in
+> the STS0 register has to be written by one upon reset complete to
+> clear the interrupt.
+
+I'm using the MicroE module with LAN8651 device connected to nucleo
+STM32G4 microcontroller.
+
+Maybe not directly related to Linux, but I would like to ask for some
+clarification.
+
+>=20
+> Signed-off-by: Parthiban Veerasooran
+> <Parthiban.Veerasooran@microchip.com> ---
+>  drivers/net/ethernet/oa_tc6.c | 141
+> ++++++++++++++++++++++++++++++++-- include/linux/oa_tc6.h        |
+> 16 +++- 2 files changed, 150 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/oa_tc6.c
+> b/drivers/net/ethernet/oa_tc6.c index 613cf034430a..0019f70345b6
+> 100644 --- a/drivers/net/ethernet/oa_tc6.c
+> +++ b/drivers/net/ethernet/oa_tc6.c
+> @@ -6,6 +6,7 @@
+>   */
+> =20
+>  #include <linux/bitfield.h>
+> +#include <linux/interrupt.h>
+>  #include <linux/oa_tc6.h>
+> =20
+>  static int oa_tc6_spi_transfer(struct spi_device *spi, u8 *ptx, u8
+> *prx, @@ -160,10 +161,16 @@ int oa_tc6_perform_ctrl(struct oa_tc6
+> *tc6, u32 addr, u32 val[], u8 len, if (ret)
+>  		goto err_ctrl;
+> =20
+> -	/* Check echoed/received control reply */
+> -	ret =3D oa_tc6_check_control(tc6, tx_buf, rx_buf, len, wnr,
+> ctrl_prot);
+> -	if (ret)
+> -		goto err_ctrl;
+> +	/* In case of reset write, the echoed control command
+> doesn't have any
+> +	 * valid data. So no need to check for error.
+> +	 */
+> +	if (addr !=3D OA_TC6_RESET) {
+> +		/* Check echoed/received control reply */
+> +		ret =3D oa_tc6_check_control(tc6, tx_buf, rx_buf, len,
+> wnr,
+> +					   ctrl_prot);
+> +		if (ret)
+> +			goto err_ctrl;
+> +	}
+> =20
+>  	if (!wnr) {
+>  		/* Copy read data from the rx data in case of ctrl
+> read */ @@ -186,6 +193,88 @@ int oa_tc6_perform_ctrl(struct oa_tc6
+> *tc6, u32 addr, u32 val[], u8 len, return ret;
+>  }
+> =20
+> +static int oa_tc6_handler(void *data)
+> +{
+> +	struct oa_tc6 *tc6 =3D data;
+> +	u32 regval;
+> +	int ret;
+> +
+> +	while (likely(!kthread_should_stop())) {
+> +		wait_event_interruptible(tc6->tc6_wq, tc6->int_flag
+> ||
+> +					 kthread_should_stop());
+> +		if (tc6->int_flag) {
+> +			tc6->int_flag =3D false;
+> +			ret =3D oa_tc6_perform_ctrl(tc6, OA_TC6_STS0,
+> &regval, 1,
+> +						  false, false);
+> +			if (ret) {
+> +				dev_err(&tc6->spi->dev, "Failed to
+> read STS0\n");
+> +				continue;
+> +			}
+> +			/* Check for reset complete interrupt status
+> */
+> +			if (regval & RESETC) {
+
+Just maybe mine small remark. IMHO the reset shall not pollute the IRQ
+hander. The RESETC is just set on the initialization phase and only
+then shall be served. Please correct me if I'm wrong, but it will not
+be handled during "normal" operation.
+
+> +				regval =3D RESETC;
+> +				/* SPI host should write RESETC bit
+> with one to
+> +				 * clear the reset interrupt status.
+> +				 */
+> +				ret =3D oa_tc6_perform_ctrl(tc6,
+> OA_TC6_STS0,
+> +							  &regval,
+> 1, true,
+> +							  false);
+
+Is this enough to have the IRQ_N deasserted (i.e. pulled HIGH)?
+
+The documentation states it clearly that one also needs to set SYNC bit
+(BIT(15)) in the OA_CONFIG0 register (which would have the 0x8006 value).
+
+Mine problem is that even after writing 0x40 to OA_STATUS0 and 0x8006
+to OA_CONFIG0 the IRQ_N is still LOW (it is pulled up via 10K resistor).
+
+(I'm able to read those registers and those show expected values)
+
+> +				if (ret) {
+> +					dev_err(&tc6->spi->dev,
+> +						"Failed to write
+> STS0\n");
+> +					continue;
+> +				}
+> +				complete(&tc6->rst_complete);
+> +			}
+> +		}
+> +	}
+> +	return 0;
+> +}
+> +
+> +static irqreturn_t macphy_irq(int irq, void *dev_id)
+> +{
+> +	struct oa_tc6 *tc6 =3D dev_id;
+> +
+> +	/* Wake tc6 task to perform interrupt action */
+> +	tc6->int_flag =3D true;
+> +	wake_up_interruptible(&tc6->tc6_wq);
+> +
+> +	return IRQ_HANDLED;
+> +}
+> +
+> +static int oa_tc6_sw_reset(struct oa_tc6 *tc6)
+> +{
+> +	long timeleft;
+> +	u32 regval;
+> +	int ret;
+> +
+> +	/* Perform software reset with both protected and
+> unprotected control
+> +	 * commands because the driver doesn't know the current
+> status of the
+> +	 * MAC-PHY.
+> +	 */
+> +	regval =3D SW_RESET;
+> +	reinit_completion(&tc6->rst_complete);
+> +	ret =3D oa_tc6_perform_ctrl(tc6, OA_TC6_RESET, &regval, 1,
+> true, false);
+> +	if (ret) {
+> +		dev_err(&tc6->spi->dev, "RESET register write
+> failed\n");
+> +		return ret;
+> +	}
+> +
+> +	ret =3D oa_tc6_perform_ctrl(tc6, OA_TC6_RESET, &regval, 1,
+> true, true);
+> +	if (ret) {
+> +		dev_err(&tc6->spi->dev, "RESET register write
+> failed\n");
+> +		return ret;
+> +	}
+> +	timeleft =3D
+
+Was it on purpose to not use the RST_N pin to perform GPIO based reset?
+
+When I generate reset pulse (and keep it for low for > 5us) the IRQ_N
+gets high. After some time it gets low (as expected). But then it
+doesn't get high any more.
+
+> wait_for_completion_interruptible_timeout(&tc6->rst_complete,
+> +
+> msecs_to_jiffies(1));
+
+Please also clarify - does the LAN8651 require up to 1ms "settle down"
+(after reset) time before it gets operational again?
+
+> +	if (timeleft <=3D 0) {
+> +		dev_err(&tc6->spi->dev, "MAC-PHY reset failed\n");
+> +		return -ENODEV;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  int oa_tc6_write_register(struct oa_tc6 *tc6, u32 addr, u32 val[],
+> u8 len) {
+>  	return oa_tc6_perform_ctrl(tc6, addr, val, len, true,
+> tc6->ctrl_prot); @@ -201,6 +290,7 @@
+> EXPORT_SYMBOL_GPL(oa_tc6_read_register); struct oa_tc6
+> *oa_tc6_init(struct spi_device *spi) {
+>  	struct oa_tc6 *tc6;
+> +	int ret;
+> =20
+>  	if (!spi)
+>  		return NULL;
+> @@ -211,12 +301,51 @@ struct oa_tc6 *oa_tc6_init(struct spi_device
+> *spi)=20
+>  	tc6->spi =3D spi;
+> =20
+> +	/* Used for triggering the OA TC6 task */
+> +	init_waitqueue_head(&tc6->tc6_wq);
+> +
+> +	init_completion(&tc6->rst_complete);
+> +
+> +	/* This task performs the SPI transfer */
+> +	tc6->tc6_task =3D kthread_run(oa_tc6_handler, tc6, "OA TC6
+> Task");
+> +	if (IS_ERR(tc6->tc6_task))
+> +		goto err_tc6_task;
+> +
+> +	/* Set the highest priority to the tc6 task as it is time
+> critical */
+> +	sched_set_fifo(tc6->tc6_task);
+> +
+> +	/* Register MAC-PHY interrupt service routine */
+> +	ret =3D devm_request_irq(&spi->dev, spi->irq, macphy_irq, 0,
+> "macphy int",
+> +			       tc6);
+> +	if ((ret !=3D -ENOTCONN) && ret < 0) {
+> +		dev_err(&spi->dev, "Error attaching macphy irq
+> %d\n", ret);
+> +		goto err_macphy_irq;
+> +	}
+> +
+> +	/* Perform MAC-PHY software reset */
+> +	if (oa_tc6_sw_reset(tc6))
+> +		goto err_macphy_reset;
+> +
+>  	return tc6;
+> +
+> +err_macphy_reset:
+> +	devm_free_irq(&tc6->spi->dev, tc6->spi->irq, tc6);
+> +err_macphy_irq:
+> +	kthread_stop(tc6->tc6_task);
+> +err_tc6_task:
+> +	kfree(tc6);
+> +	return NULL;
+>  }
+>  EXPORT_SYMBOL_GPL(oa_tc6_init);
+> =20
+> -void oa_tc6_deinit(struct oa_tc6 *tc6)
+> +int oa_tc6_deinit(struct oa_tc6 *tc6)
+>  {
+> -	kfree(tc6);
+> +	int ret;
+> +
+> +	devm_free_irq(&tc6->spi->dev, tc6->spi->irq, tc6);
+> +	ret =3D kthread_stop(tc6->tc6_task);
+> +	if (!ret)
+> +		kfree(tc6);
+> +	return ret;
+>  }
+>  EXPORT_SYMBOL_GPL(oa_tc6_deinit);
+> diff --git a/include/linux/oa_tc6.h b/include/linux/oa_tc6.h
+> index 5e0a58ab1dcd..315f061c2dfe 100644
+> --- a/include/linux/oa_tc6.h
+> +++ b/include/linux/oa_tc6.h
+> @@ -17,15 +17,29 @@
+>  #define CTRL_HDR_LEN	GENMASK(7, 1)	/* Length */
+>  #define CTRL_HDR_P	BIT(0)		/* Parity Bit */
+> =20
+> +/* Open Alliance TC6 Standard Control and Status Registers */
+> +#define OA_TC6_RESET	0x0003		/* Reset Control
+> and Status Register */ +#define OA_TC6_STS0	0x0008
+> 	/* Status Register #0 */ +
+> +/* RESET register field */
+> +#define SW_RESET	BIT(0)		/* Software Reset */
+> +
+> +/* STATUS0 register field */
+> +#define RESETC		BIT(6)		/* Reset
+> Complete */ +
+>  #define TC6_HDR_SIZE	4		/* Ctrl command header
+> size as per OA */ #define TC6_FTR_SIZE	4		/*
+> Ctrl command footer size ss per OA */=20
+>  struct oa_tc6 {
+>  	struct spi_device *spi;
+>  	bool ctrl_prot;
+> +	struct task_struct *tc6_task;
+> +	wait_queue_head_t tc6_wq;
+> +	bool int_flag;
+> +	struct completion rst_complete;
+>  };
+> =20
+>  struct oa_tc6 *oa_tc6_init(struct spi_device *spi);
+> -void oa_tc6_deinit(struct oa_tc6 *tc6);
+> +int oa_tc6_deinit(struct oa_tc6 *tc6);
+>  int oa_tc6_write_register(struct oa_tc6 *tc6, u32 addr, u32 value[],
+> u8 len); int oa_tc6_read_register(struct oa_tc6 *tc6, u32 addr, u32
+> value[], u8 len);
+
+
+
+
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/DJo1IhAiFfHPBz=pE_nTB6W
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmUBdooACgkQAR8vZIA0
+zr0+qAgAijD2xWlrJP0Q+Q/4BmtBBN4mFK4gnhBpJTT7O8jEXM8YEDznoZ/pK5IN
+RePC1m2cKz5HwcLIXvUI6LWSFJ0Zz8Q3Uxdatb43lgHeuVZRPRHLlcfJUvk76zUb
+5oxoYFGPcOOWoPbRSlvnnVFmN6IS9IilKRlIQ8MkD6LVRknbR6guZEXc9HBA/JRL
+MP+FxZDGu3iZ95Ov7QM449odOPSArZw14L9uawrNeL0hTcvBhlOGTSukKDI4lOzJ
+K0qJM8n9ksx27FyjeW4bMQdCnDX2pp+tRiKlahxvaFU462dfoU5tLLxyKz6ROrnN
+kM6jfLtY/JotZ2x3X99l7YO0aVaMew==
+=jGDj
+-----END PGP SIGNATURE-----
+
+--Sig_/DJo1IhAiFfHPBz=pE_nTB6W--
 
