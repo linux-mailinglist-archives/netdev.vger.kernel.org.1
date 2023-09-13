@@ -1,121 +1,109 @@
-Return-Path: <netdev+bounces-33530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9CF979E5D0
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 13:10:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 344A779E5F5
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 13:11:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7453E28260D
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 11:10:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E196E282603
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 11:11:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B53A11E51A;
-	Wed, 13 Sep 2023 11:10:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 129021E52D;
+	Wed, 13 Sep 2023 11:10:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8261210D
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 11:10:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F29D51E52A;
+	Wed, 13 Sep 2023 11:10:28 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BBF719A6;
-	Wed, 13 Sep 2023 04:10:04 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FA7619A6;
+	Wed, 13 Sep 2023 04:10:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694603404; x=1726139404;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=ibxWhsbZoS6ac7vybC6BlSjsaIyivr2gyS1htHkWXmQ=;
-  b=lHrL3VeCM0czN3vYDt1QoySR0A9SfI284LJwYbMJOYEwKS7xQnObwF2Z
-   wQKmlx93trPBGwzLRE5jhge6BWaS5EyQjA2liltqcLQGFYM0AK7SSS3jO
-   HhJbJNA0DtuScu868p+SpdCYYvMywsk5pBogHXums35bLY2yijQx9fj68
-   +xSLk+voWrXyIew4KZbI8yTcOIkYkE0fT6cq5vLfzvx6/uL0CFNQK5jJj
-   bu7AEGbvCl/8BBAd9/xbp3V5QiamGUC9Yhmv1sXGZiNipd0u8vuviV6b5
-   J+q3gPk6rcsbrismZ1XJa43Pc9xBgfjH/fMDSAHsXBr1hb4bQhO2peXZd
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="358899686"
+  t=1694603428; x=1726139428;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=uqF9R+6e0mdQgOwFpYVrH+65K7xWTsBoK2ERwBn9lEo=;
+  b=DqUL5wJ9hV7rl9CYxi2lVdXWWur+r4l7lxNAc8+5mzcaH6DhhN0T4ST9
+   hOgqEf4J3wNBU7XseuaUQhvCld3wXjPBI/Sl4Ax7kbXYVxSHNKd8FCumP
+   l0k8zI5d/yS4Eak3hY87ji5Hv6vcfxArjgUeZ7esB9NQ0iQuly/N8CMy8
+   SRpenCvCsS+FKuKG4LLCeFT1QjGXk1uNIm6N+MgemBqzxDzf6gK7ruxHZ
+   6PqLZqRaNdwGbeFjivYfMc9vi75SmmqTos9lE6i88WIIMhD3F4Uhem9eV
+   q/W0f6AJGJTLfi/OrAtNvxFhxXHDbBiqNp1IxjKSaavW+s4/iI7jVVe3R
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="358899721"
 X-IronPort-AV: E=Sophos;i="6.02,143,1688454000"; 
-   d="scan'208";a="358899686"
+   d="scan'208";a="358899721"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 04:10:03 -0700
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 04:10:28 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="809639200"
+X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="809639357"
 X-IronPort-AV: E=Sophos;i="6.02,143,1688454000"; 
-   d="scan'208";a="809639200"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by fmsmga008.fm.intel.com with ESMTP; 13 Sep 2023 04:10:01 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1003)
-	id F1D22BC0; Wed, 13 Sep 2023 14:09:59 +0300 (EEST)
+   d="scan'208";a="809639357"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by fmsmga008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 04:10:26 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.96)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1qgNlH-008qY6-13;
+	Wed, 13 Sep 2023 14:10:23 +0300
+Date: Wed, 13 Sep 2023 14:10:22 +0300
 From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH v2 1/1] net: core: Use the bitmap API to allocate bitmaps
-Date: Wed, 13 Sep 2023 14:09:57 +0300
-Message-Id: <20230913110957.485237-1-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.40.0.1.gaa8946217a0b
+	Jakub Kicinski <kuba@kernel.org>
+Subject: Re: [PATCH net-next v1 2/2] net: core: Sort headers alphabetically
+Message-ID: <ZQGYnoHt8PAT23A4@smile.fi.intel.com>
+References: <20230911154534.4174265-1-andriy.shevchenko@linux.intel.com>
+ <20230911154534.4174265-2-andriy.shevchenko@linux.intel.com>
+ <20230912152031.GI401982@kernel.org>
+ <ZQCTXkZcJLvzNL4F@smile.fi.intel.com>
+ <20f57b1309b6df60b08ce71f2d7711fa3d6b6b44.camel@redhat.com>
+ <ZQCaMHBHp/Ha29ao@smile.fi.intel.com>
+ <32a8715a63b686aa0ac19fdae22b5d605d47ae35.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <32a8715a63b686aa0ac19fdae22b5d605d47ae35.camel@redhat.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-Use bitmap_zalloc() and bitmap_free() instead of hand-writing them.
-It is less verbose and it improves the type checking and semantic.
+On Tue, Sep 12, 2023 at 07:25:48PM +0200, Paolo Abeni wrote:
+> On Tue, 2023-09-12 at 20:04 +0300, Andy Shevchenko wrote:
+> > On Tue, Sep 12, 2023 at 06:53:23PM +0200, Paolo Abeni wrote:
+> > > On Tue, 2023-09-12 at 19:35 +0300, Andy Shevchenko wrote:
 
-While at it, add missing header inclusion (should be bitops.h,
-but with the above change it becomes bitmap.h).
+...
 
-Suggested-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Link: https://lore.kernel.org/r/20230911154534.4174265-1-andriy.shevchenko@linux.intel.com
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
-v2: added tags (Simon), sent separately from the series (Paolo)
- net/core/dev.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+> > > Please repost the first patch standalone.
+> > 
+> > Why to repost, what did I miss? It's available via lore, just run
+> > 
+> >   b4 am -slt -P _ 20230911154534.4174265-1-andriy.shevchenko@linux.intel.com
+> > 
+> > to get it :-)
+> 
+> It's fairly better if actions (changes) on patches are taken by the
+> submitter: it scales way better, and if the other path take places we
+> can be easily flooded with small (but likely increasingly less smaller)
+> requests that will soon prevent any other activity from being taken.
+> 
+> Please, repost the single patch, it would be easier to me.
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index ccff2b6ef958..85df22f05c38 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -69,7 +69,7 @@
-  */
- 
- #include <linux/uaccess.h>
--#include <linux/bitops.h>
-+#include <linux/bitmap.h>
- #include <linux/capability.h>
- #include <linux/cpu.h>
- #include <linux/types.h>
-@@ -1080,7 +1080,7 @@ static int __dev_alloc_name(struct net *net, const char *name, char *buf)
- 			return -EINVAL;
- 
- 		/* Use one page as a bit array of possible slots */
--		inuse = (unsigned long *) get_zeroed_page(GFP_ATOMIC);
-+		inuse = bitmap_zalloc(max_netdevices, GFP_ATOMIC);
- 		if (!inuse)
- 			return -ENOMEM;
- 
-@@ -1109,7 +1109,7 @@ static int __dev_alloc_name(struct net *net, const char *name, char *buf)
- 		}
- 
- 		i = find_first_zero_bit(inuse, max_netdevices);
--		free_page((unsigned long) inuse);
-+		bitmap_free(inuse);
- 	}
- 
- 	snprintf(buf, IFNAMSIZ, name, i);
+Done.
+
 -- 
-2.40.0.1.gaa8946217a0b
+With Best Regards,
+Andy Shevchenko
+
 
 
