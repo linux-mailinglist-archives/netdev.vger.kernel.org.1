@@ -1,208 +1,165 @@
-Return-Path: <netdev+bounces-33427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6C4D79DEA3
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 05:33:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63DCF79DEAA
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 05:34:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0FFB281DA2
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 03:33:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81DD81C20D74
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 03:34:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7084DA45;
-	Wed, 13 Sep 2023 03:33:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79C81A45;
+	Wed, 13 Sep 2023 03:34:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61923A41
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 03:33:15 +0000 (UTC)
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09F42170F;
-	Tue, 12 Sep 2023 20:33:14 -0700 (PDT)
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38D1VVes023409;
-	Wed, 13 Sep 2023 03:32:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=uFJyocmED4hz9zxf654Kw/VEVbsiQNhYNzZor0D7cI4=;
- b=kdcfk6CBHJEirtPrhb+oIGZax1z1OU+em6Eq6ZrV5oFWju/n1e2TF6lP1ZJOXx4wm0Qu
- /F5GPLm7uwz0CWC24AMg4MFRDjHGU7Wr/gFnREG3clJw9ScDnzZKZLu+fSCnCXpvrAuN
- STBJ2ilabS70foGDDalHOojEfyZG1wJDBAehIXYJ2tnHjPejnIraLQypXpRhDWB5EtH/
- WP1/G2/jnCFZRofGWOmK7nIg2sUR6v6fa+AtyvWftyaQ+6O7+xheg365PEIhZ8Mi6amn
- I+h8kkcey+kLzM4h44yj7ztus8uboGNSTRXquxfNO9GDJLoRFBct1LSUJ0XxPGQmQplF eg== 
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3t2y7q8mer-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 13 Sep 2023 03:32:30 +0000
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 38D3WT0f004638
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 13 Sep 2023 03:32:29 GMT
-Received: from [10.216.41.52] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.36; Tue, 12 Sep
- 2023 20:32:21 -0700
-Message-ID: <ef61cef0-fd3a-d89c-b73e-b10e63fa7789@quicinc.com>
-Date: Wed, 13 Sep 2023 09:02:13 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B893065A;
+	Wed, 13 Sep 2023 03:34:40 +0000 (UTC)
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87C3A125;
+	Tue, 12 Sep 2023 20:34:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1694576077;
+	bh=Dy9uoHunOxBUhL2lOo0mUbBiUZ+oUaTiLsVFylkoPbQ=;
+	h=Date:From:To:Cc:Subject:From;
+	b=piMKBqFnBW2rxtAwIlETdgFgk4YpJiyl+QYOkTT0G/dJI/T3UhZdDyGkdJAwW/weu
+	 02h3SXWir6FmOKhdRVW0lZAkUo0euxAxm+75ztK4SAX4uRGxaVS8AJ06AW7xmX8Tr7
+	 zE9TogB9NWJpCRVfpVb7RLnVhhI2pzPJ/LYYMBcuLVAUEvE8ofnk+8h8LhLLkyMsV8
+	 pbbipfVxB/BQPAahm5bPHj48E50GFLByWUrPMv1kp5kacA1U33ya2OCn31j2CfK1jH
+	 7HHIuiozuMaaBVA5h94kQrarKnmTptIg2bkQ7lfxbkiQoZpdrzRQ0zxwFKObwjNURX
+	 PNQCKyCMOMkuQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4RlmKT42vdz4wxn;
+	Wed, 13 Sep 2023 13:34:37 +1000 (AEST)
+Date: Wed, 13 Sep 2023 13:34:36 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
+ <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, bpf
+ <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>
+Cc: Yonghong Song <yonghong.song@linux.dev>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: boot warning from the bpf-next tree
+Message-ID: <20230913133436.0eeec4cb@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-Subject: Re: [PATCH V2 6/7] arm64: dts: qcom: ipq9574: Add support for nsscc
- node
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-CC: <andersson@kernel.org>, <agross@kernel.org>, <konrad.dybcio@linaro.org>,
-        <mturquette@baylibre.com>, <sboyd@kernel.org>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <catalin.marinas@arm.com>, <will@kernel.org>, <p.zabel@pengutronix.de>,
-        <richardcochran@gmail.com>, <arnd@arndb.de>, <geert+renesas@glider.be>,
-        <nfraprado@collabora.com>, <rafal@milecki.pl>, <peng.fan@nxp.com>,
-        <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
-        <quic_saahtoma@quicinc.com>
-References: <20230825091234.32713-1-quic_devipriy@quicinc.com>
- <20230825091234.32713-7-quic_devipriy@quicinc.com>
- <CAA8EJpo75zWLXuF-HC-Xz+6mvu_S1ET-9gzW=mOq+FjKspDwhw@mail.gmail.com>
-Content-Language: en-US
-From: Devi Priya <quic_devipriy@quicinc.com>
-In-Reply-To: <CAA8EJpo75zWLXuF-HC-Xz+6mvu_S1ET-9gzW=mOq+FjKspDwhw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: gApxFy5Cy_uY5wxT9JTOvWBqjExHH7f3
-X-Proofpoint-ORIG-GUID: gApxFy5Cy_uY5wxT9JTOvWBqjExHH7f3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-09-12_24,2023-09-05_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
- malwarescore=0 clxscore=1015 spamscore=0 priorityscore=1501
- mlxlogscore=999 phishscore=0 bulkscore=0 suspectscore=0 adultscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2308100000 definitions=main-2309130027
+Content-Type: multipart/signed; boundary="Sig_/2nhR/XrgbpD/A2lo9BdBFyW";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
+--Sig_/2nhR/XrgbpD/A2lo9BdBFyW
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
+Hi all,
 
-On 8/25/2023 4:58 PM, Dmitry Baryshkov wrote:
-> On Fri, 25 Aug 2023 at 12:15, Devi Priya <quic_devipriy@quicinc.com> wrote:
->>
->> Add a node for the nss clock controller found on ipq9574 based devices.
->>
->> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
->> ---
->>   Changes in V2:
->>          - Dropped the fixed clock node gcc_gpll0_out_aux and added
->>            support for the same in gcc driver
->>          - Updated the node name to clock-controller@39b00000
->>          - Added clock-names to retrieve the nssnoc clocks and add them
->>            to the list of pm clocks in nss driver
->>
->>   arch/arm64/boot/dts/qcom/ipq9574.dtsi | 48 +++++++++++++++++++++++++++
->>   1 file changed, 48 insertions(+)
->>
->> diff --git a/arch/arm64/boot/dts/qcom/ipq9574.dtsi b/arch/arm64/boot/dts/qcom/ipq9574.dtsi
->> index 51aba071c1eb..903311547e96 100644
->> --- a/arch/arm64/boot/dts/qcom/ipq9574.dtsi
->> +++ b/arch/arm64/boot/dts/qcom/ipq9574.dtsi
->> @@ -10,6 +10,8 @@
->>   #include <dt-bindings/clock/qcom,ipq9574-gcc.h>
->>   #include <dt-bindings/interrupt-controller/arm-gic.h>
->>   #include <dt-bindings/reset/qcom,ipq9574-gcc.h>
->> +#include <dt-bindings/clock/qcom,ipq9574-nsscc.h>
->> +#include <dt-bindings/reset/qcom,ipq9574-nsscc.h>
->>   #include <dt-bindings/thermal/thermal.h>
->>
->>   / {
->> @@ -18,6 +20,24 @@ / {
->>          #size-cells = <2>;
->>
->>          clocks {
->> +               bias_pll_cc_clk: bias-pll-cc-clk {
->> +                       compatible = "fixed-clock";
->> +                       clock-frequency = <1200000000>;
->> +                       #clock-cells = <0>;
->> +               };
->> +
->> +               bias_pll_nss_noc_clk: bias-pll-nss-noc-clk {
->> +                       compatible = "fixed-clock";
->> +                       clock-frequency = <461500000>;
->> +                       #clock-cells = <0>;
->> +               };
->> +
->> +               bias_pll_ubi_nc_clk: bias-pll-ubi-nc-clk {
->> +                       compatible = "fixed-clock";
->> +                       clock-frequency = <353000000>;
->> +                       #clock-cells = <0>;
->> +               };
-> 
-> Which part provides these clocks?
-The Bias PLL generates these clocks based on the reference clock.
-> 
->> +
->>                  sleep_clk: sleep-clk {
->>                          compatible = "fixed-clock";
->>                          #clock-cells = <0>;
->> @@ -722,6 +742,34 @@ frame@b128000 {
->>                                  status = "disabled";
->>                          };
->>                  };
->> +
->> +               nsscc: clock-controller@39b00000 {
->> +                       compatible = "qcom,ipq9574-nsscc";
->> +                       reg = <0x39b00000 0x80000>;
->> +                       clocks = <&gcc GCC_NSSNOC_NSSCC_CLK>,
->> +                                <&gcc GCC_NSSNOC_SNOC_CLK>,
->> +                                <&gcc GCC_NSSNOC_SNOC_1_CLK>,
->> +                                <&bias_pll_cc_clk>,
->> +                                <&bias_pll_nss_noc_clk>,
->> +                                <&bias_pll_ubi_nc_clk>,
->> +                                <&gcc GPLL0_OUT_AUX>,
->> +                                <0>,
->> +                                <0>,
->> +                                <0>,
->> +                                <0>,
->> +                                <0>,
->> +                                <0>,
->> +                                <&xo_board_clk>;
-> 
-> If you move xo_board closer to the start of the list, it will be
-> slightly easier to review.
-Sure okay
-> 
->> +                       clock-names = "nssnoc_nsscc", "nssnoc_snoc", "nssnoc_snoc_1",
->> +                                     "bias_pll_cc_clk", "bias_pll_nss_noc_clk",
->> +                                     "bias_pll_ubi_nc_clk", "gpll0_out_aux", "uniphy0_nss_rx_clk",
->> +                                     "uniphy0_nss_tx_clk", "uniphy1_nss_rx_clk",
->> +                                     "uniphy1_nss_tx_clk", "uniphy2_nss_rx_clk",
->> +                                     "uniphy2_nss_tx_clk", "xo_board_clk";
-> 
-> You are using clock indices. Please drop clock-names.
-Sure okay
+Today's linux-next boot tests (powerpc pseries_le_defconfig) produced
+this warning:
 
-Thanks,
-Devi Priya
-> 
->> +                       #clock-cells = <1>;
->> +                       #reset-cells = <1>;
->> +                       #power-domain-cells = <1>;
->> +               };
->>          };
->>
->>          thermal-zones {
->> --
->> 2.34.1
->>
-> 
-> 
+ ------------[ cut here ]------------
+ bpf_mem_cache[0]: unexpected object size 16, expect 96
+ WARNING: CPU: 0 PID: 1 at kernel/bpf/memalloc.c:500 bpf_mem_alloc_init+0x4=
+10/0x440
+ Modules linked in:
+ CPU: 0 PID: 1 Comm: swapper/0 Not tainted 6.6.0-rc1-04964-g2e08ed1d459f #1
+ Hardware name: IBM pSeries (emulated by qemu) POWER8 (raw) 0x4d0200 0xf000=
+004 of:SLOF,HEAD pSeries
+ NIP:  c0000000003c0890 LR: c0000000003c088c CTR: 0000000000000000
+ REGS: c000000004783890 TRAP: 0700   Not tainted  (6.6.0-rc1-04964-g2e08ed1=
+d459f)
+ MSR:  8000000002029033 <SF,VEC,EE,ME,IR,DR,RI,LE>  CR: 24000280  XER: 0000=
+0000
+ CFAR: c00000000014cfa0 IRQMASK: 0=20
+ GPR00: c0000000003c088c c000000004783b30 c000000001578c00 0000000000000036=
+=20
+ GPR04: 0000000000000000 c000000002667e18 0000000000000001 0000000000000000=
+=20
+ GPR08: c000000002667ce0 0000000000000001 0000000000000000 0000000044000280=
+=20
+ GPR12: 0000000000000000 c000000002b00000 c000000000011188 0000000000000060=
+=20
+ GPR16: c0000000011f9a30 c000000002920f68 c0000000021fac40 c0000000021fac40=
+=20
+ GPR20: c000000002a3ed88 c000000002921560 c0000000014867f0 c00000000291ccd8=
+=20
+ GPR24: 0000000000000000 0000000000000000 0000000000000000 0000000000000010=
+=20
+ GPR28: c0000000011f9a30 0000000000000000 000000000000000b c00000007fc9ac40=
+=20
+ NIP [c0000000003c0890] bpf_mem_alloc_init+0x410/0x440
+ LR [c0000000003c088c] bpf_mem_alloc_init+0x40c/0x440
+ Call Trace:
+ [c000000004783b30] [c0000000003c088c] bpf_mem_alloc_init+0x40c/0x440 (unre=
+liable)
+ [c000000004783c20] [c00000000203d0c0] bpf_global_ma_init+0x5c/0x9c
+ [c000000004783c50] [c000000000010bc0] do_one_initcall+0x80/0x300
+ [c000000004783d20] [c000000002004978] kernel_init_freeable+0x30c/0x3b4
+ [c000000004783df0] [c0000000000111b0] kernel_init+0x30/0x1a0
+ [c000000004783e50] [c00000000000debc] ret_from_kernel_user_thread+0x14/0x1c
+ --- interrupt: 0 at 0x0
+ NIP:  0000000000000000 LR: 0000000000000000 CTR: 0000000000000000
+ REGS: c000000004783e80 TRAP: 0000   Not tainted  (6.6.0-rc1-04964-g2e08ed1=
+d459f)
+ MSR:  0000000000000000 <>  CR: 00000000  XER: 00000000
+ CFAR: 0000000000000000 IRQMASK: 0=20
+ GPR00: 0000000000000000 0000000000000000 0000000000000000 0000000000000000=
+=20
+ GPR04: 0000000000000000 0000000000000000 0000000000000000 0000000000000000=
+=20
+ GPR08: 0000000000000000 0000000000000000 0000000000000000 0000000000000000=
+=20
+ GPR12: 0000000000000000 0000000000000000 0000000000000000 0000000000000000=
+=20
+ GPR16: 0000000000000000 0000000000000000 0000000000000000 0000000000000000=
+=20
+ GPR20: 0000000000000000 0000000000000000 0000000000000000 0000000000000000=
+=20
+ GPR24: 0000000000000000 0000000000000000 0000000000000000 0000000000000000=
+=20
+ GPR28: 0000000000000000 0000000000000000 0000000000000000 0000000000000000=
+=20
+ NIP [0000000000000000] 0x0
+ LR [0000000000000000] 0x0
+ --- interrupt: 0
+ Code: 3b000000 4bfffcbc 78650020 3c62ffe7 39200001 3d420130 7cc607b4 7ba40=
+020 386382f0 992a1e24 4bd8c631 60000000 <0fe00000> 4bffff40 ea410080 3860ff=
+f4=20
+ ---[ end trace 0000000000000000 ]---
+
+Presumably related to commit
+
+  41a5db8d8161 ("bpf: Add support for non-fix-size percpu mem allocation")
+
+(or other commist in that series) from the bpf-next tree.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/2nhR/XrgbpD/A2lo9BdBFyW
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmUBLcwACgkQAVBC80lX
+0GwoWAf/WS/cy+zGeUOhFGGy4ClkfDlQdz+7voGFOfLXmfowWgVau3QTv3+XXr5c
+B8uLvoxuS0EJfcZw5/4l2qPnYcl3UyTXTfRAOdVpZlGz2FZIhPGzizrcg5FdPCxc
+0PeDPG8sVklwVOFfQ8N+ZN/9xhWbV5lTt3miYo2wtMaWPSTRxl7/2l9dpvr8wVSR
+zePaC6s2dGTIrzSZ0mqbd7fEjyUmt3fcRC16bh3WdRYk6cwBqPfQt9Gmbl61/lna
+x8n62LU7WpcYEQIHU6ZM0E2STDabPmK9MAX9UFem9lxzIu3XFlQuUNQvlhsEl7J+
+QJIa2LvwFF0jZYbHSfBTo0oLsx3dcA==
+=HIPp
+-----END PGP SIGNATURE-----
+
+--Sig_/2nhR/XrgbpD/A2lo9BdBFyW--
 
