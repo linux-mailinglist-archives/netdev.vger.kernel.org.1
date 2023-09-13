@@ -1,122 +1,89 @@
-Return-Path: <netdev+bounces-33543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A81579E6E9
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 13:35:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE6AF79E705
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 13:40:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5380D28256B
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 11:35:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16E3C28251C
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 11:40:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BA541EA66;
-	Wed, 13 Sep 2023 11:35:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E555E1EA6E;
+	Wed, 13 Sep 2023 11:40:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F1FB1E519
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 11:35:32 +0000 (UTC)
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C44621FC0;
-	Wed, 13 Sep 2023 04:35:31 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 235F224000E;
-	Wed, 13 Sep 2023 11:35:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1694604930;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WbMwXGk6o+lbYJAjbVb82tnFj2aYuAgarBbBqqRuBPc=;
-	b=Z2GShICU3ihvCutupOM5tgMDhIm2mE3jZBu65j1kClIXb2kYp4zA/1kLyRZzGnS+y8zwpF
-	i86FO0SJS5yz1RmHw7lK4RftC4V8Zq87sTEDaeW6ujIFLUgkEcgSneHohDugmA/6dXn9M7
-	l6ri9KtfyFJDfNZa5xmZdwMi4UJUcKqCk4itn8lqSf4uXjh/hLbvGajBUtR+3uqm8KgPyE
-	P0CTMnaxoU9OeECX6sFWp7QiheE76FXBve+lU0I1gknHwXcQtOK6Ujz0RJT34oRYMgMcUy
-	ootEQlkXZFAYcTtHnxCsV1YuntvZx6uKdcTZYTyUsvrhINyUHJiJQGJmuJjvIw==
-Message-ID: <137fd54d-7d2d-4d0b-a50b-cca69875a814@arinc9.com>
-Date: Wed, 13 Sep 2023 14:35:11 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC4B918C2D
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 11:40:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1D834C433C9;
+	Wed, 13 Sep 2023 11:40:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694605227;
+	bh=Fe9V3fAeoTIWzn3vmerCsL1xnoDRfgdt+KYOXSw8htw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ctBmKGOfHJzWpYX2EDFqyY2szGRI8oegpT6Yb21YSBDU0v5OhxVpi55ulUDrZh8Gq
+	 0CZdXRoSp9x7p4OIcSlfyAcmWNpHxgXm9Fj6QNpzjiL0kVuTdB5thY4IzMuTmDxM+d
+	 8ENhVyjm5U+YLVfC9Ay/lJMcSipqBvbCieHdYOXqqNeFPb6xv6hkYUT7RViPVq112u
+	 b326AgYca5LDc9wOwkfH3cle9bxIMA0FDhmkbSqRCyqktP+brXnRSlLhICXEzfB+uQ
+	 Ke4aZJm/x57q+bO/NS8mGZ34rlggJiCXok8f9Alsfh10uA/cyS6vugNquXhW/R31Vz
+	 sG6HD817wznlg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F2B8AE1C28E;
+	Wed, 13 Sep 2023 11:40:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/4] dt-bindings: net: dsa: document internal MDIO bus
-Content-Language: en-US
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Woojung Huh <woojung.huh@microchip.com>,
- UNGLinuxDriver@microchip.com, Linus Walleij <linus.walleij@linaro.org>,
- =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
- Daniel Golle <daniel@makrotopia.org>, Landen Chao
- <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Matthias Brugger
- <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-References: <0cee0928-74c9-4048-8cd8-70bfbfafd9b2@arinc9.com>
- <20230827121235.zog4c3ehu2cyd3jy@skbuf>
- <676d1a2b-6ffa-4aff-8bed-a749c373f5b3@arinc9.com>
- <87325ce9-595a-4dda-a6a1-b5927d25719b@arinc9.com>
- <20230911225126.rk23g3u3bzo3agby@skbuf>
- <036c0763-f1b2-49ff-bc82-1ff16eec27ab@arinc9.com>
- <20230912193450.h5s6miubag46z623@skbuf>
- <6cec079e-991e-4222-a76d-d6156de0daca@arinc9.com>
- <20230913074231.5azwxqjuv2wp5nik@skbuf>
- <89c9b84c-574c-4071-9524-9207597a3f0a@arinc9.com>
- <20230913110404.co7earmnbzf6hhoe@skbuf>
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <20230913110404.co7earmnbzf6hhoe@skbuf>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
+Subject: Re: [PATCH net-next v3 0/4] selftests/tc-testing: add tests covering
+ classid
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169460522699.11253.18350477068462150356.git-patchwork-notify@kernel.org>
+Date: Wed, 13 Sep 2023 11:40:26 +0000
+References: <20230911215016.1096644-1-pctammela@mojatatu.com>
+In-Reply-To: <20230911215016.1096644-1-pctammela@mojatatu.com>
+To: Pedro Tammela <pctammela@mojatatu.com>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, shuah@kernel.org, victor@mojatatu.com
 
-On 13.09.2023 14:04, Vladimir Oltean wrote:
-> I don't think they're for switch ports only. Any driver which uses
-> phylink_fwnode_phy_connect() or its derivatives gets subject to the same
-> bindings. But putting the sub-schema in ethernet-controller.yaml makes
-> sense, just maybe not naming it "phylink-switch".
+Hello:
 
-Got it. Should we disallow managed altogether when fixed-link is also
-defined, or just with in-band-status value?
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Currently:
+On Mon, 11 Sep 2023 18:50:12 -0300 you wrote:
+> Patches 1-3 add missing tests covering classid behaviour on tdc for cls_fw,
+> cls_route and cls_fw. This behaviour was recently fixed by valis[0].
+> 
+> Patch 4 comes from the development done in the previous patches as it turns out
+> cls_route never returns meaningful errors.
+> 
+> [0] https://lore.kernel.org/all/20230729123202.72406-1-jhs@mojatatu.com/
+> 
+> [...]
 
-diff --git a/Documentation/devicetree/bindings/net/ethernet-controller.yaml b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-index 9f6a5ccbcefe..3b5946a4be34 100644
---- a/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-+++ b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-@@ -284,6 +284,21 @@ allOf:
-              controllers that have configurable TX internal delays. If this
-              property is present then the MAC applies the TX delay.
-  
-+$defs:
-+  phylink:
-+    description: phylink bindings for ethernet controllers
-+    allOf:
-+      - anyOf:
-+          - required: [ fixed-link ]
-+          - required: [ phy-handle ]
-+          - required: [ managed ]
-+
-+      - if:
-+          required: [ fixed-link ]
-+        then:
-+          properties:
-+            managed: false
-+
-  additionalProperties: true
-  
-  ...
+Here is the summary with links:
+  - [net-next,v3,1/4] selftests/tc-testing: cls_fw: add tests for classid
+    https://git.kernel.org/netdev/net-next/c/70ad43333cbe
+  - [net-next,v3,2/4] selftests/tc-testing: cls_route: add tests for classid
+    https://git.kernel.org/netdev/net-next/c/7c339083616c
+  - [net-next,v3,3/4] selftests/tc-testing: cls_u32: add tests for classid
+    https://git.kernel.org/netdev/net-next/c/e2f2fb3c352d
+  - [net-next,v3,4/4] net/sched: cls_route: make netlink errors meaningful
+    https://git.kernel.org/netdev/net-next/c/ef765c258759
 
-Arınç
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
