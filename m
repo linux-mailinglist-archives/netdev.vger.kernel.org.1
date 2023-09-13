@@ -1,144 +1,127 @@
-Return-Path: <netdev+bounces-33574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04F3E79EA4B
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 16:00:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0328079EA63
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 16:03:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 109A11C203A3
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 14:00:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17F201C20C82
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 14:03:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55D0E1EA93;
-	Wed, 13 Sep 2023 14:00:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 043461F166;
+	Wed, 13 Sep 2023 14:03:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 481411A718
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 14:00:16 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id B4F2F19B1
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 07:00:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1694613614;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1yK3xgmt1aeFdUkAxw9Y0+ZQFHP2f+qkDkwODsKtQl0=;
-	b=iTjKRLz++kwQDoV6ybdz5g8N2TXWH6cpoWNPaSc4YzSvbQP4qwEs+wjNdUrwlUyAWViYdG
-	PlyPoIhPn1K4OZtmiIJB7rGuiUHqt5dMfqBjRbc2/giJKpa4viun2YwJqJtAA9nDLeqKgV
-	u7am5H3lp2ThwbFzAY35iF3lgTd/QNs=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-255-TVu3PfCyP56GETtd5vT1WQ-1; Wed, 13 Sep 2023 10:00:13 -0400
-X-MC-Unique: TVu3PfCyP56GETtd5vT1WQ-1
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-76efd8bf515so66974585a.1
-        for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 07:00:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8CDF1EA74
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 14:03:25 +0000 (UTC)
+Received: from mail-vk1-xa2c.google.com (mail-vk1-xa2c.google.com [IPv6:2607:f8b0:4864:20::a2c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09C5419B1
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 07:03:25 -0700 (PDT)
+Received: by mail-vk1-xa2c.google.com with SMTP id 71dfb90a1353d-4943862e73dso2140509e0c.1
+        for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 07:03:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694613804; x=1695218604; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yjzbHnSvAqIQYDELTaH1Gq6eiRXRq5flC8+idgkGMLs=;
+        b=k5B0ZhDpF7vzAAJAlCM0kn4bmCW8+byZg+b7oD2t7hPy37MESRpgv7t8a4U6ehp15Q
+         5HRAa46ZtV9Q/+pwpIkIuF2TkQuIBUsahbAIW2KO59rkGXHKn73rt4gc+eewTsSvHFq1
+         AhADH9QJrRpGSXmPg8MGKo+Q2V0bV7wdsGdMQ5mQZi96DtISr7/moYdhEK/XaxFiiRaJ
+         KVFherJQ84lmY4C+QLnlxV8IHXo/zgQgqeBx0e52H7/QErIAl52VAk1Y7LC5sW8W1P/k
+         n4wC38nZDGypCRue9zdOrVRJW6xv+YWlgKMe0YK87qFfHy0FgGsMTQDSi0bnMjpnjTtD
+         MG4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694613613; x=1695218413;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1yK3xgmt1aeFdUkAxw9Y0+ZQFHP2f+qkDkwODsKtQl0=;
-        b=TAKUtuWGtcq0gaf7Nr2t3IeVsmbUW+na/pERc63sjg7ZB3Bjvf+6juiUlbTMlLEk8c
-         G203XIBjZ6/2vdb9sPKirS9xY23mdScGA6sZffmA7B+flSZavNvzSNdCsxMgZ21eNzNK
-         dhFJQHGrN90zlIDboYYjbYw4H5cFVlFNZC9wnfcAqZMhTV2IVUEQSM8Wg+9dX+O4Uip0
-         zH8yDhC7lwmohvicvqCvEROIDIfnKM9T1rJILkxHt58d7iqJ0n0q202TKpbaEtJrVkzh
-         xHZwCfbnq/NT9CsbDvtE9oxR9ZAxPhyo8u7chbcsid/EibcYombHfhTn6e5ENk7L1JvT
-         x9qg==
-X-Gm-Message-State: AOJu0Yy1PcXl92YW47rf91gDF22WzW3LbogKyjOP8ZVlOcMB1BCNCXfj
-	vxlMAIp9IoSj/LBkAFIGog/AoC3rJdy5W8Ic89TZdIEsP9k3Usdfp/8ulnPxaTDcADUNYY6+SMO
-	uDgbWfg9cE1MSX0I9
-X-Received: by 2002:a05:620a:44c3:b0:76e:f686:cad8 with SMTP id y3-20020a05620a44c300b0076ef686cad8mr7244556qkp.13.1694613613036;
-        Wed, 13 Sep 2023 07:00:13 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEfk9vTwiioPzhJO0D1j6+0LQmPdk1mn8JxTGfaPUXi0LyXZ0YuCSf940L14zsRR6mW81HaUA==
-X-Received: by 2002:a05:620a:44c3:b0:76e:f686:cad8 with SMTP id y3-20020a05620a44c300b0076ef686cad8mr7244535qkp.13.1694613612753;
-        Wed, 13 Sep 2023 07:00:12 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id u9-20020a0cf1c9000000b00653589babcbsm4456536qvl.87.2023.09.13.07.00.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 13 Sep 2023 07:00:11 -0700 (PDT)
-Message-ID: <bed381a8-7d3d-d596-bc88-6ff8a7a5a33b@redhat.com>
-Date: Wed, 13 Sep 2023 16:00:08 +0200
+        d=1e100.net; s=20230601; t=1694613804; x=1695218604;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yjzbHnSvAqIQYDELTaH1Gq6eiRXRq5flC8+idgkGMLs=;
+        b=hnokP5pV1rstI5wUd6tIusYqpElp5AgIUiqqAxO+9OtCshhixLNHG2TPUcFJI9OWWi
+         XJcPnbk6N4qZYjgtvthqKEeJrlOC6Q4edWMQCycGELblUN6BItFO/BNak48MT43kofoO
+         pLnn8ZxqBPXbMNJXApuPhk+f9vzdD+h4F9BOdj5wEgO1iLtaepAevt3ZcoOVlXOK+jsr
+         XYZhi8Bl0ix1mWdxXRxt6BWlplJ43giTZW8jkmFE4oEJ2E0nOnbXbuoTZi4doMMcYzJT
+         VitKhTLSJyXCf57xVxUUQHpHznW92lFPgh2KPCyICTSvD2UApNHyVdwgJ3GelgeuHY2J
+         tRrg==
+X-Gm-Message-State: AOJu0YwbA463Q2hcFYk5VYuQ4rJqyZ2Qyr9A4s64/DCFYNHFyNJrRBNa
+	FqoW6xo2V+vh6u5C1w+gjCzWb7aFtedSaT2vMFk=
+X-Google-Smtp-Source: AGHT+IF1lAbN8btfTZBgIdggkQPnepRwFtWbtA+Gtbwc87g2ntv9gEeBFAxlR7Ak+csX/0FDiW0vJA9kNPmKakHEz7M=
+X-Received: by 2002:a1f:ec84:0:b0:48d:eaa:45c4 with SMTP id
+ k126-20020a1fec84000000b0048d0eaa45c4mr2487181vkh.7.1694613803687; Wed, 13
+ Sep 2023 07:03:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH v2] vhost: Allow null msg.size on VHOST_IOTLB_INVALIDATE
-Content-Language: en-US
-To: eric.auger.pro@gmail.com, elic@nvidia.com, mail@anirudhrb.com,
- jasowang@redhat.com, mst@redhat.com, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, netdev@vger.kernel.org,
- virtualization@lists.linux-foundation.org, kvmarm@lists.linux.dev
-Cc: stable@vger.kernel.org
-References: <20230824093722.249291-1-eric.auger@redhat.com>
-From: Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20230824093722.249291-1-eric.auger@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20230912013332.2048422-1-jrife@google.com> <65006891779ed_25e754294b8@willemb.c.googlers.com.notmuch>
+ <1ca3ca8a-6185-bc55-de74-53991ffc6f91@iogearbox.net> <CADKFtnTOD2+7B5tH8YMHEnxubiG+Cs+t8EhTft+q51YwxjW9xw@mail.gmail.com>
+ <CAF=yD-KKGYhKjxio9om1rz7pPe1uiRgODuXWvoLqrGrRbtWNkA@mail.gmail.com>
+ <CADKFtnSgBZcpYBYRwr6WgnS6j9xH+U0W7bxSqt9ge5aumu4QQg@mail.gmail.com>
+ <CAF=yD-JW+Gs+EeJk2jknU6ZL0prjRO41Q3EpVTOTpTD8sEOh6A@mail.gmail.com> <CADKFtnTzqLw4F2m9+7BxZZW_QKm_QiduMb6to9mU1WAvbo9MWQ@mail.gmail.com>
+In-Reply-To: <CADKFtnTzqLw4F2m9+7BxZZW_QKm_QiduMb6to9mU1WAvbo9MWQ@mail.gmail.com>
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Wed, 13 Sep 2023 10:02:47 -0400
+Message-ID: <CAF=yD-Lapvy4J748ge8k5v7gUoynDxJPpXKV8rOdgtAw7=_ErQ@mail.gmail.com>
+Subject: Re: [PATCH net] net: prevent address overwrite in connect() and sendmsg()
+To: Jordan Rife <jrife@google.com>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, davem@davemloft.net, 
+	Eric Dumazet <edumazet@google.com>, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, dborkman@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
-
-On 8/24/23 11:37, Eric Auger wrote:
-> Commit e2ae38cf3d91 ("vhost: fix hung thread due to erroneous iotlb
-> entries") Forbade vhost iotlb msg with null size to prevent entries
-> with size = start = 0 and last = ULONG_MAX to end up in the iotlb.
+On Tue, Sep 12, 2023 at 5:09=E2=80=AFPM Jordan Rife <jrife@google.com> wrot=
+e:
 >
-> Then commit 95932ab2ea07 ("vhost: allow batching hint without size")
-> only applied the check for VHOST_IOTLB_UPDATE and VHOST_IOTLB_INVALIDATE
-> message types to fix a regression observed with batching hit.
+> > If we take this path, it could be a single patch. The subsystem
+> > maintainers should be CC:ed so that they can (N)ACK it.
+> >
+> > But I do not mean to ask to split it up and test each one separately.
+> >
+> > The change from sock->ops->connect to kernel_connect is certainly
+> > trivial enough that compile testing should suffice.
 >
-> Still, the introduction of that check introduced a regression for
-> some users attempting to invalidate the whole ULONG_MAX range by
-> setting the size to 0. This is the case with qemu/smmuv3/vhost
-> integration which does not work anymore. It Looks safe to partially
-> revert the original commit and allow VHOST_IOTLB_INVALIDATE messages
-> with null size. vhost_iotlb_del_range() will compute a correct end
-> iova. Same for vhost_vdpa_iotlb_unmap().
+> Ack. Thanks for clarifying.
 >
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Fixes: e2ae38cf3d91 ("vhost: fix hung thread due to erroneous iotlb entries")
-> Cc: stable@vger.kernel.org # v5.17+
-> Acked-by: Jason Wang <jasowang@redhat.com>
-
-Gentle ping for this fix? Any other comments besides Jason's A-b?
-
-Best Regards
-
-Eric
+> > The only question is whether we should pursue your original patch and
+> > accept that this will continue, or one that improves the situation,
+> > but touches more files and thus has a higher risk of merge conflicts.
+> >
+> > I'd like to give others some time to chime in. I've given my opinion,
+> > but it's only one.
+> >
+> > I'd like to give others some time to chime in. I've given my opinion,
+> > but it's only one.
 >
-> ---
-> v1 -> v2:
-> - Added Cc stable and Jason's Acked-by
-> ---
->  drivers/vhost/vhost.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
->
-> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> index c71d573f1c94..e0c181ad17e3 100644
-> --- a/drivers/vhost/vhost.c
-> +++ b/drivers/vhost/vhost.c
-> @@ -1458,9 +1458,7 @@ ssize_t vhost_chr_write_iter(struct vhost_dev *dev,
->  		goto done;
->  	}
->  
-> -	if ((msg.type == VHOST_IOTLB_UPDATE ||
-> -	     msg.type == VHOST_IOTLB_INVALIDATE) &&
-> -	     msg.size == 0) {
-> +	if (msg.type == VHOST_IOTLB_UPDATE && msg.size == 0) {
->  		ret = -EINVAL;
->  		goto done;
->  	}
+> Sounds good. I'll wait to hear others' opinions on the best path forward.
 
+No other comments so far.
+
+My hunch is that a short list of these changes
+
+```
+@@ -1328,7 +1328,7 @@ static int kernel_bindconnect(struct socket *s,
+struct sockaddr *laddr,
+        if (rv < 0)
+                return rv;
+
+-       rv =3D s->ops->connect(s, raddr, size, flags);
++       rv =3D kernel_connect(s, raddr, size, flags);
+```
+
+is no more invasive than your proposed patch, and gives a more robust outco=
+me.
+
+Please take a stab.
+
+If it proves at all non-trivial, e.g., in the conversion of arguments
+between kernel_sendmsg and sock_sendmsg/sock->ops->sendmsg, then let's
+submit your original patch. And I will do the conversion in net-next
+instead.
 
