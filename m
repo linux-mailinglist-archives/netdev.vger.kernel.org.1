@@ -1,128 +1,126 @@
-Return-Path: <netdev+bounces-33551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8400D79E815
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 14:32:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AFA179E822
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 14:36:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39632281BE9
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 12:32:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 081AA1C20DF6
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 12:36:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 198961DDD9;
-	Wed, 13 Sep 2023 12:31:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A6151A704;
+	Wed, 13 Sep 2023 12:36:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CDF522EED
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 12:31:40 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30FBB1FC0;
-	Wed, 13 Sep 2023 05:31:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694608300; x=1726144300;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=wo7umevM4e5cancbBmuxKjkF/sAUzuBzzYDYja1futw=;
-  b=BZA1AfNZyKA8S0EMrOjr4K59DEX2wqVsBFYjQTUmK4NioBFHXH2NNVu6
-   f05aQivLAmnNLjgUeWuMh/wiwSDy5F5tpjl5+JmMndk3NtGloAxkcyuOn
-   mZ5JebhiPzIiGr4zxOweBRNZ0t6L3WS3NsCb0jrGkSGk/AZ7aLMotMrQt
-   MW8tG+sV9ay0OtK6sfwjbA2+61HvQUMHxEf1o01c76SSJ0ee3/KZCRR5j
-   5HZJc1qw53UVLys6e6KFm0PTP0XXwKKZBHAJhXQIUAnpKon4rypcdgRWR
-   Ey96mSupFVXJQcB2xQQ3PdYt0VSxgft3QLmNZOVPVOhVbH3Uqw317iCA5
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="368912686"
-X-IronPort-AV: E=Sophos;i="6.02,143,1688454000"; 
-   d="scan'208";a="368912686"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 05:28:42 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="693836724"
-X-IronPort-AV: E=Sophos;i="6.02,143,1688454000"; 
-   d="scan'208";a="693836724"
-Received: from pakurapo-mobl3.ger.corp.intel.com (HELO ijarvine-mobl2.ger.corp.intel.com) ([10.249.45.213])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 05:28:38 -0700
-From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-To: Jonathan Cameron <Jonathan.Cameron@Huawei.com>,
-	linux-pci@vger.kernel.org,
-	Bjorn Helgaas <helgaas@kernel.org>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Subject: [PATCH v2 10/10] e1000e: Use pcie_capability_read_word() for reading LNKSTA
-Date: Wed, 13 Sep 2023 15:27:48 +0300
-Message-Id: <20230913122748.29530-11-ilpo.jarvinen@linux.intel.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230913122748.29530-1-ilpo.jarvinen@linux.intel.com>
-References: <20230913122748.29530-1-ilpo.jarvinen@linux.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B823321D
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 12:36:38 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EF2B19A6;
+	Wed, 13 Sep 2023 05:36:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Znl3NLuXYp7P/vugDRSybZxt9vQVGXDZ3zZmS+2t90I=; b=2AHv4vQxAGFpG5nS4mY2BzHTk7
+	o3x8sq4nCEV5EOqXykpo5L1ynfZ9ecym/SZxjOnxroFNUm7p1DhUndMhl87gAXr4UhTMjGc5EI52Y
+	Au3VeWaYFT0LItEi9zyxD50rWvs+2x+Y/qgILlDEqEvKvZBiLjCxA9gTzADMdLDhpEts=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qgP6Y-006Iyp-G8; Wed, 13 Sep 2023 14:36:26 +0200
+Date: Wed, 13 Sep 2023 14:36:26 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	corbet@lwn.net, steen.hegelund@microchip.com, rdunlap@infradead.org,
+	horms@kernel.org, casper.casan@gmail.com, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, horatiu.vultur@microchip.com,
+	Woojung.Huh@microchip.com, Nicolas.Ferre@microchip.com,
+	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com
+Subject: Re: [RFC PATCH net-next 2/6] net: ethernet: add mac-phy interrupt
+ support with reset complete handling
+Message-ID: <61a58960-f2f3-4772-8f12-0d1f9cfec2c5@lunn.ch>
+References: <20230908142919.14849-1-Parthiban.Veerasooran@microchip.com>
+ <20230908142919.14849-3-Parthiban.Veerasooran@microchip.com>
+ <20230913104458.1d4cdd51@wsk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230913104458.1d4cdd51@wsk>
 
-Use pcie_capability_read_word() for reading LNKSTA and remove the
-custom define that matches to PCI_EXP_LNKSTA.
+> Just maybe mine small remark. IMHO the reset shall not pollute the IRQ
+> hander. The RESETC is just set on the initialization phase and only
+> then shall be served. Please correct me if I'm wrong, but it will not
+> be handled during "normal" operation.
 
-As only single user for cap_offset remains, remove it too and use
-adapter->pdev->pcie_cap directly in the if condition.
+This is something i also wondered. Maybe if the firmware in the
+MAC-PHY crashes, burns, and a watchdog reset it, could it assert
+RESETC? I think maybe a WARN_ON_ONCE() for RESETC in the interrupt
+handler would be useful, but otherwise ignore it. Probe can then poll
+during its reset.
 
-Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
----
- drivers/net/ethernet/intel/e1000e/defines.h |  1 -
- drivers/net/ethernet/intel/e1000e/mac.c     | 10 ++++------
- 2 files changed, 4 insertions(+), 7 deletions(-)
+> > +				regval = RESETC;
+> > +				/* SPI host should write RESETC bit
+> > with one to
+> > +				 * clear the reset interrupt status.
+> > +				 */
+> > +				ret = oa_tc6_perform_ctrl(tc6,
+> > OA_TC6_STS0,
+> > +							  &regval,
+> > 1, true,
+> > +							  false);
+> 
+> Is this enough to have the IRQ_N deasserted (i.e. pulled HIGH)?
+> 
+> The documentation states it clearly that one also needs to set SYNC bit
+> (BIT(15)) in the OA_CONFIG0 register (which would have the 0x8006 value).
+> 
+> Mine problem is that even after writing 0x40 to OA_STATUS0 and 0x8006
+> to OA_CONFIG0 the IRQ_N is still LOW (it is pulled up via 10K resistor).
+> 
+> (I'm able to read those registers and those show expected values)
 
-diff --git a/drivers/net/ethernet/intel/e1000e/defines.h b/drivers/net/ethernet/intel/e1000e/defines.h
-index a4d29c9e03a6..23a58cada43a 100644
---- a/drivers/net/ethernet/intel/e1000e/defines.h
-+++ b/drivers/net/ethernet/intel/e1000e/defines.h
-@@ -678,7 +678,6 @@
- 
- /* PCI/PCI-X/PCI-EX Config space */
- #define PCI_HEADER_TYPE_REGISTER     0x0E
--#define PCIE_LINK_STATUS             0x12
- 
- #define PCI_HEADER_TYPE_MULTIFUNC    0x80
- 
-diff --git a/drivers/net/ethernet/intel/e1000e/mac.c b/drivers/net/ethernet/intel/e1000e/mac.c
-index 5340cf73778d..e86652a30069 100644
---- a/drivers/net/ethernet/intel/e1000e/mac.c
-+++ b/drivers/net/ethernet/intel/e1000e/mac.c
-@@ -18,15 +18,13 @@ s32 e1000e_get_bus_info_pcie(struct e1000_hw *hw)
- 	struct e1000_mac_info *mac = &hw->mac;
- 	struct e1000_bus_info *bus = &hw->bus;
- 	struct e1000_adapter *adapter = hw->adapter;
--	u16 pcie_link_status, cap_offset;
-+	u16 pcie_link_status;
- 
--	cap_offset = adapter->pdev->pcie_cap;
--	if (!cap_offset) {
-+	if (!adapter->pdev->pcie_cap) {
- 		bus->width = e1000_bus_width_unknown;
- 	} else {
--		pci_read_config_word(adapter->pdev,
--				     cap_offset + PCIE_LINK_STATUS,
--				     &pcie_link_status);
-+		pcie_capability_read_word(adapter->pdev, PCI_EXP_LNKSTA,
-+					  &pcie_link_status);
- 		bus->width = (enum e1000_bus_width)FIELD_GET(PCI_EXP_LNKSTA_NLW,
- 							     pcie_link_status);
- 	}
--- 
-2.30.2
+What does STATUS0 and STATUS1 contain? That might be a dumb question,
+i've not read the details for interrupt handling yet, but maybe there
+is another interrupt pending? Or the interrupt mask needs writing?
 
+> Was it on purpose to not use the RST_N pin to perform GPIO based reset?
+> 
+> When I generate reset pulse (and keep it for low for > 5us) the IRQ_N
+> gets high. After some time it gets low (as expected). But then it
+> doesn't get high any more.
+
+Does the standard say RST_N is mandatory to be controlled by software?
+I could imagine RST_N is tied to the board global reset when the power
+supply is stable. Software reset is then used at probe time.
+
+So this could be a board design decision. I can see this code getting
+extended in the future, an optional gpiod passed to the core for it to
+use.
+
+> > msecs_to_jiffies(1));
+> 
+> Please also clarify - does the LAN8651 require up to 1ms "settle down"
+> (after reset) time before it gets operational again?
+
+If this is not part of the standard, it really should be in the MAC
+driver, or configurable, since different devices might need different
+delays. But ideally, if the status bit says it is good to go, i would
+really expect it to be good to go. So this probably should be a
+LAN8651 quirk.
+
+	Andrew
 
