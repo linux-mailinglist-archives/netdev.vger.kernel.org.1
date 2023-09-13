@@ -1,110 +1,325 @@
-Return-Path: <netdev+bounces-33638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33639-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A276D79EFC8
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 19:04:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC83279EFCE
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 19:04:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C9342826E3
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 17:04:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF9AD281D90
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 17:04:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D65F1F954;
-	Wed, 13 Sep 2023 16:59:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B3EE200B6;
+	Wed, 13 Sep 2023 17:02:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 216A1AD52
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 16:59:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89ACFC433C8;
-	Wed, 13 Sep 2023 16:59:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694624397;
-	bh=BnteqCpF/CAUK7DK9U9Ghtfp5dt4d9MfOz2/eAS/u7s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cPc5I0ZLysgdFaSm9d3iPjGsHib6No1WDfTfDNmZ8EJftw2ukgPJqbdTvFwfII6h5
-	 XsjFCfQwy0hAhvcNI/zC1jAxOZx+xj3WkJy3PnXdFgBaTdKUmzEXfr8r119FUpA9ws
-	 uEyzFAjE2f/LP5rj9F/N4Be4pbP/BK9uPoheaZ2R88lgsiTu9NUbtgyaz2XOX1oPZT
-	 eklyhY3ZUUL2hQtxVd/re7fFxkttitCrig5ohr9Pm1WOgM5lChR8UOojrbVvjicS9G
-	 gipMxf05N4nYGfN5v5g6bWOTb7T8iOMYlMWHXGVTPRzp+C5LHyalJK3Qgj/yIop80d
-	 GuvQxVLkJ3wdg==
-Date: Wed, 13 Sep 2023 17:59:48 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Lee Jones <lee@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Qiang Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	Shengjiu Wang <shengjiu.wang@gmail.com>,
-	Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>,
-	Nicolin Chen <nicoleotsuka@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org,
-	Simon Horman <horms@kernel.org>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v5 24/31] net: wan: Add framer framework support
-Message-ID: <e3245053-1d4c-4ee3-9e03-8a6ca54e26d1@sirena.org.uk>
-References: <20230912081527.208499-1-herve.codina@bootlin.com>
- <20230912101436.225781-1-herve.codina@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5649BE559
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 17:02:54 +0000 (UTC)
+Received: from mail-qv1-xf2a.google.com (mail-qv1-xf2a.google.com [IPv6:2607:f8b0:4864:20::f2a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82807DC
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 10:02:53 -0700 (PDT)
+Received: by mail-qv1-xf2a.google.com with SMTP id 6a1803df08f44-64a5bc53646so284526d6.2
+        for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 10:02:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694624572; x=1695229372; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vc//83u4nAeaH1l8/gUO6AhmhnRewPZBdrifpjJDYQY=;
+        b=gy5iOVu/DNpgnJZiRUYx3Rj9fsyCgJkVb8BPJyNjAapoKw41D3G4nCu2IPC+Knx5iM
+         if3A+WYzFGDj26pMguZ9JI0c0jmdhlu/24wwmJFTZKDQZb5Q4hbDir/KR/ZeHW+65GTq
+         oGdXobq/NRwgpHTak16iC51AlTKK8aPzv4pXkLjSDCGl2Pvpeyug1k0cQXlTOQ7MqHfX
+         qSHUhyKXNnZkgyo6hQ698AgETzeFeYPUBp1FcyJi12Foob3vnVTOeqNiEIjgPgYSowJB
+         MeV4gFmKeXtYfTBhXzhUwZGnv7CdF4TFGf9ohjcX15JLbGThtEE2Q1n7h4zMK8gKkSwv
+         0wDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694624572; x=1695229372;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vc//83u4nAeaH1l8/gUO6AhmhnRewPZBdrifpjJDYQY=;
+        b=KRuAOXO3SiLMScz/+c4U6exX52ZkwRsxsTV/EZlGAgCWyDZZzskNqREg72wBSOGkmH
+         wQMBpnAX1vvSHcOGndHMPWjJjLbjM//kK8hukpcwio5ZNqL4gQ72cprZ7hgPHUd7BNla
+         XAB5NfLLMPWDEH7S08UxlaS2YlD8Gra5t/lljUitPBpkaOhUQh1do1TTICydsEfphk0p
+         dY2YWXSSf+Girr8Vjr0rbDxP+rxk3fIyIZo2NFN+1Svu40Ymdz2fPeE85IZ8Gm+jlHkI
+         lNNqV8vkFnXUn4oBgze1lQajHibO3rHdFvoIGGIJ7Yj1sPCLX93By8uJgLeiJQoxI7wN
+         TYSg==
+X-Gm-Message-State: AOJu0Yzlydg2hd2Rb+vS1XVjF2i7q7VSli3gHDNPpazGQI0yoCLsBZgm
+	s/nv5cKBsGjcuGi9gVx4dUE=
+X-Google-Smtp-Source: AGHT+IFbDpK62iCySk7GM+VUcEVs+FQVsZi5x3arrg4Tx1u8o69RXJmmKf9K68kJkpaVlFnCtZP2Jw==
+X-Received: by 2002:a05:6214:2dc5:b0:64f:9333:13bc with SMTP id nc5-20020a0562142dc500b0064f933313bcmr3571704qvb.23.1694624572506;
+        Wed, 13 Sep 2023 10:02:52 -0700 (PDT)
+Received: from localhost (modemcable065.128-200-24.mc.videotron.ca. [24.200.128.65])
+        by smtp.gmail.com with ESMTPSA id i8-20020a0cf488000000b0064f70a860d8sm4639112qvm.41.2023.09.13.10.02.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Sep 2023 10:02:52 -0700 (PDT)
+Date: Wed, 13 Sep 2023 13:02:51 -0400
+From: Benjamin Poirier <benjamin.poirier@gmail.com>
+To: Liang Chen <liangchen.linux@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2] pktgen: Introducing 'SHARED' flag for
+ testing with non-shared skb
+Message-ID: <ZQHrO7dSNQkPOvKM@d3>
+References: <20230913051046.19484-1-liangchen.linux@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="3d4xnD0OBUXwj5Mp"
-Content-Disposition: inline
-In-Reply-To: <20230912101436.225781-1-herve.codina@bootlin.com>
-X-Cookie: Use extra care when cleaning on stairs.
-
-
---3d4xnD0OBUXwj5Mp
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20230913051046.19484-1-liangchen.linux@gmail.com>
 
-On Tue, Sep 12, 2023 at 12:14:36PM +0200, Herve Codina wrote:
-> A framer is a component in charge of an E1/T1 line interface.
-> Connected usually to a TDM bus, it converts TDM frames to/from E1/T1
-> frames. It also provides information related to the E1/T1 line.
->=20
-> The framer framework provides a set of APIs for the framer drivers
-> (framer provider) to create/destroy a framer and APIs for the framer
-> users (framer consumer) to obtain a reference to the framer, and
-> use the framer.
+On 2023-09-13 13:10 +0800, Liang Chen wrote:
+> Currently, skbs generated by pktgen always have their reference count
+> incremented before transmission, causing their reference count to be
+> always greater than 1, leading to two issues:
+>   1. Only the code paths for shared skbs can be tested.
+>   2. In certain situations, skbs can only be released by pktgen.
+> To enhance testing comprehensiveness, we are introducing the "SHARED"
+> flag to indicate whether an SKB is shared. This flag is enabled by
+> default, aligning with the current behavior. However, disabling this
+> flag allows skbs with a reference count of 1 to be transmitted.
+> So we can test non-shared skbs and code paths where skbs are released
+> within the stack.
+> 
+> Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
+> ---
+>  Documentation/networking/pktgen.rst | 13 ++++++++
+>  net/core/pktgen.c                   | 50 +++++++++++++++++++++++++----
+>  2 files changed, 56 insertions(+), 7 deletions(-)
+> 
+> diff --git a/Documentation/networking/pktgen.rst b/Documentation/networking/pktgen.rst
+> index 1225f0f63ff0..ffd976c0cbf0 100644
+> --- a/Documentation/networking/pktgen.rst
+> +++ b/Documentation/networking/pktgen.rst
+> @@ -178,6 +178,7 @@ Examples::
+>  			      IPSEC # IPsec encapsulation (needs CONFIG_XFRM)
+>  			      NODE_ALLOC # node specific memory allocation
+>  			      NO_TIMESTAMP # disable timestamping
+> +			      SHARED # enable shared SKB
+>   pgset 'flag ![name]'    Clear a flag to determine behaviour.
+>  			 Note that you might need to use single quote in
+>  			 interactive mode, so that your shell wouldn't expand
+> @@ -288,6 +289,17 @@ To avoid breaking existing testbed scripts for using AH type and tunnel mode,
+>  you can use "pgset spi SPI_VALUE" to specify which transformation mode
+>  to employ.
+>  
+> +Disable shared SKB
+> +==================
+> +By default, SKBs sent by pktgen are shared (user count > 1).
+> +If you need to test with non-shared SKBs, you can remove the "SHARED" flag
+> +by simply setting::
+> +
+> +	pg_set "flag !SHARED"
+> +
+> +However, if the "clone_skb," "burst," or "count" parameters are configured,
+> +the skb still needs to be held by pktgen for further access. Hence the skb
+> +must be shared.
+>  
+>  Current commands and configuration options
+>  ==========================================
+> @@ -357,6 +369,7 @@ Current commands and configuration options
+>      IPSEC
+>      NODE_ALLOC
+>      NO_TIMESTAMP
+> +    SHARED
+>  
+>      spi (ipsec)
+>  
+> diff --git a/net/core/pktgen.c b/net/core/pktgen.c
+> index f56b8d697014..3cf00090cf09 100644
+> --- a/net/core/pktgen.c
+> +++ b/net/core/pktgen.c
+> @@ -200,6 +200,7 @@
+>  	pf(VID_RND)		/* Random VLAN ID */			\
+>  	pf(SVID_RND)		/* Random SVLAN ID */			\
+>  	pf(NODE)		/* Node memory alloc*/			\
+> +	pf(SHARED)		/* Shared SKB */			\
+>  
+>  #define pf(flag)		flag##_SHIFT,
+>  enum pkt_flags {
+> @@ -1198,7 +1199,8 @@ static ssize_t pktgen_if_write(struct file *file,
+>  		    ((pkt_dev->xmit_mode == M_NETIF_RECEIVE) ||
+>  		     !(pkt_dev->odev->priv_flags & IFF_TX_SKB_SHARING)))
+>  			return -ENOTSUPP;
+> -		if (value > 0 && pkt_dev->n_imix_entries > 0)
+> +		if (value > 0 && (pkt_dev->n_imix_entries > 0 ||
+> +				  !(pkt_dev->flags & F_SHARED)))
+>  			return -EINVAL;
 
-If people are fine with this could we perhaps get it applied on a branch
-with a tag?  That way we could cut down the size of the series a little
-and I could apply the generic ASoC bit too, neither of the two patches
-have any dependency on the actual hardware.
+I see that imix uses EINVAL but I would suggest to add the new check to
+the previous condition which returns -ENOTSUPP. A value like "clone_skb
+1" is not invalid by itself.
 
---3d4xnD0OBUXwj5Mp
-Content-Type: application/pgp-signature; name="signature.asc"
+>  
+>  		i += len;
+> @@ -1212,6 +1214,9 @@ static ssize_t pktgen_if_write(struct file *file,
+>  		if (len < 0)
+>  			return len;
+>  
+> +		if ((value > 0) && !(pkt_dev->flags & F_SHARED))
+> +			return -EINVAL;
+> +
 
------BEGIN PGP SIGNATURE-----
+I think the restriction on count == 0 can be dropped by adding the
+following changes, do you agree?
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmUB6oMACgkQJNaLcl1U
-h9C6Xgf/eVzH2ZK88zsRlmvtdc+p6XZjgKPJFkUlIhE9Ma70SkaA+GvjpzFrSISC
-0oFzEllaNXg3QA5Dql2eFFYQgtr5ubist5gEg7ySisIk/3GFEx1+bOqfE8Hd0wxS
-EOmSRrnORoEywUsp1tI/CIh6s+FkPAwH0ZLtXwvWiKeWjQc8q9wKDnqqahC84N6Q
-NESewhcaX2cQNfQXdyKGrnV9RVVSaVml3mQ4OvcjG21+FFq8IFvmn1HuLyhzj7ka
-ACjNRWS9xgBsIqVyOOaYB2Ji62cf+WK4/DJig11BI34n9N7Tnbi80+kb0JX/WVno
-ncpqIK4/jpD4JNn+BxeAIiICNG0cQw==
-=nBcU
------END PGP SIGNATURE-----
+diff --git a/net/core/pktgen.c b/net/core/pktgen.c
+index 3cf00090cf09..6fe19783b060 100644
+--- a/net/core/pktgen.c
++++ b/net/core/pktgen.c
+@@ -1214,9 +1214,6 @@ static ssize_t pktgen_if_write(struct file *file,
+ 		if (len < 0)
+ 			return len;
+ 
+-		if ((value > 0) && !(pkt_dev->flags & F_SHARED))
+-			return -EINVAL;
+-
+ 		i += len;
+ 		pkt_dev->count = value;
+ 		sprintf(pg_result, "OK: count=%llu",
+@@ -1344,12 +1341,12 @@ static ssize_t pktgen_if_write(struct file *file,
+ 
+ 		if (flag) {
+ 			if (disable) {
+-				/* If "clone_skb", "burst", or "count" parameters are
++				/* If "clone_skb" or "burst" parameters are
+ 				 * configured, it means that the skb still needs to be
+ 				 * referenced by the pktgen, so the skb must be shared.
+ 				 */
+ 				if (flag == F_SHARED && (pkt_dev->clone_skb ||
+-							 pkt_dev->burst > 1 || pkt_dev->count))
++							 pkt_dev->burst > 1))
+ 					return -EINVAL;
+ 				pkt_dev->flags &= ~flag;
+ 			} else {
+@@ -3623,7 +3620,8 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
+ 
+ 	/* If pkt_dev->count is zero, then run forever */
+ 	if ((pkt_dev->count != 0) && (pkt_dev->sofar >= pkt_dev->count)) {
+-		pktgen_wait_for_skb(pkt_dev);
++		if (pkt_dev->skb)
++			pktgen_wait_for_skb(pkt_dev);
+ 
+ 		/* Done with this */
+ 		pktgen_stop_device(pkt_dev);
 
---3d4xnD0OBUXwj5Mp--
+
+>  		i += len;
+>  		pkt_dev->count = value;
+>  		sprintf(pg_result, "OK: count=%llu",
+> @@ -1257,6 +1262,10 @@ static ssize_t pktgen_if_write(struct file *file,
+>  		     ((pkt_dev->xmit_mode == M_START_XMIT) &&
+>  		     (!(pkt_dev->odev->priv_flags & IFF_TX_SKB_SHARING)))))
+>  			return -ENOTSUPP;
+> +
+> +		if ((value > 1) && !(pkt_dev->flags & F_SHARED))
+> +			return -EINVAL;
+> +
+
+Please integrate the new check with the existing ones in the 'if' just
+above.
+
+>  		pkt_dev->burst = value < 1 ? 1 : value;
+>  		sprintf(pg_result, "OK: burst=%u", pkt_dev->burst);
+>  		return count;
+> @@ -1334,10 +1343,18 @@ static ssize_t pktgen_if_write(struct file *file,
+>  		flag = pktgen_read_flag(f, &disable);
+>  
+>  		if (flag) {
+> -			if (disable)
+> +			if (disable) {
+> +				/* If "clone_skb", "burst", or "count" parameters are
+> +				 * configured, it means that the skb still needs to be
+> +				 * referenced by the pktgen, so the skb must be shared.
+> +				 */
+> +				if (flag == F_SHARED && (pkt_dev->clone_skb ||
+> +							 pkt_dev->burst > 1 || pkt_dev->count))
+> +					return -EINVAL;
+
+netdev uses an 80 column limit
+https://github.com/kuba-moo/nipa/blob/853db1f2a67758d839324920f7319b94630efd17/tests/patch/checkpatch/checkpatch.sh#L16
+
+>  				pkt_dev->flags &= ~flag;
+> -			else
+> +			} else {
+>  				pkt_dev->flags |= flag;
+> +			}
+>  		} else {
+>  			sprintf(pg_result,
+>  				"Flag -:%s:- unknown\nAvailable flags, (prepend ! to un-set flag):\n%s",
+> @@ -1350,7 +1367,8 @@ static ssize_t pktgen_if_write(struct file *file,
+>  #ifdef CONFIG_XFRM
+>  				"IPSEC, "
+>  #endif
+> -				"NODE_ALLOC\n");
+> +				"NODE_ALLOC, "
+> +				"SHARED\n");
+
+This triggers a checkpatch warning. How about cleaning that code up in a
+preceding patch to use pkt_flag_names[] instead?
+
+>  			return count;
+>  		}
+>  		sprintf(pg_result, "OK: flags=0x%x", pkt_dev->flags);
+> @@ -3483,7 +3501,8 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
+>  	if (pkt_dev->xmit_mode == M_NETIF_RECEIVE) {
+>  		skb = pkt_dev->skb;
+>  		skb->protocol = eth_type_trans(skb, skb->dev);
+> -		refcount_add(burst, &skb->users);
+> +		if (pkt_dev->flags & F_SHARED)
+> +			refcount_add(burst, &skb->users);
+>  		local_bh_disable();
+>  		do {
+>  			ret = netif_receive_skb(skb);
+> @@ -3491,6 +3510,10 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
+>  				pkt_dev->errors++;
+>  			pkt_dev->sofar++;
+>  			pkt_dev->seq_num++;
+> +			if (unlikely(!(pkt_dev->flags & F_SHARED))) {
+> +				pkt_dev->skb = NULL;
+> +				break;
+> +			}
+>  			if (refcount_read(&skb->users) != burst) {
+>  				/* skb was queued by rps/rfs or taps,
+>  				 * so cannot reuse this skb
+> @@ -3509,7 +3532,8 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
+>  		goto out; /* Skips xmit_mode M_START_XMIT */
+>  	} else if (pkt_dev->xmit_mode == M_QUEUE_XMIT) {
+>  		local_bh_disable();
+> -		refcount_inc(&pkt_dev->skb->users);
+> +		if (pkt_dev->flags & F_SHARED)
+> +			refcount_inc(&pkt_dev->skb->users);
+>  
+>  		ret = dev_queue_xmit(pkt_dev->skb);
+>  		switch (ret) {
+> @@ -3517,8 +3541,13 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
+>  			pkt_dev->sofar++;
+>  			pkt_dev->seq_num++;
+>  			pkt_dev->tx_bytes += pkt_dev->last_pkt_size;
+> +			if (!(pkt_dev->flags & F_SHARED))
+> +				pkt_dev->skb = NULL;
+>  			break;
+>  		case NET_XMIT_DROP:
+> +			if (!(pkt_dev->flags & F_SHARED))
+> +				pkt_dev->skb = NULL;
+> +			fallthrough;
+>  		case NET_XMIT_CN:
+>  		/* These are all valid return codes for a qdisc but
+>  		 * indicate packets are being dropped or will likely
+
+This patch introduces almost the same use after free problem as v1.
+Please take the time to look at the existing code to understand the
+cases when a skb refcount is dropped by the stack.
+
+This time the problem can be triggered with:
+ip link add dummy0 up type dummy
+tc qdisc add dev dummy0 root pfifo_head_drop limit 0
+And then run pktgen on dummy0 with "flag !SHARED" and "xmit_mode
+queue_xmit"
 
