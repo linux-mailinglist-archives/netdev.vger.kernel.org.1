@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-33549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B69779E7FC
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 14:30:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 764AB79E80F
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 14:31:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9D401C20C48
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 12:30:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2FB5A281DE6
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 12:31:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E79F1EA95;
-	Wed, 13 Sep 2023 12:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B9F51DDC3;
+	Wed, 13 Sep 2023 12:31:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 604E33D388
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 12:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE712AB2D
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 12:31:32 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 776B11BDD;
-	Wed, 13 Sep 2023 05:30:35 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75DE11BC7;
+	Wed, 13 Sep 2023 05:31:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694608235; x=1726144235;
+  t=1694608291; x=1726144291;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=zQpj7OaTDonluY2E3OGQf5kVh3FqltWnatkxOc0duHk=;
-  b=eDfgN0MfyQUdB5ZYrBp0kmgE5KJ/Hn6imRmwhkLYeSWBAMDQO4Qwdbx9
-   RAFTBcjqI6eZwr0LlRJoTP/iom81QI1Wfhr/NPMjkKv8tnvm8/PmXVtOy
-   48iCNCzjUXeHnf1iQDrStnH3EbPKmltJHNSmbgiX818BqcrzeeC6YuRF8
-   WurnHQwNdY25crh9NlxWu/g00Ef/uFSA0m87I/T/EUIMKUo8C3rSFYQeW
-   VLwGKBgYadRL1NFtp7veXPXV6fdFVyuzEYe6pja4I4MA+FACELjyQApeu
-   30uy+1Td5n5XuVKpt0qXkjuLmp9o0ZJ1hXKgxPNdqj4W1kJq+FR6KIj2F
+  bh=h23ccGE5WuEhEsJ1piAqm7UfKXwPFLCCzGvyJoEQsXM=;
+  b=bWkO0aC09I1gdaes/RX+cM0ugVa/3UYNJWcHpRnDBJKOQIggO0mMpZSL
+   9aH6LMHEBeBF/X+qbgwtb5ie3XarYzwXvcOV8sUe1l/mCcKxIFGWWDgUG
+   YtcgF4bJMVBI9xz6Iy5ImddTm4Vxn2dROICi4XOfa5JFDRfXOOum/+t0K
+   4YVjX+mVXhTto/PF/EmqzNhOzko70nB0r9PM9Eq3kTNCvk5iStdwKUQXe
+   g2aRXGFMd7uicibFe61R6BgSF6oSRwZDjNfJTDdGRz/T1RyCWHVLpd8TA
+   UZdLdAmLh/zebxSN21vmYj6S3EWxKKF/CqQcDiKABsI64lKDzTTobVUIn
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="368912417"
+X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="368912633"
 X-IronPort-AV: E=Sophos;i="6.02,143,1688454000"; 
-   d="scan'208";a="368912417"
+   d="scan'208";a="368912633"
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 05:28:12 -0700
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 05:28:37 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="693836628"
+X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="693836688"
 X-IronPort-AV: E=Sophos;i="6.02,143,1688454000"; 
-   d="scan'208";a="693836628"
+   d="scan'208";a="693836688"
 Received: from pakurapo-mobl3.ger.corp.intel.com (HELO ijarvine-mobl2.ger.corp.intel.com) ([10.249.45.213])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 05:28:08 -0700
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 05:28:33 -0700
 From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
 To: Jonathan Cameron <Jonathan.Cameron@Huawei.com>,
 	linux-pci@vger.kernel.org,
@@ -60,9 +60,9 @@ To: Jonathan Cameron <Jonathan.Cameron@Huawei.com>,
 	linux-kernel@vger.kernel.org
 Cc: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
 	Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Subject: [PATCH v2 03/10] igb: Use FIELD_GET() to extract Link Width
-Date: Wed, 13 Sep 2023 15:27:41 +0300
-Message-Id: <20230913122748.29530-4-ilpo.jarvinen@linux.intel.com>
+Subject: [PATCH v2 09/10] e1000e: Use PCI_EXP_LNKSTA_NLW & FIELD_GET() instead of custom defines/code
+Date: Wed, 13 Sep 2023 15:27:47 +0300
+Message-Id: <20230913122748.29530-10-ilpo.jarvinen@linux.intel.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20230913122748.29530-1-ilpo.jarvinen@linux.intel.com>
 References: <20230913122748.29530-1-ilpo.jarvinen@linux.intel.com>
@@ -75,39 +75,55 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Use FIELD_GET() to extract PCIe Negotiated Link Width field instead of
-custom masking and shifting.
+e1000e has own copy of PCI Negotiated Link Width field defines. Use the
+one from include/uapi/linux/pci_regs.h instead of the custom ones and
+remove the custom ones. Also convert to use FIELD_GET().
 
+Suggested-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 ---
- drivers/net/ethernet/intel/igb/e1000_mac.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/intel/e1000e/defines.h | 2 --
+ drivers/net/ethernet/intel/e1000e/mac.c     | 7 ++++---
+ 2 files changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/igb/e1000_mac.c b/drivers/net/ethernet/intel/igb/e1000_mac.c
-index caf91c6f52b4..5a23b9cfec6c 100644
---- a/drivers/net/ethernet/intel/igb/e1000_mac.c
-+++ b/drivers/net/ethernet/intel/igb/e1000_mac.c
-@@ -1,6 +1,7 @@
+diff --git a/drivers/net/ethernet/intel/e1000e/defines.h b/drivers/net/ethernet/intel/e1000e/defines.h
+index 63c3c79380a1..a4d29c9e03a6 100644
+--- a/drivers/net/ethernet/intel/e1000e/defines.h
++++ b/drivers/net/ethernet/intel/e1000e/defines.h
+@@ -681,8 +681,6 @@
+ #define PCIE_LINK_STATUS             0x12
+ 
+ #define PCI_HEADER_TYPE_MULTIFUNC    0x80
+-#define PCIE_LINK_WIDTH_MASK         0x3F0
+-#define PCIE_LINK_WIDTH_SHIFT        4
+ 
+ #define PHY_REVISION_MASK      0xFFFFFFF0
+ #define MAX_PHY_REG_ADDRESS    0x1F  /* 5 bit address bus (0-0x1F) */
+diff --git a/drivers/net/ethernet/intel/e1000e/mac.c b/drivers/net/ethernet/intel/e1000e/mac.c
+index 5df7ad93f3d7..5340cf73778d 100644
+--- a/drivers/net/ethernet/intel/e1000e/mac.c
++++ b/drivers/net/ethernet/intel/e1000e/mac.c
+@@ -1,6 +1,8 @@
  // SPDX-License-Identifier: GPL-2.0
- /* Copyright(c) 2007 - 2018 Intel Corporation. */
+ /* Copyright(c) 1999 - 2018 Intel Corporation. */
  
 +#include <linux/bitfield.h>
- #include <linux/if_ether.h>
- #include <linux/delay.h>
- #include <linux/pci.h>
-@@ -50,9 +51,8 @@ s32 igb_get_bus_info_pcie(struct e1000_hw *hw)
- 			break;
- 		}
++
+ #include "e1000.h"
  
+ /**
+@@ -25,9 +27,8 @@ s32 e1000e_get_bus_info_pcie(struct e1000_hw *hw)
+ 		pci_read_config_word(adapter->pdev,
+ 				     cap_offset + PCIE_LINK_STATUS,
+ 				     &pcie_link_status);
 -		bus->width = (enum e1000_bus_width)((pcie_link_status &
--						     PCI_EXP_LNKSTA_NLW) >>
--						     PCI_EXP_LNKSTA_NLW_SHIFT);
+-						     PCIE_LINK_WIDTH_MASK) >>
+-						    PCIE_LINK_WIDTH_SHIFT);
 +		bus->width = (enum e1000_bus_width)FIELD_GET(PCI_EXP_LNKSTA_NLW,
 +							     pcie_link_status);
  	}
  
- 	reg = rd32(E1000_STATUS);
+ 	mac->ops.set_lan_id(hw);
 -- 
 2.30.2
 
