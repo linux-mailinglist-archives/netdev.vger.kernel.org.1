@@ -1,123 +1,153 @@
-Return-Path: <netdev+bounces-33440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0717A79DFDF
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 08:18:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F40A79DFEA
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 08:20:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1927F1C20B04
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 06:18:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3898D2817A3
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 06:20:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 544D315AC5;
-	Wed, 13 Sep 2023 06:18:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CABEF1640C;
+	Wed, 13 Sep 2023 06:19:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48D621C29
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 06:18:07 +0000 (UTC)
-Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C05EA172E;
-	Tue, 12 Sep 2023 23:18:06 -0700 (PDT)
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 38D6HuuB060351;
-	Wed, 13 Sep 2023 01:17:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1694585876;
-	bh=KTEy4fLTR0uFXToGRqCZmDU06j1oqTsEPOhr5SqQt1Y=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=Fh8KV2D3DXUvT7B5UrdWGZ7kNtekZyl4eZoshrfgu3ExQcWGq/AHI1kGQlxTkrTa0
-	 FDhh7hvnmWOHEQmtDiseLsA1Q/1hR8EQBnoHdK5NmLfcrf7NzPJFyHoF+wJo+Phy+9
-	 G0HGy6LiEwDhCreBw5o8Wy8G6BcAnnGqN+ADrCl0=
-Received: from DLEE100.ent.ti.com (dlee100.ent.ti.com [157.170.170.30])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 38D6HuCc013445
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 13 Sep 2023 01:17:56 -0500
-Received: from DLEE111.ent.ti.com (157.170.170.22) by DLEE100.ent.ti.com
- (157.170.170.30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 13
- Sep 2023 01:17:56 -0500
-Received: from lelv0327.itg.ti.com (10.180.67.183) by DLEE111.ent.ti.com
- (157.170.170.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 13 Sep 2023 01:17:56 -0500
-Received: from [10.24.69.199] (ileaxei01-snat.itg.ti.com [10.180.69.5])
-	by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id 38D6Hol5073331;
-	Wed, 13 Sep 2023 01:17:51 -0500
-Message-ID: <73ec102b-94de-e5ca-f425-8228bf5e2511@ti.com>
-Date: Wed, 13 Sep 2023 11:47:50 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B525215AE9
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 06:19:53 +0000 (UTC)
+Received: from mail-ot1-f80.google.com (mail-ot1-f80.google.com [209.85.210.80])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC7FC1730
+	for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 23:19:52 -0700 (PDT)
+Received: by mail-ot1-f80.google.com with SMTP id 46e09a7af769-6b9f057f6daso6499712a34.0
+        for <netdev@vger.kernel.org>; Tue, 12 Sep 2023 23:19:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694585992; x=1695190792;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Qm6f4RGkzYtG8ypj34ipT+n6BCPW3HEasexrRCREDnM=;
+        b=GMmb42y7ANfFvm+vMyMJkp/cqzw6LDAjWyljOJPS5c8UpW1UYGJ0Qvkjy+1p6b3i8q
+         huDwlpEQKs0PAKC3HMJ48vd2WeRIQhTMos0c7Y0/MA4VXEL891WjRODwpvKzQHaJtCED
+         L/5ntaTeXpVE6eq0kpIxnA3YMc7YJDFJQQwocMNM9kPjmgCgjUwCKyUWoObrg8XoIzrM
+         nwa9MklB54an9y/l4+uow7P52nOgl93odrTvkmnm5vYppbbfIrtkXLOapcBkA7xYoGQg
+         XaULIDlIoYjsjfO8J/mXQ8ms+5arXS0Kb9yNZ/wEjElofqv/NZfqcEvbsCHIHiViNRwg
+         8Zwg==
+X-Gm-Message-State: AOJu0YwF2ocEa3YevbzZ3PYWVm6En3ckn2HZMxLXyUR8Xrx6yDZdbQOm
+	x1rpECBCzd61Ca9qrFGMCYfx7yoLHkr/IvQEOIMUwDMXoL9J
+X-Google-Smtp-Source: AGHT+IHqQa6THb/fPEtlTGw/PkqP44GfmiYhQoQbeCNAKHqeyse991U74CWQV8S4K2X3x33+4ye1RQEuV9m4mdpC/6z6Ux1YIpfb
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-Subject: Re: [EXTERNAL] Re: [PATCH net-next v2 1/2] dt-bindings: net: Add
- documentation for Half duplex support.
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Rob Herring <robh@kernel.org>, Roger Quadros <rogerq@ti.com>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Paolo Abeni <pabeni@redhat.com>, Jakub
- Kicinski <kuba@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Simon
- Horman <horms@kernel.org>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>, <srk@ti.com>,
-        <r-gunasekaran@ti.com>, Roger Quadros <rogerq@kernel.org>
-References: <20230911060200.2164771-1-danishanwar@ti.com>
- <20230911060200.2164771-2-danishanwar@ti.com>
- <20230911164628.GA1295856-robh@kernel.org>
- <0c23d883-0a79-ee7c-332c-c6580f8691df@ti.com>
- <90b3e6cc-7246-4d02-bd0f-2ce7847bc261@lunn.ch>
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <90b3e6cc-7246-4d02-bd0f-2ce7847bc261@lunn.ch>
+X-Received: by 2002:a05:6830:1d77:b0:6b9:97f6:655 with SMTP id
+ l23-20020a0568301d7700b006b997f60655mr455389oti.2.1694585992251; Tue, 12 Sep
+ 2023 23:19:52 -0700 (PDT)
+Date: Tue, 12 Sep 2023 23:19:52 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000001c12b30605378ce8@google.com>
+Subject: [syzbot] [net?] WARNING in __ip6_append_data
+From: syzbot <syzbot+62cbf263225ae13ff153@syzkaller.appspotmail.com>
+To: bpf@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org, 
+	edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-On 12/09/23 20:46, Andrew Lunn wrote:
->> Sure Rob, I will change the description to below.
->>
->>     description:
->>       Indicates that the PHY output pin (COL) is routed to ICSSG GPIO
-> 
-> The PHY has multiple output pins, so i would not put COL in brackets,
-> but make it explicit which pin you are referring to.
-> 
+Hello,
 
-Sure, I will remove the brackets and make it explicit.
+syzbot found the following issue on:
 
->>       pin (PRGx_PRU0/1_GPIO10) as input and ICSSG MII port is capable
->>       of half duplex operations.
-> 
-> "input and so the ICSSG MII port is"
-> 
+HEAD commit:    65d6e954e378 Merge tag 'gfs2-v6.5-rc5-fixes' of git://git...
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=142177f4680000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b273cdfbc13e9a4b
+dashboard link: https://syzkaller.appspot.com/bug?extid=62cbf263225ae13ff153
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11f37a0c680000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10034f3fa80000
 
-I think "input so that the ICSSG MII port is" will be better.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/74df7181e630/disk-65d6e954.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/8455d5988dfe/vmlinux-65d6e954.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/8ee7b79f0dfd/bzImage-65d6e954.xz
 
-The description would look something like below,
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+62cbf263225ae13ff153@syzkaller.appspotmail.com
 
-  description:
-    Indicates that the PHY output pin COL is routed to ICSSG GPIO pin
-    (PRGx_PRU0/1_GPIO10) as input so that the ICSSG MII port is
-    capable of half duplex operations.
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 5042 at net/ipv6/ip6_output.c:1800 __ip6_append_data.isra.0+0x1be8/0x47f0 net/ipv6/ip6_output.c:1800
+Modules linked in:
+CPU: 1 PID: 5042 Comm: syz-executor133 Not tainted 6.5.0-syzkaller-11938-g65d6e954e378 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
+RIP: 0010:__ip6_append_data.isra.0+0x1be8/0x47f0 net/ipv6/ip6_output.c:1800
+Code: db f6 ff ff e8 09 d5 97 f8 49 8d 44 24 ff 48 89 44 24 60 49 8d 6c 24 07 e9 c2 f6 ff ff 4c 8b b4 24 90 01 00 00 e8 e8 d4 97 f8 <0f> 0b 48 8b 44 24 10 45 89 f4 48 8d 98 74 02 00 00 e8 d2 d4 97 f8
+RSP: 0018:ffffc90003a1f3b8 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: 0000000000001004 RCX: 0000000000000000
+RDX: ffff88801fe70000 RSI: ffffffff88efcf18 RDI: 0000000000000006
+RBP: 0000000000001000 R08: 0000000000000006 R09: 0000000000001004
+R10: 0000000000001000 R11: 0000000000000000 R12: 0000000000000001
+R13: dffffc0000000000 R14: 0000000000001004 R15: ffff888019f31000
+FS:  0000555557280380(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000000045ad50 CR3: 0000000072666000 CR4: 00000000003506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ ip6_append_data+0x1e6/0x510 net/ipv6/ip6_output.c:1895
+ l2tp_ip6_sendmsg+0xdf9/0x1cc0 net/l2tp/l2tp_ip6.c:631
+ inet_sendmsg+0x9d/0xe0 net/ipv4/af_inet.c:840
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ sock_sendmsg+0xd9/0x180 net/socket.c:753
+ splice_to_socket+0xade/0x1010 fs/splice.c:881
+ do_splice_from fs/splice.c:933 [inline]
+ direct_splice_actor+0x118/0x180 fs/splice.c:1142
+ splice_direct_to_actor+0x347/0xa30 fs/splice.c:1088
+ do_splice_direct+0x1af/0x280 fs/splice.c:1194
+ do_sendfile+0xb88/0x1390 fs/read_write.c:1254
+ __do_sys_sendfile64 fs/read_write.c:1322 [inline]
+ __se_sys_sendfile64 fs/read_write.c:1308 [inline]
+ __x64_sys_sendfile64+0x1d6/0x220 fs/read_write.c:1308
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7f6b11150469
+Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fffd14e71a8 EFLAGS: 00000246 ORIG_RAX: 0000000000000028
+RAX: ffffffffffffffda RBX: 00007fffd14e7378 RCX: 00007f6b11150469
+RDX: 0000000000000000 RSI: 0000000000000004 RDI: 0000000000000005
+RBP: 00007f6b111c3610 R08: 00007fffd14e7378 R09: 00007fffd14e7378
+R10: 000000010000a006 R11: 0000000000000246 R12: 0000000000000001
+R13: 00007fffd14e7368 R14: 0000000000000001 R15: 0000000000000001
+ </TASK>
 
-I will post the next version with this change.
 
->        Andrew
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
--- 
-Thanks and Regards,
-Danish
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
