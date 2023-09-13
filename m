@@ -1,124 +1,137 @@
-Return-Path: <netdev+bounces-33658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C14AB79F0DE
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 20:07:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20D9A79F0EE
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 20:12:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A211C1C20B1A
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 18:07:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDD59281990
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 18:12:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A678200CD;
-	Wed, 13 Sep 2023 18:06:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A653200C1;
+	Wed, 13 Sep 2023 18:12:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01FC6200B8;
-	Wed, 13 Sep 2023 18:06:38 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5306E19AF;
-	Wed, 13 Sep 2023 11:06:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694628398; x=1726164398;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=WlYbkPJZkUce+Ge4UcLmtKXlVZSqkCwT2W6g3hDwPqM=;
-  b=UnOBtai6lCKyyjQGFscZgWwg3tcOtrs5KMfCGJuNoHLC8Kmm1oV82a+N
-   OBjwlR2T5jMmJd8YqNz42rTNM7/5HRtUyEOSoFhWoIt/I7qANX5wha5Gy
-   riDwB0cYrmsiTt8u/r61NSXaLr7tx/4pLwy0bghh6D93j9yyLluTrWFdy
-   Qpq+bNJwV6W0vx9slKJaEADDarnqhUrgDLN9JoW1BFOrXuRMujq26YLP8
-   X9gd4iE/IXmV+UpFVG1Q8jzCWmyOvQBHjrJ3Be4uzlGDXyjwwT07b1kRl
-   SeagyvxfzyWts1p7VD2Ao7SHZ/1RQhAWQWekWMCLG7Kq/pT3bhpZCfq5y
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="378659437"
-X-IronPort-AV: E=Sophos;i="6.02,143,1688454000"; 
-   d="scan'208";a="378659437"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 11:06:34 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="747418209"
-X-IronPort-AV: E=Sophos;i="6.02,143,1688454000"; 
-   d="scan'208";a="747418209"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmsmga007.fm.intel.com with ESMTP; 13 Sep 2023 11:06:33 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	anthony.l.nguyen@intel.com,
-	sasha.neftin@intel.com,
-	maciej.fijalkowski@intel.com,
-	magnus.karlsson@intel.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	bpf@vger.kernel.org,
-	Ferenc Fejes <ferenc.fejes@ericsson.com>,
-	Naama Meir <naamax.meir@linux.intel.com>
-Subject: [PATCH net] igc: Fix infinite initialization loop with early XDP redirect
-Date: Wed, 13 Sep 2023 11:06:15 -0700
-Message-Id: <20230913180615.2116232-1-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.38.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B149AD52
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 18:12:24 +0000 (UTC)
+Received: from sipsolutions.net (unknown [IPv6:2a01:4f8:242:246e::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F241919B6;
+	Wed, 13 Sep 2023 11:12:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=M5bGmoUyQupKtGvvQEF+4JyDxHWZgmyPOatv62PK+Lo=;
+	t=1694628744; x=1695838344; b=fqtZmpMdJZCJxxa0Uu90BFUXm2D5DdfzjFeKWD8H+DEMpbN
+	w6HA052efdF35jLmeq3PDMPbob2aB9ZBIiirWIgt/LpJyQfpFqNkfgnbzFT8Y+tuF4H6atJBMNz+0
+	YFF5+DxMi7uXq1FVddLXkgLQaMdyylK75KSJFpvWZFQxoxw1DDdgPAlufHiT0ciDCbwJlm113wOX9
+	w3cIg0lg+GfU85nF+24vqJy4qknNkrooz4NoStLrYr7u8rvg40dFO1FSqZwG7FO2y7VTTgjc3zx+Q
+	/bNsNaL7zjvCUv6rkPWMc0aF1BWmvr3rDzFxxR94zohWPumB6fVPfN5TGMrfFKZw==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1qgUKz-00FFbN-1l;
+	Wed, 13 Sep 2023 20:11:41 +0200
+Message-ID: <515a7435bd83ecc8a9d63306d4bc076c762f22bf.camel@sipsolutions.net>
+Subject: Re: [PATCH v3] workqueue: don't skip lockdep work dependency in
+ cancel_work_sync()
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Guenter Roeck <linux@roeck-us.net>, Tetsuo Handa
+	 <penguin-kernel@i-love.sakura.ne.jp>
+Cc: Lai Jiangshan <jiangshanlai@gmail.com>, Tejun Heo <tj@kernel.org>, Hillf
+	Danton <hdanton@sina.com>, LKML <linux-kernel@vger.kernel.org>, Heyi Guo
+	 <guoheyi@linux.alibaba.com>, netdev@vger.kernel.org
+Date: Wed, 13 Sep 2023 20:11:39 +0200
+In-Reply-To: <a50218b6-fc42-7f12-155a-5e01fc8dd1a0@roeck-us.net>
+References: <21b9c1ac-64b7-7f4b-1e62-bf2f021fffcd@I-love.SAKURA.ne.jp>
+	 <YuK78Jiy12BJG/Tp@slm.duckdns.org>
+	 <0ad532b2-df5f-331a-ae7f-21460fc62fe2@I-love.SAKURA.ne.jp>
+	 <97cbf8a9-d5e1-376f-6a49-3474871ea6b4@I-love.SAKURA.ne.jp>
+	 <afa1ac2c-a023-a91e-e596-60931b38247e@I-love.SAKURA.ne.jp>
+	 <7d034f7b-af42-4dbc-0887-60f4bdb3dcca@I-love.SAKURA.ne.jp>
+	 <0a85696a-b0b9-0f4a-7c00-cd89edc9304c@I-love.SAKURA.ne.jp>
+	 <77d47eed-6a22-7e81-59de-4d45852ca4de@I-love.SAKURA.ne.jp>
+	 <e0717628-e436-4091-8b2e-2f4dcb646ec8@roeck-us.net>
+	 <6b1c6996da5d215371e164b54e8854541dee0ded.camel@sipsolutions.net>
+	 <a50218b6-fc42-7f12-155a-5e01fc8dd1a0@roeck-us.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-malware-bazaar: not-scanned
 
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+On Wed, 2023-09-13 at 08:59 -0700, Guenter Roeck wrote:
+>=20
+> So you are saying that anything running in a workqueue must not
+> acquire rtnl_lock because cancel_[delayed_]work_sync() may be called
+> under rtnl_lock.
 
-When an XDP redirect happens before the link is ready, that
-transmission will not finish and will timeout, causing an adapter
-reset. If the redirects do not stop, the adapter will not stop
-resetting.
+No no, sorry if I wasn't clear. I mean this particular function / work
+struct cannot acquire the RTNL because the cancel _for it_ is called
+under RTNL.
 
-Wait for the driver to signal that there's a carrier before allowing
-transmissions to proceed.
+It used to be that this was also tied to the entire workqueue, but this
+is no longer true due to the way workqueues work these days.
 
-Previous code was relying that when __IGC_DOWN is cleared, the NIC is
-ready to transmit as all the queues are ready, what happens is that
-the carrier presence will only be signaled later, after the watchdog
-workqueue has a chance to run. And during this interval (between
-clearing __IGC_DOWN and the watchdog running) if any transmission
-happens the timeout is emitted (detected by igc_tx_timeout()) which
-causes the reset, with the potential for the infinite loop.
 
-Fixes: 4ff320361092 ("igc: Add support for XDP_REDIRECT action")
-Reported-by: Ferenc Fejes <ferenc.fejes@ericsson.com>
-Closes: https://lore.kernel.org/netdev/0caf33cf6adb3a5bf137eeaa20e89b167c9986d5.camel@ericsson.com/
-Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Tested-by: Ferenc Fejes <ferenc.fejes@ericsson.com>
-Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Tested-by: Naama Meir <naamax.meir@linux.intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/igc/igc_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> FWIW, it would be nice if the lockdep code would generate some other
+> message in this situation. Complaining about a deadlock involving a
+> lock that doesn't exist if lock debugging isn't enabled is not really
+> helpful and, yes, may result in reporters to falsely assume that this
+> lock is responsible for the potential deadlock.
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 293b45717683..98de34d0ce07 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -6491,7 +6491,7 @@ static int igc_xdp_xmit(struct net_device *dev, int num_frames,
- 	struct igc_ring *ring;
- 	int i, drops;
- 
--	if (unlikely(test_bit(__IGC_DOWN, &adapter->state)))
-+	if (unlikely(!netif_carrier_ok(dev)))
- 		return -ENETDOWN;
- 
- 	if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
--- 
-2.38.1
+Well, I don't know of any way to tell lockdep that, but I guess ideas
+welcome? I mean, I'm not even sure what else it would tell you, other
+than that you have a deadlock?
 
+I mean, OK, I guess it's fair - it says "acquire lock" when it says
+
+[    9.810406] ip/357 is trying to acquire lock:
+[    9.810501] 83af6c40 ((work_completion)(&(&dev->state_queue)->work)){+.+=
+.}-{0:0}, at: __flush_work+0x40/0x550
+
+and it's not really a lock, but I'm not even sure how to phrase it
+better? Note the scenario may be more complex than here.
+
+I mean, perhaps we could add an optional message somehow and it could
+say
+
+"ip/357 is waiting for the work:"
+
+but then we'd also have to update the scenario message to something like
+
+[    9.813938]        CPU0                    CPU1
+[    9.813999]        ----                    ----
+[    9.814062]   lock(rtnl_mutex);
+[    9.814139]                                run((work_completion)(&(&dev-=
+>state_queue)->work));
+[    9.814258]                                lock(rtnl_mutex);
+[    9.814354]   wait((work_completion)(&(&dev->state_queue)->work));
+
+
+which is really hard to do because how should lockdep know that the two
+ways of "acquiring the lock" are actually different, and which one is
+which? I'm not even convinced it could really do that.
+
+In any case, I'd rather have a bug report from this than not, even if
+it's not trivial to read.
+
+
+... and here I thought we went through all of this 15+ years ago when I
+added it in commit 4e6045f13478 ("workqueue: debug flushing deadlocks
+with lockdep"), at which time the situation was actually worse because
+you had to not only pay attention to the work struct, but also the
+entire workqueue - which is today only true for ordered workqueues... Oh
+well :)
+
+johannes
 
