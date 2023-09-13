@@ -1,113 +1,118 @@
-Return-Path: <netdev+bounces-33555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B83679E878
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 14:58:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D101C79E884
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 15:00:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F8151C20C24
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 12:58:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C170280FB8
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 13:00:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D1451A713;
-	Wed, 13 Sep 2023 12:58:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2652D1A710;
+	Wed, 13 Sep 2023 13:00:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E31217F0
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 12:58:38 +0000 (UTC)
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A08B19BD
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 05:58:37 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59285f1e267so17003557b3.0
-        for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 05:58:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1897B3D6C
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 13:00:54 +0000 (UTC)
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29F631989;
+	Wed, 13 Sep 2023 06:00:54 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-52a40cf952dso8999985a12.2;
+        Wed, 13 Sep 2023 06:00:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1694609916; x=1695214716; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=DFT+AWTl7eLVy9AYroczgg2Se8+xyJps9lEPHLx/ixw=;
-        b=bwe6z0f7dqGwZ0w0QxqNleFNYaXiafP4x4+rAucZ4OIjhHc8wZH6ZQTQ4RJSXISIS4
-         vXy31wQp2xUpHXBtAxK6rgd6NE7GSZQuqCkqaHWnm/Mdvw9ibmeMW3lWgSUFSQW9cBW4
-         giBSwZXI/O3RsNz1F02GdNI3ey8p8OZgjbxHKD3UtHar0bc7S5K3tsJffnTbA8fjI5up
-         i6DBxQFfesTScCZ1mENBdlWrHDvTHmPAlkTjEP45xdYbH/OChnF6Gus1f/pvEKA8YAsQ
-         3YIakffoVypFGFYhJTMlBiI/BAjHnqHkp3oJP78egqFikHMdzWs31mM3h79NyZrV96fs
-         HzqA==
+        d=gmail.com; s=20221208; t=1694610052; x=1695214852; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=YrbAZ7p+q0hOYwba3y8YZqHpfIOsVvTzknQ/Q/Cixt4=;
+        b=h0yD0aAnv4+XqR7pucMoFGVVlvtqY7MRd1/KWFLgAV5vNJyqzVo6LvjTCyjF4VQ1BD
+         fmvucMUgGfxazxI6xob9M8E/N0OQ5bPpwFWnjEyjMrxcEhSSUQr/LeGXTE4paAIQt+gw
+         X4BRdAnPaZ0+HGgwAwQpKYituheU+gOBIWD5ZEolpFsVk0ZvS5s65h0NM6O2I4ShzzIZ
+         sa42Z591XrhF+7/+b0yecp4mP0teoZ+BqzA/ANIeRrHvrQcr14jmS0EHKnqHowPndOHf
+         eYrXXoI8pWezOXPQl3Nnkfg5Jr7TpAcFzoGmP1QMDsCokkEM6qdagnbL2t8Nb9Jber99
+         5dVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694609916; x=1695214716;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DFT+AWTl7eLVy9AYroczgg2Se8+xyJps9lEPHLx/ixw=;
-        b=L3Bfumc8m1okW6suxJgmiXpP2kO7W6+1xa2VP8WCaRbMUfNuan4G6oNo6F5IZPJAHP
-         eVdIZdYrtCZFxRhwgzsfJhETgdDJdD3wVDp58JzrQeK7b2CImJn6g6ujkF89v0DaNN9w
-         x90xO9vr7EeqUOeTGNjVKqBagTEMXqma9+M1j6Wf1P4DjHkodbDP7vVfk0ZZjT84/p7I
-         ShtTkaiuD9P1DefrzOD6kDZnvYSZHbTj4VyZZvBlxatFC5zXgHOzpuK3mAX1hmHnRaFR
-         1gtHQtXAtpMpzmbxqlfp+bPE0aAdVe6osarDCrt8F0pK72OyL4Uvg50Eyw+0wRvhWrsT
-         xogA==
-X-Gm-Message-State: AOJu0YzZIz02HJRnImJNJT4zfl0Aa0/F3FzvMLTBeXIfCMzX09EtrWr/
-	LnU6I64NBkGdHIllkxHr/BTGWVUi1L/NUQ==
-X-Google-Smtp-Source: AGHT+IE1QCqtKJowlrQn7tIPLx2D8Dpz3iCha9wHC1GSB5Ydu6Igl7ozGBG5RfNjSAT1Os/Shy29xyhsq7hGRg==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:1022:b0:ca3:3341:6315 with SMTP
- id x2-20020a056902102200b00ca333416315mr93496ybt.0.1694609916624; Wed, 13 Sep
- 2023 05:58:36 -0700 (PDT)
-Date: Wed, 13 Sep 2023 12:58:35 +0000
+        d=1e100.net; s=20230601; t=1694610052; x=1695214852;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YrbAZ7p+q0hOYwba3y8YZqHpfIOsVvTzknQ/Q/Cixt4=;
+        b=b4bLdaUqPbCOPBNYxzmCLPgaLcm6yQf1HvEdvNSpZYuPYSelH2pKgSc6GoiSGLgY0t
+         NXlCJUoj83/LUBlX1H9iwRkEPY1Sf8qIyI0Jiv3uo35omAOPY9mT+hf0UGgQUfhGvQwJ
+         Ck5b/6bA4bz4dO+8BdStwaWzF3SGCJzHcOWgqqVPOPM1AP82oFGTd5ENku21Gw3aBgb+
+         2kMNEkmQu0hZsIkr2vehTIy3x8m59tu1JlitKapgRY9gIMGngzgpet8dmOQm/IJyxd2A
+         NVsWRROX6MGis13C30dR5K0BIPS/oUO8SJEPb+z16pxbflXyR7YuT1zUrbpLfct7B9Wt
+         SUSg==
+X-Gm-Message-State: AOJu0YyzKm2T1j1AkuZGdHVyUGHPymgYm3qvOrknaZbOgAfgCYWbooHG
+	JHonphimhisMKNDMahwEMkY=
+X-Google-Smtp-Source: AGHT+IFZY1lZRYIGtnHSSLJ5Dv9nUSo3FSHlEpmP7yJBNk19dcocL3jmULDt3kHQBRqk+jZdLrELeg==
+X-Received: by 2002:a05:6402:743:b0:52f:b405:4f21 with SMTP id p3-20020a056402074300b0052fb4054f21mr2383088edy.7.1694610052353;
+        Wed, 13 Sep 2023 06:00:52 -0700 (PDT)
+Received: from skbuf ([188.26.184.93])
+        by smtp.gmail.com with ESMTPSA id j18-20020a50ed12000000b0052996528b81sm7285107eds.45.2023.09.13.06.00.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Sep 2023 06:00:52 -0700 (PDT)
+Date: Wed, 13 Sep 2023 16:00:49 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH 2/4] dt-bindings: net: dsa: document internal MDIO bus
+Message-ID: <20230913130049.ivvl4vzjcfedsddr@skbuf>
+References: <676d1a2b-6ffa-4aff-8bed-a749c373f5b3@arinc9.com>
+ <87325ce9-595a-4dda-a6a1-b5927d25719b@arinc9.com>
+ <20230911225126.rk23g3u3bzo3agby@skbuf>
+ <036c0763-f1b2-49ff-bc82-1ff16eec27ab@arinc9.com>
+ <20230912193450.h5s6miubag46z623@skbuf>
+ <6cec079e-991e-4222-a76d-d6156de0daca@arinc9.com>
+ <20230913074231.5azwxqjuv2wp5nik@skbuf>
+ <89c9b84c-574c-4071-9524-9207597a3f0a@arinc9.com>
+ <20230913110404.co7earmnbzf6hhoe@skbuf>
+ <137fd54d-7d2d-4d0b-a50b-cca69875a814@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
-Message-ID: <20230913125835.3445264-1-edumazet@google.com>
-Subject: [PATCH net-next] net: use indirect call helpers for sk->sk_prot->release_cb()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <137fd54d-7d2d-4d0b-a50b-cca69875a814@arinc9.com>
 
-When adding sk->sk_prot->release_cb() call from __sk_flush_backlog()
-Paolo suggested using indirect call helpers to take care of
-CONFIG_RETPOLINE=y case.
+On Wed, Sep 13, 2023 at 02:35:11PM +0300, Arınç ÜNAL wrote:
+> On 13.09.2023 14:04, Vladimir Oltean wrote:
+> > I don't think they're for switch ports only. Any driver which uses
+> > phylink_fwnode_phy_connect() or its derivatives gets subject to the same
+> > bindings. But putting the sub-schema in ethernet-controller.yaml makes
+> > sense, just maybe not naming it "phylink-switch".
+> 
+> Got it. Should we disallow managed altogether when fixed-link is also
+> defined, or just with in-band-status value?
 
-It turns out Google had such mitigation for years in release_sock(),
-it is time to make this public :)
-
-Suggested-by: Paolo Abeni <pabeni@redhat.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/core/sock.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/net/core/sock.c b/net/core/sock.c
-index bb89b88bc1e8a042c4ee40b3c8345dc58cb1b369..969b11ede8cd8c08138a8164279b4e5923f825e6 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -3003,7 +3003,9 @@ void __sk_flush_backlog(struct sock *sk)
- 	__release_sock(sk);
- 
- 	if (sk->sk_prot->release_cb)
--		sk->sk_prot->release_cb(sk);
-+		INDIRECT_CALL_INET_1(sk->sk_prot->release_cb,
-+				     tcp_release_cb, sk);
-+
- 	spin_unlock_bh(&sk->sk_lock.slock);
- }
- EXPORT_SYMBOL_GPL(__sk_flush_backlog);
-@@ -3523,7 +3525,8 @@ void release_sock(struct sock *sk)
- 		__release_sock(sk);
- 
- 	if (sk->sk_prot->release_cb)
--		sk->sk_prot->release_cb(sk);
-+		INDIRECT_CALL_INET_1(sk->sk_prot->release_cb,
-+				     tcp_release_cb, sk);
- 
- 	sock_release_ownership(sk);
- 	if (waitqueue_active(&sk->sk_lock.wq))
--- 
-2.42.0.283.g2d96d420d3-goog
-
+Just with the "in-band-status" value - just like phylink_parse_mode()
+implies. If not possible, just leave that condition out.
 
