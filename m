@@ -1,233 +1,150 @@
-Return-Path: <netdev+bounces-33656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38FC879F0DC
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 20:06:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 97C3E79F0DD
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 20:06:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6FE3281690
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 18:06:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F4972814AA
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 18:06:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6A20200CF;
-	Wed, 13 Sep 2023 18:04:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94B51200BF;
+	Wed, 13 Sep 2023 18:04:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3CD422EE1
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 18:04:28 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DF1D19AE
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 11:04:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694628268; x=1726164268;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=26/CiIvt/6qb74d+P2hyZxrt+8O2E0LWkiNjTyDa9Wg=;
-  b=EyH9PaSIyMD9Bhhrz7Opb2UHGJEcBDMskaEU8mGJTb6QOd9PTjAaHMYT
-   ZAF8zucVaibMxnT6rA1pYA8f/O8v/FNtrl0izx5JkDeS4Acltvxoz0UJw
-   fea6ZShbSUmhsv5TkFFR9KFQkBG6TwoUkBF05a7vX+vcOMTRAKNi7TAxe
-   Ct000hWPg3T2ZAmFzTOi1FVuNCdux2pn8Ob71/v2pSbyK9tfsXEAQaHqD
-   /u4ap+sn0jebM9p9AANi8MOa/SFuOBK72fh5RGLg1ccEieQe3L9K83CD1
-   34cBaKuDZ573MDEeaw6/MXV4Fe0E4TYAsBxr2jFBC449l6j7DlRIGmcwU
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="378658471"
-X-IronPort-AV: E=Sophos;i="6.02,143,1688454000"; 
-   d="scan'208";a="378658471"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 11:03:56 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10832"; a="747417174"
-X-IronPort-AV: E=Sophos;i="6.02,143,1688454000"; 
-   d="scan'208";a="747417174"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmsmga007.fm.intel.com with ESMTP; 13 Sep 2023 11:03:55 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Norbert Zulinski <norbertx.zulinski@intel.com>,
-	anthony.l.nguyen@intel.com,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: [PATCH net-next 4/4] iavf: Add ability to turn off CRC stripping for VF
-Date: Wed, 13 Sep 2023 11:03:34 -0700
-Message-Id: <20230913180334.2116162-5-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20230913180334.2116162-1-anthony.l.nguyen@intel.com>
-References: <20230913180334.2116162-1-anthony.l.nguyen@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF5E200BA
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 18:04:48 +0000 (UTC)
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC5BA19AF
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 11:04:47 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-501bd164fbfso126608e87.0
+        for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 11:04:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1694628286; x=1695233086; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fNsgE5MDTbRQ5HIO/G/tH1SLpYyQIm/4XdiBisvcDVg=;
+        b=rPqwWUHeK9VLVzqIU0nB++ocKrOzWdVPTahtNabWHSX5ZfdiHCeB8ptai/okg+t4gi
+         8fKrex0Dl9k+RsbMBDpYJrnUMyJDOGXOrCmMgnNLsLsh2PJ/8OAR/RGpRtHeZZRlxm5x
+         NM7oaKRk1EeY2XiEdN2iaZusAOrz6iBVYnbKBZcamKP5QhsQo39rl0ylig8eyrK8TZ4V
+         C5Gm+Cpt3pZ3iJMEQZa/im4mlj6DE5JcE+fHt2WFcTZeaKuZacsSCkWSoSBLFrhuHWUx
+         fWXzLuVLfL7JW9i9uz35iTjqUaTpipVaRTtN7rfbakFlVXBcJLShABWg86X4EuCQR6y7
+         wPDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694628286; x=1695233086;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fNsgE5MDTbRQ5HIO/G/tH1SLpYyQIm/4XdiBisvcDVg=;
+        b=XFjhJ6unK0LOJ3xlLF6e2ahKpwUN8HAsCDWsVmC9/RdDvHp1DeGdBxBOFDhpmpy/C1
+         gy4Ckti6vofQrs4NXLZ+gQl6VWT5fO8zsqDRuw6YR/YtwyuZuJfU352kvIo55ADmsThX
+         DThZM4hK0SkG3Ku77YeWuk8mKVA5l+kcDPsfeznnSZhpWV6GG8LoNoFNB6lGik+PIjh5
+         iypkwp+jgQ2p8yuqc3Kvvg6Ukngw6nDvgZ+Q1Xu1Fp+P2wHAMfkR9HQE9iJGLKsypmEI
+         g1MIlZTP1mUoTY5tFe4aWqy6MkNpP70uPC2NfStqGreMQ5HKJEOWouwKOpFeqG9aih73
+         jUDQ==
+X-Gm-Message-State: AOJu0YwtsyvId7093bw+7Vcx5pTVGTZjnmygS1TKiBAYr5nKdrhs31bj
+	NFMZ4tDcG2tpI8jY7vNHMyOSnzFZcpkqEm5kqAHllA==
+X-Google-Smtp-Source: AGHT+IFkkEmySG5asgqEgvgZoofccFn96biiUHkRg+A6EwCjxx9cN2qIufD7u0GWLmpT29SxQW0dtd/DLMM/OIsZlSg=
+X-Received: by 2002:a05:6512:21b1:b0:500:a08e:2fd3 with SMTP id
+ c17-20020a05651221b100b00500a08e2fd3mr2175478lft.21.1694628285777; Wed, 13
+ Sep 2023 11:04:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20230912013332.2048422-1-jrife@google.com> <65006891779ed_25e754294b8@willemb.c.googlers.com.notmuch>
+ <1ca3ca8a-6185-bc55-de74-53991ffc6f91@iogearbox.net> <CADKFtnTOD2+7B5tH8YMHEnxubiG+Cs+t8EhTft+q51YwxjW9xw@mail.gmail.com>
+ <CAF=yD-KKGYhKjxio9om1rz7pPe1uiRgODuXWvoLqrGrRbtWNkA@mail.gmail.com>
+ <CADKFtnSgBZcpYBYRwr6WgnS6j9xH+U0W7bxSqt9ge5aumu4QQg@mail.gmail.com>
+ <CAF=yD-JW+Gs+EeJk2jknU6ZL0prjRO41Q3EpVTOTpTD8sEOh6A@mail.gmail.com>
+ <CADKFtnTzqLw4F2m9+7BxZZW_QKm_QiduMb6to9mU1WAvbo9MWQ@mail.gmail.com> <CAF=yD-Lapvy4J748ge8k5v7gUoynDxJPpXKV8rOdgtAw7=_ErQ@mail.gmail.com>
+In-Reply-To: <CAF=yD-Lapvy4J748ge8k5v7gUoynDxJPpXKV8rOdgtAw7=_ErQ@mail.gmail.com>
+From: Jordan Rife <jrife@google.com>
+Date: Wed, 13 Sep 2023 11:04:34 -0700
+Message-ID: <CADKFtnRyqOiek24U0ePb1MFqM1oXnYWb4FEPr-=EjswmQFr=_A@mail.gmail.com>
+Subject: Re: [PATCH net] net: prevent address overwrite in connect() and sendmsg()
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, davem@davemloft.net, 
+	Eric Dumazet <edumazet@google.com>, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, dborkman@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Norbert Zulinski <norbertx.zulinski@intel.com>
+> Please take a stab.
 
-Previously CRC stripping was always enabled for VF.
+To clarify, the plan is to:
 
-Now it is possible to turn off CRC stripping via ethtool:
+1) Swap out calls to sock->ops->connect() with kernel_connect()
+2) Move the address copy to kernel_sendmsg()
+3) Swap out calls to sock_sendmsg()/sock->ops->sendmsg() with kernel_sendms=
+g()
 
-    #ethtool -K <interface> rx-fcs on
+> If it proves at all non-trivial, e.g., in the conversion of arguments
+> between kernel_sendmsg and sock_sendmsg/sock->ops->sendmsg, then let's
+> submit your original patch. And I will do the conversion in net-next
+> instead.
 
-To turn off CRC stripping, first VLAN stripping must be disabled:
+I'll give it a try and see how trivial the changes are.
 
-    #ethtool -K <interface> rx-vlan-offload off
+-Jordan
 
-if any VLAN interfaces exists, otherwise VLAN stripping will be turned
-off by the driver.
-
-In iavf_configure_queues add check if CRC stripping is enabled for
-VF, if it's enabled then set crc_disabled to false on every VF's
-queue. In iavf_set_features add check if CRC stripping setting was
-changed then schedule reset.
-
-Signed-off-by: Norbert Zulinski <norbertx.zulinski@intel.com>
-Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
-Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/iavf/iavf.h        |  2 +
- drivers/net/ethernet/intel/iavf/iavf_main.c   | 59 ++++++++++++++++++-
- .../net/ethernet/intel/iavf/iavf_virtchnl.c   |  4 ++
- 3 files changed, 64 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/intel/iavf/iavf.h b/drivers/net/ethernet/intel/iavf/iavf.h
-index 738e25657c6b..f32b0453584f 100644
---- a/drivers/net/ethernet/intel/iavf/iavf.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf.h
-@@ -406,6 +406,8 @@ struct iavf_adapter {
- 			  VIRTCHNL_VF_OFFLOAD_VLAN)
- #define VLAN_V2_ALLOWED(_a) ((_a)->vf_res->vf_cap_flags & \
- 			     VIRTCHNL_VF_OFFLOAD_VLAN_V2)
-+#define CRC_OFFLOAD_ALLOWED(_a) ((_a)->vf_res->vf_cap_flags & \
-+				 VIRTCHNL_VF_OFFLOAD_CRC)
- #define VLAN_V2_FILTERING_ALLOWED(_a) \
- 	(VLAN_V2_ALLOWED((_a)) && \
- 	 ((_a)->vlan_v2_caps.filtering.filtering_support.outer || \
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-index 36b94ee44211..a02440664bca 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-@@ -4401,6 +4401,9 @@ static int iavf_set_features(struct net_device *netdev,
- 	    (features & NETIF_VLAN_OFFLOAD_FEATURES))
- 		iavf_set_vlan_offload_features(adapter, netdev->features,
- 					       features);
-+	if (CRC_OFFLOAD_ALLOWED(adapter) &&
-+	    ((netdev->features & NETIF_F_RXFCS) ^ (features & NETIF_F_RXFCS)))
-+		iavf_schedule_reset(adapter, IAVF_FLAG_RESET_NEEDED);
- 
- 	return 0;
- }
-@@ -4522,6 +4525,9 @@ iavf_get_netdev_vlan_hw_features(struct iavf_adapter *adapter)
- 		}
- 	}
- 
-+	if (CRC_OFFLOAD_ALLOWED(adapter))
-+		hw_features |= NETIF_F_RXFCS;
-+
- 	return hw_features;
- }
- 
-@@ -4685,6 +4691,55 @@ iavf_fix_netdev_vlan_features(struct iavf_adapter *adapter,
- 	return requested_features;
- }
- 
-+/**
-+ * iavf_fix_strip_features - fix NETDEV CRC and VLAN strip features
-+ * @adapter: board private structure
-+ * @requested_features: stack requested NETDEV features
-+ *
-+ * Returns fixed-up features bits
-+ **/
-+static netdev_features_t
-+iavf_fix_strip_features(struct iavf_adapter *adapter,
-+			netdev_features_t requested_features)
-+{
-+	struct net_device *netdev = adapter->netdev;
-+	bool crc_offload_req, is_vlan_strip;
-+	netdev_features_t vlan_strip;
-+	int num_non_zero_vlan;
-+
-+	crc_offload_req = CRC_OFFLOAD_ALLOWED(adapter) &&
-+			  (requested_features & NETIF_F_RXFCS);
-+	num_non_zero_vlan = iavf_get_num_vlans_added(adapter);
-+	vlan_strip = (NETIF_F_HW_VLAN_CTAG_RX | NETIF_F_HW_VLAN_STAG_RX);
-+	is_vlan_strip = requested_features & vlan_strip;
-+
-+	if (!crc_offload_req)
-+		return requested_features;
-+
-+	if (!num_non_zero_vlan && (netdev->features & vlan_strip) &&
-+	    !(netdev->features & NETIF_F_RXFCS) && is_vlan_strip) {
-+		requested_features &= ~vlan_strip;
-+		netdev_info(netdev, "Disabling VLAN stripping as FCS/CRC stripping is also disabled and there is no VLAN configured\n");
-+		return requested_features;
-+	}
-+
-+	if ((netdev->features & NETIF_F_RXFCS) && is_vlan_strip) {
-+		requested_features &= ~vlan_strip;
-+		if (!(netdev->features & vlan_strip))
-+			netdev_info(netdev, "To enable VLAN stripping, first need to enable FCS/CRC stripping");
-+
-+		return requested_features;
-+	}
-+
-+	if (num_non_zero_vlan && is_vlan_strip &&
-+	    !(netdev->features & NETIF_F_RXFCS)) {
-+		requested_features &= ~NETIF_F_RXFCS;
-+		netdev_info(netdev, "To disable FCS/CRC stripping, first need to disable VLAN stripping");
-+	}
-+
-+	return requested_features;
-+}
-+
- /**
-  * iavf_fix_features - fix up the netdev feature bits
-  * @netdev: our net device
-@@ -4697,7 +4752,9 @@ static netdev_features_t iavf_fix_features(struct net_device *netdev,
- {
- 	struct iavf_adapter *adapter = netdev_priv(netdev);
- 
--	return iavf_fix_netdev_vlan_features(adapter, features);
-+	features = iavf_fix_netdev_vlan_features(adapter, features);
-+
-+	return iavf_fix_strip_features(adapter, features);
- }
- 
- static const struct net_device_ops iavf_netdev_ops = {
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-index 0b97b424e487..8ce6389b5815 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-@@ -142,6 +142,7 @@ int iavf_send_vf_config_msg(struct iavf_adapter *adapter)
- 	       VIRTCHNL_VF_OFFLOAD_RSS_PCTYPE_V2 |
- 	       VIRTCHNL_VF_OFFLOAD_ENCAP |
- 	       VIRTCHNL_VF_OFFLOAD_VLAN_V2 |
-+	       VIRTCHNL_VF_OFFLOAD_CRC |
- 	       VIRTCHNL_VF_OFFLOAD_ENCAP_CSUM |
- 	       VIRTCHNL_VF_OFFLOAD_REQ_QUEUES |
- 	       VIRTCHNL_VF_OFFLOAD_ADQ |
-@@ -312,6 +313,9 @@ void iavf_configure_queues(struct iavf_adapter *adapter)
- 		vqpi->rxq.databuffer_size =
- 			ALIGN(adapter->rx_rings[i].rx_buf_len,
- 			      BIT_ULL(IAVF_RXQ_CTX_DBUFF_SHIFT));
-+		if (CRC_OFFLOAD_ALLOWED(adapter))
-+			vqpi->rxq.crc_disable = !!(adapter->netdev->features &
-+						   NETIF_F_RXFCS);
- 		vqpi++;
- 	}
- 
--- 
-2.38.1
-
+On Wed, Sep 13, 2023 at 7:03=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> On Tue, Sep 12, 2023 at 5:09=E2=80=AFPM Jordan Rife <jrife@google.com> wr=
+ote:
+> >
+> > > If we take this path, it could be a single patch. The subsystem
+> > > maintainers should be CC:ed so that they can (N)ACK it.
+> > >
+> > > But I do not mean to ask to split it up and test each one separately.
+> > >
+> > > The change from sock->ops->connect to kernel_connect is certainly
+> > > trivial enough that compile testing should suffice.
+> >
+> > Ack. Thanks for clarifying.
+> >
+> > > The only question is whether we should pursue your original patch and
+> > > accept that this will continue, or one that improves the situation,
+> > > but touches more files and thus has a higher risk of merge conflicts.
+> > >
+> > > I'd like to give others some time to chime in. I've given my opinion,
+> > > but it's only one.
+> > >
+> > > I'd like to give others some time to chime in. I've given my opinion,
+> > > but it's only one.
+> >
+> > Sounds good. I'll wait to hear others' opinions on the best path forwar=
+d.
+>
+> No other comments so far.
+>
+> My hunch is that a short list of these changes
+>
+> ```
+> @@ -1328,7 +1328,7 @@ static int kernel_bindconnect(struct socket *s,
+> struct sockaddr *laddr,
+>         if (rv < 0)
+>                 return rv;
+>
+> -       rv =3D s->ops->connect(s, raddr, size, flags);
+> +       rv =3D kernel_connect(s, raddr, size, flags);
+> ```
+>
+> is no more invasive than your proposed patch, and gives a more robust out=
+come.
+>
+> Please take a stab.
+>
+> If it proves at all non-trivial, e.g., in the conversion of arguments
+> between kernel_sendmsg and sock_sendmsg/sock->ops->sendmsg, then let's
+> submit your original patch. And I will do the conversion in net-next
+> instead.
 
