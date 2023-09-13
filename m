@@ -1,26 +1,26 @@
-Return-Path: <netdev+bounces-33686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BD7379F438
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 23:58:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BA6679F43B
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 23:59:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9795428184E
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 21:58:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46A041C20A8D
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 21:59:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A55222F19;
-	Wed, 13 Sep 2023 21:58:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9438622F15;
+	Wed, 13 Sep 2023 21:58:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FC72B667
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 21:58:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8698427711
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 21:58:13 +0000 (UTC)
 Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 45803173A;
-	Wed, 13 Sep 2023 14:58:11 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 91A1F173A;
+	Wed, 13 Sep 2023 14:58:12 -0700 (PDT)
 From: Pablo Neira Ayuso <pablo@netfilter.org>
 To: netfilter-devel@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -28,9 +28,9 @@ Cc: davem@davemloft.net,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	edumazet@google.com
-Subject: [PATCH net 1/9] netfilter: nf_tables: disallow rule removal from chain binding
-Date: Wed, 13 Sep 2023 23:57:52 +0200
-Message-Id: <20230913215800.107269-2-pablo@netfilter.org>
+Subject: [PATCH net 2/9] netfilter: nft_set_rbtree: use read spinlock to avoid datapath contention
+Date: Wed, 13 Sep 2023 23:57:53 +0200
+Message-Id: <20230913215800.107269-3-pablo@netfilter.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20230913215800.107269-1-pablo@netfilter.org>
 References: <20230913215800.107269-1-pablo@netfilter.org>
@@ -42,95 +42,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Chain binding only requires the rule addition/insertion command within
-the same transaction. Removal of rules from chain bindings within the
-same transaction makes no sense, userspace does not utilize this
-feature. Replace nft_chain_is_bound() check to nft_chain_binding() in
-rule deletion commands. Replace command implies a rule deletion, reject
-this command too.
+rbtree GC does not modify the datastructure, instead it collects expired
+elements and it enqueues a GC transaction. Use a read spinlock instead
+to avoid data contention while GC worker is running.
 
-Rule flush command can also safely rely on this nft_chain_binding()
-check because unbound chains are not allowed since 62e1e94b246e
-("netfilter: nf_tables: reject unbound chain set before commit phase").
-
-Fixes: d0e2c7de92c7 ("netfilter: nf_tables: add NFT_CHAIN_BINDING")
-Reported-by: Kevin Rich <kevinrich1337@gmail.com>
+Fixes: f6c383b8c31a ("netfilter: nf_tables: adapt set backend to use GC transaction API")
 Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
 ---
- net/netfilter/nf_tables_api.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+ net/netfilter/nft_set_rbtree.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index e429ebba74b3..895c6e4fba97 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -1432,7 +1432,7 @@ static int nft_flush_table(struct nft_ctx *ctx)
- 		if (!nft_is_active_next(ctx->net, chain))
- 			continue;
+diff --git a/net/netfilter/nft_set_rbtree.c b/net/netfilter/nft_set_rbtree.c
+index f250b5399344..70491ba98dec 100644
+--- a/net/netfilter/nft_set_rbtree.c
++++ b/net/netfilter/nft_set_rbtree.c
+@@ -622,8 +622,7 @@ static void nft_rbtree_gc(struct work_struct *work)
+ 	if (!gc)
+ 		goto done;
  
--		if (nft_chain_is_bound(chain))
-+		if (nft_chain_binding(chain))
- 			continue;
+-	write_lock_bh(&priv->lock);
+-	write_seqcount_begin(&priv->count);
++	read_lock_bh(&priv->lock);
+ 	for (node = rb_first(&priv->root); node != NULL; node = rb_next(node)) {
  
- 		ctx->chain = chain;
-@@ -1477,7 +1477,7 @@ static int nft_flush_table(struct nft_ctx *ctx)
- 		if (!nft_is_active_next(ctx->net, chain))
- 			continue;
+ 		/* Ruleset has been updated, try later. */
+@@ -673,8 +672,7 @@ static void nft_rbtree_gc(struct work_struct *work)
+ 	gc = nft_trans_gc_catchall(gc, gc_seq);
  
--		if (nft_chain_is_bound(chain))
-+		if (nft_chain_binding(chain))
- 			continue;
+ try_later:
+-	write_seqcount_end(&priv->count);
+-	write_unlock_bh(&priv->lock);
++	read_unlock_bh(&priv->lock);
  
- 		ctx->chain = chain;
-@@ -2910,6 +2910,9 @@ static int nf_tables_delchain(struct sk_buff *skb, const struct nfnl_info *info,
- 		return PTR_ERR(chain);
- 	}
- 
-+	if (nft_chain_binding(chain))
-+		return -EOPNOTSUPP;
-+
- 	nft_ctx_init(&ctx, net, skb, info->nlh, family, table, chain, nla);
- 
- 	if (nla[NFTA_CHAIN_HOOK]) {
-@@ -3971,6 +3974,11 @@ static int nf_tables_newrule(struct sk_buff *skb, const struct nfnl_info *info,
- 	}
- 
- 	if (info->nlh->nlmsg_flags & NLM_F_REPLACE) {
-+		if (nft_chain_binding(chain)) {
-+			err = -EOPNOTSUPP;
-+			goto err_destroy_flow_rule;
-+		}
-+
- 		err = nft_delrule(&ctx, old_rule);
- 		if (err < 0)
- 			goto err_destroy_flow_rule;
-@@ -4078,7 +4086,7 @@ static int nf_tables_delrule(struct sk_buff *skb, const struct nfnl_info *info,
- 			NL_SET_BAD_ATTR(extack, nla[NFTA_RULE_CHAIN]);
- 			return PTR_ERR(chain);
- 		}
--		if (nft_chain_is_bound(chain))
-+		if (nft_chain_binding(chain))
- 			return -EOPNOTSUPP;
- 	}
- 
-@@ -4112,7 +4120,7 @@ static int nf_tables_delrule(struct sk_buff *skb, const struct nfnl_info *info,
- 		list_for_each_entry(chain, &table->chains, list) {
- 			if (!nft_is_active_next(net, chain))
- 				continue;
--			if (nft_chain_is_bound(chain))
-+			if (nft_chain_binding(chain))
- 				continue;
- 
- 			ctx.chain = chain;
-@@ -11054,7 +11062,7 @@ static void __nft_release_table(struct net *net, struct nft_table *table)
- 	ctx.family = table->family;
- 	ctx.table = table;
- 	list_for_each_entry(chain, &table->chains, list) {
--		if (nft_chain_is_bound(chain))
-+		if (nft_chain_binding(chain))
- 			continue;
- 
- 		ctx.chain = chain;
+ 	if (gc)
+ 		nft_trans_gc_queue_async_done(gc);
 -- 
 2.30.2
 
