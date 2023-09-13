@@ -1,391 +1,110 @@
-Return-Path: <netdev+bounces-33637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E51E879EFC2
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 19:03:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A276D79EFC8
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 19:04:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A37328269F
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 17:03:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C9342826E3
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 17:04:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5D8A22F10;
-	Wed, 13 Sep 2023 16:57:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D65F1F954;
+	Wed, 13 Sep 2023 16:59:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A726322EE6
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 16:57:31 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0D1FA1FD2
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 09:57:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1694624250;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jTW4hj6R6SH2WgBE9Xhmo5Z05cFVRaLxhGn+V3gLo/A=;
-	b=HyYyDGQ5+crGYtT2e4BA+No/lpFhxIcPzQ57idYmn6PZxoZx3CZBjMaC+nl3vTWz4wXxiz
-	4dwxQeN+tVtJvHhBiFplrnh21kWeHat6QoJDIgGQNevcMkrTlwR/NKBznW4RLDyQNM5bus
-	JZCH/y3oowQa5deYcKHGtssGnu07wws=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-583-kw6qakgRMmKfBnOo7mji8A-1; Wed, 13 Sep 2023 12:57:27 -0400
-X-MC-Unique: kw6qakgRMmKfBnOo7mji8A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0D8F6855321;
-	Wed, 13 Sep 2023 16:57:26 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.216])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C823740C6EA8;
-	Wed, 13 Sep 2023 16:57:23 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Al Viro <viro@zeniv.linux.org.uk>,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Cc: David Howells <dhowells@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Christian Brauner <christian@brauner.io>,
-	David Laight <David.Laight@ACULAB.COM>,
-	Matthew Wilcox <willy@infradead.org>,
-	Jeff Layton <jlayton@kernel.org>,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 216A1AD52
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 16:59:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89ACFC433C8;
+	Wed, 13 Sep 2023 16:59:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694624397;
+	bh=BnteqCpF/CAUK7DK9U9Ghtfp5dt4d9MfOz2/eAS/u7s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cPc5I0ZLysgdFaSm9d3iPjGsHib6No1WDfTfDNmZ8EJftw2ukgPJqbdTvFwfII6h5
+	 XsjFCfQwy0hAhvcNI/zC1jAxOZx+xj3WkJy3PnXdFgBaTdKUmzEXfr8r119FUpA9ws
+	 uEyzFAjE2f/LP5rj9F/N4Be4pbP/BK9uPoheaZ2R88lgsiTu9NUbtgyaz2XOX1oPZT
+	 eklyhY3ZUUL2hQtxVd/re7fFxkttitCrig5ohr9Pm1WOgM5lChR8UOojrbVvjicS9G
+	 gipMxf05N4nYGfN5v5g6bWOTb7T8iOMYlMWHXGVTPRzp+C5LHyalJK3Qgj/yIop80d
+	 GuvQxVLkJ3wdg==
+Date: Wed, 13 Sep 2023 17:59:48 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH v4 13/13] iov_iter: Create a fake device to allow iov_iter testing/benchmarking
-Date: Wed, 13 Sep 2023 17:56:48 +0100
-Message-ID: <20230913165648.2570623-14-dhowells@redhat.com>
-In-Reply-To: <20230913165648.2570623-1-dhowells@redhat.com>
-References: <20230913165648.2570623-1-dhowells@redhat.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Lee Jones <lee@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Qiang Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	Shengjiu Wang <shengjiu.wang@gmail.com>,
+	Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>,
+	Nicolin Chen <nicoleotsuka@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org,
+	Simon Horman <horms@kernel.org>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v5 24/31] net: wan: Add framer framework support
+Message-ID: <e3245053-1d4c-4ee3-9e03-8a6ca54e26d1@sirena.org.uk>
+References: <20230912081527.208499-1-herve.codina@bootlin.com>
+ <20230912101436.225781-1-herve.codina@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="3d4xnD0OBUXwj5Mp"
+Content-Disposition: inline
+In-Reply-To: <20230912101436.225781-1-herve.codina@bootlin.com>
+X-Cookie: Use extra care when cleaning on stairs.
 
-Create a fake device to allow testing and benchmarking of UBUF and IOVEC
-iterators.  /dev/iov-test is created and can be driven with pwritev() in
-which case it copies everything to a sink page and it can be written with
-preadv() in which case it copies repeatedly from a patterned page.
 
-The time taken is logged with tracepoints.
+--3d4xnD0OBUXwj5Mp
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This can be driven by something like:
+On Tue, Sep 12, 2023 at 12:14:36PM +0200, Herve Codina wrote:
+> A framer is a component in charge of an E1/T1 line interface.
+> Connected usually to a TDM bus, it converts TDM frames to/from E1/T1
+> frames. It also provides information related to the E1/T1 line.
+>=20
+> The framer framework provides a set of APIs for the framer drivers
+> (framer provider) to create/destroy a framer and APIs for the framer
+> users (framer consumer) to obtain a reference to the framer, and
+> use the framer.
 
-	echo 1 >/sys/kernel/debug/tracing/events/iov_test/enable
-	cmd="r -b 1M -V 256 0 256M"; xfs_io -c "open /dev/iov-test" \
-	    -c "$cmd" -c "$cmd" -c "$cmd" -c "$cmd" \
-	    -c "$cmd" -c "$cmd" -c "$cmd" -c "$cmd" \
-	    -c "$cmd" -c "$cmd" -c "$cmd" -c "$cmd" \
-	    -c "$cmd" -c "$cmd" -c "$cmd" -c "$cmd"
-	cmd="w -b 1M -V 256 0 256M"; xfs_io -c "open /dev/iov-test" \
-	    -c "$cmd" -c "$cmd" -c "$cmd" -c "$cmd" \
-	    -c "$cmd" -c "$cmd" -c "$cmd" -c "$cmd" \
-	    -c "$cmd" -c "$cmd" -c "$cmd" -c "$cmd" \
-	    -c "$cmd" -c "$cmd" -c "$cmd" -c "$cmd"
+If people are fine with this could we perhaps get it applied on a branch
+with a tag?  That way we could cut down the size of the series a little
+and I could apply the generic ASoC bit too, neither of the two patches
+have any dependency on the actual hardware.
 
-showing something like:
+--3d4xnD0OBUXwj5Mp
+Content-Type: application/pgp-signature; name="signature.asc"
 
-         ...: iov_test_read: size=10000000 done=10000000 ty=1 nr=256 dur=27653
-         ...: iov_test_write: size=10000000 done=10000000 ty=1 nr=256 dur=31792
+-----BEGIN PGP SIGNATURE-----
 
-in the trace log.
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmUB6oMACgkQJNaLcl1U
+h9C6Xgf/eVzH2ZK88zsRlmvtdc+p6XZjgKPJFkUlIhE9Ma70SkaA+GvjpzFrSISC
+0oFzEllaNXg3QA5Dql2eFFYQgtr5ubist5gEg7ySisIk/3GFEx1+bOqfE8Hd0wxS
+EOmSRrnORoEywUsp1tI/CIh6s+FkPAwH0ZLtXwvWiKeWjQc8q9wKDnqqahC84N6Q
+NESewhcaX2cQNfQXdyKGrnV9RVVSaVml3mQ4OvcjG21+FFq8IFvmn1HuLyhzj7ka
+ACjNRWS9xgBsIqVyOOaYB2Ji62cf+WK4/DJig11BI34n9N7Tnbi80+kb0JX/WVno
+ncpqIK4/jpD4JNn+BxeAIiICNG0cQw==
+=nBcU
+-----END PGP SIGNATURE-----
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Alexander Viro <viro@zeniv.linux.org.uk>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Christoph Hellwig <hch@lst.de>
-cc: Christian Brauner <christian@brauner.io>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: Linus Torvalds <torvalds@linux-foundation.org>
-cc: David Laight <David.Laight@ACULAB.COM>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: linux-block@vger.kernel.org
-cc: linux-fsdevel@vger.kernel.org
-cc: linux-mm@kvack.org
-cc: netdev@vger.kernel.org
----
- lib/Kconfig.debug         |   8 +++
- lib/Makefile              |   1 +
- lib/test_iov_iter.c       | 134 ++++++++++++++++++++++++++++++++++++++
- lib/test_iov_iter_trace.h |  80 +++++++++++++++++++++++
- 4 files changed, 223 insertions(+)
- create mode 100644 lib/test_iov_iter.c
- create mode 100644 lib/test_iov_iter_trace.h
-
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index fa307f93fa2e..cf8392c51344 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -2524,6 +2524,14 @@ config TEST_SYSCTL
- 
- 	  If unsure, say N.
- 
-+config TEST_IOV_ITER
-+	tristate "iov_iter test driver"
-+	help
-+	  This creates a misc device that can be used as a way to test various
-+	  I/O iterator functions through the use of readv/writev and ioctl.
-+
-+	  If unsure, say N.
-+
- config BITFIELD_KUNIT
- 	tristate "KUnit test bitfield functions at runtime" if !KUNIT_ALL_TESTS
- 	depends on KUNIT
-diff --git a/lib/Makefile b/lib/Makefile
-index 740109b6e2c8..f6419544a749 100644
---- a/lib/Makefile
-+++ b/lib/Makefile
-@@ -65,6 +65,7 @@ CFLAGS_test_bitops.o += -Werror
- obj-$(CONFIG_CPUMASK_KUNIT_TEST) += cpumask_kunit.o
- obj-$(CONFIG_TEST_SYSCTL) += test_sysctl.o
- obj-$(CONFIG_TEST_IOV_ITER) += kunit_iov_iter.o
-+obj-$(CONFIG_TEST_IOV_ITER) += test_iov_iter.o
- obj-$(CONFIG_HASH_KUNIT_TEST) += test_hash.o
- obj-$(CONFIG_TEST_IDA) += test_ida.o
- obj-$(CONFIG_TEST_UBSAN) += test_ubsan.o
-diff --git a/lib/test_iov_iter.c b/lib/test_iov_iter.c
-new file mode 100644
-index 000000000000..afa70647dbde
---- /dev/null
-+++ b/lib/test_iov_iter.c
-@@ -0,0 +1,134 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/* I/O iterator testing device.
-+ *
-+ * Copyright (C) 2023 Red Hat, Inc. All Rights Reserved.
-+ * Written by David Howells (dhowells@redhat.com)
-+ */
-+
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
-+#include <linux/module.h>
-+#include <linux/uio.h>
-+#include <linux/fs.h>
-+#include <linux/pagemap.h>
-+#include <linux/miscdevice.h>
-+#define CREATE_TRACE_POINTS
-+#include "test_iov_iter_trace.h"
-+
-+MODULE_DESCRIPTION("iov_iter testing");
-+MODULE_AUTHOR("David Howells <dhowells@redhat.com>");
-+MODULE_LICENSE("GPL");
-+
-+static ssize_t iov_test_read_iter(struct kiocb *iocb, struct iov_iter *iter)
-+{
-+	struct folio *folio = iocb->ki_filp->private_data;
-+	unsigned int nr_segs = iter->nr_segs;
-+	size_t size = iov_iter_count(iter), fsize = folio_size(folio);
-+	size_t copied = 0, offset = 0, i;
-+	ktime_t a, b;
-+	u8 *p;
-+
-+	/* Pattern the buffer */
-+	p = kmap_local_folio(folio, 0);
-+	for (i = 0; i < folio_size(folio); i++)
-+		p[i] = i & 0xff;
-+	kunmap_local(p);
-+
-+	a = ktime_get_real();
-+	while (iov_iter_count(iter)) {
-+		size_t done, part = min(iov_iter_count(iter), fsize - offset);
-+
-+		done = copy_folio_to_iter(folio, offset, part, iter);
-+		if (done == 0)
-+			break;
-+		copied += done;
-+		offset = (offset + done) & (fsize - 1);
-+	}
-+
-+	b = ktime_get_real();
-+	trace_iov_test_read(size, copied, iov_iter_type(iter), nr_segs,
-+			    ktime_to_us(ktime_sub(b, a)));
-+	return copied;
-+}
-+
-+static ssize_t iov_test_write_iter(struct kiocb *iocb, struct iov_iter *iter)
-+{
-+	struct folio *folio = iocb->ki_filp->private_data;
-+	unsigned int nr_segs = iter->nr_segs;
-+	size_t size = iov_iter_count(iter), fsize = folio_size(folio);
-+	size_t copied = 0, offset = 0;
-+	ktime_t a = ktime_get_real(), b;
-+
-+	while (iov_iter_count(iter)) {
-+		size_t done, part = min(iov_iter_count(iter), fsize - offset);
-+
-+		done = copy_page_from_iter(folio_page(folio, 0), offset, part, iter);
-+		if (done == 0)
-+			break;
-+		copied += done;
-+		offset = (offset + done) & (fsize - 1);
-+	}
-+
-+	b = ktime_get_real();
-+	trace_iov_test_write(size, copied, iov_iter_type(iter), nr_segs,
-+			     ktime_to_us(ktime_sub(b, a)));
-+	return copied;
-+}
-+
-+static int iov_test_open(struct inode *inode, struct file *file)
-+{
-+	struct folio *folio;
-+
-+	if (!capable(CAP_SYS_ADMIN))
-+		return -EPERM;
-+
-+	folio = folio_alloc(GFP_KERNEL, 0);
-+	if (!folio)
-+		return -ENOMEM;
-+	file->private_data = folio;
-+	return 0;
-+}
-+
-+static int iov_test_release(struct inode *inode, struct file *file)
-+{
-+	struct folio *folio = file->private_data;
-+
-+	folio_put(folio);
-+	return 0;
-+}
-+
-+static const struct file_operations iov_test_fops = {
-+	.owner		= THIS_MODULE,
-+	.open		= iov_test_open,
-+	.release	= iov_test_release,
-+	.read_iter	= iov_test_read_iter,
-+	.write_iter	= iov_test_write_iter,
-+	.splice_read	= copy_splice_read,
-+	.llseek		= noop_llseek,
-+};
-+
-+static struct miscdevice iov_test_dev = {
-+	.minor	= MISC_DYNAMIC_MINOR,
-+	.name	= "iov-test",
-+	.fops	= &iov_test_fops,
-+};
-+
-+static int __init iov_test_init(void)
-+{
-+	int ret;
-+
-+	ret = misc_register(&iov_test_dev);
-+	if (ret < 0)
-+		return ret;
-+	pr_info("Loaded\n");
-+	return 0;
-+}
-+module_init(iov_test_init);
-+
-+static void __exit iov_test_exit(void)
-+{
-+	pr_info("Unloading\n");
-+
-+	misc_deregister(&iov_test_dev);
-+}
-+module_exit(iov_test_exit);
-diff --git a/lib/test_iov_iter_trace.h b/lib/test_iov_iter_trace.h
-new file mode 100644
-index 000000000000..b99cade5d004
---- /dev/null
-+++ b/lib/test_iov_iter_trace.h
-@@ -0,0 +1,80 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* I/O iterator testing device.
-+ *
-+ * Copyright (C) 2023 Red Hat, Inc. All Rights Reserved.
-+ * Written by David Howells (dhowells@redhat.com)
-+ */
-+#undef TRACE_SYSTEM
-+#define TRACE_SYSTEM iov_test
-+
-+#if !defined(_IOV_TEST_TRACE_H) || defined(TRACE_HEADER_MULTI_READ)
-+#define _IOV_TEST_TRACE_H
-+
-+#include <linux/tracepoint.h>
-+
-+TRACE_EVENT(iov_test_read,
-+	    TP_PROTO(size_t size, size_t done, enum iter_type type,
-+		     unsigned int nr_segs, u64 duration),
-+
-+	    TP_ARGS(size, done, type, nr_segs, duration),
-+
-+	    TP_STRUCT__entry(
-+		    __field(size_t,		size)
-+		    __field(size_t,		done)
-+		    __field(enum iter_type,	type)
-+		    __field(unsigned int,	nr_segs)
-+		    __field(u64,		duration)
-+			     ),
-+
-+	    TP_fast_assign(
-+		    __entry->size = size;
-+		    __entry->done = done;
-+		    __entry->type = type;
-+		    __entry->nr_segs = nr_segs;
-+		    __entry->duration = duration;
-+			   ),
-+
-+	    TP_printk("size=%zx done=%zx ty=%u nr=%u dur=%llu",
-+		      __entry->size,
-+		      __entry->done,
-+		      __entry->type,
-+		      __entry->nr_segs,
-+		      __entry->duration)
-+	    );
-+
-+TRACE_EVENT(iov_test_write,
-+	    TP_PROTO(size_t size, size_t done, enum iter_type type,
-+		     unsigned int nr_segs, u64 duration),
-+
-+	    TP_ARGS(size, done, type, nr_segs, duration),
-+
-+	    TP_STRUCT__entry(
-+		    __field(size_t,		size)
-+		    __field(size_t,		done)
-+		    __field(enum iter_type,	type)
-+		    __field(unsigned int,	nr_segs)
-+		    __field(u64,		duration)
-+			     ),
-+
-+	    TP_fast_assign(
-+		    __entry->size = size;
-+		    __entry->done = done;
-+		    __entry->type = type;
-+		    __entry->nr_segs = nr_segs;
-+		    __entry->duration = duration;
-+			   ),
-+
-+	    TP_printk("size=%zx done=%zx ty=%u nr=%u dur=%llu",
-+		      __entry->size,
-+		      __entry->done,
-+		      __entry->type,
-+		      __entry->nr_segs,
-+		      __entry->duration)
-+	    );
-+
-+#endif /* _IOV_TEST_TRACE_H */
-+
-+#undef TRACE_INCLUDE_PATH
-+#define TRACE_INCLUDE_PATH .
-+#define TRACE_INCLUDE_FILE test_iov_iter_trace
-+#include <trace/define_trace.h>
-
+--3d4xnD0OBUXwj5Mp--
 
