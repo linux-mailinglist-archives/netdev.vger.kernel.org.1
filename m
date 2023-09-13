@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-33454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E304779E08E
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 09:14:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1583A79E08F
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 09:14:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E36AF1C20D83
-	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 07:14:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C56A9281B74
+	for <lists+netdev@lfdr.de>; Wed, 13 Sep 2023 07:14:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64423182B0;
-	Wed, 13 Sep 2023 07:12:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6ADC182CA;
+	Wed, 13 Sep 2023 07:12:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 584C5182A4
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 07:12:53 +0000 (UTC)
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 763771728
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 00:12:52 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-401d67434daso70008715e9.2
-        for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 00:12:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC75A182A3
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 07:12:54 +0000 (UTC)
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CFE81728
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 00:12:54 -0700 (PDT)
+Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-31aeef88a55so6007437f8f.2
+        for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 00:12:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1694589171; x=1695193971; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1694589172; x=1695193972; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tx5cwCcgwsE/VDoxUQV5N86Hk7Oe81f9AvXImzVF+5A=;
-        b=m5ggpqFT8fUJaCSGSD1tm3MIy1IB1TooSxNlSbMlqIn/3KeVPP4M18fQunKcoINc5p
-         OLib6ZoKreuWG1n54Y23HmdUlaRm9/XToJ9ZRJ0oz/3CSMr8gMj6y9JxTliydu33Ckp7
-         w/dGY1AEBQKcesBTDDtzzCVWYUA5BI444jDxzh5uXcXh6wFbUe9C6GzpFPQ9X2sDnGxX
-         c8EBb84UfbsnNzKlC2yRpELK9f09lqh+AcWLJ7uySUGeWR8wi8pKDiwBROzzQ86rSOEO
-         9RvTbnwBKFEbN1KBaddE67d7Hrhz6GGowWMJzwaDRO6uhzBXm9w3dWbvP+Hg9WKMGkWJ
-         znGA==
+        bh=PPUEIwNx71s3eWjcIHfx8aNZVUmLM22niP2i+9vR93c=;
+        b=al4WkwwVYM4nqNvQ82uF60cri/3qTgguU+QOa+3zKrD7/f59mVfpX4lflHnR3HQbCO
+         TBK4CHhJJpOkPepoNt4QsU+5kvhjg2MrO5uXNMjRGYnhee24RTNxg+iOul2hQfpm/Hvb
+         GEZoHelA5mgnUNBAkehUKKiVicYQ3/w9iFcp6GnLWEd108cn/Wpbhmrhv+i+SiucvBdW
+         l3aBiYPzR8q9eo9dzDGM8qft4cAF0qvXtM7KkVDk46ZX7wOwfp4QFWmG5pYiqpvGGbnU
+         GaWYij5EkKl746K+f4VsG83pqkLEbWPZnnYI9Jecpo+mOyVIXk9GDaUHfnmPc+/Qjzon
+         9AOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694589171; x=1695193971;
+        d=1e100.net; s=20230601; t=1694589172; x=1695193972;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=tx5cwCcgwsE/VDoxUQV5N86Hk7Oe81f9AvXImzVF+5A=;
-        b=rqcu2NLdvRJpulxzck/paLF7HanN2ZvsRyG/poU5EHHK12y1PZyX7ARKpUHgRBr/JG
-         YMTLsuX6Zfo2I0DyaJkSX93mPutleVXGMbbc8SpICihwJXePnfcmWvcFEZ4tC0Kx/Pa4
-         /tCTDK9lVzmQ9I1Ho0Yd7oZYlHpCKMl2TJEfjU1lf9YeL4il/Z8InDUlhnzV+x+0T+N8
-         z3kT+tSW6LHjcbsYKTXaxCRYb48FfWYajAzsGTctBn+/5FfTPDNEkc30HPk05UgxqBMr
-         6bwQBiuTaQiEN2Br1uQW3cFDbTzxPhuD9Q3X8eZ/jG/nJtyY5huGZKUfGJ+9EPdQ4t6P
-         sq1g==
-X-Gm-Message-State: AOJu0YzO0fSq9qHLvMHQvuwiIClzC+97HQnzXqBYnpoP+HDZe/os0JDG
-	Lg2IEy0FJifc0Dd56IBwzanj5LP0Uu2Byqgg57U=
-X-Google-Smtp-Source: AGHT+IEMhxSUp2FNgMOJZyxM9fQQdmleP3KPq97xLWjQyHx8HtnMmaKT5/fTZL3dWew6dTb5qELIug==
-X-Received: by 2002:a7b:c44e:0:b0:401:c0ef:c287 with SMTP id l14-20020a7bc44e000000b00401c0efc287mr1282784wmi.27.1694589171068;
-        Wed, 13 Sep 2023 00:12:51 -0700 (PDT)
+        bh=PPUEIwNx71s3eWjcIHfx8aNZVUmLM22niP2i+9vR93c=;
+        b=OcxgfWc8vYg+Eo0V7qGDploAkOe5uFxXoVK4A7JZ6CaMaechL6/4lhPYBQgbwy/PmP
+         WsGgrKfyVK4vJlMur0TWUYlGCJSFP9a7jewcwgkK+R+oubTaJ4O8M2qlKVrS0Ue9ShKQ
+         iSbEhU9zbTLA03Q6zZA1+BRRtf+n7803q27VVEvSaiAvdXACH0ZrENdIXE3sJrZXgOf4
+         NvmJIXSEqXfYP+ILRmbasExtWbwLDBFi16l2n+kjXyq0L4/Iz9B2xt+vwJ64t8vNvmWZ
+         T7RLJhXSqCRoZ7QaBEYFlIeNKSixtfQuXyYVkj+54Cw7nyUFc6HxOrKCEuarBuqiprRq
+         DVng==
+X-Gm-Message-State: AOJu0YwfEU8LeEr+jq6H5TOgI0HTG2shSkFRFCv+EWVlKIVopi2GGZOs
+	vNbvKZnBtDwaTwqT9oyy670vAkqHG+pMuqnH4BQ=
+X-Google-Smtp-Source: AGHT+IGXTYFNIzApQa/tfZExtrc7xRaGySZIhOB5sRg4nVAzee5Ynq0MgDtB2kLD5MhyUGtICPIovw==
+X-Received: by 2002:a5d:6ac3:0:b0:314:2fdd:28ef with SMTP id u3-20020a5d6ac3000000b003142fdd28efmr1368501wrw.18.1694589172729;
+        Wed, 13 Sep 2023 00:12:52 -0700 (PDT)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id x20-20020a05600c2a5400b003fe601a7d46sm1098719wme.45.2023.09.13.00.12.50
+        by smtp.gmail.com with ESMTPSA id g3-20020a5d6983000000b003197c7d08ddsm14680861wru.71.2023.09.13.00.12.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Sep 2023 00:12:50 -0700 (PDT)
+        Wed, 13 Sep 2023 00:12:52 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -69,9 +69,9 @@ Cc: kuba@kernel.org,
 	shayd@nvidia.com,
 	saeedm@nvidia.com,
 	horms@kernel.org
-Subject: [patch net-next v2 03/12] net/mlx5: Lift reload limitation when SFs are present
-Date: Wed, 13 Sep 2023 09:12:34 +0200
-Message-ID: <20230913071243.930265-4-jiri@resnulli.us>
+Subject: [patch net-next v2 04/12] devlink: put netnsid to nested handle
+Date: Wed, 13 Sep 2023 09:12:35 +0200
+Message-ID: <20230913071243.930265-5-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230913071243.930265-1-jiri@resnulli.us>
 References: <20230913071243.930265-1-jiri@resnulli.us>
@@ -85,45 +85,55 @@ Content-Transfer-Encoding: 8bit
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Historically, the shared devlink_mutex prevented devlink instances from
-being registered/unregistered during another devlink instance reload
-operation. However, devlink_muxex is gone for some time now, this
-limitation is no longer needed. Lift it.
+If netns of devlink instance and nested devlink instance differs,
+put netnsid attr to indicate that.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/devlink.c | 11 -----------
- 1 file changed, 11 deletions(-)
+v1->v2:
+- new patch
+---
+ net/devlink/linecard.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/devlink.c b/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
-index af8460bb257b..3e064234f6fe 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/devlink.c
-@@ -138,7 +138,6 @@ static int mlx5_devlink_reload_down(struct devlink *devlink, bool netns_change,
- {
- 	struct mlx5_core_dev *dev = devlink_priv(devlink);
- 	struct pci_dev *pdev = dev->pdev;
--	bool sf_dev_allocated;
- 	int ret = 0;
+diff --git a/net/devlink/linecard.c b/net/devlink/linecard.c
+index a0210ba56f2d..f95abdc93c66 100644
+--- a/net/devlink/linecard.c
++++ b/net/devlink/linecard.c
+@@ -65,7 +65,8 @@ devlink_linecard_get_from_info(struct devlink *devlink, struct genl_info *info)
+ 	return devlink_linecard_get_from_attrs(devlink, info->attrs);
+ }
  
- 	if (mlx5_dev_is_lightweight(dev)) {
-@@ -148,16 +147,6 @@ static int mlx5_devlink_reload_down(struct devlink *devlink, bool netns_change,
- 		return 0;
+-static int devlink_nl_put_nested_handle(struct sk_buff *msg, struct devlink *devlink)
++static int devlink_nl_put_nested_handle(struct sk_buff *msg, struct net *net,
++					struct devlink *devlink)
+ {
+ 	struct nlattr *nested_attr;
+ 
+@@ -74,6 +75,13 @@ static int devlink_nl_put_nested_handle(struct sk_buff *msg, struct devlink *dev
+ 		return -EMSGSIZE;
+ 	if (devlink_nl_put_handle(msg, devlink))
+ 		goto nla_put_failure;
++	if (!net_eq(net, devlink_net(devlink))) {
++		int id = peernet2id_alloc(net, devlink_net(devlink),
++					  GFP_KERNEL);
++
++		if (nla_put_s32(msg, DEVLINK_ATTR_NETNS_ID, id))
++			return -EMSGSIZE;
++	}
+ 
+ 	nla_nest_end(msg, nested_attr);
+ 	return 0;
+@@ -131,7 +139,8 @@ static int devlink_nl_linecard_fill(struct sk_buff *msg,
  	}
  
--	sf_dev_allocated = mlx5_sf_dev_allocated(dev);
--	if (sf_dev_allocated) {
--		/* Reload results in deleting SF device which further results in
--		 * unregistering devlink instance while holding devlink_mutext.
--		 * Hence, do not support reload.
--		 */
--		NL_SET_ERR_MSG_MOD(extack, "reload is unsupported when SFs are allocated");
--		return -EOPNOTSUPP;
--	}
--
- 	if (mlx5_lag_is_active(dev)) {
- 		NL_SET_ERR_MSG_MOD(extack, "reload is unsupported in Lag mode");
- 		return -EOPNOTSUPP;
+ 	if (linecard->nested_devlink &&
+-	    devlink_nl_put_nested_handle(msg, linecard->nested_devlink))
++	    devlink_nl_put_nested_handle(msg, devlink_net(devlink),
++					 linecard->nested_devlink))
+ 		goto nla_put_failure;
+ 
+ 	genlmsg_end(msg, hdr);
 -- 
 2.41.0
 
