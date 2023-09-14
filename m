@@ -1,225 +1,74 @@
-Return-Path: <netdev+bounces-33869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 705F57A0859
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 17:00:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF82B7A085F
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 17:01:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0E191B20C0B
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 15:00:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46941281D86
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 15:01:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F6A428E31;
-	Thu, 14 Sep 2023 14:42:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D21C18E03;
+	Thu, 14 Sep 2023 14:43:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F27728E11
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 14:42:57 +0000 (UTC)
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 603071BE1;
-	Thu, 14 Sep 2023 07:42:56 -0700 (PDT)
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 38EEgPfY51324145, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/2.92/5.92) with ESMTPS id 38EEgPfY51324145
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 14 Sep 2023 22:42:25 +0800
-Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.17; Thu, 14 Sep 2023 22:42:25 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS03.realtek.com.tw (172.21.6.96) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.7; Thu, 14 Sep 2023 22:42:23 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::7445:d92b:d0b3:f79c]) by
- RTEXMBS04.realtek.com.tw ([fe80::7445:d92b:d0b3:f79c%5]) with mapi id
- 15.01.2375.007; Thu, 14 Sep 2023 22:42:23 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "kuba@kernel.org" <kuba@kernel.org>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-Subject: RE: [PATCH net-next v7 01/13] net:ethernet:realtek:rtase: Add pci table supported in this module
-Thread-Topic: [PATCH net-next v7 01/13] net:ethernet:realtek:rtase: Add pci
- table supported in this module
-Thread-Index: AQHZ5Vod6KPsJrX8j0u27fA5whG9T7AYwrUAgAGlWXA=
-Date: Thu, 14 Sep 2023 14:42:23 +0000
-Message-ID: <edbc001d331944f69017af67f71990ef@realtek.com>
-References: <20230912091830.338164-1-justinlai0215@realtek.com>
- <20230912091830.338164-2-justinlai0215@realtek.com>
- <b655f427-0c45-4df6-be7f-6adf743ea0d4@lunn.ch>
-In-Reply-To: <b655f427-0c45-4df6-be7f-6adf743ea0d4@lunn.ch>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-x-originating-ip: [172.21.210.185]
-x-kse-serverinfo: RTEXMBS03.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4961B28E11
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 14:43:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99734C433C7;
+	Thu, 14 Sep 2023 14:43:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694702590;
+	bh=3pqLWiiPUDPfILLrll593nzDnDuukq6YmKiyR5hQotY=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=tLD1O2ITFkjXLno9Lz6Vvmx4EFHfVgMQCxoEILxcDyZtF6kN+WMK7a6Ml4+W8aKTW
+	 sP/PRNMtFLg21r2hOfurqGnWId5ND8vMJyTB/ACmTc3oF3C+O+/vBmEIMOAGoR9ogt
+	 6fHNagyPaVu7foc0g7B582ki8I0bpWF3g5LzDwYywyjsbKDaylsjITJdZn6ifCH1Qv
+	 PwztyDtsZuIN8iinPs/1b1Tg9nXlthpEchdyysOA88yCiF4PCYAR/m6bzvzlBsaxV7
+	 5mU9vqLZxnBrJ2CosZjv6f4weF2GEYpzI1aCSJG/rf8S9sm1dXdEWEUcVgLi4VUKBB
+	 48Hd5bTvOAtOw==
+Message-ID: <c737bd4c-7cd4-11f0-3906-3a9018170888@kernel.org>
+Date: Thu, 14 Sep 2023 08:43:09 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.0
+Subject: Re: IPv6 address scope not set to operator-configured value
+Content-Language: en-US
+To: Tj <linux@iam.tj>, netdev@vger.kernel.org,
+ Guillaume Nault <gnault@redhat.com>
+References: <ab9737bc-cc91-6ccd-e104-4a94899e69e8@iam.tj>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <ab9737bc-cc91-6ccd-e104-4a94899e69e8@iam.tj>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 9/14/23 7:51 AM, Tj wrote:
+> Apologies if this doesn't thread - I've had to manually add the
+> In-Reply-To header because I did not receive Guillaume's reply and only
+> discovered it via the email archive.
+> 
+> Not being able to set the scope causes a problem. The scenario in which
+> I need to use it is interfaces with multiple global and ULA addresses
+> where a multicast-DNS responder needs to choose the correct address to
+> send in reply to queries. This affects both avahi and systemd-resolved
+> which currently seem to chose almost - but not quite - at random; but
+> enough so that it often breaks.
+> 
+> E.g: if the query originates from a ULA address the response should give
+> a ULA address; if the query originates from a global then a global
+> address, etc. In fact, being able to simply set scopes and enable the
+> responder to be configured to use a specific scope would be helpful.
+> It'd certainly avoid having to hard-code logic to determine what address
+> ranges represent a particular logical zone.
 
-> > +/* the table of time unit
-> > + * 4b'0000: 1.024us,    4b'0001: 2.048us,    4b'0010: 4.096us,
-> > + * 4b'0011: 8.192us,    4b'0100: 16.384us,   4b'0101: 32.768us,
-> > + * 4b'0110: 65.536us,   4b'0111: 131.072us,  4b'1000: 252.144us,
-> > + * 4b'1001: 524.288us,  4b'1010: 1048.576us, 4b'1011: 2097.152us,
-> > + * 4b'1100: 4194.304us, 4b'1101: 8388.608us, 4b'1110: 16777.216us,
-> > + * 4b'1111: 33554.432us
->=20
-> This seems to be all comment. Where is the table?
->=20
-> > + *
-> > + * the table of packet number unit
-> > + * 2b'00: 1,
-> > + * 2b'01: 2,
-> > + * 2b'10: 4,
-> > + * 2b'11: 16
->=20
-> Again, what use is this?
->=20
-> > + *
-> > + * interrupt mitigation =3D count * unit
-> > + * example: If want to set packet number mitigation be 64
-> > + *          the number unit is set 3,
-> > + *          and the number count is set 4
-> > + *          If want to set time be 131.072us
-> > + *          the time unit is set 4,
-> > + *          and the time count is set 8
-> > + */
->=20
-> Rather than a comment, how about a little function which does the calcula=
-tion.
-> Code can be just as good at explaining something as English text.
-
-Hi, Andrew
-
-This calculation is a bit complicated. We will rewrite this part as a fixed=
--unit calculation mitigation function in the next version. The time unit wi=
-ll be set to 16u, and the packet number unit will be set to 16.
-
->=20
-> > +     if (!dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64)))
-> > +             dev->features |=3D NETIF_F_HIGHDMA;
-> > +     else if (dma_set_mask_and_coherent(&pdev->dev,
-> DMA_BIT_MASK(32)))
-> > +             goto err_out_free_res;
-> > +     else
-> > +             pr_info("DMA_BIT_MASK: 32\n");
->=20
-> dev_info(). Don't use pr_ functions if you have a struct device.
->=20
-> > +static int rtase_init_one(struct pci_dev *pdev,
-> > +                       const struct pci_device_id *ent) {
-> > +     struct net_device *dev =3D NULL;
-> > +     void __iomem *ioaddr =3D NULL;
-> > +     struct rtase_private *tp;
-> > +     int ret;
-> > +
-> > +     if (!pdev->is_physfn && pdev->is_virtfn) {
-> > +             pr_info("This module does not support a virtual function.=
-");
-> > +             return -EINVAL;
-> > +     }
-> > +
-> > +     pr_info("Automotive Switch Ethernet driver loaded\n");
->=20
-> dev_dbg(), or nothing at all.
->=20
-> > +
-> > +     ret =3D rtase_init_board(pdev, &dev, &ioaddr);
-> > +     if (ret !=3D 0)
-> > +             return ret;
-> > +
-> > +     tp =3D netdev_priv(dev);
-> > +     tp->mmio_addr =3D ioaddr;
-> > +     tp->dev =3D dev;
-> > +     tp->pdev =3D pdev;
-> > +
-> > +     /* identify chip attached to board */
-> > +     if (!rtase_check_mac_version_valid(tp)) {
-> > +             return dev_err_probe(&pdev->dev, -ENODEV,
-> > +                                  "unknown chip version, contact
-> rtase maintainers (see MAINTAINERS file)\n");
-> > +     }
-> > +
-> > +     dev->tstats =3D netdev_alloc_pcpu_stats(struct pcpu_sw_netstats);
-> > +     if (!dev->tstats)
-> > +             goto err_out_1;
-> > +
-> > +     rtase_init_software_variable(tp);
-> > +     rtase_init_hardware(tp);
-> > +
-> > +     ret =3D rtase_alloc_interrupt(pdev, tp);
-> > +     if (ret < 0) {
-> > +             pr_err("unable to alloc MSIX/MSI\n");
-> > +             goto err_out_1;
-> > +     }
-> > +
-> > +     rtase_init_netdev_ops(dev);
-> > +
-> > +     dev->features |=3D NETIF_F_HW_VLAN_CTAG_TX |
-> > + NETIF_F_HW_VLAN_CTAG_RX;
-> > +
-> > +     dev->features |=3D NETIF_F_IP_CSUM;
-> > +     dev->features |=3D NETIF_F_RXCSUM | NETIF_F_SG | NETIF_F_TSO;
-> > +     dev->features |=3D NETIF_F_IPV6_CSUM | NETIF_F_TSO6;
-> > +     dev->hw_features =3D NETIF_F_SG | NETIF_F_IP_CSUM | NETIF_F_TSO
-> |
-> > +                        NETIF_F_RXCSUM |
-> NETIF_F_HW_VLAN_CTAG_TX |
-> > +                        NETIF_F_HW_VLAN_CTAG_RX;
-> > +     dev->hw_features |=3D NETIF_F_RXALL;
-> > +     dev->hw_features |=3D NETIF_F_RXFCS;
-> > +     dev->hw_features |=3D NETIF_F_IPV6_CSUM | NETIF_F_TSO6;
-> > +     dev->vlan_features =3D NETIF_F_SG | NETIF_F_IP_CSUM | NETIF_F_TSO
-> |
-> > +                          NETIF_F_HIGHDMA;
-> > +     dev->priv_flags |=3D IFF_LIVE_ADDR_CHANGE;
-> > +     netif_set_tso_max_size(dev, LSO_64K);
-> > +     netif_set_tso_max_segs(dev, NIC_MAX_PHYS_BUF_COUNT_LSO2);
-> > +
-> > +     rtase_get_mac_address(dev);
-> > +
-> > +     tp->tally_vaddr =3D dma_alloc_coherent(&pdev->dev,
-> > +
-> sizeof(*tp->tally_vaddr),
-> > +                                          &tp->tally_paddr,
-> > +                                          GFP_KERNEL);
-> > +     if (!tp->tally_vaddr) {
-> > +             ret =3D -ENOMEM;
-> > +             goto err_out;
-> > +     }
-> > +
-> > +     rtase_tally_counter_clear(tp);
-> > +
-> > +     pci_set_drvdata(pdev, dev);
-> > +
-> > +     ret =3D register_netdev(dev);
-> > +     if (ret !=3D 0)
-> > +             goto err_out;
-> > +
-> > +     netdev_info(dev, "%pM, IRQ %d\n", dev->dev_addr, dev->irq);
->=20
-> netdev_dbg(), or nothing at all.
->=20
->         Andrew
-
-Thank you for your suggestion, I will correct it.
+We cannot change the behavior of an existing API. We have tried that
+many times in the past, and inevitably most changes are reverted.
 
