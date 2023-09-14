@@ -1,112 +1,117 @@
-Return-Path: <netdev+bounces-33944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33945-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 495ED7A0C46
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 20:12:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69E5E7A0C8C
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 20:17:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 013611F244E7
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 18:12:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 06663B208F7
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 18:17:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64475219F4;
-	Thu, 14 Sep 2023 18:12:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AC05266B2;
+	Thu, 14 Sep 2023 18:17:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A3032628E
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 18:08:41 +0000 (UTC)
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2C6F1FDF;
-	Thu, 14 Sep 2023 11:08:40 -0700 (PDT)
-Received: from [2a02:8108:d00:dcc::d6ab]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1qgqla-0002SE-QL; Thu, 14 Sep 2023 20:08:38 +0200
-Message-ID: <ff2abfbe-a46b-414b-a757-8185495838b7@leemhuis.info>
-Date: Thu, 14 Sep 2023 20:08:38 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0807518E1B;
+	Thu, 14 Sep 2023 18:17:43 +0000 (UTC)
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1530C1FD7;
+	Thu, 14 Sep 2023 11:17:43 -0700 (PDT)
+Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-31ae6bf91a9so1231900f8f.2;
+        Thu, 14 Sep 2023 11:17:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694715461; x=1695320261; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=slgEAK+XoFog52OsY7C5eWDU4QO7+bjpMrPdH4n5j/g=;
+        b=jBkVvJPDPeCwON89BeCJ2C8gPNHQo40lZ4q+6QJK2AAQNFgxsTcK8eV4piGFIDeRXh
+         gGkn91KfEYv85qdqU0tJEE6bXbvsh8EWM/Mhc/6t3iBm9TWQnPvc+ABjLzn0cyPKw2Sh
+         kyUBhc49Mj3gn5OBLUYOBa7pdfr2f/fhPnUdRbv9zt1uoR6f0k/cio0HW0Rk2x9zAOUR
+         KGS01A35+aQbsAU6FNev2CFAuYLlk+E4qqSVNbkfhpv5XRXxQ/Gf31RipF4Kc8zypJdd
+         z2LoH+rFnpNAr7Qd+CRFhFsIqM63P/GtYYC6IPvUqe44j/I0mLCvWECA6Qhx+avV7hRk
+         T2Ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694715461; x=1695320261;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=slgEAK+XoFog52OsY7C5eWDU4QO7+bjpMrPdH4n5j/g=;
+        b=pMc9YU43pLzDMZ+QjOO285i4l8G8JhA9E/t8c3Q5tuvSfng9/EaE1nbga3BnE5Uc5s
+         axdilaIGE03ojAikSB+c/wYYnNi6JeFqi9/axu0igAUlJY9FVnIBZWhSvGJHdUWXzKR7
+         aVUSTLkNvXnyANw5TXSI3bAh1UGwPuuBTcBgmUCa+eKQrjpNGithmgPErOQU3ToQQXzX
+         VBN15pTQeIQat/vmPVz5uIV+hI9OH8y5m3GF8LtP5utKnqo5xsCI8MVbO9lXv7MxBFDL
+         YU0/SPOla6HqQpon7HgFyHWSeLdPVCu5IFObQga5G6CZRxWAX1MQgVemgRZkQ9SCKXQS
+         kgow==
+X-Gm-Message-State: AOJu0YzuyFo8JjlKq8nNvr936Iuj5EmhI6hKIaYvTn53srPU7AtiVDWP
+	sHePTUh52SnbQrqwNwAK/arG3uA9daTP+J+UF1OPe+u4/Ak=
+X-Google-Smtp-Source: AGHT+IHescFL/juEmVe99nxg45LPqBJUBmV9LSzGNUPX3mQ/Z61pHUW6jN6QvgQxmkHxa8Zup2aqNHQW/QMd/WIHwyM=
+X-Received: by 2002:a5d:6a11:0:b0:31f:a256:4bbb with SMTP id
+ m17-20020a5d6a11000000b0031fa2564bbbmr4596839wru.71.1694715461194; Thu, 14
+ Sep 2023 11:17:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: hci_sync: Fix handling of
- HCI_QUIRK_STRICT_DUPLICATE_FILTER
-Content-Language: en-US, de-DE
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Linux regressions mailing list <regressions@lists.linux.dev>,
- patchwork-bot+bluetooth@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev <netdev@vger.kernel.org>, Stefan Agner <stefan@agner.ch>
-References: <20230829205936.766544-1-luiz.dentz@gmail.com>
- <169343402479.21564.11565149320234658166.git-patchwork-notify@kernel.org>
- <de698d06-9784-43ed-9437-61d6edf9672b@leemhuis.info>
- <CABBYNZK2PPkLra8Au-fdN2nG2YLkfFRmPtEPQL0suLzBv=HHcA@mail.gmail.com>
- <574ca8dd-ee97-4c8b-a154-51faf83cabdf@leemhuis.info>
- <CABBYNZJ=5VH2+my7Gw1fMCaGgdOQfbWNtBGOc27_XQqCP7jD-A@mail.gmail.com>
-From: Thorsten Leemhuis <regressions@leemhuis.info>
-In-Reply-To: <CABBYNZJ=5VH2+my7Gw1fMCaGgdOQfbWNtBGOc27_XQqCP7jD-A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1694714921;07dc0098;
-X-HE-SMSGID: 1qgqla-0002SE-QL
+References: <20230914124928.340701-1-asavkov@redhat.com>
+In-Reply-To: <20230914124928.340701-1-asavkov@redhat.com>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Thu, 14 Sep 2023 11:17:29 -0700
+Message-ID: <CAEf4BzaAgSSj7W7S4uX=NormhaG1=ty8XumTRcSSEPd0XC4ocg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next] selftests/bpf: skip module_fentry_shadow test
+ when bpf_testmod is not available
+To: Artem Savkov <asavkov@redhat.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	vmalik@redhat.com, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 14.09.23 19:51, Luiz Augusto von Dentz wrote:
-> On Wed, Sep 13, 2023 at 10:13 PM Thorsten Leemhuis
-> <regressions@leemhuis.info> wrote:
->> On 12.09.23 21:09, Luiz Augusto von Dentz wrote:
->>> On Mon, Sep 11, 2023 at 6:40 AM Linux regression tracking (Thorsten
->>> Leemhuis) <regressions@leemhuis.info> wrote:
->>>> On 31.08.23 00:20, patchwork-bot+bluetooth@kernel.org wrote:
->>>>> This patch was applied to bluetooth/bluetooth-next.git (master)
->>>>> by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
->>>>> On Tue, 29 Aug 2023 13:59:36 -0700 you wrote:
->>>>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>>>>>
->>>>>> When HCI_QUIRK_STRICT_DUPLICATE_FILTER is set LE scanning requires
->>>>>> periodic restarts of the scanning procedure as the controller would
->>>>>> consider device previously found as duplicated despite of RSSI changes,
->>>>>> but in order to set the scan timeout properly set le_scan_restart needs
->>>>>> to be synchronous so it shall not use hci_cmd_sync_queue which defers
->>>>>> the command processing to cmd_sync_work.
->>>>>> [...]
->>>>>
->>>>> Here is the summary with links:
->>>>>   - Bluetooth: hci_sync: Fix handling of HCI_QUIRK_STRICT_DUPLICATE_FILTER
->>>>>     https://git.kernel.org/bluetooth/bluetooth-next/c/52bf4fd43f75
->>>>
->>>> That is (maybe among others?) a fix for a regression from 6.1, so why
->>>> was this merged into a "for-next" branch instead of a branch that
->>>> targets the current cycle?
-> [...]
->> That answer doesn't answer the question afaics, as both 6.1 and 6.4 were
->> released in the past year -- the fix thus should not wait till the next
->> merge window, unless it's high risk or something. See this statement
->> from Linus:
->> https://lore.kernel.org/all/CAHk-=wis_qQy4oDNynNKi5b7Qhosmxtoj1jxo5wmB6SRUwQUBQ@mail.gmail.com/
-> Thanks for the feedback, I will try to push fixes to net more often.
+On Thu, Sep 14, 2023 at 5:49=E2=80=AFAM Artem Savkov <asavkov@redhat.com> w=
+rote:
+>
+> This test relies on bpf_testmod, so skip it if the module is not availabl=
+e.
+>
+> Fixes: aa3d65de4b900 ("bpf/selftests: Test fentry attachment to shadowed =
+functions")
+> Signed-off-by: Artem Savkov <asavkov@redhat.com>
+> ---
+>  .../testing/selftests/bpf/prog_tests/module_fentry_shadow.c  | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/tools/testing/selftests/bpf/prog_tests/module_fentry_shadow.=
+c b/tools/testing/selftests/bpf/prog_tests/module_fentry_shadow.c
+> index c7636e18b1ebd..cdd55e5340dec 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/module_fentry_shadow.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/module_fentry_shadow.c
+> @@ -61,6 +61,11 @@ void test_module_fentry_shadow(void)
+>         int link_fd[2] =3D {};
+>         __s32 btf_id[2] =3D {};
+>
+> +        if (!env.has_testmod) {
+> +                test__skip();
+> +                return;
+> +        }
+> +
 
-Great, many thx!
+you used spaces for indentation, please don't do that. It was also
+obvious if you looked at patchworks status ([0]). I fixed it up while
+applying, but keep this in mind for the future. Thanks.
 
->>> but I could probably have it marked for stable just
->>> to make sure it would get backported to affected versions.
->> That would be great, too!
-> Well now that it has already been merged via -next tree shall we still
-> attempt to mark it as stable? Perhaps we need to check if it was not
-> backported already based on the Fixes tag.
+  [0] https://patchwork.kernel.org/project/netdevbpf/patch/20230914124928.3=
+40701-1-asavkov@redhat.com/
 
-Changes only get backported once they hit mainline, which hasn't
-happened yet. And to get them into the net branch (and from there to
-mainline) a new commit is needed anyway, so you might as well add the
-stable tag to it. Side note: And don't worry that identical commit is
-already in -next, git handles that well afaik (but if you rebase
-bluetooth-next for other reasons anyway you might as well remove it).
-
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-If I did something stupid, please tell me, as explained on that page.
+>         LIBBPF_OPTS(bpf_prog_load_opts, load_opts,
+>                 .expected_attach_type =3D BPF_TRACE_FENTRY,
+>         );
+> --
+> 2.41.0
+>
 
