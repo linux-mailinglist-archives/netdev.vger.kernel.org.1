@@ -1,252 +1,239 @@
-Return-Path: <netdev+bounces-33922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C2867A0A97
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 18:17:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D06707A0A83
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 18:12:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EB04EB20D2E
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 16:17:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 612041C20902
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 16:12:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C13B52135E;
-	Thu, 14 Sep 2023 16:17:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8D5021358;
+	Thu, 14 Sep 2023 16:12:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8B1C18E28;
-	Thu, 14 Sep 2023 16:17:16 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D3BC10C7;
-	Thu, 14 Sep 2023 09:17:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694708236; x=1726244236;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=dtx6puYU5oZJh3x5EGDrDtT57YKHBMGq+tz1O+XF6yE=;
-  b=SQRYRB3+k17nPSG96626g9EiMyDuQaR4ds6XPA6IBk1PyJu3BaFZgSIj
-   N9CkNJ0pd5hhNG2/TvbNDM0XRZG3d8VEh9HyvUPDOaoho4fbeg2f6tY54
-   8UMew+H7k6BCKxmYswMXtZrJPtMVnMorpWo5ZXAhC68HhEDkB5P+vn4+W
-   ZQZEDJXuZEKdDhBbwj+q5COSTxvSRi7lIWd24xfZfc9E/bCkAL0jtSmg4
-   wqp6be4yTerXnuQagBct5gln16TS6MY363J4v8+4IExx4+0BimLUoSN3q
-   XWsAx9AOw0423UD9TS+M/+4+QA+DUuuMSJ1I89BU/2eHsr0IngBJBpY3f
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="376340026"
-X-IronPort-AV: E=Sophos;i="6.02,146,1688454000"; 
-   d="scan'208";a="376340026"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2023 09:13:22 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="694361750"
-X-IronPort-AV: E=Sophos;i="6.02,146,1688454000"; 
-   d="scan'208";a="694361750"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Sep 2023 09:13:21 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Thu, 14 Sep 2023 09:13:21 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Thu, 14 Sep 2023 09:13:21 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Thu, 14 Sep 2023 09:13:21 -0700
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.48) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Thu, 14 Sep 2023 09:13:21 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RT8qqq97PyEs57S6Y8vcyWvUlSck3Ioi+/kto2gl1U75Rsji5mEOFGGHM8i55cLOQNkgdeDNKtZkjCJhD4HyGXuEVpv7RFndpPvUYkhD2JVwngswBg/IsNgE03EPG+qeG4x/moDP5ahKpx55p2bXy4ms5ysS99R0ASAATlOQGLR0JSV4qoxquTJZCfxwIxZ9NVU3UcQs8WMk1Zaa3ICGWYmvVrNep2Ucy7pSCmC3QzoEBugIrp1RRQSqArRFq0BroKwGCiNvaH6Jq6HnJD9FcFJzBjcNC8GS0sqmifhx9007t4L8LdYGLoOmhR+p30QgNWiuGgsvl6dCOrG29t4pUA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SkeBjq8hdb+DAPbGpUwxqsSClSylOT0jX6iAYqGO5jw=;
- b=jU2mo+0yKMHaFaQxn/raBYC+jdym9MV1WgVX0jJiCZzWz7i4NsN7e0zZxUIquKvYpQh6AzqifTD+ljtGAy+P/gc1EJmAqjZTRTGR7sTAaQFMB/Pvq/8PSCf5P0CbPlmC9minl8e+I+1OaAHDPEGcIswZxfQXOyHez9m4ioZfkXZQ1M1LLzjmGqatq0DcTCgOh5liYY0b218yDR637pB2v6GxNltUn4gwHn/OAoTQ3Q2XVX2H8zPuEQ6MXFSf8b3c6yvU0uezCay9L5jrgIYToibPb9LoEyFyC+F5SQ2+QRuN83eQ6NZjMgoWtuz6rOwFKs20xEkGv7+ynbBnRIBQbw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
- by CYYPR11MB8429.namprd11.prod.outlook.com (2603:10b6:930:c2::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.20; Thu, 14 Sep
- 2023 16:13:18 +0000
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::bede:bd20:31e9:fcb4]) by DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::bede:bd20:31e9:fcb4%7]) with mapi id 15.20.6768.029; Thu, 14 Sep 2023
- 16:13:18 +0000
-Message-ID: <eceeb36a-6621-b0c3-371d-e617023fb0e4@intel.com>
-Date: Thu, 14 Sep 2023 18:12:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [xdp-hints] [RFC bpf-next 01/23] ice: make RX hash reading code
- more reusable
-Content-Language: en-US
-To: Larysa Zaremba <larysa.zaremba@intel.com>
-CC: <bpf@vger.kernel.org>, <ast@kernel.org>, <daniel@iogearbox.net>,
-	<andrii@kernel.org>, <martin.lau@linux.dev>, <song@kernel.org>, <yhs@fb.com>,
-	<john.fastabend@gmail.com>, <kpsingh@kernel.org>, <sdf@google.com>,
-	<haoluo@google.com>, <jolsa@kernel.org>, David Ahern <dsahern@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Willem de Bruijn <willemb@google.com>,
-	Jesper Dangaard Brouer <brouer@redhat.com>, Anatoly Burakov
-	<anatoly.burakov@intel.com>, Alexander Lobakin <alexandr.lobakin@intel.com>,
-	Magnus Karlsson <magnus.karlsson@gmail.com>, Maryam Tahhan
-	<mtahhan@redhat.com>, <xdp-hints@xdp-project.net>, <netdev@vger.kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Alexei Starovoitov
-	<alexei.starovoitov@gmail.com>, Simon Horman <simon.horman@corigine.com>,
-	Tariq Toukan <tariqt@mellanox.com>, Saeed Mahameed <saeedm@mellanox.com>
-References: <20230824192703.712881-1-larysa.zaremba@intel.com>
- <20230824192703.712881-2-larysa.zaremba@intel.com>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-In-Reply-To: <20230824192703.712881-2-larysa.zaremba@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BE1P281CA0177.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:66::6) To DM6PR11MB3625.namprd11.prod.outlook.com
- (2603:10b6:5:13a::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E75528E39;
+	Thu, 14 Sep 2023 16:12:32 +0000 (UTC)
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE3801FD6;
+	Thu, 14 Sep 2023 09:12:31 -0700 (PDT)
+Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-9ad8a822508so151937366b.0;
+        Thu, 14 Sep 2023 09:12:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694707950; x=1695312750; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SThObeQlIaemVPSCk4ah7fqYpyLQMYXbP7Z15PryLj0=;
+        b=O2AWI2dIB+ylQ5iAEdz8Y0teCrDLileC+hoBn9/pTf9DYCFEERJrSxIGa+MV6FfCil
+         4eMvk+oDFKAeLkKgESN2YJJC93tDwRbDH0sdqc/aVgun+HREcqc4YyEFSF44JZr7fJX5
+         xoUQHF9P8JejgF82Q5BMCMi0JMe6jL2j96yjuN3eS7QivgtoKrrTjN4qioaDeseVP02F
+         msizHTMu/fnsE3WDfw5SFkhTGvYYZx02d2IHb4xioX+CQQIk4Hwngx9eBhvX29T/6x+9
+         maZU9w9sT7CpAxgHNuask6xrr6G//WxERiHstIgOiyh2EzZtJx76UFqVF8wVwUYB6gOV
+         TKNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694707950; x=1695312750;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SThObeQlIaemVPSCk4ah7fqYpyLQMYXbP7Z15PryLj0=;
+        b=R0iXEK0JoFKYMSz/uFIcqDF/0Z9l0/oWkSKDgwK5mHUbQ4N2DZv5UxPtaWMAo7fhFb
+         Frt8LSoU5KE0xeCzFe1EWTPBD2H7Cci5i2u+HADlb7kJ3DcTqrJj5FHvcD8U31TB80YH
+         Wa9LpWAo0ORcF7+dDIaEYY9uY589LLP/yugz4QXGVDvn1pHB7aaJje+YPKM6DejhY0In
+         0khE0g69aI5GOS++zC2Uw59gVbJcUqu2zjQ4282tPMsRNpGJ6HFvMSq+Mw5xNDtdGORu
+         rQMQcRDSORoIM+jrqQ1wRzQ/Z28ckKfFLz/x7FuiyuUQWhw6QYGSUZZt36SBQNLN3SsT
+         SMQw==
+X-Gm-Message-State: AOJu0YzwyZoF/Errt9oDuPq0B66loAwXNg8QRouRG96Gma1axEPTnIP6
+	9bF2f09aT2RJV+Dg1wmtybY=
+X-Google-Smtp-Source: AGHT+IELqO4SvOWFV2/pKbLA0g4UVTZ7AbMewT+KnbWAN1uC7xCJlW08XIvsVg3T7S+uvgq7bq1bMA==
+X-Received: by 2002:a17:906:7692:b0:9a2:739:3aa1 with SMTP id o18-20020a170906769200b009a207393aa1mr5162206ejm.61.1694707949815;
+        Thu, 14 Sep 2023 09:12:29 -0700 (PDT)
+Received: from skbuf ([188.26.56.202])
+        by smtp.gmail.com with ESMTPSA id l13-20020a170906078d00b009a193a5acffsm1179235ejc.121.2023.09.14.09.12.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Sep 2023 09:12:29 -0700 (PDT)
+Date: Thu, 14 Sep 2023 19:12:26 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH 2/4] dt-bindings: net: dsa: document internal MDIO bus
+Message-ID: <20230914161226.563423jjeuywfe57@skbuf>
+References: <0cee0928-74c9-4048-8cd8-70bfbfafd9b2@arinc9.com>
+ <20230827121235.zog4c3ehu2cyd3jy@skbuf>
+ <676d1a2b-6ffa-4aff-8bed-a749c373f5b3@arinc9.com>
+ <87325ce9-595a-4dda-a6a1-b5927d25719b@arinc9.com>
+ <20230911225126.rk23g3u3bzo3agby@skbuf>
+ <036c0763-f1b2-49ff-bc82-1ff16eec27ab@arinc9.com>
+ <20230912193450.h5s6miubag46z623@skbuf>
+ <6cec079e-991e-4222-a76d-d6156de0daca@arinc9.com>
+ <20230913074231.5azwxqjuv2wp5nik@skbuf>
+ <ZQHcV5DUfcCYkkTi@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|CYYPR11MB8429:EE_
-X-MS-Office365-Filtering-Correlation-Id: 11483fd0-8a02-46e7-9c40-08dbb53d81d5
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 4Vyi9fA9dVqoe62C4pJNj+75H3KfEiOMQzJ0bAJypqQJVy1Oy61kxvAre5InejzbssWOaGJo0qyNqSnpZgoHBVKLZYI2wT0opv3I62Faf1Ak+HLvT0zFF66NV7vFfDIh0l3/uNMyVsWe/aKK9MsI9x3ttPvlaipz1fhJVOqlGab+MgxWsHokdlb/ySaBr3Z2MUppi7lwZ6eZzOfxXczB6MO/35/EaE7gzp3bCgQrRKFHlOjDcdmZgm3bMv6GO02bfaLKMX3OFXoxMACHHXwbgsP6J87ShQaFHuV7llb69mt+zRgkUjD4MGH0UbRh4ZoCMQZMb5mE4lyfC+K+tZolwU6Ne+GJq5peNw7ioNH+HgIZxTAzrPTStMS/ZglXQS5vRC3hSopgSuUUAUVQm7E30M0XpH4cT2ouF9LeVN71R12BHS0A2M8YqgQ9dEJFi0svYw7iStYekQ3HA8nzYpy40PU995B2Ye1190Re8Wt09XB22u+ebd7emEG78jFRTtFPqQnvH8S/6FLuJJ7NuWDGMcEbDvXvFuOfQeRlUBJlJXmti8NMMGvIqYu4yEYVHCoqz8c1QCPhFetrzv4aA0DWxIO1mfOgtS9kcA3K1jk4yc7Z+YGNAj8CRJ8ZDEGyR7IGsm0cRm4Z2wMkC/YKsd8JLA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(136003)(396003)(376002)(346002)(366004)(1800799009)(186009)(451199024)(2906002)(86362001)(31696002)(6512007)(26005)(2616005)(478600001)(36756003)(6666004)(6486002)(6506007)(83380400001)(38100700002)(82960400001)(7416002)(41300700001)(31686004)(8936002)(4326008)(6862004)(8676002)(5660300002)(66476007)(66556008)(54906003)(66946007)(37006003)(316002)(6636002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UnM3cHo3QnRYUWVPV0JRcXZPQ3FFa1Z2SDFwT21TS0x4NkcreFRKd0Y1LzRk?=
- =?utf-8?B?d0VGYno1ZlRMQmdsaTN0elozdGFyWGdtVWFIL2JwZGNaRW5FMHZwUFlmYWpk?=
- =?utf-8?B?UEJGdWxNZTFJTjNnNENHKzlBanA2TVc2NXVDVnFmNjFRcWZwTGhSNTV2NFBE?=
- =?utf-8?B?azd6S1BTMFZka0I3K2NFVUd4akEyU1NabGVFWjhFNUtqRG8xclQ4Z1kzYTRx?=
- =?utf-8?B?SnJGQStYRkV2ei9ranRrQ08rakFuMlI1a2VpRnFkZURXK3RjK2FqdHFjVHkz?=
- =?utf-8?B?cVo5akNDOEdYZzZvTk5weXo1UmJBSDRoUEExamd4MHQ4L205a0M0N1ViLzB5?=
- =?utf-8?B?aGVZTzdEazZ0dzI1ZHpBNk85ODFXMTVDQ0RTNG1OQWdJTGlxTER5VXNWano0?=
- =?utf-8?B?RzRsRWJ0SjJFY0FIcmNTdStDakVlcy9hTEdOYmI4dENSY1N6S0FwVzhhSy9l?=
- =?utf-8?B?dkUzQWRjdEFhSTlYY0FvZTdkQ0RHeVlsK0FvV2l5ajVFclJiditHSU8yMS9r?=
- =?utf-8?B?S1U0NnR6cEVxT244aFhmUStFTDBtWDdmRlRYaVE0QnUrL3MwbW85em42M293?=
- =?utf-8?B?VzR3M0ExTmgzVVNVMHVvaTRtZnVoNkxGdUtQVzRHMXBLdm5JTVoxOGxHNjFV?=
- =?utf-8?B?MFJNVHhvSFlkTTBBZXgrVmhmUzFsQ3JPUmZtTlZWT1dsQktNMzFaUzBCeEFu?=
- =?utf-8?B?dVVRc1pZNThtY1crV2Fxa0hlRmtleGRVSnFDRVpPMmVQUHIzTlB0UDlQbDBK?=
- =?utf-8?B?VHdqQmtDTXo1eTlWS1hjQTdqTTZRaVBzNHFZYUU3MGpzTHFHVzg2ekUwUmkz?=
- =?utf-8?B?Tk5OTFJvNE5qZEdZVjB0eEFJVE5vTjBnODBSNGtTaTVDL0hoenZCcFExblhx?=
- =?utf-8?B?QmJPNzc2b2ZGT3A2c1ZjVEpVTGNEV25LR3dhRDgxbWliOU92bGYrRy9rOFZY?=
- =?utf-8?B?VDRMYVJJVnRodlE2RFFrbCtpYlhBaVJMbVRCdnhTUGJuL3JVaG55bE1BQnEy?=
- =?utf-8?B?SnRvRWphSEtRa29nVXh3TmZObUM4ZkJDWFhnTmxKSjlKQy9LSXhCZ3ROTDBx?=
- =?utf-8?B?dUdzQ1lSSU1KTjlGZjBMT0svVzgyWUorUUZMeW8vSXQvUFdJdEVobU5zcFdV?=
- =?utf-8?B?cmk2cDNRazlqSHk3SEpCbzBad0NSZTg3Y0Fqdnp2MUxlakVlYTNOVEhVZGZS?=
- =?utf-8?B?aTBhc29Hck01U3FkM2NyS3RNMlBWa0dvWG11aUtpMHJjR2VzbkxoSzhNcU5w?=
- =?utf-8?B?V3I2Tms0eHJzYUgxUE0rbko2UUNkb3BIWjFORks5d3FwYTdMQkxPck5DNnkr?=
- =?utf-8?B?NnpyQzNWcEtPeFNmMkd5YkR4Qkdzd0JzMTdFZ1VFK25oYnlmQlVFaVBweCtl?=
- =?utf-8?B?a1RVZUdEbktNT3FLOUZvQ05RNjFhSFYyZG9SdXpKYUZFZVZVaGxRMEJka0NI?=
- =?utf-8?B?Z3d2bnVsbmFZaGNleFEwOXV3MWZWdStISVRsSzJCSTVsTnI1RFRKT2t4YjNJ?=
- =?utf-8?B?ZXJMaUdXaE9rcFVwbGJNVXJ5M2V3T0lyc0krb2tPdmdJRGdoM2F4U01HR0Za?=
- =?utf-8?B?V21NNDAyUTNUeWhJUFlJRzg5c1hJOHM1TnhJV2hxY0FKRlVPVHVKSjk4NUhZ?=
- =?utf-8?B?MGZ4Wk9hWTVLT0FqQW84ZzlTeFFUcUxqaW1MVGw4OW92UnNER1ZXVzJEbXRj?=
- =?utf-8?B?UXE1UXZwa3Azc3RGSlYyTGxDejEwNG0vTk9PZlhiL0tjaWdEb0hFZGJxTU1y?=
- =?utf-8?B?aUNWZzQ1aFhWVVY3UU1WbURZcDVvcUdpMkRZKzdBUkZIdmtZNGZVRXl4ZFZV?=
- =?utf-8?B?Y084NjJXRzdHbjZTM3Y1MXdPK1dndEZ6ZjJPVHprbEZCR0s0bmN5VWRRTWNS?=
- =?utf-8?B?MXZrbHZWb0RJbW9ydDVTV2ZNOWV1N0xEOXBVSlY2ZXQrblVlRXA3OGpKeW84?=
- =?utf-8?B?S0Y2Y2xKbmhUTW1KaG9hamNSbDJIQ1RGVDV1WktXbm9RZDUyb3Zad2haZ0lZ?=
- =?utf-8?B?SDBnNDNZYUVGV0hXZ1Ard3pZZFhza1BMallYbHYwZ1dPUTZwanVMM1UvNXNu?=
- =?utf-8?B?dDVrcHdRTVZMa1ZoaTFyMnVYTFFpeUdxSHFjNkxlK1R3ZWNFa1NOUDU0TXNN?=
- =?utf-8?B?dHhnTU5neVJ5ejE4SXFoZGFGOUFreHlpZmZ3LzZnL1Y4ajhyRm9MaUdmd0JG?=
- =?utf-8?B?dFE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 11483fd0-8a02-46e7-9c40-08dbb53d81d5
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Sep 2023 16:13:18.1731
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Dqn6H4vrSyvOWUeTDmBCgqKW4E75JyLIrFkyRHGmTP3ssctk9uk0Ozv3re8OIjozff53SntAKs2dBuIJPpsqQcDsX5+oLp5i9p2lTWnSV68=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR11MB8429
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZQHcV5DUfcCYkkTi@shell.armlinux.org.uk>
 
-From: Larysa Zaremba <larysa.zaremba@intel.com>
-Date: Thu, 24 Aug 2023 21:26:40 +0200
+On Wed, Sep 13, 2023 at 04:59:19PM +0100, Russell King (Oracle) wrote:
+> However, phylink pretty much requires phy-mode to be specified to be
+> something sane for shared ports, so I wouldn't be in favour of relaxing
+> the checkinng in dsa_shared_port_validate_of()... not unless you're
+> now going to accept the approach I originally proposed to have DSA
+> drivers tell the core (and thus phylink) what phy-mode and other link
+> parameters should be used when they are missing from DT.
 
-> Previously, we only needed RX hash in skb path,
-> hence all related code was written with skb in mind.
-> But with the addition of XDP hints via kfuncs to the ice driver,
-> the same logic will be needed in .xmo_() callbacks.
-> 
-> Separate generic process of reading RX hash from a descriptor
-> into a separate function.
-> 
-> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+Ok, so with a missing phy-mode on the CPU port, phylink_parse_fixedlink() ->
+phy_lookup_setting() will return NULL and that will print a phylink_warn(),
+but other than that, phylink_mac_link_up() does get called at the right
+speed and duplex.
 
-I like the patch, except three minors above,
+I agree that for sane behavior it should be specified, but it appears
+that even with PHY_INTERFACE_MODE_NA something can be hacked up...
 
-> ---
->  drivers/net/ethernet/intel/ice/ice_txrx_lib.c | 37 +++++++++++++------
->  1 file changed, 26 insertions(+), 11 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-> index c8322fb6f2b3..8f7f6d78f7bf 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-> @@ -63,28 +63,43 @@ static enum pkt_hash_types ice_ptype_to_htype(u16 ptype)
->  }
->  
->  /**
-> - * ice_rx_hash - set the hash value in the skb
-> + * ice_get_rx_hash - get RX hash value from descriptor
-> + * @rx_desc: specific descriptor
-> + *
-> + * Returns hash, if present, 0 otherwise.
-> + */
-> +static u32
-> +ice_get_rx_hash(const union ice_32b_rx_flex_desc *rx_desc)
+[    4.818368] sja1105 spi0.1: Failed to read phy-mode or phy-interface-type property for port 4
+[    4.864667] sja1105 spi0.1: OF node /soc/spi@2100000/ethernet-switch@1/ports/port@4 of CPU port 4 lacks the required "phy-mode" property
+[    4.882957] sja1105 spi0.1: pl->link_config.speed 1000 pl->link_config.duplex 1 pl->supported 00,00000000,00000000,00000240
+[    4.894189] sja1105 spi0.1: phy_setting speed -1 duplex -1 bit -1
+[    4.900283] sja1105 spi0.1: fixed link full duplex 1000Mbps not recognised
+[    4.907798] sja1105 spi0.1: configuring for fixed/ link mode
+[    4.916183] sja1105 spi0.1 swp5 (uninitialized): PHY [mdio@2d24000:06] driver [Broadcom BCM5464] (irq=POLL)
+[    4.934770] sja1105 spi0.1 swp2 (uninitialized): PHY [mdio@2d24000:03] driver [Broadcom BCM5464] (irq=POLL)
+[    4.951619] sja1105 spi0.1 swp3 (uninitialized): PHY [mdio@2d24000:04] driver [Broadcom BCM5464] (irq=POLL)
+[    4.968349] sja1105 spi0.1 swp4 (uninitialized): PHY [mdio@2d24000:05] driver [Broadcom BCM5464] (irq=POLL)
+[    4.984017] fsl-gianfar soc:ethernet@2d90000 eth2: entered promiscuous mode
+[    4.991327] DSA: tree 0 setup
+[    4.995129] sja1105 spi0.1: sja1105_mac_link_up: port 4 interface  speed 1000 duplex 1
+[    5.005004] sja1105 spi0.1: Link is Up - 1Gbps/Full - flow control off
 
-The whole declaration could easily fit into one line :>
-
-> +{
-> +	const struct ice_32b_rx_flex_desc_nic *nic_mdid;
-> +
-> +	if (rx_desc->wb.rxdid != ICE_RXDID_FLEX_NIC)
-
-Not really related: have you tried to measure branch hit/miss here?
-Can't it be a candidate for unlikely()?
-
-> +		return 0;
-> +
-> +	nic_mdid = (struct ice_32b_rx_flex_desc_nic *)rx_desc;
-> +	return le32_to_cpu(nic_mdid->rss_hash);
-
-I think the common convention in the kernel is to separate the last
-return from the main body with a newline.
-To not leave the cast above alone, you can embed it into the declaration.
-
-	const struct ice_32b_rx_flex_desc_nic *mdid = (typeof(mdid))rx_desc;
-
-This is a compile-time cast w/o any maths anyway, so doing it before
-checking for the descriptor type doesn't hurt in any way.
-
-	if (!= FLEX)
-		return 0;
-
-	return le32_ ...
-
-(or via a ternary)
-
-> +}
-
-[...]
-
-Thanks,
-Olek
+diff --git a/arch/arm/boot/dts/nxp/ls/ls1021a-tsn.dts b/arch/arm/boot/dts/nxp/ls/ls1021a-tsn.dts
+index 1ea32fff4120..0bfffcb51af9 100644
+--- a/arch/arm/boot/dts/nxp/ls/ls1021a-tsn.dts
++++ b/arch/arm/boot/dts/nxp/ls/ls1021a-tsn.dts
+@@ -90,7 +90,7 @@ port@3 {
+ 			port@4 {
+ 				/* Internal port connected to eth2 */
+ 				ethernet = <&enet2>;
+-				phy-mode = "rgmii";
++//				phy-mode = "rgmii";
+ 				rx-internal-delay-ps = <0>;
+ 				tx-internal-delay-ps = <0>;
+ 				reg = <4>;
+diff --git a/drivers/net/dsa/sja1105/sja1105_main.c b/drivers/net/dsa/sja1105/sja1105_main.c
+index a23d980d28f5..dba1fa545a9c 100644
+--- a/drivers/net/dsa/sja1105/sja1105_main.c
++++ b/drivers/net/dsa/sja1105/sja1105_main.c
+@@ -327,6 +327,8 @@ static int sja1105_init_mii_settings(struct sja1105_private *priv)
+ 			mii->xmii_mode[i] = XMII_MODE_SGMII;
+ 			mii->special[i] = true;
+ 			break;
++		case PHY_INTERFACE_MODE_NA:
++			break;
+ unsupported:
+ 		default:
+ 			dev_err(dev, "Unsupported PHY mode %s on port %d!\n",
+@@ -1205,11 +1207,10 @@ static int sja1105_parse_ports_node(struct sja1105_private *priv,
+ 		/* Get PHY mode from DT */
+ 		err = of_get_phy_mode(child, &phy_mode);
+ 		if (err) {
+-			dev_err(dev, "Failed to read phy-mode or "
++			dev_warn(dev, "Failed to read phy-mode or "
+ 				"phy-interface-type property for port %d\n",
+ 				index);
+-			of_node_put(child);
+-			return -ENODEV;
++			phy_mode = PHY_INTERFACE_MODE_NA;
+ 		}
+ 
+ 		phy_node = of_parse_phandle(child, "phy-handle", 0);
+@@ -1383,6 +1384,8 @@ static void sja1105_mac_link_up(struct dsa_switch *ds, int port,
+ {
+ 	struct sja1105_private *priv = ds->priv;
+ 
++	dev_err(ds->dev, "%s: port %d interface %s speed %d duplex %d\n", __func__, port, phy_modes(interface), speed, duplex);
++
+ 	sja1105_adjust_port_config(priv, port, speed);
+ 
+ 	sja1105_inhibit_tx(priv, BIT(port), false);
+@@ -1414,7 +1417,10 @@ static void sja1105_phylink_get_caps(struct dsa_switch *ds, int port,
+ 		 * config (the xMII Mode table cannot be dynamically
+ 		 * reconfigured), and we have to program that early.
+ 		 */
+-		__set_bit(phy_mode, config->supported_interfaces);
++		if (phy_mode == PHY_INTERFACE_MODE_NA)
++			phy_interface_set_rgmii(config->supported_interfaces);
++		else
++			__set_bit(phy_mode, config->supported_interfaces);
+ 	}
+ 
+ 	/* The MAC does not support pause frames, and also doesn't
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 0d7354955d62..674689011059 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -841,6 +841,15 @@ static int phylink_parse_fixedlink(struct phylink *pl,
+ 	if (autoneg)
+ 		phylink_set(pl->supported, Autoneg);
+ 
++	phylink_err(pl, "pl->link_config.speed %d pl->link_config.duplex %d pl->supported %*pb\n",
++		    pl->link_config.speed, pl->link_config.duplex, __ETHTOOL_LINK_MODE_MASK_NBITS,
++		    pl->supported);
++
++	phylink_err(pl, "phy_setting speed %d duplex %d bit %d\n",
++		    s ? s->speed : -1,
++		    s ? s->duplex : -1,
++		    s ? s->bit : -1);
++
+ 	if (s) {
+ 		__set_bit(s->bit, pl->supported);
+ 		__set_bit(s->bit, pl->link_config.lp_advertising);
+diff --git a/net/dsa/port.c b/net/dsa/port.c
+index 5f01bd4f9dec..34e5dc48f0ff 100644
+--- a/net/dsa/port.c
++++ b/net/dsa/port.c
+@@ -1927,6 +1927,16 @@ static const char * const dsa_switches_apply_workarounds[] = {
+ #if IS_ENABLED(CONFIG_NET_DSA_SMSC_LAN9303_I2C)
+ 	"smsc,lan9303-i2c",
+ #endif
++	"nxp,sja1105e",
++	"nxp,sja1105t",
++	"nxp,sja1105p",
++	"nxp,sja1105q",
++	"nxp,sja1105r",
++	"nxp,sja1105s",
++	"nxp,sja1110a",
++	"nxp,sja1110b",
++	"nxp,sja1110c",
++	"nxp,sja1110d",
+ 	NULL,
+ };
+ 
 
