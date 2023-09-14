@@ -1,263 +1,200 @@
-Return-Path: <netdev+bounces-33895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEB4F7A093D
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 17:29:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A2457A0947
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 17:31:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC96D1C20844
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 15:29:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35ACB1F24273
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 15:31:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E1FF21351;
-	Thu, 14 Sep 2023 15:17:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 855581C68C;
+	Thu, 14 Sep 2023 15:20:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DA4339C
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 15:17:17 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8E3AA1FD0
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 08:17:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1694704635;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KBHXLcuV4EPqLOuVGuSZ2vgBmxBMgNfH5q8svpMWRW4=;
-	b=UBWoeL3/NlEnHu9PXV10oocxlTtTJpsgDq/V48FOTUyMjSWZZipL6j+uBUdyusGvq105w8
-	DYPu+MFPlqx/lO3P0MOWBlu3G1KmX+D9ryAaObjZFIS6boOOn0EbNO25yTb3uRPN79DdIn
-	QxPcXWUFqIEFQqV7MSGjUfmlKc24WvI=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-384-s7h072Q4NNasoV7Y8CZ6rQ-1; Thu, 14 Sep 2023 11:17:14 -0400
-X-MC-Unique: s7h072Q4NNasoV7Y8CZ6rQ-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2be48142a6cso2647331fa.1
-        for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 08:17:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694704632; x=1695309432;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KBHXLcuV4EPqLOuVGuSZ2vgBmxBMgNfH5q8svpMWRW4=;
-        b=MrRqnAHK70VZZKvsVXyQDq5He7aV9kyxJVMncBvEd+1cg5sgr5mqJAObwnQpHKWo0c
-         nyFcwKTOwSELUe86/HIgEiwgo7UJGuooJa3vMk+tut1lwWwX4BrG5cP4w8FpbkmjRizc
-         kysvZlNJQ8/x2MmZlphjcS0x5EOCDhWRQghf6zKs2tJducIqruOWNEegtgQGDMyCX/Pe
-         OzttGd/0fyF20CUXbB29uy73gFTE2fW3auDj5QI23J/xwtU4KgGjN5fnu3Qu18T+ThMP
-         6dB32aQpWRORyyLNFB6ujAOezUVQRIQWQkz1rZdyUzEhEmBqbftCERt7XWlfiF5wzPTg
-         6C4A==
-X-Gm-Message-State: AOJu0YzkpUxbLbRhlDQmAmyMOyy9OKbulrRnIWF9fR2uZa+qTVxcDeWj
-	IuupIvW3x7DMQxQkR8q0rL3haQVAi7SpPcba+LFd3Wfc0ICSGr6Cq8m6pp27XN4/00DJ1N1YM0V
-	hpTG0lOAvEWUvYSZj
-X-Received: by 2002:ac2:488d:0:b0:502:d7fe:46f0 with SMTP id x13-20020ac2488d000000b00502d7fe46f0mr4370582lfc.0.1694704632710;
-        Thu, 14 Sep 2023 08:17:12 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGsU0DDT6yb3BujGwrIOC4cHfjRDtzTfEejwVQRucm650X7K6Lu5bFm3ku0G5LtBzXT6cTgCA==
-X-Received: by 2002:ac2:488d:0:b0:502:d7fe:46f0 with SMTP id x13-20020ac2488d000000b00502d7fe46f0mr4370560lfc.0.1694704632270;
-        Thu, 14 Sep 2023 08:17:12 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-242-187.dyn.eolo.it. [146.241.242.187])
-        by smtp.gmail.com with ESMTPSA id v10-20020aa7cd4a000000b0052333d7e320sm1033353edw.27.2023.09.14.08.17.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Sep 2023 08:17:11 -0700 (PDT)
-Message-ID: <9e53ca46be34f3c393861b7a645bb25f0b03f1d2.camel@redhat.com>
-Subject: Re: [PATCH net-next v8 2/6] page_pool: unify frag_count handling in
- page_pool_is_last_frag()
-From: Paolo Abeni <pabeni@redhat.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
- kuba@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Lorenzo Bianconi
- <lorenzo@kernel.org>, Alexander Duyck <alexander.duyck@gmail.com>, Liang
- Chen <liangchen.linux@gmail.com>, Alexander Lobakin
- <aleksander.lobakin@intel.com>,  Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>, Eric Dumazet
- <edumazet@google.com>
-Date: Thu, 14 Sep 2023 17:17:10 +0200
-In-Reply-To: <20230912083126.65484-3-linyunsheng@huawei.com>
-References: <20230912083126.65484-1-linyunsheng@huawei.com>
-	 <20230912083126.65484-3-linyunsheng@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7648139C
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 15:20:22 +0000 (UTC)
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2046.outbound.protection.outlook.com [40.107.220.46])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2C411FCC;
+	Thu, 14 Sep 2023 08:20:21 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Dih+S/SBNNOSYyUBhsm9ktAkab6ea+yxSENwCdtNt+1hg3ypbst/FDV+3Tz4X/JeDx4xl7wuMAm/gupOxpzM2KF+hldJklvJm/IUzrYkaDimvMH/349y+Ia/mDAh12b0tc1KxBpXETKk29cyXE3BI3y1rskx3p4Cx0YDwK9g/CfKPsnSvxCj6xQaBdHINWoQU2l/eX5nznq03kjZOzosG3tz2qvN3qnB/qd5Tl4sb0PSrvq7sMDsHkKiEYoSzajgd4bHDC739R4EWcJamSwDbVtzJ6RSgYZvqv39b1dHiXvrIKP91Xyw1Mr+vbTzlj8D13XTvuOzWwrusYBqvdl8aA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7rYXGvPzbMSrXYOJqxO3Qy46Yltf8R9K0xFSsYrDwYw=;
+ b=O/8cW1NWqvFTrSGZmGF7+qt9ruWUZzWfcuMCKCvPOiOJwBJCu75d5lXsQ49HK/JlfguZHnqd6Qk/Ox0l3KBQ3dTQ1um+kcTrx5ALZxW5Nbji/oh8mIB+EitvpemrCjam0eWuQ3g5dGWc46XNtuf9VpvjpbqQxUiiyJpusUkv35pde5+SZLJUiDyUdeWqGmbDLTXBdzR7Eigr10YkgeuBcXtvCM+ek4XzluJ0zFCUHivxmoA7tyuOrrjB2moXC1A5F+6OY6oauNY+OtDA9za5lliG+5atWLQwaWxZFNR26h7mIJ0vurXfZE4fSl94oJEVVE3r03K9aKxeaSYXCtaLrw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7rYXGvPzbMSrXYOJqxO3Qy46Yltf8R9K0xFSsYrDwYw=;
+ b=d8hYobn7RxFFDtn+M2EB+9J4okcV6dDhG+CO8vqgQ6oDEREs2an8ZaDL0puO2nrxf/FxJLE81INVz0GLKZXI3/4v9OdS4jrsGBu+WeKrlFcopNWv9mzA/AuSywxgP1eWBJK6vHS1Z1Y6nAmtpj52ITHeL3ITIX4Ge2HILvPbBVU=
+Received: from BYAPR08CA0026.namprd08.prod.outlook.com (2603:10b6:a03:100::39)
+ by DM6PR12MB4943.namprd12.prod.outlook.com (2603:10b6:5:1bc::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.19; Thu, 14 Sep
+ 2023 15:20:19 +0000
+Received: from SA2PEPF000015CA.namprd03.prod.outlook.com
+ (2603:10b6:a03:100:cafe::87) by BYAPR08CA0026.outlook.office365.com
+ (2603:10b6:a03:100::39) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.20 via Frontend
+ Transport; Thu, 14 Sep 2023 15:20:18 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ SA2PEPF000015CA.mail.protection.outlook.com (10.167.241.200) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6792.20 via Frontend Transport; Thu, 14 Sep 2023 15:20:18 +0000
+Received: from SATLEXMB08.amd.com (10.181.40.132) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 14 Sep
+ 2023 10:20:14 -0500
+Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB08.amd.com
+ (10.181.40.132) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 14 Sep
+ 2023 08:20:14 -0700
+Received: from xcbalexaust40x.xilinx.com (10.180.168.240) by
+ SATLEXMB03.amd.com (10.181.40.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Thu, 14 Sep 2023 10:20:13 -0500
+From: Alex Austin <alex.austin@amd.com>
+To: <netdev@vger.kernel.org>, <linux-net-drivers@amd.com>
+CC: <ecree.xilinx@gmail.com>, <habetsm.xilinx@gmail.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <richardcochran@gmail.com>,
+	<linux-kernel@vger.kernel.org>, Alex Austin <alex.austin@amd.com>
+Subject: [PATCH net-next] sfc: make coding style of PTP addresses consistent with core
+Date: Thu, 14 Sep 2023 16:19:16 +0100
+Message-ID: <20230914151916.21044-1-alex.austin@amd.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA2PEPF000015CA:EE_|DM6PR12MB4943:EE_
+X-MS-Office365-Filtering-Correlation-Id: fc0fb7b7-7a9b-4531-dbcb-08dbb5361ac4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	opJ5LCGIvXVe9JWoLrEx4rywVD8UnG6w2NvujgHAqXi8OwvC3W0angCFLnu/fHrfyM3KIazppHXoDTbf7AaPdWdKX5GNRkAa1REo5SFK18m9VywUdznX5wIy3vECNUGqHkXbhFiw4Y5FS54VAo+5+WUzM1JC2YDAX97WZXbHXbVqRCeV+MTHDYG+J0ZhIAZM74A0yqee8NuliGBkgSjVX9GhwxHPGA+JijXnM+W17UW1BgooKYvjGhb8xdkatCr1AvT7tdC2lH6V4XhlCHGlrK+OnDTWuKx9law9jJcRIQs3+pSHs0p8DJTiaDcv1BYKL/o9jN+tbj+++meh4o0aeN0OUierJZ39xkzveUp60PZHSpNE1RVTshKOSIDgEdcgnFeiFEwZ1R6S1nxXU7uyy+EwBWY8f/KvOe9pXh8nREYCvJqm2ULdxAVrlYAkxb5sfdacfYPMa5ev3tk8/79V/K/zvba1HwqVGIuar0ETZ9Vm+bUZY8BgcoV7DECbhVxoSqqpQd6VB9Q5N6s1ISHKp7ko7jRtBwBEKoDILql2oc9lSeMC0D8Xa6usONvR9iObpkh0cS7J1wFinUQHXpKl4EXns4LyfwsCXhI4AAZadyBx7ZbwvdIgmF7WcrUTRY7qpzJWCCqPF2MAH08niUgwEHqdbITHQRmRctcgD8qsOTSgwT/N6PNs0SHTd0K2RarreMXElaleeGWS1mX9s4UHzz7fy0swsCVwfm5L/nOF4wNFCpgKch48X+E7b3IWYX435ZA/0qACivwMPouqT3hnlg==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(346002)(376002)(136003)(39860400002)(396003)(82310400011)(186009)(1800799009)(451199024)(40470700004)(46966006)(36840700001)(26005)(5660300002)(4326008)(1076003)(8936002)(40460700003)(8676002)(2616005)(2906002)(83380400001)(86362001)(81166007)(356005)(82740400003)(36756003)(47076005)(336012)(36860700001)(426003)(40480700001)(70586007)(316002)(54906003)(6636002)(110136005)(70206006)(44832011)(41300700001)(478600001)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Sep 2023 15:20:18.4402
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: fc0fb7b7-7a9b-4531-dbcb-08dbb5361ac4
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SA2PEPF000015CA.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4943
 
-On Tue, 2023-09-12 at 16:31 +0800, Yunsheng Lin wrote:
-> Currently when page_pool_create() is called with
-> PP_FLAG_PAGE_FRAG flag, page_pool_alloc_pages() is only
-> allowed to be called under the below constraints:
-> 1. page_pool_fragment_page() need to be called to setup
->    page->pp_frag_count immediately.
-> 2. page_pool_defrag_page() often need to be called to drain
->    the page->pp_frag_count when there is no more user will
->    be holding on to that page.
->=20
-> Those constraints exist in order to support a page to be
-> split into multi frags.
->=20
-> And those constraints have some overhead because of the
-> cache line dirtying/bouncing and atomic update.
->=20
-> Those constraints are unavoidable for case when we need a
-> page to be split into more than one frag, but there is also
-> case that we want to avoid the above constraints and their
-> overhead when a page can't be split as it can only hold a big
-> frag as requested by user, depending on different use cases:
-> use case 1: allocate page without page splitting.
-> use case 2: allocate page with page splitting.
-> use case 3: allocate page with or without page splitting
->             depending on the frag size.
->=20
-> Currently page pool only provide page_pool_alloc_pages() and
-> page_pool_alloc_frag() API to enable the 1 & 2 separately,
-> so we can not use a combination of 1 & 2 to enable 3, it is
-> not possible yet because of the per page_pool flag
-> PP_FLAG_PAGE_FRAG.
->=20
-> So in order to allow allocating unsplit page without the
-> overhead of split page while still allow allocating split
-> page we need to remove the per page_pool flag in
-> page_pool_is_last_frag(), as best as I can think of, it seems
-> there are two methods as below:
-> 1. Add per page flag/bit to indicate a page is split or
->    not, which means we might need to update that flag/bit
->    everytime the page is recycled, dirtying the cache line
->    of 'struct page' for use case 1.
-> 2. Unify the page->pp_frag_count handling for both split and
->    unsplit page by assuming all pages in the page pool is split
->    into a big frag initially.
->=20
-> As page pool already supports use case 1 without dirtying the
-> cache line of 'struct page' whenever a page is recyclable, we
-> need to support the above use case 3 with minimal overhead,
-> especially not adding any noticeable overhead for use case 1,
-> and we are already doing an optimization by not updating
-> pp_frag_count in page_pool_defrag_page() for the last frag
-> user, this patch chooses to unify the pp_frag_count handling
-> to support the above use case 3.
->=20
-> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> CC: Lorenzo Bianconi <lorenzo@kernel.org>
-> CC: Alexander Duyck <alexander.duyck@gmail.com>
-> CC: Liang Chen <liangchen.linux@gmail.com>
-> CC: Alexander Lobakin <aleksander.lobakin@intel.com>
-> ---
->  include/net/page_pool/helpers.h | 48 ++++++++++++++++++++++++---------
->  net/core/page_pool.c            | 10 ++++++-
->  2 files changed, 44 insertions(+), 14 deletions(-)
->=20
-> diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/help=
-ers.h
-> index 8e1c85de4995..0ec81b91bed8 100644
-> --- a/include/net/page_pool/helpers.h
-> +++ b/include/net/page_pool/helpers.h
-> @@ -115,28 +115,50 @@ static inline long page_pool_defrag_page(struct pag=
-e *page, long nr)
->  	long ret;
-> =20
->  	/* If nr =3D=3D pp_frag_count then we have cleared all remaining
-> -	 * references to the page. No need to actually overwrite it, instead
-> -	 * we can leave this to be overwritten by the calling function.
-> +	 * references to the page:
-> +	 * 1. 'n =3D=3D 1': no need to actually overwrite it.
-> +	 * 2. 'n !=3D 1': overwrite it with one, which is the rare case
-> +	 *              for frag draining.
->  	 *
-> -	 * The main advantage to doing this is that an atomic_read is
-> -	 * generally a much cheaper operation than an atomic update,
-> -	 * especially when dealing with a page that may be partitioned
-> -	 * into only 2 or 3 pieces.
-> +	 * The main advantage to doing this is that not only we avoid a
-> +	 * atomic update, as an atomic_read is generally a much cheaper
-> +	 * operation than an atomic update, especially when dealing with
-> +	 * a page that may be partitioned into only 2 or 3 pieces; but
-> +	 * also unify the frag and non-frag handling by ensuring all
-> +	 * pages have been split into one big frag initially, and only
-> +	 * overwrite it when the page is split into more than one frag.
->  	 */
-> -	if (atomic_long_read(&page->pp_frag_count) =3D=3D nr)
-> +	if (atomic_long_read(&page->pp_frag_count) =3D=3D nr) {
-> +		/* As we have ensured nr is always one for constant case
-> +		 * using the BUILD_BUG_ON(), only need to handle the
-> +		 * non-constant case here for frag count draining, which
-> +		 * is a rare case.
-> +		 */
-> +		BUILD_BUG_ON(__builtin_constant_p(nr) && nr !=3D 1);
-> +		if (!__builtin_constant_p(nr))
-> +			atomic_long_set(&page->pp_frag_count, 1);
-> +
->  		return 0;
-> +	}
-> =20
->  	ret =3D atomic_long_sub_return(nr, &page->pp_frag_count);
->  	WARN_ON(ret < 0);
-> +
-> +	/* We are the last user here too, reset frag count back to 1 to
-> +	 * ensure all pages have been split into one big frag initially,
-> +	 * this should be the rare case when the last two frag users call
-> +	 * page_pool_defrag_page() currently.
-> +	 */
-> +	if (unlikely(!ret))
-> +		atomic_long_set(&page->pp_frag_count, 1);
-> +
->  	return ret;
->  }
-> =20
-> -static inline bool page_pool_is_last_frag(struct page_pool *pool,
-> -					  struct page *page)
-> +static inline bool page_pool_is_last_frag(struct page *page)
->  {
-> -	/* If fragments aren't enabled or count is 0 we were the last user */
-> -	return !(pool->p.flags & PP_FLAG_PAGE_FRAG) ||
-> -	       (page_pool_defrag_page(page, 1) =3D=3D 0);
-> +	/* If page_pool_defrag_page() returns 0, we were the last user */
-> +	return page_pool_defrag_page(page, 1) =3D=3D 0;
->  }
-> =20
->  /**
-> @@ -161,7 +183,7 @@ static inline void page_pool_put_page(struct page_poo=
-l *pool,
->  	 * allow registering MEM_TYPE_PAGE_POOL, but shield linker.
->  	 */
->  #ifdef CONFIG_PAGE_POOL
-> -	if (!page_pool_is_last_frag(pool, page))
-> +	if (!page_pool_is_last_frag(page))
->  		return;
-> =20
->  	page_pool_put_defragged_page(pool, page, dma_sync_size, allow_direct);
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index 8a9868ea5067..403b6df2e144 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -376,6 +376,14 @@ static void page_pool_set_pp_info(struct page_pool *=
-pool,
->  {
->  	page->pp =3D pool;
->  	page->pp_magic |=3D PP_SIGNATURE;
-> +
-> +	/* Ensuring all pages have been split into one big frag initially:
-> +	 * page_pool_set_pp_info() is only called once for every page when it
-> +	 * is allocated from the page allocator and page_pool_fragment_page()
-> +	 * is dirtying the same cache line as the page->pp_magic above, so
-> +	 * the overhead is negligible.
-> +	 */
-> +	page_pool_fragment_page(page, 1);
->  	if (pool->p.init_callback)
->  		pool->p.init_callback(page, pool->p.init_arg);
->  }
+Follow the style used in the core kernel (e.g.
+include/linux/etherdevice.h and include/linux/in6.h) for the PTP IPv6
+and Ethernet addresses. No functional changes.
 
-I think it would be nice backing the above claim with some benchmarks.
-(possibly even just a micro-benchmark around the relevant APIs)
-and include such info into the changelog message.
+Signed-off-by: Alex Austin <alex.austin@amd.com>
+Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
+---
+ drivers/net/ethernet/sfc/ptp.c | 27 ++++++++++++++-------------
+ 1 file changed, 14 insertions(+), 13 deletions(-)
 
-Cheers,
-
-Paolo
+diff --git a/drivers/net/ethernet/sfc/ptp.c b/drivers/net/ethernet/sfc/ptp.c
+index f54200f03e15..b04fdbb8aece 100644
+--- a/drivers/net/ethernet/sfc/ptp.c
++++ b/drivers/net/ethernet/sfc/ptp.c
+@@ -108,11 +108,17 @@
+ #define	PTP_MIN_LENGTH		63
+ 
+ #define PTP_ADDR_IPV4		0xe0000181	/* 224.0.1.129 */
+-#define PTP_ADDR_IPV6		{0xff, 0x0e, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, \
+-				0, 0x01, 0x81}	/* ff0e::181 */
++
++/* ff0e::181 */
++static const struct in6_addr ptp_addr_ipv6 = { { {
++	0xff, 0x0e, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x01, 0x81 } } };
++
++/* 01-1B-19-00-00-00 */
++static const u8 ptp_addr_ether[ETH_ALEN] __aligned(2) = {
++	0x01, 0x1b, 0x19, 0x00, 0x00, 0x00 };
++
+ #define PTP_EVENT_PORT		319
+ #define PTP_GENERAL_PORT	320
+-#define PTP_ADDR_ETHER		{0x01, 0x1b, 0x19, 0, 0, 0} /* 01-1B-19-00-00-00 */
+ 
+ /* Annoyingly the format of the version numbers are different between
+  * versions 1 and 2 so it isn't possible to simply look for 1 or 2.
+@@ -1296,7 +1302,7 @@ static int efx_ptp_insert_ipv4_filter(struct efx_nic *efx,
+ 
+ static int efx_ptp_insert_ipv6_filter(struct efx_nic *efx,
+ 				      struct list_head *filter_list,
+-				      struct in6_addr *addr, u16 port,
++				      const struct in6_addr *addr, u16 port,
+ 				      unsigned long expiry)
+ {
+ 	struct efx_filter_spec spec;
+@@ -1309,11 +1315,10 @@ static int efx_ptp_insert_ipv6_filter(struct efx_nic *efx,
+ static int efx_ptp_insert_eth_multicast_filter(struct efx_nic *efx)
+ {
+ 	struct efx_ptp_data *ptp = efx->ptp_data;
+-	const u8 addr[ETH_ALEN] = PTP_ADDR_ETHER;
+ 	struct efx_filter_spec spec;
+ 
+ 	efx_ptp_init_filter(efx, &spec);
+-	efx_filter_set_eth_local(&spec, EFX_FILTER_VID_UNSPEC, addr);
++	efx_filter_set_eth_local(&spec, EFX_FILTER_VID_UNSPEC, ptp_addr_ether);
+ 	spec.match_flags |= EFX_FILTER_MATCH_ETHER_TYPE;
+ 	spec.ether_type = htons(ETH_P_1588);
+ 	return efx_ptp_insert_filter(efx, &ptp->rxfilters_mcast, &spec, 0);
+@@ -1346,15 +1351,13 @@ static int efx_ptp_insert_multicast_filters(struct efx_nic *efx)
+ 	 * PTP over IPv6 and Ethernet
+ 	 */
+ 	if (efx_ptp_use_mac_tx_timestamps(efx)) {
+-		struct in6_addr ipv6_addr = {{PTP_ADDR_IPV6}};
+-
+ 		rc = efx_ptp_insert_ipv6_filter(efx, &ptp->rxfilters_mcast,
+-						&ipv6_addr, PTP_EVENT_PORT, 0);
++						&ptp_addr_ipv6, PTP_EVENT_PORT, 0);
+ 		if (rc < 0)
+ 			goto fail;
+ 
+ 		rc = efx_ptp_insert_ipv6_filter(efx, &ptp->rxfilters_mcast,
+-						&ipv6_addr, PTP_GENERAL_PORT, 0);
++						&ptp_addr_ipv6, PTP_GENERAL_PORT, 0);
+ 		if (rc < 0)
+ 			goto fail;
+ 
+@@ -1379,9 +1382,7 @@ static bool efx_ptp_valid_unicast_event_pkt(struct sk_buff *skb)
+ 			ip_hdr(skb)->protocol == IPPROTO_UDP &&
+ 			udp_hdr(skb)->source == htons(PTP_EVENT_PORT);
+ 	} else if (skb->protocol == htons(ETH_P_IPV6)) {
+-		struct in6_addr mcast_addr = {{PTP_ADDR_IPV6}};
+-
+-		return !ipv6_addr_equal(&ipv6_hdr(skb)->daddr, &mcast_addr) &&
++		return !ipv6_addr_equal(&ipv6_hdr(skb)->daddr, &ptp_addr_ipv6) &&
+ 			ipv6_hdr(skb)->nexthdr == IPPROTO_UDP &&
+ 			udp_hdr(skb)->source == htons(PTP_EVENT_PORT);
+ 	}
+-- 
+2.17.1
 
 
