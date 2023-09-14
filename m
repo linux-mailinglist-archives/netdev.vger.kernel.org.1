@@ -1,383 +1,131 @@
-Return-Path: <netdev+bounces-33724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AB4D79F8ED
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 05:33:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0081F79F98A
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 06:20:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA9021F216D8
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 03:33:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A94822817B2
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 04:20:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE1BA802;
-	Thu, 14 Sep 2023 03:33:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C359915BD;
+	Thu, 14 Sep 2023 04:20:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A949D7F
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 03:33:00 +0000 (UTC)
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C3D71BFC
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 20:32:59 -0700 (PDT)
-Received: by mail-lj1-x231.google.com with SMTP id 38308e7fff4ca-2bfb1167277so7132031fa.2
-        for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 20:32:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694662377; x=1695267177; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2qTWE4WtnleAEmgOKJ58K7DNQm4TpFT7Um6QVSk0jW4=;
-        b=GuGlpnNQozjhAOjJMoXEP81o2FhiULKgUGUNtdOqY6VwJ5m6t1L2KSRKIwRbQ5PoXy
-         HsGrSKyjIlZDEK5uNLCeZMPPI3+lg8AfUNfVnLfaJiNb8rRejYve9rsOBRQ3/9/qhT17
-         s54z2tI9g6L+1Hl36dyp50jWEii4FZqNw6o1U0sK0srCz5bczKFStWDxJVS+oqRYASJA
-         45Mw0wS21ZicwA1ekfvp/mPTuS5Lo1g4qvwrctSl6a9mkhwBPlwWKuaoR+lQ7WSJKq99
-         cyTDXt5udw2SwZ49XjTaUHr1KDnZtFqg4IkT6XxPqaKCYoZS6Me13267IFXO5QPtSD0W
-         Hklw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694662377; x=1695267177;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2qTWE4WtnleAEmgOKJ58K7DNQm4TpFT7Um6QVSk0jW4=;
-        b=AEyj3cp6H1FVrZTGqCTpzWg7kRg4rtKtJZ6Pkij4l3DRsPLH56frhfsgR/0dMVhBIC
-         Esoufqfiu3umkYam2XcZ4fHuRr0FgfCAUTEFvdry/WtjCxRKcOTpcou9QA76BT40SWN3
-         ZGpK8IdeF2lQswQnb7dZg3oXvh4oF/fNQFbJ9dzapA/Yf0774sF0DS/cyqihHFZgyveF
-         At3r6TpFJy/5BvTYn/5fn2YUVGvJxppGc9HCOTGbit/oTxH6R0LBWpja11s1fD3xNqZp
-         oxkB9ID/wMhaL5vTi5lbnzvpI3ah79sWJloc9aF+EcRwAXAAJqAjzn4UWBtrYE5F8xze
-         BnNA==
-X-Gm-Message-State: AOJu0YyDMDfuKdkQea60XJhFOJ2FAe20et1a+X+AH8hkmAMbMsaihybs
-	tQTxxK8HQsn62ZjQTF/Axon8RHtBkhA25tzjA5M=
-X-Google-Smtp-Source: AGHT+IFVsLk/SQCM2EuC6aKwMV98Vj9In7Lw9zX/LEBB4rI4bqrJ6q/erDSYCnI3x0bvsOZSWOM+SW8OE3nlA80v1Wc=
-X-Received: by 2002:a2e:9216:0:b0:2bc:d097:2b72 with SMTP id
- k22-20020a2e9216000000b002bcd0972b72mr4102675ljg.48.1694662377078; Wed, 13
- Sep 2023 20:32:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B058A7F
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 04:20:30 +0000 (UTC)
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2085.outbound.protection.outlook.com [40.107.244.85])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E38FAE59
+	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 21:20:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ViNQJQzyWnC3t9KT/GGZ7HGlphy3eMfxcAY6pkAisF2l3cpIS/5baDG/ScQcxTLGcsLoOmAgfc43BWbO/Mf8+4uxHxUNMvnLRPP9C9PwUplfTlW543AbySlPHpM/t09rWXL4lhqn4wNQzIf5PWbtKap7+t6sW4NnE3VkAiF0SVt2MKf6Ja/Ao2J7mGIlLjt6Ksd9Lo2Qg6m6YXlbyd/ko4zZk3S9+Y/7+1hD7p2w6fDGNHs1PswnQ4N447Q6lBV3a/1moEjiio1JZVui7T7iWYkiXDvE5MGMrHhArXYLSkZWG/bpVZvWtmZlIgRRjaekWtaQKphw1NdhIL6sdBTFag==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NOL0kl9COOpkVr9Fa4Cc0Z4vazYatJV+4I/o/Z33yAg=;
+ b=UfDvsWcnvwDumo0W76gx1OEHchwaL1SOK70+7CodsuSzdOW+UL9ulaUSko0TvUe6IbDIBHDq2xqmfy/Hs2ac56q46ttJz67XSQogdc9n6c7Zu7W4FNbyBWhM739IPZ9ic+8/UfNDgbKH1+ccMiTET5nqyDQBJXa0Wy5fQQET5VUcslFcWmwGlauZU58uLMDhPEzSb7nbz4dZDCy2p+w5yapXn/lHjLnRbuhhmBniLy6tYVz2yYVk/tJhLLF+2qCNVcXodGDmto7QH1TIOG6oe9Q6x4vCoFFRdO9pC+hxsOX7VUiyU80e+nXRrssDbreKtQf4LmxiMTeNhDosk0bZXg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NOL0kl9COOpkVr9Fa4Cc0Z4vazYatJV+4I/o/Z33yAg=;
+ b=iPTOFHizx9AwYJY4oVQ5i6UYHZcKs2QUYABm1xflnSR4VRDzyEmh6Hv6ZNOupgEs3m61wY9NKF8Zv0pZ60T3a3iuK+Wy7vrKBse/dWW+YabXdbFmtiLUI/0CaJfW5v2R3vtimZ3bwuVhMlaIjvcDDfDQ1duNB6LoJdLFGCOOtZE=
+Received: from BL1PR13CA0084.namprd13.prod.outlook.com (2603:10b6:208:2b8::29)
+ by PH7PR12MB6954.namprd12.prod.outlook.com (2603:10b6:510:1b7::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.37; Thu, 14 Sep
+ 2023 04:20:27 +0000
+Received: from MN1PEPF0000ECD6.namprd02.prod.outlook.com
+ (2603:10b6:208:2b8:cafe::77) by BL1PR13CA0084.outlook.office365.com
+ (2603:10b6:208:2b8::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.16 via Frontend
+ Transport; Thu, 14 Sep 2023 04:20:26 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ MN1PEPF0000ECD6.mail.protection.outlook.com (10.167.242.135) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6792.19 via Frontend Transport; Thu, 14 Sep 2023 04:20:26 +0000
+Received: from jatayu.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 13 Sep
+ 2023 23:20:24 -0500
+From: Raju Rangoju <Raju.Rangoju@amd.com>
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <Shyam-sundar.S-k@amd.com>, Raju Rangoju
+	<Raju.Rangoju@amd.com>
+Subject: [PATCH net] amd-xgbe: read STAT1 register twice to get correct value
+Date: Thu, 14 Sep 2023 09:49:44 +0530
+Message-ID: <20230914041944.450751-1-Raju.Rangoju@amd.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230913051046.19484-1-liangchen.linux@gmail.com> <ZQHrO7dSNQkPOvKM@d3>
-In-Reply-To: <ZQHrO7dSNQkPOvKM@d3>
-From: Liang Chen <liangchen.linux@gmail.com>
-Date: Thu, 14 Sep 2023 11:32:44 +0800
-Message-ID: <CAKhg4t+mx3m+_JgR7CWRtLUS_8k+mm_NFVQh5aFdycq7M5LomQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] pktgen: Introducing 'SHARED' flag for testing
- with non-shared skb
-To: Benjamin Poirier <benjamin.poirier@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECD6:EE_|PH7PR12MB6954:EE_
+X-MS-Office365-Filtering-Correlation-Id: 24df359a-37f4-40ba-1415-08dbb4d9ec55
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	mD9QgqiPC9vkszOhR0fyxpKJBN6CcCFy5XRxANFpSS9q9hMeKja6dvTRWchCizsjGgT2dYuYTJUoycYtj708TPgU02ADcJ13jLA8ZJP6iVrU8m1l20NMDtKirqWQzU86V/MaO3bs3/2wxRkEZV5+bZRxaQg7yptiFpE0ZLIDpNM1Doys1Yucql4FnDr4tDd4r5qPIN+giPDSQaydxCVTPorBnvSfPsN73VDGacwpX9q5paEus8H07U1gO+pJ3gwxca0w9ZYd4XOdAUVMOnUxXMRSjrMaMeUkN2NLQw6/7d57KQuBms5didXw+CHBocmMQhm4SPEGoi/8B4IocIFgvxaaklRFqMzRVeozo35Iz9SyOTHmR2gQ4BAuMq7lpaUt5NH+goGJcPAOdh8sDTTbeQVXJcwRpiUWq2G9sXv16gwjjFoBFZCBo+ZfZ5rcfy5GTVC+xE4JfFt2svLAAKul/u6Z26dfKjCRYoCF7/3WpeygmsS7Y/HD6TtBh93Is38c4eR/MS6iFNYve8yAMDrKOdbbRJqrgkWO266gz2i6rH95jMCq8QbYcCstLlAOpZOPM060Y+39qnH+xtx8glA7XNMsP5wLxrRj4rnxBd594flLInF01C1jxNEqy/3oPc0e6AU713mQs2oaDdUOWyLGK3gmpl296iCusHthTdwBJCTve4mCUxJ4tfth4yWVaD6NzG/1CSoZW1MX4fPI7tJX65dru4fMEAa730Pq3VAGZ+bnxmniw4f40rrXNd+JsPONaRXGTTZDR4FrPE6lYevjDg==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(396003)(376002)(39860400002)(346002)(136003)(451199024)(82310400011)(186009)(1800799009)(36840700001)(40470700004)(46966006)(6666004)(70206006)(54906003)(70586007)(6916009)(40480700001)(7696005)(41300700001)(316002)(478600001)(8936002)(26005)(16526019)(40460700003)(82740400003)(8676002)(1076003)(2616005)(4326008)(81166007)(356005)(5660300002)(86362001)(36756003)(2906002)(47076005)(36860700001)(426003)(336012)(4744005)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Sep 2023 04:20:26.8489
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 24df359a-37f4-40ba-1415-08dbb4d9ec55
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MN1PEPF0000ECD6.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6954
 
-On Thu, Sep 14, 2023 at 1:02=E2=80=AFAM Benjamin Poirier
-<benjamin.poirier@gmail.com> wrote:
->
-> On 2023-09-13 13:10 +0800, Liang Chen wrote:
-> > Currently, skbs generated by pktgen always have their reference count
-> > incremented before transmission, causing their reference count to be
-> > always greater than 1, leading to two issues:
-> >   1. Only the code paths for shared skbs can be tested.
-> >   2. In certain situations, skbs can only be released by pktgen.
-> > To enhance testing comprehensiveness, we are introducing the "SHARED"
-> > flag to indicate whether an SKB is shared. This flag is enabled by
-> > default, aligning with the current behavior. However, disabling this
-> > flag allows skbs with a reference count of 1 to be transmitted.
-> > So we can test non-shared skbs and code paths where skbs are released
-> > within the stack.
-> >
-> > Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
-> > ---
-> >  Documentation/networking/pktgen.rst | 13 ++++++++
-> >  net/core/pktgen.c                   | 50 +++++++++++++++++++++++++----
-> >  2 files changed, 56 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/Documentation/networking/pktgen.rst b/Documentation/networ=
-king/pktgen.rst
-> > index 1225f0f63ff0..ffd976c0cbf0 100644
-> > --- a/Documentation/networking/pktgen.rst
-> > +++ b/Documentation/networking/pktgen.rst
-> > @@ -178,6 +178,7 @@ Examples::
-> >                             IPSEC # IPsec encapsulation (needs CONFIG_X=
-FRM)
-> >                             NODE_ALLOC # node specific memory allocatio=
-n
-> >                             NO_TIMESTAMP # disable timestamping
-> > +                           SHARED # enable shared SKB
-> >   pgset 'flag ![name]'    Clear a flag to determine behaviour.
-> >                        Note that you might need to use single quote in
-> >                        interactive mode, so that your shell wouldn't ex=
-pand
-> > @@ -288,6 +289,17 @@ To avoid breaking existing testbed scripts for usi=
-ng AH type and tunnel mode,
-> >  you can use "pgset spi SPI_VALUE" to specify which transformation mode
-> >  to employ.
-> >
-> > +Disable shared SKB
-> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > +By default, SKBs sent by pktgen are shared (user count > 1).
-> > +If you need to test with non-shared SKBs, you can remove the "SHARED" =
-flag
-> > +by simply setting::
-> > +
-> > +     pg_set "flag !SHARED"
-> > +
-> > +However, if the "clone_skb," "burst," or "count" parameters are config=
-ured,
-> > +the skb still needs to be held by pktgen for further access. Hence the=
- skb
-> > +must be shared.
-> >
-> >  Current commands and configuration options
-> >  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > @@ -357,6 +369,7 @@ Current commands and configuration options
-> >      IPSEC
-> >      NODE_ALLOC
-> >      NO_TIMESTAMP
-> > +    SHARED
-> >
-> >      spi (ipsec)
-> >
-> > diff --git a/net/core/pktgen.c b/net/core/pktgen.c
-> > index f56b8d697014..3cf00090cf09 100644
-> > --- a/net/core/pktgen.c
-> > +++ b/net/core/pktgen.c
-> > @@ -200,6 +200,7 @@
-> >       pf(VID_RND)             /* Random VLAN ID */                    \
-> >       pf(SVID_RND)            /* Random SVLAN ID */                   \
-> >       pf(NODE)                /* Node memory alloc*/                  \
-> > +     pf(SHARED)              /* Shared SKB */                        \
-> >
-> >  #define pf(flag)             flag##_SHIFT,
-> >  enum pkt_flags {
-> > @@ -1198,7 +1199,8 @@ static ssize_t pktgen_if_write(struct file *file,
-> >                   ((pkt_dev->xmit_mode =3D=3D M_NETIF_RECEIVE) ||
-> >                    !(pkt_dev->odev->priv_flags & IFF_TX_SKB_SHARING)))
-> >                       return -ENOTSUPP;
-> > -             if (value > 0 && pkt_dev->n_imix_entries > 0)
-> > +             if (value > 0 && (pkt_dev->n_imix_entries > 0 ||
-> > +                               !(pkt_dev->flags & F_SHARED)))
-> >                       return -EINVAL;
->
-> I see that imix uses EINVAL but I would suggest to add the new check to
-> the previous condition which returns -ENOTSUPP. A value like "clone_skb
-> 1" is not invalid by itself.
->
+Link status is latched low, so read once to clear
+and then read again to get current state.
 
-Returning 'ENOTSUPP' seems to imply that "such a option is not
-supported by the NIC", while we are trying to convey to users "such a
-combination is invalid'. So it is a bit confusing as to which one to
-return.
+Fixes: 4f3b20bfbb75 ("amd-xgbe: add support for rx-adaptation")
+Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
+Acked-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
+---
+ drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> >
-> >               i +=3D len;
-> > @@ -1212,6 +1214,9 @@ static ssize_t pktgen_if_write(struct file *file,
-> >               if (len < 0)
-> >                       return len;
-> >
-> > +             if ((value > 0) && !(pkt_dev->flags & F_SHARED))
-> > +                     return -EINVAL;
-> > +
->
-> I think the restriction on count =3D=3D 0 can be dropped by adding the
-> following changes, do you agree?
->
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c b/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
+index 6a716337f48b..c83085285e8c 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
+@@ -2930,6 +2930,7 @@ static int xgbe_phy_link_status(struct xgbe_prv_data *pdata, int *an_restart)
+ 
+ 		/* check again for the link and adaptation status */
+ 		reg = XMDIO_READ(pdata, MDIO_MMD_PCS, MDIO_STAT1);
++		reg = XMDIO_READ(pdata, MDIO_MMD_PCS, MDIO_STAT1);
+ 		if ((reg & MDIO_STAT1_LSTATUS) && pdata->rx_adapt_done)
+ 			return 1;
+ 	} else if (reg & MDIO_STAT1_LSTATUS)
+-- 
+2.25.1
 
-Yes, I agree. At least, this doesn't change the existing behavior
-without using the 'SHARED' flag. Only in that case, the code doesn't
-wait for the last packet to be transmitted.
-
-
-> diff --git a/net/core/pktgen.c b/net/core/pktgen.c
-> index 3cf00090cf09..6fe19783b060 100644
-> --- a/net/core/pktgen.c
-> +++ b/net/core/pktgen.c
-> @@ -1214,9 +1214,6 @@ static ssize_t pktgen_if_write(struct file *file,
->                 if (len < 0)
->                         return len;
->
-> -               if ((value > 0) && !(pkt_dev->flags & F_SHARED))
-> -                       return -EINVAL;
-> -
->                 i +=3D len;
->                 pkt_dev->count =3D value;
->                 sprintf(pg_result, "OK: count=3D%llu",
-> @@ -1344,12 +1341,12 @@ static ssize_t pktgen_if_write(struct file *file,
->
->                 if (flag) {
->                         if (disable) {
-> -                               /* If "clone_skb", "burst", or "count" pa=
-rameters are
-> +                               /* If "clone_skb" or "burst" parameters a=
-re
->                                  * configured, it means that the skb stil=
-l needs to be
->                                  * referenced by the pktgen, so the skb m=
-ust be shared.
->                                  */
->                                 if (flag =3D=3D F_SHARED && (pkt_dev->clo=
-ne_skb ||
-> -                                                        pkt_dev->burst >=
- 1 || pkt_dev->count))
-> +                                                        pkt_dev->burst >=
- 1))
->                                         return -EINVAL;
->                                 pkt_dev->flags &=3D ~flag;
->                         } else {
-> @@ -3623,7 +3620,8 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
->
->         /* If pkt_dev->count is zero, then run forever */
->         if ((pkt_dev->count !=3D 0) && (pkt_dev->sofar >=3D pkt_dev->coun=
-t)) {
-> -               pktgen_wait_for_skb(pkt_dev);
-> +               if (pkt_dev->skb)
-> +                       pktgen_wait_for_skb(pkt_dev);
->
->                 /* Done with this */
->                 pktgen_stop_device(pkt_dev);
->
->
-> >               i +=3D len;
-> >               pkt_dev->count =3D value;
-> >               sprintf(pg_result, "OK: count=3D%llu",
-> > @@ -1257,6 +1262,10 @@ static ssize_t pktgen_if_write(struct file *file=
-,
-> >                    ((pkt_dev->xmit_mode =3D=3D M_START_XMIT) &&
-> >                    (!(pkt_dev->odev->priv_flags & IFF_TX_SKB_SHARING)))=
-))
-> >                       return -ENOTSUPP;
-> > +
-> > +             if ((value > 1) && !(pkt_dev->flags & F_SHARED))
-> > +                     return -EINVAL;
-> > +
->
-> Please integrate the new check with the existing ones in the 'if' just
-> above.
->
-> >               pkt_dev->burst =3D value < 1 ? 1 : value;
-> >               sprintf(pg_result, "OK: burst=3D%u", pkt_dev->burst);
-> >               return count;
-> > @@ -1334,10 +1343,18 @@ static ssize_t pktgen_if_write(struct file *fil=
-e,
-> >               flag =3D pktgen_read_flag(f, &disable);
-> >
-> >               if (flag) {
-> > -                     if (disable)
-> > +                     if (disable) {
-> > +                             /* If "clone_skb", "burst", or "count" pa=
-rameters are
-> > +                              * configured, it means that the skb stil=
-l needs to be
-> > +                              * referenced by the pktgen, so the skb m=
-ust be shared.
-> > +                              */
-> > +                             if (flag =3D=3D F_SHARED && (pkt_dev->clo=
-ne_skb ||
-> > +                                                      pkt_dev->burst >=
- 1 || pkt_dev->count))
-> > +                                     return -EINVAL;
->
-> netdev uses an 80 column limit
-> https://github.com/kuba-moo/nipa/blob/853db1f2a67758d839324920f7319b94630=
-efd17/tests/patch/checkpatch/checkpatch.sh#L16
->
-
-Sure.
-
-> >                               pkt_dev->flags &=3D ~flag;
-> > -                     else
-> > +                     } else {
-> >                               pkt_dev->flags |=3D flag;
-> > +                     }
-> >               } else {
-> >                       sprintf(pg_result,
-> >                               "Flag -:%s:- unknown\nAvailable flags, (p=
-repend ! to un-set flag):\n%s",
-> > @@ -1350,7 +1367,8 @@ static ssize_t pktgen_if_write(struct file *file,
-> >  #ifdef CONFIG_XFRM
-> >                               "IPSEC, "
-> >  #endif
-> > -                             "NODE_ALLOC\n");
-> > +                             "NODE_ALLOC, "
-> > +                             "SHARED\n");
->
-> This triggers a checkpatch warning. How about cleaning that code up in a
-> preceding patch to use pkt_flag_names[] instead?
->
-
-Sure.
-
-> >                       return count;
-> >               }
-> >               sprintf(pg_result, "OK: flags=3D0x%x", pkt_dev->flags);
-> > @@ -3483,7 +3501,8 @@ static void pktgen_xmit(struct pktgen_dev *pkt_de=
-v)
-> >       if (pkt_dev->xmit_mode =3D=3D M_NETIF_RECEIVE) {
-> >               skb =3D pkt_dev->skb;
-> >               skb->protocol =3D eth_type_trans(skb, skb->dev);
-> > -             refcount_add(burst, &skb->users);
-> > +             if (pkt_dev->flags & F_SHARED)
-> > +                     refcount_add(burst, &skb->users);
-> >               local_bh_disable();
-> >               do {
-> >                       ret =3D netif_receive_skb(skb);
-> > @@ -3491,6 +3510,10 @@ static void pktgen_xmit(struct pktgen_dev *pkt_d=
-ev)
-> >                               pkt_dev->errors++;
-> >                       pkt_dev->sofar++;
-> >                       pkt_dev->seq_num++;
-> > +                     if (unlikely(!(pkt_dev->flags & F_SHARED))) {
-> > +                             pkt_dev->skb =3D NULL;
-> > +                             break;
-> > +                     }
-> >                       if (refcount_read(&skb->users) !=3D burst) {
-> >                               /* skb was queued by rps/rfs or taps,
-> >                                * so cannot reuse this skb
-> > @@ -3509,7 +3532,8 @@ static void pktgen_xmit(struct pktgen_dev *pkt_de=
-v)
-> >               goto out; /* Skips xmit_mode M_START_XMIT */
-> >       } else if (pkt_dev->xmit_mode =3D=3D M_QUEUE_XMIT) {
-> >               local_bh_disable();
-> > -             refcount_inc(&pkt_dev->skb->users);
-> > +             if (pkt_dev->flags & F_SHARED)
-> > +                     refcount_inc(&pkt_dev->skb->users);
-> >
-> >               ret =3D dev_queue_xmit(pkt_dev->skb);
-> >               switch (ret) {
-> > @@ -3517,8 +3541,13 @@ static void pktgen_xmit(struct pktgen_dev *pkt_d=
-ev)
-> >                       pkt_dev->sofar++;
-> >                       pkt_dev->seq_num++;
-> >                       pkt_dev->tx_bytes +=3D pkt_dev->last_pkt_size;
-> > +                     if (!(pkt_dev->flags & F_SHARED))
-> > +                             pkt_dev->skb =3D NULL;
-> >                       break;
-> >               case NET_XMIT_DROP:
-> > +                     if (!(pkt_dev->flags & F_SHARED))
-> > +                             pkt_dev->skb =3D NULL;
-> > +                     fallthrough;
-> >               case NET_XMIT_CN:
-> >               /* These are all valid return codes for a qdisc but
-> >                * indicate packets are being dropped or will likely
->
-> This patch introduces almost the same use after free problem as v1.
-> Please take the time to look at the existing code to understand the
-> cases when a skb refcount is dropped by the stack.
->
-> This time the problem can be triggered with:
-> ip link add dummy0 up type dummy
-> tc qdisc add dev dummy0 root pfifo_head_drop limit 0
-> And then run pktgen on dummy0 with "flag !SHARED" and "xmit_mode
-> queue_xmit"
-
-
-Thank you for pointing it out. We will take a closer look into this problem=
-.
-
-
-Thanks,
-Liang
 
