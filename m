@@ -1,125 +1,153 @@
-Return-Path: <netdev+bounces-33836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33838-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64E057A06D4
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 16:04:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 804A87A06F8
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 16:12:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B44471F23A68
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 14:04:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D86D0281A10
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 14:12:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C41321A1D;
-	Thu, 14 Sep 2023 14:04:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3572D224DD;
+	Thu, 14 Sep 2023 14:12:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C049241E3;
-	Thu, 14 Sep 2023 14:04:08 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4735D1A2;
-	Thu, 14 Sep 2023 07:04:07 -0700 (PDT)
-Received: from kwepemi500020.china.huawei.com (unknown [172.30.72.57])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Rmf8y1GDlzGppB;
-	Thu, 14 Sep 2023 22:00:18 +0800 (CST)
-Received: from [10.67.109.184] (10.67.109.184) by
- kwepemi500020.china.huawei.com (7.221.188.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Thu, 14 Sep 2023 22:04:01 +0800
-Message-ID: <aacefd22-39df-6941-4d43-d47f72caa9d2@huawei.com>
-Date: Thu, 14 Sep 2023 22:04:00 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 286BE224D3
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 14:12:02 +0000 (UTC)
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCE8A1BF9;
+	Thu, 14 Sep 2023 07:12:01 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 0D1CE100006;
+	Thu, 14 Sep 2023 17:11:59 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 0D1CE100006
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1694700719;
+	bh=2Sn5v2IP39dIXPaQUcY6Rx1KATowf+vHArILTGeExRg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
+	b=EXo9SW1260pWO5Q+lg2E7ys1XB+qwE7RBTM83czOFyrEpRJgnfiw12L1Db6YK4aEK
+	 b52wvkIFSDf4q2jTUwKKoWuWhDhb96oXXZcNwnjBYD631fPlNrOOmkUVT7Z8PFc4f6
+	 gu28DlZ1IbgiPauR0CEbMQkUi4h9rDtjBOv5//4qnhsxycvhax4knZS771rM+eJxNr
+	 KmNUSTlRx1afirK7TIncF7PJcXlKvjCYDlZrb4Xq2rZmo2PhRyzRCfYds6dNASbGD3
+	 oxyRUQfb4ipel4TMT5vIbNWlj+JIsPG7pXT2f4gOdXDhz2D5eTXeaZWY4bZrwiUgcc
+	 k0qQ+bnXOoFbg==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Thu, 14 Sep 2023 17:11:58 +0300 (MSK)
+Received: from [192.168.0.106] (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Thu, 14 Sep 2023 17:11:58 +0300
+Message-ID: <7bf35d28-893b-5bea-beb7-9a25bc2f0a0e@salutedevices.com>
+Date: Thu, 14 Sep 2023 17:05:17 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
-Subject: Re: [PATCH bpf-next 4/6] riscv, bpf: Add necessary Zbb instructions
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH net-next v8 0/4] vsock/virtio/vhost: MSG_ZEROCOPY
+ preparations
 Content-Language: en-US
-To: Conor Dooley <conor.dooley@microchip.com>, Conor Dooley <conor@kernel.org>
-CC: Pu Lehui <pulehui@huaweicloud.com>, <bpf@vger.kernel.org>,
-	<linux-riscv@lists.infradead.org>, <netdev@vger.kernel.org>,
-	=?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, Alexei Starovoitov
-	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
-	<andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu
-	<song@kernel.org>, Yonghong Song <yhs@fb.com>, John Fastabend
-	<john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav Fomichev
-	<sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>, Luke Nelson <luke.r.nels@gmail.com>
-References: <20230913153413.1446068-1-pulehui@huaweicloud.com>
- <20230913153413.1446068-5-pulehui@huaweicloud.com>
- <20230913-granny-heat-35d70b49ac85@spud>
- <20230914-ought-hypnotize-64cee0e27ed2@wendy>
-From: Pu Lehui <pulehui@huawei.com>
-In-Reply-To: <20230914-ought-hypnotize-64cee0e27ed2@wendy>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.67.109.184]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemi500020.china.huawei.com (7.221.188.8)
-X-CFilter-Loop: Reflected
+To: Stefano Garzarella <sgarzare@redhat.com>
+CC: Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin"
+	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
+	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
+References: <20230911202234.1932024-1-avkrasnov@salutedevices.com>
+ <554ugdobcmxraek662xkxjdehcu5ri6awxvhvlvnygyru5zlsx@e7cyloz6so7u>
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+In-Reply-To: <554ugdobcmxraek662xkxjdehcu5ri6awxvhvlvnygyru5zlsx@e7cyloz6so7u>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 179868 [Sep 14 2023]
+X-KSMG-AntiSpam-Version: 5.9.59.0
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 530 530 ecb1547b3f72d1df4c71c0b60e67ba6b4aea5432, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;lore.kernel.org:7.1.1;100.64.160.123:7.1.2;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2023/09/14 12:07:00
+X-KSMG-LinksScanning: Clean, bases: 2023/09/14 12:07:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/09/14 11:07:00 #21890594
+X-KSMG-AntiVirus-Status: Clean, skipped
 
+Hello Stefano,
 
-
-On 2023/9/14 21:02, Conor Dooley wrote:
-> On Wed, Sep 13, 2023 at 05:23:48PM +0100, Conor Dooley wrote:
->> On Wed, Sep 13, 2023 at 11:34:11PM +0800, Pu Lehui wrote:
->>> From: Pu Lehui <pulehui@huawei.com>
->>>
->>> Add necessary Zbb instructions introduced by [0] to reduce code size and
->>> improve performance of RV64 JIT. At the same time, a helper is added to
->>> check whether the CPU supports Zbb instructions.
->>>
->>> [0] https://github.com/riscv/riscv-bitmanip/releases/download/1.0.0/bitmanip-1.0.0-38-g865e7a7.pdf
->>>
->>> Signed-off-by: Pu Lehui <pulehui@huawei.com>
->>> ---
->>>   arch/riscv/net/bpf_jit.h | 26 ++++++++++++++++++++++++++
->>>   1 file changed, 26 insertions(+)
->>>
->>> diff --git a/arch/riscv/net/bpf_jit.h b/arch/riscv/net/bpf_jit.h
->>> index 8e0ef4d08..7ee59d1f6 100644
->>> --- a/arch/riscv/net/bpf_jit.h
->>> +++ b/arch/riscv/net/bpf_jit.h
->>> @@ -18,6 +18,11 @@ static inline bool rvc_enabled(void)
->>>   	return IS_ENABLED(CONFIG_RISCV_ISA_C);
->>>   }
->>>   
->>> +static inline bool rvzbb_enabled(void)
->>> +{
->>> +	return IS_ENABLED(CONFIG_RISCV_ISA_ZBB);
->>> +}
->>
->> I dunno much about bpf, so passing question that may be a bit obvious:
->> Is this meant to be a test as to whether the kernel binary is built with
->> support for the extension, or whether the underlying platform is capable
->> of executing zbb instructions.
->>
->> Sorry if that would be obvious to a bpf aficionado, context I have here
->> is the later user and the above rvc_enabled() test, which functions
->> differently to Zbb and so doesn't really help me.
+On 14.09.2023 17:07, Stefano Garzarella wrote:
+> Hi Arseniy,
 > 
-> FTR, I got an off-list reply about this & it is meant to be a check as
-> to whether the underlying platform supports the extension. The current
-> test here is insufficient for that.
+> On Mon, Sep 11, 2023 at 11:22:30PM +0300, Arseniy Krasnov wrote:
+>> Hello,
+>>
+>> this patchset is first of three parts of another big patchset for
+>> MSG_ZEROCOPY flag support:
+>> https://lore.kernel.org/netdev/20230701063947.3422088-1-AVKrasnov@sberdevices.ru/
+>>
+>> During review of this series, Stefano Garzarella <sgarzare@redhat.com>
+>> suggested to split it for three parts to simplify review and merging:
+>>
+>> 1) virtio and vhost updates (for fragged skbs) <--- this patchset
+>> 2) AF_VSOCK updates (allows to enable MSG_ZEROCOPY mode and read
+>>   tx completions) and update for Documentation/.
+>> 3) Updates for tests and utils.
+>>
+>> This series enables handling of fragged skbs in virtio and vhost parts.
+>> Newly logic won't be triggered, because SO_ZEROCOPY options is still
+>> impossible to enable at this moment (next bunch of patches from big
+>> set above will enable it).
+>>
+>> I've included changelog to some patches anyway, because there were some
+>> comments during review of last big patchset from the link above.
 > 
+> Thanks, I left some comments on patch 4, the others LGTM.
+> Sorry to not having spotted them before, but moving
+> virtio_transport_alloc_skb() around the file, made the patch a little
+> confusing and difficult to review.
 
-Thanks Conor for explain me lot about the difference between Compressed 
-instructions and Zbb instructions. As the compressed instructions are a 
-build-time option, while the Zbb is runtime detected. We need to add 
-additional runtime detection as show bellow:
+Sure, no problem, I'll fix them! Thanks for review.
 
-riscv_has_extension_likely(RISCV_ISA_EXT_ZBB)
+> 
+> In addition, I started having failures of test 14 (server: host,
+> client: guest), so I looked better to see if there was anything wrong,
+> but it fails me even without this series applied.
+> 
+> It happens to me intermittently (~30%), does it happen to you?
+> Can you take a look at it?
 
-will patch this suggestion to the next version.
+Yes! sometime ago I also started to get fails of this test, not ~30%,
+significantly rare, but it depends on environment I guess, anyway I'm going to
+look at this on the next few days
 
-Thanks,
-Lehui.
+Thanks, Arseniy
 
+> 
+> host$ ./vsock_test --mode=server --control-port=12345 --peer-cid=4
+> ...
+> 14 - SOCK_STREAM virtio skb merge...expected recv(2) returns 8 bytes, got 3
+> 
+> guest$ ./vsock_test --mode=client --control-host=192.168.133.2 --control-port=12345 --peer-cid=2
+> 
 > Thanks,
-> Conor.
+> Stefano
+> 
 
