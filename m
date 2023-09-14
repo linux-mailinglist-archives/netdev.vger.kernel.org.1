@@ -1,171 +1,108 @@
-Return-Path: <netdev+bounces-33792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BCA87A027D
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 13:25:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B7F77A02B1
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 13:33:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 075A4280F2C
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 11:25:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9DADFB20961
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 11:33:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59AD8CA69;
-	Thu, 14 Sep 2023 11:25:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 362B915E96;
+	Thu, 14 Sep 2023 11:32:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D1B4208D1
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 11:25:12 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9D3AD1A5
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 04:25:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1694690710;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=f2hDyfU1b40FQL9fZS1RPzUCtY8X09ykI8Ju0Dyg2s4=;
-	b=RrzOrImjZNl58OV+uLkx4jENE3AteTYeVfF/7FanehJ+c6/PtMKkUp1aSciZ7rP1s8dGvE
-	pyuJrrmGtalIuj6ZD0LmWwaS9beWFXAfuwn3xXNfygZXaSC9o4wjc0TKAQlYSKPd8++MPb
-	pcdiERm7Ejnl43ic2cd+C4y3tDTaE9E=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-572-Jj6Os8kgPti-NjVoNAqyuQ-1; Thu, 14 Sep 2023 07:25:09 -0400
-X-MC-Unique: Jj6Os8kgPti-NjVoNAqyuQ-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-402d1892cecso4041065e9.1
-        for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 04:25:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22954208A3;
+	Thu, 14 Sep 2023 11:32:50 +0000 (UTC)
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7311E1BE8;
+	Thu, 14 Sep 2023 04:32:49 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2b9338e4695so12003011fa.2;
+        Thu, 14 Sep 2023 04:32:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694691167; x=1695295967; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LtP+ORG51cOnQgAyG8Q8L/PuvqcAZFq5aTIYWfYMZs4=;
+        b=UDEqhXjW/OEqJJS2rAavgtk9cYHfatxeVCSon8uQQxxeYcfnfxEodg7nErgoqNEb4j
+         kVr2juhb/2LakczKz2VpfH3OrglkOvJUk2y+NVj457o+zaXOM2zujsuY49XLsV+hBmCn
+         +lX7+7UxjNSGTXYrH1IrsR7gzvQK5Ly9TWZBPlNmK39VqkTclMFQuBTeYv1HyuIYKEgR
+         1hn7kQ3VMNp8jy5+j3BZC2Fl9ew32xXF2Emnl1U6fcW5Of9XBk/H/6CpFUbX4YXhl3Ti
+         m8QIGxH2ozO2TV3tgiNn8MF0PGUOX/KBBs4ljYPq4/0+zbJUdEDAX1vKFD+7EYHxX7Fh
+         /mdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694690708; x=1695295508;
+        d=1e100.net; s=20230601; t=1694691167; x=1695295967;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=f2hDyfU1b40FQL9fZS1RPzUCtY8X09ykI8Ju0Dyg2s4=;
-        b=AjMfSmzh/OmNdBNwzzkgIGkiVk+R8myKQW7DPd7FRG9lUzr7lpBw62+t1m2kXfgLkP
-         MNh/Y+sYvWQiJgnENr7/D/LZAOYLE3VU8Ae372Eh9tKkd9nvJgb02RZkrGdrKkEBeolJ
-         NZxoXSaU6UX9iI2j5H7pIl1woxM6vwvLdhfM0aX0whix8v9dmKhJsN1Dt6wA0lOxZQfD
-         pLB3F3K1KPmJhSf/Pz2ecPHD1EqfA8APyy8I4hOHKMJifWt2yDFYwzOER1tkTpN60i9C
-         rzp/YY6FsFm2QFTEUj+yFwOGYfxwLK/S2eY441WSwOmFGaHTLZPENWRYVtMRf6aCMQY2
-         p2YA==
-X-Gm-Message-State: AOJu0YwfzFPBIRESkkPTk6k7s1bpb83v7RM0M6UHRHjuHT7x2rYlZX78
-	ZIJTsyLCprqzCeJhACiJscnI1UvtLJP0yU/ayOV9qVTb/4ytHxWEMm0bfkss/91Ziyj9RBDChML
-	ktIb9onerU9BRuaJ2
-X-Received: by 2002:a1c:7914:0:b0:401:cf93:3103 with SMTP id l20-20020a1c7914000000b00401cf933103mr1318293wme.0.1694690707973;
-        Thu, 14 Sep 2023 04:25:07 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEeFx36SStVfKBMMDHBKgIzhzB5r3kokl/1wHGsMUlr+ymY6Q9E2do/WpDXYQ0ZJ6kuhRh10w==
-X-Received: by 2002:a1c:7914:0:b0:401:cf93:3103 with SMTP id l20-20020a1c7914000000b00401cf933103mr1318272wme.0.1694690707641;
-        Thu, 14 Sep 2023 04:25:07 -0700 (PDT)
-Received: from localhost (net-2-34-76-254.cust.vodafonedsl.it. [2.34.76.254])
-        by smtp.gmail.com with ESMTPSA id g13-20020a7bc4cd000000b003fc02e8ea68sm4592932wmk.13.2023.09.14.04.25.06
+        bh=LtP+ORG51cOnQgAyG8Q8L/PuvqcAZFq5aTIYWfYMZs4=;
+        b=nx2Y/tbCxzlmXpaEdCkN1m6W6hQ4XD9O+DLyzYSHENazJdhJPP75W9Ws3H/4+X5gfI
+         8CdnB9XBv/D9Oyfp8cTdb0Xx1MBtHiKfqvzmDvrnFXqk/lzQmPjSZeH3209BiYYRSjZa
+         8DVXs2R3NffDL8PYc6KCoG1n+LOLvOIEQXvy4/kPKJROq0VsTKwFemxFaKUgbYkDYw79
+         saPOpCsH4AxEeW+Xs2SO84x/na+x8XVh95JzgJGm8sJbfUrnmGMAMucjBgFU++1XNWJY
+         pyq4qazmzjgrzeroQly/NZUaSD7xyavWHm549sI4qWMnalr9Snk/pMY7ubCyiFegxCPL
+         QaSg==
+X-Gm-Message-State: AOJu0Yy1lWfBErYZZAO6TE56BhGjPFE1RZQ/HGWs0CKmPc4D9WaQhUrI
+	ebgkJryoTMrAQeQaD8PIlgU=
+X-Google-Smtp-Source: AGHT+IFU1JI/BHPOJOArjfnzjINNAJavuJJ6VMYd9VBuQkPUCgFXcEp/9CjG0Rg8PaabYFr1/HcxFQ==
+X-Received: by 2002:a2e:350d:0:b0:2bc:ed75:1b0 with SMTP id z13-20020a2e350d000000b002bced7501b0mr4966389ljz.2.1694691167361;
+        Thu, 14 Sep 2023 04:32:47 -0700 (PDT)
+Received: from skbuf ([188.26.56.202])
+        by smtp.gmail.com with ESMTPSA id x8-20020a170906298800b0099bcb44493fsm884550eje.147.2023.09.14.04.32.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Sep 2023 04:25:07 -0700 (PDT)
-Date: Thu, 14 Sep 2023 13:25:05 +0200
-From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Lorenzo Bianconi <lorenzo@kernel.org>, linux-nfs@vger.kernel.org,
-	chuck.lever@oracle.com, jlayton@kernel.org, neilb@suse.de,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v8 2/3] NFSD: introduce netlink rpc_status stubs
-Message-ID: <ZQLtkfc3R/IvOLgi@lore-desk>
-References: <cover.1694436263.git.lorenzo@kernel.org>
- <ce3bc230e1b8d0c741a240c17d99f5a2072e7ce1.1694436263.git.lorenzo@kernel.org>
- <20230912150751.GG401982@kernel.org>
+        Thu, 14 Sep 2023 04:32:47 -0700 (PDT)
+Date: Thu, 14 Sep 2023 14:32:44 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>, Rob Herring <robh@kernel.org>,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v5 1/2] dt-bindings: net: dsa: microchip: Update
+ ksz device tree bindings for drive strength
+Message-ID: <20230914113244.ozj4swe7ck3l4dbr@skbuf>
+References: <20230914075107.2239886-1-o.rempel@pengutronix.de>
+ <20230914075107.2239886-1-o.rempel@pengutronix.de>
+ <20230914075107.2239886-2-o.rempel@pengutronix.de>
+ <20230914075107.2239886-2-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="tNrImtEzFl/+ZPIv"
-Content-Disposition: inline
-In-Reply-To: <20230912150751.GG401982@kernel.org>
-
-
---tNrImtEzFl/+ZPIv
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20230914075107.2239886-2-o.rempel@pengutronix.de>
+ <20230914075107.2239886-2-o.rempel@pengutronix.de>
 
-> On Mon, Sep 11, 2023 at 02:49:45PM +0200, Lorenzo Bianconi wrote:
-> > Generate empty netlink stubs and uAPI through nfsd_server.yaml specs:
-> >=20
-> > $./tools/net/ynl/ynl-gen-c.py --mode uapi \
-> >  --spec Documentation/netlink/specs/nfsd_server.yaml \
-> >  --header -o include/uapi/linux/nfsd_server.h
-> > $./tools/net/ynl/ynl-gen-c.py --mode kernel \
-> >  --spec Documentation/netlink/specs/nfsd_server.yaml \
-> >  --header -o fs/nfsd/nfs_netlink_gen.h
-> > $./tools/net/ynl/ynl-gen-c.py --mode kernel \
-> >  --spec Documentation/netlink/specs/nfsd_server.yaml \
-> >  --source -o fs/nfsd/nfs_netlink_gen.c
-> >=20
-> > Tested-by: Jeff Layton <jlayton@kernel.org>
-> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
->=20
-> ...
->=20
-> > diff --git a/fs/nfsd/nfsctl.c b/fs/nfsd/nfsctl.c
-> > index 33f80d289d63..1be66088849c 100644
-> > --- a/fs/nfsd/nfsctl.c
-> > +++ b/fs/nfsd/nfsctl.c
-> > @@ -1495,6 +1495,22 @@ static int create_proc_exports_entry(void)
-> > =20
-> >  unsigned int nfsd_net_id;
-> > =20
-> > +int nfsd_server_nl_rpc_status_get_start(struct netlink_callback *cb)
-> > +{
-> > +	return 0;
-> > +}
-> > +
-> > +int nfsd_server_nl_rpc_status_get_done(struct netlink_callback *cb)
-> > +{
-> > +	return 0;
-> > +}
-> > +
-> > +int nfsd_server_nl_rpc_status_get_dumpit(struct sk_buff *skb,
-> > +					 struct netlink_callback *cb)
-> > +{
-> > +	return 0;
-> > +}
-> > +
->=20
-> Hi Lorenzo,
+On Thu, Sep 14, 2023 at 09:51:06AM +0200, Oleksij Rempel wrote:
+> Extend device tree bindings to support drive strength configuration for the
+> ksz* switches. Introduced properties:
+> - microchip,hi-drive-strength-microamp: Controls the drive strength for
+>   high-speed interfaces like GMII/RGMII and more.
+> - microchip,lo-drive-strength-microamp: Governs the drive strength for
+>   low-speed interfaces such as LEDs, PME_N, and others.
+> - microchip,io-drive-strength-microamp: Controls the drive strength for
+>   for undocumented Pads on KSZ88xx variants.
+> 
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> Reviewed-by: Rob Herring <robh@kernel.org>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> ---
 
-Hi Simon,
-
->=20
-> W=3D1 build for gcc-13 and clang-16, and Smatch, complain that
-> there is no prototype for the above functions.
->=20
-> Perhaps nfs_netlink_gen.h should be included in this file?
-
-actually I added it in patch 3/3. I will move it here. Thx.
-
-Regards,
-Lorenzo
-
->=20
-> >  /**
-> >   * nfsd_net_init - Prepare the nfsd_net portion of a new net namespace
-> >   * @net: a freshly-created network namespace
->=20
-> ...
->=20
-
---tNrImtEzFl/+ZPIv
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZQLtkQAKCRA6cBh0uS2t
-rD2bAP9KyJWMYFncdne90PW4IGot6TyXx3FF+H0CswJ8iOn+tAD/XuoGLCi6X2uz
-oxQQZq2NdKdcICP1rk6TSwFnlDNglwo=
-=5wyb
------END PGP SIGNATURE-----
-
---tNrImtEzFl/+ZPIv--
-
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
