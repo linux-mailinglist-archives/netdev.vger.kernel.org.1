@@ -1,100 +1,87 @@
-Return-Path: <netdev+bounces-33901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E33D7A096D
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 17:36:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F7BB7A0976
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 17:37:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A951B20E32
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 15:36:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B0CC4B20E3A
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 15:37:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 549822134E;
-	Thu, 14 Sep 2023 15:30:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C099C18E28;
+	Thu, 14 Sep 2023 15:30:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 448B139C;
-	Thu, 14 Sep 2023 15:30:20 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3D231FD2;
-	Thu, 14 Sep 2023 08:30:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=i72nV52dAV7BoIv5xkuAKyDpaTPPktJ5NY14WUAiEc8=; b=G6DWgR0/orUNfGoJef996to622
-	qFrT+v5C2oZawWN8/NYHXskLQquYqDNNpglfZGiMeLv6Zn9imP0e3Rgu9r+znq3Zc1+DhOb1sInkv
-	UqfENyeAwEz0tgHbI7/DZ/AvO7xzVJaMPjLqjMigCr9A+s3sXqtxAiaTyYZzZC+d9VR5ApIxv1GvT
-	MmNauzVdeXS9pQcUXpqEjkRq+du7bkf9CCAxzpXO6Jquez+e2l6cnRPHY7eTL9VifLuECMThzWjc4
-	4NLFBRG4NKoYpc4CZmdNZoHUFobIWESrOg+xewFhzE+dQjwqmoQ6klHPn2qNnYr6gX0+8Xu/wuosZ
-	+1UmQTbA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36224)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qgoIH-0004Uq-2p;
-	Thu, 14 Sep 2023 16:30:13 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qgoIF-0004sf-VS; Thu, 14 Sep 2023 16:30:12 +0100
-Date: Thu, 14 Sep 2023 16:30:11 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Alexei Starovoitov <ast@kernel.org>, bpf@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Emil Renner Berthing <kernel@esmil.dk>,
-	Eric Dumazet <edumazet@google.com>,
-	Fabio Estevam <festevam@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	NXP Linux Team <linux-imx@nxp.com>, Paolo Abeni <pabeni@redhat.com>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Samin Guo <samin.guo@starfivetech.com>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Shawn Guo <shawnguo@kernel.org>
-Subject: Re: [PATCH net-next 4/6] net: stmmac: rk: use
- stmmac_set_tx_clk_gmii()
-Message-ID: <ZQMnA1PgPDDQzDrC@shell.armlinux.org.uk>
-References: <ZQMPnyutz6T23E8T@shell.armlinux.org.uk>
- <E1qgmkp-007Z4s-GL@rmk-PC.armlinux.org.uk>
- <7vhtvd25qswsju34lgqi4em5v3utsxlvi3lltyt5yqqecddpyh@c5yvk7t5k5zz>
- <ZQMgtXSTsNoZohnx@shell.armlinux.org.uk>
- <rene2x562lqsknmwpaxpu337mhl4bgynct6vcyryebvem2umso@2pjocnxluxgg>
- <ZQMmV2pSCAX8AJzz@shell.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41FCFD53F
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 15:30:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CCA83C433C9;
+	Thu, 14 Sep 2023 15:30:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694705426;
+	bh=Q3w4ykEz2lEoSofN+SUjn3Lth1qicuxOdvzXmwjElDc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=V7ZpHgLH0+pP0LQ20nb4Po9U5jDnLjpSoKh6Lz9Q+aE5oVg6Vu1mIJfsaS9u6S4SD
+	 wy0WFNXZQ23HUUZ+VXyPosavhhRxlzBUs5kVtLFBbqScHWC93u4puDUQ0uSVfIdtxG
+	 4vp/1WhIcStzgokacvADnZxW6NA35CC74Ik7aSFB4Y8ZO67fMOnypWjMv86T2YhQ/J
+	 gBfJy8P63xcosxGKx08L3h5GTaBZGiJRWV7oH9Qi0D1r4XMsWgw/bJfA2EkYEkNNOB
+	 KX/vRGhYYA0zjMtYrn6fbYbE7a6OYbxFOVJu1hfzAetJAwVHvJfTLql0hHaNVCGLch
+	 a+1G1xEFHiTgg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B0A25E1C28E;
+	Thu, 14 Sep 2023 15:30:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZQMmV2pSCAX8AJzz@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH iproute2-next 0/2] configure: add support for color
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169470542671.22890.15589088948266236796.git-patchwork-notify@kernel.org>
+Date: Thu, 14 Sep 2023 15:30:26 +0000
+References: <cover.1694625043.git.aclaudi@redhat.com>
+In-Reply-To: <cover.1694625043.git.aclaudi@redhat.com>
+To: Andrea Claudi <aclaudi@redhat.com>
+Cc: netdev@vger.kernel.org, roopa@nvidia.com, razor@blackwall.org,
+ bridge@lists.linux-foundation.org, stephen@networkplumber.org,
+ dsahern@gmail.com
 
-On Thu, Sep 14, 2023 at 04:27:19PM +0100, Russell King (Oracle) wrote:
-> I won't be doing that, sorry. If that's not acceptable, then I'm
-> junking this series.
+Hello:
 
-In fact, no, I'm making that decision now. I have 42 patches. I'm
-deleting them all because I just can't be bothered with the hassle
-of trying to improve this crappy driver.
+This series was applied to iproute2/iproute2-next.git (main)
+by David Ahern <dsahern@kernel.org>:
 
-Have a good day.
+On Wed, 13 Sep 2023 19:58:24 +0200 you wrote:
+> This series add support for the color parameter in iproute2 configure
+> script. The idea is to make it possible for iproute2 users and packagers
+> to set a default value for the color option different from the current
+> one, COLOR_OPT_NEVER, while maintaining the current default behaviour.
+> 
+> Patch 1 add the color option to the configure script. Users can set
+> three different values, never, auto and always, with the same meanings
+> they have for the -c / -color ip option. Default value is 'never', which
+> results in ip, tc and bridge to maintain their current output behaviour
+> (i.e. colorless output).
+> 
+> [...]
 
+Here is the summary with links:
+  - [iproute2-next,1/2] configure: add the --color option
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=5e704f4b5ba2
+  - [iproute2-next,2/2] treewide: use configured value as the default color output
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=b5d0273fdbab
+
+You are awesome, thank you!
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
