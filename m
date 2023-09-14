@@ -1,201 +1,152 @@
-Return-Path: <netdev+bounces-33918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C674B7A0A52
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 18:06:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D28D7A0A73
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 18:09:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD2AC1C20C46
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 16:06:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AAB31C2109C
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 16:09:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 518D92134F;
-	Thu, 14 Sep 2023 16:06:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F3F72134E;
+	Thu, 14 Sep 2023 16:07:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C56215E96;
-	Thu, 14 Sep 2023 16:06:36 +0000 (UTC)
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AA031BF8;
-	Thu, 14 Sep 2023 09:06:35 -0700 (PDT)
-Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-502934c88b7so2009719e87.2;
-        Thu, 14 Sep 2023 09:06:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59F1628E39
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 16:07:59 +0000 (UTC)
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5B241FD6
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 09:07:58 -0700 (PDT)
+Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-68fb71ded6dso911583b3a.0
+        for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 09:07:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694707593; x=1695312393; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=N2RmVCxa+sY1O1smqmxSFhSqD8dLKrMsO0o7RVWwTR8=;
-        b=llLjuX2Klw6EF+aoHwYyQXJrYpvzqSyBl9hTdEoqDTxAh/H8fIuNqTouwjutVwd8ii
-         +ikKTj6C/oByCKWZEqkyUhg9OWGeWxu/7AFG7uypSaKm+DueCH2hwU6X4uGyyFyd4vuM
-         ydlZ9YB+Fw3a+ZqBq8ibJ6Pkkxj9zYoA6vrK4n/ka2PZDuiEM4ILkqsTkuLG+ymw/yUe
-         JBWmqrDKP/lGKoodjfE7iWJpMSjquBFfDZRICO4bP9sQxdhDZVdQxCA2vG8bc3cAU/JP
-         QeZCadJLlh795AdD230nTP5nXkAXzmzkKDQZSXti2jTVH4NZ2Tk9q4oZswNdY9IDQNYG
-         2Ekg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694707593; x=1695312393;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20221208; t=1694707678; x=1695312478; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=N2RmVCxa+sY1O1smqmxSFhSqD8dLKrMsO0o7RVWwTR8=;
-        b=oci7xkIFQry2E/BKkbXDB7CR73LvCoX48bP7i4Rif1CEcUhMA+lBXS/u4Ah/aOyGob
-         3I/bRgXiKMBdws3ztkcRWWWwvePZMSeu3QmCl6W2/dClJzVV5dScycG3pCuxU5jvWxOY
-         Zbu00yFTUJwq/Ey1Gqwf9CAsBdL3OqToY2X3WQxksk90y/tVrHz6Gd+O3Ikho0C/UaYK
-         axBoljETCcCA5M/+f6Qgab5YdhhUP28MUk3O1EspML/yBPJ5ACd/ADgW2YYA/DK7WR9I
-         jY0ap9kqJUjevjHLKos52lGZgPqvZ2GtcfSU99+dIHqZjYhr48Ar2zritlh5aVuwtPm8
-         2RNw==
-X-Gm-Message-State: AOJu0YzIG8VxGjKLI8XblXTLAJtyuohogHq8UoqpfyD7zO3mXK9X2v+w
-	3IXmquZqAMHsMyxM3Psoj9E=
-X-Google-Smtp-Source: AGHT+IHY85sbLIHKHvdLPwdF844Gzsdokk3pkOJ3DB92vd+npIoH6cwuF3DF7ecUJOhFUcipLEBr6g==
-X-Received: by 2002:a19:ca1a:0:b0:4fd:f84f:83c1 with SMTP id a26-20020a19ca1a000000b004fdf84f83c1mr4054712lfg.64.1694707593142;
-        Thu, 14 Sep 2023 09:06:33 -0700 (PDT)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id n23-20020a195517000000b0050096712dc8sm318873lfe.277.2023.09.14.09.06.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Sep 2023 09:06:32 -0700 (PDT)
-Date: Thu, 14 Sep 2023 19:06:29 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, Alexei Starovoitov <ast@kernel.org>, bpf@vger.kernel.org, 
-	Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, 
-	Emil Renner Berthing <kernel@esmil.dk>, Eric Dumazet <edumazet@google.com>, 
-	Fabio Estevam <festevam@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	linux-arm-kernel@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, NXP Linux Team <linux-imx@nxp.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Pengutronix Kernel Team <kernel@pengutronix.de>, 
-	Samin Guo <samin.guo@starfivetech.com>, Sascha Hauer <s.hauer@pengutronix.de>, 
-	Shawn Guo <shawnguo@kernel.org>
-Subject: Re: [PATCH net-next 1/6] net: stmmac: add stmmac_set_tx_clk_gmii()
-Message-ID: <pyizjtvvzc4hwklj3nrjb2f6uqvwzskpdinb3agdhelclxouoa@s7bjgexnspnv>
-References: <ZQMPnyutz6T23E8T@shell.armlinux.org.uk>
- <E1qgmka-007Z4Z-1E@rmk-PC.armlinux.org.uk>
- <j64xmkplk2kkb4esteaic3hsofex3eishxxr3z6hppnm6heoz5@5fyj4x5qouc3>
- <ZQMizWbkAEyTh4M7@shell.armlinux.org.uk>
+        bh=juuH/zar78Q48Gj6bVfB0fZD21h8ZoWaQbN1zRk6qWE=;
+        b=cLlJnrezTATvFBi/gZ5lh09n/zTeTvZZhPjZbmPI3EeIrXRkGekTsBBP+sLT0oc52b
+         T0nH4cmYRLy9iwfsdnDdLR/ao2aAAegYNc5+nnA6Vu4ltYMEzGRrK7c5KNP2yU3Av4FJ
+         nmcFfjaZzoT3tN2ti2jbbL62n2V+JUROLT3lbg1MNdiqJwtxbXgbQJcHpYPf+khQ0z+J
+         1yoqe+6ZimzyW0Kb7EqTofLF9JCnBaMJMcOwgd4ijru0AcO9W7C4QG01Y9FlpVB3YCKL
+         B8O2fgwLBF7q/GbnOgEXR/tGMTwkCblR478bNbGXUJMyKgjc5A8mhVmBCQpFH86W2p6T
+         62Rg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694707678; x=1695312478;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=juuH/zar78Q48Gj6bVfB0fZD21h8ZoWaQbN1zRk6qWE=;
+        b=FR0lFCnrexx7Saul5a2IrSttGHXoy47IxROg60NOTW3jne4vwJDuAZAZn/c1zidxN9
+         +wnaxZ6HIuImenpldnmYGYntLGyiIDYqgo2uJ7u1vvAzrgNPxKRaM4c4uZhoVSOMvTdh
+         Ad6RIeocSPxsyDUI/5TqiL/6T3ZbI79tWfQ2vLPyQIVw5B4LaYut2J3WWc1a8fEPouwM
+         kyCBjwPs4gbKZPhWUzVoW6jRrkXcl9enanxW3BzUk64+tgXRTFeRs8aA7/3jkO3ioexV
+         ZfyYKRq32qHP+bOtjCHysklFxSm5UPduqeaFvnQsFj+vE0y43liItN56UT16MJ5YvpH3
+         Vp4w==
+X-Gm-Message-State: AOJu0YwuiiuqqpBSL9IR67NGThHl+KsP97r5mCz65lDL2bfqEfwDj9f5
+	aMXNcI2IWU0HUHxEV/yOTHU8piyEWPTtWyfLL1M=
+X-Google-Smtp-Source: AGHT+IGYhCU6zz7omf82kZklWoXEFlrAimOYNx9REbudyCngwJ5EgEcX0RndZls09LdNUZe5LwEe0HgH9e0wJ4aiMQM=
+X-Received: by 2002:a05:6a21:1aa:b0:14b:8b82:867f with SMTP id
+ le42-20020a056a2101aa00b0014b8b82867fmr7080350pzb.50.1694707677803; Thu, 14
+ Sep 2023 09:07:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZQMizWbkAEyTh4M7@shell.armlinux.org.uk>
+References: <CAPsLH6aHJGG7kAaZ7hdyKoSor4Ws2Fwujjjxog6E_bQrY1fA+w@mail.gmail.com>
+ <20230914155126.GM1599918@black.fi.intel.com>
+In-Reply-To: <20230914155126.GM1599918@black.fi.intel.com>
+From: Yachen Liu <blankwonder@gmail.com>
+Date: Fri, 15 Sep 2023 00:07:46 +0800
+Message-ID: <CAPsLH6aWqo7apL++DZUAkYxQacaW1Rh_-B=VpJAgH3UzBaiZbA@mail.gmail.com>
+Subject: Re: [Bug][USB4NET] Potential Bug with USB4NET and Linux Bridging
+To: Mika Westerberg <mika.westerberg@linux.intel.com>
+Cc: netdev@vger.kernel.org, michael.jamet@intel.com, YehezkelShB@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 14, 2023 at 04:12:13PM +0100, Russell King (Oracle) wrote:
-> On Thu, Sep 14, 2023 at 05:54:09PM +0300, Serge Semin wrote:
-> > On Thu, Sep 14, 2023 at 02:51:20PM +0100, Russell King (Oracle) wrote:
-> > > Add a helper function for setting the transmit clock for GMII
-> > > interfaces. This handles 1G, 100M and 10M using the standard clock
-> > > rates of 125MHz, 25MHz and 2.5MHz.
-> > > 
-> > > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> > > ---
-> > >  .../ethernet/stmicro/stmmac/stmmac_platform.c | 25 +++++++++++++++++++
-> > >  .../ethernet/stmicro/stmmac/stmmac_platform.h |  1 +
-> > >  2 files changed, 26 insertions(+)
-> > > 
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> > > index 0f28795e581c..f7635ed2b255 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> > > @@ -700,6 +700,31 @@ EXPORT_SYMBOL_GPL(stmmac_probe_config_dt);
-> > >  EXPORT_SYMBOL_GPL(devm_stmmac_probe_config_dt);
-> > >  EXPORT_SYMBOL_GPL(stmmac_remove_config_dt);
-> > >  
-> > 
-> > > +int stmmac_set_tx_clk_gmii(struct clk *tx_clk, unsigned int speed)
-> > > +{
-> > > +	unsigned long rate;
-> > > +
-> > > +	switch (speed) {
-> > > +	case SPEED_1000:
-> > > +		rate = 125000000;
-> > > +		break;
-> > > +
-> > > +	case SPEED_100:
-> > > +		rate = 25000000;
-> > > +		break;
-> > > +
-> > > +	case SPEED_10:
-> > > +		rate = 2500000;
-> > > +		break;
-> > > +
-> > > +	default:
-> > > +		return -ENOTSUPP;
-> > > +	}
-> > > +
-> > > +	return clk_set_rate(tx_clk, rate);
-> > > +}
-> > > +EXPORT_SYMBOL_GPL(stmmac_set_tx_clk_gmii);
-> > 
-> > As I already noted in v1 normally the switch-case operations are
-> > defined with no additional line separating the cases. I would have
-> > dropped them here too especially seeing the stmmac core driver mainly
-> > follow that implicit convention.
-> 
-> It's rather haphazard whether there are blank lines or not between
-> case statements.
+Hi,
 
-Is it haphazard in the STMMAC core driver too? The only exception is
-the HWtstamp switch-case statements which just a bit bulky. So having
-additional empty lines there rather weakly but is still justified by
-that.
+I just did a simple test. When using a standard network card, I can
+capture big packets on all three interfaces (eth/br/tap), which can
+exceed 50000B at most, and the MTU of the three devices is all just
+1500.
 
-In anyway my comment is just a nitpick inferred from the implicit
-local convention. It's totally IMO and isn't implied to be considered
-as a strong request to be implemented. I repeated my comment just
-because you didn't respond to it in v1. It looked as if you just
-missed it.
+I don't know much about Linux's networking architecture. I guess it
+should be that when bridging is done, it checks whether the interface
+supports GSO and then does special processing. However, for
+Thunderbolt devices, no GSO feature was detected so no processing was
+done causing problems.
 
-> 
-> > Additionally I suggest to move the method to being defined at the head
-> > of the file. Thus a more natural order normally utilized in the kernel
-> > drivers would be preserved: all functional implementations go first,
-> > the platform-specific things are placed below like probe()/remove()
-> > and their sub-functions, suspend()/resume() and PM descriptors,
-> > (device IDs table, driver descriptor, etc). stmmac_set_tx_clk_gmii()
-> > looks as a functional helper which is normally utilized on the network
-> > device open() stage in the framework of the fix_mac_speed() callback.
-> > Moreover my suggestion gets to be even more justified seeing you
-> > placed the method prototype at the head of the prototypes list in the
-> > stmmac_platform.h file.
-> 
+Note: ethtool -k can read whether a general network card has enabled
+GSO but it doesn't work for thunderbolt0 interface.
 
-> How is one supposed to know about this? I did my best trying to work
-> out where they should've gone...
-
-Well, from my experience submitting the patches to various kernel
-subsystems and drivers there are many implicit conventions which
-aren't described anywhere, but could be inferred from the code itself.
-This one is one of such implicit conventions which isn't mandatory but
-a nice-to-have feature for better readability and maintainability (for
-instance in order to determine where to put new methods and features
-to the already available drivers). In anyway this comment is also a
-nitpick, which from my point of view would improve the code
-readability. It's normally up to the driver/subsystem maintainers to
-define such conventions required.
-
-Regarding the implicit conventions. Some of the subsystem and driver
-maintainers imply that such conventions would be preserved (just
-recently met that in the PCIe subsystem). When it happens it's so
-irritating especially if it concerns a big series.
-
-> 
-> If it's that important, maybe add some /* Comments */ to state that
-> there are separate sections to the file?
-
-Would be nice to have them indeed. Though I normally just stick to
-that convention by default if there is no another one could be
-inferred from the code itself.
-
--Serge(y)
-
-> 
-> -- 
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+On Thu, Sep 14, 2023 at 11:52=E2=80=AFPM Mika Westerberg
+<mika.westerberg@linux.intel.com> wrote:
+>
+> Hi,
+>
+> On Thu, Sep 14, 2023 at 10:02:24PM +0800, Yachen Liu wrote:
+> > Hello,
+> >
+> > I've noticed a potential issue with USB4NET when used in conjunction
+> > with Linux bridging. I'm uncertain if it's a bug or a configuration
+> > oversight on my part.
+> >
+> > In essence, when the device at the other end of Thunderbolt sends
+> > packets using the TSO mechanism (default behavior in macOS), the Linux
+> > thunderbolt0 interface correctly receives this large packet. However,
+> > the packet isn't properly forwarded to another device via bridging.
+> >
+> > Detailed Description:
+> >
+> > The test environment consists of three systems:
+> >
+> > A: Mac Mini (M2): macOS Sonoma 14.0 RC
+> > B: Proxmox VE 8.0. Kernel release: 6.2.16-3-pve, acting as the Host sys=
+tem.
+> > C: Debian. A Guest system running within B.
+> >
+> > System A and B are connected via USB4, while System C is a virtual
+> > machine within B. On B, thunderbolt0 and tap102i0 are bridged to
+> > establish a connection between A and C.
+> >
+> > During an iperf3 speed test between A and B, I've achieved
+> > bi-directional speeds of around 18Gbps. Between B and C, the speeds
+> > are 100Gbps+ at their peak, with a minimum of 28Gbps.
+> >
+> > However, when performing an iperf3 speed test between A and C, the
+> > direction from C to A shows about 18Gbps, but from A to C, the speed
+> > drops to just tens of Kbps, essentially making it unusable.
+> >
+> > If tested using UDP, both directions achieve roughly 5Gbps. (I suspect
+> > some buffer issue in macOS limiting the speed).
+> >
+> > After various tests and investigations, I found that by setting
+> > macOS's net.inet.tcp.tso to 0 (disabling TSO), speeds from A to C
+> > improved to around 10Gbps.
+> >
+> > Packet capture via tcpdump revealed that macOS writes large packets
+> > (over 10000B) to Thunderbolt Networking using TSO. These packets are
+> > correctly captured on thunderbolt0, but are missing from tap102i0,
+> > resulting in significant packet loss.
+> >
+> > Since ethtool doesn't support the thunderbolt0 device, further testing
+> > has been hindered.
+> >
+> > I'm unsure if this is a bug, or if it could be resolved via
+> > configuration. If more information is needed, I am more than willing
+> > to assist further with tests.
+>
+> Thank you for the report. To be honest, I'm not sure how the interface
+> should in this case and is there perhaps some way for a NIC driver to
+> pass TSO packets up so that they would be passed in the same way to the
+> tap interface. Is there any example driver where this works? Like if you
+> use ethernet instead of TBT/USB4 does that work with TSO packets?
 
