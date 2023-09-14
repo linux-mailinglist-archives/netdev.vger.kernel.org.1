@@ -1,158 +1,243 @@
-Return-Path: <netdev+bounces-33892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAA477A0929
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 17:26:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F42387A0932
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 17:28:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA50C1C20DE9
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 15:26:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9DD6A1F2230E
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 15:28:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08DC72137C;
-	Thu, 14 Sep 2023 15:12:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE0592375D;
+	Thu, 14 Sep 2023 15:15:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC62439C;
-	Thu, 14 Sep 2023 15:12:23 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 307D4A8;
-	Thu, 14 Sep 2023 08:12:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=JCzR9bnKdQWaES21IE+SF94nKQUXujpbyIjqGFP/0Oc=; b=DocVKf/DEW9GRSxUzKW453infY
-	3tYI+lAYsKsAnPVa7L81GtPxGu/JHmN0CUL5NnFS5ySgtVc0fm7xGOTr/TlNJz+qFOaxnb2S9YCLa
-	xM/M+3/QGiaZJ3iIWQNW2T09x4tADGJD/aDNbarS7hf46Gy9NH411PTGoI6Zl+XttLd8Yi/6cexjh
-	KAkiikxKjDnuZxrk3vLO2r/ak/Oz8I2NbDpgRuopWXji7UCf9N2hl2dLZYhiIsiQHw0hv+cl8URyC
-	bh4xBVakhyntjhPPVqeBZvQ8ckzeO2McAI6zEDpVO6AkjJTIArjD2rcGxa7mmop04lraEZo5pU1fb
-	Ioank7rA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40360)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qgo0u-0004Sf-1Y;
-	Thu, 14 Sep 2023 16:12:16 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qgo0r-0004s6-VM; Thu, 14 Sep 2023 16:12:13 +0100
-Date: Thu, 14 Sep 2023 16:12:13 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Alexei Starovoitov <ast@kernel.org>, bpf@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Emil Renner Berthing <kernel@esmil.dk>,
-	Eric Dumazet <edumazet@google.com>,
-	Fabio Estevam <festevam@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	NXP Linux Team <linux-imx@nxp.com>, Paolo Abeni <pabeni@redhat.com>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Samin Guo <samin.guo@starfivetech.com>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Shawn Guo <shawnguo@kernel.org>
-Subject: Re: [PATCH net-next 1/6] net: stmmac: add stmmac_set_tx_clk_gmii()
-Message-ID: <ZQMizWbkAEyTh4M7@shell.armlinux.org.uk>
-References: <ZQMPnyutz6T23E8T@shell.armlinux.org.uk>
- <E1qgmka-007Z4Z-1E@rmk-PC.armlinux.org.uk>
- <j64xmkplk2kkb4esteaic3hsofex3eishxxr3z6hppnm6heoz5@5fyj4x5qouc3>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA6B39C
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 15:15:28 +0000 (UTC)
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C8BD1FC9
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 08:15:27 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-502153ae36cso1786500e87.3
+        for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 08:15:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1694704526; x=1695309326; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BrNzThEUI5fLlkgWOlz9qpDOnszAeALvT3xNb1ip2FY=;
+        b=E9azK6QnWXEomtT9A+AZfxPQcYaFSBWa8ksal/MgEOhxJpTbtJiwSX6/juw+QwpWvm
+         tT5o8JO+XsSOY/dweyH1njsR8UjI5gLx+MMF3sS6tDCh58sr0tJjqqi17SweHpW7nnFg
+         +bZp0bM0bgHMZ7RxQ2DGhnM7NjldfjBNe8n9uc54KEqm4wyCbQmuuGfoWE5eroJ5MHwo
+         68Jql1YxLT4qTnQJo1rqUXeKv/Ov8csznwkNUmRj3MC+qnCUNhyCaRpVeMdJiFifJQoC
+         yPoTvopwgUFEmjmSdmJzO23i162kukF2U8T3nLm9GWrWsF3za9LJwYT5OZ0cByi0g04d
+         CDaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694704526; x=1695309326;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BrNzThEUI5fLlkgWOlz9qpDOnszAeALvT3xNb1ip2FY=;
+        b=RND3mE6FLHWDtW1f7rbZvAqLSL+mwEIZbw/cLuLfN5gIQJp69z8ylqxucacKTCMOSo
+         0nWnRPyhtxSwz69/Kreo7t8emco5YbGsS0EXDvTmfNSRlpdoLdRmnj7FaidGBTo7/9xP
+         mLUWccj6TBXAYXEDfhV4u9DUI6Mfj8BH19dKCUBmfE1icLQNQcO6+gHcjZvjwOLykpyF
+         H2lexe99PNax+QeAxo3/clE/IpT9ztxfFwXrdObXNPlIoewwSASfpvjcY6M16+u2IxsX
+         LHvDdUI2uhdslwtguZvM/pkYwlSnticvSi6CqO3/tF0IBfOcVs/hgTLw15RQohPQJsS6
+         Jiag==
+X-Gm-Message-State: AOJu0Yz3UauWQgG8EdqZJhSNAmb77v6D976s2bQjFVyMx7lBfF7yomih
+	WUmiNktmj8OKROTWDLc8HYz1sg==
+X-Google-Smtp-Source: AGHT+IGuZpid9Pql/7rrl1nbTO+5IU95A25NhAduCC4gw0hgKPktdsfXi98hVZe6tk2xRNGo6LKKUg==
+X-Received: by 2002:a05:6512:b98:b0:500:b3fe:916e with SMTP id b24-20020a0565120b9800b00500b3fe916emr5284069lfv.2.1694704525548;
+        Thu, 14 Sep 2023 08:15:25 -0700 (PDT)
+Received: from [192.168.0.105] (haunt.prize.volia.net. [93.72.109.136])
+        by smtp.gmail.com with ESMTPSA id qx15-20020a170906fccf00b009a5f1d15644sm1127905ejb.119.2023.09.14.08.15.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Sep 2023 08:15:25 -0700 (PDT)
+Message-ID: <e0b3861a-18eb-80ad-1cf8-c563f97e2157@blackwall.org>
+Date: Thu, 14 Sep 2023 18:15:23 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <j64xmkplk2kkb4esteaic3hsofex3eishxxr3z6hppnm6heoz5@5fyj4x5qouc3>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH net-next v3 3/6] net: bridge: Track and limit dynamically
+ learned FDB entries
+To: Johannes Nixdorf <jnixdorf-oss@avm.de>,
+ "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+ David Ahern <dsahern@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Ido Schimmel <idosch@nvidia.com>,
+ Jakub Kicinski <kuba@kernel.org>, Oleksij Rempel <linux@rempel-privat.de>,
+ Paolo Abeni <pabeni@redhat.com>, Roopa Prabhu <roopa@nvidia.com>,
+ Shuah Khan <shuah@kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: bridge@lists.linux-foundation.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20230905-fdb_limit-v3-0-7597cd500a82@avm.de>
+ <20230905-fdb_limit-v3-3-7597cd500a82@avm.de>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20230905-fdb_limit-v3-3-7597cd500a82@avm.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Sep 14, 2023 at 05:54:09PM +0300, Serge Semin wrote:
-> On Thu, Sep 14, 2023 at 02:51:20PM +0100, Russell King (Oracle) wrote:
-> > Add a helper function for setting the transmit clock for GMII
-> > interfaces. This handles 1G, 100M and 10M using the standard clock
-> > rates of 125MHz, 25MHz and 2.5MHz.
-> > 
-> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> > ---
-> >  .../ethernet/stmicro/stmmac/stmmac_platform.c | 25 +++++++++++++++++++
-> >  .../ethernet/stmicro/stmmac/stmmac_platform.h |  1 +
-> >  2 files changed, 26 insertions(+)
-> > 
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> > index 0f28795e581c..f7635ed2b255 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> > @@ -700,6 +700,31 @@ EXPORT_SYMBOL_GPL(stmmac_probe_config_dt);
-> >  EXPORT_SYMBOL_GPL(devm_stmmac_probe_config_dt);
-> >  EXPORT_SYMBOL_GPL(stmmac_remove_config_dt);
-> >  
+On 9/5/23 14:47, Johannes Nixdorf wrote:
+> A malicious actor behind one bridge port may spam the kernel with packets
+> with a random source MAC address, each of which will create an FDB entry,
+> each of which is a dynamic allocation in the kernel.
 > 
-> > +int stmmac_set_tx_clk_gmii(struct clk *tx_clk, unsigned int speed)
-> > +{
-> > +	unsigned long rate;
-> > +
-> > +	switch (speed) {
-> > +	case SPEED_1000:
-> > +		rate = 125000000;
-> > +		break;
-> > +
-> > +	case SPEED_100:
-> > +		rate = 25000000;
-> > +		break;
-> > +
-> > +	case SPEED_10:
-> > +		rate = 2500000;
-> > +		break;
-> > +
-> > +	default:
-> > +		return -ENOTSUPP;
-> > +	}
-> > +
-> > +	return clk_set_rate(tx_clk, rate);
-> > +}
-> > +EXPORT_SYMBOL_GPL(stmmac_set_tx_clk_gmii);
+> There are roughly 2^48 different MAC addresses, further limited by the
+> rhashtable they are stored in to 2^31. Each entry is of the type struct
+> net_bridge_fdb_entry, which is currently 128 bytes big. This means the
+> maximum amount of memory allocated for FDB entries is 2^31 * 128B =
+> 256GiB, which is too much for most computers.
 > 
-> As I already noted in v1 normally the switch-case operations are
-> defined with no additional line separating the cases. I would have
-> dropped them here too especially seeing the stmmac core driver mainly
-> follow that implicit convention.
+> Mitigate this by maintaining a per bridge count of those automatically
+> generated entries in fdb_n_learned_entries, and a limit in
+> fdb_max_learned_entries. If the limit is hit new entries are not learned
+> anymore.
+> 
+> For backwards compatibility the default setting of 0 disables the limit.
+> 
+> User-added entries by netlink or from bridge or bridge port addresses
+> are never blocked and do not count towards that limit.
+> 
+> Introduce a new fdb entry flag BR_FDB_DYNAMIC_LEARNED to keep track of
+> whether an FDB entry is included in the count. The flag is enabled for
+> dynamically learned entries, and disabled for all other entries. This
+> should be equivalent to BR_FDB_ADDED_BY_USER and BR_FDB_LOCAL being unset,
+> but contrary to the two flags it can be toggled atomically.
+> 
+> Atomicity is required here, as there are multiple callers that modify the
+> flags, but are not under a common lock (br_fdb_update is the exception
+> for br->hash_lock, br_fdb_external_learn_add for RTNL).
+> 
+> Signed-off-by: Johannes Nixdorf <jnixdorf-oss@avm.de>
+> ---
+>   net/bridge/br_fdb.c     | 34 ++++++++++++++++++++++++++++++++--
+>   net/bridge/br_private.h |  4 ++++
+>   2 files changed, 36 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/bridge/br_fdb.c b/net/bridge/br_fdb.c
+> index 06e28ef8d9ff..f8a96ed9a338 100644
+> --- a/net/bridge/br_fdb.c
+> +++ b/net/bridge/br_fdb.c
+> @@ -329,11 +329,18 @@ static void fdb_delete(struct net_bridge *br, struct net_bridge_fdb_entry *f,
+>   	hlist_del_init_rcu(&f->fdb_node);
+>   	rhashtable_remove_fast(&br->fdb_hash_tbl, &f->rhnode,
+>   			       br_fdb_rht_params);
+> +	if (test_bit(BR_FDB_DYNAMIC_LEARNED, &f->flags))
 
-It's rather haphazard whether there are blank lines or not between
-case statements.
+this is racy with br_fdb_update(), the fdb entry is still visible 
+because a grace period hasn't passed, so in theory br_fdb_update() can
+unset the bit after this test and...
+> +		atomic_dec(&br->fdb_n_learned_entries);
+... this will decrease once more wrongly
 
-> Additionally I suggest to move the method to being defined at the head
-> of the file. Thus a more natural order normally utilized in the kernel
-> drivers would be preserved: all functional implementations go first,
-> the platform-specific things are placed below like probe()/remove()
-> and their sub-functions, suspend()/resume() and PM descriptors,
-> (device IDs table, driver descriptor, etc). stmmac_set_tx_clk_gmii()
-> looks as a functional helper which is normally utilized on the network
-> device open() stage in the framework of the fix_mac_speed() callback.
-> Moreover my suggestion gets to be even more justified seeing you
-> placed the method prototype at the head of the prototypes list in the
-> stmmac_platform.h file.
+>   	fdb_notify(br, f, RTM_DELNEIGH, swdev_notify);
+>   	call_rcu(&f->rcu, fdb_rcu_free);
+>   }
+>   
+> -/* Delete a local entry if no other port had the same address. */
+> +/* Delete a local entry if no other port had the same address.
+> + *
+> + * This function should only be called on entries with BR_FDB_LOCAL set,
+> + * so even with BR_FDB_ADDED_BY_USER cleared we never need to increase
+> + * the accounting for dynamically learned entries again.
+> + */
+>   static void fdb_delete_local(struct net_bridge *br,
+>   			     const struct net_bridge_port *p,
+>   			     struct net_bridge_fdb_entry *f)
+> @@ -388,9 +395,20 @@ static struct net_bridge_fdb_entry *fdb_create(struct net_bridge *br,
+>   					       __u16 vid,
+>   					       unsigned long flags)
+>   {
+> +	bool learned = !test_bit(BR_FDB_ADDED_BY_USER, &flags) &&
+> +		       !test_bit(BR_FDB_LOCAL, &flags);
+> +	u32 max_learned = READ_ONCE(br->fdb_max_learned_entries);
+>   	struct net_bridge_fdb_entry *fdb;
+>   	int err;
+>   
+> +	if (likely(learned)) {
+> +		int n_learned = atomic_read(&br->fdb_n_learned_entries);
+> +
+> +		if (unlikely(max_learned && n_learned >= max_learned))
+> +			return NULL;
+> +		__set_bit(BR_FDB_DYNAMIC_LEARNED, &flags);
+> +	}
+> +
+>   	fdb = kmem_cache_alloc(br_fdb_cache, GFP_ATOMIC);
+>   	if (!fdb)
+>   		return NULL;
+> @@ -407,6 +425,9 @@ static struct net_bridge_fdb_entry *fdb_create(struct net_bridge *br,
+>   		return NULL;
+>   	}
+>   
+> +	if (likely(learned))
+> +		atomic_inc(&br->fdb_n_learned_entries);
+> +
+>   	hlist_add_head_rcu(&fdb->fdb_node, &br->fdb_list);
+>   
+>   	return fdb;
+> @@ -893,8 +914,11 @@ void br_fdb_update(struct net_bridge *br, struct net_bridge_port *source,
+>   					clear_bit(BR_FDB_LOCKED, &fdb->flags);
+>   			}
+>   
+> -			if (unlikely(test_bit(BR_FDB_ADDED_BY_USER, &flags)))
+> +			if (unlikely(test_bit(BR_FDB_ADDED_BY_USER, &flags))) {
+>   				set_bit(BR_FDB_ADDED_BY_USER, &fdb->flags);
+> +				if (test_and_clear_bit(BR_FDB_DYNAMIC_LEARNED, &fdb->flags))
+> +					atomic_dec(&br->fdb_n_learned_entries);
+> +			}
+>   			if (unlikely(fdb_modified)) {
+>   				trace_br_fdb_update(br, source, addr, vid, flags);
+>   				fdb_notify(br, fdb, RTM_NEWNEIGH, true);
+> @@ -1071,6 +1095,8 @@ static int fdb_add_entry(struct net_bridge *br, struct net_bridge_port *source,
+>   		}
+>   
+>   		set_bit(BR_FDB_ADDED_BY_USER, &fdb->flags);
+> +		if (test_and_clear_bit(BR_FDB_DYNAMIC_LEARNED, &fdb->flags))
+> +			atomic_dec(&br->fdb_n_learned_entries);
+>   	}
+>   
+>   	if (fdb_to_nud(br, fdb) != state) {
+> @@ -1445,6 +1471,10 @@ int br_fdb_external_learn_add(struct net_bridge *br, struct net_bridge_port *p,
+>   		if (!p)
+>   			set_bit(BR_FDB_LOCAL, &fdb->flags);
+>   
+> +		if ((swdev_notify || !p) &&
+> +		    test_and_clear_bit(BR_FDB_DYNAMIC_LEARNED, &fdb->flags))
+> +			atomic_dec(&br->fdb_n_learned_entries);
+> +
+>   		if (modified)
+>   			fdb_notify(br, fdb, RTM_NEWNEIGH, swdev_notify);
+>   	}
+> diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
+> index a63b32c1638e..675cc40ae1dc 100644
+> --- a/net/bridge/br_private.h
+> +++ b/net/bridge/br_private.h
+> @@ -274,6 +274,7 @@ enum {
+>   	BR_FDB_NOTIFY,
+>   	BR_FDB_NOTIFY_INACTIVE,
+>   	BR_FDB_LOCKED,
+> +	BR_FDB_DYNAMIC_LEARNED,
+>   };
+>   
+>   struct net_bridge_fdb_key {
+> @@ -554,6 +555,9 @@ struct net_bridge {
+>   	struct kobject			*ifobj;
+>   	u32				auto_cnt;
+>   
+> +	atomic_t			fdb_n_learned_entries;
+> +	u32				fdb_max_learned_entries;
+> +
+>   #ifdef CONFIG_NET_SWITCHDEV
+>   	/* Counter used to make sure that hardware domains get unique
+>   	 * identifiers in case a bridge spans multiple switchdev instances.
+> 
 
-How is one supposed to know about this? I did my best trying to work
-out where they should've gone...
-
-If it's that important, maybe add some /* Comments */ to state that
-there are separate sections to the file?
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
