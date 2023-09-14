@@ -1,210 +1,123 @@
-Return-Path: <netdev+bounces-33982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B18AF7A10D9
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 00:19:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 414F67A1108
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 00:32:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DB23282AC4
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 22:19:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E55F1C20DDE
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 22:32:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2415327EC8;
-	Thu, 14 Sep 2023 22:16:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9E0ED2E3;
+	Thu, 14 Sep 2023 22:32:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C7F6273D8
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 22:16:04 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id BCED9273A
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 15:16:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1694729762;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kJbp/xPUEeZPZ6xlN6+ErzCN36LIEvr4JCtOzFEoqKk=;
-	b=MlNDhjCie433k0jPrPIc4OCcOaAA8I/kYQKCDyF72MIyVt7ZXWIsOnNMPSQPUIVOZQ9RlQ
-	BnLT0G8m0d5WARyOIivEmyMKRKyFgmZ8+zt46av2PB881CRX4zjj2GUCsdWEo61p5l2bFF
-	isvLt1k2xLp42EXb+PKZoVa5HeiP+C4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-321-oafUx_6YMSSpr0ZeGoRjbg-1; Thu, 14 Sep 2023 18:15:59 -0400
-X-MC-Unique: oafUx_6YMSSpr0ZeGoRjbg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 20ECC816525;
-	Thu, 14 Sep 2023 22:15:58 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.216])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 686E72026D4B;
-	Thu, 14 Sep 2023 22:15:55 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Al Viro <viro@zeniv.linux.org.uk>,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Cc: David Howells <dhowells@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Christian Brauner <christian@brauner.io>,
-	David Laight <David.Laight@ACULAB.COM>,
-	Matthew Wilcox <willy@infradead.org>,
-	Brendan Higgins <brendanhiggins@google.com>,
-	David Gow <davidgow@google.com>,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	kunit-dev@googlegroups.com,
-	linux-kernel@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christian Brauner <brauner@kernel.org>,
-	David Hildenbrand <david@redhat.com>,
-	John Hubbard <jhubbard@nvidia.com>
-Subject: [RFC PATCH 9/9] iov_iter: Add benchmarking kunit tests for UBUF/IOVEC
-Date: Thu, 14 Sep 2023 23:15:26 +0100
-Message-ID: <20230914221526.3153402-10-dhowells@redhat.com>
-In-Reply-To: <20230914221526.3153402-1-dhowells@redhat.com>
-References: <20230914221526.3153402-1-dhowells@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0A0638F
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 22:32:36 +0000 (UTC)
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2088.outbound.protection.outlook.com [40.107.95.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C9B3270B
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 15:32:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=D/jolYwg9E5u+5wjUKHPaFVLRg38hlkVmThGwXlaJTfQG6eqkCmYgqhrsJ2J7DJFRb8UqBkcdF3XOdhtGzES/8C4zUfaa1H6kzy+BU7Y7nnE534JiHo5n6J7wogG95NN7wLpSb3WEtC3sTcdkmGr23yzLslFa83zqV8Mmc6y2p9ieFfVQik7oSezyhdmrlemI57q96LxxGYRe901ib6/QUowVNcKvRBUJr8eRyhB2AWdBDS75KwsmkRhH8A2/hU0HoQz44EPJjnHWpY8eB7ePrJMT5mKS6Svc19+tLnpiO/txYZ8M8WKvxRsRhQcmC+9E51Q1n92XpeMeJiJw+qqTA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2cdmgFZCj+Dxb9/L0+nmsxQyyULWUJ93Uh26oMPjITU=;
+ b=ifUdHL1e3214T1l6AlE3cdnWz9BJ4H+dNwNlcvYSkp5PYovSFxME5xMf6RsNdH05eYT9cxAXpMIGKF02qRZMGxSvNmNpu84ckMNR7N6cRP2k40m+csUNiFg2QhL3EaD38b2obxB80Esl4fZYfQVq4d2CQ2d4wpMxLmjO5pmw0CuXSm70Pe20/W8W2mz7Wz5f6o+T3etDEsUUmDPAlje0LX2AU/eQWihtEBp5lsETPVTFcjt6YjpFVh6LQmwP9FprrWPu/7rIdemxdz/fB7070cPyqIDaMstt+YVuM4fH/fotiI5HyxE9wTFeK87YUhd928HARwyVt7EeT07wuB0ziA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2cdmgFZCj+Dxb9/L0+nmsxQyyULWUJ93Uh26oMPjITU=;
+ b=ej9I53KBhCgjLdHvuJ4ibSmE8x0Ug7WEtSUrR2kQB1A8VF/ee1bAk2j2OuwjzJcu1bsbG+KFZ6UZglKxVvgVKtP+/UDMMzojN/hO7t7NHvgCF8IFmvA04DbgWHcJ+NFbtN6htSN7bUF4O4yVdRJ5FmUPJpzl+QZoHtqQfEVWmuE=
+Received: from CH2PR15CA0022.namprd15.prod.outlook.com (2603:10b6:610:51::32)
+ by CH3PR12MB8994.namprd12.prod.outlook.com (2603:10b6:610:171::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.38; Thu, 14 Sep
+ 2023 22:32:32 +0000
+Received: from DS3PEPF000099D8.namprd04.prod.outlook.com
+ (2603:10b6:610:51:cafe::50) by CH2PR15CA0022.outlook.office365.com
+ (2603:10b6:610:51::32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.21 via Frontend
+ Transport; Thu, 14 Sep 2023 22:32:31 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DS3PEPF000099D8.mail.protection.outlook.com (10.167.17.9) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6792.20 via Frontend Transport; Thu, 14 Sep 2023 22:32:31 +0000
+Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 14 Sep
+ 2023 17:32:30 -0500
+From: Shannon Nelson <shannon.nelson@amd.com>
+To: <netdev@vger.kernel.org>, <brett.creeley@amd.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: Shannon Nelson <shannon.nelson@amd.com>
+Subject: [PATCH net-next 0/4] pds_core: add PCI reset handling
+Date: Thu, 14 Sep 2023 15:31:56 -0700
+Message-ID: <20230914223200.65533-1-shannon.nelson@amd.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099D8:EE_|CH3PR12MB8994:EE_
+X-MS-Office365-Filtering-Correlation-Id: dd3d82a2-e4ef-4283-27a9-08dbb5727c49
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	7tpbuo/vucEAumVB/NUaOHMpRD0etzxrVLyoQTc6DhVJKmP3Qukll7WmC02JSGsGR8JyUtb/d/+nD9MCkkbbRZTcqYZKRn90MOJKRsdXmHKo64goqqk5pnLAtR6QfJ2FhrPkCnFl1FoZmetWja0OUK+LkpGX8LzkMpe2qA0LQzAnieGn0K9gCZI0r8c0Uk6WmoOj79/WgcHApyTiyNFSdEyeMU3lqc1dKxsQx3mjQd4AqVQ6ZzvQyY1RtWtVS19UQrVyEH7kkljtqh4onATL1Da6/3qyZzzanOewxXmPJxwQnDPt+BdpiFYj4GTc5jrd+P/SE6gawywCHgWpjHbfTNFAwmKtCZtlw6XraqozGFLOcTIhKBtikUZsmUND47uHmmJeRlXxM7554qixkKN4OUX1jD52ZXPmfoPlFdQmUdthmctTfoAQNIsEAzqJSGrZTmusC1pOPXt264hbdT7OIjuQ6w+cEzW+vRpgjdVdFCD6059LtX6QefjLJoJC5ytMCldxCffEzU9STZ7eIKf+H1GgcZjc7m1GSUAtr7gg10r3W1EjckmWmHiwGiHHSLxq8wWlBrs55DSINJsWGFVajAj4JHK0g20yd60ogmPGEfVeaDYtcp3LRq4bdvqIv99hQqMGTGKY9hvqKnswKTSGfcDpco0e3MbviHFMoqxsmQAzrzKvwh9eTlh7Z86M1wdg81WhN5U0Xzn4p3Dx4rNq4ndvSkKXpuLx+vfT8EcOTymEjQkZ/MbKZ6ftmGJr9D78hcAa97Uj78ERbVqZeCa0iA==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(396003)(136003)(376002)(346002)(451199024)(82310400011)(186009)(1800799009)(36840700001)(40470700004)(46966006)(82740400003)(36756003)(81166007)(40480700001)(356005)(86362001)(40460700003)(4744005)(2906002)(6666004)(8936002)(8676002)(4326008)(44832011)(70206006)(70586007)(5660300002)(83380400001)(1076003)(16526019)(26005)(478600001)(110136005)(336012)(47076005)(316002)(41300700001)(36860700001)(426003)(2616005)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Sep 2023 22:32:31.8344
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: dd3d82a2-e4ef-4283-27a9-08dbb5727c49
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS3PEPF000099D8.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8994
 
-Add kunit tests to benchmark 256MiB copies to a UBUF iterator and an IOVEC
-iterator.  This attaches a userspace VM with a mapped file in it
-temporarily to the test thread.
+Make sure pds_core can handle and recover from PCI function resets and
+similar PCI bus issues: add detection and handlers for PCI problems.
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Andrew Morton <akpm@linux-foundation.org>
-cc: Christoph Hellwig <hch@lst.de>
-cc: Christian Brauner <brauner@kernel.org>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Al Viro <viro@zeniv.linux.org.uk>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: David Hildenbrand <david@redhat.com>
-cc: John Hubbard <jhubbard@nvidia.com>
-cc: Brendan Higgins <brendanhiggins@google.com>
-cc: David Gow <davidgow@google.com>
-cc: linux-kselftest@vger.kernel.org
-cc: kunit-dev@googlegroups.com
-cc: linux-mm@kvack.org
-cc: linux-fsdevel@vger.kernel.org
----
- lib/kunit_iov_iter.c | 85 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 85 insertions(+)
+Shannon Nelson (4):
+  pds_core: check health in devcmd wait
+  pds_core: keep viftypes table across reset
+  pds_core: implement pci reset handlers
+  pds_core: add attempts to fix broken PCI
 
-diff --git a/lib/kunit_iov_iter.c b/lib/kunit_iov_iter.c
-index f8d0cd6a2923..cc9c64663a73 100644
---- a/lib/kunit_iov_iter.c
-+++ b/lib/kunit_iov_iter.c
-@@ -1304,6 +1304,89 @@ static void *__init iov_kunit_create_source(struct kunit *test, size_t npages)
- 	return scratch;
- }
- 
-+/*
-+ * Time copying 256MiB through an ITER_UBUF.
-+ */
-+static void __init iov_kunit_benchmark_ubuf(struct kunit *test)
-+{
-+	struct iov_iter iter;
-+	unsigned int samples[IOV_KUNIT_NR_SAMPLES];
-+	ktime_t a, b;
-+	ssize_t copied;
-+	size_t size = 256 * 1024 * 1024, npages = size / PAGE_SIZE;
-+	void *scratch;
-+	int i;
-+	u8 __user *buffer;
-+
-+	/* Allocate a huge buffer and populate it with pages. */
-+	buffer = iov_kunit_create_user_buf(test, npages, NULL);
-+
-+	/* Create a single large buffer to copy to/from. */
-+	scratch = iov_kunit_create_source(test, npages);
-+
-+	/* Perform and time a bunch of copies. */
-+	kunit_info(test, "Benchmarking copy_to_iter() over UBUF:\n");
-+	for (i = 0; i < IOV_KUNIT_NR_SAMPLES; i++) {
-+		iov_iter_ubuf(&iter, ITER_DEST, buffer, size);
-+
-+		a = ktime_get_real();
-+		copied = copy_to_iter(scratch, size, &iter);
-+		b = ktime_get_real();
-+		KUNIT_EXPECT_EQ(test, copied, size);
-+		samples[i] = ktime_to_us(ktime_sub(b, a));
-+	}
-+
-+	iov_kunit_benchmark_print_stats(test, samples);
-+	KUNIT_SUCCEED();
-+}
-+
-+/*
-+ * Time copying 256MiB through an ITER_IOVEC.
-+ */
-+static void __init iov_kunit_benchmark_iovec(struct kunit *test)
-+{
-+	struct iov_iter iter;
-+	struct iovec iov[8];
-+	unsigned int samples[IOV_KUNIT_NR_SAMPLES];
-+	ktime_t a, b;
-+	ssize_t copied;
-+	size_t size = 256 * 1024 * 1024, npages = size / PAGE_SIZE, part;
-+	void *scratch;
-+	int i;
-+	u8 __user *buffer;
-+
-+	/* Allocate a huge buffer and populate it with pages. */
-+	buffer = iov_kunit_create_user_buf(test, npages, NULL);
-+
-+	/* Create a single large buffer to copy to/from. */
-+	scratch = iov_kunit_create_source(test, npages);
-+
-+	/* Split the target over a number of iovecs */
-+	copied = 0;
-+	for (i = 0; i < ARRAY_SIZE(iov); i++) {
-+		part = size / ARRAY_SIZE(iov);
-+		iov[i].iov_base = buffer + copied;
-+		iov[i].iov_len = part;
-+		copied += part;
-+	}
-+	iov[i - 1].iov_len += size - part;
-+
-+	/* Perform and time a bunch of copies. */
-+	kunit_info(test, "Benchmarking copy_to_iter() over IOVEC:\n");
-+	for (i = 0; i < IOV_KUNIT_NR_SAMPLES; i++) {
-+		iov_iter_init(&iter, ITER_DEST, iov, ARRAY_SIZE(iov), size);
-+
-+		a = ktime_get_real();
-+		copied = copy_to_iter(scratch, size, &iter);
-+		b = ktime_get_real();
-+		KUNIT_EXPECT_EQ(test, copied, size);
-+		samples[i] = ktime_to_us(ktime_sub(b, a));
-+	}
-+
-+	iov_kunit_benchmark_print_stats(test, samples);
-+	KUNIT_SUCCEED();
-+}
-+
- /*
-  * Time copying 256MiB through an ITER_KVEC.
-  */
-@@ -1504,6 +1587,8 @@ static struct kunit_case __refdata iov_kunit_cases[] = {
- 	KUNIT_CASE(iov_kunit_extract_pages_kvec),
- 	KUNIT_CASE(iov_kunit_extract_pages_bvec),
- 	KUNIT_CASE(iov_kunit_extract_pages_xarray),
-+	KUNIT_CASE(iov_kunit_benchmark_ubuf),
-+	KUNIT_CASE(iov_kunit_benchmark_iovec),
- 	KUNIT_CASE(iov_kunit_benchmark_kvec),
- 	KUNIT_CASE(iov_kunit_benchmark_bvec),
- 	KUNIT_CASE(iov_kunit_benchmark_bvec_split),
+ drivers/net/ethernet/amd/pds_core/core.c | 43 +++++++++++++++-----
+ drivers/net/ethernet/amd/pds_core/core.h |  7 ++++
+ drivers/net/ethernet/amd/pds_core/dev.c  | 11 +++++-
+ drivers/net/ethernet/amd/pds_core/main.c | 50 ++++++++++++++++++++++++
+ include/linux/pds/pds_core_if.h          |  1 +
+ 5 files changed, 101 insertions(+), 11 deletions(-)
+
+-- 
+2.17.1
 
 
