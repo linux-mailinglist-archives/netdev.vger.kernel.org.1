@@ -1,204 +1,408 @@
-Return-Path: <netdev+bounces-33714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33715-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8F6579F61F
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 03:06:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39BBB79F63D
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 03:19:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 594ED1F21A8D
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 01:06:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5CBF1F21B0B
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 01:19:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DC7237C;
-	Thu, 14 Sep 2023 01:06:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9071B384;
+	Thu, 14 Sep 2023 01:18:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EE87369
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 01:06:17 +0000 (UTC)
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08A8A1BCF;
-	Wed, 13 Sep 2023 18:06:17 -0700 (PDT)
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38DGZgol032135;
-	Thu, 14 Sep 2023 01:00:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : message-id : references : date : in-reply-to : content-type :
- mime-version; s=corp-2023-03-30;
- bh=PhrOtT9oKbjaBUBwJlb3F3CQEiH4a2EsCBteVFN55Rs=;
- b=vD9BqpK83PgndiFOQyBjqmK9UK/XlzkvXgi66ugc8ZGKP3pjvEVOXBpQMN3ysexV27mz
- MeSJ6rm4HecVbRHmJZ1GOnU7mZkDd39ZJ+Y3zoC9VY4aA1qtD/2AFrdOOsr7+Ojn9L/m
- jC1QN5RgPO9hH3hvRlF4VpDKOwz3/yZvy+rDEH6WlnNNxr3MjBt033wcwZTyc9jZG4ot
- m294/WWmlUU5qomOzl66IfVwltENmj4vC+9Q9IQtxCDFPiIaAWmlTs5xho21Gxby68U1
- w/ECNaYvLXr4A5xWHSuryd8n6lhXoQSOeEZS7WB4Juujcr1ClsOZLjIdb7Txt+Y8YzqG EA== 
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3t2y7muej9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 14 Sep 2023 01:00:17 +0000
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 38DMFNMD023178;
-	Thu, 14 Sep 2023 01:00:17 GMT
-Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2176.outbound.protection.outlook.com [104.47.59.176])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3t0f588jeb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 14 Sep 2023 01:00:17 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KYi7Yh300Q/erJdiH7DUun+lWae5D92GqoNvJ4qfqby3qlwfNaSjF+cu6uAndv5f9rzg9RiTBaPyJ0D/XX6T6DRGkYdXe60p0NkOIIVSo3VzQZH1aAE57iMFjIOgyKF7MyuWVD6BwrljXh7pRPOrA8WpYcx1o3aUEvHToZrpeuG8Y0+k1xEbDGc8lg4g9mFwUkvOm8g1X5Fke+teChmKYTjQwlN5hBGAVYqA1drBzgf1Q2chx7evrqON1aVq+c0fl/zEjNijxjyAqRCG5lMbpa3ClOhLDORg19ycRCxORh0Mm+UrI0vmU5uxFwrmX0z6GaL6wWJkxc0vCyriyNhYJw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PhrOtT9oKbjaBUBwJlb3F3CQEiH4a2EsCBteVFN55Rs=;
- b=WM9/Lp3OADEvicFN2+1w8zVf5pq3LtMS2IyR66n8ZHdsA0irUEs1sLyAIjy63ThPC99sIp86w7R1uEWMkb+w5djpWPjXrEyUeP5JbGfUGDfiYc/gyiWU0+042a/e/JdSWQUF0+vytoxxtabTaJB7pPj4HoJ6bsWGVOeTbg6IXnW1llPcw9YDRtXdH1VgoqCdm2QGWJD1mzg6apoYDXOXzejc9+JGxeOflZUKzlruHfI/iLXASO7omJk0qQn13AGFN5KFWrCuK/qtj7PL+k7BEi2xJTmZbl7GMEYJgqOhjiLmFuUsJGHuX14vQIMYitzMX3cckl093rho01y8IYRVzg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PhrOtT9oKbjaBUBwJlb3F3CQEiH4a2EsCBteVFN55Rs=;
- b=YkrG0aLjxsUcaROcSub2NguKbr465w+6UNvsAAITQwdnMC3uOOuQ6lw9oSEZwVih6UF/r+T0Pl15f7QNPIqy59962OnRtZShAcMl/xx9XYEAiMCY6ss/fO+SnDqKjD9ejRA2KMskpxdzzSEqx9EDBZ/TCEB03lb/0Tap3wFDSd0=
-Received: from PH0PR10MB4759.namprd10.prod.outlook.com (2603:10b6:510:3d::12)
- by IA0PR10MB7208.namprd10.prod.outlook.com (2603:10b6:208:404::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.34; Thu, 14 Sep
- 2023 01:00:14 +0000
-Received: from PH0PR10MB4759.namprd10.prod.outlook.com
- ([fe80::59f3:b30d:a592:36be]) by PH0PR10MB4759.namprd10.prod.outlook.com
- ([fe80::59f3:b30d:a592:36be%7]) with mapi id 15.20.6792.019; Thu, 14 Sep 2023
- 01:00:13 +0000
-To: Ilpo =?utf-8?Q?J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Cc: Rob Herring <robh@kernel.org>, Bjorn Helgaas <helgaas@kernel.org>,
-        linux-pci@vger.kernel.org, Brian King <brking@us.ibm.com>,
-        "James E.J.
- Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen"
- <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org,
-        3chas3@gmail.com, dalias@libc.org, glaubitz@physik.fu-berlin.de,
-        ink@jurassic.park.msu.ru, kw@linux.com, linux-alpha@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-atm-general@lists.sourceforge.net, linux-sh@vger.kernel.org,
-        lpieralisi@kernel.org, mattst88@gmail.com, netdev@vger.kernel.org,
-        richard.henderson@linaro.org, toan@os.amperecomputing.com,
-        ysato@users.sourceforge.jp
-Subject: Re: [PATCH v3 6/6] scsi: ipr: Do PCI error checks on own line
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <yq1jzstfu2z.fsf@ca-mkp.ca.oracle.com>
-References: <20230911125354.25501-1-ilpo.jarvinen@linux.intel.com>
-	<20230911125354.25501-7-ilpo.jarvinen@linux.intel.com>
-Date: Wed, 13 Sep 2023 21:00:11 -0400
-In-Reply-To: <20230911125354.25501-7-ilpo.jarvinen@linux.intel.com> ("Ilpo
-	=?utf-8?Q?J=C3=A4rvinen=22's?= message of "Mon, 11 Sep 2023 15:53:54
- +0300")
-Content-Type: text/plain
-X-ClientProxiedBy: SA1P222CA0037.NAMP222.PROD.OUTLOOK.COM
- (2603:10b6:806:2d0::18) To PH0PR10MB4759.namprd10.prod.outlook.com
- (2603:10b6:510:3d::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75CA8369;
+	Thu, 14 Sep 2023 01:18:50 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D36DA1724;
+	Wed, 13 Sep 2023 18:18:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=eHIQuT6UlrAMV8LSR515DTq2wIcqJxO0YuYeb28K3lY=; b=Wjv7sm3DNC7tMRxgXrWbtjkyt1
+	hfskufYENJkJvGnSvOYswn9dAvkeVBSICVfLXWbC3/bZUPS07mOxzrmfrTjjLi4+s7m+wG4FuLWjS
+	yqPz0mdSf0iYA8nPlmeGlSzlSjgT2Zc5/t4UZ4l1ihc6++rxA+40r81XRRlukHnQLmyQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qgb09-006Lwq-D4; Thu, 14 Sep 2023 03:18:37 +0200
+Date: Thu, 14 Sep 2023 03:18:37 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	corbet@lwn.net, steen.hegelund@microchip.com, rdunlap@infradead.org,
+	horms@kernel.org, casper.casan@gmail.com, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, horatiu.vultur@microchip.com,
+	Woojung.Huh@microchip.com, Nicolas.Ferre@microchip.com,
+	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com
+Subject: Re: [RFC PATCH net-next 4/6] net: ethernet: implement data
+ transaction interface
+Message-ID: <e874dab4-e701-44f8-bbe0-ce66784ecf5c@lunn.ch>
+References: <20230908142919.14849-1-Parthiban.Veerasooran@microchip.com>
+ <20230908142919.14849-5-Parthiban.Veerasooran@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR10MB4759:EE_|IA0PR10MB7208:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6d00dd9d-e7cc-4c1b-0074-08dbb4bdf3d9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 
-	/M2HSQOas1Wsw9xzFFJXcjlREl1EVOz/2QhXC/UN+p+u1sXQGnAXN4N3yE1l4Ptn56u+mYEc9p8HcfGkYS0So+eI8tzEU1nvMX7DOr72Mf4kNoGtYPthfB/GCRpMLVX9kylewWGUWpP5fuTVrTsdYyQxUt7R21310q3jUhoY/1jfJ7C9zD5Wahs7MSsYLrGKymEVcXfNzSRwqa9eMJu9GzOWjC8WHZGLBMA6P8agf6ysP79fgNCT/ZzTLM/GYuVB/KWreyCceck+59SLRwF/k4i1VVyAAawOcVG2svTWXrjjLVoa7e+4K2Lz3GTVbhriLrB44Vk2Iwhmd12+WCHfsaYGD0yV+jPOEQjUTp7ttq9f9c1quuE/zVuXtwZk0xX6S1MMuSyIxvft+iZZplpwiXDd9OnHdK6AsYboTigeffPWMiTGoBfWON6Xiofk3V4LnPia/OyJMP6IpJteBCYBMy57FArfjDyIR6ZelepzGWNrnUc26n2dTT6G0FYSuaIDXgopUUkz8h6B0MX2zzDjT0ibghAnBQs+qLjBgwjzYOUYZyFmO+qY28dud1wERonT
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB4759.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(376002)(39860400002)(366004)(136003)(396003)(186009)(451199024)(1800799009)(41300700001)(558084003)(66556008)(38100700002)(26005)(86362001)(66946007)(2906002)(6512007)(6506007)(8676002)(54906003)(5660300002)(316002)(36916002)(4326008)(478600001)(7416002)(8936002)(6486002)(6916009)(66476007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?us-ascii?Q?5Fj/Wj75PkA5jhOm0ANHATkW93D3BrNaRRGR9Ql/mu9Mvd2ZY/ynME01kjj7?=
- =?us-ascii?Q?3OZn8fH5A8eT1s+CWN2p5Wr3G6bXjSPVPaW9lrfICq/xHQmc6iU+Tj3u/0Iy?=
- =?us-ascii?Q?fNJnZMgP6K1t9yaB/Y59rTePrnXweCYAjmxRdT7cns35U/SmmmmodG9OEois?=
- =?us-ascii?Q?kVOd8YOMwZCtw2Da1dYS6D3a86HkjCYCToOhctNEo3sXka+uvfxTT09E8DcE?=
- =?us-ascii?Q?NB+ezoSe+mktPPtMPbEcIU95nYXLpJShLzM1IZZkOfuAbZLmdihRKmudgFr8?=
- =?us-ascii?Q?Ym1lbMxaLs8Hd0hXBLrIiuCftzAug4DJYcvl8GhIFeXrUhDv04riJ6aot20b?=
- =?us-ascii?Q?USjCUQKvt2P70BdsPpfqqnjYCLi76wOhQ85ndJJFUJnVOvRklT6CTb3PUesH?=
- =?us-ascii?Q?94uqnridUzLE7z5zYWXahZabQimsbl5G0ik8H8cZNxH0D8K8u6vSwPhnYKcl?=
- =?us-ascii?Q?tPSiLE+HFx+vE2osUVc5X+LPEayuZ4g1xk9fFVNpN/O7VUYA/p4i93R93hFU?=
- =?us-ascii?Q?id7mXm1QXfPaqP+QVVY52f0disVTS38t8Gsqh2GOrg/oS2YzD8oP3FERsocN?=
- =?us-ascii?Q?kS6aRc7E4UL51CF5uHVM7pl8SaxDeTjbMUWMWHMZNEz8/AyDqrkr0HvvuOej?=
- =?us-ascii?Q?Q2n1rKQUsT95BVCQjx5auTOcN+t8AZANmoeT4M5A1EjtxlHseHvDXExwBgk2?=
- =?us-ascii?Q?jS3wxMCf6HtsdeoMqxUVjctckwwfQXmxuZzD7/XQ71I7FaAEM8nPkUgI4Vja?=
- =?us-ascii?Q?xo3CB36CNdgA9JHaXZGBxEjCMyFDD8ZXUn5aalpEyndvcR9IgWwlTN2bgnwt?=
- =?us-ascii?Q?bMGrj+GWziJHgAE2H0beK4Dehf5b0SgdPOjc23uwPZA/Y1LVP5LQXcJ5YXKD?=
- =?us-ascii?Q?zUtV2LQFgfmxNO3kBeO8YJjYFKzQ0rgzH27QsOLOXAa/NCAz5FXPzx+q6pw2?=
- =?us-ascii?Q?ss5RpG8HAmYgrGZeA6j/AX6S5NjmjZjNRQ/xujE1zdjYa69vtpu+DimfY2Dy?=
- =?us-ascii?Q?iLnRkvXpl8+j9P5ue8p9+hULHl3WxRMnRveuY4NoYlTqokEEv/DWVrC/ILP7?=
- =?us-ascii?Q?5oSQDEOKK4t9j7XuCak2DxZWXMTYX6tSjE446158xcfqLhuUZ8+HXnmvvHMm?=
- =?us-ascii?Q?ulGRt4OQdpJNAVyGBCRVfqeD8fKdWxMKl3y8Aj5tD/thcE0JooL0D3vx1j7o?=
- =?us-ascii?Q?Ar9MTf93QCGehUWq4KfRdgkwqWabsmpvYHRE6Y5jXYrCUWkdX/fVAjPHUhJ/?=
- =?us-ascii?Q?GmPHUV1gkKSYpWDgoGpDiE1PQwtIMc/FR8R1jgrzZ984ZXAbIe3ekwtiAbf/?=
- =?us-ascii?Q?9+v53e8wxVwyM3bCmlvoznlfS+gwONySOx0no6GO3bnIPi5jry7VQaDh8Jrn?=
- =?us-ascii?Q?r71lBAZca4la3s+AHvQArUJ5DR9Wpb3xfLw+x06+9NO5Df+VUlTG6KZ1Yn03?=
- =?us-ascii?Q?rzHLq5oOpCh2G1INAFWbjSVvi9p40Z9yUzfMoY9xjVA6ThPkXLUqwGVNhQGM?=
- =?us-ascii?Q?Sg8THot/BGTDNAcKFFl7EVkU1PVO/8EZ324ER7tbVIVTNgSQ9lqomiChipVZ?=
- =?us-ascii?Q?8biybXjmrIbiTUGthePbrd9zqXySOZVPsBO3P5NIYaBYUpxYrTfgcB6hcd3r?=
- =?us-ascii?Q?5g=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	=?us-ascii?Q?Bt0PnBJ80q+zt9gZNqX4vAMbg8c8mFe3OGrIMZMtwoy/nPanNVPm5qXuViTw?=
- =?us-ascii?Q?jiiJGhn7IqI/PSGEpAwFAADMP29oSHWe3wFnXjkYU9FI0Dy6sWPPJJURyjx1?=
- =?us-ascii?Q?ye9C4tR6vERKR579yfitNrQg1WL8xkPyshX4AAScdONXKJgIF6MPkWY/CBKb?=
- =?us-ascii?Q?etHyH4gVUX1N+xK8EUtmCxefk1qS+bJPpgmxzwydUnJJjXbrGw57k0StTXo1?=
- =?us-ascii?Q?zR6XFRrV5B5hd1uDuG0oTWx56AnRaR2cQE3PVx++80hTE4oaGyrv4u0R4sio?=
- =?us-ascii?Q?fFylJczOkcs+5J4XBfigehe8hw2gS7FM92U+WOYbxUsz85Bi7ZEb2T+nMkl3?=
- =?us-ascii?Q?4UjK98QzpmX5FD1XqXBu92gZltPY5+hIdyAvmf8oyuZEa2Ly17pTZCAfbAlA?=
- =?us-ascii?Q?8N4uj1agUAwVnbC6IIAGJU6how+9BbYO1RjJAg7Nrf4V2fkp0HhFte4FXXGp?=
- =?us-ascii?Q?gC/6yMWlN7jXIrVxm7y68/w2vsN4ydGMXRoivze4t1DTg/bEF4oad4gRiYPq?=
- =?us-ascii?Q?xqS2EtxxkwPbhIogKVCgCBlCeDvENstcxsDtD+1YP/V+2NThRUaxHCgiYk21?=
- =?us-ascii?Q?6waBQQNk4ecUFRS9QZEOjQn9I6CY96k0gyZx0V7wnSRBl/TyTu76sRtFeYZ5?=
- =?us-ascii?Q?f45S2wnGLmuUgRUoBnhhNaTsrgWU98UTGLdCno9AFxVyETChfaLnYZDxskST?=
- =?us-ascii?Q?fyt+gx/tWOVHNM16SnkISw286nQLYSwZJuIn8lXaScr81qC40rCu/ObisD6g?=
- =?us-ascii?Q?3VH6/s8mX9+UTdlZ0d/wyWD9FSu9g4RBNVr7qb707LuiKQIRzhgo/xXTuEag?=
- =?us-ascii?Q?vTfWI7e/UNpq71ZBQ/E4znACOvTNVPp3m0Xq9SaHy3lqdusOcDJC3Hi4o/Ey?=
- =?us-ascii?Q?Duv3+jnTsVPhDkBGXZIdyYg8/hq2GPATsJ5QwoQHVdJ0tTcCLN/ND6J3Iahf?=
- =?us-ascii?Q?FigLOtyiqW9K4XFPHkj6d/vfyaYLS6RA6ZN+qcb4pDu0Ng1xpP70Bivxzt2X?=
- =?us-ascii?Q?BuKHvQu1UM7PxjC7nIvxyVjJxqlXL2KDKkVa6sAPa3NfSAvcHC03Z0jhqb7J?=
- =?us-ascii?Q?gK3k3sJQVJRB83FBv4UfGau8iFv1WggyDb+B6mWm4fXe4LZZQkofCInfKtTV?=
- =?us-ascii?Q?cFlpTwaJzmn2oHAFo3lRibncHQzCwJGO8S34Rhs8Zv7icVa8vM3yAVyrkvaL?=
- =?us-ascii?Q?GrrT/pgrM2JpxOXtz//k7ZsJ/YwueZ9x81uywvAfxQ/admLAcjZZlHYdxkV4?=
- =?us-ascii?Q?Dvg4VQpLytO8QXP+7tSF6u1F5vCn9M5dD33ugJEnLbLoB9woE7hOdnAkII+K?=
- =?us-ascii?Q?TnEsm20L5xXOksMFIfqZc3KNjOaG3TYwohfXYphlssGciQ=3D=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6d00dd9d-e7cc-4c1b-0074-08dbb4bdf3d9
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB4759.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Sep 2023 01:00:13.6925
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RUZaJruQtxb8vrRuymc0HaK2Ubz8mgkmoRW6GBtohsXzcc7pFKdgJxCYxbtRTOnsOco8kzh/eNbjKKgMjugGB5NfARMLybZSmaGkE6PRaIY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR10MB7208
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-09-13_19,2023-09-13_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 adultscore=0
- mlxlogscore=991 phishscore=0 malwarescore=0 mlxscore=0 spamscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2308100000 definitions=main-2309140007
-X-Proofpoint-ORIG-GUID: GcjXtN8SqpJS2w893qHm4n3SAdD57HGt
-X-Proofpoint-GUID: GcjXtN8SqpJS2w893qHm4n3SAdD57HGt
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230908142919.14849-5-Parthiban.Veerasooran@microchip.com>
 
+> +static void oa_tc6_rx_eth_ready(struct oa_tc6 *tc6)
+> +{
+> +	struct sk_buff *skb = NULL;
+> +
+> +	/* Send the received ethernet packet to network layer */
+> +	skb = netdev_alloc_skb(tc6->netdev, tc6->rxd_bytes + NET_IP_ALIGN);
+> +	if (!skb) {
+> +		tc6->netdev->stats.rx_dropped++;
+> +		netdev_err(tc6->netdev, "Out of memory for rx'd frame");
 
-Ilpo,
+Being out of memory is not likely to go away quickly. So i can see
+this spamming the kernel log. At minimum make it rate limited, or just
+rely on the counter and do not print anything.
 
-> Instead of if conditions with line splits, use the usual error handling
-> pattern with a separate variable to improve readability.
->
-> No functional changes intended.
+> +static int oa_tc6_process_exst(struct oa_tc6 *tc6)
+> +{
+> +	u32 regval;
+> +	int ret;
+> +
+> +	ret = oa_tc6_read_register(tc6, OA_TC6_STS0, &regval, 1);
+> +	if (ret) {
+> +		netdev_err(tc6->netdev, "STS0 register read failed.\n");
+> +		return ret;
+> +	}
+> +	if (regval & TXPE)
+> +		netdev_err(tc6->netdev, "Transmit protocol error\n");
+> +	if (regval & TXBOE)
+> +		netdev_err(tc6->netdev, "Transmit buffer overflow\n");
+> +	if (regval & TXBUE)
+> +		netdev_err(tc6->netdev, "Transmit buffer underflow\n");
+> +	if (regval & RXBOE)
+> +		netdev_err(tc6->netdev, "Receive buffer overflow\n");
+> +	if (regval & LOFE)
+> +		netdev_err(tc6->netdev, "Loss of frame\n");
+> +	if (regval & HDRE)
+> +		netdev_err(tc6->netdev, "Header error\n");
+> +	if (regval & TXFCSE)
+> +		netdev_err(tc6->netdev, "Transmit Frame Check Sequence Error\n");
 
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Do you expect these problems to magically fix themselves, or is this
+going to spam the kernel log until the machine is rebooted?
 
--- 
-Martin K. Petersen	Oracle Linux Engineering
+It seems a counter would be more appropriate, and maybe one rate
+limited message if the problem persists.
+
+Please look at all your netdev_err() calls and consider if they are
+really needed, should they be netdev_dbg(), or statistics counters.
+
+> +static int oa_tc6_process_rx_chunks(struct oa_tc6 *tc6, u8 *buf, u16 len)
+> +{
+> +	u8 cp_count;
+> +	u8 *payload;
+> +	u32 ftr;
+> +	u16 ebo;
+> +	u16 sbo;
+> +
+> +	/* Calculate the number of chunks received */
+> +	cp_count = len / (tc6->cps + TC6_FTR_SIZE);
+> +
+> +	for (u8 i = 0; i < cp_count; i++) {
+> +		/* Get the footer and payload */
+> +		ftr = *(u32 *)&buf[tc6->cps + (i * (tc6->cps + TC6_FTR_SIZE))];
+> +		ftr = be32_to_cpu(ftr);
+> +		payload = &buf[(i * (tc6->cps + TC6_FTR_SIZE))];
+> +		/* Check for footer parity error */
+> +		if (oa_tc6_get_parity(ftr)) {
+> +			netdev_err(tc6->netdev, "Footer: Parity error\n");
+> +			goto err_exit;
+> +		}
+> +		/* If EXST set in the footer then read STS0 register to get the
+> +		 * status information.
+> +		 */
+> +		if (FIELD_GET(DATA_FTR_EXST, ftr)) {
+> +			if (oa_tc6_process_exst(tc6))
+> +				netdev_err(tc6->netdev, "Failed to process EXST\n");
+> +			goto err_exit;
+> +		}
+> +		if (FIELD_GET(DATA_FTR_HDRB, ftr)) {
+> +			netdev_err(tc6->netdev, "Footer: Received header bad\n");
+> +			goto err_exit;
+> +		}
+> +		if (!FIELD_GET(DATA_FTR_SYNC, ftr)) {
+> +			netdev_err(tc6->netdev, "Footer: Configuration unsync\n");
+> +			goto err_exit;
+> +		}
+> +		/* If Frame Drop is set, indicates that the MAC has detected a
+> +		 * condition for which the SPI host should drop the received
+> +		 * ethernet frame.
+> +		 */
+> +		if (FIELD_GET(DATA_FTR_FD, ftr) && FIELD_GET(DATA_FTR_EV, ftr)) {
+> +			netdev_warn(tc6->netdev, "Footer: Frame drop\n");
+> +			if (FIELD_GET(DATA_FTR_SV, ftr)) {
+> +				goto start_new_frame;
+> +			} else {
+> +				if (tc6->rx_eth_started) {
+> +					tc6->rxd_bytes = 0;
+> +					tc6->rx_eth_started = false;
+> +					tc6->netdev->stats.rx_dropped++;
+> +				}
+> +				continue;
+> +			}
+> +		}
+> +		/* Check for data valid */
+> +		if (FIELD_GET(DATA_FTR_DV, ftr)) {
+> +			/* Check whether both start valid and end valid are in a
+> +			 * single chunk payload means a single chunk payload may
+> +			 * contain an entire ethernet frame.
+> +			 */
+> +			if (FIELD_GET(DATA_FTR_SV, ftr) &&
+> +			    FIELD_GET(DATA_FTR_EV, ftr)) {
+> +				sbo = FIELD_GET(DATA_FTR_SWO, ftr) * 4;
+> +				ebo = FIELD_GET(DATA_FTR_EBO, ftr) + 1;
+> +				if (ebo <= sbo) {
+> +					memcpy(&tc6->eth_rx_buf[tc6->rxd_bytes],
+> +					       &payload[0], ebo);
+> +					tc6->rxd_bytes += ebo;
+> +					oa_tc6_rx_eth_ready(tc6);
+> +					tc6->rxd_bytes = 0;
+> +					memcpy(&tc6->eth_rx_buf[tc6->rxd_bytes],
+> +					       &payload[sbo], tc6->cps - sbo);
+> +					tc6->rxd_bytes += (tc6->cps - sbo);
+> +					goto exit;
+> +				} else {
+> +					memcpy(&tc6->eth_rx_buf[tc6->rxd_bytes],
+> +					       &payload[sbo], ebo - sbo);
+> +					tc6->rxd_bytes += (ebo - sbo);
+> +					oa_tc6_rx_eth_ready(tc6);
+> +					tc6->rxd_bytes = 0;
+> +					goto exit;
+> +				}
+> +			}
+> +start_new_frame:
+> +			/* Check for start valid to start capturing the incoming
+> +			 * ethernet frame.
+> +			 */
+> +			if (FIELD_GET(DATA_FTR_SV, ftr) && !tc6->rx_eth_started) {
+> +				tc6->rxd_bytes = 0;
+> +				tc6->rx_eth_started = true;
+> +				sbo = FIELD_GET(DATA_FTR_SWO, ftr) * 4;
+> +				memcpy(&tc6->eth_rx_buf[tc6->rxd_bytes],
+> +				       &payload[sbo], tc6->cps - sbo);
+> +				tc6->rxd_bytes += (tc6->cps - sbo);
+> +				goto exit;
+> +			}
+> +
+> +			/* Check for end valid and calculate the copy length */
+> +			if (tc6->rx_eth_started) {
+> +				if (FIELD_GET(DATA_FTR_EV, ftr))
+> +					ebo = FIELD_GET(DATA_FTR_EBO, ftr) + 1;
+> +				else
+> +					ebo = tc6->cps;
+> +
+> +				memcpy(&tc6->eth_rx_buf[tc6->rxd_bytes],
+> +				       &payload[0], ebo);
+> +				tc6->rxd_bytes += ebo;
+> +				if (FIELD_GET(DATA_FTR_EV, ftr)) {
+> +					/* If End Valid set then send the
+> +					 * received ethernet frame to n/w.
+> +					 */
+> +					oa_tc6_rx_eth_ready(tc6);
+> +					tc6->rxd_bytes = 0;
+> +					tc6->rx_eth_started = false;
+> +				}
+> +			}
+> +		}
+> +
+> +exit:
+> +		tc6->txc = FIELD_GET(DATA_FTR_TXC, ftr);
+> +		tc6->rca = FIELD_GET(DATA_FTR_RCA, ftr);
+> +	}
+> +	return FTR_OK;
+> +
+> +err_exit:
+> +	if (tc6->rx_eth_started) {
+> +		tc6->rxd_bytes = 0;
+> +		tc6->rx_eth_started = false;
+> +		tc6->netdev->stats.rx_dropped++;
+> +	}
+> +	return FTR_ERR;
+> +}
+
+This is quite a complex function, with a lot of gotos. Please try to
+split it up into helpers.
+
+> +
+>  static int oa_tc6_handler(void *data)
+>  {
+>  	struct oa_tc6 *tc6 = data;
+> +	bool txc_wait = false;
+> +	u16 tx_pos = 0;
+>  	u32 regval;
+> +	u16 len;
+>  	int ret;
+>  
+>  	while (likely(!kthread_should_stop())) {
+> -		wait_event_interruptible(tc6->tc6_wq, tc6->int_flag ||
+> +		wait_event_interruptible(tc6->tc6_wq, tc6->tx_flag ||
+> +					 tc6->int_flag || tc6->rca ||
+>  					 kthread_should_stop());
+> -		if (tc6->int_flag) {
+> +		if (tc6->int_flag && !tc6->reset) {
+>  			tc6->int_flag = false;
+> +			tc6->reset = true;
+>  			ret = oa_tc6_perform_ctrl(tc6, OA_TC6_STS0, &regval, 1,
+>  						  false, false);
+>  			if (ret) {
+> @@ -227,10 +435,170 @@ static int oa_tc6_handler(void *data)
+>  				complete(&tc6->rst_complete);
+>  			}
+>  		}
+> +
+> +		if (tc6->int_flag || tc6->rca) {
+> +			/* If rca is updated from the previous footer then
+> +			 * prepare the empty chunks equal to rca and perform
+> +			 * SPI transfer to receive the ethernet frame.
+> +			 */
+> +			if (tc6->rca) {
+> +				len = oa_tc6_prepare_empty_chunk(tc6,
+> +								 tc6->spi_tx_buf,
+> +								 tc6->rca);
+> +			} else {
+> +				/* If there is an interrupt then perform a SPI
+> +				 * transfer with a empty chunk to get the
+> +				 * details.
+> +				 */
+> +				tc6->int_flag = false;
+> +				len = oa_tc6_prepare_empty_chunk(tc6,
+> +								 tc6->spi_tx_buf,
+> +								 1);
+> +			}
+> +			/* Perform SPI transfer */
+> +			ret = oa_tc6_spi_transfer(tc6->spi, tc6->spi_tx_buf,
+> +						  tc6->spi_rx_buf, len);
+> +			if (ret) {
+> +				netdev_err(tc6->netdev, "SPI transfer failed\n");
+> +				continue;
+> +			}
+> +			/* Process the received chunks to get the ethernet frame
+> +			 * or interrupt details.
+> +			 */
+> +			if (oa_tc6_process_rx_chunks(tc6, tc6->spi_rx_buf, len))
+> +				continue;
+> +		}
+> +
+> +		/* If there is a tx ethernet frame available */
+> +		if (tc6->tx_flag || txc_wait) {
+> +			tc6->tx_flag = false;
+> +			txc_wait = false;
+> +			len = 0;
+> +			if (!tc6->txc) {
+> +				/* If there is no txc available to transport the
+> +				 * tx ethernet frames then wait for the MAC-PHY
+> +				 * interrupt to get the txc availability.
+> +				 */
+> +				txc_wait = true;
+> +				continue;
+> +			} else if (tc6->txc >= tc6->txc_needed) {
+> +				len = tc6->txc_needed * (tc6->cps + TC6_HDR_SIZE);
+> +			} else {
+> +				len = tc6->txc * (tc6->cps + TC6_HDR_SIZE);
+> +			}
+> +			memcpy(&tc6->spi_tx_buf[0], &tc6->eth_tx_buf[tx_pos],
+> +			       len);
+> +			ret = oa_tc6_spi_transfer(tc6->spi, tc6->spi_tx_buf,
+> +						  tc6->spi_rx_buf, len);
+> +			if (ret) {
+> +				netdev_err(tc6->netdev, "SPI transfer failed\n");
+> +				continue;
+> +			}
+> +			/* Process the received chunks to get the ethernet frame
+> +			 * or status.
+> +			 */
+> +			if (oa_tc6_process_rx_chunks(tc6, tc6->spi_rx_buf,
+> +						     len)) {
+> +				/* In case of error while processing rx chunks
+> +				 * discard the incomplete tx ethernet frame and
+> +				 * resend it.
+> +				 */
+> +				tx_pos = 0;
+> +				tc6->txc_needed = tc6->total_txc_needed;
+> +			} else {
+> +				tx_pos += len;
+> +				tc6->txc_needed = tc6->txc_needed -
+> +						  (len / (tc6->cps + TC6_HDR_SIZE));
+> +				/* If the complete ethernet frame is transmitted
+> +				 * then return the skb and update the details to
+> +				 * n/w layer.
+> +				 */
+> +				if (!tc6->txc_needed) {
+> +					tc6->netdev->stats.tx_packets++;
+> +					tc6->netdev->stats.tx_bytes += tc6->tx_skb->len;
+> +					dev_kfree_skb(tc6->tx_skb);
+> +					tx_pos = 0;
+> +					tc6->tx_skb = NULL;
+> +					if (netif_queue_stopped(tc6->netdev))
+> +						netif_wake_queue(tc6->netdev);
+> +				} else if (tc6->txc) {
+> +					/* If txc is available again and updated
+> +					 * from the previous footer then perform
+> +					 * tx again.
+> +					 */
+> +					tc6->tx_flag = true;
+> +				} else {
+> +					/* If there is no txc then wait for the
+> +					 * interrupt to indicate txc
+> +					 * availability.
+> +					 */
+> +					txc_wait = true;
+> +				}
+> +			}
+> +		}
+>  	}
+>  	return 0;
+>  }
+
+This is also a huge function. The Linux coding style says:
+
+     Functions should be short and sweet, and do just one thing. They
+     should fit on one or two screenfuls of text (the ISO/ANSI screen
+     size is 80x24, as we all know), and do one thing and do that
+     well.
+
+Please break this up into lots of smaller functions which do just one
+thing.
+
+> -struct oa_tc6 *oa_tc6_init(struct spi_device *spi)
+> +struct oa_tc6 *oa_tc6_init(struct spi_device *spi, struct net_device *netdev)
+>  {
+>  	struct oa_tc6 *tc6;
+>  	int ret;
+> @@ -334,11 +710,39 @@ struct oa_tc6 *oa_tc6_init(struct spi_device *spi)
+>  	if (!spi)
+>  		return NULL;
+>  
+> +	if (!netdev)
+> +		return NULL;
+
+Hos can this happen? Let is explode if some developer is dumb enough
+to pass a NULL.
+
+> +#define MAX_ETH_LEN	1536
+
+Where do 1536 come from? Maybe this needs an OA_TC6 prefix to make it
+clear this is specific to this protocol?
+
+      Andrew
 
