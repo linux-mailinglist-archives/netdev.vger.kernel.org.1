@@ -1,71 +1,88 @@
-Return-Path: <netdev+bounces-33777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC6D97A0158
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 12:13:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC4F77A01A2
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 12:26:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE42E1C20841
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 10:13:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 24470B20AC6
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 10:26:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21C95101D5;
-	Thu, 14 Sep 2023 10:13:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33FF520B2B;
+	Thu, 14 Sep 2023 10:26:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 152901D52D
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 10:13:26 +0000 (UTC)
-Received: from mail.socialglobal.pl (mail.socialglobal.pl [51.195.90.253])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 659B31BE3
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 03:13:25 -0700 (PDT)
-Received: by mail.socialglobal.pl (Postfix, from userid 1002)
-	id DAE7023687; Thu, 14 Sep 2023 10:10:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=socialglobal.pl;
-	s=mail; t=1694686345;
-	bh=XwhyqI/moZPDJ7KCfcA6Gip8fA7ZKcg5SWsKuF/26zk=;
-	h=Date:From:To:Subject:From;
-	b=RgxdGBI1WDc7D3CslQmM0q2nqqzv0fxndz/UrGYi3KN/QXFZC2hinoT9xfFS7mJvX
-	 +ygKh3kWqFB9J0NwBXNoCyRI66XP8U7dvZu35fvFBF969COEomLchI/8TZoAWlyVw9
-	 LfltYHGHX66mP8u4MYOR055pPzDBWz19+cC6U0cyanhwraffvPS6oNjX7WMAN18MC6
-	 HUg51jM9e0biWL0wyGzhzz8Qpt+mrqzsjoCgpLsQCUddEEwGH1GAv0VSVv5GXSOC5I
-	 XhXRRYQfmEh3Z2Ub5L4U8TRcIqghF5ezCXAeJGe76bdTuOg9iJedxwyX1JPB2SNe6g
-	 aPdfKgFLK1lBQ==
-Received: by mail.socialglobal.pl for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 10:10:26 GMT
-Message-ID: <20230914093223-0.1.8f.2uqz9.0.3nssqjb7hj@socialglobal.pl>
-Date: Thu, 14 Sep 2023 10:10:26 GMT
-From: "Dominik Perkowski" <dominik.perkowski@socialglobal.pl>
-To: <netdev@vger.kernel.org>
-Subject: Pozycjonowanie- informacja
-X-Mailer: mail.socialglobal.pl
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1705A1D524
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 10:26:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D93CC433C8;
+	Thu, 14 Sep 2023 10:26:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694687164;
+	bh=y38loyGQg6GHCvGEMW1DVfwqr90xmnw3mOxNq3q890Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CKDCUJ+S70fzVxBgXMd6f5LgH4LN0s0fLZHUD1C+M9SoyDLILoblXbJCq/6GR8Sli
+	 ecyH2cyRpFdEXkI71Et0ySbLjlmNVwE5ya/1hWGYozTE6xHghQZxaF097GWJx2PUpN
+	 kz+wS5Qhyl6EcGTkMR2T9ad0HkMdAvBbLprPLLe421fs75rGxjHLjaLEOhhezVPMOV
+	 gxph54cPk/pTZFoDc6ATKqoFQD+qrZMkl9H6nhx1WvfX6+xvp6g1vUx3DRXjAxc4LP
+	 w4O14C1S0J4+dgCifGTT8x0NR84NnvElkgTJcCbtLM1/Lb9aB1etH8TZO2NUPi6lBi
+	 xh2HX6qF8MyQA==
+Date: Thu, 14 Sep 2023 12:25:49 +0200
+From: Simon Horman <horms@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com
+Subject: Re: [PATCH net-next 00/14] ipv6: round of data-races fixes
+Message-ID: <20230914102549.GW401982@kernel.org>
+References: <20230912160212.3467976-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230912160212.3467976-1-edumazet@google.com>
 
-Dzie=C5=84 dobry,=20
+On Tue, Sep 12, 2023 at 04:01:58PM +0000, Eric Dumazet wrote:
+> This series is inspired by one related syzbot report.
+> 
+> Many inet6_sk(sk) fields reads or writes are racy.
+> 
+> Move 1-bit fields to inet->inet_flags to provide
+> atomic safety. inet6_{test|set|clear|assign}_bit() helpers
+> could be changed later if we need to make room in inet_flags.
+> 
+> Also add missing READ_ONCE()/WRITE_ONCE() when
+> lockless readers need access to specific fields.
+> 
+> np->srcprefs will be handled separately to avoid merge conflicts
+> because a prior patch was posted for net tree.
+> 
+> Eric Dumazet (14):
+>   ipv6: lockless IPV6_UNICAST_HOPS implementation
+>   ipv6: lockless IPV6_MULTICAST_LOOP implementation
+>   ipv6: lockless IPV6_MULTICAST_HOPS implementation
+>   ipv6: lockless IPV6_MTU implementation
+>   ipv6: lockless IPV6_MINHOPCOUNT implementation
+>   ipv6: lockless IPV6_RECVERR_RFC4884 implementation
+>   ipv6: lockless IPV6_MULTICAST_ALL implementation
+>   ipv6: lockless IPV6_AUTOFLOWLABEL implementation
+>   ipv6: lockless IPV6_DONTFRAG implementation
+>   ipv6: lockless IPV6_RECVERR implemetation
+>   ipv6: move np->repflow to atomic flags
+>   ipv6: lockless IPV6_ROUTER_ALERT_ISOLATE implementation
+>   ipv6: lockless IPV6_MTU_DISCOVER implementation
+>   ipv6: lockless IPV6_FLOWINFO_SEND implementation
 
-jaki=C5=9B czas temu zg=C5=82osi=C5=82a si=C4=99 do nas firma, kt=C3=B3re=
-j strona internetowa nie pozycjonowa=C5=82a si=C4=99 wysoko w wyszukiwarc=
-e Google.=20
+For series,
 
-Na podstawie wykonanego przez nas audytu SEO zoptymalizowali=C5=9Bmy tre=C5=
-=9Bci na stronie pod k=C4=85tem wcze=C5=9Bniej opracowanych s=C5=82=C3=B3=
-w kluczowych. Nasz wewn=C4=99trzny system codziennie analizuje prawid=C5=82=
-owe dzia=C5=82anie witryny.  Dzi=C4=99ki indywidualnej strategii, firma z=
-dobywa coraz wi=C4=99cej Klient=C3=B3w. =20
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Czy chcieliby Pa=C5=84stwo zwi=C4=99kszy=C4=87 liczb=C4=99 os=C3=B3b odwi=
-edzaj=C4=85cych stron=C4=99 internetow=C4=85 firmy? M=C3=B3g=C5=82bym prz=
-edstawi=C4=87 ofert=C4=99?=20
-
-
-Pozdrawiam serdecznie,
-Dominik Perkowski
 
