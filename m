@@ -1,158 +1,90 @@
-Return-Path: <netdev+bounces-33806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A1D67A039E
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 14:19:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B15E7A03AD
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 14:22:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FF501C20C83
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 12:19:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 532FF1C20E2E
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 12:22:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCDEC219F3;
-	Thu, 14 Sep 2023 12:19:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 601EE219F3;
+	Thu, 14 Sep 2023 12:22:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB344208A8;
-	Thu, 14 Sep 2023 12:19:16 +0000 (UTC)
-Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FEE31FCA;
-	Thu, 14 Sep 2023 05:19:16 -0700 (PDT)
-Received: by mail-lj1-x234.google.com with SMTP id 38308e7fff4ca-2bceb02fd2bso13590741fa.1;
-        Thu, 14 Sep 2023 05:19:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694693954; x=1695298754; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MIai8kEfSJbbe1MQb/EaG0qclNnxV1ZUNxpY+1c/fgg=;
-        b=qmV0jNYFzd4yu8PKwd04qfL+mI9xgGFkLb87lchMQFEXPZjOob/HGUMSKKdUgWg/I+
-         C6VidDWz2FKfwMrkZdmllMdU+xiMIdDR49HCoMp4DKaK93gPI4DcJtsNhhISdWBU4G+y
-         Ewdz/Wy0ssW1Y5B3ImBpB028OUp3QiXnBGW0HaFNCyy0fCHu/S/xYscQEkZunQ4VLVJ6
-         iJhrem8IrNKZbjhiZ6+eOSQ6fSCwLRAt0R4qrCPhBTqEWTpJ8QgRe5sOC5CXcDeNTz44
-         H1dGoafP9gpbXEBeay4zMl0WlnEml/63d1yqpd58GaEMmZ9Fx4Gk68biaHRH8NnXu0Ue
-         Djrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694693954; x=1695298754;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MIai8kEfSJbbe1MQb/EaG0qclNnxV1ZUNxpY+1c/fgg=;
-        b=ogFSAXMYXDv+zglZfeTboxf6zxmc2AKymO8UnQ+nxj3KbUvX8bri9MxXV4olVO7qCa
-         3B7aFyAUHYylRHwlzLfacR8WMqxWj0Ms1NworiOh9tw25YOqTgN9NwaFC3338is+R9ij
-         qDUuOxqziEoDvUurX61KHqROwB+Vbk2DqEX06+tbiIdZ9bJ5b+mSWsBENigSGLeZOe04
-         A4e4V2lKAYtUrK/bYYKUVN4vAVKPlR0vv2+LvEINlpwZvWKFhtfw9EQSxj/wsBts/VzF
-         n7HQcaTVwFcCxok6ErPvSpGJtzqmDMgkOO7EhhurvatsoF/RpDYYQwtcpfckVP1xn8go
-         I2WA==
-X-Gm-Message-State: AOJu0Yyacvp8VNFN299huZ10kQPCDVV0giVRIzaWReqrbKLpfzTGY3OB
-	8V3w8ksYxYLdhqhH+WoijlE=
-X-Google-Smtp-Source: AGHT+IE9J7DJwE8nML/CCXVSNOTksA6PiQP2wqKee1UuUlkr5qnQ39Oe2QWwbbOyrqnQ31oguUUuxw==
-X-Received: by 2002:a2e:808d:0:b0:2bd:a5e:2255 with SMTP id i13-20020a2e808d000000b002bd0a5e2255mr4898056ljg.28.1694693954191;
-        Thu, 14 Sep 2023 05:19:14 -0700 (PDT)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id w24-20020a2e9bd8000000b002bce5e379a3sm261435ljj.7.2023.09.14.05.19.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Sep 2023 05:19:13 -0700 (PDT)
-Date: Thu, 14 Sep 2023 15:19:10 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, Alexei Starovoitov <ast@kernel.org>, bpf@vger.kernel.org, 
-	Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, 
-	Emil Renner Berthing <kernel@esmil.dk>, Eric Dumazet <edumazet@google.com>, 
-	Fabio Estevam <festevam@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	linux-arm-kernel@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, NXP Linux Team <linux-imx@nxp.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Pengutronix Kernel Team <kernel@pengutronix.de>, 
-	Samin Guo <samin.guo@starfivetech.com>, Sascha Hauer <s.hauer@pengutronix.de>, 
-	Shawn Guo <shawnguo@kernel.org>
-Subject: Re: [PATCH net-next 2/6] net: stmmac: imx: use
- dwmac_set_tx_clk_gmii()
-Message-ID: <hsov2bii5wenzexplq2fbgzsls2y5yssdobqjeil2nd2haqilm@jammanegu4vd>
-References: <ZP8yEFWn0Ml3ALWq@shell.armlinux.org.uk>
- <E1qfiqi-007TPS-BZ@rmk-PC.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51EB1208BD
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 12:22:27 +0000 (UTC)
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 70FCD1FC0;
+	Thu, 14 Sep 2023 05:22:26 -0700 (PDT)
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 38ECLd5A21169338, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/2.92/5.92) with ESMTPS id 38ECLd5A21169338
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 14 Sep 2023 20:21:41 +0800
+Received: from RTEXMBS06.realtek.com.tw (172.21.6.99) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.17; Thu, 14 Sep 2023 20:21:40 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS06.realtek.com.tw (172.21.6.99) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.34; Thu, 14 Sep 2023 20:21:39 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::7445:d92b:d0b3:f79c]) by
+ RTEXMBS04.realtek.com.tw ([fe80::7445:d92b:d0b3:f79c%5]) with mapi id
+ 15.01.2375.007; Thu, 14 Sep 2023 20:21:39 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+Subject: RE: [PATCH net-next v7 02/13] net:ethernet:realtek:rtase: Implement the .ndo_open function
+Thread-Topic: [PATCH net-next v7 02/13] net:ethernet:realtek:rtase: Implement
+ the .ndo_open function
+Thread-Index: AQHZ5Voer1zs1eayP0a8NW2oYFXOS7AYxCOAgAF8KOA=
+Date: Thu, 14 Sep 2023 12:21:39 +0000
+Message-ID: <226589a878f64b5eae3b7ca55936e926@realtek.com>
+References: <20230912091830.338164-1-justinlai0215@realtek.com>
+ <20230912091830.338164-3-justinlai0215@realtek.com>
+ <a7a4d7b6-84cd-49fc-9fde-1a6a232bf7af@lunn.ch>
+In-Reply-To: <a7a4d7b6-84cd-49fc-9fde-1a6a232bf7af@lunn.ch>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+x-originating-ip: [172.21.210.185]
+x-kse-serverinfo: RTEXMBS06.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1qfiqi-007TPS-BZ@rmk-PC.armlinux.org.uk>
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-On Mon, Sep 11, 2023 at 04:29:16PM +0100, Russell King (Oracle) wrote:
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> On Tue, Sep 12, 2023 at 05:18:19PM +0800, Justin Lai wrote:
+> > Implement the .ndo_open function to set default hardware settings and
+> > initialize the descriptor ring and interrupts. Among them, when
+> > requesting irq, because the first group of interrupts needs to process
+> > more events, the overall structure will be different from other groups
+> > of interrupts, so it needs to be processed separately.
+>=20
+> Please take a look at the page pool code.
+>=20
+>        Andrew
 
-BTW I don't know whether it's ok to have an empty description in the
-patches for the networking subsystem, but the kernel maintainers
-mainly request to add at least some text with the change justification
-especially seeing the submitting-patches.rst doc says the description
-is mandatory.
-
--Serge(y)
-
-> ---
->  .../net/ethernet/stmicro/stmmac/dwmac-imx.c   | 27 ++++++-------------
->  1 file changed, 8 insertions(+), 19 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-> index df34e34cc14f..d2569faf7cc3 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-> @@ -21,6 +21,7 @@
->  #include <linux/stmmac.h>
->  
->  #include "stmmac_platform.h"
-> +#include "stmmac_plat_lib.h"
->  
->  #define GPR_ENET_QOS_INTF_MODE_MASK	GENMASK(21, 16)
->  #define GPR_ENET_QOS_INTF_SEL_MII	(0x0 << 16)
-> @@ -186,7 +187,6 @@ static void imx_dwmac_fix_speed(void *priv, unsigned int speed, unsigned int mod
->  {
->  	struct plat_stmmacenet_data *plat_dat;
->  	struct imx_priv_data *dwmac = priv;
-> -	unsigned long rate;
->  	int err;
->  
->  	plat_dat = dwmac->plat_dat;
-> @@ -196,24 +196,13 @@ static void imx_dwmac_fix_speed(void *priv, unsigned int speed, unsigned int mod
->  	    (plat_dat->mac_interface == PHY_INTERFACE_MODE_MII))
->  		return;
->  
-> -	switch (speed) {
-> -	case SPEED_1000:
-> -		rate = 125000000;
-> -		break;
-> -	case SPEED_100:
-> -		rate = 25000000;
-> -		break;
-> -	case SPEED_10:
-> -		rate = 2500000;
-> -		break;
-> -	default:
-> -		dev_err(dwmac->dev, "invalid speed %u\n", speed);
-> -		return;
-> -	}
-> -
-> -	err = clk_set_rate(dwmac->clk_tx, rate);
-> -	if (err < 0)
-> -		dev_err(dwmac->dev, "failed to set tx rate %lu\n", rate);
-> +	err = dwmac_set_tx_clk_gmii(dwmac->clk_tx, speed);
-> +	if (err == -ENOTSUPP)
-> +		dev_err(dwmac->dev, "invalid speed %dMbps\n", speed);
-> +	else if (err)
-> +		dev_err(dwmac->dev,
-> +			"failed to set tx rate for speed %dMbps: %pe\n",
-> +			speed, ERR_PTR(err));
->  }
->  
->  static void imx93_dwmac_fix_speed(void *priv, unsigned int speed, unsigned int mode)
-> -- 
-> 2.30.2
-> 
-> 
+Hi, Andrew
+Do you want us to use Page Pool API in this driver?
 
