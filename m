@@ -1,87 +1,96 @@
-Return-Path: <netdev+bounces-33902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33904-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F7BB7A0976
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 17:37:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40AD57A097B
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 17:39:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B0CC4B20E3A
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 15:37:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC87D2815E8
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 15:39:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C099C18E28;
-	Thu, 14 Sep 2023 15:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8982A210E0;
+	Thu, 14 Sep 2023 15:34:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41FCFD53F
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 15:30:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CCA83C433C9;
-	Thu, 14 Sep 2023 15:30:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694705426;
-	bh=Q3w4ykEz2lEoSofN+SUjn3Lth1qicuxOdvzXmwjElDc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=V7ZpHgLH0+pP0LQ20nb4Po9U5jDnLjpSoKh6Lz9Q+aE5oVg6Vu1mIJfsaS9u6S4SD
-	 wy0WFNXZQ23HUUZ+VXyPosavhhRxlzBUs5kVtLFBbqScHWC93u4puDUQ0uSVfIdtxG
-	 4vp/1WhIcStzgokacvADnZxW6NA35CC74Ik7aSFB4Y8ZO67fMOnypWjMv86T2YhQ/J
-	 gBfJy8P63xcosxGKx08L3h5GTaBZGiJRWV7oH9Qi0D1r4XMsWgw/bJfA2EkYEkNNOB
-	 KX/vRGhYYA0zjMtYrn6fbYbE7a6OYbxFOVJu1hfzAetJAwVHvJfTLql0hHaNVCGLch
-	 a+1G1xEFHiTgg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B0A25E1C28E;
-	Thu, 14 Sep 2023 15:30:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79AA61CFA1
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 15:34:33 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBD48CE
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 08:34:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=oaKfQGpMMn72gwZ88Ye3fR6rJs56XMRuBIxQGzbcdM0=; b=ZNtFGrgLSDILYlMTU1kKruTrg9
+	gTKWKH7NHWDTUt2AuUdYDGxZuXBlECFrjVG4tJQ1zaEcjxLVTcErnCeUfGhPoqnd9B7rTRnrkx6x0
+	hCduaYpKA7WSCSsvqYGmdUyyR/eV5JC4U4F1Cp5qZcYLjspcpyf1yc8O0DrhOVBzl5oOEPiqPx9sw
+	d5hpUaFR+Bg/7tUYimFzRC+/6myGmqo1RRFaGwGaSVmcw0WLH7LeW47p2fdb6NRneWQrbBSC/V+Sd
+	SLh2hqMXz+7IppgBK2DiDaIwsY73A/uXhY6FU0sxiVc1Mmv3DdPZ0i8459HioxhiFTQ9MWPBDoFOG
+	EP1dIEtw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60278)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qgoME-0004VO-2D;
+	Thu, 14 Sep 2023 16:34:18 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qgoMD-0004sp-NR; Thu, 14 Sep 2023 16:34:17 +0100
+Date: Thu, 14 Sep 2023 16:34:17 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: chenhao418@huawei.com, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jijie Shao <shaojijie@huawei.com>,
+	lanhao@huawei.com, liuyonglong@huawei.com, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, shenjian15@huawei.com,
+	wangjie125@huawei.com, wangpeiyang1@huawei.com
+Subject: [PATCH net-next 0/7] net: phy: avoid race when erroring stopping PHY
+Message-ID: <ZQMn+Wkvod10vdLd@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2-next 0/2] configure: add support for color
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169470542671.22890.15589088948266236796.git-patchwork-notify@kernel.org>
-Date: Thu, 14 Sep 2023 15:30:26 +0000
-References: <cover.1694625043.git.aclaudi@redhat.com>
-In-Reply-To: <cover.1694625043.git.aclaudi@redhat.com>
-To: Andrea Claudi <aclaudi@redhat.com>
-Cc: netdev@vger.kernel.org, roopa@nvidia.com, razor@blackwall.org,
- bridge@lists.linux-foundation.org, stephen@networkplumber.org,
- dsahern@gmail.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hello:
+This series addresses a problem reported by Jijie Shao where the PHY
+state machine can race with phy_stop() leading to an incorrect state.
 
-This series was applied to iproute2/iproute2-next.git (main)
-by David Ahern <dsahern@kernel.org>:
+The issue centres around phy_state_machine() dropping the phydev->lock
+mutex briefly, which allows phy_stop() to get in half-way through the
+state machine, and when the state machine resumes, it overwrites
+phydev->state with a value incompatible with a stopped PHY. This causes
+a subsequent phy_start() to issue a warning.
 
-On Wed, 13 Sep 2023 19:58:24 +0200 you wrote:
-> This series add support for the color parameter in iproute2 configure
-> script. The idea is to make it possible for iproute2 users and packagers
-> to set a default value for the color option different from the current
-> one, COLOR_OPT_NEVER, while maintaining the current default behaviour.
-> 
-> Patch 1 add the color option to the configure script. Users can set
-> three different values, never, auto and always, with the same meanings
-> they have for the -c / -color ip option. Default value is 'never', which
-> results in ip, tc and bridge to maintain their current output behaviour
-> (i.e. colorless output).
-> 
-> [...]
+We address this firstly by using versions of functions that do not take
+tne lock, moving them into the locked region. The only function that
+this can't be done with is phy_suspend() which needs to call into the
+driver without taking the lock.
 
-Here is the summary with links:
-  - [iproute2-next,1/2] configure: add the --color option
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=5e704f4b5ba2
-  - [iproute2-next,2/2] treewide: use configured value as the default color output
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=b5d0273fdbab
+For phy_suspend(), we split the state machine into two parts - the
+initial part which runs under the phydev->lock, and the second part
+which runs without the lock.
 
-You are awesome, thank you!
+We finish off by using the split state machine in phy_stop() which
+removes another unnecessary unlock-lock sequence from phylib.
+
+Changes from RFC:
+- Added Jijie Shao's tested-by
+
+ drivers/net/phy/phy.c | 204 +++++++++++++++++++++++++++-----------------------
+ 1 file changed, 110 insertions(+), 94 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
