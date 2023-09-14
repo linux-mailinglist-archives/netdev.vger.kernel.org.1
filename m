@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-33965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AF597A0F8B
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 23:09:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A40607A0F8E
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 23:09:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B96BB1C20ECB
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 21:09:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13A00282165
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 21:09:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C91B3273F9;
-	Thu, 14 Sep 2023 21:05:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B65C27717;
+	Thu, 14 Sep 2023 21:05:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CACB273EA
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 21:05:07 +0000 (UTC)
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B589726B7
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 14:05:06 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-5659b9ae3ebso1109485a12.1
-        for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 14:05:06 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94BFE2770D
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 21:05:09 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2072726B7
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 14:05:09 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59bdae1ef38so34136717b3.1
+        for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 14:05:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1694725506; x=1695330306; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1694725508; x=1695330308; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=14VbHOqDafwAEmRkcsvovpu96sXlLVwtTgqqhNnYgGk=;
-        b=K7ZVy7yzeaqIQY74d/bmQ4dq8jAWhVknqfFm2IRjfI2jqO3YehlaHxGqZKHNvs1D1A
-         /bGqi2T8KOmL3o0hwYQsRyfP1+xZwK3QpKsusqd/u6ewY8J+9qbst4iA/MMyclGlyZIH
-         HzA/0b2PDsQOEUhCJDihzZr2IB430NMgI2bliqCYWi02OoVfI6nhPbBn3GdO68kj44dY
-         srKqwUGWOmJcj0hX+M9rBXMyuxDAutYV2URUU40o1EZGwe/5WR4qaXNL4ySXfv+dKRxD
-         7vyzSmYsq2haOcpVE+dyvewn/ZZY+tcah/hSPXXgeVfahWuo/CbN5Yi+1e2I/5YKr2lJ
-         db/A==
+        bh=lXhMN6bGqnJggKKLO/4TPQFnVFdhmWWVa7skOr7EcB8=;
+        b=1eVf/qMBlmaRnP/1942HvQrE/fVdAZvSdZl+GAruNIN/cxjz2IRUWcYkdxtXwVC7i+
+         mc2qT+JSgHDHggfQjgWUzwiASaPgEzaAgj5jSqZfzFO3a650REd3oj9SnQQMm30g8oY+
+         JuVdE9/s78Vr97KT6H1xz4/AC2aECct6lm3uqP1S6fPHgP3lHa1seGnGt0TM1AR9EApY
+         ZoQGxK2pIjGQTPt7LCVcheSdLo7wlt+wMTm/lI5qk4e19MytdrLCE84U5s07qpgj3Jlv
+         dEGrCgKlm5bWYPqmGe3A5iZmdvcLTiuzKILne8Um8WOEpgKsQ1PD2J6pZnW2GBXCK+oW
+         b7Yw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694725506; x=1695330306;
+        d=1e100.net; s=20230601; t=1694725508; x=1695330308;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=14VbHOqDafwAEmRkcsvovpu96sXlLVwtTgqqhNnYgGk=;
-        b=fnREMzuaNv/VQZ4smtQ6+CRrVY7/zQCqEFJmnO5cD3Piv3UIl9lzqbkcNXQzgzNfas
-         mowmBkR+TtCvJFoBLVI1IA1xt4WFJ3TI16KVl7FdyxRZ//+GmUmVd72CMarpmiR4/PCz
-         sJpOv5QrRxmVoPEtlfCKLvBzvUYVplHTmYtV6iX+ESu4BshPg9LLNX5ntcD6u8UdyYZD
-         TuTfpiyHfw7v9GTwt7MkrwC/0gEtOG6ZUc4pWpwTM6nyKRIqUO/M6Ei9wV0ILZrKsLHA
-         PtZstPjymXkTjzm+iTNBg+H/E2EUu3E3ukGaR/buz1Uw85IltuHY1RttRSt4IEpa2J+u
-         se8Q==
-X-Gm-Message-State: AOJu0YyTbEDAo4ePiki+6uhMdQMXq66pXTDzmYPYX5WZxsajfrqKH6bT
-	dnyNKgRNs9Q3ShD638MQNaEl6EU=
-X-Google-Smtp-Source: AGHT+IHwSi48qvJdhvmPfcZWPgqPC20HubxSk5DHX5wOCnxgL7h677co1BhFyfAM+WdU60ZWR+hFZKA=
+        bh=lXhMN6bGqnJggKKLO/4TPQFnVFdhmWWVa7skOr7EcB8=;
+        b=h+zpHUzF4K3x1sh2/Y73GPxkC2t+zWH+pqoc/0Q83+arQXTTWy87CL0LHZ/M4NQLnx
+         TVBkKRgiXRG5EBkODSM2V9lrJ/KQb9MVPlfgQwtob2eBkmdKwJMxVLqEXGXqJXqdexK/
+         KTKLOfqb6ihok2aubTysSiGreHM2sGTUk+VQMuIK7x5ppNFQ2C8Ti7wUfNZAtBXU1sOu
+         r+gUkkjXQsX3kx4TVSD2StsH7nlOq0dgE63FtNXKkPYWkUhdAJ83M/JlDjU44+pd502o
+         50uGVrRtopePbCmAzZfrebATCMF5nRfcUlCfbPcdGeYYTXtVcBX/n4ggUjXy+sgTIHiT
+         I37w==
+X-Gm-Message-State: AOJu0Yw+WdIOY0ESwkEGijfjXtRfCJwCFTXzvcfAiYtbUgizeKMI3lWZ
+	Fg9Pv4PWjFImA2sKaDDdTH9af/U=
+X-Google-Smtp-Source: AGHT+IGI2D9XWQKji+z7BtupmR2kkWhx+xOBty7hIfVTjdRPqhTUDncVdW97+QXgcVjNaC3FDLQCpxo=
 X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a63:be41:0:b0:563:84fc:f4dd with SMTP id
- g1-20020a63be41000000b0056384fcf4ddmr146499pgo.6.1694725506209; Thu, 14 Sep
- 2023 14:05:06 -0700 (PDT)
-Date: Thu, 14 Sep 2023 14:04:49 -0700
+ (user=sdf job=sendgmr) by 2002:a81:9850:0:b0:59b:5a5b:3a91 with SMTP id
+ p77-20020a819850000000b0059b5a5b3a91mr104601ywg.2.1694725508369; Thu, 14 Sep
+ 2023 14:05:08 -0700 (PDT)
+Date: Thu, 14 Sep 2023 14:04:50 -0700
 In-Reply-To: <20230914210452.2588884-1-sdf@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -62,8 +62,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20230914210452.2588884-1-sdf@google.com>
 X-Mailer: git-send-email 2.42.0.459.ge4e396fd5e-goog
-Message-ID: <20230914210452.2588884-7-sdf@google.com>
-Subject: [PATCH bpf-next v2 6/9] selftests/bpf: Add csum helpers
+Message-ID: <20230914210452.2588884-8-sdf@google.com>
+Subject: [PATCH bpf-next v2 7/9] selftests/bpf: Add TX side to xdp_metadata
 From: Stanislav Fomichev <sdf@google.com>
 To: bpf@vger.kernel.org
 Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
@@ -75,71 +75,119 @@ Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
 	xdp-hints@xdp-project.net
 Content-Type: text/plain; charset="UTF-8"
 
-Checksum helpers will be used to calculate pseudo-header checksum in
-AF_XDP metadata selftests.
-
-The helpers are mirroring existing kernel ones:
-- csum_tcpudp_magic : IPv4 pseudo header csum
-- csum_ipv6_magic : IPv6 pseudo header csum
-- csum_fold : fold csum and do one's complement
+Request TX timestamp and make sure it's not empty.
+Request TX checksum offload (SW-only) and make sure it's resolved
+to the correct one.
 
 Signed-off-by: Stanislav Fomichev <sdf@google.com>
 ---
- tools/testing/selftests/bpf/network_helpers.h | 43 +++++++++++++++++++
- 1 file changed, 43 insertions(+)
+ .../selftests/bpf/prog_tests/xdp_metadata.c   | 31 +++++++++++++++++--
+ 1 file changed, 28 insertions(+), 3 deletions(-)
 
-diff --git a/tools/testing/selftests/bpf/network_helpers.h b/tools/testing/selftests/bpf/network_helpers.h
-index 5eccc67d1a99..654a854c9fb2 100644
---- a/tools/testing/selftests/bpf/network_helpers.h
-+++ b/tools/testing/selftests/bpf/network_helpers.h
-@@ -70,4 +70,47 @@ struct nstoken;
-  */
- struct nstoken *open_netns(const char *name);
- void close_netns(struct nstoken *token);
+diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c b/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
+index 626c461fa34d..f0da8fe93276 100644
+--- a/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
++++ b/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
+@@ -57,6 +57,7 @@ static int open_xsk(int ifindex, struct xsk *xsk)
+ 		.comp_size = XSK_RING_CONS__DEFAULT_NUM_DESCS,
+ 		.frame_size = XSK_UMEM__DEFAULT_FRAME_SIZE,
+ 		.flags = XDP_UMEM_UNALIGNED_CHUNK_FLAG,
++		.tx_metadata_len = sizeof(struct xsk_tx_metadata),
+ 	};
+ 	__u32 idx;
+ 	u64 addr;
+@@ -138,6 +139,7 @@ static void ip_csum(struct iphdr *iph)
+ 
+ static int generate_packet(struct xsk *xsk, __u16 dst_port)
+ {
++	struct xsk_tx_metadata *meta;
+ 	struct xdp_desc *tx_desc;
+ 	struct udphdr *udph;
+ 	struct ethhdr *eth;
+@@ -151,10 +153,14 @@ static int generate_packet(struct xsk *xsk, __u16 dst_port)
+ 		return -1;
+ 
+ 	tx_desc = xsk_ring_prod__tx_desc(&xsk->tx, idx);
+-	tx_desc->addr = idx % (UMEM_NUM / 2) * UMEM_FRAME_SIZE;
++	tx_desc->addr = idx % (UMEM_NUM / 2) * UMEM_FRAME_SIZE + sizeof(struct xsk_tx_metadata);
+ 	printf("%p: tx_desc[%u]->addr=%llx\n", xsk, idx, tx_desc->addr);
+ 	data = xsk_umem__get_data(xsk->umem_area, tx_desc->addr);
+ 
++	meta = data - sizeof(struct xsk_tx_metadata);
++	memset(meta, 0, sizeof(*meta));
++	meta->flags = XDP_TX_METADATA_TIMESTAMP;
 +
-+static __u16 csum_fold(__u32 csum)
-+{
-+	csum = (csum & 0xffff) + (csum >> 16);
-+	csum = (csum & 0xffff) + (csum >> 16);
+ 	eth = data;
+ 	iph = (void *)(eth + 1);
+ 	udph = (void *)(iph + 1);
+@@ -178,11 +184,17 @@ static int generate_packet(struct xsk *xsk, __u16 dst_port)
+ 	udph->source = htons(AF_XDP_SOURCE_PORT);
+ 	udph->dest = htons(dst_port);
+ 	udph->len = htons(sizeof(*udph) + UDP_PAYLOAD_BYTES);
+-	udph->check = 0;
++	udph->check = ~csum_tcpudp_magic(iph->saddr, iph->daddr,
++					 ntohs(udph->len), IPPROTO_UDP, 0);
+ 
+ 	memset(udph + 1, 0xAA, UDP_PAYLOAD_BYTES);
+ 
++	meta->flags |= XDP_TX_METADATA_CHECKSUM | XDP_TX_METADATA_CHECKSUM_SW;
++	meta->csum_start = sizeof(*eth) + sizeof(*iph);
++	meta->csum_offset = offsetof(struct udphdr, check);
 +
-+	return (__u16)~csum;
-+}
+ 	tx_desc->len = sizeof(*eth) + sizeof(*iph) + sizeof(*udph) + UDP_PAYLOAD_BYTES;
++	tx_desc->options |= XDP_TX_METADATA;
+ 	xsk_ring_prod__submit(&xsk->tx, 1);
+ 
+ 	ret = sendto(xsk_socket__fd(xsk->socket), NULL, 0, MSG_DONTWAIT, NULL, 0);
+@@ -194,13 +206,21 @@ static int generate_packet(struct xsk *xsk, __u16 dst_port)
+ 
+ static void complete_tx(struct xsk *xsk)
+ {
+-	__u32 idx;
++	struct xsk_tx_metadata *meta;
+ 	__u64 addr;
++	void *data;
++	__u32 idx;
+ 
+ 	if (ASSERT_EQ(xsk_ring_cons__peek(&xsk->comp, 1, &idx), 1, "xsk_ring_cons__peek")) {
+ 		addr = *xsk_ring_cons__comp_addr(&xsk->comp, idx);
+ 
+ 		printf("%p: complete tx idx=%u addr=%llx\n", xsk, idx, addr);
 +
-+static inline __sum16 csum_tcpudp_magic(__be32 saddr, __be32 daddr,
-+					__u32 len, __u8 proto,
-+					__wsum csum)
-+{
-+	__u64 s = csum;
++		data = xsk_umem__get_data(xsk->umem_area, addr);
++		meta = data - sizeof(struct xsk_tx_metadata);
 +
-+	s += (__u32)saddr;
-+	s += (__u32)daddr;
-+	s += htons(proto + len);
-+	s = (s & 0xffffffff) + (s >> 32);
-+	s = (s & 0xffffffff) + (s >> 32);
++		ASSERT_NEQ(meta->completion.tx_timestamp, 0, "tx_timestamp");
 +
-+	return csum_fold((__u32)s);
-+}
+ 		xsk_ring_cons__release(&xsk->comp, 1);
+ 	}
+ }
+@@ -221,6 +241,7 @@ static int verify_xsk_metadata(struct xsk *xsk)
+ 	const struct xdp_desc *rx_desc;
+ 	struct pollfd fds = {};
+ 	struct xdp_meta *meta;
++	struct udphdr *udph;
+ 	struct ethhdr *eth;
+ 	struct iphdr *iph;
+ 	__u64 comp_addr;
+@@ -257,6 +278,7 @@ static int verify_xsk_metadata(struct xsk *xsk)
+ 	ASSERT_EQ(eth->h_proto, htons(ETH_P_IP), "eth->h_proto");
+ 	iph = (void *)(eth + 1);
+ 	ASSERT_EQ((int)iph->version, 4, "iph->version");
++	udph = (void *)(iph + 1);
+ 
+ 	/* custom metadata */
+ 
+@@ -270,6 +292,9 @@ static int verify_xsk_metadata(struct xsk *xsk)
+ 
+ 	ASSERT_EQ(meta->rx_hash_type, 0, "rx_hash_type");
+ 
++	/* checksum offload */
++	ASSERT_EQ(udph->check, 0x1c72, "csum");
 +
-+static inline __sum16 csum_ipv6_magic(const struct in6_addr *saddr,
-+				      const struct in6_addr *daddr,
-+					__u32 len, __u8 proto,
-+					__wsum csum)
-+{
-+	__u64 s = csum;
-+	int i;
-+
-+	for (i = 0; i < 4; i++)
-+		s += (__u32)saddr->s6_addr32[i];
-+	for (i = 0; i < 4; i++)
-+		s += (__u32)daddr->s6_addr32[i];
-+	s += htons(proto + len);
-+	s = (s & 0xffffffff) + (s >> 32);
-+	s = (s & 0xffffffff) + (s >> 32);
-+
-+	return csum_fold((__u32)s);
-+}
-+
- #endif
+ 	xsk_ring_cons__release(&xsk->rx, 1);
+ 	refill_rx(xsk, comp_addr);
+ 
 -- 
 2.42.0.459.ge4e396fd5e-goog
 
