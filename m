@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-33870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF82B7A085F
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 17:01:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F4F67A0885
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 17:06:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46941281D86
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 15:01:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46A2E1F23F6E
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 15:06:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D21C18E03;
-	Thu, 14 Sep 2023 14:43:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4BA721119;
+	Thu, 14 Sep 2023 14:51:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4961B28E11
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 14:43:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99734C433C7;
-	Thu, 14 Sep 2023 14:43:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65F5628E11
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 14:51:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 903F5C433C8;
+	Thu, 14 Sep 2023 14:51:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694702590;
-	bh=3pqLWiiPUDPfILLrll593nzDnDuukq6YmKiyR5hQotY=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=tLD1O2ITFkjXLno9Lz6Vvmx4EFHfVgMQCxoEILxcDyZtF6kN+WMK7a6Ml4+W8aKTW
-	 sP/PRNMtFLg21r2hOfurqGnWId5ND8vMJyTB/ACmTc3oF3C+O+/vBmEIMOAGoR9ogt
-	 6fHNagyPaVu7foc0g7B582ki8I0bpWF3g5LzDwYywyjsbKDaylsjITJdZn6ifCH1Qv
-	 PwztyDtsZuIN8iinPs/1b1Tg9nXlthpEchdyysOA88yCiF4PCYAR/m6bzvzlBsaxV7
-	 5mU9vqLZxnBrJ2CosZjv6f4weF2GEYpzI1aCSJG/rf8S9sm1dXdEWEUcVgLi4VUKBB
-	 48Hd5bTvOAtOw==
-Message-ID: <c737bd4c-7cd4-11f0-3906-3a9018170888@kernel.org>
-Date: Thu, 14 Sep 2023 08:43:09 -0600
+	s=k20201202; t=1694703114;
+	bh=qM4S6wVnaVHR0/d74jb/l/qLHq+xuqif+tUXhvjpo/E=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=DXvHdJyrxuyrYbNOuC5WunNIZHw3j3fTbxt7Yc6Gc6o/1vY6fZfvav3EtI5ftcOkr
+	 bHTzscT5h/lUjAIHpUEOuVL+I8Hne8cRZuqjAyZVUUJ6LgtdMpwopWjJRyPF/juHcE
+	 D7Nn3+3QRl9Y4KBZPB0rUx6roSm7hJ4BwFgBtvTZYYMr1wwh74IY5Q7bFosITyXixH
+	 3KzJ05TCgXcV16mKaSGztTmVeWuxC3dRxZgMqx5lo3+im3H1+lIlmWllXes/hDqKPj
+	 hz8bRWcBCOOwZf2Sg+VW0uM0cONjazh0jRMDejZcmxo0QWb+r3qq7VMSsu1ZW6GS5p
+	 yF/HGgUTLJVcg==
+Message-ID: <2453b4d3-55a2-ca52-c4f6-81bbaa3d0c5b@kernel.org>
+Date: Thu, 14 Sep 2023 08:51:53 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -40,35 +40,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
  Gecko/20100101 Thunderbird/102.15.0
-Subject: Re: IPv6 address scope not set to operator-configured value
+Subject: Re: [PATCH net-next 01/14] ipv6: lockless IPV6_UNICAST_HOPS
+ implementation
 Content-Language: en-US
-To: Tj <linux@iam.tj>, netdev@vger.kernel.org,
- Guillaume Nault <gnault@redhat.com>
-References: <ab9737bc-cc91-6ccd-e104-4a94899e69e8@iam.tj>
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <20230912160212.3467976-1-edumazet@google.com>
+ <20230912160212.3467976-2-edumazet@google.com>
 From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <ab9737bc-cc91-6ccd-e104-4a94899e69e8@iam.tj>
+In-Reply-To: <20230912160212.3467976-2-edumazet@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 9/14/23 7:51 AM, Tj wrote:
-> Apologies if this doesn't thread - I've had to manually add the
-> In-Reply-To header because I did not receive Guillaume's reply and only
-> discovered it via the email archive.
+On 9/12/23 10:01 AM, Eric Dumazet wrote:
+> Some np->hop_limit accesses are racy, when socket lock is not held.
 > 
-> Not being able to set the scope causes a problem. The scenario in which
-> I need to use it is interfaces with multiple global and ULA addresses
-> where a multicast-DNS responder needs to choose the correct address to
-> send in reply to queries. This affects both avahi and systemd-resolved
-> which currently seem to chose almost - but not quite - at random; but
-> enough so that it often breaks.
+> Add missing annotations and switch to full lockless implementation.
 > 
-> E.g: if the query originates from a ULA address the response should give
-> a ULA address; if the query originates from a global then a global
-> address, etc. In fact, being able to simply set scopes and enable the
-> responder to be configured to use a specific scope would be helpful.
-> It'd certainly avoid having to hard-code logic to determine what address
-> ranges represent a particular logical zone.
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  include/linux/ipv6.h     | 12 +-----------
+>  include/net/ipv6.h       |  2 +-
+>  net/ipv6/ip6_output.c    |  2 +-
+>  net/ipv6/ipv6_sockglue.c | 20 +++++++++++---------
+>  net/ipv6/mcast.c         |  2 +-
+>  net/ipv6/ndisc.c         |  2 +-
+>  6 files changed, 16 insertions(+), 24 deletions(-)
+> 
 
-We cannot change the behavior of an existing API. We have tried that
-many times in the past, and inevitably most changes are reverted.
+Reviewed-by: David Ahern <dsahern@kernel.org>
+
+
 
