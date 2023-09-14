@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-33860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 999517A07D6
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 16:49:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C9667A07DE
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 16:50:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4893A281BC7
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 14:49:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92E9E281A4D
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 14:49:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28C6721346;
-	Thu, 14 Sep 2023 14:39:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14DFB21354;
+	Thu, 14 Sep 2023 14:39:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C5121344;
-	Thu, 14 Sep 2023 14:39:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAC6BC43397;
-	Thu, 14 Sep 2023 14:39:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D6E921352;
+	Thu, 14 Sep 2023 14:39:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC44DC433C8;
+	Thu, 14 Sep 2023 14:39:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694702374;
-	bh=bptKA4oxu938HC76Gt7Y+c/P6Zyx8f+qya9UM/jezdY=;
+	s=k20201202; t=1694702378;
+	bh=NuGvozSv9WccAC4JHs7SvmzDslrfdkBPTRpl9vmfPbQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LQgRUn8d7kTWrl1/JS/ClNubszPNHA6pcsRN4+rsXGTkNvYl+sKsyw7CM1h0WAvY8
-	 FZcRQGYtD0hFzUCjECOTcdEtnk98pPYKRWxJSxUcsZBT2PpBBk8VzuC4wgytU1rp25
-	 gq6+1N1II972L4ai0sEE9otV8HXxBA1WDhWPdDul/PnxroyM6JivlxC8o6NSC+5JZw
-	 ADYFszokqS3Fbjdug9TKwJig0Jh28ktgDg8/L80Pyka5Eymw/ba+LqtSixhQsTl1Jg
-	 zKOBbdJa9KcJeLxiJrkc2CAbE2D2BbnQWDbNnjVj/Crc7trZxyhzIUji/9gNJPvraY
-	 M8lgQLYR2F9jg==
+	b=XP/5j5UGQQIJMpHxUgBLukt0K67oVVXI9Tk1OgNH7LivXba9HAtQARD4VhfbvpzHP
+	 P7+oJ0VKWOhl4zljq4U3styg8PcE8T5fiK99iQpgZ7QitUK9B3D2rw8Iq8FCHIaoBK
+	 gewwfmLXfcWTDnJsoPt7M+Witqti9GaQV8R2u5qftw4nPpo7AHvM8X3qtUy4PNbt9u
+	 wHrqsMmcxCQ4IYCXoBQiKbRDvljiqH7cwMSeWtolzOCapZvDpOXwAcRmHY7cBrSS8g
+	 hkL/FLHa4k0p0F8OkFnXADaydGoVgwTy/ltnAbtokr4bj8SUiDGVs2TpjY3SNw35uC
+	 ZfAq8tLVQwqLw==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
 To: netdev@vger.kernel.org
 Cc: lorenzo.bianconi@redhat.com,
@@ -47,9 +47,9 @@ Cc: lorenzo.bianconi@redhat.com,
 	robh+dt@kernel.org,
 	krzysztof.kozlowski+dt@linaro.org,
 	devicetree@vger.kernel.org
-Subject: [PATCH net-next 07/15] net: ethernet: mtk_wed: introduce mtk_wed_buf structure
-Date: Thu, 14 Sep 2023 16:38:12 +0200
-Message-ID: <7eede969f46fee8c05913fe1893cb60db9144edf.1694701767.git.lorenzo@kernel.org>
+Subject: [PATCH net-next 08/15] net: ethernet: mtk_wed: move mem_region array out of mtk_wed_mcu_load_firmware
+Date: Thu, 14 Sep 2023 16:38:13 +0200
+Message-ID: <0b85368e324422b99cd29d4c1dad2e93bb7ad660.1694701767.git.lorenzo@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <cover.1694701767.git.lorenzo@kernel.org>
 References: <cover.1694701767.git.lorenzo@kernel.org>
@@ -61,95 +61,95 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Introduce mtk_wed_buf structure to store both virtual and physical
-addresses allocated in mtk_wed_tx_buffer_alloc() routine. This is a
-preliminary patch to add WED support for MT7988 SoC since it relies on a
-different dma descriptor layout not storing page dma addresses.
+Remove mtk_wed_wo_memory_region boot structure in mtk_wed_wo.
+This is a preliminary patch to introduce WED support for MT7988 SoC.
 
-Co-developed-by: Sujuan Chen <sujuan.chen@mediatek.com>
-Signed-off-by: Sujuan Chen <sujuan.chen@mediatek.com>
 Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
- drivers/net/ethernet/mediatek/mtk_wed.c | 12 ++++++------
- include/linux/soc/mediatek/mtk_wed.h    |  7 ++++++-
- 2 files changed, 12 insertions(+), 7 deletions(-)
+ drivers/net/ethernet/mediatek/mtk_wed_mcu.c | 37 ++++++++++-----------
+ drivers/net/ethernet/mediatek/mtk_wed_wo.h  |  1 -
+ 2 files changed, 18 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/net/ethernet/mediatek/mtk_wed.c b/drivers/net/ethernet/mediatek/mtk_wed.c
-index 8880b018ffca..58d97be98029 100644
---- a/drivers/net/ethernet/mediatek/mtk_wed.c
-+++ b/drivers/net/ethernet/mediatek/mtk_wed.c
-@@ -300,9 +300,9 @@ mtk_wed_assign(struct mtk_wed_device *dev)
- static int
- mtk_wed_tx_buffer_alloc(struct mtk_wed_device *dev)
- {
-+	struct mtk_wed_buf *page_list;
- 	struct mtk_wdma_desc *desc;
- 	dma_addr_t desc_phys;
--	void **page_list;
- 	int token = dev->wlan.token_start;
- 	int ring_size;
- 	int n_pages;
-@@ -343,7 +343,8 @@ mtk_wed_tx_buffer_alloc(struct mtk_wed_device *dev)
- 			return -ENOMEM;
- 		}
+diff --git a/drivers/net/ethernet/mediatek/mtk_wed_mcu.c b/drivers/net/ethernet/mediatek/mtk_wed_mcu.c
+index 4e48905ac70d..cc54fbd7380a 100644
+--- a/drivers/net/ethernet/mediatek/mtk_wed_mcu.c
++++ b/drivers/net/ethernet/mediatek/mtk_wed_mcu.c
+@@ -16,14 +16,30 @@
+ #include "mtk_wed_wo.h"
+ #include "mtk_wed.h"
  
--		page_list[page_idx++] = page;
-+		page_list[page_idx].p = page;
-+		page_list[page_idx++].phy_addr = page_phys;
- 		dma_sync_single_for_cpu(dev->hw->dev, page_phys, PAGE_SIZE,
- 					DMA_BIDIRECTIONAL);
- 
-@@ -387,8 +388,8 @@ mtk_wed_tx_buffer_alloc(struct mtk_wed_device *dev)
- static void
- mtk_wed_free_tx_buffer(struct mtk_wed_device *dev)
- {
-+	struct mtk_wed_buf *page_list = dev->tx_buf_ring.pages;
- 	struct mtk_wdma_desc *desc = dev->tx_buf_ring.desc;
--	void **page_list = dev->tx_buf_ring.pages;
- 	int page_idx;
- 	int i;
- 
-@@ -400,13 +401,12 @@ mtk_wed_free_tx_buffer(struct mtk_wed_device *dev)
- 
- 	for (i = 0, page_idx = 0; i < dev->tx_buf_ring.size;
- 	     i += MTK_WED_BUF_PER_PAGE) {
--		void *page = page_list[page_idx++];
--		dma_addr_t buf_addr;
-+		dma_addr_t buf_addr = page_list[page_idx].phy_addr;
-+		void *page = page_list[page_idx++].p;
- 
- 		if (!page)
- 			break;
- 
--		buf_addr = le32_to_cpu(desc[i].buf0);
- 		dma_unmap_page(dev->hw->dev, buf_addr, PAGE_SIZE,
- 			       DMA_BIDIRECTIONAL);
- 		__free_page(page);
-diff --git a/include/linux/soc/mediatek/mtk_wed.h b/include/linux/soc/mediatek/mtk_wed.h
-index c6512c216b27..5f00dc26582b 100644
---- a/include/linux/soc/mediatek/mtk_wed.h
-+++ b/include/linux/soc/mediatek/mtk_wed.h
-@@ -76,6 +76,11 @@ struct mtk_wed_wo_rx_stats {
- 	__le32 rx_drop_cnt;
- };
- 
-+struct mtk_wed_buf {
-+	void *p;
-+	dma_addr_t phy_addr;
++static struct mtk_wed_wo_memory_region mem_region[] = {
++	[MTK_WED_WO_REGION_EMI] = {
++		.name = "wo-emi",
++	},
++	[MTK_WED_WO_REGION_ILM] = {
++		.name = "wo-ilm",
++	},
++	[MTK_WED_WO_REGION_DATA] = {
++		.name = "wo-data",
++		.shared = true,
++	},
++	[MTK_WED_WO_REGION_BOOT] = {
++		.name = "wo-boot",
++	},
 +};
 +
- struct mtk_wed_device {
- #ifdef CONFIG_NET_MEDIATEK_SOC_WED
- 	const struct mtk_wed_ops *ops;
-@@ -97,7 +102,7 @@ struct mtk_wed_device {
+ static u32 wo_r32(struct mtk_wed_wo *wo, u32 reg)
+ {
+-	return readl(wo->boot.addr + reg);
++	return readl(mem_region[MTK_WED_WO_REGION_BOOT].addr + reg);
+ }
  
- 	struct {
- 		int size;
--		void **pages;
-+		struct mtk_wed_buf *pages;
- 		struct mtk_wdma_desc *desc;
- 		dma_addr_t desc_phys;
- 	} tx_buf_ring;
+ static void wo_w32(struct mtk_wed_wo *wo, u32 reg, u32 val)
+ {
+-	writel(val, wo->boot.addr + reg);
++	writel(val, mem_region[MTK_WED_WO_REGION_BOOT].addr + reg);
+ }
+ 
+ static struct sk_buff *
+@@ -294,18 +310,6 @@ mtk_wed_mcu_run_firmware(struct mtk_wed_wo *wo, const struct firmware *fw,
+ static int
+ mtk_wed_mcu_load_firmware(struct mtk_wed_wo *wo)
+ {
+-	static struct mtk_wed_wo_memory_region mem_region[] = {
+-		[MTK_WED_WO_REGION_EMI] = {
+-			.name = "wo-emi",
+-		},
+-		[MTK_WED_WO_REGION_ILM] = {
+-			.name = "wo-ilm",
+-		},
+-		[MTK_WED_WO_REGION_DATA] = {
+-			.name = "wo-data",
+-			.shared = true,
+-		},
+-	};
+ 	const struct mtk_wed_fw_trailer *trailer;
+ 	const struct firmware *fw;
+ 	const char *fw_name;
+@@ -319,11 +323,6 @@ mtk_wed_mcu_load_firmware(struct mtk_wed_wo *wo)
+ 			return ret;
+ 	}
+ 
+-	wo->boot.name = "wo-boot";
+-	ret = mtk_wed_get_memory_region(wo, &wo->boot);
+-	if (ret)
+-		return ret;
+-
+ 	/* set dummy cr */
+ 	wed_w32(wo->hw->wed_dev, MTK_WED_SCR0 + 4 * MTK_WED_DUMMY_CR_FWDL,
+ 		wo->hw->index + 1);
+diff --git a/drivers/net/ethernet/mediatek/mtk_wed_wo.h b/drivers/net/ethernet/mediatek/mtk_wed_wo.h
+index 7a1a2a28f1ac..8ed81761bf10 100644
+--- a/drivers/net/ethernet/mediatek/mtk_wed_wo.h
++++ b/drivers/net/ethernet/mediatek/mtk_wed_wo.h
+@@ -228,7 +228,6 @@ struct mtk_wed_wo_queue {
+ 
+ struct mtk_wed_wo {
+ 	struct mtk_wed_hw *hw;
+-	struct mtk_wed_wo_memory_region boot;
+ 
+ 	struct mtk_wed_wo_queue q_tx;
+ 	struct mtk_wed_wo_queue q_rx;
 -- 
 2.41.0
 
