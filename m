@@ -1,146 +1,105 @@
-Return-Path: <netdev+bounces-33969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33970-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C02887A0FAF
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 23:18:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B77387A0FC0
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 23:21:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2543E281DDD
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 21:18:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 721CD282456
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 21:21:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7659326E24;
-	Thu, 14 Sep 2023 21:18:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D741526E2B;
+	Thu, 14 Sep 2023 21:20:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 628CB1F60E
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 21:18:41 +0000 (UTC)
-Received: from phobos.denx.de (phobos.denx.de [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B8B426B2;
-	Thu, 14 Sep 2023 14:18:40 -0700 (PDT)
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 57E1F864F1;
-	Thu, 14 Sep 2023 23:18:37 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1694726317;
-	bh=GaCjucgmR2ewr/vach/jiJUHP6lxAeRNjrbpvetIbhs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=W4ifAGTqsSa9eHpgsVjOY1+CAYl9DanA2tnNIWVs2BvES+m9hqf+S8FbE0sQ9lY++
-	 L1KOLJlDCYVT/bgCK9fAcufKw53sZ2YDPkhZpbBoCoANkPXNUMwakvpTUfU7CXUP1A
-	 WMBChieM5Hh1gLucp4OqDnpAz73h5xMSbZjGzSSiQnac2zUqI0HLc3qxcDwViLiOP7
-	 7BThGVgKobx7lrxVEbfi5fDBCxdZ44IxG3aM8536i7s4gW0+amNXoXCgOcUz7EVMxT
-	 fDmeAO6hkAZZG8Ec3FPBVA5/rwaRIviUWGbCpzcw3wDUbWAZ0N1FBeM4FQKqPcBHXB
-	 8BLxWtb8/wCKg==
-Date: Thu, 14 Sep 2023 23:18:31 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Tristram.Ha@microchip.com, Eric Dumazet
- <edumazet@google.com>, davem@davemloft.net, Woojung Huh
- <woojung.huh@microchip.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
- Florian Fainelli <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com, Oleksij
- Rempel <linux@rempel-privat.de>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [[RFC PATCH v4 net-next] 0/2] net: dsa: hsr: Enable HSR HW
- offloading for KSZ9477
-Message-ID: <20230914231831.0f406585@wsk>
-In-Reply-To: <20230913184206.6dmfw4weoomjqwfp@skbuf>
-References: <20230912092909.4yj4b2b4xrhzdztu@skbuf>
-	<20230912160326.188e1d13@wsk>
-	<20230912160326.188e1d13@wsk>
-	<20230912142644.u4sdkveei3e5hwaf@skbuf>
-	<20230912170641.5bfc3cfe@wsk>
-	<20230912215523.as4puqamj65dikip@skbuf>
-	<20230913102219.773e38f8@wsk>
-	<20230913105806.g5p3wck675gbw5fo@skbuf>
-	<20230913141548.70658940@wsk>
-	<20230913135102.hoyl4tifyf77kdo2@skbuf>
-	<20230913184206.6dmfw4weoomjqwfp@skbuf>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5444526E26
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 21:20:46 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C0C42705
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 14:20:45 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59b50b45481so18535817b3.1
+        for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 14:20:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1694726445; x=1695331245; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ob3uAvnOoSCrtCSZPkBDgY1akrbFBa78/VkbR/tD3Zk=;
+        b=vOINow2YxM/MoSfukFZ+ffrZCGQymL1/8iS4WZMKdLIOjR5lWXaAC7A8DVAmDEuYSJ
+         eVarJzpkG9cb+yEJ9ex8zSMdTP5BIxrCgLWVUJJWm+nuz4cuaxe6+ZKRFxf/vuDP1AOO
+         Igxca97ZL1BJEgGVbJBDmAIu0+JF09MnlKp6LA4bb0yCKyk2vm8FTWyHVMQMx9bOhPcL
+         RSJJwqI4cdBz7jr8JUBRzH3DJyaHjtl9/2b0Lfn4Yw3Hwn94ZF/Ci2oKsJGaHvOIgZhr
+         HBhFoU6klN3eTC3QkiE+S58oOHd42DD4sL/C3/mvDNXWdPBu0fIcFFFyGOo3BC7IHyRy
+         GU6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694726445; x=1695331245;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ob3uAvnOoSCrtCSZPkBDgY1akrbFBa78/VkbR/tD3Zk=;
+        b=RDzKMTwAv7q22d65kr5H8OYYkEntO8odT5Has9zLSY53IPXrVTsLiD8e6Yq5XvdWoX
+         YoGAreq1pmHV27iZ0SAeMSN6UMA48hbyJ3IkJfvTSDsiA41yg9fyCQEGLT3v+YH3N+4g
+         6BAEHB2qvNTqOMK1/StCPMgNRpRiArubppmIm65wJV+9wLA2kdKeGHW4vW0bEWWAuzr5
+         Sgng5KHBpbpjV86Ln5jsKhYDHDJ89zyUTXJ6BLHx+KKUmps26cet3sr/h8W9PAv6jKKE
+         5HdM2fEevJw/HQ+ZWoEwnAQ7mbQJKvYo11Bwdm3Jw49u/6B+Qjcyqzp0gYuygDK79w7C
+         lDoA==
+X-Gm-Message-State: AOJu0YxjBNBxBctFC/eXo8I9bTu5wSPtg3ujycW2eeFxOmPCXSnd/Vo8
+	jkWt7M+BMQqba3Ug4M7eIm2qyg/MH7R38Q==
+X-Google-Smtp-Source: AGHT+IHqKkwRb4VbopLin6Ia5XmxbD4rC+NeBFNXt+55ae4VdsIBmIxgGh8mmlngX1m+Fr0aiJb37+HMAskv5w==
+X-Received: from shakeelb.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:262e])
+ (user=shakeelb job=sendgmr) by 2002:a81:af11:0:b0:565:9bee:22e0 with SMTP id
+ n17-20020a81af11000000b005659bee22e0mr176595ywh.0.1694726444854; Thu, 14 Sep
+ 2023 14:20:44 -0700 (PDT)
+Date: Thu, 14 Sep 2023 21:20:42 +0000
+In-Reply-To: <20230901062141.51972-1-wuyun.abel@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/f7Bh6uyRP=wObsNfKuHGfr2";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Mime-Version: 1.0
+References: <20230901062141.51972-1-wuyun.abel@bytedance.com>
+Message-ID: <20230914212042.nnubjht3huiap3kk@google.com>
+Subject: Re: [RFC PATCH net-next 0/3] sock: Be aware of memcg pressure on alloc
+From: Shakeel Butt <shakeelb@google.com>
+To: Abel Wu <wuyun.abel@bytedance.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
+	Michal Hocko <mhocko@suse.com>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Yosry Ahmed <yosryahmed@google.com>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, Yu Zhao <yuzhao@google.com>, 
+	Kefeng Wang <wangkefeng.wang@huawei.com>, Yafang Shao <laoar.shao@gmail.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Martin KaFai Lau <martin.lau@kernel.org>, 
+	Breno Leitao <leitao@debian.org>, Alexander Mikhalitsyn <alexander@mihalicyn.com>, 
+	David Howells <dhowells@redhat.com>, Jason Xing <kernelxing@tencent.com>, 
+	open list <linux-kernel@vger.kernel.org>, 
+	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>, "open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>
+Content-Type: text/plain; charset="us-ascii"
 
---Sig_/f7Bh6uyRP=wObsNfKuHGfr2
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Fri, Sep 01, 2023 at 02:21:25PM +0800, Abel Wu wrote:
+> 
+[...]
+> As expected, no obvious performance gain or loss observed. As for the
+> issue we encountered, this patchset provides better worst-case behavior
+> that such OOM cases are reduced at some extent. While further fine-
+> grained traffic control is what the workloads need to think about.
+> 
 
-Hi Vladimir,
+I agree with the motivation but I don't agree with the solution (patch 2
+and 3). This is adding one more heuristic in the code which you yourself
+described as helped to some extent. In addition adding more dependency
+on vmpressure subsystem which is in weird state. Vmpressure is a cgroup
+v1 feature which somehow networking subsystem is relying on for cgroup
+v2 deployments. In addition vmpressure acts differently for workloads
+with different memory types (mapped, mlocked, kernel memory).
 
-> On Wed, Sep 13, 2023 at 04:51:02PM +0300, Vladimir Oltean wrote:
-> > > I'm really stunned, how much extra work is required to add two
-> > > callbacks to DSA subsystem (to have already implemented feature)
-> > > for a single chip IC. =20
-> >=20
-> > Some observations are best kept to yourself. This is only the
-> > second HSR offload in the entire kernel. To complain that the
-> > infrastructure needs some extensions, for something that wasn't
-> > even needed for the first implementation (tracking a MAC address),
-> > is unrealistic. =20
->=20
-> Can you please test the attached incremental patch, which applies on
-> top of your RFC v4 series? It contains an implementation of my own
-> review feedback.
+Anyways, have you explored the BPF based approach. You can induce socket
+pressure at the points you care about and define memory pressure however
+your use-case cares for. You can define memory pressure using PSI or
+vmpressure or maybe with MEMCG_HIGH events. What do you think?
 
-Thanks for preparing the patch - it clarified all the point from
-previous e-mails... (and shed some light on mine understanding of DSA
-internals)
-
-It works when applied on top of v4. No performance regressions (with
-nuttcp) observed.
-
-I've also tested the scenario when one tried to alter lan1 after HW
-offloading enabled. It was not possible to alter the MAC address.
-
-
-As fair as I understood from the commit message - some part of this
-patch needs to be applied before HSR offloading v4.
-
-Hence I will wait for it to be posted and upstreamed.
-
-Only then some of this patch code would be squashed to v5 of hsr
-support.
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/f7Bh6uyRP=wObsNfKuHGfr2
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmUDeKcACgkQAR8vZIA0
-zr2aiQgAjbddYHIsZ5gXqPROrAWEQ6T4afqk4bryUfpgNiXiT6uDYt+m0ohRfezL
-gzEU+D1pom+5m9YPNXJpM67lIO1HKx55v30d7vOo3wY4xwPYBDvo9kkK2j0gtEHl
-6iJoJn6tTqZnY6Oyusd4WfUo2YSmFyM6PwyaRf5vYtGDhnjogKEn7oBf7nPMJt71
-D+fGRo5eJuV8Ckdez7BzePskYzCr3VygnBoZfVWcQhfSA4JlhQfednx/WslgPNFS
-75XhnDxePuozbC1rUt1LBAzXYvEOgWG6T6oElIXBCB2TsrIWcuIXeIS9Ys26ZsH/
-F+IqSoVI5kWml9IvOiscMxUwFkTx2w==
-=5sNg
------END PGP SIGNATURE-----
-
---Sig_/f7Bh6uyRP=wObsNfKuHGfr2--
+thanks,
+Shakeel
 
