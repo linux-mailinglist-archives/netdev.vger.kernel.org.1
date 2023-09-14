@@ -1,499 +1,626 @@
-Return-Path: <netdev+bounces-33868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C9387A082E
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 16:58:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E870F7A0865
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 17:02:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C1BAB20A12
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 14:58:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FB28281D9B
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 15:02:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7522026299;
-	Thu, 14 Sep 2023 14:40:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 987FA28E3A;
+	Thu, 14 Sep 2023 14:46:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C56D26288;
-	Thu, 14 Sep 2023 14:40:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 658D6C433B8;
-	Thu, 14 Sep 2023 14:40:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694702405;
-	bh=uFy0yaIXeuU1WIHiqXjw8Vi32xgRKC9435bq8I2+iF0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SXIcBOlrAXldRWLG6CkqIVCX4GvN14veWYaBfKe8QpwQbpCu54yffxtvNlL1V2iYA
-	 JOu7CuVlqxLF9vHZFcHDZ/b9Vhg1WWjBOYJlgkZFtj8i+p/+J4MjCZO69/g9TWcwyH
-	 CvF1pNmQpBaZvgnc8f19Z2goLMpGq7tLhkRTcvXObuSavC8Qvss+HlmjUqj7F3gtPw
-	 qyfRdzJBIvkmdoaDtsjTUtx01w+t72yA1I1vkg9yZm/+LpUxovdeCr0LpTBIKfbTp8
-	 aXijRLsNk8/0kdTibOuMdgLneCvv3o2ZjU1vQivZx9VQyJvj4j8VqfUgCovKuLFM0p
-	 8FFlr4EZeVPpw==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: netdev@vger.kernel.org
-Cc: lorenzo.bianconi@redhat.com,
-	nbd@nbd.name,
-	john@phrozen.org,
-	sean.wang@mediatek.com,
-	Mark-MC.Lee@mediatek.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	daniel@makrotopia.org,
-	linux-mediatek@lists.infradead.org,
-	sujuan.chen@mediatek.com,
-	robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org,
-	devicetree@vger.kernel.org
-Subject: [PATCH net-next 15/15] net: ethernet: mtk_wed: debugfs: add WED 3.0 debugfs entries
-Date: Thu, 14 Sep 2023 16:38:20 +0200
-Message-ID: <a387f20ea6032dd74165cdd830f7b945f9e093c7.1694701767.git.lorenzo@kernel.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <cover.1694701767.git.lorenzo@kernel.org>
-References: <cover.1694701767.git.lorenzo@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8548828E11
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 14:46:26 +0000 (UTC)
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CA291BFE;
+	Thu, 14 Sep 2023 07:46:25 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id CFC72100002;
+	Thu, 14 Sep 2023 17:46:23 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru CFC72100002
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1694702783;
+	bh=LPlma2LAeMgyhlh98VrzM6ckVv1GOUdtnoROUWdF3SU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
+	b=in3mRz3xMSBz1JeSCLHA086BH0kEpv8iwdfc80EgXGBJFyXlP6wek/23Cac79uwm4
+	 0TLyLt2v1bcdBoZ07uKFXVOSAIl7CKbSmkSrq1vTs1T+Hae7LTl9JIpSc4yxxQeaqk
+	 JWuMuTZfDDFs1EwDG6JlY37OX5PnFyZtT1wV1iXngLtAGfyoYm7qE/ycxoSn6bODhT
+	 pljTsqB+pp7JaWhNk/Pql5eGtx8NaFSVXrbUzJcCpdap0hRHjwbChPmnYyF1inJFar
+	 uP7UpCjdNLjfH/JJgQPm7IL2TcsGUQ/lpy3+IfFmY/q8DqLHoE/RNJyFyOtiafXjb/
+	 E9OGK5N+sNTtw==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Thu, 14 Sep 2023 17:46:23 +0300 (MSK)
+Received: from [192.168.0.106] (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Thu, 14 Sep 2023 17:46:23 +0300
+Message-ID: <9513728a-4326-59db-cdc3-8da9c7cf8970@salutedevices.com>
+Date: Thu, 14 Sep 2023 17:39:42 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH net-next v8 4/4] vsock/virtio: MSG_ZEROCOPY flag support
+Content-Language: en-US
+To: Stefano Garzarella <sgarzare@redhat.com>
+CC: Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin"
+	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
+	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
+References: <20230911202234.1932024-1-avkrasnov@salutedevices.com>
+ <20230911202234.1932024-5-avkrasnov@salutedevices.com>
+ <paronli5omh2byddxcsbew3lrnydq4liifsevp2oomhhy5pxed@q46cdz6qp2in>
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+In-Reply-To: <paronli5omh2byddxcsbew3lrnydq4liifsevp2oomhhy5pxed@q46cdz6qp2in>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 179869 [Sep 14 2023]
+X-KSMG-AntiSpam-Version: 5.9.59.0
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 530 530 ecb1547b3f72d1df4c71c0b60e67ba6b4aea5432, {Tracking_from_domain_doesnt_match_to}, 100.64.160.123:7.1.2;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;salutedevices.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/09/14 11:07:00 #21890594
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-From: Sujuan Chen <sujuan.chen@mediatek.com>
 
-Introduce WED3.0 debugfs entries useful for debugging.
 
-Co-developed-by: Lorenzo Bianconi <lorenzo@kernel.org>
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-Signed-off-by: Sujuan Chen <sujuan.chen@mediatek.com>
----
- .../net/ethernet/mediatek/mtk_wed_debugfs.c   | 371 +++++++++++++++++-
- 1 file changed, 369 insertions(+), 2 deletions(-)
+On 14.09.2023 16:57, Stefano Garzarella wrote:
+> On Mon, Sep 11, 2023 at 11:22:34PM +0300, Arseniy Krasnov wrote:
+>> This adds handling of MSG_ZEROCOPY flag on transmission path:
+>>
+>> 1) If this flag is set and zerocopy transmission is possible (enabled
+>>   in socket options and transport allows zerocopy), then non-linear
+>>   skb will be created and filled with the pages of user's buffer.
+>>   Pages of user's buffer are locked in memory by 'get_user_pages()'.
+>> 2) Replaces way of skb owning: instead of 'skb_set_owner_sk_safe()' it
+>>   calls 'skb_set_owner_w()'. Reason of this change is that
+>>   '__zerocopy_sg_from_iter()' increments 'sk_wmem_alloc' of socket, so
+>>   to decrease this field correctly, proper skb destructor is needed:
+>>   'sock_wfree()'. This destructor is set by 'skb_set_owner_w()'.
+>> 3) Adds new callback to 'struct virtio_transport': 'can_msgzerocopy'.
+>>   If this callback is set, then transport needs extra check to be able
+>>   to send provided number of buffers in zerocopy mode. Currently, the
+>>   only transport that needs this callback set is virtio, because this
+>>   transport adds new buffers to the virtio queue and we need to check,
+>>   that number of these buffers is less than size of the queue (it is
+>>   required by virtio spec). vhost and loopback transports don't need
+>>   this check.
+>>
+>> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+>> ---
+>> Changelog:
+>> v5(big patchset) -> v1:
+>>  * Refactorings of 'if' conditions.
+>>  * Remove extra blank line.
+>>  * Remove 'frag_off' field unneeded init.
+>>  * Add function 'virtio_transport_fill_skb()' which fills both linear
+>>    and non-linear skb with provided data.
+>> v1 -> v2:
+>>  * Use original order of last four arguments in 'virtio_transport_alloc_skb()'.
+>> v2 -> v3:
+>>  * Add new transport callback: 'msgzerocopy_check_iov'. It checks that
+>>    provided 'iov_iter' with data could be sent in a zerocopy mode.
+>>    If this callback is not set in transport - transport allows to send
+>>    any 'iov_iter' in zerocopy mode. Otherwise - if callback returns 'true'
+>>    then zerocopy is allowed. Reason of this callback is that in case of
+>>    G2H transmission we insert whole skb to the tx virtio queue and such
+>>    skb must fit to the size of the virtio queue to be sent in a single
+>>    iteration (may be tx logic in 'virtio_transport.c' could be reworked
+>>    as in vhost to support partial send of current skb). This callback
+>>    will be enabled only for G2H path. For details pls see comment
+>>    'Check that tx queue...' below.
+>> v3 -> v4:
+>>  * 'msgzerocopy_check_iov' moved from 'struct vsock_transport' to
+>>    'struct virtio_transport' as it is virtio specific callback and
+>>    never needed in other transports.
+>> v4 -> v5:
+>>  * 'msgzerocopy_check_iov' renamed to 'can_msgzerocopy' and now it
+>>    uses number of buffers to send as input argument. I think there is
+>>    no need to pass iov to this callback (at least today, it is used only
+>>    by guest side of virtio transport), because the only thing that this
+>>    callback does is comparison of number of buffers to be inserted to
+>>    the tx queue and size of this queue.
+>>  * Remove any checks for type of current 'iov_iter' with payload (is it
+>>    'iovec' or 'ubuf'). These checks left from the earlier versions where I
+>>    didn't use already implemented kernel API which handles every type of
+>>    'iov_iter'.
+>> v5 -> v6:
+>>  * Refactor 'virtio_transport_fill_skb()'.
+>>  * Add 'WARN_ON_ONCE()' and comment on invalid combination of destination
+>>    socket and payload in 'virtio_transport_alloc_skb()'.
+>> v7 -> v8:
+>>  * Move '+1' addition from 'can_msgzerocopy' callback body to the caller.
+>>    This addition means packet header.
+>>  * In 'virtio_transport_can_zcopy()' rename 'max_to_send' argument to
+>>    'pkt_len'.
+>>  * Update commit message by adding details about new 'can_msgzerocopy'
+>>    callback.
+>>  * In 'virtio_transport_init_hdr()' move 'len' argument directly after
+>>    'info'.
+>>  * Add comment about processing last skb in tx loop.
+>>  * Update comment for 'can_msgzerocopy' callback for more details.
+>>
+>> include/linux/virtio_vsock.h            |   9 +
+>> net/vmw_vsock/virtio_transport.c        |  32 +++
+>> net/vmw_vsock/virtio_transport_common.c | 256 ++++++++++++++++++------
+>> 3 files changed, 239 insertions(+), 58 deletions(-)
+>>
+>> diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>> index a91fbdf233e4..ebb3ce63d64d 100644
+>> --- a/include/linux/virtio_vsock.h
+>> +++ b/include/linux/virtio_vsock.h
+>> @@ -160,6 +160,15 @@ struct virtio_transport {
+>>
+>>     /* Takes ownership of the packet */
+>>     int (*send_pkt)(struct sk_buff *skb);
+>> +
+>> +    /* Used in MSG_ZEROCOPY mode. Checks, that provided data
+>> +     * (number of buffers) could be transmitted with zerocopy
+>> +     * mode. If this callback is not implemented for the current
+>> +     * transport - this means that this transport doesn't need
+>> +     * extra checks and can perform zerocopy transmission by
+>> +     * default.
+>> +     */
+>> +    bool (*can_msgzerocopy)(int bufs_num);
+>> };
+>>
+>> ssize_t
+>> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>> index 73d730156349..09ba3128e759 100644
+>> --- a/net/vmw_vsock/virtio_transport.c
+>> +++ b/net/vmw_vsock/virtio_transport.c
+>> @@ -455,6 +455,37 @@ static void virtio_vsock_rx_done(struct virtqueue *vq)
+>>     queue_work(virtio_vsock_workqueue, &vsock->rx_work);
+>> }
+>>
+>> +static bool virtio_transport_can_msgzerocopy(int bufs_num)
+>> +{
+>> +    struct virtio_vsock *vsock;
+>> +    bool res = false;
+>> +
+>> +    rcu_read_lock();
+>> +
+>> +    vsock = rcu_dereference(the_virtio_vsock);
+>> +    if (vsock) {
+>> +        struct virtqueue *vq = vsock->vqs[VSOCK_VQ_TX];
+>> +
+>> +        /* Check that tx queue is large enough to keep whole
+>> +         * data to send. This is needed, because when there is
+>> +         * not enough free space in the queue, current skb to
+>> +         * send will be reinserted to the head of tx list of
+>> +         * the socket to retry transmission later, so if skb
+>> +         * is bigger than whole queue, it will be reinserted
+>> +         * again and again, thus blocking other skbs to be sent.
+>> +         * Each page of the user provided buffer will be added
+>> +         * as a single buffer to the tx virtqueue, so compare
+>> +         * number of pages against maximum capacity of the queue.
+>> +         */
+>> +        if (bufs_num <= vq->num_max)
+>> +            res = true;
+>> +    }
+>> +
+>> +    rcu_read_unlock();
+>> +
+>> +    return res;
+>> +}
+>> +
+>> static bool virtio_transport_seqpacket_allow(u32 remote_cid);
+>>
+>> static struct virtio_transport virtio_transport = {
+>> @@ -504,6 +535,7 @@ static struct virtio_transport virtio_transport = {
+>>     },
+>>
+>>     .send_pkt = virtio_transport_send_pkt,
+>> +    .can_msgzerocopy = virtio_transport_can_msgzerocopy,
+>> };
+>>
+>> static bool virtio_transport_seqpacket_allow(u32 remote_cid)
+>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>> index 3a48e48a99ac..e358f118b07e 100644
+>> --- a/net/vmw_vsock/virtio_transport_common.c
+>> +++ b/net/vmw_vsock/virtio_transport_common.c
+>> @@ -37,73 +37,110 @@ virtio_transport_get_ops(struct vsock_sock *vsk)
+>>     return container_of(t, struct virtio_transport, transport);
+>> }
+>>
+>> -/* Returns a new packet on success, otherwise returns NULL.
+>> - *
+>> - * If NULL is returned, errp is set to a negative errno.
+>> - */
+> 
+> Why we are removing this comment?
 
-diff --git a/drivers/net/ethernet/mediatek/mtk_wed_debugfs.c b/drivers/net/ethernet/mediatek/mtk_wed_debugfs.c
-index 8999d0c743f3..781c691473e1 100644
---- a/drivers/net/ethernet/mediatek/mtk_wed_debugfs.c
-+++ b/drivers/net/ethernet/mediatek/mtk_wed_debugfs.c
-@@ -11,6 +11,7 @@ struct reg_dump {
- 	u16 offset;
- 	u8 type;
- 	u8 base;
-+	u32 mask;
- };
- 
- enum {
-@@ -25,6 +26,8 @@ enum {
- 
- #define DUMP_STR(_str) { _str, 0, DUMP_TYPE_STRING }
- #define DUMP_REG(_reg, ...) { #_reg, MTK_##_reg, __VA_ARGS__ }
-+#define DUMP_REG_MASK(_reg, _mask)	\
-+	{ #_mask, MTK_##_reg, DUMP_TYPE_WED, 0, MTK_##_mask }
- #define DUMP_RING(_prefix, _base, ...)				\
- 	{ _prefix " BASE", _base, __VA_ARGS__ },		\
- 	{ _prefix " CNT",  _base + 0x4, __VA_ARGS__ },	\
-@@ -32,6 +35,7 @@ enum {
- 	{ _prefix " DIDX", _base + 0xc, __VA_ARGS__ }
- 
- #define DUMP_WED(_reg) DUMP_REG(_reg, DUMP_TYPE_WED)
-+#define DUMP_WED_MASK(_reg, _mask) DUMP_REG_MASK(_reg, _mask)
- #define DUMP_WED_RING(_base) DUMP_RING(#_base, MTK_##_base, DUMP_TYPE_WED)
- 
- #define DUMP_WDMA(_reg) DUMP_REG(_reg, DUMP_TYPE_WDMA)
-@@ -212,18 +216,372 @@ wed_rxinfo_show(struct seq_file *s, void *data)
- 		DUMP_WED(WED_RTQM_Q2B_MIB),
- 		DUMP_WED(WED_RTQM_PFDBK_MIB),
- 	};
-+	static const struct reg_dump regs_wed_v3[] = {
-+		DUMP_STR("WED RX RRO DATA"),
-+		DUMP_WED_RING(WED_RRO_RX_D_RX(0)),
-+		DUMP_WED_RING(WED_RRO_RX_D_RX(1)),
-+
-+		DUMP_STR("WED RX MSDU PAGE"),
-+		DUMP_WED_RING(WED_RRO_MSDU_PG_CTRL0(0)),
-+		DUMP_WED_RING(WED_RRO_MSDU_PG_CTRL0(1)),
-+		DUMP_WED_RING(WED_RRO_MSDU_PG_CTRL0(2)),
-+
-+		DUMP_STR("WED RX IND CMD"),
-+		DUMP_WED(WED_IND_CMD_RX_CTRL1),
-+		DUMP_WED_MASK(WED_IND_CMD_RX_CTRL2, WED_IND_CMD_MAX_CNT),
-+		DUMP_WED_MASK(WED_IND_CMD_RX_CTRL0, WED_IND_CMD_PROC_IDX),
-+		DUMP_WED_MASK(RRO_IND_CMD_SIGNATURE, RRO_IND_CMD_DMA_IDX),
-+		DUMP_WED_MASK(WED_IND_CMD_RX_CTRL0, WED_IND_CMD_MAGIC_CNT),
-+		DUMP_WED_MASK(RRO_IND_CMD_SIGNATURE, RRO_IND_CMD_MAGIC_CNT),
-+		DUMP_WED_MASK(WED_IND_CMD_RX_CTRL0,
-+			      WED_IND_CMD_PREFETCH_FREE_CNT),
-+		DUMP_WED_MASK(WED_RRO_CFG1, WED_RRO_CFG1_PARTICL_SE_ID),
-+
-+		DUMP_STR("WED ADDR ELEM"),
-+		DUMP_WED(WED_ADDR_ELEM_CFG0),
-+		DUMP_WED_MASK(WED_ADDR_ELEM_CFG1,
-+			      WED_ADDR_ELEM_PREFETCH_FREE_CNT),
-+
-+		DUMP_STR("WED Route QM"),
-+		DUMP_WED(WED_RTQM_ENQ_I2Q_DMAD_CNT),
-+		DUMP_WED(WED_RTQM_ENQ_I2N_DMAD_CNT),
-+		DUMP_WED(WED_RTQM_ENQ_I2Q_PKT_CNT),
-+		DUMP_WED(WED_RTQM_ENQ_I2N_PKT_CNT),
-+		DUMP_WED(WED_RTQM_ENQ_USED_ENTRY_CNT),
-+		DUMP_WED(WED_RTQM_ENQ_ERR_CNT),
-+
-+		DUMP_WED(WED_RTQM_DEQ_DMAD_CNT),
-+		DUMP_WED(WED_RTQM_DEQ_Q2I_DMAD_CNT),
-+		DUMP_WED(WED_RTQM_DEQ_PKT_CNT),
-+		DUMP_WED(WED_RTQM_DEQ_Q2I_PKT_CNT),
-+		DUMP_WED(WED_RTQM_DEQ_USED_PFDBK_CNT),
-+		DUMP_WED(WED_RTQM_DEQ_ERR_CNT),
-+	};
- 	struct mtk_wed_hw *hw = s->private;
- 	struct mtk_wed_device *dev = hw->wed_dev;
- 
- 	if (dev) {
- 		dump_wed_regs(s, dev, regs_common, ARRAY_SIZE(regs_common));
--		dump_wed_regs(s, dev, regs_wed_v2, ARRAY_SIZE(regs_wed_v2));
-+		if (mtk_wed_is_v2(hw))
-+			dump_wed_regs(s, dev,
-+				      regs_wed_v2, ARRAY_SIZE(regs_wed_v2));
-+		else
-+			dump_wed_regs(s, dev,
-+				      regs_wed_v3, ARRAY_SIZE(regs_wed_v3));
- 	}
- 
- 	return 0;
- }
- DEFINE_SHOW_ATTRIBUTE(wed_rxinfo);
- 
-+static int
-+wed_amsdu_show(struct seq_file *s, void *data)
-+{
-+	static const struct reg_dump regs[] = {
-+		DUMP_STR("WED AMDSU INFO"),
-+		DUMP_WED(WED_MON_AMSDU_FIFO_DMAD),
-+
-+		DUMP_STR("WED AMDSU ENG0 INFO"),
-+		DUMP_WED(WED_MON_AMSDU_ENG_DMAD(0)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_QFPL(0)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_QENI(0)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_QENO(0)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_MERG(0)),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT8(0),
-+			      WED_AMSDU_ENG_MAX_PL_CNT),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT8(0),
-+			      WED_AMSDU_ENG_MAX_QGPP_CNT),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT9(0),
-+			      WED_AMSDU_ENG_CUR_ENTRY),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT9(0),
-+			      WED_AMSDU_ENG_MAX_BUF_MERGED),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT9(0),
-+			      WED_AMSDU_ENG_MAX_MSDU_MERGED),
-+
-+		DUMP_STR("WED AMDSU ENG1 INFO"),
-+		DUMP_WED(WED_MON_AMSDU_ENG_DMAD(1)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_QFPL(1)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_QENI(1)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_QENO(1)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_MERG(1)),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT8(1),
-+			      WED_AMSDU_ENG_MAX_PL_CNT),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT8(1),
-+			      WED_AMSDU_ENG_MAX_QGPP_CNT),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT9(1),
-+			      WED_AMSDU_ENG_CUR_ENTRY),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT9(2),
-+			      WED_AMSDU_ENG_MAX_BUF_MERGED),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT9(2),
-+			      WED_AMSDU_ENG_MAX_MSDU_MERGED),
-+
-+		DUMP_STR("WED AMDSU ENG2 INFO"),
-+		DUMP_WED(WED_MON_AMSDU_ENG_DMAD(2)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_QFPL(2)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_QENI(2)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_QENO(2)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_MERG(2)),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT8(2),
-+			      WED_AMSDU_ENG_MAX_PL_CNT),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT8(2),
-+			      WED_AMSDU_ENG_MAX_QGPP_CNT),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT9(2),
-+			      WED_AMSDU_ENG_CUR_ENTRY),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT9(2),
-+			      WED_AMSDU_ENG_MAX_BUF_MERGED),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT9(2),
-+			      WED_AMSDU_ENG_MAX_MSDU_MERGED),
-+
-+		DUMP_STR("WED AMDSU ENG3 INFO"),
-+		DUMP_WED(WED_MON_AMSDU_ENG_DMAD(3)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_QFPL(3)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_QENI(3)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_QENO(3)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_MERG(3)),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT8(3),
-+			      WED_AMSDU_ENG_MAX_PL_CNT),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT8(3),
-+			      WED_AMSDU_ENG_MAX_QGPP_CNT),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT9(3),
-+			      WED_AMSDU_ENG_CUR_ENTRY),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT9(3),
-+			      WED_AMSDU_ENG_MAX_BUF_MERGED),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT9(3),
-+			      WED_AMSDU_ENG_MAX_MSDU_MERGED),
-+
-+		DUMP_STR("WED AMDSU ENG4 INFO"),
-+		DUMP_WED(WED_MON_AMSDU_ENG_DMAD(4)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_QFPL(4)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_QENI(4)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_QENO(4)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_MERG(4)),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT8(4),
-+			      WED_AMSDU_ENG_MAX_PL_CNT),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT8(4),
-+			      WED_AMSDU_ENG_MAX_QGPP_CNT),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT9(4),
-+			      WED_AMSDU_ENG_CUR_ENTRY),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT9(4),
-+			      WED_AMSDU_ENG_MAX_BUF_MERGED),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT9(4),
-+			      WED_AMSDU_ENG_MAX_MSDU_MERGED),
-+
-+		DUMP_STR("WED AMDSU ENG5 INFO"),
-+		DUMP_WED(WED_MON_AMSDU_ENG_DMAD(5)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_QFPL(5)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_QENI(5)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_QENO(5)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_MERG(5)),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT8(5),
-+			      WED_AMSDU_ENG_MAX_PL_CNT),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT8(5),
-+			      WED_AMSDU_ENG_MAX_QGPP_CNT),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT9(5),
-+			      WED_AMSDU_ENG_CUR_ENTRY),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT9(5),
-+			      WED_AMSDU_ENG_MAX_BUF_MERGED),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT9(5),
-+			      WED_AMSDU_ENG_MAX_MSDU_MERGED),
-+
-+		DUMP_STR("WED AMDSU ENG6 INFO"),
-+		DUMP_WED(WED_MON_AMSDU_ENG_DMAD(6)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_QFPL(6)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_QENI(6)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_QENO(6)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_MERG(6)),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT8(6),
-+			      WED_AMSDU_ENG_MAX_PL_CNT),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT8(6),
-+			      WED_AMSDU_ENG_MAX_QGPP_CNT),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT9(6),
-+			      WED_AMSDU_ENG_CUR_ENTRY),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT9(6),
-+			      WED_AMSDU_ENG_MAX_BUF_MERGED),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT9(6),
-+			      WED_AMSDU_ENG_MAX_MSDU_MERGED),
-+
-+		DUMP_STR("WED AMDSU ENG7 INFO"),
-+		DUMP_WED(WED_MON_AMSDU_ENG_DMAD(7)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_QFPL(7)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_QENI(7)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_QENO(7)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_MERG(7)),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT8(7),
-+			      WED_AMSDU_ENG_MAX_PL_CNT),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT8(7),
-+			      WED_AMSDU_ENG_MAX_QGPP_CNT),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT9(7),
-+			      WED_AMSDU_ENG_CUR_ENTRY),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT9(7),
-+			      WED_AMSDU_ENG_MAX_BUF_MERGED),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT9(4),
-+			      WED_AMSDU_ENG_MAX_MSDU_MERGED),
-+
-+		DUMP_STR("WED AMDSU ENG8 INFO"),
-+		DUMP_WED(WED_MON_AMSDU_ENG_DMAD(8)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_QFPL(8)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_QENI(8)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_QENO(8)),
-+		DUMP_WED(WED_MON_AMSDU_ENG_MERG(8)),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT8(8),
-+			      WED_AMSDU_ENG_MAX_PL_CNT),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT8(8),
-+			      WED_AMSDU_ENG_MAX_QGPP_CNT),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT9(8),
-+			      WED_AMSDU_ENG_CUR_ENTRY),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT9(8),
-+			      WED_AMSDU_ENG_MAX_BUF_MERGED),
-+		DUMP_WED_MASK(WED_MON_AMSDU_ENG_CNT9(8),
-+			      WED_AMSDU_ENG_MAX_MSDU_MERGED),
-+
-+		DUMP_STR("WED QMEM INFO"),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_CNT(0), WED_AMSDU_QMEM_FQ_CNT),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_CNT(0), WED_AMSDU_QMEM_SP_QCNT),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_CNT(1), WED_AMSDU_QMEM_TID0_QCNT),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_CNT(1), WED_AMSDU_QMEM_TID1_QCNT),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_CNT(2), WED_AMSDU_QMEM_TID2_QCNT),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_CNT(2), WED_AMSDU_QMEM_TID3_QCNT),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_CNT(3), WED_AMSDU_QMEM_TID4_QCNT),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_CNT(3), WED_AMSDU_QMEM_TID5_QCNT),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_CNT(4), WED_AMSDU_QMEM_TID6_QCNT),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_CNT(4), WED_AMSDU_QMEM_TID7_QCNT),
-+
-+		DUMP_STR("WED QMEM HEAD INFO"),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_PTR(0), WED_AMSDU_QMEM_FQ_HEAD),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_PTR(0), WED_AMSDU_QMEM_SP_QHEAD),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_PTR(1), WED_AMSDU_QMEM_TID0_QHEAD),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_PTR(1), WED_AMSDU_QMEM_TID1_QHEAD),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_PTR(2), WED_AMSDU_QMEM_TID2_QHEAD),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_PTR(2), WED_AMSDU_QMEM_TID3_QHEAD),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_PTR(3), WED_AMSDU_QMEM_TID4_QHEAD),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_PTR(3), WED_AMSDU_QMEM_TID5_QHEAD),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_PTR(4), WED_AMSDU_QMEM_TID6_QHEAD),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_PTR(4), WED_AMSDU_QMEM_TID7_QHEAD),
-+
-+		DUMP_STR("WED QMEM TAIL INFO"),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_PTR(5), WED_AMSDU_QMEM_FQ_TAIL),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_PTR(5), WED_AMSDU_QMEM_SP_QTAIL),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_PTR(6), WED_AMSDU_QMEM_TID0_QTAIL),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_PTR(6), WED_AMSDU_QMEM_TID1_QTAIL),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_PTR(7), WED_AMSDU_QMEM_TID2_QTAIL),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_PTR(7), WED_AMSDU_QMEM_TID3_QTAIL),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_PTR(8), WED_AMSDU_QMEM_TID4_QTAIL),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_PTR(8), WED_AMSDU_QMEM_TID5_QTAIL),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_PTR(9), WED_AMSDU_QMEM_TID6_QTAIL),
-+		DUMP_WED_MASK(WED_MON_AMSDU_QMEM_PTR(9), WED_AMSDU_QMEM_TID7_QTAIL),
-+
-+		DUMP_STR("WED HIFTXD MSDU INFO"),
-+		DUMP_WED(WED_MON_AMSDU_HIFTXD_FETCH_MSDU(1)),
-+		DUMP_WED(WED_MON_AMSDU_HIFTXD_FETCH_MSDU(2)),
-+		DUMP_WED(WED_MON_AMSDU_HIFTXD_FETCH_MSDU(3)),
-+		DUMP_WED(WED_MON_AMSDU_HIFTXD_FETCH_MSDU(4)),
-+		DUMP_WED(WED_MON_AMSDU_HIFTXD_FETCH_MSDU(5)),
-+		DUMP_WED(WED_MON_AMSDU_HIFTXD_FETCH_MSDU(6)),
-+		DUMP_WED(WED_MON_AMSDU_HIFTXD_FETCH_MSDU(7)),
-+		DUMP_WED(WED_MON_AMSDU_HIFTXD_FETCH_MSDU(8)),
-+		DUMP_WED(WED_MON_AMSDU_HIFTXD_FETCH_MSDU(9)),
-+		DUMP_WED(WED_MON_AMSDU_HIFTXD_FETCH_MSDU(10)),
-+		DUMP_WED(WED_MON_AMSDU_HIFTXD_FETCH_MSDU(11)),
-+		DUMP_WED(WED_MON_AMSDU_HIFTXD_FETCH_MSDU(12)),
-+		DUMP_WED(WED_MON_AMSDU_HIFTXD_FETCH_MSDU(13)),
-+	};
-+	struct mtk_wed_hw *hw = s->private;
-+	struct mtk_wed_device *dev = hw->wed_dev;
-+
-+	if (dev)
-+		dump_wed_regs(s, dev, regs, ARRAY_SIZE(regs));
-+
-+	return 0;
-+}
-+DEFINE_SHOW_ATTRIBUTE(wed_amsdu);
-+
-+static int
-+wed_rtqm_show(struct seq_file *s, void *data)
-+{
-+	static const struct reg_dump regs[] = {
-+		DUMP_STR("WED Route QM IGRS0(N2H + Recycle)"),
-+		DUMP_WED(WED_RTQM_IGRS0_I2HW_DMAD_CNT),
-+		DUMP_WED(WED_RTQM_IGRS0_I2H_DMAD_CNT(0)),
-+		DUMP_WED(WED_RTQM_IGRS0_I2H_DMAD_CNT(1)),
-+		DUMP_WED(WED_RTQM_IGRS0_I2HW_PKT_CNT),
-+		DUMP_WED(WED_RTQM_IGRS0_I2H_PKT_CNT(0)),
-+		DUMP_WED(WED_RTQM_IGRS0_I2H_PKT_CNT(0)),
-+		DUMP_WED(WED_RTQM_IGRS0_FDROP_CNT),
-+
-+		DUMP_STR("WED Route QM IGRS1(Legacy)"),
-+		DUMP_WED(WED_RTQM_IGRS1_I2HW_DMAD_CNT),
-+		DUMP_WED(WED_RTQM_IGRS1_I2H_DMAD_CNT(0)),
-+		DUMP_WED(WED_RTQM_IGRS1_I2H_DMAD_CNT(1)),
-+		DUMP_WED(WED_RTQM_IGRS1_I2HW_PKT_CNT),
-+		DUMP_WED(WED_RTQM_IGRS1_I2H_PKT_CNT(0)),
-+		DUMP_WED(WED_RTQM_IGRS1_I2H_PKT_CNT(1)),
-+		DUMP_WED(WED_RTQM_IGRS1_FDROP_CNT),
-+
-+		DUMP_STR("WED Route QM IGRS2(RRO3.0)"),
-+		DUMP_WED(WED_RTQM_IGRS2_I2HW_DMAD_CNT),
-+		DUMP_WED(WED_RTQM_IGRS2_I2H_DMAD_CNT(0)),
-+		DUMP_WED(WED_RTQM_IGRS2_I2H_DMAD_CNT(1)),
-+		DUMP_WED(WED_RTQM_IGRS2_I2HW_PKT_CNT),
-+		DUMP_WED(WED_RTQM_IGRS2_I2H_PKT_CNT(0)),
-+		DUMP_WED(WED_RTQM_IGRS2_I2H_PKT_CNT(1)),
-+		DUMP_WED(WED_RTQM_IGRS2_FDROP_CNT),
-+
-+		DUMP_STR("WED Route QM IGRS3(DEBUG)"),
-+		DUMP_WED(WED_RTQM_IGRS2_I2HW_DMAD_CNT),
-+		DUMP_WED(WED_RTQM_IGRS3_I2H_DMAD_CNT(0)),
-+		DUMP_WED(WED_RTQM_IGRS3_I2H_DMAD_CNT(1)),
-+		DUMP_WED(WED_RTQM_IGRS3_I2HW_PKT_CNT),
-+		DUMP_WED(WED_RTQM_IGRS3_I2H_PKT_CNT(0)),
-+		DUMP_WED(WED_RTQM_IGRS3_I2H_PKT_CNT(1)),
-+		DUMP_WED(WED_RTQM_IGRS3_FDROP_CNT),
-+	};
-+	struct mtk_wed_hw *hw = s->private;
-+	struct mtk_wed_device *dev = hw->wed_dev;
-+
-+	if (dev)
-+		dump_wed_regs(s, dev, regs, ARRAY_SIZE(regs));
-+
-+	return 0;
-+}
-+DEFINE_SHOW_ATTRIBUTE(wed_rtqm);
-+
-+static int
-+wed_rro_show(struct seq_file *s, void *data)
-+{
-+	static const struct reg_dump regs[] = {
-+		DUMP_STR("RRO/IND CMD CNT"),
-+		DUMP_WED(WED_RX_IND_CMD_CNT(1)),
-+		DUMP_WED(WED_RX_IND_CMD_CNT(2)),
-+		DUMP_WED(WED_RX_IND_CMD_CNT(3)),
-+		DUMP_WED(WED_RX_IND_CMD_CNT(4)),
-+		DUMP_WED(WED_RX_IND_CMD_CNT(5)),
-+		DUMP_WED(WED_RX_IND_CMD_CNT(6)),
-+		DUMP_WED(WED_RX_IND_CMD_CNT(7)),
-+		DUMP_WED(WED_RX_IND_CMD_CNT(8)),
-+		DUMP_WED_MASK(WED_RX_IND_CMD_CNT(9),
-+			      WED_IND_CMD_MAGIC_CNT_FAIL_CNT),
-+
-+		DUMP_WED(WED_RX_ADDR_ELEM_CNT(0)),
-+		DUMP_WED_MASK(WED_RX_ADDR_ELEM_CNT(1),
-+			      WED_ADDR_ELEM_SIG_FAIL_CNT),
-+		DUMP_WED(WED_RX_MSDU_PG_CNT(1)),
-+		DUMP_WED(WED_RX_MSDU_PG_CNT(2)),
-+		DUMP_WED(WED_RX_MSDU_PG_CNT(3)),
-+		DUMP_WED(WED_RX_MSDU_PG_CNT(4)),
-+		DUMP_WED(WED_RX_MSDU_PG_CNT(5)),
-+		DUMP_WED_MASK(WED_RX_PN_CHK_CNT,
-+			      WED_PN_CHK_FAIL_CNT),
-+	};
-+	struct mtk_wed_hw *hw = s->private;
-+	struct mtk_wed_device *dev = hw->wed_dev;
-+
-+	if (dev)
-+		dump_wed_regs(s, dev, regs, ARRAY_SIZE(regs));
-+
-+	return 0;
-+}
-+DEFINE_SHOW_ATTRIBUTE(wed_rro);
-+
- static int
- mtk_wed_reg_set(void *data, u64 val)
- {
-@@ -264,7 +622,16 @@ void mtk_wed_hw_add_debugfs(struct mtk_wed_hw *hw)
- 	debugfs_create_u32("regidx", 0600, dir, &hw->debugfs_reg);
- 	debugfs_create_file_unsafe("regval", 0600, dir, hw, &fops_regval);
- 	debugfs_create_file_unsafe("txinfo", 0400, dir, hw, &wed_txinfo_fops);
--	if (!mtk_wed_is_v1(hw))
-+	if (!mtk_wed_is_v1(hw)) {
- 		debugfs_create_file_unsafe("rxinfo", 0400, dir, hw,
- 					   &wed_rxinfo_fops);
-+		if (mtk_wed_is_v3_or_greater(hw)) {
-+			debugfs_create_file_unsafe("amsdu", 0400, dir, hw,
-+						   &wed_amsdu_fops);
-+			debugfs_create_file_unsafe("rtqm", 0400, dir, hw,
-+						   &wed_rtqm_fops);
-+			debugfs_create_file_unsafe("rro", 0400, dir, hw,
-+						   &wed_rro_fops);
-+		}
-+	}
- }
--- 
-2.41.0
+I think I can return it like:
+/* Returns a new sk_buff on success, otherwise returns NULL. */
 
+Line related to 'errp' is not needed i guess.
+
+> 
+>> -static struct sk_buff *
+>> -virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
+>> -               size_t len,
+>> -               u32 src_cid,
+>> -               u32 src_port,
+>> -               u32 dst_cid,
+>> -               u32 dst_port)
+>> -{
+>> -    const size_t skb_len = VIRTIO_VSOCK_SKB_HEADROOM + len;
+>> -    struct virtio_vsock_hdr *hdr;
+>> -    struct sk_buff *skb;
+>> -    void *payload;
+>> -    int err;
+>> +static bool virtio_transport_can_zcopy(struct virtio_vsock_pkt_info *info,
+>> +                       size_t pkt_len)
+>> +{
+>> +    const struct virtio_transport *t_ops;
+>> +    struct iov_iter *iov_iter;
+>>
+>> -    skb = virtio_vsock_alloc_skb(skb_len, GFP_KERNEL);
+>> -    if (!skb)
+>> -        return NULL;
+>> +    if (!info->msg)
+>> +        return false;
+>>
+>> -    hdr = virtio_vsock_hdr(skb);
+>> -    hdr->type    = cpu_to_le16(info->type);
+>> -    hdr->op        = cpu_to_le16(info->op);
+>> -    hdr->src_cid    = cpu_to_le64(src_cid);
+>> -    hdr->dst_cid    = cpu_to_le64(dst_cid);
+>> -    hdr->src_port    = cpu_to_le32(src_port);
+>> -    hdr->dst_port    = cpu_to_le32(dst_port);
+>> -    hdr->flags    = cpu_to_le32(info->flags);
+>> -    hdr->len    = cpu_to_le32(len);
+>> +    iov_iter = &info->msg->msg_iter;
+>>
+>> -    if (info->msg && len > 0) {
+>> -        payload = skb)put(skb, len);
+>> -        err = memcpy_from_msg(payload, info->msg, len);
+>> -        if (err)
+>> -            goto out;
+>> +    if (iov_iter->iov_offset)
+>> +        return false;
+>>
+>> -        if (msg_data_left(info->msg) == 0 &&
+>> -            info->type == VIRTIO_VSOCK_TYPE_SEQPACKET) {
+>> -            hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
+>> +    /* We can't send whole iov. */
+>> +    if (iov_iter->count > pkt_len)
+>> +        return false;
+>>
+>> -            if (info->msg->msg_flags & MSG_EOR)
+>> -                hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
+>> -        }
+>> +    /* Check that transport can send data in zerocopy mode. */
+>> +    t_ops = virtio_transport_get_ops(info->vsk);
+> 
+> While reviewing I was wondering why here we don't check if `t_ops` is
+> NULL.
+> 
+> Then I realized that the only caller of this function
+> (virtio_transport_send_pkt_info()) already get the vsk ops calling
+> virtio_transport_get_ops() and also checks if it can be null.
+> 
+> So what about passing the ops as function parameter to avoid to call
+> virtio_transport_get_ops() again?
+
+Ack
+
+> 
+>> +
+>> +    if (t_ops->can_msgzerocopy) {
+>> +        int pages_in_iov = iov_iter_npages(iov_iter, MAX_SKB_FRAGS);
+>> +        int pages_to_send = min(pages_in_iov, MAX_SKB_FRAGS);
+>> +
+>> +        /* +1 is for packet header. */
+>> +        return t_ops->can_msgzerocopy(pages_to_send + 1);
+>>     }
+>>
+>> -    if (info->reply)
+>> -        virtio_vsock_skb_set_reply(skb);
+>> +    return true;
+>> +}
+>>
+>> -    trace_virtio_transport_alloc_pkt(src_cid, src_port,
+>> -                     dst_cid, dst_port,
+>> -                     len,
+>> -                     info->type,
+>> -                     info->op,
+>> -                     info->flags);
+>> +static int virtio_transport_init_zcopy_skb(struct vsock_sock *vsk,
+>> +                       struct sk_buff *skb,
+>> +                       struct msghdr *msg,
+>> +                       bool zerocopy)
+>> +{
+>> +    struct ubuf_info *uarg;
+>>
+>> -    if (info->vsk && !skb_set_owner_sk_safe(skb, sk_vsock(info->vsk))) {
+>> -        WARN_ONCE(1, "failed to allocate skb on vsock socket with sk_refcnt == 0\n");
+>> -        goto out;
+>> +    if (msg->msg_ubuf) {
+>> +        uarg = msg->msg_ubuf;
+>> +        net_zcopy_get(uarg);
+>> +    } else {
+>> +        struct iov_iter *iter = &msg->msg_iter;
+>> +        struct ubuf_info_msgzc *uarg_zc;
+>> +
+>> +        uarg = msg_zerocopy_realloc(sk_vsock(vsk),
+>> +                        iter->count,
+>> +                        NULL);
+>> +        if (!uarg)
+>> +            return -1;
+>> +
+>> +        uarg_zc = uarg_to_msgzc(uarg);
+>> +        uarg_zc->zerocopy = zerocopy ? 1 : 0;
+>>     }
+>>
+>> -    return skb;
+>> +    skb_zcopy_init(skb, uarg);
+>>
+>> -out:
+>> -    kfree_skb(skb);
+>> -    return NULL;
+>> +    return 0;
+>> +}
+>> +
+>> +static int virtio_transport_fill_skb(struct sk_buff *skb,
+>> +                     struct virtio_vsock_pkt_info *info,
+>> +                     size_t len,
+>> +                     bool zcopy)
+>> +{
+>> +    void *payload;
+>> +    int err;
+>> +
+>> +    if (zcopy)
+>> +        return __zerocopy_sg_from_iter(info->msg, NULL, skb,
+>> +                           &info->msg->msg_iter,
+>> +                           len);
+>> +
+>> +    payload = skb_put(skb, len);
+>> +    err = memcpy_from_msg(payload, info->msg, len);
+>> +    if (err)
+>> +        return -1;
+>> +
+>> +    if (msg_data_left(info->msg))
+>> +        return 0;
+> 
+> We are returning 0 in any case, what is the purpose of this check?
+
+Right, just forget to remove it.
+
+> 
+>> +
+>> +    return 0;
+>> +}
+>> +
+>> +static void virtio_transport_init_hdr(struct sk_buff *skb,
+>> +                      struct virtio_vsock_pkt_info *info,
+>> +                      size_t payload_len,
+>> +                      u32 src_cid,
+>> +                      u32 src_port,
+>> +                      u32 dst_cid,
+>> +                      u32 dst_port)
+>> +{
+>> +    struct virtio_vsock_hdr *hdr;
+>> +
+>> +    hdr = virtio_vsock_hdr(skb);
+>> +    hdr->type    = cpu_to_le16(info->type);
+>> +    hdr->op        = cpu_to_le16(info->op);
+>> +    hdr->src_cid    = cpu_to_le64(src_cid);
+>> +    hdr->dst_cid    = cpu_to_le64(dst_cid);
+>> +    hdr->src_port    = cpu_to_le32(src_port);
+>> +    hdr->dst_port    = cpu_to_le32(dst_port);
+>> +    hdr->flags    = cpu_to_le32(info->flags);
+>> +    hdr->len    = cpu_to_le32(payload_len);
+>> }
+>>
+>> static void virtio_transport_copy_nonlinear_skb(const struct sk_buff *skb,
+>> @@ -214,6 +251,77 @@ static u16 virtio_transport_get_type(struct sock *sk)
+>>         return VIRTIO_VSOCK_TYPE_SEQPACKET;
+>> }
+>>
+>> +static struct sk_buff *virtio_transport_alloc_skb(struct vsock_sock *vsk,
+> 
+> Before this patch we used `info->vsk` in virtio_transport_alloc_skb().
+> Is it now really necessary to add vsk as a parameter? If so, why?
+
+Agree, I think previous version of virtio_transport_alloc_skb() could be
+used.
+
+> 
+>> +                          struct virtio_vsock_pkt_info *info,
+>> +                          size_t payload_len,
+>> +                          bool zcopy,
+>> +                          u32 src_cid,
+>> +                          u32 src_port,
+>> +                          u32 dst_cid,
+>> +                          u32 dst_port)
+>> +{
+>> +    struct sk_buff *skb;
+>> +    size_t skb_len;
+>> +
+>> +    skb_len = VIRTIO_VSOCK_SKB_HEADROOM;
+>> +
+>> +    if (!zcopy)
+>> +        skb_len += payload_len;
+>> +
+>> +    skb = virtio_vsock_alloc_skb(skb_len, GFP_KERNEL);
+>> +    if (!skb)
+>> +        return NULL;
+>> +
+>> +    virtio_transport_init_hdr(skb, info, payload_len, src_cid, src_port,
+>> +                  dst_cid, dst_port);
+>> +
+>> +    /* If 'vsk' != NULL then payload is always present, so we
+>> +     * will never call '__zerocopy_sg_from_iter()' below without
+>> +     * setting skb owner in 'skb_set_owner_w()'. The only case
+>> +     * when 'vsk' == NULL is VIRTIO_VSOCK_OP_RST control message
+>> +     * without payload.
+>> +     */
+>> +    WARN_ON_ONCE(!(vsk && (info->msg && payload_len)) && zcopy);
+>> +
+>> +    /* Set owner here, because '__zerocopy_sg_from_iter()' uses
+>> +     * owner of skb without check to update 'sk_wmem_alloc'.
+>> +     */
+>> +    if (vsk)
+>> +        skb_set_owner_w(skb, sk_vsock(vsk));
+>> +
+>> +    if (info->msg && payload_len > 0) {
+>> +        int err;
+>> +
+>> +        err = virtio_transport_fill_skb(skb, info, payload_len, zcopy);
+>> +        if (err)
+>> +            goto out;
+>> +
+>> +        if (info->type == VIRTIO_VSOCK_TYPE_SEQPACKET) {
+> 
+> Before this patch, we did these steps only if
+> `msg_data_left(info->msg) == 0`, why now we do it in any case?
+
+Ack, it is bug
+
+> 
+>> +            struct virtio_vsock_hdr *hdr = virtio_vsock_hdr(skb);
+>> +
+>> +            hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
+>> +
+>> +            if (info->msg->msg_flags & MSG_EOR)
+>> +                hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
+>> +        }
+>> +    }
+>> +
+>> +    if (info->reply)
+>> +        virtio_vsock_skb_set_reply(skb);
+>> +
+>> +    trace_virtio_transport_alloc_pkt(src_cid, src_port,
+>> +                     dst_cid, dst_port,
+>> +                     payload_len,
+>> +                     info->type,
+>> +                     info->op,
+>> +                     info->flags);
+> 
+> Maybe now we should trace also `zcopy`.
+
+Ack
+
+> 
+>> +
+>> +    return skb;
+>> +out:
+>> +    kfree_skb(skb);
+>> +    return NULL;
+>> +}
+>> +
+>> /* This function can only be used on connecting/connected sockets,
+>>  * since a socket assigned to a transport is required.
+>>  *
+>> @@ -222,10 +330,12 @@ static u16 virtio_transport_get_type(struct sock *sk)
+>> static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+>>                       struct virtio_vsock_pkt_info *info)
+>> {
+>> +    u32 max_skb_len = VIRTIO_VSOCK_MAX_PKT_BUF_SIZE;
+>>     u32 src_cid, src_port, dst_cid, dst_port;
+>>     const struct virtio_transport *t_ops;
+>>     struct virtio_vsock_sock *vvs;
+>>     u32 pkt_len = info->pkt_len;
+>> +    bool can_zcopy = false;
+>>     u32 rest_len;
+>>     int ret;
+>>
+>> @@ -254,15 +364,30 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+>>     if (pkt_len == 0 && info->op == VIRTIO_VSOCK_OP_RW)
+>>         return pkt_len;
+>>
+>> +    if (info->msg) {
+>> +        /* If zerocopy is not enabled by 'setsockopt()', we behave as
+>> +         * there is no MSG_ZEROCOPY flag set.
+>> +         */
+>> +        if (!sock_flag(sk_vsock(vsk), SOCK_ZEROCOPY))
+>> +            info->msg->msg_flags &= ~MSG_ZEROCOPY;
+>> +
+>> +        if (info->msg->msg_flags & MSG_ZEROCOPY)
+>> +            can_zcopy = virtio_transport_can_zcopy(info, pkt_len);
+>> +
+>> +        if (can_zcopy)
+>> +            max_skb_len = min_t(u32, VIRTIO_VSOCK_MAX_PKT_BUF_SIZE,
+>> +                        (MAX_SKB_FRAGS * PAGE_SIZE));
+>> +    }
+>> +
+>>     rest_len = pkt_len;
+>>
+>>     do {
+>>         struct sk_buff *skb;
+>>         size_t skb_len;
+>>
+>> -        skb_len = min_t(u32, VIRTIO_VSOCK_MAX_PKT_BUF_SIZE, rest_len);
+>> +        skb_len = min(max_skb_len, rest_len);
+>>
+>> -        skb = virtio_transport_alloc_skb(info, skb_len,
+>> +        skb = virtio_transport_alloc_skb(vsk, info, skb_len, can_zcopy,
+>>                          src_cid, src_port,
+>>                          dst_cid, dst_port);
+>>         if (!skb) {
+>> @@ -270,6 +395,21 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+>>             break;
+>>         }
+>>
+>> +        /* We process buffer part by part, allocating skb on
+>> +         * each iteration. If this is last skb for this buffer
+>> +         * and MSG_ZEROCOPY mode is in use - we must allocate
+>> +         * completion for the current syscall.
+>> +         */
+>> +        if (info->msg && info->msg->msg_flags & MSG_ZEROCOPY &&
+>> +            skb_len == rest_len && info->op == VIRTIO_VSOCK_OP_RW) {
+>> +            if (virtio_transport_init_zcopy_skb(vsk, skb,
+>> +                                info->msg,
+>> +                                can_zcopy)) {
+>> +                ret = -ENOMEM;
+>> +                break;
+>> +            }
+>> +        }
+>> +
+>>         virtio_transport_inc_tx_pkt(vvs, skb);
+>>
+>>         ret = t_ops->send_pkt(skb);
+>> @@ -985,7 +1125,7 @@ static int virtio_transport_reset_no_sock(const struct virtio_transport *t,
+>>     if (!t)
+>>         return -ENOTCONN;
+>>
+>> -    reply = virtio_transport_alloc_skb(&info, 0,
+>> +    reply = virtio_transport_alloc_skb(NULL, &info, 0, false,
+>>                        le64_to_cpu(hdr->dst_cid),
+>>                        le32_to_cpu(hdr->dst_port),
+>>                        le64_to_cpu(hdr->src_cid),
+>> -- 
+>> 2.25.1
+>>
+> 
 
