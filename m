@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-33859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A82367A07B5
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 16:48:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 999517A07D6
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 16:49:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C95FB20813
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 14:48:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4893A281BC7
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 14:49:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEFA121118;
-	Thu, 14 Sep 2023 14:39:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28C6721346;
+	Thu, 14 Sep 2023 14:39:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9529721117;
-	Thu, 14 Sep 2023 14:39:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4B07C433CB;
-	Thu, 14 Sep 2023 14:39:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C5121344;
+	Thu, 14 Sep 2023 14:39:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAC6BC43397;
+	Thu, 14 Sep 2023 14:39:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694702370;
-	bh=gXQWsZnC/K4vRGdHADEZFnyLphroni4lZ4MEK3xmE5Q=;
+	s=k20201202; t=1694702374;
+	bh=bptKA4oxu938HC76Gt7Y+c/P6Zyx8f+qya9UM/jezdY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Jve63uts2x9V6DGU+PaObUFChZrUIEcUeedN7mWPYgE/CmoxOVMSvF7mlmd9K7w9r
-	 uvl6ocICuXB0+0MsIu/jCrqEoNHs/Nao3vM9ChHyAQV6fy1IA2STzKKkHxRY3KcI/k
-	 1BwLEbwykYLxHVu3UnC3kUJ5vL5CcBnOfSI5Fr/ceuVX/Iks8ZIOZjp+6raBmzSfRr
-	 MVCxzi9iKBzhr7sVAqM1UKr19rfd1HHj3AwtXZa7jW9IRpmS5kgU3Aw8Pq92GeXBDw
-	 gYYiQj+a8X0Ayf+HwohIdJtELi8lLflkuw3LDUnDL+2kCr594pcIvAbaPD16GsIoUK
-	 TMidQUInwI4ug==
+	b=LQgRUn8d7kTWrl1/JS/ClNubszPNHA6pcsRN4+rsXGTkNvYl+sKsyw7CM1h0WAvY8
+	 FZcRQGYtD0hFzUCjECOTcdEtnk98pPYKRWxJSxUcsZBT2PpBBk8VzuC4wgytU1rp25
+	 gq6+1N1II972L4ai0sEE9otV8HXxBA1WDhWPdDul/PnxroyM6JivlxC8o6NSC+5JZw
+	 ADYFszokqS3Fbjdug9TKwJig0Jh28ktgDg8/L80Pyka5Eymw/ba+LqtSixhQsTl1Jg
+	 zKOBbdJa9KcJeLxiJrkc2CAbE2D2BbnQWDbNnjVj/Crc7trZxyhzIUji/9gNJPvraY
+	 M8lgQLYR2F9jg==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
 To: netdev@vger.kernel.org
 Cc: lorenzo.bianconi@redhat.com,
@@ -47,9 +47,9 @@ Cc: lorenzo.bianconi@redhat.com,
 	robh+dt@kernel.org,
 	krzysztof.kozlowski+dt@linaro.org,
 	devicetree@vger.kernel.org
-Subject: [PATCH net-next 06/15] net: ethernet: mtk_wed: rename mtk_rxbm_desc in mtk_wed_bm_desc
-Date: Thu, 14 Sep 2023 16:38:11 +0200
-Message-ID: <1b05e610e5c8582ddaa0c5f71e6e6e6016d50cb9.1694701767.git.lorenzo@kernel.org>
+Subject: [PATCH net-next 07/15] net: ethernet: mtk_wed: introduce mtk_wed_buf structure
+Date: Thu, 14 Sep 2023 16:38:12 +0200
+Message-ID: <7eede969f46fee8c05913fe1893cb60db9144edf.1694701767.git.lorenzo@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <cover.1694701767.git.lorenzo@kernel.org>
 References: <cover.1694701767.git.lorenzo@kernel.org>
@@ -61,73 +61,95 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Rename mtk_rxbm_desc structure in mtk_wed_bm_desc since it will be used
-even on tx side by MT7988 SoC.
+Introduce mtk_wed_buf structure to store both virtual and physical
+addresses allocated in mtk_wed_tx_buffer_alloc() routine. This is a
+preliminary patch to add WED support for MT7988 SoC since it relies on a
+different dma descriptor layout not storing page dma addresses.
 
+Co-developed-by: Sujuan Chen <sujuan.chen@mediatek.com>
+Signed-off-by: Sujuan Chen <sujuan.chen@mediatek.com>
 Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
- drivers/net/ethernet/mediatek/mtk_wed.c          | 4 ++--
- drivers/net/wireless/mediatek/mt76/mt7915/mmio.c | 2 +-
- include/linux/soc/mediatek/mtk_wed.h             | 4 ++--
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/mediatek/mtk_wed.c | 12 ++++++------
+ include/linux/soc/mediatek/mtk_wed.h    |  7 ++++++-
+ 2 files changed, 12 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/net/ethernet/mediatek/mtk_wed.c b/drivers/net/ethernet/mediatek/mtk_wed.c
-index 100546c63e5a..8880b018ffca 100644
+index 8880b018ffca..58d97be98029 100644
 --- a/drivers/net/ethernet/mediatek/mtk_wed.c
 +++ b/drivers/net/ethernet/mediatek/mtk_wed.c
-@@ -422,7 +422,7 @@ mtk_wed_free_tx_buffer(struct mtk_wed_device *dev)
+@@ -300,9 +300,9 @@ mtk_wed_assign(struct mtk_wed_device *dev)
  static int
- mtk_wed_rx_buffer_alloc(struct mtk_wed_device *dev)
+ mtk_wed_tx_buffer_alloc(struct mtk_wed_device *dev)
  {
--	struct mtk_rxbm_desc *desc;
-+	struct mtk_wed_bm_desc *desc;
++	struct mtk_wed_buf *page_list;
+ 	struct mtk_wdma_desc *desc;
  	dma_addr_t desc_phys;
+-	void **page_list;
+ 	int token = dev->wlan.token_start;
+ 	int ring_size;
+ 	int n_pages;
+@@ -343,7 +343,8 @@ mtk_wed_tx_buffer_alloc(struct mtk_wed_device *dev)
+ 			return -ENOMEM;
+ 		}
  
- 	dev->rx_buf_ring.size = dev->wlan.rx_nbuf;
-@@ -442,7 +442,7 @@ mtk_wed_rx_buffer_alloc(struct mtk_wed_device *dev)
+-		page_list[page_idx++] = page;
++		page_list[page_idx].p = page;
++		page_list[page_idx++].phy_addr = page_phys;
+ 		dma_sync_single_for_cpu(dev->hw->dev, page_phys, PAGE_SIZE,
+ 					DMA_BIDIRECTIONAL);
+ 
+@@ -387,8 +388,8 @@ mtk_wed_tx_buffer_alloc(struct mtk_wed_device *dev)
  static void
- mtk_wed_free_rx_buffer(struct mtk_wed_device *dev)
+ mtk_wed_free_tx_buffer(struct mtk_wed_device *dev)
  {
--	struct mtk_rxbm_desc *desc = dev->rx_buf_ring.desc;
-+	struct mtk_wed_bm_desc *desc = dev->rx_buf_ring.desc;
++	struct mtk_wed_buf *page_list = dev->tx_buf_ring.pages;
+ 	struct mtk_wdma_desc *desc = dev->tx_buf_ring.desc;
+-	void **page_list = dev->tx_buf_ring.pages;
+ 	int page_idx;
+ 	int i;
  
- 	if (!desc)
- 		return;
-diff --git a/drivers/net/wireless/mediatek/mt76/mt7915/mmio.c b/drivers/net/wireless/mediatek/mt76/mt7915/mmio.c
-index fc7ace638ce8..e7d8e03f826f 100644
---- a/drivers/net/wireless/mediatek/mt76/mt7915/mmio.c
-+++ b/drivers/net/wireless/mediatek/mt76/mt7915/mmio.c
-@@ -591,7 +591,7 @@ static void mt7915_mmio_wed_release_rx_buf(struct mtk_wed_device *wed)
+@@ -400,13 +401,12 @@ mtk_wed_free_tx_buffer(struct mtk_wed_device *dev)
  
- static u32 mt7915_mmio_wed_init_rx_buf(struct mtk_wed_device *wed, int size)
- {
--	struct mtk_rxbm_desc *desc = wed->rx_buf_ring.desc;
-+	struct mtk_wed_bm_desc *desc = wed->rx_buf_ring.desc;
- 	struct mt76_txwi_cache *t = NULL;
- 	struct mt7915_dev *dev;
- 	struct mt76_queue *q;
+ 	for (i = 0, page_idx = 0; i < dev->tx_buf_ring.size;
+ 	     i += MTK_WED_BUF_PER_PAGE) {
+-		void *page = page_list[page_idx++];
+-		dma_addr_t buf_addr;
++		dma_addr_t buf_addr = page_list[page_idx].phy_addr;
++		void *page = page_list[page_idx++].p;
+ 
+ 		if (!page)
+ 			break;
+ 
+-		buf_addr = le32_to_cpu(desc[i].buf0);
+ 		dma_unmap_page(dev->hw->dev, buf_addr, PAGE_SIZE,
+ 			       DMA_BIDIRECTIONAL);
+ 		__free_page(page);
 diff --git a/include/linux/soc/mediatek/mtk_wed.h b/include/linux/soc/mediatek/mtk_wed.h
-index b2b28180dff7..c6512c216b27 100644
+index c6512c216b27..5f00dc26582b 100644
 --- a/include/linux/soc/mediatek/mtk_wed.h
 +++ b/include/linux/soc/mediatek/mtk_wed.h
-@@ -45,7 +45,7 @@ enum mtk_wed_wo_cmd {
- 	MTK_WED_WO_CMD_WED_END
+@@ -76,6 +76,11 @@ struct mtk_wed_wo_rx_stats {
+ 	__le32 rx_drop_cnt;
  };
  
--struct mtk_rxbm_desc {
-+struct mtk_wed_bm_desc {
- 	__le32 buf0;
- 	__le32 token;
- } __packed __aligned(4);
-@@ -104,7 +104,7 @@ struct mtk_wed_device {
++struct mtk_wed_buf {
++	void *p;
++	dma_addr_t phy_addr;
++};
++
+ struct mtk_wed_device {
+ #ifdef CONFIG_NET_MEDIATEK_SOC_WED
+ 	const struct mtk_wed_ops *ops;
+@@ -97,7 +102,7 @@ struct mtk_wed_device {
  
  	struct {
  		int size;
--		struct mtk_rxbm_desc *desc;
-+		struct mtk_wed_bm_desc *desc;
+-		void **pages;
++		struct mtk_wed_buf *pages;
+ 		struct mtk_wdma_desc *desc;
  		dma_addr_t desc_phys;
- 	} rx_buf_ring;
- 
+ 	} tx_buf_ring;
 -- 
 2.41.0
 
