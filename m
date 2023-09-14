@@ -1,341 +1,244 @@
-Return-Path: <netdev+bounces-33958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F3867A0F34
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 22:46:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 765DA7A0F70
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 23:05:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9706C281594
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 20:46:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A19CF280F3D
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 21:05:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8AB426281;
-	Thu, 14 Sep 2023 20:46:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD30626E12;
+	Thu, 14 Sep 2023 21:04:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEE0333D3
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 20:46:13 +0000 (UTC)
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE9BA2698;
-	Thu, 14 Sep 2023 13:46:12 -0700 (PDT)
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id E5D8B8619A;
-	Thu, 14 Sep 2023 22:46:04 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1694724365;
-	bh=XTngkan7RZTToUwglNOoCwHHF+jxvfkJf/daBGVqjuM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VELJEuCDUVPyjayr49XiisxPTFspdLKlhYLGem3UcavfgYKR+UzcXrhILe6zRu68u
-	 1DMe8+1XhS6qUcfbXAFhjcka/cKUW8CWGimU48GAiGc3ZoQZ8VnF7Hjx/Z8vITdYnM
-	 WQymlqiljsiN7yN7svhpFCTgbLKFRFzw3nRWysKdtE6NwMa0dcEUaDy8jGN8lONc8D
-	 ZLvkpfWcMgRKYhXtvR6QUgr53rl7kWws3L3J/F+/ZCcSRP0fLgRPudGjNhbfxJBPox
-	 jbcxTFaSYozFj+BpOrDOtAKWJOacr3urDbKiXbk0gFh7oKsgz2jLDx2bHlPSwwoCXC
-	 mZyQV0oM/vrZw==
-Date: Thu, 14 Sep 2023 22:45:57 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Tristram.Ha@microchip.com, Eric Dumazet
- <edumazet@google.com>, davem@davemloft.net, Woojung Huh
- <woojung.huh@microchip.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
- Florian Fainelli <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com, Oleksij
- Rempel <linux@rempel-privat.de>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [[RFC PATCH v4 net-next] 0/2] net: dsa: hsr: Enable HSR HW
- offloading for KSZ9477
-Message-ID: <20230914224557.0ca0f057@wsk>
-In-Reply-To: <20230913135102.hoyl4tifyf77kdo2@skbuf>
-References: <20230912101748.0ca4eec8@wsk>
-	<20230912092909.4yj4b2b4xrhzdztu@skbuf>
-	<20230912160326.188e1d13@wsk>
-	<20230912160326.188e1d13@wsk>
-	<20230912142644.u4sdkveei3e5hwaf@skbuf>
-	<20230912170641.5bfc3cfe@wsk>
-	<20230912215523.as4puqamj65dikip@skbuf>
-	<20230913102219.773e38f8@wsk>
-	<20230913105806.g5p3wck675gbw5fo@skbuf>
-	<20230913141548.70658940@wsk>
-	<20230913135102.hoyl4tifyf77kdo2@skbuf>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01416266C7
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 21:04:55 +0000 (UTC)
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68144269D
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 14:04:55 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d8027f9dfefso1737485276.0
+        for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 14:04:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1694725494; x=1695330294; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=zJvyBO3Te8NNwAzPIWarqP43OTSbA2TQxDf8pmoNBSA=;
+        b=uNf7KZ/3hmSykNQMJrYmHP5plAU7RPj1OzqoxsW7DMdOf7kEHWJBZsGr/WRPe29Thb
+         gVcNArZhmH3uZFoPwHRul3MCnHDj+HrgqQ2ISA9Bbtv04aHGmEmzXNNIo2FDX/VVL+of
+         puEY7uGHK01vJ4gnh4DIIRTQgNUsAVPFBAeb3vZIwbnkaJzOvHkykV+9AQeVscFgAHVc
+         9cwBtCvJJdPtVO0EySyhXGiMeMBiFP9eurv35g+VVc0VD7Cr1f9AHNetH78wtf+cFZuj
+         aIesplZWPZt47b7seyENNcnCrNU4sbndGnfB/xj0oRZeEphwkeKc778GhawZ+NVbcgDt
+         8Ftg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694725494; x=1695330294;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zJvyBO3Te8NNwAzPIWarqP43OTSbA2TQxDf8pmoNBSA=;
+        b=O6J24s/oNpSKOtAE+KMcsvhQLdZ02/eVEhYZnNgSSYsUNpJkFsOsbLzlu04aYBSkVD
+         TWw99Bm5w44ZXn05LT8T+hmxyIDcTdp7sIU89rNm7ZAwKMWjj4J+Ad1ffIG0Xf1+rUSB
+         jBsCfEKP3ZxZ0cYCCSQJusyVHz6Jj6MMgyIHReqIGWR31Yfxsh3J5xgx040Plrqwe/p1
+         7cu1qeLTS4I9eq6GMH4COi40twg4jVKjW24770kn0tWEaQaekFHxUoAhfcAmJwT0Vw6K
+         kv88KcVaVvcdHOFc+ZAWBbOkPFfUBzIFcElFe9NGtSiE+6NoSWLsiXoUm39awXUlMx1B
+         Kh1Q==
+X-Gm-Message-State: AOJu0YwUbh17UECP1fHOoQidysJN3tQfqRo0dpBqYO3WsuWyCUx1Jsf1
+	QpjvDxOwAVeVJs/vqTOIBmD2O6E=
+X-Google-Smtp-Source: AGHT+IGgeUdxlwN37ZfLi36wuzFL1iUtuwduz2tDD5Vw0iVaYfSvBm/18ryiAh9o+jvjXeSkeBSD+Iw=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a25:aa83:0:b0:d77:f4f5:9e4 with SMTP id
+ t3-20020a25aa83000000b00d77f4f509e4mr152429ybi.2.1694725494666; Thu, 14 Sep
+ 2023 14:04:54 -0700 (PDT)
+Date: Thu, 14 Sep 2023 14:04:43 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/2qAaBY27j4Xi1V+4gXSYttg";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.459.ge4e396fd5e-goog
+Message-ID: <20230914210452.2588884-1-sdf@google.com>
+Subject: [PATCH bpf-next v2 0/9] xsk: TX metadata
+From: Stanislav Fomichev <sdf@google.com>
+To: bpf@vger.kernel.org
+Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	martin.lau@linux.dev, song@kernel.org, yhs@fb.com, john.fastabend@gmail.com, 
+	kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org, 
+	kuba@kernel.org, toke@kernel.org, willemb@google.com, dsahern@kernel.org, 
+	magnus.karlsson@intel.com, bjorn@kernel.org, maciej.fijalkowski@intel.com, 
+	hawk@kernel.org, yoong.siang.song@intel.com, netdev@vger.kernel.org, 
+	xdp-hints@xdp-project.net, Saeed Mahameed <saeedm@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
 
---Sig_/2qAaBY27j4Xi1V+4gXSYttg
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+This series implements initial TX metadata (offloads) for AF_XDP.
+See patch #2 for the main implementation and mlx5-one for the
+example on how to consume the metadata on the device side.
 
-Hi Vladimir,
+Starting with two types of offloads:
+- request TX timestamp (and write it back into the metadata area)
+- request TX checksum offload
 
-> On Wed, Sep 13, 2023 at 02:15:48PM +0200, Lukasz Majewski wrote:
-> > > I thought we were in agreement to program the actual DSA user
-> > > ports' MAC addresses to hardware. =20
-> >=20
-> > No - v4 of this solution uses HSR net device MAC address, which is
-> > supposed to be the same as DSA master. =20
->=20
-> By "in agreement" I mean "as a result of the discussion on v4 [ this
-> discussion ], where it became obvious that the DSA master solution is
-> not so robust". I hope the 12 emails already exchanged on this patch
-> set weren't for nothing.
->=20
-> > > With KSZ switches, a single CPU port is supported, so all ports
-> > > share the same DSA master. So if the contents of
-> > > REG_SW_MAC_ADDR_0 is different from the DSA master (the same DSA
-> > > master that was used for an earlier HSR offload), why do you
-> > > infer that it was altered by WoL? It makes no sense. =20
-> >=20
-> > So where is the issue? The only issue is that somebody would change
-> > DSA master (and hence HSR) MAC address, so the REG_SW_MAC_ADDR_0
-> > would not be changed. Or do I miss something? =20
->=20
-> Changing the DSA master address and changing the HSR MAC address
-> (indirectly through the ports' address) are different operations.
-> The DSA master's address and the user ports' address are not
-> necessarily in sync.
->=20
-> Each address change is problematic in its own way, and each problem
-> needs to be tackled in its own way, depending on which MAC address you
-> desire for REG_SW_MAC_ADDR_0 to track.
->=20
-> But yes, the only issue is that the MAC address can be changed at
-> runtime, after the initial offload.
->=20
-> > > - Changing the MAC address of (a) triggers a pre-existing bug.
-> > > That bug can be separated from the HSR offload discussion if the
-> > > HSR offload decides to not program the DSA master's MAC address to
-> > > hardware, but a different MAC address. The pre-existence of the
-> > > DSA bug is not a strong enough argument per se to avoid
-> > > programming the DSA master's address to hardware. =20
-> >=20
-> > And this is how v4 is implemented. Or not? =20
->=20
-> If A =3D=3D B initially, then there are 2 ways you can change that
-> condition. You can change A, or you can change B. Replace "A" with
-> "the DSA master's address" and "B" with "the HSR device's address".
->=20
-> > > - Changing the MAC address of (c) does not seem directly possible,
-> > > but:
-> > >=20
-> > > - Changing the MAC address of (b) also triggers (c) - see
-> > > hsr_netdev_notify(). This is because the HSR driver makes sure
-> > > that the addresses of port_A, port_B and the HSR device are equal
-> > > at all times. =20
-> >=20
-> > Why changing HSR port would affect HSR device MAC address? =20
->=20
-> I don't have a simpler answer than "because that's what the code
-> does".
->=20
-> If you don't have time to experiment to convince yourself that this is
-> the case, below is a set of commands that should hopefully clarify.
->=20
-> $ ip link
-> 6: eno2: <BROADCAST,MULTICAST> mtu 1508 qdisc noop state DOWN group
-> default qlen 1000 link/ether 2a:af:42:b7:73:11 brd ff:ff:ff:ff:ff:ff
->     altname end0
->     altname enp0s0f2
-> 7: swp0@eno2: <BROADCAST,MULTICAST,M-DOWN> mtu 1504 qdisc noop state
-> DOWN group default qlen 1000 link/ether a6:f4:af:fd:fc:73 brd
-> ff:ff:ff:ff:ff:ff 8: swp1@eno2: <BROADCAST,MULTICAST,M-DOWN> mtu 1500
-> qdisc noop state DOWN group default qlen 1000 link/ether
-> a6:f4:af:fd:fc:73 brd ff:ff:ff:ff:ff:ff 9: swp2@eno2:
-> <BROADCAST,MULTICAST,M-DOWN> mtu 1504 qdisc noop state DOWN group
-> default qlen 1000 link/ether a6:f4:af:fd:fc:73 brd ff:ff:ff:ff:ff:ff
-> 10: sw0p0@swp0: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop
-> state DOWN group default qlen 1000 link/ether a6:f4:af:fd:fc:73 brd
-> ff:ff:ff:ff:ff:ff 11: sw0p1@swp0: <BROADCAST,MULTICAST,M-DOWN> mtu
-> 1500 qdisc noop state DOWN group default qlen 1000 link/ether
-> a6:f4:af:fd:fc:73 brd ff:ff:ff:ff:ff:ff 12: sw0p2@swp0:
-> <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN group
-> default qlen 1000 link/ether a6:f4:af:fd:fc:73 brd ff:ff:ff:ff:ff:ff
-> 13: sw2p0@swp2: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop
-> state DOWN group default qlen 1000 link/ether a6:f4:af:fd:fc:73 brd
-> ff:ff:ff:ff:ff:ff 14: sw2p1@swp2: <BROADCAST,MULTICAST,M-DOWN> mtu
-> 1500 qdisc noop state DOWN group default qlen 1000 link/ether
-> a6:f4:af:fd:fc:73 brd ff:ff:ff:ff:ff:ff 15: sw2p2@swp2:
-> <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN group
-> default qlen 1000 link/ether a6:f4:af:fd:fc:73 brd ff:ff:ff:ff:ff:ff
-> 16: sw2p3@swp2: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop
-> state DOWN group default qlen 1000 link/ether a6:f4:af:fd:fc:73 brd
-> ff:ff:ff:ff:ff:ff # Simplified in a table for brevity. The format
-> will be kept below $ ip link show ... sw0p0              sw0p1
->       DSA master          hsr0 addr a6:f4:af:fd:fc:73
-> a6:f4:af:fd:fc:73  a6:f4:af:fd:fc:73   n/a
->=20
-> $ ip link add hsr0 type hsr slave1 sw0p0 slave2 sw0p1 version 1
-> [   70.033711] sja1105 spi2.0 sw0p0: entered promiscuous mode
-> [   70.058066] sja1105 spi2.0 sw0p1: entered promiscuous mode
-> Warning: dsa_core: Offloading not supported.
->=20
-> $ ip link show ...
->      sw0p0              sw0p1              DSA master          hsr0
-> addr a6:f4:af:fd:fc:73  a6:f4:af:fd:fc:73  a6:f4:af:fd:fc:73
-> a6:f4:af:fd:fc:73
->=20
-> $ ip link set swp0 address 00:01:02:03:04:05 # DSA master
->=20
-> $ ip link show ...
->      sw0p0              sw0p1              DSA master          hsr0
-> addr a6:f4:af:fd:fc:73  a6:f4:af:fd:fc:73  00:01:02:03:04:05
-> a6:f4:af:fd:fc:73
->=20
-> $ ip link set sw0p0 address 00:01:02:03:04:06
->=20
-> $ ip link show ...
->      sw0p0              sw0p1              DSA master          hsr0
-> addr 00:01:02:03:04:06  a6:f4:af:fd:fc:73  00:01:02:03:04:05
-> 00:01:02:03:04:06
->=20
-> $ ip link set sw0p1 address 00:01:02:03:04:07
->=20
-> $ ip link show ...
->      sw0p0              sw0p1              DSA master          hsr0
-> addr 00:01:02:03:04:06  00:01:02:03:04:07  00:01:02:03:04:05
-> 00:01:02:03:04:06
->=20
-> > Shouldn't it be forbidden, and HSR ports shall inherit MAC address
-> > of HSR device (hsr0) ? =20
->=20
-> Since HSR does _actually_ track the MAC address of port_A (sw0p0
-> above), I guess it would be best if the API introduced would always
-> program REG_SW_MAC_ADDR_0 with the MAC address of the first port that
-> joins the HSR (and requests a reference to REG_SW_MAC_ADDR_0). That
-> way, the API should work with no changing for WoL as well. Anyway -
-> minor difference between first user port and HSR dev_addr.
+Changes since v1:
+- fix obviously broken xp_tx_metadata_enabled (Jesper)
+- update xsk_tx_metadata to be a union of tx and completion sides
+  (Willem, offline)
+- update the doc to mention that metadata padding area is ignored
+  by the kernel and doesn't have to be zeroed-out (Willem, offline)
+- move tx_metadata_len to umem (Maciej, Magnus)
+- store and pass tx_timestamp separately instead of relying on
+  the metadata been unchanged between tx and completion evetns (Maciej)
 
-I've made wrong assumptions - I thought that when we have
+Note that I still only have mlx5 support here. Posting a respin
+to let Intel folks play with the latest state of the patches.
 
-hsr0    -> lan1
-	-> lan2
+v1: https://lore.kernel.org/all/20230809165418.2831456-1-sdf@google.com/
 
-it is only possible to adjust hsr0 MAC address as lan1,lan2 are in some
-way "slaves" for hsr0.
+Performance:
 
-In other words - I thought that lan1, lan2 "disappear" from "normal"
-DSA control as they after "join" are "represented" to DSA by hsr0 (the
-below hierarchy).
+I've implemented a small xskgen tool to try to saturate single tx queue:
+https://github.com/fomichev/xskgen/tree/master
 
-eth0 	-->  lan3
-	-->  lan4
-	-->  hsr0	-> lan2
-			-> lan1
+Here are the performance numbers with some analysis.
 
-And then you explained a use case where one can adjust MAC address of
-lan1 and it would be propagated to hsr0.
+1. Baseline. Running with commit eb62e6aef940 ("Merge branch 'bpf:
+Support bpf_get_func_ip helper in uprobes'"), nothing from this series:
 
-Now it is clear.
+- with 1400 bytes of payload: 98 gbps, 8 mpps
+./xskgen -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 116960000000 bits, took 1.189130 sec, 98.357623 gbps 8.409509 mpps
 
->=20
-> > > The simple matter is: if you program the MAC address of a netdev
-> > > (any netdev) to hardware =20
-> >=20
-> > Which netdev in this case? lan1, lan2, hsr0 or eth0 ? =20
->=20
-> Any netdev. It is a general statement which had a continuation, which
-> you've interrupted.
->=20
-> > > , then for a correct and robust implementation, you
-> > > need to make sure that the hardware will always be in sync with
-> > > that address, keeping in mind that the user may change it. Either
-> > > you deny changes, or you update the hardware when the address is
-> > > updated.=20
-> >=20
-> > Why I cannot just:
-> >=20
-> > 1. Check on hsr_join if lan1, lan2, hsr0 and eth0 MAC is equal and
-> > write it to REG_SW_MAC_ADDR_0? =20
->=20
-> This is actually unnecessary if you implement the reference scheme on
-> REG_SW_MAC_ADDR_0 that I've suggested. Checking the MAC address of
-> eth0 is unnecessary in any case, if you don't program it to hardware.
->=20
-> > 2. Forbid the change of lan1/lan2/eth0/hsr0 if it may affect HSR HW
-> > offloading? If user want to change it - then one shall delete hsr0
-> > net device, change MAC and create it again. =20
->=20
-> I've been saying since yesterday that you should do this.
->=20
-> > How point 2 can be achieved (if possible) ? =20
->=20
-> Re-read earlier emails.
->=20
-> > > If the DSA user port MAC address changes, =20
-> >=20
-> > You mean lan1, lan2, which are joined with hsr0? =20
->=20
-> Yup. I've been saying this for a number of emails already:
-> https://lore.kernel.org/netdev/20230912092909.4yj4b2b4xrhzdztu@skbuf/
->=20
-> | The ports which hold a reference on REG_SW_MAC_ADDR_0 cannot have
-> their | MAC address changed - and for this, you'd have to add a hook
-> to | dsa_switch_ops (and thus to the driver) from
-> | dsa_slave_set_mac_address().
->=20
-> > > and REG_SW_MAC_ADDR_0 was
-> > > previously programmed with it, and nothing is done in reaction to
-> > > this, then this is a problem with the HSR offload.  =20
-> >=20
-> > This shall be just forbidden? =20
->=20
-> Yup.
->=20
-> > > So no, it's not
-> > > just a problem with upcoming WoL patches as you imply. You need to
-> > > integrate a solution to that problem as part of your HSR patches.
-> > > =20
-> >=20
-> > I'm really stunned, how much extra work is required to add two
-> > callbacks to DSA subsystem (to have already implemented feature)
-> > for a single chip IC. =20
->=20
-> Some observations are best kept to yourself. This is only the second
-> HSR offload in the entire kernel. To complain that the infrastructure
-> needs some extensions, for something that wasn't even needed for the
-> first implementation (tracking a MAC address), is unrealistic.
+- with 200 bytes of payload: 49 gbps, 23 mpps
+./xskgen -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000064 packets 20960134144 bits, took 0.422235 sec, 49.640921 gbps 23.683645 mpps
 
+2. Adding single commit that supports reserving tx_metadata_len
+   changes nothing numbers-wise.
 
+- baseline for 1400
+./xskgen -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 116960000000 bits, took 1.189247 sec, 98.347946 gbps 8.408682 mpps
 
+- baseline for 200
+./xskgen -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 20960000000 bits, took 0.421248 sec, 49.756913 gbps 23.738985 mpps
 
-Best regards,
+3. Adding -M flag causes xskgen to reserve the metadata and fill it, but
+   doesn't set XDP_TX_METADATA descriptor option.
 
-Lukasz Majewski
+- new baseline for 1400 (with only filling the metadata)
+./xskgen -M -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 116960000000 bits, took 1.188767 sec, 98.387657 gbps 8.412077 mpps
 
---
+- new baseline for 200 (with only filling the metadata)
+./xskgen -M -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 20960000000 bits, took 0.410213 sec, 51.095407 gbps 24.377579 mpps
+(the numbers go sligtly up here, not really sure why, maybe some cache-related
+side-effects?
 
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+4. Next, I'm running the same test but with the commit that adds actual
+   general infra to parse XDP_TX_METADATA (but no driver support).
+   Essentially applying "xsk: add TX timestamp and TX checksum offload support"
+   from this series. Numbers are the same.
 
---Sig_/2qAaBY27j4Xi1V+4gXSYttg
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+- fill metadata for 1400
+./xskgen -M -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 116960000000 bits, took 1.188430 sec, 98.415557 gbps 8.414463 mpps
 
------BEGIN PGP SIGNATURE-----
+- fill metadata for 200
+./xskgen -M -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 20960000000 bits, took 0.411559 sec, 50.928299 gbps 24.297853 mpps
 
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmUDcQUACgkQAR8vZIA0
-zr0O5wgAn/aJUC5VfmXzX8kEgoqA1c0n1OcVpfXz89/U9ulQIikxZTLpgxBQoe+T
-/nbNbUUquZc9jn6HWY/nlSn8A++0zVqarsZdm/3MzeRfN+ySbaNzHttE2rYWAQpf
-ObipY2rrFdvuyw4r0sR2XMOPMUuU7ToiLWFYHC3DcmKca6/rIgx/ln25L7ruH2Ox
-Iv3gDh2e7T6mh4p+tCOhj3HLtXl85sGCT8DfYkY44STQgVCaxkbUA0959i63ND+N
-5lysQX0RbR0U5TWgVSbR8bbcDX/Z08XYd6Ze4ZaZj5LqqAHyo67yrEx9fnUPSqkk
-joqNqwYm+WAf2CaMKOtkPOUb0lZxbg==
-=LkOe
------END PGP SIGNATURE-----
+- request metadata for 1400
+./xskgen -m -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 116960000000 bits, took 1.188723 sec, 98.391299 gbps 8.412389 mpps
 
---Sig_/2qAaBY27j4Xi1V+4gXSYttg--
+- request metadata for 200
+./xskgen -m -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000064 packets 20960134144 bits, took 0.411240 sec, 50.968131 gbps 24.316856 mpps
+
+5. Now, for the most interesting part, I'm adding mlx5 driver support.
+   The mpps for 200 bytes case goes down from 23 mpps to 19 mpps, but
+   _only_ when I enable the metadata. This looks like a side effect
+   of me pushing extra metadata pointer via mlx5e_xdpi_fifo_push.
+   Hence, this part is wrapped into 'if (xp_tx_metadata_enabled)'
+   to not affect the existing non-metadata use-cases. Since this is not
+   regressing existing workloads, I'm not spending any time trying to
+   optimize it more (and leaving it up to mlx owners to purse if
+   they see any good way to do it).
+
+- same baseline
+./xskgen -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 116960000000 bits, took 1.189434 sec, 98.332484 gbps 8.407360 mpps
+
+./xskgen -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000128 packets 20960268288 bits, took 0.425254 sec, 49.288821 gbps 23.515659 mpps
+
+- fill metadata for 1400
+./xskgen -M -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 116960000000 bits, took 1.189528 sec, 98.324714 gbps 8.406696 mpps
+
+- fill metadata for 200
+./xskgen -M -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000128 packets 20960268288 bits, took 0.519085 sec, 40.379260 gbps 19.264914 mpps
+
+- request metadata for 1400
+./xskgen -m -s 1400 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000000 packets 116960000000 bits, took 1.189329 sec, 98.341165 gbps 8.408102 mpps
+
+- request metadata for 200
+./xskgen -m -s 200 -b eth3 10:70:fd:48:10:77 10:70:fd:48:10:87 fe80::1270:fdff:fe48:1077 fe80::1270:fdff:fe48:1087 1 1
+sent 10000128 packets 20960268288 bits, took 0.519929 sec, 40.313713 gbps 19.233642 mpps
+
+Cc: Saeed Mahameed <saeedm@nvidia.com>
+
+Stanislav Fomichev (9):
+  xsk: Support tx_metadata_len
+  xsk: add TX timestamp and TX checksum offload support
+  tools: ynl: print xsk-features from the sample
+  net/mlx5e: Implement AF_XDP TX timestamp and checksum offload
+  selftests/xsk: Support tx_metadata_len
+  selftests/bpf: Add csum helpers
+  selftests/bpf: Add TX side to xdp_metadata
+  selftests/bpf: Add TX side to xdp_hw_metadata
+  xsk: document tx_metadata_len layout
+
+ Documentation/netlink/specs/netdev.yaml       |  20 ++
+ Documentation/networking/index.rst            |   1 +
+ Documentation/networking/xsk-tx-metadata.rst  |  77 +++++++
+ drivers/net/ethernet/mellanox/mlx5/core/en.h  |   4 +-
+ .../net/ethernet/mellanox/mlx5/core/en/xdp.c  |  72 ++++++-
+ .../net/ethernet/mellanox/mlx5/core/en/xdp.h  |  11 +-
+ .../ethernet/mellanox/mlx5/core/en/xsk/tx.c   |  17 +-
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |   1 +
+ include/linux/netdevice.h                     |  27 +++
+ include/linux/skbuff.h                        |  14 +-
+ include/net/xdp_sock.h                        |  81 +++++++
+ include/net/xdp_sock_drv.h                    |  13 ++
+ include/net/xsk_buff_pool.h                   |   7 +
+ include/uapi/linux/if_xdp.h                   |  41 ++++
+ include/uapi/linux/netdev.h                   |  16 ++
+ net/core/netdev-genl.c                        |  12 +-
+ net/xdp/xdp_umem.c                            |   4 +
+ net/xdp/xsk.c                                 |  51 ++++-
+ net/xdp/xsk_buff_pool.c                       |   1 +
+ net/xdp/xsk_queue.h                           |  19 +-
+ tools/include/uapi/linux/if_xdp.h             |  55 ++++-
+ tools/include/uapi/linux/netdev.h             |  15 ++
+ tools/net/ynl/generated/netdev-user.c         |  19 ++
+ tools/net/ynl/generated/netdev-user.h         |   3 +
+ tools/net/ynl/samples/netdev.c                |   6 +
+ tools/testing/selftests/bpf/network_helpers.h |  43 ++++
+ .../selftests/bpf/prog_tests/xdp_metadata.c   |  31 ++-
+ tools/testing/selftests/bpf/xdp_hw_metadata.c | 202 +++++++++++++++++-
+ tools/testing/selftests/bpf/xsk.c             |   3 +
+ tools/testing/selftests/bpf/xsk.h             |   1 +
+ 30 files changed, 822 insertions(+), 45 deletions(-)
+ create mode 100644 Documentation/networking/xsk-tx-metadata.rst
+
+-- 
+2.42.0.459.ge4e396fd5e-goog
+
 
