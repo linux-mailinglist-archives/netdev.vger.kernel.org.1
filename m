@@ -1,88 +1,80 @@
-Return-Path: <netdev+bounces-33778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33779-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC4F77A01A2
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 12:26:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 441187A01A9
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 12:28:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 24470B20AC6
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 10:26:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC41FB20BD7
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 10:28:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33FF520B2B;
-	Thu, 14 Sep 2023 10:26:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D396D20B35;
+	Thu, 14 Sep 2023 10:27:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1705A1D524
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 10:26:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D93CC433C8;
-	Thu, 14 Sep 2023 10:26:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694687164;
-	bh=y38loyGQg6GHCvGEMW1DVfwqr90xmnw3mOxNq3q890Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CKDCUJ+S70fzVxBgXMd6f5LgH4LN0s0fLZHUD1C+M9SoyDLILoblXbJCq/6GR8Sli
-	 ecyH2cyRpFdEXkI71Et0ySbLjlmNVwE5ya/1hWGYozTE6xHghQZxaF097GWJx2PUpN
-	 kz+wS5Qhyl6EcGTkMR2T9ad0HkMdAvBbLprPLLe421fs75rGxjHLjaLEOhhezVPMOV
-	 gxph54cPk/pTZFoDc6ATKqoFQD+qrZMkl9H6nhx1WvfX6+xvp6g1vUx3DRXjAxc4LP
-	 w4O14C1S0J4+dgCifGTT8x0NR84NnvElkgTJcCbtLM1/Lb9aB1etH8TZO2NUPi6lBi
-	 xh2HX6qF8MyQA==
-Date: Thu, 14 Sep 2023 12:25:49 +0200
-From: Simon Horman <horms@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next 00/14] ipv6: round of data-races fixes
-Message-ID: <20230914102549.GW401982@kernel.org>
-References: <20230912160212.3467976-1-edumazet@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCD501D524;
+	Thu, 14 Sep 2023 10:27:50 +0000 (UTC)
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C0AC1BEC;
+	Thu, 14 Sep 2023 03:27:49 -0700 (PDT)
+Received: from mail.denx.de (unknown [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: festevam@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 2F7CB86907;
+	Thu, 14 Sep 2023 12:27:47 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1694687267;
+	bh=1Q/AFQfaU7MJvgFWoBA1WBlnBomqrlH9jRBRjIyqRmc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LVRabDJIiCY/07ZH01gIHAncOW7pVO8svUbHwGUy+KfMOtOrt1GDGiqpBou4Hq1R0
+	 Du2A9oJcE0nE8N8H30ZQ91oxOl1GsFHWDEq/4+IGP+SFmyd4CnJoejry8Nz5ABwDk6
+	 Hw6A3CW2t0ir3VMJu3u33a6UeynBBRjCkn4vdbVjbEChg3QXodEnwJ9QgwUBsq9F19
+	 uHfMG+Qhqv3fEaD3OnVApredAwmKscQsygLkLvfFEwiu7ync1zoGewDwaywI8XsflF
+	 mMkAtQYio+nq/z50ArvLX5vGB2O1k4a9TOOU00BnU5p3sTSbE+fT7a/4wgdIGwsXm0
+	 kt5xF8dmqASjw==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230912160212.3467976-1-edumazet@google.com>
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Thu, 14 Sep 2023 07:27:47 -0300
+From: Fabio Estevam <festevam@denx.de>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Fabio Estevam <festevam@gmail.com>, shawnguo@kernel.org,
+ wei.fang@nxp.com, shenwei.wang@nxp.com, xiaoning.wang@nxp.com,
+ kuba@kernel.org, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+ conor+dt@kernel.org, netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH 2/2] arm64: dts: imx8dxl-ss-conn: Complete the FEC
+ compatibles
+In-Reply-To: <eba4483dd75a1c18bdb24f7c41e701f96f1e2d0a.camel@redhat.com>
+References: <20230909123107.1048998-1-festevam@gmail.com>
+ <20230909123107.1048998-2-festevam@gmail.com>
+ <9dd78edb2476cc5b57ce7f6b5c6bb338ebef43fd.camel@redhat.com>
+ <eba4483dd75a1c18bdb24f7c41e701f96f1e2d0a.camel@redhat.com>
+Message-ID: <5927d40861ccd43b6d362a68718e7eba@denx.de>
+X-Sender: festevam@denx.de
+User-Agent: Roundcube Webmail/1.3.6
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-On Tue, Sep 12, 2023 at 04:01:58PM +0000, Eric Dumazet wrote:
-> This series is inspired by one related syzbot report.
-> 
-> Many inet6_sk(sk) fields reads or writes are racy.
-> 
-> Move 1-bit fields to inet->inet_flags to provide
-> atomic safety. inet6_{test|set|clear|assign}_bit() helpers
-> could be changed later if we need to make room in inet_flags.
-> 
-> Also add missing READ_ONCE()/WRITE_ONCE() when
-> lockless readers need access to specific fields.
-> 
-> np->srcprefs will be handled separately to avoid merge conflicts
-> because a prior patch was posted for net tree.
-> 
-> Eric Dumazet (14):
->   ipv6: lockless IPV6_UNICAST_HOPS implementation
->   ipv6: lockless IPV6_MULTICAST_LOOP implementation
->   ipv6: lockless IPV6_MULTICAST_HOPS implementation
->   ipv6: lockless IPV6_MTU implementation
->   ipv6: lockless IPV6_MINHOPCOUNT implementation
->   ipv6: lockless IPV6_RECVERR_RFC4884 implementation
->   ipv6: lockless IPV6_MULTICAST_ALL implementation
->   ipv6: lockless IPV6_AUTOFLOWLABEL implementation
->   ipv6: lockless IPV6_DONTFRAG implementation
->   ipv6: lockless IPV6_RECVERR implemetation
->   ipv6: move np->repflow to atomic flags
->   ipv6: lockless IPV6_ROUTER_ALERT_ISOLATE implementation
->   ipv6: lockless IPV6_MTU_DISCOVER implementation
->   ipv6: lockless IPV6_FLOWINFO_SEND implementation
+Hi Paolo,
 
-For series,
+On 14/09/2023 03:16, Paolo Abeni wrote:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+> Thinking again about it, I assume this should go via the devicetree git
+> tree, so I'm dropping it from the netdev pw.
 
+You're right. This one should go via Shawn's tree.
+
+Thanks
 
