@@ -1,146 +1,173 @@
-Return-Path: <netdev+bounces-33752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 294BD79FE9C
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 10:41:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75BE779FEF3
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 10:49:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA425B20BA1
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 08:41:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D68E28020C
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 08:49:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4193BCA4E;
-	Thu, 14 Sep 2023 08:41:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D04D910A1D;
+	Thu, 14 Sep 2023 08:49:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36DD31CFA9
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 08:41:36 +0000 (UTC)
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6130591
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 01:41:35 -0700 (PDT)
-Received: from canpemm500006.china.huawei.com (unknown [172.30.72.56])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RmW183sMpzMlLM;
-	Thu, 14 Sep 2023 16:38:04 +0800 (CST)
-Received: from [10.174.179.200] (10.174.179.200) by
- canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Thu, 14 Sep 2023 16:41:32 +0800
-Subject: Re: [PATCH net v4] team: fix null-ptr-deref when team device type is
- changed
-To: Paolo Abeni <pabeni@redhat.com>, <jiri@resnulli.us>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<netdev@vger.kernel.org>, <leon@kernel.org>, <ye.xingchen@zte.com.cn>,
-	<liuhangbin@gmail.com>
-References: <20230911094636.3256542-1-william.xuanziyang@huawei.com>
- <2910908aeafc8ff133168045ee19f290a7bb35e0.camel@redhat.com>
- <2cad19f1-552b-792f-f074-daadd8753a59@huawei.com>
- <06082c443dbaf83495dde16c33884adc30872ec8.camel@redhat.com>
-From: "Ziyang Xuan (William)" <william.xuanziyang@huawei.com>
-Message-ID: <4401cd29-0502-67b2-29b1-2db0a23b2042@huawei.com>
-Date: Thu, 14 Sep 2023 16:41:32 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCF451CFA9;
+	Thu, 14 Sep 2023 08:49:27 +0000 (UTC)
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1707A98;
+	Thu, 14 Sep 2023 01:49:27 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-404724ec0dcso897755e9.1;
+        Thu, 14 Sep 2023 01:49:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694681365; x=1695286165; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=yV6KphSkDoRKxKiln+aTSA4TnEwvlc6D8JOYcDBHbts=;
+        b=QX+rHfJ7Mv3zkcuHvtUTaLMeCrk8uRPzNkpAfrhCf0EtEk78FzHEznlfrG5MD3JPMP
+         PcWn/v4fqAO1C9B6jWl7obNwXaH3u58tdOkkABs2p82KMIV/xrnczuWPD+z2MEG6sFxT
+         xC3DF5vafCazUGKbcb+3YO2K/cleTUU7wDJNfqO3YdUo/Ue078s1EaiHbSuQMLIqWhDJ
+         4ybjecTTRgMXtvBdZ1Eo2+OlIcxmTLPavZZwwQs6WkulDIyxdN+jT1moq+U22OFOzyyu
+         hXFIvOeJ6j0cwpUUbdg8cQsbRzOuRzJ6bvjV4XHi++/oGiiOSP7C2O2u3Up5XOkB0/Op
+         kWBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694681365; x=1695286165;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yV6KphSkDoRKxKiln+aTSA4TnEwvlc6D8JOYcDBHbts=;
+        b=lwt+yWcEmscJFl/TgdC4NXx3J1R//Z/ey8tx9sMOTSnoukx5/7BGllf+0MkLjXOp3N
+         xxgCw5+63HHDeGe3NdXZMZrsVkJOGSbU6PukQg37M72DuSdy9ol+xNV4m38/CZrERTb+
+         UTwDZynh8hPT3syydU3ASXgBgOn3amTy03WILyeRJIvVwUWHjVf8DcYL2f9avlmB8WaQ
+         xX2At7BwtYge1cN50EwN6vVNabXnT6TlDJM2yj6TgaBn3UTRDKlRiHCtTWda+2ALExcN
+         dUjfDRHDHQSjdA2qOZJnmd/c2M3TtrX+yjcXxD/ay7jOtEjm0EjrcnH+AJt94us1tXSi
+         wujw==
+X-Gm-Message-State: AOJu0Yze3uJse5ZoJ3sDT0iuuP0rrjkyhkae0RNMQ12+jB71eo5GjFm/
+	SuC3lz0sBczmVXdvAlJE4Yg=
+X-Google-Smtp-Source: AGHT+IFcrtI1Z5EYCxXg+CZipWSNYTWJ+itzEClwgDKcyjJgWGDUONZNmZPuwTLj/LdiZ30fCR4vMQ==
+X-Received: by 2002:a05:600c:34c7:b0:3fe:d637:7b25 with SMTP id d7-20020a05600c34c700b003fed6377b25mr4156854wmq.0.1694681365063;
+        Thu, 14 Sep 2023 01:49:25 -0700 (PDT)
+Received: from localhost.localdomain (h-176-10-144-222.NA.cust.bahnhof.se. [176.10.144.222])
+        by smtp.gmail.com with ESMTPSA id n12-20020a05600c294c00b003fee777fd84sm1321099wmd.41.2023.09.14.01.49.23
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 14 Sep 2023 01:49:24 -0700 (PDT)
+From: Magnus Karlsson <magnus.karlsson@gmail.com>
+To: magnus.karlsson@intel.com,
+	bjorn@kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	netdev@vger.kernel.org,
+	maciej.fijalkowski@intel.com,
+	bpf@vger.kernel.org,
+	yhs@fb.com,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	song@kernel.org,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	sdf@google.com,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	przemyslaw.kitszel@intel.com
+Cc: Magnus Karlsson <magnus.karlsson@gmail.com>
+Subject: [PATCH bpf-next v4 00/10] seltests/xsk: various improvements to xskxceiver
+Date: Thu, 14 Sep 2023 10:48:47 +0200
+Message-ID: <20230914084900.492-1-magnus.karlsson@gmail.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <06082c443dbaf83495dde16c33884adc30872ec8.camel@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.179.200]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- canpemm500006.china.huawei.com (7.192.105.130)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 
-> On Wed, 2023-09-13 at 14:15 +0800, Ziyang Xuan (William) wrote:
-> 
-> To me both cases look the same in the end: the team driver sets and use
-> header_ops of a different device that will assume dev_priv() being a
-> different struct.
-> 
-> I'm guessing a generic solution could be implementing 'trampoline'
-> header_ops that just call into the lower port corresponding op, and
-> assigning such ops to the team device every time the lower has non
-> ethernet header_ops.
-> 
-> team_dev_type_check_change() should then probably check both dev->type
-> and dev->header_ops.
-> 
->>> Exporting 'eth_header_ops' for team's sake only looks a bit too
->>> much to
->>> me. I think could instead cache the header_ops ptr after the
->>> initial
->>> ether_setup().
->>
->> Is it possible to use ether_setup() like bonding driver andmodify MTU
->> individually later?
-> 
-> That could be another option to get the eth_header_ops.
-> 
-> Note that in the end both are quite similar, you will have to cache
-> some info (the mtu with the latter); ether_setup() possibly will have
-> more side effects, as it touches many fields. I personally would use
-> the thing I suggested above.
-> 
-Hi Pallo,
+This patch set implements several improvements to the xsk selftests
+test suite that I thought were useful while debugging the xsk
+multi-buffer code and tests. The largest new feature is the ability to
+be able to execute a single test instead of the whole test suite. This
+required some surgery on the current code, details below.
 
-Is it possible to modify like this?
+Anatomy of the path set:
 
-diff --git a/drivers/net/team/team.c b/drivers/net/team/team.c
-index d3dc22509ea5..8e6a87ba85aa 100644
---- a/drivers/net/team/team.c
-+++ b/drivers/net/team/team.c
-@@ -2127,7 +2127,12 @@ static const struct ethtool_ops team_ethtool_ops = {
- static void team_setup_by_port(struct net_device *dev,
-                               struct net_device *port_dev)
- {
--       dev->header_ops = port_dev->header_ops;
-+       struct team *team = netdev_priv(dev);
-+
-+       if (port_dev->type == ARPHRD_ETHER)
-+               dev->header_ops = team->header_ops_cache;
-+       else
-+               dev->header_ops = port_dev->header_ops;
-        dev->type = port_dev->type;
-        dev->hard_header_len = port_dev->hard_header_len;
-        dev->needed_headroom = port_dev->needed_headroom;
-@@ -2174,8 +2179,11 @@ static int team_dev_type_check_change(struct net_device *dev,
+1: Print useful info on a per packet basis with the option -v
 
- static void team_setup(struct net_device *dev)
- {
-+       struct team *team = netdev_priv(dev);
-+
-        ether_setup(dev);
-        dev->max_mtu = ETH_MAX_MTU;
-+       team->header_ops_cache = dev->header_ops;
+2: Add a timeout in the transmission loop too. We only used to have
+   one for the Rx thread, but Tx can lock up too waiting for
+   completions.
 
-        dev->netdev_ops = &team_netdev_ops;
-        dev->ethtool_ops = &team_ethtool_ops;
-diff --git a/include/linux/if_team.h b/include/linux/if_team.h
-index 8de6b6e67829..34bcba5a7067 100644
---- a/include/linux/if_team.h
-+++ b/include/linux/if_team.h
-@@ -189,6 +189,8 @@ struct team {
-        struct net_device *dev; /* associated netdevice */
-        struct team_pcpu_stats __percpu *pcpu_stats;
+3: Add an option (-m) to only run the tests (or a single test with a
+   later patch) in a single mode: skb, drv, or zc (zero-copy).
 
-+       const struct header_ops *header_ops_cache;
-+
-        struct mutex lock; /* used for overall locking, e.g. port lists write */
+4-5: Preparatory patches to be able to specify a test to run. Need to
+     define the test names in a single structure and their entry
+     points, so we can use this when wanting to run a specific test.
+
+6: Adds a command line option (-l) that lists all the tests.
+
+7: Adds a command line option (-t) that runs a specific test instead
+   of the whole test suite. Can be combined with -m to specify a
+   single mode too.
+
+8: Use ksft_print_msg() uniformly throughout the tests. It was a mix
+   of printf() and ksft_print_msg() before.
+
+9: In some places, we failed the whole test suite instead of a single
+   test in certain circumstances. Fix this so only the test in
+   question is failed and the rest of the test suite continues.
+
+10: Display the available command line options with -h
+
+v3 -> v4:
+* Fixed another spelling error in patch #9 [Maciej]
+* Only allow the actual strings for the -m command [Maciej]
+* Move some code from patch #7 to #3 [Maciej]
+
+v2 -> v3:
+* Drop the support for environment variables. Probably not useful. [Maciej]
+* Fixed spelling mistake in patch #9 [Maciej]
+* Fail gracefully if unsupported mode is chosen [Maciej]
+* Simplified test run loop [Maciej]
+
+v1 -> v2:
+
+* Introduce XSKTEST_MODE env variable to be able to set the mode to
+  use [Przemyslaw]
+* Introduce XSKTEST_ETH env variable to be able to set the ethernet
+  interface to use by introducing a new patch (#11) [Magnus]
+* Fixed spelling error in patch #5 [Przemyslaw, Maciej]
+* Fixed confusing documentation in patch #10  [Przemyslaw]
+* The -l option can now be used without being root [Magnus, Maciej]
+* Fixed documentation error in patch #7 [Maciej]
+* Added error handling to the -t option [Maciej]
+* -h now displayed as an option [Maciej]
+
+Thanks: Magnus
+
+Magnus Karlsson (10):
+  selftests/xsk: print per packet info in verbose mode
+  selftests/xsk: add timeout for Tx thread
+  selftests/xsk: add option to only run tests in a single mode
+  selftests/xsk: move all tests to separate functions
+  selftests/xsk: declare test names in struct
+  selftests/xsk: add option that lists all tests
+  selftests/xsk: add option to run single test
+  selftests/xsk: use ksft_print_msg uniformly
+  selftests/xsk: fail single test instead of all tests
+  selftests/xsk: display command line options with -h
+
+ tools/testing/selftests/bpf/test_xsk.sh    |  40 +-
+ tools/testing/selftests/bpf/xsk_prereqs.sh |  10 +-
+ tools/testing/selftests/bpf/xskxceiver.c   | 535 ++++++++++++---------
+ tools/testing/selftests/bpf/xskxceiver.h   |  44 +-
+ 4 files changed, 368 insertions(+), 261 deletions(-)
 
 
-Thank you.
-
-> Cheers,
-> 
-> Paolo
-> 
-> .
-> 
+base-commit: 558c50cc3b135e00c9ed15df4c9159e84166f94c
+--
+2.42.0
 
