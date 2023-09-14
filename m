@@ -1,51 +1,64 @@
-Return-Path: <netdev+bounces-33915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9A357A09C8
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 17:52:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BF617A09AF
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 17:49:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D41F91C21135
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 15:52:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 11F7FB2080B
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 15:49:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D38E6210EF;
-	Thu, 14 Sep 2023 15:50:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CDBC2110C;
+	Thu, 14 Sep 2023 15:43:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5E5318E17
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 15:50:02 +0000 (UTC)
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A22B999;
-	Thu, 14 Sep 2023 08:50:01 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id DA9B3100008;
-	Thu, 14 Sep 2023 18:49:59 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru DA9B3100008
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1694706599;
-	bh=A03gfYoSH59CVMFYfHmRQ/fyqxKJV1wkWlqg/zJjjJI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-	b=LFcmXxw2rO+WbEe/9wfMtyrB6tFK/wXNukyDXO3r1fzZXc1BwTow62TvIr7aXMuk5
-	 dQsbGGI1Wes++AG14bLTWXWXVFWq8gK3x061Xl8S8TaN2E6VNYDE/1ivTxmEbxGE0E
-	 I4jxGVDKRsZEuvbbYtlvO0pSvxFthUeZIW6Diu6+8gFtbsfj2den3Ap+XXmGh6y4KI
-	 DmKpXNgmZynqSh+uXQjSamEZbQbb1qBXOmGFUsj8KmdUegOoAkcYN/zg5+o3CcanMI
-	 WlqI8Rlhkkh9935yNd0oD+wUudyZ8WUqqAQx5rvIBZA1ok6RknLPOydJ9j7VILZL/T
-	 /IkDDYpesnFlg==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Thu, 14 Sep 2023 18:49:58 +0300 (MSK)
-Received: from [192.168.0.106] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Thu, 14 Sep 2023 18:49:57 +0300
-Message-ID: <af22df3f-2fe2-3714-1a40-47ff32e46660@salutedevices.com>
-Date: Thu, 14 Sep 2023 18:43:16 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EBB6CA78
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 15:43:23 +0000 (UTC)
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49D0D99
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 08:43:23 -0700 (PDT)
+Received: by mail-wr1-x431.google.com with SMTP id ffacd0b85a97d-31ae6bf91a9so1065650f8f.2
+        for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 08:43:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1694706201; x=1695311001; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+         :from:content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=d0dQJlmPkRoYe95XpgxvtyrGY+Vo+IGCkpC1ldQpOps=;
+        b=T7skHdfl8ieSaKNQmVy4A/ECrRjMgXpJqupWd1aKwwbrjZ7vJShuUMuiCnI+T8Bxc4
+         jDVoqQuR3xA9t7/JYFyUWvtyTH3UZN/8CR6s70iHoZSPWXqdJCa+Vg1NLMokvQ97NZUR
+         zaTccZ5GJDwe/WNfYnEal8RRTQa6VT95jlJWNrq/21hsFHFSCtnnA/fqO0OzRpDWlqHv
+         t7A+TpHJuhZ7XFlu9Mj8kQLY8gD6bJnYZQGblbj5/grBsMOsxkv+K9nOmCmySZse1lSa
+         oRAF6PJNmvIpUEil69nrKiHk8qi6iVY881p9qQHwscqwkz3SHKB6lsqAAhqIxgo8TKUe
+         Iazw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694706201; x=1695311001;
+        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+         :from:content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=d0dQJlmPkRoYe95XpgxvtyrGY+Vo+IGCkpC1ldQpOps=;
+        b=ckKHXCwBlrffJhE9JX0EzoaujYt6W4wKwJqLZTv6Kbau4gsvXTshl6o3XQztPhiIjS
+         sVlkAeLev0tTxDJVqWDifJQf0mIqybLycsIAZeJmdsu2jUBWxFuH581xeUomNdUp6oNG
+         rSeYuwsrkM698oXEeVORqORHqxDC8Dw2av4Y+ulVx/foucPR7i8cEWmNPwKSomDA20aT
+         86jF97v6n/ELd5AATemo+DyxQBsU5fVxLBT72OVMavOQt4FUX9L0OgcLP8AyCiFOPtuU
+         oV46kdEaNzK5FT+D2Xsolf/lw9LGLTa57u90nZhejbNQwd2YPH3dQIFYttKBbs+hxksp
+         U1Fw==
+X-Gm-Message-State: AOJu0Yw20uV/YU9RGNlv33e1qI95pfy6JI1spGdV3qFRqJdjEHKnmYJ2
+	oMFCZbZ/pxFqoNrKFx4rvNXarQ==
+X-Google-Smtp-Source: AGHT+IFh+MGRF71hcHzxaHPc1Bz0AfhURon+iQ2w7rwccT97qBsoKUF/fE1Z+7ponJlbLbr6+xv/0A==
+X-Received: by 2002:a05:6000:1112:b0:31f:9501:fc0c with SMTP id z18-20020a056000111200b0031f9501fc0cmr4791908wrw.45.1694706200596;
+        Thu, 14 Sep 2023 08:43:20 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:b41:c160:c3c5:63df:302e:e540? ([2a01:e0a:b41:c160:c3c5:63df:302e:e540])
+        by smtp.gmail.com with ESMTPSA id a11-20020a056000100b00b0031c52e81490sm2094046wrx.72.2023.09.14.08.43.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Sep 2023 08:43:19 -0700 (PDT)
+Message-ID: <b83e24a4-6de3-0df2-d902-f2cc3cdbaf41@6wind.com>
+Date: Thu, 14 Sep 2023 17:43:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,155 +66,113 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH net-next v8 0/4] vsock/virtio/vhost: MSG_ZEROCOPY
- preparations
+ Thunderbird/102.15.0
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH net-next] ipv4/fib: send RTM_DELROUTE notify when flush
+ fib
 Content-Language: en-US
-To: Stefano Garzarella <sgarzare@redhat.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin"
-	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
-	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20230911202234.1932024-1-avkrasnov@salutedevices.com>
- <554ugdobcmxraek662xkxjdehcu5ri6awxvhvlvnygyru5zlsx@e7cyloz6so7u>
- <7bf35d28-893b-5bea-beb7-9a25bc2f0a0e@salutedevices.com>
- <63xflnwiohdfo6m3vnrrxgv2ulplencpwug5qqacugqh7xxpu3@tsczkuqgwurb>
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-In-Reply-To: <63xflnwiohdfo6m3vnrrxgv2ulplencpwug5qqacugqh7xxpu3@tsczkuqgwurb>
-Content-Type: text/plain; charset="UTF-8"
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+To: David Ahern <dsahern@kernel.org>, Hangbin Liu <liuhangbin@gmail.com>
+Cc: Thomas Haller <thaller@redhat.com>, Benjamin Poirier
+ <bpoirier@nvidia.com>, Stephen Hemminger <stephen@networkplumber.org>,
+ Ido Schimmel <idosch@idosch.org>, netdev@vger.kernel.org,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+References: <20230724084820.4aa133cc@hermes.local>
+ <ZL+F6zUIXfyhevmm@Laptop-X1> <20230725093617.44887eb1@hermes.local>
+ <6b53e392-ca84-c50b-9d77-4f89e801d4f3@6wind.com>
+ <7e08dd3b-726d-3b1b-9db7-eddb21773817@kernel.org>
+ <640715e60e92583d08568a604c0ebb215271d99f.camel@redhat.com>
+ <8f5d2cae-17a2-f75d-7659-647d0691083b@kernel.org> <ZNKQdLAXgfVQxtxP@d3>
+ <32d40b75d5589b73e17198eb7915c546ea3ff9b1.camel@redhat.com>
+ <cc91aa7d-0707-b64f-e7a9-f5ce97d4f313@6wind.com> <ZQGG8xqt8m3IHS4z@Laptop-X1>
+ <e2b57bea-fb14-cef4-315a-406f0d3a7e4f@6wind.com>
+ <767a9486-6734-6113-9346-f4bef04370f0@kernel.org>
+ <a4003473-6809-db97-3d06-cec8e08c6ed6@6wind.com>
+Organization: 6WIND
+In-Reply-To: <a4003473-6809-db97-3d06-cec8e08c6ed6@6wind.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 179874 [Sep 14 2023]
-X-KSMG-AntiSpam-Version: 5.9.59.0
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 530 530 ecb1547b3f72d1df4c71c0b60e67ba6b4aea5432, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;salutedevices.com:7.1.1;127.0.0.199:7.1.2;lore.kernel.org:7.1.1;100.64.160.123:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2023/09/14 12:07:00
-X-KSMG-LinksScanning: Clean, bases: 2023/09/14 12:07:00
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/09/14 11:07:00 #21890594
-X-KSMG-AntiVirus-Status: Clean, skipped
+
+Le 13/09/2023 à 16:53, Nicolas Dichtel a écrit :
+> Le 13/09/2023 à 16:43, David Ahern a écrit :
+>> On 9/13/23 8:11 AM, Nicolas Dichtel wrote:
+>>> The compat_mode was introduced for daemons that doesn't support the nexthop
+>>> framework. There must be a notification (RTM_DELROUTE) when a route is deleted
+>>> due to a carrier down event. Right now, the backward compat is broken.
+>>
+>> The compat_mode is for daemons that do not understand the nexthop id
+>> attribute, and need the legacy set of attributes for the route - i.e,
+> Yes, it's my point.
+> On my system, one daemon understands and configures nexthop id and another one
+> doesn't understand nexthop id. This last daemon removes routes when an interface
+> is put down but not when the carrier is lost.
+> The kernel doc [1] says:
+> 	Further, updates or deletes of a nexthop configuration generate route
+> 	notifications for each fib entry using the nexthop.
+> So, my understanding is that a RTM_DELROUTE msg should be sent when a nexthop is
+> removed due to a carrier lost event.
+> 
+> [1]
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/networking/ip-sysctl.rst#n2116
+
+I dug a bit more about these (missing) notifications. I will try to describe
+what should be done for cases where there is no notification:
+
+When an interface is set down:
+ - the single (!multipath) routes associated with this interface should be
+   removed;
+ - for multipath routes:
+   + if all nh use this interface: the routes are deleted;
+   + if only some nh uses this interface :
+     ~ if all other nh already point to a down interface: the routes are deleted;
+     ~ if at least one nh points to an up interface:
+       o the nh are *temporarily* disabled if it's a plain nexthop;
+       o the nh is *definitely* removed if it's a nexthop object;
+When the interface is set up later, disabled nh are restored (ie only plain
+nexthop of multipath routes).
+
+When an interface loses its carrier:
+ - for routes using plain nexthop: nothing happens;
+ - for routes using nexthop objects:
+   + for single routes: they are deleted;
+   + for multipath routes, the nh is definitely removed if it's a nexthop
+     object (ie the route is deleted if there is no other nexthop in the group);
+When an interface recovers its carrier, there is nothing to do.
+
+When the last ipv4 address of an interface is removed:
+ - for routes using nexthop objects: nothing happens;
+ - for routes using plain nexthop: the same rules as 'interface down' applies.
+When an ipv4 address is added again on the interface, disabled nh are restored
+(ie only plain nexthop of multipath routes).
+
+I bet I miss some cases.
+
+Conclusions:
+ - legacy applications (that are not aware of nexthop objects) cannot maintain a
+   routing cache (even with compat_mode enabled);
+ - fixing only the legacy applications (aka compat_mode) seems too
+   complex;
+ - even if an application is aware of nexthop objects, the rules to maintain a
+   cache are far from obvious.
+
+I don't understand why there is so much reluctance to not send a notification
+when a route is deleted. This would fix all cases.
+I understand that the goal was to save netlink traffic, but in this case, the
+daemons that are interested in maintaining a routing cache have to fully parse
+their cache to mark/remove routes. For big routing tables, this will cost a lot
+of cpu, so I wonder if it's really a gain for the system. On such systems, there
+is probably more than one daemon in this case, so even more cpu to spend for
+these operations.
+
+As Thomas said, this discussion has come up for more than a decade. And with the
+nexthop objects support, it's even more complex. There is obviously something to do.
+
+At least, I would have expected an RTM_DELNEXTHOP msg for each deleted nexthop.
+But this wouldn't solve the routing cache sync for legacy applications.
 
 
-
-On 14.09.2023 18:34, Stefano Garzarella wrote:
-> On Thu, Sep 14, 2023 at 05:05:17PM +0300, Arseniy Krasnov wrote:
->> Hello Stefano,
->>
->> On 14.09.2023 17:07, Stefano Garzarella wrote:
->>> Hi Arseniy,
->>>
->>> On Mon, Sep 11, 2023 at 11:22:30PM +0300, Arseniy Krasnov wrote:
->>>> Hello,
->>>>
->>>> this patchset is first of three parts of another big patchset for
->>>> MSG_ZEROCOPY flag support:
->>>> https://lore.kernel.org/netdev/20230701063947.3422088-1-AVKrasnov@sberdevices.ru/
->>>>
->>>> During review of this series, Stefano Garzarella <sgarzare@redhat.com>
->>>> suggested to split it for three parts to simplify review and merging:
->>>>
->>>> 1) virtio and vhost updates (for fragged skbs) <--- this patchset
->>>> 2) AF_VSOCK updates (allows to enable MSG_ZEROCOPY mode and read
->>>>   tx completions) and update for Documentation/.
->>>> 3) Updates for tests and utils.
->>>>
->>>> This series enables handling of fragged skbs in virtio and vhost parts.
->>>> Newly logic won't be triggered, because SO_ZEROCOPY options is still
->>>> impossible to enable at this moment (next bunch of patches from big
->>>> set above will enable it).
->>>>
->>>> I've included changelog to some patches anyway, because there were some
->>>> comments during review of last big patchset from the link above.
->>>
->>> Thanks, I left some comments on patch 4, the others LGTM.
->>> Sorry to not having spotted them before, but moving
->>> virtio_transport_alloc_skb() around the file, made the patch a little
->>> confusing and difficult to review.
->>
->> Sure, no problem, I'll fix them! Thanks for review.
->>
->>>
->>> In addition, I started having failures of test 14 (server: host,
->>> client: guest), so I looked better to see if there was anything wrong,
->>> but it fails me even without this series applied.
->>>
->>> It happens to me intermittently (~30%), does it happen to you?
->>> Can you take a look at it?
->>
->> Yes! sometime ago I also started to get fails of this test, not ~30%,
->> significantly rare, but it depends on environment I guess, anyway I'm going to
->> look at this on the next few days
-> 
-> Maybe it's just a timing issue in the test, indeed we are expecting 8
-> bytes but we received only 3 plus the 2 bytes we received before it
-> seems exactly the same bytes we send with the first
-> `send(fd, HELLO_STR, strlen(HELLO_STR), 0);`
-> 
-> Since it is a stream socket, it could happen, so we should retry
-> the recv() or just use MSG_WAITALL.
-> 
-> Applying the following patch fixed the issue for me (15 mins without
-> errors for now):
-> 
-> diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-> index 90718c2fd4ea..7b0fed9fc58d 100644
-> --- a/tools/testing/vsock/vsock_test.c
-> +++ b/tools/testing/vsock/vsock_test.c
-> @@ -1129,7 +1129,7 @@ static void test_stream_virtio_skb_merge_server(const struct test_opts *opts)
->         control_expectln("SEND0");
-> 
->         /* Read skbuff partially. */
-> -       res = recv(fd, buf, 2, 0);
-> +       res = recv(fd, buf, 2, MSG_WAITALL);
->         if (res != 2) {
->                 fprintf(stderr, "expected recv(2) returns 2 bytes, got %zi\n", res);
->                 exit(EXIT_FAILURE);
-> @@ -1138,7 +1138,7 @@ static void test_stream_virtio_skb_merge_server(const struct test_opts *opts)
->         control_writeln("REPLY0");
->         control_expectln("SEND1");
-> 
-> -       res = recv(fd, buf + 2, sizeof(buf) - 2, 0);
-> +       res = recv(fd, buf + 2, 8, MSG_WAITALL);
->         if (res != 8) {
->                 fprintf(stderr, "expected recv(2) returns 8 bytes, got %zi\n", res);
->                 exit(EXIT_FAILURE);
-> 
-> I will check better all the cases and send a patch upstream.
-
-Agree, I think this will fix it!
-
-Thanks, Arseniy
-
-> 
-> Anyway it looks just an issue in our test suite :-)
-> 
-> Stefano
-> 
->>
->> Thanks, Arseniy
->>
->>>
->>> host$ ./vsock_test --mode=server --control-port=12345 --peer-cid=4
->>> ...
->>> 14 - SOCK_STREAM virtio skb merge...expected recv(2) returns 8 bytes, got 3
->>>
->>> guest$ ./vsock_test --mode=client --control-host=192.168.133.2 --control-port=12345 --peer-cid=2
->>>
->>> Thanks,
->>> Stefano
->>>
->>
-> 
+Regards,
+Nicolas
 
