@@ -1,169 +1,359 @@
-Return-Path: <netdev+bounces-33716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F8D279F63E
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 03:20:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7C5479F686
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 03:52:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDB981C20C62
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 01:20:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7A201C20970
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 01:52:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF470381;
-	Thu, 14 Sep 2023 01:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90C2839A;
+	Thu, 14 Sep 2023 01:52:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B02D6369
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 01:20:23 +0000 (UTC)
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2109.outbound.protection.outlook.com [40.107.96.109])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F4971713
-	for <netdev@vger.kernel.org>; Wed, 13 Sep 2023 18:20:23 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Zm+42v+fotBA+ceF2P21DjAv1NFHMV96UzpzL/WYmPg8Vg5b69QomCJc+fp5ltRub/2bGF10HQqfUG3tgc97h7OotX/2ezWTuGAjauiXEqgpSI0IsMaoRm9bGEXuQfu1rwDzRSk8/qDPJglTIkWvqTzL5xurhouty2Ua35wzPSFW6eC9ByjEvZWVpKwXe5x96QknxIdSjSxfPKhBxJr8d8xgjuENekntqztieaAhSjdAHR6T3GT3rwQlMkSqatB5wngrzag7b+wcjIhfrR2cLr/Ku7ZAfRfFwatW5zcm9qF96Kj46eriv8LT7z0kKsRyvxhu6F0+WsfkmjheECnWGA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1OvCrPMOi0igI56lr7655XAqPElIQRlhtCLZhMJdIGk=;
- b=eum0HdUbQA/P7pSDP+QKe+aqt263XJhPe65yJx/dkFNjpAqV4m+pstW7P5+s7TvZ+Um03MQ5u9xUuf8ysOQ/bMMk6XM8LM4tAp4ZwIFZmeL6u3f5XUKoagIa2P1TqN3dQLyxLEnCSj2LDYnDSFLtZR2nuC8WU7U33YoN6LYpoz4C8X7jKIehcV2EkwGPvBYjuYWvJyw4uFUn6pcw5Wx21TOeX7H/W8UsNrDUHIIUaHEcwTL3F6Co1Hhf5rDxvgthbP8CVAvrX+5B0IAO/ZDr90fY/kuqRzYHKSejcEMjOTfxOQQsJG78KNoUvN0WPGNZ9K0xObsuK/nxY4U2rxYbXA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=alexbal.com; dmarc=pass action=none header.from=alexbal.com;
- dkim=pass header.d=alexbal.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alexbal.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1OvCrPMOi0igI56lr7655XAqPElIQRlhtCLZhMJdIGk=;
- b=UttbHbTlCLe8p3u+oN9fUuiqGLBkRrfbllDUi9VWvQnHlbpRMYsblCO9kMGWCW9PbQEzbeCBL1vpIWw/nEPV23hiIpCyXpEr0GvBbpu1Zq03ugn0uASP8NraQIrzs2U9LfCr78I5D2VsCFUcUOi0QhoMgwO9sphu/F7BR8/b2cg=
-Received: from MN2PR18MB2574.namprd18.prod.outlook.com (2603:10b6:208:a9::23)
- by SN7PR18MB5387.namprd18.prod.outlook.com (2603:10b6:806:2ea::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.20; Thu, 14 Sep
- 2023 01:20:20 +0000
-Received: from MN2PR18MB2574.namprd18.prod.outlook.com
- ([fe80::ea10:7d82:526:13c]) by MN2PR18MB2574.namprd18.prod.outlook.com
- ([fe80::ea10:7d82:526:13c%5]) with mapi id 15.20.6768.036; Thu, 14 Sep 2023
- 01:20:20 +0000
-From: Alex Balcanquall <alex@alexbal.com>
-To: Jiri Pirko <jiri@resnulli.us>, Mika Westerberg
-	<mika.westerberg@linux.intel.com>
-CC: Michael Jamet <michael.jamet@intel.com>, Yehezkel Bernat
-	<YehezkelShB@gmail.com>, "David S . Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH v2] net: thunderbolt: Fix TCPv6 GSO checksum calculation
-Thread-Topic: [PATCH v2] net: thunderbolt: Fix TCPv6 GSO checksum calculation
-Thread-Index: AQHZ5gLomj8+92Y3+UuCabgCtdFTRrAYYicAgAEk3PM=
-Date: Thu, 14 Sep 2023 01:20:20 +0000
-Message-ID:
- <MN2PR18MB2574E41CCCBA6CD612D8AFE6DAF7A@MN2PR18MB2574.namprd18.prod.outlook.com>
-References: <20230913052647.407420-1-mika.westerberg@linux.intel.com>
- <ZQFp+vdoedzshCpZ@nanopsycho>
-In-Reply-To: <ZQFp+vdoedzshCpZ@nanopsycho>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=alexbal.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN2PR18MB2574:EE_|SN7PR18MB5387:EE_
-x-ms-office365-filtering-correlation-id: 63de2077-2355-4a17-832d-08dbb4c0c313
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- FgF3L2OyzhnIhhgvKkB/afx6Es+aDgd6wu+uzRujKma7uB/AW0Vs6PtXTkHRk6SqGaZR3MyYVNzUm9AEcdwzuDX2WVexTbWR2lLK+RgO/QuhAoUZ+HsavhrKFYBwmYKaPq7dkFlufe9Rd4DWEMJVdFUdp8DbzCtAXvn8mB2/vpUng9A+xAos5mauqQ7k/yfh53JnYRprwX9/t1mwrpUrF+I/u7svd2EXXctr8MK2SxjFvT0h775r4/mwM5fGVY28Cxv4AcodAG8nBzXnhF70fT2MbXUDHsH9FkHIAdlUknqyHwsfn/KC0vf4tAAtt0cwPRwyliM97SYYS3lbk8ik0Z41cfAVV2W9runcneLPIe8Z3C1/Kl1FRzcg78s5SsQKEfut2g7ORBvwMUccOFW+6RZzPHJ7OClp1wj2eLvi7M1KMckNTQqbPs6rgXH+Kvy4j0yKrrxiaUIPyDawAwk0s5WjWMf1gqCFd0SAmvhtBoabj2ORfGbLiRe3jNyoO234FGY/+miaA3SUUhOYkFUpfurzfmKVvkczCkmawaE2anAhDCwtKK8PL+nJRRvcV9un4mRVtngYg/ftuioNz8Vjm/G4aDHPQRtx7JGzPFJiHWc=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR18MB2574.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(376002)(396003)(346002)(39830400003)(366004)(1800799009)(186009)(451199024)(64756008)(66946007)(54906003)(52536014)(76116006)(4326008)(5660300002)(41300700001)(38100700002)(38070700005)(66556008)(66446008)(316002)(91956017)(110136005)(66476007)(6506007)(7696005)(53546011)(2906002)(8936002)(8676002)(9686003)(478600001)(122000001)(71200400001)(86362001)(33656002)(55016003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?psGLnk58yhoZ69HgLtCAUa4w4bUUK7py4SnXtUXslWLvsRxkjzv8dRwGi3?=
- =?iso-8859-1?Q?KjSKNx5bBnColGmt6S8xphHYAojHoN6RumbVU5zUOIepPFvewHVhfUu43I?=
- =?iso-8859-1?Q?Da45XLNtSggIm2dfJqJHe/tMveiklqZXRoRYng6BaHXIoXUSZLLbZnjhBe?=
- =?iso-8859-1?Q?OvWmmewY1HmcQZIEKedK6P03FI/f51OWltAIc/+1dnkChA6iB86Xyl9Wua?=
- =?iso-8859-1?Q?WmGYv5+22B5muDXWrwSt2kj5RhAKXdjXJVZj87/YVhSixE0o4pi8IcxK26?=
- =?iso-8859-1?Q?V6CMmoBD7knlPfoOTiGbaD+diy8ptzrQUt7MFJEJtZBbb8Ar8Kt/ofW/YC?=
- =?iso-8859-1?Q?Tl/qP+0ivp0uTGKdVKOroWpbi0vXfNnQdvFnayNHNBxRT8FOUEzY02rka1?=
- =?iso-8859-1?Q?PhM00effkiqquDl8BHljSbnHL0MkWUVZ1qyJcrHukS6EmbnxPCWbxVQRY/?=
- =?iso-8859-1?Q?lsy5YIS6wwsJZqqgCnan1MB26ho+02dc7vsYkuv+RxeSiNQ9m4kacVwQq6?=
- =?iso-8859-1?Q?VllAlr8As5r+EXibo4bN7+ZblQaIg+4pJgPqF0IQRa6SY2u7xOAN24+6RH?=
- =?iso-8859-1?Q?SBOP2XhdP0odN1BSXJN8rtLi8266CWRZJ93/8ZbWfM4kdtMtwS/6vfOVz9?=
- =?iso-8859-1?Q?Qdt7TSg/Ftq3D5yfYvfqwIBfjXDMRikR8lh9DorsAk+/1MXTAiYnofk5lG?=
- =?iso-8859-1?Q?bi5nrohhsN5J7ECu061Uaje81JUDI5aqGuyLbbWAvvRZiGJfu7Wnqy7r/N?=
- =?iso-8859-1?Q?LsbP84zbh1Vm7CujHhrqCN6ej6Jja/4Z9Dsn5sReKwcIi8BjJ7CWz6m+53?=
- =?iso-8859-1?Q?oJ1xy6Y6wuNl3nd9M/pZd4YYchuGiqZDhYzoX/kD2JuWfhTfxuQ0HVSQhq?=
- =?iso-8859-1?Q?PEEQ1zUJKF33Su6Sz8xeGCet0ihNTaODGmUd5oLLEWVDJWEt7pRkDfu+/l?=
- =?iso-8859-1?Q?Kd/rr9NzDneYJmEHCRsoGnhZjU3K/b30xRYrGBjGmLQwfIFJabI5QWOQQK?=
- =?iso-8859-1?Q?1c0/J1lVaB3B0XzHT+gXJk6iNrQFYrjyBoB3K7hbcsItdQVMlPevlS/rxU?=
- =?iso-8859-1?Q?8w91161YnAwIIrmX2kEOXM0L171O5dN06uojnOeOBz531gXiJ/1QkljlfK?=
- =?iso-8859-1?Q?V/+cCD0CpLTV/omQVklxoQxsHvA0l0B0ibzWFUVg4Sid8dDqkIqZbay/YZ?=
- =?iso-8859-1?Q?dfAr3emQcF4zb2FI0cJ8b0BnyaEk33st1gYeR5cYQpsWWh56bSYvqxW2os?=
- =?iso-8859-1?Q?immmZsM4UGN4dhbKmsBHYEA7xc3GBqZdTLAhArfEJEOjFQg4r9tjY+wzrM?=
- =?iso-8859-1?Q?bjI/0QQ0bMB6TlqnT8mgoqHeEaO94l0SBn4MyEQq97ktxnMFP+UywuuSXR?=
- =?iso-8859-1?Q?Uqty0ydMqaTFz9enfzk9Y1eohmO5J6JIHBxHHrQdwO4RiUB5sQfxhg3yMe?=
- =?iso-8859-1?Q?Rb2RMY23jWJGX3mcLGIMPOfCJj6Hgaohhc8z5fdAIl9eyPyAbLsMPgkSiA?=
- =?iso-8859-1?Q?A4Ikagh7WlEkkzAlV8Tep7ENSmzWTq56OMKEskOywgQELSpFVPwJf1MLE7?=
- =?iso-8859-1?Q?hNqo2dgH7ZawqaDnEw/LV4DgFyttYA4NqCcocL1/vUIDq5dAfF8qTx2ToH?=
- =?iso-8859-1?Q?MurIpaZFYKwu+TCSWcxyRTwE5L/9SydTMRLIUdenxVXMyPX57t6JmDL+WX?=
- =?iso-8859-1?Q?fp1dlWub4g4RK6xz+mU=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79806369;
+	Thu, 14 Sep 2023 01:52:19 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86A981BCB;
+	Wed, 13 Sep 2023 18:52:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=HNvqcEWlMU3EPaKK9ImgwxBsLqZDc2lFEhBU3jjKaNs=; b=Jk+V0B3fVUj1DzTHB8GqgsLNGO
+	QHWD2H9fADWe9PyD5AaXhtkIJ1LpwbrU1YKIAFPBzsBGu/8Lmh5yWWX8l7X7IwrAs2/zoWxHRzYwA
+	1fOaiIUNkS/nReSjls2qeM5/ohTblXhJj3gKb/pTk+nUPyoTWH1ZsPqUthfZa29ydHiI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qgbWL-006M6V-NN; Thu, 14 Sep 2023 03:51:53 +0200
+Date: Thu, 14 Sep 2023 03:51:53 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	corbet@lwn.net, steen.hegelund@microchip.com, rdunlap@infradead.org,
+	horms@kernel.org, casper.casan@gmail.com, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, horatiu.vultur@microchip.com,
+	Woojung.Huh@microchip.com, Nicolas.Ferre@microchip.com,
+	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com
+Subject: Re: [RFC PATCH net-next 5/6] microchip: lan865x: add driver support
+ for Microchip's LAN865X MACPHY
+Message-ID: <d1ffe3b1-d078-4f39-a263-c09dec6c4169@lunn.ch>
+References: <20230908142919.14849-1-Parthiban.Veerasooran@microchip.com>
+ <20230908142919.14849-6-Parthiban.Veerasooran@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: alexbal.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR18MB2574.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 63de2077-2355-4a17-832d-08dbb4c0c313
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Sep 2023 01:20:20.2073
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 2147ca43-2fb1-4d60-b704-b17158b27b0e
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: NONzDM+Q/Q7w0EGbacrFWDj+LjIgibaoGvkJcVrxlfX0C7PjVyQUxMCeu8L23QDlWZ1/dyQPZ1MxCmqbaaCafg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR18MB5387
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230908142919.14849-6-Parthiban.Veerasooran@microchip.com>
 
-Thanks, the v2 patch worked perfectly on my 3 test machines.=0A=
-=0A=
-=0A=
-=0A=
-=0A=
-From: Jiri Pirko <jiri@resnulli.us>=0A=
-Sent: Wednesday, September 13, 2023 12:51 AM=0A=
-To: Mika Westerberg <mika.westerberg@linux.intel.com>=0A=
-Cc: Michael Jamet <michael.jamet@intel.com>; Yehezkel Bernat <YehezkelShB@g=
-mail.com>; David S . Miller <davem@davemloft.net>; Eric Dumazet <edumazet@g=
-oogle.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.co=
-m>; Alex Balcanquall <alex@alexbal.com>; netdev@vger.kernel.org <netdev@vge=
-r.kernel.org>=0A=
-Subject: Re: [PATCH v2] net: thunderbolt: Fix TCPv6 GSO checksum calculatio=
-n =0A=
-=A0=0A=
-Wed, Sep 13, 2023 at 07:26:47AM CEST, mika.westerberg@linux.intel.com wrote=
-:=0A=
->Alex reported that running ssh over IPv6 does not work with=0A=
->Thunderbolt/USB4 networking driver. The reason for that is that driver=0A=
->should call skb_is_gso() before calling skb_is_gso_v6(), and it should=0A=
->not return false after calculates the checksum successfully. This probably=
-=0A=
->was a copy paste error from the original driver where it was done properly=
-.=0A=
->=0A=
->Reported-by: Alex Balcanquall <alex@alexbal.com>=0A=
->Fixes: e69b6c02b4c3 ("net: Add support for networking over Thunderbolt cab=
-le")=0A=
->Cc: stable@vger.kernel.org=0A=
-=0A=
-Interesting, it is not actually cced. No need to do it anyway.=0A=
-=0A=
-=0A=
->Signed-off-by: Mika Westerberg <mika.westerberg@linux.intel.com>=0A=
-=0A=
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>=
+> +#define DRV_VERSION		"0.1"
+
+This is pointless. The ethtool code will fill in the git hash which is
+a much more useful value to have.
+
+> +static void lan865x_handle_link_change(struct net_device *netdev)
+> +{
+> +	struct lan865x_priv *priv = netdev_priv(netdev);
+> +
+> +	phy_print_status(priv->phydev);
+> +}
+> +
+> +static int lan865x_mdiobus_read(struct mii_bus *bus, int phy_id, int idx)
+> +{
+> +	struct lan865x_priv *priv = bus->priv;
+> +	u32 regval;
+> +	bool ret;
+> +
+> +	ret = oa_tc6_read_register(priv->tc6, 0xFF00 | (idx & 0xFF), &regval, 1);
+> +	if (ret)
+> +		return -ENODEV;
+> +
+> +	return regval;
+> +}
+> +
+> +static int lan865x_mdiobus_write(struct mii_bus *bus, int phy_id, int idx,
+> +				 u16 regval)
+> +{
+> +	struct lan865x_priv *priv = bus->priv;
+> +	u32 value = regval;
+> +	bool ret;
+> +
+> +	ret = oa_tc6_write_register(priv->tc6, 0xFF00 | (idx & 0xFF), &value, 1);
+> +	if (ret)
+> +		return -ENODEV;
+> +
+> +	return 0;
+> +}
+> +
+> +static int lan865x_phy_init(struct lan865x_priv *priv)
+> +{
+> +	int ret;
+> +
+> +	priv->mdiobus = mdiobus_alloc();
+> +	if (!priv->mdiobus) {
+> +		netdev_err(priv->netdev, "MDIO bus alloc failed\n");
+> +		return -ENODEV;
+> +	}
+> +
+> +	priv->mdiobus->phy_mask = ~(u32)BIT(1);
+> +	priv->mdiobus->priv = priv;
+> +	priv->mdiobus->read = lan865x_mdiobus_read;
+> +	priv->mdiobus->write = lan865x_mdiobus_write;
+
+The MDIO bus is part of the standard. So i would expect this to be in
+the library. From what i remember, there are two different ways to
+implement MDIO, either via the PHY registers being directly mapped
+into the register space, or indirect like this. And i think there is a
+status bit somewhere which tells you which is implemented? So please
+move this code into the library, but check the status bit and return
+ENODEV if the silicon does not actually implement this access method.
+
+> +static int
+> +lan865x_set_link_ksettings(struct net_device *netdev,
+> +			   const struct ethtool_link_ksettings *cmd)
+> +{
+> +	struct lan865x_priv *priv = netdev_priv(netdev);
+> +	int ret = 0;
+> +
+> +	if (cmd->base.autoneg != AUTONEG_DISABLE ||
+> +	    cmd->base.speed != SPEED_10 || cmd->base.duplex != DUPLEX_HALF) {
+> +		if (netif_msg_link(priv))
+> +			netdev_warn(netdev, "Unsupported link setting");
+> +		ret = -EOPNOTSUPP;
+> +	} else {
+> +		if (netif_msg_link(priv))
+> +			netdev_warn(netdev, "Hardware must be disabled to set link mode");
+> +		ret = -EBUSY;
+> +	}
+> +	return ret;
+
+I would expect to see a call to phy_ethtool_ksettings_set()
+here. phylib should be able to do some of the validation.
+
+> +}
+> +
+> +static int
+> +lan865x_get_link_ksettings(struct net_device *netdev,
+> +			   struct ethtool_link_ksettings *cmd)
+> +{
+> +	ethtool_link_ksettings_zero_link_mode(cmd, supported);
+> +	ethtool_link_ksettings_add_link_mode(cmd, supported, 10baseT_Half);
+> +	ethtool_link_ksettings_add_link_mode(cmd, supported, TP);
+> +
+> +	cmd->base.speed = SPEED_10;
+> +	cmd->base.duplex = DUPLEX_HALF;
+> +	cmd->base.port	= PORT_TP;
+> +	cmd->base.autoneg = AUTONEG_DISABLE;
+> +
+> +	return 0;
+
+phy_ethtool_ksettings_get().
+
+I also think this can be moved along with the MDIO bus and PHY
+handling into the library.
+
+> +static int lan865x_set_mac_address(struct net_device *netdev, void *addr)
+> +{
+> +	struct sockaddr *address = addr;
+> +
+> +	if (netif_running(netdev))
+> +		return -EBUSY;
+> +	if (!is_valid_ether_addr(address->sa_data))
+> +		return -EADDRNOTAVAIL;
+
+Does the core allow an invalid MAC address be passed to the driver?
+
+> +
+> +	eth_hw_addr_set(netdev, address->sa_data);
+> +	return lan865x_set_hw_macaddr(netdev);
+> +}
+> +
+> +static u32 lan865x_hash(u8 addr[ETH_ALEN])
+> +{
+> +	return (ether_crc(ETH_ALEN, addr) >> 26) & 0x3f;
+> +}
+> +
+> +static void lan865x_set_multicast_list(struct net_device *netdev)
+> +{
+> +	struct lan865x_priv *priv = netdev_priv(netdev);
+> +	u32 regval = 0;
+> +
+> +	if (netdev->flags & IFF_PROMISC) {
+> +		/* Enabling promiscuous mode */
+> +		regval |= MAC_PROMISCUOUS_MODE;
+> +		regval &= (~MAC_MULTICAST_MODE);
+> +		regval &= (~MAC_UNICAST_MODE);
+> +	} else if (netdev->flags & IFF_ALLMULTI) {
+> +		/* Enabling all multicast mode */
+> +		regval &= (~MAC_PROMISCUOUS_MODE);
+> +		regval |= MAC_MULTICAST_MODE;
+> +		regval &= (~MAC_UNICAST_MODE);
+> +	} else if (!netdev_mc_empty(netdev)) {
+> +		/* Enabling specific multicast addresses */
+> +		struct netdev_hw_addr *ha;
+> +		u32 hash_lo = 0;
+> +		u32 hash_hi = 0;
+> +
+> +		netdev_for_each_mc_addr(ha, netdev) {
+> +			u32 bit_num = lan865x_hash(ha->addr);
+> +			u32 mask = 1 << (bit_num & 0x1f);
+> +
+> +			if (bit_num & 0x20)
+> +				hash_hi |= mask;
+> +			else
+> +				hash_lo |= mask;
+> +		}
+> +		if (oa_tc6_write_register(priv->tc6, REG_MAC_HASHH, &hash_hi, 1)) {
+> +			if (netif_msg_timer(priv))
+> +				netdev_err(netdev, "Failed to write reg_hashh");
+> +			return;
+> +		}
+> +		if (oa_tc6_write_register(priv->tc6, REG_MAC_HASHL, &hash_lo, 1)) {
+> +			if (netif_msg_timer(priv))
+> +				netdev_err(netdev, "Failed to write reg_hashl");
+> +			return;
+> +		}
+> +		regval &= (~MAC_PROMISCUOUS_MODE);
+> +		regval &= (~MAC_MULTICAST_MODE);
+> +		regval |= MAC_UNICAST_MODE;
+> +	} else {
+> +		/* enabling local mac address only */
+> +		if (oa_tc6_write_register(priv->tc6, REG_MAC_HASHH, &regval, 1)) {
+> +			if (netif_msg_timer(priv))
+> +				netdev_err(netdev, "Failed to write reg_hashh");
+> +			return;
+> +		}
+> +		if (oa_tc6_write_register(priv->tc6, REG_MAC_HASHL, &regval, 1)) {
+> +			if (netif_msg_timer(priv))
+> +				netdev_err(netdev, "Failed to write reg_hashl");
+> +			return;
+> +		}
+> +	}
+> +	if (oa_tc6_write_register(priv->tc6, REG_MAC_NW_CONFIG, &regval, 1)) {
+> +		if (netif_msg_timer(priv))
+> +			netdev_err(netdev, "Failed to enable promiscuous mode");
+> +	}
+> +}
+> +
+> +static netdev_tx_t lan865x_send_packet(struct sk_buff *skb,
+> +				       struct net_device *netdev)
+> +{
+> +	struct lan865x_priv *priv = netdev_priv(netdev);
+> +
+> +	return oa_tc6_send_eth_pkt(priv->tc6, skb);
+> +}
+> +
+> +static int lan865x_hw_disable(struct lan865x_priv *priv)
+> +{
+> +	u32 regval = NW_DISABLE;
+> +
+> +	if (oa_tc6_write_register(priv->tc6, REG_MAC_NW_CTRL, &regval, 1))
+> +		return -ENODEV;
+> +
+> +	return 0;
+> +}
+> +
+> +static int lan865x_net_close(struct net_device *netdev)
+> +{
+> +	struct lan865x_priv *priv = netdev_priv(netdev);
+> +	int ret;
+> +
+> +	netif_stop_queue(netdev);
+> +	ret = lan865x_hw_disable(priv);
+> +	if (ret) {
+> +		if (netif_msg_ifup(priv))
+> +			netdev_err(netdev, "Failed to disable the hardware\n");
+> +		return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int lan865x_hw_enable(struct lan865x_priv *priv)
+> +{
+> +	u32 regval = NW_TX_STATUS | NW_RX_STATUS;
+> +
+> +	if (oa_tc6_write_register(priv->tc6, REG_MAC_NW_CTRL, &regval, 1))
+> +		return -ENODEV;
+> +
+> +	return 0;
+> +}
+> +
+> +static int lan865x_net_open(struct net_device *netdev)
+> +{
+> +	struct lan865x_priv *priv = netdev_priv(netdev);
+> +	int ret;
+> +
+> +	if (!is_valid_ether_addr(netdev->dev_addr)) {
+> +		if (netif_msg_ifup(priv))
+> +			netdev_err(netdev, "Invalid MAC address %pm", netdev->dev_addr);
+> +		return -EADDRNOTAVAIL;
+
+Using a random MAC address is the normal workaround for not having a
+valid MAC address via OTP flash etc.
+
+
+> +static int lan865x_get_dt_data(struct lan865x_priv *priv)
+> +{
+> +	struct spi_device *spi = priv->spi;
+> +	int ret;
+> +
+> +	if (of_property_present(spi->dev.of_node, "oa-chunk-size")) {
+> +		ret = of_property_read_u32(spi->dev.of_node, "oa-chunk-size",
+> +					   &priv->cps);
+> +		if (ret < 0)
+> +			return ret;
+> +	} else {
+> +		priv->cps = 64;
+> +		dev_info(&spi->dev, "Property oa-chunk-size is not found in dt and proceeding with the size 64\n");
+> +	}
+> +
+> +	if (of_property_present(spi->dev.of_node, "oa-tx-cut-through"))
+> +		priv->txcte = true;
+> +	else
+> +		dev_info(&spi->dev, "Property oa-tx-cut-through is not found in dt and proceeding with tx store and forward mode\n");
+
+Please remove all these dev_info() prints. The device tree binding
+should make it clear what the defaults are when not specified in DT.
+
+> +
+> +	if (of_property_present(spi->dev.of_node, "oa-rx-cut-through"))
+> +		priv->rxcte = true;
+> +	else
+> +		dev_info(&spi->dev, "Property oa-rx-cut-through is not found in dt and proceeding with rx store and forward mode\n");
+> +
+> +	if (of_property_present(spi->dev.of_node, "oa-protected"))
+> +		priv->protected = true;
+> +	else
+> +		dev_info(&spi->dev, "Property oa-protected is not found in dt and proceeding with protection enabled\n");
+
+Which of these are proprietary properties, and which are part of the
+standard? Please move parsing all the standard properties into the
+library.
+
+> +static int lan865x_probe(struct spi_device *spi)
+> +{
+
+...
+
+> +
+> +	phy_start(priv->phydev);
+> +	return 0;
+
+phy_start() is normally done in open, not probe.
+
+	    Andrew
 
