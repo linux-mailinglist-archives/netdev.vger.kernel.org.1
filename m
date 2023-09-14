@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-33975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39B497A10A8
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 00:16:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE5627A10BA
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 00:16:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 502801C213A3
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 22:16:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A27F282777
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 22:16:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB9DF273EC;
-	Thu, 14 Sep 2023 22:15:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E759273C7;
+	Thu, 14 Sep 2023 22:15:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86A0D10A0C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02B6F26E3C
 	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 22:15:42 +0000 (UTC)
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id DB80B2715
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 15:15:41 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5CAE22719
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 15:15:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1694729740;
+	s=mimecast20190719; t=1694729741;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=4ut+h9nLVtpMfUa14begCRaPNr+Lp71R8/RKDVqE44g=;
-	b=OBZFqBz2xQ+sjLanNeqGbJKMxYG4DXaxg/2gdSBp8Uivg8x2Yzaz5DJqS2DZIJBFHaJlu/
-	K5TivYa3nVleGAsxHFomRfnKl52kx8pryfQS2jcIXW0NtYMkOpU7KtW+40OYWGwuwpZ/Zc
-	1aG3KcQ9l6CRwco9o39atq9DRd1vAgk=
+	bh=CMlwmXq8j0rs4LEdDpXfVHzrC0kRRfOaExs7WZepjuM=;
+	b=WSAgftEjjNhGbfr8l9Nu8w1W1HHLymWMY0OQKfnw2fFc27l0hwcY0LnWapfi7NAAb7ieM5
+	3PCrYDEI2APPRsTbTlZc13GLynj0jyapjzYhQAe5WjQOSXs04kayWey6W6xwGRWOhsMF3Q
+	l7kM+iSGXEEFmIlhF06NKmw5/H4xb7Y=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-615-Dibw7jBuPtiY53bSfV_A_Q-1; Thu, 14 Sep 2023 18:15:37 -0400
-X-MC-Unique: Dibw7jBuPtiY53bSfV_A_Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+ us-mta-683-hhajP-8pPVuMhR_hSlZ2uQ-1; Thu, 14 Sep 2023 18:15:40 -0400
+X-MC-Unique: hhajP-8pPVuMhR_hSlZ2uQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9C577101B456;
-	Thu, 14 Sep 2023 22:15:36 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8108F101A550;
+	Thu, 14 Sep 2023 22:15:39 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.216])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 3D31410069B4;
-	Thu, 14 Sep 2023 22:15:34 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 3B0877B62;
+	Thu, 14 Sep 2023 22:15:37 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Al Viro <viro@zeniv.linux.org.uk>,
 	Linus Torvalds <torvalds@linux-foundation.org>
@@ -65,9 +65,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	Christian Brauner <brauner@kernel.org>,
 	David Hildenbrand <david@redhat.com>,
 	John Hubbard <jhubbard@nvidia.com>
-Subject: [RFC PATCH 2/9] iov_iter: Consolidate some of the repeated code into helpers
-Date: Thu, 14 Sep 2023 23:15:19 +0100
-Message-ID: <20230914221526.3153402-3-dhowells@redhat.com>
+Subject: [RFC PATCH 3/9] iov_iter: Consolidate the test vector struct in the kunit tests
+Date: Thu, 14 Sep 2023 23:15:20 +0100
+Message-ID: <20230914221526.3153402-4-dhowells@redhat.com>
 In-Reply-To: <20230914221526.3153402-1-dhowells@redhat.com>
 References: <20230914221526.3153402-1-dhowells@redhat.com>
 Precedence: bulk
@@ -77,10 +77,10 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 
-Consolidate some of the repeated code snippets into helper functions to
-reduce the line count.
+Consolidate the test vector struct in the kunit tests so that the bvec
+pattern check helpers can share with the kvec check helpers.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Christoph Hellwig <hch@lst.de>
@@ -96,367 +96,218 @@ cc: kunit-dev@googlegroups.com
 cc: linux-mm@kvack.org
 cc: linux-fsdevel@vger.kernel.org
 ---
- lib/kunit_iov_iter.c | 189 +++++++++++++++++++------------------------
- 1 file changed, 84 insertions(+), 105 deletions(-)
+ lib/kunit_iov_iter.c | 90 ++++++++++++++++++++++++--------------------
+ 1 file changed, 50 insertions(+), 40 deletions(-)
 
 diff --git a/lib/kunit_iov_iter.c b/lib/kunit_iov_iter.c
-index 4a6c0efd33f5..ee586eb652b4 100644
+index ee586eb652b4..4925ca37cde6 100644
 --- a/lib/kunit_iov_iter.c
 +++ b/lib/kunit_iov_iter.c
-@@ -19,18 +19,18 @@ MODULE_AUTHOR("David Howells <dhowells@redhat.com>");
+@@ -18,22 +18,46 @@ MODULE_DESCRIPTION("iov_iter testing");
+ MODULE_AUTHOR("David Howells <dhowells@redhat.com>");
  MODULE_LICENSE("GPL");
  
- struct kvec_test_range {
--	int	from, to;
-+	int	page, from, to;
+-struct kvec_test_range {
++struct iov_kunit_range {
+ 	int	page, from, to;
  };
  
- static const struct kvec_test_range kvec_test_ranges[] = {
--	{ 0x00002, 0x00002 },
--	{ 0x00027, 0x03000 },
--	{ 0x05193, 0x18794 },
--	{ 0x20000, 0x20000 },
--	{ 0x20000, 0x24000 },
--	{ 0x24000, 0x27001 },
--	{ 0x29000, 0xffffb },
--	{ 0xffffd, 0xffffe },
-+	{ 0, 0x00002, 0x00002 },
-+	{ 0, 0x00027, 0x03000 },
-+	{ 0, 0x05193, 0x18794 },
-+	{ 0, 0x20000, 0x20000 },
-+	{ 0, 0x20000, 0x24000 },
-+	{ 0, 0x24000, 0x27001 },
-+	{ 0, 0x29000, 0xffffb },
-+	{ 0, 0xffffd, 0xffffe },
+-static const struct kvec_test_range kvec_test_ranges[] = {
+-	{ 0, 0x00002, 0x00002 },
+-	{ 0, 0x00027, 0x03000 },
+-	{ 0, 0x05193, 0x18794 },
+-	{ 0, 0x20000, 0x20000 },
+-	{ 0, 0x20000, 0x24000 },
+-	{ 0, 0x24000, 0x27001 },
+-	{ 0, 0x29000, 0xffffb },
+-	{ 0, 0xffffd, 0xffffe },
++/*
++ * Ranges that to use in tests where we have address/offset ranges to play
++ * with (ie. KVEC) or where we have a single blob that we can copy
++ * arbitrary chunks of (ie. XARRAY).
++ */
++static const struct iov_kunit_range kvec_test_ranges[] = {
++	{ 0, 0x00002, 0x00002 }, /* Start with an empty range */
++	{ 0, 0x00027, 0x03000 }, /* Midpage to page end */
++	{ 0, 0x05193, 0x18794 }, /* Midpage to midpage */
++	{ 0, 0x20000, 0x20000 }, /* Empty range in the middle */
++	{ 0, 0x20000, 0x24000 }, /* Page start to page end */
++	{ 0, 0x24000, 0x27001 }, /* Page end to midpage */
++	{ 0, 0x29000, 0xffffb }, /* Page start to midpage */
++	{ 0, 0xffffd, 0xffffe }, /* Almost contig to last, ending in same page */
  	{ -1 }
  };
  
-@@ -69,6 +69,57 @@ static void *__init iov_kunit_create_buffer(struct kunit *test,
- 	return buffer;
++/*
++ * Ranges that to use in tests where we have a list of partial pages to
++ * play with (ie. BVEC).
++ */
++static const struct iov_kunit_range bvec_test_ranges[] = {
++	{ 0, 0x0002, 0x0002 }, /* Start with an empty range */
++	{ 1, 0x0027, 0x0893 }, /* Random part of page */
++	{ 2, 0x0193, 0x0794 }, /* Random part of page */
++	{ 3, 0x0000, 0x1000 }, /* Full page */
++	{ 4, 0x0000, 0x1000 }, /* Full page logically contig to last */
++	{ 5, 0x0000, 0x1000 }, /* Full page logically contig to last */
++	{ 6, 0x0000, 0x0ffb }, /* Part page logically contig to last */
++	{ 6, 0x0ffd, 0x0ffe }, /* Part of prev page, but not quite contig */
++	{ -1 }
++};
++
++/*
++ * The pattern to fill with.
++ */
+ static inline u8 pattern(unsigned long x)
+ {
+ 	return x & 0xff;
+@@ -44,6 +68,9 @@ static void iov_kunit_unmap(void *data)
+ 	vunmap(data);
  }
  
 +/*
-+ * Build the reference pattern in the scratch buffer that we expect to see in
-+ * the iterator buffer (ie. the result of copy *to*).
++ * Create a buffer out of some pages and return a vmap'd pointer to it.
 + */
-+static void iov_kunit_build_to_reference_pattern(struct kunit *test, u8 *scratch,
-+						 size_t bufsize,
-+						 const struct kvec_test_range *pr)
-+{
-+	int i, patt = 0;
-+
-+	memset(scratch, 0, bufsize);
-+	for (; pr->page >= 0; pr++)
-+		for (i = pr->from; i < pr->to; i++)
-+			scratch[i] = pattern(patt++);
-+}
-+
-+/*
-+ * Build the reference pattern in the iterator buffer that we expect to see in
-+ * the scratch buffer (ie. the result of copy *from*).
-+ */
-+static void iov_kunit_build_from_reference_pattern(struct kunit *test, u8 *buffer,
-+						   size_t bufsize,
-+						   const struct kvec_test_range *pr)
-+{
-+	size_t i = 0, j;
-+
-+	memset(buffer, 0, bufsize);
-+	for (; pr->page >= 0; pr++) {
-+		for (j = pr->from; j < pr->to; j++) {
-+			buffer[i++] = pattern(j);
-+			if (i >= bufsize)
-+				return;
-+		}
-+	}
-+}
-+
-+/*
-+ * Compare two kernel buffers to see that they're the same.
-+ */
-+static void iov_kunit_check_pattern(struct kunit *test, const u8 *buffer,
-+				    const u8 *scratch, size_t bufsize)
-+{
-+	size_t i;
-+
-+	for (i = 0; i < bufsize; i++) {
-+		KUNIT_EXPECT_EQ_MSG(test, buffer[i], scratch[i], "at i=%x", i);
-+		if (buffer[i] != scratch[i])
-+			return;
-+	}
-+}
-+
- static void __init iov_kunit_load_kvec(struct kunit *test,
+ static void *__init iov_kunit_create_buffer(struct kunit *test,
+ 					    struct page ***ppages,
+ 					    size_t npages)
+@@ -75,7 +102,7 @@ static void *__init iov_kunit_create_buffer(struct kunit *test,
+  */
+ static void iov_kunit_build_to_reference_pattern(struct kunit *test, u8 *scratch,
+ 						 size_t bufsize,
+-						 const struct kvec_test_range *pr)
++						 const struct iov_kunit_range *pr)
+ {
+ 	int i, patt = 0;
+ 
+@@ -91,7 +118,7 @@ static void iov_kunit_build_to_reference_pattern(struct kunit *test, u8 *scratch
+  */
+ static void iov_kunit_build_from_reference_pattern(struct kunit *test, u8 *buffer,
+ 						   size_t bufsize,
+-						   const struct kvec_test_range *pr)
++						   const struct iov_kunit_range *pr)
+ {
+ 	size_t i = 0, j;
+ 
+@@ -124,7 +151,7 @@ static void __init iov_kunit_load_kvec(struct kunit *test,
  				       struct iov_iter *iter, int dir,
  				       struct kvec *kvec, unsigned int kvmax,
-@@ -79,7 +130,7 @@ static void __init iov_kunit_load_kvec(struct kunit *test,
+ 				       void *buffer, size_t bufsize,
+-				       const struct kvec_test_range *pr)
++				       const struct iov_kunit_range *pr)
+ {
+ 	size_t size = 0;
  	int i;
- 
- 	for (i = 0; i < kvmax; i++, pr++) {
--		if (pr->from < 0)
-+		if (pr->page < 0)
- 			break;
- 		KUNIT_ASSERT_GE(test, pr->to, pr->from);
- 		KUNIT_ASSERT_LE(test, pr->to, bufsize);
-@@ -97,13 +148,12 @@ static void __init iov_kunit_load_kvec(struct kunit *test,
-  */
- static void __init iov_kunit_copy_to_kvec(struct kunit *test)
- {
--	const struct kvec_test_range *pr;
- 	struct iov_iter iter;
- 	struct page **spages, **bpages;
- 	struct kvec kvec[8];
- 	u8 *scratch, *buffer;
- 	size_t bufsize, npages, size, copied;
--	int i, patt;
-+	int i;
- 
- 	bufsize = 0x100000;
- 	npages = bufsize / PAGE_SIZE;
-@@ -125,20 +175,8 @@ static void __init iov_kunit_copy_to_kvec(struct kunit *test)
- 	KUNIT_EXPECT_EQ(test, iter.count, 0);
- 	KUNIT_EXPECT_EQ(test, iter.nr_segs, 0);
- 
--	/* Build the expected image in the scratch buffer. */
--	patt = 0;
--	memset(scratch, 0, bufsize);
--	for (pr = kvec_test_ranges; pr->from >= 0; pr++)
--		for (i = pr->from; i < pr->to; i++)
--			scratch[i] = pattern(patt++);
--
--	/* Compare the images */
--	for (i = 0; i < bufsize; i++) {
--		KUNIT_EXPECT_EQ_MSG(test, buffer[i], scratch[i], "at i=%x", i);
--		if (buffer[i] != scratch[i])
--			return;
--	}
--
-+	iov_kunit_build_to_reference_pattern(test, scratch, bufsize, kvec_test_ranges);
-+	iov_kunit_check_pattern(test, buffer, scratch, bufsize);
+@@ -217,28 +244,12 @@ static void __init iov_kunit_copy_from_kvec(struct kunit *test)
  	KUNIT_SUCCEED();
  }
  
-@@ -147,13 +185,12 @@ static void __init iov_kunit_copy_to_kvec(struct kunit *test)
-  */
- static void __init iov_kunit_copy_from_kvec(struct kunit *test)
- {
--	const struct kvec_test_range *pr;
- 	struct iov_iter iter;
- 	struct page **spages, **bpages;
- 	struct kvec kvec[8];
- 	u8 *scratch, *buffer;
- 	size_t bufsize, npages, size, copied;
--	int i, j;
-+	int i;
- 
- 	bufsize = 0x100000;
- 	npages = bufsize / PAGE_SIZE;
-@@ -175,25 +212,8 @@ static void __init iov_kunit_copy_from_kvec(struct kunit *test)
- 	KUNIT_EXPECT_EQ(test, iter.count, 0);
- 	KUNIT_EXPECT_EQ(test, iter.nr_segs, 0);
- 
--	/* Build the expected image in the main buffer. */
--	i = 0;
--	memset(buffer, 0, bufsize);
--	for (pr = kvec_test_ranges; pr->from >= 0; pr++) {
--		for (j = pr->from; j < pr->to; j++) {
--			buffer[i++] = pattern(j);
--			if (i >= bufsize)
--				goto stop;
--		}
--	}
--stop:
+-struct bvec_test_range {
+-	int	page, from, to;
+-};
 -
--	/* Compare the images */
--	for (i = 0; i < bufsize; i++) {
--		KUNIT_EXPECT_EQ_MSG(test, scratch[i], buffer[i], "at i=%x", i);
--		if (scratch[i] != buffer[i])
--			return;
--	}
+-static const struct bvec_test_range bvec_test_ranges[] = {
+-	{ 0, 0x0002, 0x0002 },
+-	{ 1, 0x0027, 0x0893 },
+-	{ 2, 0x0193, 0x0794 },
+-	{ 3, 0x0000, 0x1000 },
+-	{ 4, 0x0000, 0x1000 },
+-	{ 5, 0x0000, 0x1000 },
+-	{ 6, 0x0000, 0x0ffb },
+-	{ 6, 0x0ffd, 0x0ffe },
+-	{ -1 }
+-};
 -
-+	iov_kunit_build_from_reference_pattern(test, buffer, bufsize, kvec_test_ranges);
-+	iov_kunit_check_pattern(test, buffer, scratch, bufsize);
- 	KUNIT_SUCCEED();
- }
- 
-@@ -210,7 +230,7 @@ static const struct bvec_test_range bvec_test_ranges[] = {
- 	{ 5, 0x0000, 0x1000 },
- 	{ 6, 0x0000, 0x0ffb },
- 	{ 6, 0x0ffd, 0x0ffe },
--	{ -1, -1, -1 }
-+	{ -1 }
- };
- 
  static void __init iov_kunit_load_bvec(struct kunit *test,
-@@ -225,7 +245,7 @@ static void __init iov_kunit_load_bvec(struct kunit *test,
- 	int i;
+ 				       struct iov_iter *iter, int dir,
+ 				       struct bio_vec *bvec, unsigned int bvmax,
+ 				       struct page **pages, size_t npages,
+ 				       size_t bufsize,
+-				       const struct bvec_test_range *pr)
++				       const struct iov_kunit_range *pr)
+ {
+ 	struct page *can_merge = NULL, *page;
+ 	size_t size = 0;
+@@ -276,13 +287,13 @@ static void __init iov_kunit_load_bvec(struct kunit *test,
+  */
+ static void __init iov_kunit_copy_to_bvec(struct kunit *test)
+ {
+-	const struct bvec_test_range *pr;
++	const struct iov_kunit_range *pr;
+ 	struct iov_iter iter;
+ 	struct bio_vec bvec[8];
+ 	struct page **spages, **bpages;
+ 	u8 *scratch, *buffer;
+ 	size_t bufsize, npages, size, copied;
+-	int i, b, patt;
++	int i, patt;
  
- 	for (i = 0; i < bvmax; i++, pr++) {
--		if (pr->from < 0)
-+		if (pr->page < 0)
- 			break;
- 		KUNIT_ASSERT_LT(test, pr->page, npages);
- 		KUNIT_ASSERT_LT(test, pr->page * PAGE_SIZE, bufsize);
-@@ -288,20 +308,14 @@ static void __init iov_kunit_copy_to_bvec(struct kunit *test)
- 	b = 0;
+ 	bufsize = 0x100000;
+ 	npages = bufsize / PAGE_SIZE;
+@@ -305,10 +316,9 @@ static void __init iov_kunit_copy_to_bvec(struct kunit *test)
+ 	KUNIT_EXPECT_EQ(test, iter.nr_segs, 0);
+ 
+ 	/* Build the expected image in the scratch buffer. */
+-	b = 0;
  	patt = 0;
  	memset(scratch, 0, bufsize);
--	for (pr = bvec_test_ranges; pr->from >= 0; pr++, b++) {
-+	for (pr = bvec_test_ranges; pr->page >= 0; pr++, b++) {
+-	for (pr = bvec_test_ranges; pr->page >= 0; pr++, b++) {
++	for (pr = bvec_test_ranges; pr->page >= 0; pr++) {
  		u8 *p = scratch + pr->page * PAGE_SIZE;
  
  		for (i = pr->from; i < pr->to; i++)
- 			p[i] = pattern(patt++);
- 	}
- 
--	/* Compare the images */
--	for (i = 0; i < bufsize; i++) {
--		KUNIT_EXPECT_EQ_MSG(test, buffer[i], scratch[i], "at i=%x", i);
--		if (buffer[i] != scratch[i])
--			return;
--	}
--
-+	iov_kunit_check_pattern(test, buffer, scratch, bufsize);
- 	KUNIT_SUCCEED();
- }
- 
-@@ -341,7 +355,7 @@ static void __init iov_kunit_copy_from_bvec(struct kunit *test)
- 	/* Build the expected image in the main buffer. */
- 	i = 0;
- 	memset(buffer, 0, bufsize);
--	for (pr = bvec_test_ranges; pr->from >= 0; pr++) {
-+	for (pr = bvec_test_ranges; pr->page >= 0; pr++) {
- 		size_t patt = pr->page * PAGE_SIZE;
- 
- 		for (j = pr->from; j < pr->to; j++) {
-@@ -352,13 +366,7 @@ static void __init iov_kunit_copy_from_bvec(struct kunit *test)
- 	}
- stop:
- 
--	/* Compare the images */
--	for (i = 0; i < bufsize; i++) {
--		KUNIT_EXPECT_EQ_MSG(test, scratch[i], buffer[i], "at i=%x", i);
--		if (scratch[i] != buffer[i])
--			return;
--	}
--
-+	iov_kunit_check_pattern(test, buffer, scratch, bufsize);
- 	KUNIT_SUCCEED();
- }
- 
-@@ -409,7 +417,7 @@ static void __init iov_kunit_copy_to_xarray(struct kunit *test)
+@@ -324,7 +334,7 @@ static void __init iov_kunit_copy_to_bvec(struct kunit *test)
+  */
+ static void __init iov_kunit_copy_from_bvec(struct kunit *test)
+ {
+-	const struct bvec_test_range *pr;
++	const struct iov_kunit_range *pr;
+ 	struct iov_iter iter;
+ 	struct bio_vec bvec[8];
  	struct page **spages, **bpages;
- 	u8 *scratch, *buffer;
- 	size_t bufsize, npages, size, copied;
--	int i, patt;
-+	int i;
- 
- 	bufsize = 0x100000;
- 	npages = bufsize / PAGE_SIZE;
-@@ -426,7 +434,7 @@ static void __init iov_kunit_copy_to_xarray(struct kunit *test)
- 	iov_kunit_load_xarray(test, &iter, READ, xarray, bpages, npages);
- 
- 	i = 0;
--	for (pr = kvec_test_ranges; pr->from >= 0; pr++) {
-+	for (pr = kvec_test_ranges; pr->page >= 0; pr++) {
- 		size = pr->to - pr->from;
- 		KUNIT_ASSERT_LE(test, pr->to, bufsize);
- 
-@@ -439,20 +447,8 @@ static void __init iov_kunit_copy_to_xarray(struct kunit *test)
- 		i += size;
- 	}
- 
--	/* Build the expected image in the scratch buffer. */
--	patt = 0;
--	memset(scratch, 0, bufsize);
--	for (pr = kvec_test_ranges; pr->from >= 0; pr++)
--		for (i = pr->from; i < pr->to; i++)
--			scratch[i] = pattern(patt++);
--
--	/* Compare the images */
--	for (i = 0; i < bufsize; i++) {
--		KUNIT_EXPECT_EQ_MSG(test, buffer[i], scratch[i], "at i=%x", i);
--		if (buffer[i] != scratch[i])
--			return;
--	}
--
-+	iov_kunit_build_to_reference_pattern(test, scratch, bufsize, kvec_test_ranges);
-+	iov_kunit_check_pattern(test, buffer, scratch, bufsize);
- 	KUNIT_SUCCEED();
- }
- 
-@@ -467,7 +463,7 @@ static void __init iov_kunit_copy_from_xarray(struct kunit *test)
+@@ -411,7 +421,7 @@ static struct xarray *iov_kunit_create_xarray(struct kunit *test)
+  */
+ static void __init iov_kunit_copy_to_xarray(struct kunit *test)
+ {
+-	const struct kvec_test_range *pr;
++	const struct iov_kunit_range *pr;
+ 	struct iov_iter iter;
+ 	struct xarray *xarray;
  	struct page **spages, **bpages;
- 	u8 *scratch, *buffer;
- 	size_t bufsize, npages, size, copied;
--	int i, j;
-+	int i;
- 
- 	bufsize = 0x100000;
- 	npages = bufsize / PAGE_SIZE;
-@@ -484,7 +480,7 @@ static void __init iov_kunit_copy_from_xarray(struct kunit *test)
- 	iov_kunit_load_xarray(test, &iter, READ, xarray, bpages, npages);
- 
- 	i = 0;
--	for (pr = kvec_test_ranges; pr->from >= 0; pr++) {
-+	for (pr = kvec_test_ranges; pr->page >= 0; pr++) {
- 		size = pr->to - pr->from;
- 		KUNIT_ASSERT_LE(test, pr->to, bufsize);
- 
-@@ -497,25 +493,8 @@ static void __init iov_kunit_copy_from_xarray(struct kunit *test)
- 		i += size;
- 	}
- 
--	/* Build the expected image in the main buffer. */
--	i = 0;
--	memset(buffer, 0, bufsize);
--	for (pr = kvec_test_ranges; pr->from >= 0; pr++) {
--		for (j = pr->from; j < pr->to; j++) {
--			buffer[i++] = pattern(j);
--			if (i >= bufsize)
--				goto stop;
--		}
--	}
--stop:
--
--	/* Compare the images */
--	for (i = 0; i < bufsize; i++) {
--		KUNIT_EXPECT_EQ_MSG(test, scratch[i], buffer[i], "at i=%x", i);
--		if (scratch[i] != buffer[i])
--			return;
--	}
--
-+	iov_kunit_build_from_reference_pattern(test, buffer, bufsize, kvec_test_ranges);
-+	iov_kunit_check_pattern(test, buffer, scratch, bufsize);
- 	KUNIT_SUCCEED();
- }
- 
-@@ -573,7 +552,7 @@ static void __init iov_kunit_extract_pages_kvec(struct kunit *test)
- 			while (from == pr->to) {
- 				pr++;
- 				from = pr->from;
--				if (from < 0)
-+				if (pr->page < 0)
- 					goto stop;
- 			}
- 			ix = from / PAGE_SIZE;
-@@ -651,7 +630,7 @@ static void __init iov_kunit_extract_pages_bvec(struct kunit *test)
- 			while (from == pr->to) {
- 				pr++;
- 				from = pr->from;
--				if (from < 0)
-+				if (pr->page < 0)
- 					goto stop;
- 			}
- 			ix = pr->page + from / PAGE_SIZE;
-@@ -698,7 +677,7 @@ static void __init iov_kunit_extract_pages_xarray(struct kunit *test)
- 	iov_kunit_create_buffer(test, &bpages, npages);
- 	iov_kunit_load_xarray(test, &iter, READ, xarray, bpages, npages);
- 
--	for (pr = kvec_test_ranges; pr->from >= 0; pr++) {
-+	for (pr = kvec_test_ranges; pr->page >= 0; pr++) {
- 		from = pr->from;
- 		size = pr->to - from;
- 		KUNIT_ASSERT_LE(test, pr->to, bufsize);
+@@ -457,7 +467,7 @@ static void __init iov_kunit_copy_to_xarray(struct kunit *test)
+  */
+ static void __init iov_kunit_copy_from_xarray(struct kunit *test)
+ {
+-	const struct kvec_test_range *pr;
++	const struct iov_kunit_range *pr;
+ 	struct iov_iter iter;
+ 	struct xarray *xarray;
+ 	struct page **spages, **bpages;
+@@ -503,7 +513,7 @@ static void __init iov_kunit_copy_from_xarray(struct kunit *test)
+  */
+ static void __init iov_kunit_extract_pages_kvec(struct kunit *test)
+ {
+-	const struct kvec_test_range *pr;
++	const struct iov_kunit_range *pr;
+ 	struct iov_iter iter;
+ 	struct page **bpages, *pagelist[8], **pages = pagelist;
+ 	struct kvec kvec[8];
+@@ -583,7 +593,7 @@ static void __init iov_kunit_extract_pages_kvec(struct kunit *test)
+  */
+ static void __init iov_kunit_extract_pages_bvec(struct kunit *test)
+ {
+-	const struct bvec_test_range *pr;
++	const struct iov_kunit_range *pr;
+ 	struct iov_iter iter;
+ 	struct page **bpages, *pagelist[8], **pages = pagelist;
+ 	struct bio_vec bvec[8];
+@@ -661,7 +671,7 @@ static void __init iov_kunit_extract_pages_bvec(struct kunit *test)
+  */
+ static void __init iov_kunit_extract_pages_xarray(struct kunit *test)
+ {
+-	const struct kvec_test_range *pr;
++	const struct iov_kunit_range *pr;
+ 	struct iov_iter iter;
+ 	struct xarray *xarray;
+ 	struct page **bpages, *pagelist[8], **pages = pagelist;
 
 
