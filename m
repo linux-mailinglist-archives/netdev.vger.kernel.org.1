@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-33804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4867A7A0370
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 14:11:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9897C7A037B
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 14:13:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B44AA1F23492
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 12:11:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 554EB281C5A
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 12:13:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5900F219F2;
-	Thu, 14 Sep 2023 12:10:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 973E1219EB;
+	Thu, 14 Sep 2023 12:13:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 473B2208A0;
-	Thu, 14 Sep 2023 12:10:57 +0000 (UTC)
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8696B1BE8;
-	Thu, 14 Sep 2023 05:10:56 -0700 (PDT)
-Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2bcd7a207f7so13395601fa.3;
-        Thu, 14 Sep 2023 05:10:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87B93208A8;
+	Thu, 14 Sep 2023 12:13:17 +0000 (UTC)
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE4971FD3;
+	Thu, 14 Sep 2023 05:13:16 -0700 (PDT)
+Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-500913779f5so1481199e87.2;
+        Thu, 14 Sep 2023 05:13:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694693455; x=1695298255; darn=vger.kernel.org;
+        d=gmail.com; s=20221208; t=1694693595; x=1695298395; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7aKtSNYkSgQY2J6i547Jd7QXH1uxzB1IpES5c19CajI=;
-        b=UcaHHzAtfXHQR1029e7hzgOat2QpgJ2lBIq9FfzXiM+veRm1FdzySJptHMz9E97R+5
-         aPvA/FPycXYInX34PYcWJWKG3ToDVd3Bf2PYl0LRONAJLx2IrXL17B5u3sjeismdBeQk
-         Q3QlC2EB5MeJDIlzGvArePvrAzSYdarCh85WroXlC7QHw1aERgcfzCsjUxqYOpM+ikuU
-         D4nB13+bM0xhJNiu4wJnEjVbZtZ1Ro30faZTsRcGLA/AmwFS7brpgWXJfOQvvB3rEcPa
-         aFYu43isObXt3MbyLxPJJkglmzuS8bzRjJT5j0jw2TK+E9Uyg7Cy0B45umZHhSXfnAeb
-         zMmw==
+        bh=vAsYiYV8tZEJujkaxJ088mOxaTtmj4YYmIGTa7ifbAU=;
+        b=AyTgXhCnnq/N51HHp/lHGThCb8VeGutBlJnwEURdLFD/28GvBNISVe/iilfbPDlZOQ
+         hOlvQ7XCkpTHUOHTewC7CzEC/NkN3w/tcvm/P/ZbXonwwaj5jelP9E6b2gmH07pnZS0Q
+         GPW0n3pH4Rhlhb2tDK6MLdUpks1+g32Y5cT2X8eE0mEFxXVGyW1uXzGuHs279oxTBSx3
+         7YNYMoK8EDYSfJ86bnn/F6/JMRic+60L6PhNhDeJTPmzEbjUDP0kuAyRqbO8nVV/Qzuj
+         TnqznHjnWalGTN/MOnSYU8SxAs12eczT/lSsagFi3KXlc15ll5Sk7vNEVCibjDGjXjMS
+         0uMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694693455; x=1695298255;
+        d=1e100.net; s=20230601; t=1694693595; x=1695298395;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7aKtSNYkSgQY2J6i547Jd7QXH1uxzB1IpES5c19CajI=;
-        b=obLD7+5tBrVuslgNVCdWCFnvRubVi6H77Bfv4R4+IByMPTAusNKxbFJdvG0uiOSdWD
-         wkk9J4/wTfV4wgjjE+8hitByi6fQED8w8AsFoe+ieOM4keBLzYCbZh5JAQhjlPBNzOXc
-         20rKJznmsx/Pzff1RRNCbVB9CCdA8UZ0uzs22vxA53vMSpdlnZ5MDOOSOczR/NroV+fI
-         MC4es0V21EHJILbfnhzWld4fz5cl7QHNuMqEEPHNpaEqSdU3PJN+rlG39z+lcwdQuPHc
-         R0BpPzSDxI1K3vglOl+cPCVfH0tw417lx+WsB99CFsEsMDy4UkNdUHiAeeKiPbRWhVJ6
-         1o7A==
-X-Gm-Message-State: AOJu0YyXIC8nyt4+ZG76Owbm3kg5F5yMViI2GjZvJLwv9V0NuAy3TYBh
-	lh1wgQcD5udEP5BJ0zKoT1o=
-X-Google-Smtp-Source: AGHT+IGihqamIC850c7IDzep4Y7BNXFBsVsUMYyKlHuV9pJ93oyclkxhqDUhCoOKgKB8oHTAh18lTg==
-X-Received: by 2002:a2e:9992:0:b0:2bf:a0d1:b112 with SMTP id w18-20020a2e9992000000b002bfa0d1b112mr5100013lji.39.1694693454513;
-        Thu, 14 Sep 2023 05:10:54 -0700 (PDT)
+        bh=vAsYiYV8tZEJujkaxJ088mOxaTtmj4YYmIGTa7ifbAU=;
+        b=XAPaUG0sFIc5urBJAGjQ4qnPuQzK1tqmiJalS+rz1xRLDBTT7JXhKbQUU90BbMOlQb
+         hdIDC3q0g47+V3JjTLv0grPsGndnq8e8tgJ78n6xftihBb7ZES7Yw5Pds+d2qHeR31T+
+         /kut2eKKGVNfpD5awvSE0W5WT6ra7FnHy80QSb6dfsue4O02ArIbEHLBAYK81iSl3QhR
+         GisOCCZmqP1N2y4PS8xSaMAKdJLSWnHNcYkvrByrlB/jm9QohW+8r/TtuDkP0Eyueu1M
+         yOlwLjFlu+iPdHkZcrNNTVKBDOyUjnPoXSTboEGFFMxJr0HKX7K9HpnCFNs/WUWP/e+a
+         Eqjg==
+X-Gm-Message-State: AOJu0Yw/d1oxHJcEddptmFlhPP6DwsLZ1nnv96XcImR6zCz/udwkVgyb
+	Xi0p74K9xg5y567FIqJMDcc=
+X-Google-Smtp-Source: AGHT+IHJQlpkWJPHB3PuWrwV6GkiZ4fG9hPIJaNch03+5NJJ1+qqAh4Z3XjEdSE2rPlt0z+Nw8Lv4Q==
+X-Received: by 2002:a05:6512:1048:b0:500:a0a3:80ff with SMTP id c8-20020a056512104800b00500a0a380ffmr5741069lfb.58.1694693594533;
+        Thu, 14 Sep 2023 05:13:14 -0700 (PDT)
 Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id w12-20020a2e998c000000b002b9e346a152sm259058lji.96.2023.09.14.05.10.53
+        by smtp.gmail.com with ESMTPSA id w30-20020a05651204de00b00502a770394dsm254986lfq.100.2023.09.14.05.13.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Sep 2023 05:10:54 -0700 (PDT)
-Date: Thu, 14 Sep 2023 15:10:51 +0300
+        Thu, 14 Sep 2023 05:13:14 -0700 (PDT)
+Date: Thu, 14 Sep 2023 15:13:10 +0300
 From: Serge Semin <fancer.lancer@gmail.com>
 To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
 Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
@@ -69,11 +69,11 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Paolo Abeni <pabeni@redhat.com>, Pengutronix Kernel Team <kernel@pengutronix.de>, 
 	Samin Guo <samin.guo@starfivetech.com>, Sascha Hauer <s.hauer@pengutronix.de>, 
 	Shawn Guo <shawnguo@kernel.org>
-Subject: Re: [PATCH net-next 5/6] net: stmmac: starfive: use
+Subject: Re: [PATCH net-next 6/6] net: stmmac: qos-eth: use
  dwmac_set_tx_clk_gmii()
-Message-ID: <c5hcpyvk75oaqp7xmrx2ql7m4aa3xgk6oifx6y5c33slkeujmh@leiy6uvhft5k>
+Message-ID: <tgurnug3ftp53gui6wwz25lo77b52clgmoqvgq5dcps2fi2xv5@uzzqvtoogy3i>
 References: <ZP8yEFWn0Ml3ALWq@shell.armlinux.org.uk>
- <E1qfiqx-007TPm-QD@rmk-PC.armlinux.org.uk>
+ <E1qfir2-007TPt-Uw@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,62 +82,77 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <E1qfiqx-007TPm-QD@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1qfir2-007TPt-Uw@rmk-PC.armlinux.org.uk>
 
-On Mon, Sep 11, 2023 at 04:29:31PM +0100, Russell King (Oracle) wrote:
+On Mon, Sep 11, 2023 at 04:29:36PM +0100, Russell King (Oracle) wrote:
 > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 > ---
->  .../ethernet/stmicro/stmmac/dwmac-starfive.c  | 29 +++++--------------
->  1 file changed, 8 insertions(+), 21 deletions(-)
+>  .../stmicro/stmmac/dwmac-dwc-qos-eth.c        | 37 ++++++-------------
+>  1 file changed, 11 insertions(+), 26 deletions(-)
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
-> index 9289bb87c3e3..3dc04017e3d3 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
-> @@ -14,6 +14,7 @@
->  #include <linux/regmap.h>
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
+> index 61ebf36da13d..a8fae37b9858 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
+> @@ -22,6 +22,7 @@
+>  #include <linux/stmmac.h>
 >  
 >  #include "stmmac_platform.h"
 > +#include "stmmac_plat_lib.h"
+>  #include "dwmac4.h"
 >  
->  #define STARFIVE_DWMAC_PHY_INFT_RGMII	0x1
->  #define STARFIVE_DWMAC_PHY_INFT_RMII	0x4
-> @@ -27,29 +28,15 @@ struct starfive_dwmac {
->  static void starfive_dwmac_fix_mac_speed(void *priv, unsigned int speed, unsigned int mode)
+>  struct tegra_eqos {
+> @@ -181,32 +182,10 @@ static void dwc_qos_remove(struct platform_device *pdev)
+>  static void tegra_eqos_fix_speed(void *priv, unsigned int speed, unsigned int mode)
 >  {
->  	struct starfive_dwmac *dwmac = priv;
-> -	unsigned long rate;
+>  	struct tegra_eqos *eqos = priv;
+> -	unsigned long rate = 125000000;
+> -	bool needs_calibration = false;
+>  	u32 value;
 >  	int err;
 >  
-> -	rate = clk_get_rate(dwmac->clk_tx);
-> -
 > -	switch (speed) {
 > -	case SPEED_1000:
+> -		needs_calibration = true;
 > -		rate = 125000000;
 > -		break;
+> -
 > -	case SPEED_100:
+> -		needs_calibration = true;
 > -		rate = 25000000;
 > -		break;
+> -
 > -	case SPEED_10:
 > -		rate = 2500000;
 > -		break;
+> -
 > -	default:
-> -		dev_err(dwmac->dev, "invalid speed %u\n", speed);
+> -		dev_err(eqos->dev, "invalid speed %u\n", speed);
 > -		break;
 > -	}
 > -
-> -	err = clk_set_rate(dwmac->clk_tx, rate);
-> -	if (err)
-> -		dev_err(dwmac->dev, "failed to set tx rate %lu\n", rate);
-> +	err = dwmac_set_tx_clk_gmii(dwmac->clk_tx, speed);
-> +	if (err == -ENOTSUPP)
+> -	if (needs_calibration) {
+> +	if (speed == SPEED_1000 || speed == SPEED_100) {
+>  		/* calibrate */
+>  		value = readl(eqos->regs + SDMEMCOMPPADCTRL);
+>  		value |= SDMEMCOMPPADCTRL_PAD_E_INPUT_OR_E_PWRD;
+> @@ -246,9 +225,15 @@ static void tegra_eqos_fix_speed(void *priv, unsigned int speed, unsigned int mo
+>  		writel(value, eqos->regs + AUTO_CAL_CONFIG);
+>  	}
+>  
+> -	err = clk_set_rate(eqos->clk_tx, rate);
+> -	if (err < 0)
+> -		dev_err(eqos->dev, "failed to set TX rate: %d\n", err);
+> +	err = dwmac_set_tx_clk_gmii(eqos->clk_tx, speed);
+> +	if (err == -ENOTSUPP) {
 
-> +		dev_err(dwmac->dev, "invalid speed %dMbps\n", speed);
+> +		dev_err(eqos->dev, "invalid speed %dMbps\n", speed);
 
 %u?
 
-> +	else if (err)
-> +		dev_err(dwmac->dev,
+> +		err = dwmac_set_tx_clk_gmii(eqos->clk_tx, SPEED_1000);
+> +	} else if (err) {
+> +		dev_err(eqos->dev,
 
 > +			"failed to set tx rate for speed %dMbps: %pe\n",
 
@@ -146,9 +161,10 @@ ditto
 -Serge(y)
 
 > +			speed, ERR_PTR(err));
+> +	}
 >  }
 >  
->  static int starfive_dwmac_set_mode(struct plat_stmmacenet_data *plat_dat)
+>  static int tegra_eqos_init(struct platform_device *pdev, void *priv)
 > -- 
 > 2.30.2
 > 
