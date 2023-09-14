@@ -1,191 +1,148 @@
-Return-Path: <netdev+bounces-33750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33749-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ED0179FE41
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 10:25:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0667179FE3A
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 10:24:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 486DA1C2085A
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 08:25:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 97037B20A1E
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 08:24:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77B193D3A6;
-	Thu, 14 Sep 2023 08:24:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 684C6DF6A;
+	Thu, 14 Sep 2023 08:24:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 675BE101DD;
-	Thu, 14 Sep 2023 08:24:33 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D60DA1FC0;
-	Thu, 14 Sep 2023 01:24:32 -0700 (PDT)
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38E8HA6G018520;
-	Thu, 14 Sep 2023 08:23:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=ypPE/0di+WH51UcfsJKW3qZaQ5nXjzd0VxPJ6ppYm+0=;
- b=pgxOY/HBbkfndYVSArGWnMvxE335RHltt8lygsC8HRFRbUvji8IX6yNF3nGF/+aBw3PX
- ztubmKv1MwatmG5iKE8xqXPqhpUGP0fNT9UjboNYG3oFMCsjALt617hH+Jh9vXaphEHy
- m4jS8Fztm607WGxd9x0dNUY5kFdz4nakyPGnwU7m6+3+xg7P2x9C1NEn1PXikhPgMSZZ
- L71YeKNhnp8Kem9xZg4oIdzcsede9ZZeYrgG4Gg1JUvFK/32mNSvorA4+eQiDxf5N5JV
- ppfk/QoKOkwujeiKyGZ/9VsTtGfMQbB8KqT834e1WsopLouGMs5X8+hf+C/ut65s8Bcx bQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t3ws7schb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Sep 2023 08:23:57 +0000
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38E8KEjv030734;
-	Thu, 14 Sep 2023 08:23:56 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t3ws7scgv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Sep 2023 08:23:56 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38E8Jbm8002724;
-	Thu, 14 Sep 2023 08:23:56 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3t14hm9c4w-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Sep 2023 08:23:55 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38E8NsGs8389168
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 14 Sep 2023 08:23:54 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E227C20043;
-	Thu, 14 Sep 2023 08:23:53 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D540C20040;
-	Thu, 14 Sep 2023 08:23:50 +0000 (GMT)
-Received: from [9.43.25.10] (unknown [9.43.25.10])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 14 Sep 2023 08:23:50 +0000 (GMT)
-Message-ID: <80621ac1-6ca4-55a6-108d-f3a205961c4d@linux.ibm.com>
-Date: Thu, 14 Sep 2023 13:53:49 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B037DF69
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 08:24:08 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8FCCD1BF9
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 01:24:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1694679846;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gIR5+s1oMSRerDuiWqtnK9wcPwcVYnx0k8Wn81GsDhA=;
+	b=TninCQt5lHEY5lbU9Y4MjbGC5ByKR/zdsEWl/VBI7jmd2KNEtp13F8DgD+99aau5lbi3RA
+	lJW5VpZhyLr5IsA0IIow6igIKM4sRvFQ3Jrv2RCvvhNQSz+nveiyQxVV8F7XcQbvxiL9EP
+	GQXfIaPS0cj5RLOfH8JRRb6SX7OBnJs=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-323-IVYy4uuTPG2XLszHaRMFVA-1; Thu, 14 Sep 2023 04:24:05 -0400
+X-MC-Unique: IVYy4uuTPG2XLszHaRMFVA-1
+Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-502b134fd49so204329e87.0
+        for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 01:24:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694679843; x=1695284643;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gIR5+s1oMSRerDuiWqtnK9wcPwcVYnx0k8Wn81GsDhA=;
+        b=hEgt1Tsexm78x+N9kBPS7MK8wleBqSPY0FzLHfEGbGu+ccdOsYh+JMf68UVpC2wVCp
+         fLDG8vMAlCcrGqLbuSCEG2mQ0GrQ8KciS/A2d3mb3gCdST/1jBF7auzDnB6zxmVZE6Fr
+         /vCrQTasBw+FNaHpENldy8/LhIpc1yql6NbY+PCF2BKGV81MFRRG3bgXzEORYby6vi9n
+         +JRbLPDFisVgEWQwdRKCW8eLkx/y5f/XuvQi7TWCNBhIRtLKP0rsjC+0JQmb6SZSIkFZ
+         bQ5lKK45AUfS8HnKkrve8a1XxZvfW92NN/6SBYFRRmJrojAvYqqbD71NHl1U4n27jJ2P
+         C+YA==
+X-Gm-Message-State: AOJu0YzePRecP2xdRATgBbLfQQkCAFS88Ec7B7jPQAWmXqNWEqMk1KJC
+	W+cjbPieloFyV3mmlQMe1N5g/5hYuhM/5ZuH8i+Fgu1zEWH0JKCbDUUr1RZD+XNz9GwOOPfWPdf
+	J3PdRiOsIUboVAv4c
+X-Received: by 2002:ac2:43b3:0:b0:501:c406:8ff1 with SMTP id t19-20020ac243b3000000b00501c4068ff1mr3989166lfl.5.1694679843654;
+        Thu, 14 Sep 2023 01:24:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFchp5mjhV334vvc1PVMFLcO6fNUdkeBdE9dcC+JSVlb/x6yKjca7qdD8I8zSRniNbbvoAZhg==
+X-Received: by 2002:ac2:43b3:0:b0:501:c406:8ff1 with SMTP id t19-20020ac243b3000000b00501c4068ff1mr3989155lfl.5.1694679843277;
+        Thu, 14 Sep 2023 01:24:03 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-242-187.dyn.eolo.it. [146.241.242.187])
+        by smtp.gmail.com with ESMTPSA id l9-20020a056402344900b0051e1660a34esm603531edc.51.2023.09.14.01.24.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Sep 2023 01:24:02 -0700 (PDT)
+Message-ID: <b6ed0ef1346363f11ddc7bb1c390a5f03f3a6b89.camel@redhat.com>
+Subject: Re: [PATCH net] net: prevent address overwrite in connect() and
+ sendmsg()
+From: Paolo Abeni <pabeni@redhat.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jordan Rife
+	 <jrife@google.com>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, davem@davemloft.net, Eric
+ Dumazet <edumazet@google.com>, kuba@kernel.org, netdev@vger.kernel.org, 
+ dborkman@kernel.org
+Date: Thu, 14 Sep 2023 10:24:01 +0200
+In-Reply-To: <CAF=yD-Lapvy4J748ge8k5v7gUoynDxJPpXKV8rOdgtAw7=_ErQ@mail.gmail.com>
+References: <20230912013332.2048422-1-jrife@google.com>
+	 <65006891779ed_25e754294b8@willemb.c.googlers.com.notmuch>
+	 <1ca3ca8a-6185-bc55-de74-53991ffc6f91@iogearbox.net>
+	 <CADKFtnTOD2+7B5tH8YMHEnxubiG+Cs+t8EhTft+q51YwxjW9xw@mail.gmail.com>
+	 <CAF=yD-KKGYhKjxio9om1rz7pPe1uiRgODuXWvoLqrGrRbtWNkA@mail.gmail.com>
+	 <CADKFtnSgBZcpYBYRwr6WgnS6j9xH+U0W7bxSqt9ge5aumu4QQg@mail.gmail.com>
+	 <CAF=yD-JW+Gs+EeJk2jknU6ZL0prjRO41Q3EpVTOTpTD8sEOh6A@mail.gmail.com>
+	 <CADKFtnTzqLw4F2m9+7BxZZW_QKm_QiduMb6to9mU1WAvbo9MWQ@mail.gmail.com>
+	 <CAF=yD-Lapvy4J748ge8k5v7gUoynDxJPpXKV8rOdgtAw7=_ErQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v4 8/8] bpf ppc32: Access only if addr is kernel address
-Content-Language: en-US
-To: Christophe Leroy <christophe.leroy@csgroup.eu>,
-        "naveen.n.rao@linux.ibm.com" <naveen.n.rao@linux.ibm.com>,
-        "mpe@ellerman.id.au" <mpe@ellerman.id.au>,
-        "ast@kernel.org"
- <ast@kernel.org>,
-        "daniel@iogearbox.net" <daniel@iogearbox.net>
-Cc: "paulus@samba.org" <paulus@samba.org>,
-        "andrii@kernel.org" <andrii@kernel.org>, "kafai@fb.com" <kafai@fb.com>,
-        "songliubraving@fb.com" <songliubraving@fb.com>,
-        "yhs@fb.com" <yhs@fb.com>,
-        "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
-        "kpsingh@kernel.org" <kpsingh@kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
-References: <20210929111855.50254-1-hbathini@linux.ibm.com>
- <20210929111855.50254-9-hbathini@linux.ibm.com>
- <aa3db398-5d44-c68c-6f74-027e31521177@csgroup.eu>
-From: Hari Bathini <hbathini@linux.ibm.com>
-In-Reply-To: <aa3db398-5d44-c68c-6f74-027e31521177@csgroup.eu>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: YPYP8T5CWpScKMH-oPpanrND1B9oYv8M
-X-Proofpoint-ORIG-GUID: qm07fJxQYzhjeBjCKgbVHNrfxH4Vh9oM
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-09-14_06,2023-09-13_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- lowpriorityscore=0 priorityscore=1501 mlxscore=0 clxscore=1011 spamscore=0
- impostorscore=0 phishscore=0 suspectscore=0 mlxlogscore=999 bulkscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2308100000 definitions=main-2309140070
 
+On Wed, 2023-09-13 at 10:02 -0400, Willem de Bruijn wrote:
+> On Tue, Sep 12, 2023 at 5:09=E2=80=AFPM Jordan Rife <jrife@google.com> wr=
+ote:
+> >=20
+> > > If we take this path, it could be a single patch. The subsystem
+> > > maintainers should be CC:ed so that they can (N)ACK it.
+> > >=20
+> > > But I do not mean to ask to split it up and test each one separately.
+> > >=20
+> > > The change from sock->ops->connect to kernel_connect is certainly
+> > > trivial enough that compile testing should suffice.
+> >=20
+> > Ack. Thanks for clarifying.
+> >=20
+> > > The only question is whether we should pursue your original patch and
+> > > accept that this will continue, or one that improves the situation,
+> > > but touches more files and thus has a higher risk of merge conflicts.
+> > >=20
+> > > I'd like to give others some time to chime in. I've given my opinion,
+> > > but it's only one.
+> > >=20
+> > > I'd like to give others some time to chime in. I've given my opinion,
+> > > but it's only one.
+> >=20
+> > Sounds good. I'll wait to hear others' opinions on the best path forwar=
+d.
+>=20
+> No other comments so far.
+>=20
+> My hunch is that a short list of these changes
+>=20
+> ```
+> @@ -1328,7 +1328,7 @@ static int kernel_bindconnect(struct socket *s,
+> struct sockaddr *laddr,
+>         if (rv < 0)
+>                 return rv;
+>=20
+> -       rv =3D s->ops->connect(s, raddr, size, flags);
+> +       rv =3D kernel_connect(s, raddr, size, flags);
+> ```
+>=20
+> is no more invasive than your proposed patch, and gives a more robust out=
+come.
+>=20
+> Please take a stab.
 
-
-On 14/09/23 11:48 am, Christophe Leroy wrote:
-> Hi,
-> 
-
-Hi Christophe,
-
-> Le 29/09/2021 à 13:18, Hari Bathini a écrit :
->> With KUAP enabled, any kernel code which wants to access userspace
->> needs to be surrounded by disable-enable KUAP. But that is not
->> happening for BPF_PROBE_MEM load instruction. Though PPC32 does not
->> support read protection, considering the fact that PTR_TO_BTF_ID
->> (which uses BPF_PROBE_MEM mode) could either be a valid kernel pointer
->> or NULL but should never be a pointer to userspace address, execute
->> BPF_PROBE_MEM load only if addr is kernel address, otherwise set
->> dst_reg=0 and move on.
-> 
-> While looking at the series "bpf: verifier: stop emitting zext for LDX"
-> from Puranjay I got a question on this old commit, see below.
-> 
->>
->> This will catch NULL, valid or invalid userspace pointers. Only bad
->> kernel pointer will be handled by BPF exception table.
->>
->> [Alexei suggested for x86]
->> Suggested-by: Alexei Starovoitov <ast@kernel.org>
->> Signed-off-by: Hari Bathini <hbathini@linux.ibm.com>
->> ---
->>
->> Changes in v4:
->> * Adjusted the emit code to avoid using temporary reg.
->>
->>
->>    arch/powerpc/net/bpf_jit_comp32.c | 34 +++++++++++++++++++++++++++++++
->>    1 file changed, 34 insertions(+)
->>
->> diff --git a/arch/powerpc/net/bpf_jit_comp32.c b/arch/powerpc/net/bpf_jit_comp32.c
->> index 6ee13a09c70d..2ac81563c78d 100644
->> --- a/arch/powerpc/net/bpf_jit_comp32.c
->> +++ b/arch/powerpc/net/bpf_jit_comp32.c
->> @@ -818,6 +818,40 @@ int bpf_jit_build_body(struct bpf_prog *fp, u32 *image, struct codegen_context *
->>    		case BPF_LDX | BPF_PROBE_MEM | BPF_W:
->>    		case BPF_LDX | BPF_MEM | BPF_DW: /* dst = *(u64 *)(ul) (src + off) */
->>    		case BPF_LDX | BPF_PROBE_MEM | BPF_DW:
->> +			/*
->> +			 * As PTR_TO_BTF_ID that uses BPF_PROBE_MEM mode could either be a valid
->> +			 * kernel pointer or NULL but not a userspace address, execute BPF_PROBE_MEM
->> +			 * load only if addr is kernel address (see is_kernel_addr()), otherwise
->> +			 * set dst_reg=0 and move on.
->> +			 */
->> +			if (BPF_MODE(code) == BPF_PROBE_MEM) {
->> +				PPC_LI32(_R0, TASK_SIZE - off);
->> +				EMIT(PPC_RAW_CMPLW(src_reg, _R0));
->> +				PPC_BCC(COND_GT, (ctx->idx + 5) * 4);
->> +				EMIT(PPC_RAW_LI(dst_reg, 0));
->> +				/*
->> +				 * For BPF_DW case, "li reg_h,0" would be needed when
->> +				 * !fp->aux->verifier_zext. Emit NOP otherwise.
->> +				 *
->> +				 * Note that "li reg_h,0" is emitted for BPF_B/H/W case,
->> +				 * if necessary. So, jump there insted of emitting an
->> +				 * additional "li reg_h,0" instruction.
->> +				 */
->> +				if (size == BPF_DW && !fp->aux->verifier_zext)
->> +					EMIT(PPC_RAW_LI(dst_reg_h, 0));
->> +				else
->> +					EMIT(PPC_RAW_NOP());
-> 
-> While do you need a NOP in the else case ? Can't we just emit no
-> instruction in that case ?
-
-Yeah but used the same offset for all cases in the conditional branch
-above. To drop the NOP, the conditional branch offset can be calculated
-based on the above if condition, I guess..
+I'm sorry for the late feedback. For the records, I agree the cleanest
+fix described above should be attempted first.
 
 Thanks,
-Hari
+
+Paolo
+
 
