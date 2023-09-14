@@ -1,161 +1,112 @@
-Return-Path: <netdev+bounces-33943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5405C7A0C3C
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 20:07:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 495ED7A0C46
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 20:12:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 916DB281BA5
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 18:07:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 013611F244E7
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 18:12:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 156BD266A4;
-	Thu, 14 Sep 2023 18:07:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64475219F4;
+	Thu, 14 Sep 2023 18:12:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3FFE1D54D;
-	Thu, 14 Sep 2023 18:07:27 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED36C1FDF;
-	Thu, 14 Sep 2023 11:07:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=DVM5Y9GchlYycYoe4MGIo5Kf5CTVmd8xy8ZARREdE/8=; b=SAh4R3lRHvnhPlZeNIxjJdVqBc
-	Mk0AoHkAFXaS6l/17Qv/R8L3TzYN2RnNSLENcMR0QLpY9x27DT37TD3jO3c7mn2QectFuXNDTe5K6
-	XzIJ5v5FqOSKTDgxd5VIyYaWnTLtpZQC7Jhmw4ifTjfeRktttX4bQLJ4ayglE8n4PNFkZ7AB5Wlac
-	zcxe9nw33PhorsMEfgbsPlm1x3F2nLP8YzXK3Xkec7jx0Jn0lPINXCgGnKbjbsxsNaReIGFA+a1iP
-	CjtgY8S6DqsN7dVpdnOSMyY6fPpjxrFdahQTcMJyWy85fyeGU27thT/Hwr8GI8hGyoh53EmBS++x9
-	m1mZKXvA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33982)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qgqkD-0004gP-2T;
-	Thu, 14 Sep 2023 19:07:13 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qgqkD-0004zA-Ty; Thu, 14 Sep 2023 19:07:13 +0100
-Date: Thu, 14 Sep 2023 19:07:13 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH 2/4] dt-bindings: net: dsa: document internal MDIO bus
-Message-ID: <ZQNL0Vy3kMbWlNFl@shell.armlinux.org.uk>
-References: <20230827121235.zog4c3ehu2cyd3jy@skbuf>
- <676d1a2b-6ffa-4aff-8bed-a749c373f5b3@arinc9.com>
- <87325ce9-595a-4dda-a6a1-b5927d25719b@arinc9.com>
- <20230911225126.rk23g3u3bzo3agby@skbuf>
- <036c0763-f1b2-49ff-bc82-1ff16eec27ab@arinc9.com>
- <20230912193450.h5s6miubag46z623@skbuf>
- <6cec079e-991e-4222-a76d-d6156de0daca@arinc9.com>
- <20230913074231.5azwxqjuv2wp5nik@skbuf>
- <ZQHcV5DUfcCYkkTi@shell.armlinux.org.uk>
- <ZQNLkiAt4jOjojRf@shell.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A3032628E
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 18:08:41 +0000 (UTC)
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2C6F1FDF;
+	Thu, 14 Sep 2023 11:08:40 -0700 (PDT)
+Received: from [2a02:8108:d00:dcc::d6ab]; authenticated
+	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+	id 1qgqla-0002SE-QL; Thu, 14 Sep 2023 20:08:38 +0200
+Message-ID: <ff2abfbe-a46b-414b-a757-8185495838b7@leemhuis.info>
+Date: Thu, 14 Sep 2023 20:08:38 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: hci_sync: Fix handling of
+ HCI_QUIRK_STRICT_DUPLICATE_FILTER
+Content-Language: en-US, de-DE
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Linux regressions mailing list <regressions@lists.linux.dev>,
+ patchwork-bot+bluetooth@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev <netdev@vger.kernel.org>, Stefan Agner <stefan@agner.ch>
+References: <20230829205936.766544-1-luiz.dentz@gmail.com>
+ <169343402479.21564.11565149320234658166.git-patchwork-notify@kernel.org>
+ <de698d06-9784-43ed-9437-61d6edf9672b@leemhuis.info>
+ <CABBYNZK2PPkLra8Au-fdN2nG2YLkfFRmPtEPQL0suLzBv=HHcA@mail.gmail.com>
+ <574ca8dd-ee97-4c8b-a154-51faf83cabdf@leemhuis.info>
+ <CABBYNZJ=5VH2+my7Gw1fMCaGgdOQfbWNtBGOc27_XQqCP7jD-A@mail.gmail.com>
+From: Thorsten Leemhuis <regressions@leemhuis.info>
+In-Reply-To: <CABBYNZJ=5VH2+my7Gw1fMCaGgdOQfbWNtBGOc27_XQqCP7jD-A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZQNLkiAt4jOjojRf@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1694714921;07dc0098;
+X-HE-SMSGID: 1qgqla-0002SE-QL
 
-On Thu, Sep 14, 2023 at 07:06:11PM +0100, Russell King (Oracle) wrote:
-> On Wed, Sep 13, 2023 at 04:59:19PM +0100, Russell King (Oracle) wrote:
-> > On Wed, Sep 13, 2023 at 10:42:31AM +0300, Vladimir Oltean wrote:
-> > > On Wed, Sep 13, 2023 at 08:52:37AM +0300, Arınç ÜNAL wrote:
-> > > > On 12.09.2023 22:34, Vladimir Oltean wrote:
-> > > > > On Tue, Sep 12, 2023 at 10:23:51PM +0300, Arınç ÜNAL wrote:
-> > > > > > The phylink bindings for user ports I ended up making by looking up the
-> > > > > > existing devicetrees are different than the phylink bindings for the shared
-> > > > > > (CPU and DSA) ports currently enforced on all switches.
-> > > > > > 
-> > > > > > My phylink bindings for user ports:
-> > > > > > 
-> > > > > >              allOf:
-> > > > > >                - anyOf:
-> > > > > >                    - required: [ fixed-link ]
-> > > > > >                    - required: [ phy-handle ]
-> > > > > >                    - required: [ managed ]
-> > > > > > 
-> > > > > >                - if:
-> > > > > >                    required: [ fixed-link ]
-> > > > > >                  then:
-> > > > > >                    not:
-> > > > > >                      required: [ managed ]
-> > > > > 
-> > > > > Right, it should have been anyOf and not oneOf.. my mistake. It is a bug
-> > > > > which should be fixed. It's the same phylink that gets used in both cases,
-> > > > > user ports and shared ports :)
-> > > > 
-> > > > One more thing, I don't recall phy-mode being required to be defined for
-> > > > user ports as it will default to GMII. I don't believe this is the same
-> > > > case for shared ports so phy-mode is required only for them?
-> > > 
-> > > phy-mode is not strictly required, but I think there is a strong
-> > > preference to set it. IIRC, when looking at the DSA device trees, there
-> > > was no case where phy-mode would be absent on CPU/DSA ports if the other
-> > > link properties were also present, so we required it too. There were no
-> > > complaints in 1 year since dsa_shared_port_validate_of() is there. The
-> > > requirement can be relaxed to just a warning and no error in the kernel,
-> > > and the removal of "required" in the schema, if it helps making it
-> > > common with user ports.
-> > 
-> > However, phylink pretty much requires phy-mode to be specified to be
-> > something sane for shared ports, so I wouldn't be in favour of relaxing
-> > the checkinng in dsa_shared_port_validate_of()... not unless you're
-> > now going to accept the approach I originally proposed to have DSA
-> > drivers tell the core (and thus phylink) what phy-mode and other link
-> > parameters should be used when they are missing from DT.
-> 
-> You mean the approach that I picked up using software nodes that got
-> thrown out by the software node people? That approach that I picked
-> up from you and tried to get merged?
-> 
-> No, that's not going to happen, and it's not a question of whether
-> _I_ am going to accept that approach or not. So don't throw that
-> back on me, please.
-> 
-> If this is something that we want to solve, we need to stop being so
-> devisive (your language above is so) and try to come up with a
-> solution that is acceptable to everyone... the swnode approach
-> doesn't seem to be it.
+On 14.09.23 19:51, Luiz Augusto von Dentz wrote:
+> On Wed, Sep 13, 2023 at 10:13 PM Thorsten Leemhuis
+> <regressions@leemhuis.info> wrote:
+>> On 12.09.23 21:09, Luiz Augusto von Dentz wrote:
+>>> On Mon, Sep 11, 2023 at 6:40 AM Linux regression tracking (Thorsten
+>>> Leemhuis) <regressions@leemhuis.info> wrote:
+>>>> On 31.08.23 00:20, patchwork-bot+bluetooth@kernel.org wrote:
+>>>>> This patch was applied to bluetooth/bluetooth-next.git (master)
+>>>>> by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+>>>>> On Tue, 29 Aug 2023 13:59:36 -0700 you wrote:
+>>>>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>>>>>
+>>>>>> When HCI_QUIRK_STRICT_DUPLICATE_FILTER is set LE scanning requires
+>>>>>> periodic restarts of the scanning procedure as the controller would
+>>>>>> consider device previously found as duplicated despite of RSSI changes,
+>>>>>> but in order to set the scan timeout properly set le_scan_restart needs
+>>>>>> to be synchronous so it shall not use hci_cmd_sync_queue which defers
+>>>>>> the command processing to cmd_sync_work.
+>>>>>> [...]
+>>>>>
+>>>>> Here is the summary with links:
+>>>>>   - Bluetooth: hci_sync: Fix handling of HCI_QUIRK_STRICT_DUPLICATE_FILTER
+>>>>>     https://git.kernel.org/bluetooth/bluetooth-next/c/52bf4fd43f75
+>>>>
+>>>> That is (maybe among others?) a fix for a regression from 6.1, so why
+>>>> was this merged into a "for-next" branch instead of a branch that
+>>>> targets the current cycle?
+> [...]
+>> That answer doesn't answer the question afaics, as both 6.1 and 6.4 were
+>> released in the past year -- the fix thus should not wait till the next
+>> merge window, unless it's high risk or something. See this statement
+>> from Linus:
+>> https://lore.kernel.org/all/CAHk-=wis_qQy4oDNynNKi5b7Qhosmxtoj1jxo5wmB6SRUwQUBQ@mail.gmail.com/
+> Thanks for the feedback, I will try to push fixes to net more often.
 
-Oh dear. I must be going mad!
+Great, many thx!
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+>>> but I could probably have it marked for stable just
+>>> to make sure it would get backported to affected versions.
+>> That would be great, too!
+> Well now that it has already been merged via -next tree shall we still
+> attempt to mark it as stable? Perhaps we need to check if it was not
+> backported already based on the Fixes tag.
+
+Changes only get backported once they hit mainline, which hasn't
+happened yet. And to get them into the net branch (and from there to
+mainline) a new commit is needed anyway, so you might as well add the
+stable tag to it. Side note: And don't worry that identical commit is
+already in -next, git handles that well afaik (but if you rebase
+bluetooth-next for other reasons anyway you might as well remove it).
+
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+--
+Everything you wanna know about Linux kernel regression tracking:
+https://linux-regtracking.leemhuis.info/about/#tldr
+If I did something stupid, please tell me, as explained on that page.
 
