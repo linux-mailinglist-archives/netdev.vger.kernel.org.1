@@ -1,73 +1,145 @@
-Return-Path: <netdev+bounces-33882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5C907A08EC
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 17:20:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A3117A08EE
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 17:20:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F6361C20D71
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 15:20:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5279F281B0C
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 15:20:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6330A18E05;
-	Thu, 14 Sep 2023 15:03:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD35418E17;
+	Thu, 14 Sep 2023 15:04:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEC4828E08
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 15:03:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF2FBC433C9;
-	Thu, 14 Sep 2023 15:03:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694703825;
-	bh=WCPZHwZt2o/yN/NOj21L9Wh/ZK07F6R74pgaSVTD+D8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=bxHjr+HJ70fZe7nfnhoZEyP3yLlsHbUdqpZcutQLdZDPZPIsQ3vSzHWgAsfOT/VCl
-	 Cpf7mEgggenTkxXOOxU2WaqqDsN5+iEcBbiEqU2EuFIT9I8zgDT3SARX0EaP5gf6Gq
-	 kMqysrKVNGRT0V+70IGM6/5+G//WBVYJ60X1LfcZW9c30lyebHDIMN57A7pbf3LZJ/
-	 oFUEqIBAaIOvTFySP9+ZrC2fdJscT32h8cXKx33XZZhYiV3HgfbaYHF9nnGnraPvsR
-	 c460W7hF+6Q6H0Or1Pd+SLbEcXiGRLrNLYvxThpaD6kfrSPoDBavalHPbv4cXUFOCG
-	 rzSoJSNLaLZEw==
-Message-ID: <5e624b57-923c-0592-2d97-cc3d08839c26@kernel.org>
-Date: Thu, 14 Sep 2023 09:03:44 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFFCA28E08;
+	Thu, 14 Sep 2023 15:04:14 +0000 (UTC)
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1426C1FC2;
+	Thu, 14 Sep 2023 08:04:14 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2b703a0453fso17533051fa.3;
+        Thu, 14 Sep 2023 08:04:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694703852; x=1695308652; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QhtIFD2lNPWWdkb9OegF+hUPlFQpOn+UoE47HAzxS60=;
+        b=KKCbUHODcR4sz8pqMt7Zdh6nzLxi///puDQ1pOVlAr2wJU4CYtfJ2IJjoRW6NHU7rM
+         GEiEiEJAHRf2qbKzXLMnTK+2QsKv5Lr0fW9rheTQrEcO/iCpY9fdWLtS3IWz1q29yEK+
+         yziytdBliCb+cxjf4m5Amf3ddAEXSrMQBD/nPWzJ+KPJ31L20r/Lunj04ja9yMHc60zL
+         GASKen40ONh1TZTVszGfaSfSJvbbz5XcP7Pt/dbwz5Vmgt9640z8cfBs4RWlvNPs6Qw4
+         0EQZcUW83IEAsrjoXbiKtA17SIHtU3xCNIj7fSjeEKr5mulGrvavYbyMfWxw1hrV6faK
+         Rv1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694703852; x=1695308652;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QhtIFD2lNPWWdkb9OegF+hUPlFQpOn+UoE47HAzxS60=;
+        b=Zbzxia5uNrr1MDd/QYKFPetoL17TDv/5pi1YhRGd7PhUh1SaemIwYxYx4pZpFrjzin
+         8srTk/JoYsfw7o6FpWsMh4O9V8LGNdFNKSghKECeSKw8qxolS4Kr3kCVvMn8antoLxrf
+         fMFb5r5gRRzd+qrz+XGMccQtv5awPTRraKCYUgA+T2IfA6gGuiZJNTwuQjUJhEExpw75
+         DUNvNMhvDdKz3Dh9OH76gkG23rOfXX25IKCd3Zn+J1YRQ65rWJbzfXZzuxkzezElnpzV
+         lt+mnhaP2Q7INbY1nADw+3mTbJpYKm01VwQwgXv4Q+MeKNj9K9dkDcyvkQABZNhYuFMF
+         bcEQ==
+X-Gm-Message-State: AOJu0YxWCI086bottsfcyV6bcJFzjH3CbyVfLKVgbDGgoGxSYZrtjMql
+	fyviuO5lKyRw5foHeIEKi1Q=
+X-Google-Smtp-Source: AGHT+IGAFYLg8GoHiSXscjrTPJtTnwzSs2lMPv68Q4agvyRTpiU+bnlotU7NkkXmS3OhDnarpKxEcA==
+X-Received: by 2002:a2e:84ce:0:b0:2b9:4413:864e with SMTP id q14-20020a2e84ce000000b002b94413864emr4463875ljh.53.1694703851940;
+        Thu, 14 Sep 2023 08:04:11 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id a2-20020a2e9802000000b002bfb71c076asm319397ljj.43.2023.09.14.08.04.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Sep 2023 08:04:11 -0700 (PDT)
+Date: Thu, 14 Sep 2023 18:04:09 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, Alexei Starovoitov <ast@kernel.org>, bpf@vger.kernel.org, 
+	Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, 
+	Emil Renner Berthing <kernel@esmil.dk>, Eric Dumazet <edumazet@google.com>, 
+	Fabio Estevam <festevam@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, NXP Linux Team <linux-imx@nxp.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Pengutronix Kernel Team <kernel@pengutronix.de>, 
+	Samin Guo <samin.guo@starfivetech.com>, Sascha Hauer <s.hauer@pengutronix.de>, 
+	Shawn Guo <shawnguo@kernel.org>
+Subject: Re: [PATCH net-next 5/6] net: stmmac: starfive: use
+ stmmac_set_tx_clk_gmii()
+Message-ID: <ad2oatdtyjr3d65daxl3haciywxjl4s57i6lnnzgqpwpwkcgc2@c4inrmr55uca>
+References: <ZQMPnyutz6T23E8T@shell.armlinux.org.uk>
+ <E1qgmku-007Z4y-KM@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.0
-Subject: Re: [PATCH net-next 07/14] ipv6: lockless IPV6_MULTICAST_ALL
- implementation
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com
-References: <20230912160212.3467976-1-edumazet@google.com>
- <20230912160212.3467976-8-edumazet@google.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20230912160212.3467976-8-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1qgmku-007Z4y-KM@rmk-PC.armlinux.org.uk>
 
-On 9/12/23 10:02 AM, Eric Dumazet wrote:
-> Move np->mc_all to an atomic flags to fix data-races.
+On Thu, Sep 14, 2023 at 02:51:40PM +0100, Russell King (Oracle) wrote:
+> Use stmmac_set_tx_clk_gmii().
 > 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+
+Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
+
+-Serge(y)
+
 > ---
->  include/linux/ipv6.h     |  1 -
->  include/net/inet_sock.h  |  1 +
->  net/ipv6/af_inet6.c      |  2 +-
->  net/ipv6/ipv6_sockglue.c | 14 ++++++--------
->  net/ipv6/mcast.c         |  2 +-
->  5 files changed, 9 insertions(+), 11 deletions(-)
+>  .../ethernet/stmicro/stmmac/dwmac-starfive.c  | 28 +++++--------------
+>  1 file changed, 7 insertions(+), 21 deletions(-)
 > 
-
-Reviewed-by: David Ahern <dsahern@kernel.org>
-
-
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
+> index 9289bb87c3e3..c2931464e977 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
+> @@ -27,29 +27,15 @@ struct starfive_dwmac {
+>  static void starfive_dwmac_fix_mac_speed(void *priv, unsigned int speed, unsigned int mode)
+>  {
+>  	struct starfive_dwmac *dwmac = priv;
+> -	unsigned long rate;
+>  	int err;
+>  
+> -	rate = clk_get_rate(dwmac->clk_tx);
+> -
+> -	switch (speed) {
+> -	case SPEED_1000:
+> -		rate = 125000000;
+> -		break;
+> -	case SPEED_100:
+> -		rate = 25000000;
+> -		break;
+> -	case SPEED_10:
+> -		rate = 2500000;
+> -		break;
+> -	default:
+> -		dev_err(dwmac->dev, "invalid speed %u\n", speed);
+> -		break;
+> -	}
+> -
+> -	err = clk_set_rate(dwmac->clk_tx, rate);
+> -	if (err)
+> -		dev_err(dwmac->dev, "failed to set tx rate %lu\n", rate);
+> +	err = stmmac_set_tx_clk_gmii(dwmac->clk_tx, speed);
+> +	if (err == -ENOTSUPP)
+> +		dev_err(dwmac->dev, "invalid speed %uMbps\n", speed);
+> +	else if (err)
+> +		dev_err(dwmac->dev,
+> +			"failed to set tx rate for speed %uMbps: %pe\n",
+> +			speed, ERR_PTR(err));
+>  }
+>  
+>  static int starfive_dwmac_set_mode(struct plat_stmmacenet_data *plat_dat)
+> -- 
+> 2.30.2
+> 
+> 
 
