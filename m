@@ -1,239 +1,248 @@
-Return-Path: <netdev+bounces-33921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D06707A0A83
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 18:12:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 848787A0AAB
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 18:22:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 612041C20902
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 16:12:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2EB16282431
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 16:22:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8D5021358;
-	Thu, 14 Sep 2023 16:12:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B90D521370;
+	Thu, 14 Sep 2023 16:22:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E75528E39;
-	Thu, 14 Sep 2023 16:12:32 +0000 (UTC)
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE3801FD6;
-	Thu, 14 Sep 2023 09:12:31 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-9ad8a822508so151937366b.0;
-        Thu, 14 Sep 2023 09:12:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694707950; x=1695312750; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SThObeQlIaemVPSCk4ah7fqYpyLQMYXbP7Z15PryLj0=;
-        b=O2AWI2dIB+ylQ5iAEdz8Y0teCrDLileC+hoBn9/pTf9DYCFEERJrSxIGa+MV6FfCil
-         4eMvk+oDFKAeLkKgESN2YJJC93tDwRbDH0sdqc/aVgun+HREcqc4YyEFSF44JZr7fJX5
-         xoUQHF9P8JejgF82Q5BMCMi0JMe6jL2j96yjuN3eS7QivgtoKrrTjN4qioaDeseVP02F
-         msizHTMu/fnsE3WDfw5SFkhTGvYYZx02d2IHb4xioX+CQQIk4Hwngx9eBhvX29T/6x+9
-         maZU9w9sT7CpAxgHNuask6xrr6G//WxERiHstIgOiyh2EzZtJx76UFqVF8wVwUYB6gOV
-         TKNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694707950; x=1695312750;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SThObeQlIaemVPSCk4ah7fqYpyLQMYXbP7Z15PryLj0=;
-        b=R0iXEK0JoFKYMSz/uFIcqDF/0Z9l0/oWkSKDgwK5mHUbQ4N2DZv5UxPtaWMAo7fhFb
-         Frt8LSoU5KE0xeCzFe1EWTPBD2H7Cci5i2u+HADlb7kJ3DcTqrJj5FHvcD8U31TB80YH
-         Wa9LpWAo0ORcF7+dDIaEYY9uY589LLP/yugz4QXGVDvn1pHB7aaJje+YPKM6DejhY0In
-         0khE0g69aI5GOS++zC2Uw59gVbJcUqu2zjQ4282tPMsRNpGJ6HFvMSq+Mw5xNDtdGORu
-         rQMQcRDSORoIM+jrqQ1wRzQ/Z28ckKfFLz/x7FuiyuUQWhw6QYGSUZZt36SBQNLN3SsT
-         SMQw==
-X-Gm-Message-State: AOJu0YzwyZoF/Errt9oDuPq0B66loAwXNg8QRouRG96Gma1axEPTnIP6
-	9bF2f09aT2RJV+Dg1wmtybY=
-X-Google-Smtp-Source: AGHT+IELqO4SvOWFV2/pKbLA0g4UVTZ7AbMewT+KnbWAN1uC7xCJlW08XIvsVg3T7S+uvgq7bq1bMA==
-X-Received: by 2002:a17:906:7692:b0:9a2:739:3aa1 with SMTP id o18-20020a170906769200b009a207393aa1mr5162206ejm.61.1694707949815;
-        Thu, 14 Sep 2023 09:12:29 -0700 (PDT)
-Received: from skbuf ([188.26.56.202])
-        by smtp.gmail.com with ESMTPSA id l13-20020a170906078d00b009a193a5acffsm1179235ejc.121.2023.09.14.09.12.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Sep 2023 09:12:29 -0700 (PDT)
-Date: Thu, 14 Sep 2023 19:12:26 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH 2/4] dt-bindings: net: dsa: document internal MDIO bus
-Message-ID: <20230914161226.563423jjeuywfe57@skbuf>
-References: <0cee0928-74c9-4048-8cd8-70bfbfafd9b2@arinc9.com>
- <20230827121235.zog4c3ehu2cyd3jy@skbuf>
- <676d1a2b-6ffa-4aff-8bed-a749c373f5b3@arinc9.com>
- <87325ce9-595a-4dda-a6a1-b5927d25719b@arinc9.com>
- <20230911225126.rk23g3u3bzo3agby@skbuf>
- <036c0763-f1b2-49ff-bc82-1ff16eec27ab@arinc9.com>
- <20230912193450.h5s6miubag46z623@skbuf>
- <6cec079e-991e-4222-a76d-d6156de0daca@arinc9.com>
- <20230913074231.5azwxqjuv2wp5nik@skbuf>
- <ZQHcV5DUfcCYkkTi@shell.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CDDB18E28;
+	Thu, 14 Sep 2023 16:22:01 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03F2710C7;
+	Thu, 14 Sep 2023 09:22:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694708521; x=1726244521;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=c6Qc2adxTI2WXoFs1eM8ut59EpOk6L59lnppL5M8T7s=;
+  b=TZBhfh7sGR94HTQGhmfepIPyoXJ0pbuB2GhDiF9IGIBwbzBn6SP/iWBf
+   W2Df7ozM4439vqTmFpHrl+8DMKYvItWwgJ0hgs3ZqOueuO91PkYFw1uDV
+   WK/AZnQwceSgDKviK7byLT2XGcnFfbikLIT/kZsZo+6ESRfpkRzKBpw8N
+   WFQskTiTA4VBThNa7wgRyt0Aw0l5oCry/HK3Vxu5t/H4qbfSdZaW9Kg04
+   Kp7gBCbDkXFbL2gJoHZv4yJNFgIITYPVaD77R4wZvO73K3CO3nmFqGpp0
+   hCYnj5peRcEipZ+HA0V88pgikEYuUwLch73QJ7GKCr70WKn/Vns6LmpZK
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="358421463"
+X-IronPort-AV: E=Sophos;i="6.02,146,1688454000"; 
+   d="scan'208";a="358421463"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2023 09:21:33 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="887881589"
+X-IronPort-AV: E=Sophos;i="6.02,146,1688454000"; 
+   d="scan'208";a="887881589"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmsmga001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Sep 2023 09:21:00 -0700
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Thu, 14 Sep 2023 09:21:32 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Thu, 14 Sep 2023 09:21:32 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.107)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Thu, 14 Sep 2023 09:21:32 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Siiy+TObcsE8odPd/StYGhrSVhIPGE8h/LjBQja5IuQSHhvqV/jSZ+5ZJnNNaxyV2EoKsD5XlhPbWchP3OKk+8Ymv8YFb9KzVVcwSGJdzbp4J+PqzxliIXU2zpWrZ6A7cGreuBaNK0Q3NIV5MOYfudzYjig5cOavW048jXK3uW/sSDYnfpanQhFjeEFY2jUof7en0TWVzlvDc27Odcm3/+nD0BSU6VLOB0FaZum2P56jLBoLSUG4oUsjsgg8dorjrpapqlE/SgHRRWGiWt3H9WiaoITgx3q/QpnI3YwRIddSqt0uPFErUGPAOwlNKn3Uz2uYJPz6LjzKO9J7MeMajw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3kuFd8UvnzdIyWn9avd13xfOHId3bBtkSNaM+2gx/uM=;
+ b=iYMPzaSou8Yh4VRdqQWdpZQQEBRBtyn66VB5Bi5DKeMrRKeHNkH0KT7RmuJgVmnS8sgxQLFG1vE2PKKM1sK9uPgeQz5mwq4fOmv1caKz474FhTmxS1DVeGZtlRXEvsTrj11Kx3Oa4gWN0TZeEul3yt74r0/+1PDrJo+Mj5erravEBCGtB2Xuu7+mDrJW4rlJ4i9xNUMqqYRPDWF6bisdnAB6RWNSgyfafUB79UHZLi+HtvHokRC7GgiJ7/7nNgUpzTx4NVO6EQMpawqNEe01gqpdSsBpL5dbuol3LfzdVM4Of7wQ4KlQSpMpayh0pzTl9yVzgusvpd2P5Xipfgdkjg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
+ by CYXPR11MB8731.namprd11.prod.outlook.com (2603:10b6:930:db::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.30; Thu, 14 Sep
+ 2023 16:21:30 +0000
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::10f1:d83:9ee2:bf5d]) by SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::10f1:d83:9ee2:bf5d%3]) with mapi id 15.20.6768.029; Thu, 14 Sep 2023
+ 16:21:30 +0000
+Date: Thu, 14 Sep 2023 18:15:47 +0200
+From: Larysa Zaremba <larysa.zaremba@intel.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+CC: <bpf@vger.kernel.org>, <ast@kernel.org>, <daniel@iogearbox.net>,
+	<andrii@kernel.org>, <martin.lau@linux.dev>, <song@kernel.org>, <yhs@fb.com>,
+	<john.fastabend@gmail.com>, <kpsingh@kernel.org>, <sdf@google.com>,
+	<haoluo@google.com>, <jolsa@kernel.org>, David Ahern <dsahern@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Willem de Bruijn <willemb@google.com>,
+	Jesper Dangaard Brouer <brouer@redhat.com>, Anatoly Burakov
+	<anatoly.burakov@intel.com>, Alexander Lobakin <alexandr.lobakin@intel.com>,
+	Magnus Karlsson <magnus.karlsson@gmail.com>, Maryam Tahhan
+	<mtahhan@redhat.com>, <xdp-hints@xdp-project.net>, <netdev@vger.kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Alexei Starovoitov
+	<alexei.starovoitov@gmail.com>, Simon Horman <simon.horman@corigine.com>,
+	Tariq Toukan <tariqt@mellanox.com>, Saeed Mahameed <saeedm@mellanox.com>
+Subject: Re: [xdp-hints] [RFC bpf-next 01/23] ice: make RX hash reading code
+ more reusable
+Message-ID: <ZQMxs1XSQOQN5kBI@lincoln>
+References: <20230824192703.712881-1-larysa.zaremba@intel.com>
+ <20230824192703.712881-2-larysa.zaremba@intel.com>
+ <eceeb36a-6621-b0c3-371d-e617023fb0e4@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <eceeb36a-6621-b0c3-371d-e617023fb0e4@intel.com>
+X-ClientProxiedBy: FR4P281CA0132.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:b9::10) To SN7PR11MB7540.namprd11.prod.outlook.com
+ (2603:10b6:806:340::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZQHcV5DUfcCYkkTi@shell.armlinux.org.uk>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|CYXPR11MB8731:EE_
+X-MS-Office365-Filtering-Correlation-Id: bfc3db6b-21ac-4723-2903-08dbb53ea74c
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: DcreoruNryE9haH5pHst5pQLQ5oFCtg9G2rdJ8QNqxaGm3qcu+8FJs0JGMsWCFJt6ni785bZ8YFSjZyNke3J6inGE9CkIKAitouRKkkD2FqdR0UJ/3X9wI8w5/1wwEOBwCtzlL+YEwF4/w7zw/H02qtCp1uXqmgUT6nSlgYW4uhlqCL0+ehHHzBNtU+P6Zmo63XuYKWItd8goWb6ve3F9Ddoh79GUK134m/DyNuNcfT7u3AZOykr2ZdFuYiYkmvWQmSpRkJPsnESBnNKIDytD0Avxwebk3H2lgAHos5+w0pJL5lw5PZS7RhtovPQwZYTiPxoD5XkwBsx+2JMStFZTwz4o8hx/wVhx+HaClIePAMR4ziUXJdOYfwKzYBEJQd4PMr82CoGIYRIGSs9pX/EFfCHPf5qNKInc57jqnke9gX7nQc3TIDuyayhw/mW2lFhpTrGgbPVH9DSz6pmk0JPo3P8Ets3tfDNjz6kMWiYtUKPuFGqWV4v9P4bK+VbjyfSuNynGT6BF52q8b6hdzcbTqNre268UxlfX/Ssciwmih8w5isExqU+IPhiRWYA/RUa
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(39860400002)(396003)(376002)(346002)(136003)(366004)(1800799009)(451199024)(186009)(33716001)(6506007)(6666004)(6486002)(8936002)(66946007)(83380400001)(5660300002)(2906002)(41300700001)(478600001)(6512007)(7416002)(66556008)(6636002)(26005)(54906003)(44832011)(66476007)(8676002)(316002)(6862004)(9686003)(86362001)(38100700002)(4326008)(82960400001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?WZ3zR70S6U0P+k/LxvUUyryd7s2ZmEioWcrcJapDehHOadiOOwVJR0BTsEUD?=
+ =?us-ascii?Q?y4vKjduKqgZkXB6qPVuOoWvDsHyXX64Mdv4GZ1M3pqFGAonTmQIGWBOUiLii?=
+ =?us-ascii?Q?hVa6L2TkXYCJFeH1WaTCSIFmKqRFDktP6pBxKA4DBNyu8GwsEGlNUlwiqHnO?=
+ =?us-ascii?Q?26CRUT/kcrLJS7D/3wVXUbI4jHOzpXf6u4jxL23ac2/sdNYBWNtgtMyIwVRZ?=
+ =?us-ascii?Q?vTY6cF6NahKREa+bVJS16qvYE/l/fi7VX8RC1V6qzd7wsVbTaDtzwrr+o5vT?=
+ =?us-ascii?Q?OJBJNO5pXORTGRxWA1ThpDc0ao8YyVveoQHDm6pK2PjPP8et+qIJPVWCMDKN?=
+ =?us-ascii?Q?BT8baGVqTrn0BICfOaI9sYFbMT4deNNdbWmd2IQS6TtgIxHGIhLUSSTHdr0+?=
+ =?us-ascii?Q?mYOAuJjNixcnc9ryNP+ShvoyHnhhoeZBG4cSKarUg1hZirGeXq042XE/CS/s?=
+ =?us-ascii?Q?18gjTXwbc+LvbZeN9oFYqhdWSa0qf9VrtDC7n+qMT22YVc0UkI4dWj7lCg7c?=
+ =?us-ascii?Q?B0SJNYXMOXjH+h3zMnPeDVeIzMoQ6P+ALyHbmqj+gkfb2kkPPYTIIwQENA00?=
+ =?us-ascii?Q?QnkTn+3T0VrWb5EcUYokHmvy71SbdqeTurqiBF0aGQAqbrtuj2GPGnDPHloj?=
+ =?us-ascii?Q?QkzZ2bwCJvv04oTAEeqf5dU5jOYtJFSXL/g4Uy+NAP+avxqm9thpkXIKxsda?=
+ =?us-ascii?Q?/cVx1mrvMyDe6LxUtTRosUbC1B9pu6Lnwbhm2LphOgbItUXP6gIW7MQz1sCE?=
+ =?us-ascii?Q?3Ib8pboaJRDemQtmpnyNuU7YYrajEUlCD81c58dAP7uGYBrhP5TZSpcVClNL?=
+ =?us-ascii?Q?aSDOZGXWrwSOv9dEcdQdV9FzWgf/BUgvE41uVwA78A+jpdp045QGoHOyhgE/?=
+ =?us-ascii?Q?Fe19IoVzs0hLr1WSBZHG6mm1018G1hYtWwHzhIz2Gje/Jj0671ug7/uvXAuw?=
+ =?us-ascii?Q?rDkk2LPRsBnMVwA8LIqwZpEJvgj/oeN6fhTxD8DZFAXTKh8RK6Zhz42HITib?=
+ =?us-ascii?Q?S1mqBgkGuqv48NbzE7CSUbhsG2A+LRlvcy87bItirhWSVg7KZQh4uJfC39H9?=
+ =?us-ascii?Q?kdAo7sFfeNvRr1NqCPZsgg+YajxD4JKdLHL9CXKdmkgF+q8NJB5l9gwy2bT4?=
+ =?us-ascii?Q?OiZrzH+QlNU+ysUn0d4wzsmGFiphI665cjPSubK5e8N3P3FVb4o+sTIYzn0f?=
+ =?us-ascii?Q?S7O1XQcpWtsyZjV3/2/BHgqob4r4M3HIElHd1yGktSbOx+xJvYsyd3RZ8iy6?=
+ =?us-ascii?Q?uQvLqxyRnArf9aqYbzUbnuQ70Ts72kNSORKsViaiZ+NZZAtz4iTINtDyNQAl?=
+ =?us-ascii?Q?vUOzqpEpK6aN/Oa+4LmAB7Gig5/ZHUJTsRg4YnGzUHQES5echm4gXUAIzof8?=
+ =?us-ascii?Q?BvBOnkB0BIux3ensiPUoRj6oKi1zzKnm/lVaHW6ArZH91Vf4YVXk2WhE3qRf?=
+ =?us-ascii?Q?13fPBDWOydXUSuVwEeEcK1jAdO60wwBguMS7OWPuufkRPOS5/7twCn55vRUf?=
+ =?us-ascii?Q?OfpXS2i9icaBoIE65qV0rQdr9miYjPujGNZIfRi/Y2uLGrwIO3slZH9mAuiF?=
+ =?us-ascii?Q?uWERcLRDu0lua0CCsQdqzZT1bcbN/TxncoW4ACgd6jOog3hWQ1ppwSmt/t19?=
+ =?us-ascii?Q?6A=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: bfc3db6b-21ac-4723-2903-08dbb53ea74c
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Sep 2023 16:21:30.3624
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: xEJnDj5GZes4djJHzyivmsUbxH+o1AEF3qKa6TuVllqgV6v2ZQIXMgzRDAgp+b4zTEB0NfV+kh+tchrtRsspPs/WZf3f/vbo/Da+KYES7e4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR11MB8731
+X-OriginatorOrg: intel.com
 
-On Wed, Sep 13, 2023 at 04:59:19PM +0100, Russell King (Oracle) wrote:
-> However, phylink pretty much requires phy-mode to be specified to be
-> something sane for shared ports, so I wouldn't be in favour of relaxing
-> the checkinng in dsa_shared_port_validate_of()... not unless you're
-> now going to accept the approach I originally proposed to have DSA
-> drivers tell the core (and thus phylink) what phy-mode and other link
-> parameters should be used when they are missing from DT.
+On Thu, Sep 14, 2023 at 06:12:23PM +0200, Alexander Lobakin wrote:
+> From: Larysa Zaremba <larysa.zaremba@intel.com>
+> Date: Thu, 24 Aug 2023 21:26:40 +0200
+> 
+> > Previously, we only needed RX hash in skb path,
+> > hence all related code was written with skb in mind.
+> > But with the addition of XDP hints via kfuncs to the ice driver,
+> > the same logic will be needed in .xmo_() callbacks.
+> > 
+> > Separate generic process of reading RX hash from a descriptor
+> > into a separate function.
+> > 
+> > Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> 
+> I like the patch, except three minors above,
+> 
+> > ---
+> >  drivers/net/ethernet/intel/ice/ice_txrx_lib.c | 37 +++++++++++++------
+> >  1 file changed, 26 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+> > index c8322fb6f2b3..8f7f6d78f7bf 100644
+> > --- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+> > +++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+> > @@ -63,28 +63,43 @@ static enum pkt_hash_types ice_ptype_to_htype(u16 ptype)
+> >  }
+> >  
+> >  /**
+> > - * ice_rx_hash - set the hash value in the skb
+> > + * ice_get_rx_hash - get RX hash value from descriptor
+> > + * @rx_desc: specific descriptor
+> > + *
+> > + * Returns hash, if present, 0 otherwise.
+> > + */
+> > +static u32
+> > +ice_get_rx_hash(const union ice_32b_rx_flex_desc *rx_desc)
+> 
+> The whole declaration could easily fit into one line :>
+>
 
-Ok, so with a missing phy-mode on the CPU port, phylink_parse_fixedlink() ->
-phy_lookup_setting() will return NULL and that will print a phylink_warn(),
-but other than that, phylink_mac_link_up() does get called at the right
-speed and duplex.
+I agree
+ 
+> > +{
+> > +	const struct ice_32b_rx_flex_desc_nic *nic_mdid;
+> > +
+> > +	if (rx_desc->wb.rxdid != ICE_RXDID_FLEX_NIC)
+> 
+> Not really related: have you tried to measure branch hit/miss here?
+> Can't it be a candidate for unlikely()?
 
-I agree that for sane behavior it should be specified, but it appears
-that even with PHY_INTERFACE_MODE_NA something can be hacked up...
+I have not measured this, but at least in my test setup, I have never seen any 
+other rxdid, so unlikely() is a good idea. If it harms some particular 
+applications, we can always remove this later on request :D
 
-[    4.818368] sja1105 spi0.1: Failed to read phy-mode or phy-interface-type property for port 4
-[    4.864667] sja1105 spi0.1: OF node /soc/spi@2100000/ethernet-switch@1/ports/port@4 of CPU port 4 lacks the required "phy-mode" property
-[    4.882957] sja1105 spi0.1: pl->link_config.speed 1000 pl->link_config.duplex 1 pl->supported 00,00000000,00000000,00000240
-[    4.894189] sja1105 spi0.1: phy_setting speed -1 duplex -1 bit -1
-[    4.900283] sja1105 spi0.1: fixed link full duplex 1000Mbps not recognised
-[    4.907798] sja1105 spi0.1: configuring for fixed/ link mode
-[    4.916183] sja1105 spi0.1 swp5 (uninitialized): PHY [mdio@2d24000:06] driver [Broadcom BCM5464] (irq=POLL)
-[    4.934770] sja1105 spi0.1 swp2 (uninitialized): PHY [mdio@2d24000:03] driver [Broadcom BCM5464] (irq=POLL)
-[    4.951619] sja1105 spi0.1 swp3 (uninitialized): PHY [mdio@2d24000:04] driver [Broadcom BCM5464] (irq=POLL)
-[    4.968349] sja1105 spi0.1 swp4 (uninitialized): PHY [mdio@2d24000:05] driver [Broadcom BCM5464] (irq=POLL)
-[    4.984017] fsl-gianfar soc:ethernet@2d90000 eth2: entered promiscuous mode
-[    4.991327] DSA: tree 0 setup
-[    4.995129] sja1105 spi0.1: sja1105_mac_link_up: port 4 interface  speed 1000 duplex 1
-[    5.005004] sja1105 spi0.1: Link is Up - 1Gbps/Full - flow control off
+> > +		return 0;
+> > +
+> > +	nic_mdid = (struct ice_32b_rx_flex_desc_nic *)rx_desc;
+> > +	return le32_to_cpu(nic_mdid->rss_hash);
+> 
+> I think the common convention in the kernel is to separate the last
+> return from the main body with a newline.
+> To not leave the cast above alone, you can embed it into the declaration.
+> 
 
-diff --git a/arch/arm/boot/dts/nxp/ls/ls1021a-tsn.dts b/arch/arm/boot/dts/nxp/ls/ls1021a-tsn.dts
-index 1ea32fff4120..0bfffcb51af9 100644
---- a/arch/arm/boot/dts/nxp/ls/ls1021a-tsn.dts
-+++ b/arch/arm/boot/dts/nxp/ls/ls1021a-tsn.dts
-@@ -90,7 +90,7 @@ port@3 {
- 			port@4 {
- 				/* Internal port connected to eth2 */
- 				ethernet = <&enet2>;
--				phy-mode = "rgmii";
-+//				phy-mode = "rgmii";
- 				rx-internal-delay-ps = <0>;
- 				tx-internal-delay-ps = <0>;
- 				reg = <4>;
-diff --git a/drivers/net/dsa/sja1105/sja1105_main.c b/drivers/net/dsa/sja1105/sja1105_main.c
-index a23d980d28f5..dba1fa545a9c 100644
---- a/drivers/net/dsa/sja1105/sja1105_main.c
-+++ b/drivers/net/dsa/sja1105/sja1105_main.c
-@@ -327,6 +327,8 @@ static int sja1105_init_mii_settings(struct sja1105_private *priv)
- 			mii->xmii_mode[i] = XMII_MODE_SGMII;
- 			mii->special[i] = true;
- 			break;
-+		case PHY_INTERFACE_MODE_NA:
-+			break;
- unsupported:
- 		default:
- 			dev_err(dev, "Unsupported PHY mode %s on port %d!\n",
-@@ -1205,11 +1207,10 @@ static int sja1105_parse_ports_node(struct sja1105_private *priv,
- 		/* Get PHY mode from DT */
- 		err = of_get_phy_mode(child, &phy_mode);
- 		if (err) {
--			dev_err(dev, "Failed to read phy-mode or "
-+			dev_warn(dev, "Failed to read phy-mode or "
- 				"phy-interface-type property for port %d\n",
- 				index);
--			of_node_put(child);
--			return -ENODEV;
-+			phy_mode = PHY_INTERFACE_MODE_NA;
- 		}
- 
- 		phy_node = of_parse_phandle(child, "phy-handle", 0);
-@@ -1383,6 +1384,8 @@ static void sja1105_mac_link_up(struct dsa_switch *ds, int port,
- {
- 	struct sja1105_private *priv = ds->priv;
- 
-+	dev_err(ds->dev, "%s: port %d interface %s speed %d duplex %d\n", __func__, port, phy_modes(interface), speed, duplex);
-+
- 	sja1105_adjust_port_config(priv, port, speed);
- 
- 	sja1105_inhibit_tx(priv, BIT(port), false);
-@@ -1414,7 +1417,10 @@ static void sja1105_phylink_get_caps(struct dsa_switch *ds, int port,
- 		 * config (the xMII Mode table cannot be dynamically
- 		 * reconfigured), and we have to program that early.
- 		 */
--		__set_bit(phy_mode, config->supported_interfaces);
-+		if (phy_mode == PHY_INTERFACE_MODE_NA)
-+			phy_interface_set_rgmii(config->supported_interfaces);
-+		else
-+			__set_bit(phy_mode, config->supported_interfaces);
- 	}
- 
- 	/* The MAC does not support pause frames, and also doesn't
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 0d7354955d62..674689011059 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -841,6 +841,15 @@ static int phylink_parse_fixedlink(struct phylink *pl,
- 	if (autoneg)
- 		phylink_set(pl->supported, Autoneg);
- 
-+	phylink_err(pl, "pl->link_config.speed %d pl->link_config.duplex %d pl->supported %*pb\n",
-+		    pl->link_config.speed, pl->link_config.duplex, __ETHTOOL_LINK_MODE_MASK_NBITS,
-+		    pl->supported);
-+
-+	phylink_err(pl, "phy_setting speed %d duplex %d bit %d\n",
-+		    s ? s->speed : -1,
-+		    s ? s->duplex : -1,
-+		    s ? s->bit : -1);
-+
- 	if (s) {
- 		__set_bit(s->bit, pl->supported);
- 		__set_bit(s->bit, pl->link_config.lp_advertising);
-diff --git a/net/dsa/port.c b/net/dsa/port.c
-index 5f01bd4f9dec..34e5dc48f0ff 100644
---- a/net/dsa/port.c
-+++ b/net/dsa/port.c
-@@ -1927,6 +1927,16 @@ static const char * const dsa_switches_apply_workarounds[] = {
- #if IS_ENABLED(CONFIG_NET_DSA_SMSC_LAN9303_I2C)
- 	"smsc,lan9303-i2c",
- #endif
-+	"nxp,sja1105e",
-+	"nxp,sja1105t",
-+	"nxp,sja1105p",
-+	"nxp,sja1105q",
-+	"nxp,sja1105r",
-+	"nxp,sja1105s",
-+	"nxp,sja1110a",
-+	"nxp,sja1110b",
-+	"nxp,sja1110c",
-+	"nxp,sja1110d",
- 	NULL,
- };
- 
+I am fine with leaving the cast alone.
+
+> 	const struct ice_32b_rx_flex_desc_nic *mdid = (typeof(mdid))rx_desc;
+> 
+> This is a compile-time cast w/o any maths anyway, so doing it before
+> checking for the descriptor type doesn't hurt in any way.
+> 
+> 	if (!= FLEX)
+> 		return 0;
+> 
+> 	return le32_ ...
+> 
+> (or via a ternary)
+> 
+> > +}
+> 
+> [...]
+> 
+> Thanks,
+> Olek
 
