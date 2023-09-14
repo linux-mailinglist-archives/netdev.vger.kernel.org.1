@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-33986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF6597A110C
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 00:33:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD66D7A110A
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 00:33:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 855BE2821AB
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 22:33:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D88DE1C20DCA
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 22:33:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3976DD50B;
-	Thu, 14 Sep 2023 22:32:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B12EBC8E7;
+	Thu, 14 Sep 2023 22:32:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4454BC2F7
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 22:32:38 +0000 (UTC)
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2043.outbound.protection.outlook.com [40.107.243.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FB74270E
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 15:32:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D700CA6B
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 22:32:37 +0000 (UTC)
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2078.outbound.protection.outlook.com [40.107.92.78])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED5B42100
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 15:32:36 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fvyWFPE8AQWvZySgwG1jZS19YnIJhzhxKstyDaoOQYU3OFWKF+4GtnpLsVFJcl60IdWEW+u7nxJkiffVQGz2nD/siDHlxB8yfUL395BoO/cQ773ENmdc3SJNcnpzM/d5A5gc7BWzoVS6w96srJlrRRGBpaR/tbQoMjb9UHDy2P8PWJxOH0mTmQII7Avh+qa//nkAVdEb7Su88FhEEtABNeyWxh7XEFrM8HMWHu7mRpyBoSKNlyaDLUBTZIgqrOnMse+Vto5FmNeVQQplDo2qHj1WGl32sOAiDd/PdAqjsprjmGnB9XcwzNA0WAAADIUYEiS2nKVXnV38XW5HZ9Rrmw==
+ b=D+p36z+T51k4NZYGBE+HRj9Y4gpNba0pHCDlyP1KLC8PuW02U5IobmK1tSgySCfnn+Ket3/Bpi2klHDvWl/frjWnHtrOBMQmFyo6Rd4UM6EDQ/mKg6L6GgVTaTgsFi6bO8FyS11tQ1gPXUGrdKb6OokMf9zL2L0rldFIR+wTIx0KLE6IwuJdYrh/Rs/DjD/IfITcCjc8T7ZyZ2xjjgcCFyDh/xiUxlhpZznw30gDpM7I00TDs7Qz34T8f0eEQ1wclJ8rtbGtN0NAXsZU9uOu0+sNkHbKEbtbjT34vjrOIDEhv3lE4DJ361OtcTZcSHUhb3FwDBZhsuwL/0jQ+GqMbQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NdFloJpEMzcc8mX4ZPgmczGLBcaCSFmG6TF21BQ/2Ws=;
- b=gXRp4kHsVwpDKuThrZKJ1hF07Ic4eSir/AolpkbrFRXufyon2zSjR+oboDJ40USiO/gyx2NzqGIGqcRTGGIPPdjYtCw93aUgRDCEsHTtO2rXu5rqMZMrX+WC1bj+65wyzCL10WD8SUF0avLz29T4p3F1XU94MASHnz3AX1I9jm6QUyAfsrtHiSkOLI1sOmtsHQn8Tfu4FE2+k+rknfU3Zd90AI25zoy0uxu3VdYRyTU4mOhxhLA1UU+Ewq76aAk4hoTa+uj3zGwx+nYZC92G0dOvjE0jfMdUW7+Iwj8nYYiSH1YUrNTQbHt+IWQWI7+TYph3fXUoZ66R4Ys8h4oLow==
+ bh=mF0FybgIMdUlGftbxyCKrrkpc1FMj/RipQbVc0T5BB4=;
+ b=hIX4beBGPK+RBjZEHw6izbiNAMrHtMGSe4Am+PywOEP++F3pVgZnL+pemvb6RQ8O9ohK7PvS+AhsxtaNDjE6SfbHYtE3Zy25YJUqSvOpKH3Yxquuo6pYndpz5ldP3r4RcaHbjV1y98vtDO8M3kHaYg30Wq7+L7s9zf8qq80sq6uE5jkWUYEzVaA/3Ci63vduW/374t8ahMbmwoxO+Td6JHnpKRV0tYtT361oxLdAj1SVLzk780manAHIG7oNdv3Wjii8wyOvIBsr904sGImbx2BpYHUkDwEkMYCPqSpEh1L42+dQlRzmFM2ywN4W+50IzDKDZSk6SzHU4aPM2R5pBw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NdFloJpEMzcc8mX4ZPgmczGLBcaCSFmG6TF21BQ/2Ws=;
- b=WcybrZGPSAVfu3eteLoycTzEIis++HgA/BTI6ga+cJTAOC+rgNVJ2Ww36vu4JY95OAIhnFNWzauIQuY+TUHCjj2SzzGdd1fE97Ry/BgAqZkSQM70qNXDlC5Kizg2TUOR+UBw+bMTLScohApBFEotIBujnEC2skr/gCyiO+htjjk=
-Received: from DS7PR05CA0104.namprd05.prod.outlook.com (2603:10b6:8:56::16) by
- MW4PR12MB7288.namprd12.prod.outlook.com (2603:10b6:303:223::15) with
+ bh=mF0FybgIMdUlGftbxyCKrrkpc1FMj/RipQbVc0T5BB4=;
+ b=xT6PEgFPMTkSsWtj3UKMcPczAuL67q4eJiO6+RWFV4KLa5n7WFamaMs/xf87btkk2CSkGPmVP9a2fH6PEgNWkfbUah0btGP8ZTMZiL50qXmXebwUDbupGEXF1MxIOnLbbdXD5ii+PC1giMIc2aUvXxchmvRV0+cq8cBkCFStkeA=
+Received: from DS7PR05CA0103.namprd05.prod.outlook.com (2603:10b6:8:56::18) by
+ IA0PR12MB8864.namprd12.prod.outlook.com (2603:10b6:208:485::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.20; Thu, 14 Sep
  2023 22:32:34 +0000
 Received: from DS3PEPF000099D5.namprd04.prod.outlook.com
- (2603:10b6:8:56:cafe::71) by DS7PR05CA0104.outlook.office365.com
- (2603:10b6:8:56::16) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.20 via Frontend
- Transport; Thu, 14 Sep 2023 22:32:33 +0000
+ (2603:10b6:8:56:cafe::b5) by DS7PR05CA0103.outlook.office365.com
+ (2603:10b6:8:56::18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.21 via Frontend
+ Transport; Thu, 14 Sep 2023 22:32:34 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -55,18 +55,18 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  DS3PEPF000099D5.mail.protection.outlook.com (10.167.17.6) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6792.20 via Frontend Transport; Thu, 14 Sep 2023 22:32:33 +0000
+ 15.20.6792.20 via Frontend Transport; Thu, 14 Sep 2023 22:32:34 +0000
 Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 14 Sep
- 2023 17:32:32 -0500
+ 2023 17:32:33 -0500
 From: Shannon Nelson <shannon.nelson@amd.com>
 To: <netdev@vger.kernel.org>, <brett.creeley@amd.com>, <davem@davemloft.net>,
 	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
 CC: Shannon Nelson <shannon.nelson@amd.com>
-Subject: [PATCH net-next 2/4] pds_core: keep viftypes table across reset
-Date: Thu, 14 Sep 2023 15:31:58 -0700
-Message-ID: <20230914223200.65533-3-shannon.nelson@amd.com>
+Subject: [PATCH net-next 3/4] pds_core: implement pci reset handlers
+Date: Thu, 14 Sep 2023 15:31:59 -0700
+Message-ID: <20230914223200.65533-4-shannon.nelson@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230914223200.65533-1-shannon.nelson@amd.com>
 References: <20230914223200.65533-1-shannon.nelson@amd.com>
@@ -82,71 +82,168 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF000099D5:EE_|MW4PR12MB7288:EE_
-X-MS-Office365-Filtering-Correlation-Id: 01548e50-8089-4ea9-ab67-08dbb5727d6b
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099D5:EE_|IA0PR12MB8864:EE_
+X-MS-Office365-Filtering-Correlation-Id: ec261ffe-9e31-48f9-308c-08dbb5727dd2
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	UQ+vV3d/0T7o5zjEpdRm1p0BBcBYp4xq9+5fHHdRCn+tnvBMzZidsfjK6fu8P90tc8jE2LuU+Gx+rtOPP9ou1qfDWNjmq/EVspyfXqKlrSJ1oidPJGmuhGGT/w2ZqMcmwX3qIBJ25hMUlVeuaU2REMYGST3k3mob5sj4EYBjaQRWrkiZ4S74wdJ2YPEohNV+iUOYskdneAxng3gGn3TQBMFiH/6uOvQ3OJDbveYGVCvhz14PbsALu7D/G6IYn47ObP/5Cs5vl/hsuET9PfIKKjl8H/bamTsKLacb01JwjWFvLC9tJpPnCFHxo+h8fiYtQs327X/AvdwIUX1vQn3oGCIAV5roLhHT5xFfFYq0PU09nUPO9t9Yao0OKNn0f3BnEWYCXpDVeQwNZxhCjoO7ddOxE8PQH30LkMsmYP9Bhmp13ziYj09/VrLAG2A1yHYoBtXmNlY06d95pG/iiKG5SVzgj4uSFhXAqJPapDlsLaD5NVqLS8UCngnGL7gFjfzxqGL/YazKkkjRSbKdaGcT88gIAqQven6VP+elIXCw8xEnt0cPA89HY1TGqiEnMj1HrkmPKW1heBBM6MT7Knph2WU17+2hsLmxok8TS3Ty/fUMWwTI7HAljWGp5e3jHV3oaB5OYMr0WZ7HSrsY8trQiP/55QGK0vnKtwKWOeVz5smX71KHHTKX6/cfc2tjeAIwj3H+2k0AKi7fKAlbE8CxKgLWIqqxqsW8tsaq3fpGvoP+bClqyQZAgVqerwJJz2T2HRsIVKt3HIOpfmVp7rJ8PQ==
+	mJS6SWXFh2hBNyYDe1vfE7D+5upRtkUj4LkxTZzX7VNCCIzzkxDVKaqGrYccL6vrFEFqxwRWHO6vV6+0o2VEYZcQsLQ4VFLwSYLCbRdXRQTwkyzkX/sAbcuklJ9UJn/5t+zdyQ70/D4jX0r6FSi0qCfhDveSL5W9o3DasV9WQqADJf3bZtI4J9pe6gVNLCiZQ0O0r8v2S7xY44T10gC3lBhgXJdgcpix7jj02Mnkti6OBBM/1n6aL4ab4eD2g9mYqqpkY94IhUKRFBYrHXjyNsW7drHB7i5ly2CoAcZaIQ9mgVhEtmUaZQuBcUetp0xNbQ192XqS1b/jFybyv2wP3fysGMy8G7VocZ0zE2rZ1mTuG/RVVYgQNJO28ZrE9cVjm4nJ17UFOVuL2ElybnyGh6aP9TblYBGFBrTgY6kDgThfreqKp1Fin6QC5QBNhAl5s7CQr9bW2k+dV1Zvp6566kEYTNtVU/ypI2fdSXB2zTNR8gPkTqiHfAosyBahZFXSCYFQPiJHXV1dc8WjjbeGXgy1lEP0JQorchQvA2n13bUnL0m5ME5w5VKkKfwK13Q8j6q4qeyudW3TRb5PmIlI0LKlHRJwq0IBLR2OLED6kRWH4LllwS9m8yFgTSfk5i/H0aq0oaA5w2DSTRVBUzFLNDtZVc0GbcxtcxBUbKmW98VmWpMDlMm8JLlAWsWzI0UN/5i0hef5hhXWrCJ+xkysCn8B9uFvq1MBBEte7XF++HkDJuUvkcProbvpz2us5Wtdz3O0SmtEOc80d9rvTbUSMw==
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(346002)(136003)(39860400002)(376002)(396003)(82310400011)(186009)(1800799009)(451199024)(40470700004)(46966006)(36840700001)(478600001)(2616005)(82740400003)(41300700001)(8936002)(8676002)(86362001)(5660300002)(36756003)(44832011)(4326008)(70206006)(70586007)(110136005)(316002)(40480700001)(81166007)(356005)(40460700003)(47076005)(36860700001)(16526019)(1076003)(336012)(26005)(426003)(83380400001)(6666004)(2906002)(36900700001);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(396003)(346002)(376002)(39860400002)(136003)(82310400011)(1800799009)(186009)(451199024)(46966006)(40470700004)(36840700001)(36860700001)(40460700003)(8676002)(110136005)(82740400003)(70586007)(41300700001)(316002)(478600001)(1076003)(81166007)(2616005)(70206006)(6666004)(83380400001)(47076005)(426003)(16526019)(356005)(86362001)(26005)(336012)(8936002)(5660300002)(4326008)(44832011)(36756003)(40480700001)(2906002)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Sep 2023 22:32:33.7383
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Sep 2023 22:32:34.4102
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 01548e50-8089-4ea9-ab67-08dbb5727d6b
+X-MS-Exchange-CrossTenant-Network-Message-Id: ec261ffe-9e31-48f9-308c-08dbb5727dd2
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	DS3PEPF000099D5.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7288
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8864
 
-Keep the viftypes and the current enable/disable states
-across a recovery action.
+Implement the callbacks for a nice PCI reset.  These get called
+when a user is nice enough to use the sysfs PCI reset entry, e.g.
+    echo 1 > /sys/bus/pci/devices/0000:2b:00.0/reset
 
 Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
 Reviewed-by: Brett Creeley <brett.creeley@amd.com>
 ---
- drivers/net/ethernet/amd/pds_core/core.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/amd/pds_core/core.c | 14 +++++--
+ drivers/net/ethernet/amd/pds_core/core.h |  4 ++
+ drivers/net/ethernet/amd/pds_core/main.c | 50 ++++++++++++++++++++++++
+ 3 files changed, 65 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/net/ethernet/amd/pds_core/core.c b/drivers/net/ethernet/amd/pds_core/core.c
-index 36f9b932b9e2..6e426202ab83 100644
+index 6e426202ab83..c1b6b5f7c0b5 100644
 --- a/drivers/net/ethernet/amd/pds_core/core.c
 +++ b/drivers/net/ethernet/amd/pds_core/core.c
-@@ -445,12 +445,13 @@ int pdsc_setup(struct pdsc *pdsc, bool init)
- 		goto err_out_teardown;
+@@ -515,7 +515,7 @@ void pdsc_stop(struct pdsc *pdsc)
+ 					   PDS_CORE_INTR_MASK_SET);
+ }
  
- 	/* Set up the VIFs */
--	err = pdsc_viftypes_init(pdsc);
--	if (err)
--		goto err_out_teardown;
-+	if (init) {
-+		err = pdsc_viftypes_init(pdsc);
+-static void pdsc_fw_down(struct pdsc *pdsc)
++void pdsc_fw_down(struct pdsc *pdsc)
+ {
+ 	union pds_core_notifyq_comp reset_event = {
+ 		.reset.ecode = cpu_to_le16(PDS_EVENT_RESET),
+@@ -523,10 +523,13 @@ static void pdsc_fw_down(struct pdsc *pdsc)
+ 	};
+ 
+ 	if (test_and_set_bit(PDSC_S_FW_DEAD, &pdsc->state)) {
+-		dev_err(pdsc->dev, "%s: already happening\n", __func__);
++		dev_warn(pdsc->dev, "%s: already happening\n", __func__);
+ 		return;
+ 	}
+ 
++	if (pdsc->pdev->is_virtfn)
++		return;
++
+ 	/* Notify clients of fw_down */
+ 	if (pdsc->fw_reporter)
+ 		devlink_health_report(pdsc->fw_reporter, "FW down reported", pdsc);
+@@ -536,7 +539,7 @@ static void pdsc_fw_down(struct pdsc *pdsc)
+ 	pdsc_teardown(pdsc, PDSC_TEARDOWN_RECOVERY);
+ }
+ 
+-static void pdsc_fw_up(struct pdsc *pdsc)
++void pdsc_fw_up(struct pdsc *pdsc)
+ {
+ 	union pds_core_notifyq_comp reset_event = {
+ 		.reset.ecode = cpu_to_le16(PDS_EVENT_RESET),
+@@ -549,6 +552,11 @@ static void pdsc_fw_up(struct pdsc *pdsc)
+ 		return;
+ 	}
+ 
++	if (pdsc->pdev->is_virtfn) {
++		clear_bit(PDSC_S_FW_DEAD, &pdsc->state);
++		return;
++	}
++
+ 	err = pdsc_setup(pdsc, PDSC_SETUP_RECOVERY);
+ 	if (err)
+ 		goto err_out;
+diff --git a/drivers/net/ethernet/amd/pds_core/core.h b/drivers/net/ethernet/amd/pds_core/core.h
+index e545fafc4819..19c1957167da 100644
+--- a/drivers/net/ethernet/amd/pds_core/core.h
++++ b/drivers/net/ethernet/amd/pds_core/core.h
+@@ -309,4 +309,8 @@ irqreturn_t pdsc_adminq_isr(int irq, void *data);
+ 
+ int pdsc_firmware_update(struct pdsc *pdsc, const struct firmware *fw,
+ 			 struct netlink_ext_ack *extack);
++
++void pdsc_fw_down(struct pdsc *pdsc);
++void pdsc_fw_up(struct pdsc *pdsc);
++
+ #endif /* _PDSC_H_ */
+diff --git a/drivers/net/ethernet/amd/pds_core/main.c b/drivers/net/ethernet/amd/pds_core/main.c
+index 3a45bf474a19..4c7f982c12a1 100644
+--- a/drivers/net/ethernet/amd/pds_core/main.c
++++ b/drivers/net/ethernet/amd/pds_core/main.c
+@@ -445,12 +445,62 @@ static void pdsc_remove(struct pci_dev *pdev)
+ 	devlink_free(dl);
+ }
+ 
++static void pdsc_reset_prepare(struct pci_dev *pdev)
++{
++	struct pdsc *pdsc = pci_get_drvdata(pdev);
++
++	pdsc_fw_down(pdsc);
++
++	pci_free_irq_vectors(pdev);
++	pdsc_unmap_bars(pdsc);
++	pci_release_regions(pdev);
++	pci_disable_device(pdev);
++}
++
++static void pdsc_reset_done(struct pci_dev *pdev)
++{
++	struct pdsc *pdsc = pci_get_drvdata(pdev);
++	struct device *dev = pdsc->dev;
++	int err;
++
++	err = pci_enable_device(pdev);
++	if (err) {
++		dev_err(dev, "Cannot enable PCI device: %pe\n", ERR_PTR(err));
++		return;
++	}
++	pci_set_master(pdev);
++
++	if (!pdev->is_virtfn) {
++		pcie_print_link_status(pdsc->pdev);
++
++		err = pci_request_regions(pdsc->pdev, PDS_CORE_DRV_NAME);
++		if (err) {
++			dev_err(pdsc->dev, "Cannot request PCI regions: %pe\n",
++				ERR_PTR(err));
++			return;
++		}
++
++		err = pdsc_map_bars(pdsc);
 +		if (err)
-+			goto err_out_teardown;
- 
--	if (init)
- 		pdsc_debugfs_add_viftype(pdsc);
++			return;
 +	}
++
++	pdsc_fw_up(pdsc);
++}
++
++static const struct pci_error_handlers pdsc_err_handler = {
++	/* FLR handling */
++	.reset_prepare      = pdsc_reset_prepare,
++	.reset_done         = pdsc_reset_done,
++};
++
+ static struct pci_driver pdsc_driver = {
+ 	.name = PDS_CORE_DRV_NAME,
+ 	.id_table = pdsc_id_table,
+ 	.probe = pdsc_probe,
+ 	.remove = pdsc_remove,
+ 	.sriov_configure = pdsc_sriov_configure,
++	.err_handler = &pdsc_err_handler,
+ };
  
- 	clear_bit(PDSC_S_FW_DEAD, &pdsc->state);
- 	return 0;
-@@ -469,8 +470,10 @@ void pdsc_teardown(struct pdsc *pdsc, bool removing)
- 	pdsc_qcq_free(pdsc, &pdsc->notifyqcq);
- 	pdsc_qcq_free(pdsc, &pdsc->adminqcq);
- 
--	kfree(pdsc->viftype_status);
--	pdsc->viftype_status = NULL;
-+	if (removing) {
-+		kfree(pdsc->viftype_status);
-+		pdsc->viftype_status = NULL;
-+	}
- 
- 	if (pdsc->intr_info) {
- 		for (i = 0; i < pdsc->nintrs; i++)
+ void *pdsc_get_pf_struct(struct pci_dev *vf_pdev)
 -- 
 2.17.1
 
