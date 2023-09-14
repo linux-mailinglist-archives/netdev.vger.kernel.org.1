@@ -1,149 +1,70 @@
-Return-Path: <netdev+bounces-33878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E48477A08C9
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 17:16:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAA037A08CF
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 17:17:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BA48281BD8
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 15:16:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A8461F24213
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 15:17:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A588210FE;
-	Thu, 14 Sep 2023 15:00:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DC72D261;
+	Thu, 14 Sep 2023 15:01:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A78539C;
-	Thu, 14 Sep 2023 15:00:18 +0000 (UTC)
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BC741FC4;
-	Thu, 14 Sep 2023 08:00:17 -0700 (PDT)
-Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-501bef6e0d3so1788183e87.1;
-        Thu, 14 Sep 2023 08:00:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694703615; x=1695308415; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ost934mXsFAdMAZL0F6K6qliA7AblkstZWyU0HrIN0s=;
-        b=U0Ucn2dr2NcrRdXiCBQ8vtODENVLNfrd/4La3iLgeVQTPlIK+E5Wh6siCNaUZShYNi
-         +mBM+rJDKH5tsLfTJlBKyNRAJBRLdJpGup6iOaNSMvfzXE2vu4z9tKL9ySA5pf2HuJRL
-         T9QhQLrfkrmvjo9zXtw181xbeOz5luszhAICW/wMVB/Q81FH/MhDFTYZqbJZxTflunj2
-         fph08PPYpmJxjkvh3IlDPfFc3mVUd9YzDORLqx0oYNZBly8HHQvdhJF4v6Hf4sdx5XjY
-         FMnjqZKXC1wnjpCr6D3Ljs0408cUlRqFlzFeaahl2n0gSr9V99vl7PJU8noAuCJvN0H5
-         kqXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694703615; x=1695308415;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ost934mXsFAdMAZL0F6K6qliA7AblkstZWyU0HrIN0s=;
-        b=rgYVR6hxFZ2ZzIwpqd0DMC02UQOE3UW6l1QJowqOxHSljleazW1xt2ITjCPCBxOJ50
-         PdNlaX9TynU27BY+vy0lwp6gJVHx9m41t89yOmT0FOFpDJnp+0v2Zk8OsBmdc99CRWEb
-         XL7Pgoa1N9gh06cwjll1lsnn4u+UrzJZQrPiRBYBpr7xWLMzwFLL6MdiABEtILZHMQDl
-         02HfvM65Jc7lBuHU9KjEVxL0d9y2T5bwbWq0gMVVba/VJvxQ2hlPQ51FDx3ouN1giNq9
-         HMvEucI1FgLYqW9MxfeAxmIfLltfWH3NaYhrX+Oj4SAsg5L2m1SedXA0Tk8V1zsKtiJu
-         0AKA==
-X-Gm-Message-State: AOJu0YxOMJEOUuv92ljeFDjBFhmb6mgLqhkWPtK/RRR3AbbfzhsH0k9w
-	AwBmZDjjOco9HQwtIjphAtA=
-X-Google-Smtp-Source: AGHT+IEyuQasdt2T0VDWeN/DaQrMM3CCucu0MV6lzspojZuxz3D9lCseE6UrznxpRfcOfZwYMqK2hw==
-X-Received: by 2002:a19:6918:0:b0:4fb:9f93:365f with SMTP id e24-20020a196918000000b004fb9f93365fmr4161961lfc.38.1694703615403;
-        Thu, 14 Sep 2023 08:00:15 -0700 (PDT)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id a13-20020a056512020d00b005008b5191aesm302321lfo.284.2023.09.14.08.00.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Sep 2023 08:00:15 -0700 (PDT)
-Date: Thu, 14 Sep 2023 18:00:12 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, Alexei Starovoitov <ast@kernel.org>, bpf@vger.kernel.org, 
-	Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, 
-	Emil Renner Berthing <kernel@esmil.dk>, Eric Dumazet <edumazet@google.com>, 
-	Fabio Estevam <festevam@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	linux-arm-kernel@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, NXP Linux Team <linux-imx@nxp.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Pengutronix Kernel Team <kernel@pengutronix.de>, 
-	Samin Guo <samin.guo@starfivetech.com>, Sascha Hauer <s.hauer@pengutronix.de>, 
-	Shawn Guo <shawnguo@kernel.org>
-Subject: Re: [PATCH net-next 3/6] net: stmmac: intel-plat: use
- stmmac_set_tx_clk_gmii()
-Message-ID: <vbljmrosykldu3jutfqyxtp22ivbcfyn2luu3cg55saeyi2uqp@tayl2qsbmovg>
-References: <ZQMPnyutz6T23E8T@shell.armlinux.org.uk>
- <E1qgmkk-007Z4l-BK@rmk-PC.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBA4B28E28
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 15:01:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F9DFC433C7;
+	Thu, 14 Sep 2023 15:01:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694703696;
+	bh=DldlN/rJDcbQjdii1OXIMebBG7I2u1q/R7dxdkUwNcI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=n47Vcu9oI7qTs+4+mCNhbyBRzdgiQvVF5qQmLY2YfaPtzseC9rZ9E6KI/OpoOkXeK
+	 /bPkNgp0VltvRJcLry591gMpAzToavNiud9GB01rcKNUxZwEvV93maCfU5oNv7GdD3
+	 rB+N1kl844ynTcVm/hylZBMPfQvjntBbWtVcYLJZCQMHLk0PpIVbxRxOM/dYrp4VfF
+	 821ocV3+GP/8DkBW63OooPqyuPBJvgksIMJTHlr2+E3xAH8Bj9THEMKChkUwfNxYFZ
+	 dpXYuJmuJ5cAdHtJC49VuEOBDwiRlSEh8hTVjUp2UJa1Ahd79F08VsPQFEkB8MD+bQ
+	 0v4/bMiWW/55Q==
+Message-ID: <ce3531de-f020-4ec2-7c15-720b6cac951a@kernel.org>
+Date: Thu, 14 Sep 2023 09:01:35 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1qgmkk-007Z4l-BK@rmk-PC.armlinux.org.uk>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.0
+Subject: Re: [PATCH net-next 05/14] ipv6: lockless IPV6_MINHOPCOUNT
+ implementation
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <20230912160212.3467976-1-edumazet@google.com>
+ <20230912160212.3467976-6-edumazet@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20230912160212.3467976-6-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Sep 14, 2023 at 02:51:30PM +0100, Russell King (Oracle) wrote:
-> Use stmmac_set_tx_clk_gmii().
+On 9/12/23 10:02 AM, Eric Dumazet wrote:
+> Add one missing READ_ONCE() annotation in do_ipv6_getsockopt()
+> and make IPV6_MINHOPCOUNT setsockopt() lockless.
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-
-Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
-
--Serge(y)
-
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 > ---
->  .../stmicro/stmmac/dwmac-intel-plat.c         | 34 +++++--------------
->  1 file changed, 8 insertions(+), 26 deletions(-)
+>  net/ipv6/ipv6_sockglue.c | 31 +++++++++++++++----------------
+>  1 file changed, 15 insertions(+), 16 deletions(-)
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c
-> index d352a14f9d48..c6ebd1d91f38 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c
-> @@ -31,32 +31,14 @@ struct intel_dwmac_data {
->  static void kmb_eth_fix_mac_speed(void *priv, unsigned int speed, unsigned int mode)
->  {
->  	struct intel_dwmac *dwmac = priv;
-> -	unsigned long rate;
-> -	int ret;
-> -
-> -	rate = clk_get_rate(dwmac->tx_clk);
-> -
-> -	switch (speed) {
-> -	case SPEED_1000:
-> -		rate = 125000000;
-> -		break;
-> -
-> -	case SPEED_100:
-> -		rate = 25000000;
-> -		break;
-> -
-> -	case SPEED_10:
-> -		rate = 2500000;
-> -		break;
-> -
-> -	default:
-> -		dev_err(dwmac->dev, "Invalid speed\n");
-> -		break;
-> -	}
-> -
-> -	ret = clk_set_rate(dwmac->tx_clk, rate);
-> -	if (ret)
-> -		dev_err(dwmac->dev, "Failed to configure tx clock rate\n");
-> +	int err;
-> +
-> +	err = stmmac_set_tx_clk_gmii(dwmac->tx_clk, speed);
-> +	if (err == -ENOTSUPP)
-> +		dev_err(dwmac->dev, "invalid speed %uMbps\n", speed);
-> +	else if (err)
-> +		dev_err(dwmac->dev, "failed to set tx rate for speed %uMbps: %pe\n",
-> +			speed, ERR_PTR(err));
->  }
->  
->  static const struct intel_dwmac_data kmb_data = {
-> -- 
-> 2.30.2
-> 
-> 
+
+Reviewed-by: David Ahern <dsahern@kernel.org>
+
+
 
