@@ -1,71 +1,69 @@
-Return-Path: <netdev+bounces-33972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A30BA7A107A
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 00:03:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5A1F7A10A0
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 00:15:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31359282643
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 22:03:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E92E91C21125
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 22:15:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2C7E266C7;
-	Thu, 14 Sep 2023 22:03:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29A0626E3C;
+	Thu, 14 Sep 2023 22:15:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C345A241F8
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 22:03:02 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11B632120
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 15:03:02 -0700 (PDT)
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38EM1V2P012412;
-	Thu, 14 Sep 2023 22:02:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=g310eJVPH+nXcYI11Pht0kGIzprw56k0BiYraYq4Kmg=;
- b=WpSNKAaA4NJjh4vCFqbQcdN+BOnrxtf2DDD0IHmhYz0mpWLfVdsP1OiUXdJ4SHj+Hx/T
- v/7WPAHox66mq1BPno/KDw8hBjl5CM4JIplX7N/M89s/8gSasyJCSPofV9zE+v1sjHfy
- qM/xcsdtORFSQSyIJM947dRpVhu6mjqzFiBvGpn1g9aoNqemEJoSmwJZNE7pqVEHGESk
- 8AIFj9lchkDvbQQv9peFTKksd7LwgPECSUJA7y6S50AMQbrsMDJ4y8PQodIKwg5iiufJ
- EX2YOLie9yKRvQiVIM/kPLtgotnzFbiA1N24BaL1TxjqVCJhUL+DQG8gbnh+yuQoMqby Ug== 
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t4akx02vx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Sep 2023 22:02:56 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38EL5ebK002752;
-	Thu, 14 Sep 2023 22:02:55 GMT
-Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3t14hmdxmu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Sep 2023 22:02:55 +0000
-Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38EM2sim37749118
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 14 Sep 2023 22:02:54 GMT
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C632A58063;
-	Thu, 14 Sep 2023 22:02:54 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 43A0A58059;
-	Thu, 14 Sep 2023 22:02:54 +0000 (GMT)
-Received: from ltc19u30.ibm.com (unknown [9.114.224.51])
-	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 14 Sep 2023 22:02:54 +0000 (GMT)
-From: David Christensen <drc@ibm.com>
-To: shannon.nelson@amd.com, brett.creeley@amd.com, drivers@pensando.io
-Cc: netdev@vger.kernel.org, David Christensen <drc@linux.vnet.ibm.com>
-Subject: [PATCH net v2] ionic: fix 16bit math issue when PAGE_SIZE >= 64KB
-Date: Thu, 14 Sep 2023 18:02:52 -0400
-Message-Id: <20230914220252.286248-1-drc@ibm.com>
-X-Mailer: git-send-email 2.39.1
-In-Reply-To: <20230911222212.103406-1-drc@linux.vnet.ibm.com>
-References: <20230911222212.103406-1-drc@linux.vnet.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6D910A0C
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 22:15:36 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5C5311BF8
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 15:15:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1694729734;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=qbzfkB6XDeg+lyjll9b1bWAHm6ZrCh25IkF3gmIpS/A=;
+	b=GZlGMmB6Bg6pBEyGp/btkk1Bn1Rm0NDGGvnVL1KTEioxs8HaHthx7Tpo/Wb8QUnmOEcAbf
+	JYRn5yvOimF7G4hILD4yURy4a/WzmDYqntYA1upFil/PPpQkbMVes424yZk9DjxkeQ9BIT
+	Gboqvl2HzmInZTGnNXhMAzyG9wyAtv8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-593-0e1tLjckMi63woBcMf-5IA-1; Thu, 14 Sep 2023 18:15:31 -0400
+X-MC-Unique: 0e1tLjckMi63woBcMf-5IA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 80B2E857A9E;
+	Thu, 14 Sep 2023 22:15:30 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.216])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 76C5410F1BE7;
+	Thu, 14 Sep 2023 22:15:28 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Al Viro <viro@zeniv.linux.org.uk>,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Cc: David Howells <dhowells@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Christian Brauner <christian@brauner.io>,
+	David Laight <David.Laight@ACULAB.COM>,
+	Matthew Wilcox <willy@infradead.org>,
+	Brendan Higgins <brendanhiggins@google.com>,
+	David Gow <davidgow@google.com>,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-mm@kvack.org,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	kunit-dev@googlegroups.com,
+	linux-kernel@vger.kernel.org
+Subject: [RFC PATCH 0/9] iov_iter: kunit: Cleanup, abstraction and more tests
+Date: Thu, 14 Sep 2023 23:15:17 +0100
+Message-ID: <20230914221526.3153402-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,89 +71,82 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 8a2EjL4vM2AHtU6mAxOeujuKEbherPD_
-X-Proofpoint-ORIG-GUID: 8a2EjL4vM2AHtU6mAxOeujuKEbherPD_
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-09-14_12,2023-09-14_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 clxscore=1011
- mlxscore=0 malwarescore=0 priorityscore=1501 suspectscore=0 phishscore=0
- spamscore=0 impostorscore=0 lowpriorityscore=0 mlxlogscore=999 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2308100000
- definitions=main-2309140192
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 
-From: David Christensen <drc@linux.vnet.ibm.com>
+Hi Al, Linus,
 
-The ionic device supports a maximum buffer length of 16 bits (see
-ionic_rxq_desc or ionic_rxq_sg_elem).  When adding new buffers to
-the receive rings, the function ionic_rx_fill() uses 16bit math when
-calculating the number of pages to allocate for an RX descriptor,
-given the interface's MTU setting. If the system PAGE_SIZE >= 64KB,
-and the buf_info->page_offset is 0, the remain_len value will never
-decrement from the original MTU value and the frag_len value will
-always be 0, causing additional pages to be allocated as scatter-
-gather elements unnecessarily.
+These patches make some changes to the kunit tests previously added for
+iov_iter testing, in particular adding support for testing UBUF/IOVEC
+iterators:
 
-A similar math issue exists in ionic_rx_frags(), but no failures
-have been observed here since a 64KB page should not normally
-require any scatter-gather elements at any legal Ethernet MTU size.
+ (1) Clean up a couple of checkpatch style complaints.
 
-Fixes: 4b0a7539a372 ("ionic: implement Rx page reuse")
-Signed-off-by: David Christensen <drc@linux.vnet.ibm.com>
----
- drivers/net/ethernet/pensando/ionic/ionic_dev.h  |  1 +
- drivers/net/ethernet/pensando/ionic/ionic_txrx.c | 10 +++++++---
- 2 files changed, 8 insertions(+), 3 deletions(-)
+ (2) Consolidate some repeated bits of code into helper functions and use
+     the same struct to represent straight offset/address ranges and
+     partial page lists.
 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_dev.h b/drivers/net/ethernet/pensando/ionic/ionic_dev.h
-index 6aac98bcb9f4..aae4131f146a 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_dev.h
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_dev.h
-@@ -187,6 +187,7 @@ typedef void (*ionic_desc_cb)(struct ionic_queue *q,
- 			      struct ionic_desc_info *desc_info,
- 			      struct ionic_cq_info *cq_info, void *cb_arg);
- 
-+#define IONIC_MAX_BUF_LEN			((u16)-1)
- #define IONIC_PAGE_SIZE				PAGE_SIZE
- #define IONIC_PAGE_SPLIT_SZ			(PAGE_SIZE / 2)
- #define IONIC_PAGE_GFP_MASK			(GFP_ATOMIC | __GFP_NOWARN |\
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-index 26798fc635db..44466e8c5d77 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-@@ -207,7 +207,8 @@ static struct sk_buff *ionic_rx_frags(struct ionic_queue *q,
- 			return NULL;
- 		}
- 
--		frag_len = min_t(u16, len, IONIC_PAGE_SIZE - buf_info->page_offset);
-+		frag_len = min_t(u16, len, min_t(u32, IONIC_MAX_BUF_LEN,
-+						 IONIC_PAGE_SIZE - buf_info->page_offset));
- 		len -= frag_len;
- 
- 		dma_sync_single_for_cpu(dev,
-@@ -452,7 +453,8 @@ void ionic_rx_fill(struct ionic_queue *q)
- 
- 		/* fill main descriptor - buf[0] */
- 		desc->addr = cpu_to_le64(buf_info->dma_addr + buf_info->page_offset);
--		frag_len = min_t(u16, len, IONIC_PAGE_SIZE - buf_info->page_offset);
-+		frag_len = min_t(u16, len, min_t(u32, IONIC_MAX_BUF_LEN,
-+						 IONIC_PAGE_SIZE - buf_info->page_offset));
- 		desc->len = cpu_to_le16(frag_len);
- 		remain_len -= frag_len;
- 		buf_info++;
-@@ -471,7 +473,9 @@ void ionic_rx_fill(struct ionic_queue *q)
- 			}
- 
- 			sg_elem->addr = cpu_to_le64(buf_info->dma_addr + buf_info->page_offset);
--			frag_len = min_t(u16, remain_len, IONIC_PAGE_SIZE - buf_info->page_offset);
-+			frag_len = min_t(u16, remain_len, min_t(u32, IONIC_MAX_BUF_LEN,
-+								IONIC_PAGE_SIZE -
-+								buf_info->page_offset));
- 			sg_elem->len = cpu_to_le16(frag_len);
- 			remain_len -= frag_len;
- 			buf_info++;
--- 
-2.39.1
+ (3) Add a function to set up a userspace VM, attach the VM to the kunit
+     testing thread, create an anonymous file, stuff some pages into the
+     file and map the file into the VM to act as a buffer that can be used
+     with UBUF/IOVEC iterators.
+
+     I map an anonymous file with pages attached rather than using MAP_ANON
+     so that I can check the pages obtained from iov_iter_extract_pages()
+     without worrying about them changing due to swap, migrate, etc..
+
+     [?] Is this the best way to do things?  Mirroring execve, it requires
+     a number of extra core symbols to be exported.  Should this be done in
+     the core code?
+
+ (4) Add tests for copying into and out of UBUF and IOVEC iterators.
+
+ (5) Add tests for extracting pages from UBUF and IOVEC iterators.
+
+ (6) Add tests to benchmark copying 256MiB to UBUF, IOVEC, KVEC, BVEC and
+     XARRAY iterators.
+
+     [!] Note that this requires 256MiB of memory for UBUF and IOVEC; the
+     KVEC, BVEC and XARRAY benchmarking maps a single page multiple times.
+     I might be able to shrink that if I can add the same page multiple
+     times to the anon file's pagecache.  I'm sure this is not recommended,
+     but I might be able to get away with it for this particular
+     application.
+
+ (7) Add a test to benchmark copying 256MiB through dynamically allocated
+     256-page bvecs to simulate bio construction.
+
+Example benchmarks output:
+
+ iov_kunit_benchmark_ubuf: avg 26899 uS, stddev 142 uS
+ iov_kunit_benchmark_iovec: avg 26897 uS, stddev 74 uS
+ iov_kunit_benchmark_kvec: avg 2688 uS, stddev 35 uS
+ iov_kunit_benchmark_bvec: avg 3139 uS, stddev 21 uS
+ iov_kunit_benchmark_bvec_split: avg 3379 uS, stddev 15 uS
+ iov_kunit_benchmark_xarray: avg 3582 uS, stddev 13 uS
+
+I've pushed the patches here also:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=iov-kunit
+
+David
+
+David Howells (9):
+  iov_iter: Fix some checkpatch complaints in kunit tests
+  iov_iter: Consolidate some of the repeated code into helpers
+  iov_iter: Consolidate the test vector struct in the kunit tests
+  iov_iter: Consolidate bvec pattern checking
+  iov_iter: Create a function to prepare userspace VM for UBUF/IOVEC
+    tests
+  iov_iter: Add copy kunit tests for ITER_UBUF and ITER_IOVEC
+  iov_iter: Add extract kunit tests for ITER_UBUF and ITER_IOVEC
+  iov_iter: Add benchmarking kunit tests
+  iov_iter: Add benchmarking kunit tests for UBUF/IOVEC
+
+ fs/anon_inodes.c     |    1 +
+ kernel/fork.c        |    2 +
+ lib/kunit_iov_iter.c | 1211 +++++++++++++++++++++++++++++++++++-------
+ mm/mmap.c            |    1 +
+ mm/util.c            |    1 +
+ 5 files changed, 1024 insertions(+), 192 deletions(-)
 
 
