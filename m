@@ -1,69 +1,80 @@
-Return-Path: <netdev+bounces-33939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42CA27A0B6B
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 19:19:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF4D97A0BFF
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 19:51:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB5E91C20DED
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 17:19:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D07F1F2408C
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 17:51:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B6DF26299;
-	Thu, 14 Sep 2023 17:18:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32723262AE;
+	Thu, 14 Sep 2023 17:51:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3730026292
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 17:18:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9D755C433C9;
-	Thu, 14 Sep 2023 17:18:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAF1A10A2F
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 17:51:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 20E44C433C9;
+	Thu, 14 Sep 2023 17:51:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694711932;
-	bh=S/oPRvCIOqAzQbXStblC4xSp1oIYNFBV4KDPAvO8sS8=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=hF3xaF/uvSraa/EktDanhHBar7+R8spLaO0vteMkNYdHDozrHjPyz/ccXknGZgBO5
-	 gJVzoj7Ke/w7OiedTTQ69089ydUlrT1TVWYzMGzLvMniC/lGK59NQvkRJL4+QoNrkR
-	 dqBa9gNH9Un5DU1lcSDE3YTBeHmeNKc7NV9A0LZL8dVnPAJToXfTE8nFCWwXPB1nUx
-	 sNJZFYQ6Kr+0rvx8UBtFCeCEZHhjgVV5xQLlZKTGoo+IWpzxDdLfFY4NF3BcP8OqIk
-	 MQgAlUzrcMWz0KB4V19/j/2aMaWfYQNDBRpFK/VjPOS2ERQPZ/2zH5N2xxTVuq6BZJ
-	 s0HVxMYQJxk9g==
+	s=k20201202; t=1694713886;
+	bh=Y+TiaH7nEnTtK97dGbzl74ozQlGiijQHhK1f2rwQW7E=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=bGO8wioW8L0iq4AGp8ea3npwiqdVu0vAZ1c70dkebiY95CNaC6yKj8/rYnTq04NRc
+	 bj8Jlmrr8L4obkKum/X3+VS+A5RlE3vJVLdBciW5zg3pDZQNpmUR0e6yVARekCZvdY
+	 Rzv5/DKRB8VfMsiRHiVF907h5V4L3BZzEHXqwE7njvmTJ/Q/DS+DJ28ApuO5c9vgTV
+	 B2KvxSmkmu1M3fPHcA5SnpI9Rc2yRDsLeRkct55lLkUBb3P95jOI3W6X4MicRXszDC
+	 EUMIKR3UmKd9Lgwv0rrReN4DLoMliXi6QzUvVPDVL8e9fO2LfDLOS78CGiPiZiV0hv
+	 bq44hNk4GbOww==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8B7E4E1C28E;
-	Thu, 14 Sep 2023 17:18:52 +0000 (UTC)
-Subject: Re: [GIT PULL] Networking for 6.6-rc2
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20230914131626.49468-1-pabeni@redhat.com>
-References: <20230914131626.49468-1-pabeni@redhat.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20230914131626.49468-1-pabeni@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.6-rc2
-X-PR-Tracked-Commit-Id: a22730b1b4bf437c6bbfdeff5feddf54be4aeada
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 9fdfb15a3dbf818e06be514f4abbfc071004cbe7
-Message-Id: <169471193255.25746.5742986007553004024.pr-tracker-bot@kernel.org>
-Date: Thu, 14 Sep 2023 17:18:52 +0000
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 06825E22AF4;
+	Thu, 14 Sep 2023 17:51:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [GIT PULL] Networking for 6.6-rc2
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169471388602.12217.8215674538813373212.git-patchwork-notify@kernel.org>
+Date: Thu, 14 Sep 2023 17:51:26 +0000
+References: <20230914131626.49468-1-pabeni@redhat.com>
+In-Reply-To: <20230914131626.49468-1-pabeni@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-The pull request you sent on Thu, 14 Sep 2023 15:16:26 +0200:
+Hello:
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.6-rc2
+This pull request was applied to netdev/net.git (main)
+by Linus Torvalds <torvalds@linux-foundation.org>:
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/9fdfb15a3dbf818e06be514f4abbfc071004cbe7
+On Thu, 14 Sep 2023 15:16:26 +0200 you wrote:
+> Hi Linus!
+> 
+> Quite unusually, this does not contains any fix coming from subtrees
+> (nf, ebpf, wifi, etc).
+> 
+> The following changes since commit 73be7fb14e83d24383f840a22f24d3ed222ca319:
+> 
+> [...]
 
-Thank you!
+Here is the summary with links:
+  - [GIT,PULL] Networking for 6.6-rc2
+    https://git.kernel.org/netdev/net/c/9fdfb15a3dbf
 
+You are awesome, thank you!
 -- 
 Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
