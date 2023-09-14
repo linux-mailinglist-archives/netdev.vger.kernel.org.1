@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-33908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC9627A098A
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 17:43:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C270D7A098B
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 17:44:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6D7AEB20C78
-	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 15:43:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E537282211
+	for <lists+netdev@lfdr.de>; Thu, 14 Sep 2023 15:44:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB8D0250F0;
-	Thu, 14 Sep 2023 15:35:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E257926290;
+	Thu, 14 Sep 2023 15:36:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFADB10A1E
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 15:35:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D66F210A1E
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 15:36:02 +0000 (UTC)
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AAC11FD0
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 08:35:59 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 268C1DD
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 08:36:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
 	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=t26CLbX1MWgAEwYjLRM8G7h4VbkzoB7fg+lDXEq42i8=; b=C1zzwQrSlVM0/ChEFQugLcZ/sc
-	jkxWt+Wtr1yAnNG6nAYLWLs8C/pF4uHSitiLVHSmfZbrjkrYHlkLncnBGGtCQYMT+7QpphYpJ72Tr
-	/XCAzCKBbUPgs/0gKnR1eu1yBop8rcZyVMXOMii9tDsX8jk/JduSS8aAlLDm7hJHEZB9bJhXR9HYl
-	i433C2EYR5i6Aydj6UWdktUlziu6Joko46yajs+3xrxYJk2LcHJEgM9WslgYnIcBkEWZj9EER1arM
-	JkE3R7LWUCdqKITxuESrPbIRFzyGaMsE+IPJOtV8YKRv0+u5lT/ksvXpHBXDtMPb+OstBC55fgSkg
-	pR58gxeQ==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:46322 helo=rmk-PC.armlinux.org.uk)
+	bh=+Q5xU7a1lkRBYmSj89LoPX87ow41lpqP1TCCTG6cSkA=; b=jKse70RnCUkvPBEqt3W0SsM8ey
+	jPU2nQYFFMDbwHGSz9zU2uvG3yoEtzQhmWV4LwxPDvQ+bmpnje6dl2L+N20tOSjtcAHy6Fm0zDLIQ
+	SoP4ddaFP7OX3ndu5PT9xejVDOjkY0ESJ3E3XE1av7c4xi8Ot02OI1c7x4jUc3/wE4hJLvcyRB/4H
+	05rIccXi/gDA9JAwMsDfT2XeMv3WHeH7KBEDB4VXiOKLrtBBxYGJOMW63RkWwdjXZO+gJiyEl31Ix
+	EMwWsQvB0c3LBQPrsbg+KXhcGMRAVtpjvnXihh4SOTcCYG8lmWEc15LR+Lt3AXrCXZUHRet5ZqAMc
+	AcO7TFxQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:46326 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1qgoNe-0004Wc-18;
-	Thu, 14 Sep 2023 16:35:46 +0100
+	id 1qgoNj-0004Wu-1f;
+	Thu, 14 Sep 2023 16:35:51 +0100
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1qgoNf-007a4O-47; Thu, 14 Sep 2023 16:35:47 +0100
+	id 1qgoNk-007a4U-8r; Thu, 14 Sep 2023 16:35:52 +0100
 In-Reply-To: <ZQMn+Wkvod10vdLd@shell.armlinux.org.uk>
 References: <ZQMn+Wkvod10vdLd@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -59,8 +59,7 @@ Cc: chenhao418@huawei.com,
 	 shenjian15@huawei.com,
 	 wangjie125@huawei.com,
 	 wangpeiyang1@huawei.com
-Subject: [PATCH net-next 4/7] net: phy: move phy_suspend() to end of
- phy_state_machine()
+Subject: [PATCH net-next 5/7] net: phy: move phy_state_machine()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,54 +69,189 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1qgoNf-007a4O-47@rmk-PC.armlinux.org.uk>
+Message-Id: <E1qgoNk-007a4U-8r@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Thu, 14 Sep 2023 16:35:47 +0100
+Date: Thu, 14 Sep 2023 16:35:52 +0100
 
-Move the call to phy_suspend() to the end of phy_state_machine() after
-we release the lock so that we can combine the locked areas.
-phy_suspend() can not be called while holding phydev->lock as it has
-caused deadlocks in the past.
+Move phy_state_machine() before phy_stop() to avoid subsequent patches
+introducing forward references.
 
 Tested-by: Jijie Shao <shaojijie@huawei.com>
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/phy/phy.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+ drivers/net/phy/phy.c | 152 +++++++++++++++++++++---------------------
+ 1 file changed, 76 insertions(+), 76 deletions(-)
 
 diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
-index 5bb33af2a4cb..756326f38b14 100644
+index 756326f38b14..20e23fa9cf96 100644
 --- a/drivers/net/phy/phy.c
 +++ b/drivers/net/phy/phy.c
-@@ -1494,15 +1494,11 @@ void phy_state_machine(struct work_struct *work)
- 		func = &_phy_start_aneg;
- 	}
+@@ -1353,82 +1353,6 @@ void phy_free_interrupt(struct phy_device *phydev)
+ }
+ EXPORT_SYMBOL(phy_free_interrupt);
  
+-/**
+- * phy_stop - Bring down the PHY link, and stop checking the status
+- * @phydev: target phy_device struct
+- */
+-void phy_stop(struct phy_device *phydev)
+-{
+-	struct net_device *dev = phydev->attached_dev;
+-	enum phy_state old_state;
+-
+-	if (!phy_is_started(phydev) && phydev->state != PHY_DOWN &&
+-	    phydev->state != PHY_ERROR) {
+-		WARN(1, "called from state %s\n",
+-		     phy_state_to_str(phydev->state));
+-		return;
+-	}
+-
+-	mutex_lock(&phydev->lock);
+-	old_state = phydev->state;
+-
+-	if (phydev->state == PHY_CABLETEST) {
+-		phy_abort_cable_test(phydev);
+-		netif_testing_off(dev);
+-	}
+-
+-	if (phydev->sfp_bus)
+-		sfp_upstream_stop(phydev->sfp_bus);
+-
+-	phydev->state = PHY_HALTED;
+-	phy_process_state_change(phydev, old_state);
+-
 -	mutex_unlock(&phydev->lock);
 -
--	if (do_suspend)
--		phy_suspend(phydev);
+-	phy_state_machine(&phydev->state_queue.work);
+-	phy_stop_machine(phydev);
 -
--	if (err == -ENODEV)
-+	if (err == -ENODEV) {
-+		mutex_unlock(&phydev->lock);
- 		return;
-+	}
- 
+-	/* Cannot call flush_scheduled_work() here as desired because
+-	 * of rtnl_lock(), but PHY_HALTED shall guarantee irq handler
+-	 * will not reenable interrupts.
+-	 */
+-}
+-EXPORT_SYMBOL(phy_stop);
+-
+-/**
+- * phy_start - start or restart a PHY device
+- * @phydev: target phy_device struct
+- *
+- * Description: Indicates the attached device's readiness to
+- *   handle PHY-related work.  Used during startup to start the
+- *   PHY, and after a call to phy_stop() to resume operation.
+- *   Also used to indicate the MDIO bus has cleared an error
+- *   condition.
+- */
+-void phy_start(struct phy_device *phydev)
+-{
 -	mutex_lock(&phydev->lock);
- 	if (err < 0)
- 		phy_error_precise(phydev, func, err);
- 
-@@ -1519,6 +1515,9 @@ void phy_state_machine(struct work_struct *work)
- 	if (phy_polling_mode(phydev) && phy_is_started(phydev))
- 		phy_queue_state_machine(phydev, PHY_STATE_TIME);
- 	mutex_unlock(&phydev->lock);
-+
-+	if (do_suspend)
-+		phy_suspend(phydev);
+-
+-	if (phydev->state != PHY_READY && phydev->state != PHY_HALTED) {
+-		WARN(1, "called from state %s\n",
+-		     phy_state_to_str(phydev->state));
+-		goto out;
+-	}
+-
+-	if (phydev->sfp_bus)
+-		sfp_upstream_start(phydev->sfp_bus);
+-
+-	/* if phy was suspended, bring the physical link up again */
+-	__phy_resume(phydev);
+-
+-	phydev->state = PHY_UP;
+-
+-	phy_start_machine(phydev);
+-out:
+-	mutex_unlock(&phydev->lock);
+-}
+-EXPORT_SYMBOL(phy_start);
+-
+ /**
+  * phy_state_machine - Handle the state machine
+  * @work: work_struct that describes the work to be done
+@@ -1520,6 +1444,82 @@ void phy_state_machine(struct work_struct *work)
+ 		phy_suspend(phydev);
  }
  
++/**
++ * phy_stop - Bring down the PHY link, and stop checking the status
++ * @phydev: target phy_device struct
++ */
++void phy_stop(struct phy_device *phydev)
++{
++	struct net_device *dev = phydev->attached_dev;
++	enum phy_state old_state;
++
++	if (!phy_is_started(phydev) && phydev->state != PHY_DOWN &&
++	    phydev->state != PHY_ERROR) {
++		WARN(1, "called from state %s\n",
++		     phy_state_to_str(phydev->state));
++		return;
++	}
++
++	mutex_lock(&phydev->lock);
++	old_state = phydev->state;
++
++	if (phydev->state == PHY_CABLETEST) {
++		phy_abort_cable_test(phydev);
++		netif_testing_off(dev);
++	}
++
++	if (phydev->sfp_bus)
++		sfp_upstream_stop(phydev->sfp_bus);
++
++	phydev->state = PHY_HALTED;
++	phy_process_state_change(phydev, old_state);
++
++	mutex_unlock(&phydev->lock);
++
++	phy_state_machine(&phydev->state_queue.work);
++	phy_stop_machine(phydev);
++
++	/* Cannot call flush_scheduled_work() here as desired because
++	 * of rtnl_lock(), but PHY_HALTED shall guarantee irq handler
++	 * will not reenable interrupts.
++	 */
++}
++EXPORT_SYMBOL(phy_stop);
++
++/**
++ * phy_start - start or restart a PHY device
++ * @phydev: target phy_device struct
++ *
++ * Description: Indicates the attached device's readiness to
++ *   handle PHY-related work.  Used during startup to start the
++ *   PHY, and after a call to phy_stop() to resume operation.
++ *   Also used to indicate the MDIO bus has cleared an error
++ *   condition.
++ */
++void phy_start(struct phy_device *phydev)
++{
++	mutex_lock(&phydev->lock);
++
++	if (phydev->state != PHY_READY && phydev->state != PHY_HALTED) {
++		WARN(1, "called from state %s\n",
++		     phy_state_to_str(phydev->state));
++		goto out;
++	}
++
++	if (phydev->sfp_bus)
++		sfp_upstream_start(phydev->sfp_bus);
++
++	/* if phy was suspended, bring the physical link up again */
++	__phy_resume(phydev);
++
++	phydev->state = PHY_UP;
++
++	phy_start_machine(phydev);
++out:
++	mutex_unlock(&phydev->lock);
++}
++EXPORT_SYMBOL(phy_start);
++
  /**
+  * phy_mac_interrupt - MAC says the link has changed
+  * @phydev: phy_device struct with changed link
 -- 
 2.30.2
 
