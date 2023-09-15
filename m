@@ -1,75 +1,85 @@
-Return-Path: <netdev+bounces-34065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E65E7A1EE7
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 14:41:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E953A7A1F35
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 14:50:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB57F2826AE
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 12:41:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B6CB1C20B57
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 12:50:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 839A610794;
-	Fri, 15 Sep 2023 12:41:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 714BE107B0;
+	Fri, 15 Sep 2023 12:50:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57B82CA70
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 12:41:21 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DFA2B8
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 05:41:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=/K5i2IsXgbEDKlCuOomRbYpzH/HWfq3W48itS0NfOh0=; b=lFT9iC2u5i2t06+z5yhbo4C0gb
-	i0xTM5LEv1L8+9uj0D8TgbgNoLOCjjpQ3kDMqcW89HhkBl+qlVXWSfpvNwfkhQnpoEvE33qPP9zRz
-	4WYfD2L7A8XY4lJEZ+IftOu3/r6lGmT3/03LJ3whCykU5Ok2p5YwrdyicawiHpULDooE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qh88G-006Xak-N1; Fri, 15 Sep 2023 14:41:12 +0200
-Date: Fri, 15 Sep 2023 14:41:12 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Raju Rangoju <Raju.Rangoju@amd.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, Shyam-sundar.S-k@amd.com
-Subject: Re: [PATCH net] amd-xgbe: read STAT1 register twice to get correct
- value
-Message-ID: <4f54056f-dac4-4ad8-8f87-0837334d1b01@lunn.ch>
-References: <20230914041944.450751-1-Raju.Rangoju@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EB2710785
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 12:50:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id F41C4C433C9;
+	Fri, 15 Sep 2023 12:50:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694782224;
+	bh=j7EQ9egi6nTkZics5u17+M5e6Vfs08LcWcvUYFnL07Q=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=DbE6seDCh8Li8HuuPxH9WXN1A0VMAfNLd6QlsQdcJ1H837duqvum5q23x0cbyjFeW
+	 oD3awROKETSSu7vdkYkiidlS0ez2j1LGYMnMyee5MQV7JHreID5C09t9/jFz1bNH1+
+	 /5rfFokG6hCaNkXOY5DBDOp4GOFHSqQavczUGWvSQo1eTyPLp6h7dlXPI1nrz0KljV
+	 7hbj439Zg/AUzA34DuUy5gOY28mngtqCHp3ofv7Cc9onww8qtsbH3pwPQf0bmOZrL1
+	 dWXxftSj9niLzg7ejxFCkS2v6bMQRWi5opUD6ohzTOEgdgnSBkKE1c2lWPVcWVeG7S
+	 SVka4yijFWbQw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D88B0E22AF4;
+	Fri, 15 Sep 2023 12:50:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230914041944.450751-1-Raju.Rangoju@amd.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2] net: thunderbolt: Fix TCPv6 GSO checksum calculation
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169478222388.4767.9033689483567758945.git-patchwork-notify@kernel.org>
+Date: Fri, 15 Sep 2023 12:50:23 +0000
+References: <20230913052647.407420-1-mika.westerberg@linux.intel.com>
+In-Reply-To: <20230913052647.407420-1-mika.westerberg@linux.intel.com>
+To: Mika Westerberg <mika.westerberg@linux.intel.com>
+Cc: michael.jamet@intel.com, YehezkelShB@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, alex@alexbal.com,
+ netdev@vger.kernel.org
 
-On Thu, Sep 14, 2023 at 09:49:44AM +0530, Raju Rangoju wrote:
-> Link status is latched low, so read once to clear
-> and then read again to get current state.
+Hello:
 
-I don't know about your PHY implementation, but within phylib and
-Linux PHY drivers, this is considered wrong. You loose out on being
-notified of the link going down and then back up again. Or up and then
-down again.
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-But since this is not a Linux PHY driver, you are free to do whatever
-you want...
+On Wed, 13 Sep 2023 08:26:47 +0300 you wrote:
+> Alex reported that running ssh over IPv6 does not work with
+> Thunderbolt/USB4 networking driver. The reason for that is that driver
+> should call skb_is_gso() before calling skb_is_gso_v6(), and it should
+> not return false after calculates the checksum successfully. This probably
+> was a copy paste error from the original driver where it was done properly.
+> 
+> Reported-by: Alex Balcanquall <alex@alexbal.com>
+> Fixes: e69b6c02b4c3 ("net: Add support for networking over Thunderbolt cable")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Mika Westerberg <mika.westerberg@linux.intel.com>
+> 
+> [...]
 
-Also, i believe it is latched, not latched low. So i think your commit
-message is wrong. You should probably check with IEEE 802.3 clause 22.
+Here is the summary with links:
+  - [v2] net: thunderbolt: Fix TCPv6 GSO checksum calculation
+    https://git.kernel.org/netdev/net/c/e0b65f9b81fe
 
-    Andrew
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
