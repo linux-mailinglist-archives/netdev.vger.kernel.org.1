@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-34041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34042-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2DEC7A1BA8
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 12:04:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F0ED57A1BAB
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 12:04:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8DF32282614
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 10:04:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A51528182E
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 10:04:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E00DDF55;
-	Fri, 15 Sep 2023 10:03:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4D71DF60;
+	Fri, 15 Sep 2023 10:04:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E6F1D29B;
-	Fri, 15 Sep 2023 10:03:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7C12DF58;
+	Fri, 15 Sep 2023 10:04:08 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D7294493;
-	Fri, 15 Sep 2023 03:02:33 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92FED3592;
+	Fri, 15 Sep 2023 03:02:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694772165; x=1726308165;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Ed4YUZv03FL/7pT0GTcscmk26C9Wo3TferDm4a8fs+I=;
-  b=PkhI5gk4YPFyjciC6siFEA9LbLJPsFAkfaJZeJqFi/dGhwtSdkvD6s00
-   8LSX8vP8+8cMerKWtRuo3bOlS0v4DPzmcG9Fbl8mmE8Q/fIIdPFz6QqC5
-   M2FP9OTDAl2kJ7PB9QI4UoULUS1tVLaw18meFDnstRXYJPktECcz8nZP/
-   /mjxNpupZf5ijWN2BBHU/+UBciaCiRjHHAyMzfUO9AMxdrPizOMOa67R/
-   k7dr1fx2CCPpHlbr8AQMd2VaUKayTg18iQm54DD/jUKS2wjF8w6xank7c
-   ZtnJjkAmrXnYBusn4WvcYCbywdoTx+SQCa6qfKjQqpjuOX1DuqXOj8pEu
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="381938667"
+  t=1694772167; x=1726308167;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=SNz9ScF+wt804GivI3ixasEzsFqTt1XAXDDCOHpojXU=;
+  b=S6Zn2VKdeTr7lLpNvU1QmttEvVUO/Jt+JFEPPfA8YJRW/ffc1u13H+z5
+   JGuzCwt804I3LIbVgGJ0Rgkl17FtuorlhYmARPJVv5ruIl5G/cViSuvc3
+   WWJttCMUcsGBfSod/drqJTYVMlwqKp6raTDiBQVO+JR0tIXyBQl59QG+5
+   QCZnuty+GYK/Yss/CINOzx4Gz4KavTB93INzVTwB9iApobxLbiEf4cSPC
+   Sn4NQNiDqCd84ab94FrBpEUPNmeAARQJ48RPJUAEmsit/0IxwUKuOHtbJ
+   xoq9ufpOSukEE9dJOyA03f4qHn44Wrdvo8kYOAjLu3aW1+B3AFLcwoYYp
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="381938691"
 X-IronPort-AV: E=Sophos;i="6.02,148,1688454000"; 
-   d="scan'208";a="381938667"
+   d="scan'208";a="381938691"
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2023 02:54:25 -0700
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2023 02:54:31 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="744916284"
+X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="744916306"
 X-IronPort-AV: E=Sophos;i="6.02,148,1688454000"; 
-   d="scan'208";a="744916284"
+   d="scan'208";a="744916306"
 Received: from pglc00032.png.intel.com ([10.221.207.52])
-  by orsmga002.jf.intel.com with ESMTP; 15 Sep 2023 02:54:20 -0700
+  by orsmga002.jf.intel.com with ESMTP; 15 Sep 2023 02:54:27 -0700
 From: Rohan G Thomas <rohan.g.thomas@intel.com>
 To: "David S . Miller" <davem@davemloft.net>,
 	Alexandre Torgue <alexandre.torgue@foss.st.com>,
@@ -64,10 +64,12 @@ Cc: netdev@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	Rohan G Thomas <rohan.g.thomas@intel.com>
-Subject: [PATCH net-next v6 0/2] net: stmmac: Tx coe sw fallback
-Date: Fri, 15 Sep 2023 17:54:15 +0800
-Message-Id: <20230915095417.1949-1-rohan.g.thomas@intel.com>
+Subject: [PATCH net-next v6 1/2] dt-bindings: net: snps,dwmac: Tx coe unsupported
+Date: Fri, 15 Sep 2023 17:54:16 +0800
+Message-Id: <20230915095417.1949-2-rohan.g.thomas@intel.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230915095417.1949-1-rohan.g.thomas@intel.com>
+References: <20230915095417.1949-1-rohan.g.thomas@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,40 +84,27 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
-DW xGMAC IP can be synthesized such that it can support tx checksum
-offloading only for a few initial tx queues. Also as Serge pointed
-out, for the DW QoS IP, tx coe can be individually configured for
-each tx queue. This patchset adds support for tx coe sw fallback for
-those queues that don't support tx coe. Also, add binding for
-snps,coe-unsupported property.
+Add dt-bindings for coe-unsupported property per tx queue.
 
-changelog v6:
-* Reworked patchset to cover DW QoS Ethernet IP also.
+Signed-off-by: Rohan G Thomas <rohan.g.thomas@intel.com>
+---
+ Documentation/devicetree/bindings/net/snps,dwmac.yaml | 3 +++
+ 1 file changed, 3 insertions(+)
 
-changelog v5:
-* As rightly suggested by Serge, reworked redundant code.
-
-changelog v4: 
-* Replaced tx_q_coe_lmt with bit flag.
-
-changelog v3: 
-* Resend with complete email list.
-
-changelog v2: 
-* Reformed binding description.
-* Minor grammatical corrections in comments and commit messages.
-
-Rohan G Thomas (2):
-  dt-bindings: net: snps,dwmac: Tx coe unsupported
-  net: stmmac: Tx coe sw fallback
-
- Documentation/devicetree/bindings/net/snps,dwmac.yaml |  3 +++
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c     | 10 ++++++++++
- drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c |  3 +++
- include/linux/stmmac.h                                |  1 +
- 4 files changed, 17 insertions(+)
-
+diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+index ddf9522a5dc2..365e6cb73484 100644
+--- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
++++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+@@ -394,6 +394,9 @@ properties:
+               When a PFC frame is received with priorities matching the bitmask,
+               the queue is blocked from transmitting for the pause time specified
+               in the PFC frame.
++          snps,coe-unsupported:
++            type: boolean
++            description: TX checksum offload is unsupported by the TX queue.
+         allOf:
+           - if:
+               required:
 -- 
 2.25.1
 
