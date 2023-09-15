@@ -1,135 +1,125 @@
-Return-Path: <netdev+bounces-33996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B75457A1372
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 04:00:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBDB67A13CB
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 04:23:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74B06281A0C
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 02:00:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7554F281AAA
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 02:23:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F375F806;
-	Fri, 15 Sep 2023 02:00:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 326D97F8;
+	Fri, 15 Sep 2023 02:23:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D325836A
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 02:00:17 +0000 (UTC)
-Received: from out-224.mta0.migadu.com (out-224.mta0.migadu.com [IPv6:2001:41d0:1004:224b::e0])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4096126A4
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 19:00:17 -0700 (PDT)
-Message-ID: <a4b20b86-d6cc-d623-206b-fac3e7336276@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1694743215;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=I07btjcoTGwy0N0AeqVOBXPTZEM3pn1yxPZvn66rdQc=;
-	b=d8XC3gLs5ka9+pZVPwR1sfcMmhWTqJj+RYNc5FodS6rlwx/JV0XbMbrE4qAkQJzVDyjlzR
-	uNWPb3UdIai3gjY785X3hZ/tkn42Cgulu70ASJpQS48A7LHf8hwqzeoo3bhytqdKnXbeRS
-	ooOoV9+hWJxQXlBAPznlqVbK6M5TcN4=
-Date: Fri, 15 Sep 2023 10:00:07 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC970A48
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 02:23:51 +0000 (UTC)
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB0CC2130
+	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 19:23:50 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1c0c6d4d650so14934115ad.0
+        for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 19:23:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1694744630; x=1695349430; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1cdP7F3B0fJT11nTRmQGNfjx5Q98729ZE49xkqjuwcM=;
+        b=Yf4tMJtc/kfIHct3oRtwJKut9Vi2D0qDQccku+jqMQz9JKGOvC72weIV6EnBZszPkw
+         5Hl53ASQmWetJSWqLecCwh0Gk7LEwJZV+HiDxfjop9Tcx3t1opEv9p4N91E028Rn4ryX
+         yWHgdQIzEDSwSMn127yaeWAR+06IGeVUkbMnaZT77y0Ap0TGF0rmMVhkMbraS5h85Eev
+         l4FDxsA0gKsaw0ovh5ZuNUp8sH+Q8RJbwbg8u2BGrtlbjsADJUm3oPYZz6hSSqi1ymRP
+         jv/5xRFM05TIPGImVsqHKjFMeMRkzFEJ9OSiROlQrWhIioolD9R+LUyH8vIdLU6JBgLn
+         7noQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694744630; x=1695349430;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1cdP7F3B0fJT11nTRmQGNfjx5Q98729ZE49xkqjuwcM=;
+        b=LaAFe3OZQY+SIf0eYErR6xBfwGrhXVs6XH3Z+LXx0Z9xqIhruJsAA90n62tW7/2G56
+         F9Obh3YZBx7/Tp++OREuBnjwAAgf+yPFtR0q1/QuYJct1x745Z5EHSA0ZUMqd54bt03+
+         45MzbLhddVpGU+G5Bv34f3OPU7WBqlG/c1jyzQOMHCzp81O6cvlF/AmhKpI6jQpNavlJ
+         wMOR2gNGn4LyxQUOr4c0+GYPe4OJuQgnBa3NrHdpiWwDwrWgsIrFbTBVxJis1hMQ97QI
+         c9uKXEzA6v0vgG8EyEd5iJJyqpW2cW0anvIYnuVig1Utm5RkvlMKNILkdr0En/8b1mHQ
+         Nz/w==
+X-Gm-Message-State: AOJu0Yy/F9gbDNwmcU2CeQbn+3RnLMC5KzIvsH6rHu5X9nWFEcufHet4
+	wPnHMwklY2EnVjloNKvSqpo=
+X-Google-Smtp-Source: AGHT+IF5pgDYQydgphb4ydZrEEdWi5jRYWvPClNRwvAV+n9exWTp5nDQdPXYOQ1o1PDypcw3fvFT4A==
+X-Received: by 2002:a17:902:f682:b0:1c2:1068:1f4f with SMTP id l2-20020a170902f68200b001c210681f4fmr405863plg.17.1694744629492;
+        Thu, 14 Sep 2023 19:23:49 -0700 (PDT)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id i13-20020a170902eb4d00b001b04c2023e3sm2245027pli.218.2023.09.14.19.23.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Sep 2023 19:23:48 -0700 (PDT)
+Date: Fri, 15 Sep 2023 10:23:43 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Ido Schimmel <idosch@idosch.org>,
+	Thomas Haller <thaller@redhat.com>
+Subject: Re: [PATCH net-next] ipv6: do not merge differe type and protocol
+ routes
+Message-ID: <ZQPAL84/w323CgNT@Laptop-X1>
+References: <20230830061550.2319741-1-liuhangbin@gmail.com>
+ <eeb19959-26f4-e8c1-abde-726dbb2b828d@6wind.com>
+ <01baf374-97c0-2a6f-db85-078488795bf9@kernel.org>
+ <db56de33-2112-5a4c-af94-6c8d26a8bfc1@6wind.com>
+ <ZPBn9RQUL5mS/bBx@Laptop-X1>
+ <62bcd732-31ed-e358-e8dd-1df237d735ef@6wind.com>
+ <2546e031-f189-e1b1-bc50-bc7776045719@kernel.org>
+ <bf3bb290-25b7-e327-851a-d6a036daab03@6wind.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v3] net/core: Export dev_core_stats_*_inc()
-Content-Language: en-US
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20230914023718.3854545-1-yajun.deng@linux.dev>
- <ef9d4ca5-35e4-ff8c-c1aa-f77a4b04d0a2@intel.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yajun Deng <yajun.deng@linux.dev>
-In-Reply-To: <ef9d4ca5-35e4-ff8c-c1aa-f77a4b04d0a2@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bf3bb290-25b7-e327-851a-d6a036daab03@6wind.com>
 
+On Fri, Sep 01, 2023 at 11:36:51AM +0200, Nicolas Dichtel wrote:
+> > I do agree now that protocol is informative (passthrough from the kernel
+> > perspective) so not really part of the route. That should be dropped
 
-On 2023/9/14 23:22, Alexander Lobakin wrote:
-> From: Yajun Deng <yajun.deng@linux.dev>
-> Date: Thu, 14 Sep 2023 10:37:18 +0800
->
->> Although there is a kfree_skb_reason() helper function that can be used to
->> find the reason why this skb is dropped, but most callers didn't increase
->> one of rx_dropped, tx_dropped, rx_nohandler and rx_otherhost_dropped.
->>
->> For the users, people are more concerned about why the dropped in ip
->> is increasing. So we can export dev_core_stats_rx_dropped_inc sets,
->> which users would trace them know why rx_dropped is increasing.
->>
->> Export dev_core_stats_{rx_dropped, tx_dropped, rx_nohandler,
->> rx_otherhost_dropped}_inc for trace. Also, move dev_core_stats()
->> and netdev_core_stats_alloc() to dev.c, as they are not called
->> externally.
-> I'd like to hear some arguments against having them static inlines + one
-> external that I proposed earlier.
+I'm not sure. Is there any user space route daemon will use this info? e.g. some
+BGP route daemon?
 
-I'd like to hear suggestions from the maintainers. If the maintainers 
-have no objections, I'd like to
+> > from the patch leaving just a check on rt_type as to whether the routes
+> > are different. From there the append, prepend, replace and change
+> > semantics should decide what happens (ie., how the route is inserted).
+> Right. What can guide us is the meaning/concept/benefit of having this kind of
+> routing table:
+> local 2001:db8:103::/64 via 2001:db8:101::10 dev dummy1 metric 1024 pref medium
+> 2001:db8:103::/64 via 2001:db8:101::10 dev dummy2 metric 1024 pref medium
+> 
+> I don't understand how this is used/useful. It's why I ask for the use case/goal
+> of this patch.
+> How does the user know which route is used?
 
-use your approach.
+I'm not sure how user will use it. Maybe just block/forward some traffic to
+local first and remove the local route later to unblock them. IPv4 can also
+do like this. e.g.
 
->> Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
->> ---
->> v3: __cold should be added to the netdev_core_stats_alloc().
->> v2: use __cold instead of inline in dev_core_stats().
->> v1: https://lore.kernel.org/netdev/20230911082016.3694700-1-yajun.deng@linux.dev/
-> ...as it's not at least mentioned here in the changelog.
->
-> [...]
->
->> diff --git a/net/core/dev.c b/net/core/dev.c
->> index ccff2b6ef958..98592e4c1df0 100644
->> --- a/net/core/dev.c
->> +++ b/net/core/dev.c
->> @@ -10475,7 +10475,7 @@ void netdev_stats_to_stats64(struct rtnl_link_stats64 *stats64,
->>   }
->>   EXPORT_SYMBOL(netdev_stats_to_stats64);
->>   
->> -struct net_device_core_stats __percpu *netdev_core_stats_alloc(struct net_device *dev)
->> +static __cold struct net_device_core_stats __percpu *netdev_core_stats_alloc(struct net_device *dev)
-> This is way over 79/80 chars, break the line before "netdev_".
-Okay.
->
->>   {
->>   	struct net_device_core_stats __percpu *p;
->>   
->> @@ -10488,7 +10488,35 @@ struct net_device_core_stats __percpu *netdev_core_stats_alloc(struct net_device
->>   	/* This READ_ONCE() pairs with the cmpxchg() above */
->>   	return READ_ONCE(dev->core_stats);
->>   }
->> -EXPORT_SYMBOL(netdev_core_stats_alloc);
->> +
->> +static inline struct net_device_core_stats __percpu *dev_core_stats(struct net_device *dev)
-> Same for the line length.
-> Also notice that now some of the functions you touch have "dev_" prefix,
-> others have "netdev_", I'd probably take a look into unifying this.
-Okay, I'll unify with the "netdev_" prefix.
-> (note for the maintainers that it would be probably better to leave
->   explicit "inline" here, but no bloat-o-meter was provided by the
->   author, so I can't say anything for sure)
->
->> +{
->> +	/* This READ_ONCE() pairs with the write in netdev_core_stats_alloc() */
->> +	struct net_device_core_stats __percpu *p = READ_ONCE(dev->core_stats);
->> +
->> +	if (likely(p))
->> +		return p;
->> +
->> +	return netdev_core_stats_alloc(dev);
->> +}
-> [...]
->
-> Thanks,
-> Olek
++ ip link add dummy1 up type dummy
++ ip link add dummy2 up type dummy
++ ip addr add 192.168.0.1/24 dev dummy1
++ ip addr add 192.168.0.2/24 dev dummy2
++ ip route add local 192.168.3.0/24 dev dummy1 table 100
++ ip route append unicast 192.168.3.0/24 dev dummy1 table 100
++ ip route append unicast 192.168.3.0/24 dev dummy2 table 100
++ ip route show table 100
+local 192.168.3.0/24 dev dummy1 scope host
+192.168.3.0/24 dev dummy1 scope link
+192.168.3.0/24 dev dummy2 scope link
+
+Thanks
+Hangbin
 
