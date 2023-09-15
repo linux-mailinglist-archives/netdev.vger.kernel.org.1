@@ -1,338 +1,83 @@
-Return-Path: <netdev+bounces-34023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E5FA7A1ACF
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 11:38:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 573577A1AD5
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 11:40:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D0DE1C20C94
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 09:38:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A66F1C20DE9
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 09:40:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22005DDC9;
-	Fri, 15 Sep 2023 09:38:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69570DDCB;
+	Fri, 15 Sep 2023 09:40:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0527E79D4
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 09:38:46 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id EA68A2D61
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 02:38:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1694770704;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1kkiG5L/a/xceIw2PPIGBdgyPVq7y6221yleAsPibq4=;
-	b=INbdH8ThtlJSAJJ8dGpV++RhoRTveJIMU0t6n5WceyQE6+Hd54rVx5j7NNvNfW8UMIne4A
-	G4YdZ5agV81zM9zMsYrcu86I+qTsBhJPDSDEwNoX7xnv80srsxKDEWvaIdrt/U9WmFrm3X
-	1EY/0ZGi/jmYQNBtmEpC476XAJM4RA0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-260-Zfaqv3swO7urejhYiLIkNA-1; Fri, 15 Sep 2023 05:38:17 -0400
-X-MC-Unique: Zfaqv3swO7urejhYiLIkNA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0647681DA99;
-	Fri, 15 Sep 2023 09:38:17 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.216])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id D167428FD;
-	Fri, 15 Sep 2023 09:38:14 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <445a78b0ff3047fea20d3c8058a5ff6a@AcuMS.aculab.com>
-References: <445a78b0ff3047fea20d3c8058a5ff6a@AcuMS.aculab.com> <20230913165648.2570623-1-dhowells@redhat.com> <20230913165648.2570623-6-dhowells@redhat.com>
-To: David Laight <David.Laight@ACULAB.COM>
-Cc: dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
-    Linus Torvalds <torvalds@linux-foundation.org>,
-    Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-    "Christian
- Brauner" <christian@brauner.io>,
-    Matthew Wilcox <willy@infradead.org>,
-    "Jeff
- Layton" <jlayton@kernel.org>,
-    "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-    "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-    "linux-mm@kvack.org" <linux-mm@kvack.org>,
-    "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-    "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v4 05/13] iov: Move iterator functions to a header file
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3A42DDC3
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 09:40:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6B5CCC433C9;
+	Fri, 15 Sep 2023 09:40:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694770825;
+	bh=gcU20BJEN7Gm0vzOHOzHJmfBEJWw/hAN5vM5YrC3p2Q=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=trS7DUvPJITd77iqNUwBXemZqwl0d3FACxmvEh8F3Y0uDycA21naekIMO5/bR8Szi
+	 HuBK8/jGyk8qJN4mczKwYbpcPnWqASIXJotr8Xq2pp9p+gKB9x93alArZZY+GynzNU
+	 l6ltpqSmSG4dUZwVTSppt9x/Rak41BmDuyabg94Dz+HHJMvFf9Yz3649holbIJS6br
+	 Md3vzyKL5GGwnfZlSry/bxp/rFY4XmjxhbpVu0bxrSYiv7mKY/9BC6wKYrFkPyvtNw
+	 XxqVIGQY/2wEpy0D8yc9ODXDipesNoGQO2ztsCaK4iNTylO6fV7nRePMHe8VX25RhV
+	 IucwedZCeuFAg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4A993E22AF3;
+	Fri, 15 Sep 2023 09:40:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3369773.1694770694.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 15 Sep 2023 10:38:14 +0100
-Message-ID: <3369774.1694770694@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=unavailable autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] net: ti: icssg-prueth: add PTP dependency
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169477082530.23365.278837331642360033.git-patchwork-notify@kernel.org>
+Date: Fri, 15 Sep 2023 09:40:25 +0000
+References: <20230912185509.2430563-1-arnd@kernel.org>
+In-Reply-To: <20230912185509.2430563-1-arnd@kernel.org>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, richardcochran@gmail.com, vigneshr@ti.com,
+ grygorii.strashko@ti.com, danishanwar@ti.com, rogerq@ti.com, arnd@arndb.de,
+ horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-David Laight <David.Laight@ACULAB.COM> wrote:
+Hello:
 
-> > Move the iterator functions to a header file so that other operations =
-that
-> > need to scan over an iterator can be added.  For instance, the rbd dri=
-ver
-> > could use this to scan a buffer to see if it is all zeros and libceph =
-could
-> > use this to generate a crc.
-> =
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-> These all look a bit big for being more generally inlined.
-> =
+On Tue, 12 Sep 2023 20:54:51 +0200 you wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> The driver can now use PTP if enabled but fails to link built-in
+> if PTP is a loadable module:
+> 
+> aarch64-linux-ld: drivers/net/ethernet/ti/icssg/icss_iep.o: in function `icss_iep_get_ptp_clock_idx':
+> icss_iep.c:(.text+0x200): undefined reference to `ptp_clock_index'
+> 
+> [...]
 
-> I know you want to avoid the indirect call in the normal cases,
-> but maybe it would be ok for other uses?
+Here is the summary with links:
+  - net: ti: icssg-prueth: add PTP dependency
+    https://git.kernel.org/netdev/net/c/a8f367f7e131
 
-So you'd advocate for something like:
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-	size_t generic_iterate(struct iov_iter *iter, size_t len, void *priv,
-			       void *priv2, iov_ustep_f ustep, iov_step_f step)
-	{
-		return iterate_and_advance2(iter, len, priv, priv2,
-					    ustep, step);
-	}
-	EXPORT_SYMBOL(generic_iterate);
-
-in lib/iov_iter.c and then call that from the places that want to use it?
-
-I tried benchmarking that (see attached patch - it needs to go on top of m=
-y
-iov patches).  Running the insmod thrice and then filtering out and sortin=
-g
-the results:
-
-	iov_kunit_benchmark_bvec: avg 3174 uS, stddev 68 uS
-	iov_kunit_benchmark_bvec: avg 3176 uS, stddev 61 uS
-	iov_kunit_benchmark_bvec: avg 3180 uS, stddev 64 uS
-	iov_kunit_benchmark_bvec_outofline: avg 3678 uS, stddev 4 uS
-	iov_kunit_benchmark_bvec_outofline: avg 3678 uS, stddev 5 uS
-	iov_kunit_benchmark_bvec_outofline: avg 3679 uS, stddev 6 uS
-	iov_kunit_benchmark_xarray: avg 3560 uS, stddev 5 uS
-	iov_kunit_benchmark_xarray: avg 3560 uS, stddev 6 uS
-	iov_kunit_benchmark_xarray: avg 3570 uS, stddev 16 uS
-	iov_kunit_benchmark_xarray_outofline: avg 4125 uS, stddev 13 uS
-	iov_kunit_benchmark_xarray_outofline: avg 4125 uS, stddev 2 uS
-	iov_kunit_benchmark_xarray_outofline: avg 4125 uS, stddev 6 uS
-
-It adds almost 16% overhead:
-
-	(gdb) p 4125/3560.0
-	$2 =3D 1.1587078651685394
-	(gdb) p 3678/3174.0
-	$3 =3D 1.1587901701323251
-
-I'm guessing a lot of that is due to function pointer mitigations.
-
-Now, part of the code size expansion can be mitigated by using, say,
-iterate_and_advance_kernel() if you know you aren't going to encounter
-user-backed iterators, or even using, say, iterate_bvec() if you know you'=
-re
-only going to see a specific iterator type.
-
-David
----
-iov_iter: Benchmark out of line generic iterator
-
-diff --git a/include/linux/iov_iter.h b/include/linux/iov_iter.h
-index 2ebb86c041b6..8f562e80473b 100644
---- a/include/linux/iov_iter.h
-+++ b/include/linux/iov_iter.h
-@@ -293,4 +293,7 @@ size_t iterate_and_advance_kernel(struct iov_iter *ite=
-r, size_t len, void *priv,
- 	return progress;
- }
- =
-
-+size_t generic_iterate(struct iov_iter *iter, size_t len, void *priv, voi=
-d *priv2,
-+		       iov_ustep_f ustep, iov_step_f step);
-+
- #endif /* _LINUX_IOV_ITER_H */
-diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index 8f7a10c4a295..f9643dd02676 100644
---- a/lib/iov_iter.c
-+++ b/lib/iov_iter.c
-@@ -1684,3 +1684,10 @@ ssize_t iov_iter_extract_pages(struct iov_iter *i,
- 	return -EFAULT;
- }
- EXPORT_SYMBOL_GPL(iov_iter_extract_pages);
-+
-+size_t generic_iterate(struct iov_iter *iter, size_t len, void *priv, voi=
-d *priv2,
-+		       iov_ustep_f ustep, iov_step_f step)
-+{
-+	return iterate_and_advance2(iter, len, priv, priv2, ustep, step);
-+}
-+EXPORT_SYMBOL(generic_iterate);
-diff --git a/lib/kunit_iov_iter.c b/lib/kunit_iov_iter.c
-index cc9c64663a73..f208516a68c9 100644
---- a/lib/kunit_iov_iter.c
-+++ b/lib/kunit_iov_iter.c
-@@ -18,6 +18,7 @@
- #include <linux/writeback.h>
- #include <linux/uio.h>
- #include <linux/bvec.h>
-+#include <linux/iov_iter.h>
- #include <kunit/test.h>
- =
-
- MODULE_DESCRIPTION("iov_iter testing");
-@@ -1571,6 +1572,124 @@ static void __init iov_kunit_benchmark_xarray(stru=
-ct kunit *test)
- 	KUNIT_SUCCEED();
- }
- =
-
-+static noinline
-+size_t shovel_to_user_iter(void __user *iter_to, size_t progress,
-+			   size_t len, void *from, void *priv2)
-+{
-+	if (should_fail_usercopy())
-+		return len;
-+	if (access_ok(iter_to, len)) {
-+		from +=3D progress;
-+		instrument_copy_to_user(iter_to, from, len);
-+		len =3D raw_copy_to_user(iter_to, from, len);
-+	}
-+	return len;
-+}
-+
-+static noinline
-+size_t shovel_to_kernel_iter(void *iter_to, size_t progress,
-+			     size_t len, void *from, void *priv2)
-+{
-+	memcpy(iter_to, from + progress, len);
-+	return 0;
-+}
-+
-+/*
-+ * Time copying 256MiB through an ITER_BVEC with an out-of-line copier
-+ * function.
-+ */
-+static void __init iov_kunit_benchmark_bvec_outofline(struct kunit *test)
-+{
-+	struct iov_iter iter;
-+	struct bio_vec *bvec;
-+	struct page *page;
-+	unsigned int samples[IOV_KUNIT_NR_SAMPLES];
-+	ktime_t a, b;
-+	ssize_t copied;
-+	size_t size =3D 256 * 1024 * 1024, npages =3D size / PAGE_SIZE;
-+	void *scratch;
-+	int i;
-+
-+	/* Allocate a page and tile it repeatedly in the buffer. */
-+	page =3D alloc_page(GFP_KERNEL);
-+	KUNIT_ASSERT_NOT_NULL(test, page);
-+	kunit_add_action_or_reset(test, iov_kunit_free_page, page);
-+
-+	bvec =3D kunit_kmalloc_array(test, npages, sizeof(bvec[0]), GFP_KERNEL);
-+	KUNIT_ASSERT_NOT_NULL(test, bvec);
-+	for (i =3D 0; i < npages; i++)
-+		bvec_set_page(&bvec[i], page, PAGE_SIZE, 0);
-+
-+	/* Create a single large buffer to copy to/from. */
-+	scratch =3D iov_kunit_create_source(test, npages);
-+
-+	/* Perform and time a bunch of copies. */
-+	kunit_info(test, "Benchmarking copy_to_iter() over BVEC:\n");
-+	for (i =3D 0; i < IOV_KUNIT_NR_SAMPLES; i++) {
-+		iov_iter_bvec(&iter, ITER_DEST, bvec, npages, size);
-+		a =3D ktime_get_real();
-+		copied =3D generic_iterate(&iter, size, scratch, NULL,
-+					 shovel_to_user_iter,
-+					 shovel_to_kernel_iter);
-+		b =3D ktime_get_real();
-+		KUNIT_EXPECT_EQ(test, copied, size);
-+		samples[i] =3D ktime_to_us(ktime_sub(b, a));
-+	}
-+
-+	iov_kunit_benchmark_print_stats(test, samples);
-+	KUNIT_SUCCEED();
-+}
-+
-+/*
-+ * Time copying 256MiB through an ITER_XARRAY with an out-of-line copier
-+ * function.
-+ */
-+static void __init iov_kunit_benchmark_xarray_outofline(struct kunit *tes=
-t)
-+{
-+	struct iov_iter iter;
-+	struct xarray *xarray;
-+	struct page *page;
-+	unsigned int samples[IOV_KUNIT_NR_SAMPLES];
-+	ktime_t a, b;
-+	ssize_t copied;
-+	size_t size =3D 256 * 1024 * 1024, npages =3D size / PAGE_SIZE;
-+	void *scratch;
-+	int i;
-+
-+	/* Allocate a page and tile it repeatedly in the buffer. */
-+	page =3D alloc_page(GFP_KERNEL);
-+	KUNIT_ASSERT_NOT_NULL(test, page);
-+	kunit_add_action_or_reset(test, iov_kunit_free_page, page);
-+
-+	xarray =3D iov_kunit_create_xarray(test);
-+
-+	for (i =3D 0; i < npages; i++) {
-+		void *x =3D xa_store(xarray, i, page, GFP_KERNEL);
-+
-+		KUNIT_ASSERT_FALSE(test, xa_is_err(x));
-+	}
-+
-+	/* Create a single large buffer to copy to/from. */
-+	scratch =3D iov_kunit_create_source(test, npages);
-+
-+	/* Perform and time a bunch of copies. */
-+	kunit_info(test, "Benchmarking copy_to_iter() over XARRAY:\n");
-+	for (i =3D 0; i < IOV_KUNIT_NR_SAMPLES; i++) {
-+		iov_iter_xarray(&iter, ITER_DEST, xarray, 0, size);
-+		a =3D ktime_get_real();
-+
-+		copied =3D generic_iterate(&iter, size, scratch, NULL,
-+					 shovel_to_user_iter,
-+					 shovel_to_kernel_iter);
-+		b =3D ktime_get_real();
-+		KUNIT_EXPECT_EQ(test, copied, size);
-+		samples[i] =3D ktime_to_us(ktime_sub(b, a));
-+	}
-+
-+	iov_kunit_benchmark_print_stats(test, samples);
-+	KUNIT_SUCCEED();
-+}
-+
- static struct kunit_case __refdata iov_kunit_cases[] =3D {
- 	KUNIT_CASE(iov_kunit_copy_to_ubuf),
- 	KUNIT_CASE(iov_kunit_copy_from_ubuf),
-@@ -1593,6 +1712,8 @@ static struct kunit_case __refdata iov_kunit_cases[]=
- =3D {
- 	KUNIT_CASE(iov_kunit_benchmark_bvec),
- 	KUNIT_CASE(iov_kunit_benchmark_bvec_split),
- 	KUNIT_CASE(iov_kunit_benchmark_xarray),
-+	KUNIT_CASE(iov_kunit_benchmark_bvec_outofline),
-+	KUNIT_CASE(iov_kunit_benchmark_xarray_outofline),
- 	{}
- };
- =
 
 
