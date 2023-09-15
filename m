@@ -1,107 +1,141 @@
-Return-Path: <netdev+bounces-34048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 314E97A1CD6
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 12:54:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 023777A1D57
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 13:23:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 457111C20BD9
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 10:54:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9E571C20EC7
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 11:23:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C3E3101C0;
-	Fri, 15 Sep 2023 10:54:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 734A1101DF;
+	Fri, 15 Sep 2023 11:23:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDF34DF60
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 10:54:28 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E83EEA1;
-	Fri, 15 Sep 2023 03:54:26 -0700 (PDT)
-Received: from dggpeml500006.china.huawei.com (unknown [172.30.72.54])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Rn9xf3NrBzrSkf;
-	Fri, 15 Sep 2023 18:52:22 +0800 (CST)
-Received: from localhost.localdomain (10.175.112.70) by
- dggpeml500006.china.huawei.com (7.185.36.76) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Fri, 15 Sep 2023 18:54:21 +0800
-From: Zhang Changzhong <zhangchangzhong@huawei.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, David
- Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Xin Long
-	<lucien.xin@gmail.com>
-CC: Zhang Changzhong <zhangchangzhong@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net] xfrm6: fix inet6_dev refcount underflow problem
-Date: Fri, 15 Sep 2023 19:20:41 +0800
-Message-ID: <1694776841-30837-1-git-send-email-zhangchangzhong@huawei.com>
-X-Mailer: git-send-email 1.8.3.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EE64101D4
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 11:23:11 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id BBAB5CC4
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 04:23:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1694776987;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0FgfSRx3oRdPWwtJgpHE291K7gqnxGDzcnbdYAGADtA=;
+	b=e9sdElNuAEwbDsk9p4yPcbMv3sN2eNWztoSsfEqLZe8gkg4/QLJqcUnlKIs8pDjKGCMc2V
+	jyj4ry0CwZJ85QdkvooqobelOcDS1PaauFsdKqoClVXcnjmpC2r1VSSfNdBFjO6o+SoMRR
+	lMtBocbspqkV0t+ulLzz+xTkqEl+85A=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-235-wzrmM9JrM0iDuLsov5_gxg-1; Fri, 15 Sep 2023 07:23:04 -0400
+X-MC-Unique: wzrmM9JrM0iDuLsov5_gxg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5BFD9803470;
+	Fri, 15 Sep 2023 11:23:03 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.216])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id F20CB40C6EA8;
+	Fri, 15 Sep 2023 11:23:00 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <5017b9fa177f4deaa5d481a5d8914ab4@AcuMS.aculab.com>
+References: <5017b9fa177f4deaa5d481a5d8914ab4@AcuMS.aculab.com> <dcc6543d71524ac488ca2a56dd430118@AcuMS.aculab.com> <20230914221526.3153402-1-dhowells@redhat.com> <20230914221526.3153402-10-dhowells@redhat.com> <3370515.1694772627@warthog.procyon.org.uk>
+To: David Laight <David.Laight@ACULAB.COM>
+Cc: dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
+    Linus Torvalds <torvalds@linux-foundation.org>,
+    Jens Axboe <axboe@kernel.dk>, "Christoph
+ Hellwig" <hch@lst.de>,
+    Christian Brauner <christian@brauner.io>,
+    "Matthew
+ Wilcox" <willy@infradead.org>,
+    Brendan Higgins <brendanhiggins@google.com>,
+    David Gow <davidgow@google.com>,
+    "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+    "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+    "linux-mm@kvack.org" <linux-mm@kvack.org>,
+    "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+    "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+    "kunit-dev@googlegroups.com" <kunit-dev@googlegroups.com>,
+    "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+    Andrew Morton <akpm@linux-foundation.org>,
+    Christian Brauner <brauner@kernel.org>,
+    "David
+ Hildenbrand" <david@redhat.com>,
+    John Hubbard <jhubbard@nvidia.com>
+Subject: Re: [RFC PATCH 9/9] iov_iter: Add benchmarking kunit tests for UBUF/IOVEC
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.112.70]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpeml500006.china.huawei.com (7.185.36.76)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3449351.1694776980.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 15 Sep 2023 12:23:00 +0100
+Message-ID: <3449352.1694776980@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-There are race conditions that may lead to inet6_dev refcount underflow
-in xfrm6_dst_destroy() and rt6_uncached_list_flush_dev().
+David Laight <David.Laight@ACULAB.COM> wrote:
 
-One of the refcount underflow bugs is shown below:
-	(cpu 1)                	|	(cpu 2)
-xfrm6_dst_destroy()             |
-  ...                           |
-  in6_dev_put()                 |
-				|  rt6_uncached_list_flush_dev()
-  ...				|    ...
-				|    in6_dev_put()
-  rt6_uncached_list_del()       |    ...
-  ...                           |
+> > > Some measurements can be made using readv() and writev()
+> > > on /dev/zero and /dev/null.
+> > =
 
-xfrm6_dst_destroy() calls rt6_uncached_list_del() after in6_dev_put(),
-so rt6_uncached_list_flush_dev() has a chance to call in6_dev_put()
-again for the same inet6_dev.
+> > Forget /dev/null; that doesn't actually engage any iteration code.  Th=
+e same
+> > for writing to /dev/zero.  Reading from /dev/zero does its own iterati=
+on thing
+> > rather than using iterate_and_advance(), presumably because it checks =
+for
+> > signals and resched.
+> =
 
-Fix it by moving in6_dev_put() after rt6_uncached_list_del() in
-xfrm6_dst_destroy().
+> Using /dev/null does exercise the 'copy iov from user' code.
 
-Fixes: 510c321b5571 ("xfrm: reuse uncached_list to track xdsts")
-Signed-off-by: Zhang Changzhong <zhangchangzhong@huawei.com>
----
- net/ipv6/xfrm6_policy.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Ummm....  Not really:
 
-diff --git a/net/ipv6/xfrm6_policy.c b/net/ipv6/xfrm6_policy.c
-index 41a680c..42fb6996 100644
---- a/net/ipv6/xfrm6_policy.c
-+++ b/net/ipv6/xfrm6_policy.c
-@@ -117,10 +117,10 @@ static void xfrm6_dst_destroy(struct dst_entry *dst)
- {
- 	struct xfrm_dst *xdst = (struct xfrm_dst *)dst;
- 
--	if (likely(xdst->u.rt6.rt6i_idev))
--		in6_dev_put(xdst->u.rt6.rt6i_idev);
- 	dst_destroy_metrics_generic(dst);
- 	rt6_uncached_list_del(&xdst->u.rt6);
-+	if (likely(xdst->u.rt6.rt6i_idev))
-+		in6_dev_put(xdst->u.rt6.rt6i_idev);
- 	xfrm_dst_destroy(xdst);
- }
- 
--- 
-2.9.5
+static ssize_t read_null(struct file *file, char __user *buf,
+			 size_t count, loff_t *ppos)
+{
+	return 0;
+}
+
+static ssize_t write_null(struct file *file, const char __user *buf,
+			  size_t count, loff_t *ppos)
+{
+	return count;
+}
+
+static ssize_t read_iter_null(struct kiocb *iocb, struct iov_iter *to)
+{
+	return 0;
+}
+
+static ssize_t write_iter_null(struct kiocb *iocb, struct iov_iter *from)
+{
+	size_t count =3D iov_iter_count(from);
+	iov_iter_advance(from, count);
+	return count;
+}
+
+David
 
 
