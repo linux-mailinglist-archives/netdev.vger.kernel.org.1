@@ -1,104 +1,84 @@
-Return-Path: <netdev+bounces-34096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA61D7A2129
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 16:37:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CDA3D7A20C4
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 16:23:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93190282AB2
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 14:37:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 861E82821F2
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 14:23:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5B8F30CF4;
-	Fri, 15 Sep 2023 14:37:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5DB81119E;
+	Fri, 15 Sep 2023 14:22:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0AA230CE5
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 14:37:21 +0000 (UTC)
-X-Greylist: delayed 911 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 15 Sep 2023 07:37:20 PDT
-Received: from m12.mail.163.com (m12.mail.163.com [220.181.12.214])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3BC931AC;
-	Fri, 15 Sep 2023 07:37:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=GNsVK
-	vTS98xa9PYmw/wBQ5bwtcO5/g2y0Ou7JL7DMuI=; b=LjbTTRrsAaTyMK/KjzFTe
-	08QsaTkRIbyZQz/iVB5B//9t+zslNFpuiYvqJHpSbsN2MEJ/bF5A79Ya7ebgcuCI
-	W97PwJQtPyhDSjj8vM9lpdgc4DOKenbNXj8zrNBHgMBytplTK/0FL26uxS+wSHob
-	4e/kuCcisjs5LQGNnkADao=
-Received: from icess-ProLiant-DL380-Gen10.. (unknown [183.174.60.14])
-	by zwqz-smtp-mta-g5-4 (Coremail) with SMTP id _____wD3ZiBKaARlfESGCA--.51912S4;
-	Fri, 15 Sep 2023 22:21:06 +0800 (CST)
-From: Ma Ke <make_ruc2021@163.com>
-To: jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ma Ke <make_ruc2021@163.com>
-Subject: [PATCH] net: sched: drr: dont intepret cls results when asked to drop
-Date: Fri, 15 Sep 2023 22:20:56 +0800
-Message-Id: <20230915142056.3411330-1-make_ruc2021@163.com>
-X-Mailer: git-send-email 2.37.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59B0810A09;
+	Fri, 15 Sep 2023 14:22:53 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D5951AC;
+	Fri, 15 Sep 2023 07:22:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:To:From:Date:From:Sender:Reply-To:Subject:Date:
+	Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=1yldzElETnKeG++jsfq4NDMKuUjbp7vxfG0LMRVCp+g=; b=gC4Y5GJ0aa3btSElsa7kth3hsR
+	Imj4jo7cfSaCOxWwacFJtO0H3jCEEism5QMuYcKyRLmBb0oqzdZdMjyodqdEW9wgprGVJqA8kcsIR
+	Yq7PcDp/9EmKpZsmluS23ulfsem7FOqamfTpw12+A3YghxYaLIUace+RMYWKE4F2qjpA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qh9iP-006YAD-9H; Fri, 15 Sep 2023 16:22:37 +0200
+Date: Fri, 15 Sep 2023 16:22:37 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	corbet@lwn.net, steen.hegelund@microchip.com, rdunlap@infradead.org,
+	horms@kernel.org, casper.casan@gmail.com, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, horatiu.vultur@microchip.com,
+	Woojung.Huh@microchip.com, Nicolas.Ferre@microchip.com,
+	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com,
+	Alexandru Tachici <alexandru.tachici@analog.com>
+Subject: Re: [RFC PATCH net-next 0/6] Add support for OPEN Alliance
+ 10BASE-T1x MACPHY Serial Interface
+Message-ID: <ac528d48-44f9-4717-a61d-35365a11de78@lunn.ch>
+References: <20230908142919.14849-1-Parthiban.Veerasooran@microchip.com>
+ <20230915-wizard-junction-b58f2aad64c5@ifak-system.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3ZiBKaARlfESGCA--.51912S4
-X-Coremail-Antispam: 1Uf129KBjvdXoWruFW7uryUWr17Gry3Zw4kCrg_yoWDWFc_ua
-	4rWr93Cr1xCF18Cr4IkF42k395KFyfZ3WfJws7t3srW3yFvr98Ar1kGa93J3ykGF4Fkry7
-	X3sFgry5Gr9F9jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7xRKpnQ7UUUUU==
-X-Originating-IP: [183.174.60.14]
-X-CM-SenderInfo: 5pdnvshuxfjiisr6il2tof0z/1tbivgXrC1ZcivHc5wACsT
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_BL,
-	RCVD_IN_MSPIKE_L4,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230915-wizard-junction-b58f2aad64c5@ifak-system.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-If asked to drop a packet via TC_ACT_SHOT it is unsafe to
-assume that res.class contains a valid pointer.
+On Fri, Sep 15, 2023 at 03:56:59PM +0200, Alexander Dahl wrote:
+> Hello,
+> 
+> this is interesting, by chance I just looked at a chip claiming
+> similar features today, which already has a driver in kernel: Analog
+> Devices ADIN1110.
 
-Signed-off-by: Ma Ke <make_ruc2021@163.com>
----
- net/sched/sch_drr.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Ah, interesting. I had no idea this driver/device is an OA TC6 device.
 
-diff --git a/net/sched/sch_drr.c b/net/sched/sch_drr.c
-index 19901e77cd3b..a535dc3b0e05 100644
---- a/net/sched/sch_drr.c
-+++ b/net/sched/sch_drr.c
-@@ -310,6 +310,8 @@ static struct drr_class *drr_classify(struct sk_buff *skb, struct Qdisc *sch,
- 	fl = rcu_dereference_bh(q->filter_list);
- 	result = tcf_classify(skb, NULL, fl, &res, false);
- 	if (result >= 0) {
-+		if (result == TC_ACT_SHOT)
-+			return NULL;
- #ifdef CONFIG_NET_CLS_ACT
- 		switch (result) {
- 		case TC_ACT_QUEUED:
-@@ -317,8 +319,6 @@ static struct drr_class *drr_classify(struct sk_buff *skb, struct Qdisc *sch,
- 		case TC_ACT_TRAP:
- 			*qerr = NET_XMIT_SUCCESS | __NET_XMIT_STOLEN;
- 			fallthrough;
--		case TC_ACT_SHOT:
--			return NULL;
- 		}
- #endif
- 		cl = (struct drr_class *)res.class;
--- 
-2.37.2
+So ideally, we want the adin1110.c to also use the new framework, and
+remove the duplicate code. Parthiban, please look at the driver and
+make sure the APIs are such that Alexandru Tachici can swap his driver
+to using it. Having two implementations should help make it clear what
+is the same and what is different.
 
+   Andrew
 
