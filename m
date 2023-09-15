@@ -1,28 +1,28 @@
-Return-Path: <netdev+bounces-34033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34037-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F135C7A1B85
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 11:59:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 734BE7A1B9A
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 12:01:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C99CE1C211B0
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 09:59:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9663D1C208E8
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 10:01:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB947DF47;
-	Fri, 15 Sep 2023 09:59:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D86EDF4B;
+	Fri, 15 Sep 2023 10:00:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D331DF45
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 09:59:23 +0000 (UTC)
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3430544A5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41204D52A
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 10:00:13 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F16A944A3;
 	Fri, 15 Sep 2023 02:57:46 -0700 (PDT)
 Received: from kwepemm600007.china.huawei.com (unknown [172.30.72.53])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Rn8hG3g8bz1N8Kk;
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Rn8hG26SYzrRyV;
 	Fri, 15 Sep 2023 17:55:42 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.2) by
  kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
@@ -35,10 +35,12 @@ To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
 CC: <shenjian15@huawei.com>, <wangjie125@huawei.com>,
 	<liuyonglong@huawei.com>, <shaojijie@huawei.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net 0/5] There are some bugfix for the HNS3 ethernet driver
-Date: Fri, 15 Sep 2023 17:53:00 +0800
-Message-ID: <20230915095305.422328-1-shaojijie@huawei.com>
+Subject: [PATCH net 1/5] net: hns3: add cmdq check for vf periodic service task
+Date: Fri, 15 Sep 2023 17:53:01 +0800
+Message-ID: <20230915095305.422328-2-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.30.0
+In-Reply-To: <20230915095305.422328-1-shaojijie@huawei.com>
+References: <20230915095305.422328-1-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,28 +54,36 @@ X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
  kwepemm600007.china.huawei.com (7.193.23.208)
 X-CFilter-Loop: Reflected
 X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-There are some bugfix for the HNS3 ethernet driver
+From: Jie Wang <wangjie125@huawei.com>
 
-Jian Shen (1):
-  net: hns3: only enable unicast promisc when mac table full
+When the vf cmdq is disabled, there is no need to keep these task running.
+So this patch skip these task when the cmdq is disabled.
 
-Jie Wang (3):
-  net: hns3: add cmdq check for vf periodic service task
-  net: hns3: fix GRE checksum offload issue
-  net: hns3: add 5ms delay before clear firmware reset irq source
+Signed-off-by: Jie Wang <wangjie125@huawei.com>
+Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+---
+ drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Jijie Shao (1):
-  net: hns3: fix fail to delete tc flower rules during reset issue
-
- drivers/net/ethernet/hisilicon/hns3/hns3_enet.c     |  9 +++++++++
- .../net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c | 13 ++++++++++++-
- .../ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c   |  3 ++-
- 3 files changed, 23 insertions(+), 2 deletions(-)
-
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
+index 7a2f9233d695..a4d68fb216fb 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
+@@ -1855,7 +1855,8 @@ static void hclgevf_periodic_service_task(struct hclgevf_dev *hdev)
+ 	unsigned long delta = round_jiffies_relative(HZ);
+ 	struct hnae3_handle *handle = &hdev->nic;
+ 
+-	if (test_bit(HCLGEVF_STATE_RST_FAIL, &hdev->state))
++	if (test_bit(HCLGEVF_STATE_RST_FAIL, &hdev->state) ||
++	    test_bit(HCLGE_COMM_STATE_CMD_DISABLE, &hdev->hw.hw.comm_state))
+ 		return;
+ 
+ 	if (time_is_after_jiffies(hdev->last_serv_processed + HZ)) {
 -- 
 2.30.0
 
