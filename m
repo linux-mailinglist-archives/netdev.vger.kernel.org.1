@@ -1,129 +1,144 @@
-Return-Path: <netdev+bounces-34075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91EB67A1F82
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 15:08:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC1C77A1F86
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 15:09:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 449AB282A4E
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 13:08:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A51A32829FC
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 13:09:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE74C10952;
-	Fri, 15 Sep 2023 13:08:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4524310953;
+	Fri, 15 Sep 2023 13:09:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69CB1101EB
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 13:08:37 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 585F21713
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 06:08:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=zVjwPM45IGEkiY7NbUCpkjVMxV4lpxHCQIo62c7Hia0=; b=qs
-	gW5y9m3yC+Gs+zrvfNKsogWFR3/MLhTDirarUqYl3Qu2RhTjVtuykfAyX23RvnhJ4RQbb72REmFNF
-	K0LrOg8ay+TtbRrwSg3tgKVHRNhoWmLa75vIYTvmYHMe9iqkp3LwMFrHTFEEz2CS/b+bauKxzIsgH
-	CQtMFjm3HtFnLpA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qh8Yj-006XjN-DS; Fri, 15 Sep 2023 15:08:33 +0200
-Date: Fri, 15 Sep 2023 15:08:33 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Fabio Estevam <festevam@gmail.com>
-Cc: Vladimir Oltean <olteanv@gmail.com>, l00g33k@gmail.com,
-	netdev <netdev@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-	sashal@kernel.org
-Subject: Re: mv88e6xxx: Timeout waiting for EEPROM done
-Message-ID: <333e23ae-fe75-48e1-a2fb-65b127ec9b3e@lunn.ch>
-References: <CAOMZO5AE3HkjRb9-UsoG44XL064Lca7zx9gG47+==GbhVPUFsw@mail.gmail.com>
- <8020f97d-a5c9-4b78-bcf2-fc5245c67138@lunn.ch>
- <CAOMZO5BzaJ3Bw2hwWZ3iiMCX3_VejnZ=LHDhkdU8YmhKHuA5xw@mail.gmail.com>
- <CAOMZO5DJXsbgEDAZSjWJXBesHad1oWR9ht3a3Xjf=Q-faHm1rg@mail.gmail.com>
- <597f21f0-e922-440c-91af-b12cb2a0b7a4@lunn.ch>
- <CAOMZO5BDWFtYu5iae7Gk-bF6Q6d1TV4dYZ=GtW_L_-CV8HapBg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BBA9107AF
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 13:09:10 +0000 (UTC)
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id EDE541AC
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 06:09:07 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-228-gfN89gbnNrWhS9R-wZDH7g-1; Fri, 15 Sep 2023 14:08:45 +0100
+X-MC-Unique: gfN89gbnNrWhS9R-wZDH7g-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 15 Sep
+ 2023 14:08:40 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Fri, 15 Sep 2023 14:08:40 +0100
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'David Howells' <dhowells@redhat.com>
+CC: Al Viro <viro@zeniv.linux.org.uk>, Linus Torvalds
+	<torvalds@linux-foundation.org>, Jens Axboe <axboe@kernel.dk>, "Christoph
+ Hellwig" <hch@lst.de>, Christian Brauner <christian@brauner.io>, "Matthew
+ Wilcox" <willy@infradead.org>, Brendan Higgins <brendanhiggins@google.com>,
+	David Gow <davidgow@google.com>, "linux-fsdevel@vger.kernel.org"
+	<linux-fsdevel@vger.kernel.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"kunit-dev@googlegroups.com" <kunit-dev@googlegroups.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Andrew Morton
+	<akpm@linux-foundation.org>, Christian Brauner <brauner@kernel.org>, "David
+ Hildenbrand" <david@redhat.com>, John Hubbard <jhubbard@nvidia.com>
+Subject: RE: [RFC PATCH 9/9] iov_iter: Add benchmarking kunit tests for
+ UBUF/IOVEC
+Thread-Topic: [RFC PATCH 9/9] iov_iter: Add benchmarking kunit tests for
+ UBUF/IOVEC
+Thread-Index: AQHZ51kQ26Nrcgq1TkqWWiI5nPv6dLAbdkPggAAj+YCAABqPYP//+bcAgAAdLuD///c+AIAAFogg
+Date: Fri, 15 Sep 2023 13:08:40 +0000
+Message-ID: <a2ad7401f76645648861563d51122798@AcuMS.aculab.com>
+References: <72e93605b28742c2a496ce4890ecaa80@AcuMS.aculab.com>
+ <5017b9fa177f4deaa5d481a5d8914ab4@AcuMS.aculab.com>
+ <dcc6543d71524ac488ca2a56dd430118@AcuMS.aculab.com>
+ <20230914221526.3153402-1-dhowells@redhat.com>
+ <20230914221526.3153402-10-dhowells@redhat.com>
+ <3370515.1694772627@warthog.procyon.org.uk>
+ <3449352.1694776980@warthog.procyon.org.uk>
+ <3585404.1694781366@warthog.procyon.org.uk>
+In-Reply-To: <3585404.1694781366@warthog.procyon.org.uk>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOMZO5BDWFtYu5iae7Gk-bF6Q6d1TV4dYZ=GtW_L_-CV8HapBg@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,T_SPF_TEMPERROR
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Sep 14, 2023 at 09:40:05PM -0300, Fabio Estevam wrote:
-> Hi Andrew,
-> 
-> On Thu, Sep 14, 2023 at 6:38 PM Andrew Lunn <andrew@lunn.ch> wrote:
-> 
-> > Unfortunately, none of my boards appear to have the reset pin wired to
-> > a GPIO.
-> >
-> > The 6352 data sheet documents the reset pin is active low. So i can
-> > understand using GPIO_ACTIVE_LOW.
-> 
-> What does the datasheet say about the minimal duration for the reset
-> pin being asserted?
+From: David Howells
+> Sent: 15 September 2023 13:36
+>=20
+> David Laight <David.Laight@ACULAB.COM> wrote:
+>=20
+> > I was thinking of import_iovec() - or whatever its current
+> > name is.
+>=20
+> That doesn't actually access the buffer described by the iovec[].
+>=20
+> > That really needs a single structure that contains the iov_iter
+> > and the cache[] (which the caller pretty much always allocates
+> > in the same place).
+>=20
+> cache[]?
 
-It is a bit ambiguous. RESETn is both an input and an output. It says
-this about input for the For the 6352:
+Ah it is usually called iovstack[].
 
-     As in input, when RESETn is driven low by an external device,
-     this device will then driver RESETn low as an output for 8 to
-     14ms (10ms typically). In this mode RESETn can be used to
-     debounce a hardware reset switch.
+That is the code that reads the iovec[] from user.
+For small counts there is an on-stack cache[], for large
+counts it has call kmalloc().
+So when the io completes you have to free the allocated buffer.
 
-So i would say it needs to be low long enough not to be a glitch, but
-can be short.
+A canonical example is:
 
-> > In probe, we want to ensure the switch is taken out of reset, if the
-> > bootloader etc has left it in reset. We don't actually perform a reset
-> > here. That is done later. So we want the pin to have a high value. I
-> 
-> My concern is that the implemented method to bring the reset pin out
-> of reset may violate the datasheet by not waiting the required amount
-> of time.
-> 
-> Someone who has access to the datasheet may confirm, please.
-> 
-> > know gpiod_set_value() takes into account if the DT node has
-> > GPIO_ACTIVE_LOW. So setting a value of 0 disables it, which means it
-> > goes high. This is what we want. But the intention of the code is that
-> > the actual devm_gpiod_get_optional() should set the GPIO to output a
-> > high. But does devm_gpiod_get_optional() do the same mapping as
-> > gpiod_set_value()? gpiod_direction_output() documents says:
-> 
-> Yes, this is my understanding.
-> 
-> >  * Set the direction of the passed GPIO to output, such as gpiod_set_value() can
-> >  * be called safely on it. The initial value of the output must be specified
-> >  * as the logical value of the GPIO, i.e. taking its ACTIVE_LOW status into
-> >  * account.
-> >
-> > I don't know how to interpret this.
-> >
-> > Is the first change on its own sufficient to make it work? As i said,
-> 
-> No, it is not. On my tests, I needed to force the reset GPIO to be low
-> for a certain duration,
+static ssize_t vfs_readv(struct file *file, const struct iovec __user *vec,
+=09=09  unsigned long vlen, loff_t *pos, rwf_t flags)
+{
+=09struct iovec iovstack[UIO_FASTIOV];
+=09struct iovec *iov =3D iovstack;
+=09struct iov_iter iter;
+=09ssize_t ret;
 
-Is you device held in reset before the driver loads? As i said, the
-aim of this code is not to actually reset the switch, but to ensure it
-is taken out of reset if it was being held in reset. And if it was
-being held in reset, i would expect that to be for a long time, at
-least the current Linux boot time.
+=09ret =3D import_iovec(ITER_DEST, vec, vlen, ARRAY_SIZE(iovstack), &iov, &=
+iter);
+=09if (ret >=3D 0) {
+=09=09ret =3D do_iter_read(file, &iter, pos, flags);
+=09=09kfree(iov);
+=09}
 
-   Andrew
+=09return ret;
+}
+
+If 'iter' and 'iovstack' are put together in a structure the
+calling sequence becomes much less annoying.
+The kfree() can (probably) check iter.iovec !=3D iovsatack (as an inline).
+
+But io_uring manages to allocate the iov_iter and iovstack[] in
+entirely different places - and then copies them about.
+
+=09David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
+
 
