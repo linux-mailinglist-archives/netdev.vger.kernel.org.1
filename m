@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-34143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A8227A2562
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 20:13:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 379377A2563
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 20:13:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C118A281D79
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 18:13:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E77CC1C20A3C
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 18:13:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34FE918AE7;
-	Fri, 15 Sep 2023 18:12:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D28618E0A;
+	Fri, 15 Sep 2023 18:12:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 519A715E93
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C665715EBF
 	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 18:12:50 +0000 (UTC)
 Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BB961FD7
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C5F21FE8
 	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 11:12:49 -0700 (PDT)
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1694801567;
+	s=2020; t=1694801568;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=a1lgYYAsG57snL31iQEKiT+ZxutAikuTvErgxmStpu0=;
-	b=QvfeEqgn4KAO80bGjM8RONKradQxrLfIjxn6xIiisLc+Y0rNuWhYqCZ79wMtKAMtnp1Z6r
-	uaztU4BSdzZK8x7qtPBRTEN2yxxBJ7o5i02fKaMUMGz9p+mYiUr9WNAm+vfncnvzB8Iqfk
-	R+THcMqRPHJJ6XNqE0teoCTI0hQpQeJqwR08ndj8TMtkkhbrd5LboYQeRO/ziYgAMndFrl
-	oCtCo2EFyWiiJtbooAEBO7JEvltU66rGEmiMUpQcpnTJZAmgmE+6CB9x4N1t5yrubRZHtN
-	/Pfg5SK8OmE4l4lFdYKN2h6V4BXBpd3Wz9+3vWKvWx2qRv0+Phhbaz4v/zJYkg==
+	bh=9FCDZpNVUthe5YJ6++GFz+34R4wqawny6ddWnkhAFU4=;
+	b=kgBQVXDwC0IHZ5nKQplkzieglAChuCsnNQ4l+vrWK1dqHUxIMBqE+uDCG+Y5lQyPNVXTEp
+	C0JFIV5KQdUFr5rI1dQl4S2EPCmmb90+dCrJXX+AkJsGQXbK67KA274IpCBg4EbhjSfo1K
+	nMCLoLNn1UWuSMmN23yVYTg1HcxULmnC6xl1J+RhdojBqcu5LM1WKmgLI9xBgsr3mLpMcL
+	hJwyeVHuoQ12b/ARECp0OGbJdCUjPeFyaHKwwPnjuwlTBhCE8x1I0yoHcPfZdcT/y2pWqE
+	CJN+3nBdeB1+cAdY3FSxuE0ulT6Bvc3Zr1dCBJ/Lcowx94ND4a31RP78YYd+uw==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1694801567;
+	s=2020e; t=1694801568;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=a1lgYYAsG57snL31iQEKiT+ZxutAikuTvErgxmStpu0=;
-	b=jRoacA7MO2KaB7SuAFEd0Qxc2zvuhyixbpLbM3zzhcsdIhHvmmvHxXNlLfF4EJ3gPhyEwm
-	UEmSsP7jdcg6IgCw==
+	bh=9FCDZpNVUthe5YJ6++GFz+34R4wqawny6ddWnkhAFU4=;
+	b=u7kjFERgvC5nggZkFazhiaj7j61gUdkby4wJ7hHUoTTn0VLLL9dgmWC5XOBKOVp01O5js6
+	t/f4jkBvloA5PDAQ==
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
 	Andreas Oetken <ennoerlangen@gmail.com>,
@@ -53,9 +53,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Shuah Khan <shuah@kernel.org>,
 	Thomas Gleixner <tglx@linutronix.de>,
 	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: [PATCH net-next 2/5] net: hsr: Add __packed to struct hsr_sup_tlv.
-Date: Fri, 15 Sep 2023 20:10:03 +0200
-Message-Id: <20230915181006.2086061-3-bigeasy@linutronix.de>
+Subject: [PATCH net-next 3/5] selftests: hsr: Use `let' properly.
+Date: Fri, 15 Sep 2023 20:10:04 +0200
+Message-Id: <20230915181006.2086061-4-bigeasy@linutronix.de>
 In-Reply-To: <20230915181006.2086061-1-bigeasy@linutronix.de>
 References: <20230915181006.2086061-1-bigeasy@linutronix.de>
 Precedence: bulk
@@ -71,31 +71,32 @@ X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Struct hsr_sup_tlv describes HW layout and therefore it needs a __packed
-attribute to ensure the compiler does not add any padding.
-Due to the size and __packed attribute of the structs that use
-hsr_sup_tlv it has no functional impact.
+The timeout in the while loop is never subtracted due wrong usage of
+`let' leading to an endless loop if the former condition never gets
+true.
 
-Add __packed to struct hsr_sup_tlv.
+Put the statement for let in quotes so it is parsed as a single
+statement.
 
 Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 ---
- net/hsr/hsr_main.h | 2 +-
+ tools/testing/selftests/net/hsr/hsr_ping.sh | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/hsr/hsr_main.h b/net/hsr/hsr_main.h
-index 6851e33df7d14..18e01791ad799 100644
---- a/net/hsr/hsr_main.h
-+++ b/net/hsr/hsr_main.h
-@@ -83,7 +83,7 @@ struct hsr_vlan_ethhdr {
- struct hsr_sup_tlv {
- 	u8		HSR_TLV_type;
- 	u8		HSR_TLV_length;
--};
-+} __packed;
+diff --git a/tools/testing/selftests/net/hsr/hsr_ping.sh b/tools/testing/se=
+lftests/net/hsr/hsr_ping.sh
+index df91435387086..183f4a0f19dd9 100755
+--- a/tools/testing/selftests/net/hsr/hsr_ping.sh
++++ b/tools/testing/selftests/net/hsr/hsr_ping.sh
+@@ -197,7 +197,7 @@ do
+ 		break
+ 	fi
+ 	sleep 1
+-	let WAIT =3D WAIT - 1
++	let "WAIT =3D WAIT - 1"
+ done
 =20
- /* HSR/PRP Supervision Frame data types.
-  * Field names as defined in the IEC:2010 standard for HSR.
+ # Just a safety delay in case the above check didn't handle it.
 --=20
 2.40.1
 
