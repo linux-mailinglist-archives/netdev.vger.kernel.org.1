@@ -1,99 +1,135 @@
-Return-Path: <netdev+bounces-34163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02AEF7A2682
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 20:47:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AD6F97A269C
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 20:53:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39EBE282057
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 18:47:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B2F32820F8
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 18:53:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAE031773F;
-	Fri, 15 Sep 2023 18:47:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9336617758;
+	Fri, 15 Sep 2023 18:53:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96FE6362
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 18:47:36 +0000 (UTC)
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CDF42D62
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 11:44:44 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1c4194f7635so13687975ad.0
-        for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 11:44:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07D9D1119A
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 18:53:40 +0000 (UTC)
+Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E5674231;
+	Fri, 15 Sep 2023 11:52:08 -0700 (PDT)
+Received: by mail-yb1-xb2e.google.com with SMTP id 3f1490d57ef6-d8195078f69so2030067276.3;
+        Fri, 15 Sep 2023 11:52:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1694803482; x=1695408282; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Itsw2lvjOF4d1lcaGatZ2lrxzNTInyFHU12iNAuhsa0=;
-        b=UcohAoQAIsWWDIgI7BS4TdftP8BkbFCWvYnlnqDpaUUXHCH9eMK8yVInnUisQPL/nW
-         A7oQQCsvjwu+RLSIEUvthKcMWY8iucOrVF5JVTBqvllmUOvFSIvU9CIqvhLQylqUJaqx
-         Yp9nPC5lhePXZuKibzmoFKXut+dIY8LbYzvMs=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694803482; x=1695408282;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1694803927; x=1695408727; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Itsw2lvjOF4d1lcaGatZ2lrxzNTInyFHU12iNAuhsa0=;
-        b=qhl9PhGEFYtgqEqgORTLjmI5gLGDVNvBujGN6WhjS30EAQDfWNhMGcPPCeoxsiT9Nu
-         6buFqJLXOPxAIxpMxj9gjIQBtmYuxvJS0nwcwWUSxwJOZaAiFtXhD8cvqpG5SVsFhTSF
-         Tmd+x9lHtoBC9I++z5UiyuXZ3el7PE5BeaoyoQOuST/ThMYUAtsNnN3jeZAaS0kddm2/
-         BTvsnVRNTKzIQdgbehrj0n9EYFcibQbkLa0qQUlG/4qDfJjlmoLt3wNCQjg7Jsckxvt4
-         zc+oKXX/DiTN+HBugdh0GhMd2kNSQcfOJ1yMb2V+ubkBGt3Fc+yOdxfFvgxE1lyNsP96
-         f+fg==
-X-Gm-Message-State: AOJu0Yw7Q/IDqQrr1iqnTlZLnMjxxBGur7XHusxWCuxuFy+iTeavj19D
-	stNX0PjLCpTXJSaFWWnUgkv/ig==
-X-Google-Smtp-Source: AGHT+IGM/U9TMc9dhOkJaD9Q2LSMeEhEmfp04Mj+FcHBxuLYmJmp+99UA23YpkT+qqmkIf+jiqtkCQ==
-X-Received: by 2002:a17:902:c213:b0:1c3:b0c7:38bf with SMTP id 19-20020a170902c21300b001c3b0c738bfmr6342438pll.12.1694803481936;
-        Fri, 15 Sep 2023 11:44:41 -0700 (PDT)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id s18-20020a170902b19200b001bb9aadfb04sm3771453plr.220.2023.09.15.11.44.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Sep 2023 11:44:41 -0700 (PDT)
-Date: Fri, 15 Sep 2023 11:44:40 -0700
-From: Kees Cook <keescook@chromium.org>
-To: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc: Jeroen de Borst <jeroendb@google.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>,
-	Shailend Chand <shailend@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH][next] gve: Use size_add() in call to struct_size()
-Message-ID: <202309151144.E420B9F8@keescook>
-References: <ZQSfze9HgfLDkFPV@work>
+        bh=Aasqqb01RTyUvRyGC6hxJdfWHqT4CxMFKON4c77kp3M=;
+        b=eAz7InM8FPLZNPX83zSor/LTfCch4SPDxaF7/5g0GCb/CkAJSiNes5OVKBf3mvn4Hi
+         cL5ktYfvmyPEKDZKHQ/ujWEuY3ekGtkzPJRcohE2m7f2RsDg2oSIWxnkjqgUbFYymwqj
+         FJWuUAmI9+DuOEToqhVa4kTrHUE/7iIRV9dJuYtttqLRY+xFQKYANDFXrEDceUyz+lIM
+         5s/9xOA0WVk8fPG/JtLpJhToKWJhg2NBnOo7vsAqyzvSoYwVqvU1NGowqhGXK/cw0ser
+         WkIiqh10O5hQgsNpqsHShT4b/m8JWOfjvKnwYJxNr8YI7wn2enKo1XWLwKBIVW/5Fbls
+         zo6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694803927; x=1695408727;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Aasqqb01RTyUvRyGC6hxJdfWHqT4CxMFKON4c77kp3M=;
+        b=TgRJznptYtkkvgd+LJMdpasG6RFeDYyNaXT/F/G5o4WrVUPg3TMrK8gNeEpxjxykbr
+         9D7SNrhQ2WAt0PWL+5KvuDhUpNMrYHtB+Mxb4dsrHXIggh5j85FLJrpmHl0UQvwMuPEN
+         EQI3vLgeIdOrr0miSmb51d1fQvWhwLEJix27EeIvQo6YE9mw41rhYv0Ucaym74SXzCvT
+         NuqhvdygKBHsnODolMwsETHISXCvmH5foPdZRZ5d1p54gq7B1qMxAS9cbjMlIzgPLKD/
+         gVcZ/SgkAFgNxkQK0KGHaZ1uQiZcHItxgSc2bHsGHFz5RWTawQB15ALDDHwsNxTWRB+c
+         +i1Q==
+X-Gm-Message-State: AOJu0Yx6yVo+3muBFl7lGIJprQS+TS+oWvQLkGxl8pD4ue1YCSSchE6h
+	YRiTEmu9y5/muyeekLsVKaUIffTHhP4Gao/btw6oSew8zK4=
+X-Google-Smtp-Source: AGHT+IFtViUcwHB63JJGkZ0dOZUaLMuKX4K2XDKAxy3Vzcd5o8VKqSzB0gfqFM1bWruYU8ouo8UKJDeyIzIObrYoOaE=
+X-Received: by 2002:a25:b51:0:b0:d80:1604:f6e9 with SMTP id
+ 78-20020a250b51000000b00d801604f6e9mr2276156ybl.44.1694803927437; Fri, 15 Sep
+ 2023 11:52:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZQSfze9HgfLDkFPV@work>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
+References: <1694776841-30837-1-git-send-email-zhangchangzhong@huawei.com>
+In-Reply-To: <1694776841-30837-1-git-send-email-zhangchangzhong@huawei.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Fri, 15 Sep 2023 14:51:56 -0400
+Message-ID: <CADvbK_euiOKytyFd6KYgNoM5SbDcyz92Li=K7P48H35q1AFxYg@mail.gmail.com>
+Subject: Re: [PATCH net] xfrm6: fix inet6_dev refcount underflow problem
+To: Zhang Changzhong <zhangchangzhong@huawei.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Sep 15, 2023 at 12:17:49PM -0600, Gustavo A. R. Silva wrote:
-> If, for any reason, `tx_stats_num + rx_stats_num` wraps around, the
-> protection that struct_size() adds against potential integer overflows
-> is defeated. Fix this by hardening call to struct_size() with size_add().
-> 
-> Fixes: 691f4077d560 ("gve: Replace zero-length array with flexible-array member")
-> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-
-Thanks, yes, this will maintain SIZE_MAX saturation if it happens.
-
-Reviewed-by: Kees Cook <keescook@chromium.org>
-
--- 
-Kees Cook
+On Fri, Sep 15, 2023 at 6:54=E2=80=AFAM Zhang Changzhong
+<zhangchangzhong@huawei.com> wrote:
+>
+> There are race conditions that may lead to inet6_dev refcount underflow
+> in xfrm6_dst_destroy() and rt6_uncached_list_flush_dev().
+>
+> One of the refcount underflow bugs is shown below:
+>         (cpu 1)                 |       (cpu 2)
+> xfrm6_dst_destroy()             |
+>   ...                           |
+>   in6_dev_put()                 |
+>                                 |  rt6_uncached_list_flush_dev()
+>   ...                           |    ...
+>                                 |    in6_dev_put()
+>   rt6_uncached_list_del()       |    ...
+>   ...                           |
+>
+> xfrm6_dst_destroy() calls rt6_uncached_list_del() after in6_dev_put(),
+> so rt6_uncached_list_flush_dev() has a chance to call in6_dev_put()
+> again for the same inet6_dev.
+>
+> Fix it by moving in6_dev_put() after rt6_uncached_list_del() in
+> xfrm6_dst_destroy().
+>
+> Fixes: 510c321b5571 ("xfrm: reuse uncached_list to track xdsts")
+> Signed-off-by: Zhang Changzhong <zhangchangzhong@huawei.com>
+> ---
+>  net/ipv6/xfrm6_policy.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/ipv6/xfrm6_policy.c b/net/ipv6/xfrm6_policy.c
+> index 41a680c..42fb6996 100644
+> --- a/net/ipv6/xfrm6_policy.c
+> +++ b/net/ipv6/xfrm6_policy.c
+> @@ -117,10 +117,10 @@ static void xfrm6_dst_destroy(struct dst_entry *dst=
+)
+>  {
+>         struct xfrm_dst *xdst =3D (struct xfrm_dst *)dst;
+>
+> -       if (likely(xdst->u.rt6.rt6i_idev))
+> -               in6_dev_put(xdst->u.rt6.rt6i_idev);
+>         dst_destroy_metrics_generic(dst);
+>         rt6_uncached_list_del(&xdst->u.rt6);
+> +       if (likely(xdst->u.rt6.rt6i_idev))
+> +               in6_dev_put(xdst->u.rt6.rt6i_idev);
+>         xfrm_dst_destroy(xdst);
+>  }
+>
+> --
+> 2.9.5
+>
+Reviewed-by: Xin Long <lucien.xin@gmail.com>
+Thanks.
 
