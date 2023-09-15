@@ -1,718 +1,420 @@
-Return-Path: <netdev+bounces-33991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D55177A12B8
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 03:05:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17D3E7A12BF
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 03:06:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B2742820BD
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 01:05:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 260951C20F3D
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 01:06:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1B47652;
-	Fri, 15 Sep 2023 01:05:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DC85380;
+	Fri, 15 Sep 2023 01:06:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51CE336A;
-	Fri, 15 Sep 2023 01:05:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9789CC433CB;
-	Fri, 15 Sep 2023 01:05:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694739923;
-	bh=/+T2kHP+yN3i1UHDJJ9EztJ2b09LmvcDHhfaOKfFahQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=dMzt4disWJkzHTxFN3bUfN7GkEZkVPUtevTTYC1IMRd4ABzfvyI69sjNGYdEhsNwv
-	 QzF38iBkEarTp/dWqBHdgdJQLckOoamXtc2Q1Kuori2h6sw9le7Py7PcLVnoNQtloy
-	 ij4yg7ZNoULCNxmWNt+z3LPaC4Dx5JAleCy0UxbaxoqBLv00PF92eHr7D01QypXwmb
-	 6/UjYFBYnnhdq9wq+y5MjME2wEio78d9qobbXPQT6xtLjBVQUOr+pXcXWonOpMrqT6
-	 Dko6viiNm/Gx7j4A4AXJ952vHy7bJKF9L3/qnpckNlQPbiIHKLlhIfY86RVxP5KW8/
-	 O+AHF+dStJAvA==
-From: Jisheng Zhang <jszhang@kernel.org>
-To: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>
-Cc: netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-sunxi@lists.linux.dev,
-	linux-stm32@st-md-mailman.stormreply.com,
-	johannes@sipsolutions.net,
-	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-Subject: [PATCH] net: stmmac: fix incorrect rxq|txq_stats reference
-Date: Fri, 15 Sep 2023 08:53:16 +0800
-Message-Id: <20230915005316.592-1-jszhang@kernel.org>
-X-Mailer: git-send-email 2.40.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F05936A;
+	Fri, 15 Sep 2023 01:06:00 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 865CB2111;
+	Thu, 14 Sep 2023 18:05:59 -0700 (PDT)
+Received: from canpemm500010.china.huawei.com (unknown [172.30.72.56])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RmwrD74PsztRtk;
+	Fri, 15 Sep 2023 09:01:48 +0800 (CST)
+Received: from [10.174.176.93] (10.174.176.93) by
+ canpemm500010.china.huawei.com (7.192.105.118) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Fri, 15 Sep 2023 09:05:56 +0800
+Message-ID: <22dda933-9c60-e515-733f-97958ab42563@huawei.com>
+Date: Fri, 15 Sep 2023 09:05:56 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [PATCH bpf-next v4 0/7] add BPF_F_PERMANENT flag for sockmap
+ skmsg redirect
+To: Jakub Sitnicki <jakub@cloudflare.com>
+CC: <john.fastabend@gmail.com>, <ast@kernel.org>, <daniel@iogearbox.net>,
+	<andrii@kernel.org>, <martin.lau@linux.dev>, <song@kernel.org>,
+	<yonghong.song@linux.dev>, <kpsingh@kernel.org>, <sdf@google.com>,
+	<haoluo@google.com>, <jolsa@kernel.org>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<dsahern@kernel.org>, <netdev@vger.kernel.org>, <bpf@vger.kernel.org>
+References: <20230902100744.2687785-1-liujian56@huawei.com>
+ <87il8f9tuo.fsf@cloudflare.com>
+From: "liujian (CE)" <liujian56@huawei.com>
+In-Reply-To: <87il8f9tuo.fsf@cloudflare.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.176.93]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ canpemm500010.china.huawei.com (7.192.105.118)
+X-CFilter-Loop: Reflected
 
-commit 133466c3bbe1 ("net: stmmac: use per-queue 64 bit statistics
-where necessary") caused one regression as found by Uwe, the backtrace
-looks like:
 
-INFO: trying to register non-static key.
-The code is fine but needs lockdep annotation, or maybe
-you didn't initialize this object before use?
-turning off the locking correctness validator.
-CPU: 0 PID: 1 Comm: swapper/0 Not tainted 6.5.0-rc1-00449-g133466c3bbe1-dirty #21
-Hardware name: STM32 (Device Tree Support)
- unwind_backtrace from show_stack+0x18/0x1c
- show_stack from dump_stack_lvl+0x60/0x90
- dump_stack_lvl from register_lock_class+0x98c/0x99c
- register_lock_class from __lock_acquire+0x74/0x293c
- __lock_acquire from lock_acquire+0x134/0x398
- lock_acquire from stmmac_get_stats64+0x2ac/0x2fc
- stmmac_get_stats64 from dev_get_stats+0x44/0x130
- dev_get_stats from rtnl_fill_stats+0x38/0x120
- rtnl_fill_stats from rtnl_fill_ifinfo+0x834/0x17f4
- rtnl_fill_ifinfo from rtmsg_ifinfo_build_skb+0xc0/0x144
- rtmsg_ifinfo_build_skb from rtmsg_ifinfo+0x50/0x88
- rtmsg_ifinfo from __dev_notify_flags+0xc0/0xec
- __dev_notify_flags from dev_change_flags+0x50/0x5c
- dev_change_flags from ip_auto_config+0x2f4/0x1260
- ip_auto_config from do_one_initcall+0x70/0x35c
- do_one_initcall from kernel_init_freeable+0x2ac/0x308
- kernel_init_freeable from kernel_init+0x1c/0x138
- kernel_init from ret_from_fork+0x14/0x2c
 
-The reason is the rxq|txq_stats structures are not what expected
-because stmmac_open() -> __stmmac_open() the structure is overwritten
-by "memcpy(&priv->dma_conf, dma_conf, sizeof(*dma_conf));"
-This causes the well initialized syncp member of rxq|txq_stats is
-overwritten unexpectedly as pointed out by Johannes and Uwe.
-
-Fix this issue by moving rxq|txq_stats back to stmmac_extra_stats. For
-SMP cache friendly, we also mark stmmac_txq_stats and stmmac_rxq_stats
-as ____cacheline_aligned_in_smp.
-
-Fixes: 133466c3bbe1 ("net: stmmac: use per-queue 64 bit statistics where necessary")
-Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
-Reported-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
----
- drivers/net/ethernet/stmicro/stmmac/common.h  |   7 +-
- .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |  16 +--
- .../net/ethernet/stmicro/stmmac/dwmac4_lib.c  |  16 +--
- .../net/ethernet/stmicro/stmmac/dwmac_lib.c   |  16 +--
- .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    |  16 +--
- drivers/net/ethernet/stmicro/stmmac/stmmac.h  |   2 -
- .../ethernet/stmicro/stmmac/stmmac_ethtool.c  |  32 ++---
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 125 ++++++++++--------
- 8 files changed, 120 insertions(+), 110 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
-index 403cb397d4d3..1e996c29043d 100644
---- a/drivers/net/ethernet/stmicro/stmmac/common.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/common.h
-@@ -70,7 +70,7 @@ struct stmmac_txq_stats {
- 	u64 tx_tso_frames;
- 	u64 tx_tso_nfrags;
- 	struct u64_stats_sync syncp;
--};
-+} ____cacheline_aligned_in_smp;
- 
- struct stmmac_rxq_stats {
- 	u64 rx_bytes;
-@@ -79,7 +79,7 @@ struct stmmac_rxq_stats {
- 	u64 rx_normal_irq_n;
- 	u64 napi_poll;
- 	struct u64_stats_sync syncp;
--};
-+} ____cacheline_aligned_in_smp;
- 
- /* Extra statistic and debug information exposed by ethtool */
- struct stmmac_extra_stats {
-@@ -202,6 +202,9 @@ struct stmmac_extra_stats {
- 	unsigned long mtl_est_hlbf;
- 	unsigned long mtl_est_btre;
- 	unsigned long mtl_est_btrlm;
-+	/* per queue statistics */
-+	struct stmmac_txq_stats txq_stats[MTL_MAX_TX_QUEUES];
-+	struct stmmac_rxq_stats rxq_stats[MTL_MAX_RX_QUEUES];
- 	unsigned long rx_dropped;
- 	unsigned long rx_errors;
- 	unsigned long tx_dropped;
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-index 01e77368eef1..465ff1fd4785 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-@@ -441,8 +441,8 @@ static int sun8i_dwmac_dma_interrupt(struct stmmac_priv *priv,
- 				     struct stmmac_extra_stats *x, u32 chan,
- 				     u32 dir)
- {
--	struct stmmac_rx_queue *rx_q = &priv->dma_conf.rx_queue[chan];
--	struct stmmac_tx_queue *tx_q = &priv->dma_conf.tx_queue[chan];
-+	struct stmmac_rxq_stats *rxq_stats = &priv->xstats.rxq_stats[chan];
-+	struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[chan];
- 	int ret = 0;
- 	u32 v;
- 
-@@ -455,9 +455,9 @@ static int sun8i_dwmac_dma_interrupt(struct stmmac_priv *priv,
- 
- 	if (v & EMAC_TX_INT) {
- 		ret |= handle_tx;
--		u64_stats_update_begin(&tx_q->txq_stats.syncp);
--		tx_q->txq_stats.tx_normal_irq_n++;
--		u64_stats_update_end(&tx_q->txq_stats.syncp);
-+		u64_stats_update_begin(&txq_stats->syncp);
-+		txq_stats->tx_normal_irq_n++;
-+		u64_stats_update_end(&txq_stats->syncp);
- 	}
- 
- 	if (v & EMAC_TX_DMA_STOP_INT)
-@@ -479,9 +479,9 @@ static int sun8i_dwmac_dma_interrupt(struct stmmac_priv *priv,
- 
- 	if (v & EMAC_RX_INT) {
- 		ret |= handle_rx;
--		u64_stats_update_begin(&rx_q->rxq_stats.syncp);
--		rx_q->rxq_stats.rx_normal_irq_n++;
--		u64_stats_update_end(&rx_q->rxq_stats.syncp);
-+		u64_stats_update_begin(&rxq_stats->syncp);
-+		rxq_stats->rx_normal_irq_n++;
-+		u64_stats_update_end(&rxq_stats->syncp);
- 	}
- 
- 	if (v & EMAC_RX_BUF_UA_INT)
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_lib.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_lib.c
-index 980e5f8a37ec..9470d3fd2ded 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_lib.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_lib.c
-@@ -171,8 +171,8 @@ int dwmac4_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
- 	const struct dwmac4_addrs *dwmac4_addrs = priv->plat->dwmac4_addrs;
- 	u32 intr_status = readl(ioaddr + DMA_CHAN_STATUS(dwmac4_addrs, chan));
- 	u32 intr_en = readl(ioaddr + DMA_CHAN_INTR_ENA(dwmac4_addrs, chan));
--	struct stmmac_rx_queue *rx_q = &priv->dma_conf.rx_queue[chan];
--	struct stmmac_tx_queue *tx_q = &priv->dma_conf.tx_queue[chan];
-+	struct stmmac_rxq_stats *rxq_stats = &priv->xstats.rxq_stats[chan];
-+	struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[chan];
- 	int ret = 0;
- 
- 	if (dir == DMA_DIR_RX)
-@@ -201,15 +201,15 @@ int dwmac4_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
- 	}
- 	/* TX/RX NORMAL interrupts */
- 	if (likely(intr_status & DMA_CHAN_STATUS_RI)) {
--		u64_stats_update_begin(&rx_q->rxq_stats.syncp);
--		rx_q->rxq_stats.rx_normal_irq_n++;
--		u64_stats_update_end(&rx_q->rxq_stats.syncp);
-+		u64_stats_update_begin(&rxq_stats->syncp);
-+		rxq_stats->rx_normal_irq_n++;
-+		u64_stats_update_end(&rxq_stats->syncp);
- 		ret |= handle_rx;
- 	}
- 	if (likely(intr_status & DMA_CHAN_STATUS_TI)) {
--		u64_stats_update_begin(&tx_q->txq_stats.syncp);
--		tx_q->txq_stats.tx_normal_irq_n++;
--		u64_stats_update_end(&tx_q->txq_stats.syncp);
-+		u64_stats_update_begin(&txq_stats->syncp);
-+		txq_stats->tx_normal_irq_n++;
-+		u64_stats_update_end(&txq_stats->syncp);
- 		ret |= handle_tx;
- 	}
- 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
-index aaa09b16b016..7907d62d3437 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
-@@ -162,8 +162,8 @@ static void show_rx_process_state(unsigned int status)
- int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
- 			struct stmmac_extra_stats *x, u32 chan, u32 dir)
- {
--	struct stmmac_rx_queue *rx_q = &priv->dma_conf.rx_queue[chan];
--	struct stmmac_tx_queue *tx_q = &priv->dma_conf.tx_queue[chan];
-+	struct stmmac_rxq_stats *rxq_stats = &priv->xstats.rxq_stats[chan];
-+	struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[chan];
- 	int ret = 0;
- 	/* read the status register (CSR5) */
- 	u32 intr_status = readl(ioaddr + DMA_STATUS);
-@@ -215,16 +215,16 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
- 			u32 value = readl(ioaddr + DMA_INTR_ENA);
- 			/* to schedule NAPI on real RIE event. */
- 			if (likely(value & DMA_INTR_ENA_RIE)) {
--				u64_stats_update_begin(&rx_q->rxq_stats.syncp);
--				rx_q->rxq_stats.rx_normal_irq_n++;
--				u64_stats_update_end(&rx_q->rxq_stats.syncp);
-+				u64_stats_update_begin(&rxq_stats->syncp);
-+				rxq_stats->rx_normal_irq_n++;
-+				u64_stats_update_end(&rxq_stats->syncp);
- 				ret |= handle_rx;
- 			}
- 		}
- 		if (likely(intr_status & DMA_STATUS_TI)) {
--			u64_stats_update_begin(&tx_q->txq_stats.syncp);
--			tx_q->txq_stats.tx_normal_irq_n++;
--			u64_stats_update_end(&tx_q->txq_stats.syncp);
-+			u64_stats_update_begin(&txq_stats->syncp);
-+			txq_stats->tx_normal_irq_n++;
-+			u64_stats_update_end(&txq_stats->syncp);
- 			ret |= handle_tx;
- 		}
- 		if (unlikely(intr_status & DMA_STATUS_ERI))
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-index fa69d64a8694..3cde695fec91 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
-@@ -337,8 +337,8 @@ static int dwxgmac2_dma_interrupt(struct stmmac_priv *priv,
- 				  struct stmmac_extra_stats *x, u32 chan,
- 				  u32 dir)
- {
--	struct stmmac_rx_queue *rx_q = &priv->dma_conf.rx_queue[chan];
--	struct stmmac_tx_queue *tx_q = &priv->dma_conf.tx_queue[chan];
-+	struct stmmac_rxq_stats *rxq_stats = &priv->xstats.rxq_stats[chan];
-+	struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[chan];
- 	u32 intr_status = readl(ioaddr + XGMAC_DMA_CH_STATUS(chan));
- 	u32 intr_en = readl(ioaddr + XGMAC_DMA_CH_INT_EN(chan));
- 	int ret = 0;
-@@ -367,15 +367,15 @@ static int dwxgmac2_dma_interrupt(struct stmmac_priv *priv,
- 	/* TX/RX NORMAL interrupts */
- 	if (likely(intr_status & XGMAC_NIS)) {
- 		if (likely(intr_status & XGMAC_RI)) {
--			u64_stats_update_begin(&rx_q->rxq_stats.syncp);
--			rx_q->rxq_stats.rx_normal_irq_n++;
--			u64_stats_update_end(&rx_q->rxq_stats.syncp);
-+			u64_stats_update_begin(&rxq_stats->syncp);
-+			rxq_stats->rx_normal_irq_n++;
-+			u64_stats_update_end(&rxq_stats->syncp);
- 			ret |= handle_rx;
- 		}
- 		if (likely(intr_status & (XGMAC_TI | XGMAC_TBU))) {
--			u64_stats_update_begin(&tx_q->txq_stats.syncp);
--			tx_q->txq_stats.tx_normal_irq_n++;
--			u64_stats_update_end(&tx_q->txq_stats.syncp);
-+			u64_stats_update_begin(&txq_stats->syncp);
-+			txq_stats->tx_normal_irq_n++;
-+			u64_stats_update_end(&txq_stats->syncp);
- 			ret |= handle_tx;
- 		}
- 	}
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-index 3401e888a9f6..cd7a9768de5f 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-@@ -78,7 +78,6 @@ struct stmmac_tx_queue {
- 	dma_addr_t dma_tx_phy;
- 	dma_addr_t tx_tail_addr;
- 	u32 mss;
--	struct stmmac_txq_stats txq_stats;
- };
- 
- struct stmmac_rx_buffer {
-@@ -123,7 +122,6 @@ struct stmmac_rx_queue {
- 		unsigned int len;
- 		unsigned int error;
- 	} state;
--	struct stmmac_rxq_stats rxq_stats;
- };
- 
- struct stmmac_channel {
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-index b7ac7abecdd3..6aa5c0556d22 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
-@@ -548,14 +548,14 @@ static void stmmac_get_per_qstats(struct stmmac_priv *priv, u64 *data)
- 
- 	pos = data;
- 	for (q = 0; q < tx_cnt; q++) {
--		struct stmmac_tx_queue *tx_q = &priv->dma_conf.tx_queue[q];
-+		struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[q];
- 		struct stmmac_txq_stats snapshot;
- 
- 		data = pos;
- 		do {
--			start = u64_stats_fetch_begin(&tx_q->txq_stats.syncp);
--			snapshot = tx_q->txq_stats;
--		} while (u64_stats_fetch_retry(&tx_q->txq_stats.syncp, start));
-+			start = u64_stats_fetch_begin(&txq_stats->syncp);
-+			snapshot = *txq_stats;
-+		} while (u64_stats_fetch_retry(&txq_stats->syncp, start));
- 
- 		p = (char *)&snapshot + offsetof(struct stmmac_txq_stats, tx_pkt_n);
- 		for (stat = 0; stat < STMMAC_TXQ_STATS; stat++) {
-@@ -566,14 +566,14 @@ static void stmmac_get_per_qstats(struct stmmac_priv *priv, u64 *data)
- 
- 	pos = data;
- 	for (q = 0; q < rx_cnt; q++) {
--		struct stmmac_rx_queue *rx_q = &priv->dma_conf.rx_queue[q];
-+		struct stmmac_rxq_stats *rxq_stats = &priv->xstats.rxq_stats[q];
- 		struct stmmac_rxq_stats snapshot;
- 
- 		data = pos;
- 		do {
--			start = u64_stats_fetch_begin(&rx_q->rxq_stats.syncp);
--			snapshot = rx_q->rxq_stats;
--		} while (u64_stats_fetch_retry(&rx_q->rxq_stats.syncp, start));
-+			start = u64_stats_fetch_begin(&rxq_stats->syncp);
-+			snapshot = *rxq_stats;
-+		} while (u64_stats_fetch_retry(&rxq_stats->syncp, start));
- 
- 		p = (char *)&snapshot + offsetof(struct stmmac_rxq_stats, rx_pkt_n);
- 		for (stat = 0; stat < STMMAC_RXQ_STATS; stat++) {
-@@ -637,14 +637,14 @@ static void stmmac_get_ethtool_stats(struct net_device *dev,
- 
- 	pos = j;
- 	for (i = 0; i < rx_queues_count; i++) {
--		struct stmmac_rx_queue *rx_q = &priv->dma_conf.rx_queue[i];
-+		struct stmmac_rxq_stats *rxq_stats = &priv->xstats.rxq_stats[i];
- 		struct stmmac_rxq_stats snapshot;
- 
- 		j = pos;
- 		do {
--			start = u64_stats_fetch_begin(&rx_q->rxq_stats.syncp);
--			snapshot = rx_q->rxq_stats;
--		} while (u64_stats_fetch_retry(&rx_q->rxq_stats.syncp, start));
-+			start = u64_stats_fetch_begin(&rxq_stats->syncp);
-+			snapshot = *rxq_stats;
-+		} while (u64_stats_fetch_retry(&rxq_stats->syncp, start));
- 
- 		data[j++] += snapshot.rx_pkt_n;
- 		data[j++] += snapshot.rx_normal_irq_n;
-@@ -654,14 +654,14 @@ static void stmmac_get_ethtool_stats(struct net_device *dev,
- 
- 	pos = j;
- 	for (i = 0; i < tx_queues_count; i++) {
--		struct stmmac_tx_queue *tx_q = &priv->dma_conf.tx_queue[i];
-+		struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[i];
- 		struct stmmac_txq_stats snapshot;
- 
- 		j = pos;
- 		do {
--			start = u64_stats_fetch_begin(&tx_q->txq_stats.syncp);
--			snapshot = tx_q->txq_stats;
--		} while (u64_stats_fetch_retry(&tx_q->txq_stats.syncp, start));
-+			start = u64_stats_fetch_begin(&txq_stats->syncp);
-+			snapshot = *txq_stats;
-+		} while (u64_stats_fetch_retry(&txq_stats->syncp, start));
- 
- 		data[j++] += snapshot.tx_pkt_n;
- 		data[j++] += snapshot.tx_normal_irq_n;
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 9a3182b9e767..5a2b06c6e889 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -2426,6 +2426,7 @@ static bool stmmac_xdp_xmit_zc(struct stmmac_priv *priv, u32 queue, u32 budget)
- {
- 	struct netdev_queue *nq = netdev_get_tx_queue(priv->dev, queue);
- 	struct stmmac_tx_queue *tx_q = &priv->dma_conf.tx_queue[queue];
-+	struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[queue];
- 	struct xsk_buff_pool *pool = tx_q->xsk_pool;
- 	unsigned int entry = tx_q->cur_tx;
- 	struct dma_desc *tx_desc = NULL;
-@@ -2505,9 +2506,9 @@ static bool stmmac_xdp_xmit_zc(struct stmmac_priv *priv, u32 queue, u32 budget)
- 		tx_q->cur_tx = STMMAC_GET_ENTRY(tx_q->cur_tx, priv->dma_conf.dma_tx_size);
- 		entry = tx_q->cur_tx;
- 	}
--	flags = u64_stats_update_begin_irqsave(&tx_q->txq_stats.syncp);
--	tx_q->txq_stats.tx_set_ic_bit += tx_set_ic_bit;
--	u64_stats_update_end_irqrestore(&tx_q->txq_stats.syncp, flags);
-+	flags = u64_stats_update_begin_irqsave(&txq_stats->syncp);
-+	txq_stats->tx_set_ic_bit += tx_set_ic_bit;
-+	u64_stats_update_end_irqrestore(&txq_stats->syncp, flags);
- 
- 	if (tx_desc) {
- 		stmmac_flush_tx_descriptors(priv, queue);
-@@ -2547,6 +2548,7 @@ static void stmmac_bump_dma_threshold(struct stmmac_priv *priv, u32 chan)
- static int stmmac_tx_clean(struct stmmac_priv *priv, int budget, u32 queue)
- {
- 	struct stmmac_tx_queue *tx_q = &priv->dma_conf.tx_queue[queue];
-+	struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[queue];
- 	unsigned int bytes_compl = 0, pkts_compl = 0;
- 	unsigned int entry, xmits = 0, count = 0;
- 	u32 tx_packets = 0, tx_errors = 0;
-@@ -2708,11 +2710,11 @@ static int stmmac_tx_clean(struct stmmac_priv *priv, int budget, u32 queue)
- 			      STMMAC_COAL_TIMER(priv->tx_coal_timer[queue]),
- 			      HRTIMER_MODE_REL);
- 
--	flags = u64_stats_update_begin_irqsave(&tx_q->txq_stats.syncp);
--	tx_q->txq_stats.tx_packets += tx_packets;
--	tx_q->txq_stats.tx_pkt_n += tx_packets;
--	tx_q->txq_stats.tx_clean++;
--	u64_stats_update_end_irqrestore(&tx_q->txq_stats.syncp, flags);
-+	flags = u64_stats_update_begin_irqsave(&txq_stats->syncp);
-+	txq_stats->tx_packets += tx_packets;
-+	txq_stats->tx_pkt_n += tx_packets;
-+	txq_stats->tx_clean++;
-+	u64_stats_update_end_irqrestore(&txq_stats->syncp, flags);
- 
- 	priv->xstats.tx_errors += tx_errors;
- 
-@@ -4112,6 +4114,7 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
- 	int nfrags = skb_shinfo(skb)->nr_frags;
- 	u32 queue = skb_get_queue_mapping(skb);
- 	unsigned int first_entry, tx_packets;
-+	struct stmmac_txq_stats *txq_stats;
- 	int tmp_pay_len = 0, first_tx;
- 	struct stmmac_tx_queue *tx_q;
- 	bool has_vlan, set_ic;
-@@ -4122,6 +4125,7 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
- 	int i;
- 
- 	tx_q = &priv->dma_conf.tx_queue[queue];
-+	txq_stats = &priv->xstats.txq_stats[queue];
- 	first_tx = tx_q->cur_tx;
- 
- 	/* Compute header lengths */
-@@ -4280,13 +4284,13 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
- 		netif_tx_stop_queue(netdev_get_tx_queue(priv->dev, queue));
- 	}
- 
--	flags = u64_stats_update_begin_irqsave(&tx_q->txq_stats.syncp);
--	tx_q->txq_stats.tx_bytes += skb->len;
--	tx_q->txq_stats.tx_tso_frames++;
--	tx_q->txq_stats.tx_tso_nfrags += nfrags;
-+	flags = u64_stats_update_begin_irqsave(&txq_stats->syncp);
-+	txq_stats->tx_bytes += skb->len;
-+	txq_stats->tx_tso_frames++;
-+	txq_stats->tx_tso_nfrags += nfrags;
- 	if (set_ic)
--		tx_q->txq_stats.tx_set_ic_bit++;
--	u64_stats_update_end_irqrestore(&tx_q->txq_stats.syncp, flags);
-+		txq_stats->tx_set_ic_bit++;
-+	u64_stats_update_end_irqrestore(&txq_stats->syncp, flags);
- 
- 	if (priv->sarc_type)
- 		stmmac_set_desc_sarc(priv, first, priv->sarc_type);
-@@ -4357,6 +4361,7 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
- 	u32 queue = skb_get_queue_mapping(skb);
- 	int nfrags = skb_shinfo(skb)->nr_frags;
- 	int gso = skb_shinfo(skb)->gso_type;
-+	struct stmmac_txq_stats *txq_stats;
- 	struct dma_edesc *tbs_desc = NULL;
- 	struct dma_desc *desc, *first;
- 	struct stmmac_tx_queue *tx_q;
-@@ -4366,6 +4371,7 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
- 	dma_addr_t des;
- 
- 	tx_q = &priv->dma_conf.tx_queue[queue];
-+	txq_stats = &priv->xstats.txq_stats[queue];
- 	first_tx = tx_q->cur_tx;
- 
- 	if (priv->tx_path_in_lpi_mode && priv->eee_sw_timer_en)
-@@ -4517,11 +4523,11 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
- 		netif_tx_stop_queue(netdev_get_tx_queue(priv->dev, queue));
- 	}
- 
--	flags = u64_stats_update_begin_irqsave(&tx_q->txq_stats.syncp);
--	tx_q->txq_stats.tx_bytes += skb->len;
-+	flags = u64_stats_update_begin_irqsave(&txq_stats->syncp);
-+	txq_stats->tx_bytes += skb->len;
- 	if (set_ic)
--		tx_q->txq_stats.tx_set_ic_bit++;
--	u64_stats_update_end_irqrestore(&tx_q->txq_stats.syncp, flags);
-+		txq_stats->tx_set_ic_bit++;
-+	u64_stats_update_end_irqrestore(&txq_stats->syncp, flags);
- 
- 	if (priv->sarc_type)
- 		stmmac_set_desc_sarc(priv, first, priv->sarc_type);
-@@ -4728,6 +4734,7 @@ static unsigned int stmmac_rx_buf2_len(struct stmmac_priv *priv,
- static int stmmac_xdp_xmit_xdpf(struct stmmac_priv *priv, int queue,
- 				struct xdp_frame *xdpf, bool dma_map)
- {
-+	struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[queue];
- 	struct stmmac_tx_queue *tx_q = &priv->dma_conf.tx_queue[queue];
- 	unsigned int entry = tx_q->cur_tx;
- 	struct dma_desc *tx_desc;
-@@ -4787,9 +4794,9 @@ static int stmmac_xdp_xmit_xdpf(struct stmmac_priv *priv, int queue,
- 		unsigned long flags;
- 		tx_q->tx_count_frames = 0;
- 		stmmac_set_tx_ic(priv, tx_desc);
--		flags = u64_stats_update_begin_irqsave(&tx_q->txq_stats.syncp);
--		tx_q->txq_stats.tx_set_ic_bit++;
--		u64_stats_update_end_irqrestore(&tx_q->txq_stats.syncp, flags);
-+		flags = u64_stats_update_begin_irqsave(&txq_stats->syncp);
-+		txq_stats->tx_set_ic_bit++;
-+		u64_stats_update_end_irqrestore(&txq_stats->syncp, flags);
- 	}
- 
- 	stmmac_enable_dma_transmission(priv, priv->ioaddr);
-@@ -4934,7 +4941,7 @@ static void stmmac_dispatch_skb_zc(struct stmmac_priv *priv, u32 queue,
- 				   struct dma_desc *p, struct dma_desc *np,
- 				   struct xdp_buff *xdp)
- {
--	struct stmmac_rx_queue *rx_q = &priv->dma_conf.rx_queue[queue];
-+	struct stmmac_rxq_stats *rxq_stats = &priv->xstats.rxq_stats[queue];
- 	struct stmmac_channel *ch = &priv->channel[queue];
- 	unsigned int len = xdp->data_end - xdp->data;
- 	enum pkt_hash_types hash_type;
-@@ -4964,10 +4971,10 @@ static void stmmac_dispatch_skb_zc(struct stmmac_priv *priv, u32 queue,
- 	skb_record_rx_queue(skb, queue);
- 	napi_gro_receive(&ch->rxtx_napi, skb);
- 
--	flags = u64_stats_update_begin_irqsave(&rx_q->rxq_stats.syncp);
--	rx_q->rxq_stats.rx_pkt_n++;
--	rx_q->rxq_stats.rx_bytes += len;
--	u64_stats_update_end_irqrestore(&rx_q->rxq_stats.syncp, flags);
-+	flags = u64_stats_update_begin_irqsave(&rxq_stats->syncp);
-+	rxq_stats->rx_pkt_n++;
-+	rxq_stats->rx_bytes += len;
-+	u64_stats_update_end_irqrestore(&rxq_stats->syncp, flags);
- }
- 
- static bool stmmac_rx_refill_zc(struct stmmac_priv *priv, u32 queue, u32 budget)
-@@ -5040,6 +5047,7 @@ static struct stmmac_xdp_buff *xsk_buff_to_stmmac_ctx(struct xdp_buff *xdp)
- 
- static int stmmac_rx_zc(struct stmmac_priv *priv, int limit, u32 queue)
- {
-+	struct stmmac_rxq_stats *rxq_stats = &priv->xstats.rxq_stats[queue];
- 	struct stmmac_rx_queue *rx_q = &priv->dma_conf.rx_queue[queue];
- 	unsigned int count = 0, error = 0, len = 0;
- 	int dirty = stmmac_rx_dirty(priv, queue);
-@@ -5203,9 +5211,9 @@ static int stmmac_rx_zc(struct stmmac_priv *priv, int limit, u32 queue)
- 
- 	stmmac_finalize_xdp_rx(priv, xdp_status);
- 
--	flags = u64_stats_update_begin_irqsave(&rx_q->rxq_stats.syncp);
--	rx_q->rxq_stats.rx_pkt_n += count;
--	u64_stats_update_end_irqrestore(&rx_q->rxq_stats.syncp, flags);
-+	flags = u64_stats_update_begin_irqsave(&rxq_stats->syncp);
-+	rxq_stats->rx_pkt_n += count;
-+	u64_stats_update_end_irqrestore(&rxq_stats->syncp, flags);
- 
- 	priv->xstats.rx_dropped += rx_dropped;
- 	priv->xstats.rx_errors += rx_errors;
-@@ -5233,6 +5241,7 @@ static int stmmac_rx_zc(struct stmmac_priv *priv, int limit, u32 queue)
- static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
- {
- 	u32 rx_errors = 0, rx_dropped = 0, rx_bytes = 0, rx_packets = 0;
-+	struct stmmac_rxq_stats *rxq_stats = &priv->xstats.rxq_stats[queue];
- 	struct stmmac_rx_queue *rx_q = &priv->dma_conf.rx_queue[queue];
- 	struct stmmac_channel *ch = &priv->channel[queue];
- 	unsigned int count = 0, error = 0, len = 0;
-@@ -5494,11 +5503,11 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
- 
- 	stmmac_rx_refill(priv, queue);
- 
--	flags = u64_stats_update_begin_irqsave(&rx_q->rxq_stats.syncp);
--	rx_q->rxq_stats.rx_packets += rx_packets;
--	rx_q->rxq_stats.rx_bytes += rx_bytes;
--	rx_q->rxq_stats.rx_pkt_n += count;
--	u64_stats_update_end_irqrestore(&rx_q->rxq_stats.syncp, flags);
-+	flags = u64_stats_update_begin_irqsave(&rxq_stats->syncp);
-+	rxq_stats->rx_packets += rx_packets;
-+	rxq_stats->rx_bytes += rx_bytes;
-+	rxq_stats->rx_pkt_n += count;
-+	u64_stats_update_end_irqrestore(&rxq_stats->syncp, flags);
- 
- 	priv->xstats.rx_dropped += rx_dropped;
- 	priv->xstats.rx_errors += rx_errors;
-@@ -5511,15 +5520,15 @@ static int stmmac_napi_poll_rx(struct napi_struct *napi, int budget)
- 	struct stmmac_channel *ch =
- 		container_of(napi, struct stmmac_channel, rx_napi);
- 	struct stmmac_priv *priv = ch->priv_data;
--	struct stmmac_rx_queue *rx_q;
-+	struct stmmac_rxq_stats *rxq_stats;
- 	u32 chan = ch->index;
- 	unsigned long flags;
- 	int work_done;
- 
--	rx_q = &priv->dma_conf.rx_queue[chan];
--	flags = u64_stats_update_begin_irqsave(&rx_q->rxq_stats.syncp);
--	rx_q->rxq_stats.napi_poll++;
--	u64_stats_update_end_irqrestore(&rx_q->rxq_stats.syncp, flags);
-+	rxq_stats = &priv->xstats.rxq_stats[chan];
-+	flags = u64_stats_update_begin_irqsave(&rxq_stats->syncp);
-+	rxq_stats->napi_poll++;
-+	u64_stats_update_end_irqrestore(&rxq_stats->syncp, flags);
- 
- 	work_done = stmmac_rx(priv, budget, chan);
- 	if (work_done < budget && napi_complete_done(napi, work_done)) {
-@@ -5538,15 +5547,15 @@ static int stmmac_napi_poll_tx(struct napi_struct *napi, int budget)
- 	struct stmmac_channel *ch =
- 		container_of(napi, struct stmmac_channel, tx_napi);
- 	struct stmmac_priv *priv = ch->priv_data;
--	struct stmmac_tx_queue *tx_q;
-+	struct stmmac_txq_stats *txq_stats;
- 	u32 chan = ch->index;
- 	unsigned long flags;
- 	int work_done;
- 
--	tx_q = &priv->dma_conf.tx_queue[chan];
--	flags = u64_stats_update_begin_irqsave(&tx_q->txq_stats.syncp);
--	tx_q->txq_stats.napi_poll++;
--	u64_stats_update_end_irqrestore(&tx_q->txq_stats.syncp, flags);
-+	txq_stats = &priv->xstats.txq_stats[chan];
-+	flags = u64_stats_update_begin_irqsave(&txq_stats->syncp);
-+	txq_stats->napi_poll++;
-+	u64_stats_update_end_irqrestore(&txq_stats->syncp, flags);
- 
- 	work_done = stmmac_tx_clean(priv, budget, chan);
- 	work_done = min(work_done, budget);
-@@ -5568,20 +5577,20 @@ static int stmmac_napi_poll_rxtx(struct napi_struct *napi, int budget)
- 		container_of(napi, struct stmmac_channel, rxtx_napi);
- 	struct stmmac_priv *priv = ch->priv_data;
- 	int rx_done, tx_done, rxtx_done;
--	struct stmmac_rx_queue *rx_q;
--	struct stmmac_tx_queue *tx_q;
-+	struct stmmac_rxq_stats *rxq_stats;
-+	struct stmmac_txq_stats *txq_stats;
- 	u32 chan = ch->index;
- 	unsigned long flags;
- 
--	rx_q = &priv->dma_conf.rx_queue[chan];
--	flags = u64_stats_update_begin_irqsave(&rx_q->rxq_stats.syncp);
--	rx_q->rxq_stats.napi_poll++;
--	u64_stats_update_end_irqrestore(&rx_q->rxq_stats.syncp, flags);
-+	rxq_stats = &priv->xstats.rxq_stats[chan];
-+	flags = u64_stats_update_begin_irqsave(&rxq_stats->syncp);
-+	rxq_stats->napi_poll++;
-+	u64_stats_update_end_irqrestore(&rxq_stats->syncp, flags);
- 
--	tx_q = &priv->dma_conf.tx_queue[chan];
--	flags = u64_stats_update_begin_irqsave(&tx_q->txq_stats.syncp);
--	tx_q->txq_stats.napi_poll++;
--	u64_stats_update_end_irqrestore(&tx_q->txq_stats.syncp, flags);
-+	txq_stats = &priv->xstats.txq_stats[chan];
-+	flags = u64_stats_update_begin_irqsave(&txq_stats->syncp);
-+	txq_stats->napi_poll++;
-+	u64_stats_update_end_irqrestore(&txq_stats->syncp, flags);
- 
- 	tx_done = stmmac_tx_clean(priv, budget, chan);
- 	tx_done = min(tx_done, budget);
-@@ -6924,7 +6933,7 @@ static void stmmac_get_stats64(struct net_device *dev, struct rtnl_link_stats64
- 	int q;
- 
- 	for (q = 0; q < tx_cnt; q++) {
--		struct stmmac_txq_stats *txq_stats = &priv->dma_conf.tx_queue[q].txq_stats;
-+		struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[q];
- 		u64 tx_packets;
- 		u64 tx_bytes;
- 
-@@ -6939,7 +6948,7 @@ static void stmmac_get_stats64(struct net_device *dev, struct rtnl_link_stats64
- 	}
- 
- 	for (q = 0; q < rx_cnt; q++) {
--		struct stmmac_rxq_stats *rxq_stats = &priv->dma_conf.rx_queue[q].rxq_stats;
-+		struct stmmac_rxq_stats *rxq_stats = &priv->xstats.rxq_stats[q];
- 		u64 rx_packets;
- 		u64 rx_bytes;
- 
-@@ -7340,9 +7349,9 @@ int stmmac_dvr_probe(struct device *device,
- 	priv->dev = ndev;
- 
- 	for (i = 0; i < MTL_MAX_RX_QUEUES; i++)
--		u64_stats_init(&priv->dma_conf.rx_queue[i].rxq_stats.syncp);
-+		u64_stats_init(&priv->xstats.rxq_stats[i].syncp);
- 	for (i = 0; i < MTL_MAX_TX_QUEUES; i++)
--		u64_stats_init(&priv->dma_conf.tx_queue[i].txq_stats.syncp);
-+		u64_stats_init(&priv->xstats.txq_stats[i].syncp);
- 
- 	stmmac_set_ethtool_ops(ndev);
- 	priv->pause = pause;
--- 
-2.40.1
-
+On 2023/9/13 1:21, Jakub Sitnicki wrote:
+> On Sat, Sep 02, 2023 at 06:07 PM +08, Liu Jian wrote:
+>> v3->v4: Change the two helpers's description.
+>> 	Let BPF_F_PERMANENT takes precedence over apply/cork_bytes.
+> 
+> I gave it another try. But somethings is still not right.
+> 
+> sockmap tests run cleanly for me on bpf tree @ 4eb94a779307.
+> 
+> But with this patch set applied I'm seeing a refcount splat. Please see
+> the sample session log at the end. Reproducible every time.
+> 
+> I've also included the warning itself with the stack trace decoded. Once
+> again, this is commit 4eb94a779307 with these patches on top.
+> 
+> I'm preparing for a talk that is in a few weeks [1], so unfortunately I
+> have limited cycles to help debug this.
+I'll try and debug this issue. Thank you for taking the time to review it.
+> 
+> [1] https://www.usenix.org/conference/srecon23emea/presentation/sitnicki
+> 
+> $ ./scripts/decode_stacktrace.sh ./vmlinux < trace.txt
+> [    7.846863] ------------[ cut here ]------------
+> [    7.847383] refcount_t: underflow; use-after-free.
+> [    7.847919] WARNING: CPU: 3 PID: 36 at lib/refcount.c:28 refcount_warn_saturate (lib/refcount.c:28 (discriminator 1))
+> [    7.848719] Modules linked in: bpf_testmod(OE)
+> [    7.850364] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.fc38 04/01/2014
+> [    7.851893] Workqueue: events sk_psock_destroy
+> [    7.852617] RIP: 0010:refcount_warn_saturate (lib/refcount.c:28 (discriminator 1))
+> [ 7.853383] Code: 01 e8 32 f0 a9 ff 0f 0b 5d c3 cc cc cc cc 80 3d 24 c5 01 02 00 75 81 48 c7 c7 98 cc 77 82 c6 05 14 c5 01 02 01 e8 0e f0 a9 ff <0f> 0b 5d c3 cc cc cc cc 80 3d 01 c5 01 02 00 0f 85 59 ff ff ff 48
+> All code
+> ========
+>     0:   01 e8                   add    %ebp,%eax
+>     2:   32 f0                   xor    %al,%dh
+>     4:   a9 ff 0f 0b 5d          test   $0x5d0b0fff,%eax
+>     9:   c3                      ret
+>     a:   cc                      int3
+>     b:   cc                      int3
+>     c:   cc                      int3
+>     d:   cc                      int3
+>     e:   80 3d 24 c5 01 02 00    cmpb   $0x0,0x201c524(%rip)        # 0x201c539
+>    15:   75 81                   jne    0xffffffffffffff98
+>    17:   48 c7 c7 98 cc 77 82    mov    $0xffffffff8277cc98,%rdi
+>    1e:   c6 05 14 c5 01 02 01    movb   $0x1,0x201c514(%rip)        # 0x201c539
+>    25:   e8 0e f0 a9 ff          call   0xffffffffffa9f038
+>    2a:*  0f 0b                   ud2             <-- trapping instruction
+>    2c:   5d                      pop    %rbp
+>    2d:   c3                      ret
+>    2e:   cc                      int3
+>    2f:   cc                      int3
+>    30:   cc                      int3
+>    31:   cc                      int3
+>    32:   80 3d 01 c5 01 02 00    cmpb   $0x0,0x201c501(%rip)        # 0x201c53a
+>    39:   0f 85 59 ff ff ff       jne    0xffffffffffffff98
+>    3f:   48                      rex.W
+> 
+> Code starting with the faulting instruction
+> ===========================================
+>     0:   0f 0b                   ud2
+>     2:   5d                      pop    %rbp
+>     3:   c3                      ret
+>     4:   cc                      int3
+>     5:   cc                      int3
+>     6:   cc                      int3
+>     7:   cc                      int3
+>     8:   80 3d 01 c5 01 02 00    cmpb   $0x0,0x201c501(%rip)        # 0x201c510
+>     f:   0f 85 59 ff ff ff       jne    0xffffffffffffff6e
+>    15:   48                      rex.W
+> [    7.855330] RSP: 0018:ffffc9000014bdd8 EFLAGS: 00010282
+> [    7.855891] RAX: 0000000000000000 RBX: ffff888104ea0438 RCX: 0000000000000000
+> [    7.856539] RDX: 0000000000000002 RSI: ffffc9000014bc50 RDI: 00000000ffffffff
+> [    7.857348] RBP: ffffc9000014bdd8 R08: 0000000000000000 R09: ffffffff82e9bd60
+> [    7.858088] R10: ffffc9000014bc48 R11: ffffffff8359bda8 R12: ffff888104ea0268
+> [    7.858956] R13: ffff888104ea0268 R14: ffff888104ea0268 R15: dead000000000100
+> [    7.859687] FS:  0000000000000000(0000) GS:ffff88813bd80000(0000) knlGS:0000000000000000
+> [    7.860349] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [    7.861013] CR2: 00007f4e2d2a7f78 CR3: 0000000002e6e002 CR4: 0000000000770ea0
+> [    7.862014] PKRU: 55555554
+> [    7.862224] Call Trace:
+> [    7.862515]  <TASK>
+> [    7.862719] ? show_regs (arch/x86/kernel/dumpstack.c:479)
+> [    7.863159] ? __warn (kernel/panic.c:673)
+> [    7.863521] ? refcount_warn_saturate (lib/refcount.c:28 (discriminator 1))
+> [    7.864073] ? report_bug (lib/bug.c:180 lib/bug.c:219)
+> [    7.864523] ? handle_bug (arch/x86/kernel/traps.c:237)
+> [    7.864954] ? exc_invalid_op (arch/x86/kernel/traps.c:258 (discriminator 1))
+> [    7.865379] ? asm_exc_invalid_op (./arch/x86/include/asm/idtentry.h:568)
+> [    7.866011] ? refcount_warn_saturate (lib/refcount.c:28 (discriminator 1))
+> [    7.866613] ? refcount_warn_saturate (lib/refcount.c:28 (discriminator 1))
+> [    7.867159] sk_psock_destroy (./include/linux/refcount.h:283 ./include/linux/refcount.h:315 ./include/linux/refcount.h:333 ./include/net/sock.h:1990 net/core/skmsg.c:828)
+> [    7.867579] process_one_work (kernel/workqueue.c:2630)
+> [    7.868120] worker_thread (kernel/workqueue.c:2697 (discriminator 2) kernel/workqueue.c:2784 (discriminator 2))
+> [    7.868363] ? rescuer_thread (kernel/workqueue.c:2730)
+> [    7.868589] kthread (kernel/kthread.c:388)
+> [    7.869017] ? kthread_complete_and_exit (kernel/kthread.c:341)
+> [    7.869716] ret_from_fork (arch/x86/kernel/process.c:147)
+> [    7.870273] ? kthread_complete_and_exit (kernel/kthread.c:341)
+> [    7.870889] ret_from_fork_asm (arch/x86/entry/entry_64.S:312)
+> [    7.871374]  </TASK>
+> [    7.871818] irq event stamp: 2515
+> [    7.872285] hardirqs last enabled at (2523): console_unlock (./arch/x86/include/asm/irqflags.h:42 ./arch/x86/include/asm/irqflags.h:77 ./arch/x86/include/asm/irqflags.h:135 kernel/printk/printk.c:347 kernel/printk/printk.c:2720 kernel/printk/printk.c:3039)
+> [    7.873173] hardirqs last disabled at (2532): console_unlock (kernel/printk/printk.c:345 (discriminator 3) kernel/printk/printk.c:2720 (discriminator 3) kernel/printk/printk.c:3039 (discriminator 3))
+> [    7.874103] softirqs last enabled at (2190): __do_softirq (./arch/x86/include/asm/preempt.h:27 kernel/softirq.c:400 kernel/softirq.c:582)
+> [    7.875196] softirqs last disabled at (2185): irq_exit_rcu (kernel/softirq.c:427 kernel/softirq.c:632 kernel/softirq.c:644)
+> [    7.875811] ---[ end trace 0000000000000000 ]---
+> 
+> --8<--
+> 
+> bash-5.2# ./test_progs -t sockmap
+> [    7.691453] bpf_testmod: loading out-of-tree module taints kernel.
+> [    7.691759] bpf_testmod: module verification failed: signature and/or required key missing - tainting kernel
+> #24      bpf_sockmap_map_iter_fd:OK
+> #211/1   sockmap_basic/sockmap create_update_free:OK
+> #211/2   sockmap_basic/sockhash create_update_free:OK
+> #211/3   sockmap_basic/sockmap sk_msg load helpers:OK
+> #211/4   sockmap_basic/sockhash sk_msg load helpers:OK
+> #211/5   sockmap_basic/sockmap update:OK
+> #211/6   sockmap_basic/sockhash update:OK
+> #211/7   sockmap_basic/sockmap update in unsafe context:OK
+> #211/8   sockmap_basic/sockmap copy:OK
+> #211/9   sockmap_basic/sockhash copy:OK
+> #211/10  sockmap_basic/sockmap skb_verdict attach:OK
+> #211/11  sockmap_basic/sockmap msg_verdict progs query:OK
+> #211/12  sockmap_basic/sockmap stream_parser progs query:OK
+> #211/13  sockmap_basic/sockmap stream_verdict progs query:OK
+> #211/14  sockmap_basic/sockmap skb_verdict progs query:OK
+> #211/15  sockmap_basic/sockmap skb_verdict shutdown:OK
+> #211/16  sockmap_basic/sockmap skb_verdict fionread:OK
+> #211/17  sockmap_basic/sockmap skb_verdict fionread on drop:OK
+> #211/18  sockmap_basic/sockmap msg_verdict:OK
+> #211/19  sockmap_basic/sockmap msg_verdict ingress:OK
+> #211/20  sockmap_basic/sockmap msg_verdict permanent:OK
+> #211/21  sockmap_basic/sockmap msg_verdict ingress permanent:OK
+> #211/22  sockmap_basic/sockmap msg_verdict permanent self:OK
+> #211/23  sockmap_basic/sockmap msg_verdict ingress permanent self:OK
+> #211/24  sockmap_basic/sockmap msg_verdict permanent shutdown:OK
+> #211/25  sockmap_basic/sockmap msg_verdict ingress permanent shutdown:OK
+> #211/26  sockmap_basic/sockmap msg_verdict shutdown:OK
+> #211/27  sockmap_basic/sockmap msg_verdict ingress shutdown:OK
+> #211     sockmap_basic:OK
+> #212/1   sockmap_ktls/sockmap_ktls disconnect_after_delete IPv4 SOCKMAP:OK
+> #212/2   sockmap_ktls/sockmap_ktls update_fails_when_sock_has_ulp IPv4 SOCKMAP:OK
+> #212/3   sockmap_ktls/sockmap_ktls disconnect_after_delete IPv4 SOCKMAP:OK
+> #212/4   sockmap_ktls/sockmap_ktls update_fails_when_sock_has_ulp IPv4 SOCKMAP:OK
+> #212/5   sockmap_ktls/sockmap_ktls disconnect_after_delete IPv4 SOCKMAP:OK
+> #212/6   sockmap_ktls/sockmap_ktls update_fails_when_sock_has_ulp IPv4 SOCKMAP:OK
+> #212/7   sockmap_ktls/sockmap_ktls disconnect_after_delete IPv4 SOCKMAP:OK
+> #212/8   sockmap_ktls/sockmap_ktls update_fails_when_sock_has_ulp IPv4 SOCKMAP:OK
+> #212     sockmap_ktls:OK
+> [    7.846863] ------------[ cut here ]------------
+> [    7.847383] refcount_t: underflow; use-after-free.
+> [    7.847919] WARNING: CPU: 3 PID: 36 at lib/refcount.c:28 refcount_warn_saturate+0xc2/0x110
+> [    7.848719] Modules linked in: bpf_testmod(OE)
+> [    7.849207] CPU: 3 PID: 36 Comm: kworker/3:0 Tainted: G           OE      6.5.0+ #13
+> [    7.850364] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.fc38 04/01/2014
+> [    7.851893] Workqueue: events sk_psock_destroy
+> [    7.852617] RIP: 0010:refcount_warn_saturate+0xc2/0x110
+> [    7.853383] Code: 01 e8 32 f0 a9 ff 0f 0b 5d c3 cc cc cc cc 80 3d 24 c5 01 02 00 75 81 48 c7 c7 98 cc 77 82 c6 05 14 c5 01 02 01 e8 0e f0 a9 ff <0f> 0b 5d c3 cc cc cc cc 80 3d 01 c5 01 02 00 0f 85 59 ff ff ff 48
+> [    7.855330] RSP: 0018:ffffc9000014bdd8 EFLAGS: 00010282
+> [    7.855891] RAX: 0000000000000000 RBX: ffff888104ea0438 RCX: 0000000000000000
+> [    7.856539] RDX: 0000000000000002 RSI: ffffc9000014bc50 RDI: 00000000ffffffff
+> [    7.857348] RBP: ffffc9000014bdd8 R08: 0000000000000000 R09: ffffffff82e9bd60
+> [    7.858088] R10: ffffc9000014bc48 R11: ffffffff8359bda8 R12: ffff888104ea0268
+> [    7.858956] R13: ffff888104ea0268 R14: ffff888104ea0268 R15: dead000000000100
+> [    7.859687] FS:  0000000000000000(0000) GS:ffff88813bd80000(0000) knlGS:0000000000000000
+> [    7.860349] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [    7.861013] CR2: 00007f4e2d2a7f78 CR3: 0000000002e6e002 CR4: 0000000000770ea0
+> [    7.862014] PKRU: 55555554
+> [    7.862224] Call Trace:
+> [    7.862515]  <TASK>
+> [    7.862719]  ? show_regs+0x60/0x70
+> [    7.863159]  ? __warn+0x84/0x180
+> [    7.863521]  ? refcount_warn_saturate+0xc2/0x110
+> [    7.864073]  ? report_bug+0x192/0x1c0
+> [    7.864523]  ? handle_bug+0x42/0x80
+> [    7.864954]  ? exc_invalid_op+0x18/0x70
+> [    7.865379]  ? asm_exc_invalid_op+0x1b/0x20
+> [    7.866011]  ? refcount_warn_saturate+0xc2/0x110
+> [    7.866613]  ? refcount_warn_saturate+0xc2/0x110
+> [    7.867159]  sk_psock_destroy+0x2c5/0x2e0
+> [    7.867579]  process_one_work+0x1fe/0x4f0
+> [    7.868120]  worker_thread+0x1d6/0x3d0
+> [    7.868363]  ? rescuer_thread+0x380/0x380
+> [    7.868589]  kthread+0x106/0x140
+> [    7.869017]  ? kthread_complete_and_exit+0x20/0x20
+> [    7.869716]  ret_from_fork+0x35/0x60
+> [    7.870273]  ? kthread_complete_and_exit+0x20/0x20
+> [    7.870889]  ret_from_fork_asm+0x11/0x20
+> [    7.871374]  </TASK>
+> [    7.871818] irq event stamp: 2515
+> [    7.872285] hardirqs last  enabled at (2523): [<ffffffff811ae505>] console_unlock+0x105/0x130
+> [    7.873173] hardirqs last disabled at (2532): [<ffffffff811ae4ea>] console_unlock+0xea/0x130
+> [    7.874103] softirqs last  enabled at (2190): [<ffffffff81d21495>] __do_softirq+0x2f5/0x3f3
+> [    7.875196] softirqs last disabled at (2185): [<ffffffff8112d18f>] irq_exit_rcu+0x8f/0xf0
+> [    7.875811] ---[ end trace 0000000000000000 ]---
+> #213/1   sockmap_listen/sockmap IPv4 TCP test_insert_invalid:OK
+> #213/2   sockmap_listen/sockmap IPv4 TCP test_insert_opened:OK
+> #213/3   sockmap_listen/sockmap IPv4 TCP test_insert_bound:OK
+> #213/4   sockmap_listen/sockmap IPv4 TCP test_insert:OK
+> #213/5   sockmap_listen/sockmap IPv4 TCP test_delete_after_insert:OK
+> #213/6   sockmap_listen/sockmap IPv4 TCP test_delete_after_close:OK
+> #213/7   sockmap_listen/sockmap IPv4 TCP test_lookup_after_insert:OK
+> #213/8   sockmap_listen/sockmap IPv4 TCP test_lookup_after_delete:OK
+> #213/9   sockmap_listen/sockmap IPv4 TCP test_lookup_32_bit_value:OK
+> #213/10  sockmap_listen/sockmap IPv4 TCP test_update_existing:OK
+> #213/11  sockmap_listen/sockmap IPv4 TCP test_destroy_orphan_child:OK
+> #213/12  sockmap_listen/sockmap IPv4 TCP test_syn_recv_insert_delete:OK
+> #213/13  sockmap_listen/sockmap IPv4 TCP test_race_insert_listen:OK
+> #213/14  sockmap_listen/sockmap IPv4 TCP test_clone_after_delete:OK
+> #213/15  sockmap_listen/sockmap IPv4 TCP test_accept_after_delete:OK
+> #213/16  sockmap_listen/sockmap IPv4 TCP test_accept_before_delete:OK
+> #213/17  sockmap_listen/sockmap IPv4 UDP test_insert_invalid:OK
+> #213/18  sockmap_listen/sockmap IPv4 UDP test_insert_opened:OK
+> #213/19  sockmap_listen/sockmap IPv4 UDP test_insert:OK
+> #213/20  sockmap_listen/sockmap IPv4 UDP test_delete_after_insert:OK
+> #213/21  sockmap_listen/sockmap IPv4 UDP test_delete_after_close:OK
+> #213/22  sockmap_listen/sockmap IPv4 UDP test_lookup_after_insert:OK
+> #213/23  sockmap_listen/sockmap IPv4 UDP test_lookup_after_delete:OK
+> #213/24  sockmap_listen/sockmap IPv4 UDP test_lookup_32_bit_value:OK
+> #213/25  sockmap_listen/sockmap IPv4 UDP test_update_existing:OK
+> #213/26  sockmap_listen/sockmap IPv4 test_skb_redir_to_connected:OK
+> #213/27  sockmap_listen/sockmap IPv4 test_skb_redir_to_listening:OK
+> #213/28  sockmap_listen/sockmap IPv4 test_skb_redir_partial:OK
+> #213/29  sockmap_listen/sockmap IPv4 test_msg_redir_to_connected:OK
+> #213/30  sockmap_listen/sockmap IPv4 test_msg_redir_to_listening:OK
+> #213/31  sockmap_listen/sockmap IPv4 TCP test_reuseport_select_listening:OK
+> #213/32  sockmap_listen/sockmap IPv4 TCP test_reuseport_select_connected:OK
+> #213/33  sockmap_listen/sockmap IPv4 TCP test_reuseport_mixed_groups:OK
+> #213/34  sockmap_listen/sockmap IPv4 UDP test_reuseport_select_listening:OK
+> #213/35  sockmap_listen/sockmap IPv4 UDP test_reuseport_select_connected:OK
+> #213/36  sockmap_listen/sockmap IPv4 UDP test_reuseport_mixed_groups:OK
+> #213/37  sockmap_listen/sockmap IPv4 test_udp_redir:OK
+> #213/38  sockmap_listen/sockmap IPv4 test_udp_unix_redir:OK
+> #213/39  sockmap_listen/sockmap IPv6 TCP test_insert_invalid:OK
+> #213/40  sockmap_listen/sockmap IPv6 TCP test_insert_opened:OK
+> #213/41  sockmap_listen/sockmap IPv6 TCP test_insert_bound:OK
+> #213/42  sockmap_listen/sockmap IPv6 TCP test_insert:OK
+> #213/43  sockmap_listen/sockmap IPv6 TCP test_delete_after_insert:OK
+> #213/44  sockmap_listen/sockmap IPv6 TCP test_delete_after_close:OK
+> #213/45  sockmap_listen/sockmap IPv6 TCP test_lookup_after_insert:OK
+> #213/46  sockmap_listen/sockmap IPv6 TCP test_lookup_after_delete:OK
+> #213/47  sockmap_listen/sockmap IPv6 TCP test_lookup_32_bit_value:OK
+> #213/48  sockmap_listen/sockmap IPv6 TCP test_update_existing:OK
+> #213/49  sockmap_listen/sockmap IPv6 TCP test_destroy_orphan_child:OK
+> #213/50  sockmap_listen/sockmap IPv6 TCP test_syn_recv_insert_delete:OK
+> #213/51  sockmap_listen/sockmap IPv6 TCP test_race_insert_listen:OK
+> #213/52  sockmap_listen/sockmap IPv6 TCP test_clone_after_delete:OK
+> #213/53  sockmap_listen/sockmap IPv6 TCP test_accept_after_delete:OK
+> #213/54  sockmap_listen/sockmap IPv6 TCP test_accept_before_delete:OK
+> #213/55  sockmap_listen/sockmap IPv6 UDP test_insert_invalid:OK
+> #213/56  sockmap_listen/sockmap IPv6 UDP test_insert_opened:OK
+> #213/57  sockmap_listen/sockmap IPv6 UDP test_insert:OK
+> #213/58  sockmap_listen/sockmap IPv6 UDP test_delete_after_insert:OK
+> #213/59  sockmap_listen/sockmap IPv6 UDP test_delete_after_close:OK
+> #213/60  sockmap_listen/sockmap IPv6 UDP test_lookup_after_insert:OK
+> #213/61  sockmap_listen/sockmap IPv6 UDP test_lookup_after_delete:OK
+> #213/62  sockmap_listen/sockmap IPv6 UDP test_lookup_32_bit_value:OK
+> #213/63  sockmap_listen/sockmap IPv6 UDP test_update_existing:OK
+> #213/64  sockmap_listen/sockmap IPv6 test_skb_redir_to_connected:OK
+> #213/65  sockmap_listen/sockmap IPv6 test_skb_redir_to_listening:OK
+> #213/66  sockmap_listen/sockmap IPv6 test_skb_redir_partial:OK
+> #213/67  sockmap_listen/sockmap IPv6 test_msg_redir_to_connected:OK
+> #213/68  sockmap_listen/sockmap IPv6 test_msg_redir_to_listening:OK
+> #213/69  sockmap_listen/sockmap IPv6 TCP test_reuseport_select_listening:OK
+> #213/70  sockmap_listen/sockmap IPv6 TCP test_reuseport_select_connected:OK
+> #213/71  sockmap_listen/sockmap IPv6 TCP test_reuseport_mixed_groups:OK
+> #213/72  sockmap_listen/sockmap IPv6 UDP test_reuseport_select_listening:OK
+> #213/73  sockmap_listen/sockmap IPv6 UDP test_reuseport_select_connected:OK
+> #213/74  sockmap_listen/sockmap IPv6 UDP test_reuseport_mixed_groups:OK
+> #213/75  sockmap_listen/sockmap IPv6 test_udp_redir:OK
+> #213/76  sockmap_listen/sockmap IPv6 test_udp_unix_redir:OK
+> #213/77  sockmap_listen/sockmap Unix test_unix_redir:OK
+> #213/78  sockmap_listen/sockmap Unix test_unix_redir:OK
+> #213/79  sockmap_listen/sockmap VSOCK test_vsock_redir:OK
+> #213/80  sockmap_listen/sockhash IPv4 TCP test_insert_invalid:OK
+> #213/81  sockmap_listen/sockhash IPv4 TCP test_insert_opened:OK
+> #213/82  sockmap_listen/sockhash IPv4 TCP test_insert_bound:OK
+> #213/83  sockmap_listen/sockhash IPv4 TCP test_insert:OK
+> #213/84  sockmap_listen/sockhash IPv4 TCP test_delete_after_insert:OK
+> #213/85  sockmap_listen/sockhash IPv4 TCP test_delete_after_close:OK
+> #213/86  sockmap_listen/sockhash IPv4 TCP test_lookup_after_insert:OK
+> #213/87  sockmap_listen/sockhash IPv4 TCP test_lookup_after_delete:OK
+> #213/88  sockmap_listen/sockhash IPv4 TCP test_lookup_32_bit_value:OK
+> #213/89  sockmap_listen/sockhash IPv4 TCP test_update_existing:OK
+> #213/90  sockmap_listen/sockhash IPv4 TCP test_destroy_orphan_child:OK
+> #213/91  sockmap_listen/sockhash IPv4 TCP test_syn_recv_insert_delete:OK
+> #213/92  sockmap_listen/sockhash IPv4 TCP test_race_insert_listen:OK
+> #213/93  sockmap_listen/sockhash IPv4 TCP test_clone_after_delete:OK
+> #213/94  sockmap_listen/sockhash IPv4 TCP test_accept_after_delete:OK
+> #213/95  sockmap_listen/sockhash IPv4 TCP test_accept_before_delete:OK
+> #213/96  sockmap_listen/sockhash IPv4 UDP test_insert_invalid:OK
+> #213/97  sockmap_listen/sockhash IPv4 UDP test_insert_opened:OK
+> #213/98  sockmap_listen/sockhash IPv4 UDP test_insert:OK
+> #213/99  sockmap_listen/sockhash IPv4 UDP test_delete_after_insert:OK
+> #213/100 sockmap_listen/sockhash IPv4 UDP test_delete_after_close:OK
+> #213/101 sockmap_listen/sockhash IPv4 UDP test_lookup_after_insert:OK
+> #213/102 sockmap_listen/sockhash IPv4 UDP test_lookup_after_delete:OK
+> #213/103 sockmap_listen/sockhash IPv4 UDP test_lookup_32_bit_value:OK
+> #213/104 sockmap_listen/sockhash IPv4 UDP test_update_existing:OK
+> #213/105 sockmap_listen/sockhash IPv4 test_skb_redir_to_connected:OK
+> #213/106 sockmap_listen/sockhash IPv4 test_skb_redir_to_listening:OK
+> #213/107 sockmap_listen/sockhash IPv4 test_skb_redir_partial:OK
+> #213/108 sockmap_listen/sockhash IPv4 test_msg_redir_to_connected:OK
+> #213/109 sockmap_listen/sockhash IPv4 test_msg_redir_to_listening:OK
+> #213/110 sockmap_listen/sockhash IPv4 TCP test_reuseport_select_listening:OK
+> #213/111 sockmap_listen/sockhash IPv4 TCP test_reuseport_select_connected:OK
+> #213/112 sockmap_listen/sockhash IPv4 TCP test_reuseport_mixed_groups:OK
+> #213/113 sockmap_listen/sockhash IPv4 UDP test_reuseport_select_listening:OK
+> #213/114 sockmap_listen/sockhash IPv4 UDP test_reuseport_select_connected:OK
+> #213/115 sockmap_listen/sockhash IPv4 UDP test_reuseport_mixed_groups:OK
+> #213/116 sockmap_listen/sockhash IPv4 test_udp_redir:OK
+> #213/117 sockmap_listen/sockhash IPv4 test_udp_unix_redir:OK
+> #213/118 sockmap_listen/sockhash IPv6 TCP test_insert_invalid:OK
+> #213/119 sockmap_listen/sockhash IPv6 TCP test_insert_opened:OK
+> #213/120 sockmap_listen/sockhash IPv6 TCP test_insert_bound:OK
+> #213/121 sockmap_listen/sockhash IPv6 TCP test_insert:OK
+> #213/122 sockmap_listen/sockhash IPv6 TCP test_delete_after_insert:OK
+> #213/123 sockmap_listen/sockhash IPv6 TCP test_delete_after_close:OK
+> #213/124 sockmap_listen/sockhash IPv6 TCP test_lookup_after_insert:OK
+> #213/125 sockmap_listen/sockhash IPv6 TCP test_lookup_after_delete:OK
+> #213/126 sockmap_listen/sockhash IPv6 TCP test_lookup_32_bit_value:OK
+> #213/127 sockmap_listen/sockhash IPv6 TCP test_update_existing:OK
+> #213/128 sockmap_listen/sockhash IPv6 TCP test_destroy_orphan_child:OK
+> #213/129 sockmap_listen/sockhash IPv6 TCP test_syn_recv_insert_delete:OK
+> #213/130 sockmap_listen/sockhash IPv6 TCP test_race_insert_listen:OK
+> #213/131 sockmap_listen/sockhash IPv6 TCP test_clone_after_delete:OK
+> #213/132 sockmap_listen/sockhash IPv6 TCP test_accept_after_delete:OK
+> #213/133 sockmap_listen/sockhash IPv6 TCP test_accept_before_delete:OK
+> #213/134 sockmap_listen/sockhash IPv6 UDP test_insert_invalid:OK
+> #213/135 sockmap_listen/sockhash IPv6 UDP test_insert_opened:OK
+> #213/136 sockmap_listen/sockhash IPv6 UDP test_insert:OK
+> #213/137 sockmap_listen/sockhash IPv6 UDP test_delete_after_insert:OK
+> #213/138 sockmap_listen/sockhash IPv6 UDP test_delete_after_close:OK
+> #213/139 sockmap_listen/sockhash IPv6 UDP test_lookup_after_insert:OK
+> #213/140 sockmap_listen/sockhash IPv6 UDP test_lookup_after_delete:OK
+> #213/141 sockmap_listen/sockhash IPv6 UDP test_lookup_32_bit_value:OK
+> #213/142 sockmap_listen/sockhash IPv6 UDP test_update_existing:OK
+> #213/143 sockmap_listen/sockhash IPv6 test_skb_redir_to_connected:OK
+> #213/144 sockmap_listen/sockhash IPv6 test_skb_redir_to_listening:OK
+> #213/145 sockmap_listen/sockhash IPv6 test_skb_redir_partial:OK
+> #213/146 sockmap_listen/sockhash IPv6 test_msg_redir_to_connected:OK
+> #213/147 sockmap_listen/sockhash IPv6 test_msg_redir_to_listening:OK
+> #213/148 sockmap_listen/sockhash IPv6 TCP test_reuseport_select_listening:OK
+> #213/149 sockmap_listen/sockhash IPv6 TCP test_reuseport_select_connected:OK
+> #213/150 sockmap_listen/sockhash IPv6 TCP test_reuseport_mixed_groups:OK
+> #213/151 sockmap_listen/sockhash IPv6 UDP test_reuseport_select_listening:OK
+> #213/152 sockmap_listen/sockhash IPv6 UDP test_reuseport_select_connected:OK
+> #213/153 sockmap_listen/sockhash IPv6 UDP test_reuseport_mixed_groups:OK
+> #213/154 sockmap_listen/sockhash IPv6 test_udp_redir:OK
+> #213/155 sockmap_listen/sockhash IPv6 test_udp_unix_redir:OK
+> #213/156 sockmap_listen/sockhash Unix test_unix_redir:OK
+> #213/157 sockmap_listen/sockhash Unix test_unix_redir:OK
+> #213/158 sockmap_listen/sockhash VSOCK test_vsock_redir:OK
+> #213     sockmap_listen:OK
+> Summary: 4/193 PASSED, 0 SKIPPED, 0 FAILED
+> bash-5.2#
+> 
 
