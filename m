@@ -1,102 +1,129 @@
-Return-Path: <netdev+bounces-34086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEEFB7A2075
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 16:05:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DB7D77A2095
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 16:13:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87D45282BB8
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 14:05:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CD412823D3
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 14:13:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C4BF11189;
-	Fri, 15 Sep 2023 14:05:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DCF011189;
+	Fri, 15 Sep 2023 14:13:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCCE410A32
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 14:05:23 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 30CFD2729
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 07:05:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1694786721;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=PpSIIB1mvYApP01E3iIGKXxZD7tQZq1zZDR9KGP+8mk=;
-	b=KQOAUlOQc1jVk81cuUo0LZNM7s9tl8eYJ314ZTGPy2qXhr/XmGGj5ulWI9QIZ4hDPYtV7W
-	wJq2zP7CTTrOl1ydZ/OUB6+7w7YlpjG2eikpfdT7geBeNV8aM1Zwy8T/O+8Sp8TzSfN7P5
-	ujInfPQoRNznVkQe19za1wLhnN68yLI=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-351-YYINLg7aMqenwQiJZbbLcg-1; Fri, 15 Sep 2023 10:05:19 -0400
-X-MC-Unique: YYINLg7aMqenwQiJZbbLcg-1
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-52fbe735dfcso1481970a12.3
-        for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 07:05:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 082D4101D4
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 14:13:49 +0000 (UTC)
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E768E1FD0
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 07:13:48 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id 41be03b00d2f7-5783e07fdcbso1280a12.0
+        for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 07:13:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1694787228; x=1695392028; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ke/S75Act/GYPOSeawP6Jdwgvv0mn/jdboBsDb1L9yQ=;
+        b=JieD2Jj2FS19AtMfhHHFVzh5NoA/wuUKnKdALbdNazjTmycVIIYIQzUeLY4V0yO32r
+         u79aA2Y+KAn5HMYpzxG8CMOvha24SpBkz5kYZldN1vFIHcm5JTT9gmEZ+ucDFYNpHenK
+         /vCr+BKk1SlHpEaCQezdCyDvRI/XNNUnfOrcPAAADV4/JESqS7rbuyDLaYmPGHuk2tiY
+         PLNz4n/3xr/ZS0rJhUe1hMT0IjCZ3COanvsVhV2DHL2Q9kTfbcTzSBzF3Vgi1vzD3kHK
+         bAx/6jyYIRNhoIf1QqXisdvB24pBi5B6PLnIU3mqxDEXvEHzP6qipseP45qdbcpCGyTX
+         XS8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694786718; x=1695391518;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=PpSIIB1mvYApP01E3iIGKXxZD7tQZq1zZDR9KGP+8mk=;
-        b=xDrjsWVlAElwHdV4WkYxq1yQbM7JaitPVGfjeq5ocF4hXt7SI5lFQ3lEe6sWo1Iab2
-         YD52dPWNREYhPbqYrk40yoJvrHWLJ64TbFvqzgRM1z4Q2V8CCXVwgmSFFB9lcvNs9xfj
-         WH3/fW5CydjsSm5kCDhblkR3KLoVGe2rvVx3JghBMm3cmFq2O4O6CH7CR+UHe2hUgaJb
-         5GEmCt1qcdR0MzN891GwOKQyptvv6Wk9Hb3iveMSnDd0Mn21dFcERddLsIOscBY4oRsK
-         SPRgx7mhQkIkA1QlP+0DcsmWFqS/FhOQVwqSGSxKxGsScjImkzrGT0J9Tu+sit7AIcZ3
-         1qkA==
-X-Gm-Message-State: AOJu0YzbkBBiyeUl1z80dhK0aMJy816j+HvYNgqYWzPGmSl+voNDe1R5
-	xi/gfAUAaEO2euv1uzfLn7dZO9Ds9DV3mbTmDzje+9AFevr5CNynmK7fGVHiL2iK1yWdyq7bIvZ
-	0dIMtXPBcGFvNDeiF1u8t3pynT7aP8GT6Z+Corh+3vZ0=
-X-Received: by 2002:aa7:c24b:0:b0:522:1956:a291 with SMTP id y11-20020aa7c24b000000b005221956a291mr1403996edo.8.1694786718304;
-        Fri, 15 Sep 2023 07:05:18 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IENaUrSukINVFutVEhyltutN+3v2vUw89AHoLMRzYm50JTRklRonP/SpNHk7yTb23Zx0F5XJdth9ljX9cbq0VM=
-X-Received: by 2002:aa7:c24b:0:b0:522:1956:a291 with SMTP id
- y11-20020aa7c24b000000b005221956a291mr1403978edo.8.1694786718009; Fri, 15 Sep
- 2023 07:05:18 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1694787228; x=1695392028;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ke/S75Act/GYPOSeawP6Jdwgvv0mn/jdboBsDb1L9yQ=;
+        b=YUIPROe5A2zElY5Gxoh8OrjqpcKvXf1XR/T8iHDxo/WFsp9lc8Ki3bE17jnsSLNPr6
+         hTDsuQgOELUBAwR1dl9ihZybS99ek66c54VqSPMfYFzSR3qLnbXU2SD7z0Nfv7jJBxid
+         2W2jiISbNAFIo/19A6t5BjZ3t6zYx2tgcCUWK9D6IRmkyraj66krJZf7uT+Y15hQIvan
+         wRhp7ESdGEsemb4otpZimKISFhNmM1lMZLUbJtVySO5q/6FcV1hhcd4cSPwi24jsEx/b
+         Ttpi3Aw7Mus2dDz/4fPW8JdXkPKeXU2gn4MUbK6LZeFpV1lnA8QwgQCPSEOera9K1sYn
+         RR2Q==
+X-Gm-Message-State: AOJu0Yy7MFyf3GdIkSw1kWFHeYlJXDaooD5dy8P7HkawE7Afl1lx657f
+	UQOQGhJ/nsUHVKETKKAAO3FmIckXIULFkWTSJZU=
+X-Google-Smtp-Source: AGHT+IFVb1QexceCNEMxn+OszAR0FB6zGhWO7Fh1x9HE0DtJcsnBh9jMrOSOQEKc8CkCl1Ut6fPMq0QVw1t9IwuapgY=
+X-Received: by 2002:a17:90a:6d27:b0:26d:2635:5a7c with SMTP id
+ z36-20020a17090a6d2700b0026d26355a7cmr1551869pjj.2.1694787228346; Fri, 15 Sep
+ 2023 07:13:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Alexander Aring <aahringo@redhat.com>
-Date: Fri, 15 Sep 2023 10:05:06 -0400
-Message-ID: <CAK-6q+ghZRxrWQg3k0x1-SofoxfVfObJMg8wZ3UUMM4CU2oiWg@mail.gmail.com>
-Subject: nft_rhash_walk, rhashtable and resize event
-To: Network Development <netdev@vger.kernel.org>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>, kadlec@netfilter.org, fw@strlen.de, 
-	gfs2@lists.linux.dev, David Teigland <teigland@redhat.com>, tgraf@suug.ch, 
-	herbert@gondor.apana.org.au
+References: <CAOMZO5AE3HkjRb9-UsoG44XL064Lca7zx9gG47+==GbhVPUFsw@mail.gmail.com>
+ <8020f97d-a5c9-4b78-bcf2-fc5245c67138@lunn.ch> <CAOMZO5BzaJ3Bw2hwWZ3iiMCX3_VejnZ=LHDhkdU8YmhKHuA5xw@mail.gmail.com>
+ <CAOMZO5DJXsbgEDAZSjWJXBesHad1oWR9ht3a3Xjf=Q-faHm1rg@mail.gmail.com>
+ <597f21f0-e922-440c-91af-b12cb2a0b7a4@lunn.ch> <CAOMZO5BDWFtYu5iae7Gk-bF6Q6d1TV4dYZ=GtW_L_-CV8HapBg@mail.gmail.com>
+ <333e23ae-fe75-48e1-a2fb-65b127ec9b3e@lunn.ch>
+In-Reply-To: <333e23ae-fe75-48e1-a2fb-65b127ec9b3e@lunn.ch>
+From: Fabio Estevam <festevam@gmail.com>
+Date: Fri, 15 Sep 2023 11:13:36 -0300
+Message-ID: <CAOMZO5AQ6VJi7Qhz4B0VQk5f2_R0bXB_RqipgGMBz9+vtHBMmg@mail.gmail.com>
+Subject: Re: mv88e6xxx: Timeout waiting for EEPROM done
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Vladimir Oltean <olteanv@gmail.com>, l00g33k@gmail.com, netdev <netdev@vger.kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>, sashal@kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+Hi Andrew,
 
-I try to find some ways that fits my use case of iterating a
-rhashtable. I found [0] but it somehow tries to skip objects again if
-a rhashtable resize event occurs during a hash walk. It does that by
-skipping the already iterated objects according to a counter that is
-tracked, see [0]:
+On Fri, Sep 15, 2023 at 10:08=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote=
+:
 
-if (iter->count < iter->skip)
+> > What does the datasheet say about the minimal duration for the reset
+> > pin being asserted?
+>
+> It is a bit ambiguous. RESETn is both an input and an output. It says
+> this about input for the For the 6352:
+>
+>      As in input, when RESETn is driven low by an external device,
+>      this device will then driver RESETn low as an output for 8 to
+>      14ms (10ms typically). In this mode RESETn can be used to
+>      debounce a hardware reset switch.
+>
+> So i would say it needs to be low long enough not to be a glitch, but
+> can be short.
 
-from my understanding.
+Thanks for confirming with the datasheet.
 
-My question is here? Is that allowed to do because a resize event may
-change the order how to iterate over a rhashtable.
+> Is you device held in reset before the driver loads? As i said, the
 
-Thanks.
+Just checked with a scope here and no, the reset pin is not held in
+reset before the driver loads.
 
-- Alex
+> aim of this code is not to actually reset the switch, but to ensure it
+> is taken out of reset if it was being held in reset. And if it was
+> being held in reset, i would expect that to be for a long time, at
+> least the current Linux boot time.
 
-[0] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/net/netfilter/nft_set_hash.c?h=v6.6-rc1#n257
+That's a point I am concerned about: why don't we follow the datasheet
+with respect to taking the reset pin out of reset?
 
+Isn't the sequence I used below better suited as it follows the
+datasheet by guaranteeing the 10ms at a low level?
+
+       chip->reset =3D devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_HIGH=
+);
+       ....
+       if (chip->reset) {
+                usleep_range(10000, 20000);
+                gpiod_set_value(chip->reset, 0);
+                usleep_range(10000, 20000);
+       }
 
