@@ -1,100 +1,173 @@
-Return-Path: <netdev+bounces-34036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34030-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D15787A1B93
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 12:00:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 54C817A1B74
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 11:57:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8ABCC281BBB
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 10:00:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D9A6282A55
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 09:57:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1353DF51;
-	Fri, 15 Sep 2023 09:59:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DEAEDDDE;
+	Fri, 15 Sep 2023 09:57:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0D5979D4
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 09:59:50 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AA712716;
-	Fri, 15 Sep 2023 02:57:49 -0700 (PDT)
-Received: from kwepemm600007.china.huawei.com (unknown [172.30.72.57])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Rn8fJ1C0WzNn0n;
-	Fri, 15 Sep 2023 17:54:00 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.2) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Fri, 15 Sep 2023 17:57:43 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <shenjian15@huawei.com>, <wangjie125@huawei.com>,
-	<liuyonglong@huawei.com>, <shaojijie@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net 5/5] net: hns3: add 5ms delay before clear firmware reset irq source
-Date: Fri, 15 Sep 2023 17:53:05 +0800
-Message-ID: <20230915095305.422328-6-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20230915095305.422328-1-shaojijie@huawei.com>
-References: <20230915095305.422328-1-shaojijie@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B3B263A5;
+	Fri, 15 Sep 2023 09:57:05 +0000 (UTC)
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E6F735B8;
+	Fri, 15 Sep 2023 02:55:49 -0700 (PDT)
+Received: by mail-lj1-x229.google.com with SMTP id 38308e7fff4ca-2bfc14e6d03so23533191fa.1;
+        Fri, 15 Sep 2023 02:55:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1694771744; x=1695376544; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=R7zkJukNUYSEGarsHRiRBGtJZPGffpcT+jlk9LRKGkg=;
+        b=QdDGbNqwhEhBBx55vCpuZUUqgRtMPj0DEuYY06Q1cc2zPr1YJA8e4Hdw9vHiLzjRI5
+         6ViwJGJ74DKMuM2tFeqwF48JJA9fsDikXiOxF3XE33md+61WcupXWq25Ysx2BCvLwpvR
+         H7R4W03PaD+uGD7io/NIGKFUw4rY7wpbtMZ+kOOvmEUbGr26ofcNwlm9BfdT2Riueb1v
+         FNUmGe8F5HO7IBFQwkyuablKbdqexwmwk1+S3/iixuIC2s5UNP3MuUnbUD3G/lbb+DZ7
+         AYXyiNFu0DrUL3k4lhr/5T8XhuIJtBLUYyspBVoNsLWDc1722jOwJH1QPEy82x5zmRJg
+         WQ5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694771744; x=1695376544;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=R7zkJukNUYSEGarsHRiRBGtJZPGffpcT+jlk9LRKGkg=;
+        b=jcc3msjCUTFScJoSXvAGYBE09pZKtDtZoz0ucEKzC6TC50TH4HkOfK4HSZVrFMNglw
+         51+X4cn1ANFnn4x2BmSMRwVMUJ3fzuNmQaABdnF3H6cVjgb1kuL5B93d9aj40fd1y0D8
+         GYsjpCymzfc4lVALzji5oJXs+XxEAfUb/K2evL7ouwIzmJ6bKGwZJddej0Xx2gc1IkUp
+         WW0+N3LQCNa18dy9whCMQddFcpvCACI5GaBH/9kmeNjJPFfTHRA740rD+ikf2sh1lfn/
+         /ys+vuAlyQWsLOjlM9lPyzAIboBX7RGa+M0UNpZQg+c5OWLB+KYlc/l7UYVJqQRWxhHC
+         qynQ==
+X-Gm-Message-State: AOJu0Yzt4QdoJlyuJDer9JinfYIZ03Gd2e2zzWAk6eDjj3gxoLWVjdrc
+	fX2L/QCFEX+fltMlrsk0ZDeUxj/nMFd9tQ==
+X-Google-Smtp-Source: AGHT+IHZLNXpdRzn2IhV8455COBFdw8gXQ4ZUbGrFWe4r4mMAp2BwvIbfoiDIKVm4dVnely/apypdg==
+X-Received: by 2002:a2e:3019:0:b0:2bd:a67:e8c with SMTP id w25-20020a2e3019000000b002bd0a670e8cmr494625ljw.3.1694771743907;
+        Fri, 15 Sep 2023 02:55:43 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id a20-20020a2eb174000000b002b9a1e9ba68sm654548ljm.136.2023.09.15.02.55.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Sep 2023 02:55:43 -0700 (PDT)
+Date: Fri, 15 Sep 2023 12:55:41 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Keguang Zhang <keguang.zhang@gmail.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org, Lee Jones <lee@kernel.org>, 
+	Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+	Conor Dooley <conor+dt@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, Serge Semin <Sergey.Semin@baikalelectronics.ru>
+Subject: Re: [PATCH v5 0/3] Move Loongson1 MAC arch-code to the driver dir
+Message-ID: <ueevvju7i42wik6fevdmvbtypm4su77guyo4zizhrfreexken7@nrcovxfnyuvq>
+References: <20230914114435.481900-1-keguang.zhang@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.67.165.2]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemm600007.china.huawei.com (7.193.23.208)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230914114435.481900-1-keguang.zhang@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Jie Wang <wangjie125@huawei.com>
+Hi Keguang
 
-Currently the reset process in hns3 and firmware watchdog init process is
-asynchronous. we think firmware watchdog initialization is completed
-before hns3 clear the firmware interrupt source. However, firmware
-initialization may not complete early.
+On Thu, Sep 14, 2023 at 07:44:32PM +0800, Keguang Zhang wrote:
+> In order to convert Loongson1 MAC platform devices to the devicetree
+> nodes, Loongson1 MAC arch-code should be moved to the driver dir.
+> Add dt-binding document and update MAINTAINERS file accordingly. 
+>     
+> In other words, this patchset is a preparation for converting
+> Loongson1 platform devices to devicetree.
 
-so we add delay before hns3 clear firmware interrupt source and 5 ms delay
-is enough to avoid second firmware reset interrupt.
+No more comments from my side. Thank you for the patches and
+especially for the patience in the review process.
 
-Signed-off-by: Jie Wang <wangjie125@huawei.com>
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
----
- drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c | 5 +++++
- 1 file changed, 5 insertions(+)
+For the entire series:
+Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-index 2bd77871f3bf..c42574e29747 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-@@ -3564,9 +3564,14 @@ static u32 hclge_check_event_cause(struct hclge_dev *hdev, u32 *clearval)
- static void hclge_clear_event_cause(struct hclge_dev *hdev, u32 event_type,
- 				    u32 regclr)
- {
-+#define HCLGE_IMP_RESET_DELAY		5
-+
- 	switch (event_type) {
- 	case HCLGE_VECTOR0_EVENT_PTP:
- 	case HCLGE_VECTOR0_EVENT_RST:
-+		if (regclr == BIT(HCLGE_VECTOR0_IMPRESET_INT_B))
-+			mdelay(HCLGE_IMP_RESET_DELAY);
-+
- 		hclge_write_dev(&hdev->hw, HCLGE_MISC_RESET_STS_REG, regclr);
- 		break;
- 	case HCLGE_VECTOR0_EVENT_MBX:
--- 
-2.30.0
+* I'll also send individual Rb tags to each patch so b4 would be able
+* to take it into account.
 
+-Serge(y)
+
+> 
+> Changelog
+> V4 -> V5: Replace stmmac_probe_config_dt() with devm_stmmac_probe_config_dt()
+>           Replace stmmac_pltfr_probe() with devm_stmmac_pltfr_probe()
+>           Squash patch 4 into patch 2 and 3
+> V3 -> V4: Add Acked-by tag from Krzysztof Kozlowski
+>           Add "|" to description part
+>           Amend "phy-mode" property
+>           Drop ls1x_dwmac_syscon definition and its instances
+>           Drop three redundant fields from the ls1x_dwmac structure
+>           Drop the ls1x_dwmac_init() method.
+>           Update the dt-binding document entry of Loongson1 Ethernet
+>           Some minor improvements
+> V2 -> V3: Split the DT-schema file into loongson,ls1b-gmac.yaml
+>           and loongson,ls1c-emac.yaml (suggested by Serge Semin)
+>           Change the compatibles to loongson,ls1b-gmac and loongson,ls1c-emac
+>           Rename loongson,dwmac-syscon to loongson,ls1-syscon
+>           Amend the title
+>           Add description
+>           Add Reviewed-by tag from Krzysztof Kozlowski
+>           Change compatibles back to loongson,ls1b-syscon
+>           and loongson,ls1c-syscon
+>           Determine the device ID by physical
+>           base address(suggested by Serge Semin)
+>           Use regmap instead of regmap fields
+>           Use syscon_regmap_lookup_by_phandle()
+>           Some minor fixes
+>           Update the entries of MAINTAINERS
+> V1 -> V2: Leave the Ethernet platform data for now
+>           Make the syscon compatibles more specific
+>           Fix "clock-names" and "interrupt-names" property
+>           Rename the syscon property to "loongson,dwmac-syscon"
+>           Drop "phy-handle" and "phy-mode" requirement
+>           Revert adding loongson,ls1b-dwmac/loongson,ls1c-dwmac
+>           to snps,dwmac.yaml
+>           Fix the build errors due to CONFIG_OF being unset
+>           Change struct reg_field definitions to const
+>           Rename the syscon property to "loongson,dwmac-syscon"
+>           Add MII PHY mode for LS1C
+>           Improve the commit message
+> 
+> Keguang Zhang (3):
+>   dt-bindings: mfd: syscon: Add compatibles for Loongson-1 syscon
+>   dt-bindings: net: Add Loongson-1 Ethernet Controller
+>   net: stmmac: Add glue layer for Loongson-1 SoC
+> 
+>  .../devicetree/bindings/mfd/syscon.yaml       |   2 +
+>  .../bindings/net/loongson,ls1b-gmac.yaml      | 114 ++++++++++
+>  .../bindings/net/loongson,ls1c-emac.yaml      | 113 ++++++++++
+>  MAINTAINERS                                   |   2 +
+>  drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 +
+>  drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
+>  .../ethernet/stmicro/stmmac/dwmac-loongson1.c | 209 ++++++++++++++++++
+>  7 files changed, 452 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/loongson,ls1b-gmac.yaml
+>  create mode 100644 Documentation/devicetree/bindings/net/loongson,ls1c-emac.yaml
+>  create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c
+> 
+> 
+> base-commit: 98897dc735cf6635f0966f76eb0108354168fb15
+> -- 
+> 2.39.2
+> 
+> 
 
