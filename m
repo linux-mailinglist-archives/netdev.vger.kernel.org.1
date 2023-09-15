@@ -1,55 +1,85 @@
-Return-Path: <netdev+bounces-34089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDA3D7A20C4
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 16:23:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C60597A20C6
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 16:23:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 861E82821F2
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 14:23:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CC411C2173A
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 14:23:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5DB81119E;
-	Fri, 15 Sep 2023 14:22:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5585111A0;
+	Fri, 15 Sep 2023 14:23:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59B0810A09;
-	Fri, 15 Sep 2023 14:22:53 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D5951AC;
-	Fri, 15 Sep 2023 07:22:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:To:From:Date:From:Sender:Reply-To:Subject:Date:
-	Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=1yldzElETnKeG++jsfq4NDMKuUjbp7vxfG0LMRVCp+g=; b=gC4Y5GJ0aa3btSElsa7kth3hsR
-	Imj4jo7cfSaCOxWwacFJtO0H3jCEEism5QMuYcKyRLmBb0oqzdZdMjyodqdEW9wgprGVJqA8kcsIR
-	Yq7PcDp/9EmKpZsmluS23ulfsem7FOqamfTpw12+A3YghxYaLIUace+RMYWKE4F2qjpA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qh9iP-006YAD-9H; Fri, 15 Sep 2023 16:22:37 +0200
-Date: Fri, 15 Sep 2023 16:22:37 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	corbet@lwn.net, steen.hegelund@microchip.com, rdunlap@infradead.org,
-	horms@kernel.org, casper.casan@gmail.com, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, horatiu.vultur@microchip.com,
-	Woojung.Huh@microchip.com, Nicolas.Ferre@microchip.com,
-	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com,
-	Alexandru Tachici <alexandru.tachici@analog.com>
-Subject: Re: [RFC PATCH net-next 0/6] Add support for OPEN Alliance
- 10BASE-T1x MACPHY Serial Interface
-Message-ID: <ac528d48-44f9-4717-a61d-35365a11de78@lunn.ch>
-References: <20230908142919.14849-1-Parthiban.Veerasooran@microchip.com>
- <20230915-wizard-junction-b58f2aad64c5@ifak-system.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ADDB33ED
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 14:23:12 +0000 (UTC)
+Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FB541FD6;
+	Fri, 15 Sep 2023 07:23:00 -0700 (PDT)
+Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-9ada6b0649fso297003166b.1;
+        Fri, 15 Sep 2023 07:23:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1694787779; x=1695392579; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uGVCkiXWOB11DyLhpvTxqW1sPBrI2lAkEGSU8kx/EBU=;
+        b=Bw4nstfF2EogAobnzl9EnGcQu3ZUuNE+NJU+4tWXu//g6pnbYPkl+t2VC4PLxGqQ4R
+         PPRT5MwVXsBz4ZTFXIxSf80Tuzsm2rovKMK6GWu9JjntFb/T0qwC3r2k6LhRN5/nIMr1
+         gCoyN/wNtHy0+QOG0tsnRHiY4TZZ2jJXzUZltDV7/dW50MsKDnI5U40VZ8zoTe8k1V0J
+         xcy8K3QZJPxgjBTtxX8yRSK4GynDmlAAkjYZSuP+/6k5th5mUPSmMJzW4Mn+FK/bAdon
+         GTXEMv3C1+lX5LIs5Bb1N15YQNELIEshF3tPFWV7QQcQeIsjFfbVthLi9Agsm5vbTcvT
+         /ByQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694787779; x=1695392579;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uGVCkiXWOB11DyLhpvTxqW1sPBrI2lAkEGSU8kx/EBU=;
+        b=ZIdiw2HNVvJoeeVrWcNKoNOZ48vONI81gawoIuSLqbDbTmIPcamVZrKnWkArQ3ApDL
+         xSzu1hTljXB7r/TiTTnrt7ZbAOMcXAqnE5ljAPMPf8fm6UGydxw4BqbghH3wojZPKXut
+         Exop59Tcg5Kz+ob73wvjT/nHxUvyrrXRse0reg2YeWPsNV3b6R/uMMBy2MvVn23yEFRQ
+         DfnQWMxuFHSDKFAIt8b7zB4t/HwpftD9OG3M3/w6zV2TzAt6INLo3YOoK0jCSjEaxHeh
+         PApUPt1QDTh4IAmoNAw7+7zsSRmRxtWtXQm4IVK8iv6SsyMtjWEY/wxGGjZTeuSCaLcV
+         ORvg==
+X-Gm-Message-State: AOJu0YwOAfn7Ui2N3+hHx8SZ/Su3RKRfXY/87xJyiGYkwQ7byCmMDAlJ
+	AgamNjcpWl6wzlZL+uIFHuE=
+X-Google-Smtp-Source: AGHT+IGFce7UkaRu27hHw9O1XzUOv7Woyx2ch2dJ4o15aKXnWDBpslZ274zxX9Ictg7Fqo6UzDGQuA==
+X-Received: by 2002:a17:907:270b:b0:9a1:e1cf:6c70 with SMTP id w11-20020a170907270b00b009a1e1cf6c70mr1653849ejk.6.1694787778485;
+        Fri, 15 Sep 2023 07:22:58 -0700 (PDT)
+Received: from skbuf ([188.26.56.202])
+        by smtp.gmail.com with ESMTPSA id w18-20020a170906481200b0099329b3ab67sm2485879ejq.71.2023.09.15.07.22.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Sep 2023 07:22:57 -0700 (PDT)
+Date: Fri, 15 Sep 2023 17:22:55 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, Tristram.Ha@microchip.com,
+	Eric Dumazet <edumazet@google.com>, davem@davemloft.net,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	UNGLinuxDriver@microchip.com,
+	Oleksij Rempel <linux@rempel-privat.de>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [[RFC PATCH v4 net-next] 0/2] net: dsa: hsr: Enable HSR HW
+ offloading for KSZ9477
+Message-ID: <20230915142255.dcosmtrh25nbw5x7@skbuf>
+References: <20230912160326.188e1d13@wsk>
+ <20230912142644.u4sdkveei3e5hwaf@skbuf>
+ <20230912170641.5bfc3cfe@wsk>
+ <20230912215523.as4puqamj65dikip@skbuf>
+ <20230913102219.773e38f8@wsk>
+ <20230913105806.g5p3wck675gbw5fo@skbuf>
+ <20230913141548.70658940@wsk>
+ <20230913135102.hoyl4tifyf77kdo2@skbuf>
+ <20230913184206.6dmfw4weoomjqwfp@skbuf>
+ <20230914231831.0f406585@wsk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,27 +88,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230915-wizard-junction-b58f2aad64c5@ifak-system.com>
+In-Reply-To: <20230914231831.0f406585@wsk>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Sep 15, 2023 at 03:56:59PM +0200, Alexander Dahl wrote:
-> Hello,
+On Thu, Sep 14, 2023 at 11:18:31PM +0200, Lukasz Majewski wrote:
+> As fair as I understood from the commit message - some part of this
+> patch needs to be applied before HSR offloading v4.
 > 
-> this is interesting, by chance I just looked at a chip claiming
-> similar features today, which already has a driver in kernel: Analog
-> Devices ADIN1110.
+> Hence I will wait for it to be posted and upstreamed.
+> 
+> Only then some of this patch code would be squashed to v5 of hsr
+> support.
 
-Ah, interesting. I had no idea this driver/device is an OA TC6 device.
+No, this isn't how this is going to work. I can't post my patches and
+then you post yours, because that would mean some functionality is
+introduced without a user (ds->ops->port_set_mac_address), and we don't
+accept that, because you may or may not resubmit your HSR patches as a
+first user of the new infra.
 
-So ideally, we want the adin1110.c to also use the new framework, and
-remove the duplicate code. Parthiban, please look at the driver and
-make sure the APIs are such that Alexandru Tachici can swap his driver
-to using it. Having two implementations should help make it clear what
-is the same and what is different.
+So, what needs to happen is you need to post all the patches as an
+all-or-nothing series. Somewhere in Documentation/process/ it is
+probably explained in more detail what to pay attention to, when reposting
+what is partly others' work. But the basic idea is that you need to keep
+the Author: and Signed-off-by: fields if you aren't making major changes,
+but you must also add your own Signed-off-by: at the end. You also have
+responsibility for the patches that you post, and have to respond to
+review feedback, even if they aren't authored for you. You are obviously
+free to make changes to patches until they pass your own criteria.
 
-   Andrew
+The most that I can do to help you is to split that squashed patch and
+put the result on a branch:
+https://github.com/vladimiroltean/linux/commits/lukma-ksz-hsr-rfc-v4
+
+But it's up to you to take it from there, rebase it on net-next, review
+the result, test it, make sure that the changes are something that you
+can justify when submitting, etc. You won't be alone if you need help,
+of course, but the point is that you're not 100% passive to this activity.
 
