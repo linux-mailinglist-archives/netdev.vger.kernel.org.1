@@ -1,235 +1,84 @@
-Return-Path: <netdev+bounces-34176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 298727A2737
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 21:32:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F18937A2725
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 21:24:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB3B4280AA0
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 19:32:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D48A61C209D3
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 19:24:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7028F19BCB;
-	Fri, 15 Sep 2023 19:32:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71FBF18E36;
+	Fri, 15 Sep 2023 19:24:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B3BD1094C
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 19:32:14 +0000 (UTC)
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 358CA1BD3;
-	Fri, 15 Sep 2023 12:32:13 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id CEE47120006;
-	Fri, 15 Sep 2023 22:32:11 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru CEE47120006
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1694806331;
-	bh=l0Loo6vjrMYjpOkEIy8hPGh/WjLnRg5uM0/1NlORcvw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-	b=rQKhg2dKUTWalvNdwlLxBvRuBV21Xb8UibNnlfq16SNS1pV7JypTG/1bi970I53gb
-	 C/Ql5SQQbFX/LGxc1wSfLJgpRVuwnMnq63+c0Yj4KxUzk3FLJesCASF/XzNtfc3POg
-	 s08Gy7Gt0GXaEskM6FNzlxoi0S/tmMaZLRnxl7AycHjCQA8cKgZsgQHWvjFyUI4oWt
-	 EXRZWgRn0NMwH6gfa82lf+CaUEJwdA/LpiHlhNM3qIdZDsu/bmMkWXxsfHz5Alecch
-	 YkXZPv84WSqTrxBwLMi87fzGi/sHPEK8uE+cCLUbVReJyhDlUrmnbHBTOLtCLtQOP2
-	 4P8esKiZbf2Hg==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Fri, 15 Sep 2023 22:32:11 +0300 (MSK)
-Received: from [192.168.0.106] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Fri, 15 Sep 2023 22:32:11 +0300
-Message-ID: <ee1382e7-1e0e-a8f5-3703-11d28939df4f@salutedevices.com>
-Date: Fri, 15 Sep 2023 22:25:28 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69CB319BD3
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 19:24:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA574C433C8;
+	Fri, 15 Sep 2023 19:24:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694805881;
+	bh=MwqHe4JvGzG4fmXR069X5g/4C9oJN5CAAugIujwOjR0=;
+	h=Date:From:To:Cc:Subject:From;
+	b=Yzd/ccnw/jpnhpn+bE/Ms49Rl7aD6/8TKdway2v9+BbVA2BAJHLITBjaVZf9X77d1
+	 fU+KDmmLjj0MQ8T2Mjxo3bnrw4On0yYxWpN7lDPbcFBBg7OaZdmNbiEtNOEUXZw4VS
+	 r2eAOmzguYLY4oInOGggWoYmLIBLqkhGHmzQfeheLjJobKWnKuv7zablUqmUb7/+rG
+	 BkX7+nO5HB3LOTJOPxfK/wZpcti98WWvttp/qWrJ1sEWdA6UlumNi8MXGTS7zkM1Go
+	 KhrefT0si+o14upI4rsCpe5yY63ovVia8VBZge93yijsrHO7EA0iZcK4VT9vkCb983
+	 5WWKjHrnJeSkw==
+Date: Fri, 15 Sep 2023 13:25:36 -0600
+From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To: Ishizaki Kou <kou.ishizaki@toshiba.co.jp>,
+	Geoff Levand <geoff@infradead.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Cc: netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	linux-kernel@vger.kernel.org,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH][next] net: spider_net: Use size_add() in call to
+ struct_size()
+Message-ID: <ZQSvsLmJrDsKtLCa@work>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH net-next 3/5] vsock/test: add send_buf() utility function
-Content-Language: en-US
-To: Stefano Garzarella <sgarzare@redhat.com>, <netdev@vger.kernel.org>
-CC: <linux-kernel@vger.kernel.org>,
-	<virtualization@lists.linux-foundation.org>, <oxffffaa@gmail.com>, Bobby
- Eshleman <bobby.eshleman@bytedance.com>
-References: <20230915121452.87192-1-sgarzare@redhat.com>
- <20230915121452.87192-4-sgarzare@redhat.com>
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-In-Reply-To: <20230915121452.87192-4-sgarzare@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 179903 [Sep 15 2023]
-X-KSMG-AntiSpam-Version: 5.9.59.0
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 530 530 ecb1547b3f72d1df4c71c0b60e67ba6b4aea5432, {Tracking_from_domain_doesnt_match_to}, 100.64.160.123:7.1.2;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;salutedevices.com:7.1.1;127.0.0.199:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/09/15 17:43:00 #21898246
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
+If, for any reason, the open-coded arithmetic causes a wraparound,
+the protection that `struct_size()` adds against potential integer
+overflows is defeated. Fix this by hardening call to `struct_size()`
+with `size_add()`.
 
+Fixes: 3f1071ec39f7 ("net: spider_net: Use struct_size() helper")
+Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+---
+ drivers/net/ethernet/toshiba/spider_net.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On 15.09.2023 15:14, Stefano Garzarella wrote:
-> Move the code of send_byte() out in a new utility function that
-> can be used to send a generic buffer.
-> 
-> This new function can be used when we need to send a custom
-> buffer and not just a single 'A' byte.
-> 
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
->  tools/testing/vsock/util.h |  2 +
->  tools/testing/vsock/util.c | 90 +++++++++++++++++++++++---------------
->  2 files changed, 56 insertions(+), 36 deletions(-)
+diff --git a/drivers/net/ethernet/toshiba/spider_net.c b/drivers/net/ethernet/toshiba/spider_net.c
+index 50d7eacfec58..87e67121477c 100644
+--- a/drivers/net/ethernet/toshiba/spider_net.c
++++ b/drivers/net/ethernet/toshiba/spider_net.c
+@@ -2332,7 +2332,7 @@ spider_net_alloc_card(void)
+ 	struct spider_net_card *card;
+ 
+ 	netdev = alloc_etherdev(struct_size(card, darray,
+-					    tx_descriptors + rx_descriptors));
++					    size_add(tx_descriptors, rx_descriptors)));
+ 	if (!netdev)
+ 		return NULL;
+ 
+-- 
+2.34.1
 
-Reviewed-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
-
-> 
-> diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
-> index fe31f267e67e..e5407677ce05 100644
-> --- a/tools/testing/vsock/util.h
-> +++ b/tools/testing/vsock/util.h
-> @@ -42,6 +42,8 @@ int vsock_stream_accept(unsigned int cid, unsigned int port,
->  int vsock_seqpacket_accept(unsigned int cid, unsigned int port,
->  			   struct sockaddr_vm *clientaddrp);
->  void vsock_wait_remote_close(int fd);
-> +void send_buf(int fd, const void *buf, size_t len, int flags,
-> +	      ssize_t expected_ret);
->  void recv_buf(int fd, void *buf, size_t len, int flags, ssize_t expected_ret);
->  void send_byte(int fd, int expected_ret, int flags);
->  void recv_byte(int fd, int expected_ret, int flags);
-> diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
-> index 2826902706e8..6779d5008b27 100644
-> --- a/tools/testing/vsock/util.c
-> +++ b/tools/testing/vsock/util.c
-> @@ -211,6 +211,59 @@ int vsock_seqpacket_accept(unsigned int cid, unsigned int port,
->  	return vsock_accept(cid, port, clientaddrp, SOCK_SEQPACKET);
->  }
->  
-> +/* Transmit bytes from a buffer and check the return value.
-> + *
-> + * expected_ret:
-> + *  <0 Negative errno (for testing errors)
-> + *   0 End-of-file
-> + *  >0 Success (bytes successfully written)
-> + */
-> +void send_buf(int fd, const void *buf, size_t len, int flags,
-> +	      ssize_t expected_ret)
-> +{
-> +	ssize_t nwritten = 0;
-> +	ssize_t ret;
-> +
-> +	timeout_begin(TIMEOUT);
-> +	do {
-> +		ret = send(fd, buf + nwritten, len - nwritten, flags);
-> +		timeout_check("send");
-> +
-> +		if (ret == 0 || (ret < 0 && errno != EINTR))
-> +			break;
-> +
-> +		nwritten += ret;
-> +	} while (nwritten < len);
-> +	timeout_end();
-> +
-> +	if (expected_ret < 0) {
-> +		if (ret != -1) {
-> +			fprintf(stderr, "bogus send(2) return value %zd (expected %zd)\n",
-> +				ret, expected_ret);
-> +			exit(EXIT_FAILURE);
-> +		}
-> +		if (errno != -expected_ret) {
-> +			perror("send");
-> +			exit(EXIT_FAILURE);
-> +		}
-> +		return;
-> +	}
-> +
-> +	if (ret < 0) {
-> +		perror("send");
-> +		exit(EXIT_FAILURE);
-> +	}
-> +
-> +	if (nwritten != expected_ret) {
-> +		if (ret == 0)
-> +			fprintf(stderr, "unexpected EOF while sending bytes\n");
-> +
-> +		fprintf(stderr, "bogus send(2) bytes written %zd (expected %zd)\n",
-> +			nwritten, expected_ret);
-> +		exit(EXIT_FAILURE);
-> +	}
-> +}
-> +
->  /* Receive bytes in a buffer and check the return value.
->   *
->   * expected_ret:
-> @@ -273,43 +326,8 @@ void recv_buf(int fd, void *buf, size_t len, int flags, ssize_t expected_ret)
->  void send_byte(int fd, int expected_ret, int flags)
->  {
->  	const uint8_t byte = 'A';
-> -	ssize_t nwritten;
-> -
-> -	timeout_begin(TIMEOUT);
-> -	do {
-> -		nwritten = send(fd, &byte, sizeof(byte), flags);
-> -		timeout_check("write");
-> -	} while (nwritten < 0 && errno == EINTR);
-> -	timeout_end();
-> -
-> -	if (expected_ret < 0) {
-> -		if (nwritten != -1) {
-> -			fprintf(stderr, "bogus send(2) return value %zd\n",
-> -				nwritten);
-> -			exit(EXIT_FAILURE);
-> -		}
-> -		if (errno != -expected_ret) {
-> -			perror("write");
-> -			exit(EXIT_FAILURE);
-> -		}
-> -		return;
-> -	}
->  
-> -	if (nwritten < 0) {
-> -		perror("write");
-> -		exit(EXIT_FAILURE);
-> -	}
-> -	if (nwritten == 0) {
-> -		if (expected_ret == 0)
-> -			return;
-> -
-> -		fprintf(stderr, "unexpected EOF while sending byte\n");
-> -		exit(EXIT_FAILURE);
-> -	}
-> -	if (nwritten != sizeof(byte)) {
-> -		fprintf(stderr, "bogus send(2) return value %zd\n", nwritten);
-> -		exit(EXIT_FAILURE);
-> -	}
-> +	send_buf(fd, &byte, sizeof(byte), flags, expected_ret);
->  }
->  
->  /* Receive one byte and check the return value.
 
