@@ -1,94 +1,107 @@
-Return-Path: <netdev+bounces-34049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34048-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 543277A1CE0
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 12:57:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 314E97A1CD6
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 12:54:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 285831C20BBB
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 10:57:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 457111C20BD9
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 10:54:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08252101C4;
-	Fri, 15 Sep 2023 10:57:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C3E3101C0;
+	Fri, 15 Sep 2023 10:54:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 783EEDF43
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 10:57:50 +0000 (UTC)
-Received: from m12.mail.163.com (m12.mail.163.com [220.181.12.198])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6E644C1;
-	Fri, 15 Sep 2023 03:57:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=K1WVK
-	BLMutY4DqmK6xRjujxKt6vIdorbFmbMAqFpgAA=; b=G63GLx9GmkBYqRUVmi76r
-	lLUNWLCFHMEGj7ctPoAKrwQY/y4BfhHQff3tSj7o1K+apdWy3T3wdNnRRGthxz7u
-	NNj6RTNeBXMpv0FVXc5ebM9JIc1nyqB+tK6r445qHG08iCogM8XWM1dSZftp9i1N
-	/Lgb/hDJKtseniVbn1EZ5M=
-Received: from icess-ProLiant-DL380-Gen10.. (unknown [183.174.60.14])
-	by zwqz-smtp-mta-g3-0 (Coremail) with SMTP id _____wB3NjN9OARlbOJwCA--.60164S4;
-	Fri, 15 Sep 2023 18:57:12 +0800 (CST)
-From: Ma Ke <make_ruc2021@163.com>
-To: jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ma Ke <make_ruc2021@163.com>
-Subject: [PATCH] net: sched: htb: dont intepret cls results when asked to drop
-Date: Fri, 15 Sep 2023 18:56:58 +0800
-Message-Id: <20230915105658.3407020-1-make_ruc2021@163.com>
-X-Mailer: git-send-email 2.37.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDF34DF60
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 10:54:28 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E83EEA1;
+	Fri, 15 Sep 2023 03:54:26 -0700 (PDT)
+Received: from dggpeml500006.china.huawei.com (unknown [172.30.72.54])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Rn9xf3NrBzrSkf;
+	Fri, 15 Sep 2023 18:52:22 +0800 (CST)
+Received: from localhost.localdomain (10.175.112.70) by
+ dggpeml500006.china.huawei.com (7.185.36.76) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Fri, 15 Sep 2023 18:54:21 +0800
+From: Zhang Changzhong <zhangchangzhong@huawei.com>
+To: Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
+	<herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, David
+ Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Xin Long
+	<lucien.xin@gmail.com>
+CC: Zhang Changzhong <zhangchangzhong@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH net] xfrm6: fix inet6_dev refcount underflow problem
+Date: Fri, 15 Sep 2023 19:20:41 +0800
+Message-ID: <1694776841-30837-1-git-send-email-zhangchangzhong@huawei.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wB3NjN9OARlbOJwCA--.60164S4
-X-Coremail-Antispam: 1Uf129KBjvdXoWruFW7ury8Jr43Ar1kKw43trb_yoW3JFc_A3
-	s7GFs3CF1xCFn5Gw47Ar40kryFk3WSv3Z7J39xKrs7Xw1FkrZ8Gr1kWFs3J393Wr42kFyU
-	ZasFga45GrnIkjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7xRKfHUJUUUUU==
-X-Originating-IP: [183.174.60.14]
-X-CM-SenderInfo: 5pdnvshuxfjiisr6il2tof0z/xtbBFQTrC2B9oIcqyQAAso
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_BL,
-	RCVD_IN_MSPIKE_L4,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.175.112.70]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpeml500006.china.huawei.com (7.185.36.76)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-If asked to drop a packet via TC_ACT_SHOT it is unsafe to
-assume that res.class contains a valid pointer.
+There are race conditions that may lead to inet6_dev refcount underflow
+in xfrm6_dst_destroy() and rt6_uncached_list_flush_dev().
 
-Signed-off-by: Ma Ke <make_ruc2021@163.com>
+One of the refcount underflow bugs is shown below:
+	(cpu 1)                	|	(cpu 2)
+xfrm6_dst_destroy()             |
+  ...                           |
+  in6_dev_put()                 |
+				|  rt6_uncached_list_flush_dev()
+  ...				|    ...
+				|    in6_dev_put()
+  rt6_uncached_list_del()       |    ...
+  ...                           |
+
+xfrm6_dst_destroy() calls rt6_uncached_list_del() after in6_dev_put(),
+so rt6_uncached_list_flush_dev() has a chance to call in6_dev_put()
+again for the same inet6_dev.
+
+Fix it by moving in6_dev_put() after rt6_uncached_list_del() in
+xfrm6_dst_destroy().
+
+Fixes: 510c321b5571 ("xfrm: reuse uncached_list to track xdsts")
+Signed-off-by: Zhang Changzhong <zhangchangzhong@huawei.com>
 ---
- net/sched/sch_htb.c | 2 ++
- 1 file changed, 2 insertions(+)
+ net/ipv6/xfrm6_policy.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/sched/sch_htb.c b/net/sched/sch_htb.c
-index 0d947414e616..5e8bd23d972f 100644
---- a/net/sched/sch_htb.c
-+++ b/net/sched/sch_htb.c
-@@ -243,6 +243,8 @@ static struct htb_class *htb_classify(struct sk_buff *skb, struct Qdisc *sch,
+diff --git a/net/ipv6/xfrm6_policy.c b/net/ipv6/xfrm6_policy.c
+index 41a680c..42fb6996 100644
+--- a/net/ipv6/xfrm6_policy.c
++++ b/net/ipv6/xfrm6_policy.c
+@@ -117,10 +117,10 @@ static void xfrm6_dst_destroy(struct dst_entry *dst)
+ {
+ 	struct xfrm_dst *xdst = (struct xfrm_dst *)dst;
  
- 	*qerr = NET_XMIT_SUCCESS | __NET_XMIT_BYPASS;
- 	while (tcf && (result = tcf_classify(skb, NULL, tcf, &res, false)) >= 0) {
-+		if (result == TC_ACT_SHOT)
-+			return NULL;
- #ifdef CONFIG_NET_CLS_ACT
- 		switch (result) {
- 		case TC_ACT_QUEUED:
+-	if (likely(xdst->u.rt6.rt6i_idev))
+-		in6_dev_put(xdst->u.rt6.rt6i_idev);
+ 	dst_destroy_metrics_generic(dst);
+ 	rt6_uncached_list_del(&xdst->u.rt6);
++	if (likely(xdst->u.rt6.rt6i_idev))
++		in6_dev_put(xdst->u.rt6.rt6i_idev);
+ 	xfrm_dst_destroy(xdst);
+ }
+ 
 -- 
-2.37.2
+2.9.5
 
 
