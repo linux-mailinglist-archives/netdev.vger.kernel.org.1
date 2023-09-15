@@ -1,222 +1,323 @@
-Return-Path: <netdev+bounces-34013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8C6B7A186C
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 10:14:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92D0F7A1882
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 10:21:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 144D61C20C95
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 08:14:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4AEC92821E8
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 08:21:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53D45DDC3;
-	Fri, 15 Sep 2023 08:12:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EA80D50C;
+	Fri, 15 Sep 2023 08:21:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E136CD51F
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 08:12:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 72051C116B1;
-	Fri, 15 Sep 2023 08:12:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694765529;
-	bh=y9p3UYAIMJYjb40CC2T6cih6I1fY4W9Hbg/V6sTn8TY=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=a+EMsNxbv65R0S68VXBg/YQjWQdnESJwPYzIgKQ9hNwkqXRaVMlOaEMFTn0+1YCVr
-	 g0N4tGIDPk25hgEtlsF0cR+0xgrEdhyCwWcs95bImZC7ZM0Pr9+a4e4sWWKMYISIUJ
-	 HPDj6EsANQd4WH7wW4D4IERfp7eCqDW/vtQAKzVYQaB5mCUWkEyejShOA9andrZBrh
-	 16EJopjAK/9GCwNPCU4a5vcAz2p5KrWA0EGlAbcukRBNcsbHBby+se7OCfLtEScVuu
-	 dP8m3jneIpw2fYVBAHtO/YC/jaykC7VVmwilIFM2BUacSOkNkzk83VkjFDpz/l9JHd
-	 3mfqa1YW++rxQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EA92EE6436;
-	Fri, 15 Sep 2023 08:12:09 +0000 (UTC)
-From:
- Nikita Shubin via B4 Relay <devnull+nikita.shubin.maquefel.me@kernel.org>
-Date: Fri, 15 Sep 2023 11:11:04 +0300
-Subject: [PATCH v4 22/42] net: cirrus: add DT support for Cirrus EP93xx
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E562D2FD
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 08:21:39 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C31B2710;
+	Fri, 15 Sep 2023 01:19:27 -0700 (PDT)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38F5l7wq031886;
+	Fri, 15 Sep 2023 01:16:21 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=VrbC/opRa3bowTi+jCvbDXGelqHejkboudyRrfjNUGg=;
+ b=Oefx0vveY/TVlfpV9cEKJC4o0p+9y5uB7LPLqC4yd0vX7Lxdz2dwTnxJdpkB2cSDswJE
+ GfPRNbwMce/szrxdRDwkfOxKx9t/8h+CCmWX+5S/UNMgjSovNeJmqOAp4WmvWCH5nNKj
+ QgSsLzJdkU711KHw7mINnHZUgjkzvwnnEOMbfCoqiQU+IV/HBkXoKv1QagD47cryjDPB
+ eBZP8ef7Cjfv2IfNuDDxns89N+AH+5RaBmXbgxiOMa9h1u6ujV+ujmGFH3/EvVqK5+Ws
+ r/HDWqaZDRf95fIPVeWcBQzeYavmSU9e5Jf02uadlQuEDctXIJm8boUaZWuWBu7WdVEN eQ== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3t4gnd0hxb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Fri, 15 Sep 2023 01:16:21 -0700
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 15 Sep
+ 2023 01:16:19 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Fri, 15 Sep 2023 01:16:19 -0700
+Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
+	by maili.marvell.com (Postfix) with ESMTP id 2A8D85B6932;
+	Fri, 15 Sep 2023 01:16:18 -0700 (PDT)
+From: Shinas Rasheed <srasheed@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <hgani@marvell.com>
+CC: <egallen@redhat.com>, <mschmidt@redhat.com>, <vimleshk@marvell.com>,
+        Shinas Rasheed <srasheed@marvell.com>,
+        Veerasenareddy Burru
+	<vburru@marvell.com>,
+        Sathesh Edara <sedara@marvell.com>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>
+Subject: [net-next PATCH] octeon_ep: support to fetch firmware info
+Date: Fri, 15 Sep 2023 01:16:07 -0700
+Message-ID: <20230915081608.2155837-1-srasheed@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20230915-ep93xx-v4-22-a1d779dcec10@maquefel.me>
-References: <20230915-ep93xx-v4-0-a1d779dcec10@maquefel.me>
-In-Reply-To: <20230915-ep93xx-v4-0-a1d779dcec10@maquefel.me>
-To: Hartley Sweeten <hsweeten@visionengravers.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Arnd Bergmann <arnd@arndb.de>, 
- Alexander Sverdlin <alexander.sverdlin@gmail.com>, 
- Andrew Lunn <andrew@lunn.ch>
-X-Mailer: b4 0.13-dev-e3e53
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1694765525; l=4243;
- i=nikita.shubin@maquefel.me; s=20230718; h=from:subject:message-id;
- bh=eU0c+xJYiL6WXg+xPK7wne9lsQqNb34seN7qAKH0NSo=; =?utf-8?q?b=3DhlTb95jDHGyi?=
- =?utf-8?q?U+9gdcAS+r4p73ccnIxPPFRzGdo1wUr6Mt23BoOptBIP96EGc8xVjN2DP7KmqJ05?=
- m2MhCMi3CShYhmjDdntb7QpcyUgB3gc2nfdQbzEO9kWFQVlNpEHp
-X-Developer-Key: i=nikita.shubin@maquefel.me; a=ed25519;
- pk=vqf5YIUJ7BJv3EJFaNNxWZgGuMgDH6rwufTLflwU9ac=
-X-Endpoint-Received:
- by B4 Relay for nikita.shubin@maquefel.me/20230718 with auth_id=65
-X-Original-From: Nikita Shubin <nikita.shubin@maquefel.me>
-Reply-To: <nikita.shubin@maquefel.me>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: L9E9cJZoaB3971lDCONrr1yMGxDWKGPO
+X-Proofpoint-ORIG-GUID: L9E9cJZoaB3971lDCONrr1yMGxDWKGPO
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-09-15_05,2023-09-14_01,2023-05-22_02
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Nikita Shubin <nikita.shubin@maquefel.me>
+Add support to fetch firmware info such as heartbeat miss count,
+heartbeat interval. This shall be used for heartbeat monitor.
 
-- add OF ID match table
-- get phy_id from the device tree, as part of mdio
-- copy_addr is now always used, as there is no SoC/board that aren't
-- dropped platform header
-
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Tested-by: Alexander Sverdlin <alexander.sverdlin@gmail.com>
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-Signed-off-by: Nikita Shubin <nikita.shubin@maquefel.me>
+Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
 ---
- drivers/net/ethernet/cirrus/ep93xx_eth.c | 63 ++++++++++++++++----------------
- 1 file changed, 32 insertions(+), 31 deletions(-)
+ .../marvell/octeon_ep/octep_cn9k_pf.c         | 10 +++-----
+ .../ethernet/marvell/octeon_ep/octep_config.h | 22 +++++++++++++----
+ .../marvell/octeon_ep/octep_ctrl_net.c        | 24 ++++++++++++++++++-
+ .../marvell/octeon_ep/octep_ctrl_net.h        | 18 ++++++++++++++
+ .../ethernet/marvell/octeon_ep/octep_main.c   | 16 +++++++++----
+ .../marvell/octeon_ep/octep_regs_cn9k_pf.h    |  4 ++++
+ 6 files changed, 77 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/net/ethernet/cirrus/ep93xx_eth.c b/drivers/net/ethernet/cirrus/ep93xx_eth.c
-index 8627ab19d470..3106dd97fe74 100644
---- a/drivers/net/ethernet/cirrus/ep93xx_eth.c
-+++ b/drivers/net/ethernet/cirrus/ep93xx_eth.c
-@@ -17,12 +17,11 @@
- #include <linux/interrupt.h>
- #include <linux/moduleparam.h>
- #include <linux/platform_device.h>
-+#include <linux/of.h>
- #include <linux/delay.h>
- #include <linux/io.h>
- #include <linux/slab.h>
+diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_cn9k_pf.c b/drivers/net/ethernet/marvell/octeon_ep/octep_cn9k_pf.c
+index 90c3a419932d..f282cd5b29ea 100644
+--- a/drivers/net/ethernet/marvell/octeon_ep/octep_cn9k_pf.c
++++ b/drivers/net/ethernet/marvell/octeon_ep/octep_cn9k_pf.c
+@@ -16,9 +16,6 @@
+ #define CTRL_MBOX_MAX_PF	128
+ #define CTRL_MBOX_SZ		((size_t)(0x400000 / CTRL_MBOX_MAX_PF))
  
--#include <linux/platform_data/eth-ep93xx.h>
+-#define FW_HB_INTERVAL_IN_SECS		1
+-#define FW_HB_MISS_COUNT		10
 -
- #define DRV_MODULE_NAME		"ep93xx-eth"
- 
- #define RX_QUEUE_ENTRIES	64
-@@ -738,25 +737,6 @@ static const struct net_device_ops ep93xx_netdev_ops = {
- 	.ndo_set_mac_address	= eth_mac_addr,
- };
- 
--static struct net_device *ep93xx_dev_alloc(struct ep93xx_eth_data *data)
--{
--	struct net_device *dev;
--
--	dev = alloc_etherdev(sizeof(struct ep93xx_priv));
--	if (dev == NULL)
--		return NULL;
--
--	eth_hw_addr_set(dev, data->dev_addr);
--
--	dev->ethtool_ops = &ep93xx_ethtool_ops;
--	dev->netdev_ops = &ep93xx_netdev_ops;
--
--	dev->features |= NETIF_F_SG | NETIF_F_HW_CSUM;
--
--	return dev;
--}
--
--
- static int ep93xx_eth_remove(struct platform_device *pdev)
- {
- 	struct net_device *dev;
-@@ -788,27 +768,47 @@ static int ep93xx_eth_remove(struct platform_device *pdev)
- 
- static int ep93xx_eth_probe(struct platform_device *pdev)
- {
--	struct ep93xx_eth_data *data;
- 	struct net_device *dev;
- 	struct ep93xx_priv *ep;
- 	struct resource *mem;
-+	void __iomem *base_addr;
-+	struct device_node *np;
-+	u32 phy_id;
- 	int irq;
- 	int err;
- 
- 	if (pdev == NULL)
- 		return -ENODEV;
--	data = dev_get_platdata(&pdev->dev);
- 
- 	mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
- 	irq = platform_get_irq(pdev, 0);
- 	if (!mem || irq < 0)
- 		return -ENXIO;
- 
--	dev = ep93xx_dev_alloc(data);
-+	base_addr = ioremap(mem->start, resource_size(mem));
-+	if (!base_addr)
-+		return dev_err_probe(&pdev->dev, -EIO, "Failed to ioremap ethernet registers\n");
-+
-+	np = of_parse_phandle(pdev->dev.of_node, "phy-handle", 0);
-+	if (!np)
-+		return dev_err_probe(&pdev->dev, -ENODEV, "Please provide \"phy-handle\"\n");
-+
-+	err = of_property_read_u32(np, "reg", &phy_id);
-+	of_node_put(np);
-+	if (err)
-+		return dev_err_probe(&pdev->dev, -ENOENT, "Failed to locate \"phy_id\"\n");
-+
-+	dev = alloc_etherdev(sizeof(struct ep93xx_priv));
- 	if (dev == NULL) {
- 		err = -ENOMEM;
- 		goto err_out;
+ /* Names of Hardware non-queue generic interrupts */
+ static char *cn93_non_ioq_msix_names[] = {
+ 	"epf_ire_rint",
+@@ -250,12 +247,11 @@ static void octep_init_config_cn93_pf(struct octep_device *oct)
+ 		link = PCI_DEVFN(PCI_SLOT(oct->pdev->devfn), link);
  	}
-+
-+	eth_hw_addr_set(dev, base_addr + 0x50);
-+	dev->ethtool_ops = &ep93xx_ethtool_ops;
-+	dev->netdev_ops = &ep93xx_netdev_ops;
-+	dev->features |= NETIF_F_SG | NETIF_F_HW_CSUM;
-+
- 	ep = netdev_priv(dev);
- 	ep->dev = dev;
- 	SET_NETDEV_DEV(dev, &pdev->dev);
-@@ -824,15 +824,10 @@ static int ep93xx_eth_probe(struct platform_device *pdev)
- 		goto err_out;
- 	}
+ 	conf->ctrl_mbox_cfg.barmem_addr = (void __iomem *)oct->mmio[2].hw_addr +
+-					   (0x400000ull * 7) +
++					   CN93_PEM_BAR4_INDEX_OFFSET +
+ 					   (link * CTRL_MBOX_SZ);
  
--	ep->base_addr = ioremap(mem->start, resource_size(mem));
--	if (ep->base_addr == NULL) {
--		dev_err(&pdev->dev, "Failed to ioremap ethernet registers\n");
--		err = -EIO;
--		goto err_out;
--	}
-+	ep->base_addr = base_addr;
- 	ep->irq = irq;
- 
--	ep->mii.phy_id = data->phy_id;
-+	ep->mii.phy_id = phy_id;
- 	ep->mii.phy_id_mask = 0x1f;
- 	ep->mii.reg_num_mask = 0x1f;
- 	ep->mii.dev = dev;
-@@ -859,12 +854,18 @@ static int ep93xx_eth_probe(struct platform_device *pdev)
- 	return err;
+-	conf->hb_interval = FW_HB_INTERVAL_IN_SECS;
+-	conf->max_hb_miss_cnt = FW_HB_MISS_COUNT;
+-
++	conf->fw_info.hb_interval = OCTEP_DEFAULT_FW_HB_INTERVAL;
++	conf->fw_info.hb_miss_count = OCTEP_DEFAULT_FW_HB_MISS_COUNT;
  }
  
-+static const struct of_device_id ep93xx_eth_of_ids[] = {
-+	{ .compatible = "cirrus,ep9301-eth" },
-+	{ /* sentinel */ }
-+};
-+MODULE_DEVICE_TABLE(of, ep93xx_eth_of_ids);
+ /* Setup registers for a hardware Tx Queue  */
+diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_config.h b/drivers/net/ethernet/marvell/octeon_ep/octep_config.h
+index df7cd39d9fce..1622a6ebf036 100644
+--- a/drivers/net/ethernet/marvell/octeon_ep/octep_config.h
++++ b/drivers/net/ethernet/marvell/octeon_ep/octep_config.h
+@@ -49,6 +49,11 @@
+ /* Default MTU */
+ #define OCTEP_DEFAULT_MTU    1500
  
- static struct platform_driver ep93xx_eth_driver = {
- 	.probe		= ep93xx_eth_probe,
- 	.remove		= ep93xx_eth_remove,
- 	.driver		= {
- 		.name	= "ep93xx-eth",
-+		.of_match_table = ep93xx_eth_of_ids,
- 	},
++/* pf heartbeat interval in milliseconds */
++#define OCTEP_DEFAULT_FW_HB_INTERVAL           1000
++/* pf heartbeat miss count */
++#define OCTEP_DEFAULT_FW_HB_MISS_COUNT         20
++
+ /* Macros to get octeon config params */
+ #define CFG_GET_IQ_CFG(cfg)             ((cfg)->iq)
+ #define CFG_GET_IQ_NUM_DESC(cfg)        ((cfg)->iq.num_descs)
+@@ -181,6 +186,16 @@ struct octep_ctrl_mbox_config {
+ 	void __iomem *barmem_addr;
  };
  
-
++/* Info from firmware */
++struct octep_fw_info {
++	/* interface pkind */
++	u16 pkind;
++	/* heartbeat interval in milliseconds */
++	u16 hb_interval;
++	/* heartbeat miss count */
++	u16 hb_miss_count;
++};
++
+ /* Data Structure to hold configuration limits and active config */
+ struct octep_config {
+ 	/* Input Queue attributes. */
+@@ -201,10 +216,7 @@ struct octep_config {
+ 	/* ctrl mbox config */
+ 	struct octep_ctrl_mbox_config ctrl_mbox_cfg;
+ 
+-	/* Configured maximum heartbeat miss count */
+-	u32 max_hb_miss_cnt;
+-
+-	/* Configured firmware heartbeat interval in secs */
+-	u32 hb_interval;
++	/* fw info */
++	struct octep_fw_info fw_info;
+ };
+ #endif /* _OCTEP_CONFIG_H_ */
+diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
+index 4c6d91a8c83e..5b5343fd2771 100644
+--- a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
++++ b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
+@@ -26,7 +26,7 @@ static atomic_t ctrl_net_msg_id;
+ 
+ /* Control plane version in which OCTEP_CTRL_NET_H2F_CMD was added */
+ static const u32 octep_ctrl_net_h2f_cmd_versions[OCTEP_CTRL_NET_H2F_CMD_MAX] = {
+-	[OCTEP_CTRL_NET_H2F_CMD_INVALID ... OCTEP_CTRL_NET_H2F_CMD_LINK_INFO] =
++	[OCTEP_CTRL_NET_H2F_CMD_INVALID ... OCTEP_CTRL_NET_H2F_CMD_GET_INFO] =
+ 	 OCTEP_CP_VERSION(1, 0, 0)
+ };
+ 
+@@ -353,6 +353,28 @@ void octep_ctrl_net_recv_fw_messages(struct octep_device *oct)
+ 	}
+ }
+ 
++int octep_ctrl_net_get_info(struct octep_device *oct, int vfid,
++			    struct octep_fw_info *info)
++{
++	struct octep_ctrl_net_wait_data d = {0};
++	struct octep_ctrl_net_h2f_resp *resp;
++	struct octep_ctrl_net_h2f_req *req;
++	int err;
++
++	req = &d.data.req;
++	init_send_req(&d.msg, req, 0, vfid);
++	req->hdr.s.cmd = OCTEP_CTRL_NET_H2F_CMD_GET_INFO;
++	req->link_info.cmd = OCTEP_CTRL_NET_CMD_GET;
++	err = octep_send_mbox_req(oct, &d, true);
++	if (err < 0)
++		return err;
++
++	resp = &d.data.resp;
++	memcpy(info, &resp->info.fw_info, sizeof(struct octep_fw_info));
++
++	return 0;
++}
++
+ int octep_ctrl_net_uninit(struct octep_device *oct)
+ {
+ 	struct octep_ctrl_net_wait_data *pos, *n;
+diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h
+index 1c2ef4ee31d9..b330f370131b 100644
+--- a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h
++++ b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h
+@@ -41,6 +41,7 @@ enum octep_ctrl_net_h2f_cmd {
+ 	OCTEP_CTRL_NET_H2F_CMD_LINK_STATUS,
+ 	OCTEP_CTRL_NET_H2F_CMD_RX_STATE,
+ 	OCTEP_CTRL_NET_H2F_CMD_LINK_INFO,
++	OCTEP_CTRL_NET_H2F_CMD_GET_INFO,
+ 	OCTEP_CTRL_NET_H2F_CMD_MAX
+ };
+ 
+@@ -161,6 +162,11 @@ struct octep_ctrl_net_h2f_resp_cmd_state {
+ 	u16 state;
+ };
+ 
++/* get info request */
++struct octep_ctrl_net_h2f_resp_cmd_get_info {
++	struct octep_fw_info fw_info;
++};
++
+ /* Host to fw response data */
+ struct octep_ctrl_net_h2f_resp {
+ 	union octep_ctrl_net_resp_hdr hdr;
+@@ -171,6 +177,7 @@ struct octep_ctrl_net_h2f_resp {
+ 		struct octep_ctrl_net_h2f_resp_cmd_state link;
+ 		struct octep_ctrl_net_h2f_resp_cmd_state rx;
+ 		struct octep_ctrl_net_link_info link_info;
++		struct octep_ctrl_net_h2f_resp_cmd_get_info info;
+ 	};
+ } __packed;
+ 
+@@ -330,6 +337,17 @@ int octep_ctrl_net_set_link_info(struct octep_device *oct,
+  */
+ void octep_ctrl_net_recv_fw_messages(struct octep_device *oct);
+ 
++/** Get info from firmware.
++ *
++ * @param oct: non-null pointer to struct octep_device.
++ * @param vfid: Index of virtual function.
++ * @param info: non-null pointer to struct octep_fw_info.
++ *
++ * return value: 0 on success, -errno on failure.
++ */
++int octep_ctrl_net_get_info(struct octep_device *oct, int vfid,
++			    struct octep_fw_info *info);
++
+ /** Uninitialize data for ctrl net.
+  *
+  * @param oct: non-null pointer to struct octep_device.
+diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
+index 43eb6e871351..ec3fd7ca3125 100644
+--- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
++++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
+@@ -918,9 +918,9 @@ static void octep_hb_timeout_task(struct work_struct *work)
+ 	int miss_cnt;
+ 
+ 	miss_cnt = atomic_inc_return(&oct->hb_miss_cnt);
+-	if (miss_cnt < oct->conf->max_hb_miss_cnt) {
++	if (miss_cnt < oct->conf->fw_info.hb_miss_count) {
+ 		queue_delayed_work(octep_wq, &oct->hb_task,
+-				   msecs_to_jiffies(oct->conf->hb_interval * 1000));
++				   msecs_to_jiffies(oct->conf->fw_info.hb_interval));
+ 		return;
+ 	}
+ 
+@@ -1013,8 +1013,7 @@ int octep_device_setup(struct octep_device *oct)
+ 
+ 	atomic_set(&oct->hb_miss_cnt, 0);
+ 	INIT_DELAYED_WORK(&oct->hb_task, octep_hb_timeout_task);
+-	queue_delayed_work(octep_wq, &oct->hb_task,
+-			   msecs_to_jiffies(oct->conf->hb_interval * 1000));
++
+ 	return 0;
+ 
+ unsupported_dev:
+@@ -1139,6 +1138,15 @@ static int octep_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		dev_err(&pdev->dev, "Device setup failed\n");
+ 		goto err_octep_config;
+ 	}
++
++	octep_ctrl_net_get_info(octep_dev, OCTEP_CTRL_NET_INVALID_VFID,
++				&octep_dev->conf->fw_info);
++	dev_info(&octep_dev->pdev->dev, "Heartbeat interval %u msecs Heartbeat miss count %u\n",
++		 octep_dev->conf->fw_info.hb_interval,
++		 octep_dev->conf->fw_info.hb_miss_count);
++	queue_delayed_work(octep_wq, &octep_dev->hb_task,
++			   msecs_to_jiffies(octep_dev->conf->fw_info.hb_interval));
++
+ 	INIT_WORK(&octep_dev->tx_timeout_task, octep_tx_timeout_task);
+ 	INIT_WORK(&octep_dev->ctrl_mbox_task, octep_ctrl_mbox_task);
+ 	INIT_DELAYED_WORK(&octep_dev->intr_poll_task, octep_intr_poll_task);
+diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_regs_cn9k_pf.h b/drivers/net/ethernet/marvell/octeon_ep/octep_regs_cn9k_pf.h
+index b25c3093dc7b..0a43983e9101 100644
+--- a/drivers/net/ethernet/marvell/octeon_ep/octep_regs_cn9k_pf.h
++++ b/drivers/net/ethernet/marvell/octeon_ep/octep_regs_cn9k_pf.h
+@@ -370,4 +370,8 @@
+ /* bit 1 for firmware heartbeat interrupt */
+ #define CN93_SDP_EPF_OEI_RINT_DATA_BIT_HBEAT	BIT_ULL(1)
+ 
++#define CN93_PEM_BAR4_INDEX            7
++#define CN93_PEM_BAR4_INDEX_SIZE       0x400000ULL
++#define CN93_PEM_BAR4_INDEX_OFFSET     (CN93_PEM_BAR4_INDEX * CN93_PEM_BAR4_INDEX_SIZE)
++
+ #endif /* _OCTEP_REGS_CN9K_PF_H_ */
 -- 
-2.39.2
+2.25.1
 
 
