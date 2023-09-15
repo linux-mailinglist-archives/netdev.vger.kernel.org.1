@@ -1,155 +1,122 @@
-Return-Path: <netdev+bounces-34043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7DC07A1BB1
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 12:05:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB5147A1BCD
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 12:11:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83F35282B25
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 10:05:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8E491C215BC
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 10:11:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DBB3DF45;
-	Fri, 15 Sep 2023 10:05:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ABA4DF67;
+	Fri, 15 Sep 2023 10:11:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EC35DF58;
-	Fri, 15 Sep 2023 10:05:15 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81BB4268A;
-	Fri, 15 Sep 2023 03:02:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694772178; x=1726308178;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=dlwnheLHWrheCZf+0lnqyF5y1gAk0XJDuzApxL+C0IU=;
-  b=gI3engqurk/g/497fI/CT66pBwFbuwP1ckNDl9K2h2Uy2QkoNG0CwqNJ
-   dYUpHTZbDlP4VueUD0xrGldn52YsMKtzD2NyJAY3FwL/TCI2y4qwMath2
-   CNDkw8G/Grkp0XCDg4cPL4W9RKYojpbup0TNYvjZypnYax3JpJ4yNmOeB
-   EN1iNesEl3AT/9Ann9Dkgj4uEJm8cWVHyyRAEZmLSzFRQh0EXyLz/ryA9
-   Z7xhOW36Fw2rgkt4UL7MgGM5NWDIP/T+zAsRH19yXFqDm7FQc7tTce9Ee
-   0i8KvbKa3a5vzIklEItn0c570dG4m/e62VxuTooHwnM+SUZzEongmdns1
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="381938741"
-X-IronPort-AV: E=Sophos;i="6.02,148,1688454000"; 
-   d="scan'208";a="381938741"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2023 02:54:38 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="744916324"
-X-IronPort-AV: E=Sophos;i="6.02,148,1688454000"; 
-   d="scan'208";a="744916324"
-Received: from pglc00032.png.intel.com ([10.221.207.52])
-  by orsmga002.jf.intel.com with ESMTP; 15 Sep 2023 02:54:33 -0700
-From: Rohan G Thomas <rohan.g.thomas@intel.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	fancer.lancer@gmail.com
-Cc: netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Rohan G Thomas <rohan.g.thomas@intel.com>
-Subject: [PATCH net-next v6 2/2] net: stmmac: Tx coe sw fallback
-Date: Fri, 15 Sep 2023 17:54:17 +0800
-Message-Id: <20230915095417.1949-3-rohan.g.thomas@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230915095417.1949-1-rohan.g.thomas@intel.com>
-References: <20230915095417.1949-1-rohan.g.thomas@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A2B7FBFB
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 10:11:05 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 96D582D67
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 03:10:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1694772635;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5U61MhzJI73OJTFzPfDsmy/XLiTcwMLxEtjvstIs+RY=;
+	b=ivhf49ZnSEwDwbujyd0LCmdxLWEFlFn1aEkVB1C/HG3nzn2ue4PyLwPzINy+bCUoE/ppJX
+	Bau/0Uwa4sM/w4yN0J5Fs9awSS5JyrInVp9YJPGFRrwnMsTPx0XnvrORqoXwMrZ+tXb5vI
+	3rqJUSOvQttT9Oiuh5NGxSanF5hbW2Q=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-396-u5N0xklJP8-lgLuGgb9A3w-1; Fri, 15 Sep 2023 06:10:32 -0400
+X-MC-Unique: u5N0xklJP8-lgLuGgb9A3w-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B637A85A5A8;
+	Fri, 15 Sep 2023 10:10:31 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.216])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 388F240C2070;
+	Fri, 15 Sep 2023 10:10:28 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <dcc6543d71524ac488ca2a56dd430118@AcuMS.aculab.com>
+References: <dcc6543d71524ac488ca2a56dd430118@AcuMS.aculab.com> <20230914221526.3153402-1-dhowells@redhat.com> <20230914221526.3153402-10-dhowells@redhat.com>
+To: David Laight <David.Laight@ACULAB.COM>
+Cc: dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
+    Linus Torvalds <torvalds@linux-foundation.org>,
+    Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+    "Christian
+ Brauner" <christian@brauner.io>,
+    Matthew Wilcox <willy@infradead.org>,
+    "Brendan Higgins" <brendanhiggins@google.com>,
+    David Gow <davidgow@google.com>,
+    "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+    "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+    "linux-mm@kvack.org" <linux-mm@kvack.org>,
+    "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+    "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+    "kunit-dev@googlegroups.com" <kunit-dev@googlegroups.com>,
+    "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+    Andrew Morton <akpm@linux-foundation.org>,
+    Christian Brauner <brauner@kernel.org>,
+    David Hildenbrand <david@redhat.com>,
+    John Hubbard <jhubbard@nvidia.com>
+Subject: Re: [RFC PATCH 9/9] iov_iter: Add benchmarking kunit tests for UBUF/IOVEC
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3370514.1694772627.1@warthog.procyon.org.uk>
+Date: Fri, 15 Sep 2023 11:10:27 +0100
+Message-ID: <3370515.1694772627@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add sw fallback of tx checksum calculation for those tx queues that
-don't support tx checksum offloading. DW xGMAC IP can be synthesized
-such that it can support tx checksum offloading only for a few
-initial tx queues. Also as Serge pointed out, for the DW QoS IP, tx
-coe can be individually configured for each tx queue.
+David Laight <David.Laight@ACULAB.COM> wrote:
 
-So when tx coe is enabled, for any tx queue that doesn't support
-tx coe with 'coe-unsupported' flag set will have a sw fallback
-happen in the driver for tx checksum calculation when any packets to
-be transmitted on these tx queues.
+> > Add kunit tests to benchmark 256MiB copies to a UBUF iterator and an IOVEC
+> > iterator.  This attaches a userspace VM with a mapped file in it
+> > temporarily to the test thread.
+> 
+> Isn't that going to be completely dominated by the cache fills
+> from memory?
 
-Signed-off-by: Rohan G Thomas <rohan.g.thomas@intel.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c     | 10 ++++++++++
- drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c |  3 +++
- include/linux/stmmac.h                                |  1 +
- 3 files changed, 14 insertions(+)
+Yes...  but it should be consistent in the amount of time that consumes since
+no device drivers are involved.  I can try adding the same folio to the
+anon_file multiple times - it might work especially if I don't put the pages
+on the LRU (if that's even possible) - but I wanted separate pages for the
+extraction test.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 2206789802bf..9201ed778ebc 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -4401,6 +4401,16 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
- 	WARN_ON(tx_q->tx_skbuff[first_entry]);
- 
- 	csum_insertion = (skb->ip_summed == CHECKSUM_PARTIAL);
-+	/* DWMAC IPs can be synthesized to support tx coe only for a few tx
-+	 * queues. In that case, checksum offloading for those queues that don't
-+	 * support tx coe needs to fallback to software checksum calculation.
-+	 */
-+	if (csum_insertion &&
-+	    priv->plat->tx_queues_cfg[queue].coe_unsupported) {
-+		if (unlikely(skb_checksum_help(skb)))
-+			goto dma_map_err;
-+		csum_insertion = !csum_insertion;
-+	}
- 
- 	if (likely(priv->extend_desc))
- 		desc = (struct dma_desc *)(tx_q->dma_etx + entry);
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-index 0f28795e581c..a09014c9e7d0 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-@@ -276,6 +276,9 @@ static int stmmac_mtl_setup(struct platform_device *pdev,
- 			plat->tx_queues_cfg[queue].use_prio = true;
- 		}
- 
-+		plat->tx_queues_cfg[queue].coe_unsupported =
-+			of_property_read_bool(q_node, "snps,coe-unsupported");
-+
- 		queue++;
- 	}
- 	if (queue != plat->tx_queues_to_use) {
-diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-index ce89cc3e4913..c0079a7574ae 100644
---- a/include/linux/stmmac.h
-+++ b/include/linux/stmmac.h
-@@ -139,6 +139,7 @@ struct stmmac_rxq_cfg {
- 
- struct stmmac_txq_cfg {
- 	u32 weight;
-+	bool coe_unsupported;
- 	u8 mode_to_use;
- 	/* Credit Base Shaper parameters */
- 	u32 send_slope;
--- 
-2.25.1
+> I'd have thought you'd need to use something with a lot of
+> small fragments so that the iteration code dominates the copy.
+
+That would actually be a separate benchmark case which I should try also.
+
+> Some measurements can be made using readv() and writev()
+> on /dev/zero and /dev/null.
+
+Forget /dev/null; that doesn't actually engage any iteration code.  The same
+for writing to /dev/zero.  Reading from /dev/zero does its own iteration thing
+rather than using iterate_and_advance(), presumably because it checks for
+signals and resched.
+
+David
 
 
