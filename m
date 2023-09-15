@@ -1,79 +1,88 @@
-Return-Path: <netdev+bounces-34087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34088-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB7D77A2095
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 16:13:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24C677A20B5
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 16:20:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CD412823D3
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 14:13:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF85728216B
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 14:19:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DCF011189;
-	Fri, 15 Sep 2023 14:13:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E4BD1119A;
+	Fri, 15 Sep 2023 14:19:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 082D4101D4
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 14:13:49 +0000 (UTC)
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E768E1FD0
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 07:13:48 -0700 (PDT)
-Received: by mail-pg1-x52d.google.com with SMTP id 41be03b00d2f7-5783e07fdcbso1280a12.0
-        for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 07:13:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 289C833ED;
+	Fri, 15 Sep 2023 14:19:55 +0000 (UTC)
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A75E71FCE;
+	Fri, 15 Sep 2023 07:19:53 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2b9338e4695so33779291fa.2;
+        Fri, 15 Sep 2023 07:19:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1694787228; x=1695392028; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ke/S75Act/GYPOSeawP6Jdwgvv0mn/jdboBsDb1L9yQ=;
-        b=JieD2Jj2FS19AtMfhHHFVzh5NoA/wuUKnKdALbdNazjTmycVIIYIQzUeLY4V0yO32r
-         u79aA2Y+KAn5HMYpzxG8CMOvha24SpBkz5kYZldN1vFIHcm5JTT9gmEZ+ucDFYNpHenK
-         /vCr+BKk1SlHpEaCQezdCyDvRI/XNNUnfOrcPAAADV4/JESqS7rbuyDLaYmPGHuk2tiY
-         PLNz4n/3xr/ZS0rJhUe1hMT0IjCZ3COanvsVhV2DHL2Q9kTfbcTzSBzF3Vgi1vzD3kHK
-         bAx/6jyYIRNhoIf1QqXisdvB24pBi5B6PLnIU3mqxDEXvEHzP6qipseP45qdbcpCGyTX
-         XS8A==
+        d=gmail.com; s=20230601; t=1694787592; x=1695392392; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=9p1y/dHKWZ4mldBm4B4C2rsKuH8pDG1nwww6AtIwFhc=;
+        b=S55yFmX9FkgupeoDzmLQsFhYECFXPAPyXlVzrqvOBCbkrinGZZ2WUVj2MrtRWKICEs
+         qdLYdYb6iO3bktSn9ocUfX6yM7zTD8ODoOfzk3+ALd9IuACWpUBVTzZxGmmmWR3l11A0
+         20XNEUNwKMKCpJceqsh0ChI/xV+4Zgx4j0PyvdskAsm/81uGrz5etlwKPP1Np9rRrCZ4
+         Fc/hRyc41U+oAD1r4CfkAMWjkd8Xl0xIXszEZilSjV3AMAtTgz/8OSXrx/mXdbhmiVRB
+         KE5ICLV1qqJVg9hKRC071h0SWuvC5Sx+F1wfr8CmQZfUthOz9IGJNvadjAyxbFR3tIzF
+         eFQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694787228; x=1695392028;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ke/S75Act/GYPOSeawP6Jdwgvv0mn/jdboBsDb1L9yQ=;
-        b=YUIPROe5A2zElY5Gxoh8OrjqpcKvXf1XR/T8iHDxo/WFsp9lc8Ki3bE17jnsSLNPr6
-         hTDsuQgOELUBAwR1dl9ihZybS99ek66c54VqSPMfYFzSR3qLnbXU2SD7z0Nfv7jJBxid
-         2W2jiISbNAFIo/19A6t5BjZ3t6zYx2tgcCUWK9D6IRmkyraj66krJZf7uT+Y15hQIvan
-         wRhp7ESdGEsemb4otpZimKISFhNmM1lMZLUbJtVySO5q/6FcV1hhcd4cSPwi24jsEx/b
-         Ttpi3Aw7Mus2dDz/4fPW8JdXkPKeXU2gn4MUbK6LZeFpV1lnA8QwgQCPSEOera9K1sYn
-         RR2Q==
-X-Gm-Message-State: AOJu0Yy7MFyf3GdIkSw1kWFHeYlJXDaooD5dy8P7HkawE7Afl1lx657f
-	UQOQGhJ/nsUHVKETKKAAO3FmIckXIULFkWTSJZU=
-X-Google-Smtp-Source: AGHT+IFVb1QexceCNEMxn+OszAR0FB6zGhWO7Fh1x9HE0DtJcsnBh9jMrOSOQEKc8CkCl1Ut6fPMq0QVw1t9IwuapgY=
-X-Received: by 2002:a17:90a:6d27:b0:26d:2635:5a7c with SMTP id
- z36-20020a17090a6d2700b0026d26355a7cmr1551869pjj.2.1694787228346; Fri, 15 Sep
- 2023 07:13:48 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1694787592; x=1695392392;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9p1y/dHKWZ4mldBm4B4C2rsKuH8pDG1nwww6AtIwFhc=;
+        b=ZLcHW7B7cgBMWiwC4sQLJf9GF+9FFTPjVCNMmsE8NiKRi68qsgGf7S8gsJSTjD2S3V
+         eIsE9sTLJOtekmAJHkYnYYM04yvtUoDPFUwdCJklOmg3bnUdL3SIEUoVwokiwBxdnhIS
+         THUkgGTO4pKoWkZhX2wTYbmjtSRJRM5GJZzCCZCSkeZqxug9yD/o7fKwlfyMbHIWUdUp
+         YOsSJ+mZGOUpAbTQ/P+3QrohumpXVetvinnGGC084ewsnTIe8tLcQ4od/G/3d6PivxsC
+         KjysS4KzUPzGyssk7jvjRdgugi9I9eihh/Y/uHaYIpZrPIp74chgGJuxdBb7mtP/9zfI
+         TbEQ==
+X-Gm-Message-State: AOJu0YwILZxV3t9+kGDcOAbMxIYynSJAGpUuMX+SfqZpvWeLVlCiYNcB
+	ZIOrkV4sIREE5cE+g8dNXUE=
+X-Google-Smtp-Source: AGHT+IHmpAzcVMy9/mTX5cEnVsuC3NbKv+46JVCvmYw71ilIB49LnenXkrLGAxFC5kVwaYrjAoW6Xg==
+X-Received: by 2002:a05:651c:cc:b0:2b6:e2c1:6cda with SMTP id 12-20020a05651c00cc00b002b6e2c16cdamr1625717ljr.46.1694787591541;
+        Fri, 15 Sep 2023 07:19:51 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id x18-20020a2e9c92000000b002b6cb25e3f1sm696566lji.108.2023.09.15.07.19.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Sep 2023 07:19:51 -0700 (PDT)
+Date: Fri, 15 Sep 2023 17:19:48 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+Cc: Keguang Zhang <keguang.zhang@gmail.com>, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Lee Jones <lee@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Serge Semin <Sergey.Semin@baikalelectronics.ru>
+Subject: Re: [PATCH v5 0/3] Move Loongson1 MAC arch-code to the driver dir
+Message-ID: <bwwxpczznbfaqpzuzvtgbkmluk6wfxfp25coy6t7mjq3axjnvs@5pvgxumiyjkd>
+References: <20230914114435.481900-1-keguang.zhang@gmail.com>
+ <ueevvju7i42wik6fevdmvbtypm4su77guyo4zizhrfreexken7@nrcovxfnyuvq>
+ <f69ac27a-943c-3966-385a-e12ecd71d33a@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAOMZO5AE3HkjRb9-UsoG44XL064Lca7zx9gG47+==GbhVPUFsw@mail.gmail.com>
- <8020f97d-a5c9-4b78-bcf2-fc5245c67138@lunn.ch> <CAOMZO5BzaJ3Bw2hwWZ3iiMCX3_VejnZ=LHDhkdU8YmhKHuA5xw@mail.gmail.com>
- <CAOMZO5DJXsbgEDAZSjWJXBesHad1oWR9ht3a3Xjf=Q-faHm1rg@mail.gmail.com>
- <597f21f0-e922-440c-91af-b12cb2a0b7a4@lunn.ch> <CAOMZO5BDWFtYu5iae7Gk-bF6Q6d1TV4dYZ=GtW_L_-CV8HapBg@mail.gmail.com>
- <333e23ae-fe75-48e1-a2fb-65b127ec9b3e@lunn.ch>
-In-Reply-To: <333e23ae-fe75-48e1-a2fb-65b127ec9b3e@lunn.ch>
-From: Fabio Estevam <festevam@gmail.com>
-Date: Fri, 15 Sep 2023 11:13:36 -0300
-Message-ID: <CAOMZO5AQ6VJi7Qhz4B0VQk5f2_R0bXB_RqipgGMBz9+vtHBMmg@mail.gmail.com>
-Subject: Re: mv88e6xxx: Timeout waiting for EEPROM done
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Vladimir Oltean <olteanv@gmail.com>, l00g33k@gmail.com, netdev <netdev@vger.kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, sashal@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f69ac27a-943c-3966-385a-e12ecd71d33a@linaro.org>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -81,49 +90,42 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Andrew,
+On Fri, Sep 15, 2023 at 03:23:44PM +0200, Philippe Mathieu-Daudé wrote:
+> On 15/9/23 11:55, Serge Semin wrote:
+> > Hi Keguang
+> > 
+> > On Thu, Sep 14, 2023 at 07:44:32PM +0800, Keguang Zhang wrote:
+> > > In order to convert Loongson1 MAC platform devices to the devicetree
+> > > nodes, Loongson1 MAC arch-code should be moved to the driver dir.
+> > > Add dt-binding document and update MAINTAINERS file accordingly.
+> > > In other words, this patchset is a preparation for converting
+> > > Loongson1 platform devices to devicetree.
+> > 
+> > No more comments from my side. Thank you for the patches and
+> > especially for the patience in the review process.
+> > 
+> > For the entire series:
+> > Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
+> > 
+> > * I'll also send individual Rb tags to each patch so b4 would be able
+> > * to take it into account.
+> 
 
-On Fri, Sep 15, 2023 at 10:08=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote=
-:
+> Maintainers using b4 should use the '-t' option, then you don't need
+> to do that:
+> 
+>  -t, --apply-cover-trailers
+> 
+>  By default, b4 will not apply any code review trailers sent to
+>  the cover letter (but will let you know when it finds those).
+>  This lets you automatically apply these trailers to all commits
+>  in the series. This will become the default in a future version
+>  of b4.
+> 
+> https://b4.docs.kernel.org/en/latest/maintainer/am-shazam.html#common-flags
 
-> > What does the datasheet say about the minimal duration for the reset
-> > pin being asserted?
->
-> It is a bit ambiguous. RESETn is both an input and an output. It says
-> this about input for the For the 6352:
->
->      As in input, when RESETn is driven low by an external device,
->      this device will then driver RESETn low as an output for 8 to
->      14ms (10ms typically). In this mode RESETn can be used to
->      debounce a hardware reset switch.
->
-> So i would say it needs to be low long enough not to be a glitch, but
-> can be short.
+Oh, got it. Can't believe I didn't figure out to take a closer look at
+the help-page. Thanks for pointing it out to me.
 
-Thanks for confirming with the datasheet.
-
-> Is you device held in reset before the driver loads? As i said, the
-
-Just checked with a scope here and no, the reset pin is not held in
-reset before the driver loads.
-
-> aim of this code is not to actually reset the switch, but to ensure it
-> is taken out of reset if it was being held in reset. And if it was
-> being held in reset, i would expect that to be for a long time, at
-> least the current Linux boot time.
-
-That's a point I am concerned about: why don't we follow the datasheet
-with respect to taking the reset pin out of reset?
-
-Isn't the sequence I used below better suited as it follows the
-datasheet by guaranteeing the 10ms at a low level?
-
-       chip->reset =3D devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_HIGH=
-);
-       ....
-       if (chip->reset) {
-                usleep_range(10000, 20000);
-                gpiod_set_value(chip->reset, 0);
-                usleep_range(10000, 20000);
-       }
+-Serge(y)
 
