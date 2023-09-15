@@ -1,182 +1,112 @@
-Return-Path: <netdev+bounces-34079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 869047A1FCA
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 15:25:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 182557A1FDC
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 15:30:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98A1D1C216A2
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 13:25:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41B241C211A5
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 13:30:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7255D1095C;
-	Fri, 15 Sep 2023 13:25:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92D4110973;
+	Fri, 15 Sep 2023 13:30:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3290B10A07
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 13:25:02 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id D8D0E1FE1
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 06:25:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1694784300;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FEED101EB
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 13:30:27 +0000 (UTC)
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8EED18D;
+	Fri, 15 Sep 2023 06:30:25 -0700 (PDT)
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1694784624;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=YwX0LvGe2IzI2EOEiWJxA7uUIanGLX6c6iCFRhbWEYk=;
-	b=N9TJb7DU+wiRYto+J74cKWfMrmN0tHju+qlbrqTSn7cahsoQs7GCd0XtD/6gRT0PxABy4v
-	sZgUWO2rPzMiq5UCOo8nyl1X2DdOAxtJtfr7BLixdHBOFOWFXjad2I7ZIRG9cMsu2h/vcl
-	NgWlsz9Vqh6JIllP351l1+xwMenmmoE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-66-4Bq-zBPcP-SVdF6pYdLdww-1; Fri, 15 Sep 2023 09:24:54 -0400
-X-MC-Unique: 4Bq-zBPcP-SVdF6pYdLdww-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CA13480349B;
-	Fri, 15 Sep 2023 13:24:53 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.216])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 6689610F1BE9;
-	Fri, 15 Sep 2023 13:24:51 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <5017b9fa177f4deaa5d481a5d8914ab4@AcuMS.aculab.com>
-References: <5017b9fa177f4deaa5d481a5d8914ab4@AcuMS.aculab.com> <dcc6543d71524ac488ca2a56dd430118@AcuMS.aculab.com> <20230914221526.3153402-1-dhowells@redhat.com> <20230914221526.3153402-10-dhowells@redhat.com> <3370515.1694772627@warthog.procyon.org.uk>
-To: David Laight <David.Laight@ACULAB.COM>
-Cc: dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
-    Linus Torvalds <torvalds@linux-foundation.org>,
-    Jens Axboe <axboe@kernel.dk>, "Christoph
- Hellwig" <hch@lst.de>,
-    Christian Brauner <christian@brauner.io>,
-    "Matthew
- Wilcox" <willy@infradead.org>,
-    Brendan Higgins <brendanhiggins@google.com>,
-    David Gow <davidgow@google.com>,
-    "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-    "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-    "linux-mm@kvack.org" <linux-mm@kvack.org>,
-    "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-    "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-    "kunit-dev@googlegroups.com" <kunit-dev@googlegroups.com>,
-    "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-    Andrew Morton <akpm@linux-foundation.org>,
-    Christian Brauner <brauner@kernel.org>,
-    "David
- Hildenbrand" <david@redhat.com>,
-    John Hubbard <jhubbard@nvidia.com>
-Subject: Re: [RFC PATCH 9/9] iov_iter: Add benchmarking kunit tests for UBUF/IOVEC
+	bh=t4a69QAJHoLA0O/kevTly+3PbGRi/ca9qXsnMKQmmz4=;
+	b=VvhyY2DjZI2vuivX7kUro9SCFkXJxhGEOzbmZVk78FLfzmED6+pXPF71mKfsEnmzi5ke/Y
+	JzUSn+Y4ieqsib0SLhHkNeXeE0eeZdOPsxH9BFFg8IGHpqUHhgLFKbM9jjmOlkBUh0oI7i
+	D0CUFWf00DY0DU2tvyKNA9Fy0I7H9gfSlZXnZdrEVs19CYik3pGy+KHhMjC7HIQUOPnBHB
+	6rtDDAbD2aLigxZObvxapKneQW+ZtNScPpN+tl85LIxzZiGvpCw/J+HUOEkOuxNEzFQ6WK
+	8Z7B7kQsYsXXU4WOrzqKpQOnKVj2jUk9bQFluXtkTHfD/+f37KWohaOdnnT1ZA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1694784624;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=t4a69QAJHoLA0O/kevTly+3PbGRi/ca9qXsnMKQmmz4=;
+	b=MB7u8FElR3aNFJLb/9MfgTw1mqXDhAupHamM3e/Ij4hNRTGnIiKMXsws8Nk249DLQk0XIb
+	2cTXmHAYSYrwk0Dg==
+To: Peter Hilber <peter.hilber@opensynergy.com>,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: Peter Hilber <peter.hilber@opensynergy.com>, Ingo Molnar
+ <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+ <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
+ <hpa@zytor.com>, Richard Cochran <richardcochran@gmail.com>, John Stultz
+ <jstultz@google.com>, Stephen Boyd <sboyd@kernel.org>,
+ netdev@vger.kernel.org, Marc Zyngier <maz@kernel.org>, Paolo Bonzini
+ <pbonzini@redhat.com>, Oliver Upton <oliver.upton@linux.dev>, James Morse
+ <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui
+ Yu <yuzenghui@huawei.com>, Sean Christopherson <seanjc@google.com>
+Subject: Re: [RFC PATCH 4/4] treewide: Use clocksource id for struct
+ system_counterval_t
+In-Reply-To: <20230818011256.211078-5-peter.hilber@opensynergy.com>
+References: <20230818011256.211078-1-peter.hilber@opensynergy.com>
+ <20230818011256.211078-5-peter.hilber@opensynergy.com>
+Date: Fri, 15 Sep 2023 15:30:23 +0200
+Message-ID: <87cyyj1s40.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3629597.1694784290.1@warthog.procyon.org.uk>
-Date: Fri, 15 Sep 2023 14:24:50 +0100
-Message-ID: <3629598.1694784290@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-David Laight <David.Laight@ACULAB.COM> wrote:
+Peter!
 
-> You could also just not do the copy!
-> Although you need (say) asm volatile("\n",:::"memory") to
-> stop it all being completely optimised away.
-> That might show up a difference in the 'out_of_line' test
-> where 15% on top on the data copies is massive - it may be
-> that the data cache behaviour is very different for the
-> two cases.
+On Fri, Aug 18 2023 at 03:12, Peter Hilber wrote:
+> --- a/arch/x86/kernel/tsc.c
+> +++ b/arch/x86/kernel/tsc.c
+> @@ -1313,7 +1313,7 @@ struct system_counterval_t convert_art_to_tsc(u64 art)
+>  	res += tmp + art_to_tsc_offset;
+>  
+>  	return (struct system_counterval_t) {
+> -		.cs = have_art ? &clocksource_tsc : NULL,
+> +		.cs_id = have_art ? CSID_TSC : CSID_GENERIC,
+>  		.cycles = res
 
-I tried using the following as the load:
+Can you please change all of this so that:
 
-	volatile unsigned long foo;
+    patch 1:   Adds cs_id to struct system_counterval_t
+    patch 2-4: Add the clocksource ID and set the cs_id field
+    patch 5:   Switches the core to evaluate cs_id
+    patch 6:   Remove the cs field from system_counterval_t
 
-	static __always_inline
-	size_t idle_user_iter(void __user *iter_from, size_t progress,
-			      size_t len, void *to, void *priv2)
-	{
-		nop();
-		nop();
-		foo += (unsigned long)iter_from;
-		foo += (unsigned long)len;
-		foo += (unsigned long)to + progress;
-		nop();
-		nop();
-		return 0;
-	}
 
-	static __always_inline
-	size_t idle_kernel_iter(void *iter_from, size_t progress,
-				size_t len, void *to, void *priv2)
-	{
-		nop();
-		nop();
-		foo += (unsigned long)iter_from;
-		foo += (unsigned long)len;
-		foo += (unsigned long)to + progress;
-		nop();
-		nop();
-		return 0;
-	}
+> --- a/include/linux/timekeeping.h
+> +++ b/include/linux/timekeeping.h
+> @@ -270,12 +270,12 @@ struct system_device_crosststamp {
+>   * struct system_counterval_t - system counter value with the pointer to the
+>   *				corresponding clocksource
+>   * @cycles:	System counter value
+> - * @cs:		Clocksource corresponding to system counter value. Used by
+> + * @cs_id:	Clocksource corresponding to system counter value. Used by
+>   *		timekeeping code to verify comparibility of two cycle values
 
-	size_t iov_iter_idle(struct iov_iter *iter, size_t len, void *priv)
-	{
-		return iterate_and_advance(iter, len, priv,
-					   idle_user_iter, idle_kernel_iter);
-	}
-	EXPORT_SYMBOL(iov_iter_idle);
+That comment is inaccurate. It's not longer the clocksource itself. It's
+the ID which is used for validation.
 
-adding various things into a volatile variable to prevent the optimiser from
-discarding the calculations.
+Thanks,
 
-I get:
-
- iov_kunit_benchmark_bvec: avg 395 uS, stddev 46 uS
- iov_kunit_benchmark_bvec: avg 397 uS, stddev 38 uS
- iov_kunit_benchmark_bvec: avg 411 uS, stddev 57 uS
- iov_kunit_benchmark_bvec_outofline: avg 781 uS, stddev 5 uS
- iov_kunit_benchmark_bvec_outofline: avg 781 uS, stddev 6 uS
- iov_kunit_benchmark_bvec_outofline: avg 781 uS, stddev 7 uS
- iov_kunit_benchmark_bvec_split: avg 3599 uS, stddev 737 uS
- iov_kunit_benchmark_bvec_split: avg 3664 uS, stddev 838 uS
- iov_kunit_benchmark_bvec_split: avg 3669 uS, stddev 875 uS
- iov_kunit_benchmark_iovec: avg 472 uS, stddev 17 uS
- iov_kunit_benchmark_iovec: avg 506 uS, stddev 59 uS
- iov_kunit_benchmark_iovec: avg 525 uS, stddev 14 uS
- iov_kunit_benchmark_kvec: avg 421 uS, stddev 73 uS
- iov_kunit_benchmark_kvec: avg 428 uS, stddev 68 uS
- iov_kunit_benchmark_kvec: avg 469 uS, stddev 75 uS
- iov_kunit_benchmark_ubuf: avg 1052 uS, stddev 6 uS
- iov_kunit_benchmark_ubuf: avg 1168 uS, stddev 8 uS
- iov_kunit_benchmark_ubuf: avg 1168 uS, stddev 9 uS
- iov_kunit_benchmark_xarray: avg 680 uS, stddev 11 uS
- iov_kunit_benchmark_xarray: avg 682 uS, stddev 20 uS
- iov_kunit_benchmark_xarray: avg 686 uS, stddev 46 uS
- iov_kunit_benchmark_xarray_outofline: avg 1340 uS, stddev 34 uS
- iov_kunit_benchmark_xarray_outofline: avg 1358 uS, stddev 12 uS
- iov_kunit_benchmark_xarray_outofline: avg 1358 uS, stddev 15 uS
-
-where I made the iovec and kvec tests split their buffers into PAGE_SIZE
-segments and the ubuf test issue an iteration per PAGE_SIZE'd chunk.
-Splitting kvec into just 8 results in the iteration taking <1uS.
-
-The bvec_split test is doing a kmalloc() per 256 pages inside of the loop,
-which is why that takes quite a long time.
-
-David
-
+        tglx
 
