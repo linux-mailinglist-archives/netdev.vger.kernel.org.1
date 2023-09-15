@@ -1,146 +1,181 @@
-Return-Path: <netdev+bounces-34057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 069CC7A1E61
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 14:17:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 833007A1E6D
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 14:19:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FA9828249A
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 12:17:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E114281BFD
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 12:19:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAD2C107B1;
-	Fri, 15 Sep 2023 12:15:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBCB710788;
+	Fri, 15 Sep 2023 12:19:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C071078B
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 12:15:33 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id A92DA2708
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 05:15:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1694780127;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4IzPTIpBjDzBGvsyRo0gBVOG837dBZudcrNhelcBAVs=;
-	b=NuNY3WG1WnX4m0MxIHJzurF+eZ0XicILWQUxYh92xYOaJ8S50QOA8NVMwkyznnAQ5N5O+6
-	ORNnHX+vMVdrhxaHPoEWdF735SLcZ1nUUH6vJpFaL55/HlIeXy0duGFYf//7Uap1jLQP6M
-	j3QuukfkLhdXJUrsP5fxJl3ypQEzhUc=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-14-ckf4-NPBNmy6066eMRlmkA-1; Fri, 15 Sep 2023 08:15:26 -0400
-X-MC-Unique: ckf4-NPBNmy6066eMRlmkA-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-401db25510fso15593425e9.1
-        for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 05:15:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58C628485;
+	Fri, 15 Sep 2023 12:19:50 +0000 (UTC)
+Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA2852719;
+	Fri, 15 Sep 2023 05:18:35 -0700 (PDT)
+Received: by mail-ej1-x633.google.com with SMTP id a640c23a62f3a-99bdeae1d0aso257633266b.1;
+        Fri, 15 Sep 2023 05:18:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1694780314; x=1695385114; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Ymd4KNlOZU8aSyQl8RdaNXFFLMRuv3B/W9dK3PdwrAc=;
+        b=Qe5yvcctpK8hnDXGJ38jjgWhYV3v6RHDBdkO0nF+YfXq9PVr2coBoL1FC1m5/scEMy
+         kXZprRpqwBOBy9juoUxif8pQmYdS+3deoC/o6xWlVE2b9WX0rd/djE34sJbP30twJdX0
+         ThL3bCpth/VDFUywk9+StI7RWYrw8fZJNZ2bDhfUWuKaEL+qMHgw/q2LOu2RDxdSXJ0v
+         hCFQCMPO8MH1sJru57MCWGzLclxerTHHT+ohIpAoum6vVjNqlqYF6E2OcBdhnVdP2RCu
+         Wj+VwU2p0zurszdRvhzpcB5D9DEClPLYCQ8NLclB2EpM77LwiS1Ha1KvmDe9o+u7uy2o
+         tJlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694780125; x=1695384925;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4IzPTIpBjDzBGvsyRo0gBVOG837dBZudcrNhelcBAVs=;
-        b=hu5bTG1+Y4H/LCO86y+zLGMfIjZXQVUCu4iyUHi8eOTrgW2JcP77HWct4n67eubhBU
-         3P0UIOxsjFh+MVmYaurR/Wjujp093P1x9MOzFlFXNvD2thkMCybkLvrGDDZncH3ioVYX
-         fWHfawXKuATv0+X7XSDBQ8KnRMugRXIjKvDgQeV1GMX8IcB8LmsIIAmboni6ebjVu4pE
-         wUCaCPwXjLtY+zJVQT0KznzmUKyRRBfRydDxbDEAFUgJtxHmhZFL7w+U5JLhAYgKzp90
-         VO7VGYWyUHxVFndUXOo6jaLIZUTeRIAhoIxs1cEcQKtzhH9bDJCXpJgQxRMFQDnuiwiM
-         qq7w==
-X-Gm-Message-State: AOJu0YwjxY90DsihYwWS3QVyUptRi5RY7TjqxiB7IH/TelntAWOg3Jpm
-	EmJoN6pfYNg4EiJF7IHsOCIZZd3Rdeg/GsXMzz/PZvqQyP/H/zxQeXvDOCImiga8VawLtnaYOre
-	uRf87Eyq9jA1mHstcSIB2idbjXZR3PyN2z1hlxqtWq3TioFsqYwgSOk7NXEesHER91X7y8smfAu
-	paa3Y=
-X-Received: by 2002:adf:cd08:0:b0:31f:afeb:4e71 with SMTP id w8-20020adfcd08000000b0031fafeb4e71mr1327912wrm.48.1694780124928;
-        Fri, 15 Sep 2023 05:15:24 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEAM+qT8oGEefSDmkyANZPTMrHB/rc6Va9KYPc9DtRjeZCpejNAvp5rpxARReDs63NX0XPsvQ==
-X-Received: by 2002:adf:cd08:0:b0:31f:afeb:4e71 with SMTP id w8-20020adfcd08000000b0031fafeb4e71mr1327892wrm.48.1694780124604;
-        Fri, 15 Sep 2023 05:15:24 -0700 (PDT)
-Received: from step1.lan ([46.222.72.72])
-        by smtp.gmail.com with ESMTPSA id s1-20020a5d4ec1000000b0031fbbe347e1sm4287767wrv.65.2023.09.15.05.15.22
+        d=1e100.net; s=20230601; t=1694780314; x=1695385114;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ymd4KNlOZU8aSyQl8RdaNXFFLMRuv3B/W9dK3PdwrAc=;
+        b=k1/IAAqTulY0jt4i/1kr2oPXExlBqXGmc5ktHdKcSc+boXeR79Dpf5/Cb0IfYQY2fr
+         A9aR0VuAyOr5KWHeV5WfWC/EgCWVvSmvU+urk2fCvwUnixYtzqbVMkcMyE8f5PnpM5Xc
+         f14yXnBQq8yhkurkdZdIC/UAluBKfLyOe3mmMpb0BetEZ7cTtu4jCoinK3XHVox2087w
+         39imdzquJCjEYiDGH+SH7huBiNAKMokHsvkAMayyth/SQIpv//TalWVg14AlSoUxFdlu
+         o/KNIgqPVOZyZIJ5Kc0AsU3vV6NnOMs0eS8PiV+HSDsjdXBbY9jgSLyPkIkL/AE0MO1O
+         +iRA==
+X-Gm-Message-State: AOJu0Ywc402qpgR3Q++1GqVTulpHJJLtuuWq1xkmG9rjvxopW+V5tPyU
+	zOvqNC57T8Vi2692LyQ3OF0=
+X-Google-Smtp-Source: AGHT+IGIM8mfUCVD2aaq64c6QqJ77AiQF4lLWq19si18HJ2jdi75s8K70DPYuygwVCGIEpJnXsYbrA==
+X-Received: by 2002:a17:906:535d:b0:9a1:fb4c:3b65 with SMTP id j29-20020a170906535d00b009a1fb4c3b65mr1141593ejo.14.1694780313700;
+        Fri, 15 Sep 2023 05:18:33 -0700 (PDT)
+Received: from skbuf ([188.26.56.202])
+        by smtp.gmail.com with ESMTPSA id x7-20020a170906134700b009a0955a7ad0sm2335355ejb.128.2023.09.15.05.18.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Sep 2023 05:15:23 -0700 (PDT)
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Arseniy Krasnov <avkrasnov@salutedevices.com>,
-	virtualization@lists.linux-foundation.org,
-	oxffffaa@gmail.com,
-	Bobby Eshleman <bobby.eshleman@bytedance.com>
-Subject: [PATCH net-next 5/5] vsock/test: track bytes in MSG_PEEK test for SOCK_SEQPACKET
-Date: Fri, 15 Sep 2023 14:14:52 +0200
-Message-ID: <20230915121452.87192-6-sgarzare@redhat.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230915121452.87192-1-sgarzare@redhat.com>
-References: <20230915121452.87192-1-sgarzare@redhat.com>
+        Fri, 15 Sep 2023 05:18:33 -0700 (PDT)
+Date: Fri, 15 Sep 2023 15:18:30 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH 2/4] dt-bindings: net: dsa: document internal MDIO bus
+Message-ID: <20230915121830.tmzuxthup7rzewhv@skbuf>
+References: <676d1a2b-6ffa-4aff-8bed-a749c373f5b3@arinc9.com>
+ <87325ce9-595a-4dda-a6a1-b5927d25719b@arinc9.com>
+ <20230911225126.rk23g3u3bzo3agby@skbuf>
+ <036c0763-f1b2-49ff-bc82-1ff16eec27ab@arinc9.com>
+ <20230912193450.h5s6miubag46z623@skbuf>
+ <6cec079e-991e-4222-a76d-d6156de0daca@arinc9.com>
+ <20230913074231.5azwxqjuv2wp5nik@skbuf>
+ <ZQHcV5DUfcCYkkTi@shell.armlinux.org.uk>
+ <ZQNLkiAt4jOjojRf@shell.armlinux.org.uk>
+ <ZQNL0Vy3kMbWlNFl@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <ZQNL0Vy3kMbWlNFl@shell.armlinux.org.uk>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The test was a bit complicated to read.
-Added variables to keep track of the bytes read and to be read
-in each step. Also some comments.
+Hi Russell,
 
-The test is unchanged.
+On Thu, Sep 14, 2023 at 07:07:13PM +0100, Russell King (Oracle) wrote:
+> On Thu, Sep 14, 2023 at 07:06:11PM +0100, Russell King (Oracle) wrote:
+> > On Wed, Sep 13, 2023 at 04:59:19PM +0100, Russell King (Oracle) wrote:
+> > > On Wed, Sep 13, 2023 at 10:42:31AM +0300, Vladimir Oltean wrote:
+> > > > On Wed, Sep 13, 2023 at 08:52:37AM +0300, Arınç ÜNAL wrote:
+> > > > > One more thing, I don't recall phy-mode being required to be defined for
+> > > > > user ports as it will default to GMII. I don't believe this is the same
+> > > > > case for shared ports so phy-mode is required only for them?
+> > > > 
+> > > > phy-mode is not strictly required, but I think there is a strong
+> > > > preference to set it. IIRC, when looking at the DSA device trees, there
+> > > > was no case where phy-mode would be absent on CPU/DSA ports if the other
+> > > > link properties were also present, so we required it too. There were no
+> > > > complaints in 1 year since dsa_shared_port_validate_of() is there. The
+> > > > requirement can be relaxed to just a warning and no error in the kernel,
+> > > > and the removal of "required" in the schema, if it helps making it
+> > > > common with user ports.
+> > > 
+> > > However, phylink pretty much requires phy-mode to be specified to be
+> > > something sane for shared ports, so I wouldn't be in favour of relaxing
+> > > the checkinng in dsa_shared_port_validate_of()... not unless you're
+> > > now going to accept the approach I originally proposed to have DSA
+> > > drivers tell the core (and thus phylink) what phy-mode and other link
+> > > parameters should be used when they are missing from DT.
+> > 
+> > You mean the approach that I picked up using software nodes that got
+> > thrown out by the software node people? That approach that I picked
+> > up from you and tried to get merged?
+> > 
+> > No, that's not going to happen, and it's not a question of whether
+> > _I_ am going to accept that approach or not. So don't throw that
+> > back on me, please.
+> > 
+> > If this is something that we want to solve, we need to stop being so
+> > devisive (your language above is so) and try to come up with a
+> > solution that is acceptable to everyone... the swnode approach
+> > doesn't seem to be it.
+> 
+> Oh dear. I must be going mad!
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- tools/testing/vsock/vsock_test.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+So first things first: I am not advocating for making phy-mode fully
+optional in the sense that you say (if absent, then write non-OF code
+through which DSA infers the phy-mode from drivers). I'm happy with the
+current form of the code.
 
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index b18acbaf92e2..5743dcae2350 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -1002,6 +1002,7 @@ static void test_stream_virtio_skb_merge_client(const struct test_opts *opts)
- 
- static void test_stream_virtio_skb_merge_server(const struct test_opts *opts)
- {
-+	size_t read = 0, to_read;
- 	unsigned char buf[64];
- 	int fd;
- 
-@@ -1014,14 +1015,21 @@ static void test_stream_virtio_skb_merge_server(const struct test_opts *opts)
- 	control_expectln("SEND0");
- 
- 	/* Read skbuff partially. */
--	recv_buf(fd, buf, 2, 0, 2);
-+	to_read = 2;
-+	recv_buf(fd, buf + read, to_read, 0, to_read);
-+	read += to_read;
- 
- 	control_writeln("REPLY0");
- 	control_expectln("SEND1");
- 
--	recv_buf(fd, buf + 2, 8, 0, 8);
-+	/* Read the rest of both buffers */
-+	to_read = strlen(HELLO_STR WORLD_STR) - read;
-+	recv_buf(fd, buf + read, to_read, 0, to_read);
-+	read += to_read;
- 
--	recv_buf(fd, buf, sizeof(buf) - 8 - 2, MSG_DONTWAIT, -EAGAIN);
-+	/* No more bytes should be there */
-+	to_read = sizeof(buf) - read;
-+	recv_buf(fd, buf + read, to_read, MSG_DONTWAIT, -EAGAIN);
- 
- 	if (memcmp(buf, HELLO_STR WORLD_STR, strlen(HELLO_STR WORLD_STR))) {
- 		fprintf(stderr, "pattern mismatch\n");
--- 
-2.41.0
+I was just trying to add some nuance to this bizarre aspect signalled by
+Arınç - phy-mode is not required for user ports, presumably because when
+it is absent, user ports will default to GMII. That isn't an intrinsic
+feature of user ports, but rather of having a phydev, and so, because
+DSA/CPU ports can also have a phydev, logically it means that phy-mode
+can also be omitted in that particular case, with the same result.
 
+Our missing_phy_mode check from dsa_shared_port_validate_of() is theoretically
+more restrictive than it needs to be, because it artificially prohibits
+that behavior, and it results in an inexplicable difference in the phylink
+dt-bindings for user vs shared ports. So that's where my relaxation
+proposal came from: we could make missing_phy_mode non-fatal, and that
+would permit the configurations which can work to work, and the ones
+which can't work will fail elsewhere. Just like for the user ports.
+
+Where I wasn't absolutely clear is that I don't want Arınç to change any
+of that. Right now, on DSA shared ports, phy-mode is required and on user
+ports it isn't. The difference is a bit strange (arbitrary considering
+the example above) and should maybe be settled at some point in the
+future, but for now, the dt-bindings should document it like that.
 
