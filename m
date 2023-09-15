@@ -1,323 +1,261 @@
-Return-Path: <netdev+bounces-34015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92D0F7A1882
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 10:21:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5E537A18D4
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 10:29:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4AEC92821E8
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 08:21:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73C731C20C25
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 08:29:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EA80D50C;
-	Fri, 15 Sep 2023 08:21:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ED4ED515;
+	Fri, 15 Sep 2023 08:29:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E562D2FD
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 08:21:39 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C31B2710;
-	Fri, 15 Sep 2023 01:19:27 -0700 (PDT)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38F5l7wq031886;
-	Fri, 15 Sep 2023 01:16:21 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=pfpt0220; bh=VrbC/opRa3bowTi+jCvbDXGelqHejkboudyRrfjNUGg=;
- b=Oefx0vveY/TVlfpV9cEKJC4o0p+9y5uB7LPLqC4yd0vX7Lxdz2dwTnxJdpkB2cSDswJE
- GfPRNbwMce/szrxdRDwkfOxKx9t/8h+CCmWX+5S/UNMgjSovNeJmqOAp4WmvWCH5nNKj
- QgSsLzJdkU711KHw7mINnHZUgjkzvwnnEOMbfCoqiQU+IV/HBkXoKv1QagD47cryjDPB
- eBZP8ef7Cjfv2IfNuDDxns89N+AH+5RaBmXbgxiOMa9h1u6ujV+ujmGFH3/EvVqK5+Ws
- r/HDWqaZDRf95fIPVeWcBQzeYavmSU9e5Jf02uadlQuEDctXIJm8boUaZWuWBu7WdVEN eQ== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3t4gnd0hxb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Fri, 15 Sep 2023 01:16:21 -0700
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 15 Sep
- 2023 01:16:19 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Fri, 15 Sep 2023 01:16:19 -0700
-Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
-	by maili.marvell.com (Postfix) with ESMTP id 2A8D85B6932;
-	Fri, 15 Sep 2023 01:16:18 -0700 (PDT)
-From: Shinas Rasheed <srasheed@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <hgani@marvell.com>
-CC: <egallen@redhat.com>, <mschmidt@redhat.com>, <vimleshk@marvell.com>,
-        Shinas Rasheed <srasheed@marvell.com>,
-        Veerasenareddy Burru
-	<vburru@marvell.com>,
-        Sathesh Edara <sedara@marvell.com>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-Subject: [net-next PATCH] octeon_ep: support to fetch firmware info
-Date: Fri, 15 Sep 2023 01:16:07 -0700
-Message-ID: <20230915081608.2155837-1-srasheed@marvell.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE693D304
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 08:29:28 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id DF2602D66
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 01:28:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1694766526;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AcGHkHEkl2F+HrrCmBnGlpMxClskGfx3G9ZgUgAvCEo=;
+	b=gMsh9PsPTyJNpLOrgiEIB1qo+ORoNB/fRLqizbIudCxGzPgkEBqH0Y7Xs1CU2vxxm5OWxz
+	O+LhvtpctjPFn5yzJ7Hxh6EIoaMdIkBkbsyqX+qoxDzDLrkADdPfjp3ggKDkDP3uQeLIlO
+	UUGnUJ62nyW2NF0YbA8ADYT1Bt9LshM=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-449-EVtrkpTSNyK_utnp8RYIqw-1; Fri, 15 Sep 2023 04:28:44 -0400
+X-MC-Unique: EVtrkpTSNyK_utnp8RYIqw-1
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2bceb2b3024so23314431fa.0
+        for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 01:28:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694766523; x=1695371323;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :to:subject:cc:user-agent:mime-version:date:message-id:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AcGHkHEkl2F+HrrCmBnGlpMxClskGfx3G9ZgUgAvCEo=;
+        b=f1/mc1x5RVaDaMVi0Un+8tTJVoAIuKBRxl6X5aG/NaN/LuasmmpkU3+EjsRalUrjeB
+         WbkQgET8Hdzh9abSfHWhD18NG6WEycmuRdCPWTu4EcGKyVw/1520+mhdG/AwiR87xfee
+         vbnEeN23mv6NyWTmvQKUIS8KsvEyvIOTgCbi/VRPaOLX2y7fTBxKmh1Kv0Sk3TVZlYpA
+         vgVu0SekwtQHnTo4EOgCaFjnMxClRwK1M4C2QJEj9hXlBbSYa/i/vehMhuSJAjMacIic
+         BKKW2TMa+S0lER4lK/Dofb4HdooxmJgkdhEu/vmdvu62Gr0mRuxuNrEMlld5OO7aBQU3
+         4hUQ==
+X-Gm-Message-State: AOJu0Yw9HDdCv78EdF2F5Ow/LBmzxl+Ie6B46yf2D6qRxVeClHcIgzJj
+	Ywv5xK43onmSQKPprTbkXo9qJFgJGknu34ksQmuEGhxeM5vpj5u3UyIXncgReiWiBmcQtkVmq/S
+	EykN1G1+azQPMMHQl
+X-Received: by 2002:ac2:5e68:0:b0:502:a56b:65f7 with SMTP id a8-20020ac25e68000000b00502a56b65f7mr809373lfr.16.1694766522966;
+        Fri, 15 Sep 2023 01:28:42 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEXe9WijGF+xd6sNUS8Btxyd7ZjXZH/hd49roTE/EzbjLuB9jzTKiTfy80O32sXsGz2tMVrcw==
+X-Received: by 2002:ac2:5e68:0:b0:502:a56b:65f7 with SMTP id a8-20020ac25e68000000b00502a56b65f7mr809354lfr.16.1694766522621;
+        Fri, 15 Sep 2023 01:28:42 -0700 (PDT)
+Received: from [192.168.41.200] (83-90-141-187-cable.dk.customer.tdc.net. [83.90.141.187])
+        by smtp.gmail.com with ESMTPSA id c27-20020ac244bb000000b004f86d3e52c0sm557925lfm.4.2023.09.15.01.28.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Sep 2023 01:28:41 -0700 (PDT)
+From: Jesper Dangaard Brouer <jbrouer@redhat.com>
+X-Google-Original-From: Jesper Dangaard Brouer <brouer@redhat.com>
+Message-ID: <84282e55-519c-0e17-30c5-b6de54d1001c@redhat.com>
+Date: Fri, 15 Sep 2023 10:28:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: L9E9cJZoaB3971lDCONrr1yMGxDWKGPO
-X-Proofpoint-ORIG-GUID: L9E9cJZoaB3971lDCONrr1yMGxDWKGPO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-09-15_05,2023-09-14_01,2023-05-22_02
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Cc: brouer@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Lorenzo Bianconi <lorenzo@kernel.org>,
+ Alexander Duyck <alexander.duyck@gmail.com>,
+ Liang Chen <liangchen.linux@gmail.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Guillaume Tucker <guillaume.tucker@collabora.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Eric Dumazet <edumazet@google.com>, Linux-MM <linux-mm@kvack.org>,
+ Matthew Wilcox <willy@infradead.org>,
+ Mel Gorman <mgorman@techsingularity.net>
+Subject: Re: [PATCH net-next v8 1/6] page_pool: frag API support for 32-bit
+ arch with 64-bit DMA
+To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com
+References: <20230912083126.65484-1-linyunsheng@huawei.com>
+ <20230912083126.65484-2-linyunsheng@huawei.com>
+Content-Language: en-US
+In-Reply-To: <20230912083126.65484-2-linyunsheng@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add support to fetch firmware info such as heartbeat miss count,
-heartbeat interval. This shall be used for heartbeat monitor.
+Hi Lin,
 
-Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
----
- .../marvell/octeon_ep/octep_cn9k_pf.c         | 10 +++-----
- .../ethernet/marvell/octeon_ep/octep_config.h | 22 +++++++++++++----
- .../marvell/octeon_ep/octep_ctrl_net.c        | 24 ++++++++++++++++++-
- .../marvell/octeon_ep/octep_ctrl_net.h        | 18 ++++++++++++++
- .../ethernet/marvell/octeon_ep/octep_main.c   | 16 +++++++++----
- .../marvell/octeon_ep/octep_regs_cn9k_pf.h    |  4 ++++
- 6 files changed, 77 insertions(+), 17 deletions(-)
+This looks reasonable, but given you are changing struct-page
+(include/linux/mm_types.h) we need to MM-list <linux-mm@kvack.org>.
+Also Cc Wilcox.
 
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_cn9k_pf.c b/drivers/net/ethernet/marvell/octeon_ep/octep_cn9k_pf.c
-index 90c3a419932d..f282cd5b29ea 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_cn9k_pf.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_cn9k_pf.c
-@@ -16,9 +16,6 @@
- #define CTRL_MBOX_MAX_PF	128
- #define CTRL_MBOX_SZ		((size_t)(0x400000 / CTRL_MBOX_MAX_PF))
- 
--#define FW_HB_INTERVAL_IN_SECS		1
--#define FW_HB_MISS_COUNT		10
--
- /* Names of Hardware non-queue generic interrupts */
- static char *cn93_non_ioq_msix_names[] = {
- 	"epf_ire_rint",
-@@ -250,12 +247,11 @@ static void octep_init_config_cn93_pf(struct octep_device *oct)
- 		link = PCI_DEVFN(PCI_SLOT(oct->pdev->devfn), link);
- 	}
- 	conf->ctrl_mbox_cfg.barmem_addr = (void __iomem *)oct->mmio[2].hw_addr +
--					   (0x400000ull * 7) +
-+					   CN93_PEM_BAR4_INDEX_OFFSET +
- 					   (link * CTRL_MBOX_SZ);
- 
--	conf->hb_interval = FW_HB_INTERVAL_IN_SECS;
--	conf->max_hb_miss_cnt = FW_HB_MISS_COUNT;
--
-+	conf->fw_info.hb_interval = OCTEP_DEFAULT_FW_HB_INTERVAL;
-+	conf->fw_info.hb_miss_count = OCTEP_DEFAULT_FW_HB_MISS_COUNT;
- }
- 
- /* Setup registers for a hardware Tx Queue  */
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_config.h b/drivers/net/ethernet/marvell/octeon_ep/octep_config.h
-index df7cd39d9fce..1622a6ebf036 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_config.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_config.h
-@@ -49,6 +49,11 @@
- /* Default MTU */
- #define OCTEP_DEFAULT_MTU    1500
- 
-+/* pf heartbeat interval in milliseconds */
-+#define OCTEP_DEFAULT_FW_HB_INTERVAL           1000
-+/* pf heartbeat miss count */
-+#define OCTEP_DEFAULT_FW_HB_MISS_COUNT         20
-+
- /* Macros to get octeon config params */
- #define CFG_GET_IQ_CFG(cfg)             ((cfg)->iq)
- #define CFG_GET_IQ_NUM_DESC(cfg)        ((cfg)->iq.num_descs)
-@@ -181,6 +186,16 @@ struct octep_ctrl_mbox_config {
- 	void __iomem *barmem_addr;
- };
- 
-+/* Info from firmware */
-+struct octep_fw_info {
-+	/* interface pkind */
-+	u16 pkind;
-+	/* heartbeat interval in milliseconds */
-+	u16 hb_interval;
-+	/* heartbeat miss count */
-+	u16 hb_miss_count;
-+};
-+
- /* Data Structure to hold configuration limits and active config */
- struct octep_config {
- 	/* Input Queue attributes. */
-@@ -201,10 +216,7 @@ struct octep_config {
- 	/* ctrl mbox config */
- 	struct octep_ctrl_mbox_config ctrl_mbox_cfg;
- 
--	/* Configured maximum heartbeat miss count */
--	u32 max_hb_miss_cnt;
--
--	/* Configured firmware heartbeat interval in secs */
--	u32 hb_interval;
-+	/* fw info */
-+	struct octep_fw_info fw_info;
- };
- #endif /* _OCTEP_CONFIG_H_ */
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
-index 4c6d91a8c83e..5b5343fd2771 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
-@@ -26,7 +26,7 @@ static atomic_t ctrl_net_msg_id;
- 
- /* Control plane version in which OCTEP_CTRL_NET_H2F_CMD was added */
- static const u32 octep_ctrl_net_h2f_cmd_versions[OCTEP_CTRL_NET_H2F_CMD_MAX] = {
--	[OCTEP_CTRL_NET_H2F_CMD_INVALID ... OCTEP_CTRL_NET_H2F_CMD_LINK_INFO] =
-+	[OCTEP_CTRL_NET_H2F_CMD_INVALID ... OCTEP_CTRL_NET_H2F_CMD_GET_INFO] =
- 	 OCTEP_CP_VERSION(1, 0, 0)
- };
- 
-@@ -353,6 +353,28 @@ void octep_ctrl_net_recv_fw_messages(struct octep_device *oct)
- 	}
- }
- 
-+int octep_ctrl_net_get_info(struct octep_device *oct, int vfid,
-+			    struct octep_fw_info *info)
-+{
-+	struct octep_ctrl_net_wait_data d = {0};
-+	struct octep_ctrl_net_h2f_resp *resp;
-+	struct octep_ctrl_net_h2f_req *req;
-+	int err;
-+
-+	req = &d.data.req;
-+	init_send_req(&d.msg, req, 0, vfid);
-+	req->hdr.s.cmd = OCTEP_CTRL_NET_H2F_CMD_GET_INFO;
-+	req->link_info.cmd = OCTEP_CTRL_NET_CMD_GET;
-+	err = octep_send_mbox_req(oct, &d, true);
-+	if (err < 0)
-+		return err;
-+
-+	resp = &d.data.resp;
-+	memcpy(info, &resp->info.fw_info, sizeof(struct octep_fw_info));
-+
-+	return 0;
-+}
-+
- int octep_ctrl_net_uninit(struct octep_device *oct)
- {
- 	struct octep_ctrl_net_wait_data *pos, *n;
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h
-index 1c2ef4ee31d9..b330f370131b 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h
-@@ -41,6 +41,7 @@ enum octep_ctrl_net_h2f_cmd {
- 	OCTEP_CTRL_NET_H2F_CMD_LINK_STATUS,
- 	OCTEP_CTRL_NET_H2F_CMD_RX_STATE,
- 	OCTEP_CTRL_NET_H2F_CMD_LINK_INFO,
-+	OCTEP_CTRL_NET_H2F_CMD_GET_INFO,
- 	OCTEP_CTRL_NET_H2F_CMD_MAX
- };
- 
-@@ -161,6 +162,11 @@ struct octep_ctrl_net_h2f_resp_cmd_state {
- 	u16 state;
- };
- 
-+/* get info request */
-+struct octep_ctrl_net_h2f_resp_cmd_get_info {
-+	struct octep_fw_info fw_info;
-+};
-+
- /* Host to fw response data */
- struct octep_ctrl_net_h2f_resp {
- 	union octep_ctrl_net_resp_hdr hdr;
-@@ -171,6 +177,7 @@ struct octep_ctrl_net_h2f_resp {
- 		struct octep_ctrl_net_h2f_resp_cmd_state link;
- 		struct octep_ctrl_net_h2f_resp_cmd_state rx;
- 		struct octep_ctrl_net_link_info link_info;
-+		struct octep_ctrl_net_h2f_resp_cmd_get_info info;
- 	};
- } __packed;
- 
-@@ -330,6 +337,17 @@ int octep_ctrl_net_set_link_info(struct octep_device *oct,
-  */
- void octep_ctrl_net_recv_fw_messages(struct octep_device *oct);
- 
-+/** Get info from firmware.
-+ *
-+ * @param oct: non-null pointer to struct octep_device.
-+ * @param vfid: Index of virtual function.
-+ * @param info: non-null pointer to struct octep_fw_info.
-+ *
-+ * return value: 0 on success, -errno on failure.
-+ */
-+int octep_ctrl_net_get_info(struct octep_device *oct, int vfid,
-+			    struct octep_fw_info *info);
-+
- /** Uninitialize data for ctrl net.
-  *
-  * @param oct: non-null pointer to struct octep_device.
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-index 43eb6e871351..ec3fd7ca3125 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-@@ -918,9 +918,9 @@ static void octep_hb_timeout_task(struct work_struct *work)
- 	int miss_cnt;
- 
- 	miss_cnt = atomic_inc_return(&oct->hb_miss_cnt);
--	if (miss_cnt < oct->conf->max_hb_miss_cnt) {
-+	if (miss_cnt < oct->conf->fw_info.hb_miss_count) {
- 		queue_delayed_work(octep_wq, &oct->hb_task,
--				   msecs_to_jiffies(oct->conf->hb_interval * 1000));
-+				   msecs_to_jiffies(oct->conf->fw_info.hb_interval));
- 		return;
- 	}
- 
-@@ -1013,8 +1013,7 @@ int octep_device_setup(struct octep_device *oct)
- 
- 	atomic_set(&oct->hb_miss_cnt, 0);
- 	INIT_DELAYED_WORK(&oct->hb_task, octep_hb_timeout_task);
--	queue_delayed_work(octep_wq, &oct->hb_task,
--			   msecs_to_jiffies(oct->conf->hb_interval * 1000));
-+
- 	return 0;
- 
- unsupported_dev:
-@@ -1139,6 +1138,15 @@ static int octep_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		dev_err(&pdev->dev, "Device setup failed\n");
- 		goto err_octep_config;
- 	}
-+
-+	octep_ctrl_net_get_info(octep_dev, OCTEP_CTRL_NET_INVALID_VFID,
-+				&octep_dev->conf->fw_info);
-+	dev_info(&octep_dev->pdev->dev, "Heartbeat interval %u msecs Heartbeat miss count %u\n",
-+		 octep_dev->conf->fw_info.hb_interval,
-+		 octep_dev->conf->fw_info.hb_miss_count);
-+	queue_delayed_work(octep_wq, &octep_dev->hb_task,
-+			   msecs_to_jiffies(octep_dev->conf->fw_info.hb_interval));
-+
- 	INIT_WORK(&octep_dev->tx_timeout_task, octep_tx_timeout_task);
- 	INIT_WORK(&octep_dev->ctrl_mbox_task, octep_ctrl_mbox_task);
- 	INIT_DELAYED_WORK(&octep_dev->intr_poll_task, octep_intr_poll_task);
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_regs_cn9k_pf.h b/drivers/net/ethernet/marvell/octeon_ep/octep_regs_cn9k_pf.h
-index b25c3093dc7b..0a43983e9101 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_regs_cn9k_pf.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_regs_cn9k_pf.h
-@@ -370,4 +370,8 @@
- /* bit 1 for firmware heartbeat interrupt */
- #define CN93_SDP_EPF_OEI_RINT_DATA_BIT_HBEAT	BIT_ULL(1)
- 
-+#define CN93_PEM_BAR4_INDEX            7
-+#define CN93_PEM_BAR4_INDEX_SIZE       0x400000ULL
-+#define CN93_PEM_BAR4_INDEX_OFFSET     (CN93_PEM_BAR4_INDEX * CN93_PEM_BAR4_INDEX_SIZE)
-+
- #endif /* _OCTEP_REGS_CN9K_PF_H_ */
--- 
-2.25.1
+I think it was Ilias and Duyck that validated the assumptions, last time
+this patch was discussed. Thus I want to see their review before this is
+applied.
+
+-Jesper
+
+On 12/09/2023 10.31, Yunsheng Lin wrote:
+> Currently page_pool_alloc_frag() is not supported in 32-bit
+> arch with 64-bit DMA because of the overlap issue between
+> pp_frag_count and dma_addr_upper in 'struct page' for those
+> arches, which seems to be quite common, see [1], which means
+> driver may need to handle it when using frag API.
+> 
+> It is assumed that the combination of the above arch with an
+> address space >16TB does not exist, as all those arches have
+> 64b equivalent, it seems logical to use the 64b version for a
+> system with a large address space. It is also assumed that dma
+> address is page aligned when we are dma mapping a page aliged
+> buffer, see [2].
+> 
+> That means we're storing 12 bits of 0 at the lower end for a
+> dma address, we can reuse those bits for the above arches to
+> support 32b+12b, which is 16TB of memory.
+> 
+> If we make a wrong assumption, a warning is emitted so that
+> user can report to us.
+> 
+> 1. https://lore.kernel.org/all/20211117075652.58299-1-linyunsheng@huawei.com/
+> 2. https://lore.kernel.org/all/20230818145145.4b357c89@kernel.org/
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> CC: Lorenzo Bianconi <lorenzo@kernel.org>
+> CC: Alexander Duyck <alexander.duyck@gmail.com>
+> CC: Liang Chen <liangchen.linux@gmail.com>
+> CC: Alexander Lobakin <aleksander.lobakin@intel.com>
+> CC: Guillaume Tucker <guillaume.tucker@collabora.com>
+> ---
+>   include/linux/mm_types.h        | 13 +------------
+>   include/net/page_pool/helpers.h | 20 ++++++++++++++------
+>   net/core/page_pool.c            | 14 +++++++++-----
+>   3 files changed, 24 insertions(+), 23 deletions(-)
+> 
+> diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
+> index 36c5b43999e6..74b49c4c7a52 100644
+> --- a/include/linux/mm_types.h
+> +++ b/include/linux/mm_types.h
+> @@ -125,18 +125,7 @@ struct page {
+>   			struct page_pool *pp;
+>   			unsigned long _pp_mapping_pad;
+>   			unsigned long dma_addr;
+> -			union {
+> -				/**
+> -				 * dma_addr_upper: might require a 64-bit
+> -				 * value on 32-bit architectures.
+> -				 */
+> -				unsigned long dma_addr_upper;
+> -				/**
+> -				 * For frag page support, not supported in
+> -				 * 32-bit architectures with 64-bit DMA.
+> -				 */
+> -				atomic_long_t pp_frag_count;
+> -			};
+> +			atomic_long_t pp_frag_count;
+>   		};
+>   		struct {	/* Tail pages of compound page */
+>   			unsigned long compound_head;	/* Bit zero is set */
+> diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
+> index 94231533a369..8e1c85de4995 100644
+> --- a/include/net/page_pool/helpers.h
+> +++ b/include/net/page_pool/helpers.h
+> @@ -197,7 +197,7 @@ static inline void page_pool_recycle_direct(struct page_pool *pool,
+>   	page_pool_put_full_page(pool, page, true);
+>   }
+>   
+> -#define PAGE_POOL_DMA_USE_PP_FRAG_COUNT	\
+> +#define PAGE_POOL_32BIT_ARCH_WITH_64BIT_DMA	\
+>   		(sizeof(dma_addr_t) > sizeof(unsigned long))
+>   
+>   /**
+> @@ -211,17 +211,25 @@ static inline dma_addr_t page_pool_get_dma_addr(struct page *page)
+>   {
+>   	dma_addr_t ret = page->dma_addr;
+>   
+> -	if (PAGE_POOL_DMA_USE_PP_FRAG_COUNT)
+> -		ret |= (dma_addr_t)page->dma_addr_upper << 16 << 16;
+> +	if (PAGE_POOL_32BIT_ARCH_WITH_64BIT_DMA)
+> +		ret <<= PAGE_SHIFT;
+>   
+>   	return ret;
+>   }
+>   
+> -static inline void page_pool_set_dma_addr(struct page *page, dma_addr_t addr)
+> +static inline bool page_pool_set_dma_addr(struct page *page, dma_addr_t addr)
+>   {
+> +	if (PAGE_POOL_32BIT_ARCH_WITH_64BIT_DMA) {
+> +		page->dma_addr = addr >> PAGE_SHIFT;
+> +
+> +		/* We assume page alignment to shave off bottom bits,
+> +		 * if this "compression" doesn't work we need to drop.
+> +		 */
+> +		return addr != (dma_addr_t)page->dma_addr << PAGE_SHIFT;
+> +	}
+> +
+>   	page->dma_addr = addr;
+> -	if (PAGE_POOL_DMA_USE_PP_FRAG_COUNT)
+> -		page->dma_addr_upper = upper_32_bits(addr);
+> +	return false;
+>   }
+>   
+>   static inline bool page_pool_put(struct page_pool *pool)
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index 77cb75e63aca..8a9868ea5067 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -211,10 +211,6 @@ static int page_pool_init(struct page_pool *pool,
+>   		 */
+>   	}
+>   
+> -	if (PAGE_POOL_DMA_USE_PP_FRAG_COUNT &&
+> -	    pool->p.flags & PP_FLAG_PAGE_FRAG)
+> -		return -EINVAL;
+> -
+>   #ifdef CONFIG_PAGE_POOL_STATS
+>   	pool->recycle_stats = alloc_percpu(struct page_pool_recycle_stats);
+>   	if (!pool->recycle_stats)
+> @@ -359,12 +355,20 @@ static bool page_pool_dma_map(struct page_pool *pool, struct page *page)
+>   	if (dma_mapping_error(pool->p.dev, dma))
+>   		return false;
+>   
+> -	page_pool_set_dma_addr(page, dma);
+> +	if (page_pool_set_dma_addr(page, dma))
+> +		goto unmap_failed;
+>   
+>   	if (pool->p.flags & PP_FLAG_DMA_SYNC_DEV)
+>   		page_pool_dma_sync_for_device(pool, page, pool->p.max_len);
+>   
+>   	return true;
+> +
+> +unmap_failed:
+> +	WARN_ON_ONCE("unexpected DMA address, please report to netdev@");
+> +	dma_unmap_page_attrs(pool->p.dev, dma,
+> +			     PAGE_SIZE << pool->p.order, pool->p.dma_dir,
+> +			     DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_WEAK_ORDERING);
+> +	return false;
+>   }
+>   
+>   static void page_pool_set_pp_info(struct page_pool *pool,
 
 
