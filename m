@@ -1,328 +1,223 @@
-Return-Path: <netdev+bounces-34012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE5827A1818
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 10:12:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E456B7A1807
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 10:11:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74CDE2821A7
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 08:12:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FDFF28219A
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 08:11:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A90BED30F;
-	Fri, 15 Sep 2023 08:12:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CA10D2F6;
+	Fri, 15 Sep 2023 08:11:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82EAB6123
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 08:12:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EF55DC433CA;
-	Fri, 15 Sep 2023 08:12:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694765528;
-	bh=agloKg28g9/YDRsW6JpbMHgCzMLCcZvfA0DO3+uFT6U=;
-	h=From:Subject:Date:To:Cc:Reply-To:From;
-	b=biImRSYA1Gz9ex5hNnBvsCHN9Ke70AUTaJ/1oXos0Jp7PNytynhYDldZqmwGGwqIG
-	 wBDKtPE0OTqUI1L63BvWt/+LCgVBbLdZCfr41q3wmoGf4wSW/aJrIfFwombizAcdZg
-	 qvSoZF/En9YlofX7qoeahgKwyA5XkjPRaozJcx0YgybsjABHPXaJjBTEuBtzK8LPQW
-	 jobWx6+oa9+BDtivYaoAnYXnxx8o2rsLE386o7+u+Um3TgcOPHoXDeCO9Jw/08P+7h
-	 vQQ0+r6aW6E3rdL67GLQm+1B22ApzP0EDxkQv5g6EBJoCtur/p98vje3l/BQ6kXwd+
-	 Ok5Q7hby1Jxgw==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C23FEEE6436;
-	Fri, 15 Sep 2023 08:12:07 +0000 (UTC)
-From:
- Nikita Shubin via B4 Relay <devnull+nikita.shubin.maquefel.me@kernel.org>
-Subject: [PATCH v4 00/42] ep93xx device tree conversion
-Date: Fri, 15 Sep 2023 11:10:42 +0300
-Message-Id: <20230915-ep93xx-v4-0-a1d779dcec10@maquefel.me>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03E393FE4
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 08:11:09 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17C412113
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 01:11:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694765467; x=1726301467;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=lRgy8rQrOndp00wDQL+/0CHHOQHsRI4NiR6uSnkP1pQ=;
+  b=cX5j9PkjRzDV+Ls0lH7FydrFVZm0pM/ivV1wuweRwzlIF+JVs7RpUr+A
+   z8UrRtCQLhRAsKeHSXGXjTEumnPSs6QyAI6sALqG4NfSDwqjjRM98WvTx
+   9cMZeQFeeQcKaazvZ9jbZM5ptgLz0xkqQsCrmGR1zNw2A+vyW+Ffn3mdM
+   qo7xa0r7Iar/fY56t+cZ53uu0xVbJjgD5Zt6sAcsZgh+/P/lxB8hnAJgG
+   l3trkMOkHo0AzZVyE04I1P0jy9cOh9eRTYlPy+0OG5UFcZ6OCfjkUPmEj
+   caCTWnigdf4GxU6J/FinbhOGVT7rYk2TCstrtr/9jGx25Uo3ZAByYByQO
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="358608227"
+X-IronPort-AV: E=Sophos;i="6.02,148,1688454000"; 
+   d="scan'208";a="358608227"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2023 01:11:06 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="694641895"
+X-IronPort-AV: E=Sophos;i="6.02,148,1688454000"; 
+   d="scan'208";a="694641895"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orsmga003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 15 Sep 2023 01:11:06 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Fri, 15 Sep 2023 01:11:06 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Fri, 15 Sep 2023 01:11:06 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.108)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Fri, 15 Sep 2023 01:11:05 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gi8jsdnvahTvrrtBpSOaLL/zgZrZNuH27NsIqxPrA7G4vUb3OfB/wa5uQL4835YslV0Z9QhnLSYwpwRz+6EEa0Y8+N+lVxFAhksBy1vzCTbBLg5XImvEuAoKwjhhxepmrQfYQi7H3HLl4jWD8ntTgiN0WOjdGm1RfWTfaChs93UFFIisJrXKqUHzCt/+/H4OxfYZn2s/Suwh9OJn+0vWA7Zi+ScSrsf83AZtcRpxtz0sUtnIA4n4A1wNiIfVIDZl8AZfaMCTSlEHq+8BR3ZOtmLreVtCNvWgCQupDzXRYZvLUfoW89rWEFNKv7en/1Md7ElfIyAO0FRHnwYiyR6+/Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hUPyfIK0pHXhyM7TbUM3nP64ODJD2M804wcjSRYorbA=;
+ b=kMmkxSkSPrNQtv0T51gIGf1dzgY2vGdwMfO7Kx+n3V39Tk6jIzrSJqt6KE7FuY78oNg24DyJQry1/DG5mCduIUyPNki0fIwCPO5D9jxF0WYk3ARHDfU+bhzVVIE0xRJr3OBQ/CLknyRRmsb2kukYEnB7U4t2ohkapHKnNGSgG236RU/y3fz1xOMuyRV86M3zmUZ05o1HAYeWCEa1bLrBhnNragdG40s6jrqhKwKAefot/lOIIXMlZl55Ie97Z/gomjx0XQdDli0NDbSS70RTWj/wcmqVI3gbhYnVJ1jGvP9y66tGO43aJ1MbSi8jTbLwEHZfoJA96idkYL7PGvZmsg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL0PR11MB3521.namprd11.prod.outlook.com (2603:10b6:208:7b::32)
+ by SN7PR11MB7018.namprd11.prod.outlook.com (2603:10b6:806:2ad::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.20; Fri, 15 Sep
+ 2023 08:11:04 +0000
+Received: from BL0PR11MB3521.namprd11.prod.outlook.com
+ ([fe80::d36b:7f39:5410:6b30]) by BL0PR11MB3521.namprd11.prod.outlook.com
+ ([fe80::d36b:7f39:5410:6b30%6]) with mapi id 15.20.6792.020; Fri, 15 Sep 2023
+ 08:11:04 +0000
+From: "Romanowski, Rafal" <rafal.romanowski@intel.com>
+To: "Polchlopek, Mateusz" <mateusz.polchlopek@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Brandeburg, Jesse"
+	<jesse.brandeburg@intel.com>, "leon@kernel.org" <leon@kernel.org>, "Kitszel,
+ Przemyslaw" <przemyslaw.kitszel@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH] [PATCH iwl-next v2] ice: store VF's
+ pci_dev ptr in ice_vf
+Thread-Topic: [Intel-wired-lan] [PATCH] [PATCH iwl-next v2] ice: store VF's
+ pci_dev ptr in ice_vf
+Thread-Index: AQHZ5XCXUqZGgitRIkCHVCW2tY88SrAXH9QAgARtg2A=
+Date: Fri, 15 Sep 2023 08:11:03 +0000
+Message-ID: <BL0PR11MB352164FF9E164361B0FDE0748FF6A@BL0PR11MB3521.namprd11.prod.outlook.com>
+References: <20230912115626.105828-1-mateusz.polchlopek@intel.com>
+ <47f92633-4bb0-49d7-9a03-d1ad6cfba464@intel.com>
+In-Reply-To: <47f92633-4bb0-49d7-9a03-d1ad6cfba464@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL0PR11MB3521:EE_|SN7PR11MB7018:EE_
+x-ms-office365-filtering-correlation-id: de8af8c7-5c36-421b-c806-08dbb5c34e53
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 4BbHFdklSgXtMLIQzgVYTVOerWZHqJIn+ZjGNkWZ+A1Y60iNA2w8Ei8FbszqvecdpWXiWKnsbj3kNjgpRo5G6s+C9iEWLTwLDWczfxEVsEuXOIhTz5MNVf/gu3R9jBiK501D6htpdgPi6nxaG1ngVCEvqvLA+N7W6Ph5IMtqPq4pkfT6hg5rU5cplLfCRBOg2GIcNzScHF+m0aaaQ9+0RYPLZ1FjfrnUwPi57FMz3zuyGn5gxEdBUI4VV49J7tdMo/P+vmgF3dW3cYlMRwY7EaGcWJfyGyKVKf0trKtmZe5miIuIveE9MElGpaw/dadr0fFKSMA/NUfKHJkAbDhnZj5q0sBPATK/Dj5YoT13LWm2zuFaQSzIh6quy0Sh7Xz+vbknea0Q0uCVX2X9alIFm8VKP2XKflR8YIU0RlE3oNs0tGRefEsLcO2GGQMk/DXeO4QfLaA2TAYiAeKGF2l/UQR4aVmgC5SX+HhIqkmMDN1pcG11kyF+XlfEkv2XnEz1F7Gq3nVJkUx7rAf1t/PnxyKeDTH1o0w1IeLkYL770FBkxU2AITY9Ge5JZ7Ix+yQCEOeoi5wP5vJshtB/7QLl1AAHP5EFtlLRNOV0ByAR+2a3k1UUZJcIpAfsyMRAFGykKIPMoqLNSmue+kwmJfyYkQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB3521.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(39860400002)(396003)(346002)(376002)(186009)(451199024)(1800799009)(38100700002)(38070700005)(107886003)(122000001)(966005)(478600001)(26005)(71200400001)(9686003)(82960400001)(7696005)(53546011)(6506007)(66556008)(66946007)(110136005)(76116006)(41300700001)(66476007)(66446008)(316002)(54906003)(64756008)(83380400001)(52536014)(5660300002)(2906002)(4326008)(8676002)(8936002)(86362001)(55016003)(33656002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?0dmR0OAzVgKbeD40EVKIQ8vQKb5OwJm5vo0Khz2Y7SSKU2jDxQ4cNwyrMme8?=
+ =?us-ascii?Q?VodLul+Hkcgf9vXx65IGp4owf9xZ0Yr5GJ3RnoAnvVNb3EfEIHr6adrYsvLm?=
+ =?us-ascii?Q?8G4nrBkRydo50fXdwdMiAq+bo5GF3iIKMwddZi3tV4SDbzdrjn8ZpiIAFxC0?=
+ =?us-ascii?Q?jYmYmTFaHiBbCGl+8DCra01qLC8DDjw99lKl73SPpK2g1Wf41yxuBdB//ZGe?=
+ =?us-ascii?Q?MW8vljl4hGXnqbNQ56BxVJEG+b0PnLCDXpMtq9WCSODJ8jQzOae0gFVeWLEU?=
+ =?us-ascii?Q?XRSCsuJf2dB3qAV0I6DeaijeMYUyQcjJue7DOczKojjc2Mf83SXzpFYMeFKd?=
+ =?us-ascii?Q?xD8veumcCdWdkjNoozvZkM/haq7ekNFBgnVlj/G5JLJlDOFqJCF8Kbv4ShMG?=
+ =?us-ascii?Q?l0XVIbK+HACmeHS3aq7QVa4ELgeHfGIbsdVW4iHqVECT2Tsr14pWFIfZT15L?=
+ =?us-ascii?Q?219fjgY5+oiCdWmrFTw1DcFL1g7rEbA2NSC1wXGqAA7AnPSXgzPfjiZtRi43?=
+ =?us-ascii?Q?nBcbl86GHZlPxrz8lDIIagvY4+I/+OFI3miZY9WERlHFEoCEMqlOgCZq6w5q?=
+ =?us-ascii?Q?lYCKTy4RMLSUhTE5neMD3qXox9xlCAWv02v4PaRyU05Bhlb+Vcu/c3h4fVhE?=
+ =?us-ascii?Q?CRsCXMZCE2Awa7oFTP4/QXrbBdm/3jjjgMUJH6GrJiKAIUKlczTHaV7P5ErM?=
+ =?us-ascii?Q?bXuIE2MEJdbgZqRXUF+BvcBtHrou+Ii1pXD201dnL91vgHg00mCsKjvycdM2?=
+ =?us-ascii?Q?zP8Sr7HiWgBdrv7k+12FTbA+0mn6mkIvj9jqf1Z5juhdrbv1MiGAhmF2UgdL?=
+ =?us-ascii?Q?4wIuVLzpZRVX89QYeC6etMisCWCu3IUTzhiL0Xhx/R2dTJCogR8RoNb97Ire?=
+ =?us-ascii?Q?nq6D5GqBQn44cLy25Yut7EjJYKMhe0zq+XrwJc2f4hyQ/j4RoukAIMmQMTBa?=
+ =?us-ascii?Q?m1dzp+rT+0X1YLvYPfHEeZpNW6sJlSG4uZ9wCjJqPQ2BmCL1n2hKrHHCREoU?=
+ =?us-ascii?Q?Eq0AJ1smdsOOwpr4HV/BZV0P3b9kXXzhANq3ozV16zUPtEdUoW3O4zx4odRf?=
+ =?us-ascii?Q?CkT4g4rL1fRi2H/hzigQBNOodx1dlvOFlCQOgS5vyvpK0sogEn8LJQ0egwKh?=
+ =?us-ascii?Q?ud3zZzHRioqqgFEmd2TnWhUVnsKXkHz8OcVD0Z66M1x/3r5ZA2KooGLvqrHx?=
+ =?us-ascii?Q?Pp7E7wTIrzumjhypdq0YpH7BuxkU8vFXn9Z2vYWZuTkwcJPKqJ1t2Vkuq0i5?=
+ =?us-ascii?Q?EiqavIFQMMEEr8TpLlNIwIeKjn41L30kO1lrpa1/Gso56B22BUJrgz/dnE9G?=
+ =?us-ascii?Q?MbDtjxLGLb89E6FdQ2n7lmHEdYarLiEZhDM7tAuAijKCy5XzztAVbCN8p9al?=
+ =?us-ascii?Q?/uD7lwIYLYI1UuueLKsuLOT9w5ADppo2Q0h5r6F73B9b0G5DiS+mS9MdUgEl?=
+ =?us-ascii?Q?xm8/QuMrZaIxUCt0qX5dVeGOfZQFPsN9ba+5ofg7PUT+mp6mlpZrwPNGkGoA?=
+ =?us-ascii?Q?6i7kqgQziUKx6C9DbkIyPqtpw32uz/hy8dJZpSrYzXVkdPX07f7o8tn5HQ1Y?=
+ =?us-ascii?Q?sK3mIME+u5gKc+z+xpXidbO+sziEpPRE6GwW77mvmBYLZRc302/Xq2LtvlEY?=
+ =?us-ascii?Q?pQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAIMRBGUC/2WOzQ6CMBCEX8X07JJ2lx/15HsYDwUWu1GKtkgwh
- ncXuBjj8ctMvpm3ihyEozps3irwIFE6P0O63ajKWX9hkHpmhRpJ5zoDvu9pHEGbqsjJFIw1qrl
- c2shQBusrt9RbG3sOS3AP3Mi4LpzOMzeha6F3ge3Xm2JqkDLExOxIIxjwcpXeJtE9S/HH1j6e3
- PAtaXlROol9F17r54EW8d+9gUAD1TnZrDFGE/84ztM0fQBYHN69+gAAAA==
-To: Hartley Sweeten <hsweeten@visionengravers.com>, 
- Alexander Sverdlin <alexander.sverdlin@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, Lukasz Majewski <lukma@denx.de>, 
- Linus Walleij <linus.walleij@linaro.org>, 
- Bartosz Golaszewski <brgl@bgdev.pl>, Andy Shevchenko <andy@kernel.org>, 
- Michael Turquette <mturquette@baylibre.com>, 
- Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
- Conor Dooley <conor+dt@kernel.org>, 
- Nikita Shubin <nikita.shubin@maquefel.me>, 
- Sebastian Reichel <sre@kernel.org>, 
- Daniel Lezcano <daniel.lezcano@linaro.org>, 
- Thomas Gleixner <tglx@linutronix.de>, 
- Alessandro Zummo <a.zummo@towertech.it>, 
- Alexandre Belloni <alexandre.belloni@bootlin.com>, 
- Wim Van Sebroeck <wim@linux-watchdog.org>, 
- Guenter Roeck <linux@roeck-us.net>, 
- Thierry Reding <thierry.reding@gmail.com>, 
- =?utf-8?q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>, 
- Mark Brown <broonie@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>, 
- Miquel Raynal <miquel.raynal@bootlin.com>, 
- Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>, 
- Damien Le Moal <dlemoal@kernel.org>, Sergey Shtylyov <s.shtylyov@omp.ru>, 
- Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
- Liam Girdwood <lgirdwood@gmail.com>, Jaroslav Kysela <perex@perex.cz>, 
- Takashi Iwai <tiwai@suse.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- linux-gpio@vger.kernel.org, linux-clk@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-pm@vger.kernel.org, 
- linux-rtc@vger.kernel.org, linux-watchdog@vger.kernel.org, 
- linux-pwm@vger.kernel.org, linux-spi@vger.kernel.org, 
- netdev@vger.kernel.org, dmaengine@vger.kernel.org, 
- linux-mtd@lists.infradead.org, linux-ide@vger.kernel.org, 
- linux-input@vger.kernel.org, alsa-devel@alsa-project.org, 
- Arnd Bergmann <arnd@arndb.de>, 
- Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
- Andy Shevchenko <andy.shevchenko@gmail.com>, Andrew Lunn <andrew@lunn.ch>
-X-Mailer: b4 0.13-dev-e3e53
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1694765525; l=10008;
- i=nikita.shubin@maquefel.me; s=20230718; h=from:subject:message-id;
- bh=agloKg28g9/YDRsW6JpbMHgCzMLCcZvfA0DO3+uFT6U=; =?utf-8?q?b=3DlFhzja5WXyxz?=
- =?utf-8?q?/PLTphurB/M7+sirpyh84veoDhmItUYEygTnM2rKc8vgA4hyFJjn2QEJembynYrr?=
- my3ZXC3QCmFL6iSycW9kRWpVdxebuBU00lnoSjSyA95RpVxeZd1i
-X-Developer-Key: i=nikita.shubin@maquefel.me; a=ed25519;
- pk=vqf5YIUJ7BJv3EJFaNNxWZgGuMgDH6rwufTLflwU9ac=
-X-Endpoint-Received:
- by B4 Relay for nikita.shubin@maquefel.me/20230718 with auth_id=65
-X-Original-From: Nikita Shubin <nikita.shubin@maquefel.me>
-Reply-To: <nikita.shubin@maquefel.me>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB3521.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: de8af8c7-5c36-421b-c806-08dbb5c34e53
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Sep 2023 08:11:04.0242
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: bI1a2s1DAzRqaIAB8AdbIczw3yLD1qvjaGW5UpNMmRrQMvev2bKsApfJa/2HlWLbY8jDhoL2udVL9WfXw0BvxEkKVAorjT3KJnx/NAwntac=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB7018
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-This series aims to convert ep93xx from platform to full device tree support.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+> Mateusz Polchlopek
+> Sent: Tuesday, September 12, 2023 2:34 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: netdev@vger.kernel.org; Brandeburg, Jesse
+> <jesse.brandeburg@intel.com>; leon@kernel.org; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>
+> Subject: Re: [Intel-wired-lan] [PATCH] [PATCH iwl-next v2] ice: store VF'=
+s
+> pci_dev ptr in ice_vf
+>=20
+> On 9/12/2023 1:56 PM, Mateusz Polchlopek wrote:
+> > From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> >
+> > Extend struct ice_vf by vfdev.
+> > Calculation of vfdev falls more nicely into ice_create_vf_entries().
+> >
+> > Caching of vfdev enables simplification of ice_restore_all_vfs_msi_stat=
+e().
+> >
+> > Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+> > Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> > Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> > Co-developed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+> > Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+>=20
+> I forgot to attach changelog, sorry:
+>=20
+> v2: balance vfdev refcount
+>=20
+> v2:
+> https://lore.kernel.org/netdev/20230912115626.105828-1-
+> mateusz.polchlopek@intel.com/
+> v1:
+> https://lore.kernel.org/netdev/20230816085454.235440-1-
+> przemyslaw.kitszel@intel.com/
+>=20
+> > ---
+> >   drivers/net/ethernet/intel/ice/ice_main.c   |  2 +-
+> >   drivers/net/ethernet/intel/ice/ice_sriov.c  | 50 +++++++++++---------=
+-
+> >   drivers/net/ethernet/intel/ice/ice_sriov.h  |  4 +-
+> >   drivers/net/ethernet/intel/ice/ice_vf_lib.c |  2 +
+> >   drivers/net/ethernet/intel/ice/ice_vf_lib.h |  2 +-
+> >   5 files changed, 32 insertions(+), 28 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/intel/ice/ice_main.c
+> > b/drivers/net/ethernet/intel/ice/ice_main.c
+> > index a5997008bb98..38adffbe0edf 100644
+> > --- a/drivers/net/ethernet/intel/ice/ice_main.c
+> > +++ b/drivers/net/ethernet/intel/ice/ice_main.c
+> > @@ -5561,7 +5561,7 @@ static void ice_pci_err_resume(struct pci_dev
 
-The main goal is to receive ACK's to take it via Arnd's arm-soc branch.
 
-Major changes:
-- drop newline at the end from each YAML files
-- rename dma and clk bindings headers to match first compatible
-- shrink SoC exported functions number to only 2
-- dropped some ep93xx_pata fixes from these series
-- dropped m48t86 stuff from these series
+Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
 
-Bit thanks to Andy Shevchenko for thorough review.
 
-Some parts are were sent in advance, so these series depends on the
-following:
-
-Link: https://lore.kernel.org/all/20230823-m48t86_device_tree-v2-0-21ff275f949d@maquefel.me/
-Link: https://lore.kernel.org/all/20230823-ep93xx_pata_fixes-v1-0-d7e7229be148@maquefel.me/
-
----
-Changes in v4:
-
-- gpio: ep93xx: split device in multiple
-  - s/generic_handle_irq/generic_handle_domain_irq/
-  - s/int offset/irq_hw_number_t offset/ though now it looks a bit odd to me
-  - drop i = 0
-  - drop 'error'
-  - use dev_err_probe withour printing devname once again
-
-dt-bindings: clock: Add Cirrus EP93xx
-  - renamed cirrus,ep93xx-clock.h -> cirrus,ep9301-clk.h
-
-clk: ep93xx: add DT support for Cirrus EP93xx
-  - drop unused includes
-  - use .name only for xtali, pll1, pll2 parents
-  - convert // to /*
-  - pass clk_parent_data instead of char* clock name
-
-dt-bindings: pinctrl: Add Cirrus EP93xx
-  - s/additionalProperties/unevaluatedProperties/
-
-dt-bindings: soc: Add Cirrus EP93xx
-  - move syscon to soc directory
-  - add vendor prefix
-  - make reboot same style as pinctrl, clk
-  - use absolute path for ref
-  - expand example
-
-soc: Add SoC driver for Cirrus ep93xx
-  - s/0xf0000000/GENMASK(31, 28)/
-  - s/ret/ep93xx_chip_revision(map)/
-  - drop symbol exports
-  - convert to platform driver
-
-dt-bindings: rtc: Add Cirrus EP93xx
-  - allOf: with $ref to rtc.yaml
-  - s/additionalProperties/unevaluatedProperties/
-
-dt-bindings: watchdog: Add Cirrus EP93x
-  - drop description
-  - reword
-
-power: reset: Add a driver for the ep93xx reset
-  - lets use 'GPL-2.0+' instead of '(GPL-2.0)'
-  - s/of_device/of/
-  - drop mdelay with warning
-  - return 0 at the end
-
-net: cirrus: add DT support for Cirrus EP93xx
-  - fix leaking np
-
-mtd: nand: add support for ts72xx
-  - +bits.h
-  - drop comment
-  - ok to fwnode_get_next_child_node
-  - use goto to put handle and nand and report error
-
-ARM: dts: add Cirrus EP93XX SoC .dtsi
-  - add simple-bus for ebi, as we don't require to setup anything
-  - add arm,pl011 compatible to uart nodes
-  - drop i2c-gpio, as it's isn't used anywhere
-
-ARM: dts: ep93xx: add ts7250 board
-  - generic node name for temperature-sensor
-  - drop i2c
-  - move nand, rtc, watchdog to ebi node
- 
-- Link to v3: https://lore.kernel.org/r/20230605-ep93xx-v3-0-3d63a5f1103e@maquefel.me
-
----
-Alexander Sverdlin (2):
-      ARM: dts: ep93xx: Add EDB9302 DT
-      ASoC: cirrus: edb93xx: Delete driver
-
-Nikita Shubin (40):
-      gpio: ep93xx: split device in multiple
-      ARM: ep93xx: add swlocked prototypes
-      dt-bindings: clock: Add Cirrus EP93xx
-      clk: ep93xx: add DT support for Cirrus EP93xx
-      dt-bindings: pinctrl: Add Cirrus EP93xx
-      pinctrl: add a Cirrus ep93xx SoC pin controller
-      dt-bindings: power: reset: Add ep93xx reset
-      power: reset: Add a driver for the ep93xx reset
-      dt-bindings: soc: Add Cirrus EP93xx
-      soc: Add SoC driver for Cirrus ep93xx
-      dt-bindings: timers: Add Cirrus EP93xx
-      clocksource: ep93xx: Add driver for Cirrus Logic EP93xx
-      dt-bindings: rtc: Add Cirrus EP93xx
-      rtc: ep93xx: add DT support for Cirrus EP93xx
-      dt-bindings: watchdog: Add Cirrus EP93x
-      watchdog: ep93xx: add DT support for Cirrus EP93xx
-      dt-bindings: pwm: Add Cirrus EP93xx
-      pwm: ep93xx: add DT support for Cirrus EP93xx
-      dt-bindings: spi: Add Cirrus EP93xx
-      spi: ep93xx: add DT support for Cirrus EP93xx
-      dt-bindings: net: Add Cirrus EP93xx
-      net: cirrus: add DT support for Cirrus EP93xx
-      dt-bindings: dma: Add Cirrus EP93xx
-      dma: cirrus: add DT support for Cirrus EP93xx
-      dt-bindings: mtd: Add ts7200 nand-controller
-      mtd: nand: add support for ts72xx
-      dt-bindings: ata: Add Cirrus EP93xx
-      ata: pata_ep93xx: add device tree support
-      dt-bindings: input: Add Cirrus EP93xx keypad
-      input: keypad: ep93xx: add DT support for Cirrus EP93xx
-      dt-bindings: wdt: Add ts72xx
-      wdt: ts72xx: add DT support for ts72xx
-      gpio: ep93xx: add DT support for gpio-ep93xx
-      ARM: dts: add Cirrus EP93XX SoC .dtsi
-      ARM: dts: ep93xx: add ts7250 board
-      ARM: ep93xx: DT for the Cirrus ep93xx SoC platforms
-      pwm: ep93xx: drop legacy pinctrl
-      ata: pata_ep93xx: remove legacy pinctrl use
-      ARM: ep93xx: delete all boardfiles
-      ARM: ep93xx: soc: drop defines
-
- .../bindings/arm/cirrus/cirrus,ep9301.yaml         |   38 +
- .../bindings/ata/cirrus,ep9312-pata.yaml           |   42 +
- .../bindings/clock/cirrus,ep9301-clk.yaml          |   46 +
- .../bindings/dma/cirrus,ep9301-dma-m2m.yaml        |   69 +
- .../bindings/dma/cirrus,ep9301-dma-m2p.yaml        |  121 ++
- .../bindings/input/cirrus,ep9307-keypad.yaml       |   87 ++
- .../devicetree/bindings/mtd/technologic,nand.yaml  |   45 +
- .../devicetree/bindings/net/cirrus,ep9301-eth.yaml |   59 +
- .../bindings/pinctrl/cirrus,ep9301-pinctrl.yaml    |   57 +
- .../bindings/power/reset/cirrus,ep9301-reboot.yaml |   34 +
- .../devicetree/bindings/pwm/cirrus,ep9301-pwm.yaml |   46 +
- .../devicetree/bindings/rtc/cirrus,ep9301-rtc.yaml |   42 +
- .../bindings/soc/cirrus/cirrus,ep9301-syscon.yaml  |   71 +
- .../devicetree/bindings/spi/cirrus,ep9301-spi.yaml |   61 +
- .../bindings/timer/cirrus,ep9301-timer.yaml        |   49 +
- .../bindings/watchdog/cirrus,ep9301-wdt.yaml       |   42 +
- .../bindings/watchdog/technologic,ts7200-wdt.yaml  |   45 +
- arch/arm/Makefile                                  |    1 -
- arch/arm/boot/dts/cirrus/Makefile                  |    4 +
- arch/arm/boot/dts/cirrus/ep93xx-bk3.dts            |  124 ++
- arch/arm/boot/dts/cirrus/ep93xx-edb9302.dts        |  180 +++
- arch/arm/boot/dts/cirrus/ep93xx-ts7250.dts         |  143 ++
- arch/arm/boot/dts/cirrus/ep93xx.dtsi               |  454 +++++++
- arch/arm/mach-ep93xx/Kconfig                       |   20 +-
- arch/arm/mach-ep93xx/Makefile                      |   11 -
- arch/arm/mach-ep93xx/clock.c                       |  733 ----------
- arch/arm/mach-ep93xx/core.c                        | 1017 --------------
- arch/arm/mach-ep93xx/dma.c                         |  114 --
- arch/arm/mach-ep93xx/edb93xx.c                     |  344 -----
- arch/arm/mach-ep93xx/ep93xx-regs.h                 |   38 -
- arch/arm/mach-ep93xx/gpio-ep93xx.h                 |  111 --
- arch/arm/mach-ep93xx/hardware.h                    |   25 -
- arch/arm/mach-ep93xx/irqs.h                        |   76 --
- arch/arm/mach-ep93xx/platform.h                    |   42 -
- arch/arm/mach-ep93xx/soc.h                         |  212 ---
- arch/arm/mach-ep93xx/ts72xx.c                      |  422 ------
- arch/arm/mach-ep93xx/ts72xx.h                      |   94 --
- arch/arm/mach-ep93xx/vision_ep9307.c               |  311 -----
- drivers/ata/pata_ep93xx.c                          |   33 +-
- drivers/clk/Kconfig                                |    8 +
- drivers/clk/Makefile                               |    1 +
- drivers/clk/clk-ep93xx.c                           |  753 +++++++++++
- drivers/clocksource/Kconfig                        |   11 +
- drivers/clocksource/Makefile                       |    1 +
- .../clocksource}/timer-ep93xx.c                    |  155 ++-
- drivers/dma/ep93xx_dma.c                           |  125 +-
- drivers/gpio/gpio-ep93xx.c                         |  331 ++---
- drivers/input/keyboard/ep93xx_keypad.c             |   74 +-
- drivers/mtd/nand/raw/Kconfig                       |    7 +
- drivers/mtd/nand/raw/Makefile                      |    1 +
- drivers/mtd/nand/raw/technologic-nand-controller.c |  166 +++
- drivers/net/ethernet/cirrus/ep93xx_eth.c           |   63 +-
- drivers/pinctrl/Kconfig                            |    7 +
- drivers/pinctrl/Makefile                           |    1 +
- drivers/pinctrl/pinctrl-ep93xx.c                   | 1429 ++++++++++++++++++++
- drivers/power/reset/Kconfig                        |   10 +
- drivers/power/reset/Makefile                       |    1 +
- drivers/power/reset/ep93xx-restart.c               |   85 ++
- drivers/pwm/pwm-ep93xx.c                           |   26 +-
- drivers/rtc/rtc-ep93xx.c                           |    8 +
- drivers/soc/Kconfig                                |    1 +
- drivers/soc/Makefile                               |    1 +
- drivers/soc/cirrus/Kconfig                         |   12 +
- drivers/soc/cirrus/Makefile                        |    2 +
- drivers/soc/cirrus/soc-ep93xx.c                    |  215 +++
- drivers/spi/spi-ep93xx.c                           |   28 +-
- drivers/watchdog/ep93xx_wdt.c                      |    8 +
- drivers/watchdog/ts72xx_wdt.c                      |    8 +
- include/dt-bindings/clock/cirrus,ep9301-clk.h      |   41 +
- include/dt-bindings/dma/cirrus,ep93xx-dma.h        |   26 +
- include/linux/platform_data/dma-ep93xx.h           |   25 +-
- include/linux/platform_data/eth-ep93xx.h           |   10 -
- include/linux/platform_data/keypad-ep93xx.h        |   32 -
- include/linux/soc/cirrus/ep93xx.h                  |   29 +-
- sound/soc/cirrus/Kconfig                           |    9 -
- sound/soc/cirrus/Makefile                          |    4 -
- sound/soc/cirrus/edb93xx.c                         |  117 --
- 77 files changed, 5126 insertions(+), 4168 deletions(-)
----
-base-commit: bdc09c8e8b16d494ccd1c56e903e78dd76455a35
-change-id: 20230605-ep93xx-01c76317e2d2
-
-Best regards,
--- 
-Nikita Shubin <nikita.shubin@maquefel.me>
 
 
