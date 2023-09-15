@@ -1,166 +1,140 @@
-Return-Path: <netdev+bounces-34060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A9357A1E75
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 14:20:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BC7017A1EA4
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 14:25:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32098282519
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 12:20:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7618D282B0A
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 12:25:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C564D10795;
-	Fri, 15 Sep 2023 12:20:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5BC6107A9;
+	Fri, 15 Sep 2023 12:24:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11E10DDDE
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 12:20:16 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id D2412273D
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 05:19:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1694780393;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=S6YdaabWMt5kMqbNYNBaQroIwASFlYwE8xKBnDy2tD0=;
-	b=fevduDTFgbcoGGopeKCknX3zxHY3ujh6xDv6jcCGr5PPyP99AbDynyEr/qQYLQP9jsuySN
-	pKCQUUjnRN2O8JYtiUUbTPe8i2Gw7cxVCTCcdZApKj9Lr3VMXt5iMgvBVGBvYOvUwVDRhA
-	AR/Qum3srKnZ1/UBQ7UNxVeiXoAURcM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-426-7G8sFEHCP9WrzceNBoHclg-1; Fri, 15 Sep 2023 08:19:49 -0400
-X-MC-Unique: 7G8sFEHCP9WrzceNBoHclg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CEA2E857F8A;
-	Fri, 15 Sep 2023 12:19:48 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.216])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 6B0591004145;
-	Fri, 15 Sep 2023 12:19:46 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <dcc6543d71524ac488ca2a56dd430118@AcuMS.aculab.com>
-References: <dcc6543d71524ac488ca2a56dd430118@AcuMS.aculab.com> <20230914221526.3153402-1-dhowells@redhat.com> <20230914221526.3153402-10-dhowells@redhat.com>
-To: David Laight <David.Laight@ACULAB.COM>
-Cc: dhowells@redhat.com, Al Viro <viro@zeniv.linux.org.uk>,
-    Linus Torvalds <torvalds@linux-foundation.org>,
-    Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-    "Christian
- Brauner" <christian@brauner.io>,
-    Matthew Wilcox <willy@infradead.org>,
-    "Brendan Higgins" <brendanhiggins@google.com>,
-    David Gow <davidgow@google.com>,
-    "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-    "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-    "linux-mm@kvack.org" <linux-mm@kvack.org>,
-    "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-    "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-    "kunit-dev@googlegroups.com" <kunit-dev@googlegroups.com>,
-    "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-    Andrew Morton <akpm@linux-foundation.org>,
-    Christian Brauner <brauner@kernel.org>,
-    David Hildenbrand <david@redhat.com>,
-    John Hubbard <jhubbard@nvidia.com>
-Subject: Re: [RFC PATCH 9/9] iov_iter: Add benchmarking kunit tests for UBUF/IOVEC
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26FA310948
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 12:24:06 +0000 (UTC)
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D343268F
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 05:24:04 -0700 (PDT)
+Received: by mail-pg1-x52e.google.com with SMTP id 41be03b00d2f7-573d52030fbso1701619a12.0
+        for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 05:24:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1694780643; x=1695385443; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=nNLIWA4i5VL9jGjfNW9VF4j/lei4wxTdyKGKThaxys0=;
+        b=fCh1/+XU9LO4Xx14uEnuDfhsuQN/ocSsVzHAkRY0v08EMNgNjFadwOkxGj+RG9junX
+         lq7dWa/iyTKQc3sV7TFqA6shmU0I4Kc5QQmdsLh05SZbNLTAqS15suHzxK+wxfNUv5UI
+         mrElIZkchBTe3/XxLk3aE1em9gzWm9B4G9fT14OvcIEyd64A06vuZ+FJp15J4VjrqbRi
+         LPU2Jppr0F9sgvmquedYFOjSoCgSNB3FRqDF8BOsnXoaFTrkfUC1FQQigBnMgPw5AW7n
+         9HxkyjDhKfnUxkQEQlM2Ha6XSXlMhF34jUXAjz2QKR8tkE/yYy7On/nvXQ3nH2M/4bOQ
+         Tewg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694780643; x=1695385443;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nNLIWA4i5VL9jGjfNW9VF4j/lei4wxTdyKGKThaxys0=;
+        b=CeH8O9mNmsYTCfnrJ34Q/GJlPEa8gafFlxb/6WF3A1Zi/7VUWjFkHU53aZ9Q3/s579
+         d1xwiA5El420nQ9Ymi4U5ri2VDaHxrAsI/D3jW+cRpOVZ62/KdpnFk9F1CIvd6ZNvVkJ
+         o0qo9EeWcjJJX6ndAq4bi+iCCnSA6hsUYwfp71wHxtad0fxFLSwoXdpfBeTHChXuk4KL
+         hGIxyQ++o4Qa7RgfkOAAN+EYpSWaLXZ0LG7UmB0TEFHwnjvmnZtNZrR6LLq0M5lcU9fe
+         ZRpxh6hZtBtz2zlYTV6k9jhqeHy+FRY/9FiCmUq/av4J5/99o+fRNow7DvX+WtLohZwL
+         hYcg==
+X-Gm-Message-State: AOJu0Yx0B1c0q8psQAVkRzZwBg9pVHU+lYKz1Gh0brPVXxTprQ9sFdE+
+	Vb1zViHfUxnvL53LaR+OM+M=
+X-Google-Smtp-Source: AGHT+IEFcsHo5Sbczc2DW8TTln1k9tGayeZNOacQvgbqGBAekY0hmybmjRE1B8Q5ySMWM2iHId9UvQ==
+X-Received: by 2002:a17:90a:1189:b0:274:2523:fc7f with SMTP id e9-20020a17090a118900b002742523fc7fmr1238141pja.47.1694780643546;
+        Fri, 15 Sep 2023 05:24:03 -0700 (PDT)
+Received: from 192.168.0.123 ([199.119.202.101])
+        by smtp.googlemail.com with ESMTPSA id 23-20020a17090a199700b00267eead2f16sm3167231pji.36.2023.09.15.05.23.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Sep 2023 05:24:02 -0700 (PDT)
+From: Liang Chen <liangchen.linux@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	benjamin.poirier@gmail.com
+Cc: netdev@vger.kernel.org,
+	liangchen.linux@gmail.com
+Subject: [PATCH net-next v3 1/2] pktgen: Automate flag enumeration for unknown flag handling
+Date: Fri, 15 Sep 2023 20:23:16 +0800
+Message-Id: <20230915122317.100390-1-liangchen.linux@gmail.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3545839.1694780385.1@warthog.procyon.org.uk>
-Date: Fri, 15 Sep 2023 13:19:45 +0100
-Message-ID: <3545840.1694780385@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-David Laight <David.Laight@ACULAB.COM> wrote:
+When specifying an unknown flag, it will print all available flags.
+Currently, these flags are provided as fixed strings, which requires
+manual updates when flags change. Replacing it with automated flag
+enumeration.
 
-> Isn't that going to be completely dominated by the cache fills
-> from memory?
-> 
-> I'd have thought you'd need to use something with a lot of
-> small fragments so that the iteration code dominates the copy.
+Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
+---
+ net/core/pktgen.c | 24 +++++++++++++-----------
+ 1 file changed, 13 insertions(+), 11 deletions(-)
 
-Okay, if I switch it to using MAP_ANON for the big 256MiB buffer, switch all
-the benchmarking tests to use copy_from_iter() rather than copy_to_iter() and
-make the iovec benchmark use a separate iovec for each page, there's then a
-single page replicated across the mapping.
-
-Given that, without my macro-to-inline-func patches applied, I see:
-
-	iov_kunit_benchmark_bvec: avg 3184 uS, stddev 16 uS
-	iov_kunit_benchmark_bvec: avg 3189 uS, stddev 17 uS
-	iov_kunit_benchmark_bvec: avg 3190 uS, stddev 16 uS
-	iov_kunit_benchmark_bvec_outofline: avg 3731 uS, stddev 10 uS
-	iov_kunit_benchmark_bvec_outofline: avg 3735 uS, stddev 10 uS
-	iov_kunit_benchmark_bvec_outofline: avg 3738 uS, stddev 11 uS
-	iov_kunit_benchmark_bvec_split: avg 3403 uS, stddev 10 uS
-	iov_kunit_benchmark_bvec_split: avg 3405 uS, stddev 18 uS
-	iov_kunit_benchmark_bvec_split: avg 3407 uS, stddev 29 uS
-	iov_kunit_benchmark_iovec: avg 6616 uS, stddev 20 uS
-	iov_kunit_benchmark_iovec: avg 6619 uS, stddev 22 uS
-	iov_kunit_benchmark_iovec: avg 6621 uS, stddev 46 uS
-	iov_kunit_benchmark_kvec: avg 2671 uS, stddev 12 uS
-	iov_kunit_benchmark_kvec: avg 2671 uS, stddev 13 uS
-	iov_kunit_benchmark_kvec: avg 2675 uS, stddev 12 uS
-	iov_kunit_benchmark_ubuf: avg 6191 uS, stddev 1946 uS
-	iov_kunit_benchmark_ubuf: avg 6418 uS, stddev 3263 uS
-	iov_kunit_benchmark_ubuf: avg 6443 uS, stddev 3275 uS
-	iov_kunit_benchmark_xarray: avg 3689 uS, stddev 5 uS
-	iov_kunit_benchmark_xarray: avg 3689 uS, stddev 6 uS
-	iov_kunit_benchmark_xarray: avg 3698 uS, stddev 22 uS
-	iov_kunit_benchmark_xarray_outofline: avg 4202 uS, stddev 3 uS
-	iov_kunit_benchmark_xarray_outofline: avg 4204 uS, stddev 9 uS
-	iov_kunit_benchmark_xarray_outofline: avg 4210 uS, stddev 9 uS
-
-and with, I get:
-
-	iov_kunit_benchmark_bvec: avg 3241 uS, stddev 13 uS
-	iov_kunit_benchmark_bvec: avg 3245 uS, stddev 16 uS
-	iov_kunit_benchmark_bvec: avg 3248 uS, stddev 15 uS
-	iov_kunit_benchmark_bvec_outofline: avg 3705 uS, stddev 12 uS
-	iov_kunit_benchmark_bvec_outofline: avg 3706 uS, stddev 10 uS
-	iov_kunit_benchmark_bvec_outofline: avg 3709 uS, stddev 9 uS
-	iov_kunit_benchmark_bvec_split: avg 3446 uS, stddev 10 uS
-	iov_kunit_benchmark_bvec_split: avg 3447 uS, stddev 12 uS
-	iov_kunit_benchmark_bvec_split: avg 3448 uS, stddev 12 uS
-	iov_kunit_benchmark_iovec: avg 6587 uS, stddev 22 uS
-	iov_kunit_benchmark_iovec: avg 6587 uS, stddev 22 uS
-	iov_kunit_benchmark_iovec: avg 6590 uS, stddev 27 uS
-	iov_kunit_benchmark_kvec: avg 2671 uS, stddev 12 uS
-	iov_kunit_benchmark_kvec: avg 2672 uS, stddev 12 uS
-	iov_kunit_benchmark_kvec: avg 2676 uS, stddev 19 uS
-	iov_kunit_benchmark_ubuf: avg 6241 uS, stddev 2199 uS
-	iov_kunit_benchmark_ubuf: avg 6266 uS, stddev 2245 uS
-	iov_kunit_benchmark_ubuf: avg 6513 uS, stddev 3899 uS
-	iov_kunit_benchmark_xarray: avg 3695 uS, stddev 6 uS
-	iov_kunit_benchmark_xarray: avg 3695 uS, stddev 7 uS
-	iov_kunit_benchmark_xarray: avg 3703 uS, stddev 11 uS
-	iov_kunit_benchmark_xarray_outofline: avg 4215 uS, stddev 16 uS
-	iov_kunit_benchmark_xarray_outofline: avg 4217 uS, stddev 20 uS
-	iov_kunit_benchmark_xarray_outofline: avg 4224 uS, stddev 10 uS
-
-Interestingly, most of them are quite tight, but UBUF is all over the place.
-That's with the test covering the entire 256M span with a single UBUF
-iterator, so it would seem unlikely that the difference is due to the
-iteration framework.
-
-David
+diff --git a/net/core/pktgen.c b/net/core/pktgen.c
+index f56b8d697014..ffd659dbd6c3 100644
+--- a/net/core/pktgen.c
++++ b/net/core/pktgen.c
+@@ -1318,6 +1318,7 @@ static ssize_t pktgen_if_write(struct file *file,
+ 		return count;
+ 	}
+ 	if (!strcmp(name, "flag")) {
++		unsigned int n;
+ 		__u32 flag;
+ 		char f[32];
+ 		bool disable = false;
+@@ -1339,18 +1340,19 @@ static ssize_t pktgen_if_write(struct file *file,
+ 			else
+ 				pkt_dev->flags |= flag;
+ 		} else {
+-			sprintf(pg_result,
+-				"Flag -:%s:- unknown\nAvailable flags, (prepend ! to un-set flag):\n%s",
+-				f,
+-				"IPSRC_RND, IPDST_RND, UDPSRC_RND, UDPDST_RND, "
+-				"MACSRC_RND, MACDST_RND, TXSIZE_RND, IPV6, "
+-				"MPLS_RND, VID_RND, SVID_RND, FLOW_SEQ, "
+-				"QUEUE_MAP_RND, QUEUE_MAP_CPU, UDPCSUM, "
+-				"NO_TIMESTAMP, "
+-#ifdef CONFIG_XFRM
+-				"IPSEC, "
++			pg_result += sprintf(pg_result,
++				"Flag -:%s:- unknown\n%s", f,
++				"Available flags, (prepend ! to un-set flag):\n");
++			for (n = 0; n < NR_PKT_FLAGS; n++) {
++#ifndef CONFIG_XFRM
++				if (!strcmp("IPSEC", pkt_flag_names[n]))
++					continue;
+ #endif
+-				"NODE_ALLOC\n");
++				pg_result += sprintf(pg_result, "%s, ", pkt_flag_names[n]);
++			}
++			/* Remove the comma and whitespace at the end */
++			*(pg_result - 2) = '\n';
++
+ 			return count;
+ 		}
+ 		sprintf(pg_result, "OK: flags=0x%x", pkt_dev->flags);
+-- 
+2.40.1
 
 
