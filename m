@@ -1,81 +1,106 @@
-Return-Path: <netdev+bounces-34009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C921A7A166E
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 08:50:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C4E847A16EC
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 09:09:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57DDA1C209A3
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 06:50:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CFF231C21249
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 07:09:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0441963A2;
-	Fri, 15 Sep 2023 06:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88E4DCA73;
+	Fri, 15 Sep 2023 07:09:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AA616123
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 06:50:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C71F8C433C9;
-	Fri, 15 Sep 2023 06:50:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694760623;
-	bh=ObWNuq8koaE1gLyiliRm7muB6+RXph5Nc8rKBgICxI8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=VQv6+08CmRTeI9hXC14excCQBIN4tHLDhYrHU1CIhHYNgeziqhlzFqzLpMC6Ot7ME
-	 cR9HAcRWGGmo8UIX+HkhsG9ut2ORYRETx1hQw3FvslH9Ov+4sEzctVXBw/kY+AQk1k
-	 BsSuZt+IJ3Hnv2Ng1Tz1If+0PzUQeLtUXtnVO8qjhDCpK4eTgKZOcA41XBrmcZ/DcV
-	 2d/qYzeDwlivIxAG1rO+5S5vuzsLuK3c+h5H9xEHex2yYR6L1Ril5xwPlthnLt5zsL
-	 3syRI+vNyOIVI5U7+CtlkMICx2hntIgopl2fbD4OawwXBB7eptTA9qhnRZQejRRY6O
-	 lpmOwqBbZBFPA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id ABC82E22AEE;
-	Fri, 15 Sep 2023 06:50:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9399EBC
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 07:09:20 +0000 (UTC)
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id F13CDA1
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 00:09:18 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-198-t_eZK13gOEuJOSE7_IKRiA-1; Fri, 15 Sep 2023 08:09:16 +0100
+X-MC-Unique: t_eZK13gOEuJOSE7_IKRiA-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 15 Sep
+ 2023 08:09:12 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Fri, 15 Sep 2023 08:09:12 +0100
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'David Howells' <dhowells@redhat.com>, Al Viro <viro@zeniv.linux.org.uk>,
+	Linus Torvalds <torvalds@linux-foundation.org>
+CC: Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, "Christian
+ Brauner" <christian@brauner.io>, Matthew Wilcox <willy@infradead.org>,
+	"Brendan Higgins" <brendanhiggins@google.com>, David Gow
+	<davidgow@google.com>, "linux-fsdevel@vger.kernel.org"
+	<linux-fsdevel@vger.kernel.org>, "linux-block@vger.kernel.org"
+	<linux-block@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"kunit-dev@googlegroups.com" <kunit-dev@googlegroups.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Andrew Morton
+	<akpm@linux-foundation.org>, Christian Brauner <brauner@kernel.org>, David
+ Hildenbrand <david@redhat.com>, John Hubbard <jhubbard@nvidia.com>
+Subject: RE: [RFC PATCH 9/9] iov_iter: Add benchmarking kunit tests for
+ UBUF/IOVEC
+Thread-Topic: [RFC PATCH 9/9] iov_iter: Add benchmarking kunit tests for
+ UBUF/IOVEC
+Thread-Index: AQHZ51kQ26Nrcgq1TkqWWiI5nPv6dLAbdkPg
+Date: Fri, 15 Sep 2023 07:09:12 +0000
+Message-ID: <dcc6543d71524ac488ca2a56dd430118@AcuMS.aculab.com>
+References: <20230914221526.3153402-1-dhowells@redhat.com>
+ <20230914221526.3153402-10-dhowells@redhat.com>
+In-Reply-To: <20230914221526.3153402-10-dhowells@redhat.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] selftests: tls: swap the TX and RX sockets in some tests
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169476062369.6309.9489492222022024788.git-patchwork-notify@kernel.org>
-Date: Fri, 15 Sep 2023 06:50:23 +0000
-References: <aae431141a7c5e143af5339e6aa80cb6cd3087b9.1694443646.git.sd@queasysnail.net>
-In-Reply-To: <aae431141a7c5e143af5339e6aa80cb6cd3087b9.1694443646.git.sd@queasysnail.net>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, shuah@kernel.org,
- davejwatson@fb.com, linux-kselftest@vger.kernel.org
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+From: David Howells
+> Sent: 14 September 2023 23:15
+>=20
+> Add kunit tests to benchmark 256MiB copies to a UBUF iterator and an IOVE=
+C
+> iterator.  This attaches a userspace VM with a mapped file in it
+> temporarily to the test thread.
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+Isn't that going to be completely dominated by the cache fills
+from memory?
 
-On Tue, 12 Sep 2023 16:16:25 +0200 you wrote:
-> tls.sendmsg_large and tls.sendmsg_multiple are trying to send through
-> the self->cfd socket (only configured with TLS_RX) and to receive through
-> the self->fd socket (only configured with TLS_TX), so they're not using
-> kTLS at all. Swap the sockets.
-> 
-> Fixes: 7f657d5bf507 ("selftests: tls: add selftests for TLS sockets")
-> Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
-> 
-> [...]
+I'd have thought you'd need to use something with a lot of
+small fragments so that the iteration code dominates the copy.
 
-Here is the summary with links:
-  - [net] selftests: tls: swap the TX and RX sockets in some tests
-    https://git.kernel.org/netdev/net/c/c326ca98446e
+Some measurements can be made using readv() and writev()
+on /dev/zero and /dev/null.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+=09David
 
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
 
 
