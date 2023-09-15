@@ -1,80 +1,70 @@
-Return-Path: <netdev+bounces-33997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-33998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBDB67A13CB
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 04:23:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6F027A13EA
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 04:45:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7554F281AAA
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 02:23:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 752A71C20D44
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 02:45:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 326D97F8;
-	Fri, 15 Sep 2023 02:23:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 749DC81C;
+	Fri, 15 Sep 2023 02:45:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC970A48
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 02:23:51 +0000 (UTC)
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB0CC2130
-	for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 19:23:50 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1c0c6d4d650so14934115ad.0
-        for <netdev@vger.kernel.org>; Thu, 14 Sep 2023 19:23:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1694744630; x=1695349430; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1cdP7F3B0fJT11nTRmQGNfjx5Q98729ZE49xkqjuwcM=;
-        b=Yf4tMJtc/kfIHct3oRtwJKut9Vi2D0qDQccku+jqMQz9JKGOvC72weIV6EnBZszPkw
-         5Hl53ASQmWetJSWqLecCwh0Gk7LEwJZV+HiDxfjop9Tcx3t1opEv9p4N91E028Rn4ryX
-         yWHgdQIzEDSwSMn127yaeWAR+06IGeVUkbMnaZT77y0Ap0TGF0rmMVhkMbraS5h85Eev
-         l4FDxsA0gKsaw0ovh5ZuNUp8sH+Q8RJbwbg8u2BGrtlbjsADJUm3oPYZz6hSSqi1ymRP
-         jv/5xRFM05TIPGImVsqHKjFMeMRkzFEJ9OSiROlQrWhIioolD9R+LUyH8vIdLU6JBgLn
-         7noQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694744630; x=1695349430;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1cdP7F3B0fJT11nTRmQGNfjx5Q98729ZE49xkqjuwcM=;
-        b=LaAFe3OZQY+SIf0eYErR6xBfwGrhXVs6XH3Z+LXx0Z9xqIhruJsAA90n62tW7/2G56
-         F9Obh3YZBx7/Tp++OREuBnjwAAgf+yPFtR0q1/QuYJct1x745Z5EHSA0ZUMqd54bt03+
-         45MzbLhddVpGU+G5Bv34f3OPU7WBqlG/c1jyzQOMHCzp81O6cvlF/AmhKpI6jQpNavlJ
-         wMOR2gNGn4LyxQUOr4c0+GYPe4OJuQgnBa3NrHdpiWwDwrWgsIrFbTBVxJis1hMQ97QI
-         c9uKXEzA6v0vgG8EyEd5iJJyqpW2cW0anvIYnuVig1Utm5RkvlMKNILkdr0En/8b1mHQ
-         Nz/w==
-X-Gm-Message-State: AOJu0Yy/F9gbDNwmcU2CeQbn+3RnLMC5KzIvsH6rHu5X9nWFEcufHet4
-	wPnHMwklY2EnVjloNKvSqpo=
-X-Google-Smtp-Source: AGHT+IF5pgDYQydgphb4ydZrEEdWi5jRYWvPClNRwvAV+n9exWTp5nDQdPXYOQ1o1PDypcw3fvFT4A==
-X-Received: by 2002:a17:902:f682:b0:1c2:1068:1f4f with SMTP id l2-20020a170902f68200b001c210681f4fmr405863plg.17.1694744629492;
-        Thu, 14 Sep 2023 19:23:49 -0700 (PDT)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id i13-20020a170902eb4d00b001b04c2023e3sm2245027pli.218.2023.09.14.19.23.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Sep 2023 19:23:48 -0700 (PDT)
-Date: Fri, 15 Sep 2023 10:23:43 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Ido Schimmel <idosch@idosch.org>,
-	Thomas Haller <thaller@redhat.com>
-Subject: Re: [PATCH net-next] ipv6: do not merge differe type and protocol
- routes
-Message-ID: <ZQPAL84/w323CgNT@Laptop-X1>
-References: <20230830061550.2319741-1-liuhangbin@gmail.com>
- <eeb19959-26f4-e8c1-abde-726dbb2b828d@6wind.com>
- <01baf374-97c0-2a6f-db85-078488795bf9@kernel.org>
- <db56de33-2112-5a4c-af94-6c8d26a8bfc1@6wind.com>
- <ZPBn9RQUL5mS/bBx@Laptop-X1>
- <62bcd732-31ed-e358-e8dd-1df237d735ef@6wind.com>
- <2546e031-f189-e1b1-bc50-bc7776045719@kernel.org>
- <bf3bb290-25b7-e327-851a-d6a036daab03@6wind.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71BA17F;
+	Fri, 15 Sep 2023 02:45:20 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9BF426AB;
+	Thu, 14 Sep 2023 19:45:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694745919; x=1726281919;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=bknfMAASl4tDMfba7zMcHuWz0AayuUezqHpZNb2hdkw=;
+  b=KRtBnh24klc74AEARGSgK4G0/a3RYa12+PFQmMTRNdfUpm2s4BEb1YVi
+   GO7krgnIgOJHBHp7xHb0U6mviGcmGfVZ8z98jFMKaF9W+sLJ0lnmhuqC0
+   aadVjIcPDu3nrXUsPivxHWx1LG4FtYQWrIGOMUpBccndfREk7RO5kbo7r
+   mAl7+mcphKFHTXNhvR/i53uxrwf1gbpOiizemH3Yx+osWqxGN98eYyChz
+   SPjY4pdnev8bJ+xWbogXE5WP6gnpOftFPX10arBQqed+B9nPQzgZ8IJrh
+   fWTBoHefHZkmW/voQNKVbFstHKxym8TL2WqAGUpp+OFKOtaSz6QXhggon
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="379061817"
+X-IronPort-AV: E=Sophos;i="6.02,147,1688454000"; 
+   d="scan'208";a="379061817"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2023 19:45:19 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10833"; a="738165607"
+X-IronPort-AV: E=Sophos;i="6.02,147,1688454000"; 
+   d="scan'208";a="738165607"
+Received: from lkp-server02.sh.intel.com (HELO 9ef86b2655e5) ([10.239.97.151])
+  by orsmga007.jf.intel.com with ESMTP; 14 Sep 2023 19:45:12 -0700
+Received: from kbuild by 9ef86b2655e5 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qgypR-0002KT-0l;
+	Fri, 15 Sep 2023 02:45:09 +0000
+Date: Fri, 15 Sep 2023 10:44:14 +0800
+From: kernel test robot <lkp@intel.com>
+To: Stanislav Fomichev <sdf@google.com>, bpf@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, ast@kernel.org, daniel@iogearbox.net,
+	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
+	yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org,
+	sdf@google.com, haoluo@google.com, jolsa@kernel.org,
+	kuba@kernel.org, toke@kernel.org, willemb@google.com,
+	dsahern@kernel.org, magnus.karlsson@intel.com, bjorn@kernel.org,
+	maciej.fijalkowski@intel.com, hawk@kernel.org,
+	yoong.siang.song@intel.com, netdev@vger.kernel.org,
+	xdp-hints@xdp-project.net, Saeed Mahameed <saeedm@nvidia.com>
+Subject: Re: [PATCH bpf-next v2 4/9] net/mlx5e: Implement AF_XDP TX timestamp
+ and checksum offload
+Message-ID: <202309151024.ZDZ6mRxc-lkp@intel.com>
+References: <20230914210452.2588884-5-sdf@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,43 +73,152 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <bf3bb290-25b7-e327-851a-d6a036daab03@6wind.com>
+In-Reply-To: <20230914210452.2588884-5-sdf@google.com>
 
-On Fri, Sep 01, 2023 at 11:36:51AM +0200, Nicolas Dichtel wrote:
-> > I do agree now that protocol is informative (passthrough from the kernel
-> > perspective) so not really part of the route. That should be dropped
+Hi Stanislav,
 
-I'm not sure. Is there any user space route daemon will use this info? e.g. some
-BGP route daemon?
+kernel test robot noticed the following build errors:
 
-> > from the patch leaving just a check on rt_type as to whether the routes
-> > are different. From there the append, prepend, replace and change
-> > semantics should decide what happens (ie., how the route is inserted).
-> Right. What can guide us is the meaning/concept/benefit of having this kind of
-> routing table:
-> local 2001:db8:103::/64 via 2001:db8:101::10 dev dummy1 metric 1024 pref medium
-> 2001:db8:103::/64 via 2001:db8:101::10 dev dummy2 metric 1024 pref medium
-> 
-> I don't understand how this is used/useful. It's why I ask for the use case/goal
-> of this patch.
-> How does the user know which route is used?
+[auto build test ERROR on bpf-next/master]
 
-I'm not sure how user will use it. Maybe just block/forward some traffic to
-local first and remove the local route later to unblock them. IPv4 can also
-do like this. e.g.
+url:    https://github.com/intel-lab-lkp/linux/commits/Stanislav-Fomichev/xsk-Support-tx_metadata_len/20230915-051153
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
+patch link:    https://lore.kernel.org/r/20230914210452.2588884-5-sdf%40google.com
+patch subject: [PATCH bpf-next v2 4/9] net/mlx5e: Implement AF_XDP TX timestamp and checksum offload
+config: s390-defconfig (https://download.01.org/0day-ci/archive/20230915/202309151024.ZDZ6mRxc-lkp@intel.com/config)
+compiler: s390-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230915/202309151024.ZDZ6mRxc-lkp@intel.com/reproduce)
 
-+ ip link add dummy1 up type dummy
-+ ip link add dummy2 up type dummy
-+ ip addr add 192.168.0.1/24 dev dummy1
-+ ip addr add 192.168.0.2/24 dev dummy2
-+ ip route add local 192.168.3.0/24 dev dummy1 table 100
-+ ip route append unicast 192.168.3.0/24 dev dummy1 table 100
-+ ip route append unicast 192.168.3.0/24 dev dummy2 table 100
-+ ip route show table 100
-local 192.168.3.0/24 dev dummy1 scope host
-192.168.3.0/24 dev dummy1 scope link
-192.168.3.0/24 dev dummy2 scope link
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202309151024.ZDZ6mRxc-lkp@intel.com/
 
-Thanks
-Hangbin
+All errors (new ones prefixed by >>):
+
+   In file included from include/net/xdp_sock_drv.h:9,
+                    from drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c:34:
+   include/net/xdp_sock.h:183:52: warning: 'struct xsk_tx_metadata_comp' declared inside parameter list will not be visible outside of this definition or declaration
+     183 | static inline void xsk_tx_metadata_complete(struct xsk_tx_metadata_comp *compl,
+         |                                                    ^~~~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c: In function 'mlx5e_free_xdpsq_desc':
+>> drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c:719:58: error: passing argument 1 of 'xsk_tx_metadata_complete' from incompatible pointer type [-Werror=incompatible-pointer-types]
+     719 |                                 xsk_tx_metadata_complete(compl, &mlx5e_xsk_tx_metadata_ops, &priv);
+         |                                                          ^~~~~
+         |                                                          |
+         |                                                          struct xsk_tx_metadata_compl *
+   include/net/xdp_sock.h:183:74: note: expected 'struct xsk_tx_metadata_comp *' but argument is of type 'struct xsk_tx_metadata_compl *'
+     183 | static inline void xsk_tx_metadata_complete(struct xsk_tx_metadata_comp *compl,
+         |                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
+   cc1: some warnings being treated as errors
+--
+   In file included from drivers/net/ethernet/mellanox/mlx5/core/en/xdp.h:36,
+                    from drivers/net/ethernet/mellanox/mlx5/core/en/xsk/tx.c:6:
+   include/net/xdp_sock.h:183:52: warning: 'struct xsk_tx_metadata_comp' declared inside parameter list will not be visible outside of this definition or declaration
+     183 | static inline void xsk_tx_metadata_complete(struct xsk_tx_metadata_comp *compl,
+         |                                                    ^~~~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/mellanox/mlx5/core/en/xsk/tx.c: In function 'mlx5e_xsk_tx':
+>> drivers/net/ethernet/mellanox/mlx5/core/en/xsk/tx.c:117:33: error: implicit declaration of function 'xsk_tx_metadata_to_compl'; did you mean 'xsk_tx_metadata_complete'? [-Werror=implicit-function-declaration]
+     117 |                                 xsk_tx_metadata_to_compl(meta, &compl);
+         |                                 ^~~~~~~~~~~~~~~~~~~~~~~~
+         |                                 xsk_tx_metadata_complete
+   cc1: some warnings being treated as errors
+
+
+vim +/xsk_tx_metadata_complete +719 drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
+
+   641	
+   642	static void mlx5e_free_xdpsq_desc(struct mlx5e_xdpsq *sq,
+   643					  struct mlx5e_xdp_wqe_info *wi,
+   644					  u32 *xsk_frames,
+   645					  struct xdp_frame_bulk *bq,
+   646					  struct mlx5e_cq *cq,
+   647					  struct mlx5_cqe64 *cqe)
+   648	{
+   649		struct mlx5e_xdp_info_fifo *xdpi_fifo = &sq->db.xdpi_fifo;
+   650		u16 i;
+   651	
+   652		for (i = 0; i < wi->num_pkts; i++) {
+   653			union mlx5e_xdp_info xdpi = mlx5e_xdpi_fifo_pop(xdpi_fifo);
+   654	
+   655			switch (xdpi.mode) {
+   656			case MLX5E_XDP_XMIT_MODE_FRAME: {
+   657				/* XDP_TX from the XSK RQ and XDP_REDIRECT */
+   658				struct xdp_frame *xdpf;
+   659				dma_addr_t dma_addr;
+   660	
+   661				xdpi = mlx5e_xdpi_fifo_pop(xdpi_fifo);
+   662				xdpf = xdpi.frame.xdpf;
+   663				xdpi = mlx5e_xdpi_fifo_pop(xdpi_fifo);
+   664				dma_addr = xdpi.frame.dma_addr;
+   665	
+   666				dma_unmap_single(sq->pdev, dma_addr,
+   667						 xdpf->len, DMA_TO_DEVICE);
+   668				if (xdp_frame_has_frags(xdpf)) {
+   669					struct skb_shared_info *sinfo;
+   670					int j;
+   671	
+   672					sinfo = xdp_get_shared_info_from_frame(xdpf);
+   673					for (j = 0; j < sinfo->nr_frags; j++) {
+   674						skb_frag_t *frag = &sinfo->frags[j];
+   675	
+   676						xdpi = mlx5e_xdpi_fifo_pop(xdpi_fifo);
+   677						dma_addr = xdpi.frame.dma_addr;
+   678	
+   679						dma_unmap_single(sq->pdev, dma_addr,
+   680								 skb_frag_size(frag), DMA_TO_DEVICE);
+   681					}
+   682				}
+   683				xdp_return_frame_bulk(xdpf, bq);
+   684				break;
+   685			}
+   686			case MLX5E_XDP_XMIT_MODE_PAGE: {
+   687				/* XDP_TX from the regular RQ */
+   688				u8 num, n = 0;
+   689	
+   690				xdpi = mlx5e_xdpi_fifo_pop(xdpi_fifo);
+   691				num = xdpi.page.num;
+   692	
+   693				do {
+   694					struct page *page;
+   695	
+   696					xdpi = mlx5e_xdpi_fifo_pop(xdpi_fifo);
+   697					page = xdpi.page.page;
+   698	
+   699					/* No need to check ((page->pp_magic & ~0x3UL) == PP_SIGNATURE)
+   700					 * as we know this is a page_pool page.
+   701					 */
+   702					page_pool_recycle_direct(page->pp, page);
+   703				} while (++n < num);
+   704	
+   705				break;
+   706			}
+   707			case MLX5E_XDP_XMIT_MODE_XSK: {
+   708				/* AF_XDP send */
+   709				struct xsk_tx_metadata_compl *compl = NULL;
+   710				struct mlx5e_xsk_tx_complete priv = {
+   711					.cqe = cqe,
+   712					.cq = cq,
+   713				};
+   714	
+   715				if (xp_tx_metadata_enabled(sq->xsk_pool)) {
+   716					xdpi = mlx5e_xdpi_fifo_pop(xdpi_fifo);
+   717					compl = &xdpi.xsk_meta;
+   718	
+ > 719					xsk_tx_metadata_complete(compl, &mlx5e_xsk_tx_metadata_ops, &priv);
+   720				}
+   721	
+   722				(*xsk_frames)++;
+   723				break;
+   724			}
+   725			default:
+   726				WARN_ON_ONCE(true);
+   727			}
+   728		}
+   729	}
+   730	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
