@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-34177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA20E7A273A
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 21:33:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E4867A2743
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 21:35:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA4481C20948
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 19:33:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0FBA282059
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 19:35:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF20819BD6;
-	Fri, 15 Sep 2023 19:33:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEE1E19BDB;
+	Fri, 15 Sep 2023 19:35:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6F1930CED
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 19:33:37 +0000 (UTC)
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C60D61FC9;
-	Fri, 15 Sep 2023 12:33:35 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 6D27C100009;
-	Fri, 15 Sep 2023 22:33:34 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 6D27C100009
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C037519BBD
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 19:35:52 +0000 (UTC)
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2C811BD3;
+	Fri, 15 Sep 2023 12:35:50 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 6BC05120006;
+	Fri, 15 Sep 2023 22:35:49 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 6BC05120006
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1694806414;
-	bh=v8qrWHEpktj/HI37WHvjpCicfK73rrI34hJOHObgZ+g=;
+	s=mail; t=1694806549;
+	bh=EoVRfIycVq5CUGfnsCjJEvjbWmLF3KZCRHTlIU2ad1c=;
 	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-	b=be8gWYSd5t78hgY0ruFA6FlGcYM/mn1oGHHMdKI8z7WnkQYVPgZ4+s+DVECBxXvUx
-	 02JgTRhNdNds2UHJkPyQLuBoJYOEDKGJa8EC/I6YP2z2D20ni46yKSICbUQcq6G4zx
-	 MD6xOsU7mRY14o3Zw9p1LgXOA+V9ow3k8hReIBvksW9RE6esjk1Wnfr7pLzk40rJm9
-	 C74TU+BGz7NC1m9fGfqgBPCyC/ZuTKq87pVZ+j/Mp1CxPyIy2b02FAsJ3Xhk81Kt3L
-	 UZdJjUHR7B1cDf/t3QRmxHkFxim+GDn+x59xFSEYrrSE0prv9Dr0lTbnbKLpPzqM6w
-	 FyMpEUiNx+lhw==
+	b=sKafJcg33wiPmnYgdgs/37KbtxssDPZT8snLLUyGWV6qQlRjtm26Jq7J72Dl5S5Es
+	 VM/Kd5ZF3zZe2YQuqv9wfBLduqClKz5Q5fB0HqHdPwXWbWDq1RKiUlPWq1OnHZR/6b
+	 Ny2CsL/cFGUkyHcXjovgZloL7udrHky5zOWV+bm8oSLsAvM6UFWc0akTK47JsO24Ls
+	 a7wH8s6rQzkdw+7K2D4yiDcPPE8Y8kkvlzJX8EYMbSJaIShukRymCFs1sIVFt/uWk8
+	 Ga5ts0oR5QPLWYP9PfMGNuoBUNZQCw88OBMzEFPha+/NWANPMjLlRMx/S4L7x0c5l+
+	 0v3t4anhgYrdw==
 Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
 	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Fri, 15 Sep 2023 22:33:34 +0300 (MSK)
+	Fri, 15 Sep 2023 22:35:49 +0300 (MSK)
 Received: from [192.168.0.106] (100.64.160.123) by
  p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Fri, 15 Sep 2023 22:33:33 +0300
-Message-ID: <fa40fd12-a0dd-0fdf-8f35-c842fca27207@salutedevices.com>
-Date: Fri, 15 Sep 2023 22:26:45 +0300
+ 15.2.1118.30; Fri, 15 Sep 2023 22:35:49 +0300
+Message-ID: <97ea5def-d82f-9f8b-fb45-8b37c3d96cb9@salutedevices.com>
+Date: Fri, 15 Sep 2023 22:29:06 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,16 +54,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.7.1
-Subject: Re: [PATCH net-next 4/5] vsock/test: use send_buf() in vsock_test.c
+Subject: Re: [PATCH net-next 5/5] vsock/test: track bytes in MSG_PEEK test for
+ SOCK_SEQPACKET
 Content-Language: en-US
 To: Stefano Garzarella <sgarzare@redhat.com>, <netdev@vger.kernel.org>
 CC: <linux-kernel@vger.kernel.org>,
 	<virtualization@lists.linux-foundation.org>, <oxffffaa@gmail.com>, Bobby
  Eshleman <bobby.eshleman@bytedance.com>
 References: <20230915121452.87192-1-sgarzare@redhat.com>
- <20230915121452.87192-5-sgarzare@redhat.com>
+ <20230915121452.87192-6-sgarzare@redhat.com>
 From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-In-Reply-To: <20230915121452.87192-5-sgarzare@redhat.com>
+In-Reply-To: <20230915121452.87192-6-sgarzare@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [100.64.160.123]
@@ -78,7 +79,7 @@ X-KSMG-AntiSpam-Rate: 0
 X-KSMG-AntiSpam-Status: not_detected
 X-KSMG-AntiSpam-Method: none
 X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 530 530 ecb1547b3f72d1df4c71c0b60e67ba6b4aea5432, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1;salutedevices.com:7.1.1;127.0.0.199:7.1.2;100.64.160.123:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-KSMG-AntiSpam-Info: LuaCore: 530 530 ecb1547b3f72d1df4c71c0b60e67ba6b4aea5432, {Tracking_from_domain_doesnt_match_to}, 100.64.160.123:7.1.2;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;salutedevices.com:7.1.1;127.0.0.199:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
 X-MS-Exchange-Organization-SCL: -1
 X-KSMG-AntiSpam-Interceptor-Info: scan successful
 X-KSMG-AntiPhishing: Clean
@@ -92,192 +93,61 @@ X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Small remark on 'Subject' - this is not MSG_PEEK test, it is test for sk_buff merging.
 
-
-On 15.09.2023 15:14, Stefano Garzarella wrote:
-> We have a very common pattern used in vsock_test that we can
-> now replace with the new send_buf().
-> 
-> This allows us to reuse the code we already had to check the
-> actual return value and wait for all the bytes to be sent with
-> an appropriate timeout.
-> 
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
->  tools/testing/vsock/vsock_test.c | 75 ++++----------------------------
->  1 file changed, 9 insertions(+), 66 deletions(-)
+Considering that:
 
 Reviewed-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
 
+Thanks, Arseniy
+
+On 15.09.2023 15:14, Stefano Garzarella wrote:
+> The test was a bit complicated to read.
+> Added variables to keep track of the bytes read and to be read
+> in each step. Also some comments.
+> 
+> The test is unchanged.
+> 
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>  tools/testing/vsock/vsock_test.c | 14 +++++++++++---
+>  1 file changed, 11 insertions(+), 3 deletions(-)
 > 
 > diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-> index d1dcbaeb477a..b18acbaf92e2 100644
+> index b18acbaf92e2..5743dcae2350 100644
 > --- a/tools/testing/vsock/vsock_test.c
 > +++ b/tools/testing/vsock/vsock_test.c
-> @@ -261,7 +261,6 @@ static void test_msg_peek_client(const struct test_opts *opts,
->  				 bool seqpacket)
+> @@ -1002,6 +1002,7 @@ static void test_stream_virtio_skb_merge_client(const struct test_opts *opts)
+>  
+>  static void test_stream_virtio_skb_merge_server(const struct test_opts *opts)
 >  {
->  	unsigned char buf[MSG_PEEK_BUF_LEN];
-> -	ssize_t send_size;
->  	int fd;
->  	int i;
->  
-> @@ -280,17 +279,7 @@ static void test_msg_peek_client(const struct test_opts *opts,
->  
->  	control_expectln("SRVREADY");
->  
-> -	send_size = send(fd, buf, sizeof(buf), 0);
-> -
-> -	if (send_size < 0) {
-> -		perror("send");
-> -		exit(EXIT_FAILURE);
-> -	}
-> -
-> -	if (send_size != sizeof(buf)) {
-> -		fprintf(stderr, "Invalid send size %zi\n", send_size);
-> -		exit(EXIT_FAILURE);
-> -	}
-> +	send_buf(fd, buf, sizeof(buf), 0, sizeof(buf));
->  
->  	close(fd);
->  }
-> @@ -385,7 +374,6 @@ static void test_seqpacket_msg_bounds_client(const struct test_opts *opts)
->  	msg_count = SOCK_BUF_SIZE / MAX_MSG_SIZE;
->  
->  	for (int i = 0; i < msg_count; i++) {
-> -		ssize_t send_size;
->  		size_t buf_size;
->  		int flags;
->  		void *buf;
-> @@ -413,17 +401,7 @@ static void test_seqpacket_msg_bounds_client(const struct test_opts *opts)
->  			flags = 0;
->  		}
->  
-> -		send_size = send(fd, buf, buf_size, flags);
-> -
-> -		if (send_size < 0) {
-> -			perror("send");
-> -			exit(EXIT_FAILURE);
-> -		}
-> -
-> -		if (send_size != buf_size) {
-> -			fprintf(stderr, "Invalid send size\n");
-> -			exit(EXIT_FAILURE);
-> -		}
-> +		send_buf(fd, buf, buf_size, flags, buf_size);
->  
->  		/*
->  		 * Hash sum is computed at both client and server in
-> @@ -524,10 +502,7 @@ static void test_seqpacket_msg_trunc_client(const struct test_opts *opts)
->  		exit(EXIT_FAILURE);
->  	}
->  
-> -	if (send(fd, buf, sizeof(buf), 0) != sizeof(buf)) {
-> -		perror("send failed");
-> -		exit(EXIT_FAILURE);
-> -	}
-> +	send_buf(fd, buf, sizeof(buf), 0, sizeof(buf));
->  
->  	control_writeln("SENDDONE");
->  	close(fd);
-> @@ -649,7 +624,6 @@ static void test_seqpacket_timeout_server(const struct test_opts *opts)
->  static void test_seqpacket_bigmsg_client(const struct test_opts *opts)
->  {
->  	unsigned long sock_buf_size;
-> -	ssize_t send_size;
->  	socklen_t len;
->  	void *data;
->  	int fd;
-> @@ -676,18 +650,7 @@ static void test_seqpacket_bigmsg_client(const struct test_opts *opts)
->  		exit(EXIT_FAILURE);
->  	}
->  
-> -	send_size = send(fd, data, sock_buf_size, 0);
-> -	if (send_size != -1) {
-> -		fprintf(stderr, "expected 'send(2)' failure, got %zi\n",
-> -			send_size);
-> -		exit(EXIT_FAILURE);
-> -	}
-> -
-> -	if (errno != EMSGSIZE) {
-> -		fprintf(stderr, "expected EMSGSIZE in 'errno', got %i\n",
-> -			errno);
-> -		exit(EXIT_FAILURE);
-> -	}
-> +	send_buf(fd, data, sock_buf_size, 0, -EMSGSIZE);
->  
->  	control_writeln("CLISENT");
->  
-> @@ -741,15 +704,9 @@ static void test_seqpacket_invalid_rec_buffer_client(const struct test_opts *opt
->  	memset(buf1, BUF_PATTERN_1, buf_size);
->  	memset(buf2, BUF_PATTERN_2, buf_size);
->  
-> -	if (send(fd, buf1, buf_size, 0) != buf_size) {
-> -		perror("send failed");
-> -		exit(EXIT_FAILURE);
-> -	}
-> +	send_buf(fd, buf1, buf_size, 0, buf_size);
->  
-> -	if (send(fd, buf2, buf_size, 0) != buf_size) {
-> -		perror("send failed");
-> -		exit(EXIT_FAILURE);
-> -	}
-> +	send_buf(fd, buf2, buf_size, 0, buf_size);
->  
->  	close(fd);
->  }
-> @@ -972,7 +929,6 @@ static void test_inv_buf_client(const struct test_opts *opts, bool stream)
->  static void test_inv_buf_server(const struct test_opts *opts, bool stream)
->  {
->  	unsigned char data[INV_BUF_TEST_DATA_LEN] = {0};
-> -	ssize_t res;
+> +	size_t read = 0, to_read;
+>  	unsigned char buf[64];
 >  	int fd;
 >  
->  	if (stream)
-> @@ -985,11 +941,7 @@ static void test_inv_buf_server(const struct test_opts *opts, bool stream)
->  		exit(EXIT_FAILURE);
->  	}
+> @@ -1014,14 +1015,21 @@ static void test_stream_virtio_skb_merge_server(const struct test_opts *opts)
+>  	control_expectln("SEND0");
 >  
-> -	res = send(fd, data, sizeof(data), 0);
-> -	if (res != sizeof(data)) {
-> -		fprintf(stderr, "unexpected send(2) result %zi\n", res);
-> -		exit(EXIT_FAILURE);
-> -	}
-> +	send_buf(fd, data, sizeof(data), 0, sizeof(data));
+>  	/* Read skbuff partially. */
+> -	recv_buf(fd, buf, 2, 0, 2);
+> +	to_read = 2;
+> +	recv_buf(fd, buf + read, to_read, 0, to_read);
+> +	read += to_read;
 >  
->  	control_writeln("SENDDONE");
+>  	control_writeln("REPLY0");
+>  	control_expectln("SEND1");
 >  
-> @@ -1023,7 +975,6 @@ static void test_seqpacket_inv_buf_server(const struct test_opts *opts)
+> -	recv_buf(fd, buf + 2, 8, 0, 8);
+> +	/* Read the rest of both buffers */
+> +	to_read = strlen(HELLO_STR WORLD_STR) - read;
+> +	recv_buf(fd, buf + read, to_read, 0, to_read);
+> +	read += to_read;
 >  
->  static void test_stream_virtio_skb_merge_client(const struct test_opts *opts)
->  {
-> -	ssize_t res;
->  	int fd;
+> -	recv_buf(fd, buf, sizeof(buf) - 8 - 2, MSG_DONTWAIT, -EAGAIN);
+> +	/* No more bytes should be there */
+> +	to_read = sizeof(buf) - read;
+> +	recv_buf(fd, buf + read, to_read, MSG_DONTWAIT, -EAGAIN);
 >  
->  	fd = vsock_stream_connect(opts->peer_cid, 1234);
-> @@ -1033,22 +984,14 @@ static void test_stream_virtio_skb_merge_client(const struct test_opts *opts)
->  	}
->  
->  	/* Send first skbuff. */
-> -	res = send(fd, HELLO_STR, strlen(HELLO_STR), 0);
-> -	if (res != strlen(HELLO_STR)) {
-> -		fprintf(stderr, "unexpected send(2) result %zi\n", res);
-> -		exit(EXIT_FAILURE);
-> -	}
-> +	send_buf(fd, HELLO_STR, strlen(HELLO_STR), 0, strlen(HELLO_STR));
->  
->  	control_writeln("SEND0");
->  	/* Peer reads part of first skbuff. */
->  	control_expectln("REPLY0");
->  
->  	/* Send second skbuff, it will be appended to the first. */
-> -	res = send(fd, WORLD_STR, strlen(WORLD_STR), 0);
-> -	if (res != strlen(WORLD_STR)) {
-> -		fprintf(stderr, "unexpected send(2) result %zi\n", res);
-> -		exit(EXIT_FAILURE);
-> -	}
-> +	send_buf(fd, WORLD_STR, strlen(WORLD_STR), 0, strlen(WORLD_STR));
->  
->  	control_writeln("SEND1");
->  	/* Peer reads merged skbuff packet. */
+>  	if (memcmp(buf, HELLO_STR WORLD_STR, strlen(HELLO_STR WORLD_STR))) {
+>  		fprintf(stderr, "pattern mismatch\n");
 
