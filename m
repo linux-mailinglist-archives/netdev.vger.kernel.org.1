@@ -1,69 +1,77 @@
-Return-Path: <netdev+bounces-34182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 894037A274E
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 21:43:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 195BD7A2770
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 21:52:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D9F71C209B7
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 19:43:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7923282194
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 19:52:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F25941A73C;
-	Fri, 15 Sep 2023 19:43:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11ECF1B261;
+	Fri, 15 Sep 2023 19:52:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A336D19BDC
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 19:43:08 +0000 (UTC)
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A84A1FD0
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 12:43:06 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id 98e67ed59e1d1-2749b003363so784261a91.2
-        for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 12:43:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1694806985; x=1695411785; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KYJud1t9lPyuPjtdwBUAsD3BvXWOOoP+siQ8uzoHdDU=;
-        b=lv1AMfeEfiHIn4vWjkJMk6a+yMVmMhhtfeZJjM3put5fvaifKq7g2lhVGwER0Daw93
-         ynoj6O+ATUqllHBeZro2u7NTsIzpaJVLN41BpjOzxK86MFYu8nPdhlfnc4Wpprd8egsv
-         I1F+LPgHMza92k1ilz+o8T0LlusPuOj0FSAFI=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4538330D01
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 19:52:34 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5C527211E
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 12:52:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1694807551;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HNgfdJeO076tImx6jFh9hOiFdIPM4yz7+TlZmmONbfo=;
+	b=caYd3g/OTvPdRkqJGjSUOni9v8dLL1ubt/idcXL2Pgv5sQztmarzgqw9LAmU0ZRAl+T6WF
+	Kyw8+9gfA3zlTzVvsxV+2GiEwlrVYWO3PXB2ymx1b4MiCBqdg4Q6ErBA40DHGMFW7B16u1
+	fJw0WJ4y0JDmXv3lA2fRRZtau9WZDYM=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-470-_L0Upw1bM1O-EgMbwCLbtA-1; Fri, 15 Sep 2023 15:52:29 -0400
+X-MC-Unique: _L0Upw1bM1O-EgMbwCLbtA-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-3f5df65fa35so19320995e9.3
+        for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 12:52:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694806985; x=1695411785;
+        d=1e100.net; s=20230601; t=1694807547; x=1695412347;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KYJud1t9lPyuPjtdwBUAsD3BvXWOOoP+siQ8uzoHdDU=;
-        b=A9Y61o6/WT3ZNZYq6GE5KwtPwyHYFbitTamnticaWGm9X5eDlEwUW5bvdWRLDC7JMc
-         7rn8GhAIHOIOOeX/ZCxEgro11bsLdRF7J3ndVGocVTiveba2/0BcJ4KI8yJ/XCVloZZQ
-         f6aVBBqnFgDZ0iuo1dSoXG/OWPJkepYU9XKwDxb/bg6+61iU79a3tb2PbdNonEXXYn3U
-         bik88spP/gr31KsPd4z+7KmwGEltJynkO2i5Di/YSWBeKU7XA9tXRnxidemjvnOV+UiS
-         YghqaoMV8jCsZAzJruUcYjhh8XZwg6/7Mon760912/m5PK5MIJyBRPNaULgIDqExMess
-         wNJw==
-X-Gm-Message-State: AOJu0YzOK4BRD8t/WcZpngUk2bzEXYXDEuWW6voNseZ64DHfivCWdc8n
-	mwmICy+3WMGmV+gqFuK5pfNk9w==
-X-Google-Smtp-Source: AGHT+IFeG9K8dCFdWE7JO8su8gomrvm80dps740wxaqk3Qc6GiQQ8BQQx0l1yX49avLzT86ttQjnhw==
-X-Received: by 2002:a17:90b:38ce:b0:274:96a:5007 with SMTP id nn14-20020a17090b38ce00b00274096a5007mr2503313pjb.1.1694806985660;
-        Fri, 15 Sep 2023 12:43:05 -0700 (PDT)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id ft7-20020a17090b0f8700b0026309d57724sm5200947pjb.39.2023.09.15.12.43.05
+        bh=HNgfdJeO076tImx6jFh9hOiFdIPM4yz7+TlZmmONbfo=;
+        b=QKXjLE9YBGpzebS5W13d71sbYqsJrCprnX+Szh4sepshtqFPfoh13sh5Mt0VpnT+eI
+         BtArzj6gWzo+bsr9QwJw+K5L8Q9DGdaf0gEPUAJ7k3IOm+uLZ28HrlHO0sNXCmmOcdvJ
+         aZ+fqbEd3otuSyMTlGc0b406bpTcn2UAcTV2AkSrivK1ORFaT5X3XoWKP14g7e6HgRs7
+         GZ8tKMt/008OqGzrMcIZKqP2Aj+mc3p+hE7AZXp2xEJi7mAyfpAocj0Y61pFoAyNBqX/
+         uKsppv5O2QsIIhGEgaxU6e2ZoAKEvCyplvwlXJA5/PV7HkGrdJVjno0qHjmto5yDLZi+
+         rFhQ==
+X-Gm-Message-State: AOJu0YxdovBPdHsHMrEULfBkD1O7Q6h49+dKS6aNmYi9mFadHIuJaxHV
+	qjysay/AlnwtXzsgVW7xu/LlOXW9IhWFc5oux2AVEcav1Ysepmj2trMJwNWeJn0WPHCH6ueluyU
+	lRkvT2i3AAYM/HKj/cuy9cqkb
+X-Received: by 2002:a7b:c40d:0:b0:403:bb3:28bf with SMTP id k13-20020a7bc40d000000b004030bb328bfmr2261436wmi.23.1694807547635;
+        Fri, 15 Sep 2023 12:52:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEmlmT0ooNTnsAwr0JuC93RZbtPuUICSBkNB34kVLhlyWNQHIW9rl6cri/YkGGKH+2LXdQkpA==
+X-Received: by 2002:a7b:c40d:0:b0:403:bb3:28bf with SMTP id k13-20020a7bc40d000000b004030bb328bfmr2261420wmi.23.1694807547265;
+        Fri, 15 Sep 2023 12:52:27 -0700 (PDT)
+Received: from localhost ([37.163.8.26])
+        by smtp.gmail.com with ESMTPSA id n12-20020a05600c294c00b003ff3b964a9asm8289732wmd.39.2023.09.15.12.52.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Sep 2023 12:43:05 -0700 (PDT)
-Date: Fri, 15 Sep 2023 12:43:04 -0700
-From: Kees Cook <keescook@chromium.org>
-To: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc: Jon Maloy <jmaloy@redhat.com>, Ying Xue <ying.xue@windriver.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH][next] tipc: Use size_add() in calls to struct_size()
-Message-ID: <202309151243.647E424@keescook>
-References: <ZQStiorAZPgfMMZD@work>
+        Fri, 15 Sep 2023 12:52:26 -0700 (PDT)
+Date: Fri, 15 Sep 2023 21:52:22 +0200
+From: Andrea Claudi <aclaudi@redhat.com>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org, Roopa Prabhu <roopa@nvidia.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	bridge@lists.linux-foundation.org, David Ahern <dsahern@gmail.com>
+Subject: Re: [PATCH iproute2-next 1/2] configure: add the --color option
+Message-ID: <ZQS19lwZlso1AMAR@renaissance-vector>
+References: <cover.1694625043.git.aclaudi@redhat.com>
+ <844947000ac7744a3b40b10f9cf971fd15572195.1694625043.git.aclaudi@redhat.com>
+ <20230915085912.78ffd25c@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,25 +80,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZQStiorAZPgfMMZD@work>
+In-Reply-To: <20230915085912.78ffd25c@hermes.local>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Sep 15, 2023 at 01:16:26PM -0600, Gustavo A. R. Silva wrote:
-> If, for any reason, the open-coded arithmetic causes a wraparound,
-> the protection that `struct_size()` adds against potential integer
-> overflows is defeated. Fix this by hardening call to `struct_size()`
-> with `size_add()`.
+On Fri, Sep 15, 2023 at 08:59:12AM -0700, Stephen Hemminger wrote:
+> On Wed, 13 Sep 2023 19:58:25 +0200
+> Andrea Claudi <aclaudi@redhat.com> wrote:
 > 
-> Fixes: e034c6d23bc4 ("tipc: Use struct_size() helper")
-> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+> > This commit allows users/packagers to choose a default for the color
+> > output feature provided by some iproute2 tools.
+> > 
+> > The configure script option is documented in the script itself and it is
+> > pretty much self-explanatory. The default value is set to "never" to
+> > avoid changes to the current ip, tc, and bridge behaviour.
+> > 
+> > Signed-off-by: Andrea Claudi <aclaudi@redhat.com>
+> > ---
+> 
+> More build time config is not the answer either.
+> Don't want complaints from distribution users about the change.
+> Needs to be an environment variable or config file.
+>
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
+Hi Stephen,
+This is not modifying the default behaviour; as David noted color output
+will be off as it is right now. If packagers want to make use of this,
+it's up to them to choose a sane default for their environment. After
+all, we are providing options such as '--prefix' and '--libdir', and
+there are endless possibilities to choose obviously wrong values for
+these vars. Packagers are gonna deal with their own choices.
 
--- 
-Kees Cook
+I think I can improve this in two ways:
+
+1. Exclude 'always' from the allowed color choices
+This is the setting with the highest chance to produce complaints, since
+it is enabling color output regardless of stdout state. 'auto' instead
+produces color output only on stdout that are terminals. Of course
+'always' will remain as a param choice for the command line.
+
+2. Add packaging guidelines to README (or README.packaging)
+iproute packaging is a bit tricky, since some packaging systems simply
+assume that configure comes from autotools. We even leverage this to our
+advantage, providing configure options that packaging systems use
+flawlessly as the autotools ones. I can provide some info about this,
+and add some recommendations about sane configure defaults, especially
+about the --color option.
+
+What do you think? Is this approach fine for you?
+
 
