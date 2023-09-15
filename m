@@ -1,139 +1,100 @@
-Return-Path: <netdev+bounces-34127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5193D7A2391
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 18:28:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D38F67A2393
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 18:28:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C2F528267A
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 16:28:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86C231C20A2B
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 16:28:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2142125AE;
-	Fri, 15 Sep 2023 16:28:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E77125B1;
+	Fri, 15 Sep 2023 16:28:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC1BA30D04
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 16:28:04 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EEDEE69;
-	Fri, 15 Sep 2023 09:28:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694795283; x=1726331283;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=jWPmuh3AP2eau1bdvZPWN1uwQnHbBAhrFZvD7Bt9Gs8=;
-  b=NcSsyBvKHYj6tJjybY7Z89of1VCdKIhYwSXSKNd6pmollbKdZFpF8Rfa
-   fdKp2ycoHpR2NHhVfanKnbtbNAYmTi86+9yyRRW6ObHPbJhxllYMksCb9
-   j7JKc3R9W8G94UW7rKkGnN8PxjnSfsS8JuTcssnBUdxLxEnqPJEXw+KzT
-   2cuKgDawkGM+6FicsKES0VS09sjjvVBnhHFkkvdtD/vUue4rJyj7NCV6C
-   m9WYYZf9n49czlktcPjev/p8zxTlqhq+SkG+pDwTAdW95OUeYn8RF9XX8
-   AHV+RN4E5KzKZ9WQephLQEaCwkWl9b4aDJMx91ehD91NtBoeqWs3m/Czv
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10834"; a="358708033"
-X-IronPort-AV: E=Sophos;i="6.02,149,1688454000"; 
-   d="scan'208";a="358708033"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2023 09:28:02 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10834"; a="918704671"
-X-IronPort-AV: E=Sophos;i="6.02,149,1688454000"; 
-   d="scan'208";a="918704671"
-Received: from lkp-server02.sh.intel.com (HELO 9ef86b2655e5) ([10.239.97.151])
-  by orsmga005.jf.intel.com with ESMTP; 15 Sep 2023 09:27:59 -0700
-Received: from kbuild by 9ef86b2655e5 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qhBfh-0003BQ-25;
-	Fri, 15 Sep 2023 16:27:57 +0000
-Date: Sat, 16 Sep 2023 00:27:51 +0800
-From: kernel test robot <lkp@intel.com>
-To: Ma Ke <make_ruc2021@163.com>, jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Ma Ke <make_ruc2021@163.com>
-Subject: Re: [PATCH] net: sched: hfsc: dont intepret cls results when asked
- to drop
-Message-ID: <202309160007.7615P5Df-lkp@intel.com>
-References: <20230915134408.3410595-1-make_ruc2021@163.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22AA411CBF;
+	Fri, 15 Sep 2023 16:28:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B929C433C8;
+	Fri, 15 Sep 2023 16:28:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694795332;
+	bh=xFP4xP9LgYUNQYWlHLEw+gHE48/2qAyc2EfESi3YoiI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ONYvrKPbd80wQteDgGA4/C/inRBfN9eLEkTU51VoXcnrs4QWl1IRU7FQOEp/FL9kT
+	 DDIRkzvi9g06a8WNelzs4R/OZlsX5jDMIkw4kX80Wa2/vkR5+Awuq8XIADoqzamYaW
+	 5k6K6uPdYabwSUxl2ZJREpYDAEGIw+oCxriQKyweKmzoAld0wh3+4GtUGB22UtwHMc
+	 YdmwhlPGcsvXWAxbBi3TsTc0FhnODy1d7cHx52xbmLwN+1wxbMZjnT+l62d2VqxjiC
+	 anMmFZfFL9QCgoG4XHGROHf6NS0TsPlRlKNXw8ZnFlf8Vf0gdH8Wt3IFMAokM+jdjX
+	 txiefVRftqsiw==
+Date: Fri, 15 Sep 2023 18:28:48 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Rob Herring <robh@kernel.org>
+Cc: netdev@vger.kernel.org, lorenzo.bianconi@redhat.com, nbd@nbd.name,
+	john@phrozen.org, sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, daniel@makrotopia.org,
+	linux-mediatek@lists.infradead.org, sujuan.chen@mediatek.com,
+	krzysztof.kozlowski+dt@linaro.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next 10/15] net: ethernet: mtk_wed: introduce WED
+ support for MT7988
+Message-ID: <ZQSGQH5n78e0wpz7@lore-desk>
+References: <cover.1694701767.git.lorenzo@kernel.org>
+ <330efa9f15a6da8a8e7596d3a942f3e893730e12.1694701767.git.lorenzo@kernel.org>
+ <20230915145548.GA3704791-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Yyt0PgioCXTYT4h4"
+Content-Disposition: inline
+In-Reply-To: <20230915145548.GA3704791-robh@kernel.org>
+
+
+--Yyt0PgioCXTYT4h4
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230915134408.3410595-1-make_ruc2021@163.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: quoted-printable
 
-Hi Ma,
+> On Thu, Sep 14, 2023 at 04:38:15PM +0200, Lorenzo Bianconi wrote:
+> > From: Sujuan Chen <sujuan.chen@mediatek.com>
+> >=20
+> > Similar to MT7986 and MT7622, enable Wireless Ethernet Ditpatcher for
+[...]
+> > -	ring_size =3D dev->wlan.nbuf & ~(MTK_WED_BUF_PER_PAGE - 1);
+> > -	n_pages =3D ring_size / MTK_WED_BUF_PER_PAGE;
+> > +	if (!mtk_wed_is_v3_or_greater(dev->hw)) {
+> > +		dev->tx_buf_ring.desc_size =3D sizeof(struct mtk_wdma_desc);
+>=20
+> Instead of checking the version or using of_device_is_compatible() in=20
+> other places why don't you define driver match data for all this static=
+=20
+> data.
 
-kernel test robot noticed the following build warnings:
+ack, I will look into it.
 
-[auto build test WARNING on net-next/main]
-[also build test WARNING on net/main linus/master v6.6-rc1 next-20230915]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Regards,
+Lorenzo
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Ma-Ke/net-sched-hfsc-dont-intepret-cls-results-when-asked-to-drop/20230915-214635
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20230915134408.3410595-1-make_ruc2021%40163.com
-patch subject: [PATCH] net: sched: hfsc: dont intepret cls results when asked to drop
-config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/20230916/202309160007.7615P5Df-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230916/202309160007.7615P5Df-lkp@intel.com/reproduce)
+>=20
+> Rob
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202309160007.7615P5Df-lkp@intel.com/
+--Yyt0PgioCXTYT4h4
+Content-Type: application/pgp-signature; name="signature.asc"
 
-All warnings (new ones prefixed by >>):
+-----BEGIN PGP SIGNATURE-----
 
-   In file included from include/linux/compiler_types.h:80,
-                    from <command-line>:
-   net/sched/sch_hfsc.c: In function 'hfsc_classify':
->> include/linux/compiler_attributes.h:227:41: warning: attribute 'fallthrough' not preceding a case label or default label
-     227 | # define fallthrough                    __attribute__((__fallthrough__))
-         |                                         ^~~~~~~~~~~~~
-   net/sched/sch_hfsc.c:1146:25: note: in expansion of macro 'fallthrough'
-    1146 |                         fallthrough;
-         |                         ^~~~~~~~~~~
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZQSGQAAKCRA6cBh0uS2t
+rJXiAQCakzUT0GOnyU0/R38SoArHgoeIBl5bxY1xtoxwJOUMgwD/b+t/uUG8UFJk
+rErIrPODkOdRCFq961CiUNRTVAzv+w0=
+=SpFW
+-----END PGP SIGNATURE-----
 
-
-vim +/fallthrough +227 include/linux/compiler_attributes.h
-
-294f69e662d157 Joe Perches   2019-10-05  214  
-294f69e662d157 Joe Perches   2019-10-05  215  /*
-294f69e662d157 Joe Perches   2019-10-05  216   * Add the pseudo keyword 'fallthrough' so case statement blocks
-294f69e662d157 Joe Perches   2019-10-05  217   * must end with any of these keywords:
-294f69e662d157 Joe Perches   2019-10-05  218   *   break;
-294f69e662d157 Joe Perches   2019-10-05  219   *   fallthrough;
-ca0760e7d79e2b Wei Ming Chen 2021-05-06  220   *   continue;
-294f69e662d157 Joe Perches   2019-10-05  221   *   goto <label>;
-294f69e662d157 Joe Perches   2019-10-05  222   *   return [expression];
-294f69e662d157 Joe Perches   2019-10-05  223   *
-294f69e662d157 Joe Perches   2019-10-05  224   *  gcc: https://gcc.gnu.org/onlinedocs/gcc/Statement-Attributes.html#Statement-Attributes
-294f69e662d157 Joe Perches   2019-10-05  225   */
-294f69e662d157 Joe Perches   2019-10-05  226  #if __has_attribute(__fallthrough__)
-294f69e662d157 Joe Perches   2019-10-05 @227  # define fallthrough                    __attribute__((__fallthrough__))
-294f69e662d157 Joe Perches   2019-10-05  228  #else
-294f69e662d157 Joe Perches   2019-10-05  229  # define fallthrough                    do {} while (0)  /* fallthrough */
-a3f8a30f3f0079 Miguel Ojeda  2018-08-30  230  #endif
-a3f8a30f3f0079 Miguel Ojeda  2018-08-30  231  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+--Yyt0PgioCXTYT4h4--
 
