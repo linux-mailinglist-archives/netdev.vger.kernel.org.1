@@ -1,279 +1,218 @@
-Return-Path: <netdev+bounces-34131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA5AF7A23C2
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 18:43:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 524387A2400
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 18:56:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB92B1C20B77
-	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 16:43:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 664A81C20936
+	for <lists+netdev@lfdr.de>; Fri, 15 Sep 2023 16:56:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0E3811C86;
-	Fri, 15 Sep 2023 16:43:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E4A7125B6;
+	Fri, 15 Sep 2023 16:55:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2B43107B5
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 16:43:43 +0000 (UTC)
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 762F52701
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 09:43:41 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id 98e67ed59e1d1-2746af1b835so1629242a91.2
-        for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 09:43:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1694796221; x=1695401021; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=m53qMJm4RuVXwBwIzA52N27etyKUHXZb5lwpVSZrmRc=;
-        b=Iq4AgKyjEfi/cnti1RY5Veg+BZbtAqy0RFL4H0Q9YjzbmqfRRNuToXMBAbhr9qO2ap
-         MClp7u0C9cK+c119Et1ZvKiU+C8nuR4mXMZBvBepH/7KehUBQfWZk8zPnMI9I6AL5EXN
-         b3NmyjxGL9PT56xR8wM/H1OiEBVIHHYjdLPgJhr+guo050L0FTO/dBvIRfJujqNjUQ3j
-         +gPWoNIX+RXpsbwWI8DWqIZhRqUqrJcH73+26eSvGMat4r381qmNlLIxxPaag17rpdxt
-         XWhdcfP0zo078AktaJ8LW4G4ZY/Svx0tg2Wfv72w4Vz2JAzoNHI7bugSxKZHPqQFOHt1
-         u41A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694796221; x=1695401021;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=m53qMJm4RuVXwBwIzA52N27etyKUHXZb5lwpVSZrmRc=;
-        b=AfHGbsSqy9v8N91Ko/IhtmTErbqk11lScysNjWLKsTzinXLiti6XO3vUQhX70jaU4j
-         u+bOW2zfzOvRLbc7RcySNKhGLwmI8PyhimdfDSWUVeuI3E4eJhvt9jVDf1f2lJI52M0V
-         TXCaaNwCNgo5g9oFIAALlUhFVYCqYbzglFW0Fs4+fpzDk1bm2rep4MUNeMjM6PynbnsK
-         DFr3U1IKxMZ0aXsVeYMmY7Jj42GZnIXYFAHS+B3cQmpbXsRUFOJxXTwvMTYPh3Br47AU
-         2nr3G7YPMknE2y5lXRz7TFleZ+g8zM1Kr+4TMcbwQ/pWDiEFI/R6b4XExLY4et76a1t4
-         x8VA==
-X-Gm-Message-State: AOJu0YzvSXXaihNG2+IcNqeKWUetT39VgnIW64Ck5MpajUnO54YEjtzN
-	Whe4fPtBsR0V9upcXz8Is1DYD4+bBzLpktdMH6w=
-X-Google-Smtp-Source: AGHT+IF+Eo6aQfN5dKcO0ndT8Ae4xIM0dmcr/AoB6qcT06O833vqIhGf5Vky2gBRs7knj4FdnjAXhQ==
-X-Received: by 2002:a17:90a:4b06:b0:26f:2c5a:bbb3 with SMTP id g6-20020a17090a4b0600b0026f2c5abbb3mr1878549pjh.40.1694796220625;
-        Fri, 15 Sep 2023 09:43:40 -0700 (PDT)
-Received: from hermes.local (204-195-112-131.wavecable.com. [204.195.112.131])
-        by smtp.gmail.com with ESMTPSA id n14-20020a17090ac68e00b002680b2d2ab6sm5019701pjt.19.2023.09.15.09.43.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Sep 2023 09:43:40 -0700 (PDT)
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: netdev@vger.kernel.org
-Cc: Stephen Hemminger <stephen@networkplumber.org>
-Subject: [RFC iproute] allow overriding color option in environment
-Date: Fri, 15 Sep 2023 09:43:30 -0700
-Message-Id: <20230915164330.59642-1-stephen@networkplumber.org>
-X-Mailer: git-send-email 2.39.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A20E1094C
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 16:55:56 +0000 (UTC)
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2083.outbound.protection.outlook.com [40.107.243.83])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB4452126
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 09:55:52 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZRSsEjouExx+BbEsv63WNSFoQ/w7oVfk3NEhx1+AhD69iSgSqgaqyB4vLpVQiXUWSdRHUIuQYpL1NEzKYKWuGyXwIqruWmW8tie0dCY2x9ai6sWFOj9MOhswVmoJBDxrRpottokqYi6+rPQsG8V9cVFa6sP0rLeN9kAh0t0ClVgYNW2n0M+pLErld9Pp3UXfq1fn5Zb9Resih9nk/yyn8cTjcijwJjpywWdzM6rEK/PFddsoUjVw1r+6UEu9KbQ5IXqkXFM1VPiaurdpBR9FQ7vnpoJMJHSczlYItCT/0MjDswXHW7c71hYZoRlL75FCCuo9GwH4yfvY+hIcx5s1/g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=oSfKtXY8oUturWf3q6PHWRBPmaiR6uja3l3esxRCw1E=;
+ b=LXIj0Hqev2jbFHAHmR/G+iUMrVCc0nx7eY4C+IuQ6nw2aRrkSquP0V2RXH8Wa9019qGQ/u0uLerzoMT+9AI805MepuPBxa2L49RiEBbq8WbeUlT3hfzW/HSWsMNBDSeygBn+C2fBV3MBm3lasN94K0vN00nTNUQG9/9HVnN2v4K133IvDSPE+859voh2l59Y0T0ervpOKgwvOE0Tqkz9eNj5cgizzRQW15gLzw28AMaTKL1mdFKe6nHic13waLK3xbvntO4U+dC1y0gaNZv/U97mVYgixr90J4s19gj8VMdMjGikIaerO2END+y0ripD7Ammp3uU4E+eEicTz6mI/w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oSfKtXY8oUturWf3q6PHWRBPmaiR6uja3l3esxRCw1E=;
+ b=vPGDsgU6PzA0X7dHCqvc+JUqBqehf5CLG1tQW+Z+zG0+6CKp2bLLJ60OOiTrtS9Lakc2SdBuzQW/XMMu9hEjEBfTGyJ2vHOHDVQzEGihLwpOQWmCUPvkMdpF+6cR16qt9Qu1XPHCHPhZFW7er7Mt2V/pD7wm17JG/AjJSE9riBc=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
+ BL1PR12MB5302.namprd12.prod.outlook.com (2603:10b6:208:31d::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.20; Fri, 15 Sep
+ 2023 16:55:50 +0000
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::5c9:9a26:e051:ddd2]) by DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::5c9:9a26:e051:ddd2%7]) with mapi id 15.20.6792.020; Fri, 15 Sep 2023
+ 16:55:50 +0000
+Message-ID: <96eecedf-a7af-4a66-8377-bb411adf7919@amd.com>
+Date: Fri, 15 Sep 2023 09:55:46 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] ionic: fix 16bit math issue when PAGE_SIZE >= 64KB
+Content-Language: en-US
+To: David Christensen <drc@ibm.com>, brett.creeley@amd.com,
+ drivers@pensando.io
+Cc: netdev@vger.kernel.org, David Christensen <drc@linux.vnet.ibm.com>
+References: <20230911222212.103406-1-drc@linux.vnet.ibm.com>
+ <20230914220252.286248-1-drc@ibm.com>
+From: "Nelson, Shannon" <shannon.nelson@amd.com>
+In-Reply-To: <20230914220252.286248-1-drc@ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BY3PR04CA0028.namprd04.prod.outlook.com
+ (2603:10b6:a03:217::33) To DS0PR12MB6583.namprd12.prod.outlook.com
+ (2603:10b6:8:d1::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|BL1PR12MB5302:EE_
+X-MS-Office365-Filtering-Correlation-Id: 645e2c8c-9445-442c-56d3-08dbb60c9d5b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	96AHSmDc7BxBJFrVOAlLTLPRPwB/PtRpTxxqifS6lQJndhqnkf0M8VBTbP3vuxwgHvgj9OOf1fYcEzV3XOiAK67oCF5uSSSdVwYTn7Nq179X6Jrf9LROWoPT2XCvBmqZDP/zAUtg87X388T+DEE804h5XugQbyAQtdGIszjl5O9ES4kc4/My/j9QhB43xov0/vLhtCbokf4ANhkES3E19TmTEr0e7JUt3Fd4IkVhsiLJIy7Vch26cK8uF4znH1Jef0PgNIEwz0VrJzeFj6YMWJFj9Yw7gus30Ryn7jhCW+fCp2FVgt963TZ+V7vGchkcKNp6xgoO3ECCIo62whETfJFYctFM/HM5mDczrdmoKUMY06hARpdIc1MECPkO7EfN9a0HiN2n5o3oZ3xaD+7G369ebQmOfT2OAi9IQLZI3sEVGUtTUDxFp7QjR8YRqnIDIwH/xxPZ8LLKxrsmjmrv5d2XkaPLw8VoA5NncWgqSiFRYPo78SAVX1k1jeSBjo8WlvlTFj4QxUIjQ3YGw2JvUwYPHBzFkMa0EzjIoS1gVBY1MDJW2xNjPB6LjtAB3qWx/dYTEq5gGtD10hvyUWEALlAuSHKXY0nMPBGgiFtel9MO8aiAMKRb+6IPHTP6XtG2DpxyL+uYLhCawk7bIn7sJw==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(136003)(346002)(396003)(366004)(1800799009)(451199024)(186009)(26005)(2616005)(478600001)(6512007)(53546011)(6506007)(6486002)(2906002)(6666004)(31696002)(5660300002)(8936002)(4326008)(36756003)(66946007)(86362001)(66556008)(66476007)(316002)(41300700001)(31686004)(83380400001)(8676002)(38100700002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?alBadXlOVkh2U2xaVnNlMzR3VWxWMnNURktDY2Q2bHE2VHpZSzBJd0I2WU9Y?=
+ =?utf-8?B?ZFFtMU1EbEJqNkVUTDJDSVlKVlRXTGYvaFpiOU1vQmxWSDhRbDZqVk9EQUdP?=
+ =?utf-8?B?SUc0NU1tckNrVm5xWUh3MjJEdWgwODF6dExlYU4rVW9uc1drdU13YXdETktH?=
+ =?utf-8?B?N0dab3hPRnN6M0R2bzhXVVN6bTdDUy9oNU5DUlFZUWxSOVZPd00wV1piZ3hL?=
+ =?utf-8?B?bC9laldGejVKQllET293QXJMd0Iyamo3SnZET1V5ZlB6SHc3UHlHaE12YzNq?=
+ =?utf-8?B?cnZOamhhQng4S3Y0TVpLcWVhNnJxdlQ0ZVdiRzRCTjBSOFpQZS84dk1mZUJJ?=
+ =?utf-8?B?QUlJaXpheGh2VldIMk9GUlN3SDZUU2NmL0JDdmZNUVVnZXJUdmszRFZ2azM4?=
+ =?utf-8?B?V3AyOVNtekZyaGpSU1RyUjJqMUZoMU9HVXNzTjVaNkFCRXZ3QzBzaDRCUEkw?=
+ =?utf-8?B?bnNod0kzQVYxeEZSZUIzZjhDQ2Q2b2cveStDK0hPVmFTamk2TGxrSFZsNisy?=
+ =?utf-8?B?T2ROUksyaGYxaXh3bkw1V2l2Q3NBem1VRU5rN25CSXZvOGNhZExqZ0VBUWs1?=
+ =?utf-8?B?cGptSVAxMWtoZ0s1ZERia1o2T0ZCb3F2MUtpeHdjVG9OREdFRkNYNHdWT21j?=
+ =?utf-8?B?b2QyV2FvVGZjRHNpZTFta1hnK2JiZ3VLdkoyQ3VFcWI0dU5aZkcrSkdseit0?=
+ =?utf-8?B?QnhhUGJ5V3BHQXo2TGtNS3NnOWVpb29ocFphdWFsQ2xtaTBDdC9tSGdzNmh5?=
+ =?utf-8?B?TEVKanZTdmZVZUZJTnpPandpNXpwajg1UFFZZWYwemRRbHM3bzluMnhQUDJE?=
+ =?utf-8?B?QW1YN3VXcFRQMVRlYldSYVdJemJoVWNOcVM4enU0a2JlOGllMmtOeGFYOXAz?=
+ =?utf-8?B?dkxLNkkvYS9scFdMODN1MTV6TjJaWmdNaEEyRDRFN0RGVTVlYTdZaDZMbFd2?=
+ =?utf-8?B?Wk9ham0xQnZmNkJyMzNKZ2I5WnZGWnpBcytDVDZjQWF5VWlyVURlVWtydGJo?=
+ =?utf-8?B?Y2FYRzFmeXdGUWUyWEFOb0ZUZ29KU01yMmZ5NFZBcENTT2JhSGFEY0NSdEZR?=
+ =?utf-8?B?eEFISzVScU1SRTloYndvdEVHV2tzVmd1czlDR0pES1dJcDdjQ1grZWZOcDlS?=
+ =?utf-8?B?Nk92dnhiRkJXQ3YzcTlRN01SbXorOEwvckI1SWZjNGtoanpPdkNIeCs1MG1k?=
+ =?utf-8?B?K01QbFVjVmhvSW54R0g1d0NHcWFZMC82UnNaVkZRWXlCRnhLbHBySXdBRFdy?=
+ =?utf-8?B?R3V0WXJ3MEJsMUkxdG1sVFM4M0FST3NDQkhmd2xRakllZXdKZHhDSHNRR2p0?=
+ =?utf-8?B?OW82b0UzcytuYy9TYWsrNFhiSnpwMVJ5MkRIY1hOSGJ3QThXSENkMXFuTDQx?=
+ =?utf-8?B?TmgzK2czMXVJZGFmQmN0cUh2ZGdUV0x4UVVnMGxheWFMT3krNTEveUxEeVFr?=
+ =?utf-8?B?MzRkeExiNUFpckhSNXMzb2MrZmkvcVNSNW44bDd5TStvUWJoU3ZheEVmSFZY?=
+ =?utf-8?B?V3lUamo0R3h1WU9rS3Q2RjViWWI5VVR3K1EzMmx3bmsvaXQzS2NndFQwdE9I?=
+ =?utf-8?B?d3JZa2hxbHh0L2Y3V3o3Yit6dlRNcHVhNGtUaGpNZldDbGViTlFKRkhsSWU5?=
+ =?utf-8?B?Q3g0U1k1cnNMVDkyYWhHRzV5OXlRV0o2SitlWXEyZUhIKytaa1dQSEsraFhT?=
+ =?utf-8?B?RnQzL3JrV293cDg4M3AzSUNoRGJQbUlieGpuVnJ2ZzBDZEFFR0JvQllHOHpv?=
+ =?utf-8?B?TTc1MFhDL2VnVFVHNTIxY3hsVlNvNjIzVnNCTG5IVTZqbGFOWFR4Vkl0bnNt?=
+ =?utf-8?B?SlNlVExBTVRPTGJYZ1NBY0c4cDNMa0hzVlR5cjBuL2kyVmcrZUtmcTV3ZHBC?=
+ =?utf-8?B?WHBlSjcxNlZGSnEreFVGd3JZY2M1M0VocDMrT2hlUktOcXpCZUgzVkJPSGE4?=
+ =?utf-8?B?Um1DQU8rVkJ0UG9vTlJQTnh3d3JJbTVpRUtCNEdYZFFMTXBselZUR3FlMWZt?=
+ =?utf-8?B?RzRUeGtkdE4wa0xHb0FGSGtUNGVHS0I3cjgydWZOT0RiK0xGNDBBbVdKNVhw?=
+ =?utf-8?B?VHdCOUI3S1dlTWgrcDRGYVd4WitQZEg2eis3ckF5eUtMMGVoZFltTmVFWllm?=
+ =?utf-8?Q?m9iE9twE6Vhej+B8ZcAq4tG1g?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 645e2c8c-9445-442c-56d3-08dbb60c9d5b
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2023 16:55:50.1186
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: oHVILPEvKPYsES2bjQjytZNLDDff4fa12yZlw7YfhaHQBZyOkxDapF10FlXp/vFk2X55uIOUMpgq0zANVUQ72w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5302
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-For ip, tc, and bridge command introduce a new way to enable
-automatic colorization via environment variable.
+On 9/14/2023 3:02 PM, David Christensen wrote:
+> 
+> From: David Christensen <drc@linux.vnet.ibm.com>
+> 
+> The ionic device supports a maximum buffer length of 16 bits (see
+> ionic_rxq_desc or ionic_rxq_sg_elem).  When adding new buffers to
+> the receive rings, the function ionic_rx_fill() uses 16bit math when
+> calculating the number of pages to allocate for an RX descriptor,
+> given the interface's MTU setting. If the system PAGE_SIZE >= 64KB,
+> and the buf_info->page_offset is 0, the remain_len value will never
+> decrement from the original MTU value and the frag_len value will
+> always be 0, causing additional pages to be allocated as scatter-
+> gather elements unnecessarily.
+> 
+> A similar math issue exists in ionic_rx_frags(), but no failures
+> have been observed here since a 64KB page should not normally
+> require any scatter-gather elements at any legal Ethernet MTU size.
+> 
+> Fixes: 4b0a7539a372 ("ionic: implement Rx page reuse")
+> Signed-off-by: David Christensen <drc@linux.vnet.ibm.com>
 
-Example:
-  $ IP_COLOR=auto ip -br show addr
+Thanks
 
-Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
----
- bridge/bridge.c   |  3 ++-
- include/color.h   |  1 +
- ip/ip.c           |  2 +-
- lib/color.c       | 36 +++++++++++++++++++++++++++---------
- man/man8/bridge.8 |  7 +++++++
- man/man8/ip.8     | 14 +++++++++-----
- man/man8/tc.8     |  6 ++++++
- tc/tc.c           |  2 +-
- 8 files changed, 54 insertions(+), 17 deletions(-)
+Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
 
-diff --git a/bridge/bridge.c b/bridge/bridge.c
-index 704be50c70b3..f9a245cb3670 100644
---- a/bridge/bridge.c
-+++ b/bridge/bridge.c
-@@ -23,7 +23,6 @@ int preferred_family = AF_UNSPEC;
- int oneline;
- int show_stats;
- int show_details;
--static int color;
- int compress_vlans;
- int json;
- int timestamp;
-@@ -103,6 +102,8 @@ static int batch(const char *name)
- int
- main(int argc, char **argv)
- {
-+	int color = default_color("BRIDGE_COLOR");
-+
- 	while (argc > 1) {
- 		const char *opt = argv[1];
- 
-diff --git a/include/color.h b/include/color.h
-index 17ec56f3d7b4..8eea534f38e1 100644
---- a/include/color.h
-+++ b/include/color.h
-@@ -20,6 +20,7 @@ enum color_opt {
- 	COLOR_OPT_ALWAYS = 2
- };
- 
-+int default_color(const char *argv0);
- bool check_enable_color(int color, int json);
- bool matches_color(const char *arg, int *val);
- int color_fprintf(FILE *fp, enum color_attr attr, const char *fmt, ...);
-diff --git a/ip/ip.c b/ip/ip.c
-index 8c046ef1df14..e15d5fe52d92 100644
---- a/ip/ip.c
-+++ b/ip/ip.c
-@@ -168,7 +168,7 @@ int main(int argc, char **argv)
- 	const char *libbpf_version;
- 	char *batch_file = NULL;
- 	char *basename;
--	int color = 0;
-+	int color = default_color("IP_COLOR");
- 
- 	/* to run vrf exec without root, capabilities might be set, drop them
- 	 * if not needed as the first thing.
-diff --git a/lib/color.c b/lib/color.c
-index 59976847295c..9262fc51c1f2 100644
---- a/lib/color.c
-+++ b/lib/color.c
-@@ -93,6 +93,32 @@ bool check_enable_color(int color, int json)
- 	return false;
- }
- 
-+static bool match_color_value(const char *arg, int *val)
-+{
-+	if (*arg == '\0' || !strcmp(arg, "always"))
-+		*val = COLOR_OPT_ALWAYS;
-+	else if (!strcmp(arg, "auto"))
-+		*val = COLOR_OPT_AUTO;
-+	else if (!strcmp(arg, "never"))
-+		*val = COLOR_OPT_NEVER;
-+	else
-+		return false;
-+	return true;
-+}
-+
-+int default_color(const char *env)
-+{
-+	int val = COLOR_OPT_NEVER;
-+	char *name;
-+	size_t i;
-+
-+	name = getenv(env);
-+	if (name && match_color_value(name, &val))
-+		return val;
-+
-+	return COLOR_OPT_NEVER;
-+}
-+
- bool matches_color(const char *arg, int *val)
- {
- 	char *dup, *p;
-@@ -108,15 +134,7 @@ bool matches_color(const char *arg, int *val)
- 	if (matches(dup, "-color"))
- 		return false;
- 
--	if (*p == '\0' || !strcmp(p, "always"))
--		*val = COLOR_OPT_ALWAYS;
--	else if (!strcmp(p, "auto"))
--		*val = COLOR_OPT_AUTO;
--	else if (!strcmp(p, "never"))
--		*val = COLOR_OPT_NEVER;
--	else
--		return false;
--	return true;
-+	return match_color_value(p, val);
- }
- 
- static void set_color_palette(void)
-diff --git a/man/man8/bridge.8 b/man/man8/bridge.8
-index c52c9331e2c2..58bb1ddbd26a 100644
---- a/man/man8/bridge.8
-+++ b/man/man8/bridge.8
-@@ -319,6 +319,13 @@ precedence. This flag is ignored if
- .B \-json
- is also given.
- 
-+
-+The default color setting is
-+.B never
-+but can be overridden by the
-+.B BRIDGE_COLOR
-+environment variable.
-+
- .TP
- .BR "\-j", " \-json"
- Output results in JavaScript Object Notation (JSON).
-diff --git a/man/man8/ip.8 b/man/man8/ip.8
-index 72227d44fd30..df572f47d96d 100644
---- a/man/man8/ip.8
-+++ b/man/man8/ip.8
-@@ -197,11 +197,15 @@ precedence. This flag is ignored if
- .B \-json
- is also given.
- 
--Used color palette can be influenced by
--.BR COLORFGBG
--environment variable
--(see
--.BR ENVIRONMENT ).
-+The default color setting is
-+.B never
-+but can be overridden by the
-+.B IP_COLOR
-+environment variable.
-+
-+The color palette used can be adjusted with
-+.B COLORFGBG
-+environment variable.
- 
- .TP
- .BR "\-t" , " \-timestamp"
-diff --git a/man/man8/tc.8 b/man/man8/tc.8
-index d436d46472af..39ac6dcd1631 100644
---- a/man/man8/tc.8
-+++ b/man/man8/tc.8
-@@ -805,6 +805,12 @@ precedence. This flag is ignored if
- .B \-json
- is also given.
- 
-+The default color setting is
-+.B never
-+but can be overridden by the
-+.B TC_COLOR
-+environment variable.
-+
- .TP
- .BR "\-j", " \-json"
- Display results in JSON format.
-diff --git a/tc/tc.c b/tc/tc.c
-index 258205004611..b7cd60d68a38 100644
---- a/tc/tc.c
-+++ b/tc/tc.c
-@@ -35,7 +35,6 @@ int use_iec;
- int force;
- bool use_names;
- int json;
--int color;
- int oneline;
- int brief;
- 
-@@ -254,6 +253,7 @@ int main(int argc, char **argv)
- {
- 	const char *libbpf_version;
- 	char *batch_file = NULL;
-+	int color = default_color("TC_COLOR");
- 	int ret;
- 
- 	while (argc > 1) {
--- 
-2.39.2
-
+> ---
+>   drivers/net/ethernet/pensando/ionic/ionic_dev.h  |  1 +
+>   drivers/net/ethernet/pensando/ionic/ionic_txrx.c | 10 +++++++---
+>   2 files changed, 8 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_dev.h b/drivers/net/ethernet/pensando/ionic/ionic_dev.h
+> index 6aac98bcb9f4..aae4131f146a 100644
+> --- a/drivers/net/ethernet/pensando/ionic/ionic_dev.h
+> +++ b/drivers/net/ethernet/pensando/ionic/ionic_dev.h
+> @@ -187,6 +187,7 @@ typedef void (*ionic_desc_cb)(struct ionic_queue *q,
+>                                struct ionic_desc_info *desc_info,
+>                                struct ionic_cq_info *cq_info, void *cb_arg);
+> 
+> +#define IONIC_MAX_BUF_LEN                      ((u16)-1)
+>   #define IONIC_PAGE_SIZE                                PAGE_SIZE
+>   #define IONIC_PAGE_SPLIT_SZ                    (PAGE_SIZE / 2)
+>   #define IONIC_PAGE_GFP_MASK                    (GFP_ATOMIC | __GFP_NOWARN |\
+> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
+> index 26798fc635db..44466e8c5d77 100644
+> --- a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
+> +++ b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
+> @@ -207,7 +207,8 @@ static struct sk_buff *ionic_rx_frags(struct ionic_queue *q,
+>                          return NULL;
+>                  }
+> 
+> -               frag_len = min_t(u16, len, IONIC_PAGE_SIZE - buf_info->page_offset);
+> +               frag_len = min_t(u16, len, min_t(u32, IONIC_MAX_BUF_LEN,
+> +                                                IONIC_PAGE_SIZE - buf_info->page_offset));
+>                  len -= frag_len;
+> 
+>                  dma_sync_single_for_cpu(dev,
+> @@ -452,7 +453,8 @@ void ionic_rx_fill(struct ionic_queue *q)
+> 
+>                  /* fill main descriptor - buf[0] */
+>                  desc->addr = cpu_to_le64(buf_info->dma_addr + buf_info->page_offset);
+> -               frag_len = min_t(u16, len, IONIC_PAGE_SIZE - buf_info->page_offset);
+> +               frag_len = min_t(u16, len, min_t(u32, IONIC_MAX_BUF_LEN,
+> +                                                IONIC_PAGE_SIZE - buf_info->page_offset));
+>                  desc->len = cpu_to_le16(frag_len);
+>                  remain_len -= frag_len;
+>                  buf_info++;
+> @@ -471,7 +473,9 @@ void ionic_rx_fill(struct ionic_queue *q)
+>                          }
+> 
+>                          sg_elem->addr = cpu_to_le64(buf_info->dma_addr + buf_info->page_offset);
+> -                       frag_len = min_t(u16, remain_len, IONIC_PAGE_SIZE - buf_info->page_offset);
+> +                       frag_len = min_t(u16, remain_len, min_t(u32, IONIC_MAX_BUF_LEN,
+> +                                                               IONIC_PAGE_SIZE -
+> +                                                               buf_info->page_offset));
+>                          sg_elem->len = cpu_to_le16(frag_len);
+>                          remain_len -= frag_len;
+>                          buf_info++;
+> --
+> 2.39.1
+> 
 
