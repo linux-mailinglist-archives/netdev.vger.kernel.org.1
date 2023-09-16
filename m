@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-34240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDCFD7A2EC0
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 10:14:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AB6EE7A2EC1
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 10:14:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97ED4281E93
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 08:14:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60A0B2816C1
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 08:14:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF0A012B90;
-	Sat, 16 Sep 2023 08:11:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 873B0125B8;
+	Sat, 16 Sep 2023 08:11:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB248D507;
-	Sat, 16 Sep 2023 08:11:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9109FC433CD;
-	Sat, 16 Sep 2023 08:11:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F085134A3;
+	Sat, 16 Sep 2023 08:11:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A8EAC433CB;
+	Sat, 16 Sep 2023 08:11:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694851896;
-	bh=k+EgMO48VJPl+HjO+Hwx9k/pRjhpwRrvBBp+z5uHuOA=;
+	s=k20201202; t=1694851903;
+	bh=suO+8eIztFCZlwSD7uqirMgAu/b9k2nFDN75QHwxBD0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gGjbG3NcBcZIJ7tpqtuZoL2zZNoxErWFHC0rmmQ/60zEcbA4EttoGPMInsTX7b1K5
-	 4D1FOAO6FgVfC/lI8ByZrdzDQAiA92qADKiKGEsjpGEa9IVSJNBn8d56BeFaiaIjs4
-	 DJFZ0kSEzpV3NdGhGG8VZIij65keerTrL2dsKophdQw+W9OLd4YG4lzTsv+xknAl7G
-	 3Sal9uC3mIVctoO1DsgUVYQpv9yyNCODVkF9KnTX9dgDGVub1tuo8vngrNM44WfyY5
-	 MIuqRF9SOV/RrTuDKzMUwWLOCGtn8p2D/4rNOXMoxgyYh1V4vVRV/kSuI1z4MQ3una
-	 6eiX8kywOVmww==
+	b=MGeoc3XoBZL8cc3sfZZH/HKjz3P8JT7A7MD9eBbBq8uuOhwjSVLoYoCr3q1VEdLYX
+	 W9heWbbUKiqMPN4cviVdUNYpFAU8F5GAL1YOe/GVFJOFqxfD0Aptk5cNgfnL/NcL/8
+	 UIicHoxn0GQujien1GTKeUk0olmirGcx6cuswT4l/Fu9LMV/W7HFt8sYpYlj+ffA7v
+	 84PUFRZgd5yeYpl5hyByQdjPi6tPTHr0iLJlvmcUZdNeIHJBNouiWlUX3XQmXjnrmI
+	 RvnW3jKyuN4Kswgu9CYCRLrv6sIYDY5T5LCZ8jwvQ7reocrGfs4Wnp5W4s5XYj3Z5n
+	 bxzx2RkLNzkJg==
 From: Jisheng Zhang <jszhang@kernel.org>
 To: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
 	Alexandre Torgue <alexandre.torgue@foss.st.com>,
@@ -66,9 +66,9 @@ Cc: netdev@vger.kernel.org,
 	linux-sunxi@lists.linux.dev,
 	linux-tegra@vger.kernel.org,
 	linux-mediatek@lists.infradead.org
-Subject: [PATCH net-next v2 09/23] net: stmmac: dwmac-lpc18xx: use devm_stmmac_probe_config_dt()
-Date: Sat, 16 Sep 2023 15:58:15 +0800
-Message-Id: <20230916075829.1560-10-jszhang@kernel.org>
+Subject: [PATCH net-next v2 10/23] net: stmmac: dwmac-mediatek: use devm_stmmac_probe_config_dt()
+Date: Sat, 16 Sep 2023 15:58:16 +0800
+Message-Id: <20230916075829.1560-11-jszhang@kernel.org>
 X-Mailer: git-send-email 2.40.0
 In-Reply-To: <20230916075829.1560-1-jszhang@kernel.org>
 References: <20230916075829.1560-1-jszhang@kernel.org>
@@ -83,19 +83,19 @@ Content-Transfer-Encoding: 8bit
 Simplify the driver's probe() function by using the devres
 variant of stmmac_probe_config_dt().
 
-The remove_new() callback now needs to be switched to
+The calling of stmmac_pltfr_remove() now needs to be switched to
 stmmac_pltfr_remove_no_dt().
 
 Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
 ---
- .../ethernet/stmicro/stmmac/dwmac-lpc18xx.c   | 21 +++++--------------
- 1 file changed, 5 insertions(+), 16 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c
-index d0aa674ce705..dad23b47f383 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c
-@@ -37,7 +37,7 @@ static int lpc18xx_dwmac_probe(struct platform_device *pdev)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c
+index cd796ec04132..11976a854240 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c
+@@ -656,7 +656,7 @@ static int mediatek_dwmac_probe(struct platform_device *pdev)
  	if (ret)
  		return ret;
  
@@ -104,51 +104,33 @@ index d0aa674ce705..dad23b47f383 100644
  	if (IS_ERR(plat_dat))
  		return PTR_ERR(plat_dat);
  
-@@ -46,8 +46,7 @@ static int lpc18xx_dwmac_probe(struct platform_device *pdev)
- 	reg = syscon_regmap_lookup_by_compatible("nxp,lpc1850-creg");
- 	if (IS_ERR(reg)) {
- 		dev_err(&pdev->dev, "syscon lookup failed\n");
--		ret = PTR_ERR(reg);
--		goto err_remove_config_dt;
-+		return PTR_ERR(reg);
- 	}
+@@ -665,7 +665,7 @@ static int mediatek_dwmac_probe(struct platform_device *pdev)
  
- 	if (plat_dat->mac_interface == PHY_INTERFACE_MODE_MII) {
-@@ -56,23 +55,13 @@ static int lpc18xx_dwmac_probe(struct platform_device *pdev)
- 		ethmode = LPC18XX_CREG_CREG6_ETHMODE_RMII;
- 	} else {
- 		dev_err(&pdev->dev, "Only MII and RMII mode supported\n");
--		ret = -EINVAL;
+ 	ret = mediatek_dwmac_clks_config(priv_plat, true);
+ 	if (ret)
 -		goto err_remove_config_dt;
-+		return -EINVAL;
- 	}
++		return ret;
  
- 	regmap_update_bits(reg, LPC18XX_CREG_CREG6,
- 			   LPC18XX_CREG_CREG6_ETHMODE_MASK, ethmode);
+ 	ret = stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
+ 	if (ret)
+@@ -675,8 +675,6 @@ static int mediatek_dwmac_probe(struct platform_device *pdev)
  
--	ret = stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
--	if (ret)
--		goto err_remove_config_dt;
--
--	return 0;
--
+ err_drv_probe:
+ 	mediatek_dwmac_clks_config(priv_plat, false);
 -err_remove_config_dt:
 -	stmmac_remove_config_dt(pdev, plat_dat);
--
--	return ret;
-+	return stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
+ 
+ 	return ret;
+ }
+@@ -685,7 +683,7 @@ static void mediatek_dwmac_remove(struct platform_device *pdev)
+ {
+ 	struct mediatek_dwmac_plat_data *priv_plat = get_stmmac_bsp_priv(&pdev->dev);
+ 
+-	stmmac_pltfr_remove(pdev);
++	stmmac_pltfr_remove_no_dt(pdev);
+ 	mediatek_dwmac_clks_config(priv_plat, false);
  }
  
- static const struct of_device_id lpc18xx_dwmac_match[] = {
-@@ -83,7 +72,7 @@ MODULE_DEVICE_TABLE(of, lpc18xx_dwmac_match);
- 
- static struct platform_driver lpc18xx_dwmac_driver = {
- 	.probe  = lpc18xx_dwmac_probe,
--	.remove_new = stmmac_pltfr_remove,
-+	.remove_new = stmmac_pltfr_remove_no_dt,
- 	.driver = {
- 		.name           = "lpc18xx-dwmac",
- 		.pm		= &stmmac_pltfr_pm_ops,
 -- 
 2.40.1
 
