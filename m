@@ -1,56 +1,43 @@
-Return-Path: <netdev+bounces-34302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAF277A30F6
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 16:47:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 55A057A30F9
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 16:52:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6560F28240A
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 14:47:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D17D32823C4
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 14:52:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E22E613FEE;
-	Sat, 16 Sep 2023 14:47:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9007313FEE;
+	Sat, 16 Sep 2023 14:52:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D704812B9A;
-	Sat, 16 Sep 2023 14:47:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4018C433C7;
-	Sat, 16 Sep 2023 14:47:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8824C23DE
+	for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 14:52:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92DDFC433C7;
+	Sat, 16 Sep 2023 14:52:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694875668;
-	bh=DrpFaRSh/IAeouBerVCYqiVaRBz09LVTL2zZXjVhk0A=;
+	s=k20201202; t=1694875938;
+	bh=s5RPDwmBuyoJEWWvgXj8NmOZVFaB6NfKR4yGxoqvfMI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BcGZXd7tGQX9f5peC25KLnAHHnsRMglQ2tX2ZQlXPodNBeeEDSPRM7LaDVUwchSK/
-	 aGU6cA7qLoXcoqcfKRaoydd98XmsKv7GZOS/LlXhPk7q480dXWJG3xedTzLac2/Vtj
-	 +RrsniiJQHOplMRj9R0agcXR6IgVBKnUqwLSyneJ0os+zB6TD2vm3GfzubIBSIshVh
-	 XDS2Y9MJAjZ+wQsdDdr7q1B1bQJj6MUlDEX2FyR00OcO4loRd5/40PVIQUW77Bx6i1
-	 qrvl27ZSLI5oiokE6B7zjD88dfkhIKS+0R5xygnHUnSTMAAhV6FkC4MyaFQi0AnTtO
-	 rJ2GwPydVg5uA==
-Date: Sat, 16 Sep 2023 16:47:42 +0200
+	b=moYawI2OExitQtpiehMqU+NuO418Y/1651GnXGvY2TAOz2WmjDlMhoaJFTz5gxtxW
+	 3t+Drqe2+rOYOfbMvskyMLR9bm+C9TkALWshx8REPy5AJXhOCf4cpV4h2ph91Fs03E
+	 /COAD8b/Dh7Ajx5PATMG/X0+nHGQnCkilV8zmJcU2kksMYisJ8dWdjXvWothuuMoM3
+	 dTMhfZEcSlIydXXNYWHx3UDqVeGcMyzFvw6i+4B7455HInCW+9FYH5rGrfEaIk1fEd
+	 WbN41VXMdYKeMcdfSY9b3M41qHHW4eLNmnFupq2R1M2KtjO1E+fkddaPSH+oWoxPlO
+	 CaDHmHJpiqWtw==
+Date: Sat, 16 Sep 2023 16:52:15 +0200
 From: Simon Horman <horms@kernel.org>
-To: Pu Lehui <pulehui@huaweicloud.com>
-Cc: bpf@vger.kernel.org, linux-riscv@lists.infradead.org,
-	netdev@vger.kernel.org,
-	=?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yhs@fb.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Luke Nelson <luke.r.nels@gmail.com>, Pu Lehui <pulehui@huawei.com>
-Subject: Re: [PATCH bpf-next 3/6] riscv, bpf: Simplify sext and zext logics
- in branch instructions
-Message-ID: <20230916144742.GB1125562@kernel.org>
-References: <20230913153413.1446068-1-pulehui@huaweicloud.com>
- <20230913153413.1446068-4-pulehui@huaweicloud.com>
+To: Shannon Nelson <shannon.nelson@amd.com>
+Cc: netdev@vger.kernel.org, brett.creeley@amd.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH net-next 0/4] pds_core: add PCI reset handling
+Message-ID: <20230916145215.GC1125562@kernel.org>
+References: <20230914223200.65533-1-shannon.nelson@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,34 +46,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230913153413.1446068-4-pulehui@huaweicloud.com>
+In-Reply-To: <20230914223200.65533-1-shannon.nelson@amd.com>
 
-On Wed, Sep 13, 2023 at 11:34:10PM +0800, Pu Lehui wrote:
-> From: Pu Lehui <pulehui@huawei.com>
+On Thu, Sep 14, 2023 at 03:31:56PM -0700, Shannon Nelson wrote:
+> Make sure pds_core can handle and recover from PCI function resets and
+> similar PCI bus issues: add detection and handlers for PCI problems.
 > 
-> There are many extension helpers in the current branch instructions, and
-> the implementation is a bit complicated. We simplify this logic through
-> two simple extension helpers with alternate register.
-> 
-> Signed-off-by: Pu Lehui <pulehui@huawei.com>
-> ---
->  arch/riscv/net/bpf_jit_comp64.c | 82 +++++++++++++--------------------
->  1 file changed, 31 insertions(+), 51 deletions(-)
-> 
-> diff --git a/arch/riscv/net/bpf_jit_comp64.c b/arch/riscv/net/bpf_jit_comp64.c
-> index 4a649e195..1728ce16d 100644
-> --- a/arch/riscv/net/bpf_jit_comp64.c
-> +++ b/arch/riscv/net/bpf_jit_comp64.c
-> @@ -141,6 +141,19 @@ static bool in_auipc_jalr_range(s64 val)
->  		val < ((1L << 31) - (1L << 11));
->  }
->  
-> +/* Modify rd pointer to alternate reg to avoid corrupting orignal reg */
+> Shannon Nelson (4):
+>   pds_core: check health in devcmd wait
+>   pds_core: keep viftypes table across reset
+>   pds_core: implement pci reset handlers
+>   pds_core: add attempts to fix broken PCI
 
-Hi Pu Lehui,
+For series,
 
-nit: original
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-I suggest running checkpatch --codespell over this series before submitting
-v2.
 
