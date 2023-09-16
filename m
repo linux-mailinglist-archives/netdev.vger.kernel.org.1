@@ -1,82 +1,79 @@
-Return-Path: <netdev+bounces-34206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 122347A2CB0
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 02:47:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAB567A2CB9
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 02:49:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BADE2285CA0
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 00:47:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74BA4285D03
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 00:49:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C10C71376;
-	Sat, 16 Sep 2023 00:47:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 378B2A44;
+	Sat, 16 Sep 2023 00:49:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AE3036E;
-	Sat, 16 Sep 2023 00:47:06 +0000 (UTC)
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB55A4215;
-	Fri, 15 Sep 2023 17:43:08 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-68fbbb953cfso2374729b3a.2;
-        Fri, 15 Sep 2023 17:43:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A968736E
+	for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 00:49:20 +0000 (UTC)
+Received: from mail-qk1-x732.google.com (mail-qk1-x732.google.com [IPv6:2607:f8b0:4864:20::732])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 264863C19
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 17:45:17 -0700 (PDT)
+Received: by mail-qk1-x732.google.com with SMTP id af79cd13be357-76f08e302a1so173788585a.1
+        for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 17:45:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1694824738; x=1695429538; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=oLD25PkDucnrSNAyY6bLmFdlfMbVXirkQaLQA+P5Bg4=;
-        b=Kt/vJ/MhrJVb8rBXUi8x6tyj3GXLD6JJfbaWRVpJ2rkyshYAld40+KmxQexNB0XnQ+
-         txJOMFuZddxkIGBKgz02bmsk8Ut4r+tv4K29cWo4YTl3KQ1TWkZm0fcz+9gj5I27M8us
-         ZWqBqlaK8i5SwBIwM+jcXc8cGu9MWpPGvCety9//Qrzltpb16Rwm9hmKgy+6AZLS5tD9
-         ssjgDs5HRq+pzKh8/AhZHBoKx5JLDRyVeAQwMvtGsIieGPfciA5Jn7YMljwzaapJnwTV
-         zLH5MubaVy4j1olcBQmXDXFm/3qNMhjsTafludIbMQobf33L5NNLaEkLeJa5xU3mmk2K
-         kxNA==
+        d=gmail.com; s=20230601; t=1694825106; x=1695429906; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=E8My/cgpW36hTwbXw0d1QkiE0VUgauihCO6z5sxZ0/E=;
+        b=eU9UpzJh8EHPY/QAtklb6SNh2AtmKcDg3kCHURwo1WIp4z5XRh8tqWfAqMTPWgITts
+         /BlEb919xKc7ZVuB6mw3f4viLCdxFIDBQvy+7nATRj1ZVxRqSZ8v2aPF7DAEL9lGWRrf
+         9YQWBIK29uPvgvzMcd5c9DB2M3aTgrCoH9TShkRCHSIXKlT60Wqii5oJvi984DpY3zfn
+         L3LTEPS0dvoopAwxBrL2uvAdGqBU4egwqZBVeY7PxJLcmJZzbnd/iSpE5M31y0msZ9y/
+         Jm5PjhG+9DQ6m2c4YsFyuokiAeUaENU6WtZeg93gKWE/+u5CO0Em17FijhKyTtbiksmC
+         hmwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694824738; x=1695429538;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oLD25PkDucnrSNAyY6bLmFdlfMbVXirkQaLQA+P5Bg4=;
-        b=IbAbH0gSRTQfyuMxQxM0oLRF+c/7JfBc6klKzZqOr2qKg4qYeiWj999DV/OpnZ83nL
-         H510C9QSyh3PuEzVkSOOgwGXJMvXRMSZonLHM2/rjG6CcHi8JYR0iZGcHQJcMIxNJGbC
-         sAI6sO4M+yCT2E5+oP5I4T9iGN7VK/Yp7QHyZTJw9QBNi4toEVRFdOBsYSHsYmcvio39
-         X/dXqDc0LRkTS22iwxG4I3HlMdTmtVyg7BOpoKHzOG/TT2Np/4MKfi19AZyeGFNciiXQ
-         pDKJmqxkGXsIwa4TstuZPTSubxsrKVRKIsR1iLXVLjhHy/eFqAXK2sUB2FsM+J+cAQ5J
-         mBmw==
-X-Gm-Message-State: AOJu0Yw3ih9Y1DigDOYlFXJk2v33eV2sfqzbULArbl41ygLZ1q0UgdyL
-	BmajIy9Hnc4YgIrdU9iYNwY=
-X-Google-Smtp-Source: AGHT+IHnK/TqBA+sZc7A73yvDiS57VraQEJGDTcm3aiGkOsjDXv6fshdxRNYnbwh+1UNQ0C4ejysrA==
-X-Received: by 2002:a05:6a20:7d8c:b0:131:c760:2a0b with SMTP id v12-20020a056a207d8c00b00131c7602a0bmr4438104pzj.52.1694824738337;
-        Fri, 15 Sep 2023 17:38:58 -0700 (PDT)
-Received: from localhost.localdomain ([2620:10d:c090:400::4:252e])
-        by smtp.gmail.com with ESMTPSA id g21-20020a62e315000000b0068c670afe30sm3474140pfh.124.2023.09.15.17.38.56
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Fri, 15 Sep 2023 17:38:57 -0700 (PDT)
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-To: davem@davemloft.net
-Cc: kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	kernel-team@fb.com
-Subject: pull-request: bpf 2023-09-15
-Date: Fri, 15 Sep 2023 17:38:55 -0700
-Message-Id: <20230916003855.82646-1-alexei.starovoitov@gmail.com>
-X-Mailer: git-send-email 2.39.2 (Apple Git-143)
+        d=1e100.net; s=20230601; t=1694825106; x=1695429906;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=E8My/cgpW36hTwbXw0d1QkiE0VUgauihCO6z5sxZ0/E=;
+        b=Va4gucQSgGvqV4eF0i1e9UIfIE1XyDnMweGVstQx6dFc0u6Y0EU4eCzv2O+8/d/12K
+         2mPqHjnNoLFSIDuQQ1+kJxymkETvPXeYNhrVnuxDkn4roCalaPBfUp8dgiKACoWIccFu
+         EoIpvhP20jMbb8ZhhmDOtBr9RleEJUDlL5ejsuR8t/pGcfQnIoXKeGC7WzEVaSIG7Qme
+         WhFD5psUzZXN0TDdh9kxFxhmlLsUMibRxtImAj4ofleYQ8YN81EVyj3z6Co3NM0/Rgbc
+         vWwNI4Fv7z/aZObS0+CvizG4DApv152bc90IcFrlPTVET+McyUCPZvWF5y2JGL2QQMb7
+         e6bw==
+X-Gm-Message-State: AOJu0YwufQFQ9j39q6qY3DthVCCstmg4xREr/4zlzgJV0i2aJmMw2n6K
+	RlDGSmnU+zBeD4gm50XzZOs=
+X-Google-Smtp-Source: AGHT+IHIYwg7guqWtegkkPi2ZxYZLT3nbaiTpa0LYdYNXOZzEBmMpMCs52ANdCX6tYXVUM4uWZI1VA==
+X-Received: by 2002:a05:620a:4794:b0:76f:14a9:56fe with SMTP id dt20-20020a05620a479400b0076f14a956femr3102904qkb.58.1694825106010;
+        Fri, 15 Sep 2023 17:45:06 -0700 (PDT)
+Received: from localhost (modemcable065.128-200-24.mc.videotron.ca. [24.200.128.65])
+        by smtp.gmail.com with ESMTPSA id u19-20020ae9c013000000b0076cc0a6e127sm1565047qkk.116.2023.09.15.17.45.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Sep 2023 17:45:05 -0700 (PDT)
+Date: Fri, 15 Sep 2023 20:45:04 -0400
+From: Benjamin Poirier <benjamin.poirier@gmail.com>
+To: Liang Chen <liangchen.linux@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v3 2/2] pktgen: Introducing 'SHARED' flag for
+ testing with non-shared skb
+Message-ID: <ZQT6kI7MgLdQTfHA@d3>
+References: <20230915122317.100390-1-liangchen.linux@gmail.com>
+ <20230915122317.100390-2-liangchen.linux@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230915122317.100390-2-liangchen.linux@gmail.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -84,123 +81,193 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi David, hi Jakub, hi Paolo, hi Eric,
+On 2023-09-15 20:23 +0800, Liang Chen wrote:
+> Currently, skbs generated by pktgen always have their reference count
+> incremented before transmission, causing their reference count to be
+> always greater than 1, leading to two issues:
+>   1. Only the code paths for shared skbs can be tested.
+>   2. In certain situations, skbs can only be released by pktgen.
+> To enhance testing comprehensiveness, we are introducing the "SHARED"
+> flag to indicate whether an SKB is shared. This flag is enabled by
+> default, aligning with the current behavior. However, disabling this
+> flag allows skbs with a reference count of 1 to be transmitted.
+> So we can test non-shared skbs and code paths where skbs are released
+> within the stack.
+> 
+> Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
+> 
+> ---
+>  Changes from v2:
+> - Lifted the check on 'count' when 'not shared' is configured.
+> - Fixed a use-after-free problem when sending failed
+> ---
+>  Documentation/networking/pktgen.rst | 12 ++++++++
+>  net/core/pktgen.c                   | 47 ++++++++++++++++++++++++-----
+>  2 files changed, 51 insertions(+), 8 deletions(-)
+> 
+> diff --git a/Documentation/networking/pktgen.rst b/Documentation/networking/pktgen.rst
+> index 1225f0f63ff0..c945218946e1 100644
+> --- a/Documentation/networking/pktgen.rst
+> +++ b/Documentation/networking/pktgen.rst
+> @@ -178,6 +178,7 @@ Examples::
+>  			      IPSEC # IPsec encapsulation (needs CONFIG_XFRM)
+>  			      NODE_ALLOC # node specific memory allocation
+>  			      NO_TIMESTAMP # disable timestamping
+> +			      SHARED # enable shared SKB
+>   pgset 'flag ![name]'    Clear a flag to determine behaviour.
+>  			 Note that you might need to use single quote in
+>  			 interactive mode, so that your shell wouldn't expand
+> @@ -288,6 +289,16 @@ To avoid breaking existing testbed scripts for using AH type and tunnel mode,
+>  you can use "pgset spi SPI_VALUE" to specify which transformation mode
+>  to employ.
+>  
+> +Disable shared SKB
+> +==================
+> +By default, SKBs sent by pktgen are shared (user count > 1).
+> +To test with non-shared SKBs, remove the "SHARED" flag by simply setting::
+> +
+> +	pg_set "flag !SHARED"
+> +
+> +However, if the "clone_skb" or "burst" parameters are configured, the skb
+> +still needs to be held by pktgen for further access. Hence the skb must be
+> +shared.
+>  
+>  Current commands and configuration options
+>  ==========================================
+> @@ -357,6 +368,7 @@ Current commands and configuration options
+>      IPSEC
+>      NODE_ALLOC
+>      NO_TIMESTAMP
+> +    SHARED
+>  
+>      spi (ipsec)
+>  
+> diff --git a/net/core/pktgen.c b/net/core/pktgen.c
+> index ffd659dbd6c3..5cc69feec7d7 100644
+> --- a/net/core/pktgen.c
+> +++ b/net/core/pktgen.c
+> @@ -200,6 +200,7 @@
+>  	pf(VID_RND)		/* Random VLAN ID */			\
+>  	pf(SVID_RND)		/* Random SVLAN ID */			\
+>  	pf(NODE)		/* Node memory alloc*/			\
+> +	pf(SHARED)		/* Shared SKB */			\
+>  
+>  #define pf(flag)		flag##_SHIFT,
+>  enum pkt_flags {
+> @@ -1198,7 +1199,8 @@ static ssize_t pktgen_if_write(struct file *file,
+>  		    ((pkt_dev->xmit_mode == M_NETIF_RECEIVE) ||
+>  		     !(pkt_dev->odev->priv_flags & IFF_TX_SKB_SHARING)))
+>  			return -ENOTSUPP;
+> -		if (value > 0 && pkt_dev->n_imix_entries > 0)
+> +		if (value > 0 && (pkt_dev->n_imix_entries > 0 ||
+> +				  !(pkt_dev->flags & F_SHARED)))
+>  			return -EINVAL;
+>  
+>  		i += len;
+> @@ -1257,6 +1259,10 @@ static ssize_t pktgen_if_write(struct file *file,
+>  		     ((pkt_dev->xmit_mode == M_START_XMIT) &&
+>  		     (!(pkt_dev->odev->priv_flags & IFF_TX_SKB_SHARING)))))
+>  			return -ENOTSUPP;
+> +
+> +		if ((value > 1) && !(pkt_dev->flags & F_SHARED))
+> +			return -EINVAL;
+> +
 
-The following pull-request contains BPF updates for your *net* tree.
+Make sure to run checkpatch and check the patchwork results. There are
+some points to correct:
+https://patchwork.kernel.org/project/netdevbpf/patch/20230915122317.100390-2-liangchen.linux@gmail.com/
 
-We've added 21 non-merge commits during the last 8 day(s) which contain
-a total of 21 files changed, 450 insertions(+), 36 deletions(-).
+>  		pkt_dev->burst = value < 1 ? 1 : value;
+>  		sprintf(pg_result, "OK: burst=%u", pkt_dev->burst);
+>  		return count;
+> @@ -1335,10 +1341,18 @@ static ssize_t pktgen_if_write(struct file *file,
+>  		flag = pktgen_read_flag(f, &disable);
+>  
+>  		if (flag) {
+> -			if (disable)
+> +			if (disable) {
+> +				/* If "clone_skb", or "burst" parameters are
+> +				 * configured, it means that the skb still needs to be
+> +				 * referenced by the pktgen, so the skb must be shared.
+> +				 */
+> +				if (flag == F_SHARED && (pkt_dev->clone_skb ||
+> +							 pkt_dev->burst > 1))
+> +					return -EINVAL;
+>  				pkt_dev->flags &= ~flag;
+> -			else
+> +			} else {
+>  				pkt_dev->flags |= flag;
+> +			}
+>  		} else {
+>  			pg_result += sprintf(pg_result,
+>  				"Flag -:%s:- unknown\n%s", f,
+> @@ -3485,7 +3499,8 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
+>  	if (pkt_dev->xmit_mode == M_NETIF_RECEIVE) {
+>  		skb = pkt_dev->skb;
+>  		skb->protocol = eth_type_trans(skb, skb->dev);
+> -		refcount_add(burst, &skb->users);
+> +		if (pkt_dev->flags & F_SHARED)
+> +			refcount_add(burst, &skb->users);
+>  		local_bh_disable();
+>  		do {
+>  			ret = netif_receive_skb(skb);
+> @@ -3493,6 +3508,10 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
+>  				pkt_dev->errors++;
+>  			pkt_dev->sofar++;
+>  			pkt_dev->seq_num++;
+> +			if (unlikely(!(pkt_dev->flags & F_SHARED))) {
+> +				pkt_dev->skb = NULL;
+> +				break;
+> +			}
+>  			if (refcount_read(&skb->users) != burst) {
+>  				/* skb was queued by rps/rfs or taps,
+>  				 * so cannot reuse this skb
+> @@ -3511,9 +3530,14 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
+>  		goto out; /* Skips xmit_mode M_START_XMIT */
+>  	} else if (pkt_dev->xmit_mode == M_QUEUE_XMIT) {
+>  		local_bh_disable();
+> -		refcount_inc(&pkt_dev->skb->users);
+> +		if (pkt_dev->flags & F_SHARED)
+> +			refcount_inc(&pkt_dev->skb->users);
+>  
+>  		ret = dev_queue_xmit(pkt_dev->skb);
+> +
+> +		if (!(pkt_dev->flags & F_SHARED) && dev_xmit_complete(ret))
+> +			pkt_dev->skb = NULL;
+> +
+>  		switch (ret) {
+>  		case NET_XMIT_SUCCESS:
+>  			pkt_dev->sofar++;
+> @@ -3551,11 +3575,15 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
+>  		pkt_dev->last_ok = 0;
+>  		goto unlock;
+>  	}
+> -	refcount_add(burst, &pkt_dev->skb->users);
+> +	if (pkt_dev->flags & F_SHARED)
+> +		refcount_add(burst, &pkt_dev->skb->users);
+>  
+>  xmit_more:
+>  	ret = netdev_start_xmit(pkt_dev->skb, odev, txq, --burst > 0);
+>  
+> +	if (!(pkt_dev->flags & F_SHARED) && dev_xmit_complete(ret))
+> +		pkt_dev->skb = NULL;
+> +
+>  	switch (ret) {
+>  	case NETDEV_TX_OK:
+>  		pkt_dev->last_ok = 1;
+> @@ -3577,7 +3605,8 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
+>  		fallthrough;
+>  	case NETDEV_TX_BUSY:
+>  		/* Retry it next time */
+> -		refcount_dec(&(pkt_dev->skb->users));
+> +		if (!(pkt_dev->flags & F_SHARED))
+> +			refcount_dec(&(pkt_dev->skb->users));
 
-The main changes are:
+With "flag !SHARED", this leads to a refcount underflow if the driver
+returns NETDEV_TX_BUSY.
 
-1) Adjust bpf_mem_alloc buckets to match ksize(), from Hou Tao.
+It looks like the condition is inverted, no?
 
-2) Check whether override is allowed in kprobe mult, from Jiri Olsa.
-
-3) Fix btf_id symbol generation with ld.lld, from Jiri and Nick.
-
-4) Fix potential deadlock when using queue and stack maps from NMI, from Toke Høiland-Jørgensen.
-
-Please consider pulling these changes from:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git 
-
-Thanks a lot!
-
-Also thanks to reporters, reviewers and testers of commits in this pull-request:
-
-Alan Maguire, Biju Das, Björn Töpel, Dan Carpenter, Daniel Borkmann, 
-Eduard Zingerman, Hsin-Wei Hung, Marcus Seyfarth, Nathan Chancellor, 
-Satya Durga Srinivasu Prabhala, Song Liu, Stephen Rothwell
-
-----------------------------------------------------------------
-
-The following changes since commit ac28b1ec6135649b5d78b028e47264cb3ebca5ea:
-
-  net: ipv4: fix one memleak in __inet_del_ifa() (2023-09-08 08:02:17 +0100)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git 
-
-for you to fetch changes up to c0bb9fb0e52a64601d38b3739b729d9138d4c8a1:
-
-  bpf: Fix BTF_ID symbol generation collision in tools/ (2023-09-15 12:08:27 -0700)
-
-----------------------------------------------------------------
-Alexei Starovoitov (1):
-      Merge branch 'fix-the-unmatched-unit_size-of-bpf_mem_cache'
-
-Andrii Nakryiko (1):
-      selftests/bpf: ensure all CI arches set CONFIG_BPF_KPROBE_OVERRIDE=y
-
-Artem Savkov (1):
-      selftests/bpf: fix unpriv_disabled check in test_verifier
-
-Christophe JAILLET (1):
-      bpf: Fix a erroneous check after snprintf()
-
-Eduard Zingerman (2):
-      bpf: Avoid dummy bpf_offload_netdev in __bpf_prog_dev_bound_init
-      selftests/bpf: Offloaded prog after non-offloaded should not cause BUG
-
-Hou Tao (5):
-      bpf: Adjust size_index according to the value of KMALLOC_MIN_SIZE
-      bpf: Don't prefill for unused bpf_mem_cache
-      bpf: Ensure unit_size is matched with slab cache object size
-      selftests/bpf: Test all valid alloc sizes for bpf mem allocator
-      bpf: Skip unit_size checking for global per-cpu allocator
-
-Ilya Leoshkevich (1):
-      netfilter, bpf: Adjust timeouts of non-confirmed CTs in bpf_ct_insert_entry()
-
-Jiri Olsa (5):
-      bpf: Add override check to kprobe multi link attach
-      selftests/bpf: Add kprobe_multi override test
-      selftests/bpf: Fix kprobe_multi_test/attach_override test
-      bpf: Fix uprobe_multi get_pid_task error path
-      bpf: Fix BTF_ID symbol generation collision
-
-Martin KaFai Lau (1):
-      Merge branch 'Avoid dummy bpf_offload_netdev in __bpf_prog_dev_bound_init'
-
-Nick Desaulniers (1):
-      bpf: Fix BTF_ID symbol generation collision in tools/
-
-Randy Dunlap (1):
-      bpf, cgroup: fix multiple kernel-doc warnings
-
-Stanislav Fomichev (2):
-      bpf: Clarify error expectations from bpf_clone_redirect
-      selftests/bpf: Update bpf_clone_redirect expected return code
-
-Toke Høiland-Jørgensen (1):
-      bpf: Avoid deadlock when using queue and stack maps from NMI
-
- include/linux/btf_ids.h                            |   2 +-
- include/uapi/linux/bpf.h                           |   4 +-
- kernel/bpf/btf.c                                   |   2 +-
- kernel/bpf/cgroup.c                                |  13 ++-
- kernel/bpf/memalloc.c                              |  94 +++++++++++++++-
- kernel/bpf/offload.c                               |  12 +-
- kernel/bpf/queue_stack_maps.c                      |  21 +++-
- kernel/trace/bpf_trace.c                           |  20 +++-
- net/netfilter/nf_conntrack_bpf.c                   |   2 +
- tools/include/linux/btf_ids.h                      |   2 +-
- tools/include/uapi/linux/bpf.h                     |   4 +-
- tools/testing/selftests/bpf/DENYLIST.aarch64       |  10 +-
- tools/testing/selftests/bpf/config                 |   1 +
- tools/testing/selftests/bpf/config.x86_64          |   1 -
- tools/testing/selftests/bpf/prog_tests/empty_skb.c |  12 +-
- .../selftests/bpf/prog_tests/kprobe_multi_test.c   |  37 +++++++
- .../testing/selftests/bpf/prog_tests/test_bpf_ma.c |  50 +++++++++
- .../selftests/bpf/prog_tests/xdp_dev_bound_only.c  |  61 ++++++++++
- .../selftests/bpf/progs/kprobe_multi_override.c    |  13 +++
- tools/testing/selftests/bpf/progs/test_bpf_ma.c    | 123 +++++++++++++++++++++
- tools/testing/selftests/bpf/test_verifier.c        |   2 +-
- 21 files changed, 450 insertions(+), 36 deletions(-)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/test_bpf_ma.c
- create mode 100644 tools/testing/selftests/bpf/prog_tests/xdp_dev_bound_only.c
- create mode 100644 tools/testing/selftests/bpf/progs/kprobe_multi_override.c
- create mode 100644 tools/testing/selftests/bpf/progs/test_bpf_ma.c
+I tested it by hacking e1000_xmit_frame() to return NETDEV_TX_BUSY right
+at the beginning.
 
