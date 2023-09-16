@@ -1,39 +1,62 @@
-Return-Path: <netdev+bounces-34285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34291-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C31E7A304B
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 14:50:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48E0E7A30A5
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 15:17:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C968282241
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 12:50:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3917281828
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 13:17:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 200D213AEB;
-	Sat, 16 Sep 2023 12:50:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8625C13AC3;
+	Sat, 16 Sep 2023 13:16:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1289A13AE2;
-	Sat, 16 Sep 2023 12:50:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C1F67C433C8;
-	Sat, 16 Sep 2023 12:50:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694868625;
-	bh=is763Roi5ov/kMNn626EbxklsD+DxMGwEaaeBVrFqco=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tPoK2KD8Fm7XkcJhxu92PANpJplpWgdqVnxJRQ4ejRLlxH7B5ACMxlp1VfLFXpe8h
-	 g2wi15walmPvn0U06nRufqyRBdA8UlTfECVvHyurPDTFEwhir2sljByMdbEzotePVn
-	 3UZFR8GHhCH0qjrlg4n4KUXFBxV5b7jG0hURIUtwE+WXu0xcldycp9XkhLk4jTDlyf
-	 WdN5VNO+QrrfWCFtQq1fVKc5WymOigSV+Z/VvULPrFQ45Rb7Re1u6ts4Fw2BAfp7Ib
-	 Bzd8HlbZNZd/DVJY9nxnW6XkhGifYE9CPxprVFKN4mWBz89owTz4P/k+i0PrRtokTT
-	 dDe4dyMT5Hc8A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A40E9E26887;
-	Sat, 16 Sep 2023 12:50:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CFDB13FE3
+	for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 13:16:22 +0000 (UTC)
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E7951B5;
+	Sat, 16 Sep 2023 06:16:18 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 373CC12000B;
+	Sat, 16 Sep 2023 16:16:15 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 373CC12000B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1694870175;
+	bh=Sdq3fDXjPa3CrACJWQvLhfRSTOnnHZbbxxjFtBJgqQs=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+	b=Vm/xWXLAS7Izu+GKWS6lCqc/Q5DENeLzjgy1E6f617THBTzB7K6Kckv0Sn8hdhBni
+	 hPr9BH3MFYzaQpV/p/jLC+ObDlCSXisDyfT7KarF4mUbHbcjTRbCgKLryWjBSKGk/q
+	 oORn/R1YxDIk8FHoOgqHGfs4szkM892Cmz5F3f705KwhVzIfTp/booGMtbGIjXPpxk
+	 0bhH+XNFEL2qxrB6whnLNJ1QIVqtT11AhAEpciafJj8EewhnHWCmwkoWTzXeVyRCNE
+	 9ZIdI/61/lQ/DGQZhZM6l/7ppVzXayHB+aVfw0zQ2bs+X0ugmBPuiw1Hdcu2f1uLps
+	 wflhxIVpTO7Zg==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Sat, 16 Sep 2023 16:16:14 +0300 (MSK)
+Received: from localhost.localdomain (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Sat, 16 Sep 2023 16:16:14 +0300
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
+	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
+	<jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>
+CC: <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<kernel@sberdevices.ru>, <oxffffaa@gmail.com>, <avkrasnov@salutedevices.com>
+Subject: [PATCH net-next v9 0/4] vsock/virtio/vhost: MSG_ZEROCOPY preparations
+Date: Sat, 16 Sep 2023 16:09:14 +0300
+Message-ID: <20230916130918.4105122-1-avkrasnov@salutedevices.com>
+X-Mailer: git-send-email 2.35.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,51 +64,107 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5 0/2] net: dsa: microchip: add drive strength
- support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169486862566.28624.11679449629469023987.git-patchwork-notify@kernel.org>
-Date: Sat, 16 Sep 2023 12:50:25 +0000
-References: <20230914075107.2239886-1-o.rempel@pengutronix.de>
-In-Reply-To: <20230914075107.2239886-1-o.rempel@pengutronix.de>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: davem@davemloft.net, andrew@lunn.ch, edumazet@google.com,
- f.fainelli@gmail.com, kuba@kernel.org, pabeni@redhat.com, olteanv@gmail.com,
- woojung.huh@microchip.com, arun.ramadoss@microchip.com, conor+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, robh+dt@kernel.org, kernel@pengutronix.de,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- UNGLinuxDriver@microchip.com, linux@armlinux.org.uk,
- devicetree@vger.kernel.org
+Content-Type: text/plain
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 179905 [Sep 16 2023]
+X-KSMG-AntiSpam-Version: 5.9.59.0
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 530 530 ecb1547b3f72d1df4c71c0b60e67ba6b4aea5432, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;git.kernel.org:7.1.1;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;127.0.0.199:7.1.2;lore.kernel.org:7.1.1;100.64.160.123:7.1.2;salutedevices.com:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2023/09/16 12:20:00
+X-KSMG-LinksScanning: Clean, bases: 2023/09/16 12:20:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/09/16 12:14:00 #21905676
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Hello,
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+this patchset is first of three parts of another big patchset for
+MSG_ZEROCOPY flag support:
+https://lore.kernel.org/netdev/20230701063947.3422088-1-AVKrasnov@sberdevices.ru/
 
-On Thu, 14 Sep 2023 09:51:05 +0200 you wrote:
-> changes v5:
-> - rename milliamp to microamp
-> - do not expect negative error code on snprintf
-> - set coma after last struct element
-> - rename found to have_any_prop
-> 
-> changes v4:
-> - integrate microchip feedback to the ksz9477_drive_strengths comment.
-> - add Reviewed-by: Rob Herring <robh@kernel.org>
-> 
-> [...]
+During review of this series, Stefano Garzarella <sgarzare@redhat.com>
+suggested to split it for three parts to simplify review and merging:
 
-Here is the summary with links:
-  - [net-next,v5,1/2] dt-bindings: net: dsa: microchip: Update ksz device tree bindings for drive strength
-    https://git.kernel.org/netdev/net-next/c/e26f40a60f17
-  - [net-next,v5,2/2] net: dsa: microchip: Add drive strength configuration
-    https://git.kernel.org/netdev/net-next/c/d67d7247f641
+1) virtio and vhost updates (for fragged skbs) <--- this patchset
+2) AF_VSOCK updates (allows to enable MSG_ZEROCOPY mode and read
+   tx completions) and update for Documentation/.
+3) Updates for tests and utils.
 
-You are awesome, thank you!
+This series enables handling of fragged skbs in virtio and vhost parts.
+Newly logic won't be triggered, because SO_ZEROCOPY options is still
+impossible to enable at this moment (next bunch of patches from big
+set above will enable it).
+
+I've included changelog to some patches anyway, because there were some
+comments during review of last big patchset from the link above.
+
+Head for this patchset is:
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=f2fa1c812c91e99d0317d1fc7d845e1e05f39716
+
+Link to v1:
+https://lore.kernel.org/netdev/20230717210051.856388-1-AVKrasnov@sberdevices.ru/
+Link to v2:
+https://lore.kernel.org/netdev/20230718180237.3248179-1-AVKrasnov@sberdevices.ru/
+Link to v3:
+https://lore.kernel.org/netdev/20230720214245.457298-1-AVKrasnov@sberdevices.ru/
+Link to v4:
+https://lore.kernel.org/netdev/20230727222627.1895355-1-AVKrasnov@sberdevices.ru/
+Link to v5:
+https://lore.kernel.org/netdev/20230730085905.3420811-1-AVKrasnov@sberdevices.ru/
+Link to v6:
+https://lore.kernel.org/netdev/20230814212720.3679058-1-AVKrasnov@sberdevices.ru/
+Link to v7:
+https://lore.kernel.org/netdev/20230827085436.941183-1-avkrasnov@salutedevices.com/
+Link to v8:
+https://lore.kernel.org/netdev/20230911202234.1932024-1-avkrasnov@salutedevices.com/
+
+Changelog:
+ v3 -> v4:
+ * Patchset rebased and tested on new HEAD of net-next (see hash above).
+ v4 -> v5:
+ * See per-patch changelog after ---.
+ v5 -> v6:
+ * Patchset rebased and tested on new HEAD of net-next (see hash above).
+ * See per-patch changelog after ---.
+ v6 -> v7:
+ * Patchset rebased and tested on new HEAD of net-next (see hash above).
+ * See per-patch changelog after ---.
+ v7 -> v8:
+ * Patchset rebased and tested on new HEAD of net-next (see hash above).
+ * See per-patch changelog after ---.
+ v8 -> v9:
+ * Patchset rebased and tested on new HEAD of net-next (see hash above).
+ * See per-patch changelog after ---.
+
+Arseniy Krasnov (4):
+  vsock/virtio/vhost: read data from non-linear skb
+  vsock/virtio: support to send non-linear skb
+  vsock/virtio: non-linear skb handling for tap
+  vsock/virtio: MSG_ZEROCOPY flag support
+
+ drivers/vhost/vsock.c                         |  14 +-
+ include/linux/virtio_vsock.h                  |  10 +
+ .../events/vsock_virtio_transport_common.h    |  12 +-
+ net/vmw_vsock/virtio_transport.c              |  92 +++++-
+ net/vmw_vsock/virtio_transport_common.c       | 307 ++++++++++++++----
+ 5 files changed, 348 insertions(+), 87 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.25.1
 
 
