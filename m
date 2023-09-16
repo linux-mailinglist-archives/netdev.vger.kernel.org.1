@@ -1,64 +1,74 @@
-Return-Path: <netdev+bounces-34293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E5327A30A8
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 15:18:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FB307A3094
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 15:12:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 028C0282479
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 13:18:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 369B81C20C57
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 13:12:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26A8814268;
-	Sat, 16 Sep 2023 13:16:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3022513FF0;
+	Sat, 16 Sep 2023 13:11:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 795C413FE1
-	for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 13:16:21 +0000 (UTC)
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E38D184;
-	Sat, 16 Sep 2023 06:16:18 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 146AA100009;
-	Sat, 16 Sep 2023 16:16:17 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 146AA100009
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1694870177;
-	bh=/Bnn+MMB1RppAlNyR2JfZ9mCYsFUh1vkO2uCOoEPgxA=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=EQ4qRVLE508YFr4vc4H40R6aJREc2ZvUgMZMgwz2jOSa/Gpvk8wy9fDeUysg2+oqJ
-	 Zjte9cELLGc38NS9hWh6g/4rQw5+Veu0TF0EvTkpBo5K2yTpiYUuliCNLLHsPEcvem
-	 oLZyCe3zAzNuKLnb7yUmlye26qBn/sKCq5+HxR4DafFBlbTSzP876FaO1S/g/TDlr4
-	 i3rSUYjJeogbMPK4pMkBcMA6wIpNifqgLQABQDHHkLHH88O7cqhquhB45FC9tzt8+Q
-	 NtSMdiShPwTHrM5nb9FCYr6d/FfMH/xjZ+B3p3US/9WQzH6IGI0J8hhTZ3/zzN8LAX
-	 oAFErrrd/C3uQ==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Sat, 16 Sep 2023 16:16:16 +0300 (MSK)
-Received: from localhost.localdomain (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Sat, 16 Sep 2023 16:16:16 +0300
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
-	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
-	<jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>
-CC: <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<kernel@sberdevices.ru>, <oxffffaa@gmail.com>, <avkrasnov@salutedevices.com>
-Subject: [PATCH net-next v9 4/4] vsock/virtio: MSG_ZEROCOPY flag support
-Date: Sat, 16 Sep 2023 16:09:18 +0300
-Message-ID: <20230916130918.4105122-5-avkrasnov@salutedevices.com>
-X-Mailer: git-send-email 2.35.0
-In-Reply-To: <20230916130918.4105122-1-avkrasnov@salutedevices.com>
-References: <20230916130918.4105122-1-avkrasnov@salutedevices.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12344134D8
+	for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 13:11:30 +0000 (UTC)
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7D41DD
+	for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 06:11:28 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id 41be03b00d2f7-5774b3de210so2265842a12.0
+        for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 06:11:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1694869888; x=1695474688; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=A+6V7zyIWBSyuKBXwovspmEjzeuP9h+Xekl4hJdv+74=;
+        b=ap8sQNPZSMd//P17yvfaTx1Xr7TRnWXhrVAttM2F0gZG8zaNwHeW/WyoCccDr1OC9X
+         PwLyGiaZDkygYr4Lz1P7WHQ6aS6Ji6lbC7l+FQL/hNCWgjXZ+K8G0myzb9mDVbRTTJEW
+         yy4ei9PnR3nuiUtk+p4g6bSuj05FuhdGV5ciCmUR3HGyRfktcK75hlyrVWE0ULqT1wHg
+         aikKB/s2DrVTGOr6MR+hIuvOo4hjSiiRVeL1YTv/wT+IjKUU4iUbPVQwQy58qIqClDA9
+         BH/3M4u6JdyjavBAU66ltCj7zluCvjfjB4ekTJyXJmM05K3agcY+apffQUFDipORy2Yk
+         sm0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694869888; x=1695474688;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=A+6V7zyIWBSyuKBXwovspmEjzeuP9h+Xekl4hJdv+74=;
+        b=VNH75igokw+JwvaGfiE8ueM9jTgMPyoVCkk2LEfmvMNaGWG3CoReeOTES7/ehekI7w
+         xyvW9fFUMZTXoNgTrCW8//8NTPHhnOJTv7PF0BSlGuWqHt1QsVb+b15q5AlAC+irEvvG
+         ajnBm5HKBrzk06Yi1tV1WmqnPWmKrAT+kqxNmAnWDRRWwHzfze5f3mzFKKkwBCkgZiO3
+         v6mFJ04ueC5LXs9jWlWNbozgUZxH19XF54CSZOhvi7ARyGG9Hxx15q4R2JzlgRLP7hBQ
+         SwaYkmwJwxpUkJP0Vz2Ta9lB0LPwUV0caOMiUkE+dA2sT5MrYjzz6ucYDgmTUVxePF7c
+         ZO7w==
+X-Gm-Message-State: AOJu0YzTFzMvXAvluuvaNyUiEqu4zbbhyvxXIJCSOHR0FyGJHL9Jsq5A
+	NScR725Dcw9aiLfXn1CXN4Q=
+X-Google-Smtp-Source: AGHT+IHEcZx6bXK/Hu+O9AVEorrv8wi2FpcSwgK/2zuAw+V+3P/XpHexrgk+K6putsrmd0JCUH8CJA==
+X-Received: by 2002:a05:6a21:3b46:b0:14c:6397:ac6e with SMTP id zy6-20020a056a213b4600b0014c6397ac6emr3863149pzb.23.1694869888038;
+        Sat, 16 Sep 2023 06:11:28 -0700 (PDT)
+Received: from ap.. ([182.213.254.91])
+        by smtp.gmail.com with ESMTPSA id f93-20020a17090a706600b0026fa1931f66sm4864187pjk.9.2023.09.16.06.11.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 16 Sep 2023 06:11:26 -0700 (PDT)
+From: Taehee Yoo <ap420073@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	jiri@resnulli.us,
+	netdev@vger.kernel.org
+Cc: ap420073@gmail.com,
+	syzbot+9bbbacfbf1e04d5221f7@syzkaller.appspotmail.com,
+	syzbot+1c71587a1a09de7fbde3@syzkaller.appspotmail.com
+Subject: [PATCH net v2] net: team: get rid of team->lock in team module
+Date: Sat, 16 Sep 2023 13:11:15 +0000
+Message-Id: <20230916131115.488756-1-ap420073@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,563 +76,434 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 179905 [Sep 16 2023]
-X-KSMG-AntiSpam-Version: 5.9.59.0
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 530 530 ecb1547b3f72d1df4c71c0b60e67ba6b4aea5432, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;100.64.160.123:7.1.2;127.0.0.199:7.1.2;salutedevices.com:7.1.1;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/09/16 12:14:00 #21905676
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This adds handling of MSG_ZEROCOPY flag on transmission path:
+The purpose of team->lock is to protect the private data of the team
+interface. But RTNL already protects it all well.
+The precise purpose of the team->lock is to reduce contention of
+RTNL due to GENL operations such as getting the team port list, and
+configuration dump.
 
-1) If this flag is set and zerocopy transmission is possible (enabled
-   in socket options and transport allows zerocopy), then non-linear
-   skb will be created and filled with the pages of user's buffer.
-   Pages of user's buffer are locked in memory by 'get_user_pages()'.
-2) Replaces way of skb owning: instead of 'skb_set_owner_sk_safe()' it
-   calls 'skb_set_owner_w()'. Reason of this change is that
-   '__zerocopy_sg_from_iter()' increments 'sk_wmem_alloc' of socket, so
-   to decrease this field correctly, proper skb destructor is needed:
-   'sock_wfree()'. This destructor is set by 'skb_set_owner_w()'.
-3) Adds new callback to 'struct virtio_transport': 'can_msgzerocopy'.
-   If this callback is set, then transport needs extra check to be able
-   to send provided number of buffers in zerocopy mode. Currently, the
-   only transport that needs this callback set is virtio, because this
-   transport adds new buffers to the virtio queue and we need to check,
-   that number of these buffers is less than size of the queue (it is
-   required by virtio spec). vhost and loopback transports don't need
-   this check.
+team interface has used a dynamic lockdep key to avoid false-positive
+lockdep deadlock detection. Virtual interfaces such as team usually
+have their own lock for protecting private data.
+These interfaces can be nested.
+team0
+  |
+team1
 
-Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Each interface's lock is actually different(team0->lock and team1->lock).
+So,
+mutex_lock(&team0->lock);
+mutex_lock(&team1->lock);
+mutex_unlock(&team1->lock);
+mutex_unlock(&team0->lock);
+The above case is absolutely safe. But lockdep warns about deadlock.
+Because the lockdep understands these two locks are same. This is a
+false-positive lockdep warning.
+
+So, in order to avoid this problem, the team interfaces started to use
+dynamic lockdep key. The false-positive problem was fixed, but it
+introduced a new problem.
+
+When the new team virtual interface is created, it registers a dynamic
+lockdep key(creates dynamic lockdep key) and uses it. But there is the
+limitation of the number of lockdep keys.
+So, If so many team interfaces are created, it consumes all lockdep keys.
+Then, the lockdep stops to work and warns about it.
+
+So, in order to fix this issue, It just removes team->lock and uses
+RTNL instead.
+
+The previous approach to fix this issue was to use the subclass lockdep
+key instead of the dynamic lockdep key. It requires RTNL before acquiring
+a nested lock because the subclass variable(dev->nested_lock) is
+protected by RTNL.
+However, the coverage of team->lock is too wide so sometimes it should
+use a subclass variable before initialization.
+So, it can't work well in the port initialization and unregister logic.
+
+This approach is just removing the team->lock clearly.
+So there is no special locking scenario in the team module.
+Also, It may convert RTNL to RCU for the read-most operations such as
+GENL dump but not yet adopted.
+
+Reproducer:
+   for i in {0..1000}
+   do
+           ip link add team$i type team
+           ip link add dummy$i master team$i type dummy
+           ip link set dummy$i up
+           ip link set team$i up
+   done
+
+Splat looks like:
+   BUG: MAX_LOCKDEP_ENTRIES too low!
+   turning off the locking correctness validator.
+   CPU: 1 PID: 7255 Comm: teamd Not tainted 6.6.0-rc1+ #63
+   Call Trace:
+    <TASK>
+    dump_stack_lvl+0x64/0xb0
+    add_lock_to_list+0x30d/0x5e0
+    check_prev_add+0x73a/0x23a0
+    __lock_acquire+0x326f/0x4e00
+    ? __pfx___lock_acquire+0x10/0x10
+    ? __pfx_netdev_warn+0x10/0x10
+    lock_acquire+0x1b4/0x520
+    ? linkwatch_fire_event+0x68/0x1b0
+    ? __pfx_lock_acquire+0x10/0x10
+    ? __team_port_change_send+0x2b3/0x4c0
+    ? __pfx___team_port_change_send+0x10/0x10
+    _raw_spin_lock_irqsave+0x47/0x90
+    ? linkwatch_fire_event+0x68/0x1b0
+    linkwatch_fire_event+0x68/0x1b0
+    netif_carrier_on+0x74/0xd0
+    team_add_slave+0x123a/0x1e80
+    ? __pfx_team_add_slave+0x10/0x10
+    ? mutex_is_locked+0x17/0x50
+    ? rtnl_is_locked+0x15/0x20
+    ? netdev_master_upper_dev_get+0x13/0x100
+    do_setlink+0x73f/0x31f0
+    ...
+
+Reported-by: syzbot+9bbbacfbf1e04d5221f7@syzkaller.appspotmail.com
+Reported-by: syzbot+1c71587a1a09de7fbde3@syzkaller.appspotmail.com
+Fixes: 369f61bee0f5 ("team: fix nested locking lockdep warning")
+Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 ---
- Changelog:
- v5(big patchset) -> v1:
-  * Refactorings of 'if' conditions.
-  * Remove extra blank line.
-  * Remove 'frag_off' field unneeded init.
-  * Add function 'virtio_transport_fill_skb()' which fills both linear
-    and non-linear skb with provided data.
- v1 -> v2:
-  * Use original order of last four arguments in 'virtio_transport_alloc_skb()'.
- v2 -> v3:
-  * Add new transport callback: 'msgzerocopy_check_iov'. It checks that
-    provided 'iov_iter' with data could be sent in a zerocopy mode.
-    If this callback is not set in transport - transport allows to send
-    any 'iov_iter' in zerocopy mode. Otherwise - if callback returns 'true'
-    then zerocopy is allowed. Reason of this callback is that in case of
-    G2H transmission we insert whole skb to the tx virtio queue and such
-    skb must fit to the size of the virtio queue to be sent in a single
-    iteration (may be tx logic in 'virtio_transport.c' could be reworked
-    as in vhost to support partial send of current skb). This callback
-    will be enabled only for G2H path. For details pls see comment 
-    'Check that tx queue...' below.
- v3 -> v4:
-  * 'msgzerocopy_check_iov' moved from 'struct vsock_transport' to
-    'struct virtio_transport' as it is virtio specific callback and
-    never needed in other transports.
- v4 -> v5:
-  * 'msgzerocopy_check_iov' renamed to 'can_msgzerocopy' and now it
-    uses number of buffers to send as input argument. I think there is
-    no need to pass iov to this callback (at least today, it is used only
-    by guest side of virtio transport), because the only thing that this
-    callback does is comparison of number of buffers to be inserted to
-    the tx queue and size of this queue.
-  * Remove any checks for type of current 'iov_iter' with payload (is it
-    'iovec' or 'ubuf'). These checks left from the earlier versions where I
-    didn't use already implemented kernel API which handles every type of
-    'iov_iter'.
- v5 -> v6:
-  * Refactor 'virtio_transport_fill_skb()'.
-  * Add 'WARN_ON_ONCE()' and comment on invalid combination of destination
-    socket and payload in 'virtio_transport_alloc_skb()'. 
- v7 -> v8:
-  * Move '+1' addition from 'can_msgzerocopy' callback body to the caller.
-    This addition means packet header.
-  * In 'virtio_transport_can_zcopy()' rename 'max_to_send' argument to
-    'pkt_len'.
-  * Update commit message by adding details about new 'can_msgzerocopy'
-    callback.
-  * In 'virtio_transport_init_hdr()' move 'len' argument directly after
-    'info'.
-  * Add comment about processing last skb in tx loop.
-  * Update comment for 'can_msgzerocopy' callback for more details.
- v8 -> v9:
-  * Return and update comment for 'virtio_transport_alloc_skb()'.
-  * Pass pointer to transport ops to 'virtio_transport_can_zcopy()',
-    this allows to use it directly without calling virtio_transport_get_ops()'.
-  * Remove redundant call for 'msg_data_left()' in 'virtio_transport_fill_skb()'.
-  * Do not pass 'struct vsock_sock*' to 'virtio_transport_alloc_skb()',
-    use same pointer from already passed 'struct virtio_vsock_pkt_info*'.
-  * Fix setting 'end of message' bit for SOCK_SEQPACKET (add call for
-    'msg_data_left()' == 0).
-  * Add 'zcopy' parameter to packet allocation trace event.
 
- include/linux/virtio_vsock.h                  |   9 +
- .../events/vsock_virtio_transport_common.h    |  12 +-
- net/vmw_vsock/virtio_transport.c              |  32 +++
- net/vmw_vsock/virtio_transport_common.c       | 250 ++++++++++++++----
- 4 files changed, 241 insertions(+), 62 deletions(-)
+v2:
+ - v1 was reverted, 39285e124edb ("net: team: do not use dynamic lockdep key")
+ - Remove team->lock completely instead of using subclass lockdep key.
 
-diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
-index a91fbdf233e4..ebb3ce63d64d 100644
---- a/include/linux/virtio_vsock.h
-+++ b/include/linux/virtio_vsock.h
-@@ -160,6 +160,15 @@ struct virtio_transport {
+ drivers/net/team/team.c                   | 62 +++++++----------------
+ drivers/net/team/team_mode_activebackup.c |  2 +-
+ drivers/net/team/team_mode_loadbalance.c  | 10 ++--
+ include/linux/if_team.h                   |  2 -
+ 4 files changed, 24 insertions(+), 52 deletions(-)
+
+diff --git a/drivers/net/team/team.c b/drivers/net/team/team.c
+index e8b94580194e..741c93db5bc0 100644
+--- a/drivers/net/team/team.c
++++ b/drivers/net/team/team.c
+@@ -928,8 +928,7 @@ static bool team_port_find(const struct team *team,
+ /*
+  * Enable/disable port by adding to enabled port hashlist and setting
+  * port->index (Might be racy so reader could see incorrect ifindex when
+- * processing a flying packet, but that is not a problem). Write guarded
+- * by team->lock.
++ * processing a flying packet, but that is not a problem).
+  */
+ static void team_port_enable(struct team *team,
+ 			     struct team_port *port)
+@@ -1643,8 +1642,6 @@ static int team_init(struct net_device *dev)
+ 		goto err_options_register;
+ 	netif_carrier_off(dev);
  
- 	/* Takes ownership of the packet */
- 	int (*send_pkt)(struct sk_buff *skb);
-+
-+	/* Used in MSG_ZEROCOPY mode. Checks, that provided data
-+	 * (number of buffers) could be transmitted with zerocopy
-+	 * mode. If this callback is not implemented for the current
-+	 * transport - this means that this transport doesn't need
-+	 * extra checks and can perform zerocopy transmission by
-+	 * default.
-+	 */
-+	bool (*can_msgzerocopy)(int bufs_num);
- };
+-	lockdep_register_key(&team->team_lock_key);
+-	__mutex_init(&team->lock, "team->team_lock_key", &team->team_lock_key);
+ 	netdev_lockdep_set_classes(dev);
  
- ssize_t
-diff --git a/include/trace/events/vsock_virtio_transport_common.h b/include/trace/events/vsock_virtio_transport_common.h
-index d0b3f0ea9ba1..f1ebe36787c3 100644
---- a/include/trace/events/vsock_virtio_transport_common.h
-+++ b/include/trace/events/vsock_virtio_transport_common.h
-@@ -43,7 +43,8 @@ TRACE_EVENT(virtio_transport_alloc_pkt,
- 		 __u32 len,
- 		 __u16 type,
- 		 __u16 op,
--		 __u32 flags
-+		 __u32 flags,
-+		 bool zcopy
- 	),
- 	TP_ARGS(
- 		src_cid, src_port,
-@@ -51,7 +52,8 @@ TRACE_EVENT(virtio_transport_alloc_pkt,
- 		len,
- 		type,
- 		op,
--		flags
-+		flags,
-+		zcopy
- 	),
- 	TP_STRUCT__entry(
- 		__field(__u32, src_cid)
-@@ -62,6 +64,7 @@ TRACE_EVENT(virtio_transport_alloc_pkt,
- 		__field(__u16, type)
- 		__field(__u16, op)
- 		__field(__u32, flags)
-+		__field(bool, zcopy)
- 	),
- 	TP_fast_assign(
- 		__entry->src_cid = src_cid;
-@@ -72,14 +75,15 @@ TRACE_EVENT(virtio_transport_alloc_pkt,
- 		__entry->type = type;
- 		__entry->op = op;
- 		__entry->flags = flags;
-+		__entry->zcopy = zcopy;
- 	),
--	TP_printk("%u:%u -> %u:%u len=%u type=%s op=%s flags=%#x",
-+	TP_printk("%u:%u -> %u:%u len=%u type=%s op=%s flags=%#x zcopy=%s",
- 		  __entry->src_cid, __entry->src_port,
- 		  __entry->dst_cid, __entry->dst_port,
- 		  __entry->len,
- 		  show_type(__entry->type),
- 		  show_op(__entry->op),
--		  __entry->flags)
-+		  __entry->flags, __entry->zcopy ? "true" : "false")
- );
+ 	return 0;
+@@ -1665,7 +1662,6 @@ static void team_uninit(struct net_device *dev)
+ 	struct team_port *port;
+ 	struct team_port *tmp;
  
- TRACE_EVENT(virtio_transport_recv_pkt,
-diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-index 73d730156349..09ba3128e759 100644
---- a/net/vmw_vsock/virtio_transport.c
-+++ b/net/vmw_vsock/virtio_transport.c
-@@ -455,6 +455,37 @@ static void virtio_vsock_rx_done(struct virtqueue *vq)
- 	queue_work(virtio_vsock_workqueue, &vsock->rx_work);
+-	mutex_lock(&team->lock);
+ 	list_for_each_entry_safe(port, tmp, &team->port_list, list)
+ 		team_port_del(team, port->dev);
+ 
+@@ -1674,9 +1670,7 @@ static void team_uninit(struct net_device *dev)
+ 	team_mcast_rejoin_fini(team);
+ 	team_notify_peers_fini(team);
+ 	team_queue_override_fini(team);
+-	mutex_unlock(&team->lock);
+ 	netdev_change_features(dev);
+-	lockdep_unregister_key(&team->team_lock_key);
  }
  
-+static bool virtio_transport_can_msgzerocopy(int bufs_num)
-+{
-+	struct virtio_vsock *vsock;
-+	bool res = false;
-+
-+	rcu_read_lock();
-+
-+	vsock = rcu_dereference(the_virtio_vsock);
-+	if (vsock) {
-+		struct virtqueue *vq = vsock->vqs[VSOCK_VQ_TX];
-+
-+		/* Check that tx queue is large enough to keep whole
-+		 * data to send. This is needed, because when there is
-+		 * not enough free space in the queue, current skb to
-+		 * send will be reinserted to the head of tx list of
-+		 * the socket to retry transmission later, so if skb
-+		 * is bigger than whole queue, it will be reinserted
-+		 * again and again, thus blocking other skbs to be sent.
-+		 * Each page of the user provided buffer will be added
-+		 * as a single buffer to the tx virtqueue, so compare
-+		 * number of pages against maximum capacity of the queue.
-+		 */
-+		if (bufs_num <= vq->num_max)
-+			res = true;
-+	}
-+
-+	rcu_read_unlock();
-+
-+	return res;
-+}
-+
- static bool virtio_transport_seqpacket_allow(u32 remote_cid);
- 
- static struct virtio_transport virtio_transport = {
-@@ -504,6 +535,7 @@ static struct virtio_transport virtio_transport = {
- 	},
- 
- 	.send_pkt = virtio_transport_send_pkt,
-+	.can_msgzerocopy = virtio_transport_can_msgzerocopy,
- };
- 
- static bool virtio_transport_seqpacket_allow(u32 remote_cid)
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index 3a48e48a99ac..e22c81435ef7 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -37,73 +37,99 @@ virtio_transport_get_ops(struct vsock_sock *vsk)
- 	return container_of(t, struct virtio_transport, transport);
+ static void team_destructor(struct net_device *dev)
+@@ -1797,11 +1791,9 @@ static int team_set_mac_address(struct net_device *dev, void *p)
+ 	if (dev->type == ARPHRD_ETHER && !is_valid_ether_addr(addr->sa_data))
+ 		return -EADDRNOTAVAIL;
+ 	dev_addr_set(dev, addr->sa_data);
+-	mutex_lock(&team->lock);
+ 	list_for_each_entry(port, &team->port_list, list)
+ 		if (team->ops.port_change_dev_addr)
+ 			team->ops.port_change_dev_addr(team, port);
+-	mutex_unlock(&team->lock);
+ 	return 0;
  }
  
--/* Returns a new packet on success, otherwise returns NULL.
-- *
-- * If NULL is returned, errp is set to a negative errno.
-- */
--static struct sk_buff *
--virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
--			   size_t len,
--			   u32 src_cid,
--			   u32 src_port,
--			   u32 dst_cid,
--			   u32 dst_port)
--{
--	const size_t skb_len = VIRTIO_VSOCK_SKB_HEADROOM + len;
--	struct virtio_vsock_hdr *hdr;
--	struct sk_buff *skb;
--	void *payload;
--	int err;
-+static bool virtio_transport_can_zcopy(const struct virtio_transport *t_ops,
-+				       struct virtio_vsock_pkt_info *info,
-+				       size_t pkt_len)
-+{
-+	struct iov_iter *iov_iter;
- 
--	skb = virtio_vsock_alloc_skb(skb_len, GFP_KERNEL);
--	if (!skb)
--		return NULL;
-+	if (!info->msg)
-+		return false;
- 
--	hdr = virtio_vsock_hdr(skb);
--	hdr->type	= cpu_to_le16(info->type);
--	hdr->op		= cpu_to_le16(info->op);
--	hdr->src_cid	= cpu_to_le64(src_cid);
--	hdr->dst_cid	= cpu_to_le64(dst_cid);
--	hdr->src_port	= cpu_to_le32(src_port);
--	hdr->dst_port	= cpu_to_le32(dst_port);
--	hdr->flags	= cpu_to_le32(info->flags);
--	hdr->len	= cpu_to_le32(len);
-+	iov_iter = &info->msg->msg_iter;
- 
--	if (info->msg && len > 0) {
--		payload = skb_put(skb, len);
--		err = memcpy_from_msg(payload, info->msg, len);
--		if (err)
--			goto out;
-+	if (iov_iter->iov_offset)
-+		return false;
- 
--		if (msg_data_left(info->msg) == 0 &&
--		    info->type == VIRTIO_VSOCK_TYPE_SEQPACKET) {
--			hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
-+	/* We can't send whole iov. */
-+	if (iov_iter->count > pkt_len)
-+		return false;
- 
--			if (info->msg->msg_flags & MSG_EOR)
--				hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
--		}
-+	/* Check that transport can send data in zerocopy mode. */
-+	t_ops = virtio_transport_get_ops(info->vsk);
-+
-+	if (t_ops->can_msgzerocopy) {
-+		int pages_in_iov = iov_iter_npages(iov_iter, MAX_SKB_FRAGS);
-+		int pages_to_send = min(pages_in_iov, MAX_SKB_FRAGS);
-+
-+		/* +1 is for packet header. */
-+		return t_ops->can_msgzerocopy(pages_to_send + 1);
+@@ -1815,7 +1807,6 @@ static int team_change_mtu(struct net_device *dev, int new_mtu)
+ 	 * Alhough this is reader, it's guarded by team lock. It's not possible
+ 	 * to traverse list in reverse under rcu_read_lock
+ 	 */
+-	mutex_lock(&team->lock);
+ 	team->port_mtu_change_allowed = true;
+ 	list_for_each_entry(port, &team->port_list, list) {
+ 		err = dev_set_mtu(port->dev, new_mtu);
+@@ -1826,7 +1817,6 @@ static int team_change_mtu(struct net_device *dev, int new_mtu)
+ 		}
  	}
+ 	team->port_mtu_change_allowed = false;
+-	mutex_unlock(&team->lock);
  
--	if (info->reply)
--		virtio_vsock_skb_set_reply(skb);
-+	return true;
-+}
+ 	dev->mtu = new_mtu;
  
--	trace_virtio_transport_alloc_pkt(src_cid, src_port,
--					 dst_cid, dst_port,
--					 len,
--					 info->type,
--					 info->op,
--					 info->flags);
-+static int virtio_transport_init_zcopy_skb(struct vsock_sock *vsk,
-+					   struct sk_buff *skb,
-+					   struct msghdr *msg,
-+					   bool zerocopy)
-+{
-+	struct ubuf_info *uarg;
+@@ -1836,7 +1826,6 @@ static int team_change_mtu(struct net_device *dev, int new_mtu)
+ 	list_for_each_entry_continue_reverse(port, &team->port_list, list)
+ 		dev_set_mtu(port->dev, dev->mtu);
+ 	team->port_mtu_change_allowed = false;
+-	mutex_unlock(&team->lock);
  
--	if (info->vsk && !skb_set_owner_sk_safe(skb, sk_vsock(info->vsk))) {
--		WARN_ONCE(1, "failed to allocate skb on vsock socket with sk_refcnt == 0\n");
--		goto out;
-+	if (msg->msg_ubuf) {
-+		uarg = msg->msg_ubuf;
-+		net_zcopy_get(uarg);
-+	} else {
-+		struct iov_iter *iter = &msg->msg_iter;
-+		struct ubuf_info_msgzc *uarg_zc;
-+
-+		uarg = msg_zerocopy_realloc(sk_vsock(vsk),
-+					    iter->count,
-+					    NULL);
-+		if (!uarg)
-+			return -1;
-+
-+		uarg_zc = uarg_to_msgzc(uarg);
-+		uarg_zc->zerocopy = zerocopy ? 1 : 0;
+ 	return err;
+ }
+@@ -1890,20 +1879,17 @@ static int team_vlan_rx_add_vid(struct net_device *dev, __be16 proto, u16 vid)
+ 	 * Alhough this is reader, it's guarded by team lock. It's not possible
+ 	 * to traverse list in reverse under rcu_read_lock
+ 	 */
+-	mutex_lock(&team->lock);
+ 	list_for_each_entry(port, &team->port_list, list) {
+ 		err = vlan_vid_add(port->dev, proto, vid);
+ 		if (err)
+ 			goto unwind;
  	}
+-	mutex_unlock(&team->lock);
  
--	return skb;
-+	skb_zcopy_init(skb, uarg);
+ 	return 0;
  
--out:
--	kfree_skb(skb);
--	return NULL;
-+	return 0;
-+}
-+
-+static int virtio_transport_fill_skb(struct sk_buff *skb,
-+				     struct virtio_vsock_pkt_info *info,
-+				     size_t len,
-+				     bool zcopy)
-+{
-+	if (zcopy)
-+		return __zerocopy_sg_from_iter(info->msg, NULL, skb,
-+					       &info->msg->msg_iter,
-+					       len);
-+
-+	return memcpy_from_msg(skb_put(skb, len), info->msg, len);
-+}
-+
-+static void virtio_transport_init_hdr(struct sk_buff *skb,
-+				      struct virtio_vsock_pkt_info *info,
-+				      size_t payload_len,
-+				      u32 src_cid,
-+				      u32 src_port,
-+				      u32 dst_cid,
-+				      u32 dst_port)
-+{
-+	struct virtio_vsock_hdr *hdr;
-+
-+	hdr = virtio_vsock_hdr(skb);
-+	hdr->type	= cpu_to_le16(info->type);
-+	hdr->op		= cpu_to_le16(info->op);
-+	hdr->src_cid	= cpu_to_le64(src_cid);
-+	hdr->dst_cid	= cpu_to_le64(dst_cid);
-+	hdr->src_port	= cpu_to_le32(src_port);
-+	hdr->dst_port	= cpu_to_le32(dst_port);
-+	hdr->flags	= cpu_to_le32(info->flags);
-+	hdr->len	= cpu_to_le32(payload_len);
+ unwind:
+ 	list_for_each_entry_continue_reverse(port, &team->port_list, list)
+ 		vlan_vid_del(port->dev, proto, vid);
+-	mutex_unlock(&team->lock);
+ 
+ 	return err;
  }
+@@ -1913,10 +1899,8 @@ static int team_vlan_rx_kill_vid(struct net_device *dev, __be16 proto, u16 vid)
+ 	struct team *team = netdev_priv(dev);
+ 	struct team_port *port;
  
- static void virtio_transport_copy_nonlinear_skb(const struct sk_buff *skb,
-@@ -214,6 +240,82 @@ static u16 virtio_transport_get_type(struct sock *sk)
- 		return VIRTIO_VSOCK_TYPE_SEQPACKET;
+-	mutex_lock(&team->lock);
+ 	list_for_each_entry(port, &team->port_list, list)
+ 		vlan_vid_del(port->dev, proto, vid);
+-	mutex_unlock(&team->lock);
+ 
+ 	return 0;
  }
- 
-+/* Returns new sk_buff on success, otherwise returns NULL. */
-+static struct sk_buff *virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *info,
-+						  size_t payload_len,
-+						  bool zcopy,
-+						  u32 src_cid,
-+						  u32 src_port,
-+						  u32 dst_cid,
-+						  u32 dst_port)
-+{
-+	struct vsock_sock *vsk;
-+	struct sk_buff *skb;
-+	size_t skb_len;
-+
-+	skb_len = VIRTIO_VSOCK_SKB_HEADROOM;
-+
-+	if (!zcopy)
-+		skb_len += payload_len;
-+
-+	skb = virtio_vsock_alloc_skb(skb_len, GFP_KERNEL);
-+	if (!skb)
-+		return NULL;
-+
-+	virtio_transport_init_hdr(skb, info, payload_len, src_cid, src_port,
-+				  dst_cid, dst_port);
-+
-+	vsk = info->vsk;
-+
-+	/* If 'vsk' != NULL then payload is always present, so we
-+	 * will never call '__zerocopy_sg_from_iter()' below without
-+	 * setting skb owner in 'skb_set_owner_w()'. The only case
-+	 * when 'vsk' == NULL is VIRTIO_VSOCK_OP_RST control message
-+	 * without payload.
-+	 */
-+	WARN_ON_ONCE(!(vsk && (info->msg && payload_len)) && zcopy);
-+
-+	/* Set owner here, because '__zerocopy_sg_from_iter()' uses
-+	 * owner of skb without check to update 'sk_wmem_alloc'.
-+	 */
-+	if (vsk)
-+		skb_set_owner_w(skb, sk_vsock(vsk));
-+
-+	if (info->msg && payload_len > 0) {
-+		int err;
-+
-+		err = virtio_transport_fill_skb(skb, info, payload_len, zcopy);
-+		if (err)
-+			goto out;
-+
-+		if (msg_data_left(info->msg) == 0 &&
-+		    info->type == VIRTIO_VSOCK_TYPE_SEQPACKET) {
-+			struct virtio_vsock_hdr *hdr = virtio_vsock_hdr(skb);
-+
-+			hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOM);
-+
-+			if (info->msg->msg_flags & MSG_EOR)
-+				hdr->flags |= cpu_to_le32(VIRTIO_VSOCK_SEQ_EOR);
-+		}
-+	}
-+
-+	if (info->reply)
-+		virtio_vsock_skb_set_reply(skb);
-+
-+	trace_virtio_transport_alloc_pkt(src_cid, src_port,
-+					 dst_cid, dst_port,
-+					 payload_len,
-+					 info->type,
-+					 info->op,
-+					 info->flags,
-+					 zcopy);
-+
-+	return skb;
-+out:
-+	kfree_skb(skb);
-+	return NULL;
-+}
-+
- /* This function can only be used on connecting/connected sockets,
-  * since a socket assigned to a transport is required.
-  *
-@@ -222,10 +324,12 @@ static u16 virtio_transport_get_type(struct sock *sk)
- static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
- 					  struct virtio_vsock_pkt_info *info)
+@@ -1938,9 +1922,7 @@ static void team_netpoll_cleanup(struct net_device *dev)
  {
-+	u32 max_skb_len = VIRTIO_VSOCK_MAX_PKT_BUF_SIZE;
- 	u32 src_cid, src_port, dst_cid, dst_port;
- 	const struct virtio_transport *t_ops;
- 	struct virtio_vsock_sock *vvs;
- 	u32 pkt_len = info->pkt_len;
-+	bool can_zcopy = false;
- 	u32 rest_len;
- 	int ret;
+ 	struct team *team = netdev_priv(dev);
  
-@@ -254,15 +358,30 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
- 	if (pkt_len == 0 && info->op == VIRTIO_VSOCK_OP_RW)
- 		return pkt_len;
+-	mutex_lock(&team->lock);
+ 	__team_netpoll_cleanup(team);
+-	mutex_unlock(&team->lock);
+ }
  
-+	if (info->msg) {
-+		/* If zerocopy is not enabled by 'setsockopt()', we behave as
-+		 * there is no MSG_ZEROCOPY flag set.
-+		 */
-+		if (!sock_flag(sk_vsock(vsk), SOCK_ZEROCOPY))
-+			info->msg->msg_flags &= ~MSG_ZEROCOPY;
-+
-+		if (info->msg->msg_flags & MSG_ZEROCOPY)
-+			can_zcopy = virtio_transport_can_zcopy(t_ops, info, pkt_len);
-+
-+		if (can_zcopy)
-+			max_skb_len = min_t(u32, VIRTIO_VSOCK_MAX_PKT_BUF_SIZE,
-+					    (MAX_SKB_FRAGS * PAGE_SIZE));
-+	}
-+
- 	rest_len = pkt_len;
+ static int team_netpoll_setup(struct net_device *dev,
+@@ -1950,7 +1932,6 @@ static int team_netpoll_setup(struct net_device *dev,
+ 	struct team_port *port;
+ 	int err = 0;
  
- 	do {
- 		struct sk_buff *skb;
- 		size_t skb_len;
- 
--		skb_len = min_t(u32, VIRTIO_VSOCK_MAX_PKT_BUF_SIZE, rest_len);
-+		skb_len = min(max_skb_len, rest_len);
- 
--		skb = virtio_transport_alloc_skb(info, skb_len,
-+		skb = virtio_transport_alloc_skb(info, skb_len, can_zcopy,
- 						 src_cid, src_port,
- 						 dst_cid, dst_port);
- 		if (!skb) {
-@@ -270,6 +389,21 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
+-	mutex_lock(&team->lock);
+ 	list_for_each_entry(port, &team->port_list, list) {
+ 		err = __team_port_enable_netpoll(port);
+ 		if (err) {
+@@ -1958,7 +1939,6 @@ static int team_netpoll_setup(struct net_device *dev,
  			break;
  		}
+ 	}
+-	mutex_unlock(&team->lock);
+ 	return err;
+ }
+ #endif
+@@ -1969,9 +1949,7 @@ static int team_add_slave(struct net_device *dev, struct net_device *port_dev,
+ 	struct team *team = netdev_priv(dev);
+ 	int err;
  
-+		/* We process buffer part by part, allocating skb on
-+		 * each iteration. If this is last skb for this buffer
-+		 * and MSG_ZEROCOPY mode is in use - we must allocate
-+		 * completion for the current syscall.
-+		 */
-+		if (info->msg && info->msg->msg_flags & MSG_ZEROCOPY &&
-+		    skb_len == rest_len && info->op == VIRTIO_VSOCK_OP_RW) {
-+			if (virtio_transport_init_zcopy_skb(vsk, skb,
-+							    info->msg,
-+							    can_zcopy)) {
-+				ret = -ENOMEM;
-+				break;
-+			}
-+		}
+-	mutex_lock(&team->lock);
+ 	err = team_port_add(team, port_dev, extack);
+-	mutex_unlock(&team->lock);
+ 
+ 	if (!err)
+ 		netdev_change_features(dev);
+@@ -1984,19 +1962,10 @@ static int team_del_slave(struct net_device *dev, struct net_device *port_dev)
+ 	struct team *team = netdev_priv(dev);
+ 	int err;
+ 
+-	mutex_lock(&team->lock);
+ 	err = team_port_del(team, port_dev);
+-	mutex_unlock(&team->lock);
+ 
+-	if (err)
+-		return err;
+-
+-	if (netif_is_team_master(port_dev)) {
+-		lockdep_unregister_key(&team->team_lock_key);
+-		lockdep_register_key(&team->team_lock_key);
+-		lockdep_set_class(&team->lock, &team->team_lock_key);
+-	}
+-	netdev_change_features(dev);
++	if (!err)
++		netdev_change_features(dev);
+ 
+ 	return err;
+ }
+@@ -2316,13 +2285,11 @@ static struct team *team_nl_team_get(struct genl_info *info)
+ 	}
+ 
+ 	team = netdev_priv(dev);
+-	mutex_lock(&team->lock);
+ 	return team;
+ }
+ 
+ static void team_nl_team_put(struct team *team)
+ {
+-	mutex_unlock(&team->lock);
+ 	dev_put(team->dev);
+ }
+ 
+@@ -2512,9 +2479,13 @@ static int team_nl_cmd_options_get(struct sk_buff *skb, struct genl_info *info)
+ 	int err;
+ 	LIST_HEAD(sel_opt_inst_list);
+ 
++	rtnl_lock();
 +
- 		virtio_transport_inc_tx_pkt(vvs, skb);
+ 	team = team_nl_team_get(info);
+-	if (!team)
+-		return -EINVAL;
++	if (!team) {
++		err = -EINVAL;
++		goto rtnl_unlock;
++	}
  
- 		ret = t_ops->send_pkt(skb);
-@@ -985,7 +1119,7 @@ static int virtio_transport_reset_no_sock(const struct virtio_transport *t,
- 	if (!t)
- 		return -ENOTCONN;
+ 	list_for_each_entry(opt_inst, &team->option_inst_list, list)
+ 		list_add_tail(&opt_inst->tmp_list, &sel_opt_inst_list);
+@@ -2524,6 +2495,8 @@ static int team_nl_cmd_options_get(struct sk_buff *skb, struct genl_info *info)
  
--	reply = virtio_transport_alloc_skb(&info, 0,
-+	reply = virtio_transport_alloc_skb(&info, 0, false,
- 					   le64_to_cpu(hdr->dst_cid),
- 					   le32_to_cpu(hdr->dst_port),
- 					   le64_to_cpu(hdr->src_cid),
+ 	team_nl_team_put(team);
+ 
++rtnl_unlock:
++	rtnl_unlock();
+ 	return err;
+ }
+ 
+@@ -2800,15 +2773,20 @@ static int team_nl_cmd_port_list_get(struct sk_buff *skb,
+ 	struct team *team;
+ 	int err;
+ 
++	rtnl_lock();
+ 	team = team_nl_team_get(info);
+-	if (!team)
+-		return -EINVAL;
++	if (!team) {
++		err = -EINVAL;
++		goto rtnl_unlock;
++	}
+ 
+ 	err = team_nl_send_port_list_get(team, info->snd_portid, info->snd_seq,
+ 					 NLM_F_ACK, team_nl_send_unicast, NULL);
+ 
+ 	team_nl_team_put(team);
+ 
++rtnl_unlock:
++	rtnl_unlock();
+ 	return err;
+ }
+ 
+@@ -2982,11 +2960,7 @@ static void __team_port_change_port_removed(struct team_port *port)
+ 
+ static void team_port_change_check(struct team_port *port, bool linkup)
+ {
+-	struct team *team = port->team;
+-
+-	mutex_lock(&team->lock);
+ 	__team_port_change_check(port, linkup);
+-	mutex_unlock(&team->lock);
+ }
+ 
+ 
+diff --git a/drivers/net/team/team_mode_activebackup.c b/drivers/net/team/team_mode_activebackup.c
+index e0f599e2a51d..1776c7500588 100644
+--- a/drivers/net/team/team_mode_activebackup.c
++++ b/drivers/net/team/team_mode_activebackup.c
+@@ -68,7 +68,7 @@ static void ab_active_port_get(struct team *team, struct team_gsetter_ctx *ctx)
+ 	struct team_port *active_port;
+ 
+ 	active_port = rcu_dereference_protected(ab_priv(team)->active_port,
+-						lockdep_is_held(&team->lock));
++						lockdep_rtnl_is_held());
+ 	if (active_port)
+ 		ctx->data.u32_val = active_port->dev->ifindex;
+ 	else
+diff --git a/drivers/net/team/team_mode_loadbalance.c b/drivers/net/team/team_mode_loadbalance.c
+index 00f8989c29c0..64a22866fabf 100644
+--- a/drivers/net/team/team_mode_loadbalance.c
++++ b/drivers/net/team/team_mode_loadbalance.c
+@@ -302,7 +302,7 @@ static int lb_bpf_func_set(struct team *team, struct team_gsetter_ctx *ctx)
+ 		/* Clear old filter data */
+ 		__fprog_destroy(lb_priv->ex->orig_fprog);
+ 		orig_fp = rcu_dereference_protected(lb_priv->fp,
+-						lockdep_is_held(&team->lock));
++						    lockdep_rtnl_is_held());
+ 	}
+ 
+ 	rcu_assign_pointer(lb_priv->fp, fp);
+@@ -325,7 +325,7 @@ static void lb_bpf_func_free(struct team *team)
+ 
+ 	__fprog_destroy(lb_priv->ex->orig_fprog);
+ 	fp = rcu_dereference_protected(lb_priv->fp,
+-				       lockdep_is_held(&team->lock));
++				       lockdep_rtnl_is_held());
+ 	bpf_prog_destroy(fp);
+ }
+ 
+@@ -336,7 +336,7 @@ static void lb_tx_method_get(struct team *team, struct team_gsetter_ctx *ctx)
+ 	char *name;
+ 
+ 	func = rcu_dereference_protected(lb_priv->select_tx_port_func,
+-					 lockdep_is_held(&team->lock));
++					 lockdep_rtnl_is_held());
+ 	name = lb_select_tx_port_get_name(func);
+ 	BUG_ON(!name);
+ 	ctx->data.str_val = name;
+@@ -478,7 +478,7 @@ static void lb_stats_refresh(struct work_struct *work)
+ 	team = lb_priv_ex->team;
+ 	lb_priv = get_lb_priv(team);
+ 
+-	if (!mutex_trylock(&team->lock)) {
++	if (!rtnl_trylock()) {
+ 		schedule_delayed_work(&lb_priv_ex->stats.refresh_dw, 0);
+ 		return;
+ 	}
+@@ -515,7 +515,7 @@ static void lb_stats_refresh(struct work_struct *work)
+ 	schedule_delayed_work(&lb_priv_ex->stats.refresh_dw,
+ 			      (lb_priv_ex->stats.refresh_interval * HZ) / 10);
+ 
+-	mutex_unlock(&team->lock);
++	rtnl_unlock();
+ }
+ 
+ static void lb_stats_refresh_interval_get(struct team *team,
+diff --git a/include/linux/if_team.h b/include/linux/if_team.h
+index 1b9b15a492fa..cfd5ad577e5c 100644
+--- a/include/linux/if_team.h
++++ b/include/linux/if_team.h
+@@ -189,8 +189,6 @@ struct team {
+ 	struct net_device *dev; /* associated netdevice */
+ 	struct team_pcpu_stats __percpu *pcpu_stats;
+ 
+-	struct mutex lock; /* used for overall locking, e.g. port lists write */
+-
+ 	/*
+ 	 * List of enabled ports and their count
+ 	 */
 -- 
-2.25.1
+2.34.1
 
 
