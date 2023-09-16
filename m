@@ -1,68 +1,234 @@
-Return-Path: <netdev+bounces-34313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 179D67A3120
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 17:34:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2593B7A3130
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 17:45:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD6AC28214F
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 15:34:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F83B1C209AC
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 15:45:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D76814275;
-	Sat, 16 Sep 2023 15:34:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB3CA1B27A;
+	Sat, 16 Sep 2023 15:44:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BF6A12B9A
-	for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 15:34:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3217BC433C7;
-	Sat, 16 Sep 2023 15:34:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694878459;
-	bh=RdDZPLFEo/rep3G/EYR6iQccvFHq02ff6Uft8SoULpM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fRV5fOA5i/oiztva45eZ94ZEA0D3UIS0T+UqpJ6uIsRHFSlGPpGy3byGJQIMua+rp
-	 b7RmMzyimhWgDo/JhPx5S5WVRyK5/8CXkTKnER/NyeHYl8p+JiP5mLUV52L9NGHsoz
-	 cil37iOIsJs/iKTGTJcOQixj7zPHmt6ZtCJ8Nec6dirQXV3G7Glvos35VOuKvFv0Lz
-	 R5iWfrXjB8opxqnuvEfVAw7g1J5gyq8efsZiD57GG0RSjWeJQmwvAt9FtcPqN7kjG6
-	 P26Txzp58GOxQfxcngWYznW4ktfjS/i/PofTI3EXLrbrwl0IbHLQxKf1Ly7g75ISrp
-	 JLnbbghPvcUEA==
-Date: Sat, 16 Sep 2023 17:34:15 +0200
-From: Simon Horman <horms@kernel.org>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	shenjian15@huawei.com, wangjie125@huawei.com,
-	liuyonglong@huawei.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 1/5] net: hns3: add cmdq check for vf periodic
- service task
-Message-ID: <20230916153415.GF1125562@kernel.org>
-References: <20230915095305.422328-1-shaojijie@huawei.com>
- <20230915095305.422328-2-shaojijie@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD27A14A82
+	for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 15:44:28 +0000 (UTC)
+Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3906BCE3
+	for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 08:44:26 -0700 (PDT)
+Received: from [192.168.2.51] (p4fe718a3.dip0.t-ipconnect.de [79.231.24.163])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: stefan@datenfreihafen.org)
+	by proxima.lasnet.de (Postfix) with ESMTPSA id 4A831C0270;
+	Sat, 16 Sep 2023 17:36:18 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+	s=2021; t=1694878578;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pLNPP6HB8qBQRUNSmQElKva/41IvPL9YbKIHWl8GTXk=;
+	b=L+GtHgBl4KLUXwee+wbGGELbnoPEZrIdXcTyHMXH9fBrVSJnGV9qHxaVKhVIx2u+YvYLmd
+	auL/748VSS6r1RNgoZaWZzleIJDtn7Hi6O1efKapV/psscbXDBCgrUw6TLHH4VUKwCKlz9
+	H5/frsiOi5ytyZi8Oo65fisSnqX+qG2vKx1+bLy5ugaEZC8+BHoxHbf0/65payQDf9zV7d
+	ImLYbaa4/U+G/+hts+Rc04OeCpaEP0Jh3PYBtd6C3pARLhYP83qzmy+WE4n0/TZSLWsVqW
+	//3UIJM0fjkwrxxNwTFtefGRPW1fICjBP/fsXQ6KMhivA6ooFI1DTXjZ7Mh7hQ==
+Message-ID: <32cfbf0f-7ac8-5a4c-d9cd-9650a64fc0ea@datenfreihafen.org>
+Date: Sat, 16 Sep 2023 17:36:17 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230915095305.422328-2-shaojijie@huawei.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+Subject: Re: [PATCH wpan-next v2 02/11] ieee802154: Internal PAN management
+To: Miquel Raynal <miquel.raynal@bootlin.com>,
+ Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+ David Girault <david.girault@qorvo.com>,
+ Romuald Despres <romuald.despres@qorvo.com>,
+ Frederic Blain <frederic.blain@qorvo.com>,
+ Nicolas Schodet <nico@ni.fr.eu.org>,
+ Guilhem Imberton <guilhem.imberton@qorvo.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+References: <20230901170501.1066321-1-miquel.raynal@bootlin.com>
+ <20230901170501.1066321-3-miquel.raynal@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20230901170501.1066321-3-miquel.raynal@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, Sep 15, 2023 at 05:53:01PM +0800, Jijie Shao wrote:
-> From: Jie Wang <wangjie125@huawei.com>
+Hello Miquel.
+
+On 01.09.23 19:04, Miquel Raynal wrote:
+> Introduce structures to describe peer devices in a PAN as well as a few
+> related helpers. We basically care about:
+> - Our unique parent after associating with a coordinator.
+> - Peer devices, children, which successfully associated with us.
 > 
-> When the vf cmdq is disabled, there is no need to keep these task running.
-> So this patch skip these task when the cmdq is disabled.
+> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> ---
+>   include/net/cfg802154.h | 46 ++++++++++++++++++++++++++++
+>   net/ieee802154/Makefile |  2 +-
+>   net/ieee802154/core.c   |  2 ++
+>   net/ieee802154/pan.c    | 66 +++++++++++++++++++++++++++++++++++++++++
+>   4 files changed, 115 insertions(+), 1 deletion(-)
+>   create mode 100644 net/ieee802154/pan.c
 > 
-> Signed-off-by: Jie Wang <wangjie125@huawei.com>
-> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+> diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
+> index f79ce133e51a..6c7193b4873c 100644
+> --- a/include/net/cfg802154.h
+> +++ b/include/net/cfg802154.h
+> @@ -303,6 +303,22 @@ struct ieee802154_coord_desc {
+>   	bool gts_permit;
+>   };
+>   
+> +/**
+> + * struct ieee802154_pan_device - PAN device information
+> + * @pan_id: the PAN ID of this device
+> + * @mode: the preferred mode to reach the device
+> + * @short_addr: the short address of this device
+> + * @extended_addr: the extended address of this device
+> + * @node: the list node
+> + */
+> +struct ieee802154_pan_device {
+> +	__le16 pan_id;
+> +	u8 mode;
+> +	__le16 short_addr;
+> +	__le64 extended_addr;
+> +	struct list_head node;
+> +};
+> +
+>   /**
+>    * struct cfg802154_scan_request - Scan request
+>    *
+> @@ -478,6 +494,11 @@ struct wpan_dev {
+>   
+>   	/* fallback for acknowledgment bit setting */
+>   	bool ackreq;
+> +
+> +	/* Associations */
+> +	struct mutex association_lock;
+> +	struct ieee802154_pan_device *parent;
+> +	struct list_head children;
+>   };
+>   
+>   #define to_phy(_dev)	container_of(_dev, struct wpan_phy, dev)
+> @@ -529,4 +550,29 @@ static inline const char *wpan_phy_name(struct wpan_phy *phy)
+>   void ieee802154_configure_durations(struct wpan_phy *phy,
+>   				    unsigned int page, unsigned int channel);
+>   
+> +/**
+> + * cfg802154_device_is_associated - Checks whether we are associated to any device
+> + * @wpan_dev: the wpan device
 
-Hi Jinjie Shao,
+Missing return value documentation.
 
-if this is a fix then it's probably appropriate to include a Fixes tag.
+> + */
+> +bool cfg802154_device_is_associated(struct wpan_dev *wpan_dev);
+> +
+> +/**
+> + * cfg802154_device_is_parent - Checks if a device is our coordinator
+> + * @wpan_dev: the wpan device
+> + * @target: the expected parent
+> + * @return: true if @target is our coordinator
+> + */
+> +bool cfg802154_device_is_parent(struct wpan_dev *wpan_dev,
+> +				struct ieee802154_addr *target);
+> +
+> +/**
+> + * cfg802154_device_is_child - Checks whether a device is associated to us
+> + * @wpan_dev: the wpan device
+> + * @target: the expected child
+> + * @return: the PAN device
+> + */
+> +struct ieee802154_pan_device *
+> +cfg802154_device_is_child(struct wpan_dev *wpan_dev,
+> +			  struct ieee802154_addr *target);
+> +
+>   #endif /* __NET_CFG802154_H */
+> diff --git a/net/ieee802154/Makefile b/net/ieee802154/Makefile
+> index f05b7bdae2aa..7bce67673e83 100644
+> --- a/net/ieee802154/Makefile
+> +++ b/net/ieee802154/Makefile
+> @@ -4,7 +4,7 @@ obj-$(CONFIG_IEEE802154_SOCKET) += ieee802154_socket.o
+>   obj-y += 6lowpan/
+>   
+>   ieee802154-y := netlink.o nl-mac.o nl-phy.o nl_policy.o core.o \
+> -                header_ops.o sysfs.o nl802154.o trace.o
+> +                header_ops.o sysfs.o nl802154.o trace.o pan.o
+>   ieee802154_socket-y := socket.o
+>   
+>   CFLAGS_trace.o := -I$(src)
+> diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
+> index 57546e07e06a..cd69bdbfd59f 100644
+> --- a/net/ieee802154/core.c
+> +++ b/net/ieee802154/core.c
+> @@ -276,6 +276,8 @@ static int cfg802154_netdev_notifier_call(struct notifier_block *nb,
+>   		wpan_dev->identifier = ++rdev->wpan_dev_id;
+>   		list_add_rcu(&wpan_dev->list, &rdev->wpan_dev_list);
+>   		rdev->devlist_generation++;
+> +		mutex_init(&wpan_dev->association_lock);
+> +		INIT_LIST_HEAD(&wpan_dev->children);
+>   
+>   		wpan_dev->netdev = dev;
+>   		break;
+> diff --git a/net/ieee802154/pan.c b/net/ieee802154/pan.c
+> new file mode 100644
+> index 000000000000..e2a12a42ba2b
+> --- /dev/null
+> +++ b/net/ieee802154/pan.c
+> @@ -0,0 +1,66 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * IEEE 802.15.4 PAN management
+> + *
+> + * Copyright (C) 2021 Qorvo US, Inc
+> + * Authors:
+> + *   - David Girault <david.girault@qorvo.com>
+> + *   - Miquel Raynal <miquel.raynal@bootlin.com>
+> + */
+> +
+> +#include <linux/kernel.h>
+> +#include <net/cfg802154.h>
+> +#include <net/af_ieee802154.h>
+> +
+> +static bool cfg802154_same_addr(struct ieee802154_pan_device *a,
+> +				struct ieee802154_addr *b)
+> +{
+> +	if (!a || !b)
+> +		return false;
+> +
+> +	switch (b->mode) {
+> +	case IEEE802154_ADDR_SHORT:
+> +		return a->short_addr == b->short_addr;
+> +	case IEEE802154_ADDR_LONG:
+> +		return a->extended_addr == b->extended_addr;
+> +	default:
+> +		return false;
+> +	}
+> +}
+
+Don't we already have such a helper already?
+
+regards
+Stefan Schmidt
 
