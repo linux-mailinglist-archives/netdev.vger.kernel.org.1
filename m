@@ -1,67 +1,88 @@
-Return-Path: <netdev+bounces-34325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2EA87A31DD
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 20:25:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BA757A326A
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 22:17:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DBB81C2092C
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 18:25:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E8CB1C20A7A
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 20:17:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF94E1BDDF;
-	Sat, 16 Sep 2023 18:25:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5A2F1C283;
+	Sat, 16 Sep 2023 20:17:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40064134DE
-	for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 18:25:09 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D010CE6;
-	Sat, 16 Sep 2023 11:25:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=xaTgqIRqEW118i1euHWPGl1GL4m7oLRslyef9vzxato=; b=cMTQ5S0H6ptadVHrLUVUPezYG0
-	M/m9SP+CLoFdyO2PpoZEf5Ld6DB59iCsLWDck05pQLQDBzS050zVFVFDppfLyXkFDpX2nA+G/x10F
-	nUyJ1hPFsUIrnBQ24CHqasjX/Mmqnqvy+Y41WlSNOFxP9Cuwx8cSG/nXTAtt95OQi03B8pkCatQpW
-	hDgHmHJj/FNxOxFAcXuHdkTaBlcSxOnSvsDzlYQrEhoNkl4jAPPBvPbW03oCBYytNzrIyLiLEtZ+E
-	hJLzXV137LRsaeX/ajGL72d+sO8izCz9F8L9Hl1Nmoq96ettQHwKEm3GOCVWkQHDKzYoVca2sdnQG
-	x9Lo2Jyg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38474)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qhZyG-0006uM-23;
-	Sat, 16 Sep 2023 19:24:44 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qhZyA-00072B-OD; Sat, 16 Sep 2023 19:24:38 +0100
-Date: Sat, 16 Sep 2023 19:24:38 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, llvm@lists.linux.dev,
-	ndesaulniers@google.com, nathan@kernel.org, trix@redhat.com
-Subject: Re: [PATCH net-next] net: ethernet: mtk_eth_soc: add paths and
- SerDes modes for MT7988
-Message-ID: <ZQXy5pxPRN1QXQkq@shell.armlinux.org.uk>
-References: <675b5abd8b40a71c177e9e4e4c92d2d6b1413b9b.1694527316.git.daniel@makrotopia.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A1101BDF9;
+	Sat, 16 Sep 2023 20:17:08 +0000 (UTC)
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90179CD8;
+	Sat, 16 Sep 2023 13:17:05 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id 2adb3069b0e04-50300cb4776so1285856e87.3;
+        Sat, 16 Sep 2023 13:17:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1694895424; x=1695500224; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=UNhhSv5EciaOBb+e1S2UjWYyLKGfXoLDerHcISpMZ/M=;
+        b=G6xoVExFBGrKOGOYRSsaDGVJXefddpTV5eGBtOG114Y4xy0BlE56OldylcnFcyUcz/
+         j4kaAuJlnVCAU74dUlQX68e1ErrDTdlUFMh72oIQNtdbxDglTOCJNV5sZQi0wtNe4i4K
+         z+00lde4ZmERj08Sdi3VCcLWFWCZLqg9ggQFcny+/11jVPo28U312pGN91s70XOfrBUv
+         6OAK/+C+hu9tTLQ2tdbov8pA529CXqHeVypfTozu9SyemOeBFBwFZju7PBfxXlVsIfHk
+         FxRx/275nhd+SOH0amX6Q1zCpqO+ydArUh7SkyXI5cGTjt+mOeIEuOrsVEu3mW9fI+3N
+         kA0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694895424; x=1695500224;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UNhhSv5EciaOBb+e1S2UjWYyLKGfXoLDerHcISpMZ/M=;
+        b=JF+Tc9Ro5ZmKl3iFPdEjwiZF/Tps3ctmYr+jw4N0XXNzRyboX9EBsd+aNePNMz9Kqi
+         7FIKeEdorKRpYf0xEGHNtPIBtbB0XRfQlPGnvnsOVwfjMXzWIXg2UY+8AL74Fhq3olpb
+         3+QkklLhBAfci969PPq6jFBCNg1JzuJaLM3KwQZcbW1syr8rVxpDQ+OoLUBFtn/JnH3K
+         u4+8gSJIHTfdYvv71wjvrR1tui+GXgQRhTXQxDrANzqJDuasCcKx6+uWKzpdw7sZtl5f
+         Hijsx8axhK9qD492Xhed00r1ArGII/RIrovo7X8tfYJPKlK+e6JBA/sJ9RT5TBhAw+O2
+         6KRQ==
+X-Gm-Message-State: AOJu0YzQAo6EE/DAaoPfyZHNP2+gWd7IpvhbpdbbdsJaIwoElBh//SJj
+	dlUpfK7XW/l/om0UBYTG6TQ=
+X-Google-Smtp-Source: AGHT+IH/c4i0uop45XSoB3FVHudZLfQx+wFFjmngE5fSGUxt14oE+PYAFRWGPEKb4HXVctYTbkYdMQ==
+X-Received: by 2002:a05:6512:a96:b0:4f8:7513:8cac with SMTP id m22-20020a0565120a9600b004f875138cacmr5451811lfu.48.1694895423484;
+        Sat, 16 Sep 2023 13:17:03 -0700 (PDT)
+Received: from mobilestation ([95.79.219.206])
+        by smtp.gmail.com with ESMTPSA id h10-20020ac25d6a000000b004f85d80ca64sm1140038lft.221.2023.09.16.13.17.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 16 Sep 2023 13:17:02 -0700 (PDT)
+Date: Sat, 16 Sep 2023 23:17:00 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Jose Abreu <Jose.Abreu@synopsys.com>
+Cc: Russell King <linux@armlinux.org.uk>, Jakub Kicinski <kuba@kernel.org>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Alexei Starovoitov <ast@kernel.org>, 
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	"David S. Miller" <davem@davemloft.net>, Emil Renner Berthing <kernel@esmil.dk>, 
+	Eric Dumazet <edumazet@google.com>, Fabio Estevam <festevam@gmail.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
+	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, NXP Linux Team <linux-imx@nxp.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Pengutronix Kernel Team <kernel@pengutronix.de>, 
+	Samin Guo <samin.guo@starfivetech.com>, Sascha Hauer <s.hauer@pengutronix.de>, 
+	Shawn Guo <shawnguo@kernel.org>
+Subject: Re: [PATCH net-next 4/6] net: stmmac: rk: use
+ stmmac_set_tx_clk_gmii()
+Message-ID: <c7jenrfdzdbvg4wa4pukan7qb6sumigulafmwgmiyjoexr5w3d@djcti5cf6b6s>
+References: <ZQMPnyutz6T23E8T@shell.armlinux.org.uk>
+ <E1qgmkp-007Z4s-GL@rmk-PC.armlinux.org.uk>
+ <7vhtvd25qswsju34lgqi4em5v3utsxlvi3lltyt5yqqecddpyh@c5yvk7t5k5zz>
+ <ZQMgtXSTsNoZohnx@shell.armlinux.org.uk>
+ <rene2x562lqsknmwpaxpu337mhl4bgynct6vcyryebvem2umso@2pjocnxluxgg>
+ <ZQMmV2pSCAX8AJzz@shell.armlinux.org.uk>
+ <ZQMnA1PgPDDQzDrC@shell.armlinux.org.uk>
+ <DM4PR12MB50888CA414C76F5C59C27E50D3F7A@DM4PR12MB5088.namprd12.prod.outlook.com>
+ <uzvjph54kg2jkfbmwrvmunqv64ig7j6szr6pxxbiesnz5lletg@zq57w7jj2up4>
+ <DM4PR12MB5088A61E5F067EB459C06CCFD3F6A@DM4PR12MB5088.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,83 +91,41 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <675b5abd8b40a71c177e9e4e4c92d2d6b1413b9b.1694527316.git.daniel@makrotopia.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <DM4PR12MB5088A61E5F067EB459C06CCFD3F6A@DM4PR12MB5088.namprd12.prod.outlook.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Sep 12, 2023 at 03:54:40PM +0100, Daniel Golle wrote:
-> +static void mtk_usxgmii_pcs_get_state(struct phylink_pcs *pcs,
-> +				      struct phylink_link_state *state)
-> +{
-> +	struct mtk_usxgmii_pcs *mpcs = pcs_to_mtk_usxgmii_pcs(pcs);
-> +	struct mtk_eth *eth = mpcs->eth;
-> +	struct mtk_mac *mac = eth->mac[mtk_xgmii2mac_id(eth, mpcs->id)];
-> +	u32 val = 0;
-> +
-> +	regmap_read(mpcs->regmap, RG_PCS_AN_CTRL0, &val);
-> +	if (FIELD_GET(USXGMII_AN_ENABLE, val)) {
-> +		/* Refresh LPA by inverting LPA_LATCH */
-> +		regmap_read(mpcs->regmap, RG_PCS_AN_STS0, &val);
-> +		regmap_update_bits(mpcs->regmap, RG_PCS_AN_STS0,
-> +				   USXGMII_LPA_LATCH,
-> +				   !(val & USXGMII_LPA_LATCH));
-> +
-> +		regmap_read(mpcs->regmap, RG_PCS_AN_STS0, &val);
-> +
-> +		phylink_decode_usxgmii_word(state, FIELD_GET(USXGMII_PCS_AN_WORD,
-> +							     val));
-> +
-> +		state->interface = mpcs->interface;
+On Fri, Sep 15, 2023 at 08:38:51AM +0000, Jose Abreu wrote:
+> From: Serge Semin <fancer.lancer@gmail.com>
+> Date: Thu, Sep 14, 2023 at 18:05:09
+> 
+> > I actually thought the driver has been long abandoned seeing how many
+> > questionable changes have been accepted. That's why I decided to step
+> > in with more detailed reviews for now. Anyway It's up to you to
+> > decide. You are the driver maintainer after all.
+> 
 
-Why are you assigning state->interface?
+> It's up to everyone to decide. I understand your comments on the patchset
+> and agree with most of them 
 
-> +	} else {
-> +		val = mtk_r32(mac->hw, MTK_XGMAC_STS(mac->id));
-> +
-> +		if (mac->id == MTK_GMAC2_ID)
-> +			val >>= 16;
-> +
-> +		switch (FIELD_GET(MTK_USXGMII_PCS_MODE, val)) {
-> +		case 0:
-> +			state->speed = SPEED_10000;
-> +			break;
-> +		case 1:
-> +			state->speed = SPEED_5000;
-> +			break;
-> +		case 2:
-> +			state->speed = SPEED_2500;
-> +			break;
-> +		case 3:
-> +			state->speed = SPEED_1000;
-> +			break;
-> +		}
-> +
-> +		state->interface = mpcs->interface;
-> +		state->link = FIELD_GET(MTK_USXGMII_PCS_LINK, val);
-> +		state->duplex = DUPLEX_FULL;
-> +	}
-> +
-> +	/* Refresh USXGMII link status by toggling RG_PCS_RX_STATUS_UPDATE */
-> +	regmap_set_bits(mpcs->regmap, RG_PCS_RX_STATUS0, RG_PCS_RX_STATUS_UPDATE);
-> +	ndelay(1020);
-> +	regmap_clear_bits(mpcs->regmap, RG_PCS_RX_STATUS0, RG_PCS_RX_STATUS_UPDATE);
-> +	ndelay(1020);
-> +
-> +	/* Read USXGMII link status */
-> +	regmap_read(mpcs->regmap, RG_PCS_RX_STATUS0, &val);
-> +	state->link = state->link && FIELD_GET(RG_PCS_RX_LINK_STATUS, val);
+Ok. Thanks for clarification. I'll keep reviewing the bits then
+submitted for the STMMAC driver based on my knowledges of the driver
+guts and the DW GMAC/XGMAC/Eth QoS IP-cores implementation.
 
-Doesn't this make the assignment to state->link above irrelevant?
+> but on the topic of changing the entire
+> patchset to add the fix on "plat_stmmacenet_data->fix_mac_speed",
+> I don't think it's on the scope of this series.
 
-I need to spend a bit longer looking through this - it looks like there
-are three levels of indirection in this now?
+That's what I meant in my comment. Of course it's out of the series
+scope.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+-Serge(y)
+
+> 
+> Thanks,
+> Jose
 
