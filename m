@@ -1,146 +1,92 @@
-Return-Path: <netdev+bounces-34301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 870C47A30F3
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 16:46:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AAF277A30F6
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 16:47:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6B7C281B12
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 14:46:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6560F28240A
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 14:47:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2EE713FEE;
-	Sat, 16 Sep 2023 14:46:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E22E613FEE;
+	Sat, 16 Sep 2023 14:47:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AEE83C38;
-	Sat, 16 Sep 2023 14:46:43 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5294218E;
-	Sat, 16 Sep 2023 07:46:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=kKrlL3psbhaCacm+GqwkX8wPmM3l79IE3hZOV3TRBaI=; b=zE
-	HVhZz4uTqMJMVJcu3KYGmi2MLjVRMMHNyLX6kcjia1n2F2IQc5io9HeXGOfGGKvZH8iRZIPVZcp77
-	LYzk7HhHXaOsCZo9gQEC4pSqcpkLutxR9IK8JXRLqlbCiDWp1ZE+40PSHsw0ZI0x9t45osDZMRWM0
-	Cd2D5NLvGyYD+O8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qhWZ9-006dsL-DM; Sat, 16 Sep 2023 16:46:35 +0200
-Date: Sat, 16 Sep 2023 16:46:35 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Bagas Sanjaya <bagasdotme@gmail.com>
-Cc: Louis-Marie <rauline.lm@protonmail.com>,
-	Linux USB <linux-usb@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Hayes Wang <hayeswang@realtek.com>, Simon Horman <horms@kernel.org>,
-	Antonio Napolitano <anton@polit.no>,
-	Douglas Anderson <dianders@chromium.org>,
-	Andrew Gaul <gaul@gaul.org>,
-	=?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>,
-	Jean-Francois Le Fillatre <jflf_kernel@gmx.com>,
-	Dennis Wassenberg <dennis.wassenberg@secunet.com>,
-	Nicolas Dumazet <ndumazet@google.com>,
-	Mark Pearson <mpearson-lenovo@squebb.ca>,
-	Hannu Hartikainen <hannu@hrtk.in>,
-	=?utf-8?Q?=C5=81ukasz?= Bartosik <lb@semihalf.com>
-Subject: Re: Lenovo Hybrid Dock MAC passtrough patch
-Message-ID: <a4d79eb6-ebab-4a7e-9b57-81c8e68b7c41@lunn.ch>
-References: <guK8MKcjWbPsZ1LuRVYxFf7WfsWa025shmVj7iq289LHf59N6i6OlkD0N9KhICJzbMfFW2aXYbguZ1NtZNn6PlA_-JvF3k7uJtG89THdZ6w=@protonmail.com>
- <ZQWcQTQahx-QEGDl@debian.me>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D704812B9A;
+	Sat, 16 Sep 2023 14:47:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4018C433C7;
+	Sat, 16 Sep 2023 14:47:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694875668;
+	bh=DrpFaRSh/IAeouBerVCYqiVaRBz09LVTL2zZXjVhk0A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BcGZXd7tGQX9f5peC25KLnAHHnsRMglQ2tX2ZQlXPodNBeeEDSPRM7LaDVUwchSK/
+	 aGU6cA7qLoXcoqcfKRaoydd98XmsKv7GZOS/LlXhPk7q480dXWJG3xedTzLac2/Vtj
+	 +RrsniiJQHOplMRj9R0agcXR6IgVBKnUqwLSyneJ0os+zB6TD2vm3GfzubIBSIshVh
+	 XDS2Y9MJAjZ+wQsdDdr7q1B1bQJj6MUlDEX2FyR00OcO4loRd5/40PVIQUW77Bx6i1
+	 qrvl27ZSLI5oiokE6B7zjD88dfkhIKS+0R5xygnHUnSTMAAhV6FkC4MyaFQi0AnTtO
+	 rJ2GwPydVg5uA==
+Date: Sat, 16 Sep 2023 16:47:42 +0200
+From: Simon Horman <horms@kernel.org>
+To: Pu Lehui <pulehui@huaweicloud.com>
+Cc: bpf@vger.kernel.org, linux-riscv@lists.infradead.org,
+	netdev@vger.kernel.org,
+	=?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Yonghong Song <yhs@fb.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Luke Nelson <luke.r.nels@gmail.com>, Pu Lehui <pulehui@huawei.com>
+Subject: Re: [PATCH bpf-next 3/6] riscv, bpf: Simplify sext and zext logics
+ in branch instructions
+Message-ID: <20230916144742.GB1125562@kernel.org>
+References: <20230913153413.1446068-1-pulehui@huaweicloud.com>
+ <20230913153413.1446068-4-pulehui@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZQWcQTQahx-QEGDl@debian.me>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+In-Reply-To: <20230913153413.1446068-4-pulehui@huaweicloud.com>
 
-On Sat, Sep 16, 2023 at 07:14:57PM +0700, Bagas Sanjaya wrote:
-> On Sat, Sep 16, 2023 at 11:41:49AM +0000, Louis-Marie wrote:
-> > Hi,
-> > I would like to submit a patch for enabling mac passtrough for the Lenovo Hybrid Dock.
-> > Tested with Fedora 6.4.12.
-> > 
-> > 
-> > 
-> > diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.cindex 0c13d9950cd8..02e6404bf6ea 100644
-> > --- a/drivers/net/usb/r8152.c
-> > +++ b/drivers/net/usb/r8152.c
-> > @@ -781,6 +781,7 @@ enum rtl8152_flags {
-> >  #define DEVICE_ID_THINKPAD_USB_C_DONGLE            0x720c
-> >  #define DEVICE_ID_THINKPAD_USB_C_DOCK_GEN2     0xa387
-> >  #define DEVICE_ID_THINKPAD_USB_C_DOCK_GEN3     0x3062
-> > +#define DEVICE_ID_THINKPAD_HYBRID_USB_C_DOCK       0xa359
-> > 
-> >  struct tally_counter {
-> >     __le64  tx_packets;
-> > @@ -9583,6 +9584,7 @@ static bool rtl8152_supports_lenovo_macpassthru(struct usb_device *udev)
-> >         case DEVICE_ID_THINKPAD_THUNDERBOLT3_DOCK_GEN2:
-> >         case DEVICE_ID_THINKPAD_USB_C_DOCK_GEN2:
-> >         case DEVICE_ID_THINKPAD_USB_C_DOCK_GEN3:
-> > +       case DEVICE_ID_THINKPAD_HYBRID_USB_C_DOCK:
-> >         case DEVICE_ID_THINKPAD_USB_C_DONGLE:
-> >             return 1;
-> >         }
-> > @@ -9832,6 +9834,7 @@ static const struct usb_device_id rtl8152_table[] = {
-> >     { USB_DEVICE(VENDOR_ID_LENOVO,  0x7214) },
-> >     { USB_DEVICE(VENDOR_ID_LENOVO,  0x721e) },
-> >     { USB_DEVICE(VENDOR_ID_LENOVO,  0xa387) },
-> > +   { USB_DEVICE(VENDOR_ID_LENOVO,  0xa359) },
-> >     { USB_DEVICE(VENDOR_ID_LINKSYS, 0x0041) },
-> >     { USB_DEVICE(VENDOR_ID_NVIDIA,  0x09ff) },
-> >     { USB_DEVICE(VENDOR_ID_TPLINK,  0x0601) },
-> > diff --git a/drivers/usb/core/quirks.c b/drivers/usb/core/quirks.c
-> > index 15e9bd180a1d..ad98c8ffbc69 100644
-> > --- a/drivers/usb/core/quirks.c
-> > +++ b/drivers/usb/core/quirks.c
-> > @@ -470,6 +470,9 @@ static const struct usb_device_id usb_quirk_list[] = {
-> >     /* Lenovo ThinkPad USB-C Dock Gen2 Ethernet (RTL8153 GigE) */
-> >     { USB_DEVICE(0x17ef, 0xa387), .driver_info = USB_QUIRK_NO_LPM },
-> > 
-> > +   /* Lenovo ThinkPad Hydrid USB-C Dock */
-> > +   { USB_DEVICE(0x17ef, 0xa359), .driver_info = USB_QUIRK_NO_LPM },
-> > +
-> >     /* BUILDWIN Photo Frame */
-> >     { USB_DEVICE(0x1908, 0x1315), .driver_info =
-> >             USB_QUIRK_HONOR_BNUMINTERFACES },
-> > 
-> > Signed-off-by: Louis-Marie Rauline <rauline.lm@protonmail.com>
-> > 
+On Wed, Sep 13, 2023 at 11:34:10PM +0800, Pu Lehui wrote:
+> From: Pu Lehui <pulehui@huawei.com>
 > 
-> Can you send above suggestion as formal patch instead? See
-> Documentation/process/submitting-patches.rst for how to properly submit
-> patches. And also, use git-send-email(1) when sending them so that patch
-> corruption (like tabs converting to spaces and line wrapping as in above
-> diff) doesn't occur.
+> There are many extension helpers in the current branch instructions, and
+> the implementation is a bit complicated. We simplify this logic through
+> two simple extension helpers with alternate register.
 > 
-> Thanks.
+> Signed-off-by: Pu Lehui <pulehui@huawei.com>
+> ---
+>  arch/riscv/net/bpf_jit_comp64.c | 82 +++++++++++++--------------------
+>  1 file changed, 31 insertions(+), 51 deletions(-)
+> 
+> diff --git a/arch/riscv/net/bpf_jit_comp64.c b/arch/riscv/net/bpf_jit_comp64.c
+> index 4a649e195..1728ce16d 100644
+> --- a/arch/riscv/net/bpf_jit_comp64.c
+> +++ b/arch/riscv/net/bpf_jit_comp64.c
+> @@ -141,6 +141,19 @@ static bool in_auipc_jalr_range(s64 val)
+>  		val < ((1L << 31) - (1L << 11));
+>  }
+>  
+> +/* Modify rd pointer to alternate reg to avoid corrupting orignal reg */
 
-This appears to do more than MAC passthrough, e.g. adding a quirk for
-LPM. Please split the patch up. The MAC passthrough part is likely to
-be rejected, because MAC pass through is a mess, but the quirk part
-looks O.K.
+Hi Pu Lehui,
 
-      Andrew
+nit: original
+
+I suggest running checkpatch --codespell over this series before submitting
+v2.
 
