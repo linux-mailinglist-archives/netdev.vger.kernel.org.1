@@ -1,125 +1,148 @@
-Return-Path: <netdev+bounces-34321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C975B7A3157
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 18:16:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 340F07A317B
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 18:48:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A65C41C209A2
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 16:16:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FE2F1C209AF
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 16:48:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6BAD18B04;
-	Sat, 16 Sep 2023 16:16:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53C5A18E27;
+	Sat, 16 Sep 2023 16:48:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 242C81428F;
-	Sat, 16 Sep 2023 16:16:08 +0000 (UTC)
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F39C4CC0;
-	Sat, 16 Sep 2023 09:16:03 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A761F20004;
-	Sat, 16 Sep 2023 16:15:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1694880962;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3gR3DLgOcVXEyCHmeRvHW5kTpbx/Ml5B4FTcTxP2j0o=;
-	b=dlTg8bzB+GMfQwAkNn10piDT3xlzayexaJtzerTcgHGpGMs/JAhpZPkaM8RoNcP//TSyqN
-	3qqwDwy34P2RQiy3Kz8V9s5uw9bjz86onvrpaijDpXuq/oH81lB+2Yme5oZAxFBj7pTtCX
-	oM2LDmFmQum3aFrwsNN4fZtg9PUMRqx6PwUFU7uvrKAlbbFMOzjF3Dqm9MQ+BO6pxYcOMh
-	ifohoX73vuoVQ12QX1Ql7G1QHgmUvNpWCS/+P+cwSVNJ19TSSVrCnNe1mXIr/9LntGG2p8
-	3yC5m9V4cZIzMAHQGVFJEoeGGAnb+x1HyLflkFe7W4wgbaNMfGzsecHWLd0tfg==
-Message-ID: <e0a925bb-d4f1-44a1-8fe3-e1a59c4a7476@arinc9.com>
-Date: Sat, 16 Sep 2023 19:15:02 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B55EB12B9A
+	for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 16:48:00 +0000 (UTC)
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C70ECE0
+	for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 09:47:58 -0700 (PDT)
+Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-52c4d3ff424so3780884a12.0
+        for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 09:47:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1694882876; x=1695487676; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ejZyk1D+Wp2SXvuf4rFgBU6uIbrjoPbkU5t2XjSkEwU=;
+        b=JeqG/bZH297Z8e0o62CRFFd2qPh9cq8katULmy1/Fbv8oQykcXQmifh6mmHz0HVVVr
+         VNbONpKqqlVyCgn0tojmsFCrU8s7nliY68xKubvjyNonkXRqGCA9RvlkSqzm7eQxXTwk
+         ANfAOb32C3Kxtq7R8IQlZdm14WKO03eVY4LHlCKwyAniqoZKtq6vYJR+EnlT7c6oQOZA
+         3/wlF1JnB16y1MxbSy4pD1dmqD0bfSAq8KKm15LbJUBvwwR68ocIPW69dseAJYjd7tDc
+         5pkRszmw3MqcMDYn3+inatTkBnoDuoTSSzHEK3GDXIax1IlVphNdoSooFxzJIY/392TH
+         PXzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694882876; x=1695487676;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ejZyk1D+Wp2SXvuf4rFgBU6uIbrjoPbkU5t2XjSkEwU=;
+        b=xUf5pywqrC04n0lCNSU/gK6WrpupjshSUwiijgaxgtoo5/8Mpaev8pw6P1iKF8dQEv
+         HOyE26QxdGXs499XJE7nhInwOSRPNtQvBL16nxzTBAsnzDxcwZ5Hb035j2b/HJtO0yOq
+         wff7zAc+k2MF+JvpMNSsulIMIlBb4hD3PcsYbLrR3nM/vKh1+bPcr9Y0NvBVBrprZFS3
+         AZfe1K57I/Ldv/04qt53hR7MjFMVwJ9CiJ058z/NLNMmNV1o8eHl9QcU40wWjtG4fj7B
+         G/3qBFfb+lgWBmX/I9m9BazriLBUbBzIy22XPsfdSmn2AfgfXUZD+HzV8Ym8jRJmaf7p
+         45tg==
+X-Gm-Message-State: AOJu0YxszJy1PjC6aqb67vY/cYwZcCeFCatUQjYQ1qaVjYIBsf1Okhtl
+	KpaZZtO4HLjEQsVbx2JZ+DZGmQ==
+X-Google-Smtp-Source: AGHT+IHV1Cr/15N093RlXPwD11x1/13mxPo2WpxyyCCTPnijQVC7KlL4vLJlaf015N6YMmQuCxKH4w==
+X-Received: by 2002:aa7:df07:0:b0:525:ce69:b52d with SMTP id c7-20020aa7df07000000b00525ce69b52dmr4380676edy.39.1694882876100;
+        Sat, 16 Sep 2023 09:47:56 -0700 (PDT)
+Received: from localhost ([86.61.181.4])
+        by smtp.gmail.com with ESMTPSA id m24-20020aa7d358000000b005231e1780aasm3649224edr.91.2023.09.16.09.47.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 16 Sep 2023 09:47:55 -0700 (PDT)
+Date: Sat, 16 Sep 2023 18:47:54 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Taehee Yoo <ap420073@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, netdev@vger.kernel.org,
+	syzbot+9bbbacfbf1e04d5221f7@syzkaller.appspotmail.com,
+	syzbot+1c71587a1a09de7fbde3@syzkaller.appspotmail.com
+Subject: Re: [PATCH net v2] net: team: get rid of team->lock in team module
+Message-ID: <ZQXcOmtm1l36nUwV@nanopsycho>
+References: <20230916131115.488756-1-ap420073@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 10/10] dt-bindings: net:
- marvell-armada-370-neta: convert to json-schema
-Content-Language: en-US
-To: Rob Herring <robh@kernel.org>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Sean Wang <sean.wang@mediatek.com>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Woojung Huh <Woojung.Huh@microchip.com>, John Crispin <john@phrozen.org>,
- linux-mediatek@lists.infradead.org, Lorenzo Bianconi <lorenzo@kernel.org>,
- Felix Fietkau <nbd@nbd.name>, Oleksij Rempel <linux@rempel-privat.de>,
- Shyam Pandey <radhey.shyam.pandey@xilinx.com>, Andrew Lunn <andrew@lunn.ch>,
- Steen Hegelund <steen.hegelund@microchip.com>, linux-kernel@vger.kernel.org,
- =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
- Daniel Machon <daniel.machon@microchip.com>,
- Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
- UNGLinuxDriver@microchip.com, Linus Walleij <linus.walleij@linaro.org>,
- Eric Dumazet <edumazet@google.com>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Marcin Wojtas <mw@semihalf.com>, Giuseppe Cavallaro
- <peppe.cavallaro@st.com>, "David S. Miller" <davem@davemloft.net>,
- Nicolas Ferre <nicolas.ferre@microchip.com>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Vladimir Oltean <olteanv@gmail.com>,
- Claudiu Beznea <claudiu.beznea@microchip.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Daniel Golle
- <daniel@makrotopia.org>, Horatiu Vultur <horatiu.vultur@microchip.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- linux-arm-kernel@lists.infradead.org, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh+dt@kernel.org>,
- Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
- Marek Vasut <marex@denx.de>, Claudiu Manoil <claudiu.manoil@nxp.com>,
- Sekhar Nori <nsekhar@ti.com>, Lars Povlsen <lars.povlsen@microchip.com>,
- Kurt Kanzenbach <kurt@linutronix.de>, Jose Abreu <joabreu@synopsys.com>,
- Madalin Bucur <madalin.bucur@nxp.com>, netdev@vger.kernel.org,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- Magnus Damm <magnus.damm@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- mithat.guner@xeront.com,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- Ioana Ciornei <ioana.ciornei@nxp.com>, devicetree@vger.kernel.org,
- Conor Dooley <conor+dt@kernel.org>,
- George McCollister <george.mccollister@gmail.com>, erkin.bozoglu@xeront.com,
- linux-renesas-soc@vger.kernel.org
-References: <20230916110902.234273-1-arinc.unal@arinc9.com>
- <20230916110902.234273-11-arinc.unal@arinc9.com>
- <169487631064.1637966.13545721653989465162.robh@kernel.org>
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <169487631064.1637966.13545721653989465162.robh@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230916131115.488756-1-ap420073@gmail.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 16.09.2023 17:58, Rob Herring wrote:
-> My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-> on your patch (DT_CHECKER_FLAGS is new in v5.13):
-> 
-> yamllint warnings/errors:
-> 
-> dtschema/dtc warnings/errors:
-> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/marvell-armada-370-neta.yaml:
-> Unresolvable JSON pointer: '$defs/phylink'
+Sat, Sep 16, 2023 at 03:11:15PM CEST, ap420073@gmail.com wrote:
+>The purpose of team->lock is to protect the private data of the team
+>interface. But RTNL already protects it all well.
+>The precise purpose of the team->lock is to reduce contention of
+>RTNL due to GENL operations such as getting the team port list, and
+>configuration dump.
+>
+>team interface has used a dynamic lockdep key to avoid false-positive
+>lockdep deadlock detection. Virtual interfaces such as team usually
+>have their own lock for protecting private data.
+>These interfaces can be nested.
+>team0
+>  |
+>team1
+>
+>Each interface's lock is actually different(team0->lock and team1->lock).
+>So,
+>mutex_lock(&team0->lock);
+>mutex_lock(&team1->lock);
+>mutex_unlock(&team1->lock);
+>mutex_unlock(&team0->lock);
+>The above case is absolutely safe. But lockdep warns about deadlock.
+>Because the lockdep understands these two locks are same. This is a
+>false-positive lockdep warning.
+>
+>So, in order to avoid this problem, the team interfaces started to use
+>dynamic lockdep key. The false-positive problem was fixed, but it
+>introduced a new problem.
+>
+>When the new team virtual interface is created, it registers a dynamic
+>lockdep key(creates dynamic lockdep key) and uses it. But there is the
+>limitation of the number of lockdep keys.
+>So, If so many team interfaces are created, it consumes all lockdep keys.
+>Then, the lockdep stops to work and warns about it.
 
-Not surprising as this is added with a previous patch in this series.
+What about fixing the lockdep instead? I bet this is not the only
+occurence of this problem.
 
-> doc reference errors (make refcheckdocs):
-> Warning: Documentation/devicetree/bindings/net/marvell-neta-bm.txt references a file that doesn't exist: Documentation/devicetree/bindings/net/marvell-armada-370-neta.txt
-> Documentation/devicetree/bindings/net/marvell-neta-bm.txt: Documentation/devicetree/bindings/net/marvell-armada-370-neta.txt
 
-Will address.
-
-Arınç
+>
+>So, in order to fix this issue, It just removes team->lock and uses
+>RTNL instead.
+>
+>The previous approach to fix this issue was to use the subclass lockdep
+>key instead of the dynamic lockdep key. It requires RTNL before acquiring
+>a nested lock because the subclass variable(dev->nested_lock) is
+>protected by RTNL.
+>However, the coverage of team->lock is too wide so sometimes it should
+>use a subclass variable before initialization.
+>So, it can't work well in the port initialization and unregister logic.
+>
+>This approach is just removing the team->lock clearly.
+>So there is no special locking scenario in the team module.
+>Also, It may convert RTNL to RCU for the read-most operations such as
+>GENL dump but not yet adopted.
+>
+>Reproducer:
+>   for i in {0..1000}
+>   do
+>           ip link add team$i type team
+>           ip link add dummy$i master team$i type dummy
+>           ip link set dummy$i up
+>           ip link set team$i up
+>   done
+>
 
