@@ -1,119 +1,127 @@
-Return-Path: <netdev+bounces-34319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 110E87A3133
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 17:47:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0561B7A3149
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 18:01:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9FCC281FB2
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 15:47:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6384B281A66
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 16:01:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E322B14296;
-	Sat, 16 Sep 2023 15:47:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B53E14AB0;
+	Sat, 16 Sep 2023 16:01:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7FFA14291;
-	Sat, 16 Sep 2023 15:47:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6142C433C8;
-	Sat, 16 Sep 2023 15:47:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694879263;
-	bh=9yoeSuSu4c9avKuB9jsu8jsIQJYt6cBB3MWv0m0Z7y0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Qe8Sc6HLO2iQZ9PjqYe1yCCRQ1tpnCuR3MCfNQEU9aSMLnwJM9Hhl0/bONQXIPfd5
-	 WmLJsJ/tiCNRjsOKIFJrc2i9jLeX7G5SS1WMXuDoyRed0jMGkLFprFwDmwk4uSNBo5
-	 z6ceK18Ahw1+EMw+kgrsL+y+BNFk92hEn94HOTDhhQuHSpCT7W4z6fjg14rH6BVQ86
-	 yY2MiMDmDCOpc183NEO2j4DrbMiLlKzbh1njf4KTt+Ghvfo1kClALhuvrvFFubX7Gy
-	 8BQRvSt3QIWMEg4BoyZh+DRbmRrMUX95NQa6vByR7Blu7bKb6cIEV6V/g44xjWsCfk
-	 WKOnp3JIalObg==
-Date: Sat, 16 Sep 2023 17:47:37 +0200
-From: Simon Horman <horms@kernel.org>
-To: Jisheng Zhang <jszhang@kernel.org>
-Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-sunxi@lists.linux.dev,
-	linux-stm32@st-md-mailman.stormreply.com, johannes@sipsolutions.net,
-	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-Subject: Re: [PATCH] net: stmmac: fix incorrect rxq|txq_stats reference
-Message-ID: <20230916154737.GG1125562@kernel.org>
-References: <20230915005316.592-1-jszhang@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89912125D1;
+	Sat, 16 Sep 2023 16:01:06 +0000 (UTC)
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8292418E;
+	Sat, 16 Sep 2023 09:01:03 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id BD3E820004;
+	Sat, 16 Sep 2023 16:00:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1694880059;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cicF7chj7riRpPja3q96dvd4VI1Db8nQ+jlNJBelRdk=;
+	b=eGZbIXcnDc09K7Gp+rHBN3OWiS/9NK5vw0Gj4xYPxi3VsYaLThWXFfxH4EV8zHrfJJBo6T
+	9fq+QNQP1zC4Ukto5j86b4GRfy0XcYAfBXBr/WCRyDMELcpISzTyfM9WJ5GCNKy3mUQ+1i
+	LR4/aFA3t3jgS4u2fQGC3Xm4+nr9pk69bV1fe3l0MFGebw11iqbOEYW9guWMrtY0FiDZl2
+	KZpnwCsEGY4KEPfCQRmVTmSx/o31pU9Va4K99L9c9nYjT/MaJkviA7yVC8v6pQ/6lIECS4
+	gY4v/1Vv0/grUi3JTXrI7+1/mcdFNKdZ11PDij6YbPh3xCAOO59eKmW3FKYuUQ==
+Message-ID: <bdd2b752-21f9-4d1e-85e1-75a04479bc73@arinc9.com>
+Date: Sat, 16 Sep 2023 19:00:17 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 07/10] dt-bindings: net: enforce phylink
+ bindings on certain ethernet controllers
+Content-Language: en-US
+To: Rob Herring <robh@kernel.org>
+Cc: Marcin Wojtas <mw@semihalf.com>, erkin.bozoglu@xeront.com,
+ Jakub Kicinski <kuba@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Daniel Machon <daniel.machon@microchip.com>,
+ =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
+ Vladimir Oltean <olteanv@gmail.com>, netdev@vger.kernel.org,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ linux-renesas-soc@vger.kernel.org, Jose Abreu <joabreu@synopsys.com>,
+ Daniel Golle <daniel@makrotopia.org>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Claudiu Beznea <claudiu.beznea@microchip.com>,
+ Oleksij Rempel <linux@rempel-privat.de>,
+ Florian Fainelli <f.fainelli@gmail.com>, Sekhar Nori <nsekhar@ti.com>,
+ Landen Chao <Landen.Chao@mediatek.com>, Lorenzo Bianconi
+ <lorenzo@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+ Magnus Damm <magnus.damm@gmail.com>, Madalin Bucur <madalin.bucur@nxp.com>,
+ Lars Povlsen <lars.povlsen@microchip.com>, UNGLinuxDriver@microchip.com,
+ Steen He gelund <steen.hegelund@microchip.com>,
+ Rob Herring <robh+dt@kernel.org>, mithat.guner@xeront.com,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Horatiu Vultur <horatiu.vultur@microchip.com>, devicetree@vger.kernel.org,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Conor Dooley <conor+dt@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ John Crispin <john@phrozen.org>,
+ George McCollister <george.mccollister@gmail.com>,
+ Marek Vasut <marex@denx.de>, "David S. Miller" <davem@davemloft.net>,
+ Ioana Ciornei <ioana.ciornei@nxp.com>, DENG Qingfang <dqfext@gmail.com>,
+ Felix Fietkau <nbd@nbd.name>, Claudiu Manoil <claudiu.manoil@nxp.com>,
+ linux-mediatek@lists.infradead.org, Eric Dumazet <edumazet@google.com>,
+ Linus Walleij <linus.walleij@linaro.org>, Sean Wang
+ <sean.wang@mediatek.com>, Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Woojung Huh <woojung.huh@microchip.com>,
+ Alexandr e Torgue <alexandre.torgue@foss.st.com>,
+ Shyam Pandey <radhey.shyam.pandey@xilinx.com>,
+ Paolo Abeni <pabeni@redhat.com>, Kurt Kanzenbach <kurt@linutronix.de>,
+ "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+ =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ linux-kernel@vger.kernel.org
+References: <20230916110902.234273-1-arinc.unal@arinc9.com>
+ <20230916110902.234273-8-arinc.unal@arinc9.com>
+ <169487630940.1637895.12001153052612710003.robh@kernel.org>
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <169487630940.1637895.12001153052612710003.robh@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230915005316.592-1-jszhang@kernel.org>
+X-GND-Sasl: arinc.unal@arinc9.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, Sep 15, 2023 at 08:53:16AM +0800, Jisheng Zhang wrote:
-> commit 133466c3bbe1 ("net: stmmac: use per-queue 64 bit statistics
-> where necessary") caused one regression as found by Uwe, the backtrace
-> looks like:
+On 16.09.2023 17:58, Rob Herring wrote:
+> My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
+> on your patch (DT_CHECKER_FLAGS is new in v5.13):
 > 
-> INFO: trying to register non-static key.
-> The code is fine but needs lockdep annotation, or maybe
-> you didn't initialize this object before use?
-> turning off the locking correctness validator.
-> CPU: 0 PID: 1 Comm: swapper/0 Not tainted 6.5.0-rc1-00449-g133466c3bbe1-dirty #21
-> Hardware name: STM32 (Device Tree Support)
->  unwind_backtrace from show_stack+0x18/0x1c
->  show_stack from dump_stack_lvl+0x60/0x90
->  dump_stack_lvl from register_lock_class+0x98c/0x99c
->  register_lock_class from __lock_acquire+0x74/0x293c
->  __lock_acquire from lock_acquire+0x134/0x398
->  lock_acquire from stmmac_get_stats64+0x2ac/0x2fc
->  stmmac_get_stats64 from dev_get_stats+0x44/0x130
->  dev_get_stats from rtnl_fill_stats+0x38/0x120
->  rtnl_fill_stats from rtnl_fill_ifinfo+0x834/0x17f4
->  rtnl_fill_ifinfo from rtmsg_ifinfo_build_skb+0xc0/0x144
->  rtmsg_ifinfo_build_skb from rtmsg_ifinfo+0x50/0x88
->  rtmsg_ifinfo from __dev_notify_flags+0xc0/0xec
->  __dev_notify_flags from dev_change_flags+0x50/0x5c
->  dev_change_flags from ip_auto_config+0x2f4/0x1260
->  ip_auto_config from do_one_initcall+0x70/0x35c
->  do_one_initcall from kernel_init_freeable+0x2ac/0x308
->  kernel_init_freeable from kernel_init+0x1c/0x138
->  kernel_init from ret_from_fork+0x14/0x2c
+> yamllint warnings/errors:
 > 
-> The reason is the rxq|txq_stats structures are not what expected
-> because stmmac_open() -> __stmmac_open() the structure is overwritten
-> by "memcpy(&priv->dma_conf, dma_conf, sizeof(*dma_conf));"
-> This causes the well initialized syncp member of rxq|txq_stats is
-> overwritten unexpectedly as pointed out by Johannes and Uwe.
-> 
-> Fix this issue by moving rxq|txq_stats back to stmmac_extra_stats. For
-> SMP cache friendly, we also mark stmmac_txq_stats and stmmac_rxq_stats
-> as ____cacheline_aligned_in_smp.
-> 
-> Fixes: 133466c3bbe1 ("net: stmmac: use per-queue 64 bit statistics where necessary")
-> Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
-> Reported-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+> dtschema/dtc warnings/errors:
+> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/stm32-dwmac.example.dtb: ethernet@5800a000: 'anyOf' conditional failed, one must be fixed:
+> 	'fixed-link' is a required property
+> 	'pcs-handle' is a required property
+> 	'tbi-handle' is a required property
+> 	'phy-handle' is a required property
+> 	'sfp' is a required property
+> 	'managed' is a required property
+> 	from schema $id: http://devicetree.org/schemas/net/stm32-dwmac.yaml#
 
-Hi Jisheng Zhang,
+I will address the examples once I get a comment on my paragraph starting
+with "RFC:" on the patch log.
 
-as a fix for Networking code this should be based targeted at the net tree.
-
-  Subject: [PATCH net] ...
-
-Unfortunately it doesn't apply cleanly against net.
-Please consider rebasing and reposting.
-
--- 
-pw-bot: changes-requested
+Arınç
 
