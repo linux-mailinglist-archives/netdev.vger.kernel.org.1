@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-34269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5902C7A2F72
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 13:10:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D67417A2F76
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 13:10:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 146A22820BC
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 11:10:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0E811C20A22
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 11:10:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5FD6134B0;
-	Sat, 16 Sep 2023 11:09:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A2B2134B3;
+	Sat, 16 Sep 2023 11:10:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35EDB134AE;
-	Sat, 16 Sep 2023 11:09:52 +0000 (UTC)
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB70119F;
-	Sat, 16 Sep 2023 04:09:50 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 73E3E240003;
-	Sat, 16 Sep 2023 11:09:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36B1912B7D;
+	Sat, 16 Sep 2023 11:10:16 +0000 (UTC)
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::221])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72B381B0;
+	Sat, 16 Sep 2023 04:10:10 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id C6EE8240004;
+	Sat, 16 Sep 2023 11:09:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1694862589;
+	t=1694862609;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=lscCcidsJMMOQkHcl8eCmBbaHAYgbiEltqPqbGnvzb8=;
-	b=VdvydhjubqnTb7zMzlmvDb1AyuPlHiJU1Pmq977kdg2rTcKM8lqKF5FamXN2RD0kuYAIKy
-	N8Ya1bJkDpYePX037ZX6DqzRS0aKK2BR1qZd/1rKahuc1ZE1+DtjF2ml8+DyuBdJko/L41
-	uVMRjFxnMGH+z0aMGnqqBl5aZtHgnocmV81BBECvLyncbHRVPeGz6eTvI95chAwCXQdidJ
-	S32jFRpQiAwE/WbqdYKdR+VXecLnoA4IslS+9AACuM+g+hehqFq9qshqXUr5pYUhcDGqXJ
-	a4fsb0r7UVYdHD6LyPImW+59xuH2V1lIYn95YPoIeElxjf65EAGYpMe3WTuxug==
+	bh=bCVsSCUqr94fHC72W488TJM9Q7uBl3U9XOpO5b6zFkI=;
+	b=HFsOWmhU1AcmLExDDgGw+IVR7jUbH2dKOYbsQSzyL2/Y3HtO7H7t2hWrEwTraBnNLF4Hmd
+	2wzXQfuG7cx4+RvoIVZhkyP+aeXXfN7BObZ+w6LTHTSTFxSbHSrbKHPzWN5tPE8TM2pjZ2
+	5B1Hm1Ud+TRTYf16+hrsWr7H2DJn0AUeMfLqf8nGWVsGuak+TQeE12kxIcBCofOtG3lBti
+	fEZjgT02/ye1we3qf17VcgXSc2jHSC9TwLnI0cn4RK4BOmqFNUc7rEX0NyZZs6D3LzKXNa
+	ex0TJsVceQFcxXb2dkoH1PrA/YI1y1xZ8Erzqp1WhvnGaQJCYh4uJ4UdoYU42Q==
 From: =?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -87,7 +87,8 @@ To: "David S. Miller" <davem@davemloft.net>,
 	Grygorii Strashko <grygorii.strashko@ti.com>,
 	Sekhar Nori <nsekhar@ti.com>,
 	Shyam Pandey <radhey.shyam.pandey@xilinx.com>
-Cc: David Bauer <mail@david-bauer.net>,
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Rob Herring <robh@kernel.org>,
 	Woojung Huh <Woojung.Huh@microchip.com>,
 	Steen Hegelund <steen.hegelund@microchip.com>,
 	mithat.guner@xeront.com,
@@ -98,9 +99,9 @@ Cc: David Bauer <mail@david-bauer.net>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org,
 	linux-renesas-soc@vger.kernel.org
-Subject: [PATCH net-next v2 01/10] net: dsa: mt7530: register OF node for internal MDIO bus
-Date: Sat, 16 Sep 2023 14:08:53 +0300
-Message-Id: <20230916110902.234273-2-arinc.unal@arinc9.com>
+Subject: [PATCH net-next v2 02/10] dt-bindings: net: dsa: microchip,lan937x: add missing ethernet on example
+Date: Sat, 16 Sep 2023 14:08:54 +0300
+Message-Id: <20230916110902.234273-3-arinc.unal@arinc9.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230916110902.234273-1-arinc.unal@arinc9.com>
 References: <20230916110902.234273-1-arinc.unal@arinc9.com>
@@ -113,57 +114,58 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: arinc.unal@arinc9.com
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: David Bauer <mail@david-bauer.net>
+The port@5 node on the example is supposed to be used as a CPU port. Add
+the missing ethernet property and remove the label property. Remove the MAC
+bindings on the example as they cannot be validated.
 
-The MT753x switches provide a switch-internal MDIO bus for the embedded
-PHYs.
-
-Register a OF sub-node on the switch OF-node for this internal MDIO bus.
-This allows to configure the embedded PHYs using device-tree.
-
-Signed-off-by: David Bauer <mail@david-bauer.net>
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Acked-by: Rob Herring <robh@kernel.org>
 ---
- drivers/net/dsa/mt7530.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ .../bindings/net/dsa/microchip,lan937x.yaml          | 12 +-----------
+ 1 file changed, 1 insertion(+), 11 deletions(-)
 
-diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-index 035a34b50f31..7db9af7b9658 100644
---- a/drivers/net/dsa/mt7530.c
-+++ b/drivers/net/dsa/mt7530.c
-@@ -2156,10 +2156,13 @@ mt7530_setup_mdio(struct mt7530_priv *priv)
- {
- 	struct dsa_switch *ds = priv->ds;
- 	struct device *dev = priv->dev;
-+	struct device_node *np, *mnp;
- 	struct mii_bus *bus;
- 	static int idx;
- 	int ret;
+diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
+index 8d7e878b84dc..d187034fb31a 100644
+--- a/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
+@@ -68,16 +68,6 @@ examples:
+   - |
+     #include <dt-bindings/gpio/gpio.h>
  
-+	np = priv->dev->of_node;
-+
- 	bus = devm_mdiobus_alloc(dev);
- 	if (!bus)
- 		return -ENOMEM;
-@@ -2178,7 +2181,9 @@ mt7530_setup_mdio(struct mt7530_priv *priv)
- 	if (priv->irq)
- 		mt7530_setup_mdio_irq(priv);
+-    macb0 {
+-            #address-cells = <1>;
+-            #size-cells = <0>;
+-
+-            fixed-link {
+-                    speed = <1000>;
+-                    full-duplex;
+-            };
+-    };
+-
+     spi {
+             #address-cells = <1>;
+             #size-cells = <0>;
+@@ -134,10 +124,10 @@ examples:
  
--	ret = devm_mdiobus_register(dev, bus);
-+	mnp = of_get_child_by_name(np, "mdio");
-+	ret = devm_of_mdiobus_register(dev, bus, mnp);
-+	of_node_put(mnp);
- 	if (ret) {
- 		dev_err(dev, "failed to register MDIO bus: %d\n", ret);
- 		if (priv->irq)
+                             port@5 {
+                                     reg = <5>;
+-                                    label = "lan7";
+                                     phy-mode = "rgmii";
+                                     tx-internal-delay-ps = <2000>;
+                                     rx-internal-delay-ps = <2000>;
++                                    ethernet = <&macb1>;
+ 
+                                     fixed-link {
+                                             speed = <1000>;
 -- 
 2.39.2
 
