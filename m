@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-34249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AC5B7A2ECC
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 10:17:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 233E97A2ECD
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 10:17:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 562181C209F4
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 08:17:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 823E9282248
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 08:17:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F07AF2573;
-	Sat, 16 Sep 2023 08:12:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9687413AC7;
+	Sat, 16 Sep 2023 08:12:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E01A613AC7;
-	Sat, 16 Sep 2023 08:12:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21B44C433C8;
-	Sat, 16 Sep 2023 08:12:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A6D1111B8;
+	Sat, 16 Sep 2023 08:12:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E48DC433CA;
+	Sat, 16 Sep 2023 08:12:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694851959;
-	bh=gDuGzivyyQ8xcbFnZYFp+TOLVAp3wAS56uHvlgLzSs8=;
+	s=k20201202; t=1694851967;
+	bh=YIjtmUbVrg/RXcc1/xGF0odjZwPY+o3yQzwT12xvMT0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BOI8U9K2Jl/RBpbL0O5fLetMAE8GEGGrk+yB2Cq9NziIhXCzwtosHXALsyebat8Nj
-	 AjspZN72qPnAeSHwcyav0UVtA66Y6d1ipkwR8kjhYnmTs9h3xKM4arM8MQQXPukHhr
-	 ZwNtnjLe3YjIgjfmfe4EZ1luzsB8A6jURhgjMBCkG3wkfMxHcWg4GdJM33ODCMdi7h
-	 6vcQbtoOnaGpHbswQfLCNaUfcGyp13ynhK4TprN6uYUuj2V7sYp35kZoNGWKOEUHZl
-	 S6an22a3PDfpXxA2elkd5T6oKGsKQrPpCXyJGOub6PIz+F05D0LrNkdukrFn/TUuPx
-	 gWtQY+OA19qPQ==
+	b=Ih3jhFek7Im/uNs9x+ian0b7ZipqTfZA29fQeyQ0M/r4MkwvWGCVgx/iFYivQs/xz
+	 AIGGMW/YQ0RUlDqjdl7TSesFoSkgf0nud823dgrt0fyF16nrxFEa/+aUiHkwUzxU8E
+	 DBFm8s9CiCMbiNrJtUAbx61Xo0Rp1bA8N/cWlsKGbz6drGc/M9tectoq9B3yeZ7osH
+	 dB8bQvYXgi6Jj0osY7yn8ZEw4rZG6OWI8TlZnSpkQ2TisGhd2YHqz1SdaK+K7RbmDG
+	 w1nfDAmwC+TDgh8NUHA32q6NcujKPO2jW6z2W/QrqkjEZWXD/MldrB0ASbVoZnHnFI
+	 U5MxpToJREWdg==
 From: Jisheng Zhang <jszhang@kernel.org>
 To: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
 	Alexandre Torgue <alexandre.torgue@foss.st.com>,
@@ -66,9 +66,9 @@ Cc: netdev@vger.kernel.org,
 	linux-sunxi@lists.linux.dev,
 	linux-tegra@vger.kernel.org,
 	linux-mediatek@lists.infradead.org
-Subject: [PATCH net-next v2 18/23] net: stmmac: dwmac-sun8i: use devm_stmmac_probe_config_dt()
-Date: Sat, 16 Sep 2023 15:58:24 +0800
-Message-Id: <20230916075829.1560-19-jszhang@kernel.org>
+Subject: [PATCH net-next v2 19/23] net: stmmac: dwmac-sunxi: use devm_stmmac_probe_config_dt()
+Date: Sat, 16 Sep 2023 15:58:25 +0800
+Message-Id: <20230916075829.1560-20-jszhang@kernel.org>
 X-Mailer: git-send-email 2.40.0
 In-Reply-To: <20230916075829.1560-1-jszhang@kernel.org>
 References: <20230916075829.1560-1-jszhang@kernel.org>
@@ -83,54 +83,89 @@ Content-Transfer-Encoding: 8bit
 Simplify the driver's probe() function by using the devres
 variant of stmmac_probe_config_dt().
 
-The calling of stmmac_pltfr_remove() now needs to be switched to
+The remove_new() callback now needs to be switched to
 stmmac_pltfr_remove_no_dt().
 
 Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ .../net/ethernet/stmicro/stmmac/dwmac-sunxi.c | 25 +++++++------------
+ 1 file changed, 9 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-index 01e77368eef1..63a7e5e53d7b 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-@@ -1224,7 +1224,7 @@ static int sun8i_dwmac_probe(struct platform_device *pdev)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sunxi.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sunxi.c
+index beceeae579bf..b857235f5b1f 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sunxi.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sunxi.c
+@@ -108,36 +108,31 @@ static int sun7i_gmac_probe(struct platform_device *pdev)
  	if (ret)
- 		return -EINVAL;
+ 		return ret;
  
 -	plat_dat = stmmac_probe_config_dt(pdev, stmmac_res.mac);
 +	plat_dat = devm_stmmac_probe_config_dt(pdev, stmmac_res.mac);
  	if (IS_ERR(plat_dat))
  		return PTR_ERR(plat_dat);
  
-@@ -1244,7 +1244,7 @@ static int sun8i_dwmac_probe(struct platform_device *pdev)
+ 	gmac = devm_kzalloc(dev, sizeof(*gmac), GFP_KERNEL);
+-	if (!gmac) {
+-		ret = -ENOMEM;
+-		goto err_remove_config_dt;
+-	}
++	if (!gmac)
++		return -ENOMEM;
  
- 	ret = sun8i_dwmac_set_syscon(&pdev->dev, plat_dat);
+ 	ret = of_get_phy_mode(dev->of_node, &gmac->interface);
+ 	if (ret && ret != -ENODEV) {
+ 		dev_err(dev, "Can't get phy-mode\n");
+-		goto err_remove_config_dt;
++		return ret;
+ 	}
+ 
+ 	gmac->tx_clk = devm_clk_get(dev, "allwinner_gmac_tx");
+ 	if (IS_ERR(gmac->tx_clk)) {
+ 		dev_err(dev, "could not get tx clock\n");
+-		ret = PTR_ERR(gmac->tx_clk);
+-		goto err_remove_config_dt;
++		return PTR_ERR(gmac->tx_clk);
+ 	}
+ 
+ 	/* Optional regulator for PHY */
+ 	gmac->regulator = devm_regulator_get_optional(dev, "phy");
+ 	if (IS_ERR(gmac->regulator)) {
+-		if (PTR_ERR(gmac->regulator) == -EPROBE_DEFER) {
+-			ret = -EPROBE_DEFER;
+-			goto err_remove_config_dt;
+-		}
++		if (PTR_ERR(gmac->regulator) == -EPROBE_DEFER)
++			return -EPROBE_DEFER;
+ 		dev_info(dev, "no regulator found\n");
+ 		gmac->regulator = NULL;
+ 	}
+@@ -155,7 +150,7 @@ static int sun7i_gmac_probe(struct platform_device *pdev)
+ 
+ 	ret = sun7i_gmac_init(pdev, plat_dat->bsp_priv);
  	if (ret)
--		goto dwmac_deconfig;
+-		goto err_remove_config_dt;
 +		return ret;
  
- 	ret = sun8i_dwmac_init(pdev, plat_dat->bsp_priv);
+ 	ret = stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
  	if (ret)
-@@ -1295,8 +1295,6 @@ static int sun8i_dwmac_probe(struct platform_device *pdev)
- 	sun8i_dwmac_exit(pdev, gmac);
- dwmac_syscon:
- 	sun8i_dwmac_unset_syscon(gmac);
--dwmac_deconfig:
+@@ -165,8 +160,6 @@ static int sun7i_gmac_probe(struct platform_device *pdev)
+ 
+ err_gmac_exit:
+ 	sun7i_gmac_exit(pdev, plat_dat->bsp_priv);
+-err_remove_config_dt:
 -	stmmac_remove_config_dt(pdev, plat_dat);
  
  	return ret;
  }
-@@ -1314,7 +1312,7 @@ static void sun8i_dwmac_remove(struct platform_device *pdev)
- 		clk_put(gmac->ephy_clk);
- 	}
+@@ -179,7 +172,7 @@ MODULE_DEVICE_TABLE(of, sun7i_dwmac_match);
  
--	stmmac_pltfr_remove(pdev);
-+	stmmac_pltfr_remove_no_dt(pdev);
- 	sun8i_dwmac_unset_syscon(gmac);
- }
- 
+ static struct platform_driver sun7i_dwmac_driver = {
+ 	.probe  = sun7i_gmac_probe,
+-	.remove_new = stmmac_pltfr_remove,
++	.remove_new = stmmac_pltfr_remove_no_dt,
+ 	.driver = {
+ 		.name           = "sun7i-dwmac",
+ 		.pm		= &stmmac_pltfr_pm_ops,
 -- 
 2.40.1
 
