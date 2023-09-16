@@ -1,116 +1,304 @@
-Return-Path: <netdev+bounces-34218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 552957A2D9D
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 05:20:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 780C97A2D9E
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 05:20:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5846D1C20960
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 03:20:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9848C1C20BEF
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 03:20:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C347A6121;
-	Sat, 16 Sep 2023 03:20:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AFAA6128;
+	Sat, 16 Sep 2023 03:20:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE0321117
-	for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 03:20:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8802C433C7;
-	Sat, 16 Sep 2023 03:20:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694834421;
-	bh=gv8ym2Lyn5u77YU9R2c/JvN/eWjA7mufZAg/wowkbGc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=eIwwRLcvjcU2uPYLf5POzomQCN9L7CU+82Yf0/dP/M+n+d6k7MszRqrQ68HHLSRjd
-	 Y7cRXozHYOPyidAWbD69D7Yv5vxrsetB95NO1l1V0hrWozEPP5Pm1WWZbxIv8ZYTAq
-	 FBUQHGiObCvv5gFMRTM639ge5NLaOAOi6lGgb4pUyO/C2q4AYWskIpKP3fn6yqgDMi
-	 Bp3hp7xBEL+2nDqiSBHdt6XlICXhMlfGV6ia6aq3CK2+U7iCz66kJ5u5pHHqNjDnh9
-	 DyzAbOMzVQ9DboAMMp9EIbvv0GTPtBFsIkLcX/t74Ba0u9xniK/pJGDdYlM6yi1dPh
-	 3n8IMKQWw55dw==
-Message-ID: <a0f77ac5-369b-adb9-506c-429ec4e3fc86@kernel.org>
-Date: Fri, 15 Sep 2023 21:20:20 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BC595692
+	for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 03:20:41 +0000 (UTC)
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63A531BE3
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 20:20:39 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2bb9a063f26so44114311fa.2
+        for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 20:20:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1694834437; x=1695439237; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=re06Uw0y9rDR/VY949ZW8aE3o4CnXVw5pUTgJHAWxo0=;
+        b=GCI58SEy6qDMMAVmVD55txNM7ecufQf2JxgzzP2HLpQhqCEWHs8BNSkow/7RYWv8Lm
+         /KDwQkw1SeStsfffhvIpYlNDtQSAvcZ6oz3lmWH86ClkmPJVBpdk4njYWCszGfDJvoCw
+         LKEFUK1wVqlLvwrIHm9ibQs9s2l/27OHvDWxbAcsd5HgdBOZE6NJdOORzOVXapHHXbQo
+         sMhUAnY6kl+DGAIttyHe52ZlDvxjCsoOucrcYo7A43PSCWC5Eg+0Fw4BHXfaZFstEbA8
+         rr/Hl1Q45y2pi7Txb7Ja/i0MfaYp2q4yl6k/NL+UUzJWuQYDbqV8JQfp+wh4ie48gqWC
+         mlKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694834437; x=1695439237;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=re06Uw0y9rDR/VY949ZW8aE3o4CnXVw5pUTgJHAWxo0=;
+        b=jAmQ8hhFzncc+JeI3KO8vnyYjxe9s3+pirVSCyXem8SSh06mix0NVq2qrsJw1XxTNp
+         kE2Cve/HGS5ogtKOQG0Di2TQK0stl+RZ2gxFWIVURlj0xh66XLTxaysNMhpu9f2KDCsU
+         8cjpnl9lLJywbjcFb03AwqCSvhPIOJ02j4OKLB1T9yjALNPQtTMtVEyUrVJtf5hMXClP
+         xEQeEyWo8SYFMmeEQzOBWF0Kzti5QKcQE+2RqHo7IpQ49gvEP111qJ/xHebc+qxVHqZX
+         VmpwwLeNp4Jcj3ocIHi6hFpoOTd85Qa/ssCCUoy9K1e8TXRDUZ2kIQoV6QnavaptMlq6
+         MzwA==
+X-Gm-Message-State: AOJu0YwSpJBDh3hjToZkJ3gKtthEMxggOhu8rbwLtvkzuWoepLTBjO0U
+	U3BrFV0I8tRpFKtIV9LvyiBVD6J3PrYS+wwPg+g=
+X-Google-Smtp-Source: AGHT+IG93LNEKKVgrhyMBTM0Qsezmyi/hUs4P7x7Ku+Jk0yqzmhem/DMY3IPrEF9Cxj/6sEo/XLXALpxuMvc3r9PCng=
+X-Received: by 2002:a2e:964d:0:b0:2bc:f1d3:b54c with SMTP id
+ z13-20020a2e964d000000b002bcf1d3b54cmr3206338ljh.20.1694834437257; Fri, 15
+ Sep 2023 20:20:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.0
-Subject: Re: [PATCH v1 net-next 0/5] Analyze and Reorganize core Networking
- Structs to optimize cacheline consumption
-Content-Language: en-US
-To: Coco Li <lixiaoyan@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>,
- Mubashir Adnan Qureshi <mubashirq@google.com>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Chao Wu <wwchao@google.com>,
- Wei Wang <weiwan@google.com>
-References: <20230916010625.2771731-1-lixiaoyan@google.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20230916010625.2771731-1-lixiaoyan@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20230915122317.100390-1-liangchen.linux@gmail.com>
+ <20230915122317.100390-2-liangchen.linux@gmail.com> <ZQT6kI7MgLdQTfHA@d3>
+In-Reply-To: <ZQT6kI7MgLdQTfHA@d3>
+From: Liang Chen <liangchen.linux@gmail.com>
+Date: Sat, 16 Sep 2023 11:20:24 +0800
+Message-ID: <CAKhg4tKZsx6cwcZf94ZgkErzWy-EQRJBiXEJJ45bso9g1xAkpg@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 2/2] pktgen: Introducing 'SHARED' flag for
+ testing with non-shared skb
+To: Benjamin Poirier <benjamin.poirier@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On 9/15/23 7:06 PM, Coco Li wrote:
-> Currently, variable-heavy structs in the networking stack is organized
-> chronologically, logically and sometimes by cache line access.
-> 
-> This patch series attempts to reorganize the core networking stack
-> variables to minimize cacheline consumption during the phase of data
-> transfer. Specifically, we looked at the TCP/IP stack and the fast
-> path definition in TCP.
-> 
-> For documentation purposes, we also added new files for each core data
-> structure we considered, although not all ended up being modified due
-> to the amount of existing cache line they span in the fast path. In 
-> the documentation, we recorded all variables we identified on the
-> fast path and the reasons. We also hope that in the future when
-> variables are added/modified, the document can be referred to and
-> updated accordingly to reflect the latest variable organization.
-> 
-> Tested:
-> Our tests were run with neper tcp_rr using tcp traffic. The tests have $cpu
-> number of threads and variable number of flows (see below).
-> 
-> Tests were run on 6.5-rc1
-> 
-> Efficiency is computed as cpu seconds / throughput (one tcp_rr round trip).
-> The following result shows Efficiency delta before and after the patch
-> series is applied.
-> 
-> On AMD platforms with 100Gb/s NIC and 256Mb L3 cache:
-> IPv4
-> Flows	with patches	clean kernel	  Percent reduction
-> 30k	0.0001736538065	0.0002741191042	-36.65%
-> 20k	0.0001583661752	0.0002712559158	-41.62%
-> 10k	0.0001639148817	0.0002951800751	-44.47%
-> 5k	0.0001859683866	0.0003320642536	-44.00%
-> 1k	0.0002035190546	0.0003152056382	-35.43%
-> 
-> IPv6
-> Flows	with patches  clean kernel    Percent reduction
-> 30k	0.000202535503	0.0003275329163 -38.16%
-> 20k	0.0002020654777	0.0003411304786 -40.77%
-> 10k	0.0002122427035	0.0003803674705 -44.20%
-> 5k	0.0002348776729	0.0004030403953 -41.72%
-> 1k	0.0002237384583	0.0002813646157 -20.48%
-> 
-> On Intel platforms with 200Gb/s NIC and 105Mb L3 cache:
-> IPv6
-> Flows	with patches	clean kernel	Percent reduction
-> 30k	0.0006296537873	0.0006370427753	-1.16%
-> 20k	0.0003451029365	0.0003628016076	-4.88%
-> 10k	0.0003187646958	0.0003346835645	-4.76%
-> 5k	0.0002954676348	0.000311807592	-5.24%
-> 1k	0.0001909169342	0.0001848069709	3.31%
-> 
+On Sat, Sep 16, 2023 at 8:45=E2=80=AFAM Benjamin Poirier
+<benjamin.poirier@gmail.com> wrote:
+>
+> On 2023-09-15 20:23 +0800, Liang Chen wrote:
+> > Currently, skbs generated by pktgen always have their reference count
+> > incremented before transmission, causing their reference count to be
+> > always greater than 1, leading to two issues:
+> >   1. Only the code paths for shared skbs can be tested.
+> >   2. In certain situations, skbs can only be released by pktgen.
+> > To enhance testing comprehensiveness, we are introducing the "SHARED"
+> > flag to indicate whether an SKB is shared. This flag is enabled by
+> > default, aligning with the current behavior. However, disabling this
+> > flag allows skbs with a reference count of 1 to be transmitted.
+> > So we can test non-shared skbs and code paths where skbs are released
+> > within the stack.
+> >
+> > Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
+> >
+> > ---
+> >  Changes from v2:
+> > - Lifted the check on 'count' when 'not shared' is configured.
+> > - Fixed a use-after-free problem when sending failed
+> > ---
+> >  Documentation/networking/pktgen.rst | 12 ++++++++
+> >  net/core/pktgen.c                   | 47 ++++++++++++++++++++++++-----
+> >  2 files changed, 51 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/Documentation/networking/pktgen.rst b/Documentation/networ=
+king/pktgen.rst
+> > index 1225f0f63ff0..c945218946e1 100644
+> > --- a/Documentation/networking/pktgen.rst
+> > +++ b/Documentation/networking/pktgen.rst
+> > @@ -178,6 +178,7 @@ Examples::
+> >                             IPSEC # IPsec encapsulation (needs CONFIG_X=
+FRM)
+> >                             NODE_ALLOC # node specific memory allocatio=
+n
+> >                             NO_TIMESTAMP # disable timestamping
+> > +                           SHARED # enable shared SKB
+> >   pgset 'flag ![name]'    Clear a flag to determine behaviour.
+> >                        Note that you might need to use single quote in
+> >                        interactive mode, so that your shell wouldn't ex=
+pand
+> > @@ -288,6 +289,16 @@ To avoid breaking existing testbed scripts for usi=
+ng AH type and tunnel mode,
+> >  you can use "pgset spi SPI_VALUE" to specify which transformation mode
+> >  to employ.
+> >
+> > +Disable shared SKB
+> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > +By default, SKBs sent by pktgen are shared (user count > 1).
+> > +To test with non-shared SKBs, remove the "SHARED" flag by simply setti=
+ng::
+> > +
+> > +     pg_set "flag !SHARED"
+> > +
+> > +However, if the "clone_skb" or "burst" parameters are configured, the =
+skb
+> > +still needs to be held by pktgen for further access. Hence the skb mus=
+t be
+> > +shared.
+> >
+> >  Current commands and configuration options
+> >  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > @@ -357,6 +368,7 @@ Current commands and configuration options
+> >      IPSEC
+> >      NODE_ALLOC
+> >      NO_TIMESTAMP
+> > +    SHARED
+> >
+> >      spi (ipsec)
+> >
+> > diff --git a/net/core/pktgen.c b/net/core/pktgen.c
+> > index ffd659dbd6c3..5cc69feec7d7 100644
+> > --- a/net/core/pktgen.c
+> > +++ b/net/core/pktgen.c
+> > @@ -200,6 +200,7 @@
+> >       pf(VID_RND)             /* Random VLAN ID */                    \
+> >       pf(SVID_RND)            /* Random SVLAN ID */                   \
+> >       pf(NODE)                /* Node memory alloc*/                  \
+> > +     pf(SHARED)              /* Shared SKB */                        \
+> >
+> >  #define pf(flag)             flag##_SHIFT,
+> >  enum pkt_flags {
+> > @@ -1198,7 +1199,8 @@ static ssize_t pktgen_if_write(struct file *file,
+> >                   ((pkt_dev->xmit_mode =3D=3D M_NETIF_RECEIVE) ||
+> >                    !(pkt_dev->odev->priv_flags & IFF_TX_SKB_SHARING)))
+> >                       return -ENOTSUPP;
+> > -             if (value > 0 && pkt_dev->n_imix_entries > 0)
+> > +             if (value > 0 && (pkt_dev->n_imix_entries > 0 ||
+> > +                               !(pkt_dev->flags & F_SHARED)))
+> >                       return -EINVAL;
+> >
+> >               i +=3D len;
+> > @@ -1257,6 +1259,10 @@ static ssize_t pktgen_if_write(struct file *file=
+,
+> >                    ((pkt_dev->xmit_mode =3D=3D M_START_XMIT) &&
+> >                    (!(pkt_dev->odev->priv_flags & IFF_TX_SKB_SHARING)))=
+))
+> >                       return -ENOTSUPP;
+> > +
+> > +             if ((value > 1) && !(pkt_dev->flags & F_SHARED))
+> > +                     return -EINVAL;
+> > +
+>
+> Make sure to run checkpatch and check the patchwork results. There are
+> some points to correct:
+> https://patchwork.kernel.org/project/netdevbpf/patch/20230915122317.10039=
+0-2-liangchen.linux@gmail.com/
+>
 
-This is awesome. How much of the work leveraged tools vs manually going
-through code to do the reorganization of the structs? e.g., was the perf
-c2c of use?
+Sure. Will do.
 
+> >               pkt_dev->burst =3D value < 1 ? 1 : value;
+> >               sprintf(pg_result, "OK: burst=3D%u", pkt_dev->burst);
+> >               return count;
+> > @@ -1335,10 +1341,18 @@ static ssize_t pktgen_if_write(struct file *fil=
+e,
+> >               flag =3D pktgen_read_flag(f, &disable);
+> >
+> >               if (flag) {
+> > -                     if (disable)
+> > +                     if (disable) {
+> > +                             /* If "clone_skb", or "burst" parameters =
+are
+> > +                              * configured, it means that the skb stil=
+l needs to be
+> > +                              * referenced by the pktgen, so the skb m=
+ust be shared.
+> > +                              */
+> > +                             if (flag =3D=3D F_SHARED && (pkt_dev->clo=
+ne_skb ||
+> > +                                                      pkt_dev->burst >=
+ 1))
+> > +                                     return -EINVAL;
+> >                               pkt_dev->flags &=3D ~flag;
+> > -                     else
+> > +                     } else {
+> >                               pkt_dev->flags |=3D flag;
+> > +                     }
+> >               } else {
+> >                       pg_result +=3D sprintf(pg_result,
+> >                               "Flag -:%s:- unknown\n%s", f,
+> > @@ -3485,7 +3499,8 @@ static void pktgen_xmit(struct pktgen_dev *pkt_de=
+v)
+> >       if (pkt_dev->xmit_mode =3D=3D M_NETIF_RECEIVE) {
+> >               skb =3D pkt_dev->skb;
+> >               skb->protocol =3D eth_type_trans(skb, skb->dev);
+> > -             refcount_add(burst, &skb->users);
+> > +             if (pkt_dev->flags & F_SHARED)
+> > +                     refcount_add(burst, &skb->users);
+> >               local_bh_disable();
+> >               do {
+> >                       ret =3D netif_receive_skb(skb);
+> > @@ -3493,6 +3508,10 @@ static void pktgen_xmit(struct pktgen_dev *pkt_d=
+ev)
+> >                               pkt_dev->errors++;
+> >                       pkt_dev->sofar++;
+> >                       pkt_dev->seq_num++;
+> > +                     if (unlikely(!(pkt_dev->flags & F_SHARED))) {
+> > +                             pkt_dev->skb =3D NULL;
+> > +                             break;
+> > +                     }
+> >                       if (refcount_read(&skb->users) !=3D burst) {
+> >                               /* skb was queued by rps/rfs or taps,
+> >                                * so cannot reuse this skb
+> > @@ -3511,9 +3530,14 @@ static void pktgen_xmit(struct pktgen_dev *pkt_d=
+ev)
+> >               goto out; /* Skips xmit_mode M_START_XMIT */
+> >       } else if (pkt_dev->xmit_mode =3D=3D M_QUEUE_XMIT) {
+> >               local_bh_disable();
+> > -             refcount_inc(&pkt_dev->skb->users);
+> > +             if (pkt_dev->flags & F_SHARED)
+> > +                     refcount_inc(&pkt_dev->skb->users);
+> >
+> >               ret =3D dev_queue_xmit(pkt_dev->skb);
+> > +
+> > +             if (!(pkt_dev->flags & F_SHARED) && dev_xmit_complete(ret=
+))
+> > +                     pkt_dev->skb =3D NULL;
+> > +
+> >               switch (ret) {
+> >               case NET_XMIT_SUCCESS:
+> >                       pkt_dev->sofar++;
+> > @@ -3551,11 +3575,15 @@ static void pktgen_xmit(struct pktgen_dev *pkt_=
+dev)
+> >               pkt_dev->last_ok =3D 0;
+> >               goto unlock;
+> >       }
+> > -     refcount_add(burst, &pkt_dev->skb->users);
+> > +     if (pkt_dev->flags & F_SHARED)
+> > +             refcount_add(burst, &pkt_dev->skb->users);
+> >
+> >  xmit_more:
+> >       ret =3D netdev_start_xmit(pkt_dev->skb, odev, txq, --burst > 0);
+> >
+> > +     if (!(pkt_dev->flags & F_SHARED) && dev_xmit_complete(ret))
+> > +             pkt_dev->skb =3D NULL;
+> > +
+> >       switch (ret) {
+> >       case NETDEV_TX_OK:
+> >               pkt_dev->last_ok =3D 1;
+> > @@ -3577,7 +3605,8 @@ static void pktgen_xmit(struct pktgen_dev *pkt_de=
+v)
+> >               fallthrough;
+> >       case NETDEV_TX_BUSY:
+> >               /* Retry it next time */
+> > -             refcount_dec(&(pkt_dev->skb->users));
+> > +             if (!(pkt_dev->flags & F_SHARED))
+> > +                     refcount_dec(&(pkt_dev->skb->users));
+>
+> With "flag !SHARED", this leads to a refcount underflow if the driver
+> returns NETDEV_TX_BUSY.
+>
+> It looks like the condition is inverted, no?
+>
+
+Yeah, my bad. Sorry about that. Thanks!
+
+> I tested it by hacking e1000_xmit_frame() to return NETDEV_TX_BUSY right
+> at the beginning.
 
