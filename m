@@ -1,193 +1,85 @@
-Return-Path: <netdev+bounces-34282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C85D57A2FE6
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 14:15:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A1607A3042
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 14:40:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6464E282698
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 12:15:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5363B2819E8
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 12:40:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 203FB13AD8;
-	Sat, 16 Sep 2023 12:15:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B294B13AEB;
+	Sat, 16 Sep 2023 12:40:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB18E134C4;
-	Sat, 16 Sep 2023 12:15:07 +0000 (UTC)
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74948CEB;
-	Sat, 16 Sep 2023 05:15:05 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-69042d398b1so1633113b3a.0;
-        Sat, 16 Sep 2023 05:15:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1694866502; x=1695471302; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1t3Hu2NlVXsk58k7VRC9awkwVf6POWMPotKsVrYh9ZA=;
-        b=DS3oDiRGcreDbHLA0nFwxlYW0uzQZi50/kej9gzOXqFVKPKknCliObztcQJ9h6y6BZ
-         Z0PGbvBF8BuS3JcrRPThibBTEbCi7yCXStIg5uBYwd7xzprHBZZJPr8rFuKgwmGtCK2T
-         jfLzFR3uRAWFrY95nKJIeAiZTOW/TF6SiKppQ5iN1hsUvY+bjrdA15kSvM812VO9Hdm9
-         ZwGvkRsuHMy8c6id2Q/4j92vfQq3IjGl1j4aWaXFAISePToSiGTwl5/4pTZSkooLbwBa
-         5JAVV5ghr2Bcyuc1Gt6WsRvhxEAoJDFRSgYhXa8WRN+y8D1Fv+z+H4BLGRBggV/Alzuf
-         1d+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694866502; x=1695471302;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1t3Hu2NlVXsk58k7VRC9awkwVf6POWMPotKsVrYh9ZA=;
-        b=A1/L/KkHD3wmGyCzPBC5R5dbuq824jmpwMslCBaMUV3/To01IixCPY2Rv40YuBvCsS
-         bEnm8ur5BDGTztnuIAHzNapXMKv5uqDXsgNyJDxXIw2qrX8jAg5U84ZJfcqdc3LMBaP/
-         VMFvyM6hKvYolYuizDKqA67NRDLH2xB5c4s3P7PrJVwpO4TeE2dC5uesFr5FjzTVTaMh
-         QKs+8AG1I4G89VOCCtOVH/2I3lDXua8fb2VXsdl+wu5C4sBCOet43lwtDUTzsDLGxNNw
-         TAI8bZHX6KWmuGYjjhqdo6wPAVxxwzgSBa27NiK5dqzYaRqCXnE1VfoXaCt+EScau4a9
-         8d7w==
-X-Gm-Message-State: AOJu0Yx0085i+Nigilzaqp0J9HZi8pk2HOdfK/EEqJVRO+oLxHMs3peH
-	LKHPy2bq+6THjFfcIlmF+Jo=
-X-Google-Smtp-Source: AGHT+IHWpEKQuMsgpmDDzc8xAXIBaf029YhKC4CG4uKR2rPwxHN9LtWMcJE+cTTWpqHWeh+tR3KQFA==
-X-Received: by 2002:a05:6a00:15c5:b0:68c:49e4:bd71 with SMTP id o5-20020a056a0015c500b0068c49e4bd71mr5571390pfu.34.1694866502230;
-        Sat, 16 Sep 2023 05:15:02 -0700 (PDT)
-Received: from debian.me ([103.124.138.83])
-        by smtp.gmail.com with ESMTPSA id j20-20020a62b614000000b0068bc6a75848sm4406720pff.156.2023.09.16.05.15.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 Sep 2023 05:15:01 -0700 (PDT)
-Received: by debian.me (Postfix, from userid 1000)
-	id 45A4481C8E58; Sat, 16 Sep 2023 19:14:58 +0700 (WIB)
-Date: Sat, 16 Sep 2023 19:14:57 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Louis-Marie <rauline.lm@protonmail.com>,
-	Linux USB <linux-usb@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Hayes Wang <hayeswang@realtek.com>, Simon Horman <horms@kernel.org>,
-	Antonio Napolitano <anton@polit.no>,
-	Douglas Anderson <dianders@chromium.org>,
-	Andrew Gaul <gaul@gaul.org>,
-	=?utf-8?B?QmrDuHJu?= Mork <bjorn@mork.no>,
-	Jean-Francois Le Fillatre <jflf_kernel@gmx.com>,
-	Dennis Wassenberg <dennis.wassenberg@secunet.com>,
-	Nicolas Dumazet <ndumazet@google.com>,
-	Mark Pearson <mpearson-lenovo@squebb.ca>,
-	Hannu Hartikainen <hannu@hrtk.in>,
-	=?utf-8?Q?=C5=81ukasz?= Bartosik <lb@semihalf.com>
-Subject: Re: Lenovo Hybrid Dock MAC passtrough patch
-Message-ID: <ZQWcQTQahx-QEGDl@debian.me>
-References: <guK8MKcjWbPsZ1LuRVYxFf7WfsWa025shmVj7iq289LHf59N6i6OlkD0N9KhICJzbMfFW2aXYbguZ1NtZNn6PlA_-JvF3k7uJtG89THdZ6w=@protonmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1CA013AC3;
+	Sat, 16 Sep 2023 12:40:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2DE7AC433C9;
+	Sat, 16 Sep 2023 12:40:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694868025;
+	bh=DS0CiDN0PcyhGgmTs8VuTLeTyqIdaNhkRE3CbjT46wM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=cB21YVVVq47d36H2fNTmpMCkwEmACKVgM3aqrE86hU9GdheCahGsRQBJ1oFhLIsSp
+	 DYQuI6BiBUVn4OEBry20BOCmwkgTm/vKA5YyrCryFVDaNvyewObD95T17NBhHB8xAk
+	 HYuzm0x9LSAdcRrtvJN313+ymxRshWNsBFrhl9eb9P/9anXLhPKSESaTX7oSCqfs7z
+	 s3Tr9ZYuRrgspbrj1SeUfMu99IgeuwddemJfYQ72C/lbpxUNlKkpfsmqaMEOxS7+jB
+	 1bJvcC9bIdSPr3/8Cx+voOZ+QMCFY/szI4CPYHooam6WTPySLxKD/udM9QQiw/0Lnj
+	 UMYBA6PVXXGtA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 09E7AE26881;
+	Sat, 16 Sep 2023 12:40:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="OfTnmoJtB1ynC3bV"
-Content-Disposition: inline
-In-Reply-To: <guK8MKcjWbPsZ1LuRVYxFf7WfsWa025shmVj7iq289LHf59N6i6OlkD0N9KhICJzbMfFW2aXYbguZ1NtZNn6PlA_-JvF3k7uJtG89THdZ6w=@protonmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] igc: Fix infinite initialization loop with early XDP
+ redirect
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169486802502.24089.4629058589745902790.git-patchwork-notify@kernel.org>
+Date: Sat, 16 Sep 2023 12:40:25 +0000
+References: <20230913180615.2116232-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20230913180615.2116232-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, vinicius.gomes@intel.com,
+ sasha.neftin@intel.com, maciej.fijalkowski@intel.com,
+ magnus.karlsson@intel.com, ast@kernel.org, daniel@iogearbox.net,
+ hawk@kernel.org, john.fastabend@gmail.com, bpf@vger.kernel.org,
+ ferenc.fejes@ericsson.com, naamax.meir@linux.intel.com
+
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Wed, 13 Sep 2023 11:06:15 -0700 you wrote:
+> From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+> 
+> When an XDP redirect happens before the link is ready, that
+> transmission will not finish and will timeout, causing an adapter
+> reset. If the redirects do not stop, the adapter will not stop
+> resetting.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] igc: Fix infinite initialization loop with early XDP redirect
+    https://git.kernel.org/netdev/net/c/cb47b1f679c4
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---OfTnmoJtB1ynC3bV
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Sat, Sep 16, 2023 at 11:41:49AM +0000, Louis-Marie wrote:
-> Hi,
-> I would like to submit a patch for enabling mac passtrough for the Lenovo=
- Hybrid Dock.
-> Tested with Fedora 6.4.12.
->=20
->=20
->=20
-> diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.cindex 0c13d=
-9950cd8..02e6404bf6ea 100644
-> --- a/drivers/net/usb/r8152.c
-> +++ b/drivers/net/usb/r8152.c
-> @@ -781,6 +781,7 @@ enum rtl8152_flags {
-> =C2=A0#define DEVICE_ID_THINKPAD_USB_C_DONGLE =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A00x720c
-> =C2=A0#define DEVICE_ID_THINKPAD_USB_C_DOCK_GEN2 =C2=A0 =C2=A0 0xa387
-> =C2=A0#define DEVICE_ID_THINKPAD_USB_C_DOCK_GEN3 =C2=A0 =C2=A0 0x3062
-> +#define DEVICE_ID_THINKPAD_HYBRID_USB_C_DOCK =C2=A0 =C2=A0 =C2=A0 0xa359
->=20
-> =C2=A0struct tally_counter {
-> =C2=A0 =C2=A0 __le64 =C2=A0tx_packets;
-> @@ -9583,6 +9584,7 @@ static bool rtl8152_supports_lenovo_macpassthru(str=
-uct usb_device *udev)
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 case DEVICE_ID_THINKPAD_THUNDERBOLT3_DOCK_GEN=
-2:
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 case DEVICE_ID_THINKPAD_USB_C_DOCK_GEN2:
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 case DEVICE_ID_THINKPAD_USB_C_DOCK_GEN3:
-> + =C2=A0 =C2=A0 =C2=A0 case DEVICE_ID_THINKPAD_HYBRID_USB_C_DOCK:
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 case DEVICE_ID_THINKPAD_USB_C_DONGLE:
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return 1;
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 }
-> @@ -9832,6 +9834,7 @@ static const struct usb_device_id rtl8152_table[] =
-=3D {
-> =C2=A0 =C2=A0 { USB_DEVICE(VENDOR_ID_LENOVO, =C2=A00x7214) },
-> =C2=A0 =C2=A0 { USB_DEVICE(VENDOR_ID_LENOVO, =C2=A00x721e) },
-> =C2=A0 =C2=A0 { USB_DEVICE(VENDOR_ID_LENOVO, =C2=A00xa387) },
-> + =C2=A0 { USB_DEVICE(VENDOR_ID_LENOVO, =C2=A00xa359) },
-> =C2=A0 =C2=A0 { USB_DEVICE(VENDOR_ID_LINKSYS, 0x0041) },
-> =C2=A0 =C2=A0 { USB_DEVICE(VENDOR_ID_NVIDIA, =C2=A00x09ff) },
-> =C2=A0 =C2=A0 { USB_DEVICE(VENDOR_ID_TPLINK, =C2=A00x0601) },
-> diff --git a/drivers/usb/core/quirks.c b/drivers/usb/core/quirks.c
-> index 15e9bd180a1d..ad98c8ffbc69 100644
-> --- a/drivers/usb/core/quirks.c
-> +++ b/drivers/usb/core/quirks.c
-> @@ -470,6 +470,9 @@ static const struct usb_device_id usb_quirk_list[] =
-=3D {
-> =C2=A0 =C2=A0 /* Lenovo ThinkPad USB-C Dock Gen2 Ethernet (RTL8153 GigE) =
-*/
-> =C2=A0 =C2=A0 { USB_DEVICE(0x17ef, 0xa387), .driver_info =3D USB_QUIRK_NO=
-_LPM },
->=20
-> + =C2=A0 /* Lenovo ThinkPad Hydrid USB-C Dock */
-> + =C2=A0 { USB_DEVICE(0x17ef, 0xa359), .driver_info =3D USB_QUIRK_NO_LPM =
-},
-> +
-> =C2=A0 =C2=A0 /* BUILDWIN Photo Frame */
-> =C2=A0 =C2=A0 { USB_DEVICE(0x1908, 0x1315), .driver_info =3D
-> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 USB_QUIRK_HONOR_BNUMINTERFACES =
-},
->=20
-> Signed-off-by: Louis-Marie Rauline <rauline.lm@protonmail.com>
->=20
-
-Can you send above suggestion as formal patch instead? See
-Documentation/process/submitting-patches.rst for how to properly submit
-patches. And also, use git-send-email(1) when sending them so that patch
-corruption (like tabs converting to spaces and line wrapping as in above
-diff) doesn't occur.
-
-Thanks.
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---OfTnmoJtB1ynC3bV
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZQWcPQAKCRD2uYlJVVFO
-o/u6AP9cLVGluMyFIUFqW+ia7vUD0EjgYMoxOm7zjRV1fgMrGgEAmmMhnk3BbOTT
-qXMf8rc686SvEWjuGWj1DsJAlmWAMgU=
-=mQv0
------END PGP SIGNATURE-----
-
---OfTnmoJtB1ynC3bV--
 
