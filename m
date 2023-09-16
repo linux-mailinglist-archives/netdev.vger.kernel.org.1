@@ -1,138 +1,126 @@
-Return-Path: <netdev+bounces-34222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3340E7A2E05
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 07:18:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C55597A2E2A
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 08:17:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5BEE281FBF
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 05:18:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B8C71C209A2
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 06:17:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94A5E5677;
-	Sat, 16 Sep 2023 05:18:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 357BA6AAE;
+	Sat, 16 Sep 2023 06:17:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2E561FA3
-	for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 05:18:16 +0000 (UTC)
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F9701BCA;
-	Fri, 15 Sep 2023 22:18:14 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id 98e67ed59e1d1-2745cd2ba68so2323042a91.0;
-        Fri, 15 Sep 2023 22:18:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1694841493; x=1695446293; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:references:subject:to:from
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1qdYiZ8LF0tnKSZBA/euKOT4dE27FmTPvneuvwGAtB4=;
-        b=k7Zl+NS0nW91td44ZPci9WfG0wc8x70mOEIEPeBAcEtIWdTB6PLysFXv9hnOh77wYp
-         i0a+tSeX1yfcryElX5orRWtphblRx4S6d947rTG9fGw3Cg+UMbaG+GtWS+WuXmPA08G0
-         FRb49Yt+4Bv2rC7u+hmE7lC1EwoA26sRsTdtgOhPToGfdTdK0cgN3UhThlL+lejtpB30
-         SOSQ1D+QyldBTEWZf45vlWTiYEg9u+3irmS3wf/HwS91STUq5hBHaqKL6vX4jHpaAroQ
-         Tcfv1EHuivpI6/jkmhTrO1DEhUGfW1JXQHbMoKUWnyzqTb/jrmUM1lQRX0o9WpetYPpd
-         XlEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694841493; x=1695446293;
-        h=content-transfer-encoding:in-reply-to:references:subject:to:from
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=1qdYiZ8LF0tnKSZBA/euKOT4dE27FmTPvneuvwGAtB4=;
-        b=VD4f+Tmx2IAneeS3JnGEOIeEc1OtOvn++cD4ci1LoWMHfUH8/bG8oEnNE+eiKxw5tC
-         ZGkqJiWwqc2s0dbDwOhLBYqEcAj1tGHUNlyKmgIiEkV6s+VnBcCVnG7xO+mAX5D1QBXR
-         duQel+Nz0xoYZuslOP4DCzSjBZq6Mi56X6Zef0MbDwUBFvVciEZmXMQ1XcB5FJ8SE1TS
-         2I+TFR8Q67nuT1YvxESzAXNXtoUWpZXOAinP00g4risbslAhNmTv2IGrSGYDFIHycYyp
-         ZE73RwvWDEcjNISsP2paqTIijwPKR1RjDqksncoaVoBW9JixexW5PSJPwLO7Bwa1Y7MK
-         Tg9A==
-X-Gm-Message-State: AOJu0YyoDTz9pbeOIQT6CtCOusmw37ESsF/TnhO84a6R0UZL0KqDpUAM
-	auy66dj8s8i5sPS4Clv6K20=
-X-Google-Smtp-Source: AGHT+IHdVfenN52p2XAOd1T6Tm4wVogq0iXsaKupgPDHdMKw528Otc/dSSu/9b9aAGUZo4iSklnRww==
-X-Received: by 2002:a17:90b:4d83:b0:274:5638:2a03 with SMTP id oj3-20020a17090b4d8300b0027456382a03mr3239453pjb.20.1694841493383;
-        Fri, 15 Sep 2023 22:18:13 -0700 (PDT)
-Received: from ?IPV6:2401:4900:1c60:c4b6:ed28:95c7:9a77:34ba? ([2401:4900:1c60:c4b6:ed28:95c7:9a77:34ba])
-        by smtp.gmail.com with ESMTPSA id r1-20020a17090a438100b0027480345180sm3451992pjg.2.2023.09.15.22.18.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Sep 2023 22:18:12 -0700 (PDT)
-Message-ID: <916720db-0d36-2587-9b91-69ec6f70d64c@gmail.com>
-Date: Sat, 16 Sep 2023 10:48:05 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AAC933DC;
+	Sat, 16 Sep 2023 06:17:28 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD9ABCC0;
+	Fri, 15 Sep 2023 23:17:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694845046; x=1726381046;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=Dpw80PtFYNDVGjI+iulRnzMBDHhLG8ZhcBIQvgHxF4s=;
+  b=Wngwpc/9UFg3VxmQUA2UopDoOpA101MO/XPtYsa8oPSsgOSzrcqCZd9P
+   PcKp2Jw0D2+jcgpfDLEAYaCqOGXbySWIWslZ/S8uLTajWSBohiPzhu+U7
+   lTGE+tUSBxR40zDq/AjINTpzMMLuDG+8MU3FNaZodprMtLinihLkezGxg
+   LsRXK/1eh2LhSu1JgGXnJo4C5GYJ4F9zXzY9bFdXXT1UVaPg/vJ+eUBJ0
+   coyxRrNiyr/2akBcFJxj8iydEdONanUIwCOCQazk755APtciBxqp/G48Y
+   K8xvDI1YbDj9muEgQYMlPorfYna2Nw2tnjcQHTrqtYiANufxe8whWwIdg
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10834"; a="443461809"
+X-IronPort-AV: E=Sophos;i="6.02,151,1688454000"; 
+   d="scan'208";a="443461809"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2023 23:17:26 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10834"; a="738564989"
+X-IronPort-AV: E=Sophos;i="6.02,151,1688454000"; 
+   d="scan'208";a="738564989"
+Received: from pglc00032.png.intel.com ([10.221.207.52])
+  by orsmga007.jf.intel.com with ESMTP; 15 Sep 2023 23:17:21 -0700
+From: rohan.g.thomas@intel.com
+To: robh@kernel.org
+Cc: alexandre.torgue@foss.st.com,
+	conor+dt@kernel.org,
+	davem@davemloft.net,
+	devicetree@vger.kernel.org,
+	edumazet@google.com,
+	fancer.lancer@gmail.com,
+	joabreu@synopsys.com,
+	krzysztof.kozlowski+dt@linaro.org,
+	kuba@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	mcoquelin.stm32@gmail.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	peppe.cavallaro@st.com,
+	rohan.g.thomas@intel.com
+Subject: Re: [linux-drivers-review] [PATCH net-next v2 1/3] net: stmmac: xgmac: EST interrupts handling
+Date: Sat, 16 Sep 2023 14:17:18 +0800
+Message-Id: <20230916061718.336-1-rohan.g.thomas@intel.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230915154258.GA3769303-robh@kernel.org>
+References: <20230915154258.GA3769303-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-From: bhupesh.linux@gmail.com
-To: Georgi Djakov <djakov@kernel.org>, netdev@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, vkoul@kernel.org, davem@davemloft.net,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Update Bhupesh's email address
-References: <20230915191600.3410862-1-bhupesh.linux@gmail.com>
- <facce62d-07cd-4899-866b-c9d7eebe38a8@kernel.org>
-In-Reply-To: <facce62d-07cd-4899-866b-c9d7eebe38a8@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+From: Rohan G Thomas <rohan.g.thomas@intel.com>
 
-On 9/16/23 2:07 AM, Georgi Djakov <djakov@kernel.org> wrote:
-> Hi Bhupesh,
-> 
-> On 15.09.23 22:16, Bhupesh Sharma wrote:
-> > Update the email address for Bhupesh's maintainer entry and fill in
-> > .mailmap accordingly.
-> >
-> > Signed-off-by: Bhupesh Sharma <bhupesh.linux@gmail.com>
-> > ---
-> >   .mailmap    | 5 +++++
-> >   MAINTAINERS | 2 +-
-> >   2 files changed, 6 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/.mailmap b/.mailmap
-> > index a0a6efe87186..a69dfc6bbf1f 100644
-> > --- a/.mailmap
-> > +++ b/.mailmap
-> > @@ -94,6 +94,11 @@ Ben M Cahill <ben.m.cahill@intel.com>
-> >   Ben Widawsky <bwidawsk@kernel.org> <ben@bwidawsk.net>
-> >   Ben Widawsky <bwidawsk@kernel.org> <ben.widawsky@intel.com>
-> >   Ben Widawsky <bwidawsk@kernel.org> <benjamin.widawsky@intel.com>
-> > +Bhupesh Sharma <bhupesh.linux@gmail.com> <bhupesh.sharma@linaro.org>
-> > +Bhupesh Sharma <bhupesh.linux@gmail.com> <bhsharma@redhat.com>
-> > +Bhupesh Sharma <bhupesh.linux@gmail.com> <bhupesh.sharma@freescale.com>
-> > +Bhupesh Sharma <bhupesh.linux@gmail.com> <bhupesh.sharma@st.com>
-> > +Bjorn Andersson <andersson@kernel.org> <bjorn@kryo.se>
-> 
-> This line looks like an unintentional change?
+Thanks for the review comments.
+Will address this in the next version.
 
-Oops. Indeed. Let me fix this in v2.
-
-Regards,
-Bhupesh
-
-> >   Bjorn Andersson <andersson@kernel.org> <bjorn@kryo.se>
-> >   Bjorn Andersson <andersson@kernel.org> <bjorn.andersson@linaro.org>
-> >   Bjorn Andersson <andersson@kernel.org> <bjorn.andersson@sonymobile.com>
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index fa7487b7729b..620301a2b5ef 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -17740,7 +17740,7 @@ F:    drivers/net/ethernet/qualcomm/emac/
-> >   QUALCOMM ETHQOS ETHERNET DRIVER
-> >   M:    Vinod Koul <vkoul@kernel.org>
-> > -R:    Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> > +R:    Bhupesh Sharma <bhupesh.linux@gmail.com>
-> >   L:    netdev@vger.kernel.org
-> >   L:    linux-arm-msm@vger.kernel.org
-> >   S:    Maintained
-> 
-> 
+On Fri, Sep 15, 2023 at 05:54:16PM +0800, Rohan G Thomas wrote:
+>> Add dt-bindings for coe-unsupported property per tx queue.
+>
+>Why? (What every commit msg should answer)
+>
+>> 
+>> Signed-off-by: Rohan G Thomas <rohan.g.thomas@intel.com>
+>> ---
+>>  Documentation/devicetree/bindings/net/snps,dwmac.yaml | 3 +++
+>>  1 file changed, 3 insertions(+)
+>> 
+>> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+>> index ddf9522a5dc2..365e6cb73484 100644
+>> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+>> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+>> @@ -394,6 +394,9 @@ properties:
+>>                When a PFC frame is received with priorities matching the bitmask,
+>>                the queue is blocked from transmitting for the pause time specified
+>>                in the PFC frame.
+>
+>blank line needed
+>
+>> +          snps,coe-unsupported:
+>> +            type: boolean
+>> +            description: TX checksum offload is unsupported by the TX queue.
+>
+>And here.
+>
+>>          allOf:
+>>            - if:
+>>                required:
+>> -- 
+>> 2.25.1
+>> 
 
