@@ -1,139 +1,161 @@
-Return-Path: <netdev+bounces-34229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48A897A2E60
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 09:20:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56C4A7A2E61
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 09:23:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED48128208C
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 07:20:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 659D81C20A00
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 07:23:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55517461;
-	Sat, 16 Sep 2023 07:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37A97101EA;
+	Sat, 16 Sep 2023 07:23:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 611BE6131
-	for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 07:20:34 +0000 (UTC)
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3BF6CD8
-	for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 00:20:31 -0700 (PDT)
-Received: from dggpeml500022.china.huawei.com (unknown [172.30.72.57])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Rnj8M0WyNz1N7w0;
-	Sat, 16 Sep 2023 15:18:27 +0800 (CST)
-Received: from [10.67.120.135] (10.67.120.135) by
- dggpeml500022.china.huawei.com (7.185.36.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Sat, 16 Sep 2023 15:20:27 +0800
-Subject: Re: [RFCv8 PATCH net-next 00/55] net: extend the type of
- netdev_features_t to bitmap
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <ecree.xilinx@gmail.com>,
-	<andrew@lunn.ch>, <hkallweit1@gmail.com>, <saeed@kernel.org>,
-	<leon@kernel.org>, <netdev@vger.kernel.org>, <linuxarm@huawei.com>
-References: <20220918094336.28958-1-shenjian15@huawei.com>
- <20221125154421.82829-1-alexandr.lobakin@intel.com>
- <724a884e-d5ca-8192-b3be-bf68711be515@huawei.com>
- <20221128155127.2101925-1-alexandr.lobakin@intel.com>
- <d250f3b2-a63e-f0c5-fb48-52210922a846@intel.com>
-From: "shenjian (K)" <shenjian15@huawei.com>
-Message-ID: <0352cd0e-9721-514d-0683-0eed91f711d7@huawei.com>
-Date: Sat, 16 Sep 2023 15:20:27 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.5.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2E70D507
+	for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 07:23:44 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D16B6CD8;
+	Sat, 16 Sep 2023 00:23:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694849022; x=1726385022;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=c8i88xw7kqkRtm+RFJUtTj4XqEyRCmEHSLpdILSbhQA=;
+  b=IwIbhVEFS9ctTz8z8ccdFka4LvjICuBk+O8Hqs1RppYB/Q5D/1RbYXd/
+   Y2XPyEJgftakNEP9YFDOY912wqSfNltmHFiprJT59KyUiWat4DHDTbUtX
+   t/XOpeH/y3/azzEKM/ogdqCTpTldTvY4CT0QNwCJyfdh1sXvDGvmgXDfC
+   chdLS1n4k7ZkY3jq2a6JAZdtT9cGX6Q+GlzsRx9mlxjTYHI8mThpRnGim
+   fppGcF4dQQFpIDbAGQGiDOIFvhHDXWNESAle6IrQcM+YNXPSzay23Emc+
+   W+XfJPy4jjEjXlfO8lReUBRO/CvrEmgd8xtUdK0r/WuRRIRmdBEEi7mJS
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10834"; a="359640194"
+X-IronPort-AV: E=Sophos;i="6.02,151,1688454000"; 
+   d="scan'208";a="359640194"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2023 00:23:42 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10834"; a="745246136"
+X-IronPort-AV: E=Sophos;i="6.02,151,1688454000"; 
+   d="scan'208";a="745246136"
+Received: from lkp-server02.sh.intel.com (HELO 9ef86b2655e5) ([10.239.97.151])
+  by orsmga002.jf.intel.com with ESMTP; 16 Sep 2023 00:23:39 -0700
+Received: from kbuild by 9ef86b2655e5 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qhPeS-00041Q-2x;
+	Sat, 16 Sep 2023 07:23:36 +0000
+Date: Sat, 16 Sep 2023 15:22:54 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ma Ke <make_ruc2021@163.com>, jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Ma Ke <make_ruc2021@163.com>
+Subject: Re: [PATCH] net: sched: qfq: dont intepret cls results when asked to
+ drop
+Message-ID: <202309161521.08Hs5BL9-lkp@intel.com>
+References: <20230915142355.3411527-1-make_ruc2021@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <d250f3b2-a63e-f0c5-fb48-52210922a846@intel.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.67.120.135]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpeml500022.china.huawei.com (7.185.36.66)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230915142355.3411527-1-make_ruc2021@163.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Hi Ma,
+
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on net-next/main]
+[also build test ERROR on net/main linus/master v6.6-rc1 next-20230915]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Ma-Ke/net-sched-qfq-dont-intepret-cls-results-when-asked-to-drop/20230915-222648
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20230915142355.3411527-1-make_ruc2021%40163.com
+patch subject: [PATCH] net: sched: qfq: dont intepret cls results when asked to drop
+config: x86_64-rhel-8.3-rust (https://download.01.org/0day-ci/archive/20230916/202309161521.08Hs5BL9-lkp@intel.com/config)
+compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230916/202309161521.08Hs5BL9-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202309161521.08Hs5BL9-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> net/sched/sch_qfq.c:707:4: error: fallthrough annotation does not directly precede switch label
+                           fallthrough;
+                           ^
+   include/linux/compiler_attributes.h:227:41: note: expanded from macro 'fallthrough'
+   # define fallthrough                    __attribute__((__fallthrough__))
+                                           ^
+   1 error generated.
 
 
-在 2023/9/13 18:28, Alexander Lobakin 写道:
-> From: Alexander Lobakin <alexandr.lobakin@intel.com>
-> Date: Mon, 28 Nov 2022 16:51:27 +0100
->
->> From: "shenjian (K)" <shenjian15@huawei.com>
->> Date: Mon, 28 Nov 2022 23:22:28 +0800
->>
->>> 2022/11/25 23:44, Alexander Lobakin:
->>>> From: Jian Shen <shenjian15@huawei.com>
->>>> Date: Sun, 18 Sep 2022 09:42:41 +0000
->>>>
->>>>> For the prototype of netdev_features_t is u64, and the number
->>>>> of netdevice feature bits is 64 now. So there is no space to
->>>>> introduce new feature bit.
->>>>>
->>>>> This patchset try to solve it by change the prototype of
->>>>> netdev_features_t from u64 to structure below:
->>>>> 	typedef struct {
->>>>> 		DECLARE_BITMAP(bits, NETDEV_FEATURE_COUNT);
->>>>> 	} netdev_features_t;
->>>>>
->>>>> With this change, it's necessary to introduce a set of bitmap
->>>>> operation helpers for netdev features. [patch 1]
->>>> Hey,
->>>>
->>>> what's the current status, how's going?
->>>>
->>>> [...]
->>> Hi, Alexander
->>>
->>> Sorry to reply late, I'm still working on this, dealing with split the
->>> patchset.
->> Hey, no worries. Just curious as I believe lots of new features are
->> waiting for new bits to be available :D
-> Hey,
->
-> Any news?
-Sorry， Olek .
+vim +707 net/sched/sch_qfq.c
 
-Would you like to continue the work ? I thought I could finish this work 
-as soon as possible, but in fact, there is a serious time conflict.
+0545a303777351 stephen hemminger   2011-04-04  678  
+0545a303777351 stephen hemminger   2011-04-04  679  static struct qfq_class *qfq_classify(struct sk_buff *skb, struct Qdisc *sch,
+0545a303777351 stephen hemminger   2011-04-04  680  				      int *qerr)
+0545a303777351 stephen hemminger   2011-04-04  681  {
+0545a303777351 stephen hemminger   2011-04-04  682  	struct qfq_sched *q = qdisc_priv(sch);
+0545a303777351 stephen hemminger   2011-04-04  683  	struct qfq_class *cl;
+0545a303777351 stephen hemminger   2011-04-04  684  	struct tcf_result res;
+25d8c0d55f241c John Fastabend      2014-09-12  685  	struct tcf_proto *fl;
+0545a303777351 stephen hemminger   2011-04-04  686  	int result;
+0545a303777351 stephen hemminger   2011-04-04  687  
+0545a303777351 stephen hemminger   2011-04-04  688  	if (TC_H_MAJ(skb->priority ^ sch->handle) == 0) {
+0545a303777351 stephen hemminger   2011-04-04  689  		pr_debug("qfq_classify: found %d\n", skb->priority);
+0545a303777351 stephen hemminger   2011-04-04  690  		cl = qfq_find_class(sch, skb->priority);
+0545a303777351 stephen hemminger   2011-04-04  691  		if (cl != NULL)
+0545a303777351 stephen hemminger   2011-04-04  692  			return cl;
+0545a303777351 stephen hemminger   2011-04-04  693  	}
+0545a303777351 stephen hemminger   2011-04-04  694  
+0545a303777351 stephen hemminger   2011-04-04  695  	*qerr = NET_XMIT_SUCCESS | __NET_XMIT_BYPASS;
+25d8c0d55f241c John Fastabend      2014-09-12  696  	fl = rcu_dereference_bh(q->filter_list);
+3aa2605594556c Davide Caratti      2021-07-28  697  	result = tcf_classify(skb, NULL, fl, &res, false);
+0545a303777351 stephen hemminger   2011-04-04  698  	if (result >= 0) {
+0698b7004e7da6 Ma Ke               2023-09-15  699  		if (result == TC_ACT_SHOT)
+0698b7004e7da6 Ma Ke               2023-09-15  700  			return NULL;
+0545a303777351 stephen hemminger   2011-04-04  701  #ifdef CONFIG_NET_CLS_ACT
+0545a303777351 stephen hemminger   2011-04-04  702  		switch (result) {
+0545a303777351 stephen hemminger   2011-04-04  703  		case TC_ACT_QUEUED:
+0545a303777351 stephen hemminger   2011-04-04  704  		case TC_ACT_STOLEN:
+e25ea21ffa66a0 Jiri Pirko          2017-06-06  705  		case TC_ACT_TRAP:
+0545a303777351 stephen hemminger   2011-04-04  706  			*qerr = NET_XMIT_SUCCESS | __NET_XMIT_STOLEN;
+964201de695b8a Gustavo A. R. Silva 2020-07-07 @707  			fallthrough;
+0545a303777351 stephen hemminger   2011-04-04  708  		}
+0545a303777351 stephen hemminger   2011-04-04  709  #endif
+0545a303777351 stephen hemminger   2011-04-04  710  		cl = (struct qfq_class *)res.class;
+0545a303777351 stephen hemminger   2011-04-04  711  		if (cl == NULL)
+0545a303777351 stephen hemminger   2011-04-04  712  			cl = qfq_find_class(sch, res.classid);
+0545a303777351 stephen hemminger   2011-04-04  713  		return cl;
+0545a303777351 stephen hemminger   2011-04-04  714  	}
+0545a303777351 stephen hemminger   2011-04-04  715  
+0545a303777351 stephen hemminger   2011-04-04  716  	return NULL;
+0545a303777351 stephen hemminger   2011-04-04  717  }
+0545a303777351 stephen hemminger   2011-04-04  718  
 
-Jian
-
->>> Btw, could you kindly review this V8 set? I have adjusted the protocol
->>> of many interfaces and helpers,
->> I'll try to find some time to review it this week, will see.
->>
->>> to avoiding return or pass data large than 64bits. Hope to get more
->> Yes, I'd prefer to not pass more than 64 bits in one function
->> argument, which means functions operating with netdev_features_t
->> must start take pointers. Otherwise, with passing netdev_features_t
->> directly as a struct, the very first newly added feature will do
->> 8 -> 16 bytes on the stack per argument, boom.
->>
->>> opinions.
->>>
->>> Thanks!
->>>
->>> Jian
->>>>> -- 
->>>>> 2.33.0
->>>> Thanks,
->>>> Olek
->> Thanks,
->> Olek
-> Thanks,
-> Olek
-> .
->
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
