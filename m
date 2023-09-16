@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-34211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34212-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46D607A2CD5
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 03:07:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 722337A2CD6
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 03:08:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6024B1C20B9F
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 01:07:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26F3A28599D
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 01:08:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5212246BA;
-	Sat, 16 Sep 2023 01:06:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD21F137C;
+	Sat, 16 Sep 2023 01:06:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71E8020E4
-	for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 01:06:35 +0000 (UTC)
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43E1599
-	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 18:06:34 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d7ea08906b3so3186226276.1
-        for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 18:06:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D02B46B4
+	for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 01:06:37 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8F3290
+	for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 18:06:35 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59c27703cc6so8771597b3.2
+        for <netdev@vger.kernel.org>; Fri, 15 Sep 2023 18:06:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1694826393; x=1695431193; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1694826395; x=1695431195; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=b0bK6ULrtNX2DuCdsYiIZqeCSKJ2lyeHjtXdrDJF3wQ=;
-        b=Tq8pTvc3zP9LWmK91t/CxCV7B52YsYYHhSFOOesw7w8Gt1HCYrd3XvKX6O3jhqyBXQ
-         FhzhJMG3w9O+n3Md+D4a84C75uPYm3txfUIjW93FuExWaILEvE8A8JgYe4h1Skf0NTSk
-         sgRM9cEJSSHcVziE2tnRwu1R55SEXnzNsnEM97jWwVFVIozdBMwhX4vYk7vDzWXuyc2G
-         c5yIOGZHLCDyxZ5gYr3+dSVheUu9EJa7V7IljyDAIxZDiFTtWydc3FuCn6QOEfd9KbrG
-         9+vFlPrpcRVHILyOzgghbDQ12MW+Ej8lDqGyYn/GONXtFNd+eC9ZU/5mbvhXdZxPTo69
-         64PA==
+        bh=5Qz4V3XLqv+E98DDYmVT2fp6gpWlZyDG6UyupNw3+L0=;
+        b=Uny8XMeE+lgZ9X3RT5tlPonqaPOKWnh71sTnsgCQ/r7vk5xK/Kizp6vqzCA73k1mEL
+         hT843nfhmdHJ8/bB5/V3CcE4K+ZgbOf6eaA67OFf3jL4DLX1PO3fLbTLNFWZufC4D38K
+         m+IwkZYxZLRGhEkecSr57XqozD9Z3ag3E+GOn7IF5Y3Zw6qbznKNpvnprJKk4PXHG4/z
+         ons4Bo5evUSKRKyiBLRLOUpT8CAZmNY0vmYGmdxQKINs/TSAPiPRLtdPdstFP/TfDR3u
+         QA1ZjpnCnhOj5FFEDLUV3ngIeb3w1cKuiECrYWOJD2Wk/miJpEIxy0EBE0F36/w3fIZe
+         87zA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694826393; x=1695431193;
+        d=1e100.net; s=20230601; t=1694826395; x=1695431195;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=b0bK6ULrtNX2DuCdsYiIZqeCSKJ2lyeHjtXdrDJF3wQ=;
-        b=oo82ZI/u12CA/5pjU6wIgPMkOmwxPsEwvtX3H52pQ4xseJShjw3Xk7pXtGgk8Vq4mV
-         K9Fq9W4+m4chrbbyx1D+BkevsJJdXltJ7yA14RWhr8UEEozj2AJDnittweAQzNrvhyRC
-         ch+mgmXGpYg0TmNsSEOIXz9f3ka4tifNtny6r6tPnLJkOpl0/ET0Ru+cfTQ5xWIXnLre
-         3msveVmp5KlxZ2O4vue3Pe4tLi35QYEZnGfYwjkrJoE5ZmSmhv9rFO0Lgd7Eij1NCXfk
-         5c8Lqvcmn0cf0V76eAHzvxDBidRJ+zV8PtbxljgZMWrPVFJdPuDg9XK8pgTg2PQrJerB
-         TxzQ==
-X-Gm-Message-State: AOJu0YzKJrHLD/q1k+L/J6hjyUJzsZRsMAwtZsryjWfkaPtF1psT2NVQ
-	GFvZfsYDqGuMj7a/l0/4d0k9wYkCsD3YqXw=
-X-Google-Smtp-Source: AGHT+IEoMiDscVJtr3I3tMbXxeJW2uDJPqzhCJVubP5MFKrorQP008/xWg4YR/IIRmJA/z7R7tGF7bFK3RZJea4=
+        bh=5Qz4V3XLqv+E98DDYmVT2fp6gpWlZyDG6UyupNw3+L0=;
+        b=DKs98mO77wNCAuTZ2QpddyV7PFHmz2E3eO3LTWmYVEjN3Pv67O15Y3GLK3NTWmidYR
+         Hf9s41xKbAsU+9EYRgQVMIiV45zdvD6V+1m9M3BdoXB9SWeN4ZC8Rb7cspnNpf0Uflo5
+         5kzl8eVoFO+36kkT1Hfh/Ns95dobQKvWSgYgaookURNkC7mPYS5R0sJ51fBApD5FCXUG
+         qd1+mOTlV4qZp3FZSGEFkWwZ+T1tVCP91D0gL1kDcNungldC7Zm/P3KZohuaTlCnottJ
+         Fm1SEmk4raZk9tS8rowTqfgKt3tYIaBqrF37NmQXZWy7G+AVWIb0+F9SizZYeuEmP1Iz
+         DyHA==
+X-Gm-Message-State: AOJu0Yyel/a+6NUs76j1N9yLjKQeMibS+N+vjfEhF5vgEq/GXBZsO8Iv
+	1Eb9UAeNnduBk3O+coyGPnF574GOzGzCfr4=
+X-Google-Smtp-Source: AGHT+IGgTWhaZLVrsyduuScQsJ3cCj+moGP8e8ROSFp5zopYp8WPg3qqnAXCRP0dIQJF7OX3qRJqI/VmagQZrDw=
 X-Received: from coco0920.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:2a23])
- (user=lixiaoyan job=sendgmr) by 2002:a25:add3:0:b0:d81:754a:7cbb with SMTP id
- d19-20020a25add3000000b00d81754a7cbbmr71762ybe.11.1694826393566; Fri, 15 Sep
- 2023 18:06:33 -0700 (PDT)
-Date: Sat, 16 Sep 2023 01:06:23 +0000
+ (user=lixiaoyan job=sendgmr) by 2002:a81:ad64:0:b0:59b:eea4:a5a6 with SMTP id
+ l36-20020a81ad64000000b0059beea4a5a6mr81737ywk.0.1694826395202; Fri, 15 Sep
+ 2023 18:06:35 -0700 (PDT)
+Date: Sat, 16 Sep 2023 01:06:24 +0000
 In-Reply-To: <20230916010625.2771731-1-lixiaoyan@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -62,8 +62,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20230916010625.2771731-1-lixiaoyan@google.com>
 X-Mailer: git-send-email 2.42.0.459.ge4e396fd5e-goog
-Message-ID: <20230916010625.2771731-4-lixiaoyan@google.com>
-Subject: [PATCH v1 net-next 3/5] netns-ipv4: reorganize netns_ipv4 fast path variables
+Message-ID: <20230916010625.2771731-5-lixiaoyan@google.com>
+Subject: [PATCH v1 net-next 4/5] net-device: reorganize net_device fast path variables
 From: Coco Li <lixiaoyan@google.com>
 To: Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
 	Neal Cardwell <ncardwell@google.com>, Mubashir Adnan Qureshi <mubashirq@google.com>, 
@@ -78,124 +78,226 @@ X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Reorganize fast path variables on tx-txrx-rx order.
-Fastpath cacheline ends after sysctl_tcp_rmem.
-There are only read-only variables here. (write is on the control path
-and not considered in this case)
+Reorganize fast path variables on tx-txrx-rx order
+Fastpath variables end after npinfo.
 
 Below data generated with pahole on x86 architecture.
 
-Fast path variables span cache lines before change: 4
-Fast path variables span cache lines after change: 2
+Fast path variables span cache lines before change: 12
+Fast path variables span cache lines after change: 4
 
 Tested:
 Built and installed.
 
 Signed-off-by: Coco Li <lixiaoyan@google.com>
 Suggested-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: Wei Wang <weiwan@google.com>
 ---
- include/net/netns/ipv4.h | 36 +++++++++++++++++++++---------------
- 1 file changed, 21 insertions(+), 15 deletions(-)
+ include/linux/netdevice.h | 96 +++++++++++++++++++--------------------
+ 1 file changed, 48 insertions(+), 48 deletions(-)
 
-diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
-index d96d05b088197..41f5597aa01fd 100644
---- a/include/net/netns/ipv4.h
-+++ b/include/net/netns/ipv4.h
-@@ -42,6 +42,27 @@ struct inet_timewait_death_row {
- struct tcp_fastopen_context;
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 0896aaa91dd7b..e52ee8d51add5 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -2054,6 +2054,54 @@ enum netdev_ml_priv_type {
+  */
  
- struct netns_ipv4 {
-+	/* TX readonly hotpath cache lines */
-+	u8 sysctl_tcp_early_retrans;
-+	u8 sysctl_tcp_tso_win_divisor;
-+	u8 sysctl_tcp_tso_rtt_log;
-+	u8 sysctl_tcp_autocorking;
-+	int sysctl_tcp_min_snd_mss;
-+	unsigned int sysctl_tcp_notsent_lowat;
-+	int sysctl_tcp_limit_output_bytes;
-+	int sysctl_tcp_min_rtt_wlen;
-+	int sysctl_tcp_wmem[3];
-+	u8 sysctl_ip_fwd_use_pmtu;
+ struct net_device {
++	/* TX read-mostly hotpath */
++	unsigned long long	priv_flags;
++	const struct net_device_ops *netdev_ops;
++	const struct header_ops *header_ops;
++	struct netdev_queue	*_tx;
++	unsigned int		real_num_tx_queues;
++	unsigned int		gso_max_size;
++	unsigned int		gso_ipv4_max_size;
++	u16			gso_max_segs;
++	s16			num_tc;
++	/* Note : dev->mtu is often read without holding a lock.
++	 * Writers usually hold RTNL.
++	 * It is recommended to use READ_ONCE() to annotate the reads,
++	 * and to use WRITE_ONCE() to annotate the writes.
++	 */
++	unsigned int		mtu;
++	unsigned short		needed_headroom;
++	struct netdev_tc_txq	tc_to_txq[TC_MAX_QUEUE];
++#ifdef CONFIG_XPS
++	struct xps_dev_maps __rcu *xps_maps[XPS_MAPS_MAX];
++#endif
++#ifdef CONFIG_NETFILTER_EGRESS
++	struct nf_hook_entries __rcu *nf_hooks_egress;
++#endif
 +
-+	/* TXRX readonly hotpath cache lines */
-+	u8 sysctl_tcp_moderate_rcvbuf;
++	/* TXRX read-mostly hotpath */
++	unsigned int		flags;
++	unsigned short		hard_header_len;
++	netdev_features_t	features;
++	struct inet6_dev __rcu	*ip6_ptr;
 +
-+	/* RX readonly hotpath cache line */
-+	u8 sysctl_ip_early_demux;
-+	u8 sysctl_tcp_early_demux;
-+	int sysctl_tcp_reordering;
-+	int sysctl_tcp_rmem[3];
++	/* RX read-mostly hotpath */
++	struct list_head	ptype_specific;
++	int			ifindex;
++	unsigned int		real_num_rx_queues;
++	struct netdev_rx_queue	*_rx;
++	unsigned long		gro_flush_timeout;
++	int			napi_defer_hard_irqs;
++	unsigned int		gro_max_size;
++	unsigned int		gro_ipv4_max_size;
++	unsigned		threaded:1;
++	rx_handler_func_t __rcu	*rx_handler;
++	void __rcu		*rx_handler_data;
++	possible_net_t			nd_net;
++#ifdef CONFIG_NETPOLL
++	struct netpoll_info __rcu	*npinfo;
++#endif
 +
- 	struct inet_timewait_death_row tcp_death_row;
- 	struct udp_table *udp_table;
+ 	char			name[IFNAMSIZ];
+ 	struct netdev_name_node	*name_node;
+ 	struct dev_ifalias	__rcu *ifalias;
+@@ -2078,7 +2126,6 @@ struct net_device {
+ 	struct list_head	unreg_list;
+ 	struct list_head	close_list;
+ 	struct list_head	ptype_all;
+-	struct list_head	ptype_specific;
  
-@@ -96,17 +117,14 @@ struct netns_ipv4 {
+ 	struct {
+ 		struct list_head upper;
+@@ -2086,25 +2133,12 @@ struct net_device {
+ 	} adj_list;
  
- 	u8 sysctl_ip_default_ttl;
- 	u8 sysctl_ip_no_pmtu_disc;
--	u8 sysctl_ip_fwd_use_pmtu;
- 	u8 sysctl_ip_fwd_update_priority;
- 	u8 sysctl_ip_nonlocal_bind;
- 	u8 sysctl_ip_autobind_reuse;
- 	/* Shall we try to damage output packets if routing dev changes? */
- 	u8 sysctl_ip_dynaddr;
--	u8 sysctl_ip_early_demux;
- #ifdef CONFIG_NET_L3_MASTER_DEV
- 	u8 sysctl_raw_l3mdev_accept;
+ 	/* Read-mostly cache-line for fast-path access */
+-	unsigned int		flags;
+ 	xdp_features_t		xdp_features;
+-	unsigned long long	priv_flags;
+-	const struct net_device_ops *netdev_ops;
+ 	const struct xdp_metadata_ops *xdp_metadata_ops;
+-	int			ifindex;
+ 	unsigned short		gflags;
+-	unsigned short		hard_header_len;
+ 
+-	/* Note : dev->mtu is often read without holding a lock.
+-	 * Writers usually hold RTNL.
+-	 * It is recommended to use READ_ONCE() to annotate the reads,
+-	 * and to use WRITE_ONCE() to annotate the writes.
+-	 */
+-	unsigned int		mtu;
+-	unsigned short		needed_headroom;
+ 	unsigned short		needed_tailroom;
+ 
+-	netdev_features_t	features;
+ 	netdev_features_t	hw_features;
+ 	netdev_features_t	wanted_features;
+ 	netdev_features_t	vlan_features;
+@@ -2148,8 +2182,6 @@ struct net_device {
+ 	const struct tlsdev_ops *tlsdev_ops;
  #endif
--	u8 sysctl_tcp_early_demux;
- 	u8 sysctl_udp_early_demux;
  
- 	u8 sysctl_nexthop_compat_mode;
-@@ -119,7 +137,6 @@ struct netns_ipv4 {
- 	u8 sysctl_tcp_mtu_probing;
- 	int sysctl_tcp_mtu_probe_floor;
- 	int sysctl_tcp_base_mss;
--	int sysctl_tcp_min_snd_mss;
- 	int sysctl_tcp_probe_threshold;
- 	u32 sysctl_tcp_probe_interval;
+-	const struct header_ops *header_ops;
+-
+ 	unsigned char		operstate;
+ 	unsigned char		link_mode;
  
-@@ -133,17 +150,14 @@ struct netns_ipv4 {
- 	u8 sysctl_tcp_migrate_req;
- 	u8 sysctl_tcp_comp_sack_nr;
- 	u8 sysctl_tcp_backlog_ack_defer;
--	int sysctl_tcp_reordering;
- 	u8 sysctl_tcp_retries1;
- 	u8 sysctl_tcp_retries2;
- 	u8 sysctl_tcp_orphan_retries;
- 	u8 sysctl_tcp_tw_reuse;
- 	int sysctl_tcp_fin_timeout;
--	unsigned int sysctl_tcp_notsent_lowat;
- 	u8 sysctl_tcp_sack;
- 	u8 sysctl_tcp_window_scaling;
- 	u8 sysctl_tcp_timestamps;
--	u8 sysctl_tcp_early_retrans;
- 	u8 sysctl_tcp_recovery;
- 	u8 sysctl_tcp_thin_linear_timeouts;
- 	u8 sysctl_tcp_slow_start_after_idle;
-@@ -159,21 +173,13 @@ struct netns_ipv4 {
- 	u8 sysctl_tcp_frto;
- 	u8 sysctl_tcp_nometrics_save;
- 	u8 sysctl_tcp_no_ssthresh_metrics_save;
--	u8 sysctl_tcp_moderate_rcvbuf;
--	u8 sysctl_tcp_tso_win_divisor;
- 	u8 sysctl_tcp_workaround_signed_windows;
--	int sysctl_tcp_limit_output_bytes;
- 	int sysctl_tcp_challenge_ack_limit;
--	int sysctl_tcp_min_rtt_wlen;
- 	u8 sysctl_tcp_min_tso_segs;
--	u8 sysctl_tcp_tso_rtt_log;
--	u8 sysctl_tcp_autocorking;
- 	u8 sysctl_tcp_reflect_tos;
- 	int sysctl_tcp_invalid_ratelimit;
- 	int sysctl_tcp_pacing_ss_ratio;
- 	int sysctl_tcp_pacing_ca_ratio;
--	int sysctl_tcp_wmem[3];
--	int sysctl_tcp_rmem[3];
- 	unsigned int sysctl_tcp_child_ehash_entries;
- 	unsigned long sysctl_tcp_comp_sack_delay_ns;
- 	unsigned long sysctl_tcp_comp_sack_slack_ns;
+@@ -2190,9 +2222,7 @@ struct net_device {
+ 
+ 
+ 	/* Protocol-specific pointers */
+-
+ 	struct in_device __rcu	*ip_ptr;
+-	struct inet6_dev __rcu	*ip6_ptr;
+ #if IS_ENABLED(CONFIG_VLAN_8021Q)
+ 	struct vlan_info __rcu	*vlan_info;
+ #endif
+@@ -2227,23 +2257,14 @@ struct net_device {
+ 	/* Interface address info used in eth_type_trans() */
+ 	const unsigned char	*dev_addr;
+ 
+-	struct netdev_rx_queue	*_rx;
+ 	unsigned int		num_rx_queues;
+-	unsigned int		real_num_rx_queues;
+-
+ 	struct bpf_prog __rcu	*xdp_prog;
+-	unsigned long		gro_flush_timeout;
+-	int			napi_defer_hard_irqs;
+ #define GRO_LEGACY_MAX_SIZE	65536u
+ /* TCP minimal MSS is 8 (TCP_MIN_GSO_SIZE),
+  * and shinfo->gso_segs is a 16bit field.
+  */
+ #define GRO_MAX_SIZE		(8 * 65535u)
+-	unsigned int		gro_max_size;
+-	unsigned int		gro_ipv4_max_size;
+ 	unsigned int		xdp_zc_max_segs;
+-	rx_handler_func_t __rcu	*rx_handler;
+-	void __rcu		*rx_handler_data;
+ #ifdef CONFIG_NET_XGRESS
+ 	struct bpf_mprog_entry __rcu *tcx_ingress;
+ #endif
+@@ -2261,24 +2282,15 @@ struct net_device {
+ /*
+  * Cache lines mostly used on transmit path
+  */
+-	struct netdev_queue	*_tx ____cacheline_aligned_in_smp;
+ 	unsigned int		num_tx_queues;
+-	unsigned int		real_num_tx_queues;
+ 	struct Qdisc __rcu	*qdisc;
+ 	unsigned int		tx_queue_len;
+ 	spinlock_t		tx_global_lock;
+ 
+ 	struct xdp_dev_bulk_queue __percpu *xdp_bulkq;
+-
+-#ifdef CONFIG_XPS
+-	struct xps_dev_maps __rcu *xps_maps[XPS_MAPS_MAX];
+-#endif
+ #ifdef CONFIG_NET_XGRESS
+ 	struct bpf_mprog_entry __rcu *tcx_egress;
+ #endif
+-#ifdef CONFIG_NETFILTER_EGRESS
+-	struct nf_hook_entries __rcu *nf_hooks_egress;
+-#endif
+ 
+ #ifdef CONFIG_NET_SCHED
+ 	DECLARE_HASHTABLE	(qdisc_hash, 4);
+@@ -2318,12 +2330,6 @@ struct net_device {
+ 	bool needs_free_netdev;
+ 	void (*priv_destructor)(struct net_device *dev);
+ 
+-#ifdef CONFIG_NETPOLL
+-	struct netpoll_info __rcu	*npinfo;
+-#endif
+-
+-	possible_net_t			nd_net;
+-
+ 	/* mid-layer private */
+ 	void				*ml_priv;
+ 	enum netdev_ml_priv_type	ml_priv_type;
+@@ -2357,20 +2363,15 @@ struct net_device {
+  */
+ #define GSO_MAX_SIZE		(8 * GSO_MAX_SEGS)
+ 
+-	unsigned int		gso_max_size;
+ #define TSO_LEGACY_MAX_SIZE	65536
+ #define TSO_MAX_SIZE		UINT_MAX
+ 	unsigned int		tso_max_size;
+-	u16			gso_max_segs;
+ #define TSO_MAX_SEGS		U16_MAX
+ 	u16			tso_max_segs;
+-	unsigned int		gso_ipv4_max_size;
+ 
+ #ifdef CONFIG_DCB
+ 	const struct dcbnl_rtnl_ops *dcbnl_ops;
+ #endif
+-	s16			num_tc;
+-	struct netdev_tc_txq	tc_to_txq[TC_MAX_QUEUE];
+ 	u8			prio_tc_map[TC_BITMASK + 1];
+ 
+ #if IS_ENABLED(CONFIG_FCOE)
+@@ -2384,7 +2385,6 @@ struct net_device {
+ 	struct lock_class_key	*qdisc_tx_busylock;
+ 	bool			proto_down;
+ 	unsigned		wol_enabled:1;
+-	unsigned		threaded:1;
+ 
+ 	struct list_head	net_notifier_list;
+ 
 -- 
 2.42.0.459.ge4e396fd5e-goog
 
