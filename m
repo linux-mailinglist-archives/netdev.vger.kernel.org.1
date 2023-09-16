@@ -1,195 +1,145 @@
-Return-Path: <netdev+bounces-34316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 719057A312F
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 17:45:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 137FE7A3131
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 17:46:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B948281143
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 15:45:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BE2E1C20B64
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 15:46:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D71AF18E31;
-	Sat, 16 Sep 2023 15:44:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C1E714A87;
+	Sat, 16 Sep 2023 15:45:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7314B14A80
-	for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 15:44:28 +0000 (UTC)
-X-Greylist: delayed 479 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 16 Sep 2023 08:44:26 PDT
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37BC7186
-	for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 08:44:26 -0700 (PDT)
-Received: from [192.168.2.51] (p4fe718a3.dip0.t-ipconnect.de [79.231.24.163])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
-	(No client certificate requested)
-	(Authenticated sender: stefan@datenfreihafen.org)
-	by proxima.lasnet.de (Postfix) with ESMTPSA id D7A8BC0E1B;
-	Sat, 16 Sep 2023 17:36:41 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-	s=2021; t=1694878602;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F14F13AD9;
+	Sat, 16 Sep 2023 15:45:21 +0000 (UTC)
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AE88184;
+	Sat, 16 Sep 2023 08:45:19 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 6E4D4C0005;
+	Sat, 16 Sep 2023 15:45:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1694879117;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=txoP9qso+zll7gHcm7QuU9pRu9dFt/xb8/N1YC8yrKI=;
-	b=vS0Ben+CsyVNJdv/1ApqGOE4V0+KTpj/MM76mHq5Cl54ZyTe5tLKUDGzhxJIrqSLFZLtdz
-	bdGIKoIElpO2XNzcePxMvXe8H84Y6E7CC4QDE8ESmi9XL8ZjItpel1tJH1eyxYs7O53FMU
-	fAE63/ezGaAZbMz4ckpdU+fqYWrPiziIycTtwyifPg9UcQhPF+uJEkDvtMLcDMXJAYSPJ2
-	nSnhwFj25ZIx/35DmtKH1+5DgBnZeeecY8AtDBKpX9z4LpdqoMHwbkfM7MaCs40EaKCF57
-	bFt4omrc7gB7Y8bksi4A1FCqCAXGJCXI+hQ8MVj9VGwyAuCKhEeaN4aNjFIKng==
-Message-ID: <385bff6c-1322-d2ea-16df-6e005888db0b@datenfreihafen.org>
-Date: Sat, 16 Sep 2023 17:36:41 +0200
+	bh=iKU7mLoYHSbaWsMW5qLWUohutwbcss/sFfhr1eqSfbo=;
+	b=GdJ7GMxBovtaJXuVJXQeL9F/8c1Kp3OBFjkusnp7zOgmYE5Om+W7T1Kts5XEXwqrEJK+R3
+	wVxarI+WeNgCskgQ17tWw2BKiQm1U1Pvy0rx4D5gzRZLr4RUagXZ5BCogf1EY6wV2kRZ/h
+	Os6yN9ypLrIYsYm1J5/NN81aU8rj+/rleRLewB0CgMXnmRGii52lZkTnASS3T0ZXZDi7N1
+	Vd8eH+3qXfk3+qiJ2bcvuYqmljaFYuxK2ZNXz8Kel+nAz2UX+yywxWa1e0ugDrUWb9Nnc+
+	Vs/8jFHtM1PVBgoVys1nB/LJTk6s1urgwMunlKZ+vBKdKNFQ44Jw+aPrFwGODQ==
+Message-ID: <ae50cb7f-3110-4627-867e-32598056859d@arinc9.com>
+Date: Sat, 16 Sep 2023 18:44:59 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-Subject: Re: [PATCH wpan-next v2 11/11] ieee802154: Give the user the
- association list
-To: Miquel Raynal <miquel.raynal@bootlin.com>,
- Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
- David Girault <david.girault@qorvo.com>,
- Romuald Despres <romuald.despres@qorvo.com>,
- Frederic Blain <frederic.blain@qorvo.com>,
- Nicolas Schodet <nico@ni.fr.eu.org>,
- Guilhem Imberton <guilhem.imberton@qorvo.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-References: <20230901170501.1066321-1-miquel.raynal@bootlin.com>
- <20230901170501.1066321-12-miquel.raynal@bootlin.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 08/10] dt-bindings: net: dsa: marvell: convert
+ to json-schema
 Content-Language: en-US
-In-Reply-To: <20230901170501.1066321-12-miquel.raynal@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ George McCollister <george.mccollister@gmail.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
+ <olteanv@gmail.com>, Kurt Kanzenbach <kurt@linutronix.de>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+ Linus Walleij <linus.walleij@linaro.org>,
+ =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+ =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
+ Marcin Wojtas <mw@semihalf.com>,
+ "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Lars Povlsen <lars.povlsen@microchip.com>,
+ Steen Hegelund <Steen.Hegelund@microchip.com>,
+ Daniel Machon <daniel.machon@microchip.com>,
+ Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+ Daniel Golle <daniel@makrotopia.org>, Landen Chao
+ <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Claudiu Beznea <claudiu.beznea@microchip.com>, Marek Vasut <marex@denx.de>,
+ Claudiu Manoil <claudiu.manoil@nxp.com>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ John Crispin <john@phrozen.org>, Madalin Bucur <madalin.bucur@nxp.com>,
+ Ioana Ciornei <ioana.ciornei@nxp.com>, Lorenzo Bianconi
+ <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+ Horatiu Vultur <horatiu.vultur@microchip.com>,
+ Oleksij Rempel <linux@rempel-privat.de>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Grygorii Strashko <grygorii.strashko@ti.com>, Sekhar Nori <nsekhar@ti.com>,
+ Shyam Pandey <radhey.shyam.pandey@xilinx.com>, mithat.guner@xeront.com,
+ erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ linux-renesas-soc@vger.kernel.org
+References: <20230916110902.234273-1-arinc.unal@arinc9.com>
+ <20230916110902.234273-9-arinc.unal@arinc9.com>
+ <63cc4c3c-5cac-4d54-99be-7f05e98406ba@lunn.ch>
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <63cc4c3c-5cac-4d54-99be-7f05e98406ba@lunn.ch>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello Miquel.
-
-On 01.09.23 19:05, Miquel Raynal wrote:
-> Upon request, we must be able to provide to the user the list of
-> associations currently in place. Let's add a new netlink command and
-> attribute for this purpose.
+On 16.09.2023 17:05, Andrew Lunn wrote:
+>> +properties:
+>> +  compatible:
+>> +    oneOf:
+>> +      - description: |
+>> +          Switch has base address 0x10. Use with models:
+>> +          6085, 6095, 6097, 6123, 6131, 6141, 6161, 6165, 6171, 6172, 6175,
+>> +          6176, 6185, 6240, 6320, 6321, 6341, 6350, 6351, 6352
+>> +        const: marvell,mv88e6085
 > 
-> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
-> ---
->   include/net/nl802154.h    |  18 ++++++-
->   net/ieee802154/nl802154.c | 107 ++++++++++++++++++++++++++++++++++++++
->   2 files changed, 123 insertions(+), 2 deletions(-)
+> The .txt file contained:
 > 
-> diff --git a/include/net/nl802154.h b/include/net/nl802154.h
-> index 8b26faae49e8..4c752f799957 100644
-> --- a/include/net/nl802154.h
-> +++ b/include/net/nl802154.h
-> @@ -81,6 +81,7 @@ enum nl802154_commands {
->   	NL802154_CMD_ASSOCIATE,
->   	NL802154_CMD_DISASSOCIATE,
->   	NL802154_CMD_SET_MAX_ASSOCIATIONS,
-> +	NL802154_CMD_LIST_ASSOCIATIONS,
->   
->   	/* add new commands above here */
->   
-> @@ -151,6 +152,7 @@ enum nl802154_attrs {
->   	NL802154_ATTR_SCAN_DONE_REASON,
->   	NL802154_ATTR_BEACON_INTERVAL,
->   	NL802154_ATTR_MAX_ASSOCIATIONS,
-> +	NL802154_ATTR_PEER,
->   
->   	/* add attributes here, update the policy in nl802154.c */
->   
-> @@ -389,8 +391,6 @@ enum nl802154_supported_bool_states {
->   	NL802154_SUPPORTED_BOOL_MAX = __NL802154_SUPPORTED_BOOL_AFTER_LAST - 1
->   };
->   
-> -#ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
-> -
->   enum nl802154_dev_addr_modes {
->   	NL802154_DEV_ADDR_NONE,
->   	__NL802154_DEV_ADDR_INVALID,
-> @@ -410,12 +410,26 @@ enum nl802154_dev_addr_attrs {
->   	NL802154_DEV_ADDR_ATTR_SHORT,
->   	NL802154_DEV_ADDR_ATTR_EXTENDED,
->   	NL802154_DEV_ADDR_ATTR_PAD,
-> +	NL802154_DEV_ADDR_ATTR_PEER_TYPE,
->   
->   	/* keep last */
->   	__NL802154_DEV_ADDR_ATTR_AFTER_LAST,
->   	NL802154_DEV_ADDR_ATTR_MAX = __NL802154_DEV_ADDR_ATTR_AFTER_LAST - 1
->   };
->   
-> +enum nl802154_peer_type {
-> +	NL802154_PEER_TYPE_UNSPEC,
-> +
-> +	NL802154_PEER_TYPE_PARENT,
-> +	NL802154_PEER_TYPE_CHILD,
-> +
-> +	/* keep last */
-> +	__NL802154_PEER_TYPE_AFTER_LAST,
-> +	NL802154_PEER_TYPE_MAX = __NL802154_PEER_TYPE_AFTER_LAST - 1
-> +};
-> +
-> +#ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
-> +
->   enum nl802154_key_id_modes {
->   	NL802154_KEY_ID_MODE_IMPLICIT,
->   	NL802154_KEY_ID_MODE_INDEX,
-> diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-> index e16e57fc34d0..e26d7cec02ce 100644
-> --- a/net/ieee802154/nl802154.c
-> +++ b/net/ieee802154/nl802154.c
-> @@ -235,6 +235,7 @@ static const struct nla_policy nl802154_policy[NL802154_ATTR_MAX+1] = {
->   	[NL802154_ATTR_BEACON_INTERVAL] =
->   		NLA_POLICY_MAX(NLA_U8, IEEE802154_ACTIVE_SCAN_DURATION),
->   	[NL802154_ATTR_MAX_ASSOCIATIONS] = { .type = NLA_U32 },
-> +	[NL802154_ATTR_PEER] = { .type = NLA_NESTED },
->   
->   #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
->   	[NL802154_ATTR_SEC_ENABLED] = { .type = NLA_U8, },
-> @@ -1717,6 +1718,107 @@ static int nl802154_set_max_associations(struct sk_buff *skb, struct genl_info *
->   	return 0;
->   }
->   
-> +static int nl802154_send_peer_info(struct sk_buff *msg,
-> +				   struct netlink_callback *cb,
-> +				   u32 seq, int flags,
-> +				   struct cfg802154_registered_device *rdev,
-> +				   struct wpan_dev *wpan_dev,
-> +				   struct ieee802154_pan_device *peer,
-> +				   enum nl802154_peer_type type)
-> +{
-> +	struct nlattr *nla;
-> +	void *hdr;
-> +
-> +	ASSERT_RTNL();
-> +
-> +	hdr = nl802154hdr_put(msg, NETLINK_CB(cb->skb).portid, seq, flags,
-> +			      NL802154_CMD_LIST_ASSOCIATIONS);
-> +	if (!hdr)
-> +		return -ENOBUFS;
-> +
-> +	genl_dump_check_consistent(cb, hdr);
-> +
-> +	if (nla_put_u32(msg, NL802154_ATTR_GENERATION,
-> +			wpan_dev->association_generation))
+>      The compatibility string is used only to find an identification
+>      register, which is at a different MDIO base address in different
+>      switch families.
+> 
+> Please keep this text. There has been a lot of confusion in the past,
+> lots of circular arguments etc, and it is way too late to do anything
+> different. So i want to make it clear what the compatible is used for,
+> juts to find the ID registers, nothing more.
 
+Will do.
 
-This one still confuses me. I only ever see it increasing in the code. 
-Did I miss something?
+> 
+>> +
+>> +      - description: |
+>> +          Switch has base address 0x00. Use with models:
+>> +          6190, 6190X, 6191, 6290, 6361, 6390, 6390X
+> 
+> The .txt file is missing the 6191X and 6393X, which belong here. If
+> you need to respin, please could you add them here.
 
-regards
-Stefan Schmidt
+Will do.
+
+Arınç
 
