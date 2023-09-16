@@ -1,64 +1,65 @@
-Return-Path: <netdev+bounces-34262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2232C7A2F56
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 12:54:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 44F347A2F57
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 12:54:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D558128213C
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 10:54:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2365282104
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 10:54:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB19C12B9C;
-	Sat, 16 Sep 2023 10:53:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D32312B97;
+	Sat, 16 Sep 2023 10:54:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 813DD12B97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D760A12B95
 	for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 10:53:58 +0000 (UTC)
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BE9DCF8
-	for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 03:53:55 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-403012f276dso32181965e9.0
-        for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 03:53:55 -0700 (PDT)
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 905A5CFB
+	for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 03:53:56 -0700 (PDT)
+Received: by mail-wm1-x329.google.com with SMTP id 5b1f17b1804b1-401b393ddd2so33942765e9.0
+        for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 03:53:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares.net; s=google; t=1694861634; x=1695466434; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=pXq3ztXMbHolyHBrYC8jW9R2bypQ+SZTONMaVPi85RA=;
-        b=5tsFUfaPGTLlJ7/oVRRE8JTabmYFF75Xrm3yKL49kUFdAE11AJIzmb7PLwGYIsr5N5
-         adAcJgLZYSxKNW6iflD3ZjoLu4xhkHosb5mNI0QnZwNyl43qEcgl0wDfO4VwxeSOdRuG
-         MvV9aC3SXbuzclpPetvV4+UCnrlGy9fcQaBsAkjTDeA8dHyS/M7O/D8bByV5M18mAiCD
-         jN5JTp5bI+oOGCM5UPqUwJrf9GsWtCsgFsLdZ/taXIkLqvgTZph1DLfvjE1EwMjN5StX
-         8kyRi7/NIcMeYcixjutLi0e+mVVN8cvZ+az/acaV8bDKMARPLd76ooaeKC0PxpkLHAkA
-         gNQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694861634; x=1695466434;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=tessares.net; s=google; t=1694861635; x=1695466435; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=pXq3ztXMbHolyHBrYC8jW9R2bypQ+SZTONMaVPi85RA=;
-        b=o1woXEJhrvTugQ3jwRcsNhaX9pu5w7tyW3drab13Ac1nLl3Nj2kz89DkQb0VP2aCmP
-         YdVADwp/JyLKM60eFApdWIUgf5EJJpi4b5mviTVUGPNedjFTw0lhLJQTncVsY8hwX/IB
-         TXV3HVPDrveaaMyr6U5TnzGAfqYRJJFx1A2y/IF3vNLwtJC9U7Zeecise02OvaWPOXo7
-         GZFysSbcoMIvZOYarusFjrNUVDhD++mjmRek+CPlCzudvWn6ZymDDCZPAqVTXQqwtptZ
-         w/KEFXbJuEtvb0zMiyAkk/a0QqNXBi+a2yfk4Dx8axuPWtOXZTn5fqUC27pfWiB+IbWA
-         dh3w==
-X-Gm-Message-State: AOJu0YwCa4ozGtZhghfATiXsJcPZIJR71xhr1rqNLhAEhtu0ll22uZOZ
-	eWC4bh57YhyhFqsP8kFd7XqzZw==
-X-Google-Smtp-Source: AGHT+IEaGkeBo+UEUY8AsPDzyVfUc1LI0L2Es4YLkSDx3om/sns505iK7K51Rnc6Z+vKfYjClRej/Q==
-X-Received: by 2002:a05:600c:2299:b0:403:9b7:a720 with SMTP id 25-20020a05600c229900b0040309b7a720mr3942992wmf.1.1694861633854;
-        Sat, 16 Sep 2023 03:53:53 -0700 (PDT)
+        bh=WqJ79R2SnJAHHfAI9dTKO9toC5LU8hBRU518BwY/FZA=;
+        b=eMQdMrnLE7kErtVEdSa8yvR8tGJaKjcFyje8tqP9gCPRNp6htL1clQqeB8BT8cMwcO
+         msBqVzjx3hN6T1CI2y4Nb3PcaBPdOI0YfhV7RRJ1EezasEj4cMK/PPyzxb7tg1yIAXjs
+         Au5PV8AXs8aOqizcvgJz2IyvmTBy2Sgp3pUr9zy5SjUHgxIjrlssC1QiDBjlhELf+lTn
+         KW7y1z6KBeZObxO9LNWue3Dyp1T7PjwhnegpD5M9ub+9Mr8bnyB1mroZL8IUWM0XGwiC
+         OLV0iWozMqFwKM98XFxFODPTwn7tWJS6L+jUUuYkbpzFQTs5MYHtLZ1Ynm365Dv07d3z
+         wW3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694861635; x=1695466435;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WqJ79R2SnJAHHfAI9dTKO9toC5LU8hBRU518BwY/FZA=;
+        b=nNBFxxb+kqonY+bsw3PS5pJ0me/z4FywcZa+0pEdpGAw+gJvadaYm6rzCQevDM0yZ+
+         qKUrlb9ymiBYOIkDuX/SYXlWDSfdxVqU4aNCJu8vI4iI0UxsoiNM2Y31oB5J5VSgnOQ6
+         iE/x59sxy9s30DQBscWH65q7n/1ppCmVVfK/cy0mlIQuU5HvUbo8fPny+ORni0ScRDsV
+         f9Qa3/naEreZS41y+zsLLKuXsMiST4bYrvinvBaNYDRiwef3GLngXCLbGHQpCmw8J0xq
+         9KZmpcGAcdwNNjhK69tCfizRRykTjWs5QcBHIQ30U/OFa5woR3/K1fLLIiBojYJTC2sU
+         9buQ==
+X-Gm-Message-State: AOJu0YyIjuDAmlTFUmMC1T6YVk2oAhiwl3z4EScwr3PrifGHIRHy7En1
+	ueh2dhmGWWw67RE4KzK5r6bUGw==
+X-Google-Smtp-Source: AGHT+IHsZm0HQC9qiLlex5/BpHC1RrP5Q384dz5/IrZZm1i/R4fOEFUr8sglC/57npnA1QpgbQt7dw==
+X-Received: by 2002:adf:ea0b:0:b0:314:15b7:20a5 with SMTP id q11-20020adfea0b000000b0031415b720a5mr3605338wrm.54.1694861635092;
+        Sat, 16 Sep 2023 03:53:55 -0700 (PDT)
 Received: from vdi08.nix.tessares.net (static.219.156.76.144.clients.your-server.de. [144.76.156.219])
-        by smtp.gmail.com with ESMTPSA id z20-20020a7bc7d4000000b003feae747ff2sm9900743wmk.35.2023.09.16.03.53.52
+        by smtp.gmail.com with ESMTPSA id z20-20020a7bc7d4000000b003feae747ff2sm9900743wmk.35.2023.09.16.03.53.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 Sep 2023 03:53:53 -0700 (PDT)
+        Sat, 16 Sep 2023 03:53:54 -0700 (PDT)
 From: Matthieu Baerts <matthieu.baerts@tessares.net>
-Subject: [PATCH net 0/5] mptcp: fix stalled connections
-Date: Sat, 16 Sep 2023 12:52:44 +0200
-Message-Id: <20230916-upstream-net-20230915-mptcp-hanging-conn-v1-0-05d1a8b851a8@tessares.net>
+Date: Sat, 16 Sep 2023 12:52:45 +0200
+Subject: [PATCH net 1/5] mptcp: fix bogus receive window shrinkage with
+ multiple subflows
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,9 +68,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAPyIBWUC/z2NywqDMBBFf0Vm7UAe1NeviIs0He0sHEMSS0H89
- 6YuXJ4L59wDEkWmBEN1QKQPJ96kgK4r8G8nCyG/CoNRxqpeP3APKUdyKwplvNc1ZB/wL7As6Dc
- RVI3qre2eujUdlFyINPP3uhqhyDCd5w9FK11VfwAAAA==
+Message-Id: <20230916-upstream-net-20230915-mptcp-hanging-conn-v1-1-05d1a8b851a8@tessares.net>
+References: <20230916-upstream-net-20230915-mptcp-hanging-conn-v1-0-05d1a8b851a8@tessares.net>
+In-Reply-To: <20230916-upstream-net-20230915-mptcp-hanging-conn-v1-0-05d1a8b851a8@tessares.net>
 To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -77,21 +78,21 @@ To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
  Matthieu Baerts <matthieu.baerts@tessares.net>, stable@vger.kernel.org
 X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1934;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1538;
  i=matthieu.baerts@tessares.net; h=from:subject:message-id;
- bh=Qibb+XUG3Fu5XjpF54vZjeB9fuXW430sjfoEwViSqns=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBlBYlAmJev8waCdAk/HQ4mawHPUUqTslGS/EMGx
- HFwgFDm9aOJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZQWJQAAKCRD2t4JPQmmg
- c10dEADHm11WwquREihNaEZRxVI4RRl2js578WKR9JZcqmezDjdgPplnVNVpoue7dPM/Bi2PEx/
- 11Zfs7E3/oZKZQqp8bmHYIUrriTON8aLVCck+TODLiAvvQzMJcBrELpdQP279PcSNWUpzHrDzNZ
- Dk0iYs/el2szXTp3dJi3PVW1KQGibEzAy8YGvnXdvKRUOV5S2lPBPEuRA/XRJlwUs6vFFuPfowe
- Ef80nyrbn08eGgT45DnJ2UBilgOxKP5zuFHvJ4Ik3K10W6wa7IPnvaKobQPaCByV7e57petq7Ww
- HbZMbzoXyhJqVXTRr06hy8b/G8tp57fzPDDWs5SLkYI+i8a9TV166eIjRnpsEaS4M184G1LaxnG
- rfbNrdbrj+yL8EClR5qXdPnPfRGnHgCMMoHVvF29uAX1B7qjfcefoF2Ehy0wRSpZcYhjyosVRf2
- f9btUL/sbOvZLPL1Cq7QwBfCANDYMcl86hRqFSi+7+XyoRltbaiJa1aHdzExWP2jZd27NBM4nsZ
- DacKWknb/Z/wjVToRDlCt08zjObRXjXmGWxjwQuHs7OCklWVNesfuqnxTH8jxEtHJwCKbyFOVce
- HEINmL2Hx10EsrSyDcQKQMH0WbTtqHWkIMpP9E6rw7ZTACV+jUnyWCdRWPBVpwx4wigLIaLRXps
- rO8r4imsJOL/+zg==
+ bh=sz+nh5NIsadTNPEpnKohPqzpae+0POVMkN8Lp2ml4e8=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBlBYlAdD3Es2m1E+RxWvNs/6/5QPODTmMhRSwga
+ qJifHcbjWyJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZQWJQAAKCRD2t4JPQmmg
+ cz88D/49ajLuykR6XBy8Phzep80ts3D/bLO/Wts9WXfRmd2F/xNh4N/cdCe0DbPX+wZtnmqMVKp
+ 3pmPgHBKv08muyta2rpwqA7GylzSd0e/1ZYS3IGJ/J7hjWkNKaX4bxBxVB/q1lUb+22gSHacwKB
+ ruuSHNc9CGczV7vsE+BACTuqa0O3WgGCFG6IgMGOnyM6Ox0sIcu6aJ7O9M2h8TRcwmNW9/17k1m
+ OE3qmsghIv8HuxMswryoWTF7jefrzEHUIX5P6C06oCQ9Qc/usq9Y4SUWZT46ZZrCuAzkxZRbzec
+ QeUMZMuXAov/AyzwQlqccOLUme9Ae6R0u9ofRhbBIjvr8jKaS+QVeUNekIeDgdJQOb4A7XM08Xz
+ ILodhtl8IqGn2VuKMFL1nzNuVEaT/vXXEQ2jjIQJyP/DILkbPKpkhAWAYM2IeIYZx6ZUrF92v9N
+ vYZX1+zPl1DW++NrwG21eNtLWuHeay7haUgFDiMiS8x561d9GjatxgQ92rv1KQn9Q5K+1Md+2j4
+ 3Dp4lqfBYbbAs6bT8BRPuQSzWkK8zecRQHOBwvMaSpKOeRmvTeAZkHC5V5S/U9mvz2MieztvHAB
+ xWpwFB7o4BrkrXLVpc9rNjBRaLO74SXEVxhHD0I6S+2Wgd5hKW7lxKsu2UyCwdqTf/PktTIcBaD
+ j34N2UGTmFlme1w==
 X-Developer-Key: i=matthieu.baerts@tessares.net; a=openpgp;
  fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -101,47 +102,51 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Daire reported a few issues with MPTCP where some connections were
-stalled in different states. Paolo did a great job fixing them.
+From: Paolo Abeni <pabeni@redhat.com>
 
-Patch 1 fixes bogus receive window shrinkage with multiple subflows. Due
-to a race condition and unlucky circumstances, that may lead to
-TCP-level window shrinkage, and the connection being stalled on the
-sender end.
+In case multiple subflows race to update the mptcp-level receive
+window, the subflow losing the race should use the window value
+provided by the "winning" subflow to update it's own tcp-level
+rcv_wnd.
 
-Patch 2 is a preparation for patch 3 which processes pending subflow
-errors on close. Without that and under specific circumstances, the
-MPTCP-level socket might not switch to the CLOSE state and stall.
+To such goal, the current code bogusly uses the mptcp-level rcv_wnd
+value as observed before the update attempt. On unlucky circumstances
+that may lead to TCP-level window shrinkage, and stall the other end.
 
-Patch 4 is also a preparation patch for the next one. Patch 5 fixes
-MPTCP connections not switching to the CLOSE state when all subflows
-have been closed but no DATA_FIN have been exchanged to explicitly close
-the MPTCP connection. Now connections in such state will switch to the
-CLOSE state after a timeout, still allowing the "make-after-break"
-feature but making sure connections don't stall forever. It will be
-possible to modify this timeout -- currently matching TCP TIMEWAIT value
-(60 seconds) -- in a future version.
+Address the issue feeding to the rcv wnd update the correct value.
 
+Fixes: f3589be0c420 ("mptcp: never shrink offered window")
+Cc: stable@vger.kernel.org
+Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/427
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Reviewed-by: Mat Martineau <martineau@kernel.org>
 Signed-off-by: Matthieu Baerts <matthieu.baerts@tessares.net>
 ---
-Paolo Abeni (5):
-      mptcp: fix bogus receive window shrinkage with multiple subflows
-      mptcp: move __mptcp_error_report in protocol.c
-      mptcp: process pending subflow error on close
-      mptcp: rename timer related helper to less confusing names
-      mptcp: fix dangling connection hang-up
+ net/mptcp/options.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
- net/mptcp/options.c  |   5 +-
- net/mptcp/protocol.c | 165 +++++++++++++++++++++++++++++++--------------------
- net/mptcp/protocol.h |  24 +++++++-
- net/mptcp/subflow.c  |  39 +-----------
- 4 files changed, 130 insertions(+), 103 deletions(-)
----
-base-commit: 615efed8b63f60ddd69c0b8f32f7783859034fc2
-change-id: 20230915-upstream-net-20230915-mptcp-hanging-conn-0609338b1728
+diff --git a/net/mptcp/options.c b/net/mptcp/options.c
+index c254accb14de..cd15ec73073e 100644
+--- a/net/mptcp/options.c
++++ b/net/mptcp/options.c
+@@ -1269,12 +1269,13 @@ static void mptcp_set_rwin(struct tcp_sock *tp, struct tcphdr *th)
+ 
+ 			if (rcv_wnd == rcv_wnd_old)
+ 				break;
+-			if (before64(rcv_wnd_new, rcv_wnd)) {
++
++			rcv_wnd_old = rcv_wnd;
++			if (before64(rcv_wnd_new, rcv_wnd_old)) {
+ 				MPTCP_INC_STATS(sock_net(ssk), MPTCP_MIB_RCVWNDCONFLICTUPDATE);
+ 				goto raise_win;
+ 			}
+ 			MPTCP_INC_STATS(sock_net(ssk), MPTCP_MIB_RCVWNDCONFLICT);
+-			rcv_wnd_old = rcv_wnd;
+ 		}
+ 		return;
+ 	}
 
-Best regards,
 -- 
-Matthieu Baerts <matthieu.baerts@tessares.net>
+2.40.1
 
 
