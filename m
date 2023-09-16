@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-34258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9ADFB7A2F3B
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 12:20:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 671D97A2F45
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 12:40:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85E331C209FA
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 10:20:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57C4F1C209BC
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 10:40:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFF7112B89;
-	Sat, 16 Sep 2023 10:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8492412B79;
+	Sat, 16 Sep 2023 10:40:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9EC63220
-	for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 10:20:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4C9E9C433C9;
-	Sat, 16 Sep 2023 10:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 757AAEAE5
+	for <netdev@vger.kernel.org>; Sat, 16 Sep 2023 10:40:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CB828C433C9;
+	Sat, 16 Sep 2023 10:40:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694859627;
-	bh=tkPEYowSleh1P9oFQDhlZITsODAiyvzYGIZIQ+fKBy0=;
+	s=k20201202; t=1694860823;
+	bh=gMjmVOJ/+tUIG7QXWPuL0HqhSpfLApgRTDaNzDhJKto=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Udr8WT/EQpFc0qWkiKAAl6knmpdGeGX12E8JPVTmfKp7xC8agK9xN5XXZhQsMg79R
-	 TmhQH2AkFSwl+jOrMRqktTwL3fsDwu+htjidjBkVRoRIqVIrP0SpxQaZjcAzjGfi0I
-	 tMi89x4YmY9RL3fb/+JGfRsNGCD9DO3KmcBHmvMpT5yGM6bMt2EOkPDJ4CSKV5p3us
-	 SWEn42bYJEHTpdGp456ptJI0Q+x1Dgbm1peKz9S9OJH+XgZe337pcp4IBVL0nSvpCt
-	 EbGLxWEJPeEZ7/k2VDixBo1GH1L40YwPzFifNt0IPwmnpYF6aV7+QC63/WFNWKSfWG
-	 KK/RJd72QbtFQ==
+	b=ORRtssDw+IZq/dYNr3OoPgJ8nDNoEe7JYHUXYVmoXtLSCzEZj787CZ23urIS/T4Kv
+	 aCGCtycVv7CbCORSrW7fHJynT9YkaUpopCHPnGq18rA8DXeNQ0WisZQeOZY+Cgna1H
+	 bqS50j6XMz4zOBUWlocApSIHP3WEXTXzs0W3Ugof9xG5iubb7vWGRv/KfTLh10Q8ye
+	 4E5PBgDMRZ7DZX+4goXQYMVSDXQnLoFSM5STtJ4VLtYXJzYwoWJ6CBscZ/UBvpIrI4
+	 84Nr8Ani/+Zln7VXyhVOMLDmYW+mzNVjS2p4WUbSwTwBhN2BInMnIUKMXuIucQST/A
+	 KpW03L3XdMi7g==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2E559E26882;
-	Sat, 16 Sep 2023 10:20:27 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AE10CE26882;
+	Sat, 16 Sep 2023 10:40:23 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -41,40 +41,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net-next] net: ethernet: mtk_wed: do not assume offload
- callbacks are always set
+Subject: Re: [PATCH net-next] sfc: make coding style of PTP addresses consistent
+ with core
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169485962718.21949.1017999086684232854.git-patchwork-notify@kernel.org>
-Date: Sat, 16 Sep 2023 10:20:27 +0000
-References: <ea9e1313e01f7925b9fc4040f3776070447f261d.1694630374.git.lorenzo@kernel.org>
-In-Reply-To: <ea9e1313e01f7925b9fc4040f3776070447f261d.1694630374.git.lorenzo@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: netdev@vger.kernel.org, lorenzo.bianconi@redhat.com, nbd@nbd.name,
- john@phrozen.org, sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org
+ <169486082370.31413.1577389710976551346.git-patchwork-notify@kernel.org>
+Date: Sat, 16 Sep 2023 10:40:23 +0000
+References: <20230914151916.21044-1-alex.austin@amd.com>
+In-Reply-To: <20230914151916.21044-1-alex.austin@amd.com>
+To: Alex Austin <alex.austin@amd.com>
+Cc: netdev@vger.kernel.org, linux-net-drivers@amd.com, ecree.xilinx@gmail.com,
+ habetsm.xilinx@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, richardcochran@gmail.com,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Wed, 13 Sep 2023 20:42:47 +0200 you wrote:
-> Check if wlan.offload_enable and wlan.offload_disable callbacks are set
-> in mtk_wed_flow_add/mtk_wed_flow_remove since mt7996 will not rely
-> on them.
+On Thu, 14 Sep 2023 16:19:16 +0100 you wrote:
+> Follow the style used in the core kernel (e.g.
+> include/linux/etherdevice.h and include/linux/in6.h) for the PTP IPv6
+> and Ethernet addresses. No functional changes.
 > 
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> ---
-> Changes since v1:
-> - move offload check inside hw_lock critical section
+> Signed-off-by: Alex Austin <alex.austin@amd.com>
+> Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,net-next] net: ethernet: mtk_wed: do not assume offload callbacks are always set
-    https://git.kernel.org/netdev/net-next/c/01b38de18d06
+  - [net-next] sfc: make coding style of PTP addresses consistent with core
+    https://git.kernel.org/netdev/net-next/c/487e1937b9c0
 
 You are awesome, thank you!
 -- 
