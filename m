@@ -1,145 +1,119 @@
-Return-Path: <netdev+bounces-34318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 137FE7A3131
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 17:46:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 110E87A3133
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 17:47:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BE2E1C20B64
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 15:46:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9FCC281FB2
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 15:47:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C1E714A87;
-	Sat, 16 Sep 2023 15:45:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E322B14296;
+	Sat, 16 Sep 2023 15:47:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F14F13AD9;
-	Sat, 16 Sep 2023 15:45:21 +0000 (UTC)
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AE88184;
-	Sat, 16 Sep 2023 08:45:19 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 6E4D4C0005;
-	Sat, 16 Sep 2023 15:45:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1694879117;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iKU7mLoYHSbaWsMW5qLWUohutwbcss/sFfhr1eqSfbo=;
-	b=GdJ7GMxBovtaJXuVJXQeL9F/8c1Kp3OBFjkusnp7zOgmYE5Om+W7T1Kts5XEXwqrEJK+R3
-	wVxarI+WeNgCskgQ17tWw2BKiQm1U1Pvy0rx4D5gzRZLr4RUagXZ5BCogf1EY6wV2kRZ/h
-	Os6yN9ypLrIYsYm1J5/NN81aU8rj+/rleRLewB0CgMXnmRGii52lZkTnASS3T0ZXZDi7N1
-	Vd8eH+3qXfk3+qiJ2bcvuYqmljaFYuxK2ZNXz8Kel+nAz2UX+yywxWa1e0ugDrUWb9Nnc+
-	Vs/8jFHtM1PVBgoVys1nB/LJTk6s1urgwMunlKZ+vBKdKNFQ44Jw+aPrFwGODQ==
-Message-ID: <ae50cb7f-3110-4627-867e-32598056859d@arinc9.com>
-Date: Sat, 16 Sep 2023 18:44:59 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7FFA14291;
+	Sat, 16 Sep 2023 15:47:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6142C433C8;
+	Sat, 16 Sep 2023 15:47:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694879263;
+	bh=9yoeSuSu4c9avKuB9jsu8jsIQJYt6cBB3MWv0m0Z7y0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Qe8Sc6HLO2iQZ9PjqYe1yCCRQ1tpnCuR3MCfNQEU9aSMLnwJM9Hhl0/bONQXIPfd5
+	 WmLJsJ/tiCNRjsOKIFJrc2i9jLeX7G5SS1WMXuDoyRed0jMGkLFprFwDmwk4uSNBo5
+	 z6ceK18Ahw1+EMw+kgrsL+y+BNFk92hEn94HOTDhhQuHSpCT7W4z6fjg14rH6BVQ86
+	 yY2MiMDmDCOpc183NEO2j4DrbMiLlKzbh1njf4KTt+Ghvfo1kClALhuvrvFFubX7Gy
+	 8BQRvSt3QIWMEg4BoyZh+DRbmRrMUX95NQa6vByR7Blu7bKb6cIEV6V/g44xjWsCfk
+	 WKOnp3JIalObg==
+Date: Sat, 16 Sep 2023 17:47:37 +0200
+From: Simon Horman <horms@kernel.org>
+To: Jisheng Zhang <jszhang@kernel.org>
+Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-sunxi@lists.linux.dev,
+	linux-stm32@st-md-mailman.stormreply.com, johannes@sipsolutions.net,
+	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+Subject: Re: [PATCH] net: stmmac: fix incorrect rxq|txq_stats reference
+Message-ID: <20230916154737.GG1125562@kernel.org>
+References: <20230915005316.592-1-jszhang@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 08/10] dt-bindings: net: dsa: marvell: convert
- to json-schema
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>,
- George McCollister <george.mccollister@gmail.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
- <olteanv@gmail.com>, Kurt Kanzenbach <kurt@linutronix.de>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
- Linus Walleij <linus.walleij@linaro.org>,
- =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
- =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
- Marcin Wojtas <mw@semihalf.com>,
- "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Lars Povlsen <lars.povlsen@microchip.com>,
- Steen Hegelund <Steen.Hegelund@microchip.com>,
- Daniel Machon <daniel.machon@microchip.com>,
- Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
- Daniel Golle <daniel@makrotopia.org>, Landen Chao
- <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Magnus Damm <magnus.damm@gmail.com>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Nicolas Ferre <nicolas.ferre@microchip.com>,
- Claudiu Beznea <claudiu.beznea@microchip.com>, Marek Vasut <marex@denx.de>,
- Claudiu Manoil <claudiu.manoil@nxp.com>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- John Crispin <john@phrozen.org>, Madalin Bucur <madalin.bucur@nxp.com>,
- Ioana Ciornei <ioana.ciornei@nxp.com>, Lorenzo Bianconi
- <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
- Horatiu Vultur <horatiu.vultur@microchip.com>,
- Oleksij Rempel <linux@rempel-privat.de>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Grygorii Strashko <grygorii.strashko@ti.com>, Sekhar Nori <nsekhar@ti.com>,
- Shyam Pandey <radhey.shyam.pandey@xilinx.com>, mithat.guner@xeront.com,
- erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- linux-renesas-soc@vger.kernel.org
-References: <20230916110902.234273-1-arinc.unal@arinc9.com>
- <20230916110902.234273-9-arinc.unal@arinc9.com>
- <63cc4c3c-5cac-4d54-99be-7f05e98406ba@lunn.ch>
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <63cc4c3c-5cac-4d54-99be-7f05e98406ba@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+In-Reply-To: <20230915005316.592-1-jszhang@kernel.org>
 
-On 16.09.2023 17:05, Andrew Lunn wrote:
->> +properties:
->> +  compatible:
->> +    oneOf:
->> +      - description: |
->> +          Switch has base address 0x10. Use with models:
->> +          6085, 6095, 6097, 6123, 6131, 6141, 6161, 6165, 6171, 6172, 6175,
->> +          6176, 6185, 6240, 6320, 6321, 6341, 6350, 6351, 6352
->> +        const: marvell,mv88e6085
+On Fri, Sep 15, 2023 at 08:53:16AM +0800, Jisheng Zhang wrote:
+> commit 133466c3bbe1 ("net: stmmac: use per-queue 64 bit statistics
+> where necessary") caused one regression as found by Uwe, the backtrace
+> looks like:
 > 
-> The .txt file contained:
+> INFO: trying to register non-static key.
+> The code is fine but needs lockdep annotation, or maybe
+> you didn't initialize this object before use?
+> turning off the locking correctness validator.
+> CPU: 0 PID: 1 Comm: swapper/0 Not tainted 6.5.0-rc1-00449-g133466c3bbe1-dirty #21
+> Hardware name: STM32 (Device Tree Support)
+>  unwind_backtrace from show_stack+0x18/0x1c
+>  show_stack from dump_stack_lvl+0x60/0x90
+>  dump_stack_lvl from register_lock_class+0x98c/0x99c
+>  register_lock_class from __lock_acquire+0x74/0x293c
+>  __lock_acquire from lock_acquire+0x134/0x398
+>  lock_acquire from stmmac_get_stats64+0x2ac/0x2fc
+>  stmmac_get_stats64 from dev_get_stats+0x44/0x130
+>  dev_get_stats from rtnl_fill_stats+0x38/0x120
+>  rtnl_fill_stats from rtnl_fill_ifinfo+0x834/0x17f4
+>  rtnl_fill_ifinfo from rtmsg_ifinfo_build_skb+0xc0/0x144
+>  rtmsg_ifinfo_build_skb from rtmsg_ifinfo+0x50/0x88
+>  rtmsg_ifinfo from __dev_notify_flags+0xc0/0xec
+>  __dev_notify_flags from dev_change_flags+0x50/0x5c
+>  dev_change_flags from ip_auto_config+0x2f4/0x1260
+>  ip_auto_config from do_one_initcall+0x70/0x35c
+>  do_one_initcall from kernel_init_freeable+0x2ac/0x308
+>  kernel_init_freeable from kernel_init+0x1c/0x138
+>  kernel_init from ret_from_fork+0x14/0x2c
 > 
->      The compatibility string is used only to find an identification
->      register, which is at a different MDIO base address in different
->      switch families.
+> The reason is the rxq|txq_stats structures are not what expected
+> because stmmac_open() -> __stmmac_open() the structure is overwritten
+> by "memcpy(&priv->dma_conf, dma_conf, sizeof(*dma_conf));"
+> This causes the well initialized syncp member of rxq|txq_stats is
+> overwritten unexpectedly as pointed out by Johannes and Uwe.
 > 
-> Please keep this text. There has been a lot of confusion in the past,
-> lots of circular arguments etc, and it is way too late to do anything
-> different. So i want to make it clear what the compatible is used for,
-> juts to find the ID registers, nothing more.
+> Fix this issue by moving rxq|txq_stats back to stmmac_extra_stats. For
+> SMP cache friendly, we also mark stmmac_txq_stats and stmmac_rxq_stats
+> as ____cacheline_aligned_in_smp.
+> 
+> Fixes: 133466c3bbe1 ("net: stmmac: use per-queue 64 bit statistics where necessary")
+> Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+> Reported-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 
-Will do.
+Hi Jisheng Zhang,
 
-> 
->> +
->> +      - description: |
->> +          Switch has base address 0x00. Use with models:
->> +          6190, 6190X, 6191, 6290, 6361, 6390, 6390X
-> 
-> The .txt file is missing the 6191X and 6393X, which belong here. If
-> you need to respin, please could you add them here.
+as a fix for Networking code this should be based targeted at the net tree.
 
-Will do.
+  Subject: [PATCH net] ...
 
-Arınç
+Unfortunately it doesn't apply cleanly against net.
+Please consider rebasing and reposting.
+
+-- 
+pw-bot: changes-requested
 
