@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-34275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 220397A2F90
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 13:13:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BD747A2F92
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 13:13:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20A481C20948
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 11:13:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6C1D2821ED
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 11:13:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6DFE134C4;
-	Sat, 16 Sep 2023 11:13:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B767A134C5;
+	Sat, 16 Sep 2023 11:13:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41247134B4;
-	Sat, 16 Sep 2023 11:13:04 +0000 (UTC)
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9F36E62;
-	Sat, 16 Sep 2023 04:12:41 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 86FEF240002;
-	Sat, 16 Sep 2023 11:11:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA4D134AD;
+	Sat, 16 Sep 2023 11:13:35 +0000 (UTC)
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::221])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45320E4E;
+	Sat, 16 Sep 2023 04:13:08 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 51BF6240003;
+	Sat, 16 Sep 2023 11:12:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1694862760;
+	t=1694862786;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=sxK8lRKWIBb9Z0O3Tvb06WKXqFsJaGZqBLWHiNoJa3o=;
-	b=DjJ2fCg+wOKIS1DRGr73CWt8njm6u2HR4WWyOJN4HutNBHu3/1RBIe+MHn7PjSeGIMw80C
-	yP9rtDIfZKpD82VrW1U/XKKELh1kDRKoMHwxMdgEyyPzKJShHGQ9cxqafjEDOkmlfw23WY
-	pCa2BdbZUMV8QP1VaCiRb5Q061T7COsXPzdtfNE1S5pDdfbWus9ads9qANlQwgR/Zn3dGN
-	5v4N9sqpqn8MM/3dA//0l6TKN38AtKhhOtmLqUkNaLVB/eO2NomBYxZsESH18gCfMzu5i7
-	cYOy2zBTTP4eNXco6g9d1Werqui7D+26dueceOzN3KMSzZIGPNE0/N81TmDHXA==
+	bh=xhIrExaH+Pxga2qgOi/puibscZ/eAZoI/ny/hgH81io=;
+	b=jQd0Gg737dggiZcbuwSo9+ScBsaoWp0hSmSQV+Uw4DHZL9+nAfv+His6tE/s4jcaPECdfS
+	3PGuHtcD6ZBST3GP+GcXpao4T+19AD3mR7a0iFPctDerOEbID43OqogHDjknexA5ZJOMTR
+	3jQreJPImNKLVLB66K/k1GeC6ELcVz0NXoe6iqaEVmyCFzqMiKcrxkYwbQTNGoIiWJ8S2i
+	yKMaMRd2GDcKecgNAeNhq+uSnl0ewa5HnqlZUOUerSkE/fUtuZtuSqfhDSNnZLYA1l01DN
+	p3PY5iRyOgyQh/9bP1g7+HlEF4DT8I/684zeGZ1QKOS/0rQtEvPXZazEW85C9w==
 From: =?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -97,9 +97,9 @@ Cc: Woojung Huh <Woojung.Huh@microchip.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org,
 	linux-renesas-soc@vger.kernel.org
-Subject: [PATCH net-next v2 06/10] dt-bindings: net: define phylink bindings
-Date: Sat, 16 Sep 2023 14:08:58 +0300
-Message-Id: <20230916110902.234273-7-arinc.unal@arinc9.com>
+Subject: [PATCH net-next v2 07/10] dt-bindings: net: enforce phylink bindings on certain ethernet controllers
+Date: Sat, 16 Sep 2023 14:08:59 +0300
+Message-Id: <20230916110902.234273-8-arinc.unal@arinc9.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230916110902.234273-1-arinc.unal@arinc9.com>
 References: <20230916110902.234273-1-arinc.unal@arinc9.com>
@@ -112,93 +112,612 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: arinc.unal@arinc9.com
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Define the phylink bindings on ethernet-controller.yaml and replace the
-bindings on the dsa-port.yaml schema with them. The shared ports of DSA
-requires phy-mode so keep that.
+Phylink bindings are required for ethernet controllers that utilise
+phylink_fwnode_phy_connect() directly or through phylink_of_phy_connect(),
+and register OF-based only MDIO buses, if they register any.
 
-Important remarks about the phylink bindings:
-- fsl,fman-dtsec uses tbi-handle instead of pcs-handle, therefore
-  tbi-handle is included.
-- For sfp, only managed with the in-band-status value must be required, but
-  phy-handle is required as another option because of a special case on the
-  eth2 node on arch/arm/boot/dts/marvell/armada-385-turris-omnia.dts.
+All the drivers that utilise phylink_fwnode_phy_connect() directly or
+through phylink_of_phy_connect():
+
+- DSA
+- drivers/net/ethernet/mscc/ocelot_net.c
+  - mscc,vsc7514-switch.yaml
+- drivers/net/ethernet/microchip/sparx5/sparx5_netdev.c
+  - microchip,sparx5-switch.yaml
+- drivers/net/ethernet/altera/altera_tse_main.c
+  - altr,tse.yaml
+- drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+  - xlnx,axi-ethernet.yaml
+- drivers/net/ethernet/mediatek/mtk_eth_soc.c
+  - mediatek,net.yaml
+- drivers/net/ethernet/ti/am65-cpsw-nuss.c
+  - ti,k3-am654-cpsw-nuss.yaml
+- drivers/net/ethernet/atheros/ag71xx.c
+  - qca,ar71xx.yaml
+- drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
+  - fsl,fman-dtsec.yaml
+- drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+  - microchip,lan966x-switch.yaml
+- drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+  - marvell,pp2.yaml
+- drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c
+  - fsl,qoriq-mc-dpmac.yaml
+- drivers/net/ethernet/cadence/macb_main.c
+  - cdns,macb.yaml
+  - Can register non-OF-based bus.
+- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+  - snps,dwmac.yaml
+  - Can register non-OF-based bus.
+- drivers/net/ethernet/marvell/mvneta.c
+  - marvell-armada-370-neta.txt
+- drivers/net/ethernet/freescale/enetc/enetc.c
+  - fsl-enetc.txt
+
+RFC: The drivers marked with "can register non-OF-based bus" seem to search
+the MDIO bus to connect the PHY to the MAC using phylink_connect_phy()
+and/or phy_find_first() if phylink bindings don't exist. Should we enforce
+phylink bindings on their schemas regardless?
+
+DSA, like any other driver utilising the Linux MDIO infrastructure,
+can register a bus. On certain conditions, it registers the MDIO
+bus of the switch it controls non-OF-based.
+
+We can know when DSA won't create any non-OF-based buses. That leaves us
+with only OF-based buses in which case we can enforce phylink bindings for
+user ports. The bindings are already enforced for shared ports so we can
+enforce the bindings for all ports on the switch schemas which will achieve
+the same result with fewer lines.
+
+By looking at whether the mdio child node exists and what is explained on
+it, we can enforce phylink bindings.
+
+- mscc,vsc7514-switch.yaml
+  - Enforce phylink bindings for all ports.
+
+- arrow,xrs700x.yaml
+  - Enforce phylink bindings for all ports.
+
+- brcm,b53.yaml
+  - Enforce phylink bindings for all ports if "mdio" is defined.
+
+- brcm,sf2.yaml
+  - Enforce phylink bindings for all ports.
+
+- hirschmann,hellcreek.yaml
+  - Enforce phylink bindings for all ports.
+
+- mediatek,mt7530.yaml
+  - Enforce phylink bindings for all ports if "mdio" is defined.
+
+- microchip,ksz.yaml
+  - Enforce phylink bindings for all ports if "mdio" is defined.
+
+- microchip,lan937x.yaml
+  - Enforce phylink bindings for all ports if "mdio" is defined.
+
+- mscc,ocelot.yaml
+  - Enforce phylink bindings for all ports.
+
+- nxp,sja1105.yaml
+  - Enforce phylink bindings for all ports.
+
+- qca8k.yaml
+  - Enforce phylink bindings for all ports if "mdio" is defined.
+
+- realtek.yaml
+  - Enforce phylink bindings for all ports if "mdio" is defined.
+
+- renesas,rzn1-a5psw.yaml
+  - Enforce phylink bindings for all ports.
+
+- ar9331.txt
+  - Enforce phylink bindings for all ports.
+
+- lan9303.txt
+  - Enforce phylink bindings for all ports if "mdio" is defined.
+
+- lantiq-gswip.txt
+  - Enforce phylink bindings for all ports.
+
+- marvell.txt
+  - Enforce phylink bindings for all ports if "mdio" is defined.
+
+- vitesse,vsc73xx.txt
+  - Enforce phylink bindings for all ports if "mdio" is defined.
+
+I will convert the non json-schema documents accordingly.
 
 Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
 ---
- .../devicetree/bindings/net/dsa/dsa-port.yaml | 12 ++------
- .../bindings/net/ethernet-controller.yaml     | 29 +++++++++++++++++++
- 2 files changed, 31 insertions(+), 10 deletions(-)
+ .../devicetree/bindings/net/altr,tse.yaml     |  1 +
+ .../devicetree/bindings/net/cdns,macb.yaml    |  1 +
+ .../bindings/net/dsa/arrow,xrs700x.yaml       |  6 ++
+ .../devicetree/bindings/net/dsa/brcm,b53.yaml |  9 +++
+ .../devicetree/bindings/net/dsa/brcm,sf2.yaml |  6 +-
+ .../net/dsa/hirschmann,hellcreek.yaml         |  6 ++
+ .../bindings/net/dsa/mediatek,mt7530.yaml     |  9 +++
+ .../bindings/net/dsa/microchip,ksz.yaml       |  9 +++
+ .../bindings/net/dsa/microchip,lan937x.yaml   |  9 +++
+ .../bindings/net/dsa/mscc,ocelot.yaml         |  6 ++
+ .../bindings/net/dsa/nxp,sja1105.yaml         |  1 +
+ .../devicetree/bindings/net/dsa/qca8k.yaml    |  9 +++
+ .../devicetree/bindings/net/dsa/realtek.yaml  | 57 +++++++++++--------
+ .../bindings/net/dsa/renesas,rzn1-a5psw.yaml  |  2 +-
+ .../bindings/net/fsl,fman-dtsec.yaml          |  1 +
+ .../bindings/net/fsl,qoriq-mc-dpmac.yaml      |  1 +
+ .../devicetree/bindings/net/marvell,pp2.yaml  |  4 +-
+ .../devicetree/bindings/net/mediatek,net.yaml |  1 +
+ .../net/microchip,lan966x-switch.yaml         |  4 +-
+ .../bindings/net/microchip,sparx5-switch.yaml |  5 +-
+ .../bindings/net/mscc,vsc7514-switch.yaml     |  5 ++
+ .../devicetree/bindings/net/qca,ar71xx.yaml   |  1 +
+ .../devicetree/bindings/net/snps,dwmac.yaml   |  1 +
+ .../bindings/net/ti,k3-am654-cpsw-nuss.yaml   |  4 +-
+ .../bindings/net/xlnx,axi-ethernet.yaml       |  3 +-
+ 25 files changed, 130 insertions(+), 31 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml b/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml
-index 480120469953..53efb686cfc7 100644
---- a/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml
-+++ b/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml
-@@ -65,16 +65,8 @@ if:
-     - required: [ ethernet ]
-     - required: [ link ]
- then:
--  allOf:
--    - required:
--        - phy-mode
--    - oneOf:
--        - required:
--            - fixed-link
--        - required:
--            - phy-handle
--        - required:
--            - managed
-+  $ref: /schemas/net/ethernet-controller.yaml#/$defs/phylink
-+  required: [ phy-mode ]
+diff --git a/Documentation/devicetree/bindings/net/altr,tse.yaml b/Documentation/devicetree/bindings/net/altr,tse.yaml
+index f5d3b70af07a..24e0f1213109 100644
+--- a/Documentation/devicetree/bindings/net/altr,tse.yaml
++++ b/Documentation/devicetree/bindings/net/altr,tse.yaml
+@@ -67,6 +67,7 @@ required:
  
- additionalProperties: true
+ allOf:
+   - $ref: ethernet-controller.yaml#
++  - $ref: ethernet-controller.yaml#/$defs/phylink
+   - if:
+       properties:
+         compatible:
+diff --git a/Documentation/devicetree/bindings/net/cdns,macb.yaml b/Documentation/devicetree/bindings/net/cdns,macb.yaml
+index bf8894a0257e..a455de04c5f1 100644
+--- a/Documentation/devicetree/bindings/net/cdns,macb.yaml
++++ b/Documentation/devicetree/bindings/net/cdns,macb.yaml
+@@ -156,6 +156,7 @@ required:
  
-diff --git a/Documentation/devicetree/bindings/net/ethernet-controller.yaml b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-index 9f6a5ccbcefe..ef28ebc76798 100644
---- a/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-+++ b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-@@ -284,6 +284,35 @@ allOf:
-             controllers that have configurable TX internal delays. If this
-             property is present then the MAC applies the TX delay.
+ allOf:
+   - $ref: ethernet-controller.yaml#
++  - $ref: ethernet-controller.yaml#/$defs/phylink
  
-+$defs:
-+  phylink:
-+    description: phylink bindings for ethernet controllers
-+    allOf:
-+      - anyOf:
-+          - required: [ fixed-link ]
-+          - required: [ pcs-handle ]
-+          - required: [ tbi-handle ]
-+          - required: [ phy-handle ]
-+          - required: [ sfp ]
-+          - required: [ managed ]
+   - if:
+       not:
+diff --git a/Documentation/devicetree/bindings/net/dsa/arrow,xrs700x.yaml b/Documentation/devicetree/bindings/net/dsa/arrow,xrs700x.yaml
+index 9565a7402146..7829fc9e202d 100644
+--- a/Documentation/devicetree/bindings/net/dsa/arrow,xrs700x.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/arrow,xrs700x.yaml
+@@ -29,6 +29,12 @@ properties:
+   reg:
+     maxItems: 1
+ 
++patternProperties:
++  "^(ethernet-)?ports$":
++    patternProperties:
++      "^(ethernet-)?port@[0-9]+$":
++        $ref: /schemas/net/ethernet-controller.yaml#/$defs/phylink
 +
-+      - if:
-+          required: [ fixed-link ]
-+        then:
+ required:
+   - compatible
+   - reg
+diff --git a/Documentation/devicetree/bindings/net/dsa/brcm,b53.yaml b/Documentation/devicetree/bindings/net/dsa/brcm,b53.yaml
+index 0bb2ff0cf2d0..ed5b3eab1948 100644
+--- a/Documentation/devicetree/bindings/net/dsa/brcm,b53.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/brcm,b53.yaml
+@@ -142,6 +142,15 @@ allOf:
+         reg:
+           maxItems: 1
+ 
++  - if:
++      required: [ mdio ]
++    then:
++      patternProperties:
++        "^(ethernet-)?ports$":
++          patternProperties:
++            "^(ethernet-)?port@[0-9]+$":
++              $ref: /schemas/net/ethernet-controller.yaml#/$defs/phylink
++
+ unevaluatedProperties: false
+ 
+ examples:
+diff --git a/Documentation/devicetree/bindings/net/dsa/brcm,sf2.yaml b/Documentation/devicetree/bindings/net/dsa/brcm,sf2.yaml
+index c745407f2f68..6cffcd35a943 100644
+--- a/Documentation/devicetree/bindings/net/dsa/brcm,sf2.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/brcm,sf2.yaml
+@@ -81,7 +81,10 @@ properties:
+ 
+     patternProperties:
+       '^port@[0-9a-f]$':
+-        $ref: dsa-port.yaml#
++        type: object
++        allOf:
++          - $ref: dsa-port.yaml#
++          - $ref: /schemas/net/ethernet-controller.yaml#/$defs/phylink
+         unevaluatedProperties: false
+ 
+         properties:
+@@ -161,6 +164,7 @@ examples:
+                     port@0 {
+                             label = "gphy";
+                             reg = <0>;
++                            phy-handle = <&phy8>;
+                     };
+             };
+     };
+diff --git a/Documentation/devicetree/bindings/net/dsa/hirschmann,hellcreek.yaml b/Documentation/devicetree/bindings/net/dsa/hirschmann,hellcreek.yaml
+index 4021b054f684..30b4c7b1fd08 100644
+--- a/Documentation/devicetree/bindings/net/dsa/hirschmann,hellcreek.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/hirschmann,hellcreek.yaml
+@@ -67,6 +67,12 @@ properties:
+ 
+     additionalProperties: false
+ 
++patternProperties:
++  "^(ethernet-)?ports$":
++    patternProperties:
++      "^(ethernet-)?port@[0-9]+$":
++        $ref: /schemas/net/ethernet-controller.yaml#/$defs/phylink
++
+ required:
+   - compatible
+   - reg
+diff --git a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
+index 31a7dbbf704d..a8e1134707e4 100644
+--- a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
+@@ -297,6 +297,15 @@ allOf:
+         mediatek,mcm: false
+         reset-names: false
+ 
++  - if:
++      required: [ mdio ]
++    then:
++      patternProperties:
++        "^(ethernet-)?ports$":
++          patternProperties:
++            "^(ethernet-)?port@[0-9]+$":
++              $ref: /schemas/net/ethernet-controller.yaml#/$defs/phylink
++
+ unevaluatedProperties: false
+ 
+ examples:
+diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+index 20e4174fe1ab..d8f12234eec6 100644
+--- a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+@@ -60,6 +60,15 @@ required:
+   - compatible
+   - reg
+ 
++if:
++  required: [ mdio ]
++then:
++  patternProperties:
++    "^(ethernet-)?ports$":
++      patternProperties:
++        "^(ethernet-)?port@[0-9]+$":
++          $ref: /schemas/net/ethernet-controller.yaml#/$defs/phylink
++
+ unevaluatedProperties: false
+ 
+ examples:
+diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
+index 33a4926b2d94..44a892b93eca 100644
+--- a/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/microchip,lan937x.yaml
+@@ -65,6 +65,15 @@ required:
+   - compatible
+   - reg
+ 
++if:
++  required: [ mdio ]
++then:
++  patternProperties:
++    "^(ethernet-)?ports$":
++      patternProperties:
++        "^(ethernet-)?port@[0-9]+$":
++          $ref: /schemas/net/ethernet-controller.yaml#/$defs/phylink
++
+ unevaluatedProperties: false
+ 
+ examples:
+diff --git a/Documentation/devicetree/bindings/net/dsa/mscc,ocelot.yaml b/Documentation/devicetree/bindings/net/dsa/mscc,ocelot.yaml
+index fe02d05196e4..80cc9c49282b 100644
+--- a/Documentation/devicetree/bindings/net/dsa/mscc,ocelot.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/mscc,ocelot.yaml
+@@ -73,6 +73,12 @@ properties:
+   little-endian: true
+   big-endian: true
+ 
++patternProperties:
++  "^(ethernet-)?ports$":
++    patternProperties:
++      "^(ethernet-)?port@[0-9]+$":
++        $ref: /schemas/net/ethernet-controller.yaml#/$defs/phylink
++
+ required:
+   - compatible
+   - reg
+diff --git a/Documentation/devicetree/bindings/net/dsa/nxp,sja1105.yaml b/Documentation/devicetree/bindings/net/dsa/nxp,sja1105.yaml
+index 6838dc165d06..1d5c4a81caf6 100644
+--- a/Documentation/devicetree/bindings/net/dsa/nxp,sja1105.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/nxp,sja1105.yaml
+@@ -79,6 +79,7 @@ patternProperties:
+   "^(ethernet-)?ports$":
+     patternProperties:
+       "^(ethernet-)?port@[0-9]+$":
++        $ref: /schemas/net/ethernet-controller.yaml#/$defs/phylink
+         allOf:
+           - if:
+               properties:
+diff --git a/Documentation/devicetree/bindings/net/dsa/qca8k.yaml b/Documentation/devicetree/bindings/net/dsa/qca8k.yaml
+index c472050582be..546939ab2053 100644
+--- a/Documentation/devicetree/bindings/net/dsa/qca8k.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/qca8k.yaml
+@@ -114,6 +114,15 @@ required:
+   - compatible
+   - reg
+ 
++if:
++  required: [ mdio ]
++then:
++  patternProperties:
++    "^(ethernet-)?ports$":
++      patternProperties:
++        "^(ethernet-)?port@[0-6]$":
++          $ref: /schemas/net/ethernet-controller.yaml#/$defs/phylink
++
+ unevaluatedProperties: false
+ 
+ examples:
+diff --git a/Documentation/devicetree/bindings/net/dsa/realtek.yaml b/Documentation/devicetree/bindings/net/dsa/realtek.yaml
+index 62ebaa4b5ae3..ec0428b74157 100644
+--- a/Documentation/devicetree/bindings/net/dsa/realtek.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/realtek.yaml
+@@ -6,8 +6,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
+ 
+ title: Realtek switches for unmanaged switches
+ 
+-allOf:
+-  - $ref: dsa.yaml#/$defs/ethernet-ports
++$ref: dsa.yaml#/$defs/ethernet-ports
+ 
+ maintainers:
+   - Linus Walleij <linus.walleij@linaro.org>
+@@ -107,33 +106,43 @@ properties:
+       compatible:
+         const: realtek,smi-mdio
+ 
+-if:
+-  required:
+-    - reg
++allOf:
++  - if:
++      required:
++        - reg
+ 
+-then:
+-  $ref: /schemas/spi/spi-peripheral-props.yaml#
+-  properties:
+-    mdc-gpios: false
+-    mdio-gpios: false
+-    mdio:
++    then:
++      $ref: /schemas/spi/spi-peripheral-props.yaml#
+       properties:
+-        compatible: false
++        mdc-gpios: false
++        mdio-gpios: false
++        mdio:
 +          properties:
-+            managed:
-+              const: auto
-+
-+      - if:
-+          required: [ sfp ]
-+        then:
-+          oneOf:
-+            - required: [ phy-handle ]
-+            - required: [ managed ]
-+              properties:
-+                managed:
-+                  const: in-band-status
-+
- additionalProperties: true
++            compatible: false
  
- ...
+-else:
+-  properties:
+-    mdio:
+-      required:
+-        - compatible
++    else:
++      properties:
++        mdio:
++          required:
++            - compatible
+ 
+-  required:
+-    - mdc-gpios
+-    - mdio-gpios
+-    - mdio
+-    - reset-gpios
++      required:
++        - mdc-gpios
++        - mdio-gpios
++        - mdio
++        - reset-gpios
+ 
+-required:
+-  - compatible
++    required:
++      - compatible
++
++  - if:
++      required: [ mdio ]
++    then:
++      patternProperties:
++        "^(ethernet-)?ports$":
++          patternProperties:
++            "^(ethernet-)?port@[0-9]+$":
++              $ref: /schemas/net/ethernet-controller.yaml#/$defs/phylink
+ 
+ unevaluatedProperties: false
+ 
+diff --git a/Documentation/devicetree/bindings/net/dsa/renesas,rzn1-a5psw.yaml b/Documentation/devicetree/bindings/net/dsa/renesas,rzn1-a5psw.yaml
+index 9ad9f5cdf688..7ec4371932ef 100644
+--- a/Documentation/devicetree/bindings/net/dsa/renesas,rzn1-a5psw.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/renesas,rzn1-a5psw.yaml
+@@ -72,7 +72,7 @@ properties:
+ 
+     patternProperties:
+       "^(ethernet-)?port@[0-4]$":
+-        type: object
++        $ref: /schemas/net/ethernet-controller.yaml#/$defs/phylink
+         description: Ethernet switch ports
+ 
+         properties:
+diff --git a/Documentation/devicetree/bindings/net/fsl,fman-dtsec.yaml b/Documentation/devicetree/bindings/net/fsl,fman-dtsec.yaml
+index c80c880a9dab..c31db5f7d548 100644
+--- a/Documentation/devicetree/bindings/net/fsl,fman-dtsec.yaml
++++ b/Documentation/devicetree/bindings/net/fsl,fman-dtsec.yaml
+@@ -136,6 +136,7 @@ dependencies:
+ 
+ allOf:
+   - $ref: ethernet-controller.yaml#
++  - $ref: ethernet-controller.yaml#/$defs/phylink
+   - if:
+       properties:
+         compatible:
+diff --git a/Documentation/devicetree/bindings/net/fsl,qoriq-mc-dpmac.yaml b/Documentation/devicetree/bindings/net/fsl,qoriq-mc-dpmac.yaml
+index a1b71b35319e..b2cab0fa7b35 100644
+--- a/Documentation/devicetree/bindings/net/fsl,qoriq-mc-dpmac.yaml
++++ b/Documentation/devicetree/bindings/net/fsl,qoriq-mc-dpmac.yaml
+@@ -15,6 +15,7 @@ description:
+ 
+ allOf:
+   - $ref: ethernet-controller.yaml#
++  - $ref: ethernet-controller.yaml#/$defs/phylink
+ 
+ properties:
+   compatible:
+diff --git a/Documentation/devicetree/bindings/net/marvell,pp2.yaml b/Documentation/devicetree/bindings/net/marvell,pp2.yaml
+index 4eadafc43d4f..8e60cc4bbbc9 100644
+--- a/Documentation/devicetree/bindings/net/marvell,pp2.yaml
++++ b/Documentation/devicetree/bindings/net/marvell,pp2.yaml
+@@ -59,7 +59,9 @@ patternProperties:
+   '^(ethernet-)?port@[0-2]$':
+     type: object
+     description: subnode for each ethernet port.
+-    $ref: ethernet-controller.yaml#
++    allOf:
++      - $ref: ethernet-controller.yaml#
++      - $ref: ethernet-controller.yaml#/$defs/phylink
+     unevaluatedProperties: false
+ 
+     properties:
+diff --git a/Documentation/devicetree/bindings/net/mediatek,net.yaml b/Documentation/devicetree/bindings/net/mediatek,net.yaml
+index e74502a0afe8..7562bb64baa9 100644
+--- a/Documentation/devicetree/bindings/net/mediatek,net.yaml
++++ b/Documentation/devicetree/bindings/net/mediatek,net.yaml
+@@ -391,6 +391,7 @@ patternProperties:
+     unevaluatedProperties: false
+     allOf:
+       - $ref: ethernet-controller.yaml#
++      - $ref: ethernet-controller.yaml#/$defs/phylink
+     description:
+       Ethernet MAC node
+     properties:
+diff --git a/Documentation/devicetree/bindings/net/microchip,lan966x-switch.yaml b/Documentation/devicetree/bindings/net/microchip,lan966x-switch.yaml
+index 306ef9ecf2b9..a770cfc490a9 100644
+--- a/Documentation/devicetree/bindings/net/microchip,lan966x-switch.yaml
++++ b/Documentation/devicetree/bindings/net/microchip,lan966x-switch.yaml
+@@ -73,7 +73,9 @@ properties:
+       "^port@[0-9a-f]+$":
+         type: object
+ 
+-        $ref: /schemas/net/ethernet-controller.yaml#
++        allOf:
++          - $ref: ethernet-controller.yaml#
++          - $ref: ethernet-controller.yaml#/$defs/phylink
+         unevaluatedProperties: false
+ 
+         properties:
+diff --git a/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml b/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml
+index fcafef8d5a33..da4b4d934705 100644
+--- a/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml
++++ b/Documentation/devicetree/bindings/net/microchip,sparx5-switch.yaml
+@@ -84,7 +84,10 @@ properties:
+ 
+     patternProperties:
+       "^port@[0-9a-f]+$":
+-        $ref: /schemas/net/ethernet-controller.yaml#
++        type: object
++        allOf:
++          - $ref: ethernet-controller.yaml#
++          - $ref: ethernet-controller.yaml#/$defs/phylink
+         unevaluatedProperties: false
+ 
+         properties:
+diff --git a/Documentation/devicetree/bindings/net/mscc,vsc7514-switch.yaml b/Documentation/devicetree/bindings/net/mscc,vsc7514-switch.yaml
+index 8ee2c7d7ff42..b3aff7b0790e 100644
+--- a/Documentation/devicetree/bindings/net/mscc,vsc7514-switch.yaml
++++ b/Documentation/devicetree/bindings/net/mscc,vsc7514-switch.yaml
+@@ -126,6 +126,11 @@ properties:
+       - const: xtr
+       - const: fdma
+ 
++  ethernet-ports:
++    patternProperties:
++      "^port@[0-9a-f]+$":
++        $ref: ethernet-controller.yaml#/$defs/phylink
++
+ required:
+   - compatible
+   - reg
+diff --git a/Documentation/devicetree/bindings/net/qca,ar71xx.yaml b/Documentation/devicetree/bindings/net/qca,ar71xx.yaml
+index 89f94b31b546..d021bfb4ad20 100644
+--- a/Documentation/devicetree/bindings/net/qca,ar71xx.yaml
++++ b/Documentation/devicetree/bindings/net/qca,ar71xx.yaml
+@@ -8,6 +8,7 @@ title: QCA AR71XX MAC
+ 
+ allOf:
+   - $ref: ethernet-controller.yaml#
++  - $ref: ethernet-controller.yaml#/$defs/phylink
+ 
+ maintainers:
+   - Oleksij Rempel <o.rempel@pengutronix.de>
+diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+index ddf9522a5dc2..62d8c2cfafe9 100644
+--- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
++++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+@@ -567,6 +567,7 @@ dependencies:
+ 
+ allOf:
+   - $ref: ethernet-controller.yaml#
++  - $ref: ethernet-controller.yaml#/$defs/phylink
+   - if:
+       properties:
+         compatible:
+diff --git a/Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml b/Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml
+index c9c25132d154..d4366a11918e 100644
+--- a/Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml
++++ b/Documentation/devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml
+@@ -117,7 +117,9 @@ properties:
+         type: object
+         description: CPSWxG NUSS external ports
+ 
+-        $ref: ethernet-controller.yaml#
++        allOf:
++          - $ref: ethernet-controller.yaml#
++          - $ref: ethernet-controller.yaml#/$defs/phylink
+         unevaluatedProperties: false
+ 
+         properties:
+diff --git a/Documentation/devicetree/bindings/net/xlnx,axi-ethernet.yaml b/Documentation/devicetree/bindings/net/xlnx,axi-ethernet.yaml
+index 1d33d80af11c..f8894546c02a 100644
+--- a/Documentation/devicetree/bindings/net/xlnx,axi-ethernet.yaml
++++ b/Documentation/devicetree/bindings/net/xlnx,axi-ethernet.yaml
+@@ -130,7 +130,8 @@ required:
+   - phy-handle
+ 
+ allOf:
+-  - $ref: /schemas/net/ethernet-controller.yaml#
++  - $ref: ethernet-controller.yaml#
++  - $ref: ethernet-controller.yaml#/$defs/phylink
+ 
+ additionalProperties: false
+ 
 -- 
 2.39.2
 
