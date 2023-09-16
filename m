@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-34253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A4617A2ED2
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 10:18:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79E767A2ED3
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 10:19:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5050A282270
-	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 08:18:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CDF71C20ACF
+	for <lists+netdev@lfdr.de>; Sat, 16 Sep 2023 08:19:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CA8A12B73;
-	Sat, 16 Sep 2023 08:13:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6E6911C96;
+	Sat, 16 Sep 2023 08:13:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3538512B6A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5E8213FED;
+	Sat, 16 Sep 2023 08:13:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 754C6C43391;
 	Sat, 16 Sep 2023 08:13:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E25B1C433D9;
-	Sat, 16 Sep 2023 08:13:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694851987;
-	bh=Ook4MmbZyTHTwBCPoZcoElhvKPXaGKHEfuZZRckhrmY=;
+	s=k20201202; t=1694851993;
+	bh=SbggMlwJmGCB60uPWKaRi5TsR0G979nd8MU9xOIf0lo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nvRKVGJKVHMGLMpp5YqLLYgdXsun+QlFWk4gFlg85cQYIwJ0diFJXzoJtQvgRYI+z
-	 3pRwqAoLxhGAEnlm/HY8SDM55pRzT8xmX6w8U6xpUmXUqbFUiXxjjqiicaNhXWb1RS
-	 5UWBpJunRapoCq9ybIJHKOg3rubzsaW5eVQNSI5sjTQC8ziQ/6+XoSTUSX7hHMUdWV
-	 3T0ogMoSc5oPSVIDwofX2oYTnU5qXVRsP9cC6Wt0JygjJCybt5EZcnUMHaJNHOvQxN
-	 Gb90KRTtGWCtSAdKHRTe8BlG1SBH+9WaRRXjNV849EigxmDn1gO0gcwHRRIHvg5MRM
-	 GALllzSuuDR9w==
+	b=uXSdb0bhIxN0kQMA76OEwrbI8wVWljqxCRLq7WOcHzQBXC/VR9SL7OiaBND9bS8Ql
+	 UCugoEdaqhd0REzK1bwto/i5rtvyfhl8jQI1CDtt6dEbsk0yNu4edCMJz9Gdvkgq9+
+	 +kF2rbFNV1v7YcKqKtLORvAiNQSdiT9wvY7PfB85hCgpefuSM5cKL6xfGvcpMvZtkn
+	 uD3l0NZRsXjdlgmwkZgH/Sz9IloouFroW6TE8xiAfi8o0GynY8rrnPLj3N5vKLui1n
+	 ZZXzIHJWxCq1WDxT7bwirT80KL2/joCYGfPGGsbNespTMauW6p1LPvxAbgBjGCtTRz
+	 Njkq0gUGcXwBg==
 From: Jisheng Zhang <jszhang@kernel.org>
 To: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
 	Alexandre Torgue <alexandre.torgue@foss.st.com>,
@@ -66,9 +66,9 @@ Cc: netdev@vger.kernel.org,
 	linux-sunxi@lists.linux.dev,
 	linux-tegra@vger.kernel.org,
 	linux-mediatek@lists.infradead.org
-Subject: [PATCH net-next v2 22/23] net: stmmac: rename stmmac_pltfr_remove_no_dt to stmmac_pltfr_remove
-Date: Sat, 16 Sep 2023 15:58:28 +0800
-Message-Id: <20230916075829.1560-23-jszhang@kernel.org>
+Subject: [PATCH net-next v2 23/23] net: stmmac: make stmmac_{probe|remove}_config_dt static
+Date: Sat, 16 Sep 2023 15:58:29 +0800
+Message-Id: <20230916075829.1560-24-jszhang@kernel.org>
 X-Mailer: git-send-email 2.40.0
 In-Reply-To: <20230916075829.1560-1-jszhang@kernel.org>
 References: <20230916075829.1560-1-jszhang@kernel.org>
@@ -80,291 +80,115 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Now, all users of the old stmmac_pltfr_remove() are converted to the
-devres helper, it's time to rename stmmac_pltfr_remove_no_dt() back to
-stmmac_pltfr_remove() and remove the old stmmac_pltfr_remove().
+Now there's no external users of these two functions, make them static
+so that there aren't any new usages of stmmac_probe_config_dt().
+
+To avoid forward declaration, move stmmac_remove_config_dt() location.
 
 Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+Suggested-by: Russell King <linux@armlinux.org.uk>
 ---
- .../ethernet/stmicro/stmmac/dwmac-anarion.c   |  2 +-
- .../net/ethernet/stmicro/stmmac/dwmac-imx.c   |  2 +-
- .../ethernet/stmicro/stmmac/dwmac-ingenic.c   |  2 +-
- .../stmicro/stmmac/dwmac-intel-plat.c         |  2 +-
- .../ethernet/stmicro/stmmac/dwmac-ipq806x.c   |  2 +-
- .../ethernet/stmicro/stmmac/dwmac-lpc18xx.c   |  2 +-
- .../ethernet/stmicro/stmmac/dwmac-mediatek.c  |  2 +-
- .../net/ethernet/stmicro/stmmac/dwmac-meson.c |  2 +-
- .../ethernet/stmicro/stmmac/dwmac-meson8b.c   |  2 +-
- .../ethernet/stmicro/stmmac/dwmac-socfpga.c   |  2 +-
- .../ethernet/stmicro/stmmac/dwmac-starfive.c  |  2 +-
- .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |  2 +-
- .../net/ethernet/stmicro/stmmac/dwmac-sunxi.c |  2 +-
- .../net/ethernet/stmicro/stmmac/dwmac-tegra.c |  2 +-
- .../ethernet/stmicro/stmmac/dwmac-visconti.c  |  3 +--
- .../ethernet/stmicro/stmmac/stmmac_platform.c | 23 +++----------------
- .../ethernet/stmicro/stmmac/stmmac_platform.h |  1 -
- 17 files changed, 18 insertions(+), 37 deletions(-)
+ .../ethernet/stmicro/stmmac/stmmac_platform.c | 47 +++++++------------
+ .../ethernet/stmicro/stmmac/stmmac_platform.h |  4 --
+ 2 files changed, 17 insertions(+), 34 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-anarion.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-anarion.c
-index 0df3a2ad0986..643ee6d8d4dd 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-anarion.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-anarion.c
-@@ -135,7 +135,7 @@ MODULE_DEVICE_TABLE(of, anarion_dwmac_match);
- 
- static struct platform_driver anarion_dwmac_driver = {
- 	.probe  = anarion_dwmac_probe,
--	.remove_new = stmmac_pltfr_remove_no_dt,
-+	.remove_new = stmmac_pltfr_remove,
- 	.driver = {
- 		.name           = "anarion-dwmac",
- 		.pm		= &stmmac_pltfr_pm_ops,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-index e5989424894b..8f730ada71f9 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c
-@@ -418,7 +418,7 @@ MODULE_DEVICE_TABLE(of, imx_dwmac_match);
- 
- static struct platform_driver imx_dwmac_driver = {
- 	.probe  = imx_dwmac_probe,
--	.remove_new = stmmac_pltfr_remove_no_dt,
-+	.remove_new = stmmac_pltfr_remove,
- 	.driver = {
- 		.name           = "imx-dwmac",
- 		.pm		= &stmmac_pltfr_pm_ops,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
-index 3f87053ffc07..19c93b998fb3 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
-@@ -370,7 +370,7 @@ MODULE_DEVICE_TABLE(of, ingenic_mac_of_matches);
- 
- static struct platform_driver ingenic_mac_driver = {
- 	.probe		= ingenic_mac_probe,
--	.remove_new	= stmmac_pltfr_remove_no_dt,
-+	.remove_new	= stmmac_pltfr_remove,
- 	.driver		= {
- 		.name	= "ingenic-mac",
- 		.pm		= pm_ptr(&ingenic_mac_pm_ops),
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c
-index d1aec2ca2b42..70edc5232379 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c
-@@ -164,7 +164,7 @@ static void intel_eth_plat_remove(struct platform_device *pdev)
- {
- 	struct intel_dwmac *dwmac = get_stmmac_bsp_priv(&pdev->dev);
- 
--	stmmac_pltfr_remove_no_dt(pdev);
-+	stmmac_pltfr_remove(pdev);
- 	clk_disable_unprepare(dwmac->tx_clk);
- }
- 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-ipq806x.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-ipq806x.c
-index a9916fd07616..281687d7083b 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-ipq806x.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-ipq806x.c
-@@ -487,7 +487,7 @@ MODULE_DEVICE_TABLE(of, ipq806x_gmac_dwmac_match);
- 
- static struct platform_driver ipq806x_gmac_dwmac_driver = {
- 	.probe = ipq806x_gmac_probe,
--	.remove_new = stmmac_pltfr_remove_no_dt,
-+	.remove_new = stmmac_pltfr_remove,
- 	.driver = {
- 		.name		= "ipq806x-gmac-dwmac",
- 		.pm		= &stmmac_pltfr_pm_ops,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c
-index dad23b47f383..4c810d8f5bea 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c
-@@ -72,7 +72,7 @@ MODULE_DEVICE_TABLE(of, lpc18xx_dwmac_match);
- 
- static struct platform_driver lpc18xx_dwmac_driver = {
- 	.probe  = lpc18xx_dwmac_probe,
--	.remove_new = stmmac_pltfr_remove_no_dt,
-+	.remove_new = stmmac_pltfr_remove,
- 	.driver = {
- 		.name           = "lpc18xx-dwmac",
- 		.pm		= &stmmac_pltfr_pm_ops,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c
-index 11976a854240..2a9132d6d743 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-mediatek.c
-@@ -683,7 +683,7 @@ static void mediatek_dwmac_remove(struct platform_device *pdev)
- {
- 	struct mediatek_dwmac_plat_data *priv_plat = get_stmmac_bsp_priv(&pdev->dev);
- 
--	stmmac_pltfr_remove_no_dt(pdev);
-+	stmmac_pltfr_remove(pdev);
- 	mediatek_dwmac_clks_config(priv_plat, false);
- }
- 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c
-index 3373d3ec2368..a16bfa9089ea 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-meson.c
-@@ -78,7 +78,7 @@ MODULE_DEVICE_TABLE(of, meson6_dwmac_match);
- 
- static struct platform_driver meson6_dwmac_driver = {
- 	.probe  = meson6_dwmac_probe,
--	.remove_new = stmmac_pltfr_remove_no_dt,
-+	.remove_new = stmmac_pltfr_remove,
- 	.driver = {
- 		.name           = "meson6-dwmac",
- 		.pm		= &stmmac_pltfr_pm_ops,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-meson8b.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-meson8b.c
-index 37f249980929..b23944aa344e 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-meson8b.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-meson8b.c
-@@ -520,7 +520,7 @@ MODULE_DEVICE_TABLE(of, meson8b_dwmac_match);
- 
- static struct platform_driver meson8b_dwmac_driver = {
- 	.probe  = meson8b_dwmac_probe,
--	.remove_new = stmmac_pltfr_remove_no_dt,
-+	.remove_new = stmmac_pltfr_remove,
- 	.driver = {
- 		.name           = "meson8b-dwmac",
- 		.pm		= &stmmac_pltfr_pm_ops,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-index 03e7701d0186..ba2ce776bd4d 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-@@ -500,7 +500,7 @@ static void socfpga_dwmac_remove(struct platform_device *pdev)
- 	struct stmmac_priv *priv = netdev_priv(ndev);
- 	struct phylink_pcs *pcs = priv->hw->lynx_pcs;
- 
--	stmmac_pltfr_remove_no_dt(pdev);
-+	stmmac_pltfr_remove(pdev);
- 
- 	lynx_pcs_destroy(pcs);
- }
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
-index e87b4d335c72..5d630affb4d1 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
-@@ -152,7 +152,7 @@ MODULE_DEVICE_TABLE(of, starfive_dwmac_match);
- 
- static struct platform_driver starfive_dwmac_driver = {
- 	.probe  = starfive_dwmac_probe,
--	.remove_new = stmmac_pltfr_remove_no_dt,
-+	.remove_new = stmmac_pltfr_remove,
- 	.driver = {
- 		.name = "starfive-dwmac",
- 		.pm = &stmmac_pltfr_pm_ops,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-index 63a7e5e53d7b..1c702d0b2d29 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-@@ -1312,7 +1312,7 @@ static void sun8i_dwmac_remove(struct platform_device *pdev)
- 		clk_put(gmac->ephy_clk);
- 	}
- 
--	stmmac_pltfr_remove_no_dt(pdev);
-+	stmmac_pltfr_remove(pdev);
- 	sun8i_dwmac_unset_syscon(gmac);
- }
- 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sunxi.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sunxi.c
-index b857235f5b1f..2653a9f0958c 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sunxi.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sunxi.c
-@@ -172,7 +172,7 @@ MODULE_DEVICE_TABLE(of, sun7i_dwmac_match);
- 
- static struct platform_driver sun7i_dwmac_driver = {
- 	.probe  = sun7i_gmac_probe,
--	.remove_new = stmmac_pltfr_remove_no_dt,
-+	.remove_new = stmmac_pltfr_remove,
- 	.driver = {
- 		.name           = "sun7i-dwmac",
- 		.pm		= &stmmac_pltfr_pm_ops,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
-index 7e512c0762ea..362f85136c3e 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
-@@ -358,7 +358,7 @@ static void tegra_mgbe_remove(struct platform_device *pdev)
- 
- 	clk_bulk_disable_unprepare(ARRAY_SIZE(mgbe_clks), mgbe->clks);
- 
--	stmmac_pltfr_remove_no_dt(pdev);
-+	stmmac_pltfr_remove(pdev);
- }
- 
- static const struct of_device_id tegra_mgbe_match[] = {
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c
-index 45f5d66a11c2..a5a5cfa989c6 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c
-@@ -256,8 +256,7 @@ static int visconti_eth_dwmac_probe(struct platform_device *pdev)
- 
- static void visconti_eth_dwmac_remove(struct platform_device *pdev)
- {
--	stmmac_pltfr_remove_no_dt(pdev);
--
-+	stmmac_pltfr_remove(pdev);
- 	visconti_eth_clock_remove(pdev);
- }
- 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-index 0f28795e581c..716434b58321 100644
+index 716434b58321..2063de1683b2 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-@@ -807,7 +807,7 @@ static void devm_stmmac_pltfr_remove(void *data)
- {
- 	struct platform_device *pdev = data;
- 
--	stmmac_pltfr_remove_no_dt(pdev);
-+	stmmac_pltfr_remove(pdev);
+@@ -384,6 +384,22 @@ static int stmmac_of_get_mac_mode(struct device_node *np)
+ 	return -ENODEV;
  }
  
++/**
++ * stmmac_remove_config_dt - undo the effects of stmmac_probe_config_dt()
++ * @pdev: platform_device structure
++ * @plat: driver data platform structure
++ *
++ * Release resources claimed by stmmac_probe_config_dt().
++ */
++static void stmmac_remove_config_dt(struct platform_device *pdev,
++				    struct plat_stmmacenet_data *plat)
++{
++	clk_disable_unprepare(plat->stmmac_clk);
++	clk_disable_unprepare(plat->pclk);
++	of_node_put(plat->phy_node);
++	of_node_put(plat->mdio_node);
++}
++
  /**
-@@ -834,12 +834,12 @@ int devm_stmmac_pltfr_probe(struct platform_device *pdev,
- EXPORT_SYMBOL_GPL(devm_stmmac_pltfr_probe);
- 
- /**
-- * stmmac_pltfr_remove_no_dt
-+ * stmmac_pltfr_remove
-  * @pdev: pointer to the platform device
-  * Description: This undoes the effects of stmmac_pltfr_probe() by removing the
-  * driver and calling the platform's exit() callback.
+  * stmmac_probe_config_dt - parse device-tree driver parameters
+  * @pdev: platform_device structure
+@@ -392,7 +408,7 @@ static int stmmac_of_get_mac_mode(struct device_node *np)
+  * this function is to read the driver parameters from device-tree and
+  * set some private fields that will be used by the main at runtime.
   */
--void stmmac_pltfr_remove_no_dt(struct platform_device *pdev)
-+void stmmac_pltfr_remove(struct platform_device *pdev)
+-struct plat_stmmacenet_data *
++static struct plat_stmmacenet_data *
+ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
  {
- 	struct net_device *ndev = platform_get_drvdata(pdev);
- 	struct stmmac_priv *priv = netdev_priv(ndev);
-@@ -848,23 +848,6 @@ void stmmac_pltfr_remove_no_dt(struct platform_device *pdev)
- 	stmmac_dvr_remove(&pdev->dev);
- 	stmmac_pltfr_exit(pdev, plat);
+ 	struct device_node *np = pdev->dev.of_node;
+@@ -662,43 +678,14 @@ devm_stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+ 
+ 	return plat;
  }
--EXPORT_SYMBOL_GPL(stmmac_pltfr_remove_no_dt);
 -
 -/**
-- * stmmac_pltfr_remove
-- * @pdev: platform device pointer
-- * Description: this function calls the main to free the net resources
-- * and calls the platforms hook and release the resources (e.g. mem).
+- * stmmac_remove_config_dt - undo the effects of stmmac_probe_config_dt()
+- * @pdev: platform_device structure
+- * @plat: driver data platform structure
+- *
+- * Release resources claimed by stmmac_probe_config_dt().
 - */
--void stmmac_pltfr_remove(struct platform_device *pdev)
+-void stmmac_remove_config_dt(struct platform_device *pdev,
+-			     struct plat_stmmacenet_data *plat)
 -{
--	struct net_device *ndev = platform_get_drvdata(pdev);
--	struct stmmac_priv *priv = netdev_priv(ndev);
--	struct plat_stmmacenet_data *plat = priv->plat;
--
--	stmmac_pltfr_remove_no_dt(pdev);
--	stmmac_remove_config_dt(pdev, plat);
+-	clk_disable_unprepare(plat->stmmac_clk);
+-	clk_disable_unprepare(plat->pclk);
+-	of_node_put(plat->phy_node);
+-	of_node_put(plat->mdio_node);
 -}
- EXPORT_SYMBOL_GPL(stmmac_pltfr_remove);
+ #else
+-struct plat_stmmacenet_data *
+-stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+-{
+-	return ERR_PTR(-EINVAL);
+-}
+-
+ struct plat_stmmacenet_data *
+ devm_stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+ {
+ 	return ERR_PTR(-EINVAL);
+ }
+-
+-void stmmac_remove_config_dt(struct platform_device *pdev,
+-			     struct plat_stmmacenet_data *plat)
+-{
+-}
+ #endif /* CONFIG_OF */
+-EXPORT_SYMBOL_GPL(stmmac_probe_config_dt);
+ EXPORT_SYMBOL_GPL(devm_stmmac_probe_config_dt);
+-EXPORT_SYMBOL_GPL(stmmac_remove_config_dt);
  
- /**
+ int stmmac_get_platform_resources(struct platform_device *pdev,
+ 				  struct stmmac_resources *stmmac_res)
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.h
-index c5565b2a70ac..bb07a99e1248 100644
+index bb07a99e1248..bb6fc7e59aed 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.h
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.h
-@@ -32,7 +32,6 @@ int stmmac_pltfr_probe(struct platform_device *pdev,
- int devm_stmmac_pltfr_probe(struct platform_device *pdev,
- 			    struct plat_stmmacenet_data *plat,
- 			    struct stmmac_resources *res);
--void stmmac_pltfr_remove_no_dt(struct platform_device *pdev);
- void stmmac_pltfr_remove(struct platform_device *pdev);
- extern const struct dev_pm_ops stmmac_pltfr_pm_ops;
+@@ -11,12 +11,8 @@
  
+ #include "stmmac.h"
+ 
+-struct plat_stmmacenet_data *
+-stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac);
+ struct plat_stmmacenet_data *
+ devm_stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac);
+-void stmmac_remove_config_dt(struct platform_device *pdev,
+-			     struct plat_stmmacenet_data *plat);
+ 
+ int stmmac_get_platform_resources(struct platform_device *pdev,
+ 				  struct stmmac_resources *stmmac_res);
 -- 
 2.40.1
 
