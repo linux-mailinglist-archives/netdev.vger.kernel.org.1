@@ -1,156 +1,113 @@
-Return-Path: <netdev+bounces-34364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 184DE7A3B9E
-	for <lists+netdev@lfdr.de>; Sun, 17 Sep 2023 22:20:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F2637A3D9F
+	for <lists+netdev@lfdr.de>; Sun, 17 Sep 2023 22:51:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42CAD1C2098F
-	for <lists+netdev@lfdr.de>; Sun, 17 Sep 2023 20:20:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CCF7281424
+	for <lists+netdev@lfdr.de>; Sun, 17 Sep 2023 20:51:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DB167461;
-	Sun, 17 Sep 2023 20:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 849B97472;
+	Sun, 17 Sep 2023 20:51:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 722C56FA7
-	for <netdev@vger.kernel.org>; Sun, 17 Sep 2023 20:20:24 +0000 (UTC)
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C914101
-	for <netdev@vger.kernel.org>; Sun, 17 Sep 2023 13:20:21 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1qhyFF-0008UD-3j; Sun, 17 Sep 2023 22:19:53 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1qhyFB-0073yw-4k; Sun, 17 Sep 2023 22:19:49 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1qhyFA-002Q2Y-R4; Sun, 17 Sep 2023 22:19:48 +0200
-Date: Sun, 17 Sep 2023 22:19:46 +0200
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To: Jisheng Zhang <jszhang@kernel.org>
-Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-sunxi@lists.linux.dev,
-	linux-stm32@st-md-mailman.stormreply.com, johannes@sipsolutions.net
-Subject: Re: [PATCH v2] net: stmmac: fix incorrect rxq|txq_stats reference
-Message-ID: <20230917201946.5z5y2qn4ydpwppse@pengutronix.de>
-References: <20230917165328.3403-1-jszhang@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0AAB63B8
+	for <netdev@vger.kernel.org>; Sun, 17 Sep 2023 20:51:47 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61576131;
+	Sun, 17 Sep 2023 13:51:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694983906; x=1726519906;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=paznUEp5GxW/Ux7AJ7asXSl9DWPKdN6uyysmYb20O+E=;
+  b=gw5pRvvFAD8Do1CzoE5ufdwYaPBd8sgP+Fv0HshxM0YvbxfgS84/1YYD
+   +8ycOfCrPWRqLs8Y5hhlu2pv6zrT1OLcGT60tAaAd0K1e5auAD/KemB/E
+   ngB3aT4j/ag5SvBigaonXqobotcZAxMFOkvEpTEA2nwHggsep0K6DBn+z
+   X5v3EApHb2zWsH7X6D0+bIx+CE3kZ6jF0cu022h3/1JJ+yqFfocdIOJ+x
+   bj548k7siI8ADJQKF76wwYxPr7wA5TG+q+huQmJNqyNW4+erY9lw89eKk
+   gNjzbAdsn41UZSlYHnCzA/RPG5P02s0VTDOO0bpih8LyLzMOWtTTsuzWS
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10836"; a="359780755"
+X-IronPort-AV: E=Sophos;i="6.02,155,1688454000"; 
+   d="scan'208";a="359780755"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2023 13:51:45 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10836"; a="815798331"
+X-IronPort-AV: E=Sophos;i="6.02,155,1688454000"; 
+   d="scan'208";a="815798331"
+Received: from lkp-server02.sh.intel.com (HELO 9ef86b2655e5) ([10.239.97.151])
+  by fmsmga004.fm.intel.com with ESMTP; 17 Sep 2023 13:51:43 -0700
+Received: from kbuild by 9ef86b2655e5 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qhyk1-0005Sa-2g;
+	Sun, 17 Sep 2023 20:51:41 +0000
+Date: Mon, 18 Sep 2023 04:50:59 +0800
+From: kernel test robot <lkp@intel.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Bagas Sanjaya <bagasdotme@gmail.com>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@nvidia.com>, linux-doc@vger.kernel.org
+Subject: [net-next:main 2/43] htmldocs:
+ Documentation/driver-api/dpll.rst:427: WARNING: Error in "code-block"
+ directive:
+Message-ID: <202309180456.lOhxy9gS-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="z7mb6j7jc652k2fi"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230917165328.3403-1-jszhang@kernel.org>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git main
+head:   d692873cbe861a870cdc9cbfb120eefd113c3dfd
+commit: dbb291f19393b628a1d15b94a78d471b9d94e532 [2/43] dpll: documentation on DPLL subsystem interface
+reproduce: (https://download.01.org/0day-ci/archive/20230918/202309180456.lOhxy9gS-lkp@intel.com/reproduce)
 
---z7mb6j7jc652k2fi
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202309180456.lOhxy9gS-lkp@intel.com/
 
-On Mon, Sep 18, 2023 at 12:53:28AM +0800, Jisheng Zhang wrote:
-> commit 133466c3bbe1 ("net: stmmac: use per-queue 64 bit statistics
-> where necessary") caused one regression as found by Uwe, the backtrace
-> looks like:
->=20
-> 	INFO: trying to register non-static key.
-> 	The code is fine but needs lockdep annotation, or maybe
-> 	you didn't initialize this object before use?
-> 	turning off the locking correctness validator.
-> 	CPU: 0 PID: 1 Comm: swapper/0 Not tainted 6.5.0-rc1-00449-g133466c3bbe1-=
-dirty #21
-> 	Hardware name: STM32 (Device Tree Support)
-> 	 unwind_backtrace from show_stack+0x18/0x1c
-> 	 show_stack from dump_stack_lvl+0x60/0x90
-> 	 dump_stack_lvl from register_lock_class+0x98c/0x99c
-> 	 register_lock_class from __lock_acquire+0x74/0x293c
-> 	 __lock_acquire from lock_acquire+0x134/0x398
-> 	 lock_acquire from stmmac_get_stats64+0x2ac/0x2fc
-> 	 stmmac_get_stats64 from dev_get_stats+0x44/0x130
-> 	 dev_get_stats from rtnl_fill_stats+0x38/0x120
-> 	 rtnl_fill_stats from rtnl_fill_ifinfo+0x834/0x17f4
-> 	 rtnl_fill_ifinfo from rtmsg_ifinfo_build_skb+0xc0/0x144
-> 	 rtmsg_ifinfo_build_skb from rtmsg_ifinfo+0x50/0x88
-> 	 rtmsg_ifinfo from __dev_notify_flags+0xc0/0xec
-> 	 __dev_notify_flags from dev_change_flags+0x50/0x5c
-> 	 dev_change_flags from ip_auto_config+0x2f4/0x1260
-> 	 ip_auto_config from do_one_initcall+0x70/0x35c
-> 	 do_one_initcall from kernel_init_freeable+0x2ac/0x308
-> 	 kernel_init_freeable from kernel_init+0x1c/0x138
-> 	 kernel_init from ret_from_fork+0x14/0x2c
->=20
-> The reason is the rxq|txq_stats structures are not what expected
-> because stmmac_open() -> __stmmac_open() the structure is overwritten
-> by "memcpy(&priv->dma_conf, dma_conf, sizeof(*dma_conf));"
-> This causes the well initialized syncp member of rxq|txq_stats is
-> overwritten unexpectedly as pointed out by Johannes and Uwe.
->=20
-> Fix this issue by moving rxq|txq_stats back to stmmac_extra_stats. For
-> SMP cache friendly, we also mark stmmac_txq_stats and stmmac_rxq_stats
-> as ____cacheline_aligned_in_smp.
->=20
-> Fixes: 133466c3bbe1 ("net: stmmac: use per-queue 64 bit statistics where =
-necessary")
-> Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
-> Reported-by: Uwe Kleine-K=F6nig <u.kleine-koenig@pengutronix.de>
+All warnings (new ones prefixed by >>):
 
-I didn't look at the patch, but it makes the splat go away for me.
-Thanks \o/
+>> Documentation/driver-api/dpll.rst:427: WARNING: Error in "code-block" directive:
 
-Tested-by: Uwe Kleine-K=F6nig <u.kleine-koenig@pengutronix.de>
+vim +427 Documentation/driver-api/dpll.rst
 
-Best regards
-Uwe
+   426	
+ > 427	.. code-block:: c
+   428		static const struct dpll_device_ops dpll_ops = {
+   429			.lock_status_get = ptp_ocp_dpll_lock_status_get,
+   430			.mode_get = ptp_ocp_dpll_mode_get,
+   431			.mode_supported = ptp_ocp_dpll_mode_supported,
+   432		};
+   433	
+   434		static const struct dpll_pin_ops dpll_pins_ops = {
+   435			.frequency_get = ptp_ocp_dpll_frequency_get,
+   436			.frequency_set = ptp_ocp_dpll_frequency_set,
+   437			.direction_get = ptp_ocp_dpll_direction_get,
+   438			.direction_set = ptp_ocp_dpll_direction_set,
+   439			.state_on_dpll_get = ptp_ocp_dpll_state_get,
+   440		};
+   441	
 
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
-
---z7mb6j7jc652k2fi
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmUHX2EACgkQj4D7WH0S
-/k5snggAu813qfU1WKakoC+H/WXhJwN4cXPPgMXgDZA6nrYzT6bBacs0CwmyDpWt
-QnNFTF3trjFkTqqD+OIn3o+sSBzDLWcePKsvaaAJwCnhdUwKN0NCS8wFsj1EUS6K
-NlRGAoXKAMJ2GxBz/cjG3SH5crrX5JaWQ1Z300jnDyLuissdrE8e1p4FMkx7+u2U
-tNQoaDlzrO7/Yyu252ydShGf/7BcPQ0ORHt+J3nwlnia8wEjsyhiuGBEdvNW+lgo
-h4zST1Qthn8dzmTg8U4bqG9C1UWJSOC+jliAqn9m3wjguxxlozI1wp9EoAtnQhSy
-eJazAhMpOnqwixpWYHL9dJV8Uuaxkw==
-=c2ks
------END PGP SIGNATURE-----
-
---z7mb6j7jc652k2fi--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
