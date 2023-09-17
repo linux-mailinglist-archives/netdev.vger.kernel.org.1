@@ -1,94 +1,80 @@
-Return-Path: <netdev+bounces-34348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D2227A35C8
-	for <lists+netdev@lfdr.de>; Sun, 17 Sep 2023 16:11:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BBF07A35CE
+	for <lists+netdev@lfdr.de>; Sun, 17 Sep 2023 16:20:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 295811C208D2
-	for <lists+netdev@lfdr.de>; Sun, 17 Sep 2023 14:11:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A9621C20866
+	for <lists+netdev@lfdr.de>; Sun, 17 Sep 2023 14:20:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F3724A2E;
-	Sun, 17 Sep 2023 14:11:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 966FE4A32;
+	Sun, 17 Sep 2023 14:20:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CC4F1859
-	for <netdev@vger.kernel.org>; Sun, 17 Sep 2023 14:11:53 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09C95121
-	for <netdev@vger.kernel.org>; Sun, 17 Sep 2023 07:11:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=6U2Rz+8AetsoIrc6VjbBwcOZjV8vBNigNMls4XT/ACg=; b=jgA2ub9icF8cvgOQggxBaI9HPr
-	K30bTF94o/vH6n38cJpiiUH+EiyiDjjYa8N7H6jGdDL+WzvmdqbvYOxcA54l3LvxNV00usUpWGyPs
-	xORzO9oU4Cv4ZcBaCXLPStKtOyALSnaCn6T2TTdkQgUgaVwZQdBsA7GVx0x5WcyRTheQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qhsV1-006hLg-Lj; Sun, 17 Sep 2023 16:11:47 +0200
-Date: Sun, 17 Sep 2023 16:11:47 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Raju Rangoju <Raju.Rangoju@amd.com>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, Shyam-sundar.S-k@amd.com
-Subject: Re: [PATCH net] amd-xgbe: read STAT1 register twice to get correct
- value
-Message-ID: <13d692fb-1f89-4336-a53a-d5d07d81f6a6@lunn.ch>
-References: <20230914041944.450751-1-Raju.Rangoju@amd.com>
- <4f54056f-dac4-4ad8-8f87-0837334d1b01@lunn.ch>
- <d6c6b06f-4f90-62da-7774-02b737198ce0@amd.com>
- <703cae60-5898-e602-f899-06d795b58705@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DD384A2D
+	for <netdev@vger.kernel.org>; Sun, 17 Sep 2023 14:20:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E447CC433C9;
+	Sun, 17 Sep 2023 14:20:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1694960422;
+	bh=zUtWz9g4B9LburLkv1hDAggJaJDo0JAQNWqmKa50EFc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=lwERfuq/k1g8IxrnQYO9GZ/576k5TSVqzcyZ/8u6MKz/jqWBxgM4Bh82jM/iKcnGT
+	 z/vJL6ImLZjQ8JyfowBHg3E1OEkk7hNnlq2nmJ/sH2PxW9MSNhgIElsfQ/TyeRlzg6
+	 OnKlF2sgKG4WvbZLFHuEuHlT8ga7XJAAL5viEv2t9RZlC/hQYKDACabcYWQMIsU3Bi
+	 S2clUhStEGkGq+tRQlnrImBCXdkT/zaImE6kZDtCFic6aUop11gUX08CJ146h6iee/
+	 ogPjvDKRA0n3lDQErpAAnJmpN01AISACQ0RLbNb7jBRE+P7TOPjpj4lr3jZQNhKFXn
+	 uVKsvWNY+SUcA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CA3FAE26885;
+	Sun, 17 Sep 2023 14:20:22 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <703cae60-5898-e602-f899-06d795b58705@amd.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3 net] ipv4: fix null-deref in ipv4_link_failure
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169496042282.14652.10041213543711903914.git-patchwork-notify@kernel.org>
+Date: Sun, 17 Sep 2023 14:20:22 +0000
+References: <ZQPn2cF3aX/523eC@westworld>
+In-Reply-To: <ZQPn2cF3aX/523eC@westworld>
+To: Kyle Zeng <zengyhkyle@gmail.com>
+Cc: pabeni@redhat.com, dsahern@kernel.org, vfedorenko@novek.ru,
+ davem@davemloft.net, netdev@vger.kernel.org, ssuryaextr@gmail.com
 
-> Thanks, Tom.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Thu, 14 Sep 2023 22:12:57 -0700 you wrote:
+> Currently, we assume the skb is associated with a device before calling
+> __ip_options_compile, which is not always the case if it is re-routed by
+> ipvs.
+> When skb->dev is NULL, dev_net(skb->dev) will become null-dereference.
+> This patch adds a check for the edge case and switch to use the net_device
+> from the rtable when skb->dev is NULL.
 > 
-> The following thread (found online) has the detailed info on the IEEE 802.3
-> Standard that define the Link Status bit:
-> 
-> https://microchip.my.site.com/s/article/How-to-correctly-read-the-Ethernet-PHY-Link-Status-bit
+> [...]
 
-The relevant section for me is:
+Here is the summary with links:
+  - [v3,net] ipv4: fix null-deref in ipv4_link_failure
+    https://git.kernel.org/netdev/net/c/0113d9c9d1cc
 
-    Having a latched-low bit helps to ensure a link drop (no matter
-    how short the duration before re-establishing link-up again) gets
-    recorded and can be read from PHY register by the upper network
-    layer (e.g., MAC processor).
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-By reading it twice, you are loosing the information the link went
-down. This could mean you don't restart dhcp to get a new IP address
-for a new subnet, kick of IPv6 getting the new network prefix so it
-can create its IPv6 address etc.
 
-When Linux is driving the PHYs using phylib, drivers are written such
-that they report the latched link down. This gets report to the stack,
-and so up to user space etc. phylib will then ask the driver a second
-time to get the link status, and it might then return that the link is
-now up. That then gets reported to the stack and user space.
-
-As i said, you are not using phylib, this is not a linux PHY driver,
-so i don't actually care what you do here. I just want to point out
-why what you are doing could be wrong.
-
-    Andrew
 
