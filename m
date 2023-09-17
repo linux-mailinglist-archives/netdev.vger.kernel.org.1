@@ -1,113 +1,177 @@
-Return-Path: <netdev+bounces-34365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F2637A3D9F
-	for <lists+netdev@lfdr.de>; Sun, 17 Sep 2023 22:51:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD68D7A3E6E
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 00:26:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CCF7281424
-	for <lists+netdev@lfdr.de>; Sun, 17 Sep 2023 20:51:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE2C21C209BC
+	for <lists+netdev@lfdr.de>; Sun, 17 Sep 2023 22:26:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 849B97472;
-	Sun, 17 Sep 2023 20:51:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1B3BF505;
+	Sun, 17 Sep 2023 22:26:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0AAB63B8
-	for <netdev@vger.kernel.org>; Sun, 17 Sep 2023 20:51:47 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61576131;
-	Sun, 17 Sep 2023 13:51:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1694983906; x=1726519906;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=paznUEp5GxW/Ux7AJ7asXSl9DWPKdN6uyysmYb20O+E=;
-  b=gw5pRvvFAD8Do1CzoE5ufdwYaPBd8sgP+Fv0HshxM0YvbxfgS84/1YYD
-   +8ycOfCrPWRqLs8Y5hhlu2pv6zrT1OLcGT60tAaAd0K1e5auAD/KemB/E
-   ngB3aT4j/ag5SvBigaonXqobotcZAxMFOkvEpTEA2nwHggsep0K6DBn+z
-   X5v3EApHb2zWsH7X6D0+bIx+CE3kZ6jF0cu022h3/1JJ+yqFfocdIOJ+x
-   bj548k7siI8ADJQKF76wwYxPr7wA5TG+q+huQmJNqyNW4+erY9lw89eKk
-   gNjzbAdsn41UZSlYHnCzA/RPG5P02s0VTDOO0bpih8LyLzMOWtTTsuzWS
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10836"; a="359780755"
-X-IronPort-AV: E=Sophos;i="6.02,155,1688454000"; 
-   d="scan'208";a="359780755"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2023 13:51:45 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10836"; a="815798331"
-X-IronPort-AV: E=Sophos;i="6.02,155,1688454000"; 
-   d="scan'208";a="815798331"
-Received: from lkp-server02.sh.intel.com (HELO 9ef86b2655e5) ([10.239.97.151])
-  by fmsmga004.fm.intel.com with ESMTP; 17 Sep 2023 13:51:43 -0700
-Received: from kbuild by 9ef86b2655e5 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qhyk1-0005Sa-2g;
-	Sun, 17 Sep 2023 20:51:41 +0000
-Date: Mon, 18 Sep 2023 04:50:59 +0800
-From: kernel test robot <lkp@intel.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Bagas Sanjaya <bagasdotme@gmail.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jiri Pirko <jiri@nvidia.com>, linux-doc@vger.kernel.org
-Subject: [net-next:main 2/43] htmldocs:
- Documentation/driver-api/dpll.rst:427: WARNING: Error in "code-block"
- directive:
-Message-ID: <202309180456.lOhxy9gS-lkp@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DACC7469
+	for <netdev@vger.kernel.org>; Sun, 17 Sep 2023 22:26:00 +0000 (UTC)
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47BC9129
+	for <netdev@vger.kernel.org>; Sun, 17 Sep 2023 15:25:59 -0700 (PDT)
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com [209.85.160.197])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id DBFEB3F66D
+	for <netdev@vger.kernel.org>; Sun, 17 Sep 2023 22:25:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1694989556;
+	bh=I9MD/frOYatXvnTs5iG7mBs2PH8/IlXgMFq6W02dlmo=;
+	h=From:In-Reply-To:References:Mime-Version:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=NmQRKRhi0LohoPlWsC0Tzix0+bVD7BtHqObbtgxvQ/+GycprG3wYcIoMLZqE8AiqF
+	 k5oIzFDC0M+zXmVKJWGViVC+ZbXccz+sQRfqlMvdMRGxfWXdaP0Fnntn7DSfyDO1o6
+	 kqziQ/bOoIBUcT8160q880Hhkv07Dzz4A/pEicwM7CzSajWc2c5jZ9XL3znRlpk+LS
+	 U4Fwf/Ua60DpxiL0kyS1OmwQyA2r0/LoSPa1QKIP2TMa2dNm371Pia9Bohv/JrKTKu
+	 o38QfEE+s1bYz57xAULK0IN0heugS3zHgR2H8Nsi/LwLzSbkHkIIz9SizYX5aIebp2
+	 de38Fzd7zSxTw==
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-412eee4b64cso47692861cf.1
+        for <netdev@vger.kernel.org>; Sun, 17 Sep 2023 15:25:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694989555; x=1695594355;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=I9MD/frOYatXvnTs5iG7mBs2PH8/IlXgMFq6W02dlmo=;
+        b=Qd44AAdyQW+vGRQ8TSBC0hFZEcJSkEFJ5kGqybjC8nRQHJu3oeybXE4OKhmuQBSNxi
+         9L+YNxbivWL7Vif240sNllwLqjRdPNcJvPLFmZLd/JBf0HzseAgqO2NM/mrXmtQqFnUz
+         U/lRbnNbYRDBA+zZjzqlYDSonK8YiL/phoY9sqKLC8Pgkycg5Imifq5BhT422CHL1phB
+         I1JjoOL7HtjKEHOZffue6jgPGQGiYfEXNEvVywuC4Yg6t9G41H217eHqiqnwXikMYR2m
+         SyUtazSW3w+Oodj0T+MhiZScCJQG2QAXssKc32CL6Z5gzu++aHtEqUFUYdX3VNJmURzT
+         w7wQ==
+X-Gm-Message-State: AOJu0Yy15NnCm+VCNUnaM/M5siLN5JbTySaOHZuuCOAXiD6kBwDBibWQ
+	Ncg+b8u2XTF6in96Ai/KNZA24cxDdxEPDxX8xXRNK5E4KjdEwlPTbzivuxdeQ81B/8jujmu8FCy
+	/gtRGTEkIcyAVLed4OCHxHzaKKYkUXXbnMvqhtYaxDzjRTrm+2A==
+X-Received: by 2002:ac8:7f91:0:b0:416:db70:2653 with SMTP id z17-20020ac87f91000000b00416db702653mr8876095qtj.38.1694989555288;
+        Sun, 17 Sep 2023 15:25:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFezqxmfqtGhS2FxPCsYpubnTNK6tACbhkhYR/40Y08aycFwHOLWJhOoCYZSF3ud4i1i0EL+r/CXjLeOYzof7Y=
+X-Received: by 2002:ac8:7f91:0:b0:416:db70:2653 with SMTP id
+ z17-20020ac87f91000000b00416db702653mr8876059qtj.38.1694989554976; Sun, 17
+ Sep 2023 15:25:54 -0700 (PDT)
+Received: from 348282803490 named unknown by gmailapi.google.com with
+ HTTPREST; Sun, 17 Sep 2023 15:25:54 -0700
+From: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+In-Reply-To: <20230916075829.1560-1-jszhang@kernel.org>
+References: <20230916075829.1560-1-jszhang@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Mime-Version: 1.0
+Date: Sun, 17 Sep 2023 15:25:54 -0700
+Message-ID: <CAJM55Z-_yq3DrOC2KxQf8j5y_iDD7ejEReP4XajUz74iVp02LQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 00/22] convert to devm_stmmac_probe_config_dt
+To: Jisheng Zhang <jszhang@kernel.org>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Shawn Guo <shawnguo@kernel.org>, 
+	Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>, 
+	Fabio Estevam <festevam@gmail.com>, NXP Linux Team <linux-imx@nxp.com>, 
+	Vladimir Zapolskiy <vz@mleia.com>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	Kevin Hilman <khilman@baylibre.com>, Jerome Brunet <jbrunet@baylibre.com>, 
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>, Emil Renner Berthing <kernel@esmil.dk>, 
+	Samin Guo <samin.guo@starfivetech.com>, Chen-Yu Tsai <wens@csie.org>, 
+	Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>, 
+	Thierry Reding <thierry.reding@gmail.com>, 
+	Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>, Russell King <linux@armlinux.org.uk>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-amlogic@lists.infradead.org, 
+	linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org, 
+	linux-mediatek@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git main
-head:   d692873cbe861a870cdc9cbfb120eefd113c3dfd
-commit: dbb291f19393b628a1d15b94a78d471b9d94e532 [2/43] dpll: documentation on DPLL subsystem interface
-reproduce: (https://download.01.org/0day-ci/archive/20230918/202309180456.lOhxy9gS-lkp@intel.com/reproduce)
+Jisheng Zhang wrote:
+> Russell pointed out there's a new devm_stmmac_probe_config_dt()
+> helper now when reviewing my starfive gmac error handling patch[1].
+> After greping the code, this nice helper was introduced by Bartosz in
+> [2], I think it's time to convert all dwmac users to this helper and
+> finally complete the TODO in [2] "but once all users of the old
+> stmmac_pltfr_remove() are converted to the devres helper, it will be
+> renamed back to stmmac_pltfr_remove() and the no_dt function removed."
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202309180456.lOhxy9gS-lkp@intel.com/
+Thanks for doing this.
 
-All warnings (new ones prefixed by >>):
+Reviewed-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
 
->> Documentation/driver-api/dpll.rst:427: WARNING: Error in "code-block" directive:
-
-vim +427 Documentation/driver-api/dpll.rst
-
-   426	
- > 427	.. code-block:: c
-   428		static const struct dpll_device_ops dpll_ops = {
-   429			.lock_status_get = ptp_ocp_dpll_lock_status_get,
-   430			.mode_get = ptp_ocp_dpll_mode_get,
-   431			.mode_supported = ptp_ocp_dpll_mode_supported,
-   432		};
-   433	
-   434		static const struct dpll_pin_ops dpll_pins_ops = {
-   435			.frequency_get = ptp_ocp_dpll_frequency_get,
-   436			.frequency_set = ptp_ocp_dpll_frequency_set,
-   437			.direction_get = ptp_ocp_dpll_direction_get,
-   438			.direction_set = ptp_ocp_dpll_direction_set,
-   439			.state_on_dpll_get = ptp_ocp_dpll_state_get,
-   440		};
-   441	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+>
+> Link: https://lore.kernel.org/netdev/ZOtWmedBsa6wQQ6+@shell.armlinux.org.uk/ [1]
+> Link: https://lore.kernel.org/all/20230623100417.93592-1-brgl@bgdev.pl/  [2]
+>
+> Since v1:
+>  - rebase on new net-next
+>  - add make stmmac_{probe|remove}_config_dt static as suggested by Russell.
+>
+> Jisheng Zhang (23):
+>   net: stmmac: dwmac-anarion: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-dwc-qos-eth: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-generic: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-generic: use devm_stmmac_pltfr_probe()
+>   net: stmmac: dwmac-imx: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-ingenic: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-intel-plat: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-ipq806x: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-lpc18xx: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-mediatek: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-meson: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-meson8b: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-rk: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-socfpga: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-starfive: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-sti: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-stm32: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-sun8i: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-sunxi: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-tegra: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-visconti: use devm_stmmac_probe_config_dt()
+>   net: stmmac: rename stmmac_pltfr_remove_no_dt to stmmac_pltfr_remove
+>   net: stmmac: make stmmac_{probe|remove}_config_dt static
+>
+>  .../ethernet/stmicro/stmmac/dwmac-anarion.c   | 10 +--
+>  .../stmicro/stmmac/dwmac-dwc-qos-eth.c        | 15 +---
+>  .../ethernet/stmicro/stmmac/dwmac-generic.c   | 15 +---
+>  .../net/ethernet/stmicro/stmmac/dwmac-imx.c   | 13 ++--
+>  .../ethernet/stmicro/stmmac/dwmac-ingenic.c   | 33 +++------
+>  .../stmicro/stmmac/dwmac-intel-plat.c         | 25 +++----
+>  .../ethernet/stmicro/stmmac/dwmac-ipq806x.c   | 27 +++----
+>  .../ethernet/stmicro/stmmac/dwmac-lpc18xx.c   | 19 ++---
+>  .../ethernet/stmicro/stmmac/dwmac-mediatek.c  |  6 +-
+>  .../net/ethernet/stmicro/stmmac/dwmac-meson.c | 25 ++-----
+>  .../ethernet/stmicro/stmmac/dwmac-meson8b.c   | 53 +++++---------
+>  .../net/ethernet/stmicro/stmmac/dwmac-rk.c    | 14 ++--
+>  .../ethernet/stmicro/stmmac/dwmac-socfpga.c   | 16 ++---
+>  .../ethernet/stmicro/stmmac/dwmac-starfive.c  | 10 +--
+>  .../net/ethernet/stmicro/stmmac/dwmac-sti.c   | 14 ++--
+>  .../net/ethernet/stmicro/stmmac/dwmac-stm32.c | 17 ++---
+>  .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |  6 +-
+>  .../net/ethernet/stmicro/stmmac/dwmac-sunxi.c | 23 +++---
+>  .../net/ethernet/stmicro/stmmac/dwmac-tegra.c | 10 ++-
+>  .../ethernet/stmicro/stmmac/dwmac-visconti.c  | 18 ++---
+>  .../ethernet/stmicro/stmmac/stmmac_platform.c | 70 ++++++-------------
+>  .../ethernet/stmicro/stmmac/stmmac_platform.h |  5 --
+>  22 files changed, 127 insertions(+), 317 deletions(-)
+>
+> --
+> 2.40.1
 
