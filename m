@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-34335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 254447A3542
-	for <lists+netdev@lfdr.de>; Sun, 17 Sep 2023 13:00:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAC747A3543
+	for <lists+netdev@lfdr.de>; Sun, 17 Sep 2023 13:00:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E76B01C20A36
-	for <lists+netdev@lfdr.de>; Sun, 17 Sep 2023 11:00:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D37721C20A3C
+	for <lists+netdev@lfdr.de>; Sun, 17 Sep 2023 11:00:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12DC5256D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 149852575;
 	Sun, 17 Sep 2023 11:00:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CBBB1877
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CCC523C5
 	for <netdev@vger.kernel.org>; Sun, 17 Sep 2023 11:00:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7E9B4C433CA;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7B459C433C8;
 	Sun, 17 Sep 2023 11:00:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1694948427;
-	bh=HfgC7d0FtOAdp+ZuPQmgKrOhrTPbwfYccJFb28cgpAc=;
+	bh=s08oDzPuNzSJeFX6h/ScM9J80V2nEYO6YkYo4nxEPCE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qX8NbPx0u2dZioS4UIcY8/Rr6tVG+8VLMiIWEER8AF//hrtpeZZelFhOQRoyHuMWq
-	 K1U1K8k2Jlq1nssaglZPgLp19yDNeIc3cyBE0c6GG0/npKzJmK58NE+b+bgbNLuE4R
-	 7r3kptVPAnrjnwu/+AvA+kakPGMAQFai29ch3K3Xeph8+0uS+uzY6r/A2mpbZkp6nS
-	 NlzcS8OkXbMP68zzsfaNlfZ44Iz7ZY6LJ3mjRbT4HMssq3n9fD3Uh5PB05uvUCvcSv
-	 Rdf7hW/cpeVXGKL6ZDz8+tqU85kTeOJGs5pJkzpqM/VwFe7Wi4Y2px36VBFAUUQg0y
-	 SIgJeVIydtVkg==
+	b=nritynd2YmYUlN1ie5Ol4kmiqCoZ5YuAdBaqB1rdW9DyUzY5ckHaIv3mlVt52W+Ze
+	 CkVyNPkKEA0HggjJK7WTDYR+3afmh9aobqqy7H3YnB1Ezsx70YW4ca9y2eJAT8w1x3
+	 PjDJGUp5NWF6rbMJlTMVaT1cL240EHZqLkchK6JhyZK4IfUhQjnwAS3dnSfOR0i/w5
+	 PoJfvWfc/cf77esp/YA2sM5hOv88kUAFW5RKvL6CsIdl3nQiILPgkwiwqMSCgF6R54
+	 fnaMzKOPkuVXNx+PGFTJiBCvQpYzNAqWIQZwOCTOs85sSdkHZiM+PgFtPE1x/lr8MR
+	 c++vLi1xox62w==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 64C2FE26880;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5A962E26888;
 	Sun, 17 Sep 2023 11:00:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,42 +41,59 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v1] net: microchip: lan743x: add fixed phy unregister
- support
+Subject: Re: [PATCH net-next v8 0/9] Create common DPLL configuration API
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169494842740.21621.7514600997922629086.git-patchwork-notify@kernel.org>
+ <169494842736.21621.10730860855645661664.git-patchwork-notify@kernel.org>
 Date: Sun, 17 Sep 2023 11:00:27 +0000
-References: <20230914061737.3147-1-Pavithra.Sathyanarayanan@microchip.com>
-In-Reply-To: <20230914061737.3147-1-Pavithra.Sathyanarayanan@microchip.com>
-To: Pavithra Sathyanarayanan <Pavithra.Sathyanarayanan@microchip.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- bryan.whitehead@microchip.com, UNGLinuxDriver@microchip.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+References: <20230913204943.1051233-1-vadim.fedorenko@linux.dev>
+In-Reply-To: <20230913204943.1051233-1-vadim.fedorenko@linux.dev>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: kuba@kernel.org, jiri@resnulli.us, arkadiusz.kubalewski@intel.com,
+ jonathan.lemon@gmail.com, pabeni@redhat.com, milena.olech@intel.com,
+ michal.michalik@intel.com, linux-arm-kernel@lists.infradead.org,
+ poros@redhat.com, mschmidt@redhat.com, netdev@vger.kernel.org,
+ linux-clk@vger.kernel.org, bvanassche@acm.org,
+ intel-wired-lan@lists.osuosl.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Thu, 14 Sep 2023 11:47:37 +0530 you wrote:
-> When operating in fixed phy mode and if there is repeated open/close
-> phy test cases, everytime the fixed phy is registered as a new phy
-> which leads to overrun after 32 iterations. It is solved by adding
-> fixed_phy_unregister() in the phy_close path.
+On Wed, 13 Sep 2023 21:49:34 +0100 you wrote:
+> Implement common API for DPLL configuration and status reporting.
+> The API utilises netlink interface as transport for commands and event
+> notifications. This API aims to extend current pin configuration
+> provided by PTP subsystem and make it flexible and easy to cover
+> complex configurations.
 > 
-> In phy_close path, netdev->phydev cannot be used directly in
-> fixed_phy_unregister() due to two reasons,
->     - netdev->phydev is set to NULL in phy_disconnect()
->     - fixed_phy_unregister() can be called only after phy_disconnect()
-> So saving the netdev->phydev in local variable 'phydev' and
-> passing it to phy_disconnect().
+> Netlink interface is based on ynl spec, it allows use of in-kernel
+> tools/net/ynl/cli.py application to control the interface with properly
+> formated command and json attribute strings. Here are few command
+> examples of how it works with `ice` driver on supported NIC:
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v1] net: microchip: lan743x: add fixed phy unregister support
-    https://git.kernel.org/netdev/net-next/c/1e73cfe85952
+  - [net-next,v8,1/9] dpll: documentation on DPLL subsystem interface
+    https://git.kernel.org/netdev/net-next/c/dbb291f19393
+  - [net-next,v8,2/9] dpll: spec: Add Netlink spec in YAML
+    https://git.kernel.org/netdev/net-next/c/3badff3a25d8
+  - [net-next,v8,3/9] dpll: core: Add DPLL framework base functions
+    https://git.kernel.org/netdev/net-next/c/9431063ad323
+  - [net-next,v8,4/9] dpll: netlink: Add DPLL framework base functions
+    https://git.kernel.org/netdev/net-next/c/9d71b54b65b1
+  - [net-next,v8,5/9] netdev: expose DPLL pin handle for netdevice
+    https://git.kernel.org/netdev/net-next/c/5f1842692880
+  - [net-next,v8,6/9] ice: add admin commands to access cgu configuration
+    https://git.kernel.org/netdev/net-next/c/8a3a565ff210
+  - [net-next,v8,7/9] ice: implement dpll interface to control cgu
+    https://git.kernel.org/netdev/net-next/c/d7999f5ea64b
+  - [net-next,v8,8/9] ptp_ocp: implement DPLL ops
+    https://git.kernel.org/netdev/net-next/c/09eeb3aecc6c
+  - [net-next,v8,9/9] mlx5: Implement SyncE support using DPLL infrastructure
+    https://git.kernel.org/netdev/net-next/c/496fd0a26bbf
 
 You are awesome, thank you!
 -- 
