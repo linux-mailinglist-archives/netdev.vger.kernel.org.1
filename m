@@ -1,122 +1,101 @@
-Return-Path: <netdev+bounces-34355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FC8B7A3647
-	for <lists+netdev@lfdr.de>; Sun, 17 Sep 2023 17:34:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EE3EA7A369E
+	for <lists+netdev@lfdr.de>; Sun, 17 Sep 2023 18:46:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 577831C21799
-	for <lists+netdev@lfdr.de>; Sun, 17 Sep 2023 15:34:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C80081C20B89
+	for <lists+netdev@lfdr.de>; Sun, 17 Sep 2023 16:46:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BB1163B0;
-	Sun, 17 Sep 2023 15:31:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D20425390;
+	Sun, 17 Sep 2023 16:46:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7424568A
-	for <netdev@vger.kernel.org>; Sun, 17 Sep 2023 15:31:27 +0000 (UTC)
-Received: from mail-4317.proton.ch (mail-4317.proton.ch [185.70.43.17])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C2FFE72
-	for <netdev@vger.kernel.org>; Sun, 17 Sep 2023 08:30:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=n8pjl.ca;
-	s=protonmail2; t=1694964627; x=1695223827;
-	bh=r9tNyhYUviuUIEjOuqr/xK8XRYTBBhupTvy6oQw3GAo=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=iJhtsrVLAM+MN352MItoeVXIZAmzRmi64/3kba/5ayqO6ZUeikmUWrIfeG1WARKr7
-	 SlGe4kY/YIUWmwDvHEPbb7hLAUPhTdUApEe7pWEnQjrBsQxUReIzzUmJID2CBOwlrD
-	 ATLD055icLaFwn+2Q89JzofuRnqXTKDnED7z7S7g+UISYO4uZqmtKiqVmELfvkpjBp
-	 8okehxph3hDO/FrJOZoV+qTGVV7u0bZZFG/mlsFIiM/89CCFxc4BzHPW9dLyFOifQE
-	 nvmJhcQFp/iMNKyEiPnE73J+jxHZoiuXgxD7Xjh6Y9ELSfHWvF8ax3I3xKrhqC65Bo
-	 YksA78WGaxOsQ==
-Date: Sun, 17 Sep 2023 15:30:21 +0000
-To: linux-hams@vger.kernel.org
-From: Peter Lafreniere <peter@n8pjl.ca>
-Cc: Peter Lafreniere <peter@n8pjl.ca>, thomas@osterried.de, netdev@vger.kernel.org, ralf@linux-mips.org
-Subject: [PATCH 3/3] ax25: Kconfig: Update link for linux-ax25.org
-Message-ID: <20230917152938.8231-4-peter@n8pjl.ca>
-In-Reply-To: <20230917152938.8231-1-peter@n8pjl.ca>
-References: <20230908113907.25053-1-peter@n8pjl.ca> <20230917152938.8231-1-peter@n8pjl.ca>
-Feedback-ID: 53133685:user:proton
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D46E52C80
+	for <netdev@vger.kernel.org>; Sun, 17 Sep 2023 16:46:21 +0000 (UTC)
+Received: from out-224.mta0.migadu.com (out-224.mta0.migadu.com [91.218.175.224])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55D1911D
+	for <netdev@vger.kernel.org>; Sun, 17 Sep 2023 09:46:20 -0700 (PDT)
+Date: Mon, 18 Sep 2023 02:41:39 +1000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jookia.org; s=key1;
+	t=1694969176;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cWEPku0i8kVPsZpOe1gkv2DiCKZJ0Jfwih7/n8DF784=;
+	b=se7/6/QM0A8jm9+kIdXkUD3Jf6aYwkf6CSra3Mddks3SB0bfk7CUE5iQyuYNXvelfrLiIO
+	gG86cqzwkLn7Fj50xHajVTRKAPbMR4UwO+lxAtR7wAdXTUFi9e01LUXiplLeCXEWsYbvtV
+	aOtiEjof1sHiIwLA6SQG5aMDNLUw7E5vK9v5cMqjDSXOXjjh7qJO8faxgdvSpuaqpOKgdH
+	GzYlxOQt4DE/BfkYobq6EvHORYo/wVuOr/Yu3tLOGqLbJ/MZ3y8jsdv4NzkOG4nVeJA7qd
+	QRfHK40BzGPumrAcx8/lo56P+JuZhu61BnmhuOXrFHaF5CnvucD4RJTdk7PE/w==
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: John Watts <contact@jookia.org>
+To: linux-can@vger.kernel.org
+Cc: Wolfgang Grandegger <wg@grandegger.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: Re: [PATCH] can: sun4i_can: Only show Kconfig if ARCH_SUNXI is set
+Message-ID: <ZQcsQ3z1OZMfZLH9@titan>
+References: <20230905231342.2042759-2-contact@jookia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230905231342.2042759-2-contact@jookia.org>
+X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-http://linux-ax25.org has been down for nearly a year. Its official
-replacement is https://linux-ax25.in-berlin.de. Change all references to
-the old site in the ax25 Kconfig to its replacement.
+Hi there,
 
-Link: https://marc.info/?m=3D166792551600315
-Signed-off-by: Peter Lafreniere <peter@n8pjl.ca>
----
- net/ax25/Kconfig | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+I'd like to bump this. Do I re-send this or just reply to it?
 
-diff --git a/net/ax25/Kconfig b/net/ax25/Kconfig
-index d3a9843a043d..fdb666607f10 100644
---- a/net/ax25/Kconfig
-+++ b/net/ax25/Kconfig
-@@ -10,7 +10,7 @@ menuconfig HAMRADIO
- =09  If you want to connect your Linux box to an amateur radio, answer Y
- =09  here. You want to read <https://www.tapr.org/>
- =09  and more specifically about AX.25 on Linux
--=09  <http://www.linux-ax25.org/>.
-+=09  <https://linux-ax25.in-berlin.de>.
-=20
- =09  Note that the answer to this question won't directly affect the
- =09  kernel: saying N will just cause the configurator to skip all
-@@ -61,7 +61,7 @@ config AX25_DAMA_SLAVE
- =09  configuration. Linux cannot yet act as a DAMA server.  This option
- =09  only compiles DAMA slave support into the kernel.  It still needs to
- =09  be enabled at runtime.  For more about DAMA see
--=09  <http://www.linux-ax25.org>.  If unsure, say Y.
-+=09  <https://linux-ax25.in-berlin.de>.  If unsure, say Y.
-=20
- # placeholder until implemented
- config AX25_DAMA_MASTER
-@@ -87,9 +87,9 @@ config NETROM
- =09  A comprehensive listing of all the software for Linux amateur radio
- =09  users as well as information about how to configure an AX.25 port is
- =09  contained in the Linux Ham Wiki, available from
--=09  <http://www.linux-ax25.org>. You also might want to check out the
--=09  file <file:Documentation/networking/ax25.rst>. More information about
--=09  digital amateur radio in general is on the WWW at
-+=09  <https://linux-ax25.in-berlin.de>. You also might want to check out
-+=09  the file <file:Documentation/networking/ax25.rst>. More information
-+=09  about digital amateur radio in general is on the WWW at
- =09  <https://www.tapr.org/>.
-=20
- =09  To compile this driver as a module, choose M here: the
-@@ -106,9 +106,9 @@ config ROSE
- =09  A comprehensive listing of all the software for Linux amateur radio
- =09  users as well as information about how to configure an AX.25 port is
- =09  contained in the Linux Ham Wiki, available from
--=09  <http://www.linux-ax25.org>.  You also might want to check out the
--=09  file <file:Documentation/networking/ax25.rst>. More information about
--=09  digital amateur radio in general is on the WWW at
-+=09  <https://linux-ax25.in-berlin.de>.  You also might want to check out
-+=09  the file <file:Documentation/networking/ax25.rst>. More information
-+=09  about digital amateur radio in general is on the WWW at
- =09  <https://www.tapr.org/>.
-=20
- =09  To compile this driver as a module, choose M here: the
---=20
-2.42.0
+John.
 
-
+On Wed, Sep 06, 2023 at 09:13:43AM +1000, John Watts wrote:
+> When adding the RISCV option I didn't gate it behind ARCH_SUNXI.
+> As a result this option shows up with Allwinner support isn't enabled.
+> Fix that by requiring ARCH_SUNXI to be set if RISCV is set.
+> 
+> Fixes: 8abb95250ae6 ("can: sun4i_can: Add support for the Allwinner D1")
+> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> Closes: https://lore.kernel.org/linux-sunxi/CAMuHMdV2m54UAH0X2dG7stEg=grFihrdsz4+o7=_DpBMhjTbkw@mail.gmail.com/
+> Signed-off-by: John Watts <contact@jookia.org>
+> ---
+>  drivers/net/can/Kconfig | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/can/Kconfig b/drivers/net/can/Kconfig
+> index 649453a3c858..f8cde9f9f554 100644
+> --- a/drivers/net/can/Kconfig
+> +++ b/drivers/net/can/Kconfig
+> @@ -190,7 +190,7 @@ config CAN_SLCAN
+>  
+>  config CAN_SUN4I
+>  	tristate "Allwinner A10 CAN controller"
+> -	depends on MACH_SUN4I || MACH_SUN7I || RISCV || COMPILE_TEST
+> +	depends on MACH_SUN4I || MACH_SUN7I || (RISCV && ARCH_SUNXI) || COMPILE_TEST
+>  	help
+>  	  Say Y here if you want to use CAN controller found on Allwinner
+>  	  A10/A20/D1 SoCs.
+> -- 
+> 2.42.0
+> 
 
