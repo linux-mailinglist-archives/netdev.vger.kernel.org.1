@@ -1,153 +1,129 @@
-Return-Path: <netdev+bounces-34332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAA827A349C
-	for <lists+netdev@lfdr.de>; Sun, 17 Sep 2023 10:47:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 44B657A3514
+	for <lists+netdev@lfdr.de>; Sun, 17 Sep 2023 12:04:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D3251C20A53
-	for <lists+netdev@lfdr.de>; Sun, 17 Sep 2023 08:47:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37D961C208CB
+	for <lists+netdev@lfdr.de>; Sun, 17 Sep 2023 10:04:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DD361C3D;
-	Sun, 17 Sep 2023 08:47:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4264723A3;
+	Sun, 17 Sep 2023 10:04:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BD121876;
-	Sun, 17 Sep 2023 08:47:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61959C433C7;
-	Sun, 17 Sep 2023 08:47:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 307B31FB3;
+	Sun, 17 Sep 2023 10:04:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52139C433C8;
+	Sun, 17 Sep 2023 10:03:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1694940454;
-	bh=l+Sr+3wtCBb7xzBSEztJcEqZ8CXJywYnYrDfeKgva0g=;
+	s=k20201202; t=1694945041;
+	bh=Gso6S/NadZnbLvgrACDdGV3yKQ0lDXCmgQv0+9JSmeE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FKlcyKI2kpWpgmNiueo4a26VAntMReflY2KPdNKBUoBv1OPJC6yo+TgJ/eYj1XNI8
-	 YqWY7bQg8BuZ3eDnrfXfmIKcf36zE3/mU1QJDRa+G3zh0HnHqus3I/jAXZ6GcIZOWV
-	 aacSttw4rLx/isPT7EN2NHNV4Bf2fIPH1KBMpkKuDkOk3ANTrlaBwkD8Or9uJsSG+y
-	 LhmswnwVU6GJF2EXmjH0oIHPZWt+YiMwY34fc3sbjRWV0rxk3bK1wjdbs7hknE8LQ5
-	 M1jBaGONdVNuOp0BlkXjkR8ws/A3YY3WWwdzpG2k855dT/l0o77y+ytD38Dpl2I6M9
-	 4P2jSGmXhCBYA==
-Date: Sun, 17 Sep 2023 10:47:28 +0200
-From: Simon Horman <horms@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: netdev@vger.kernel.org, lorenzo.bianconi@redhat.com, nbd@nbd.name,
-	john@phrozen.org, sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, daniel@makrotopia.org,
-	linux-mediatek@lists.infradead.org, sujuan.chen@mediatek.com,
-	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next 13/15] net: ethernet: mtk_wed: introduce hw_rro
- support for MT7988
-Message-ID: <20230917084728.GI1125562@kernel.org>
-References: <cover.1694701767.git.lorenzo@kernel.org>
- <da27f7333fa31808ceae581d9bef5030c6072f33.1694701767.git.lorenzo@kernel.org>
+	b=V5bdmq+S8UpnPJnPiePBHbssJs5tcLQYAfJy3MYqUbj4Z1ggrkoekIJNTi+fW/cGS
+	 SJpPDQ2WOXZQwUrLeAia9CsGSQW1AjPjrb6Q5R6hJ1gujm7EteVVQzaeedetIM3jdx
+	 3xxQis3riBr6+R2kTADEeXAsBA7lewPP8EAHAEg3g4Ono+D9dbGgpbYGAaR+37VhgR
+	 ZR6jqzDXReYg3cqVFmpmf6MIsQzUUnFN4wggJeBxJHDo5d3N/disihdWZ/K6ZxnE9g
+	 ZcpajpyxaZr9kilkPrnNNINqubQMErLDjlYI0RxwgMciiC5e8iYUbcODsg6wPCntRY
+	 wunFLDNXQSYlA==
+Date: Sun, 17 Sep 2023 11:03:56 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Rohan G Thomas <rohan.g.thomas@intel.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	fancer.lancer@gmail.com, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v7 1/2] dt-bindings: net: snps,dwmac: Tx coe
+ unsupported
+Message-ID: <20230917-figurine-overlying-f5a0935af5ea@spud>
+References: <20230916063312.7011-1-rohan.g.thomas@intel.com>
+ <20230916063312.7011-2-rohan.g.thomas@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="sfl5dMioS+61NyiC"
+Content-Disposition: inline
+In-Reply-To: <20230916063312.7011-2-rohan.g.thomas@intel.com>
+
+
+--sfl5dMioS+61NyiC
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <da27f7333fa31808ceae581d9bef5030c6072f33.1694701767.git.lorenzo@kernel.org>
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 14, 2023 at 04:38:18PM +0200, Lorenzo Bianconi wrote:
-> From: Sujuan Chen <sujuan.chen@mediatek.com>
-> 
-> MT7988 SoC support 802.11 receive reordering offload in hw while
-> MT7986 SoC implements it through the firmware running on the mcu.
-> 
-> Co-developed-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> Signed-off-by: Sujuan Chen <sujuan.chen@mediatek.com>
+On Sat, Sep 16, 2023 at 02:33:11PM +0800, Rohan G Thomas wrote:
+> Add dt-bindings for coe-unsupported property per tx queue. Some DWMAC
+> IPs support tx checksum offloading(coe) only for a few tx queues.
+>=20
+> DW xGMAC IP can be synthesized such that it can support tx coe only
+> for a few initial tx queues. Also as Serge pointed out, for the DW
+> QoS IP tx coe can be individually configured for each tx queue. This
+> property is added to have sw fallback for checksum calculation if a
+> tx queue doesn't support tx coe.
+>=20
+> Signed-off-by: Rohan G Thomas <rohan.g.thomas@intel.com>
 
-...
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
 
-Hi Lorenzo,
+Thanks,
+Conor.
 
-some minor feedback from my side.
+> ---
+>  Documentation/devicetree/bindings/net/snps,dwmac.yaml | 5 +++++
+>  1 file changed, 5 insertions(+)
+>=20
+> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Docu=
+mentation/devicetree/bindings/net/snps,dwmac.yaml
+> index ddf9522a5dc2..5c2769dc689a 100644
+> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> @@ -394,6 +394,11 @@ properties:
+>                When a PFC frame is received with priorities matching the =
+bitmask,
+>                the queue is blocked from transmitting for the pause time =
+specified
+>                in the PFC frame.
+> +
+> +          snps,coe-unsupported:
+> +            type: boolean
+> +            description: TX checksum offload is unsupported by the TX qu=
+eue.
+> +
+>          allOf:
+>            - if:
+>                required:
+> --=20
+> 2.25.1
+>=20
 
-> @@ -565,6 +565,73 @@ mtk_wed_free_tx_buffer(struct mtk_wed_device *dev)
->  	kfree(page_list);
->  }
->  
-> +static int
-> +mtk_wed_hwrro_buffer_alloc(struct mtk_wed_device *dev)
-> +{
-> +	int n_pages = MTK_WED_RX_PG_BM_CNT / MTK_WED_RX_BUF_PER_PAGE;
-> +	struct mtk_wed_buf *page_list;
-> +	struct mtk_wed_bm_desc *desc;
-> +	dma_addr_t desc_phys;
-> +	int i, page_idx = 0;
-> +
-> +	if (!dev->wlan.hw_rro)
-> +		return 0;
-> +
-> +	page_list = kcalloc(n_pages, sizeof(*page_list), GFP_KERNEL);
-> +	if (!page_list)
-> +		return -ENOMEM;
-> +
-> +	dev->hw_rro.size = dev->wlan.rx_nbuf & ~(MTK_WED_BUF_PER_PAGE - 1);
-> +	dev->hw_rro.pages = page_list;
-> +	desc = dma_alloc_coherent(dev->hw->dev,
-> +				  dev->wlan.rx_nbuf * sizeof(*desc),
-> +				  &desc_phys, GFP_KERNEL);
-> +	if (!desc)
-> +		return -ENOMEM;
-> +
-> +	dev->hw_rro.desc = desc;
-> +	dev->hw_rro.desc_phys = desc_phys;
-> +
-> +	for (i = 0; i < MTK_WED_RX_PG_BM_CNT; i += MTK_WED_RX_BUF_PER_PAGE) {
-> +		dma_addr_t page_phys, buf_phys;
-> +		struct page *page;
-> +		void *buf;
-> +		int s;
-> +
-> +		page = __dev_alloc_page(GFP_KERNEL);
-> +		if (!page)
-> +			return -ENOMEM;
-> +
-> +		page_phys = dma_map_page(dev->hw->dev, page, 0, PAGE_SIZE,
-> +					 DMA_BIDIRECTIONAL);
-> +		if (dma_mapping_error(dev->hw->dev, page_phys)) {
-> +			__free_page(page);
-> +			return -ENOMEM;
-> +		}
-> +
-> +		page_list[page_idx].p = page;
-> +		page_list[page_idx++].phy_addr = page_phys;
-> +		dma_sync_single_for_cpu(dev->hw->dev, page_phys, PAGE_SIZE,
-> +					DMA_BIDIRECTIONAL);
-> +
-> +		buf = page_to_virt(page);
-> +		buf_phys = page_phys;
-> +
-> +		for (s = 0; s < MTK_WED_RX_BUF_PER_PAGE; s++) {
-> +			desc->buf0 = cpu_to_le32(buf_phys);
-> +			desc++;
-> +
-> +			buf += MTK_WED_PAGE_BUF_SIZE;
+--sfl5dMioS+61NyiC
+Content-Type: application/pgp-signature; name="signature.asc"
 
-clang-16 W=1 warns that buf is set but otherwise unused in this function.
+-----BEGIN PGP SIGNATURE-----
 
-> +			buf_phys += MTK_WED_PAGE_BUF_SIZE;
-> +		}
-> +
-> +		dma_sync_single_for_device(dev->hw->dev, page_phys, PAGE_SIZE,
-> +					   DMA_BIDIRECTIONAL);
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static int
->  mtk_wed_rx_buffer_alloc(struct mtk_wed_device *dev)
->  {
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZQbPCwAKCRB4tDGHoIJi
+0jpOAP0Rec+DYUN9Tx+3DSmk0L8jcQbqesqX7hzjoxzMCmsBwAD+LoOp6/jRtBiP
+ZD5abXvbAPNK63Z3f0NgpMoHlrqdKQY=
+=Te+k
+-----END PGP SIGNATURE-----
 
-...
+--sfl5dMioS+61NyiC--
 
