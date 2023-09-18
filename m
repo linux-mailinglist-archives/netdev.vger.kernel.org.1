@@ -1,84 +1,82 @@
-Return-Path: <netdev+bounces-34380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C5247A3F8E
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 05:04:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C40FD7A3F9C
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 05:11:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DA521C20902
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 03:04:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 779652814A9
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 03:11:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1157D1389;
-	Mon, 18 Sep 2023 03:04:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6486215C0;
+	Mon, 18 Sep 2023 03:11:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A294136C
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 03:04:46 +0000 (UTC)
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48112123
-	for <netdev@vger.kernel.org>; Sun, 17 Sep 2023 20:04:44 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-9a9d82d73f9so490468066b.3
-        for <netdev@vger.kernel.org>; Sun, 17 Sep 2023 20:04:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DEEB15A8
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 03:11:28 +0000 (UTC)
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3A52ED
+	for <netdev@vger.kernel.org>; Sun, 17 Sep 2023 20:11:24 -0700 (PDT)
+Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-530196c780dso4474678a12.1
+        for <netdev@vger.kernel.org>; Sun, 17 Sep 2023 20:11:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695006283; x=1695611083; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1695006683; x=1695611483; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CtmlNlNGdtcbUqyAkol7IL8wZ3jbuVMuO8O21MgKuds=;
-        b=XtnvYMkdepe++ZxL4l8UJ1QIYts0ytOCYUezZawZaAyi5OoWoyFjh7/do+uLXS9+xL
-         3eQMcxvWW+48xU6f0tz8mP7VPwngqv9JccInGmqt52VL7//u4zXDlL/v0xFqHQHiHgIO
-         C5ra5kQM5qEp+TaN/Qov2SKiid9nxQOtDoJgw49DShVxc9l8zsYewLK+TKQYiJjKZKEM
-         HdXdQy3V/00mH2cr8+KDVgGr/u2ryu3bJfpwIScizLX1yQ09/3qPByXsq0Ty7l9A25M7
-         menxbaaCLlnhVVaC952+1j5TZ/xcCIFoeUl0WWS5zxmV2ocEmQAA2Fmyv+4aIvlclZf9
-         AO9g==
+        bh=u9xXA4/MiyXBdOAxpoDrdHfzl9KflbCD7w+4HXa2PiI=;
+        b=qc0QBM5xfN2M39+6C7/e1McM4AANIyR0uGrqWGgZk7SJlOJOTvB8FUzu1O/pYw07lx
+         EozHQWbKLvnTzN8Q188Cz6TfMBhahU7jZl896CHbcW2d6b51HLvT3v9Z68Opcp3+rL8N
+         EV9J5E2KqHmHPnAXTXx8agPIg7O7ALBJTrqwQ5+2vpGy3tAbUgVF388VLGNrdxsSTGll
+         M7MPh8LMyUxvv2C/KMZc0GUDwUpRH+dPuKVA6QlSgZ+Z2jtBU4BPiJ47uGQowqicw7J/
+         88/eDxDRrEA1ANhhaWTvSi/Dmu1NfPmseE3hlYh5vY2m3HWNOiWoCgJcNmdKUcsf72sx
+         8dEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695006283; x=1695611083;
+        d=1e100.net; s=20230601; t=1695006683; x=1695611483;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CtmlNlNGdtcbUqyAkol7IL8wZ3jbuVMuO8O21MgKuds=;
-        b=QZYNYNC01wUtqe3rpTDVYzApJ7DbVhbWuxonRTsjYyQwVqu0AV0GRMO4H6ZKZIHnZy
-         w0kAGwA/ol6jbj2wro9bTMNrBPscDLoe0k2bdFDX4GmvjzqiEZsYAxJJPpHFglg9O+0H
-         HPZ7DhuBNYNIFXLLgLSrgz/5vxwRT+WEBBnoiUcnlnh9LeCsdMMs08ifjfAaG1/pHDGC
-         gFhlFaUJ6DMJSg/flX4fNAwB7QPrenlAQUs28Qv5S0bHW7BBkWMKgbJOMx41LJZPaLoh
-         bQGwh5BUSuXA0pqllWMX3a5eYboR6leLvQUq3B0s9yfT0bBOUvMTBZtASvJcMa5S9X5M
-         oeLw==
-X-Gm-Message-State: AOJu0Yyf2DMcrXXIJvIcmWWlHyE6yba43zRG8e5LatVncQiVM8s3TRlO
-	PAZx48pUpSze9yAdFcyMK2YhycWGwdCH0nOIX54aVA==
-X-Google-Smtp-Source: AGHT+IEJLqGfYnIBhjSBr9B2Pz/X+4xKw2bIUqgN27XvUjnji+q/CYg6PfkUSTQIK1yR4c4eEqs/hjLXgljD84RAbYg=
-X-Received: by 2002:a17:906:32cf:b0:9a2:86a:f9b7 with SMTP id
- k15-20020a17090632cf00b009a2086af9b7mr5916571ejk.59.1695006282582; Sun, 17
- Sep 2023 20:04:42 -0700 (PDT)
+        bh=u9xXA4/MiyXBdOAxpoDrdHfzl9KflbCD7w+4HXa2PiI=;
+        b=UIvai+3qoIulSFlMlkhfpu8DiZI5WIiGJ7493Z8ahTNfVikBcw4gLoNF0fbqC2RU75
+         Cak8TK2oS3lMuo/1E/E5Ty39UKi5e5gArbmHFqcrSo9W8GnNOAWWZWs3Fidf2aKnoSBf
+         NH/q8iZJSp48L86Dbx8depET61LtHiKJHP1uNteKF1sfsqvqkI5MN2B8Kk8mA3fJX+kR
+         SJnGaClNnG7WwucWXIyEmU7frsdyuFr/AO1eOnVMyix0nyFfVzw1k1nyPZh+haZz2ABv
+         6XlEno5raMmJ0ALGc6ozEc6DnjzZ500ypTDm8PeyHyhQgeB6K4VxZc3glO4e1/XUrujb
+         KavA==
+X-Gm-Message-State: AOJu0YzQAQR60s3IRiRKWT/4wQwrshJbQ7u3lV4tllpW9nvCtxXhOD60
+	nQD/p6eATM3H6rPtquBxHjAoYXBkxt7iWD9trpGo9A==
+X-Google-Smtp-Source: AGHT+IFjL+iiFbHdO3d/W3p7KZsU2LLoHR5YK3d0TmKfIf3DLhhjvOnRUWaiH8iaJFaiCuRgftD2X5YRr7C+37kCFJA=
+X-Received: by 2002:a17:906:23f1:b0:9ad:e18a:734 with SMTP id
+ j17-20020a17090623f100b009ade18a0734mr5302755ejg.26.1695006683148; Sun, 17
+ Sep 2023 20:11:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230918025021.4078252-1-jrife@google.com>
-In-Reply-To: <20230918025021.4078252-1-jrife@google.com>
+References: <20230918025021.4078252-1-jrife@google.com> <20230918025021.4078252-3-jrife@google.com>
+In-Reply-To: <20230918025021.4078252-3-jrife@google.com>
 From: Jordan Rife <jrife@google.com>
-Date: Sun, 17 Sep 2023 20:04:31 -0700
-Message-ID: <CADKFtnR-tkqQn6217X0Losb5ePFbhJ7B7a+hF24rqYkeHUMm1g@mail.gmail.com>
-Subject: Re: [PATCH net v2 1/3] net: replace calls to sock->ops->connect()
- with kernel_connect()
+Date: Sun, 17 Sep 2023 20:11:11 -0700
+Message-ID: <CADKFtnQ4Z3r98n7cGmwW4noXTyKjJcRGH3AqEMfZj7jFq--C8g@mail.gmail.com>
+Subject: Re: [PATCH net v2 3/3] net: prevent address rewrite in kernel_bind()
 To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
 	pabeni@redhat.com, netdev@vger.kernel.org
 Cc: dborkman@kernel.org, willemdebruijn.kernel@gmail.com, 
 	philipp.reisner@linbit.com, lars.ellenberg@linbit.com, 
-	christoph.boehmwalder@linbit.com, axboe@kernel.dk, chengyou@linux.alibaba.com, 
-	kaishen@linux.alibaba.com, jgg@ziepe.ca, leon@kernel.org, bmt@zurich.ibm.com, 
-	ccaulfie@redhat.com, teigland@redhat.com, mark@fasheh.com, jlbec@evilplan.org, 
+	christoph.boehmwalder@linbit.com, axboe@kernel.dk, airlied@redhat.com, 
+	chengyou@linux.alibaba.com, kaishen@linux.alibaba.com, jgg@ziepe.ca, 
+	leon@kernel.org, bmt@zurich.ibm.com, isdn@linux-pingi.de, ccaulfie@redhat.com, 
+	teigland@redhat.com, mark@fasheh.com, jlbec@evilplan.org, 
 	joseph.qi@linux.alibaba.com, sfrench@samba.org, pc@manguebit.com, 
-	lsahlber@redhat.com, sprasad@microsoft.com, tom@talpey.com, ericvh@kernel.org, 
-	lucho@ionkov.net, asmadeus@codewreck.org, linux_oss@crudebyte.com, 
-	idryomov@gmail.com, xiubli@redhat.com, jlayton@kernel.org, horms@verge.net.au, 
-	ja@ssi.bg, pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de, 
-	santosh.shilimkar@oracle.com
+	lsahlber@redhat.com, sprasad@microsoft.com, tom@talpey.com, 
+	horms@verge.net.au, ja@ssi.bg, pablo@netfilter.org, kadlec@netfilter.org, 
+	fw@strlen.de, santosh.shilimkar@oracle.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
@@ -91,264 +89,330 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 CC subsystem maintainers:
 
-- DRBD
-- BLOCK LAYER:
-- INFINIBAND SUBSYSTEM:
-- SOFT-IWARP DRIVER:
-- DISTRIBUTED LOCK MANAGER (DLM):
-- ORACLE CLUSTER FILESYSTEM 2 (OCFS2):
-- COMMON INTERNET FILE SYSTEM CLIENT (CIFS and SMB3):
-- 9P FILE SYSTEM:
-- CEPH COMMON CODE (LIBCEPH):
-- IPVS:
-- NETFILTER:
-- RDS - RELIABLE DATAGRAM SOCKETS:
+- DRBD DRIVER
+- BLOCK LAYER
+- AGPGART DRIVER
+- ALIBABA ELASTIC RDMA DRIVER
+- INFINIBAND SUBSYSTEM
+- SOFT-IWARP DRIVER (siw)
+- ISDN/mISDN SUBSYSTEM
+- DISTRIBUTED LOCK MANAGER (DLM)
+- ORACLE CLUSTER FILESYSTEM 2 (OCFS2)
+- COMMON INTERNET FILE SYSTEM CLIENT (CIFS and SMB3)
+- IPVS
+- NETFILTER
+- RDS - RELIABLE DATAGRAM SOCKETS
 
 On Sun, Sep 17, 2023 at 7:50=E2=80=AFPM Jordan Rife <jrife@google.com> wrot=
 e:
 >
-> commit 0bdf399342c5 ("net: Avoid address overwrite in kernel_connect")
-> ensured that kernel_connect() will not overwrite the address parameter
-> in cases where BPF connect hooks perform an address rewrite. This change
-> replaces all direct calls to sock->ops->connect() with kernel_connect()
-> to make these call safe.
+> Similar to the change in commit 0bdf399342c5("net: Avoid address
+> overwrite in kernel_connect"), BPF hooks run on bind may rewrite the
+> address passed to kernel_bind(). This change
 >
-> This patch also introduces a sanity check to kernel_connect() to ensure
-> that the addr_length does not exceed the size of sockaddr_storage before
-> performing the address copy.
+> 1) Makes a copy of the bind address in kernel_bind() to insulate
+>    callers.
+> 2) Replaces direct calls to sock->ops->bind() with kernel_bind()
 >
 > Link: https://lore.kernel.org/netdev/20230912013332.2048422-1-jrife@googl=
 e.com/
 >
 > Signed-off-by: Jordan Rife <jrife@google.com>
 > ---
-> v1->v2: Split up original patch into patch series. Insulate calls with
->         kernel_connect() instead of pushing address copy deeper into
->         sock->ops->connect().
+> v1->v2: Split up original patch into patch series. Insulate
+>         sock->ops->bind() calls with kernel_bind().
 >
->  drivers/block/drbd/drbd_receiver.c     |  2 +-
->  drivers/infiniband/hw/erdma/erdma_cm.c |  2 +-
->  drivers/infiniband/sw/siw/siw_cm.c     |  2 +-
->  fs/dlm/lowcomms.c                      |  6 +++---
->  fs/ocfs2/cluster/tcp.c                 |  8 ++++----
->  fs/smb/client/connect.c                |  4 ++--
->  net/9p/trans_fd.c                      | 10 +++++-----
->  net/ceph/messenger.c                   |  4 ++--
+>  drivers/block/drbd/drbd_receiver.c     |  4 ++--
+>  drivers/char/agp/alpha-agp.c           |  2 +-
+>  drivers/infiniband/hw/erdma/erdma_cm.c |  6 +++---
+>  drivers/infiniband/sw/siw/siw_cm.c     | 10 +++++-----
+>  drivers/isdn/mISDN/l1oip_core.c        |  4 ++--
+>  fs/dlm/lowcomms.c                      |  7 +++----
+>  fs/ocfs2/cluster/tcp.c                 |  6 +++---
+>  fs/smb/client/connect.c                |  6 +++---
 >  net/netfilter/ipvs/ip_vs_sync.c        |  4 ++--
 >  net/rds/tcp_connect.c                  |  2 +-
->  net/socket.c                           |  3 +++
->  11 files changed, 25 insertions(+), 22 deletions(-)
+>  net/rds/tcp_listen.c                   |  2 +-
+>  net/socket.c                           |  7 +++++++
+>  12 files changed, 33 insertions(+), 27 deletions(-)
 >
 > diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd=
 _receiver.c
-> index 0c9f54197768d..9b2660e990a98 100644
+> index 9b2660e990a98..752759ed22b8c 100644
 > --- a/drivers/block/drbd/drbd_receiver.c
 > +++ b/drivers/block/drbd/drbd_receiver.c
-> @@ -646,7 +646,7 @@ static struct socket *drbd_try_connect(struct drbd_co=
+> @@ -638,7 +638,7 @@ static struct socket *drbd_try_connect(struct drbd_co=
 nnection *connection)
->          * stay C_WF_CONNECTION, don't go Disconnecting! */
->         disconnect_on_error =3D 0;
->         what =3D "connect";
-> -       err =3D sock->ops->connect(sock, (struct sockaddr *) &peer_in6, p=
-eer_addr_len, 0);
-> +       err =3D kernel_connect(sock, (struct sockaddr *)&peer_in6, peer_a=
-ddr_len, 0);
+>         *  a free one dynamically.
+>         */
+>         what =3D "bind before connect";
+> -       err =3D sock->ops->bind(sock, (struct sockaddr *) &src_in6, my_ad=
+dr_len);
+> +       err =3D kernel_bind(sock, (struct sockaddr *)&src_in6, my_addr_le=
+n);
+>         if (err < 0)
+>                 goto out;
 >
->  out:
->         if (err < 0) {
+> @@ -725,7 +725,7 @@ static int prepare_listen_socket(struct drbd_connecti=
+on *connection, struct acce
+>         drbd_setbufsize(s_listen, sndbuf_size, rcvbuf_size);
+>
+>         what =3D "bind before listen";
+> -       err =3D s_listen->ops->bind(s_listen, (struct sockaddr *)&my_addr=
+, my_addr_len);
+> +       err =3D kernel_bind(s_listen, (struct sockaddr *)&my_addr, my_add=
+r_len);
+>         if (err < 0)
+>                 goto out;
+>
+> diff --git a/drivers/char/agp/alpha-agp.c b/drivers/char/agp/alpha-agp.c
+> index c9bf2c2198418..f251fedfb4840 100644
+> --- a/drivers/char/agp/alpha-agp.c
+> +++ b/drivers/char/agp/alpha-agp.c
+> @@ -96,7 +96,7 @@ static int alpha_core_agp_insert_memory(struct agp_memo=
+ry *mem, off_t pg_start,
+>         if ((pg_start + mem->page_count) > num_entries)
+>                 return -EINVAL;
+>
+> -       status =3D agp->ops->bind(agp, pg_start, mem);
+> +       status =3D kernel_bind(agp, pg_start, mem);
+>         mb();
+>         alpha_core_agp_tlbflush(mem);
+>
 > diff --git a/drivers/infiniband/hw/erdma/erdma_cm.c b/drivers/infiniband/=
 hw/erdma/erdma_cm.c
-> index 771059a8eb7d7..e2b89e7bbe2b8 100644
+> index e2b89e7bbe2b8..674702d159c29 100644
 > --- a/drivers/infiniband/hw/erdma/erdma_cm.c
 > +++ b/drivers/infiniband/hw/erdma/erdma_cm.c
-> @@ -993,7 +993,7 @@ static int kernel_bindconnect(struct socket *s, struc=
+> @@ -990,7 +990,7 @@ static int kernel_bindconnect(struct socket *s, struc=
 t sockaddr *laddr,
->         ret =3D s->ops->bind(s, laddr, laddrlen);
+>         int ret;
+>
+>         sock_set_reuseaddr(s->sk);
+> -       ret =3D s->ops->bind(s, laddr, laddrlen);
+> +       ret =3D kernel_bind(s, laddr, laddrlen);
 >         if (ret)
 >                 return ret;
-> -       ret =3D s->ops->connect(s, raddr, raddrlen, flags);
-> +       ret =3D kernel_connect(s, raddr, raddrlen, flags);
->         return ret < 0 ? ret : 0;
->  }
+>         ret =3D kernel_connect(s, raddr, raddrlen, flags);
+> @@ -1309,8 +1309,8 @@ int erdma_create_listen(struct iw_cm_id *id, int ba=
+cklog)
+>         if (ipv4_is_zeronet(laddr->sin_addr.s_addr))
+>                 s->sk->sk_bound_dev_if =3D dev->netdev->ifindex;
+>
+> -       ret =3D s->ops->bind(s, (struct sockaddr *)laddr,
+> -                          sizeof(struct sockaddr_in));
+> +       ret =3D kernel_bind(s, (struct sockaddr *)laddr,
+> +                         sizeof(struct sockaddr_in));
+>         if (ret)
+>                 goto error;
 >
 > diff --git a/drivers/infiniband/sw/siw/siw_cm.c b/drivers/infiniband/sw/s=
 iw/siw_cm.c
-> index a2605178f4eda..05624f424153e 100644
+> index 05624f424153e..d05e0eeee9244 100644
 > --- a/drivers/infiniband/sw/siw/siw_cm.c
 > +++ b/drivers/infiniband/sw/siw/siw_cm.c
-> @@ -1328,7 +1328,7 @@ static int kernel_bindconnect(struct socket *s, str=
+> @@ -1324,7 +1324,7 @@ static int kernel_bindconnect(struct socket *s, str=
 uct sockaddr *laddr,
+>                         return rv;
+>         }
+>
+> -       rv =3D s->ops->bind(s, laddr, size);
+> +       rv =3D kernel_bind(s, laddr, size);
 >         if (rv < 0)
 >                 return rv;
 >
-> -       rv =3D s->ops->connect(s, raddr, size, flags);
-> +       rv =3D kernel_connect(s, raddr, size, flags);
+> @@ -1793,8 +1793,8 @@ int siw_create_listen(struct iw_cm_id *id, int back=
+log)
+>                 if (ipv4_is_zeronet(laddr->sin_addr.s_addr))
+>                         s->sk->sk_bound_dev_if =3D sdev->netdev->ifindex;
 >
->         return rv < 0 ? rv : 0;
->  }
+> -               rv =3D s->ops->bind(s, (struct sockaddr *)laddr,
+> -                                 sizeof(struct sockaddr_in));
+> +               rv =3D kernel_bind(s, (struct sockaddr *)laddr,
+> +                                sizeof(struct sockaddr_in));
+>         } else {
+>                 struct sockaddr_in6 *laddr =3D &to_sockaddr_in6(id->local=
+_addr);
+>
+> @@ -1811,8 +1811,8 @@ int siw_create_listen(struct iw_cm_id *id, int back=
+log)
+>                 if (ipv6_addr_any(&laddr->sin6_addr))
+>                         s->sk->sk_bound_dev_if =3D sdev->netdev->ifindex;
+>
+> -               rv =3D s->ops->bind(s, (struct sockaddr *)laddr,
+> -                                 sizeof(struct sockaddr_in6));
+> +               rv =3D kernel_bind(s, (struct sockaddr *)laddr,
+> +                                sizeof(struct sockaddr_in6));
+>         }
+>         if (rv) {
+>                 siw_dbg(id->device, "socket bind error: %d\n", rv);
+> diff --git a/drivers/isdn/mISDN/l1oip_core.c b/drivers/isdn/mISDN/l1oip_c=
+ore.c
+> index f010b35a05313..681147e1fc843 100644
+> --- a/drivers/isdn/mISDN/l1oip_core.c
+> +++ b/drivers/isdn/mISDN/l1oip_core.c
+> @@ -675,8 +675,8 @@ l1oip_socket_thread(void *data)
+>         hc->sin_remote.sin_port =3D htons((unsigned short)hc->remoteport)=
+;
+>
+>         /* bind to incoming port */
+> -       if (socket->ops->bind(socket, (struct sockaddr *)&hc->sin_local,
+> -                             sizeof(hc->sin_local))) {
+> +       if (kernel_bind(socket, (struct sockaddr *)&hc->sin_local,
+> +                       sizeof(hc->sin_local))) {
+>                 printk(KERN_ERR "%s: Failed to bind socket to port %d.\n"=
+,
+>                        __func__, hc->localport);
+>                 ret =3D -EINVAL;
 > diff --git a/fs/dlm/lowcomms.c b/fs/dlm/lowcomms.c
-> index f7bc22e74db27..1cf796b97eb65 100644
+> index 1cf796b97eb65..73ab179833fbd 100644
 > --- a/fs/dlm/lowcomms.c
 > +++ b/fs/dlm/lowcomms.c
-> @@ -1818,7 +1818,7 @@ static int dlm_tcp_bind(struct socket *sock)
->  static int dlm_tcp_connect(struct connection *con, struct socket *sock,
->                            struct sockaddr *addr, int addr_len)
->  {
-> -       return sock->ops->connect(sock, addr, addr_len, O_NONBLOCK);
-> +       return kernel_connect(sock, addr, addr_len, O_NONBLOCK);
+> @@ -1805,8 +1805,7 @@ static int dlm_tcp_bind(struct socket *sock)
+>         memcpy(&src_addr, &dlm_local_addr[0], sizeof(src_addr));
+>         make_sockaddr(&src_addr, 0, &addr_len);
+>
+> -       result =3D sock->ops->bind(sock, (struct sockaddr *)&src_addr,
+> -                                addr_len);
+> +       result =3D kernel_bind(sock, (struct sockaddr *)&src_addr, addr_l=
+en);
+>         if (result < 0) {
+>                 /* This *may* not indicate a critical error */
+>                 log_print("could not bind for connect: %d", result);
+> @@ -1850,8 +1849,8 @@ static int dlm_tcp_listen_bind(struct socket *sock)
+>
+>         /* Bind to our port */
+>         make_sockaddr(&dlm_local_addr[0], dlm_config.ci_tcp_port, &addr_l=
+en);
+> -       return sock->ops->bind(sock, (struct sockaddr *)&dlm_local_addr[0=
+],
+> -                              addr_len);
+> +       return kernel_bind(sock, (struct sockaddr *)&dlm_local_addr[0],
+> +                          addr_len);
 >  }
 >
->  static int dlm_tcp_listen_validate(void)
-> @@ -1876,12 +1876,12 @@ static int dlm_sctp_connect(struct connection *co=
-n, struct socket *sock,
->         int ret;
->
->         /*
-> -        * Make sock->ops->connect() function return in specified time,
-> +        * Make kernel_connect() function return in specified time,
->          * since O_NONBLOCK argument in connect() function does not work =
-here,
->          * then, we should restore the default value of this attribute.
->          */
->         sock_set_sndtimeo(sock->sk, 5);
-> -       ret =3D sock->ops->connect(sock, addr, addr_len, 0);
-> +       ret =3D kernel_connect(sock, addr, addr_len, 0);
->         sock_set_sndtimeo(sock->sk, 0);
->         return ret;
->  }
+>  static const struct dlm_proto_ops dlm_tcp_ops =3D {
 > diff --git a/fs/ocfs2/cluster/tcp.c b/fs/ocfs2/cluster/tcp.c
-> index 960080753d3bd..ead7c287ff373 100644
+> index ead7c287ff373..3a4a7a521476d 100644
 > --- a/fs/ocfs2/cluster/tcp.c
 > +++ b/fs/ocfs2/cluster/tcp.c
-> @@ -1636,10 +1636,10 @@ static void o2net_start_connect(struct work_struc=
-t *work)
->         remoteaddr.sin_addr.s_addr =3D node->nd_ipv4_address;
->         remoteaddr.sin_port =3D node->nd_ipv4_port;
+> @@ -1614,8 +1614,8 @@ static void o2net_start_connect(struct work_struct =
+*work)
+>         myaddr.sin_addr.s_addr =3D mynode->nd_ipv4_address;
+>         myaddr.sin_port =3D htons(0); /* any port */
 >
-> -       ret =3D sc->sc_sock->ops->connect(sc->sc_sock,
-> -                                       (struct sockaddr *)&remoteaddr,
-> -                                       sizeof(remoteaddr),
-> -                                       O_NONBLOCK);
-> +       ret =3D kernel_connect(sc->sc_sock,
-> +                            (struct sockaddr *)&remoteaddr,
-> +                            sizeof(remoteaddr),
-> +                            O_NONBLOCK);
->         if (ret =3D=3D -EINPROGRESS)
->                 ret =3D 0;
+> -       ret =3D sock->ops->bind(sock, (struct sockaddr *)&myaddr,
+> -                             sizeof(myaddr));
+> +       ret =3D kernel_bind(sock, (struct sockaddr *)&myaddr,
+> +                         sizeof(myaddr));
+>         if (ret) {
+>                 mlog(ML_ERROR, "bind failed with %d at address %pI4\n",
+>                      ret, &mynode->nd_ipv4_address);
+> @@ -1998,7 +1998,7 @@ static int o2net_open_listening_sock(__be32 addr, _=
+_be16 port)
+>         INIT_WORK(&o2net_listen_work, o2net_accept_many);
 >
+>         sock->sk->sk_reuse =3D SK_CAN_REUSE;
+> -       ret =3D sock->ops->bind(sock, (struct sockaddr *)&sin, sizeof(sin=
+));
+> +       ret =3D kernel_bind(sock, (struct sockaddr *)&sin, sizeof(sin));
+>         if (ret < 0) {
+>                 printk(KERN_ERR "o2net: Error %d while binding socket at =
+"
+>                        "%pI4:%u\n", ret, &addr, ntohs(port));
 > diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-> index 687754791bf0a..b7764cd57e035 100644
+> index b7764cd57e035..6dcc1cd41b8c5 100644
 > --- a/fs/smb/client/connect.c
 > +++ b/fs/smb/client/connect.c
-> @@ -3042,8 +3042,8 @@ generic_ip_connect(struct TCP_Server_Info *server)
->                  socket->sk->sk_sndbuf,
->                  socket->sk->sk_rcvbuf, socket->sk->sk_rcvtimeo);
->
-> -       rc =3D socket->ops->connect(socket, saddr, slen,
-> -                                 server->noblockcnt ? O_NONBLOCK : 0);
-> +       rc =3D kernel_connect(socket, saddr, slen,
-> +                           server->noblockcnt ? O_NONBLOCK : 0);
->         /*
->          * When mounting SMB root file systems, we do not want to block i=
-n
->          * connect. Otherwise bail out and then let cifs_reconnect() perf=
-orm
-> diff --git a/net/9p/trans_fd.c b/net/9p/trans_fd.c
-> index c4015f30f9fa7..225ee8b6d4c5b 100644
-> --- a/net/9p/trans_fd.c
-> +++ b/net/9p/trans_fd.c
-> @@ -1019,9 +1019,9 @@ p9_fd_create_tcp(struct p9_client *client, const ch=
-ar *addr, char *args)
->                 }
->         }
->
-> -       err =3D READ_ONCE(csocket->ops)->connect(csocket,
-> -                                   (struct sockaddr *)&sin_server,
-> -                                   sizeof(struct sockaddr_in), 0);
-> +       err =3D kernel_connect(csocket,
-> +                            (struct sockaddr *)&sin_server,
-> +                            sizeof(struct sockaddr_in), 0);
->         if (err < 0) {
->                 pr_err("%s (%d): problem connecting socket to %s\n",
->                        __func__, task_pid_nr(current), addr);
-> @@ -1060,8 +1060,8 @@ p9_fd_create_unix(struct p9_client *client, const c=
-har *addr, char *args)
->
->                 return err;
->         }
-> -       err =3D READ_ONCE(csocket->ops)->connect(csocket, (struct sockadd=
-r *)&sun_server,
-> -                       sizeof(struct sockaddr_un) - 1, 0);
-> +       err =3D kernel_connect(csocket, (struct sockaddr *)&sun_server,
-> +                            sizeof(struct sockaddr_un) - 1, 0);
->         if (err < 0) {
->                 pr_err("%s (%d): problem connecting socket: %s: %d\n",
->                        __func__, task_pid_nr(current), addr, err);
-> diff --git a/net/ceph/messenger.c b/net/ceph/messenger.c
-> index 10a41cd9c5235..3c8b78d9c4d1c 100644
-> --- a/net/ceph/messenger.c
-> +++ b/net/ceph/messenger.c
-> @@ -459,8 +459,8 @@ int ceph_tcp_connect(struct ceph_connection *con)
->         set_sock_callbacks(sock, con);
->
->         con_sock_state_connecting(con);
-> -       ret =3D sock->ops->connect(sock, (struct sockaddr *)&ss, sizeof(s=
-s),
-> -                                O_NONBLOCK);
-> +       ret =3D kernel_connect(sock, (struct sockaddr *)&ss, sizeof(ss),
-> +                            O_NONBLOCK);
->         if (ret =3D=3D -EINPROGRESS) {
->                 dout("connect %s EINPROGRESS sk_state =3D %u\n",
->                      ceph_pr_addr(&con->peer_addr),
+> @@ -2891,9 +2891,9 @@ bind_socket(struct TCP_Server_Info *server)
+>         if (server->srcaddr.ss_family !=3D AF_UNSPEC) {
+>                 /* Bind to the specified local IP address */
+>                 struct socket *socket =3D server->ssocket;
+> -               rc =3D socket->ops->bind(socket,
+> -                                      (struct sockaddr *) &server->srcad=
+dr,
+> -                                      sizeof(server->srcaddr));
+> +               rc =3D kernel_bind(socket,
+> +                                (struct sockaddr *)&server->srcaddr,
+> +                                sizeof(server->srcaddr));
+>                 if (rc < 0) {
+>                         struct sockaddr_in *saddr4;
+>                         struct sockaddr_in6 *saddr6;
 > diff --git a/net/netfilter/ipvs/ip_vs_sync.c b/net/netfilter/ipvs/ip_vs_s=
 ync.c
-> index da5af28ff57b5..6e4ed1e11a3b7 100644
+> index 6e4ed1e11a3b7..4174076c66fa7 100644
 > --- a/net/netfilter/ipvs/ip_vs_sync.c
 > +++ b/net/netfilter/ipvs/ip_vs_sync.c
-> @@ -1505,8 +1505,8 @@ static int make_send_sock(struct netns_ipvs *ipvs, =
-int id,
->         }
+> @@ -1439,7 +1439,7 @@ static int bind_mcastif_addr(struct socket *sock, s=
+truct net_device *dev)
+>         sin.sin_addr.s_addr  =3D addr;
+>         sin.sin_port         =3D 0;
 >
->         get_mcast_sockaddr(&mcast_addr, &salen, &ipvs->mcfg, id);
-> -       result =3D sock->ops->connect(sock, (struct sockaddr *) &mcast_ad=
-dr,
-> -                                   salen, 0);
-> +       result =3D kernel_connect(sock, (struct sockaddr *)&mcast_addr,
-> +                               salen, 0);
+> -       return sock->ops->bind(sock, (struct sockaddr*)&sin, sizeof(sin))=
+;
+> +       return kernel_bind(sock, (struct sockaddr *)&sin, sizeof(sin));
+>  }
+>
+>  static void get_mcast_sockaddr(union ipvs_sockaddr *sa, int *salen,
+> @@ -1546,7 +1546,7 @@ static int make_receive_sock(struct netns_ipvs *ipv=
+s, int id,
+>
+>         get_mcast_sockaddr(&mcast_addr, &salen, &ipvs->bcfg, id);
+>         sock->sk->sk_bound_dev_if =3D dev->ifindex;
+> -       result =3D sock->ops->bind(sock, (struct sockaddr *)&mcast_addr, =
+salen);
+> +       result =3D kernel_bind(sock, (struct sockaddr *)&mcast_addr, sale=
+n);
 >         if (result < 0) {
->                 pr_err("Error connecting to the multicast addr\n");
+>                 pr_err("Error binding to the multicast addr\n");
 >                 goto error;
 > diff --git a/net/rds/tcp_connect.c b/net/rds/tcp_connect.c
-> index f0c477c5d1db4..d788c6d28986f 100644
+> index d788c6d28986f..a0046e99d6df7 100644
 > --- a/net/rds/tcp_connect.c
 > +++ b/net/rds/tcp_connect.c
-> @@ -173,7 +173,7 @@ int rds_tcp_conn_path_connect(struct rds_conn_path *c=
+> @@ -145,7 +145,7 @@ int rds_tcp_conn_path_connect(struct rds_conn_path *c=
 p)
->          * own the socket
->          */
->         rds_tcp_set_callbacks(sock, cp);
-> -       ret =3D sock->ops->connect(sock, addr, addrlen, O_NONBLOCK);
-> +       ret =3D kernel_connect(sock, addr, addrlen, O_NONBLOCK);
+>                 addrlen =3D sizeof(sin);
+>         }
 >
->         rdsdebug("connect to address %pI6c returned %d\n", &conn->c_faddr=
-, ret);
->         if (ret =3D=3D -EINPROGRESS)
+> -       ret =3D sock->ops->bind(sock, addr, addrlen);
+> +       ret =3D kernel_bind(sock, addr, addrlen);
+>         if (ret) {
+>                 rdsdebug("bind failed with %d at address %pI6c\n",
+>                          ret, &conn->c_laddr);
+> diff --git a/net/rds/tcp_listen.c b/net/rds/tcp_listen.c
+> index 014fa24418c12..53b3535a1e4a8 100644
+> --- a/net/rds/tcp_listen.c
+> +++ b/net/rds/tcp_listen.c
+> @@ -306,7 +306,7 @@ struct socket *rds_tcp_listen_init(struct net *net, b=
+ool isv6)
+>                 addr_len =3D sizeof(*sin);
+>         }
+>
+> -       ret =3D sock->ops->bind(sock, (struct sockaddr *)&ss, addr_len);
+> +       ret =3D kernel_bind(sock, (struct sockaddr *)&ss, addr_len);
+>         if (ret < 0) {
+>                 rdsdebug("could not bind %s listener socket: %d\n",
+>                          isv6 ? "IPv6" : "IPv4", ret);
 > diff --git a/net/socket.c b/net/socket.c
-> index c8b08b32f097e..b2e3700d035a6 100644
+> index b0189b773d130..426e2c72bb3c6 100644
 > --- a/net/socket.c
 > +++ b/net/socket.c
-> @@ -3572,6 +3572,9 @@ int kernel_connect(struct socket *sock, struct sock=
-addr *addr, int addrlen,
->  {
->         struct sockaddr_storage address;
+> @@ -3519,6 +3519,13 @@ static long compat_sock_ioctl(struct file *file, u=
+nsigned int cmd,
 >
+>  int kernel_bind(struct socket *sock, struct sockaddr *addr, int addrlen)
+>  {
+> +       struct sockaddr_storage address;
+> +
 > +       if (addrlen > sizeof(address))
 > +               return -EINVAL;
 > +
->         memcpy(&address, addr, addrlen);
->
->         return READ_ONCE(sock->ops)->connect(sock, (struct sockaddr *)&ad=
-dress,
+> +       memcpy(&address, addr, addrlen);
+> +
+>         return READ_ONCE(sock->ops)->bind(sock, addr, addrlen);
+>  }
+>  EXPORT_SYMBOL(kernel_bind);
 > --
 > 2.42.0.459.ge4e396fd5e-goog
 >
