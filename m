@@ -1,53 +1,50 @@
-Return-Path: <netdev+bounces-34765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34749-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2932C7A5461
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 22:50:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43AB87A5446
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 22:44:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58AFE1C20ADC
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 20:50:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1BAF281592
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 20:44:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD6962AB3C;
-	Mon, 18 Sep 2023 20:42:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DAB6450EF;
+	Mon, 18 Sep 2023 20:42:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F37F28DD2
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:42:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 363F214010
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:42:46 +0000 (UTC)
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EACBC115
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:42:53 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23BA210F
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:42:44 -0700 (PDT)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiL4l-0006iX-Gl; Mon, 18 Sep 2023 22:42:35 +0200
+	id 1qiL4m-0006iY-HJ; Mon, 18 Sep 2023 22:42:36 +0200
 Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiL4k-007Ihd-W1; Mon, 18 Sep 2023 22:42:35 +0200
+	id 1qiL4l-007Ihg-5c; Mon, 18 Sep 2023 22:42:35 +0200
 Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiL4k-002mnK-MP; Mon, 18 Sep 2023 22:42:34 +0200
+	id 1qiL4k-002mnO-SA; Mon, 18 Sep 2023 22:42:34 +0200
 From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>
-Cc: =?utf-8?q?Andreas_F=C3=A4rber?= <afaerber@suse.de>,
-	Manivannan Sadhasivam <mani@kernel.org>,
+Cc: Andreas Larsson <andreas@gaisler.com>,
 	netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-actions@lists.infradead.org,
 	kernel@pengutronix.de
-Subject: [PATCH net-next 02/54] net: ethernet: actions: Convert to platform remove callback returning void
-Date: Mon, 18 Sep 2023 22:41:34 +0200
-Message-Id: <20230918204227.1316886-3-u.kleine-koenig@pengutronix.de>
+Subject: [PATCH net-next 03/54] net: ethernet: aeroflex: Convert to platform remove callback returning void
+Date: Mon, 18 Sep 2023 22:41:35 +0200
+Message-Id: <20230918204227.1316886-4-u.kleine-koenig@pengutronix.de>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230918204227.1316886-1-u.kleine-koenig@pengutronix.de>
 References: <20230918204227.1316886-1-u.kleine-koenig@pengutronix.de>
@@ -58,7 +55,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1828; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=3znPGO0RfhmqxvbD5NBa8OBHygHhK6zJDWDu6v82RRk=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlCLXnzHMlghjXgVX+n61lj/vguwKhwtooq1Qx1 84sODSdPmGJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZQi15wAKCRCPgPtYfRL+ TsMfB/95n6LKlwOClbQPZf9t8bzQnOuCHDXKPp7gjzdx8eIYr2AKwZbqNnLlf47umJ7RCctm16N fjh0EssoFemRBo8j0PYJgrAgz67tSU8rUCCnprZ3+WhCM2knal8PSOFqmDsK59CZ1NgvayqDk+I iUgwvLtse7hhPfT+sB0De07BNePYCJmmRZ9fODy4CoPfMMs91aTFMIubi4uxWb7IupvMwh+l7/g t/qFbE4g5vNJGntQKRsKGECLtmp5CFLbuXRJVtIvPAvEyNFQpk/8Ll0F8H2ugPMS+q1Uqy1ibh6 ZEe29GIe4Z0Pb1I8Y+8slQPqOerJL8WVxlWYb3i8zmKaM7Z2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1955; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=8WXkMNqzG0/9SRJt3MEZXSg9KAXLUFS2ZsUc2zryNWE=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlCLXoNqLutMPWbLoSKz3gaWNRAN3R+n9Up6MSc yTMrIoGq+OJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZQi16AAKCRCPgPtYfRL+ TpyWB/wN7O3O6jddQ4jR8XUEjVfiwqrO3gYdEt2I5ki2LQ5zm0ImFfaPh+wsxSFnUJt11xya9ry BemQlKUWwZ/VULOmDKAH+jvoa541FcmDs2eghy5fyBuoYCE7hsojMSG6TiFn8OKk/OYiBj34Zxa AkgeH44y/d8yWf/tYcUj6RWHTK5koHNLXziw8/UQ9scpp5QsaYh4n4ye3nl5O0S2TP7OlT9N2Y9 cZGEwLxHJCrm7/KeVieRdDTlUwBOrnGej2KQmeW57JK6QeygxxgKgaYL7orNuJ7ua2PLFhvAZf5 Zau+Xw1qcBrUzdUAFeOuxIv8koM86St9pdAVn1cg+1AympDi
 X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
@@ -84,39 +81,40 @@ callback to the void returning variant.
 
 Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 ---
- drivers/net/ethernet/actions/owl-emac.c | 6 ++----
+ drivers/net/ethernet/aeroflex/greth.c | 6 ++----
  1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/actions/owl-emac.c b/drivers/net/ethernet/actions/owl-emac.c
-index c6f8f852bff1..e03193da5874 100644
---- a/drivers/net/ethernet/actions/owl-emac.c
-+++ b/drivers/net/ethernet/actions/owl-emac.c
-@@ -1582,15 +1582,13 @@ static int owl_emac_probe(struct platform_device *pdev)
- 	return 0;
+diff --git a/drivers/net/ethernet/aeroflex/greth.c b/drivers/net/ethernet/aeroflex/greth.c
+index 597a02c75d52..27af7746d645 100644
+--- a/drivers/net/ethernet/aeroflex/greth.c
++++ b/drivers/net/ethernet/aeroflex/greth.c
+@@ -1525,7 +1525,7 @@ static int greth_of_probe(struct platform_device *ofdev)
+ 	return err;
  }
  
--static int owl_emac_remove(struct platform_device *pdev)
-+static void owl_emac_remove(struct platform_device *pdev)
+-static int greth_of_remove(struct platform_device *of_dev)
++static void greth_of_remove(struct platform_device *of_dev)
  {
- 	struct owl_emac_priv *priv = platform_get_drvdata(pdev);
+ 	struct net_device *ndev = platform_get_drvdata(of_dev);
+ 	struct greth_private *greth = netdev_priv(ndev);
+@@ -1544,8 +1544,6 @@ static int greth_of_remove(struct platform_device *of_dev)
+ 	of_iounmap(&of_dev->resource[0], greth->regs, resource_size(&of_dev->resource[0]));
  
- 	netif_napi_del(&priv->napi);
- 	phy_disconnect(priv->netdev->phydev);
- 	cancel_work_sync(&priv->mac_reset_task);
+ 	free_netdev(ndev);
 -
 -	return 0;
  }
  
- static const struct of_device_id owl_emac_of_match[] = {
-@@ -1609,7 +1607,7 @@ static struct platform_driver owl_emac_driver = {
- 		.pm = &owl_emac_pm_ops,
+ static const struct of_device_id greth_of_match[] = {
+@@ -1566,7 +1564,7 @@ static struct platform_driver greth_of_driver = {
+ 		.of_match_table = greth_of_match,
  	},
- 	.probe = owl_emac_probe,
--	.remove = owl_emac_remove,
-+	.remove_new = owl_emac_remove,
+ 	.probe = greth_of_probe,
+-	.remove = greth_of_remove,
++	.remove_new = greth_of_remove,
  };
- module_platform_driver(owl_emac_driver);
  
+ module_platform_driver(greth_of_driver);
 -- 
 2.40.1
 
