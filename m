@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-34538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D215C7A4871
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 13:31:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 421EF7A4863
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 13:29:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84601282782
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 11:31:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A7981C211AD
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 11:29:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E7321C69D;
-	Mon, 18 Sep 2023 11:31:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 930F01C690;
+	Mon, 18 Sep 2023 11:29:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C94A38F88;
-	Mon, 18 Sep 2023 11:31:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60F4938F87;
+	Mon, 18 Sep 2023 11:28:58 +0000 (UTC)
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A3EB10EF;
-	Mon, 18 Sep 2023 04:29:59 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A72B22D72;
+	Mon, 18 Sep 2023 04:23:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1695036599; x=1726572599;
+  t=1695036236; x=1726572236;
   h=from:to:cc:subject:date:message-id:references:
    in-reply-to:content-id:content-transfer-encoding:
    mime-version;
   bh=bH/Ubu5mp1udw7rUikXMhI11vrANTJHbYk+wTKyzDQE=;
-  b=S5kYct0sk8TMuW60bMXNU7ZrqPNT7Euyb14ltndBQBievEPYl179bOcB
-   eMynOD17KfUxd7pioOFb+Dv0uAAvVS3F6My6KKSGi+Xpc3PX3diVzMY+S
-   xTLHn5YZCI6Yk58079ZcKt6Gb/8i2IZ2czOqgX/nNgV51+TmbtF4k69vK
-   4FFD5SO5up2V1Z7RbA+TvS83FG4NgyYtPN2qM9mwm1SW3yabRfNnunILM
-   DtlEO4sYL/Pe0jGOa8CVoI+0Uxe+sOISyqY23V1mbohqQgUp4ZdCyzi4Y
-   g3FSSmkHIF02EsCPmwjNwOhG0fLNR0D2moiZC2hMdXs+vXb00LzSOYuwM
-   w==;
+  b=fCVuSmpAjgtJ50nY55Avhye3Y3REBpF5y0iw8OZg+o34ODvwxmHLgV/C
+   LTDwFTf6JupZo5L5bq5K8G5r/5HGOtjqRkPNWn4sbRfEUN+FPniAHZLee
+   TvCEXD2JvtLfDTZGsxjSBeY4Xaxc3g94JUBg+azYCxO3i97kJbT2raK7L
+   BOBVMAHNJqsKCKOvtUZFMvcVgN1U+7a/zdIVn86fWC3Hn+lmjgSFWIjZf
+   AzA+/+BzZf5mGZBdc55JdJLNX1VwsWqV5uGH8b6Igc+YhInqD+tnnOwzM
+   Np/ryIVL+MiEgYk9wqgF3SBBPQA/VYRUvjeYxKmCiph6zUGLzIDCZIqPP
+   Q==;
 X-CSE-ConnectionGUID: AX5F2GGaS4mN+FgnJvrkWg==
 X-CSE-MsgGUID: BVZBTsCDR3KFSMSkgtGhXg==
 X-ThreatScanner-Verdict: Negative
@@ -170,13 +170,6 @@ X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
 X-MS-Exchange-CrossTenant-userprincipalname: htLmr7sw5L9K/rchL9oLi8TnDzFhbib+UgGctYTDvH1ZE7u+EXsrhyyzTu4lEIZqLYN7YX9gZtMMgQwqqeI3qG7E4tvrJSoykKvYGfV0PiSgnLindRJd83G7hyTRJ6hJ
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7026
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_NONE autolearn=unavailable autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
 SGkgQW5kcmV3LA0KDQpPbiAxNC8wOS8yMyA3OjI1IGFtLCBBbmRyZXcgTHVubiB3cm90ZToNCj4g
 RVhURVJOQUwgRU1BSUw6IERvIG5vdCBjbGljayBsaW5rcyBvciBvcGVuIGF0dGFjaG1lbnRzIHVu
