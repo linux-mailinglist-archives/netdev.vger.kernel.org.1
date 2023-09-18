@@ -1,52 +1,56 @@
-Return-Path: <netdev+bounces-34778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FA3C7A5483
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 22:54:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85A057A54B9
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 23:02:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E4F61C209BF
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 20:54:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73E941C212A3
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 21:02:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CBE431A91;
-	Mon, 18 Sep 2023 20:43:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46611358A6;
+	Mon, 18 Sep 2023 20:43:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E71BB30FA4
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:42:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB6C135897
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:43:08 +0000 (UTC)
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15F8D115
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:42:58 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E977D10D
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:43:06 -0700 (PDT)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiL4x-0007O2-Ks; Mon, 18 Sep 2023 22:42:47 +0200
+	id 1qiL4y-0007Ph-1d; Mon, 18 Sep 2023 22:42:48 +0200
 Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiL4w-007IkP-PS; Mon, 18 Sep 2023 22:42:46 +0200
+	id 1qiL4x-007IkU-26; Mon, 18 Sep 2023 22:42:47 +0200
 Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiL4w-002mqB-G2; Mon, 18 Sep 2023 22:42:46 +0200
+	id 1qiL4w-002mqF-OZ; Mon, 18 Sep 2023 22:42:46 +0200
 From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>
-Cc: Jassi Brar <jaswinder.singh@linaro.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+Cc: Simon Horman <horms@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>,
+	Alex Elder <elder@linaro.org>,
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+	Wei Fang <wei.fang@nxp.com>,
 	netdev@vger.kernel.org,
 	kernel@pengutronix.de
-Subject: [PATCH net-next 46/54] net: ethernet: socionext: Convert to platform remove callback returning void
-Date: Mon, 18 Sep 2023 22:42:18 +0200
-Message-Id: <20230918204227.1316886-47-u.kleine-koenig@pengutronix.de>
+Subject: [PATCH net-next 47/54] net: ethernet: sun: Convert to platform remove callback returning void
+Date: Mon, 18 Sep 2023 22:42:19 +0200
+Message-Id: <20230918204227.1316886-48-u.kleine-koenig@pengutronix.de>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230918204227.1316886-1-u.kleine-koenig@pengutronix.de>
 References: <20230918204227.1316886-1-u.kleine-koenig@pengutronix.de>
@@ -57,7 +61,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2903; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=/9gc0xs4sbly4T5H2ySmtsJ6UvNyolK3OiLiO4bOId8=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlCLYYE7j2t2/YVZck/NMSdtxfTVqUjIS4pecwP 0CiLgn/PD6JATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZQi2GAAKCRCPgPtYfRL+ TpB/CACM9HRt+JmAllbQ0YWR+6/625fPTa+BKfqXYYP5Ez4w3SonMnBX2WR84B4VVlCPt/4uJ7u 0aPty/IIQin5jRcH6CZ5Jt2EHlAozVKCqhDyKe+DcewQN/n4u5hebabqNZFeLsAlgZedccI7say kGoRP4SwZCvoo141eHqAlaVDigG0IutpUFOb9/o+Z+E9qF19Ly0OeaEH4zAjCccvYOPFU6gm17p 0pZX7/TRmwYOr3YD/t/ovGUtudvSpoK0pYlDxh7MrWbuurNvPiOdWL4ovw6dq8YQD+LwHW1kN52 IY/nv/2LExMjqZHaH6CvulENowGSPMuuK2DMxyfx2+SGjRBU
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3887; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=eNUPWqS3HwsvdRnQwonIfX0MnGa81NyHrfpAAK9T1F8=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlCLYZfD2YVSr4iAEonj+Wsse1LfN9wsARYWdiX 1KE5dMYK1qJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZQi2GQAKCRCPgPtYfRL+ Tqn3B/9wCcI4Q5uMpeHMBh1d/iCzPUro9K4b8T5Utqhh0xpmRdkj4S2xLRqvhgpf3c5tI3BEDrV XA7t/RQtqFeyXtIrKz+79iQdtlIBlwUWiOZLvnyt1ANOOe/tTbzq1kxpXBiMjtG/GPIne4jlW7s /9cnPeFFHz+t3QLGCUaRplQh2Y05kTHGVSJNi2WpYOGCV/X4UUXRvbpGAOjk4ow2h/pNj33GWPh D+WsaXrvMOQicqle2eYLml3+kJxqzOCcnRiycQOVA6sVJPJJeSVc63FfScIhBeeOiSxLvLJRvko wirckDLRDUANBdcvnQmRkwcbIjNqLuh3uvhwy5TlICGXUN4n
 X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
@@ -83,72 +87,103 @@ callback to the void returning variant.
 
 Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 ---
- drivers/net/ethernet/socionext/netsec.c  | 6 ++----
- drivers/net/ethernet/socionext/sni_ave.c | 6 ++----
- 2 files changed, 4 insertions(+), 8 deletions(-)
+ drivers/net/ethernet/sun/niu.c     | 5 ++---
+ drivers/net/ethernet/sun/sunbmac.c | 6 ++----
+ drivers/net/ethernet/sun/sunqe.c   | 6 ++----
+ 3 files changed, 6 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/net/ethernet/socionext/netsec.c b/drivers/net/ethernet/socionext/netsec.c
-index f358ea003193..d9cfafb96085 100644
---- a/drivers/net/ethernet/socionext/netsec.c
-+++ b/drivers/net/ethernet/socionext/netsec.c
-@@ -2150,7 +2150,7 @@ static int netsec_probe(struct platform_device *pdev)
- 	return ret;
+diff --git a/drivers/net/ethernet/sun/niu.c b/drivers/net/ethernet/sun/niu.c
+index 011d74087f86..21431f43e4c2 100644
+--- a/drivers/net/ethernet/sun/niu.c
++++ b/drivers/net/ethernet/sun/niu.c
+@@ -10132,7 +10132,7 @@ static int niu_of_probe(struct platform_device *op)
+ 	return err;
  }
  
--static int netsec_remove(struct platform_device *pdev)
-+static void netsec_remove(struct platform_device *pdev)
+-static int niu_of_remove(struct platform_device *op)
++static void niu_of_remove(struct platform_device *op)
  {
- 	struct netsec_priv *priv = platform_get_drvdata(pdev);
+ 	struct net_device *dev = platform_get_drvdata(op);
  
-@@ -2162,8 +2162,6 @@ static int netsec_remove(struct platform_device *pdev)
+@@ -10165,7 +10165,6 @@ static int niu_of_remove(struct platform_device *op)
  
- 	pm_runtime_disable(&pdev->dev);
- 	free_netdev(priv->ndev);
+ 		free_netdev(dev);
+ 	}
+-	return 0;
+ }
+ 
+ static const struct of_device_id niu_match[] = {
+@@ -10183,7 +10182,7 @@ static struct platform_driver niu_of_driver = {
+ 		.of_match_table = niu_match,
+ 	},
+ 	.probe		= niu_of_probe,
+-	.remove		= niu_of_remove,
++	.remove_new	= niu_of_remove,
+ };
+ 
+ #endif /* CONFIG_SPARC64 */
+diff --git a/drivers/net/ethernet/sun/sunbmac.c b/drivers/net/ethernet/sun/sunbmac.c
+index cc34d92d2e3d..16c86b13c185 100644
+--- a/drivers/net/ethernet/sun/sunbmac.c
++++ b/drivers/net/ethernet/sun/sunbmac.c
+@@ -1234,7 +1234,7 @@ static int bigmac_sbus_probe(struct platform_device *op)
+ 	return bigmac_ether_init(op, qec_op);
+ }
+ 
+-static int bigmac_sbus_remove(struct platform_device *op)
++static void bigmac_sbus_remove(struct platform_device *op)
+ {
+ 	struct bigmac *bp = platform_get_drvdata(op);
+ 	struct device *parent = op->dev.parent;
+@@ -1255,8 +1255,6 @@ static int bigmac_sbus_remove(struct platform_device *op)
+ 			  bp->bblock_dvma);
+ 
+ 	free_netdev(net_dev);
 -
 -	return 0;
  }
  
- #ifdef CONFIG_PM
-@@ -2211,7 +2209,7 @@ MODULE_DEVICE_TABLE(acpi, netsec_acpi_ids);
+ static const struct of_device_id bigmac_sbus_match[] = {
+@@ -1274,7 +1272,7 @@ static struct platform_driver bigmac_sbus_driver = {
+ 		.of_match_table = bigmac_sbus_match,
+ 	},
+ 	.probe		= bigmac_sbus_probe,
+-	.remove		= bigmac_sbus_remove,
++	.remove_new	= bigmac_sbus_remove,
+ };
  
- static struct platform_driver netsec_driver = {
- 	.probe	= netsec_probe,
--	.remove	= netsec_remove,
-+	.remove_new = netsec_remove,
- 	.driver = {
- 		.name = "netsec",
- 		.pm = &netsec_pm_ops,
-diff --git a/drivers/net/ethernet/socionext/sni_ave.c b/drivers/net/ethernet/socionext/sni_ave.c
-index 4838d2383a43..eed24e67c5a6 100644
---- a/drivers/net/ethernet/socionext/sni_ave.c
-+++ b/drivers/net/ethernet/socionext/sni_ave.c
-@@ -1719,7 +1719,7 @@ static int ave_probe(struct platform_device *pdev)
- 	return ret;
+ module_platform_driver(bigmac_sbus_driver);
+diff --git a/drivers/net/ethernet/sun/sunqe.c b/drivers/net/ethernet/sun/sunqe.c
+index b37360f44972..aedd13c94225 100644
+--- a/drivers/net/ethernet/sun/sunqe.c
++++ b/drivers/net/ethernet/sun/sunqe.c
+@@ -933,7 +933,7 @@ static int qec_sbus_probe(struct platform_device *op)
+ 	return qec_ether_init(op);
  }
  
--static int ave_remove(struct platform_device *pdev)
-+static void ave_remove(struct platform_device *pdev)
+-static int qec_sbus_remove(struct platform_device *op)
++static void qec_sbus_remove(struct platform_device *op)
  {
- 	struct net_device *ndev = platform_get_drvdata(pdev);
- 	struct ave_private *priv = netdev_priv(ndev);
-@@ -1727,8 +1727,6 @@ static int ave_remove(struct platform_device *pdev)
- 	unregister_netdev(ndev);
- 	netif_napi_del(&priv->napi_rx);
- 	netif_napi_del(&priv->napi_tx);
+ 	struct sunqe *qp = platform_get_drvdata(op);
+ 	struct net_device *net_dev = qp->dev;
+@@ -948,8 +948,6 @@ static int qec_sbus_remove(struct platform_device *op)
+ 			  qp->buffers, qp->buffers_dvma);
+ 
+ 	free_netdev(net_dev);
 -
 -	return 0;
  }
  
- #ifdef CONFIG_PM_SLEEP
-@@ -1976,7 +1974,7 @@ MODULE_DEVICE_TABLE(of, of_ave_match);
+ static const struct of_device_id qec_sbus_match[] = {
+@@ -967,7 +965,7 @@ static struct platform_driver qec_sbus_driver = {
+ 		.of_match_table = qec_sbus_match,
+ 	},
+ 	.probe		= qec_sbus_probe,
+-	.remove		= qec_sbus_remove,
++	.remove_new	= qec_sbus_remove,
+ };
  
- static struct platform_driver ave_driver = {
- 	.probe  = ave_probe,
--	.remove = ave_remove,
-+	.remove_new = ave_remove,
- 	.driver	= {
- 		.name = "ave",
- 		.pm   = AVE_PM_OPS,
+ static int __init qec_init(void)
 -- 
 2.40.1
 
