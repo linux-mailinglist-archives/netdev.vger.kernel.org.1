@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-34597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32C497A4D41
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 17:47:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 882A37A4CA4
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 17:37:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D8131C213F3
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 15:47:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D93A1C21136
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 15:37:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 726B2208C3;
-	Mon, 18 Sep 2023 15:46:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF00E1D6BB;
+	Mon, 18 Sep 2023 15:37:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACDC3137C
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 15:46:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9B641D6A1
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 15:37:29 +0000 (UTC)
 Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [217.70.178.240])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FF1110F6;
-	Mon, 18 Sep 2023 08:45:22 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A89CCE9;
+	Mon, 18 Sep 2023 08:35:48 -0700 (PDT)
 Received: from relay5-d.mail.gandi.net (unknown [217.70.183.197])
-	by mslow1.mail.gandi.net (Postfix) with ESMTP id 38FFED190E;
-	Mon, 18 Sep 2023 15:08:43 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 993E31C0013;
-	Mon, 18 Sep 2023 15:08:41 +0000 (UTC)
+	by mslow1.mail.gandi.net (Postfix) with ESMTP id 565AAD1930;
+	Mon, 18 Sep 2023 15:08:46 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 77D261C0003;
+	Mon, 18 Sep 2023 15:08:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1695049722;
+	t=1695049725;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=sIcsMvQctXfIyyO0w8xGqF5/t3joZP9ZvbLANbwjpnQ=;
-	b=HmBGJReq6mR6ErVzlJH3cdRMiG8H5W+pwcj9S+Uwgk8bw4Ga5c5ByREXRgeMhu1ih98EWu
-	3LStYbJHhqyjW1DPsC6GltXEUQFDqKyBUwKbIPrJLzEqyXUPCOc9TpqXWiDdJ4mo2pXocU
-	sXWZK3elqAiK7GxHHitFm+eJTOumuBgf3PwC6Fv+CScX0WZVd4OMyNopkQ5mrRSpIcGwBx
-	6SW8chU1Ho9rAzkFwYTZQ+ZpbgKivbgfRSdldFELHpooNJjeamfWdYeExErpk2vZB1ppjp
-	Y/u7vWXpbuhVy+btlDQA6hBY6f5q124LTcBjFOOHo3vep3WWmyML46cyZ9MOUA==
+	bh=YqQ9PFkNZ7FlEQrNIrUxQJAcjr3CAMWwJylbar1PE9U=;
+	b=NgVB9OohHI7TrKaGB2tVQZOXpUGkXiI3Ui1LrOwfgWhv+dGwDedI5puTMD2/LuBPnRsx7F
+	ImO2z3rwis15vg5bMPSMZt3rHaXm7DG1L+hewYXkErk998YrqRlCDjG3in1vYNkJVQMnE1
+	3LDuohyIoYHVfTRc1crfOPLpSztuKvgNZ/pQk9hMJfqFEpe2cBY2kDt/uX+2QaASNGbl5m
+	0qkGAB+R9DrgMtb1kbrs6ut0DRXvx0LU0JKEVBGyVoaHkqkzegUfXF00iGM/VPeQWNFRKU
+	4jx1FQbcQ5Iu8TP4MT+2h6z2EV7lGvfnQbiJMIdz6/kz9SSKkpSpVFUahUcCLw==
 From: Miquel Raynal <miquel.raynal@bootlin.com>
 To: Alexander Aring <alex.aring@gmail.com>,
 	Stefan Schmidt <stefan@datenfreihafen.org>,
@@ -54,9 +54,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Guilhem Imberton <guilhem.imberton@qorvo.com>,
 	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
 	Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next v3 08/11] ieee802154: Add support for limiting the number of associated devices
-Date: Mon, 18 Sep 2023 17:08:06 +0200
-Message-Id: <20230918150809.275058-9-miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-next v3 10/11] mac802154: Handle disassociation notifications from peers
+Date: Mon, 18 Sep 2023 17:08:08 +0200
+Message-Id: <20230918150809.275058-11-miquel.raynal@bootlin.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230918150809.275058-1-miquel.raynal@bootlin.com>
 References: <20230918150809.275058-1-miquel.raynal@bootlin.com>
@@ -74,148 +74,111 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Coordinators may refuse associations. We need a user input for
-that. Let's add a new netlink command which can provide a maximum number
-of devices we accept to associate with as a first step. Later, we could
-also forward the request to userspace and check whether the association
-should be accepted or not.
+Peers may decided to disassociate from us, their coordinator, in this
+case they will send a disassociation notification which we must
+acknowledge. If we don't, the peer device considers itself disassociated
+anyway. We also need to drop the reference to this child from our
+internal structures.
 
 Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
 ---
- include/net/cfg802154.h   |  8 ++++++++
- include/net/nl802154.h    |  2 ++
- net/ieee802154/core.c     |  1 +
- net/ieee802154/nl802154.c | 28 ++++++++++++++++++++++++++++
- net/ieee802154/pan.c      |  8 ++++++++
- 5 files changed, 47 insertions(+)
+ net/mac802154/ieee802154_i.h |  2 ++
+ net/mac802154/rx.c           |  8 ++++++
+ net/mac802154/scan.c         | 52 ++++++++++++++++++++++++++++++++++++
+ 3 files changed, 62 insertions(+)
 
-diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-index f0d0e0cb4ad8..bb09ccaf56c2 100644
---- a/include/net/cfg802154.h
-+++ b/include/net/cfg802154.h
-@@ -506,6 +506,7 @@ struct wpan_dev {
- 	struct mutex association_lock;
- 	struct ieee802154_pan_device *parent;
- 	struct list_head children;
-+	unsigned int max_associations;
- };
+diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
+index 432bfa87249e..08dd521a51a5 100644
+--- a/net/mac802154/ieee802154_i.h
++++ b/net/mac802154/ieee802154_i.h
+@@ -318,6 +318,8 @@ static inline bool mac802154_is_associating(struct ieee802154_local *local)
+ int mac802154_send_disassociation_notif(struct ieee802154_sub_if_data *sdata,
+ 					struct ieee802154_pan_device *target,
+ 					u8 reason);
++int mac802154_process_disassociation_notif(struct ieee802154_sub_if_data *sdata,
++					   struct sk_buff *skb);
+ int mac802154_process_association_req(struct ieee802154_sub_if_data *sdata,
+ 				      struct sk_buff *skb);
  
- #define to_phy(_dev)	container_of(_dev, struct wpan_phy, dev)
-@@ -582,6 +583,13 @@ struct ieee802154_pan_device *
- cfg802154_device_is_child(struct wpan_dev *wpan_dev,
- 			  struct ieee802154_addr *target);
- 
-+/**
-+ * cfg802154_set_max_associations - Limit the number of future associations
-+ * @wpan_dev: the wpan device
-+ * @max: the maximum number of devices we accept to associate
-+ */
-+void cfg802154_set_max_associations(struct wpan_dev *wpan_dev, unsigned int max);
-+
- /**
-  * cfg802154_get_free_short_addr - Get a free address among the known devices
-  * @wpan_dev: the wpan device
-diff --git a/include/net/nl802154.h b/include/net/nl802154.h
-index 8a47c14c72f0..8b26faae49e8 100644
---- a/include/net/nl802154.h
-+++ b/include/net/nl802154.h
-@@ -80,6 +80,7 @@ enum nl802154_commands {
- 	NL802154_CMD_STOP_BEACONS,
- 	NL802154_CMD_ASSOCIATE,
- 	NL802154_CMD_DISASSOCIATE,
-+	NL802154_CMD_SET_MAX_ASSOCIATIONS,
- 
- 	/* add new commands above here */
- 
-@@ -149,6 +150,7 @@ enum nl802154_attrs {
- 	NL802154_ATTR_SCAN_DURATION,
- 	NL802154_ATTR_SCAN_DONE_REASON,
- 	NL802154_ATTR_BEACON_INTERVAL,
-+	NL802154_ATTR_MAX_ASSOCIATIONS,
- 
- 	/* add attributes here, update the policy in nl802154.c */
- 
-diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
-index 1670a71327a7..2d6fe45efa05 100644
---- a/net/ieee802154/core.c
-+++ b/net/ieee802154/core.c
-@@ -295,6 +295,7 @@ static int cfg802154_netdev_notifier_call(struct notifier_block *nb,
- 		rdev->devlist_generation++;
- 		mutex_init(&wpan_dev->association_lock);
- 		INIT_LIST_HEAD(&wpan_dev->children);
-+		wpan_dev->max_associations = SZ_16K;
- 
- 		wpan_dev->netdev = dev;
+diff --git a/net/mac802154/rx.c b/net/mac802154/rx.c
+index 96040b63a4fc..0024341ef9c5 100644
+--- a/net/mac802154/rx.c
++++ b/net/mac802154/rx.c
+@@ -110,6 +110,14 @@ void mac802154_rx_mac_cmd_worker(struct work_struct *work)
+ 		mac802154_process_association_req(mac_pkt->sdata, mac_pkt->skb);
  		break;
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index 5820fe425ddd..e16e57fc34d0 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -234,6 +234,7 @@ static const struct nla_policy nl802154_policy[NL802154_ATTR_MAX+1] = {
- 				 NL802154_SCAN_DONE_REASON_ABORTED),
- 	[NL802154_ATTR_BEACON_INTERVAL] =
- 		NLA_POLICY_MAX(NLA_U8, IEEE802154_ACTIVE_SCAN_DURATION),
-+	[NL802154_ATTR_MAX_ASSOCIATIONS] = { .type = NLA_U32 },
  
- #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
- 	[NL802154_ATTR_SEC_ENABLED] = { .type = NLA_U8, },
-@@ -1696,6 +1697,26 @@ static int nl802154_disassociate(struct sk_buff *skb, struct genl_info *info)
- 	return 0;
- }
- 
-+static int nl802154_set_max_associations(struct sk_buff *skb, struct genl_info *info)
-+{
-+	struct net_device *dev = info->user_ptr[1];
-+	struct wpan_dev *wpan_dev = dev->ieee802154_ptr;
-+	unsigned int max_assoc;
++	case IEEE802154_CMD_DISASSOCIATION_NOTIFY:
++		dev_dbg(&mac_pkt->sdata->dev->dev, "processing DISASSOC NOTIF\n");
++		if (mac_pkt->sdata->wpan_dev.iftype != NL802154_IFTYPE_COORD)
++			break;
 +
-+	if (!info->attrs[NL802154_ATTR_MAX_ASSOCIATIONS]) {
-+		NL_SET_ERR_MSG(info->extack, "No maximum number of association given");
++		mac802154_process_disassociation_notif(mac_pkt->sdata, mac_pkt->skb);
++		break;
++
+ 	default:
+ 		break;
+ 	}
+diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
+index 9ba45984e9de..78d29edaa2b6 100644
+--- a/net/mac802154/scan.c
++++ b/net/mac802154/scan.c
+@@ -855,3 +855,55 @@ int mac802154_process_association_req(struct ieee802154_sub_if_data *sdata,
+ 	mutex_unlock(&wpan_dev->association_lock);
+ 	return ret;
+ }
++
++int mac802154_process_disassociation_notif(struct ieee802154_sub_if_data *sdata,
++					   struct sk_buff *skb)
++{
++	struct ieee802154_addr *src = &mac_cb(skb)->source;
++	struct ieee802154_addr *dest = &mac_cb(skb)->dest;
++	struct wpan_dev *wpan_dev = &sdata->wpan_dev;
++	struct ieee802154_pan_device *child;
++	struct ieee802154_addr target;
++	bool parent;
++	u64 teaddr;
++
++	if (skb->len != sizeof(u8))
++		return -EINVAL;
++
++	if (unlikely(src->mode != IEEE802154_EXTENDED_ADDRESSING))
++		return -EINVAL;
++
++	if (dest->mode == IEEE802154_EXTENDED_ADDRESSING &&
++	    unlikely(dest->extended_addr != wpan_dev->extended_addr))
++		return -ENODEV;
++	else if (dest->mode == IEEE802154_SHORT_ADDRESSING &&
++		 unlikely(dest->short_addr != wpan_dev->short_addr))
++		return -ENODEV;
++
++	target.mode = IEEE802154_EXTENDED_ADDRESSING;
++	target.extended_addr = src->extended_addr;
++	teaddr = swab64((__force u64)target.extended_addr);
++	dev_dbg(&skb->dev->dev, "Processing DISASSOC NOTIF from %8phC\n", &teaddr);
++
++	mutex_lock(&wpan_dev->association_lock);
++	parent = cfg802154_device_is_parent(wpan_dev, &target);
++	if (!parent)
++		child = cfg802154_device_is_child(wpan_dev, &target);
++	if (!parent && !child) {
++		mutex_unlock(&wpan_dev->association_lock);
 +		return -EINVAL;
 +	}
 +
-+	max_assoc = nla_get_u32(info->attrs[NL802154_ATTR_MAX_ASSOCIATIONS]);
++	if (parent) {
++		kfree(wpan_dev->parent);
++		wpan_dev->parent = NULL;
++	} else {
++		list_del(&child->node);
++		kfree(child);
++		wpan_dev->nchildren--;
++	}
 +
-+	mutex_lock(&wpan_dev->association_lock);
-+	cfg802154_set_max_associations(wpan_dev, max_assoc);
 +	mutex_unlock(&wpan_dev->association_lock);
 +
 +	return 0;
 +}
-+
- #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
- static const struct nla_policy nl802154_dev_addr_policy[NL802154_DEV_ADDR_ATTR_MAX + 1] = {
- 	[NL802154_DEV_ADDR_ATTR_PAN_ID] = { .type = NLA_U16 },
-@@ -2833,6 +2854,13 @@ static const struct genl_ops nl802154_ops[] = {
- 				  NL802154_FLAG_CHECK_NETDEV_UP |
- 				  NL802154_FLAG_NEED_RTNL,
- 	},
-+	{
-+		.cmd = NL802154_CMD_SET_MAX_ASSOCIATIONS,
-+		.doit = nl802154_set_max_associations,
-+		.flags = GENL_ADMIN_PERM,
-+		.internal_flags = NL802154_FLAG_NEED_NETDEV |
-+				  NL802154_FLAG_NEED_RTNL,
-+	},
- #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
- 	{
- 		.cmd = NL802154_CMD_SET_SEC_PARAMS,
-diff --git a/net/ieee802154/pan.c b/net/ieee802154/pan.c
-index 8a16bb4c52a7..f6d04f6e2b8c 100644
---- a/net/ieee802154/pan.c
-+++ b/net/ieee802154/pan.c
-@@ -105,3 +105,11 @@ __le16 cfg802154_get_free_short_addr(struct wpan_dev *wpan_dev)
- 	return addr;
- }
- EXPORT_SYMBOL_GPL(cfg802154_get_free_short_addr);
-+
-+void cfg802154_set_max_associations(struct wpan_dev *wpan_dev, unsigned int max)
-+{
-+	lockdep_assert_held(&wpan_dev->association_lock);
-+
-+	wpan_dev->max_associations = max;
-+}
-+EXPORT_SYMBOL_GPL(cfg802154_set_max_associations);
 -- 
 2.34.1
 
