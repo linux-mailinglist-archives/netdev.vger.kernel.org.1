@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-34806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 611707A54CD
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 23:07:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 511AB7A54D1
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 23:07:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BC4F281F6B
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 21:07:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1BEE61C21229
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 21:07:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72E0128E26;
-	Mon, 18 Sep 2023 20:53:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE47328DD9;
+	Mon, 18 Sep 2023 20:53:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1349628E07
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:53:37 +0000 (UTC)
-Received: from mail-vs1-xe33.google.com (mail-vs1-xe33.google.com [IPv6:2607:f8b0:4864:20::e33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0551490
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:53:37 -0700 (PDT)
-Received: by mail-vs1-xe33.google.com with SMTP id ada2fe7eead31-4510182fe69so1772226137.3
-        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:53:36 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CE8D28E07
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:53:48 +0000 (UTC)
+Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D1998E;
+	Mon, 18 Sep 2023 13:53:47 -0700 (PDT)
+Received: by mail-qk1-x729.google.com with SMTP id af79cd13be357-773a5bb6fb6so261530785a.3;
+        Mon, 18 Sep 2023 13:53:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695070416; x=1695675216; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1695070426; x=1695675226; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
         bh=bK3tn5dFdIkaJdHv4A/3xeAMl/PHN2x+YLc9iStXbls=;
-        b=OAqT31Ys8gPda/J+bJXih+4I4Y/fS1/7GPIieqPf0QzJzEBzuboOo1aJszVRQepNrS
-         6WL6vTiZUMB9k0+5bfei84vh9JlePdieGKCn1nezcZbzOiCSzqKc/1T6YeahcfRyhgFT
-         5t23Kkk8o/cXJop3BU3D9WNeQfQgEIm29FD0BikL6pdxGP9pnJWTJnLkiN/P9GcVoH+g
-         8RsHBePWUucGmrgahNv/MVal0iajBkr/3K/NjSDlw2MmHd1Up5GvzhBFxdGmqhHeaJV7
-         D/GXt1qDe3srA3eQk7QmBpyoDGy/FEjHt9oOzB2mnggWegTr0x4MGx1Koy4iskqnR7pC
-         5UoQ==
+        b=L5VRhcj6cpf/XbQ4W69VF6M/VgGdG/0wVWdzVZbWfhtm4PdAXCWdvLgM6TLwkxevri
+         nYqVxjov6Zkw5SWpUaQD4pBP/B8oirfCCL4o/01gokfvzqkBiIzgXTOTKq10RxpPl7Si
+         pCjzUGonF9WK7tRx8dTY0Jr61cdFZAg33mSOrBI4EZ57/RtNhG+TBVmsQYcvuRvAz46z
+         UzwQZIz702N86tYfeiJN/6ERUcNMQIlxd07n3V7dCL+8RWU8QmXN08aKSuHpiKlZJ6H2
+         HwwXduzpWP/WdPfhnKTVRQpXJltu0cHul+nb5qYCc14BNBx4w2XAKfEN49uzpcJAPvzj
+         0K0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695070416; x=1695675216;
+        d=1e100.net; s=20230601; t=1695070426; x=1695675226;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
         bh=bK3tn5dFdIkaJdHv4A/3xeAMl/PHN2x+YLc9iStXbls=;
-        b=BtM0fhvbQ7L7zWRZUYsmAXDf53hYhy0XhZOITBnOM2Zy4bdIxKFyco08eOIE6Xnoth
-         9d8iXto8fjv35cOJzKslxTQO0/pI4F4g4Mi/62YCG7+RqkTA0vtE3KScOGu9K7DEpjqG
-         Pqo88Eu7+25lSzwsq/F6fXdAeXDNFqMwA7zR5vF1+de1hQTDvilLDrorx6KQhtsk9g2H
-         h81RkAaqRdeoYB3IoBBEiUlE9gqoNq5KwBFYSyEJfDiScmTU1/yxMGTGjMMsuMqZ1WtK
-         zzDrLbi+gS7j7rBH1X3dnL5g3M1/w2Koj3Q3dYUF4CmWiTEpa5KtqDc53ARJwAdk9NZK
-         VWJw==
-X-Gm-Message-State: AOJu0YzdLd0dtyji6qTxPNN5BxASbR1l1Ps3Lr3wOsxVhqJTpPVxoeCz
-	Gn75cIyMbP/2WQ+I0+1UfEg=
-X-Google-Smtp-Source: AGHT+IFBK8K6xgJW/qIypGlnRI1IUpmzhjW4XAbuTaQt4IBTSrI0PxalkQGyykKtalbQUdbkAWV3PQ==
-X-Received: by 2002:a05:6102:2245:b0:452:6ac0:ed19 with SMTP id e5-20020a056102224500b004526ac0ed19mr1835965vsb.31.1695070415896;
-        Mon, 18 Sep 2023 13:53:35 -0700 (PDT)
+        b=Wn3N7c1KCcomd84GnOlN7dPh8EqTw8UJf7q5iGIFOylKieiMchcUurpmrLKjao/pff
+         Z+nsWLBqjxi5r9K+o8h5asnp9nbTwIIYVxzu9qzwDNHsFrK19um9DMYqNkJ2v77qfOdr
+         SdriPP0b7DsApXzqrQ6rFb1VbagzNYwU6jWeC3wicfqZpEvH07I4GDnqFkAe/mohdkf2
+         8FyYtb7g9hS0crNP32iOkrphUB+ybT4NIeJZBp2nq56rH2qEbElgXy2JbxN035Ft5Lc/
+         VbET4sXPO5s6LusoUiLPK3mKBCsL0JIO2leLuKR02t9zut8PgDNHtuybLAIuuuANdwXV
+         ZsXg==
+X-Gm-Message-State: AOJu0Yy5ZV1ZYQBNDzVDj3mmlC3Wt/PYjJr3wStFFsgztCMZCsPOM43u
+	tb6ru+p1gJxA0PVzKKIo0DA=
+X-Google-Smtp-Source: AGHT+IFuG/RCWYnEGB2whgbEH5EazCMJ7h08Y7AAH6D+y3PeJONiu3YP0L2V+kcbEeFRyLayS4Iiqg==
+X-Received: by 2002:a0c:f24f:0:b0:658:1ca4:97f7 with SMTP id z15-20020a0cf24f000000b006581ca497f7mr3647510qvl.34.1695070426331;
+        Mon, 18 Sep 2023 13:53:46 -0700 (PDT)
 Received: from [10.67.49.139] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id i10-20020a0cab4a000000b0064f45b8c02bsm3767904qvb.49.2023.09.18.13.53.33
+        by smtp.googlemail.com with ESMTPSA id l2-20020a0cac02000000b00655e428604esm3767700qvb.137.2023.09.18.13.53.44
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Sep 2023 13:53:34 -0700 (PDT)
-Message-ID: <0e3fcf35-1c7e-df24-7105-e3d2a759b901@gmail.com>
-Date: Mon, 18 Sep 2023 13:53:32 -0700
+        Mon, 18 Sep 2023 13:53:45 -0700 (PDT)
+Message-ID: <5b8a126e-2eb3-a0cf-9b68-e9b7b9481cec@gmail.com>
+Date: Mon, 18 Sep 2023 13:53:43 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,20 +66,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.15.1
-Subject: Re: [PATCH net-next 7/9] net: dsa: realtek: Convert to platform
+Subject: Re: [PATCH net-next 8/9] net: dsa: rzn1_a5psw: Convert to platform
  remove callback returning void
 Content-Language: en-US
 To: =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
- Linus Walleij <linus.walleij@linaro.org>,
- =?UTF-8?Q?Alvin_=c5=a0ipraga?= <alsi@bang-olufsen.dk>,
+ =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
  Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, kernel@pengutronix.de
+Cc: linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
+ kernel@pengutronix.de
 References: <20230918191916.1299418-1-u.kleine-koenig@pengutronix.de>
- <20230918191916.1299418-8-u.kleine-koenig@pengutronix.de>
+ <20230918191916.1299418-9-u.kleine-koenig@pengutronix.de>
 From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20230918191916.1299418-8-u.kleine-koenig@pengutronix.de>
+In-Reply-To: <20230918191916.1299418-9-u.kleine-koenig@pengutronix.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
