@@ -1,196 +1,175 @@
-Return-Path: <netdev+bounces-34733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D29F7A537F
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 22:10:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 748397A5387
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 22:14:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 948F71C2094C
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 20:10:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B51B1C20DB0
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 20:14:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A37927EF6;
-	Mon, 18 Sep 2023 20:09:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5191220B0F;
+	Mon, 18 Sep 2023 20:14:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CFE127EDA
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:09:55 +0000 (UTC)
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1353C8F
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:09:54 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-690bc3f82a7so487570b3a.0
-        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:09:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D60C4BA41
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:14:24 +0000 (UTC)
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECF998F;
+	Mon, 18 Sep 2023 13:14:22 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-50098cc8967so7948649e87.1;
+        Mon, 18 Sep 2023 13:14:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1695067793; x=1695672593; darn=vger.kernel.org;
-        h=in-reply-to:from:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=5HqejfbBUIg5xeNSK/smSXPRDWSQImC2jjN21pXl8vs=;
-        b=RtkJSOja9h7Lx3jS3aITDUoMnTIXipNiVPrlk0mP2kHiB24p+SCgTMAloHBsDyS20U
-         d/GGo4uhakFAO/rZeVolGwUOE2hmhWFfGr49KIOo3gm6IhzVijcT5F4nAIQKU8/Qznlp
-         s+ms//gqwkWSS2TtiblL1QM+W/4iFNsDDDvSI=
+        d=gmail.com; s=20230601; t=1695068061; x=1695672861; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=M+e7RPlNIEbnCE6SNaWUDYK3xS0AglRAD4OXd3Ulb6s=;
+        b=bTh9i89mD05TlvVR6OmjzYHPXUlWHU6M5IYh2Pqrroboh2pGf5+UYoFynx89KSpX1b
+         CtUp1ANG6bivxW2EY5rOdKo1VvnNAl8mn8423w0F8aBJIF2ytvMXkOnjZaT1iOR6fLYX
+         NioIbTTRhpmWGvEVE4lbfu2aBfQPGI6uoqUjKoyHWFkpEmt/aKBpGs+HpbtRYL/ca/nA
+         DfryEtlSEVl8tzVD6FJODusw+aB1OBL8z3nzQXFPMJpdwwMxqun0hIaqX97c7YCCKHop
+         pJG5Ay8Dy+ljbWAEymGI08ZZG0hIcYmthLiKXF7yu4NvlEwwb0dD27vLBRijXmxlCUOP
+         Tg0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695067793; x=1695672593;
-        h=in-reply-to:from:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1695068061; x=1695672861;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5HqejfbBUIg5xeNSK/smSXPRDWSQImC2jjN21pXl8vs=;
-        b=hoXtZETYFvABd2aNgMxYF0hozT85NP5I9cxUFmI33bue5onqq7wvXckfogFqAs3WXC
-         H0ifQjq1d129SIcGi56u0J0bHg/xImDppmFaaLEyOwluHyalPdWCaNHPhz+5tPhCTGoy
-         AYUjNdbP3R6DNBOg5UnEJ8R2YHdoGJncs8XNDNhITm+5Vx2ZjPLfQWdupHW3hz3Mopuy
-         w9ei/hymXkCi3KpN8LfX3GTnvTXfEcVpe97IlfIO2voecZovOnVU4o2DPMFQpLQHJuUQ
-         7VRJjMRRmSb7du3sAPbv8sEBheX1O4pPj1TKEaoRspKlybIYHtXQo23yr/UY5CTFbrDL
-         tL4w==
-X-Gm-Message-State: AOJu0YwMGi+jmkB4D9R3HSnFVP6uxA6cBOpVirauArzrLNgK9vP7TZzK
-	DJ144IR62mHdE3ZyXd6AAbpQDg==
-X-Google-Smtp-Source: AGHT+IGwQcSNpLAhCqQibOd2WdzUZBRx6a+W9GArdjZCn36izTuNrVn8roQdSc1XCWGaVHbwOvRG5A==
-X-Received: by 2002:a05:6a00:15c5:b0:68f:e810:e889 with SMTP id o5-20020a056a0015c500b0068fe810e889mr10748282pfu.31.1695067793551;
-        Mon, 18 Sep 2023 13:09:53 -0700 (PDT)
-Received: from [10.67.49.139] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id g18-20020aa78752000000b0068fe9f23bf4sm7464199pfo.103.2023.09.18.13.09.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Sep 2023 13:09:52 -0700 (PDT)
-Message-ID: <2a1a5b22-ff49-b2f6-f38a-2c39ef2444e4@broadcom.com>
-Date: Mon, 18 Sep 2023 13:09:51 -0700
+        bh=M+e7RPlNIEbnCE6SNaWUDYK3xS0AglRAD4OXd3Ulb6s=;
+        b=wVjeAsFmBS5Bd9uenf8vIzLXCKCagZ3OoLoIFCweI1HVBBPquhXoldg7iJObTio4cd
+         dHKq3hjP7y+pqRZov3M6PMs6GohmI74Hv1X/8vu/KK1m6XRvVhLtRWKlgkcVk841v+cK
+         c1NPcbmyN2i/T3Fdad0AIiLKThphBvWj5UF0Ip4QH0epPsW4PgXOWu23C+dMRbwNL0hl
+         CRiuuVYdWclGBG5QAaGwifSwBBa8LVXqXFX8fhTAw1OoTXAt/1qMxMAR3d27C41HsNQr
+         4L2tvH1ZijLtarIWXYx9gtsPu1h7itskHrs78AhvxG84ezxOZ/QE+3zJk9MarBhF94lo
+         LSeQ==
+X-Gm-Message-State: AOJu0Yz8wzy5JvEawwLedtV9i7Br2GlaNOAukXKlWDCAuWnje/+AaFo5
+	WZqcZOATJ3ZqsxF/9s+whH8=
+X-Google-Smtp-Source: AGHT+IFn+LYvQSp5rZn6lhfAzGXnJK7HIJKtSCz+mspnLIkIgmBXG+lSxqLriZhpKyj97znopumt4A==
+X-Received: by 2002:a05:6512:33c8:b0:4fe:d0f:b4f7 with SMTP id d8-20020a05651233c800b004fe0d0fb4f7mr10927733lfg.65.1695068061007;
+        Mon, 18 Sep 2023 13:14:21 -0700 (PDT)
+Received: from mobilestation ([178.178.81.241])
+        by smtp.gmail.com with ESMTPSA id d33-20020a0565123d2100b0050317d2b0f3sm563142lfv.61.2023.09.18.13.14.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Sep 2023 13:14:20 -0700 (PDT)
+Date: Mon, 18 Sep 2023 23:14:06 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Jisheng Zhang <jszhang@kernel.org>
+Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Shawn Guo <shawnguo@kernel.org>, 
+	Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>, 
+	Fabio Estevam <festevam@gmail.com>, NXP Linux Team <linux-imx@nxp.com>, 
+	Vladimir Zapolskiy <vz@mleia.com>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	Kevin Hilman <khilman@baylibre.com>, Jerome Brunet <jbrunet@baylibre.com>, 
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>, Emil Renner Berthing <kernel@esmil.dk>, 
+	Samin Guo <samin.guo@starfivetech.com>, Chen-Yu Tsai <wens@csie.org>, 
+	Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>, 
+	Thierry Reding <thierry.reding@gmail.com>, Nobuhiro Iwamatsu <nobuhiro1.iwamatsu@toshiba.co.jp>, 
+	Russell King <linux@armlinux.org.uk>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-amlogic@lists.infradead.org, linux-sunxi@lists.linux.dev, 
+	linux-tegra@vger.kernel.org, linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next v2 00/22] convert to devm_stmmac_probe_config_dt
+Message-ID: <nqa7g7x3alrcbnbgkyalg5h26na6rzwid3jxdqviisi2pnkdrn@b4qvgamj4urr>
+References: <20230916075829.1560-1-jszhang@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH net-next 10/19] net: mdio: mux-bcm-iproc: Convert to
- platform remove callback returning void
-To: =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Russell King <linux@armlinux.org.uk>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20230918195102.1302746-1-u.kleine-koenig@pengutronix.de>
- <20230918195102.1302746-11-u.kleine-koenig@pengutronix.de>
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-In-Reply-To: <20230918195102.1302746-11-u.kleine-koenig@pengutronix.de>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000b886f30605a7b96e"
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230916075829.1560-1-jszhang@kernel.org>
+X-Spam-Status: No, score=1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_SBL_CSS,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---000000000000b886f30605a7b96e
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-
-On 9/18/23 12:50, Uwe Kleine-König wrote:
-> The .remove() callback for a platform driver returns an int which makes
-> many driver authors wrongly assume it's possible to do error handling by
-> returning an error code. However the value returned is ignored (apart
-> from emitting a warning) and this typically results in resource leaks.
-> To improve here there is a quest to make the remove callback return
-> void. In the first step of this quest all drivers are converted to
-> .remove_new() which already returns void. Eventually after all drivers
-> are converted, .remove_new() is renamed to .remove().
+On Sat, Sep 16, 2023 at 03:58:06PM +0800, Jisheng Zhang wrote:
+> Russell pointed out there's a new devm_stmmac_probe_config_dt()
+> helper now when reviewing my starfive gmac error handling patch[1].
+> After greping the code, this nice helper was introduced by Bartosz in
+> [2], I think it's time to convert all dwmac users to this helper and
+> finally complete the TODO in [2] "but once all users of the old
+> stmmac_pltfr_remove() are converted to the devres helper, it will be
+> renamed back to stmmac_pltfr_remove() and the no_dt function removed."
 > 
-> Trivially convert this driver from always returning zero in the remove
-> callback to the void returning variant.
+> Link: https://lore.kernel.org/netdev/ZOtWmedBsa6wQQ6+@shell.armlinux.org.uk/ [1]
+> Link: https://lore.kernel.org/all/20230623100417.93592-1-brgl@bgdev.pl/  [2]
+
+I see the series is already merged in. In anyway here is my tag:
+Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
+
+Thanks for submitting the set.
+
+-Serge(y)
+
 > 
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
-
-
---000000000000b886f30605a7b96e
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBVgwggRAoAMCAQICDBP8P9hKRVySg3Qv5DANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAxMjE4MTFaFw0yNTA5MTAxMjE4MTFaMIGW
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xGTAXBgNVBAMTEEZsb3JpYW4gRmFpbmVsbGkxLDAqBgkqhkiG
-9w0BCQEWHWZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOC
-AQ8AMIIBCgKCAQEA+oi3jMmHltY4LMUy8Up5+1zjd1iSgUBXhwCJLj1GJQF+GwP8InemBbk5rjlC
-UwbQDeIlOfb8xGqHoQFGSW8p9V1XUw+cthISLkycex0AJ09ufePshLZygRLREU0H4ecNPMejxCte
-KdtB4COST4uhBkUCo9BSy1gkl8DJ8j/BQ1KNUx6oYe0CntRag+EnHv9TM9BeXBBLfmMRnWNhvOSk
-nSmRX0J3d9/G2A3FIC6WY2XnLW7eAZCQPa1Tz3n2B5BGOxwqhwKLGLNu2SRCPHwOdD6e0drURF7/
-Vax85/EqkVnFNlfxtZhS0ugx5gn2pta7bTdBm1IG4TX+A3B1G57rVwIDAQABo4IB3jCCAdowDgYD
-VR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3Vy
-ZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEG
-CCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWdu
-MmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93
-d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6
-hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNy
-bDAoBgNVHREEITAfgR1mbG9yaWFuLmZhaW5lbGxpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggr
-BgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUUwwfJ6/F
-KL0fRdVROal/Lp4lAF0wDQYJKoZIhvcNAQELBQADggEBAKBgfteDc1mChZjKBY4xAplC6uXGyBrZ
-kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
-2s1RH00JOkO5SkYdwCHj4DB9B7KEnLatJtD8MBorvt+QxTuSh4ze96Jz3kEIoHMvwGFkgObWblsc
-3/YcLBmCgaWpZ3Ksev1vJPr5n8riG3/N4on8gO5qinmmr9Y7vGeuf5dmZrYMbnb+yCBalkUmZQwY
-NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
-AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
-LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
-/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIKIH6s2bcoFjUm+1
-DGrUIsH6JGiQwTGyzMErrFCjPXz0MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
-AQkFMQ8XDTIzMDkxODIwMDk1M1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
-AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
-MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCY2YPKOOJOG6k4hYJqpldIY6EySqHSLVE3
-30zUOH2eGU4UDyyX3aYeOKSOkwQz3S2Kwt2t4DMUuALGwEXisH/5QoznCP1eDtNH+4Jk9N/5MnzW
-UZY0OZ5r1L5H/Ey4DJQHQt86HdDwIO5o+L772DeN7bvspfNeGIs6S9o4mhnsMj3WGxIVMZNatJhf
-fcRWGv9bLT2GGVBWt2cr62yzvm6ULxkqcARAyQxpuORfI+ipyMfCDbOY9M1go59a7+rt4AkYexRW
-eMFLZWmYuUrYa39SO6UXS61bp4Qnf/6AX0IEk2q6Ed7U3gee9h5C1B4m9DJCwUbbkuF808QGM/9s
-BGHg
---000000000000b886f30605a7b96e--
+> Since v1:
+>  - rebase on new net-next
+>  - add make stmmac_{probe|remove}_config_dt static as suggested by Russell.
+> 
+> Jisheng Zhang (23):
+>   net: stmmac: dwmac-anarion: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-dwc-qos-eth: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-generic: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-generic: use devm_stmmac_pltfr_probe()
+>   net: stmmac: dwmac-imx: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-ingenic: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-intel-plat: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-ipq806x: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-lpc18xx: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-mediatek: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-meson: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-meson8b: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-rk: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-socfpga: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-starfive: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-sti: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-stm32: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-sun8i: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-sunxi: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-tegra: use devm_stmmac_probe_config_dt()
+>   net: stmmac: dwmac-visconti: use devm_stmmac_probe_config_dt()
+>   net: stmmac: rename stmmac_pltfr_remove_no_dt to stmmac_pltfr_remove
+>   net: stmmac: make stmmac_{probe|remove}_config_dt static
+> 
+>  .../ethernet/stmicro/stmmac/dwmac-anarion.c   | 10 +--
+>  .../stmicro/stmmac/dwmac-dwc-qos-eth.c        | 15 +---
+>  .../ethernet/stmicro/stmmac/dwmac-generic.c   | 15 +---
+>  .../net/ethernet/stmicro/stmmac/dwmac-imx.c   | 13 ++--
+>  .../ethernet/stmicro/stmmac/dwmac-ingenic.c   | 33 +++------
+>  .../stmicro/stmmac/dwmac-intel-plat.c         | 25 +++----
+>  .../ethernet/stmicro/stmmac/dwmac-ipq806x.c   | 27 +++----
+>  .../ethernet/stmicro/stmmac/dwmac-lpc18xx.c   | 19 ++---
+>  .../ethernet/stmicro/stmmac/dwmac-mediatek.c  |  6 +-
+>  .../net/ethernet/stmicro/stmmac/dwmac-meson.c | 25 ++-----
+>  .../ethernet/stmicro/stmmac/dwmac-meson8b.c   | 53 +++++---------
+>  .../net/ethernet/stmicro/stmmac/dwmac-rk.c    | 14 ++--
+>  .../ethernet/stmicro/stmmac/dwmac-socfpga.c   | 16 ++---
+>  .../ethernet/stmicro/stmmac/dwmac-starfive.c  | 10 +--
+>  .../net/ethernet/stmicro/stmmac/dwmac-sti.c   | 14 ++--
+>  .../net/ethernet/stmicro/stmmac/dwmac-stm32.c | 17 ++---
+>  .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |  6 +-
+>  .../net/ethernet/stmicro/stmmac/dwmac-sunxi.c | 23 +++---
+>  .../net/ethernet/stmicro/stmmac/dwmac-tegra.c | 10 ++-
+>  .../ethernet/stmicro/stmmac/dwmac-visconti.c  | 18 ++---
+>  .../ethernet/stmicro/stmmac/stmmac_platform.c | 70 ++++++-------------
+>  .../ethernet/stmicro/stmmac/stmmac_platform.h |  5 --
+>  22 files changed, 127 insertions(+), 317 deletions(-)
+> 
+> -- 
+> 2.40.1
+> 
+> 
 
