@@ -1,39 +1,61 @@
-Return-Path: <netdev+bounces-34389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8EED7A40F5
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 08:20:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2440C7A4180
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 08:48:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9117928155E
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 06:20:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD918281C73
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 06:48:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F01953BD;
-	Mon, 18 Sep 2023 06:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 380636ADF;
+	Mon, 18 Sep 2023 06:48:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33DD2525B
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 06:20:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7B6C2C433C9;
-	Mon, 18 Sep 2023 06:20:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695018022;
-	bh=PdRKME1QOWhIdYK1iz91RBb1RJwsI+x9uuQAHa14t7Q=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fn+H9+VE5yWk3jIiml/9nmTldUyRsBbgWmnLO90GnGPARNhFHy7BBhfVw87r+dEUf
-	 B18Zk/V5T4c+RK6Kud/KpStsSU26ZaApKna1GULwfiTdSvQr5XSScyyjbQ8cwCgjjU
-	 SdI1BrlJxS72+XJE0Oknu2rHcLN1w9VlrnYpLOtyG1H+D3F2arYQ0+mJ54HnXZ8Ug+
-	 23K3wnCErI9nYfpAas9YLlk2t3DknWB+qPmiQk8zWq+0NpmRx+opRWHxK/FwMqsrzj
-	 +YsvIlg+dLsTawu/vgiFoqPIk+QoHG+LXRX6X4yS2EG626hbRjovMDrplu12dL9upJ
-	 pDBu694mwHb7Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 60A31E11F40;
-	Mon, 18 Sep 2023 06:20:22 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4FCF1878
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 06:48:09 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A69397
+	for <netdev@vger.kernel.org>; Sun, 17 Sep 2023 23:48:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695019688; x=1726555688;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=GS1gck9ANbiz+tFMOrhAj4TzAhzOgIqU7Aa0jlYpc2w=;
+  b=DBsXllqD+3FDISHObULgaC+7aaFn9VeKNGpMmzaJWDaJAEKAOBolxp3P
+   GaAKkDPuckCJRVNe+TiyK14v7TIJLeORRnJByvKX3Q7oscQaVb0z6278O
+   NH2PimuAVpZbRhrh8xGMZBvh6QC0QUaN7iedKmGWA7/NVqEtbSQRkeKs0
+   lpt6zmBEQfv7atoJBvZ2wCPoMPllGF8gxqwk3ED0Y8hcRG9/gXg2xMAkI
+   bLnMz6TrO7nmfFzxSrSosArVYMH/r40QwIK06bIrQGiliFGelUFMJGDHQ
+   rLOlvbazFLWTA7HH01KzDpf+SbnH0ZDj5HEs8FsWwOaLWVMaQ5V2Ga6su
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10836"; a="369907508"
+X-IronPort-AV: E=Sophos;i="6.02,155,1688454000"; 
+   d="scan'208";a="369907508"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2023 23:48:07 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10836"; a="869452216"
+X-IronPort-AV: E=Sophos;i="6.02,156,1688454000"; 
+   d="scan'208";a="869452216"
+Received: from wasp.igk.intel.com ([10.102.20.192])
+  by orsmga004.jf.intel.com with ESMTP; 17 Sep 2023 23:48:06 -0700
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	jacob.e.keller@intel.com,
+	przemyslaw.kitszel@intel.com,
+	maciej.fijalkowski@intel.com,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Subject: [PATCH iwl-next v2 0/4] change MSI-X vectors per VF
+Date: Mon, 18 Sep 2023 08:24:02 +0200
+Message-ID: <20230918062406.90359-1-michal.swiatkowski@linux.intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,76 +63,51 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net] dccp: fix dccp_v4_err()/dccp_v6_err() again
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169501802239.15865.14994267231326012591.git-patchwork-notify@kernel.org>
-Date: Mon, 18 Sep 2023 06:20:22 +0000
-References: <20230915190035.4083297-1-edumazet@google.com>
-In-Reply-To: <20230915190035.4083297-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com, syzkaller@googlegroups.com,
- jannh@google.com
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Hi,
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+This patchset is implementing sysfs API introduced here [1].
 
-On Fri, 15 Sep 2023 19:00:35 +0000 you wrote:
-> dh->dccph_x is the 9th byte (offset 8) in "struct dccp_hdr",
-> not in the "byte 7" as Jann claimed.
-> 
-> We need to make sure the ICMP messages are big enough,
-> using more standard ways (no more assumptions).
-> 
-> syzbot reported:
-> BUG: KMSAN: uninit-value in pskb_may_pull_reason include/linux/skbuff.h:2667 [inline]
-> BUG: KMSAN: uninit-value in pskb_may_pull include/linux/skbuff.h:2681 [inline]
-> BUG: KMSAN: uninit-value in dccp_v6_err+0x426/0x1aa0 net/dccp/ipv6.c:94
-> pskb_may_pull_reason include/linux/skbuff.h:2667 [inline]
-> pskb_may_pull include/linux/skbuff.h:2681 [inline]
-> dccp_v6_err+0x426/0x1aa0 net/dccp/ipv6.c:94
-> icmpv6_notify+0x4c7/0x880 net/ipv6/icmp.c:867
-> icmpv6_rcv+0x19d5/0x30d0
-> ip6_protocol_deliver_rcu+0xda6/0x2a60 net/ipv6/ip6_input.c:438
-> ip6_input_finish net/ipv6/ip6_input.c:483 [inline]
-> NF_HOOK include/linux/netfilter.h:304 [inline]
-> ip6_input+0x15d/0x430 net/ipv6/ip6_input.c:492
-> ip6_mc_input+0xa7e/0xc80 net/ipv6/ip6_input.c:586
-> dst_input include/net/dst.h:468 [inline]
-> ip6_rcv_finish+0x5db/0x870 net/ipv6/ip6_input.c:79
-> NF_HOOK include/linux/netfilter.h:304 [inline]
-> ipv6_rcv+0xda/0x390 net/ipv6/ip6_input.c:310
-> __netif_receive_skb_one_core net/core/dev.c:5523 [inline]
-> __netif_receive_skb+0x1a6/0x5a0 net/core/dev.c:5637
-> netif_receive_skb_internal net/core/dev.c:5723 [inline]
-> netif_receive_skb+0x58/0x660 net/core/dev.c:5782
-> tun_rx_batched+0x83b/0x920
-> tun_get_user+0x564c/0x6940 drivers/net/tun.c:2002
-> tun_chr_write_iter+0x3af/0x5d0 drivers/net/tun.c:2048
-> call_write_iter include/linux/fs.h:1985 [inline]
-> new_sync_write fs/read_write.c:491 [inline]
-> vfs_write+0x8ef/0x15c0 fs/read_write.c:584
-> ksys_write+0x20f/0x4c0 fs/read_write.c:637
-> __do_sys_write fs/read_write.c:649 [inline]
-> __se_sys_write fs/read_write.c:646 [inline]
-> __x64_sys_write+0x93/0xd0 fs/read_write.c:646
-> do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
-> entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> 
-> [...]
+It will allow user to assign different amount of MSI-X vectors to VF.
+For example when there are VMs with different number of virtual cores.
 
-Here is the summary with links:
-  - [v2,net] dccp: fix dccp_v4_err()/dccp_v6_err() again
-    https://git.kernel.org/netdev/net/c/6af289746a63
+Example:
+1. Turn off autoprobe
+echo 0 > /sys/bus/pci/devices/0000\:18\:00.0/sriov_drivers_autoprobe
+2. Create VFs
+echo 4 > /sys/bus/pci/devices/0000\:18\:00.0/sriov_numvfs
+3. Configure MSI-X
+echo 20 > /sys/class/pci_bus/0000\:18/device/0000\:18\:01.0/sriov_vf_msix_count
 
-You are awesome, thank you!
+v1 --> v2: [2] (Sorry for long time between versions)
+ * rebase
+ * reword commit message in ice: implement num_msix field per VF
+
+[1] https://lore.kernel.org/netdev/20210314124256.70253-1-leon@kernel.org/
+[2] https://lore.kernel.org/netdev/20230615123830.155927-1-michal.swiatkowski@linux.intel.com/
+
+Michal Swiatkowski (4):
+  ice: implement num_msix field per VF
+  ice: add bitmap to track VF MSI-X usage
+  ice: set MSI-X vector count on VF
+  ice: manage VFs MSI-X using resource tracking
+
+ drivers/net/ethernet/intel/ice/ice.h          |   2 +
+ drivers/net/ethernet/intel/ice/ice_lib.c      |   2 +-
+ drivers/net/ethernet/intel/ice/ice_main.c     |   2 +
+ drivers/net/ethernet/intel/ice/ice_sriov.c    | 257 ++++++++++++++++--
+ drivers/net/ethernet/intel/ice/ice_sriov.h    |  13 +
+ drivers/net/ethernet/intel/ice/ice_vf_lib.h   |   4 +-
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c |   2 +-
+ 7 files changed, 258 insertions(+), 24 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.41.0
 
 
