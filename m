@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-34820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D9C27A5511
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 23:31:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C0667A5518
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 23:33:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2508A1C20B8C
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 21:31:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 370FE2820CC
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 21:33:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B57F30F98;
-	Mon, 18 Sep 2023 21:28:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 588B22AB29;
+	Mon, 18 Sep 2023 21:28:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8C8028DDA
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB92828E06
 	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 21:28:48 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55711114
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91982115
 	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 14:28:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1695072527; x=1726608527;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=wv1pJ7U0vbAAlzDhMSfDGvxZf60QlRqgjhjl/ctZJlQ=;
-  b=S4MrKht2dYosLg/d/QOYVppThr5Fliv8YpdV5CKbm7EvdXJYeN5rbk85
-   MwCQkLqWBEYbao3Dr56a9CRwL7O3q8cmflSCUpOZxC9fwtGqdiM5sb3BA
-   aRfx3rtlrwzs7xMGfNyC0xLK8l9Yifh/xDPXQ+ZnNl1mAbw7WEATrXB+2
-   OX5ddno+DhZiQrTV+0hrHZK0pN7y+juxKeiEQWOI9qRDy1hwWEu+ENlcY
-   u6AS6Ph1cIK+RkWiCqBxr7anjRiC1l4NNmKXntLBbQqbd9D5wLuaOT+1r
-   7yb8muMT/RMKw8zXOw7KThNBT6hk10tT7q93ZejX5JRzm1chPatxCREl0
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="359187261"
+  bh=LX791F6QRijic6j/sTB0pQHCBJA9MVn9mFL0/olSSBU=;
+  b=NODEfYte/svt7KDGiFOdg/wySjv3LoFiJ+ulSFCeV/4LVdp1SlYGgVYD
+   Q83OGfut0j3GUV4afoqwfxsdKRkHwv2TuukzeTfXguEUq/8tvBcglqlyc
+   Wa7ZY3YY3EC8oztS0GzQ4P3c2smmuXSMOYYaXMZA92CxQdrNkW485gwub
+   KZBoUqKLZBYQrywxpaXT4noxIY/Qhm0LHDkVMe9h+giUQfMEdful4vGDB
+   dbRfba+s9y396uZ3dyOa22gOiSV3l+yfd0+kPAmFKk7hNHbYu4SC1Pvoa
+   KV1aiqGnlt4GCMybuFh4GkhNQRUBw0+ZrobnGpm/y8OxvUKncde/56DJA
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="359187267"
 X-IronPort-AV: E=Sophos;i="6.02,157,1688454000"; 
-   d="scan'208";a="359187261"
+   d="scan'208";a="359187267"
 Received: from fmsmga007.fm.intel.com ([10.253.24.52])
   by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2023 14:28:45 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="749186215"
+X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="749186221"
 X-IronPort-AV: E=Sophos;i="6.02,157,1688454000"; 
-   d="scan'208";a="749186215"
+   d="scan'208";a="749186221"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by fmsmga007.fm.intel.com with ESMTP; 18 Sep 2023 14:28:45 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -56,9 +56,9 @@ Cc: Karol Kolacinski <karol.kolacinski@intel.com>,
 	richardcochran@gmail.com,
 	Jacob Keller <jacob.e.keller@intel.com>,
 	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: [PATCH net-next v2 06/11] ice: PTP: Rename macros used for PHY/QUAD port definitions
-Date: Mon, 18 Sep 2023 14:28:09 -0700
-Message-Id: <20230918212814.435688-7-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next v2 07/11] ice: PTP: move quad value check inside ice_fill_phy_msg_e822
+Date: Mon, 18 Sep 2023 14:28:10 -0700
+Message-Id: <20230918212814.435688-8-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20230918212814.435688-1-anthony.l.nguyen@intel.com>
 References: <20230918212814.435688-1-anthony.l.nguyen@intel.com>
@@ -78,76 +78,75 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Karol Kolacinski <karol.kolacinski@intel.com>
 
-The ice_fill_phy_msg_e822 function uses several macros to specify the
-correct address when sending a sideband message to the PHY block in
-hardware.
-
-The names of these macros are fairly generic and confusing. Future
-development is going to extend the driver to support new hardware families
-which have different relationships between PHY and QUAD. Rename the macros
-for clarity and to indicate that they are E822 specific. This also matches
-closer to the hardware specification in the data sheet.
+The callers of ice_fill_phy_msg_e822 check for whether the quad number is
+within the expected range. Move this check inside the ice_fill_phy_msg_e822
+function instead of duplicating it twice.
 
 Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c |  8 ++++----
- drivers/net/ethernet/intel/ice/ice_type.h   | 14 +++++++-------
- 2 files changed, 11 insertions(+), 11 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 10445bba6539..7c18dbac49d0 100644
+index 7c18dbac49d0..f839f186797d 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
 +++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -294,9 +294,9 @@ ice_fill_phy_msg_e822(struct ice_sbq_msg_input *msg, u8 port, u16 offset)
+@@ -621,11 +621,14 @@ ice_write_64b_phy_reg_e822(struct ice_hw *hw, u8 port, u16 low_addr, u64 val)
+  * Fill a message buffer for accessing a register in a quad shared between
+  * multiple PHYs.
+  */
+-static void
++static int
+ ice_fill_quad_msg_e822(struct ice_sbq_msg_input *msg, u8 quad, u16 offset)
  {
- 	int phy_port, phy, quadtype;
+ 	u32 addr;
  
--	phy_port = port % ICE_PORTS_PER_PHY;
--	phy = port / ICE_PORTS_PER_PHY;
--	quadtype = (port / ICE_PORTS_PER_QUAD) % ICE_NUM_QUAD_TYPE;
-+	phy_port = port % ICE_PORTS_PER_PHY_E822;
-+	phy = port / ICE_PORTS_PER_PHY_E822;
-+	quadtype = (port / ICE_PORTS_PER_QUAD) % ICE_QUADS_PER_PHY_E822;
- 
- 	if (quadtype == 0) {
- 		msg->msg_addr_low = P_Q0_L(P_0_BASE + offset, phy_port);
-@@ -628,7 +628,7 @@ ice_fill_quad_msg_e822(struct ice_sbq_msg_input *msg, u8 quad, u16 offset)
- 
++	if (quad >= ICE_MAX_QUAD)
++		return -EINVAL;
++
  	msg->dest_dev = rmn_0;
  
--	if ((quad % ICE_NUM_QUAD_TYPE) == 0)
-+	if ((quad % ICE_QUADS_PER_PHY_E822) == 0)
- 		addr = Q_0_BASE + offset;
- 	else
- 		addr = Q_1_BASE + offset;
-diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
-index 4cd131546aa9..bb5d8b681bc2 100644
---- a/drivers/net/ethernet/intel/ice/ice_type.h
-+++ b/drivers/net/ethernet/intel/ice/ice_type.h
-@@ -909,13 +909,13 @@ struct ice_hw {
- 	/* INTRL granularity in 1 us */
- 	u8 intrl_gran;
+ 	if ((quad % ICE_QUADS_PER_PHY_E822) == 0)
+@@ -635,6 +638,8 @@ ice_fill_quad_msg_e822(struct ice_sbq_msg_input *msg, u8 quad, u16 offset)
  
--#define ICE_PHY_PER_NAC		1
--#define ICE_MAX_QUAD		2
--#define ICE_NUM_QUAD_TYPE	2
--#define ICE_PORTS_PER_QUAD	4
--#define ICE_PHY_0_LAST_QUAD	1
--#define ICE_PORTS_PER_PHY	8
--#define ICE_NUM_EXTERNAL_PORTS		ICE_PORTS_PER_PHY
-+#define ICE_PHY_PER_NAC_E822		1
-+#define ICE_MAX_QUAD			2
-+#define ICE_QUADS_PER_PHY_E822		2
-+#define ICE_PORTS_PER_PHY_E822		8
-+#define ICE_PORTS_PER_QUAD		4
-+#define ICE_PORTS_PER_PHY_E810		4
-+#define ICE_NUM_EXTERNAL_PORTS		(ICE_MAX_QUAD * ICE_PORTS_PER_QUAD)
+ 	msg->msg_addr_low = lower_16_bits(addr);
+ 	msg->msg_addr_high = upper_16_bits(addr);
++
++	return 0;
+ }
  
- 	/* Active package version (currently active) */
- 	struct ice_pkg_ver active_pkg_ver;
+ /**
+@@ -653,10 +658,10 @@ ice_read_quad_reg_e822(struct ice_hw *hw, u8 quad, u16 offset, u32 *val)
+ 	struct ice_sbq_msg_input msg = {0};
+ 	int err;
+ 
+-	if (quad >= ICE_MAX_QUAD)
+-		return -EINVAL;
++	err = ice_fill_quad_msg_e822(&msg, quad, offset);
++	if (err)
++		return err;
+ 
+-	ice_fill_quad_msg_e822(&msg, quad, offset);
+ 	msg.opcode = ice_sbq_msg_rd;
+ 
+ 	err = ice_sbq_rw_reg(hw, &msg);
+@@ -687,10 +692,10 @@ ice_write_quad_reg_e822(struct ice_hw *hw, u8 quad, u16 offset, u32 val)
+ 	struct ice_sbq_msg_input msg = {0};
+ 	int err;
+ 
+-	if (quad >= ICE_MAX_QUAD)
+-		return -EINVAL;
++	err = ice_fill_quad_msg_e822(&msg, quad, offset);
++	if (err)
++		return err;
+ 
+-	ice_fill_quad_msg_e822(&msg, quad, offset);
+ 	msg.opcode = ice_sbq_msg_wr;
+ 	msg.data = val;
+ 
 -- 
 2.38.1
 
