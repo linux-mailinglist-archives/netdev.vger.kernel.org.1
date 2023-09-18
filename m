@@ -1,233 +1,205 @@
-Return-Path: <netdev+bounces-34570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34591-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F41A7A4BCC
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 17:22:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F1AA37A4CF1
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 17:44:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCBFA281C76
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 15:22:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AAFD82823B1
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 15:44:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6C671D695;
-	Mon, 18 Sep 2023 15:22:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1699B1F604;
+	Mon, 18 Sep 2023 15:44:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0335E14F77
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 15:22:00 +0000 (UTC)
-Received: from mail-il1-x12f.google.com (mail-il1-x12f.google.com [IPv6:2607:f8b0:4864:20::12f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B501E60
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 08:19:32 -0700 (PDT)
-Received: by mail-il1-x12f.google.com with SMTP id e9e14a558f8ab-34fa117f92bso291785ab.1
-        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 08:19:31 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96CE1D686;
+	Mon, 18 Sep 2023 15:44:03 +0000 (UTC)
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09122116;
+	Mon, 18 Sep 2023 08:42:18 -0700 (PDT)
+Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-530fa34ab80so2873184a12.0;
+        Mon, 18 Sep 2023 08:42:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695050370; x=1695655170; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1695051444; x=1695656244; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kujrkpvdn/mKIWmW+1GpLRQfz9MujBbkkOfEQ92xGA0=;
-        b=Hn0kMv0ajV0dUrUSgdYNPrJsi4+1DuL58rDT8ymdLzschNmuAM62iXLaBe+GnmsDgg
-         hs6yhiThI0zhhPy2bPbhdo7zUzemNATgnzAofhm+t+JeVSX2XuldgXNLQCL3x7wVwMih
-         kmfjyuUSbLe7x0Th81J2vqx1rzwZACo6Z2R09a5ykk1NFjiQtZB6DO+HelSqOA7dJpVx
-         CmXICFWPflmG/eb6EH1yIAonvMIodJXIlK0NVDgWhG3kqPGqk8Nmjp4f989/VSW+/sw8
-         hekDqWBhn0nkDM7CpizFHctZJIeaLrCNtX0YS7DvMSdBRvpDqKUx4bgdz5Cbn/4RlXi6
-         b40Q==
+        bh=Rj4c9AMW+lHnbdnbbz2179vv+UZJDmD5B/irdAQLI6A=;
+        b=jSRXO7U3ZXNMTQ+jBtwhedxCiC+c1bSuZRRinckSwjLXNS7BxQovOrEnmKVgQS34A4
+         0xLuIY+ZTYcF4KSl8vYeXhjBx3X9v6fmwZ9Uc9KAAHJ3cqBZjeGGaU95kUoyddqqK+7H
+         4JZ7YFhDrz4CICv5yOOyMoxUfxxxbYoyZ+5Zqxik+QL04pkLEn2eAnEYomqm9hTEI4UW
+         VFwMYtXOJnv6ejdPMmuYYZSph2y/YtglbLDmM1K3lUuA4PMZd6QFK7Q8EHGGy0Vor2/N
+         s5HmMiJ562kDsuSAsQcSpX6e+cC/KUQ3PNhCd9rDKNlgvn2H1YK27xpouLqdVT++eozM
+         qENg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695050370; x=1695655170;
+        d=1e100.net; s=20230601; t=1695051444; x=1695656244;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kujrkpvdn/mKIWmW+1GpLRQfz9MujBbkkOfEQ92xGA0=;
-        b=frkOoM4d2iQLUVJFfm53aEyVglOocMA089MDbM0x3kgpfPSOSpXvsWr6C0A8FC3X/R
-         lTxy1U0oehkFaNappc8fJc1wMkajlsscM+297xzhv0d19ybdciC0mA+T6KKd8MLGxiIe
-         1rsdasVdgt09ZEDPISRblebtpEovjsS06DJNgfgfGZWk0GpjROQrkOG9WyKRYEOOBFD3
-         rFqVsHbWdTaWl6L9Dbfxfc3AllpwBAaK75MAdwNCXlNA10lDBWU/HvF+jravgv9ENfrd
-         s6ibx6zuBqVX+QbJ3BFyInOzoGENBOv8wmzA2CfXDOlgPVZeRvvIy/PGNfHkau4C+e+q
-         wJ0Q==
-X-Gm-Message-State: AOJu0YzETbu9/hAHQjNKuD4+FkbMK0xgnCLxcWpX9xgtjtPmiP3IFxwB
-	1JR/mDiepA5fBAhIQJdc4tHYPL9QSm4XVbwOXRvxcWOYlU+LuggWlItMQQ==
-X-Google-Smtp-Source: AGHT+IEL1xXCAc1VgiFssCqfjbchpT46nGog02puyburvM1qIqUr9r2IfkqvoB0vR0qtdvK+Q9HssMCHFrNrUc1h7Bs=
-X-Received: by 2002:a05:622a:1446:b0:410:8ba3:21c7 with SMTP id
- v6-20020a05622a144600b004108ba321c7mr479693qtx.18.1695047325424; Mon, 18 Sep
- 2023 07:28:45 -0700 (PDT)
+        bh=Rj4c9AMW+lHnbdnbbz2179vv+UZJDmD5B/irdAQLI6A=;
+        b=AUHtRx0wJM17qzvgVrbA0ASmMgXXIUvTCNI9/LaC470hvDbMasbFuQnSwgAf0wCT4V
+         wUs5pIhu5MI52h9O3rjT7wJyvsB3XY1K8tp8D0N8D/XTwQLkE2ldX9qb3NP2boKlfuLq
+         fz7qR0RgiZicfwW+opTXuDrQzD+SwBbee6+kWLfO2yiroE/yZZBiSbFQJ+mv5CojRPZg
+         vN0Su97FQdwAE9UaD8rdg9YTWTVrs1iWlcpdLy1Yq5Gy709AJYwe7GViWpCfmbp8uQEY
+         W1SnjAJ4EPpmSfoKRzZsB0sE6GigOJUrbwcjjmyK0RGUaCnw+b0eAmDCOuYdYpBwAgqp
+         dLtQ==
+X-Gm-Message-State: AOJu0YyW6ubo0Xnngt3VWaaSGRmUPVnY9gkPtJ/ySCMF3YkWl0283Ne8
+	LsKDpDWXxu2mbLlLUKXzl0hQHqOlRV/DYFKZAHYLMliWuoI=
+X-Google-Smtp-Source: AGHT+IEXjZ3C5NwEYwz0xRr1OAYeh8IP8riDS+f3m5/CyZNNgzA6mCtpfFGH7HkWzTfVb+VmLSSbfU6xhX6KCRgTeU8=
+X-Received: by 2002:a7b:cd0d:0:b0:3ff:516b:5c4c with SMTP id
+ f13-20020a7bcd0d000000b003ff516b5c4cmr7531273wmj.18.1695047609042; Mon, 18
+ Sep 2023 07:33:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230916132932.361875-1-liangchen.linux@gmail.com> <20230916132932.361875-2-liangchen.linux@gmail.com>
-In-Reply-To: <20230916132932.361875-2-liangchen.linux@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 18 Sep 2023 16:28:34 +0200
-Message-ID: <CANn89iLA5irwbuqvJdnptGs9pQNO_63qQsJ1jjZd1E0Cd4JVMw@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 2/2] pktgen: Introducing 'SHARED' flag for
- testing with non-shared skb
-To: Liang Chen <liangchen.linux@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	benjamin.poirier@gmail.com, netdev@vger.kernel.org
+References: <20230916165853.15153-1-alexei.starovoitov@gmail.com>
+ <CANn89iK_367bq4Gv+AuA-H5UgXNuM=N3XCp7N8nkeMik0Kwp+Q@mail.gmail.com>
+ <CAADnVQL14y5=eXp=KwAjOYeLuu8DTbL_GDkGxNoHjhy498yBqw@mail.gmail.com>
+ <CANn89iKkEcsaEQRNmxdEHAkTbPVgVekUcjJvDsd-_fs0M9Qszw@mail.gmail.com>
+ <CAADnVQLn1dtBNyywZO38WyWtUyomKJDdMefpkj3mkR=+fOh+tg@mail.gmail.com>
+ <CAP01T75C3qHe3OuXcbFqDjLtb+M8UixVYxHA-Gf=c6xrNQvVAA@mail.gmail.com> <CAP01T77KpyhUByzBmz+g12GgB7SEm0qr4BGJMrkFw5DXC+_Vdw@mail.gmail.com>
+In-Reply-To: <CAP01T77KpyhUByzBmz+g12GgB7SEm0qr4BGJMrkFw5DXC+_Vdw@mail.gmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Mon, 18 Sep 2023 07:33:17 -0700
+Message-ID: <CAADnVQLSgPV0xWHj0QXgNoE4CkmDH0WESAkH_XwOHr8_jvOZ9w@mail.gmail.com>
+Subject: Re: pull-request: bpf-next 2023-09-16
+To: Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Kernel Team <kernel-team@fb.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-0.2 required=5.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Sep 16, 2023 at 3:30=E2=80=AFPM Liang Chen <liangchen.linux@gmail.c=
-om> wrote:
+On Mon, Sep 18, 2023 at 7:24=E2=80=AFAM Kumar Kartikeya Dwivedi
+<memxor@gmail.com> wrote:
 >
-> Currently, skbs generated by pktgen always have their reference count
-> incremented before transmission, causing their reference count to be
-> always greater than 1, leading to two issues:
->   1. Only the code paths for shared skbs can be tested.
->   2. In certain situations, skbs can only be released by pktgen.
-> To enhance testing comprehensiveness, we are introducing the "SHARED"
-> flag to indicate whether an SKB is shared. This flag is enabled by
-> default, aligning with the current behavior. However, disabling this
-> flag allows skbs with a reference count of 1 to be transmitted.
-> So we can test non-shared skbs and code paths where skbs are released
-> within the stack.
+> On Mon, 18 Sept 2023 at 16:15, Kumar Kartikeya Dwivedi <memxor@gmail.com>=
+ wrote:
+> >
+> > On Mon, 18 Sept 2023 at 15:56, Alexei Starovoitov
+> > <alexei.starovoitov@gmail.com> wrote:
+> > >
+> > > On Mon, Sep 18, 2023 at 6:54=E2=80=AFAM Eric Dumazet <edumazet@google=
+.com> wrote:
+> > > >
+> > > > On Mon, Sep 18, 2023 at 3:41=E2=80=AFPM Alexei Starovoitov
+> > > > <alexei.starovoitov@gmail.com> wrote:
+> > > > >
+> > > > > On Mon, Sep 18, 2023 at 6:25=E2=80=AFAM Eric Dumazet <edumazet@go=
+ogle.com> wrote:
+> > > > > >
+> > > > > > On Sat, Sep 16, 2023 at 6:59=E2=80=AFPM Alexei Starovoitov
+> > > > > > <alexei.starovoitov@gmail.com> wrote:
+> > > > > > >
+> > > > > > > Hi David, hi Jakub, hi Paolo, hi Eric,
+> > > > > > >
+> > > > > > > The following pull-request contains BPF updates for your *net=
+-next* tree.
+> > > > > > >
+> > > > > > > We've added 73 non-merge commits during the last 9 day(s) whi=
+ch contain
+> > > > > > > a total of 79 files changed, 5275 insertions(+), 600 deletion=
+s(-).
+> > > > > > >
+> > > > > > > The main changes are:
+> > > > > > >
+> > > > > > > 1) Basic BTF validation in libbpf, from Andrii Nakryiko.
+> > > > > > >
+> > > > > > > 2) bpf_assert(), bpf_throw(), exceptions in bpf progs, from K=
+umar Kartikeya Dwivedi.
+> > > > > > >
+> > > > > > > 3) next_thread cleanups, from Oleg Nesterov.
+> > > > > > >
+> > > > > > > 4) Add mcpu=3Dv4 support to arm32, from Puranjay Mohan.
+> > > > > > >
+> > > > > > > 5) Add support for __percpu pointers in bpf progs, from Yongh=
+ong Song.
+> > > > > > >
+> > > > > > > 6) Fix bpf tailcall interaction with bpf trampoline, from Leo=
+n Hwang.
+> > > > > > >
+> > > > > > > 7) Raise irq_work in bpf_mem_alloc while irqs are disabled to=
+ improve refill probabablity, from Hou Tao.
+> > > > > > >
+> > > > > > > Please consider pulling these changes from:
+> > > > > > >
+> > > > > > >   git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.=
+git
+> > > > > > >
+> > > > > >
+> > > > > > This might have been raised already, but bpf on x86 now depends=
+ on
+> > > > > > CONFIG_UNWINDER_ORC ?
+> > > > > >
+> > > > > > $ grep CONFIG_UNWINDER_ORC .config
+> > > > > > # CONFIG_UNWINDER_ORC is not set
+> > > > > >
+> > > > > > $ make ...
+> > > > > > arch/x86/net/bpf_jit_comp.c:3022:58: error: no member named 'sp=
+' in
+> > > > > > 'struct unwind_state'
+> > > > > >                 if (!addr || !consume_fn(cookie, (u64)addr,
+> > > > > > (u64)state.sp, (u64)state.bp))
+> > > > > >                                                                =
+  ~~~~~ ^
+> > > > > > 1 error generated.
+> > > > >
+> > > > > Kumar,
+> > > > > can probably explain better,
+> > > > > but no the bpf as whole doesn't depend.
+> > > > > One feature needs either ORC or frame unwinder.
+> > > > > It won't work with unwinder_guess.
+> > > > > The build error is a separate issue.
+> > > > > It hasn't been reported before.
+> > > >
+> > > > In my builds, I do have CONFIG_UNWINDER_FRAME_POINTER=3Dy
+> > > >
+> > > > $ grep UNWIND .config
+> > > > # CONFIG_UNWINDER_ORC is not set
+> > > > CONFIG_UNWINDER_FRAME_POINTER=3Dy
+> > > >
+> > > >
+> > > > I note state.sp is only available to CONFIG_UNWINDER_ORC
+> > > >
+> > > > arch/x86/include/asm/unwind.h
+> > > >
+> > > > #if defined(CONFIG_UNWINDER_ORC)
+> > > >     bool signal, full_regs;
+> > > >     unsigned long sp, bp, ip;
+> > > >     struct pt_regs *regs, *prev_regs;
+> > > > #elif defined(CONFIG_UNWINDER_FRAME_POINTER)
+> > > >    bool got_irq;
+> > > >    unsigned long *bp, *orig_sp, ip;   // this is orig_sp , not sp.
+> > >
+> > > Right. Our replies crossed.
+> > > Please ignore this PR. We need to fix this first.
+> >
+> > Hello,
+> > This is my bad. I totally missed it since I initially wrote this patch
+> > and never looked at it again.
+> > I suggest that I send a fix to disable this feature with
+> > CONFIG_UNWINDER_FRAME_POINTER=3Dy, while I work on reenabling it again
+> > for it with a follow up.
 >
-> Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
-> ---
->  Documentation/networking/pktgen.rst | 12 ++++++++
->  net/core/pktgen.c                   | 48 ++++++++++++++++++++++++-----
->  2 files changed, 52 insertions(+), 8 deletions(-)
->
-> diff --git a/Documentation/networking/pktgen.rst b/Documentation/networki=
-ng/pktgen.rst
-> index 1225f0f63ff0..c945218946e1 100644
-> --- a/Documentation/networking/pktgen.rst
-> +++ b/Documentation/networking/pktgen.rst
-> @@ -178,6 +178,7 @@ Examples::
->                               IPSEC # IPsec encapsulation (needs CONFIG_X=
-FRM)
->                               NODE_ALLOC # node specific memory allocatio=
-n
->                               NO_TIMESTAMP # disable timestamping
-> +                             SHARED # enable shared SKB
->   pgset 'flag ![name]'    Clear a flag to determine behaviour.
->                          Note that you might need to use single quote in
->                          interactive mode, so that your shell wouldn't ex=
-pand
-> @@ -288,6 +289,16 @@ To avoid breaking existing testbed scripts for using=
- AH type and tunnel mode,
->  you can use "pgset spi SPI_VALUE" to specify which transformation mode
->  to employ.
->
-> +Disable shared SKB
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +By default, SKBs sent by pktgen are shared (user count > 1).
-> +To test with non-shared SKBs, remove the "SHARED" flag by simply setting=
-::
-> +
-> +       pg_set "flag !SHARED"
-> +
-> +However, if the "clone_skb" or "burst" parameters are configured, the sk=
-b
-> +still needs to be held by pktgen for further access. Hence the skb must =
-be
-> +shared.
->
->  Current commands and configuration options
->  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> @@ -357,6 +368,7 @@ Current commands and configuration options
->      IPSEC
->      NODE_ALLOC
->      NO_TIMESTAMP
-> +    SHARED
->
->      spi (ipsec)
->
-> diff --git a/net/core/pktgen.c b/net/core/pktgen.c
-> index 48306a101fd9..c4e0814df325 100644
-> --- a/net/core/pktgen.c
-> +++ b/net/core/pktgen.c
-> @@ -200,6 +200,7 @@
->         pf(VID_RND)             /* Random VLAN ID */                    \
->         pf(SVID_RND)            /* Random SVLAN ID */                   \
->         pf(NODE)                /* Node memory alloc*/                  \
-> +       pf(SHARED)              /* Shared SKB */                        \
->
->  #define pf(flag)               flag##_SHIFT,
->  enum pkt_flags {
-> @@ -1198,7 +1199,8 @@ static ssize_t pktgen_if_write(struct file *file,
->                     ((pkt_dev->xmit_mode =3D=3D M_NETIF_RECEIVE) ||
->                      !(pkt_dev->odev->priv_flags & IFF_TX_SKB_SHARING)))
->                         return -ENOTSUPP;
-> -               if (value > 0 && pkt_dev->n_imix_entries > 0)
-> +               if (value > 0 && (pkt_dev->n_imix_entries > 0 ||
-> +                                 !(pkt_dev->flags & F_SHARED)))
->                         return -EINVAL;
->
->                 i +=3D len;
-> @@ -1257,6 +1259,10 @@ static ssize_t pktgen_if_write(struct file *file,
->                      ((pkt_dev->xmit_mode =3D=3D M_START_XMIT) &&
->                      (!(pkt_dev->odev->priv_flags & IFF_TX_SKB_SHARING)))=
-))
->                         return -ENOTSUPP;
-> +
-> +               if (value > 1 && !(pkt_dev->flags & F_SHARED))
-> +                       return -EINVAL;
-> +
->                 pkt_dev->burst =3D value < 1 ? 1 : value;
->                 sprintf(pg_result, "OK: burst=3D%u", pkt_dev->burst);
->                 return count;
-> @@ -1334,10 +1340,19 @@ static ssize_t pktgen_if_write(struct file *file,
->
->                 flag =3D pktgen_read_flag(f, &disable);
->                 if (flag) {
-> -                       if (disable)
-> +                       if (disable) {
-> +                               /* If "clone_skb", or "burst" parameters =
-are
-> +                                * configured, it means that the skb stil=
-l
-> +                                * needs to be referenced by the pktgen, =
-so
-> +                                * the skb must be shared.
-> +                                */
-> +                               if (flag =3D=3D F_SHARED && (pkt_dev->clo=
-ne_skb ||
-> +                                                        pkt_dev->burst >=
- 1))
-> +                                       return -EINVAL;
->                                 pkt_dev->flags &=3D ~flag;
-> -                       else
-> +                       } else {
->                                 pkt_dev->flags |=3D flag;
-> +                       }
->
->                         sprintf(pg_result, "OK: flags=3D0x%x", pkt_dev->f=
-lags);
->                         return count;
-> @@ -3489,7 +3504,8 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
->         if (pkt_dev->xmit_mode =3D=3D M_NETIF_RECEIVE) {
->                 skb =3D pkt_dev->skb;
->                 skb->protocol =3D eth_type_trans(skb, skb->dev);
-> -               refcount_add(burst, &skb->users);
-> +               if (pkt_dev->flags & F_SHARED)
-> +                       refcount_add(burst, &skb->users);
->                 local_bh_disable();
->                 do {
->                         ret =3D netif_receive_skb(skb);
-> @@ -3497,6 +3513,10 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev=
-)
->                                 pkt_dev->errors++;
->                         pkt_dev->sofar++;
->                         pkt_dev->seq_num++;
+> Hi, I've attached a fix that should disable it for now. I'll work on a
+> follow up to reenable it for this config option.
+> Really sorry about this, I'll try to be more careful going forward.
 
-Since pkt_dev->flags can change under us, I would rather read pkt_dev->flag=
-s
-once in pktgen_xmit() to avoid surprises...
-
-syzbot probably never figured out how to run pktgen, it is a matter of time=
-...
+Patchwork doesn't recognize patches this way.
+Pls submit it properly.
 
