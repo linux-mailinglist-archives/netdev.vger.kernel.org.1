@@ -1,119 +1,89 @@
-Return-Path: <netdev+bounces-34440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5F2B7A42BA
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 09:34:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BB2F7A4258
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 09:31:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE0D11C20DE0
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 07:34:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D924A281839
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 07:30:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD3CD1C29D;
-	Mon, 18 Sep 2023 07:32:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10E807492;
+	Mon, 18 Sep 2023 07:30:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BECCE79FB;
-	Mon, 18 Sep 2023 07:32:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BC40C433B9;
-	Mon, 18 Sep 2023 07:32:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD673C2C
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 07:30:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C57CBC433CC;
+	Mon, 18 Sep 2023 07:30:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695022341;
-	bh=07Jp3LphXzl4EkHja0JdIUA/xjHpNGiZuguIXloPztM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Vnbzf3QhQuVmwYQAf2Mt0WSZBefd5lhLSFtkXhwMC+n+X7N4ki+6T0boDwsgMr0XN
-	 AAdXg1yYsIa/lFW8JGjF+xmiLYY63eHqaMwytJIlEVwOkPrMrojuYJZhQpE797YZju
-	 GZcg8J0n+fEArc0GhUtiTV4LpXaeVrImgv2qDiS2pZ01DSA9wJwPYqPfL7KPbaX6bE
-	 QYQH9HSRdQuGBz3raOjQKyLrYnfzs7cZoMWOYQ1LzctZYuLHDNxMU/K31vWL6RTmKL
-	 zi7xoAjilllhk4DMDBlwvUkOVzwZl6SwuVwOf6rk+tbCRJ2s6/D0PIr6IMDdrgSqtE
-	 mxvGlqxn371yQ==
-From: Mike Rapoport <rppt@kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	"David S. Miller" <davem@davemloft.net>,
-	Dinh Nguyen <dinguyen@kernel.org>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Helge Deller <deller@gmx.de>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Mike Rapoport <rppt@kernel.org>,
-	Nadav Amit <nadav.amit@gmail.com>,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Puranjay Mohan <puranjay12@gmail.com>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Song Liu <song@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Will Deacon <will@kernel.org>,
-	bpf@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mips@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-modules@vger.kernel.org,
-	linux-parisc@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	loongarch@lists.linux.dev,
-	netdev@vger.kernel.org,
-	sparclinux@vger.kernel.org,
-	x86@kernel.org
-Subject: [PATCH v3 13/13] bpf: remove CONFIG_BPF_JIT dependency on CONFIG_MODULES of
-Date: Mon, 18 Sep 2023 10:29:55 +0300
-Message-Id: <20230918072955.2507221-14-rppt@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230918072955.2507221-1-rppt@kernel.org>
-References: <20230918072955.2507221-1-rppt@kernel.org>
+	s=k20201202; t=1695022223;
+	bh=i9H9wZ77yZRa4B+Ukm/PXdGqgr9Ji45NiO/SqgEzmDs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=NcQ+hOdOTyyKDZSCZsE5K8FMHaUBYU1Xx9i/XssfmSBOkzVvBAjRZ1U/Ueg3Um+6q
+	 twCt+0rJI2IeCIbJlBCfEjtDFSCIJHv0dfM8bnDhOnPt1YuZWUwLfd+1FrXRH//HRm
+	 wig2p9h0JlPZr7sqGZJzMAKhWIu69xeuKAUdtXE5WU45ZCBiV0SK2nTvM1tStvkL7T
+	 aSFNsfTJbGZF0MkY5h7U8grbbT7stM7uGBpqeWZN7usnnTsKrNjVht/YKXdXnKCjz7
+	 hEnzzMm1cMJ2HUF3J95mKiukWH8JwLhpFe4Uj5aTnOLoliXbzR19pCLAUxH6c0Xz5k
+	 SCM8kofa3VS6g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AB933E11F42;
+	Mon, 18 Sep 2023 07:30:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/5] net: hsr: Properly parse HSRv1 supervisor frames.
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169502222369.22191.13254113064617721891.git-patchwork-notify@kernel.org>
+Date: Mon, 18 Sep 2023 07:30:23 +0000
+References: <20230915181006.2086061-1-bigeasy@linutronix.de>
+In-Reply-To: <20230915181006.2086061-1-bigeasy@linutronix.de>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, ennoerlangen@gmail.com,
+ edumazet@google.com, kuba@kernel.org, lukma@denx.de, pabeni@redhat.com,
+ shuah@kernel.org, tglx@linutronix.de
 
-From: "Mike Rapoport (IBM)" <rppt@kernel.org>
+Hello:
 
-BPF just-in-time compiler depended on CONFIG_MODULES because it used
-module_alloc() to allocate memory for the generated code.
+This series was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Since code allocations are now implemented with execmem, drop dependency of
-CONFIG_BPF_JIT on CONFIG_MODULES and make it select CONFIG_EXECMEM.
+On Fri, 15 Sep 2023 20:10:01 +0200 you wrote:
+> Hi,
+> 
+> this is a follow-up to
+> 	https://lore.kernel.org/all/20230825153111.228768-1-lukma@denx.de/
+> replacing
+> 	https://lore.kernel.org/all/20230914124731.1654059-1-lukma@denx.de/
+> 
+> [...]
 
-Suggested-by: Björn Töpel <bjorn@kernel.org>
-Signed-off-by: Mike Rapoport (IBM) <rppt@kernel.org>
----
- kernel/bpf/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Here is the summary with links:
+  - [net,1/5] net: hsr: Properly parse HSRv1 supervisor frames.
+    https://git.kernel.org/netdev/net/c/295de650d3aa
+  - [net-next,2/5] net: hsr: Add __packed to struct hsr_sup_tlv.
+    https://git.kernel.org/netdev/net/c/fbd825fcd7dd
+  - [net-next,3/5] selftests: hsr: Use `let' properly.
+    https://git.kernel.org/netdev/net/c/5c3ce539a111
+  - [net-next,4/5] selftests: hsr: Reorder the testsuite.
+    https://git.kernel.org/netdev/net/c/d53f23fe164c
+  - [net-next,5/5] selftests: hsr: Extend the testsuite to also cover HSRv1.
+    https://git.kernel.org/netdev/net/c/b0e9c3b5fdaf
 
-diff --git a/kernel/bpf/Kconfig b/kernel/bpf/Kconfig
-index 6a906ff93006..5be11c906f93 100644
---- a/kernel/bpf/Kconfig
-+++ b/kernel/bpf/Kconfig
-@@ -42,7 +42,7 @@ config BPF_JIT
- 	bool "Enable BPF Just In Time compiler"
- 	depends on BPF
- 	depends on HAVE_CBPF_JIT || HAVE_EBPF_JIT
--	depends on MODULES
-+	select EXECMEM
- 	help
- 	  BPF programs are normally handled by a BPF interpreter. This option
- 	  allows the kernel to generate native code when a program is loaded
+You are awesome, thank you!
 -- 
-2.39.2
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
