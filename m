@@ -1,130 +1,120 @@
-Return-Path: <netdev+bounces-34506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 283F27A46DA
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 12:23:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2C567A46F0
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 12:30:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6B34281CB9
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 10:23:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C08621C20FB9
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 10:29:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D024E1C69A;
-	Mon, 18 Sep 2023 10:23:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79A4F1C6A3;
+	Mon, 18 Sep 2023 10:29:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C94AE1C697
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 10:23:10 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49F77121;
-	Mon, 18 Sep 2023 03:22:57 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1qiBOj-0005r4-FR; Mon, 18 Sep 2023 12:22:33 +0200
-Date: Mon, 18 Sep 2023 12:22:33 +0200
-From: Florian Westphal <fw@strlen.de>
-To: George Guo <guodongtai@kylinos.cn>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, dsahern@kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1] tcp: enhancing timestamps random algo to address
- issues arising from NAT mapping
-Message-ID: <20230918102233.GA9759@breakpoint.cc>
-References: <20230918014752.1791518-1-guodongtai@kylinos.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6924B10F9;
+	Mon, 18 Sep 2023 10:29:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69F6CC433C8;
+	Mon, 18 Sep 2023 10:29:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695032993;
+	bh=g60gI4xhtjsT6YwgP3vmxbN65nqJ+g/9M7lfzuwDok8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=QUC/PoqcQsEo9picGWT0JFvdo4BdCeaqcm8PI4spneVGRRSXZ3KSp0JiOqd5F0auQ
+	 OP/e6YWg7nvOvHjcmKDROY4Lj+LcfJ1E85N+8mAQw1LCIqrW7yXQGJbU8pe49xrCxR
+	 GAXbgd5haCQTTLr9o+8IEdfsHnL64DGfdLZ0Rudkjar6DZqJ8Wr9heXlp/I6k7Y3LL
+	 WtBC8rmpcd9VN+fLnehdfBHRK03+Je2pKyTzRj6rzUcoFf8GDwDj0vKFsM6tKfu1Pv
+	 tGwzTSXYrQjGUigmfn/Xp0nlWIyP54EISavWVH1ywuy12edR5p9FIYi+PfWacx4jWJ
+	 uK2TCCH38zeBw==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: netdev@vger.kernel.org
+Cc: lorenzo.bianconi@redhat.com,
+	nbd@nbd.name,
+	john@phrozen.org,
+	sean.wang@mediatek.com,
+	Mark-MC.Lee@mediatek.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	daniel@makrotopia.org,
+	linux-mediatek@lists.infradead.org,
+	sujuan.chen@mediatek.com,
+	horms@kernel.org,
+	robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org,
+	devicetree@vger.kernel.org
+Subject: [PATCH v2 net-next 00/17] Add WED support for MT7988 chipset
+Date: Mon, 18 Sep 2023 12:29:02 +0200
+Message-ID: <cover.1695032290.git.lorenzo@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230918014752.1791518-1-guodongtai@kylinos.cn>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
 
-George Guo <guodongtai@kylinos.cn> wrote:
-> Tsval=tsoffset+local_clock, here tsoffset is randomized with saddr and daddr parameters in func
-> secure_tcp_ts_off. Most of time it is OK except for NAT mapping to the same port and daddr.
-> Consider the following scenario:
-> 	ns1:                ns2:
-> 	+-----------+        +-----------+
-> 	|           |        |           |
-> 	|           |        |           |
-> 	|           |        |           |
-> 	| veth1     |        | vethb     |
-> 	|192.168.1.1|        |192.168.1.2|
-> 	+----+------+        +-----+-----+
-> 	     |                     |
-> 	     |                     |
-> 	     | br0:192.168.1.254   |
-> 	     +----------+----------+
-> 	 veth0          |     vetha
-> 	 192.168.1.3    |    192.168.1.4
-> 	                |
-> 	               nat(192.168.1.x -->172.30.60.199)
-> 	                |
-> 	                V
-> 	               eth0
-> 	         172.30.60.199
-> 	               |
-> 	               |
-> 	               +----> ... ...    ---->server: 172.30.60.191
-> 
-> Let's say ns1 (192.168.1.1) generates a timestamp ts1, and ns2 (192.168.1.2) generates a timestamp
-> ts2, with ts1 > ts2.
-> 
-> If ns1 initiates a connection to a server, and then the server actively closes the connection,
-> entering the TIME_WAIT state, and ns2 attempts to connect to the server while port reuse is in
-> progress, due to the presence of NAT, the server sees both connections as originating from the
-> same IP address (e.g., 172.30.60.199) and port. However, since ts2 is smaller than ts1, the server
-> will respond with the acknowledgment (ACK) for the fourth handshake.
-> 
->        SERVER                                               	CLIENT
-> 
->    1.  ESTABLISHED                                          	ESTABLISHED
-> 
->        (Close)
->    2.  FIN-WAIT-1  --> <SEQ=100><ACK=300><TSval=20><CTL=FIN,ACK>  --> CLOSE-WAIT
-> 
->    3.  FIN-WAIT-2  <-- <SEQ=300><ACK=101><TSval=40><CTL=ACK>      <-- CLOSE-WAIT
-> 
->                                                             (Close)
->    4.  TIME-WAIT   <-- <SEQ=300><ACK=101><TSval=41><CTL=FIN,ACK>  <-- LAST-ACK
-> 
->    5.  TIME-WAIT   --> <SEQ=101><ACK=301><TSval=25><CTL=ACK>      --> CLOSED
-> 
->   - - - - - - - - - - - - - port reused - - - - - - - - - - - - - - -
-> 
->    5.1. TIME-WAIT   <-- <SEQ=255><TSval=30><CTL=SYN>             <-- SYN-SENT
-> 
->    5.2. TIME-WAIT   --> <SEQ=101><ACK=301><TSval=35><CTL=ACK>    --> SYN-SENT
-> 
->    5.3. CLOSED      <-- <SEQ=301><CTL=RST>             		 <-- SYN-SENT
-> 
->    6.  SYN-RECV    <-- <SEQ=255><TSval=34><CTL=SYN>              <-- SYN-SENT
-> 
->    7.  SYN-RECV    --> <SEQ=400><ACK=301><TSval=40><CTL=SYN,ACK> --> ESTABLISHED
-> 
->    1.  ESTABLISH   <-- <SEQ=301><ACK=401><TSval=55><CTL=ACK>     <-- ESTABLISHED
-> 
-> This enhancement uses sport and daddr rather than saddr and daddr, which keep the timestamp
-> monotonically increasing in the situation described above. Then the port reuse is like this:
+Similar to MT7622 and MT7986, introduce Wireless Ethernet Dispatcher (WED)
+support for MT7988 chipset in order to offload to the hw packet engine traffic
+received from LAN/WAN device to WLAN nic (MT7996E).
+Add WED RX support in order to offload traffic received by WLAN nic to the
+wired interfaces (LAN/WAN).
 
-We used to have per-connection timestamps, i.e. hash used to include
-port numbers as well.
+Changes since v1:
+- introduce mtk_wed_soc_data data structure to contain per-SoC definitions
+- get rid of buf pointer in mtk_wed_hwrro_buffer_alloc()
+- rebase on top of net-next
 
-Unfortunately there were problem reports, too many devices expect
-monotonically increasing ts from the same address.
+Lorenzo Bianconi (12):
+  dt-bindings: soc: mediatek: mt7986-wo-ccif: add binding for MT7988 SoC
+  dt-bindings: arm: mediatek: mt7622-wed: add WED binding for MT7988 SoC
+  net: ethernet: mtk_wed: introduce versioning utility routines
+  net: ethernet: mtk_wed: do not configure rx offload if not supported
+  net: ethernet: mtk_wed: rename mtk_rxbm_desc in mtk_wed_bm_desc
+  net: ethernet: mtk_wed: introduce mtk_wed_buf structure
+  net: ethernet: mtk_wed: move mem_region array out of
+    mtk_wed_mcu_load_firmware
+  net: ethernet: mtk_wed: make memory region optional
+  net: ethernet: mtk_wed: fix EXT_INT_STATUS_RX_FBUF definitions for
+    MT7986 SoC
+  net: ethernet: mtk_wed: add mtk_wed_soc_data structure
+  net: ethernet: mtk_wed: refactor mtk_wed_check_wfdma_rx_fill routine
+  net: ethernet: mtk_wed: debugfs: move wed_v2 specific regs out of regs
+    array
 
-See 28ee1b746f49 ("secure_seq: downgrade to per-host timestamp offsets")
+Sujuan Chen (5):
+  net: ethernet: mtk_wed: introduce WED support for MT7988
+  net: ethernet: mtk_wed: introduce partial AMSDU offload support for
+    MT7988
+  net: ethernet: mtk_wed: introduce hw_rro support for MT7988
+  net: ethernet: mtk_wed: debugfs: add WED 3.0 debugfs entries
+  net: ethernet: mtk_wed: add wed 3.0 reset support
 
-So, I don't think we can safely substitute saddr with sport.
+ .../arm/mediatek/mediatek,mt7622-wed.yaml     |    1 +
+ .../soc/mediatek/mediatek,mt7986-wo-ccif.yaml |    1 +
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c   |    1 +
+ drivers/net/ethernet/mediatek/mtk_eth_soc.h   |    2 +-
+ drivers/net/ethernet/mediatek/mtk_ppe.c       |    4 +-
+ drivers/net/ethernet/mediatek/mtk_ppe.h       |   19 +-
+ .../net/ethernet/mediatek/mtk_ppe_offload.c   |    6 +-
+ drivers/net/ethernet/mediatek/mtk_wed.c       | 1400 ++++++++++++++---
+ drivers/net/ethernet/mediatek/mtk_wed.h       |   57 +
+ .../net/ethernet/mediatek/mtk_wed_debugfs.c   |  400 ++++-
+ drivers/net/ethernet/mediatek/mtk_wed_mcu.c   |   95 +-
+ drivers/net/ethernet/mediatek/mtk_wed_regs.h  |  369 ++++-
+ drivers/net/ethernet/mediatek/mtk_wed_wo.h    |    3 +-
+ .../net/wireless/mediatek/mt76/mt7915/mmio.c  |    2 +-
+ include/linux/netdevice.h                     |    1 +
+ include/linux/soc/mediatek/mtk_wed.h          |   76 +-
+ 16 files changed, 2109 insertions(+), 328 deletions(-)
+
+-- 
+2.41.0
+
 
