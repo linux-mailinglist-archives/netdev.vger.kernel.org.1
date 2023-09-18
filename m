@@ -1,160 +1,137 @@
-Return-Path: <netdev+bounces-34463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 188497A43F9
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 10:10:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D023C7A44AB
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 10:29:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 060031C20EA7
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 08:10:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F19011C20B58
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 08:29:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2C681427E;
-	Mon, 18 Sep 2023 08:09:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93C0414AA4;
+	Mon, 18 Sep 2023 08:29:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0DE4749D
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 08:09:55 +0000 (UTC)
-Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6F7C9F
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 01:09:52 -0700 (PDT)
-Received: by mail-qt1-x832.google.com with SMTP id d75a77b69052e-41513d2cca7so421841cf.0
-        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 01:09:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695024592; x=1695629392; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=38st7+CwNWQl13xaTkpZZQeswKXbWoJIBIN4bsM6Emo=;
-        b=m3DsUHkI15ViQGFCMSBgYCDmylYRsWAZdL9HyTH1gFEjtNYeiWhUlYNG2wUKvzCctR
-         c0SV4XyBSV2tFxH+3eSJLiSZ3qBA+CcQ0XiBv2Pp/GY8lEhGUEaZ+ob34SF1W6BVecd9
-         Wud8BA72hymy8kXJrGkyyS5Z/xn5p1+es5253JUkzuh/lx2qBjiOrUIkmix1WaTJoDCn
-         c0jry9kGpdb2W4vhQNFtsq3a+0NfVK4Uf4V+bkUOg2lJTeZB+FZBpgUnjvqXo7cScaJB
-         szVLk0w5Ro1RV41J3a7vi1OvOYudt04gmhCv3lfHxL2qeF6g5JPrAS7+ogn2JEl+QchQ
-         5wOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695024592; x=1695629392;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=38st7+CwNWQl13xaTkpZZQeswKXbWoJIBIN4bsM6Emo=;
-        b=ntu6E9R7zJBJiZcI8GaqPxYud3CDwcDV0In3myj4r9jHWw24iFuphnlbrhNysYtLhg
-         IXgj0gffOQsgSA+e6nJXmy6pH70y9oO97EOfXYDcZZ/XycQgeIBLzRvR0jmLpaFo8SSl
-         tToMghFg+ts47v/5H8aKPzpRho9xe8cmGQsuxQVcpN1wHlhYlZyVez2L0DkT1LpqDfEa
-         0+yHuysg9WNwqXdQMUY9wHz+PlyXAmpBkWoTuP2l+MkT7MITm6zh990lWhlMf6uYGjiX
-         VN042FwaCdz6/5rJjtirrbEkXIz0qSZtA5P+jEqVjphTFEWIiLQHh0pIclZDHVyqRfWl
-         wJzA==
-X-Gm-Message-State: AOJu0Yy4i+RcF3MmYy+/TLTRuDLlyOxQq3dT+vQa53aDBc6ELcT0Hfmx
-	fRFkJ5wpQ/NHNY08SYsBNpbw2f7mneKVOPu/eRB0+Q==
-X-Google-Smtp-Source: AGHT+IFlGfwR9VKfI97ywRNTNtaaOI6Ipg1gKde7gqFOeFzSJI/pU+LysoXQWS3rtxZdtS9fNlxrILghk8dzM2Hz8mg=
-X-Received: by 2002:a05:622a:1341:b0:417:9238:5a30 with SMTP id
- w1-20020a05622a134100b0041792385a30mr384071qtk.29.1695024591626; Mon, 18 Sep
- 2023 01:09:51 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86C4F23B9;
+	Mon, 18 Sep 2023 08:29:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46EB4C433C8;
+	Mon, 18 Sep 2023 08:29:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695025748;
+	bh=I4MBU/4uH3DIkiejuLa8YlBMQjERBUrRdAlU1AeqGEk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=E/BdUyywT4oXbhnP4Pt69tq8iGu+MHVIfEB2TfBw8MoKJ9w5m/z+GFZQ4LtD+Y1/p
+	 xElf+AccnC111qLUNjBssJzsqyhNBIZ3JClvyeN42N66G06S2HJgtSrm5u4wUIN8/Y
+	 RYx4Ru/cLPWTf+LgDVaOv2ynqVQqerjzsQ0NApGqDlFVp6hCsZQLxfhH5XidaIMC1r
+	 ZKYKo96v4NhKVEPEdMAtdhOUyDuJUAEzEQs9JDZnT47wU1XuaLHR9UwMCYwKsmY+6j
+	 cybXr0eSYf9/iXbDo0M1YdZVoS8Gd/K7oRy/PTL4WiEhErglJuDvm1HPKrDw5m1yUB
+	 98GiQ3BmWU3qg==
+Date: Mon, 18 Sep 2023 11:29:03 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Ajay Sharma <sharmaajay@microsoft.com>
+Cc: "sharmaajay@linuxonhyperv.com" <sharmaajay@linuxonhyperv.com>,
+	Long Li <longli@microsoft.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Dexuan Cui <decui@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [EXTERNAL] Re: [Patch v5 0/5] RDMA/mana_ib
+Message-ID: <20230918082903.GC13757@unreal>
+References: <1694105559-9465-1-git-send-email-sharmaajay@linuxonhyperv.com>
+ <20230911123231.GB19469@unreal>
+ <BY5PR21MB1394F62601FEFE734181FFF7D6F2A@BY5PR21MB1394.namprd21.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <64CCB695-BA43-48F5-912A-AFD5B9C103A7@gmail.com>
- <51294220-A244-46A9-A5B8-34819CE30CF4@gmail.com> <67303CFE-1938-4510-B9AE-5038BF98ABB7@gmail.com>
- <8a62f57a9454b0592ab82248fca5a21fc963995b.camel@redhat.com>
- <CALidq=UR=3rOHZczCnb1bEhbt9So60UZ5y60Cdh4aP41FkB5Tw@mail.gmail.com>
- <43ED0333-18AB-4C38-A615-7755E5BE9C3E@gmail.com> <5A853CC5-F15C-4F30-B845-D9E5B43EC039@gmail.com>
-In-Reply-To: <5A853CC5-F15C-4F30-B845-D9E5B43EC039@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 18 Sep 2023 10:09:40 +0200
-Message-ID: <CANn89iLWi7yr184a52FRrO2QW=ffLEsy1DKj+f_Yz_nPuhaMPA@mail.gmail.com>
-Subject: Re: Urgent Bug Report Kernel crash 6.5.2
-To: Martin Zaharinov <micron10@gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev <netdev@vger.kernel.org>, 
-	patchwork-bot+netdevbpf@kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	Stephen Hemminger <stephen@networkplumber.org>, kuba+netdrv@kernel.org, dsahern@gmail.com, 
-	Florian Westphal <fw@strlen.de>, Pablo Neira Ayuso <pablo@netfilter.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <BY5PR21MB1394F62601FEFE734181FFF7D6F2A@BY5PR21MB1394.namprd21.prod.outlook.com>
 
-On Sun, Sep 17, 2023 at 1:55=E2=80=AFPM Martin Zaharinov <micron10@gmail.co=
-m> wrote:
->
-> Hi Eric
-> is it possible bug to come from this patch : https://patchwork.kernel.org=
-/project/netdevbpf/cover/20230911170531.828100-1-edumazet@google.com/
->
->
+On Mon, Sep 11, 2023 at 06:57:21PM +0000, Ajay Sharma wrote:
+> I have updated the last patch to use xarray, will post the update patch. We currently use aux bus for ib device. Gd_register_device is firmware specific. All the patches use RDMA/mana_ib format which is aligned with drivers/infiniband/hw/mana/ .
 
-Everything is possible, but this is not in 6.5 kernels.
+➜  kernel git:(wip/leon-for-rc) git l --no-merges drivers/infiniband/hw/mana/
+2145328515c8 RDMA/mana_ib: Use v2 version of cfg_rx_steer_req to enable RX coalescing
+89d42b8c85b4 RDMA/mana_ib: Fix a bug when the PF indicates more entries for registering memory on first packet
+563ca0e9eab8 RDMA/mana_ib: Prevent array underflow in mana_ib_create_qp_raw()
+3574cfdca285 RDMA/mana: Remove redefinition of basic u64 type
+0266a177631d RDMA/mana_ib: Add a driver for Microsoft Azure Network Adapter
 
-I would suggest you start a bisection.
+It is different format from presented here. You added extra space before ":"
+and there is double space in one of the titles.
 
-> m.
->
-> > On 17 Sep 2023, at 14:40, Martin Zaharinov <micron10@gmail.com> wrote:
-> >
-> > One more in changelog for kernel 6.5 : https://cdn.kernel.org/pub/linux=
-/kernel/v6.x/ChangeLog-6.5
-> >
-> > I see have many bug reports with :
-> >
-> > Sep 17 11:43:11  [127675.395289][    C2]  ? process_backlog+0x10c/0x230
-> > Sep 17 11:43:11  [127675.395386][    C2]  ? __napi_poll+0x20/0x180
-> > Sep 17 11:43:11  [127675.395478][    C2]  ? net_rx_action+0x2a4/0x390
-> >
-> >
-> > In all server have simple nftables rulls , ethernet card is intel xl710=
- or 82599. its a very simple config.
-> >
-> > m.
-> >
-> >
-> >
-> >
-> >> On 16 Sep 2023, at 12:04, Martin Zaharinov <micron10@gmail.com> wrote:
-> >>
-> >> Hi Paolo
-> >>
-> >> in first report machine dont have out of tree module
-> >>
-> >> this bug is come after move from kernel 6.2 to 6.3
-> >>
-> >> m.
-> >>
-> >> On Sat, Sep 16, 2023, 11:27 Paolo Abeni <pabeni@redhat.com> wrote:
-> >> On Sat, 2023-09-16 at 02:11 +0300, Martin Zaharinov wrote:
-> >>> one more log:
-> >>>
-> >>> Sep 12 07:37:29  [151563.298466][    C5] ------------[ cut here ]----=
---------
-> >>> Sep 12 07:37:29  [151563.298550][    C5] rcuref - imbalanced put()
-> >>> Sep 12 07:37:29  [151563.298564][ C5] WARNING: CPU: 5 PID: 0 at lib/r=
-curef.c:267 rcuref_put_slowpath (lib/rcuref.c:267 (discriminator 1))
-> >>> Sep 12 07:37:29  [151563.298724][    C5] Modules linked in: nft_limit=
- nf_conntrack_netlink vlan_mon(O) pppoe pppox ppp_generic slhc nft_ct nft_n=
-at nft_chain_nat nf_tables netconsole coretemp bonding i40e nf_nat_sip nf_c=
-onntrack_sip nf_nat_pptp nf_conntrack_pptp nf_nat_tftp nf_conntrack_tftp nf=
-_nat_ftp nf_conntrack_ftp nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4=
- nf_xnatlog(O) ipmi_si ipmi_devintf ipmi_msghandler rtc_cmos [last unloaded=
-: BNGBOOT(O)]
-> >>> Sep 12 07:37:29  [151563.298894][    C5] CPU: 5 PID: 0 Comm: swapper/=
-5 Tainted: G           O       6.5.2 #1
-> >>
-> >>
-> >> You have out-of-tree modules taint in all the report you shared. Pleas=
-e
-> >> try to reproduce the issue with such taint, thanks!
-> >>
-> >> Paolo
-> >>
-> >
->
+Regarding aux, I see it, but what confuses me is proliferation of terms
+and various calls: device, client, adapter. My expectation is to see
+more uniform methodology where IB is represented as device.
+
+Thanks
+
+> 
+> Thanks
+> 
+> > -----Original Message-----
+> > From: Leon Romanovsky <leon@kernel.org>
+> > Sent: Monday, September 11, 2023 7:33 AM
+> > To: sharmaajay@linuxonhyperv.com
+> > Cc: Long Li <longli@microsoft.com>; Jason Gunthorpe <jgg@ziepe.ca>; Dexuan
+> > Cui <decui@microsoft.com>; Wei Liu <wei.liu@kernel.org>; David S. Miller
+> > <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub
+> > Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; linux-
+> > rdma@vger.kernel.org; linux-hyperv@vger.kernel.org; netdev@vger.kernel.org;
+> > linux-kernel@vger.kernel.org; Ajay Sharma <sharmaajay@microsoft.com>
+> > Subject: [EXTERNAL] Re: [Patch v5 0/5] RDMA/mana_ib
+> > 
+> > On Thu, Sep 07, 2023 at 09:52:34AM -0700, sharmaajay@linuxonhyperv.com
+> > wrote:
+> > > From: Ajay Sharma <sharmaajay@microsoft.com>
+> > >
+> > > Change from v4:
+> > > Send qp fatal error event to the context that created the qp. Add
+> > > lookup table for qp.
+> > >
+> > > Ajay Sharma (5):
+> > >   RDMA/mana_ib : Rename all mana_ib_dev type variables to mib_dev
+> > >   RDMA/mana_ib : Register Mana IB  device with Management SW
+> > >   RDMA/mana_ib : Create adapter and Add error eq
+> > >   RDMA/mana_ib : Query adapter capabilities
+> > >   RDMA/mana_ib : Send event to qp
+> > 
+> > I didn't look very deep into the series and has three very initial comments.
+> > 1. Please do git log drivers/infiniband/hw/mana/ and use same format for
+> > commit messages.
+> > 2. Don't invent your own index-to-qp query mechanism in last patch and use
+> > xarray.
+> > 3. Once you decided to export mana_gd_register_device, it hinted me that it is
+> > time to move to auxbus infrastructure.
+> > 
+> > Thanks
+> > 
+> > >
+> > >  drivers/infiniband/hw/mana/cq.c               |  12 +-
+> > >  drivers/infiniband/hw/mana/device.c           |  81 +++--
+> > >  drivers/infiniband/hw/mana/main.c             | 288 +++++++++++++-----
+> > >  drivers/infiniband/hw/mana/mana_ib.h          | 102 ++++++-
+> > >  drivers/infiniband/hw/mana/mr.c               |  42 ++-
+> > >  drivers/infiniband/hw/mana/qp.c               |  86 +++---
+> > >  drivers/infiniband/hw/mana/wq.c               |  21 +-
+> > >  .../net/ethernet/microsoft/mana/gdma_main.c   | 152 +++++----
+> > >  drivers/net/ethernet/microsoft/mana/mana_en.c |   3 +
+> > >  include/net/mana/gdma.h                       |  16 +-
+> > >  10 files changed, 545 insertions(+), 258 deletions(-)
+> > >
+> > > --
+> > > 2.25.1
+> > >
 
