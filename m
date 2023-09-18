@@ -1,259 +1,90 @@
-Return-Path: <netdev+bounces-34541-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34542-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EBA97A48B3
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 13:45:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FFFC7A48BD
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 13:50:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43F4F1C20A10
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 11:45:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28693281D7D
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 11:50:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D4A01C6BD;
-	Mon, 18 Sep 2023 11:45:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B2B61CA83;
+	Mon, 18 Sep 2023 11:50:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3ED638F88
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 11:45:10 +0000 (UTC)
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56737133
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 04:44:43 -0700 (PDT)
-Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-402d499580dso47407185e9.1
-        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 04:44:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695037482; x=1695642282; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J9LKagSYj3VXzo23cIw2NyLGMGWC6MKJWv7lMBAhis8=;
-        b=cRHLWRadnfIrI0N89LBji4xx7I96USj2BfVmnpTqe0pnCAR1gVXGr0Dmx5f7AarLp4
-         ys3sUFu46qAo3KhPq1tZBBOXpcXChBD77HcH2+ASL1uUvR/gkLFRGDTap5WzsewQ6Ww4
-         /kQCmbcFFr9KGtMxaTbwJR1/paPxnllbUZi620HtdnwpWuma1lzO4qSaBlAIrISf8B/z
-         X55Y1/Omyc+ECp61TUsfBinDVxltOVuIvaCs53spEANVYSbRZ2IuUIy/Kw04APFKpxvO
-         I5NL4N7x7dcnpIykxNM1W0kpWBU4wD0QDbNKJcZc6DRrOMRM616nk6n/vdLmft7PO8B3
-         ImOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695037482; x=1695642282;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=J9LKagSYj3VXzo23cIw2NyLGMGWC6MKJWv7lMBAhis8=;
-        b=D5XukqziD53KY0OKlF5JOmY1kt/cKpuGXnRHEzAzc1ajAhcs3+OmNZP/HJtJa4DnVb
-         Vm/8d++t+68lS6EUNtXscKXhlNZ/T1SbwumBEMnH4No9F7rxJcpXBfvIs4Tf/fzGqWoj
-         VXOoLpFrmNXnjj9TI0aHabwEZNl/GshAYIa1xH/ID3pQ5Pek5TRW74oRcwvFYCt8O8PX
-         9i3orXz54/Se4WRyK2JFrbT0LELUrcvyxrZ6TJnAeGvAZ/2WzHmChmdTSeheBEwXxe8i
-         LSozQ5EG9i0I2jqrrx6LC/F1HX0jc04RzLCk76pgOxcoYCF4o4QGQZOq39QacR3MkKFN
-         2TJQ==
-X-Gm-Message-State: AOJu0Ywq1rAbvFdrN+5ZiUQI15Wg3GQq0AXFMO264jSBVZ2SSCboa7A5
-	84McpJaNo4o9bOqA7QLGIK8gqcmGeQDmMPDjSIDInA==
-X-Google-Smtp-Source: AGHT+IEgIJY3ySAfU6d0W3ZbtC04cP1HmCyhVGGvQRhnmTyHV3/lGO845QQXBc/CQN03glLBcEyiNSq8CtH2STiedvo=
-X-Received: by 2002:a05:600c:3645:b0:402:ea83:45cf with SMTP id
- y5-20020a05600c364500b00402ea8345cfmr8109170wmq.2.1695037481494; Mon, 18 Sep
- 2023 04:44:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D59E38F88;
+	Mon, 18 Sep 2023 11:50:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B14C7C433C7;
+	Mon, 18 Sep 2023 11:50:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695037824;
+	bh=lLmkRmQrVDMuWLiRnc6WZi6wkS4qkGabF5MldHO9ynE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=XMsUM/6PTgmQgGOOp+k7DuQuDMgisWtNdzkwmPbc9znYTejBeA+hsBwQw3bKOTREQ
+	 gw/88uAwnjD/eBg5/DaeyqOfGKRvuutbX4nMRIL3elp/RoyhlzIPMeRFx+BTfIVpEA
+	 lGC7Y/mu+YyXSR3UY7IJF2t3xHwj26jtDMSa2kNablJvBh402XtE76bGbdXeYxTvky
+	 WcSEacr2gCfOqDXYr6jwORaRCG2EFYBzeqyvdsgPUVWpYbJ7YDaxEEWDGgo88Xtpc0
+	 xT2b6SQzQyW5I0JAzykFpg8Ml9NRGr2tfwZkXFgUgZQpXdgf6wuy7SqgKWd7eQg0Po
+	 KWftbkmHd8jCA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 909DFE11F41;
+	Mon, 18 Sep 2023 11:50:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ed59c1b9-6c5c-4774-a871-a24564f3a270@alu.unizg.hr>
- <CANn89iJv8VRPwQBAE=5-oKHGMs9JVCvCiCBwL+3QW9sJDxo5cQ@mail.gmail.com>
- <3e306b0a-24b8-60d4-c516-1db738d79e92@alu.unizg.hr> <CANn89iKyLdvSF11aHvg-Ytr+HbnHb4QXMie2N5GpZhxSHx-XtA@mail.gmail.com>
-In-Reply-To: <CANn89iKyLdvSF11aHvg-Ytr+HbnHb4QXMie2N5GpZhxSHx-XtA@mail.gmail.com>
-From: Marco Elver <elver@google.com>
-Date: Mon, 18 Sep 2023 13:44:02 +0200
-Message-ID: <CANpmjNNYGax0BfjA98ViGsM4rVrcaNx_SKdetgt+-SzFqB-7zg@mail.gmail.com>
-Subject: Re: BUG: KCSAN: data-race in rtl8169_poll
-To: Eric Dumazet <edumazet@google.com>
-Cc: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>, nic_swsd@realtek.com, 
-	Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/5] mptcp: fix stalled connections
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169503782458.2272.14155670573882201410.git-patchwork-notify@kernel.org>
+Date: Mon, 18 Sep 2023 11:50:24 +0000
+References: <20230916-upstream-net-20230915-mptcp-hanging-conn-v1-0-05d1a8b851a8@tessares.net>
+In-Reply-To: <20230916-upstream-net-20230915-mptcp-hanging-conn-v1-0-05d1a8b851a8@tessares.net>
+To: Matthieu Baerts <matthieu.baerts@tessares.net>
+Cc: mptcp@lists.linux.dev, martineau@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, dcaratti@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
 
-On Mon, 18 Sept 2023 at 12:39, Eric Dumazet <edumazet@google.com> wrote:
->
-> On Mon, Sep 18, 2023 at 11:43=E2=80=AFAM Mirsad Todorovac
-> <mirsad.todorovac@alu.unizg.hr> wrote:
-> >
-> > On 9/18/23 09:41, Eric Dumazet wrote:
-> > > On Mon, Sep 18, 2023 at 8:15=E2=80=AFAM Mirsad Todorovac
-> > > <mirsad.todorovac@alu.unizg.hr> wrote:
-> > >>
-> > >> Hi all,
-> > >>
-> > >> In the vanilla torvalds tree kernel on Ubuntu 22.04, commit 6.6.0-rc=
-1-kcsan-00269-ge789286468a9,
-> > >> KCSAN discovered a data-race in rtl8169_poll():
-> > >>
-> > >> [ 9591.740976] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > >> [ 9591.740990] BUG: KCSAN: data-race in rtl8169_poll (drivers/net/et=
-hernet/realtek/r8169_main.c:4430 drivers/net/ethernet/realtek/r8169_main.c:=
-4583) r8169
-> > >>
-> > >> [ 9591.741060] race at unknown origin, with read to 0xffff8881097731=
-30 of 4 bytes by interrupt on cpu 21:
-> > >> [ 9591.741073] rtl8169_poll (drivers/net/ethernet/realtek/r8169_main=
-.c:4430 drivers/net/ethernet/realtek/r8169_main.c:4583) r8169
-> > >> [ 9591.741135] __napi_poll (net/core/dev.c:6527)
-> > >> [ 9591.741149] net_rx_action (net/core/dev.c:6596 net/core/dev.c:672=
-7)
-> > >> [ 9591.741161] __do_softirq (kernel/softirq.c:553)
-> > >> [ 9591.741175] __irq_exit_rcu (kernel/softirq.c:427 kernel/softirq.c=
-:632)
-> > >> [ 9591.741185] irq_exit_rcu (kernel/softirq.c:647)
-> > >> [ 9591.741194] common_interrupt (arch/x86/kernel/irq.c:247 (discrimi=
-nator 14))
-> > >> [ 9591.741206] asm_common_interrupt (./arch/x86/include/asm/idtentry=
-.h:636)
-> > >> [ 9591.741217] cpuidle_enter_state (drivers/cpuidle/cpuidle.c:291)
-> > >> [ 9591.741227] cpuidle_enter (drivers/cpuidle/cpuidle.c:390)
-> > >> [ 9591.741237] call_cpuidle (kernel/sched/idle.c:135)
-> > >> [ 9591.741249] do_idle (kernel/sched/idle.c:219 kernel/sched/idle.c:=
-282)
-> > >> [ 9591.741259] cpu_startup_entry (kernel/sched/idle.c:378 (discrimin=
-ator 1))
-> > >> [ 9591.741268] start_secondary (arch/x86/kernel/smpboot.c:210 arch/x=
-86/kernel/smpboot.c:294)
-> > >> [ 9591.741281] secondary_startup_64_no_verify (arch/x86/kernel/head_=
-64.S:433)
-> > >>
-> > >> [ 9591.741300] value changed: 0x80003fff -> 0x34044510
-> > >>
-> > >> [ 9591.741314] Reported by Kernel Concurrency Sanitizer on:
-> > >> [ 9591.741322] CPU: 21 PID: 0 Comm: swapper/21 Tainted: G           =
-  L     6.6.0-rc1-kcsan-00269-ge789286468a9-dirty #4
-> > >> [ 9591.741334] Hardware name: ASRock X670E PG Lightning/X670E PG Lig=
-htning, BIOS 1.21 04/26/2023
-> > >> [ 9591.741343] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > >>
-> > >> (The taint is not from the proprietary module, but triggered from th=
-e previous reported and unfixed bug.)
-> > >>
-> > >> Apparently, it is this code:
-> > >>
-> > >> static int rtl8169_poll(struct napi_struct *napi, int budget)
-> > >> {
-> > >>          struct rtl8169_private *tp =3D container_of(napi, struct rt=
-l8169_private, napi);
-> > >>          struct net_device *dev =3D tp->dev;
-> > >>          int work_done;
-> > >>
-> > >>          rtl_tx(dev, tp, budget);
-> > >>
-> > >> =E2=86=92       work_done =3D rtl_rx(dev, tp, budget);
-> > >>
-> > >>          if (work_done < budget && napi_complete_done(napi, work_don=
-e))
-> > >>                  rtl_irq_enable(tp);
-> > >>
-> > >>          return work_done;
-> > >> }
-> > >>
-> > >> and
-> > >>
-> > >> static int rtl_rx(struct net_device *dev, struct rtl8169_private *tp=
-, int budget)
-> > >> {
-> > >>          struct device *d =3D tp_to_dev(tp);
-> > >>          int count;
-> > >>
-> > >>          for (count =3D 0; count < budget; count++, tp->cur_rx++) {
-> > >>                  unsigned int pkt_size, entry =3D tp->cur_rx % NUM_R=
-X_DESC;
-> > >>                  struct RxDesc *desc =3D tp->RxDescArray + entry;
-> > >>                  struct sk_buff *skb;
-> > >>                  const void *rx_buf;
-> > >>                  dma_addr_t addr;
-> > >>                  u32 status;
-> > >>
-> > >> =E2=86=92               status =3D le32_to_cpu(desc->opts1);
-> > >>                  if (status & DescOwn)
-> > >>                          break;
-> > >>
-> > >>                  /* This barrier is needed to keep us from reading
-> > >>                   * any other fields out of the Rx descriptor until
-> > >>                   * we know the status of DescOwn
-> > >>                   */
-> > >>                  dma_rmb();
-> > >>
-> > >>                  if (unlikely(status & RxRES)) {
-> > >> .
-> > >> .
-> > >> .
-> > >>
-> > >> The reason isn't obvious, so it might be interesting if this is a va=
-lid report and whether it caused spurious corruption
-> > >> of the network data on Realtek 8169 compatible cards ...
-> > >>
-> > >
-> > > I think this is pretty much expected.
-> > >
-> > > Driver reads a piece of memory that the hardware can modify.
-> > >
-> > > Adding data_race() annotations could avoid these false positives.
-> > >
-> > >> Hope this helps.
-> > >>
-> > >> Best regards,
-> > >> Mirsad Todorovac
-> >
-> > Well, another approach was this quick fix that eliminated all those rtl=
-8169_poll() KCSAN warnings.
-> >
-> > If READ_ONCE(desc->opts1) fixed it, then maybe there is more to this th=
-an meets the eye?
-> >
-> > -------------------------------------------------
-> >   drivers/net/ethernet/realtek/r8169_main.c | 2 +-
-> >   1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/et=
-hernet/realtek/r8169_main.c
-> > index 6351a2dc13bc..051551ee2a15 100644
-> > --- a/drivers/net/ethernet/realtek/r8169_main.c
-> > +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> > @@ -4427,7 +4427,7 @@ static int rtl_rx(struct net_device *dev, struct =
-rtl8169_private *tp, int budget
-> >                  dma_addr_t addr;
-> >                  u32 status;
-> >
-> > -               status =3D le32_to_cpu(desc->opts1);
-> > +               status =3D le32_to_cpu(READ_ONCE(desc->opts1));
-> >                  if (status & DescOwn)
-> >                          break;
-> >
->
-> This is also working, but in this case we already have barriers (
-> dma_rmb() here)
-> to synchronize host side and hardware (when flipping DescOwn) bit.
+Hello:
 
-READ_ONCE() does not imply any (strong) barriers (it does imply
-address-dependency barriers, i.e. ordering dependent reads/writes, but
-if that can be relied upon if the concurrent writer is a device and
-not CPU I don't know).
+This series was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-So in this case pairing READ_ONCE() with dma_rmb() is perfectly
-reasonable: writes to desc->opts1 can happen concurrently, and the
-READ_ONCE() ensures the compiler doesn't mess up that access; later
-reads must be ordered by dma_rmb().
+On Sat, 16 Sep 2023 12:52:44 +0200 you wrote:
+> Daire reported a few issues with MPTCP where some connections were
+> stalled in different states. Paolo did a great job fixing them.
+> 
+> Patch 1 fixes bogus receive window shrinkage with multiple subflows. Due
+> to a race condition and unlucky circumstances, that may lead to
+> TCP-level window shrinkage, and the connection being stalled on the
+> sender end.
+> 
+> [...]
 
-The data race here is a consequence of a concurrent write with the
-read of desc->opts1. The dma_rmb() does not prevent that from
-happening, and therefore we still have to mark the racing access.
+Here is the summary with links:
+  - [net,1/5] mptcp: fix bogus receive window shrinkage with multiple subflows
+    https://git.kernel.org/netdev/net/c/6bec041147a2
+  - [net,2/5] mptcp: move __mptcp_error_report in protocol.c
+    https://git.kernel.org/netdev/net/c/d5fbeff1ab81
+  - [net,3/5] mptcp: process pending subflow error on close
+    https://git.kernel.org/netdev/net/c/9f1a98813b4b
+  - [net,4/5] mptcp: rename timer related helper to less confusing names
+    https://git.kernel.org/netdev/net/c/f6909dc1c1f4
+  - [net,5/5] mptcp: fix dangling connection hang-up
+    https://git.kernel.org/netdev/net/c/27e5ccc2d5a5
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
