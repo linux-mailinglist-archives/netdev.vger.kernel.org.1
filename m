@@ -1,160 +1,206 @@
-Return-Path: <netdev+bounces-34475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DEAB7A4577
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 11:06:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9869C7A45BA
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 11:17:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 807661C20AA3
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 09:06:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EA7F28243B
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 09:17:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0616C14ABD;
-	Mon, 18 Sep 2023 09:06:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51D2B15485;
+	Mon, 18 Sep 2023 09:13:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5542F33EA
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 09:06:34 +0000 (UTC)
-Received: from phobos.denx.de (phobos.denx.de [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3ECC9102;
-	Mon, 18 Sep 2023 02:06:28 -0700 (PDT)
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id BABE580274;
-	Mon, 18 Sep 2023 11:06:25 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1695027986;
-	bh=9cj5r2iDVR9dQMi7AsSJAdpzOyExQqvdECqIQVMXI64=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UKZreKQsgoV36ulY/UZpeYLvL8biFmb9x4ieBRztjO80T3278chxly1b8J1X9/8Kv
-	 /8i5oSgnx/M3hCxF1WCaBQVKcQ3bJbeWXscT9JYN9PXu/ljIA6RQ59d8ZK4a7Fmw3r
-	 Nt2TnhrWtNkj211h9b3Yw3krswa26FlQVH5KG1e3PlYeyw6rH9Q7G5L1eWrAnfmeT6
-	 TFtKyOJGDnGJPnK4eAh4VCCb1R5TlCN49OrO0A3qAGhD46aWYIM9rmsieM/ufopSvo
-	 izOQ33863oLhu1SzXG/gutqc/y/mj++nvsixh+2wxEnDl+D8/ip5bRU0vRuYyq5b20
-	 WeAtEiBc5y3iw==
-Date: Mon, 18 Sep 2023 11:06:18 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Tristram.Ha@microchip.com, Eric Dumazet
- <edumazet@google.com>, davem@davemloft.net, Woojung Huh
- <woojung.huh@microchip.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
- Florian Fainelli <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com, Oleksij
- Rempel <linux@rempel-privat.de>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [[RFC PATCH v4 net-next] 0/2] net: dsa: hsr: Enable HSR HW
- offloading for KSZ9477
-Message-ID: <20230918110618.406192aa@wsk>
-In-Reply-To: <20230915142255.dcosmtrh25nbw5x7@skbuf>
-References: <20230912160326.188e1d13@wsk>
-	<20230912142644.u4sdkveei3e5hwaf@skbuf>
-	<20230912170641.5bfc3cfe@wsk>
-	<20230912215523.as4puqamj65dikip@skbuf>
-	<20230913102219.773e38f8@wsk>
-	<20230913105806.g5p3wck675gbw5fo@skbuf>
-	<20230913141548.70658940@wsk>
-	<20230913135102.hoyl4tifyf77kdo2@skbuf>
-	<20230913184206.6dmfw4weoomjqwfp@skbuf>
-	<20230914231831.0f406585@wsk>
-	<20230915142255.dcosmtrh25nbw5x7@skbuf>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34EA014F9F
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 09:13:57 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9703102
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 02:13:53 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-58c9d29588aso49850147b3.0
+        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 02:13:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695028433; x=1695633233; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=EsfBDwLTEY1b6zMZsSxMTi304GOyD83H56PBbUeF/6A=;
+        b=IC9F56GfV8pAJ4E8I78WxZTvIqn5fuSoFNVcb2kZAIuwPnmcbepDGiUAiX3/LLoKxf
+         fuKx5Rtc/J113pN5uM8bu254o/At7GO8ZrdgKwYYnrOlu7JQT0CGqQcOi4HwSTF929VF
+         oKr6HKCrtESwysemRWU+IwJqB9oRyjp1oxligWIlWP2sCtmnpaaAA3+xuytxbjUu3l/O
+         ya1AzjT5p0n7sBd2/HKDyHfJK0UO30Io990iM0iTMZBh9I3tRRhCs58RqQLieuMzvyNU
+         cFPAFqKg/L4Gv23yQ+KM9a975FW9KaCPGnIq0zDcpT7PKsS+aclRANV5EXWq4QPA7Aef
+         6haw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695028433; x=1695633233;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EsfBDwLTEY1b6zMZsSxMTi304GOyD83H56PBbUeF/6A=;
+        b=w62bUrS7PJxWYJIRR+RTb1KVEsLhMvKLAEZ8QQvIK9dAuTcOTqFzMDkLTTT//UhXim
+         MSAiiqnE2/BbMgSWaCoE7YubCja8x3hJsFkZE2drnJGALOm1mcqXbg/leTzBb9y9q6Z5
+         dEDbEEq7P3yiJoS4xxSgnupNDmOUrUQKsEssJ6xKTPwa6QGWCUsoRWK/HZDTUSYgXAlV
+         HIXNrlziPW2Ka2tbeIyo1m8JEBjomUDbvhhwg1Vu1w2lVq6+aKpEz2TAGuNX4gzhm5s5
+         v/YODRlWcbdYugyqVOe1m+OiCy1Re1m8m+IP3cuXFbgToC8v5QKH7w3e5YimH6x9r4B9
+         JP2A==
+X-Gm-Message-State: AOJu0Yx0nWBOoa4NUXVBX6xK1vLmg3KQc5+NnId3oxJY3BScnl8wqcE9
+	lDnkTefvBKn9qLiQ3clfq/77o0egvpDYgg==
+X-Google-Smtp-Source: AGHT+IHC3nfDd6vVLvqJo7B+jFEfxaJ48nt2Bu1yvbEtduSGkYFy8olTI4rD/He//0xjO3mCkQXlk/Ixbj8cCQ==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a81:b64d:0:b0:59b:fe3b:411 with SMTP id
+ h13-20020a81b64d000000b0059bfe3b0411mr211878ywk.2.1695028433035; Mon, 18 Sep
+ 2023 02:13:53 -0700 (PDT)
+Date: Mon, 18 Sep 2023 09:13:51 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/A9KPOZJlzYqXN8kBEc2=SvE";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.459.ge4e396fd5e-goog
+Message-ID: <20230918091351.1356153-1-edumazet@google.com>
+Subject: [PATCH net] net: bridge: use DEV_STATS_INC()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>, 
+	Roopa Prabhu <roopa@nvidia.com>, Nikolay Aleksandrov <razor@blackwall.org>, 
+	bridge@lists.linux-foundation.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---Sig_/A9KPOZJlzYqXN8kBEc2=SvE
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+syzbot/KCSAN reported data-races in br_handle_frame_finish() [1]
+This function can run from multiple cpus without mutual exclusion.
 
-Hi Vladimir,
+Adopt SMP safe DEV_STATS_INC() to update dev->stats fields.
 
-> On Thu, Sep 14, 2023 at 11:18:31PM +0200, Lukasz Majewski wrote:
-> > As fair as I understood from the commit message - some part of this
-> > patch needs to be applied before HSR offloading v4.
-> >=20
-> > Hence I will wait for it to be posted and upstreamed.
-> >=20
-> > Only then some of this patch code would be squashed to v5 of hsr
-> > support. =20
->=20
-> No, this isn't how this is going to work. I can't post my patches and
-> then you post yours, because that would mean some functionality is
-> introduced without a user (ds->ops->port_set_mac_address), and we
-> don't accept that, because you may or may not resubmit your HSR
-> patches as a first user of the new infra.
+Handles updates to dev->stats.tx_dropped while we are at it.
 
-Ok. Thanks for the clarification.
+[1]
+BUG: KCSAN: data-race in br_handle_frame_finish / br_handle_frame_finish
 
->=20
-> So, what needs to happen is you need to post all the patches as an
-> all-or-nothing series. Somewhere in Documentation/process/ it is
-> probably explained in more detail what to pay attention to, when
-> reposting what is partly others' work. But the basic idea is that you
-> need to keep the Author: and Signed-off-by: fields if you aren't
-> making major changes, but you must also add your own Signed-off-by:
-> at the end. You also have responsibility for the patches that you
-> post, and have to respond to review feedback, even if they aren't
-> authored for you. You are obviously free to make changes to patches
-> until they pass your own criteria.
->=20
-> The most that I can do to help you is to split that squashed patch and
-> put the result on a branch:
-> https://github.com/vladimiroltean/linux/commits/lukma-ksz-hsr-rfc-v4
->=20
-> But it's up to you to take it from there, rebase it on net-next,
-> review the result, test it, make sure that the changes are something
-> that you can justify when submitting, etc. You won't be alone if you
-> need help, of course, but the point is that you're not 100% passive
-> to this activity.
+read-write to 0xffff8881374b2178 of 8 bytes by interrupt on cpu 1:
+br_handle_frame_finish+0xd4f/0xef0 net/bridge/br_input.c:189
+br_nf_hook_thresh+0x1ed/0x220
+br_nf_pre_routing_finish_ipv6+0x50f/0x540
+NF_HOOK include/linux/netfilter.h:304 [inline]
+br_nf_pre_routing_ipv6+0x1e3/0x2a0 net/bridge/br_netfilter_ipv6.c:178
+br_nf_pre_routing+0x526/0xba0 net/bridge/br_netfilter_hooks.c:508
+nf_hook_entry_hookfn include/linux/netfilter.h:144 [inline]
+nf_hook_bridge_pre net/bridge/br_input.c:272 [inline]
+br_handle_frame+0x4c9/0x940 net/bridge/br_input.c:417
+__netif_receive_skb_core+0xa8a/0x21e0 net/core/dev.c:5417
+__netif_receive_skb_one_core net/core/dev.c:5521 [inline]
+__netif_receive_skb+0x57/0x1b0 net/core/dev.c:5637
+process_backlog+0x21f/0x380 net/core/dev.c:5965
+__napi_poll+0x60/0x3b0 net/core/dev.c:6527
+napi_poll net/core/dev.c:6594 [inline]
+net_rx_action+0x32b/0x750 net/core/dev.c:6727
+__do_softirq+0xc1/0x265 kernel/softirq.c:553
+run_ksoftirqd+0x17/0x20 kernel/softirq.c:921
+smpboot_thread_fn+0x30a/0x4a0 kernel/smpboot.c:164
+kthread+0x1d7/0x210 kernel/kthread.c:388
+ret_from_fork+0x48/0x60 arch/x86/kernel/process.c:147
+ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
 
-No problem. I will test it for a while and then send them for review.
+read-write to 0xffff8881374b2178 of 8 bytes by interrupt on cpu 0:
+br_handle_frame_finish+0xd4f/0xef0 net/bridge/br_input.c:189
+br_nf_hook_thresh+0x1ed/0x220
+br_nf_pre_routing_finish_ipv6+0x50f/0x540
+NF_HOOK include/linux/netfilter.h:304 [inline]
+br_nf_pre_routing_ipv6+0x1e3/0x2a0 net/bridge/br_netfilter_ipv6.c:178
+br_nf_pre_routing+0x526/0xba0 net/bridge/br_netfilter_hooks.c:508
+nf_hook_entry_hookfn include/linux/netfilter.h:144 [inline]
+nf_hook_bridge_pre net/bridge/br_input.c:272 [inline]
+br_handle_frame+0x4c9/0x940 net/bridge/br_input.c:417
+__netif_receive_skb_core+0xa8a/0x21e0 net/core/dev.c:5417
+__netif_receive_skb_one_core net/core/dev.c:5521 [inline]
+__netif_receive_skb+0x57/0x1b0 net/core/dev.c:5637
+process_backlog+0x21f/0x380 net/core/dev.c:5965
+__napi_poll+0x60/0x3b0 net/core/dev.c:6527
+napi_poll net/core/dev.c:6594 [inline]
+net_rx_action+0x32b/0x750 net/core/dev.c:6727
+__do_softirq+0xc1/0x265 kernel/softirq.c:553
+do_softirq+0x5e/0x90 kernel/softirq.c:454
+__local_bh_enable_ip+0x64/0x70 kernel/softirq.c:381
+__raw_spin_unlock_bh include/linux/spinlock_api_smp.h:167 [inline]
+_raw_spin_unlock_bh+0x36/0x40 kernel/locking/spinlock.c:210
+spin_unlock_bh include/linux/spinlock.h:396 [inline]
+batadv_tt_local_purge+0x1a8/0x1f0 net/batman-adv/translation-table.c:1356
+batadv_tt_purge+0x2b/0x630 net/batman-adv/translation-table.c:3560
+process_one_work kernel/workqueue.c:2630 [inline]
+process_scheduled_works+0x5b8/0xa30 kernel/workqueue.c:2703
+worker_thread+0x525/0x730 kernel/workqueue.c:2784
+kthread+0x1d7/0x210 kernel/kthread.c:388
+ret_from_fork+0x48/0x60 arch/x86/kernel/process.c:147
+ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
 
-Many thanks for help.
+value changed: 0x00000000000d7190 -> 0x00000000000d7191
 
+Reported by Kernel Concurrency Sanitizer on:
+CPU: 0 PID: 14848 Comm: kworker/u4:11 Not tainted 6.6.0-rc1-syzkaller-00236-gad8a69f361b9 #0
 
-Best regards,
+Fixes: 1c29fc4989bc ("[BRIDGE]: keep track of received multicast packets")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Roopa Prabhu <roopa@nvidia.com>
+Cc: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: bridge@lists.linux-foundation.org
+---
+ net/bridge/br_forward.c | 4 ++--
+ net/bridge/br_input.c   | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-Lukasz Majewski
+diff --git a/net/bridge/br_forward.c b/net/bridge/br_forward.c
+index 9d7bc8b96b53a911d5add8d0b21736358441755f..7431f89e897b9549a0c35d9431e36b6de2e80022 100644
+--- a/net/bridge/br_forward.c
++++ b/net/bridge/br_forward.c
+@@ -124,7 +124,7 @@ static int deliver_clone(const struct net_bridge_port *prev,
+ 
+ 	skb = skb_clone(skb, GFP_ATOMIC);
+ 	if (!skb) {
+-		dev->stats.tx_dropped++;
++		DEV_STATS_INC(dev, tx_dropped);
+ 		return -ENOMEM;
+ 	}
+ 
+@@ -268,7 +268,7 @@ static void maybe_deliver_addr(struct net_bridge_port *p, struct sk_buff *skb,
+ 
+ 	skb = skb_copy(skb, GFP_ATOMIC);
+ 	if (!skb) {
+-		dev->stats.tx_dropped++;
++		DEV_STATS_INC(dev, tx_dropped);
+ 		return;
+ 	}
+ 
+diff --git a/net/bridge/br_input.c b/net/bridge/br_input.c
+index c34a0b0901b07de9e2a3f172527a2bf1c0b6f0b7..c729528b5e85f3a28eff6bd346c18bc11288e7a8 100644
+--- a/net/bridge/br_input.c
++++ b/net/bridge/br_input.c
+@@ -181,12 +181,12 @@ int br_handle_frame_finish(struct net *net, struct sock *sk, struct sk_buff *skb
+ 			if ((mdst && mdst->host_joined) ||
+ 			    br_multicast_is_router(brmctx, skb)) {
+ 				local_rcv = true;
+-				br->dev->stats.multicast++;
++				DEV_STATS_INC(br->dev, multicast);
+ 			}
+ 			mcast_hit = true;
+ 		} else {
+ 			local_rcv = true;
+-			br->dev->stats.multicast++;
++			DEV_STATS_INC(br->dev, multicast);
+ 		}
+ 		break;
+ 	case BR_PKT_UNICAST:
+-- 
+2.42.0.459.ge4e396fd5e-goog
 
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/A9KPOZJlzYqXN8kBEc2=SvE
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmUIEwoACgkQAR8vZIA0
-zr3iVwf/Yo0c6PviMOAbhRsIiHe3qHKqLImGlTfqUZaUhiwNQncaURH1+Y74Qfnp
-jvwTWNrfys2SFO+E+vhSwEowcfdIwV4oaJVyibA9dbHWNxkjpMwB/OcxR6CHdm4F
-L8pe3pZLh0cC5ENeOClKXmSyBufh8hyeMJ6tQZBSmP39evvuOxzGbtyqlmgwuBcM
-bJo1S6tJNN18bCiIijAGkxUUjji3VZgJwY1uPhNRsqOfZjU1PGXVS3NoXFQ5kvkz
-BrsFZu2Qu0/BLXW7YfxGsVuB6DNUz+pnjXtOq+vuCdfiF5LTzxX4cDnwpaYE/cwS
-q9Uc0VQPuPjQVMtsiBI+TWdPymB6jw==
-=DNew
------END PGP SIGNATURE-----
-
---Sig_/A9KPOZJlzYqXN8kBEc2=SvE--
 
