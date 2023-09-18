@@ -1,42 +1,41 @@
-Return-Path: <netdev+bounces-34701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DE2A7A52E5
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 21:21:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2242E7A52E8
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 21:22:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 187B4281DE0
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 19:21:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC7BB281F84
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 19:21:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8B1E27724;
-	Mon, 18 Sep 2023 19:19:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D3FA27ED7;
+	Mon, 18 Sep 2023 19:19:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EDBC273F2
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 19:19:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AC0727720
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 19:19:38 +0000 (UTC)
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A98E7111
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 12:19:34 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89B6E114
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 12:19:35 -0700 (PDT)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiJmI-0002oT-8j; Mon, 18 Sep 2023 21:19:26 +0200
+	id 1qiJmI-0002pJ-DK; Mon, 18 Sep 2023 21:19:26 +0200
 Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiJmH-007I2g-Jp; Mon, 18 Sep 2023 21:19:25 +0200
+	id 1qiJmH-007I2j-R2; Mon, 18 Sep 2023 21:19:26 +0200
 Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiJmH-002m24-AH; Mon, 18 Sep 2023 21:19:25 +0200
+	id 1qiJmH-002m28-HM; Mon, 18 Sep 2023 21:19:25 +0200
 From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To: Linus Walleij <linus.walleij@linaro.org>,
-	=?utf-8?q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+To: =?utf-8?b?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
 	Andrew Lunn <andrew@lunn.ch>,
 	Florian Fainelli <f.fainelli@gmail.com>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -44,11 +43,12 @@ To: Linus Walleij <linus.walleij@linaro.org>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
+Cc: linux-renesas-soc@vger.kernel.org,
+	netdev@vger.kernel.org,
 	kernel@pengutronix.de
-Subject: [PATCH net-next 7/9] net: dsa: realtek: Convert to platform remove callback returning void
-Date: Mon, 18 Sep 2023 21:19:14 +0200
-Message-Id: <20230918191916.1299418-8-u.kleine-koenig@pengutronix.de>
+Subject: [PATCH net-next 8/9] net: dsa: rzn1_a5psw: Convert to platform remove callback returning void
+Date: Mon, 18 Sep 2023 21:19:15 +0200
+Message-Id: <20230918191916.1299418-9-u.kleine-koenig@pengutronix.de>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230918191916.1299418-1-u.kleine-koenig@pengutronix.de>
 References: <20230918191916.1299418-1-u.kleine-koenig@pengutronix.de>
@@ -59,7 +59,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2065; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=iK3BmQjJkWOMIFKZCHM8yW7ZW3YftPwlpPY4/uZATmA=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlCKKuRSzdYeY7+3Lw0N/t0mr1avEzzMTIUIs0L /XiCyRyT5yJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZQiirgAKCRCPgPtYfRL+ TggRB/0TSKF6AfgrmeAfVmZhxpb0rkTJhBJ747SykkwWh4cfy+J9SsP3YHhor0sBLgePclbOLAr 3OJpgkR/k5+FHhD0BgmPLWJnFWKaWKCK6jct/5ZPknPI/Z5/brK0DtZHdyx1mcyRjbRu3jLSCtb hl7ixJEHZ+jVClej09VOfsDuHYBk3z8tc1zF+le54p+Ge48rQCtqimijEshjVEd5Qh8z4mOmKTM w19jhtm403bVdvku9RUr5THaXqAm65YvNwJg4NHRSh/cNcD/m2jdZv1slTI+R6ISxeCngxwxDUL vClsX8WnetKwCg4iBCM287rF+EbcVFIELNc0kGFd3X5Jrkjt
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1853; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=ezyudjUK4jIuPLH326xqFF9neMeYNSsuRfOsYBz5gvg=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlCKKvoBwuhrUuoRID8Z2Soqek7Ut9EwW+QL87D g3myEVETM+JATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZQiirwAKCRCPgPtYfRL+ Tii3CACgF4qFBSPHUz8six+xtbBPHMhhYtqdE7EEvaOLAm+wSN9sKz6S5dMAxBJJw0/s9nQS1zV /D2a2jcwgrE25gSF7TbOvbk9o8OKUtaJ27fTY1q3WJ8rNOgAkFtyPWruMVn3pcK2Bg7Et9ZnmKC dQY4goGrLqBBPT5wIKfpFLcaHHiCOO4oJv4/hJ6wjnt0/9C3fyHDgZv33e61q1dh/DqXy+7lVKg rdTxGPVm2KavswseZe6eC3PC/K3XKYcYSkHJclD90TFV7YvMF5ZyikFmN7znQwpIPMGvxgt2VaC O2Q5pGmRpv9XTwUgUTjLJfApAugZzmuk1FNqmg7SEaHMamkD
 X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
@@ -86,46 +86,44 @@ callback to the void returning variant.
 
 Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 ---
- drivers/net/dsa/realtek/realtek-smi.c | 8 +++-----
+ drivers/net/dsa/rzn1_a5psw.c | 8 +++-----
  1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/dsa/realtek/realtek-smi.c b/drivers/net/dsa/realtek/realtek-smi.c
-index ff13563059c5..bfd11591faf4 100644
---- a/drivers/net/dsa/realtek/realtek-smi.c
-+++ b/drivers/net/dsa/realtek/realtek-smi.c
-@@ -506,12 +506,12 @@ static int realtek_smi_probe(struct platform_device *pdev)
- 	return 0;
+diff --git a/drivers/net/dsa/rzn1_a5psw.c b/drivers/net/dsa/rzn1_a5psw.c
+index 2eda10b33f2e..10092ea85e46 100644
+--- a/drivers/net/dsa/rzn1_a5psw.c
++++ b/drivers/net/dsa/rzn1_a5psw.c
+@@ -1272,19 +1272,17 @@ static int a5psw_probe(struct platform_device *pdev)
+ 	return ret;
  }
  
--static int realtek_smi_remove(struct platform_device *pdev)
-+static void realtek_smi_remove(struct platform_device *pdev)
+-static int a5psw_remove(struct platform_device *pdev)
++static void a5psw_remove(struct platform_device *pdev)
  {
- 	struct realtek_priv *priv = platform_get_drvdata(pdev);
+ 	struct a5psw *a5psw = platform_get_drvdata(pdev);
  
- 	if (!priv)
+ 	if (!a5psw)
 -		return 0;
 +		return;
  
- 	dsa_unregister_switch(priv->ds);
- 	if (priv->slave_mii_bus)
-@@ -520,8 +520,6 @@ static int realtek_smi_remove(struct platform_device *pdev)
- 	/* leave the device reset asserted */
- 	if (priv->reset)
- 		gpiod_set_value(priv->reset, 1);
+ 	dsa_unregister_switch(&a5psw->ds);
+ 	a5psw_pcs_free(a5psw);
+ 	clk_disable_unprepare(a5psw->hclk);
+ 	clk_disable_unprepare(a5psw->clk);
 -
 -	return 0;
  }
  
- static void realtek_smi_shutdown(struct platform_device *pdev)
-@@ -559,7 +557,7 @@ static struct platform_driver realtek_smi_driver = {
- 		.of_match_table = realtek_smi_of_match,
+ static void a5psw_shutdown(struct platform_device *pdev)
+@@ -1311,7 +1309,7 @@ static struct platform_driver a5psw_driver = {
+ 		.of_match_table = a5psw_of_mtable,
  	},
- 	.probe  = realtek_smi_probe,
--	.remove = realtek_smi_remove,
-+	.remove_new = realtek_smi_remove,
- 	.shutdown = realtek_smi_shutdown,
+ 	.probe = a5psw_probe,
+-	.remove = a5psw_remove,
++	.remove_new = a5psw_remove,
+ 	.shutdown = a5psw_shutdown,
  };
- module_platform_driver(realtek_smi_driver);
+ module_platform_driver(a5psw_driver);
 -- 
 2.40.1
 
