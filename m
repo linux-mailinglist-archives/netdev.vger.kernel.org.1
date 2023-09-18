@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-34601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 753E77A4D6B
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 17:49:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0FD77A4D12
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 17:46:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A022280F80
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 15:49:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3C221C20F03
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 15:46:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C1D8210E9;
-	Mon, 18 Sep 2023 15:47:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2F711F60A;
+	Mon, 18 Sep 2023 15:46:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D86F51F95A
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 15:47:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DB5838F8F
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 15:46:02 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98E5E121;
-	Mon, 18 Sep 2023 08:44:33 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92C2D10F5;
+	Mon, 18 Sep 2023 08:44:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695051873; x=1726587873;
+  t=1695051884; x=1726587884;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=4RLnw7kq3hIGZLooWQrGpuOQSJqB/nglTVJsokARwac=;
-  b=BiWQTkL2r5gcaOLpyGOle3AHlJbaiX8n15uOmFR6rgG6EuNjG1iSBNNf
-   BYwweDF8M1m9tDk0I9htAdK//6v82UhVRHHj1o+g7kl37wJmCOP6yJyWG
-   2XgPzKx2620pR8vWx7XEbIVTHzBc6ftDn/FipSxZE//lFS4HH8lB0wxdg
-   D7Z5d8Syxj7Mrl6ZjS19QGO1cEUhbVrfmM2BsbaaacdI05KrRrMCEEnsK
-   8ry5FL0UcrnM0DCvtk4uKBawt5t5iIMI5Hh89F1ICblxt0xau6qBCNahe
-   8Zqkfw8sBjA3fQWZyyyg6AOC6ImMuCC77b5unx05UrVSm5XHQdHsAZoBU
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="446112692"
+  bh=GntG1C/Of1kw8Cak4jvrKOjbZB9Dh17vQJmAQuf8VNA=;
+  b=CCyiFHOtrnuecVM3tUjigHAESBKnrxnahyRn0XjQWC3ntsfOOcVy3zTe
+   ZUo4VAeyvJGL9i56FHVU1nBnZusfKh+fZuO2HGz6ox47L1C1o/qP1FpPn
+   dWeUS7321BZ8mw5qKZQMqFv4e+PVyT+jqVVeAONtCv6saErVeXUkaJIm0
+   6byhgORv/FfkuP3z6LF/MFouEpM+thDXfZp8HTyUcla1h7e2Y4XpQj0db
+   YMu4e5DL6GM4J2AWf1shHC9kmJww9hPaV24TCFd6w2Z12voAbvujUZwXI
+   IuqAyu/SvX2q4VkECCJplB0cSngtVNz6BDR0BejzgeGZS1MC5hEC+OBqu
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="446112778"
 X-IronPort-AV: E=Sophos;i="6.02,156,1688454000"; 
-   d="scan'208";a="446112692"
+   d="scan'208";a="446112778"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2023 06:11:37 -0700
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2023 06:11:43 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="811341426"
+X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="811341486"
 X-IronPort-AV: E=Sophos;i="6.02,156,1688454000"; 
-   d="scan'208";a="811341426"
+   d="scan'208";a="811341486"
 Received: from nprotaso-mobl1.ccr.corp.intel.com (HELO ijarvine-mobl2.ger.corp.intel.com) ([10.252.49.156])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2023 06:11:30 -0700
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2023 06:11:37 -0700
 From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
 To: linux-pci@vger.kernel.org,
 	Bjorn Helgaas <helgaas@kernel.org>,
@@ -56,9 +56,6 @@ To: linux-pci@vger.kernel.org,
 	Heiner Kallweit <hkallweit1@gmail.com>,
 	Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
 	linux-kernel@vger.kernel.org,
-	Nirmal Patel <nirmal.patel@linux.intel.com>,
-	Jonathan Derrick <jonathan.derrick@linux.dev>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
 	Bjorn Helgaas <bhelgaas@google.com>
 Cc: ath10k@lists.infradead.org,
 	ath11k@lists.infradead.org,
@@ -71,9 +68,9 @@ Cc: ath10k@lists.infradead.org,
 	linux-wireless@vger.kernel.org,
 	netdev@vger.kernel.org,
 	=?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Subject: [PATCH v2 01/13] PCI/ASPM: Rename pci_enable_link_state() to pci_set_default_link_state()
-Date: Mon, 18 Sep 2023 16:10:51 +0300
-Message-Id: <20230918131103.24119-2-ilpo.jarvinen@linux.intel.com>
+Subject: [PATCH v2 02/13] PCI/ASPM: Improve pci_set_default_link_state() kerneldoc
+Date: Mon, 18 Sep 2023 16:10:52 +0300
+Message-Id: <20230918131103.24119-3-ilpo.jarvinen@linux.intel.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20230918131103.24119-1-ilpo.jarvinen@linux.intel.com>
 References: <20230918131103.24119-1-ilpo.jarvinen@linux.intel.com>
@@ -91,93 +88,46 @@ X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-pci_enable_link_state() and pci_disable_link_state() are not paired
-symmetrically despite their names suggesting otherwise.
-pci_enable_link_state() tweaks link state when the "default" policy is
-in use rather than exactly "enabling" some link states. Obviously, when
-the default policy is in use and the default link state is changed,
-some link states may get enabled but that is a secondary effect.
+Improve pci_set_default_link_state() documentation:
 
-Thus, rename pci_enable_link_state() to pci_set_default_link_state() to
-better match what it does. The rename also frees
-pci_enable_link_state() name so that a function that pairs
-symmetrically with pci_disable_link_state() can be added later.
+- Note the link state may get changed if the default policy is in use
+- Better follow kerneldoc formatting guidelines (separate description
+  block and return entries)
 
 Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
 ---
- drivers/pci/controller/vmd.c | 2 +-
- drivers/pci/pcie/aspm.c      | 8 ++++----
- include/linux/pci.h          | 4 ++--
- 3 files changed, 7 insertions(+), 7 deletions(-)
+ drivers/pci/pcie/aspm.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/pci/controller/vmd.c b/drivers/pci/controller/vmd.c
-index ad56df98b8e6..e424ce897d23 100644
---- a/drivers/pci/controller/vmd.c
-+++ b/drivers/pci/controller/vmd.c
-@@ -752,7 +752,7 @@ static int vmd_pm_enable_quirk(struct pci_dev *pdev, void *userdata)
- 	if (!(features & VMD_FEAT_BIOS_PM_QUIRK))
- 		return 0;
- 
--	pci_enable_link_state(pdev, PCIE_LINK_STATE_ALL);
-+	pci_set_default_link_state(pdev, PCIE_LINK_STATE_ALL);
- 
- 	pos = pci_find_ext_capability(pdev, PCI_EXT_CAP_ID_LTR);
- 	if (!pos)
 diff --git a/drivers/pci/pcie/aspm.c b/drivers/pci/pcie/aspm.c
-index 1bf630059264..fc909e20365f 100644
+index fc909e20365f..860bc94974ec 100644
 --- a/drivers/pci/pcie/aspm.c
 +++ b/drivers/pci/pcie/aspm.c
-@@ -1102,8 +1102,8 @@ int pci_disable_link_state(struct pci_dev *pdev, int state)
+@@ -1102,14 +1102,18 @@ int pci_disable_link_state(struct pci_dev *pdev, int state)
  EXPORT_SYMBOL(pci_disable_link_state);
  
  /**
-- * pci_enable_link_state - Clear and set the default device link state so that
-- * the link may be allowed to enter the specified states. Note that if the
-+ * pci_set_default_link_state - Clear and set the default device link state so
-+ * that the link may be allowed to enter the specified states. Note that if the
-  * BIOS didn't grant ASPM control to the OS, this does nothing because we can't
-  * touch the LNKCTL register. Also note that this does not enable states
-  * disabled by pci_disable_link_state(). Return 0 or a negative errno.
-@@ -1111,7 +1111,7 @@ EXPORT_SYMBOL(pci_disable_link_state);
+- * pci_set_default_link_state - Clear and set the default device link state so
+- * that the link may be allowed to enter the specified states. Note that if the
+- * BIOS didn't grant ASPM control to the OS, this does nothing because we can't
+- * touch the LNKCTL register. Also note that this does not enable states
+- * disabled by pci_disable_link_state(). Return 0 or a negative errno.
+- *
++ * pci_set_default_link_state - Set the default device link state
   * @pdev: PCI device
   * @state: Mask of ASPM link states to enable
++ *
++ * Set the default device link state so that the link may be allowed to
++ * enter the specified states. If the default policy is in use, the link
++ * state may also be updated to reflect the new default link state. Note
++ * that if the BIOS didn't grant ASPM control to the OS, this does nothing
++ * because we can't touch the LNKCTL register. Also note that this does not
++ * enable states disabled by pci_disable_link_state().
++ *
++ * Return: 0 or a negative errno.
   */
--int pci_enable_link_state(struct pci_dev *pdev, int state)
-+int pci_set_default_link_state(struct pci_dev *pdev, int state)
+ int pci_set_default_link_state(struct pci_dev *pdev, int state)
  {
- 	struct pcie_link_state *link = pcie_aspm_get_link(pdev);
- 
-@@ -1153,7 +1153,7 @@ int pci_enable_link_state(struct pci_dev *pdev, int state)
- 
- 	return 0;
- }
--EXPORT_SYMBOL(pci_enable_link_state);
-+EXPORT_SYMBOL(pci_set_default_link_state);
- 
- static int pcie_aspm_set_policy(const char *val,
- 				const struct kernel_param *kp)
-diff --git a/include/linux/pci.h b/include/linux/pci.h
-index 8c7c2c3c6c65..7df56988ff48 100644
---- a/include/linux/pci.h
-+++ b/include/linux/pci.h
-@@ -1776,7 +1776,7 @@ extern bool pcie_ports_native;
- #ifdef CONFIG_PCIEASPM
- int pci_disable_link_state(struct pci_dev *pdev, int state);
- int pci_disable_link_state_locked(struct pci_dev *pdev, int state);
--int pci_enable_link_state(struct pci_dev *pdev, int state);
-+int pci_set_default_link_state(struct pci_dev *pdev, int state);
- void pcie_no_aspm(void);
- bool pcie_aspm_support_enabled(void);
- bool pcie_aspm_enabled(struct pci_dev *pdev);
-@@ -1785,7 +1785,7 @@ static inline int pci_disable_link_state(struct pci_dev *pdev, int state)
- { return 0; }
- static inline int pci_disable_link_state_locked(struct pci_dev *pdev, int state)
- { return 0; }
--static inline int pci_enable_link_state(struct pci_dev *pdev, int state)
-+static inline int pci_set_default_link_state(struct pci_dev *pdev, int state)
- { return 0; }
- static inline void pcie_no_aspm(void) { }
- static inline bool pcie_aspm_support_enabled(void) { return false; }
 -- 
 2.30.2
 
