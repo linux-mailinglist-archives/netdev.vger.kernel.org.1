@@ -1,183 +1,193 @@
-Return-Path: <netdev+bounces-34444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34449-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41D9C7A4345
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 09:45:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D39B7A4368
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 09:48:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFBFB2813D5
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 07:45:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47EFF2822DA
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 07:48:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77911134C1;
-	Mon, 18 Sep 2023 07:44:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31D5A14AA8;
+	Mon, 18 Sep 2023 07:45:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67D13F9C1;
-	Mon, 18 Sep 2023 07:44:33 +0000 (UTC)
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A20B3CCE;
-	Mon, 18 Sep 2023 00:43:10 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id E2503C000B;
-	Mon, 18 Sep 2023 07:42:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1695022989;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yImr8034vhbpOmwr9ltkLzW5eGzffuc8l1c+tIEQu4k=;
-	b=keY1QUS7dtQt/GsW5vOiYAwTOlPRGRRxUYperfcoQ3wCmbAj7I76ON/0gdvYrWD/tWoiYL
-	Hn2p1FGMOpV7FuqzU15Nt0trTIa4GFq+b3F4Y28Uz6Ve9PGSwCgX4jLzvbWGR8Yu1pLEU2
-	1NsWUihV3cVL74ZjiCyIFfG1zGI8LQKIzhHCMa2BxY0+rOJWZITaXBmNywrfT6C1fyWcdT
-	BT636wpK0zzG/fVKstJkQo/SGNr6otVeseu8nm3FvgklIDVTPkEnJ5ewMLWMjVYTzmE0Xf
-	nT6R9OlIbFGA9Kw5pzgn3EYX71nox4MtzDHt0P9KrBj9kFNiHbI+pVNi3AYXKQ==
-Date: Mon, 18 Sep 2023 09:42:39 +0200
-From: Herve Codina <herve.codina@bootlin.com>
-To: Conor Dooley <conor@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Rob Herring
- <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Lee Jones <lee@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Qiang
- Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, Liam Girdwood
- <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Jaroslav Kysela
- <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Shengjiu Wang
- <shengjiu.wang@gmail.com>, Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam
- <festevam@gmail.com>, Nicolin Chen <nicoleotsuka@gmail.com>, Christophe
- Leroy <christophe.leroy@csgroup.eu>, Randy Dunlap <rdunlap@infradead.org>,
- netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- alsa-devel@alsa-project.org, Simon Horman <horms@kernel.org>, Christophe
- JAILLET <christophe.jaillet@wanadoo.fr>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v5 08/31] dt-bindings: soc: fsl: cpm_qe: cpm1-scc-qmc:
- Add support for QMC HDLC
-Message-ID: <20230918094239.4d2d0c32@bootlin.com>
-In-Reply-To: <20230913-unburned-overturn-41b83e1eed25@spud>
-References: <20230912081527.208499-1-herve.codina@bootlin.com>
-	<20230912101018.225246-1-herve.codina@bootlin.com>
-	<20230912-capable-stash-c7a3e33078ac@spud>
-	<20230913092640.76934b31@bootlin.com>
-	<20230913-unruly-recite-7dbbbd7e63e0@spud>
-	<20230913165250.02bab2ad@bootlin.com>
-	<20230913-oversold-delay-05368e5de9fe@spud>
-	<20230913-unburned-overturn-41b83e1eed25@spud>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5563107A5
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 07:45:47 +0000 (UTC)
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50C651BDA;
+	Mon, 18 Sep 2023 00:43:18 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1bf55a81eeaso29332635ad.0;
+        Mon, 18 Sep 2023 00:43:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695022998; x=1695627798; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hQ1AMQXZDD2nNPL5JTNkWkTCq0W5XECwYQbbG++9SbE=;
+        b=c+3KG6PQ827cI9OFfFD1cQW1dQe1950LtCOc3INe1KTcs2JHpifZvfY9rtQQvjU80e
+         Wi/4spaol4G8Tf66iptIW9BRucQp5xox90BNdvKGJOCZ58eshW/O45wXv1ZfiQIH8Zrj
+         35wtyHilP4X441stXEkAl+0ApOBB0Wx6Pv1NaYz0t5MfnCp1uPJfcDsJ90QJ+sLks1IS
+         oBO7/hJtl/xkB2Yru1+nV5kO/BXOl7BfUmj8h0usKN2qBoNXnTKwwDB+I0u5HGo+vTzw
+         NwkshyNjZ1ZsTMYTcallp3qzbyqzncDvh1VQh7nn5bO0EdU7E3dGCIxzSV19FEbfCsnQ
+         MwGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695022998; x=1695627798;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hQ1AMQXZDD2nNPL5JTNkWkTCq0W5XECwYQbbG++9SbE=;
+        b=va4P0awMIeHyW4yXxYJX/4j+jl6gdK3PE2X1naJrZISdapFTrLtR1jOretufEfPVT5
+         WKEO5VrfgT7N8XUSRDPhKJxt2hCpv5FGxScL1SsrzGpvjRYjujHmSdNzGfj0NNWTSaPO
+         //Idg1kLZTN8XKZBuugbihcseE3yw9PHsDQ9q2F7BNt+L7E5dsNOAlXqjcI0DAOwdZTw
+         JaaHIFjlCU8CHtvUhwDvT4e41YrZ5bGkDx6S9cCF7vNiBnI8kI2rNEPGdI4Cti0gdOBx
+         djLYU83+VJ1kb8wqz3zL5IQouZSa6sBkvCCu0rVoA+m0JZ2VA2CQjlg0bn8Tc6dBmn9Q
+         v23w==
+X-Gm-Message-State: AOJu0YxbFNa7JF+kn14xI1vcncDc8iBOmgPN53c8iN8RyHaHkmOcqLiz
+	X52/qki1x3i+iLXF1UgGgbkxkBz2ONA=
+X-Google-Smtp-Source: AGHT+IEDBCQpmQ+p16mUQkVOKVVZMktRIQbt/FZb0PKGH+dOGeDuATfVTdispUnZpIH+lvgx9iWqzg==
+X-Received: by 2002:a17:902:6548:b0:1c4:2b87:76f0 with SMTP id d8-20020a170902654800b001c42b8776f0mr6726454pln.47.1695022997683;
+        Mon, 18 Sep 2023 00:43:17 -0700 (PDT)
+Received: from debian.me ([103.124.138.83])
+        by smtp.gmail.com with ESMTPSA id l20-20020a170903005400b001c420afa03bsm6653203pla.109.2023.09.18.00.43.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Sep 2023 00:43:17 -0700 (PDT)
+Received: by debian.me (Postfix, from userid 1000)
+	id 7784A80253C9; Mon, 18 Sep 2023 14:43:14 +0700 (WIB)
+Date: Mon, 18 Sep 2023 14:43:14 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Stephen Rothwell <sfr@canb.auug.org.au>,
+	David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Linux Networking <netdev@vger.kernel.org>
+Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@nvidia.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: Re: linux-next: build warnings after merge of the net-next tree
+Message-ID: <ZQf_kmZZYGFJFZMp@debian.me>
+References: <20230918131521.155e9e63@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="2HGzqmuLZ58rv3ET"
+Content-Disposition: inline
+In-Reply-To: <20230918131521.155e9e63@canb.auug.org.au>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hi Conor,
 
-On Wed, 13 Sep 2023 15:59:41 +0100
-Conor Dooley <conor@kernel.org> wrote:
+--2HGzqmuLZ58rv3ET
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> On Wed, Sep 13, 2023 at 03:56:16PM +0100, Conor Dooley wrote:
-> > On Wed, Sep 13, 2023 at 04:52:50PM +0200, Herve Codina wrote:  
-> > > On Wed, 13 Sep 2023 15:42:45 +0100
-> > > Conor Dooley <conor@kernel.org> wrote:
-> > >   
-> > > > On Wed, Sep 13, 2023 at 09:26:40AM +0200, Herve Codina wrote:  
-> > > > > Hi Conor,
-> > > > > 
-> > > > > On Tue, 12 Sep 2023 18:21:58 +0100
-> > > > > Conor Dooley <conor@kernel.org> wrote:
-> > > > >     
-> > > > > > On Tue, Sep 12, 2023 at 12:10:18PM +0200, Herve Codina wrote:    
-> > > > > > > The QMC (QUICC mutichannel controller) is a controller present in some
-> > > > > > > PowerQUICC SoC such as MPC885.
-> > > > > > > The QMC HDLC uses the QMC controller to transfer HDLC data.
-> > > > > > > 
-> > > > > > > Additionally, a framer can be connected to the QMC HDLC.
-> > > > > > > If present, this framer is the interface between the TDM bus used by the
-> > > > > > > QMC HDLC and the E1/T1 line.
-> > > > > > > The QMC HDLC can use this framer to get information about the E1/T1 line
-> > > > > > > and configure the E1/T1 line.
-> > > > > > > 
-> > > > > > > Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-> > > > > > > ---
-> > > > > > >  .../bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml   | 13 +++++++++++++
-> > > > > > >  1 file changed, 13 insertions(+)
-> > > > > > > 
-> > > > > > > diff --git a/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml b/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml
-> > > > > > > index 82d9beb48e00..b5073531f3f1 100644
-> > > > > > > --- a/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml
-> > > > > > > +++ b/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml
-> > > > > > > @@ -101,6 +101,16 @@ patternProperties:
-> > > > > > >            Channel assigned Rx time-slots within the Rx time-slots routed by the
-> > > > > > >            TSA to this cell.
-> > > > > > >  
-> > > > > > > +      compatible:
-> > > > > > > +        const: fsl,qmc-hdlc
-> > > > > > > +
-> > > > > > > +      fsl,framer:
-> > > > > > > +        $ref: /schemas/types.yaml#/definitions/phandle
-> > > > > > > +        description:
-> > > > > > > +          phandle to the framer node. The framer is in charge of an E1/T1 line
-> > > > > > > +          interface connected to the TDM bus. It can be used to get the E1/T1 line
-> > > > > > > +          status such as link up/down.      
-> > > > > > 
-> > > > > > Sounds like this fsl,framer property should depend on the compatible
-> > > > > > being present, no?    
-> > > > > 
-> > > > > Well from the implementation point of view, only the QMC HDLC driver uses this
-> > > > > property.
-> > > > > 
-> > > > > From the hardware description point of view, this property means that the time slots
-> > > > > handled by this channel are connected to the framer. So I think it makes sense for
-> > > > > any channel no matter the compatible (even if compatible is not present).
-> > > > > 
-> > > > > Should I change and constraint the fsl,framer property to the compatible presence ?
-> > > > > If so, is the following correct for this contraint ?
-> > > > >    --- 8< ---
-> > > > >    dependencies:
-> > > > >      - fsl,framer: [ compatible ];
-> > > > >    --- 8< ---    
-> > > > 
-> > > > The regular sort of
-> > > > if:
-> > > > 	compatible:
-> > > > 		contains:
-> > > > 			const: foo
-> > > > then:
-> > > > 	required:
-> > > > 		- fsl,framer
-> > > > would fit the bill, no?  
-> > > 
-> > > Not sure.
-> > > "fsl,framer" is an optional property (depending on the hardware we can have
-> > > a framer or not).  
-> > 
-> > Ah apologies, I had it backwards! Your suggestion seems fair in that
-> > case.  
-> 
-> Or actually,
-> if:
-> 	compatible:
-> 		not:
-> 	 		contains:
-> 	 			const: foo
->  then:
->  	properties:
->  		fsl,framer: false
-> ? That should do the trick in a more conventional way.
+On Mon, Sep 18, 2023 at 01:15:21PM +1000, Stephen Rothwell wrote:
+> Hi all,
+>=20
+> After merging the net-next tree, today's linux-next build (htmldocs)
+> produced these warnings:
+>=20
+> Documentation/driver-api/dpll.rst:427: ERROR: Error in "code-block" direc=
+tive:
+> maximum 1 argument(s) allowed, 18 supplied.
+>=20
+> .. code-block:: c
+>         static const struct dpll_device_ops dpll_ops =3D {
+>                 .lock_status_get =3D ptp_ocp_dpll_lock_status_get,
+>                 .mode_get =3D ptp_ocp_dpll_mode_get,
+>                 .mode_supported =3D ptp_ocp_dpll_mode_supported,
+>         };
+>=20
+>         static const struct dpll_pin_ops dpll_pins_ops =3D {
+>                 .frequency_get =3D ptp_ocp_dpll_frequency_get,
+>                 .frequency_set =3D ptp_ocp_dpll_frequency_set,
+>                 .direction_get =3D ptp_ocp_dpll_direction_get,
+>                 .direction_set =3D ptp_ocp_dpll_direction_set,
+>                 .state_on_dpll_get =3D ptp_ocp_dpll_state_get,
+>         };
+> Documentation/driver-api/dpll.rst:444: ERROR: Error in "code-block" direc=
+tive:
+> maximum 1 argument(s) allowed, 21 supplied.
+>=20
+> .. code-block:: c
+>         clkid =3D pci_get_dsn(pdev);
+>         bp->dpll =3D dpll_device_get(clkid, 0, THIS_MODULE);
+>         if (IS_ERR(bp->dpll)) {
+>                 err =3D PTR_ERR(bp->dpll);
+>                 dev_err(&pdev->dev, "dpll_device_alloc failed\n");
+>                 goto out;
+>         }
+>=20
+>         err =3D dpll_device_register(bp->dpll, DPLL_TYPE_PPS, &dpll_ops, =
+bp);
+>         if (err)
+>                 goto out;
+>=20
+>         for (i =3D 0; i < OCP_SMA_NUM; i++) {
+>                 bp->sma[i].dpll_pin =3D dpll_pin_get(clkid, i, THIS_MODUL=
+E, &bp->sma[i].dpll_prop);
+>                 if (IS_ERR(bp->sma[i].dpll_pin)) {
+>                         err =3D PTR_ERR(bp->dpll);
+>                         goto out_dpll;
+>                 }
+>=20
+>                 err =3D dpll_pin_register(bp->dpll, bp->sma[i].dpll_pin, =
+&dpll_pins_ops,
+>                                         &bp->sma[i]);
+>                 if (err) {
+>                         dpll_pin_put(bp->sma[i].dpll_pin);
+>                         goto out_dpll;
+>                 }
+>         }
+> Documentation/driver-api/dpll.rst:474: ERROR: Error in "code-block" direc=
+tive:
+> maximum 1 argument(s) allowed, 12 supplied.
+>=20
+> .. code-block:: c
+>         while (i) {
+>                 --i;
+>                 dpll_pin_unregister(bp->dpll, bp->sma[i].dpll_pin, &dpll_=
+pins_ops, &bp->sma[i]);
+>                 dpll_pin_put(bp->sma[i].dpll_pin);
+>         }
+>         dpll_device_put(bp->dpll);
+>=20
+>=20
+> Introduced by commit
+>=20
+>   dbb291f19393 ("dpll: documentation on DPLL subsystem interface")
+>=20
 
-Thanks for this proposal.
-I will use it in the next iteration.
+Oops, I forgot to review dpll series. Will fix.
 
-Regards,
-Hervé
+Thanks for the report!
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--2HGzqmuLZ58rv3ET
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZQf/kQAKCRD2uYlJVVFO
+owpFAQDeSFN9OdEsaDy/jOpQeC1tlHJPmMMw0OSh6ecH4jsgnwD/Wz8SwPC9Njxd
+c/6VShwmyFiw0/K6EV85jAIXC7PqMgQ=
+=u2w5
+-----END PGP SIGNATURE-----
+
+--2HGzqmuLZ58rv3ET--
 
