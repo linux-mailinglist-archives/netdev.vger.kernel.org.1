@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-34531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11F597A47AA
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 12:55:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24B887A47AC
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 12:56:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA88D28154F
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 10:55:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 526801C2099C
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 10:56:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 678456AA4;
-	Mon, 18 Sep 2023 10:54:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E2EB1C2AC;
+	Mon, 18 Sep 2023 10:54:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D81E6FC3
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 10:54:51 +0000 (UTC)
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 271F3188
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 03:54:23 -0700 (PDT)
-Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-991c786369cso590158166b.1
-        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 03:54:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 262B614AB3
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 10:54:54 +0000 (UTC)
+Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7D5C129
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 03:54:24 -0700 (PDT)
+Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-9a9d82d73f9so538610166b.3
+        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 03:54:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1695034461; x=1695639261; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1695034463; x=1695639263; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uvAKdPrFmWu5KYQYiGqglh6LusMwFEKr0TU1U+69is8=;
-        b=dRf61l3V7p/d1qKEuXskPJcLyE2kdIiLl6pBwC4A7JPimPJvnLs0xIcXGPvZIqWZiq
-         GYYqhkBFnDFazMr/lYyPCjR4BJDepmaF3NiOjCxkwMgbUOfisoQuMQyehQubdUMS7Enl
-         58SamEYArnaHKP4po2HWiqx4ujh1vvfYxEB3Jue13WNvjnvFHgyp5ZLLESVopmP71Yob
-         sGw304NrbZXAs0kFiMhdclvFks1IP0TQG9rquDNw1wkPXuVtwx5nsB+yoKM+GRbSBHi5
-         2u5NDaMstn+gzwXja1yZ8Mnv+wpAjybsSjbBPyDS2YhVCJODIqmwUwehA3pFabrBgScn
-         7ihg==
+        bh=aKd06wBuxPIH0zq8nwAImCSv1mwa2d7HOT+ZZ81oxZQ=;
+        b=gINrMPpaLXJWiVUh5m+9sC36fvA7HviLBDhIc0bQgIN4qU4/BPWwEXFMpwi2rIGGyL
+         Avn2RPwCeHCycaZ1rtU4KDV+ViCSJwlziChEaZFC/BsbU9inzPUf/Q8ds94KoBdhVO9h
+         g6xjK7tA/Ua/qYG7San9Dd7AFCFniRCH+je/fMRloV4TiTknCC4hPOjc26JMtCo5dC9E
+         y3r9Pay2w+lvWER+ws7KBN4T9PKMIeWbkwVoDgT6CwqNCueh7H9gSA/upgaDHnLK3l22
+         wMdRnZR7uBJO8s43Ko/KsAZAqVBMUKid2KxCDECHPhgtiEKqKlmX912IpYhFWTayUrjm
+         g4Iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695034461; x=1695639261;
+        d=1e100.net; s=20230601; t=1695034463; x=1695639263;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=uvAKdPrFmWu5KYQYiGqglh6LusMwFEKr0TU1U+69is8=;
-        b=dI76Wz41rXJQsMkUjJwMye2ppAzcpV7CAqP7avyeitBMT9sTXN1R840uc5JJlqlgk7
-         bhMfRDK9GT/n5N4TJ++VjW8fgOUEBjJXdgLvpar6u0gh1HDyVqRuHj91w29L46JQSF7k
-         AHIxRX1J303CjJrnZi1UfJj8JnKskqxB/nxsRAQF2sPoc8bHmeC/LmPEUoIKilDjIYnk
-         mqJbUsnp8hIlWIitcERNixcnPlydTE1bF8AGNuCEsEXEOBamQi7xpfG9IGrN3OVn4viT
-         FF2aZLMKzCUuMJ9KVt8NSSPo6Ha333u65ZK+ymRPOt2NfuA9wYkXoS3yYeL/+rZ2Ve2g
-         qlKQ==
-X-Gm-Message-State: AOJu0YyY78m+EgUk1hq59agqhfZkLM29jHAZohbYIl4mulf0Cy/0lJQ+
-	/VvnsJwBX7sYxmGBmZoe4HmT82XuLIjaWywBlyU=
-X-Google-Smtp-Source: AGHT+IHf5xB7lISVdo/1SFGdn9z0VAAfMStmpbEooajetvSEXaZNGx1dZBimib/20hRzOvxMxJTVbA==
-X-Received: by 2002:a17:906:329a:b0:9a9:e6c3:ad28 with SMTP id 26-20020a170906329a00b009a9e6c3ad28mr7796416ejw.69.1695034461461;
-        Mon, 18 Sep 2023 03:54:21 -0700 (PDT)
+        bh=aKd06wBuxPIH0zq8nwAImCSv1mwa2d7HOT+ZZ81oxZQ=;
+        b=dqgvLHW3/6fscaEMBFOcoWDb8jc7P78957os0VLtM5fxui7JTdtwmVa2OwyQbqJ1cH
+         rdxCKpxz6IObi8v4FY4ztTnWE8za99IzyuMoyEIjQQsgvFrQFD9QpIrjdzbPKF8Ejbfj
+         GiE3ycpssoJFhFFM4DGrtqfVx9N2rqsmdZYbUVOZJ/o7+c1b6PTSQ2vRLtmZ/LvFZ1SS
+         2pvb5/lvqdPfG5oA/cGmP7E5o5GqGcCB/o2iQWC2EpzEK0BK5Ibli6pi8x06KuAWI5FY
+         BoIl/teysvrWjh12Ph9dBcpmedpdXuO5KF2S9IjZd+7dClsdThZjq5T9LDGwsCmNU/w0
+         b7PA==
+X-Gm-Message-State: AOJu0YxdAeIrQVxFJgpdLnVIYSoR9WiONL6+VqOAE6ByVjCWgGXn+p0r
+	i8DylTpR6Pv+ynm4zE1WzkQtLZM1NzJ7nZ/r7as=
+X-Google-Smtp-Source: AGHT+IHbmK7PmlWEZGUuKIqXF1NL/Q/8wqB8riFsOVMRiGKzCQjQENJ8ISDjYQxb8XvRRWcoZvqINw==
+X-Received: by 2002:a17:907:75cd:b0:9a9:dfbe:ca98 with SMTP id jl13-20020a17090775cd00b009a9dfbeca98mr7442942ejc.7.1695034462988;
+        Mon, 18 Sep 2023 03:54:22 -0700 (PDT)
 Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id y3-20020a17090629c300b009929d998abcsm6239020eje.209.2023.09.18.03.54.20
+        by smtp.gmail.com with ESMTPSA id qb18-20020a1709077e9200b009adc5802d08sm5346503ejc.190.2023.09.18.03.54.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Sep 2023 03:54:20 -0700 (PDT)
+        Mon, 18 Sep 2023 03:54:22 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: stephen@networkplumber.org,
 	dsahern@gmail.com
-Subject: [patch iproute2-next 2/4] devlink: introduce support for netns id for nested handle
-Date: Mon, 18 Sep 2023 12:54:14 +0200
-Message-ID: <20230918105416.1107260-3-jiri@resnulli.us>
+Subject: [patch iproute2-next 3/4] devlink: print nested handle for port function
+Date: Mon, 18 Sep 2023 12:54:15 +0200
+Message-ID: <20230918105416.1107260-4-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230918105416.1107260-1-jiri@resnulli.us>
 References: <20230918105416.1107260-1-jiri@resnulli.us>
@@ -81,152 +81,34 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Nested handle may contain DEVLINK_ATTR_NETNS_ID attribute that indicates
-the network namespace where the nested devlink instance resides. Process
-this converting to netns name if possible and print to user.
+If port function contains nested handle attribute, print it.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
- devlink/devlink.c | 105 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 105 insertions(+)
+ devlink/devlink.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/devlink/devlink.c b/devlink/devlink.c
-index d1795f616ca0..31dd29452c39 100644
+index 31dd29452c39..8ea7b268c63c 100644
 --- a/devlink/devlink.c
 +++ b/devlink/devlink.c
-@@ -24,6 +24,7 @@
- #include <linux/genetlink.h>
- #include <linux/devlink.h>
- #include <linux/netlink.h>
-+#include <linux/net_namespace.h>
- #include <libmnl/libmnl.h>
- #include <netinet/ether.h>
- #include <sys/select.h>
-@@ -722,6 +723,7 @@ static const enum mnl_attr_data_type devlink_policy[DEVLINK_ATTR_MAX + 1] = {
- 	[DEVLINK_ATTR_LINECARD_SUPPORTED_TYPES] = MNL_TYPE_NESTED,
- 	[DEVLINK_ATTR_NESTED_DEVLINK] = MNL_TYPE_NESTED,
- 	[DEVLINK_ATTR_SELFTESTS] = MNL_TYPE_NESTED,
-+	[DEVLINK_ATTR_NETNS_ID] = MNL_TYPE_U32,
+@@ -772,6 +772,7 @@ static const enum mnl_attr_data_type
+ devlink_function_policy[DEVLINK_PORT_FUNCTION_ATTR_MAX + 1] = {
+ 	[DEVLINK_PORT_FUNCTION_ATTR_HW_ADDR ] = MNL_TYPE_BINARY,
+ 	[DEVLINK_PORT_FN_ATTR_STATE] = MNL_TYPE_U8,
++	[DEVLINK_PORT_FN_ATTR_DEVLINK] = MNL_TYPE_NESTED,
  };
  
- static const enum mnl_attr_data_type
-@@ -2723,6 +2725,85 @@ static bool should_arr_last_handle_end(struct dl *dl, const char *bus_name,
- 	       !cmp_arr_last_handle(dl, bus_name, dev_name);
- }
+ static int function_attr_cb(const struct nlattr *attr, void *data)
+@@ -4875,6 +4876,8 @@ static void pr_out_port_function(struct dl *dl, struct nlattr **tb_port)
+ 				     port_fn_caps->value & DEVLINK_PORT_FN_CAP_MIGRATABLE ?
+ 				     "enable" : "disable");
+ 	}
++	if (tb[DEVLINK_PORT_FN_ATTR_DEVLINK])
++		pr_out_nested_handle(tb[DEVLINK_PORT_FN_ATTR_DEVLINK]);
  
-+static int32_t netns_id_by_name(const char *name)
-+{
-+	struct {
-+		struct nlmsghdr n;
-+		struct rtgenmsg g;
-+		char            buf[1024];
-+	} req = {
-+		.n.nlmsg_len = NLMSG_LENGTH(sizeof(struct rtgenmsg)),
-+		.n.nlmsg_flags = NLM_F_REQUEST,
-+		.n.nlmsg_type = RTM_GETNSID,
-+		.g.rtgen_family = AF_UNSPEC,
-+	};
-+	int ret = NETNSA_NSID_NOT_ASSIGNED;
-+	struct rtattr *tb[NETNSA_MAX + 1];
-+	struct nlmsghdr *n = NULL;
-+	struct rtnl_handle rth;
-+	struct rtgenmsg *rtg;
-+	int len;
-+	int fd;
-+
-+	fd = netns_get_fd(name);
-+	if (fd < 0)
-+		return ret;
-+
-+	if (rtnl_open(&rth, 0) < 0)
-+		return ret;
-+
-+	addattr32(&req.n, sizeof(req), NETNSA_FD, fd);
-+	if (rtnl_talk(&rth, &req.n, &n) < 0)
-+		goto out;
-+
-+	if (n->nlmsg_type == NLMSG_ERROR)
-+		goto out;
-+
-+	rtg = NLMSG_DATA(n);
-+	len = n->nlmsg_len;
-+
-+	len -= NLMSG_SPACE(sizeof(*rtg));
-+	if (len < 0)
-+		goto out;
-+
-+	parse_rtattr(tb, NETNSA_MAX, NETNS_RTA(rtg), len);
-+	if (tb[NETNSA_NSID])
-+		ret = rta_getattr_s32(tb[NETNSA_NSID]);
-+
-+out:
-+	free(n);
-+	rtnl_close(&rth);
-+	close(fd);
-+	return ret;
-+}
-+
-+struct netns_name_by_id_ctx {
-+	int32_t id;
-+	char *name;
-+};
-+
-+static int nesns_name_by_id_func(char *nsname, void *arg)
-+{
-+	struct netns_name_by_id_ctx *ctx = arg;
-+	int32_t ret;
-+
-+	ret = netns_id_by_name(nsname);
-+	if (ret < 0 || ret != ctx->id)
-+		return 0;
-+	ctx->name = strdup(nsname);
-+	return 1;
-+}
-+
-+static char *netns_name_by_id(int32_t id)
-+{
-+	struct netns_name_by_id_ctx ctx = {
-+		.id = id,
-+	};
-+
-+	netns_foreach(nesns_name_by_id_func, &ctx);
-+	return ctx.name;
-+}
-+
- static void pr_out_nested_handle(struct nlattr *nla_nested_dl)
- {
- 	struct nlattr *tb[DEVLINK_ATTR_MAX + 1] = {};
-@@ -2740,6 +2821,30 @@ static void pr_out_nested_handle(struct nlattr *nla_nested_dl)
- 	sprintf(buf, "%s/%s", mnl_attr_get_str(tb[DEVLINK_ATTR_BUS_NAME]),
- 		mnl_attr_get_str(tb[DEVLINK_ATTR_DEV_NAME]));
- 	print_string(PRINT_ANY, "nested_devlink", " nested_devlink %s", buf);
-+
-+	if (tb[DEVLINK_ATTR_NETNS_ID]) {
-+		int32_t id = mnl_attr_get_u32(tb[DEVLINK_ATTR_NETNS_ID]);
-+
-+		if (id >= 0) {
-+			char *name = netns_name_by_id(id);
-+
-+			if (name) {
-+				print_string(PRINT_ANY,
-+					     "nested_devlink_netns",
-+					     " nested_devlink_netns %s", name);
-+				free(name);
-+			} else {
-+				print_int(PRINT_ANY,
-+					  "nested_devlink_netnsid",
-+					  " nested_devlink_netnsid %d", id);
-+			}
-+		} else {
-+			print_string(PRINT_FP, NULL,
-+				     " nested_devlink_netnsid %s", "unknown");
-+			print_int(PRINT_JSON,
-+				  "nested_devlink_netnsid", NULL, id);
-+		}
-+	}
- }
- 
- static void __pr_out_handle_start(struct dl *dl, struct nlattr **tb,
+ 	if (!dl->json_output)
+ 		__pr_out_indent_dec();
 -- 
 2.41.0
 
