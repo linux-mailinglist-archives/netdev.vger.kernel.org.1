@@ -1,138 +1,249 @@
-Return-Path: <netdev+bounces-34525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34527-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B4D97A4753
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 12:40:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C10447A4762
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 12:42:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2911B1C20C7D
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 10:40:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC4E91C209A3
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 10:42:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 417BB38FAF;
-	Mon, 18 Sep 2023 10:33:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CAFF1C6BD;
+	Mon, 18 Sep 2023 10:40:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96FB38F9B
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 10:33:36 +0000 (UTC)
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com [209.85.167.199])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C3D912D
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 03:33:33 -0700 (PDT)
-Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-3ab7fb1173cso7145396b6e.3
-        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 03:33:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C8DC6FCA
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 10:40:25 +0000 (UTC)
+Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D553186
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 03:39:38 -0700 (PDT)
+Received: by mail-qt1-x82b.google.com with SMTP id d75a77b69052e-415155b2796so398891cf.1
+        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 03:39:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695033577; x=1695638377; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YgFgssEN+TCvZv6rBHJfrb2AD2oY/VPxRnqnudH7dNk=;
+        b=tKstzlNm5au+FOHU3GQef63WO5DFQqBFINadRSwAxppuayd0f9O2T8dO8VenNrRwFZ
+         vloPtPZEAj759WNddFMQLkIF97rytsJ4xrUuTS16m17cJ+OCsW0dJcSGPZNiQeMpNocI
+         9uC4UivMdMKNHGahOdpkAC+h1HkVujHv96oSTzMwNVqi4cdHzjL1yDcFbvrMUb6U18Z6
+         +8ASWipxjEkGQ58Y2pTedf35V3CUuR+560dy+jJDQymvffkmM6PJkhX2gAM8F1tpRNX2
+         68BIdLWJjAbl6W25hOgQQ4gW7CES8vbvnfQiZZR3TslK3uf91nLPN+m0q30rMtySnIOM
+         30+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695033213; x=1695638013;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TGRLeptGZvLp1hUYEMjYiRhp/wDfnF1GLg92JMr4Fig=;
-        b=mq4S7qmZkPqhXoukLtSxB8QXcXK0AlFcNvVSQWgPdKsZL7gl3GefSrEiAdS6UwkevJ
-         EX5j5oGJC/LeFMZRsEWyQ+fTLVT81M7yZxxjak/50+qNhUrAe4OkrvvrKzv11sBfEiyT
-         a+sKKfzU6j6dVT3p2uTJltPhZhdlqd3DXzf30+Nuzs4bc6U8zq4aHIWeKTq7dSVoGmQ1
-         5YOoK+iX9hxetmGQ1d0nH76+Cz7ckk63qMYKzyiAvKbjZq4UwIlFm91At6Bs91JibTTM
-         qeSMJJPy4qoORAOWvMPEoSzgDunTgt01EptGh1CYckXNOQdlWMwmbUijOalCwV9yv1bj
-         nbMA==
-X-Gm-Message-State: AOJu0YyFDFTJtH3yP5wKU3yAdnnbrxxRCHNQzt/HLmk8EmtCxfbxeOEL
-	rie8SxYHsvpXbWc11dY49BU8PupKVCVNmeGwCa2qcYyIRAL/
-X-Google-Smtp-Source: AGHT+IEhT6lrIQ3NypWojHeJGdRpTkqBG7gOMcP6APFSfTvf2EDMdZgPLQy/VATxZvrCrEux6Exk/iXUwchO/8G02Ie0b9nn54uK
+        d=1e100.net; s=20230601; t=1695033577; x=1695638377;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YgFgssEN+TCvZv6rBHJfrb2AD2oY/VPxRnqnudH7dNk=;
+        b=ZK8PoAoSPZ7Ro0jx8neV7skSVMABxsQ+uKBl8hyd3GsvkMDWYj4vymJAb11t9FY9QO
+         10LVi3Uoe6ehlQiVoJswOm/c71cnOw8njTy8B85/6iGwJaByV2gRzi6/i/M10IIsnODI
+         trD8t8jjI0ygGPfToMjTPAOp6w5WSyKSvNUQSOyJqNRZokHIJqDbJJvADqdBd4EJuz9a
+         YWAvT/TyEg23vHFGHMlrGt5yc+MTpkx33D9d9brNN6MgZkBMZZB6UhvHlC14bqqHigaC
+         dmvyzZX71ciKcWt2AwWMRCaDhsfj+9BW9cTBQD8keZj0aHr49kBAQALW+MWGJPR6C2qY
+         yrQQ==
+X-Gm-Message-State: AOJu0YyuUW9GVgR5tXQ0SjXQkHKTIzI9H/copQWUXrd9/F3acv3mAabm
+	NC57QvY/jl+mO0jEtyigJcoLJMSfCLKSVS8RI1zMaA==
+X-Google-Smtp-Source: AGHT+IFf03L42G84fm0N48JpqVHj9I4gsFxC8WzU21B9esoRqn0gNLgBqz3kaHaC5kxNyPqlKpiP7Xi9yXysfv4dzyo=
+X-Received: by 2002:a05:622a:1747:b0:403:f5b8:2bd2 with SMTP id
+ l7-20020a05622a174700b00403f5b82bd2mr372604qtk.9.1695033576987; Mon, 18 Sep
+ 2023 03:39:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:1a1f:b0:3ac:ab4f:ef3 with SMTP id
- bk31-20020a0568081a1f00b003acab4f0ef3mr3979852oib.6.1695033212795; Mon, 18
- Sep 2023 03:33:32 -0700 (PDT)
-Date: Mon, 18 Sep 2023 03:33:32 -0700
-In-Reply-To: <3905313.1695031861@warthog.procyon.org.uk>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000088066006059fac87@google.com>
-Subject: Re: [syzbot] [net?] WARNING in __ip6_append_data
-From: syzbot <syzbot+62cbf263225ae13ff153@syzkaller.appspotmail.com>
-To: bpf@vger.kernel.org, davem@davemloft.net, dhowells@redhat.com, 
-	dsahern@kernel.org, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
+References: <ed59c1b9-6c5c-4774-a871-a24564f3a270@alu.unizg.hr>
+ <CANn89iJv8VRPwQBAE=5-oKHGMs9JVCvCiCBwL+3QW9sJDxo5cQ@mail.gmail.com> <3e306b0a-24b8-60d4-c516-1db738d79e92@alu.unizg.hr>
+In-Reply-To: <3e306b0a-24b8-60d4-c516-1db738d79e92@alu.unizg.hr>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 18 Sep 2023 12:39:22 +0200
+Message-ID: <CANn89iKyLdvSF11aHvg-Ytr+HbnHb4QXMie2N5GpZhxSHx-XtA@mail.gmail.com>
+Subject: Re: BUG: KCSAN: data-race in rtl8169_poll
+To: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>, Marco Elver <elver@google.com>
+Cc: nic_swsd@realtek.com, Heiner Kallweit <hkallweit1@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=2.4 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
-	RCVD_IN_SORBS_WEB,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
 	autolearn_force=no version=3.4.6
-X-Spam-Level: **
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello,
+On Mon, Sep 18, 2023 at 11:43=E2=80=AFAM Mirsad Todorovac
+<mirsad.todorovac@alu.unizg.hr> wrote:
+>
+> On 9/18/23 09:41, Eric Dumazet wrote:
+> > On Mon, Sep 18, 2023 at 8:15=E2=80=AFAM Mirsad Todorovac
+> > <mirsad.todorovac@alu.unizg.hr> wrote:
+> >>
+> >> Hi all,
+> >>
+> >> In the vanilla torvalds tree kernel on Ubuntu 22.04, commit 6.6.0-rc1-=
+kcsan-00269-ge789286468a9,
+> >> KCSAN discovered a data-race in rtl8169_poll():
+> >>
+> >> [ 9591.740976] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >> [ 9591.740990] BUG: KCSAN: data-race in rtl8169_poll (drivers/net/ethe=
+rnet/realtek/r8169_main.c:4430 drivers/net/ethernet/realtek/r8169_main.c:45=
+83) r8169
+> >>
+> >> [ 9591.741060] race at unknown origin, with read to 0xffff888109773130=
+ of 4 bytes by interrupt on cpu 21:
+> >> [ 9591.741073] rtl8169_poll (drivers/net/ethernet/realtek/r8169_main.c=
+:4430 drivers/net/ethernet/realtek/r8169_main.c:4583) r8169
+> >> [ 9591.741135] __napi_poll (net/core/dev.c:6527)
+> >> [ 9591.741149] net_rx_action (net/core/dev.c:6596 net/core/dev.c:6727)
+> >> [ 9591.741161] __do_softirq (kernel/softirq.c:553)
+> >> [ 9591.741175] __irq_exit_rcu (kernel/softirq.c:427 kernel/softirq.c:6=
+32)
+> >> [ 9591.741185] irq_exit_rcu (kernel/softirq.c:647)
+> >> [ 9591.741194] common_interrupt (arch/x86/kernel/irq.c:247 (discrimina=
+tor 14))
+> >> [ 9591.741206] asm_common_interrupt (./arch/x86/include/asm/idtentry.h=
+:636)
+> >> [ 9591.741217] cpuidle_enter_state (drivers/cpuidle/cpuidle.c:291)
+> >> [ 9591.741227] cpuidle_enter (drivers/cpuidle/cpuidle.c:390)
+> >> [ 9591.741237] call_cpuidle (kernel/sched/idle.c:135)
+> >> [ 9591.741249] do_idle (kernel/sched/idle.c:219 kernel/sched/idle.c:28=
+2)
+> >> [ 9591.741259] cpu_startup_entry (kernel/sched/idle.c:378 (discriminat=
+or 1))
+> >> [ 9591.741268] start_secondary (arch/x86/kernel/smpboot.c:210 arch/x86=
+/kernel/smpboot.c:294)
+> >> [ 9591.741281] secondary_startup_64_no_verify (arch/x86/kernel/head_64=
+.S:433)
+> >>
+> >> [ 9591.741300] value changed: 0x80003fff -> 0x34044510
+> >>
+> >> [ 9591.741314] Reported by Kernel Concurrency Sanitizer on:
+> >> [ 9591.741322] CPU: 21 PID: 0 Comm: swapper/21 Tainted: G             =
+L     6.6.0-rc1-kcsan-00269-ge789286468a9-dirty #4
+> >> [ 9591.741334] Hardware name: ASRock X670E PG Lightning/X670E PG Light=
+ning, BIOS 1.21 04/26/2023
+> >> [ 9591.741343] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >>
+> >> (The taint is not from the proprietary module, but triggered from the =
+previous reported and unfixed bug.)
+> >>
+> >> Apparently, it is this code:
+> >>
+> >> static int rtl8169_poll(struct napi_struct *napi, int budget)
+> >> {
+> >>          struct rtl8169_private *tp =3D container_of(napi, struct rtl8=
+169_private, napi);
+> >>          struct net_device *dev =3D tp->dev;
+> >>          int work_done;
+> >>
+> >>          rtl_tx(dev, tp, budget);
+> >>
+> >> =E2=86=92       work_done =3D rtl_rx(dev, tp, budget);
+> >>
+> >>          if (work_done < budget && napi_complete_done(napi, work_done)=
+)
+> >>                  rtl_irq_enable(tp);
+> >>
+> >>          return work_done;
+> >> }
+> >>
+> >> and
+> >>
+> >> static int rtl_rx(struct net_device *dev, struct rtl8169_private *tp, =
+int budget)
+> >> {
+> >>          struct device *d =3D tp_to_dev(tp);
+> >>          int count;
+> >>
+> >>          for (count =3D 0; count < budget; count++, tp->cur_rx++) {
+> >>                  unsigned int pkt_size, entry =3D tp->cur_rx % NUM_RX_=
+DESC;
+> >>                  struct RxDesc *desc =3D tp->RxDescArray + entry;
+> >>                  struct sk_buff *skb;
+> >>                  const void *rx_buf;
+> >>                  dma_addr_t addr;
+> >>                  u32 status;
+> >>
+> >> =E2=86=92               status =3D le32_to_cpu(desc->opts1);
+> >>                  if (status & DescOwn)
+> >>                          break;
+> >>
+> >>                  /* This barrier is needed to keep us from reading
+> >>                   * any other fields out of the Rx descriptor until
+> >>                   * we know the status of DescOwn
+> >>                   */
+> >>                  dma_rmb();
+> >>
+> >>                  if (unlikely(status & RxRES)) {
+> >> .
+> >> .
+> >> .
+> >>
+> >> The reason isn't obvious, so it might be interesting if this is a vali=
+d report and whether it caused spurious corruption
+> >> of the network data on Realtek 8169 compatible cards ...
+> >>
+> >
+> > I think this is pretty much expected.
+> >
+> > Driver reads a piece of memory that the hardware can modify.
+> >
+> > Adding data_race() annotations could avoid these false positives.
+> >
+> >> Hope this helps.
+> >>
+> >> Best regards,
+> >> Mirsad Todorovac
+>
+> Well, another approach was this quick fix that eliminated all those rtl81=
+69_poll() KCSAN warnings.
+>
+> If READ_ONCE(desc->opts1) fixed it, then maybe there is more to this than=
+ meets the eye?
+>
+> -------------------------------------------------
+>   drivers/net/ethernet/realtek/r8169_main.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethe=
+rnet/realtek/r8169_main.c
+> index 6351a2dc13bc..051551ee2a15 100644
+> --- a/drivers/net/ethernet/realtek/r8169_main.c
+> +++ b/drivers/net/ethernet/realtek/r8169_main.c
+> @@ -4427,7 +4427,7 @@ static int rtl_rx(struct net_device *dev, struct rt=
+l8169_private *tp, int budget
+>                  dma_addr_t addr;
+>                  u32 status;
+>
+> -               status =3D le32_to_cpu(desc->opts1);
+> +               status =3D le32_to_cpu(READ_ONCE(desc->opts1));
+>                  if (status & DescOwn)
+>                          break;
+>
 
-syzbot has tested the proposed patch but the reproducer is still triggering an issue:
-WARNING in __ip6_append_data
+This is also working, but in this case we already have barriers (
+dma_rmb() here)
+to synchronize host side and hardware (when flipping DescOwn) bit.
 
-l2tp_ip6_sendmsg()
-MAXPLEN
-check 0 4100 65575 40, 4 65536
-l2tp_ip6_sendmsg()
-MAXPLEN
-check 4100 4100 65575 40, 0 65536
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 5455 at net/ipv6/ip6_output.c:1812 __ip6_append_data.isra.0+0x1c6d/0x4900 net/ipv6/ip6_output.c:1812
-Modules linked in:
-CPU: 0 PID: 5455 Comm: syz-executor.0 Not tainted 6.5.0-syzkaller-11938-g65d6e954e378-dirty #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/04/2023
-RIP: 0010:__ip6_append_data.isra.0+0x1c6d/0x4900 net/ipv6/ip6_output.c:1812
-Code: c4 f6 ff ff e8 84 d4 97 f8 49 8d 44 24 ff 48 89 44 24 68 49 8d 6c 24 07 e9 ab f6 ff ff 4c 8b b4 24 90 01 00 00 e8 63 d4 97 f8 <0f> 0b 48 8b 44 24 10 45 89 f4 48 8d 98 74 02 00 00 e8 4d d4 97 f8
-RSP: 0018:ffffc90004f373b8 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: 0000000000001004 RCX: 0000000000000000
-RDX: ffff888019e8bb80 RSI: ffffffff88efcf9d RDI: 0000000000000006
-RBP: 0000000000001000 R08: 0000000000000006 R09: 0000000000001004
-R10: 0000000000001000 R11: 0000000000000001 R12: 0000000000000001
-R13: dffffc0000000000 R14: 0000000000001004 R15: ffff888027b1d640
-FS:  00007feae40ff6c0(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f0f01e4e378 CR3: 000000007d467000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- ip6_append_data+0x1e6/0x510 net/ipv6/ip6_output.c:1909
- l2tp_ip6_sendmsg+0xe0c/0x1ce0 net/l2tp/l2tp_ip6.c:633
- inet_sendmsg+0x9d/0xe0 net/ipv4/af_inet.c:840
- sock_sendmsg_nosec net/socket.c:730 [inline]
- sock_sendmsg+0xd9/0x180 net/socket.c:753
- splice_to_socket+0xade/0x1010 fs/splice.c:881
- do_splice_from fs/splice.c:933 [inline]
- direct_splice_actor+0x118/0x180 fs/splice.c:1142
- splice_direct_to_actor+0x347/0xa30 fs/splice.c:1088
- do_splice_direct+0x1af/0x280 fs/splice.c:1194
- do_sendfile+0xb88/0x1390 fs/read_write.c:1254
- __do_sys_sendfile64 fs/read_write.c:1322 [inline]
- __se_sys_sendfile64 fs/read_write.c:1308 [inline]
- __x64_sys_sendfile64+0x1d6/0x220 fs/read_write.c:1308
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7feae347cae9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007feae40ff0c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000028
-RAX: ffffffffffffffda RBX: 00007feae359bf80 RCX: 00007feae347cae9
-RDX: 0000000000000000 RSI: 0000000000000004 RDI: 0000000000000005
-RBP: 00007feae34c847a R08: 0000000000000000 R09: 0000000000000000
-R10: 000000010000a006 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007feae359bf80 R15: 00007ffc444d03c8
- </TASK>
+tools/memory-model/Documentation/access-marking.txt is saying that
+data_race() would be ok.
 
+It also says that in theory, if we want to both restrict compiler
+optimizations and disable
+KCSAN diagnostics, we would need data_race(READ_ONCE(a))
 
-Tested on:
-
-commit:         65d6e954 Merge tag 'gfs2-v6.5-rc5-fixes' of git://git...
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
-console output: https://syzkaller.appspot.com/x/log.txt?x=12133ac4680000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b273cdfbc13e9a4b
-dashboard link: https://syzkaller.appspot.com/bug?extid=62cbf263225ae13ff153
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=139cae54680000
-
+Let us ask Marco Elver what would be the most sensical annotation(s) here.
 
