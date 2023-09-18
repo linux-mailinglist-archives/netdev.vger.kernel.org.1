@@ -1,385 +1,119 @@
-Return-Path: <netdev+bounces-34563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5921F7A4A62
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 15:01:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F57C7A4C95
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 17:36:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 163DB28126E
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 13:01:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34B35281D55
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 15:36:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11BA11D548;
-	Mon, 18 Sep 2023 13:00:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 075131D6BA;
+	Mon, 18 Sep 2023 15:36:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B350C1CFBF
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:00:34 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E2DE1B6
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 05:59:39 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@breakpoint.cc>)
-	id 1qiDqk-000742-6a; Mon, 18 Sep 2023 14:59:38 +0200
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: nharold@google.com,
-	lorenzo@google.com,
-	benedictwong@google.com,
-	steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au,
-	Florian Westphal <fw@strlen.de>
-Subject: [PATCH ipsec-next 2/2] xfrm: policy: replace session decode with flow dissector
-Date: Mon, 18 Sep 2023 14:59:09 +0200
-Message-ID: <20230918125914.21391-3-fw@strlen.de>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230918125914.21391-1-fw@strlen.de>
-References: <20230918125914.21391-1-fw@strlen.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96EA915494
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 15:36:22 +0000 (UTC)
+Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 191B81718
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 08:34:19 -0700 (PDT)
+Received: by mail-il1-x12b.google.com with SMTP id e9e14a558f8ab-34fc9b461b6so288875ab.1
+        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 08:34:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695051060; x=1695655860; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mbEG8R9Q06h7B+764hTxvj2PiYwwKknHP6xA5X1amj0=;
+        b=gDP0gdBRLsLGRQQFArcVF0zBw565nl8PN8uYx8RNqygJI/xs+6n3s7XKaoMzC6TYEU
+         oKqSrv+sOZxxHh7Cl5bNqBi3qsk0WCnvQAhLih705MaNo8SV0CeWgfR4e1BoJtOfC0Fc
+         bY5lxRoHbFjJCwCQkGb5v+BID8P798t2cG2up2dQVV95HR4EwUqfPCao8uPoqs6gqKLm
+         hKCLOpFE5tR27QlC/pnjHppXg66xPpGluINnNaednlqW2HOjmalmC1B9c6qraR7MsSE5
+         1qQ6fUtf0QyqJauy338nahBAoSsp1jCIREtPdjrQo/3BJ92acI7YEzkofg8XyjagDZKu
+         9fvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695051060; x=1695655860;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mbEG8R9Q06h7B+764hTxvj2PiYwwKknHP6xA5X1amj0=;
+        b=SB4Mna7KXRmpFk8Bna2SkCLf+Zvspa8dd1nol4dnU2IWcqA0/61uAH1QgiCbaAwKR8
+         IpXC8dp/4T+aE279nY0i4+ZJUEbOoqa2iNLim5L2QiyivofRrB1S8tRLDSLL6N56dzvZ
+         q1CDckFuFwsyHDat6+n3FSjiAsL6DkpdRPYj42vcYoRqGWyx6cwiaLcg7eL2GIumsvQT
+         i5vhHj8lE7+8Q9irWt/IkHDZh5mdlsPNb+tjG9W0niAtXdCy8TKZ2lziiGVDVWodjiP2
+         vgmsd7WDaorxfw1s5tZ/AApnEoOOAB/sUYLUhE1c2pPXfvYUU4pDJeY8zjbyZ7iJ/kFU
+         YZTA==
+X-Gm-Message-State: AOJu0YzOKrEBdAuHoujWSlE7rfcxIQtlQ0YALBD9eYoeXW25kLcSl6x0
+	h8CgcXxjZzHd46qabxfeeHeIktXEeqBf7CODLR6qIWWOJd6vh+ADgL0=
+X-Google-Smtp-Source: AGHT+IFQMr7V1NVsv+iG3ZZWJSGc/i50+Pl8qAgoFNL1wVPkHjspuwQhA7fyZTqmzfNbJRat87G2s1vCA00ndWHxRVw=
+X-Received: by 2002:a05:622a:18a9:b0:410:8114:107b with SMTP id
+ v41-20020a05622a18a900b004108114107bmr290576qtc.12.1695042255315; Mon, 18 Sep
+ 2023 06:04:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+References: <20230918123011.1884401-1-william.xuanziyang@huawei.com>
+In-Reply-To: <20230918123011.1884401-1-william.xuanziyang@huawei.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 18 Sep 2023 15:04:04 +0200
+Message-ID: <CANn89i+QbPvtjUjHzhG9XY5MyoVh37RSb-+KVgz1MEA7SEL0oQ@mail.gmail.com>
+Subject: Re: [PATCH net v5] team: fix null-ptr-deref when team device type is changed
+To: Ziyang Xuan <william.xuanziyang@huawei.com>
+Cc: jiri@resnulli.us, davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, liuhangbin@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-xfrm needs to populate ipv4/v6 flow struct for route lookup.
-In the past there were several bugs in this code:
+On Mon, Sep 18, 2023 at 2:30=E2=80=AFPM Ziyang Xuan
+<william.xuanziyang@huawei.com> wrote:
+>
+> Get a null-ptr-deref bug as follows with reproducer [1].
+>
+> BUG: kernel NULL pointer dereference, address: 0000000000000228
+> ...
+> RIP: 0010:vlan_dev_hard_header+0x35/0x140 [8021q]
+> ...
+> Call Trace:
+>  <TASK>
+>  ? __die+0x24/0x70
+>  ? page_fault_oops+0x82/0x150
+>  ? exc_page_fault+0x69/0x150
+>  ? asm_exc_page_fault+0x26/0x30
+>  ? vlan_dev_hard_header+0x35/0x140 [8021q]
+>  ? vlan_dev_hard_header+0x8e/0x140 [8021q]
+>  neigh_connected_output+0xb2/0x100
+>  ip6_finish_output2+0x1cb/0x520
+>  ? nf_hook_slow+0x43/0xc0
+>  ? ip6_mtu+0x46/0x80
+>  ip6_finish_output+0x2a/0xb0
+>  mld_sendpack+0x18f/0x250
+>  mld_ifc_work+0x39/0x160
+>  process_one_work+0x1e6/0x3f0
+>  worker_thread+0x4d/0x2f0
+>  ? __pfx_worker_thread+0x10/0x10
+>  kthread+0xe5/0x120
+>  ? __pfx_kthread+0x10/0x10
+>  ret_from_fork+0x34/0x50
+>  ? __pfx_kthread+0x10/0x10
+>  ret_from_fork_asm+0x1b/0x30
+>
+>
 
-1. callers that forget to reload header pointers after
-   xfrm_decode_session() (it may pull headers).
-2. bugs in decoding where accesses past skb->data occurred.
+I am quite sure this will solve some syzbot reports as well, thanks.
 
-Meanwhile network core gained a packet dissector as well.
-This switches xfrm to the flow dissector.
-
-Changes since RFC:
-Drop ipv6 mobiliy header support, AFAIU noone uses this.
-
-Drop extraction of flowlabel, replaced code doesn't set it either.
-
-Link: https://lore.kernel.org/netdev/20230908120628.26164-3-fw@strlen.de/
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- net/xfrm/xfrm_policy.c | 253 ++++++++++++++++-------------------------
- 1 file changed, 95 insertions(+), 158 deletions(-)
-
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index a014783f6d8a..1ca4ca5b1367 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -149,6 +149,21 @@ struct xfrm_pol_inexact_candidates {
- 	struct hlist_head *res[XFRM_POL_CAND_MAX];
- };
- 
-+struct xfrm_flow_keys {
-+	struct flow_dissector_key_basic basic;
-+	struct flow_dissector_key_control control;
-+	union {
-+		struct flow_dissector_key_ipv4_addrs ipv4;
-+		struct flow_dissector_key_ipv6_addrs ipv6;
-+	} addrs;
-+	struct flow_dissector_key_ip ip;
-+	struct flow_dissector_key_icmp icmp;
-+	struct flow_dissector_key_ports ports;
-+	struct flow_dissector_key_keyid gre;
-+};
-+
-+static struct flow_dissector xfrm_session_dissector __ro_after_init;
-+
- static DEFINE_SPINLOCK(xfrm_if_cb_lock);
- static struct xfrm_if_cb const __rcu *xfrm_if_cb __read_mostly;
- 
-@@ -3367,191 +3382,74 @@ xfrm_policy_ok(const struct xfrm_tmpl *tmpl, const struct sec_path *sp, int star
- }
- 
- static void
--decode_session4(struct sk_buff *skb, struct flowi *fl, bool reverse)
-+decode_session4(const struct xfrm_flow_keys *flkeys, struct flowi *fl, bool reverse)
- {
--	const struct iphdr *iph = ip_hdr(skb);
--	int ihl = iph->ihl;
--	u8 *xprth = skb_network_header(skb) + ihl * 4;
- 	struct flowi4 *fl4 = &fl->u.ip4;
- 
- 	memset(fl4, 0, sizeof(struct flowi4));
- 
--	fl4->flowi4_proto = iph->protocol;
--	fl4->daddr = reverse ? iph->saddr : iph->daddr;
--	fl4->saddr = reverse ? iph->daddr : iph->saddr;
--	fl4->flowi4_tos = iph->tos & ~INET_ECN_MASK;
--
--	if (!ip_is_fragment(iph)) {
--		switch (iph->protocol) {
--		case IPPROTO_UDP:
--		case IPPROTO_UDPLITE:
--		case IPPROTO_TCP:
--		case IPPROTO_SCTP:
--		case IPPROTO_DCCP:
--			if (xprth + 4 < skb->data ||
--			    pskb_may_pull(skb, xprth + 4 - skb->data)) {
--				__be16 *ports;
--
--				xprth = skb_network_header(skb) + ihl * 4;
--				ports = (__be16 *)xprth;
--
--				fl4->fl4_sport = ports[!!reverse];
--				fl4->fl4_dport = ports[!reverse];
--			}
--			break;
--		case IPPROTO_ICMP:
--			if (xprth + 2 < skb->data ||
--			    pskb_may_pull(skb, xprth + 2 - skb->data)) {
--				u8 *icmp;
--
--				xprth = skb_network_header(skb) + ihl * 4;
--				icmp = xprth;
--
--				fl4->fl4_icmp_type = icmp[0];
--				fl4->fl4_icmp_code = icmp[1];
--			}
--			break;
--		case IPPROTO_GRE:
--			if (xprth + 12 < skb->data ||
--			    pskb_may_pull(skb, xprth + 12 - skb->data)) {
--				__be16 *greflags;
--				__be32 *gre_hdr;
--
--				xprth = skb_network_header(skb) + ihl * 4;
--				greflags = (__be16 *)xprth;
--				gre_hdr = (__be32 *)xprth;
--
--				if (greflags[0] & GRE_KEY) {
--					if (greflags[0] & GRE_CSUM)
--						gre_hdr++;
--					fl4->fl4_gre_key = gre_hdr[1];
--				}
--			}
--			break;
--		default:
--			break;
--		}
-+	if (reverse) {
-+		fl4->saddr = flkeys->addrs.ipv4.dst;
-+		fl4->daddr = flkeys->addrs.ipv4.src;
-+		fl4->fl4_sport = flkeys->ports.dst;
-+		fl4->fl4_dport = flkeys->ports.src;
-+	} else {
-+		fl4->saddr = flkeys->addrs.ipv4.src;
-+		fl4->daddr = flkeys->addrs.ipv4.dst;
-+		fl4->fl4_sport = flkeys->ports.src;
-+		fl4->fl4_dport = flkeys->ports.dst;
- 	}
-+
-+	fl4->flowi4_proto = flkeys->basic.ip_proto;
-+	fl4->flowi4_tos = flkeys->ip.tos;
-+	fl4->fl4_icmp_type = flkeys->icmp.type;
-+	fl4->fl4_icmp_type = flkeys->icmp.code;
-+	fl4->fl4_gre_key = flkeys->gre.keyid;
- }
- 
- #if IS_ENABLED(CONFIG_IPV6)
- static void
--decode_session6(struct sk_buff *skb, struct flowi *fl, bool reverse)
-+decode_session6(const struct xfrm_flow_keys *flkeys, struct flowi *fl, bool reverse)
- {
- 	struct flowi6 *fl6 = &fl->u.ip6;
--	int onlyproto = 0;
--	const struct ipv6hdr *hdr = ipv6_hdr(skb);
--	u32 offset = sizeof(*hdr);
--	struct ipv6_opt_hdr *exthdr;
--	const unsigned char *nh = skb_network_header(skb);
--	u16 nhoff = IP6CB(skb)->nhoff;
--	u8 nexthdr;
--
--	if (!nhoff)
--		nhoff = offsetof(struct ipv6hdr, nexthdr);
--
--	nexthdr = nh[nhoff];
- 
- 	memset(fl6, 0, sizeof(struct flowi6));
- 
--	fl6->daddr = reverse ? hdr->saddr : hdr->daddr;
--	fl6->saddr = reverse ? hdr->daddr : hdr->saddr;
--
--	while (nh + offset + sizeof(*exthdr) < skb->data ||
--	       pskb_may_pull(skb, nh + offset + sizeof(*exthdr) - skb->data)) {
--		nh = skb_network_header(skb);
--		exthdr = (struct ipv6_opt_hdr *)(nh + offset);
--
--		switch (nexthdr) {
--		case NEXTHDR_FRAGMENT:
--			onlyproto = 1;
--			fallthrough;
--		case NEXTHDR_ROUTING:
--		case NEXTHDR_HOP:
--		case NEXTHDR_DEST:
--			offset += ipv6_optlen(exthdr);
--			nexthdr = exthdr->nexthdr;
--			break;
--		case IPPROTO_UDP:
--		case IPPROTO_UDPLITE:
--		case IPPROTO_TCP:
--		case IPPROTO_SCTP:
--		case IPPROTO_DCCP:
--			if (!onlyproto && (nh + offset + 4 < skb->data ||
--			     pskb_may_pull(skb, nh + offset + 4 - skb->data))) {
--				__be16 *ports;
--
--				nh = skb_network_header(skb);
--				ports = (__be16 *)(nh + offset);
--				fl6->fl6_sport = ports[!!reverse];
--				fl6->fl6_dport = ports[!reverse];
--			}
--			fl6->flowi6_proto = nexthdr;
--			return;
--		case IPPROTO_ICMPV6:
--			if (!onlyproto && (nh + offset + 2 < skb->data ||
--			    pskb_may_pull(skb, nh + offset + 2 - skb->data))) {
--				u8 *icmp;
--
--				nh = skb_network_header(skb);
--				icmp = (u8 *)(nh + offset);
--				fl6->fl6_icmp_type = icmp[0];
--				fl6->fl6_icmp_code = icmp[1];
--			}
--			fl6->flowi6_proto = nexthdr;
--			return;
--		case IPPROTO_GRE:
--			if (!onlyproto &&
--			    (nh + offset + 12 < skb->data ||
--			     pskb_may_pull(skb, nh + offset + 12 - skb->data))) {
--				struct gre_base_hdr *gre_hdr;
--				__be32 *gre_key;
--
--				nh = skb_network_header(skb);
--				gre_hdr = (struct gre_base_hdr *)(nh + offset);
--				gre_key = (__be32 *)(gre_hdr + 1);
--
--				if (gre_hdr->flags & GRE_KEY) {
--					if (gre_hdr->flags & GRE_CSUM)
--						gre_key++;
--					fl6->fl6_gre_key = *gre_key;
--				}
--			}
--			fl6->flowi6_proto = nexthdr;
--			return;
--
--#if IS_ENABLED(CONFIG_IPV6_MIP6)
--		case IPPROTO_MH:
--			offset += ipv6_optlen(exthdr);
--			if (!onlyproto && (nh + offset + 3 < skb->data ||
--			    pskb_may_pull(skb, nh + offset + 3 - skb->data))) {
--				struct ip6_mh *mh;
--
--				nh = skb_network_header(skb);
--				mh = (struct ip6_mh *)(nh + offset);
--				fl6->fl6_mh_type = mh->ip6mh_type;
--			}
--			fl6->flowi6_proto = nexthdr;
--			return;
--#endif
--		default:
--			fl6->flowi6_proto = nexthdr;
--			return;
--		}
-+	if (reverse) {
-+		fl6->saddr = flkeys->addrs.ipv6.dst;
-+		fl6->daddr = flkeys->addrs.ipv6.src;
-+		fl6->fl6_sport = flkeys->ports.dst;
-+		fl6->fl6_dport = flkeys->ports.src;
-+	} else {
-+		fl6->saddr = flkeys->addrs.ipv6.src;
-+		fl6->daddr = flkeys->addrs.ipv6.dst;
-+		fl6->fl6_sport = flkeys->ports.src;
-+		fl6->fl6_dport = flkeys->ports.dst;
- 	}
-+
-+	fl6->flowi6_proto = flkeys->basic.ip_proto;
-+	fl6->fl6_icmp_type = flkeys->icmp.type;
-+	fl6->fl6_icmp_type = flkeys->icmp.code;
-+	fl6->fl6_gre_key = flkeys->gre.keyid;
- }
- #endif
- 
- int __xfrm_decode_session(struct sk_buff *skb, struct flowi *fl,
- 			  unsigned int family, int reverse)
- {
-+	struct xfrm_flow_keys flkeys;
-+
-+	memset(&flkeys, 0, sizeof(flkeys));
-+
-+	skb_flow_dissect(skb, &xfrm_session_dissector, &flkeys, FLOW_DISSECTOR_F_STOP_AT_ENCAP);
-+
- 	switch (family) {
- 	case AF_INET:
--		decode_session4(skb, fl, reverse);
-+		decode_session4(&flkeys, fl, reverse);
- 		break;
- #if IS_ENABLED(CONFIG_IPV6)
- 	case AF_INET6:
--		decode_session6(skb, fl, reverse);
-+		decode_session6(&flkeys, fl, reverse);
- 		break;
- #endif
- 	default:
-@@ -4253,8 +4151,47 @@ static struct pernet_operations __net_initdata xfrm_net_ops = {
- 	.exit = xfrm_net_exit,
- };
- 
-+static const struct flow_dissector_key xfrm_flow_dissector_keys[] = {
-+	{
-+		.key_id = FLOW_DISSECTOR_KEY_CONTROL,
-+		.offset = offsetof(struct xfrm_flow_keys, control),
-+	},
-+	{
-+		.key_id = FLOW_DISSECTOR_KEY_BASIC,
-+		.offset = offsetof(struct xfrm_flow_keys, basic),
-+	},
-+	{
-+		.key_id = FLOW_DISSECTOR_KEY_IPV4_ADDRS,
-+		.offset = offsetof(struct xfrm_flow_keys, addrs.ipv4),
-+	},
-+	{
-+		.key_id = FLOW_DISSECTOR_KEY_IPV6_ADDRS,
-+		.offset = offsetof(struct xfrm_flow_keys, addrs.ipv6),
-+	},
-+	{
-+		.key_id = FLOW_DISSECTOR_KEY_PORTS,
-+		.offset = offsetof(struct xfrm_flow_keys, ports),
-+	},
-+	{
-+		.key_id = FLOW_DISSECTOR_KEY_GRE_KEYID,
-+		.offset = offsetof(struct xfrm_flow_keys, gre),
-+	},
-+	{
-+		.key_id = FLOW_DISSECTOR_KEY_IP,
-+		.offset = offsetof(struct xfrm_flow_keys, ip),
-+	},
-+	{
-+		.key_id = FLOW_DISSECTOR_KEY_ICMP,
-+		.offset = offsetof(struct xfrm_flow_keys, icmp),
-+	},
-+};
-+
- void __init xfrm_init(void)
- {
-+	skb_flow_dissector_init(&xfrm_session_dissector,
-+				xfrm_flow_dissector_keys,
-+				ARRAY_SIZE(xfrm_flow_dissector_keys));
-+
- 	register_pernet_subsys(&xfrm_net_ops);
- 	xfrm_dev_init();
- 	xfrm_input_init();
--- 
-2.41.0
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
