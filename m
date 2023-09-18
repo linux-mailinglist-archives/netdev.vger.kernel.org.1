@@ -1,154 +1,308 @@
-Return-Path: <netdev+bounces-34660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D0F67A520C
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 20:30:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6B7F7A522C
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 20:40:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACC372817F1
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 18:30:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA77F1C20D13
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 18:40:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F395423767;
-	Mon, 18 Sep 2023 18:30:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 215091F614;
+	Mon, 18 Sep 2023 18:40:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61C92273C4
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 18:30:42 +0000 (UTC)
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2051.outbound.protection.outlook.com [40.107.102.51])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 243B3F7
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 11:30:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lmwa8uJEX8p5u6dV4kVEy/g5pnlErV/ObtfzWOnyzvdMGYbnsbfj+oUhdngYgQFxirdZe8yzwhiUUW2V+OW81pUHiRTJO6H/Z/9O0ydLNaH/boxuGNb0CyCP+ELkCf876DJsZJoG/v6LRmKUJDQRb05Y9TPsnjFtk72Xvm2nPdEM1ZQEojXb8VksBBxBL+BSTv16fN5EyCtmhkO50EG7nI5H0f7QcC+FyhEEZGfxYPLJDS9tby+pgAsfUfAUu7EJte0rklpnx/fEJHEvk0sWAT6gzkzsKroJKb5i4s+Ym/uJJPAzkboKagkzgpdoLcAGYGYZln/wNlGRrb4l2VGP9A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NnA4TTXfxnIXAex9Sf4c6d0K7c7fF7QcjexyD43qLOE=;
- b=cEPyCZOyUiIxyPeLr7p0oVFfrbvXmWcptIcpNJDo6RUokZPxj5Q5iuRDbQVvwVpHs2SOuEPtN3ke7V7joVEenzI+2UL0/Ymb0ij/Y5Rtuq5rgAIHNEQltG4+FYf+NSh8VOnMpX27cOb29sNUS3gS6oSvCxNZZAg5t4SiyfI0aIFSA3F+x+0d3ofvmZEGFz1OLcDiwcYxkaG7oSlab/Yl51+bA1tUu5JsrLcSqSzryPeLs+DMxdCNvyUFUB3D1XskyXPeDO9uwR6e2NV13uMHlk29qiHiPcpLFViJW/7Sfsscp3ocQQ1Oq/Uh8h138bthSVebYTKlqBHO/qXDLSopeA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NnA4TTXfxnIXAex9Sf4c6d0K7c7fF7QcjexyD43qLOE=;
- b=pz+bTp6aQABV2iJs6NstWNDZGuvr1OVdiepoXetv2HSjIFX0iDLw00TYLlmURF6izlHc5IgnZC9odDb3fMC+opn5mbkH+CO6i4nOu8Q3rhvPvtl2pOGFJNCwFnz7egianBiuDgNYuUwyOTauLvTJhlbSRL0s0AW1TFk0e8JvUL7xZksAx/JB6VCjUyhEpZezw+uT+t1y1HtB7wwkwhGhxxRh7NqZjf2NN1yJ8lrTbKZ1y06GQtoCvg5NfY8gqStlXJzbeZvTCRWsY3l53eNXF4cYDPjcx4x/fIH4laGnv7lzkvuch0zk7PfvcJiPM5dent7Ye5FGM0Vs7pB1UaEdxA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from SJ1PR12MB6075.namprd12.prod.outlook.com (2603:10b6:a03:45e::8)
- by PH7PR12MB5781.namprd12.prod.outlook.com (2603:10b6:510:1d0::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.24; Mon, 18 Sep
- 2023 18:30:37 +0000
-Received: from SJ1PR12MB6075.namprd12.prod.outlook.com
- ([fe80::54a7:525f:1e2a:85b1]) by SJ1PR12MB6075.namprd12.prod.outlook.com
- ([fe80::54a7:525f:1e2a:85b1%4]) with mapi id 15.20.6792.021; Mon, 18 Sep 2023
- 18:30:36 +0000
-From: Aurelien Aptel <aaptel@nvidia.com>
-To: Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
- netdev@vger.kernel.org, hch@lst.de, kbusch@kernel.org, axboe@fb.com,
- chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org
-Cc: Boris Pismenny <borisp@nvidia.com>, aurelien.aptel@gmail.com,
- smalin@nvidia.com, malin1024@gmail.com, ogerlitz@nvidia.com,
- yorayz@nvidia.com, galshalom@nvidia.com, mgurtovoy@nvidia.com
-Subject: Re: [PATCH v15 05/20] nvme-tcp: Add DDP offload control path
-In-Reply-To: <d761c2de-fea3-cbd0-ced8-cee91a670552@grimberg.me>
-References: <20230912095949.5474-1-aaptel@nvidia.com>
- <20230912095949.5474-6-aaptel@nvidia.com>
- <d761c2de-fea3-cbd0-ced8-cee91a670552@grimberg.me>
-Date: Mon, 18 Sep 2023 21:30:30 +0300
-Message-ID: <2531qevgwqh.fsf@nvidia.com>
-Content-Type: text/plain
-X-ClientProxiedBy: FR2P281CA0043.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:92::16) To SJ1PR12MB6075.namprd12.prod.outlook.com
- (2603:10b6:a03:45e::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C0111CAB9;
+	Mon, 18 Sep 2023 18:40:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87F7AC433C9;
+	Mon, 18 Sep 2023 18:40:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695062427;
+	bh=ohRJW2WpMAFgJxA1JBZsN3B28gEviJ+HU0xdzWwTN+o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hwvYjQdtjC+c5KTGzQRn+2rim3mcWRXiI89lVvDYEQQfvxncUA3YIWgBcyKPJOKEM
+	 yZDeCufA/vTDVJOPpGvulb3N0LdWMlDgDptvPL4Ou8eMp5b4LIxerpjfZHH4SZksjS
+	 zv1qD3GmW0gNstrldOF5I4Zq0QpL7YFEuPIBNJQWdfZH2cL/lP9md1qzLneGr+GY/K
+	 RCfI3VBnp5otoEjMfVKRugCvn9NyI0b6W7tpLLRCipeCvEuYkgd855V/X3DKgZOfWv
+	 KMAedyFaVL73ZJ/DAGVkR+3U9InmBl5sz9mn/+Uj78kxI9sOjkfJKe/HxYlvIKaItw
+	 WIhEzXiMKBpZQ==
+Received: (nullmailer pid 1492209 invoked by uid 1000);
+	Mon, 18 Sep 2023 18:40:16 -0000
+Date: Mon, 18 Sep 2023 13:40:16 -0500
+From: Rob Herring <robh@kernel.org>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, George McCollister <george.mccollister@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, Kurt Kanzenbach <kurt@linutronix.de>, Matthias Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, Linus Walleij <linus.walleij@linaro.org>, Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>, =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>, Marcin Wojtas <mw@semihalf.com>, "Russell King (Oracle)" <linux@armlinux.org.uk>, Lars Povlsen <lars.povlsen@microchip.com>, Steen Hegelund <Steen.Hegelund@microchip.com>, Daniel Machon <daniel.machon@microchip.com>
+ , Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>, Daniel Golle <daniel@makrotopia.org>, Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>, Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, Maxime Chevallier <maxime.chevallier@bootlin.com>, Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@microchip.com>, Marek Vasut <marex@denx.de>, Claudiu Manoil <claudiu.manoil@nxp.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, John Crispin <john@phrozen.org>, Madalin Bucur <madalin.bucur@nxp.com>, Ioana Ciornei <ioana.ciornei@nxp.com>, Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>, Horatiu Vultur <horatiu.vultur@microchip.com>, Oleksij Rempel <linux@rempel-privat.de>, Alexandre Torgue <alexandre.torgue@foss.st.com>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, Jose Abreu <joabreu@synopsys.com>, Grygorii Strashko <grygorii.strashko@ti.com>, Sekhar
+  Nori <nsekhar@ti.com>, Shyam Pandey <radhey.shyam.pandey@xilinx.com>, mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH net-next v2 08/10] dt-bindings: net: dsa: marvell:
+ convert to json-schema
+Message-ID: <20230918184016.GB1464506-robh@kernel.org>
+References: <20230916110902.234273-1-arinc.unal@arinc9.com>
+ <20230916110902.234273-9-arinc.unal@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PR12MB6075:EE_|PH7PR12MB5781:EE_
-X-MS-Office365-Filtering-Correlation-Id: 71276211-e7c0-4df8-ad3f-08dbb87559d1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	Y7btd4fcAKjsDCSC8MuD2yVX/Nqt45ODO37AjSSAEWkfna6Zk3PSoZa3MAdWO6GiLmN8oD+kg9EU/lz2x5PgQiR3NZfJn1JBI0Tixd1HHD4kXhGJKzo0BS7LQ+Skzmt05/kQCPBoLDaeefy5kVW2PozK1WAoW9BNM/UEqqHffVkxhwPpyRRfu+0VQbsDqZKMMRPjtACEE8M3Ln6A/HEZ2Y0v+ME5MKv2WiKd5QnR8a2wwzJh+9r4a2qMDKhmDtRx8psZZK8uhybGM+MyykUwNnjDNYtECDGeEr4F5bzxvxZ5Y1Kme1qgbAbQtPCr9LXVHLBtAH86zkDjhr5z2iMgLTufdMXxqlHGoOps1vcCnY4VH3bZpburvU/7fl1QwL+1Wcfofjk48tGNxDCT3++NMcJ9e/jSpA+3/DZhIhxZAkJH7l/eNOtgMTd1uaC0mzeMBmhL6CGSpS8EuRceUgQKBfXKS9B3INSSyjlNmptimAc2QARYd4RQc+F4wMUHinJzMmLy36pwCxFxTcDtCOQ+Xnl/llLxFZ20MQjgWK5puGPAXRX3MBZZJz1thSIUwvOT
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR12MB6075.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(346002)(396003)(136003)(366004)(451199024)(1800799009)(186009)(6486002)(6506007)(86362001)(6512007)(316002)(66946007)(66556008)(41300700001)(66476007)(38100700002)(5660300002)(6666004)(478600001)(2616005)(8936002)(26005)(2906002)(4744005)(36756003)(107886003)(8676002)(4326008)(7416002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?ejNyloq1nVE+6cQzEehmT5i0S4tRee6EtwCy+jMsH5p18zmpzSJXW33TFHbl?=
- =?us-ascii?Q?ho1INnqEcWQwUNvGYWpAqTTVLcASq0HWGifWuti43nw8iE9WUzDWIivLpUug?=
- =?us-ascii?Q?VCYCms6KfH0JrE74pvUQgYS9J/la0j9Lkbyhb6qgNGaIav6qQYuQVOkl/Oa1?=
- =?us-ascii?Q?6vG1K1c2P/dLU+JwmuROBF3atIKxg6kg8qz7JG0VFmUK3NbgJWiKYmUzdHqv?=
- =?us-ascii?Q?8ADFE77iKPZjfmGN8/UUvzLgLm2dH4KO6MOG1SDqm5yRz1ol39NF9mhFgv+t?=
- =?us-ascii?Q?5M40Qm2Kwbob8apnsx1/+hwrT8a+i6qJ+pAQP/XOYqg6yEe6CCo9Ok0I3XNM?=
- =?us-ascii?Q?xl4XPli8BEyHdh2ykVvM0qo/eup72p/jWr9vumGPDVB4D2jCf0HADNkQu3vO?=
- =?us-ascii?Q?BD6FzJsvo0M+swTeVCo6MSx5O6Uko6Azxtk+0RwbUpwbHtEe7IIr1zxzb237?=
- =?us-ascii?Q?j/9z5yYxR1MmclASnjjh59lbs11emy7AlMrZQ0SlhjrlApcaAhk0w+TThlbd?=
- =?us-ascii?Q?ssfGacXTT26DAzxIvaWhA3KEJmO99wqWnaGCM1Amd5F5pD9SGI1RG/19e4Ta?=
- =?us-ascii?Q?nfQgRNbdfKBqBoXD47YH634HFMc6VMgQD6CejbsUV4tWQdkaWVeP444no5oi?=
- =?us-ascii?Q?G5NXAn5XW9G05emONAtDovL4xifXFb+QaWeZwwVtmFgh90PhXt33VHIfyt8A?=
- =?us-ascii?Q?eNATzrULwnQaJZ56N8hzyRj/xBym6nFjJ31T6XVV9S5cgrjEPi58vz4/qHvo?=
- =?us-ascii?Q?NqAZaZzRsHQGiC7kJfD/MefDX/oTcObjHVUztLP1zVxK8CsU4DH03HBA1QwU?=
- =?us-ascii?Q?OdkEGMoujQXyvdHM7h7E4Snwad291HZoowDt/8RiIlygnh+XrTE+wK2IgvsY?=
- =?us-ascii?Q?RZmiUIIuTXCBNHmypO7rGqPg+tclUqchbBen2QhcfTqlt7J8vBuc+4EPqP3v?=
- =?us-ascii?Q?0zAeB2wcQ+xuuaJM/xBKnHEmT4FYMH6q66o0/7MretBByuvQ7iYaBS8CywKO?=
- =?us-ascii?Q?tvSP/VSK6VhroLMeSgWDlh3KckSWlgT+PvkDxkGje4a2hUZHY17zeDN5cIR/?=
- =?us-ascii?Q?hB+IlAPfGtOoUQ9iXTqVU1VbIpSVmWwDL1HVSwHS03IrHfPHimYi1WMObTcC?=
- =?us-ascii?Q?TWiIlWyqPrOf+4SHiAdDrLWBJOKUPcFynTI31hO0JdyEIbjUL7ZGPKQ7vl3b?=
- =?us-ascii?Q?HQMqBfFjt6qzg+G0hutHe4qqLq40scV0Q5H191+8xUK8/crY3kC80hoUsXe5?=
- =?us-ascii?Q?eP3zpPXtukhd/3dsNuguJFlQw+WFgN4T5VUDqBFBaYF9v21XqxTf7N5wu00U?=
- =?us-ascii?Q?I+lJK8d+OWxqZIy3zlrwCfbJHRkIQmZe+pp4CyASraDoRKIuZ6cQMpsBJEeb?=
- =?us-ascii?Q?Lcn6OsvaR6Us5u7gtssxRM77vqMhanYuBgGb3V8OTFbrBK39iG/EBlVufM9e?=
- =?us-ascii?Q?cde2d4Jp98ztK0NR5u+OFefAuAwLPKklDuDX2JDM6FoGugRqQZH3nzu54tM9?=
- =?us-ascii?Q?twq4OrSNTKtLo6W7iolWheAcaviJVVvjm7PQ/FsmbnvSxgL9cBuh9D0K6vNa?=
- =?us-ascii?Q?n6AiEWyUMR9Put8maCENrewUOEWP3rekDNdt49+M?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 71276211-e7c0-4df8-ad3f-08dbb87559d1
-X-MS-Exchange-CrossTenant-AuthSource: SJ1PR12MB6075.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2023 18:30:36.2237
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: j5o7rLYVlbo3Z1x8E+FVWGJ7k22kPg2MXuLeEJUpHQiLO2MDVKnO/9yvuHfuX4cZpUh9dxHEMW0EAA6OHyldnQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5781
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-	autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230916110902.234273-9-arinc.unal@arinc9.com>
 
-Sagi Grimberg <sagi@grimberg.me> writes:
->> +static int nvme_tcp_offload_socket(struct nvme_tcp_queue *queue)
->> +{
->> +     struct ulp_ddp_config config = {.type = ULP_DDP_NVME};
->> +     int ret;
->> +
->> +     config.nvmeotcp.pfv = NVME_TCP_PFV_1_0;
->> +     config.nvmeotcp.cpda = 0;
->> +     config.nvmeotcp.dgst =
->> +             queue->hdr_digest ? NVME_TCP_HDR_DIGEST_ENABLE : 0;
->> +     config.nvmeotcp.dgst |=
->> +             queue->data_digest ? NVME_TCP_DATA_DIGEST_ENABLE : 0;
->> +     config.nvmeotcp.queue_size = queue->ctrl->ctrl.sqsize + 1;
->> +     config.nvmeotcp.queue_id = nvme_tcp_queue_id(queue);
->> +     config.nvmeotcp.io_cpu = queue->sock->sk->sk_incoming_cpu;
->
-> Please hide io_cpu inside the interface. There is no reason for
-> the ulp to assign this. btw, is sk_incoming_cpu stable at this
-> point?
+On Sat, Sep 16, 2023 at 02:09:00PM +0300, Arınç ÜNAL wrote:
+> Convert the document for Marvell ethernet switches to json-schema.
+> 
+> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+> ---
+>  .../devicetree/bindings/net/dsa/marvell.txt   | 109 ----------
+>  .../devicetree/bindings/net/dsa/marvell.yaml  | 204 ++++++++++++++++++
+>  2 files changed, 204 insertions(+), 109 deletions(-)
+>  delete mode 100644 Documentation/devicetree/bindings/net/dsa/marvell.txt
+>  create mode 100644 Documentation/devicetree/bindings/net/dsa/marvell.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/net/dsa/marvell.txt b/Documentation/devicetree/bindings/net/dsa/marvell.txt
+> deleted file mode 100644
+> index 6ec0c181b6db..000000000000
+> --- a/Documentation/devicetree/bindings/net/dsa/marvell.txt
+> +++ /dev/null
+> @@ -1,109 +0,0 @@
+> -Marvell DSA Switch Device Tree Bindings
+> ----------------------------------------
+> -
+> -WARNING: This binding is currently unstable. Do not program it into a
+> -FLASH never to be changed again. Once this binding is stable, this
+> -warning will be removed.
+> -
+> -If you need a stable binding, use the old dsa.txt binding.
+> -
+> -Marvell Switches are MDIO devices. The following properties should be
+> -placed as a child node of an mdio device.
+> -
+> -The properties described here are those specific to Marvell devices.
+> -Additional required and optional properties can be found in dsa.txt.
+> -
+> -The compatibility string is used only to find an identification register,
+> -which is at a different MDIO base address in different switch families.
+> -- "marvell,mv88e6085"	: Switch has base address 0x10. Use with models:
+> -			  6085, 6095, 6097, 6123, 6131, 6141, 6161, 6165,
+> -			  6171, 6172, 6175, 6176, 6185, 6240, 6320, 6321,
+> -			  6341, 6350, 6351, 6352
+> -- "marvell,mv88e6190"	: Switch has base address 0x00. Use with models:
+> -			  6190, 6190X, 6191, 6290, 6361, 6390, 6390X
+> -- "marvell,mv88e6250"	: Switch has base address 0x08 or 0x18. Use with model:
+> -			  6220, 6250
+> -
+> -Required properties:
+> -- compatible		: Should be one of "marvell,mv88e6085",
+> -			  "marvell,mv88e6190" or "marvell,mv88e6250" as
+> -			  indicated above
+> -- reg			: Address on the MII bus for the switch.
+> -
+> -Optional properties:
+> -
+> -- reset-gpios		: Should be a gpio specifier for a reset line
+> -- interrupts		: Interrupt from the switch
+> -- interrupt-controller	: Indicates the switch is itself an interrupt
+> -			  controller. This is used for the PHY interrupts.
+> -#interrupt-cells = <2>	: Controller uses two cells, number and flag
+> -- eeprom-length		: Set to the length of an EEPROM connected to the
+> -			  switch. Must be set if the switch can not detect
+> -			  the presence and/or size of a connected EEPROM,
+> -			  otherwise optional.
+> -- mdio			: Container of PHY and devices on the switches MDIO
+> -			  bus.
+> -- mdio?		: Container of PHYs and devices on the external MDIO
+> -			  bus. The node must contains a compatible string of
+> -			  "marvell,mv88e6xxx-mdio-external"
+> -
+> -Example:
+> -
+> -	mdio {
+> -		#address-cells = <1>;
+> -		#size-cells = <0>;
+> -		interrupt-parent = <&gpio0>;
+> -		interrupts = <27 IRQ_TYPE_LEVEL_LOW>;
+> -		interrupt-controller;
+> -		#interrupt-cells = <2>;
+> -
+> -		switch0: switch@0 {
+> -			compatible = "marvell,mv88e6085";
+> -			reg = <0>;
+> -			reset-gpios = <&gpio5 1 GPIO_ACTIVE_LOW>;
+> -
+> -			mdio {
+> -				#address-cells = <1>;
+> -				#size-cells = <0>;
+> -				switch1phy0: switch1phy0@0 {
+> -					reg = <0>;
+> -					interrupt-parent = <&switch0>;
+> -					interrupts = <0 IRQ_TYPE_LEVEL_HIGH>;
+> -				};
+> -			};
+> -		};
+> -	};
+> -
+> -	mdio {
+> -		#address-cells = <1>;
+> -		#size-cells = <0>;
+> -		interrupt-parent = <&gpio0>;
+> -		interrupts = <27 IRQ_TYPE_LEVEL_LOW>;
+> -		interrupt-controller;
+> -		#interrupt-cells = <2>;
+> -
+> -		switch0: switch@0 {
+> -			compatible = "marvell,mv88e6190";
+> -			reg = <0>;
+> -			reset-gpios = <&gpio5 1 GPIO_ACTIVE_LOW>;
+> -
+> -			mdio {
+> -				#address-cells = <1>;
+> -				#size-cells = <0>;
+> -				switch1phy0: switch1phy0@0 {
+> -					reg = <0>;
+> -					interrupt-parent = <&switch0>;
+> -					interrupts = <0 IRQ_TYPE_LEVEL_HIGH>;
+> -				};
+> -			};
+> -
+> -			mdio1 {
+> -				compatible = "marvell,mv88e6xxx-mdio-external";
+> -				#address-cells = <1>;
+> -				#size-cells = <0>;
+> -				switch1phy9: switch1phy0@9 {
+> -					reg = <9>;
+> -				};
+> -			};
+> -		};
+> -	};
+> diff --git a/Documentation/devicetree/bindings/net/dsa/marvell.yaml b/Documentation/devicetree/bindings/net/dsa/marvell.yaml
+> new file mode 100644
+> index 000000000000..45756b8d74d9
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/dsa/marvell.yaml
+> @@ -0,0 +1,204 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/dsa/marvell.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Marvell Ethernet Switches
+> +
+> +$ref: dsa.yaml#/$defs/ethernet-ports
+> +
+> +maintainers:
+> +  - Andrew Lunn <andrew@lunn.ch>
+> +  - Arınç ÜNAL <arinc.unal@arinc9.com>
+> +
+> +description:
+> +  Marvell ethernet switches are MDIO devices.
+> +
+> +properties:
+> +  compatible:
+> +    oneOf:
+> +      - description: |
+> +          Switch has base address 0x10. Use with models:
+> +          6085, 6095, 6097, 6123, 6131, 6141, 6161, 6165, 6171, 6172, 6175,
+> +          6176, 6185, 6240, 6320, 6321, 6341, 6350, 6351, 6352
+> +        const: marvell,mv88e6085
+> +
+> +      - description: |
+> +          Switch has base address 0x00. Use with models:
+> +          6190, 6190X, 6191, 6290, 6361, 6390, 6390X
+> +        const: marvell,mv88e6190
+> +
+> +      - description: |
+> +          Switch has base address 0x08 or 0x18. Use with models:
+> +          6220, 6250
+> +        const: marvell,mv88e6250
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  reset-gpios:
+> +    description: GPIO to be used to reset the whole device
+> +    maxItems: 1
+> +
+> +  "#interrupt-cells":
+> +    const: 2
+> +
+> +  interrupt-controller: true
+> +
+> +  interrupts:
+> +    maxItems: 1
+> +
+> +  eeprom-length:
+> +    description:
+> +      Set to the length of an EEPROM connected to the switch. Must be set if the
+> +      switch can not detect the presence and/or size of a connected EEPROM,
+> +      otherwise optional.
+> +
+> +  mdio:
+> +    description:
+> +      The optional node for the MDIO bus of the switch. The bus will be
+> +      registered non-OF-based if this is not defined.
 
-We will move the assignemnt of io_cpu to the interface.
-As you suggested we followed aRFS (and the NVMeTCP target) which uses
-sk->sk_incoming_cpu.
+That's a detail of the OS behavior.
+
+> +    $ref: /schemas/net/mdio.yaml#
+
+       unevaluatedProperties: false
+
+> +
+> +  mdio-external:
+> +    description: The externally reachable MDIO bus of the 6390 family switches
+> +    $ref: /schemas/net/mdio.yaml#
+
+       unevaluatedProperties: false
+
+> +
+> +    properties:
+> +      compatible:
+> +        const: marvell,mv88e6xxx-mdio-external
+> +
+> +    required:
+> +      - compatible
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +
+> +allOf:
+> +  - if:
+> +      properties:
+> +        compatible:
+> +          enum:
+> +            - marvell,mv88e6085
+> +            - marvell,mv88e6250
+> +    then:
+> +      properties:
+> +        mdio-external: false
+> +
+> +  - if:
+> +      required: [ mdio ]
+> +    then:
+> +      patternProperties:
+> +        "^(ethernet-)?ports$":
+> +          patternProperties:
+> +            "^(ethernet-)?port@[0-9]+$":
+> +              $ref: /schemas/net/ethernet-controller.yaml#/$defs/phylink
+
+This probably doesn't work right. The problem is every node ultimately 
+needs a single schema with all possible properties in order to not allow 
+undefined properties. This is the reason for the complexity with a $ref 
+at each level in schemas for these nodes.
+
+I'm not sure it is worth the complexity to enforce what you want here. 
+It may be easier to just always allow phylink properties in 
+ethernet-port nodes.  
+
+As this is a switch, it should be referencing ethernet-switch.yaml. 
+
+Rob
 
