@@ -1,150 +1,99 @@
-Return-Path: <netdev+bounces-34626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE47E7A4E40
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 18:09:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79FCF7A4E0D
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 18:05:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C77691C20B8F
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 16:09:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 353B0280D1E
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 16:05:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEEF221377;
-	Mon, 18 Sep 2023 16:07:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC537210FA;
+	Mon, 18 Sep 2023 16:05:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D01161D686
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 16:07:55 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E242446AA
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 09:07:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=2D0A941kWzO8SqVobC80GHz9ouHUnRp6nlBz+6KUEAE=; b=uAYaHFv4MJ98GdYW7lwjZ4QGuK
-	PmzMQyeV7v+L97ji2M7SU79WNWxoOA9R42P0rpV0B4J/X2ZZSEs0gmpomNp/zQVQBaKJKbMlqqXO5
-	te5sIWrh4oFzaQV0TspeAxsf15gOw8tm64e9cKv6zBB6h8zgDYTio6OHAMg39ahWWaRaUbYv5fw+t
-	5RgVH29RgqokN7/iLeSXxWVWPMkortzZHg3VQg4pox60M1btz9gJp2j9iJWSD1RI92QBlyvE/9Bu1
-	5+ZSMNRn1vvtCyCjycn0phzUQ32h53CdBTkm38waKD4QnZliiVI+romXBNYFZLZuW6reYqgFKlMMI
-	x0sW4xDg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34158)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qiDxN-0000HB-0R;
-	Mon, 18 Sep 2023 14:06:29 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qiDxK-0000Ud-MQ; Mon, 18 Sep 2023 14:06:26 +0100
-Date: Mon, 18 Sep 2023 14:06:26 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Marek Szyprowski <m.szyprowski@samsung.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	chenhao418@huawei.com, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jijie Shao <shaojijie@huawei.com>,
-	lanhao@huawei.com, liuyonglong@huawei.com, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, shenjian15@huawei.com,
-	wangjie125@huawei.com, wangpeiyang1@huawei.com
-Subject: Re: [PATCH net-next 1/7] net: phy: always call
- phy_process_state_change() under lock
-Message-ID: <ZQhLUlw452Ewu7yi@shell.armlinux.org.uk>
-References: <ZQMn+Wkvod10vdLd@shell.armlinux.org.uk>
- <E1qgoNP-007a46-Mj@rmk-PC.armlinux.org.uk>
- <CGME20230918123304eucas1p2b628f00ed8df536372f1f2b445706021@eucas1p2.samsung.com>
- <42ef8c8f-2fc0-a210-969b-7b0d648d8226@samsung.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CBD820B27
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 16:05:15 +0000 (UTC)
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEFBA4226
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 09:02:49 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1c3d8fb23d9so36324425ad.0
+        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 09:02:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695052789; x=1695657589; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SImvadFeNoGvg+t6+HEbq7a1fwmLC+aPm0CdaZ6NYAc=;
+        b=GhrYcYETK4xnnCm5DR/KmTW9kL1qnC9o0evkHN0xun/LTXJ+NktnwP22Zw3dWugMJv
+         ogTD4SWWxFN/EhmBLnKC4VOZszDan4G2uzapznP1ZIYmb57zGRvpvzDMwicoU/Bgjppt
+         c8B0JoVNhjVIc3wxiAIHeEPkqeR1DcuLvXkTK1R2cYL+QOAtjo0SH9Q6kEpGRp+VkYju
+         MkL5zK/fwVciL1zMw7xvRqb72oViC6hy6XGC0lhE5nobMwb9AKoEliUvhG7YgrSfDD+0
+         hQb7o4Lo2dAFu2ktSIa1n2L1j5BKQrkD7pVNd0olfmBDTKZT/4Gqzn4qqjFs4wVqS6eM
+         4/XQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695052789; x=1695657589;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SImvadFeNoGvg+t6+HEbq7a1fwmLC+aPm0CdaZ6NYAc=;
+        b=Cb3WA3uByqUzn5JtQajS9rwQBInAiRd6nI7bOApLkjdT1nXm6H8IbiADG52yHWp975
+         jKDBHpkYwgtE6N7niHPNw00v4JIv5r4LtavXZAYE3qOicFmaRxuMtDhjzqYfJ+8pkTmG
+         jVALV2ZEIVNOgZ+rEmZ2h2nUUkXQ859epIk9VAcwrq3xPzELNmdJwwiBODRfdi3oS/ZV
+         DbzxhWGqpRIc+F7KdUwCtbmqPAK9VmcHRKTjZ3DgPwRFtmmB/M6xdajzL1mttKMSev6E
+         5MwkyJkfgPxLcGcB+OnN7E/jJEfUftPQ/ydskYCwcH+CO//rYPRLgUK+u1QRxHDFNEiJ
+         Oypg==
+X-Gm-Message-State: AOJu0YwtbhXk/qJhhRDn41HcdI3GntNzXCUF+dZqQ1teqNeX/UHbDamc
+	aXYorej3dvb39E8ZfObRkhH93sbS03DZEhxbMLehqe5e
+X-Google-Smtp-Source: AGHT+IF5DijMs04u12QI03Zv4KTyNMUjd4m34aFdriRnRyxXKSdFlL9pYktQn6QqxdfDspSD+3kuk84f4t+c6sUeV+c=
+X-Received: by 2002:a1f:4f06:0:b0:48d:2e3d:2d57 with SMTP id
+ d6-20020a1f4f06000000b0048d2e3d2d57mr6198507vkb.4.1695042439904; Mon, 18 Sep
+ 2023 06:07:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <42ef8c8f-2fc0-a210-969b-7b0d648d8226@samsung.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+References: <20230918025021.4078252-1-jrife@google.com>
+In-Reply-To: <20230918025021.4078252-1-jrife@google.com>
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Mon, 18 Sep 2023 09:06:42 -0400
+Message-ID: <CAF=yD-KSuh0CrRn_zXdznLdg4G==qxgGeQuXetVHP2iOdQzpRA@mail.gmail.com>
+Subject: Re: [PATCH net v2 1/3] net: replace calls to sock->ops->connect()
+ with kernel_connect()
+To: Jordan Rife <jrife@google.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, netdev@vger.kernel.org, dborkman@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 18, 2023 at 02:33:04PM +0200, Marek Szyprowski wrote:
-> Hi Russell,
-> 
-> On 14.09.2023 17:35, Russell King (Oracle) wrote:
-> > phy_stop() calls phy_process_state_change() while holding the phydev
-> > lock, so also arrange for phy_state_machine() to do the same, so that
-> > this function is called with consistent locking.
-> >
-> > Tested-by: Jijie Shao <shaojijie@huawei.com>
-> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> 
-> This change, merged to linux-next as commit 8da77df649c4 ("net: phy: 
-> always call phy_process_state_change() under lock") introduces the 
-> following deadlock with ASIX AX8817X USB driver:
+On Sun, Sep 17, 2023 at 10:50=E2=80=AFPM Jordan Rife <jrife@google.com> wro=
+te:
+>
+> commit 0bdf399342c5 ("net: Avoid address overwrite in kernel_connect")
+> ensured that kernel_connect() will not overwrite the address parameter
+> in cases where BPF connect hooks perform an address rewrite. This change
+> replaces all direct calls to sock->ops->connect() with kernel_connect()
+> to make these call safe.
+>
+> This patch also introduces a sanity check to kernel_connect() to ensure
+> that the addr_length does not exceed the size of sockaddr_storage before
+> performing the address copy.
+>
+> Link: https://lore.kernel.org/netdev/20230912013332.2048422-1-jrife@googl=
+e.com/
+>
+> Signed-off-by: Jordan Rife <jrife@google.com>
 
-Yay, latent bug found...
+This looks great to me. Thanks for revising and splitting up.
 
-I guess this is asix_ax88772a_link_change_notify() which is causing
-the problem, and yes, that phy_start_aneg() needs to be the unlocked
-version (which we'll have to export.)
+Please include a Fixes tag in all patches targeting next.
 
-This should fix it.
-
-diff --git a/drivers/net/phy/ax88796b.c b/drivers/net/phy/ax88796b.c
-index 0f1e617a26c9..eb74a8cf8df1 100644
---- a/drivers/net/phy/ax88796b.c
-+++ b/drivers/net/phy/ax88796b.c
-@@ -90,7 +90,7 @@ static void asix_ax88772a_link_change_notify(struct phy_device *phydev)
- 	 */
- 	if (phydev->state == PHY_NOLINK) {
- 		phy_init_hw(phydev);
--		phy_start_aneg(phydev);
-+		_phy_start_aneg(phydev);
- 	}
- }
- 
-diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
-index 93a8676dd8d8..a5fa077650e8 100644
---- a/drivers/net/phy/phy.c
-+++ b/drivers/net/phy/phy.c
-@@ -981,7 +981,7 @@ static int phy_check_link_status(struct phy_device *phydev)
-  *   If the PHYCONTROL Layer is operating, we change the state to
-  *   reflect the beginning of Auto-negotiation or forcing.
-  */
--static int _phy_start_aneg(struct phy_device *phydev)
-+int _phy_start_aneg(struct phy_device *phydev)
- {
- 	int err;
- 
-@@ -1002,6 +1002,7 @@ static int _phy_start_aneg(struct phy_device *phydev)
- 
- 	return err;
- }
-+EXPORT_SYMBOL(_phy_start_aneg);
- 
- /**
-  * phy_start_aneg - start auto-negotiation for this PHY device
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 1351b802ffcf..3cc52826f18e 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -1736,6 +1736,7 @@ void phy_detach(struct phy_device *phydev);
- void phy_start(struct phy_device *phydev);
- void phy_stop(struct phy_device *phydev);
- int phy_config_aneg(struct phy_device *phydev);
-+int _phy_start_aneg(struct phy_device *phydev);
- int phy_start_aneg(struct phy_device *phydev);
- int phy_aneg_done(struct phy_device *phydev);
- int phy_speed_down(struct phy_device *phydev, bool sync);
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+For subsequent iteration, no need for a manual follow-up email to CC
+the subsystem reviews. Just add --cc to git send-email?
 
