@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-34644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 582A47A5090
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 19:09:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96DE77A4ECE
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 18:27:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10AC8282886
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 17:09:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AA421C2145C
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 16:27:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DD91266CA;
-	Mon, 18 Sep 2023 17:07:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25E272376F;
+	Mon, 18 Sep 2023 16:26:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33A7E266C6;
-	Mon, 18 Sep 2023 17:07:41 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E06AE94;
-	Mon, 18 Sep 2023 10:07:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=A4yzGLXsCoMt636aHEn/2wTD7iTwqIEeCCVkVl5NG28=; b=0OWcHQZMNQM1VZvs8cNLfozLdU
-	ibUf0Cv45//VYlJJO/82/PsrH3JVtfWBxWQo6escaBPOqKSAFF94nd8jyjswqUdXBVQWZLsR15b5y
-	B4KR9udrykfuaycCrQ+s2YhmecYeIL//a7LZ/YUgovJ6UwueeGZmEmt/iDXQ9L1H58N0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qiGy0-006oHE-Hg; Mon, 18 Sep 2023 18:19:20 +0200
-Date: Mon, 18 Sep 2023 18:19:20 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Jay Monkman <jtm@lopingdog.com>, devicetree@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
-	Arndt Schuebel <Arndt.Schuebel@onsemi.com>
-Subject: Re: [PATCH 3/4] net: phy: Add GPIO and DT support to NCN26000
-Message-ID: <ba9e7fb4-e19f-454c-9542-cb53b45f6b99@lunn.ch>
-References: <ZQf1Nx+2amtUZulX@lopingdog.com>
- <b279bee8-1613-23ea-a339-9d3fdde9d0eb@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D481B20B1A
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 16:26:48 +0000 (UTC)
+Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF9677EC8
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 09:26:47 -0700 (PDT)
+Received: by mail-io1-xd29.google.com with SMTP id ca18e2360f4ac-79536bc669dso163919939f.3
+        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 09:26:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1695054407; x=1695659207; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:subject:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SCMrFuGDqjX9VMKx6pC2Ltdzj+Xy9TLR+v1gqts5ts0=;
+        b=wkxOCCMYPUS46H/ImqAS2xhT9molHUX+d0eSUGGGoHKnO8WM1Ely1TlSF572t7E1qj
+         bGOmXXrpAaNYeq6FhdkZSDsgMIRfo8FxELIz2NLGAjCCO3M621erNR4NrJ0FzvcpuI7B
+         sqnmclocJXBr++zUk/LnDp0/Qz9oz38dopEdAC2A7JWtKsXeDh4DuxHjaZ8EFz9TQacC
+         +Jk1x2t9gA5X87uk/ajkWd+AkksYQKgoLH1pLoIwhuX6s/d98fmOMysb5/wlnfSf7UXB
+         V4Dc0d4BpuEtN7IaxZfjusqMKolZ5L+zVs/HXqKD6mX3Mwm85noDY6yeKwbciJZrOvQG
+         R1ZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695054407; x=1695659207;
+        h=content-transfer-encoding:mime-version:message-id:subject:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SCMrFuGDqjX9VMKx6pC2Ltdzj+Xy9TLR+v1gqts5ts0=;
+        b=G+TkPj76NiEedC4D+qTGuXTgBBUTSoYBFlG9eDnYzvwD4ZNRngEnIRut6cA2wCvWQ8
+         gYxWt/Re7BDFT1mysUO5LfL5+GlbyVS++j1aJsTVQCtplYxWkoaJlf2b0tO/QujwLbPt
+         FGuYTdKIIQsPZls3msrnlWqjF4sEPWYwa6UcUDa5w5Kn0wO0phQecFPXjUAS6cDKBRFb
+         s3iptYzTjKX5UZxX2wwzWXo50h4gLoF9ckVt747B+ilVCuheebfoNiY9Ud3ferhlNMIP
+         k/iMIOgztF1sfwG706Nu5AqUbKNPisQYw7fDNXjw0f3E2GZI3qW+HqpgOymCvBs8qW0o
+         jSwg==
+X-Gm-Message-State: AOJu0YySgRZ0sGrXUh7cSuptpQpJ0uxvCR1EwHmCi7bJ19uZmFf/Fk8N
+	Pbp/ovTe/BgkWIMdJXotP5xixFGRJerEKijL0XYA7w==
+X-Google-Smtp-Source: AGHT+IGh5AM2vnHM/7JADo8uDqOdIPl6hCsp83P+urMSwv2DJNJfbh85la3ZC8fJ1vM349qbAWoaXA==
+X-Received: by 2002:a05:6e02:13e9:b0:34c:dd54:10c6 with SMTP id w9-20020a056e0213e900b0034cdd5410c6mr11065873ilj.12.1695054406847;
+        Mon, 18 Sep 2023 09:26:46 -0700 (PDT)
+Received: from hermes.local (204-195-112-131.wavecable.com. [204.195.112.131])
+        by smtp.gmail.com with ESMTPSA id w12-20020a63a74c000000b00553b9e0510esm6956663pgo.60.2023.09.18.09.26.46
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Sep 2023 09:26:46 -0700 (PDT)
+Date: Mon, 18 Sep 2023 09:26:44 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: netdev@vger.kernel.org
+Subject: Github mirror of iproute2 has moved
+Message-ID: <20230918092644.313bcea2@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b279bee8-1613-23ea-a339-9d3fdde9d0eb@linux.dev>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Sep 18, 2023 at 11:40:36AM +0100, Vadim Fedorenko wrote:
-> > +static int ncn26000_gpio_request(struct gpio_chip *gc, unsigned int offset)
-> > +{
-> > +	struct ncn26000_priv *priv = gpiochip_get_data(gc);
-> > +
-> > +	if (offset > 2)
-> > +		return -ENODEV;
-> > +
-> > +	if (priv->gpiomask & (1 << offset))
-> 
-> it's better to use BIT(offset) here
-
-Hi Vadim
-
-When replying, please trim the email to just the relevant text.
-
-     Thanks
-	Andrew
+The github mirror of iproute2 has moved from shemminger/iproute2 to iproute2/iproute2
+This is allow for more maintainers in the future.
 
