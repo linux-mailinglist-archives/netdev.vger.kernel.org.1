@@ -1,107 +1,166 @@
-Return-Path: <netdev+bounces-34710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 293857A5346
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 21:50:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FC847A536F
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 21:58:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 291261C20BEC
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 19:50:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 216E428206B
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 19:58:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 584BD27EC4;
-	Mon, 18 Sep 2023 19:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9561828E3C;
+	Mon, 18 Sep 2023 19:51:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A225273E1
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 19:50:20 +0000 (UTC)
-Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05BE38F
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 12:50:19 -0700 (PDT)
-Received: by mail-qt1-x830.google.com with SMTP id d75a77b69052e-41513d2cca7so85251cf.0
-        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 12:50:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695066618; x=1695671418; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7rvWtiKFlK82u2LKHKuUKsMb7Ahvcy4qqgwFLIOgqOE=;
-        b=tA81WjK8ILUFRFNbyPbw8S26a/oHZSWwqEvMiAksd41ykpCfg8WxQn9FlYNwy/5/c+
-         o868sUm0iIMLsb/RIF9R6HBEKiWHaPid1DN3qtDtdnUYQONYkM3QoL0ZgtfQHnwmDUEt
-         KHuB96a0u7h9etSKXQaUfXEgv2f83FQ055G4K9N7ziRBfRbieu0fXkkikbBul0dBCJ+3
-         N6jmC/ga/pYgbEzC1LW/7wN2ukR4M/SrwsOP5u5etErhHHMS2A83lyg0bNQ3he24OGZK
-         XpjuKSpA9Sb2Cn47yZKA6O+HBDtCkrg0ovdygX7Idp5u9GcM2A75baQDlljvzEM+w7Xn
-         Vb8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695066618; x=1695671418;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7rvWtiKFlK82u2LKHKuUKsMb7Ahvcy4qqgwFLIOgqOE=;
-        b=Lqty1MczsNdWMTQp26YFAqY51QMph4/gmtUeghqOn9Ys5QltmhxDuyQ03IRf3X538g
-         sGFcP3McTsks83tINXJ8iLBJautBxkrgP29BlOhWa5re5dRahNPeiGF93ADDgRzcEVy2
-         PgobDc/U/vpSrdtyFpxAVw0O9L1p3sloYVisXOj22bgsXhvLdqmcU1NN/F3lYoiDsO9T
-         09l4qldyyf+hUu2JVFF0ksKYKmpjo5H/l8PrLiwWHOzHGtDcuM0Tv4GDFAlzbST+9/KS
-         KKY9Ty7VgXbdSgeQ0WoArfy7BEVsC7y7TLmvKyWwaiqG2aufGxpDQfBewXMr/a5K+27P
-         NfEg==
-X-Gm-Message-State: AOJu0YzvMeY6YJemxyp4Gxr0XOgKeTwKLnIkOKNrtXz0ZINJl0vzmcgs
-	LNCUH/YQ/aXzcdWonPoXmC3SjY88qH4pC4gnDo921A==
-X-Google-Smtp-Source: AGHT+IFDmk4fUZ7vz5IUOYeqlZ/EevEHVyoljp4NOvoOjiwbxDV1PWynKYaMlFP2MvCbEhwmoTcjhWCuE7wkXyM1cko=
-X-Received: by 2002:a05:622a:4292:b0:417:944a:bcb2 with SMTP id
- cr18-20020a05622a429200b00417944abcb2mr30680qtb.13.1695066617843; Mon, 18 Sep
- 2023 12:50:17 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CC8F28E0F
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 19:51:40 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 819FA118
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 12:51:38 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1qiKHB-0003kL-K7; Mon, 18 Sep 2023 21:51:21 +0200
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1qiKH7-007I8N-8m; Mon, 18 Sep 2023 21:51:17 +0200
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1qiKH6-002mBz-U1; Mon, 18 Sep 2023 21:51:16 +0200
+From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Joel Stanley <joel@jms.id.au>,
+	Andrew Jeffery <andrew@aj.id.au>,
+	netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-aspeed@lists.ozlabs.org,
+	linux-kernel@vger.kernel.org,
+	Ray Jui <rjui@broadcom.com>,
+	Scott Branden <sbranden@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Doug Berger <opendmb@gmail.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Kevin Hilman <khilman@baylibre.com>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	linux-amlogic@lists.infradead.org,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	linux-sunxi@lists.linux.dev,
+	Iyappan Subramanian <iyappan@os.amperecomputing.com>,
+	Keyur Chudgar <keyur@os.amperecomputing.com>,
+	Quan Nguyen <quan@os.amperecomputing.com>
+Subject: [PATCH net-next 00/19] net: mdio: Convert to platform remove callback returning void
+Date: Mon, 18 Sep 2023 21:50:43 +0200
+Message-Id: <20230918195102.1302746-1-u.kleine-koenig@pengutronix.de>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230916010625.2771731-1-lixiaoyan@google.com> <20230916010625.2771731-5-lixiaoyan@google.com>
-In-Reply-To: <20230916010625.2771731-5-lixiaoyan@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 18 Sep 2023 21:50:04 +0200
-Message-ID: <CANn89iLhckhKv0tF4P_hFy-z1ZNTnHKP+vsb0xGPMfrk2Y=kUQ@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next 4/5] net-device: reorganize net_device fast
- path variables
-To: Coco Li <lixiaoyan@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	Mubashir Adnan Qureshi <mubashirq@google.com>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	Chao Wu <wwchao@google.com>, Wei Wang <weiwan@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3333; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=ci0IQrSWXNAJYKg8fc1qgrDF2J0dg2FQPcKK5IFoxug=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlCKn/qrkWkMR4vATlu8+A8buQtn/uucJFCz2Je IMvpamj1JiJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZQip/wAKCRCPgPtYfRL+ TgI/CACwpYaVqL2xrOfAhNBLFfB1xVWtYI9VnYPr9stjtL6MTwB9J8cCGV9AZ3kzuvv+WH2Q4rZ 5FI4J3XS7U+/FYU0H3YQQc8TeWJY7Ox15+3DAeFd/J47vAxI040iarzF8Lk1UibG4xlKxeVr/74 7OMIbUZCi0mjPMQzdIUufaXP2vm7IHBsNE5VYDr7pvT1vJixcOEeTtR39oDZmpUGLmjXxJ4FFoZ 80e2dl5Wg/6Lwr0APE2IqAMytjXfRhdW1z8fS7axIlH1JcZePE2Vpwf3V62ohnleM1St4kJJ40I D0TiIGRs/l1V3FjneArpH8rCY8lPmB0ET/0iO0ny4VYL9Wy8
+X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Sep 16, 2023 at 3:06=E2=80=AFAM Coco Li <lixiaoyan@google.com> wrot=
-e:
->
-> Reorganize fast path variables on tx-txrx-rx order
-> Fastpath variables end after npinfo.
->
-> Below data generated with pahole on x86 architecture.
->
-> Fast path variables span cache lines before change: 12
-> Fast path variables span cache lines after change: 4
->
-> Tested:
-> Built and installed.
+Hello,
 
-Please remove these two lines.
+this series convert all platform drivers below drivers/net/mdio to
+use remove_new. The motivation is to get rid of an integer return code
+that is (mostly) ignored by the platform driver core and error prone on
+the driver side.
 
-Of course, patches are built and boot-tested, this should not have to
-be stated in the changelog
+See commit 5c5a7680e67b ("platform: Provide a remove callback that
+returns no value") for an extended explanation and the eventual goal.
 
->
-> Signed-off-by: Coco Li <lixiaoyan@google.com>
-> Suggested-by: Eric Dumazet <edumazet@google.com>
-> ---
->
+There are no interdependencies between the patches. As there are still
+quite a few drivers to convert, I'm happy about every patch that makes
+it in. So even if there is a merge conflict with one patch until you
+apply, please apply the remainder of this series anyhow.
+
+Best regards
+Uwe
+
+Uwe Kleine-König (19):
+  net: mdio: aspeed: Convert to platform remove callback returning void
+  net: mdio: bcm-iproc: Convert to platform remove callback returning
+    void
+  net: mdio: bcm-unimac: Convert to platform remove callback returning
+    void
+  net: mdio: gpio: Convert to platform remove callback returning void
+  net: mdio: hisi-femac: Convert to platform remove callback returning
+    void
+  net: mdio: ipq4019: Convert to platform remove callback returning void
+  net: mdio: ipq8064: Convert to platform remove callback returning void
+  net: mdio: moxart: Convert to platform remove callback returning void
+  net: mdio: mscc-miim: Convert to platform remove callback returning
+    void
+  net: mdio: mux-bcm-iproc: Convert to platform remove callback
+    returning void
+  net: mdio: mux-bcm6368: Convert to platform remove callback returning
+    void
+  net: mdio: mux-gpio: Convert to platform remove callback returning
+    void
+  net: mdio: mux-meson-g12a: Convert to platform remove callback
+    returning void
+  net: mdio: mux-meson-gxl: Convert to platform remove callback
+    returning void
+  net: mdio: mux-mmioreg: Convert to platform remove callback returning
+    void
+  net: mdio: mux-multiplexer: Convert to platform remove callback
+    returning void
+  net: mdio: octeon: Convert to platform remove callback returning void
+  net: mdio: sun4i: Convert to platform remove callback returning void
+  net: mdio: xgene: Convert to platform remove callback returning void
+
+ drivers/net/mdio/mdio-aspeed.c          | 6 ++----
+ drivers/net/mdio/mdio-bcm-iproc.c       | 6 ++----
+ drivers/net/mdio/mdio-bcm-unimac.c      | 6 ++----
+ drivers/net/mdio/mdio-gpio.c            | 6 ++----
+ drivers/net/mdio/mdio-hisi-femac.c      | 6 ++----
+ drivers/net/mdio/mdio-ipq4019.c         | 6 ++----
+ drivers/net/mdio/mdio-ipq8064.c         | 7 ++-----
+ drivers/net/mdio/mdio-moxart.c          | 6 ++----
+ drivers/net/mdio/mdio-mscc-miim.c       | 6 ++----
+ drivers/net/mdio/mdio-mux-bcm-iproc.c   | 6 ++----
+ drivers/net/mdio/mdio-mux-bcm6368.c     | 6 ++----
+ drivers/net/mdio/mdio-mux-gpio.c        | 5 ++---
+ drivers/net/mdio/mdio-mux-meson-g12a.c  | 6 ++----
+ drivers/net/mdio/mdio-mux-meson-gxl.c   | 6 ++----
+ drivers/net/mdio/mdio-mux-mmioreg.c     | 6 ++----
+ drivers/net/mdio/mdio-mux-multiplexer.c | 6 ++----
+ drivers/net/mdio/mdio-octeon.c          | 5 ++---
+ drivers/net/mdio/mdio-sun4i.c           | 6 ++----
+ drivers/net/mdio/mdio-xgene.c           | 6 ++----
+ 19 files changed, 38 insertions(+), 75 deletions(-)
+
+base-commit: 7fc7222d9680366edeecc219c21ca96310bdbc10
+-- 
+2.40.1
+
 
