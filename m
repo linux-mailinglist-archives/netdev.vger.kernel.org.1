@@ -1,56 +1,50 @@
-Return-Path: <netdev+bounces-34796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85A057A54B9
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 23:02:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 568467A5462
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 22:50:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73E941C212A3
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 21:02:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10FEA28147D
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 20:50:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46611358A6;
-	Mon, 18 Sep 2023 20:43:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28C022AB45;
+	Mon, 18 Sep 2023 20:42:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB6C135897
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:43:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE84A27EDF
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:42:55 +0000 (UTC)
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E977D10D
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:43:06 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19866123
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:42:54 -0700 (PDT)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiL4y-0007Ph-1d; Mon, 18 Sep 2023 22:42:48 +0200
+	id 1qiL4x-0007Qn-VN; Mon, 18 Sep 2023 22:42:48 +0200
 Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiL4x-007IkU-26; Mon, 18 Sep 2023 22:42:47 +0200
+	id 1qiL4x-007IkZ-9o; Mon, 18 Sep 2023 22:42:47 +0200
 Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiL4w-002mqF-OZ; Mon, 18 Sep 2023 22:42:46 +0200
+	id 1qiL4x-002mqJ-0L; Mon, 18 Sep 2023 22:42:47 +0200
 From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>,
-	Alex Elder <elder@linaro.org>,
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-	Wei Fang <wei.fang@nxp.com>,
+Cc: Wells Lu <wellslutw@gmail.com>,
 	netdev@vger.kernel.org,
 	kernel@pengutronix.de
-Subject: [PATCH net-next 47/54] net: ethernet: sun: Convert to platform remove callback returning void
-Date: Mon, 18 Sep 2023 22:42:19 +0200
-Message-Id: <20230918204227.1316886-48-u.kleine-koenig@pengutronix.de>
+Subject: [PATCH net-next 48/54] net: ethernet: sunplus: Convert to platform remove callback returning void
+Date: Mon, 18 Sep 2023 22:42:20 +0200
+Message-Id: <20230918204227.1316886-49-u.kleine-koenig@pengutronix.de>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230918204227.1316886-1-u.kleine-koenig@pengutronix.de>
 References: <20230918204227.1316886-1-u.kleine-koenig@pengutronix.de>
@@ -61,7 +55,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3887; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=eNUPWqS3HwsvdRnQwonIfX0MnGa81NyHrfpAAK9T1F8=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlCLYZfD2YVSr4iAEonj+Wsse1LfN9wsARYWdiX 1KE5dMYK1qJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZQi2GQAKCRCPgPtYfRL+ Tqn3B/9wCcI4Q5uMpeHMBh1d/iCzPUro9K4b8T5Utqhh0xpmRdkj4S2xLRqvhgpf3c5tI3BEDrV XA7t/RQtqFeyXtIrKz+79iQdtlIBlwUWiOZLvnyt1ANOOe/tTbzq1kxpXBiMjtG/GPIne4jlW7s /9cnPeFFHz+t3QLGCUaRplQh2Y05kTHGVSJNi2WpYOGCV/X4UUXRvbpGAOjk4ow2h/pNj33GWPh D+WsaXrvMOQicqle2eYLml3+kJxqzOCcnRiycQOVA6sVJPJJeSVc63FfScIhBeeOiSxLvLJRvko wirckDLRDUANBdcvnQmRkwcbIjNqLuh3uvhwy5TlICGXUN4n
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1882; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=5xM44S2faH8Z4OGC1S6c4z1nOwPzY/yExMbBqVbvl5I=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlCLYa/wPNsoNTTDEHjck/G7X6zIEeiePPkMeIh KP2wVLJ1X6JATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZQi2GgAKCRCPgPtYfRL+ TthoB/0RvT0wNEDYUwo4Ywto7Q40lswisSLNDa/8tdfJUKHaI1wWhxOQoCK181LBhoO847KqZ65 Cdom7JLspIhF+xKteoO6QX52dPgYH2OkSNk5lenbpR4uYbSoK6DmUCZbjfAWMuyv+lREv9pwbud iKXnOhnutxO0JsIxU4v07cosEf0XlIvtAUxZlPmx69YN3uMe/wEcBs2hU9S1DSMWucD/0tHtgEy 13v5KE1VPxf4PdMtO6aQNu00MZDAeJhhjiGYe8/SpOL9JHUmb0QWGQjQ2jgpIml+OLCK1rnYEbz zBh9UcrFqSfW9P36CEvjf1/X1QUq0afzLqqlmlYlm3zUcMhm
 X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
@@ -82,108 +76,45 @@ void. In the first step of this quest all drivers are converted to
 .remove_new() which already returns void. Eventually after all drivers
 are converted, .remove_new() is renamed to .remove().
 
-Trivially convert these drivers from always returning zero in the remove
+Trivially convert this driver from always returning zero in the remove
 callback to the void returning variant.
 
 Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 ---
- drivers/net/ethernet/sun/niu.c     | 5 ++---
- drivers/net/ethernet/sun/sunbmac.c | 6 ++----
- drivers/net/ethernet/sun/sunqe.c   | 6 ++----
- 3 files changed, 6 insertions(+), 11 deletions(-)
+ drivers/net/ethernet/sunplus/spl2sw_driver.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/sun/niu.c b/drivers/net/ethernet/sun/niu.c
-index 011d74087f86..21431f43e4c2 100644
---- a/drivers/net/ethernet/sun/niu.c
-+++ b/drivers/net/ethernet/sun/niu.c
-@@ -10132,7 +10132,7 @@ static int niu_of_probe(struct platform_device *op)
- 	return err;
+diff --git a/drivers/net/ethernet/sunplus/spl2sw_driver.c b/drivers/net/ethernet/sunplus/spl2sw_driver.c
+index c499a14314f1..391a1bc7f446 100644
+--- a/drivers/net/ethernet/sunplus/spl2sw_driver.c
++++ b/drivers/net/ethernet/sunplus/spl2sw_driver.c
+@@ -511,7 +511,7 @@ static int spl2sw_probe(struct platform_device *pdev)
+ 	return ret;
  }
  
--static int niu_of_remove(struct platform_device *op)
-+static void niu_of_remove(struct platform_device *op)
+-static int spl2sw_remove(struct platform_device *pdev)
++static void spl2sw_remove(struct platform_device *pdev)
  {
- 	struct net_device *dev = platform_get_drvdata(op);
+ 	struct spl2sw_common *comm;
+ 	int i;
+@@ -538,8 +538,6 @@ static int spl2sw_remove(struct platform_device *pdev)
+ 	spl2sw_mdio_remove(comm);
  
-@@ -10165,7 +10165,6 @@ static int niu_of_remove(struct platform_device *op)
- 
- 		free_netdev(dev);
- 	}
--	return 0;
- }
- 
- static const struct of_device_id niu_match[] = {
-@@ -10183,7 +10182,7 @@ static struct platform_driver niu_of_driver = {
- 		.of_match_table = niu_match,
- 	},
- 	.probe		= niu_of_probe,
--	.remove		= niu_of_remove,
-+	.remove_new	= niu_of_remove,
- };
- 
- #endif /* CONFIG_SPARC64 */
-diff --git a/drivers/net/ethernet/sun/sunbmac.c b/drivers/net/ethernet/sun/sunbmac.c
-index cc34d92d2e3d..16c86b13c185 100644
---- a/drivers/net/ethernet/sun/sunbmac.c
-+++ b/drivers/net/ethernet/sun/sunbmac.c
-@@ -1234,7 +1234,7 @@ static int bigmac_sbus_probe(struct platform_device *op)
- 	return bigmac_ether_init(op, qec_op);
- }
- 
--static int bigmac_sbus_remove(struct platform_device *op)
-+static void bigmac_sbus_remove(struct platform_device *op)
- {
- 	struct bigmac *bp = platform_get_drvdata(op);
- 	struct device *parent = op->dev.parent;
-@@ -1255,8 +1255,6 @@ static int bigmac_sbus_remove(struct platform_device *op)
- 			  bp->bblock_dvma);
- 
- 	free_netdev(net_dev);
+ 	clk_disable_unprepare(comm->clk);
 -
 -	return 0;
  }
  
- static const struct of_device_id bigmac_sbus_match[] = {
-@@ -1274,7 +1272,7 @@ static struct platform_driver bigmac_sbus_driver = {
- 		.of_match_table = bigmac_sbus_match,
- 	},
- 	.probe		= bigmac_sbus_probe,
--	.remove		= bigmac_sbus_remove,
-+	.remove_new	= bigmac_sbus_remove,
- };
+ static const struct of_device_id spl2sw_of_match[] = {
+@@ -551,7 +549,7 @@ MODULE_DEVICE_TABLE(of, spl2sw_of_match);
  
- module_platform_driver(bigmac_sbus_driver);
-diff --git a/drivers/net/ethernet/sun/sunqe.c b/drivers/net/ethernet/sun/sunqe.c
-index b37360f44972..aedd13c94225 100644
---- a/drivers/net/ethernet/sun/sunqe.c
-+++ b/drivers/net/ethernet/sun/sunqe.c
-@@ -933,7 +933,7 @@ static int qec_sbus_probe(struct platform_device *op)
- 	return qec_ether_init(op);
- }
- 
--static int qec_sbus_remove(struct platform_device *op)
-+static void qec_sbus_remove(struct platform_device *op)
- {
- 	struct sunqe *qp = platform_get_drvdata(op);
- 	struct net_device *net_dev = qp->dev;
-@@ -948,8 +948,6 @@ static int qec_sbus_remove(struct platform_device *op)
- 			  qp->buffers, qp->buffers_dvma);
- 
- 	free_netdev(net_dev);
--
--	return 0;
- }
- 
- static const struct of_device_id qec_sbus_match[] = {
-@@ -967,7 +965,7 @@ static struct platform_driver qec_sbus_driver = {
- 		.of_match_table = qec_sbus_match,
- 	},
- 	.probe		= qec_sbus_probe,
--	.remove		= qec_sbus_remove,
-+	.remove_new	= qec_sbus_remove,
- };
- 
- static int __init qec_init(void)
+ static struct platform_driver spl2sw_driver = {
+ 	.probe = spl2sw_probe,
+-	.remove = spl2sw_remove,
++	.remove_new = spl2sw_remove,
+ 	.driver = {
+ 		.name = "sp7021_emac",
+ 		.of_match_table = spl2sw_of_match,
 -- 
 2.40.1
 
