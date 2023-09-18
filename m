@@ -1,84 +1,198 @@
-Return-Path: <netdev+bounces-34742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2323C7A5420
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 22:29:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A90A67A5421
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 22:29:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D17D62822D9
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 20:29:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3B6B1C2105E
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 20:29:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E86F6286AE;
-	Mon, 18 Sep 2023 20:28:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B95C62869F;
+	Mon, 18 Sep 2023 20:28:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4336A2136D
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:28:40 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13C2EB6
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:28:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=IPndWJvIBO55kH4GyXg1LlOg74ksfk0ZXmRpHsYbi74=; b=iH
-	mEAvrbirKL2q3jaojKDz91oPQ72fTtl3jyEIwNwxEx2xALhTWbT4TcPMZth1L6QqoE2Iootf+3V+N
-	SIscsxWRkGZQcS1mhEt1r0T0yrm2pdg+GJsqC+jERlReLTLP2dYVwR2e6o4NtG5sjFSEyNEkrYQnh
-	imIkvf1LclEW9Gk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qiKrA-006poL-TY; Mon, 18 Sep 2023 22:28:32 +0200
-Date: Mon, 18 Sep 2023 22:28:32 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>
-Cc: Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, kernel@pengutronix.de
-Subject: Re: [PATCH net-next 9/9] net: dsa: vitesse-vsc73xx: Convert to
- platform remove callback returning void
-Message-ID: <62f279a9-8bac-440f-9999-8e2b61b96e7d@lunn.ch>
-References: <20230918191916.1299418-1-u.kleine-koenig@pengutronix.de>
- <20230918191916.1299418-10-u.kleine-koenig@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACE7F28686;
+	Mon, 18 Sep 2023 20:28:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D942FC433C8;
+	Mon, 18 Sep 2023 20:28:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695068931;
+	bh=pUlBBuz1FK2J0cyfaQ4KvrItSJbWh9d+uorfnqujgLI=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=L7UXMY1k5WmTCEz3nJJH5T79ESygRsChx6oSvJiO5+j6bg/BaSUmONosJP7oJsJt8
+	 0d1wogo6meA3o4KKhq4ocspMuc1nK0WHf+g3qyCQbJYXJBr1RuL0b+D8XRrAhdDX+H
+	 JNhKCCJIR3ouQCF6YXBoCZZjkpH5xi7NQchu+uQmxf9WnpAQcSjiiv0IyrkkiGUxbO
+	 Nn5giMTbLxNvRNb4pWZn7cU+yYj+pto3gAHZRnEtqWsCCcDZb0t3U3gLd0FXCSrR72
+	 4u4z76lOj7aRqVy1V5hEuUOpEDGrB+Ud2JU6H8ZNdoBKknw2rziHJEeoeSv/ddnlAs
+	 YTigZMLrMFqhg==
+Message-ID: <5194bd75-9562-8375-5748-ccce560b67cf@kernel.org>
+Date: Mon, 18 Sep 2023 22:28:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230918191916.1299418-10-u.kleine-koenig@pengutronix.de>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH 2/4] dt-bindings: net: Add onsemi NCN26010 ethernet
+ controller
+To: Jay Monkman <jtm@lopingdog.com>, devicetree@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+ Arndt Schuebel <Arndt.Schuebel@onsemi.com>
+References: <ZQf1Mgb8lfHkB6rl@lopingdog.com>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzk@kernel.org>
+In-Reply-To: <ZQf1Mgb8lfHkB6rl@lopingdog.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Sep 18, 2023 at 09:19:16PM +0200, Uwe Kleine-König wrote:
-> The .remove() callback for a platform driver returns an int which makes
-> many driver authors wrongly assume it's possible to do error handling by
-> returning an error code. However the value returned is ignored (apart
-> from emitting a warning) and this typically results in resource leaks.
-> To improve here there is a quest to make the remove callback return
-> void. In the first step of this quest all drivers are converted to
-> .remove_new() which already returns void. Eventually after all drivers
-> are converted, .remove_new() is renamed to .remove().
+On 18/09/2023 08:58, Jay Monkman wrote:
 > 
-> Trivially convert this driver from always returning zero in the remove
-> callback to the void returning variant.
+
+Drop stray blank line.
+
+> Add devicetree bindings for onsemi's NCN26010 10BASE-T1S
+> ethernet controller.
+
+Please use scripts/get_maintainers.pl to get a list of necessary people
+and lists to CC (and consider --no-git-fallback argument). It might
+happen, that command when run on an older kernel, gives you outdated
+entries. Therefore please be sure you base your patches on recent Linux
+kernel.
+
 > 
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+> Signed-off-by: Jay Monkman <jtm@lopingdog.com>
+> ---
+>  .../devicetree/bindings/net/onnn,macphy.yaml  | 94 +++++++++++++++++++
+>  1 file changed, 94 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/onnn,macphy.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/net/onnn,macphy.yaml b/Documentation/devicetree/bindings/net/onnn,macphy.yaml
+> new file mode 100644
+> index 000000000000..1813da81b95f
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/onnn,macphy.yaml
+> @@ -0,0 +1,94 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/onnn,macphy.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: onsemi 10BASE-T1S Ethernet Controller
+> +
+> +maintainers:
+> +  - Jay Monkman <jtm@lopingdog.com>
+> +
+> +description: |
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Do not need '|' unless you need to preserve formatting.
 
-    Andrew
+> +  Bindings for onsemi 10BASE-T1S ethernet controller.
+
+Drop "bindings for" and instead describe the hardware.
+
+> +
+> +  Supported devices:
+> +    ncn26010
+
+Supported by what? By bindings? Or driver? Drop, instead, describe the
+hardware.
+
+> +
+> +allOf:
+> +  - $ref: ethernet-controller.yaml#
+> +
+> +properties:
+> +  compatible:
+> +    const: onnn,ncn26010
+> +
+> +  ctrl-protected:
+> +    description: |
+
+Do not need '|' unless you need to preserve formatting.
+
+Is it a generic property? Does not look like. All non-standard
+properties need vendor prefix.
+
+> +      Enables control data read/write protection mode.
+
+I don't understand this and it is very close to duplicate the property
+name. Describe what it does in the hardware, not in the driver, so it
+will be justified to have it in bindings in the first place.
+
+> +    type: boolean
+> +
+> +  poll-interval:
+
+Missing units.
+
+> +    $ref: /schemas/types.yaml#/definitions/uint32
+> +    description: |
+> +      Defines how often the MACPHY thread runs in milliseconds.
+
+thread? So Linux kthread? Nope, not a bindings property.
+
+> +      If not specified, a default value of 5 is used.
+> +
+> +  tx-fcs-calc:
+> +    description: |
+> +      Enables driver calculation of the FCS on transmitted frames.
+> +    type: boolean
+
+Driver? Not hardware? So drop the property.
+
+> +
+> +  rx-fcs-check:
+> +    description: |
+> +      Enables driver checking of the FCS on received frames
+> +    type: boolean
+
+Not a bindings property.
+
+> +
+> +  interrupts:
+> +    maxItems: 1
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  mdio:
+> +    $ref: mdio.yaml#
+> +    unevaluatedProperties: false
+> +
+> +required:
+> +  - compatible
+
+Nothing else is required?
+
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    spi {
+> +      #address-cells = <1>;
+> +      #size-cells = <0>;
+
+If this is a SPI device, then you miss spi-peripheral-props.
+
+> +
+> +      ethernet@0 {
+> +        compatible = "onnn,ncn26010";
+> +        reg = <0>; /* CE0 */
+
+CE0? Isn't chip select obvious from the reg=0?
+
+
+Best regards,
+Krzysztof
+
 
