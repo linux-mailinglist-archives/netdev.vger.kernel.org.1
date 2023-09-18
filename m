@@ -1,120 +1,137 @@
-Return-Path: <netdev+bounces-34785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4282C7A5498
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 22:57:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 957567A54C0
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 23:04:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0CA8281E63
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 20:57:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F8AE1C212CB
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 21:04:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 189B334192;
-	Mon, 18 Sep 2023 20:43:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FE0127ECF;
+	Mon, 18 Sep 2023 20:49:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F3FA31A61
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:43:00 +0000 (UTC)
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E962114
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:42:59 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1qiL50-0007dw-53; Mon, 18 Sep 2023 22:42:50 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1qiL4z-007Il0-G3; Mon, 18 Sep 2023 22:42:49 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1qiL4y-002mqh-UB; Mon, 18 Sep 2023 22:42:49 +0200
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Krzysztof Halasa <khalasa@piap.pl>,
-	netdev@vger.kernel.org,
-	kernel@pengutronix.de
-Subject: [PATCH net-next 54/54] net: ethernet: xscale: Convert to platform remove callback returning void
-Date: Mon, 18 Sep 2023 22:42:26 +0200
-Message-Id: <20230918204227.1316886-55-u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230918204227.1316886-1-u.kleine-koenig@pengutronix.de>
-References: <20230918204227.1316886-1-u.kleine-koenig@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB2B91D69E
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:49:07 +0000 (UTC)
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1989111
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:49:05 -0700 (PDT)
+Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-99bf3f59905so659809166b.3
+        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:49:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695070144; x=1695674944; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fGBQgeHrDxH9X1Tg1lbMFYg4GJ5kJmZT4UQiZI5LYbo=;
+        b=fLEDW77IJgWcd+Z7uHJRbgFjSPIn0Z5a/gvpzUwqU0dYX613zel1y6kax7QrFc87GN
+         EkhhVvwm+8BuzU9PEVR8eqSkaUvwSoFKRAlhbICiiO0KzsbY9QWNjDHBb6zoUr/tf5Q2
+         a9g9tNA/Hq9JOEorOre8WNXCGoA+CGgmjZciV8Hvi572jdDpPxsVZ6o9hT09KyeMzDLc
+         +dZone19P2Q21bA60E6qqor+fZaGMomwJnAlv0apfYJuvcx+JUdDc14xfSvJSV7e5mUJ
+         2SHdoBqyHi8OGLRio182UySDpBo5jHz4q0Ea3OHCdWm27yGl7StEWG5+FtfVeIqfyb+3
+         qiZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695070144; x=1695674944;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fGBQgeHrDxH9X1Tg1lbMFYg4GJ5kJmZT4UQiZI5LYbo=;
+        b=KvoKOhP+QnQD/dqQWExLL5/jku+1ywIwyVY9r3IQP8oreEEvYGT7qw2VkrG6iyr/Nu
+         2Pi7XWyit5yKVffnlFl1Y/8tQYXyGoY+poyCvq73TEsL3gEcwZWXD8jOXmktz/XKKaJm
+         8cBouJ3y6cY9Uj4atarKnqqyP9oqAQzbi+bWjsM/VBZyN9FzTKPmxvAjBTp/Wa3sGCbJ
+         S7L3IcZLFt5qJeEWj8gr2jJPjqWJBJGPIIHRY7Jy6vjAhLXGewl2NGf/x1qH5u0FX8Lu
+         cMmzv0Rutg5qpQxPOiRsybZJ4W82nDCDj4QSuaX5uu1lJINxslJQ1ohX7IWOPJsUjOTt
+         1sXg==
+X-Gm-Message-State: AOJu0YxAaEJmh7tJd0Mh7/CyK+fjEGwNJ6Jojq/L+rdovWgMGmcrT4ag
+	6t6wD0bfEKLSTmdQdJ2aWI3LR6Bb4AA/IqIMgFBbPg==
+X-Google-Smtp-Source: AGHT+IHHDCQ7DLksnsJI/MzVZ95Jb9E3g0OC9YPirB61baunrwsXci1fuxFvrwvffGp5HKJId+y6S23I0y177D8vrzQ=
+X-Received: by 2002:a17:907:2c54:b0:9ad:e955:414d with SMTP id
+ hf20-20020a1709072c5400b009ade955414dmr6037187ejc.17.1695070144212; Mon, 18
+ Sep 2023 13:49:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1976; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=skpJBkdZppqNN1E55eE9rz5DpC2AQpwvWdNyXuoadNM=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlCLYgjcNZtpwYRM1VxgjTGXWL6L0+B/Svem2YO FBJL4pONlOJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZQi2IAAKCRCPgPtYfRL+ TqbgB/wIuiCrzsJLBweqDBYCFOHcdJfs+3qtQew0QVQqVb1hFXK+9iJSJ45tKDGnLdLzs3CSSqc X6UMOysu3rILIyFdrLfzqs0xAVYZfLDaG+nGzY+5wgJiNUP3nBIjPCsFZD9LpcmIiYKyweOaGV+ A0a7yFt80gkMezl3TiRMDlnXI92nZJJySwHiLdJVoZjUYSUVWT/PKhZ0IfrmpOy7W0C/QTSgJ06 3yAN7gWRnG165Q7FccnfWuw82sgSSeioaMTi7Lse6Um4UL6WUftdjwCf0DR9i8nbdM+7KbSbo1g ett5F4pRTcJVYnhhRNhhCDNF1q7nf/IolOLm0ruy0mm50N8+
-X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20230918025021.4078252-1-jrife@google.com> <20230918025021.4078252-2-jrife@google.com>
+ <CAF=yD-KoKAv_uPR+R+RkVbc3Lm3PREao-n7F1QckPWeW9v6JqA@mail.gmail.com>
+ <CADKFtnQnOnaq_3_o5OoWpuMvzTgzL2qKcY5oc=AbdZJvONSyKQ@mail.gmail.com>
+ <CAF=yD-+DmargLvi=i-YJ6JCJov8xYEbyQf8+KhQ00UTYry_9UQ@mail.gmail.com> <CADKFtnSoB+_RjEJZsvkM9TpEm6xmmATnBL0jj7n-JbFAxbBc-A@mail.gmail.com>
+In-Reply-To: <CADKFtnSoB+_RjEJZsvkM9TpEm6xmmATnBL0jj7n-JbFAxbBc-A@mail.gmail.com>
+From: Jordan Rife <jrife@google.com>
+Date: Mon, 18 Sep 2023 13:48:52 -0700
+Message-ID: <CADKFtnR5WANzLqA=WE_2Stii8aDPGy7Hi2tUReF1BtWe5FqOMw@mail.gmail.com>
+Subject: Re: [PATCH net v2 2/3] net: prevent rewrite of msg_name in sock_sendmsg()
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, netdev@vger.kernel.org, dborkman@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The .remove() callback for a platform driver returns an int which makes
-many driver authors wrongly assume it's possible to do error handling by
-returning an error code. However the value returned is ignored (apart
-from emitting a warning) and this typically results in resource leaks.
-To improve here there is a quest to make the remove callback return
-void. In the first step of this quest all drivers are converted to
-.remove_new() which already returns void. Eventually after all drivers
-are converted, .remove_new() is renamed to .remove().
+Just a heads up, there are also kernel_recvmsg/sock_recvmsg functions
+that mirror the kernel_sendmsg/sock_sendmsg. If we are are doing this
 
-Trivially convert this driver from always returning zero in the remove
-callback to the void returning variant.
+> 1) Rename the current kernel_sendmsg() function to
+> kernel_sendmsg_kvec() and name  our new function kernel_sendmsg(). To
+> me this makes some sense, considering the new function is the more
+> generic of the two, and the existing kernel_sendmsg() specifically
+> accepts "struct kvec".
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
----
- drivers/net/ethernet/xscale/ixp4xx_eth.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+it creates an asymmetry between *sendmsg and *recvmsg function names.
+If we wanted these to be similar then it means a rename to these
+functions (e.g. kern_recvmsg becomes kern_recvmsg_kvec, rename
+sock_recvmsg to kern_recvmsg).
 
-diff --git a/drivers/net/ethernet/xscale/ixp4xx_eth.c b/drivers/net/ethernet/xscale/ixp4xx_eth.c
-index 3b0c5f177447..b242aa61d8ab 100644
---- a/drivers/net/ethernet/xscale/ixp4xx_eth.c
-+++ b/drivers/net/ethernet/xscale/ixp4xx_eth.c
-@@ -1533,7 +1533,7 @@ static int ixp4xx_eth_probe(struct platform_device *pdev)
- 	return err;
- }
- 
--static int ixp4xx_eth_remove(struct platform_device *pdev)
-+static void ixp4xx_eth_remove(struct platform_device *pdev)
- {
- 	struct net_device *ndev = platform_get_drvdata(pdev);
- 	struct phy_device *phydev = ndev->phydev;
-@@ -1544,7 +1544,6 @@ static int ixp4xx_eth_remove(struct platform_device *pdev)
- 	ixp4xx_mdio_remove();
- 	npe_port_tab[NPE_ID(port->id)] = NULL;
- 	npe_release(port->npe);
--	return 0;
- }
- 
- static const struct of_device_id ixp4xx_eth_of_match[] = {
-@@ -1560,7 +1559,7 @@ static struct platform_driver ixp4xx_eth_driver = {
- 		.of_match_table = of_match_ptr(ixp4xx_eth_of_match),
- 	},
- 	.probe		= ixp4xx_eth_probe,
--	.remove		= ixp4xx_eth_remove,
-+	.remove_new	= ixp4xx_eth_remove,
- };
- module_platform_driver(ixp4xx_eth_driver);
- 
--- 
-2.40.1
+-Jordan
 
+On Mon, Sep 18, 2023 at 11:02=E2=80=AFAM Jordan Rife <jrife@google.com> wro=
+te:
+>
+> Sounds like a plan.
+>
+> On Mon, Sep 18, 2023 at 10:55=E2=80=AFAM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
+> >
+> > On Mon, Sep 18, 2023 at 1:52=E2=80=AFPM Jordan Rife <jrife@google.com> =
+wrote:
+> > >
+> > > > You used this short-hand to avoid having to update all callers to s=
+ock_sendmsg to __kernel_sendmsg?
+> > >
+> > > Sorry about that, I misunderstood the intent. I'm fine with
+> > > introducing a new function, doing the address copy there, and
+> > > replacing all calls to sock_sendmsg with this wrapper. One thought on
+> > > the naming though,
+> > >
+> > > To me the "__" prefix seems out of place for a function meant as a
+> > > public interface. Some possible alternatives:
+> > >
+> > > 1) Rename the current kernel_sendmsg() function to
+> > > kernel_sendmsg_kvec() and name  our new function kernel_sendmsg(). To
+> > > me this makes some sense, considering the new function is the more
+> > > generic of the two, and the existing kernel_sendmsg() specifically
+> > > accepts "struct kvec".
+> > > 2) Same as #1, but drop the old kernel_sendmsg() function instead of
+> > > renaming it. Adapt all calls to the old kernel_sendmsg() to fit the
+> > > new kernel_sendmsg() (this amounts to adding a
+> > > iov_iter_kvec(&msg->msg_iter, ITER_SOURCE, vec, num, size); call in
+> > > each spot before kernel_sendmsg() is called.
+> >
+> > Thanks. Fair points.
+> >
+> > Of the two proposals, I think the first is preferable, as it avoids
+> > some non-trivial open coding in multiple callers.
 
