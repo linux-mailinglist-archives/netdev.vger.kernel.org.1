@@ -1,198 +1,183 @@
-Return-Path: <netdev+bounces-34446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BAB87A435C
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 09:46:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 41D9C7A4345
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 09:45:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8E972822F1
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 07:46:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFBFB2813D5
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 07:45:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8430711CBD;
-	Mon, 18 Sep 2023 07:44:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77911134C1;
+	Mon, 18 Sep 2023 07:44:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07982111A1
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 07:44:42 +0000 (UTC)
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F18A7E52
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 00:42:17 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1c43fe0c0bfso14352615ad.1
-        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 00:42:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695022937; x=1695627737; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0hKYocey+6ljIdptxAs95A1TcTySiYPe7OwqA1YhMFY=;
-        b=BDqSGsT25ItUdjTt34+3ft/4qI5KIRlObVaX5umIPgAnbXgd9gaDjXR9bEciat060F
-         sWRd9QPcXFrLGTE8TQClSuFpXob6mKf7JG/oPoCPRaEm+xSynngPe5/8Wbk0KrYlXJ8s
-         sgTPEhIBW1FG9G4vA/SBGhYTbnLpL2QsTWp/3I490DmYeurUVQj45E7dyCYm/DV6kChS
-         GmuMZSID0wSIeVpmv9Pcaahc5NHfTwpLiqgAINj05AgVafTslWPnfl/I9Es14qGfYXf3
-         oAT1YCYZ/8+qSe6Ube/e9EAfTUgpjox9vPsbZUdzugXZ76c/ccCebqNZ44wfLlPnPpds
-         98qA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695022937; x=1695627737;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=0hKYocey+6ljIdptxAs95A1TcTySiYPe7OwqA1YhMFY=;
-        b=FjvYW79p8u2y/Ps2N0ny0tO3+36PWAsIpB31mcHOSlvrg/YUKpHiIck+7tSO0JAe/4
-         En6y9k4WfjvE+icaeWKdFLCRpACAcG7gelEVddxy9SscQ/qcJJFvChkDeV3jJp6nD/8E
-         m30icvm4/fB4yWx8B0YLw1x6TdPFuhzOfe5gKVe6NZ4ynuEbhOoC1i8UVq0heMbTs7B/
-         X4DdnZ3MKZqzl/4lczBPJBRCOG4YoYifzHZkhsbFoAIxCYphyY2nhiWUBC+1qy27dng0
-         x6g1DAa1LSDsJW5KuwK9GRM2YszMF9WKp/Lseof0PxKMzVfkvy9Q0c5t4jvZ64eakaHh
-         vm+w==
-X-Gm-Message-State: AOJu0Yzw7AiJ9MtymMiKFrp+eOqjakuWRSs5ktnznc8G/D48BuGznAM+
-	Rq58dWLIBKmW6aFrpXTnPJQ=
-X-Google-Smtp-Source: AGHT+IGqGLOZW5vuMg2uPwuo6Z3az0TlDRq/bV1XLo1Nwy0G1f41+NY4ytKtebYGcoTSPQ35V1Pd7w==
-X-Received: by 2002:a17:902:c106:b0:1c3:b3c7:d67f with SMTP id 6-20020a170902c10600b001c3b3c7d67fmr6861840pli.47.1695022937246;
-        Mon, 18 Sep 2023 00:42:17 -0700 (PDT)
-Received: from [192.168.123.100] ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id q21-20020a170902bd9500b001c1f016015esm7694707pls.84.2023.09.18.00.42.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Sep 2023 00:42:16 -0700 (PDT)
-Message-ID: <9ac76b6a-d490-f633-ba90-f0851f5a3b6f@gmail.com>
-Date: Mon, 18 Sep 2023 16:42:12 +0900
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67D13F9C1;
+	Mon, 18 Sep 2023 07:44:33 +0000 (UTC)
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A20B3CCE;
+	Mon, 18 Sep 2023 00:43:10 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E2503C000B;
+	Mon, 18 Sep 2023 07:42:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1695022989;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yImr8034vhbpOmwr9ltkLzW5eGzffuc8l1c+tIEQu4k=;
+	b=keY1QUS7dtQt/GsW5vOiYAwTOlPRGRRxUYperfcoQ3wCmbAj7I76ON/0gdvYrWD/tWoiYL
+	Hn2p1FGMOpV7FuqzU15Nt0trTIa4GFq+b3F4Y28Uz6Ve9PGSwCgX4jLzvbWGR8Yu1pLEU2
+	1NsWUihV3cVL74ZjiCyIFfG1zGI8LQKIzhHCMa2BxY0+rOJWZITaXBmNywrfT6C1fyWcdT
+	BT636wpK0zzG/fVKstJkQo/SGNr6otVeseu8nm3FvgklIDVTPkEnJ5ewMLWMjVYTzmE0Xf
+	nT6R9OlIbFGA9Kw5pzgn3EYX71nox4MtzDHt0P9KrBj9kFNiHbI+pVNi3AYXKQ==
+Date: Mon, 18 Sep 2023 09:42:39 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: Conor Dooley <conor@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Rob Herring
+ <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Lee Jones <lee@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Qiang
+ Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, Liam Girdwood
+ <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Jaroslav Kysela
+ <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Shengjiu Wang
+ <shengjiu.wang@gmail.com>, Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam
+ <festevam@gmail.com>, Nicolin Chen <nicoleotsuka@gmail.com>, Christophe
+ Leroy <christophe.leroy@csgroup.eu>, Randy Dunlap <rdunlap@infradead.org>,
+ netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ alsa-devel@alsa-project.org, Simon Horman <horms@kernel.org>, Christophe
+ JAILLET <christophe.jaillet@wanadoo.fr>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v5 08/31] dt-bindings: soc: fsl: cpm_qe: cpm1-scc-qmc:
+ Add support for QMC HDLC
+Message-ID: <20230918094239.4d2d0c32@bootlin.com>
+In-Reply-To: <20230913-unburned-overturn-41b83e1eed25@spud>
+References: <20230912081527.208499-1-herve.codina@bootlin.com>
+	<20230912101018.225246-1-herve.codina@bootlin.com>
+	<20230912-capable-stash-c7a3e33078ac@spud>
+	<20230913092640.76934b31@bootlin.com>
+	<20230913-unruly-recite-7dbbbd7e63e0@spud>
+	<20230913165250.02bab2ad@bootlin.com>
+	<20230913-oversold-delay-05368e5de9fe@spud>
+	<20230913-unburned-overturn-41b83e1eed25@spud>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: [PATCH net v2] net: team: get rid of team->lock in team module
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org,
- syzbot+9bbbacfbf1e04d5221f7@syzkaller.appspotmail.com,
- syzbot+1c71587a1a09de7fbde3@syzkaller.appspotmail.com
-References: <20230916131115.488756-1-ap420073@gmail.com>
- <ZQXcOmtm1l36nUwV@nanopsycho>
- <a8aac295-6021-f13b-fd26-311462d0a930@gmail.com>
- <ZQf5/f7jFvvCJBSw@nanopsycho>
-From: Taehee Yoo <ap420073@gmail.com>
-In-Reply-To: <ZQf5/f7jFvvCJBSw@nanopsycho>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+X-GND-Sasl: herve.codina@bootlin.com
 
+Hi Conor,
 
+On Wed, 13 Sep 2023 15:59:41 +0100
+Conor Dooley <conor@kernel.org> wrote:
 
-On 2023. 9. 18. 오후 4:19, Jiri Pirko wrote:
- > Mon, Sep 18, 2023 at 03:16:26AM CEST, ap420073@gmail.com wrote:
- >>
- >>
- >> On 2023. 9. 17. 오전 1:47, Jiri Pirko wrote:
- >>
- >> Hi Jiri,
- >> Thank you so much for your review!
- >>
- >>> Sat, Sep 16, 2023 at 03:11:15PM CEST, ap420073@gmail.com wrote:
- >>>> The purpose of team->lock is to protect the private data of the team
- >>>> interface. But RTNL already protects it all well.
- >>>> The precise purpose of the team->lock is to reduce contention of
- >>>> RTNL due to GENL operations such as getting the team port list, and
- >>>> configuration dump.
- >>>>
- >>>> team interface has used a dynamic lockdep key to avoid false-positive
- >>>> lockdep deadlock detection. Virtual interfaces such as team usually
- >>>> have their own lock for protecting private data.
- >>>> These interfaces can be nested.
- >>>> team0
- >>>>    |
- >>>> team1
- >>>>
- >>>> Each interface's lock is actually different(team0->lock and 
-team1->lock).
- >>>> So,
- >>>> mutex_lock(&team0->lock);
- >>>> mutex_lock(&team1->lock);
- >>>> mutex_unlock(&team1->lock);
- >>>> mutex_unlock(&team0->lock);
- >>>> The above case is absolutely safe. But lockdep warns about deadlock.
- >>>> Because the lockdep understands these two locks are same. This is a
- >>>> false-positive lockdep warning.
- >>>>
- >>>> So, in order to avoid this problem, the team interfaces started to use
- >>>> dynamic lockdep key. The false-positive problem was fixed, but it
- >>>> introduced a new problem.
- >>>>
- >>>> When the new team virtual interface is created, it registers a dynamic
- >>>> lockdep key(creates dynamic lockdep key) and uses it. But there is the
- >>>> limitation of the number of lockdep keys.
- >>>> So, If so many team interfaces are created, it consumes all 
-lockdep keys.
- >>>> Then, the lockdep stops to work and warns about it.
- >>>
- >>> What about fixing the lockdep instead? I bet this is not the only
- >>> occurence of this problem.
- >>
- >> There were many similar patches for fixing lockdep false-positive 
-problem.
- >> But, I didn't consider fixing lockdep because I thought the 
-limitation of
- >> lockdep key was normal.
- >> So, I still think stopping working due to exceeding lockdep keys is 
-not a
- >> problem of the lockdep itself.
- >
- > Lockdep is a diagnostic tool. The fact the tool is not working properly
- > does not mean we need to change the code the tool is working with. Fix
- > the tool.
+> On Wed, Sep 13, 2023 at 03:56:16PM +0100, Conor Dooley wrote:
+> > On Wed, Sep 13, 2023 at 04:52:50PM +0200, Herve Codina wrote:  
+> > > On Wed, 13 Sep 2023 15:42:45 +0100
+> > > Conor Dooley <conor@kernel.org> wrote:
+> > >   
+> > > > On Wed, Sep 13, 2023 at 09:26:40AM +0200, Herve Codina wrote:  
+> > > > > Hi Conor,
+> > > > > 
+> > > > > On Tue, 12 Sep 2023 18:21:58 +0100
+> > > > > Conor Dooley <conor@kernel.org> wrote:
+> > > > >     
+> > > > > > On Tue, Sep 12, 2023 at 12:10:18PM +0200, Herve Codina wrote:    
+> > > > > > > The QMC (QUICC mutichannel controller) is a controller present in some
+> > > > > > > PowerQUICC SoC such as MPC885.
+> > > > > > > The QMC HDLC uses the QMC controller to transfer HDLC data.
+> > > > > > > 
+> > > > > > > Additionally, a framer can be connected to the QMC HDLC.
+> > > > > > > If present, this framer is the interface between the TDM bus used by the
+> > > > > > > QMC HDLC and the E1/T1 line.
+> > > > > > > The QMC HDLC can use this framer to get information about the E1/T1 line
+> > > > > > > and configure the E1/T1 line.
+> > > > > > > 
+> > > > > > > Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+> > > > > > > ---
+> > > > > > >  .../bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml   | 13 +++++++++++++
+> > > > > > >  1 file changed, 13 insertions(+)
+> > > > > > > 
+> > > > > > > diff --git a/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml b/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml
+> > > > > > > index 82d9beb48e00..b5073531f3f1 100644
+> > > > > > > --- a/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml
+> > > > > > > +++ b/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml
+> > > > > > > @@ -101,6 +101,16 @@ patternProperties:
+> > > > > > >            Channel assigned Rx time-slots within the Rx time-slots routed by the
+> > > > > > >            TSA to this cell.
+> > > > > > >  
+> > > > > > > +      compatible:
+> > > > > > > +        const: fsl,qmc-hdlc
+> > > > > > > +
+> > > > > > > +      fsl,framer:
+> > > > > > > +        $ref: /schemas/types.yaml#/definitions/phandle
+> > > > > > > +        description:
+> > > > > > > +          phandle to the framer node. The framer is in charge of an E1/T1 line
+> > > > > > > +          interface connected to the TDM bus. It can be used to get the E1/T1 line
+> > > > > > > +          status such as link up/down.      
+> > > > > > 
+> > > > > > Sounds like this fsl,framer property should depend on the compatible
+> > > > > > being present, no?    
+> > > > > 
+> > > > > Well from the implementation point of view, only the QMC HDLC driver uses this
+> > > > > property.
+> > > > > 
+> > > > > From the hardware description point of view, this property means that the time slots
+> > > > > handled by this channel are connected to the framer. So I think it makes sense for
+> > > > > any channel no matter the compatible (even if compatible is not present).
+> > > > > 
+> > > > > Should I change and constraint the fsl,framer property to the compatible presence ?
+> > > > > If so, is the following correct for this contraint ?
+> > > > >    --- 8< ---
+> > > > >    dependencies:
+> > > > >      - fsl,framer: [ compatible ];
+> > > > >    --- 8< ---    
+> > > > 
+> > > > The regular sort of
+> > > > if:
+> > > > 	compatible:
+> > > > 		contains:
+> > > > 			const: foo
+> > > > then:
+> > > > 	required:
+> > > > 		- fsl,framer
+> > > > would fit the bill, no?  
+> > > 
+> > > Not sure.
+> > > "fsl,framer" is an optional property (depending on the hardware we can have
+> > > a framer or not).  
+> > 
+> > Ah apologies, I had it backwards! Your suggestion seems fair in that
+> > case.  
+> 
+> Or actually,
+> if:
+> 	compatible:
+> 		not:
+> 	 		contains:
+> 	 			const: foo
+>  then:
+>  	properties:
+>  		fsl,framer: false
+> ? That should do the trick in a more conventional way.
 
-I agree with you.
-Fixing the lockdep side looks more correct way.
-I will dig some way to fix this problem on the lockdep side.
+Thanks for this proposal.
+I will use it in the next iteration.
 
-Thank you so much!
-Taehee Yoo
-
- >
- >
- >>
- >>>
- >>>
- >>>>
- >>>> So, in order to fix this issue, It just removes team->lock and uses
- >>>> RTNL instead.
- >>>>
- >>>> The previous approach to fix this issue was to use the subclass 
-lockdep
- >>>> key instead of the dynamic lockdep key. It requires RTNL before 
-acquiring
- >>>> a nested lock because the subclass variable(dev->nested_lock) is
- >>>> protected by RTNL.
- >>>> However, the coverage of team->lock is too wide so sometimes it should
- >>>> use a subclass variable before initialization.
- >>>> So, it can't work well in the port initialization and unregister 
-logic.
- >>>>
- >>>> This approach is just removing the team->lock clearly.
- >>>> So there is no special locking scenario in the team module.
- >>>> Also, It may convert RTNL to RCU for the read-most operations such as
- >>>> GENL dump but not yet adopted.
- >>>>
- >>>> Reproducer:
- >>>>     for i in {0..1000}
- >>>>     do
- >>>>             ip link add team$i type team
- >>>>             ip link add dummy$i master team$i type dummy
- >>>>             ip link set dummy$i up
- >>>>             ip link set team$i up
- >>>>     done
- >>>>
- >>
- >> Thanks a lot!
- >> Taehee Yoo
+Regards,
+Hervé
 
