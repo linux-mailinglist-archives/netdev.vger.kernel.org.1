@@ -1,187 +1,187 @@
-Return-Path: <netdev+bounces-34628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2AC17A4E53
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 18:10:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 335AB7A4EBF
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 18:25:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CDB8282321
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 16:10:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4FF31C2120A
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 16:25:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7359123740;
-	Mon, 18 Sep 2023 16:08:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 091871CA87;
+	Mon, 18 Sep 2023 16:25:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0408C210FA;
-	Mon, 18 Sep 2023 16:08:24 +0000 (UTC)
-Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C79F24C03;
-	Mon, 18 Sep 2023 09:08:11 -0700 (PDT)
-Received: by mail-lj1-x242.google.com with SMTP id 38308e7fff4ca-2bffa8578feso28310211fa.2;
-        Mon, 18 Sep 2023 09:08:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695053290; x=1695658090; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mw9PGns58MpgDbC90EC6PCBD0i/AuxCD1+N04xG6c7I=;
-        b=Ro6SKHhLbi//LraJ7eNoJRjfZwkRNldCVUccCpFG8C3+R6nDguXDpUEcJmY7KbXlfV
-         HS26JH+LIhrlIDq3Xy17ujhxUGV/0zRMCYimMGNXgkFE+dYRdF/u1hLKASckGUc8lPrp
-         PIAEKPdtj987r5BmL54nmNAyKg32bx0EVx+aZu/NMJFttOTL9w0T0RWE1GvvxK0Wnm/T
-         esWNl8rEVTEse3s0rqWlxsmErSImsBf0U3kbJXsnsq3rSLUafHZZNqRFMs34jQDxul8a
-         LIN4XtiwpDycF2xabU4rZB0vweEa58VX+i5T+x9vhKH3E1d04DyKDpnwi60sBtzeUBaY
-         sTPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695053290; x=1695658090;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mw9PGns58MpgDbC90EC6PCBD0i/AuxCD1+N04xG6c7I=;
-        b=hiFwVeQuPu1aEd6i/vEWsgOqUCVQgH/J2LMCJ+RjC7vS0iBPWySlsqYVu+w3X5SxBq
-         9qRFde6vEeIth0VSKLMjPgnrcTHJxoXzJzTBSfg/6Rb3KWzbZgVAe8QnxdnobwQT8MqI
-         qdGa+Jf9V3WVAmKjEDnwx38lLdXzBuhBV42S4zADmO6xTj7Hy+DUGeGYQ2PwUitbOONH
-         UMDVzECVrbqTAg5xNKkxDs5Lizv+3p43r5fZv8Iwq+oP8M6OR1x3NaaUVbT3zG26VjX7
-         C0NJ/J8UJ2ch0EWP4l3od8PwB7rGi1vo1OeRK6HXo9lsKj6g8YS+kDbA5WOMYMEwtY5z
-         TKxA==
-X-Gm-Message-State: AOJu0YwCLEv/gapby7ywRyi9oPZ3WWusmGxnkNaoE1JTSchTZjWItPTo
-	OW9fxLHOcy9hP9CpDliE0QbFaPrSYlPRVzZB3LNyqNwugEQ=
-X-Google-Smtp-Source: AGHT+IEkCcydntQavCkIUABpmahINsBagQaEup2IybnBeuFdtNhWBnfMeN4B40L4hpYTqpyLMSdUK5ibhUjDVBfYAlw=
-X-Received: by 2002:a17:906:9e:b0:9a1:be50:ae61 with SMTP id
- 30-20020a170906009e00b009a1be50ae61mr7613626ejc.69.1695046540120; Mon, 18 Sep
- 2023 07:15:40 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D978C2376C
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 16:25:28 +0000 (UTC)
+Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [217.70.178.240])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2AA7349E2;
+	Mon, 18 Sep 2023 09:24:17 -0700 (PDT)
+Received: from relay5-d.mail.gandi.net (unknown [IPv6:2001:4b98:dc4:8::225])
+	by mslow1.mail.gandi.net (Postfix) with ESMTP id AF10AD1910;
+	Mon, 18 Sep 2023 15:08:44 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 037A31C0014;
+	Mon, 18 Sep 2023 15:08:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1695049724;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=C5Vkva5HZnVM4Ixi9QUntO5y0V2AbU4F4e7tb6GhRRI=;
+	b=SxCaaljdNENIY33lLp8j/TFGhnIJlLJMl11K89xczy5wJN+ig6J9q3ETDgG01TIMvwvxsO
+	MhVzF07H2GANK2TvT2CPJg3juITXNUXGRU56r6LwocP8PrZtDDz+IcO1w9gqiEvnxJGtDa
+	CwwQwytK7RA1T6BHCqgDYBthotaJqFT5e+bhnb7i4pfXUy6CY3Yvr7uJeFDdDBIlxvALrl
+	EZgKiN4dmIwl8sdDEntfQYMzEplLBdzgBoO2WH8nUHC7TKPUnpVvR8kXcwuYP8pQzPUKLw
+	7sV4ySijdqWBrRlX4s2BmWK2j8/5hOS+8hjGWrUQ0MTCOwq0ReOV+lRThtTsJA==
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	linux-wpan@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	netdev@vger.kernel.org,
+	David Girault <david.girault@qorvo.com>,
+	Romuald Despres <romuald.despres@qorvo.com>,
+	Frederic Blain <frederic.blain@qorvo.com>,
+	Nicolas Schodet <nico@ni.fr.eu.org>,
+	Guilhem Imberton <guilhem.imberton@qorvo.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>
+Subject: [PATCH wpan-next v3 09/11] mac802154: Follow the number of associated devices
+Date: Mon, 18 Sep 2023 17:08:07 +0200
+Message-Id: <20230918150809.275058-10-miquel.raynal@bootlin.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230918150809.275058-1-miquel.raynal@bootlin.com>
+References: <20230918150809.275058-1-miquel.raynal@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230916165853.15153-1-alexei.starovoitov@gmail.com>
- <CANn89iK_367bq4Gv+AuA-H5UgXNuM=N3XCp7N8nkeMik0Kwp+Q@mail.gmail.com>
- <CAADnVQL14y5=eXp=KwAjOYeLuu8DTbL_GDkGxNoHjhy498yBqw@mail.gmail.com>
- <CANn89iKkEcsaEQRNmxdEHAkTbPVgVekUcjJvDsd-_fs0M9Qszw@mail.gmail.com> <CAADnVQLn1dtBNyywZO38WyWtUyomKJDdMefpkj3mkR=+fOh+tg@mail.gmail.com>
-In-Reply-To: <CAADnVQLn1dtBNyywZO38WyWtUyomKJDdMefpkj3mkR=+fOh+tg@mail.gmail.com>
-From: Kumar Kartikeya Dwivedi <memxor@gmail.com>
-Date: Mon, 18 Sep 2023 16:15:03 +0200
-Message-ID: <CAP01T75C3qHe3OuXcbFqDjLtb+M8UixVYxHA-Gf=c6xrNQvVAA@mail.gmail.com>
-Subject: Re: pull-request: bpf-next 2023-09-16
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
-	Kernel Team <kernel-team@fb.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: miquel.raynal@bootlin.com
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, 18 Sept 2023 at 15:56, Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
->
-> On Mon, Sep 18, 2023 at 6:54=E2=80=AFAM Eric Dumazet <edumazet@google.com=
-> wrote:
-> >
-> > On Mon, Sep 18, 2023 at 3:41=E2=80=AFPM Alexei Starovoitov
-> > <alexei.starovoitov@gmail.com> wrote:
-> > >
-> > > On Mon, Sep 18, 2023 at 6:25=E2=80=AFAM Eric Dumazet <edumazet@google=
-.com> wrote:
-> > > >
-> > > > On Sat, Sep 16, 2023 at 6:59=E2=80=AFPM Alexei Starovoitov
-> > > > <alexei.starovoitov@gmail.com> wrote:
-> > > > >
-> > > > > Hi David, hi Jakub, hi Paolo, hi Eric,
-> > > > >
-> > > > > The following pull-request contains BPF updates for your *net-nex=
-t* tree.
-> > > > >
-> > > > > We've added 73 non-merge commits during the last 9 day(s) which c=
-ontain
-> > > > > a total of 79 files changed, 5275 insertions(+), 600 deletions(-)=
-.
-> > > > >
-> > > > > The main changes are:
-> > > > >
-> > > > > 1) Basic BTF validation in libbpf, from Andrii Nakryiko.
-> > > > >
-> > > > > 2) bpf_assert(), bpf_throw(), exceptions in bpf progs, from Kumar=
- Kartikeya Dwivedi.
-> > > > >
-> > > > > 3) next_thread cleanups, from Oleg Nesterov.
-> > > > >
-> > > > > 4) Add mcpu=3Dv4 support to arm32, from Puranjay Mohan.
-> > > > >
-> > > > > 5) Add support for __percpu pointers in bpf progs, from Yonghong =
-Song.
-> > > > >
-> > > > > 6) Fix bpf tailcall interaction with bpf trampoline, from Leon Hw=
-ang.
-> > > > >
-> > > > > 7) Raise irq_work in bpf_mem_alloc while irqs are disabled to imp=
-rove refill probabablity, from Hou Tao.
-> > > > >
-> > > > > Please consider pulling these changes from:
-> > > > >
-> > > > >   git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git
-> > > > >
-> > > >
-> > > > This might have been raised already, but bpf on x86 now depends on
-> > > > CONFIG_UNWINDER_ORC ?
-> > > >
-> > > > $ grep CONFIG_UNWINDER_ORC .config
-> > > > # CONFIG_UNWINDER_ORC is not set
-> > > >
-> > > > $ make ...
-> > > > arch/x86/net/bpf_jit_comp.c:3022:58: error: no member named 'sp' in
-> > > > 'struct unwind_state'
-> > > >                 if (!addr || !consume_fn(cookie, (u64)addr,
-> > > > (u64)state.sp, (u64)state.bp))
-> > > >                                                                  ~~=
-~~~ ^
-> > > > 1 error generated.
-> > >
-> > > Kumar,
-> > > can probably explain better,
-> > > but no the bpf as whole doesn't depend.
-> > > One feature needs either ORC or frame unwinder.
-> > > It won't work with unwinder_guess.
-> > > The build error is a separate issue.
-> > > It hasn't been reported before.
-> >
-> > In my builds, I do have CONFIG_UNWINDER_FRAME_POINTER=3Dy
-> >
-> > $ grep UNWIND .config
-> > # CONFIG_UNWINDER_ORC is not set
-> > CONFIG_UNWINDER_FRAME_POINTER=3Dy
-> >
-> >
-> > I note state.sp is only available to CONFIG_UNWINDER_ORC
-> >
-> > arch/x86/include/asm/unwind.h
-> >
-> > #if defined(CONFIG_UNWINDER_ORC)
-> >     bool signal, full_regs;
-> >     unsigned long sp, bp, ip;
-> >     struct pt_regs *regs, *prev_regs;
-> > #elif defined(CONFIG_UNWINDER_FRAME_POINTER)
-> >    bool got_irq;
-> >    unsigned long *bp, *orig_sp, ip;   // this is orig_sp , not sp.
->
-> Right. Our replies crossed.
-> Please ignore this PR. We need to fix this first.
+Track the count of associated devices. Limit the number of associations
+using the value provided by the user if any. If we reach the maximum
+number of associations, we tell the device we are at capacity. If the
+user do not want to accept any more associations, it may specify the
+value 0 to the maximum number of associations, which will lead to an
+access denied error status returned to the peers trying to associate.
 
-Hello,
-This is my bad. I totally missed it since I initially wrote this patch
-and never looked at it again.
-I suggest that I send a fix to disable this feature with
-CONFIG_UNWINDER_FRAME_POINTER=3Dy, while I work on reenabling it again
-for it with a follow up.
+Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+---
+ include/net/cfg802154.h |  1 +
+ net/ieee802154/core.c   |  2 ++
+ net/mac802154/cfg.c     |  1 +
+ net/mac802154/scan.c    | 33 +++++++++++++++++++++++----------
+ 4 files changed, 27 insertions(+), 10 deletions(-)
+
+diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
+index bb09ccaf56c2..fe5310cb8d60 100644
+--- a/include/net/cfg802154.h
++++ b/include/net/cfg802154.h
+@@ -507,6 +507,7 @@ struct wpan_dev {
+ 	struct ieee802154_pan_device *parent;
+ 	struct list_head children;
+ 	unsigned int max_associations;
++	unsigned int nchildren;
+ };
+ 
+ #define to_phy(_dev)	container_of(_dev, struct wpan_phy, dev)
+diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
+index 2d6fe45efa05..60e8fff1347e 100644
+--- a/net/ieee802154/core.c
++++ b/net/ieee802154/core.c
+@@ -212,6 +212,8 @@ static void cfg802154_free_peer_structures(struct wpan_dev *wpan_dev)
+ 		kfree(child);
+ 	}
+ 
++	wpan_dev->nchildren = 0;
++
+ 	mutex_unlock(&wpan_dev->association_lock);
+ }
+ 
+diff --git a/net/mac802154/cfg.c b/net/mac802154/cfg.c
+index 0d0aed788f57..4a85fa674f66 100644
+--- a/net/mac802154/cfg.c
++++ b/net/mac802154/cfg.c
+@@ -454,6 +454,7 @@ static int mac802154_disassociate_child(struct wpan_phy *wpan_phy,
+ 		return ret;
+ 
+ 	list_del(&child->node);
++	wpan_dev->nchildren--;
+ 	kfree(child);
+ 
+ 	return 0;
+diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
+index 76f04550aabb..9ba45984e9de 100644
+--- a/net/mac802154/scan.c
++++ b/net/mac802154/scan.c
+@@ -800,20 +800,32 @@ int mac802154_process_association_req(struct ieee802154_sub_if_data *sdata,
+ 	child->mode = IEEE802154_EXTENDED_ADDRESSING;
+ 	ceaddr = swab64((__force u64)child->extended_addr);
+ 
+-	assoc_resp_pl.status = IEEE802154_ASSOCIATION_SUCCESSFUL;
+-	if (assoc_req_pl.alloc_addr) {
+-		assoc_resp_pl.short_addr = cfg802154_get_free_short_addr(wpan_dev);
+-		child->mode = IEEE802154_SHORT_ADDRESSING;
++	if (wpan_dev->nchildren >= wpan_dev->max_associations) {
++		if (!wpan_dev->max_associations)
++			assoc_resp_pl.status = IEEE802154_PAN_ACCESS_DENIED;
++		else
++			assoc_resp_pl.status = IEEE802154_PAN_AT_CAPACITY;
++		assoc_resp_pl.short_addr = cpu_to_le16(IEEE802154_ADDR_SHORT_BROADCAST);
++		dev_dbg(&sdata->dev->dev,
++			"Refusing ASSOC REQ from child %8phC, %s\n", &ceaddr,
++			assoc_resp_pl.status == IEEE802154_PAN_ACCESS_DENIED ?
++			"access denied" : "too many children");
+ 	} else {
+-		assoc_resp_pl.short_addr = cpu_to_le16(IEEE802154_ADDR_SHORT_UNSPEC);
++		assoc_resp_pl.status = IEEE802154_ASSOCIATION_SUCCESSFUL;
++		if (assoc_req_pl.alloc_addr) {
++			assoc_resp_pl.short_addr = cfg802154_get_free_short_addr(wpan_dev);
++			child->mode = IEEE802154_SHORT_ADDRESSING;
++		} else {
++			assoc_resp_pl.short_addr = cpu_to_le16(IEEE802154_ADDR_SHORT_UNSPEC);
++		}
++		child->short_addr = assoc_resp_pl.short_addr;
++		dev_dbg(&sdata->dev->dev,
++			"Accepting ASSOC REQ from child %8phC, providing short address 0x%04x\n",
++			&ceaddr, le16_to_cpu(child->short_addr));
+ 	}
+-	child->short_addr = assoc_resp_pl.short_addr;
+-	dev_dbg(&sdata->dev->dev,
+-		"Accepting ASSOC REQ from child %8phC, providing short address 0x%04x\n",
+-		&ceaddr, le16_to_cpu(child->short_addr));
+ 
+ 	ret = mac802154_send_association_resp_locked(sdata, child, &assoc_resp_pl);
+-	if (ret) {
++	if (ret || assoc_resp_pl.status != IEEE802154_ASSOCIATION_SUCCESSFUL) {
+ 		kfree(child);
+ 		goto unlock;
+ 	}
+@@ -837,6 +849,7 @@ int mac802154_process_association_req(struct ieee802154_sub_if_data *sdata,
+ 	}
+ 
+ 	list_add(&child->node, &wpan_dev->children);
++	wpan_dev->nchildren++;
+ 
+ unlock:
+ 	mutex_unlock(&wpan_dev->association_lock);
+-- 
+2.34.1
+
 
