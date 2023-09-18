@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-34705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34700-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21C157A5300
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 21:23:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D51CD7A52E3
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 21:20:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A7601C20D23
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 19:23:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84767281DEA
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 19:20:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFAC2273FD;
-	Mon, 18 Sep 2023 19:19:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CD8027735;
+	Mon, 18 Sep 2023 19:19:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91D85273F6
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 19:19:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39602273ED
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 19:19:37 +0000 (UTC)
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59852111
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 12:19:52 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3C7910F
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 12:19:34 -0700 (PDT)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiJmK-0002ny-A9; Mon, 18 Sep 2023 21:19:28 +0200
+	id 1qiJmH-0002nz-L2; Mon, 18 Sep 2023 21:19:25 +0200
 Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiJmG-007I2L-0p; Mon, 18 Sep 2023 21:19:24 +0200
+	id 1qiJmG-007I2O-8c; Mon, 18 Sep 2023 21:19:24 +0200
 Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiJmF-002m1d-Is; Mon, 18 Sep 2023 21:19:23 +0200
+	id 1qiJmF-002m1g-UM; Mon, 18 Sep 2023 21:19:23 +0200
 From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
 To: Florian Fainelli <florian.fainelli@broadcom.com>,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -41,34 +41,15 @@ To: Florian Fainelli <florian.fainelli@broadcom.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Kurt Kanzenbach <kurt@linutronix.de>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Hauke Mehrtens <hauke@hauke-m.de>,
-	=?utf-8?b?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	Colin Foster <colin.foster@in-advantage.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	UNGLinuxDriver@microchip.com,
-	Linus Walleij <linus.walleij@linaro.org>,
-	=?utf-8?q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
-	=?utf-8?b?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>
+	Paolo Abeni <pabeni@redhat.com>
 Cc: netdev@vger.kernel.org,
-	kernel@pengutronix.de,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	linux-renesas-soc@vger.kernel.org
-Subject: [PATCH net-next 0/9] net: dsa: Convert to platform remove callback returning void
-Date: Mon, 18 Sep 2023 21:19:07 +0200
-Message-Id: <20230918191916.1299418-1-u.kleine-koenig@pengutronix.de>
+	kernel@pengutronix.de
+Subject: [PATCH net-next 1/9] net: dsa: b53: Convert to platform remove callback returning void
+Date: Mon, 18 Sep 2023 21:19:08 +0200
+Message-Id: <20230918191916.1299418-2-u.kleine-koenig@pengutronix.de>
 X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20230918191916.1299418-1-u.kleine-koenig@pengutronix.de>
+References: <20230918191916.1299418-1-u.kleine-koenig@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,7 +57,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2189; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=ZA7dOFQnSLtrugXK9Bl0+O8+Kz/XLhZGGCrzvWbf/y4=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlCKKmTnyEQKzVWdf6Nj8Xvf8bg7hDbrstIXHat tgDgTFphauJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZQiipgAKCRCPgPtYfRL+ TiQYB/96svIfIe+AAw+Fih3TuSWGmjmLWKi8W8r7Loh8Pu2E6hhlYD0AKX/i5R+7mbQZf9bb8dr oJlDp45nupIK/x0putx4RZpjMqMDxP59wfujefc21r+oRQJsDpYOQKOIpKw/r73+X94GNFFuCHn avBjzZfD6hug7rQ5XOX9WXSc8IsvDvcbDVYZsAW5isS0esbjISA9VmaT0cnI1BjkbgWei0NYRtD bKo2/r2uiYHO7/RObCY8d7Fp6DyHYQNRb+X5JXM0nQ/9GJmzzyUIXs8nJvp6K1znnyOFoQsPTNe /ko6OH3sTs42Eb3UadUrWfTG+04YHysc/Beo6c32crUzEL19
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2813; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=GqU17FgeMi/nZ1dy/v0xgslfOsHBLbsjKnEzgzQUCn8=; b=owGbwMvMwMXY3/A7olbonx/jabUkhlSORctfLtA1DJrhxsVycS57Yn++kuexj59nPJ+n/HZx3 T3Nikk9nYzGLAyMXAyyYoos9o1rMq2q5CI71/67DDOIlQlkCgMXpwBMxOgw+z+VtI/fHKpLUr7s /MvKJHVtQaBWoOWzjd+MEguqk44szL2ydyb/GlFulqtO5/n/7t/9Km2OukLY/tIzrwJ8nl2/ntG dNNfocIUyK2dUX828e89YNf6INbRbvlK/XDRJR5RbpOH/RMu/clmyXzYlGU/+Gl8n+q5EIz+6bE nMrBD9SdK1U2Zck+NWzi5o4fHWusDzzGvnq4maorMZUnaUTVg6pWDL7JOnH0f+0WVexRu9btLnZ SkX+faHLSqva7q0uCzCrOisaUFTh5jIfKVnpUsEXYHKeeZo6jdr/VFarxLzgrH4TvTb2hPeu8w0 XRvKsw8/u9+UlHVb1duPL/3z+1ie4O2+Hr3zXz+QS1MFAA==
 X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
@@ -89,54 +70,86 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello,
+The .remove() callback for a platform driver returns an int which makes
+many driver authors wrongly assume it's possible to do error handling by
+returning an error code. However the value returned is ignored (apart
+from emitting a warning) and this typically results in resource leaks.
+To improve here there is a quest to make the remove callback return
+void. In the first step of this quest all drivers are converted to
+.remove_new() which already returns void. Eventually after all drivers
+are converted, .remove_new() is renamed to .remove().
 
-this series converts all platform drivers below drivers/net/dsa to use
-remove_new. The motivation is to get rid of an integer return code
-that is (mostly) ignored by the platform driver core and error prone on
-the driver side.
+Trivially convert these drivers from always returning zero in the remove
+callback to the void returning variant.
 
-See commit 5c5a7680e67b ("platform: Provide a remove callback that
-returns no value") for an extended explanation and the eventual goal.
+Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+---
+ drivers/net/dsa/b53/b53_mmap.c | 6 ++----
+ drivers/net/dsa/b53/b53_srab.c | 8 +++-----
+ 2 files changed, 5 insertions(+), 9 deletions(-)
 
-There are no interdependencies between the patches. As there are still
-quite a few drivers to convert, I'm happy about every patch that makes
-it in. So even if there is a merge conflict with one patch until you
-apply or a subject prefix is suboptimal, please apply the remainder of
-this series anyhow.
-
-Best regards
-Uwe
-
-Uwe Kleine-König (9):
-  net: dsa: b53: Convert to platform remove callback returning void
-  net: dsa: bcm_sf2: Convert to platform remove callback returning void
-  net: dsa: hirschmann: Convert to platform remove callback returning
-    void
-  net: dsa: lantiq_gswip: Convert to platform remove callback returning
-    void
-  net: dsa: mt7530: Convert to platform remove callback returning void
-  net: dsa: ocelot: Convert to platform remove callback returning void
-  net: dsa: realtek: Convert to platform remove callback returning void
-  net: dsa: rzn1_a5psw: Convert to platform remove callback returning
-    void
-  net: dsa: vitesse-vsc73xx: Convert to platform remove callback
-    returning void
-
- drivers/net/dsa/b53/b53_mmap.c             | 6 ++----
- drivers/net/dsa/b53/b53_srab.c             | 8 +++-----
- drivers/net/dsa/bcm_sf2.c                  | 8 +++-----
- drivers/net/dsa/hirschmann/hellcreek.c     | 8 +++-----
- drivers/net/dsa/lantiq_gswip.c             | 8 +++-----
- drivers/net/dsa/mt7530-mmio.c              | 7 ++-----
- drivers/net/dsa/ocelot/ocelot_ext.c        | 8 +++-----
- drivers/net/dsa/ocelot/seville_vsc9953.c   | 8 +++-----
- drivers/net/dsa/realtek/realtek-smi.c      | 8 +++-----
- drivers/net/dsa/rzn1_a5psw.c               | 8 +++-----
- drivers/net/dsa/vitesse-vsc73xx-platform.c | 8 +++-----
- 11 files changed, 31 insertions(+), 54 deletions(-)
-
-base-commit: 7fc7222d9680366edeecc219c21ca96310bdbc10
+diff --git a/drivers/net/dsa/b53/b53_mmap.c b/drivers/net/dsa/b53/b53_mmap.c
+index 5e39641ea887..3a89349dc918 100644
+--- a/drivers/net/dsa/b53/b53_mmap.c
++++ b/drivers/net/dsa/b53/b53_mmap.c
+@@ -324,14 +324,12 @@ static int b53_mmap_probe(struct platform_device *pdev)
+ 	return b53_switch_register(dev);
+ }
+ 
+-static int b53_mmap_remove(struct platform_device *pdev)
++static void b53_mmap_remove(struct platform_device *pdev)
+ {
+ 	struct b53_device *dev = platform_get_drvdata(pdev);
+ 
+ 	if (dev)
+ 		b53_switch_remove(dev);
+-
+-	return 0;
+ }
+ 
+ static void b53_mmap_shutdown(struct platform_device *pdev)
+@@ -372,7 +370,7 @@ MODULE_DEVICE_TABLE(of, b53_mmap_of_table);
+ 
+ static struct platform_driver b53_mmap_driver = {
+ 	.probe = b53_mmap_probe,
+-	.remove = b53_mmap_remove,
++	.remove_new = b53_mmap_remove,
+ 	.shutdown = b53_mmap_shutdown,
+ 	.driver = {
+ 		.name = "b53-switch",
+diff --git a/drivers/net/dsa/b53/b53_srab.c b/drivers/net/dsa/b53/b53_srab.c
+index bcb44034404d..f3f95332ff17 100644
+--- a/drivers/net/dsa/b53/b53_srab.c
++++ b/drivers/net/dsa/b53/b53_srab.c
+@@ -657,17 +657,15 @@ static int b53_srab_probe(struct platform_device *pdev)
+ 	return b53_switch_register(dev);
+ }
+ 
+-static int b53_srab_remove(struct platform_device *pdev)
++static void b53_srab_remove(struct platform_device *pdev)
+ {
+ 	struct b53_device *dev = platform_get_drvdata(pdev);
+ 
+ 	if (!dev)
+-		return 0;
++		return;
+ 
+ 	b53_srab_intr_set(dev->priv, false);
+ 	b53_switch_remove(dev);
+-
+-	return 0;
+ }
+ 
+ static void b53_srab_shutdown(struct platform_device *pdev)
+@@ -684,7 +682,7 @@ static void b53_srab_shutdown(struct platform_device *pdev)
+ 
+ static struct platform_driver b53_srab_driver = {
+ 	.probe = b53_srab_probe,
+-	.remove = b53_srab_remove,
++	.remove_new = b53_srab_remove,
+ 	.shutdown = b53_srab_shutdown,
+ 	.driver = {
+ 		.name = "b53-srab-switch",
 -- 
 2.40.1
 
