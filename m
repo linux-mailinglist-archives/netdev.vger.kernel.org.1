@@ -1,193 +1,83 @@
-Return-Path: <netdev+bounces-34449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D39B7A4368
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 09:48:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EAE67A43A2
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 09:55:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47EFF2822DA
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 07:48:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C48E52813E8
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 07:55:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31D5A14AA8;
-	Mon, 18 Sep 2023 07:45:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 617F4134BD;
+	Mon, 18 Sep 2023 07:54:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5563107A5
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 07:45:47 +0000 (UTC)
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50C651BDA;
-	Mon, 18 Sep 2023 00:43:18 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1bf55a81eeaso29332635ad.0;
-        Mon, 18 Sep 2023 00:43:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695022998; x=1695627798; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hQ1AMQXZDD2nNPL5JTNkWkTCq0W5XECwYQbbG++9SbE=;
-        b=c+3KG6PQ827cI9OFfFD1cQW1dQe1950LtCOc3INe1KTcs2JHpifZvfY9rtQQvjU80e
-         Wi/4spaol4G8Tf66iptIW9BRucQp5xox90BNdvKGJOCZ58eshW/O45wXv1ZfiQIH8Zrj
-         35wtyHilP4X441stXEkAl+0ApOBB0Wx6Pv1NaYz0t5MfnCp1uPJfcDsJ90QJ+sLks1IS
-         oBO7/hJtl/xkB2Yru1+nV5kO/BXOl7BfUmj8h0usKN2qBoNXnTKwwDB+I0u5HGo+vTzw
-         NwkshyNjZ1ZsTMYTcallp3qzbyqzncDvh1VQh7nn5bO0EdU7E3dGCIxzSV19FEbfCsnQ
-         MwGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695022998; x=1695627798;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hQ1AMQXZDD2nNPL5JTNkWkTCq0W5XECwYQbbG++9SbE=;
-        b=va4P0awMIeHyW4yXxYJX/4j+jl6gdK3PE2X1naJrZISdapFTrLtR1jOretufEfPVT5
-         WKEO5VrfgT7N8XUSRDPhKJxt2hCpv5FGxScL1SsrzGpvjRYjujHmSdNzGfj0NNWTSaPO
-         //Idg1kLZTN8XKZBuugbihcseE3yw9PHsDQ9q2F7BNt+L7E5dsNOAlXqjcI0DAOwdZTw
-         JaaHIFjlCU8CHtvUhwDvT4e41YrZ5bGkDx6S9cCF7vNiBnI8kI2rNEPGdI4Cti0gdOBx
-         djLYU83+VJ1kb8wqz3zL5IQouZSa6sBkvCCu0rVoA+m0JZ2VA2CQjlg0bn8Tc6dBmn9Q
-         v23w==
-X-Gm-Message-State: AOJu0YxbFNa7JF+kn14xI1vcncDc8iBOmgPN53c8iN8RyHaHkmOcqLiz
-	X52/qki1x3i+iLXF1UgGgbkxkBz2ONA=
-X-Google-Smtp-Source: AGHT+IEDBCQpmQ+p16mUQkVOKVVZMktRIQbt/FZb0PKGH+dOGeDuATfVTdispUnZpIH+lvgx9iWqzg==
-X-Received: by 2002:a17:902:6548:b0:1c4:2b87:76f0 with SMTP id d8-20020a170902654800b001c42b8776f0mr6726454pln.47.1695022997683;
-        Mon, 18 Sep 2023 00:43:17 -0700 (PDT)
-Received: from debian.me ([103.124.138.83])
-        by smtp.gmail.com with ESMTPSA id l20-20020a170903005400b001c420afa03bsm6653203pla.109.2023.09.18.00.43.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Sep 2023 00:43:17 -0700 (PDT)
-Received: by debian.me (Postfix, from userid 1000)
-	id 7784A80253C9; Mon, 18 Sep 2023 14:43:14 +0700 (WIB)
-Date: Mon, 18 Sep 2023 14:43:14 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Stephen Rothwell <sfr@canb.auug.org.au>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Linux Networking <netdev@vger.kernel.org>
-Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jiri Pirko <jiri@nvidia.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: Re: linux-next: build warnings after merge of the net-next tree
-Message-ID: <ZQf_kmZZYGFJFZMp@debian.me>
-References: <20230918131521.155e9e63@canb.auug.org.au>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EC3E23A7
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 07:54:47 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 740483A82;
+	Mon, 18 Sep 2023 00:53:00 -0700 (PDT)
+Received: from kwepemm600007.china.huawei.com (unknown [172.30.72.54])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Rpxlv5B87zVky9;
+	Mon, 18 Sep 2023 15:50:03 +0800 (CST)
+Received: from localhost.localdomain (10.67.165.2) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Mon, 18 Sep 2023 15:52:58 +0800
+From: Jijie Shao <shaojijie@huawei.com>
+To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <shenjian15@huawei.com>, <wangjie125@huawei.com>,
+	<liuyonglong@huawei.com>, <shaojijie@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH V2 net 0/5] There are some bugfix for the HNS3 ethernet driver
+Date: Mon, 18 Sep 2023 15:48:35 +0800
+Message-ID: <20230918074840.2650978-1-shaojijie@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="2HGzqmuLZ58rv3ET"
-Content-Disposition: inline
-In-Reply-To: <20230918131521.155e9e63@canb.auug.org.au>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.67.165.2]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
+X-CFilter-Loop: Reflected
 
+There are some bugfix for the HNS3 ethernet driver
 
---2HGzqmuLZ58rv3ET
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+---
+ChangeLog:
+v1->v2:
+  add Fixes tag for bugfix patch suggested by Simon Horman
+  v1: https://lore.kernel.org/all/20230915095305.422328-1-shaojijie@huawei.com/
+---
+	
+Jian Shen (1):
+  net: hns3: only enable unicast promisc when mac table full
 
-On Mon, Sep 18, 2023 at 01:15:21PM +1000, Stephen Rothwell wrote:
-> Hi all,
->=20
-> After merging the net-next tree, today's linux-next build (htmldocs)
-> produced these warnings:
->=20
-> Documentation/driver-api/dpll.rst:427: ERROR: Error in "code-block" direc=
-tive:
-> maximum 1 argument(s) allowed, 18 supplied.
->=20
-> .. code-block:: c
->         static const struct dpll_device_ops dpll_ops =3D {
->                 .lock_status_get =3D ptp_ocp_dpll_lock_status_get,
->                 .mode_get =3D ptp_ocp_dpll_mode_get,
->                 .mode_supported =3D ptp_ocp_dpll_mode_supported,
->         };
->=20
->         static const struct dpll_pin_ops dpll_pins_ops =3D {
->                 .frequency_get =3D ptp_ocp_dpll_frequency_get,
->                 .frequency_set =3D ptp_ocp_dpll_frequency_set,
->                 .direction_get =3D ptp_ocp_dpll_direction_get,
->                 .direction_set =3D ptp_ocp_dpll_direction_set,
->                 .state_on_dpll_get =3D ptp_ocp_dpll_state_get,
->         };
-> Documentation/driver-api/dpll.rst:444: ERROR: Error in "code-block" direc=
-tive:
-> maximum 1 argument(s) allowed, 21 supplied.
->=20
-> .. code-block:: c
->         clkid =3D pci_get_dsn(pdev);
->         bp->dpll =3D dpll_device_get(clkid, 0, THIS_MODULE);
->         if (IS_ERR(bp->dpll)) {
->                 err =3D PTR_ERR(bp->dpll);
->                 dev_err(&pdev->dev, "dpll_device_alloc failed\n");
->                 goto out;
->         }
->=20
->         err =3D dpll_device_register(bp->dpll, DPLL_TYPE_PPS, &dpll_ops, =
-bp);
->         if (err)
->                 goto out;
->=20
->         for (i =3D 0; i < OCP_SMA_NUM; i++) {
->                 bp->sma[i].dpll_pin =3D dpll_pin_get(clkid, i, THIS_MODUL=
-E, &bp->sma[i].dpll_prop);
->                 if (IS_ERR(bp->sma[i].dpll_pin)) {
->                         err =3D PTR_ERR(bp->dpll);
->                         goto out_dpll;
->                 }
->=20
->                 err =3D dpll_pin_register(bp->dpll, bp->sma[i].dpll_pin, =
-&dpll_pins_ops,
->                                         &bp->sma[i]);
->                 if (err) {
->                         dpll_pin_put(bp->sma[i].dpll_pin);
->                         goto out_dpll;
->                 }
->         }
-> Documentation/driver-api/dpll.rst:474: ERROR: Error in "code-block" direc=
-tive:
-> maximum 1 argument(s) allowed, 12 supplied.
->=20
-> .. code-block:: c
->         while (i) {
->                 --i;
->                 dpll_pin_unregister(bp->dpll, bp->sma[i].dpll_pin, &dpll_=
-pins_ops, &bp->sma[i]);
->                 dpll_pin_put(bp->sma[i].dpll_pin);
->         }
->         dpll_device_put(bp->dpll);
->=20
->=20
-> Introduced by commit
->=20
->   dbb291f19393 ("dpll: documentation on DPLL subsystem interface")
->=20
+Jie Wang (3):
+  net: hns3: add cmdq check for vf periodic service task
+  net: hns3: fix GRE checksum offload issue
+  net: hns3: add 5ms delay before clear firmware reset irq source
 
-Oops, I forgot to review dpll series. Will fix.
+Jijie Shao (1):
+  net: hns3: fix fail to delete tc flower rules during reset issue
 
-Thanks for the report!
+ drivers/net/ethernet/hisilicon/hns3/hns3_enet.c     |  9 +++++++++
+ .../net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c | 13 ++++++++++++-
+ .../ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c   |  3 ++-
+ 3 files changed, 23 insertions(+), 2 deletions(-)
 
---=20
-An old man doll... just what I always wanted! - Clara
+-- 
+2.30.0
 
---2HGzqmuLZ58rv3ET
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZQf/kQAKCRD2uYlJVVFO
-owpFAQDeSFN9OdEsaDy/jOpQeC1tlHJPmMMw0OSh6ecH4jsgnwD/Wz8SwPC9Njxd
-c/6VShwmyFiw0/K6EV85jAIXC7PqMgQ=
-=u2w5
------END PGP SIGNATURE-----
-
---2HGzqmuLZ58rv3ET--
 
