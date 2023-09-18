@@ -1,53 +1,49 @@
-Return-Path: <netdev+bounces-34776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64F457A5480
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 22:53:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E41A87A5455
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 22:47:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CB761C209F9
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 20:53:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49BFF281312
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 20:47:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFE4031A7E;
-	Mon, 18 Sep 2023 20:43:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F09128DB0;
+	Mon, 18 Sep 2023 20:42:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 804D030F83
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:42:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7799127EDC
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:42:52 +0000 (UTC)
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 058C7112
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:42:57 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D186D10D
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:42:50 -0700 (PDT)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiL4u-0007HW-So; Mon, 18 Sep 2023 22:42:44 +0200
+	id 1qiL4v-0007Hx-4S; Mon, 18 Sep 2023 22:42:45 +0200
 Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiL4t-007Ijg-Ez; Mon, 18 Sep 2023 22:42:43 +0200
+	id 1qiL4t-007Ijk-Og; Mon, 18 Sep 2023 22:42:43 +0200
 Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiL4t-002mpT-5Y; Mon, 18 Sep 2023 22:42:43 +0200
+	id 1qiL4t-002mpW-ES; Mon, 18 Sep 2023 22:42:43 +0200
 From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	UNGLinuxDriver@microchip.com,
-	netdev@vger.kernel.org,
+Cc: netdev@vger.kernel.org,
 	kernel@pengutronix.de
-Subject: [PATCH net-next 35/54] net: ethernet: mscc: Convert to platform remove callback returning void
-Date: Mon, 18 Sep 2023 22:42:07 +0200
-Message-Id: <20230918204227.1316886-36-u.kleine-koenig@pengutronix.de>
+Subject: [PATCH net-next 36/54] net: ethernet: natsemi: Convert to platform remove callback returning void
+Date: Mon, 18 Sep 2023 22:42:08 +0200
+Message-Id: <20230918204227.1316886-37-u.kleine-koenig@pengutronix.de>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230918204227.1316886-1-u.kleine-koenig@pengutronix.de>
 References: <20230918204227.1316886-1-u.kleine-koenig@pengutronix.de>
@@ -58,7 +54,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1889; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=22evVWLmAieIL0TkeUtwIoAuUdqsBU76Qw6kgaIyxk8=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlCLYL0YR9fH1Bq9++n/ivdFt0DxdKdW68fPlIp F9h04n7t+WJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZQi2CwAKCRCPgPtYfRL+ Tt2kB/90MC4zv19JjLc5oSmIlXex0qZTGC/YjSBTILY8khPPJxRt7EUNeiOgUfEj9eH98axeJx+ e0J6lm7QIV+5Dmrnqte8aoZjTKxeYb0DNgN5vOEJGT8ubdyIWgwR6mLBnN0yC6ZB1oemEWRjId6 TxKXTbwRs2KJtyJ0vVEJcV7PBBXvZOtbjkkzzo3ZFf1z6izHAOB4+f/aPnelA2ehsZAw6c3VC3Q nd41gJyjnhnpuqbAmt2jbVEV0W0/O16Xv9yGasXu1cyfRqEPkd+3Eca6kYDFzVA2cWnSefvn3cv 2gfhYGXGk8DHb2ImNVCDBdpq/jR9UGVqrb/DWVn9VDTyf0OA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3021; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=6ut+ktGhprMg3ZA7qKOu98KV3jC7LLvQZXddHHVD/RI=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlCLYMJdMMqoYv6IZKA09L3FHlMQInBYS1Cb6a1 eBWdTrBclWJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZQi2DAAKCRCPgPtYfRL+ TtveB/9aeqcXKv52xoy3Q/7JaiLRff6bIUFaYsGtSLVkS1tG+ld02ZHYPhHjH4eWUpZUYXS3g+t 4MgoQLGI/U30q3hpQkKXbU3RPnsxTwyHHRxK5yaLup/ZZ0f8+riK+QDI9FrxElRSTcgC1aIQtzO nfX8wap3FhDdzUcE3FcykuKl3Rxpx35wZjqaEedZvzJCDjuvOGHdmYtUE0aHzCCVQVWogEykRf7 TdjV48NoTIEQ+X24YoeGgHWvMfcKyCyTEO4IXOy9e7Tx0UodRhd49PmSp4FZhtrFOASFZej7/lS /UoC1uznYnPSO/DALbQNjn4eILSRwFDhie6UOywmmGDjdgLP
 X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
@@ -79,42 +75,71 @@ void. In the first step of this quest all drivers are converted to
 .remove_new() which already returns void. Eventually after all drivers
 are converted, .remove_new() is renamed to .remove().
 
-Trivially convert this driver from always returning zero in the remove
+Trivially convert these drivers from always returning zero in the remove
 callback to the void returning variant.
 
 Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 ---
- drivers/net/ethernet/mscc/ocelot_vsc7514.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/natsemi/jazzsonic.c | 6 ++----
+ drivers/net/ethernet/natsemi/macsonic.c  | 6 ++----
+ 2 files changed, 4 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/mscc/ocelot_vsc7514.c b/drivers/net/ethernet/mscc/ocelot_vsc7514.c
-index 151b42465348..993212c3a7da 100644
---- a/drivers/net/ethernet/mscc/ocelot_vsc7514.c
-+++ b/drivers/net/ethernet/mscc/ocelot_vsc7514.c
-@@ -392,7 +392,7 @@ static int mscc_ocelot_probe(struct platform_device *pdev)
- 	return err;
- }
+diff --git a/drivers/net/ethernet/natsemi/jazzsonic.c b/drivers/net/ethernet/natsemi/jazzsonic.c
+index 3f371faeb6d0..2b6e097df28f 100644
+--- a/drivers/net/ethernet/natsemi/jazzsonic.c
++++ b/drivers/net/ethernet/natsemi/jazzsonic.c
+@@ -227,7 +227,7 @@ MODULE_ALIAS("platform:jazzsonic");
  
--static int mscc_ocelot_remove(struct platform_device *pdev)
-+static void mscc_ocelot_remove(struct platform_device *pdev)
+ #include "sonic.c"
+ 
+-static int jazz_sonic_device_remove(struct platform_device *pdev)
++static void jazz_sonic_device_remove(struct platform_device *pdev)
  {
- 	struct ocelot *ocelot = platform_get_drvdata(pdev);
- 
-@@ -408,13 +408,11 @@ static int mscc_ocelot_remove(struct platform_device *pdev)
- 	unregister_switchdev_notifier(&ocelot_switchdev_nb);
- 	unregister_netdevice_notifier(&ocelot_netdevice_nb);
- 	devlink_free(ocelot->devlink);
+ 	struct net_device *dev = platform_get_drvdata(pdev);
+ 	struct sonic_local* lp = netdev_priv(dev);
+@@ -237,13 +237,11 @@ static int jazz_sonic_device_remove(struct platform_device *pdev)
+ 	                  lp->descriptors, lp->descriptors_laddr);
+ 	release_mem_region(dev->base_addr, SONIC_MEM_SIZE);
+ 	free_netdev(dev);
 -
 -	return 0;
  }
  
- static struct platform_driver mscc_ocelot_driver = {
- 	.probe = mscc_ocelot_probe,
--	.remove = mscc_ocelot_remove,
-+	.remove_new = mscc_ocelot_remove,
+ static struct platform_driver jazz_sonic_driver = {
+ 	.probe	= jazz_sonic_probe,
+-	.remove	= jazz_sonic_device_remove,
++	.remove_new = jazz_sonic_device_remove,
+ 	.driver	= {
+ 		.name	= jazz_sonic_string,
+ 	},
+diff --git a/drivers/net/ethernet/natsemi/macsonic.c b/drivers/net/ethernet/natsemi/macsonic.c
+index b16f7c830f9b..2fc63860dbdb 100644
+--- a/drivers/net/ethernet/natsemi/macsonic.c
++++ b/drivers/net/ethernet/natsemi/macsonic.c
+@@ -532,7 +532,7 @@ MODULE_ALIAS("platform:macsonic");
+ 
+ #include "sonic.c"
+ 
+-static int mac_sonic_platform_remove(struct platform_device *pdev)
++static void mac_sonic_platform_remove(struct platform_device *pdev)
+ {
+ 	struct net_device *dev = platform_get_drvdata(pdev);
+ 	struct sonic_local* lp = netdev_priv(dev);
+@@ -541,13 +541,11 @@ static int mac_sonic_platform_remove(struct platform_device *pdev)
+ 	dma_free_coherent(lp->device, SIZEOF_SONIC_DESC * SONIC_BUS_SCALE(lp->dma_bitmode),
+ 	                  lp->descriptors, lp->descriptors_laddr);
+ 	free_netdev(dev);
+-
+-	return 0;
+ }
+ 
+ static struct platform_driver mac_sonic_platform_driver = {
+ 	.probe  = mac_sonic_platform_probe,
+-	.remove = mac_sonic_platform_remove,
++	.remove_new = mac_sonic_platform_remove,
  	.driver = {
- 		.name = "ocelot-switch",
- 		.of_match_table = mscc_ocelot_match,
+ 		.name = "macsonic",
+ 	},
 -- 
 2.40.1
 
