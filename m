@@ -1,97 +1,109 @@
-Return-Path: <netdev+bounces-34435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81F8D7A42A5
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 09:34:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF7777A42F8
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 09:40:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A72D281DC9
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 07:34:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBE8B1C210B8
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 07:40:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1CD379FD;
-	Mon, 18 Sep 2023 07:31:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 425E079FD;
+	Mon, 18 Sep 2023 07:40:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9E4F14AAD
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 07:31:39 +0000 (UTC)
-Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33E5A197;
-	Mon, 18 Sep 2023 00:31:28 -0700 (PDT)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.nyi.internal (Postfix) with ESMTP id 9D4C65C0152;
-	Mon, 18 Sep 2023 03:31:27 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute5.internal (MEProxy); Mon, 18 Sep 2023 03:31:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm2; t=1695022287; x=1695108687; bh=YTcyWiGsDcH3h
-	DR+6efIJUv0XVuW7F54zGUEX+HekeE=; b=XeFZt4k3yxxKIxg7+9pecr1XxHAdB
-	uoruOhrzc1asSfE4JphaRxshTnvuTSond3JWHvfRLEH+nN+XJ8RaXfzE/Iz7UaNH
-	srdBS5GfO5VonagRvQVR++8rCrm1mTGw5GHKiHjqHuuhAoKspd38YveDTbF1sE3e
-	41wNcJ1s3ejc2SSJgTEM8TIxmYYe2BoNu5puI2zoU0WAt2tseXa5IogAMUc3M8rZ
-	Rs3IREi4eWiqYD4HLxyZOUF+ssc+Jo2IyZ5maOiQUjg/n/fzMaUrHiSUceCPzZhR
-	HWpoCqbu+9c3QqOE+jba1Ce+zzJU1bDWZo7ZK6WeRR0MvrRoqXgq98qHw==
-X-ME-Sender: <xms:z_wHZdiqpsmq6FbcYpWTc350Oo2xIXJG0ajGWxdeYJKvvox-B-HGHQ>
-    <xme:z_wHZSDqirBuP4o_lDLr-Z30pQ-osGbstWCoa3_eqTBBzAeyt51gMhtZwVDvAPeE7
-    U_yH5fRPgAj-rk>
-X-ME-Received: <xmr:z_wHZdHHXobL1zAwrqfNfQFityIhTfi42c8-toBPOX-zhQV3oKCxBYMvvlF8ZHB_Ga_VadPE7J5J2feLAClHfk0bhk3MQw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrudejjedguddvfecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkugho
-    ucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrg
-    htthgvrhhnpedvudefveekheeugeeftddvveefgfduieefudeifefgleekheegleegjeej
-    geeghfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    hiughoshgthhesihguohhstghhrdhorhhg
-X-ME-Proxy: <xmx:z_wHZSRGcBV8QG7J_ccEk-4r5J-onpFW11kqVmxu0S_K-fDPcQB0yg>
-    <xmx:z_wHZaz5RR1g392IzmS-fkOW25IN8zWSr5zWyxAeMu4CVm-9MD0n7A>
-    <xmx:z_wHZY5ykig_eLZ9sOdBJT7NEzpgEiw0mrZn43yZjvDYAIZyT6HVZA>
-    <xmx:z_wHZZlGA_49A5j-D3VFJ371f3FatlZZeXjleRORcxdrYVw9mWQkRw>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 18 Sep 2023 03:31:26 -0400 (EDT)
-Date: Mon, 18 Sep 2023 10:31:23 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH][next] mlxsw: Use size_mul() in call to struct_size()
-Message-ID: <ZQf8y6RVobiGUyzZ@shredder>
-References: <ZQSqA80YyLQsnd1L@work>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CBBD79F4
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 07:40:49 +0000 (UTC)
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::225])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A1C230C2;
+	Mon, 18 Sep 2023 00:37:07 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 8BB8C1C000C;
+	Mon, 18 Sep 2023 07:37:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1695022623;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kMUXF3i8vZfKK4TTptUJRX/v1cTmR9n/zzTlrk9sT30=;
+	b=asePB56APJvEKxXg2/wykZhHucA9qXsW29IS7M3aPZVcYUoS8NiV9wGwSZqFJox37PN5ct
+	X6cmoE+pCJ3Csv2IiPARuibGhOiAVsPunAgkkWv4+wI0qpU5FNkGqwQoABj4Wg6lK091C6
+	I96m+MaaezZlseSbNfYxbqX3AZjgsv9/+RezEPZMh6lHGlk/4CKwDibrDzE+2XRZqyxpNF
+	4vogm0qInZgZTPKtwAr/uG7zLIE/UiMrPLes1Xa3JnESGqEOiOLhrdBA5deXVKHnncTkFG
+	wfPUvDs/3sW1uOugSZMKjAtOpMXQ782ZsN2OXcbbggMK9LK40MevTQwQ3Hfq5w==
+Date: Mon, 18 Sep 2023 09:36:59 +0200
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Stefan Schmidt <stefan@datenfreihafen.org>
+Cc: Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ netdev@vger.kernel.org, David Girault <david.girault@qorvo.com>, Romuald
+ Despres <romuald.despres@qorvo.com>, Frederic Blain
+ <frederic.blain@qorvo.com>, Nicolas Schodet <nico@ni.fr.eu.org>, Guilhem
+ Imberton <guilhem.imberton@qorvo.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH wpan-next v2 07/11] mac802154: Handle association
+ requests from peers
+Message-ID: <20230918093659.6488891a@xps-13>
+In-Reply-To: <7b9b1b97-7c02-06b3-7a84-db1f33784be3@datenfreihafen.org>
+References: <20230901170501.1066321-1-miquel.raynal@bootlin.com>
+	<20230901170501.1066321-8-miquel.raynal@bootlin.com>
+	<7b9b1b97-7c02-06b3-7a84-db1f33784be3@datenfreihafen.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZQSqA80YyLQsnd1L@work>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Sep 15, 2023 at 01:01:23PM -0600, Gustavo A. R. Silva wrote:
-> If, for any reason, the open-coded arithmetic causes a wraparound, the
-> protection that `struct_size()` adds against potential integer overflows
-> is defeated. Fix this by hardening call to `struct_size()` with `size_mul()`.
-> 
-> Fixes: 2285ec872d9d ("mlxsw: spectrum_acl_bloom_filter: use struct_size() in kzalloc()")
-> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+Hi Stefan,
 
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+> > +static int
+> > +mac802154_send_association_resp_locked(struct ieee802154_sub_if_data *=
+sdata,
+> > +				       struct ieee802154_pan_device *target,
+> > +				       struct ieee802154_assoc_resp_pl *assoc_resp_pl)
+> > +{
+> > +	u64 teaddr =3D swab64((__force u64)target->extended_addr);
+> > +	struct ieee802154_association_resp_frame frame =3D {};
+> > +	struct ieee802154_local *local =3D sdata->local;
+> > +	struct wpan_dev *wpan_dev =3D &sdata->wpan_dev;
+> > +	struct sk_buff *skb;
+> > +	int ret;
+> > +
+> > +	frame.mhr.fc.type =3D IEEE802154_FC_TYPE_MAC_CMD;
+> > +	frame.mhr.fc.security_enabled =3D 0;
+> > +	frame.mhr.fc.frame_pending =3D 0;
+> > +	frame.mhr.fc.ack_request =3D 1; /* We always expect an ack here */
+> > +	frame.mhr.fc.intra_pan =3D 1;
+> > +	frame.mhr.fc.dest_addr_mode =3D IEEE802154_EXTENDED_ADDRESSING;
+> > +	frame.mhr.fc.version =3D IEEE802154_2003_STD;
+> > +	frame.mhr.fc.source_addr_mode =3D IEEE802154_EXTENDED_ADDRESSING;
+> > +	frame.mhr.seq =3D 10; =20
+>=20
+> Where does the 10 come from and what is the meaning?
+
+Good point, that is a leftover from my earlier WIP versions. A few lines
+below this is overwritten by:
+
+	frame.mhr.seq =3D atomic_inc_return(&wpan_dev->dsn) & 0xFF;
+
+I'll of course drop the `seq =3D 10` line.
+
+Thanks,
+Miqu=C3=A8l
 
