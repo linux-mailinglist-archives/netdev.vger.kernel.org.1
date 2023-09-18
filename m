@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-34415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F26677A41C6
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 09:09:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E87367A41C9
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 09:10:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 294081C20DE7
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 07:09:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1ED8281E74
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 07:10:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C440748E;
-	Mon, 18 Sep 2023 07:09:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B407A79CB;
+	Mon, 18 Sep 2023 07:09:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 450027469;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 253527468;
 	Mon, 18 Sep 2023 07:09:06 +0000 (UTC)
 Received: from core.lopingdog.com (core.lopingdog.com [162.55.228.84])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5563711A;
-	Mon, 18 Sep 2023 00:08:36 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49DF212F;
+	Mon, 18 Sep 2023 00:08:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=lopingdog.com;
-	s=mail; t=1695020335;
-	bh=i/qzEeo8fc//u5Bc1P6x2eVPi43Lvo5cbbQc5SwjBEs=;
+	s=mail; t=1695020341;
+	bh=B+H2Yde7aQ0rvCr6RPca7aubuh7ZTcIKOPoviGVXPv0=;
 	h=Date:From:To:Subject:From;
-	b=XmF6He8xvOu8dvzWON+arINRODBSa6t6KE7srG2357M2cFSfN/9CS+R2zZ2gm5VE6
-	 AHD6pf1q2PD5hMg9if8+ItTwicMoqqffUHlnMsmJkWGO/sP2a0nhFuqBSpM8qBKFTD
-	 CnSVp60n+4kptVxOYjXSQC/J9DNY0b78kIAx9SM1CMcmxosdHJJ9LD9f8rI6iTVlB2
-	 tp8RHbVNLfdJUJagNXZIU7nknjj3bUCurvRQJHkmdMOhCn/GVGbRRsw0toBu5sIWGi
-	 dRCST4NTy5e2gHGM9XZNjbM2iw/Qwo4J4VEWbgmCONDMFNokrAEdV4cbiTJRNMAlOH
-	 EKsyMz+fRDjDA==
+	b=rDqZhCpgUfIbYop4ZntRaUeRm61s4VGfbZtCyuBwn4fOG9KdTwV7QPpV3il8e0gNw
+	 nABvEhOHMtrRDHPSRGb34Q8Uh2uT8yOhkUncYl5mXbFwKRGfdb59wfq0VIvrZCbx1V
+	 BW/+A89mRmjuJ8rTSlgZDAxghz+U5Tf62OU/ou1Hpc35iTtlgYBMsxcqebaYabIigf
+	 qfkmIp3WbkEf2HWX5iKvQ7PATaCs9MeWNzKdDzoNtvoOHp2i8/dZj0OJrj6Iyfe2Jy
+	 Pi8wbP6vzprNJcHeQZbFs+BHoFRDb9vUgOhK86ktXjozfc6S7bNFGqoume1WdGHzF5
+	 RruB7NM5zY9jQ==
 Received: from authenticated-user (core.lopingdog.com [162.55.228.84])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by core.lopingdog.com (Postfix) with ESMTPSA id 270594405E6;
-	Mon, 18 Sep 2023 01:58:54 -0500 (CDT)
-Date: Mon, 18 Sep 2023 01:58:52 -0500
+	by core.lopingdog.com (Postfix) with ESMTPSA id 3A2DA440CCF;
+	Mon, 18 Sep 2023 01:59:00 -0500 (CDT)
+Date: Mon, 18 Sep 2023 01:58:58 -0500
 From: Jay Monkman <jtm@lopingdog.com>
 To: devicetree@vger.kernel.org, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
 	Arndt Schuebel <Arndt.Schuebel@onsemi.com>
-Subject: [PATCH 1/4] dt-bindings: net: Add bindings for onsemi NCN26000 PHY
-Message-ID: <ZQf1LMnICzEnt9XK@lopingdog.com>
+Subject: [PATCH 2/4] dt-bindings: net: Add onsemi NCN26010 ethernet controller
+Message-ID: <ZQf1Mgb8lfHkB6rl@lopingdog.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,177 +60,78 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
-Add devicetree bindings for onsemi's NCN26000 10BASE-T1S PHY.
+Add devicetree bindings for onsemi's NCN26010 10BASE-T1S
+ethernet controller.
 
 Signed-off-by: Jay Monkman <jtm@lopingdog.com>
 ---
- .../bindings/net/onnn,ncn26000.yaml           | 177 ++++++++++++++++++
- 1 file changed, 177 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/onnn,ncn26000.yaml
+ .../devicetree/bindings/net/onnn,macphy.yaml  | 94 +++++++++++++++++++
+ 1 file changed, 94 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/onnn,macphy.yaml
 
-diff --git a/Documentation/devicetree/bindings/net/onnn,ncn26000.yaml b/Documentation/devicetree/bindings/net/onnn,ncn26000.yaml
+diff --git a/Documentation/devicetree/bindings/net/onnn,macphy.yaml b/Documentation/devicetree/bindings/net/onnn,macphy.yaml
 new file mode 100644
-index 000000000000..b0b1e1ea86f2
+index 000000000000..1813da81b95f
 --- /dev/null
-+++ b/Documentation/devicetree/bindings/net/onnn,ncn26000.yaml
-@@ -0,0 +1,177 @@
++++ b/Documentation/devicetree/bindings/net/onnn,macphy.yaml
+@@ -0,0 +1,94 @@
 +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 +%YAML 1.2
 +---
-+$id: http://devicetree.org/schemas/net/onnn,ncn26000.yaml#
++$id: http://devicetree.org/schemas/net/onnn,macphy.yaml#
 +$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
-+title: onsemi NCN26000 10BASE-T1S Ethernet PHY
++title: onsemi 10BASE-T1S Ethernet Controller
 +
 +maintainers:
 +  - Jay Monkman <jtm@lopingdog.com>
 +
 +description: |
-+  Bindings for onsemi NCN26000 10BASE-T1S ethernet PHY.
++  Bindings for onsemi 10BASE-T1S ethernet controller.
++
++  Supported devices:
++    ncn26010
 +
 +allOf:
-+  - $ref: ethernet-phy.yaml#
++  - $ref: ethernet-controller.yaml#
 +
 +properties:
-+  description: |
-+    Sets the transmitter amplitude gain. If not specified,
-+    gain is set to 1.0V (1v0)
-+  tx-gain:
-+    enum:
-+      - 1v1
-+      - 1v0
-+      - 0v9
-+      - 0v8
++  compatible:
++    const: onnn,ncn26010
 +
-+  tx-slew:
++  ctrl-protected:
 +    description: |
-+      Sets the slew rate of the TX line driver output. Defaults
-+      to slow if not set.
-+    enum:
-+      - fast
-+      - slow
-+
-+  dig-slew:
-+    description: |
-+      Sets the slew rate of the digital output pins. Defaults
-+      to slow if not set.
-+    enum:
-+      - fast
-+      - slow
-+
-+  cmc-comp:
-+    description: |
-+      Sets the common mode choke resistance (CMC compensation).
-+      Defaults to 0-0.5 ohm (0p25) if not set.
-+    enum:
-+      - 0p25
-+      - 1p38
-+      - 3p00
-+      - 3p37
-+
-+  plca-precedence:
-+    description: |
-+      Enables PLCA precedence mode. Defaults to off if not
-+      set.
++      Enables control data read/write protection mode.
 +    type: boolean
 +
-+  eni-mode:
++  poll-interval:
++    $ref: /schemas/types.yaml#/definitions/uint32
 +    description: |
-+      Enables Enhanced Noise Immunity mode. Defaults to off if
-+      not set.
-+    enum:
-+      - force-on
-+      - force-off
-+      - auto
++      Defines how often the MACPHY thread runs in milliseconds.
++      If not specified, a default value of 5 is used.
 +
-+  tx-pkt-loop:
++  tx-fcs-calc:
 +    description: |
-+      Enables packet loopback mode. Defaults to off is not set.
++      Enables driver calculation of the FCS on transmitted frames.
 +    type: boolean
 +
-+  unjab-tmr-disable:
++  rx-fcs-check:
 +    description: |
-+      Disables the Unjab Timer. When disabled, device transmission
-+      will be stopped due to a jabber error and only restarted on
-+      device reset. If not set, this defaults to enabled.
++      Enables driver checking of the FCS on received frames
 +    type: boolean
 +
-+  col-disable:
-+    description: |
-+      Disables collision masking. Defaults to enabled if not set.
-+    type: boolean
++  interrupts:
++    maxItems: 1
 +
-+  no-rx-delay:
-+    description: |
-+      Disables the RX internal path delay. Defaults to enabled if
-+      not set.
-+    type: boolean
++  reg:
++    maxItems: 1
 +
-+  dio0-fn:
-+    description: |
-+      Selects the DIO0 pin output function. Defaults to disabled if
-+      not set.
-+    enum:
-+      - sfd-tx
-+      - sfd-rx
-+      - sfd-rxtx
-+      - led-link
-+      - led-plca
-+      - led-tx
-+      - led-rx
-+      - led-rxtx
-+      - clk25m
++  mdio:
++    $ref: mdio.yaml#
++    unevaluatedProperties: false
 +
-+  dio0-pullup:
-+    description: |
-+      Enables the DIO0 pin pullup. Defaults to no pull up if not
-+      set.
-+    type: boolean
-+
-+  dio0-active-high:
-+    description: |
-+      Sets DIO0 pin output state. Defaults to low if not set
-+    type: boolean
-+
-+  dio0-slew:
-+    description: |
-+      Sets the slew rate of the DIO0 pin. Defaults to slow if not set.
-+    enum:
-+      - fast
-+      - slow
-+
-+  dio1-fn:
-+    description: |
-+      Selects the DIO1 pin output function. Defaults to disabled if
-+      not set.
-+    enum:
-+      - sfd-tx
-+      - sfd-rx
-+      - sfd-rxtx
-+      - led-link
-+      - led-plca
-+      - led-tx
-+      - led-rx
-+      - led-rxtx
-+      - clk25m
-+
-+  dio1-pullup:
-+    description: |
-+      Enables the DIO1 pin pullup. Defaults to no pull up if not
-+      set.
-+    type: boolean
-+
-+  dio1-active-high:
-+    description: |
-+      Sets DIO1 pin output state. Defaults to low if not set
-+    type: boolean
-+
-+  dio1-slew:
-+    description: |
-+      Sets the slew rate of the DIO1 pin. Defaults to slow if not set.
-+    enum:
-+      - fast
-+      - slow
++required:
++  - compatible
 +
 +additionalProperties: false
 +
@@ -240,15 +141,32 @@ index 000000000000..b0b1e1ea86f2
 +      #address-cells = <1>;
 +      #size-cells = <0>;
 +
-+      ephy0: ethernet-phy@0 {
-+        compatible = "ethernet-phy-ieee802.3-c22";
-+        reg = <0>;
-+        dio0-fn = "gpio";
-+        dio0-slew = "slow";
-+        dio1-fn = "gpio";
-+        dio1-slew = "slow";
-+        eni-enable;
-+        device_type = "ethernet-phy";
++      ethernet@0 {
++        compatible = "onnn,ncn26010";
++        reg = <0>; /* CE0 */
++        ctrl-protected;
++        tx-fcs-calc;
++        rx-fcs-check;
++        poll-interval = <5>;
++        pinctrl-names = "default";
++        pinctrl-0 = <&eth1_pins>;
++        interrupt-parent = <&gpio>;
++        interrupts = <25 0x2>;
++
++        mdio {
++          #address-cells = <1>;
++          #size-cells = <0>;
++
++          ephy0: ethernet-phy@0 {
++            compatible = "ethernet-phy-ieee802.3-c22";
++            reg = <0>;
++            dio0-fn = "gpio";
++            dio0-slew = "slow";
++            dio1-fn = "gpio";
++            dio1-slew = "slow";
++            eni-enable;
++          };
++        };
 +      };
 +    };
 -- 
