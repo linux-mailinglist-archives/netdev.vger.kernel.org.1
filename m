@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-34706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07B447A5313
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 21:26:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 35F007A5314
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 21:26:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7F6A281F76
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 19:26:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEFC9281EFC
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 19:26:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8043F273EE;
-	Mon, 18 Sep 2023 19:26:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF63327717;
+	Mon, 18 Sep 2023 19:26:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B3E733DF
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 19:26:14 +0000 (UTC)
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F29D7109
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 12:26:12 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1bf7423ef3eso35625525ad.3
-        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 12:26:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E542273EE
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 19:26:27 +0000 (UTC)
+Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1A99F7
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 12:26:25 -0700 (PDT)
+Received: by mail-pg1-x52c.google.com with SMTP id 41be03b00d2f7-564af0ac494so3526907a12.0
+        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 12:26:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1695065172; x=1695669972; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1695065185; x=1695669985; darn=vger.kernel.org;
         h=in-reply-to:from:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=upbhsuBw51iVni86hWnj3Ke1yI90CvVVZjYeoToLKX4=;
-        b=bZC0byqFCnyi3yeCt3ZEQ/zZzo5a4Esbqx6Q+lbPq1Sne2WKs1dZVAM6mfTNcIvNTF
-         TWr6a2wHezr+TwInC9wAAfHiQGB50TrEGzlywWGABTM5wzXYwIRkJZPXWgTNB3iCagW9
-         KlLahDX+Fjm9NG9IRCd8VmmUK0oj+qMsWTkRE=
+        bh=Atj+KHKBsiubKI/iBlzVZFMqNLycPCkkcWoMaIleutA=;
+        b=BMGznPPmxWo0xBK2HygG6Y6ZpBI2jpzz40Kbxnd4MUF2oKATNWRXTX8zNrLQMDzp7S
+         hnhsFOnmCnjBCVx5UWXy/n3uu2Lqe9TXR2+ld2RhxON18+dsgbUCcWPGLadGetGQKHSy
+         63Q4RulxT/8cMGKppiDNvN0xAHEf8dIncoSX0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695065172; x=1695669972;
+        d=1e100.net; s=20230601; t=1695065185; x=1695669985;
         h=in-reply-to:from:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=upbhsuBw51iVni86hWnj3Ke1yI90CvVVZjYeoToLKX4=;
-        b=pQY+PQCMImwiGl4eqZEmLEVitNHT+6X/wtoK0nEThp03wtWNnzAsxJ2BWc4h+Z8PKO
-         YgB5axTgYuHm1G26KYu9ddvQrqzK1ZsP7BWd5RTezRgQxiu14bifbLvvHXnjfj6Sp4gW
-         IRj89mtKd3TQO9Hn8dhkCrlSDfaG7+k97pw5oNH8C9UrtrivWe60tk/SOJaBSc5SXpdT
-         k4ODXgGDYMImutkbc7j12V28mdMnX1Cq6kfinOp6STgilymhk9DBtDlaP7ibqbhupEqP
-         7UwF4cpn/UxYBAnpuR2e2zHm7jQPX0MyGpFpdeZ9KcVSX/+qaJ3ycKQRa15e1b2hBPAm
-         LKcA==
-X-Gm-Message-State: AOJu0YxzmkKMVWPtt+jKxCJLtkQqItzqNw+Fhrf2XNTDwu7X+Ba4Ztts
-	B51RPNBjU+cVZTXp0GhGhvG60g==
-X-Google-Smtp-Source: AGHT+IHjjmwVzvHUnXMMiohf79BNDYu1LmRVzSk7uRLSIeFOazGfaCdZ7M0GY2ShXPTFIxc7nHmexQ==
-X-Received: by 2002:a17:903:24e:b0:1c4:abc:b85a with SMTP id j14-20020a170903024e00b001c40abcb85amr9774507plh.9.1695065172380;
-        Mon, 18 Sep 2023 12:26:12 -0700 (PDT)
+        bh=Atj+KHKBsiubKI/iBlzVZFMqNLycPCkkcWoMaIleutA=;
+        b=euKVoljnN4HguIuIndI9T5m/AOwIPgJlgTyFuifzbd+8IMZS8/g+FHCSC9+HA6/igv
+         h0+I2kZpe8TuQ5ZCdG3spxagg/koDOoM9CY4OlvgGMe3+liQ1angJ/C0/zJLqCIBZ0qK
+         caA9e6b17M1Qe8Onfj74UdRz6+TrnMUL0WrNolyQu9KS0GS2e7mZbvhcFk3/iwxiGDT+
+         MIDpH5c44hGw6PDzXCDn5Os7Vv/MpckoQZW5ldJHpyJTG9AMOWAfDKvXUtvqIlJZLsHn
+         mw5uVmhg0PHrcrqJFiXFGwN+J3vNhtkuKxVSsCbyqfN/A/pZv8Xd4qx97heDjcYRoc0E
+         rHEA==
+X-Gm-Message-State: AOJu0YzeSQbGqf+pL6CN6Wxced3GLYfHvL1yBOFThxMgl4btkgwLD3t8
+	FRA2fU0flsc3xLoqUtUBLDJ6Og==
+X-Google-Smtp-Source: AGHT+IHRj7LAn1jJjam0rkjLWm3boHeJ5+r3imB4ZnjImeVSzoOLIaAxmUqHebMu6x85CrTXx4LjXA==
+X-Received: by 2002:a05:6a21:338f:b0:152:1ce8:ce3a with SMTP id yy15-20020a056a21338f00b001521ce8ce3amr9901711pzb.18.1695065185276;
+        Mon, 18 Sep 2023 12:26:25 -0700 (PDT)
 Received: from [10.67.49.139] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id jc12-20020a17090325cc00b001bf574dd1fesm5314627plb.141.2023.09.18.12.26.11
+        by smtp.gmail.com with ESMTPSA id u4-20020a62ed04000000b0068fb9965036sm7384558pfh.109.2023.09.18.12.26.23
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Sep 2023 12:26:11 -0700 (PDT)
-Message-ID: <72cd2ae3-c49e-daad-7ba7-a6e90f72c8f7@broadcom.com>
-Date: Mon, 18 Sep 2023 12:26:10 -0700
+        Mon, 18 Sep 2023 12:26:24 -0700 (PDT)
+Message-ID: <548674c7-97ba-13d8-d2dd-d4aaf678063e@broadcom.com>
+Date: Mon, 18 Sep 2023 12:26:23 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,27 +62,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.15.1
-Subject: Re: [PATCH net-next 1/9] net: dsa: b53: Convert to platform remove
- callback returning void
+Subject: Re: [PATCH net-next 2/9] net: dsa: bcm_sf2: Convert to platform
+ remove callback returning void
 To: =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
  Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
 Cc: netdev@vger.kernel.org, kernel@pengutronix.de
 References: <20230918191916.1299418-1-u.kleine-koenig@pengutronix.de>
- <20230918191916.1299418-2-u.kleine-koenig@pengutronix.de>
+ <20230918191916.1299418-3-u.kleine-koenig@pengutronix.de>
 From: Florian Fainelli <florian.fainelli@broadcom.com>
-In-Reply-To: <20230918191916.1299418-2-u.kleine-koenig@pengutronix.de>
+In-Reply-To: <20230918191916.1299418-3-u.kleine-koenig@pengutronix.de>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000007d836f0605a71d0f"
+	boundary="00000000000041f1cf0605a71efc"
 X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---0000000000007d836f0605a71d0f
+--00000000000041f1cf0605a71efc
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
@@ -97,7 +97,7 @@ On 9/18/23 12:19, Uwe Kleine-König wrote:
 > .remove_new() which already returns void. Eventually after all drivers
 > are converted, .remove_new() is renamed to .remove().
 > 
-> Trivially convert these drivers from always returning zero in the remove
+> Trivially convert this driver from always returning zero in the remove
 > callback to the void returning variant.
 > 
 > Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
@@ -107,7 +107,7 @@ Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 Florian
 
 
---0000000000007d836f0605a71d0f
+--00000000000041f1cf0605a71efc
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -178,15 +178,15 @@ kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
 NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
 AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
 LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
-/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIAiEApkZ32YILKl6
-zrjzysVqRGcEQXT7JbBVbzz6pszFMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
-AQkFMQ8XDTIzMDkxODE5MjYxMlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
+/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIIay7ungboqn6w7g
+VBBCcRjJdeA7+1om+r+zW6ca/36IMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
+AQkFMQ8XDTIzMDkxODE5MjYyNVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
 AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
-MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBKcFReaGBMWKITk8IfX6/cZKQx9wSg9Kx7
-sXWu4HdkRkQG8aLOI9mG4F/soun5obcRshUxrLmQYk/4lM9vOk/7ZCVxD8C6alE0nz8BqNculSWJ
-y3u0JxXDzgEpGrZRKAa5kf/8bTXGnkG7poh8Yl56v7UbZarqZ7WcIoHfcRX/jWergRXufDofieFS
-f6UDJV3Vy5hIy0b2ufAFlQHvP3N7O3OZsSVcOJ1BwxtzzXZv3WlD67eGWP0uZ/FyFkONang+iogD
-KlttauveAIr/sHO5iY8dQsAQHaGEYpnXqyOX3y7IMMHolzh2xiEY2RlmeHnfIEb+2ngiHbB7RTvB
-Ska5
---0000000000007d836f0605a71d0f--
+MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQA3NLqaxVgB9ONykjMuz3HsK+JklZr2D+mq
+yAwch+LMDu4fPCnm77UPEvLKds2HeURvMTB63hO7YecJ/xYS7HUlW70LLwqrtdcAlGSSpE/U6Iu3
+5K6WlhtBE/gw3lMkgkzZJ23ESzr7vwXgXO2eZOrhrdmGVo+1I6p+HKna0PfC+mclOro5URFF5Qai
+wgRQfUjUrDzetzmdKzFF624AgUJHNxm+UKK4pCJax4k/iwyMfD6HRyAcBVTKkN7GuCmhvABdjKkC
+kx2k6j5O2MLso/b1IwD2DZRrT4WVDcyEnIurE5fgNqRpKQBcI+Lw7T32JoACapsme0C6YFjFwMjD
+UUMQ
+--00000000000041f1cf0605a71efc--
 
