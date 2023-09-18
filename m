@@ -1,172 +1,139 @@
-Return-Path: <netdev+bounces-34619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 819357A4DE3
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 18:02:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D70447A4DBE
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 17:58:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35C7E280C8B
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 16:02:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EDA62828D2
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 15:58:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75A7A20B05;
-	Mon, 18 Sep 2023 16:02:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19A1F208A3;
+	Mon, 18 Sep 2023 15:55:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20F27208A1
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 16:02:51 +0000 (UTC)
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2061e.outbound.protection.outlook.com [IPv6:2a01:111:f400:7eaa::61e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6245A2D69
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 09:01:22 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MiAaPAe9/4ngRWDpZOWigfkhL26B+8HNFlru8DQ0AizRinp5E9Xi1dPM5iH1Fj3Z9YbF5Ydahm4OFsm3WY5cm4fIphMmD47gSgA341a2R1vBCEVZ5i7dlw4gHGAUpX9Uvj+k+p9lJKbddPkiagAP4kG0Xfc/CpzW5NJpafJlW1eWCLYoUkz5ka8/xQ60GSl6xOOx8ndRYiC5oviB0Q02L4GpIDCZfA8iocqUcrM+13AYj1FwLGXDBi0ccIg4XS8ZXfpJv+iP/Kp153x97zPvMzAZTEb6kLeoZUcHvhHEYebPEWIbVsi1H4/6+4OMhAMEQFQYm67V4M1IELhG2RPDmA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3ONgcusYThNfdzAraX7j03g7dchPLesapLroz3L/uBo=;
- b=k/OmIRTOcsqFw2n7ZOEYDW5EPtVookH66V1fX4AaegN02dXBx+fG1Cnr6+KwDsiurm607DldwOdTIa2x04q1cnZYZRwr6JwtvUV4VodRiZssHlFBFXok/pZg9qZBBn9QDEjzktbfjDkn2UeJi7Db4NvqIXfuQwbbL7ykWp5Ekx5bux9KDt+d27Xl9hJLVIHkEft4WZoDLVHLVpyjRmBQ8RbdqTmNzXE5TC36Sz2tQhQ6fJ+KDEcE4iOTUYd+HNe7wCdSUCy28rqRkS8M0Zg5o1TlQQlgj1DBK78spzFeEH4XeaVcYzrCvhsv/vxU6BWlEpIrgBLfeKdaZ7t716Qwsw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3ONgcusYThNfdzAraX7j03g7dchPLesapLroz3L/uBo=;
- b=PvwoBa88lWMPG8PVzViMJHS1mpyW4j+dgvfeX6VZIsQQq7eCODG1I2IqOXSJIlV5Q7Za7ZBaacmfAQEbRZzfebnVTncm1PY7A5NZp6irINZIgz+mEIHcWIBhPFPhrZ40jSuJ2CeB93cpogs4A/Nkdh//V85NMhPOjIEuXXpxcHi4wRfsNkzc4o2402MVDjR7FEg8gWy1ovapwARX4FvKBDMUoBgb9UpQ7L4JTBiK0o+Rik71gbCmKIWDcLjufJwVxJqXbvlW6BblwxHr3YZo65t3GQFVRpWZ3uDpW22uWqBSYW2iG3BA+X/Xqr5e9acJqHy7SHrhuUaPSiwidraJCw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4373.namprd12.prod.outlook.com (2603:10b6:208:261::8)
- by BY5PR12MB4243.namprd12.prod.outlook.com (2603:10b6:a03:20f::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.26; Mon, 18 Sep
- 2023 15:41:51 +0000
-Received: from MN2PR12MB4373.namprd12.prod.outlook.com
- ([fe80::31e8:f2df:2902:443d]) by MN2PR12MB4373.namprd12.prod.outlook.com
- ([fe80::31e8:f2df:2902:443d%6]) with mapi id 15.20.6792.026; Mon, 18 Sep 2023
- 15:41:51 +0000
-From: Benjamin Poirier <bpoirier@nvidia.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Simon Horman <horms@kernel.org>,
-	Jiri Benc <jbenc@redhat.com>,
-	Gavin Li <gavinl@nvidia.com>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Vladimir Nikishkin <vladimir@nikishkin.pw>,
-	Li Zetao <lizetao1@huawei.com>,
-	Thomas Graf <tgraf@suug.ch>,
-	Tom Herbert <therbert@google.com>,
-	Roopa Prabhu <roopa@nvidia.com>
-Subject: [PATCH net] vxlan: Add missing entries to vxlan_get_size()
-Date: Mon, 18 Sep 2023 11:40:15 -0400
-Message-Id: <20230918154015.80722-1-bpoirier@nvidia.com>
-X-Mailer: git-send-email 2.40.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BYAPR11CA0106.namprd11.prod.outlook.com
- (2603:10b6:a03:f4::47) To MN2PR12MB4373.namprd12.prod.outlook.com
- (2603:10b6:208:261::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF5A22EF9
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 15:55:43 +0000 (UTC)
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7DB1E79
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 08:54:34 -0700 (PDT)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1c4084803f1so257585ad.0
+        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 08:54:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695052188; x=1695656988; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cDPvNTGnVzfWEnM2vQQWdbts3fJPWj+Kgd251XWPAzE=;
+        b=hberOvrBD04oMHFTZJqnFW0v+EtBjjG+1usW1y/je+A4FBF1C3SxllTwlkrCba8Mw1
+         37zU433LBaEd07UvystuwSPJnLAqKTpzDurpVb6VN08j22T73lRjAT0QwnkRoLsWTphh
+         vMyKGZf206Hcki/8ZdkSJ43Mb/9tF4zWmRlbeM2F4SWhOjWuQITCLDZKg9xj874I6jpR
+         mSHVzaWwDikAtfL0tJdc4qcHVXImMZYoMmXb2giunR01cBJWdmsvV25tVvP5iebAiWwg
+         oy+2k6dcwTDCyoCTczHNua/fueI/jHpbb6OkwHbbraKhGPL96Rsfi8IPp5fzmFWhBAF/
+         VGMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695052188; x=1695656988;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cDPvNTGnVzfWEnM2vQQWdbts3fJPWj+Kgd251XWPAzE=;
+        b=ULvfO/5310Fxc5a820nhC+B6bVdZeOSbSmtc4P4rOlDDDP1UCOfSGu0q608fp+lMFM
+         HQxZe1skpO7PIFZ+OBDficQzHq5JYnfN0NYNl/BNajNELCU+/cgQMNvHxsfeFfQLKAfL
+         wtjFsmFw7AV/5Kgv1EinshGmn9sp2nQ4bsLfZHk8tzNNppKhGzumr9OqUSIQNlCkJu+4
+         oDxlWLB5D9IylXlW7HttnQEE8P4laznThp+IFlsQOUqBBJQd8LZ3s7FK24yGTyiYwMu5
+         W6xPPdLZKS2v0lWqbUQRjFOEqL8MJy/S2tA3tGyoYOk7K1XVGrUUtHpA8fOiR5VfY4q7
+         LudQ==
+X-Gm-Message-State: AOJu0YwxBBNX9cXeQFC5FyIZKzFjCfvpdxDz7NujAC++R43Nx77M9B4L
+	Y4dj9uwfbMyQA0OTiI68YQzdT5nujC2TLnhItEIfhg==
+X-Google-Smtp-Source: AGHT+IHX1+2Zl+SQS6wfYua3ZBYCi72FsIZkYPIqSURf8Dthf3fUhwidvKwEQ1mfTRGHNrOVqA63S2x0HPiO3faeRNk=
+X-Received: by 2002:a17:902:d2cb:b0:1c5:59ea:84c3 with SMTP id
+ n11-20020a170902d2cb00b001c559ea84c3mr158871plc.21.1695052187709; Mon, 18 Sep
+ 2023 08:49:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN2PR12MB4373:EE_|BY5PR12MB4243:EE_
-X-MS-Office365-Filtering-Correlation-Id: 677ace90-45d0-44fd-cb56-08dbb85dc6b4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	NcwF/bF33JuR+uTqJbsbiImzlTpmGrwhmnl2C44d0O3vj7RJSWDZwZoY8J9NEkuXOtzMb1obBgqy23GZuZrPQz4wXbQ6mJsNITPX5QR0XZsEo6byG6TT9tclCzZ/9eRQju1XiF3GT5fTRVXOLVE/jWVxnVZwPDPCrmJJBVyCkGfuSANmbwPVySGGJuDhIqoS9RN+37Uaz601P2NhmxS6cRW/DGRB1M+4HEXfsCUxeQaIgeFpBG0TgGEkV9yq5iG+eE/IYFMe3nMRugwqG3ugMonDWP9cv38Bu9TILuiXax/VcJj/Eo9aOal3ugOIuyucc4kS8sxRxBr2vhPxzoozBiDsRKyNkHAzxlQzc9b8ZKyZz2vzUWhBilfHYkg4y9m04E7DlMcpzIkflGPwrzyNDW+tMtgZtkbnfciiNV4aaJUZO2+tPM1RxQmN5P4UfzvCsb15ERpZywteVT4UEWQNznCHtNxxsWv1lqMU+2F394+RsGfBJ7F2TzgGw7F4+rUiDg4KgbDl01VItTBkN5MhWOJYRVu5CuYM5Ruu0CA8u7tBcXBkyTTR8ohCoRT2nG+N
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4373.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(376002)(396003)(39860400002)(346002)(136003)(1800799009)(186009)(451199024)(5660300002)(26005)(107886003)(1076003)(8936002)(4326008)(8676002)(2616005)(2906002)(7416002)(86362001)(38100700002)(36756003)(83380400001)(66946007)(6506007)(6486002)(66476007)(54906003)(66556008)(6666004)(478600001)(6512007)(41300700001)(316002)(6916009);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?SBJ5a/eSxK6EtU8OC+dpqG4SVf+Iic4jSUpqk/ZOczun3o0UYXfI1Cxr4SBB?=
- =?us-ascii?Q?gjydC/WsQ4ndP2+xxIG2WA4vxucOraQUNgj74vMdQtYJdHvI8NKeU1mhMU4E?=
- =?us-ascii?Q?m1sIzONvj5xV4f0FpWnjsMq3QTJJur0XiMLECWbqoZBt21BwMBD0I7S2RW3t?=
- =?us-ascii?Q?uHxB4r58a8ED8lIcrTrNeH18sV5uLsBlHvenEcPaN+n+pSAAkVjbEYb5qEc5?=
- =?us-ascii?Q?0IoQ/iWXboGZ2U4aIe41IhbGCmxjkoTBx38PueYV1Hai0I/yrAZ43BGy3A5t?=
- =?us-ascii?Q?EjrCxvz5sgZwFmlPtG4IdhJXz3xZ23CFbLETW6epxWSzqBR/g3xJs1b7Jvvp?=
- =?us-ascii?Q?2ZrlVKANM9GOlVoRcRK3lD2vpEE+Wwb44r+zWjat7vT6Rhh3PnurE8bfEaHS?=
- =?us-ascii?Q?B9vDRtm2SFfLJ1yfK7efAPFwVvoBRN7SVJFBjt9QYwM170f/XQM3RhPKEM1a?=
- =?us-ascii?Q?rVa538SwrBzuIjji7IRNZfTNL68+78aVMoOk2H2ytwckP6FmLXXFpUYYOc/p?=
- =?us-ascii?Q?TMO1Xm9D23ZbgovWcs5mr6ClM5DSOOWDB12iZeC+pHOca4d6howkZwYS42C9?=
- =?us-ascii?Q?1hWuQImg+OH36PWpkqfAbITEIMfS1yvJLN+0itPd5/kmHNBnqkwo0v/wQB0t?=
- =?us-ascii?Q?BPulAndIE6zBvchmMHJ96R5h/sBaQviMoM8tDSpvGAjPyBqO6X5BsT0Ty6Hm?=
- =?us-ascii?Q?SzNGY7066nr2eFZo+KbXKehgqdzUOgcHSV4ZhqLi2YB8KTN9B/yovev2mAON?=
- =?us-ascii?Q?2vEr+KzW3I/9KwFGzMO1WVf6u9exiLxWLrOw3H78BtUTG3AGiUoCs4zevp/r?=
- =?us-ascii?Q?/dIgWxJfpndZpMri7j8Te2riwfOlwmB9BC/BRiqq7HZyl5Cz1f1dpbBJppGN?=
- =?us-ascii?Q?Xy2Zz4wSTojBj0IHix6simvz+bZBkFYh02Sqwa5GsgNdJ13C0nPO8TjJZEGZ?=
- =?us-ascii?Q?0e6NZL3yfo3S42/QBZGvbBGBl/mJvcCNqFpaloAgv4G2etqfsVcd2tHMZdPt?=
- =?us-ascii?Q?nHUgmn4VR29BK5pD/CbyhKjAvCdsFwr9slsM8kr/ro9WWmKnaeV+OIuDQMc9?=
- =?us-ascii?Q?/YWJzww/rneTs6lSWC/pYeB9AePQG2nUiT+b35NN/JKaDAwytMIrRkKRsrPT?=
- =?us-ascii?Q?MyTo92RaKvc0/8VQ5ECnjLait28S02goopvBqm5Mdstc5Wvp15oeNrOaqonq?=
- =?us-ascii?Q?7sGRU3b+sWDMojDETvSQ6jIZ2TDgYFxq95xsDRXPwJgQaa4HhaUKQs90NDaB?=
- =?us-ascii?Q?LmB3yCSSH6L4H/sM00krb37GUjT1flswvPuRb2Wu1dFAE+gbr0lHyh2nj+rT?=
- =?us-ascii?Q?Ezpt6Kqul37PsYqEdXfdLss0iWkCDA3ax/QxMH+se09qCFaYfSR5nDagUJU2?=
- =?us-ascii?Q?VYne+t5YPeIdQ4WHNXjOsx9dcDH2qiGT2WxQoMFhg6gvLpiD2vHcchrKEF7Y?=
- =?us-ascii?Q?9f+n2Mv4MsILsSCKCSX8PzgmJac1YC0QKVHDVqxG2N/JKsVKDCVwKpEu+v6R?=
- =?us-ascii?Q?qp/eBF6cYjjTdFljfQSoCeIiSyj0dOGZum7LeSSHA1TlzjEXb5T8ltYr8+Mn?=
- =?us-ascii?Q?8TvF1XvbJjiIbdTSR7wztdJl+nq8PT08+Tu0NgRa?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 677ace90-45d0-44fd-cb56-08dbb85dc6b4
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4373.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2023 15:41:50.9608
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: bDZChdKQ1T5/mSWwgxkE0E0/HaKjkV/r5HcBCy51Pf0lG23QAN5x4qhtUoLUBmQbibUtmSvIH5Hj+BtUNXVwbw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4243
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,RCVD_IN_DNSWL_BLOCKED,SPF_NONE autolearn=no
-	autolearn_force=no version=3.4.6
+References: <20230901062141.51972-1-wuyun.abel@bytedance.com>
+ <20230901062141.51972-4-wuyun.abel@bytedance.com> <8c470d4d-b972-3f43-9b0a-712ee882a402@bytedance.com>
+In-Reply-To: <8c470d4d-b972-3f43-9b0a-712ee882a402@bytedance.com>
+From: Shakeel Butt <shakeelb@google.com>
+Date: Mon, 18 Sep 2023 08:49:36 -0700
+Message-ID: <CALvZod4P3_726Jo_FAoDVTNrYcy1vgp67SSxix1=k8FEKoVM7g@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next 3/3] sock: Throttle pressure-aware sockets
+ under pressure
+To: Abel Wu <wuyun.abel@bytedance.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
+	Michal Hocko <mhocko@suse.com>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Yosry Ahmed <yosryahmed@google.com>, Yu Zhao <yuzhao@google.com>, 
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Kefeng Wang <wangkefeng.wang@huawei.com>, 
+	Yafang Shao <laoar.shao@gmail.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	Martin KaFai Lau <martin.lau@kernel.org>, Breno Leitao <leitao@debian.org>, 
+	Alexander Mikhalitsyn <alexander@mihalicyn.com>, David Howells <dhowells@redhat.com>, 
+	Jason Xing <kernelxing@tencent.com>, open list <linux-kernel@vger.kernel.org>, 
+	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>, "open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
+	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-There are some attributes added by vxlan_fill_info() which are not
-accounted for in vxlan_get_size(). Add them.
+On Mon, Sep 18, 2023 at 12:48=E2=80=AFAM Abel Wu <wuyun.abel@bytedance.com>=
+ wrote:
+>
+> On 9/1/23 2:21 PM, Abel Wu wrote:
+> > @@ -3087,8 +3100,20 @@ int __sk_mem_raise_allocated(struct sock *sk, in=
+t size, int amt, int kind)
+> >       if (sk_has_memory_pressure(sk)) {
+> >               u64 alloc;
+> >
+> > -             if (!sk_under_memory_pressure(sk))
+> > +             /* Be more conservative if the socket's memcg (or its
+> > +              * parents) is under reclaim pressure, try to possibly
+> > +              * avoid further memstall.
+> > +              */
+> > +             if (under_memcg_pressure)
+> > +                     goto suppress_allocation;
+> > +
+> > +             if (!sk_under_global_memory_pressure(sk))
+> >                       return 1;
+> > +
+> > +             /* Trying to be fair among all the sockets of same
+> > +              * protocal under global memory pressure, by allowing
+> > +              * the ones that under average usage to raise.
+> > +              */
+> >               alloc =3D sk_sockets_allocated_read_positive(sk);
+> >               if (sk_prot_mem_limits(sk, 2) > alloc *
+> >                   sk_mem_pages(sk->sk_wmem_queued +
+>
+> I totally agree with what Shakeel said in last reply and will try ebpf-
+> based solution to let userspace inject proper strategies. But IMHO the
+> above hunk is irrelevant to the idea of this patchset, and is the right
+> thing to do, so maybe worth a separate patch?
+>
+> This hunk originally passes the allocation when this socket is below
+> average usage even under global and/or memcg pressure. It makes sense
+> to do so under global pressure, as the 'average' is in the scope of
+> global, but it's really weird from a memcg's point of view. Actually
+> this pass condition was present before memcg pressure was introduced.
+>
+> Please correct me if I missed something, thanks!
+>
 
-I didn't find a way to trigger an actual problem from this miscalculation
-since there is usually extra space in netlink size calculations like
-if_nlmsg_size(); but maybe I just didn't search long enough.
+Please send the patch 1 and this hunk as separate patches with
+relevant motivation and reasoning.
 
-Fixes: 3511494ce2f3 ("vxlan: Group Policy extension")
-Fixes: e1e5314de08b ("vxlan: implement GPE")
-Fixes: 0ace2ca89cbd ("vxlan: Use checksum partial with remote checksum offload")
-Fixes: f9c4bb0b245c ("vxlan: vni filtering support on collect metadata device")
-Signed-off-by: Benjamin Poirier <bpoirier@nvidia.com>
----
- drivers/net/vxlan/vxlan_core.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-index e463f59e95c2..5b5597073b00 100644
---- a/drivers/net/vxlan/vxlan_core.c
-+++ b/drivers/net/vxlan/vxlan_core.c
-@@ -4331,6 +4331,10 @@ static size_t vxlan_get_size(const struct net_device *dev)
- 		nla_total_size(sizeof(__u8)) + /* IFLA_VXLAN_REMCSUM_TX */
- 		nla_total_size(sizeof(__u8)) + /* IFLA_VXLAN_REMCSUM_RX */
- 		nla_total_size(sizeof(__u8)) + /* IFLA_VXLAN_LOCALBYPASS */
-+		nla_total_size(0) + /* IFLA_VXLAN_GBP */
-+		nla_total_size(0) + /* IFLA_VXLAN_GPE */
-+		nla_total_size(0) + /* IFLA_VXLAN_REMCSUM_NOPARTIAL */
-+		nla_total_size(sizeof(__u8)) + /* IFLA_VXLAN_VNIFILTER */
- 		0;
- }
- 
--- 
-2.40.1
-
+thanks,
+Shakeel
 
