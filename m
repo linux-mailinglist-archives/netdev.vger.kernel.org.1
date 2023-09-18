@@ -1,50 +1,53 @@
-Return-Path: <netdev+bounces-34764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EE137A5460
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 22:49:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6766E7A5464
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 22:50:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0846F2817D1
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 20:49:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FFA2281A85
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 20:50:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 920792AB32;
-	Mon, 18 Sep 2023 20:42:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E55E30F8D;
+	Mon, 18 Sep 2023 20:42:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 490CB28DCD
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:42:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7756C28E19
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:42:56 +0000 (UTC)
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63938129
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:42:53 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59949114
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:42:55 -0700 (PDT)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiL4s-0007Cb-Jo; Mon, 18 Sep 2023 22:42:42 +0200
+	id 1qiL4t-0007DC-5s; Mon, 18 Sep 2023 22:42:43 +0200
 Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiL4r-007IjB-C7; Mon, 18 Sep 2023 22:42:41 +0200
+	id 1qiL4r-007IjF-J1; Mon, 18 Sep 2023 22:42:41 +0200
 Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiL4r-002mox-2h; Mon, 18 Sep 2023 22:42:41 +0200
+	id 1qiL4r-002mp1-9i; Mon, 18 Sep 2023 22:42:41 +0200
 From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>
-Cc: Hauke Mehrtens <hauke@hauke-m.de>,
+Cc: Karol Gugala <kgugala@antmicro.com>,
+	Mateusz Holenko <mholenko@antmicro.com>,
+	Gabriel Somlo <gsomlo@gmail.com>,
+	Joel Stanley <joel@jms.id.au>,
 	netdev@vger.kernel.org,
 	kernel@pengutronix.de
-Subject: [PATCH net-next 27/54] net: ethernet: lantiq_xrx200: Convert to platform remove callback returning void
-Date: Mon, 18 Sep 2023 22:41:59 +0200
-Message-Id: <20230918204227.1316886-28-u.kleine-koenig@pengutronix.de>
+Subject: [PATCH net-next 28/54] net: ethernet: litex: Convert to platform remove callback returning void
+Date: Mon, 18 Sep 2023 22:42:00 +0200
+Message-Id: <20230918204227.1316886-29-u.kleine-koenig@pengutronix.de>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230918204227.1316886-1-u.kleine-koenig@pengutronix.de>
 References: <20230918204227.1316886-1-u.kleine-koenig@pengutronix.de>
@@ -55,7 +58,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1893; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=eZZJj8wgEkKjxcNfIbS+dUY9QueSKUQEBs8J06zBGyc=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlCLYCxQFrfJRLg9lq9JiZPmhQcI7QUZ1TR2FxO fv1Kze36GmJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZQi2AgAKCRCPgPtYfRL+ Tiz2B/9EM71/+ohatgE2H1SD6ipbjd6p7FExO4B7ZMKlYpKBL6sk18RJ3v6YAUuPSQQgAvftFjt TTfgs/TGCK4WVYxxCjhnK1vmxlhhZvIY9o7YBEjGdcdJ8/fTr5siywfLLRHnJZUG1NPR1v7SZsS YQQjCChQuRiSIN7EqQfS44NThI7RrBKrL+iBMx5o9aIV4sQetS6OUjEPP+AFKC4uBfphY/7W15S 1YEwts7TsbvWbU1KBG8T5BDmlKZd+1QgdZ5x3FN3aUcSsnN4Z1GhvkE+e1xorVpLWimJGE7XnOk fMhx5yZUIZXfhPBuQoZu5DC8f8b10BZ71JTF3gdrI/6wALzS
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1783; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=aQglZgd0ygWtA7gJafMxEm+rRJmVjv1HaiZLakW2nlY=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlCLYEU8XBlCF2tQyLp1Rb84vAM8uAUNd80eH+O WmvwG8qs1KJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZQi2BAAKCRCPgPtYfRL+ TtzrB/sHH6W6e1wSVTXve47e8YdDUPK7atGineKlb8HiJ8q5MCH6bDPbvTE0CIKmzGeZ4e+mVe/ 6ubr16/cqbWw1uWnv4aFH1KW+A7LD8gJ7bcKoE97mqdztEjgAxUuZqEmkfQidnD+nATWgKULDMM YjXisqK+NjLkpvKGvr+PdaZUcXxIa0GOyRscHHqcXvSSQWuu6/Hf5DIlrSvW7b1Y2QqZv9zCIW9 6v7vvK4r03dZnHKpw0iBkTY2ebVgfIVaicHNV1FHskbAv7eQ4OtG5VGpQOBZfCBVup7cKQ8v3BR 35UVNxadBrC4mlNLy/XABS0YvGmqEEFBlhnKDCBKjZIM2syQ
 X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
@@ -81,40 +84,37 @@ callback to the void returning variant.
 
 Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 ---
- drivers/net/ethernet/lantiq_xrx200.c | 6 ++----
+ drivers/net/ethernet/litex/litex_liteeth.c | 6 ++----
  1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/lantiq_xrx200.c b/drivers/net/ethernet/lantiq_xrx200.c
-index 8d646c7f8c82..8bd4def3622e 100644
---- a/drivers/net/ethernet/lantiq_xrx200.c
-+++ b/drivers/net/ethernet/lantiq_xrx200.c
-@@ -641,7 +641,7 @@ static int xrx200_probe(struct platform_device *pdev)
- 	return err;
+diff --git a/drivers/net/ethernet/litex/litex_liteeth.c b/drivers/net/ethernet/litex/litex_liteeth.c
+index ffa96059079c..5182fe737c37 100644
+--- a/drivers/net/ethernet/litex/litex_liteeth.c
++++ b/drivers/net/ethernet/litex/litex_liteeth.c
+@@ -294,13 +294,11 @@ static int liteeth_probe(struct platform_device *pdev)
+ 	return 0;
  }
  
--static int xrx200_remove(struct platform_device *pdev)
-+static void xrx200_remove(struct platform_device *pdev)
+-static int liteeth_remove(struct platform_device *pdev)
++static void liteeth_remove(struct platform_device *pdev)
  {
- 	struct xrx200_priv *priv = platform_get_drvdata(pdev);
- 	struct net_device *net_dev = priv->net_dev;
-@@ -659,8 +659,6 @@ static int xrx200_remove(struct platform_device *pdev)
+ 	struct net_device *netdev = platform_get_drvdata(pdev);
  
- 	/* shut down hardware */
- 	xrx200_hw_cleanup(priv);
+ 	unregister_netdev(netdev);
 -
 -	return 0;
  }
  
- static const struct of_device_id xrx200_match[] = {
-@@ -671,7 +669,7 @@ MODULE_DEVICE_TABLE(of, xrx200_match);
+ static const struct of_device_id liteeth_of_match[] = {
+@@ -311,7 +309,7 @@ MODULE_DEVICE_TABLE(of, liteeth_of_match);
  
- static struct platform_driver xrx200_driver = {
- 	.probe = xrx200_probe,
--	.remove = xrx200_remove,
-+	.remove_new = xrx200_remove,
+ static struct platform_driver liteeth_driver = {
+ 	.probe = liteeth_probe,
+-	.remove = liteeth_remove,
++	.remove_new = liteeth_remove,
  	.driver = {
- 		.name = "lantiq,xrx200-net",
- 		.of_match_table = xrx200_match,
+ 		.name = DRV_NAME,
+ 		.of_match_table = liteeth_of_match,
 -- 
 2.40.1
 
