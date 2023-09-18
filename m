@@ -1,129 +1,144 @@
-Return-Path: <netdev+bounces-34624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34640-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 149D27A4E31
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 18:08:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF1A97A5073
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 19:06:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C11612829CD
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 16:08:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BE0C1C20FA3
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 17:06:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E09D721A14;
-	Mon, 18 Sep 2023 16:07:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81E3D23776;
+	Mon, 18 Sep 2023 17:06:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12CEE1D686
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 16:07:25 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35DA43C27
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 09:07:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=6I9X+hMZkpIvyrmqsaCZJRKh7zGVOklLLinjoyFNsW0=; b=QoNXlYNcZfvmq83i4UgbeQxRj5
-	hQtIoGTNBKTfgFgq7ztlfTzt5Fd32nkCGPB5gTjfkN+r+fKQbtCAZn03vEqKh6SdKvGJ//n9CAji5
-	tidofZrWbibiWSWspWhrrTu8/U5w6MTAb52njc793CiLpRoiMlRTa2eYjR8JGVht1Z+N12xkd8boO
-	ef1VmiHSsI7M3qAXhUjVQH3OiODIm28pc2hTeAn6ZHQTq9H9e5fVdoCFtMKlGYZVUVNoxQAfDHgxw
-	B8QMwcuomSPVT9PvXERzBXiPQK61GUivCnlqlYvSq0CmRmBDGb1Zm1ll5fFxHi/bGjBmeLn6HF1fg
-	ZBnX0ncg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60728)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qiEkz-0000Or-1v;
-	Mon, 18 Sep 2023 14:57:45 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qiEkz-0000X2-4G; Mon, 18 Sep 2023 14:57:45 +0100
-Date: Mon, 18 Sep 2023 14:57:45 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: phy: fix regression with AX88772A PHY
- driver
-Message-ID: <ZQhXWfKyfpNQlGew@shell.armlinux.org.uk>
-References: <E1qiEFs-007g7b-Lq@rmk-PC.armlinux.org.uk>
- <eeb31d51-2b07-4b23-a844-c4112c34ef83@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5760038FB7
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 17:06:01 +0000 (UTC)
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F4C293
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 10:05:59 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1c4084803f1so6625ad.0
+        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 10:05:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695056759; x=1695661559; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UvV317n6yyGUg56R/7pdLcqCtdADu2ogATpf8Oy64Nk=;
+        b=AkIwzN8obNWhC41YNqWF6LUYKion0Rk6vQNlHXfqrZxkzEUniTJVgajYfaYQt9oMnF
+         YEhdY7zb6/S5draoWJFMUMF7r+8fwDSRhQuEwWybStVe2lT6GfFS2FQ1PogDlFkRKhp5
+         Tpi9rzCZ1tyyIqAwSEXKKZEUaXPzQ3VC8++dBm+Ixu7hV1FPbf3pwCiwPTeInbD4YIxw
+         JWfn5+qzPDkt8JS6Q7e9ZtsynduEZVaVxNvMOdKVMoyxC2C2nT68N/yxaoUPle8jDoqx
+         i/0NLiGOqU4uLH/FdIox2ENbB69yUXuvHFpykVgRgBH1EFCJR8lcM77zNe2Vxw9KbAvf
+         QvMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695056759; x=1695661559;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UvV317n6yyGUg56R/7pdLcqCtdADu2ogATpf8Oy64Nk=;
+        b=aieXytiK9QwM7wz8JuiS18UZM0+y5fRnpD0y8Cc2CjcqwPdjdAXQHnhJX/z1WROaIV
+         9Mp0zqb3/NOnIib65C96dtRoNWo+EIUHx1qOLV6XG6hp9iL/HP0a6bs1gIz/YJ8CzuJx
+         6LwCcZHG/65n4HAZim9jJCiUt9ymcuHRRups9PPMzidJhgoqxJFv2Q8eDy8hdyXRbYlm
+         wyrm8vl2e7Vg/Rcnx1oCqDOWbFn4dI0KoBpqRif8GdZF0mKw894t1okXQUk6H7fSzJrP
+         mERnRB+nlKG8AsrLZJVicEkc+ncb5qYRNMyct0yDQh9/jBk8Clb+qZh/Qg4aO2QQbwJu
+         lGpw==
+X-Gm-Message-State: AOJu0Yz6m/S+wOWHa8rsYOAyq5cDBgqsdUpnK7pFkfocEGnIGKBgTLR1
+	s424bh6/FsZon7dqslyoQuh53gcsg5dRlCWvLMhwJ9ASuOpfHHqugNBR3Q==
+X-Google-Smtp-Source: AGHT+IG9qqBMe+choJ4leMLCkiIje8FUPx8O31NwXMKGaaM7qF1rlAYaYJnEXhRPBK/ZOM1AGuaJPBQA0/aP9CZaDVI=
+X-Received: by 2002:ac8:5ac2:0:b0:417:944a:bcb2 with SMTP id
+ d2-20020ac85ac2000000b00417944abcb2mr385498qtd.13.1695045901037; Mon, 18 Sep
+ 2023 07:05:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <eeb31d51-2b07-4b23-a844-c4112c34ef83@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <3793723.1694795079@warthog.procyon.org.uk> <CANn89iLwMhOnrmQTZJ+BqZJSbJZ+Q4W6xRknAAr+uSrk5TX-EQ@mail.gmail.com>
+ <0000000000001c12b30605378ce8@google.com> <3905046.1695031382@warthog.procyon.org.uk>
+ <65085768c17da_898cd294ae@willemb.c.googlers.com.notmuch>
+In-Reply-To: <65085768c17da_898cd294ae@willemb.c.googlers.com.notmuch>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 18 Sep 2023 16:04:49 +0200
+Message-ID: <CANn89iJ39Hguu6bRm2am6J_u0pSnm++ORa_UVpC0+8-mxORFfw@mail.gmail.com>
+Subject: Re: [syzbot] [net?] WARNING in __ip6_append_data
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: David Howells <dhowells@redhat.com>, 
+	syzbot <syzbot+62cbf263225ae13ff153@syzkaller.appspotmail.com>, bpf@vger.kernel.org, 
+	davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-16.0 required=5.0 tests=BAYES_00,DATE_IN_PAST_03_06,
+	DKIMWL_WL_MED,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Sep 18, 2023 at 03:49:32PM +0200, Andrew Lunn wrote:
-> On Mon, Sep 18, 2023 at 02:25:36PM +0100, Russell King (Oracle) wrote:
-> > Marek reports that a deadlock occurs with the AX88772A PHY used on the
-> > ASIX USB network driver:
-> > 
-> > asix 1-1.4:1.0 (unnamed net_device) (uninitialized): PHY [usb-001:003:10] driver [Asix Electronics AX88772A] (irq=POLL)
-> > Asix Electronics AX88772A usb-001:003:10: attached PHY driver(mii_bus:phy_addr=usb-001:003:10, irq=POLL)
-> > asix 1-1.4:1.0 eth0: register 'asix' at usb-12110000.usb-1.4, ASIX AX88772 USB 2.0 Ethernet, a2:99:b6:cd:11:eb
-> > asix 1-1.4:1.0 eth0: configuring for phy/internal link mode
-> > 
-> > ============================================
-> > WARNING: possible recursive locking detected
-> > 6.6.0-rc1-00239-g8da77df649c4-dirty #13949 Not tainted
-> > --------------------------------------------
-> > kworker/3:3/71 is trying to acquire lock:
-> > c6c704cc (&dev->lock){+.+.}-{3:3}, at: phy_start_aneg+0x1c/0x38
-> > 
-> > but task is already holding lock:
-> > c6c704cc (&dev->lock){+.+.}-{3:3}, at: phy_state_machine+0x100/0x2b8
-> > 
-> > This is because we now consistently call phy_process_state_change()
-> > while holding phydev->lock, but the AX88772A PHY driver then goes on
-> > to call phy_start_aneg() which tries to grab the same lock - causing
-> > deadlock.
-> > 
-> > Fix this by exporting the unlocked version, and use this in the PHY
-> > driver instead.
-> > 
-> > Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
-> > Tested-by: Marek Szyprowski <m.szyprowski@samsung.com>
-> > Fixes: ef113a60d0a9 ("net: phy: call phy_error_precise() while holding the lock")
-> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> 
-> Hi Russell
-> 
-> Yes, this fixes the problem for stable.
-> 
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> 
-> But maybe it would be better to move the hardware workaround into the
-> PHY driver? Its the PHY which is broken, so why is the MAC working
-> around it?
+On Mon, Sep 18, 2023 at 3:58=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> David Howells wrote:
+> > David Howells <dhowells@redhat.com> wrote:
+> >
+> > > I think the attached is probably an equivalent cleaned up reproducer.=
+  Note
+> > > that if the length given to sendfile() is less than 65536, it fails w=
+ith
+> > > EINVAL before it gets into __ip6_append_data().
+> >
+> > Actually, it only fails with EINVAL if the size is not a multiple of th=
+e block
+> > size of the source file because it's open O_DIRECT so, say, 65536-512 i=
+s fine
+> > (and works).
+> >
+> > But thinking more on this further, is this even a bug in my code, I won=
+der?
+> > The length passed is 65536 - but a UDP packet can't carry that, so it
+> > shouldn't it have errored out before getting that far?  (which is what =
+it
+> > seems to do when I try it).
+> >
+> > I don't see how we get past the length check in ip6_append_data() with =
+the
+> > reproducer we're given unless the MTU is somewhat bigger than 65536 (is=
+ that
+> > even possible?)
+>
+> An ipv6 packet can carry 64KB of payload, so maxnonfragsize of 65535 + 40
+> sounds correct. But payload length passed of 65536 is not (ignoring ipv6
+> jumbograms). So that should probably trigger an EINVAL -- if that is inde=
+ed
+> what the repro does.
 
-Err? Sorry, but your comment makes little sense given that my patch
-only touches the PHY core (to export _phy_start_aneg()) and the PHY
-driver (ax88796b.c) which is where the work-around is already located.
+l2tp_ip6_sendmsg() claims ip6_append_data() can make better checks,
+but what about simply replacing INT_MAX by 65535 ?
 
-I'm not having to touch the MAC driver at all to fix this, because
-afaics the MAC driver isn't involved in _this_ particular workaround.
+diff --git a/net/l2tp/l2tp_ip6.c b/net/l2tp/l2tp_ip6.c
+index 44cfb72bbd18a34e83e50bebca09729c55df524f..ab57a134923bfc8040dba0d8fb7=
+02551ff265184
+100644
+--- a/net/l2tp/l2tp_ip6.c
++++ b/net/l2tp/l2tp_ip6.c
+@@ -502,10 +502,7 @@ static int l2tp_ip6_sendmsg(struct sock *sk,
+struct msghdr *msg, size_t len)
+        int ulen;
+        int err;
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+-       /* Rough check on arithmetic overflow,
+-        * better check is made in ip6_append_data().
+-        */
+-       if (len > INT_MAX - transhdrlen)
++       if (len > 65535 - transhdrlen)
+                return -EMSGSIZE;
+        ulen =3D len + transhdrlen;
 
