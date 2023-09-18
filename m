@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-34807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 511AB7A54D1
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 23:07:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 849BF7A54D2
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 23:08:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1BEE61C21229
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 21:07:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 950301C2121D
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 21:08:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE47328DD9;
-	Mon, 18 Sep 2023 20:53:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAF4E2AB29;
+	Mon, 18 Sep 2023 20:54:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CE8D28E07
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:53:48 +0000 (UTC)
-Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D1998E;
-	Mon, 18 Sep 2023 13:53:47 -0700 (PDT)
-Received: by mail-qk1-x729.google.com with SMTP id af79cd13be357-773a5bb6fb6so261530785a.3;
-        Mon, 18 Sep 2023 13:53:47 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92FEF2AB39
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:54:00 +0000 (UTC)
+Received: from mail-qv1-xf2d.google.com (mail-qv1-xf2d.google.com [IPv6:2607:f8b0:4864:20::f2d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA63B111
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:53:59 -0700 (PDT)
+Received: by mail-qv1-xf2d.google.com with SMTP id 6a1803df08f44-6563e4defedso16464756d6.0
+        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:53:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695070426; x=1695675226; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1695070439; x=1695675239; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
         bh=bK3tn5dFdIkaJdHv4A/3xeAMl/PHN2x+YLc9iStXbls=;
-        b=L5VRhcj6cpf/XbQ4W69VF6M/VgGdG/0wVWdzVZbWfhtm4PdAXCWdvLgM6TLwkxevri
-         nYqVxjov6Zkw5SWpUaQD4pBP/B8oirfCCL4o/01gokfvzqkBiIzgXTOTKq10RxpPl7Si
-         pCjzUGonF9WK7tRx8dTY0Jr61cdFZAg33mSOrBI4EZ57/RtNhG+TBVmsQYcvuRvAz46z
-         UzwQZIz702N86tYfeiJN/6ERUcNMQIlxd07n3V7dCL+8RWU8QmXN08aKSuHpiKlZJ6H2
-         HwwXduzpWP/WdPfhnKTVRQpXJltu0cHul+nb5qYCc14BNBx4w2XAKfEN49uzpcJAPvzj
-         0K0g==
+        b=j8y641jxwjPhhyKRTfNtZoF0pcJMia9kdXQi/aNjjVUr+Rt5E/W69eyg0w8FUhL4KU
+         ntDQCstHZnq807lw06Mq9iFq6CPJIC7rMmTeN2aNbjwvxYuaDFEOT4P+U6H4bfpTwxZF
+         QZhpGBboxt6sST4+cVMtfAgI4vLXR84lzRdIZ3bSdUy+ntiZTzUJnZHm6+zTChW2nWMF
+         z1Hav+bhHFnwZLs/lc0iDLw6h9/sZi6Emn2elGeCGfEn7O8ANRbdicdYOs6FdVicHqvI
+         D2+/ko0serIVlDE0ujpB+ZTraP76rUeERjSETn/WpbIfURjeolSXhVOAE1aaPsaxIAK0
+         7SqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695070426; x=1695675226;
+        d=1e100.net; s=20230601; t=1695070439; x=1695675239;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
         bh=bK3tn5dFdIkaJdHv4A/3xeAMl/PHN2x+YLc9iStXbls=;
-        b=Wn3N7c1KCcomd84GnOlN7dPh8EqTw8UJf7q5iGIFOylKieiMchcUurpmrLKjao/pff
-         Z+nsWLBqjxi5r9K+o8h5asnp9nbTwIIYVxzu9qzwDNHsFrK19um9DMYqNkJ2v77qfOdr
-         SdriPP0b7DsApXzqrQ6rFb1VbagzNYwU6jWeC3wicfqZpEvH07I4GDnqFkAe/mohdkf2
-         8FyYtb7g9hS0crNP32iOkrphUB+ybT4NIeJZBp2nq56rH2qEbElgXy2JbxN035Ft5Lc/
-         VbET4sXPO5s6LusoUiLPK3mKBCsL0JIO2leLuKR02t9zut8PgDNHtuybLAIuuuANdwXV
-         ZsXg==
-X-Gm-Message-State: AOJu0Yy5ZV1ZYQBNDzVDj3mmlC3Wt/PYjJr3wStFFsgztCMZCsPOM43u
-	tb6ru+p1gJxA0PVzKKIo0DA=
-X-Google-Smtp-Source: AGHT+IFuG/RCWYnEGB2whgbEH5EazCMJ7h08Y7AAH6D+y3PeJONiu3YP0L2V+kcbEeFRyLayS4Iiqg==
-X-Received: by 2002:a0c:f24f:0:b0:658:1ca4:97f7 with SMTP id z15-20020a0cf24f000000b006581ca497f7mr3647510qvl.34.1695070426331;
-        Mon, 18 Sep 2023 13:53:46 -0700 (PDT)
+        b=PI0jPpI7J2pVPeWGkicPp0DhZ1HOwcr4IMvbb33NXi4tAE0rESsZjR8zQxeGDrLHZQ
+         P2m6YrzXj9pvna2FowOFyJo7OAeXADhkdmXerT85GmZ+HN12Av0Y2jZw3PR6BxUU0IlN
+         R4Ft0JlPuzgdrY3/4Naq12alcQiQb1pWj3a24iFeq02rmhXhEfpk8iOLGh92rkNTbxrs
+         oBFmzSsYSLsA0DgH2XknTn8We88PHsxq9spLjgAkR8PCoLrfFkoZ+ItQOcvtCQvPq6yq
+         zMxgGDWZ6UTVbQLWPSXYJ6Ysy8qNVQnc+rrtxIblSFCXyrPYCFti1XwaLrQEK8jr03mi
+         yB7g==
+X-Gm-Message-State: AOJu0Yw5r6prd+rdmX6h8L+bfKNYklWKYb47Tac2Ic7gIZXyXNxVo67x
+	UoZxxrpJxrtT2YJUSITgougOD/ajESjHQw==
+X-Google-Smtp-Source: AGHT+IFygmnPIP2yVrs7xjNflHgtyLnxdpzKrWJNMp30i+DGTj18aRtA66bBse7I75JazmHoS/ipJQ==
+X-Received: by 2002:ad4:5a13:0:b0:64a:92e9:10e4 with SMTP id ei19-20020ad45a13000000b0064a92e910e4mr8979495qvb.63.1695070438726;
+        Mon, 18 Sep 2023 13:53:58 -0700 (PDT)
 Received: from [10.67.49.139] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id l2-20020a0cac02000000b00655e428604esm3767700qvb.137.2023.09.18.13.53.44
+        by smtp.googlemail.com with ESMTPSA id w5-20020a0cdf85000000b006584984f3dfsm193520qvl.26.2023.09.18.13.53.56
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Sep 2023 13:53:45 -0700 (PDT)
-Message-ID: <5b8a126e-2eb3-a0cf-9b68-e9b7b9481cec@gmail.com>
-Date: Mon, 18 Sep 2023 13:53:43 -0700
+        Mon, 18 Sep 2023 13:53:58 -0700 (PDT)
+Message-ID: <4481c437-3d78-0ae9-d2ce-c12de09c1a98@gmail.com>
+Date: Mon, 18 Sep 2023 13:53:55 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,20 +66,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.15.1
-Subject: Re: [PATCH net-next 8/9] net: dsa: rzn1_a5psw: Convert to platform
- remove callback returning void
+Subject: Re: [PATCH net-next 9/9] net: dsa: vitesse-vsc73xx: Convert to
+ platform remove callback returning void
 Content-Language: en-US
 To: =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
- =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
  Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
- kernel@pengutronix.de
+Cc: netdev@vger.kernel.org, kernel@pengutronix.de
 References: <20230918191916.1299418-1-u.kleine-koenig@pengutronix.de>
- <20230918191916.1299418-9-u.kleine-koenig@pengutronix.de>
+ <20230918191916.1299418-10-u.kleine-koenig@pengutronix.de>
 From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20230918191916.1299418-9-u.kleine-koenig@pengutronix.de>
+In-Reply-To: <20230918191916.1299418-10-u.kleine-koenig@pengutronix.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
