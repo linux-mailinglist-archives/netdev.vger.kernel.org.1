@@ -1,120 +1,83 @@
-Return-Path: <netdev+bounces-34467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 829BB7A44EC
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 10:40:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBC697A44F0
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 10:40:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A40061C20B78
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 08:40:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75497281C7F
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 08:40:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05D5714A9D;
-	Mon, 18 Sep 2023 08:39:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B137D14AA7;
+	Mon, 18 Sep 2023 08:40:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F5D313AEE;
-	Mon, 18 Sep 2023 08:39:56 +0000 (UTC)
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8BE2E4;
-	Mon, 18 Sep 2023 01:39:54 -0700 (PDT)
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 38I8dEjO51893931, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/2.92/5.92) with ESMTPS id 38I8dEjO51893931
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 18 Sep 2023 16:39:14 +0800
-Received: from RTEXDAG01.realtek.com.tw (172.21.6.100) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.32; Mon, 18 Sep 2023 16:38:32 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXDAG01.realtek.com.tw (172.21.6.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.7; Mon, 18 Sep 2023 16:38:31 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::7445:d92b:d0b3:f79c]) by
- RTEXMBS04.realtek.com.tw ([fe80::7445:d92b:d0b3:f79c%5]) with mapi id
- 15.01.2375.007; Mon, 18 Sep 2023 16:38:31 +0800
-From: Hayes Wang <hayeswang@realtek.com>
-To: Eric Dumazet <edumazet@google.com>
-CC: "kuba@kernel.org" <kuba@kernel.org>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        nic_swsd <nic_swsd@realtek.com>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "linux-usb@vger.kernel.org"
-	<linux-usb@vger.kernel.org>,
-        "bjorn@mork.no" <bjorn@mork.no>,
-        "pabeni@redhat.com" <pabeni@redhat.com>
-Subject: RE: [PATCH net-next resend 1/2] r8152: remove queuing rx packets in driver
-Thread-Topic: [PATCH net-next resend 1/2] r8152: remove queuing rx packets in
- driver
-Thread-Index: AQHZ6gOv5dotXJafx06AY5ZZ4fOWz7AfsJgAgACIv9A=
-Date: Mon, 18 Sep 2023 08:38:31 +0000
-Message-ID: <7235821eb09242adaa651172729f76aa@realtek.com>
-References: <20230918074202.2461-426-nic_swsd@realtek.com>
- <20230918074202.2461-427-nic_swsd@realtek.com>
- <CANn89iJmdkyn8_hU4esycRG-XvPa_Djsp6PyaOX5cYP1Obdr4g@mail.gmail.com>
-In-Reply-To: <CANn89iJmdkyn8_hU4esycRG-XvPa_Djsp6PyaOX5cYP1Obdr4g@mail.gmail.com>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-x-originating-ip: [172.22.228.6]
-x-kse-serverinfo: RTEXDAG01.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD3AA63B6
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 08:40:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2D7D1C433C9;
+	Mon, 18 Sep 2023 08:40:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695026423;
+	bh=hkysuzXXpyTo4YJfpCQrt/6IvGPkJL0RINYK9UEJwXs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=lMK3Sc/iweRWJUj2obq3/xmL1iFgykk25FPppE+TxUipCMTsPHWi7NXxBqu+2TLXn
+	 0CiJkh5yduhs1pvHcrFF0v3ugBv/jQhh0yAvRQubKceU5eiHj+PfGiInZpyR9fTgss
+	 1E1KoxMWwgMJrHo65rZ1L2BnY/6GA3Hg+83gVyWvu2Altus5kNr1blSwuTti4ct+sg
+	 uMa2fue8sfD1VNfGw5aAwu8QeQj7cXXRDgCnd9a2IVKddN9pSKyGtq+CKE34Zc/Q29
+	 E8HFaMJnxXieRZDimG4Het9ko9dBcKXp7y6LW4EvAXWAIj26Hrpsp4YP3RFfVH1Qyo
+	 7SEskvSZPDwTw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1566FE11F41;
+	Mon, 18 Sep 2023 08:40:23 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH][next] tls: Use size_add() in call to struct_size()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169502642308.5792.6048998714250953891.git-patchwork-notify@kernel.org>
+Date: Mon, 18 Sep 2023 08:40:23 +0000
+References: <ZQSspmE8Ww8/UNkH@work>
+In-Reply-To: <ZQSspmE8Ww8/UNkH@work>
+To: Gustavo A. R. Silva <gustavoars@kernel.org>
+Cc: borisp@nvidia.com, john.fastabend@gmail.com, kuba@kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-hardening@vger.kernel.org
 
-RXJpYyBEdW1hemV0IDxlZHVtYXpldEBnb29nbGUuY29tPg0KPiBTZW50OiBNb25kYXksIFNlcHRl
-bWJlciAxOCwgMjAyMyAzOjU1IFBNDQpbLi4uXQ0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAg
-IHVyYi0+YWN0dWFsX2xlbmd0aCA9IDA7DQo+ID4gICAgICAgICAgICAgICAgICAgICAgICAgbGlz
-dF9hZGRfdGFpbCgmYWdnLT5saXN0LCBuZXh0KTsNCj4gPiAgICAgICAgICAgICAgICAgfQ0KPiA+
-ICsNCj4gPiArICAgICAgICAgICAgICAgLyogQnJlYWsgaWYgYnVkZ2V0IGlzIGV4aGF1c3RlZC4g
-Ki8NCj4gDQo+IFsxXSBNb3JlIGNvbnZlbnRpb25hbCB3YXkgdG8gdG8gcHV0IHRoaXMgY29uZGl0
-aW9uIGF0IHRoZSBiZWdpbm5pbmcgb2YNCj4gdGhlIHdoaWxlICgpIGxvb3AsDQo+IGJlY2F1c2Ug
-dGhlIGJ1ZGdldCBjb3VsZCBiZSB6ZXJvLg0KDQpJZiB0aGUgYnVkZ2V0IGlzIHplcm8sIHRoZSBm
-dW5jdGlvbiB3b3VsZG4ndCBiZSBjYWxsZWQuDQphN2I4ZDYwYjM3MjMgKCJyODE1MjogY2hlY2sg
-YnVkZ2V0IGZvciByODE1Ml9wb2xsIikgYXZvaWRzIGl0Lg0KDQo+ID4gKyAgICAgICAgICAgICAg
-IGlmICh3b3JrX2RvbmUgPj0gYnVkZ2V0KQ0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgIGJy
-ZWFrOw0KPiA+ICAgICAgICAgfQ0KPiA+DQo+ID4gKyAgICAgICAvKiBTcGxpY2UgdGhlIHJlbWFp
-bmVkIGxpc3QgYmFjayB0byByeF9kb25lICovDQo+ID4gICAgICAgICBpZiAoIWxpc3RfZW1wdHko
-JnJ4X3F1ZXVlKSkgew0KPiA+ICAgICAgICAgICAgICAgICBzcGluX2xvY2tfaXJxc2F2ZSgmdHAt
-PnJ4X2xvY2ssIGZsYWdzKTsNCj4gPiAtICAgICAgICAgICAgICAgbGlzdF9zcGxpY2VfdGFpbCgm
-cnhfcXVldWUsICZ0cC0+cnhfZG9uZSk7DQo+ID4gKyAgICAgICAgICAgICAgIGxpc3Rfc3BsaWNl
-KCZyeF9xdWV1ZSwgJnRwLT5yeF9kb25lKTsNCj4gPiAgICAgICAgICAgICAgICAgc3Bpbl91bmxv
-Y2tfaXJxcmVzdG9yZSgmdHAtPnJ4X2xvY2ssIGZsYWdzKTsNCj4gPiAgICAgICAgIH0NCj4gPg0K
-PiA+ICBvdXQxOg0KPiA+IC0gICAgICAgcmV0dXJuIHdvcmtfZG9uZTsNCj4gPiArICAgICAgIGlm
-ICh3b3JrX2RvbmUgPiBidWRnZXQpDQo+IA0KPiBUaGlzICh3b3JrX2RvbmUgPmJ1ZGdldCkgY29u
-ZGl0aW9uIHdvdWxkIG5ldmVyIGJlIHRydWUgaWYgcG9pbnQgWzFdIGlzDQo+IGFkZHJlc3NlZC4N
-Cg0KQSBidWxrIHRyYW5zZmVyIG1heSBjb250YWluIG1hbnkgcGFja2V0cywgc28gdGhlIHdvcmtf
-ZG9uZSBtYXkgYmUgbW9yZSB0aGFuIGJ1ZGdldC4NClRoYXQgaXMgd2h5IEkgcXVldWUgdGhlIHBh
-Y2tldHMgaW4gdGhlIGRyaXZlciBiZWZvcmUgdGhpcyBwYXRjaC4NCkZvciBleGFtcGxlLCBpZiBh
-IGJ1bGsgdHJhbnNmZXIgY29udGFpbnMgNzAgcGFja2V0IGFuZCBidWRnZXQgaXMgNjQsDQpuYXBp
-X2dyb19yZWNlaXZlIHdvdWxkIGJlIGNhbGxlZCBmb3IgdGhlIGZpcnN0IDY0IHBhY2tldHMgYW5k
-IDYgcGFja2V0cyB3b3VsZA0KYmUgcXVldWVkIGluIGRyaXZlciBmb3IgbmV4dCBzY2hlZHVsZS4g
-QWZ0ZXIgdGhpcyBwYXRjaCwgbmFwaV9ncm9fcmVjZWl2ZSgpIHdvdWxkDQpiZSBjYWxsZWQgZm9y
-IHRoZSA3MCBwYWNrZXRzLCBldmVuIHRoZSBidWRnZXQgaXMgNjQuIEFuZCB0aGUgcmVtYWluZWQg
-YnVsayB0cmFuc2ZlcnMNCndvdWxkIGJlIGhhbmRsZWQgZm9yIG5leHQgc2NoZWR1bGUuDQoNCj4g
-PiArICAgICAgICAgICAgICAgcmV0dXJuIGJ1ZGdldDsNCj4gPiArICAgICAgIGVsc2UNCj4gPiAr
-ICAgICAgICAgICAgICAgcmV0dXJuIHdvcmtfZG9uZTsNCj4gPiAgfQ0KDQpCZXN0IFJlZ2FyZHMs
-DQpIYXllcw0KDQo=
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Fri, 15 Sep 2023 13:12:38 -0600 you wrote:
+> If, for any reason, the open-coded arithmetic causes a wraparound,
+> the protection that `struct_size()` adds against potential integer
+> overflows is defeated. Fix this by hardening call to `struct_size()`
+> with `size_add()`.
+> 
+> Fixes: b89fec54fd61 ("tls: rx: wrap decrypt params in a struct")
+> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+> 
+> [...]
+
+Here is the summary with links:
+  - [next] tls: Use size_add() in call to struct_size()
+    https://git.kernel.org/netdev/net-next/c/a2713257ee2b
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
