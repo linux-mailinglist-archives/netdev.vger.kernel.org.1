@@ -1,173 +1,244 @@
-Return-Path: <netdev+bounces-34370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34371-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E0FF7A3F23
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 03:16:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29B9E7A3F49
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 03:47:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE8B82812E1
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 01:16:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3DC041C2088A
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 01:47:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6FED1119;
-	Mon, 18 Sep 2023 01:16:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6DD21108;
+	Mon, 18 Sep 2023 01:46:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84510620
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 01:16:33 +0000 (UTC)
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB846126
-	for <netdev@vger.kernel.org>; Sun, 17 Sep 2023 18:16:31 -0700 (PDT)
-Received: by mail-pg1-x52e.google.com with SMTP id 41be03b00d2f7-577a98f78b2so2818503a12.3
-        for <netdev@vger.kernel.org>; Sun, 17 Sep 2023 18:16:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1694999791; x=1695604591; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=588EBNhdj+2aJdpJxClb2GumVUmDqi8OHhk47ZxwVMc=;
-        b=i7OmO4vTMc+h8uY7RZaUMYlhyKfYcgf0GHKAZjTbHrf0HNAlKD+nlY1OhGe/P9GIHl
-         5txjWgyVjDUlg2252jJVvdQd15B1SDpuOuE/fcjsgKvn6f0YmbLl/gzTl76Wobqti/ha
-         XzecroeNWiW/TFJjCc+4GYvs62jmoHyeTh8odz0NbN9eYLu05MVJeFjZvmORy6eh6Bju
-         H1L898vEV20lqQopyjzfgqXE/mQWJoWN4jHlFzAKlx2vQF/6YQ644Wwn5jO4KFgVfa+C
-         Fye97nsr7WuvQZnwqL0E+6cwCoD8Jw4EgxdS28wIDcG+8PhFI2z1bxQgAnk01RwQKGIi
-         xA7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694999791; x=1695604591;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=588EBNhdj+2aJdpJxClb2GumVUmDqi8OHhk47ZxwVMc=;
-        b=ijC+Hr1mhTerUych/NFHDQFWdRSmHJGFmFan6+N8eUEzuIg5rvDU1ouVKUapO527GL
-         ewgPqQCVTwxTqqAxCt9PzkGm3eQAlpxI8ZNJmJuvocuBqJ9gB1HMIDrD0OfiGUNqOoly
-         3XaTH3CMUjoY94RQK9mvXw3uDKsOfCaEkV8vO3O4Dz5Q7TTWNtM+7eUAMjuxbz8gLj2h
-         QMPtQvD/B6MdVbvHZQ+V1rArv26L2TnAbnSjrCKBczAfH9zR7UDhwcdhFziEFxUd1rek
-         KEC6U8XkcnsoOGq2nhHEsb3PhUINQzisfEtixii9Vl5M8ia8ly1q75mJVHqt61DkUP46
-         Io3A==
-X-Gm-Message-State: AOJu0Yzh5Up7ytbK4tlpxWG09h5KkwJQ9uxIbu9isMAAOB5az528kgl8
-	khE4acjfW5R5T/WbNhB12hs=
-X-Google-Smtp-Source: AGHT+IGRsEBjGFSHFB2GIVNxUnJNH/dKO3G4/rAM2ZyMkboA9tGHLB9WSHPwoy2HsgL5Duo5LAfx8w==
-X-Received: by 2002:a17:90b:1887:b0:274:566a:3477 with SMTP id mn7-20020a17090b188700b00274566a3477mr5202446pjb.39.1694999790929;
-        Sun, 17 Sep 2023 18:16:30 -0700 (PDT)
-Received: from [192.168.123.100] ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id n7-20020a17090a2fc700b00267d9f4d340sm1396981pjm.44.2023.09.17.18.16.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 17 Sep 2023 18:16:30 -0700 (PDT)
-Message-ID: <a8aac295-6021-f13b-fd26-311462d0a930@gmail.com>
-Date: Mon, 18 Sep 2023 10:16:26 +0900
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3306139B
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 01:46:50 +0000 (UTC)
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3728A11C;
+	Sun, 17 Sep 2023 18:46:47 -0700 (PDT)
+X-UUID: 0d32ae22f4e74d71922d09c55c7932d4-20230918
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.31,REQID:82219cff-e942-401e-94f1-c94b93bedad2,IP:-5,
+	URL:0,TC:0,Content:0,EDM:25,RT:0,SF:-9,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:11
+X-CID-INFO: VERSION:1.1.31,REQID:82219cff-e942-401e-94f1-c94b93bedad2,IP:-5,UR
+	L:0,TC:0,Content:0,EDM:25,RT:0,SF:-9,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:11
+X-CID-META: VersionHash:0ad78a4,CLOUDID:09a2f1be-14cc-44ca-b657-2d2783296e72,B
+	ulkID:2309180946397W7A7FSK,BulkQuantity:0,Recheck:0,SF:17|19|43|38|24|102,
+	TC:nil,Content:0,EDM:5,IP:nil,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,COL:0
+	,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
+X-UUID: 0d32ae22f4e74d71922d09c55c7932d4-20230918
+X-User: guodongtai@kylinos.cn
+Received: from localhost.localdomain [(39.156.73.14)] by mailgw
+	(envelope-from <guodongtai@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 1701327177; Mon, 18 Sep 2023 09:46:37 +0800
+From: George Guo <guodongtai@kylinos.cn>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dsahern@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v1] tcp: enhancing timestamps random algo to address issues arising from NAT mapping
+Date: Mon, 18 Sep 2023 09:47:52 +0800
+Message-Id: <20230918014752.1791518-1-guodongtai@kylinos.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.13.0
-Subject: Re: [PATCH net v2] net: team: get rid of team->lock in team module
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org,
- syzbot+9bbbacfbf1e04d5221f7@syzkaller.appspotmail.com,
- syzbot+1c71587a1a09de7fbde3@syzkaller.appspotmail.com
-References: <20230916131115.488756-1-ap420073@gmail.com>
- <ZQXcOmtm1l36nUwV@nanopsycho>
-From: Taehee Yoo <ap420073@gmail.com>
-In-Reply-To: <ZQXcOmtm1l36nUwV@nanopsycho>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Tsval=tsoffset+local_clock, here tsoffset is randomized with saddr and daddr parameters in func
+secure_tcp_ts_off. Most of time it is OK except for NAT mapping to the same port and daddr.
+Consider the following scenario:
+	ns1:                ns2:
+	+-----------+        +-----------+
+	|           |        |           |
+	|           |        |           |
+	|           |        |           |
+	| veth1     |        | vethb     |
+	|192.168.1.1|        |192.168.1.2|
+	+----+------+        +-----+-----+
+	     |                     |
+	     |                     |
+	     | br0:192.168.1.254   |
+	     +----------+----------+
+	 veth0          |     vetha
+	 192.168.1.3    |    192.168.1.4
+	                |
+	               nat(192.168.1.x -->172.30.60.199)
+	                |
+	                V
+	               eth0
+	         172.30.60.199
+	               |
+	               |
+	               +----> ... ...    ---->server: 172.30.60.191
 
+Let's say ns1 (192.168.1.1) generates a timestamp ts1, and ns2 (192.168.1.2) generates a timestamp
+ts2, with ts1 > ts2.
 
-On 2023. 9. 17. 오전 1:47, Jiri Pirko wrote:
+If ns1 initiates a connection to a server, and then the server actively closes the connection,
+entering the TIME_WAIT state, and ns2 attempts to connect to the server while port reuse is in
+progress, due to the presence of NAT, the server sees both connections as originating from the
+same IP address (e.g., 172.30.60.199) and port. However, since ts2 is smaller than ts1, the server
+will respond with the acknowledgment (ACK) for the fourth handshake.
 
-Hi Jiri,
-Thank you so much for your review!
+       SERVER                                               	CLIENT
 
- > Sat, Sep 16, 2023 at 03:11:15PM CEST, ap420073@gmail.com wrote:
- >> The purpose of team->lock is to protect the private data of the team
- >> interface. But RTNL already protects it all well.
- >> The precise purpose of the team->lock is to reduce contention of
- >> RTNL due to GENL operations such as getting the team port list, and
- >> configuration dump.
- >>
- >> team interface has used a dynamic lockdep key to avoid false-positive
- >> lockdep deadlock detection. Virtual interfaces such as team usually
- >> have their own lock for protecting private data.
- >> These interfaces can be nested.
- >> team0
- >>   |
- >> team1
- >>
- >> Each interface's lock is actually different(team0->lock and 
-team1->lock).
- >> So,
- >> mutex_lock(&team0->lock);
- >> mutex_lock(&team1->lock);
- >> mutex_unlock(&team1->lock);
- >> mutex_unlock(&team0->lock);
- >> The above case is absolutely safe. But lockdep warns about deadlock.
- >> Because the lockdep understands these two locks are same. This is a
- >> false-positive lockdep warning.
- >>
- >> So, in order to avoid this problem, the team interfaces started to use
- >> dynamic lockdep key. The false-positive problem was fixed, but it
- >> introduced a new problem.
- >>
- >> When the new team virtual interface is created, it registers a dynamic
- >> lockdep key(creates dynamic lockdep key) and uses it. But there is the
- >> limitation of the number of lockdep keys.
- >> So, If so many team interfaces are created, it consumes all lockdep 
-keys.
- >> Then, the lockdep stops to work and warns about it.
- >
- > What about fixing the lockdep instead? I bet this is not the only
- > occurence of this problem.
+   1.  ESTABLISHED                                          	ESTABLISHED
 
-There were many similar patches for fixing lockdep false-positive problem.
-But, I didn't consider fixing lockdep because I thought the limitation 
-of lockdep key was normal.
-So, I still think stopping working due to exceeding lockdep keys is not 
-a problem of the lockdep itself.
+       (Close)
+   2.  FIN-WAIT-1  --> <SEQ=100><ACK=300><TSval=20><CTL=FIN,ACK>  --> CLOSE-WAIT
 
- >
- >
- >>
- >> So, in order to fix this issue, It just removes team->lock and uses
- >> RTNL instead.
- >>
- >> The previous approach to fix this issue was to use the subclass lockdep
- >> key instead of the dynamic lockdep key. It requires RTNL before 
-acquiring
- >> a nested lock because the subclass variable(dev->nested_lock) is
- >> protected by RTNL.
- >> However, the coverage of team->lock is too wide so sometimes it should
- >> use a subclass variable before initialization.
- >> So, it can't work well in the port initialization and unregister logic.
- >>
- >> This approach is just removing the team->lock clearly.
- >> So there is no special locking scenario in the team module.
- >> Also, It may convert RTNL to RCU for the read-most operations such as
- >> GENL dump but not yet adopted.
- >>
- >> Reproducer:
- >>    for i in {0..1000}
- >>    do
- >>            ip link add team$i type team
- >>            ip link add dummy$i master team$i type dummy
- >>            ip link set dummy$i up
- >>            ip link set team$i up
- >>    done
- >>
+   3.  FIN-WAIT-2  <-- <SEQ=300><ACK=101><TSval=40><CTL=ACK>      <-- CLOSE-WAIT
 
-Thanks a lot!
-Taehee Yoo
+                                                            (Close)
+   4.  TIME-WAIT   <-- <SEQ=300><ACK=101><TSval=41><CTL=FIN,ACK>  <-- LAST-ACK
+
+   5.  TIME-WAIT   --> <SEQ=101><ACK=301><TSval=25><CTL=ACK>      --> CLOSED
+
+  - - - - - - - - - - - - - port reused - - - - - - - - - - - - - - -
+
+   5.1. TIME-WAIT   <-- <SEQ=255><TSval=30><CTL=SYN>             <-- SYN-SENT
+
+   5.2. TIME-WAIT   --> <SEQ=101><ACK=301><TSval=35><CTL=ACK>    --> SYN-SENT
+
+   5.3. CLOSED      <-- <SEQ=301><CTL=RST>             		 <-- SYN-SENT
+
+   6.  SYN-RECV    <-- <SEQ=255><TSval=34><CTL=SYN>              <-- SYN-SENT
+
+   7.  SYN-RECV    --> <SEQ=400><ACK=301><TSval=40><CTL=SYN,ACK> --> ESTABLISHED
+
+   1.  ESTABLISH   <-- <SEQ=301><ACK=401><TSval=55><CTL=ACK>     <-- ESTABLISHED
+
+This enhancement uses sport and daddr rather than saddr and daddr, which keep the timestamp
+monotonically increasing in the situation described above. Then the port reuse is like this:
+
+       SERVER                                               	CLIENT
+
+   1.  ESTABLISHED                                          	ESTABLISHED
+
+       (Close)
+   2.  FIN-WAIT-1  --> <SEQ=100><ACK=300><TSval=20><CTL=FIN,ACK>  --> CLOSE-WAIT
+
+   3.  FIN-WAIT-2  <-- <SEQ=300><ACK=101><TSval=40><CTL=ACK>      <-- CLOSE-WAIT
+
+                                                            (Close)
+   4.  TIME-WAIT   <-- <SEQ=300><ACK=101><TSval=41><CTL=FIN,ACK>  <-- LAST-ACK
+
+   5.  TIME-WAIT   --> <SEQ=101><ACK=301><TSval=25><CTL=ACK>      --> CLOSED
+
+  - - - - - - - - - - - - - port reused - - - - - - - - - - - - - - -
+
+   5.1. TIME-WAIT  <-- <SEQ=300><TSval=50><CTL=SYN>               <-- SYN-SENT
+
+   6.  SYN-RECV    --> <SEQ=400><ACK=301><TSval=40><CTL=SYN,ACK>  --> ESTABLISHED
+
+   1.  ESTABLISH   <-- <SEQ=301><ACK=401><TSval=55><CTL=ACK>      <-- ESTABLISHED
+
+The enhancement lets port reused more efficiently.
+
+Signed-off-by: George Guo <guodongtai@kylinos.cn>
+---
+ include/net/secure_seq.h | 2 +-
+ net/core/secure_seq.c    | 4 ++--
+ net/ipv4/syncookies.c    | 4 ++--
+ net/ipv4/tcp_ipv4.c      | 6 ++++--
+ 4 files changed, 9 insertions(+), 7 deletions(-)
+
+diff --git a/include/net/secure_seq.h b/include/net/secure_seq.h
+index 21e7fa2a1813..40fb53520aa4 100644
+--- a/include/net/secure_seq.h
++++ b/include/net/secure_seq.h
+@@ -11,7 +11,7 @@ u64 secure_ipv6_port_ephemeral(const __be32 *saddr, const __be32 *daddr,
+ 			       __be16 dport);
+ u32 secure_tcp_seq(__be32 saddr, __be32 daddr,
+ 		   __be16 sport, __be16 dport);
+-u32 secure_tcp_ts_off(const struct net *net, __be32 saddr, __be32 daddr);
++u32 secure_tcp_ts_off(const struct net *net, __be16 sport, __be32 daddr);
+ u32 secure_tcpv6_seq(const __be32 *saddr, const __be32 *daddr,
+ 		     __be16 sport, __be16 dport);
+ u32 secure_tcpv6_ts_off(const struct net *net,
+diff --git a/net/core/secure_seq.c b/net/core/secure_seq.c
+index b0ff6153be62..575b6afe39a4 100644
+--- a/net/core/secure_seq.c
++++ b/net/core/secure_seq.c
+@@ -118,13 +118,13 @@ EXPORT_SYMBOL(secure_ipv6_port_ephemeral);
+ #endif
+ 
+ #ifdef CONFIG_INET
+-u32 secure_tcp_ts_off(const struct net *net, __be32 saddr, __be32 daddr)
++u32 secure_tcp_ts_off(const struct net *net, __be16 sport, __be32 daddr)
+ {
+ 	if (READ_ONCE(net->ipv4.sysctl_tcp_timestamps) != 1)
+ 		return 0;
+ 
+ 	ts_secret_init();
+-	return siphash_2u32((__force u32)saddr, (__force u32)daddr,
++	return siphash_2u32((__force u32)sport, (__force u32)daddr,
+ 			    &ts_secret);
+ }
+ 
+diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
+index dc478a0574cb..df1757ff5956 100644
+--- a/net/ipv4/syncookies.c
++++ b/net/ipv4/syncookies.c
+@@ -360,8 +360,8 @@ struct sock *cookie_v4_check(struct sock *sk, struct sk_buff *skb)
+ 
+ 	if (tcp_opt.saw_tstamp && tcp_opt.rcv_tsecr) {
+ 		tsoff = secure_tcp_ts_off(sock_net(sk),
+-					  ip_hdr(skb)->daddr,
+-					  ip_hdr(skb)->saddr);
++					  th->source,
++					  ip_hdr(skb)->daddr);
+ 		tcp_opt.rcv_tsecr -= tsoff;
+ 	}
+ 
+diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+index 27140e5cdc06..acad4b14ecf7 100644
+--- a/net/ipv4/tcp_ipv4.c
++++ b/net/ipv4/tcp_ipv4.c
+@@ -104,7 +104,9 @@ static u32 tcp_v4_init_seq(const struct sk_buff *skb)
+ 
+ static u32 tcp_v4_init_ts_off(const struct net *net, const struct sk_buff *skb)
+ {
+-	return secure_tcp_ts_off(net, ip_hdr(skb)->daddr, ip_hdr(skb)->saddr);
++	const struct tcphdr *th = tcp_hdr(skb);
++
++	return secure_tcp_ts_off(net, th->source, ip_hdr(skb)->daddr);
+ }
+ 
+ int tcp_twsk_unique(struct sock *sk, struct sock *sktw, void *twp)
+@@ -309,7 +311,7 @@ int tcp_v4_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
+ 						  inet->inet_sport,
+ 						  usin->sin_port));
+ 		WRITE_ONCE(tp->tsoffset,
+-			   secure_tcp_ts_off(net, inet->inet_saddr,
++			   secure_tcp_ts_off(net, inet->inet_sport,
+ 					     inet->inet_daddr));
+ 	}
+ 
+-- 
+2.34.1
+
 
