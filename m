@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-34821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 289B67A5512
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 23:31:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 156617A5516
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 23:32:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6691281F1C
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 21:31:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C30B5282009
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 21:32:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51A5330FA3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAE9531A6B;
 	Mon, 18 Sep 2023 21:28:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8335B28E3C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E541E2AB3D
 	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 21:28:50 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A8208E
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92314119
 	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 14:28:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1695072528; x=1726608528;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=xDT2d0XTt/djZM4qF1alnrxtlI1+4H294yBp8Pqe410=;
-  b=Pcsm0zGX4z/fQ9B2g+h3rUv4Ru+erK5sEIF/r0tEge4nqLN3OdIT+B2W
-   xXkwEWOA1KLLTvmuSyO3feoW9YHEPHwkMzjQxsO8YMakOGUpyK7Rh2GZC
-   8PunrB1pRs0hPhgZylvTuRnSpwH+4bE00Dw5dUw9hSh2i8uzTxiGC7sdM
-   /CmovTLIv2TDvF/lsZgHsnsM9FurRrBV+7sYXWrJ7nBKuUfsRHdyjIy72
-   n20MDtHat3tGVW52bK7Oqj0H2Yq8dT9pVZ3gd3EWFaj4THOQqalN64QN2
-   oY07Rcl6bqbDKV9oCy/EgnUMx6VWEltKIkQgdTCr4LjggAbarUq6ALHty
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="359187286"
+  bh=SCV90KSJA2aF+Je+BSBKLye8flYVz5LWBWHjo/Ct7wM=;
+  b=TJUXbXfDoWbIGLW56kN8bA6g9PFVPRqIqxE76cJmVsAAVw2j2n9uYz8F
+   l6rYaIbVd+mR6v7q8GQzbfzbkSpzWEhqYGAJbABxkf8RGtDCsY0eP4baX
+   gKPiE09gKsRmvdS7PTeDZd4M8nwZOpiBcnfp8JLEHBdw2KGnP1VWnksDy
+   K+Rr/s1o8BL4OEYu93HRA/U0Fa/poYLEjKiccOYLtX6wmfb5Fnzm8lYkV
+   2A/t2CFiCxtUJLJ1THody6WApM8xDSFTlqJW6vi/enxd2Yerc2RRp6+p8
+   DznrEWu1oXETUA95ffIL/qu4H5iniJa8LZEJLOvBgaJEo4KmqXVugfgkp
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="359187292"
 X-IronPort-AV: E=Sophos;i="6.02,157,1688454000"; 
-   d="scan'208";a="359187286"
+   d="scan'208";a="359187292"
 Received: from fmsmga007.fm.intel.com ([10.253.24.52])
   by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2023 14:28:46 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="749186238"
+X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="749186244"
 X-IronPort-AV: E=Sophos;i="6.02,157,1688454000"; 
-   d="scan'208";a="749186238"
+   d="scan'208";a="749186244"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by fmsmga007.fm.intel.com with ESMTP; 18 Sep 2023 14:28:46 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -53,10 +53,11 @@ To: davem@davemloft.net,
 	netdev@vger.kernel.org
 Cc: Jacob Keller <jacob.e.keller@intel.com>,
 	anthony.l.nguyen@intel.com,
-	richardcochran@gmail.com
-Subject: [PATCH net-next v2 10/11] ice: introduce ice_pf_src_tmr_owned
-Date: Mon, 18 Sep 2023 14:28:13 -0700
-Message-Id: <20230918212814.435688-11-anthony.l.nguyen@intel.com>
+	richardcochran@gmail.com,
+	Sunitha Mekala <sunithax.d.mekala@intel.com>
+Subject: [PATCH net-next v2 11/11] ice: check netlist before enabling ICE_F_GNSS
+Date: Mon, 18 Sep 2023 14:28:14 -0700
+Message-Id: <20230918212814.435688-12-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20230918212814.435688-1-anthony.l.nguyen@intel.com>
 References: <20230918212814.435688-1-anthony.l.nguyen@intel.com>
@@ -76,91 +77,93 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Jacob Keller <jacob.e.keller@intel.com>
 
-Add ice_pf_src_tmr_owned() macro to check the function capability bit
-indicating if the current function owns the PTP hardware clock. This is
-slightly shorter than the more verbose access via
-hw.func_caps.ts_func_info.src_tmr_owned. Use this where possible rather
-than open coding its equivalent.
+Similar to the change made for ICE_F_SMA_CTRL, check the netlist before
+enabling support for ICE_F_GNSS. This ensures that the driver only enables
+the GNSS feature on devices which actually have the feature enabled in the
+firmware device configuration.
 
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Tested-by: Sunitha Mekala <sunithax.d.mekala@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice.h      | 2 ++
- drivers/net/ethernet/intel/ice/ice_lib.c  | 2 +-
- drivers/net/ethernet/intel/ice/ice_main.c | 2 +-
- drivers/net/ethernet/intel/ice/ice_ptp.c  | 6 +++---
- 4 files changed, 7 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_adminq_cmd.h |  2 ++
+ drivers/net/ethernet/intel/ice/ice_common.c     | 15 +++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_common.h     |  1 +
+ drivers/net/ethernet/intel/ice/ice_gnss.c       |  3 +++
+ 4 files changed, 21 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-index 04665aff2234..d30ae39c19f0 100644
---- a/drivers/net/ethernet/intel/ice/ice.h
-+++ b/drivers/net/ethernet/intel/ice/ice.h
-@@ -196,6 +196,8 @@
+diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+index b20241df4d3f..24293f52f2d1 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
++++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+@@ -1393,6 +1393,7 @@ struct ice_aqc_link_topo_params {
+ #define ICE_AQC_LINK_TOPO_NODE_TYPE_ID_EEPROM	8
+ #define ICE_AQC_LINK_TOPO_NODE_TYPE_CLK_CTRL	9
+ #define ICE_AQC_LINK_TOPO_NODE_TYPE_CLK_MUX	10
++#define ICE_AQC_LINK_TOPO_NODE_TYPE_GPS		11
+ #define ICE_AQC_LINK_TOPO_NODE_CTX_S		4
+ #define ICE_AQC_LINK_TOPO_NODE_CTX_M		\
+ 				(0xF << ICE_AQC_LINK_TOPO_NODE_CTX_S)
+@@ -1435,6 +1436,7 @@ struct ice_aqc_get_link_topo {
+ #define ICE_AQC_GET_LINK_TOPO_NODE_NR_E822_PHY		0x30
+ #define ICE_AQC_GET_LINK_TOPO_NODE_NR_C827		0x31
+ #define ICE_AQC_GET_LINK_TOPO_NODE_NR_GEN_CLK_MUX	0x47
++#define ICE_AQC_GET_LINK_TOPO_NODE_NR_GEN_GPS		0x48
+ 	u8 rsvd[9];
+ };
  
- #define ice_pf_to_dev(pf) (&((pf)->pdev->dev))
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index 089558b3b1ae..8f31ae449948 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -2764,6 +2764,21 @@ bool ice_is_pf_c827(struct ice_hw *hw)
+ 	return false;
+ }
  
-+#define ice_pf_src_tmr_owned(pf) ((pf)->hw.func_caps.ts_func_info.src_tmr_owned)
++/**
++ * ice_is_gps_in_netlist
++ * @hw: pointer to the hw struct
++ *
++ * Check if the GPS generic device is present in the netlist
++ */
++bool ice_is_gps_in_netlist(struct ice_hw *hw)
++{
++	if (ice_find_netlist_node(hw, ICE_AQC_LINK_TOPO_NODE_TYPE_GPS,
++				  ICE_AQC_GET_LINK_TOPO_NODE_NR_GEN_GPS, NULL))
++		return false;
 +
- enum ice_feature {
- 	ICE_F_DSCP,
- 	ICE_F_PHY_RCLK,
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index 382196486054..1549890a3cbf 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -3992,7 +3992,7 @@ void ice_init_feature_support(struct ice_pf *pf)
- 		if (ice_is_phy_rclk_present(&pf->hw))
- 			ice_set_feature_support(pf, ICE_F_PHY_RCLK);
- 		/* If we don't own the timer - don't enable other caps */
--		if (!pf->hw.func_caps.ts_func_info.src_tmr_owned)
-+		if (!ice_pf_src_tmr_owned(pf))
- 			break;
- 		if (ice_is_cgu_present(&pf->hw))
- 			ice_set_feature_support(pf, ICE_F_CGU);
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index b73d3b1e48d1..e22f41fea8db 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -3159,7 +3159,7 @@ static irqreturn_t ice_misc_intr(int __always_unused irq, void *data)
++	return true;
++}
++
+ /**
+  * ice_aq_list_caps - query function/device capabilities
+  * @hw: pointer to the HW struct
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
+index 74e44b450de4..47a75651ca38 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.h
++++ b/drivers/net/ethernet/intel/ice/ice_common.h
+@@ -93,6 +93,7 @@ ice_aq_get_phy_caps(struct ice_port_info *pi, bool qual_mods, u8 report_mode,
+ 		    struct ice_aqc_get_phy_caps_data *caps,
+ 		    struct ice_sq_cd *cd);
+ bool ice_is_pf_c827(struct ice_hw *hw);
++bool ice_is_gps_in_netlist(struct ice_hw *hw);
+ int
+ ice_find_netlist_node(struct ice_hw *hw, u8 node_type_ctx, u8 node_part_number,
+ 		      u16 *node_handle);
+diff --git a/drivers/net/ethernet/intel/ice/ice_gnss.c b/drivers/net/ethernet/intel/ice/ice_gnss.c
+index 75c9de675f20..c8ea1af51ad3 100644
+--- a/drivers/net/ethernet/intel/ice/ice_gnss.c
++++ b/drivers/net/ethernet/intel/ice/ice_gnss.c
+@@ -389,6 +389,9 @@ bool ice_gnss_is_gps_present(struct ice_hw *hw)
+ 	if (!hw->func_caps.ts_func_info.src_tmr_owned)
+ 		return false;
  
- 		ena_mask &= ~PFINT_OICR_TSYN_EVNT_M;
- 
--		if (hw->func_caps.ts_func_info.src_tmr_owned) {
-+		if (ice_pf_src_tmr_owned(pf)) {
- 			/* Save EVENTs from GLTSYN register */
- 			pf->ptp.ext_ts_irq |= gltsyn_stat &
- 					      (GLTSYN_STAT_EVENT0_M |
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 7ae1f1abe965..05f922d3b316 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -436,7 +436,7 @@ static void ice_clear_ptp_clock_index(struct ice_pf *pf)
- 	int err;
- 
- 	/* Do not clear the index if we don't own the timer */
--	if (!hw->func_caps.ts_func_info.src_tmr_owned)
-+	if (!ice_pf_src_tmr_owned(pf))
- 		return;
- 
- 	tmr_idx = hw->func_caps.ts_func_info.tmr_index_assoc;
-@@ -2499,7 +2499,7 @@ void ice_ptp_reset(struct ice_pf *pf)
- 	if (test_bit(ICE_PFR_REQ, pf->state))
- 		goto pfr;
- 
--	if (!hw->func_caps.ts_func_info.src_tmr_owned)
-+	if (!ice_pf_src_tmr_owned(pf))
- 		goto reset_ts;
- 
- 	err = ice_ptp_init_phc(hw);
-@@ -2751,7 +2751,7 @@ void ice_ptp_init(struct ice_pf *pf)
- 	/* If this function owns the clock hardware, it must allocate and
- 	 * configure the PTP clock device to represent it.
- 	 */
--	if (hw->func_caps.ts_func_info.src_tmr_owned) {
-+	if (ice_pf_src_tmr_owned(pf)) {
- 		err = ice_ptp_init_owner(pf);
- 		if (err)
- 			goto err;
++	if (!ice_is_gps_in_netlist(hw))
++		return false;
++
+ #if IS_ENABLED(CONFIG_PTP_1588_CLOCK)
+ 	if (ice_is_e810t(hw)) {
+ 		int err;
 -- 
 2.38.1
 
