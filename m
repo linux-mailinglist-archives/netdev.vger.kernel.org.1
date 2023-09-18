@@ -1,80 +1,233 @@
-Return-Path: <netdev+bounces-34565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F4747A4B0A
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 16:28:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F41A7A4BCC
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 17:22:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42AD91C20AAE
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 14:28:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCBFA281C76
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 15:22:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EBD61D55D;
-	Mon, 18 Sep 2023 14:28:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6C671D695;
+	Mon, 18 Sep 2023 15:22:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 451D66FB8
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 14:28:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18049C32783;
-	Mon, 18 Sep 2023 14:28:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695047303;
-	bh=cVt3BSeAbCgVpGd6WsEDtgkVPihUYdejvLe8R1O+i1g=;
-	h=Subject:From:In-Reply-To:References:To:Cc:Date:From;
-	b=oujQRKR3JJRDQPQnBYyL9Mg1kpOvs+cB33amTS3eFRjjqd1ZG90xTJeuoCIljLWSh
-	 77WZKkUjudUGRZIgu3zj8S3mVt8EOKLZYDjtT05yhKmY7IfiIxZLbLhCC8AruV3ojg
-	 UMhQ8RsJVZBstLuk0jUp5BH0orKiLeSIezkoh/b26DFLv6yZlsFbPy+66G54AQ3sO5
-	 6wfuro4Idxl2oYwUqrRAifR5IZOQdnnjV/JhDh9fm1EKl4Ox8JjFOAuH26AFjEs5pY
-	 zOds9b6vC4jPfASTBfTap1B9zqOOL9Fn2sbFEgLN7ARf0r6uZ12mYb7JLJwRvgSpyT
-	 dZudbPpR/4joA==
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0335E14F77
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 15:22:00 +0000 (UTC)
+Received: from mail-il1-x12f.google.com (mail-il1-x12f.google.com [IPv6:2607:f8b0:4864:20::12f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B501E60
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 08:19:32 -0700 (PDT)
+Received: by mail-il1-x12f.google.com with SMTP id e9e14a558f8ab-34fa117f92bso291785ab.1
+        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 08:19:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695050370; x=1695655170; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kujrkpvdn/mKIWmW+1GpLRQfz9MujBbkkOfEQ92xGA0=;
+        b=Hn0kMv0ajV0dUrUSgdYNPrJsi4+1DuL58rDT8ymdLzschNmuAM62iXLaBe+GnmsDgg
+         hs6yhiThI0zhhPy2bPbhdo7zUzemNATgnzAofhm+t+JeVSX2XuldgXNLQCL3x7wVwMih
+         kmfjyuUSbLe7x0Th81J2vqx1rzwZACo6Z2R09a5ykk1NFjiQtZB6DO+HelSqOA7dJpVx
+         CmXICFWPflmG/eb6EH1yIAonvMIodJXIlK0NVDgWhG3kqPGqk8Nmjp4f989/VSW+/sw8
+         hekDqWBhn0nkDM7CpizFHctZJIeaLrCNtX0YS7DvMSdBRvpDqKUx4bgdz5Cbn/4RlXi6
+         b40Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695050370; x=1695655170;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kujrkpvdn/mKIWmW+1GpLRQfz9MujBbkkOfEQ92xGA0=;
+        b=frkOoM4d2iQLUVJFfm53aEyVglOocMA089MDbM0x3kgpfPSOSpXvsWr6C0A8FC3X/R
+         lTxy1U0oehkFaNappc8fJc1wMkajlsscM+297xzhv0d19ybdciC0mA+T6KKd8MLGxiIe
+         1rsdasVdgt09ZEDPISRblebtpEovjsS06DJNgfgfGZWk0GpjROQrkOG9WyKRYEOOBFD3
+         rFqVsHbWdTaWl6L9Dbfxfc3AllpwBAaK75MAdwNCXlNA10lDBWU/HvF+jravgv9ENfrd
+         s6ibx6zuBqVX+QbJ3BFyInOzoGENBOv8wmzA2CfXDOlgPVZeRvvIy/PGNfHkau4C+e+q
+         wJ0Q==
+X-Gm-Message-State: AOJu0YzETbu9/hAHQjNKuD4+FkbMK0xgnCLxcWpX9xgtjtPmiP3IFxwB
+	1JR/mDiepA5fBAhIQJdc4tHYPL9QSm4XVbwOXRvxcWOYlU+LuggWlItMQQ==
+X-Google-Smtp-Source: AGHT+IEL1xXCAc1VgiFssCqfjbchpT46nGog02puyburvM1qIqUr9r2IfkqvoB0vR0qtdvK+Q9HssMCHFrNrUc1h7Bs=
+X-Received: by 2002:a05:622a:1446:b0:410:8ba3:21c7 with SMTP id
+ v6-20020a05622a144600b004108ba321c7mr479693qtx.18.1695047325424; Mon, 18 Sep
+ 2023 07:28:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH v3 1/2] wifi: cw1200: Avoid processing an invalid TIM IE
-From: Kalle Valo <kvalo@kernel.org>
-In-Reply-To: <20230831-ieee80211_tim_ie-v3-1-e10ff584ab5d@quicinc.com>
-References: <20230831-ieee80211_tim_ie-v3-1-e10ff584ab5d@quicinc.com>
-To: Jeff Johnson <quic_jjohnson@quicinc.com>
-Cc: <kernel@quicinc.com>, =?utf-8?q?Toke_H?=
-	=?utf-8?q?=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
- "Christian Lamparter" <chunkeey@googlemail.com>,
- Stanislaw Gruszka <stf_xl@wp.pl>,
- "Helmut Schaa" <helmut.schaa@googlemail.com>,
- Ping-Ke Shih <pkshih@realtek.com>, Johannes Berg <johannes@sipsolutions.net>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Kees Cook <keescook@chromium.org>, <linux-wireless@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
- Jeff Johnson <quic_jjohnson@quicinc.com>
-User-Agent: pwcli/0.1.1-git (https://github.com/kvalo/pwcli/) Python/3.11.2
-Message-ID: <169504729816.740666.17271538419199878496.kvalo@kernel.org>
-Date: Mon, 18 Sep 2023 14:28:19 +0000 (UTC)
+References: <20230916132932.361875-1-liangchen.linux@gmail.com> <20230916132932.361875-2-liangchen.linux@gmail.com>
+In-Reply-To: <20230916132932.361875-2-liangchen.linux@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 18 Sep 2023 16:28:34 +0200
+Message-ID: <CANn89iLA5irwbuqvJdnptGs9pQNO_63qQsJ1jjZd1E0Cd4JVMw@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 2/2] pktgen: Introducing 'SHARED' flag for
+ testing with non-shared skb
+To: Liang Chen <liangchen.linux@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	benjamin.poirier@gmail.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Jeff Johnson <quic_jjohnson@quicinc.com> wrote:
+On Sat, Sep 16, 2023 at 3:30=E2=80=AFPM Liang Chen <liangchen.linux@gmail.c=
+om> wrote:
+>
+> Currently, skbs generated by pktgen always have their reference count
+> incremented before transmission, causing their reference count to be
+> always greater than 1, leading to two issues:
+>   1. Only the code paths for shared skbs can be tested.
+>   2. In certain situations, skbs can only be released by pktgen.
+> To enhance testing comprehensiveness, we are introducing the "SHARED"
+> flag to indicate whether an SKB is shared. This flag is enabled by
+> default, aligning with the current behavior. However, disabling this
+> flag allows skbs with a reference count of 1 to be transmitted.
+> So we can test non-shared skbs and code paths where skbs are released
+> within the stack.
+>
+> Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
+> ---
+>  Documentation/networking/pktgen.rst | 12 ++++++++
+>  net/core/pktgen.c                   | 48 ++++++++++++++++++++++++-----
+>  2 files changed, 52 insertions(+), 8 deletions(-)
+>
+> diff --git a/Documentation/networking/pktgen.rst b/Documentation/networki=
+ng/pktgen.rst
+> index 1225f0f63ff0..c945218946e1 100644
+> --- a/Documentation/networking/pktgen.rst
+> +++ b/Documentation/networking/pktgen.rst
+> @@ -178,6 +178,7 @@ Examples::
+>                               IPSEC # IPsec encapsulation (needs CONFIG_X=
+FRM)
+>                               NODE_ALLOC # node specific memory allocatio=
+n
+>                               NO_TIMESTAMP # disable timestamping
+> +                             SHARED # enable shared SKB
+>   pgset 'flag ![name]'    Clear a flag to determine behaviour.
+>                          Note that you might need to use single quote in
+>                          interactive mode, so that your shell wouldn't ex=
+pand
+> @@ -288,6 +289,16 @@ To avoid breaking existing testbed scripts for using=
+ AH type and tunnel mode,
+>  you can use "pgset spi SPI_VALUE" to specify which transformation mode
+>  to employ.
+>
+> +Disable shared SKB
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +By default, SKBs sent by pktgen are shared (user count > 1).
+> +To test with non-shared SKBs, remove the "SHARED" flag by simply setting=
+::
+> +
+> +       pg_set "flag !SHARED"
+> +
+> +However, if the "clone_skb" or "burst" parameters are configured, the sk=
+b
+> +still needs to be held by pktgen for further access. Hence the skb must =
+be
+> +shared.
+>
+>  Current commands and configuration options
+>  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> @@ -357,6 +368,7 @@ Current commands and configuration options
+>      IPSEC
+>      NODE_ALLOC
+>      NO_TIMESTAMP
+> +    SHARED
+>
+>      spi (ipsec)
+>
+> diff --git a/net/core/pktgen.c b/net/core/pktgen.c
+> index 48306a101fd9..c4e0814df325 100644
+> --- a/net/core/pktgen.c
+> +++ b/net/core/pktgen.c
+> @@ -200,6 +200,7 @@
+>         pf(VID_RND)             /* Random VLAN ID */                    \
+>         pf(SVID_RND)            /* Random SVLAN ID */                   \
+>         pf(NODE)                /* Node memory alloc*/                  \
+> +       pf(SHARED)              /* Shared SKB */                        \
+>
+>  #define pf(flag)               flag##_SHIFT,
+>  enum pkt_flags {
+> @@ -1198,7 +1199,8 @@ static ssize_t pktgen_if_write(struct file *file,
+>                     ((pkt_dev->xmit_mode =3D=3D M_NETIF_RECEIVE) ||
+>                      !(pkt_dev->odev->priv_flags & IFF_TX_SKB_SHARING)))
+>                         return -ENOTSUPP;
+> -               if (value > 0 && pkt_dev->n_imix_entries > 0)
+> +               if (value > 0 && (pkt_dev->n_imix_entries > 0 ||
+> +                                 !(pkt_dev->flags & F_SHARED)))
+>                         return -EINVAL;
+>
+>                 i +=3D len;
+> @@ -1257,6 +1259,10 @@ static ssize_t pktgen_if_write(struct file *file,
+>                      ((pkt_dev->xmit_mode =3D=3D M_START_XMIT) &&
+>                      (!(pkt_dev->odev->priv_flags & IFF_TX_SKB_SHARING)))=
+))
+>                         return -ENOTSUPP;
+> +
+> +               if (value > 1 && !(pkt_dev->flags & F_SHARED))
+> +                       return -EINVAL;
+> +
+>                 pkt_dev->burst =3D value < 1 ? 1 : value;
+>                 sprintf(pg_result, "OK: burst=3D%u", pkt_dev->burst);
+>                 return count;
+> @@ -1334,10 +1340,19 @@ static ssize_t pktgen_if_write(struct file *file,
+>
+>                 flag =3D pktgen_read_flag(f, &disable);
+>                 if (flag) {
+> -                       if (disable)
+> +                       if (disable) {
+> +                               /* If "clone_skb", or "burst" parameters =
+are
+> +                                * configured, it means that the skb stil=
+l
+> +                                * needs to be referenced by the pktgen, =
+so
+> +                                * the skb must be shared.
+> +                                */
+> +                               if (flag =3D=3D F_SHARED && (pkt_dev->clo=
+ne_skb ||
+> +                                                        pkt_dev->burst >=
+ 1))
+> +                                       return -EINVAL;
+>                                 pkt_dev->flags &=3D ~flag;
+> -                       else
+> +                       } else {
+>                                 pkt_dev->flags |=3D flag;
+> +                       }
+>
+>                         sprintf(pg_result, "OK: flags=3D0x%x", pkt_dev->f=
+lags);
+>                         return count;
+> @@ -3489,7 +3504,8 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev)
+>         if (pkt_dev->xmit_mode =3D=3D M_NETIF_RECEIVE) {
+>                 skb =3D pkt_dev->skb;
+>                 skb->protocol =3D eth_type_trans(skb, skb->dev);
+> -               refcount_add(burst, &skb->users);
+> +               if (pkt_dev->flags & F_SHARED)
+> +                       refcount_add(burst, &skb->users);
+>                 local_bh_disable();
+>                 do {
+>                         ret =3D netif_receive_skb(skb);
+> @@ -3497,6 +3513,10 @@ static void pktgen_xmit(struct pktgen_dev *pkt_dev=
+)
+>                                 pkt_dev->errors++;
+>                         pkt_dev->sofar++;
+>                         pkt_dev->seq_num++;
 
-> While converting struct ieee80211_tim_ie::virtual_map to be a flexible
-> array it was observed that the TIM IE processing in cw1200_rx_cb()
-> could potentially process a malformed IE in a manner that could result
-> in a buffer over-read. Add logic to verify that the TIM IE length is
-> large enough to hold a valid TIM payload before processing it.
-> 
-> Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
+Since pkt_dev->flags can change under us, I would rather read pkt_dev->flag=
+s
+once in pktgen_xmit() to avoid surprises...
 
-Patch applied to wireless-next.git, thanks.
-
-b7bcea9c27b3 wifi: cw1200: Avoid processing an invalid TIM IE
-
--- 
-https://patchwork.kernel.org/project/linux-wireless/patch/20230831-ieee80211_tim_ie-v3-1-e10ff584ab5d@quicinc.com/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
-
+syzbot probably never figured out how to run pktgen, it is a matter of time=
+...
 
