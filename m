@@ -1,95 +1,101 @@
-Return-Path: <netdev+bounces-34809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57BAD7A54D3
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 23:08:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42E697A54D4
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 23:08:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CFB91C21211
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 21:08:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C11E1C211D2
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 21:08:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7653830F86;
-	Mon, 18 Sep 2023 20:54:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 851B430F93;
+	Mon, 18 Sep 2023 20:54:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC6C728E0C
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:54:18 +0000 (UTC)
-Received: from mail-ua1-x933.google.com (mail-ua1-x933.google.com [IPv6:2607:f8b0:4864:20::933])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B10098E
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:54:16 -0700 (PDT)
-Received: by mail-ua1-x933.google.com with SMTP id a1e0cc1a2514c-7a282340fdfso1493096241.0
-        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:54:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2857127722
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:54:34 +0000 (UTC)
+Received: from mail-qv1-xf35.google.com (mail-qv1-xf35.google.com [IPv6:2607:f8b0:4864:20::f35])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80FF010F;
+	Mon, 18 Sep 2023 13:54:32 -0700 (PDT)
+Received: by mail-qv1-xf35.google.com with SMTP id 6a1803df08f44-6561c09ead6so26573566d6.1;
+        Mon, 18 Sep 2023 13:54:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695070456; x=1695675256; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=BMA2Tlorp/5C3XjCYdfhDG00VA/Qyz1kb9MumbAmE3A=;
-        b=LcGpOAbNBLnA5Q/MyHWFqvc256KVSf1EBl9S6psNA3IN5egYn2IzzcwrVz9L0N2pYN
-         IcyhXASKVx+LtIyHSZN7bKlusaNfT2fbwpD0P23G1I0Lvbt9Sv7MUmWZuUvWE7OXYEf6
-         4c1E6EMaXG4PRfVrQH6TzPaNeiVAf7n6jE8HjZNe09xZNfUTKne/57umZr8hnaj8eQHV
-         1W3DO5B76irdozGt5X4Ne139Rq65JUI38Xn8rW+DwjP5G/sRZ8WOBGkjBaIWBFWBwmhT
-         yh/NSMhKTxc1TwDq9gbdRiZcLyV44ej6qfPvkN6JB8CYCcBN9G+JXsdoyo19cDMXz86t
-         POPQ==
+        d=gmail.com; s=20230601; t=1695070471; x=1695675271; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3JKOIoxjAMpIMhlbFLnI66RFMTxES9Lx9Tg51O/hoxQ=;
+        b=DAWne48y9mrma4iHxVLNNejLW5EsAzip9NtC1NIkZNplCo2yw4KSLT89Yw6mX0W7b4
+         HH8QsJepoCJjrb+SpGSHnBDYXohusfHtXocAPI1JbfSFUXhP3GooeaLyBpnDIcD8rM/u
+         aZosC0f31Y83UpW5vYRtqlIFgKPZJ43mhxXI65IYZl/xz79DpDBP76xPEKcL7dS1m44f
+         Nv2idHX8akVzsLHu0FQNIre8HzjNTnmnyfMsFC2rWhAGpeiQtCghCNedS7v1PEOpIzcc
+         s+WMJWeF58c3rsFGt1hGCr5iQwOwl1EGX8EdBe4O2x/hp/KlOlgebOfYylv+7yq5xqmm
+         cwFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695070456; x=1695675256;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1695070471; x=1695675271;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BMA2Tlorp/5C3XjCYdfhDG00VA/Qyz1kb9MumbAmE3A=;
-        b=t+RCoe7fKfNewI7hllbgQJ6iy31vzDrEUvg0EmeBwpPNm6DbSRFvxvbsyukHTFYtd9
-         Cf/X9EzFY3uwUgGuV9bWSyi6sGgWJyEwEBmaTl33pRMr+OTtUdktxsa7QODSSiTnB2Ng
-         VqGkEh7J+jfp4QKd/gCTGUNWHrGuyavqGEvQYbuLcYNJoOFMBmenMmRvmqR/JvTziaOp
-         mJ4L5y2GKM8XZ97SgHQ1iIkskAS7URBxJOuWZOXPa94tBP49zHKwA7UfmEBSL3k60xzB
-         nB5294Ln9na4YJHaXkxWgZVCfdxWnQDCXfdnXzDQPHaplmqVPAhXB3ognlni51xGjR09
-         vSOw==
-X-Gm-Message-State: AOJu0YxTdRaeUXUECJfFKA4NduFy07gn8mXJOgTdhkju3XhDSz9dj92r
-	9wWXp6RzWxmfk2iy57fV4rw=
-X-Google-Smtp-Source: AGHT+IFwCCMuWANPIA3rQxXfuBYy6uk0lOQYPIH8fKIEbAwD3RUXcWBYpE+OOckAi1QRP1ORn9fgGA==
-X-Received: by 2002:a67:f3cf:0:b0:44e:a18a:2514 with SMTP id j15-20020a67f3cf000000b0044ea18a2514mr8791998vsn.33.1695070455768;
-        Mon, 18 Sep 2023 13:54:15 -0700 (PDT)
-Received: from errol.ini.cmu.edu ([72.95.245.133])
-        by smtp.gmail.com with ESMTPSA id a15-20020ac84d8f000000b004108c610d08sm3268875qtw.32.2023.09.18.13.54.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Sep 2023 13:54:15 -0700 (PDT)
-Date: Mon, 18 Sep 2023 16:54:13 -0400
-From: "Gabriel L. Somlo" <gsomlo@gmail.com>
-To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Karol Gugala <kgugala@antmicro.com>,
-	Mateusz Holenko <mholenko@antmicro.com>,
-	Joel Stanley <joel@jms.id.au>, netdev@vger.kernel.org,
-	kernel@pengutronix.de
-Subject: Re: [PATCH net-next 28/54] net: ethernet: litex: Convert to platform
- remove callback returning void
-Message-ID: <ZQi49RlWeYWPPSxG@errol.ini.cmu.edu>
-References: <20230918204227.1316886-1-u.kleine-koenig@pengutronix.de>
- <20230918204227.1316886-29-u.kleine-koenig@pengutronix.de>
+        bh=3JKOIoxjAMpIMhlbFLnI66RFMTxES9Lx9Tg51O/hoxQ=;
+        b=AoujEkolbwdbmb3dpbNxkerab1sVRwPcgEcZnG6AcivIcFm65tVwBXo7Po/16S2ed/
+         GUfNmq6q0KLHnC+hpb8CNanKLDId4iFQ4zb3o4tCAxN/h9fSrYB/VU3CfckmJ6MfIWKd
+         uhof2eghBZeE4UtIT1ERS9SxoIFznIDDwxwlNvSYne++pBMt//TfK+SU1XwpZwZMnB9/
+         X6Ba+Dv7K/OoUZyiRUXqbD5XEn2vqKPSSKC9DRc0afAUVrt2Vt6sWFsiTVpbRbjSJgH1
+         ocizWXQhOHyvX3SuY3BaGY+ry8lTl9tF7oPwgFm6G7Zub09xRLihjHpNWzkXGQx9ugnb
+         YCog==
+X-Gm-Message-State: AOJu0Yx2zpEnwkyytmKDxXTmGLoQYD0gS4LjO0wd3MHAJH3PrC1fVlTM
+	d/J3eLQVHJiV7/sEKr2yaL8=
+X-Google-Smtp-Source: AGHT+IEeDcfxx5E7MUkRKktvg+P5mdOgPZw4O5XC0zUqrlKQT2E6ixUqyqYrH9qxnPAEOXW5th/aOw==
+X-Received: by 2002:a0c:e4c9:0:b0:658:574:5b84 with SMTP id g9-20020a0ce4c9000000b0065805745b84mr4277949qvm.6.1695070471526;
+        Mon, 18 Sep 2023 13:54:31 -0700 (PDT)
+Received: from [10.67.49.139] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id w26-20020a0ca81a000000b00655e2005350sm3745460qva.9.2023.09.18.13.54.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 Sep 2023 13:54:30 -0700 (PDT)
+Message-ID: <05cfcbdd-ebc2-b494-4d18-f643e436a80c@gmail.com>
+Date: Mon, 18 Sep 2023 13:54:28 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH net-next 49/54] net: ethernet: ti: Convert to platform
+ remove callback returning void
+Content-Language: en-US
+To: =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Grygorii Strashko <grygorii.strashko@ti.com>,
+ Marc Kleine-Budde <mkl@pengutronix.de>, Nathan Chancellor
+ <nathan@kernel.org>, Nathan Huckleberry <nhuck@google.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Bhupesh Sharma <bhupesh.sharma@linaro.org>, Wei Fang <wei.fang@nxp.com>,
+ Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Arnd Bergmann <arnd@arndb.de>, netdev@vger.kernel.org,
+ kernel@pengutronix.de, linux-omap@vger.kernel.org
+References: <20230918204227.1316886-1-u.kleine-koenig@pengutronix.de>
+ <20230918204227.1316886-50-u.kleine-koenig@pengutronix.de>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20230918204227.1316886-50-u.kleine-koenig@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230918204227.1316886-29-u.kleine-koenig@pengutronix.de>
-X-Clacks-Overhead: GNU Terry Pratchett
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Sep 18, 2023 at 10:42:00PM +0200, Uwe Kleine-König wrote:
+On 9/18/23 13:42, Uwe Kleine-KÃ¶nig wrote:
 > The .remove() callback for a platform driver returns an int which makes
 > many driver authors wrongly assume it's possible to do error handling by
 > returning an error code. However the value returned is ignored (apart
@@ -99,48 +105,15 @@ On Mon, Sep 18, 2023 at 10:42:00PM +0200, Uwe Kleine-König wrote:
 > .remove_new() which already returns void. Eventually after all drivers
 > are converted, .remove_new() is renamed to .remove().
 > 
-> Trivially convert this driver from always returning zero in the remove
+> Trivially convert these drivers from always returning zero in the remove
 > callback to the void returning variant.
-
-Acked-by: Gabriel Somlo <gsomlo@gmail.com>
-
-Thanks,
---G
- 
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+> 
+> Signed-off-by: Uwe Kleine-KÃ¶nig <u.kleine-koenig@pengutronix.de>
 > ---
->  drivers/net/ethernet/litex/litex_liteeth.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/litex/litex_liteeth.c b/drivers/net/ethernet/litex/litex_liteeth.c
-> index ffa96059079c..5182fe737c37 100644
-> --- a/drivers/net/ethernet/litex/litex_liteeth.c
-> +++ b/drivers/net/ethernet/litex/litex_liteeth.c
-> @@ -294,13 +294,11 @@ static int liteeth_probe(struct platform_device *pdev)
->  	return 0;
->  }
->  
-> -static int liteeth_remove(struct platform_device *pdev)
-> +static void liteeth_remove(struct platform_device *pdev)
->  {
->  	struct net_device *netdev = platform_get_drvdata(pdev);
->  
->  	unregister_netdev(netdev);
-> -
-> -	return 0;
->  }
->  
->  static const struct of_device_id liteeth_of_match[] = {
-> @@ -311,7 +309,7 @@ MODULE_DEVICE_TABLE(of, liteeth_of_match);
->  
->  static struct platform_driver liteeth_driver = {
->  	.probe = liteeth_probe,
-> -	.remove = liteeth_remove,
-> +	.remove_new = liteeth_remove,
->  	.driver = {
->  		.name = DRV_NAME,
->  		.of_match_table = liteeth_of_match,
-> -- 
-> 2.40.1
-> 
+>   drivers/net/ethernet/ti/cpmac.c        | 6 ++----
+
+Reviewed-by: Florian Fainelli <f.fainelli@gmail.com> # cpmac
+-- 
+Florian
+
 
