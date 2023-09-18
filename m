@@ -1,54 +1,50 @@
-Return-Path: <netdev+bounces-34751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 900E77A544B
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 22:45:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53A247A544A
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 22:44:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46D0928103D
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 20:45:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E0C81C20C07
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 20:44:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46DAA450FF;
-	Mon, 18 Sep 2023 20:42:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9598450F6;
+	Mon, 18 Sep 2023 20:42:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F95266D6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7793F1D69E
 	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:42:49 +0000 (UTC)
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55768112
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:42:48 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6FCB8F
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:42:47 -0700 (PDT)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiL4m-0006ii-4Q; Mon, 18 Sep 2023 22:42:36 +0200
+	id 1qiL4m-0006ij-E4; Mon, 18 Sep 2023 22:42:36 +0200
 Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiL4l-007Ihj-ET; Mon, 18 Sep 2023 22:42:35 +0200
+	id 1qiL4l-007Ihn-ND; Mon, 18 Sep 2023 22:42:35 +0200
 Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiL4l-002mnS-4k; Mon, 18 Sep 2023 22:42:35 +0200
+	id 1qiL4l-002mnW-DM; Mon, 18 Sep 2023 22:42:35 +0200
 From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>
-Cc: Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>,
+Cc: Joyce Ooi <joyce.ooi@intel.com>,
 	netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-sunxi@lists.linux.dev,
 	kernel@pengutronix.de
-Subject: [PATCH net-next 04/54] net: ethernet: allwinner: Convert to platform remove callback returning void
-Date: Mon, 18 Sep 2023 22:41:36 +0200
-Message-Id: <20230918204227.1316886-5-u.kleine-koenig@pengutronix.de>
+Subject: [PATCH net-next 05/54] net: ethernet: altera: Convert to platform remove callback returning void
+Date: Mon, 18 Sep 2023 22:41:37 +0200
+Message-Id: <20230918204227.1316886-6-u.kleine-koenig@pengutronix.de>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230918204227.1316886-1-u.kleine-koenig@pengutronix.de>
 References: <20230918204227.1316886-1-u.kleine-koenig@pengutronix.de>
@@ -59,7 +55,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1933; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=/brLzDs1X8Bi9La4K8zev2mnuxRHEMkq0e27iN0d61o=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlCLXpjCQR2Xy6r9GAUU5Slp4iE7VmvuvsDyHWw BKa/uhDBaiJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZQi16QAKCRCPgPtYfRL+ TuFvB/95bAWGago7Ab7zdAK8oFt2UfUEXr13+CjxQG92mOLLsC7zpqs0M5xJk3M8WGh4YPbw1h3 Y2OkP8OfiQO5OLchqnB5dLnq2nvU5d6Jfpt4mVXylIUHN23D1P+ZZVhXPQXlCfvkpkclteNpMGv S8UIekel8klXTQ/kQUBNRBbKsl7Le+a5yAhh1OH/0gBrpKKxecgMMU6EEJLBC+WuwNljMShlpS9 mXIfRRQEZ4vLhBfCXJNRktjjkX7DwZxG9g9MiSCj8iUbUHF9/OZ21aGzjmQ2w6K6P8r3Wf3gqOi +bsVdyIXYhzYFyx9cNe4Ej6jPQeqGvq1xFJrFFFtuUNGm8ra
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1984; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=Sp88t+dNPfPvXPh/0eZ7Jv86PJSLjnxb94QZmtB+6i8=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlCLXqixKOKdyPcfMJva/g2JsHyUD2XYNKEu6AH BqRfO52/PqJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZQi16gAKCRCPgPtYfRL+ TqixB/9hAaZ7l3CVNkzqqPM5wnyZBmxM1YHU3DtIOx/EXgcumGu6NlJuqcXXubW8Ym/GYF/xITe 9k7BewSPUSYoWl/sMPftdu6LUN2Ubr5wyVdgbjmh7ayxjfTae80P6AxBDJ7oQeuaYTXI2Ca2J1Z DEjxQsS3cDCqJ5qqRUTs5X+dbO91TcVtWxszF2ocCp0clH6INJgjm7bQmGZlnidFzNQewxkRHfg F3UIMVLe2I5n1ht03WXXw1VH8zrDzq21TuhT1Y9JfO4KOayb2IGwic+ShWkMWN4RhejvxAOeUQq 8DOFfL+f0dqscc9Oiak99C0b//ZLTGjef433SCEwly7tymvD
 X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
@@ -85,39 +81,40 @@ callback to the void returning variant.
 
 Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 ---
- drivers/net/ethernet/allwinner/sun4i-emac.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/altera/altera_tse_main.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/allwinner/sun4i-emac.c b/drivers/net/ethernet/allwinner/sun4i-emac.c
-index a94c62956eed..d761c08fe5c1 100644
---- a/drivers/net/ethernet/allwinner/sun4i-emac.c
-+++ b/drivers/net/ethernet/allwinner/sun4i-emac.c
-@@ -1083,7 +1083,7 @@ static int emac_probe(struct platform_device *pdev)
- 	return ret;
- }
+diff --git a/drivers/net/ethernet/altera/altera_tse_main.c b/drivers/net/ethernet/altera/altera_tse_main.c
+index 2e15800e5310..1b1799985d1d 100644
+--- a/drivers/net/ethernet/altera/altera_tse_main.c
++++ b/drivers/net/ethernet/altera/altera_tse_main.c
+@@ -1464,7 +1464,7 @@ static int altera_tse_probe(struct platform_device *pdev)
  
--static int emac_remove(struct platform_device *pdev)
-+static void emac_remove(struct platform_device *pdev)
+ /* Remove Altera TSE MAC device
+  */
+-static int altera_tse_remove(struct platform_device *pdev)
++static void altera_tse_remove(struct platform_device *pdev)
  {
  	struct net_device *ndev = platform_get_drvdata(pdev);
- 	struct emac_board_info *db = netdev_priv(ndev);
-@@ -1101,7 +1101,6 @@ static int emac_remove(struct platform_device *pdev)
- 	free_netdev(ndev);
+ 	struct altera_tse_private *priv = netdev_priv(ndev);
+@@ -1476,8 +1476,6 @@ static int altera_tse_remove(struct platform_device *pdev)
+ 	lynx_pcs_destroy(priv->pcs);
  
- 	dev_dbg(&pdev->dev, "released and freed device\n");
+ 	free_netdev(ndev);
+-
 -	return 0;
  }
  
- static int emac_suspend(struct platform_device *dev, pm_message_t state)
-@@ -1143,7 +1142,7 @@ static struct platform_driver emac_driver = {
- 		.of_match_table = emac_of_match,
- 	},
- 	.probe = emac_probe,
--	.remove = emac_remove,
-+	.remove_new = emac_remove,
- 	.suspend = emac_suspend,
- 	.resume = emac_resume,
- };
+ static const struct altera_dmaops altera_dtype_sgdma = {
+@@ -1528,7 +1526,7 @@ MODULE_DEVICE_TABLE(of, altera_tse_ids);
+ 
+ static struct platform_driver altera_tse_driver = {
+ 	.probe		= altera_tse_probe,
+-	.remove		= altera_tse_remove,
++	.remove_new	= altera_tse_remove,
+ 	.suspend	= NULL,
+ 	.resume		= NULL,
+ 	.driver		= {
 -- 
 2.40.1
 
