@@ -1,61 +1,56 @@
-Return-Path: <netdev+bounces-34738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6A857A5411
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 22:27:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5355B7A541B
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 22:28:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 045361C21053
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 20:27:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D9EF282411
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 20:28:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 569252869A;
-	Mon, 18 Sep 2023 20:27:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84470286AE;
+	Mon, 18 Sep 2023 20:27:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E266927EF4
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:27:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D30B82868A
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:27:46 +0000 (UTC)
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2EEE8F
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:27:25 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42FDF11F
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:27:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
 	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
 	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
 	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=L2CeVtMgPVz1Pc2WYqNBWNTnOW0CR0j2BuL7XCt64PY=; b=Rd
-	fF6cBmqJhiAkzseRwUfLpsWOI0McKGTm5+OI3C7CY3KyJGFioe7Ht/y99sDm4O/LlNwAq27Lk/7W8
-	JR4vX6sNIhF4JqLmnbfpGRyVsFBThNTgdoLF7tkfWZIRvTp+V27ew77LYUaATlvA/hndlp9PuKhPJ
-	EktwqClDvv9QTeI=;
+	In-Reply-To:References; bh=FzWI9yaV6SJN5Eb4xc6+SpHkKiqBcEENDthh1eLcrlU=; b=5y
+	EWLtQTc01FuNhFVAdoRRpuWusiuM2uUPTiAiqo6ZhbEIsGaRBITYeU+eMiAkINzE/8F6cPu42fhQo
+	CcuW8xGJcChtsE5Cmdao87TvhNF0r89siTALSyg8cAR54Gtzh+HQwgdlq60j7xafgA0FyNP02RnVq
+	NvUExn10R5EQog8=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1qiKpp-006plo-75; Mon, 18 Sep 2023 22:27:09 +0200
-Date: Mon, 18 Sep 2023 22:27:09 +0200
+	id 1qiKqE-006pmX-J8; Mon, 18 Sep 2023 22:27:34 +0200
+Date: Mon, 18 Sep 2023 22:27:34 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>
-Cc: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
+Cc: Colin Foster <colin.foster@in-advantage.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	UNGLinuxDriver@microchip.com,
 	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	netdev@vger.kernel.org, kernel@pengutronix.de,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next 5/9] net: dsa: mt7530: Convert to platform
+	netdev@vger.kernel.org, kernel@pengutronix.de
+Subject: Re: [PATCH net-next 6/9] net: dsa: ocelot: Convert to platform
  remove callback returning void
-Message-ID: <00267afc-fb9f-4e4e-9956-28d2f3b63528@lunn.ch>
+Message-ID: <e8f9e37b-411a-4bca-820c-9a3c44933518@lunn.ch>
 References: <20230918191916.1299418-1-u.kleine-koenig@pengutronix.de>
- <20230918191916.1299418-6-u.kleine-koenig@pengutronix.de>
+ <20230918191916.1299418-7-u.kleine-koenig@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,14 +60,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230918191916.1299418-6-u.kleine-koenig@pengutronix.de>
+In-Reply-To: <20230918191916.1299418-7-u.kleine-koenig@pengutronix.de>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
 	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Sep 18, 2023 at 09:19:12PM +0200, Uwe Kleine-König wrote:
+On Mon, Sep 18, 2023 at 09:19:13PM +0200, Uwe Kleine-König wrote:
 > The .remove() callback for a platform driver returns an int which makes
 > many driver authors wrongly assume it's possible to do error handling by
 > returning an error code. However the value returned is ignored (apart
@@ -82,7 +77,7 @@ On Mon, Sep 18, 2023 at 09:19:12PM +0200, Uwe Kleine-König wrote:
 > .remove_new() which already returns void. Eventually after all drivers
 > are converted, .remove_new() is renamed to .remove().
 > 
-> Trivially convert this driver from always returning zero in the remove
+> Trivially convert these drivers from always returning zero in the remove
 > callback to the void returning variant.
 > 
 > Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
