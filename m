@@ -1,103 +1,195 @@
-Return-Path: <netdev+bounces-34623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D903D7A4E2F
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 18:08:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93F477A4E76
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 18:18:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3D0F1C214FB
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 16:08:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 405F2282821
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 16:18:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2EB3210FA;
-	Mon, 18 Sep 2023 16:07:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D22072376E;
+	Mon, 18 Sep 2023 16:17:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EF111D686
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 16:07:15 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20F3A59E2
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 09:07:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=yTRpoHAtEnJNybM7+Zhr0WgpKJefB3Ur0aO/o5Mjaug=; b=PBftq/IcLGdUFGTvxHSDKia04v
-	j/wdD0YEYkI7SWvTXgmLLN3ZibfIb3Uyv6Z1V01ZZaHQ/Cp9+MLygqiXphmYpFaNasBeuOG3fmos/
-	vQz7n7/vQV2WLwakojQEPi/IfL+nd1NvC6QOjmtXmUpoWoGBiQbtk7ioD0zxrRrU0axgHoFwgxc5n
-	VTud5cHtkkWECSEBgb69gwmJsXlC7gEE9H1jmCWP6h5o5aj4bT8Al29zTr7ED5BTZtuSzVheTnohj
-	U+4TvFhnezGeRJdJKEUoJyaktwgzFqy8RU3Jom6YNYmE6YORq65PCzISydSd2pSNei9dIRhtaxlyZ
-	hS61A1ig==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45154)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qiDxs-0000HU-2L;
-	Mon, 18 Sep 2023 14:07:00 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qiDxt-0000Uk-JX; Mon, 18 Sep 2023 14:07:01 +0100
-Date: Mon, 18 Sep 2023 14:07:01 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Marek Szyprowski <m.szyprowski@samsung.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>, chenhao418@huawei.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jijie Shao <shaojijie@huawei.com>,
-	lanhao@huawei.com, liuyonglong@huawei.com, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, shenjian15@huawei.com,
-	wangjie125@huawei.com, wangpeiyang1@huawei.com
-Subject: Re: [PATCH net-next 1/7] net: phy: always call
- phy_process_state_change() under lock
-Message-ID: <ZQhLdXS6pCaPffPi@shell.armlinux.org.uk>
-References: <ZQMn+Wkvod10vdLd@shell.armlinux.org.uk>
- <E1qgoNP-007a46-Mj@rmk-PC.armlinux.org.uk>
- <CGME20230918123304eucas1p2b628f00ed8df536372f1f2b445706021@eucas1p2.samsung.com>
- <42ef8c8f-2fc0-a210-969b-7b0d648d8226@samsung.com>
- <b54eca90-93cb-40ed-8c18-23b196b4728b@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D64422F1F
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 16:17:45 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D674A1FC9;
+	Mon, 18 Sep 2023 09:17:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695053858; x=1726589858;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=kDT+yWJAUHrBQ8ex5Uxk7tCrxharMirq80UQzoJeAvk=;
+  b=JubL0SGD129feTlxJbpEtLUy5fAs6Exf+tYTFgooSXcczDpaAndTVc2O
+   IF0Rux7dygTVLWBcC4nqidMxiFnC9c9tQTT7d/0L8LA6pH6wjY6QBCPt4
+   vfW9hx7c70IMqrxn6dvsW/jMsIbI77mMPrXEqzimjXBMRAH0wccmmY+b0
+   ljVmKf0zfF+ds94dkq8IEqhKersOT5Ic7MaP8L3ZF99+f5xWE8YLVQRQ2
+   mtUxcJiutcmG+YrkgBBt6b4bqxU2qPf0VtrarGrLJcyHzlajnCYICAAmf
+   4sOY5Oy5Ju7Rf1jzssP6IFHfna1L8EbF8G0neV4V4BgBdMppJOvGGBUfk
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="446113624"
+X-IronPort-AV: E=Sophos;i="6.02,156,1688454000"; 
+   d="scan'208";a="446113624"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2023 06:13:53 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="811343130"
+X-IronPort-AV: E=Sophos;i="6.02,156,1688454000"; 
+   d="scan'208";a="811343130"
+Received: from nprotaso-mobl1.ccr.corp.intel.com (HELO ijarvine-mobl2.ger.corp.intel.com) ([10.252.49.156])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2023 06:13:47 -0700
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+To: linux-pci@vger.kernel.org,
+	Bjorn Helgaas <helgaas@kernel.org>,
+	Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+	Rob Herring <robh@kernel.org>,
+	=?UTF-8?q?Krzysztof=20Wilczy=C5=84ski?= <kw@linux.com>,
+	Lukas Wunner <lukas@wunner.de>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
+	linux-kernel@vger.kernel.org,
+	Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	linux-rdma@vger.kernel.org
+Cc: ath10k@lists.infradead.org,
+	ath11k@lists.infradead.org,
+	ath12k@lists.infradead.org,
+	intel-wired-lan@lists.osuosl.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org,
+	=?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Dean Luick <dean.luick@cornelisnetworks.com>
+Subject: [PATCH v2 12/13] RDMA/hfi1: Use pci_disable/enable_link_state()
+Date: Mon, 18 Sep 2023 16:11:02 +0300
+Message-Id: <20230918131103.24119-13-ilpo.jarvinen@linux.intel.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20230918131103.24119-1-ilpo.jarvinen@linux.intel.com>
+References: <20230918131103.24119-1-ilpo.jarvinen@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b54eca90-93cb-40ed-8c18-23b196b4728b@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
 	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Sep 18, 2023 at 02:55:32PM +0200, Andrew Lunn wrote:
-> > This probably need to be fixed somewhere in drivers/net/usb/asix* but at 
-> > the first glance I don't see any obvious place that need a fix.
-> 
-> static int __asix_mdio_read(struct net_device *netdev, int phy_id, int loc,
->                             bool in_pm)
-> {
->         struct usbnet *dev = netdev_priv(netdev);
->         __le16 res;
->         int ret;
-> 
->         mutex_lock(&dev->phy_mutex);
-> 
-> Taking this lock here is the problem. Same for write.
-> 
-> There is some funky stuff going on in asix_devices.c. It using both
-> phylib and the much older mii code.
+IB/hfi1 driver adjusts ASPM state itself which leaves ASPM service
+driver in PCI core unaware of the link state changes the driver
+implemented.
 
-I don't think that's the problem...
+Call pci_disable_link_state() and pci_enable_link_state() instead of
+adjusting ASPMC field in LNKCTL directly in the driver and let PCI core
+handle the ASPM state management. Remove the functions that handled the
+ASPM changes that are now unnecessary.
 
+Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
+Reviewed-by: Dean Luick <dean.luick@cornelisnetworks.com>
+---
+ drivers/infiniband/hw/hfi1/aspm.c | 38 +++----------------------------
+ drivers/infiniband/hw/hfi1/pcie.c |  2 +-
+ 2 files changed, 4 insertions(+), 36 deletions(-)
+
+diff --git a/drivers/infiniband/hw/hfi1/aspm.c b/drivers/infiniband/hw/hfi1/aspm.c
+index a3c53be4072c..8e3fc1d4c9c6 100644
+--- a/drivers/infiniband/hw/hfi1/aspm.c
++++ b/drivers/infiniband/hw/hfi1/aspm.c
+@@ -54,45 +54,13 @@ static void aspm_hw_set_l1_ent_latency(struct hfi1_devdata *dd)
+ 	pci_write_config_dword(dd->pcidev, PCIE_CFG_REG_PL3, reg32);
+ }
+ 
+-static void aspm_hw_enable_l1(struct hfi1_devdata *dd)
+-{
+-	struct pci_dev *parent = dd->pcidev->bus->self;
+-
+-	/*
+-	 * If the driver does not have access to the upstream component,
+-	 * it cannot support ASPM L1 at all.
+-	 */
+-	if (!parent)
+-		return;
+-
+-	/* Enable ASPM L1 first in upstream component and then downstream */
+-	pcie_capability_clear_and_set_word(parent, PCI_EXP_LNKCTL,
+-					   PCI_EXP_LNKCTL_ASPMC,
+-					   PCI_EXP_LNKCTL_ASPM_L1);
+-	pcie_capability_clear_and_set_word(dd->pcidev, PCI_EXP_LNKCTL,
+-					   PCI_EXP_LNKCTL_ASPMC,
+-					   PCI_EXP_LNKCTL_ASPM_L1);
+-}
+-
+-void aspm_hw_disable_l1(struct hfi1_devdata *dd)
+-{
+-	struct pci_dev *parent = dd->pcidev->bus->self;
+-
+-	/* Disable ASPM L1 first in downstream component and then upstream */
+-	pcie_capability_clear_and_set_word(dd->pcidev, PCI_EXP_LNKCTL,
+-					   PCI_EXP_LNKCTL_ASPMC, 0x0);
+-	if (parent)
+-		pcie_capability_clear_and_set_word(parent, PCI_EXP_LNKCTL,
+-						   PCI_EXP_LNKCTL_ASPMC, 0x0);
+-}
+-
+ static  void aspm_enable(struct hfi1_devdata *dd)
+ {
+ 	if (dd->aspm_enabled || aspm_mode == ASPM_MODE_DISABLED ||
+ 	    !dd->aspm_supported)
+ 		return;
+ 
+-	aspm_hw_enable_l1(dd);
++	pci_enable_link_state(dd->pcidev, PCI_EXP_LNKCTL_ASPM_L1);
+ 	dd->aspm_enabled = true;
+ }
+ 
+@@ -101,7 +69,7 @@ static  void aspm_disable(struct hfi1_devdata *dd)
+ 	if (!dd->aspm_enabled || aspm_mode == ASPM_MODE_ENABLED)
+ 		return;
+ 
+-	aspm_hw_disable_l1(dd);
++	pci_disable_link_state(dd->pcidev, PCIE_LINK_STATE_L0S | PCIE_LINK_STATE_L1);
+ 	dd->aspm_enabled = false;
+ }
+ 
+@@ -254,7 +222,7 @@ void aspm_init(struct hfi1_devdata *dd)
+ 	/* Start with ASPM disabled */
+ 	aspm_hw_set_l1_ent_latency(dd);
+ 	dd->aspm_enabled = false;
+-	aspm_hw_disable_l1(dd);
++	pci_disable_link_state(dd->pcidev, PCIE_LINK_STATE_L0S | PCIE_LINK_STATE_L1);
+ 
+ 	/* Now turn on ASPM if configured */
+ 	aspm_enable_all(dd);
+diff --git a/drivers/infiniband/hw/hfi1/pcie.c b/drivers/infiniband/hw/hfi1/pcie.c
+index 08732e1ac966..767f6cb770b6 100644
+--- a/drivers/infiniband/hw/hfi1/pcie.c
++++ b/drivers/infiniband/hw/hfi1/pcie.c
+@@ -1182,7 +1182,7 @@ int do_pcie_gen3_transition(struct hfi1_devdata *dd)
+ 	 * will be enabled if required later
+ 	 */
+ 	dd_dev_info(dd, "%s: clearing ASPM\n", __func__);
+-	aspm_hw_disable_l1(dd);
++	pci_disable_link_state(dd->pcidev, PCIE_LINK_STATE_L0S | PCIE_LINK_STATE_L1);
+ 
+ 	/*
+ 	 * step 5f: clear DirectSpeedChange
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.30.2
+
 
