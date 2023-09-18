@@ -1,138 +1,151 @@
-Return-Path: <netdev+bounces-34492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34476-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B49C7A460A
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 11:35:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DE2E7A4590
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 11:12:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA18528208E
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 09:35:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11D022814AB
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 09:12:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 870C61C29D;
-	Mon, 18 Sep 2023 09:34:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8961D14F82;
+	Mon, 18 Sep 2023 09:11:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58A3D1C29F
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 09:34:52 +0000 (UTC)
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABABCD3;
-	Mon, 18 Sep 2023 02:34:21 -0700 (PDT)
-Received: by mail-pg1-x52a.google.com with SMTP id 41be03b00d2f7-517ab9a4a13so3567177a12.1;
-        Mon, 18 Sep 2023 02:34:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695029661; x=1695634461; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=q6G1xYyE1NNaqnfLS7CDtUFGpGb/0lIiK2Jwl5R5oxI=;
-        b=fB5b5XaVmPEj+anElM7/wARYMiej2CFGCiFQ7koRr9/WklRncxwWPtYKZD9VOcUtjD
-         DuUJ63etBtX+ZYcdS3C6qm4zMP/kDlrs+0Zvy35fQ0QeJjCoWIAdJQvzmLn1ojgpq17i
-         AIoqbfiNsJs4LSabnihuGW5gDkkP2FdjVlkzpzRuTbbdOQWc3cBhDjHvwuVsTvh4NTyu
-         8NpC+oXkthRIzfV96vr3jAc4wsBNv7NT/vfnh6SpcILbXukhQPoGXYxkLDVfPA/Vs6iz
-         C4J8jnDke3w0+xqzMn6MdlW/2banLViybg9OswQbOpD81dE9Bx2IHkNQyaiPPFS8Fya1
-         fiJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695029661; x=1695634461;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=q6G1xYyE1NNaqnfLS7CDtUFGpGb/0lIiK2Jwl5R5oxI=;
-        b=ItbXMURHcMJnM8+3jwCFZSHvKpsy2TM9gd2fjGVqQd8dJQPAi8A/rGosjPbv4BXc/s
-         N77fhXU7Mcl45N1OhSCEsJKohTZ4FmZjl+UMDn/zcEpaW81f0NunOuQkHHS5lR77zbQt
-         ZytHyXLD9A0xHH+PkXj8Vp2etTI60qIel1nrxa+9XrRQv66yplj2JB07J8svwldmCltk
-         t+fxVttjaJWNmCchXQat3ylrbsZML7d2q2pPiItCWATze7ZJBUWm/GccTBSOlvviApMq
-         pAhu0ewsJedbXu9gtdGUMWyRiyYg1z6oewNoIRx2mosAqx+YIddOYjwvpUon0jrhWcqX
-         6Ehg==
-X-Gm-Message-State: AOJu0Yyg7tzhi6HqmOJ9akIHPKTkVWIRfxsi9aFWfOhhHhyaodhBZ3bb
-	ChLNRKNaII2UUO9A0IZnSDU=
-X-Google-Smtp-Source: AGHT+IFm99M0Df9AumnbyiG39jt6iyYrSQnDBT8geb5vG0E10iYCc342KUEf8lOfcQXeizvJ+WLjyQ==
-X-Received: by 2002:a17:90a:fb92:b0:274:6a79:17c1 with SMTP id cp18-20020a17090afb9200b002746a7917c1mr7507752pjb.15.1695029661068;
-        Mon, 18 Sep 2023 02:34:21 -0700 (PDT)
-Received: from debian.me ([103.124.138.83])
-        by smtp.gmail.com with ESMTPSA id 30-20020a17090a19de00b002694fee879csm9353848pjj.36.2023.09.18.02.34.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Sep 2023 02:34:20 -0700 (PDT)
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Jonathan Corbet <corbet@lwn.net>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>,
-	Linux Documentation <linux-doc@vger.kernel.org>,
-	Bagas Sanjaya <bagasdotme@gmail.com>
-Subject: [PATCH 2/2] Documentation: dpll: wrap DPLL_CMD_PIN_GET output in a code block
-Date: Mon, 18 Sep 2023 16:32:39 +0700
-Message-Id: <20230918093240.29824-3-bagasdotme@gmail.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230918093240.29824-1-bagasdotme@gmail.com>
-References: <20230918093240.29824-1-bagasdotme@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D3FA5382;
+	Mon, 18 Sep 2023 09:11:55 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D484C5;
+	Mon, 18 Sep 2023 02:11:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695028313; x=1726564313;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=RJJO2x4Zh+7nF0s81CNDj9yNY5C6WK5O66SjlprhQYg=;
+  b=inCbK/8xEStPovu7GTJrr74RW+IpogO/u/eddRfDDc0Jlt9qD4owIyw0
+   V/0Dv65HDr1ypk15QZSteIFksb0rIudoXUVJ25YagSTud28kXs32HU+7E
+   d+Bu7bS2PUWxcZ2K0fsl56Ute+3WVRTsVqtWIFuXML7nhvKUafExSrvqz
+   UvFJmM259ky3wfP5gTeCYcUqqlfk2IA63Ui8FuERjjOiLjAlYJ6rMF7Sn
+   lMhO5VCwmgQDsGsLf9c+4ZV83YQkQOI/JiGt3yfbyrstwJ11Z6oJc8xZ8
+   dtXZi3xjysn1Mzp7hriBb35eYZm8aRO1LvJKuDesHy3tmAhh0ZcDfLz8K
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10836"; a="364647890"
+X-IronPort-AV: E=Sophos;i="6.02,156,1688454000"; 
+   d="scan'208";a="364647890"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2023 02:11:52 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10836"; a="815949958"
+X-IronPort-AV: E=Sophos;i="6.02,156,1688454000"; 
+   d="scan'208";a="815949958"
+Received: from unknown (HELO axxiablr2..) ([10.190.162.200])
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2023 02:11:48 -0700
+From: Tushar Vyavahare <tushar.vyavahare@intel.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	bjorn@kernel.org,
+	magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com,
+	jonathan.lemon@gmail.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	tirthendu.sarkar@intel.com,
+	tushar.vyavahare@intel.com
+Subject: [PATCH bpf-next 0/8] Add a test for SHARED_UMEM feature
+Date: Mon, 18 Sep 2023 15:02:56 +0530
+Message-Id: <20230918093304.367826-1-tushar.vyavahare@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1705; i=bagasdotme@gmail.com; h=from:subject; bh=uj4JKbL5vY/lq6EfpVPwFUuyIVX3awrGKWlV163bhVM=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDKkckiYxXIbvJlx1u1HmtObVG6tMcYHsNwk3KpI7rp/9v 74mxU2go5SFQYyLQVZMkWVSIl/T6V1GIhfa1zrCzGFlAhnCwMUpABPRvsTI8FUgttGj5vvrCRbs p7fEd4axbVfb9vTR045aFYu9c2Ml7BgZppcqi0r4mXGLNDAuYzi5YuVbW4ffMs1rlt66UBy05ck 8DgA=
-X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-DPLL_CMD_PIN_GET netlink command output for mux-type pins looks ugly
-with normal paragraph formatting. Format it as a code block instead.
+Implement a test for the SHARED_UMEM feature in this patch set and make
+necessary changes/improvements. Ensure that the framework now supports
+different streams for different sockets.
 
-Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
----
- Documentation/driver-api/dpll.rst | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+Patch series summary:
 
-diff --git a/Documentation/driver-api/dpll.rst b/Documentation/driver-api/dpll.rst
-index 01eb4de867036f..69670deb8c4e09 100644
---- a/Documentation/driver-api/dpll.rst
-+++ b/Documentation/driver-api/dpll.rst
-@@ -119,19 +119,19 @@ with.
- If a pin was registered with multiple parent pins, they behave like a
- multiple output multiplexer. In this case output of a
- ``DPLL_CMD_PIN_GET`` would contain multiple pin-parent nested
--attributes with current state related to each parent, like:
-+attributes with current state related to each parent, like::
- 
--'pin': [{{
--  'clock-id': 282574471561216,
--  'module-name': 'ice',
--  'capabilities': 4,
--  'id': 13,
--  'parent-pin': [
--  {'parent-id': 2, 'state': 'connected'},
--  {'parent-id': 3, 'state': 'disconnected'}
--  ],
--  'type': 'synce-eth-port'
--  }}]
-+        'pin': [{{
-+          'clock-id': 282574471561216,
-+          'module-name': 'ice',
-+          'capabilities': 4,
-+          'id': 13,
-+          'parent-pin': [
-+          {'parent-id': 2, 'state': 'connected'},
-+          {'parent-id': 3, 'state': 'disconnected'}
-+          ],
-+          'type': 'synce-eth-port'
-+          }}]
- 
- Only one child pin can provide its signal to the parent MUX-type pin at
- a time, the selection is done by requesting change of a child pin state
+1: Move the packet stream from the ifobject struct to the xsk_socket_info
+   struct to enable the use of different streams for different sockets
+   This will facilitate the sending and receiving of data from multiple
+   sockets simultaneously using the SHARED_XDP_UMEM feature.
+
+   It gives flexibility of send/recive individual traffic on particular
+   socket.
+
+2: Rename the header file to a generic name so that it can be used by all
+   future XDP programs.
+
+3: Move the src_mac and dst_mac fields from the ifobject structure to the
+   xsk_socket_info structure to achieve per-socket MAC address assignment.
+   Implement the function called generate_mac_addresses() to generate MAC
+   addresses based on the required number by the framework.
+
+   Require this in order to steer traffic to various sockets in subsequent
+   patches.
+
+4: Improve the receive_pkt() function to enable it to receive packets from
+   multiple sockets. Define a sock_num variable to iterate through all the
+   sockets in the Rx path. Add nb_valid_entries to check that all the
+   expected number of packets are received.
+
+5: The pkt_set() function no longer needs the umem parameter. This commit
+   removes the umem parameter from the pkt_set() function.
+
+6: Iterate over all the sockets in the send pkts function. Update
+   send_pkts() to handle multiple sockets for sending packets.
+   Multiple TX sockets are utilized alternately based on the batch size
+   for improve packet transmission.
+
+7: Modify xsk_update_xskmap() to accept the index as an argument, enabling
+   the addition of multiple sockets to xskmap.
+
+8: Add a new test for testing shared umem feature. This is accomplished by
+   adding a new XDP program and using the multiple sockets. The new  XDP
+   program redirects the packets based on the destination MAC address.
+
+Tushar Vyavahare (8):
+  selftests/xsk: move pkt_stream to the xsk_socket_info
+  selftests/xsk: rename xsk_xdp_metadata.h to xsk_xdp_common.h
+  selftests/xsk: implement a function that generates MAC addresses
+  selftests/xsk: iterate over all the sockets in the receive pkts
+    function
+  selftests/xsk: remove unnecessary parameter from pkt_set() function
+    call
+  selftests/xsk: iterate over all the sockets in the send pkts function
+  selftests/xsk: modify xsk_update_xskmap() to accept the index as an
+    argument.
+  selftests/xsk: add a test for shared umem feature
+
+ .../selftests/bpf/progs/xsk_xdp_progs.c       |  22 +-
+ tools/testing/selftests/bpf/xsk.c             |   3 +-
+ tools/testing/selftests/bpf/xsk.h             |   2 +-
+ tools/testing/selftests/bpf/xsk_xdp_common.h  |  12 +
+ .../testing/selftests/bpf/xsk_xdp_metadata.h  |   5 -
+ tools/testing/selftests/bpf/xskxceiver.c      | 524 +++++++++++-------
+ tools/testing/selftests/bpf/xskxceiver.h      |  14 +-
+ 7 files changed, 376 insertions(+), 206 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/xsk_xdp_common.h
+ delete mode 100644 tools/testing/selftests/bpf/xsk_xdp_metadata.h
+
 -- 
-An old man doll... just what I always wanted! - Clara
+2.34.1
 
 
