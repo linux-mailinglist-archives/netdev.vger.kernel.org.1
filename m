@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-34732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C6197A537E
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 22:10:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D29F7A537F
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 22:10:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F16D1C209D4
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 20:09:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 948F71C2094C
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 20:10:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BE3127EF4;
-	Mon, 18 Sep 2023 20:09:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A37927EF6;
+	Mon, 18 Sep 2023 20:09:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDC1233DF
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:09:44 +0000 (UTC)
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73B78119
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:09:42 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-68fb2e9ebbfso3793037b3a.2
-        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:09:42 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CFE127EDA
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:09:55 +0000 (UTC)
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1353C8F
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:09:54 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-690bc3f82a7so487570b3a.0
+        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:09:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1695067782; x=1695672582; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1695067793; x=1695672593; darn=vger.kernel.org;
         h=in-reply-to:from:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=VAN9RdJrgSEym0NPQvMtQt6orckn/szzKLmgaBk3EHI=;
-        b=buGD4/dkPkWHeoiOmp75S3IpO0E+Rl7or8xhTwrzmtR/OSiLEmN8CnoQYYPs0NtjqG
-         Zk1YTghzvgKq3r9PkoFum5Zz9baYUXQnwXWMvct+ktD02+PShgV3H7tRSzQnVFFPqjGW
-         3oEULbkf1R8lvvw3giN9OLCG0OGyK7lLC+gl8=
+        bh=5HqejfbBUIg5xeNSK/smSXPRDWSQImC2jjN21pXl8vs=;
+        b=RtkJSOja9h7Lx3jS3aITDUoMnTIXipNiVPrlk0mP2kHiB24p+SCgTMAloHBsDyS20U
+         d/GGo4uhakFAO/rZeVolGwUOE2hmhWFfGr49KIOo3gm6IhzVijcT5F4nAIQKU8/Qznlp
+         s+ms//gqwkWSS2TtiblL1QM+W/4iFNsDDDvSI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695067782; x=1695672582;
+        d=1e100.net; s=20230601; t=1695067793; x=1695672593;
         h=in-reply-to:from:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VAN9RdJrgSEym0NPQvMtQt6orckn/szzKLmgaBk3EHI=;
-        b=HukhyQ5mMTCMwgRCiz7u8VH5OWwMyiIZnD8iiFELeXvsFmaO7KjFV931ClogA0y4h4
-         Z3GgNxX9GcI/UGhge8BDDP6UB0b7emYZpvF17nuyiyORhyQtUjhfso3KSayzMbzPYc8V
-         oFMZ0H/7ifd7qQmTdj0QpUJSu2us8iNRM82VE/enrqkLUz/cLNINjgp46h0DGiYzeXsj
-         7Mkb5DGxqLcpoClLScXsYfSZE8YxdvsGZ4Tqwp0cqwNT4y4dhjwW5FQsGT/EHbzOnWOh
-         uCjysn2d0R5wU+/tzuLpdnTiRmAuo4SY6UmTcbxL5oe4DWinTJIpLmBptwmh0OF6rfFo
-         7k5g==
-X-Gm-Message-State: AOJu0Yzzqlx30d4A6YvC394b+FvigFaiDRTEe7X/eBWOK20ed5dErSwz
-	06MPQV3cLUpxsEL69L25k/r6kg==
-X-Google-Smtp-Source: AGHT+IHj+3O7MBRiD9AQu8kO/tE38DedfUsVeyDKLUDxEaBcMr76n20xvYwt5mCfBu+MZArWR9SR5A==
-X-Received: by 2002:a05:6a21:47c6:b0:140:a25:1c1d with SMTP id as6-20020a056a2147c600b001400a251c1dmr7726012pzc.51.1695067781695;
-        Mon, 18 Sep 2023 13:09:41 -0700 (PDT)
+        bh=5HqejfbBUIg5xeNSK/smSXPRDWSQImC2jjN21pXl8vs=;
+        b=hoXtZETYFvABd2aNgMxYF0hozT85NP5I9cxUFmI33bue5onqq7wvXckfogFqAs3WXC
+         H0ifQjq1d129SIcGi56u0J0bHg/xImDppmFaaLEyOwluHyalPdWCaNHPhz+5tPhCTGoy
+         AYUjNdbP3R6DNBOg5UnEJ8R2YHdoGJncs8XNDNhITm+5Vx2ZjPLfQWdupHW3hz3Mopuy
+         w9ei/hymXkCi3KpN8LfX3GTnvTXfEcVpe97IlfIO2voecZovOnVU4o2DPMFQpLQHJuUQ
+         7VRJjMRRmSb7du3sAPbv8sEBheX1O4pPj1TKEaoRspKlybIYHtXQo23yr/UY5CTFbrDL
+         tL4w==
+X-Gm-Message-State: AOJu0YwMGi+jmkB4D9R3HSnFVP6uxA6cBOpVirauArzrLNgK9vP7TZzK
+	DJ144IR62mHdE3ZyXd6AAbpQDg==
+X-Google-Smtp-Source: AGHT+IGwQcSNpLAhCqQibOd2WdzUZBRx6a+W9GArdjZCn36izTuNrVn8roQdSc1XCWGaVHbwOvRG5A==
+X-Received: by 2002:a05:6a00:15c5:b0:68f:e810:e889 with SMTP id o5-20020a056a0015c500b0068fe810e889mr10748282pfu.31.1695067793551;
+        Mon, 18 Sep 2023 13:09:53 -0700 (PDT)
 Received: from [10.67.49.139] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id d23-20020aa78157000000b0068feb378b89sm7742139pfn.171.2023.09.18.13.09.40
+        by smtp.gmail.com with ESMTPSA id g18-20020aa78752000000b0068fe9f23bf4sm7464199pfo.103.2023.09.18.13.09.51
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Sep 2023 13:09:41 -0700 (PDT)
-Message-ID: <8500a4d8-47e5-9b24-04d5-35b78d32d9d3@broadcom.com>
-Date: Mon, 18 Sep 2023 13:09:39 -0700
+        Mon, 18 Sep 2023 13:09:52 -0700 (PDT)
+Message-ID: <2a1a5b22-ff49-b2f6-f38a-2c39ef2444e4@broadcom.com>
+Date: Mon, 18 Sep 2023 13:09:51 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,23 +62,23 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.15.1
-Subject: Re: [PATCH net-next 03/19] net: mdio: bcm-unimac: Convert to platform
- remove callback returning void
+Subject: Re: [PATCH net-next 10/19] net: mdio: mux-bcm-iproc: Convert to
+ platform remove callback returning void
 To: =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>,
  Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Doug Berger <opendmb@gmail.com>,
+Cc: Russell King <linux@armlinux.org.uk>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
  Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ <bcm-kernel-feedback-list@broadcom.com>, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 References: <20230918195102.1302746-1-u.kleine-koenig@pengutronix.de>
- <20230918195102.1302746-4-u.kleine-koenig@pengutronix.de>
+ <20230918195102.1302746-11-u.kleine-koenig@pengutronix.de>
 From: Florian Fainelli <florian.fainelli@broadcom.com>
-In-Reply-To: <20230918195102.1302746-4-u.kleine-koenig@pengutronix.de>
+In-Reply-To: <20230918195102.1302746-11-u.kleine-koenig@pengutronix.de>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000000502e40605a7b987"
+	boundary="000000000000b886f30605a7b96e"
 X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
@@ -86,7 +86,7 @@ X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---0000000000000502e40605a7b987
+--000000000000b886f30605a7b96e
 Content-Language: en-US
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
@@ -111,7 +111,7 @@ Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 Florian
 
 
---0000000000000502e40605a7b987
+--000000000000b886f30605a7b96e
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -184,13 +184,13 @@ AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
 LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
 /D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIKIH6s2bcoFjUm+1
 DGrUIsH6JGiQwTGyzMErrFCjPXz0MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
-AQkFMQ8XDTIzMDkxODIwMDk0MlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
+AQkFMQ8XDTIzMDkxODIwMDk1M1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
 AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
-MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCrGTr+qBTjzIarD5hwTgtiXi1PlWS3iAqO
-nVHZIzyEmmgi4JvW5Jq/q4pkKtz21qz07QKqUWTlJm1zrVhhmTAYj8kJiYdBgS+r9QpR7RVtrYAK
-RwJnkMqncDsSp3Dgtb/q+uR2EHHH+LJwyWD9bjGFbRPppEKatr8XZkXJwJvaIbPNyYqhpcjHSsDG
-swqUgRHudYsogvpkdaFSRdvehkXWGn3zHbi/SriLxO4pYxyYqjrmMUwqGHhPI0O/UVsd9Nw7H3BL
-aPAChofXH5xCAw8imteEi8WrxeTrPpwq3mWohBB4lA9Y95DaE5sPzt6nPpd7xds1Wn09bnTo07zi
-CdTn
---0000000000000502e40605a7b987--
+MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCY2YPKOOJOG6k4hYJqpldIY6EySqHSLVE3
+30zUOH2eGU4UDyyX3aYeOKSOkwQz3S2Kwt2t4DMUuALGwEXisH/5QoznCP1eDtNH+4Jk9N/5MnzW
+UZY0OZ5r1L5H/Ey4DJQHQt86HdDwIO5o+L772DeN7bvspfNeGIs6S9o4mhnsMj3WGxIVMZNatJhf
+fcRWGv9bLT2GGVBWt2cr62yzvm6ULxkqcARAyQxpuORfI+ipyMfCDbOY9M1go59a7+rt4AkYexRW
+eMFLZWmYuUrYa39SO6UXS61bp4Qnf/6AX0IEk2q6Ed7U3gee9h5C1B4m9DJCwUbbkuF808QGM/9s
+BGHg
+--000000000000b886f30605a7b96e--
 
