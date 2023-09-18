@@ -1,74 +1,79 @@
-Return-Path: <netdev+bounces-34462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A27357A43DD
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 10:06:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 188497A43F9
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 10:10:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CDD42823D7
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 08:06:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 060031C20EA7
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 08:10:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36545134BD;
-	Mon, 18 Sep 2023 08:06:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2C681427E;
+	Mon, 18 Sep 2023 08:09:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B28C94C94
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 08:06:06 +0000 (UTC)
-Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 821E1CC1
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 01:05:21 -0700 (PDT)
-Received: by mail-qt1-x835.google.com with SMTP id d75a77b69052e-41513d2cca7so420351cf.0
-        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 01:05:21 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0DE4749D
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 08:09:55 +0000 (UTC)
+Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6F7C9F
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 01:09:52 -0700 (PDT)
+Received: by mail-qt1-x832.google.com with SMTP id d75a77b69052e-41513d2cca7so421841cf.0
+        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 01:09:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695024320; x=1695629120; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1695024592; x=1695629392; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=PPWRnEDlmzjDvKCuAcepEH2uKQacvVIlU4RvOyhuSnA=;
-        b=GllnoLzg7aWr3e6VmVYQq8dkj6H7ipAuoWhjF0SUuytBFGUkhsQpzvh5bffYVy9N9Z
-         nRwvXFJGTNlOIAdW/hFIBCEMPAnbCykXKTJVPx1v2eMveiT2QtSAf7Ee+o0tuj1AliLM
-         G9qjjgk42Z3zGkmACJDfFfkbhdyUWBPcCYJ3A+XfzkdqufjdSTOE6kSbdZXgbiL078Ao
-         3q8oSIFQ11AQsmUP6Z1nB0pfaUOonUtNDqCdsCTvofhgebsV+FDZTE9hkGpO1fMSu6Id
-         j5mpkS1g+tp+YVCUhtqoZ5rUAv1JmDbUu0jRzYPsXpSu0GaCfVNDrByjIjZHFWgl/nOC
-         nH4g==
+        bh=38st7+CwNWQl13xaTkpZZQeswKXbWoJIBIN4bsM6Emo=;
+        b=m3DsUHkI15ViQGFCMSBgYCDmylYRsWAZdL9HyTH1gFEjtNYeiWhUlYNG2wUKvzCctR
+         c0SV4XyBSV2tFxH+3eSJLiSZ3qBA+CcQ0XiBv2Pp/GY8lEhGUEaZ+ob34SF1W6BVecd9
+         Wud8BA72hymy8kXJrGkyyS5Z/xn5p1+es5253JUkzuh/lx2qBjiOrUIkmix1WaTJoDCn
+         c0jry9kGpdb2W4vhQNFtsq3a+0NfVK4Uf4V+bkUOg2lJTeZB+FZBpgUnjvqXo7cScaJB
+         szVLk0w5Ro1RV41J3a7vi1OvOYudt04gmhCv3lfHxL2qeF6g5JPrAS7+ogn2JEl+QchQ
+         5wOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695024320; x=1695629120;
+        d=1e100.net; s=20230601; t=1695024592; x=1695629392;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=PPWRnEDlmzjDvKCuAcepEH2uKQacvVIlU4RvOyhuSnA=;
-        b=TmvXdC3pvk5Zb14/wlHmmJPuBX7QyXAVu1k8Xu3OHukPx6pbcsuVjdvypFp36AhUY8
-         vmm5waUtLR1Va+DSNtEmK3/wzhrXtNem5nAsLPaiyPCjT9qLigUedV5NcR5y9jhDQLxg
-         rLJ/mzHFne+lgK1aFqgh9aMJ5ORdnEzeC+Lz5pqAL7ytXaZa36CxK/JJ2eAc5R11k4dB
-         E/D1giykhjukoNaB0blC/yNa0BHd4DORvdi8MIv9ap+2BB2IHbfHDJjwzgdCoeeWvaER
-         kqdpBenChZAa+bja0FNPKjl/szxVYtEGR9MHs6QLhBf1ZxQnZAlzm53mxzs+LVPTxXF+
-         CWow==
-X-Gm-Message-State: AOJu0YwlBBMjAofbX5j9o98ue6DiAZToa1/V4EQIUjzlgk0O5GEM2rUn
-	83S89wyfGllL7gqjpXpHUvIVASlPEZ5pGdAU7PmBJ74sGGYTznvukLI=
-X-Google-Smtp-Source: AGHT+IFRIMz0D/vZED3GkAZFZcTtAHDSy2HcE7KbS6iJ5+GbAWb7kjTWJ3WhxNfrV7aD1K21VRYJqOQvJc/7LTZGChc=
-X-Received: by 2002:a05:622a:1307:b0:40f:d1f4:aa58 with SMTP id
- v7-20020a05622a130700b0040fd1f4aa58mr316425qtk.8.1695024320296; Mon, 18 Sep
- 2023 01:05:20 -0700 (PDT)
+        bh=38st7+CwNWQl13xaTkpZZQeswKXbWoJIBIN4bsM6Emo=;
+        b=ntu6E9R7zJBJiZcI8GaqPxYud3CDwcDV0In3myj4r9jHWw24iFuphnlbrhNysYtLhg
+         IXgj0gffOQsgSA+e6nJXmy6pH70y9oO97EOfXYDcZZ/XycQgeIBLzRvR0jmLpaFo8SSl
+         tToMghFg+ts47v/5H8aKPzpRho9xe8cmGQsuxQVcpN1wHlhYlZyVez2L0DkT1LpqDfEa
+         0+yHuysg9WNwqXdQMUY9wHz+PlyXAmpBkWoTuP2l+MkT7MITm6zh990lWhlMf6uYGjiX
+         VN042FwaCdz6/5rJjtirrbEkXIz0qSZtA5P+jEqVjphTFEWIiLQHh0pIclZDHVyqRfWl
+         wJzA==
+X-Gm-Message-State: AOJu0Yy4i+RcF3MmYy+/TLTRuDLlyOxQq3dT+vQa53aDBc6ELcT0Hfmx
+	fRFkJ5wpQ/NHNY08SYsBNpbw2f7mneKVOPu/eRB0+Q==
+X-Google-Smtp-Source: AGHT+IFlGfwR9VKfI97ywRNTNtaaOI6Ipg1gKde7gqFOeFzSJI/pU+LysoXQWS3rtxZdtS9fNlxrILghk8dzM2Hz8mg=
+X-Received: by 2002:a05:622a:1341:b0:417:9238:5a30 with SMTP id
+ w1-20020a05622a134100b0041792385a30mr384071qtk.29.1695024591626; Mon, 18 Sep
+ 2023 01:09:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230918014752.1791518-1-guodongtai@kylinos.cn>
-In-Reply-To: <20230918014752.1791518-1-guodongtai@kylinos.cn>
+References: <64CCB695-BA43-48F5-912A-AFD5B9C103A7@gmail.com>
+ <51294220-A244-46A9-A5B8-34819CE30CF4@gmail.com> <67303CFE-1938-4510-B9AE-5038BF98ABB7@gmail.com>
+ <8a62f57a9454b0592ab82248fca5a21fc963995b.camel@redhat.com>
+ <CALidq=UR=3rOHZczCnb1bEhbt9So60UZ5y60Cdh4aP41FkB5Tw@mail.gmail.com>
+ <43ED0333-18AB-4C38-A615-7755E5BE9C3E@gmail.com> <5A853CC5-F15C-4F30-B845-D9E5B43EC039@gmail.com>
+In-Reply-To: <5A853CC5-F15C-4F30-B845-D9E5B43EC039@gmail.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 18 Sep 2023 10:05:09 +0200
-Message-ID: <CANn89i+WshtNwNSALCpbQbZFWN41xP85+c8GdHX2DabzQzx+6A@mail.gmail.com>
-Subject: Re: [PATCH v1] tcp: enhancing timestamps random algo to address
- issues arising from NAT mapping
-To: George Guo <guodongtai@kylinos.cn>, Florian Westphal <fw@strlen.de>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	dsahern@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Mon, 18 Sep 2023 10:09:40 +0200
+Message-ID: <CANn89iLWi7yr184a52FRrO2QW=ffLEsy1DKj+f_Yz_nPuhaMPA@mail.gmail.com>
+Subject: Re: Urgent Bug Report Kernel crash 6.5.2
+To: Martin Zaharinov <micron10@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev <netdev@vger.kernel.org>, 
+	patchwork-bot+netdevbpf@kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+	Stephen Hemminger <stephen@networkplumber.org>, kuba+netdrv@kernel.org, dsahern@gmail.com, 
+	Florian Westphal <fw@strlen.de>, Pablo Neira Ayuso <pablo@netfilter.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
@@ -79,140 +84,77 @@ X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Sep 18, 2023 at 3:46=E2=80=AFAM George Guo <guodongtai@kylinos.cn> =
-wrote:
+On Sun, Sep 17, 2023 at 1:55=E2=80=AFPM Martin Zaharinov <micron10@gmail.co=
+m> wrote:
 >
-> Tsval=3Dtsoffset+local_clock, here tsoffset is randomized with saddr and =
-daddr parameters in func
-> secure_tcp_ts_off. Most of time it is OK except for NAT mapping to the sa=
-me port and daddr.
-> Consider the following scenario:
->         ns1:                ns2:
->         +-----------+        +-----------+
->         |           |        |           |
->         |           |        |           |
->         |           |        |           |
->         | veth1     |        | vethb     |
->         |192.168.1.1|        |192.168.1.2|
->         +----+------+        +-----+-----+
->              |                     |
->              |                     |
->              | br0:192.168.1.254   |
->              +----------+----------+
->          veth0          |     vetha
->          192.168.1.3    |    192.168.1.4
->                         |
->                        nat(192.168.1.x -->172.30.60.199)
->                         |
->                         V
->                        eth0
->                  172.30.60.199
->                        |
->                        |
->                        +----> ... ...    ---->server: 172.30.60.191
+> Hi Eric
+> is it possible bug to come from this patch : https://patchwork.kernel.org=
+/project/netdevbpf/cover/20230911170531.828100-1-edumazet@google.com/
 >
-> Let's say ns1 (192.168.1.1) generates a timestamp ts1, and ns2 (192.168.1=
-.2) generates a timestamp
-> ts2, with ts1 > ts2.
->
-> If ns1 initiates a connection to a server, and then the server actively c=
-loses the connection,
-> entering the TIME_WAIT state, and ns2 attempts to connect to the server w=
-hile port reuse is in
-> progress, due to the presence of NAT, the server sees both connections as=
- originating from the
-> same IP address (e.g., 172.30.60.199) and port. However, since ts2 is sma=
-ller than ts1, the server
-> will respond with the acknowledgment (ACK) for the fourth handshake.
->
->        SERVER                                                   CLIENT
->
->    1.  ESTABLISHED                                              ESTABLISH=
-ED
->
->        (Close)
->    2.  FIN-WAIT-1  --> <SEQ=3D100><ACK=3D300><TSval=3D20><CTL=3DFIN,ACK> =
- --> CLOSE-WAIT
->
->    3.  FIN-WAIT-2  <-- <SEQ=3D300><ACK=3D101><TSval=3D40><CTL=3DACK>     =
- <-- CLOSE-WAIT
->
->                                                             (Close)
->    4.  TIME-WAIT   <-- <SEQ=3D300><ACK=3D101><TSval=3D41><CTL=3DFIN,ACK> =
- <-- LAST-ACK
->
->    5.  TIME-WAIT   --> <SEQ=3D101><ACK=3D301><TSval=3D25><CTL=3DACK>     =
- --> CLOSED
->
->   - - - - - - - - - - - - - port reused - - - - - - - - - - - - - - -
->
->    5.1. TIME-WAIT   <-- <SEQ=3D255><TSval=3D30><CTL=3DSYN>             <-=
-- SYN-SENT
->
->    5.2. TIME-WAIT   --> <SEQ=3D101><ACK=3D301><TSval=3D35><CTL=3DACK>    =
---> SYN-SENT
->
->    5.3. CLOSED      <-- <SEQ=3D301><CTL=3DRST>                       <-- =
-SYN-SENT
->
->    6.  SYN-RECV    <-- <SEQ=3D255><TSval=3D34><CTL=3DSYN>              <-=
-- SYN-SENT
->
->    7.  SYN-RECV    --> <SEQ=3D400><ACK=3D301><TSval=3D40><CTL=3DSYN,ACK> =
---> ESTABLISHED
->
->    1.  ESTABLISH   <-- <SEQ=3D301><ACK=3D401><TSval=3D55><CTL=3DACK>     =
-<-- ESTABLISHED
->
-> This enhancement uses sport and daddr rather than saddr and daddr, which =
-keep the timestamp
-> monotonically increasing in the situation described above. Then the port =
-reuse is like this:
->
->        SERVER                                                   CLIENT
->
->    1.  ESTABLISHED                                              ESTABLISH=
-ED
->
->        (Close)
->    2.  FIN-WAIT-1  --> <SEQ=3D100><ACK=3D300><TSval=3D20><CTL=3DFIN,ACK> =
- --> CLOSE-WAIT
->
->    3.  FIN-WAIT-2  <-- <SEQ=3D300><ACK=3D101><TSval=3D40><CTL=3DACK>     =
- <-- CLOSE-WAIT
->
->                                                             (Close)
->    4.  TIME-WAIT   <-- <SEQ=3D300><ACK=3D101><TSval=3D41><CTL=3DFIN,ACK> =
- <-- LAST-ACK
->
->    5.  TIME-WAIT   --> <SEQ=3D101><ACK=3D301><TSval=3D25><CTL=3DACK>     =
- --> CLOSED
->
->   - - - - - - - - - - - - - port reused - - - - - - - - - - - - - - -
->
->    5.1. TIME-WAIT  <-- <SEQ=3D300><TSval=3D50><CTL=3DSYN>               <=
--- SYN-SENT
->
->    6.  SYN-RECV    --> <SEQ=3D400><ACK=3D301><TSval=3D40><CTL=3DSYN,ACK> =
- --> ESTABLISHED
->
->    1.  ESTABLISH   <-- <SEQ=3D301><ACK=3D401><TSval=3D55><CTL=3DACK>     =
- <-- ESTABLISHED
->
-> The enhancement lets port reused more efficiently.
->
-> Signed-off-by: George Guo <guodongtai@kylinos.cn>
 >
 
-CC Florian
+Everything is possible, but this is not in 6.5 kernels.
 
-I do not think we can 'fix' tcp timestamp vs NAT.
-Unless the NAT device makes sure a port is dedicated for a peer,
-and/or the NAT rewrites TS values
-(which would be bad).
+I would suggest you start a bisection.
 
-I personally prefer seeing the same timestamps from A to B regardless
-of ports, it helps detect various issues.
-
-Also, you seem to forget IPv6.
+> m.
+>
+> > On 17 Sep 2023, at 14:40, Martin Zaharinov <micron10@gmail.com> wrote:
+> >
+> > One more in changelog for kernel 6.5 : https://cdn.kernel.org/pub/linux=
+/kernel/v6.x/ChangeLog-6.5
+> >
+> > I see have many bug reports with :
+> >
+> > Sep 17 11:43:11  [127675.395289][    C2]  ? process_backlog+0x10c/0x230
+> > Sep 17 11:43:11  [127675.395386][    C2]  ? __napi_poll+0x20/0x180
+> > Sep 17 11:43:11  [127675.395478][    C2]  ? net_rx_action+0x2a4/0x390
+> >
+> >
+> > In all server have simple nftables rulls , ethernet card is intel xl710=
+ or 82599. its a very simple config.
+> >
+> > m.
+> >
+> >
+> >
+> >
+> >> On 16 Sep 2023, at 12:04, Martin Zaharinov <micron10@gmail.com> wrote:
+> >>
+> >> Hi Paolo
+> >>
+> >> in first report machine dont have out of tree module
+> >>
+> >> this bug is come after move from kernel 6.2 to 6.3
+> >>
+> >> m.
+> >>
+> >> On Sat, Sep 16, 2023, 11:27 Paolo Abeni <pabeni@redhat.com> wrote:
+> >> On Sat, 2023-09-16 at 02:11 +0300, Martin Zaharinov wrote:
+> >>> one more log:
+> >>>
+> >>> Sep 12 07:37:29  [151563.298466][    C5] ------------[ cut here ]----=
+--------
+> >>> Sep 12 07:37:29  [151563.298550][    C5] rcuref - imbalanced put()
+> >>> Sep 12 07:37:29  [151563.298564][ C5] WARNING: CPU: 5 PID: 0 at lib/r=
+curef.c:267 rcuref_put_slowpath (lib/rcuref.c:267 (discriminator 1))
+> >>> Sep 12 07:37:29  [151563.298724][    C5] Modules linked in: nft_limit=
+ nf_conntrack_netlink vlan_mon(O) pppoe pppox ppp_generic slhc nft_ct nft_n=
+at nft_chain_nat nf_tables netconsole coretemp bonding i40e nf_nat_sip nf_c=
+onntrack_sip nf_nat_pptp nf_conntrack_pptp nf_nat_tftp nf_conntrack_tftp nf=
+_nat_ftp nf_conntrack_ftp nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4=
+ nf_xnatlog(O) ipmi_si ipmi_devintf ipmi_msghandler rtc_cmos [last unloaded=
+: BNGBOOT(O)]
+> >>> Sep 12 07:37:29  [151563.298894][    C5] CPU: 5 PID: 0 Comm: swapper/=
+5 Tainted: G           O       6.5.2 #1
+> >>
+> >>
+> >> You have out-of-tree modules taint in all the report you shared. Pleas=
+e
+> >> try to reproduce the issue with such taint, thanks!
+> >>
+> >> Paolo
+> >>
+> >
+>
 
