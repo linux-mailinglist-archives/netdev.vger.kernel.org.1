@@ -1,49 +1,55 @@
-Return-Path: <netdev+bounces-34759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82A757A5457
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 22:47:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1832B7A54AA
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 22:58:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EDBA1C2093C
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 20:47:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7C412822B4
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 20:58:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3724C28DCA;
-	Mon, 18 Sep 2023 20:42:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD377341B3;
+	Mon, 18 Sep 2023 20:43:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B650286B9
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:42:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30EFA328C6
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:43:03 +0000 (UTC)
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFE27121
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:42:51 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97C9F112
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:43:01 -0700 (PDT)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiL4v-0007Ic-KW; Mon, 18 Sep 2023 22:42:45 +0200
+	id 1qiL4v-0007J4-Qp; Mon, 18 Sep 2023 22:42:45 +0200
 Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiL4u-007Ijr-85; Mon, 18 Sep 2023 22:42:44 +0200
+	id 1qiL4u-007Ijv-IM; Mon, 18 Sep 2023 22:42:44 +0200
 Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiL4t-002mpb-OB; Mon, 18 Sep 2023 22:42:43 +0200
+	id 1qiL4u-002mpf-7J; Mon, 18 Sep 2023 22:42:44 +0200
 From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
+Cc: Simon Horman <horms@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Rob Herring <robh@kernel.org>,
+	Yuri Karpov <YKarpov@ispras.ru>,
+	netdev@vger.kernel.org,
 	kernel@pengutronix.de
-Subject: [PATCH net-next 37/54] net: ethernet: natsemi: Convert to platform remove callback returning void
-Date: Mon, 18 Sep 2023 22:42:09 +0200
-Message-Id: <20230918204227.1316886-38-u.kleine-koenig@pengutronix.de>
+Subject: [PATCH net-next 38/54] net: ethernet: ni: Convert to platform remove callback returning void
+Date: Mon, 18 Sep 2023 22:42:10 +0200
+Message-Id: <20230918204227.1316886-39-u.kleine-koenig@pengutronix.de>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230918204227.1316886-1-u.kleine-koenig@pengutronix.de>
 References: <20230918204227.1316886-1-u.kleine-koenig@pengutronix.de>
@@ -54,7 +60,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1864; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=repDy9UOYODNUNkzisi6DJHgyYk9gV3PbSPLHsj0TIs=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlCLYOkh2VgdrALjNLrCegr0psi1zqGQY4lvHi4 frcU/y4tHmJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZQi2DgAKCRCPgPtYfRL+ TgJLCACw31MGJ5deHJDAWtNnWufJRGMBzsI+say+/UtjQd628/xAT8vuQbf9h8Cd5dWGZYnBjdM suBnQT+boK2cQroBT2eakMBCJzDoygfnVFjGe3998BtKk1qkYPmwu3siK0+190qwYYVqM77ze2m 3XPiMN+fKCCiJpj+MwbWQbla+aPRdVc5vYm8ucvBv3+1Ze8iJq97XAVAe56Dae2j15O4x0ClQRr +YRUPeckturzfmwKuK2/bF6LCPqYB2vMTF6IVfRjdQzGfuHTohkItofvnEj/cGNIjLbRo8nUQhz t1oGHOs6tUQwwAPHEZfk1EOUJmTBfHuOQq5v9UwfHBkgOr5y
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1746; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=MRBOfQKaCAA7LlXhzXKB3VI+bOl265w+kJ1ZYdd5PnM=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlCLYPsVPucH4Lwp0ga5isQz/mGFwVbJ73rjSGC kcLwJBRgveJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZQi2DwAKCRCPgPtYfRL+ TivnB/wIHXVlOMEkLC82viwrjcTsEUmH7S1WpqIv9KAimGRrl5PuVSbLS0Fs8ssqBzp2NiFZ/e7 xFCDoDjxkscpypP/JBBsTkLzwWN/JaUQDzgcvFJzs0SDHhOXffjeoDMfiR/5thPXkDYnqhjAQZ6 SvaF+13PY+5sBzl+0biHVe+ig9LuQHlChgDM5THTc2T8cmezjfVQvqXCJa3HLHseJsDSOm72b7E IEJPdiZ+sWXXG5ZXQIw1nrqn9xd4y48WPGrVQki4Fwvx6QcQkOK6tPeKGB5+wSjSEXUF/JlBsKB +aaM058pokfKDrPxBTq2963W9zmecfF6EwpvKehvgacGOg+p
 X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
@@ -80,37 +86,37 @@ callback to the void returning variant.
 
 Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 ---
- drivers/net/ethernet/natsemi/xtsonic.c | 6 ++----
+ drivers/net/ethernet/ni/nixge.c | 6 ++----
  1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/natsemi/xtsonic.c b/drivers/net/ethernet/natsemi/xtsonic.c
-index 52fef34d43f9..8943e7244310 100644
---- a/drivers/net/ethernet/natsemi/xtsonic.c
-+++ b/drivers/net/ethernet/natsemi/xtsonic.c
-@@ -249,7 +249,7 @@ MODULE_DESCRIPTION("Xtensa XT2000 SONIC ethernet driver");
+diff --git a/drivers/net/ethernet/ni/nixge.c b/drivers/net/ethernet/ni/nixge.c
+index ba27bbc68f85..97f4798f4b42 100644
+--- a/drivers/net/ethernet/ni/nixge.c
++++ b/drivers/net/ethernet/ni/nixge.c
+@@ -1397,7 +1397,7 @@ static int nixge_probe(struct platform_device *pdev)
+ 	return err;
+ }
  
- #include "sonic.c"
- 
--static int xtsonic_device_remove(struct platform_device *pdev)
-+static void xtsonic_device_remove(struct platform_device *pdev)
+-static int nixge_remove(struct platform_device *pdev)
++static void nixge_remove(struct platform_device *pdev)
  {
- 	struct net_device *dev = platform_get_drvdata(pdev);
- 	struct sonic_local *lp = netdev_priv(dev);
-@@ -260,13 +260,11 @@ static int xtsonic_device_remove(struct platform_device *pdev)
- 			  lp->descriptors, lp->descriptors_laddr);
- 	release_region (dev->base_addr, SONIC_MEM_SIZE);
- 	free_netdev(dev);
+ 	struct net_device *ndev = platform_get_drvdata(pdev);
+ 	struct nixge_priv *priv = netdev_priv(ndev);
+@@ -1412,13 +1412,11 @@ static int nixge_remove(struct platform_device *pdev)
+ 		mdiobus_unregister(priv->mii_bus);
+ 
+ 	free_netdev(ndev);
 -
 -	return 0;
  }
  
- static struct platform_driver xtsonic_driver = {
- 	.probe = xtsonic_probe,
--	.remove = xtsonic_device_remove,
-+	.remove_new = xtsonic_device_remove,
- 	.driver = {
- 		.name = xtsonic_string,
- 	},
+ static struct platform_driver nixge_driver = {
+ 	.probe		= nixge_probe,
+-	.remove		= nixge_remove,
++	.remove_new	= nixge_remove,
+ 	.driver		= {
+ 		.name		= "nixge",
+ 		.of_match_table	= nixge_dt_ids,
 -- 
 2.40.1
 
