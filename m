@@ -1,308 +1,125 @@
-Return-Path: <netdev+bounces-34661-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34662-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6B7F7A522C
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 20:40:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D93657A522F
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 20:41:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA77F1C20D13
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 18:40:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 923F9281771
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 18:40:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 215091F614;
-	Mon, 18 Sep 2023 18:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC10B1F947;
+	Mon, 18 Sep 2023 18:40:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C0111CAB9;
-	Mon, 18 Sep 2023 18:40:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87F7AC433C9;
-	Mon, 18 Sep 2023 18:40:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695062427;
-	bh=ohRJW2WpMAFgJxA1JBZsN3B28gEviJ+HU0xdzWwTN+o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hwvYjQdtjC+c5KTGzQRn+2rim3mcWRXiI89lVvDYEQQfvxncUA3YIWgBcyKPJOKEM
-	 yZDeCufA/vTDVJOPpGvulb3N0LdWMlDgDptvPL4Ou8eMp5b4LIxerpjfZHH4SZksjS
-	 zv1qD3GmW0gNstrldOF5I4Zq0QpL7YFEuPIBNJQWdfZH2cL/lP9md1qzLneGr+GY/K
-	 RCfI3VBnp5otoEjMfVKRugCvn9NyI0b6W7tpLLRCipeCvEuYkgd855V/X3DKgZOfWv
-	 KMAedyFaVL73ZJ/DAGVkR+3U9InmBl5sz9mn/+Uj78kxI9sOjkfJKe/HxYlvIKaItw
-	 WIhEzXiMKBpZQ==
-Received: (nullmailer pid 1492209 invoked by uid 1000);
-	Mon, 18 Sep 2023 18:40:16 -0000
-Date: Mon, 18 Sep 2023 13:40:16 -0500
-From: Rob Herring <robh@kernel.org>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, George McCollister <george.mccollister@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, Kurt Kanzenbach <kurt@linutronix.de>, Matthias Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, Linus Walleij <linus.walleij@linaro.org>, Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>, =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>, Marcin Wojtas <mw@semihalf.com>, "Russell King (Oracle)" <linux@armlinux.org.uk>, Lars Povlsen <lars.povlsen@microchip.com>, Steen Hegelund <Steen.Hegelund@microchip.com>, Daniel Machon <daniel.machon@microchip.com>
- , Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>, Daniel Golle <daniel@makrotopia.org>, Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>, Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, Maxime Chevallier <maxime.chevallier@bootlin.com>, Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@microchip.com>, Marek Vasut <marex@denx.de>, Claudiu Manoil <claudiu.manoil@nxp.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, John Crispin <john@phrozen.org>, Madalin Bucur <madalin.bucur@nxp.com>, Ioana Ciornei <ioana.ciornei@nxp.com>, Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>, Horatiu Vultur <horatiu.vultur@microchip.com>, Oleksij Rempel <linux@rempel-privat.de>, Alexandre Torgue <alexandre.torgue@foss.st.com>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, Jose Abreu <joabreu@synopsys.com>, Grygorii Strashko <grygorii.strashko@ti.com>, Sekhar
-  Nori <nsekhar@ti.com>, Shyam Pandey <radhey.shyam.pandey@xilinx.com>, mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH net-next v2 08/10] dt-bindings: net: dsa: marvell:
- convert to json-schema
-Message-ID: <20230918184016.GB1464506-robh@kernel.org>
-References: <20230916110902.234273-1-arinc.unal@arinc9.com>
- <20230916110902.234273-9-arinc.unal@arinc9.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55D591F5E8
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 18:40:36 +0000 (UTC)
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2840D115
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 11:40:34 -0700 (PDT)
+Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-502fdfeb1d9so4018118e87.2
+        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 11:40:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1695062432; x=1695667232; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2WdsSfofUGele0mRKN0b7stC04NtZCFmAAWd2U17AD0=;
+        b=x7GPbHCH2cQZRsl8f1oC+pTnRGOBNwvvJPRVFU2ZSo7FZlV4BGtK/VCVBHhPgXHdjn
+         c5CCWW6Vz4iAZuSr+H8a65L9M2L6AyWvGvuSLML5/h/DJrHTOVQHggy0djF/2P9UqsgX
+         vVTSUDKocohIbAFjMAYxb1p1+E0SZzg6YZSj1cQJ/UoBBvhiDITkaaWOKu8BiQOByOKC
+         HVJJNz46cNKSPbKB/kfUuvd1APkIk7dkssAbcD3IBzCggeITj1OzldjEi+sAkrNWESfA
+         NK/LvAJS1J1BnrVoqpXnflVRkBbRSdqVhBZIBFdKAbcG50It26q6fFhSuyOD/kte15Y7
+         niJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695062432; x=1695667232;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2WdsSfofUGele0mRKN0b7stC04NtZCFmAAWd2U17AD0=;
+        b=PcKvPfnsWAni1UwtodpNx1hURJXYceCMfO8RM0ilrXJ4V695lJ+XHxW31Sa4FYNVq8
+         ulP1maXUdE0i8gEdIa8rca9WxPVJAjn2Mfe4yHdGNWmETz3aHtLCogG5u/k2XFjNPD8E
+         TDsfuwZSvwOz53mqnHQaPzfCbRJIi0bZ/ardVUKp8RiEzfpc0ENAdkKjWe9dekwEwskY
+         aoTy/ZRn4IoUNMjNORCk2SioFBMuf8BW30mQo5bwiG98Ri77ugsenu9NK17gouWIqpTm
+         WKSfoRN1PJzJ+lMn9U1En4FXhs5wLyiYxrZOHmEjY5hSygMx/lJcSvfydLVjG6jHJdMP
+         cmRw==
+X-Gm-Message-State: AOJu0YyuCz7Hr58LO/pFzeYHThHenJOT2vE4KIR+JkEQV0HRyuh0lsuD
+	Mvn6AN33UVJpJdj+BB3hINZH+w==
+X-Google-Smtp-Source: AGHT+IEG5a0g3TQxjA6y+VsgWpRutdjILd2hXXFuYE6O9EeZg+pUHc+g67XKe9NEynTqdCUmxUpIZQ==
+X-Received: by 2002:ac2:5bc2:0:b0:500:ba5d:e750 with SMTP id u2-20020ac25bc2000000b00500ba5de750mr7419176lfn.52.1695062432136;
+        Mon, 18 Sep 2023 11:40:32 -0700 (PDT)
+Received: from [192.168.0.105] (haunt.prize.volia.net. [93.72.109.136])
+        by smtp.gmail.com with ESMTPSA id e9-20020aa7d7c9000000b0050488d1d376sm6440576eds.0.2023.09.18.11.40.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 Sep 2023 11:40:31 -0700 (PDT)
+Message-ID: <e3405821-a614-2e04-c319-b54b9a1a0901@blackwall.org>
+Date: Mon, 18 Sep 2023 21:40:29 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230916110902.234273-9-arinc.unal@arinc9.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH net] vxlan: Add missing entries to vxlan_get_size()
+Content-Language: en-US
+To: Benjamin Poirier <bpoirier@nvidia.com>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Ido Schimmel <idosch@nvidia.com>,
+ Simon Horman <horms@kernel.org>, Jiri Benc <jbenc@redhat.com>,
+ Gavin Li <gavinl@nvidia.com>, Hangbin Liu <liuhangbin@gmail.com>,
+ Vladimir Nikishkin <vladimir@nikishkin.pw>, Li Zetao <lizetao1@huawei.com>,
+ Thomas Graf <tgraf@suug.ch>, Tom Herbert <therbert@google.com>,
+ Roopa Prabhu <roopa@nvidia.com>
+References: <20230918154015.80722-1-bpoirier@nvidia.com>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20230918154015.80722-1-bpoirier@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Sat, Sep 16, 2023 at 02:09:00PM +0300, Arınç ÜNAL wrote:
-> Convert the document for Marvell ethernet switches to json-schema.
+On 9/18/23 18:40, Benjamin Poirier wrote:
+> There are some attributes added by vxlan_fill_info() which are not
+> accounted for in vxlan_get_size(). Add them.
 > 
-> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+> I didn't find a way to trigger an actual problem from this miscalculation
+> since there is usually extra space in netlink size calculations like
+> if_nlmsg_size(); but maybe I just didn't search long enough.
+> 
+> Fixes: 3511494ce2f3 ("vxlan: Group Policy extension")
+> Fixes: e1e5314de08b ("vxlan: implement GPE")
+> Fixes: 0ace2ca89cbd ("vxlan: Use checksum partial with remote checksum offload")
+> Fixes: f9c4bb0b245c ("vxlan: vni filtering support on collect metadata device")
+> Signed-off-by: Benjamin Poirier <bpoirier@nvidia.com>
 > ---
->  .../devicetree/bindings/net/dsa/marvell.txt   | 109 ----------
->  .../devicetree/bindings/net/dsa/marvell.yaml  | 204 ++++++++++++++++++
->  2 files changed, 204 insertions(+), 109 deletions(-)
->  delete mode 100644 Documentation/devicetree/bindings/net/dsa/marvell.txt
->  create mode 100644 Documentation/devicetree/bindings/net/dsa/marvell.yaml
+>   drivers/net/vxlan/vxlan_core.c | 4 ++++
+>   1 file changed, 4 insertions(+)
 > 
-> diff --git a/Documentation/devicetree/bindings/net/dsa/marvell.txt b/Documentation/devicetree/bindings/net/dsa/marvell.txt
-> deleted file mode 100644
-> index 6ec0c181b6db..000000000000
-> --- a/Documentation/devicetree/bindings/net/dsa/marvell.txt
-> +++ /dev/null
-> @@ -1,109 +0,0 @@
-> -Marvell DSA Switch Device Tree Bindings
-> ----------------------------------------
-> -
-> -WARNING: This binding is currently unstable. Do not program it into a
-> -FLASH never to be changed again. Once this binding is stable, this
-> -warning will be removed.
-> -
-> -If you need a stable binding, use the old dsa.txt binding.
-> -
-> -Marvell Switches are MDIO devices. The following properties should be
-> -placed as a child node of an mdio device.
-> -
-> -The properties described here are those specific to Marvell devices.
-> -Additional required and optional properties can be found in dsa.txt.
-> -
-> -The compatibility string is used only to find an identification register,
-> -which is at a different MDIO base address in different switch families.
-> -- "marvell,mv88e6085"	: Switch has base address 0x10. Use with models:
-> -			  6085, 6095, 6097, 6123, 6131, 6141, 6161, 6165,
-> -			  6171, 6172, 6175, 6176, 6185, 6240, 6320, 6321,
-> -			  6341, 6350, 6351, 6352
-> -- "marvell,mv88e6190"	: Switch has base address 0x00. Use with models:
-> -			  6190, 6190X, 6191, 6290, 6361, 6390, 6390X
-> -- "marvell,mv88e6250"	: Switch has base address 0x08 or 0x18. Use with model:
-> -			  6220, 6250
-> -
-> -Required properties:
-> -- compatible		: Should be one of "marvell,mv88e6085",
-> -			  "marvell,mv88e6190" or "marvell,mv88e6250" as
-> -			  indicated above
-> -- reg			: Address on the MII bus for the switch.
-> -
-> -Optional properties:
-> -
-> -- reset-gpios		: Should be a gpio specifier for a reset line
-> -- interrupts		: Interrupt from the switch
-> -- interrupt-controller	: Indicates the switch is itself an interrupt
-> -			  controller. This is used for the PHY interrupts.
-> -#interrupt-cells = <2>	: Controller uses two cells, number and flag
-> -- eeprom-length		: Set to the length of an EEPROM connected to the
-> -			  switch. Must be set if the switch can not detect
-> -			  the presence and/or size of a connected EEPROM,
-> -			  otherwise optional.
-> -- mdio			: Container of PHY and devices on the switches MDIO
-> -			  bus.
-> -- mdio?		: Container of PHYs and devices on the external MDIO
-> -			  bus. The node must contains a compatible string of
-> -			  "marvell,mv88e6xxx-mdio-external"
-> -
-> -Example:
-> -
-> -	mdio {
-> -		#address-cells = <1>;
-> -		#size-cells = <0>;
-> -		interrupt-parent = <&gpio0>;
-> -		interrupts = <27 IRQ_TYPE_LEVEL_LOW>;
-> -		interrupt-controller;
-> -		#interrupt-cells = <2>;
-> -
-> -		switch0: switch@0 {
-> -			compatible = "marvell,mv88e6085";
-> -			reg = <0>;
-> -			reset-gpios = <&gpio5 1 GPIO_ACTIVE_LOW>;
-> -
-> -			mdio {
-> -				#address-cells = <1>;
-> -				#size-cells = <0>;
-> -				switch1phy0: switch1phy0@0 {
-> -					reg = <0>;
-> -					interrupt-parent = <&switch0>;
-> -					interrupts = <0 IRQ_TYPE_LEVEL_HIGH>;
-> -				};
-> -			};
-> -		};
-> -	};
-> -
-> -	mdio {
-> -		#address-cells = <1>;
-> -		#size-cells = <0>;
-> -		interrupt-parent = <&gpio0>;
-> -		interrupts = <27 IRQ_TYPE_LEVEL_LOW>;
-> -		interrupt-controller;
-> -		#interrupt-cells = <2>;
-> -
-> -		switch0: switch@0 {
-> -			compatible = "marvell,mv88e6190";
-> -			reg = <0>;
-> -			reset-gpios = <&gpio5 1 GPIO_ACTIVE_LOW>;
-> -
-> -			mdio {
-> -				#address-cells = <1>;
-> -				#size-cells = <0>;
-> -				switch1phy0: switch1phy0@0 {
-> -					reg = <0>;
-> -					interrupt-parent = <&switch0>;
-> -					interrupts = <0 IRQ_TYPE_LEVEL_HIGH>;
-> -				};
-> -			};
-> -
-> -			mdio1 {
-> -				compatible = "marvell,mv88e6xxx-mdio-external";
-> -				#address-cells = <1>;
-> -				#size-cells = <0>;
-> -				switch1phy9: switch1phy0@9 {
-> -					reg = <9>;
-> -				};
-> -			};
-> -		};
-> -	};
-> diff --git a/Documentation/devicetree/bindings/net/dsa/marvell.yaml b/Documentation/devicetree/bindings/net/dsa/marvell.yaml
-> new file mode 100644
-> index 000000000000..45756b8d74d9
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/dsa/marvell.yaml
-> @@ -0,0 +1,204 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/dsa/marvell.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Marvell Ethernet Switches
-> +
-> +$ref: dsa.yaml#/$defs/ethernet-ports
-> +
-> +maintainers:
-> +  - Andrew Lunn <andrew@lunn.ch>
-> +  - Arınç ÜNAL <arinc.unal@arinc9.com>
-> +
-> +description:
-> +  Marvell ethernet switches are MDIO devices.
-> +
-> +properties:
-> +  compatible:
-> +    oneOf:
-> +      - description: |
-> +          Switch has base address 0x10. Use with models:
-> +          6085, 6095, 6097, 6123, 6131, 6141, 6161, 6165, 6171, 6172, 6175,
-> +          6176, 6185, 6240, 6320, 6321, 6341, 6350, 6351, 6352
-> +        const: marvell,mv88e6085
-> +
-> +      - description: |
-> +          Switch has base address 0x00. Use with models:
-> +          6190, 6190X, 6191, 6290, 6361, 6390, 6390X
-> +        const: marvell,mv88e6190
-> +
-> +      - description: |
-> +          Switch has base address 0x08 or 0x18. Use with models:
-> +          6220, 6250
-> +        const: marvell,mv88e6250
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  reset-gpios:
-> +    description: GPIO to be used to reset the whole device
-> +    maxItems: 1
-> +
-> +  "#interrupt-cells":
-> +    const: 2
-> +
-> +  interrupt-controller: true
-> +
-> +  interrupts:
-> +    maxItems: 1
-> +
-> +  eeprom-length:
-> +    description:
-> +      Set to the length of an EEPROM connected to the switch. Must be set if the
-> +      switch can not detect the presence and/or size of a connected EEPROM,
-> +      otherwise optional.
-> +
-> +  mdio:
-> +    description:
-> +      The optional node for the MDIO bus of the switch. The bus will be
-> +      registered non-OF-based if this is not defined.
+> diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+> index e463f59e95c2..5b5597073b00 100644
+> --- a/drivers/net/vxlan/vxlan_core.c
+> +++ b/drivers/net/vxlan/vxlan_core.c
+> @@ -4331,6 +4331,10 @@ static size_t vxlan_get_size(const struct net_device *dev)
+>   		nla_total_size(sizeof(__u8)) + /* IFLA_VXLAN_REMCSUM_TX */
+>   		nla_total_size(sizeof(__u8)) + /* IFLA_VXLAN_REMCSUM_RX */
+>   		nla_total_size(sizeof(__u8)) + /* IFLA_VXLAN_LOCALBYPASS */
+> +		nla_total_size(0) + /* IFLA_VXLAN_GBP */
+> +		nla_total_size(0) + /* IFLA_VXLAN_GPE */
+> +		nla_total_size(0) + /* IFLA_VXLAN_REMCSUM_NOPARTIAL */
+> +		nla_total_size(sizeof(__u8)) + /* IFLA_VXLAN_VNIFILTER */
+>   		0;
+>   }
+>   
 
-That's a detail of the OS behavior.
-
-> +    $ref: /schemas/net/mdio.yaml#
-
-       unevaluatedProperties: false
-
-> +
-> +  mdio-external:
-> +    description: The externally reachable MDIO bus of the 6390 family switches
-> +    $ref: /schemas/net/mdio.yaml#
-
-       unevaluatedProperties: false
-
-> +
-> +    properties:
-> +      compatible:
-> +        const: marvell,mv88e6xxx-mdio-external
-> +
-> +    required:
-> +      - compatible
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +
-> +allOf:
-> +  - if:
-> +      properties:
-> +        compatible:
-> +          enum:
-> +            - marvell,mv88e6085
-> +            - marvell,mv88e6250
-> +    then:
-> +      properties:
-> +        mdio-external: false
-> +
-> +  - if:
-> +      required: [ mdio ]
-> +    then:
-> +      patternProperties:
-> +        "^(ethernet-)?ports$":
-> +          patternProperties:
-> +            "^(ethernet-)?port@[0-9]+$":
-> +              $ref: /schemas/net/ethernet-controller.yaml#/$defs/phylink
-
-This probably doesn't work right. The problem is every node ultimately 
-needs a single schema with all possible properties in order to not allow 
-undefined properties. This is the reason for the complexity with a $ref 
-at each level in schemas for these nodes.
-
-I'm not sure it is worth the complexity to enforce what you want here. 
-It may be easier to just always allow phylink properties in 
-ethernet-port nodes.  
-
-As this is a switch, it should be referencing ethernet-switch.yaml. 
-
-Rob
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
