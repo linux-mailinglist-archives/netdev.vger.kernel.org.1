@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-34407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15B097A4187
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 08:49:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 178717A4188
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 08:49:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C417D281C39
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 06:48:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7306281CAA
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 06:49:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CCE7746B;
-	Mon, 18 Sep 2023 06:48:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D582746A;
+	Mon, 18 Sep 2023 06:48:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A9BC6FC7
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 06:48:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCE987486
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 06:48:15 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E58397
-	for <netdev@vger.kernel.org>; Sun, 17 Sep 2023 23:48:12 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F141CE6
+	for <netdev@vger.kernel.org>; Sun, 17 Sep 2023 23:48:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695019692; x=1726555692;
+  t=1695019693; x=1726555693;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ZewXIPDm41f0GPMUjIb1QVbIyLgeOQM7RvDiQgEwv9o=;
-  b=fBuKyK4n0s98zw24HR/7od7TX2u985vqzK6EXq4kMxDpxAS6eVDCFBvi
-   ESzNU3yPG0YHEY8H0o4ZzRhExqIsxhqTscIKP8R76Qzcoq1fhvosXELdy
-   g/YzpMTAQQB1EMRM8nG3lxILKftCJC234diAnA1qYOYZfC9F0X9g5A/pC
-   qBwStwsv7vylbnbdqJQQxRjslubPTbig2+HTWWIMiomHRk/vIrXYg7BnL
-   TS847icy3D8dsu95lhOP5+FGYyG/RJSNRIB0d6MRMe9NP2klYgnP2CZzy
-   TuQRx9spjeX+Y42eWfjNlcZHQFvxO+ddi0YAUvnfYpZlbm09hqr+jg0F2
+  bh=plfIQL/2azstt84v8XmF5dAmDePM5u9fxmeTQNfLtP8=;
+  b=TvSgYcULnfcwlfGfWJudJAPIpZCr6nvh5S3SP1YIAC0BZpZcxtz4R/6R
+   rRFLqKOZHVEu6CSBO03Fsk4xFEqiNmtTD4mbHNndUfXJR5w9XIOO5wa6o
+   rp+9PsXa/1PI0ob6uKA2xGvjDtob46Znpjpjx4HMGrxS0HfGMiV37FeOk
+   BVSOYHO76xs87BGbCYyI5xrfvCKDjigX+9jKAoDDjS8KHgK2RhmTJoFnZ
+   CpA4Xu5Cafl7wrmiSWCvVRGd6Q5BMwDXD7CgxKbFg0LC+X7JFXPCM+emC
+   VVqDSdnKXIJYty9GUcs+3xJXwhzH9gFeLjOrDE1CZ6WXofViseTOzs2xR
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10836"; a="369907536"
+X-IronPort-AV: E=McAfee;i="6600,9927,10836"; a="369907553"
 X-IronPort-AV: E=Sophos;i="6.02,155,1688454000"; 
-   d="scan'208";a="369907536"
+   d="scan'208";a="369907553"
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2023 23:48:11 -0700
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2023 23:48:13 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10836"; a="869452239"
+X-IronPort-AV: E=McAfee;i="6600,9927,10836"; a="869452252"
 X-IronPort-AV: E=Sophos;i="6.02,156,1688454000"; 
-   d="scan'208";a="869452239"
+   d="scan'208";a="869452252"
 Received: from wasp.igk.intel.com ([10.102.20.192])
-  by orsmga004.jf.intel.com with ESMTP; 17 Sep 2023 23:48:10 -0700
+  by orsmga004.jf.intel.com with ESMTP; 17 Sep 2023 23:48:11 -0700
 From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
@@ -52,9 +52,9 @@ Cc: netdev@vger.kernel.org,
 	przemyslaw.kitszel@intel.com,
 	maciej.fijalkowski@intel.com,
 	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Subject: [PATCH iwl-next v2 2/4] ice: add bitmap to track VF MSI-X usage
-Date: Mon, 18 Sep 2023 08:24:04 +0200
-Message-ID: <20230918062406.90359-3-michal.swiatkowski@linux.intel.com>
+Subject: [PATCH iwl-next v2 3/4] ice: set MSI-X vector count on VF
+Date: Mon, 18 Sep 2023 08:24:05 +0200
+Message-ID: <20230918062406.90359-4-michal.swiatkowski@linux.intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230918062406.90359-1-michal.swiatkowski@linux.intel.com>
 References: <20230918062406.90359-1-michal.swiatkowski@linux.intel.com>
@@ -72,71 +72,149 @@ X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Create a bitamp to track MSI-X usage for VFs. The bitmap has the size of
-total MSI-X amount on device, because at init time the amount of MSI-X
-used by VFs isn't known.
+Implement ops needed to set MSI-X vector count on VF.
 
-The bitmap is used in follow up patchset to provide a block of
-continuous block of MSI-X indexes for each created VF.
+sriov_get_vf_total_msix() should return total number of MSI-X that can
+be used by the VFs. Return the value set by devlink resources API
+(pf->req_msix.vf).
+
+sriov_set_msix_vec_count() will set number of MSI-X on particular VF.
+Disable VF register mapping, rebuild VSI with new MSI-X and queues
+values and enable new VF register mapping.
+
+For best performance set number of queues equal to number of MSI-X.
 
 Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice.h       | 2 ++
- drivers/net/ethernet/intel/ice/ice_sriov.c | 9 +++++++++
- 2 files changed, 11 insertions(+)
+ drivers/net/ethernet/intel/ice/ice_main.c  |  2 +
+ drivers/net/ethernet/intel/ice/ice_sriov.c | 69 ++++++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_sriov.h | 13 ++++
+ 3 files changed, 84 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-index 051007ccab43..5fef43d3d994 100644
---- a/drivers/net/ethernet/intel/ice/ice.h
-+++ b/drivers/net/ethernet/intel/ice/ice.h
-@@ -550,6 +550,8 @@ struct ice_pf {
- 	 * MSIX vectors allowed on this PF.
- 	 */
- 	u16 sriov_base_vector;
-+	unsigned long *sriov_irq_bm;	/* bitmap to track irq usage */
-+	u16 sriov_irq_size;		/* size of the irq_bm bitmap */
- 
- 	u16 ctrl_vsi_idx;		/* control VSI index in pf->vsi array */
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 38adffbe0edf..c301ab1d6610 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -5655,6 +5655,8 @@ static struct pci_driver ice_driver = {
+ #endif /* CONFIG_PM */
+ 	.shutdown = ice_shutdown,
+ 	.sriov_configure = ice_sriov_configure,
++	.sriov_get_vf_total_msix = ice_sriov_get_vf_total_msix,
++	.sriov_set_msix_vec_count = ice_sriov_set_msix_vec_count,
+ 	.err_handler = &ice_pci_err_handler
+ };
  
 diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
-index d345f5d8635b..49adb0b05817 100644
+index 49adb0b05817..679bf63fd17a 100644
 --- a/drivers/net/ethernet/intel/ice/ice_sriov.c
 +++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
-@@ -138,6 +138,8 @@ static int ice_sriov_free_msix_res(struct ice_pf *pf)
- 	if (!pf)
- 		return -EINVAL;
- 
-+	bitmap_free(pf->sriov_irq_bm);
-+	pf->sriov_irq_size = 0;
- 	pf->sriov_base_vector = 0;
- 
+@@ -987,6 +987,75 @@ static int ice_check_sriov_allowed(struct ice_pf *pf)
  	return 0;
-@@ -853,10 +855,16 @@ static int ice_create_vf_entries(struct ice_pf *pf, u16 num_vfs)
-  */
- static int ice_ena_vfs(struct ice_pf *pf, u16 num_vfs)
- {
-+	int total_vectors = pf->hw.func_caps.common_cap.num_msix_vectors;
- 	struct device *dev = ice_pf_to_dev(pf);
- 	struct ice_hw *hw = &pf->hw;
- 	int ret;
- 
-+	pf->sriov_irq_bm = bitmap_zalloc(total_vectors, GFP_KERNEL);
-+	if (!pf->sriov_irq_bm)
-+		return -ENOMEM;
-+	pf->sriov_irq_size = total_vectors;
-+
- 	/* Disable global interrupt 0 so we don't try to handle the VFLR. */
- 	wr32(hw, GLINT_DYN_CTL(pf->oicr_irq.index),
- 	     ICE_ITR_NONE << GLINT_DYN_CTL_ITR_INDX_S);
-@@ -915,6 +923,7 @@ static int ice_ena_vfs(struct ice_pf *pf, u16 num_vfs)
- 	/* rearm interrupts here */
- 	ice_irq_dynamic_ena(hw, NULL, NULL);
- 	clear_bit(ICE_OICR_INTR_DIS, pf->state);
-+	bitmap_free(pf->sriov_irq_bm);
- 	return ret;
  }
  
++/**
++ * ice_sriov_get_vf_total_msix - return number of MSI-X used by VFs
++ * @pdev: pointer to pci_dev struct
++ *
++ * The function is called via sysfs ops
++ */
++u32 ice_sriov_get_vf_total_msix(struct pci_dev *pdev)
++{
++	struct ice_pf *pf = pci_get_drvdata(pdev);
++
++	return pf->sriov_irq_size - ice_get_max_used_msix_vector(pf);
++}
++
++/**
++ * ice_sriov_set_msix_vec_count
++ * @vf_dev: pointer to pci_dev struct of VF device
++ * @msix_vec_count: new value for MSI-X amount on this VF
++ *
++ * Set requested MSI-X, queues and registers for @vf_dev.
++ *
++ * First do some sanity checks like if there are any VFs, if the new value
++ * is correct etc. Then disable old mapping (MSI-X and queues registers), change
++ * MSI-X and queues, rebuild VSI and enable new mapping.
++ *
++ * If it is possible (driver not binded to VF) try to remap also other VFs to
++ * linearize irqs register usage.
++ */
++int ice_sriov_set_msix_vec_count(struct pci_dev *vf_dev, int msix_vec_count)
++{
++	struct pci_dev *pdev = pci_physfn(vf_dev);
++	struct ice_pf *pf = pci_get_drvdata(pdev);
++	struct ice_vf *vf;
++	u16 queues;
++	int id;
++
++	if (!ice_get_num_vfs(pf))
++		return -ENOENT;
++
++	if (!msix_vec_count)
++		return 0;
++
++	queues = msix_vec_count;
++	/* add 1 MSI-X for OICR */
++	msix_vec_count += 1;
++
++	/* Transition of PCI VF function number to function_id */
++	for (id = 0; id < pci_num_vf(pdev); id++) {
++		if (vf_dev->devfn == pci_iov_virtfn_devfn(pdev, id))
++			break;
++	}
++
++	if (id == pci_num_vf(pdev))
++		return -ENOENT;
++
++	vf = ice_get_vf_by_id(pf, id);
++
++	if (!vf)
++		return -ENOENT;
++
++	ice_dis_vf_mappings(vf);
++	vf->num_msix = msix_vec_count;
++	vf->num_vf_qs = queues;
++	ice_vsi_rebuild(ice_get_vf_vsi(vf), ICE_VSI_FLAG_NO_INIT);
++	ice_ena_vf_mappings(vf);
++	ice_put_vf(vf);
++
++	return 0;
++}
++
+ /**
+  * ice_sriov_configure - Enable or change number of VFs via sysfs
+  * @pdev: pointer to a pci_dev structure
+diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.h b/drivers/net/ethernet/intel/ice/ice_sriov.h
+index 06829443d540..8488df38b586 100644
+--- a/drivers/net/ethernet/intel/ice/ice_sriov.h
++++ b/drivers/net/ethernet/intel/ice/ice_sriov.h
+@@ -60,6 +60,8 @@ void ice_print_vfs_mdd_events(struct ice_pf *pf);
+ void ice_print_vf_rx_mdd_event(struct ice_vf *vf);
+ bool
+ ice_vc_validate_pattern(struct ice_vf *vf, struct virtchnl_proto_hdrs *proto);
++u32 ice_sriov_get_vf_total_msix(struct pci_dev *pdev);
++int ice_sriov_set_msix_vec_count(struct pci_dev *vf_dev, int msix_vec_count);
+ #else /* CONFIG_PCI_IOV */
+ static inline void ice_process_vflr_event(struct ice_pf *pf) { }
+ static inline void ice_free_vfs(struct ice_pf *pf) { }
+@@ -142,5 +144,16 @@ ice_get_vf_stats(struct net_device __always_unused *netdev,
+ {
+ 	return -EOPNOTSUPP;
+ }
++
++static inline u32 ice_sriov_get_vf_total_msix(struct pci_dev *pdev)
++{
++	return 0;
++}
++
++static inline int
++ice_sriov_set_msix_vec_count(struct pci_dev *vf_dev, int msix_vec_count)
++{
++	return -EOPNOTSUPP;
++}
+ #endif /* CONFIG_PCI_IOV */
+ #endif /* _ICE_SRIOV_H_ */
 -- 
 2.41.0
 
