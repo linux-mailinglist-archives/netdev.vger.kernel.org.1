@@ -1,50 +1,49 @@
-Return-Path: <netdev+bounces-34753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF9F57A544D
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 22:45:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 518337A5445
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 22:43:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D759F1C20434
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 20:45:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B1FC2816B0
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 20:43:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F31727EF2;
-	Mon, 18 Sep 2023 20:42:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFDEB450E9;
+	Mon, 18 Sep 2023 20:42:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DF0A266DD
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:42:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33985450D6
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 20:42:46 +0000 (UTC)
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED53611C
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:42:48 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 106D810D
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 13:42:44 -0700 (PDT)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiL4o-0006lz-5o; Mon, 18 Sep 2023 22:42:38 +0200
+	id 1qiL4o-0006nb-Jb; Mon, 18 Sep 2023 22:42:38 +0200
 Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiL4n-007IiK-Nu; Mon, 18 Sep 2023 22:42:37 +0200
+	id 1qiL4o-007IiN-3U; Mon, 18 Sep 2023 22:42:38 +0200
 Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiL4n-002mo2-ER; Mon, 18 Sep 2023 22:42:37 +0200
+	id 1qiL4n-002mo7-OH; Mon, 18 Sep 2023 22:42:37 +0200
 From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>,
-	netdev@vger.kernel.org,
+Cc: netdev@vger.kernel.org,
 	kernel@pengutronix.de
-Subject: [PATCH net-next 13/54] net: ethernet: calxeda: Convert to platform remove callback returning void
-Date: Mon, 18 Sep 2023 22:41:45 +0200
-Message-Id: <20230918204227.1316886-14-u.kleine-koenig@pengutronix.de>
+Subject: [PATCH net-next 14/54] net: ethernet: cavium: Convert to platform remove callback returning void
+Date: Mon, 18 Sep 2023 22:41:46 +0200
+Message-Id: <20230918204227.1316886-15-u.kleine-koenig@pengutronix.de>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230918204227.1316886-1-u.kleine-koenig@pengutronix.de>
 References: <20230918204227.1316886-1-u.kleine-koenig@pengutronix.de>
@@ -55,7 +54,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1946; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=XHVaCGZNXkcjmW8qC17UNpNWBdhyT+Qb05ci1B79J+A=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlCLXzbPc+K+zAWntUEVfFF2aryK6nEveXs91eS 1Bg6IIOg1iJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZQi18wAKCRCPgPtYfRL+ TvlWB/49K+M0Xvy8Xb/MmqHdfF/yjne8x81ZCQe7NaEmN2zzv1goffeSAZtx9qAIaXNbB0gx8B3 y6RaqSU74vrUEjH0lRpru8h7zdZapMbCq5CkLncpxONGIf1BN43xmRUW/H+RCCu+tNz/UI/BRA6 muANcDhJ7mVQ+vIC8Tr+5rTgeJuYj8w4OrWochIz7uMlax5ELcnQOlKwbo55nb+YrptZiQ6OYh8 qWTfesk+gzI+4ASeJwgKiNMV1882fYKcLa+r5JxMPDOxXnn6K329sf37PpLeXmUy70fKCldXNRa ceegVuEpRAuaIuf5VM4OphCAhoI5b+ExjOgS2RN2Yw6VC1Eo
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2002; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=H8wm3+1bM870xkjbSzba5N8n2u8MnrP7uTtNDVTS4SE=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlCLX03ttt5sr02acSIF6XwD4/iBoSGSi+S+JU3 IjelQYAUBuJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZQi19AAKCRCPgPtYfRL+ TlfPCACvMexESsLJJ/J+yOFJQ+GjBqEeTL2SYX5McK5N8KVB8dy76T21hz438DwX6LML1Ke82qt ZBqvoBaAjZJ4zei5Q7gdEzfHkgij03fST0J0IcZBcnZgAoVkjlEdO6irPd3ISR/aQO3vHS8qO/z Ufrm9kIN47NT9TQhyG1W2OPJWF/cOkIFjwu67dw+TK+Ty6LtCHkqqEEvbB9Cs9o9JZpiSYS8uOe VhsmT8aTrPDwokohJZipMlsCePktUg1VwTcs/FgRlT+mCHGqMRvBIIJ1EXFqmpx/8nC5VlZNVAT 0XSKLL8qe/iKfa+2aJBw5Y3XrVdEoSuIX6LzLlAZj9EkK4Ci
 X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
@@ -81,40 +80,39 @@ callback to the void returning variant.
 
 Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 ---
- drivers/net/ethernet/calxeda/xgmac.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/cavium/octeon/octeon_mgmt.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/calxeda/xgmac.c b/drivers/net/ethernet/calxeda/xgmac.c
-index f4f87dfa9687..5e97f1e4e38e 100644
---- a/drivers/net/ethernet/calxeda/xgmac.c
-+++ b/drivers/net/ethernet/calxeda/xgmac.c
-@@ -1820,7 +1820,7 @@ static int xgmac_probe(struct platform_device *pdev)
-  * changes the link status, releases the DMA descriptor rings,
-  * unregisters the MDIO bus and unmaps the allocated memory.
-  */
--static int xgmac_remove(struct platform_device *pdev)
-+static void xgmac_remove(struct platform_device *pdev)
- {
- 	struct net_device *ndev = platform_get_drvdata(pdev);
- 	struct xgmac_priv *priv = netdev_priv(ndev);
-@@ -1840,8 +1840,6 @@ static int xgmac_remove(struct platform_device *pdev)
- 	release_mem_region(res->start, resource_size(res));
+diff --git a/drivers/net/ethernet/cavium/octeon/octeon_mgmt.c b/drivers/net/ethernet/cavium/octeon/octeon_mgmt.c
+index edde0b8fa49c..007d4b06819e 100644
+--- a/drivers/net/ethernet/cavium/octeon/octeon_mgmt.c
++++ b/drivers/net/ethernet/cavium/octeon/octeon_mgmt.c
+@@ -1521,7 +1521,7 @@ static int octeon_mgmt_probe(struct platform_device *pdev)
+ 	return result;
+ }
  
- 	free_netdev(ndev);
--
+-static int octeon_mgmt_remove(struct platform_device *pdev)
++static void octeon_mgmt_remove(struct platform_device *pdev)
+ {
+ 	struct net_device *netdev = platform_get_drvdata(pdev);
+ 	struct octeon_mgmt *p = netdev_priv(netdev);
+@@ -1529,7 +1529,6 @@ static int octeon_mgmt_remove(struct platform_device *pdev)
+ 	unregister_netdev(netdev);
+ 	of_node_put(p->phy_np);
+ 	free_netdev(netdev);
 -	return 0;
  }
  
- #ifdef CONFIG_PM_SLEEP
-@@ -1921,7 +1919,7 @@ static struct platform_driver xgmac_driver = {
- 		.pm = &xgmac_pm_ops,
+ static const struct of_device_id octeon_mgmt_match[] = {
+@@ -1546,7 +1545,7 @@ static struct platform_driver octeon_mgmt_driver = {
+ 		.of_match_table = octeon_mgmt_match,
  	},
- 	.probe = xgmac_probe,
--	.remove = xgmac_remove,
-+	.remove_new = xgmac_remove,
+ 	.probe		= octeon_mgmt_probe,
+-	.remove		= octeon_mgmt_remove,
++	.remove_new	= octeon_mgmt_remove,
  };
  
- module_platform_driver(xgmac_driver);
+ module_platform_driver(octeon_mgmt_driver);
 -- 
 2.40.1
 
