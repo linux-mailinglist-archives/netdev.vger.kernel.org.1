@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-34716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49DB87A5362
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 21:53:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D340B7A536A
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 21:56:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 781311C20C97
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 19:53:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00DCD1C20A83
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 19:56:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4731128691;
-	Mon, 18 Sep 2023 19:51:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB97728DC9;
+	Mon, 18 Sep 2023 19:51:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1CDF27ED4
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 19:51:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BCC8286B3
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 19:51:35 +0000 (UTC)
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08598101
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 12:51:29 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B47E5120
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 12:51:33 -0700 (PDT)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiKHB-0003u8-Av; Mon, 18 Sep 2023 21:51:21 +0200
+	id 1qiKHB-0003uR-K7; Mon, 18 Sep 2023 21:51:21 +0200
 Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiKHA-007I9M-SL; Mon, 18 Sep 2023 21:51:20 +0200
+	id 1qiKHB-007I9Q-38; Mon, 18 Sep 2023 21:51:21 +0200
 Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1qiKHA-002mD0-Il; Mon, 18 Sep 2023 21:51:20 +0200
+	id 1qiKHA-002mD4-Pk; Mon, 18 Sep 2023 21:51:20 +0200
 From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
 To: Andrew Lunn <andrew@lunn.ch>,
 	Heiner Kallweit <hkallweit1@gmail.com>
@@ -44,9 +44,9 @@ Cc: Russell King <linux@armlinux.org.uk>,
 	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 16/19] net: mdio: mux-multiplexer: Convert to platform remove callback returning void
-Date: Mon, 18 Sep 2023 21:50:59 +0200
-Message-Id: <20230918195102.1302746-17-u.kleine-koenig@pengutronix.de>
+Subject: [PATCH net-next 17/19] net: mdio: octeon: Convert to platform remove callback returning void
+Date: Mon, 18 Sep 2023 21:51:00 +0200
+Message-Id: <20230918195102.1302746-18-u.kleine-koenig@pengutronix.de>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230918195102.1302746-1-u.kleine-koenig@pengutronix.de>
 References: <20230918195102.1302746-1-u.kleine-koenig@pengutronix.de>
@@ -57,7 +57,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1993; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=aBuTX9v1GXrVkGebzfqqZP9JXk2psQGbdaJCDMk0zD0=; b=owGbwMvMwMXY3/A7olbonx/jabUkhlSOVUKaTpYZHBwGXckGwc1dy0TedJ25fMU2oe2a560Mq bNBVy90MhqzMDByMciKKbLYN67JtKqSi+xc++8yzCBWJpApDFycAjCRCY7sv1k1pkt72uT/4/96 4vTpGS3FBcJJTk+ZApcbZUSIH5D8yy98g1lmsdTr95Y/3G4kB8VJc3toLz58sm/+z1nZ/ndPHXZ /etEnQ+Xlb6/w8AAdXdXsfT0a/nvEJZl2WIRdl3N+vYd1af5iu+gi+f7bocJ/r+6cJXUrq32xjc TjJx9+9h4T+jGdUTCAt/m5uvHyDhk3kfxXCo73pKTb152fXf81V/fsjDCNAkWZj0+5d2zykPjH8 ZVn3ypem8U74pMCuzdP+sP4yPe8eq2Nr1321+YNTdzHl9W2PN/ussJWL0aEzfb0+6Wavvd2b+ae duAVt6p6xkzuAP9LCaJ/OUNCdsuGyHYbfZI6dqtxr/M0AA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1922; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=JgSJpI+VgVasj2hx9BfwfaykoqbFS61hnmgshTkmMks=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlCKoTbUB4KBW9aATzEPLdw6uEFKPaCItJVlsBH o736L7smEWJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZQiqEwAKCRCPgPtYfRL+ ToxUCACIr1RfOW1GF5asJluuxSIZo6fSkOMkZ3BXImWLOugohvvLL33TVjHornpg87S3BXmJf/e sbn51ri7AsGXTVCZHlaXIWm+cDeTOTAztOQpYQ+P7G480pbnehIJn9B2dUpoOvhoW8lcChX3GsY 7SjpY19IK0rSNlou3Qq8vhPB2pR/CgPWEdm5Zt25BEQF9S6a3L/Z050S41TPcyR2GV+FAF31jbC 2zIaPsZ534nbQcz/M3niwn7OeEmkuR1avl4IJWi2RW+mgtoYqJGK2zy0EbKcTijAmkvLF/0ThFf a6kf9+TrzLUS92Fc0/FX8qIZS+QVXQBCupb9JDto/aAb4Je9
 X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
@@ -83,40 +83,39 @@ callback to the void returning variant.
 
 Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 ---
- drivers/net/mdio/mdio-mux-multiplexer.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ drivers/net/mdio/mdio-octeon.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/mdio/mdio-mux-multiplexer.c b/drivers/net/mdio/mdio-mux-multiplexer.c
-index bfa5af577b0a..569b13383191 100644
---- a/drivers/net/mdio/mdio-mux-multiplexer.c
-+++ b/drivers/net/mdio/mdio-mux-multiplexer.c
-@@ -85,7 +85,7 @@ static int mdio_mux_multiplexer_probe(struct platform_device *pdev)
- 	return ret;
+diff --git a/drivers/net/mdio/mdio-octeon.c b/drivers/net/mdio/mdio-octeon.c
+index 7c65c547d377..037a38cfed56 100644
+--- a/drivers/net/mdio/mdio-octeon.c
++++ b/drivers/net/mdio/mdio-octeon.c
+@@ -78,7 +78,7 @@ static int octeon_mdiobus_probe(struct platform_device *pdev)
+ 	return err;
  }
  
--static int mdio_mux_multiplexer_remove(struct platform_device *pdev)
-+static void mdio_mux_multiplexer_remove(struct platform_device *pdev)
+-static int octeon_mdiobus_remove(struct platform_device *pdev)
++static void octeon_mdiobus_remove(struct platform_device *pdev)
  {
- 	struct mdio_mux_multiplexer_state *s = platform_get_drvdata(pdev);
- 
-@@ -93,8 +93,6 @@ static int mdio_mux_multiplexer_remove(struct platform_device *pdev)
- 
- 	if (s->do_deselect)
- 		mux_control_deselect(s->muxc);
--
+ 	struct cavium_mdiobus *bus;
+ 	union cvmx_smix_en smi_en;
+@@ -88,7 +88,6 @@ static int octeon_mdiobus_remove(struct platform_device *pdev)
+ 	mdiobus_unregister(bus->mii_bus);
+ 	smi_en.u64 = 0;
+ 	oct_mdio_writeq(smi_en.u64, bus->register_base + SMI_EN);
 -	return 0;
  }
  
- static const struct of_device_id mdio_mux_multiplexer_match[] = {
-@@ -109,7 +107,7 @@ static struct platform_driver mdio_mux_multiplexer_driver = {
- 		.of_match_table	= mdio_mux_multiplexer_match,
+ static const struct of_device_id octeon_mdiobus_match[] = {
+@@ -105,7 +104,7 @@ static struct platform_driver octeon_mdiobus_driver = {
+ 		.of_match_table = octeon_mdiobus_match,
  	},
- 	.probe		= mdio_mux_multiplexer_probe,
--	.remove		= mdio_mux_multiplexer_remove,
-+	.remove_new	= mdio_mux_multiplexer_remove,
+ 	.probe		= octeon_mdiobus_probe,
+-	.remove		= octeon_mdiobus_remove,
++	.remove_new	= octeon_mdiobus_remove,
  };
  
- module_platform_driver(mdio_mux_multiplexer_driver);
+ module_platform_driver(octeon_mdiobus_driver);
 -- 
 2.40.1
 
