@@ -1,132 +1,101 @@
-Return-Path: <netdev+bounces-34488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 531C77A45E3
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 11:29:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62BFA7A45E1
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 11:28:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DF5E28232D
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 09:29:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FA601C20431
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 09:28:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7E381BDC5;
-	Mon, 18 Sep 2023 09:28:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62667156F5;
+	Mon, 18 Sep 2023 09:28:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C8F514AA4;
-	Mon, 18 Sep 2023 09:28:53 +0000 (UTC)
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70A47118;
-	Mon, 18 Sep 2023 02:28:49 -0700 (PDT)
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 38I9S5Nq81942313, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/2.92/5.92) with ESMTPS id 38I9S5Nq81942313
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 18 Sep 2023 17:28:05 +0800
-Received: from RTEXMBS06.realtek.com.tw (172.21.6.99) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.32; Mon, 18 Sep 2023 17:28:04 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS06.realtek.com.tw (172.21.6.99) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.34; Mon, 18 Sep 2023 17:28:03 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::7445:d92b:d0b3:f79c]) by
- RTEXMBS04.realtek.com.tw ([fe80::7445:d92b:d0b3:f79c%5]) with mapi id
- 15.01.2375.007; Mon, 18 Sep 2023 17:28:03 +0800
-From: Hayes Wang <hayeswang@realtek.com>
-To: Eric Dumazet <edumazet@google.com>
-CC: "kuba@kernel.org" <kuba@kernel.org>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        nic_swsd <nic_swsd@realtek.com>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "linux-usb@vger.kernel.org"
-	<linux-usb@vger.kernel.org>,
-        "bjorn@mork.no" <bjorn@mork.no>,
-        "pabeni@redhat.com" <pabeni@redhat.com>
-Subject: RE: [PATCH net-next resend 1/2] r8152: remove queuing rx packets in driver
-Thread-Topic: [PATCH net-next resend 1/2] r8152: remove queuing rx packets in
- driver
-Thread-Index: AQHZ6gOv5dotXJafx06AY5ZZ4fOWz7AfsJgAgACIv9D//4eLAIAAi13g
-Date: Mon, 18 Sep 2023 09:28:03 +0000
-Message-ID: <e3ad16c0e8414af6be25f4bf9ab5e1e3@realtek.com>
-References: <20230918074202.2461-426-nic_swsd@realtek.com>
- <20230918074202.2461-427-nic_swsd@realtek.com>
- <CANn89iJmdkyn8_hU4esycRG-XvPa_Djsp6PyaOX5cYP1Obdr4g@mail.gmail.com>
- <7235821eb09242adaa651172729f76aa@realtek.com>
- <CANn89i+Tou=YwteEd5ceaHP54sZpkRotwcV6YWAs4jAUq=ocJg@mail.gmail.com>
-In-Reply-To: <CANn89i+Tou=YwteEd5ceaHP54sZpkRotwcV6YWAs4jAUq=ocJg@mail.gmail.com>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-x-originating-ip: [172.22.228.6]
-x-kse-serverinfo: RTEXMBS06.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70AFE134BD
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 09:28:18 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBC06B5
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 02:28:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1695029296;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xuvYthy3e6B7JSC0V9D8RdJxDbtEhheNOXF7LwHrspA=;
+	b=MlGKEB1pgOHtI63byenTQ7bFFe9q+jyE3jT9SUDT+vvktzjXPiVLSXfag91YGKXrpemUNB
+	lAXyMXilXsNUPttz6o7x6DVgIU8CUlh8kiNPCb7Zd8WJbPAT404oKbdI6vnmhPGf1n447Y
+	JfyYH8hN2pAkqyuLcQsMpygpO4cDL+k=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-57-vOodOCy8NbK1JMFHV0mfng-1; Mon, 18 Sep 2023 05:28:13 -0400
+X-MC-Unique: vOodOCy8NbK1JMFHV0mfng-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-404fa5c1d99so11925785e9.3
+        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 02:28:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695029291; x=1695634091;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xuvYthy3e6B7JSC0V9D8RdJxDbtEhheNOXF7LwHrspA=;
+        b=ntSN5NDNyLwPcv8CoEvfkDHFbCVj8PDtgHM9Z/XLAXIKJcHQmmJYl5wHaK1GLwFNCL
+         +10aU7LXvUJ5KUUrTFea0zNYsxsBEpp+1fFDH3ShR9UkAyQdQ3kGVqoePwJ/A0E8cjCY
+         zxQIfdASBnJLuyFQ6NVElPhxtsVatTz9ETFJqgrfTvMITJA663y8G4gOTpU3IpvnY3mU
+         0EzhLTMwWHGpv+qLV0jniw5Fyr+S20qfwr6QDoXYH0QolT6qtPU6/cQsRu7TFVxSb0bs
+         3EAmDmsETXdfBWbV8EBYcn06xzIcIJVi66tTUwNG6zsOJdNzzCgayk+MhoLNWrY2gGA8
+         i0tA==
+X-Gm-Message-State: AOJu0YxJuD3sPESunX9XI2ZjHofCXKmIuhP3Ecn55V/jiqmze4uh0ahn
+	HnjNcFSX+Sp3BF9mIc6XbNwyOXNGDvx5x+PzLELU3XWrOdFLI5SmZ/IHPjSJ5f02/fZn1nE6YAD
+	wS0MTRogA7tanD6lRVZK7Tivg
+X-Received: by 2002:a5d:58e1:0:b0:319:79bb:980c with SMTP id f1-20020a5d58e1000000b0031979bb980cmr6471587wrd.64.1695029291788;
+        Mon, 18 Sep 2023 02:28:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF4zcxllvAx7KJ5OpPMSGtFgGeEiGq4GvnoJxyWB/ntoU9UWCE5jqpRoNL1109iKtPQPmkeUw==
+X-Received: by 2002:a5d:58e1:0:b0:319:79bb:980c with SMTP id f1-20020a5d58e1000000b0031979bb980cmr6471575wrd.64.1695029291446;
+        Mon, 18 Sep 2023 02:28:11 -0700 (PDT)
+Received: from localhost ([37.160.2.82])
+        by smtp.gmail.com with ESMTPSA id p14-20020a1c740e000000b003fe407ca05bsm14783436wmc.37.2023.09.18.02.28.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Sep 2023 02:28:10 -0700 (PDT)
+Date: Mon, 18 Sep 2023 11:28:06 +0200
+From: Andrea Claudi <aclaudi@redhat.com>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH iproute2 v2] allow overriding color option in environment
+Message-ID: <ZQgYJrKxyBLhWMrM@renaissance-vector>
+References: <20230916150326.7942-1-stephen@networkplumber.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230916150326.7942-1-stephen@networkplumber.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-RXJpYyBEdW1hemV0IDxlZHVtYXpldEBnb29nbGUuY29tPg0KPiBTZW50OiBNb25kYXksIFNlcHRl
-bWJlciAxOCwgMjAyMyA0OjUzIFBNDQpbLi4uXQ0KPiA+ID4gWzFdIE1vcmUgY29udmVudGlvbmFs
-IHdheSB0byB0byBwdXQgdGhpcyBjb25kaXRpb24gYXQgdGhlIGJlZ2lubmluZyBvZg0KPiA+ID4g
-dGhlIHdoaWxlICgpIGxvb3AsDQo+ID4gPiBiZWNhdXNlIHRoZSBidWRnZXQgY291bGQgYmUgemVy
-by4NCj4gPg0KPiA+IElmIHRoZSBidWRnZXQgaXMgemVybywgdGhlIGZ1bmN0aW9uIHdvdWxkbid0
-IGJlIGNhbGxlZC4NCj4gPiBhN2I4ZDYwYjM3MjMgKCJyODE1MjogY2hlY2sgYnVkZ2V0IGZvciBy
-ODE1Ml9wb2xsIikgYXZvaWRzIGl0Lg0KPiANCj4gWWVzLCBhbmQgd2UgY291bGQgcmV2ZXJ0ICB0
-aGlzIHBhdGNoIDovDQo+IA0KPiBNb3ZpbmcgdGhlIHRlc3QgYXQgdGhlIGZyb250IG9mIHRoZSBs
-b29wIGxpa2UgbW9zdCBvdGhlciBkcml2ZXJzIHdvdWxkDQo+IGhhdmUgYXZvaWRlZCB0aGlzIGlz
-c3VlLA0KPiBhbmQgYXZvaWRlZCB0aGlzIGRpc2N1c3Npb24uDQoNCkkgZG9uJ3QgZG8gdGhhdCBi
-ZWNhdXNlIEkgd2FudCB0byBhdm9pZCBzb21lIGNoZWNrcyBhbmQgc3BpbiBsb2NrIGJlZm9yZSBh
-bmQgYWZ0ZXINCnRoZSBsb29wLiBGb3IgZXhhbXBsZSwNCg0KMS4gc3BpbiBsb2NrDQoyLiBtb3Zl
-IHRoZSByZWFkeSBsaXN0cyB0byBsb2NhbA0KMy4gc3BpbiB1bmxvY2sNCjQuIGxvb3AgdGhlIGxp
-c3RzDQo1LiBicmVhayB0aGUgbG9vcCBpZiBidWRnZXQgaXMgemVybw0KNi4gc3BpbiBsb2NrDQo3
-LiBtb3ZlIHRoZSByZW1haW5lZCBsaXN0IGJhY2sgZm9yIG5leHQgc2NoZWR1bGUNCjguIHNwaW4g
-dW5sb2NrDQoNCkkgY291bGQgYXZvaWQgdGhlIHJlZHVuZGFudCBiZWhhdmlvci4NCg0KPiA+ID4g
-PiArICAgICAgICAgICAgICAgaWYgKHdvcmtfZG9uZSA+PSBidWRnZXQpDQo+ID4gPiA+ICsgICAg
-ICAgICAgICAgICAgICAgICAgIGJyZWFrOw0KPiA+ID4gPiAgICAgICAgIH0NCj4gPiA+ID4NCj4g
-PiA+ID4gKyAgICAgICAvKiBTcGxpY2UgdGhlIHJlbWFpbmVkIGxpc3QgYmFjayB0byByeF9kb25l
-ICovDQo+ID4gPiA+ICAgICAgICAgaWYgKCFsaXN0X2VtcHR5KCZyeF9xdWV1ZSkpIHsNCj4gPiA+
-ID4gICAgICAgICAgICAgICAgIHNwaW5fbG9ja19pcnFzYXZlKCZ0cC0+cnhfbG9jaywgZmxhZ3Mp
-Ow0KPiA+ID4gPiAtICAgICAgICAgICAgICAgbGlzdF9zcGxpY2VfdGFpbCgmcnhfcXVldWUsICZ0
-cC0+cnhfZG9uZSk7DQo+ID4gPiA+ICsgICAgICAgICAgICAgICBsaXN0X3NwbGljZSgmcnhfcXVl
-dWUsICZ0cC0+cnhfZG9uZSk7DQo+ID4gPiA+ICAgICAgICAgICAgICAgICBzcGluX3VubG9ja19p
-cnFyZXN0b3JlKCZ0cC0+cnhfbG9jaywgZmxhZ3MpOw0KPiA+ID4gPiAgICAgICAgIH0NCj4gPiA+
-ID4NCj4gPiA+ID4gIG91dDE6DQo+ID4gPiA+IC0gICAgICAgcmV0dXJuIHdvcmtfZG9uZTsNCj4g
-PiA+ID4gKyAgICAgICBpZiAod29ya19kb25lID4gYnVkZ2V0KQ0KPiA+ID4NCj4gPiA+IFRoaXMg
-KHdvcmtfZG9uZSA+YnVkZ2V0KSBjb25kaXRpb24gd291bGQgbmV2ZXIgYmUgdHJ1ZSBpZiBwb2lu
-dCBbMV0gaXMNCj4gPiA+IGFkZHJlc3NlZC4NCj4gPg0KPiA+IEEgYnVsayB0cmFuc2ZlciBtYXkg
-Y29udGFpbiBtYW55IHBhY2tldHMsIHNvIHRoZSB3b3JrX2RvbmUgbWF5IGJlIG1vcmUNCj4gdGhh
-biBidWRnZXQuDQo+ID4gVGhhdCBpcyB3aHkgSSBxdWV1ZSB0aGUgcGFja2V0cyBpbiB0aGUgZHJp
-dmVyIGJlZm9yZSB0aGlzIHBhdGNoLg0KPiA+IEZvciBleGFtcGxlLCBpZiBhIGJ1bGsgdHJhbnNm
-ZXIgY29udGFpbnMgNzAgcGFja2V0IGFuZCBidWRnZXQgaXMgNjQsDQo+ID4gbmFwaV9ncm9fcmVj
-ZWl2ZSB3b3VsZCBiZSBjYWxsZWQgZm9yIHRoZSBmaXJzdCA2NCBwYWNrZXRzIGFuZCA2IHBhY2tl
-dHMNCj4gd291bGQNCj4gPiBiZSBxdWV1ZWQgaW4gZHJpdmVyIGZvciBuZXh0IHNjaGVkdWxlLiBB
-ZnRlciB0aGlzIHBhdGNoLCBuYXBpX2dyb19yZWNlaXZlKCkNCj4gd291bGQNCj4gPiBiZSBjYWxs
-ZWQgZm9yIHRoZSA3MCBwYWNrZXRzLCBldmVuIHRoZSBidWRnZXQgaXMgNjQuIEFuZCB0aGUgcmVt
-YWluZWQgYnVsaw0KPiB0cmFuc2ZlcnMNCj4gPiB3b3VsZCBiZSBoYW5kbGVkIGZvciBuZXh0IHNj
-aGVkdWxlLg0KPiANCj4gQSBjb21tZW50IHdvdWxkIGJlIG5pY2UuIE5BUEkgbG9naWMgc2hvdWxk
-IGxvb2sgdGhlIHNhbWUgaW4gYWxsIGRyaXZlcnMuDQo+IA0KPiBJZiBhIGRyaXZlciBoYXMgc29t
-ZSBwZWN1bGlhcml0aWVzLCBjb21tZW50cyB3b3VsZCBoZWxwIHRvIG1haW50YWluDQo+IHRoZSBj
-b2RlIGluIHRoZSBsb25nIHJ1bi4NCg0KSSB3b3VsZCB1cGRhdGUgaXQuIFRoYW5rcy4NCg0KQmVz
-dCBSZWdhcmRzLA0KSGF5ZXMNCg0KDQo=
+On Sat, Sep 16, 2023 at 08:03:26AM -0700, Stephen Hemminger wrote:
+> For ip, tc, and bridge command introduce IPROUTE_COLORS to enable
+> automatic colorization via environment variable.
+> Similar to how grep handles color flag.
+> 
+> Example:
+>   $ IPROUTE_COLORS=auto ip -br addr
+> 
+> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+
+Acked-by: Andrea Claudi <aclaudi@redhat.com>
+
+Thanks.
+
 
