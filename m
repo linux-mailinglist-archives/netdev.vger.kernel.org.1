@@ -1,49 +1,39 @@
-Return-Path: <netdev+bounces-34494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8172C7A4619
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 11:38:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C694F7A4631
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 11:40:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A19791C203DD
-	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 09:38:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 804C328162F
+	for <lists+netdev@lfdr.de>; Mon, 18 Sep 2023 09:40:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3596F1C2B2;
-	Mon, 18 Sep 2023 09:38:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D7F31C29D;
+	Mon, 18 Sep 2023 09:40:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A6F1BDF7;
-	Mon, 18 Sep 2023 09:38:28 +0000 (UTC)
-Received: from m12.mail.163.com (m12.mail.163.com [220.181.12.216])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0A0CD109;
-	Mon, 18 Sep 2023 02:38:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=E6Gq9
-	q199088uQOPOTWvFqHg+HaKxn9bHmNfYLiu5Pc=; b=RNgmNIYISLthaIaO9kLB9
-	nJWV450G5i0dDGgSXisS5fgLpPATWjhJptaqaLQQF3kYN/mso4x4w2pdO5BrE3Z+
-	NBbaLtFvDny8PhUY7hA2m3LKvigIAg66HfKArN9m5m3VEQHGTTOS6wmO2sWuKfVG
-	Vbm5UFEUyzuudXVXDS7+r4=
-Received: from icess-ProLiant-DL380-Gen10.. (unknown [183.174.60.14])
-	by zwqz-smtp-mta-g5-1 (Coremail) with SMTP id _____wDnq2QWGghlLjGXCQ--.241S4;
-	Mon, 18 Sep 2023 17:36:32 +0800 (CST)
-From: Ma Ke <make_ruc2021@163.com>
-To: john.fastabend@gmail.com,
-	jakub@cloudflare.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	Ma Ke <make_ruc2021@163.com>
-Subject: [PATCH] bpf, sockmap: fix deadlocks in the sockhash and sockmap
-Date: Mon, 18 Sep 2023 17:36:20 +0800
-Message-Id: <20230918093620.3479627-1-make_ruc2021@163.com>
-X-Mailer: git-send-email 2.37.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2483F6FD0;
+	Mon, 18 Sep 2023 09:40:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E1BCBC433CA;
+	Mon, 18 Sep 2023 09:40:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695030022;
+	bh=uRfOQOB0II5sP8GPpDWkYX/vEwWZ4Q9wf7azPLUxnI8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=W+/CFp1VkUNvrkW4WOXwUNjeLGGda4LOtdSOhfnYStHDdLVlHuZgUtGJ6PmPrATSn
+	 s28+YAtvisNIxRfYRakr/TdDBQfPOITm9eY2KLuKlhFf7fRLLzxAzCpIU8BVq4gMlA
+	 2m5g/NqQxmPK2TaBf3uef6ajyji2hvUJpAgnrzw42gtp6JqVnPPfl/n6qfFIe1v+z/
+	 rOdSMU1EGbXcYtaU2Arp8vi41mRQEEuUBclAnxxeff6oAvSXhlA1PyrTDKyEWfLYBV
+	 IvBBO6M0C/3vulS+/41rNhmTpdXm3y0oi6nheA43JyCMotdTmfRmL0g+5Rzr/Mhuus
+	 +MIjX3Y5F4oiQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C78EBE11F41;
+	Mon, 18 Sep 2023 09:40:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,61 +41,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDnq2QWGghlLjGXCQ--.241S4
-X-Coremail-Antispam: 1Uf129KBjvJXoW7Aryktr43tr48Xw4DGF15urg_yoW8GF4rpF
-	yrKa1rWrWkA3WF9FZ3Xw4vqrs5trn8Zr1UGFyrCa4Yyr9xKryqgFy0kasY9r1YyrW2yr15
-	GF42k3y3G3yrC3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zifcTdUUUUU=
-X-Originating-IP: [183.174.60.14]
-X-CM-SenderInfo: 5pdnvshuxfjiisr6il2tof0z/1tbiyALuC1p7LzCXDgAAsI
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_BL,
-	RCVD_IN_MSPIKE_L4,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: Re: [PATCH] ceph: Annotate struct ceph_monmap with __counted_by
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169503002181.24344.5873701629214587241.git-patchwork-notify@kernel.org>
+Date: Mon, 18 Sep 2023 09:40:21 +0000
+References: <20230915201510.never.365-kees@kernel.org>
+In-Reply-To: <20230915201510.never.365-kees@kernel.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: idryomov@gmail.com, xiubli@redhat.com, jlayton@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ ceph-devel@vger.kernel.org, netdev@vger.kernel.org, nathan@kernel.org,
+ ndesaulniers@google.com, trix@redhat.com, linux-kernel@vger.kernel.org,
+ llvm@lists.linux.dev, linux-hardening@vger.kernel.org
 
-It seems that elements in sockhash are rarely actively
-deleted by users or ebpf program. Therefore, we do not
-pay much attention to their deletion. Compared with hash
-maps, sockhash only provides spin_lock_bh protection.
-This causes it to appear to have self-locking behavior
-in the interrupt context, as CVE-2023-0160 points out.
+Hello:
 
-Signed-off-by: Ma Ke <make_ruc2021@163.com>
----
- net/core/sock_map.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-diff --git a/net/core/sock_map.c b/net/core/sock_map.c
-index cb11750b1df5..1302d484e769 100644
---- a/net/core/sock_map.c
-+++ b/net/core/sock_map.c
-@@ -928,11 +928,12 @@ static long sock_hash_delete_elem(struct bpf_map *map, void *key)
- 	struct bpf_shtab_bucket *bucket;
- 	struct bpf_shtab_elem *elem;
- 	int ret = -ENOENT;
-+	unsigned long flags;
- 
- 	hash = sock_hash_bucket_hash(key, key_size);
- 	bucket = sock_hash_select_bucket(htab, hash);
- 
--	spin_lock_bh(&bucket->lock);
-+	spin_lock_irqsave(&bucket->lock, flags);
- 	elem = sock_hash_lookup_elem_raw(&bucket->head, hash, key, key_size);
- 	if (elem) {
- 		hlist_del_rcu(&elem->node);
-@@ -940,7 +941,7 @@ static long sock_hash_delete_elem(struct bpf_map *map, void *key)
- 		sock_hash_free_elem(htab, elem);
- 		ret = 0;
- 	}
--	spin_unlock_bh(&bucket->lock);
-+	spin_unlock_irqrestore(&bucket->lock, flags);
- 	return ret;
- }
- 
+On Fri, 15 Sep 2023 13:15:10 -0700 you wrote:
+> Prepare for the coming implementation by GCC and Clang of the __counted_by
+> attribute. Flexible array members annotated with __counted_by can have
+> their accesses bounds-checked at run-time checking via CONFIG_UBSAN_BOUNDS
+> (for array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
+> functions).
+> 
+> As found with Coccinelle[1], add __counted_by for struct ceph_monmap.
+> Additionally, since the element count member must be set before accessing
+> the annotated flexible array member, move its initialization earlier.
+> 
+> [...]
+
+Here is the summary with links:
+  - ceph: Annotate struct ceph_monmap with __counted_by
+    https://git.kernel.org/netdev/net-next/c/1cb6422ecac8
+
+You are awesome, thank you!
 -- 
-2.37.2
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
