@@ -1,297 +1,191 @@
-Return-Path: <netdev+bounces-35067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B2FF7A6C92
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 22:57:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD8407A6C87
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 22:51:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8B541C20A80
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 20:57:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 721132814E7
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 20:51:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFF0037148;
-	Tue, 19 Sep 2023 20:57:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D3F336B19;
+	Tue, 19 Sep 2023 20:51:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8C398831
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 20:57:46 +0000 (UTC)
-X-Greylist: delayed 905 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 19 Sep 2023 13:57:44 PDT
-Received: from s1-ba86.socketlabs.email-od.com (s1-ba86.socketlabs.email-od.com [142.0.186.134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3810CB3
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 13:57:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; d=email-od.com;i=@email-od.com;s=dkim;
-	c=relaxed/relaxed; q=dns/txt; t=1695157064; x=1697749064;
-	h=content-transfer-encoding:content-type:in-reply-to:from:content-language:references:cc:to:subject:mime-version:date:message-id:x-thread-info:subject:to:from:cc:reply-to;
-	bh=AskR4byY02A0+0bNCEbBq1u+3fbXAqKncGpUjIuFVcM=;
-	b=UgxVS9GroiZ72Z0/fbjznnCM9egPzb6SSBLtCWAHAisSl+PWtf7zrZJttUE8264VV5YihGOOm7/CWW3qrFMZxFXIe3VifHJffo/9z9hEHW37wJ3oualSc5xmJC0EBtakNkgfNHO2sDRrRejg2FUID5NpmW3reSDxEB6OcSQDK4c=
-X-Thread-Info: NDUwNC4xMi4xNWZkOTAwMDdhNzdkMjcubmV0ZGV2PXZnZXIua2VybmVsLm9yZw==
-Received: from r3.us-east-1.aws.in.socketlabs.com (r3.us-east-1.aws.in.socketlabs.com [142.0.191.3]) by mxrs4.email-od.com
-	with ESMTP(version=Tls12 cipher=Aes256 bits=256); Tue, 19 Sep 2023 16:42:29 -0400
-Received: from nalramli.com (d14-69-55-117.try.wideopenwest.com [69.14.117.55]) by r3.us-east-1.aws.in.socketlabs.com
-	with ESMTP; Tue, 19 Sep 2023 16:42:28 -0400
-Received: from [10.0.2.15] (d14-69-55-117.try.wideopenwest.com [69.14.117.55])
-	by nalramli.com (Postfix) with ESMTPS id 09F092CE000F;
-	Tue, 19 Sep 2023 16:42:27 -0400 (EDT)
-Message-ID: <150cef65-1de0-4145-a917-18a3665808c2@nalramli.com>
-Date: Tue, 19 Sep 2023 16:42:27 -0400
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82CD8347BA;
+	Tue, 19 Sep 2023 20:51:16 +0000 (UTC)
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7948BD;
+	Tue, 19 Sep 2023 13:51:11 -0700 (PDT)
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.96)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1qihgL-00082Y-13;
+	Tue, 19 Sep 2023 20:50:53 +0000
+Date: Tue, 19 Sep 2023 21:50:44 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Rob Herring <robh@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+	John Crispin <john@phrozen.org>, Sean Wang <sean.wang@mediatek.com>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next v2 1/2] dt-bindings: net: mediatek,net: add
+ phandles for SerDes on MT7988
+Message-ID: <ZQoJpGLhNZ0M2JhI@makrotopia.org>
+References: <cover.1695058909.git.daniel@makrotopia.org>
+ <35c12a115893d324db16ec6983afb5f1951fd4c9.1695058909.git.daniel@makrotopia.org>
+ <20230919180909.GA4151534-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next RFC v2 0/4] mlx5: support per queue coalesce settings
-To: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Cc: netdev@vger.kernel.org, saeedm@nvidia.com, saeed@kernel.org,
- kuba@kernel.org, davem@davemloft.net, tariqt@nvidia.com,
- linux-kernel@vger.kernel.org, leon@kernel.org, jdamato@fastly.com,
- sbhogavilli@fastly.com, nalramli@fastly.com
-References: <ZOemz1HLp95aGXXQ@x130> <20230918222955.2066-1-dev@nalramli.com>
- <87ttrq802f.fsf@nvidia.com>
-Content-Language: en-US
-From: "Nabil S. Alramli" <dev@nalramli.com>
-In-Reply-To: <87ttrq802f.fsf@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-13.3 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_IADB_DK,RCVD_IN_IADB_LISTED,
-	RCVD_IN_IADB_OPTIN,RCVD_IN_IADB_RDNS,RCVD_IN_IADB_SENDERID,
-	RCVD_IN_IADB_SPF,RCVD_IN_IADB_VOUCHED,SPF_HELO_PASS,SPF_PASS,
-	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230919180909.GA4151534-robh@kernel.org>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Rahul,
+Hi Rob,
 
-Thank you for your response.
+thank you for the review!
 
-On 9/19/23 14:55, Rahul Rameshbabu wrote:
-> Hi Nabil,
+On Tue, Sep 19, 2023 at 01:09:09PM -0500, Rob Herring wrote:
+> On Mon, Sep 18, 2023 at 11:26:34PM +0100, Daniel Golle wrote:
+> > Add several phandles needed for Ethernet SerDes interfaces on the
+> > MediaTek MT7988 SoC.
+> > 
+> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> > ---
+> >  .../devicetree/bindings/net/mediatek,net.yaml | 28 +++++++++++++++++++
+> >  1 file changed, 28 insertions(+)
+> > 
+> > diff --git a/Documentation/devicetree/bindings/net/mediatek,net.yaml b/Documentation/devicetree/bindings/net/mediatek,net.yaml
+> > index e74502a0afe86..78219158b96af 100644
+> > --- a/Documentation/devicetree/bindings/net/mediatek,net.yaml
+> > +++ b/Documentation/devicetree/bindings/net/mediatek,net.yaml
+> > @@ -385,6 +385,34 @@ allOf:
+> >            minItems: 2
+> >            maxItems: 2
+> >  
+> > +        mediatek,toprgu:
+> > +          $ref: /schemas/types.yaml#/definitions/phandle
+> > +          description:
+> > +            Phandle to the syscon representing the reset controller.
 > 
-> On Mon, 18 Sep, 2023 18:29:51 -0400 "Nabil S. Alramli" <dev@nalramli.com> wrote:
->> Hello,
->>
->> This is v2 of my previous patch:
->> https://lore.kernel.org/lkml/20230823223121.58676-1-dev@nalramli.com/.
->>
->> Saeed: Thanks for reviewing v1. I made significant changes to support
->> per-channel DIM settings. Is this ready for an official v1 submission or
->> are there other major changes you'd like to see before I do that?
->>
->> ***************************************************************************
->> Version History
->> ---------------
->> * v1: Initial draft, individual channel DIM changes not supported.
->> * v2: Support individual channel DIM changes.
->> ***************************************************************************
+> Use the reset binding
+
+I got an alternative implementation ready which implements an actual
+reset controller (by extending drivers/watchdog/mtk_wdt.c to cover
+also MT7988 and its addition sw-reset-enable bits) and uses single
+phandles for each reset bit assigned to the corresponding units
+instead of listing them all for the ethernet controller (maybe that's
+one step too far though...)
+
+However, as mentioned in the cover letter, using the Linux reset
+controller API (which having to use is a consequence of having to use
+the reset bindings) doesn't allow to simultanously deassert the
+resets of pextp, usxgmii pcs and/or sgmii pcs which is how the vendor
+implementation is doing it as all reset bits are on the same 32-bit
+register and the Ethernet driver is the only driver needing to access
+that register.
+
+Asserting the resets in sequence and subsequently deasserting in
+sequence works for me, but it will have to be confirmed to not create
+any problems because it's clearly a deviation from the behavior of the
+reference implementation.
+
+
 > 
-> We actually began working on a patch set for the feature internally
-> inspired by your initial RFC. If it is alright with you, would it be ok
-> to have you as a co-author of that series that we should have prepared
-> in the coming days? We have some minor enhancements that we think will
-> improve the general architecture for how we handle both the global and
-> per-queue settings.
+> > +
+> > +        mediatek,usxgmiisys:
+> > +          $ref: /schemas/types.yaml#/definitions/phandle-array
+> > +          minItems: 2
+> > +          maxItems: 2
+> > +          items:
+> > +            maxItems: 1
+> > +          description:
+> > +            A list of phandle to the syscon node referencing the USXGMII PCS.
 > 
+> Use the PCS binding
 
-Yes. Please feel free to add me as a co-author. Actually, I'm new to
-submitting mlx-5 patches and a lot of credit goes to Joe Damato
-<jdamato@fastly.com> who had this initial idea and helped me develop it
-into this patch, so would you mind adding him as well? If you would like
-you could start with my patch-set and then revert it and add your own,
-or if you think that's too much trouble then I'm fine with however you'd
-like to proceed. I'd be happy to test your patch whenever it's ready.
+Ack, I will ie. implement standalone PCS driver similar to eg.
+pcs-rzn1-miic.c.
 
->>
->> Currently, only gobal coalescing configuration queries or changes are
->> supported in the `mlx5` driver. However, per-queue operations are not, and
->> result in `EOPNOTSUPP` errors when attempted with `ethtool`. This patch
->> adds support for per-queue coalesce operations.
->>
->> Here's an example use case:
->>
->> - A mlx5 NIC is configured with 8 queues, each queue has its IRQ pinned to
->>    a unique CPU.
->> - Two custom RSS contexts are created: context 1 and context 2. Each
->>    context has a different set of queues where flows are distributed. For
->>    example, context 1 may distribute flows to queues 0-3, and context 2 may
->>    distribute flows to queues 4-7.
->> - A series of ntuple filters are installed which direct matching flows to
->>    RSS contexts. For example, perhaps port 80 is directed to context 1 and
->>    port 443 to context 2.
->> - Applications which receive network data associated with either context
->>    are pinned to the CPUs where the queues in the matching context have
->>    their IRQs pinned to maximize locality.
->>
->> The apps themselves, however, may have different requirements on latency vs
->> CPU usage and so setting the per queue IRQ coalesce values would be very
->> helpful.
->>
->> This patch would support this. In v1 DIM mode changes could only be changed
->> NIC-wide. However, in this iteration, DIM mode changes are supported
->> globally as well as on a per-queue basis.
->>
->> Here's an example:
->>
->> ```
->> $ sudo ethtool --per-queue eth0 queue_mask 0x4 --show-coalesce
->> Queue: 2
->> Adaptive RX: on  TX: on
->> stats-block-usecs: 0
->> sample-interval: 0
->> pkt-rate-low: 0
->> pkt-rate-high: 0
->>
->> rx-usecs: 8
->> rx-frames: 128
->> rx-usecs-irq: 0
->> rx-frames-irq: 0
->>
->> tx-usecs: 8
->> tx-frames: 128
->> tx-usecs-irq: 0
->> tx-frames-irq: 0
->> ```
->>
->> Now, let's try to set adaptive-rx off rx-usecs 16 for queue 2:
->>
->> ```
->> $ sudo ethtool --per-queue eth0 queue_mask 0x4 --coalesce adaptive-rx off
->> $ sudo ethtool --per-queue eth0 queue_mask 0x4 --coalesce rx-usecs 16
->> ```
->>
->> Confirm that the operation succeeded:
->>
->> ```
->> $ sudo ethtool --per-queue eth0 queue_mask 0x4 --show-coalesce
->> Queue: 2
->> Adaptive RX: off  TX: on
->> stats-block-usecs: 0
->> sample-interval: 0
->> pkt-rate-low: 0
->> pkt-rate-high: 0
->>
->> rx-usecs: 16
->> rx-frames: 32
->> rx-usecs-irq: 0
->> rx-frames-irq: 0
->>
->> tx-usecs: 8
->> tx-frames: 128
->> tx-usecs-irq: 0
->> tx-frames-irq: 0
->> ```
->>
->> The individual channel settings do not overwrite the global ones. However
->> Setting the global parameters will also reset all of the individual channel
->> options. For example, after we set the options for queue 2, we'll see that
->> the global options remain unchanged:
->> ```
->> $ sudo ethtool --show-coalesce eth0
->> Coalesce parameters for eth0:
->> Adaptive RX: on  TX: on
->> stats-block-usecs: 0
->> sample-interval: 0
->> pkt-rate-low: 0
->> pkt-rate-high: 0
->>
->> rx-usecs: 8
->> rx-frames: 128
->> rx-usecs-irq: 0
->> rx-frames-irq: 0
->>
->> tx-usecs: 16
->> tx-frames: 32
->> tx-usecs-irq: 0
->> tx-frames-irq: 0
->> ```
->>
->> But then if we set them, we'll see that the options for queue 2 have been
->> reset as well:
->> ```
->> $ sudo ethtool --coalesce eth0 adaptive-tx off
->>
->> $ sudo ethtool --show-coalesce eth0
->> Coalesce parameters for eth0:
->> Adaptive RX: on  TX: off
->> stats-block-usecs: 0
->> sample-interval: 0
->> pkt-rate-low: 0
->> pkt-rate-high: 0
->>
->> rx-usecs: 8
->> rx-frames: 128
->> rx-usecs-irq: 0
->> rx-frames-irq: 0
->>
->> tx-usecs: 16
->> tx-frames: 32
->> tx-usecs-irq: 0
->> tx-frames-irq: 0
->>
->> $ sudo ethtool --per-queue eth0 queue_mask 0x4 --show-coalesce
->> Queue: 2
->> Adaptive RX: on  TX: off
->> stats-block-usecs: 0
->> sample-interval: 0
->> pkt-rate-low: 0
->> pkt-rate-high: 0
->>
->> rx-usecs: 8
->> rx-frames: 128
->> rx-usecs-irq: 0
->> rx-frames-irq: 0
->>
->> tx-usecs: 16
->> tx-frames: 32
->> tx-usecs-irq: 0
->> tx-frames-irq: 0
->> ```
->>
->> Previously a global `struct mlx5e_params` stored the options in
->> `struct mlx5e_priv.channels.params`. That was preserved, but a channel-
->> specific instance was added as well, in `struct mlx5e_channel.params`.
->>
->> Best Regards,
->>
->> ***************************************************************************
->>
->> Nabil S. Alramli (4):
->>    mlx5: Add mlx5e_param to individual mlx5e_channel and preserve them
->>      through mlx5e_open_channels()
->>    mlx5: Add queue number parameter to mlx5e_safe_switch_params()
 > 
-> We currently are working on a variation of this without needing to use
-> mlx5e_safe_switch_params for updating individual channel states (our
-> variation of the feature avoids needing to place an instance of
-> mlx5e_params per channel).
+> > +
+> > +        mediatek,xfi-pextp:
+> > +          $ref: /schemas/types.yaml#/definitions/phandle-array
+> > +          minItems: 2
+> > +          maxItems: 2
+> > +          items:
+> > +            maxItems: 1
+> > +          description:
+> > +            A list of phandle to the syscon node that handles the 10GE SerDes PHY.
 > 
+> Use the phy binding (phys, not phy-handle for ethernet PHY).
 
-Oh I'm curious to see how this solution works. I look forward to your
-upcoming patch, and would be happy to review it as well.
+Ack, this can be implemented as a standalone PHY driver using PHY
+bindings. I will do that instead.
 
->>    mlx5: Implement mlx5e_ethtool_{get,set}_per_queue_coalesce() to
->>      support per-queue operations
->>    mlx5: Add {get,set}_per_queue_coalesce()
->>
->>   drivers/net/ethernet/mellanox/mlx5/core/en.h  |   6 +-
->>   .../ethernet/mellanox/mlx5/core/en_dcbnl.c    |   2 +-
->>   .../ethernet/mellanox/mlx5/core/en_ethtool.c  | 214 +++++++++++++-----
->>   .../net/ethernet/mellanox/mlx5/core/en_main.c |  76 +++++--
->>   .../ethernet/mellanox/mlx5/core/ipoib/ipoib.c |   2 +-
->>   5 files changed, 222 insertions(+), 78 deletions(-)
 > 
-> --
-> Thanks,
+> > +
+> > +        mediatek,xfi-pll:
+> > +          $ref: /schemas/types.yaml#/definitions/phandle
+> > +          description:
+> > +            Phandle to the syscon node handling the 10GE SerDes clock setup.
 > 
-> Rahul Rameshbabu
+> Use the clock binding
 
-Best Regards,
+Does that imply that I should implement a clock driver whith only a
+single clock offering only a single operation ('enable') which would
+then do the magic register writes?
 
--- Nabil S. Alramli
+While one part is actually identifyable as taking care of enabling a
+clock, I would not know how to meaningfully abstract the other (first)
+part, see vendor driver:
 
+/* Register to control USXGMII XFI PLL digital */
+#define XFI_PLL_DIG_GLB8        0x08
+#define RG_XFI_PLL_EN           BIT(31)
+
+/* Register to control USXGMII XFI PLL analog */
+#define XFI_PLL_ANA_GLB8        0x108
+#define RG_XFI_PLL_ANA_SWWA     0x02283248
+
+[...]
+
+/* Add software workaround for USXGMII PLL TCL issue */
+regmap_write(ss->pll, XFI_PLL_ANA_GLB8, RG_XFI_PLL_ANA_SWWA);
+// How would you represent the line above using the abstractions of the
+// common clk framework?
+
+regmap_read(ss->pll, XFI_PLL_DIG_GLB8, &val); //    that looks like it
+val |= RG_XFI_PLL_EN;                         // <- could be a abstracted
+regmap_write(ss->pll, XFI_PLL_DIG_GLB8, val); //    in a meaningful way in
+                                                    clock driver.
+
+... which is all we ever do on that regmap. Ever.
+
+
+Thanks in advance to everybody sharing their ideas and advises.
 
