@@ -1,86 +1,118 @@
-Return-Path: <netdev+bounces-34968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 487DD7A63EC
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 14:55:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 261AB7A63FD
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 14:57:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01FA52810BA
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 12:55:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4E04281095
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 12:57:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A582C37CA6;
-	Tue, 19 Sep 2023 12:54:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3968037CAA;
+	Tue, 19 Sep 2023 12:57:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 571271FA1;
-	Tue, 19 Sep 2023 12:54:58 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D441DF3;
-	Tue, 19 Sep 2023 05:54:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=1Npvrzyz+/TZN9YuhYrSAlYVBkFpFs1Wg2sTP1rKTzM=; b=XXl0VR2tj8IyKUOHxyeVKdBQ12
-	QbqTt8W+/Un78rkZaHzfMrIOQfiPRpMR423vSz4l8tSzehXttY60c+iOpNCet9ysn7EAbYhBdUPyT
-	KKUq+vcVhFuT4suCzdVfZvc1mfP7pWTaeatTbcKuDD3L4r1sYPzuYMaYJzyhP0c7UuQo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qiaFb-006uYS-1A; Tue, 19 Sep 2023 14:54:47 +0200
-Date: Tue, 19 Sep 2023 14:54:47 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Parthiban.Veerasooran@microchip.com
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	corbet@lwn.net, Steen.Hegelund@microchip.com, rdunlap@infradead.org,
-	horms@kernel.org, casper.casan@gmail.com, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, Horatiu.Vultur@microchip.com,
-	Woojung.Huh@microchip.com, Nicolas.Ferre@microchip.com,
-	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com
-Subject: Re: [RFC PATCH net-next 3/6] net: ethernet: implement OA TC6
- configuration function
-Message-ID: <d2d26c6c-0345-46cf-b806-15834ba8b40f@lunn.ch>
-References: <20230908142919.14849-1-Parthiban.Veerasooran@microchip.com>
- <20230908142919.14849-4-Parthiban.Veerasooran@microchip.com>
- <dd0a6cd5-91e5-4e13-8025-d6c88bdab5a2@lunn.ch>
- <46fab729-4c5a-1a6e-37d0-fea62c0717f7@microchip.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CFB61FA1
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 12:57:17 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDB63119;
+	Tue, 19 Sep 2023 05:57:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695128235; x=1726664235;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=zQpj7OaTDonluY2E3OGQf5kVh3FqltWnatkxOc0duHk=;
+  b=Ga3v3AHrnWTbQgTYua4B+ALHhCO9p6CandAqD/iOUTsSBv/2DwM7iiKK
+   h8pElWQYTDZgjU2d9dZ36HVxdYOxD2EU7QtYbYuI2oOyMZ9AC6FskiKGs
+   p9YvTY0nhKBuVXKFCXZXIidmjbVrFLZCg8kNqRz8wjCj0MuK00PyJEucw
+   v1T8cjEio0BSVJ0YxNo+92IsDyLI1I1S66S4hgT1EqaheWMSg1vUa3/vh
+   0WcKVPA4tRwmHFtdU//cyByIRp/bTdXpjYnF0QlMk+q/+Iqb9NaqysBhP
+   uur3oI3Br5+qssSMsK+782B0EouVQ6uCGr5kCjsY9ifrsSR6POXTJO+J4
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10838"; a="359324655"
+X-IronPort-AV: E=Sophos;i="6.02,159,1688454000"; 
+   d="scan'208";a="359324655"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2023 05:57:15 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10838"; a="746228767"
+X-IronPort-AV: E=Sophos;i="6.02,159,1688454000"; 
+   d="scan'208";a="746228767"
+Received: from vdesserx-mobl1.ger.corp.intel.com (HELO localhost.localdomain) ([10.249.32.31])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2023 05:57:10 -0700
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+To: Bjorn Helgaas <bhelgaas@google.com>,
+	linux-pci@vger.kernel.org,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Subject: [PATCH v3 3/8] igb: Use FIELD_GET() to extract Link Width
+Date: Tue, 19 Sep 2023 15:56:43 +0300
+Message-Id: <20230919125648.1920-4-ilpo.jarvinen@linux.intel.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20230919125648.1920-1-ilpo.jarvinen@linux.intel.com>
+References: <20230919125648.1920-1-ilpo.jarvinen@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <46fab729-4c5a-1a6e-37d0-fea62c0717f7@microchip.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> >> +/* Unmasking interrupt fields in IMASK0 */
-> >> +#define HDREM                ~BIT(5)         /* Header Error Mask */
-> >> +#define LOFEM                ~BIT(4)         /* Loss of Framing Error Mask */
-> >> +#define RXBOEM               ~BIT(3)         /* Rx Buffer Overflow Error Mask */
-> >> +#define TXBUEM               ~BIT(2)         /* Tx Buffer Underflow Error Mask */
-> >> +#define TXBOEM               ~BIT(1)         /* Tx Buffer Overflow Error Mask */
-> >> +#define TXPEM                ~BIT(0)         /* Tx Protocol Error Mask */
-> > 
-> > Using ~BIT(X) is very usual. I would not do this, Principle of Least
-> > Surprise.
-> Sorry, I don't get your point. Could you please explain bit more?
+Use FIELD_GET() to extract PCIe Negotiated Link Width field instead of
+custom masking and shifting.
 
-Look around kernel header files. How often do you see ~BIT(5)?  My
-guess it is approximately 0. So i'm suggesting you remove the ~ and
-have the user of the #define assemble the mask and then do the ~ .
+Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+---
+ drivers/net/ethernet/intel/igb/e1000_mac.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-     Andrew
+diff --git a/drivers/net/ethernet/intel/igb/e1000_mac.c b/drivers/net/ethernet/intel/igb/e1000_mac.c
+index caf91c6f52b4..5a23b9cfec6c 100644
+--- a/drivers/net/ethernet/intel/igb/e1000_mac.c
++++ b/drivers/net/ethernet/intel/igb/e1000_mac.c
+@@ -1,6 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0
+ /* Copyright(c) 2007 - 2018 Intel Corporation. */
+ 
++#include <linux/bitfield.h>
+ #include <linux/if_ether.h>
+ #include <linux/delay.h>
+ #include <linux/pci.h>
+@@ -50,9 +51,8 @@ s32 igb_get_bus_info_pcie(struct e1000_hw *hw)
+ 			break;
+ 		}
+ 
+-		bus->width = (enum e1000_bus_width)((pcie_link_status &
+-						     PCI_EXP_LNKSTA_NLW) >>
+-						     PCI_EXP_LNKSTA_NLW_SHIFT);
++		bus->width = (enum e1000_bus_width)FIELD_GET(PCI_EXP_LNKSTA_NLW,
++							     pcie_link_status);
+ 	}
+ 
+ 	reg = rd32(E1000_STATUS);
+-- 
+2.30.2
+
 
