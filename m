@@ -1,125 +1,137 @@
-Return-Path: <netdev+bounces-34979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5CE67A64DA
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 15:27:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E38FA7A6549
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 15:36:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F68028156C
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 13:27:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F46E282310
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 13:36:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAAEE36AE2;
-	Tue, 19 Sep 2023 13:27:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D8036B01;
+	Tue, 19 Sep 2023 13:36:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F7EF1863B
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 13:27:24 +0000 (UTC)
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCDA2EC;
-	Tue, 19 Sep 2023 06:27:22 -0700 (PDT)
-Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.207])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Rqj9b5SvDz6K5nL;
-	Tue, 19 Sep 2023 21:26:27 +0800 (CST)
-Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Tue, 19 Sep
- 2023 14:27:19 +0100
-Date: Tue, 19 Sep 2023 14:27:17 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Ilpo =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
-CC: Bjorn Helgaas <bhelgaas@google.com>, <linux-pci@vger.kernel.org>, "Jesse
- Brandeburg" <jesse.brandeburg@intel.com>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, <intel-wired-lan@lists.osuosl.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v3 8/8] e1000e: Use pcie_capability_read_word() for
- reading LNKSTA
-Message-ID: <20230919142717.0000247c@Huawei.com>
-In-Reply-To: <20230919125648.1920-9-ilpo.jarvinen@linux.intel.com>
-References: <20230919125648.1920-1-ilpo.jarvinen@linux.intel.com>
-	<20230919125648.1920-9-ilpo.jarvinen@linux.intel.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6438D2E65A
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 13:36:03 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E02B6F3
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 06:36:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1695130561;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BQmRjXCmgAQl3a6tpa/J+d//osgH4H/G1TUy2TGbM10=;
+	b=enFmpdmPnDJUjCGdFo2A+7ljU6lVl06QBRf4XfQhtrxaUVwKsHRoWSV+7i9iVDfpwhyY6i
+	29utuKROz4Fz2xuWWGsdyX6yx2zoVL6xdDqJVQEUMrtY1OQ1Ssrv+2Xd/dSNnH+nTIGzaS
+	LHj14iahnvgWIw7pomcemw5UDyvxLxM=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-627-khsJjZDZN4Cz6m0_eXm5Dw-1; Tue, 19 Sep 2023 09:35:59 -0400
+X-MC-Unique: khsJjZDZN4Cz6m0_eXm5Dw-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-770ef0da402so758478685a.1
+        for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 06:35:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695130559; x=1695735359;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BQmRjXCmgAQl3a6tpa/J+d//osgH4H/G1TUy2TGbM10=;
+        b=n+hjohxF/KkzZNJzdb7bRRxkh7G/MUbug/HxWJkofU6BrH0K0oSd/kAkgXmbGBvzoS
+         GrtFBdd94Zmpy7wNXLrvEduC1xqzPgHLpL0Nn5bNhQjvKk3HQcvPlAaWiy7lksqYfYq1
+         At/YCegjMDRm55yveS113/RfRuLrXZGwPiyPdW+FJfUhYy31d12aHjZDi9PM9t1hiZnQ
+         ps8SW/vRa/c7wgAVRM0iFlyQZ5Gn/jo7dclS94aQ8+7DBQFQnECRwcIBQuHPMW8oKFeg
+         BTa6WDMvhgDBe7C7KgHO/haGc1267r7R+34/oqdhS2BZFRBHU4kgnBpzfHR++REKqBHC
+         eOCg==
+X-Gm-Message-State: AOJu0YxgR6m9mcWpE50u+KKguG348OxCU4Pj2TkquCWNZSWHbItnWUTm
+	ZzyBJnd1KPKcYHX86AA2jnlKEp2b0kdULRRAgobxDhZl/JHq2/gAhosAvv7NR0rmpmO7od3fd5V
+	HeiqaKF3Psk9yBs6U
+X-Received: by 2002:a0c:f001:0:b0:656:4a25:2080 with SMTP id z1-20020a0cf001000000b006564a252080mr7874562qvk.14.1695130559372;
+        Tue, 19 Sep 2023 06:35:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IELog22rYA2MEE9wvtU9k2iQ0qP5GVCV4XB9+NFnOEeZMlYRp+cnMnNZiRhNH7IqEct7Tt4FA==
+X-Received: by 2002:a0c:f001:0:b0:656:4a25:2080 with SMTP id z1-20020a0cf001000000b006564a252080mr7874542qvk.14.1695130559155;
+        Tue, 19 Sep 2023 06:35:59 -0700 (PDT)
+Received: from sgarzare-redhat ([46.222.165.38])
+        by smtp.gmail.com with ESMTPSA id g28-20020a0caadc000000b0064d6a81e4d4sm1773184qvb.113.2023.09.19.06.35.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Sep 2023 06:35:58 -0700 (PDT)
+Date: Tue, 19 Sep 2023 15:35:51 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Arseniy Krasnov <avkrasnov@salutedevices.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Jason Wang <jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>, 
+	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
+	oxffffaa@gmail.com
+Subject: Re: [PATCH net-next v9 0/4] vsock/virtio/vhost: MSG_ZEROCOPY
+ preparations
+Message-ID: <hq67e2b3ljfjikvbaneczdve3fzg3dl5ziyc7xtujyqesp6dzm@fh5nqkptpb4n>
+References: <20230916130918.4105122-1-avkrasnov@salutedevices.com>
+ <b5873e36-fe8c-85e8-e11b-4ccec386c015@salutedevices.com>
+ <yys5jgwkukvfyrgfz6txxzqc7el5megf2xntnk6j4ausvjdgld@7aan4quqy4bs>
+ <a5b25ee07245125fac4bbdc3b3604758251907d2.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [10.202.227.76]
-X-ClientProxiedBy: lhrpeml500005.china.huawei.com (7.191.163.240) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <a5b25ee07245125fac4bbdc3b3604758251907d2.camel@redhat.com>
+X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,RCVD_IN_SORBS_WEB,SPF_HELO_NONE,
+	SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 19 Sep 2023 15:56:48 +0300
-Ilpo J=E4rvinen <ilpo.jarvinen@linux.intel.com> wrote:
+On Tue, Sep 19, 2023 at 03:19:54PM +0200, Paolo Abeni wrote:
+>On Tue, 2023-09-19 at 09:54 +0200, Stefano Garzarella wrote:
+>> On Mon, Sep 18, 2023 at 07:56:00PM +0300, Arseniy Krasnov wrote:
+>> > Hi Stefano,
+>> >
+>> > thanks for review! So when this patchset will be merged to net-next,
+>> > I'll start sending next part of MSG_ZEROCOPY patchset, e.g. AF_VSOCK +
+>> > Documentation/ patches.
+>>
+>> Ack, if it is not a very big series, maybe better to include also the
+>> tests so we can run them before merge the feature.
+>
+>I understand that at least 2 follow-up series are waiting for this, one
+>of them targeting net-next and the bigger one targeting the virtio
+>tree. Am I correct?
 
-> Use pcie_capability_read_word() for reading LNKSTA and remove the
-> custom define that matches to PCI_EXP_LNKSTA.
->=20
-> As only single user for cap_offset remains, replace it with a call to
-> pci_pcie_cap(). Instead of e1000_adapter, make local variable out of
-> pci_dev because both users are interested in it.
->=20
-> Signed-off-by: Ilpo J=E4rvinen <ilpo.jarvinen@linux.intel.com>
-LGTM
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+IIUC the next series will touch only the vsock core
+(net/vmw_vsock/af_vsock.c), tests, and documentation.
 
-> ---
->  drivers/net/ethernet/intel/e1000e/defines.h |  1 -
->  drivers/net/ethernet/intel/e1000e/mac.c     | 11 ++++-------
->  2 files changed, 4 insertions(+), 8 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/e1000e/defines.h b/drivers/net/et=
-hernet/intel/e1000e/defines.h
-> index a4d29c9e03a6..23a58cada43a 100644
-> --- a/drivers/net/ethernet/intel/e1000e/defines.h
-> +++ b/drivers/net/ethernet/intel/e1000e/defines.h
-> @@ -678,7 +678,6 @@
-> =20
->  /* PCI/PCI-X/PCI-EX Config space */
->  #define PCI_HEADER_TYPE_REGISTER     0x0E
-> -#define PCIE_LINK_STATUS             0x12
-> =20
->  #define PCI_HEADER_TYPE_MULTIFUNC    0x80
-> =20
-> diff --git a/drivers/net/ethernet/intel/e1000e/mac.c b/drivers/net/ethern=
-et/intel/e1000e/mac.c
-> index 5340cf73778d..694a779e718d 100644
-> --- a/drivers/net/ethernet/intel/e1000e/mac.c
-> +++ b/drivers/net/ethernet/intel/e1000e/mac.c
-> @@ -17,16 +17,13 @@ s32 e1000e_get_bus_info_pcie(struct e1000_hw *hw)
->  {
->  	struct e1000_mac_info *mac =3D &hw->mac;
->  	struct e1000_bus_info *bus =3D &hw->bus;
-> -	struct e1000_adapter *adapter =3D hw->adapter;
-> -	u16 pcie_link_status, cap_offset;
-> +	struct pci_dev *pdev =3D hw->adapter->pdev;
-> +	u16 pcie_link_status;
-> =20
-> -	cap_offset =3D adapter->pdev->pcie_cap;
-> -	if (!cap_offset) {
-> +	if (!pci_pcie_cap(pdev)) {
->  		bus->width =3D e1000_bus_width_unknown;
->  	} else {
-> -		pci_read_config_word(adapter->pdev,
-> -				     cap_offset + PCIE_LINK_STATUS,
-> -				     &pcie_link_status);
-> +		pcie_capability_read_word(pdev, PCI_EXP_LNKSTA, &pcie_link_status);
->  		bus->width =3D (enum e1000_bus_width)FIELD_GET(PCI_EXP_LNKSTA_NLW,
->  							     pcie_link_status);
->  	}
+The virtio part should be fully covered by this series.
+
+@Arseniy feel free to correct me!
+
+>
+>DaveM suggests this should go via the virtio tree, too. Any different
+>opinion?
+
+For this series should be fine, I'm not sure about the next series.
+Merging this with the virtio tree, then it forces us to do it for
+followup as well right?
+
+In theory followup is more on the core, so better with net-next, but
+it's also true that for now only virtio transports support it, so it
+might be okay to continue with virtio.
+
+@Michael WDYT?
+
+Thanks,
+Stefano
 
 
