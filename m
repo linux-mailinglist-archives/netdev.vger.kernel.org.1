@@ -1,69 +1,72 @@
-Return-Path: <netdev+bounces-34944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34945-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6463C7A61CD
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 13:56:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C28A7A61CF
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 13:57:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D8F01C20BEE
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 11:56:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F5E9281701
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 11:57:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E00E15BE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4EB41865B;
 	Tue, 19 Sep 2023 11:56:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE18E3FD4
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 11:56:51 +0000 (UTC)
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B840AE3
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 04:56:48 -0700 (PDT)
-Received: by mail-wr1-x42a.google.com with SMTP id ffacd0b85a97d-31c5c06e8bbso5369941f8f.1
-        for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 04:56:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 811CD4684
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 11:56:52 +0000 (UTC)
+Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07F4AF2
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 04:56:51 -0700 (PDT)
+Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-401d80f4ef8so61429095e9.1
+        for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 04:56:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1695124607; x=1695729407; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=EYcsoKmuAOYH1Dousqvl+I00OLRj+UXR05BdfP8aYI4=;
-        b=jTWmVKCderPAW7wkhzXvNU2nBFw6ezwiOCMm7FozgF60n1wCKPrWpHBJP91wHGgD2e
-         JXHHvH8Hi59zQ6idgAJ60pnp2iDW5LF/BONZIvw0mxOLHgQrb9l8V47B9ZAr02EmNWUh
-         gKVFGaSVGut33R91FhmOzBz3s+Yz9Xea32ZF1+sITMwfjPf11cV1XUslArzirQJuj2GA
-         CZfqChOj+m1/NT0g3c5z4zxi++5PxZYKqV+3qRazKy7ePL9fVX0/KItnMwQw9hSfjmfi
-         fnOBizYnxOJUMvuMF+yXhPm+u9EQSyIyBhvWeyopFspIilGawhAYqN+0jHmSgu+S6BZE
-         7eEA==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1695124609; x=1695729409; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0xm57SUfFZHH+8dv1S0QHpRMRBULiYAXcl59n2S0Yyw=;
+        b=tgBpvOAT/yGrTizC+Br7B1vSxPFnsOgNxrtOraG+AFmRWQZjACRZnadFnk6Qca14i5
+         ErWQQrl/N9kh2tQ5As3lSTHvP96WDGwHAErqg3bCjioiqohy7hqT8p5QFx/vT5gEEF0s
+         wPxHPmIUiG3wJjZoMS7rK34L0cx9/8EUe/qrkSjHDWmjvGbLerLcGTC8EwU8YlHosE5p
+         PaSwKT2Jv/0rSRK8hwx9sf7kZQJs8nd4DWlSWvhUR+j30xNXgG2UNHt4m8uOlP5TXplj
+         z4feX+xu7Ax6B3ChQa9ZDvY+pwKPtmEYKFWLDtho1Ig2KD0EgAqWjYxRxlWupsG4SwUV
+         sUAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695124607; x=1695729407;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=EYcsoKmuAOYH1Dousqvl+I00OLRj+UXR05BdfP8aYI4=;
-        b=pFXJAHTuaqua/62ezq6SUDj57xCq4bee0cuDCBE0li9Ijhy0b/K3tmwDLHC802kNyU
-         WZ3+OnV5dP/IUDoYskY9IsWuO75mrWeowX0srbq4G0wrlp9o+XTD0xaKBEr2t9jvMXM9
-         +BC2FvXpzXFZwQw3gmAjDKBmq+NS9fDM0Dpn+z5HuSRC5zFvre4D/961XgnZnOF6nS7t
-         h8hpDkv+rV50ONSANqeslV3ntOcisl1I50cqLbtapQq1srqsOl7OCtrOp1TiPHKMPHkH
-         A0KJ4iKGSyOM5ef+Cxuo3BzEyWL+O+WyRUKNkwdNDjgXXiHCRnIGBQmnnTTywyuyM6h3
-         A/+g==
-X-Gm-Message-State: AOJu0YzPdhdQE9Qnsm4lnJXgLIivnmJcM1ObbbF4ACfR89QpSt5R1nkL
-	3/UJe13fo5YuMNiGxF7j5uS96goL5LJTAoN17SA=
-X-Google-Smtp-Source: AGHT+IEAtyhcoD4Ivx8mXsIUCg5Dqj3uwlgWiLFtWA8hjkl4Y7Ffj8hnGQq6ioutqm3uR5p8ynCHiA==
-X-Received: by 2002:adf:fbd0:0:b0:31f:afeb:4e7e with SMTP id d16-20020adffbd0000000b0031fafeb4e7emr9530855wrs.37.1695124606937;
-        Tue, 19 Sep 2023 04:56:46 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1695124609; x=1695729409;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0xm57SUfFZHH+8dv1S0QHpRMRBULiYAXcl59n2S0Yyw=;
+        b=jLr4sy5cB1YVVTzIa14+NDZ4dLTg0uoyg7+GlAZO+//EDZZ/Ac0Jeekkzsi4FRwZ6j
+         FrPegwDCbnH9//Lehfyj8XfbEPUGz0sutZom8wYXbYQ5EyQzmOlb5OaH0+OeX9f76MUE
+         hB0yz5d6IHnmJ1hd7XVlTAekLeYdD8yZow9CqdWdLmprGCo8ktPlVwmjC9/izncH60q7
+         52cgl32FGI3YfffKmL/5bQ4iX3C57COHIaCmxZ59hHXxrDqUDOKhiwnN3DPUVjgRnfbT
+         ObQ5GbNqBkOb2ToM9dNUnFAXD9v4GGW2GfzdT6xQIRo1DDh5NQlNBzmhc0TfQfxjXkT1
+         Jt5A==
+X-Gm-Message-State: AOJu0YwgdVj9UmhNhffRJcxCB+xkZf6kJJtFcXBw4OuEZELrYhJSSttm
+	hDWaUfBp2MnXi7ERaPePWO7IGhNmICrekk/mFgM=
+X-Google-Smtp-Source: AGHT+IERuXkKzqWlNabyKXx9B/ctZ6jonv0eP33OXRWP1UQZWSMs5DUjyzJeJSl1NMxfQOyU48j9gQ==
+X-Received: by 2002:a7b:c3d0:0:b0:3fb:a506:5656 with SMTP id t16-20020a7bc3d0000000b003fba5065656mr9314254wmj.32.1695124609452;
+        Tue, 19 Sep 2023 04:56:49 -0700 (PDT)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id a4-20020adffb84000000b0031c5ce91ad6sm15362943wrr.97.2023.09.19.04.56.45
+        by smtp.gmail.com with ESMTPSA id u17-20020a05600c00d100b003fe0a0e03fcsm17923654wmm.12.2023.09.19.04.56.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Sep 2023 04:56:46 -0700 (PDT)
+        Tue, 19 Sep 2023 04:56:48 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: stephen@networkplumber.org,
 	dsahern@gmail.com,
 	daniel.machon@microchip.com
-Subject: [patch iproute2-next v2 0/5] expose devlink instances relationships
-Date: Tue, 19 Sep 2023 13:56:39 +0200
-Message-ID: <20230919115644.1157890-1-jiri@resnulli.us>
+Subject: [patch iproute2-next v2 1/5] devlink: update headers
+Date: Tue, 19 Sep 2023 13:56:40 +0200
+Message-ID: <20230919115644.1157890-2-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230919115644.1157890-1-jiri@resnulli.us>
+References: <20230919115644.1157890-1-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,52 +82,25 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Print out recently added attributes that expose relationships between
-devlink instances. This patchset extends the outputs by
-"nested_devlink" and "nested_devlink_netns" attributes.
+Update the devlink headers to recent net-next.
 
-Examples:
-$ devlink dev
-pci/0000:08:00.0: nested_devlink auxiliary/mlx5_core.eth.0
-pci/0000:08:00.1: nested_devlink auxiliary/mlx5_core.eth.1
-auxiliary/mlx5_core.eth.1
-auxiliary/mlx5_core.eth.0
-
-$ devlink port add pci/0000:08:00.0 flavour pcisf pfnum 0 sfnum 106
-pci/0000:08:00.0/32768: type eth netdev eth4 flavour pcisf controller 0 pfnum 0 sfnum 106 splittable false
-  function:
-    hw_addr 00:00:00:00:00:00 state inactive opstate detached roce enable
-$ devlink port function set pci/0000:08:00.0/32768 state active
-$ devlink port show pci/0000:08:00.0/32768
-pci/0000:08:00.0/32768: type eth netdev eth4 flavour pcisf controller 0 pfnum 0 sfnum 106 splittable false
-  function:
-    hw_addr 00:00:00:00:00:00 state active opstate attached roce enable nested_devlink auxiliary/mlx5_core.sf.2
-
-# devlink dev reload auxiliary/mlx5_core.sf.2 netns ns1
-$ devlink port show pci/0000:08:00.0/32768
-pci/0000:08:00.0/32768: type eth netdev eth4 flavour pcisf controller 0 pfnum 0 sfnum 106 splittable false
-  function:
-    hw_addr 00:00:00:00:00:00 state active opstate attached roce enable nested_devlink auxiliary/mlx5_core.sf.2 nested_devlink_netns ns1
-
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
-v1->v2:
-- patch #2 was added
-- patch #3 uses new helper added by patch #2, typo is fixed
+ include/uapi/linux/devlink.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-Jiri Pirko (5):
-  devlink: update headers
-  ip/ipnetns: move internals of get_netnsid_from_name() into namespace.c
-  devlink: introduce support for netns id for nested handle
-  devlink: print nested handle for port function
-  devlink: print nested devlink handle for devlink dev
-
- devlink/devlink.c            | 108 +++++++++++++++++++++++++++++++++--
- include/namespace.h          |   4 ++
- include/uapi/linux/devlink.h |   1 +
- ip/ipnetns.c                 |  45 +--------------
- lib/namespace.c              |  49 ++++++++++++++++
- 5 files changed, 159 insertions(+), 48 deletions(-)
-
+diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
+index 8b9b98e75059..6c4721270910 100644
+--- a/include/uapi/linux/devlink.h
++++ b/include/uapi/linux/devlink.h
+@@ -680,6 +680,7 @@ enum devlink_port_function_attr {
+ 	DEVLINK_PORT_FN_ATTR_STATE,	/* u8 */
+ 	DEVLINK_PORT_FN_ATTR_OPSTATE,	/* u8 */
+ 	DEVLINK_PORT_FN_ATTR_CAPS,	/* bitfield32 */
++	DEVLINK_PORT_FN_ATTR_DEVLINK,	/* nested */
+ 
+ 	__DEVLINK_PORT_FUNCTION_ATTR_MAX,
+ 	DEVLINK_PORT_FUNCTION_ATTR_MAX = __DEVLINK_PORT_FUNCTION_ATTR_MAX - 1
 -- 
 2.41.0
 
