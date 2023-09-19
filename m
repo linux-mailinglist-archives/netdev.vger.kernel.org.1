@@ -1,148 +1,111 @@
-Return-Path: <netdev+bounces-35000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35001-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6C297A6698
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 16:25:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28E447A66D5
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 16:36:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7166E281E52
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 14:25:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BEE241C20ED9
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 14:36:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 925C51862B;
-	Tue, 19 Sep 2023 14:25:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3482A18621;
+	Tue, 19 Sep 2023 14:36:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BA505237
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 14:25:19 +0000 (UTC)
-Received: from mail.astralinux.ru (mail.astralinux.ru [217.74.38.119])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 329F9100;
-	Tue, 19 Sep 2023 07:25:16 -0700 (PDT)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.astralinux.ru (Postfix) with ESMTP id CF242186686B;
-	Tue, 19 Sep 2023 17:25:12 +0300 (MSK)
-Received: from mail.astralinux.ru ([127.0.0.1])
-	by localhost (rbta-msk-vsrv-mail01.astralinux.ru [127.0.0.1]) (amavisd-new, port 10032)
-	with ESMTP id txwk927cRQHZ; Tue, 19 Sep 2023 17:25:12 +0300 (MSK)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.astralinux.ru (Postfix) with ESMTP id 72C471866AFE;
-	Tue, 19 Sep 2023 17:25:12 +0300 (MSK)
-X-Virus-Scanned: amavisd-new at astralinux.ru
-Received: from mail.astralinux.ru ([127.0.0.1])
-	by localhost (rbta-msk-vsrv-mail01.astralinux.ru [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id HIkNsWFKyl_9; Tue, 19 Sep 2023 17:25:12 +0300 (MSK)
-Received: from rbta-msk-lt-302690.astralinux.ru (unknown [10.177.235.105])
-	by mail.astralinux.ru (Postfix) with ESMTPSA id DE370186681B;
-	Tue, 19 Sep 2023 17:25:10 +0300 (MSK)
-From: Alexandra Diupina <adiupina@astralinux.ru>
-To: Zhao Qiang <qiang.zhao@nxp.com>
-Cc: Alexandra Diupina <adiupina@astralinux.ru>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org
-Subject: [PATCH v5] drivers/net: process the result of hdlc_open() and add call of hdlc_close() in uhdlc_close()
-Date: Tue, 19 Sep 2023 17:25:02 +0300
-Message-Id: <20230919142502.13898-1-adiupina@astralinux.ru>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <c1437313a3fea94a66d33f7bf97f363c77838359.camel@redhat.com>
-References: 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E019F3715D
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 14:36:35 +0000 (UTC)
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80846BE
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 07:36:34 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-404732a0700so58649115e9.0
+        for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 07:36:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695134193; x=1695738993; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VqWfPazUioSHKQCq40SJfNRl+iwKgwPn3TlvV+AW248=;
+        b=gQUsjG13tqJLje5ZDA7gBc6obKnUnXL8NL85mSNvjk9GI31VcRUO7uwkgqu6XrC0ci
+         N/08jlNc5K+JKY6c5Wuwv2+4Ios/1gT4Q9MBs9vYjdyKQbMNl0ecSVVa1/Fm8ia/T6Cb
+         LXflMnq5fMZjBDwy4QAqWfY616RCpxUpqt99VI2SVTKqMAHx1sihl5mavxXnFe2GPAAW
+         XyW3bXpTk1aXvpxPj7uyp1k8NK892aJ8J9fkTLUoDdq02VNAyoUUB5E9gylw0kiJyAjK
+         x9UfDIDNAwn26yUvT8I+a3VLF7KFsYhH2YCEZhiwK40eNSeawZDRIAmWAEwpIpKOHNhY
+         xbTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695134193; x=1695738993;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VqWfPazUioSHKQCq40SJfNRl+iwKgwPn3TlvV+AW248=;
+        b=AjQFN6zP3qf/9vlYbCyk+FsNrGFJ2rhwcm7grdXPaTKIQ0dw8BaPSUXuJQKGzTXIHa
+         XyDZejkxH5ujWp7v6JCOE5cUQA0fStfPcvP61NrX6VhCThd+qxsS7eJ1qj4i2wZgZwoC
+         SPlMJeazyFPXurr5+FkA32sJZxG7H7qHyle+DqYApW2cNQfMJ4OchQBFjFMAqHreccYR
+         i8sj8dNWH1Fw7WGAAi1TdIQNJeOnfh8t5oOBPzPgP7hMq5Gr0KbedgDngHpDEzsD0Bnq
+         wPhj5i6OIrVdqumuRji60rOoJ9hfSUnTzpNfvFkqzAoGvhoJkwFDNE7C5UnlIGlZ3zHO
+         cJNw==
+X-Gm-Message-State: AOJu0YzlfubhlLaGV46tXFMC3HW2lxHFLXmNC6Dr+ZPYQiyi/Jhpj0Qc
+	/ctRYKbyZGVuLxEKEJ90FgE=
+X-Google-Smtp-Source: AGHT+IFHgrkBeSGmdFzxAUnwEi1p8GMg1I9dVnrrpicI0bqO3TTSFKYuA6BpebYruFevBmxWwg0vjw==
+X-Received: by 2002:a7b:cd8c:0:b0:401:d2cb:e6f3 with SMTP id y12-20020a7bcd8c000000b00401d2cbe6f3mr6020wmj.1.1695134192730;
+        Tue, 19 Sep 2023 07:36:32 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id q30-20020adfab1e000000b003177074f830sm14284467wrc.59.2023.09.19.07.36.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Sep 2023 07:36:32 -0700 (PDT)
+Subject: Re: [RFC PATCH v3 net-next 4/7] net: ethtool: let the core choose RSS
+ context IDs
+To: edward.cree@amd.com, linux-net-drivers@amd.com, davem@davemloft.net,
+ kuba@kernel.org, edumazet@google.com, pabeni@redhat.com,
+ netdev@vger.kernel.org, habetsm.xilinx@gmail.com,
+ sudheer.mogilappagari@intel.com, jdamato@fastly.com, andrew@lunn.ch,
+ mw@semihalf.com, linux@armlinux.org.uk, sgoutham@marvell.com,
+ gakula@marvell.com, sbhatta@marvell.com, hkelam@marvell.com,
+ saeedm@nvidia.com, leon@kernel.org
+References: <cover.1694443665.git.ecree.xilinx@gmail.com>
+ <b0de802241f4484d44379f9a990e69d67782948e.1694443665.git.ecree.xilinx@gmail.com>
+ <20230919111038.GA25721@xcbmartinh41x.xilinx.com>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <f0ecc83c-13c7-9cb8-ee2c-8b8e1cba7db1@gmail.com>
+Date: Tue, 19 Sep 2023 15:36:30 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230919111038.GA25721@xcbmartinh41x.xilinx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Process the result of hdlc_open() and call uhdlc_close()
-in case of an error. It is necessary to pass the error
-code up the control flow, similar to a possible
-error in request_irq().
-Also add a hdlc_close() call to the uhdlc_close()
-because the comment to hdlc_close() says it must be called
-by the hardware driver when the HDLC device is being closed
+On 19/09/2023 12:10, Martin Habets wrote:
+> On Tue, Sep 12, 2023 at 03:21:39PM +0100, edward.cree@amd.com wrote:
+>> +	int	(*create_rxfh_context)(struct net_device *,
+>> +				       struct ethtool_rxfh_context *ctx,
+>> +				       const u32 *indir, const u8 *key,
+>> +				       const u8 hfunc, u32 rss_context);
+> 
+> To return the rss_context this creates shouldn't it use a pointer to
+> rss_context here?
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+No, the whole point of this new API is that the core, not the
+ driver, chooses the value of rss_context.  Does the commit
+ message not explain that sufficiently?
+(If you look at Patch #7 you'll see that sfc doesn't even use the
+ value, though other drivers might if their HW has a fixed set of
+ slots for RSS configs.)
 
-Fixes: c19b6d246a35 ("drivers/net: support hdlc function for QE-UCC")
-Signed-off-by: Alexandra Diupina <adiupina@astralinux.ru>
----
-v5: do some refactoring as Paolo Abeni <pabeni@redhat.com> and=20
-Christophe Leroy <christophe.leroy@csgroup.eu> suggested
-v4: undo all the things done prior to hdlc_open() as=20
-Jakub Kicinski <kuba@kernel.org> suggested,=20
-add hdlc_close() call to the uhdlc_close() to match the function comment,=
-=20
-add uhdlc_close() declaration to the top of the file not to put the=20
-uhdlc_close() function definition before uhdlc_open()
-v3: Fix the commits tree
-v2: Remove the 'rc' variable (stores the return value of the=20
-hdlc_open()) as Christophe Leroy <christophe.leroy@csgroup.eu> suggested
- drivers/net/wan/fsl_ucc_hdlc.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/wan/fsl_ucc_hdlc.c b/drivers/net/wan/fsl_ucc_hdl=
-c.c
-index 47c2ad7a3e42..fd50bb313b92 100644
---- a/drivers/net/wan/fsl_ucc_hdlc.c
-+++ b/drivers/net/wan/fsl_ucc_hdlc.c
-@@ -34,6 +34,8 @@
- #define TDM_PPPOHT_SLIC_MAXIN
- #define RX_BD_ERRORS (R_CD_S | R_OV_S | R_CR_S | R_AB_S | R_NO_S | R_LG_=
-S)
-=20
-+static int uhdlc_close(struct net_device *dev);
-+
- static struct ucc_tdm_info utdm_primary_info =3D {
- 	.uf_info =3D {
- 		.tsa =3D 0,
-@@ -708,6 +710,7 @@ static int uhdlc_open(struct net_device *dev)
- 	hdlc_device *hdlc =3D dev_to_hdlc(dev);
- 	struct ucc_hdlc_private *priv =3D hdlc->priv;
- 	struct ucc_tdm *utdm =3D priv->utdm;
-+	int rc =3D 0;
-=20
- 	if (priv->hdlc_busy !=3D 1) {
- 		if (request_irq(priv->ut_info->uf_info.irq,
-@@ -731,10 +734,13 @@ static int uhdlc_open(struct net_device *dev)
- 		napi_enable(&priv->napi);
- 		netdev_reset_queue(dev);
- 		netif_start_queue(dev);
--		hdlc_open(dev);
-+
-+		rc =3D hdlc_open(dev);
-+		if (rc)
-+			uhdlc_close(dev);
- 	}
-=20
--	return 0;
-+	return rc;
- }
-=20
- static void uhdlc_memclean(struct ucc_hdlc_private *priv)
-@@ -824,6 +830,8 @@ static int uhdlc_close(struct net_device *dev)
- 	netdev_reset_queue(dev);
- 	priv->hdlc_busy =3D 0;
-=20
-+	hdlc_close(dev);
-+
- 	return 0;
- }
-=20
---=20
-2.30.2
-
+-ed
 
