@@ -1,153 +1,79 @@
-Return-Path: <netdev+bounces-34852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C51D7A57CB
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 05:15:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93AB07A57D4
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 05:19:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CE371C2035A
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 03:15:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4ED96281358
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 03:19:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 544AD341A1;
-	Tue, 19 Sep 2023 03:15:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEB3D34187;
+	Tue, 19 Sep 2023 03:19:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFDC9328D7;
-	Tue, 19 Sep 2023 03:14:58 +0000 (UTC)
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C4DD111;
-	Mon, 18 Sep 2023 20:14:54 -0700 (PDT)
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 38J3EMDj82933326, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/2.92/5.92) with ESMTPS id 38J3EMDj82933326
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 19 Sep 2023 11:14:22 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.32; Tue, 19 Sep 2023 11:14:05 +0800
-Received: from fc38.localdomain (172.22.228.98) by RTEXMBS04.realtek.com.tw
- (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.7; Tue, 19 Sep
- 2023 11:14:04 +0800
-From: Hayes Wang <hayeswang@realtek.com>
-To: <kuba@kernel.org>, <davem@davemloft.net>
-CC: <netdev@vger.kernel.org>, <nic_swsd@realtek.com>,
-        <linux-kernel@vger.kernel.org>, <linux-usb@vger.kernel.org>,
-        <edumazet@google.com>, <bjorn@mork.no>, <pabeni@redhat.com>,
-        Hayes Wang
-	<hayeswang@realtek.com>
-Subject: [PATCH net-next v2 2/2] r8152: use napi_gro_frags
-Date: Tue, 19 Sep 2023 11:13:51 +0800
-Message-ID: <20230919031351.7334-431-nic_swsd@realtek.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230919031351.7334-429-nic_swsd@realtek.com>
-References: <20230919031351.7334-429-nic_swsd@realtek.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4B13180;
+	Tue, 19 Sep 2023 03:19:15 +0000 (UTC)
+Received: from core.lopingdog.com (core.lopingdog.com [162.55.228.84])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FC0810E;
+	Mon, 18 Sep 2023 20:19:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=lopingdog.com;
+	s=mail; t=1695093552;
+	bh=7bVHNdcpaHpCFEna/MIK8KvjKex0U/8cfhWm/DIBQiA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MG/UxRcGxgHBjbMWFFx6damvZVR00dlUdv6vMki7EDUTZPSZHTmWLH4uAAiCfnHK9
+	 Q8sOG0HuYtobmdCXQafmKrJYSAMldPwPvbtOdvwwkT7iTpmoh3icjYBd3iB42v2C+G
+	 Y0Gx3/0+6zYSRk2wVdYmsAdNmDu+ryUxwNuUAwsT6v2aErdBn4d6PG5b6/PqBW+g4n
+	 7nMVrheJ+c+xuJQnpTOfjMcFpU5/jlaGgMFOpCETSjCGNXIbOcAS/+2MWcY9jAyji/
+	 q0fvYS1HW3SMhoMxM0dE1xHlui1Eyzs56cxU2084CRaB34AqxzrUaPHWZu+tDcC78A
+	 c8COUBTh+s4KA==
+Received: from authenticated-user (core.lopingdog.com [162.55.228.84])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by core.lopingdog.com (Postfix) with ESMTPSA id CE53E4402D7;
+	Mon, 18 Sep 2023 22:19:11 -0500 (CDT)
+Date: Mon, 18 Sep 2023 22:19:10 -0500
+From: Jay Monkman <jtm@lopingdog.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: devicetree@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+	Arndt Schuebel <Arndt.Schuebel@onsemi.com>
+Subject: Re: [PATCH 2/4] dt-bindings: net: Add onsemi NCN26010 ethernet
+ controller
+Message-ID: <ZQkTLmi5VtxczYLs@lopingdog.com>
+References: <ZQf1Mgb8lfHkB6rl@lopingdog.com>
+ <5194bd75-9562-8375-5748-ccce560b67cf@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [172.22.228.98]
-X-ClientProxiedBy: RTEXH36506.realtek.com.tw (172.21.6.27) To
- RTEXMBS04.realtek.com.tw (172.21.6.97)
-X-KSE-ServerInfo: RTEXMBS04.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5194bd75-9562-8375-5748-ccce560b67cf@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Use napi_gro_frags() for the skb of fragments.
+On Mon, Sep 18, 2023 at 10:28:47PM +0200, Krzysztof Kozlowski wrote:
 
-Signed-off-by: Hayes Wang <hayeswang@realtek.com>
----
- drivers/net/usb/r8152.c | 32 +++++++++++++++++++-------------
- 1 file changed, 19 insertions(+), 13 deletions(-)
+> Please use scripts/get_maintainers.pl to get a list of necessary people
+> and lists to CC (and consider --no-git-fallback argument). It might
+> happen, that command when run on an older kernel, gives you outdated
+> entries. Therefore please be sure you base your patches on recent Linux
+> kernel.
 
-diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-index 03bb3a58f2a6..00dac52dea44 100644
---- a/drivers/net/usb/r8152.c
-+++ b/drivers/net/usb/r8152.c
-@@ -2462,8 +2462,9 @@ static int rx_bottom(struct r8152 *tp, int budget)
- 		while (urb->actual_length > len_used) {
- 			struct net_device *netdev = tp->netdev;
- 			struct net_device_stats *stats = &netdev->stats;
--			unsigned int pkt_len, rx_frag_head_sz;
-+			unsigned int pkt_len;
- 			struct sk_buff *skb;
-+			bool use_frags;
- 
- 			pkt_len = le32_to_cpu(rx_desc->opts1) & RX_LEN_MASK;
- 			if (pkt_len < ETH_ZLEN)
-@@ -2477,35 +2478,40 @@ static int rx_bottom(struct r8152 *tp, int budget)
- 			rx_data += sizeof(struct rx_desc);
- 
- 			if (!agg_free || tp->rx_copybreak > pkt_len)
--				rx_frag_head_sz = pkt_len;
-+				use_frags = false;
- 			else
--				rx_frag_head_sz = tp->rx_copybreak;
-+				use_frags = true;
-+
-+			if (use_frags)
-+				skb = napi_get_frags(napi);
-+			else
-+				skb = napi_alloc_skb(napi, pkt_len);
- 
--			skb = napi_alloc_skb(napi, rx_frag_head_sz);
- 			if (!skb) {
- 				stats->rx_dropped++;
- 				goto find_next_rx;
- 			}
- 
- 			skb->ip_summed = r8152_rx_csum(tp, rx_desc);
--			memcpy(skb->data, rx_data, rx_frag_head_sz);
--			skb_put(skb, rx_frag_head_sz);
--			pkt_len -= rx_frag_head_sz;
--			rx_data += rx_frag_head_sz;
--			if (pkt_len) {
-+			rtl_rx_vlan_tag(rx_desc, skb);
-+
-+			if (use_frags) {
- 				skb_add_rx_frag(skb, 0, agg->page,
- 						agg_offset(agg, rx_data),
- 						pkt_len,
- 						SKB_DATA_ALIGN(pkt_len));
- 				get_page(agg->page);
-+				napi_gro_frags(napi);
-+			} else {
-+				memcpy(skb->data, rx_data, pkt_len);
-+				skb_put(skb, pkt_len);
-+				skb->protocol = eth_type_trans(skb, netdev);
-+				napi_gro_receive(napi, skb);
- 			}
- 
--			skb->protocol = eth_type_trans(skb, netdev);
--			rtl_rx_vlan_tag(rx_desc, skb);
- 			work_done++;
- 			stats->rx_packets++;
--			stats->rx_bytes += skb->len;
--			napi_gro_receive(napi, skb);
-+			stats->rx_bytes += pkt_len;
- 
- find_next_rx:
- 			rx_data = rx_agg_align(rx_data + pkt_len + ETH_FCS_LEN);
--- 
-2.41.0
+Will do. Thanks for your other comments - I've got some work to do.
+
+Jay
 
 
