@@ -1,350 +1,192 @@
-Return-Path: <netdev+bounces-34935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCDA57A60C1
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 13:11:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 449F67A60F7
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 13:14:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E77F01C20AEA
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 11:11:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 605B81C20AEA
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 11:14:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0357E358AA;
-	Tue, 19 Sep 2023 11:11:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D915E38BAE;
+	Tue, 19 Sep 2023 11:14:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B42152E639
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 11:10:57 +0000 (UTC)
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2040.outbound.protection.outlook.com [40.107.96.40])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BCA6A9
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 04:10:55 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FDBB38BA9;
+	Tue, 19 Sep 2023 11:14:26 +0000 (UTC)
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD8582D7E;
+	Tue, 19 Sep 2023 04:13:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1695122036; x=1726658036;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=nvYREegptLbLU9C96sEDqoWc7+it5HIqTU+CP//ycYQ=;
+  b=DzmPqGceN/IFX37im1hNjFpCO4uOZ3S/WDkVU/Xs+MdlIw6Y0COigyEs
+   s/B5yVF9cmSEiTsrV/PBJtDgFd6fRBWqfMjsmdFEJUXmOrD5SAk9cK7re
+   XnIgi/coflj6xOcCCan+JrkJ1OyQHgNo3/3X+IWcJ8Yii40EZTlYqLOTb
+   QB35VasKaQ5ZzeHwbG05GnIZWl+2/yJ8m/IrImXJtof0ZkPHPN6aP00kV
+   L5Wcj2Rj0E2MuWMvvsD6Drjc2EcSVvubtHLwnxaeq0TxoSGhdTxkWYIrN
+   t+xtJ+nAQORPcUjwdJ0pDNGYKYE903xFOLhK9jhQtBAE3nF4nY2nz/NkP
+   w==;
+X-CSE-ConnectionGUID: fFPnucd/SCK8IEWNYATfjg==
+X-CSE-MsgGUID: flZEG7qAQNisRDmsLPDaAA==
+X-ThreatScanner-Verdict: Negative
+X-IronPort-AV: E=Sophos;i="6.02,159,1688454000"; 
+   d="scan'208";a="172412939"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 Sep 2023 04:13:49 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Tue, 19 Sep 2023 04:13:18 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (10.10.215.89) by
+ email.microchip.com (10.10.87.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21 via Frontend
+ Transport; Tue, 19 Sep 2023 04:13:18 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NE2Crbdw1n8pJKCP9RJ8LZEQ7J6vsj6c0v1zs4LeVdkSFZaHqjRLUYDRgRf7RTkoQ2rvoerjaoI6e4H1SK/O61BtXTkdQomImxKJ5GsdhahcUQnKpdw+aVSCb9VQ5Az7AqnIqWpwrTb4h5oaxSvMSTQsEoo7egz+zE3ZbWO8a7uSve0TJqDaxRfFLUYOSL7iRIuXHYEBXGTah1/nRaHs2U3y7gfRGaSzD6dAKESKr10wHkU1vLUtmdXqk5LyjSylKIPrrIRw4ANY8PMykUDtc2VjNcn2nQei39b3IBHmSEtVSCEfjTzSqT53r6jRyuSaixYkV+d2xPaOOl80kULwtw==
+ b=TltWFwo7esIzrf2DxnUElG84t8nm10wuazsoxw+BnSymmJNq6lxwfgIdtwmDp82MQgiRFp9/WqyIIbaSzjDZXhBziGV6tCrBgYoXQShHkIdmjV4G0k3mh8pQmSu5dvAAD7tmcq7xm4C/AAVnfVyv8ypAkwayOlhmsBOqL4FxZ47Y8pFHXUeupZLWHzQzolkmH5wzhUAAHtiAWGhWBYa/W15isnxQuqiR6pHIbOb+3Rky/Grff7dVcTIInIh5P2CLX7Dhls0/RiWOE4qGN7QNV7Z/YGRQFfd1ERyCcjssZJTX/8i5zCqYALHvZaaHesk4jdO5u9DlZUu5/uopwSK/eA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5DfgZEXymShqsAuZZFB5ywdTSithYFXeUmY6c4IOZX4=;
- b=duiddsqyfedNLVvALJs5JDoj41JYgfmt+JJfwnZBqudD0VOPnoPUws9AftO1iT9TeJIEye2X9JH6TIbkiOt73U2rXYerA4pe0dr7p2E+ou2Tu4TelAFhpd7bCigvfNgzXoawBVTV6rFlqODtrtAf44GcFm3Wl7xbvL00wb67YwkDW8b4ZBsPx8493Dw2Ck9PEAmbCTH6ZtU1HR5AFkVFvBdnFvK3//S6xIgk/tJ4u3SavpRq1f5rWeglcxX/pjdyU3UjRvGang0te3JyIFiMIX2xIPeR/lIIk8x4z/2byXqTxBK75Xw41kLvDddkwle14TPXTomZgJP2lK1Ve4AI7g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ bh=nvYREegptLbLU9C96sEDqoWc7+it5HIqTU+CP//ycYQ=;
+ b=AYdkOKJiPDLacQCIk1ww2UdfhC4Aj2/v4M2LalPisScSJs5mw26x8iLorscl3sMryWGeX69LMC7Vociv7lbrX0MaCCIRQLZaV7oZczQbyw6wh7GGcNpkatJdmreLoI3l+sbsaoQNw7IOdw7VruRwboNChNiy+/HZuo0gN6b6Eh8J4U9In8e6cAkYLbdFkCwsynJr2yHLXrc2bzdyB4bDh41K9ul59in5uzXcAdCFIUUj0wFIXqO72fizbCU7U5MNb4B+WWb+cQU3VRwwhY1YVLPv3Ofh+yVZXpouKRuSRIe6VudgjdAJLN7GKpLrxQyB5ZGxu7TT1CmBOkKe5fXU+g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=microchiptechnology.onmicrosoft.com;
+ s=selector2-microchiptechnology-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5DfgZEXymShqsAuZZFB5ywdTSithYFXeUmY6c4IOZX4=;
- b=y+Um2+D2pQVN05dYNHx2GYZWomcmbqUPHXOEKCliOMN2b6RzK9SVwoP14UiIsATiMk/Kl+8OBjyATxJ3itOqRUNQGl3REv45RQN3Wi/0sUJ887XitW2XFTWjTXEHLciafb3kPmwkRFK2yLdHjhmTwbX2wkKkiumB/KzzTG8Enl4=
-Received: from BL1P223CA0029.NAMP223.PROD.OUTLOOK.COM (2603:10b6:208:2c4::34)
- by PH0PR12MB7907.namprd12.prod.outlook.com (2603:10b6:510:28d::11) with
+ bh=nvYREegptLbLU9C96sEDqoWc7+it5HIqTU+CP//ycYQ=;
+ b=Ab3wBtdcGYKR2U6kxBg4Pp7xloK1JPuFovNp8wCF67Ls+YdtAehQqk28U3iJaT1VVKUAMcIf3tGNa/kRZ8f2mXvxTRn5P6gdZtlNzmk8RVCegSe18NkxtT8PZC4945gSgW35ScWIe3xvOIXDzHLymBD5lykcUmGAyxsZBhOy9pg=
+Received: from DM6PR11MB3532.namprd11.prod.outlook.com (2603:10b6:5:70::25) by
+ PH8PR11MB6610.namprd11.prod.outlook.com (2603:10b6:510:1cd::17) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.27; Tue, 19 Sep
- 2023 11:10:45 +0000
-Received: from MN1PEPF0000F0E5.namprd04.prod.outlook.com
- (2603:10b6:208:2c4:cafe::31) by BL1P223CA0029.outlook.office365.com
- (2603:10b6:208:2c4::34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.28 via Frontend
- Transport; Tue, 19 Sep 2023 11:10:45 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
-Received: from SATLEXMB03.amd.com (165.204.84.17) by
- MN1PEPF0000F0E5.mail.protection.outlook.com (10.167.242.43) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6792.20 via Frontend Transport; Tue, 19 Sep 2023 11:10:45 +0000
-Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 19 Sep
- 2023 06:10:44 -0500
-Received: from localhost (10.180.168.240) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27 via Frontend
- Transport; Tue, 19 Sep 2023 06:10:44 -0500
-Date: Tue, 19 Sep 2023 12:10:38 +0100
-From: Martin Habets <martin.habets@amd.com>
-To: <edward.cree@amd.com>
-CC: <linux-net-drivers@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<edumazet@google.com>, <pabeni@redhat.com>, Edward Cree
-	<ecree.xilinx@gmail.com>, <netdev@vger.kernel.org>,
-	<habetsm.xilinx@gmail.com>, <sudheer.mogilappagari@intel.com>,
-	<jdamato@fastly.com>, <andrew@lunn.ch>, <mw@semihalf.com>,
-	<linux@armlinux.org.uk>, <sgoutham@marvell.com>, <gakula@marvell.com>,
-	<sbhatta@marvell.com>, <hkelam@marvell.com>, <saeedm@nvidia.com>,
-	<leon@kernel.org>
-Subject: Re: [RFC PATCH v3 net-next 4/7] net: ethtool: let the core choose
- RSS context IDs
-Message-ID: <20230919111038.GA25721@xcbmartinh41x.xilinx.com>
-Mail-Followup-To: edward.cree@amd.com, linux-net-drivers@amd.com,
-	davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
-	pabeni@redhat.com, Edward Cree <ecree.xilinx@gmail.com>,
-	netdev@vger.kernel.org, habetsm.xilinx@gmail.com,
-	sudheer.mogilappagari@intel.com, jdamato@fastly.com, andrew@lunn.ch,
-	mw@semihalf.com, linux@armlinux.org.uk, sgoutham@marvell.com,
-	gakula@marvell.com, sbhatta@marvell.com, hkelam@marvell.com,
-	saeedm@nvidia.com, leon@kernel.org
-References: <cover.1694443665.git.ecree.xilinx@gmail.com>
- <b0de802241f4484d44379f9a990e69d67782948e.1694443665.git.ecree.xilinx@gmail.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.31; Tue, 19 Sep
+ 2023 11:13:13 +0000
+Received: from DM6PR11MB3532.namprd11.prod.outlook.com
+ ([fe80::6352:54f7:6c42:69ef]) by DM6PR11MB3532.namprd11.prod.outlook.com
+ ([fe80::6352:54f7:6c42:69ef%6]) with mapi id 15.20.6792.026; Tue, 19 Sep 2023
+ 11:13:13 +0000
+From: <Parthiban.Veerasooran@microchip.com>
+To: <andrew@lunn.ch>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <robh+dt@kernel.org>,
+	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>, <corbet@lwn.net>,
+	<Steen.Hegelund@microchip.com>, <rdunlap@infradead.org>, <horms@kernel.org>,
+	<casper.casan@gmail.com>, <netdev@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <Horatiu.Vultur@microchip.com>,
+	<Woojung.Huh@microchip.com>, <Nicolas.Ferre@microchip.com>,
+	<UNGLinuxDriver@microchip.com>, <Thorsten.Kummermehr@microchip.com>
+Subject: Re: [RFC PATCH net-next 1/6] net: ethernet: implement OPEN Alliance
+ control transaction interface
+Thread-Topic: [RFC PATCH net-next 1/6] net: ethernet: implement OPEN Alliance
+ control transaction interface
+Thread-Index: AQHZ4mEB+nwP90vbvEyYqcmk7ntkibAYC/aAgAoD1gA=
+Date: Tue, 19 Sep 2023 11:13:13 +0000
+Message-ID: <9615b403-52c1-f24f-382f-8eea3ddfcf04@microchip.com>
+References: <20230908142919.14849-1-Parthiban.Veerasooran@microchip.com>
+ <20230908142919.14849-2-Parthiban.Veerasooran@microchip.com>
+ <8d53ca8d-bcf6-4673-a8ff-b621d700576e@lunn.ch>
+In-Reply-To: <8d53ca8d-bcf6-4673-a8ff-b621d700576e@lunn.ch>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR11MB3532:EE_|PH8PR11MB6610:EE_
+x-ms-office365-filtering-correlation-id: b3d1db76-f967-4051-a637-08dbb9016a55
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: /LOrD6N/HE6zFYkRVdPinKP21L3B2BAAk7P3CW+eRI49e27+hS4qvzxbt7AF2GKKbK9lvOvhtXMCsig+XPFERv9p4tMaUfqn9IiYERx94bteSI9W8lBU9SD9/K6DJ/INKqW0qwQ3xi0sJHEkACqOif0Whd/qKKb5zYP2Mk7lRJdNvtA8MQ2riMm7Gv3PL7Dr0iu8m2UWp0NdVpme9j/sQhuuK2gOLrHt93mk1+fwyOkPnPASqN42BhIqtzsG7IddQexS3dr9welFpNeybAWQBderV8Z+Doo7xQe2Ijhfe2GIsK6qroxYprRb/swQgfqWPpUs4CdN2RUBbOg7AasceiCCJqDyMqiIyCSOziR6ikbgZuAEN0Nyo/o8p4V9JAozyiNRR7kxy8IDteMlfHq8Gt5MYB9qtZBIJG+2jUMXRJPvalkqkb40aCXQLIIIgHjRFzw7RGoRP4IT5C1SlF8hmx+aMLhgwVwKnHPPpBK3/+KGNatq+/rlc1h9Chd1RRSmH03rwyBslI8qUUVT9epDYtP+QCBpgFt/h5Cjcjfiwp4amjfPTHb9xs2mHvmEN9Irxvuri1XDq/2rqYjXe/Gj+b5U4vmLgJT1RP5J9kd7tfcNuBHR7O9q4gjxtofjrlnWw6xqqM9Ou88K2OJg8FLd9p/prEBLcmGb1UhwJi095DfpkrBMCPGLUd0BO+clQwqJ
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3532.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(39860400002)(136003)(376002)(396003)(346002)(451199024)(186009)(1800799009)(53546011)(31686004)(4744005)(2906002)(7416002)(8936002)(4326008)(41300700001)(5660300002)(66446008)(54906003)(76116006)(91956017)(66556008)(36756003)(64756008)(107886003)(66946007)(8676002)(66476007)(6916009)(316002)(122000001)(478600001)(71200400001)(6486002)(26005)(38100700002)(6506007)(83380400001)(31696002)(38070700005)(2616005)(6512007)(86362001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?YXd5MUpjN3B1cXowUzdzK1AzTTlrd05IOVA4clVKZ01nUEdnL3p3MXlwTG96?=
+ =?utf-8?B?K1FyL3hDVklXbkpmNEZTa0RiT3lDUDZ1eHU5V0s2UGtYR0RoZVNUNTV0SUJ5?=
+ =?utf-8?B?ZG5IcWlUUmMxY1kzRi9XWTJ2WnBVbng5Y3dHV0RlZmlsSDhRbDJZdVpEdDBX?=
+ =?utf-8?B?TW1sTkZQNzdyVElMZjJhN0VBS1NzaTc2VUJ3d3B0cU1kWnNvdUhxVU81MC9o?=
+ =?utf-8?B?YjdXeUMxYXJlZ2hRdHo2RzFUV3gwbFM4aldpVjFmM1JQYVpPdUNmUGxIL0or?=
+ =?utf-8?B?SVo4b3hTOWRCMUhSNVo2VklxYUlKekt3OSt5NVNDOWV4MDVoMGMxTHRnenIy?=
+ =?utf-8?B?anNyNlRtL0tsY055V3gzSmsrR1E1VDRwQXZCQzJ4aTUrVjZIODIwaHVFMmlG?=
+ =?utf-8?B?THYxcExUaWdLSVIxVFZCV0ExbEo0TTg5bU1uS0N5L0JwY3pDYlY2azRmMmo1?=
+ =?utf-8?B?YU9pcFdFUlpYdVlGZmd1MlFmc0xib1k3ZFQ0azJTbGRjcEJyeC9DWmVWQXNL?=
+ =?utf-8?B?bVFpR3JwM1VlQkhrZ1VpM1JDa2NTMmM2UTFUNmRmczNsU0pXdWNoaFRoVnRD?=
+ =?utf-8?B?cUZNQjhCZy9CY1E2YytabWVvV291SlNjUkdyNDRnS1dUaytrV2RhZDh5blJD?=
+ =?utf-8?B?SCt3Y2htUEZVejF2c1RzNkcxKy9UdjFmaXlybnd6cnRUMndYeXRhaEE0Rkpm?=
+ =?utf-8?B?V2Uzd080TFkvb3paKzFGNnk1SXVVODUvNkhVTXBGSXpXWExSY1JDT3BlNGsw?=
+ =?utf-8?B?OHlTVzhTL3Q0cmxHRXpEaThrRzVCdnpvZEk5K2dKSG1hNFNQTFVFNWhXSmZH?=
+ =?utf-8?B?UlBDRVltbXRPdllkOVBINFNZT0h6N0o5OGp6c0pMTUltQzNGb1U5Uk5PZFFy?=
+ =?utf-8?B?d1dmcEJURWtabVZ4enFRQjRMWkFXQ0ZhbDNLWGpSakp5OU9YTVN1YVRnaVd6?=
+ =?utf-8?B?aUVTVE1jN080UlZVTm5GRi92ZmtLa2lFTGkxYTY3c28vWmxmVXNVTHhRZmFN?=
+ =?utf-8?B?S2VwZFE4cllucndlTnNDNVNPL3ZKMnZ3K2ZwMDd2NjR0amFLdDRXY3puN0pR?=
+ =?utf-8?B?a1dNZjZweDZRdnpsSFNmQ0o4V0d0Ty9lVWlGY2J0L3JyMFZjZHBTNXVFZWJL?=
+ =?utf-8?B?TnNiU1lTMGZtb0dHY201YTA2cEVLWU95bkJwME5sQUg3SzVETVE5aXNyTXBu?=
+ =?utf-8?B?ZjZUb2g2aUppMWVGRkxEd0FOVDVlQ2w4UlVneVNsalRoMkhQSlFXR0lhbFFr?=
+ =?utf-8?B?SDh3MkZvV0tmeXp3VWxzczA4ZUNnUHRXa1N5akp4Um1rVHJtYXdoSDViWFp3?=
+ =?utf-8?B?ZldCTVdUelIwTTkwQWdwQ3M4Zit2TFhFWk1mL2d4WGZVeW8vUWpoa0tkYzNs?=
+ =?utf-8?B?K3F6OXpwODV4Y2kwVmFIaWR3dWl2eThLNU1EdVZ5MUZsZDZPWUNwclNoWTBw?=
+ =?utf-8?B?UjltZHBONFdYV0d5ZWYyTWg5SlIycmN3K0pZWDlmZHpQUjkzMDdjUHh5UHE0?=
+ =?utf-8?B?QSttU3lxa2lVTFJiNEFBR1BCbFV2R0FUTWtrRUllQ0NWeUgrb0JhUUhsbnh1?=
+ =?utf-8?B?SHlFNi8xNnk2b2xlYm5DZkVsdzJ1d1BPTnl4Q0RkVEMvaXd1MmU3TUx3dVN0?=
+ =?utf-8?B?bUd2c0NjZDFsdnE4cDhMOTR6OWFMa2tNSWdFL2VGNGlubjJ6dzhBQ2FhaXFl?=
+ =?utf-8?B?aTdZNHowN0hObHBidWNSYzZPaUc1NlVCZHErdHRta3hSdUlBZG5qc0xQL1Vi?=
+ =?utf-8?B?Qzd5b3hUdVJhazZubFJoQ2hqb241QXltUnNtVlRPaWdlaHhlMS9xQU1McWJP?=
+ =?utf-8?B?N3lEbHFNRW1RMm9PYkwrRFJGRG1Tdm1WS0xhRGJVWlhCSVRFY2dpY0pKWGhv?=
+ =?utf-8?B?eWdlRXpEMGdVMWlkc1o2UlhtdzlGOHpVdS9xWVJtMFBXMTNVRDd6c3hFeExB?=
+ =?utf-8?B?d0FSS2wzajR0ejU1V3JIYVlybkNaMk91UkxUMU0rTzBoTzY3YWwwOEZ5eEZp?=
+ =?utf-8?B?N2dmaFJCMFZpUVBMVmFpTUN6cGRQUitrSXV5eUJKSEdzWGFQWTBBY25vemMz?=
+ =?utf-8?B?bUEzbWh5WnpNUURjbHc2RE9UWWFtcHBhVGdFNW9QQjN1b092eHE3a0RhQVFU?=
+ =?utf-8?B?eUlVLzE2Z3pFd1ZLeDlwQnBYOHdRK2g1TDE3TW5LTUhrc3JFUEZIdm14Q1Qr?=
+ =?utf-8?B?WXc9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <D67B64EA4A16E34BA54D786030351F0D@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <b0de802241f4484d44379f9a990e69d67782948e.1694443665.git.ecree.xilinx@gmail.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN1PEPF0000F0E5:EE_|PH0PR12MB7907:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3c691212-15bc-43be-b5b4-08dbb901121f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	LQFnQMB72mSM8512MtMA0LMlFW3nqea8CGfsIbFnK/++VjB+T8M5e/HU5hhRvUg3oCgvDlSfxQh3ckx3O986TO16rGw9p4dKJI9Nja1iqZbyvE4jRxvt4g61cBPLBkqGjeByFSmxm4inLlTzMjxxsRt/Y5RlhVrA7trNnptZzYMaZ7DbdrmM9sfZumVMoMWVcS7ZuFLweDTFjVIrG9wYXp5PqbHonXqGaLzgQZrx9TBA45visECAp8KbchPLsrqLU1NuKIDFPdzSR/TyysK2PFLEYqxanin08DBIIL9yUbdAlEEmyxcdMAwgJ506gZzt11unVJL3C+W6vyJsWBGm9ZmlDdVkZKTFJj1FfvEXGPof1YwM966Q0Zv22Oa9IZimn9dXfad3HugBz/oA6UJnmwXbXyU0qA78a5/xiAy4AakqCa1kP+ra1d50eTleJlVlv2xhTeW2UHPzflCMpVaWjn7S/p7zUAWgyKFedxZ2GZfD3Ssxo8SnAEO7LqsLDxwu1bP1VHnTsH/1CdRnvj25TPNyN8KXC98VJrRlhPasqabmmWV9l/Ghbj62hOONLnXFZTLDS09DQT53Tssiz7Di5G4+CgON+kANoZwWIrM7MlinRpigR3CVlScdzYgA/sPmCwCmeG39Mc9ybBsTZY2mroOgMYCROMfMp/thSdz4duCd+Kk3V9Dy9dt4hgVZi0mEvCbn5yHAqc0+JD2OD+oXA8KekX1AUlqzPu5ZBPXcrB0ph9pvS7eSPufa16UV3mEd8t55fKMggkXG59YJqiOUGw==
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(376002)(136003)(346002)(39860400002)(396003)(1800799009)(451199024)(186009)(82310400011)(46966006)(40470700004)(36840700001)(40480700001)(66899024)(40460700003)(336012)(426003)(83380400001)(9686003)(26005)(1076003)(47076005)(36860700001)(6636002)(316002)(41300700001)(7416002)(54906003)(70586007)(44832011)(70206006)(5660300002)(4326008)(8676002)(8936002)(6862004)(478600001)(6666004)(2906002)(86362001)(33656002)(82740400003)(356005)(81166007)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Sep 2023 11:10:45.2918
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3532.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b3d1db76-f967-4051-a637-08dbb9016a55
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Sep 2023 11:13:13.2819
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3c691212-15bc-43be-b5b4-08dbb901121f
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MN1PEPF0000F0E5.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7907
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-	autolearn=no autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 6Zm47iGeyvjiA3w6z0q9vA/y5me6oHTZhX/d751BmpxWnUe7ZYEeamj3DFJK21IYUa3FU668vZqMz9N70VLuTShD6ZjgXTIMZ1Xh00WMW3m8gN5Ji3p5dERobquc8Pu7
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6610
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Sep 12, 2023 at 03:21:39PM +0100, edward.cree@amd.com wrote:
-> 
-> From: Edward Cree <ecree.xilinx@gmail.com>
-> 
-> Add a new API to create/modify/remove RSS contexts, that passes in the
->  newly-chosen context ID (not as a pointer) rather than leaving the
->  driver to choose it on create.  Also pass in the ctx, allowing drivers
->  to easily use its private data area to store their hardware-specific
->  state.
-> Keep the existing .set_rxfh_context API for now as a fallback, but
->  deprecate it.
-> 
-> Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
-> ---
->  include/linux/ethtool.h | 40 ++++++++++++++++++++++++--
->  net/core/dev.c          | 11 +++++--
->  net/ethtool/ioctl.c     | 64 +++++++++++++++++++++++++++++++----------
->  3 files changed, 94 insertions(+), 21 deletions(-)
-> 
-> diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-> index f7317b53ab61..4fa2a7f6ed4c 100644
-> --- a/include/linux/ethtool.h
-> +++ b/include/linux/ethtool.h
-> @@ -747,10 +747,33 @@ struct ethtool_mm_stats {
->   * @get_rxfh_context: Get the contents of the RX flow hash indirection table,
->   *	hash key, and/or hash function assiciated to the given rss context.
->   *	Returns a negative error code or zero.
-> - * @set_rxfh_context: Create, remove and configure RSS contexts. Allows setting
-> + * @create_rxfh_context: Create a new RSS context with the specified RX flow
-> + *	hash indirection table, hash key, and hash function.
-> + *	Arguments which are set to %NULL or zero will be populated to
-> + *	appropriate defaults by the driver.
-> + *	The &struct ethtool_rxfh_context for this context is passed in @ctx;
-> + *	note that the indir table, hkey and hfunc are not yet populated as
-> + *	of this call.  The driver does not need to update these; the core
-> + *	will do so if this op succeeds.
-> + *	If the driver provides this method, it must also provide
-> + *	@modify_rxfh_context and @remove_rxfh_context.
-> + *	Returns a negative error code or zero.
-> + * @modify_rxfh_context: Reconfigure the specified RSS context.  Allows setting
->   *	the contents of the RX flow hash indirection table, hash key, and/or
-> - *	hash function associated to the given context. Arguments which are set
-> - *	to %NULL or zero will remain unchanged.
-> + *	hash function associated with the given context.
-> + *	Arguments which are set to %NULL or zero will remain unchanged.
-> + *	The &struct ethtool_rxfh_context for this context is passed in @ctx;
-> + *	note that it will still contain the *old* settings.  The driver does
-> + *	not need to update these; the core will do so if this op succeeds.
-> + *	Returns a negative error code or zero. An error code must be returned
-> + *	if at least one unsupported change was requested.
-> + * @remove_rxfh_context: Remove the specified RSS context.
-> + *	The &struct ethtool_rxfh_context for this context is passed in @ctx.
-> + *	Returns a negative error code or zero.
-> + * @set_rxfh_context: Deprecated API to create, remove and configure RSS
-> + *	contexts. Allows setting the contents of the RX flow hash indirection
-> + *	table, hash key, and/or hash function associated to the given context.
-> + *	Arguments which are set to %NULL or zero will remain unchanged.
->   *	Returns a negative error code or zero. An error code must be returned
->   *	if at least one unsupported change was requested.
->   * @get_channels: Get number of channels.
-> @@ -901,6 +924,17 @@ struct ethtool_ops {
->  			    const u8 *key, const u8 hfunc);
->  	int	(*get_rxfh_context)(struct net_device *, u32 *indir, u8 *key,
->  				    u8 *hfunc, u32 rss_context);
-> +	int	(*create_rxfh_context)(struct net_device *,
-> +				       struct ethtool_rxfh_context *ctx,
-> +				       const u32 *indir, const u8 *key,
-> +				       const u8 hfunc, u32 rss_context);
-
-To return the rss_context this creates shouldn't it use a pointer to
-rss_context here?
-
-Matin
-
-> +	int	(*modify_rxfh_context)(struct net_device *,
-> +				       struct ethtool_rxfh_context *ctx,
-> +				       const u32 *indir, const u8 *key,
-> +				       const u8 hfunc, u32 rss_context);
-> +	int	(*remove_rxfh_context)(struct net_device *,
-> +				       struct ethtool_rxfh_context *ctx,
-> +				       u32 rss_context);
->  	int	(*set_rxfh_context)(struct net_device *, const u32 *indir,
->  				    const u8 *key, const u8 hfunc,
->  				    u32 *rss_context, bool delete);
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 4bbb6bda7b7e..6b8e5fd8691b 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -10860,15 +10860,20 @@ static void netdev_rss_contexts_free(struct net_device *dev)
->  	struct ethtool_rxfh_context *ctx;
->  	u32 context;
->  
-> -	if (!dev->ethtool_ops->set_rxfh_context)
-> +	if (!dev->ethtool_ops->create_rxfh_context &&
-> +	    !dev->ethtool_ops->set_rxfh_context)
->  		return;
->  	idr_for_each_entry(&dev->ethtool->rss_ctx, ctx, context) {
->  		u32 *indir = ethtool_rxfh_context_indir(ctx);
->  		u8 *key = ethtool_rxfh_context_key(ctx);
->  
->  		idr_remove(&dev->ethtool->rss_ctx, context);
-> -		dev->ethtool_ops->set_rxfh_context(dev, indir, key, ctx->hfunc,
-> -						   &context, true);
-> +		if (dev->ethtool_ops->create_rxfh_context)
-> +			dev->ethtool_ops->remove_rxfh_context(dev, ctx, context);
-> +		else
-> +			dev->ethtool_ops->set_rxfh_context(dev, indir, key,
-> +							   ctx->hfunc,
-> +							   &context, true);
->  		kfree(ctx);
->  	}
->  }
-> diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-> index db596b61c6ab..4ce960a5ad4c 100644
-> --- a/net/ethtool/ioctl.c
-> +++ b/net/ethtool/ioctl.c
-> @@ -1274,7 +1274,8 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
->  	if (rxfh.rsvd8[0] || rxfh.rsvd8[1] || rxfh.rsvd8[2] || rxfh.rsvd32)
->  		return -EINVAL;
->  	/* Most drivers don't handle rss_context, check it's 0 as well */
-> -	if (rxfh.rss_context && !ops->set_rxfh_context)
-> +	if (rxfh.rss_context && !(ops->create_rxfh_context ||
-> +				  ops->set_rxfh_context))
->  		return -EOPNOTSUPP;
->  	create = rxfh.rss_context == ETH_RXFH_CONTEXT_ALLOC;
->  
-> @@ -1349,8 +1350,28 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
->  		}
->  		ctx->indir_size = dev_indir_size;
->  		ctx->key_size = dev_key_size;
-> -		ctx->hfunc = rxfh.hfunc;
->  		ctx->priv_size = ops->rxfh_priv_size;
-> +		/* Initialise to an empty context */
-> +		ctx->indir_no_change = ctx->key_no_change = 1;
-> +		ctx->hfunc = ETH_RSS_HASH_NO_CHANGE;
-> +		if (ops->create_rxfh_context) {
-> +			int ctx_id;
-> +
-> +			/* driver uses new API, core allocates ID */
-> +			/* if rss_ctx_max_id is not specified (left as 0), it is
-> +			 * treated as INT_MAX + 1 by idr_alloc
-> +			 */
-> +			ctx_id = idr_alloc(&dev->ethtool->rss_ctx, ctx, 1,
-> +					   dev->ethtool->rss_ctx_max_id,
-> +					   GFP_KERNEL_ACCOUNT);
-> +			/* 0 is not allowed, so treat it like an error here */
-> +			if (ctx_id <= 0) {
-> +				kfree(ctx);
-> +				ret = -ENOMEM;
-> +				goto out;
-> +			}
-> +			rxfh.rss_context = ctx_id;
-> +		}
->  	} else if (rxfh.rss_context) {
->  		ctx = idr_find(&dev->ethtool->rss_ctx, rxfh.rss_context);
->  		if (!ctx) {
-> @@ -1359,15 +1380,34 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
->  		}
->  	}
->  
-> -	if (rxfh.rss_context)
-> -		ret = ops->set_rxfh_context(dev, indir, hkey, rxfh.hfunc,
-> -					    &rxfh.rss_context, delete);
-> -	else
-> +	if (rxfh.rss_context) {
-> +		if (ops->create_rxfh_context) {
-> +			if (create)
-> +				ret = ops->create_rxfh_context(dev, ctx, indir,
-> +							       hkey, rxfh.hfunc,
-> +							       rxfh.rss_context);
-> +			else if (delete)
-> +				ret = ops->remove_rxfh_context(dev, ctx,
-> +							       rxfh.rss_context);
-> +			else
-> +				ret = ops->modify_rxfh_context(dev, ctx, indir,
-> +							       hkey, rxfh.hfunc,
-> +							       rxfh.rss_context);
-> +		} else {
-> +			ret = ops->set_rxfh_context(dev, indir, hkey,
-> +						    rxfh.hfunc,
-> +						    &rxfh.rss_context, delete);
-> +		}
-> +	} else {
->  		ret = ops->set_rxfh(dev, indir, hkey, rxfh.hfunc);
-> +	}
->  	if (ret) {
-> -		if (create)
-> +		if (create) {
->  			/* failed to create, free our new tracking entry */
-> +			if (ops->create_rxfh_context)
-> +				idr_remove(&dev->ethtool->rss_ctx, rxfh.rss_context);
->  			kfree(ctx);
-> +		}
->  		goto out;
->  	}
->  
-> @@ -1383,12 +1423,8 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
->  			dev->priv_flags |= IFF_RXFH_CONFIGURED;
->  	}
->  	/* Update rss_ctx tracking */
-> -	if (create) {
-> -		/* Ideally this should happen before calling the driver,
-> -		 * so that we can fail more cleanly; but we don't have the
-> -		 * context ID until the driver picks it, so we have to
-> -		 * wait until after.
-> -		 */
-> +	if (create && !ops->create_rxfh_context) {
-> +		/* driver uses old API, it chose context ID */
->  		if (WARN_ON(idr_find(&dev->ethtool->rss_ctx, rxfh.rss_context))) {
->  			/* context ID reused, our tracking is screwed */
->  			kfree(ctx);
-> @@ -1398,8 +1434,6 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
->  		WARN_ON(idr_alloc(&dev->ethtool->rss_ctx, ctx, rxfh.rss_context,
->  				  rxfh.rss_context + 1, GFP_KERNEL) !=
->  			rxfh.rss_context);
-> -		ctx->indir_no_change = rxfh.indir_size == ETH_RXFH_INDIR_NO_CHANGE;
-> -		ctx->key_no_change = !rxfh.key_size;
->  	}
->  	if (delete) {
->  		WARN_ON(idr_remove(&dev->ethtool->rss_ctx, rxfh.rss_context) != ctx);
+SGkgQW5kcmV3LA0KDQpPbiAxMy8wOS8yMyA3OjQ2IGFtLCBBbmRyZXcgTHVubiB3cm90ZToNCj4g
+RVhURVJOQUwgRU1BSUw6IERvIG5vdCBjbGljayBsaW5rcyBvciBvcGVuIGF0dGFjaG1lbnRzIHVu
+bGVzcyB5b3Uga25vdyB0aGUgY29udGVudCBpcyBzYWZlDQo+IA0KPj4gK3N0cnVjdCBvYV90YzYg
+ew0KPj4gKyAgICAgc3RydWN0IHNwaV9kZXZpY2UgKnNwaTsNCj4+ICsgICAgIGJvb2wgY3RybF9w
+cm90Ow0KPj4gK307DQo+IA0KPiBTaG91bGQgdGhpcyBiZSBjb25zaWRlcmVkIGFuIG9wYXF1ZSBz
+dHJ1Y3R1cmUgd2hpY2ggdGhlIE1BQyBkcml2ZXINCj4gc2hvdWxkIG5vdCBhY2Nlc3MgdGhlIG1l
+bWJlcnM/DQo+IA0KPiBJIGRvbid0IHNlZSBhbnl0aGluZyBzZXR0aW5nIGN0cmxfcHJvdCBoZXJl
+LiBEb2VzIGl0IG5lZWQgYSBzZXR0ZXIgYW5kDQo+IGEgZ2V0dGVyPw0KQWggb2ssIGl0IGlzIHN1
+cHBvc2VkIHRvIGJlIGRvbmUgaW4gdGhlIG9hX3RjNl9pbml0KCkgZnVuY3Rpb24uIFNvbWVob3cg
+DQptaXNzZWQgaXQuIFdpbGwgY29ycmVjdCBpdCBpbiB0aGUgbmV4dCB2ZXJzaW9uLg0KDQpCZXN0
+IFJlZ2FyZHMsDQpQYXJ0aGliYW4gVg0KPiANCj4gICAgICAgICAgQW5kcmV3DQoNCg==
 
