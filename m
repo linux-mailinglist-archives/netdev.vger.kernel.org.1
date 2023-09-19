@@ -1,30 +1,30 @@
-Return-Path: <netdev+bounces-34884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB2847A5B96
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 09:50:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73C757A5B97
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 09:50:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD9BD1C2096F
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 07:50:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06A272822A7
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 07:50:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 591BA38DC8;
-	Tue, 19 Sep 2023 07:49:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E42B038BD3;
+	Tue, 19 Sep 2023 07:49:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92F3538BD1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFBDE38DC2
 	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 07:49:23 +0000 (UTC)
 Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5395411C
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 00:49:20 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VsQewon_1695109757;
-Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0VsQewon_1695109757)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F19512B
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 00:49:22 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VsQX2aq_1695109758;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0VsQX2aq_1695109758)
           by smtp.aliyun-inc.com;
-          Tue, 19 Sep 2023 15:49:18 +0800
+          Tue, 19 Sep 2023 15:49:19 +0800
 From: Heng Qi <hengqi@linux.alibaba.com>
 To: netdev@vger.kernel.org,
 	virtualization@lists.linux-foundation.org
@@ -38,10 +38,11 @@ Cc: "Michael S . Tsirkin" <mst@redhat.com>,
 	Daniel Borkmann <daniel@iogearbox.net>,
 	Jesper Dangaard Brouer <hawk@kernel.org>,
 	John Fastabend <john.fastabend@gmail.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Subject: [PATCH net 1/6] virtio-net: initially change the value of tx-frames
-Date: Tue, 19 Sep 2023 15:49:10 +0800
-Message-Id: <20230919074915.103110-2-hengqi@linux.alibaba.com>
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Gavin Li <gavinl@nvidia.com>
+Subject: [PATCH net 2/6] virtio-net: fix mismatch of getting tx-frames
+Date: Tue, 19 Sep 2023 15:49:11 +0800
+Message-Id: <20230919074915.103110-3-hengqi@linux.alibaba.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20230919074915.103110-1-hengqi@linux.alibaba.com>
 References: <20230919074915.103110-1-hengqi@linux.alibaba.com>
@@ -59,100 +60,29 @@ X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Background:
-1. Commit 0c465be183c7 ("virtio_net: ethtool tx napi configuration") uses
-   tx-frames to toggle napi_tx (0 off and 1 on) if notification coalescing
-   is not supported.
-2. Commit 31c03aef9bc2 ("virtio_net: enable napi_tx by default") enables
-   napi_tx for all txqs by default.
+Since virtio-net allows switching napi_tx for per txq, we have to
+get the specific txq's result now.
 
-Status:
-When virtio-net supports notification coalescing, after initialization,
-tx-frames is 0 and napi_tx is true.
-
-Problem:
-When the user only wants to set rx coalescing params using
-           ethtool -C eth0 rx-usecs 10, or
-	   ethtool -Q eth0 queue_mask 0x1 -C rx-usecs 10,
-these cmds will carry tx-frames as 0, causing the napi_tx switching condition
-is satisfied. Then the user gets:
-           netlink error: Device or resource busy.
-
-The same happens when trying to set rx-frames, adaptive_rx, adaptive_tx...
-
-Result:
-When notification coalescing feature is negotiated, initially make the
-value of tx-frames to be consistent with napi_tx.
-
-For compatibility with the past, it is still supported to use tx-frames
-to toggle napi_tx.
-
-Reported-by: Xiaoming Zhao <zxm377917@alibaba-inc.com>
+Fixes: 394bd87764b6 ("virtio_net: support per queue interrupt coalesce command")
+Cc: Gavin Li <gavinl@nvidia.com>
 Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
 ---
- drivers/net/virtio_net.c | 42 +++++++++++++++++++++++++++++++++-------
- 1 file changed, 35 insertions(+), 7 deletions(-)
+ drivers/net/virtio_net.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index fe7f314d65c9..fd5bc8d59eda 100644
+index fd5bc8d59eda..80d35a864790 100644
 --- a/drivers/net/virtio_net.c
 +++ b/drivers/net/virtio_net.c
-@@ -4442,13 +4442,6 @@ static int virtnet_probe(struct virtio_device *vdev)
- 		dev->xdp_features |= NETDEV_XDP_ACT_RX_SG;
+@@ -3453,7 +3453,7 @@ static int virtnet_get_per_queue_coalesce(struct net_device *dev,
+ 	} else {
+ 		ec->rx_max_coalesced_frames = 1;
+ 
+-		if (vi->sq[0].napi.weight)
++		if (vi->sq[queue].napi.weight)
+ 			ec->tx_max_coalesced_frames = 1;
  	}
  
--	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_NOTF_COAL)) {
--		vi->intr_coal_rx.max_usecs = 0;
--		vi->intr_coal_tx.max_usecs = 0;
--		vi->intr_coal_tx.max_packets = 0;
--		vi->intr_coal_rx.max_packets = 0;
--	}
--
- 	if (virtio_has_feature(vdev, VIRTIO_NET_F_HASH_REPORT))
- 		vi->has_rss_hash_report = true;
- 
-@@ -4523,6 +4516,41 @@ static int virtnet_probe(struct virtio_device *vdev)
- 	if (err)
- 		goto free;
- 
-+	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_NOTF_COAL)) {
-+		vi->intr_coal_rx.max_usecs = 0;
-+		vi->intr_coal_tx.max_usecs = 0;
-+		vi->intr_coal_rx.max_packets = 0;
-+
-+		/* Why is this needed?
-+		 * If without this setting, consider that when VIRTIO_NET_F_NOTF_COAL is
-+		 * negotiated and napi_tx is initially true: when the user sets non tx-frames
-+		 * parameters, such as the following cmd or others,
-+		 *		ethtool -C eth0 rx-usecs 10.
-+		 * Then
-+		 * 1. ethtool_set_coalesce() first calls virtnet_get_coalesce() to get
-+		 *    the last parameters except rx-usecs. If tx-frames has never been set before,
-+		 *    virtnet_get_coalesce() returns with tx-frames=0 in the parameters.
-+		 * 2. virtnet_set_coalesce() is then called, according to 1:
-+		 *    ec->tx_max_coalesced_frames=0. Now napi_tx switching condition is met.
-+		 * 3. If the device is up, the user setting fails:
-+		 *	       "netlink error: Device or resource busy"
-+		 * This is not intuitive. Therefore, we keep napi_tx state consistent with
-+		 * tx-frames when VIRTIO_NET_F_NOTF_COAL is negotiated. This behavior is
-+		 * compatible with before.
-+		 */
-+		if (vi->sq[0].napi.weight)
-+			vi->intr_coal_tx.max_packets = 1;
-+		else
-+			vi->intr_coal_tx.max_packets = 0;
-+	}
-+
-+	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL)) {
-+		/* The reason is the same as VIRTIO_NET_F_NOTF_COAL. */
-+		for (i = 0; i < vi->max_queue_pairs; i++)
-+			if (vi->sq[i].napi.weight)
-+				vi->sq[i].intr_coal.max_packets = 1;
-+	}
-+
- #ifdef CONFIG_SYSFS
- 	if (vi->mergeable_rx_bufs)
- 		dev->sysfs_rx_queue_group = &virtio_net_mrg_rx_group;
 -- 
 2.19.1.6.gb485710b
 
