@@ -1,133 +1,86 @@
-Return-Path: <netdev+bounces-34981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D5647A6554
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 15:36:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C21B27A6567
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 15:40:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 256CA28225C
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 13:36:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D5CC281AAF
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 13:40:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 900BC36B0E;
-	Tue, 19 Sep 2023 13:36:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52CA136B19;
+	Tue, 19 Sep 2023 13:40:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEE1636AE2
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 13:36:35 +0000 (UTC)
-Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E43FF9;
-	Tue, 19 Sep 2023 06:36:34 -0700 (PDT)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.nyi.internal (Postfix) with ESMTP id 0A3D15C00A5;
-	Tue, 19 Sep 2023 09:36:34 -0400 (EDT)
-Received: from imap47 ([10.202.2.97])
-  by compute5.internal (MEProxy); Tue, 19 Sep 2023 09:36:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=svenpeter.dev;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:sender:subject:subject:to:to;
-	 s=fm2; t=1695130594; x=1695216994; bh=G3Kkrzt0AGrrY/tjL0EyntUuI
-	Bb8mCCGj+mtTnmx+Q8=; b=UnODe/CFFm/fKyGaSWbPPfJGyccMgh1Fl4ql7J8B2
-	9jTTCbW7SBL9mmZVXktU9NHHOKE59vNmIt0/3PhYLyfB2ct9PpB2TtdW2GrTNk0N
-	p54KxQZhj60LKixvUfYSDQa4v3EbvN8Xt+LCAGQGVQ26IZGNwzMCGuce3Gghezi+
-	NDemRIJWikj5y3YJh93ZKtlx/6vlOGJnSRujwbi6RlScOarSzktohPxAwVVayDgE
-	wc1G63LzMMrc7gbgXgfjjE3fjf+QuIdkFrVuooWiII9CtYxJ0KGYCqtctLBBxlXB
-	a0MaGet4EcXXzcNEDj0hlAAITshodNu2ZUQSCM82e95IQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:sender:subject:subject:to:to:x-me-proxy
-	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1695130594; x=1695216994; bh=G3Kkrzt0AGrrY/tjL0EyntUuIBb8mCCGj+m
-	tTnmx+Q8=; b=Ki98uDeNfz0jsUIT+QrBfvj6hR3UdAj0JGP0Kk0m3is6XGITVnc
-	DitfO8Z+GtWWohKTB22DWPAWKANFWZvwpnHoOdj68y6C4Z7ADQwwOPv0cl9n2b+x
-	ySjituYs4vc8wTr6657lSCf6nuZlPaevwRT+ZlC5EloYB2OJvQKrFkiBrlsDjKms
-	R/4JDdefME8w8YDPy5+wnxG2+Fya9/liDAL5qCMMKpXum+43+FmCAvT5DhfpQlfI
-	HT3jt59lJiwFge+hvLDqbVFgQ4bt7cNR/bPeevGW7CpYG9z9TksRHzzWy5ZpkhSc
-	+qvxWapAs7q7hQNor2DKBFbtWnh42FwH2mg==
-X-ME-Sender: <xms:4KMJZbW9LbqWPcHkGh_DlPuxCBkGLtv3JnsYlVzXjKzSIeeti7RIhg>
-    <xme:4KMJZTmAvH4L7z_nGaP5KdfIvqOZiks__CHr-LlmDmPx7zd2plYewMvSEyaWyUHFk
-    jKbOhCbS2QMQUW6WgU>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrudekuddgfeeiucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtgfesthhqredtreerjeenucfhrhhomhepfdfu
-    vhgvnhcurfgvthgvrhdfuceoshhvvghnsehsvhgvnhhpvghtvghrrdguvghvqeenucggtf
-    frrghtthgvrhhnpeevhedthffgffelhedujefgueduudeutdefleevvdetudelhfeihfdv
-    ffelteeuudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhroh
-    hmpehsvhgvnhesshhvvghnphgvthgvrhdruggvvh
-X-ME-Proxy: <xmx:4KMJZXYmYuvL3nH0_SgD_kNdsC7XHLClfVBAmruidR-V60B6y3P-MQ>
-    <xmx:4KMJZWXQA3WzRBb5zCu-QYvcA4iZm-q-O5n5rA4kxuHe43SgaGHuSg>
-    <xmx:4KMJZVk9Oi99N4mk7qm3lIUI4afyU90X7PI_XuVzNp7f82_pACbMKw>
-    <xmx:4qMJZdNsFBGmk6guzMsje_BoEdpEh-d6HrZzup8N865hs4SPZgsPDA>
-Feedback-ID: i51094778:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 0378AA60077; Tue, 19 Sep 2023 09:36:31 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-761-gece9e40c48-fm-20230913.001-gece9e40c
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC0D836AE2
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 13:40:25 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7039CF1;
+	Tue, 19 Sep 2023 06:40:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=bF2zlnUUaHnn/ghDIFe4kmsq06/HOWxQot3UX+2BOfU=; b=oJH8a0F9WSWQW57hGDZZCj9cqa
+	7qVSgu2OJN8qLZUZ6wr57FhEyngEzGrtJ5NkEQyWgyIMLzsdSeK2QOWoGgG3eUO63RlwJ3Jjqwvvo
+	lkP5UEqAc5UBf89o2sN1vd6TqejxMnXNJaEw49yRCArqF+gGqLlpQeN5pFpTCXRk/r9lQgNUpbPXE
+	hZszHk5bfw7FgYhK6CigMhbQ1gDuk2+nRprgv8hP5iK9sk+vy3WEEPOwlZsR/eSiHffpMU3Ehyrs8
+	zRT0y47a1mEhkNO4bZr64hsm79/98+isKx52AuSFtnSE2za87D9+KMS6TwhJV0t19h7BfKNpV93nl
+	eONMPpEQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41456)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qiaxb-0001yE-1s;
+	Tue, 19 Sep 2023 14:40:15 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qiaxb-0001YI-4q; Tue, 19 Sep 2023 14:40:15 +0100
+Date: Tue, 19 Sep 2023 14:40:15 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH] net: sfp: add quirk for Fiberstone
+ GPON-ONU-34-20BI
+Message-ID: <ZQmkv9o329m98CUG@shell.armlinux.org.uk>
+References: <20230919124720.8210-1-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <aabaa49f-8988-42c0-bf8e-2266005e2155@app.fastmail.com>
-In-Reply-To: <20230918131103.24119-7-ilpo.jarvinen@linux.intel.com>
-References: <20230918131103.24119-1-ilpo.jarvinen@linux.intel.com>
- <20230918131103.24119-7-ilpo.jarvinen@linux.intel.com>
-Date: Tue, 19 Sep 2023 15:36:10 +0200
-From: "Sven Peter" <sven@svenpeter.dev>
-To: =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- linux-pci@vger.kernel.org, "Bjorn Helgaas" <helgaas@kernel.org>,
- "Lorenzo Pieralisi" <lorenzo.pieralisi@arm.com>,
- "Rob Herring" <robh@kernel.org>,
- =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kw@linux.com>,
- "Lukas Wunner" <lukas@wunner.de>, "Rafael J. Wysocki" <rafael@kernel.org>,
- "Heiner Kallweit" <hkallweit1@gmail.com>,
- "Emmanuel Grumbach" <emmanuel.grumbach@intel.com>,
- linux-kernel@vger.kernel.org, "Hector Martin" <marcan@marcan.st>,
- "Alyssa Rosenzweig" <alyssa@rosenzweig.io>,
- "Marcel Holtmann" <marcel@holtmann.org>,
- "Johan Hedberg" <johan.hedberg@gmail.com>,
- "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
- "Bjorn Helgaas" <bhelgaas@google.com>, asahi@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org
-Cc: ath10k@lists.infradead.org, ath11k@lists.infradead.org,
- ath12k@lists.infradead.org, intel-wired-lan@lists.osuosl.org,
- linux-mediatek@lists.infradead.org, linux-rdma@vger.kernel.org,
- linux-wireless@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 06/13] Bluetooth: hci_bcm4377: Convert aspm disable to quirk
-Content-Type: text/plain;charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230919124720.8210-1-ansuelsmth@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+On Tue, Sep 19, 2023 at 02:47:20PM +0200, Christian Marangi wrote:
+> Fiberstone GPON-ONU-34-20B can operate at 2500base-X, but report 1.2GBd
+> NRZ in their EEPROM.
+> 
+> The module also require the ignore tx fault fixup similar to Huawei MA5671A
+> as it gets disabled on error messages with serial redirection enabled.
 
-On Mon, Sep 18, 2023, at 15:10, Ilpo J=C3=A4rvinen wrote:
-> pci_disable_link_state() was made reliable regardless of ASPM CONFIG
-> and OS being disallowed to change ASPM states to allow drivers to rely
-> on pci_disable_link_state() working.
->
-> Remove driver working around unreliable pci_disable_link_state() from
-> hci_bcm4377 driver and add a PCI quirk to disable ASPM.
->
-> Signed-off-by: Ilpo J=C3=A4rvinen <ilpo.jarvinen@linux.intel.com>
-> ---
+I'll send you shortly a different approach for the "ignore tx fault"
+thing that I'd like you to test please.
 
-Acked-by: Sven Peter <sven@svenpeter.dev>
-
-
-Thanks,
-
-Sven
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
