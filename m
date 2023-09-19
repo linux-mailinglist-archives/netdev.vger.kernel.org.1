@@ -1,135 +1,90 @@
-Return-Path: <netdev+bounces-34971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ECDF7A6412
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 14:58:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 502207A6418
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 14:58:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E1A01C20A43
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 12:58:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 617CF1C20B2D
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 12:58:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AA0B37CAE;
-	Tue, 19 Sep 2023 12:58:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B815B37CB0;
+	Tue, 19 Sep 2023 12:58:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DCDB37CA7
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 12:58:08 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15E871AB;
-	Tue, 19 Sep 2023 05:58:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695128281; x=1726664281;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=wybvJEwkKu9h7qtl+C0LlmYtIk8v3lXqyQYeuG0CfZU=;
-  b=eEYsWEHt9Do6GBf/16Gq4r8MZMz34VTVNvOJlsIcmr4qmkqRNdUWN6BN
-   /Pp3ZGJTbhVS2KWnVfCw27UM5PHTvBjnDINF7/iZVIvcAYZxS27MMsncm
-   snrDbMickYQ8lOkd1LY+p6gvLOjuv013EK+DUNu4LUzNctQnzihxDOu37
-   AB7g7VfBrFotS/jqBDzXZHBBDgWCXywIqOBKPlTMzQ5A17VxE9aDZWWuH
-   ZOWjjjYdASDkqhb0wowGyCjOiCWP/ajY3lZpRNtnb9hii+d6eUcjtdUuc
-   qdcqGMZq41JV/AlprzKAr5KTL+rBm4J+IRSpYRPOALLyXJblySWDl1TZs
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10838"; a="359324748"
-X-IronPort-AV: E=Sophos;i="6.02,159,1688454000"; 
-   d="scan'208";a="359324748"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2023 05:57:45 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10838"; a="746228994"
-X-IronPort-AV: E=Sophos;i="6.02,159,1688454000"; 
-   d="scan'208";a="746228994"
-Received: from vdesserx-mobl1.ger.corp.intel.com (HELO localhost.localdomain) ([10.249.32.31])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2023 05:57:40 -0700
-From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-To: Bjorn Helgaas <bhelgaas@google.com>,
-	linux-pci@vger.kernel.org,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Subject: [PATCH v3 8/8] e1000e: Use pcie_capability_read_word() for reading LNKSTA
-Date: Tue, 19 Sep 2023 15:56:48 +0300
-Message-Id: <20230919125648.1920-9-ilpo.jarvinen@linux.intel.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230919125648.1920-1-ilpo.jarvinen@linux.intel.com>
-References: <20230919125648.1920-1-ilpo.jarvinen@linux.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C56C37CA6;
+	Tue, 19 Sep 2023 12:58:41 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9413F3;
+	Tue, 19 Sep 2023 05:58:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=6pJg57Rcm0bmG3CDzyP2i9I6PKCyoCY99pTc1UrpBC8=; b=bZh8QSHyXJjGveMP/Dkg4hr+hR
+	KOM1GS26Sr/9iplc+88NCDHXRHqKbCRO6pbQPLx2EGjjgycmX8CDMoo7Zf9wZ1DDABIu2TeGYOByQ
+	f0JEpxvknIcw6dPbKvpLgPdC0W7+fSGaOZU9X/Jwu/c55ONcBRBSdWyqOb9TciWeZTC8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qiaJB-006uaR-El; Tue, 19 Sep 2023 14:58:29 +0200
+Date: Tue, 19 Sep 2023 14:58:29 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Parthiban.Veerasooran@microchip.com
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	corbet@lwn.net, Steen.Hegelund@microchip.com, rdunlap@infradead.org,
+	horms@kernel.org, casper.casan@gmail.com, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, Horatiu.Vultur@microchip.com,
+	Woojung.Huh@microchip.com, Nicolas.Ferre@microchip.com,
+	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com
+Subject: Re: [RFC PATCH net-next 1/6] net: ethernet: implement OPEN Alliance
+ control transaction interface
+Message-ID: <4c1d0d38-c459-4722-bead-7660d85f4925@lunn.ch>
+References: <20230908142919.14849-1-Parthiban.Veerasooran@microchip.com>
+ <20230908142919.14849-2-Parthiban.Veerasooran@microchip.com>
+ <8d53ca8d-bcf6-4673-a8ff-b621d700576e@lunn.ch>
+ <9615b403-52c1-f24f-382f-8eea3ddfcf04@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9615b403-52c1-f24f-382f-8eea3ddfcf04@microchip.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Use pcie_capability_read_word() for reading LNKSTA and remove the
-custom define that matches to PCI_EXP_LNKSTA.
+On Tue, Sep 19, 2023 at 11:13:13AM +0000, Parthiban.Veerasooran@microchip.com wrote:
+> Hi Andrew,
+> 
+> On 13/09/23 7:46 am, Andrew Lunn wrote:
+> > EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
+> > 
+> >> +struct oa_tc6 {
+> >> +     struct spi_device *spi;
+> >> +     bool ctrl_prot;
+> >> +};
+> > 
+> > Should this be considered an opaque structure which the MAC driver
+> > should not access the members?
 
-As only single user for cap_offset remains, replace it with a call to
-pci_pcie_cap(). Instead of e1000_adapter, make local variable out of
-pci_dev because both users are interested in it.
+Opaque vs not opaque is an important design decision. If the MAC
+driver is allowed to directly access this structure, you should
+document the locking concept. If the MAC is not supposed to access it
+directly, only uses getters/setters, that also needs documenting, and
+maybe even make it a void * in the MAC driver.
 
-Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
----
- drivers/net/ethernet/intel/e1000e/defines.h |  1 -
- drivers/net/ethernet/intel/e1000e/mac.c     | 11 ++++-------
- 2 files changed, 4 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/e1000e/defines.h b/drivers/net/ethernet/intel/e1000e/defines.h
-index a4d29c9e03a6..23a58cada43a 100644
---- a/drivers/net/ethernet/intel/e1000e/defines.h
-+++ b/drivers/net/ethernet/intel/e1000e/defines.h
-@@ -678,7 +678,6 @@
- 
- /* PCI/PCI-X/PCI-EX Config space */
- #define PCI_HEADER_TYPE_REGISTER     0x0E
--#define PCIE_LINK_STATUS             0x12
- 
- #define PCI_HEADER_TYPE_MULTIFUNC    0x80
- 
-diff --git a/drivers/net/ethernet/intel/e1000e/mac.c b/drivers/net/ethernet/intel/e1000e/mac.c
-index 5340cf73778d..694a779e718d 100644
---- a/drivers/net/ethernet/intel/e1000e/mac.c
-+++ b/drivers/net/ethernet/intel/e1000e/mac.c
-@@ -17,16 +17,13 @@ s32 e1000e_get_bus_info_pcie(struct e1000_hw *hw)
- {
- 	struct e1000_mac_info *mac = &hw->mac;
- 	struct e1000_bus_info *bus = &hw->bus;
--	struct e1000_adapter *adapter = hw->adapter;
--	u16 pcie_link_status, cap_offset;
-+	struct pci_dev *pdev = hw->adapter->pdev;
-+	u16 pcie_link_status;
- 
--	cap_offset = adapter->pdev->pcie_cap;
--	if (!cap_offset) {
-+	if (!pci_pcie_cap(pdev)) {
- 		bus->width = e1000_bus_width_unknown;
- 	} else {
--		pci_read_config_word(adapter->pdev,
--				     cap_offset + PCIE_LINK_STATUS,
--				     &pcie_link_status);
-+		pcie_capability_read_word(pdev, PCI_EXP_LNKSTA, &pcie_link_status);
- 		bus->width = (enum e1000_bus_width)FIELD_GET(PCI_EXP_LNKSTA_NLW,
- 							     pcie_link_status);
- 	}
--- 
-2.30.2
-
+      Andrew
 
