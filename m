@@ -1,30 +1,30 @@
-Return-Path: <netdev+bounces-35022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35023-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 003F77A673D
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 16:48:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E1BE17A6742
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 16:49:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DF13281C4E
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 14:48:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 973FC2821D6
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 14:49:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 877883B78C;
-	Tue, 19 Sep 2023 14:43:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EC7D3B796;
+	Tue, 19 Sep 2023 14:43:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 288833B78A
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 14:43:31 +0000 (UTC)
-Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB12E119;
-	Tue, 19 Sep 2023 07:43:16 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VsRsS.Z_1695134589;
-Received: from localhost(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VsRsS.Z_1695134589)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4313F3B78A
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 14:43:34 +0000 (UTC)
+Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F37BE64;
+	Tue, 19 Sep 2023 07:43:19 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VsRqcDd_1695134591;
+Received: from localhost(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VsRqcDd_1695134591)
           by smtp.aliyun-inc.com;
-          Tue, 19 Sep 2023 22:43:10 +0800
+          Tue, 19 Sep 2023 22:43:13 +0800
 From: Wen Gu <guwen@linux.alibaba.com>
 To: kgraul@linux.ibm.com,
 	wenjia@linux.ibm.com,
@@ -39,16 +39,16 @@ Cc: alibuda@linux.alibaba.com,
 	linux-s390@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 17/18] net/smc: modify cursor update logic when sndbuf mapped to RMB
-Date: Tue, 19 Sep 2023 22:42:01 +0800
-Message-Id: <1695134522-126655-18-git-send-email-guwen@linux.alibaba.com>
+Subject: [PATCH net-next 18/18] net/smc: add interface implementation of loopback device
+Date: Tue, 19 Sep 2023 22:42:02 +0800
+Message-Id: <1695134522-126655-19-git-send-email-guwen@linux.alibaba.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1695134522-126655-1-git-send-email-guwen@linux.alibaba.com>
 References: <1695134522-126655-1-git-send-email-guwen@linux.alibaba.com>
 X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-	version=3.4.6
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 Precedence: bulk
@@ -57,103 +57,233 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
-Since local sndbuf shares the same physical memory with peer RMB after
-mapping, the logic related to cursor update needs to be adapted to ensure
-that the data written by local won't overwrite the data that has not been
-consumed by the peer.
+This patch completes the specific implementation of loopback device
+for the newly added SMC-D DMB-related interface.
 
-So in this case, the fin_curs and sndbuf_space that were originally
-updated after sending the CDC message should be modified to not be update
-until the peer updates cons_curs.
+The loopback device always provides mappable DMB because the device
+users are in the same OS instance.
 
 Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
 ---
- net/smc/smc_cdc.c | 50 +++++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 39 insertions(+), 11 deletions(-)
+ net/smc/smc_loopback.c | 105 ++++++++++++++++++++++++++++++++++++++++++++-----
+ net/smc/smc_loopback.h |   5 +++
+ 2 files changed, 100 insertions(+), 10 deletions(-)
 
-diff --git a/net/smc/smc_cdc.c b/net/smc/smc_cdc.c
-index 2641800..7cc677d 100644
---- a/net/smc/smc_cdc.c
-+++ b/net/smc/smc_cdc.c
-@@ -18,6 +18,7 @@
- #include "smc_tx.h"
- #include "smc_rx.h"
- #include "smc_close.h"
-+#include "smc_ism.h"
+diff --git a/net/smc/smc_loopback.c b/net/smc/smc_loopback.c
+index 650561b..611998b 100644
+--- a/net/smc/smc_loopback.c
++++ b/net/smc/smc_loopback.c
+@@ -105,6 +105,7 @@ static int smc_lo_register_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb,
+ 	}
+ 	dmb_node->len = dmb->dmb_len;
+ 	dmb_node->dma_addr = (dma_addr_t)dmb_node->cpu_addr;
++	refcount_set(&dmb_node->refcnt, 1);
  
- /********************************** send *************************************/
+ again:
+ 	/* add new dmb into hash table */
+@@ -118,6 +119,7 @@ static int smc_lo_register_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb,
+ 	}
+ 	hash_add(ldev->dmb_ht, &dmb_node->list, dmb_node->token);
+ 	write_unlock(&ldev->dmb_ht_lock);
++	atomic_inc(&ldev->dmb_cnt);
  
-@@ -256,17 +257,24 @@ int smcd_cdc_msg_send(struct smc_connection *conn)
- 		return rc;
- 	smc_curs_copy(&conn->rx_curs_confirmed, &curs, conn);
- 	conn->local_rx_ctrl.prod_flags.cons_curs_upd_req = 0;
--	/* Calculate transmitted data and increment free send buffer space */
--	diff = smc_curs_diff(conn->sndbuf_desc->len, &conn->tx_curs_fin,
--			     &conn->tx_curs_sent);
--	/* increased by confirmed number of bytes */
--	smp_mb__before_atomic();
--	atomic_add(diff, &conn->sndbuf_space);
--	/* guarantee 0 <= sndbuf_space <= sndbuf_desc->len */
--	smp_mb__after_atomic();
--	smc_curs_copy(&conn->tx_curs_fin, &conn->tx_curs_sent, conn);
-+	if (!smc_ism_dmb_mappable(conn->lgr->smcd)) {
-+		/* If local sndbuf has been mapped to peer RMB, then
-+		 * don't update the tx_curs_fin and sndbuf_space until
-+		 * peer has consumed the data in RMB.
-+		 */
+ 	dmb->sba_idx = dmb_node->sba_idx;
+ 	dmb->dmb_tok = dmb_node->token;
+@@ -139,28 +141,98 @@ static int smc_lo_unregister_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb)
+ 	struct smc_lo_dmb_node *dmb_node = NULL, *tmp_node;
+ 	struct smc_lo_dev *ldev = smcd->priv;
  
--	smc_tx_sndbuf_nonfull(smc);
-+		/* Calculate transmitted data and increment free send buffer space */
-+		diff = smc_curs_diff(conn->sndbuf_desc->len, &conn->tx_curs_fin,
-+				     &conn->tx_curs_sent);
-+		/* increased by confirmed number of bytes */
-+		smp_mb__before_atomic();
-+		atomic_add(diff, &conn->sndbuf_space);
-+		/* guarantee 0 <= sndbuf_space <= sndbuf_desc->len */
-+		smp_mb__after_atomic();
-+		smc_curs_copy(&conn->tx_curs_fin, &conn->tx_curs_sent, conn);
+-	/* remove dmb from hash table */
+-	write_lock(&ldev->dmb_ht_lock);
++	/* find dmb from hash table */
++	read_lock(&ldev->dmb_ht_lock);
+ 	hash_for_each_possible(ldev->dmb_ht, tmp_node, list, dmb->dmb_tok) {
+ 		if (tmp_node->token == dmb->dmb_tok) {
+ 			dmb_node = tmp_node;
++			dmb_node->freeing = 1;
+ 			break;
+ 		}
+ 	}
+ 	if (!dmb_node) {
+-		write_unlock(&ldev->dmb_ht_lock);
++		read_unlock(&ldev->dmb_ht_lock);
+ 		return -EINVAL;
+ 	}
++	read_unlock(&ldev->dmb_ht_lock);
 +
-+		smc_tx_sndbuf_nonfull(smc);
++	/* wait for dmb refcnt to be 0 */
++	if (!refcount_dec_and_test(&dmb_node->refcnt))
++		wait_event(ldev->dmbs_release, !refcount_read(&dmb_node->refcnt));
++
++	/* remove dmb from hash table */
++	write_lock(&ldev->dmb_ht_lock);
+ 	hash_del(&dmb_node->list);
+ 	write_unlock(&ldev->dmb_ht_lock);
+ 
+ 	clear_bit(dmb_node->sba_idx, ldev->sba_idx_mask);
++
+ 	kfree(dmb_node->cpu_addr);
+ 	kfree(dmb_node);
+ 
++	if (atomic_dec_and_test(&ldev->dmb_cnt))
++		wake_up(&ldev->ldev_release);
++	return 0;
++}
++
++static int smc_lo_attach_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb)
++{
++	struct smc_lo_dmb_node *dmb_node = NULL, *tmp_node;
++	struct smc_lo_dev *ldev = smcd->priv;
++
++	/* find dmb_node according to dmb->dmb_tok */
++	read_lock(&ldev->dmb_ht_lock);
++	hash_for_each_possible(ldev->dmb_ht, tmp_node, list, dmb->dmb_tok) {
++		if (tmp_node->token == dmb->dmb_tok && !tmp_node->freeing) {
++			dmb_node = tmp_node;
++			break;
++		}
 +	}
- 	return rc;
++	if (!dmb_node) {
++		read_unlock(&ldev->dmb_ht_lock);
++		return -EINVAL;
++	}
++	refcount_inc(&dmb_node->refcnt);
++	read_unlock(&ldev->dmb_ht_lock);
++
++	/* provide dmb information */
++	dmb->sba_idx = dmb_node->sba_idx;
++	dmb->dmb_tok = dmb_node->token;
++	dmb->cpu_addr = dmb_node->cpu_addr;
++	dmb->dma_addr = dmb_node->dma_addr;
++	dmb->dmb_len = dmb_node->len;
+ 	return 0;
  }
  
-@@ -324,7 +332,7 @@ static void smc_cdc_msg_recv_action(struct smc_sock *smc,
- {
- 	union smc_host_cursor cons_old, prod_old;
- 	struct smc_connection *conn = &smc->conn;
--	int diff_cons, diff_prod;
-+	int diff_cons, diff_prod, diff_tx;
- 
- 	smc_curs_copy(&prod_old, &conn->local_rx_ctrl.prod, conn);
- 	smc_curs_copy(&cons_old, &conn->local_rx_ctrl.cons, conn);
-@@ -340,6 +348,26 @@ static void smc_cdc_msg_recv_action(struct smc_sock *smc,
- 		atomic_add(diff_cons, &conn->peer_rmbe_space);
- 		/* guarantee 0 <= peer_rmbe_space <= peer_rmbe_size */
- 		smp_mb__after_atomic();
++static int smc_lo_detach_dmb(struct smcd_dev *smcd, u64 token)
++{
++	struct smc_lo_dmb_node *dmb_node = NULL, *tmp_node;
++	struct smc_lo_dev *ldev = smcd->priv;
 +
-+		if (conn->lgr->is_smcd &&
-+		    smc_ism_dmb_mappable(conn->lgr->smcd)) {
-+			/* If local sndbuf has been mapped to peer RMB, then
-+			 * update tx_curs_fin and sndbuf_space when peer has
-+			 * consumed the data in it's RMB.
-+			 */
-+
-+			/* calculate peer rmb consumed data */
-+			diff_tx = smc_curs_diff(conn->sndbuf_desc->len, &conn->tx_curs_fin,
-+						&conn->local_rx_ctrl.cons);
-+			/* increase local sndbuf space and fin_curs */
-+			smp_mb__before_atomic();
-+			atomic_add(diff_tx, &conn->sndbuf_space);
-+			/* guarantee 0 <= sndbuf_space <= sndbuf_desc->len */
-+			smp_mb__after_atomic();
-+			smc_curs_copy(&conn->tx_curs_fin, &conn->local_rx_ctrl.cons, conn);
-+
-+			smc_tx_sndbuf_nonfull(smc);
++	/* find dmb_node according to dmb->dmb_tok */
++	read_lock(&ldev->dmb_ht_lock);
++	hash_for_each_possible(ldev->dmb_ht, tmp_node, list, token) {
++		if (tmp_node->token == token) {
++			dmb_node = tmp_node;
++			break;
 +		}
- 	}
++	}
++	if (!dmb_node) {
++		read_unlock(&ldev->dmb_ht_lock);
++		return -EINVAL;
++	}
++	read_unlock(&ldev->dmb_ht_lock);
++
++	if (refcount_dec_and_test(&dmb_node->refcnt))
++		wake_up_all(&ldev->dmbs_release);
++	return 0;
++}
++
++static int smc_lo_get_dev_attr(struct smcd_dev *smcd)
++{
++	return BIT(ISM_ATTR_DMB_MAP);
++}
++
+ static int smc_lo_add_vlan_id(struct smcd_dev *smcd, u64 vlan_id)
+ {
+ 	return -EOPNOTSUPP;
+@@ -193,7 +265,15 @@ static int smc_lo_move_data(struct smcd_dev *smcd, u64 dmb_tok, unsigned int idx
+ {
+ 	struct smc_lo_dmb_node *rmb_node = NULL, *tmp_node;
+ 	struct smc_lo_dev *ldev = smcd->priv;
+-
++	struct smc_connection *conn;
++
++	if (!sf) {
++		/* local sndbuf shares the same physical memory with
++		 * peer RMB, so no need to copy data from local sndbuf
++		 * to peer RMB.
++		 */
++		return 0;
++	}
+ 	read_lock(&ldev->dmb_ht_lock);
+ 	hash_for_each_possible(ldev->dmb_ht, tmp_node, list, dmb_tok) {
+ 		if (tmp_node->token == dmb_tok) {
+@@ -209,13 +289,10 @@ static int smc_lo_move_data(struct smcd_dev *smcd, u64 dmb_tok, unsigned int idx
  
- 	diff_prod = smc_curs_diff(conn->rmb_desc->len, &prod_old,
+ 	memcpy((char *)rmb_node->cpu_addr + offset, data, size);
+ 
+-	if (sf) {
+-		struct smc_connection *conn =
+-			smcd->conn[rmb_node->sba_idx];
++	conn = smcd->conn[rmb_node->sba_idx];
++	if (conn && !conn->killed)
++		smcd_cdc_rx_handler(conn);
+ 
+-		if (conn && !conn->killed)
+-			smcd_cdc_rx_handler(conn);
+-	}
+ 	return 0;
+ }
+ 
+@@ -252,6 +329,8 @@ static struct device *smc_lo_get_dev(struct smcd_dev *smcd)
+ 	.query_remote_gid = smc_lo_query_rgid,
+ 	.register_dmb = smc_lo_register_dmb,
+ 	.unregister_dmb = smc_lo_unregister_dmb,
++	.attach_dmb = smc_lo_attach_dmb,
++	.detach_dmb = smc_lo_detach_dmb,
+ 	.add_vlan_id = smc_lo_add_vlan_id,
+ 	.del_vlan_id = smc_lo_del_vlan_id,
+ 	.set_vlan_required = smc_lo_set_vlan_required,
+@@ -263,6 +342,7 @@ static struct device *smc_lo_get_dev(struct smcd_dev *smcd)
+ 	.get_local_gid = smc_lo_get_local_gid,
+ 	.get_chid = smc_lo_get_chid,
+ 	.get_dev = smc_lo_get_dev,
++	.get_dev_attr = smc_lo_get_dev_attr,
+ };
+ 
+ static struct smcd_dev *smcd_lo_alloc_dev(const struct smcd_ops *ops,
+@@ -342,6 +422,9 @@ static int smc_lo_dev_init(struct smc_lo_dev *ldev)
+ 	smc_lo_generate_id(ldev);
+ 	rwlock_init(&ldev->dmb_ht_lock);
+ 	hash_init(ldev->dmb_ht);
++	atomic_set(&ldev->dmb_cnt, 0);
++	init_waitqueue_head(&ldev->dmbs_release);
++	init_waitqueue_head(&ldev->ldev_release);
+ 
+ 	return smcd_lo_register_dev(ldev);
+ }
+@@ -375,6 +458,8 @@ static int smc_lo_dev_probe(void)
+ static void smc_lo_dev_exit(struct smc_lo_dev *ldev)
+ {
+ 	smcd_lo_unregister_dev(ldev);
++	if (atomic_read(&ldev->dmb_cnt))
++		wait_event(ldev->ldev_release, !atomic_read(&ldev->dmb_cnt));
+ }
+ 
+ static void smc_lo_dev_remove(void)
+diff --git a/net/smc/smc_loopback.h b/net/smc/smc_loopback.h
+index 943424f..506e524 100644
+--- a/net/smc/smc_loopback.h
++++ b/net/smc/smc_loopback.h
+@@ -29,6 +29,8 @@ struct smc_lo_dmb_node {
+ 	u32 sba_idx;
+ 	void *cpu_addr;
+ 	dma_addr_t dma_addr;
++	refcount_t refcnt;
++	u8 freeing : 1;
+ };
+ 
+ struct smc_lo_dev {
+@@ -39,6 +41,9 @@ struct smc_lo_dev {
+ 	DECLARE_BITMAP(sba_idx_mask, SMC_LODEV_MAX_DMBS);
+ 	rwlock_t dmb_ht_lock;
+ 	DECLARE_HASHTABLE(dmb_ht, SMC_LODEV_DMBS_HASH_BITS);
++	atomic_t dmb_cnt;
++	wait_queue_head_t dmbs_release;
++	wait_queue_head_t ldev_release;
+ };
+ 
+ int smc_loopback_init(void);
 -- 
 1.8.3.1
 
