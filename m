@@ -2,280 +2,439 @@ Return-Path: <netdev+bounces-35031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00FE27A6856
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 17:50:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 88A917A68A5
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 18:13:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D0F928131E
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 15:50:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11FDA281709
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 16:13:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCDE337C95;
-	Tue, 19 Sep 2023 15:50:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3198F38BA4;
+	Tue, 19 Sep 2023 16:13:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5BC23717C
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 15:50:35 +0000 (UTC)
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2071.outbound.protection.outlook.com [40.107.95.71])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08501BE
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 08:43:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BdxLXJfUDo4ULSGoHW+38SxO5sRkgj5mOVSZtSdIAeE9fIEDAmhr4CmOQKuAS3/hcC0bHOaASnaU3GaEC8k07KeVct2PxbJuw6kTCP9HibwcaBWdlp5tXiBng/XGNtQ3zrNYIu1OiuCx9HyDG63UAgj3xLjyIgm0c76xKX6WaQh/cp+xuQ5zK+IX1ohYCdcPNPRf/P9V8ZT094xmb4onFzldLAg8Se/eA2Q9Y5h8b1lI2znBelipGncqRJcri26ikTw1gGLU+7qSi3inq3nQF+L7U5s5rZjATyxPleCRP2RB21Ouu28sq8USDwqdxX+poCHnLw1dVXpmGNqHAqXI8w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZLAddiIrSNCTtRohgDc7XTftr+TsHvH5PKzrfJW/0BY=;
- b=ELcLApI7ric/TCxZSM62qnUJW6whqTFH98g8Jf1766f+qZ7YFPLyMia+lYGIEXFSnorFtpRzCAH4OdRT2DfL+FjoBQZX2uOBc/+HAxmnKx7PfnwzuNH+rNN3Gqjmu/+ChMZwTTw2qsV/lHSIdX9fMu16alCHAmuVTXZHTElYc2OALJEuZ9hTmwwZltVGAoosT9TVab9xu/nRnRjRO6teqrkDbOPppwlY2+snoii3uDawqFqDPd+OYdZ19BL3w6e5Ud65viSwRSMDV00V+d1K9M625Nnc7z1/ALLWtkLibRKCLzHPahbMf6iSYbW7DYM5c0khMHJt7X2Pk0usQL3H+A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZLAddiIrSNCTtRohgDc7XTftr+TsHvH5PKzrfJW/0BY=;
- b=aFWCIpoiGiyYFtpErg9rlnOcSVfLvHhHIiZ7GbqUaKJXDDjZh0heUQEto4Vf+/uBpjyYAeyrxueWpMOLaaLuFyYzpg9/oziDg9CaJkTFjd/xKy4C7DQpO/m/aSeXYIqs/ywX9CBQjLguT3ed6P0WgH8bnIDcpybwy8u4lWUhu4T4EBfSYYn15dbtHbxMDRxZ4RpXVRCj81BoozhGIJ9cjHMoaCHP1zi3G5vX0pfuy7sK1gyI0b6bSxLqwXv5/SavrzEq72HKDZ5YKTT0GvVSrc/0Ws1kMI3Ofla0j1Kd7MApE0iBe2zJYGcGCojiGVvBBautrVcvh6bx0E7L1JYvTw==
-Received: from SN4PR0501CA0106.namprd05.prod.outlook.com
- (2603:10b6:803:42::23) by MW6PR12MB8998.namprd12.prod.outlook.com
- (2603:10b6:303:249::9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.27; Tue, 19 Sep
- 2023 15:43:46 +0000
-Received: from SN1PEPF0002636A.namprd02.prod.outlook.com
- (2603:10b6:803:42:cafe::e3) by SN4PR0501CA0106.outlook.office365.com
- (2603:10b6:803:42::23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.28 via Frontend
- Transport; Tue, 19 Sep 2023 15:43:46 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SN1PEPF0002636A.mail.protection.outlook.com (10.167.241.135) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6792.20 via Frontend Transport; Tue, 19 Sep 2023 15:43:46 +0000
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 19 Sep
- 2023 08:43:26 -0700
-Received: from yaviefel.vdiclient.nvidia.com (10.126.231.35) by
- rnnvmail202.nvidia.com (10.129.68.7) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.41; Tue, 19 Sep 2023 08:43:23 -0700
-From: Petr Machata <petrm@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>
-CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, "Amit
- Cohen" <amcohen@nvidia.com>, <mlxsw@nvidia.com>
-Subject: [PATCH net-next v2 3/3] mlxsw: Edit IPv6 key blocks to use one less block for multicast forwarding
-Date: Tue, 19 Sep 2023 17:42:56 +0200
-Message-ID: <1eef364e0a42ad93e07352f9a3134bc5c6841668.1695137616.git.petrm@nvidia.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <cover.1695137616.git.petrm@nvidia.com>
-References: <cover.1695137616.git.petrm@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EBDA36AEF
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 16:13:01 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79CCD9D
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 09:12:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1695139977;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=7DinXRW8uYhcdYnKxZEOd/0XsHigGWMaEQ5KwkB8lL0=;
+	b=VqMnqSIM7rKd+EA8RtltouYNo41JD9CVcqpgZRtSrPub5S7/tc0VXDT2j9PGmQ5xf0nhLN
+	/3iYzyC1hITMxgFEo48q7gTo4bkVW04d2D4Dt+XJ+p2NQFN3tzezj8AexoiMlKdoEO2ycp
+	btpHqVOshyp3Zq4ZZyRyZ+JeoB33dys=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-682-DRLT1Ma4NdKf3JKiGG0BYg-1; Tue, 19 Sep 2023 12:12:56 -0400
+X-MC-Unique: DRLT1Ma4NdKf3JKiGG0BYg-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 50DE08039D1;
+	Tue, 19 Sep 2023 16:12:55 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.216])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 931D6492B16;
+	Tue, 19 Sep 2023 16:12:53 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: netdev@vger.kernel.org
+cc: dhowells@redhat.com,
+    syzbot+62cbf263225ae13ff153@syzkaller.appspotmail.com,
+    Eric Dumazet <edumazet@google.com>,
+    Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+    "David S. Miller" <davem@davemloft.net>,
+    David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+    Jakub Kicinski <kuba@kernel.org>, bpf@vger.kernel.org,
+    syzkaller-bugs@googlegroups.com, linux-kernel@vger.kernel.org
+Subject: [PATCH net] ipv4, ipv6: Fix handling of transhdrlen in __ip{,6}_append_data()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.126.231.35]
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail202.nvidia.com (10.129.68.7)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF0002636A:EE_|MW6PR12MB8998:EE_
-X-MS-Office365-Filtering-Correlation-Id: d35809b2-8524-4381-746f-08dbb92735e9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	cTunCIU4qKvE1nqQ+o+1pqA9YR9E74HmoB0pCmdu6PkWDbEWMbEnbIChrXLdi1rxWCJLHnA4HxOcppacSL/c75Myf7FsbILjwZEu0eXcVcyNoOgseg2wSV9o8kJd/evvsyUmtttq9M1QbAE5M+fFT9pf2IvfMcy+VvsvF3sqrRiX9nPNaA/L6r66BcEQfoPNT3T/tVVzx2X49Ntbl/rLwLHtjBsL8wsOQsObw1aKksrBN7oNOUR601x14hpHrRbya8OQ1/LmByrFDBnvY/gHaJ4isVAExwRbLvUWsAjV1SxNyg7fjEOxMTbRDXPjeLznNhCc4JlH/OaxobDVA6NBMp44jSd7MhhaIwRfEQS0md4973KjjdZ9ujpqiOOnaNO5UADVVjT5RlOJapmHuWkWvqPPFCrSa58wcZd9N2UFsNL7+4nNuh4douVR5HpOoFNHE6styOSAh5mqJk3nAGhIs3PkDWcK2BpVYvkMuNrpijtepn+WI6p7I45kUAmpWXMthXUZf3TbpqY3fyp5Xu57KucGh/B7m5rLr+c+QrqbPFroxUQrPQDkV7CrbdphWZD9Af/67qs8mQiJKrYepTYXcXRH2hywC+WPD7lxCwucx6Vy1uHqzzkn923BHGrImqUpiHjYh9UUmHPJuHrQ73RQMqcHRs6pcqBi99EBlZo8UssnuCHKevUGSpFcdM7c/0ERnyw/qhKSlBhX4oQw37I3LJHDn2tyz55PHB449yrvJrgwsM+F09VYUuIGP+IqEFas
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(396003)(39860400002)(346002)(376002)(82310400011)(451199024)(1800799009)(186009)(40470700004)(46966006)(36840700001)(356005)(7636003)(82740400003)(36756003)(40480700001)(40460700003)(86362001)(478600001)(54906003)(70206006)(2906002)(70586007)(110136005)(6666004)(7696005)(8676002)(8936002)(5660300002)(4326008)(41300700001)(316002)(47076005)(36860700001)(66574015)(107886003)(26005)(16526019)(2616005)(426003)(336012)(83380400001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Sep 2023 15:43:46.1006
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d35809b2-8524-4381-746f-08dbb92735e9
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF0002636A.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB8998
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-	autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <75314.1695139973.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 19 Sep 2023 17:12:53 +0100
+Message-ID: <75315.1695139973@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Amit Cohen <amcohen@nvidia.com>
+    =
 
-Two ACL regions that are configured by the driver during initialization are
-the ones used for IPv4 and IPv6 multicast forwarding. Entries residing
-in these two regions match on the {SIP, DIP, VRID} key elements.
+Including the transhdrlen in length is a problem when the packet is
+partially filled (e.g. something like send(MSG_MORE) happened previously)
+when appending to an IPv4 or IPv6 packet as we don't want to repeat the
+transport header or account for it twice.  This can happen under some
+circumstances, such as splicing into an L2TP socket.
 
-Currently for IPv6 region, 9 key blocks are used:
-* 4 for SIP - 'ipv4_1', 'ipv6_{3,4,5}'
-* 4 for DIP - 'ipv4_0', 'ipv6_{0,1,2/2b}'
-* 1 for VRID - 'ipv4_4b'
+The symptom observed is a warning in __ip6_append_data():
 
-This can be improved by reducing the amount key blocks needed for
-the IPv6 region to 8. It is possible to use key blocks that mix subsets of
-the VRID element with subsets of the DIP element.
-The following key blocks can be used:
-* 4 for SIP - 'ipv4_1', 'ipv6_{3,4,5}'
-* 1 for subset of DIP - 'ipv4_0'
-* 3 for the rest of DIP and subsets of VRID - 'ipv6_{0,1,2/2b}'
+    WARNING: CPU: 1 PID: 5042 at net/ipv6/ip6_output.c:1800 __ip6_append_d=
+ata.isra.0+0x1be8/0x47f0 net/ipv6/ip6_output.c:1800
 
-To make this happen, add VRID sub-elements as part of existing keys -
-'ipv6_{0,1,2/2b}'. Note that one of the sub-elements is called
-VRID_ROUTER_MSB and does not contain bit numbers like the rest, as for
-Spectrum < 4 this element represents bits 8-10 and for Spectrum-4 it
-represents bits 8-11.
+that occurs when MSG_SPLICE_PAGES is used to append more data to an alread=
+y
+partially occupied skbuff.  The warning occurs when 'copy' is larger than
+the amount of data in the message iterator.  This is because the requested
+length includes the transport header length when it shouldn't.  This can b=
+e
+triggered by, for example:
 
-Breaking VRID into 3 sub-elements makes the driver use one less block in
-IPv6 region for multicast forwarding. The sub-elements can be filled in
-blocks that are used for destination IP.
+        sfd =3D socket(AF_INET6, SOCK_DGRAM, IPPROTO_L2TP);
+        bind(sfd, ...); // ::1
+        connect(sfd, ...); // ::1 port 7
+        send(sfd, buffer, 4100, MSG_MORE);
+        sendfile(sfd, dfd, NULL, 1024);
 
-The algorithm in the driver that chooses which key blocks will be used is
-lazy and not the optimal one. It searches the block that contains the most
-elements that are required, chooses it, removes the elements that appear
-in the chosen block and starts again searching the block that contains the
-most elements.
+Fix this by pushing the addition of transhdrlen into length down into
+__ip_append_data() and __ip6_append_data(), making it conditional on the
+write queue being empty (otherwise we just clear transhdrlen).
 
-When key block 'ipv4_4' is defined, the algorithm might choose it, as it
-contains 2 sub-elements of VRID, then 8 blocks must be chosen for SIP and
-DIP and we get 9 blocks to match on {SIP, DIP, VRID}. That is why we had to
-remove key block 'ipv4_4' in a previous patch and use key block that
-contains one field for VRID.
+Notes:
 
-This improvement was tested and indeed 8 blocks are used instead of 9.
+ (1) The length supplied by userspace in ping_*_sendmsg() includes the
+     transport header len in the size, so we need to subtract it as the
+     iterator has been advanced to copy out the header - however we still
+     have to return the fact that we use it from sys_sendmsg(), so we can'=
+t
+     just preemptively decrease len at the beginning of the function.
 
-Signed-off-by: Amit Cohen <amcohen@nvidia.com>
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-Signed-off-by: Petr Machata <petrm@nvidia.com>
+ (2) Raw sockets include the transport header in the payload and pass down
+     a zero transhdrlen, which I just leave as is.
+
+ (3) A smaller fix could be to make ip{,6}_append_data() subtract
+     transhdrlen from length if it is going to set transhdrlen to 0 - but
+     it would seem better just not to include it in the first place.
+
+Reported-by: syzbot+62cbf263225ae13ff153@syzkaller.appspotmail.com
+Link: https://lore.kernel.org/r/0000000000001c12b30605378ce8@google.com/
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: David Ahern <dsahern@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: netdev@vger.kernel.org
+cc: bpf@vger.kernel.org
+cc: syzkaller-bugs@googlegroups.com
 ---
- .../ethernet/mellanox/mlxsw/core_acl_flex_keys.c  |  3 +++
- .../ethernet/mellanox/mlxsw/core_acl_flex_keys.h  |  3 +++
- .../ethernet/mellanox/mlxsw/spectrum2_mr_tcam.c   | 15 ++++++++++++---
- .../mellanox/mlxsw/spectrum_acl_flex_keys.c       |  4 ++++
- 4 files changed, 22 insertions(+), 3 deletions(-)
+ net/ipv4/icmp.c       |    3 +--
+ net/ipv4/ip_output.c  |    7 +++++--
+ net/ipv4/ping.c       |    3 ++-
+ net/ipv4/udp.c        |    8 +++-----
+ net/ipv6/icmp.c       |    6 ++----
+ net/ipv6/ip6_output.c |   16 +++++++++-------
+ net/ipv6/ping.c       |    3 ++-
+ net/ipv6/udp.c        |    8 +++-----
+ net/l2tp/l2tp_ip6.c   |    4 +---
+ 9 files changed, 28 insertions(+), 30 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_keys.c b/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_keys.c
-index 22e5efb0eb8c..745438d8ae10 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_keys.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_keys.c
-@@ -43,6 +43,9 @@ static const struct mlxsw_afk_element_info mlxsw_afk_element_infos[] = {
- 	MLXSW_AFK_ELEMENT_INFO_BUF(DST_IP_0_31, 0x3C, 4),
- 	MLXSW_AFK_ELEMENT_INFO_U32(FDB_MISS, 0x40, 0, 1),
- 	MLXSW_AFK_ELEMENT_INFO_U32(L4_PORT_RANGE, 0x40, 1, 16),
-+	MLXSW_AFK_ELEMENT_INFO_U32(VIRT_ROUTER_0_3, 0x40, 17, 4),
-+	MLXSW_AFK_ELEMENT_INFO_U32(VIRT_ROUTER_4_7, 0x40, 21, 4),
-+	MLXSW_AFK_ELEMENT_INFO_U32(VIRT_ROUTER_MSB, 0x40, 25, 4),
- };
- 
- struct mlxsw_afk {
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_keys.h b/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_keys.h
-index 75e9bbc36170..1c76aa3ffab7 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_keys.h
-+++ b/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_keys.h
-@@ -36,6 +36,9 @@ enum mlxsw_afk_element {
- 	MLXSW_AFK_ELEMENT_VIRT_ROUTER,
- 	MLXSW_AFK_ELEMENT_FDB_MISS,
- 	MLXSW_AFK_ELEMENT_L4_PORT_RANGE,
-+	MLXSW_AFK_ELEMENT_VIRT_ROUTER_0_3,
-+	MLXSW_AFK_ELEMENT_VIRT_ROUTER_4_7,
-+	MLXSW_AFK_ELEMENT_VIRT_ROUTER_MSB,
- 	MLXSW_AFK_ELEMENT_MAX,
- };
- 
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum2_mr_tcam.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum2_mr_tcam.c
-index 2efcc9372d4e..99eeafdc8d1e 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/spectrum2_mr_tcam.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum2_mr_tcam.c
-@@ -88,7 +88,9 @@ static void mlxsw_sp2_mr_tcam_ipv4_fini(struct mlxsw_sp2_mr_tcam *mr_tcam)
- }
- 
- static const enum mlxsw_afk_element mlxsw_sp2_mr_tcam_usage_ipv6[] = {
--		MLXSW_AFK_ELEMENT_VIRT_ROUTER,
-+		MLXSW_AFK_ELEMENT_VIRT_ROUTER_0_3,
-+		MLXSW_AFK_ELEMENT_VIRT_ROUTER_4_7,
-+		MLXSW_AFK_ELEMENT_VIRT_ROUTER_MSB,
- 		MLXSW_AFK_ELEMENT_SRC_IP_96_127,
- 		MLXSW_AFK_ELEMENT_SRC_IP_64_95,
- 		MLXSW_AFK_ELEMENT_SRC_IP_32_63,
-@@ -140,6 +142,8 @@ static void
- mlxsw_sp2_mr_tcam_rule_parse4(struct mlxsw_sp_acl_rule_info *rulei,
- 			      struct mlxsw_sp_mr_route_key *key)
+diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
+index b8607763d113..e1140597e971 100644
+--- a/net/ipv4/icmp.c
++++ b/net/ipv4/icmp.c
+@@ -368,8 +368,7 @@ static void icmp_push_reply(struct sock *sk,
+ 	struct sk_buff *skb;
+ =
+
+ 	if (ip_append_data(sk, fl4, icmp_glue_bits, icmp_param,
+-			   icmp_param->data_len+icmp_param->head_len,
+-			   icmp_param->head_len,
++			   icmp_param->data_len, icmp_param->head_len,
+ 			   ipc, rt, MSG_DONTWAIT) < 0) {
+ 		__ICMP_INC_STATS(sock_net(sk), ICMP_MIB_OUTERRORS);
+ 		ip_flush_pending_frames(sk);
+diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
+index 4ab877cf6d35..80735bb34a73 100644
+--- a/net/ipv4/ip_output.c
++++ b/net/ipv4/ip_output.c
+@@ -974,6 +974,11 @@ static int __ip_append_data(struct sock *sk,
+ 	bool paged, extra_uref =3D false;
+ 	u32 tskey =3D 0;
+ =
+
++	if (skb_queue_empty(&sk->sk_write_queue))
++		length +=3D transhdrlen;
++	else
++		transhdrlen =3D 0;
++
+ 	skb =3D skb_peek_tail(queue);
+ =
+
+ 	exthdrlen =3D !skb ? rt->dst.header_len : 0;
+@@ -1353,8 +1358,6 @@ int ip_append_data(struct sock *sk, struct flowi4 *f=
+l4,
+ 		err =3D ip_setup_cork(sk, &inet->cork.base, ipc, rtp);
+ 		if (err)
+ 			return err;
+-	} else {
+-		transhdrlen =3D 0;
+ 	}
+ =
+
+ 	return __ip_append_data(sk, fl4, &sk->sk_write_queue, &inet->cork.base,
+diff --git a/net/ipv4/ping.c b/net/ipv4/ping.c
+index 75e0aee35eb7..237f25a015f7 100644
+--- a/net/ipv4/ping.c
++++ b/net/ipv4/ping.c
+@@ -819,7 +819,8 @@ static int ping_v4_sendmsg(struct sock *sk, struct msg=
+hdr *msg, size_t len)
+ 	pfh.wcheck =3D 0;
+ 	pfh.family =3D AF_INET;
+ =
+
+-	err =3D ip_append_data(sk, &fl4, ping_getfrag, &pfh, len,
++	err =3D ip_append_data(sk, &fl4, ping_getfrag, &pfh,
++			     len - sizeof(struct icmphdr),
+ 			     sizeof(struct icmphdr), &ipc, &rt,
+ 			     msg->msg_flags);
+ 	if (err)
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index f39b9c844580..b16da49a8478 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -1042,7 +1042,6 @@ int udp_sendmsg(struct sock *sk, struct msghdr *msg,=
+ size_t len)
+ 	DECLARE_SOCKADDR(struct sockaddr_in *, usin, msg->msg_name);
+ 	struct flowi4 fl4_stack;
+ 	struct flowi4 *fl4;
+-	int ulen =3D len;
+ 	struct ipcm_cookie ipc;
+ 	struct rtable *rt =3D NULL;
+ 	int free =3D 0;
+@@ -1084,7 +1083,6 @@ int udp_sendmsg(struct sock *sk, struct msghdr *msg,=
+ size_t len)
+ 		}
+ 		release_sock(sk);
+ 	}
+-	ulen +=3D sizeof(struct udphdr);
+ =
+
+ 	/*
+ 	 *	Get and verify the address.
+@@ -1238,7 +1236,7 @@ int udp_sendmsg(struct sock *sk, struct msghdr *msg,=
+ size_t len)
+ 	if (!corkreq) {
+ 		struct inet_cork cork;
+ =
+
+-		skb =3D ip_make_skb(sk, fl4, getfrag, msg, ulen,
++		skb =3D ip_make_skb(sk, fl4, getfrag, msg, len,
+ 				  sizeof(struct udphdr), &ipc, &rt,
+ 				  &cork, msg->msg_flags);
+ 		err =3D PTR_ERR(skb);
+@@ -1268,8 +1266,8 @@ int udp_sendmsg(struct sock *sk, struct msghdr *msg,=
+ size_t len)
+ 	up->pending =3D AF_INET;
+ =
+
+ do_append_data:
+-	up->len +=3D ulen;
+-	err =3D ip_append_data(sk, fl4, getfrag, msg, ulen,
++	up->len +=3D sizeof(struct udphdr) + len;
++	err =3D ip_append_data(sk, fl4, getfrag, msg, len,
+ 			     sizeof(struct udphdr), &ipc, &rt,
+ 			     corkreq ? msg->msg_flags|MSG_MORE : msg->msg_flags);
+ 	if (err)
+diff --git a/net/ipv6/icmp.c b/net/ipv6/icmp.c
+index 93a594a901d1..55ae1966fa75 100644
+--- a/net/ipv6/icmp.c
++++ b/net/ipv6/icmp.c
+@@ -614,8 +614,7 @@ void icmp6_send(struct sk_buff *skb, u8 type, u8 code,=
+ __u32 info,
+ 	idev =3D __in6_dev_get(skb->dev);
+ =
+
+ 	if (ip6_append_data(sk, icmpv6_getfrag, &msg,
+-			    len + sizeof(struct icmp6hdr),
+-			    sizeof(struct icmp6hdr),
++			    len, sizeof(struct icmp6hdr),
+ 			    &ipc6, &fl6, (struct rt6_info *)dst,
+ 			    MSG_DONTWAIT)) {
+ 		ICMP6_INC_STATS(net, idev, ICMP6_MIB_OUTERRORS);
+@@ -801,8 +800,7 @@ static enum skb_drop_reason icmpv6_echo_reply(struct s=
+k_buff *skb)
+ 			goto out_dst_release;
+ =
+
+ 	if (ip6_append_data(sk, icmpv6_getfrag, &msg,
+-			    skb->len + sizeof(struct icmp6hdr),
+-			    sizeof(struct icmp6hdr), &ipc6, &fl6,
++			    skb->len, sizeof(struct icmp6hdr), &ipc6, &fl6,
+ 			    (struct rt6_info *)dst, MSG_DONTWAIT)) {
+ 		__ICMP6_INC_STATS(net, idev, ICMP6_MIB_OUTERRORS);
+ 		ip6_flush_pending_frames(sk);
+diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+index 54fc4c711f2c..21bae77489c9 100644
+--- a/net/ipv6/ip6_output.c
++++ b/net/ipv6/ip6_output.c
+@@ -1490,6 +1490,11 @@ static int __ip6_append_data(struct sock *sk,
+ 	unsigned int wmem_alloc_delta =3D 0;
+ 	bool paged, extra_uref =3D false;
+ =
+
++	if (skb_queue_empty(&sk->sk_write_queue))
++		length +=3D transhdrlen;
++	else
++		transhdrlen =3D 0;
++
+ 	skb =3D skb_peek_tail(queue);
+ 	if (!skb) {
+ 		exthdrlen =3D opt ? opt->opt_flen : 0;
+@@ -1868,7 +1873,6 @@ int ip6_append_data(struct sock *sk,
  {
-+	mlxsw_sp_acl_rulei_keymask_u32(rulei, MLXSW_AFK_ELEMENT_VIRT_ROUTER,
-+				       key->vrid, GENMASK(11, 0));
- 	mlxsw_sp_acl_rulei_keymask_buf(rulei, MLXSW_AFK_ELEMENT_SRC_IP_0_31,
- 				       (char *) &key->source.addr4,
- 				       (char *) &key->source_mask.addr4, 4);
-@@ -152,6 +156,13 @@ static void
- mlxsw_sp2_mr_tcam_rule_parse6(struct mlxsw_sp_acl_rule_info *rulei,
- 			      struct mlxsw_sp_mr_route_key *key)
- {
-+	mlxsw_sp_acl_rulei_keymask_u32(rulei, MLXSW_AFK_ELEMENT_VIRT_ROUTER_0_3,
-+				       key->vrid, GENMASK(3, 0));
-+	mlxsw_sp_acl_rulei_keymask_u32(rulei, MLXSW_AFK_ELEMENT_VIRT_ROUTER_4_7,
-+				       key->vrid >> 4, GENMASK(3, 0));
-+	mlxsw_sp_acl_rulei_keymask_u32(rulei,
-+				       MLXSW_AFK_ELEMENT_VIRT_ROUTER_MSB,
-+				       key->vrid >> 8, GENMASK(3, 0));
- 	mlxsw_sp_acl_rulei_keymask_buf(rulei, MLXSW_AFK_ELEMENT_SRC_IP_96_127,
- 				       &key->source.addr6.s6_addr[0x0],
- 				       &key->source_mask.addr6.s6_addr[0x0], 4);
-@@ -187,8 +198,6 @@ mlxsw_sp2_mr_tcam_rule_parse(struct mlxsw_sp_acl_rule *rule,
- 
- 	rulei = mlxsw_sp_acl_rule_rulei(rule);
- 	rulei->priority = priority;
--	mlxsw_sp_acl_rulei_keymask_u32(rulei, MLXSW_AFK_ELEMENT_VIRT_ROUTER,
--				       key->vrid, GENMASK(11, 0));
- 	switch (key->proto) {
- 	case MLXSW_SP_L3_PROTO_IPV4:
- 		return mlxsw_sp2_mr_tcam_rule_parse4(rulei, key);
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_flex_keys.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_flex_keys.c
-index 7d66c4f2deea..4b3564f5fd65 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_flex_keys.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_flex_keys.c
-@@ -176,14 +176,17 @@ static struct mlxsw_afk_element_inst mlxsw_sp_afk_element_info_ipv4_5[] = {
- };
- 
- static struct mlxsw_afk_element_inst mlxsw_sp_afk_element_info_ipv6_0[] = {
-+	MLXSW_AFK_ELEMENT_INST_U32(VIRT_ROUTER_0_3, 0x00, 0, 4),
- 	MLXSW_AFK_ELEMENT_INST_BUF(DST_IP_32_63, 0x04, 4),
- };
- 
- static struct mlxsw_afk_element_inst mlxsw_sp_afk_element_info_ipv6_1[] = {
-+	MLXSW_AFK_ELEMENT_INST_U32(VIRT_ROUTER_4_7, 0x00, 0, 4),
- 	MLXSW_AFK_ELEMENT_INST_BUF(DST_IP_64_95, 0x04, 4),
- };
- 
- static struct mlxsw_afk_element_inst mlxsw_sp_afk_element_info_ipv6_2[] = {
-+	MLXSW_AFK_ELEMENT_INST_EXT_U32(VIRT_ROUTER_MSB, 0x00, 0, 3, 0, true),
- 	MLXSW_AFK_ELEMENT_INST_BUF(DST_IP_96_127, 0x04, 4),
- };
- 
-@@ -326,6 +329,7 @@ static struct mlxsw_afk_element_inst mlxsw_sp_afk_element_info_ipv4_5b[] = {
- };
- 
- static struct mlxsw_afk_element_inst mlxsw_sp_afk_element_info_ipv6_2b[] = {
-+	MLXSW_AFK_ELEMENT_INST_U32(VIRT_ROUTER_MSB, 0x00, 0, 4),
- 	MLXSW_AFK_ELEMENT_INST_BUF(DST_IP_96_127, 0x04, 4),
- };
- 
--- 
-2.41.0
+ 	struct inet_sock *inet =3D inet_sk(sk);
+ 	struct ipv6_pinfo *np =3D inet6_sk(sk);
+-	int exthdrlen;
+ 	int err;
+ =
+
+ 	if (flags&MSG_PROBE)
+@@ -1884,13 +1888,11 @@ int ip6_append_data(struct sock *sk,
+ 			return err;
+ =
+
+ 		inet->cork.fl.u.ip6 =3D *fl6;
+-		exthdrlen =3D (ipc6->opt ? ipc6->opt->opt_flen : 0);
+-		length +=3D exthdrlen;
+-		transhdrlen +=3D exthdrlen;
+-	} else {
+-		transhdrlen =3D 0;
+ 	}
+ =
+
++	/* Add space for extensions */
++	transhdrlen +=3D (ipc6->opt ? ipc6->opt->opt_flen : 0);
++
+ 	return __ip6_append_data(sk, &sk->sk_write_queue, &inet->cork,
+ 				 &np->cork, sk_page_frag(sk), getfrag,
+ 				 from, length, transhdrlen, flags, ipc6);
+@@ -2095,7 +2097,7 @@ struct sk_buff *ip6_make_skb(struct sock *sk,
+ =
+
+ 	err =3D __ip6_append_data(sk, &queue, cork, &v6_cork,
+ 				&current->task_frag, getfrag, from,
+-				length + exthdrlen, transhdrlen + exthdrlen,
++				length, transhdrlen + exthdrlen,
+ 				flags, ipc6);
+ 	if (err) {
+ 		__ip6_flush_pending_frames(sk, &queue, cork, &v6_cork);
+diff --git a/net/ipv6/ping.c b/net/ipv6/ping.c
+index 5831aaa53d75..fa2701241724 100644
+--- a/net/ipv6/ping.c
++++ b/net/ipv6/ping.c
+@@ -174,7 +174,8 @@ static int ping_v6_sendmsg(struct sock *sk, struct msg=
+hdr *msg, size_t len)
+ 		ipc6.hlimit =3D ip6_sk_dst_hoplimit(np, &fl6, dst);
+ =
+
+ 	lock_sock(sk);
+-	err =3D ip6_append_data(sk, ping_getfrag, &pfh, len,
++	err =3D ip6_append_data(sk, ping_getfrag, &pfh,
++			      len - sizeof(struct icmp6hdr),
+ 			      sizeof(struct icmp6hdr), &ipc6, &fl6, rt,
+ 			      MSG_DONTWAIT);
+ =
+
+diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+index 86b5d509a468..9dd71f542c9f 100644
+--- a/net/ipv6/udp.c
++++ b/net/ipv6/udp.c
+@@ -1331,7 +1331,6 @@ int udpv6_sendmsg(struct sock *sk, struct msghdr *ms=
+g, size_t len)
+ 	struct ipcm6_cookie ipc6;
+ 	int addr_len =3D msg->msg_namelen;
+ 	bool connected =3D false;
+-	int ulen =3D len;
+ 	int corkreq =3D READ_ONCE(up->corkflag) || msg->msg_flags&MSG_MORE;
+ 	int err;
+ 	int is_udplite =3D IS_UDPLITE(sk);
+@@ -1416,7 +1415,6 @@ int udpv6_sendmsg(struct sock *sk, struct msghdr *ms=
+g, size_t len)
+ 		}
+ 		release_sock(sk);
+ 	}
+-	ulen +=3D sizeof(struct udphdr);
+ =
+
+ 	memset(fl6, 0, sizeof(*fl6));
+ =
+
+@@ -1567,7 +1565,7 @@ int udpv6_sendmsg(struct sock *sk, struct msghdr *ms=
+g, size_t len)
+ 	if (!corkreq) {
+ 		struct sk_buff *skb;
+ =
+
+-		skb =3D ip6_make_skb(sk, getfrag, msg, ulen,
++		skb =3D ip6_make_skb(sk, getfrag, msg, len,
+ 				   sizeof(struct udphdr), &ipc6,
+ 				   (struct rt6_info *)dst,
+ 				   msg->msg_flags, &cork);
+@@ -1594,8 +1592,8 @@ int udpv6_sendmsg(struct sock *sk, struct msghdr *ms=
+g, size_t len)
+ do_append_data:
+ 	if (ipc6.dontfrag < 0)
+ 		ipc6.dontfrag =3D np->dontfrag;
+-	up->len +=3D ulen;
+-	err =3D ip6_append_data(sk, getfrag, msg, ulen, sizeof(struct udphdr),
++	up->len +=3D sizeof(struct udphdr) + len;
++	err =3D ip6_append_data(sk, getfrag, msg, len, sizeof(struct udphdr),
+ 			      &ipc6, fl6, (struct rt6_info *)dst,
+ 			      corkreq ? msg->msg_flags|MSG_MORE : msg->msg_flags);
+ 	if (err)
+diff --git a/net/l2tp/l2tp_ip6.c b/net/l2tp/l2tp_ip6.c
+index ed8ebb6f5909..d5d1c3b68200 100644
+--- a/net/l2tp/l2tp_ip6.c
++++ b/net/l2tp/l2tp_ip6.c
+@@ -499,7 +499,6 @@ static int l2tp_ip6_sendmsg(struct sock *sk, struct ms=
+ghdr *msg, size_t len)
+ 	struct ipcm6_cookie ipc6;
+ 	int addr_len =3D msg->msg_namelen;
+ 	int transhdrlen =3D 4; /* zero session-id */
+-	int ulen;
+ 	int err;
+ =
+
+ 	/* Rough check on arithmetic overflow,
+@@ -507,7 +506,6 @@ static int l2tp_ip6_sendmsg(struct sock *sk, struct ms=
+ghdr *msg, size_t len)
+ 	 */
+ 	if (len > INT_MAX - transhdrlen)
+ 		return -EMSGSIZE;
+-	ulen =3D len + transhdrlen;
+ =
+
+ 	/* Mirror BSD error message compatibility */
+ 	if (msg->msg_flags & MSG_OOB)
+@@ -629,7 +627,7 @@ static int l2tp_ip6_sendmsg(struct sock *sk, struct ms=
+ghdr *msg, size_t len)
+ back_from_confirm:
+ 	lock_sock(sk);
+ 	err =3D ip6_append_data(sk, ip_generic_getfrag, msg,
+-			      ulen, transhdrlen, &ipc6,
++			      len, transhdrlen, &ipc6,
+ 			      &fl6, (struct rt6_info *)dst,
+ 			      msg->msg_flags);
+ 	if (err)
 
 
