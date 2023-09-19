@@ -1,200 +1,122 @@
-Return-Path: <netdev+bounces-34996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B19D97A6644
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 16:15:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B27E57A664C
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 16:15:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B54091C20961
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 14:15:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E027E1C20964
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 14:15:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40DC93FB38;
-	Tue, 19 Sep 2023 14:15:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DCC33715E;
+	Tue, 19 Sep 2023 14:15:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9179A1863A
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 14:14:57 +0000 (UTC)
-Received: from mail-oa1-x2b.google.com (mail-oa1-x2b.google.com [IPv6:2001:4860:4864:20::2b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDD83CC3
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 07:14:09 -0700 (PDT)
-Received: by mail-oa1-x2b.google.com with SMTP id 586e51a60fabf-1cca0a1b3c7so3660323fac.2
-        for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 07:14:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695132849; x=1695737649; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jTJqvPxX6FaZZaFRNiPga+TAVPvYlxI3dTYbfsQ5sKo=;
-        b=jN0lG3gbDl9jf+hWdP68y6br8IGs/+8SvSVkKkv1fbEK0Cq6FZFkxZ8pKmk+0CPklt
-         4o/4JKSxSmVEpG/+Cw5lD2HW8hfLzGu9n+DIdfdIew5cKdMCYVRdk4btzO9qibk2tZWU
-         I8epCgZrNuB7Kl7AEbaIyNMvmImXIXiIZNd89J6oQ+1hZFwxSL32YyhYbrvwqe/zMS+W
-         DC4zzxygwx3kapRV4RGYGhxt9cU+s/6st9VPNgF3J4SfIRUL0jGovtgOdj3IG0DbqbzN
-         Mp+QaXjhXM48HJq2V/EzHsxPKtC53GErkqlF9UFSIYzVay/Z/DEsaj8xJN4I+dFYOBOi
-         vkyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695132849; x=1695737649;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=jTJqvPxX6FaZZaFRNiPga+TAVPvYlxI3dTYbfsQ5sKo=;
-        b=ervDC0uCbcU91hpNev2Ly3UWCa3ewUscghGI0GxdMtaWtpsMG0jY+XY71A4ATUF1Vf
-         jx+hxZyamrmqaO1LKyjNlHNq4opFKIaNcUFIL3bMxvQFwCvaHpLYTknZXU+nVKnm3LZj
-         CG8dZcjzRd2o8jecxks84uLCHfuZktgw2EiWlIZ4YN7cXAkSEhrYFvakelrYI1utYKRG
-         a/y5iJoEEreTL5sgWOl97FkG6se0tDNjtbklalugr3w19DNtRqOGq5mBKW2uNezlbkvx
-         Voxt/S+/zzv9qqBAdp/QNW44TDDQU3AvciKmAUQhEP/KeEvjtNc17esc3fM5oLLVhxOx
-         SYfA==
-X-Gm-Message-State: AOJu0Yyngk5KyLZ+lRbho5AotfbIABoC0Uq85ElqLCkFlOA/mTYNEf+X
-	+7rbCRCY+tEWUyI6d9mx+pk=
-X-Google-Smtp-Source: AGHT+IHeWsoFSDZu2MWA9XayhVx0SaIWudSoKcQF3d7YF9LtoCqZ5iyUMLpLRfdTKxp/KN66idGCHw==
-X-Received: by 2002:a05:6870:4153:b0:1d5:a6ac:ac92 with SMTP id r19-20020a056870415300b001d5a6acac92mr14839577oad.38.1695132848752;
-        Tue, 19 Sep 2023 07:14:08 -0700 (PDT)
-Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
-        by smtp.gmail.com with ESMTPSA id e5-20020ac80645000000b0041520676966sm3806910qth.47.2023.09.19.07.14.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Sep 2023 07:14:08 -0700 (PDT)
-Date: Tue, 19 Sep 2023 10:14:08 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jordan Rife <jrife@google.com>, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- willemdebruijn.kernel@gmail.com, 
- netdev@vger.kernel.org
-Cc: dborkman@kernel.org, 
- Jordan Rife <jrife@google.com>
-Message-ID: <6509acb026cd0_1dda19294c@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20230919004636.147954-1-jrife@google.com>
-References: <20230919004636.147954-1-jrife@google.com>
-Subject: Re: [PATCH net v3 2/3] net: prevent rewrite of msg_name in
- sock_sendmsg()
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00F0637178
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 14:15:49 +0000 (UTC)
+Received: from mail-4022.proton.ch (mail-4022.proton.ch [185.70.40.22])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B5F71AA
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 07:14:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=n8pjl.ca;
+	s=protonmail2; t=1695132885; x=1695392085;
+	bh=vPL1MT90V5hwUBxn6nmVibwGx/TKACB+/zyKiiwt3hI=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=XJ2jy0fcgXvClcpNh0sWmuLY7c/jCyOSrEd+qn8XFgCuPNn11yNaPM2decmB3xa0d
+	 5OR7iplV6v3+OD+g+O/LzjHd7eiiVBnXmzd/5moakHjLDtMoW6nrIJa912pnijJrKu
+	 x+29Ica/T3imO2zFcLoIJiTpiKy15C3y47L6H4DXoyMA9RFbSTB8KZi/30QQO7A+pw
+	 qy5mUQzQDg7XVTsnTueJacUzSWAet8+hZzY/Z07D2+SywsYtshj9L2qd3sHRuEIHqt
+	 IC1ETP4q6infWPpf1Asctv0MN1sPuErJm0rPLbUfInB/ychBzlvdYrgpnKa7N5z9LX
+	 ZGrX/MEwFVBAw==
+Date: Tue, 19 Sep 2023 14:14:23 +0000
+To: linux-hams@vger.kernel.org
+From: Peter Lafreniere <peter@n8pjl.ca>
+Cc: Peter Lafreniere <peter@n8pjl.ca>, netdev@vger.kernel.org
+Subject: [PATCH] hamradio: baycom: remove useless link in Kconfig
+Message-ID: <20230919141417.39702-1-peter@n8pjl.ca>
+Feedback-ID: 53133685:user:proton
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Jordan Rife wrote:
-> Callers of sock_sendmsg(), and similarly kernel_sendmsg(), in kernel
-> space may observe their value of msg_name change in cases where BPF
-> sendmsg hooks rewrite the send address. This has been confirmed to break
-> NFS mounts running in UDP mode and has the potential to break other
-> systems.
-> 
-> This patch:
-> 
-> 1) Creates a new function called __sock_sendmsg() with same logic as the
->    old sock_sendmsg() function.
-> 2) Replaces calls to sock_sendmsg() made by __sys_sendto() and
->    __sys_sendmsg() with __sock_sendmsg() to avoid an unnecessary copy,
->    as these system calls are already protected.
-> 3) Modifies sock_sendmsg() so that it makes a copy of msg_name if
->    present before passing it down the stack to insulate callers from
->    changes to the send address.
-> 
-> Link: https://lore.kernel.org/netdev/20230912013332.2048422-1-jrife@google.com/
-> Fixes: 1cedee13d25a ("bpf: Hooks for sys_sendmsg")
-> Signed-off-by: Jordan Rife <jrife@google.com>
-> ---
-> v2->v3: Add "Fixes" tag.
-> v1->v2: Split up original patch into patch series. Perform address copy
-> 	in sock_sendmsg() instead of sock->ops->sendmsg().
-> 
->  net/socket.c | 32 ++++++++++++++++++++++++++------
->  1 file changed, 26 insertions(+), 6 deletions(-)
-> 
-> diff --git a/net/socket.c b/net/socket.c
-> index eb7f14143caed..2d34a69b84406 100644
-> --- a/net/socket.c
-> +++ b/net/socket.c
-> @@ -737,6 +737,14 @@ static inline int sock_sendmsg_nosec(struct socket *sock, struct msghdr *msg)
->  	return ret;
->  }
->  
-> +static int __sock_sendmsg(struct socket *sock, struct msghdr *msg)
-> +{
-> +	int err = security_socket_sendmsg(sock, msg,
-> +					  msg_data_left(msg));
-> +
-> +	return err ?: sock_sendmsg_nosec(sock, msg);
-> +}
-> +
->  /**
->   *	sock_sendmsg - send a message through @sock
->   *	@sock: socket
-> @@ -747,10 +755,22 @@ static inline int sock_sendmsg_nosec(struct socket *sock, struct msghdr *msg)
->   */
->  int sock_sendmsg(struct socket *sock, struct msghdr *msg)
->  {
-> -	int err = security_socket_sendmsg(sock, msg,
-> -					  msg_data_left(msg));
-> +	struct sockaddr_storage address;
-> +	struct sockaddr_storage *save_addr = (struct sockaddr_storage *)msg->msg_name;
+The Kconfig help text for baycom drivers suggests that more information
+on the hardware can be found at <https://www.baycom.de>. The website now
+includes no information on their ham radio products other than a mention
+that they were once produced by the company, saying:
+"The amateur radio equipment is now no longer part and business of BayCom G=
+mbH"
 
-Since there's feedback on patch 3/3: please maintain reverse xmas tree:
-reorder these two declarations from longest to shortest.
-> +	int ret;
->  
-> -	return err ?: sock_sendmsg_nosec(sock, msg);
-> +	if (msg->msg_name) {
-> +		if (msg->msg_namelen < 0 || msg->msg_namelen > sizeof(address))
-> +			return -EINVAL;
-> +
-> +		memcpy(&address, msg->msg_name, msg->msg_namelen);
-> +		msg->msg_name = &address;
-> +	}
-> +
-> +	ret = __sock_sendmsg(sock, msg);
-> +	msg->msg_name = save_addr;
-> +
-> +	return ret;
->  }
->  EXPORT_SYMBOL(sock_sendmsg);
->  
-> @@ -1138,7 +1158,7 @@ static ssize_t sock_write_iter(struct kiocb *iocb, struct iov_iter *from)
->  	if (sock->type == SOCK_SEQPACKET)
->  		msg.msg_flags |= MSG_EOR;
->  
-> -	res = sock_sendmsg(sock, &msg);
-> +	res = __sock_sendmsg(sock, &msg);
->  	*from = msg.msg_iter;
->  	return res;
->  }
-> @@ -2174,7 +2194,7 @@ int __sys_sendto(int fd, void __user *buff, size_t len, unsigned int flags,
->  	if (sock->file->f_flags & O_NONBLOCK)
->  		flags |= MSG_DONTWAIT;
->  	msg.msg_flags = flags;
-> -	err = sock_sendmsg(sock, &msg);
-> +	err = __sock_sendmsg(sock, &msg);
->  
->  out_put:
->  	fput_light(sock->file, fput_needed);
-> @@ -2538,7 +2558,7 @@ static int ____sys_sendmsg(struct socket *sock, struct msghdr *msg_sys,
->  		err = sock_sendmsg_nosec(sock, msg_sys);
->  		goto out_freectl;
->  	}
-> -	err = sock_sendmsg(sock, msg_sys);
-> +	err = __sock_sendmsg(sock, msg_sys);
->  	/*
->  	 * If this is sendmmsg() and sending to current destination address was
->  	 * successful, remember it.
-> -- 
-> 2.42.0.459.ge4e396fd5e-goog
-> 
+As there is no information relavent to the baycom driver on the site,
+remove the link.
+
+Signed-off-by: Peter Lafreniere <peter@n8pjl.ca>
+---
+ drivers/net/hamradio/Kconfig | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/net/hamradio/Kconfig b/drivers/net/hamradio/Kconfig
+index a94c7bd5db2e..25b1f929c422 100644
+--- a/drivers/net/hamradio/Kconfig
++++ b/drivers/net/hamradio/Kconfig
+@@ -94,8 +94,8 @@ config BAYCOM_SER_FDX
+ =09  driver, "BAYCOM ser12 half-duplex driver for AX.25" is the old
+ =09  driver and still provided in case this driver does not work with
+ =09  your serial interface chip. To configure the driver, use the sethdlc
+-=09  utility available in the standard ax25 utilities package. For
+-=09  information on the modems, see <http://www.baycom.de/> and
++=09  utility available in the standard ax25 utilities package.
++=09  For more information on the modems, see
+ =09  <file:Documentation/networking/device_drivers/hamradio/baycom.rst>.
+=20
+ =09  To compile this driver as a module, choose M here: the module
+@@ -112,8 +112,7 @@ config BAYCOM_SER_HDX
+ =09  still provided in case your serial interface chip does not work with
+ =09  the full-duplex driver. This driver is deprecated.  To configure
+ =09  the driver, use the sethdlc utility available in the standard ax25
+-=09  utilities package. For information on the modems, see
+-=09  <http://www.baycom.de/> and
++=09  utilities package. For more information on the modems, see
+ =09  <file:Documentation/networking/device_drivers/hamradio/baycom.rst>.
+=20
+ =09  To compile this driver as a module, choose M here: the module
+@@ -127,8 +126,8 @@ config BAYCOM_PAR
+ =09  This is a driver for Baycom style simple amateur radio modems that
+ =09  connect to a parallel interface. The driver supports the picpar and
+ =09  par96 designs. To configure the driver, use the sethdlc utility
+-=09  available in the standard ax25 utilities package. For information on
+-=09  the modems, see <http://www.baycom.de/> and the file
++=09  available in the standard ax25 utilities package.
++=09  For more information on the modems, see
+ =09  <file:Documentation/networking/device_drivers/hamradio/baycom.rst>.
+=20
+ =09  To compile this driver as a module, choose M here: the module
+@@ -142,8 +141,8 @@ config BAYCOM_EPP
+ =09  This is a driver for Baycom style simple amateur radio modems that
+ =09  connect to a parallel interface. The driver supports the EPP
+ =09  designs. To configure the driver, use the sethdlc utility available
+-=09  in the standard ax25 utilities package. For information on the
+-=09  modems, see <http://www.baycom.de/> and the file
++=09  in the standard ax25 utilities package.
++=09  For more information on the modems, see
+ =09  <file:Documentation/networking/device_drivers/hamradio/baycom.rst>.
+=20
+ =09  To compile this driver as a module, choose M here: the module
+--=20
+2.42.0
 
 
 
