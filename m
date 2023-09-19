@@ -1,164 +1,269 @@
-Return-Path: <netdev+bounces-34894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CA717A5BE1
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 10:04:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 227927A5C01
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 10:10:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A09F1C20B7F
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 08:04:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC189280FBC
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 08:10:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A31DF38DC6;
-	Tue, 19 Sep 2023 08:04:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80E0138DF2;
+	Tue, 19 Sep 2023 08:10:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1521FA9
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 08:04:23 +0000 (UTC)
-Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2122.outbound.protection.outlook.com [40.107.104.122])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEF6012A
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 01:04:21 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Cd5ZL0yDP5cpRdU65Buy9hA6JunJ0x13rnUDBGIz/x3MNQX1aB+t3SsZ4dj76UOm7NiHaM5Pswt8Dyy6SZalIY+PE0de6vlN9SPvaLQQOGYGM1J4V+Vvw7Cl8NTdcnmLe2ek/NUIlbIxk/wX52WlGCDljrTKdDeH5KayYCKNnmvZkMtRx0NXyGKrJbgOm+pXu5c7Nf/dLNfE1f4JlQaVldQgfRJA3Go0fuhL6sXQEyJ1B3uyQ1YydwRj57EQWXQHtkPKOrVYDWjV5fY8dUs1/usOsXtB5YK390f+CSWjIAyfBodrUOP4vuY6AYo4SZduTHtEfYMksrCQQYN5VwDngQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WcFbqCUl92daJebUnQlTPlE1l5tLyyX9c8me4XB3HYw=;
- b=fR6IvYaJO+pWiL7cqouhdytwbsmQQEFAfoRz5BJEw/YjnMcCz7wr6dKAT96vpnqdSjAZQkacofQZ0jwzS3FS5ZlS1hVtgBJWQnSmfjsqyM8j35buN5wlODAxNJbSRx6wPpb3oxcc5h7wrIuZnL7giKwRdKorVcZiF7luj69bzCGB2P5HY/Lj7CdukKcbetiwgir6vPlBnQDPhQqY+Esli15j2W78hZz3iycaDohfZBbk2idA8JRPFGtfLXMdOEyuK0uH2LLS6ju7doYdlWlLvwon/wi23ThPoF6Q6VupLtWcrVMqJ1hcgplUROEqn0HpRk4TSdd2oZ3faX6ECNzfyA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=bang-olufsen.dk; dmarc=pass action=none
- header.from=bang-olufsen.dk; dkim=pass header.d=bang-olufsen.dk; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bang-olufsen.dk;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WcFbqCUl92daJebUnQlTPlE1l5tLyyX9c8me4XB3HYw=;
- b=a8H0BF5xrKI7L56zElT29ZvgwyQJTgYu6TiZ/W3ugRn0kZmP74Zls0goD96HzADUENcgbGYc5GTs3tXBwMxtpjPaNSjeu7/jGaVi0x/Pa0NlPURJWAAL+1tau2+ltg/oCWvMKyuMXefN52WHBZiSpC/PNwb+q6nO9Q9PX9CVLNA=
-Received: from AM6PR03MB3943.eurprd03.prod.outlook.com (2603:10a6:20b:26::24)
- by DB8PR03MB6250.eurprd03.prod.outlook.com (2603:10a6:10:136::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.27; Tue, 19 Sep
- 2023 08:04:19 +0000
-Received: from AM6PR03MB3943.eurprd03.prod.outlook.com
- ([fe80::620a:c21c:f077:8069]) by AM6PR03MB3943.eurprd03.prod.outlook.com
- ([fe80::620a:c21c:f077:8069%5]) with mapi id 15.20.6792.026; Tue, 19 Sep 2023
- 08:04:19 +0000
-From: =?utf-8?B?QWx2aW4gxaBpcHJhZ2E=?= <ALSI@bang-olufsen.dk>
-To: =?utf-8?B?VXdlIEtsZWluZS1Lw7ZuaWc=?= <u.kleine-koenig@pengutronix.de>
-CC: Linus Walleij <linus.walleij@linaro.org>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "kernel@pengutronix.de"
-	<kernel@pengutronix.de>
-Subject: Re: [PATCH net-next 7/9] net: dsa: realtek: Convert to platform
- remove callback returning void
-Thread-Topic: [PATCH net-next 7/9] net: dsa: realtek: Convert to platform
- remove callback returning void
-Thread-Index: AQHZ6mULkE+jwU1pM0GYpJj+6Apmw7AhyvuA
-Date: Tue, 19 Sep 2023 08:04:18 +0000
-Message-ID: <qnaqcauq3n6364hhet2dwrenb6s2jstwjxv7hlv5u6muvn3vf4@pu4pa5g4vrmw>
-References: <20230918191916.1299418-1-u.kleine-koenig@pengutronix.de>
- <20230918191916.1299418-8-u.kleine-koenig@pengutronix.de>
-In-Reply-To: <20230918191916.1299418-8-u.kleine-koenig@pengutronix.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=bang-olufsen.dk;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM6PR03MB3943:EE_|DB8PR03MB6250:EE_
-x-ms-office365-filtering-correlation-id: 8bb43aff-f10e-4071-281f-08dbb8e706a3
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- rZV5urY358R3Br0qwB0WKMPe5le3WbikwhP9ew6XSTzW1gock7MiDz9D7gYTZk6dSw26hWw6tvG7NvD/oLvy1HRmNx9ITsOfcjf8FGLjOa5asUdXDowkYTs888Ryg1NCGxecACWMmDGEivZ5PPVBwW8q/TYKkQOpJmSES1owUAVwJqxuaa2U+N0VGyj1jZ/oFhK7wX74x8iTGbGQIJ3USjRoXks9jpwV0ROiirzXvrD/peYzCu4rRWgb3jBots2K4puorF3Os5dqcyEirsHFoikvZAGogK339VyZFGDjaKq0BdEhrlyCzumUGR4h8hsZ1yzrbBiOqnuhuULJmGg4af0OB1H/vbTqayG3vcjEllXzUAYfqE32m+1qfJbu4/A02XoeHmbMHO0J9uI3atiCa/MofM522EF2/KubV+yu3KCfPK7bYW31rHGR57ZTW5p3emrl8rJStwsHdp6w7lruzabYQmXc8+LIvgAFgZkEj6PY5+FzP8KieMXGIBm5vp7zSQImy6EaLRNzCA+FlGYsdiZ+urlWuNrWpguscx3cuhajIccVGA5ZZO391xckPaVHlDCHyts3UX1P7UwmRjP8rbmGGk0UtiwaAEFCFTtbPQF6dRJppylubLBcn3B9bfaJ
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM6PR03MB3943.eurprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(396003)(39850400004)(366004)(136003)(376002)(346002)(451199024)(1800799009)(186009)(2906002)(7416002)(5660300002)(26005)(66946007)(41300700001)(66556008)(64756008)(66446008)(316002)(6916009)(66476007)(54906003)(76116006)(91956017)(4744005)(478600001)(8936002)(4326008)(8676002)(71200400001)(6506007)(6486002)(6512007)(9686003)(85182001)(85202003)(122000001)(66574015)(33716001)(38100700002)(38070700005)(86362001)(83380400001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?Q25yNnhVRGZKMzhvRThRL2VKN0xFeWZLSDdQSUhuMktaTnd2cjg5NzV1WjBZ?=
- =?utf-8?B?Q3RtWnNFSTJqV01meXBmZndtVzR1TGErbW1FeHhzK2xQWDhmcGxzSDBvQXZO?=
- =?utf-8?B?a1h1OS9SNTJrZGdBRHloRzlTNGJ4VmQwZHY2RlBha2phNmpCQXMxS1d5MllU?=
- =?utf-8?B?ZFlHYTdKaG1vakZrVXJPVFhiMitPQW9razJHUkJKamZVYXg2TWIwK3R4bmh6?=
- =?utf-8?B?dVZ4bXhQbytVdEttSERFVVd3dWRNdTVhcnRqaW13UCt5OHpDdlh1TGRXUldT?=
- =?utf-8?B?RUVTUG1CWm1xdEthTmtVem5EeXZNQVhLR3kzMW5hUmNmUmxpbWtUWkZvSVNX?=
- =?utf-8?B?TTdqWlJvUSs0b1lwSC9Cd2ZhK1lRdGNrRisxRGRyblowUjdNNXA1WFp3Rysv?=
- =?utf-8?B?ZWtPOVB0KzdhaWxmaFRLYUxjQTF1aFFyeGQyWWxQd2J6Y25vNWxzYitoSGxR?=
- =?utf-8?B?RmpkYXZTZXNPY2FGdThPNjFhVnljR0ltMmVoQnJmQlBEV0JzbFdLOWZTdXcy?=
- =?utf-8?B?a2Y4aFZsdEZMc21xUGJLZ00yTnhZOEROcnhWMnhPS3RlbDFlRWJQcG43Q3o0?=
- =?utf-8?B?N1ZxcjdIZUF2WStWSEVMNUdaT1BNK0F3K0NZQXdReWF0OU9nVGJkQmhMTHAx?=
- =?utf-8?B?bzdsQ3RJNFQyeEJBbmR5WmdWTFZ0VW1JK2lacm1FeU9rMDFud29UT25QYU9y?=
- =?utf-8?B?bXJwbEpxTUxWMm9yNXVkb1Y4UDJLNkx5ZkVZYXoxNHRrN2cyOGtVNkF6N2la?=
- =?utf-8?B?YnZKdkRBTmI5Skg1OUlyN05ZaFVOR3huREUrVHduUHBoMVZZT01pTUhYM2p4?=
- =?utf-8?B?RDNjV0N6dXA3bmhQb0tMd1NXRlFOQnUzVkRSRG9vb2xQYWFtMjdHU1A5dFNq?=
- =?utf-8?B?UG4zQWs2MmxtK3A5bEppYU54RHNhUG5BTEpWL3psTzdydXhIcjFRaXJMOC9k?=
- =?utf-8?B?UDU5V0drQjJRNGlGU295UTg1TyswQmpSd3hxaUlxaXhJWHV0clZnWWVpMWdY?=
- =?utf-8?B?Rno2ZzdzbUVlUXkwZ3FPNThNQUM3UzEzTmNGejZqajFTNkpPY0ZuNTdCZU10?=
- =?utf-8?B?a1RDMDB6TlRpVmZPMll6UHdlUU9wZkh6dHIwaDg4SFk5UTlkWVlUMi9POHVK?=
- =?utf-8?B?eVZ2YzBtTGN2dm5kK2E1b0JVRFIxeTZqRVJTd1QrV0xIZUFIQjViK1NBbEcz?=
- =?utf-8?B?Qko1dlpKZi9DU09YWjlmckJKbmxYRmQwT05iMXE3bjAwYVlDWWhhdFlQM0xn?=
- =?utf-8?B?ZWN1Wkh2aVlMUEN1b2crbVgrRythWWRJODN3K1h6Z3dBaHBWNm9tWEZqOEtF?=
- =?utf-8?B?MndtUGwydnU0MHZIaUtLSVlCRXo3U253dnJHTlB4clRPOVRPbGJvSHcxMkpi?=
- =?utf-8?B?YUdnVXZKa21WUTVlcXNSTU56Y0NrUGxVbGJRWDJTUmZVSlBHbFd2enVWdGM0?=
- =?utf-8?B?SDQ2a2lPOGwvMCtuQTJmdFcrQ09GYjBkY25rU1M1dXhOQnY3L1JYZlZNYUw1?=
- =?utf-8?B?N2k2cTJZRVFHUHo3NUJCV3RQa1ZjTG92cTJMTTIrTGtETkZDVHJHcEZpNDFu?=
- =?utf-8?B?UHlhL0puT3RoRUZ1dmdkTGR0Tk1RR1IraW1uUGF6MkxUN1dIaVlXSnh2NE9F?=
- =?utf-8?B?bVA4Y0VqemIxQVhBa09lOHRGcXEwRGlxaDBTRDJvdmRsT0xQSm9TVUtwTHNM?=
- =?utf-8?B?dmVSOHZGVW5EMk5ZUHhvR2pYNkU2UmZOR2NEalhHazR4bDhOUW4vdEtzNGkx?=
- =?utf-8?B?UG5NYWtZcTRQU09yMC9FM0U0WTBXT28wVFZ4V3JmeUtDaVJtYmZnbU8zTVpq?=
- =?utf-8?B?V2R6VHVzOW9yTDh5TC9XcmVtOWFGcS83dExhQ2Z0dHRoU29JK3ZJdzUxb2ty?=
- =?utf-8?B?MmlVU2x6UFI0M25VL2o5TVM5bXlMZG5tV21RV2Q1LzNqV1FxbEFqNjZzZUlm?=
- =?utf-8?B?d2gxR0FML1B3VmR0V093dkJkZXpISDZHTDZNdWRBT1pmOHA0aDNrY05maVdL?=
- =?utf-8?B?VHU5QTZOTDhtYjhwcE50K2tYalU2NzdkL2RFcUZ0LzRQeG9mdStudXRJYWZh?=
- =?utf-8?B?USt5dWxNMmlMV21iKzk0RGNmV3RyNXZCS0xXcUVnQjJaYWQzcjJKNFNYdGhR?=
- =?utf-8?B?V0Jtc1hmdktuVzFTVGRmQ1A1NXJRNVRhY09qVXJtN0drTm94Z2xmTFQ3a28x?=
- =?utf-8?B?bUE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B8AD998684DE634FA8E3EAA6E70900BC@eurprd03.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 144D238BB2
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 08:10:00 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A89D11F
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 01:09:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1695110998;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PI/+nfzFJWi3Vn25d+86T28N25J4dQrJLl3+cdAvKhM=;
+	b=JB/Rux2q/Se4rJRqagkHw924T8Dx7rzIAwcRvWChM51yJw2gh4ma/xHZ/+nme/L50d0Fl9
+	jiVNkEo29tL2kBzUwfXPM6pwvAZKxg+sRsmzcwDK0zkFf1uA1X+O7eGuJKFTIVXlOEvbe5
+	/L+iqHyw/0sdsNsXXTkc7hNZ6LWn2RQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-620-9E9_0MtNOF27vNMcefhTZQ-1; Tue, 19 Sep 2023 04:09:57 -0400
+X-MC-Unique: 9E9_0MtNOF27vNMcefhTZQ-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-404f8ccee4bso8644265e9.1
+        for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 01:09:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695110996; x=1695715796;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PI/+nfzFJWi3Vn25d+86T28N25J4dQrJLl3+cdAvKhM=;
+        b=eVfAH61gPN3Dczvr4vJ2guvyf9Emq+736jmtoDtBci/DrjWpottr2QyS0VbLpPZoJO
+         8xYfUX7aDGsJyX6N4eTx9ZQWkN2NMwsrr5l/dYKSade5Tj880uleUtwkSl8b+mBTXI2l
+         LdyVZ9r1aRG+fg87OYDrpxlpR+6ze2jcaR6RrVped4CnuDgo/3zncrLzN4ItY30zeHji
+         Zm91w7WLUgMxuyRTbiLor3Q8d9NTUioUSbQN/QC0FcM6AvcSxCKGw0UvH/A8TmUytRJP
+         fYm/vSpGdtmemLidW5K2Mt5y3hunfr/SybPnlZ9ippRq6ZWTKV2g9jyaBG+B00EXn/u+
+         jELw==
+X-Gm-Message-State: AOJu0YxV9BRy7ZhqKZ4pA73yourR6DAte7xX4Yzx+kxJrsAzumjSD8j0
+	3+tm/a0WpGELMgDoStAGOEJRq5SkXxPaBA1+M9tDdFZbD6B60nddgJHwr7/SbcgpS2G3h9keU79
+	jh+iXHbVTnBa4ydat
+X-Received: by 2002:a5d:4451:0:b0:317:3a23:4855 with SMTP id x17-20020a5d4451000000b003173a234855mr8677121wrr.2.1695110995923;
+        Tue, 19 Sep 2023 01:09:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEnozanEdBHPHLTCvo19P7FXzd4HDI6kF6PBXgpim2pFs9vT2c/v6VyxHOXzp8X3t8uE/Wufw==
+X-Received: by 2002:a5d:4451:0:b0:317:3a23:4855 with SMTP id x17-20020a5d4451000000b003173a234855mr8677104wrr.2.1695110995573;
+        Tue, 19 Sep 2023 01:09:55 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-241-221.dyn.eolo.it. [146.241.241.221])
+        by smtp.gmail.com with ESMTPSA id o6-20020adfeac6000000b0031c6dc684f8sm14800648wrn.20.2023.09.19.01.09.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Sep 2023 01:09:55 -0700 (PDT)
+Message-ID: <4a1d7edcfae1e967eb2951f591c10c02965f6dc2.camel@redhat.com>
+Subject: Re: [PATCH net-next v4 2/2] pktgen: Introducing 'SHARED' flag for
+ testing with non-shared skb
+From: Paolo Abeni <pabeni@redhat.com>
+To: Eric Dumazet <edumazet@google.com>, Liang Chen
+ <liangchen.linux@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, benjamin.poirier@gmail.com, 
+	netdev@vger.kernel.org
+Date: Tue, 19 Sep 2023 10:09:53 +0200
+In-Reply-To: <CANn89iLA5irwbuqvJdnptGs9pQNO_63qQsJ1jjZd1E0Cd4JVMw@mail.gmail.com>
+References: <20230916132932.361875-1-liangchen.linux@gmail.com>
+	 <20230916132932.361875-2-liangchen.linux@gmail.com>
+	 <CANn89iLA5irwbuqvJdnptGs9pQNO_63qQsJ1jjZd1E0Cd4JVMw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: bang-olufsen.dk
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM6PR03MB3943.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8bb43aff-f10e-4071-281f-08dbb8e706a3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Sep 2023 08:04:19.0823
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 210d08b8-83f7-470a-bc96-381193ca14a1
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: bTYWImX0OL1DJNEr6V0Sb8C082PEsknpkAApwZT1isEo69bLA+YX6sd29h+ZcAlJG5eLVsIaFIvl9ZJEREYf+Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR03MB6250
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-T24gTW9uLCBTZXAgMTgsIDIwMjMgYXQgMDk6MTk6MTRQTSArMDIwMCwgVXdlIEtsZWluZS1Lw7Zu
-aWcgd3JvdGU6DQo+IFRoZSAucmVtb3ZlKCkgY2FsbGJhY2sgZm9yIGEgcGxhdGZvcm0gZHJpdmVy
-IHJldHVybnMgYW4gaW50IHdoaWNoIG1ha2VzDQo+IG1hbnkgZHJpdmVyIGF1dGhvcnMgd3Jvbmds
-eSBhc3N1bWUgaXQncyBwb3NzaWJsZSB0byBkbyBlcnJvciBoYW5kbGluZyBieQ0KPiByZXR1cm5p
-bmcgYW4gZXJyb3IgY29kZS4gSG93ZXZlciB0aGUgdmFsdWUgcmV0dXJuZWQgaXMgaWdub3JlZCAo
-YXBhcnQNCj4gZnJvbSBlbWl0dGluZyBhIHdhcm5pbmcpIGFuZCB0aGlzIHR5cGljYWxseSByZXN1
-bHRzIGluIHJlc291cmNlIGxlYWtzLg0KPiBUbyBpbXByb3ZlIGhlcmUgdGhlcmUgaXMgYSBxdWVz
-dCB0byBtYWtlIHRoZSByZW1vdmUgY2FsbGJhY2sgcmV0dXJuDQo+IHZvaWQuIEluIHRoZSBmaXJz
-dCBzdGVwIG9mIHRoaXMgcXVlc3QgYWxsIGRyaXZlcnMgYXJlIGNvbnZlcnRlZCB0bw0KPiAucmVt
-b3ZlX25ldygpIHdoaWNoIGFscmVhZHkgcmV0dXJucyB2b2lkLiBFdmVudHVhbGx5IGFmdGVyIGFs
-bCBkcml2ZXJzDQo+IGFyZSBjb252ZXJ0ZWQsIC5yZW1vdmVfbmV3KCkgaXMgcmVuYW1lZCB0byAu
-cmVtb3ZlKCkuDQo+IA0KPiBUcml2aWFsbHkgY29udmVydCB0aGlzIGRyaXZlciBmcm9tIGFsd2F5
-cyByZXR1cm5pbmcgemVybyBpbiB0aGUgcmVtb3ZlDQo+IGNhbGxiYWNrIHRvIHRoZSB2b2lkIHJl
-dHVybmluZyB2YXJpYW50Lg0KPiANCj4gU2lnbmVkLW9mZi1ieTogVXdlIEtsZWluZS1Lw7ZuaWcg
-PHUua2xlaW5lLWtvZW5pZ0BwZW5ndXRyb25peC5kZT4NCj4gLS0tDQoNClJldmlld2VkLWJ5OiBB
-bHZpbiDFoGlwcmFnYSA8YWxzaUBiYW5nLW9sdWZzZW4uZGs+
+On Mon, 2023-09-18 at 16:28 +0200, Eric Dumazet wrote:
+> On Sat, Sep 16, 2023 at 3:30=E2=80=AFPM Liang Chen <liangchen.linux@gmail=
+.com> wrote:
+> >=20
+> > Currently, skbs generated by pktgen always have their reference count
+> > incremented before transmission, causing their reference count to be
+> > always greater than 1, leading to two issues:
+> >   1. Only the code paths for shared skbs can be tested.
+> >   2. In certain situations, skbs can only be released by pktgen.
+> > To enhance testing comprehensiveness, we are introducing the "SHARED"
+> > flag to indicate whether an SKB is shared. This flag is enabled by
+> > default, aligning with the current behavior. However, disabling this
+> > flag allows skbs with a reference count of 1 to be transmitted.
+> > So we can test non-shared skbs and code paths where skbs are released
+> > within the stack.
+> >=20
+> > Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
+> > ---
+> >  Documentation/networking/pktgen.rst | 12 ++++++++
+> >  net/core/pktgen.c                   | 48 ++++++++++++++++++++++++-----
+> >  2 files changed, 52 insertions(+), 8 deletions(-)
+> >=20
+> > diff --git a/Documentation/networking/pktgen.rst b/Documentation/networ=
+king/pktgen.rst
+> > index 1225f0f63ff0..c945218946e1 100644
+> > --- a/Documentation/networking/pktgen.rst
+> > +++ b/Documentation/networking/pktgen.rst
+> > @@ -178,6 +178,7 @@ Examples::
+> >                               IPSEC # IPsec encapsulation (needs CONFIG=
+_XFRM)
+> >                               NODE_ALLOC # node specific memory allocat=
+ion
+> >                               NO_TIMESTAMP # disable timestamping
+> > +                             SHARED # enable shared SKB
+> >   pgset 'flag ![name]'    Clear a flag to determine behaviour.
+> >                          Note that you might need to use single quote i=
+n
+> >                          interactive mode, so that your shell wouldn't =
+expand
+> > @@ -288,6 +289,16 @@ To avoid breaking existing testbed scripts for usi=
+ng AH type and tunnel mode,
+> >  you can use "pgset spi SPI_VALUE" to specify which transformation mode
+> >  to employ.
+> >=20
+> > +Disable shared SKB
+> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > +By default, SKBs sent by pktgen are shared (user count > 1).
+> > +To test with non-shared SKBs, remove the "SHARED" flag by simply setti=
+ng::
+> > +
+> > +       pg_set "flag !SHARED"
+> > +
+> > +However, if the "clone_skb" or "burst" parameters are configured, the =
+skb
+> > +still needs to be held by pktgen for further access. Hence the skb mus=
+t be
+> > +shared.
+> >=20
+> >  Current commands and configuration options
+> >  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > @@ -357,6 +368,7 @@ Current commands and configuration options
+> >      IPSEC
+> >      NODE_ALLOC
+> >      NO_TIMESTAMP
+> > +    SHARED
+> >=20
+> >      spi (ipsec)
+> >=20
+> > diff --git a/net/core/pktgen.c b/net/core/pktgen.c
+> > index 48306a101fd9..c4e0814df325 100644
+> > --- a/net/core/pktgen.c
+> > +++ b/net/core/pktgen.c
+> > @@ -200,6 +200,7 @@
+> >         pf(VID_RND)             /* Random VLAN ID */                   =
+ \
+> >         pf(SVID_RND)            /* Random SVLAN ID */                  =
+ \
+> >         pf(NODE)                /* Node memory alloc*/                 =
+ \
+> > +       pf(SHARED)              /* Shared SKB */                       =
+ \
+> >=20
+> >  #define pf(flag)               flag##_SHIFT,
+> >  enum pkt_flags {
+> > @@ -1198,7 +1199,8 @@ static ssize_t pktgen_if_write(struct file *file,
+> >                     ((pkt_dev->xmit_mode =3D=3D M_NETIF_RECEIVE) ||
+> >                      !(pkt_dev->odev->priv_flags & IFF_TX_SKB_SHARING))=
+)
+> >                         return -ENOTSUPP;
+> > -               if (value > 0 && pkt_dev->n_imix_entries > 0)
+> > +               if (value > 0 && (pkt_dev->n_imix_entries > 0 ||
+> > +                                 !(pkt_dev->flags & F_SHARED)))
+> >                         return -EINVAL;
+> >=20
+> >                 i +=3D len;
+> > @@ -1257,6 +1259,10 @@ static ssize_t pktgen_if_write(struct file *file=
+,
+> >                      ((pkt_dev->xmit_mode =3D=3D M_START_XMIT) &&
+> >                      (!(pkt_dev->odev->priv_flags & IFF_TX_SKB_SHARING)=
+))))
+> >                         return -ENOTSUPP;
+> > +
+> > +               if (value > 1 && !(pkt_dev->flags & F_SHARED))
+> > +                       return -EINVAL;
+> > +
+> >                 pkt_dev->burst =3D value < 1 ? 1 : value;
+> >                 sprintf(pg_result, "OK: burst=3D%u", pkt_dev->burst);
+> >                 return count;
+> > @@ -1334,10 +1340,19 @@ static ssize_t pktgen_if_write(struct file *fil=
+e,
+> >=20
+> >                 flag =3D pktgen_read_flag(f, &disable);
+> >                 if (flag) {
+> > -                       if (disable)
+> > +                       if (disable) {
+> > +                               /* If "clone_skb", or "burst" parameter=
+s are
+> > +                                * configured, it means that the skb st=
+ill
+> > +                                * needs to be referenced by the pktgen=
+, so
+> > +                                * the skb must be shared.
+> > +                                */
+> > +                               if (flag =3D=3D F_SHARED && (pkt_dev->c=
+lone_skb ||
+> > +                                                        pkt_dev->burst=
+ > 1))
+> > +                                       return -EINVAL;
+> >                                 pkt_dev->flags &=3D ~flag;
+> > -                       else
+> > +                       } else {
+> >                                 pkt_dev->flags |=3D flag;
+> > +                       }
+> >=20
+> >                         sprintf(pg_result, "OK: flags=3D0x%x", pkt_dev-=
+>flags);
+> >                         return count;
+> > @@ -3489,7 +3504,8 @@ static void pktgen_xmit(struct pktgen_dev *pkt_de=
+v)
+> >         if (pkt_dev->xmit_mode =3D=3D M_NETIF_RECEIVE) {
+> >                 skb =3D pkt_dev->skb;
+> >                 skb->protocol =3D eth_type_trans(skb, skb->dev);
+> > -               refcount_add(burst, &skb->users);
+> > +               if (pkt_dev->flags & F_SHARED)
+> > +                       refcount_add(burst, &skb->users);
+> >                 local_bh_disable();
+> >                 do {
+> >                         ret =3D netif_receive_skb(skb);
+> > @@ -3497,6 +3513,10 @@ static void pktgen_xmit(struct pktgen_dev *pkt_d=
+ev)
+> >                                 pkt_dev->errors++;
+> >                         pkt_dev->sofar++;
+> >                         pkt_dev->seq_num++;
+>=20
+> Since pkt_dev->flags can change under us, I would rather read pkt_dev->fl=
+ags
+> once in pktgen_xmit() to avoid surprises...
+
+Additionally I *think* we can't assume pkt_dev->burst and pkt_dev-
+>flags have consistent values in pktgen_xmit(). The user-space
+(syzkaller) could flip burst and flag in between the read access in
+pktgen_xmit().=20
+
+There is a later:
+
+	if (unlikely(burst))
+		WARN_ON(refcount_sub_and_test(burst, &pkt_dev->skb->users));
+
+that will need explicit check for 'pkt_dev->skb' not being NULL.
+
+Cheers,
+
+Paolo
+
 
