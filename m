@@ -1,176 +1,116 @@
-Return-Path: <netdev+bounces-34993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EA867A661B
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 16:03:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F7977A662A
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 16:07:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49AD5281F27
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 14:03:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A15D62821B6
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 14:07:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 688A538DD2;
-	Tue, 19 Sep 2023 14:03:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D844638BC2;
+	Tue, 19 Sep 2023 14:07:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 235303C07
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 14:03:31 +0000 (UTC)
-Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18EE6F2
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 07:03:30 -0700 (PDT)
-Received: by mail-io1-xd2c.google.com with SMTP id ca18e2360f4ac-7926b7f8636so141625639f.1
-        for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 07:03:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695132209; x=1695737009; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vtVLO2haBgS3lLOL325dUaSh5qZMcnVFUSZOYjIbPBw=;
-        b=bmRdIR2p5fME2uz0fMqR4K0Wd6xYVv1x91JSS6N/YJ46cTUtyiUfdqA0fS6oxvhDQY
-         b2XxWxMYdheDiccrnan3Lh0ElbHofWQ5d3M5krI44i9gY7vOV8ASdzVSuU8q+HjY2nmz
-         MACHabZEcT1Du9ZPo23A5qmWElqTXsef1/vzgnkvJ+49q9AlUHGMl1c9Y7FBqZCUNG4m
-         Xm3vmyhfZD59+UUI65tleTIzkSQhjjPBxWkE29CNUc7FLd1/TCesBCokVm8EbU+S8lCC
-         s2XY73UiPHcN//s0o4XU9Yn00Z/Iwv99OB4TqspHWveWXaJVCCUWR5nPqPmBFHV/Ef1V
-         E3Nw==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AED5F374ED
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 14:07:41 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFB6CF2
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 07:07:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1695132459;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LMykJCQlkdtke1jV1HRdImSUTkLSJsXVxgTZNCPIZuo=;
+	b=hH2WnyJKPiaRQKvqiCxXqUhpc5T5pF7DvUJsNzPqp5NNMaEUU4q4Ioo4mGL0jKayuRKV0F
+	2THqg8O6U/4r57S0TOmuNS0lgW2JLM4wXnXB95HHGgnnc2WQHdl2F8DuqW2ixFHsd1/knz
+	fBdCqXttxHiVQIbShCsdHfCF16ZNL5A=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-649-pbPE0PGWPZaa5DOVMJRaHQ-1; Tue, 19 Sep 2023 10:07:37 -0400
+X-MC-Unique: pbPE0PGWPZaa5DOVMJRaHQ-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-9aa1e8d983aso131294466b.0
+        for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 07:07:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695132209; x=1695737009;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vtVLO2haBgS3lLOL325dUaSh5qZMcnVFUSZOYjIbPBw=;
-        b=mQrhv3YSdbk8YLXYPwU03DPGhaU6gXZ0l/eHlTqTogZ9xAeZo0QJagNKlRnIy4gHzw
-         Q4zvoA2OFggbr5jBuy1rhrlt5y5UNq3zx3oIJF8CWMcBjJOTSaMeaUHQH82XO64zDjPV
-         vwnJ1Xv+66PazDGI2VBIsTeb75xSkZsGugrpm27Qr68WBOxRnWvZcXQQmisKRPZ4L9gt
-         mh4+ZbpIGAdmZ510JwaGtIck0TfkKNd1nPqCsI0IEAUoz07+6uK3qY2Cxq8bYql0Xo4y
-         ioAZ4J8+Jb2aUQLo/UczDIFuSU4zfERcTjEXGlSyr4Ncmsnlgc7XsrY5cARZrtwBdAaG
-         4fNA==
-X-Gm-Message-State: AOJu0YyzvmKWXMIRiBzScpA4z3ssEed6XjFW05HnaLa0/cr5zQq2iy98
-	OXmomj+6BvZkgTFumxiP5LE=
-X-Google-Smtp-Source: AGHT+IG760PCBf4Duk4zO8WDQqT9mxNrVyXwE7tzTv8MFU43eZB/5G6JKNi3lVJFFoq/BnmmaTyJcg==
-X-Received: by 2002:a5e:c104:0:b0:792:93b9:2065 with SMTP id v4-20020a5ec104000000b0079293b92065mr2193831iol.7.1695132209213;
-        Tue, 19 Sep 2023 07:03:29 -0700 (PDT)
-Received: from ?IPV6:2601:282:1e82:2350:a8ed:9f3d:7434:4c90? ([2601:282:1e82:2350:a8ed:9f3d:7434:4c90])
-        by smtp.googlemail.com with ESMTPSA id q20-20020a5d8354000000b00777b7fdbbffsm3464413ior.8.2023.09.19.07.03.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Sep 2023 07:03:28 -0700 (PDT)
-Message-ID: <3652856a-1cda-c050-04da-fe2204949ff5@gmail.com>
-Date: Tue, 19 Sep 2023 08:03:27 -0600
+        d=1e100.net; s=20230601; t=1695132456; x=1695737256;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LMykJCQlkdtke1jV1HRdImSUTkLSJsXVxgTZNCPIZuo=;
+        b=LYG0rnEIcIoR8YOdoq3FpseDwYVx3IRdcmu6RogjEaGTcAuYRzgAm0P+Y6zrrM7nup
+         OhMchOsrlmBi+PCT5lHlM1LIupLvNUVu0hfyeLyFPGmaamL1dpCDC+N7CYOdwxmi5Ng/
+         Sj8D8ZOVM3Rkn5aAV0MdlM9WQxZPI2ZR0sFU7r2x3okqQ2veK3dqSktYphRZU+WuXFi7
+         Ugf5QNfAkgHax1e9uGa0wBb/3mT8uWZt9PCmoxm3KQyUUL/jSPX5DyNYM9KTVsNmIVLJ
+         sEsaZULl/Qt3TW/I87q/zlx/bGxmexcfGZXNWxZt0pKVAeMYL8I0ntT1PjktZmdsDeWZ
+         +8/g==
+X-Gm-Message-State: AOJu0YxR8kBlSs2qZV8ooLmJ0B2gL5fBwRQ4d4H0MMGRI2dnTfxSugFq
+	Yj8CDT0n7RqbXJhNvgkl3erqOTmLAdFuDTDpC7kjpJ4HiR4mU37AOviDoWrZJ+TMsVJ8c0H8Bo5
+	o8k779ANsZPXx/bko
+X-Received: by 2002:a17:906:74ca:b0:9a1:eb67:c0d3 with SMTP id z10-20020a17090674ca00b009a1eb67c0d3mr10338008ejl.4.1695132456048;
+        Tue, 19 Sep 2023 07:07:36 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IENFS4cpAX8S6AwUFpq/x09AJbWBVQNwDPOx+C99DIJFQmc2UIwUgdKqqVnaAY0+5cwFRnW1g==
+X-Received: by 2002:a17:906:74ca:b0:9a1:eb67:c0d3 with SMTP id z10-20020a17090674ca00b009a1eb67c0d3mr10337985ejl.4.1695132455690;
+        Tue, 19 Sep 2023 07:07:35 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-241-221.dyn.eolo.it. [146.241.241.221])
+        by smtp.gmail.com with ESMTPSA id fi8-20020a170906da0800b00997e00e78e6sm7851723ejb.112.2023.09.19.07.07.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Sep 2023 07:07:35 -0700 (PDT)
+Message-ID: <6243f8f6b0e110ba48a9e6e974ea3de875857f49.camel@redhat.com>
+Subject: Re: [PATCH v2 net-next 09/17] net: ethernet: mtk_wed: fix
+ EXT_INT_STATUS_RX_FBUF definitions for MT7986 SoC
+From: Paolo Abeni <pabeni@redhat.com>
+To: Daniel Golle <daniel@makrotopia.org>, Lorenzo Bianconi
+ <lorenzo@kernel.org>
+Cc: netdev@vger.kernel.org, lorenzo.bianconi@redhat.com, nbd@nbd.name, 
+ john@phrozen.org, sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com, 
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+ linux-mediatek@lists.infradead.org, sujuan.chen@mediatek.com,
+ horms@kernel.org,  robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, 
+ devicetree@vger.kernel.org
+Date: Tue, 19 Sep 2023 16:07:33 +0200
+In-Reply-To: <ZQg2AxAIxkadOiIr@makrotopia.org>
+References: <cover.1695032290.git.lorenzo@kernel.org>
+	 <ebde071cc3cc9c35b00366c41912ee2f25e5282d.1695032291.git.lorenzo@kernel.org>
+	 <ZQg2AxAIxkadOiIr@makrotopia.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [patch iproute2-next v2 3/5] devlink: introduce support for netns
- id for nested handle
-Content-Language: en-US
-To: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org
-Cc: stephen@networkplumber.org, daniel.machon@microchip.com
-References: <20230919115644.1157890-1-jiri@resnulli.us>
- <20230919115644.1157890-4-jiri@resnulli.us>
-From: David Ahern <dsahern@gmail.com>
-In-Reply-To: <20230919115644.1157890-4-jiri@resnulli.us>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 9/19/23 5:56 AM, Jiri Pirko wrote:
-> @@ -2723,6 +2725,40 @@ static bool should_arr_last_handle_end(struct dl *dl, const char *bus_name,
->  	       !cmp_arr_last_handle(dl, bus_name, dev_name);
->  }
->  
-> +struct netns_name_by_id_ctx {
-> +	int32_t id;
-> +	char *name;
-> +	struct rtnl_handle *rth;
-> +};
-> +
-> +static int netns_name_by_id_func(char *nsname, void *arg)
-> +{
-> +	struct netns_name_by_id_ctx *ctx = arg;
-> +	int32_t ret;
-> +
-> +	ret = netns_netnsid_from_name(ctx->rth, nsname);
-> +	if (ret < 0 || ret != ctx->id)
-> +		return 0;
-> +	ctx->name = strdup(nsname);
-> +	return 1;
-> +}
-> +
-> +static char *netns_name_by_id(int32_t id)
-> +{
-> +	struct rtnl_handle rth;
-> +	struct netns_name_by_id_ctx ctx = {
-> +		.id = id,
-> +		.rth = &rth,
-> +	};
-> +
-> +	if (rtnl_open(&rth, 0) < 0)
-> +		return NULL;
-> +	netns_foreach(netns_name_by_id_func, &ctx);
-> +	rtnl_close(&rth);
-> +
-> +	return ctx.name;
-> +}
-> +
+On Mon, 2023-09-18 at 12:35 +0100, Daniel Golle wrote:
+> On Mon, Sep 18, 2023 at 12:29:11PM +0200, Lorenzo Bianconi wrote:
+> > Fix MTK_WED_EXT_INT_STATUS_RX_FBUF_LO_TH and
+> > MTK_WED_EXT_INT_STATUS_RX_FBUF_HI_TH definitions for MT7986 (MT7986 is
+> > the only SoC to use them).
+>=20
+> Afaik this applies also to MT7981 which is very similar to MT7986.
 
-The above is not devlink specific, so it should go in lib/namespace.c as
-well.
+FTR, I read the above as this series is going to additionally
+support/work fine with MT7981; no modification asked here, fine to be
+merged.
 
-Name wise it should be consistent with the last patch, so either
-netns_id_to_name or netns_name_from_id based on the name from the
-refactoring in patch 2.
+Please scream loudly soon otherwise ;)
 
+Thanks,
 
->  static void pr_out_nested_handle(struct nlattr *nla_nested_dl)
->  {
->  	struct nlattr *tb[DEVLINK_ATTR_MAX + 1] = {};
-> @@ -2740,6 +2776,30 @@ static void pr_out_nested_handle(struct nlattr *nla_nested_dl)
->  	sprintf(buf, "%s/%s", mnl_attr_get_str(tb[DEVLINK_ATTR_BUS_NAME]),
->  		mnl_attr_get_str(tb[DEVLINK_ATTR_DEV_NAME]));
->  	print_string(PRINT_ANY, "nested_devlink", " nested_devlink %s", buf);
-> +
-> +	if (tb[DEVLINK_ATTR_NETNS_ID]) {
-> +		int32_t id = mnl_attr_get_u32(tb[DEVLINK_ATTR_NETNS_ID]);
-> +
-> +		if (id >= 0) {
-> +			char *name = netns_name_by_id(id);
-> +
-> +			if (name) {
-> +				print_string(PRINT_ANY,
-> +					     "nested_devlink_netns",
-> +					     " nested_devlink_netns %s", name);
-> +				free(name);
-> +			} else {
-> +				print_int(PRINT_ANY,
-> +					  "nested_devlink_netnsid",
-> +					  " nested_devlink_netnsid %d", id);
-> +			}
-> +		} else {
-> +			print_string(PRINT_FP, NULL,
-> +				     " nested_devlink_netnsid %s", "unknown");
-> +			print_int(PRINT_JSON,
-> +				  "nested_devlink_netnsid", NULL, id);
-> +		}
-
-Also, devlink in the name here provides no addititional value (devlink
-is the command name) and why add 'nested'? The attribute is just
-NETNS_ID, so why not just 'netnsid' here.
-
-
-> +	}
->  }
->  
->  static void __pr_out_handle_start(struct dl *dl, struct nlattr **tb,
+Paolo
 
 
