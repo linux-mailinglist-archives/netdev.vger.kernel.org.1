@@ -1,132 +1,131 @@
-Return-Path: <netdev+bounces-34943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 085C87A61B4
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 13:50:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6463C7A61CD
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 13:56:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 19CB91C20BEE
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 11:50:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D8F01C20BEE
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 11:56:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EBE43FB3C;
-	Tue, 19 Sep 2023 11:50:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E00E15BE;
+	Tue, 19 Sep 2023 11:56:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D432847F;
-	Tue, 19 Sep 2023 11:50:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDDE5C433C8;
-	Tue, 19 Sep 2023 11:50:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695124249;
-	bh=9DucqhPLC8iD8mKt/UY5nRsFVFCE4cN3x0qFqAkFRdw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=p0iuhkrNQTG8uLwqcqT0nDVxAg2xxiPBXj2MBJQ8uykOEz7d2GqljLc5NeiQCWpOk
-	 iMU4dedJY5/1aJPwIP8xbCZwl+lfuRGbcqdMEQp2rkqs3cA+1KPHdebD5llnHxhj/H
-	 5PipQbUhbWIPYEq1mVsITRvPNQMQ4eH0phahrl5on/8VKFLjKEc6+k07Bc0bAyt6kb
-	 XyHXlKde1ZkBflGzOi5VCSK2p2s3lPo27BIzhzOPe4x16v4KnRjtYkRjE3lQe023U5
-	 FGBHfq79gc/sP9M2TVYkaNBT21gHnmI3DMNVQ7PEnoGee1OUsES+uzhfrkMVk7s/gz
-	 Hz8fH/TfC/YLg==
-Date: Tue, 19 Sep 2023 12:50:43 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Pu Lehui <pulehui@huawei.com>
-Cc: Pu Lehui <pulehui@huaweicloud.com>, bpf@vger.kernel.org,
-	linux-riscv@lists.infradead.org, netdev@vger.kernel.org,
-	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yhs@fb.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Luke Nelson <luke.r.nels@gmail.com>
-Subject: Re: [PATCH bpf-next 4/4] riscv, bpf: Mixing bpf2bpf and tailcalls
-Message-ID: <20230919-5f1894d892685612395aabaf@fedora>
-References: <20230919035711.3297256-1-pulehui@huaweicloud.com>
- <20230919035711.3297256-5-pulehui@huaweicloud.com>
- <20230919-4734211982e4e411a93650a7@fedora>
- <8ebbd85d-857a-432b-be56-1f8f425b979d@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE18E3FD4
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 11:56:51 +0000 (UTC)
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B840AE3
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 04:56:48 -0700 (PDT)
+Received: by mail-wr1-x42a.google.com with SMTP id ffacd0b85a97d-31c5c06e8bbso5369941f8f.1
+        for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 04:56:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1695124607; x=1695729407; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=EYcsoKmuAOYH1Dousqvl+I00OLRj+UXR05BdfP8aYI4=;
+        b=jTWmVKCderPAW7wkhzXvNU2nBFw6ezwiOCMm7FozgF60n1wCKPrWpHBJP91wHGgD2e
+         JXHHvH8Hi59zQ6idgAJ60pnp2iDW5LF/BONZIvw0mxOLHgQrb9l8V47B9ZAr02EmNWUh
+         gKVFGaSVGut33R91FhmOzBz3s+Yz9Xea32ZF1+sITMwfjPf11cV1XUslArzirQJuj2GA
+         CZfqChOj+m1/NT0g3c5z4zxi++5PxZYKqV+3qRazKy7ePL9fVX0/KItnMwQw9hSfjmfi
+         fnOBizYnxOJUMvuMF+yXhPm+u9EQSyIyBhvWeyopFspIilGawhAYqN+0jHmSgu+S6BZE
+         7eEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695124607; x=1695729407;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EYcsoKmuAOYH1Dousqvl+I00OLRj+UXR05BdfP8aYI4=;
+        b=pFXJAHTuaqua/62ezq6SUDj57xCq4bee0cuDCBE0li9Ijhy0b/K3tmwDLHC802kNyU
+         WZ3+OnV5dP/IUDoYskY9IsWuO75mrWeowX0srbq4G0wrlp9o+XTD0xaKBEr2t9jvMXM9
+         +BC2FvXpzXFZwQw3gmAjDKBmq+NS9fDM0Dpn+z5HuSRC5zFvre4D/961XgnZnOF6nS7t
+         h8hpDkv+rV50ONSANqeslV3ntOcisl1I50cqLbtapQq1srqsOl7OCtrOp1TiPHKMPHkH
+         A0KJ4iKGSyOM5ef+Cxuo3BzEyWL+O+WyRUKNkwdNDjgXXiHCRnIGBQmnnTTywyuyM6h3
+         A/+g==
+X-Gm-Message-State: AOJu0YzPdhdQE9Qnsm4lnJXgLIivnmJcM1ObbbF4ACfR89QpSt5R1nkL
+	3/UJe13fo5YuMNiGxF7j5uS96goL5LJTAoN17SA=
+X-Google-Smtp-Source: AGHT+IEAtyhcoD4Ivx8mXsIUCg5Dqj3uwlgWiLFtWA8hjkl4Y7Ffj8hnGQq6ioutqm3uR5p8ynCHiA==
+X-Received: by 2002:adf:fbd0:0:b0:31f:afeb:4e7e with SMTP id d16-20020adffbd0000000b0031fafeb4e7emr9530855wrs.37.1695124606937;
+        Tue, 19 Sep 2023 04:56:46 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id a4-20020adffb84000000b0031c5ce91ad6sm15362943wrr.97.2023.09.19.04.56.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Sep 2023 04:56:46 -0700 (PDT)
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: stephen@networkplumber.org,
+	dsahern@gmail.com,
+	daniel.machon@microchip.com
+Subject: [patch iproute2-next v2 0/5] expose devlink instances relationships
+Date: Tue, 19 Sep 2023 13:56:39 +0200
+Message-ID: <20230919115644.1157890-1-jiri@resnulli.us>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="7aGyZq91J3TAjZi+"
-Content-Disposition: inline
-In-Reply-To: <8ebbd85d-857a-432b-be56-1f8f425b979d@huawei.com>
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
+From: Jiri Pirko <jiri@nvidia.com>
 
---7aGyZq91J3TAjZi+
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Print out recently added attributes that expose relationships between
+devlink instances. This patchset extends the outputs by
+"nested_devlink" and "nested_devlink_netns" attributes.
 
-On Tue, Sep 19, 2023 at 07:23:07PM +0800, Pu Lehui wrote:
->=20
->=20
-> On 2023/9/19 18:04, Conor Dooley wrote:
-> > On Tue, Sep 19, 2023 at 11:57:11AM +0800, Pu Lehui wrote:
-> > > From: Pu Lehui <pulehui@huawei.com>
-> > >=20
-> > > In the current RV64 JIT, if we just don't initialize the TCC in subpr=
-og,
-> > > the TCC can be propagated from the parent process to the subprocess, =
-but
-> > > the TCC of the parent process cannot be restored when the subprocess
-> > > exits. Since the RV64 TCC is initialized before saving the callee sav=
-ed
-> > > registers into the stack, we cannot use the callee saved register to
-> > > pass the TCC, otherwise the original value of the callee saved regist=
-er
-> > > will be destroyed. So we implemented mixing bpf2bpf and tailcalls
-> > > similar to x86_64, i.e. using a non-callee saved register to transfer
-> > > the TCC between functions, and saving that register to the stack to
-> > > protect the TCC value. At the same time, we also consider the scenario
-> > > of mixing trampoline.
-> > >=20
-> > > Tests test_bpf.ko and test_verifier have passed, as well as the relat=
-ive
-> > > testcases of test_progs*.
-> > >=20
-> > > Signed-off-by: Pu Lehui <pulehui@huawei.com>
-> >=20
-> > Breaks the build:
-> > ../arch/riscv/net/bpf_jit_comp64.c:846:14: error: use of undeclared ide=
-ntifier 'BPF_TRAMP_F_TAIL_CALL_CTX'
-> >=20
->=20
-> Hi Conor,
->=20
-> BPF_TRAMP_F_TAIL_CALL_CTX rely on commit [0], and it has been merged into
-> bpf-next tree.
+Examples:
+$ devlink dev
+pci/0000:08:00.0: nested_devlink auxiliary/mlx5_core.eth.0
+pci/0000:08:00.1: nested_devlink auxiliary/mlx5_core.eth.1
+auxiliary/mlx5_core.eth.1
+auxiliary/mlx5_core.eth.0
 
-I see. I did check the cover to see if there was anything relevant
-there, like a link or base commit, but since there were neither I opted
-to pass on the warning from the patchwork automation we have :)
+$ devlink port add pci/0000:08:00.0 flavour pcisf pfnum 0 sfnum 106
+pci/0000:08:00.0/32768: type eth netdev eth4 flavour pcisf controller 0 pfnum 0 sfnum 106 splittable false
+  function:
+    hw_addr 00:00:00:00:00:00 state inactive opstate detached roce enable
+$ devlink port function set pci/0000:08:00.0/32768 state active
+$ devlink port show pci/0000:08:00.0/32768
+pci/0000:08:00.0/32768: type eth netdev eth4 flavour pcisf controller 0 pfnum 0 sfnum 106 splittable false
+  function:
+    hw_addr 00:00:00:00:00:00 state active opstate attached roce enable nested_devlink auxiliary/mlx5_core.sf.2
 
-Thanks & sorry for the noise on this one.
+# devlink dev reload auxiliary/mlx5_core.sf.2 netns ns1
+$ devlink port show pci/0000:08:00.0/32768
+pci/0000:08:00.0/32768: type eth netdev eth4 flavour pcisf controller 0 pfnum 0 sfnum 106 splittable false
+  function:
+    hw_addr 00:00:00:00:00:00 state active opstate attached roce enable nested_devlink auxiliary/mlx5_core.sf.2 nested_devlink_netns ns1
 
-Thanks,
-Conor.
+---
+v1->v2:
+- patch #2 was added
+- patch #3 uses new helper added by patch #2, typo is fixed
 
---7aGyZq91J3TAjZi+
-Content-Type: application/pgp-signature; name="signature.asc"
+Jiri Pirko (5):
+  devlink: update headers
+  ip/ipnetns: move internals of get_netnsid_from_name() into namespace.c
+  devlink: introduce support for netns id for nested handle
+  devlink: print nested handle for port function
+  devlink: print nested devlink handle for devlink dev
 
------BEGIN PGP SIGNATURE-----
+ devlink/devlink.c            | 108 +++++++++++++++++++++++++++++++++--
+ include/namespace.h          |   4 ++
+ include/uapi/linux/devlink.h |   1 +
+ ip/ipnetns.c                 |  45 +--------------
+ lib/namespace.c              |  49 ++++++++++++++++
+ 5 files changed, 159 insertions(+), 48 deletions(-)
 
-iHUEARYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZQmLAgAKCRB4tDGHoIJi
-0lhqAQCq1PZp2coB5qmzqa14vKJ4qyIbOxQvaXzCKk9mHyZECwD9E0i6/Nqg+6SZ
-3xhMyPJa3N1LGnQPDMrfPnKQErAgoAk=
-=w3wa
------END PGP SIGNATURE-----
+-- 
+2.41.0
 
---7aGyZq91J3TAjZi+--
 
