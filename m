@@ -1,105 +1,223 @@
-Return-Path: <netdev+bounces-35004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35005-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BC5C7A66E7
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 16:40:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 204417A66F3
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 16:42:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A8D71C20A00
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 14:40:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 202281C2092B
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 14:42:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A28892E63C;
-	Tue, 19 Sep 2023 14:40:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56D6B30F88;
+	Tue, 19 Sep 2023 14:42:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 985281862B
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 14:40:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 17E00C433C9;
-	Tue, 19 Sep 2023 14:40:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695134423;
-	bh=kryayjI+DpBs8BqT5LH6EtjtpekinSXNyepf9NYHdUU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=rz3hiMSFAtBm9z66sWV9YjXmMklF1B9UwmGiJPV2kZX7bxcVGQdtOdTSsawb2BKPg
-	 OLqkIjUIoRwLf/g6khHFq/fojRe2ZMZkKCM1IQbbhvMHQgG4cn96etGL7wNYKlRqF/
-	 vNOsGxFztDx0X+I+oJOIrYloAqTvtHr4PbXAn579y/zmf0nQYvL2+RK+wgiA7hsR6p
-	 ZS1gSeOhk4je/4RFwJcMt7Ush46Eh9cAOmsP/OPKUYMAcS//fiub8dBSXIoeroJH6p
-	 PfQRd6sgod4/Pig8oZt47cJH4edPYKP/MEND/fRjgRl9yNJ8VMfEcElksLbxku63Nm
-	 c5X/2YI3b34iA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F1A9AE11F4C;
-	Tue, 19 Sep 2023 14:40:22 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AF093716F
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 14:42:21 +0000 (UTC)
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6078883;
+	Tue, 19 Sep 2023 07:42:17 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VsRxVvS_1695134522;
+Received: from localhost(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VsRxVvS_1695134522)
+          by smtp.aliyun-inc.com;
+          Tue, 19 Sep 2023 22:42:14 +0800
+From: Wen Gu <guwen@linux.alibaba.com>
+To: kgraul@linux.ibm.com,
+	wenjia@linux.ibm.com,
+	jaka@linux.ibm.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: alibuda@linux.alibaba.com,
+	tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 00/18] net/smc: implement virtual ISM extension and loopback-ism
+Date: Tue, 19 Sep 2023 22:41:44 +0800
+Message-Id: <1695134522-126655-1-git-send-email-guwen@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Spam-Status: No, score=-8.7 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,NUMERIC_HTTP_ADDR,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v5] team: fix null-ptr-deref when team device type is
- changed
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169513442298.2241.9179797432803836099.git-patchwork-notify@kernel.org>
-Date: Tue, 19 Sep 2023 14:40:22 +0000
-References: <20230918123011.1884401-1-william.xuanziyang@huawei.com>
-In-Reply-To: <20230918123011.1884401-1-william.xuanziyang@huawei.com>
-To: Ziyang Xuan <william.xuanziyang@huawei.com>
-Cc: jiri@resnulli.us, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- liuhangbin@gmail.com
 
-Hello:
+Hi, all
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+# Background
 
-On Mon, 18 Sep 2023 20:30:11 +0800 you wrote:
-> Get a null-ptr-deref bug as follows with reproducer [1].
-> 
-> BUG: kernel NULL pointer dereference, address: 0000000000000228
-> ...
-> RIP: 0010:vlan_dev_hard_header+0x35/0x140 [8021q]
-> ...
-> Call Trace:
->  <TASK>
->  ? __die+0x24/0x70
->  ? page_fault_oops+0x82/0x150
->  ? exc_page_fault+0x69/0x150
->  ? asm_exc_page_fault+0x26/0x30
->  ? vlan_dev_hard_header+0x35/0x140 [8021q]
->  ? vlan_dev_hard_header+0x8e/0x140 [8021q]
->  neigh_connected_output+0xb2/0x100
->  ip6_finish_output2+0x1cb/0x520
->  ? nf_hook_slow+0x43/0xc0
->  ? ip6_mtu+0x46/0x80
->  ip6_finish_output+0x2a/0xb0
->  mld_sendpack+0x18f/0x250
->  mld_ifc_work+0x39/0x160
->  process_one_work+0x1e6/0x3f0
->  worker_thread+0x4d/0x2f0
->  ? __pfx_worker_thread+0x10/0x10
->  kthread+0xe5/0x120
->  ? __pfx_kthread+0x10/0x10
->  ret_from_fork+0x34/0x50
->  ? __pfx_kthread+0x10/0x10
->  ret_from_fork_asm+0x1b/0x30
-> 
-> [...]
+SMC-D is now used in IBM z with ISM function to optimize network interconnect
+for intra-CPC communications. Inspired by this, we try to make SMC-D available
+on the non-s390 architecture through a software-simulated virtual ISM device,
+such as loopback-ism device here, to accelerate inter-process or inter-containers
+communication within the same OS.
 
-Here is the summary with links:
-  - [net,v5] team: fix null-ptr-deref when team device type is changed
-    https://git.kernel.org/netdev/net/c/492032760127
+# Design
 
-You are awesome, thank you!
+This patch set includes 4 parts:
+
+ - Patch #1-#3: decouple ISM device hard code from SMC-D stack.
+ - Patch #4-#8: implement virtual ISM extension defined in SMCv2.1.
+ - Patch #9-#13: implement loopback-ism device.
+ - Patch #14-#18: memory copy optimization for the case using loopback.
+
+The loopback-ism device is designed as a kernel device and not be limited to
+a specific net namespace, ends of both inter-process connection (1/1' in diagram
+below) or inter-container connection (2/2' in diagram below) will find that peer
+shares the same loopback-ism device during the CLC handshake. Then loopback-ism
+device will be chosen.
+
+ Container 1 (ns1)                              Container 2 (ns2)
+ +-----------------------------------------+    +-------------------------+
+ | +-------+      +-------+      +-------+ |    |        +-------+        |
+ | | App A |      | App B |      | App C | |    |        | App D |<-+     |
+ | +-------+      +---^---+      +-------+ |    |        +-------+  |(2') |
+ |     |127.0.0.1 (1')|             |192.168.0.11       192.168.0.12|     |
+ |  (1)|   +--------+ | +--------+  |(2)   |    | +--------+   +--------+ |
+ |     `-->|   lo   |-` |  eth0  |<-`      |    | |   lo   |   |  eth0  | |
+ +---------+--|---^-+---+-----|--+---------+    +-+--------+---+-^------+-+
+              |   |           |                                  |
+ Kernel       |   |           |                                  |
+ +----+-------v---+-----------v----------------------------------+---+----+
+ |    |                            TCP                               |    |
+ |    |                                                              |    |
+ |    +--------------------------------------------------------------+    |
+ |                                                                        |
+ |                           +--------------+                             |
+ |                           | smc loopback |                             |
+ +---------------------------+--------------+-----------------------------+
+
+
+loopback-ism device allocs RMBs and sndbufs for each connection peer and 'moves'
+data from sndbuf at one end to RMB at the other end. Since communication occurs
+within the same kernel, the sndbuf can be mapped to peer RMB so that the data
+copy in loopback-ism case can be avoided.
+
+ Container 1 (ns1)                              Container 2 (ns2)
+ +-----------------------------------------+    +-------------------------+
+ | +-------+      +-------+      +-------+ |    |        +-------+        |
+ | | App A |      | App B |      | App C | |    |        | App D |        |
+ | +-------+      +--^----+      +-------+ |    |        +---^---+        |
+ |       |           |               |     |    |            |            |
+ |   (1) |      (1') |           (2) |     |    |       (2') |            |
+ |       |           |               |     |    |            |            |
+ +-------|-----------|---------------|-----+    +------------|------------+
+         |           |               |                       |
+ Kernel  |           |               |                       |
+ +-------|-----------|---------------|-----------------------|------------+
+ | +-----v-+      +-------+      +---v---+               +-------+        |
+ | | snd A |-+    | RMB B |<--+  | snd C |-+          +->| RMB D |        |
+ | +-------+ |    +-------+   |  +-------+ |          |  +-------+        |
+ | +-------+ |    +-------+   |  +-------+ |          |  +-------+        |
+ | | RMB A | |    | snd B |   |  | RMB C | |          |  | snd D |        |
+ | +-------+ |    +-------+   |  +-------+ |          |  +-------+        |
+ |           |               +-------------v+         |                   |
+ |           +-------------->| smc loopback |---------+                   |
+ +---------------------------+--------------+-----------------------------+
+
+# Benchmark Test
+
+ * Test environments:
+      - VM with Intel Xeon Platinum 8 core 2.50GHz, 16 GiB mem.
+      - SMC sndbuf/RMB size 1MB.
+
+ * Test object:
+      - TCP: run on TCP loopback.
+      - domain: run on UNIX domain.
+      - SMC lo: run on SMC loopback device.
+
+1. ipc-benchmark (see [1])
+
+ - ./<foo> -c 1000000 -s 100
+
+                       TCP              domain              SMC-lo
+Message
+rate (msg/s)         78855     107621(+36.41%)     153351(+94.47%)
+
+2. sockperf
+
+ - serv: <smc_run> taskset -c <cpu> sockperf sr --tcp
+ - clnt: <smc_run> taskset -c <cpu> sockperf { tp | pp } --tcp --msg-size={ 64000 for tp | 14 for pp } -i 127.0.0.1 -t 30
+
+                            TCP                  SMC-lo
+Bandwidth(MBps)        5169.250       8007.080(+54.89%)
+Latency(us)               6.122          3.174(-48.15%)
+
+3. nginx/wrk
+
+ - serv: <smc_run> nginx
+ - clnt: <smc_run> wrk -t 8 -c 1000 -d 30 http://127.0.0.1:80
+
+                           TCP                   SMC-lo
+Requests/s           197432.19       261056.09(+32.22%)
+
+4. redis-benchmark
+
+ - serv: <smc_run> redis-server
+ - clnt: <smc_run> redis-benchmark -h 127.0.0.1 -q -t set,get -n 400000 -c 200 -d 1024
+
+                           TCP                   SMC-lo
+GET(Requests/s)       86244.07       122025.62(+41.48%)
+SET(Requests/s)       86749.08       120048.02(+38.38%)
+
+[1] https://github.com/goldsborough/ipc-bench
+
+Wen Gu (18):
+  net/smc: decouple ism_dev from SMC-D device dump
+  net/smc: decouple ism_dev from SMC-D DMB registration
+  net/smc: extract v2 check helper from SMC-D device registration
+  net/smc: support SMCv2.x supplemental features negotiation
+  net/smc: reserve CHID range for SMC-D virtual device
+  net/smc: extend GID to 128bits for virtual ISM device
+  net/smc: disable SEID on non-s390 architecture
+  net/smc: enable virtual ISM device feature bit
+  net/smc: introduce SMC-D loopback device
+  net/smc: implement ID-related operations of loopback
+  net/smc: implement some unsupported operations of loopback
+  net/smc: implement DMB-related operations of loopback
+  net/smc: register loopback device as SMC-Dv2 device
+  net/smc: add operation for getting DMB attribute
+  net/smc: add operations for DMB attach and detach
+  net/smc: avoid data copy from sndbuf to peer RMB in SMC-D
+  net/smc: modify cursor update logic when sndbuf mapped to RMB
+  net/smc: add interface implementation of loopback device
+
+ drivers/s390/net/ism_drv.c |  13 +-
+ include/net/smc.h          |  28 ++-
+ include/uapi/linux/smc.h   |   3 +
+ net/smc/Makefile           |   2 +-
+ net/smc/af_smc.c           |  73 +++++--
+ net/smc/smc.h              |   7 +
+ net/smc/smc_cdc.c          |  56 ++++--
+ net/smc/smc_cdc.h          |   1 +
+ net/smc/smc_clc.c          |  56 ++++--
+ net/smc/smc_clc.h          |  10 +-
+ net/smc/smc_core.c         | 108 +++++++++-
+ net/smc/smc_core.h         |   9 +-
+ net/smc/smc_diag.c         |   6 +-
+ net/smc/smc_ism.c          |  96 ++++++---
+ net/smc/smc_ism.h          |  24 ++-
+ net/smc/smc_loopback.c     | 482 +++++++++++++++++++++++++++++++++++++++++++++
+ net/smc/smc_loopback.h     |  52 +++++
+ net/smc/smc_pnet.c         |   4 +-
+ 18 files changed, 938 insertions(+), 92 deletions(-)
+ create mode 100644 net/smc/smc_loopback.c
+ create mode 100644 net/smc/smc_loopback.h
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+1.8.3.1
 
 
