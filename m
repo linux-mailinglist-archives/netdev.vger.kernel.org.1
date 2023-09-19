@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-34840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34841-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26F2B7A56AC
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 02:46:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52F177A56AD
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 02:47:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 958781C20A3F
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 00:46:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8710E281E8F
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 00:47:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C90B163;
-	Tue, 19 Sep 2023 00:46:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 916C215A3;
+	Tue, 19 Sep 2023 00:46:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A704615A3
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 00:46:38 +0000 (UTC)
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29F61114
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 17:46:35 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d7ec535fe42so5261089276.1
-        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 17:46:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 046E41872
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 00:46:41 +0000 (UTC)
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6110210D
+	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 17:46:40 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d81c39acfd9so3703625276.0
+        for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 17:46:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695084394; x=1695689194; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1695084399; x=1695689199; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=nZI4WQvaICAXY2f7JZMwx/vILSY7yeD3gxZekHHKSyA=;
-        b=2X+UuLJIQWtugBixi9UMMyt8pAj8UWhe+2hD+kGH11gm3+lxkCNya6pdTT0/L3vQek
-         LJ+AYaQMk8zyXYFcDQucsErdr/KZOwgH+GfiFwBrseBBq8lhP7C55wHOVTgh/RYE24G0
-         HS1/mvvuLFfAdm/QXvrKpbv0lNjOLHvcJkP8q6aWxQNn1enUH0/O3M0AFeq6KVtYIR4L
-         xC9IIb8fBDfNTAXcMmFO0+PqNsq3skadixacV0gHiXDms7chERZ+1zpZiKA4FXCH3iec
-         o/YBB+jt6RvMD69fE64VVQa46Fbdfnjiqy+2qSOXxZWXj69iducVsOKRUhIgbSKVgJPZ
-         1ypA==
+        bh=DM2x/0dEjxiH90pAnx5OiSC5Yve6BvtplaNk7VqGVyY=;
+        b=3ISQyGW/vdGRxxoHyCmeqoFJ0pJT/HnSRx+NDN5Ncsrj90jF2FroinqSMMjHp6r1yk
+         FVyfHBVbEqkqVCRr9g2+5fH7pn6MXhOEjKTUtjg0BL7caZuT8jlCdu//UHZbTfB9YSav
+         Ba59zXQLTGj+AGqvZ8m/ftcbiX9Y0FUMd5GR/DohCrde9wCbNcDI/ZT6vTp2F1h/dxPk
+         v4jSN2RyCiFFf1jmBcSL6OgoxppsXCMExiX7ivszARwpk7d+dhn3UOKxnDhkqsme9nKm
+         oE4hCXwXqd1uDYVp5mITezgD5UFXzApL3eZAqKq26/ZN4Awjhw1DBqZ3qj3p0sZ718a2
+         MpHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695084394; x=1695689194;
+        d=1e100.net; s=20230601; t=1695084399; x=1695689199;
         h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=nZI4WQvaICAXY2f7JZMwx/vILSY7yeD3gxZekHHKSyA=;
-        b=LLTUQYVdhmlG0Pd8MgcXizg9kNOiJY0LA1twvczgescgxWQmU9Wc6YjN4iRfrJdz1q
-         skx5z6EFcETHLMy6a9nQIoKQ/HYn0fa960bdVzjzUucUBVuViabPCvkFN4SASKcNdASb
-         NK95mfu+xAiNoz/JAXV4AN9dBy3YYiH5MQkqauo67pXq3TXSLqsquplaSDHYUCthS8Th
-         QQx/r0gYii3+ZJxeaU0WtPn3vjjq53vzEDUXI18qhngNS7hadR2Pxqg3O+Pe1b2r+rkl
-         I3d6QwY0rrri5TXBqf1bAWZYAY2lXblIOjfrilS/9gFym50GSK8gQXS7PhT/ze8YI7j6
-         O9DQ==
-X-Gm-Message-State: AOJu0YxFfUYmz2bx3/dP3PT8/bkYxDTPGtm/e9iASbfhdfaoWX2tsUoh
-	nvk9rhFihUotx5wnBED27S+UtsWyTw==
-X-Google-Smtp-Source: AGHT+IGh9Q6V42mut0ANBjQQSFDfrxLEbM2rs3fTXKxAdckmJrYHDET7RQgSRxUazsVnoSg1dl5LZH/kLQ==
+        bh=DM2x/0dEjxiH90pAnx5OiSC5Yve6BvtplaNk7VqGVyY=;
+        b=cJMbl9SXvZvw+fTjgoa2nwDp6vlMeBza4e8kYfrJYWFKxlIn4JiEGxibMshNjO/YPA
+         OpAlbOEq2QnsBovMszpTAXvkQkd4Kis+r9REI48BJtC0haby4vSfiV3c3YZMMiuU+qj8
+         j2P0keLTtRkoN4d6A3M0OYXqMIlPoZnPTlZ7cRSJ513DXBu0GWk9r6vMr34IC7t6TAQv
+         cgQVcqYqCukeBBxjN8tkFh1pr9yCRaf367nQCxE1nZmPDAVdWxX+SIhjD6s3/CYe5qrc
+         Q72J2I1bVq0eL2RQ1EcgGvQkUHyDuYc0qLbdosfgLEZmuseTSPMljaZcbGO4MFa0gaoI
+         QEsA==
+X-Gm-Message-State: AOJu0YwaTDJ13NPrR3oqH3vutdpaZU2M5OerHk3pfmOJW6Hg92yQL2fW
+	GzavBluT8uQx3IAYyrqjaDjZtB3LbQ==
+X-Google-Smtp-Source: AGHT+IGjUW36J2qfz9f3Vsve/RLs53v/rHWYidYbROr23LH7bQc6qj/kjH0FzjmKQ4iFYvohOVtjRXQCUQ==
 X-Received: from jrife.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:9f])
- (user=jrife job=sendgmr) by 2002:a25:c74e:0:b0:d7e:add7:4de6 with SMTP id
- w75-20020a25c74e000000b00d7eadd74de6mr225015ybe.4.1695084394442; Mon, 18 Sep
- 2023 17:46:34 -0700 (PDT)
-Date: Mon, 18 Sep 2023 19:46:12 -0500
+ (user=jrife job=sendgmr) by 2002:a05:6902:144d:b0:d81:503e:2824 with SMTP id
+ a13-20020a056902144d00b00d81503e2824mr238240ybv.10.1695084399615; Mon, 18 Sep
+ 2023 17:46:39 -0700 (PDT)
+Date: Mon, 18 Sep 2023 19:46:36 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,21 +60,12 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.42.0.459.ge4e396fd5e-goog
-Message-ID: <20230919004613.147693-1-jrife@google.com>
-Subject: [PATCH net v3 1/3] net: replace calls to sock->ops->connect() with kernel_connect()
+Message-ID: <20230919004636.147954-1-jrife@google.com>
+Subject: [PATCH net v3 2/3] net: prevent rewrite of msg_name in sock_sendmsg()
 From: Jordan Rife <jrife@google.com>
 To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
 	pabeni@redhat.com, willemdebruijn.kernel@gmail.com, netdev@vger.kernel.org
-Cc: dborkman@kernel.org, philipp.reisner@linbit.com, lars.ellenberg@linbit.com, 
-	christoph.boehmwalder@linbit.com, axboe@kernel.dk, chengyou@linux.alibaba.com, 
-	kaishen@linux.alibaba.com, jgg@ziepe.ca, leon@kernel.org, bmt@zurich.ibm.com, 
-	ccaulfie@redhat.com, teigland@redhat.com, mark@fasheh.com, jlbec@evilplan.org, 
-	joseph.qi@linux.alibaba.com, sfrench@samba.org, pc@manguebit.com, 
-	lsahlber@redhat.com, sprasad@microsoft.com, tom@talpey.com, ericvh@kernel.org, 
-	lucho@ionkov.net, asmadeus@codewreck.org, linux_oss@crudebyte.com, 
-	idryomov@gmail.com, xiubli@redhat.com, jlayton@kernel.org, horms@verge.net.au, 
-	ja@ssi.bg, pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de, 
-	santosh.shilimkar@oracle.com, Jordan Rife <jrife@google.com>
+Cc: dborkman@kernel.org, Jordan Rife <jrife@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
@@ -83,223 +74,106 @@ X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-commit 0bdf399342c5 ("net: Avoid address overwrite in kernel_connect")
-ensured that kernel_connect() will not overwrite the address parameter
-in cases where BPF connect hooks perform an address rewrite. This change
-replaces all direct calls to sock->ops->connect() with kernel_connect()
-to make these call safe.
+Callers of sock_sendmsg(), and similarly kernel_sendmsg(), in kernel
+space may observe their value of msg_name change in cases where BPF
+sendmsg hooks rewrite the send address. This has been confirmed to break
+NFS mounts running in UDP mode and has the potential to break other
+systems.
 
-This patch also introduces a sanity check to kernel_connect() for
-addrlen.
+This patch:
+
+1) Creates a new function called __sock_sendmsg() with same logic as the
+   old sock_sendmsg() function.
+2) Replaces calls to sock_sendmsg() made by __sys_sendto() and
+   __sys_sendmsg() with __sock_sendmsg() to avoid an unnecessary copy,
+   as these system calls are already protected.
+3) Modifies sock_sendmsg() so that it makes a copy of msg_name if
+   present before passing it down the stack to insulate callers from
+   changes to the send address.
 
 Link: https://lore.kernel.org/netdev/20230912013332.2048422-1-jrife@google.com/
-Fixes: d74bad4e74ee ("bpf: Hooks for sys_connect")
+Fixes: 1cedee13d25a ("bpf: Hooks for sys_sendmsg")
 Signed-off-by: Jordan Rife <jrife@google.com>
 ---
-v2->v3: Add "Fixes" tag. Check for positivity in addrlen sanity check.
-v1->v2: Split up original patch into patch series. Insulate calls with
-	kernel_connect() instead of pushing address copy deeper into
-	sock->ops->connect().
+v2->v3: Add "Fixes" tag.
+v1->v2: Split up original patch into patch series. Perform address copy
+	in sock_sendmsg() instead of sock->ops->sendmsg().
 
- drivers/block/drbd/drbd_receiver.c     |  2 +-
- drivers/infiniband/hw/erdma/erdma_cm.c |  2 +-
- drivers/infiniband/sw/siw/siw_cm.c     |  2 +-
- fs/dlm/lowcomms.c                      |  6 +++---
- fs/ocfs2/cluster/tcp.c                 |  8 ++++----
- fs/smb/client/connect.c                |  4 ++--
- net/9p/trans_fd.c                      | 10 +++++-----
- net/ceph/messenger.c                   |  4 ++--
- net/netfilter/ipvs/ip_vs_sync.c        |  4 ++--
- net/rds/tcp_connect.c                  |  2 +-
- net/socket.c                           |  3 +++
- 11 files changed, 25 insertions(+), 22 deletions(-)
+ net/socket.c | 32 ++++++++++++++++++++++++++------
+ 1 file changed, 26 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-index 0c9f54197768d..9b2660e990a98 100644
---- a/drivers/block/drbd/drbd_receiver.c
-+++ b/drivers/block/drbd/drbd_receiver.c
-@@ -646,7 +646,7 @@ static struct socket *drbd_try_connect(struct drbd_connection *connection)
- 	 * stay C_WF_CONNECTION, don't go Disconnecting! */
- 	disconnect_on_error = 0;
- 	what = "connect";
--	err = sock->ops->connect(sock, (struct sockaddr *) &peer_in6, peer_addr_len, 0);
-+	err = kernel_connect(sock, (struct sockaddr *)&peer_in6, peer_addr_len, 0);
- 
- out:
- 	if (err < 0) {
-diff --git a/drivers/infiniband/hw/erdma/erdma_cm.c b/drivers/infiniband/hw/erdma/erdma_cm.c
-index 771059a8eb7d7..e2b89e7bbe2b8 100644
---- a/drivers/infiniband/hw/erdma/erdma_cm.c
-+++ b/drivers/infiniband/hw/erdma/erdma_cm.c
-@@ -993,7 +993,7 @@ static int kernel_bindconnect(struct socket *s, struct sockaddr *laddr,
- 	ret = s->ops->bind(s, laddr, laddrlen);
- 	if (ret)
- 		return ret;
--	ret = s->ops->connect(s, raddr, raddrlen, flags);
-+	ret = kernel_connect(s, raddr, raddrlen, flags);
- 	return ret < 0 ? ret : 0;
- }
- 
-diff --git a/drivers/infiniband/sw/siw/siw_cm.c b/drivers/infiniband/sw/siw/siw_cm.c
-index a2605178f4eda..05624f424153e 100644
---- a/drivers/infiniband/sw/siw/siw_cm.c
-+++ b/drivers/infiniband/sw/siw/siw_cm.c
-@@ -1328,7 +1328,7 @@ static int kernel_bindconnect(struct socket *s, struct sockaddr *laddr,
- 	if (rv < 0)
- 		return rv;
- 
--	rv = s->ops->connect(s, raddr, size, flags);
-+	rv = kernel_connect(s, raddr, size, flags);
- 
- 	return rv < 0 ? rv : 0;
- }
-diff --git a/fs/dlm/lowcomms.c b/fs/dlm/lowcomms.c
-index f7bc22e74db27..1cf796b97eb65 100644
---- a/fs/dlm/lowcomms.c
-+++ b/fs/dlm/lowcomms.c
-@@ -1818,7 +1818,7 @@ static int dlm_tcp_bind(struct socket *sock)
- static int dlm_tcp_connect(struct connection *con, struct socket *sock,
- 			   struct sockaddr *addr, int addr_len)
- {
--	return sock->ops->connect(sock, addr, addr_len, O_NONBLOCK);
-+	return kernel_connect(sock, addr, addr_len, O_NONBLOCK);
- }
- 
- static int dlm_tcp_listen_validate(void)
-@@ -1876,12 +1876,12 @@ static int dlm_sctp_connect(struct connection *con, struct socket *sock,
- 	int ret;
- 
- 	/*
--	 * Make sock->ops->connect() function return in specified time,
-+	 * Make kernel_connect() function return in specified time,
- 	 * since O_NONBLOCK argument in connect() function does not work here,
- 	 * then, we should restore the default value of this attribute.
- 	 */
- 	sock_set_sndtimeo(sock->sk, 5);
--	ret = sock->ops->connect(sock, addr, addr_len, 0);
-+	ret = kernel_connect(sock, addr, addr_len, 0);
- 	sock_set_sndtimeo(sock->sk, 0);
- 	return ret;
- }
-diff --git a/fs/ocfs2/cluster/tcp.c b/fs/ocfs2/cluster/tcp.c
-index 960080753d3bd..ead7c287ff373 100644
---- a/fs/ocfs2/cluster/tcp.c
-+++ b/fs/ocfs2/cluster/tcp.c
-@@ -1636,10 +1636,10 @@ static void o2net_start_connect(struct work_struct *work)
- 	remoteaddr.sin_addr.s_addr = node->nd_ipv4_address;
- 	remoteaddr.sin_port = node->nd_ipv4_port;
- 
--	ret = sc->sc_sock->ops->connect(sc->sc_sock,
--					(struct sockaddr *)&remoteaddr,
--					sizeof(remoteaddr),
--					O_NONBLOCK);
-+	ret = kernel_connect(sc->sc_sock,
-+			     (struct sockaddr *)&remoteaddr,
-+			     sizeof(remoteaddr),
-+			     O_NONBLOCK);
- 	if (ret == -EINPROGRESS)
- 		ret = 0;
- 
-diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
-index 687754791bf0a..b7764cd57e035 100644
---- a/fs/smb/client/connect.c
-+++ b/fs/smb/client/connect.c
-@@ -3042,8 +3042,8 @@ generic_ip_connect(struct TCP_Server_Info *server)
- 		 socket->sk->sk_sndbuf,
- 		 socket->sk->sk_rcvbuf, socket->sk->sk_rcvtimeo);
- 
--	rc = socket->ops->connect(socket, saddr, slen,
--				  server->noblockcnt ? O_NONBLOCK : 0);
-+	rc = kernel_connect(socket, saddr, slen,
-+			    server->noblockcnt ? O_NONBLOCK : 0);
- 	/*
- 	 * When mounting SMB root file systems, we do not want to block in
- 	 * connect. Otherwise bail out and then let cifs_reconnect() perform
-diff --git a/net/9p/trans_fd.c b/net/9p/trans_fd.c
-index c4015f30f9fa7..225ee8b6d4c5b 100644
---- a/net/9p/trans_fd.c
-+++ b/net/9p/trans_fd.c
-@@ -1019,9 +1019,9 @@ p9_fd_create_tcp(struct p9_client *client, const char *addr, char *args)
- 		}
- 	}
- 
--	err = READ_ONCE(csocket->ops)->connect(csocket,
--				    (struct sockaddr *)&sin_server,
--				    sizeof(struct sockaddr_in), 0);
-+	err = kernel_connect(csocket,
-+			     (struct sockaddr *)&sin_server,
-+			     sizeof(struct sockaddr_in), 0);
- 	if (err < 0) {
- 		pr_err("%s (%d): problem connecting socket to %s\n",
- 		       __func__, task_pid_nr(current), addr);
-@@ -1060,8 +1060,8 @@ p9_fd_create_unix(struct p9_client *client, const char *addr, char *args)
- 
- 		return err;
- 	}
--	err = READ_ONCE(csocket->ops)->connect(csocket, (struct sockaddr *)&sun_server,
--			sizeof(struct sockaddr_un) - 1, 0);
-+	err = kernel_connect(csocket, (struct sockaddr *)&sun_server,
-+			     sizeof(struct sockaddr_un) - 1, 0);
- 	if (err < 0) {
- 		pr_err("%s (%d): problem connecting socket: %s: %d\n",
- 		       __func__, task_pid_nr(current), addr, err);
-diff --git a/net/ceph/messenger.c b/net/ceph/messenger.c
-index 10a41cd9c5235..3c8b78d9c4d1c 100644
---- a/net/ceph/messenger.c
-+++ b/net/ceph/messenger.c
-@@ -459,8 +459,8 @@ int ceph_tcp_connect(struct ceph_connection *con)
- 	set_sock_callbacks(sock, con);
- 
- 	con_sock_state_connecting(con);
--	ret = sock->ops->connect(sock, (struct sockaddr *)&ss, sizeof(ss),
--				 O_NONBLOCK);
-+	ret = kernel_connect(sock, (struct sockaddr *)&ss, sizeof(ss),
-+			     O_NONBLOCK);
- 	if (ret == -EINPROGRESS) {
- 		dout("connect %s EINPROGRESS sk_state = %u\n",
- 		     ceph_pr_addr(&con->peer_addr),
-diff --git a/net/netfilter/ipvs/ip_vs_sync.c b/net/netfilter/ipvs/ip_vs_sync.c
-index da5af28ff57b5..6e4ed1e11a3b7 100644
---- a/net/netfilter/ipvs/ip_vs_sync.c
-+++ b/net/netfilter/ipvs/ip_vs_sync.c
-@@ -1505,8 +1505,8 @@ static int make_send_sock(struct netns_ipvs *ipvs, int id,
- 	}
- 
- 	get_mcast_sockaddr(&mcast_addr, &salen, &ipvs->mcfg, id);
--	result = sock->ops->connect(sock, (struct sockaddr *) &mcast_addr,
--				    salen, 0);
-+	result = kernel_connect(sock, (struct sockaddr *)&mcast_addr,
-+				salen, 0);
- 	if (result < 0) {
- 		pr_err("Error connecting to the multicast addr\n");
- 		goto error;
-diff --git a/net/rds/tcp_connect.c b/net/rds/tcp_connect.c
-index f0c477c5d1db4..d788c6d28986f 100644
---- a/net/rds/tcp_connect.c
-+++ b/net/rds/tcp_connect.c
-@@ -173,7 +173,7 @@ int rds_tcp_conn_path_connect(struct rds_conn_path *cp)
- 	 * own the socket
- 	 */
- 	rds_tcp_set_callbacks(sock, cp);
--	ret = sock->ops->connect(sock, addr, addrlen, O_NONBLOCK);
-+	ret = kernel_connect(sock, addr, addrlen, O_NONBLOCK);
- 
- 	rdsdebug("connect to address %pI6c returned %d\n", &conn->c_faddr, ret);
- 	if (ret == -EINPROGRESS)
 diff --git a/net/socket.c b/net/socket.c
-index c8b08b32f097e..eb7f14143caed 100644
+index eb7f14143caed..2d34a69b84406 100644
 --- a/net/socket.c
 +++ b/net/socket.c
-@@ -3572,6 +3572,9 @@ int kernel_connect(struct socket *sock, struct sockaddr *addr, int addrlen,
- {
- 	struct sockaddr_storage address;
+@@ -737,6 +737,14 @@ static inline int sock_sendmsg_nosec(struct socket *sock, struct msghdr *msg)
+ 	return ret;
+ }
  
-+	if (addrlen < 0 || addrlen > sizeof(address))
-+		return -EINVAL;
++static int __sock_sendmsg(struct socket *sock, struct msghdr *msg)
++{
++	int err = security_socket_sendmsg(sock, msg,
++					  msg_data_left(msg));
 +
- 	memcpy(&address, addr, addrlen);
++	return err ?: sock_sendmsg_nosec(sock, msg);
++}
++
+ /**
+  *	sock_sendmsg - send a message through @sock
+  *	@sock: socket
+@@ -747,10 +755,22 @@ static inline int sock_sendmsg_nosec(struct socket *sock, struct msghdr *msg)
+  */
+ int sock_sendmsg(struct socket *sock, struct msghdr *msg)
+ {
+-	int err = security_socket_sendmsg(sock, msg,
+-					  msg_data_left(msg));
++	struct sockaddr_storage address;
++	struct sockaddr_storage *save_addr = (struct sockaddr_storage *)msg->msg_name;
++	int ret;
  
- 	return READ_ONCE(sock->ops)->connect(sock, (struct sockaddr *)&address,
+-	return err ?: sock_sendmsg_nosec(sock, msg);
++	if (msg->msg_name) {
++		if (msg->msg_namelen < 0 || msg->msg_namelen > sizeof(address))
++			return -EINVAL;
++
++		memcpy(&address, msg->msg_name, msg->msg_namelen);
++		msg->msg_name = &address;
++	}
++
++	ret = __sock_sendmsg(sock, msg);
++	msg->msg_name = save_addr;
++
++	return ret;
+ }
+ EXPORT_SYMBOL(sock_sendmsg);
+ 
+@@ -1138,7 +1158,7 @@ static ssize_t sock_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 	if (sock->type == SOCK_SEQPACKET)
+ 		msg.msg_flags |= MSG_EOR;
+ 
+-	res = sock_sendmsg(sock, &msg);
++	res = __sock_sendmsg(sock, &msg);
+ 	*from = msg.msg_iter;
+ 	return res;
+ }
+@@ -2174,7 +2194,7 @@ int __sys_sendto(int fd, void __user *buff, size_t len, unsigned int flags,
+ 	if (sock->file->f_flags & O_NONBLOCK)
+ 		flags |= MSG_DONTWAIT;
+ 	msg.msg_flags = flags;
+-	err = sock_sendmsg(sock, &msg);
++	err = __sock_sendmsg(sock, &msg);
+ 
+ out_put:
+ 	fput_light(sock->file, fput_needed);
+@@ -2538,7 +2558,7 @@ static int ____sys_sendmsg(struct socket *sock, struct msghdr *msg_sys,
+ 		err = sock_sendmsg_nosec(sock, msg_sys);
+ 		goto out_freectl;
+ 	}
+-	err = sock_sendmsg(sock, msg_sys);
++	err = __sock_sendmsg(sock, msg_sys);
+ 	/*
+ 	 * If this is sendmmsg() and sending to current destination address was
+ 	 * successful, remember it.
 -- 
 2.42.0.459.ge4e396fd5e-goog
 
