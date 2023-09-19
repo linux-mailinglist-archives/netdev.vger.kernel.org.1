@@ -1,101 +1,113 @@
-Return-Path: <netdev+bounces-34875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34877-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E9D97A5A71
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 09:04:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11B6C7A5A7D
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 09:06:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC8711C20CC9
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 07:04:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E6881C20C6B
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 07:06:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79D213588F;
-	Tue, 19 Sep 2023 07:04:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20B26358B3;
+	Tue, 19 Sep 2023 07:06:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3066134CFE
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 07:04:14 +0000 (UTC)
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B89AF118
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 00:04:12 -0700 (PDT)
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-9ada1842428so111514766b.1
-        for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 00:04:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD68635891
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 07:06:07 +0000 (UTC)
+Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55211119;
+	Tue, 19 Sep 2023 00:06:06 -0700 (PDT)
+Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-d7b79a4899bso4861711276.2;
+        Tue, 19 Sep 2023 00:06:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695107051; x=1695711851;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=d/LuZHHSnEA+ZRQK6hZMwwxNsZx+UGYYWxDQS26Kk7A=;
-        b=FTAxQ5P2sa7g91esbt8i99hEj26EcRFJ0XDgNzeKJYb+5jffByv/ELBx2abMKIXB32
-         DdiVPD04xzLcKyKzIxW6T9oY5mTx3gdCRmvVbquQyGw79UHunEg358YhSLV6F19v+PB7
-         tmr3mZ15vGCYXj0dq67B8PRih4DiSWP1sdqTZYgtV2e3+bz4jQ5sLLVIRmuln9vb82TB
-         MlIS8GuAt5bHsicxNS/ADTl03CPfVC1KSHOiCzU4WQcKqcG3piC6NoRBdeE42qlvxL6W
-         tdy3saS+fig76G5YGukYFILeGNJObo/THLu567etlrdQE76Nx1ZNYSORc8G2y+u7KAGh
-         kCpA==
-X-Gm-Message-State: AOJu0Yx3pJsi3wZPxE4UZ97kD6KppuHVVMIUXoSLE6jf/Ro0i2Qo85Yl
-	rFNdaEc/LP/OIby3rp3YEC4=
-X-Google-Smtp-Source: AGHT+IHWmj4W+Y9QZ2DqpEfiibOwPzes1Xi2G5DM9117uMzoXLq+26BklRQ62M9WKTUOYi7X5WHFeA==
-X-Received: by 2002:a17:906:9e:b0:9a5:ce62:6e1a with SMTP id 30-20020a170906009e00b009a5ce626e1amr8790586ejc.1.1695107050998;
-        Tue, 19 Sep 2023 00:04:10 -0700 (PDT)
-Received: from [192.168.64.157] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id jw24-20020a17090776b800b009a168ab6ee2sm7366103ejc.164.2023.09.19.00.04.09
+        d=1e100.net; s=20230601; t=1695107165; x=1695711965;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=I+JsXgPrRmZipxrSTjC/0RMNw3C2YqMInkATFZo5ysE=;
+        b=WC+fomU3VxoX8xfQusJk4k5jG/jamk2sMOGYGBEhTV5JEbxT8SfuGiJXvs2sPoyoTj
+         RIyZlXnSWbGeb/EM0uM9Xw/WVkUNCxofRbpBNHAbzjnztyxvYt5fbjbyqxGAR0CqXoxJ
+         Rjcd3oSxdJqY/PSXFJ+h4jC4xOq7bV5cPPfT2Xvb9qWaFTIzvGYl+BdIo3nuJjp90NSD
+         Bg3uF5V6Yxojd9szIp1iumvzHyKKpnET/hSXanjEehTYeNWRi6mcx/DW5aUeC/+B+ywZ
+         zLBQ8pzdUZTdqWZA3q0R+hQKEWhTJN+oHjQrIrleziZVVqVCE75PfToaLdYD1gab2KXZ
+         UDGA==
+X-Gm-Message-State: AOJu0YxZ8oyZiGzcOXCBXea6tZyo3X/9A2HWrwEMt3HaTYGnZmo5BoqV
+	v7q8XP3Fgp5is9cfx90DOXejV+w4uGf/HQ==
+X-Google-Smtp-Source: AGHT+IFbKSx2IkygULM0lUAAl7L761VXPUD30GbstwnRJbZUCyL4+hse65KKS9WvqdCA4uIPkgGK7g==
+X-Received: by 2002:a25:ca14:0:b0:d11:2a52:3f35 with SMTP id a20-20020a25ca14000000b00d112a523f35mr10852312ybg.20.1695107165249;
+        Tue, 19 Sep 2023 00:06:05 -0700 (PDT)
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com. [209.85.128.176])
+        by smtp.gmail.com with ESMTPSA id v142-20020a25c594000000b00d13b72fae3esm2715981ybe.2.2023.09.19.00.06.04
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Sep 2023 00:04:10 -0700 (PDT)
-Message-ID: <5b0fcc27-04aa-3ebd-e82a-8df39ed3ef5d@grimberg.me>
-Date: Tue, 19 Sep 2023 10:04:08 +0300
+        Tue, 19 Sep 2023 00:06:04 -0700 (PDT)
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-59ec6d7bb89so10436717b3.2;
+        Tue, 19 Sep 2023 00:06:04 -0700 (PDT)
+X-Received: by 2002:a81:7189:0:b0:592:4f93:e831 with SMTP id
+ m131-20020a817189000000b005924f93e831mr11737610ywc.48.1695107164442; Tue, 19
+ Sep 2023 00:06:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-Subject: Re: [PATCH v15 06/20] nvme-tcp: Add DDP data-path
-Content-Language: en-US
-To: Aurelien Aptel <aaptel@nvidia.com>, linux-nvme@lists.infradead.org,
- netdev@vger.kernel.org, hch@lst.de, kbusch@kernel.org, axboe@fb.com,
- chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org
-Cc: Boris Pismenny <borisp@nvidia.com>, aurelien.aptel@gmail.com,
- smalin@nvidia.com, malin1024@gmail.com, ogerlitz@nvidia.com,
- yorayz@nvidia.com, galshalom@nvidia.com, mgurtovoy@nvidia.com
-References: <20230912095949.5474-1-aaptel@nvidia.com>
- <20230912095949.5474-7-aaptel@nvidia.com>
- <ef66595c-95cd-94c4-7f51-d3d7683a188a@grimberg.me>
- <2537congwxt.fsf@nvidia.com>
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <2537congwxt.fsf@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,
+References: <20230918191916.1299418-1-u.kleine-koenig@pengutronix.de> <20230918191916.1299418-9-u.kleine-koenig@pengutronix.de>
+In-Reply-To: <20230918191916.1299418-9-u.kleine-koenig@pengutronix.de>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 19 Sep 2023 09:05:52 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdX2xEBGXrEMJP8Z-fyMGEppXEx2VDd2W1BqKu1DsXaeBQ@mail.gmail.com>
+Message-ID: <CAMuHMdX2xEBGXrEMJP8Z-fyMGEppXEx2VDd2W1BqKu1DsXaeBQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 8/9] net: dsa: rzn1_a5psw: Convert to platform
+ remove callback returning void
+To: =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+Cc: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
+	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
+	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
+	kernel@pengutronix.de
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Mon, Sep 18, 2023 at 9:22=E2=80=AFPM Uwe Kleine-K=C3=B6nig
+<u.kleine-koenig@pengutronix.de> wrote:
+> The .remove() callback for a platform driver returns an int which makes
+> many driver authors wrongly assume it's possible to do error handling by
+> returning an error code. However the value returned is ignored (apart
+> from emitting a warning) and this typically results in resource leaks.
+> To improve here there is a quest to make the remove callback return
+> void. In the first step of this quest all drivers are converted to
+> .remove_new() which already returns void. Eventually after all drivers
+> are converted, .remove_new() is renamed to .remove().
+>
+> Trivially convert this driver from always returning zero in the remove
+> callback to the void returning variant.
+>
+> Signed-off-by: Uwe Kleine-K=C3=B6nig <u.kleine-koenig@pengutronix.de>
 
->>> @@ -1235,6 +1330,9 @@ static int nvme_tcp_try_send_cmd_pdu(struct nvme_tcp_request *req)
->>>        else
->>>                msg.msg_flags |= MSG_EOR;
->>>
->>> +     if (test_bit(NVME_TCP_Q_OFF_DDP, &queue->flags))
->>> +             nvme_tcp_setup_ddp(queue, blk_mq_rq_from_pdu(req));
->>
->> Didn't we agree that setup_ddp should move to setup time and
->> not send time?
-> 
-> We believe we haven't reached a conclusion last time [1].
-> 
-> Moving the setup_ddp() call earlier at setup time is less efficient (up
-> to ~15% less IOPS) when it does the work on a different CPU.
-> 
-> 1: https://lore.kernel.org/all/253h6oxvlwd.fsf@nvidia.com/
+Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
-Can you please explain why? sk_incoming_cpu is updated from the network
-recv path while you are arguing that the timing matters before you even
-send the pdu. I don't understand why should that matter.
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
