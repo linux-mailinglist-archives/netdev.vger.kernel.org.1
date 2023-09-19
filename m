@@ -1,172 +1,186 @@
-Return-Path: <netdev+bounces-34910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34911-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1643E7A5E2F
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 11:36:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 641BF7A5E3A
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 11:38:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B7981C20F77
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 09:36:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C6552824F7
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 09:38:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B7E9341A0;
-	Tue, 19 Sep 2023 09:36:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 209EA341A0;
+	Tue, 19 Sep 2023 09:38:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 944892AB2D
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 09:36:14 +0000 (UTC)
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A00C8134;
-	Tue, 19 Sep 2023 02:36:10 -0700 (PDT)
-Received: by mail-lf1-x131.google.com with SMTP id 2adb3069b0e04-502984f5018so9094480e87.3;
-        Tue, 19 Sep 2023 02:36:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695116168; x=1695720968; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7m2efdLB8ktZfybi/MVWKqgiRo/osg2GKKQiDbaXOWg=;
-        b=APqNDH+1IFPvXFqatQ1sCnNv2C8dmUtRJ9RQIDrY+HAS2WS8dbfZ7LLlCh5lttn5vr
-         9tFrYw25N94/iiyJbYR9q84FOl4y0wZ/yyQF6mcX7Qs+0IxoJmsTIqXQ63uN2ddLskwn
-         J9rQtJZ6W7/2odzUpOadvRTNoROkUmpMNdqgF+Qu5b4rUBEgiIKfPovFICI2h6V+e/6j
-         vZ/JPPbJO/HxUofrWmu6AXcNx9oLu/NtyG0NoPhRm1PpOhkmPuWprm9H3jTwqLpgmLo9
-         uYYbtXVQfoTY0Y2nXWctVXatNwAr8n8Pvbk72rGkPYkp6yI9d6s+mrKkuyaR+vUOIHy9
-         DWAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695116168; x=1695720968;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7m2efdLB8ktZfybi/MVWKqgiRo/osg2GKKQiDbaXOWg=;
-        b=YcM6kGfrP5ComCPHYcz0CjEqpxkqmf8ehVZWyc7YamgN7GkE41ZfEvjgGd90LC8Wyj
-         lpRdPcT0zpzx2mHNv8FPBRPXnraeEHZTNjrGVMOmThYB7mbBkP22g59+rRkgmTjxI2gM
-         n983MDBPxw2UEhwMapcOmxGG+jttlTbTelL2gWSEL88vkEMR13D9vqzQpzNaIjWILx1q
-         OjveDE71Jxyz3ai2ThSHsfkm7BmD3CvYz9dpUT+7S0p1DjyCVqHQUS0ZkR4hF8XDV8Y8
-         0Nn866QxBwPrB1DvvDqUHOYWvHzWNmRWi1htZTxYEELKNrNnB2aIshxlU8zLCY2lJCLj
-         hBhw==
-X-Gm-Message-State: AOJu0YzEM578F63x8q2pUPCRV5mEAoUB7gCMvfgxQJ4qYX7D5xeOZWDl
-	ZfMqnVNLEmu4wkWQQjDPMCg=
-X-Google-Smtp-Source: AGHT+IHMbnTqsO0VDrNi2QZqkPFxshm2jbSMpD30w1QcJe4V3yS2zdB2k7/2TwtPX8XbWKDEpgs2RA==
-X-Received: by 2002:a19:4f1a:0:b0:4ff:95c:e158 with SMTP id d26-20020a194f1a000000b004ff095ce158mr9499408lfb.64.1695116167893;
-        Tue, 19 Sep 2023 02:36:07 -0700 (PDT)
-Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
-        by smtp.gmail.com with ESMTPSA id n7-20020a7bcbc7000000b003fef3180e7asm17560133wmi.44.2023.09.19.02.36.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Sep 2023 02:36:07 -0700 (PDT)
-From: Colin Ian King <colin.i.king@gmail.com>
-To: Vladimir Oltean <olteanv@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH][next] net: dsa: sja1105: make read-only const arrays static
-Date: Tue, 19 Sep 2023 10:36:06 +0100
-Message-Id: <20230919093606.24446-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.39.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4A8D450E9
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 09:38:30 +0000 (UTC)
+Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BF4DE7
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 02:38:28 -0700 (PDT)
+Received: from pps.filterd (m0250810.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38J6A3Co019017;
+	Tue, 19 Sep 2023 02:38:11 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
+	 h=from:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding:content-type; s=
+	PPS06212021; bh=FoHeJfDj+4G/JIgb3myzNjXn8OZlclbys96jzM5/WHM=; b=
+	neNE5n23XIY4X7gU9YixqoUC2/mpPpqFoRjcvFk0hsRp2gzlc5bXnVgCEbe8CwQN
+	xMPbCuSVfJsoTQoN/RXJ/GtoUE5a/M4akSjzYGcQXLXJNNhkj+iucGD07UfgOEDy
+	meBZWdHyNa5n64xjSc1yG/iaXbszd2FhqYCnKBQdaqNwXpGSmCa9jmwRmb7epdWf
+	N97DQ8vohZvwz2Bpx5ejwKyif/NYUw56MxMvu0Eu/Am9XuxPpucSjMTkexVPIfvn
+	xPBD8uIrVD+vMaYllAlq/8zhZHMnE2QfBvACqq1Cy6JK6arf51GHLgkqG8f6Qiih
+	0D8M5No9x2t/XOsZlbTfEw==
+Received: from ala-exchng01.corp.ad.wrs.com (ala-exchng01.wrs.com [147.11.82.252])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 3t57n0t57q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Tue, 19 Sep 2023 02:38:11 -0700 (PDT)
+Received: from ala-exchng01.corp.ad.wrs.com (147.11.82.252) by
+ ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Tue, 19 Sep 2023 02:38:10 -0700
+Received: from pek-lpd-ccm3.wrs.com (147.11.1.11) by
+ ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server id
+ 15.1.2507.32 via Frontend Transport; Tue, 19 Sep 2023 02:38:08 -0700
+From: Heng Guo <heng.guo@windriver.com>
+To: <davem@davemloft.net>, <sahern@kernel.org>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <filip.pudak@windriver.com>,
+        <heng.guo@windriver.com>
+Subject: [PATCH v2 0/1] Issue description and debug
+Date: Tue, 19 Sep 2023 17:38:02 +0800
+Message-ID: <20230919093803.56034-1-heng.guo@windriver.com>
+X-Mailer: git-send-email 2.35.2
+In-Reply-To: <20230914051623.2180843-2-heng.guo@windriver.com>
+References: <20230914051623.2180843-2-heng.guo@windriver.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: 23_CYDpurLKww-5THtZ-rqQ6Tqs8yYeF
+X-Proofpoint-ORIG-GUID: 23_CYDpurLKww-5THtZ-rqQ6Tqs8yYeF
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.980,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-09-19_04,2023-09-18_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 phishscore=0
+ suspectscore=0 mlxscore=0 lowpriorityscore=0 adultscore=0 bulkscore=0
+ clxscore=1015 malwarescore=0 mlxlogscore=460 priorityscore=1501
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2309190081
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Don't populate read-only const arrays on the stack, instead make them
-static.
+Hi maintainers,
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
----
- drivers/net/dsa/sja1105/sja1105_clocking.c | 21 +++++++++++++--------
- 1 file changed, 13 insertions(+), 8 deletions(-)
+The IPSTATS_MIB_OUTFORWDATAGRAMS is counted after fragment check.
 
-diff --git a/drivers/net/dsa/sja1105/sja1105_clocking.c b/drivers/net/dsa/sja1105/sja1105_clocking.c
-index e3699f76f6d7..08a3e7b96254 100644
---- a/drivers/net/dsa/sja1105/sja1105_clocking.c
-+++ b/drivers/net/dsa/sja1105/sja1105_clocking.c
-@@ -153,14 +153,14 @@ static int sja1105_cgu_mii_tx_clk_config(struct sja1105_private *priv,
- {
- 	const struct sja1105_regs *regs = priv->info->regs;
- 	struct sja1105_cgu_mii_ctrl mii_tx_clk;
--	const int mac_clk_sources[] = {
-+	static const int mac_clk_sources[] = {
- 		CLKSRC_MII0_TX_CLK,
- 		CLKSRC_MII1_TX_CLK,
- 		CLKSRC_MII2_TX_CLK,
- 		CLKSRC_MII3_TX_CLK,
- 		CLKSRC_MII4_TX_CLK,
- 	};
--	const int phy_clk_sources[] = {
-+	static const int phy_clk_sources[] = {
- 		CLKSRC_IDIV0,
- 		CLKSRC_IDIV1,
- 		CLKSRC_IDIV2,
-@@ -194,7 +194,7 @@ sja1105_cgu_mii_rx_clk_config(struct sja1105_private *priv, int port)
- 	const struct sja1105_regs *regs = priv->info->regs;
- 	struct sja1105_cgu_mii_ctrl mii_rx_clk;
- 	u8 packed_buf[SJA1105_SIZE_CGU_CMD] = {0};
--	const int clk_sources[] = {
-+	static const int clk_sources[] = {
- 		CLKSRC_MII0_RX_CLK,
- 		CLKSRC_MII1_RX_CLK,
- 		CLKSRC_MII2_RX_CLK,
-@@ -221,7 +221,7 @@ sja1105_cgu_mii_ext_tx_clk_config(struct sja1105_private *priv, int port)
- 	const struct sja1105_regs *regs = priv->info->regs;
- 	struct sja1105_cgu_mii_ctrl mii_ext_tx_clk;
- 	u8 packed_buf[SJA1105_SIZE_CGU_CMD] = {0};
--	const int clk_sources[] = {
-+	static const int clk_sources[] = {
- 		CLKSRC_IDIV0,
- 		CLKSRC_IDIV1,
- 		CLKSRC_IDIV2,
-@@ -248,7 +248,7 @@ sja1105_cgu_mii_ext_rx_clk_config(struct sja1105_private *priv, int port)
- 	const struct sja1105_regs *regs = priv->info->regs;
- 	struct sja1105_cgu_mii_ctrl mii_ext_rx_clk;
- 	u8 packed_buf[SJA1105_SIZE_CGU_CMD] = {0};
--	const int clk_sources[] = {
-+	static const int clk_sources[] = {
- 		CLKSRC_IDIV0,
- 		CLKSRC_IDIV1,
- 		CLKSRC_IDIV2,
-@@ -349,8 +349,13 @@ static int sja1105_cgu_rgmii_tx_clk_config(struct sja1105_private *priv,
- 	if (speed == priv->info->port_speed[SJA1105_SPEED_1000MBPS]) {
- 		clksrc = CLKSRC_PLL0;
- 	} else {
--		int clk_sources[] = {CLKSRC_IDIV0, CLKSRC_IDIV1, CLKSRC_IDIV2,
--				     CLKSRC_IDIV3, CLKSRC_IDIV4};
-+		static const int clk_sources[] = {
-+			CLKSRC_IDIV0,
-+			CLKSRC_IDIV1,
-+			CLKSRC_IDIV2,
-+			CLKSRC_IDIV3,
-+			CLKSRC_IDIV4,
-+		};
- 		clksrc = clk_sources[port];
- 	}
- 
-@@ -638,7 +643,7 @@ static int sja1105_cgu_rmii_ref_clk_config(struct sja1105_private *priv,
- 	const struct sja1105_regs *regs = priv->info->regs;
- 	struct sja1105_cgu_mii_ctrl ref_clk;
- 	u8 packed_buf[SJA1105_SIZE_CGU_CMD] = {0};
--	const int clk_sources[] = {
-+	static const int clk_sources[] = {
- 		CLKSRC_MII0_TX_CLK,
- 		CLKSRC_MII1_TX_CLK,
- 		CLKSRC_MII2_TX_CLK,
+Reproduce environment:
+network with 3 VM linuxs is connected as below:
+VM1<---->VM2(latest kernel 6.5.0-rc7)<---->VM3
+VM1: eth0 ip: 192.168.122.207 MTU 1800
+VM2: eth0 ip: 192.168.122.208, eth1 ip: 192.168.123.224 MTU 1500
+VM3: eth0 ip: 192.168.123.240 MTU 1800
+
+Reproduce:
+VM1 send 1600 bytes UDP data to VM3 using tools scapy with flags='DF'.
+scapy command:
+send(IP(dst="192.168.123.240",flags='DF')/UDP()/str('0'*1600),count=1,
+inter=1.000000)
+
+Result:
+Before IP data is sent.
+----------------------------------------------------------------------
+root@qemux86-64:~# cat /proc/net/snmp
+Ip: Forwarding DefaultTTL InReceives InHdrErrors InAddrErrors
+ForwDatagrams InUnknownProtos InDiscards InDelivers OutRequests
+ OutDiscards OutNoRoutes ReasmTimeout ReasmReqdss
+Ip: 1 64 6 0 2 2 0 0 2 4 0 0 0 0 0 0 0 0 0
+......
+root@qemux86-64:~#
+----------------------------------------------------------------------
+After IP data is sent.
+----------------------------------------------------------------------
+root@qemux86-64:~# cat /proc/net/snmp
+Ip: Forwarding DefaultTTL InReceives InHdrErrors InAddrErrors
+ ForwDatagrams InUnknownProtos InDiscards InDelivers OutRequests
+ OutDiscards OutNoRoutes ReasmTimeout ReasmReqdss
+Ip: 1 64 7 0 2 2 0 0 2 5 0 0 0 0 0 0 0 1 0
+......
+root@qemux86-64:~#
+----------------------------------------------------------------------
+ForwDatagrams is always keeping 2 without increment.
+
+Issue description and patch:
+ip_exceeds_mtu() in ip_forward() drops this IP datagram because skb len
+(1600 sending by scapy) is over MTU(1500 in VM2) and "DF" is set.
+According to RFC 4293 "3.2.3. IP Statistics Tables",
+  +-------+------>------+----->-----+----->-----+
+  | InForwDatagrams (6) | OutForwDatagrams (6)  |
+  |                     V                       +->-+ OutFragReqds
+  |                 InNoRoutes                  |   | (packets)
+  / (local packet (3)                           |   |
+  |  IF is that of the address                  |   +--> OutFragFails
+  |  and may not be the receiving IF)           |   |    (packets)
+the IPSTATS_MIB_OUTFORWDATAGRAMS should be counted before fragment
+check.
+The existing implementation, instead, would incease the counter after
+fragment check: ip_exceeds_mtu() in ipv4 and ip6_pkt_too_big() in ipv6.
+So do patch to move IPSTATS_MIB_OUTFORWDATAGRAMS counter to ip_forward()
+for ipv4 and ip6_forward() for ipv6.
+
+Test result with patch:
+Before IP data is sent.
+----------------------------------------------------------------------
+root@qemux86-64:~# cat /proc/net/snmp
+Ip: Forwarding DefaultTTL InReceives InHdrErrors InAddrErrors
+ ForwDatagrams InUnknownProtos InDiscards InDelivers OutRequests
+ OutDiscards OutNoRoutes ReasmTimeout ReasmReqdss
+Ip: 1 64 6 0 2 2 0 0 2 4 0 0 0 0 0 0 0 0 0
+......
+root@qemux86-64:~#
+----------------------------------------------------------------------
+After IP data is sent.
+----------------------------------------------------------------------
+root@qemux86-64:~# cat /proc/net/snmp
+Ip: Forwarding DefaultTTL InReceives InHdrErrors InAddrErrors
+ ForwDatagrams InUnknownProtos InDiscards InDelivers OutRequests
+ OutDiscards OutNoRoutes ReasmTimeout ReasmReqdss
+Ip: 1 64 7 0 2 3 0 0 2 5 0 0 0 0 0 0 0 1 0
+......
+root@qemux86-64:~#
+----------------------------------------------------------------------
+ForwDatagrams is updated from 2 to 3.
+
+Thanks,
+Heng
+
+
+
+v1->v2: fix build warning
+Reported-by: kernel test robot <lkp@intel.com>
+Closes:
+https://lore.kernel.org/oe-kbuild-all/202309141701.7OFxGdE5-lkp@intel.com/
+
+Heng Guo (1):
+  net: ipv4,ipv6: fix IPSTATS_MIB_OUTFORWDATAGRAMS increment after
+    fragment check
+
+ net/ipv4/ip_forward.c | 4 ++--
+ net/ipv6/ip6_output.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
 -- 
-2.39.2
+2.25.1
 
 
