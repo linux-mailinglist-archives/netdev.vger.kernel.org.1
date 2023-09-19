@@ -1,93 +1,133 @@
-Return-Path: <netdev+bounces-34845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 677827A5766
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 04:27:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 199947A577B
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 04:48:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 897E1281A56
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 02:27:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6288D2816B7
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 02:48:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 396CE6FBF;
-	Tue, 19 Sep 2023 02:27:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51B3D8470;
+	Tue, 19 Sep 2023 02:48:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32639450F6
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 02:27:23 +0000 (UTC)
-X-Greylist: delayed 49991 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 18 Sep 2023 19:27:22 PDT
-Received: from out-220.mta1.migadu.com (out-220.mta1.migadu.com [95.215.58.220])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 204C510D
-	for <netdev@vger.kernel.org>; Mon, 18 Sep 2023 19:27:22 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1695090440;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=GldjsjLN9+yIG261E0aNo5eTT0aAfea0jQrrQue5u00=;
-	b=mkZMkq7B3bUpxEPYmu2MMcafJg4hXDsOyrfwPXWWPuo23kQP5p5h2a7nbOPpddUEXUDmhf
-	3/dEV+SIuCGVpJMz0JvI/8VFF/lfB5lkXgdH/kllhkpg9ctUeoKO0voCtwe8OJ0D4beMvl
-	QehRcZutZVMEFLVcDtA8HLkEmZ4GjXA=
-From: Cai Huoqing <cai.huoqing@linux.dev>
-To: vadim.fedorenko@linux.dev
-Cc: Cai Huoqing <cai.huoqing@linux.dev>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] net: hinic: Fix warning-hinic_set_vlan_fliter() warn: variable dereferenced before check 'hwdev'
-Date: Tue, 19 Sep 2023 10:27:15 +0800
-Message-Id: <20230919022715.6424-1-cai.huoqing@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42BBD1105
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 02:48:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4BADC433C7;
+	Tue, 19 Sep 2023 02:48:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695091708;
+	bh=2755jxFkicCTn1c48CUYFE/Jy+ctGV/scn1ufTSgoSE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=eJk9Dm5XRqqK09RIwCsCDXeqTz7gty9GU76ALkzwS8FJ2hS0tNsnh/ZV+w4FOQpWD
+	 kX0sNfDSCYK21iL/CFOwIpr3aFsolal0A2UuAoobM8EgYR9uoLo25lW4xi3BDKrag1
+	 fL9LUt0+UjSqClHfInSUj7IhOEdhHhiJ/EVE+glogMjbG3dqATm6IiVAktrZ9sLcOR
+	 TVIJPn0gVH9FcN9eIfmuzzMguFzdwz0n3v6l0r1RaItMY45sukNd45aiLSyRTVhOeL
+	 vlsNRF9S+lq1h6k9lzqQMRbeMmtgkVwIvR0mGHf+GnIAcpUYYlp4OGMdAbTA2+46aU
+	 l13OrlGuSTZXw==
+Message-ID: <6196a7af-dd0f-a35f-df3f-56dce277b9bc@kernel.org>
+Date: Mon, 18 Sep 2023 20:48:26 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH net-next] ipv6: lockless IPV6_ADDR_PREFERENCES
+ implementation
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <20230918142321.1794107-1-edumazet@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20230918142321.1794107-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-'hwdev' is checked too late and hwdev will not be NULL, so remove the check
+On 9/18/23 8:23 AM, Eric Dumazet wrote:
+> We have data-races while reading np->srcprefs
+> 
+> Switch the field to a plain byte, add READ_ONCE()
+> and WRITE_ONCE() annotations where needed,
+> and IPV6_ADDR_PREFERENCES setsockopt() can now be lockless.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  include/linux/ipv6.h     |  2 +-
+>  include/net/ip6_route.h  |  5 ++---
+>  include/net/ipv6.h       | 20 +++++++-------------
+>  net/ipv6/ip6_output.c    |  2 +-
+>  net/ipv6/ipv6_sockglue.c | 19 ++++++++++---------
+>  net/ipv6/route.c         |  2 +-
+>  6 files changed, 22 insertions(+), 28 deletions(-)
+> 
+> diff --git a/include/linux/ipv6.h b/include/linux/ipv6.h
+> index 09253825c99c7a94c4c8a3f176f0ceecd0b166bc..e400ff757f136e72e81277d48063551e445b4970 100644
+> --- a/include/linux/ipv6.h
+> +++ b/include/linux/ipv6.h
+> @@ -243,7 +243,7 @@ struct ipv6_pinfo {
+>  	} rxopt;
+>  
+>  	/* sockopt flags */
+> -	__u8			srcprefs:3;	/* 001: prefer temporary address
+> +	__u8			srcprefs;	/* 001: prefer temporary address
+>  						 * 010: prefer public address
+>  						 * 100: prefer care-of address
+>  						 */
+> diff --git a/include/net/ip6_route.h b/include/net/ip6_route.h
+> index b1ea49900b4ae17cb3436f884e26f5ae3a7a761c..28b0657902615157c4cbd836cc70e0767cf49a4d 100644
+> --- a/include/net/ip6_route.h
+> +++ b/include/net/ip6_route.h
+> @@ -53,13 +53,12 @@ struct route_info {
+>   */
+>  static inline int rt6_srcprefs2flags(unsigned int srcprefs)
+>  {
+> -	/* No need to bitmask because srcprefs have only 3 bits. */
+> -	return srcprefs << 3;
+> +	return (srcprefs & IPV6_PREFER_SRC_MASK) << 3;
+>  }
+>  
+>  static inline unsigned int rt6_flags2srcprefs(int flags)
+>  {
+> -	return (flags >> 3) & 7;
+> +	return (flags >> 3) & IPV6_PREFER_SRC_MASK;
+>  }
+>  
+>  static inline bool rt6_need_strict(const struct in6_addr *daddr)
+> diff --git a/include/net/ipv6.h b/include/net/ipv6.h
+> index bd115980809f386a7d38a5471d8d636f25ce1eba..b3444c8a6f744c17052a9fa1c85d54c6b08a1889 100644
+> --- a/include/net/ipv6.h
+> +++ b/include/net/ipv6.h
+> @@ -1306,10 +1306,13 @@ static inline void ip6_sock_set_recverr(struct sock *sk)
+>  	inet6_set_bit(RECVERR6, sk);
+>  }
+>  
+> -static inline int __ip6_sock_set_addr_preferences(struct sock *sk, int val)
+> +#define IPV6_PREFER_SRC_MASK (IPV6_PREFER_SRC_TMP | IPV6_PREFER_SRC_PUBLIC | \
+> +			      IPV6_PREFER_SRC_COA)
+> +
+> +static inline int ip6_sock_set_addr_preferences(struct sock *sk, int val)
+>  {
+> +	unsigned int prefmask = ~IPV6_PREFER_SRC_MASK;
+>  	unsigned int pref = 0;
+> -	unsigned int prefmask = ~0;
+>  
+>  	/* check PUBLIC/TMP/PUBTMP_DEFAULT conflicts */
+>  	switch (val & (IPV6_PREFER_SRC_PUBLIC |
 
-Fixes: 2acf960e3be6 ("net: hinic: Add support for configuration of rx-vlan-filter by ethtool")
-Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-Closes: https://lore.kernel.org/r/202309112354.pikZCmyk-lkp@intel.com/
-Signed-off-by: Cai Huoqing <cai.huoqing@linux.dev>
----
-v1->v2: Remove 'hwdev' check directly 
-v1 link: https://lore.kernel.org/lkml/20230918123401.6951-1-cai.huoqing@linux.dev/
+Unfortunate that address preference details are spread across 3 non-uapi
+header files, but that is a change for a different patch.
 
- drivers/net/ethernet/huawei/hinic/hinic_port.c | 3 ---
- 1 file changed, 3 deletions(-)
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-diff --git a/drivers/net/ethernet/huawei/hinic/hinic_port.c b/drivers/net/ethernet/huawei/hinic/hinic_port.c
-index 9406237c461e..f81a43d2cdfc 100644
---- a/drivers/net/ethernet/huawei/hinic/hinic_port.c
-+++ b/drivers/net/ethernet/huawei/hinic/hinic_port.c
-@@ -456,9 +456,6 @@ int hinic_set_vlan_fliter(struct hinic_dev *nic_dev, u32 en)
- 	u16 out_size = sizeof(vlan_filter);
- 	int err;
- 
--	if (!hwdev)
--		return -EINVAL;
--
- 	vlan_filter.func_idx = HINIC_HWIF_FUNC_IDX(hwif);
- 	vlan_filter.enable = en;
- 
--- 
-2.34.1
 
 
