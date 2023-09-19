@@ -1,146 +1,123 @@
-Return-Path: <netdev+bounces-34881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 452EF7A5B64
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 09:41:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8FAE7A5B78
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 09:43:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E32D1C20CE3
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 07:41:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2B19281281
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 07:43:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EEB338BC4;
-	Tue, 19 Sep 2023 07:41:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7E7838BC7;
+	Tue, 19 Sep 2023 07:43:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC15A3B
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 07:41:01 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44D7A120
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 00:40:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1695109258;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=K8DEMBKUf7wrXxpg4qEqs33NQceh/oaxZGz6ns8z/zo=;
-	b=TAV+pjdNc2IlAARadWtKATuxQNmua7Bq9qenlHYB3UI/OXq5wLOn3qGC40NAMz3ZeOCjkT
-	iTn7BlDNcQeNiVVyOOZilAZhnFcvrHttxQP7AStTNrpJhQ7pzTcYu+Ol3z1q0sobnAzAt7
-	aXn26fCuQltpTw7+lT/nDHJWEeMa5Rg=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-591-PcUp0EpwNXugstWb-ZhmDQ-1; Tue, 19 Sep 2023 03:40:56 -0400
-X-MC-Unique: PcUp0EpwNXugstWb-ZhmDQ-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-40503cbb9b3so6281305e9.0
-        for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 00:40:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695109255; x=1695714055;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=K8DEMBKUf7wrXxpg4qEqs33NQceh/oaxZGz6ns8z/zo=;
-        b=c/0FWhrJjBaoGzRrK+d9NnUY/KbGxU4NgFF0Uox+zNMCI0BpCb5agmoFtpp0AFfpeL
-         ECZhppvWzU2h0FcL7Iqe+SPmEbRQkGJ0UJk4kei3u92DIJ6wDyAh68KdhIj8mZvaw2s7
-         fSgp7CqjrsURyfc3M/LEDP2SN8pr6HhZnjbpMr19c9NAvOPSVPB2vWpqzIBxQQvMbpO5
-         3a6IbeJTNFEzQP/771wqiQpIF+xbCvEnpLBCTxIybq6+SsioppL7D/U9/02J5yo1TTvx
-         qZowyG0zfCEEb6YzqCbxxI1ONdF+D/Hqs4CMBS2hwVsHPEW4mViwfkMk79xkHCQYlCrs
-         HI7w==
-X-Gm-Message-State: AOJu0YzfKDD7sKZ04mqQ3I2RPhr6Kyybu9eqS1C5FUSHqH9aLAwtJKbl
-	S9J6QQY+zW18K+ilyBJK/rovWrTK5CfT8XwgGogo/3okalvW7ecWXQSK92htY3yeS72ciqcN0EC
-	o2BJSpcy15wL0HmBU
-X-Received: by 2002:a05:600c:1da9:b0:404:72f9:d59a with SMTP id p41-20020a05600c1da900b0040472f9d59amr9945861wms.0.1695109255429;
-        Tue, 19 Sep 2023 00:40:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IER+za7ns1Evg+8KxlXu4Np/4twVy7+ly7Wu1nCY2T/FCiSZTNxseHXcM0mLSfVoVyOXRek2g==
-X-Received: by 2002:a05:600c:1da9:b0:404:72f9:d59a with SMTP id p41-20020a05600c1da900b0040472f9d59amr9945842wms.0.1695109255074;
-        Tue, 19 Sep 2023 00:40:55 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-241-221.dyn.eolo.it. [146.241.241.221])
-        by smtp.gmail.com with ESMTPSA id k15-20020a5d628f000000b0031f729d883asm14701393wru.42.2023.09.19.00.40.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Sep 2023 00:40:54 -0700 (PDT)
-Message-ID: <d89e68db75f06c41c9b28584c1210ed31d27db2a.camel@redhat.com>
-Subject: Re: [PATCH net v2] net: team: get rid of team->lock in team module
-From: Paolo Abeni <pabeni@redhat.com>
-To: Jiri Pirko <jiri@resnulli.us>, Taehee Yoo <ap420073@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com, 
- netdev@vger.kernel.org,
- syzbot+9bbbacfbf1e04d5221f7@syzkaller.appspotmail.com, 
- syzbot+1c71587a1a09de7fbde3@syzkaller.appspotmail.com
-Date: Tue, 19 Sep 2023 09:40:53 +0200
-In-Reply-To: <ZQXcOmtm1l36nUwV@nanopsycho>
-References: <20230916131115.488756-1-ap420073@gmail.com>
-	 <ZQXcOmtm1l36nUwV@nanopsycho>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D0ACA3B;
+	Tue, 19 Sep 2023 07:43:30 +0000 (UTC)
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A041FC;
+	Tue, 19 Sep 2023 00:43:28 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4RqYYh3nZ1z4f3khJ;
+	Tue, 19 Sep 2023 15:43:20 +0800 (CST)
+Received: from [10.67.109.184] (unknown [10.67.109.184])
+	by APP4 (Coremail) with SMTP id gCh0CgD3itobUQllqvpkAw--.22769S2;
+	Tue, 19 Sep 2023 15:43:24 +0800 (CST)
+Message-ID: <ed2be1b1-f556-42a5-878a-f3e499c18f2a@huaweicloud.com>
+Date: Tue, 19 Sep 2023 15:43:23 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next v2 4/6] riscv, bpf: Add necessary Zbb
+ instructions
+Content-Language: en-US
+To: Conor Dooley <conor@kernel.org>
+Cc: bpf@vger.kernel.org, linux-riscv@lists.infradead.org,
+ netdev@vger.kernel.org, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>,
+ KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Luke Nelson <luke.r.nels@gmail.com>,
+ Pu Lehui <pulehui@huawei.com>
+References: <20230919035839.3297328-1-pulehui@huaweicloud.com>
+ <20230919035839.3297328-5-pulehui@huaweicloud.com>
+ <20230919-a19c47b423c995826615a89e@fedora>
+From: Pu Lehui <pulehui@huaweicloud.com>
+In-Reply-To: <20230919-a19c47b423c995826615a89e@fedora>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:gCh0CgD3itobUQllqvpkAw--.22769S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7uF4DGry8uFW7ZFWkurWruFg_yoW8Jw4xpF
+	48GF45CrWvqrn7Gr9aqF18Wr15tF4Fqr13Gr47XrW8JFZFg345Krn5Gw1YgFn8uFyIkF1F
+	vrWfWFn3CF4jvaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkFb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxAIw28IcxkI
+	7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxV
+	Cjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY
+	6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6x
+	AIw20EY4v20xvaj40_Wr1j6rW3Jr1lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280
+	aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x07UZ18PUUUUU=
+X-CM-SenderInfo: psxovxtxl6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, 2023-09-16 at 18:47 +0200, Jiri Pirko wrote:
-> Sat, Sep 16, 2023 at 03:11:15PM CEST, ap420073@gmail.com wrote:
-> > The purpose of team->lock is to protect the private data of the team
-> > interface. But RTNL already protects it all well.
-> > The precise purpose of the team->lock is to reduce contention of
-> > RTNL due to GENL operations such as getting the team port list, and
-> > configuration dump.
-> >=20
-> > team interface has used a dynamic lockdep key to avoid false-positive
-> > lockdep deadlock detection. Virtual interfaces such as team usually
-> > have their own lock for protecting private data.
-> > These interfaces can be nested.
-> > team0
-> >  |
-> > team1
-> >=20
-> > Each interface's lock is actually different(team0->lock and team1->lock=
-).
-> > So,
-> > mutex_lock(&team0->lock);
-> > mutex_lock(&team1->lock);
-> > mutex_unlock(&team1->lock);
-> > mutex_unlock(&team0->lock);
-> > The above case is absolutely safe. But lockdep warns about deadlock.
-> > Because the lockdep understands these two locks are same. This is a
-> > false-positive lockdep warning.
-> >=20
-> > So, in order to avoid this problem, the team interfaces started to use
-> > dynamic lockdep key. The false-positive problem was fixed, but it
-> > introduced a new problem.
-> >=20
-> > When the new team virtual interface is created, it registers a dynamic
-> > lockdep key(creates dynamic lockdep key) and uses it. But there is the
-> > limitation of the number of lockdep keys.
-> > So, If so many team interfaces are created, it consumes all lockdep key=
-s.
-> > Then, the lockdep stops to work and warns about it.
->=20
-> What about fixing the lockdep instead? I bet this is not the only
-> occurence of this problem.
 
-I think/fear that solving the max key lockdep problem could be
-problematic hard and/or requiring an invasive change.
 
-Is there any real use-case requiring team devices being nested one to
-each other? If not, can we simply prevent such nesting in
-team_port_add()? I'm guessing that syzkaller can find more ways to
-exploit such complex setup.
+On 2023/9/19 15:38, Conor Dooley wrote:
+> On Tue, Sep 19, 2023 at 11:58:37AM +0800, Pu Lehui wrote:
+>> From: Pu Lehui <pulehui@huawei.com>
+>>
+>> Add necessary Zbb instructions introduced by [0] to reduce code size and
+>> improve performance of RV64 JIT. Meanwhile, a runtime deteted helper is
+>> added to check whether the CPU supports Zbb instructions.
+>>
+>> Link: https://github.com/riscv/riscv-bitmanip/releases/download/1.0.0/bitmanip-1.0.0-38-g865e7a7.pdf [0]
+>> Suggested-by: Conor Dooley <conor@kernel.org>
+> 
+> Nah, you can drop this. It was just a review comment :)
+> 
+OK, will drop if have next
 
-Cheers,
-
-Paolo
+>> Signed-off-by: Pu Lehui <pulehui@huawei.com>
+>> ---
+>>   arch/riscv/net/bpf_jit.h | 26 ++++++++++++++++++++++++++
+>>   1 file changed, 26 insertions(+)
+>>
+>> diff --git a/arch/riscv/net/bpf_jit.h b/arch/riscv/net/bpf_jit.h
+>> index 8e0ef4d08..4e24fb2bd 100644
+>> --- a/arch/riscv/net/bpf_jit.h
+>> +++ b/arch/riscv/net/bpf_jit.h
+>> @@ -18,6 +18,11 @@ static inline bool rvc_enabled(void)
+>>   	return IS_ENABLED(CONFIG_RISCV_ISA_C);
+>>   }
+>>   
+>> +static inline bool rvzbb_enabled(void)
+>> +{
+>> +	return IS_ENABLED(CONFIG_RISCV_ISA_ZBB) && riscv_has_extension_likely(RISCV_ISA_EXT_ZBB);
+> 
+> This looks like it should work, thanks for changing it.
+> 
+> Cheers,
+> Conor.
 
 
