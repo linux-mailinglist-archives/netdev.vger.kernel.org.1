@@ -1,175 +1,89 @@
-Return-Path: <netdev+bounces-34850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBF797A57C3
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 05:11:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B41757A57C7
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 05:15:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F14F281C23
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 03:11:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BEDB11C20D50
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 03:15:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DD2B328D3;
-	Tue, 19 Sep 2023 03:11:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6127F34184;
+	Tue, 19 Sep 2023 03:15:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A07328C8
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 03:11:27 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 197D8119;
-	Mon, 18 Sep 2023 20:11:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695093085; x=1726629085;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=//n56qSOGpYjB+Tw3lFwSa+S8fDa2+ZU1y1haKxm4iY=;
-  b=Y0vJSIAda41cB6a6hMxsIjLKf9s3B1PhNoOhlqDuucQVgRWksxHavu3x
-   YoIdXXZ3rtzS16mUye5cSU1TwIxodUBM0Kszf4XqW0qfuosrlPDC7FJQy
-   T4o3ggEOxRYDemaSLKGUQD0GTMCJ/1b39xv5fffdI/+t0BTtbQYCil3wA
-   D+xXrIHJsZvcuyt9ClQswdqPb0ITU4yDgqGuYsoEHH5B/Lcc6bNQgF5vK
-   2ruj48wUTz35WGGfrhotwMz/QleuNjcOiltqQNuzQpO3ZTqkozgru2HDP
-   nYWtonTAJh+gF9ujTo/DFIMvudtj3bLctbv0UVUC5b2goX0QCIHtFjmMv
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="378740633"
-X-IronPort-AV: E=Sophos;i="6.02,158,1688454000"; 
-   d="scan'208";a="378740633"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2023 20:11:24 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="992995676"
-X-IronPort-AV: E=Sophos;i="6.02,158,1688454000"; 
-   d="scan'208";a="992995676"
-Received: from lkp-server02.sh.intel.com (HELO 9ef86b2655e5) ([10.239.97.151])
-  by fmsmga006.fm.intel.com with ESMTP; 18 Sep 2023 20:11:20 -0700
-Received: from kbuild by 9ef86b2655e5 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qiR8w-0006pQ-1V;
-	Tue, 19 Sep 2023 03:11:18 +0000
-Date: Tue, 19 Sep 2023 11:10:44 +0800
-From: kernel test robot <lkp@intel.com>
-To: Miquel Raynal <miquel.raynal@bootlin.com>,
-	Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	linux-wpan@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	netdev@vger.kernel.org, David Girault <david.girault@qorvo.com>,
-	Romuald Despres <romuald.despres@qorvo.com>,
-	Frederic Blain <frederic.blain@qorvo.com>,
-	Nicolas Schodet <nico@ni.fr.eu.org>,
-	Guilhem Imberton <guilhem.imberton@qorvo.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: Re: [PATCH wpan-next v3 11/11] ieee802154: Give the user the
- association list
-Message-ID: <202309191044.4ABvPP5X-lkp@intel.com>
-References: <20230918150809.275058-12-miquel.raynal@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC6668470;
+	Tue, 19 Sep 2023 03:14:58 +0000 (UTC)
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2DB4112;
+	Mon, 18 Sep 2023 20:14:55 -0700 (PDT)
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 38J3EKDj82933326, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/2.92/5.92) with ESMTPS id 38J3EKDj82933326
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 19 Sep 2023 11:14:20 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.32; Tue, 19 Sep 2023 11:14:02 +0800
+Received: from fc38.localdomain (172.22.228.98) by RTEXMBS04.realtek.com.tw
+ (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.7; Tue, 19 Sep
+ 2023 11:14:02 +0800
+From: Hayes Wang <hayeswang@realtek.com>
+To: <kuba@kernel.org>, <davem@davemloft.net>
+CC: <netdev@vger.kernel.org>, <nic_swsd@realtek.com>,
+        <linux-kernel@vger.kernel.org>, <linux-usb@vger.kernel.org>,
+        <edumazet@google.com>, <bjorn@mork.no>, <pabeni@redhat.com>,
+        Hayes Wang
+	<hayeswang@realtek.com>
+Subject: [PATCH net-next v2 0/2] r8152: modify rx_bottom
+Date: Tue, 19 Sep 2023 11:13:49 +0800
+Message-ID: <20230919031351.7334-429-nic_swsd@realtek.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230918150809.275058-12-miquel.raynal@bootlin.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [172.22.228.98]
+X-ClientProxiedBy: RTEXH36506.realtek.com.tw (172.21.6.27) To
+ RTEXMBS04.realtek.com.tw (172.21.6.97)
+X-KSE-ServerInfo: RTEXMBS04.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Miquel,
+v2:
+For patch #1, add comment, update commit message, and add Fixes tag.
 
-kernel test robot noticed the following build errors:
+v1:
+These patches are used to improve rx_bottom().
 
-[auto build test ERROR on net-next/main]
-[also build test ERROR on net/main linus/master v6.6-rc2 next-20230918]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Hayes Wang (2):
+  r8152: remove queuing rx packets in driver
+  r8152: use napi_gro_frags
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Miquel-Raynal/ieee802154-Let-PAN-IDs-be-reset/20230919-002634
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20230918150809.275058-12-miquel.raynal%40bootlin.com
-patch subject: [PATCH wpan-next v3 11/11] ieee802154: Give the user the association list
-config: powerpc64-randconfig-001-20230919 (https://download.01.org/0day-ci/archive/20230919/202309191044.4ABvPP5X-lkp@intel.com/config)
-compiler: powerpc64-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230919/202309191044.4ABvPP5X-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202309191044.4ABvPP5X-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   net/ieee802154/nl802154.c: In function 'nl802154_list_associations':
->> net/ieee802154/nl802154.c:1778:15: error: implicit declaration of function 'nl802154_prepare_wpan_dev_dump' [-Werror=implicit-function-declaration]
-    1778 |         err = nl802154_prepare_wpan_dev_dump(skb, cb, &rdev, &wpan_dev);
-         |               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->> net/ieee802154/nl802154.c:1811:9: error: implicit declaration of function 'nl802154_finish_wpan_dev_dump' [-Werror=implicit-function-declaration]
-    1811 |         nl802154_finish_wpan_dev_dump(rdev);
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   cc1: some warnings being treated as errors
-
-
-vim +/nl802154_prepare_wpan_dev_dump +1778 net/ieee802154/nl802154.c
-
-  1769	
-  1770	static int nl802154_list_associations(struct sk_buff *skb,
-  1771					      struct netlink_callback *cb)
-  1772	{
-  1773		struct cfg802154_registered_device *rdev;
-  1774		struct ieee802154_pan_device *child;
-  1775		struct wpan_dev *wpan_dev;
-  1776		int err;
-  1777	
-> 1778		err = nl802154_prepare_wpan_dev_dump(skb, cb, &rdev, &wpan_dev);
-  1779		if (err)
-  1780			return err;
-  1781	
-  1782		mutex_lock(&wpan_dev->association_lock);
-  1783	
-  1784		if (cb->args[2])
-  1785			goto out;
-  1786	
-  1787		if (wpan_dev->parent) {
-  1788			err = nl802154_send_peer_info(skb, cb, cb->nlh->nlmsg_seq,
-  1789						      NLM_F_MULTI, rdev, wpan_dev,
-  1790						      wpan_dev->parent,
-  1791						      NL802154_PEER_TYPE_PARENT);
-  1792			if (err < 0)
-  1793				goto out_err;
-  1794		}
-  1795	
-  1796		list_for_each_entry(child, &wpan_dev->children, node) {
-  1797			err = nl802154_send_peer_info(skb, cb, cb->nlh->nlmsg_seq,
-  1798						      NLM_F_MULTI, rdev, wpan_dev,
-  1799						      child,
-  1800						      NL802154_PEER_TYPE_CHILD);
-  1801			if (err < 0)
-  1802				goto out_err;
-  1803		}
-  1804	
-  1805		cb->args[2] = 1;
-  1806	out:
-  1807		err = skb->len;
-  1808	out_err:
-  1809		mutex_unlock(&wpan_dev->association_lock);
-  1810	
-> 1811		nl802154_finish_wpan_dev_dump(rdev);
-  1812	
-  1813		return err;
-  1814	}
-  1815	
+ drivers/net/usb/r8152.c | 84 ++++++++++++++++++-----------------------
+ 1 file changed, 36 insertions(+), 48 deletions(-)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.41.0
+
 
