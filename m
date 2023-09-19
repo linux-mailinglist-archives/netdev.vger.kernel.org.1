@@ -1,358 +1,187 @@
-Return-Path: <netdev+bounces-34998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E29417A666A
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 16:19:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B9257A667E
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 16:21:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B345B1C209A7
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 14:19:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E14D7281EFC
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 14:21:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 788873716F;
-	Tue, 19 Sep 2023 14:18:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 962933715D;
+	Tue, 19 Sep 2023 14:21:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAB1937165
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 14:18:57 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63AAFBE;
-	Tue, 19 Sep 2023 07:18:55 -0700 (PDT)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38JDb4HF026717;
-	Tue, 19 Sep 2023 07:18:40 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-type; s=pfpt0220;
- bh=P5UlX3E1s+XY9LyEfHq8Mz6BYuAJueMM/PbIL+Q0jmA=;
- b=fDVXMCxNTAgj2govAGyClkvN/BcTsDEO2mKMLR+pVtJvFXSZW9asRGBkH56ULUoOdqMZ
- 9BPIjtZo+9DHFgu5sYGvsvQzINaAcY4kxiyJzvmgAA2h5UyLmVurL14YHSa6AhRgyqM0
- YJTvJBWCxEULg1Ir6W8a6tODh3gCh9JvCCK1+hYWQFHkBPVKYQu7lY1y7gh1/0WMWLjA
- AwcGIiTOjMpoZawAhiQPjWBZaiILh/dGDkKvGHEs2HL57Mhyp75i7BgGI2doyP2IasWT
- JXo9mIvHRLdFHS27XTzXCKkRRFpyXTyFSMEwiW6dvRd4uJX0J/28eZgu3U0lQfX6b3Z0 DQ== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3t5bvkrrb5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Tue, 19 Sep 2023 07:18:40 -0700
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 19 Sep
- 2023 07:18:37 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Tue, 19 Sep 2023 07:18:37 -0700
-Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id 25E2A3F709B;
-	Tue, 19 Sep 2023 07:18:33 -0700 (PDT)
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <sgoutham@marvell.com>,
-        <gakula@marvell.com>, <jerinj@marvell.com>, <lcherian@marvell.com>,
-        <sbhatta@marvell.com>, <hkelam@marvell.com>, <naveenm@marvell.com>,
-        <edumazet@google.com>, <pabeni@redhat.com>
-Subject: [net-net Patchv2] octeontx2-pf: Tc flower offload support for MPLS
-Date: Tue, 19 Sep 2023 19:48:32 +0530
-Message-ID: <20230919141832.5931-1-hkelam@marvell.com>
-X-Mailer: git-send-email 2.17.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECD7A1FAA
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 14:21:46 +0000 (UTC)
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27750B8
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 07:21:43 -0700 (PDT)
+Received: by mail-wr1-x42f.google.com with SMTP id ffacd0b85a97d-32155a45957so1980415f8f.0
+        for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 07:21:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1695133301; x=1695738101; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fJGMiysx/JfRAL6iX46WM7AExnXBLd3c6bT4aLtreL4=;
+        b=MTHr4gzj/701kE/m/m343/p70qUa2f/7L1HapT5HdqCC8EyNNDzTAIXT7gS5FuIgEo
+         iorFMMziRAtbV6o0mfWwt4VOlgbB1IeGuBVc5yeaHu5RnwHpDZ2aRROJqQ1uex19MOH9
+         9kh55BPlHkmWJvYjVyVJyxcxal/7tWd/opqmNoyL9t3Xqd58YCyHl/QweBy0OregCMH8
+         jBXQCwnEFZlxAbwxO4Ca4iEwHfH90yOpwwPP59yRgojfesHEsGMqxsNphzN86QSo+Z7T
+         fFT3j6j6LBOyiEX3v4rX6M+o78+jSsqZl9/DwZtF3mx9sGiImRtAG64VmyhzZ5CO8JFm
+         Bx1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695133301; x=1695738101;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fJGMiysx/JfRAL6iX46WM7AExnXBLd3c6bT4aLtreL4=;
+        b=nzek5nNIrkPuB9SYF6cJmjP0MgsVwEPCxpf+TDya54nKmfim26H4bXiA/Q0pcZyIUM
+         8fLa0E2PyGhA/gaAroVyfm6dJpTNam9K1opoy1TjOAPOtKroKLiRY18So/nbj6OdbUcN
+         E8d+kzUyWHmf7cfpptT4xbTZYN5C4b16s+gbZIIMsYEGu3ZKT4xVQhZpf6mbZKFjEyif
+         p43ptABDy9EVznh0ZPi5VenxHN6YH/lqJzqyAPZxKL0SVpDiB4eNsJOLE2C6XrtMVylw
+         W+qUxriJ8v9o2vyJGL55VgsF/YaS3iNCjXL/en0LyVcPHvckcZrumENhqncooAZ5GwaN
+         1X9A==
+X-Gm-Message-State: AOJu0YxSkoh4Vgtti1UTtnYcEMJX7mGKQRd92mPQMqhGKE+RJxCKkzoL
+	uunGeoANsLhbKpFlG4Va7xRXVJa5o+OrdnGSNqY=
+X-Google-Smtp-Source: AGHT+IFZww+99LiqYaFHaXnT4kMy1dhMAiggqBi3uCsB3VqghJzSpovZ5HhcR+WkuArAAe6lcI5PpQ==
+X-Received: by 2002:adf:a4c9:0:b0:31f:f9aa:a456 with SMTP id h9-20020adfa4c9000000b0031ff9aaa456mr9767527wrb.2.1695133301430;
+        Tue, 19 Sep 2023 07:21:41 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id o9-20020a5d62c9000000b00317afc7949csm15708239wrv.50.2023.09.19.07.21.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Sep 2023 07:21:40 -0700 (PDT)
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com
+Subject: [patch net-next] tools: ynl-gen: lift type requirement for attribute subsets
+Date: Tue, 19 Sep 2023 16:21:39 +0200
+Message-ID: <20230919142139.1167653-1-jiri@resnulli.us>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-GUID: ga6Sc3IeB3ZuBgF78npX5pKrxRYK0g9e
-X-Proofpoint-ORIG-GUID: ga6Sc3IeB3ZuBgF78npX5pKrxRYK0g9e
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-09-19_06,2023-09-19_01,2023-05-22_02
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
+	T_FILL_THIS_FORM_SHORT autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This patch extends flower offload support for MPLS protocol.
-Due to hardware limitation, currently driver supports lse
-depth up to 4.
+From: Jiri Pirko <jiri@nvidia.com>
 
-Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
-Signed-off-by: Sunil Goutham <sgoutham@marvell.com>
+In case an attribute is used in a subset, the type has to be currently
+specified. As the attribute is already defined in the original set, this
+is a redundant information in yaml file, moreover, may lead to
+inconsistencies.
+
+Example:
+attribute-sets:
+    ...
+    name: pin
+    enum-name: dpll_a_pin
+    attributes:
+      ...
+      -
+        name: parent-id
+        type: u32
+      ...
+  -
+    name: pin-parent-device
+    subset-of: pin
+    attributes:
+      -
+        name: parent-id
+        type: u32             <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+Remove the requirement from schema files to specify the "type" and add
+check and bail out if "type" is not set.
+
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
-v2 * instead of magic number 0xffffff00 use appropriate mask OTX2_FLOWER_MASK_MPLS_NON_TTL
+ Documentation/netlink/genetlink-c.yaml      | 2 +-
+ Documentation/netlink/genetlink-legacy.yaml | 2 +-
+ Documentation/netlink/genetlink.yaml        | 2 +-
+ Documentation/netlink/netlink-raw.yaml      | 2 +-
+ tools/net/ynl/ynl-gen-c.py                  | 2 ++
+ 5 files changed, 6 insertions(+), 4 deletions(-)
 
- .../net/ethernet/marvell/octeontx2/af/mbox.h  |  6 ++
- .../net/ethernet/marvell/octeontx2/af/npc.h   |  8 +++
- .../marvell/octeontx2/af/rvu_debugfs.c        | 52 ++++++++++++++++++
- .../marvell/octeontx2/af/rvu_npc_fs.c         | 46 ++++++++++++++++
- .../ethernet/marvell/octeontx2/nic/otx2_tc.c  | 55 +++++++++++++++++++
- 5 files changed, 167 insertions(+)
+diff --git a/Documentation/netlink/genetlink-c.yaml b/Documentation/netlink/genetlink-c.yaml
+index 9806c44f604c..80d8aa2708c5 100644
+--- a/Documentation/netlink/genetlink-c.yaml
++++ b/Documentation/netlink/genetlink-c.yaml
+@@ -142,7 +142,7 @@ properties:
+           type: array
+           items:
+             type: object
+-            required: [ name, type ]
++            required: [ name ]
+             additionalProperties: False
+             properties:
+               name:
+diff --git a/Documentation/netlink/genetlink-legacy.yaml b/Documentation/netlink/genetlink-legacy.yaml
+index 12a0a045605d..2a21aae525a4 100644
+--- a/Documentation/netlink/genetlink-legacy.yaml
++++ b/Documentation/netlink/genetlink-legacy.yaml
+@@ -180,7 +180,7 @@ properties:
+           type: array
+           items:
+             type: object
+-            required: [ name, type ]
++            required: [ name ]
+             additionalProperties: False
+             properties:
+               name:
+diff --git a/Documentation/netlink/genetlink.yaml b/Documentation/netlink/genetlink.yaml
+index 3d338c48bf21..9e8354f80466 100644
+--- a/Documentation/netlink/genetlink.yaml
++++ b/Documentation/netlink/genetlink.yaml
+@@ -115,7 +115,7 @@ properties:
+           type: array
+           items:
+             type: object
+-            required: [ name, type ]
++            required: [ name ]
+             additionalProperties: False
+             properties:
+               name:
+diff --git a/Documentation/netlink/netlink-raw.yaml b/Documentation/netlink/netlink-raw.yaml
+index 896797876414..9aeb64b27ada 100644
+--- a/Documentation/netlink/netlink-raw.yaml
++++ b/Documentation/netlink/netlink-raw.yaml
+@@ -187,7 +187,7 @@ properties:
+           type: array
+           items:
+             type: object
+-            required: [ name, type ]
++            required: [ name ]
+             additionalProperties: False
+             properties:
+               name:
+diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
+index 897af958cee8..b378412a9d7a 100755
+--- a/tools/net/ynl/ynl-gen-c.py
++++ b/tools/net/ynl/ynl-gen-c.py
+@@ -723,6 +723,8 @@ class AttrSet(SpecAttrSet):
+             self.c_name = ''
+ 
+     def new_attr(self, elem, value):
++        if 'type' not in elem:
++            raise Exception(f"Type has to be set for attribute {elem['name']}")
+         if elem['type'] in scalars:
+             t = TypeScalar(self.family, self, elem, value)
+         elif elem['type'] == 'unused':
+-- 
+2.41.0
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-index c5bd7747fc0e..6845556581c3 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-@@ -1473,6 +1473,12 @@ struct flow_msg {
- 		u8 next_header;
- 	};
- 	__be16 vlan_itci;
-+#define OTX2_FLOWER_MASK_MPLS_LB		GENMASK(31, 12)
-+#define OTX2_FLOWER_MASK_MPLS_TC		GENMASK(11, 9)
-+#define OTX2_FLOWER_MASK_MPLS_BOS		BIT(8)
-+#define OTX2_FLOWER_MASK_MPLS_TTL		GENMASK(7, 0)
-+#define OTX2_FLOWER_MASK_MPLS_NON_TTL		GENMASK(31, 8)
-+	u32 mpls_lse[4];
- };
-
- struct npc_install_flow_req {
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/npc.h b/drivers/net/ethernet/marvell/octeontx2/af/npc.h
-index de9fbd98dfb7..ab3e39eef2eb 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/npc.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/npc.h
-@@ -206,6 +206,14 @@ enum key_fields {
- 	NPC_SPORT_SCTP,
- 	NPC_DPORT_SCTP,
- 	NPC_IPSEC_SPI,
-+	NPC_MPLS1_LBTCBOS,
-+	NPC_MPLS1_TTL,
-+	NPC_MPLS2_LBTCBOS,
-+	NPC_MPLS2_TTL,
-+	NPC_MPLS3_LBTCBOS,
-+	NPC_MPLS3_TTL,
-+	NPC_MPLS4_LBTCBOS,
-+	NPC_MPLS4_TTL,
- 	NPC_HEADER_FIELDS_MAX,
- 	NPC_CHAN = NPC_HEADER_FIELDS_MAX, /* Valid when Rx */
- 	NPC_PF_FUNC, /* Valid when Tx */
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-index d30e84803481..e71c3da52cfd 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-@@ -2756,6 +2756,26 @@ static int rvu_dbg_npc_rx_miss_stats_display(struct seq_file *filp,
-
- RVU_DEBUG_SEQ_FOPS(npc_rx_miss_act, npc_rx_miss_stats_display, NULL);
-
-+#define RVU_DBG_PRINT_MPLS_TTL(pkt, mask)                                                  \
-+do {											   \
-+	seq_printf(s, "%ld ", FIELD_GET(OTX2_FLOWER_MASK_MPLS_TTL, pkt));                  \
-+	seq_printf(s, "mask 0x%lx\n", FIELD_GET(OTX2_FLOWER_MASK_MPLS_TTL, mask));         \
-+} while (0)                                                                                \
-+
-+#define RVU_DBG_PRINT_MPLS_LBTCBOS(_pkt, _mask)                                            \
-+do {										           \
-+	typeof(_pkt) (pkt) = (_pkt);							   \
-+	typeof(_mask) (mask) = (_mask);                                                    \
-+	seq_printf(s, "%ld %ld %ld\n",                                        \
-+		   FIELD_GET(OTX2_FLOWER_MASK_MPLS_LB, pkt),                               \
-+		   FIELD_GET(OTX2_FLOWER_MASK_MPLS_TC, pkt),                               \
-+		   FIELD_GET(OTX2_FLOWER_MASK_MPLS_BOS, pkt));                             \
-+	seq_printf(s, "\tmask 0x%lx 0x%lx 0x%lx\n",                           \
-+		   FIELD_GET(OTX2_FLOWER_MASK_MPLS_LB, mask),                              \
-+		   FIELD_GET(OTX2_FLOWER_MASK_MPLS_TC, mask),                              \
-+		   FIELD_GET(OTX2_FLOWER_MASK_MPLS_BOS, mask));                            \
-+} while (0)                                                                                \
-+
- static void rvu_dbg_npc_mcam_show_flows(struct seq_file *s,
- 					struct rvu_npc_mcam_rule *rule)
- {
-@@ -2836,6 +2856,38 @@ static void rvu_dbg_npc_mcam_show_flows(struct seq_file *s,
- 			seq_printf(s, "0x%x ", ntohl(rule->packet.spi));
- 			seq_printf(s, "mask 0x%x\n", ntohl(rule->mask.spi));
- 			break;
-+		case NPC_MPLS1_LBTCBOS:
-+			RVU_DBG_PRINT_MPLS_LBTCBOS(rule->packet.mpls_lse[0],
-+						   rule->mask.mpls_lse[0]);
-+			break;
-+		case NPC_MPLS1_TTL:
-+			RVU_DBG_PRINT_MPLS_TTL(rule->packet.mpls_lse[0],
-+					       rule->mask.mpls_lse[0]);
-+			break;
-+		case NPC_MPLS2_LBTCBOS:
-+			RVU_DBG_PRINT_MPLS_LBTCBOS(rule->packet.mpls_lse[1],
-+						   rule->mask.mpls_lse[1]);
-+			break;
-+		case NPC_MPLS2_TTL:
-+			RVU_DBG_PRINT_MPLS_TTL(rule->packet.mpls_lse[1],
-+					       rule->mask.mpls_lse[1]);
-+			break;
-+		case NPC_MPLS3_LBTCBOS:
-+			RVU_DBG_PRINT_MPLS_LBTCBOS(rule->packet.mpls_lse[2],
-+						   rule->mask.mpls_lse[2]);
-+			break;
-+		case NPC_MPLS3_TTL:
-+			RVU_DBG_PRINT_MPLS_TTL(rule->packet.mpls_lse[2],
-+					       rule->mask.mpls_lse[2]);
-+			break;
-+		case NPC_MPLS4_LBTCBOS:
-+			RVU_DBG_PRINT_MPLS_LBTCBOS(rule->packet.mpls_lse[3],
-+						   rule->mask.mpls_lse[3]);
-+			break;
-+		case NPC_MPLS4_TTL:
-+			RVU_DBG_PRINT_MPLS_TTL(rule->packet.mpls_lse[3],
-+					       rule->mask.mpls_lse[3]);
-+			break;
- 		default:
- 			seq_puts(s, "\n");
- 			break;
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-index 237f82082ebe..8c3c1a1e10a6 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-@@ -43,6 +43,14 @@ static const char * const npc_flow_names[] = {
- 	[NPC_DPORT_SCTP] = "sctp destination port",
- 	[NPC_LXMB]	= "Mcast/Bcast header ",
- 	[NPC_IPSEC_SPI] = "SPI ",
-+	[NPC_MPLS1_LBTCBOS] = "lse depth 1 label tc bos",
-+	[NPC_MPLS1_TTL]     = "lse depth 1 ttl",
-+	[NPC_MPLS2_LBTCBOS] = "lse depth 2 label tc bos",
-+	[NPC_MPLS2_TTL]     = "lse depth 2 ttl",
-+	[NPC_MPLS3_LBTCBOS] = "lse depth 3 label tc bos",
-+	[NPC_MPLS3_TTL]     = "lse depth 3 ttl",
-+	[NPC_MPLS4_LBTCBOS] = "lse depth 4 label tc bos",
-+	[NPC_MPLS4_TTL]     = "lse depth 4",
- 	[NPC_UNKNOWN]	= "unknown",
- };
-
-@@ -528,6 +536,14 @@ do {									       \
-
- 	NPC_SCAN_HDR(NPC_IPSEC_SPI, NPC_LID_LD, NPC_LT_LD_AH, 4, 4);
- 	NPC_SCAN_HDR(NPC_IPSEC_SPI, NPC_LID_LE, NPC_LT_LE_ESP, 0, 4);
-+	NPC_SCAN_HDR(NPC_MPLS1_LBTCBOS, NPC_LID_LC, NPC_LT_LC_MPLS, 0, 3);
-+	NPC_SCAN_HDR(NPC_MPLS1_TTL, NPC_LID_LC, NPC_LT_LC_MPLS, 3, 1);
-+	NPC_SCAN_HDR(NPC_MPLS2_LBTCBOS, NPC_LID_LC, NPC_LT_LC_MPLS, 4, 3);
-+	NPC_SCAN_HDR(NPC_MPLS2_TTL, NPC_LID_LC, NPC_LT_LC_MPLS, 7, 1);
-+	NPC_SCAN_HDR(NPC_MPLS3_LBTCBOS, NPC_LID_LC, NPC_LT_LC_MPLS, 8, 3);
-+	NPC_SCAN_HDR(NPC_MPLS3_TTL, NPC_LID_LC, NPC_LT_LC_MPLS, 11, 1);
-+	NPC_SCAN_HDR(NPC_MPLS4_LBTCBOS, NPC_LID_LC, NPC_LT_LC_MPLS, 12, 3);
-+	NPC_SCAN_HDR(NPC_MPLS4_TTL, NPC_LID_LC, NPC_LT_LC_MPLS, 15, 1);
-
- 	/* SMAC follows the DMAC(which is 6 bytes) */
- 	NPC_SCAN_HDR(NPC_SMAC, NPC_LID_LA, la_ltype, la_start + 6, 6);
-@@ -593,6 +609,11 @@ static void npc_set_features(struct rvu *rvu, int blkaddr, u8 intf)
- 	/* for L2M/L2B/L3M/L3B, check if the type is present in the key */
- 	if (npc_check_field(rvu, blkaddr, NPC_LXMB, intf))
- 		*features |= BIT_ULL(NPC_LXMB);
-+
-+	for (hdr = NPC_MPLS1_LBTCBOS; hdr <= NPC_MPLS4_TTL; hdr++) {
-+		if (npc_check_field(rvu, blkaddr, hdr, intf))
-+			*features |= BIT_ULL(hdr);
-+	}
- }
-
- /* Scan key extraction profile and record how fields of our interest
-@@ -959,6 +980,31 @@ do {									      \
- 	NPC_WRITE_FLOW(NPC_INNER_VID, vlan_itci, ntohs(pkt->vlan_itci), 0,
- 		       ntohs(mask->vlan_itci), 0);
-
-+	NPC_WRITE_FLOW(NPC_MPLS1_LBTCBOS, mpls_lse,
-+		       FIELD_GET(OTX2_FLOWER_MASK_MPLS_NON_TTL, pkt->mpls_lse[0]), 0,
-+		       FIELD_GET(OTX2_FLOWER_MASK_MPLS_NON_TTL, mask->mpls_lse[0]), 0);
-+	NPC_WRITE_FLOW(NPC_MPLS1_TTL, mpls_lse,
-+		       FIELD_GET(OTX2_FLOWER_MASK_MPLS_TTL, pkt->mpls_lse[0]), 0,
-+		       FIELD_GET(OTX2_FLOWER_MASK_MPLS_TTL, mask->mpls_lse[0]), 0);
-+	NPC_WRITE_FLOW(NPC_MPLS2_LBTCBOS, mpls_lse,
-+		       FIELD_GET(OTX2_FLOWER_MASK_MPLS_NON_TTL, pkt->mpls_lse[1]), 0,
-+		       FIELD_GET(OTX2_FLOWER_MASK_MPLS_NON_TTL, mask->mpls_lse[1]), 0);
-+	NPC_WRITE_FLOW(NPC_MPLS2_TTL, mpls_lse,
-+		       FIELD_GET(OTX2_FLOWER_MASK_MPLS_TTL, pkt->mpls_lse[1]), 0,
-+		       FIELD_GET(OTX2_FLOWER_MASK_MPLS_TTL, mask->mpls_lse[1]), 0);
-+	NPC_WRITE_FLOW(NPC_MPLS3_LBTCBOS, mpls_lse,
-+		       FIELD_GET(OTX2_FLOWER_MASK_MPLS_NON_TTL, pkt->mpls_lse[2]), 0,
-+		       FIELD_GET(OTX2_FLOWER_MASK_MPLS_NON_TTL, mask->mpls_lse[2]), 0);
-+	NPC_WRITE_FLOW(NPC_MPLS3_TTL, mpls_lse,
-+		       FIELD_GET(OTX2_FLOWER_MASK_MPLS_TTL, pkt->mpls_lse[2]), 0,
-+		       FIELD_GET(OTX2_FLOWER_MASK_MPLS_TTL, mask->mpls_lse[2]), 0);
-+	NPC_WRITE_FLOW(NPC_MPLS4_LBTCBOS, mpls_lse,
-+		       FIELD_GET(OTX2_FLOWER_MASK_MPLS_NON_TTL, pkt->mpls_lse[3]), 0,
-+		       FIELD_GET(OTX2_FLOWER_MASK_MPLS_NON_TTL, mask->mpls_lse[3]), 0);
-+	NPC_WRITE_FLOW(NPC_MPLS4_TTL, mpls_lse,
-+		       FIELD_GET(OTX2_FLOWER_MASK_MPLS_TTL, pkt->mpls_lse[3]), 0,
-+		       FIELD_GET(OTX2_FLOWER_MASK_MPLS_TTL, mask->mpls_lse[3]), 0);
-+
- 	NPC_WRITE_FLOW(NPC_IPFRAG_IPV6, next_header, pkt->next_header, 0,
- 		       mask->next_header, 0);
- 	npc_update_ipv6_flow(rvu, entry, features, pkt, mask, output, intf);
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-index fab9d85bfb37..95e6a58ba087 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-@@ -27,6 +27,8 @@
- #define CN10K_TLX_BURST_MANTISSA	GENMASK_ULL(43, 29)
- #define CN10K_TLX_BURST_EXPONENT	GENMASK_ULL(47, 44)
-
-+#define OTX2_UNSUPP_LSE_DEPTH		GENMASK(6, 4)
-+
- struct otx2_tc_flow_stats {
- 	u64 bytes;
- 	u64 pkts;
-@@ -519,6 +521,7 @@ static int otx2_tc_prepare_flow(struct otx2_nic *nic, struct otx2_tc_flow *node,
- 	      BIT_ULL(FLOW_DISSECTOR_KEY_IPV6_ADDRS) |
- 	      BIT_ULL(FLOW_DISSECTOR_KEY_PORTS) |
- 	      BIT(FLOW_DISSECTOR_KEY_IPSEC) |
-+	      BIT_ULL(FLOW_DISSECTOR_KEY_MPLS) |
- 	      BIT_ULL(FLOW_DISSECTOR_KEY_IP))))  {
- 		netdev_info(nic->netdev, "unsupported flow used key 0x%llx",
- 			    dissector->used_keys);
-@@ -738,6 +741,58 @@ static int otx2_tc_prepare_flow(struct otx2_nic *nic, struct otx2_tc_flow *node,
- 		}
- 	}
-
-+	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_MPLS)) {
-+		struct flow_match_mpls match;
-+		u8 bit;
-+
-+		flow_rule_match_mpls(rule, &match);
-+
-+		if (match.mask->used_lses & OTX2_UNSUPP_LSE_DEPTH) {
-+			NL_SET_ERR_MSG_MOD(extack,
-+					   "unsupported LSE depth for MPLS match offload");
-+			return -EOPNOTSUPP;
-+		}
-+
-+		for_each_set_bit(bit, (unsigned long *)&match.mask->used_lses,
-+				 FLOW_DIS_MPLS_MAX)  {
-+			/* check if any of the fields LABEL,TC,BOS are set */
-+			if (*((u32 *)&match.mask->ls[bit]) &
-+			    OTX2_FLOWER_MASK_MPLS_NON_TTL) {
-+				/* Hardware will capture 4 byte MPLS header into two
-+				 * fields NPC_MPLSX_LBTCBOS and NPC_MPLSX_TTL. Derive
-+				 * the associated NPC key based on header index and offset.
-+				 */
-+
-+				req->features |= BIT_ULL(NPC_MPLS1_LBTCBOS + 2 * bit);
-+				flow_spec->mpls_lse[bit] =
-+					FIELD_PREP(OTX2_FLOWER_MASK_MPLS_LB,
-+						   match.key->ls[bit].mpls_label) |
-+					FIELD_PREP(OTX2_FLOWER_MASK_MPLS_TC,
-+						   match.key->ls[bit].mpls_tc) |
-+					FIELD_PREP(OTX2_FLOWER_MASK_MPLS_BOS,
-+						   match.key->ls[bit].mpls_bos);
-+
-+				flow_mask->mpls_lse[bit] =
-+					FIELD_PREP(OTX2_FLOWER_MASK_MPLS_LB,
-+						   match.mask->ls[bit].mpls_label) |
-+					FIELD_PREP(OTX2_FLOWER_MASK_MPLS_TC,
-+						   match.mask->ls[bit].mpls_tc) |
-+					FIELD_PREP(OTX2_FLOWER_MASK_MPLS_BOS,
-+						   match.mask->ls[bit].mpls_bos);
-+			}
-+
-+			if (match.mask->ls[bit].mpls_ttl) {
-+				req->features |= BIT_ULL(NPC_MPLS1_TTL + 2 * bit);
-+				flow_spec->mpls_lse[bit] |=
-+					FIELD_PREP(OTX2_FLOWER_MASK_MPLS_TTL,
-+						   match.key->ls[bit].mpls_ttl);
-+				flow_mask->mpls_lse[bit] |=
-+					FIELD_PREP(OTX2_FLOWER_MASK_MPLS_TTL,
-+						   match.mask->ls[bit].mpls_ttl);
-+			}
-+		}
-+	}
-+
- 	return otx2_tc_parse_actions(nic, &rule->action, req, f, node);
- }
-
---
-2.17.1
 
