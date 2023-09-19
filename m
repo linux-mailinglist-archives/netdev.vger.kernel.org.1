@@ -1,111 +1,111 @@
-Return-Path: <netdev+bounces-34961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FAE77A62DC
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 14:27:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3294E7A631C
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 14:37:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 491C9281F6F
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 12:27:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59A971C20D63
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 12:37:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45823374D6;
-	Tue, 19 Sep 2023 12:27:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE09E1381;
+	Tue, 19 Sep 2023 12:37:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AC34374D4;
-	Tue, 19 Sep 2023 12:27:28 +0000 (UTC)
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0DEBF9;
-	Tue, 19 Sep 2023 05:27:22 -0700 (PDT)
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 38JCQbptE3560705, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/2.92/5.92) with ESMTPS id 38JCQbptE3560705
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 19 Sep 2023 20:26:38 +0800
-Received: from RTEXDAG02.realtek.com.tw (172.21.6.101) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.32; Tue, 19 Sep 2023 20:26:38 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXDAG02.realtek.com.tw (172.21.6.101) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.7; Tue, 19 Sep 2023 20:26:32 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::7445:d92b:d0b3:f79c]) by
- RTEXMBS04.realtek.com.tw ([fe80::7445:d92b:d0b3:f79c%5]) with mapi id
- 15.01.2375.007; Tue, 19 Sep 2023 20:26:31 +0800
-From: Hayes Wang <hayeswang@realtek.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "kuba@kernel.org" <kuba@kernel.org>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        nic_swsd <nic_swsd@realtek.com>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "linux-usb@vger.kernel.org"
-	<linux-usb@vger.kernel.org>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "bjorn@mork.no" <bjorn@mork.no>,
-        "pabeni@redhat.com" <pabeni@redhat.com>
-Subject: RE: [PATCH net-next v2 1/2] r8152: remove queuing rx packets in driver
-Thread-Topic: [PATCH net-next v2 1/2] r8152: remove queuing rx packets in
- driver
-Thread-Index: AQHZ6qdYyQovugIsME21Grz+cVcRerAhiHwAgACHqzA=
-Date: Tue, 19 Sep 2023 12:26:31 +0000
-Message-ID: <1a57cf3f867d4dfd991ef1d4024c931b@realtek.com>
-References: <20230919031351.7334-429-nic_swsd@realtek.com>
- <20230919031351.7334-430-nic_swsd@realtek.com>
- <369f3139-4e63-4327-8745-2d72d7dfea8f@lunn.ch>
-In-Reply-To: <369f3139-4e63-4327-8745-2d72d7dfea8f@lunn.ch>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-x-originating-ip: [172.22.228.6]
-x-kse-serverinfo: RTEXDAG02.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43DE6180
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 12:37:01 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0B75B8;
+	Tue, 19 Sep 2023 05:37:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=inDk8N2T125IGZw+Hvw9eF0VsCxTLPPSLhsQjE3UgpY=; b=nL2uvseSs2yqXWXhKPqR78UOq0
+	esDuwFxeHYnNEplu9VCpGpq9hHvusQFo0bx9moXbrq6jE6m3v5TL1LzHh/M2Ahsm9MLXnansfQFt7
+	hksjP/eSBLlbcdwPGIiyTbGUsdrg0feCi4ji6a8PCgU9hA9tvOV1qVaOrF56W7WnRUQ0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qiZyM-006uRA-4Z; Tue, 19 Sep 2023 14:36:58 +0200
+Date: Tue, 19 Sep 2023 14:36:58 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
+Subject: Re: netif_carrier_on() race
+Message-ID: <a0734a8e-5681-4fd1-8cf0-bcb63a43f897@lunn.ch>
+References: <346b21d87c69f817ea3c37caceb34f1f56255884.camel@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <346b21d87c69f817ea3c37caceb34f1f56255884.camel@sipsolutions.net>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Andrew Lunn <andrew@lunn.ch>
-> Sent: Tuesday, September 19, 2023 8:08 PM
-[...]
-> > -     return work_done;
-> > +     if (work_done > budget)
-> > +             return budget;
-> > +     else
-> > +             return work_done;
-> >  }
->=20
-> I don't know NAPI too well. Are there implications of not telling it
-> the truth?
+> All of this makes sense since you need to hold RTNL for all those state
+> changes/notifier chains, but it does lead to the first race/consistency
+> problem: if you query at just the right time you can see carrier being
+> on, however, if the carrier is actually removed again and the linkwatch
+> work didn't run yet, there might never be an event for the carrier on,
+> iow, you might have:
+> 
+>  netif_carrier_on()
+>  query from userspace and see carrier on
+>  netif_carrier_off()
+>  linkwatch work runs and sends only carrier off event
+> 
+> This is at least a bit confusing, but not really my main problem here,
+> though it did in fact happen to me as well, in a fashion.
 
-You could check the reply from Jakub Kicinski, as following link.
-https://www.spinics.net/lists/netdev/msg933846.html
-https://www.spinics.net/lists/netdev/msg933923.html
+That is interesting. Copper Ethernet PHYs might have the opposite
+problem. The status bit about link is latching low. This means that if
+the link is lost and then very quickly comes back again, you always
+get to see the lost and then restored link. So maybe we have:
 
-If the work_done is more than budget, I should return budget.
+  netif_carrier_off()
+  query from userspace and see carrier off
+  netif_carrier_oon()
+  linkwatch work runs and sends only carrier on event
 
-Best Regards,
-Hayes
+???
 
+Maybe we want linkwatch to keep the old and the new state. If there is
+a change reported while there is still work queued, which flips a bit
+back to its old state, it needs to block until the work is actually
+done?
+
+> Possible solution #2:
+> ---------------------
+> Another - more feasible - option might be to say OK, so the associated
+> event (and a few friends) are the problem, so we can queue those events
+> in cfg80211, and only release them on NETDEV_CHANGE notifier call.
+> That's from netdev_state_change() after dev_activate() in linkwatch
+> work. We'd want to pair it with netif_carrier_on() so we actually expect
+> the event to come, and maybe give netif_carrier_on() a return value
+> indicating that it scheduled - or else check using carrier_up_count
+> perhaps?
+
+Probably not an issue with 802.11, but sometimes drivers do odd things
+with the carrier because of the BMC. The BMC can have a side channel
+into the hosts NIC, which allows it to share the hosts PHY and RJ45
+socket. So that the BMC can send/receive frames while the host NIC is
+admin down, the carrier might actually be up. And requests to down the
+carrier are ignored.
+
+As i said, probably irrelevant to 802.11, but if you try to make a
+generic solution, you might need to watch out for this.
+
+	Andrew
 
