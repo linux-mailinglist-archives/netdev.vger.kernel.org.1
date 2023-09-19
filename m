@@ -1,266 +1,180 @@
-Return-Path: <netdev+bounces-35095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA84C7A6E8D
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 00:18:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B63CB7A6E8B
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 00:18:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A3D11C20357
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 22:18:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A71D91C20828
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 22:18:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7987B3C697;
-	Tue, 19 Sep 2023 22:15:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 861CF3B7B9;
+	Tue, 19 Sep 2023 22:15:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13B23B788;
-	Tue, 19 Sep 2023 22:15:36 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53739D8;
-	Tue, 19 Sep 2023 15:15:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=d0HioYZKyXay6hHxTJK1WFxa9hlPbFJmhfqfWx+ai4A=; b=flMHtCANXl75Zo3gGIrTeg0leW
-	uoJxGOvDO2RHyWSp0c6oV6fhgtitLbvcRI7x+J6kS19wxB4FpmZxhvOTafZlSNRnfB9dqgfsSeWi2
-	JyPnvm7cfFZRS9qz2I08cc6NvYz7yD/Yxqj8LaUlWJHWvE59m/vgkz/tYORNV8nBaHE8YtuJXknFD
-	e4fQVkY8gwGW1KS1iUodyTKwe4hBMuZaDPsmMVlXtnitCC+jo8fNgfjnmz9PwP/MOvySVXhVCSWT6
-	RVolgFqdnbpY8FSEF1P40wPx8vpuVXpW6G+TLxaOoV7nAtLGXhCL+VVh6iii0daCpRgdckFw1b/sV
-	eQn6ylkA==;
-Received: from sslproxy05.your-server.de ([78.46.172.2])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qiizy-000NfG-OD; Wed, 20 Sep 2023 00:15:14 +0200
-Received: from [194.230.148.14] (helo=localhost.localdomain)
-	by sslproxy05.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qiizy-000AW7-5l; Wed, 20 Sep 2023 00:15:14 +0200
-Subject: Re: [PATCH net-next 1/1] net/sched: Disambiguate verdict from return
- code
-To: Victor Nogueira <victor@mojatatu.com>, jhs@mojatatu.com,
- xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, paulb@nvidia.com
-Cc: netdev@vger.kernel.org, kernel@mojatatu.com, martin.lau@linux.dev,
- bpf@vger.kernel.org
-References: <20230919145951.352548-1-victor@mojatatu.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <beb5e6f3-e2a1-637d-e06d-247b36474e95@iogearbox.net>
-Date: Wed, 20 Sep 2023 00:15:13 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D64A83B285
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 22:15:35 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74248F7
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 15:15:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695161732; x=1726697732;
+  h=subject:from:to:cc:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Bx6O4pqWprve4wLQTszMsqej5dpku+qqVpPqIWtKcgc=;
+  b=gvNXIoEnrbYbVI69zCzX5IB2kP9x4LVXWsX9P5A+ROB9mzEQRDNUyova
+   RJq2Pn3BSiznFcYAIlmRa+HnB3CNX7r1qp5yM+UDhtnn5H8QeWS+Vef4j
+   HMVbD2LVpclXVx3RenN2IUr6+g2u8CXocg+8B1R+PhFGHBmo909+x4GkL
+   LSlwQIUyKfN8HsgMiQK4I/ELWSpOo0sdbftzy2TWIzIC7qe7KA1nMyZaj
+   8K6//RmTWrZ+xnXshyogaOkQR78uH7AlyJmbFq1pjtDdiP1sXiPqHsZ0x
+   W5KyutYUNvWDPEYPp7vnkVKdqWJALljFgZZ3g8GmpWH6DYMReLJydnM/M
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10838"; a="370378385"
+X-IronPort-AV: E=Sophos;i="6.02,160,1688454000"; 
+   d="scan'208";a="370378385"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2023 15:11:46 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10838"; a="749644498"
+X-IronPort-AV: E=Sophos;i="6.02,160,1688454000"; 
+   d="scan'208";a="749644498"
+Received: from anambiarhost.jf.intel.com ([10.166.29.163])
+  by fmsmga007.fm.intel.com with ESMTP; 19 Sep 2023 15:11:46 -0700
+Subject: [net-next PATCH v3 00/10] Introduce queue and NAPI support in
+ netdev-genl (Was: Introduce NAPI queues support)
+From: Amritha Nambiar <amritha.nambiar@intel.com>
+To: netdev@vger.kernel.org, kuba@kernel.org
+Cc: sridhar.samudrala@intel.com, amritha.nambiar@intel.com
+Date: Tue, 19 Sep 2023 15:27:14 -0700
+Message-ID: <169516206704.7377.12938469824609831999.stgit@anambiarhost.jf.intel.com>
+User-Agent: StGit/unknown-version
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20230919145951.352548-1-victor@mojatatu.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27036/Tue Sep 19 09:42:31 2023)
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-[ +Martin, bpf ]
+Add the capability to export the following via netdev-genl interface:
+- queue information supported by the device
+- NAPI information supported by the device
 
-On 9/19/23 4:59 PM, Victor Nogueira wrote:
-> Currently there is no way to distinguish between an error and a
-> classification verdict. This patch adds the verdict field as a part of
-> struct tcf_result. That way, tcf_classify can return a proper
-> error number when it fails, and we keep the classification result
-> information encapsulated in struct tcf_result.
-> 
-> Also add values SKB_DROP_REASON_TC_EGRESS_ERROR and
-> SKB_DROP_REASON_TC_INGRESS_ERROR to enum skb_drop_reason.
-> With that we can distinguish between a drop from a processing error versus
-> a drop from classification.
-> 
-> Signed-off-by: Victor Nogueira <victor@mojatatu.com>
-> ---
->   include/net/dropreason-core.h |  6 +++++
->   include/net/sch_generic.h     |  7 ++++++
->   net/core/dev.c                | 42 ++++++++++++++++++++++++++---------
->   net/sched/cls_api.c           | 38 ++++++++++++++++++++-----------
->   net/sched/sch_cake.c          | 32 +++++++++++++-------------
->   net/sched/sch_drr.c           | 33 +++++++++++++--------------
->   net/sched/sch_ets.c           |  6 +++--
->   net/sched/sch_fq_codel.c      | 29 ++++++++++++------------
->   net/sched/sch_fq_pie.c        | 28 +++++++++++------------
->   net/sched/sch_hfsc.c          |  6 +++--
->   net/sched/sch_htb.c           |  6 +++--
->   net/sched/sch_multiq.c        |  6 +++--
->   net/sched/sch_prio.c          |  7 ++++--
->   net/sched/sch_qfq.c           | 34 +++++++++++++---------------
->   net/sched/sch_sfb.c           | 29 ++++++++++++------------
->   net/sched/sch_sfq.c           | 28 +++++++++++------------
->   16 files changed, 195 insertions(+), 142 deletions(-)
-> 
-> diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
-> index a587e83fc169..b1c069c8e7f2 100644
-> --- a/include/net/dropreason-core.h
-> +++ b/include/net/dropreason-core.h
-> @@ -80,6 +80,8 @@
->   	FN(IPV6_NDISC_BAD_OPTIONS)	\
->   	FN(IPV6_NDISC_NS_OTHERHOST)	\
->   	FN(QUEUE_PURGE)			\
-> +	FN(TC_EGRESS_ERROR)		\
-> +	FN(TC_INGRESS_ERROR)		\
->   	FNe(MAX)
->   
->   /**
-> @@ -345,6 +347,10 @@ enum skb_drop_reason {
->   	SKB_DROP_REASON_IPV6_NDISC_NS_OTHERHOST,
->   	/** @SKB_DROP_REASON_QUEUE_PURGE: bulk free. */
->   	SKB_DROP_REASON_QUEUE_PURGE,
-> +	/** @SKB_DROP_REASON_TC_EGRESS_ERROR: dropped in TC egress HOOK due to error */
-> +	SKB_DROP_REASON_TC_EGRESS_ERROR,
-> +	/** @SKB_DROP_REASON_TC_INGRESS_ERROR: dropped in TC ingress HOOK due to error */
-> +	SKB_DROP_REASON_TC_INGRESS_ERROR,
->   	/**
->   	 * @SKB_DROP_REASON_MAX: the maximum of core drop reasons, which
->   	 * shouldn't be used as a real 'reason' - only for tracing code gen
-> diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-> index f232512505f8..9a3f71d2545e 100644
-> --- a/include/net/sch_generic.h
-> +++ b/include/net/sch_generic.h
-> @@ -326,6 +326,7 @@ struct Qdisc_ops {
->   
->   
->   struct tcf_result {
-> +	u32 verdict;
->   	union {
->   		struct {
->   			unsigned long	class;
-> @@ -336,6 +337,12 @@ struct tcf_result {
->   	};
->   };
->   
-> +static inline void tcf_result_set_verdict(struct tcf_result *res,
-> +					  const u32 verdict)
-> +{
-> +	res->verdict = verdict;
-> +}
-> +
->   struct tcf_chain;
->   
->   struct tcf_proto_ops {
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index ccff2b6ef958..1450f4741d9b 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -3910,31 +3910,39 @@ EXPORT_SYMBOL_GPL(netdev_xmit_skip_txqueue);
->   #endif /* CONFIG_NET_EGRESS */
->   
->   #ifdef CONFIG_NET_XGRESS
-> -static int tc_run(struct tcx_entry *entry, struct sk_buff *skb)
-> +static int tc_run(struct tcx_entry *entry, struct sk_buff *skb,
-> +		  struct tcf_result *res)
->   {
-> -	int ret = TC_ACT_UNSPEC;
-> +	int ret = 0;
->   #ifdef CONFIG_NET_CLS_ACT
->   	struct mini_Qdisc *miniq = rcu_dereference_bh(entry->miniq);
-> -	struct tcf_result res;
->   
-> -	if (!miniq)
-> +	if (!miniq) {
-> +		tcf_result_set_verdict(res, TC_ACT_UNSPEC);
->   		return ret;
-> +	}
->   
->   	tc_skb_cb(skb)->mru = 0;
->   	tc_skb_cb(skb)->post_ct = false;
->   
->   	mini_qdisc_bstats_cpu_update(miniq, skb);
-> -	ret = tcf_classify(skb, miniq->block, miniq->filter_list, &res, false);
-> +	ret = tcf_classify(skb, miniq->block, miniq->filter_list, res, false);
-> +	if (ret < 0) {
-> +		mini_qdisc_qstats_cpu_drop(miniq);
-> +		return ret;
-> +	}
->   	/* Only tcf related quirks below. */
-> -	switch (ret) {
-> +	switch (res->verdict) {
->   	case TC_ACT_SHOT:
->   		mini_qdisc_qstats_cpu_drop(miniq);
->   		break;
->   	case TC_ACT_OK:
->   	case TC_ACT_RECLASSIFY:
-> -		skb->tc_index = TC_H_MIN(res.classid);
-> +		skb->tc_index = TC_H_MIN(res->classid);
->   		break;
->   	}
-> +#else
-> +	tcf_result_set_verdict(res, TC_ACT_UNSPEC);
->   #endif /* CONFIG_NET_CLS_ACT */
->   	return ret;
->   }
-> @@ -3977,6 +3985,7 @@ sch_handle_ingress(struct sk_buff *skb, struct packet_type **pt_prev, int *ret,
->   		   struct net_device *orig_dev, bool *another)
->   {
->   	struct bpf_mprog_entry *entry = rcu_dereference_bh(skb->dev->tcx_ingress);
-> +	struct tcf_result res = {0};
->   	int sch_ret;
->   
->   	if (!entry)
-> @@ -3994,9 +4003,14 @@ sch_handle_ingress(struct sk_buff *skb, struct packet_type **pt_prev, int *ret,
->   		if (sch_ret != TC_ACT_UNSPEC)
->   			goto ingress_verdict;
->   	}
-> -	sch_ret = tc_run(tcx_entry(entry), skb);
-> +	sch_ret = tc_run(tcx_entry(entry), skb, &res);
-> +	if (sch_ret < 0) {
-> +		kfree_skb_reason(skb, SKB_DROP_REASON_TC_INGRESS_ERROR);
-> +		*ret = NET_RX_DROP;
-> +		return NULL;
-> +	}
->   ingress_verdict:
-> -	switch (sch_ret) {
-> +	switch (res.verdict) {
+Introduce support for associating  queue and NAPI instance.
+Extend the netdev_genl generic netlink family for netdev
+with queue and NAPI data. 
 
-This breaks tcx, please move all this logic into tc_run(). No changes to sch_handle_ingress()
-or sch_handle_egress should be necessary, you can then just remap the return code to TC_ACT_SHOT
-in such case.
+The queue parameters exposed are:
+- queue index
+- queue type
+- ifindex
+- NAPI id associated with the queue
+- tx maxrate
+Additional rx and tx queue parameters can be exposed in follow up
+patches by stashing them in netdev queue structures. XDP queue type
+can also be supported in future.
 
->   	case TC_ACT_REDIRECT:
->   		/* skb_mac_header check was done by BPF, so we can safely
->   		 * push the L2 header back before redirecting to another
-> @@ -4032,6 +4046,7 @@ static __always_inline struct sk_buff *
->   sch_handle_egress(struct sk_buff *skb, int *ret, struct net_device *dev)
->   {
->   	struct bpf_mprog_entry *entry = rcu_dereference_bh(dev->tcx_egress);
-> +	struct tcf_result res = {0};
->   	int sch_ret;
->   
->   	if (!entry)
-> @@ -4045,9 +4060,14 @@ sch_handle_egress(struct sk_buff *skb, int *ret, struct net_device *dev)
->   		if (sch_ret != TC_ACT_UNSPEC)
->   			goto egress_verdict;
->   	}
-> -	sch_ret = tc_run(tcx_entry(entry), skb);
-> +	sch_ret = tc_run(tcx_entry(entry), skb, &res);
-> +	if (sch_ret < 0) {
-> +		kfree_skb_reason(skb, SKB_DROP_REASON_TC_EGRESS_ERROR);
-> +		*ret = NET_XMIT_DROP;
-> +		return NULL;
-> +	}
->   egress_verdict:
-> -	switch (sch_ret) {
-> +	switch (res.verdict) {
->   	case TC_ACT_REDIRECT:
->   		/* No need to push/pop skb's mac_header here on egress! */
->   		skb_do_redirect(skb);
+The NAPI fields exposed are:
+- NAPI id
+- NAPI device ifindex
+- Interrupt number associated with the NAPI instance
+- PID for the NAPI thread
+
+This series only supports 'get' ability for retrieving
+certain queue and NAPI attributes. The 'set' ability for
+configuring queue and associated NAPI instance via netdev-genl
+will be submitted as a separate patch series.
+
+Previous discussion at:
+https://lore.kernel.org/netdev/c8476530638a5f4381d64db0e024ed49c2db3b02.camel@gmail.com/T/#m00999652a8b4731fbdb7bf698d2e3666c65a60e7
+
+$ ./cli.py --spec netdev.yaml --do queue-get  --json='{"ifindex": 12, "q-id": 0, "q-type": 0}'
+{'ifindex': 12, 'napi-id': 593, 'q-id': 0, 'q-type': 'rx'}
+
+$ ./cli.py --spec netdev.yaml  --do queue-get --json='{"ifindex": 12, "q-id": 0, "q-type": 1}'
+{'ifindex': 12, 'napi-id': 593, 'q-id': 0, 'q-type': 'tx', 'tx-maxrate': 0}
+
+$ ./cli.py --spec netdev.yaml  --dump queue-get --json='{"ifindex": 12}'
+[{'ifindex': 12, 'napi-id': 593, 'q-id': 0, 'q-type': 'rx'},
+ {'ifindex': 12, 'napi-id': 594, 'q-id': 1, 'q-type': 'rx'},
+ {'ifindex': 12, 'napi-id': 595, 'q-id': 2, 'q-type': 'rx'},
+ {'ifindex': 12, 'napi-id': 596, 'q-id': 3, 'q-type': 'rx'},
+ {'ifindex': 12, 'napi-id': 593, 'q-id': 0, 'q-type': 'tx', 'tx-maxrate': 0},
+ {'ifindex': 12, 'napi-id': 594, 'q-id': 1, 'q-type': 'tx', 'tx-maxrate': 0},
+ {'ifindex': 12, 'napi-id': 595, 'q-id': 2, 'q-type': 'tx', 'tx-maxrate': 0},
+ {'ifindex': 12, 'napi-id': 596, 'q-id': 3, 'q-type': 'tx', 'tx-maxrate': 0}]
+
+$ ./cli.py --spec netdev.yaml --do napi-get --json='{"napi-id": 593}'
+{'ifindex': 12, 'irq': 291, 'napi-id': 593, 'pid': 3817}
+
+$ ./cli.py --spec netdev.yaml --dump napi-get --json='{"ifindex": 12}'
+[{'ifindex': 12, 'irq': 294, 'napi-id': 596, 'pid': 3814},
+ {'ifindex': 12, 'irq': 293, 'napi-id': 595, 'pid': 3815},
+ {'ifindex': 12, 'irq': 292, 'napi-id': 594, 'pid': 3816},
+ {'ifindex': 12, 'irq': 291, 'napi-id': 593, 'pid': 3817}]
+
+v2 -> v3
+* Implemented queue as separate netlink object
+with support for exposing per-queue paramters
+* Removed queue-list associations with NAPI
+* Addressed other review feedback WRT tracking list
+iterations
+
+v1 -> v2
+* Removed multi-attr nest for NAPI object
+* Added support for flat/individual NAPI objects
+* Changed 'do' command to take napi-id as argument
+* Supported filtered 'dump' (dump with ifindex for a netdev and dump for
+  all netdevs)
+
+RFC -> v1
+* Changed to separate 'napi_get' command
+* Added support to expose interrupt and PID for the NAPI
+* Used list of netdev queue structs
+* Split patches further and fixed code style and errors
+
+---
+
+Amritha Nambiar (10):
+      netdev-genl: spec: Extend netdev netlink spec in YAML for queue
+      net: Add queue and napi association
+      ice: Add support in the driver for associating queue with napi
+      netdev-genl: Add netlink framework functions for queue
+      netdev-genl: spec: Extend netdev netlink spec in YAML for NAPI
+      netdev-genl: Add netlink framework functions for napi
+      netdev-genl: spec: Add irq in netdev netlink YAML spec
+      net: Add NAPI IRQ support
+      netdev-genl: spec: Add PID in netdev netlink YAML spec
+      netdev-genl: Add PID for the NAPI thread
+
+
+ Documentation/netlink/specs/netdev.yaml   |   92 ++++++++
+ drivers/net/ethernet/intel/ice/ice_lib.c  |   60 +++++
+ drivers/net/ethernet/intel/ice/ice_lib.h  |    4 
+ drivers/net/ethernet/intel/ice/ice_main.c |    4 
+ include/linux/netdevice.h                 |   13 +
+ include/net/netdev_rx_queue.h             |    2 
+ include/uapi/linux/netdev.h               |   28 ++
+ net/core/dev.c                            |   39 +++
+ net/core/netdev-genl-gen.c                |   50 ++++
+ net/core/netdev-genl-gen.h                |    5 
+ net/core/netdev-genl.c                    |  347 +++++++++++++++++++++++++++++
+ tools/include/uapi/linux/netdev.h         |   28 ++
+ tools/net/ynl/generated/netdev-user.c     |  295 +++++++++++++++++++++++++
+ tools/net/ynl/generated/netdev-user.h     |  180 +++++++++++++++
+ 14 files changed, 1143 insertions(+), 4 deletions(-)
+
+--
 
