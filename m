@@ -1,174 +1,230 @@
-Return-Path: <netdev+bounces-34903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50BAC7A5CAF
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 10:35:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ED3E7A5C97
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 10:33:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E2931C20F35
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 08:35:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FE491C20EA2
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 08:33:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6242358AB;
-	Tue, 19 Sep 2023 08:35:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C735A38BB4;
+	Tue, 19 Sep 2023 08:32:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160B6F509;
-	Tue, 19 Sep 2023 08:35:20 +0000 (UTC)
-X-Greylist: delayed 482 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 19 Sep 2023 01:35:16 PDT
-Received: from mail.katalix.com (mail.katalix.com [IPv6:2a05:d01c:827:b342:16d0:7237:f32a:8096])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2F83512F;
-	Tue, 19 Sep 2023 01:35:16 -0700 (PDT)
-Received: from localhost (unknown [IPv6:2a02:8012:909b:0:adca:73b6:841b:e197])
-	(Authenticated sender: tom)
-	by mail.katalix.com (Postfix) with ESMTPSA id C25287EA0A;
-	Tue, 19 Sep 2023 09:27:13 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
-	t=1695112033; bh=CWPOj42vo1VLahFkddCpX9HOxMdoGJMoAp4EYdfoRWs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Disposition:In-Reply-To:From;
-	z=Date:=20Tue,=2019=20Sep=202023=2009:27:13=20+0100|From:=20Tom=20P
-	 arkin=20<tparkin@katalix.com>|To:=20Eric=20Dumazet=20<edumazet@goo
-	 gle.com>|Cc:=20Willem=20de=20Bruijn=20<willemdebruijn.kernel@gmail
-	 .com>,=0D=0A=09David=20Howells=20<dhowells@redhat.com>,=0D=0A=09sy
-	 zbot=20<syzbot+62cbf263225ae13ff153@syzkaller.appspotmail.com>,=0D
-	 =0A=09bpf@vger.kernel.org,=20davem@davemloft.net,=20dsahern@kernel
-	 .org,=0D=0A=09kuba@kernel.org,=20linux-kernel@vger.kernel.org,=0D=
-	 0A=09netdev@vger.kernel.org,=20pabeni@redhat.com,=0D=0A=09syzkalle
-	 r-bugs@googlegroups.com|Subject:=20Re:=20[syzbot]=20[net?]=20WARNI
-	 NG=20in=20__ip6_append_data|Message-ID:=20<ZQlbYVCjCyuPotdX@katali
-	 x.com>|References:=20<3793723.1694795079@warthog.procyon.org.uk>=0
-	 D=0A=20<CANn89iLwMhOnrmQTZJ+BqZJSbJZ+Q4W6xRknAAr+uSrk5TX-EQ@mail.g
-	 mail.com>=0D=0A=20<0000000000001c12b30605378ce8@google.com>=0D=0A=
-	 20<3905046.1695031382@warthog.procyon.org.uk>=0D=0A=20<65085768c17
-	 da_898cd294ae@willemb.c.googlers.com.notmuch>=0D=0A=20<CANn89iJ39H
-	 guu6bRm2am6J_u0pSnm++ORa_UVpC0+8-mxORFfw@mail.gmail.com>|MIME-Vers
-	 ion:=201.0|Content-Disposition:=20inline|In-Reply-To:=20<CANn89iJ3
-	 9Hguu6bRm2am6J_u0pSnm++ORa_UVpC0+8-mxORFfw@mail.gmail.com>;
-	b=WnT0zDzGVLTO7JManFGA4oHixkhzvG2IjnUtWaXi0AdzSV2+FV27g/f4hhaf5hmTn
-	 /tS94y+6rdjNpV664UAGmLSVLiTlCdqbEm8dybaxfUYsPMRFNaAVQ5xO942NbSfrOX
-	 nUsEBgKB6i61ALidtdat6o1fEjlVPcjaEZAsg74D3cZKFlng/7u057lQ8a0mkuqf/p
-	 Irgtcq2EGsci7fUi/YezBZDJ6pNsaZVClWyVOVnibZARlKraaflyyQJ/ndZEc3cntV
-	 jBdOMhpud9Ol+F2jy9VlZtHYSdZGx6hYWb1fjVU6B+B02RpA81DJpXUPLG+9nlk5vk
-	 yqSIQfETZtYmA==
-Date: Tue, 19 Sep 2023 09:27:13 +0100
-From: Tom Parkin <tparkin@katalix.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	David Howells <dhowells@redhat.com>,
-	syzbot <syzbot+62cbf263225ae13ff153@syzkaller.appspotmail.com>,
-	bpf@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
-	kuba@kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [net?] WARNING in __ip6_append_data
-Message-ID: <ZQlbYVCjCyuPotdX@katalix.com>
-References: <3793723.1694795079@warthog.procyon.org.uk>
- <CANn89iLwMhOnrmQTZJ+BqZJSbJZ+Q4W6xRknAAr+uSrk5TX-EQ@mail.gmail.com>
- <0000000000001c12b30605378ce8@google.com>
- <3905046.1695031382@warthog.procyon.org.uk>
- <65085768c17da_898cd294ae@willemb.c.googlers.com.notmuch>
- <CANn89iJ39Hguu6bRm2am6J_u0pSnm++ORa_UVpC0+8-mxORFfw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C50D79CD
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 08:32:47 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D4F5114;
+	Tue, 19 Sep 2023 01:32:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695112366; x=1726648366;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=p5b47tBzw/+3ty++y9okl7mAy08SzXvVi+NKQmeDnms=;
+  b=HBMsip+xex6GOZXS/yqiPkcfW7uqr5zM0uIOKo4BjZb6Tcb7bPOj8edO
+   08nSQiC1ldWQN5oXXRW3k27dmj3ah4FmKBI1V7pogBFLJwBgTevdC9dPw
+   5Rc3nI73QnmxsuY+yOTNjkg2gNKsdgOTLrB2zcyTt0Zip1um8pPn+cvCg
+   C/sbWb9eBmN7mFlDRNfDrHzO39mE92O5eIcyp24QoZpFLJ/UXY7HfOrV+
+   yn62Q1CUaff/oKOCh90HCStwbexJH8GqKsHaDtUsmGCRFjNKX8577GLUp
+   Usqa5DTEihiGadig9KVSMzN9FlkrDQ3d7NZknbI9WC1yDbMZ0MUL/E7HO
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="383708703"
+X-IronPort-AV: E=Sophos;i="6.02,159,1688454000"; 
+   d="scan'208";a="383708703"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2023 01:32:45 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="811650032"
+X-IronPort-AV: E=Sophos;i="6.02,159,1688454000"; 
+   d="scan'208";a="811650032"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmsmga008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 19 Sep 2023 01:32:28 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Tue, 19 Sep 2023 01:32:24 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Tue, 19 Sep 2023 01:32:24 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.104)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Tue, 19 Sep 2023 01:32:23 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fHDcTlzGgFAFBxG1kO+vBhL9Cm9DJgwFEBxHgjvN/9ABZv4JOYB4C0uLfuI4mkDXt9lMb2/Tr5jlX/+DHGCtfxUAZmHEm8NpJJB0F/Hyz/6s4BeoVKA5VYb4OzEpC0UzcdFh5lgewI3AevyucfFt13R/9Cy/5jF+L/lMyrxsaa/Uz6YaJnvWQIB/1hCJP0EMKbnLpW0kpielxhr3c/+oRQkBiiNbbOqQpYv0cRM0LCf0ZTMut/HQ3Nk4BFo3vL/SHesQZRmZhwb8CUt6QZ8+446BfSny7oCwBSQ5ryUi3nZWKiagPiRpLz53iZft4C7K8zejN9DItFsDMStSc2F6GQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=b8zHZwp9Qtb1tpPjsm5BNdIwBXX8DjPDMAiAsvyH/kY=;
+ b=RZRHDij4eF7tm5PRNWj76HKaT2BQ4txTRkEn6COiSAOaaMhb69nJSayFS24CEw6RypXSWjLCVumtK93YtzdIbdHscVDgI6kXpc+UWs6l4N9ohdooS91sRwN7W1OST8KCgp+uvTuKwIoBMx++o+Lk7zvqrDgVG9CW7epYipqaDlBNXvEWMgVsAPPqF9gT9uLGi4Z+NKlrinF4zeyquKF1vVdFvdV8d2UPU9oto1pF3oQ3dGBgr8STVwmhvkEkiamee2WBfEjAlKj2ecAgv4XKAYuTNwXf5pPXaq7FKAt1llQk26UH75KZox5fNP+j+Gcd2HOVl/vxLASTJPsAdHYZ5A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB6779.namprd11.prod.outlook.com (2603:10b6:510:1ca::17)
+ by MN0PR11MB6088.namprd11.prod.outlook.com (2603:10b6:208:3cc::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.26; Tue, 19 Sep
+ 2023 08:32:20 +0000
+Received: from PH8PR11MB6779.namprd11.prod.outlook.com
+ ([fe80::73c6:1231:e700:924]) by PH8PR11MB6779.namprd11.prod.outlook.com
+ ([fe80::73c6:1231:e700:924%4]) with mapi id 15.20.6792.026; Tue, 19 Sep 2023
+ 08:32:20 +0000
+Date: Tue, 19 Sep 2023 16:32:09 +0800
+From: kernel test robot <oliver.sang@intel.com>
+To: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
+CC: <oe-lkp@lists.linux.dev>, <lkp@intel.com>, <linux-kernel@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>, <netdev@vger.kernel.org>,
+	<oliver.sang@intel.com>
+Subject: [linus:master] [selftests]  8ae9efb859:
+ kernel-selftests.net.fib_tests.sh.fail
+Message-ID: <202309191658.c00d8b8-oliver.sang@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+X-ClientProxiedBy: SG2PR03CA0105.apcprd03.prod.outlook.com
+ (2603:1096:4:7c::33) To PH8PR11MB6779.namprd11.prod.outlook.com
+ (2603:10b6:510:1ca::17)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="qe7qz294sxBAXLZG"
-Content-Disposition: inline
-In-Reply-To: <CANn89iJ39Hguu6bRm2am6J_u0pSnm++ORa_UVpC0+8-mxORFfw@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB6779:EE_|MN0PR11MB6088:EE_
+X-MS-Office365-Filtering-Correlation-Id: c4b6d750-608a-435a-f1bd-08dbb8eaf0bd
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Ch8v/HYKhiDCjvu2fu4Y4/5PvQhNkSWU2gbFkxWjkkkNuLBRmM0Z73/PxcdEaRofHXXqbxOeQmZ6DgXeoT/2PT4Iu8QJPDRsJDG/TZAAHw6cnnDOkVqmHqfruzUiuPfof9bNaNTwcf8nYfX5xUtXmd2eJTjg5rGhdrD5uBd/scQ+jwoQjQptoamM0jE3ldPOlghNkToZXfmBlUc8DtOShpVx0SIPMsv26WuXzukyKlLNNQLumjxhJjXPAzgXKO6Og5Yfj0aFXmmn6J08oNZa+vthtyXCoFHEArM13tDzolKsYFOC7S9ve282tfs4kyvAtCLsLvv6eNZovjfwiJ+qZSXS6InJfsSkhZCeS6binDJxGIyaVjJdA5/tKO1ETth0Lx1/17q4TwmnJMEMP4N4vwxQ54z+HOPOsHObsKPnrfWYGJfTDPMhZscl8+Xqyu/yKsZMDWZt3j6S8iuGH65UZVcvLMjiWgcxCKghd8+8TDspAo9yyvGwVPPELJkCJsCnAZ0aKINg22MAShMwi2tlUGaZunz1lciG4Z+mBzSEfmX/R0QOsXknxVrbV6hUJVssibaB+d0W+3U2X+P1GEr77IXIFD2sQFfReoSW8zIWhifxIYFvQWx2CC25TggF8Ahlow4u53ZXri1UNqOP0UpVcQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB6779.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(39860400002)(376002)(136003)(346002)(396003)(451199024)(186009)(1800799009)(6506007)(6666004)(6486002)(83380400001)(478600001)(82960400001)(86362001)(38100700002)(36756003)(4326008)(1076003)(2616005)(2906002)(966005)(6512007)(8676002)(5660300002)(26005)(41300700001)(107886003)(8936002)(66476007)(316002)(66946007)(66556008)(6916009)(568244002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?g6zU5kA//knElrntyPc5g0Fjk2fc+IZMP/WVUgg3FOGmVbRN5FgtLxTOt4rO?=
+ =?us-ascii?Q?7IkNkKkzOnd/oT1NR1ucWpqr7iRb88ffDI1W+Ds9bd0gEIo/y5a4zKLrKOrV?=
+ =?us-ascii?Q?2aHdGm/+6Xk3UcEhpfac7ZtNZJ0ExiQtucxhp7KXq/enrJNfHYfYZB88LlXt?=
+ =?us-ascii?Q?XNKxfG1FYE5xLTtNpvTWCrLEFihz7mTfwo7AG9FuXBhlZl9UhmCLvWYoY8Yi?=
+ =?us-ascii?Q?UXvHPCaU/HYi1xLtLV1twb+BBUeKN2XKpYzhZ+X/+fM7+XoJL8oTkD/eyjuZ?=
+ =?us-ascii?Q?/Hx3FWc1JDDXl/s81rkICTtzHFEUUZCtbjcBaG/RlrY+8kRzyeCxQ5H8aJSS?=
+ =?us-ascii?Q?vmr0BIcsf9biEAelXeD3lvHl4XEOYGAhIoo6O4q2PGGVG8Ep+Vq7MPhICsm2?=
+ =?us-ascii?Q?ZEm25LWQzJEvpyWj3oct8KdR4gvJJ+5Yqrkrd5J3CPHE6XYekeX9f8T9SsfV?=
+ =?us-ascii?Q?HsjT0I42dDoSKTfz2UHcubcwIe2UarQfK//0z0VfQWKgbnJLS9HeI7kWBTCg?=
+ =?us-ascii?Q?t7wHvhL+Uefwb6mwl4Dz4ti5l34y5PMkets4mrXtYQ1oI8UfpVG3ifw1kVhk?=
+ =?us-ascii?Q?o+1RuBUncxqSM54oZUrm+OPw+2gc+ZFbzHYE8YsIDWm1oBFMWjJ6NzEZ5tTy?=
+ =?us-ascii?Q?HmId30xhoLAYqJEcHayj35cB22FEyQV0Whpj4+CQp9gms6OX4DFw2avidPNb?=
+ =?us-ascii?Q?bWUwC4efQGkcLnCGLasQaReQecsGOdrGr+yecx24j4K7VONyi7+EOn72Yq5O?=
+ =?us-ascii?Q?TNF7jktjPQnsJM5xSFaz9ALtTDadaDuyC9OwqzJjWTc2M7l+sNgJu0QOJXiT?=
+ =?us-ascii?Q?PQajQnoQdjCTwPqNIzfCNUy63hEji6uljSYf5P3TkayASJMzQMFwo/i+2iyE?=
+ =?us-ascii?Q?+YKefyzSFI5Wq4r6Lh/Mrx3wsWqNDaUNId8fsAKHljul/cN583iiPK1JX8U1?=
+ =?us-ascii?Q?Ge7P/Wz9fkvdepgaEDnnvlHoyS+2hL9hgaGx4whAwrPJWUEQ0gD4YodSZ7IT?=
+ =?us-ascii?Q?caYJgbRkRp0aiFcStU5yjKkkl68U9pnTFc/kEqG6E+XQTRg0d/nuay2Cnqla?=
+ =?us-ascii?Q?YZiIbQ1ZyLY+kM3ABkj2FkBdb3bZgPBHQ93VFKi/JuTRHVpBua7BUszVHVn1?=
+ =?us-ascii?Q?hhxqc+zRJ1r4rms4EhHOZCxEHqtmW3j3LYiGlZD/am+2wB7/cjXd7mZ6VAgo?=
+ =?us-ascii?Q?715HXYsy/SEYft3/EFNwiaIdy73fyyAqZOTcjLXf2MgkUlIqrmlSFg+I1yNe?=
+ =?us-ascii?Q?1PEDI2F47Zf2UWQfxJlBc4Vl3mZ0foh05rTLQvno9BIEAYQTIkiaPK6nMDlM?=
+ =?us-ascii?Q?tkdVeUCG/lb9MZrxSGDikOLTgOGd/fFJh6qZowcXIFaapXOD69ipEmflYj6/?=
+ =?us-ascii?Q?meVD4WvioUPfMp10MVJkA5WWrC+rhhHDOJwyRsDLdzgOm0EtvNqG/iVd2FyJ?=
+ =?us-ascii?Q?eg4tDNnZnc26DBJQXp2YTDDbQu4bfaKmCv1o0nn53qYWv6AhsXhIY8JXi6vm?=
+ =?us-ascii?Q?tj8OV/ikzFqc//mUieWW7bw0OGN0XnfVCpl5+2sDZiDoKTET9pV16rVw5NTr?=
+ =?us-ascii?Q?5vV5IVgLCQfKLL0SHnO2eUvE593pNgstRgpvUHIV6OdaFfPCsXGEIm7AlBKw?=
+ =?us-ascii?Q?vw=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: c4b6d750-608a-435a-f1bd-08dbb8eaf0bd
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB6779.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Sep 2023 08:32:20.5257
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BUBfzm+z94nNgtZIGLWwnWwuQ5FrdrsyBM1spCLO/uKWzkgXdW7mx3dL8I2fYvGHW/LtP4w4evmk3FJVh9LAwQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR11MB6088
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
---qe7qz294sxBAXLZG
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+hi, Sriram Yagnaraman,
 
-On  Mon, Sep 18, 2023 at 16:04:49 +0200, Eric Dumazet wrote:
-> On Mon, Sep 18, 2023 at 3:58=E2=80=AFPM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > David Howells wrote:
-> > > David Howells <dhowells@redhat.com> wrote:
-> > >
-> > > > I think the attached is probably an equivalent cleaned up reproduce=
-r.  Note
-> > > > that if the length given to sendfile() is less than 65536, it fails=
- with
-> > > > EINVAL before it gets into __ip6_append_data().
-> > >
-> > > Actually, it only fails with EINVAL if the size is not a multiple of =
-the block
-> > > size of the source file because it's open O_DIRECT so, say, 65536-512=
- is fine
-> > > (and works).
-> > >
-> > > But thinking more on this further, is this even a bug in my code, I w=
-onder?
-> > > The length passed is 65536 - but a UDP packet can't carry that, so it
-> > > shouldn't it have errored out before getting that far?  (which is wha=
-t it
-> > > seems to do when I try it).
-> > >
-> > > I don't see how we get past the length check in ip6_append_data() wit=
-h the
-> > > reproducer we're given unless the MTU is somewhat bigger than 65536 (=
-is that
-> > > even possible?)
-> >
-> > An ipv6 packet can carry 64KB of payload, so maxnonfragsize of 65535 + =
-40
-> > sounds correct. But payload length passed of 65536 is not (ignoring ipv6
-> > jumbograms). So that should probably trigger an EINVAL -- if that is in=
-deed
-> > what the repro does.
->=20
-> l2tp_ip6_sendmsg() claims ip6_append_data() can make better checks,
-> but what about simply replacing INT_MAX by 65535 ?
+we noticed two new added tests failed in our test environment.
+want to consult with you what's the dependency and requirement to run them?
+Thanks a lot!
 
-Slightly OT but I think the l2tp_ip6.c approach was probably cribbed
-=66rom net/ipv6/udp.c's udpv6_sendmsg originally:
+Hello,
+
+kernel test robot noticed "kernel-selftests.net.fib_tests.sh.fail" on:
+
+commit: 8ae9efb859c05a54ac92b3336c6ca0597c9c8cdb ("selftests: fib_tests: Add multipath list receive tests")
+https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
+
+in testcase: kernel-selftests
+version: kernel-selftests-x86_64-60acb023-1_20230329
+with following parameters:
+
+	group: net
 
 
-    /* Rough check on arithmetic overflow,
-       better check is made in ip6_append_data().
-       */
-    if (len > INT_MAX - sizeof(struct udphdr))
-        return -EMSGSIZE;
+
+compiler: gcc-12
+test machine: 36 threads 1 sockets Intel(R) Core(TM) i9-10980XE CPU @ 3.00GHz (Cascade Lake) with 32G memory
+
+(please refer to attached dmesg/kmsg for entire log/backtrace)
 
 
-Should the udp code be modified similarly?
 
---=20
-Tom Parkin
-Katalix Systems Ltd
-https://katalix.com
-Catalysts for your Embedded Linux software development
 
---qe7qz294sxBAXLZG
-Content-Type: application/pgp-signature; name="signature.asc"
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <oliver.sang@intel.com>
+| Closes: https://lore.kernel.org/oe-lkp/202309191658.c00d8b8-oliver.sang@intel.com
 
------BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEsUkgyDzMwrj81nq0lIwGZQq6i9AFAmUJW1sACgkQlIwGZQq6
-i9CDhwf8Dr9xdA/kYI0P1TS6do/S0cMJsdoybHmEfhErfoA5n20det6rz7EvsxLn
-qkiFW3urMCSMAsB6wuftENVni4tswHbpWjuQ890o8BfmW/fBL7avioZd6qESgykx
-X4WGGkDLeRnlOZb5jhzqVKsinxmhDQQL/Iogq18z/VWZwC6od+k61RIIIwdpgik8
-foGPo6aJ3a43pAJ7Cl8AeAAySHHJ+0nZPlh7ns49bcBWfDa9y05hVddXAcNSOExL
-LVt2Atkm1BIXGR7eSB9dIb5clb9WRWT1hqFfuE6N6DkYyqmRWkbEdsLvntWm5CcD
-UC+ZbLZlslafOuG+BLDrAXiWcL3wRw==
-=X+72
------END PGP SIGNATURE-----
 
---qe7qz294sxBAXLZG--
+# timeout set to 1500
+# selftests: net: fib_tests.sh
+# 
+# Single path route test
+#     Start point
+#     TEST: IPv4 fibmatch                                                 [ OK ]
+#     TEST: IPv6 fibmatch                                                 [ OK ]
+#     Nexthop device deleted
+#     TEST: IPv4 fibmatch - no route                                      [ OK ]
+#     TEST: IPv6 fibmatch - no route                                      [ OK ]
+
+...
+
+# 
+# Fib6 garbage collection test
+#     TEST: ipv6 route garbage collection                                 [ OK ]
+# 
+# IPv4 multipath list receive tests
+#     TEST: Multipath route hit ratio (.06)                               [FAIL]
+# 
+# IPv6 multipath list receive tests
+#     TEST: Multipath route hit ratio (.10)                               [FAIL]
+# 
+# Tests passed: 223
+# Tests failed:   2
+not ok 17 selftests: net: fib_tests.sh # exit=1
+
+
+
+The kernel config and materials to reproduce are available at:
+https://download.01.org/0day-ci/archive/20230919/202309191658.c00d8b8-oliver.sang@intel.com
+
+
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
+
 
