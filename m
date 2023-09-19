@@ -1,180 +1,145 @@
-Return-Path: <netdev+bounces-35044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4889D7A6A3A
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 19:53:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 321567A6A3D
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 19:53:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2175C1C20B65
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 17:53:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEDD3281B6F
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 17:53:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A629347B9;
-	Tue, 19 Sep 2023 17:53:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5033B347C8;
+	Tue, 19 Sep 2023 17:53:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7B918460
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 17:53:11 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF9B98F
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 10:53:08 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d817775453dso6023743276.2
-        for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 10:53:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F13F7F509
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 17:53:25 +0000 (UTC)
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FAB795
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 10:53:24 -0700 (PDT)
+Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-9aa0495f9cfso13477366b.1
+        for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 10:53:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695145988; x=1695750788; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=qQrU6vyyJK+GpT4LI0fE5qrjc1subTmaNwUd6fCEDnk=;
-        b=UdMK2/GAiIcYKbSCU2NzF2OfoRrK/BwzwC2mdG7chDSb1yyhEZDui20rNe8ZE+PipI
-         aweEiHOL7S16kCjvK9SraDEDDGXQbC4vCjDNK8MrEUSqWnNstCZWRYwQblXulWDd0yf0
-         qHZMG8R1VlFKnUyAAlJkeKU4ZJ9K1Orwmi+JwyO+y5+Db5vALMdhEOA9OfBMuCA71kR5
-         EvumUP4J3bbsi1zB85nimpuDP34xIoehNEqkgTjnl1a3jHrdk3U9hS+ObjRR/KqI5BMJ
-         9ZVPhIvkz5Sg+E/+jeHgmEXHt3SZXanV6jvSZxbDDSw0uUC4MCd2UYaL+4PrZq6ZYMxc
-         TRkA==
+        d=gmail.com; s=20230601; t=1695146002; x=1695750802; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SobCRVBWBiZshOjl92hEWU1P6I6lrGt/lK1MY9eemKI=;
+        b=ayrT3U8tqKtOkX5d4/up82P0jRYoq3kXvugbG0vY5Mt7/37sHU1JZwqM4710ie7EzD
+         9iZXuu48II6Y/NKVL5VTLwbRl4rxzBzEU4gpCySjbPr5uDLNIKwMSmnzKOUb03BvIgZx
+         RRDfWuiAr5xN30HnL/b4cZRRKFkI2zLZdy5373QOYCcWkB0YeTD3SSwQOzx1IT6k35tT
+         7zqUHsDP3R7OkIVa8UdX1dBygKcTBCZe6R/cEIrNmhgwa++tNuiQaIF3Pp2L8mmsy4ON
+         5NdY9ATDGqBMEy2xH9izmwxzZPqIcErOOJ8+Il4iuOXc69KPZdcD4mCjk/0z88q4aofZ
+         aRfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695145988; x=1695750788;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qQrU6vyyJK+GpT4LI0fE5qrjc1subTmaNwUd6fCEDnk=;
-        b=CX9gxDRBiu7pbbcR4kWAYViU86mK/S20geVZQEXM1G6oSmKRizQDCKAPIQ8VcMu7q6
-         GmXD0eAifTofP4MuhT2gx0FOCaCQCsS+EAkiIZaIKBEfGd1Xomr9rq1L6EHlc5M6XJtf
-         QlJeqRSKk3+xEoI4tVTQk0nsIW9YMVe9AcCwqysA4OMBBRhv7Y/Y+P47wYznqPAo4p/K
-         rISms8DbV1cD2JBLj//yn5a1LRZsA0nq4WhfUWUvVrP6FEXb5t6mxAy+Hpjf0vUsjGnT
-         +JeEvqGSMtTyDtPva4ZDBINSqMQUFWJ6JwGVfMt6iP+8mU/2IgELpDqxoELKgFPQX39X
-         paRw==
-X-Gm-Message-State: AOJu0YzIFFZ0oak+rt5cdlypJvD7fUvOP4o+HGlfFHNN+gLAxLBAXlBE
-	8UfTOsE3xgRL8imxrnIxmBmvopfnng==
-X-Google-Smtp-Source: AGHT+IETHz79JtKbYe4YlHoLjiYBboCMucFwvA1gNs5nXByDf3BIdsqRTUVYiJExuerG3s27zBa9cqYPDA==
-X-Received: from jrife.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:9f])
- (user=jrife job=sendgmr) by 2002:a5b:dc7:0:b0:c78:c530:6345 with SMTP id
- t7-20020a5b0dc7000000b00c78c5306345mr5693ybr.7.1695145988018; Tue, 19 Sep
- 2023 10:53:08 -0700 (PDT)
-Date: Tue, 19 Sep 2023 12:52:54 -0500
+        d=1e100.net; s=20230601; t=1695146002; x=1695750802;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SobCRVBWBiZshOjl92hEWU1P6I6lrGt/lK1MY9eemKI=;
+        b=NSBB9gRZYB4WInU/CPx9TP6ooSzx6P9f6Pq7b4K5ZrUp7hmwUbHWOr83nUbh0qqEe6
+         025H0sSPLOCFjdFa7qoaDSJbkKLwg/rFVDs+JAsE4fzBvpBow618KlBWZ+9ispCNqbHQ
+         R54bi1niofxLMACE8ZsephCAFbknGtHwClVDafRK3lnQaPtoSRwlRUWx602ta4B6c1R4
+         03aDgUVYwuig7tum+hFSXOccGyEZtveW/znrxwKOkG02PAMZFnGnMAqBuHVuBKLP626+
+         yHtgfHFiz4XkpFa44LSBgZo8xJVGsCkgeuusWQEfPUuxRYU4/XasG31ZOh8GGCEULb+2
+         2Cuw==
+X-Gm-Message-State: AOJu0YzHZ761NXRu6Yh14ffC+nQHZrI6wS+eBJEkDWdA8kWY7IMd92oF
+	3VxXrLTiER6KVIK/6eBsz5U=
+X-Google-Smtp-Source: AGHT+IEfiX3n8F6lt99inntbSKcXtT57fwdREuW/iQxvaaB2mGsrm0Y/uG05AHOBUSIXhvDM3rXZjQ==
+X-Received: by 2002:a17:907:97cb:b0:9aa:f7f:e276 with SMTP id js11-20020a17090797cb00b009aa0f7fe276mr4612478ejc.38.1695146002278;
+        Tue, 19 Sep 2023 10:53:22 -0700 (PDT)
+Received: from localhost (tor-exit-13.zbau.f3netze.de. [185.220.100.240])
+        by smtp.gmail.com with ESMTPSA id l27-20020a1709060e1b00b00985ed2f1584sm8050520eji.187.2023.09.19.10.53.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Sep 2023 10:53:21 -0700 (PDT)
+Date: Tue, 19 Sep 2023 20:53:20 +0300
+From: Maxim Mikityanskiy <maxtram95@gmail.com>
+To: Vincent Whitchurch <Vincent.Whitchurch@axis.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+	"nbd@nbd.name" <nbd@nbd.name>,
+	"alexandre.torgue@st.com" <alexandre.torgue@st.com>,
+	"joabreu@synopsys.com" <joabreu@synopsys.com>,
+	kernel <kernel@axis.com>,
+	"peppe.cavallaro@st.com" <peppe.cavallaro@st.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net] net: stmmac: Use hrtimer for TX coalescing
+Message-ID: <ZQngEIh5Y9S1LzMw@mail.gmail.com>
+References: <20201120150208.6838-1-vincent.whitchurch@axis.com>
+ <732f3c01-a36f-4c9b-8273-a55aba9094d8@nbd.name>
+ <2e1db3c654b4e76c7249e90ecf8fa9d64046cbb8.camel@axis.com>
+ <a4ee2e37-6b2f-4cab-aab8-b9c46a7c1334@nbd.name>
+ <f3c70b8e345a174817e6a7f38725d958f8193bf1.camel@axis.com>
+ <ZO-E2_A-UrC9127S@mail.gmail.com>
+ <1b485fa168f2862adf3f0967a04a7f0e1a99ffe3.camel@axis.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.42.0.459.ge4e396fd5e-goog
-Message-ID: <20230919175254.144417-1-jrife@google.com>
-Subject: [PATCH net v4 2/3] net: prevent rewrite of msg_name in sock_sendmsg()
-From: Jordan Rife <jrife@google.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, willemdebruijn.kernel@gmail.com, netdev@vger.kernel.org
-Cc: dborkman@kernel.org, Jordan Rife <jrife@google.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1b485fa168f2862adf3f0967a04a7f0e1a99ffe3.camel@axis.com>
+X-Spam-Status: No, score=2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_BL_SPAMCOP_NET,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_SBL_CSS,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.6
+X-Spam-Level: **
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Callers of sock_sendmsg(), and similarly kernel_sendmsg(), in kernel
-space may observe their value of msg_name change in cases where BPF
-sendmsg hooks rewrite the send address. This has been confirmed to break
-NFS mounts running in UDP mode and has the potential to break other
-systems.
+On Mon, 18 Sep 2023 at 12:56:31 +0000, Vincent Whitchurch wrote:
+> On Wed, 2023-08-30 at 21:05 +0300, Maxim Mikityanskiy wrote:
+> > On Wed, 30 Aug 2023 at 14:55:37 +0000, Vincent Whitchurch wrote:
+> > > Any test results with this patch on the hardware with the performance
+> > > problems would be appreciated.
+> > 
+> > TL/DR: it's definitely better than without the patch, but still worse
+> > than fully reverting hrtimer [1].
+> 
+> Thank you for testing this.
+> 
+> Have you also had the chance to try out Felix's suggestion of completely
+> disabling coalescing in the driver?  For that you will need to apply the
+> patch at [0] (the command below may appear to work without the patch but
+> the timer will continue to be programmed and expire immediately if the
+> patch is not applied) and then run something like:
+> 
+>   ethtool -C eth0 tx-frame 1 tx-usecs 0
 
-This patch:
+It's really good, yet not as perfect as reverting the hrtimer patch.
+Aggregated summary over 15 20-second iperf3 tests (with XPS, RPS and
+flow tables):
 
-1) Creates a new function called __sock_sendmsg() with same logic as the
-   old sock_sendmsg() function.
-2) Replaces calls to sock_sendmsg() made by __sys_sendto() and
-   __sys_sendmsg() with __sock_sendmsg() to avoid an unnecessary copy,
-   as these system calls are already protected.
-3) Modifies sock_sendmsg() so that it makes a copy of msg_name if
-   present before passing it down the stack to insulate callers from
-   changes to the send address.
+        | avg up | avg dn | std up | std dn
+--------|--------|--------|--------|--------
+Revert  |   931  |   939  |     6  |     2
+No-coal |   925  |   916  |    13  |    26
 
-Link: https://lore.kernel.org/netdev/20230912013332.2048422-1-jrife@google.com/
-Fixes: 1cedee13d25a ("bpf: Hooks for sys_sendmsg")
-Cc: stable@vger.kernel.org
-Signed-off-by: Jordan Rife <jrife@google.com>
----
-v3->v4: Maintain reverse xmas tree order for variable declarations.
-	Remove precondition check for msg_namelen.
-v2->v3: Add "Fixes" tag.
-v1->v2: Split up original patch into patch series. Perform address copy
-        in sock_sendmsg() instead of sock->ops->sendmsg().
+I'd say it's almost as good as the full revert, but with more deviation,
+numbers are less stable.
 
- net/socket.c | 29 +++++++++++++++++++++++------
- 1 file changed, 23 insertions(+), 6 deletions(-)
+Kind of off topic, but I've also been testing PPPoE, and it's pretty bad
+even with the available fixes:
 
-diff --git a/net/socket.c b/net/socket.c
-index c8b08b32f097e..a39ec136f5cff 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -737,6 +737,14 @@ static inline int sock_sendmsg_nosec(struct socket *sock, struct msghdr *msg)
- 	return ret;
- }
- 
-+static int __sock_sendmsg(struct socket *sock, struct msghdr *msg)
-+{
-+	int err = security_socket_sendmsg(sock, msg,
-+					  msg_data_left(msg));
-+
-+	return err ?: sock_sendmsg_nosec(sock, msg);
-+}
-+
- /**
-  *	sock_sendmsg - send a message through @sock
-  *	@sock: socket
-@@ -747,10 +755,19 @@ static inline int sock_sendmsg_nosec(struct socket *sock, struct msghdr *msg)
-  */
- int sock_sendmsg(struct socket *sock, struct msghdr *msg)
- {
--	int err = security_socket_sendmsg(sock, msg,
--					  msg_data_left(msg));
-+	struct sockaddr_storage *save_addr = (struct sockaddr_storage *)msg->msg_name;
-+	struct sockaddr_storage address;
-+	int ret;
- 
--	return err ?: sock_sendmsg_nosec(sock, msg);
-+	if (msg->msg_name) {
-+		memcpy(&address, msg->msg_name, msg->msg_namelen);
-+		msg->msg_name = &address;
-+	}
-+
-+	ret = __sock_sendmsg(sock, msg);
-+	msg->msg_name = save_addr;
-+
-+	return ret;
- }
- EXPORT_SYMBOL(sock_sendmsg);
- 
-@@ -1138,7 +1155,7 @@ static ssize_t sock_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	if (sock->type == SOCK_SEQPACKET)
- 		msg.msg_flags |= MSG_EOR;
- 
--	res = sock_sendmsg(sock, &msg);
-+	res = __sock_sendmsg(sock, &msg);
- 	*from = msg.msg_iter;
- 	return res;
- }
-@@ -2174,7 +2191,7 @@ int __sys_sendto(int fd, void __user *buff, size_t len, unsigned int flags,
- 	if (sock->file->f_flags & O_NONBLOCK)
- 		flags |= MSG_DONTWAIT;
- 	msg.msg_flags = flags;
--	err = sock_sendmsg(sock, &msg);
-+	err = __sock_sendmsg(sock, &msg);
- 
- out_put:
- 	fput_light(sock->file, fput_needed);
-@@ -2538,7 +2555,7 @@ static int ____sys_sendmsg(struct socket *sock, struct msghdr *msg_sys,
- 		err = sock_sendmsg_nosec(sock, msg_sys);
- 		goto out_freectl;
- 	}
--	err = sock_sendmsg(sock, msg_sys);
-+	err = __sock_sendmsg(sock, msg_sys);
- 	/*
- 	 * If this is sendmmsg() and sending to current destination address was
- 	 * successful, remember it.
--- 
-2.42.0.459.ge4e396fd5e-goog
+        | avg up | avg dn | std up | std dn
+--------|--------|--------|--------|--------
+Revert  |   791  |   388  |    13  |    26
+No-coal |   806  |   390  |    97  |    60
 
+Thanks,
+Max
+
+> 
+> [0] https://lore.kernel.org/all/20230907-stmmac-coaloff-v2-1-38ccfac548b9@axis.com/
+> 
+> With coalescing disabled in the driver, there is also the option of
+> playing with the generic software IRQ coalescing options available in
+> NAPI in newer kernels (eg. gro_flush_timeout), which may work better for
+> you than the one in the driver.
 
