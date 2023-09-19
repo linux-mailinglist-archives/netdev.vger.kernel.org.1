@@ -1,145 +1,363 @@
-Return-Path: <netdev+bounces-35045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 321567A6A3D
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 19:53:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51A0D7A6A40
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 19:54:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEDD3281B6F
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 17:53:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 364171C20A92
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 17:54:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5033B347C8;
-	Tue, 19 Sep 2023 17:53:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 297B036B09;
+	Tue, 19 Sep 2023 17:53:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F13F7F509
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 17:53:25 +0000 (UTC)
-Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FAB795
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 10:53:24 -0700 (PDT)
-Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-9aa0495f9cfso13477366b.1
-        for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 10:53:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AA30F500
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 17:53:41 +0000 (UTC)
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 583B099
+	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 10:53:38 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d81a76a11eeso5361363276.3
+        for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 10:53:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695146002; x=1695750802; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SobCRVBWBiZshOjl92hEWU1P6I6lrGt/lK1MY9eemKI=;
-        b=ayrT3U8tqKtOkX5d4/up82P0jRYoq3kXvugbG0vY5Mt7/37sHU1JZwqM4710ie7EzD
-         9iZXuu48II6Y/NKVL5VTLwbRl4rxzBzEU4gpCySjbPr5uDLNIKwMSmnzKOUb03BvIgZx
-         RRDfWuiAr5xN30HnL/b4cZRRKFkI2zLZdy5373QOYCcWkB0YeTD3SSwQOzx1IT6k35tT
-         7zqUHsDP3R7OkIVa8UdX1dBygKcTBCZe6R/cEIrNmhgwa++tNuiQaIF3Pp2L8mmsy4ON
-         5NdY9ATDGqBMEy2xH9izmwxzZPqIcErOOJ8+Il4iuOXc69KPZdcD4mCjk/0z88q4aofZ
-         aRfw==
+        d=google.com; s=20230601; t=1695146017; x=1695750817; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=3dakH73oFSBXTdrwI4+ZlSgXIWNyYAr3KMqRH086qXw=;
+        b=w6a/HtK/Ks2hddiaHR961dWnQvKviSd1XOTr19x1mvpAODE/Nc46lyivg/wei9pUc8
+         IMzI8bGjsWDNeeKNv6J155PlM1MLqMsgLAMCjAzQdM5d4wVKqV4BvFMMxNYEDW9f5tIF
+         gYVIf1tLJzRyRYBE6XqA/pBCaWcILRyF1W84fQ5gFSIpb0af8SAZgOpLiF48WhJt7fjP
+         KoKwXmXSIkf+Ip4LbklsEIAYvG3P7qwTYDcLa3Hnh4fT2GqkDbbhG9xQugDyGWFaoQOr
+         VJaohi104suCx4I0Le2hckpaMLJszDxqhMaHx1vHZHsNHpaTjc3YabbujHHOjClfiTaD
+         a8Ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695146002; x=1695750802;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SobCRVBWBiZshOjl92hEWU1P6I6lrGt/lK1MY9eemKI=;
-        b=NSBB9gRZYB4WInU/CPx9TP6ooSzx6P9f6Pq7b4K5ZrUp7hmwUbHWOr83nUbh0qqEe6
-         025H0sSPLOCFjdFa7qoaDSJbkKLwg/rFVDs+JAsE4fzBvpBow618KlBWZ+9ispCNqbHQ
-         R54bi1niofxLMACE8ZsephCAFbknGtHwClVDafRK3lnQaPtoSRwlRUWx602ta4B6c1R4
-         03aDgUVYwuig7tum+hFSXOccGyEZtveW/znrxwKOkG02PAMZFnGnMAqBuHVuBKLP626+
-         yHtgfHFiz4XkpFa44LSBgZo8xJVGsCkgeuusWQEfPUuxRYU4/XasG31ZOh8GGCEULb+2
-         2Cuw==
-X-Gm-Message-State: AOJu0YzHZ761NXRu6Yh14ffC+nQHZrI6wS+eBJEkDWdA8kWY7IMd92oF
-	3VxXrLTiER6KVIK/6eBsz5U=
-X-Google-Smtp-Source: AGHT+IEfiX3n8F6lt99inntbSKcXtT57fwdREuW/iQxvaaB2mGsrm0Y/uG05AHOBUSIXhvDM3rXZjQ==
-X-Received: by 2002:a17:907:97cb:b0:9aa:f7f:e276 with SMTP id js11-20020a17090797cb00b009aa0f7fe276mr4612478ejc.38.1695146002278;
-        Tue, 19 Sep 2023 10:53:22 -0700 (PDT)
-Received: from localhost (tor-exit-13.zbau.f3netze.de. [185.220.100.240])
-        by smtp.gmail.com with ESMTPSA id l27-20020a1709060e1b00b00985ed2f1584sm8050520eji.187.2023.09.19.10.53.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Sep 2023 10:53:21 -0700 (PDT)
-Date: Tue, 19 Sep 2023 20:53:20 +0300
-From: Maxim Mikityanskiy <maxtram95@gmail.com>
-To: Vincent Whitchurch <Vincent.Whitchurch@axis.com>
-Cc: "davem@davemloft.net" <davem@davemloft.net>,
-	"nbd@nbd.name" <nbd@nbd.name>,
-	"alexandre.torgue@st.com" <alexandre.torgue@st.com>,
-	"joabreu@synopsys.com" <joabreu@synopsys.com>,
-	kernel <kernel@axis.com>,
-	"peppe.cavallaro@st.com" <peppe.cavallaro@st.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net] net: stmmac: Use hrtimer for TX coalescing
-Message-ID: <ZQngEIh5Y9S1LzMw@mail.gmail.com>
-References: <20201120150208.6838-1-vincent.whitchurch@axis.com>
- <732f3c01-a36f-4c9b-8273-a55aba9094d8@nbd.name>
- <2e1db3c654b4e76c7249e90ecf8fa9d64046cbb8.camel@axis.com>
- <a4ee2e37-6b2f-4cab-aab8-b9c46a7c1334@nbd.name>
- <f3c70b8e345a174817e6a7f38725d958f8193bf1.camel@axis.com>
- <ZO-E2_A-UrC9127S@mail.gmail.com>
- <1b485fa168f2862adf3f0967a04a7f0e1a99ffe3.camel@axis.com>
+        d=1e100.net; s=20230601; t=1695146017; x=1695750817;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3dakH73oFSBXTdrwI4+ZlSgXIWNyYAr3KMqRH086qXw=;
+        b=YVKhvjFU59z2rgfTH6rS/dFYtvF0fix91lojjXYRS8jdgx9hukovtmqQ4UzDRN6rvX
+         XDLD2YV5NQuMSGciyP8CkqmCDLf0yHjX1yl0w4E1DzOd2vjqHPjHIF27c52ElZgwc8mZ
+         vbHZD36UYEMAveA0GYY78O+Ij2RkFsxOd4r6qgHcQLdrRrb0zAYApRoYX9vMK4Mvp2Dd
+         KgMPm7pSIQ4G1+Agc+rF7OB7BGABCnwnTmyFN66vDKtbEGQZGBn4/2kD4CQBHbPgpIch
+         qdaMqMBoRT6hyHI6oJzmjn1HZ7dy2vGeISDBaXYYt/eSQHhvuGP4X9OlOrIuKF2fx6r1
+         k/4Q==
+X-Gm-Message-State: AOJu0YzqIwH5ZWON4JqIKTNmCvbfwJ9uhERrwOr1vof+5JJu0AI1I27l
+	pPVfDe8eV0b5shvf00bVZD4NcNVSfw==
+X-Google-Smtp-Source: AGHT+IFeLfPLSvQkmgKFhH1v1MtdCHGoVrUXirxq9kK9cBRYy0h/dsCEHEw33K8bnfI/iIhrV8h5wBBdKw==
+X-Received: from jrife.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:9f])
+ (user=jrife job=sendgmr) by 2002:a25:d085:0:b0:d84:2619:56df with SMTP id
+ h127-20020a25d085000000b00d84261956dfmr5934ybg.13.1695146017529; Tue, 19 Sep
+ 2023 10:53:37 -0700 (PDT)
+Date: Tue, 19 Sep 2023 12:53:23 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1b485fa168f2862adf3f0967a04a7f0e1a99ffe3.camel@axis.com>
-X-Spam-Status: No, score=2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_BL_SPAMCOP_NET,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_SBL_CSS,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.6
-X-Spam-Level: **
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.459.ge4e396fd5e-goog
+Message-ID: <20230919175323.144902-1-jrife@google.com>
+Subject: [PATCH net v4 3/3] net: prevent address rewrite in kernel_bind()
+From: Jordan Rife <jrife@google.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, willemdebruijn.kernel@gmail.com, netdev@vger.kernel.org
+Cc: dborkman@kernel.org, philipp.reisner@linbit.com, lars.ellenberg@linbit.com, 
+	christoph.boehmwalder@linbit.com, axboe@kernel.dk, airlied@redhat.com, 
+	chengyou@linux.alibaba.com, kaishen@linux.alibaba.com, jgg@ziepe.ca, 
+	leon@kernel.org, bmt@zurich.ibm.com, isdn@linux-pingi.de, ccaulfie@redhat.com, 
+	teigland@redhat.com, mark@fasheh.com, jlbec@evilplan.org, 
+	joseph.qi@linux.alibaba.com, sfrench@samba.org, pc@manguebit.com, 
+	lsahlber@redhat.com, sprasad@microsoft.com, tom@talpey.com, 
+	horms@verge.net.au, ja@ssi.bg, pablo@netfilter.org, kadlec@netfilter.org, 
+	fw@strlen.de, santosh.shilimkar@oracle.com, Jordan Rife <jrife@google.com>, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, 18 Sep 2023 at 12:56:31 +0000, Vincent Whitchurch wrote:
-> On Wed, 2023-08-30 at 21:05 +0300, Maxim Mikityanskiy wrote:
-> > On Wed, 30 Aug 2023 at 14:55:37 +0000, Vincent Whitchurch wrote:
-> > > Any test results with this patch on the hardware with the performance
-> > > problems would be appreciated.
-> > 
-> > TL/DR: it's definitely better than without the patch, but still worse
-> > than fully reverting hrtimer [1].
-> 
-> Thank you for testing this.
-> 
-> Have you also had the chance to try out Felix's suggestion of completely
-> disabling coalescing in the driver?  For that you will need to apply the
-> patch at [0] (the command below may appear to work without the patch but
-> the timer will continue to be programmed and expire immediately if the
-> patch is not applied) and then run something like:
-> 
->   ethtool -C eth0 tx-frame 1 tx-usecs 0
+Similar to the change in commit 0bdf399342c5("net: Avoid address
+overwrite in kernel_connect"), BPF hooks run on bind may rewrite the
+address passed to kernel_bind(). This change
 
-It's really good, yet not as perfect as reverting the hrtimer patch.
-Aggregated summary over 15 20-second iperf3 tests (with XPS, RPS and
-flow tables):
+1) Makes a copy of the bind address in kernel_bind() to insulate
+   callers.
+2) Replaces direct calls to sock->ops->bind() with kernel_bind()
 
-        | avg up | avg dn | std up | std dn
---------|--------|--------|--------|--------
-Revert  |   931  |   939  |     6  |     2
-No-coal |   925  |   916  |    13  |    26
+Link: https://lore.kernel.org/netdev/20230912013332.2048422-1-jrife@google.com/
+Fixes: 4fbac77d2d09 ("bpf: Hooks for sys_bind")
+Cc: stable@vger.kernel.org
+Signed-off-by: Jordan Rife <jrife@google.com>
+---
+v3->v4: Remove precondition check for addrlen. Pass address copy to
+        bind() instead of original address.
+v2->v3: Add "Fixes" tag. Check for positivity in addrlen sanity check.
+v1->v2: Split up original patch into patch series. Insulate
+        sock->ops->bind() calls with kernel_bind().
 
-I'd say it's almost as good as the full revert, but with more deviation,
-numbers are less stable.
+ drivers/block/drbd/drbd_receiver.c     |  4 ++--
+ drivers/char/agp/alpha-agp.c           |  2 +-
+ drivers/infiniband/hw/erdma/erdma_cm.c |  6 +++---
+ drivers/infiniband/sw/siw/siw_cm.c     | 10 +++++-----
+ drivers/isdn/mISDN/l1oip_core.c        |  4 ++--
+ fs/dlm/lowcomms.c                      |  7 +++----
+ fs/ocfs2/cluster/tcp.c                 |  6 +++---
+ fs/smb/client/connect.c                |  6 +++---
+ net/netfilter/ipvs/ip_vs_sync.c        |  4 ++--
+ net/rds/tcp_connect.c                  |  2 +-
+ net/rds/tcp_listen.c                   |  2 +-
+ net/socket.c                           |  7 ++++++-
+ 12 files changed, 32 insertions(+), 28 deletions(-)
 
-Kind of off topic, but I've also been testing PPPoE, and it's pretty bad
-even with the available fixes:
+diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
+index 9b2660e990a98..752759ed22b8c 100644
+--- a/drivers/block/drbd/drbd_receiver.c
++++ b/drivers/block/drbd/drbd_receiver.c
+@@ -638,7 +638,7 @@ static struct socket *drbd_try_connect(struct drbd_connection *connection)
+ 	*  a free one dynamically.
+ 	*/
+ 	what = "bind before connect";
+-	err = sock->ops->bind(sock, (struct sockaddr *) &src_in6, my_addr_len);
++	err = kernel_bind(sock, (struct sockaddr *)&src_in6, my_addr_len);
+ 	if (err < 0)
+ 		goto out;
+ 
+@@ -725,7 +725,7 @@ static int prepare_listen_socket(struct drbd_connection *connection, struct acce
+ 	drbd_setbufsize(s_listen, sndbuf_size, rcvbuf_size);
+ 
+ 	what = "bind before listen";
+-	err = s_listen->ops->bind(s_listen, (struct sockaddr *)&my_addr, my_addr_len);
++	err = kernel_bind(s_listen, (struct sockaddr *)&my_addr, my_addr_len);
+ 	if (err < 0)
+ 		goto out;
+ 
+diff --git a/drivers/char/agp/alpha-agp.c b/drivers/char/agp/alpha-agp.c
+index c9bf2c2198418..f251fedfb4840 100644
+--- a/drivers/char/agp/alpha-agp.c
++++ b/drivers/char/agp/alpha-agp.c
+@@ -96,7 +96,7 @@ static int alpha_core_agp_insert_memory(struct agp_memory *mem, off_t pg_start,
+ 	if ((pg_start + mem->page_count) > num_entries)
+ 		return -EINVAL;
+ 
+-	status = agp->ops->bind(agp, pg_start, mem);
++	status = kernel_bind(agp, pg_start, mem);
+ 	mb();
+ 	alpha_core_agp_tlbflush(mem);
+ 
+diff --git a/drivers/infiniband/hw/erdma/erdma_cm.c b/drivers/infiniband/hw/erdma/erdma_cm.c
+index e2b89e7bbe2b8..674702d159c29 100644
+--- a/drivers/infiniband/hw/erdma/erdma_cm.c
++++ b/drivers/infiniband/hw/erdma/erdma_cm.c
+@@ -990,7 +990,7 @@ static int kernel_bindconnect(struct socket *s, struct sockaddr *laddr,
+ 	int ret;
+ 
+ 	sock_set_reuseaddr(s->sk);
+-	ret = s->ops->bind(s, laddr, laddrlen);
++	ret = kernel_bind(s, laddr, laddrlen);
+ 	if (ret)
+ 		return ret;
+ 	ret = kernel_connect(s, raddr, raddrlen, flags);
+@@ -1309,8 +1309,8 @@ int erdma_create_listen(struct iw_cm_id *id, int backlog)
+ 	if (ipv4_is_zeronet(laddr->sin_addr.s_addr))
+ 		s->sk->sk_bound_dev_if = dev->netdev->ifindex;
+ 
+-	ret = s->ops->bind(s, (struct sockaddr *)laddr,
+-			   sizeof(struct sockaddr_in));
++	ret = kernel_bind(s, (struct sockaddr *)laddr,
++			  sizeof(struct sockaddr_in));
+ 	if (ret)
+ 		goto error;
+ 
+diff --git a/drivers/infiniband/sw/siw/siw_cm.c b/drivers/infiniband/sw/siw/siw_cm.c
+index 05624f424153e..d05e0eeee9244 100644
+--- a/drivers/infiniband/sw/siw/siw_cm.c
++++ b/drivers/infiniband/sw/siw/siw_cm.c
+@@ -1324,7 +1324,7 @@ static int kernel_bindconnect(struct socket *s, struct sockaddr *laddr,
+ 			return rv;
+ 	}
+ 
+-	rv = s->ops->bind(s, laddr, size);
++	rv = kernel_bind(s, laddr, size);
+ 	if (rv < 0)
+ 		return rv;
+ 
+@@ -1793,8 +1793,8 @@ int siw_create_listen(struct iw_cm_id *id, int backlog)
+ 		if (ipv4_is_zeronet(laddr->sin_addr.s_addr))
+ 			s->sk->sk_bound_dev_if = sdev->netdev->ifindex;
+ 
+-		rv = s->ops->bind(s, (struct sockaddr *)laddr,
+-				  sizeof(struct sockaddr_in));
++		rv = kernel_bind(s, (struct sockaddr *)laddr,
++				 sizeof(struct sockaddr_in));
+ 	} else {
+ 		struct sockaddr_in6 *laddr = &to_sockaddr_in6(id->local_addr);
+ 
+@@ -1811,8 +1811,8 @@ int siw_create_listen(struct iw_cm_id *id, int backlog)
+ 		if (ipv6_addr_any(&laddr->sin6_addr))
+ 			s->sk->sk_bound_dev_if = sdev->netdev->ifindex;
+ 
+-		rv = s->ops->bind(s, (struct sockaddr *)laddr,
+-				  sizeof(struct sockaddr_in6));
++		rv = kernel_bind(s, (struct sockaddr *)laddr,
++				 sizeof(struct sockaddr_in6));
+ 	}
+ 	if (rv) {
+ 		siw_dbg(id->device, "socket bind error: %d\n", rv);
+diff --git a/drivers/isdn/mISDN/l1oip_core.c b/drivers/isdn/mISDN/l1oip_core.c
+index f010b35a05313..681147e1fc843 100644
+--- a/drivers/isdn/mISDN/l1oip_core.c
++++ b/drivers/isdn/mISDN/l1oip_core.c
+@@ -675,8 +675,8 @@ l1oip_socket_thread(void *data)
+ 	hc->sin_remote.sin_port = htons((unsigned short)hc->remoteport);
+ 
+ 	/* bind to incoming port */
+-	if (socket->ops->bind(socket, (struct sockaddr *)&hc->sin_local,
+-			      sizeof(hc->sin_local))) {
++	if (kernel_bind(socket, (struct sockaddr *)&hc->sin_local,
++			sizeof(hc->sin_local))) {
+ 		printk(KERN_ERR "%s: Failed to bind socket to port %d.\n",
+ 		       __func__, hc->localport);
+ 		ret = -EINVAL;
+diff --git a/fs/dlm/lowcomms.c b/fs/dlm/lowcomms.c
+index 1cf796b97eb65..73ab179833fbd 100644
+--- a/fs/dlm/lowcomms.c
++++ b/fs/dlm/lowcomms.c
+@@ -1805,8 +1805,7 @@ static int dlm_tcp_bind(struct socket *sock)
+ 	memcpy(&src_addr, &dlm_local_addr[0], sizeof(src_addr));
+ 	make_sockaddr(&src_addr, 0, &addr_len);
+ 
+-	result = sock->ops->bind(sock, (struct sockaddr *)&src_addr,
+-				 addr_len);
++	result = kernel_bind(sock, (struct sockaddr *)&src_addr, addr_len);
+ 	if (result < 0) {
+ 		/* This *may* not indicate a critical error */
+ 		log_print("could not bind for connect: %d", result);
+@@ -1850,8 +1849,8 @@ static int dlm_tcp_listen_bind(struct socket *sock)
+ 
+ 	/* Bind to our port */
+ 	make_sockaddr(&dlm_local_addr[0], dlm_config.ci_tcp_port, &addr_len);
+-	return sock->ops->bind(sock, (struct sockaddr *)&dlm_local_addr[0],
+-			       addr_len);
++	return kernel_bind(sock, (struct sockaddr *)&dlm_local_addr[0],
++			   addr_len);
+ }
+ 
+ static const struct dlm_proto_ops dlm_tcp_ops = {
+diff --git a/fs/ocfs2/cluster/tcp.c b/fs/ocfs2/cluster/tcp.c
+index ead7c287ff373..3a4a7a521476d 100644
+--- a/fs/ocfs2/cluster/tcp.c
++++ b/fs/ocfs2/cluster/tcp.c
+@@ -1614,8 +1614,8 @@ static void o2net_start_connect(struct work_struct *work)
+ 	myaddr.sin_addr.s_addr = mynode->nd_ipv4_address;
+ 	myaddr.sin_port = htons(0); /* any port */
+ 
+-	ret = sock->ops->bind(sock, (struct sockaddr *)&myaddr,
+-			      sizeof(myaddr));
++	ret = kernel_bind(sock, (struct sockaddr *)&myaddr,
++			  sizeof(myaddr));
+ 	if (ret) {
+ 		mlog(ML_ERROR, "bind failed with %d at address %pI4\n",
+ 		     ret, &mynode->nd_ipv4_address);
+@@ -1998,7 +1998,7 @@ static int o2net_open_listening_sock(__be32 addr, __be16 port)
+ 	INIT_WORK(&o2net_listen_work, o2net_accept_many);
+ 
+ 	sock->sk->sk_reuse = SK_CAN_REUSE;
+-	ret = sock->ops->bind(sock, (struct sockaddr *)&sin, sizeof(sin));
++	ret = kernel_bind(sock, (struct sockaddr *)&sin, sizeof(sin));
+ 	if (ret < 0) {
+ 		printk(KERN_ERR "o2net: Error %d while binding socket at "
+ 		       "%pI4:%u\n", ret, &addr, ntohs(port)); 
+diff --git a/fs/smb/client/connect.c b/fs/smb/client/connect.c
+index b7764cd57e035..6dcc1cd41b8c5 100644
+--- a/fs/smb/client/connect.c
++++ b/fs/smb/client/connect.c
+@@ -2891,9 +2891,9 @@ bind_socket(struct TCP_Server_Info *server)
+ 	if (server->srcaddr.ss_family != AF_UNSPEC) {
+ 		/* Bind to the specified local IP address */
+ 		struct socket *socket = server->ssocket;
+-		rc = socket->ops->bind(socket,
+-				       (struct sockaddr *) &server->srcaddr,
+-				       sizeof(server->srcaddr));
++		rc = kernel_bind(socket,
++				 (struct sockaddr *)&server->srcaddr,
++				 sizeof(server->srcaddr));
+ 		if (rc < 0) {
+ 			struct sockaddr_in *saddr4;
+ 			struct sockaddr_in6 *saddr6;
+diff --git a/net/netfilter/ipvs/ip_vs_sync.c b/net/netfilter/ipvs/ip_vs_sync.c
+index 6e4ed1e11a3b7..4174076c66fa7 100644
+--- a/net/netfilter/ipvs/ip_vs_sync.c
++++ b/net/netfilter/ipvs/ip_vs_sync.c
+@@ -1439,7 +1439,7 @@ static int bind_mcastif_addr(struct socket *sock, struct net_device *dev)
+ 	sin.sin_addr.s_addr  = addr;
+ 	sin.sin_port         = 0;
+ 
+-	return sock->ops->bind(sock, (struct sockaddr*)&sin, sizeof(sin));
++	return kernel_bind(sock, (struct sockaddr *)&sin, sizeof(sin));
+ }
+ 
+ static void get_mcast_sockaddr(union ipvs_sockaddr *sa, int *salen,
+@@ -1546,7 +1546,7 @@ static int make_receive_sock(struct netns_ipvs *ipvs, int id,
+ 
+ 	get_mcast_sockaddr(&mcast_addr, &salen, &ipvs->bcfg, id);
+ 	sock->sk->sk_bound_dev_if = dev->ifindex;
+-	result = sock->ops->bind(sock, (struct sockaddr *)&mcast_addr, salen);
++	result = kernel_bind(sock, (struct sockaddr *)&mcast_addr, salen);
+ 	if (result < 0) {
+ 		pr_err("Error binding to the multicast addr\n");
+ 		goto error;
+diff --git a/net/rds/tcp_connect.c b/net/rds/tcp_connect.c
+index d788c6d28986f..a0046e99d6df7 100644
+--- a/net/rds/tcp_connect.c
++++ b/net/rds/tcp_connect.c
+@@ -145,7 +145,7 @@ int rds_tcp_conn_path_connect(struct rds_conn_path *cp)
+ 		addrlen = sizeof(sin);
+ 	}
+ 
+-	ret = sock->ops->bind(sock, addr, addrlen);
++	ret = kernel_bind(sock, addr, addrlen);
+ 	if (ret) {
+ 		rdsdebug("bind failed with %d at address %pI6c\n",
+ 			 ret, &conn->c_laddr);
+diff --git a/net/rds/tcp_listen.c b/net/rds/tcp_listen.c
+index 014fa24418c12..53b3535a1e4a8 100644
+--- a/net/rds/tcp_listen.c
++++ b/net/rds/tcp_listen.c
+@@ -306,7 +306,7 @@ struct socket *rds_tcp_listen_init(struct net *net, bool isv6)
+ 		addr_len = sizeof(*sin);
+ 	}
+ 
+-	ret = sock->ops->bind(sock, (struct sockaddr *)&ss, addr_len);
++	ret = kernel_bind(sock, (struct sockaddr *)&ss, addr_len);
+ 	if (ret < 0) {
+ 		rdsdebug("could not bind %s listener socket: %d\n",
+ 			 isv6 ? "IPv6" : "IPv4", ret);
+diff --git a/net/socket.c b/net/socket.c
+index a39ec136f5cff..c4a6f55329552 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -3516,7 +3516,12 @@ static long compat_sock_ioctl(struct file *file, unsigned int cmd,
+ 
+ int kernel_bind(struct socket *sock, struct sockaddr *addr, int addrlen)
+ {
+-	return READ_ONCE(sock->ops)->bind(sock, addr, addrlen);
++	struct sockaddr_storage address;
++
++	memcpy(&address, addr, addrlen);
++
++	return READ_ONCE(sock->ops)->bind(sock, (struct sockaddr *)&address,
++					  addrlen);
+ }
+ EXPORT_SYMBOL(kernel_bind);
+ 
+-- 
+2.42.0.459.ge4e396fd5e-goog
 
-        | avg up | avg dn | std up | std dn
---------|--------|--------|--------|--------
-Revert  |   791  |   388  |    13  |    26
-No-coal |   806  |   390  |    97  |    60
-
-Thanks,
-Max
-
-> 
-> [0] https://lore.kernel.org/all/20230907-stmmac-coaloff-v2-1-38ccfac548b9@axis.com/
-> 
-> With coalescing disabled in the driver, there is also the option of
-> playing with the generic software IRQ coalescing options available in
-> NAPI in newer kernels (eg. gro_flush_timeout), which may work better for
-> you than the one in the driver.
 
