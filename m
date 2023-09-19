@@ -1,113 +1,109 @@
-Return-Path: <netdev+bounces-34921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-34922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00AA87A5ECB
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 11:54:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A38647A5F00
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 12:05:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BC571C20EFA
-	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 09:54:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B0D171C2098F
+	for <lists+netdev@lfdr.de>; Tue, 19 Sep 2023 10:05:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9E302E62A;
-	Tue, 19 Sep 2023 09:54:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C364F2E639;
+	Tue, 19 Sep 2023 10:05:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CBE92E621
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 09:54:16 +0000 (UTC)
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8616C19B4
-	for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 02:54:12 -0700 (PDT)
-Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-99bdcade7fbso701157166b.1
-        for <netdev@vger.kernel.org>; Tue, 19 Sep 2023 02:54:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1695117251; x=1695722051; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=OmXgnmvOiVfooj4M23wQXodnaTVsRKoq6QYvvY7fqHM=;
-        b=RgQyoqUm11pRry9dUDKqKUxVvTI2uVecQ2JniY1b3jBaAKIkQB3UZb6B3YcCKXUXaf
-         OT6KuGJuX0mDfVrGdMKsYB5ZyO5oY5/Q5Q2iTNdm5LZZeGW67c2fNvtmlJIWeUncBlyq
-         XLua7I+5+CQ1K9KC9Z3e9kxqYf/zhl0vsIVU2iZkxLgACELaFfggRdSzq9JVj5gFTDpM
-         yLPJUltHgzM49H2mY4Mkp8aSHbWg/E5UvU0QB30jTg1u2p/+oaaILpIG8rHGNBZFVj9K
-         FCaXn1/F3e73NHlCXn4a7TX0RG9iapgjtGEyL4xlh225FEKIei0klikQj+UN1Pjambrr
-         9YaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695117251; x=1695722051;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OmXgnmvOiVfooj4M23wQXodnaTVsRKoq6QYvvY7fqHM=;
-        b=mep2CL9iTYES1iegpAGULQigdECI3b2+c+034D9ht+Vswolk6rXBtd7AOrCNeQVQKP
-         6aGf388aBJOKiE9C3wesLEDXUzgJhtVeS+fyyb8D4yeky+8E7z2YXUecGTu6pffKdyls
-         Qw/B3+yt+NXGX0+YwUZhFrl2nAzquPtudlMj5ocx9TLXkGQE9f9mH2UED/Z+9AijngCn
-         LGZUkT3nL7KKEXUX3iWQDCnI0shZZmz3XQ/LdlXHJKhEIgy+J1bcefGhJTrqX9iE4FDp
-         +ftcDEa0/lMrItx7gTBDMGcYhzU8OMLAOsb28x5qttLcjGGNk6CamSuVqkkR6AidbVwi
-         fKhQ==
-X-Gm-Message-State: AOJu0YzGVTSctjbaG8u/5xiJWka0E2ryCQvp70UtyC5pv1oSxcQ4fPgm
-	J+08T6vK7G8Plb5MAqcOxn/OTw==
-X-Google-Smtp-Source: AGHT+IFD+/JR8bBXkKzRaOn6uW69Q1H71e3hBw6gpkPpcO6ABZxmcJoEcS7N9t36yAyaScr+LBt+gA==
-X-Received: by 2002:a17:907:a07c:b0:992:bc8:58e4 with SMTP id ia28-20020a170907a07c00b009920bc858e4mr6491327ejc.20.1695117250517;
-        Tue, 19 Sep 2023 02:54:10 -0700 (PDT)
-Received: from blmsp.fritz.box ([2001:4091:a246:8222:dbda:9cd9:39cc:f174])
-        by smtp.gmail.com with ESMTPSA id g11-20020a170906198b00b009926928d486sm7521855ejd.35.2023.09.19.02.54.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Sep 2023 02:54:09 -0700 (PDT)
-From: Markus Schneider-Pargmann <msp@baylibre.com>
-To: Wolfgang Grandegger <wg@grandegger.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Sean Anderson <sean.anderson@seco.com>,
-	linux-can@vger.kernel.org,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B258B110B;
+	Tue, 19 Sep 2023 10:05:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64294C433C7;
+	Tue, 19 Sep 2023 10:04:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695117900;
+	bh=UWm/jZ0BpAK791nEkanovA5cdga8NxQpAaGrGnuJ0tE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YwgAzIpwo9U7itbW+rxsSq6V6Qx5nb30gUuDuFgF+TQSRy9mFzkDDBG/ni+kt9HtR
+	 XbapZhf4IS4n05WwagOY1/jPCaDPhix5Y8MsGfYCnBDPG1bBFj0S+IhS2OHVXx9Rvn
+	 v7Gdf1qdNk+HAR/g4sEmBBAXG1gCDBqo00rPRCXRL7hOhXXv0tTUK2as/lWdXmrE6C
+	 Fvxcfk3ApBKKhWdNOLtpgj9uuyfBmgfcKvpuo9yzX8DvcieMZXKcZdm+R3h6NVIX24
+	 hjPlouJKkO6+oUB7FIS9gOJ/KKy57/BVGNzBcib8POQOl9VB36614l3nB2EBPZxv+4
+	 7brJJWtXYaNNg==
+Date: Tue, 19 Sep 2023 11:04:53 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Pu Lehui <pulehui@huaweicloud.com>
+Cc: bpf@vger.kernel.org, linux-riscv@lists.infradead.org,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Markus Schneider-Pargmann <msp@baylibre.com>
-Subject: [PATCH] can: tcan4x5x: Fix id2_register for tcan4553
-Date: Tue, 19 Sep 2023 11:54:01 +0200
-Message-Id: <20230919095401.1312259-1-msp@baylibre.com>
-X-Mailer: git-send-email 2.40.1
+	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Yonghong Song <yhs@fb.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Luke Nelson <luke.r.nels@gmail.com>, Pu Lehui <pulehui@huawei.com>
+Subject: Re: [PATCH bpf-next 4/4] riscv, bpf: Mixing bpf2bpf and tailcalls
+Message-ID: <20230919-4734211982e4e411a93650a7@fedora>
+References: <20230919035711.3297256-1-pulehui@huaweicloud.com>
+ <20230919035711.3297256-5-pulehui@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ATOEW6o/+/ySUOUC"
+Content-Disposition: inline
+In-Reply-To: <20230919035711.3297256-5-pulehui@huaweicloud.com>
 
-Fix id2_register content for tcan4553. This slipped through my testing.
 
-Reported-by: Sean Anderson <sean.anderson@seco.com>
-Closes: https://lore.kernel.org/lkml/a94e6fc8-4f08-7877-2ba0-29b9c2780136@seco.com/
-Fixes: 142c6dc6d9d7 ("can: tcan4x5x: Add support for tcan4552/4553")
-Signed-off-by: Markus Schneider-Pargmann <msp@baylibre.com>
----
- drivers/net/can/m_can/tcan4x5x-core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+--ATOEW6o/+/ySUOUC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/drivers/net/can/m_can/tcan4x5x-core.c b/drivers/net/can/m_can/tcan4x5x-core.c
-index 8a4143809d33..ae8c42f5debd 100644
---- a/drivers/net/can/m_can/tcan4x5x-core.c
-+++ b/drivers/net/can/m_can/tcan4x5x-core.c
-@@ -125,7 +125,7 @@ static const struct tcan4x5x_version_info tcan4x5x_versions[] = {
- 	},
- 	[TCAN4553] = {
- 		.name = "4553",
--		.id2_register = 0x32353534,
-+		.id2_register = 0x33353534,
- 	},
- 	/* generic version with no id2_register at the end */
- 	[TCAN4X5X] = {
--- 
-2.40.1
+On Tue, Sep 19, 2023 at 11:57:11AM +0800, Pu Lehui wrote:
+> From: Pu Lehui <pulehui@huawei.com>
+>=20
+> In the current RV64 JIT, if we just don't initialize the TCC in subprog,
+> the TCC can be propagated from the parent process to the subprocess, but
+> the TCC of the parent process cannot be restored when the subprocess
+> exits. Since the RV64 TCC is initialized before saving the callee saved
+> registers into the stack, we cannot use the callee saved register to
+> pass the TCC, otherwise the original value of the callee saved register
+> will be destroyed. So we implemented mixing bpf2bpf and tailcalls
+> similar to x86_64, i.e. using a non-callee saved register to transfer
+> the TCC between functions, and saving that register to the stack to
+> protect the TCC value. At the same time, we also consider the scenario
+> of mixing trampoline.
+>=20
+> Tests test_bpf.ko and test_verifier have passed, as well as the relative
+> testcases of test_progs*.
+>=20
+> Signed-off-by: Pu Lehui <pulehui@huawei.com>
 
+Breaks the build:
+=2E./arch/riscv/net/bpf_jit_comp64.c:846:14: error: use of undeclared ident=
+ifier 'BPF_TRAMP_F_TAIL_CALL_CTX'
+
+Thanks,
+Conor.
+
+--ATOEW6o/+/ySUOUC
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEARYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZQlyOAAKCRB4tDGHoIJi
+0r/rAP0RRG8B+qpWNcU7qcE9Ft11M7jGHMnDR1qMquQuiP7XvgEA+UKszKDvr0or
+aj3aTNgx/eXSCPPE7ouXf4b6WzNODwI=
+=jgUK
+-----END PGP SIGNATURE-----
+
+--ATOEW6o/+/ySUOUC--
 
