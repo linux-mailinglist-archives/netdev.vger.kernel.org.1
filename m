@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-35139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D3687A73B5
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 09:09:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B076A7A73D5
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 09:19:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B82D4281AB1
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 07:09:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20F7D281A2E
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 07:19:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16F868472;
-	Wed, 20 Sep 2023 07:09:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8FC58483;
+	Wed, 20 Sep 2023 07:19:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0795A846B
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 07:09:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 942D2C433C8;
-	Wed, 20 Sep 2023 07:09:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B51178472
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 07:19:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37707C433C7;
+	Wed, 20 Sep 2023 07:19:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695193751;
-	bh=NQsmncYKZ6Bvzvqjwb0lz1WJq9j9DPdUwVIN26wMP4M=;
+	s=k20201202; t=1695194358;
+	bh=WyO9M//XrozD9V7TnomV/MSTgBlPqTOV4kfhlkxyjSU=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ZdPPwKMCr3tNw51hiNGxLF3uEZP0Yr7jvRX5wH+9t8Br2XHowgxEq5BiZZfuByAoj
-	 nttmdqzmTP14T/VTgR51pknSbUvTNBjjlBTTP3k+Qo+oAKClIklRzKo+DJ7ARdVUyh
-	 gXNefo61/hZ5HmF3EibgcRKDQs015B/lHDJPYM0ZUtXGQdd4ozeI7k5vpUk7U3tLRA
-	 cWxHY8uCW0NGyA5i0Qm6THjMaTqBsmrWtoOF6AKE+CnVH+fml4+FBFEo9bF3bgh+13
-	 QEG3O4veED6JhGu68srMKnfIO4DvIrR8IBAJX4QsfhXFL/lpDjHN4EqMhGJDYHsrkH
-	 SLfYkT20Apo6g==
-Message-ID: <7c05ec2c-fe13-5324-f537-4f12697d1566@kernel.org>
-Date: Wed, 20 Sep 2023 10:09:05 +0300
+	b=U+YO+seSaVhGE61tbw7daKIcwHsvtGx6VsQenbdtEZ77Rmrr0voTBoP7zvXToLX5p
+	 8h8qn6gk0nul2EC9kuw8FTVswGOmVSVqIkK+rW9n8MTh7YQWlEjVNdVxcxmHCUAWY3
+	 gHyLknMIgdQQP+Lu9GQQT0riUjYtZ6X5LfOJPq5uiUbtCzxkIPS/h4fmUaCO+NBq6E
+	 hCtyMJxOABL4mwaJX6HXJLxbgRg6yDuiCBrayvBkdDPuypU5P0lDwc6SlHs7EhbVyl
+	 uLq6ZqbALxmJiC1qzwR/gq0ZLWpCXlVkomuyrLntgNIkEVYmpGTdP6ZyLb5praUKFy
+	 3tXT1Dw2+aMiA==
+Message-ID: <79bd4b5b-7ea8-4a3b-d098-9aecd43b1675@kernel.org>
+Date: Wed, 20 Sep 2023 10:19:12 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -42,115 +42,71 @@ User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.15.1
 Subject: Re: [PATCH v2] net: ethernet: ti: am65-cpsw: add mqprio qdisc offload
  in channel mode
-To: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, vladimir.oltean@nxp.com
-Cc: horms@kernel.org, s-vadapalli@ti.com, srk@ti.com, vigneshr@ti.com,
- p-varis@ti.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- rogerq@kernel.rog
-References: <20230918075358.5878-1-rogerq@kernel.org>
- <ba0063d31a926b1775fe98e56b15976b4d8726cd.camel@redhat.com>
 Content-Language: en-US
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, s-vadapalli@ti.com, srk@ti.com,
+ vigneshr@ti.com, p-varis@ti.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, rogerq@kernel.rog
+References: <20230918075358.5878-1-rogerq@kernel.org>
+ <20230918075358.5878-1-rogerq@kernel.org>
+ <20230919124703.hj2bvqeogfhv36qy@skbuf>
 From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <ba0063d31a926b1775fe98e56b15976b4d8726cd.camel@redhat.com>
+In-Reply-To: <20230919124703.hj2bvqeogfhv36qy@skbuf>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi Paolo,
+Hi Vladimir,
 
-On 19/09/2023 14:32, Paolo Abeni wrote:
-> On Mon, 2023-09-18 at 10:53 +0300, Roger Quadros wrote:
->> @@ -937,3 +918,296 @@ void am65_cpsw_qos_tx_p0_rate_init(struct am65_cpsw_common *common)
->>  		       host->port_base + AM65_CPSW_PN_REG_PRI_CIR(tx_ch));
+On 19/09/2023 15:47, Vladimir Oltean wrote:
+> Hi Roger,
 > 
-> [...]
+> On Mon, Sep 18, 2023 at 10:53:58AM +0300, Roger Quadros wrote:
+>> -int am65_cpsw_qos_ndo_setup_tc(struct net_device *ndev, enum tc_setup_type type,
+>> -			       void *type_data)
+>> -{
+>> -	switch (type) {
+>> -	case TC_QUERY_CAPS:
+>> -		return am65_cpsw_tc_query_caps(ndev, type_data);
+>> -	case TC_SETUP_QDISC_TAPRIO:
+>> -		return am65_cpsw_setup_taprio(ndev, type_data);
+>> -	case TC_SETUP_BLOCK:
+>> -		return am65_cpsw_qos_setup_tc_block(ndev, type_data);
+>> -	default:
+>> -		return -EOPNOTSUPP;
+>> -	}
+>> -}
+>> -
+>> -void am65_cpsw_qos_link_up(struct net_device *ndev, int link_speed)
+>> -{
+>> -	struct am65_cpsw_port *port = am65_ndev_to_port(ndev);
+>> -
+>> -	if (!IS_ENABLED(CONFIG_TI_AM65_CPSW_TAS))
+>> -		return;
+>> -
+>> -	am65_cpsw_est_link_up(ndev, link_speed);
+>> -	port->qos.link_down_time = 0;
+>> -}
+>> -
+>> -void am65_cpsw_qos_link_down(struct net_device *ndev)
+>> -{
+>> -	struct am65_cpsw_port *port = am65_ndev_to_port(ndev);
+>> -
+>> -	if (!IS_ENABLED(CONFIG_TI_AM65_CPSW_TAS))
+>> -		return;
+>> -
+>> -	if (!port->qos.link_down_time)
+>> -		port->qos.link_down_time = ktime_get();
+>> -
+>> -	port->qos.link_speed = SPEED_UNKNOWN;
+>> -}
+>> -
 > 
->> +static int am65_cpsw_mqprio_verify_shaper(struct am65_cpsw_port *port,
->> +					  struct tc_mqprio_qopt_offload *mqprio)
->> +{
->> +	u64 min_rate_total = 0, max_rate_total = 0;
->> +	u32 min_rate_msk = 0, max_rate_msk = 0;
->> +	bool has_min_rate, has_max_rate;
->> +	int num_tc, i;
->> +	struct am65_cpsw_mqprio *p_mqprio = &port->qos.mqprio;
->> +	struct netlink_ext_ack *extack = mqprio->extack;
+> Could you split the code movement to a separate change?
+
+OK.
+
 > 
-> Please, respect the reverse x-mas tree order.
-> 
->> +
->> +	if (!(mqprio->flags & TC_MQPRIO_F_SHAPER))
->> +		return 0;
->> +
->> +	if (mqprio->shaper != TC_MQPRIO_SHAPER_BW_RATE)
->> +		return 0;
->> +
->> +	has_min_rate = !!(mqprio->flags & TC_MQPRIO_F_MIN_RATE);
->> +	has_max_rate = !!(mqprio->flags & TC_MQPRIO_F_MAX_RATE);
->> +
->> +	if (!has_min_rate && has_max_rate) {
->> +		NL_SET_ERR_MSG_MOD(extack, "min_rate is required with max_rate");
->> +		return -EOPNOTSUPP;
->> +	}
->> +
->> +	if (!has_min_rate)
->> +		return 0;
->> +
->> +	num_tc = mqprio->qopt.num_tc;
->> +
->> +	for (i = num_tc - 1; i >= 0; i--) {
->> +		u32 ch_msk;
->> +
->> +		if (mqprio->min_rate[i])
->> +			min_rate_msk |= BIT(i);
->> +		min_rate_total +=  mqprio->min_rate[i];
->> +
->> +		if (has_max_rate) {
->> +			if (mqprio->max_rate[i])
->> +				max_rate_msk |= BIT(i);
->> +			max_rate_total +=  mqprio->max_rate[i];
->> +
->> +			if (!mqprio->min_rate[i] && mqprio->max_rate[i]) {
->> +				NL_SET_ERR_MSG_FMT_MOD(extack,
->> +						       "TX tc%d rate max>0 but min=0\n",
->> +						       i);
->> +				return -EINVAL;
->> +			}
->> +
->> +			if (mqprio->max_rate[i] &&
->> +			    mqprio->max_rate[i] < mqprio->min_rate[i]) {
->> +				NL_SET_ERR_MSG_FMT_MOD(extack,
->> +						       "TX tc%d rate min(%llu)>max(%llu)\n",
->> +						       i, mqprio->min_rate[i],
->> +						       mqprio->max_rate[i]);
->> +				return -EINVAL;
->> +			}
->> +		}
->> +
->> +		ch_msk = GENMASK(num_tc - 1, i);
->> +		if ((min_rate_msk & BIT(i)) && (min_rate_msk ^ ch_msk)) {
->> +			NL_SET_ERR_MSG_FMT_MOD(extack,
->> +					       "TX min rate limiting has to be enabled sequentially hi->lo tx_rate_msk%x\n",
->> +					       min_rate_msk);
->> +			return -EINVAL;
->> +		}
->> +
->> +		if ((max_rate_msk & BIT(i)) && (max_rate_msk ^ ch_msk)) {
->> +			NL_SET_ERR_MSG_FMT_MOD(extack,
->> +					       "TX max rate limiting has to be enabled sequentially hi->lo tx_rate_msk%x\n",
->> +					       max_rate_msk);
->> +			return -EINVAL;
->> +		}
->> +	}
->> +
->> +	min_rate_total *= 8;
->> +	min_rate_total /= 1000 * 1000;
->> +	max_rate_total *= 8;
->> +	max_rate_total /= 1000 * 1000;
-> 
-> For consistency with other code doing the same algebra, you could use a
-> single statement for both '*' and '/'. You could also add an helper for
-> that conversion, as there are multiple use-case already.
-> 
->> +
 >> +	if (port->qos.link_speed != SPEED_UNKNOWN) {
 >> +		if (min_rate_total > port->qos.link_speed) {
 >> +			NL_SET_ERR_MSG_FMT_MOD(extack, "TX rate min %llu exceeds link speed %d\n",
@@ -164,8 +120,20 @@ On 19/09/2023 14:32, Paolo Abeni wrote:
 >> +			return -EINVAL;
 >> +		}
 >> +	}
+> 
+> Link speeds can be renegotiated, and the mqprio offload can be installed
+> while the link is down. So this restriction, while honorable, has limited
+> usefulness.
+
+For link down case it won't run those checks, but I get your point.
+I'll drop these checks.
+
+> 
 >> +
 >> +	p_mqprio->shaper_en = 1;
+> 
+> s/1/true/
+> 
 >> +	p_mqprio->max_rate_total = max_t(u64, min_rate_total, max_rate_total);
 >> +
 >> +	return 0;
@@ -178,6 +146,9 @@ On 19/09/2023 14:32, Paolo Abeni wrote:
 >> +	struct am65_cpsw_common *common = port->common;
 >> +
 >> +	p_mqprio->shaper_en = 0;
+> 
+> s/0/false/
+> 
 >> +	p_mqprio->max_rate_total = 0;
 >> +
 >> +	am65_cpsw_tx_pn_shaper_reset(port);
@@ -188,7 +159,15 @@ On 19/09/2023 14:32, Paolo Abeni wrote:
 >> +	writel(0,
 >> +	       port->port_base + AM65_CPSW_PN_REG_TX_PRI_MAP);
 > 
-> No need to wrap the above statement on multiple lines.
+> What exactly needs pm_runtime_get_sync()? This writel() doesn't?
+
+Good catch. In my tests, the network interface was up so controller
+was already active. But we will need to do a pm_runtime_get_sync()
+if all network interfaces of the controller are down.
+
+So, I will need to move the pm_runtime_get_sync() call before
+am65_cpsw_reset_tc_mqprio();
+
 > 
 >> +}
 >> +
@@ -216,58 +195,6 @@ On 19/09/2023 14:32, Paolo Abeni wrote:
 >> +		pm_runtime_put_noidle(common->dev);
 >> +		return ret;
 >> +	}
->> +
->> +	ret = am65_cpsw_mqprio_verify_shaper(port, mqprio);
->> +	if (ret)
->> +		goto exit_put;
->> +
->> +	netdev_set_num_tc(ndev, num_tc);
->> +
->> +	/* Multiple Linux priorities can map to a Traffic Class
->> +	 * A Traffic Class can have multiple contiguous Queues,
->> +	 * Queues get mapped to Channels (thread_id),
->> +	 *	if not VLAN tagged, thread_id is used as packet_priority
->> +	 *	if VLAN tagged. VLAN priority is used as packet_priorit
->> +	 * packet_priority gets mapped to header_priority in p0_rx_pri_map,
->> +	 * header_priority gets mapped to switch_priority in pn_tx_pri_map.
->> +	 * As p0_rx_pri_map is left at defaults (0x76543210), we can
->> +	 * assume that Queue_n gets mapped to header_priority_n. We can then
->> +	 * set the switch priority in pn_tx_pri_map.
->> +	 */
->> +
->> +	for (tc = 0; tc < num_tc; tc++) {
->> +	 /* For simplicity we assign the same priority (TCn) to all queues
->> +	  * of a Traffic Class.
->> +	  */
-> 
-> Please align the comment with the relevant code.
-> 
-> [...]
-> 
->> +diff --git a/drivers/net/ethernet/ti/am65-cpsw-qos.h b/drivers/net/ethernet/ti/am65-cpsw-qos.h
->> index 0cc2a3b3d7f9..5431fbf8b6e0 100644
->> --- a/drivers/net/ethernet/ti/am65-cpsw-qos.h
->> +++ b/drivers/net/ethernet/ti/am65-cpsw-qos.h
->> @@ -9,6 +9,7 @@
->>  #include <net/pkt_sched.h>
->>  
->>  struct am65_cpsw_common;
->> +struct am65_cpsw_port;
->>  
->>  struct am65_cpsw_est {
->>  	int buf;
->> @@ -16,6 +17,12 @@ struct am65_cpsw_est {
->>  	struct tc_taprio_qopt_offload taprio;
->>  };
->>  
->> +struct am65_cpsw_mqprio {
->> +	struct tc_mqprio_qopt_offload mqprio_hw;
->> +	u64 max_rate_total;
->> +	unsigned shaper_en:1;
-> 
-> Perhaps 'bool' instead?
-
-Thanks for the review. I'll fix them in next revision.
 
 -- 
 cheers,
