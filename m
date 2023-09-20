@@ -1,67 +1,69 @@
-Return-Path: <netdev+bounces-35318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 419647A8DAC
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 22:17:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C9DA7A8DAE
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 22:18:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75E1C281D8A
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 20:17:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA2E1281DA9
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 20:18:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D8E71A5A4;
-	Wed, 20 Sep 2023 20:17:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8B2B405C1;
+	Wed, 20 Sep 2023 20:17:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DF9341235
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 20:17:20 +0000 (UTC)
-Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 553A3B9
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 13:17:18 -0700 (PDT)
-Received: by mail-qk1-x749.google.com with SMTP id af79cd13be357-76dcf1d8905so17276985a.1
-        for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 13:17:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24CE519BC2
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 20:17:21 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CC13A1
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 13:17:20 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59bee08c13aso3347107b3.0
+        for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 13:17:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695241037; x=1695845837; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=aQXsiBEzn/ykqwFugABCLTdDmR3Km67mI3QA7N0wltg=;
-        b=Og04wfWgYUK9vMHLXL/fwR3QsGTL7ltfCJ0zq5HhQmf7OXGsqtJSZie9CiGgWKTucB
-         pUDAhGjtNVn425UFklmJ+nheMYWWtjIzd1Ue48C59dFD7fj6Gtkl74NgHK6eh/yfrNXX
-         7m07QP1olvgdZwYNYiAjXzMQFmUXQstASH7wNRl9bLB5LywmiOr+O1Y1eFLjnlctXIxt
-         4awyJpFCiJ8xLuCmYQe7g1EYJgW5brPDo8Df2T1KmiApqQICk05rQG2JEV9NEq9ebTaP
-         CnVGuq06Asskte027xvNVAnlmGiN5/gT7Pg5d/5S87dBa4DvtNyHEXk6ETAb7uE2yvkK
-         rHgg==
+        d=google.com; s=20230601; t=1695241039; x=1695845839; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uj6P0v48M4kybTeH39AjAjcaPQnv+wxriaAZEolvkjk=;
+        b=dQVLk4sMO4mfSItaqZ8Q3R9pCU3UTrLlgOubCzN2Y85rZkZK29/p7K3xVvV4FjQzul
+         2sni9rjy6pxhIZG0O9NZla2jsjT/lFt885bngr63eNufnzu6okEbB53V6Qhb5dJ4YJv7
+         Z5HihyXjvPSQElF0Q5VDnp+vZJfpezwFqx2NiB5vGTN9VrBxL8g0N40C4VHUbnbfIcBI
+         /SgIXlGsF6HGiJt1uylmb1ZrX/dq/U8AYO8IwFBW9XhMkMM6gNFVdyCHQ9N0WpmePazE
+         FPJgX7+OZ3ZiTLdYFqRt4bHvGefFirV5B9EFCy/9Ht330Beu0q+MCM3S2NOcm+KXeYBp
+         R7Ng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695241037; x=1695845837;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=aQXsiBEzn/ykqwFugABCLTdDmR3Km67mI3QA7N0wltg=;
-        b=HCMYMHtTfXow2ER6MFt5m+6hH/ateCJi4fuzCi/P7stVWgOaDYtkeq+/HW64QQjb+5
-         atBZwKksXPNPWwO0mKZEtMuSToE0svymhekT8eSGl6/7MwFeInVCasSyXlGDZUHUBsBA
-         lLlJBO2Zm9ui9Gl9BwvZjQsK7pMFJnzTvKvg8URWsuwV+zozVlu4ERW6eHNCGvRgwS3a
-         EJAA8JlAJbflYn5yY/TS9CZMdiEbZKcESavje4dRoPRQKzp22yBUvDf8S/qFrpXdlLzV
-         FisvSMLgQUIKDGm5bD1siU6nU+XPtv7ReOfkKEO+AstqoOaXmPc59Slx/0hrSY1o+g/e
-         +8ZQ==
-X-Gm-Message-State: AOJu0YwwaY4eP2ey0CIoz76jP9jISw4g3aajLbycGl0luH7QqPg46BBe
-	jWsVEjPgKRgrqUAuCZ/6SOvYzqVLYdzgiQ==
-X-Google-Smtp-Source: AGHT+IEgS0fUKG7/N7Dsu8qryGHmdZWFeFHrnFpF94jpfXHOe0FN1yxhaNGL+5SFq0UdJMrDrJ2Z3vaPpXIxMw==
+        d=1e100.net; s=20230601; t=1695241039; x=1695845839;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uj6P0v48M4kybTeH39AjAjcaPQnv+wxriaAZEolvkjk=;
+        b=Dq2dASmkJa0u/iQMRk+VKXFVhuWVEMiezZdiaRwj/Uf7HQtiLMhRcHQzC1IEJyp4ZD
+         B0fbudcaVbCEZSAZhxzJU/0V+bHNu/XCsk5RiD9cKDrBMccGr9khzzyWREgsdDaYkPHP
+         yN13FLyeWrgFE7xcdoi4bSJuG52EdoSd5OD5uhDjHibramqQygrEVlnGuUzAn0s01Fl7
+         IKvXeec3HlUFgrR0nruAqk+LpZSwYOeBtDdkqZhTYyiO4U+qx4pA71YNa/xFRYAgyyf8
+         Nm42ZaxwquEQTjyiY641XV5G1cPlJ6nTEBT4GDjVS3WK2S4nLwkIsqHVJ/ke7aA2F0U+
+         PI3Q==
+X-Gm-Message-State: AOJu0YyFXIMZ/vRf4PAYEqqCLJUnhLeZ8YGFuFbV1mbbHJhhRYrxjWcP
+	jJOYC6wUVUxIREQK/mkJzNwm9KAWPjGfDQ==
+X-Google-Smtp-Source: AGHT+IEvF/5LS2F4K69LwpAFVU48JW47ngatRsUCLXgFlHUYVAPqcPGFTmOlIVihI0UpFkpj7l9A4K4lnOVVeA==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:620a:481:b0:76d:be7d:97d8 with SMTP
- id 1-20020a05620a048100b0076dbe7d97d8mr50792qkr.3.1695241037207; Wed, 20 Sep
- 2023 13:17:17 -0700 (PDT)
-Date: Wed, 20 Sep 2023 20:17:10 +0000
+ (user=edumazet job=sendgmr) by 2002:a81:4323:0:b0:59b:d857:8317 with SMTP id
+ q35-20020a814323000000b0059bd8578317mr54494ywa.2.1695241039004; Wed, 20 Sep
+ 2023 13:17:19 -0700 (PDT)
+Date: Wed, 20 Sep 2023 20:17:11 +0000
+In-Reply-To: <20230920201715.418491-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20230920201715.418491-1-edumazet@google.com>
 X-Mailer: git-send-email 2.42.0.459.ge4e396fd5e-goog
-Message-ID: <20230920201715.418491-1-edumazet@google.com>
-Subject: [PATCH v2 net-next 0/5] net_sched: sch_fq: round of improvements
+Message-ID: <20230920201715.418491-2-edumazet@google.com>
+Subject: [PATCH v2 net-next 1/5] net_sched: constify qdisc_priv()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -77,38 +79,33 @@ X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-For FQ tenth anniversary, it was time for making it faster.
+In order to propagate const qualifiers, we change qdisc_priv()
+to accept a possibly const argument.
 
-The FQ part (as in Fair Queue) is rather expensive, because
-we have to classify packets and store them in a per-flow structure,
-and add this per-flow structure in a hash table. Then the RR lists
-also add cache line misses.
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ include/net/pkt_sched.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Most fq qdisc are almost idle. Trying to share NIC bandwidth has
-no benefits, thus the qdisc could behave like a FIFO.
-
-This series brings a 5 % throughput increase in intensive
-tcp_rr workload, and 13 % increase for (unpaced) UDP packets.
-
-v2: removed an extra label (build bot).
-    Fix an accidental increase of stat_internal_packets counter
-    in fast path.
-    Added "constify qdisc_priv()" patch to allow fq_fastpath_check()
-    first parameter to be const.
-    typo on 'eligible' (Willem)
-
-Eric Dumazet (5):
-  net_sched: constify qdisc_priv()
-  net_sched: sch_fq: struct sched_data reorg
-  net_sched: sch_fq: change how @inactive is tracked
-  net_sched: sch_fq: add fast path for mostly idle qdisc
-  net_sched: sch_fq: always garbage collect
-
- include/net/pkt_sched.h        |   8 +-
- include/uapi/linux/pkt_sched.h |   1 +
- net/sched/sch_fq.c             | 148 +++++++++++++++++++++++----------
- 3 files changed, 110 insertions(+), 47 deletions(-)
-
+diff --git a/include/net/pkt_sched.h b/include/net/pkt_sched.h
+index 15960564e0c364ef430f1e3fcdd0e835c2f94a77..9fa1d0794dfa5241705f9a39c896ed44519a9f13 100644
+--- a/include/net/pkt_sched.h
++++ b/include/net/pkt_sched.h
+@@ -20,10 +20,10 @@ struct qdisc_walker {
+ 	int	(*fn)(struct Qdisc *, unsigned long cl, struct qdisc_walker *);
+ };
+ 
+-static inline void *qdisc_priv(struct Qdisc *q)
+-{
+-	return &q->privdata;
+-}
++#define qdisc_priv(q)							\
++	_Generic(q,							\
++		 const struct Qdisc * : (const void *)&q->privdata,	\
++		 struct Qdisc * : (void *)&q->privdata)
+ 
+ static inline struct Qdisc *qdisc_from_priv(void *priv)
+ {
 -- 
 2.42.0.459.ge4e396fd5e-goog
 
