@@ -1,97 +1,97 @@
-Return-Path: <netdev+bounces-35214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94CFC7A7A10
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 13:07:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 28EDB7A7A22
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 13:11:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A0EC21C20A70
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 11:07:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56BC61C209C7
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 11:11:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DF3C16438;
-	Wed, 20 Sep 2023 11:07:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B710E1863D;
+	Wed, 20 Sep 2023 11:10:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05A4C154AF
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 11:07:48 +0000 (UTC)
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C27B2F3;
-	Wed, 20 Sep 2023 04:07:46 -0700 (PDT)
-Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-52bd9ddb741so8466799a12.0;
-        Wed, 20 Sep 2023 04:07:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695208065; x=1695812865; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vS/Cs2PLMP0wrXesDar8P/cFTTk09RoR8vpOfuuFr04=;
-        b=FXd2I3XyuHZDW6sMuOLbD9oBI6GbFcL07yr+qtB7jwgqvPaOQy9g/DBw8sxq6OpZOe
-         XyGCF9GhpjdPlNJUuZMg4KOnHgGEc9NY2+YbXpMZt540ocAogHp0LDTwGli3HnOdAABI
-         wAvNRXDSINNzrzZuuiUXVxF0PuF/pENTzexppxjoEvx1P7ql1C4YpJKLRIfP0fYXOt7M
-         nC5MP3nbwR4MQ6kvKezFLX3Q7MhwHdzq3qauSFnm+ABMl8SsaRwuUSo/bm6jOERWH8jy
-         2k5eUOmMoxVqSSWINbjZOy0+vgNESy9srBjkQtF/h5rr1W06TjFDSfP+QFs+WNc6vd3L
-         e0qQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695208065; x=1695812865;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vS/Cs2PLMP0wrXesDar8P/cFTTk09RoR8vpOfuuFr04=;
-        b=Ey85zOk9wjcoRLx2jJkLhBZxkytR7etY1z26YXSPVEuxkRl0SB+jdza0syabJ5Jnnf
-         qq/EgtCKgn/+ps/0bSmF7YBy3jI7LbSTT8J8LY0NTTLibLgsRY4Pvd3M6EXPnHowB4dE
-         WrDBd7RsiGs9KSMTH6DqgfJTGzdciY812beya7dwehUPW4Av2iDTy8qWYl1B+19S1KGT
-         1rWbmeV86vQvujJKiRWnk5StpXL/mQjle9Pt4dcCPjcFDvuHaw9E50VllTF93PfKFhIu
-         A27ubvqwRfME8ZWBAMOfTCNYaomVIGMA3yTNHez7NcW5h+DGlNGc0LRPzdTQM8XHvF4E
-         iKyg==
-X-Gm-Message-State: AOJu0YzRICb6kIBU4rjmJi46owZmWeRhSUP9ZzC9/B2ERnMSpWX2saLK
-	tVxJYnr7WPd/5MBADkoA3uE=
-X-Google-Smtp-Source: AGHT+IHJhYxXGF/oFkiARA6ufQ+RN2C28QZsKxEpzmxPTjndi+q1qWkXBk95MZAnjOn+PYiONQvuSw==
-X-Received: by 2002:aa7:d518:0:b0:530:52d2:f656 with SMTP id y24-20020aa7d518000000b0053052d2f656mr1749171edq.21.1695208064972;
-        Wed, 20 Sep 2023 04:07:44 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id es19-20020a056402381300b0051e1660a34esm7605111edb.51.2023.09.20.04.07.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Sep 2023 04:07:44 -0700 (PDT)
-Date: Wed, 20 Sep 2023 14:07:42 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Colin Ian King <colin.i.king@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH][next] net: dsa: sja1105: make read-only const arrays
- static
-Message-ID: <20230920110742.aykludzienjg5fn6@skbuf>
-References: <20230919093606.24446-1-colin.i.king@gmail.com>
- <20230919093606.24446-1-colin.i.king@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66A998465
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 11:10:56 +0000 (UTC)
+Received: from out-230.mta0.migadu.com (out-230.mta0.migadu.com [IPv6:2001:41d0:1004:224b::e6])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49105C2
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 04:10:54 -0700 (PDT)
+Message-ID: <0ae9f426-7225-ac4b-4ecd-d53e36dbf365@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1695208252;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ahWAoqjkjHE7OKtu8gYBWsnzFn2eGN8zPA0rlWEMIgU=;
+	b=uHAbTRnk6FKa0i1DNUr+weL5Zd/1izaFg50KVEVqeHBZCFN4CoB7Yc3A/jKs2MPjg8pAyb
+	6STsBpkkmeCh8xmixYuuXBdRADSdxM8cat+FTOdB1Yp5HRBwb55kkNlfw/tolSQs/1xo2S
+	KPJx/SpvUE0UOk3Eq/78q9Lp+HAmetw=
+Date: Wed, 20 Sep 2023 12:10:47 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230919093606.24446-1-colin.i.king@gmail.com>
- <20230919093606.24446-1-colin.i.king@gmail.com>
+Subject: Re: [PATCH net-next] netdev: Remove unneeded semicolon
+Content-Language: en-US
+To: Yang Li <yang.lee@linux.alibaba.com>, arkadiusz.kubalewski@intel.com,
+ jiri@resnulli.us
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Abaci Robot <abaci@linux.alibaba.com>
+References: <20230919010305.120991-1-yang.lee@linux.alibaba.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20230919010305.120991-1-yang.lee@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Sep 19, 2023 at 10:36:06AM +0100, Colin Ian King wrote:
-> Don't populate read-only const arrays on the stack, instead make them
-> static.
+On 19/09/2023 02:03, Yang Li wrote:
+> ./drivers/dpll/dpll_netlink.c:847:3-4: Unneeded semicolon
 > 
-> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
-> ---
+> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+> Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=6605
+> Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
 
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Hi Yang!
+There was a report from Intel's bot too about the issue, could you 
+please add the tags from it?
+
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: 
+https://lore.kernel.org/oe-kbuild-all/202309190540.RFwfIgO7-lkp@intel.com/
+
+Thanks!
+
+> ---
+>   drivers/dpll/dpll_netlink.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
+> index 764437a0661b..e20daba6896a 100644
+> --- a/drivers/dpll/dpll_netlink.c
+> +++ b/drivers/dpll/dpll_netlink.c
+> @@ -844,7 +844,7 @@ dpll_pin_find(u64 clock_id, struct nlattr *mod_name_attr,
+>   				return ERR_PTR(-EINVAL);
+>   			}
+>   			pin_match = pin;
+> -		};
+> +		}
+>   	}
+>   	if (!pin_match) {
+>   		NL_SET_ERR_MSG(extack, "not found");
+
 
