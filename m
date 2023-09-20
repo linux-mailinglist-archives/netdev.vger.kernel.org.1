@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-35264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE92B7A8359
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 15:27:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 685957A8361
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 15:29:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C6AD81C203DC
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 13:27:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 238F7281E03
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 13:28:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 641DA37153;
-	Wed, 20 Sep 2023 13:27:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86D4F3714B;
+	Wed, 20 Sep 2023 13:28:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 475E2347C4
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 13:27:25 +0000 (UTC)
-Received: from mail-qv1-xf31.google.com (mail-qv1-xf31.google.com [IPv6:2607:f8b0:4864:20::f31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4E31E0;
-	Wed, 20 Sep 2023 06:27:21 -0700 (PDT)
-Received: by mail-qv1-xf31.google.com with SMTP id 6a1803df08f44-656262cd5aeso34303456d6.3;
-        Wed, 20 Sep 2023 06:27:21 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 592F9328C2
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 13:28:55 +0000 (UTC)
+Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39AA691;
+	Wed, 20 Sep 2023 06:28:54 -0700 (PDT)
+Received: by mail-qk1-x72e.google.com with SMTP id af79cd13be357-773ac11de71so372087685a.2;
+        Wed, 20 Sep 2023 06:28:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695216440; x=1695821240; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1695216533; x=1695821333; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7lJBAHwXz95QANGBLZn265N6QlIJAVj8T25LP6ROrKU=;
-        b=UKTLqVBcncDOEBfJGGP8uKLDvgy9H50mL7gM5FfHOG87DEEMuFyCujMnNk2N78cxu1
-         BFvHOynSJTvhBSgJA5Zn9o41XGU+R74D6Tb9WeWREj2Ad1W0N5uYnlbY7v/Vgx5Uqd+y
-         /3XiJmg3AjwJ+/zvuWHxPy7SqycMAsc30TGOq/QEQdhOqinly3aYPLx5SBgq+gyA60Ju
-         /WVVEiYprSvOqD8ojaVp4+i3EgLwHgYQ9Ph5/sljhx1UbVbd+wHy8k0RZGiAkAtbhvLM
-         OuS5JyV9l/pRYCRXz9enJJG9oBu+71gh6qZpXgo5WjCzcPsjL3E+wPOlpJXwGCVpEIP7
-         OLxg==
+        bh=vIWgxY3/V9YOuv89H/HAnhBGBkq4ee0D61xCeXLJOwc=;
+        b=lybBFEuBgVBaH3rsuH5KyRqXCodYyeu2GqCxD7PsZkDcWn4eRMwzdMJ13h2TK/gkVQ
+         IfIDd5yRCjPyBX1lte22oOv3UPClmxdqRAlEegKcCbzBCg7CpCS8qomnfiyjbV7f8ZlC
+         F+pGkNcf1Qhv7i4bTVgYOcLxm2cfM327HL4nwgERI9nJ/wlCGoxHWoJeVCHKI6xaS+Jr
+         IQ25zDGXW66idTnRHomRIWTh2kJcKMnavnuX5EH4TfXMulep7jnMMRlGKZf7Hwd2ediD
+         zcAd/tj6wVveFBid4BOBOMFGgSmXt/y39j2l8yW96YI764WqFgWjfa7L4IQHniV/8SrL
+         x/fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695216440; x=1695821240;
+        d=1e100.net; s=20230601; t=1695216533; x=1695821333;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=7lJBAHwXz95QANGBLZn265N6QlIJAVj8T25LP6ROrKU=;
-        b=ptquM1AlMMV2NQV617jW0v6R7fNa+aZtsNjhyd5Ro03CEAMaOQBPGpVDNlZpr9Hv8A
-         IOr9pf/9wDyaj9AfLwhy5eNZxS8AADvfuBQysebNHGW76yt68meSPs2F9waUcLd30Sp5
-         HmZhZQNkIFoH1LOrc1Je/KHXzJakZaRAUkMBwLlr9T0BAjpGDEumFsNCmPEPsHnLm6jV
-         757067RPVvzK8Qrta39QWFS3W8uut6BihjT95wNCwwuo6kd5Mse3GkO8Q1RAHc4/22D4
-         b09mHTZ9A9GmDvXFxqNrxrEHINem4FP17YVnQ1o0UeCEdrlMDfJV7RSSXx1OInKfdKCq
-         TMbg==
-X-Gm-Message-State: AOJu0Yzqa/JiFcnG5TcBFnBln2didXJuUBg99Izq5xX58k8gIWApcyvL
-	Cj84nXm1CY6ePUVLAMdI7VdwiO6e1U9xhw==
-X-Google-Smtp-Source: AGHT+IG5b3th4xNUuvg+sk7Pn9aTH4enYL56voYGp06KsdUbZ1iypoRXYbAp1/62ou/mXzeE41X1ag==
-X-Received: by 2002:ad4:4532:0:b0:647:2f8f:8c29 with SMTP id l18-20020ad44532000000b006472f8f8c29mr1983309qvu.48.1695216440547;
-        Wed, 20 Sep 2023 06:27:20 -0700 (PDT)
+        bh=vIWgxY3/V9YOuv89H/HAnhBGBkq4ee0D61xCeXLJOwc=;
+        b=tE7spRTOte9MI5fyHbP9mvZuRoYxdeHWNLOwShJIUnVgfp2tA2QElw/vnJwq9ghAnQ
+         QsP57XotAQwjW6IYgatXPN60ATPN5csEg50OARxIIxKoIulMyiC7n3Z8MY8g4gSX8UXN
+         7HBEdgx9GxVIYAGobE+6n5o8dyFlC/ge86r+hXF7urzLgzS6JBFsdh83UWASTxhmLBjz
+         +ykg25ATLZvzNW64fOqKV0DuNTLwseHtwW9pwJHKtViaf0QRsRwqeJ8kOOqHsfqT+yUO
+         6+L4Kj+5FhMR85oV+T83QLyB3hWaUEYZ3p9sPicQBU9CIINL4T5TuP/dIelB+zjYjc1w
+         Va5w==
+X-Gm-Message-State: AOJu0YwfY/LkHOCA6GpO6R2Lf79PZbyjHZE2yz4iGBgFT9wjhKMW7Wu/
+	QSBe+kvouGf0VLTVsywX+PY=
+X-Google-Smtp-Source: AGHT+IFJ+GJ0WzHhmVBLQ1o6OFBNHFST+PNmxXmM1sWW2ARifBJFyfFuMoGFixzzFzYm3N4JaNNlKQ==
+X-Received: by 2002:a05:620a:2454:b0:76e:ff2e:44c5 with SMTP id h20-20020a05620a245400b0076eff2e44c5mr3105848qkn.37.1695216533126;
+        Wed, 20 Sep 2023 06:28:53 -0700 (PDT)
 Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
-        by smtp.gmail.com with ESMTPSA id x18-20020a0cb212000000b0063fbfbde4adsm5257903qvd.129.2023.09.20.06.27.19
+        by smtp.gmail.com with ESMTPSA id m12-20020ae9e70c000000b00772662b7804sm4802716qka.100.2023.09.20.06.28.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Sep 2023 06:27:19 -0700 (PDT)
-Date: Wed, 20 Sep 2023 09:27:19 -0400
+        Wed, 20 Sep 2023 06:28:52 -0700 (PDT)
+Date: Wed, 20 Sep 2023 09:28:52 -0400
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 To: Jordan Rife <jrife@google.com>, 
  davem@davemloft.net, 
@@ -66,45 +66,13 @@ To: Jordan Rife <jrife@google.com>,
  willemdebruijn.kernel@gmail.com, 
  netdev@vger.kernel.org
 Cc: dborkman@kernel.org, 
- philipp.reisner@linbit.com, 
- lars.ellenberg@linbit.com, 
- christoph.boehmwalder@linbit.com, 
- axboe@kernel.dk, 
- chengyou@linux.alibaba.com, 
- kaishen@linux.alibaba.com, 
- jgg@ziepe.ca, 
- leon@kernel.org, 
- bmt@zurich.ibm.com, 
- ccaulfie@redhat.com, 
- teigland@redhat.com, 
- mark@fasheh.com, 
- jlbec@evilplan.org, 
- joseph.qi@linux.alibaba.com, 
- sfrench@samba.org, 
- pc@manguebit.com, 
- lsahlber@redhat.com, 
- sprasad@microsoft.com, 
- tom@talpey.com, 
- ericvh@kernel.org, 
- lucho@ionkov.net, 
- asmadeus@codewreck.org, 
- linux_oss@crudebyte.com, 
- idryomov@gmail.com, 
- xiubli@redhat.com, 
- jlayton@kernel.org, 
- horms@verge.net.au, 
- ja@ssi.bg, 
- pablo@netfilter.org, 
- kadlec@netfilter.org, 
- fw@strlen.de, 
- santosh.shilimkar@oracle.com, 
  Jordan Rife <jrife@google.com>, 
  stable@vger.kernel.org
-Message-ID: <650af33778093_37ac73294a9@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20230919175159.144073-1-jrife@google.com>
-References: <20230919175159.144073-1-jrife@google.com>
-Subject: Re: [PATCH net v4 1/3] net: replace calls to sock->ops->connect()
- with kernel_connect()
+Message-ID: <650af39492a56_37ac7329469@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20230919175254.144417-1-jrife@google.com>
+References: <20230919175254.144417-1-jrife@google.com>
+Subject: Re: [PATCH net v4 2/3] net: prevent rewrite of msg_name in
+ sock_sendmsg()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -116,20 +84,31 @@ Content-Type: text/plain;
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 Jordan Rife wrote:
-> commit 0bdf399342c5 ("net: Avoid address overwrite in kernel_connect")
-> ensured that kernel_connect() will not overwrite the address parameter
-> in cases where BPF connect hooks perform an address rewrite. This change
-> replaces all direct calls to sock->ops->connect() with kernel_connect()
-> to make these call safe.
+> Callers of sock_sendmsg(), and similarly kernel_sendmsg(), in kernel
+> space may observe their value of msg_name change in cases where BPF
+> sendmsg hooks rewrite the send address. This has been confirmed to break
+> NFS mounts running in UDP mode and has the potential to break other
+> systems.
+> 
+> This patch:
+> 
+> 1) Creates a new function called __sock_sendmsg() with same logic as the
+>    old sock_sendmsg() function.
+> 2) Replaces calls to sock_sendmsg() made by __sys_sendto() and
+>    __sys_sendmsg() with __sock_sendmsg() to avoid an unnecessary copy,
+>    as these system calls are already protected.
+> 3) Modifies sock_sendmsg() so that it makes a copy of msg_name if
+>    present before passing it down the stack to insulate callers from
+>    changes to the send address.
 > 
 > Link: https://lore.kernel.org/netdev/20230912013332.2048422-1-jrife@google.com/
-> Fixes: d74bad4e74ee ("bpf: Hooks for sys_connect")
+> Fixes: 1cedee13d25a ("bpf: Hooks for sys_sendmsg")
 > Cc: stable@vger.kernel.org
 > Signed-off-by: Jordan Rife <jrife@google.com>
 
