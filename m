@@ -1,148 +1,132 @@
-Return-Path: <netdev+bounces-35222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23CC97A7B58
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 13:51:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 772E17A7BB2
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 13:55:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D862B1C20988
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 11:51:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CC6D2815B6
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 11:55:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27A68208BB;
-	Wed, 20 Sep 2023 11:51:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF304208BB;
+	Wed, 20 Sep 2023 11:55:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F2121D6A7
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 11:51:10 +0000 (UTC)
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2074.outbound.protection.outlook.com [40.107.93.74])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1489130;
-	Wed, 20 Sep 2023 04:51:08 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=a++t16KJjtbrUpX8f4ASKkcM54okvoVeNTWqSbnpXEp6wvuc4Ov61LBIEBeZ2/Cm0b6ReypPe+sqpaE+oPahB21x7w/EIsJGVbEfuOYy9iszFZstslZrhxKBYiqZYOiAGv3eGZHzVii0Q0sD9SsWUijFqY+NxpfhhSxlmpXGVahdsCVODzy8K/n+j3KRTA05OcGeOIuC0mUM2GedeiveR+9ZTmTima1hpg80ahPk3ah+MK6yKg5XKbRVVN6FIhM3DmJ6Wz9EE296CxiaCsSzHqXLWQTentgivMZVgY0v3jlt2egyreis2XG1kQejppXYflaeRRq+tBdOYltERH5t6A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jzL5CoGtdQYgFiut1AY2LxEFmUTxwXDDJotBPFMB5Yk=;
- b=l6Qwl+XUAXd3q0vtnqG30vUELwc9I8cOBFJsIa9QjVkuAEbGRah3ECMmgQ7/gKq7irfnBAkPn6aCrwLW9E1s9NdjOPU8PokNNvjhrYztdK9XAkzlez42EHK+YRy6tnEI5j+0elxNx6Hs+Ij+NPffS5kuI/vKqsYv/KsP3H3oF1b3LvLz0FAk/+i3KpFMHDO8STu2IjWYKO1WpqAVQ6nbJ7WsEc2rzTXsSDuj9Mk2U0Ltv8OYM/T9owMM8uZ8K7flwthYCJq4S9uatGjdapl92oT4YlrlRhURZq/JrBDAMRsy0n9OIT1ZYX3VaWqXLaTIi6mTR5Q3x+me34vOjVSoDA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=davemloft.net smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jzL5CoGtdQYgFiut1AY2LxEFmUTxwXDDJotBPFMB5Yk=;
- b=YD2mwS5ls+4uOAv8n7A6+ChaBcOg3KaKhCKu+OYAuIW+yeeitUDIb2XTQNeFa608bZiycM6qIwyTKno5X7o64wq6a8WsbEJNGwnL3re8EWuEp0uox00pF3n5g6I90iaTU91T/UALI2f9w4XOIGiZNJuwAqwNYjO2UekGQeYEfPU=
-Received: from DM6PR03CA0069.namprd03.prod.outlook.com (2603:10b6:5:100::46)
- by CY5PR12MB6299.namprd12.prod.outlook.com (2603:10b6:930:20::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.20; Wed, 20 Sep
- 2023 11:51:05 +0000
-Received: from CY4PEPF0000EE38.namprd03.prod.outlook.com
- (2603:10b6:5:100:cafe::5) by DM6PR03CA0069.outlook.office365.com
- (2603:10b6:5:100::46) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.30 via Frontend
- Transport; Wed, 20 Sep 2023 11:51:04 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
-Received: from SATLEXMB03.amd.com (165.204.84.17) by
- CY4PEPF0000EE38.mail.protection.outlook.com (10.167.242.12) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6792.20 via Frontend Transport; Wed, 20 Sep 2023 11:51:04 +0000
-Received: from SATLEXMB08.amd.com (10.181.40.132) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 20 Sep
- 2023 06:51:04 -0500
-Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB08.amd.com
- (10.181.40.132) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 20 Sep
- 2023 04:50:56 -0700
-Received: from xhdharinik40.xilinx.com (10.180.168.240) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server id 15.1.2507.27 via Frontend
- Transport; Wed, 20 Sep 2023 06:50:53 -0500
-From: Harini Katakam <harini.katakam@amd.com>
-To: <davem@davemloft.net>, <kuba@kernel.org>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <esben@geanix.com>, <jsc@umbraculum.org>,
-	<christophe.jaillet@wanadoo.fr>
-CC: <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>, <harinikatakamlinux@gmail.com>,
-	<michal.simek@amd.com>, <harini.katakam@amd.com>,
-	<radhey.shyam.pandey@amd.com>
-Subject: [PATCH net-next] MAINTAINERS: Add an obsolete entry for LL TEMAC driver
-Date: Wed, 20 Sep 2023 17:20:47 +0530
-Message-ID: <20230920115047.31345-1-harini.katakam@amd.com>
-X-Mailer: git-send-email 2.17.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61A1528E00
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 11:55:00 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 668A592
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 04:54:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1695210897;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=FbqkaALD9koK0woUrwUvX01fiQlAL8xBltNKiAO1nLU=;
+	b=GWpM69VM8QjjwUP6X/XXGhNuIFqOChTIMh5zdAudy7x2lICDNEPdzbnM8fw18W4KuURceH
+	IyOfVc5ScB5W2IypzkvmfKbgt/VphQFSeDASw2HUyL8foYzmg2oSeIdZ05lrvpjR8ZQTsH
+	Eq1zJ5u7vIHV7hebzJy6nDVLlUEg42c=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-412-yWqD37fVOf2OKXhamFjCVw-1; Wed, 20 Sep 2023 07:54:53 -0400
+X-MC-Unique: yWqD37fVOf2OKXhamFjCVw-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7DD863812591;
+	Wed, 20 Sep 2023 11:54:52 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.45.225.145])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 3BE43492C37;
+	Wed, 20 Sep 2023 11:54:51 +0000 (UTC)
+From: Michal Schmidt <mschmidt@redhat.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: Jacob Keller <jacob.e.keller@intel.com>,
+	Leyi Rong <leyi.rong@intel.com>,
+	Michal Jaron <michalx.jaron@intel.com>,
+	Mateusz Palczewski <mateusz.palczewski@intel.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH net] ice: always add legacy 32byte RXDID in supported_rxdids
+Date: Wed, 20 Sep 2023 13:54:38 +0200
+Message-ID: <20230920115439.61172-1-mschmidt@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE38:EE_|CY5PR12MB6299:EE_
-X-MS-Office365-Filtering-Correlation-Id: 334b2dd9-d815-48c1-080d-08dbb9cfde9c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	tuITCXMIAJUeIfH5zBccvaGsnmao63ESyvXkEJGFlVgwHGdsVc2aIyLVCVLsuEHvu9eg0PikcofyrQ+dq/LH53D3SGtRyTqaz41JBuN79SuGJEYvotY2+lsE9lT8qhmbUPlhqj6FH6gXMQTeeCXFVL28WnPDcZVAAN/mv/uN8By2iy/iOiEyh1f+cVd+CKTsYgaEPNwhIzKvmT2SAG1hnZXjsIeVfLCnX6TJUNLH4hmdGwkZPT/8ozt5BGgQUGlZh98asdOSOnzxTQJSyM8FqVZMkr9U15IhQgeVTxsgk6ypn6deGL4i/Y4Bce8EuY7L+RImGSXOl4O16ZqnJ5754A3t3GExv3jXh1UCJPsrvuDa4o/bG3QFHkh9CP7c6DGn/gK3PbkHHSii+1y7zakOt9/gNhnioXPy+0DyP3C2tCv16DfdOg+5LWW1eBqyWWKIlGgMwJ0o4Tf8q+4VLelioMtzhBZBD4cvOTu+8JPL4Ysw4PIKg+5vytmw2N4hDgPdM6p362GJbykHZ4LXCY2NAz5vCGM6EF2N9TYvGXmsUTkg+y13jNzHaorDRB37P9967TYrWUhuH69so8g9Ra4zqLW2G2SD71IPwm7F/3MNwss9jMJtymnYNKqNXcM3luxIONJEErAAADVb/yIvmo73g8PyI11/+6K6R4vGtYCkXQ9jhCd3VhHb1btur/426wBEtmLqrQ5ISORrfP/mV4ZxDf9mFCidPMj2XKQZo6Z/obyFJCR/S4uos8XpL2rPkVIypxljSYDpFTMKRB9mhR9p4A==
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(136003)(376002)(346002)(396003)(1800799009)(451199024)(186009)(82310400011)(40470700004)(46966006)(36840700001)(8936002)(44832011)(8676002)(478600001)(110136005)(70206006)(54906003)(70586007)(6666004)(316002)(40460700003)(5660300002)(36860700001)(36756003)(82740400003)(86362001)(40480700001)(4326008)(47076005)(4744005)(7416002)(2906002)(426003)(336012)(41300700001)(1076003)(2616005)(26005)(81166007)(356005)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Sep 2023 11:51:04.6099
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 334b2dd9-d815-48c1-080d-08dbb9cfde9c
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EE38.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6299
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-	autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+X-Spam-Status: No, score=1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	RCVD_IN_SBL_CSS,SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no
+	version=3.4.6
+X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-LL TEMAC IP is no longer supported. Hence add an entry marking the
-driver as obsolete.
+When the PF and VF drivers both support flexible rx descriptors and have
+negotiated the VIRTCHNL_VF_OFFLOAD_RX_FLEX_DESC capability, the VF driver
+queries the PF for the list of supported descriptor formats
+(VIRTCHNL_OP_GET_SUPPORTED_RXDIDS). The PF driver is supposed to set the
+supported_rxdids bits that correspond to the descriptor formats the
+firmware implements. The legacy 32-byte rx desc format is always
+supported, even though it is not expressed in GLFLXP_RXDID_FLAGS.
 
-Signed-off-by: Harini Katakam <harini.katakam@amd.com>
----
-This is an old driver with no bindings doc and hence the maintainers
-entry does not contain a link to documentation.
----
- MAINTAINERS | 5 +++++
- 1 file changed, 5 insertions(+)
+The ice driver does not advertise the legacy 32-byte rx desc support,
+which leads to this failure to bring up the VF using the Intel
+out-of-tree iavf driver:
+ iavf 0000:41:01.0: PF does not list support for default Rx descriptor format
+ ...
+ iavf 0000:41:01.0: PF returned error -5 (VIRTCHNL_STATUS_ERR_PARAM) to our request 6
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 3dde038545d8..820a7817f02f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -23696,6 +23696,11 @@ F:	Documentation/devicetree/bindings/gpio/xlnx,gpio-xilinx.yaml
- F:	drivers/gpio/gpio-xilinx.c
- F:	drivers/gpio/gpio-zynq.c
+The in-tree iavf driver does not expose this bug, because it does not
+yet implement VIRTCHNL_VF_OFFLOAD_RX_FLEX_DESC.
+
+The ice driver must always set the ICE_RXDID_LEGACY_1 bit in
+supported_rxdids. The Intel out-of-tree ice driver and the ice driver in
+DPDK both do this.
+
+I copied this piece of the code and the comment text from the Intel
+out-of-tree driver.
+
+Fixes: e753df8fbca5 ("ice: Add support Flex RXD")
+Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
+---
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.c b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
+index b03426ac932b..db97353efd06 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl.c
++++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
+@@ -2617,12 +2617,14 @@ static int ice_vc_query_rxdid(struct ice_vf *vf)
+ 		goto err;
+ 	}
  
-+XILINX LL TEMAC ETHERNET DRIVER
-+L:	netdev@vger.kernel.org
-+S:	Obsolete
-+F:	drivers/net/ethernet/xilinx/ll_temac*
+-	/* Read flexiflag registers to determine whether the
+-	 * corresponding RXDID is configured and supported or not.
+-	 * Since Legacy 16byte descriptor format is not supported,
+-	 * start from Legacy 32byte descriptor.
++	/* RXDIDs supported by DDP package can be read from the register
++	 * to get the supported RXDID bitmap. But the legacy 32byte RXDID
++	 * is not listed in DDP package, add it in the bitmap manually.
++	 * Legacy 16byte descriptor is not supported.
+ 	 */
+-	for (i = ICE_RXDID_LEGACY_1; i < ICE_FLEX_DESC_RXDID_MAX_NUM; i++) {
++	rxdid->supported_rxdids |= BIT(ICE_RXDID_LEGACY_1);
 +
- XILINX PWM DRIVER
- M:	Sean Anderson <sean.anderson@seco.com>
- S:	Maintained
++	for (i = ICE_RXDID_FLEX_NIC; i < ICE_FLEX_DESC_RXDID_MAX_NUM; i++) {
+ 		regval = rd32(hw, GLFLXP_RXDID_FLAGS(i, 0));
+ 		if ((regval >> GLFLXP_RXDID_FLAGS_FLEXIFLAG_4N_S)
+ 			& GLFLXP_RXDID_FLAGS_FLEXIFLAG_4N_M)
 -- 
-2.17.1
+2.41.0
 
 
