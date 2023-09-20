@@ -1,177 +1,146 @@
-Return-Path: <netdev+bounces-35202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 237CE7A790F
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 12:21:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F22237A7971
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 12:38:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D22122815CD
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 10:21:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 273EE1C20921
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 10:38:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8F7E15ADC;
-	Wed, 20 Sep 2023 10:21:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87E5FF9EB;
+	Wed, 20 Sep 2023 10:38:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 669EA11709
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 10:21:01 +0000 (UTC)
-Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EDABB9
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 03:20:59 -0700 (PDT)
-Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-9adc75f6f09so734140766b.0
-        for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 03:20:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27C0879FA
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 10:38:48 +0000 (UTC)
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73D44AC
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 03:38:47 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-522bd411679so8557069a12.0
+        for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 03:38:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1695205258; x=1695810058; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=DiPSvOokKshBPUexjeZdWsFIcxk+jNh+RekcG+HrWWg=;
-        b=Q8EpkBsXTujeK9KdV6Ipi7CIded8Z6A0o/320eaBS2YNI9Zq5bpqELgDYnby1+9NAA
-         x0vMxlCZ2/DciYy40fAvHuWP8COzzHiVI/qd3xHjIY3GRS6EgfZ6dxRKS2/tjLVC8i0y
-         qvadDtmLzGVtCr0/a8rjv7jgIv0Fu1k67t6AGN/cjILyedNJzrP7qGX0tQ2JKlkUMaZ1
-         gaFArQimp1wcn1cCl7VEHSEEHO/NweHipL3Ft+5rqN8IUPRxvL8kPKQps/qBypjSbhAl
-         uyBZEqwxJKEGIfQVE3JyWz/MhktcREIMed/6xQo/MoBYXxgfjYjarm8FRtYy1MOpOFgo
-         pd3g==
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1695206326; x=1695811126; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AdSo+Yj9RqpysydqoW13PgqmyUcBvx2Eis/Ti0rFlec=;
+        b=O8uno3frTZMddpPEumUm6IKgSwSI0RN0ydfs0QetyNt43sO5Q10L1NRNR0hlDLz7+1
+         zcFzWrzoYxXIJEBgtNpoLheXZ8ATK5Y+d4zwmBbV6K2s4POjMeLUd0GRO9dmZXMztELb
+         k+2xEtD8SVXw7p2ta1q+qS2d8QijG7PronpTGYnZEgaWVw4SZ/k3StCWMH/B0j5MguBy
+         3g183Zp1sPCZ2OU+lU5xIU4nox8nIE4lKk6h9ZdgXVE8zB/hQSQBghaau1PvIdjk7W0B
+         aPIvxYeMYtcoJ6ytYw9TNFxw1nsfw9kB89lgPAH0bHB7+NT8C7Na/xVin7bIBq9DlgY0
+         NO/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695205258; x=1695810058;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DiPSvOokKshBPUexjeZdWsFIcxk+jNh+RekcG+HrWWg=;
-        b=J9yppJ0egnb6wEkQXEc12Tlrp63Wt7+1jhHz2k3mgCHPs7jjC9M3/15fQp8FcSIwPS
-         +j2cOKlmsVSPHq5tE0dvirdj8KRR6FDRInd1ejLCS4OUWqORL6hB0t4zzfHCPb1UcGpF
-         SCYgS/UaHcGkX+RB58hktXiFOI5Hbo0Pz4iFVZNAU444LVhllEbCquSy5YC8zKBOBJDl
-         usKMHJ/UGDQBt4QSttnGSI9/h9JapKJfi5XJ4pcQqyqmq7khe8iX35roNBJWvucIqt44
-         +3juxIUD/NFSAmHRCVMBs8qk3G8HsSRdIsaeKAIBbSs+wp82Rq8xkr6Vvp3fvuX+2hPg
-         H/6w==
-X-Gm-Message-State: AOJu0YxRbW5ddVXgEGNXqO8ZEo6u5PFcbax6eUEdj+WsiGVyqtEkc8RG
-	GMw45eaNBQ/zoqRoThf8NVvU9A==
-X-Google-Smtp-Source: AGHT+IH9y572ZzI5LplOgamEjCHT7V9pJ+GhfVOuSFBC7rQC9QWMtvEuhe38Ye8C0++DNoADW9M0qw==
-X-Received: by 2002:a17:907:2c4f:b0:9ad:78b7:29ea with SMTP id hf15-20020a1709072c4f00b009ad78b729eamr1394976ejc.44.1695205257896;
-        Wed, 20 Sep 2023 03:20:57 -0700 (PDT)
-Received: from cloudflare.com (79.184.124.164.ipv4.supernova.orange.pl. [79.184.124.164])
-        by smtp.gmail.com with ESMTPSA id c26-20020a170906341a00b00993470682e5sm9122587ejb.32.2023.09.20.03.20.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Sep 2023 03:20:57 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	kernel-team@cloudflare.com,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Cong Wang <cong.wang@bytedance.com>
-Subject: [PATCH bpf] bpf, sockmap: Reject sk_msg egress redirects to non-TCP sockets
-Date: Wed, 20 Sep 2023 12:20:55 +0200
-Message-ID: <20230920102055.42662-1-jakub@cloudflare.com>
-X-Mailer: git-send-email 2.41.0
+        d=1e100.net; s=20230601; t=1695206326; x=1695811126;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AdSo+Yj9RqpysydqoW13PgqmyUcBvx2Eis/Ti0rFlec=;
+        b=vi05LBZ+8dfqrCrxHwRbV3lPVEoPywfgQ+q39JAxJzQudfI3U27gOL9aCTHXsW/PT1
+         HpZ1Wd2nWbElm2B0ug9VwKEY2TxMLoPzD9D1YKblmjcUqinpoJzknaAVkxZyP3U+G7Uo
+         Kmm5xsl3rYcPByOsZp4zimzpLrxDjdeqvXqnV8UWM3KSm+eSXx8Re4klRiTLsXEFjgWd
+         qfD7AwVUPTMJs7uSU5qcYwAe8kFsLbUWMlJcoP4zp37mjWunvHdVRROi8XkJXpEZvrPb
+         5PllSqk2cQ03IqC551SDnHq7GQWcMdQzw1TSKNN+RBKqk+T6l85nf+zQEJHCL1GV2DDT
+         aMlw==
+X-Gm-Message-State: AOJu0Yz+ke6Ot/59NXxCFDFOVOSgwctfCsQkinh1eg0YgvO1YldFvNn4
+	0zHz49HPglPgtOJw+NLGPt3tUg==
+X-Google-Smtp-Source: AGHT+IFehE89tHvs0SlmIuyGhWVwt6FDd+QNohM1Xfis9aQK/Bb6UsCymjX4NSQAWlxdHCs1Rw7DvA==
+X-Received: by 2002:a17:906:25b:b0:9ad:e7d8:1e26 with SMTP id 27-20020a170906025b00b009ade7d81e26mr1471526ejl.57.1695206325802;
+        Wed, 20 Sep 2023 03:38:45 -0700 (PDT)
+Received: from [192.168.0.105] (haunt.prize.volia.net. [93.72.109.136])
+        by smtp.gmail.com with ESMTPSA id i8-20020a170906698800b00988dbbd1f7esm9076712ejr.213.2023.09.20.03.38.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Sep 2023 03:38:45 -0700 (PDT)
+Message-ID: <e6b9ed8b-7044-0fab-a735-fa9cbeeb97c1@blackwall.org>
+Date: Wed, 20 Sep 2023 13:38:44 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [RFC Draft PATCH net-next 0/1] Bridge doc update
+To: Hangbin Liu <liuhangbin@gmail.com>, Roopa Prabhu <roopa@nvidia.com>
+Cc: "David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+ David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Ido Schimmel <idosch@idosch.org>,
+ Stephen Hemminger <stephen@networkplumber.org>
+References: <20230913092854.1027336-1-liuhangbin@gmail.com>
+ <ZQq5NDqPAbwi98yU@Laptop-X1>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <ZQq5NDqPAbwi98yU@Laptop-X1>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-With a SOCKMAP/SOCKHASH map and an sk_msg program user can steer messages
-sent from one TCP socket (s1) to actually egress from another TCP
-socket (s2):
+On 9/20/23 12:19, Hangbin Liu wrote:
+> Hi Nikolay, Roopa,
+> 
+> Do you have any comments for this RFC?
+> 
+> Thanks
+> Hangbin
+> On Wed, Sep 13, 2023 at 05:28:52PM +0800, Hangbin Liu wrote:
+>> Hi,
+>>
+>> After a long busy period. I got time to check how to update the bridge doc.
+>> Here is the previous discussion we made[1].
+>>
+>> In this update. I plan to convert all the bridge description/comments to
+>> the kernel headers. And add sphinx identifiers in the doc to show them
+>> directly. At the same time, I wrote a script to convert the description
+>> in kernel header file to iproute2 man doc. With this, there is no need
+>> to maintain the doc in 2 places.
+>>
+>> For the script. I use python docutils to read the rst comments. When dump
+>> the man page. I do it manually to match the current ip link man page style.
+>> I tried rst2man, but the generated man doc will break the current style.
+>> If you have any other better way, please tell me.
+>>
+>> [1] https://lore.kernel.org/netdev/5ddac447-c268-e559-a8dc-08ae3d124352@blackwall.org/
+>>
+>>
+>> Hangbin Liu (1):
+>>    Doc: update bridge doc
+>>
+>>   Documentation/networking/bridge.rst |  85 ++++++++++--
+>>   include/uapi/linux/if_bridge.h      |  24 ++++
+>>   include/uapi/linux/if_link.h        | 194 ++++++++++++++++++++++++++++
+>>   3 files changed, 293 insertions(+), 10 deletions(-)
+>>
+>> -- 
+>> 2.41.0
+>>
 
-tcp_bpf_sendmsg(s1)		// = sk_prot->sendmsg
-  tcp_bpf_send_verdict(s1)	// __SK_REDIRECT case
-    tcp_bpf_sendmsg_redir(s2)
-      tcp_bpf_push_locked(s2)
-	tcp_bpf_push(s2)
-	  tcp_rate_check_app_limited(s2) // expects tcp_sock
-	  tcp_sendmsg_locked(s2)	 // ditto
+Hi Hangbin,
+I support all efforts to improve documentation, but I do share the same 
+concerns that Stephen has already voiced. I don't think we should be 
+generating the man page from the kernel docs, IMO it would be simpler
+and easier for everyone to support both docs - one is for the user-space
+iproute2 commands, the other could go into the kernel api details. All
+attribute descriptions can still be added to headers, that would be very
+valuable on its own. I prefer to have the freedom to change the docs 
+format in any way, generating them from comments is kind of limiting.
+The purpose of each document is different and it will be difficult
+to combine them for a man page. It would be much easier for everyone
+to add user-related command descriptions and examples in iproute2's 
+documentation, and to add kernel-specific (or uapi) documentation to the
+kernel doc. We can add references for each with a short description.
+W.r.t the kernel doc topics covered, I think the list is a good start.
 
-There is a hard-coded assumption in the call-chain, that the egress
-socket (s2) is a TCP socket.
-
-However in commit 122e6c79efe1 ("sock_map: Update sock type checks for
-UDP") we have enabled redirects to non-TCP sockets. This was done for the
-sake of BPF sk_skb programs. There was no indention to support sk_msg
-send-to-egress use case.
-
-As a result, attempts to send-to-egress through a non-TCP socket lead to a
-crash due to invalid downcast from sock to tcp_sock:
-
- BUG: kernel NULL pointer dereference, address: 000000000000002f
- ...
- Call Trace:
-  <TASK>
-  ? show_regs+0x60/0x70
-  ? __die+0x1f/0x70
-  ? page_fault_oops+0x80/0x160
-  ? do_user_addr_fault+0x2d7/0x800
-  ? rcu_is_watching+0x11/0x50
-  ? exc_page_fault+0x70/0x1c0
-  ? asm_exc_page_fault+0x27/0x30
-  ? tcp_tso_segs+0x14/0xa0
-  tcp_write_xmit+0x67/0xce0
-  __tcp_push_pending_frames+0x32/0xf0
-  tcp_push+0x107/0x140
-  tcp_sendmsg_locked+0x99f/0xbb0
-  tcp_bpf_push+0x19d/0x3a0
-  tcp_bpf_sendmsg_redir+0x55/0xd0
-  tcp_bpf_send_verdict+0x407/0x550
-  tcp_bpf_sendmsg+0x1a1/0x390
-  inet_sendmsg+0x6a/0x70
-  sock_sendmsg+0x9d/0xc0
-  ? sockfd_lookup_light+0x12/0x80
-  __sys_sendto+0x10e/0x160
-  ? syscall_enter_from_user_mode+0x20/0x60
-  ? __this_cpu_preempt_check+0x13/0x20
-  ? lockdep_hardirqs_on+0x82/0x110
-  __x64_sys_sendto+0x1f/0x30
-  do_syscall_64+0x38/0x90
-  entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-Reject selecting a non-TCP sockets as redirect target from a BPF sk_msg
-program to prevent the crash. When attempted, user will receive an EACCES
-error from send/sendto/sendmsg() syscall.
-
-Fixes: 122e6c79efe1 ("sock_map: Update sock type checks for UDP")
-Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
----
-FYI, I'm working on revamping the sockmap_listen selftest, which exercises
-some of redirect combinations, to cover the whole combination matrix so
-that we can catch these kinds of problems early on.
-
- net/core/sock_map.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/net/core/sock_map.c b/net/core/sock_map.c
-index cb11750b1df5..4292c2ed1828 100644
---- a/net/core/sock_map.c
-+++ b/net/core/sock_map.c
-@@ -668,6 +668,8 @@ BPF_CALL_4(bpf_msg_redirect_map, struct sk_msg *, msg,
- 	sk = __sock_map_lookup_elem(map, key);
- 	if (unlikely(!sk || !sock_map_redirect_allowed(sk)))
- 		return SK_DROP;
-+	if (!(flags & BPF_F_INGRESS) && !sk_is_tcp(sk))
-+		return SK_DROP;
- 
- 	msg->flags = flags;
- 	msg->sk_redir = sk;
-@@ -1267,6 +1269,8 @@ BPF_CALL_4(bpf_msg_redirect_hash, struct sk_msg *, msg,
- 	sk = __sock_hash_lookup_elem(map, key);
- 	if (unlikely(!sk || !sock_map_redirect_allowed(sk)))
- 		return SK_DROP;
-+	if (!(flags & BPF_F_INGRESS) && !sk_is_tcp(sk))
-+		return SK_DROP;
- 
- 	msg->flags = flags;
- 	msg->sk_redir = sk;
--- 
-2.41.0
-
+Thank you,
+  Nik
 
