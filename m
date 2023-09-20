@@ -1,107 +1,88 @@
-Return-Path: <netdev+bounces-35188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D86BA7A779B
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 11:32:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1B547A77A7
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 11:34:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E870B1C20ABF
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 09:32:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FCF51C20E94
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 09:34:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54E2514283;
-	Wed, 20 Sep 2023 09:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74413154B3;
+	Wed, 20 Sep 2023 09:34:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4318E11721
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 09:30:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1AC41C433C7;
-	Wed, 20 Sep 2023 09:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E15611730;
+	Wed, 20 Sep 2023 09:34:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51BA7C433C8;
+	Wed, 20 Sep 2023 09:34:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695202224;
-	bh=vC4eUrsH2Ay5ObH877X6wC9knycta7WDqSvROcgL6fI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RFg/orxs2Kk0ttJSiyrFNgDcPf6uXKdR9qYWcJZhrsFgLFMD2t5hkzlLer0pEUHRG
-	 38oaWA1Ew/74EQZDulmnFruZ0siVlC9QJDI0yX4P3yb/hyR6Nw4tUhQyiJ7OlTeNLF
-	 s/H7JqPZ4G65Ys8NrfNDxyegdZlqTkLHXMWEPs7zbQQD8o3Jj6vlPMDIBrVNC/hrWv
-	 iAnPlVvVy77iPtjgjnyv8dA6tKel0eKzdSUsR1tvUxZZgrWmZXgK5HEILlrf2rm02m
-	 QRzXJWZWCFNmDs9xfIYPB1g3MsurPFUQORgYl0QLHau1fwZV6rbaSyooEesmBh9z29
-	 quvxmeYUTmbGg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EE09FC561EE;
-	Wed, 20 Sep 2023 09:30:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1695202484;
+	bh=QRqraJthrB8s9rPFRvGC6l5CWWwWQnee/47O8rOjCCw=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=hHW7X4m7KYpDH5gfY61PdqOpjN3Y7rHvb8kCZPi2x4QeZ4282xmLjtH/VG98fLLt2
+	 nnMOFneixT9add37HLtFNJq4cPxFz0G0CYiPYBF4mfuu0Wd7Ylcic2Yyig9S88zxI/
+	 wZ1y138LMKQb3ZE6Dc99cRaKauE718Qsi7GkZqONwyB7rIFvccLpXII9v54328Y5Xf
+	 QMXEZusEupYfBMolEIdWaI69MR1OWSs30AEjcVl3TLDIdedsK3IFxjtHA+Oc2h17Q8
+	 HkBgJqIzsp7+r3Xf1XkVKFMg6EwaPxvbBnArHbwZ0wuxPx8VLJEKw6szjW+9BTpb7T
+	 nXEayUPV2CyBA==
+From: Lee Jones <lee@kernel.org>
+To: Herve Codina <herve.codina@bootlin.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Lee Jones <lee@kernel.org>, 
+ Linus Walleij <linus.walleij@linaro.org>, Qiang Zhao <qiang.zhao@nxp.com>, 
+ Li Yang <leoyang.li@nxp.com>, Liam Girdwood <lgirdwood@gmail.com>, 
+ Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>, 
+ Takashi Iwai <tiwai@suse.com>, Shengjiu Wang <shengjiu.wang@gmail.com>, 
+ Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>, 
+ Nicolin Chen <nicoleotsuka@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, 
+ Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ alsa-devel@alsa-project.org, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+In-Reply-To: <528425d6472176bb1d02d79596b51f8c28a551cc.1692376361.git.christophe.leroy@csgroup.eu>
+References: <cover.1692376360.git.christophe.leroy@csgroup.eu>
+ <528425d6472176bb1d02d79596b51f8c28a551cc.1692376361.git.christophe.leroy@csgroup.eu>
+Subject: Re: (subset) [PATCH v4 23/28] mfd: core: Ensure disabled devices
+ are skiped without aborting
+Message-Id: <169520247904.3353856.9378855807085829647.b4-ty@kernel.org>
+Date: Wed, 20 Sep 2023 10:34:39 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/9] net: dsa: Convert to platform remove callback
- returning void
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169520222397.8158.5375930289513597156.git-patchwork-notify@kernel.org>
-Date: Wed, 20 Sep 2023 09:30:23 +0000
-References: <20230918191916.1299418-1-u.kleine-koenig@pengutronix.de>
-In-Reply-To: <20230918191916.1299418-1-u.kleine-koenig@pengutronix.de>
-To: =?utf-8?q?Uwe_Kleine-K=C3=B6nig_=3Cu=2Ekleine-koenig=40pengutronix=2Ede=3E?=@codeaurora.org
-Cc: florian.fainelli@broadcom.com, andrew@lunn.ch, olteanv@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- kurt@linutronix.de, f.fainelli@gmail.com, hauke@hauke-m.de,
- arinc.unal@arinc9.com, daniel@makrotopia.org, Landen.Chao@mediatek.com,
- dqfext@gmail.com, sean.wang@mediatek.com, matthias.bgg@gmail.com,
- colin.foster@in-advantage.com, vladimir.oltean@nxp.com,
- claudiu.manoil@nxp.com, alexandre.belloni@bootlin.com,
- UNGLinuxDriver@microchip.com, linus.walleij@linaro.org, alsi@bang-olufsen.dk,
- clement.leger@bootlin.com, netdev@vger.kernel.org, kernel@pengutronix.de,
- angelogioacchino.delregno@collabora.com,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- linux-renesas-soc@vger.kernel.org
+X-Mailer: b4 0.12.2
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Mon, 18 Sep 2023 21:19:07 +0200 you wrote:
-> Hello,
+On Fri, 18 Aug 2023 18:39:17 +0200, Christophe Leroy wrote:
+> The loop searching for a matching device based on its compatible
+> string is aborted when a matching disabled device is found.
+> This abort prevents to add devices as soon as one disabled device
+> is found.
 > 
-> this series converts all platform drivers below drivers/net/dsa to use
-> remove_new. The motivation is to get rid of an integer return code
-> that is (mostly) ignored by the platform driver core and error prone on
-> the driver side.
+> Continue searching for an other device instead of aborting on the
+> first disabled one fixes the issue.
 > 
 > [...]
 
-Here is the summary with links:
-  - [net-next,1/9] net: dsa: b53: Convert to platform remove callback returning void
-    https://git.kernel.org/netdev/net-next/c/c306171d6914
-  - [net-next,2/9] net: dsa: bcm_sf2: Convert to platform remove callback returning void
-    https://git.kernel.org/netdev/net-next/c/75f5205f1dd8
-  - [net-next,3/9] net: dsa: hirschmann: Convert to platform remove callback returning void
-    https://git.kernel.org/netdev/net-next/c/beb8592d0416
-  - [net-next,4/9] net: dsa: lantiq_gswip: Convert to platform remove callback returning void
-    https://git.kernel.org/netdev/net-next/c/a59f960c4d10
-  - [net-next,5/9] net: dsa: mt7530: Convert to platform remove callback returning void
-    https://git.kernel.org/netdev/net-next/c/9764bbad3d33
-  - [net-next,6/9] net: dsa: ocelot: Convert to platform remove callback returning void
-    https://git.kernel.org/netdev/net-next/c/68ace16ce330
-  - [net-next,7/9] net: dsa: realtek: Convert to platform remove callback returning void
-    https://git.kernel.org/netdev/net-next/c/d48a5472b8f2
-  - [net-next,8/9] net: dsa: rzn1_a5psw: Convert to platform remove callback returning void
-    https://git.kernel.org/netdev/net-next/c/76be075d7f99
-  - [net-next,9/9] net: dsa: vitesse-vsc73xx: Convert to platform remove callback returning void
-    https://git.kernel.org/netdev/net-next/c/ce322d45683f
+Applied, thanks!
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+[23/28] mfd: core: Ensure disabled devices are skiped without aborting
+        commit: 36d139dc63db18eb95165fcc2bd3c670c948d605
 
+--
+Lee Jones [李琼斯]
 
 
