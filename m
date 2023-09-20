@@ -1,104 +1,83 @@
-Return-Path: <netdev+bounces-35149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35150-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CF4B7A74F0
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 09:54:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3C027A7568
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 10:10:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCB47281DE2
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 07:54:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF2881C209AE
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 08:10:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E82A5C8E0;
-	Wed, 20 Sep 2023 07:54:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C327ED30B;
+	Wed, 20 Sep 2023 08:10:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AC3A8C0A;
-	Wed, 20 Sep 2023 07:54:23 +0000 (UTC)
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2F87D6;
-	Wed, 20 Sep 2023 00:54:21 -0700 (PDT)
-Date: Wed, 20 Sep 2023 09:54:18 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1695196459;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DgR6B6oH7fsw3ZFJDc2Wq39XL479VS3UgB7X/Iv0yZQ=;
-	b=Lc0qcF6ilcHpuRsQEVRAejAt4RkNMHwkHsetAA57B+FTWwNJjCXuAiPIYTzpTLhV7BFoed
-	K1ystsOqu1B49l2F7s66harVZ5GjlKir3C6JG9uC6HhB9rU81hkPgkWh0OZvPGX8SeooTG
-	QOE+LqBzLKIHEOhAZzqHL7N37IfoWIErez/j/plBtkm5jBHR4f7Wkq91fHQMGXxjX2+uP9
-	Tu5hMrbJlPIHVlSC/56qY8bbeMdSRUgYHDLHoF5O/h/UTCMHgrTInmjvuL5oOycXZ2dKX7
-	+xRSi2foPzJu4f6sMhbBDKdxDeGqtMq+JkkE5mBA+RnH5X+8tiaBVjVSd1uQjQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1695196459;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DgR6B6oH7fsw3ZFJDc2Wq39XL479VS3UgB7X/Iv0yZQ=;
-	b=J4Ja/EeE4O8uXE05RP2QLC8QD+VXXcy/P+d2wHrzHCFDJC1HahqKjBajgqKf3C533S6CDI
-	yTYNjxwDhb2p0SDg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH net v2 0/3] Add missing xdp_do_flush() invocations.
-Message-ID: <20230920075418.TdZ0jsM_@linutronix.de>
-References: <20230918153611.165722-1-bigeasy@linutronix.de>
- <cb2f7931-5ae5-8583-acff-4a186fed6632@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABBC7C8E3
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 08:10:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 74D43C433C7;
+	Wed, 20 Sep 2023 08:10:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695197422;
+	bh=ZvJSHPgwxEeIJ0N4CahnZwA/cwF02dK3QxgnqygSUWo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=LTbvZf5mEc1vSW8RZnEmh8It6eYTvPY0V2V+c6r7GQwGQvUJSM1T0vzYZ926QhyDv
+	 oIU9VtXZkJ1edrHgqtqCfeWlMT+hLGI/gR5x7xEnW/65jgxnd4BXP9j7incrn/Vn3K
+	 lAF2PRrDm9GyZx7JCQ53as7FX39mZe9p0Dis0aK4Xj8AcNLQy8d4aY5LDr3ZNqA0CD
+	 ofB4fBdH58b07OsX6RuQoy1oaf9BrJoe64uYDre8eJNCGDoH3WOeDLw8szYGy6spwf
+	 rTPDuutPmFwKHX49hgVIUiQs0RUNtKAArINlBVBZ1oAwAd7eIgtJp6cTIOmbzzqNF2
+	 nmTbooKo9ufbw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5A7AEC41671;
+	Wed, 20 Sep 2023 08:10:22 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <cb2f7931-5ae5-8583-acff-4a186fed6632@kernel.org>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] vxlan: Add missing entries to vxlan_get_size()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169519742236.8735.10821506861511564714.git-patchwork-notify@kernel.org>
+Date: Wed, 20 Sep 2023 08:10:22 +0000
+References: <20230918154015.80722-1-bpoirier@nvidia.com>
+In-Reply-To: <20230918154015.80722-1-bpoirier@nvidia.com>
+To: Benjamin Poirier <bpoirier@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, idosch@nvidia.com, razor@blackwall.org,
+ horms@kernel.org, jbenc@redhat.com, gavinl@nvidia.com, liuhangbin@gmail.com,
+ vladimir@nikishkin.pw, lizetao1@huawei.com, tgraf@suug.ch,
+ therbert@google.com, roopa@nvidia.com
 
-On 2023-09-20 09:04:27 [+0200], Jesper Dangaard Brouer wrote:
-> Hi Sebastian,
+Hello:
 
-Hi Jesper,
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-> On 18/09/2023 17.36, Sebastian Andrzej Siewior wrote:
-> > Hi,
-> >=20
-> > I've been looking at the drivers/ XDP users and noticed that some
-> > XDP_REDIRECT user don't invoke xdp_do_flush() at the end.
->=20
-> I'm wondering if we could detect (and WARN) in the net core e.g.
-> net_rx_action() that a driver is missing a flush?
->=20
-> The idea could be to check the per CPU (struct) bpf_redirect_info.
-> Or check (per CPU) dev_flush_list.
->=20
-> If some is worried about performance implications, then we can hide this
-> under CONFIG_DEBUG_NET.
+On Mon, 18 Sep 2023 11:40:15 -0400 you wrote:
+> There are some attributes added by vxlan_fill_info() which are not
+> accounted for in vxlan_get_size(). Add them.
+> 
+> I didn't find a way to trigger an actual problem from this miscalculation
+> since there is usually extra space in netlink size calculations like
+> if_nlmsg_size(); but maybe I just didn't search long enough.
+> 
+> [...]
 
-I had a WARN_ON in mind since the list has to be empty after the
-completion of a NAPI callback. Now that you are bringing it up let me
-actually do something=E2=80=A6
+Here is the summary with links:
+  - [net] vxlan: Add missing entries to vxlan_get_size()
+    https://git.kernel.org/netdev/net/c/4e4b1798cc90
 
-> --Jesper
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Sebastian
+
 
