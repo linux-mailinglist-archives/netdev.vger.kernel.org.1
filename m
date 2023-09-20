@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-35218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BD6B7A7AAA
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 13:44:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D34277A7AA9
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 13:44:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73FF51C208C7
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 11:44:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CFBBF1C20993
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 11:44:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6157D27EFE;
-	Wed, 20 Sep 2023 11:44:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2868208BB;
+	Wed, 20 Sep 2023 11:44:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7555C18655
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D6E318650
 	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 11:44:06 +0000 (UTC)
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEC45CF;
+Received: from phobos.denx.de (phobos.denx.de [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEBBECE;
 	Wed, 20 Sep 2023 04:44:02 -0700 (PDT)
 Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
 	(No client certificate requested)
 	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 2918086AA5;
+	by phobos.denx.de (Postfix) with ESMTPSA id 9A48B86AFA;
 	Wed, 20 Sep 2023 13:44:00 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1695210240;
-	bh=vFPC4EiLCUTFUWbe59gLsrG1YBY4uTMUwAsCR3vkdZs=;
+	s=phobos-20191101; t=1695210241;
+	bh=JFsLFOJrmcJ4WHo0K+13UYlyXYwrIUlqnx9nfro4rc4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=S7hvlXFfU15ZfVmeLMVsoMbU+MVAJpc5tWjxrp3jL133TawNM4vXx7jlM0Iv2xN6d
-	 89vral4FAv8FtD3daHX89J8aEEsZD9jRRYhJd89p57ZxI5iEP04JS/DVNBX5XnebYa
-	 CFUz5wrBG1qp8oLEcCLExkYSeTEO93jIqgf7sPxU5ku3iTgMNSayRQU/AxyHylL7t8
-	 6bR389mt4B1Ih50+Cmq77UD2RtT/+0/C4J425ft/aFCcaPI0h6AKSeSHeTrW40ukWT
-	 eLSsmN/lRleqCpnCbqLN2fs5oAK9tXhaW4rlC8PKY2/FMDyqWh3fvK+7ieMg4wx2BQ
-	 slOwZ7U9t8gqA==
+	b=FhpcstQm6M9ponOIec9P+seV2I0OG5IQJqPO+5j65+8RsJAPN0pBPAeB/MSUSgF+z
+	 G8+dGU46JZWHiFvhPkF14XzeH3WaJEl8DRBT3YbtyUmAN3k9qmWk9VQ3NxypL6R8ME
+	 KUvnQ5i7d7pGaEk9PvKriEDGAQnncY4IT6UYOfqLk3WciKeEh/AwT2SJn5aunYxF6i
+	 OCtSdGNE+bJsHxnhzLGp0PDSbnNRDQwZPpK7+WhHvs4Feo43uDDJemwsguuwbGPgek
+	 bMmMcfU3TGkX0zPAwv7GUMXRHJtJEvymN7UDS2rM0ocjJeZs9Pn3qh012Uvu1o1m2X
+	 Ed65zvLriioNw==
 From: Lukasz Majewski <lukma@denx.de>
 To: Tristram.Ha@microchip.com,
 	Eric Dumazet <edumazet@google.com>,
@@ -51,10 +51,11 @@ Cc: Florian Fainelli <f.fainelli@gmail.com>,
 	UNGLinuxDriver@microchip.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
 	Lukasz Majewski <lukma@denx.de>
-Subject: [PATCH v5 net-next 3/5] net: dsa: tag_ksz: Extend ksz9477_xmit() for HSR frame duplication
-Date: Wed, 20 Sep 2023 13:43:41 +0200
-Message-Id: <20230920114343.1979843-4-lukma@denx.de>
+Subject: [PATCH v5 net-next 4/5] net: dsa: microchip: move REG_SW_MAC_ADDR to dev->info->regs[]
+Date: Wed, 20 Sep 2023 13:43:42 +0200
+Message-Id: <20230920114343.1979843-5-lukma@denx.de>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230920114343.1979843-1-lukma@denx.de>
 References: <20230920114343.1979843-1-lukma@denx.de>
@@ -73,57 +74,100 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The KSZ9477 has support for HSR (High-Availability Seamless Redundancy).
-One of its offloading (i.e. performed in the switch IC hardware) features
-is to duplicate received frame to both HSR aware switch ports.
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-To achieve this goal - the tail TAG needs to be modified. To be more
-specific, both ports must be marked as destination (egress) ones.
+Defining macros which have the same name but different values is bad
+practice, because it makes it hard to avoid code duplication. The same
+code does different things, depending on the file it's placed in.
+Case in point, we want to access REG_SW_MAC_ADDR from ksz_common.c, but
+currently we can't, because we don't know which kszXXXX_reg.h to include
+from the common code.
 
-The NETIF_F_HW_HSR_DUP flag indicates that the device supports HSR and
-assures (in HSR core code) that frame is sent only once from HOST to
-switch with tail tag indicating both ports.
+Remove the REG_SW_MAC_ADDR_{0..5} macros from ksz8795_reg.h and
+ksz9477_reg.h, and re-add this register offset to the dev->info->regs[]
+array.
 
+Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 Signed-off-by: Lukasz Majewski <lukma@denx.de>
 
 ---
-Changes for v2:
-- Use ksz_hsr_get_ports() to obtain the bits values corresponding to
-  HSR aware ports
-
-Changes for v3:
-- None
-
-Changes for v4:
-- Iterate over switch ports to find ones supporting HSR. Comparing to v3,
-  where caching of egress tag bits were used, no noticeable performance
-  regression has been observed.
-
 Changes for v5:
-- None
+- New patch
 ---
- net/dsa/tag_ksz.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ drivers/net/dsa/microchip/ksz8795_reg.h | 7 -------
+ drivers/net/dsa/microchip/ksz9477_reg.h | 7 -------
+ drivers/net/dsa/microchip/ksz_common.c  | 2 ++
+ drivers/net/dsa/microchip/ksz_common.h  | 1 +
+ 4 files changed, 3 insertions(+), 14 deletions(-)
 
-diff --git a/net/dsa/tag_ksz.c b/net/dsa/tag_ksz.c
-index ea100bd25939..3632e47dea9e 100644
---- a/net/dsa/tag_ksz.c
-+++ b/net/dsa/tag_ksz.c
-@@ -293,6 +293,14 @@ static struct sk_buff *ksz9477_xmit(struct sk_buff *skb,
- 	if (is_link_local_ether_addr(hdr->h_dest))
- 		val |= KSZ9477_TAIL_TAG_OVERRIDE;
+diff --git a/drivers/net/dsa/microchip/ksz8795_reg.h b/drivers/net/dsa/microchip/ksz8795_reg.h
+index 7a57c6088f80..ee1b673d5f30 100644
+--- a/drivers/net/dsa/microchip/ksz8795_reg.h
++++ b/drivers/net/dsa/microchip/ksz8795_reg.h
+@@ -323,13 +323,6 @@
+ 	((addr) + REG_PORT_1_CTRL_0 + (port) *	\
+ 		(REG_PORT_2_CTRL_0 - REG_PORT_1_CTRL_0))
  
-+	if (dev->features & NETIF_F_HW_HSR_DUP) {
-+		struct net_device *hsr_dev = dp->hsr_dev;
-+		struct dsa_port *other_dp;
-+
-+		dsa_hsr_foreach_port(other_dp, dp->ds, hsr_dev)
-+			val |= BIT(other_dp->index);
-+	}
-+
- 	*tag = cpu_to_be16(val);
+-#define REG_SW_MAC_ADDR_0		0x68
+-#define REG_SW_MAC_ADDR_1		0x69
+-#define REG_SW_MAC_ADDR_2		0x6A
+-#define REG_SW_MAC_ADDR_3		0x6B
+-#define REG_SW_MAC_ADDR_4		0x6C
+-#define REG_SW_MAC_ADDR_5		0x6D
+-
+ #define TABLE_EXT_SELECT_S		5
+ #define TABLE_EEE_V			1
+ #define TABLE_ACL_V			2
+diff --git a/drivers/net/dsa/microchip/ksz9477_reg.h b/drivers/net/dsa/microchip/ksz9477_reg.h
+index cba3dba58bc3..c8866c180fe5 100644
+--- a/drivers/net/dsa/microchip/ksz9477_reg.h
++++ b/drivers/net/dsa/microchip/ksz9477_reg.h
+@@ -166,13 +166,6 @@
+ #define SW_DOUBLE_TAG			BIT(7)
+ #define SW_RESET			BIT(1)
  
- 	return ksz_defer_xmit(dp, skb);
+-#define REG_SW_MAC_ADDR_0		0x0302
+-#define REG_SW_MAC_ADDR_1		0x0303
+-#define REG_SW_MAC_ADDR_2		0x0304
+-#define REG_SW_MAC_ADDR_3		0x0305
+-#define REG_SW_MAC_ADDR_4		0x0306
+-#define REG_SW_MAC_ADDR_5		0x0307
+-
+ #define REG_SW_MTU__2			0x0308
+ #define REG_SW_MTU_MASK			GENMASK(13, 0)
+ 
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index 42db7679c360..c67ad0f6e1fa 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -298,6 +298,7 @@ static const struct ksz_dev_ops lan937x_dev_ops = {
+ };
+ 
+ static const u16 ksz8795_regs[] = {
++	[REG_SW_MAC_ADDR]		= 0x68,
+ 	[REG_IND_CTRL_0]		= 0x6E,
+ 	[REG_IND_DATA_8]		= 0x70,
+ 	[REG_IND_DATA_CHECK]		= 0x72,
+@@ -426,6 +427,7 @@ static u8 ksz8863_shifts[] = {
+ };
+ 
+ static const u16 ksz9477_regs[] = {
++	[REG_SW_MAC_ADDR]		= 0x0302,
+ 	[P_STP_CTRL]			= 0x0B04,
+ 	[S_START_CTRL]			= 0x0300,
+ 	[S_BROADCAST_CTRL]		= 0x0332,
+diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
+index a4de58847dea..1f3fb6c23f36 100644
+--- a/drivers/net/dsa/microchip/ksz_common.h
++++ b/drivers/net/dsa/microchip/ksz_common.h
+@@ -211,6 +211,7 @@ enum ksz_chip_id {
+ };
+ 
+ enum ksz_regs {
++	REG_SW_MAC_ADDR,
+ 	REG_IND_CTRL_0,
+ 	REG_IND_DATA_8,
+ 	REG_IND_DATA_CHECK,
 -- 
 2.20.1
 
