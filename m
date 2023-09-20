@@ -1,102 +1,121 @@
-Return-Path: <netdev+bounces-35329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C6097A8E69
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 23:27:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A079C7A8E75
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 23:30:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 93AABB209CF
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 21:27:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 538311C20503
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 21:30:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94C5E3CD17;
-	Wed, 20 Sep 2023 21:27:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFD943CD14;
+	Wed, 20 Sep 2023 21:30:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D94120E0
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 21:27:00 +0000 (UTC)
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FD11E5;
-	Wed, 20 Sep 2023 14:26:58 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1c1ff5b741cso2098585ad.2;
-        Wed, 20 Sep 2023 14:26:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695245218; x=1695850018; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=OW1bCapNnc1pk804XZRkkc9oHw8Yk6bRTQr+o6NDMqY=;
-        b=Edq/jF3IDa3RTxb0IdCYRb9uFq9vEeOWU0lXDn7+NkfsuniJh/izyZTTa0uB7TeD6H
-         UI7flZ34QQkINvEOOycvFhQT0JT0HJW6PuS4rNg/RiZO6AsX+lT7QUAR7lkrggFc+uTG
-         fJ/NRIsUJUE28fWX1X6dOuulYShumLmc2maZRwAFYdGVGTFguRf2AsOvL2BuRDAS1APu
-         ZAfJcGrT566sdz/6uxMrzQrxtPBlwSv5XW2JmfIsLGXVUgF1xtjDT7qq5qT0IToduBrI
-         zDziY1VkuxbDKcSebZwAqTSwNChpiQplFZa1wuk7yd8n13PTdQvy8mWbSI/Px5JgbEAw
-         S/sA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695245218; x=1695850018;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OW1bCapNnc1pk804XZRkkc9oHw8Yk6bRTQr+o6NDMqY=;
-        b=RrTyzMCKsFyT/EWStB+I4kwTdhHmMK8rBpjglpiTchmFcq2G9IQgL/AI2y4DJIu0K+
-         oAgsnOPJS8PHz3RInyq0dc6YiGZ8P3+DE2S04FJUe2wgLEBTKVjR69NmGYefnU0fnSrb
-         dV4wxNQl2pkoTldhhFvYWdHWXSzsJSM65I6pBqVP8K8roxK4Qd02t9WlVCFGyIlAvXRV
-         q5kZmA9WvjCxC+XU2OxEQ7TFHFBuv6lZ8zvBBi1e4MLvtSJE5T7zocw1u9YmIAfkLCqQ
-         8tIdcX77Gt95CG+acpcOdkQh65rwuHX0i/jFHx/Pco04M2zpm1sS55UtdRzYM3JjjPiw
-         +X5Q==
-X-Gm-Message-State: AOJu0YxEc3qUqbt+74e5ZxUnv0e8wfpTaGGEBt2whSKtLChsSBph/F/D
-	/Yd5Gj7FNttguSrMr5lGDgs=
-X-Google-Smtp-Source: AGHT+IGxQgG724Kp+Ls03txNsv0GZaXgxL1G1SYNw1KTDuPn8lU1gPwHqtMo2lhhvLrVOt0ZXch4Dw==
-X-Received: by 2002:a17:902:7202:b0:1bb:77a2:edda with SMTP id ba2-20020a170902720200b001bb77a2eddamr2751222plb.36.1695245218001;
-        Wed, 20 Sep 2023 14:26:58 -0700 (PDT)
-Received: from [10.67.49.139] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id 9-20020a170902c10900b001b9d7c8f44dsm10936885pli.182.2023.09.20.14.26.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Sep 2023 14:26:55 -0700 (PDT)
-Message-ID: <12861f5b-a618-fc78-a0c2-05c2aab326f3@gmail.com>
-Date: Wed, 20 Sep 2023 14:26:53 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E87C941A88
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 21:30:21 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 734F6C2;
+	Wed, 20 Sep 2023 14:30:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=6v2opmoFg7iTULsiIm+tDuLVY19sjKvFanl0iv7NN1o=; b=buDyQX+yG1Vtywipv9/KYh/HQS
+	mG+ZauoFDs4ND9NJqm+19+SHBrVxkSxzDN5235umhT2Js9Lgh/CY6IYgzU6zBNupVHwoR1TWSf09K
+	0yF2XxYy0CP4qJ5iGkRiqCLkTPDHnFSKQU+Z8MhUyO6BzWwXVXGVL0ixewm0hgVtXY82csiDQ7TbR
+	DDIlGmBn0/zs2vqoK8OaYuVvpgpNw9VgColQpDf7iEWOT4l50YyEJMIEJmMqHZjBl6tHfJFiF7Cx7
+	DW4UlH8dpST1tGqD0MKsNQA2RYmE860c67qFZvABmYlNJLWvKroHgaumo8FWGFGVdl1fIi7I+/xLi
+	NBufu3MA==;
+Received: from [2601:1c2:980:9ec0::9fed]
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1qj4lx-004Gnu-1X;
+	Wed, 20 Sep 2023 21:30:13 +0000
+Message-ID: <2038f544-859f-4ffb-9840-37c1ba289259@infradead.org>
+Date: Wed, 20 Sep 2023 14:30:09 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH 5/6] net: cpmac: remove driver to prepare for platform
- removal
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 3/3] idpf: fix undefined reference to
+ tcp_gro_complete() when !CONFIG_INET
 Content-Language: en-US
-To: Wolfram Sang <wsa+renesas@sang-engineering.com>,
- linux-mips@vger.kernel.org
-Cc: Jonas Gorski <jonas.gorski@gmail.com>,
+To: Alexander Lobakin <aleksander.lobakin@intel.com>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <20230920201035.3445-1-wsa+renesas@sang-engineering.com>
- <20230920201035.3445-6-wsa+renesas@sang-engineering.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20230920201035.3445-6-wsa+renesas@sang-engineering.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Michal Michalik <michal.michalik@intel.com>,
+ Milena Olech <milena.olech@intel.com>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20230920180745.1607563-1-aleksander.lobakin@intel.com>
+ <20230920180745.1607563-4-aleksander.lobakin@intel.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20230920180745.1607563-4-aleksander.lobakin@intel.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 9/20/23 13:10, Wolfram Sang wrote:
-> AR7 is going to be removed from the Kernel, so remove its networking
-> support in form of the cpmac driver. This allows us to remove the
-> platform because this driver includes a platform specific header.
+
+
+On 9/20/23 11:07, Alexander Lobakin wrote:
+> When CONFIG_INET is not set, tcp_gro_complete is not compiled, although
+> the drivers using it may still be compiled (spotted by Randy):
 > 
-> Signed-off-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
+> aarch64-linux-ld: drivers/net/ethernet/intel/idpf/idpf_txrx.o:
+> in function `idpf_rx_rsc.isra.0':
+> drivers/net/ethernet/intel/idpf/idpf_txrx.c:2909:(.text+0x40cc):
+> undefined reference to `tcp_gro_complete'
+> 
+> The drivers need to guard the calls to it manually.
+> Return early from the RSC completion function if !CONFIG_INET, it won't
+> work properly either way. This effectively makes it be compiled-out
+> almost entirely on such builds.
+> 
+> Fixes: 3a8845af66ed ("idpf: add RX splitq napi poll support")
+> Reported-by: Randy Dunlap <rdunlap@infradead.org>
+> Closes: https://lore.kernel.org/linux-next/4c84eb7b-3dec-467b-934b-8a0240f7fb12@infradead.org
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 
-Acked-by: Florian Fainelli <f.fainelli@gmail.com>
+That builds for me.  Thanks.
+
+Tested-by: Randy Dunlap <rdunlap@infradead.org>
+
+I hope that these patches can be merged into the v6.6 instead of
+v6.7 kernel at some point (i.e., [PATCH net] instead of net-next).
+
+
+> ---
+>  drivers/net/ethernet/intel/idpf/idpf_txrx.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+> index 6fa79898c42c..aa45afeb6496 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+> @@ -2876,6 +2876,9 @@ static int idpf_rx_rsc(struct idpf_queue *rxq, struct sk_buff *skb,
+>  	if (unlikely(!(ipv4 ^ ipv6)))
+>  		return -EINVAL;
+>  
+> +	if (!IS_ENABLED(CONFIG_INET))
+> +		return 0;
+> +
+>  	rsc_segments = DIV_ROUND_UP(skb->data_len, rsc_seg_len);
+>  	if (unlikely(rsc_segments == 1))
+>  		return 0;
+
 -- 
-Florian
-
+~Randy
 
