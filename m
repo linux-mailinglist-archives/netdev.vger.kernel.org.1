@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-35328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36D387A8E40
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 23:11:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C6097A8E69
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 23:27:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA886281377
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 21:11:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 93AABB209CF
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 21:27:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BB713CD10;
-	Wed, 20 Sep 2023 21:11:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94C5E3CD17;
+	Wed, 20 Sep 2023 21:27:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7E5E41A80;
-	Wed, 20 Sep 2023 21:11:23 +0000 (UTC)
-Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97FF9C2;
-	Wed, 20 Sep 2023 14:11:22 -0700 (PDT)
-Received: by mail-yb1-xb34.google.com with SMTP id 3f1490d57ef6-d81b803b09aso397227276.2;
-        Wed, 20 Sep 2023 14:11:22 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D94120E0
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 21:27:00 +0000 (UTC)
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FD11E5;
+	Wed, 20 Sep 2023 14:26:58 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1c1ff5b741cso2098585ad.2;
+        Wed, 20 Sep 2023 14:26:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695244282; x=1695849082; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1695245218; x=1695850018; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=ck01rY7g6eieWdyN/838nrtggmL0o8sQJFo5pWQPmMI=;
-        b=SN/WTUCL2ZGJ6ZLqKEkYdKLTqh30LIzYETOjjz+Ox7n8XvATtQFYgIeVP9DVx3wY72
-         /cf0PVzRGcuEqtyOYrzYmj8f2sKX01g+t3YNQuQGs4XXAXQa05JFVbvN3LCyDTF6tG1n
-         rOXZsQXyEJwuLiQToMUo6kh8yHpUpJdp5gXufzZ7kGeOMJbx8ipcw0Ud9P12d8uyN84l
-         HbNX70XH45AIsEsCS9o1vlUrC/0DFrQkV/GQDgS0iLAEcdewkGlHjHs5Ofy2r0ZBuHQp
-         ppARf0azo+jMXDJY6ubrQQOXMSCUqahuZSdo23EdEKCbZ94L51HOfcN4fxcj4ZWHKRJv
-         0q4A==
+        bh=OW1bCapNnc1pk804XZRkkc9oHw8Yk6bRTQr+o6NDMqY=;
+        b=Edq/jF3IDa3RTxb0IdCYRb9uFq9vEeOWU0lXDn7+NkfsuniJh/izyZTTa0uB7TeD6H
+         UI7flZ34QQkINvEOOycvFhQT0JT0HJW6PuS4rNg/RiZO6AsX+lT7QUAR7lkrggFc+uTG
+         fJ/NRIsUJUE28fWX1X6dOuulYShumLmc2maZRwAFYdGVGTFguRf2AsOvL2BuRDAS1APu
+         ZAfJcGrT566sdz/6uxMrzQrxtPBlwSv5XW2JmfIsLGXVUgF1xtjDT7qq5qT0IToduBrI
+         zDziY1VkuxbDKcSebZwAqTSwNChpiQplFZa1wuk7yd8n13PTdQvy8mWbSI/Px5JgbEAw
+         S/sA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695244282; x=1695849082;
+        d=1e100.net; s=20230601; t=1695245218; x=1695850018;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ck01rY7g6eieWdyN/838nrtggmL0o8sQJFo5pWQPmMI=;
-        b=sqIF9d4VF/UpEq6RDz704Kw9lcmf9pzShL/mzMRf3mm9SAde/r8uSy2vaSAWefYNqZ
-         pVrFdJronjOhQP4WP8XvBzCDGbI1ULUm2AgIt4ohfWfUdsPY98aacn6csl1i3Y6g7E/X
-         nx4VV3yo6gMlT1k99Ny+kmzijZHB06vyoNcmG5BDQxUkdPeFC27es04hYhdREbwT86bA
-         ygvm9xu1qrjJPI9/j7/VA51FMm1bhzK4OZcLTr4e8z1BWwbrLelWhLpKsmrmXXX30gNF
-         TrdvonQ7JwdV7s7+t8WYJYuc3whOAs3Y8k2F+WifT89/0pJyfdGKjmdC0YeUAML+K87S
-         +GnA==
-X-Gm-Message-State: AOJu0YxGnKgVi/F5AcFtzqUvCMyMy/x9WaiTUMy38UAE5ZVBiw0awWc1
-	y4BNK1s+OjmC9d+DWQPgQbLe1BkOuCw=
-X-Google-Smtp-Source: AGHT+IHJdK7nOnt0hU3D91rCQjheuhXxVnULYhHnjKmmqbgHHKpSh7W6Y+okZfiiJHPzQ1PvWYIZ9g==
-X-Received: by 2002:a25:d2c2:0:b0:d08:2101:562d with SMTP id j185-20020a25d2c2000000b00d082101562dmr3841349ybg.34.1695244281751;
-        Wed, 20 Sep 2023 14:11:21 -0700 (PDT)
-Received: from ?IPV6:2600:1700:6cf8:1240:dcd2:9730:2c7c:239f? ([2600:1700:6cf8:1240:dcd2:9730:2c7c:239f])
-        by smtp.gmail.com with ESMTPSA id 142-20020a250394000000b00d8161769507sm15506ybd.25.2023.09.20.14.11.20
+        bh=OW1bCapNnc1pk804XZRkkc9oHw8Yk6bRTQr+o6NDMqY=;
+        b=RrTyzMCKsFyT/EWStB+I4kwTdhHmMK8rBpjglpiTchmFcq2G9IQgL/AI2y4DJIu0K+
+         oAgsnOPJS8PHz3RInyq0dc6YiGZ8P3+DE2S04FJUe2wgLEBTKVjR69NmGYefnU0fnSrb
+         dV4wxNQl2pkoTldhhFvYWdHWXSzsJSM65I6pBqVP8K8roxK4Qd02t9WlVCFGyIlAvXRV
+         q5kZmA9WvjCxC+XU2OxEQ7TFHFBuv6lZ8zvBBi1e4MLvtSJE5T7zocw1u9YmIAfkLCqQ
+         8tIdcX77Gt95CG+acpcOdkQh65rwuHX0i/jFHx/Pco04M2zpm1sS55UtdRzYM3JjjPiw
+         +X5Q==
+X-Gm-Message-State: AOJu0YxEc3qUqbt+74e5ZxUnv0e8wfpTaGGEBt2whSKtLChsSBph/F/D
+	/Yd5Gj7FNttguSrMr5lGDgs=
+X-Google-Smtp-Source: AGHT+IGxQgG724Kp+Ls03txNsv0GZaXgxL1G1SYNw1KTDuPn8lU1gPwHqtMo2lhhvLrVOt0ZXch4Dw==
+X-Received: by 2002:a17:902:7202:b0:1bb:77a2:edda with SMTP id ba2-20020a170902720200b001bb77a2eddamr2751222plb.36.1695245218001;
+        Wed, 20 Sep 2023 14:26:58 -0700 (PDT)
+Received: from [10.67.49.139] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id 9-20020a170902c10900b001b9d7c8f44dsm10936885pli.182.2023.09.20.14.26.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Sep 2023 14:11:21 -0700 (PDT)
-Message-ID: <3b0af149-2561-a672-a03c-241dbb1672c1@gmail.com>
-Date: Wed, 20 Sep 2023 14:11:19 -0700
+        Wed, 20 Sep 2023 14:26:55 -0700 (PDT)
+Message-ID: <12861f5b-a618-fc78-a0c2-05c2aab326f3@gmail.com>
+Date: Wed, 20 Sep 2023 14:26:53 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,63 +66,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.15.1
-Subject: Re: [PATCH bpf] bpf, sockmap: Reject sk_msg egress redirects to
- non-TCP sockets
+Subject: Re: [PATCH 5/6] net: cpmac: remove driver to prepare for platform
+ removal
 Content-Language: en-US
-To: Jakub Sitnicki <jakub@cloudflare.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, kernel-team@cloudflare.com,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Cong Wang <cong.wang@bytedance.com>
-References: <20230920102055.42662-1-jakub@cloudflare.com>
- <1224b3f1-4b2a-3c49-5f29-cfce0652ba94@gmail.com>
- <87wmwk7dy5.fsf@cloudflare.com>
-From: Kui-Feng Lee <sinquersw@gmail.com>
-In-Reply-To: <87wmwk7dy5.fsf@cloudflare.com>
+To: Wolfram Sang <wsa+renesas@sang-engineering.com>,
+ linux-mips@vger.kernel.org
+Cc: Jonas Gorski <jonas.gorski@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20230920201035.3445-1-wsa+renesas@sang-engineering.com>
+ <20230920201035.3445-6-wsa+renesas@sang-engineering.com>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20230920201035.3445-6-wsa+renesas@sang-engineering.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-On 9/20/23 13:59, Jakub Sitnicki wrote:
-> On Wed, Sep 20, 2023 at 11:19 AM -07, Kui-Feng Lee wrote:
->> On 9/20/23 03:20, Jakub Sitnicki wrote:
->>> diff --git a/net/core/sock_map.c b/net/core/sock_map.c
->>> index cb11750b1df5..4292c2ed1828 100644
->>> --- a/net/core/sock_map.c
->>> +++ b/net/core/sock_map.c
->>> @@ -668,6 +668,8 @@ BPF_CALL_4(bpf_msg_redirect_map, struct sk_msg *, msg,
->>>    	sk = __sock_map_lookup_elem(map, key);
->>>    	if (unlikely(!sk || !sock_map_redirect_allowed(sk)))
->>>    		return SK_DROP;
->>> +	if (!(flags & BPF_F_INGRESS) && !sk_is_tcp(sk))
->>> +		return SK_DROP;
->>>      	msg->flags = flags;
->>>    	msg->sk_redir = sk;
->>> @@ -1267,6 +1269,8 @@ BPF_CALL_4(bpf_msg_redirect_hash, struct sk_msg *, msg,
->>>    	sk = __sock_hash_lookup_elem(map, key);
->>>    	if (unlikely(!sk || !sock_map_redirect_allowed(sk)))
->>>    		return SK_DROP;
->>> +	if (!(flags & BPF_F_INGRESS) && !sk_is_tcp(sk))
->>> +		return SK_DROP;
->>>      	msg->flags = flags;
->>>    	msg->sk_redir = sk;
->>
->> Just be curious! Can it happen to other socket types?
->> I mean to redirect a msg from a sk of any type to one of another type.
+On 9/20/23 13:10, Wolfram Sang wrote:
+> AR7 is going to be removed from the Kernel, so remove its networking
+> support in form of the cpmac driver. This allows us to remove the
+> platform because this driver includes a platform specific header.
 > 
-> Today sk_msg redirects are implemented only for tcp4 and tcp6.
-> 
-> Here's a full matrix of what redirects are supported [1].
-> 
-> [1] https://gist.github.com/jsitnicki/578fdd614d181bed2b02922b17972b4e
+> Signed-off-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
 
-Thanks!
+Acked-by: Florian Fainelli <f.fainelli@gmail.com>
+-- 
+Florian
+
 
