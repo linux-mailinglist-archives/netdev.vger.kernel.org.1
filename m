@@ -1,251 +1,130 @@
-Return-Path: <netdev+bounces-35172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FCCF7A774C
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 11:25:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDCEE7A7757
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 11:27:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE39228159B
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 09:25:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD98D1C20B87
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 09:27:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 210B9154B1;
-	Wed, 20 Sep 2023 09:23:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0571611C84;
+	Wed, 20 Sep 2023 09:27:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 546C9154B9
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 09:23:10 +0000 (UTC)
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2060.outbound.protection.outlook.com [40.107.20.60])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB603AF;
-	Wed, 20 Sep 2023 02:23:08 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RNE8tmrxpmoK7SZ8XUonakEpWJFYuPbhAMmcTnkmj/UzkPlzc24jE3t8GkP9++CqLU25PQ41aCgSYBTBw+AjnwoiUdWJLYrRRyz/GUZZutLi0Oe/mCl4zNyIyyYRMoF1eh/8my5y+OZzNIFu7AkVqgAWf19gmMf7MPbYcm1qQBBWLZLDKGXrfuJoqr1Xmfwng/ngbrSjOdxrKLd5QqmWeqra+/s4/TNZCJRMHCrQ+Teb7vyu4NzecSLckIOH4OInNYDv0i1FRHwyiwRCW731y323LRfPgzyGqdNwJcfSyH6cYlEAQ/8UaJ5FKOht4jL68qVz42c/25787ic4orR4Kg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=D9euG0uAS8G445WOAx6gFRnjtPHUXe82BT2Zu3+2a3Q=;
- b=T4ec7dtNnXYpTh+V1dUcHgnUIg3bwQV9IfRK2tM72lrylpvKYewPSmvHX0LR7IMs5SVUr0251jFGO9kAAQ2svkX7d0a0RHU3MxBcJUfxyg/01yGzasYWtJE2LaDG4hEvUswprT13XlZySuSr5TKOtV7NmpZIQ4n4+LHMFbHixXq1wbwTSBezFbWkN+CPl1birhWrU/FP3fdsvr2PIFIhND7D5Hmnai1OA7zUfTXIuT2fstHcVB1KKGQzMUk8+uzRK6nVOybBCBUhI2WlWkRbkpIiYRvZHOqaO1dleRXZfa+EVgXi3t/ZpmuapY5hDlPlFvj/gJ9BumHJnBSRj8Gb9A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
- dkim=pass header.d=oss.nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
- s=selector2-NXP1-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=D9euG0uAS8G445WOAx6gFRnjtPHUXe82BT2Zu3+2a3Q=;
- b=ZBSx82QgcDOjQpAee+YBk23Arj9j9IP6YvG2axwwX2F/GD8v0QJVSd41bzZ5O0uCvPpzYtlxGdMB3hTko25vtkXIs2TMyh2/pKnJrgJzrRYNMzFOMFA1sHKyMJFCHZvxFwrv1HgHPLQFYC15edggv5fCZ4swv4Eoy0z5qA28WXQ=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=oss.nxp.com;
-Received: from AM9PR04MB8954.eurprd04.prod.outlook.com (2603:10a6:20b:409::7)
- by AM7PR04MB6933.eurprd04.prod.outlook.com (2603:10a6:20b:10d::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.26; Wed, 20 Sep
- 2023 09:23:04 +0000
-Received: from AM9PR04MB8954.eurprd04.prod.outlook.com
- ([fe80::e109:7026:7d76:5617]) by AM9PR04MB8954.eurprd04.prod.outlook.com
- ([fe80::e109:7026:7d76:5617%7]) with mapi id 15.20.6792.026; Wed, 20 Sep 2023
- 09:23:04 +0000
-From: "Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	richardcochran@gmail.com,
-	sd@queasysnail.net,
-	sebastian.tobuschat@oss.nxp.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
-Subject: [PATCH net-next v5 7/7] net: phy: nxp-c45-tja11xx: implement mdo_insert_tx_tag
-Date: Wed, 20 Sep 2023 12:22:37 +0300
-Message-Id: <20230920092237.121033-8-radu-nicolae.pirea@oss.nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230920092237.121033-1-radu-nicolae.pirea@oss.nxp.com>
-References: <20230920092237.121033-1-radu-nicolae.pirea@oss.nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM9P193CA0019.EURP193.PROD.OUTLOOK.COM
- (2603:10a6:20b:21e::24) To AM9PR04MB8954.eurprd04.prod.outlook.com
- (2603:10a6:20b:409::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0977F1173F
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 09:26:59 +0000 (UTC)
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F71BAB;
+	Wed, 20 Sep 2023 02:26:54 -0700 (PDT)
+Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.201])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4RrCmK4DbPz6HJc3;
+	Wed, 20 Sep 2023 17:24:49 +0800 (CST)
+Received: from mscphis00759.huawei.com (10.123.66.134) by
+ lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Wed, 20 Sep 2023 10:26:47 +0100
+From: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+To: <mic@digikod.net>
+CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
+	<artem.kuzin@huawei.com>
+Subject: [PATCH v12 00/12] Network support for Landlock
+Date: Wed, 20 Sep 2023 17:26:28 +0800
+Message-ID: <20230920092641.832134-1-konstantin.meskhidze@huawei.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM9PR04MB8954:EE_|AM7PR04MB6933:EE_
-X-MS-Office365-Filtering-Correlation-Id: 48a6915f-8538-43d3-cd6c-08dbb9bb3153
-X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	jmSxDWGpBP0uZJRrEKpd8QYG2OURSCxteYBV/xd0AGHcKrJY/hallUESpbX0n9uHUUAPz7b7dk34aZXIJcypStZGRKIoO5W0dWMlLSjbqh7ZKO2s8KXQbEKB79jL2lr3IgIJDAoe5Raxca4PN21a+p5VerX0/13QYVwdYaaaXhqbTR8K4znuBWiuo6EXWyFubvGbrPkFmHKrX83EQtRjaPLyFMUQoaZQ4srE+p9a7x5nywaffUIl1oRb+I6PtJRbVIF8NiObhdLLILOrDCbPdTwUFvjIp/U9xgeGJyryvZ1w4faRudi0VINLhlcoXIgyFuDh1AFuXI50kcbWCvD6J2p7oZMVZffLyZlwoNwivoyHLyo1TyuTgARozZD9lGS+MQnWDN4vYvASXApy2FhCuRkYv7C1PdNCFS9EmWiVjR0CyRbQBobgymgar30Ynhu9AJTYUxC7rHTfrLVY7o5sl1/h+ngm1IntT9BnFsLBXbhLY6+8TJ0tv4iBz8n/6uRcbI4dVZ46chONNZOy2QkUMf01wsm6PGoNh77cmJos77XYF6DNGSNwnO007ZoOOcOAnEljm+m1Od8++jwSR+kMwUur5fQhTUidgmZls3ExkdRGVwuG+r5xzwMrMKZpO06fFjWgRZF8NBznQSUr/cPYWA==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8954.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(366004)(136003)(346002)(396003)(376002)(451199024)(1800799009)(186009)(316002)(41300700001)(8676002)(4326008)(66476007)(8936002)(1076003)(6512007)(38350700002)(6486002)(6506007)(26005)(52116002)(2616005)(6666004)(86362001)(38100700002)(478600001)(921005)(66556008)(66946007)(6636002)(2906002)(5660300002)(7416002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?dPnBTM3evFIqeVFcCbY5iJcRJZvhxtv6T6WdmX0HUXZEPUj+mzTS4ruOhehY?=
- =?us-ascii?Q?Xovv+z7+tjoAYjXmuCxOrkfDYr6g+8DPyZRKAh1s6ShoRPtrXjmXMld8R9rR?=
- =?us-ascii?Q?EW8ePtmpahoNpp/yVH973rLRvRX2Ze7k5iigNvuAgYeI3/KqvOpzNCM8B2fW?=
- =?us-ascii?Q?AB+oQWvXW1wxJc9LaSZFKVrruW3GS/Wum6oDOfkSJg6+FIKJcoYOKfPycuSe?=
- =?us-ascii?Q?+u6LQjCAS0stYsjZnLSv3bG8GoVt890uY10bKTM6mIf5MHmhZMydnpLlNPlF?=
- =?us-ascii?Q?Re5bWGIHhd6UiEbEHQtuLp5CHIQw5fv92H0IuTm/p6sYfQ/lE9Vm5eAQfAen?=
- =?us-ascii?Q?mzsqNwUg9JrAUP+r5ufPmg6k5T/Lq70W0f3l416XLYbDy2fC6Q1KDzaslFse?=
- =?us-ascii?Q?+EnfHCR/wa1jQNt3h0dUf7j1uOiOP0cuo76JK5pNf6hXyR0oTNx7E7fIjPR4?=
- =?us-ascii?Q?oBysILdWMy4wBPZlEkNkgW9hbJdoXwIA7tg+ZfUujX5kIe843+PiMTcJ+4BD?=
- =?us-ascii?Q?Tbc3N0W0uFKo9PgDpSCRVu1f/xsx4SW8qUG51xGkVPLdj4P31TqD6k5m1TNi?=
- =?us-ascii?Q?mUut9z5tUh++cK0dEV4cQbUIQcRfuLCEZL5CA4ytlQgio8M7l+nHZNbj5MX6?=
- =?us-ascii?Q?67I7hlgYnnYh8t/LzqFoulc4lNVqFaey15kZDNa5/5MTsxdVlL+MpjXCXFTT?=
- =?us-ascii?Q?g5zAVB8dcmbmN30qFBV0WEiLJbCIiY73C3wu8u8MDFgOdbFetkwkAjOqCK6Z?=
- =?us-ascii?Q?WUTgUfD70iqrVxO3O/RVmNOMaNN62iE6pZgOJmmLgwN465wjj8gKb1uCqfs0?=
- =?us-ascii?Q?RE3ncSoIDJUzRCHyJ9PMqzIfuPanXdpy/28y5tnCTlrU88lBa2GYTwTaue9c?=
- =?us-ascii?Q?ZVKbse8mZLkpNiXxLWqbi40ZR4Rzxm1VCqkmPJNXvh7UVw8JwMk16iRNfjeP?=
- =?us-ascii?Q?w2BT43jwVqVM8FIZg6iJs4AiTd9d15dB2ZGrqKIeBkCXh92uy1e8bb4kjm+9?=
- =?us-ascii?Q?FGrArKfQTkwhngHzx2qHOEoTC7RHrUXo8EyiEL0jq9IC/jMWBzHjL4fivW4L?=
- =?us-ascii?Q?6/r0IOPmOx7P2BCQN7bUnSwRJjKIxQ8Y9Q/t/C39Sh2i68YXJNPZ+jS1NnC4?=
- =?us-ascii?Q?GJHWx+hOzSjRGvf8QVWiFiLLnUdcucENJQtYueK8zr+QJSL10LrHjAt2fdrO?=
- =?us-ascii?Q?Mat2oc++EjZ4GtYo7qQrMqNMMuRFY50+TtkgUzbzEyyupp/zL0C82YwDEZOs?=
- =?us-ascii?Q?vhI4cBMoMyCtgWfum2mRgEI08un4Ob9IcfY14qfcgjGeuVaiBPIi4OJ4haNa?=
- =?us-ascii?Q?iISL5txxfSvSbs5SPxAbSBojcwwtxnE3vP4rHBReCWLnhKQuLyTtK4GnbXHE?=
- =?us-ascii?Q?LpkpBH5es+/to1sT5q4FtFb8Biq/wshH2gd7iRwozy2IlyLTm1REAqgkZGQS?=
- =?us-ascii?Q?WR6PzdnB4ohzvtBcl2AY2pTZbV6z1rosXzDZTc6/sYu3KwLiU7KNfnQ2uo7C?=
- =?us-ascii?Q?CunwXYoTuQAxXhGunOqpEgVVDpgV2B9Qg2YbJDqcRe5pkE4Cj0ikzcutCJ10?=
- =?us-ascii?Q?rxkbXQNXvmkcAqJ/Azo0JJ9PqcxidlSeFxM0UkTKEOilHWRnUq+AMwXnK8vq?=
- =?us-ascii?Q?9Q=3D=3D?=
-X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 48a6915f-8538-43d3-cd6c-08dbb9bb3153
-X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8954.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Sep 2023 09:23:04.1957
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: il/37mJz9MIeW+mg5heZzI7j8VEzFs30O5c0hgj5dy1Y6zP4TIFRRaajMOZ0xBrxK29AG4GZE/SuHKIKRKuc2JilkKvJpMqahmC4rmKmGiI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR04MB6933
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.123.66.134]
+X-ClientProxiedBy: mscpeml500002.china.huawei.com (7.188.26.138) To
+ lhrpeml500004.china.huawei.com (7.191.163.9)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Implement mdo_insert_tx_tag to insert the TLV header in the ethernet
-frame.
+Hi,
+This is a new V12 patch related to Landlock LSM network confinement.
+It is based on the landlock's -next branch on top of v6.5-rc6 kernel version:
+https://git.kernel.org/pub/scm/linux/kernel/git/mic/linux.git/log/?h=next
 
-Signed-off-by: Radu Pirea (NXP OSS) <radu-nicolae.pirea@oss.nxp.com>
----
-Changes in V5:
-- removed unused defines MACSEC_TLV_CP and MACSEC_TLV_SC_ID_OFF
+It brings refactoring of previous patch version V11.
+Mostly there are fixes of logic and typos, refactoring some selftests.
 
-Changes in V4:
-- removed macsec_extscs parameter
+All test were run in QEMU evironment and compiled with
+ -static flag.
+ 1. network_test: 77/77 tests passed.
+ 2. base_test: 7/7 tests passed.
+ 3. fs_test: 108/108 tests passed.
+ 4. ptrace_test: 8/8 tests passed.
 
-Changes in V3:
-- extscs parameter renamed to macsec_extscs and improved description
+Previous versions:
+v11: https://lore.kernel.org/linux-security-module/20230515161339.631577-1-konstantin.meskhidze@huawei.com/
+v10: https://lore.kernel.org/linux-security-module/20230323085226.1432550-1-konstantin.meskhidze@huawei.com/
+v9: https://lore.kernel.org/linux-security-module/20230116085818.165539-1-konstantin.meskhidze@huawei.com/
+v8: https://lore.kernel.org/linux-security-module/20221021152644.155136-1-konstantin.meskhidze@huawei.com/
+v7: https://lore.kernel.org/linux-security-module/20220829170401.834298-1-konstantin.meskhidze@huawei.com/
+v6: https://lore.kernel.org/linux-security-module/20220621082313.3330667-1-konstantin.meskhidze@huawei.com/
+v5: https://lore.kernel.org/linux-security-module/20220516152038.39594-1-konstantin.meskhidze@huawei.com
+v4: https://lore.kernel.org/linux-security-module/20220309134459.6448-1-konstantin.meskhidze@huawei.com/
+v3: https://lore.kernel.org/linux-security-module/20220124080215.265538-1-konstantin.meskhidze@huawei.com/
+v2: https://lore.kernel.org/linux-security-module/20211228115212.703084-1-konstantin.meskhidze@huawei.com/
+v1: https://lore.kernel.org/linux-security-module/20211210072123.386713-1-konstantin.meskhidze@huawei.com/
 
-Changes in V2:
-- added extscs parameter to choose the TX SC selection mechanism between
-and MAC SA based selection and TLV header based selection
+Konstantin Meskhidze (11):
+  landlock: Make ruleset's access masks more generic
+  landlock: Refactor landlock_find_rule/insert_rule
+  landlock: Refactor merge/inherit_ruleset functions
+  landlock: Move and rename layer helpers
+  landlock: Refactor layer helpers
+  landlock: Refactor landlock_add_rule() syscall
+  landlock: Add network rules and TCP hooks support
+  selftests/landlock: Share enforce_ruleset()
+  selftests/landlock: Add 7 new test variants dedicated to network
+  samples/landlock: Add network demo
+  landlock: Document Landlock's network support
 
- drivers/net/phy/nxp-c45-tja11xx-macsec.c | 41 ++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+Mickaël Salaün (1):
+  landlock: Allow filesystem layout changes for domains without such
+    rule type
 
-diff --git a/drivers/net/phy/nxp-c45-tja11xx-macsec.c b/drivers/net/phy/nxp-c45-tja11xx-macsec.c
-index 4dd10ea6e06c..6ff0ceeeecd1 100644
---- a/drivers/net/phy/nxp-c45-tja11xx-macsec.c
-+++ b/drivers/net/phy/nxp-c45-tja11xx-macsec.c
-@@ -11,6 +11,7 @@
- #include <linux/module.h>
- #include <linux/phy.h>
- #include <linux/processor.h>
-+#include <net/dst_metadata.h>
- #include <net/macsec.h>
- 
- #include "nxp-c45-tja11xx.h"
-@@ -118,6 +119,8 @@
- #define ADPTR_CNTRL			0x0F00
- #define ADPTR_CNTRL_CONFIG_EN		BIT(14)
- #define ADPTR_CNTRL_ADPTR_EN		BIT(12)
-+#define ADPTR_TX_TAG_CNTRL		0x0F0C
-+#define ADPTR_TX_TAG_CNTRL_ENA		BIT(31)
- 
- #define TX_SC_FLT_BASE			0x800
- #define TX_SC_FLT_SIZE			0x10
-@@ -166,6 +169,11 @@
- #define MACSEC_INPBTS			0x0638
- #define MACSEC_IPSNFS			0x063C
- 
-+#define TJA11XX_TLV_TX_NEEDED_HEADROOM	(32)
-+#define TJA11XX_TLV_NEEDED_TAILROOM	(0)
-+
-+#define ETH_P_TJA11XX_TLV		(0x4e58)
-+
- enum nxp_c45_sa_type {
- 	TX_SA,
- 	RX_SA,
-@@ -1541,6 +1549,31 @@ static int nxp_c45_mdo_get_rx_sa_stats(struct macsec_context *ctx)
- 	return 0;
- }
- 
-+struct tja11xx_tlv_header {
-+	struct ethhdr eth;
-+	u8 subtype;
-+	u8 len;
-+	u8 payload[28];
-+};
-+
-+static int nxp_c45_mdo_insert_tx_tag(struct phy_device *phydev,
-+				     struct sk_buff *skb)
-+{
-+	struct tja11xx_tlv_header *tlv;
-+	struct ethhdr *eth;
-+
-+	eth = eth_hdr(skb);
-+	tlv = skb_push(skb, TJA11XX_TLV_TX_NEEDED_HEADROOM);
-+	memmove(tlv, eth, sizeof(*eth));
-+	skb_reset_mac_header(skb);
-+	tlv->eth.h_proto = htons(ETH_P_TJA11XX_TLV);
-+	tlv->subtype = 1;
-+	tlv->len = sizeof(tlv->payload);
-+	memset(tlv->payload, 0, sizeof(tlv->payload));
-+
-+	return 0;
-+}
-+
- static const struct macsec_ops nxp_c45_macsec_ops = {
- 	.mdo_dev_open = nxp_c45_mdo_dev_open,
- 	.mdo_dev_stop = nxp_c45_mdo_dev_stop,
-@@ -1561,6 +1594,9 @@ static const struct macsec_ops nxp_c45_macsec_ops = {
- 	.mdo_get_tx_sa_stats = nxp_c45_mdo_get_tx_sa_stats,
- 	.mdo_get_rx_sc_stats = nxp_c45_mdo_get_rx_sc_stats,
- 	.mdo_get_rx_sa_stats = nxp_c45_mdo_get_rx_sa_stats,
-+	.mdo_insert_tx_tag = nxp_c45_mdo_insert_tx_tag,
-+	.needed_headroom = TJA11XX_TLV_TX_NEEDED_HEADROOM,
-+	.needed_tailroom = TJA11XX_TLV_NEEDED_TAILROOM,
- };
- 
- int nxp_c45_macsec_config_init(struct phy_device *phydev)
-@@ -1581,6 +1617,11 @@ int nxp_c45_macsec_config_init(struct phy_device *phydev)
- 	if (ret)
- 		return ret;
- 
-+	ret = nxp_c45_macsec_write(phydev, ADPTR_TX_TAG_CNTRL,
-+				   ADPTR_TX_TAG_CNTRL_ENA);
-+	if (ret)
-+		return ret;
-+
- 	ret = nxp_c45_macsec_write(phydev, ADPTR_CNTRL, ADPTR_CNTRL_ADPTR_EN);
- 	if (ret)
- 		return ret;
--- 
-2.34.1
+ Documentation/userspace-api/landlock.rst     |   93 +-
+ include/uapi/linux/landlock.h                |   47 +
+ samples/landlock/sandboxer.c                 |  114 +-
+ security/landlock/Kconfig                    |    3 +-
+ security/landlock/Makefile                   |    2 +
+ security/landlock/fs.c                       |  232 +--
+ security/landlock/limits.h                   |    6 +
+ security/landlock/net.c                      |  241 +++
+ security/landlock/net.h                      |   35 +
+ security/landlock/ruleset.c                  |  405 ++++-
+ security/landlock/ruleset.h                  |  181 +-
+ security/landlock/setup.c                    |    2 +
+ security/landlock/syscalls.c                 |  122 +-
+ tools/testing/selftests/landlock/base_test.c |    2 +-
+ tools/testing/selftests/landlock/common.h    |   10 +
+ tools/testing/selftests/landlock/config      |    4 +
+ tools/testing/selftests/landlock/fs_test.c   |   75 +-
+ tools/testing/selftests/landlock/net_test.c  | 1592 ++++++++++++++++++
+ 18 files changed, 2815 insertions(+), 351 deletions(-)
+ create mode 100644 security/landlock/net.c
+ create mode 100644 security/landlock/net.h
+ create mode 100644 tools/testing/selftests/landlock/net_test.c
+
+--
+2.25.1
 
 
