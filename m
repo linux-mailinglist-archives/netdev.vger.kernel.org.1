@@ -1,105 +1,170 @@
-Return-Path: <netdev+bounces-35190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5E517A77BF
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 11:40:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86F427A7865
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 12:00:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F7091C20AB7
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 09:40:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D05E281BEC
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 10:00:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BB4A154B7;
-	Wed, 20 Sep 2023 09:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F2A4156DF;
+	Wed, 20 Sep 2023 10:00:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56EACC8E2
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 09:40:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BFF96C433C8;
-	Wed, 20 Sep 2023 09:40:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695202826;
-	bh=vAfq2Kjos4AL2tqYc1Pqjb1PW2feaZFHafhkuYx3jyg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=j3JcGU7pSa6QPeS4z4JGf/CChHqZpr+l7PRD1hqPHu7H+cO6k1MqfKEfXdyTfbsa+
-	 vdfqHKPMLbzxGuliQ9ItAVztu6nbOn07ubOTILvEeNLc1OYsSicsZpZtve2a7sg4vw
-	 4fFHOY4hUD+icCYMQtL2jFXQvABBIKwhBC7X+3ulOWqdW99/aFaegWe6247xPTmvyg
-	 0IjZyXd9reZro/KNfOnt2DWvaxjEQNfHpHtVEAF0KEbo8jBS6beH/k3EIwH/zmEy57
-	 qXCRPmqu/RCNC/2U6AJVtLiQ6MFux5q7D3eApt8PhaF6R5k9w6gZReoNFd7XSk7fom
-	 IJ+nGjGE+wpHg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A427CC561EE;
-	Wed, 20 Sep 2023 09:40:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDAF7156E0
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 10:00:09 +0000 (UTC)
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B89A8F;
+	Wed, 20 Sep 2023 03:00:06 -0700 (PDT)
+Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.206])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4RrDVd4wpkz6HJcK;
+	Wed, 20 Sep 2023 17:58:01 +0800 (CST)
+Received: from [10.123.123.126] (10.123.123.126) by
+ lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Wed, 20 Sep 2023 11:00:03 +0100
+Message-ID: <7cb458f1-7aff-ccf3-abfd-b563bfc65b84@huawei.com>
+Date: Wed, 20 Sep 2023 13:00:02 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Subject: Re: [PATCH v11.1] selftests/landlock: Add 11 new test suites
+ dedicated to network
+Content-Language: ru
+To: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
+CC: Paul Moore <paul@paul-moore.com>, <artem.kuzin@huawei.com>,
+	<gnoack3000@gmail.com>, <willemdebruijn.kernel@gmail.com>,
+	<yusongping@huawei.com>, <linux-security-module@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>
+References: <20230515161339.631577-11-konstantin.meskhidze@huawei.com>
+ <20230706145543.1284007-1-mic@digikod.net>
+ <3db64cf8-6a45-a361-aa57-9bfbaf866ef8@digikod.net>
+ <b2a94da1-f9df-b684-7666-1c63060f68f1@huawei.com>
+ <20230817.koh5see0eaLa@digikod.net>
+ <239800f3-baf4-1c7d-047f-8ba90b097bee@huawei.com>
+ <20230914.ASu9sho1Aef0@digikod.net>
+ <076bfaa6-1e0b-c95b-5727-00001c79f2c0@huawei.com>
+ <20230918.shauB5gei9Ai@digikod.net>
+From: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
+In-Reply-To: <20230918.shauB5gei9Ai@digikod.net>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 00/11][pull request] Intel Wired LAN Driver
- Updates 2023-09-18 (ice)
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169520282666.15537.8525913267479543878.git-patchwork-notify@kernel.org>
-Date: Wed, 20 Sep 2023 09:40:26 +0000
-References: <20230918212814.435688-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20230918212814.435688-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, jacob.e.keller@intel.com,
- richardcochran@gmail.com
+X-Originating-IP: [10.123.123.126]
+X-ClientProxiedBy: lhrpeml100001.china.huawei.com (7.191.160.183) To
+ lhrpeml500004.china.huawei.com (7.191.163.9)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-5.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
 
-This series was applied to netdev/net-next.git (main)
-by Tony Nguyen <anthony.l.nguyen@intel.com>:
 
-On Mon, 18 Sep 2023 14:28:03 -0700 you wrote:
-> This series contains updates to ice driver only.
+9/18/2023 9:56 AM, Mickaël Salaün пишет:
+> On Fri, Sep 15, 2023 at 11:54:46AM +0300, Konstantin Meskhidze (A) wrote:
+>> 
+>> 
+>> 9/14/2023 11:08 AM, Mickaël Salaün пишет:
+>> > On Mon, Sep 11, 2023 at 01:13:24PM +0300, Konstantin Meskhidze (A) wrote:
+>> > > 
+>> > > 
+>> > > 8/17/2023 6:08 PM, Mickaël Salaün пишет:
+>> > > > On Sat, Aug 12, 2023 at 05:37:00PM +0300, Konstantin Meskhidze (A) wrote:
+>> > > > > > > > > 7/12/2023 10:02 AM, Mickaël Salaün пишет:
+>> > > > > > > On 06/07/2023 16:55, Mickaël Salaün wrote:
+>> > > > > > > From: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+>> > > > > > > > > This patch is a revamp of the v11 tests [1] with new tests
+>> > > > > (see the
+>> > > > > > > "Changes since v11" description).  I (Mickaël) only added the following
+>> > > > > > > todo list and the "Changes since v11" sections in this commit message.
+>> > > > > > > I think this patch is good but it would appreciate reviews.
+>> > > > > > > You can find the diff of my changes here but it is not really readable:
+>> > > > > > > https://git.kernel.org/mic/c/78edf722fba5 (landlock-net-v11 branch)
+>> > > > > > > [1] https://lore.kernel.org/all/20230515161339.631577-11-konstantin.meskhidze@huawei.com/
+>> > > > > > > TODO:
+>> > > > > > > - Rename all "net_service" to "net_port".
+>> > > > > > > - Fix the two kernel bugs found with the new tests.
+>> > > > > > > - Update this commit message with a small description of all tests.
+>> > > > > > > [...]
+>> > > > > > > We should also add a test to make sure errno is the same
+>> > > with and
+>> > > > > > without sandboxing when using port 0 for connect and consistent with
+>> > > > > > bind (using an available port). The test fixture and variants should be
+>> > > > > > quite similar to the "ipv4" ones, but we can also add AF_INET6 variants,
+>> > > > > > which will result in 8 "ip" variants:
+>> > > > > > > TEST_F(ip, port_zero)
+>> > > > > > {
+>> > > > > > 	if (variant->sandbox == TCP_SANDBOX) {
+>> > > > > > 		/* Denies any connect and bind. */
+>> > > > > > 	}
+>> > > > > > 	/* Checks errno for port 0. */
+>> > > > > > }
+>> > > > > As I understand the would be the next test cases:
+>> > > > > > > 	1. ip4, sandboxed, bind port 0 -> should return EACCES
+>> > > (denied by
+>> > > > > landlock).
+>> > > > > Without any allowed port, yes. This test case is useful.
+>> > > > > By tuning /proc/sys/net/ipv4/ip_local_port_range (see
+>> > > > inet_csk_find_open_port call) we should be able to pick a specific
+>> > > > allowed port and test it.  We can also test for the EADDRINUSE error to
+>> > > > make sure error ordering is correct (compared with -EACCES).
+>> > >   Sorry, did not get this case. Could please explain it with more details?
+>> > 
+>> > According to bind(2), if no port are available, the syscall should
+>> > return EADDRINUSE. And this returned value should be the same whatever
+>> > the process is sandbox or not (and never EACCES). But as I explained
+>> > just below, we cannot know this random port from the LSM hook, so no
+>> > need to tweak /proc/sys/net/ipv4/ip_local_port_range, and your this is
+>> > correct:
+>> > 
+>> > 1. ip4, sandboxed, bind port 0 -> should return EACCES (denied by
+>> > landlock).
+>> 
+>>   yep, adding rule with port 0 (for bind) returns EINVAL then
+>>   calling bind port 0 returns EACCES cause there is no rule with port 0.
+>> > 
+>> > > > > However, I think the current LSM API don't enable to infer this
+>> > > random
+>> > > > port because the LSM hook is called before a port is picked.  If this is
+>> > > > correct, the best way to control port binding would be to always deny
+>> > > > binding on port zero/random (when restricting port binding, whatever
+>> > > > exception rules are in place). This explanation should be part of a
+>> > > > comment for this specific exception.
+>> > > 
+>> > >   Yep, if some LSM rule (for bind) has been applied a with specific port,
+>> > > other attemps to bind with zero/random ports would be refused by LSM
+>> > > security checks.
+>> > 
+>> > To say it another way, we should not allow to add a rule with port 0 for
+>> > LANDLOCK_ACCESS_NET_BIND_TCP, but return -EINVAL in this case. This
+>> > limitation should be explained, documented and tested.
+>> > 
+>> > With (only) LANDLOCK_ACCESS_NET_CONNECT_TCP it should be allowed though
+>> > (except if there is also LANDLOCK_ACCESS_NET_BIND_TCP) of course.
+>> > Another test should cover the case with a new rule with these two access
+>> > rights and port 0.
+>> 
+>>  I think it's possible to have LANDLOCK_ACCESS_NET_CONNECT_TCP with port 0
+>> with LANDLOCK_ACCESS_NET_BIND_TCP at the same time, cause
+>> LANDLOCK_ACCESS_NET_BIND_TCP rule is allowed (by Landlock) with any other
+>> port but 0.
 > 
-> Sergey prepends ICE_ to PTP timer commands to clearly convey namespace
-> of commands.
-> 
-> Karol adds retrying to acquire hardware semaphore for cross-timestamping
-> and avoids writing to timestamp registers on E822 devices. He also
-> renames some defines to be more clear and align with the data sheet.
-> Additionally, a range check is moved in order to reduce duplicated code.
-> 
-> [...]
+> It would mask the fact that port zero cannot be allowed, which could be
+> possible one day. So for now we need to return EINVAL in this case.
 
-Here is the summary with links:
-  - [net-next,v2,01/11] ice: prefix clock timer command enumeration values with ICE_PTP
-    https://git.kernel.org/netdev/net-next/c/40326b2b4296
-  - [net-next,v2,02/11] ice: retry acquiring hardware semaphore during cross-timestamp request
-    https://git.kernel.org/netdev/net-next/c/097c317afe0a
-  - [net-next,v2,03/11] ice: Support cross-timestamping for E823 devices
-    https://git.kernel.org/netdev/net-next/c/88c360e49f51
-  - [net-next,v2,04/11] ice: introduce hw->phy_model for handling PTP PHY differences
-    https://git.kernel.org/netdev/net-next/c/be16574609f1
-  - [net-next,v2,05/11] ice: PTP: Clean up timestamp registers correctly
-    https://git.kernel.org/netdev/net-next/c/be65a1a33bde
-  - [net-next,v2,06/11] ice: PTP: Rename macros used for PHY/QUAD port definitions
-    https://git.kernel.org/netdev/net-next/c/64fd7de2469d
-  - [net-next,v2,07/11] ice: PTP: move quad value check inside ice_fill_phy_msg_e822
-    https://git.kernel.org/netdev/net-next/c/dd84744cf5ea
-  - [net-next,v2,08/11] ice: remove ICE_F_PTP_EXTTS feature flag
-    https://git.kernel.org/netdev/net-next/c/12a5a28b565b
-  - [net-next,v2,09/11] ice: fix pin assignment for E810-T without SMA control
-    https://git.kernel.org/netdev/net-next/c/5a7cee1cb4b9
-  - [net-next,v2,10/11] ice: introduce ice_pf_src_tmr_owned
-    https://git.kernel.org/netdev/net-next/c/42d40bb21e33
-  - [net-next,v2,11/11] ice: check netlist before enabling ICE_F_GNSS
-    https://git.kernel.org/netdev/net-next/c/89776a6a702e
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+   Got it. I added bind mask in add_rule_net_service() to check that 
+zero port is not allowed with bind action. I sent all changes in the 
+latest V12 patch.
+> .
 
