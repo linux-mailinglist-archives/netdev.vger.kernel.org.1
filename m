@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-35126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35127-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB09F7A72EA
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 08:39:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB78E7A72EC
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 08:39:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 212C61C20AAB
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 06:39:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75F0928189F
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 06:39:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 637098C1C;
-	Wed, 20 Sep 2023 06:36:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FE258C0A;
+	Wed, 20 Sep 2023 06:36:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5228C19
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 06:36:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E3AEC433CD;
-	Wed, 20 Sep 2023 06:36:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E4008F72
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 06:36:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18140C433C7;
+	Wed, 20 Sep 2023 06:36:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695191766;
-	bh=+xsryfgaPixIgPNogVTJCa8i5jkYie0rwQbaXU9Xexg=;
+	s=k20201202; t=1695191767;
+	bh=/PbfMOZhJMNV00rw/gz9c/Tmp0rtYfzGzyUD04wIurw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZuBdjc3KbeX0jC6mvZwqaTskS3gajwvNDfNX3dh7T8YSBWm93LnLIIBENSkFsw2ka
-	 Cl8I7mlOfM20r9SPn7nf2CxODu6XUi/wGu20exhDi3oUcau7xnDSQ0iODQ7kdst05K
-	 gR2jRtZSGrS7HW2AfaHR6Jozq4/HIhlroHZXrSUddCFzhNufbYdYIj6+S3xl6X/RN9
-	 nMams/eh8ByCfBN3AiGXyzPlWYJLZtvx6kRPkapfT3er8mOvLf5jpU8+mipHtDyCrj
-	 S1iuwgYqlPantKgqJwFubwnsXTDhSlEk5jZXesA7pjq+l84Uihnlvi1EiXOJaQb0QO
-	 gySPz/Ncv0F8g==
+	b=spMCw0CoETkIyZVLQNgMPIteHd5D88TkkkY2yy4lNmN0NUs3Oet2MvZXmcUFhDhf2
+	 hLZW8SwTKTOVmYSbOWHzBOqvgVtkzC7cLDc2mx8Fi6o4kfYOzrNkV1hMuoDz98Dhfj
+	 68U7QzQ2ZX3NWNZLL1wSUxb+ntlJrrnDKmC74CaTwuidruXBkmfk5TOo3tlEmpNToK
+	 amNY8OiS1oCzjkWGWM/6xy6UNOI4pLURIjKZFjTuVhEeOpVYR2netkpg7q+Z9ZRqtv
+	 XMGYm5TcIePD4MIX4u79jPoPc14yYx3iPaMtUIunGR3rFeCmeTKYlCM8EdBjWAZ3gM
+	 bfWFvjHWgTZzQ==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -38,11 +38,12 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Jiri Pirko <jiri@nvidia.com>,
-	Shay Drory <shayd@nvidia.com>
-Subject: [net-next 08/15] net/mlx5: Remove redundant max_sfs check and field from struct mlx5_sf_dev_table
-Date: Tue, 19 Sep 2023 23:35:45 -0700
-Message-ID: <20230920063552.296978-9-saeed@kernel.org>
+	Jianbo Liu <jianbol@nvidia.com>,
+	Parav Pandit <parav@nvidia.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>
+Subject: [net-next 09/15] net/mlx5e: Consider aggregated port speed during rate configuration
+Date: Tue, 19 Sep 2023 23:35:46 -0700
+Message-ID: <20230920063552.296978-10-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230920063552.296978-1-saeed@kernel.org>
 References: <20230920063552.296978-1-saeed@kernel.org>
@@ -54,86 +55,139 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jiri Pirko <jiri@nvidia.com>
+From: Jianbo Liu <jianbol@nvidia.com>
 
-table->max_sfs is initialized in mlx5_sf_dev_table_create() and only
-used to check for 0 in mlx5_sf_dev_add(). mlx5_sf_dev_add() is called
-either from mlx5_sf_dev_state_change_handler() or
-mlx5_sf_dev_add_active_work(). Both ensure max SF count is not 0,
-using mlx5_sf_max_functions() helper before calling mlx5_sf_dev_add().
+When LAG is configured, functions (PF,VF,SF) can utilize the maximum
+aggregated link speed for transmission. Currently the aggregated link
+speed is not considered.
 
-So remove the redundant check and no longer used max_sfs field.
+Hence, improve it to use the aggregated link speed by referring to the
+physical port's upper bonding device when LAG is configured.
 
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
-Reviewed-by: Shay Drory <shayd@nvidia.com>
+Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
+Reviewed-by: Parav Pandit <parav@nvidia.com>
+Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../net/ethernet/mellanox/mlx5/core/sf/dev/dev.c  | 15 ---------------
- 1 file changed, 15 deletions(-)
+ .../net/ethernet/mellanox/mlx5/core/esw/qos.c | 84 ++++++++++++++++---
+ 1 file changed, 72 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/dev.c b/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/dev.c
-index 05e148db9889..0f9b280514b8 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/dev.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/dev.c
-@@ -14,7 +14,6 @@
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
+index 1887a24ee414..f76c8f0562e9 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
+@@ -2,6 +2,7 @@
+ /* Copyright (c) 2021, NVIDIA CORPORATION & AFFILIATES. All rights reserved. */
  
- struct mlx5_sf_dev_table {
- 	struct xarray devices;
--	unsigned int max_sfs;
- 	phys_addr_t base_address;
- 	u64 sf_bar_length;
- 	struct notifier_block nb;
-@@ -110,12 +109,6 @@ static void mlx5_sf_dev_add(struct mlx5_core_dev *dev, u16 sf_index, u16 fn_id,
- 	sf_dev->parent_mdev = dev;
- 	sf_dev->fn_id = fn_id;
+ #include "eswitch.h"
++#include "lib/mlx5.h"
+ #include "esw/qos.h"
+ #include "en/port.h"
+ #define CREATE_TRACE_POINTS
+@@ -701,6 +702,70 @@ int mlx5_esw_qos_set_vport_rate(struct mlx5_eswitch *esw, struct mlx5_vport *vpo
+ 	return err;
+ }
  
--	if (!table->max_sfs) {
--		mlx5_adev_idx_free(id);
--		kfree(sf_dev);
--		err = -EOPNOTSUPP;
--		goto add_err;
--	}
- 	sf_dev->bar_base_addr = table->base_address + (sf_index * table->sf_bar_length);
- 
- 	trace_mlx5_sf_dev_add(dev, sf_dev, id);
-@@ -296,7 +289,6 @@ static void mlx5_sf_dev_destroy_active_work(struct mlx5_sf_dev_table *table)
- void mlx5_sf_dev_table_create(struct mlx5_core_dev *dev)
++static u32 mlx5_esw_qos_lag_link_speed_get_locked(struct mlx5_core_dev *mdev)
++{
++	struct ethtool_link_ksettings lksettings;
++	struct net_device *slave, *master;
++	u32 speed = SPEED_UNKNOWN;
++
++	/* Lock ensures a stable reference to master and slave netdevice
++	 * while port speed of master is queried.
++	 */
++	ASSERT_RTNL();
++
++	slave = mlx5_uplink_netdev_get(mdev);
++	if (!slave)
++		goto out;
++
++	master = netdev_master_upper_dev_get(slave);
++	if (master && !__ethtool_get_link_ksettings(master, &lksettings))
++		speed = lksettings.base.speed;
++
++out:
++	return speed;
++}
++
++static int mlx5_esw_qos_max_link_speed_get(struct mlx5_core_dev *mdev, u32 *link_speed_max,
++					   bool hold_rtnl_lock, struct netlink_ext_ack *extack)
++{
++	int err;
++
++	if (!mlx5_lag_is_active(mdev))
++		goto skip_lag;
++
++	if (hold_rtnl_lock)
++		rtnl_lock();
++
++	*link_speed_max = mlx5_esw_qos_lag_link_speed_get_locked(mdev);
++
++	if (hold_rtnl_lock)
++		rtnl_unlock();
++
++	if (*link_speed_max != (u32)SPEED_UNKNOWN)
++		return 0;
++
++skip_lag:
++	err = mlx5_port_max_linkspeed(mdev, link_speed_max);
++	if (err)
++		NL_SET_ERR_MSG_MOD(extack, "Failed to get link maximum speed");
++
++	return err;
++}
++
++static int mlx5_esw_qos_link_speed_verify(struct mlx5_core_dev *mdev,
++					  const char *name, u32 link_speed_max,
++					  u64 value, struct netlink_ext_ack *extack)
++{
++	if (value > link_speed_max) {
++		pr_err("%s rate value %lluMbps exceed link maximum speed %u.\n",
++		       name, value, link_speed_max);
++		NL_SET_ERR_MSG_MOD(extack, "TX rate value exceed link maximum speed");
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
+ int mlx5_esw_qos_modify_vport_rate(struct mlx5_eswitch *esw, u16 vport_num, u32 rate_mbps)
  {
- 	struct mlx5_sf_dev_table *table;
--	unsigned int max_sfs;
+ 	u32 ctx[MLX5_ST_SZ_DW(scheduling_context)] = {};
+@@ -744,12 +809,6 @@ static int esw_qos_devlink_rate_to_mbps(struct mlx5_core_dev *mdev, const char *
+ 	u64 value;
  	int err;
  
- 	if (!mlx5_sf_dev_supported(dev))
-@@ -310,13 +302,8 @@ void mlx5_sf_dev_table_create(struct mlx5_core_dev *dev)
+-	err = mlx5_port_max_linkspeed(mdev, &link_speed_max);
+-	if (err) {
+-		NL_SET_ERR_MSG_MOD(extack, "Failed to get link maximum speed");
+-		return err;
+-	}
+-
+ 	value = div_u64_rem(*rate, MLX5_LINKSPEED_UNIT, &remainder);
+ 	if (remainder) {
+ 		pr_err("%s rate value %lluBps not in link speed units of 1Mbps.\n",
+@@ -758,12 +817,13 @@ static int esw_qos_devlink_rate_to_mbps(struct mlx5_core_dev *mdev, const char *
+ 		return -EINVAL;
+ 	}
  
- 	table->nb.notifier_call = mlx5_sf_dev_state_change_handler;
- 	table->dev = dev;
--	if (MLX5_CAP_GEN(dev, max_num_sf))
--		max_sfs = MLX5_CAP_GEN(dev, max_num_sf);
--	else
--		max_sfs = 1 << MLX5_CAP_GEN(dev, log_max_sf);
- 	table->sf_bar_length = 1 << (MLX5_CAP_GEN(dev, log_min_sf_size) + 12);
- 	table->base_address = pci_resource_start(dev->pdev, 2);
--	table->max_sfs = max_sfs;
- 	xa_init(&table->devices);
- 	mutex_init(&table->table_lock);
- 	dev->priv.sf_dev_table = table;
-@@ -332,7 +319,6 @@ void mlx5_sf_dev_table_create(struct mlx5_core_dev *dev)
- 	err = mlx5_sf_dev_vhca_arm_all(table);
- 	if (err)
- 		goto arm_err;
--	mlx5_core_dbg(dev, "SF DEV: max sf devices=%d\n", max_sfs);
- 	return;
+-	if (value > link_speed_max) {
+-		pr_err("%s rate value %lluMbps exceed link maximum speed %u.\n",
+-		       name, value, link_speed_max);
+-		NL_SET_ERR_MSG_MOD(extack, "TX rate value exceed link maximum speed");
+-		return -EINVAL;
+-	}
++	err = mlx5_esw_qos_max_link_speed_get(mdev, &link_speed_max, true, extack);
++	if (err)
++		return err;
++
++	err = mlx5_esw_qos_link_speed_verify(mdev, name, link_speed_max, value, extack);
++	if (err)
++		return err;
  
- arm_err:
-@@ -340,7 +326,6 @@ void mlx5_sf_dev_table_create(struct mlx5_core_dev *dev)
- add_active_err:
- 	mlx5_vhca_event_notifier_unregister(dev, &table->nb);
- vhca_err:
--	table->max_sfs = 0;
- 	kfree(table);
- 	dev->priv.sf_dev_table = NULL;
- table_err:
+ 	*rate = value;
+ 	return 0;
 -- 
 2.41.0
 
