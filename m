@@ -1,77 +1,63 @@
-Return-Path: <netdev+bounces-35312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AB4F7A8BFB
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 20:47:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD3F67A8C2D
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 21:00:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FE0F1C20904
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 18:47:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B647BB20A67
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 19:00:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B6C53CD1B;
-	Wed, 20 Sep 2023 18:47:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 465441173B;
+	Wed, 20 Sep 2023 19:00:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A0DC19C
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 18:47:07 +0000 (UTC)
-Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED718A1;
-	Wed, 20 Sep 2023 11:47:05 -0700 (PDT)
-Received: by mail-oi1-x235.google.com with SMTP id 5614622812f47-3a707bc2397so13157b6e.0;
-        Wed, 20 Sep 2023 11:47:05 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D035A3CCEC
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 19:00:12 +0000 (UTC)
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC834E8;
+	Wed, 20 Sep 2023 12:00:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695235625; x=1695840425; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=v0J0SB+HxdrckHlsfA7/IFLQxnFqSrv8r/bynMG33Mg=;
-        b=OtJy34PfjNvOt2i1to6O+ucxet6xnJyE8Aah4KR5/wR+now3uqJJWjFv8Y9D7WHKHC
-         fL5x7Eq7pgadbfhYK5VGUrYSVbVWXJPRtp+erYp2q7vQiVrkzIcHyxhftnObQjoLEet5
-         DFM8E81Oml6B5XiORq3b1FQoRVUqjIMPybt1S5H53k/tnB03P2PQ0/q+ParUgpgsPzxU
-         ELzMC+T204Iu6qzW6HggPUNodne0WUUwQQ+26qJknHfiUiNcGwMQj118S+ASLnvVXEnE
-         +DeRNU9zEvxqavUd4EC7Tw3y1CupqyFIXgs+m8/dNIQy7OcsO5kWFm5WYUQAlqOvfHYD
-         syDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695235625; x=1695840425;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=v0J0SB+HxdrckHlsfA7/IFLQxnFqSrv8r/bynMG33Mg=;
-        b=i/+4vG3oXVmqayK6y++tgQ6/gak4N8oAnVxAKs2WauJUOTPhSb9AIZml8Gk/UOjemP
-         AYwWV2Iwtp1i1BaBI+JZV4f7nEELO4sj5hbGwLb20JS3SqAJbov6iiEAMYSHWMY6ftYm
-         3X/UI+Tb5Db/xZmk/tlZbg6qc8mr2pBwGqoRceuPHrwpPxLjKWqWWmXYQaBihqorFlzA
-         MIqWYEXnRA3Pg8wlCNYem++id02W0cPokV7922ZbxLkZVkp0s5LanjCv5dllu1da8jyx
-         lnmK7aFNFdXKNa1Ey/IlB9PS1eReBUoShJKZTRU7KnDl3xk72aPq2zrtp14Bd/31McVL
-         e0qQ==
-X-Gm-Message-State: AOJu0YzueRs/EAgzyPCUoNM3fpMNLdF0dFuHfle0B74OLtFchoU9tQKL
-	aNA/tU6iXToDNfBDsuFtdNw=
-X-Google-Smtp-Source: AGHT+IH9gK9IyX7y+Bj/PRIVToVWY5h53jyVu8uDelJTuMsZnWMWtIkQMSEwOUKSrYNPrWT4Io40uQ==
-X-Received: by 2002:a05:6870:2190:b0:1d6:3e08:c150 with SMTP id l16-20020a056870219000b001d63e08c150mr3251269oae.5.1695235625088;
-        Wed, 20 Sep 2023 11:47:05 -0700 (PDT)
-Received: from fabio-Precision-3551.. ([2804:14c:485:4b61:7290:a7f7:69b2:711b])
-        by smtp.gmail.com with ESMTPSA id t20-20020a9d7754000000b006b922956cecsm6320333otl.25.2023.09.20.11.47.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Sep 2023 11:47:04 -0700 (PDT)
-From: Fabio Estevam <festevam@gmail.com>
-To: kuba@kernel.org
-Cc: andrew@lunn.ch,
-	f.fainelli@gmail.com,
-	olteanv@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	l00g33k@gmail.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Fabio Estevam <festevam@denx.de>,
-	Florian Fainelli <florian.fainelli@broadcom.com>
-Subject: [PATCH v2 net] net: dsa: mv88e6xxx: Avoid EEPROM timeout when EEPROM is absent
-Date: Wed, 20 Sep 2023 15:46:47 -0300
-Message-Id: <20230920184647.84316-1-festevam@gmail.com>
-X-Mailer: git-send-email 2.34.1
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1695236410; x=1726772410;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=ZjPu7pghN+++7EQS8KqJ3h6m2q6ZCRIsdA25YcSip9k=;
+  b=EI794SIpSmfVJUWlCmifS/COuiH18aHbu119vncyh5v+rR6owCzd6di0
+   1P1BrjDZmwLuM95nYw+v5ENK0IbSCT5oQpAXGXxn7OQYe1KwgGwiI/p85
+   OkrCRLFJp27xHOf7J/OBiK2GK1f/qnnW1FqUNQjz4JMpzyG+2v9OtvX3g
+   I=;
+X-IronPort-AV: E=Sophos;i="6.03,162,1694736000"; 
+   d="scan'208";a="584644147"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-7fa2de02.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2023 19:00:07 +0000
+Received: from EX19MTAUWC002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+	by email-inbound-relay-pdx-2b-m6i4x-7fa2de02.us-west-2.amazon.com (Postfix) with ESMTPS id BEE8C40DCF;
+	Wed, 20 Sep 2023 19:00:05 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Wed, 20 Sep 2023 19:00:05 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.106.101.14) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Wed, 20 Sep 2023 19:00:02 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <syzbot+71e724675ba3958edb31@syzkaller.appspotmail.com>
+CC: <avagin@gmail.com>, <davem@davemloft.net>, <dsahern@kernel.org>,
+	<edumazet@google.com>, <kuba@kernel.org>, <kuniyu@amazon.com>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <syzkaller-bugs@googlegroups.com>
+Subject: Re: [syzbot] [net?] WARNING in inet_csk_get_port (2)
+Date: Wed, 20 Sep 2023 11:59:52 -0700
+Message-ID: <20230920185952.94518-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <0000000000004ba00e0605ce2fcf@google.com>
+References: <0000000000004ba00e0605ce2fcf@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,132 +65,136 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.106.101.14]
+X-ClientProxiedBy: EX19D043UWC002.ant.amazon.com (10.13.139.222) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SORTED_RECIPS,
+	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Fabio Estevam <festevam@denx.de>
+From: syzbot <syzbot+71e724675ba3958edb31@syzkaller.appspotmail.com>
+Date: Wed, 20 Sep 2023 11:02:55 -0700
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    2cf0f7156238 Merge tag 'nfs-for-6.6-2' of git://git.linux-..
+> git tree:       upstream
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=17405ab0680000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=d594086f139d167
+> dashboard link: https://syzkaller.appspot.com/bug?extid=71e724675ba3958edb31
+> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16b2e118680000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=127b55c4680000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/456b02029fa8/disk-2cf0f715.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/9f9ff0c00454/vmlinux-2cf0f715.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/0ede19fba30f/bzImage-2cf0f715.xz
+> 
+> The issue was bisected to:
+> 
+> commit c48ef9c4aed3632566b57ba66cec6ec78624d4cb
+> Author: Kuniyuki Iwashima <kuniyu@amazon.com>
+> Date:   Mon Sep 11 18:36:57 2023 +0000
+> 
+>     tcp: Fix bind() regression for v4-mapped-v6 non-wildcard address.
+>
 
-Since commit 23d775f12dcd ("net: dsa: mv88e6xxx: Wait for EEPROM done
-before HW reset") the following error is seen on a imx8mn board with
-a 88E6320 switch:
+We need this condition to put v4 sk and v4-mapped-v6 sk into
+the same bucket.
 
-mv88e6085 30be0000.ethernet-1:00: Timeout waiting for EEPROM done
-
-This board does not have an EEPROM attached to the switch though.
-
-This problem is well explained by Andrew Lunn:
-
-"If there is an EEPROM, and the EEPROM contains a lot of data, it could
-be that when we perform a hardware reset towards the end of probe, it
-interrupts an I2C bus transaction, leaving the I2C bus in a bad state,
-and future reads of the EEPROM do not work.
-
-The work around for this was to poll the EEInt status and wait for it
-to go true before performing the hardware reset.
-
-However, we have discovered that for some boards which do not have an
-EEPROM, EEInt never indicates complete. As a result,
-mv88e6xxx_g1_wait_eeprom_done() spins for a second and then prints a
-warning.
-
-We probably need a different solution than calling
-mv88e6xxx_g1_wait_eeprom_done(). The datasheet for 6352 documents the
-EEPROM Command register:
-
-bit 15 is:
-
-  EEPROM Unit Busy. This bit must be set to a one to start an EEPROM
-  operation (see EEOp below). Only one EEPROM operation can be
-  executing at one time so this bit must be zero before setting it to
-  a one.  When the requested EEPROM operation completes this bit will
-  automatically be cleared to a zero. The transition of this bit from
-  a one to a zero can be used to generate an interrupt (the EEInt in
-  Global 1, offset 0x00).
-
-and more interesting is bit 11:
-
-  Register Loader Running. This bit is set to one whenever the
-  register loader is busy executing instructions contained in the
-  EEPROM."
-
-Change to mv88e6xxx_g2_eeprom_wait() to fix the timeout error when the
-EEPROM chip is not present.
-  
-Fixes: 23d775f12dcd ("net: dsa: mv88e6xxx: Wait for EEPROM done before HW reset")
-Suggested-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Fabio Estevam <festevam@denx.de>
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
----
-Alfred,
-
-Please test it, if you have a chance. I want to be sure that your usecase
-still works well.
-
-Changes since v1:
-- Use the correct function name in the last sentence: 
-"Change to mv88e6xxx_g2_eeprom_wait() to fix the timeout ..."
-- Collected Florian's tag.
-- Passed the net prefix in the Subject line.
-
- drivers/net/dsa/mv88e6xxx/chip.c    | 6 ++++--
- drivers/net/dsa/mv88e6xxx/global2.c | 2 +-
- drivers/net/dsa/mv88e6xxx/global2.h | 2 ++
- 3 files changed, 7 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index a73008b9e0b3..ba906dfab055 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.c
-+++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -3012,14 +3012,16 @@ static void mv88e6xxx_hardware_reset(struct mv88e6xxx_chip *chip)
- 		 * from the wrong location resulting in the switch booting
- 		 * to wrong mode and inoperable.
- 		 */
--		mv88e6xxx_g1_wait_eeprom_done(chip);
-+		if (chip->info->ops->get_eeprom)
-+			mv88e6xxx_g2_eeprom_wait(chip);
+---8<---
+diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
+index dfb1c61c0c2b..6487357d1ddd 100644
+--- a/net/ipv4/inet_hashtables.c
++++ b/net/ipv4/inet_hashtables.c
+@@ -822,7 +823,8 @@ static bool inet_bind2_bucket_match(const struct inet_bind2_bucket *tb,
+ 			return ipv6_addr_v4mapped(&tb->v6_rcv_saddr) &&
+ 				tb->v6_rcv_saddr.s6_addr32[3] == sk->sk_rcv_saddr;
  
- 		gpiod_set_value_cansleep(gpiod, 1);
- 		usleep_range(10000, 20000);
- 		gpiod_set_value_cansleep(gpiod, 0);
- 		usleep_range(10000, 20000);
- 
--		mv88e6xxx_g1_wait_eeprom_done(chip);
-+		if (chip->info->ops->get_eeprom)
-+			mv88e6xxx_g2_eeprom_wait(chip);
+-		return false;
++		return ipv6_addr_v4mapped(&sk->sk_v6_rcv_saddr) &&
++			sk->sk_v6_rcv_saddr.s6_addr32[3] == tb->rcv_saddr;
  	}
- }
  
-diff --git a/drivers/net/dsa/mv88e6xxx/global2.c b/drivers/net/dsa/mv88e6xxx/global2.c
-index ec49939968fa..ac302a935ce6 100644
---- a/drivers/net/dsa/mv88e6xxx/global2.c
-+++ b/drivers/net/dsa/mv88e6xxx/global2.c
-@@ -340,7 +340,7 @@ int mv88e6xxx_g2_pot_clear(struct mv88e6xxx_chip *chip)
-  * Offset 0x15: EEPROM Addr (for 8-bit data access)
-  */
- 
--static int mv88e6xxx_g2_eeprom_wait(struct mv88e6xxx_chip *chip)
-+int mv88e6xxx_g2_eeprom_wait(struct mv88e6xxx_chip *chip)
- {
- 	int bit = __bf_shf(MV88E6XXX_G2_EEPROM_CMD_BUSY);
- 	int err;
-diff --git a/drivers/net/dsa/mv88e6xxx/global2.h b/drivers/net/dsa/mv88e6xxx/global2.h
-index c05fad5c9f19..6d8d38944b23 100644
---- a/drivers/net/dsa/mv88e6xxx/global2.h
-+++ b/drivers/net/dsa/mv88e6xxx/global2.h
-@@ -360,6 +360,8 @@ int mv88e6xxx_g2_trunk_clear(struct mv88e6xxx_chip *chip);
- int mv88e6xxx_g2_device_mapping_write(struct mv88e6xxx_chip *chip, int target,
- 				      int port);
- 
-+int mv88e6xxx_g2_eeprom_wait(struct mv88e6xxx_chip *chip);
-+
- extern const struct mv88e6xxx_irq_ops mv88e6097_watchdog_ops;
- extern const struct mv88e6xxx_irq_ops mv88e6250_watchdog_ops;
- extern const struct mv88e6xxx_irq_ops mv88e6390_watchdog_ops;
--- 
-2.34.1
+ 	if (sk->sk_family == AF_INET6)
+---8<---
 
+Scenario is like
+
+  1) bind(v4) creates a tb2 bucket
+  2) bind(v4-mapped-v6) creates another tb2 bucket
+  3) listen(v4) finds the second tb2 and trigger warning
+
+---8<---
+from socket import *
+
+s = socket()
+s.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)
+s.bind(('255.255.255.255', 0))
+
+s2 = socket(AF_INET6, SOCK_STREAM)
+s2.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)
+s2.bind(('::ffff:255.255.255.255', s.getsockname()[1]))
+s.listen()
+---8<---
+
+Will post a formal patch after doing more tests with SO_REUSEPORT.
+
+Thanks!
+
+
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15567dc4680000
+> final oops:     https://syzkaller.appspot.com/x/report.txt?x=17567dc4680000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=13567dc4680000
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+71e724675ba3958edb31@syzkaller.appspotmail.com
+> Fixes: c48ef9c4aed3 ("tcp: Fix bind() regression for v4-mapped-v6 non-wildcard address.")
+> 
+> ------------[ cut here ]------------
+> WARNING: CPU: 0 PID: 5049 at net/ipv4/inet_connection_sock.c:587 inet_csk_get_port+0xf96/0x2350 net/ipv4/inet_connection_sock.c:587
+> Modules linked in:
+> CPU: 0 PID: 5049 Comm: syz-executor288 Not tainted 6.6.0-rc2-syzkaller-00018-g2cf0f7156238 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/04/2023
+> RIP: 0010:inet_csk_get_port+0xf96/0x2350 net/ipv4/inet_connection_sock.c:587
+> Code: 7c 24 08 e8 4c b6 8a 01 31 d2 be 88 01 00 00 48 c7 c7 e0 94 ae 8b e8 59 2e a3 f8 2e 2e 2e 31 c0 e9 04 fe ff ff e8 ca 88 d0 f8 <0f> 0b e9 0f f9 ff ff e8 be 88 d0 f8 49 8d 7e 48 e8 65 ca 5a 00 31
+> RSP: 0018:ffffc90003abfbf0 EFLAGS: 00010293
+> RAX: 0000000000000000 RBX: ffff888026429100 RCX: 0000000000000000
+> RDX: ffff88807edcbb80 RSI: ffffffff88b73d66 RDI: ffff888026c49f38
+> RBP: ffff888026c49f30 R08: 0000000000000005 R09: 0000000000000000
+> R10: 0000000000000001 R11: 0000000000000000 R12: ffffffff9260f200
+> R13: ffff888026c49880 R14: 0000000000000000 R15: ffff888026429100
+> FS:  00005555557d5380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 000000000045ad50 CR3: 0000000025754000 CR4: 00000000003506f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>  inet_csk_listen_start+0x155/0x360 net/ipv4/inet_connection_sock.c:1256
+>  __inet_listen_sk+0x1b8/0x5c0 net/ipv4/af_inet.c:217
+>  inet_listen+0x93/0xd0 net/ipv4/af_inet.c:239
+>  __sys_listen+0x194/0x270 net/socket.c:1866
+>  __do_sys_listen net/socket.c:1875 [inline]
+>  __se_sys_listen net/socket.c:1873 [inline]
+>  __x64_sys_listen+0x53/0x80 net/socket.c:1873
+>  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+>  do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+>  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> RIP: 0033:0x7f3a5bce3af9
+> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 c1 17 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007ffc1a1c79e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000032
+> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f3a5bce3af9
+> RDX: 00007f3a5bce3af9 RSI: 0000000000000000 RDI: 0000000000000003
+> RBP: 00007f3a5bd565f0 R08: 0000000000000006 R09: 0000000000000006
+> R10: 0000000000000006 R11: 0000000000000246 R12: 0000000000000001
+> R13: 431bde82d7b634db R14: 0000000000000001 R15: 0000000000000001
+>  </TASK>
 
