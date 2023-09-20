@@ -1,94 +1,95 @@
-Return-Path: <netdev+bounces-35333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB5567A8EAE
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 23:47:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 408587A8EB2
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 23:51:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5A805B208A8
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 21:47:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DCF3EB20975
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 21:51:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99C86405D4;
-	Wed, 20 Sep 2023 21:47:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39B68405D9;
+	Wed, 20 Sep 2023 21:51:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EDAA1A5B6
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 21:47:41 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CE36A3
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 14:47:40 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1qj52n-0001jp-Jv; Wed, 20 Sep 2023 23:47:37 +0200
-Date: Wed, 20 Sep 2023 23:47:37 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Eugene Crosser <crosser@average.org>
-Cc: netdev@vger.kernel.org, Florian Westphal <fw@strlen.de>,
-	Yi-Hung Wei <yihung.wei@gmail.com>,
-	Martin Bene <martin.bene@icomedias.com>
-Subject: Re: conntrack: TCP CLOSE and TIME_WAIT are not counted towards
- per-zone limit, and can overflow global table
-Message-ID: <20230920214737.GB25778@breakpoint.cc>
-References: <8c7e44d2-e78f-4f8d-9016-2a4b8429e14d@average.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A324F41A80
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 21:51:11 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F270BCA
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 14:51:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1695246668;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mb2TaKKb4j3v0Qjvph/ZrpHnGP1w4j4um3WN9+g8J4M=;
+	b=XRL4atl1dANi84ZKYqpJSZx+KkyLG9hzHrvRfUo2JqcaygAWlVogim60wMhaX0GRshF9mP
+	161oRwXtrjvqzgHEhpLxAND2ZQ64z13A1Ot4LTR7AQrXkuORR5SdC4AUHuZ+j1Yx+x1Tz/
+	szus+mfYBiM4QaMTJ+2ZppOKVW0ETJ4=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-670-2LSAMNEHNnKBiXvbRx8oqA-1; Wed, 20 Sep 2023 17:51:03 -0400
+X-MC-Unique: 2LSAMNEHNnKBiXvbRx8oqA-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B9B3D3C02539;
+	Wed, 20 Sep 2023 21:51:02 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.216])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id C95AF492B16;
+	Wed, 20 Sep 2023 21:51:00 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20230920130400.203330-1-dhowells@redhat.com>
+References: <20230920130400.203330-1-dhowells@redhat.com>
+Cc: dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
+    Al Viro <viro@zeniv.linux.org.uk>,
+    Linus Torvalds <torvalds@linux-foundation.org>,
+    Christoph Hellwig <hch@lst.de>,
+    Christian Brauner <christian@brauner.io>,
+    David Laight <David.Laight@ACULAB.COM>,
+    Matthew Wilcox <willy@infradead.org>,
+    Brendan Higgins <brendanhiggins@google.com>,
+    David Gow <davidgow@google.com>, linux-fsdevel@vger.kernel.org,
+    linux-block@vger.kernel.org, linux-mm@kvack.org,
+    netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+    kunit-dev@googlegroups.com, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH v2 0/9] iov_iter: kunit: Cleanup, abstraction and more tests
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8c7e44d2-e78f-4f8d-9016-2a4b8429e14d@average.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <654562.1695246660.1@warthog.procyon.org.uk>
+Date: Wed, 20 Sep 2023 22:51:00 +0100
+Message-ID: <654563.1695246660@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-Spam-Status: No, score=2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,MISSING_HEADERS,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,RCVD_IN_SBL_CSS,
+	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: **
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Eugene Crosser <crosser@average.org> wrote:
-> we are running a virtualization platform, and assign different conntrack
-> zones, with per-zone limits, to different users. The goal is to prevent
-> situation when one user exhaust the whole conntrack table on the host,
-> e.g. if the user is under some DDoS scenario.
-> 
-> We noticed that under some flooding scenarios, the number of entries in
-> the zone assigned to the user goes way above the per-zone limit, and
-> reaches the global host limit. In our test, almost all of those entries
-> were in "CLOSE" state.
-> 
-> It looks like this function in net/filter/nf_conncount.c:71
-> 
-> static inline bool already_closed(const struct nf_conn *conn)
-> {
-> 	if (nf_ct_protonum(conn) == IPPROTO_TCP)
-> 		return conn->proto.tcp.state == TCP_CONNTRACK_TIME_WAIT ||
-> 		       conn->proto.tcp.state == TCP_CONNTRACK_CLOSE;
-> 	else
-> 		return false;
-> }
-> 
-> is used to explicitly exclude such entries from counting.
-> 
-> As I understand, this creates a situation when an attacker can inflict a
-> DoS situation on the host, by opening _and immediately closing_ a large
-> number of TCP connections. That is to say, per-zone limits, as currently
-> implemented, _do not_ allow to prevent overflow of the host-wide
-> conntrack table.
-> 
-> What was the reason to exclude such entries from counting?
+David Howells <dhowells@redhat.com> wrote:
 
-I'd wager only intent was to limit *active* connections, not conntrack
-entries.
+> Hi Jens,
+> 
+> Can you consider taking this through the block tree?
 
-This code originates from a time when zones did not exist, hence
-conntrack upperlimit was sufficient, no partitioning needed.
+Sorry, I forgot to remove the 'RFC' tag in the subject.
 
-> Should this exception be removed, and _all_ entries in the zone counted
-> towards the limit?
+David
 
-I suppose so.
 
