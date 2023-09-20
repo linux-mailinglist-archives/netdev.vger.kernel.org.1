@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-35138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48A1B7A73A1
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 09:04:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D3687A73B5
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 09:09:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 230B21C20A93
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 07:04:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B82D4281AB1
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 07:09:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D73F58477;
-	Wed, 20 Sep 2023 07:04:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16F868472;
+	Wed, 20 Sep 2023 07:09:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD33653AC;
-	Wed, 20 Sep 2023 07:04:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B22F5C433CA;
-	Wed, 20 Sep 2023 07:04:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0795A846B
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 07:09:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 942D2C433C8;
+	Wed, 20 Sep 2023 07:09:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695193472;
-	bh=63k/p/+gW9Dz6wOhRcJZeOVhcS6BwsEFxWn9/zo05ME=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=K/QAr4+eZDL9AAAs/FnZTfOGD/2bLGvHZ7G4C7rjd9AblbVWZ7MB6ebDmF5TRTi/E
-	 q8hWF7TmVhIM71tRCPXNKAZR5M9uDj4KFV7Kb8OW0aQtSXE7EecQ7iMtm99B7EWjhP
-	 xJkSmwWMIww7O1y4NUJ9Yxf7s/7bIKqB4/v7zKkzc9C5SNyk+J/b2hRlRqV/B4vyqb
-	 Ph1UlGeK16ArFfOFJ6LuRIwEJnS0bNKUmGpXx3GKzk3NPwVmcR5aJhirAdQ8VSUybn
-	 AYE9UIIkyjhRQm4eNLIYvxm2dP/VlIwcKgvIBxul9bbIQY5XIJ0iufqAgpdq7S1ezC
-	 vsvHCiiJIJNrg==
-Message-ID: <cb2f7931-5ae5-8583-acff-4a186fed6632@kernel.org>
-Date: Wed, 20 Sep 2023 09:04:27 +0200
+	s=k20201202; t=1695193751;
+	bh=NQsmncYKZ6Bvzvqjwb0lz1WJq9j9DPdUwVIN26wMP4M=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ZdPPwKMCr3tNw51hiNGxLF3uEZP0Yr7jvRX5wH+9t8Br2XHowgxEq5BiZZfuByAoj
+	 nttmdqzmTP14T/VTgR51pknSbUvTNBjjlBTTP3k+Qo+oAKClIklRzKo+DJ7ARdVUyh
+	 gXNefo61/hZ5HmF3EibgcRKDQs015B/lHDJPYM0ZUtXGQdd4ozeI7k5vpUk7U3tLRA
+	 cWxHY8uCW0NGyA5i0Qm6THjMaTqBsmrWtoOF6AKE+CnVH+fml4+FBFEo9bF3bgh+13
+	 QEG3O4veED6JhGu68srMKnfIO4DvIrR8IBAJX4QsfhXFL/lpDjHN4EqMhGJDYHsrkH
+	 SLfYkT20Apo6g==
+Message-ID: <7c05ec2c-fe13-5324-f537-4f12697d1566@kernel.org>
+Date: Wed, 20 Sep 2023 10:09:05 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -39,51 +39,237 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Cc: "David S. Miller" <davem@davemloft.net>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
- Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH net v2 0/3] Add missing xdp_do_flush() invocations.
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v2] net: ethernet: ti: am65-cpsw: add mqprio qdisc offload
+ in channel mode
+To: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, vladimir.oltean@nxp.com
+Cc: horms@kernel.org, s-vadapalli@ti.com, srk@ti.com, vigneshr@ti.com,
+ p-varis@ti.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ rogerq@kernel.rog
+References: <20230918075358.5878-1-rogerq@kernel.org>
+ <ba0063d31a926b1775fe98e56b15976b4d8726cd.camel@redhat.com>
 Content-Language: en-US
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- netdev@vger.kernel.org, bpf@vger.kernel.org
-References: <20230918153611.165722-1-bigeasy@linutronix.de>
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20230918153611.165722-1-bigeasy@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <ba0063d31a926b1775fe98e56b15976b4d8726cd.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Sebastian,
+Hi Paolo,
 
-
-On 18/09/2023 17.36, Sebastian Andrzej Siewior wrote:
-> Hi,
+On 19/09/2023 14:32, Paolo Abeni wrote:
+> On Mon, 2023-09-18 at 10:53 +0300, Roger Quadros wrote:
+>> @@ -937,3 +918,296 @@ void am65_cpsw_qos_tx_p0_rate_init(struct am65_cpsw_common *common)
+>>  		       host->port_base + AM65_CPSW_PN_REG_PRI_CIR(tx_ch));
 > 
-> I've been looking at the drivers/ XDP users and noticed that some
-> XDP_REDIRECT user don't invoke xdp_do_flush() at the end.
-
-I'm wondering if we could detect (and WARN) in the net core e.g.
-net_rx_action() that a driver is missing a flush?
-
-The idea could be to check the per CPU (struct) bpf_redirect_info.
-Or check (per CPU) dev_flush_list.
-
-If some is worried about performance implications, then we can hide this
-under CONFIG_DEBUG_NET.
-
-> v1…v2: https://lore.kernel.org/all/20230908135748.794163-1-bigeasy@linutronix.de
->    - Collected tags.
->    - Dropped the #4 patch which was touching cpu_map_bpf_prog_run()
->      because it is not needed.
+> [...]
 > 
+>> +static int am65_cpsw_mqprio_verify_shaper(struct am65_cpsw_port *port,
+>> +					  struct tc_mqprio_qopt_offload *mqprio)
+>> +{
+>> +	u64 min_rate_total = 0, max_rate_total = 0;
+>> +	u32 min_rate_msk = 0, max_rate_msk = 0;
+>> +	bool has_min_rate, has_max_rate;
+>> +	int num_tc, i;
+>> +	struct am65_cpsw_mqprio *p_mqprio = &port->qos.mqprio;
+>> +	struct netlink_ext_ack *extack = mqprio->extack;
+> 
+> Please, respect the reverse x-mas tree order.
+> 
+>> +
+>> +	if (!(mqprio->flags & TC_MQPRIO_F_SHAPER))
+>> +		return 0;
+>> +
+>> +	if (mqprio->shaper != TC_MQPRIO_SHAPER_BW_RATE)
+>> +		return 0;
+>> +
+>> +	has_min_rate = !!(mqprio->flags & TC_MQPRIO_F_MIN_RATE);
+>> +	has_max_rate = !!(mqprio->flags & TC_MQPRIO_F_MAX_RATE);
+>> +
+>> +	if (!has_min_rate && has_max_rate) {
+>> +		NL_SET_ERR_MSG_MOD(extack, "min_rate is required with max_rate");
+>> +		return -EOPNOTSUPP;
+>> +	}
+>> +
+>> +	if (!has_min_rate)
+>> +		return 0;
+>> +
+>> +	num_tc = mqprio->qopt.num_tc;
+>> +
+>> +	for (i = num_tc - 1; i >= 0; i--) {
+>> +		u32 ch_msk;
+>> +
+>> +		if (mqprio->min_rate[i])
+>> +			min_rate_msk |= BIT(i);
+>> +		min_rate_total +=  mqprio->min_rate[i];
+>> +
+>> +		if (has_max_rate) {
+>> +			if (mqprio->max_rate[i])
+>> +				max_rate_msk |= BIT(i);
+>> +			max_rate_total +=  mqprio->max_rate[i];
+>> +
+>> +			if (!mqprio->min_rate[i] && mqprio->max_rate[i]) {
+>> +				NL_SET_ERR_MSG_FMT_MOD(extack,
+>> +						       "TX tc%d rate max>0 but min=0\n",
+>> +						       i);
+>> +				return -EINVAL;
+>> +			}
+>> +
+>> +			if (mqprio->max_rate[i] &&
+>> +			    mqprio->max_rate[i] < mqprio->min_rate[i]) {
+>> +				NL_SET_ERR_MSG_FMT_MOD(extack,
+>> +						       "TX tc%d rate min(%llu)>max(%llu)\n",
+>> +						       i, mqprio->min_rate[i],
+>> +						       mqprio->max_rate[i]);
+>> +				return -EINVAL;
+>> +			}
+>> +		}
+>> +
+>> +		ch_msk = GENMASK(num_tc - 1, i);
+>> +		if ((min_rate_msk & BIT(i)) && (min_rate_msk ^ ch_msk)) {
+>> +			NL_SET_ERR_MSG_FMT_MOD(extack,
+>> +					       "TX min rate limiting has to be enabled sequentially hi->lo tx_rate_msk%x\n",
+>> +					       min_rate_msk);
+>> +			return -EINVAL;
+>> +		}
+>> +
+>> +		if ((max_rate_msk & BIT(i)) && (max_rate_msk ^ ch_msk)) {
+>> +			NL_SET_ERR_MSG_FMT_MOD(extack,
+>> +					       "TX max rate limiting has to be enabled sequentially hi->lo tx_rate_msk%x\n",
+>> +					       max_rate_msk);
+>> +			return -EINVAL;
+>> +		}
+>> +	}
+>> +
+>> +	min_rate_total *= 8;
+>> +	min_rate_total /= 1000 * 1000;
+>> +	max_rate_total *= 8;
+>> +	max_rate_total /= 1000 * 1000;
+> 
+> For consistency with other code doing the same algebra, you could use a
+> single statement for both '*' and '/'. You could also add an helper for
+> that conversion, as there are multiple use-case already.
+> 
+>> +
+>> +	if (port->qos.link_speed != SPEED_UNKNOWN) {
+>> +		if (min_rate_total > port->qos.link_speed) {
+>> +			NL_SET_ERR_MSG_FMT_MOD(extack, "TX rate min %llu exceeds link speed %d\n",
+>> +					       min_rate_total, port->qos.link_speed);
+>> +			return -EINVAL;
+>> +		}
+>> +
+>> +		if (max_rate_total > port->qos.link_speed) {
+>> +			NL_SET_ERR_MSG_FMT_MOD(extack, "TX rate max %llu exceeds link speed %d\n",
+>> +					       max_rate_total, port->qos.link_speed);
+>> +			return -EINVAL;
+>> +		}
+>> +	}
+>> +
+>> +	p_mqprio->shaper_en = 1;
+>> +	p_mqprio->max_rate_total = max_t(u64, min_rate_total, max_rate_total);
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static void am65_cpsw_reset_tc_mqprio(struct net_device *ndev)
+>> +{
+>> +	struct am65_cpsw_port *port = am65_ndev_to_port(ndev);
+>> +	struct am65_cpsw_mqprio *p_mqprio = &port->qos.mqprio;
+>> +	struct am65_cpsw_common *common = port->common;
+>> +
+>> +	p_mqprio->shaper_en = 0;
+>> +	p_mqprio->max_rate_total = 0;
+>> +
+>> +	am65_cpsw_tx_pn_shaper_reset(port);
+>> +	netdev_reset_tc(ndev);
+>> +	netif_set_real_num_tx_queues(ndev, common->tx_ch_num);
+>> +
+>> +	/* Reset all Queue priorities to 0 */
+>> +	writel(0,
+>> +	       port->port_base + AM65_CPSW_PN_REG_TX_PRI_MAP);
+> 
+> No need to wrap the above statement on multiple lines.
+> 
+>> +}
+>> +
+>> +static int am65_cpsw_setup_mqprio(struct net_device *ndev, void *type_data)
+>> +{
+>> +	struct am65_cpsw_port *port = am65_ndev_to_port(ndev);
+>> +	struct am65_cpsw_mqprio *p_mqprio = &port->qos.mqprio;
+>> +	struct tc_mqprio_qopt_offload *mqprio = type_data;
+>> +	struct am65_cpsw_common *common = port->common;
+>> +	struct tc_mqprio_qopt *qopt = &mqprio->qopt;
+>> +	int tc, offset, count, ret, prio;
+>> +	u8 num_tc = qopt->num_tc;
+>> +	u32 tx_prio_map = 0;
+>> +	int i;
+>> +
+>> +	memcpy(&p_mqprio->mqprio_hw, mqprio, sizeof(*mqprio));
+>> +
+>> +	if (!num_tc) {
+>> +		am65_cpsw_reset_tc_mqprio(ndev);
+>> +		return 0;
+>> +	}
+>> +
+>> +	ret = pm_runtime_get_sync(common->dev);
+>> +	if (ret < 0) {
+>> +		pm_runtime_put_noidle(common->dev);
+>> +		return ret;
+>> +	}
+>> +
+>> +	ret = am65_cpsw_mqprio_verify_shaper(port, mqprio);
+>> +	if (ret)
+>> +		goto exit_put;
+>> +
+>> +	netdev_set_num_tc(ndev, num_tc);
+>> +
+>> +	/* Multiple Linux priorities can map to a Traffic Class
+>> +	 * A Traffic Class can have multiple contiguous Queues,
+>> +	 * Queues get mapped to Channels (thread_id),
+>> +	 *	if not VLAN tagged, thread_id is used as packet_priority
+>> +	 *	if VLAN tagged. VLAN priority is used as packet_priorit
+>> +	 * packet_priority gets mapped to header_priority in p0_rx_pri_map,
+>> +	 * header_priority gets mapped to switch_priority in pn_tx_pri_map.
+>> +	 * As p0_rx_pri_map is left at defaults (0x76543210), we can
+>> +	 * assume that Queue_n gets mapped to header_priority_n. We can then
+>> +	 * set the switch priority in pn_tx_pri_map.
+>> +	 */
+>> +
+>> +	for (tc = 0; tc < num_tc; tc++) {
+>> +	 /* For simplicity we assign the same priority (TCn) to all queues
+>> +	  * of a Traffic Class.
+>> +	  */
+> 
+> Please align the comment with the relevant code.
+> 
+> [...]
+> 
+>> +diff --git a/drivers/net/ethernet/ti/am65-cpsw-qos.h b/drivers/net/ethernet/ti/am65-cpsw-qos.h
+>> index 0cc2a3b3d7f9..5431fbf8b6e0 100644
+>> --- a/drivers/net/ethernet/ti/am65-cpsw-qos.h
+>> +++ b/drivers/net/ethernet/ti/am65-cpsw-qos.h
+>> @@ -9,6 +9,7 @@
+>>  #include <net/pkt_sched.h>
+>>  
+>>  struct am65_cpsw_common;
+>> +struct am65_cpsw_port;
+>>  
+>>  struct am65_cpsw_est {
+>>  	int buf;
+>> @@ -16,6 +17,12 @@ struct am65_cpsw_est {
+>>  	struct tc_taprio_qopt_offload taprio;
+>>  };
+>>  
+>> +struct am65_cpsw_mqprio {
+>> +	struct tc_mqprio_qopt_offload mqprio_hw;
+>> +	u64 max_rate_total;
+>> +	unsigned shaper_en:1;
+> 
+> Perhaps 'bool' instead?
 
-For the fixes in this set:
+Thanks for the review. I'll fix them in next revision.
 
-Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
-
-Thanks for fixing these! - at it can lead to strange to debug cases.
---Jesper
+-- 
+cheers,
+-roger
 
