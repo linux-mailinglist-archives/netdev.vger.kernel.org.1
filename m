@@ -1,189 +1,135 @@
-Return-Path: <netdev+bounces-35270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35271-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53AB67A83FA
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 15:54:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 342147A8601
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 16:02:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEC66280FA9
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 13:54:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC467281E67
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 14:02:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F375538DEB;
-	Wed, 20 Sep 2023 13:54:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F30C3AC27;
+	Wed, 20 Sep 2023 14:02:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C05538DE3;
-	Wed, 20 Sep 2023 13:54:45 +0000 (UTC)
-Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 931DEAD;
-	Wed, 20 Sep 2023 06:54:43 -0700 (PDT)
-Received: by mail-qk1-x735.google.com with SMTP id af79cd13be357-773ae5d2b1fso377165685a.2;
-        Wed, 20 Sep 2023 06:54:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695218082; x=1695822882; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FVF06t7IZza16CFzCOJgQajEkOspYiDG67dNcLwWTqA=;
-        b=H8IMUrKBcPWPk4ZyKKQAIo53+W7GSRbli2+0RrSu45mmGdiBXKzJUVmExCnfV8SJQj
-         e7KaiyMUS6zi0rwLacOo5q6Ci8m6G4vmCt1D5Ti65ARS8+kiTjDe9fvAYOPhZIz1E5Ju
-         pSXx9rhxOJTfqcsCgoPMFCMGySTGiJevv59jo/icKKzuBj4zlMT9DGTHQC9GEKiMtdiJ
-         UPTOIlyL8OCPeM6HviFCM1xSGdY/XzRXnL4SNYd74IDaPBsQByMtfN3PBXDN7IWH/d+v
-         7rxsCqoDgiE/Yq94iwHh8WyODtXB0OLn1H5TwLpVgH2mKV2pXRVu4Qws5tgX7KlIAfue
-         gCpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695218082; x=1695822882;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=FVF06t7IZza16CFzCOJgQajEkOspYiDG67dNcLwWTqA=;
-        b=Zv/uA1jnTyquaVuldl2KvfbeB97Uh4vDBSbQZLsSycO1xXNz0C48v8tQ5Gb3RiRGxV
-         NGp855YFFuTBHvYhL2CTaicU8hkMmnk1UJIo94q+kXJn/MeJW3PFwEV8HUqkN0r9or2C
-         gyHHxpC8pjxGVpEhWN2K/hb28F4gMs3t1hzntdPGSh5fYjWXJWiUNja5qB439ARcX+Id
-         xhMXm+puKfUA7FuOd9C6xXGh5Bh/swCFZ3xE56E6U32mUqZSh6Ht5hhE7CYCmvpdJyKv
-         QHsp+EMzP11DzUOTN1uAdO2Dax1orQkj+DqEuwI6gb5sFdxcuuPBJ/GHVdg3NMWl+2SQ
-         CerA==
-X-Gm-Message-State: AOJu0Yz1HZJ54nGmlWZWecUbHO5Dy31sDVm/GOqIXIl6xtUeRfZ43heB
-	zrcihNbwOZDW0MZ1ggy7Y7cIzcSC+yw=
-X-Google-Smtp-Source: AGHT+IEF8xZCVveTfM6rspnqiBn7ZNNofTz733mxQ//7oM0FYPWLnypYaEAokeajcDlKDm96sVZ/ZA==
-X-Received: by 2002:a05:620a:1407:b0:76f:98c:3f05 with SMTP id d7-20020a05620a140700b0076f098c3f05mr2500850qkj.76.1695218082632;
-        Wed, 20 Sep 2023 06:54:42 -0700 (PDT)
-Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
-        by smtp.gmail.com with ESMTPSA id m10-20020ae9e00a000000b0076f35d17d06sm4812021qkk.69.2023.09.20.06.54.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Sep 2023 06:54:42 -0700 (PDT)
-Date: Wed, 20 Sep 2023 09:54:42 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: David Howells <dhowells@redhat.com>, 
- netdev@vger.kernel.org
-Cc: dhowells@redhat.com, 
- syzbot+62cbf263225ae13ff153@syzkaller.appspotmail.com, 
- Eric Dumazet <edumazet@google.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- David Ahern <dsahern@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- bpf@vger.kernel.org, 
- syzkaller-bugs@googlegroups.com, 
- linux-kernel@vger.kernel.org
-Message-ID: <650af9a2aa74_37bf362941f@willemb.c.googlers.com.notmuch>
-In-Reply-To: <108791.1695199151@warthog.procyon.org.uk>
-References: <108791.1695199151@warthog.procyon.org.uk>
-Subject: Re: [PATCH net v2] ipv4, ipv6: Fix handling of transhdrlen in
- __ip{,6}_append_data()
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3486F36B12
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 14:02:06 +0000 (UTC)
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24034D7;
+	Wed, 20 Sep 2023 07:02:03 -0700 (PDT)
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+	id 1qixmD-0004OH-7z; Wed, 20 Sep 2023 16:02:01 +0200
+Message-ID: <cd12622b-bfc6-093d-5c10-493e10935440@leemhuis.info>
+Date: Wed, 20 Sep 2023 16:02:00 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: hci_sync: Fix handling of
+ HCI_QUIRK_STRICT_DUPLICATE_FILTER
+Content-Language: en-US, de-DE
+From: Thorsten Leemhuis <regressions@leemhuis.info>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Linux regressions mailing list <regressions@lists.linux.dev>,
+ patchwork-bot+bluetooth@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev <netdev@vger.kernel.org>, Stefan Agner <stefan@agner.ch>
+References: <20230829205936.766544-1-luiz.dentz@gmail.com>
+ <169343402479.21564.11565149320234658166.git-patchwork-notify@kernel.org>
+ <de698d06-9784-43ed-9437-61d6edf9672b@leemhuis.info>
+ <CABBYNZK2PPkLra8Au-fdN2nG2YLkfFRmPtEPQL0suLzBv=HHcA@mail.gmail.com>
+ <574ca8dd-ee97-4c8b-a154-51faf83cabdf@leemhuis.info>
+ <CABBYNZJ=5VH2+my7Gw1fMCaGgdOQfbWNtBGOc27_XQqCP7jD-A@mail.gmail.com>
+ <ff2abfbe-a46b-414b-a757-8185495838b7@leemhuis.info>
+In-Reply-To: <ff2abfbe-a46b-414b-a757-8185495838b7@leemhuis.info>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1695218523;629cc3e1;
+X-HE-SMSGID: 1qixmD-0004OH-7z
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-David Howells wrote:
-> Including the transhdrlen in length is a problem when the packet is
-> partially filled (e.g. something like send(MSG_MORE) happened previously)
-> when appending to an IPv4 or IPv6 packet as we don't want to repeat the
-> transport header or account for it twice.  This can happen under some
-> circumstances, such as splicing into an L2TP socket.
-> 
-> The symptom observed is a warning in __ip6_append_data():
-> 
->     WARNING: CPU: 1 PID: 5042 at net/ipv6/ip6_output.c:1800 __ip6_append_data.isra.0+0x1be8/0x47f0 net/ipv6/ip6_output.c:1800
-> 
-> that occurs when MSG_SPLICE_PAGES is used to append more data to an already
-> partially occupied skbuff.  The warning occurs when 'copy' is larger than
-> the amount of data in the message iterator.  This is because the requested
-> length includes the transport header length when it shouldn't.  This can be
-> triggered by, for example:
-> 
->         sfd = socket(AF_INET6, SOCK_DGRAM, IPPROTO_L2TP);
->         bind(sfd, ...); // ::1
->         connect(sfd, ...); // ::1 port 7
->         send(sfd, buffer, 4100, MSG_MORE);
->         sendfile(sfd, dfd, NULL, 1024);
-> 
-> Fix this by deducting transhdrlen from length in ip{,6}_append_data() right
-> before we clear transhdrlen if there is already a packet that we're going
-> to try appending to.
-> 
-> Reported-by: syzbot+62cbf263225ae13ff153@syzkaller.appspotmail.com
-> Link: https://lore.kernel.org/r/0000000000001c12b30605378ce8@google.com/
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Eric Dumazet <edumazet@google.com>
-> cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-> cc: "David S. Miller" <davem@davemloft.net>
-> cc: David Ahern <dsahern@kernel.org>
-> cc: Paolo Abeni <pabeni@redhat.com>
-> cc: Jakub Kicinski <kuba@kernel.org>
-> cc: netdev@vger.kernel.org
-> cc: bpf@vger.kernel.org
-> cc: syzkaller-bugs@googlegroups.com
-> Link: https://lore.kernel.org/r/75315.1695139973@warthog.procyon.org.uk/ # v1
-> ---
->  net/ipv4/ip_output.c  |    1 +
->  net/ipv6/ip6_output.c |    1 +
->  2 files changed, 2 insertions(+)
-> 
-> diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-> index 4ab877cf6d35..9646f2d9afcf 100644
-> --- a/net/ipv4/ip_output.c
-> +++ b/net/ipv4/ip_output.c
-> @@ -1354,6 +1354,7 @@ int ip_append_data(struct sock *sk, struct flowi4 *fl4,
->  		if (err)
->  			return err;
->  	} else {
-> +		length -= transhdrlen;
->  		transhdrlen = 0;
->  	}
->  
-> diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-> index 54fc4c711f2c..6a4ce7f622e9 100644
-> --- a/net/ipv6/ip6_output.c
-> +++ b/net/ipv6/ip6_output.c
-> @@ -1888,6 +1888,7 @@ int ip6_append_data(struct sock *sk,
->  		length += exthdrlen;
->  		transhdrlen += exthdrlen;
->  	} else {
-> +		length -= transhdrlen;
->  		transhdrlen = 0;
->  	}
->  
+Hi, Thorsten here, the Linux kernel's regression tracker. Top-posting
+for once, to make this easily accessible to everyone.
 
-Definitely a much simpler patch, thanks.
+@Luiz Augusto von Dentz: did you make any progress to get this into net
+to make sure this rather sooner then later heads to mainline? Doesn't
+looks like it from here, but maybe I'm missing something.
 
-So the current model is that callers with non-zero transhdrlen always
-pass to __ip_append_data payload length + transhdrlen.
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+--
+Everything you wanna know about Linux kernel regression tracking:
+https://linux-regtracking.leemhuis.info/about/#tldr
+If I did something stupid, please tell me, as explained on that page.
 
-I do see that udp does this: ulen += sizeof(struct udphdr); This calls
-ip_make_skb if not corked, but directly ip_append_data if corked.
+#regzbot poke
 
-Then __ip_append_data will use transhdrlen in its packet calculations,
-and reset that to zero after allocating the first new skb.
 
-So if corked *and* fragmentation, which would cause a new skb to be
-allocated, the next skb would incorrectly reserve udp header space,
-because the second __ip_append_data call will again pass transhdrlen.
-If so, then this patch fixes that. But that has never been reported,
-so I'm most likely misreading some part..
-
-So on the surface this makes sense to me. But I need to read it more
-closely still. The most risk-averse version would limit this change
-explicitly to MSG_SPLICE_PAGES calls.
-
-FWIW I think MSG_ZEROCOPY is somewhat immune compared to
-MSG_SPLCE_PAGES solely because it is limited to TCP, UDP and RDS
-sockets.
+On 14.09.23 20:08, Thorsten Leemhuis wrote:
+> On 14.09.23 19:51, Luiz Augusto von Dentz wrote:
+>> On Wed, Sep 13, 2023 at 10:13 PM Thorsten Leemhuis
+>> <regressions@leemhuis.info> wrote:
+>>> On 12.09.23 21:09, Luiz Augusto von Dentz wrote:
+>>>> On Mon, Sep 11, 2023 at 6:40 AM Linux regression tracking (Thorsten
+>>>> Leemhuis) <regressions@leemhuis.info> wrote:
+>>>>> On 31.08.23 00:20, patchwork-bot+bluetooth@kernel.org wrote:
+>>>>>> This patch was applied to bluetooth/bluetooth-next.git (master)
+>>>>>> by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+>>>>>> On Tue, 29 Aug 2023 13:59:36 -0700 you wrote:
+>>>>>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>>>>>>
+>>>>>>> When HCI_QUIRK_STRICT_DUPLICATE_FILTER is set LE scanning requires
+>>>>>>> periodic restarts of the scanning procedure as the controller would
+>>>>>>> consider device previously found as duplicated despite of RSSI changes,
+>>>>>>> but in order to set the scan timeout properly set le_scan_restart needs
+>>>>>>> to be synchronous so it shall not use hci_cmd_sync_queue which defers
+>>>>>>> the command processing to cmd_sync_work.
+>>>>>>> [...]
+>>>>>>
+>>>>>> Here is the summary with links:
+>>>>>>   - Bluetooth: hci_sync: Fix handling of HCI_QUIRK_STRICT_DUPLICATE_FILTER
+>>>>>>     https://git.kernel.org/bluetooth/bluetooth-next/c/52bf4fd43f75
+>>>>>
+>>>>> That is (maybe among others?) a fix for a regression from 6.1, so why
+>>>>> was this merged into a "for-next" branch instead of a branch that
+>>>>> targets the current cycle?
+>> [...]
+>>> That answer doesn't answer the question afaics, as both 6.1 and 6.4 were
+>>> released in the past year -- the fix thus should not wait till the next
+>>> merge window, unless it's high risk or something. See this statement
+>>> from Linus:
+>>> https://lore.kernel.org/all/CAHk-=wis_qQy4oDNynNKi5b7Qhosmxtoj1jxo5wmB6SRUwQUBQ@mail.gmail.com/
+>> Thanks for the feedback, I will try to push fixes to net more often.
+> 
+> Great, many thx!
+> 
+>>>> but I could probably have it marked for stable just
+>>>> to make sure it would get backported to affected versions.
+>>> That would be great, too!
+>> Well now that it has already been merged via -next tree shall we still
+>> attempt to mark it as stable? Perhaps we need to check if it was not
+>> backported already based on the Fixes tag.
+> 
+> Changes only get backported once they hit mainline, which hasn't
+> happened yet. And to get them into the net branch (and from there to
+> mainline) a new commit is needed anyway, so you might as well add the
+> stable tag to it. Side note: And don't worry that identical commit is
+> already in -next, git handles that well afaik (but if you rebase
+> bluetooth-next for other reasons anyway you might as well remove it).
+> 
+> Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+> --
+> Everything you wanna know about Linux kernel regression tracking:
+> https://linux-regtracking.leemhuis.info/about/#tldr
+> If I did something stupid, please tell me, as explained on that page.
 
