@@ -1,152 +1,130 @@
-Return-Path: <netdev+bounces-35154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 708947A75D8
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 10:27:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95A3C7A75F4
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 10:36:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 100D02819B5
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 08:27:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49D35281E6A
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 08:36:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB7411097C;
-	Wed, 20 Sep 2023 08:27:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFE3B8494;
+	Wed, 20 Sep 2023 08:36:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39DE1FBE6
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 08:27:37 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E8EC90
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 01:27:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695198456; x=1726734456;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=mugEMfEi1I77BlKEzCqJcYcb+pIhWsiKW9tX8FiEGkA=;
-  b=GjBFlg60e22fP6fKg3i8A7Wtl4+6TeNhgVnrM75PJ3uFt0Jf+hMTqsj8
-   fgw35/9oUpxZIMAPSlSfFttDxIbThTA+wmFFSvazD1eWuTwcPtXy+Au8v
-   Vm7415OMnIKhxZtpGvdH50HUbj5IzVPg9rZ5wQUdhwkWcu43APgiz4lpY
-   6IcRDBh7LrvvdRnUWzhWwe5lUQxHJWM46v7PjNrK20w8361dsJXwVG0zu
-   BWilKfwOFWoDjwbsg95eGAL/je1rdUoyemb2qtLBEJwD6v6ebchleQpXs
-   1HEBA90e/EdjV1XvSN4CjdXOHUiB/lM0iVzYNtTaFBJd08YDCrUlL2SCO
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10838"; a="370476830"
-X-IronPort-AV: E=Sophos;i="6.02,161,1688454000"; 
-   d="scan'208";a="370476830"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2023 01:27:34 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10838"; a="775902663"
-X-IronPort-AV: E=Sophos;i="6.02,161,1688454000"; 
-   d="scan'208";a="775902663"
-Received: from naamamex-mobl.ger.corp.intel.com (HELO [10.214.192.216]) ([10.214.192.216])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2023 01:27:32 -0700
-Message-ID: <6da7388a-45f2-b705-af74-f493dc301b52@linux.intel.com>
-Date: Wed, 20 Sep 2023 11:27:24 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B03E3D64
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 08:36:05 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D55BFB0
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 01:36:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1695198963;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fyO783HFK2K9KUO8v9jboxC20XyrMbrsezvU6yX9E9k=;
+	b=RRQlm9P81vuGXOTgcp9KBNCU9WvgeexmFh+kPkWRHnWyKmr6rF6QhPmh3Tby0SAooS+x5v
+	chlpuwLPHNG3m//Ld/Z6DOJcMqsI4MRyQbnVM94Emd6AEG045u7k7jyuJwavF1MTnLxg/L
+	6mjNoD1V4M0DpZMlmWvj2xnUmd13tqE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-185-W7EXuqRtMya6E5jYoYDVdw-1; Wed, 20 Sep 2023 04:35:59 -0400
+X-MC-Unique: W7EXuqRtMya6E5jYoYDVdw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 07DAE811E7B;
+	Wed, 20 Sep 2023 08:35:59 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.216])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 9792640C6EBF;
+	Wed, 20 Sep 2023 08:35:57 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <CAF=yD-+kRXmwuKHVrUUL6oBPhWiPKucm_5-Y+YM==9Bp3DQiGQ@mail.gmail.com>
+References: <CAF=yD-+kRXmwuKHVrUUL6oBPhWiPKucm_5-Y+YM==9Bp3DQiGQ@mail.gmail.com> <75315.1695139973@warthog.procyon.org.uk>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: dhowells@redhat.com, netdev@vger.kernel.org,
+    syzbot+62cbf263225ae13ff153@syzkaller.appspotmail.com,
+    Eric Dumazet <edumazet@google.com>,
+    "David S. Miller" <davem@davemloft.net>,
+    David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+    Jakub Kicinski <kuba@kernel.org>, bpf@vger.kernel.org,
+    syzkaller-bugs@googlegroups.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] ipv4, ipv6: Fix handling of transhdrlen in __ip{,6}_append_data()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH iwl-net v5] igc: Expose tx-usecs coalesce setting to user
-To: Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>,
- intel-wired-lan@osuosl.org
-Cc: sasha.neftin@intel.com, bcreeley@amd.com, horms@kernel.org,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, anthony.l.nguyen@intel.com,
- husainizulkifli@gmail.com
-References: <20230908081734.28205-1-muhammad.husaini.zulkifli@intel.com>
-Content-Language: en-US
-From: "naamax.meir" <naamax.meir@linux.intel.com>
-In-Reply-To: <20230908081734.28205-1-muhammad.husaini.zulkifli@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <108653.1695198956.1@warthog.procyon.org.uk>
+Date: Wed, 20 Sep 2023 09:35:56 +0100
+Message-ID: <108654.1695198956@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 9/8/2023 11:17, Muhammad Husaini Zulkifli wrote:
-> When users attempt to obtain the coalesce setting using the
-> ethtool command, current code always returns 0 for tx-usecs.
-> This is because I225/6 always uses a queue pair setting, hence
-> tx_coalesce_usecs does not return a value during the
-> igc_ethtool_get_coalesce() callback process. The pair queue
-> condition checking in igc_ethtool_get_coalesce() is removed by
-> this patch so that the user gets information of the value of tx-usecs.
-> 
-> Even if i225/6 is using queue pair setting, there is no harm in
-> notifying the user of the tx-usecs. The implementation of the current
-> code may have previously been a copy of the legacy code i210.
-> Since I225 has the queue pair setting enabled, tx-usecs will always adhere
-> to the user-set rx-usecs value. An error message will appear when the user
-> attempts to set the tx-usecs value for the input parameters because,
-> by default, they should only set the rx-usecs value.
-> 
-> This patch also adds the helper function to get the
-> previous rx coalesce value similar to tx coalesce.
-> 
-> How to test:
-> User can get the coalesce value using ethtool command.
-> 
-> Example command:
-> Get: ethtool -c <interface>
-> 
-> Previous output:
-> 
-> rx-usecs: 3
-> rx-frames: n/a
-> rx-usecs-irq: n/a
-> rx-frames-irq: n/a
-> 
-> tx-usecs: 0
-> tx-frames: n/a
-> tx-usecs-irq: n/a
-> tx-frames-irq: n/a
-> 
-> New output:
-> 
-> rx-usecs: 3
-> rx-frames: n/a
-> rx-usecs-irq: n/a
-> rx-frames-irq: n/a
-> 
-> tx-usecs: 3
-> tx-frames: n/a
-> tx-usecs-irq: n/a
-> tx-frames-irq: n/a
-> 
-> Fixes: 8c5ad0dae93c ("igc: Add ethtool support")
-> Signed-off-by: Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>
-> Tested-by: Naama Meir <naamax.meir@linux.intel.com>
-> ---
-> V4 -> V5:
-> - Squash patch for set/get together as recommended by Jakub.
-> - Fix unstabilize value when user insert both tx and rx params
-> together.
-> - Add error message for unsupported config.
-> 
-> V3 -> V4:
-> - Implement the helper function, as recommended by Brett Creely.
-> - Fix typo in cover letter.
-> 
-> V2 -> V3:
-> - Refactor the code, as Simon suggested, to make it more readable.
-> 
-> V1 -> V2:
-> - Split the patch file into two, like Anthony suggested.
-> ---
->   drivers/net/ethernet/intel/igc/igc_ethtool.c | 31 ++++++++++++--------
->   1 file changed, 19 insertions(+), 12 deletions(-)
+Willem de Bruijn <willemdebruijn.kernel@gmail.com> wrote:
 
-Tested-by: Naama Meir <naamax.meir@linux.intel.com>
+> The proposed fix is non-trivial, and changes not just the new path
+> that observes the issue (MSG_SPLICE_PAGES), but also the other more
+> common paths that exercise __ip6_append_data.
+
+I realise that.  I broke ping/ping6 briefly, but I corrected that (I
+subtracted the ICMP header len from length after copying it out, but forgot
+that it needed adding back on for the return value of sendmsg()).  But I don't
+think there are that many callers - however, you might be right that this is
+too big for a fix.
+
+> There is significant risk to introduce an unintended side effect
+> requiring a follow-up fix. Because this function is notoriously
+> complex, multiplexing a lot of behavior: with and without transport
+> headers, edge cases like fragmentation, MSG_MORE, absence of
+> scatter-gather, ....
+
+The problem is that the bug isn't in __ip{,6}_append_data(), I think, it's
+actually higher up in ip{,6}_append_data().  I think I see *why* length has
+transhdrlen handed into it: because ping and raw sockets come with that
+pre-added-in by userspace.
+
+I would actually like to eliminate the length argument entirely and use the
+length in the iterator - but that doesn't work in all cases as sometimes there
+isn't a msghdr struct.  (And, besides, that's too big a change for a fix).
+
+I think the simplest fix, then, is just to make ip{,6}_append_data() subtract
+transhdrlen from length before clearing transhdrlen when there's already a
+packet in the queue from MSG_MORE/cork that will be appended to.
+
+> Does the issue discovered only affect MSG_SPLICE_PAGES or can it
+> affect other paths too? If the first, it possible to create a more
+> targeted fix that can trivially be seen to not affect code prior to
+> introduction of splice pages?
+
+It may also affect MSG_ZEROCOPY in interesting ways.  msg_zerocopy_realloc()
+looks suspicious as it does things with 'size' bytes from the buffer that
+doesn't have 'size' bytes of data in it (because size (aka length) includes
+transhdrlen).
+
+I would guess that we don't notice issues with ping sockets because people
+don't often use MSG_MORE/corking with them.
+
+Raw sockets shouldn't exhibit this bug as they set transhdrlen to 0 up front,
+but I can't help but wonder what the consequences are as some bits of
+__ip*_append_data() change behaviour if they see transhdrlen==0 :-/
+
+David
+
 
