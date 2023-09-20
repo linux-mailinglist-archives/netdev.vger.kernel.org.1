@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-35346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B11B97A8F6C
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 00:29:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 74B7A7A8F6D
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 00:30:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C93441C20DCA
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 22:29:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 661CE1C2090F
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 22:30:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A401D42BF8;
-	Wed, 20 Sep 2023 22:23:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8024642C04;
+	Wed, 20 Sep 2023 22:23:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1069142BF3
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 22:23:10 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B799133
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 15:23:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A80D642BF3
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 22:23:13 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3033E13E
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 15:23:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1695248587;
+	s=mimecast20190719; t=1695248591;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=OEnm3txfdKWMLGG8rrdFEcQBV2WWgkp8Kq4P7DhBB1I=;
-	b=aO/FoQF2sM4PM3nGORqn6Iu81pVupYAZXw/mxS+EoNYXm6Xzu6yh75Va/mQcgJIC/eh9Ej
-	mM29kASihj5hnmb9dfEuKuQ4OloOsPep82h1keQnGheVkiJXMIGQ5I3qv2AH29jyxmbB9y
-	XcQPqmVH4PBSYWXUdGlo0Hw2KJLPE6c=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-148-qZGJ1yNoPOih4A5wVhP7UQ-1; Wed, 20 Sep 2023 18:23:04 -0400
-X-MC-Unique: qZGJ1yNoPOih4A5wVhP7UQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	bh=qT59ImjpXymvQ6tFUMHWEUo8+jWIxsSglDsUCxtrSao=;
+	b=WWOW/mwYQR/DCRrRodyOThwIcyAm7lLVxChswFtQlRCdXwsQo0os8InlsUatnXvVoPwPTu
+	in8FcRNwvSMx/SlgMeOvyI8cfS3O41RtWXbovEvmGKrCezK5hq72HM4DRJ1MVVHvVi53i+
+	oZDyfoJ/FOeesJ779F+zAY+C2Hj0rTE=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-647-5dIXQ-LFOyWTHqsMcxPB4w-1; Wed, 20 Sep 2023 18:23:07 -0400
+X-MC-Unique: 5dIXQ-LFOyWTHqsMcxPB4w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9CC29800883;
-	Wed, 20 Sep 2023 22:23:03 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4AC303C0D183;
+	Wed, 20 Sep 2023 22:23:06 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.216])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 941A0492C37;
-	Wed, 20 Sep 2023 22:23:01 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4231E40C6EBF;
+	Wed, 20 Sep 2023 22:23:04 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: David Howells <dhowells@redhat.com>,
@@ -63,9 +63,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH v5 10/11] iov_iter, net: Merge csum_and_copy_from_iter{,_full}() together
-Date: Wed, 20 Sep 2023 23:22:30 +0100
-Message-ID: <20230920222231.686275-11-dhowells@redhat.com>
+Subject: [PATCH v5 11/11] iov_iter, net: Move hash_and_copy_to_iter() to net/
+Date: Wed, 20 Sep 2023 23:22:31 +0100
+Message-ID: <20230920222231.686275-12-dhowells@redhat.com>
 In-Reply-To: <20230920222231.686275-1-dhowells@redhat.com>
 References: <20230920222231.686275-1-dhowells@redhat.com>
 Precedence: bulk
@@ -75,16 +75,16 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Spam-Status: No, score=1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,RCVD_IN_SBL_CSS,SPF_HELO_NONE,
+	SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Move csum_and_copy_from_iter_full() out of line and then merge
-csum_and_copy_from_iter() into its only caller.
+Move hash_and_copy_to_iter() to be with its only caller in networking code.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Alexander Viro <viro@zeniv.linux.org.uk>
@@ -103,87 +103,97 @@ cc: linux-fsdevel@vger.kernel.org
 cc: linux-mm@kvack.org
 cc: netdev@vger.kernel.org
 ---
- include/linux/skbuff.h | 19 ++-----------------
- net/core/datagram.c    |  5 +++++
- net/core/skbuff.c      | 20 +++++++++++++-------
- 3 files changed, 20 insertions(+), 24 deletions(-)
+ include/linux/uio.h |  3 ---
+ lib/iov_iter.c      | 20 --------------------
+ net/core/datagram.c | 19 +++++++++++++++++++
+ 3 files changed, 19 insertions(+), 23 deletions(-)
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index c81ef5d76953..be402f55f6d6 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -3679,23 +3679,8 @@ static inline int __must_check skb_put_padto(struct sk_buff *skb, unsigned int l
- 	return __skb_put_padto(skb, len, true);
+diff --git a/include/linux/uio.h b/include/linux/uio.h
+index 0cf9937f98d3..442d0d238207 100644
+--- a/include/linux/uio.h
++++ b/include/linux/uio.h
+@@ -341,9 +341,6 @@ iov_iter_npages_cap(struct iov_iter *i, int maxpages, size_t max_bytes)
+ 	return npages;
  }
  
--struct csum_state {
--	__wsum csum;
--	size_t off;
--};
+-size_t hash_and_copy_to_iter(const void *addr, size_t bytes, void *hashp,
+-		struct iov_iter *i);
 -
--size_t csum_and_copy_from_iter(void *addr, size_t bytes, __wsum *csum, struct iov_iter *i);
--
--static __always_inline __must_check
--bool csum_and_copy_from_iter_full(void *addr, size_t bytes,
--				  __wsum *csum, struct iov_iter *i)
--{
--	size_t copied = csum_and_copy_from_iter(addr, bytes, csum, i);
--	if (likely(copied == bytes))
--		return true;
--	iov_iter_revert(i, copied);
--	return false;
--}
-+bool csum_and_copy_from_iter_full(void *addr, size_t bytes, __wsum *csum, struct iov_iter *i)
-+	__must_check;
+ struct iovec *iovec_from_user(const struct iovec __user *uvector,
+ 		unsigned long nr_segs, unsigned long fast_segs,
+ 		struct iovec *fast_iov, bool compat);
+diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+index fef934a8745d..2547c96d56c7 100644
+--- a/lib/iov_iter.c
++++ b/lib/iov_iter.c
+@@ -1,5 +1,4 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+-#include <crypto/hash.h>
+ #include <linux/export.h>
+ #include <linux/bvec.h>
+ #include <linux/fault-inject-usercopy.h>
+@@ -1093,25 +1092,6 @@ ssize_t iov_iter_get_pages_alloc2(struct iov_iter *i,
+ }
+ EXPORT_SYMBOL(iov_iter_get_pages_alloc2);
  
- static inline int skb_add_data(struct sk_buff *skb,
- 			       struct iov_iter *from, int copy)
+-size_t hash_and_copy_to_iter(const void *addr, size_t bytes, void *hashp,
+-		struct iov_iter *i)
+-{
+-#ifdef CONFIG_CRYPTO_HASH
+-	struct ahash_request *hash = hashp;
+-	struct scatterlist sg;
+-	size_t copied;
+-
+-	copied = copy_to_iter(addr, bytes, i);
+-	sg_init_one(&sg, addr, copied);
+-	ahash_request_set_crypt(hash, &sg, NULL, copied);
+-	crypto_ahash_update(hash);
+-	return copied;
+-#else
+-	return 0;
+-#endif
+-}
+-EXPORT_SYMBOL(hash_and_copy_to_iter);
+-
+ static int iov_npages(const struct iov_iter *i, int maxpages)
+ {
+ 	size_t skip = i->iov_offset, size = i->count;
 diff --git a/net/core/datagram.c b/net/core/datagram.c
-index 452620dd41e4..722311eeee18 100644
+index 722311eeee18..103d46fa0eeb 100644
 --- a/net/core/datagram.c
 +++ b/net/core/datagram.c
-@@ -738,6 +738,11 @@ size_t memcpy_to_iter_csum(void *iter_to, size_t progress,
+@@ -61,6 +61,7 @@
+ #include <net/tcp_states.h>
+ #include <trace/events/skb.h>
+ #include <net/busy_poll.h>
++#include <crypto/hash.h>
+ 
+ /*
+  *	Is a socket 'connection oriented' ?
+@@ -489,6 +490,24 @@ static int __skb_datagram_iter(const struct sk_buff *skb, int offset,
  	return 0;
  }
  
-+struct csum_state {
-+	__wsum csum;
-+	size_t off;
-+};
-+
- static size_t csum_and_copy_to_iter(const void *addr, size_t bytes, void *_csstate,
- 				    struct iov_iter *i)
- {
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 3efed86321db..2bfa6a7ba244 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -6955,13 +6955,19 @@ size_t copy_from_user_iter_csum(void __user *iter_from, size_t progress,
- 	return next ? 0 : len;
- }
- 
--size_t csum_and_copy_from_iter(void *addr, size_t bytes, __wsum *csum,
--			       struct iov_iter *i)
-+bool csum_and_copy_from_iter_full(void *addr, size_t bytes,
-+				  __wsum *csum, struct iov_iter *i)
- {
++static size_t hash_and_copy_to_iter(const void *addr, size_t bytes, void *hashp,
++				    struct iov_iter *i)
++{
++#ifdef CONFIG_CRYPTO_HASH
++	struct ahash_request *hash = hashp;
++	struct scatterlist sg;
 +	size_t copied;
 +
- 	if (WARN_ON_ONCE(!i->data_source))
--		return 0;
--	return iterate_and_advance2(i, bytes, addr, csum,
--				    copy_from_user_iter_csum,
--				    memcpy_from_iter_csum);
-+		return false;
-+	copied = iterate_and_advance2(i, bytes, addr, csum,
-+				      copy_from_user_iter_csum,
-+				      memcpy_from_iter_csum);
-+	if (likely(copied == bytes))
-+		return true;
-+	iov_iter_revert(i, copied);
-+	return false;
- }
--EXPORT_SYMBOL(csum_and_copy_from_iter);
-+EXPORT_SYMBOL(csum_and_copy_from_iter_full);
++	copied = copy_to_iter(addr, bytes, i);
++	sg_init_one(&sg, addr, copied);
++	ahash_request_set_crypt(hash, &sg, NULL, copied);
++	crypto_ahash_update(hash);
++	return copied;
++#else
++	return 0;
++#endif
++}
++
+ /**
+  *	skb_copy_and_hash_datagram_iter - Copy datagram to an iovec iterator
+  *          and update a hash.
 
 
