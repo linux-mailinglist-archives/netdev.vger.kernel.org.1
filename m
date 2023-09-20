@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-35219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96FE97A7AAE
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 13:44:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7D357A7AB9
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 13:45:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BB621C20994
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 11:44:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69771281782
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 11:45:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F37728E00;
-	Wed, 20 Sep 2023 11:44:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12C412AB4E;
+	Wed, 20 Sep 2023 11:44:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 435C718654
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7742018657
 	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 11:44:06 +0000 (UTC)
 Received: from phobos.denx.de (phobos.denx.de [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDAA7C2;
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDC15CA;
 	Wed, 20 Sep 2023 04:44:02 -0700 (PDT)
 Received: from localhost.localdomain (85-222-111-42.dynamic.chello.pl [85.222.111.42])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
 	(No client certificate requested)
 	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 707C6868D1;
-	Wed, 20 Sep 2023 13:43:58 +0200 (CEST)
+	by phobos.denx.de (Postfix) with ESMTPSA id 2B680869D8;
+	Wed, 20 Sep 2023 13:43:59 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
 	s=phobos-20191101; t=1695210239;
-	bh=wF48erZR6turOA3H1N7RgF/MSbbCoV3fPvoqpc+H5xI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=axHObFBPvaEc0AggMBm0AhfpWgIJYOP92YPWpkSyIHUdBFcMG2PLWJxpcPXj67F+Y
-	 hvUBa3RIOmpL4JeOY+E1huato09UzTIBPrhgEKpe5UPXgGU9UsJbs7ocYDUHpht4sg
-	 mv1VuvKHZVkkDAEOz26HPNFIhHoRHKr9J+F+RD+UDjiCFqMq78kjvGLO98JmfCVevy
-	 sEjEc776lZHEGfABbGLQPARtu07ujCSoRi8bczLJP1R+Us8j0ePcZK1Ho4TLzd9t4b
-	 9LwcdNGy9MqcYkI5eQsiJ4cz8UcbjOzqZx5uwz8N6l5k7MAhv+RV/bW9uvmUqx1c40
-	 mCmvwUjGUW7FA==
+	bh=a27Qd0klI7urEwzTbYsg6zbStIHc7hpeFCkLWtI2Lp4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=VHu3ngdxw7TatYp8W4GqkkEJVyrlpfOV9hUEIxyLmCfKTe8ZJyUYZu8uTtQuIvKyV
+	 Cuzx5ZPpivHeJnCdQ55/4nt6gfpohYot1ZBrqhzg97KH+ti8FoDKj5vhaU+EPIoXb7
+	 yzBE7g1dtHQH+8a8Lsre0H1zmsCE9Gycx2FRDO6d/NnVoRxVY3/9zDDwojBpR+HabY
+	 0D2eFrB5WxNB1j4QdLfWwXCCTzMranX/lUZlM/eTT/KzoNxBrFb7KbtOldUjw9BuEI
+	 UAkn9OGsI9CoHlpjoFEcIpkbCOjevbr9JG96owSGWPo8VUvR2PL6J398f66VaafO2q
+	 ZspxDmJRoqnUg==
 From: Lukasz Majewski <lukma@denx.de>
 To: Tristram.Ha@microchip.com,
 	Eric Dumazet <edumazet@google.com>,
@@ -51,11 +51,14 @@ Cc: Florian Fainelli <f.fainelli@gmail.com>,
 	UNGLinuxDriver@microchip.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
 	Lukasz Majewski <lukma@denx.de>
-Subject: [PATCH v5 net-next 0/5] net: dsa: hsr: Enable HSR HW offloading for KSZ9477
-Date: Wed, 20 Sep 2023 13:43:38 +0200
-Message-Id: <20230920114343.1979843-1-lukma@denx.de>
+Subject: [PATCH v5 net-next 1/5] net: dsa: propagate extack to ds->ops->port_hsr_join()
+Date: Wed, 20 Sep 2023 13:43:39 +0200
+Message-Id: <20230920114343.1979843-2-lukma@denx.de>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230920114343.1979843-1-lukma@denx.de>
+References: <20230920114343.1979843-1-lukma@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,63 +74,136 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This patch series provides support for HSR HW offloading in KSZ9477
-switch IC.
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-To test this feature:
-ip link add name hsr0 type hsr slave1 lan1 slave2 lan2 supervision 45 version 1
-ip link set dev lan1 up
-ip link set dev lan2 up
-ip a add 192.168.0.1/24 dev hsr0
-ip link set dev hsr0 up
+Drivers can provide meaningful error messages which state a reason why
+they can't perform an offload, and dsa_slave_changeupper() already has
+the infrastructure to propagate these over netlink rather than printing
+to the kernel log. So pass the extack argument and modify the xrs700x
+driver's port_hsr_join() prototype.
 
-To remove HSR network device:
-ip link del hsr0
+Also take the opportunity and use the extack for the 2 -EOPNOTSUPP cases
+from xrs700x_hsr_join().
 
-To test if one can adjust MAC address:
-ip link set lan2 address 00:01:02:AA:BB:CC
+Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Signed-off-by: Lukasz Majewski <lukma@denx.de>
 
-It is also possible to create another HSR interface, but it will
-only support HSR is software - e.g.
-ip link add name hsr1 type hsr slave1 lan3 slave2 lan4 supervision 45 version 1
+---
+Changes for v5:
+- New patch
+---
+ drivers/net/dsa/xrs700x/xrs700x.c | 18 ++++++++++++------
+ include/net/dsa.h                 |  3 ++-
+ net/dsa/port.c                    |  5 +++--
+ net/dsa/port.h                    |  3 ++-
+ net/dsa/slave.c                   |  2 +-
+ 5 files changed, 20 insertions(+), 11 deletions(-)
 
-Test HW:
-Two KSZ9477-EVB boards with HSR ports set to "Port1" and "Port2".
-
-Performance SW used:
-nuttcp -S --nofork
-nuttcp -vv -T 60 -r 192.168.0.2
-nuttcp -vv -T 60 -t 192.168.0.2
-
-Code: v6.6.0-rc1+ Linux repository
-Tested HSR v0 and v1
-Results:
-With KSZ9477 offloading support added: RX: 100 Mbps TX: 98 Mbps
-With no offloading 		       RX: 63 Mbps  TX: 63 Mbps
-
-Lukasz Majewski (2):
-  net: dsa: tag_ksz: Extend ksz9477_xmit() for HSR frame duplication
-  net: dsa: microchip: Enable HSR offloading for KSZ9477
-
-Vladimir Oltean (3):
-  net: dsa: propagate extack to ds->ops->port_hsr_join()
-  net: dsa: notify drivers of MAC address changes on user ports
-  net: dsa: microchip: move REG_SW_MAC_ADDR to dev->info->regs[]
-
- drivers/net/dsa/microchip/ksz8795_reg.h |   7 --
- drivers/net/dsa/microchip/ksz9477.c     |  70 +++++++++++
- drivers/net/dsa/microchip/ksz9477.h     |   2 +
- drivers/net/dsa/microchip/ksz9477_reg.h |   7 --
- drivers/net/dsa/microchip/ksz_common.c  | 149 ++++++++++++++++++++++++
- drivers/net/dsa/microchip/ksz_common.h  |  10 ++
- drivers/net/dsa/xrs700x/xrs700x.c       |  18 ++-
- include/net/dsa.h                       |  13 ++-
- net/dsa/port.c                          |   5 +-
- net/dsa/port.h                          |   3 +-
- net/dsa/slave.c                         |   9 +-
- net/dsa/tag_ksz.c                       |   8 ++
- 12 files changed, 276 insertions(+), 25 deletions(-)
-
+diff --git a/drivers/net/dsa/xrs700x/xrs700x.c b/drivers/net/dsa/xrs700x/xrs700x.c
+index 753fef757f11..5b02e9e426fd 100644
+--- a/drivers/net/dsa/xrs700x/xrs700x.c
++++ b/drivers/net/dsa/xrs700x/xrs700x.c
+@@ -548,7 +548,8 @@ static void xrs700x_bridge_leave(struct dsa_switch *ds, int port,
+ }
+ 
+ static int xrs700x_hsr_join(struct dsa_switch *ds, int port,
+-			    struct net_device *hsr)
++			    struct net_device *hsr,
++			    struct netlink_ext_ack *extack)
+ {
+ 	unsigned int val = XRS_HSR_CFG_HSR_PRP;
+ 	struct dsa_port *partner = NULL, *dp;
+@@ -562,16 +563,21 @@ static int xrs700x_hsr_join(struct dsa_switch *ds, int port,
+ 	if (ret)
+ 		return ret;
+ 
+-	/* Only ports 1 and 2 can be HSR/PRP redundant ports. */
+-	if (port != 1 && port != 2)
++	if (port != 1 && port != 2) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "Only ports 1 and 2 can offload HSR/PRP");
+ 		return -EOPNOTSUPP;
++	}
+ 
+-	if (ver == HSR_V1)
++	if (ver == HSR_V1) {
+ 		val |= XRS_HSR_CFG_HSR;
+-	else if (ver == PRP_V1)
++	} else if (ver == PRP_V1) {
+ 		val |= XRS_HSR_CFG_PRP;
+-	else
++	} else {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "Only HSR v1 and PRP v1 can be offloaded");
+ 		return -EOPNOTSUPP;
++	}
+ 
+ 	dsa_hsr_foreach_port(dp, ds, hsr) {
+ 		if (dp->index != port) {
+diff --git a/include/net/dsa.h b/include/net/dsa.h
+index 0b9c6aa27047..426724808e76 100644
+--- a/include/net/dsa.h
++++ b/include/net/dsa.h
+@@ -1198,7 +1198,8 @@ struct dsa_switch_ops {
+ 	 * HSR integration
+ 	 */
+ 	int	(*port_hsr_join)(struct dsa_switch *ds, int port,
+-				 struct net_device *hsr);
++				 struct net_device *hsr,
++				 struct netlink_ext_ack *extack);
+ 	int	(*port_hsr_leave)(struct dsa_switch *ds, int port,
+ 				  struct net_device *hsr);
+ 
+diff --git a/net/dsa/port.c b/net/dsa/port.c
+index 37ab238e8304..5f01bd4f9dec 100644
+--- a/net/dsa/port.c
++++ b/net/dsa/port.c
+@@ -2024,7 +2024,8 @@ void dsa_shared_port_link_unregister_of(struct dsa_port *dp)
+ 		dsa_shared_port_setup_phy_of(dp, false);
+ }
+ 
+-int dsa_port_hsr_join(struct dsa_port *dp, struct net_device *hsr)
++int dsa_port_hsr_join(struct dsa_port *dp, struct net_device *hsr,
++		      struct netlink_ext_ack *extack)
+ {
+ 	struct dsa_switch *ds = dp->ds;
+ 	int err;
+@@ -2034,7 +2035,7 @@ int dsa_port_hsr_join(struct dsa_port *dp, struct net_device *hsr)
+ 
+ 	dp->hsr_dev = hsr;
+ 
+-	err = ds->ops->port_hsr_join(ds, dp->index, hsr);
++	err = ds->ops->port_hsr_join(ds, dp->index, hsr, extack);
+ 	if (err)
+ 		dp->hsr_dev = NULL;
+ 
+diff --git a/net/dsa/port.h b/net/dsa/port.h
+index dc812512fd0e..334879964e2c 100644
+--- a/net/dsa/port.h
++++ b/net/dsa/port.h
+@@ -103,7 +103,8 @@ int dsa_port_phylink_create(struct dsa_port *dp);
+ void dsa_port_phylink_destroy(struct dsa_port *dp);
+ int dsa_shared_port_link_register_of(struct dsa_port *dp);
+ void dsa_shared_port_link_unregister_of(struct dsa_port *dp);
+-int dsa_port_hsr_join(struct dsa_port *dp, struct net_device *hsr);
++int dsa_port_hsr_join(struct dsa_port *dp, struct net_device *hsr,
++		      struct netlink_ext_ack *extack);
+ void dsa_port_hsr_leave(struct dsa_port *dp, struct net_device *hsr);
+ int dsa_port_tag_8021q_vlan_add(struct dsa_port *dp, u16 vid, bool broadcast);
+ void dsa_port_tag_8021q_vlan_del(struct dsa_port *dp, u16 vid, bool broadcast);
+diff --git a/net/dsa/slave.c b/net/dsa/slave.c
+index 48db91b33390..2b3d89b77121 100644
+--- a/net/dsa/slave.c
++++ b/net/dsa/slave.c
+@@ -2862,7 +2862,7 @@ static int dsa_slave_changeupper(struct net_device *dev,
+ 		}
+ 	} else if (is_hsr_master(info->upper_dev)) {
+ 		if (info->linking) {
+-			err = dsa_port_hsr_join(dp, info->upper_dev);
++			err = dsa_port_hsr_join(dp, info->upper_dev, extack);
+ 			if (err == -EOPNOTSUPP) {
+ 				NL_SET_ERR_MSG_WEAK_MOD(extack,
+ 							"Offloading not supported");
 -- 
 2.20.1
 
