@@ -1,142 +1,182 @@
-Return-Path: <netdev+bounces-35279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42AB87A8913
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 17:58:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B313F7A893F
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 18:05:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F222D2823B8
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 15:58:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67486281BED
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 16:05:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82A4A3C6A9;
-	Wed, 20 Sep 2023 15:58:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 681D83D38F;
+	Wed, 20 Sep 2023 16:05:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1485339BB
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 15:57:58 +0000 (UTC)
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FCC8C6;
-	Wed, 20 Sep 2023 08:57:57 -0700 (PDT)
-Date: Wed, 20 Sep 2023 17:57:54 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1695225475;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DpJgK3AoeiL0qj/8hSRWzm5J6WB7MCZiwbQ65O5g5hE=;
-	b=HoVeYs+Fzkh4C3WRSaDVyKTi7I2akLKNQqMscfyApQI2XrdYmjd8ckESHwBYByCH/J0ejO
-	LJcDH5QZl08p3I5rBaO9y4WS6XfaOrBETJzWcWupGyDH3vTse6b9oXJQGBXQ6FSnG7kjz8
-	BufhIGn5JvWFFzfLdbdc69Tn1qUAOY5E9UXh9ejZckIH+vp8MbD2PvbrkTEX+LyLZvoDA/
-	4vUEP1cP8ldVwfltw4l8ny9Dq7Qxfs9j/8AOFHz0FYbqDA+Tf3YVBTp/nN6zX6+tCrDTXN
-	xhEXFXXfOydt4+MsPosxo9KSnwGyfEq6P6RqbtSa2cEAxTHeBcd+1GaAS4yQXQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1695225475;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DpJgK3AoeiL0qj/8hSRWzm5J6WB7MCZiwbQ65O5g5hE=;
-	b=AgatWMwCIEwvEz7hCBga346W0evtLm84oXwufeiosrpS5dp02LijPUYp/zDPRKriM4tgfd
-	xcEa+JV7TLddAyCg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Wander Lairson Costa <wander@redhat.com>
-Subject: Re: [RFC PATCH net-next 1/2] net: Use SMP threads for backlog NAPI.
-Message-ID: <20230920155754.KzYGXMWh@linutronix.de>
-References: <20230814093528.117342-1-bigeasy@linutronix.de>
- <20230814093528.117342-2-bigeasy@linutronix.de>
- <0a842574fd0acc113ef925c48d2ad9e67aa0e101.camel@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73FDE36AED
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 16:05:12 +0000 (UTC)
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2054.outbound.protection.outlook.com [40.107.93.54])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A227CF5
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 09:05:08 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VJJpIYlIIWqDOLq9JQeOPFsQWxMhyqRhXaziPby4KZo4BfPLAdXhFnoTe/xbtikMyseB380P0Vvb6RtdL8hf5haqptlS2F2HuC6Y+ZGiWMrE/uWCM/LwHxJCL+EAWBXmAq0CPWzyoy/adUDxccXUu/r3KKOAuVs9D1cy8vrhiPqt9X3YYaUN4sbd9MmP7AoAVfcW6rFOR246r4YN/TDNKX2sMSKxoutFfd/DuYhdijMLe1gLeOhB1dyUPItNxFVaAqQoXx9J+BS4yG8zXnei4CumTim5E2VAJo4MXZUqDcKqCprcQb3tKng+hYxY5I10XjhIwuXpScSk3/VFuFY/CA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lXsaYEYL3s/DUo3RiaipYZNtLyCUIcNSQHHoOsOHWic=;
+ b=l1+ryu/gyzGl2X5M4blVRW5MT+8OwGOCD1fxzKdbntLN92Xed53MJPPplV9JSOGl0+ZgsYqManA5iMBb4A8g4KMmfeQ9yr/DbxOk7mVsXx3dUMIxlClhSSfRM7C7KdXiaML/HAuGuQPlh5mKkSesy61MuXVxCvV8w3e9hQ2IlpGFi0hlk6pnjj2lVldv2DyWIHhGcwq2Q+gC3fdvPIWYoxGu3cVLd0/0aC9bk9jAUy6GiR8k3y7Vd0GiGmBvHfRRjwIlFK8GzOndKAl/ETeMMDwg+aeNlQVoBaInVoApdka9XnzuNgPiyF2Gog3O6XGDGr0OsZYFmuK8/0ckjgnc+g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lXsaYEYL3s/DUo3RiaipYZNtLyCUIcNSQHHoOsOHWic=;
+ b=EayHtWEV526XWzbvanCuLiSvZ7KG1lLpHXAXhud0DTCTEB2r4TextvT0al9fZ7UYMAY0ySPsROzxbwIiorvBx7kdOvWiB8uvS1lkmBvOlrWD7BB8aZXnm6S7XivHz4sVnMbmZNAbasLMleJEsAMaAGZpVqU5w0yv0qCcP+mKzVRec3+mZsXs/39Zem99BQu09HmShCKgB1iIGpjYYZ0IpHVctt+BfXyg1p7wz+VoeqImQGN8tXqmdM7LSzkU6bgaLN+aa6mnaABTg4eT1J1GyzVcYv8VS4aiijZNi4IkdmOMEiPhzC2IPJvdxOmaDclNvfnd3Cr418NHDC0S+zzH2g==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SJ1PR12MB6075.namprd12.prod.outlook.com (2603:10b6:a03:45e::8)
+ by CH3PR12MB9026.namprd12.prod.outlook.com (2603:10b6:610:125::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.27; Wed, 20 Sep
+ 2023 16:05:06 +0000
+Received: from SJ1PR12MB6075.namprd12.prod.outlook.com
+ ([fe80::54a7:525f:1e2a:85b1]) by SJ1PR12MB6075.namprd12.prod.outlook.com
+ ([fe80::54a7:525f:1e2a:85b1%4]) with mapi id 15.20.6792.021; Wed, 20 Sep 2023
+ 16:05:06 +0000
+From: Aurelien Aptel <aaptel@nvidia.com>
+To: Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
+ netdev@vger.kernel.org, hch@lst.de, kbusch@kernel.org, axboe@fb.com,
+ chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org
+Cc: Boris Pismenny <borisp@nvidia.com>, aurelien.aptel@gmail.com,
+ smalin@nvidia.com, malin1024@gmail.com, ogerlitz@nvidia.com,
+ yorayz@nvidia.com, galshalom@nvidia.com, mgurtovoy@nvidia.com
+Subject: Re: [PATCH v15 06/20] nvme-tcp: Add DDP data-path
+In-Reply-To: <b82d4ecd-77f3-a562-ec5c-48b0c8ed06f8@grimberg.me>
+References: <20230912095949.5474-1-aaptel@nvidia.com>
+ <20230912095949.5474-7-aaptel@nvidia.com>
+ <ef66595c-95cd-94c4-7f51-d3d7683a188a@grimberg.me>
+ <2537congwxt.fsf@nvidia.com>
+ <5b0fcc27-04aa-3ebd-e82a-8df39ed3ef5d@grimberg.me>
+ <253v8c5fdc3.fsf@nvidia.com>
+ <b82d4ecd-77f3-a562-ec5c-48b0c8ed06f8@grimberg.me>
+Date: Wed, 20 Sep 2023 19:04:59 +0300
+Message-ID: <253sf78g79w.fsf@nvidia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: FR2P281CA0089.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:9b::15) To SJ1PR12MB6075.namprd12.prod.outlook.com
+ (2603:10b6:a03:45e::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <0a842574fd0acc113ef925c48d2ad9e67aa0e101.camel@redhat.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PR12MB6075:EE_|CH3PR12MB9026:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1b2714fa-148a-4f02-5792-08dbb9f35b17
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	kopY/6UimpApIt7aczBBD1udOPD4+xVvsd0iVWlWdBOVcC5gd/O2Cr21TCtBFlsgft4HI4llaGZnOkUveclCIuA8M/4Vq8VZaUtk7+OkURdmtdxKEjIDsSUQ6JR2VKKy7Lk/KcjFKkCQ+UUBR/kLeFPhoHetTVz6w+bcXUdmeWm/3r3KTh/e0kCk1TDBXUMzhMGt9tlPNbicPmvZddY6wJt/VEJkklMpPuFuB64CY6rdW1yHremW+poRx84ZckgL34Bcjx4IX0YADTbkw2G0j06Fcqt6IlasVHDUv1151RCwvKjoJu01cLTCzfUuQjixYhTDV9jzf6Ub4xUtDOL9ekeoMULEVWhg3cawR1UWKIJT6+u9wA8e8qmB8K3U4KR7tUa/SZejGyoi3eFySeRwI/fL0YIOH0m/LJemqB7UCrYUvoEAbOnEBLia4xKYVDRkT+FqYpytFnY/MSDJaCxPW17wg8yLonF6gkMSTf2sw9IJitWMSa5w3VHaNPiXcPcmRm7c96aGIX0j+1L4AqYZHgHyjkom4lIrZVgj8Qugxvyj+u+d4bGgt1o44G13Gi3B
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR12MB6075.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(376002)(396003)(346002)(366004)(39860400002)(451199024)(1800799009)(186009)(478600001)(7416002)(41300700001)(5660300002)(83380400001)(6666004)(2906002)(66556008)(316002)(4326008)(66476007)(8936002)(8676002)(66946007)(6486002)(6506007)(6512007)(107886003)(26005)(2616005)(36756003)(38100700002)(86362001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Mjk0cnR4MFdkWklGQi9BRlRacTFSQ1ZoRXZPWmd4RkxXWXdhMUU5UkxkRGVX?=
+ =?utf-8?B?ZVk0azdnT05GNGJDdkVRMWFDVDZpZUEraW5VdmtjS3phTGlBWDlNRTRyMkdo?=
+ =?utf-8?B?ZFR4bG1xTFhja0pSUWlsWUZWRWVmbnBiVDlzUVhFb1lENC9oSmxac1VnTU1V?=
+ =?utf-8?B?aThkckRvbHE2TENwbjE4RWs2LzlMeDRJdktZZjRqLzZHaWJqZ0pqOXdsZHNI?=
+ =?utf-8?B?S09vMUJKMjhvb1puOHVsa0ZUTVBxTitYVkJTM0t1eVBIRStWV0NUWTBqSEJY?=
+ =?utf-8?B?b0tZVGQ2YkFadk1hL0k3L0hzUFJLeXZUMkFpcEMzVmpRRW5McG4vdlhxcW5U?=
+ =?utf-8?B?R1hhK3IrZTlSYnZFMG81dmF0dkVCemU0Sms2d2RKQ0t0SjA2THRVU0RoYVNG?=
+ =?utf-8?B?MThwWTR4OXpUUFNYbTFMMWRmd2YyK3hIZ0VaOGVIZ3pDTjVJYlhXMUtGUHhJ?=
+ =?utf-8?B?Q2JVUzZyemJpZjlHOHlsRTVPWTZ0MDAxakxHZGlzVVlKR2MvZ0U0Uzgzek53?=
+ =?utf-8?B?TXNyaVcxZFhEK1NOd2I1YVhWelM3QytiM0VDS2N4OEZYNmllcW9pM3NLeTJC?=
+ =?utf-8?B?R2NGdGFObWQwanYwbkUyQVpRZVBQR0ZCTjF5SWVseElvck1iSXFMeXg5YVlB?=
+ =?utf-8?B?aml3QTZsekRwdURocXpNQTNDYVY0SG1qdUhmbUQ1cHora2I4WGNWZkRLdmUz?=
+ =?utf-8?B?V01uWmRPcXFWamtqZDQvSXZPRlgxUDlrb1krNHF4dWo2cVpyNU1TRko0QWJy?=
+ =?utf-8?B?bmZKRCtpVEFqMnlIRXR5N3JOM1FaNjYwTGt4cm1XZzRMQmVJUGNudHVQRHNh?=
+ =?utf-8?B?c2hHa1VSMGNnNmF5MWtlVEhGQXphVmpWYVltdnlNNVpBMEhKZXcvN2FkZTlL?=
+ =?utf-8?B?ZkprbXE4Q0NFc1pLaUJod1BhVEtuWXJ6bno3NlNKVlBvelNNR28zQTNtc3NY?=
+ =?utf-8?B?dkRwNXBzblBDOUlYclZydjVEMTBOS1BLN3g2L1NvOHYvVVlaVjR4UTlPVW5N?=
+ =?utf-8?B?VjRoaFFzazMrQzVmb2xOUVY2WFkrcjJtVUh5UkM4RlluQU5objIxaWltUTR4?=
+ =?utf-8?B?cEgyd0dabG1lek9iTGxjN1laSlVVU1Yyb0YzK1hBbXZTeDRqM0hwY3E3YWpw?=
+ =?utf-8?B?N3lwRmxCNUNhRWdEMXJYSDc2QkRRbmFTQ2JUeFVCU3NrU0NqZ0RTUWNjRXhH?=
+ =?utf-8?B?cjBCNUFIZm5SaUVBSW9hazVaVXNMdy80c2VvSlZSNHQrT2ZidlF3ODVtTEw1?=
+ =?utf-8?B?QStBUHl4YVkwUVZLaFVHYUNrWm1ub1E1b1pBdTk1cEtBaTg2KzhLWk1WRDZi?=
+ =?utf-8?B?ZGVORzlKclRvUWQvTm4yd0VOaGZLVmZQd2g1QmlUV0JnWlpSSHozdm0xQ0Q0?=
+ =?utf-8?B?US9kbHBITWtrYUJIb1RmWk9qVk9KejRWSHgyeGxsNkhOYnhLdlZhazNtcmRu?=
+ =?utf-8?B?R2d6czJYR1ptR0ZRcEJaWllpVTMrWWpyQW95dVlVRk1TTkhNNStpOU9scGVE?=
+ =?utf-8?B?Q1FTaEZVYVFHYU1uT1JlSlZmTmw1M2V3M0RSOGZSazZJcmJqdlZqZ0xHL2dU?=
+ =?utf-8?B?alFVKzFNS0FFNFM5bnRGRzM3amFHTGJ0aTlJbjFZeXpQanNXMkpRTjVPRzgv?=
+ =?utf-8?B?c0FYL2g0VjEyaHpzUWJhTXVOanh4V0xJREsyeWFFaEx0YlFubWJ2QW42M2Y1?=
+ =?utf-8?B?RFU0ekRyZGl2NzJKZVk1MC9GM0psSUY1UXdpMlNGZW5tekFUUXE0T0h5NHI1?=
+ =?utf-8?B?UUxYa2dxY1BmOHUwS3kxdGx5QlpWeGpmVEw0RFlEZmVvV2ZLSStwUzJGNUdE?=
+ =?utf-8?B?SGxwRkx4SndraVl3a0NnZzk0eFk1S3N5NlZSS3ZpTGl0ZStDZE5idmR1NVhI?=
+ =?utf-8?B?SUlLZEd3TGNSb3lUYmI0dk5TdUtkNkkreFd0eEY3V0tmaXVabzd1a0ZtV0du?=
+ =?utf-8?B?ZnR0SU5pL1VZWnB1MDVocjFJUU95M1pnQ3BZZCt6RFdsODE2c0R1azFUQ1FD?=
+ =?utf-8?B?MDdkUldyaGNLU2VrTVhraDJIZXBGVmxWWHNWOFhLVWRNUnFjZ2VjQW9VNzFY?=
+ =?utf-8?B?Q2trRFd0MnBsTWx2QUFGc21uUVdhUitSNmU0ZlFkckRyaTY5b04xWmVRZGp2?=
+ =?utf-8?Q?dR7XYxwJmll4/IGz2HY3LSpHR?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1b2714fa-148a-4f02-5792-08dbb9f35b17
+X-MS-Exchange-CrossTenant-AuthSource: SJ1PR12MB6075.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Sep 2023 16:05:06.1571
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: SWJeXVdpZKOvtfHQeQFv1sZU2JwBxjW97no+m9FWUJBJxmVQOZ37uJFz+ALt4NEO0s2q0O4WGvP3JE/FCUBZhw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9026
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023-08-23 15:35:41 [+0200], Paolo Abeni wrote:
-> On Mon, 2023-08-14 at 11:35 +0200, Sebastian Andrzej Siewior wrote:
-> > @@ -4781,7 +4733,7 @@ static int enqueue_to_backlog(struct sk_buff *skb, int cpu,
-> >  		 * We can use non atomic operation since we own the queue lock
-> >  		 */
-> >  		if (!__test_and_set_bit(NAPI_STATE_SCHED, &sd->backlog.state))
-> > -			napi_schedule_rps(sd);
-> > +			__napi_schedule_irqoff(&sd->backlog);
-> >  		goto enqueue;
-> >  	}
-> >  	reason = SKB_DROP_REASON_CPU_BACKLOG;
-> 
-> I *think* that the above could be quite dangerous when cpu ==
-> smp_processor_id() - that is, with plain veth usage.
-> 
-> Currently, each packet runs into the rx path just after
-> enqueue_to_backlog()/tx completes.
-> 
-> With this patch there will be a burst effect, where the backlog thread
-> will run after a few (several) packets will be enqueued, when the
-> process scheduler will decide - note that the current CPU is already
-> hosting a running process, the tx thread.
-> 
-> The above can cause packet drops (due to limited buffering) or very
-> high latency (due to long burst), even in non overload situation, quite
-> hard to debug.
-> 
-> I think the above needs to be an opt-in, but I guess that even RT
-> deployments doing some packet forwarding will not be happy with this
-> on.
+Sagi Grimberg <sagi@grimberg.me> writes:
+>> Sorry, the original answer was misleading.
+>> The problem is not about the timing but only about which CPU the code is
+>> running on.  If we move setup_ddp() earlier as you suggested, it can
+>> result it running on the wrong CPU.
+>
+> Please define wrong CPU.
 
-I've been looking at this again and have been thinking what you said
-here. I think part of the problem is that we lack a policy/ mechanism
-when a DoS is happening and what to do.
+Let's say we connect with 1 IO queue on CPU 0.
 
-Before commit d15121be74856 ("Revert "softirq: Let ksoftirqd do its
-job"") when a lot of network packets are processed then processing is
-moved to ksoftirqd and continues based on how the scheduler schedules
-the SCHED_OTHER ksoftirqd task. This avoids lock-ups of the system and
-it can do something else in between. Any interrupt will not continue the
-outstanding softirq backlog but wait for ksoftirqd. So it basically
-avoids the networking overload. It throttles the throughput if needed.
+We run our application which run IOs on multiple CPU cores (0 and 7 as
+an example).
+Whenever the IO was issued on CPU 7, setup_cmd_pdu() and queue_request()
+will be run in the context of CPU 7.
+We consider CPU 7 "wrong", because it isn't q->io_cpu (CPU 0).
 
-This isn't the case after that commit. Now, the CPU can be stuck with
-processing networking packets if the packets come in fast enough. Even
-if ksoftirqd is woken up, the next interrupt (say the timer) will
-continue with at least one round.
-By using NAPI-threads it is possible to give the control back to the
-scheduler which can throttle the NAPI processing in favour of other
-threads that ask for CPU. As you pointed out, waking the thread does not
-guarantee that it will immediately do the NAPI work. It can be delayed
-based on current load on the system.
+It's only after queue_request() dispatches it that it will it run on CPU 0.
 
-This could be influenced by assigning the NAPI-thread a SCHED_FIFO
-priority. Based on the priority it could be ensured that the thread
-starts right away or "later" if something else is more important.
-However, this opens the DoS window again: The scheduler will put the
-NAPI thread on CPU as long as it asks for it with no throttling.
+> But the sk_incmoing_cpu is updated with the cpu that is reading the
+> socket, so in fact it should converge to the io_cpu - shouldn't it?
 
-If we could somehow define a DoS condition once we are overwhelmed with
-packets, then we could act on it and throttle it. This in turn would
-allow a SCHED_FIFO priority without the fear of a lockup if the system
-is flooded with packets.
+Yes, that is true.
 
-> Cheers,
-> 
-> Paolo
+> Can you please provide a concrete explanation to the performance
+> degradation?
 
-Sebastian
+We believe the setup_ddp should be called from the CPU core on which the
+nvme queue was created so all the IO path SW-HW interaction will run on
+the same CPU core.
+The performance degradation is relevant only to specific cases in which
+the application will run on the "wrong" CPU core on which the NVMe queue
+was not created.
+
+If you don=E2=80=99t see it as a problem, we can move the setup_ddp to
+setup_cmd_pdu().
+
+Thanks
 
