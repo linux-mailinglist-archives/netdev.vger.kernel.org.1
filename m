@@ -1,156 +1,153 @@
-Return-Path: <netdev+bounces-35156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09D447A760A
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 10:39:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 182487A760E
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 10:40:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B4561C20DC4
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 08:39:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F4891C20D73
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 08:40:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C03BC8ED;
-	Wed, 20 Sep 2023 08:39:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE1B411184;
+	Wed, 20 Sep 2023 08:39:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0882E5393
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 08:39:22 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A664F8F
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 01:39:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1695199160;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=+3yBpA5iz82pce6LfLZNujDLBSjE7ZVN1nK9Rsm3ufc=;
-	b=AEvmLRvIvfGK6hrfOkNqtbOKu8+gBHK9tUcExRnIbDoimR/MNDwbDFZpme1gLtERZcULZL
-	b99scLc5WyVnC1ZOsFMpxikwSg+s8SMxGc2w8gqVu87pk78Y7grN9yyl8VHYV2VOf93UY9
-	ONnMg2Yd+m8v/DdzGGv+E+K3dFKYIbo=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-169-whr9bxVyOA-yv0PPo12ZiA-1; Wed, 20 Sep 2023 04:39:15 -0400
-X-MC-Unique: whr9bxVyOA-yv0PPo12ZiA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 139D385A5BA;
-	Wed, 20 Sep 2023 08:39:14 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.216])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 5788E2156701;
-	Wed, 20 Sep 2023 08:39:12 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: netdev@vger.kernel.org
-cc: dhowells@redhat.com,
-    syzbot+62cbf263225ae13ff153@syzkaller.appspotmail.com,
-    Eric Dumazet <edumazet@google.com>,
-    Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-    "David S. Miller" <davem@davemloft.net>,
-    David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-    Jakub Kicinski <kuba@kernel.org>, bpf@vger.kernel.org,
-    syzkaller-bugs@googlegroups.com, linux-kernel@vger.kernel.org
-Subject: [PATCH net v2] ipv4, ipv6: Fix handling of transhdrlen in __ip{,6}_append_data()
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F836C8ED
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 08:39:35 +0000 (UTC)
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2884C8F
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 01:39:33 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OyV7+1fR52kd0OTorwg3oRkTjsi8AaF0d9CTEN19Y9aeGrcttgbz/Igj/l0j6kBD3uD03ZcEEZVFR7OdsJqOIf25Ry+KUGmSTuEQXF24zi/VqTPzJlYsgEB/OiyUj4s3vjheRSzlv/h47WadEoGsLyIKAKX4ncFh1Av08MRm7P5D9ED0yCjY/4s4KnOJeZy/r3EgSBYrrX3X0N88lDlYtDrvVjxlnw3BpeOOA4x/fb8ywwJfcACs8Ncv8eX2JUQse7CTKcOqZHKVZV1IbbDGT4og8nhOjuOQyT5k4FQRGHZpGccQAc05T98Qr5PqAdfEreB+Tb7EFjznWSoJ33Zhxg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=gC70YUWYKHk8RHYZdMzXHsoMqFAfV0v82w2mv21KKm0=;
+ b=hKoTj+bVxt9XUlufof1ht2Ys0TuVNWGLQRTynXnT/Z6/5SyCLs5l+xZpVkAjhcuWjPgYPxJqPEmouDiV3Qf24sgJ5FUS+yZAmtxC8Zsk92QdMxpZoafDO1w4Z3/ugq2q1IrBzXqKelEpzQodzZsn+Z1Z9PJHIVH9o4Kf3RuDODksv8nLm3RAOV+PwCDrxB23oJymPSMLHYpesqr1LvrlizKC50SIhvSAK+vP1hUXgB6Dq1Ha0AG0jHjkcGw0uujERWv5BBX2vbb58BC0iBfi7+XJnX12MKOlIKY06YKSAFDxYdjSpNItPjwymwqsb2P+N6j8SIycSsFVNJhoKfsSFw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gC70YUWYKHk8RHYZdMzXHsoMqFAfV0v82w2mv21KKm0=;
+ b=CcKD/ELFYzFBBfilDsiF3uCJaIKCMmcQX3s5JoodfoOgpKO827DjKFnomTrnLoTlrStFQXSmQ9DLgKhndAcxeH7X/2MAcgnB7Eoz65HxAu5mG34OlLldvpXk9QYpZw67u6+w7McH/RC4qJI+Ek82PfI66iMHATOl6Tba6R+NnoNEcJ/gkr/H+7bUFYEwCteL4BWrbwHFjngbhJFUq953RcLia2QK0BByew9Wo4+oZKHVkCo9nkmDLKc/xEo4vNcMFdARffzX5F4KrYEQUBiuOjvYWRFk8tMXMRsv2vlXTHB+Ctd1iJUBEj7ZkFqa1/GRFBnmow8VO0ORV68ww+arGw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SJ1PR12MB6075.namprd12.prod.outlook.com (2603:10b6:a03:45e::8)
+ by DM8PR12MB5429.namprd12.prod.outlook.com (2603:10b6:8:29::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.19; Wed, 20 Sep
+ 2023 08:39:30 +0000
+Received: from SJ1PR12MB6075.namprd12.prod.outlook.com
+ ([fe80::54a7:525f:1e2a:85b1]) by SJ1PR12MB6075.namprd12.prod.outlook.com
+ ([fe80::54a7:525f:1e2a:85b1%4]) with mapi id 15.20.6792.021; Wed, 20 Sep 2023
+ 08:39:30 +0000
+From: Aurelien Aptel <aaptel@nvidia.com>
+To: Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
+ netdev@vger.kernel.org, hch@lst.de, kbusch@kernel.org, axboe@fb.com,
+ chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org
+Cc: Boris Pismenny <borisp@nvidia.com>, aurelien.aptel@gmail.com,
+ smalin@nvidia.com, malin1024@gmail.com, ogerlitz@nvidia.com,
+ yorayz@nvidia.com, galshalom@nvidia.com, mgurtovoy@nvidia.com
+Subject: Re: [PATCH v15 06/20] nvme-tcp: Add DDP data-path
+In-Reply-To: <5b0fcc27-04aa-3ebd-e82a-8df39ed3ef5d@grimberg.me>
+References: <20230912095949.5474-1-aaptel@nvidia.com>
+ <20230912095949.5474-7-aaptel@nvidia.com>
+ <ef66595c-95cd-94c4-7f51-d3d7683a188a@grimberg.me>
+ <2537congwxt.fsf@nvidia.com>
+ <5b0fcc27-04aa-3ebd-e82a-8df39ed3ef5d@grimberg.me>
+Date: Wed, 20 Sep 2023 11:39:24 +0300
+Message-ID: <253v8c5fdc3.fsf@nvidia.com>
+Content-Type: text/plain
+X-ClientProxiedBy: AS4P250CA0019.EURP250.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5e3::10) To SJ1PR12MB6075.namprd12.prod.outlook.com
+ (2603:10b6:a03:45e::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <108790.1695199151.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 20 Sep 2023 09:39:11 +0100
-Message-ID: <108791.1695199151@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PR12MB6075:EE_|DM8PR12MB5429:EE_
+X-MS-Office365-Filtering-Correlation-Id: da234ae5-2776-496e-d5ee-08dbb9b51b38
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	IigS4nFU0A1Mhedcd41dF4Fx+7KiBJ9q1irKTBV288w6IG/64guGs3d32wGOK0d69qx8orcVBIvqOQyIUphKm7WgdHOFf688ANzt1R7wBh5NK4faRCSbHjh/8DP7xWn9ZvCgX6xeHZZ1bTcn2wXHxc9LjGRYsKz/QMoFiHyNx2dGTMVo7p98jDQZpkz8/cVtJYo/RfkjbUFeQF6BJLttxD7xyX4pXg2hrKmrZxZ8agjkuGUkBaFVk+gAsCgZA1tWQjjaHz82Po/ton+mip8P74+FEpr2icABvshyh1Esh+5HXhgOhKs9RWc8M+uWE48IkKCG1f1pukU7cWcyYv2drNC8OpqEVXucA3VfQCh48BTelKGKEH55gc//bHDHkZvBybV0dJKp9l/ejDWXI5TOgWuhNp/sOg2T2cqJo2NXfYtj6WqSCWQ9UlHBbuIf1SiFkMBI+I35q3j3OuXJPUdAN2yCGMce52HtEqczABPOOWw8cXgSc/zPCysWbksHAsV6uLh8j9KWQEobq2jNbu/hi7nq0tNsDI5Bov/LStSjYlH/5GlbWJfZwrPZduPz6JjG
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR12MB6075.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(346002)(366004)(39860400002)(396003)(136003)(186009)(451199024)(1800799009)(2616005)(5660300002)(107886003)(41300700001)(26005)(2906002)(4744005)(7416002)(38100700002)(86362001)(36756003)(4326008)(8936002)(8676002)(83380400001)(6666004)(6486002)(6506007)(6512007)(478600001)(316002)(66946007)(66556008)(66476007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?UxFtXR76pYhrS6hTxIj0P63IVSYfraaSXmUEJVn9WWlGLDT1vDZpRFPQwGlX?=
+ =?us-ascii?Q?yGA9zM1qQZLoaMB7dVPbVwBZ5LXCBLM9LAxMnzb6ufHPpdhCegWa3GSLBe6u?=
+ =?us-ascii?Q?gze3Wo1WU06snwgK4IGIligl9X8h+IMOeGQj5k/mP/91j8L3T+7mF+CCmBBz?=
+ =?us-ascii?Q?oll0CQHu9Zxnl6sy9NnN1dcJzmnWjDM3Z0a2Buxpu/iEuv6AYgQULgArnoSB?=
+ =?us-ascii?Q?sO1JYDDy0/V4BDo4sa5bR0yXuijT7zMW5AL+XNrPTbiPkiXBgeTygBFTcfno?=
+ =?us-ascii?Q?hJdxAUXkLYdME88Eh6hSVZdNWt0BV04g6IlQCgDi7xdKje0pBTokMLCt9WHB?=
+ =?us-ascii?Q?e+Ugk3YV0gwqtE7MsadnpsxSFesRMqwYGsyOrjOav6ig3kQ0ySwj893G9wM9?=
+ =?us-ascii?Q?GbpISYZOO4f9QB4qp3XrL2Lv3VzmuRXGSu290KjbhQbUVdwb8b8f9wgIQyKn?=
+ =?us-ascii?Q?4NuQBbatKMxFjpr8zjiQG69USjmpVOtWbgfLcynV0DWAMBNihcJQFi4+1ITa?=
+ =?us-ascii?Q?1Gh117PfcmNNNYaUrNpk78OuP1A29ASxp7N7Rzv8TgNfAwJy84lEcYWZk4Hi?=
+ =?us-ascii?Q?lkDHjEYDIVEpNX0L1RyPi9dlhJQjmgq/5sORQa+0H7WNcxehJRf9wwjE6Q1/?=
+ =?us-ascii?Q?sZ4SE5eV4pXtNgr3rlbIAwfLVWaLP5pAJ0RzBLnwFWMru95cT2MJ0mwC4YsU?=
+ =?us-ascii?Q?CotGQ3fTu7fTWllTRrpE694z5RE8JbLwiMc+V06CsqOoTH9yn4ayxvzm3Xue?=
+ =?us-ascii?Q?6Pwl8JTUywEwbtziP1cT++DOUn1dvaqlHNGDeDwB91rAp8dIvwge8g7tK8OW?=
+ =?us-ascii?Q?xDEY+V47TZePEJcJuiQYm4hQl3+ljDWE4tTS2R1TOmmmU+7cJCsBQWULFk9p?=
+ =?us-ascii?Q?haKuESsTOOOP8jGjC73H6uOqhxbOTpde5Ejhdk5yWFlFxX7RqvqY7sL6Aqh7?=
+ =?us-ascii?Q?m/vP6dPoP3ykaLXlSy6hjNHeJ/aMmMexIr3GvG3fpthAq88tg2QCcf2KIYIR?=
+ =?us-ascii?Q?AaXkpyvT2ssxShPnyVvVsHSasKJ/ThypPVeWAHm3ts4RuXyvsNl6c8zrfmAE?=
+ =?us-ascii?Q?i3ld4ExnEFqhcLMXQ4zjNk2JSI7eTDO40b3gus8ZfF7dgDM/flgdyF+wrzkk?=
+ =?us-ascii?Q?/w51qWrXBCZc7Bu9aULvhbv1sGocWhr5b/YatgfhFlh9AmKkCVH3+8ZvM3+M?=
+ =?us-ascii?Q?Sv6BKB2YEe6M85wNurbTAtPO6zUWkpKZZcob2Eqf5NT+BPHzjn7FGU+FIZiH?=
+ =?us-ascii?Q?QlgzDQ0fBRdCpFeBH5e/3VslI0q3bZtRLsb29+92LFtrPdk3oiO+6dLUQ25J?=
+ =?us-ascii?Q?zz07/pK9UMhojpZU0Aw/Z1F4SndYhNVuMuN+XuUcOJQERY/K0X3cqRleBnuq?=
+ =?us-ascii?Q?zUMljWCjKjH1R1LQCqrsanUOY71s2/cg0W59sepo2chkOhs1YdfDYgmZkwTz?=
+ =?us-ascii?Q?DDDNPPoAQu1exFWuGwb2FpJOWwcxXfGzRbnbbmKr6TppWQ6r1N8YM795q+m+?=
+ =?us-ascii?Q?5OB3D+VNQcDhz4leNWKvNV1ANVnjcXQ9nmzzlBbbBbMKB3Xe0lOmSLX8iq6o?=
+ =?us-ascii?Q?mzYfs3B8V+CLBRMQUwRY9plFMPPMlEsiy5T47IX8?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: da234ae5-2776-496e-d5ee-08dbb9b51b38
+X-MS-Exchange-CrossTenant-AuthSource: SJ1PR12MB6075.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Sep 2023 08:39:30.1715
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jPpDtJiGrW+S+zZFIs4AuXVaghOG7sq4bXg2G6yFkGWfX+OVZTwWCoNsBO78Wv8gnDp4yqDPymwNckbm6a3jpg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR12MB5429
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Including the transhdrlen in length is a problem when the packet is
-partially filled (e.g. something like send(MSG_MORE) happened previously)
-when appending to an IPv4 or IPv6 packet as we don't want to repeat the
-transport header or account for it twice.  This can happen under some
-circumstances, such as splicing into an L2TP socket.
+Sagi Grimberg <sagi@grimberg.me> writes:
+> Can you please explain why? sk_incoming_cpu is updated from the network
+> recv path while you are arguing that the timing matters before you even
+> send the pdu. I don't understand why should that matter.
 
-The symptom observed is a warning in __ip6_append_data():
+Sorry, the original answer was misleading.
+The problem is not about the timing but only about which CPU the code is
+running on.  If we move setup_ddp() earlier as you suggested, it can
+result it running on the wrong CPU.
 
-    WARNING: CPU: 1 PID: 5042 at net/ipv6/ip6_output.c:1800 __ip6_append_d=
-ata.isra.0+0x1be8/0x47f0 net/ipv6/ip6_output.c:1800
+Calling setup_ddp() in nvme_tcp_setup_cmd_pdu() will not guarantee we
+are on running on the queue->io_cpu. It's only during
+nvme_tcp_queue_request() that we either know we are running on
+queue->io_cpu, or dispatch it to run on queue->io_cpu.
 
-that occurs when MSG_SPLICE_PAGES is used to append more data to an alread=
-y
-partially occupied skbuff.  The warning occurs when 'copy' is larger than
-the amount of data in the message iterator.  This is because the requested
-length includes the transport header length when it shouldn't.  This can b=
-e
-triggered by, for example:
+As it is only a performance optimization for the non-likely case, we can
+move it to nvme_tcp_setup_cmd_pdu() as you suggested and re-consider in
+the future if it will be needed.
 
-        sfd =3D socket(AF_INET6, SOCK_DGRAM, IPPROTO_L2TP);
-        bind(sfd, ...); // ::1
-        connect(sfd, ...); // ::1 port 7
-        send(sfd, buffer, 4100, MSG_MORE);
-        sendfile(sfd, dfd, NULL, 1024);
-
-Fix this by deducting transhdrlen from length in ip{,6}_append_data() righ=
-t
-before we clear transhdrlen if there is already a packet that we're going
-to try appending to.
-
-Reported-by: syzbot+62cbf263225ae13ff153@syzkaller.appspotmail.com
-Link: https://lore.kernel.org/r/0000000000001c12b30605378ce8@google.com/
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: David Ahern <dsahern@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: netdev@vger.kernel.org
-cc: bpf@vger.kernel.org
-cc: syzkaller-bugs@googlegroups.com
-Link: https://lore.kernel.org/r/75315.1695139973@warthog.procyon.org.uk/ #=
- v1
----
- net/ipv4/ip_output.c  |    1 +
- net/ipv6/ip6_output.c |    1 +
- 2 files changed, 2 insertions(+)
-
-diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-index 4ab877cf6d35..9646f2d9afcf 100644
---- a/net/ipv4/ip_output.c
-+++ b/net/ipv4/ip_output.c
-@@ -1354,6 +1354,7 @@ int ip_append_data(struct sock *sk, struct flowi4 *f=
-l4,
- 		if (err)
- 			return err;
- 	} else {
-+		length -=3D transhdrlen;
- 		transhdrlen =3D 0;
- 	}
- =
-
-diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index 54fc4c711f2c..6a4ce7f622e9 100644
---- a/net/ipv6/ip6_output.c
-+++ b/net/ipv6/ip6_output.c
-@@ -1888,6 +1888,7 @@ int ip6_append_data(struct sock *sk,
- 		length +=3D exthdrlen;
- 		transhdrlen +=3D exthdrlen;
- 	} else {
-+		length -=3D transhdrlen;
- 		transhdrlen =3D 0;
- 	}
- =
-
+Thanks
 
