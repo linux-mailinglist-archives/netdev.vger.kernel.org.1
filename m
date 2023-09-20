@@ -1,130 +1,163 @@
-Return-Path: <netdev+bounces-35315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBBEC7A8C44
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 21:07:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCFA47A8D8B
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 22:11:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7A681C20963
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 19:07:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2D30DB20A49
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 20:10:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B14891A583;
-	Wed, 20 Sep 2023 19:07:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DC9C41216;
+	Wed, 20 Sep 2023 20:10:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0656A3CCEC
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 19:07:12 +0000 (UTC)
-Received: from mail-ua1-x934.google.com (mail-ua1-x934.google.com [IPv6:2607:f8b0:4864:20::934])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4539F8F
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 12:07:11 -0700 (PDT)
-Received: by mail-ua1-x934.google.com with SMTP id a1e0cc1a2514c-7a505727e7eso56776241.0
-        for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 12:07:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695236830; x=1695841630; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jsRDkQmtc4l3w6HTU87+YCUCh7mLN+xZYxvp89CA8Gg=;
-        b=uwpv/SP+RmHyFqSUj589Tng9w9KQplwm+JO36JNyJiX2oUCTcWTZ6eQwkUzjx2BFcq
-         6Ta4QUcWf8oODjOkfwVID+7pyEp5ZjOm8U9qY17tQNo62+StEUp8VUA1UUVruy6Nehgo
-         pPJImW5JoPKZY+ahNyz95unOex33BRVJouR94ZUkYDjiqtLqsitsHbukHHgS2HU6PErc
-         vXR7fqSMQ/psEJRD4lvPM9LPi3nLKOSJr/N64pvdcytd9hhnuXsMegi3hccFBbJjxv+Q
-         +lGycbqggH+RzqO+QZ97YR9r8eA8rbCDLsCq/yh0h4u4XMEkRGcoid5cvsZZk0W9bekK
-         Hi5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695236830; x=1695841630;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jsRDkQmtc4l3w6HTU87+YCUCh7mLN+xZYxvp89CA8Gg=;
-        b=Txqxz6RrqGy3/lbXDdAOCmC9AA5DXKT1BgYv+lJen/FKJWv+gsA0bQ8X19xn53s/pL
-         Xpjj3e5Y6RAqIzeWcxBkq5DI9SdXJRIH5RL3eba3G+LvWailSfBUGCQ+1ndy6F4N4o0S
-         YIkM8KUf1qIkJCvB0cmqMbJHSDroLpjVlc0JwXeLN1j+0KI2yC8zdkrxvDI4cqx0Yu1O
-         cVqJcNhPSvPM83Lmp1k+NYrpGtQMvPQjn0MiwKlDAhDeT7Qxf5vf/6uI0CVjltB5Ysxl
-         ll6nV52Xo4BNW9y8pSfB95NpT4puJRnevZSnanZfyGtn1AZqzXEUs8aMn5Sd+KQxQTMJ
-         k/5A==
-X-Gm-Message-State: AOJu0Ywt/Xibvb9EmR75lCO7+HLb9I4sAhP1zoCfvpcQ8iIT6Dc5buI6
-	KbodxbYh8v1yhD5b6rw5l2rIg2QUMAMLePnDjtJCpA==
-X-Google-Smtp-Source: AGHT+IFCCmh9DSe/PJ94p7WMuJJ3oFG9Io8LngkZG/x2Iqg4ZaLKy8Q6/oaqnMSpYkCO6THrWIjLNkIkp9rpagkVndc=
-X-Received: by 2002:a67:e912:0:b0:450:fcad:ff18 with SMTP id
- c18-20020a67e912000000b00450fcadff18mr3600791vso.34.1695236830040; Wed, 20
- Sep 2023 12:07:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 971554120C
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 20:10:47 +0000 (UTC)
+Received: from mail.zeus03.de (www.zeus03.de [194.117.254.33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9AC4A1
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 13:10:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	sang-engineering.com; h=from:to:cc:subject:date:message-id
+	:mime-version:content-transfer-encoding; s=k1; bh=kBFMB175NoIB33
+	tUumJsDoFOA+ejFSobf6NIE+jj4Ug=; b=Uc733YxYosbjm/XEn89UsBRFOBGt1D
+	wtaJ/BXK403VVpQDNaEHxKrKojSA4FFSKMYLOgDdfhsKJ/fLaQUl6oYWSgL0kjxP
+	TjgQp1ebp9cnXOFYCGu92pW1/uFVDDjD92SyXcYt7CH+IEiDDo7JY7lZPY/W5kgV
+	K/WjWWafTRpNlvZysZM+Ey7us60jP/Qx1+1CLzQ0qWGr9L0UlEDWpY6jXTg0e4E2
+	VK6WuEnnj4ecYOJ8G5U+ks86MJOx3wyAEDrOt9aNEZJz7/pTzLfI81YT2opm3aha
+	Sn+CPpC43sMqQqmLNTySIY29gMgvxKQJW48ogG6E3SOz+QL/P6C2joyw==
+Received: (qmail 720124 invoked from network); 20 Sep 2023 22:10:40 +0200
+Received: by mail.zeus03.de with ESMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 20 Sep 2023 22:10:40 +0200
+X-UD-Smtp-Session: l3s3148p1@Nuf9988FxNgujntX
+From: Wolfram Sang <wsa+renesas@sang-engineering.com>
+To: linux-mips@vger.kernel.org
+Cc: Jonas Gorski <jonas.gorski@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-mtd@lists.infradead.org,
+	linux-serial@vger.kernel.org,
+	linux-watchdog@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH 0/6] remove AR7 platform and associated drivers
+Date: Wed, 20 Sep 2023 22:10:26 +0200
+Message-Id: <20230920201035.3445-1-wsa+renesas@sang-engineering.com>
+X-Mailer: git-send-email 2.35.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230920172943.4135513-1-edumazet@google.com> <20230920172943.4135513-4-edumazet@google.com>
-In-Reply-To: <20230920172943.4135513-4-edumazet@google.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Wed, 20 Sep 2023 15:06:53 -0400
-Message-ID: <CADVnQy=aNNg41GX4vv4qCm9WPBqoof3T5rK6hFOpMYqKfTVkSQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/3] tcp: derive delack_max from rto_min
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Soheil Hassas Yeganeh <soheil@google.com>, Yuchung Cheng <ycheng@google.com>, 
-	netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Sep 20, 2023 at 1:29=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> While BPF allows to set icsk->->icsk_delack_max
-> and/or icsk->icsk_rto_min, we have an ip route
-> attribute (RTAX_RTO_MIN) to be able to tune rto_min,
-> but nothing to consequently adjust max delayed ack,
-> which vary from 40ms to 200 ms (TCP_DELACK_{MIN|MAX}).
->
-> This makes RTAX_RTO_MIN of almost no practical use,
-> unless customers are in big trouble.
->
-> Modern days datacenter communications want to set
-> rto_min to ~5 ms, and the max delayed ack one jiffie
-> smaller to avoid spurious retransmits.
->
-> After this patch, an "rto_min 5" route attribute will
-> effectively lower max delayed ack timers to 4 ms.
->
-> Note in the following ss output, "rto:6 ... ato:4"
->
-> $ ss -temoi dst XXXXXX
-> State Recv-Q Send-Q           Local Address:Port       Peer Address:Port =
- Process
-> ESTAB 0      0        [2002:a05:6608:295::]:52950   [2002:a05:6608:297::]=
-:41597
->      ino:255134 sk:1001 <->
->          skmem:(r0,rb1707063,t872,tb262144,f0,w0,o0,bl0,d0) ts sack
->  cubic wscale:8,8 rto:6 rtt:0.02/0.002 ato:4 mss:4096 pmtu:4500
->  rcvmss:536 advmss:4096 cwnd:10 bytes_sent:54823160 bytes_acked:54823121
->  bytes_received:54823120 segs_out:1370582 segs_in:1370580
->  data_segs_out:1370579 data_segs_in:1370578 send 16.4Gbps
->  pacing_rate 32.6Gbps delivery_rate 1.72Gbps delivered:1370579
->  busy:26920ms unacked:1 rcv_rtt:34.615 rcv_space:65920
->  rcv_ssthresh:65535 minrtt:0.015 snd_wnd:65536
->
-> While we could argue this patch fixes a bug with RTAX_RTO_MIN,
-> I do not add a Fixes: tag, so that we can soak it a bit before
-> asking backports to stable branches.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
+When trying to get rid of the obsolete VLYNQ bus, Jonas and Florian
+pointed out that its only user, the AR7 platform can probaly go entirely
+[1]. This series does exactly that. Even OpenWRT has removed support
+because these devices are "stuck with 3.18" [2].
 
-Acked-by: Neal Cardwell <ncardwell@google.com>
+It removes the drivers first, because watchdog and network include
+platform specific headers. Once the drivers are gone, we remove the
+platform. The patches are based on 6.6-rc2 and created with
+"--irreversible-delete" to save some space.
 
-Thanks, Eric!
+My suggestion is that everything is merged via the MIPS tree in one go,
+so we don't have broken drivers because of missing platform headers. But
+maybe there are reasons for a two-cycle removal with the drivers first
+and the platform later?
 
-neal
+Looking forward to comments.
+
+Happy hacking,
+
+   Wolfram
+
+
+[1] https://lore.kernel.org/r/3395161f-2543-46f0-83d9-b918800305e1@gmail.com
+[2] https://openwrt.org/docs/techref/targets/ar7
+
+
+Wolfram Sang (6):
+  serial: 8250: remove AR7 support
+  mtd: parsers: ar7: remove support
+  vlynq: remove bus driver
+  watchdog: ar7_wdt: remove driver to prepare for platform removal
+  net: cpmac: remove driver to prepare for platform removal
+  MIPS: AR7: remove platform
+
+ MAINTAINERS                             |   13 -
+ arch/arm/configs/pxa_defconfig          |    1 -
+ arch/mips/Kbuild.platforms              |    1 -
+ arch/mips/Kconfig                       |   22 -
+ arch/mips/ar7/Makefile                  |   11 -
+ arch/mips/ar7/Platform                  |    5 -
+ arch/mips/ar7/clock.c                   |  439 --------
+ arch/mips/ar7/gpio.c                    |  332 ------
+ arch/mips/ar7/irq.c                     |  165 ---
+ arch/mips/ar7/memory.c                  |   51 -
+ arch/mips/ar7/platform.c                |  722 -------------
+ arch/mips/ar7/prom.c                    |  256 -----
+ arch/mips/ar7/setup.c                   |   93 --
+ arch/mips/ar7/time.c                    |   31 -
+ arch/mips/boot/compressed/uart-16550.c  |    5 -
+ arch/mips/configs/ar7_defconfig         |  119 ---
+ arch/mips/include/asm/mach-ar7/ar7.h    |  191 ----
+ arch/mips/include/asm/mach-ar7/irq.h    |   16 -
+ arch/mips/include/asm/mach-ar7/prom.h   |   12 -
+ arch/mips/include/asm/mach-ar7/spaces.h |   22 -
+ drivers/Kconfig                         |    2 -
+ drivers/Makefile                        |    1 -
+ drivers/mtd/parsers/Kconfig             |    5 -
+ drivers/mtd/parsers/Makefile            |    1 -
+ drivers/mtd/parsers/ar7part.c           |  129 ---
+ drivers/net/ethernet/ti/Kconfig         |    9 +-
+ drivers/net/ethernet/ti/Makefile        |    1 -
+ drivers/net/ethernet/ti/cpmac.c         | 1251 -----------------------
+ drivers/tty/serial/8250/8250_port.c     |    7 -
+ drivers/vlynq/Kconfig                   |   21 -
+ drivers/vlynq/Makefile                  |    6 -
+ drivers/vlynq/vlynq.c                   |  799 ---------------
+ drivers/watchdog/Kconfig                |    6 -
+ drivers/watchdog/Makefile               |    1 -
+ drivers/watchdog/ar7_wdt.c              |  315 ------
+ include/linux/vlynq.h                   |  149 ---
+ include/uapi/linux/serial_core.h        |    1 -
+ 37 files changed, 1 insertion(+), 5210 deletions(-)
+ delete mode 100644 arch/mips/ar7/Makefile
+ delete mode 100644 arch/mips/ar7/Platform
+ delete mode 100644 arch/mips/ar7/clock.c
+ delete mode 100644 arch/mips/ar7/gpio.c
+ delete mode 100644 arch/mips/ar7/irq.c
+ delete mode 100644 arch/mips/ar7/memory.c
+ delete mode 100644 arch/mips/ar7/platform.c
+ delete mode 100644 arch/mips/ar7/prom.c
+ delete mode 100644 arch/mips/ar7/setup.c
+ delete mode 100644 arch/mips/ar7/time.c
+ delete mode 100644 arch/mips/configs/ar7_defconfig
+ delete mode 100644 arch/mips/include/asm/mach-ar7/ar7.h
+ delete mode 100644 arch/mips/include/asm/mach-ar7/irq.h
+ delete mode 100644 arch/mips/include/asm/mach-ar7/prom.h
+ delete mode 100644 arch/mips/include/asm/mach-ar7/spaces.h
+ delete mode 100644 drivers/mtd/parsers/ar7part.c
+ delete mode 100644 drivers/net/ethernet/ti/cpmac.c
+ delete mode 100644 drivers/vlynq/Kconfig
+ delete mode 100644 drivers/vlynq/Makefile
+ delete mode 100644 drivers/vlynq/vlynq.c
+ delete mode 100644 drivers/watchdog/ar7_wdt.c
+ delete mode 100644 include/linux/vlynq.h
+
+-- 
+2.35.1
+
 
