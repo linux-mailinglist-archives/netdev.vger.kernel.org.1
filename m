@@ -1,63 +1,47 @@
-Return-Path: <netdev+bounces-35241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB5387A8193
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 14:46:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F6AE7A7CD0
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 14:04:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C9051C20CCE
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 12:46:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4ACB9281B7A
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 12:04:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C735531A68;
-	Wed, 20 Sep 2023 12:46:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DBB22AB36;
+	Wed, 20 Sep 2023 12:02:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B050F328A2;
-	Wed, 20 Sep 2023 12:46:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05B74C433C9;
-	Wed, 20 Sep 2023 12:46:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1695213986;
-	bh=yYUJGr1ekFJdAXZtWX62M+Gi8IxzUdobO7q5GulGG/0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uo485Gx5mf+c3zsZMnQo+V8QvO2AvpeWF/UtvuAP8xnTJc93e+GJT0HcN1PefhnsM
-	 s3KwnnbFAPePXiNbiwbqfUNfytSeDPR7jzkVbqRzCKcra5eEGWjTpXLKqPg1klgzB1
-	 Qz5eB6lbArS6x+/aIiCYqbAp8Ex5MvBJXKpWB3Jg=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	James Clark <james.clark@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Ian Rogers <irogers@google.com>,
-	Jiri Olsa <jolsa@redhat.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Martin KaFai Lau <kafai@fb.com>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Song Liu <songliubraving@fb.com>,
-	Sumanth Korikkar <sumanthk@linux.ibm.com>,
-	Thomas Richter <tmricht@linux.ibm.com>,
-	Yonghong Song <yhs@fb.com>,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Arnaldo Carvalho de Melo <acme@redhat.com>,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.15 071/110] perf test: Remove bash construct from stat_bpf_counters.sh test
-Date: Wed, 20 Sep 2023 13:32:09 +0200
-Message-ID: <20230920112833.087148087@linuxfoundation.org>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20230920112830.377666128@linuxfoundation.org>
-References: <20230920112830.377666128@linuxfoundation.org>
-User-Agent: quilt/0.67
-X-stable: review
-X-Patchwork-Hint: ignore
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4FFB30FAB
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 12:02:27 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5C94CE;
+	Wed, 20 Sep 2023 05:02:25 -0700 (PDT)
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.55])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RrHBj57LvzVjyD;
+	Wed, 20 Sep 2023 19:59:25 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.56) by
+ dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Wed, 20 Sep 2023 20:02:23 +0800
+From: Yunsheng Lin <linyunsheng@huawei.com>
+To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
+	<linyunsheng@huawei.com>, Lorenzo Bianconi <lorenzo@kernel.org>, Alexander
+ Duyck <alexander.duyck@gmail.com>, Liang Chen <liangchen.linux@gmail.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>, Jesper Dangaard Brouer
+	<hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Eric
+ Dumazet <edumazet@google.com>
+Subject: [PATCH net-next v9 4/6] page_pool: introduce page_pool[_cache]_alloc() API
+Date: Wed, 20 Sep 2023 19:58:53 +0800
+Message-ID: <20230920115855.27631-5-linyunsheng@huawei.com>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20230920115855.27631-1-linyunsheng@huawei.com>
+References: <20230920115855.27631-1-linyunsheng@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,81 +49,168 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.56]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-5.15-stable review patch.  If anyone has any objections, please let me know.
+Currently page pool supports the below use cases:
+use case 1: allocate page without page splitting using
+            page_pool_alloc_pages() API if the driver knows
+            that the memory it need is always bigger than
+            half of the page allocated from page pool.
+use case 2: allocate page frag with page splitting using
+            page_pool_alloc_frag() API if the driver knows
+            that the memory it need is always smaller than
+            or equal to the half of the page allocated from
+            page pool.
 
-------------------
+There is emerging use case [1] & [2] that is a mix of the
+above two case: the driver doesn't know the size of memory it
+need beforehand, so the driver may use something like below to
+allocate memory with least memory utilization and performance
+penalty:
 
-From: James Clark <james.clark@arm.com>
+if (size << 1 > max_size)
+	page = page_pool_alloc_pages();
+else
+	page = page_pool_alloc_frag();
 
-[ Upstream commit c8b947642d2339ce74c6a1ce56726089539f48d9 ]
+To avoid the driver doing something like above, add the
+page_pool[_cache]_alloc() API to support the above use case,
+and update the true size of memory that is acctually allocated
+by updating '*size' back to the driver in order to avoid
+exacerbating truesize underestimate problem.
 
-Currently the test skips with an error because == only works in bash:
+Rename page_pool_free() which is used in the destroy process to
+__page_pool_destroy() to avoid confusion with the newly added
+API.
 
-  $ ./perf test 91 -v
-  Couldn't bump rlimit(MEMLOCK), failures may take place when creating BPF maps, etc
-  91: perf stat --bpf-counters test                                   :
-  --- start ---
-  test child forked, pid 44586
-  ./tests/shell/stat_bpf_counters.sh: 26: [: -v: unexpected operator
-  test child finished with -2
-  ---- end ----
-  perf stat --bpf-counters test: Skip
+1. https://lore.kernel.org/all/d3ae6bd3537fbce379382ac6a42f67e22f27ece2.1683896626.git.lorenzo@kernel.org/
+2. https://lore.kernel.org/all/20230526054621.18371-3-liangchen.linux@gmail.com/
 
-Changing == to = does the same thing, but doesn't result in an error:
-
-  ./perf test 91 -v
-  Couldn't bump rlimit(MEMLOCK), failures may take place when creating BPF maps, etc
-  91: perf stat --bpf-counters test                                   :
-  --- start ---
-  test child forked, pid 45833
-  Skipping: --bpf-counters not supported
-    Error: unknown option `bpf-counters'
-  [...]
-  test child finished with -2
-  ---- end ----
-  perf stat --bpf-counters test: Skip
-
-Signed-off-by: James Clark <james.clark@arm.com>
-Cc: Alexander Shishkin <alexander.shishkin@linux.intel.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>
-Cc: Ian Rogers <irogers@google.com>
-Cc: Jiri Olsa <jolsa@redhat.com>
-Cc: John Fastabend <john.fastabend@gmail.com>
-Cc: KP Singh <kpsingh@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: Martin KaFai Lau <kafai@fb.com>
-Cc: Namhyung Kim <namhyung@kernel.org>
-Cc: Song Liu <songliubraving@fb.com>
-Cc: Sumanth Korikkar <sumanthk@linux.ibm.com>
-Cc: Thomas Richter <tmricht@linux.ibm.com>
-Cc: Yonghong Song <yhs@fb.com>
-Cc: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Link: https://lore.kernel.org/r/20211028134828.65774-2-james.clark@arm.com
-Signed-off-by: Arnaldo Carvalho de Melo <acme@redhat.com>
-Stable-dep-of: 68ca249c964f ("perf test shell stat_bpf_counters: Fix test on Intel")
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+CC: Lorenzo Bianconi <lorenzo@kernel.org>
+CC: Alexander Duyck <alexander.duyck@gmail.com>
+CC: Liang Chen <liangchen.linux@gmail.com>
+CC: Alexander Lobakin <aleksander.lobakin@intel.com>
 ---
- tools/perf/tests/shell/stat_bpf_counters.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/net/page_pool/helpers.h | 65 +++++++++++++++++++++++++++++++++
+ net/core/page_pool.c            |  4 +-
+ 2 files changed, 67 insertions(+), 2 deletions(-)
 
-diff --git a/tools/perf/tests/shell/stat_bpf_counters.sh b/tools/perf/tests/shell/stat_bpf_counters.sh
-index 2aed20dc22625..13473aeba489c 100755
---- a/tools/perf/tests/shell/stat_bpf_counters.sh
-+++ b/tools/perf/tests/shell/stat_bpf_counters.sh
-@@ -23,7 +23,7 @@ compare_number()
+diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
+index 0ec81b91bed8..c0e6c7d1b219 100644
+--- a/include/net/page_pool/helpers.h
++++ b/include/net/page_pool/helpers.h
+@@ -82,6 +82,65 @@ static inline struct page *page_pool_dev_alloc_frag(struct page_pool *pool,
+ 	return page_pool_alloc_frag(pool, offset, size, gfp);
+ }
  
- # skip if --bpf-counters is not supported
- if ! perf stat --bpf-counters true > /dev/null 2>&1; then
--	if [ "$1" == "-v" ]; then
-+	if [ "$1" = "-v" ]; then
- 		echo "Skipping: --bpf-counters not supported"
- 		perf --no-pager stat --bpf-counters true || true
- 	fi
++static inline struct page *page_pool_alloc(struct page_pool *pool,
++					   unsigned int *offset,
++					   unsigned int *size, gfp_t gfp)
++{
++	unsigned int max_size = PAGE_SIZE << pool->p.order;
++	struct page *page;
++
++	if ((*size << 1) > max_size) {
++		*size = max_size;
++		*offset = 0;
++		return page_pool_alloc_pages(pool, gfp);
++	}
++
++	page = page_pool_alloc_frag(pool, offset, *size, gfp);
++	if (unlikely(!page))
++		return NULL;
++
++	/* There is very likely not enough space for another frag, so append the
++	 * remaining size to the current frag to avoid truesize underestimate
++	 * problem.
++	 */
++	if (pool->frag_offset + *size > max_size) {
++		*size = max_size - *offset;
++		pool->frag_offset = max_size;
++	}
++
++	return page;
++}
++
++static inline struct page *page_pool_dev_alloc(struct page_pool *pool,
++					       unsigned int *offset,
++					       unsigned int *size)
++{
++	gfp_t gfp = (GFP_ATOMIC | __GFP_NOWARN);
++
++	return page_pool_alloc(pool, offset, size, gfp);
++}
++
++static inline void *page_pool_cache_alloc(struct page_pool *pool,
++					  unsigned int *size, gfp_t gfp)
++{
++	unsigned int offset;
++	struct page *page;
++
++	page = page_pool_alloc(pool, &offset, size, gfp);
++	if (unlikely(!page))
++		return NULL;
++
++	return page_address(page) + offset;
++}
++
++static inline void *page_pool_dev_cache_alloc(struct page_pool *pool,
++					      unsigned int *size)
++{
++	gfp_t gfp = (GFP_ATOMIC | __GFP_NOWARN);
++
++	return page_pool_cache_alloc(pool, size, gfp);
++}
++
+ /**
+  * page_pool_get_dma_dir() - Retrieve the stored DMA direction.
+  * @pool:	pool from which page was allocated
+@@ -222,6 +281,12 @@ static inline void page_pool_recycle_direct(struct page_pool *pool,
+ #define PAGE_POOL_32BIT_ARCH_WITH_64BIT_DMA	\
+ 		(sizeof(dma_addr_t) > sizeof(unsigned long))
+ 
++static inline void page_pool_cache_free(struct page_pool *pool, void *data,
++					bool allow_direct)
++{
++	page_pool_put_page(pool, virt_to_head_page(data), -1, allow_direct);
++}
++
+ /**
+  * page_pool_get_dma_addr() - Retrieve the stored DMA address.
+  * @page:	page allocated from a page pool
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index 1927b9c36c23..74106f6d8f73 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -809,7 +809,7 @@ static void page_pool_empty_ring(struct page_pool *pool)
+ 	}
+ }
+ 
+-static void page_pool_free(struct page_pool *pool)
++static void __page_pool_destroy(struct page_pool *pool)
+ {
+ 	if (pool->disconnect)
+ 		pool->disconnect(pool);
+@@ -860,7 +860,7 @@ static int page_pool_release(struct page_pool *pool)
+ 	page_pool_scrub(pool);
+ 	inflight = page_pool_inflight(pool);
+ 	if (!inflight)
+-		page_pool_free(pool);
++		__page_pool_destroy(pool);
+ 
+ 	return inflight;
+ }
 -- 
-2.40.1
-
-
+2.33.0
 
 
