@@ -1,110 +1,177 @@
-Return-Path: <netdev+bounces-35201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 402B37A78C5
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 12:12:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 237CE7A790F
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 12:21:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98FE4281481
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 10:12:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D22122815CD
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 10:21:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E0F915AC9;
-	Wed, 20 Sep 2023 10:12:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8F7E15ADC;
+	Wed, 20 Sep 2023 10:21:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6924156CD
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 10:12:05 +0000 (UTC)
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA33ECF
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 03:11:52 -0700 (PDT)
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-405101a02bcso8742035e9.1
-        for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 03:11:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 669EA11709
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 10:21:01 +0000 (UTC)
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EDABB9
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 03:20:59 -0700 (PDT)
+Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-9adc75f6f09so734140766b.0
+        for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 03:20:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1695205258; x=1695810058; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=DiPSvOokKshBPUexjeZdWsFIcxk+jNh+RekcG+HrWWg=;
+        b=Q8EpkBsXTujeK9KdV6Ipi7CIded8Z6A0o/320eaBS2YNI9Zq5bpqELgDYnby1+9NAA
+         x0vMxlCZ2/DciYy40fAvHuWP8COzzHiVI/qd3xHjIY3GRS6EgfZ6dxRKS2/tjLVC8i0y
+         qvadDtmLzGVtCr0/a8rjv7jgIv0Fu1k67t6AGN/cjILyedNJzrP7qGX0tQ2JKlkUMaZ1
+         gaFArQimp1wcn1cCl7VEHSEEHO/NweHipL3Ft+5rqN8IUPRxvL8kPKQps/qBypjSbhAl
+         uyBZEqwxJKEGIfQVE3JyWz/MhktcREIMed/6xQo/MoBYXxgfjYjarm8FRtYy1MOpOFgo
+         pd3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695204711; x=1695809511;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AFLGB2qgIpGyxCAHfm2i+PmCGhGU/0Xqf15cnOn5phM=;
-        b=c7isln2GdzkQRzFuTbZ3NfzZiusbrif0sUwxDWP9J0bPSEeG5uRSBg1Bd75Hvt/oIM
-         6k90LokOL3cpMGjnBT9V4BajOCNTuJwADoZ3YahI8Jgud+dczfprgTakBRAT+cOzHSG4
-         QevGua4eMQtd1aP//mOP4/8IGBUrgQ53ebMiZ3uj0ybJpJnL5NEK32XtXAfABhPtS4IC
-         V8h2oIl67XGfJtRjAy13Ik0F7Xkox9slTWfrlXxlEx5P6u/8B81LYKrobKHRNdBGSIdt
-         LmBMNsN0ZG7E9heKDNJLeBResjh9fFeGpBzCIoiLZSyQce9Hu5w3NYA9UWtsyba1rwn2
-         98IQ==
-X-Gm-Message-State: AOJu0YzI9vvnQ8Ro0LqaLdQDy2xxdPIqJ6voYj5Gc00wNwbMeaHaocR/
-	QMVcdPdtPkg9yG1/9isfNY03ufZCk44=
-X-Google-Smtp-Source: AGHT+IE8jps8mSxzh6OP9U5onGqg4xq5lXToTiBZCN6JQ9cBGAViZJwoh/6vwSycDqZnwVxCwrwX9g==
-X-Received: by 2002:a05:600c:4706:b0:404:74bf:fb3e with SMTP id v6-20020a05600c470600b0040474bffb3emr2011904wmo.2.1695204710971;
-        Wed, 20 Sep 2023 03:11:50 -0700 (PDT)
-Received: from [192.168.64.157] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id v9-20020a1cf709000000b00402f7e473b7sm1525727wmh.15.2023.09.20.03.11.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Sep 2023 03:11:50 -0700 (PDT)
-Message-ID: <b82d4ecd-77f3-a562-ec5c-48b0c8ed06f8@grimberg.me>
-Date: Wed, 20 Sep 2023 13:11:47 +0300
+        d=1e100.net; s=20230601; t=1695205258; x=1695810058;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DiPSvOokKshBPUexjeZdWsFIcxk+jNh+RekcG+HrWWg=;
+        b=J9yppJ0egnb6wEkQXEc12Tlrp63Wt7+1jhHz2k3mgCHPs7jjC9M3/15fQp8FcSIwPS
+         +j2cOKlmsVSPHq5tE0dvirdj8KRR6FDRInd1ejLCS4OUWqORL6hB0t4zzfHCPb1UcGpF
+         SCYgS/UaHcGkX+RB58hktXiFOI5Hbo0Pz4iFVZNAU444LVhllEbCquSy5YC8zKBOBJDl
+         usKMHJ/UGDQBt4QSttnGSI9/h9JapKJfi5XJ4pcQqyqmq7khe8iX35roNBJWvucIqt44
+         +3juxIUD/NFSAmHRCVMBs8qk3G8HsSRdIsaeKAIBbSs+wp82Rq8xkr6Vvp3fvuX+2hPg
+         H/6w==
+X-Gm-Message-State: AOJu0YxRbW5ddVXgEGNXqO8ZEo6u5PFcbax6eUEdj+WsiGVyqtEkc8RG
+	GMw45eaNBQ/zoqRoThf8NVvU9A==
+X-Google-Smtp-Source: AGHT+IH9y572ZzI5LplOgamEjCHT7V9pJ+GhfVOuSFBC7rQC9QWMtvEuhe38Ye8C0++DNoADW9M0qw==
+X-Received: by 2002:a17:907:2c4f:b0:9ad:78b7:29ea with SMTP id hf15-20020a1709072c4f00b009ad78b729eamr1394976ejc.44.1695205257896;
+        Wed, 20 Sep 2023 03:20:57 -0700 (PDT)
+Received: from cloudflare.com (79.184.124.164.ipv4.supernova.orange.pl. [79.184.124.164])
+        by smtp.gmail.com with ESMTPSA id c26-20020a170906341a00b00993470682e5sm9122587ejb.32.2023.09.20.03.20.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Sep 2023 03:20:57 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	kernel-team@cloudflare.com,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Cong Wang <cong.wang@bytedance.com>
+Subject: [PATCH bpf] bpf, sockmap: Reject sk_msg egress redirects to non-TCP sockets
+Date: Wed, 20 Sep 2023 12:20:55 +0200
+Message-ID: <20230920102055.42662-1-jakub@cloudflare.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v15 06/20] nvme-tcp: Add DDP data-path
-To: Aurelien Aptel <aaptel@nvidia.com>, linux-nvme@lists.infradead.org,
- netdev@vger.kernel.org, hch@lst.de, kbusch@kernel.org, axboe@fb.com,
- chaitanyak@nvidia.com, davem@davemloft.net, kuba@kernel.org
-Cc: Boris Pismenny <borisp@nvidia.com>, aurelien.aptel@gmail.com,
- smalin@nvidia.com, malin1024@gmail.com, ogerlitz@nvidia.com,
- yorayz@nvidia.com, galshalom@nvidia.com, mgurtovoy@nvidia.com
-References: <20230912095949.5474-1-aaptel@nvidia.com>
- <20230912095949.5474-7-aaptel@nvidia.com>
- <ef66595c-95cd-94c4-7f51-d3d7683a188a@grimberg.me>
- <2537congwxt.fsf@nvidia.com>
- <5b0fcc27-04aa-3ebd-e82a-8df39ed3ef5d@grimberg.me>
- <253v8c5fdc3.fsf@nvidia.com>
-Content-Language: en-US
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <253v8c5fdc3.fsf@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+With a SOCKMAP/SOCKHASH map and an sk_msg program user can steer messages
+sent from one TCP socket (s1) to actually egress from another TCP
+socket (s2):
 
->> Can you please explain why? sk_incoming_cpu is updated from the network
->> recv path while you are arguing that the timing matters before you even
->> send the pdu. I don't understand why should that matter.
-> 
-> Sorry, the original answer was misleading.
-> The problem is not about the timing but only about which CPU the code is
-> running on.  If we move setup_ddp() earlier as you suggested, it can
-> result it running on the wrong CPU.
+tcp_bpf_sendmsg(s1)		// = sk_prot->sendmsg
+  tcp_bpf_send_verdict(s1)	// __SK_REDIRECT case
+    tcp_bpf_sendmsg_redir(s2)
+      tcp_bpf_push_locked(s2)
+	tcp_bpf_push(s2)
+	  tcp_rate_check_app_limited(s2) // expects tcp_sock
+	  tcp_sendmsg_locked(s2)	 // ditto
 
-Please define wrong CPU.
+There is a hard-coded assumption in the call-chain, that the egress
+socket (s2) is a TCP socket.
 
-> Calling setup_ddp() in nvme_tcp_setup_cmd_pdu() will not guarantee we
-> are on running on the queue->io_cpu.
-> It's only during nvme_tcp_queue_request() that we either know we are running on
-> queue->io_cpu, or dispatch it to run on queue->io_cpu.
+However in commit 122e6c79efe1 ("sock_map: Update sock type checks for
+UDP") we have enabled redirects to non-TCP sockets. This was done for the
+sake of BPF sk_skb programs. There was no indention to support sk_msg
+send-to-egress use case.
 
-But the sk_incmoing_cpu is updated with the cpu that is reading the
-socket, so in fact it should converge to the io_cpu - shouldn't it?
+As a result, attempts to send-to-egress through a non-TCP socket lead to a
+crash due to invalid downcast from sock to tcp_sock:
 
-Can you please provide a concrete explanation to the performance
-degradation?
+ BUG: kernel NULL pointer dereference, address: 000000000000002f
+ ...
+ Call Trace:
+  <TASK>
+  ? show_regs+0x60/0x70
+  ? __die+0x1f/0x70
+  ? page_fault_oops+0x80/0x160
+  ? do_user_addr_fault+0x2d7/0x800
+  ? rcu_is_watching+0x11/0x50
+  ? exc_page_fault+0x70/0x1c0
+  ? asm_exc_page_fault+0x27/0x30
+  ? tcp_tso_segs+0x14/0xa0
+  tcp_write_xmit+0x67/0xce0
+  __tcp_push_pending_frames+0x32/0xf0
+  tcp_push+0x107/0x140
+  tcp_sendmsg_locked+0x99f/0xbb0
+  tcp_bpf_push+0x19d/0x3a0
+  tcp_bpf_sendmsg_redir+0x55/0xd0
+  tcp_bpf_send_verdict+0x407/0x550
+  tcp_bpf_sendmsg+0x1a1/0x390
+  inet_sendmsg+0x6a/0x70
+  sock_sendmsg+0x9d/0xc0
+  ? sockfd_lookup_light+0x12/0x80
+  __sys_sendto+0x10e/0x160
+  ? syscall_enter_from_user_mode+0x20/0x60
+  ? __this_cpu_preempt_check+0x13/0x20
+  ? lockdep_hardirqs_on+0x82/0x110
+  __x64_sys_sendto+0x1f/0x30
+  do_syscall_64+0x38/0x90
+  entry_SYSCALL_64_after_hwframe+0x63/0xcd
 
-> As it is only a performance optimization for the non-likely case, we can
-> move it to nvme_tcp_setup_cmd_pdu() as you suggested and re-consider in
-> the future if it will be needed.
+Reject selecting a non-TCP sockets as redirect target from a BPF sk_msg
+program to prevent the crash. When attempted, user will receive an EACCES
+error from send/sendto/sendmsg() syscall.
 
-Would still like to understand this case.
+Fixes: 122e6c79efe1 ("sock_map: Update sock type checks for UDP")
+Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+---
+FYI, I'm working on revamping the sockmap_listen selftest, which exercises
+some of redirect combinations, to cover the whole combination matrix so
+that we can catch these kinds of problems early on.
+
+ net/core/sock_map.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/net/core/sock_map.c b/net/core/sock_map.c
+index cb11750b1df5..4292c2ed1828 100644
+--- a/net/core/sock_map.c
++++ b/net/core/sock_map.c
+@@ -668,6 +668,8 @@ BPF_CALL_4(bpf_msg_redirect_map, struct sk_msg *, msg,
+ 	sk = __sock_map_lookup_elem(map, key);
+ 	if (unlikely(!sk || !sock_map_redirect_allowed(sk)))
+ 		return SK_DROP;
++	if (!(flags & BPF_F_INGRESS) && !sk_is_tcp(sk))
++		return SK_DROP;
+ 
+ 	msg->flags = flags;
+ 	msg->sk_redir = sk;
+@@ -1267,6 +1269,8 @@ BPF_CALL_4(bpf_msg_redirect_hash, struct sk_msg *, msg,
+ 	sk = __sock_hash_lookup_elem(map, key);
+ 	if (unlikely(!sk || !sock_map_redirect_allowed(sk)))
+ 		return SK_DROP;
++	if (!(flags & BPF_F_INGRESS) && !sk_is_tcp(sk))
++		return SK_DROP;
+ 
+ 	msg->flags = flags;
+ 	msg->sk_redir = sk;
+-- 
+2.41.0
+
 
