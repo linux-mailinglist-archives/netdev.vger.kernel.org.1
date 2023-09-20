@@ -1,845 +1,239 @@
-Return-Path: <netdev+bounces-35236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFCE57A7E4B
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 14:16:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1602D7A80DE
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 14:40:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF8EE1C209B4
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 12:16:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 066871C20B37
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 12:40:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F3AB328BD;
-	Wed, 20 Sep 2023 12:15:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FF9A1643E;
+	Wed, 20 Sep 2023 12:40:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60AD715AE7
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 12:15:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAF28C433A9;
-	Wed, 20 Sep 2023 12:15:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695212147;
-	bh=olT8E3TU+IwynXmwLR5iExMQ4jqe1iQFSIY8O+8jh2A=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LETuaAgThyDhTW115q8CbVGS1mD3aWN5j/ZfeulsFI0xXs4rm4odpbyuoKtAT0g7h
-	 GtX0HNXnCYA+RUhFAcdvxBMh9rqzDSBzYBA7wFmovx9G1naBn4SiVlj7A+ufZj8gGG
-	 zm+Fn1s93I+eTsGh2gsqRU7QpJ099Ujb1/2V0ig0/7P3IloFaVnJ5xG9R0LhMno6Bj
-	 a27jaET6dLjSB32iEUUj529AdoUJCcnxVF9CG+5QzY27U/DyGXqKhcGyTakUWR27Xn
-	 ArTEKrRJkSs7ClQcBNGEbc3qdj48nwzpJW63WMqPDt/4Pzm/DDalc4DtBJkXvEuddA
-	 kDZwKO0tz4dJg==
-From: Roger Quadros <rogerq@kernel.org>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	vladimir.oltean@nxp.com
-Cc: horms@kernel.org,
-	s-vadapalli@ti.com,
-	srk@ti.com,
-	vigneshr@ti.com,
-	p-varis@ti.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	rogerq@kernel.org
-Subject: [PATCH net-next v4 3/3] net: ethernet: ti: am65-cpsw-qos: Add Frame Preemption MAC Merge support
-Date: Wed, 20 Sep 2023 15:15:30 +0300
-Message-Id: <20230920121530.4710-4-rogerq@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230920121530.4710-1-rogerq@kernel.org>
-References: <20230920121530.4710-1-rogerq@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EDF8111AB;
+	Wed, 20 Sep 2023 12:40:36 +0000 (UTC)
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4389B83;
+	Wed, 20 Sep 2023 05:40:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1695213635; x=1726749635;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=hH/tXfcgFWyY1J6pGeUm+MrA0FJHy2L4mbGlIXpLcj8=;
+  b=xYm7GgcIUevm6xCmH5shkr+vllIdyjDcmjejkhz9zL+SC/QxoHti6MRC
+   PSrdlplzWHVggUsJ16vzWI/C/T7mZOakOKMpUHfdjXewDtG+TvWiyyPR0
+   5j+EdjquXL9Yf0mGzeSKojjNd6WmdrSf9EqrWAgGIXgtNyLP/3y5m4csG
+   bEBe7CtfIDaLB61WL2GoFBwDixCWpVHdH0+05Ou1gE6frp3Jhc2j7CB7i
+   z81L4s9ZZvL10UjxO0Yy7igbkwKqlhgMof9+erN+Zq8mEScMyZnpacdTv
+   6bo61QJU2VWMt9ldtVBQNWz8AuLNW/OwzUS00A0obw3MtGROshqqGdJpZ
+   w==;
+X-CSE-ConnectionGUID: PpI1jxETQgiDG9gAzPFPCQ==
+X-CSE-MsgGUID: O1O5ezL9Rd2nkXUgycpX+w==
+X-ThreatScanner-Verdict: Negative
+X-IronPort-AV: E=Sophos;i="6.03,162,1694761200"; 
+   d="scan'208";a="236186306"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 20 Sep 2023 05:40:34 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Wed, 20 Sep 2023 05:40:34 -0700
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (10.10.215.89) by
+ email.microchip.com (10.10.87.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21 via Frontend
+ Transport; Wed, 20 Sep 2023 05:40:33 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Rj5rbJzOGm5bV0VqgRPGCSV9GGoHBVeVzyZ97GLq5orJX5fnam3gc7Qa8zDrfhFfelNoPj15xoTfTkSwC63KJWB/kYEk64f5elkusZfpj+aWoRGUURaS/STa3pfozim2hUdNFhTBPuGxYmvpSjLYl3Hyq2psKzCSB9mvZv/hiOcldw+b2rAMAAomgGw27pe1C8D/0WoX/jcxLMsnBJHQClxlXjy2SfpAcjomt3qZfrvBiskroU9Ws/LjU5zYN77/v3Mbeb2XKwSrLOY7hwgzJSRnZ6YT7bvV7zBOh7P+tmbtJOtACscBnEqXYIzw/WcdVaiz09pmWn+Ml0TLr26BBQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hH/tXfcgFWyY1J6pGeUm+MrA0FJHy2L4mbGlIXpLcj8=;
+ b=Wy3/svpvHQROeayUo1rCNrkXpmPlixm3p7DwK3Q0C2PKenYoPrUqGFUg9vIIOGct6zqqE/j22x7Zbpm7GBaOWsfbuN0uH2gkQ1heIJ3neNeb89Rmd2grkVP62VEO8uljC7uT9pLdErsIAA+mUZaOoMvfzXQx5Ledm9zwZGr+8mYALr3BfxRWe6yW93AiVOUZyPVm4Fs5vBJRoEL+QeEf1xBecE9uHRuRu6NZBjBS9aWA3xZGp0zfX7L+XOwhvEyKLBvSvvG7nfuqzN1uZ9PG9Ry+YmFp1u4V8igG9fkxBp1a4CmYIn96HQgiS3SXLeWcLxJ7wPztfruVCD1ed0vhsA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=microchiptechnology.onmicrosoft.com;
+ s=selector2-microchiptechnology-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hH/tXfcgFWyY1J6pGeUm+MrA0FJHy2L4mbGlIXpLcj8=;
+ b=ATrAN2+YeI12RuVRiQAnEjzFE+1A99pdpHL3jwgPzQJ4YDQIuG5sgeCup9oQI6+zphG6X7bwQDcaxjBsK62pCk8GrzMImUXNGnpzJn5rA/DYWJR+vEm78/dkbCvMNHaOw7xOJQa0OHTOmoxWisZy3Esn6MDGy5YGnDoJuziSvtU=
+Received: from DM6PR11MB3532.namprd11.prod.outlook.com (2603:10b6:5:70::25) by
+ CH3PR11MB8591.namprd11.prod.outlook.com (2603:10b6:610:1af::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6813.20; Wed, 20 Sep 2023 12:40:31 +0000
+Received: from DM6PR11MB3532.namprd11.prod.outlook.com
+ ([fe80::6352:54f7:6c42:69ef]) by DM6PR11MB3532.namprd11.prod.outlook.com
+ ([fe80::6352:54f7:6c42:69ef%7]) with mapi id 15.20.6813.017; Wed, 20 Sep 2023
+ 12:40:31 +0000
+From: <Parthiban.Veerasooran@microchip.com>
+To: <andrew@lunn.ch>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <robh+dt@kernel.org>,
+	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>, <corbet@lwn.net>,
+	<Steen.Hegelund@microchip.com>, <rdunlap@infradead.org>, <horms@kernel.org>,
+	<casper.casan@gmail.com>, <netdev@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <Horatiu.Vultur@microchip.com>,
+	<Woojung.Huh@microchip.com>, <Nicolas.Ferre@microchip.com>,
+	<UNGLinuxDriver@microchip.com>, <Thorsten.Kummermehr@microchip.com>,
+	<Ciprian.Regus@analog.com>, <jtm@lopingdog.com>
+Subject: Re: [RFC PATCH net-next 1/6] net: ethernet: implement OPEN Alliance
+ control transaction interface
+Thread-Topic: [RFC PATCH net-next 1/6] net: ethernet: implement OPEN Alliance
+ control transaction interface
+Thread-Index: AQHZ4mEB+nwP90vbvEyYqcmk7ntkibAYCnuAgAoMZoCAADwLgIABZ4MA
+Date: Wed, 20 Sep 2023 12:40:31 +0000
+Message-ID: <cf23ed3c-d1cb-61fd-a305-e2787ef70cb1@microchip.com>
+References: <20230908142919.14849-1-Parthiban.Veerasooran@microchip.com>
+ <20230908142919.14849-2-Parthiban.Veerasooran@microchip.com>
+ <f23997c1-7507-41c6-8bb3-47d6a353beb8@lunn.ch>
+ <14c089d7-4d34-9cd5-7f77-55c80815e003@microchip.com>
+ <deff3e64-a10f-4d07-9651-502442a86987@lunn.ch>
+In-Reply-To: <deff3e64-a10f-4d07-9651-502442a86987@lunn.ch>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR11MB3532:EE_|CH3PR11MB8591:EE_
+x-ms-office365-filtering-correlation-id: 34943176-e5bb-4c97-b27c-08dbb9d6c6ed
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ADfstVWuH+FquQxirliFkS8EHExz3qH5+9OEhmc1TSCKRbUen3aPY9ivV4JQlLfQzLgzXRZuLYcvLK0TRCcFrNfk6bt+K26nfDD5TkzfuAq4ujRDVwIWSokxOZ6AhyhgtPySHg5Jb/0PvwYqwqAKCH1w5Fvbzg1HztXn7ud/olKq2IJz4cKd7b5q56XJGRI7CgTFpyWzOoqLevrm9DiAFN+5LayiyDYCzN0/6PSTf18lhEW/pnQAEf/8rwEoVFhWAkj36l0c0k5jTl5kejLd4d/yF4+pbG6052AoR8yDHYpm7L+gC0CeTLtxgf0e/GuybZpvd5cNO3QrYWUQxWI0SSDE/r5MufXF6cXa+eHwxA7a1ty1CcVx7hThC78SJzsnN2lE0Jn7e7uafoD/t/XDUTzLZQTyItZ6vRR2DDczIgwkEpxQ/l36cBASa7vzJnxXREt8MfPiEltdW+XHLWleTL0tJKPSLrtpkxjSngh2Mg38edejNyXc+G9BCCjHP45jYsc7TuHzSVaWR+AeCZwcjvhRZDY9Aw/rIrmTPj4PA3OXm5YQgBvqSfKkwYQRgj+RjvqLctQbSt5kCSGE3kEs0JaQGSbokUkjwfhgq+aiMBkLmyJ5KSckL8t5UCXqmgRC79uqUAD6xRHQgtz05ePMM6D+KMjgKWMbgtUnajoy/pzJ0tJHLDwORXlQ8VilSGZh
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3532.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(346002)(376002)(136003)(396003)(39860400002)(451199024)(186009)(1800799009)(31696002)(5660300002)(41300700001)(2616005)(26005)(2906002)(7416002)(122000001)(38070700005)(38100700002)(86362001)(36756003)(4326008)(8676002)(8936002)(83380400001)(478600001)(53546011)(6506007)(6486002)(6512007)(6916009)(316002)(31686004)(71200400001)(76116006)(66446008)(66556008)(64756008)(91956017)(66476007)(66946007)(54906003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?bGwxR0l2ajFBbHcxTGkxSnFBbndSdUt5VGhFYnJUQnN3cDlxR0hTNEc1Nm95?=
+ =?utf-8?B?aTFlNFF2S1pIdmZaOHJFbnhwVkladmZaZGlSN2NYYlVrSEpDL1V5b3A4RE9R?=
+ =?utf-8?B?NS9MYU1Dczk4bjhLNmwyZG8vUlZ4TkRSOHdhd0M4WUYvcG9tZmJGS3FrVm1X?=
+ =?utf-8?B?UHJscTNTWDZwTXlBSmRYOG12RkFBVkF2QzFHTXFXeWtvTHpjU1YvUldKc0dj?=
+ =?utf-8?B?NHRIQ20wN0hIQWVldFNyMDIyVjR5aUtzMWx3cnRkcmVZS2hEZGxIejViYmNr?=
+ =?utf-8?B?SS9YZ0thUVN4eHR1VWMrNTRxcGw1UkNtWk9vVjJBN3VVS0E4TUFIVnFYaldW?=
+ =?utf-8?B?T0VtME95eU9wMUo5L0tQSDdDTTEzWEFBR3AvMEpVQWhsbFFmejlaN3R4U1k3?=
+ =?utf-8?B?bExSbEZVQm9raGlPcHNvblV0aFNyRElONE4rVndZYjlZOW1iNkw0SXBydmo5?=
+ =?utf-8?B?c1UrRDZUNEp4aVpJSy9nRm41cENzQkViK0tiWGhHenA1Z2VXQWVBVHFuWHRT?=
+ =?utf-8?B?U3BqRW5nUFhkbS9SbWNITmJvOGZCVUJJeUwxYkRkWTRySDVVcmlyb1duTXVV?=
+ =?utf-8?B?dm42TjRxYkxnRmFoK08yWlVNYS9UUkY5S2kzOVdTa1dORkozbG56Mk5OcjJu?=
+ =?utf-8?B?VE1vSzJrMFBjLzdEcUczQ2tnQ2RiV1g4Nm9uWHdEWDRpMzNWUmtMVXZiRjVZ?=
+ =?utf-8?B?VGdZTmZLMjVMdTY1SEk2VjNlcDBGZFdNUnpIRjF1aWxzRkNyZzhFRXlsb1RS?=
+ =?utf-8?B?NlljRlFjU1Y2M1NYVElTY3p3SklHbmhoWndKN0U3T1dZbERrUTY3eVBGQzJq?=
+ =?utf-8?B?UkxrS0ZmYTM0ejFmZUZ6VC9jcDQrZ1g2Y3N3aElXTVpLOWM2dHNmK1lqc2tK?=
+ =?utf-8?B?R2FLTTk0RHM1ZWJvRFNOZVVqNi8xL25YU1V0cUtXbVRBMXpMVHNwYS91Vk5H?=
+ =?utf-8?B?b1p1eTN4WHErTFFPcytmK3V6S2lkSjdhazd5TDVzRzNacXpUYVVPZjd4SVBP?=
+ =?utf-8?B?dHNaVFBBQ3I1NGpYQVBQNTJsem5QSDRubk51bnNMTFpydFJXcHd3MWNaZUxn?=
+ =?utf-8?B?cDhXbjJjWUhLRVlRcDhEdEtkU1RlKzFVcjNDcGlHb2Z2b0xWSmFwZVFVM0Fp?=
+ =?utf-8?B?aCtTUVhLUVUwK3FhQ2o0OVYreUdzWFRjNCtPcnVYc1BsbVg1aGNlM2lrZWVK?=
+ =?utf-8?B?UHB5Y2IrYTFyczVaWDIrc0dUd01TWkRzODVUclZEbnlybmpYd1hNcndLaG9r?=
+ =?utf-8?B?RHkyWitXNVJFcE0waGhDWU50VXJLYnhrZGtyMW5FWUZCa0JtU0pqdEg4bEdj?=
+ =?utf-8?B?WTNxMnBqVEJQalRacVlVd3JtNVZodEJpU0tDdzU0S0VPYk9sNG0wZUptZzF5?=
+ =?utf-8?B?b0U1VXVXQXdoWFhLaHdvaE4xU09XaEgrRlg5dnp3cTBsZmRkMmVzdjZxUjYx?=
+ =?utf-8?B?YnVlSk8xaUVBWjRDdHZ5RHBOWjBEOHBIVGVyQTAwK21MSXFJR0NQczJuL0pm?=
+ =?utf-8?B?dlNRYkNJcFh5YWg1QnhFQ3BWSG91L2hGQTVYVlkzME1tMjNzSTl6ZzRGSDF3?=
+ =?utf-8?B?RUxaNjVmZ1ZYdWw3MDR1TE9RSU9oQStHdVN6T0oxWUhOajNBdHdUdEVSL2Jn?=
+ =?utf-8?B?d1daM2FEbVh4OEtuWDRnVlIxVEdSR3MrUHNpc1RLK2RHbmJRNEpFUVpTOFQv?=
+ =?utf-8?B?L2RpNFJ1bWVCVlZkdWdOZ0hmU1grRHFhR1pIUndyUVd1eGdWUmJEMjZxNHlW?=
+ =?utf-8?B?WjRoTkV4anowVlpqR0pFUUZFWmJad1pVRGlKOXdOd3lRVHFPL3puazN3Q2pS?=
+ =?utf-8?B?enpqamdFWW9WbFVQTUtBWkI2dFV5Mjg0dzRESjA1enhtYXh4ZjEwcDMwa1FX?=
+ =?utf-8?B?T2dDcW1VbURpQ05iblppdjlrdVdEazYvaDczSFVmMzVTUzU3UWp3Mlo3MC9D?=
+ =?utf-8?B?QXVLdXB6YXpEQmJxREhaaTB6WXg2UXpxRmFWazQwbDFwK29ad2tjdnhGalZW?=
+ =?utf-8?B?Tkxyc0tIdGRBNm5acUpLN2g1RFRVVnE1cncwWlJHbnlMRGhXekc5S1JZbVZK?=
+ =?utf-8?B?dW9KSVptRThuOCtZd2lESXFrbFduNlRZcU1SUUg4anJKUVpoMDFKallianUv?=
+ =?utf-8?B?UnRqSFBvcU40MjIwemtoZ3hGSEgrdE5KTXFONGtDSlFoK2d4dk5LdXUyUVdm?=
+ =?utf-8?B?R3c9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F446AE423F01954DB7CC24AE8072A484@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3532.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 34943176-e5bb-4c97-b27c-08dbb9d6c6ed
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Sep 2023 12:40:31.4191
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: TbCfgES5ERbY3HPQSxnC3qPCbqP2mVquR+LZRVMB9LbCVYepQcM+OkWUoWb+qylnBgHkoBEBpLKfEYz7oYyqW+Lu+knDTY6mun7YfM4eXSlAiT6jWgdMnRW9st8InGZ1
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8591
+X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Add driver support for viewing / changing the MAC Merge sublayer
-parameters and seeing the verification state machine's current state
-via ethtool.
-
-As hardware does not support interrupt notification for verification
-events we resort to polling on link up. On link up we try a couple of
-times for verification success and if unsuccessful then give up.
-
-The Frame Preemption feature is described in the Technical Reference
-Manual [1] in section:
-	12.3.1.4.6.7 Intersperced Express Traffic (IET – P802.3br/D2.0)
-
-Due to Silicon Errata i2208 [2] we set limit min IET fragment size to 124.
-
-[1] AM62x TRM - https://www.ti.com/lit/ug/spruiv7a/spruiv7a.pdf
-[2] AM62x Silicon Errata - https://www.ti.com/lit/er/sprz487c/sprz487c.pdf
-
-Signed-off-by: Roger Quadros <rogerq@kernel.org>
----
- drivers/net/ethernet/ti/am65-cpsw-ethtool.c | 150 ++++++++++++
- drivers/net/ethernet/ti/am65-cpsw-nuss.c    |   2 +
- drivers/net/ethernet/ti/am65-cpsw-nuss.h    |   5 +
- drivers/net/ethernet/ti/am65-cpsw-qos.c     | 240 ++++++++++++++++----
- drivers/net/ethernet/ti/am65-cpsw-qos.h     | 104 +++++++++
- 5 files changed, 454 insertions(+), 47 deletions(-)
-
-Changelog:
----------
-v4:
-- Rebase and include in the same series as mqprio support.
-
-v3:
-- Rebase on top of v6.6-rc1 and mqprio support [1]
-- Support ethtool_ops :: get_mm_stats()
-- drop unused variables cmn_ctrl and verify_cnt
-- make am65_cpsw_iet_link_state_update() and
-  am65_cpsw_iet_change_preemptible_tcs() static
-
-[1] https://lore.kernel.org/all/20230918075358.5878-1-rogerq@kernel.org/
-
-v2:
-- Use proper control bits for PMAC enable (AM65_CPSW_PN_CTL_IET_PORT_EN)
-  and TX enable (AM65_CPSW_PN_IET_MAC_PENABLE)
-- Common IET Enable (AM65_CPSW_CTL_IET_EN) is set if any port has
-  AM65_CPSW_PN_CTL_IET_PORT_EN set.
-- Fix workaround for erratum i2208. i.e. Limit rx_min_frag_size to 124
-- Fix am65_cpsw_iet_get_verify_timeout_ms() to default to timeout for
-  1G link if link is inactive.
-- resize the RX FIFO based on pmac_enabled, not tx_enabled.
-
-Test Procedure:
-
-- 2 EVMs with AM65-CPSW network port connected to each other
-- Run iet-setup-mqprio.sh on both
-
-#!/bin/sh
-#iet-setup-mqprio.sh
-
-ifconfig eth0 down
-ifconfig eth1 down
-ethtool -L eth0 tx 4
-ethtool --set-mm eth0 pmac-enabled on tx-enabled on verify-enabled on verify-time 10 tx-min-frag-size 124
-ifconfig eth0 up
-sleep 10
-
-tc qdisc add dev eth0 handle 100: root mqprio \
-num_tc 4 \
-map 0 1 2 3 \
-queues 1@0 1@1 1@2 1@3 \
-hw 1 \
-mode dcb \
-fp P P P E
-
-tc -g class show dev eth0
-tc qdisc add dev eth0 clsact
-tc filter add dev eth0 egress protocol ip prio 1 u32 match ip dport 5002 0xffff action skbedit priority 2
-tc filter add dev eth0 egress protocol ip prio 1 u32 match ip dport 5003 0xffff action skbedit priority 3
-ip addr add 192.168.3.102/24 dev eth0 
-
-- check that MAC merge verification has succeeded
-
-ethtool --show-mm eth0
-
-        MAC Merge layer state for eth0:
-        pMAC enabled: on
-        TX enabled: on
-        TX active: on
-        TX minimum fragment size: 124
-        RX minimum fragment size: 124
-        Verify enabled: on
-        Verify time: 10
-        Max verify time: 134
-        Verification status: SUCCEEDED
-
-- On receiver EVM run 2 iperf instances
-
-iperf3 -s -i30 -p5002&
-iperf3 -s -i30 -p5003&
-
-- On sender EVM run 2 iperf instances
-
-iperf3 -c 192.168.3.102 -u -b200M -l1472 -u -t5 -i30 -p5002&
-iperf3 -c 192.168.3.102 -u -b50M -l1472 -u -t5 -i30 -p5003&
-
-- Check IET stats on sender. Look for MACMergeFragCountTx: increments
-
-ethtool -I --show-mm eth0
-MAC Merge layer state for eth0:
-pMAC enabled: on
-TX enabled: on
-TX active: on
-TX minimum fragment size: 124
-RX minimum fragment size: 124
-Verify enabled: on
-Verify time: 10
-Max verify time: 134
-Verification status: SUCCEEDED
-Statistics:
-  MACMergeFrameAssErrorCount: 0
-  MACMergeFrameSmdErrorCount: 0
-  MACMergeFrameAssOkCount: 0
-  MACMergeFragCountRx: 0
-  MACMergeFragCountTx: 57824
-  MACMergeHoldCount: 0
-
-- Check IET stats on receiver. Look for MACMergeFragCountRx: and
-  MACMergeFrameAssOkCount:
-
-ethtool -I --show-mm eth0
-MAC Merge layer state for eth0:
-pMAC enabled: on
-TX enabled: on
-TX active: on
-TX minimum fragment size: 124
-RX minimum fragment size: 124
-Verify enabled: on
-Verify time: 10
-Max verify time: 134
-Verification status: SUCCEEDED
-Statistics:
-  MACMergeFrameAssErrorCount: 0
-  MACMergeFrameSmdErrorCount: 0
-  MACMergeFrameAssOkCount: 57018
-  MACMergeFragCountRx: 57824
-  MACMergeFragCountTx: 0
-  MACMergeHoldCount: 0
-
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
-index c51e2af91f69..f6b081b7e754 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
-@@ -11,6 +11,7 @@
- #include <linux/pm_runtime.h>
- 
- #include "am65-cpsw-nuss.h"
-+#include "am65-cpsw-qos.h"
- #include "cpsw_ale.h"
- #include "am65-cpts.h"
- 
-@@ -715,6 +716,152 @@ static int am65_cpsw_set_ethtool_priv_flags(struct net_device *ndev, u32 flags)
- 	return 0;
- }
- 
-+static void am65_cpsw_port_iet_rx_enable(struct am65_cpsw_port *port, bool enable)
-+{
-+	u32 val;
-+
-+	val = readl(port->port_base + AM65_CPSW_PN_REG_CTL);
-+	if (enable)
-+		val |= AM65_CPSW_PN_CTL_IET_PORT_EN;
-+	else
-+		val &= ~AM65_CPSW_PN_CTL_IET_PORT_EN;
-+
-+	writel(val, port->port_base + AM65_CPSW_PN_REG_CTL);
-+	am65_cpsw_iet_common_enable(port->common);
-+}
-+
-+static void am65_cpsw_port_iet_tx_enable(struct am65_cpsw_port *port, bool enable)
-+{
-+	u32 val;
-+
-+	val = readl(port->port_base + AM65_CPSW_PN_REG_IET_CTRL);
-+	if (enable)
-+		val |= AM65_CPSW_PN_IET_MAC_PENABLE;
-+	else
-+		val &= ~AM65_CPSW_PN_IET_MAC_PENABLE;
-+
-+	writel(val, port->port_base + AM65_CPSW_PN_REG_IET_CTRL);
-+}
-+
-+static int am65_cpsw_get_mm(struct net_device *ndev, struct ethtool_mm_state *state)
-+{
-+	struct am65_cpsw_port *port = am65_ndev_to_port(ndev);
-+	struct am65_cpsw_ndev_priv *priv = netdev_priv(ndev);
-+	u32 port_ctrl, iet_ctrl, iet_status;
-+	u32 add_frag_size;
-+
-+	mutex_lock(&priv->mm_lock);
-+
-+	iet_ctrl = readl(port->port_base + AM65_CPSW_PN_REG_IET_CTRL);
-+	port_ctrl = readl(port->port_base + AM65_CPSW_PN_REG_CTL);
-+
-+	state->tx_enabled = !!(iet_ctrl & AM65_CPSW_PN_IET_MAC_PENABLE);
-+	state->pmac_enabled = !!(port_ctrl & AM65_CPSW_PN_CTL_IET_PORT_EN);
-+
-+	iet_status = readl(port->port_base + AM65_CPSW_PN_REG_IET_STATUS);
-+
-+	if (iet_ctrl & AM65_CPSW_PN_IET_MAC_DISABLEVERIFY)
-+		state->verify_status = ETHTOOL_MM_VERIFY_STATUS_DISABLED;
-+	else if (iet_status & AM65_CPSW_PN_MAC_VERIFIED)
-+		state->verify_status = ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED;
-+	else if (iet_status & AM65_CPSW_PN_MAC_VERIFY_FAIL)
-+		state->verify_status = ETHTOOL_MM_VERIFY_STATUS_FAILED;
-+	else
-+		state->verify_status = ETHTOOL_MM_VERIFY_STATUS_UNKNOWN;
-+
-+	add_frag_size = AM65_CPSW_PN_IET_MAC_GET_ADDFRAGSIZE(iet_ctrl);
-+	state->tx_min_frag_size = ethtool_mm_frag_size_add_to_min(add_frag_size);
-+
-+	/* Errata i2208: RX min fragment size cannot be less than 124 */
-+	state->rx_min_frag_size = 124;
-+
-+	/* FPE active if common tx_enabled and verification success or disabled (forced) */
-+	state->tx_active = state->tx_enabled &&
-+			   (state->verify_status == ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED ||
-+			    state->verify_status == ETHTOOL_MM_VERIFY_STATUS_DISABLED);
-+	state->verify_enabled = !(iet_ctrl & AM65_CPSW_PN_IET_MAC_DISABLEVERIFY);
-+
-+	state->verify_time = port->qos.iet.verify_time_ms;
-+	state->max_verify_time = am65_cpsw_iet_get_verify_timeout_ms(AM65_CPSW_PN_MAC_VERIFY_CNT_MASK,
-+								     port);
-+	mutex_unlock(&priv->mm_lock);
-+
-+	return 0;
-+}
-+
-+static int am65_cpsw_set_mm(struct net_device *ndev, struct ethtool_mm_cfg *cfg,
-+			    struct netlink_ext_ack *extack)
-+{
-+	struct am65_cpsw_port *port = am65_ndev_to_port(ndev);
-+	struct am65_cpsw_ndev_priv *priv = netdev_priv(ndev);
-+	struct am65_cpsw_iet *iet = &port->qos.iet;
-+	u32 val, add_frag_size;
-+	int err;
-+
-+	err = ethtool_mm_frag_size_min_to_add(cfg->tx_min_frag_size, &add_frag_size, extack);
-+	if (err)
-+		return err;
-+
-+	mutex_lock(&priv->mm_lock);
-+
-+	if (cfg->pmac_enabled) {
-+		/* change TX & RX FIFO MAX_BLKS as per TRM recommendation */
-+		if (!iet->original_max_blks)
-+			iet->original_max_blks = readl(port->port_base + AM65_CPSW_PN_REG_MAX_BLKS);
-+
-+		writel(AM65_CPSW_PN_TX_RX_MAX_BLKS_IET,
-+		       port->port_base + AM65_CPSW_PN_REG_MAX_BLKS);
-+	} else {
-+		/* restore RX & TX FIFO MAX_BLKS */
-+		if (iet->original_max_blks) {
-+			writel(iet->original_max_blks,
-+			       port->port_base + AM65_CPSW_PN_REG_MAX_BLKS);
-+		}
-+	}
-+
-+	am65_cpsw_port_iet_rx_enable(port, cfg->pmac_enabled);
-+	am65_cpsw_port_iet_tx_enable(port, cfg->tx_enabled);
-+
-+	val = readl(port->port_base + AM65_CPSW_PN_REG_IET_CTRL);
-+	if (cfg->verify_enabled) {
-+		val &= ~AM65_CPSW_PN_IET_MAC_DISABLEVERIFY;
-+		/* Reset Verify state machine. Verification won't start here.
-+		 * Verification will be done once link-up.
-+		 */
-+		val |= AM65_CPSW_PN_IET_MAC_LINKFAIL;
-+	} else {
-+		val |= AM65_CPSW_PN_IET_MAC_DISABLEVERIFY;
-+	}
-+
-+	val &= ~AM65_CPSW_PN_IET_MAC_MAC_ADDFRAGSIZE_MASK;
-+	val |= AM65_CPSW_PN_IET_MAC_SET_ADDFRAGSIZE(add_frag_size);
-+	writel(val, port->port_base + AM65_CPSW_PN_REG_IET_CTRL);
-+
-+	/* verify_timeout_count can only be set at valid link */
-+	port->qos.iet.verify_time_ms = cfg->verify_time;
-+
-+	/* enable/disable pre-emption based on link status */
-+	am65_cpsw_iet_commit_preemptible_tcs(port);
-+
-+	mutex_unlock(&priv->mm_lock);
-+
-+	return 0;
-+}
-+
-+static void am65_cpsw_get_mm_stats(struct net_device *ndev,
-+				   struct ethtool_mm_stats *s)
-+{
-+	struct am65_cpsw_port *port = am65_ndev_to_port(ndev);
-+	void __iomem *base = port->stat_base;
-+
-+	s->MACMergeFrameAssOkCount = readl(base + AM65_CPSW_STATN_IET_RX_ASSEMBLY_OK);
-+	s->MACMergeFrameAssErrorCount = readl(base + AM65_CPSW_STATN_IET_RX_ASSEMBLY_ERROR);
-+	s->MACMergeFrameSmdErrorCount = readl(base + AM65_CPSW_STATN_IET_RX_SMD_ERROR);
-+	s->MACMergeFragCountRx = readl(base + AM65_CPSW_STATN_IET_RX_FRAG);
-+	s->MACMergeFragCountTx = readl(base + AM65_CPSW_STATN_IET_TX_FRAG);
-+	s->MACMergeHoldCount = readl(base + AM65_CPSW_STATN_IET_TX_HOLD);
-+}
-+
- const struct ethtool_ops am65_cpsw_ethtool_ops_slave = {
- 	.begin			= am65_cpsw_ethtool_op_begin,
- 	.complete		= am65_cpsw_ethtool_op_complete,
-@@ -743,4 +890,7 @@ const struct ethtool_ops am65_cpsw_ethtool_ops_slave = {
- 	.get_eee		= am65_cpsw_get_eee,
- 	.set_eee		= am65_cpsw_set_eee,
- 	.nway_reset		= am65_cpsw_nway_reset,
-+	.get_mm			= am65_cpsw_get_mm,
-+	.set_mm			= am65_cpsw_set_mm,
-+	.get_mm_stats		= am65_cpsw_get_mm_stats,
- };
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index bea6fc0f324c..2004f6a020d3 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -2161,6 +2161,8 @@ am65_cpsw_nuss_init_port_ndev(struct am65_cpsw_common *common, u32 port_idx)
- 	ndev_priv = netdev_priv(port->ndev);
- 	ndev_priv->port = port;
- 	ndev_priv->msg_enable = AM65_CPSW_DEBUG;
-+	mutex_init(&ndev_priv->mm_lock);
-+	port->qos.link_speed = SPEED_UNKNOWN;
- 	SET_NETDEV_DEV(port->ndev, dev);
- 
- 	eth_hw_addr_set(port->ndev, port->slave.mac_addr);
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.h b/drivers/net/ethernet/ti/am65-cpsw-nuss.h
-index f3dad2ab9828..1e4a045057fc 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.h
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.h
-@@ -145,6 +145,7 @@ struct am65_cpsw_common {
- 	bool			pf_p0_rx_ptype_rrobin;
- 	struct am65_cpts	*cpts;
- 	int			est_enabled;
-+	bool			iet_enabled;
- 
- 	bool		is_emac_mode;
- 	u16			br_members;
-@@ -170,6 +171,10 @@ struct am65_cpsw_ndev_priv {
- 	struct am65_cpsw_port	*port;
- 	struct am65_cpsw_ndev_stats __percpu *stats;
- 	bool offload_fwd_mark;
-+	/* Serialize access to MAC Merge state between ethtool requests
-+	 * and link state updates
-+	 */
-+	struct mutex		mm_lock;
- };
- 
- #define am65_ndev_to_priv(ndev) \
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-qos.c b/drivers/net/ethernet/ti/am65-cpsw-qos.c
-index d49a2bc97289..90f9ed4bd4d0 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-qos.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-qos.c
-@@ -4,9 +4,11 @@
-  *
-  * quality of service module includes:
-  * Enhanced Scheduler Traffic (EST - P802.1Qbv/D2.2)
-+ * Interspersed Express Traffic (IET - P802.3br/D2.0)
-  */
- 
- #include <linux/pm_runtime.h>
-+#include <linux/units.h>
- #include <linux/time.h>
- #include <net/pkt_cls.h>
- 
-@@ -15,50 +17,6 @@
- #include "am65-cpts.h"
- #include "cpsw_ale.h"
- 
--#define AM65_CPSW_REG_CTL			0x004
--#define AM65_CPSW_P0_REG_TX_PRI_MAP		0x018
--#define AM65_CPSW_P0_REG_RX_PRI_MAP		0x020
--#define AM65_CPSW_P0_REG_FIFO_STATUS		0x050
--#define AM65_CPSW_P0_REG_PRI_CIR(pri)		(0x140 + 4 * (pri))
--#define AM65_CPSW_P0_REG_PRI_EIR(pri)		(0x160 + 4 * (pri))
--
--#define AM65_CPSW_PN_REG_CTL			0x004
--#define AM65_CPSW_PN_REG_TX_PRI_MAP		0x018
--#define AM65_CPSW_PN_REG_RX_PRI_MAP		0x020
--#define AM65_CPSW_PN_REG_FIFO_STATUS		0x050
--#define AM65_CPSW_PN_REG_EST_CTL		0x060
--#define AM65_CPSW_PN_REG_PRI_CIR(pri)		(0x140 + 4 * (pri))
--#define AM65_CPSW_PN_REG_PRI_EIR(pri)		(0x160 + 4 * (pri))
--
--/* AM65_CPSW_REG_CTL register fields */
--#define AM65_CPSW_CTL_EST_EN			BIT(18)
--
--/* AM65_CPSW_PN_REG_CTL register fields */
--#define AM65_CPSW_PN_CTL_EST_PORT_EN		BIT(17)
--
--/* AM65_CPSW_PN_REG_EST_CTL register fields */
--#define AM65_CPSW_PN_EST_ONEBUF			BIT(0)
--#define AM65_CPSW_PN_EST_BUFSEL			BIT(1)
--#define AM65_CPSW_PN_EST_TS_EN			BIT(2)
--#define AM65_CPSW_PN_EST_TS_FIRST		BIT(3)
--#define AM65_CPSW_PN_EST_ONEPRI			BIT(4)
--#define AM65_CPSW_PN_EST_TS_PRI_MSK		GENMASK(7, 5)
--
--/* AM65_CPSW_PN_REG_FIFO_STATUS register fields */
--#define AM65_CPSW_PN_FST_TX_PRI_ACTIVE_MSK	GENMASK(7, 0)
--#define AM65_CPSW_PN_FST_TX_E_MAC_ALLOW_MSK	GENMASK(15, 8)
--#define AM65_CPSW_PN_FST_EST_CNT_ERR		BIT(16)
--#define AM65_CPSW_PN_FST_EST_ADD_ERR		BIT(17)
--#define AM65_CPSW_PN_FST_EST_BUFACT		BIT(18)
--
--/* EST FETCH COMMAND RAM */
--#define AM65_CPSW_FETCH_RAM_CMD_NUM		0x80
--#define AM65_CPSW_FETCH_CNT_MSK			GENMASK(21, 8)
--#define AM65_CPSW_FETCH_CNT_MAX			(AM65_CPSW_FETCH_CNT_MSK >> 8)
--#define AM65_CPSW_FETCH_CNT_OFFSET		8
--#define AM65_CPSW_FETCH_ALLOW_MSK		GENMASK(7, 0)
--#define AM65_CPSW_FETCH_ALLOW_MAX		AM65_CPSW_FETCH_ALLOW_MSK
--
- #define TO_MBPS(x)	((x) * 8 / 1000000)
- 
- enum timer_act {
-@@ -67,10 +25,193 @@ enum timer_act {
- 	TACT_SKIP_PROG,		/* just buffer can be updated */
- };
- 
--/* number of priority queues per port FIFO */
--#define AM65_CPSW_PN_FIFO_PRIO_NUM		8
--#define AM65_CPSW_PN_TX_PRI_MAP_DEFAULT		0x76543210
-+/* IET */
-+static int am65_cpsw_iet_set_verify_timeout_count(struct am65_cpsw_port *port)
-+{
-+	int verify_time_ms = port->qos.iet.verify_time_ms;
-+	int link_speed = port->qos.link_speed;
-+	u32 val;
-+
-+	if (WARN_ON(link_speed == SPEED_UNKNOWN))
-+		return -ENODEV;
-+
-+	/* The number of wireside clocks contained in the verify
-+	 * timeout counter. The default is 0x1312d0
-+	 * (10ms at 125Mhz in 1G mode).
-+	 */
-+	val = 125 * HZ_PER_MHZ;	/* assuming 125MHz wireside clock */
-+
-+	val /= MILLIHZ_PER_HZ;		/* count per ms timeout */
-+	val *= verify_time_ms;		/* count for timeout ms */
-+	if (link_speed < SPEED_1000)
-+		val <<= 1;	/* FIXME: Is this correct? */
-+
-+	if (val > AM65_CPSW_PN_MAC_VERIFY_CNT_MASK)
-+		return -EINVAL;
-+
-+	writel(val, port->port_base + AM65_CPSW_PN_REG_IET_VERIFY);
-+
-+	return 0;
-+}
-+
-+unsigned int am65_cpsw_iet_get_verify_timeout_ms(u32 count, struct am65_cpsw_port *port)
-+{
-+	int link_speed = port->qos.link_speed;
-+	u32 val = 125 * HZ_PER_MHZ;	/* assuming 125MHz wireside clock */
-+	unsigned int timeout_ms;
-+
-+	if (link_speed == SPEED_UNKNOWN)
-+		link_speed = SPEED_1000;
-+
-+	val /= MILLIHZ_PER_HZ;		/* count per ms timeout */
-+
-+	timeout_ms = count / val;
-+
-+	if (link_speed < SPEED_1000)
-+		timeout_ms >>= 1;	/* FIXME: Is this correct? */
-+
-+	return timeout_ms;
-+}
-+
-+static int am65_cpsw_iet_verify_wait(struct am65_cpsw_port *port)
-+{
-+	u32 ctrl, status;
-+	int try;
-+
-+	try = 20;
-+	do {
-+		/* Clear MAC_LINKFAIL bit to start Verify. */
-+		ctrl = readl(port->port_base + AM65_CPSW_PN_REG_IET_CTRL);
-+		ctrl &= ~AM65_CPSW_PN_IET_MAC_LINKFAIL;
-+		writel(ctrl, port->port_base + AM65_CPSW_PN_REG_IET_CTRL);
-+
-+		msleep(port->qos.iet.verify_time_ms);
-+
-+		status = readl(port->port_base + AM65_CPSW_PN_REG_IET_STATUS);
-+		if (status & AM65_CPSW_PN_MAC_VERIFIED)
-+			return 0;
-+
-+		if (status & AM65_CPSW_PN_MAC_VERIFY_FAIL) {
-+			netdev_dbg(port->ndev,
-+				   "MAC Merge verify failed, trying again");
-+			/* Reset the verify state machine by writing 1
-+			 * to LINKFAIL
-+			 */
-+			ctrl = readl(port->port_base + AM65_CPSW_PN_REG_IET_CTRL);
-+			ctrl |= AM65_CPSW_PN_IET_MAC_LINKFAIL;
-+			writel(ctrl, port->port_base + AM65_CPSW_PN_REG_IET_CTRL);
-+			continue;
-+		}
-+
-+		if (status & AM65_CPSW_PN_MAC_RESPOND_ERR) {
-+			netdev_dbg(port->ndev, "MAC Merge respond error");
-+			return -ENODEV;
-+		}
-+
-+		if (status & AM65_CPSW_PN_MAC_VERIFY_ERR) {
-+			netdev_dbg(port->ndev, "MAC Merge verify error");
-+			return -ENODEV;
-+		}
-+	} while (try-- > 0);
-+
-+	netdev_dbg(port->ndev, "MAC Merge verify timeout");
-+	return -ETIMEDOUT;
-+}
-+
-+static void am65_cpsw_iet_set_preempt_mask(struct am65_cpsw_port *port, u8 preemptible_tcs)
-+{
-+	u32 val;
-+
-+	val = readl(port->port_base + AM65_CPSW_PN_REG_IET_CTRL);
-+	val &= ~AM65_CPSW_PN_IET_MAC_PREMPT_MASK;
-+	val |= AM65_CPSW_PN_IET_MAC_SET_PREEMPT(preemptible_tcs);
-+	writel(val, port->port_base + AM65_CPSW_PN_REG_IET_CTRL);
-+}
-+
-+/* enable common IET_ENABLE only if at least 1 port has rx IET enabled.
-+ * UAPI doesn't allow tx enable without rx enable.
-+ */
-+void am65_cpsw_iet_common_enable(struct am65_cpsw_common *common)
-+{
-+	struct am65_cpsw_port *port;
-+	bool rx_enable = false;
-+	u32 val;
-+	int i;
-+
-+	for (i = 0; i < common->port_num; i++) {
-+		port = &common->ports[i];
-+		val = readl(port->port_base + AM65_CPSW_PN_REG_CTL);
-+		rx_enable = !!(val & AM65_CPSW_PN_CTL_IET_PORT_EN);
-+		if (rx_enable)
-+			break;
-+	}
-+
-+	val = readl(common->cpsw_base + AM65_CPSW_REG_CTL);
-+
-+	if (rx_enable)
-+		val |= AM65_CPSW_CTL_IET_EN;
-+	else
-+		val &= ~AM65_CPSW_CTL_IET_EN;
-+
-+	writel(val, common->cpsw_base + AM65_CPSW_REG_CTL);
-+	common->iet_enabled = rx_enable;
-+}
-+
-+/* CPSW does not have an IRQ to notify changes to the MAC Merge TX status
-+ * (active/inactive), but the preemptible traffic classes should only be
-+ * committed to hardware once TX is active. Resort to polling.
-+ */
-+void am65_cpsw_iet_commit_preemptible_tcs(struct am65_cpsw_port *port)
-+{
-+	u8 preemptible_tcs = 0;
-+	int err;
-+	u32 val;
-+
-+	if (port->qos.link_speed == SPEED_UNKNOWN)
-+		return;
-+
-+	val = readl(port->port_base + AM65_CPSW_PN_REG_CTL);
-+	if (!(val & AM65_CPSW_PN_CTL_IET_PORT_EN))
-+		return;
-+
-+	/* update common IET enable */
-+	am65_cpsw_iet_common_enable(port->common);
- 
-+	/* update verify count */
-+	err = am65_cpsw_iet_set_verify_timeout_count(port);
-+	if (err) {
-+		netdev_err(port->ndev, "couldn't set verify count: %d\n", err);
-+		return;
-+	}
-+
-+	val = readl(port->port_base + AM65_CPSW_PN_REG_IET_CTRL);
-+	if (!(val & AM65_CPSW_PN_IET_MAC_DISABLEVERIFY)) {
-+		err = am65_cpsw_iet_verify_wait(port);
-+		if (err)
-+			return;
-+	}
-+
-+	preemptible_tcs = port->qos.iet.preemptible_tcs;
-+	am65_cpsw_iet_set_preempt_mask(port, preemptible_tcs);
-+}
-+
-+static void am65_cpsw_iet_change_preemptible_tcs(struct am65_cpsw_port *port, u8 preemptible_tcs)
-+{
-+	port->qos.iet.preemptible_tcs = preemptible_tcs;
-+	am65_cpsw_iet_commit_preemptible_tcs(port);
-+}
-+
-+static void am65_cpsw_iet_link_state_update(struct net_device *ndev)
-+{
-+	struct am65_cpsw_ndev_priv *priv = am65_ndev_to_priv(ndev);
-+	struct am65_cpsw_port *port = am65_ndev_to_port(ndev);
-+
-+	mutex_lock(&priv->mm_lock);
-+	am65_cpsw_iet_commit_preemptible_tcs(port);
-+	mutex_unlock(&priv->mm_lock);
-+}
-+
-+/* EST */
- static int am65_cpsw_port_est_enabled(struct am65_cpsw_port *port)
- {
- 	return port->qos.est_oper || port->qos.est_admin;
-@@ -602,6 +743,8 @@ static int am65_cpsw_setup_taprio(struct net_device *ndev, void *type_data)
- 	if (port->qos.link_speed == SPEED_UNKNOWN)
- 		return -ENOLINK;
- 
-+	am65_cpsw_iet_change_preemptible_tcs(port, taprio->mqprio.preemptible_tcs);
-+
- 	return am65_cpsw_set_taprio(ndev, type_data);
- }
- 
-@@ -1143,6 +1286,7 @@ static int am65_cpsw_setup_mqprio(struct net_device *ndev, void *type_data)
- 	       port->port_base + AM65_CPSW_PN_REG_TX_PRI_MAP);
- 
- 	am65_cpsw_tx_pn_shaper_apply(port);
-+	am65_cpsw_iet_change_preemptible_tcs(port, mqprio->preemptible_tcs);
- 
- exit_put:
- 	pm_runtime_put(common->dev);
-@@ -1172,6 +1316,7 @@ void am65_cpsw_qos_link_up(struct net_device *ndev, int link_speed)
- 
- 	port->qos.link_speed = link_speed;
- 	am65_cpsw_tx_pn_shaper_apply(port);
-+	am65_cpsw_iet_link_state_update(ndev);
- 
- 	if (!IS_ENABLED(CONFIG_TI_AM65_CPSW_TAS))
- 		return;
-@@ -1186,6 +1331,7 @@ void am65_cpsw_qos_link_down(struct net_device *ndev)
- 
- 	port->qos.link_speed = SPEED_UNKNOWN;
- 	am65_cpsw_tx_pn_shaper_apply(port);
-+	am65_cpsw_iet_link_state_update(ndev);
- 
- 	if (!IS_ENABLED(CONFIG_TI_AM65_CPSW_TAS))
- 		return;
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-qos.h b/drivers/net/ethernet/ti/am65-cpsw-qos.h
-index e4508fe5c2c8..cf5bdd3dba2b 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-qos.h
-+++ b/drivers/net/ethernet/ti/am65-cpsw-qos.h
-@@ -23,6 +23,12 @@ struct am65_cpsw_mqprio {
- 	bool shaper_en;
- };
- 
-+struct am65_cpsw_iet {
-+	u8 preemptible_tcs;
-+	u32 original_max_blks;
-+	int verify_time_ms;
-+};
-+
- struct am65_cpsw_ale_ratelimit {
- 	unsigned long cookie;
- 	u64 rate_packet_ps;
-@@ -34,6 +40,7 @@ struct am65_cpsw_qos {
- 	ktime_t link_down_time;
- 	int link_speed;
- 	struct am65_cpsw_mqprio mqprio;
-+	struct am65_cpsw_iet iet;
- 
- 	struct am65_cpsw_ale_ratelimit ale_bc_ratelimit;
- 	struct am65_cpsw_ale_ratelimit ale_mc_ratelimit;
-@@ -46,4 +53,101 @@ void am65_cpsw_qos_link_down(struct net_device *ndev);
- int am65_cpsw_qos_ndo_tx_p0_set_maxrate(struct net_device *ndev, int queue, u32 rate_mbps);
- void am65_cpsw_qos_tx_p0_rate_init(struct am65_cpsw_common *common);
- 
-+void am65_cpsw_iet_commit_preemptible_tcs(struct am65_cpsw_port *port);
-+unsigned int am65_cpsw_iet_get_verify_timeout_ms(u32 count, struct am65_cpsw_port *port);
-+void am65_cpsw_iet_common_enable(struct am65_cpsw_common *common);
-+
-+#define AM65_CPSW_REG_CTL			0x004
-+#define AM65_CPSW_PN_REG_CTL			0x004
-+#define AM65_CPSW_PN_REG_MAX_BLKS		0x008
-+#define AM65_CPSW_PN_REG_TX_PRI_MAP		0x018
-+#define AM65_CPSW_PN_REG_RX_PRI_MAP		0x020
-+#define AM65_CPSW_PN_REG_IET_CTRL		0x040
-+#define AM65_CPSW_PN_REG_IET_STATUS		0x044
-+#define AM65_CPSW_PN_REG_IET_VERIFY		0x048
-+#define AM65_CPSW_PN_REG_FIFO_STATUS		0x050
-+#define AM65_CPSW_PN_REG_EST_CTL		0x060
-+#define AM65_CPSW_PN_REG_PRI_CIR(pri)		(0x140 + 4 * (pri))
-+#define AM65_CPSW_PN_REG_PRI_EIR(pri)		(0x160 + 4 * (pri))
-+
-+/* AM65_CPSW_REG_CTL register fields */
-+#define AM65_CPSW_CTL_IET_EN			BIT(17)
-+#define AM65_CPSW_CTL_EST_EN			BIT(18)
-+
-+/* AM65_CPSW_PN_REG_CTL register fields */
-+#define AM65_CPSW_PN_CTL_IET_PORT_EN		BIT(16)
-+#define AM65_CPSW_PN_CTL_EST_PORT_EN		BIT(17)
-+
-+/* AM65_CPSW_PN_REG_EST_CTL register fields */
-+#define AM65_CPSW_PN_EST_ONEBUF			BIT(0)
-+#define AM65_CPSW_PN_EST_BUFSEL			BIT(1)
-+#define AM65_CPSW_PN_EST_TS_EN			BIT(2)
-+#define AM65_CPSW_PN_EST_TS_FIRST		BIT(3)
-+#define AM65_CPSW_PN_EST_ONEPRI			BIT(4)
-+#define AM65_CPSW_PN_EST_TS_PRI_MSK		GENMASK(7, 5)
-+
-+/* AM65_CPSW_PN_REG_IET_CTRL register fields */
-+#define AM65_CPSW_PN_IET_MAC_PENABLE		BIT(0)
-+#define AM65_CPSW_PN_IET_MAC_DISABLEVERIFY	BIT(2)
-+#define AM65_CPSW_PN_IET_MAC_LINKFAIL		BIT(3)
-+#define AM65_CPSW_PN_IET_MAC_MAC_ADDFRAGSIZE_MASK	GENMASK(10, 8)
-+#define AM65_CPSW_PN_IET_MAC_MAC_ADDFRAGSIZE_OFFSET	8
-+#define AM65_CPSW_PN_IET_MAC_PREMPT_MASK		GENMASK(23, 16)
-+#define AM65_CPSW_PN_IET_MAC_PREMPT_OFFSET		16
-+
-+#define AM65_CPSW_PN_IET_MAC_SET_ADDFRAGSIZE(n)	(((n) << AM65_CPSW_PN_IET_MAC_MAC_ADDFRAGSIZE_OFFSET) & \
-+						  AM65_CPSW_PN_IET_MAC_MAC_ADDFRAGSIZE_MASK)
-+#define AM65_CPSW_PN_IET_MAC_GET_ADDFRAGSIZE(n)	(((n) & AM65_CPSW_PN_IET_MAC_MAC_ADDFRAGSIZE_MASK) >> \
-+						  AM65_CPSW_PN_IET_MAC_MAC_ADDFRAGSIZE_OFFSET)
-+#define AM65_CPSW_PN_IET_MAC_SET_PREEMPT(n)	(((n) << AM65_CPSW_PN_IET_MAC_PREMPT_OFFSET) & \
-+						 AM65_CPSW_PN_IET_MAC_PREMPT_MASK)
-+#define AM65_CPSW_PN_IET_MAC_GET_PREEMPT(n)	(((n) & AM65_CPSW_PN_IET_MAC_PREMPT_MASK) >> \
-+						 AM65_CPSW_PN_IET_MAC_PREMPT_OFFSET)
-+
-+/* AM65_CPSW_PN_REG_IET_STATUS register fields */
-+#define AM65_CPSW_PN_MAC_STATUS			GENMASK(3, 0)
-+#define AM65_CPSW_PN_MAC_VERIFIED		BIT(0)
-+#define AM65_CPSW_PN_MAC_VERIFY_FAIL		BIT(1)
-+#define AM65_CPSW_PN_MAC_RESPOND_ERR		BIT(2)
-+#define AM65_CPSW_PN_MAC_VERIFY_ERR		BIT(3)
-+
-+/* AM65_CPSW_PN_REG_IET_VERIFY register fields */
-+#define AM65_CPSW_PN_MAC_VERIFY_CNT_MASK	GENMASK(23, 0)
-+#define AM65_CPSW_PN_MAC_GET_VERIFY_CNT(n)	((n) & AM65_CPSW_PN_MAC_VERIFY_CNT_MASK)
-+/* 10 msec converted to NSEC */
-+#define AM65_CPSW_IET_VERIFY_CNT_MS		(10)
-+#define AM65_CPSW_IET_VERIFY_CNT_NS		(AM65_CPSW_IET_VERIFY_CNT_MS * \
-+						 NSEC_PER_MSEC)
-+
-+/* AM65_CPSW_PN_REG_FIFO_STATUS register fields */
-+#define AM65_CPSW_PN_FST_TX_PRI_ACTIVE_MSK	GENMASK(7, 0)
-+#define AM65_CPSW_PN_FST_TX_E_MAC_ALLOW_MSK	GENMASK(15, 8)
-+#define AM65_CPSW_PN_FST_EST_CNT_ERR		BIT(16)
-+#define AM65_CPSW_PN_FST_EST_ADD_ERR		BIT(17)
-+#define AM65_CPSW_PN_FST_EST_BUFACT		BIT(18)
-+
-+/* EST FETCH COMMAND RAM */
-+#define AM65_CPSW_FETCH_RAM_CMD_NUM		0x80
-+#define AM65_CPSW_FETCH_CNT_MSK			GENMASK(21, 8)
-+#define AM65_CPSW_FETCH_CNT_MAX			(AM65_CPSW_FETCH_CNT_MSK >> 8)
-+#define AM65_CPSW_FETCH_CNT_OFFSET		8
-+#define AM65_CPSW_FETCH_ALLOW_MSK		GENMASK(7, 0)
-+#define AM65_CPSW_FETCH_ALLOW_MAX		AM65_CPSW_FETCH_ALLOW_MSK
-+
-+/* AM65_CPSW_PN_REG_MAX_BLKS fields for IET and No IET cases */
-+/* 7 blocks for pn_rx_max_blks, 13 for pn_tx_max_blks*/
-+#define AM65_CPSW_PN_TX_RX_MAX_BLKS_IET		0xD07
-+
-+/* Slave IET Stats. register offsets */
-+#define AM65_CPSW_STATN_IET_RX_ASSEMBLY_ERROR	0x140
-+#define AM65_CPSW_STATN_IET_RX_ASSEMBLY_OK	0x144
-+#define AM65_CPSW_STATN_IET_RX_SMD_ERROR	0x148
-+#define AM65_CPSW_STATN_IET_RX_FRAG		0x14c
-+#define AM65_CPSW_STATN_IET_TX_HOLD		0x150
-+#define AM65_CPSW_STATN_IET_TX_FRAG		0x154
-+
-+/* number of priority queues per port FIFO */
-+#define AM65_CPSW_PN_FIFO_PRIO_NUM		8
-+#define AM65_CPSW_PN_TX_PRI_MAP_DEFAULT		0x76543210
-+
- #endif /* AM65_CPSW_QOS_H_ */
--- 
-2.34.1
-
+SGkgQW5kcmV3LA0KDQpPbiAxOS8wOS8yMyA4OjQzIHBtLCBBbmRyZXcgTHVubiB3cm90ZToNCj4g
+RVhURVJOQUwgRU1BSUw6IERvIG5vdCBjbGljayBsaW5rcyBvciBvcGVuIGF0dGFjaG1lbnRzIHVu
+bGVzcyB5b3Uga25vdyB0aGUgY29udGVudCBpcyBzYWZlDQo+IA0KPj4+PiArc3RhdGljIHZvaWQg
+b2FfdGM2X3ByZXBhcmVfY3RybF9idWYoc3RydWN0IG9hX3RjNiAqdGM2LCB1MzIgYWRkciwgdTMy
+IHZhbFtdLA0KPj4+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdTggbGVuLCBi
+b29sIHduciwgdTggKmJ1ZiwgYm9vbCBjdHJsX3Byb3QpDQo+Pj4+ICt7DQo+Pj4+ICsgICAgIHUz
+MiBoZHI7DQo+Pj4+ICsNCj4+Pj4gKyAgICAgLyogUHJlcGFyZSB0aGUgY29udHJvbCBoZWFkZXIg
+d2l0aCB0aGUgcmVxdWlyZWQgZGV0YWlscyAqLw0KPj4+PiArICAgICBoZHIgPSBGSUVMRF9QUkVQ
+KENUUkxfSERSX0ROQywgMCkgfA0KPj4+PiArICAgICAgICAgICBGSUVMRF9QUkVQKENUUkxfSERS
+X1dOUiwgd25yKSB8DQo+Pj4+ICsgICAgICAgICAgIEZJRUxEX1BSRVAoQ1RSTF9IRFJfQUlELCAw
+KSB8DQo+Pj4+ICsgICAgICAgICAgIEZJRUxEX1BSRVAoQ1RSTF9IRFJfTU1TLCBhZGRyID4+IDE2
+KSB8DQo+Pj4+ICsgICAgICAgICAgIEZJRUxEX1BSRVAoQ1RSTF9IRFJfQUREUiwgYWRkcikgfA0K
+Pj4+PiArICAgICAgICAgICBGSUVMRF9QUkVQKENUUkxfSERSX0xFTiwgbGVuIC0gMSk7DQo+Pj4+
+ICsgICAgIGhkciB8PSBGSUVMRF9QUkVQKENUUkxfSERSX1AsIG9hX3RjNl9nZXRfcGFyaXR5KGhk
+cikpOw0KPj4+PiArICAgICAqKHUzMiAqKWJ1ZiA9IGNwdV90b19iZTMyKGhkcik7DQo+Pj4+ICsN
+Cj4+Pj4gKyAgICAgaWYgKHducikgew0KPj4+DQo+Pj4gV2hhdCBkb2VzIHduciBtZWFuPyBNYXli
+ZSBnaXZlIGl0IGEgbW9yZSBtZWFuaW5nZnVsIG5hbWUsIHVubGVzcyBpdCBpcw0KPj4+IGFjdHVh
+bGx5IHNvbWV0aGluZyBpbiB0aGUgc3RhbmRhcmQuIEtlcm5lbGRvYyB3b3VsZCBhbHNvIGhlbHAu
+DQo+PiBBaCwgaXQgaXMgIndyaXRlIG5vdCByZWFkIi4gU2hhbGwgSSBuYW1lIGl0IGFzICJ3cml0
+ZV9ub3RfcmVhZCIgPw0KPiANCj4gWW91IG1pZ2h0IHdhbnQgdG8gZGVzY3JpYmUgdGhlIGhpZ2gg
+bGV2ZWwgY29uY2VwdCBhcyB3ZWxsIGluIHRoaXMNCj4gZmlsZS4gV2hhdCBpIF90aGlua18gdGhp
+cyBpcyBhYm91dCBpcyB0aGF0IFNQSSBpcyBzb3J0IG9mIGEgZnVsbA0KPiBkdXBsZXggYnVzLiBX
+aGlsZSB5b3UgYXJlIHNlbmRpbmcgZGF0YSB0byB0aGUgU1BJIGRldmljZSwgdGhlIGRldmljZQ0K
+PiBjb3VsZCBhbHNvIGJlIHNlbmRpbmcgYSBkYXRhIHRvIHRoZSBDUFU/IEFuZCAnd3JpdGUgbm90
+IHJlYWQnIGhlcmUNCj4gbWVhbnMgaWdub3JlIHdoYXQgd2UgcmVjZWl2ZSBmcm9tIHRoZSBkZXZp
+Y2U/DQpBaCBvaywgSSB0aGluayB0aGVyZSBpcyBhIG1pc3VuZGVyc3RhbmRpbmcgaGVyZS4gVGhp
+cyBpcyByZWxhdGVkIHRvIE9QRU4gDQpBbGxpYW5jZSBwcm90b2NvbC4gQ29udHJvbCB0cmFuc2Fj
+dGlvbnMgY29uc2lzdCBvZiBvbmUgb3IgbW9yZSBjb250cm9sIA0KY29tbWFuZHMuIENvbnRyb2wg
+Y29tbWFuZHMgYXJlIHVzZWQgYnkgdGhlIFNQSSBob3N0IHRvIHJlYWQgYW5kIHdyaXRlIA0KcmVn
+aXN0ZXJzIHdpdGhpbiB0aGUgTUFDLVBIWS4gRWFjaCBjb250cm9sIGNvbW1hbmRzIGFyZSBjb21w
+b3NlZCBvZiBhIA0KMzItYml0IGNvbnRyb2wgY29tbWFuZCBoZWFkZXIgZm9sbG93ZWQgYnkgcmVn
+aXN0ZXIgZGF0YS4gV05SICh3cml0ZSBub3QgDQpyZWFkKSBiaXQgaW4gdGhlIGNvbnRyb2wgY29t
+bWFuZCBoZWFkZXIgaW5kaWNhdGVzIGlmIGRhdGEgaXMgdG8gYmUgDQp3cml0dGVuIHRvIHJlZ2lz
+dGVycyAod2hlbiBzZXQpIG9yIHJlYWQgZnJvbSByZWdpc3RlcnMgKHdoZW4gY2xlYXIpLiBzbyAN
+CmJhc2ljYWxseSBpdCBpbmRpY2F0ZXMgdGhlIHR5cGUgb2YgdGhlIGNvbnRyb2wgY29tbWFuZCBv
+biB0aGUgcmVnaXN0ZXJzLg0KPiANCj4+IE9rLCBhcyBwZXIgT0Egc3BlYywgdXAgdG8gMTI4IGNv
+bnNlY3V0aXZlIHJlZ2lzdGVycyByZWFkIG9yIHdyaXRlIGNhbiBiZQ0KPj4gcG9zc2libGUuIFNv
+IHRoZSBtYXhpbXVtIHBvc3NpYmxlIHNpemUgd291bGQgYmUgMTAzMi4gQXMgeW91IHN1Z2dlc3Rl
+ZA0KPj4gd2lsbCBhbGxvY2F0ZSB0aGlzIHNpemUgb2YgbWVtb3J5IGluIHRoZSBzdGFydHVwLg0K
+PiANCj4gWWVzLCAxMDMyIGJ5dGVzIGl0IG5vdCBodWdlLCBzbyBhbGxvY2F0ZSBpdCBvbmNlIGFu
+ZCBrZWVwIGl0IGZvciB0aGUNCj4gbGlmZXRpbWUgb2YgdGhlIGRldmljZS4NClN1cmUsIHdpbGwg
+ZG8gdGhhdC4NCj4gDQo+Pj4+ICt2b2lkIG9hX3RjNl9kZWluaXQoc3RydWN0IG9hX3RjNiAqdGM2
+KQ0KPj4+PiArew0KPj4+PiArICAgICBrZnJlZSh0YzYpOw0KPj4+PiArfQ0KPj4+PiArRVhQT1JU
+X1NZTUJPTF9HUEwob2FfdGM2X2RlaW5pdCk7DQo+Pj4NCj4+PiBNYXliZSBjb25zaWRlciBhIGRl
+dm1fIEFQSSB0byBtYWtlIHRoZSBNQUMgZHJpdmVyIHNpbXBsZXIuDQo+PiBTb3JyeSBJIGRvbid0
+IGdldCB5b3VyIHBvaW50LiBDb3VsZCB5b3UgcGxlYXNlIGV4cGxhaW4gYml0IG1vcmU/DQo+IA0K
+PiBBdCBsZWFzdCBhdCB0aGlzIHN0YWdlIGluIHRoZSBwYXRjaCBzZXJpZXMsIGFsbCB5b3UgYXJl
+IGRvaW5nIGlzDQo+IGFsbG9jYXRpbmcgbWVtb3J5LiBZb3UgYWRkIG1vcmUgY29kZSBsYXRlciwg
+d2hpY2ggbWlnaHQgaW52YWxpZGF0ZSBteQ0KPiBwb2ludC4gQnV0IGlmIGFsbCB5b3UgYXJlIGRv
+aW5nIGlzIGFsbG9jYXRpbmcgbWVtb3J5LCB5b3UgY291bGQgdXNlDQo+IGRldm1fa21hbGxvYygp
+LiBUaGUgZHJpdmVyIGNvcmUgd2lsbCB0aGVuIHRha2UgY2FyZSBvZiByZWxlYXNpbmcgdGhlDQo+
+IG1lbW9yeSB3aGVuIHRoZSBkcml2ZXIgaXMgdW5sb2FkZWQsIG9yIHByb2JlIGZhaWxzLiBUaGF0
+IG1ha2VzIGNsZWFudXANCj4gc2ltcGxlciBhbmQgbWVtb3J5IGxlYWtzIGxlc3MgbGlrZWx5LiBU
+aGVyZSBhcmUgYSBsb3Qgb2YgZGV2bV8NCj4gaGVscGVycywgc2VlIGlmIHlvdSBjYW4gdXNlIHRo
+ZW0uDQpTdXJlLCBub3RlZC4NCg0KQmVzdCBSZWdhcmRzLA0KUGFydGhpYmFuIFYNCj4gDQo+ICAg
+ICAgICAgIEFuZHJldw0KPiANCg0K
 
