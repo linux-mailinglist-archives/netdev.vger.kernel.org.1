@@ -1,159 +1,104 @@
-Return-Path: <netdev+bounces-35303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35304-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 251867A8B24
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 20:07:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BEFD7A8B32
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 20:09:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFB9E1C209CA
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 18:07:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13DFC281802
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 18:09:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EC913FB3E;
-	Wed, 20 Sep 2023 18:07:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 303DC450C0;
+	Wed, 20 Sep 2023 18:09:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 202EE1A58E;
-	Wed, 20 Sep 2023 18:07:12 +0000 (UTC)
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92D23B9;
-	Wed, 20 Sep 2023 11:07:09 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id 98e67ed59e1d1-27659684a4dso9818a91.2;
-        Wed, 20 Sep 2023 11:07:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695233228; x=1695838028; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CDKh24qGZmK3VNmfI6pHneYOw8sTqAGZ08zaO3vUY08=;
-        b=mKWFyrE3fcHWUXqYQJ+756xGV+scAmbvRp8bSSf7TTNqcB0zfxdCU09WDMY33Tm0Hf
-         KjZqzxBG2L4nomB1VSFEoHMNqIRbkzMN7gYg3wX2dSNCHbBsvxiwWluDSWc0iH0dqJZG
-         q3j15R9oGhWm+3FZskcY3R+o7b46HViTRmyrJC0k7pyGq7UexLqxfgQOL2Qaxe4wYEAg
-         LfyJ3xokQP0xI1aSZe9OWYTHoRcvFo7qsnhOI16/KVstu7Z+2TGA6YKnvWAtKxY9KnqX
-         lqnseNfwiAseb3G10Oj9VAphBy5vJ373AUnyagHNrDonxSHXM+493SvL0VwaSnyymsIy
-         wDcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695233228; x=1695838028;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=CDKh24qGZmK3VNmfI6pHneYOw8sTqAGZ08zaO3vUY08=;
-        b=mWHCjTyGaCW1N9ikN8PWkwyCIJA6ZA+z48RAinU3oA2W59Hcv7TC1YBMXSa0CLNMw2
-         SNGDseHMCnNE44iNl0tImOATHJ3z9sf5e6TeHa1uhWQ01Hebfw7CxWXrGMjwDMCdxKms
-         6Y1sFfs6qxpZgHK+l5y3H0pvR6Jj1HPUEvDWHUzOHCcbwgs3sMuxhH78VZOv+mDUMsEV
-         aOpTTvokJFJnKt8ubsxk+j0et5jQprDkKcM/5HVz3/9Hur0eF1bYqgmD7gU7JcC7mbSV
-         clcElI1Y0/1KHcbStEf/L93DWyjLtKZrZraEAqrvcLJBN7kAktOYtZhtoj5dKFUke2iy
-         YQqQ==
-X-Gm-Message-State: AOJu0Yw6UooVwfon4XrWCViScFPKZ7XpJyqpMfQm51XA+RNbk0oZSxih
-	J8Qz6Fmw0AWHRqBPvq5+4Ew=
-X-Google-Smtp-Source: AGHT+IG/+wNDk+YZF0QHGDzP11GIgMoPE7UBbmKOTDz0g6UAKMB8WNjGCGHDubSoqPSGbz4LwjPY0g==
-X-Received: by 2002:a17:90a:ec0f:b0:274:2906:656a with SMTP id l15-20020a17090aec0f00b002742906656amr3273183pjy.5.1695233228412;
-        Wed, 20 Sep 2023 11:07:08 -0700 (PDT)
-Received: from localhost ([98.97.37.198])
-        by smtp.gmail.com with ESMTPSA id a13-20020a17090a8c0d00b002633fa95ac2sm1611861pjo.13.2023.09.20.11.07.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Sep 2023 11:07:07 -0700 (PDT)
-Date: Wed, 20 Sep 2023 11:07:06 -0700
-From: John Fastabend <john.fastabend@gmail.com>
-To: Kui-Feng Lee <sinquersw@gmail.com>, 
- Ma Ke <make_ruc2021@163.com>, 
- john.fastabend@gmail.com, 
- jakub@cloudflare.com, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com
-Cc: netdev@vger.kernel.org, 
- bpf@vger.kernel.org
-Message-ID: <650b34ca2b41c_4e8122080@john.notmuch>
-In-Reply-To: <dc84f39f-5b13-4a7d-a26c-598227fd9a42@gmail.com>
-References: <20230918093620.3479627-1-make_ruc2021@163.com>
- <dc84f39f-5b13-4a7d-a26c-598227fd9a42@gmail.com>
-Subject: Re: [PATCH] bpf, sockmap: fix deadlocks in the sockhash and sockmap
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29A01A583
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 18:09:10 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC8C4C6;
+	Wed, 20 Sep 2023 11:09:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695233349; x=1726769349;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=elYWzz2UFhp1lnM2zveFDnfbZqlMLy9beu05ox7gCOA=;
+  b=aBitdiOrA3sdkuMhfCEcWQKkBfYwewl9W/l3GwG5A3yGTj62uI9ZcLoI
+   QWGC4fadwTscPHz4rpAIpkpWlGoVXH2MsE+t6bkaIhYyUl6L1AdcCKpvd
+   TxUUWpXs6QK3vUHiktOvMKHSgA0RSvXLLEIJQtb3Qpceb6wCGe2p3jV6b
+   eFzmvH/myKEyXCIWJ1B1b/KszNW71HVTtU6eEzvrfM5/Jf+QmYlv2M3ee
+   ZLwJysu+NpgPMszZ5buYwqZYP1zDTDfWFQWGRqGn0C4D+7OVebGVEZP1q
+   hKLiF+kJewspxmiZogSnYiBgDHyjtum5NOUlID7NYpGhliBIbJagUwgWe
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="359685140"
+X-IronPort-AV: E=Sophos;i="6.03,162,1694761200"; 
+   d="scan'208";a="359685140"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2023 11:09:09 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="870469679"
+X-IronPort-AV: E=Sophos;i="6.03,162,1694761200"; 
+   d="scan'208";a="870469679"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by orsmga004.jf.intel.com with ESMTP; 20 Sep 2023 11:09:06 -0700
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Michal Michalik <michal.michalik@intel.com>,
+	Milena Olech <milena.olech@intel.com>,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 0/3] net/intel: fix link-time undefined reference errors
+Date: Wed, 20 Sep 2023 20:07:42 +0200
+Message-ID: <20230920180745.1607563-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Kui-Feng Lee wrote:
-> 
-> 
-> On 9/18/23 02:36, Ma Ke wrote:
-> > It seems that elements in sockhash are rarely actively
-> > deleted by users or ebpf program. Therefore, we do not
+Recently, several link-time issues were spotted in the ethernet/intel/
+folder thanks to Kbuild bots and linux-next.
+The fixes are pretty straightforward, just some stubs and CONFIG_*
+guards, so resolve all of them in one shot and unbreak randconfig
+builds.
 
-We never delete them in our usage. I think soon we will have
-support to run BPF programs without a map at all removing these
-concerns for many use cases.
+Alexander Lobakin (3):
+  ice: fix undefined references to ice_is_*() when
+    !CONFIG_PTP_1588_CLOCK
+  ice: fix undefined references from DPLL code when
+    !CONFIG_PTP_1588_CLOCK
+  idpf: fix undefined reference to tcp_gro_complete() when !CONFIG_INET
 
-> > pay much attention to their deletion. Compared with hash
-> > maps, sockhash only provides spin_lock_bh protection.
-> > This causes it to appear to have self-locking behavior
-> > in the interrupt context, as CVE-2023-0160 points out.
+ drivers/net/ethernet/intel/ice/Makefile     |  5 ++---
+ drivers/net/ethernet/intel/ice/ice_main.c   |  8 ++++---
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h | 25 ++++++++++++++++++++-
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c |  3 +++
+ 4 files changed, 34 insertions(+), 7 deletions(-)
 
-CVE is a bit exagerrated in my opinion. I'm not sure why
-anyone would delete an element from interrupt context. But,
-OK if someone wrote such a thing we shouldn't lock up.
+---
+Directly to netdev/net-next, build bots are not happy and the next
+linux-next is approaching :s
+-- 
+2.41.0
 
-> > 
-> > Signed-off-by: Ma Ke <make_ruc2021@163.com>
-> > ---
-> >   net/core/sock_map.c | 5 +++--
-> >   1 file changed, 3 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/net/core/sock_map.c b/net/core/sock_map.c
-> > index cb11750b1df5..1302d484e769 100644
-> > --- a/net/core/sock_map.c
-> > +++ b/net/core/sock_map.c
-> > @@ -928,11 +928,12 @@ static long sock_hash_delete_elem(struct bpf_map *map, void *key)
-> >   	struct bpf_shtab_bucket *bucket;
-> >   	struct bpf_shtab_elem *elem;
-> >   	int ret = -ENOENT;
-> > +	unsigned long flags;
-> 
-> Keep reverse xmas tree ordering?
-> 
-> >   
-> >   	hash = sock_hash_bucket_hash(key, key_size);
-> >   	bucket = sock_hash_select_bucket(htab, hash);
-> >   
-> > -	spin_lock_bh(&bucket->lock);
-> > +	spin_lock_irqsave(&bucket->lock, flags);
-
-The hashtab code htab_lock_bucket also does a preempt_disable()
-followed by raw_spin_lock_irqsave(). Do we need this as well
-to handle the PREEMPT_CONFIG cases.
-
-I'll also take a look, but figured I would post the question given
-I wont likely get time to check until tonight/tomorrow.
-
-Also converting to irqsave before ran into syzbot crash wont this do the
-same?
-
-> >   	elem = sock_hash_lookup_elem_raw(&bucket->head, hash, key, key_size);
-> >   	if (elem) {
-> >   		hlist_del_rcu(&elem->node);
-> > @@ -940,7 +941,7 @@ static long sock_hash_delete_elem(struct bpf_map *map, void *key)
-> >   		sock_hash_free_elem(htab, elem);
-> >   		ret = 0;
-> >   	}
-> > -	spin_unlock_bh(&bucket->lock);
-> > +	spin_unlock_irqrestore(&bucket->lock, flags);
-> >   	return ret;
-> >   }
-> >   
 
