@@ -1,133 +1,87 @@
-Return-Path: <netdev+bounces-35266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 667A47A836C
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 15:30:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C3EE37A838C
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 15:37:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 603A31C20750
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 13:30:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D7421C2048D
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 13:37:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6CAC3717B;
-	Wed, 20 Sep 2023 13:30:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E520637CBB;
+	Wed, 20 Sep 2023 13:37:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 718033715F
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 13:30:43 +0000 (UTC)
-Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18ABEAD;
-	Wed, 20 Sep 2023 06:30:42 -0700 (PDT)
-Received: by mail-qk1-x731.google.com with SMTP id af79cd13be357-76f18e09716so431515985a.2;
-        Wed, 20 Sep 2023 06:30:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695216641; x=1695821441; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PVvtMrQyahCEGoTn1zZw0/f8rWvi3EadqrwsH+LEYoU=;
-        b=Qp0v6wVCxLpsVI668waqkz8otA/VNvtbknQNXbr9EZEE858OOKEb4iOtxEw25TVfzQ
-         7OJDjO4pzdWfCEmwHYJBv7kMZ3WjAOTKDJap86vpCfozGYyEWz5pjcUDEYgwZpDKpOZi
-         QBZVA9sFMou1ZuTqgfyaUQYSVKveztf7AzHsfXLwgB+aacPxzD5cFrvWTXj2YWlpkp9R
-         lStCH5HTKBcRL/GMEfUdnvH/kLCx0QAbIvCtzXLPW5UkTKZ4nFOFpV/A7qkpRswbklPG
-         15ahxOa/jmCpzN0wB4NDTjsPK8CcZMRJbP+80Acqt3tqyeSi1KJ9Szy75Mg/ycQdlAXo
-         O/ZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695216641; x=1695821441;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=PVvtMrQyahCEGoTn1zZw0/f8rWvi3EadqrwsH+LEYoU=;
-        b=j3rLfCjtmvSsRwQWwqvi/d/ZV/WdZHpnR6cMw/SlAT5Sjb7FdR7yAqvtO46balYSQ7
-         dT7zP4AaOGu3yo1oPD/yqiEYOBiBTwqm827P6mpZXyoDo2iCr2X+a62tkMCYw6XGyzZO
-         M7ZIdCsBs9czU7LpsrVZgN6vVbIGr7BNoKjLPhIsXSdb3DhavTAXEAUFoeBzPX65LXip
-         S4PDgomekoLCPHiXKVfRB+ckiJRuI+d9S8EyBNnRqg0nYgLtKGL/iVINf9a6MJyA0ZBT
-         hUkSMhPS3nUhDiDtYZFF/F8EigmkJkHwZLY+3Ik1GXZVA9B5zn1WaHAV8gkpjdIQJFxj
-         rysw==
-X-Gm-Message-State: AOJu0Yzh9yG+7rVpL9HoxzMFlvSdo92wC2VjDvGEIlRRo3TVSFT9aL++
-	n41JdfehQ3NzxshI4/hk2H8=
-X-Google-Smtp-Source: AGHT+IH+IiyIV3jecQnzX1d6fu+6EV5NDHV6xVJ8eBfW0mdzNrGT1c2vxkg9J2q2v0YVJ7R6z1wBZQ==
-X-Received: by 2002:a05:620a:298a:b0:773:a97f:31a with SMTP id r10-20020a05620a298a00b00773a97f031amr3275726qkp.8.1695216641162;
-        Wed, 20 Sep 2023 06:30:41 -0700 (PDT)
-Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
-        by smtp.gmail.com with ESMTPSA id 16-20020a05620a06d000b00770f3e5618esm4804460qky.101.2023.09.20.06.30.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Sep 2023 06:30:40 -0700 (PDT)
-Date: Wed, 20 Sep 2023 09:30:40 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jordan Rife <jrife@google.com>, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- willemdebruijn.kernel@gmail.com, 
- netdev@vger.kernel.org
-Cc: dborkman@kernel.org, 
- philipp.reisner@linbit.com, 
- lars.ellenberg@linbit.com, 
- christoph.boehmwalder@linbit.com, 
- axboe@kernel.dk, 
- airlied@redhat.com, 
- chengyou@linux.alibaba.com, 
- kaishen@linux.alibaba.com, 
- jgg@ziepe.ca, 
- leon@kernel.org, 
- bmt@zurich.ibm.com, 
- isdn@linux-pingi.de, 
- ccaulfie@redhat.com, 
- teigland@redhat.com, 
- mark@fasheh.com, 
- jlbec@evilplan.org, 
- joseph.qi@linux.alibaba.com, 
- sfrench@samba.org, 
- pc@manguebit.com, 
- lsahlber@redhat.com, 
- sprasad@microsoft.com, 
- tom@talpey.com, 
- horms@verge.net.au, 
- ja@ssi.bg, 
- pablo@netfilter.org, 
- kadlec@netfilter.org, 
- fw@strlen.de, 
- santosh.shilimkar@oracle.com, 
- Jordan Rife <jrife@google.com>, 
- stable@vger.kernel.org
-Message-ID: <650af4001eb7c_37ac7329443@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20230919175323.144902-1-jrife@google.com>
-References: <20230919175323.144902-1-jrife@google.com>
-Subject: Re: [PATCH net v4 3/3] net: prevent address rewrite in kernel_bind()
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D875328C2;
+	Wed, 20 Sep 2023 13:37:28 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E400AD;
+	Wed, 20 Sep 2023 06:37:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=NYgPqWlLR9OmoskXgzlKZX5/4oCw4XqQIUHPbq6Tcs0=; b=fNRPN8813hhOtl2h7GqhhE1rLz
+	M7f3uLQvFM+ALO1BlDF93jgOzYIKyUAHK6baOwoPHd00yiPSI17Hosp4W/E7ig21g2wyADu7otOZB
+	/yeX9BkKYB34voDMVHNkC+D+cjSorK/NEsaVmLc5PjhaPXPYPXHVxUteWvrB+qdgiZLs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qixO5-0070hz-Le; Wed, 20 Sep 2023 15:37:05 +0200
+Date: Wed, 20 Sep 2023 15:37:05 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Parthiban.Veerasooran@microchip.com
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	corbet@lwn.net, Steen.Hegelund@microchip.com, rdunlap@infradead.org,
+	horms@kernel.org, casper.casan@gmail.com, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, Horatiu.Vultur@microchip.com,
+	Woojung.Huh@microchip.com, Nicolas.Ferre@microchip.com,
+	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com,
+	Ciprian.Regus@analog.com, jtm@lopingdog.com
+Subject: Re: [RFC PATCH net-next 1/6] net: ethernet: implement OPEN Alliance
+ control transaction interface
+Message-ID: <52685909-ec92-41b0-957f-25da8a9be9eb@lunn.ch>
+References: <20230908142919.14849-1-Parthiban.Veerasooran@microchip.com>
+ <20230908142919.14849-2-Parthiban.Veerasooran@microchip.com>
+ <f23997c1-7507-41c6-8bb3-47d6a353beb8@lunn.ch>
+ <14c089d7-4d34-9cd5-7f77-55c80815e003@microchip.com>
+ <deff3e64-a10f-4d07-9651-502442a86987@lunn.ch>
+ <cf23ed3c-d1cb-61fd-a305-e2787ef70cb1@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cf23ed3c-d1cb-61fd-a305-e2787ef70cb1@microchip.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Jordan Rife wrote:
-> Similar to the change in commit 0bdf399342c5("net: Avoid address
-> overwrite in kernel_connect"), BPF hooks run on bind may rewrite the
-> address passed to kernel_bind(). This change
-> 
-> 1) Makes a copy of the bind address in kernel_bind() to insulate
->    callers.
-> 2) Replaces direct calls to sock->ops->bind() with kernel_bind()
-> 
-> Link: https://lore.kernel.org/netdev/20230912013332.2048422-1-jrife@google.com/
-> Fixes: 4fbac77d2d09 ("bpf: Hooks for sys_bind")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Jordan Rife <jrife@google.com>
+> Ah ok, I think there is a misunderstanding here. This is related to OPEN 
+> Alliance protocol. Control transactions consist of one or more control 
+> commands. Control commands are used by the SPI host to read and write 
+> registers within the MAC-PHY. Each control commands are composed of a 
+> 32-bit control command header followed by register data. WNR (write not 
+> read) bit in the control command header indicates if data is to be 
+> written to registers (when set) or read from registers (when clear). so 
+> basically it indicates the type of the control command on the registers.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+OK, so this clearly indicates the names are bad and documentation is
+missing if i got this completely wrong. Adding kerneldoc to these
+functions should help.
+
+	Andrew
+
 
