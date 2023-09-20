@@ -1,82 +1,148 @@
-Return-Path: <netdev+bounces-35209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D209E7A79EC
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 13:00:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 920957A79F1
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 13:01:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E59DB1C20A39
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 11:00:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D3111C209E1
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 11:01:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E44318639;
-	Wed, 20 Sep 2023 11:00:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA3D115AF7;
+	Wed, 20 Sep 2023 11:00:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C7D216436
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 11:00:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E498FC433CD;
-	Wed, 20 Sep 2023 11:00:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695207623;
-	bh=rPiOUM5aaPiWdfVsIO/cyE3yqhenjHG0uI9o5H+GhkU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=c4uykEEPwEbr8zdbbSliJKEUBvRYSJjrN5AghndhxVSToOBFQbQXaXWS/acoVkMh0
-	 1dGt0z+PYTgMdyaAFwh1eoyXuLRgoYxThzE7aGUJW66AXvMczPNaiIkaRgT+Ww0Thu
-	 PwyQr0UbEgfGcJbdz0xOw8WjRQq/EtkoDDOiaaBuuwxGduEmHByahc12iHhz+/tZRx
-	 Zd6Ng/kWGjsx7G0SxGY2LZJFNMCF0SDfZivVx/0wls4ctLTwGQclXzsNtkJLz6tO0n
-	 kgb7lBM+ZE7UjMXEo89/L+EsZqO6ychFHcQdGSMhcJxTPNzGo60joUiXY3hvPhEomB
-	 5FsAlUa2dTfuA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CFDF7C41671;
-	Wed, 20 Sep 2023 11:00:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51A1718645
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 11:00:34 +0000 (UTC)
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C825CC9
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 04:00:30 -0700 (PDT)
+Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-99c136ee106so898221066b.1
+        for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 04:00:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1695207629; x=1695812429; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AEvvL7wq7MhG98C7oNkHR86nxOx9QCzBZgqGLXsj1BY=;
+        b=Xbk+ldP6J7bssSmts5jVEYVEoEwzAZsUatq2VDzg0Mc5HYFU/qGkrOujXyRew1h+Xc
+         oLGWI1TaN/Wehwo6nNbP6b4ALrvnw2bCZMmCIg3TLJyCT07jj0R4GtFm+39C9Q2aAJrY
+         /2cjqYnQ31d8cCB88t4SU1pQYbzTNMP0jFNh0MOhikTlUUUh5F7oKl4qDS1uTWkbYoDD
+         zBF4ZJCd0okdx7uDkeDLPw53IdaSgJbY1JuT95JDo2IHML3iXOLxF6ELgK+duQmFC1DR
+         2VezFrkEJlnLL0XKgzQuqcd9f1XjFkWqNFdKGaus2+kDjZ3WoImZuay6+2DtuJ+47gWi
+         Ivvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695207629; x=1695812429;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AEvvL7wq7MhG98C7oNkHR86nxOx9QCzBZgqGLXsj1BY=;
+        b=QvZvlLW8q8rFK5M4iTSyearwFAwhaeNxCYlZCqQ0Qc4vxB0Zppd9cebGLlsWmrN+ht
+         GxMe5t9gutmgTnYHGZ3ORiNa2HHLf74y0LsY4GL06pEfsHoe1YIcmyuAsO08aIhqWqKc
+         89bBfceXNsvNueh1gAtuAjubFzvoA8GpXZRS3VEy9MG5OdBKnyN1v6a0MGT9X4Lzy05n
+         8N0FI5faY5IvG2Lc4HD7alYR0Y5iev67qkxLbb/t5q+fyVTB9QZF19oBh5jcPOnvxS1u
+         aDsiumqqzp52AJImFLoXPtEja7fVZ6aecUdJMmh+7Ol/Zx/Al+XEX0sfKrCAr4veiomA
+         39bA==
+X-Gm-Message-State: AOJu0YxTLKcJxQZXrqC+9Vc4BeGLkKbklPc3dfrI6LmmYBEb3mjmAUC0
+	iQHgh4qOEOmSkc1c759je7sozw==
+X-Google-Smtp-Source: AGHT+IHZRGAJ8bXIHQMw7UiAB7gVCRXdBqDtsNv5um0prvMS5i4MV874e/3AQCZ9kJa8prT8L6JIYA==
+X-Received: by 2002:a17:906:92:b0:9a1:c0e9:58ff with SMTP id 18-20020a170906009200b009a1c0e958ffmr1669524ejc.11.1695207629279;
+        Wed, 20 Sep 2023 04:00:29 -0700 (PDT)
+Received: from [192.168.0.105] (haunt.prize.volia.net. [93.72.109.136])
+        by smtp.gmail.com with ESMTPSA id se17-20020a170907a39100b009adc86b75d5sm7857126ejc.189.2023.09.20.04.00.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Sep 2023 04:00:29 -0700 (PDT)
+Message-ID: <cc14cd4a-f3bb-3d6f-5b38-ec73cad32570@blackwall.org>
+Date: Wed, 20 Sep 2023 14:00:27 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH][next] wifi: cfg80211: make read-only array centers_80mhz
- static const
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169520762384.31903.1385774049535484165.git-patchwork-notify@kernel.org>
-Date: Wed, 20 Sep 2023 11:00:23 +0000
-References: <20230919095205.24949-1-colin.i.king@gmail.com>
-In-Reply-To: <20230919095205.24949-1-colin.i.king@gmail.com>
-To: Colin Ian King <colin.i.king@gmail.com>
-Cc: johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, linux-wireless@vger.kernel.org,
- netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
- linux-kernel@vger.kernel.org
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH net-next v4 5/6] net: bridge: Add a configurable default
+ FDB learning limit
+Content-Language: en-US
+To: Johannes Nixdorf <jnixdorf-oss@avm.de>,
+ "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+ David Ahern <dsahern@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Ido Schimmel <idosch@nvidia.com>,
+ Jakub Kicinski <kuba@kernel.org>, Oleksij Rempel <linux@rempel-privat.de>,
+ Paolo Abeni <pabeni@redhat.com>, Roopa Prabhu <roopa@nvidia.com>,
+ Shuah Khan <shuah@kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: bridge@lists.linux-foundation.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20230919-fdb_limit-v4-0-39f0293807b8@avm.de>
+ <20230919-fdb_limit-v4-5-39f0293807b8@avm.de>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20230919-fdb_limit-v4-5-39f0293807b8@avm.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Tue, 19 Sep 2023 10:52:05 +0100 you wrote:
-> Don't populate the read-only array lanes on the stack, instead make
-> it static const.
+On 9/19/23 11:12, Johannes Nixdorf wrote:
+> Add a Kconfig option to configure a default FDB learning limit system
+> wide, so a distributor building a special purpose kernel can limit all
+> created bridges by default.
 > 
-> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+> The limit is only a soft default setting and overrideable on a per bridge
+> basis using netlink.
+> 
+> Signed-off-by: Johannes Nixdorf <jnixdorf-oss@avm.de>
 > ---
->  net/mac80211/tdls.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>   net/bridge/Kconfig     | 13 +++++++++++++
+>   net/bridge/br_device.c |  2 ++
+>   2 files changed, 15 insertions(+)
+> 
+> diff --git a/net/bridge/Kconfig b/net/bridge/Kconfig
+> index 3c8ded7d3e84..c0d9c08088c4 100644
+> --- a/net/bridge/Kconfig
+> +++ b/net/bridge/Kconfig
+> @@ -84,3 +84,16 @@ config BRIDGE_CFM
+>   	  Say N to exclude this support and reduce the binary size.
+>   
+>   	  If unsure, say N.
+> +
+> +config BRIDGE_DEFAULT_FDB_MAX_LEARNED
+> +	int "Default FDB learning limit"
+> +	default 0
+> +	depends on BRIDGE
+> +	help
+> +	  Sets a default limit on the number of learned FDB entries on
+> +	  new bridges. This limit can be overwritten via netlink on a
+> +	  per bridge basis.
+> +
+> +	  The default of 0 disables the limit.
+> +
+> +	  If unsure, say 0.
+> diff --git a/net/bridge/br_device.c b/net/bridge/br_device.c
+> index 9a5ea06236bd..3214391c15a0 100644
+> --- a/net/bridge/br_device.c
+> +++ b/net/bridge/br_device.c
+> @@ -531,6 +531,8 @@ void br_dev_setup(struct net_device *dev)
+>   	br->bridge_ageing_time = br->ageing_time = BR_DEFAULT_AGEING_TIME;
+>   	dev->max_mtu = ETH_MAX_MTU;
+>   
+> +	br->fdb_max_learned = CONFIG_BRIDGE_DEFAULT_FDB_MAX_LEARNED;
+> +
+>   	br_netfilter_rtable_init(br);
+>   	br_stp_timer_init(br);
+>   	br_multicast_init(br);
+> 
 
-Here is the summary with links:
-  - [next] wifi: cfg80211: make read-only array centers_80mhz static const
-    https://git.kernel.org/netdev/net-next/c/6c0da8406382
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+This one I'm not sure about at all. Distributions can just create the 
+bridge with a predefined limit. This is not flexible and just adds
+one more kconfig option that is rather unnecessary. Why having a kconfig
+knob is better than bridge creation time limit setting? You still have
+to create the bridge, so why not set the limit then?
 
