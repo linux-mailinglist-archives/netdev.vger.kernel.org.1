@@ -1,205 +1,156 @@
-Return-Path: <netdev+bounces-35261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 263F07A8315
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 15:17:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A60E7A834F
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 15:26:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0AA21C20B5F
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 13:17:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05D47281934
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 13:26:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 463A536B0B;
-	Wed, 20 Sep 2023 13:17:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71CA937147;
+	Wed, 20 Sep 2023 13:26:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D011136AFF
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 13:17:32 +0000 (UTC)
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69B90A9
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 06:17:30 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-9ae22bf33a0so205614466b.0
-        for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 06:17:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1621136AF3
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 13:26:27 +0000 (UTC)
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A342CA
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 06:26:26 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id 98e67ed59e1d1-2764b04dc5cso2095379a91.3
+        for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 06:26:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1695215849; x=1695820649; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4z1ebTU1XlJL0RNvsPG4JRKzQxEhUmSGzIqnEtPiLRQ=;
-        b=fdf7T2WSp1aqkPRuZ7vK0uFXsWWJozqklf5R0YrYAtvJ+ccj4tP3m6hZetS3ge5rqf
-         qg47/gMfcFQS6UFDjWhm6qM2KPhVdR34vgtb73tmTU3V6uHIWpietCu9ExsPbh2nCtHv
-         lWGqfUS4Jr5qy7zqWx7e5ABStT7iH4ObaBYf4w3fHu46BNiSCXcafmNS0naM1IZkDpdA
-         dAf2o1xgHcM4KX1jPWEuftE4cpSNOxg54Fj7U6UPHV3uWgGHBlo1lxOLT/vQlyXsXlCD
-         +Dmv3nJCNbuTtWpAxfIjeay8qHXKXYLRtywNpvtgJQERRgC+uQTgvPoU+DLMZp1NKWB3
-         SYbA==
+        d=bytedance.com; s=google; t=1695216385; x=1695821185; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=K7fATTHDXaSbrRIpLorovNCmSIYGeGmL1yYhxtiI0B0=;
+        b=MSpk4amk80rD0H6FEEHwV4QPMuPeOBPlkYea6I3fwe10AW0UiEPWNXTkZxfon31eKj
+         OlJtk8iPTmI+T8V9kUpURZ5lk1g9/kOTdomH1evIlcDRGqlljLBwZ05yrJQ8QYF8EHo3
+         ogruTI+jw8/AuNQPSG3K57+FIiefCgvoRYijnwxL5btcp8ZYTtToTY2N9w6oxqIo7dyA
+         TOr0Bq2/BiGQKlIEAzr3GtOTjYRdu+lAPSh3Y8Ew7XBsg8rf1lbcuX0lwkhKAzI63OPi
+         IrqSfTXKSaEZOKYDqAD/pmFxFXPMPcSHG5cIVeJFHbHy/EEo8EKmwM2IsLGVTMo4rnFf
+         fqlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695215849; x=1695820649;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4z1ebTU1XlJL0RNvsPG4JRKzQxEhUmSGzIqnEtPiLRQ=;
-        b=WepKRXMO/4L9M1Am4F4ji5qGaSam7O+g6B0hl2fv7Je1OmZi8Bqu9Gs3S4KvNY75ci
-         ZBL6qB81b3J9IhxM9Ex/FaxkXw+W8DdM/Zw/9pTfqWrsQrCKVjD2MH+q7QYMDsE8BFnH
-         C+IyQ9WSloidAChqISM7IJE14uHLH2gTAzjaM46+lQa7G2pk9mDdQ4qwqv/oYpLSwK62
-         XVG68HAog3RJ64X6ZZ6T2KpHBzGVeE+DS6lOkQNx+WTWScmgLGkL7SyLzUmnDzLVlNby
-         TIZT7PIL8vDvn3+VTcwaMTiYhNx9eIMVekltVkPS14dP2sQJZ0iL3/kmdBagw396b1j8
-         gGAw==
-X-Gm-Message-State: AOJu0Yx5xLfTeO1hHdoyH4GxKshSX+J2Egfi6SVQHoGpB1xXJfAQyfyu
-	ko2IBdmmgIrJMQJo+fGcQlQH/Q==
-X-Google-Smtp-Source: AGHT+IEmvvIFfHDLufK6B7+1Zm9nQFebxNW9ONYqmXunc/NW7CodSVkSB9tXJZNIb7OE8MRpGCwd0w==
-X-Received: by 2002:a17:907:360a:b0:98e:4f1:f987 with SMTP id bk10-20020a170907360a00b0098e04f1f987mr7939528ejc.3.1695215848815;
-        Wed, 20 Sep 2023 06:17:28 -0700 (PDT)
-Received: from [172.20.24.238] (static-212-193-78-212.thenetworkfactory.nl. [212.78.193.212])
-        by smtp.gmail.com with ESMTPSA id g5-20020a170906394500b0099bc038eb2bsm9305870eje.58.2023.09.20.06.17.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Sep 2023 06:17:28 -0700 (PDT)
-Message-ID: <85958d72-a06c-b709-594e-52550f591175@linaro.org>
-Date: Wed, 20 Sep 2023 15:17:27 +0200
+        d=1e100.net; s=20230601; t=1695216385; x=1695821185;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=K7fATTHDXaSbrRIpLorovNCmSIYGeGmL1yYhxtiI0B0=;
+        b=WZz1h88EGBqvCVBLfVIGzqofBEquiJ94JFuffQNEXLwCWpf0TF/IGbtPKZ0sXnDv57
+         +JUjCiKPGDTS3CoEZFTqvtW7KsZKai/wKfTPyNI0RLaHS9PzyV5LLzqF851fwzBg+Sqe
+         mszfQlao+dfc+a7jrziFc/2qxMm3LFhKJwKiJVLV5qy6SpVB17d9nz2km/uBO2A/86z5
+         xqnIC6Di2mQf5kWbwkGmHfexDj1BUc2oGKnR7y2chAU7ra/yNa8bbU1MO+314qltTqbX
+         qTXUpnrlIUY2YXi6PgfCIvxK0fxbpo4q19ODFujTkZpjFyutnHCPA2QLzsu75ex5t2Xc
+         mt7Q==
+X-Gm-Message-State: AOJu0Yw7z3xezaoORULTr5XI44wqTtWlzUbNiPcjC4+RE2ztn5NIZPy1
+	W14ycMyQ5imFlV3te40AHOyDyA==
+X-Google-Smtp-Source: AGHT+IH7v4KQGYSssF5a4RuDaZXId9Eq3e5lpP2ba8bd//NMDSQFiu87b6arf46Rb3ZtsqzcjruT2A==
+X-Received: by 2002:a17:90a:fa08:b0:273:e64c:f22e with SMTP id cm8-20020a17090afa0800b00273e64cf22emr2329685pjb.29.1695216385452;
+        Wed, 20 Sep 2023 06:26:25 -0700 (PDT)
+Received: from C02DV8HUMD6R.bytedance.net ([139.177.225.242])
+        by smtp.gmail.com with ESMTPSA id cl21-20020a17090af69500b002682392506bsm1333485pjb.50.2023.09.20.06.26.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Sep 2023 06:26:25 -0700 (PDT)
+From: Abel Wu <wuyun.abel@bytedance.com>
+To: Shakeel Butt <shakeelb@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Abel Wu <wuyun.abel@bytedance.com>,
+	Breno Leitao <leitao@debian.org>,
+	Alexander Mikhalitsyn <alexander@mihalicyn.com>,
+	David Howells <dhowells@redhat.com>,
+	Jason Xing <kernelxing@tencent.com>
+Cc: Glauber Costa <glommer@parallels.com>,
+	Xin Long <lucien.xin@gmail.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	netdev@vger.kernel.org (open list:NETWORKING [GENERAL]),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next 1/2] sock: Code cleanup on __sk_mem_raise_allocated()
+Date: Wed, 20 Sep 2023 21:25:40 +0800
+Message-Id: <20230920132545.56834-1-wuyun.abel@bytedance.com>
+X-Mailer: git-send-email 2.37.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH net-next v2 1/2] dt-bindings: net: mediatek,net: add
- phandles for SerDes on MT7988
-Content-Language: en-US
-To: Daniel Golle <daniel@makrotopia.org>, Rob Herring <robh@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Felix Fietkau <nbd@nbd.name>,
- John Crispin <john@phrozen.org>, Sean Wang <sean.wang@mediatek.com>,
- Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-References: <cover.1695058909.git.daniel@makrotopia.org>
- <35c12a115893d324db16ec6983afb5f1951fd4c9.1695058909.git.daniel@makrotopia.org>
- <20230919180909.GA4151534-robh@kernel.org> <ZQoJpGLhNZ0M2JhI@makrotopia.org>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <ZQoJpGLhNZ0M2JhI@makrotopia.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 19/09/2023 22:50, Daniel Golle wrote:
-> Hi Rob,
-> 
-> thank you for the review!
-> 
-> On Tue, Sep 19, 2023 at 01:09:09PM -0500, Rob Herring wrote:
->> On Mon, Sep 18, 2023 at 11:26:34PM +0100, Daniel Golle wrote:
->>> Add several phandles needed for Ethernet SerDes interfaces on the
->>> MediaTek MT7988 SoC.
->>>
->>> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
->>> ---
->>>  .../devicetree/bindings/net/mediatek,net.yaml | 28 +++++++++++++++++++
->>>  1 file changed, 28 insertions(+)
->>>
->>> diff --git a/Documentation/devicetree/bindings/net/mediatek,net.yaml b/Documentation/devicetree/bindings/net/mediatek,net.yaml
->>> index e74502a0afe86..78219158b96af 100644
->>> --- a/Documentation/devicetree/bindings/net/mediatek,net.yaml
->>> +++ b/Documentation/devicetree/bindings/net/mediatek,net.yaml
->>> @@ -385,6 +385,34 @@ allOf:
->>>            minItems: 2
->>>            maxItems: 2
->>>  
->>> +        mediatek,toprgu:
->>> +          $ref: /schemas/types.yaml#/definitions/phandle
->>> +          description:
->>> +            Phandle to the syscon representing the reset controller.
->>
->> Use the reset binding
-> 
-> I got an alternative implementation ready which implements an actual
-> reset controller (by extending drivers/watchdog/mtk_wdt.c to cover
-> also MT7988 and its addition sw-reset-enable bits) and uses single
-> phandles for each reset bit assigned to the corresponding units
-> instead of listing them all for the ethernet controller (maybe that's
-> one step too far though...)
-> 
-> However, as mentioned in the cover letter, using the Linux reset
-> controller API (which having to use is a consequence of having to use
-> the reset bindings) doesn't allow to simultanously deassert the
-> resets of pextp, usxgmii pcs and/or sgmii pcs which is how the vendor
-> implementation is doing it as all reset bits are on the same 32-bit
-> register and the Ethernet driver is the only driver needing to access
-> that register.
+Code cleanup for both better simplicity and readability.
+No functional change intended.
 
-You can have reset for entire register, why not? And even if current
-Linux implementation had some troubles with this, you could fix it.
+Signed-off-by: Abel Wu <wuyun.abel@bytedance.com>
+Acked-by: Shakeel Butt <shakeelb@google.com>
+---
+ net/core/sock.c | 22 ++++++++++++----------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
 
-
-> 
->>
->>> +
->>> +        mediatek,xfi-pll:
->>> +          $ref: /schemas/types.yaml#/definitions/phandle
->>> +          description:
->>> +            Phandle to the syscon node handling the 10GE SerDes clock setup.
->>
->> Use the clock binding
-> 
-> Does that imply that I should implement a clock driver whith only a
-> single clock offering only a single operation ('enable') which would
-> then do the magic register writes?
-
-Yes
-
-> 
-> While one part is actually identifyable as taking care of enabling a
-> clock, I would not know how to meaningfully abstract the other (first)
-> part, see vendor driver:
-> 
-> /* Register to control USXGMII XFI PLL digital */
-> #define XFI_PLL_DIG_GLB8        0x08
-> #define RG_XFI_PLL_EN           BIT(31)
-> 
-> /* Register to control USXGMII XFI PLL analog */
-> #define XFI_PLL_ANA_GLB8        0x108
-> #define RG_XFI_PLL_ANA_SWWA     0x02283248
-> 
-> [...]
-> 
-> /* Add software workaround for USXGMII PLL TCL issue */
-> regmap_write(ss->pll, XFI_PLL_ANA_GLB8, RG_XFI_PLL_ANA_SWWA);
-> // How would you represent the line above using the abstractions of the
-> // common clk framework?
-
-What is above line? Please do not ask us to decode your vendor code. You
-know, we also have nothing to do with it.
-
-And anyway, why do you need to abstract it? Why not writing unconditionally?
-
-
-> 
-> regmap_read(ss->pll, XFI_PLL_DIG_GLB8, &val); //    that looks like it
-> val |= RG_XFI_PLL_EN;                         // <- could be a abstracted
-> regmap_write(ss->pll, XFI_PLL_DIG_GLB8, val); //    in a meaningful way in
->                                                     clock driver.
-> 
-> ... which is all we ever do on that regmap. Ever.
-
-Not only. You will also get all Linux infrastructure associated with
-this clock, so proper devlinks, sysfs/debug entries, automatic gating of
-unused clocks etc.
-
-Best regards,
-Krzysztof
+diff --git a/net/core/sock.c b/net/core/sock.c
+index a5995750c5c5..379eb8b65562 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -3046,17 +3046,19 @@ EXPORT_SYMBOL(sk_wait_data);
+  */
+ int __sk_mem_raise_allocated(struct sock *sk, int size, int amt, int kind)
+ {
+-	bool memcg_charge = mem_cgroup_sockets_enabled && sk->sk_memcg;
++	struct mem_cgroup *memcg = mem_cgroup_sockets_enabled ? sk->sk_memcg : NULL;
+ 	struct proto *prot = sk->sk_prot;
+-	bool charged = true;
++	bool charged = false;
+ 	long allocated;
+ 
+ 	sk_memory_allocated_add(sk, amt);
+ 	allocated = sk_memory_allocated(sk);
+-	if (memcg_charge &&
+-	    !(charged = mem_cgroup_charge_skmem(sk->sk_memcg, amt,
+-						gfp_memcg_charge())))
+-		goto suppress_allocation;
++
++	if (memcg) {
++		if (!mem_cgroup_charge_skmem(memcg, amt, gfp_memcg_charge()))
++			goto suppress_allocation;
++		charged = true;
++	}
+ 
+ 	/* Under limit. */
+ 	if (allocated <= sk_prot_mem_limits(sk, 0)) {
+@@ -3111,8 +3113,8 @@ int __sk_mem_raise_allocated(struct sock *sk, int size, int amt, int kind)
+ 		 */
+ 		if (sk->sk_wmem_queued + size >= sk->sk_sndbuf) {
+ 			/* Force charge with __GFP_NOFAIL */
+-			if (memcg_charge && !charged) {
+-				mem_cgroup_charge_skmem(sk->sk_memcg, amt,
++			if (memcg && !charged) {
++				mem_cgroup_charge_skmem(memcg, amt,
+ 					gfp_memcg_charge() | __GFP_NOFAIL);
+ 			}
+ 			return 1;
+@@ -3124,8 +3126,8 @@ int __sk_mem_raise_allocated(struct sock *sk, int size, int amt, int kind)
+ 
+ 	sk_memory_allocated_sub(sk, amt);
+ 
+-	if (memcg_charge && charged)
+-		mem_cgroup_uncharge_skmem(sk->sk_memcg, amt);
++	if (charged)
++		mem_cgroup_uncharge_skmem(memcg, amt);
+ 
+ 	return 0;
+ }
+-- 
+2.37.3
 
 
