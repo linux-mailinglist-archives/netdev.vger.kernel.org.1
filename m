@@ -1,202 +1,146 @@
-Return-Path: <netdev+bounces-35298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D73317A8AB1
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 19:35:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA07F7A8AC1
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 19:41:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8944B1F20F70
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 17:35:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67E0E28155D
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 17:41:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BD4C1A5B9;
-	Wed, 20 Sep 2023 17:35:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DBEE3E477;
+	Wed, 20 Sep 2023 17:41:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E1B61A58F
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 17:35:27 +0000 (UTC)
-Received: from mail-oi1-x234.google.com (mail-oi1-x234.google.com [IPv6:2607:f8b0:4864:20::234])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E9D8AF;
-	Wed, 20 Sep 2023 10:35:25 -0700 (PDT)
-Received: by mail-oi1-x234.google.com with SMTP id 5614622812f47-3a9e89fa553so3564b6e.1;
-        Wed, 20 Sep 2023 10:35:25 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56C541A5A0
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 17:41:22 +0000 (UTC)
+Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3885B9;
+	Wed, 20 Sep 2023 10:41:20 -0700 (PDT)
+Received: by mail-qk1-x72a.google.com with SMTP id af79cd13be357-773bd514996so905485a.1;
+        Wed, 20 Sep 2023 10:41:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695231324; x=1695836124; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=72ZMPmG8h3bndMZ2rA/WbfU0f4MVxkLqm1XQLZCVksU=;
-        b=dFXBgRYMZFiyt5OqkpejE1IJJ9CUVsDn/MDdagjipaMCpCg2cpPDo5XgxDwj4dEaXH
-         V60QJZ+d802O5fC5/oixgwCUFeCM7rGb7Mgk8pZhje1SCb26loY/evW7tyRuprkCPEZD
-         AVX3DEej6ztuurUwVpUKAf9UKn3s8eTWT9788ItxFJEXzgF+qBGTengs5XZOwF/nHzUk
-         aN/8yxDlQi9LedQvyDvS4kGDJtn/NbIYixF6hvd0+HhWilY77/FoFlcrYijtdQbO0juQ
-         PAINypN9aeFwUPaxNtNQdA9dfWRnxzX7W4NdQgLjXPWqjZCnAqW+1faucWrGNiMy2XM9
-         varg==
+        d=gmail.com; s=20230601; t=1695231680; x=1695836480; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=llu5nHgEQacDL2hr7yeW6ndQcmaqNUQJseQZznlx1ws=;
+        b=WrFA1MqIgo7M3z2+30rb7Uj6VoNIbDxb+V8YmDOwaXfVAYxstS3ILnkxBJsv2s/X3I
+         2zxmasNerUKEYoqi267lEQWJwd/OcAIj7DiuOSr1xFT6fCU+rUqRmCh3LpVHEqx9qcG/
+         eAmPANbqxM6JRYNEqxIwUa9PshzDVNnblk8UrHJ1aI0DUVHRO2wgkB1vnmEM+SaOPk4E
+         eSGfjSC/R52A3ygl1tHRsYHFHYk1uC/TsNFPAgd59jGf8VSCXA/nAfYr2vt8uiI/ADfD
+         JE3bMfL05TxM76lHL6sW5npGu7QF5JDVuZ1fcLbEl0df4b4QVUQDw7Hr3a0ZV+6r3r1W
+         XzyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695231324; x=1695836124;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=72ZMPmG8h3bndMZ2rA/WbfU0f4MVxkLqm1XQLZCVksU=;
-        b=KkNo0yLlI+gmzGku70SevbEeaVL2nEw+OHsLw9MlMPBh1SCGI8G+niT9ntte81+q9v
-         532WW7HZpnzRisKXvoq2Pu0W+IxDuLX8gclOB0P9z6Q21/E6FicfFnyPbZjuqdQsjc5j
-         lppbJWIG3WehGuhUVqCxyTDYNVD6Zxo7VD+9jBv3mCLn1Z5WZASuYqXGpUYrOOHkT3vx
-         s67WK12VLA0bXPeM09wiirNXKfECba23nIaZrmTy7jIkpyDX9liwkLsgGNN++j2DfaDj
-         DNN6fPzHJ52uY1IunbBIP+dtftW9moJCHvBpy1DECcVqnYjfUmzgmKXjXH3beUMBRUJY
-         qXOQ==
-X-Gm-Message-State: AOJu0YwODOqjSjLSCGeaKYgRU2nWyOFgWulWeM3jqWBEAB9a/t9dGUTQ
-	K4t/tjysokEZQw6mbt2GqIo=
-X-Google-Smtp-Source: AGHT+IHvsv5cqcTBdZLRLx1t5JqBmwesPoIlsPl1SxJ0hbPDCm88UcuT5wiVNT+hETSB3dNaZATfHA==
-X-Received: by 2002:a05:6808:178a:b0:3a9:e40c:683c with SMTP id bg10-20020a056808178a00b003a9e40c683cmr3397758oib.1.1695231324271;
-        Wed, 20 Sep 2023 10:35:24 -0700 (PDT)
-Received: from fabio-Precision-3551.. ([2804:14c:485:4b61:9f0c:3917:3374:12c4])
-        by smtp.gmail.com with ESMTPSA id 22-20020aca1016000000b003a9baa79051sm1352994oiq.11.2023.09.20.10.35.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Sep 2023 10:35:23 -0700 (PDT)
-From: Fabio Estevam <festevam@gmail.com>
-To: kuba@kernel.org
-Cc: andrew@lunn.ch,
-	f.fainelli@gmail.com,
-	olteanv@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	l00g33k@gmail.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Fabio Estevam <festevam@denx.de>
-Subject: [PATCH] net: dsa: mv88e6xxx: Avoid EEPROM timeout when EEPROM is absent
-Date: Wed, 20 Sep 2023 14:35:08 -0300
-Message-Id: <20230920173508.63449-1-festevam@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1695231680; x=1695836480;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=llu5nHgEQacDL2hr7yeW6ndQcmaqNUQJseQZznlx1ws=;
+        b=GWLsKm5Yp1dxXnDeXlFp6gSTRXl3B2cDKpV4JufmSMp2uQHTeMdYB+6RQfwbrdqTUu
+         uGnDEpoRMfjknk3qkdlA1Dm2g+Fm49HVli5Cl5aoVVGVvaRVH+o/XKGHvMKLgKmqvCGm
+         DPU2qpRP5CarBT69+FGCq+xF2GgYv1Ye3SJ4UTDwo8y8pYY171rNLU6V2xK/8LMoFChz
+         QMcAAbP/sWwmHDcFaSvRyD+7LQ2I43vVBRjv4L5IznEZCGrWFcBwpN+meH4xwum6r2eF
+         rP6yAIWgHbCqEeVqnTAdVLubtXSfdRewt5G35S2Brh3967nSSCBIUsrOjV4KwHtYYovd
+         J25w==
+X-Gm-Message-State: AOJu0YzqRJbm5daSR7ITn9fL1c3aIJcCumXWhV8x9+GSkwQtrCWwkSkD
+	K5J19eOkQ4bjjNGrzYEsgog=
+X-Google-Smtp-Source: AGHT+IEC0w9SyUCFOAOQxCTeactjZLUpNr9UDGDTOq+PLXoa/k/pnmYH3DgUWS1kNhRIC0uSrkf9wg==
+X-Received: by 2002:a05:620a:1920:b0:76d:b5ce:8f79 with SMTP id bj32-20020a05620a192000b0076db5ce8f79mr3088172qkb.34.1695231679917;
+        Wed, 20 Sep 2023 10:41:19 -0700 (PDT)
+Received: from [10.67.49.139] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id g5-20020a05620a108500b0076ef3e6e6a4sm4962053qkk.42.2023.09.20.10.41.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Sep 2023 10:41:19 -0700 (PDT)
+Message-ID: <dbff79f7-8fb2-7473-8a11-57810a25da37@gmail.com>
+Date: Wed, 20 Sep 2023 10:41:16 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH] net: dsa: mv88e6xxx: Avoid EEPROM timeout when EEPROM is
+ absent
+Content-Language: en-US
+To: Fabio Estevam <festevam@gmail.com>, kuba@kernel.org
+Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, l00g33k@gmail.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Fabio Estevam <festevam@denx.de>
+References: <20230920173508.63449-1-festevam@gmail.com>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20230920173508.63449-1-festevam@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Fabio Estevam <festevam@denx.de>
+On 9/20/23 10:35, Fabio Estevam wrote:
+> From: Fabio Estevam <festevam@denx.de>
+> 
+> Since commit 23d775f12dcd ("net: dsa: mv88e6xxx: Wait for EEPROM done
+> before HW reset") the following error is seen on a imx8mn board with
+> a 88E6320 switch:
+> 
+> mv88e6085 30be0000.ethernet-1:00: Timeout waiting for EEPROM done
+> 
+> This board does not have an EEPROM attached to the switch though.
+> 
+> This problem is well explained by Andrew Lunn:
+> 
+> "If there is an EEPROM, and the EEPROM contains a lot of data, it could
+> be that when we perform a hardware reset towards the end of probe, it
+> interrupts an I2C bus transaction, leaving the I2C bus in a bad state,
+> and future reads of the EEPROM do not work.
+> 
+> The work around for this was to poll the EEInt status and wait for it
+> to go true before performing the hardware reset.
+> 
+> However, we have discovered that for some boards which do not have an
+> EEPROM, EEInt never indicates complete. As a result,
+> mv88e6xxx_g1_wait_eeprom_done() spins for a second and then prints a
+> warning.
+> 
+> We probably need a different solution than calling
+> mv88e6xxx_g1_wait_eeprom_done(). The datasheet for 6352 documents the
+> EEPROM Command register:
+> 
+> bit 15 is:
+> 
+>    EEPROM Unit Busy. This bit must be set to a one to start an EEPROM
+>    operation (see EEOp below). Only one EEPROM operation can be
+>    executing at one time so this bit must be zero before setting it to
+>    a one.  When the requested EEPROM operation completes this bit will
+>    automatically be cleared to a zero. The transition of this bit from
+>    a one to a zero can be used to generate an interrupt (the EEInt in
+>    Global 1, offset 0x00).
+> 
+> and more interesting is bit 11:
+> 
+>    Register Loader Running. This bit is set to one whenever the
+>    register loader is busy executing instructions contained in the
+>    EEPROM."
+> 
+> Change to calling mv88e6xxx_g1_wait_eeprom_done() to fix the timeout
+> error when the EEPROM chip is not present.
+>    
+> Fixes: 23d775f12dcd ("net: dsa: mv88e6xxx: Wait for EEPROM done before HW reset")
+> Suggested-by: Andrew Lunn <andrew@lunn.ch>
+> Signed-off-by: Fabio Estevam <festevam@denx.de>
 
-Since commit 23d775f12dcd ("net: dsa: mv88e6xxx: Wait for EEPROM done
-before HW reset") the following error is seen on a imx8mn board with
-a 88E6320 switch:
-
-mv88e6085 30be0000.ethernet-1:00: Timeout waiting for EEPROM done
-
-This board does not have an EEPROM attached to the switch though.
-
-This problem is well explained by Andrew Lunn:
-
-"If there is an EEPROM, and the EEPROM contains a lot of data, it could
-be that when we perform a hardware reset towards the end of probe, it
-interrupts an I2C bus transaction, leaving the I2C bus in a bad state,
-and future reads of the EEPROM do not work.
-
-The work around for this was to poll the EEInt status and wait for it
-to go true before performing the hardware reset.
-
-However, we have discovered that for some boards which do not have an
-EEPROM, EEInt never indicates complete. As a result,
-mv88e6xxx_g1_wait_eeprom_done() spins for a second and then prints a
-warning.
-
-We probably need a different solution than calling
-mv88e6xxx_g1_wait_eeprom_done(). The datasheet for 6352 documents the
-EEPROM Command register:
-
-bit 15 is:
-
-  EEPROM Unit Busy. This bit must be set to a one to start an EEPROM
-  operation (see EEOp below). Only one EEPROM operation can be
-  executing at one time so this bit must be zero before setting it to
-  a one.  When the requested EEPROM operation completes this bit will
-  automatically be cleared to a zero. The transition of this bit from
-  a one to a zero can be used to generate an interrupt (the EEInt in
-  Global 1, offset 0x00).
-
-and more interesting is bit 11:
-
-  Register Loader Running. This bit is set to one whenever the
-  register loader is busy executing instructions contained in the
-  EEPROM."
-
-Change to calling mv88e6xxx_g1_wait_eeprom_done() to fix the timeout
-error when the EEPROM chip is not present.
-  
-Fixes: 23d775f12dcd ("net: dsa: mv88e6xxx: Wait for EEPROM done before HW reset")
-Suggested-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Fabio Estevam <festevam@denx.de>
----
-Alfred,
-
-Please test it, if you have a chance. I want to be sure that your usecase
-still works well.
-
- drivers/net/dsa/mv88e6xxx/chip.c    | 6 ++++--
- drivers/net/dsa/mv88e6xxx/global2.c | 2 +-
- drivers/net/dsa/mv88e6xxx/global2.h | 2 ++
- 3 files changed, 7 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index a73008b9e0b3..ba906dfab055 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.c
-+++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -3012,14 +3012,16 @@ static void mv88e6xxx_hardware_reset(struct mv88e6xxx_chip *chip)
- 		 * from the wrong location resulting in the switch booting
- 		 * to wrong mode and inoperable.
- 		 */
--		mv88e6xxx_g1_wait_eeprom_done(chip);
-+		if (chip->info->ops->get_eeprom)
-+			mv88e6xxx_g2_eeprom_wait(chip);
- 
- 		gpiod_set_value_cansleep(gpiod, 1);
- 		usleep_range(10000, 20000);
- 		gpiod_set_value_cansleep(gpiod, 0);
- 		usleep_range(10000, 20000);
- 
--		mv88e6xxx_g1_wait_eeprom_done(chip);
-+		if (chip->info->ops->get_eeprom)
-+			mv88e6xxx_g2_eeprom_wait(chip);
- 	}
- }
- 
-diff --git a/drivers/net/dsa/mv88e6xxx/global2.c b/drivers/net/dsa/mv88e6xxx/global2.c
-index ec49939968fa..ac302a935ce6 100644
---- a/drivers/net/dsa/mv88e6xxx/global2.c
-+++ b/drivers/net/dsa/mv88e6xxx/global2.c
-@@ -340,7 +340,7 @@ int mv88e6xxx_g2_pot_clear(struct mv88e6xxx_chip *chip)
-  * Offset 0x15: EEPROM Addr (for 8-bit data access)
-  */
- 
--static int mv88e6xxx_g2_eeprom_wait(struct mv88e6xxx_chip *chip)
-+int mv88e6xxx_g2_eeprom_wait(struct mv88e6xxx_chip *chip)
- {
- 	int bit = __bf_shf(MV88E6XXX_G2_EEPROM_CMD_BUSY);
- 	int err;
-diff --git a/drivers/net/dsa/mv88e6xxx/global2.h b/drivers/net/dsa/mv88e6xxx/global2.h
-index c05fad5c9f19..6d8d38944b23 100644
---- a/drivers/net/dsa/mv88e6xxx/global2.h
-+++ b/drivers/net/dsa/mv88e6xxx/global2.h
-@@ -360,6 +360,8 @@ int mv88e6xxx_g2_trunk_clear(struct mv88e6xxx_chip *chip);
- int mv88e6xxx_g2_device_mapping_write(struct mv88e6xxx_chip *chip, int target,
- 				      int port);
- 
-+int mv88e6xxx_g2_eeprom_wait(struct mv88e6xxx_chip *chip);
-+
- extern const struct mv88e6xxx_irq_ops mv88e6097_watchdog_ops;
- extern const struct mv88e6xxx_irq_ops mv88e6250_watchdog_ops;
- extern const struct mv88e6xxx_irq_ops mv88e6390_watchdog_ops;
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 -- 
-2.34.1
+Florian
 
 
