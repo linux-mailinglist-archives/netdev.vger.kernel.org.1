@@ -1,167 +1,159 @@
-Return-Path: <netdev+bounces-35302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE2C57A8B06
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 20:03:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 251867A8B24
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 20:07:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D60D41C208C9
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 18:03:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFB9E1C209CA
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 18:07:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3284A3FB1A;
-	Wed, 20 Sep 2023 18:02:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EC913FB3E;
+	Wed, 20 Sep 2023 18:07:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA4E1A5A2
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 18:02:57 +0000 (UTC)
-Received: from mail-oi1-f208.google.com (mail-oi1-f208.google.com [209.85.167.208])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB25494
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 11:02:55 -0700 (PDT)
-Received: by mail-oi1-f208.google.com with SMTP id 5614622812f47-3add3240d52so151202b6e.0
-        for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 11:02:55 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 202EE1A58E;
+	Wed, 20 Sep 2023 18:07:12 +0000 (UTC)
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92D23B9;
+	Wed, 20 Sep 2023 11:07:09 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id 98e67ed59e1d1-27659684a4dso9818a91.2;
+        Wed, 20 Sep 2023 11:07:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695233228; x=1695838028; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CDKh24qGZmK3VNmfI6pHneYOw8sTqAGZ08zaO3vUY08=;
+        b=mKWFyrE3fcHWUXqYQJ+756xGV+scAmbvRp8bSSf7TTNqcB0zfxdCU09WDMY33Tm0Hf
+         KjZqzxBG2L4nomB1VSFEoHMNqIRbkzMN7gYg3wX2dSNCHbBsvxiwWluDSWc0iH0dqJZG
+         q3j15R9oGhWm+3FZskcY3R+o7b46HViTRmyrJC0k7pyGq7UexLqxfgQOL2Qaxe4wYEAg
+         LfyJ3xokQP0xI1aSZe9OWYTHoRcvFo7qsnhOI16/KVstu7Z+2TGA6YKnvWAtKxY9KnqX
+         lqnseNfwiAseb3G10Oj9VAphBy5vJ373AUnyagHNrDonxSHXM+493SvL0VwaSnyymsIy
+         wDcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695232975; x=1695837775;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5teg6OFj1pXhxaX7rzqqapjXA/AqJ3+972X/yqDBJ5k=;
-        b=hP/chSfXUm82Z/777dE+YeJGxGgXqubyW7WyDTPhKGi/0FVKsgP3lIRsjHPamaNvnW
-         +2uTPkbYJojZ5OnBcQYTZovaLGI7LwuYOodn5NVwIHRF4oVe002zjO3XXgwa3gcL61pc
-         gLpVQyLmumVSj+3Ay77NbaF2aZoH/Rhrg0BAC+FG/+1pGn3eEV9f0QpM3c2/RP8fo9L3
-         3LzqxmwnVvYQrmpxAH/ZgKsHv7mGW0T+asCDerTAjT7D0WPnkhzTiqMoqa+OvqSmV1A6
-         pWG2yiAzWzKREAijgDAKrLVY6VO4FLa0Gd129XwYaBWuAM22n3mnJGlXbjLmVBBy2guJ
-         bzRw==
-X-Gm-Message-State: AOJu0YzxXn/aRf6567gXrzjy6kwAhlG2huVe7dAXOelpjo1ceD8H/C08
-	75hIAYdWBe1xHsw+lOYfa30JOWu4gBJuXKB7P9vlJdelEw4b
-X-Google-Smtp-Source: AGHT+IGoe5uqnvjbQP57E1f0/PkNymIgtUSx1BPpiQbSFRMO0t4C0JJlxF8jfjvKAn8EyN0LbsNFwNbYzxagQ4Xwa4hqZEgXWJga
+        d=1e100.net; s=20230601; t=1695233228; x=1695838028;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=CDKh24qGZmK3VNmfI6pHneYOw8sTqAGZ08zaO3vUY08=;
+        b=mWHCjTyGaCW1N9ikN8PWkwyCIJA6ZA+z48RAinU3oA2W59Hcv7TC1YBMXSa0CLNMw2
+         SNGDseHMCnNE44iNl0tImOATHJ3z9sf5e6TeHa1uhWQ01Hebfw7CxWXrGMjwDMCdxKms
+         6Y1sFfs6qxpZgHK+l5y3H0pvR6Jj1HPUEvDWHUzOHCcbwgs3sMuxhH78VZOv+mDUMsEV
+         aOpTTvokJFJnKt8ubsxk+j0et5jQprDkKcM/5HVz3/9Hur0eF1bYqgmD7gU7JcC7mbSV
+         clcElI1Y0/1KHcbStEf/L93DWyjLtKZrZraEAqrvcLJBN7kAktOYtZhtoj5dKFUke2iy
+         YQqQ==
+X-Gm-Message-State: AOJu0Yw6UooVwfon4XrWCViScFPKZ7XpJyqpMfQm51XA+RNbk0oZSxih
+	J8Qz6Fmw0AWHRqBPvq5+4Ew=
+X-Google-Smtp-Source: AGHT+IG/+wNDk+YZF0QHGDzP11GIgMoPE7UBbmKOTDz0g6UAKMB8WNjGCGHDubSoqPSGbz4LwjPY0g==
+X-Received: by 2002:a17:90a:ec0f:b0:274:2906:656a with SMTP id l15-20020a17090aec0f00b002742906656amr3273183pjy.5.1695233228412;
+        Wed, 20 Sep 2023 11:07:08 -0700 (PDT)
+Received: from localhost ([98.97.37.198])
+        by smtp.gmail.com with ESMTPSA id a13-20020a17090a8c0d00b002633fa95ac2sm1611861pjo.13.2023.09.20.11.07.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Sep 2023 11:07:07 -0700 (PDT)
+Date: Wed, 20 Sep 2023 11:07:06 -0700
+From: John Fastabend <john.fastabend@gmail.com>
+To: Kui-Feng Lee <sinquersw@gmail.com>, 
+ Ma Ke <make_ruc2021@163.com>, 
+ john.fastabend@gmail.com, 
+ jakub@cloudflare.com, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com
+Cc: netdev@vger.kernel.org, 
+ bpf@vger.kernel.org
+Message-ID: <650b34ca2b41c_4e8122080@john.notmuch>
+In-Reply-To: <dc84f39f-5b13-4a7d-a26c-598227fd9a42@gmail.com>
+References: <20230918093620.3479627-1-make_ruc2021@163.com>
+ <dc84f39f-5b13-4a7d-a26c-598227fd9a42@gmail.com>
+Subject: Re: [PATCH] bpf, sockmap: fix deadlocks in the sockhash and sockmap
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6808:3026:b0:3a8:41a7:eafc with SMTP id
- ay38-20020a056808302600b003a841a7eafcmr1573311oib.7.1695232975148; Wed, 20
- Sep 2023 11:02:55 -0700 (PDT)
-Date: Wed, 20 Sep 2023 11:02:55 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000004ba00e0605ce2fcf@google.com>
-Subject: [syzbot] [net?] WARNING in inet_csk_get_port (2)
-From: syzbot <syzbot+71e724675ba3958edb31@syzkaller.appspotmail.com>
-To: avagin@gmail.com, davem@davemloft.net, dsahern@kernel.org, 
-	edumazet@google.com, kuba@kernel.org, kuniyu@amazon.com, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-	SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.6
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello,
+Kui-Feng Lee wrote:
+> 
+> 
+> On 9/18/23 02:36, Ma Ke wrote:
+> > It seems that elements in sockhash are rarely actively
+> > deleted by users or ebpf program. Therefore, we do not
 
-syzbot found the following issue on:
+We never delete them in our usage. I think soon we will have
+support to run BPF programs without a map at all removing these
+concerns for many use cases.
 
-HEAD commit:    2cf0f7156238 Merge tag 'nfs-for-6.6-2' of git://git.linux-..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=17405ab0680000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d594086f139d167
-dashboard link: https://syzkaller.appspot.com/bug?extid=71e724675ba3958edb31
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16b2e118680000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=127b55c4680000
+> > pay much attention to their deletion. Compared with hash
+> > maps, sockhash only provides spin_lock_bh protection.
+> > This causes it to appear to have self-locking behavior
+> > in the interrupt context, as CVE-2023-0160 points out.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/456b02029fa8/disk-2cf0f715.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/9f9ff0c00454/vmlinux-2cf0f715.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/0ede19fba30f/bzImage-2cf0f715.xz
+CVE is a bit exagerrated in my opinion. I'm not sure why
+anyone would delete an element from interrupt context. But,
+OK if someone wrote such a thing we shouldn't lock up.
 
-The issue was bisected to:
+> > 
+> > Signed-off-by: Ma Ke <make_ruc2021@163.com>
+> > ---
+> >   net/core/sock_map.c | 5 +++--
+> >   1 file changed, 3 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/net/core/sock_map.c b/net/core/sock_map.c
+> > index cb11750b1df5..1302d484e769 100644
+> > --- a/net/core/sock_map.c
+> > +++ b/net/core/sock_map.c
+> > @@ -928,11 +928,12 @@ static long sock_hash_delete_elem(struct bpf_map *map, void *key)
+> >   	struct bpf_shtab_bucket *bucket;
+> >   	struct bpf_shtab_elem *elem;
+> >   	int ret = -ENOENT;
+> > +	unsigned long flags;
+> 
+> Keep reverse xmas tree ordering?
+> 
+> >   
+> >   	hash = sock_hash_bucket_hash(key, key_size);
+> >   	bucket = sock_hash_select_bucket(htab, hash);
+> >   
+> > -	spin_lock_bh(&bucket->lock);
+> > +	spin_lock_irqsave(&bucket->lock, flags);
 
-commit c48ef9c4aed3632566b57ba66cec6ec78624d4cb
-Author: Kuniyuki Iwashima <kuniyu@amazon.com>
-Date:   Mon Sep 11 18:36:57 2023 +0000
+The hashtab code htab_lock_bucket also does a preempt_disable()
+followed by raw_spin_lock_irqsave(). Do we need this as well
+to handle the PREEMPT_CONFIG cases.
 
-    tcp: Fix bind() regression for v4-mapped-v6 non-wildcard address.
+I'll also take a look, but figured I would post the question given
+I wont likely get time to check until tonight/tomorrow.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15567dc4680000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=17567dc4680000
-console output: https://syzkaller.appspot.com/x/log.txt?x=13567dc4680000
+Also converting to irqsave before ran into syzbot crash wont this do the
+same?
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+71e724675ba3958edb31@syzkaller.appspotmail.com
-Fixes: c48ef9c4aed3 ("tcp: Fix bind() regression for v4-mapped-v6 non-wildcard address.")
-
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 5049 at net/ipv4/inet_connection_sock.c:587 inet_csk_get_port+0xf96/0x2350 net/ipv4/inet_connection_sock.c:587
-Modules linked in:
-CPU: 0 PID: 5049 Comm: syz-executor288 Not tainted 6.6.0-rc2-syzkaller-00018-g2cf0f7156238 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/04/2023
-RIP: 0010:inet_csk_get_port+0xf96/0x2350 net/ipv4/inet_connection_sock.c:587
-Code: 7c 24 08 e8 4c b6 8a 01 31 d2 be 88 01 00 00 48 c7 c7 e0 94 ae 8b e8 59 2e a3 f8 2e 2e 2e 31 c0 e9 04 fe ff ff e8 ca 88 d0 f8 <0f> 0b e9 0f f9 ff ff e8 be 88 d0 f8 49 8d 7e 48 e8 65 ca 5a 00 31
-RSP: 0018:ffffc90003abfbf0 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: ffff888026429100 RCX: 0000000000000000
-RDX: ffff88807edcbb80 RSI: ffffffff88b73d66 RDI: ffff888026c49f38
-RBP: ffff888026c49f30 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000000 R12: ffffffff9260f200
-R13: ffff888026c49880 R14: 0000000000000000 R15: ffff888026429100
-FS:  00005555557d5380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000000045ad50 CR3: 0000000025754000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- inet_csk_listen_start+0x155/0x360 net/ipv4/inet_connection_sock.c:1256
- __inet_listen_sk+0x1b8/0x5c0 net/ipv4/af_inet.c:217
- inet_listen+0x93/0xd0 net/ipv4/af_inet.c:239
- __sys_listen+0x194/0x270 net/socket.c:1866
- __do_sys_listen net/socket.c:1875 [inline]
- __se_sys_listen net/socket.c:1873 [inline]
- __x64_sys_listen+0x53/0x80 net/socket.c:1873
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f3a5bce3af9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 c1 17 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffc1a1c79e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000032
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f3a5bce3af9
-RDX: 00007f3a5bce3af9 RSI: 0000000000000000 RDI: 0000000000000003
-RBP: 00007f3a5bd565f0 R08: 0000000000000006 R09: 0000000000000006
-R10: 0000000000000006 R11: 0000000000000246 R12: 0000000000000001
-R13: 431bde82d7b634db R14: 0000000000000001 R15: 0000000000000001
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+> >   	elem = sock_hash_lookup_elem_raw(&bucket->head, hash, key, key_size);
+> >   	if (elem) {
+> >   		hlist_del_rcu(&elem->node);
+> > @@ -940,7 +941,7 @@ static long sock_hash_delete_elem(struct bpf_map *map, void *key)
+> >   		sock_hash_free_elem(htab, elem);
+> >   		ret = 0;
+> >   	}
+> > -	spin_unlock_bh(&bucket->lock);
+> > +	spin_unlock_irqrestore(&bucket->lock, flags);
+> >   	return ret;
+> >   }
+> >   
 
