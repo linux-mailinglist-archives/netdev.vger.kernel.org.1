@@ -1,40 +1,45 @@
-Return-Path: <netdev+bounces-35158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35159-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D89227A7622
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 10:42:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C33207A762E
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 10:42:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93720281F62
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 08:42:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CED331C20920
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 08:42:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84B0611707;
-	Wed, 20 Sep 2023 08:42:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADFEB11714;
+	Wed, 20 Sep 2023 08:42:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFBD2259B
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 08:42:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCF36111BF
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 08:42:10 +0000 (UTC)
 Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48876FB;
-	Wed, 20 Sep 2023 01:42:07 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 736E3123;
+	Wed, 20 Sep 2023 01:42:09 -0700 (PDT)
 Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
 	(envelope-from <fw@breakpoint.cc>)
-	id 1qismW-0004wT-SJ; Wed, 20 Sep 2023 10:42:00 +0200
+	id 1qisma-0004we-UZ; Wed, 20 Sep 2023 10:42:04 +0200
 From: Florian Westphal <fw@strlen.de>
 To: <netdev@vger.kernel.org>
 Cc: Paolo Abeni <pabeni@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	<netfilter-devel@vger.kernel.org>
-Subject: [PATCH net 0/3] netfilter updates for net
-Date: Wed, 20 Sep 2023 10:41:48 +0200
-Message-ID: <20230920084156.4192-1-fw@strlen.de>
+	<netfilter-devel@vger.kernel.org>,
+	"Lee, Cherie-Anne" <cherie.lee@starlabs.sg>,
+	Bing-Jhong Billy Jheng <billy@starlabs.sg>,
+	info@starlabs.sg
+Subject: [PATCH net 1/3] netfilter: nf_tables: disable toggling dormant table state more than once
+Date: Wed, 20 Sep 2023 10:41:49 +0200
+Message-ID: <20230920084156.4192-2-fw@strlen.de>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230920084156.4192-1-fw@strlen.de>
+References: <20230920084156.4192-1-fw@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,47 +53,52 @@ X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello,
+nft -f -<<EOF
+add table ip t
+add table ip t { flags dormant; }
+add chain ip t c { type filter hook input priority 0; }
+add table ip t
+EOF
 
-The following three patches fix regressions in the netfilter subsystem:
+Triggers a splat from nf core on next table delete because we lose
+track of right hook register state:
 
-1. Reject attempts to repeatedly toggle the 'dormant' flag in a single
-   transaction.  Doing so makes nf_tables lose track of the real state
-   vs. the desired state.  This ends with an attempt to unregister hooks
-   that were never registered in the first place, which yields a splat.
+WARNING: CPU: 2 PID: 1597 at net/netfilter/core.c:501 __nf_unregister_net_hook
+RIP: 0010:__nf_unregister_net_hook+0x41b/0x570
+ nf_unregister_net_hook+0xb4/0xf0
+ __nf_tables_unregister_hook+0x160/0x1d0
+[..]
 
-2. Fix element counting in the new nftables garbage collection infra
-   that came with 6.5:  More than 255 expired elements wraps a counter
-   which results in memory leak.
+The above should have table in *active* state, but in fact no
+hooks were registered.
 
-3. Since 6.4 ipset can BUG when a set is renamed while a CREATE command
-   is in progress, fix from Jozsef Kadlecsik.
+Reject on/off/on games rather than attempting to fix this.
 
-The following changes since commit 4e4b1798cc90e376b8b61d0098b4093898a32227:
+Fixes: 179d9ba5559a ("netfilter: nf_tables: fix table flag updates")
+Reported-by: "Lee, Cherie-Anne" <cherie.lee@starlabs.sg>
+Cc: Bing-Jhong Billy Jheng <billy@starlabs.sg>
+Cc: info@starlabs.sg
+Signed-off-by: Florian Westphal <fw@strlen.de>
+---
+ net/netfilter/nf_tables_api.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-  vxlan: Add missing entries to vxlan_get_size() (2023-09-20 09:00:54 +0100)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-23-09-20
-
-for you to fetch changes up to 7433b6d2afd512d04398c73aa984d1e285be125b:
-
-  netfilter: ipset: Fix race between IPSET_CMD_CREATE and IPSET_CMD_SWAP (2023-09-20 10:35:24 +0200)
-
-Florian Westphal (2):
-      netfilter: nf_tables: disable toggling dormant table state more than once
-      netfilter: nf_tables: fix memleak when more than 255 elements expired
-
-Jozsef Kadlecsik (1):
-      netfilter: ipset: Fix race between IPSET_CMD_CREATE and IPSET_CMD_SWAP
-
- include/net/netfilter/nf_tables.h |  2 +-
- net/netfilter/ipset/ip_set_core.c | 12 ++++++++++--
- net/netfilter/nf_tables_api.c     | 14 ++++++++++++--
- 3 files changed, 23 insertions(+), 5 deletions(-)
+diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
+index d819b4d42962..a3680638ec60 100644
+--- a/net/netfilter/nf_tables_api.c
++++ b/net/netfilter/nf_tables_api.c
+@@ -1219,6 +1219,10 @@ static int nf_tables_updtable(struct nft_ctx *ctx)
+ 	     flags & NFT_TABLE_F_OWNER))
+ 		return -EOPNOTSUPP;
+ 
++	/* No dormant off/on/off/on games in single transaction */
++	if (ctx->table->flags & __NFT_TABLE_F_UPDATE)
++		return -EINVAL;
++
+ 	trans = nft_trans_alloc(ctx, NFT_MSG_NEWTABLE,
+ 				sizeof(struct nft_trans_table));
+ 	if (trans == NULL)
 -- 
 2.41.0
-
 
 
