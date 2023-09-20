@@ -1,208 +1,202 @@
-Return-Path: <netdev+bounces-35299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D41E7A8AB4
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 19:36:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D73317A8AB1
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 19:35:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6A03281196
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 17:36:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8944B1F20F70
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 17:35:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A8A13E49D;
-	Wed, 20 Sep 2023 17:35:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BD4C1A5B9;
+	Wed, 20 Sep 2023 17:35:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92B141A58F
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 17:35:32 +0000 (UTC)
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C282BDD
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 10:35:30 -0700 (PDT)
-Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-4051039701eso6005e9.1
-        for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 10:35:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E1B61A58F
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 17:35:27 +0000 (UTC)
+Received: from mail-oi1-x234.google.com (mail-oi1-x234.google.com [IPv6:2607:f8b0:4864:20::234])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E9D8AF;
+	Wed, 20 Sep 2023 10:35:25 -0700 (PDT)
+Received: by mail-oi1-x234.google.com with SMTP id 5614622812f47-3a9e89fa553so3564b6e.1;
+        Wed, 20 Sep 2023 10:35:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695231329; x=1695836129; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=38lJWdaw4dw/VjY/ObDAPYV/F6V32wUm16qcRUnFS7w=;
-        b=XIKLlmF9hpYEkDIf3hWkQfLYMNMvU5HDWzE9s8+NeT5mgLK+NN77ec5dp92kJ31pPp
-         uBCOalzy6/kEhZQdxWMGjrWLPO5xA28PdAp6E/ugVDnPCLaAwsOnCiJtsBeQRt1EPKLW
-         Su/yzGdX+iTUWvTvgdyE9MzGDCkc5iPfjuZwaNS6y0FF7j4ViAYMcfPypwxpnt763AU8
-         oFCXHXu3gUwiIFJFFbPnpl6VTSG4lYDIoADk06lw0B14rV6cXF6c9UjagdhDWnVE4m1P
-         KKnAanHYo6NbFTaakPW+8kFh/Gpsgrxje0Sl6vpL9BnAR9w15vKMsPuIzn5N6kzsjoMN
-         nM6g==
+        d=gmail.com; s=20230601; t=1695231324; x=1695836124; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=72ZMPmG8h3bndMZ2rA/WbfU0f4MVxkLqm1XQLZCVksU=;
+        b=dFXBgRYMZFiyt5OqkpejE1IJJ9CUVsDn/MDdagjipaMCpCg2cpPDo5XgxDwj4dEaXH
+         V60QJZ+d802O5fC5/oixgwCUFeCM7rGb7Mgk8pZhje1SCb26loY/evW7tyRuprkCPEZD
+         AVX3DEej6ztuurUwVpUKAf9UKn3s8eTWT9788ItxFJEXzgF+qBGTengs5XZOwF/nHzUk
+         aN/8yxDlQi9LedQvyDvS4kGDJtn/NbIYixF6hvd0+HhWilY77/FoFlcrYijtdQbO0juQ
+         PAINypN9aeFwUPaxNtNQdA9dfWRnxzX7W4NdQgLjXPWqjZCnAqW+1faucWrGNiMy2XM9
+         varg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695231329; x=1695836129;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=38lJWdaw4dw/VjY/ObDAPYV/F6V32wUm16qcRUnFS7w=;
-        b=FnGVGV82V341gsdCIwErGe77xSYOSy41T8sjEmlqOgLuEWtzg2pp5ZKlqAiA73QWNB
-         hWJSeh+9/TXCc/eeEIz23IwzkbnyCHUYJKVQ8WKgxpApFr0RYXzmq0LTC4sH8VGVeSpA
-         pFKzmp4KQtaW+C8h/jhledwb3jF69npbQbzymFQE49VQ1ebNmFU0rJ26z6OrDHYeblRX
-         ZOyVZQTlhGK+qV9qigh040ie5ntF819gB5hwartwqZD7IPIF3gZHfURJw7UXXcZhL3tz
-         NIkydVnZhqxwU2fF/wprrFuCMBXn3yksl/3aTudCZKpYJNPqPGQIwhM8KNL0SBmhBdDn
-         T0sw==
-X-Gm-Message-State: AOJu0YyZlw7K8xOr7AVVgUcxD3aXH56i5rPSNa7L2ESTUotuvkqlVaMU
-	tXGSkRfDYz8sO+RGickaF3TW4uVt2DWOYTLCMlCKsg==
-X-Google-Smtp-Source: AGHT+IH/EwgyBdam9at5MuOW5M2W9QGi3kx9DD1GJCX9itH848+yWZW3l2rbKt+gbqt2iB57rWSqrkuJOelf1qu4M6s=
-X-Received: by 2002:a05:600c:1d06:b0:3fe:d691:7d63 with SMTP id
- l6-20020a05600c1d0600b003fed6917d63mr121530wms.6.1695231328885; Wed, 20 Sep
- 2023 10:35:28 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1695231324; x=1695836124;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=72ZMPmG8h3bndMZ2rA/WbfU0f4MVxkLqm1XQLZCVksU=;
+        b=KkNo0yLlI+gmzGku70SevbEeaVL2nEw+OHsLw9MlMPBh1SCGI8G+niT9ntte81+q9v
+         532WW7HZpnzRisKXvoq2Pu0W+IxDuLX8gclOB0P9z6Q21/E6FicfFnyPbZjuqdQsjc5j
+         lppbJWIG3WehGuhUVqCxyTDYNVD6Zxo7VD+9jBv3mCLn1Z5WZASuYqXGpUYrOOHkT3vx
+         s67WK12VLA0bXPeM09wiirNXKfECba23nIaZrmTy7jIkpyDX9liwkLsgGNN++j2DfaDj
+         DNN6fPzHJ52uY1IunbBIP+dtftW9moJCHvBpy1DECcVqnYjfUmzgmKXjXH3beUMBRUJY
+         qXOQ==
+X-Gm-Message-State: AOJu0YwODOqjSjLSCGeaKYgRU2nWyOFgWulWeM3jqWBEAB9a/t9dGUTQ
+	K4t/tjysokEZQw6mbt2GqIo=
+X-Google-Smtp-Source: AGHT+IHvsv5cqcTBdZLRLx1t5JqBmwesPoIlsPl1SxJ0hbPDCm88UcuT5wiVNT+hETSB3dNaZATfHA==
+X-Received: by 2002:a05:6808:178a:b0:3a9:e40c:683c with SMTP id bg10-20020a056808178a00b003a9e40c683cmr3397758oib.1.1695231324271;
+        Wed, 20 Sep 2023 10:35:24 -0700 (PDT)
+Received: from fabio-Precision-3551.. ([2804:14c:485:4b61:9f0c:3917:3374:12c4])
+        by smtp.gmail.com with ESMTPSA id 22-20020aca1016000000b003a9baa79051sm1352994oiq.11.2023.09.20.10.35.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Sep 2023 10:35:23 -0700 (PDT)
+From: Fabio Estevam <festevam@gmail.com>
+To: kuba@kernel.org
+Cc: andrew@lunn.ch,
+	f.fainelli@gmail.com,
+	olteanv@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	l00g33k@gmail.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Fabio Estevam <festevam@denx.de>
+Subject: [PATCH] net: dsa: mv88e6xxx: Avoid EEPROM timeout when EEPROM is absent
+Date: Wed, 20 Sep 2023 14:35:08 -0300
+Message-Id: <20230920173508.63449-1-festevam@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230920172943.4135513-1-edumazet@google.com> <20230920172943.4135513-4-edumazet@google.com>
-In-Reply-To: <20230920172943.4135513-4-edumazet@google.com>
-From: Soheil Hassas Yeganeh <soheil@google.com>
-Date: Wed, 20 Sep 2023 13:34:52 -0400
-Message-ID: <CACSApvZg8soR6bsMv9NqHST2+FLX2RFGRORY-DbTDfhCcUURBQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/3] tcp: derive delack_max from rto_min
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, 
-	Yuchung Cheng <ycheng@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Sep 20, 2023 at 1:29=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> While BPF allows to set icsk->->icsk_delack_max
+From: Fabio Estevam <festevam@denx.de>
 
-nit pick in the commit message:  redundant ->->.
+Since commit 23d775f12dcd ("net: dsa: mv88e6xxx: Wait for EEPROM done
+before HW reset") the following error is seen on a imx8mn board with
+a 88E6320 switch:
 
-> and/or icsk->icsk_rto_min, we have an ip route
-> attribute (RTAX_RTO_MIN) to be able to tune rto_min,
-> but nothing to consequently adjust max delayed ack,
-> which vary from 40ms to 200 ms (TCP_DELACK_{MIN|MAX}).
->
-> This makes RTAX_RTO_MIN of almost no practical use,
-> unless customers are in big trouble.
->
-> Modern days datacenter communications want to set
-> rto_min to ~5 ms, and the max delayed ack one jiffie
-> smaller to avoid spurious retransmits.
->
-> After this patch, an "rto_min 5" route attribute will
-> effectively lower max delayed ack timers to 4 ms.
->
-> Note in the following ss output, "rto:6 ... ato:4"
->
-> $ ss -temoi dst XXXXXX
-> State Recv-Q Send-Q           Local Address:Port       Peer Address:Port =
- Process
-> ESTAB 0      0        [2002:a05:6608:295::]:52950   [2002:a05:6608:297::]=
-:41597
->      ino:255134 sk:1001 <->
->          skmem:(r0,rb1707063,t872,tb262144,f0,w0,o0,bl0,d0) ts sack
->  cubic wscale:8,8 rto:6 rtt:0.02/0.002 ato:4 mss:4096 pmtu:4500
->  rcvmss:536 advmss:4096 cwnd:10 bytes_sent:54823160 bytes_acked:54823121
->  bytes_received:54823120 segs_out:1370582 segs_in:1370580
->  data_segs_out:1370579 data_segs_in:1370578 send 16.4Gbps
->  pacing_rate 32.6Gbps delivery_rate 1.72Gbps delivered:1370579
->  busy:26920ms unacked:1 rcv_rtt:34.615 rcv_space:65920
->  rcv_ssthresh:65535 minrtt:0.015 snd_wnd:65536
->
-> While we could argue this patch fixes a bug with RTAX_RTO_MIN,
-> I do not add a Fixes: tag, so that we can soak it a bit before
-> asking backports to stable branches.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+mv88e6085 30be0000.ethernet-1:00: Timeout waiting for EEPROM done
 
-Acked-by: Soheil Hassas Yeganeh <soheil@google.com>
+This board does not have an EEPROM attached to the switch though.
 
-So great that this is now upstream :-) Thank you!
+This problem is well explained by Andrew Lunn:
 
-> ---
->  include/net/tcp.h     |  2 ++
->  net/ipv4/tcp.c        |  3 ++-
->  net/ipv4/tcp_output.c | 16 +++++++++++++++-
->  3 files changed, 19 insertions(+), 2 deletions(-)
->
-> diff --git a/include/net/tcp.h b/include/net/tcp.h
-> index a8db7d43fb6215197af4a80e270b8c82070d55cb..af9cb37fbe53ec60b4e545e8a=
-a0740bbf30da7b6 100644
-> --- a/include/net/tcp.h
-> +++ b/include/net/tcp.h
-> @@ -718,6 +718,8 @@ static inline void tcp_fast_path_check(struct sock *s=
-k)
->                 tcp_fast_path_on(tp);
->  }
->
-> +u32 tcp_delack_max(const struct sock *sk);
-> +
->  /* Compute the actual rto_min value */
->  static inline u32 tcp_rto_min(const struct sock *sk)
->  {
-> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> index 69b8d707370844020770438cc4f31aeda4830b3d..e54f91eb943b2f09f303951cc=
-72cbea61ada519d 100644
-> --- a/net/ipv4/tcp.c
-> +++ b/net/ipv4/tcp.c
-> @@ -3762,7 +3762,8 @@ void tcp_get_info(struct sock *sk, struct tcp_info =
-*info)
->                 info->tcpi_options |=3D TCPI_OPT_SYN_DATA;
->
->         info->tcpi_rto =3D jiffies_to_usecs(icsk->icsk_rto);
-> -       info->tcpi_ato =3D jiffies_to_usecs(icsk->icsk_ack.ato);
-> +       info->tcpi_ato =3D jiffies_to_usecs(min(icsk->icsk_ack.ato,
-> +                                             tcp_delack_max(sk)));
->         info->tcpi_snd_mss =3D tp->mss_cache;
->         info->tcpi_rcv_mss =3D icsk->icsk_ack.rcv_mss;
->
-> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-> index 1fc1f879cfd6c28cd655bb8f02eff6624eec2ffc..2d1e4b5ac1ca41ff3db8dc584=
-58d4e922a2c4999 100644
-> --- a/net/ipv4/tcp_output.c
-> +++ b/net/ipv4/tcp_output.c
-> @@ -3977,6 +3977,20 @@ int tcp_connect(struct sock *sk)
->  }
->  EXPORT_SYMBOL(tcp_connect);
->
-> +u32 tcp_delack_max(const struct sock *sk)
-> +{
-> +       const struct dst_entry *dst =3D __sk_dst_get(sk);
-> +       u32 delack_max =3D inet_csk(sk)->icsk_delack_max;
-> +
-> +       if (dst && dst_metric_locked(dst, RTAX_RTO_MIN)) {
-> +               u32 rto_min =3D dst_metric_rtt(dst, RTAX_RTO_MIN);
-> +               u32 delack_from_rto_min =3D max_t(int, 1, rto_min - 1);
-> +
-> +               delack_max =3D min_t(u32, delack_max, delack_from_rto_min=
-);
-> +       }
-> +       return delack_max;
-> +}
-> +
->  /* Send out a delayed ack, the caller does the policy checking
->   * to see if we should even be here.  See tcp_input.c:tcp_ack_snd_check(=
-)
->   * for details.
-> @@ -4012,7 +4026,7 @@ void tcp_send_delayed_ack(struct sock *sk)
->                 ato =3D min(ato, max_ato);
->         }
->
-> -       ato =3D min_t(u32, ato, inet_csk(sk)->icsk_delack_max);
-> +       ato =3D min_t(u32, ato, tcp_delack_max(sk));
->
->         /* Stay within the limit we were given */
->         timeout =3D jiffies + ato;
-> --
-> 2.42.0.459.ge4e396fd5e-goog
->
+"If there is an EEPROM, and the EEPROM contains a lot of data, it could
+be that when we perform a hardware reset towards the end of probe, it
+interrupts an I2C bus transaction, leaving the I2C bus in a bad state,
+and future reads of the EEPROM do not work.
+
+The work around for this was to poll the EEInt status and wait for it
+to go true before performing the hardware reset.
+
+However, we have discovered that for some boards which do not have an
+EEPROM, EEInt never indicates complete. As a result,
+mv88e6xxx_g1_wait_eeprom_done() spins for a second and then prints a
+warning.
+
+We probably need a different solution than calling
+mv88e6xxx_g1_wait_eeprom_done(). The datasheet for 6352 documents the
+EEPROM Command register:
+
+bit 15 is:
+
+  EEPROM Unit Busy. This bit must be set to a one to start an EEPROM
+  operation (see EEOp below). Only one EEPROM operation can be
+  executing at one time so this bit must be zero before setting it to
+  a one.  When the requested EEPROM operation completes this bit will
+  automatically be cleared to a zero. The transition of this bit from
+  a one to a zero can be used to generate an interrupt (the EEInt in
+  Global 1, offset 0x00).
+
+and more interesting is bit 11:
+
+  Register Loader Running. This bit is set to one whenever the
+  register loader is busy executing instructions contained in the
+  EEPROM."
+
+Change to calling mv88e6xxx_g1_wait_eeprom_done() to fix the timeout
+error when the EEPROM chip is not present.
+  
+Fixes: 23d775f12dcd ("net: dsa: mv88e6xxx: Wait for EEPROM done before HW reset")
+Suggested-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Fabio Estevam <festevam@denx.de>
+---
+Alfred,
+
+Please test it, if you have a chance. I want to be sure that your usecase
+still works well.
+
+ drivers/net/dsa/mv88e6xxx/chip.c    | 6 ++++--
+ drivers/net/dsa/mv88e6xxx/global2.c | 2 +-
+ drivers/net/dsa/mv88e6xxx/global2.h | 2 ++
+ 3 files changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
+index a73008b9e0b3..ba906dfab055 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.c
++++ b/drivers/net/dsa/mv88e6xxx/chip.c
+@@ -3012,14 +3012,16 @@ static void mv88e6xxx_hardware_reset(struct mv88e6xxx_chip *chip)
+ 		 * from the wrong location resulting in the switch booting
+ 		 * to wrong mode and inoperable.
+ 		 */
+-		mv88e6xxx_g1_wait_eeprom_done(chip);
++		if (chip->info->ops->get_eeprom)
++			mv88e6xxx_g2_eeprom_wait(chip);
+ 
+ 		gpiod_set_value_cansleep(gpiod, 1);
+ 		usleep_range(10000, 20000);
+ 		gpiod_set_value_cansleep(gpiod, 0);
+ 		usleep_range(10000, 20000);
+ 
+-		mv88e6xxx_g1_wait_eeprom_done(chip);
++		if (chip->info->ops->get_eeprom)
++			mv88e6xxx_g2_eeprom_wait(chip);
+ 	}
+ }
+ 
+diff --git a/drivers/net/dsa/mv88e6xxx/global2.c b/drivers/net/dsa/mv88e6xxx/global2.c
+index ec49939968fa..ac302a935ce6 100644
+--- a/drivers/net/dsa/mv88e6xxx/global2.c
++++ b/drivers/net/dsa/mv88e6xxx/global2.c
+@@ -340,7 +340,7 @@ int mv88e6xxx_g2_pot_clear(struct mv88e6xxx_chip *chip)
+  * Offset 0x15: EEPROM Addr (for 8-bit data access)
+  */
+ 
+-static int mv88e6xxx_g2_eeprom_wait(struct mv88e6xxx_chip *chip)
++int mv88e6xxx_g2_eeprom_wait(struct mv88e6xxx_chip *chip)
+ {
+ 	int bit = __bf_shf(MV88E6XXX_G2_EEPROM_CMD_BUSY);
+ 	int err;
+diff --git a/drivers/net/dsa/mv88e6xxx/global2.h b/drivers/net/dsa/mv88e6xxx/global2.h
+index c05fad5c9f19..6d8d38944b23 100644
+--- a/drivers/net/dsa/mv88e6xxx/global2.h
++++ b/drivers/net/dsa/mv88e6xxx/global2.h
+@@ -360,6 +360,8 @@ int mv88e6xxx_g2_trunk_clear(struct mv88e6xxx_chip *chip);
+ int mv88e6xxx_g2_device_mapping_write(struct mv88e6xxx_chip *chip, int target,
+ 				      int port);
+ 
++int mv88e6xxx_g2_eeprom_wait(struct mv88e6xxx_chip *chip);
++
+ extern const struct mv88e6xxx_irq_ops mv88e6097_watchdog_ops;
+ extern const struct mv88e6xxx_irq_ops mv88e6250_watchdog_ops;
+ extern const struct mv88e6xxx_irq_ops mv88e6390_watchdog_ops;
+-- 
+2.34.1
+
 
