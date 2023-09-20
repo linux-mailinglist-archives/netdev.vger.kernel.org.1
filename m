@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-35128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 295DF7A72EE
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 08:39:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F5787A72F5
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 08:40:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C47F1C20B31
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 06:39:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE6E72816DD
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 06:40:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BDD8C13E;
-	Wed, 20 Sep 2023 06:36:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D8FCC15F;
+	Wed, 20 Sep 2023 06:36:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A3BDC13D
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 06:36:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18A06C433CC;
-	Wed, 20 Sep 2023 06:36:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D658C13D
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 06:36:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20FBAC433C9;
+	Wed, 20 Sep 2023 06:36:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695191768;
-	bh=5cNcDJukxUqhZtOP1tOQ5D7Z3jgZBxscbObP9pX8/Q0=;
+	s=k20201202; t=1695191769;
+	bh=tNng2k+y2H0WRG39MPaMpRplIFtogBg1r85RRsvfOrY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TH5uBpz62nn9IA4Ytp0MG5kTUmBcPg96UjMUGIzIQigze9y8Mr3JMmdJReF1vgQ/g
-	 VjJvE5hmhK0sZOyjWhp26sna0LH5ad9K8fYLOqM2W1cgM0YVk4c1dTXWGW8YQdIHzs
-	 EZiPChExEAvEjZU+Kt7+vF+QxH4jqGrT6I1xAP2x27rESNO0gVy95bEwPmEv+yURNY
-	 qsWwTZrIeD7PHo2a5CnU64GC1R0b1hd2RHzJ96LTMZsuC8LDIE64E5pjzjwi/MwRD3
-	 NSKyz0MaX28h9vHtGu0E1iJ24N3vKTmuENHbDZeAK/zK9pxNY+rMFtlhtdngb8ox9W
-	 YhOrWlOAq7CEg==
+	b=D1vM/DXMn7U9q+e1G1G6st/RRVR+Ntmmu2P7ZAQyTuX5VJH9g3l9u+nXkymgc9fzz
+	 Kx5zHPWQXdYYHfOXRcEZa8/IPwMBu5tto6BNYgsoAlRD/8Ia2gnKJ8Iz4jSUybUXJf
+	 JVym+uLMuuidXGWUoJ4J3/6yw1mYsn5sKi1wR6p/sYXfvO9ntAaoTP2Xjv3/xPfMCb
+	 zc+Irjbr5XnSFLV/pJ3+zYtlb7CzG67xZ/ZixQQMy7x/ZWiQBM7qNId4Tnq8Vt+h40
+	 QEBPKzWr34XTKuXey6Zpuqib1NRWw+DyriGYm2IH6xGD1qWrJssslkh/WDiliNDlST
+	 6BR+2zxIcYF5g==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -38,12 +38,12 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Jianbo Liu <jianbol@nvidia.com>,
-	Parav Pandit <parav@nvidia.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>
-Subject: [net-next 10/15] net/mlx5e: Check police action rate for matchall filter
-Date: Tue, 19 Sep 2023 23:35:47 -0700
-Message-ID: <20230920063552.296978-11-saeed@kernel.org>
+	Erez Shitrit <erezsh@nvidia.com>,
+	Moshe Shemesh <moshe@nvidia.com>,
+	Vlad Buslov <vladbu@nvidia.com>
+Subject: [net-next 11/15] net/mlx5: Bridge, Enable mcast in smfs steering mode
+Date: Tue, 19 Sep 2023 23:35:48 -0700
+Message-ID: <20230920063552.296978-12-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230920063552.296978-1-saeed@kernel.org>
 References: <20230920063552.296978-1-saeed@kernel.org>
@@ -55,51 +55,71 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jianbo Liu <jianbol@nvidia.com>
+From: Erez Shitrit <erezsh@nvidia.com>
 
-As matchall filter uses TSAR (Transmit Scheduling Arbiter) for rate
-limit, the rate of police action should not be over the port's max
-link speed, or the maximum aggregated speed of both ports if LAG is
-configured.
+In order to have mcast offloads the driver needs the following:
+It should know if that mcast comes from wire port, in addition the flow
+should not be marked as any specific source, that way it will give the
+flexibility for the driver not to be depended on the way iterator
+implemented in the FW.
 
-Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
-Reviewed-by: Parav Pandit <parav@nvidia.com>
-Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+Signed-off-by: Erez Shitrit <erezsh@nvidia.com>
+Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
+Reviewed-by: Vlad Buslov <vladbu@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ .../ethernet/mellanox/mlx5/core/esw/bridge_mcast.c    | 11 ++---------
+ include/linux/mlx5/fs.h                               |  1 +
+ 2 files changed, 3 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
-index f76c8f0562e9..d2ebe56c3977 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
-@@ -770,6 +770,7 @@ int mlx5_esw_qos_modify_vport_rate(struct mlx5_eswitch *esw, u16 vport_num, u32
- {
- 	u32 ctx[MLX5_ST_SZ_DW(scheduling_context)] = {};
- 	struct mlx5_vport *vport;
-+	u32 link_speed_max;
- 	u32 bitmask;
- 	int err;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge_mcast.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge_mcast.c
+index 7a01714b3780..a7ed87e9d842 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge_mcast.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge_mcast.c
+@@ -78,6 +78,8 @@ mlx5_esw_bridge_mdb_flow_create(u16 esw_owner_vhca_id, struct mlx5_esw_bridge_md
+ 	xa_for_each(&entry->ports, idx, port) {
+ 		dests[i].type = MLX5_FLOW_DESTINATION_TYPE_FLOW_TABLE;
+ 		dests[i].ft = port->mcast.ft;
++		if (port->vport_num == MLX5_VPORT_UPLINK)
++			dests[i].ft->flags |= MLX5_FLOW_TABLE_UPLINK_VPORT;
+ 		i++;
+ 	}
  
-@@ -777,6 +778,17 @@ int mlx5_esw_qos_modify_vport_rate(struct mlx5_eswitch *esw, u16 vport_num, u32
- 	if (IS_ERR(vport))
- 		return PTR_ERR(vport);
+@@ -585,10 +587,6 @@ mlx5_esw_bridge_mcast_vlan_flow_create(u16 vlan_proto, struct mlx5_esw_bridge_po
+ 	if (!rule_spec)
+ 		return ERR_PTR(-ENOMEM);
  
-+	if (rate_mbps) {
-+		err = mlx5_esw_qos_max_link_speed_get(esw->dev, &link_speed_max, false, NULL);
-+		if (err)
-+			return err;
-+
-+		err = mlx5_esw_qos_link_speed_verify(esw->dev, "Police",
-+						     link_speed_max, rate_mbps, NULL);
-+		if (err)
-+			return err;
-+	}
-+
- 	mutex_lock(&esw->state_lock);
- 	if (!vport->qos.enabled) {
- 		/* Eswitch QoS wasn't enabled yet. Enable it and vport QoS. */
+-	if (MLX5_CAP_ESW_FLOWTABLE(bridge->br_offloads->esw->dev, flow_source) &&
+-	    port->vport_num == MLX5_VPORT_UPLINK)
+-		rule_spec->flow_context.flow_source =
+-			MLX5_FLOW_CONTEXT_FLOW_SOURCE_LOCAL_VPORT;
+ 	rule_spec->match_criteria_enable = MLX5_MATCH_OUTER_HEADERS;
+ 
+ 	flow_act.action |= MLX5_FLOW_CONTEXT_ACTION_PACKET_REFORMAT;
+@@ -660,11 +658,6 @@ mlx5_esw_bridge_mcast_fwd_flow_create(struct mlx5_esw_bridge_port *port)
+ 	if (!rule_spec)
+ 		return ERR_PTR(-ENOMEM);
+ 
+-	if (MLX5_CAP_ESW_FLOWTABLE(bridge->br_offloads->esw->dev, flow_source) &&
+-	    port->vport_num == MLX5_VPORT_UPLINK)
+-		rule_spec->flow_context.flow_source =
+-			MLX5_FLOW_CONTEXT_FLOW_SOURCE_LOCAL_VPORT;
+-
+ 	if (MLX5_CAP_ESW(bridge->br_offloads->esw->dev, merged_eswitch)) {
+ 		dest.vport.flags = MLX5_FLOW_DEST_VPORT_VHCA_ID;
+ 		dest.vport.vhca_id = port->esw_owner_vhca_id;
+diff --git a/include/linux/mlx5/fs.h b/include/linux/mlx5/fs.h
+index 1e00c2436377..6f7725238abc 100644
+--- a/include/linux/mlx5/fs.h
++++ b/include/linux/mlx5/fs.h
+@@ -67,6 +67,7 @@ enum {
+ 	MLX5_FLOW_TABLE_TERMINATION = BIT(2),
+ 	MLX5_FLOW_TABLE_UNMANAGED = BIT(3),
+ 	MLX5_FLOW_TABLE_OTHER_VPORT = BIT(4),
++	MLX5_FLOW_TABLE_UPLINK_VPORT = BIT(5),
+ };
+ 
+ #define LEFTOVERS_RULE_NUM	 2
 -- 
 2.41.0
 
