@@ -1,197 +1,210 @@
-Return-Path: <netdev+bounces-35313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 706BE7A8C05
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 20:48:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AB4F7A8BFB
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 20:47:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80D82B2095E
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 18:48:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FE0F1C20904
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 18:47:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEE6C3CD0B;
-	Wed, 20 Sep 2023 18:48:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B6C53CD1B;
+	Wed, 20 Sep 2023 18:47:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 522AF19C
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 18:48:33 +0000 (UTC)
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CA62B4;
-	Wed, 20 Sep 2023 11:48:31 -0700 (PDT)
-Received: from [192.168.2.51] (p4fe71b42.dip0.t-ipconnect.de [79.231.27.66])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
-	(No client certificate requested)
-	(Authenticated sender: stefan@datenfreihafen.org)
-	by proxima.lasnet.de (Postfix) with ESMTPSA id 671F7C0280;
-	Wed, 20 Sep 2023 20:48:29 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-	s=2021; t=1695235709;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=m15CFo9E09aSbx3+WeJa2pRTiKle109AiaXE5EDQYpo=;
-	b=KZHpXJbjpAD2NTkr7v2RitCTXcTGonOiziFs1YLfKaYZhOGpDb6riClU/h2EXJ1qHXiqYR
-	LF9ACGG9vos5peiafaBtRElIylzxWDz++3hnuWhX+Udsxh9q/GAEUZb/Y/bPFvMsR7v8Aj
-	V34Apgy8rNo/IIYb0L8YgrRH+aBylyQCXmwoMz5A14tPKKbkVAP2liTe/azLqDEBiOOoY4
-	xOjVYWA5DqKrqAfDxdPhXAHTEUOXedO3b6ajAJ7x5QxV+WOIkx9G9YaEcA7jxSJtzP3MId
-	NqPPO1e4GlyaktSAWYrKXtTaZVSvqcOpO7Fh9w/zYVSsGwJtMIKPUwDMGiRTOw==
-Message-ID: <92d125a3-bd3f-63ba-0a5f-9f05068a6282@datenfreihafen.org>
-Date: Wed, 20 Sep 2023 20:46:20 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A0DC19C
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 18:47:07 +0000 (UTC)
+Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED718A1;
+	Wed, 20 Sep 2023 11:47:05 -0700 (PDT)
+Received: by mail-oi1-x235.google.com with SMTP id 5614622812f47-3a707bc2397so13157b6e.0;
+        Wed, 20 Sep 2023 11:47:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695235625; x=1695840425; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=v0J0SB+HxdrckHlsfA7/IFLQxnFqSrv8r/bynMG33Mg=;
+        b=OtJy34PfjNvOt2i1to6O+ucxet6xnJyE8Aah4KR5/wR+now3uqJJWjFv8Y9D7WHKHC
+         fL5x7Eq7pgadbfhYK5VGUrYSVbVWXJPRtp+erYp2q7vQiVrkzIcHyxhftnObQjoLEet5
+         DFM8E81Oml6B5XiORq3b1FQoRVUqjIMPybt1S5H53k/tnB03P2PQ0/q+ParUgpgsPzxU
+         ELzMC+T204Iu6qzW6HggPUNodne0WUUwQQ+26qJknHfiUiNcGwMQj118S+ASLnvVXEnE
+         +DeRNU9zEvxqavUd4EC7Tw3y1CupqyFIXgs+m8/dNIQy7OcsO5kWFm5WYUQAlqOvfHYD
+         syDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695235625; x=1695840425;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=v0J0SB+HxdrckHlsfA7/IFLQxnFqSrv8r/bynMG33Mg=;
+        b=i/+4vG3oXVmqayK6y++tgQ6/gak4N8oAnVxAKs2WauJUOTPhSb9AIZml8Gk/UOjemP
+         AYwWV2Iwtp1i1BaBI+JZV4f7nEELO4sj5hbGwLb20JS3SqAJbov6iiEAMYSHWMY6ftYm
+         3X/UI+Tb5Db/xZmk/tlZbg6qc8mr2pBwGqoRceuPHrwpPxLjKWqWWmXYQaBihqorFlzA
+         MIqWYEXnRA3Pg8wlCNYem++id02W0cPokV7922ZbxLkZVkp0s5LanjCv5dllu1da8jyx
+         lnmK7aFNFdXKNa1Ey/IlB9PS1eReBUoShJKZTRU7KnDl3xk72aPq2zrtp14Bd/31McVL
+         e0qQ==
+X-Gm-Message-State: AOJu0YzueRs/EAgzyPCUoNM3fpMNLdF0dFuHfle0B74OLtFchoU9tQKL
+	aNA/tU6iXToDNfBDsuFtdNw=
+X-Google-Smtp-Source: AGHT+IH9gK9IyX7y+Bj/PRIVToVWY5h53jyVu8uDelJTuMsZnWMWtIkQMSEwOUKSrYNPrWT4Io40uQ==
+X-Received: by 2002:a05:6870:2190:b0:1d6:3e08:c150 with SMTP id l16-20020a056870219000b001d63e08c150mr3251269oae.5.1695235625088;
+        Wed, 20 Sep 2023 11:47:05 -0700 (PDT)
+Received: from fabio-Precision-3551.. ([2804:14c:485:4b61:7290:a7f7:69b2:711b])
+        by smtp.gmail.com with ESMTPSA id t20-20020a9d7754000000b006b922956cecsm6320333otl.25.2023.09.20.11.47.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Sep 2023 11:47:04 -0700 (PDT)
+From: Fabio Estevam <festevam@gmail.com>
+To: kuba@kernel.org
+Cc: andrew@lunn.ch,
+	f.fainelli@gmail.com,
+	olteanv@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	l00g33k@gmail.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Fabio Estevam <festevam@denx.de>,
+	Florian Fainelli <florian.fainelli@broadcom.com>
+Subject: [PATCH v2 net] net: dsa: mv88e6xxx: Avoid EEPROM timeout when EEPROM is absent
+Date: Wed, 20 Sep 2023 15:46:47 -0300
+Message-Id: <20230920184647.84316-1-festevam@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH wpan-next v3 00/11] ieee802154: Associations between
- devices
-Content-Language: en-US
-To: Miquel Raynal <miquel.raynal@bootlin.com>,
- Alexander Aring <alex.aring@gmail.com>, linux-wpan@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
- David Girault <david.girault@qorvo.com>,
- Romuald Despres <romuald.despres@qorvo.com>,
- Frederic Blain <frederic.blain@qorvo.com>,
- Nicolas Schodet <nico@ni.fr.eu.org>,
- Guilhem Imberton <guilhem.imberton@qorvo.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-References: <20230918150809.275058-1-miquel.raynal@bootlin.com>
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20230918150809.275058-1-miquel.raynal@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello Miquel
+From: Fabio Estevam <festevam@denx.de>
 
-On 18.09.23 17:07, Miquel Raynal wrote:
-> Hello,
-> 
-> [I know we are in the middle of the merge window, I don't think it
-> matters on the wpan side, so as the wpan subsystem did not evolve
-> much since the previous merge window I figured I would not delay the
-> sending of this series given the fact that I should have send it at the
-> beginning of the summer...]
-> 
-> Now that we can discover our peer coordinators or make ourselves
-> dynamically discoverable, we may use the information about surrounding
-> devices to create PANs dynamically. This involves of course:
-> * Requesting an association to a coordinator, waiting for the response
-> * Sending a disassociation notification to a coordinator
-> * Receiving an association request when we are coordinator, answering
->    the request (for now all devices are accepted up to a limit, to be
->    refined)
-> * Sending a disassociation notification to a child
-> * Users may request the list of associated devices (the parent and the
->    children).
-> 
-> Here are a few example of userspace calls that can be made:
-> iwpan dev <dev> associate pan_id 2 coord $COORD
-> iwpan dev <dev> list_associations
-> iwpan dev <dev> disassociate ext_addr $COORD
-> 
-> I used a small using hwsim to scan for a coordinator, associate with
-> it, look at the associations on both sides, disassociate from it and
-> check the associations again:
-> ./assoc-demo
-> *** Scan ***
-> PAN 0x0002 (on wpan1)
-> 	coordinator 0x060f3b35169a498f
-> 	page 0
-> 	channel 13
-> 	preamble code 0
-> 	mean prf 0
-> 	superframe spec. 0xcf11
-> 	LQI ff
-> *** End of scan ***
-> Associating wpan1 with coord0 0x060f3b35169a498f...
-> Dumping coord0 assoc:
-> child : 0x0b6f / 0xba7633ae47ccfb21
-> Dumping wpan1 assoc:
-> parent: 0xffff / 0x060f3b35169a498f
-> Disassociating from wpan1
-> Dumping coord0 assoc:
-> Dumping wpan1 assoc:
-> 
-> I could also successfully interact with a smaller device running Zephir,
-> using its command line interface to associate and then disassociate from
-> the Linux coordinator.
-> 
-> Thanks!
-> Miquèl
-> 
-> Changes in v3:
-> * Clarify a helper which compares if two devices seem to be identical by
->    adding two comments. This is a static function that is only used by
->    the PAN management core to operate or not an
->    association/disassociation request. In this helper, a new check is
->    introduced to be sure we compare fields which have been populated.
-> * Dropped the "association_generation" counter and all its uses along
->    the code. I tried to mimic some other counter but I agree it is not
->    super useful and could be dropped anyway.
-> * Dropped a faulty sequence number hardcoded to 10. This had no impact
->    because a few lines later the same entry was set to a valid value.
-> 
-> Changes in v2:
-> * Drop the misleading IEEE802154_ADDR_LONG_BROADCAST definition and its
->    only use which was useless anyway.
-> * Clarified how devices are defined when the user requests to associate
->    with a coordinator: for now only the extended address of the
->    coordinator is relevant so this is the only address we care about.
-> * Drop a useless NULL check before a kfree() call.
-> * Add a check when allocating a child short address: it must be
->    different than ours.
-> * Rebased on top of v6.5.
-> 
-> Miquel Raynal (11):
->    ieee802154: Let PAN IDs be reset
->    ieee802154: Internal PAN management
->    ieee802154: Add support for user association requests
->    mac802154: Handle associating
->    ieee802154: Add support for user disassociation requests
->    mac802154: Handle disassociations
->    mac802154: Handle association requests from peers
->    ieee802154: Add support for limiting the number of associated devices
->    mac802154: Follow the number of associated devices
->    mac802154: Handle disassociation notifications from peers
->    ieee802154: Give the user the association list
-> 
->   include/net/cfg802154.h         |  69 ++++++
->   include/net/ieee802154_netdev.h |  60 +++++
->   include/net/nl802154.h          |  22 +-
->   net/ieee802154/Makefile         |   2 +-
->   net/ieee802154/core.c           |  24 ++
->   net/ieee802154/nl802154.c       | 223 +++++++++++++++++-
->   net/ieee802154/pan.c            | 115 +++++++++
->   net/ieee802154/rdev-ops.h       |  30 +++
->   net/ieee802154/trace.h          |  38 +++
->   net/mac802154/cfg.c             | 170 ++++++++++++++
->   net/mac802154/ieee802154_i.h    |  27 +++
->   net/mac802154/main.c            |   2 +
->   net/mac802154/rx.c              |  25 ++
->   net/mac802154/scan.c            | 397 ++++++++++++++++++++++++++++++++
->   14 files changed, 1191 insertions(+), 13 deletions(-)
->   create mode 100644 net/ieee802154/pan.c
+Since commit 23d775f12dcd ("net: dsa: mv88e6xxx: Wait for EEPROM done
+before HW reset") the following error is seen on a imx8mn board with
+a 88E6320 switch:
 
-With my requests for patch 02/11 taken into account and the fallout for 
-the experimental config options fixed (as krobot detected) I am happy 
-with this patchset.
+mv88e6085 30be0000.ethernet-1:00: Timeout waiting for EEPROM done
 
-Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
+This board does not have an EEPROM attached to the switch though.
 
-regards
-Stefan Schmidt
+This problem is well explained by Andrew Lunn:
+
+"If there is an EEPROM, and the EEPROM contains a lot of data, it could
+be that when we perform a hardware reset towards the end of probe, it
+interrupts an I2C bus transaction, leaving the I2C bus in a bad state,
+and future reads of the EEPROM do not work.
+
+The work around for this was to poll the EEInt status and wait for it
+to go true before performing the hardware reset.
+
+However, we have discovered that for some boards which do not have an
+EEPROM, EEInt never indicates complete. As a result,
+mv88e6xxx_g1_wait_eeprom_done() spins for a second and then prints a
+warning.
+
+We probably need a different solution than calling
+mv88e6xxx_g1_wait_eeprom_done(). The datasheet for 6352 documents the
+EEPROM Command register:
+
+bit 15 is:
+
+  EEPROM Unit Busy. This bit must be set to a one to start an EEPROM
+  operation (see EEOp below). Only one EEPROM operation can be
+  executing at one time so this bit must be zero before setting it to
+  a one.  When the requested EEPROM operation completes this bit will
+  automatically be cleared to a zero. The transition of this bit from
+  a one to a zero can be used to generate an interrupt (the EEInt in
+  Global 1, offset 0x00).
+
+and more interesting is bit 11:
+
+  Register Loader Running. This bit is set to one whenever the
+  register loader is busy executing instructions contained in the
+  EEPROM."
+
+Change to mv88e6xxx_g2_eeprom_wait() to fix the timeout error when the
+EEPROM chip is not present.
+  
+Fixes: 23d775f12dcd ("net: dsa: mv88e6xxx: Wait for EEPROM done before HW reset")
+Suggested-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Fabio Estevam <festevam@denx.de>
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+---
+Alfred,
+
+Please test it, if you have a chance. I want to be sure that your usecase
+still works well.
+
+Changes since v1:
+- Use the correct function name in the last sentence: 
+"Change to mv88e6xxx_g2_eeprom_wait() to fix the timeout ..."
+- Collected Florian's tag.
+- Passed the net prefix in the Subject line.
+
+ drivers/net/dsa/mv88e6xxx/chip.c    | 6 ++++--
+ drivers/net/dsa/mv88e6xxx/global2.c | 2 +-
+ drivers/net/dsa/mv88e6xxx/global2.h | 2 ++
+ 3 files changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
+index a73008b9e0b3..ba906dfab055 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.c
++++ b/drivers/net/dsa/mv88e6xxx/chip.c
+@@ -3012,14 +3012,16 @@ static void mv88e6xxx_hardware_reset(struct mv88e6xxx_chip *chip)
+ 		 * from the wrong location resulting in the switch booting
+ 		 * to wrong mode and inoperable.
+ 		 */
+-		mv88e6xxx_g1_wait_eeprom_done(chip);
++		if (chip->info->ops->get_eeprom)
++			mv88e6xxx_g2_eeprom_wait(chip);
+ 
+ 		gpiod_set_value_cansleep(gpiod, 1);
+ 		usleep_range(10000, 20000);
+ 		gpiod_set_value_cansleep(gpiod, 0);
+ 		usleep_range(10000, 20000);
+ 
+-		mv88e6xxx_g1_wait_eeprom_done(chip);
++		if (chip->info->ops->get_eeprom)
++			mv88e6xxx_g2_eeprom_wait(chip);
+ 	}
+ }
+ 
+diff --git a/drivers/net/dsa/mv88e6xxx/global2.c b/drivers/net/dsa/mv88e6xxx/global2.c
+index ec49939968fa..ac302a935ce6 100644
+--- a/drivers/net/dsa/mv88e6xxx/global2.c
++++ b/drivers/net/dsa/mv88e6xxx/global2.c
+@@ -340,7 +340,7 @@ int mv88e6xxx_g2_pot_clear(struct mv88e6xxx_chip *chip)
+  * Offset 0x15: EEPROM Addr (for 8-bit data access)
+  */
+ 
+-static int mv88e6xxx_g2_eeprom_wait(struct mv88e6xxx_chip *chip)
++int mv88e6xxx_g2_eeprom_wait(struct mv88e6xxx_chip *chip)
+ {
+ 	int bit = __bf_shf(MV88E6XXX_G2_EEPROM_CMD_BUSY);
+ 	int err;
+diff --git a/drivers/net/dsa/mv88e6xxx/global2.h b/drivers/net/dsa/mv88e6xxx/global2.h
+index c05fad5c9f19..6d8d38944b23 100644
+--- a/drivers/net/dsa/mv88e6xxx/global2.h
++++ b/drivers/net/dsa/mv88e6xxx/global2.h
+@@ -360,6 +360,8 @@ int mv88e6xxx_g2_trunk_clear(struct mv88e6xxx_chip *chip);
+ int mv88e6xxx_g2_device_mapping_write(struct mv88e6xxx_chip *chip, int target,
+ 				      int port);
+ 
++int mv88e6xxx_g2_eeprom_wait(struct mv88e6xxx_chip *chip);
++
+ extern const struct mv88e6xxx_irq_ops mv88e6097_watchdog_ops;
+ extern const struct mv88e6xxx_irq_ops mv88e6250_watchdog_ops;
+ extern const struct mv88e6xxx_irq_ops mv88e6390_watchdog_ops;
+-- 
+2.34.1
+
 
