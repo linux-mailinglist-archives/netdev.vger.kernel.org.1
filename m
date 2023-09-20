@@ -1,119 +1,184 @@
-Return-Path: <netdev+bounces-35310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35311-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD4047A8B8C
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 20:20:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FEB87A8BBC
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 20:27:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD6531C20AB0
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 18:20:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE433281A09
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 18:27:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8105D3CCF9;
-	Wed, 20 Sep 2023 18:20:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EF333CD06;
+	Wed, 20 Sep 2023 18:27:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21DB33CCE0;
-	Wed, 20 Sep 2023 18:20:00 +0000 (UTC)
-Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15705CF;
-	Wed, 20 Sep 2023 11:19:59 -0700 (PDT)
-Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-59c2ca01f27so1473337b3.2;
-        Wed, 20 Sep 2023 11:19:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2CB53CD04
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 18:27:25 +0000 (UTC)
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BFA212B;
+	Wed, 20 Sep 2023 11:27:17 -0700 (PDT)
+Received: by mail-lj1-x234.google.com with SMTP id 38308e7fff4ca-2c008042211so1428471fa.2;
+        Wed, 20 Sep 2023 11:27:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695233998; x=1695838798; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7I9Xz++bAGAsgkt8F/KVE7hX/yqLzaV8ZibltbKxpP0=;
-        b=aZ4D/zHJZVlMm/kjBk7lahB8cy8bg4E4Q0xO+1uLWkwFujpmQSUTz0mUdFve9q+zi6
-         aNCzYbLV6Sl36+TgLK50WAYHNwXc9+qBG/8x71ZAms30UApS4+4xo0hH7fqNW+4pXkBb
-         dPgUMZAOLnXDKJ8pkh7Ts4WcuVYMEx2ic15GyJvj+it3W+1O2RhpwAew3jZ1NiSWPiP0
-         eYLvxx2FdhCcHt4SJRzQ0HzuVMzNu9jYyJPaexwoC8KpZN6ikkO5Ml8GEoqgrNFSBhwm
-         rnaK/miZvLzdM5HDqFJB1tY8r1qoQLf7Pa0fnJ7USiHOZh7obrOS2996tD2QsekcV85S
-         4R2A==
+        d=gmail.com; s=20230601; t=1695234435; x=1695839235; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/B51hhManBxQCDJi8s/bZ6EVrxt2B6zMHpl9BIven/A=;
+        b=XxkB1F4mWNZ5hmEZIAL9RYt3aY48jFNLjmnb4ZC4///+Ca/tlZV0DiKfruR22tiThX
+         LEJhcgDoh2NvAB/lgYePIdx5fEiH60rhFHTt2CsFSfFJdjs42f7+sqAwb8yw/3YvdOKh
+         yuVa99B+pLt2atDesBJP7HIHUf4cqlGB4xc+yhbu0jwgzOS+42doXSQZcTrgMbVeMnV3
+         a2dmS3cd2LN5JB/aj6EujAKJ5mOm0uFCoaAWqcJaMHtcyUE1pOdth/C+cU1fkCOGU8Ly
+         EgVcg71sxIJqyx+uRvIU3BVn4aCPnGuASMsMiOLPjdLFeEe40P3N46qZOooIBG1oWsi7
+         tJ8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695233998; x=1695838798;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7I9Xz++bAGAsgkt8F/KVE7hX/yqLzaV8ZibltbKxpP0=;
-        b=lKmIXZqYftuUQZvp8voRhlxC3X2ccqJI+SKRtdPGeT1vZvKP+HQjH70poMI7QQY9pI
-         AGbpHg3mnQehc5zg6nkgH9ak4gtZT0Re/k5L/zQC9NszgVztuzl0Wc3UyjFpYoS5iEVg
-         q/AQhdCg0vHqERYemlDfD1sIVTbtvtaBDm0JNEY/FZJPYtZG54t3yYi22gQ+cPHvjCQa
-         Xx4CCd6st7SAPE0zHoIIrLG3rGXHX8bcSVPKcFk3F8ypx/w+x+ygk2IdyFwVCjTPnczL
-         Mg0ZTMfhIVh6q0DgKCfweF9lw90SGXRj/23GSVfykbphaM3KmYpgtxM6SlriOuwjG52C
-         yGgw==
-X-Gm-Message-State: AOJu0YwBurqnEp5vboN9hCmr0dhWNR3FX7PCZeAMqpuQ3wARtYMRP6pm
-	RMXHpWxoXSB4yKU2er//A7M=
-X-Google-Smtp-Source: AGHT+IHDqR3zMWRIZe6oRybVJ+pyFcZfbB+TZCHfFFGvH7bGX4Akvqj5UTZOPk0+7hk0C5TpJW1x0Q==
-X-Received: by 2002:a81:478a:0:b0:59b:cfe1:bcf1 with SMTP id u132-20020a81478a000000b0059bcfe1bcf1mr3276561ywa.44.1695233998159;
-        Wed, 20 Sep 2023 11:19:58 -0700 (PDT)
-Received: from ?IPV6:2600:1700:6cf8:1240:dcd2:9730:2c7c:239f? ([2600:1700:6cf8:1240:dcd2:9730:2c7c:239f])
-        by smtp.gmail.com with ESMTPSA id fl19-20020a05690c339300b00582b239674esm2461327ywb.129.2023.09.20.11.19.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Sep 2023 11:19:57 -0700 (PDT)
-Message-ID: <1224b3f1-4b2a-3c49-5f29-cfce0652ba94@gmail.com>
-Date: Wed, 20 Sep 2023 11:19:56 -0700
+        d=1e100.net; s=20230601; t=1695234435; x=1695839235;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/B51hhManBxQCDJi8s/bZ6EVrxt2B6zMHpl9BIven/A=;
+        b=hWdyjNoGpGHHOxm8jWYqq0QVW795D34QxEaPUgwTw7ja7bqGbT8feVcCeQj6zGJoep
+         5FGn5YKpfgIaJYE/e/n3PD8LnrklBwxtR7WVuG7UrUJWpNyek0WCnw758z6/q1IFsRky
+         x+QbFwCmah9KhG4PLj4YboFJrkOiZzA/MGeEkL8KV+5x97fHPwdt+RH36fTDp0LgQlv6
+         23r2zHt1PqgBPpm+7hIPsUgWw119AVkpRZUDiLeGtfo8FEvQ3s1a1yxi96RL8j/TtmAa
+         PqT90Sxhdf8YPUUfYHCYg+8LNkS9wOsfXLkSDlzkgRXDNwhqyvDkZcS7Hm6S9inkLaHd
+         YxlQ==
+X-Gm-Message-State: AOJu0Yw1Tdz8WSp9RYjRRklErzHNl2SeeZ4nG95m+nV2vHGWZa4Nugej
+	dpcKO7FDrtXou3Wi9a0bLBl0YkJ/qP+8osJKy8Q=
+X-Google-Smtp-Source: AGHT+IF0iUJNRicLpJin3ByiycK68Xagu/oZrfx1jraD/qFlUAPWvrmPcx4u8CUjgnhAlieVUWLkWumO10WZWKvzyDY=
+X-Received: by 2002:a05:651c:108:b0:2bd:133c:2d71 with SMTP id
+ a8-20020a05651c010800b002bd133c2d71mr2718462ljb.52.1695234435115; Wed, 20 Sep
+ 2023 11:27:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH bpf] bpf, sockmap: Reject sk_msg egress redirects to
- non-TCP sockets
-To: Jakub Sitnicki <jakub@cloudflare.com>, bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org, kernel-team@cloudflare.com,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Cong Wang <cong.wang@bytedance.com>
-References: <20230920102055.42662-1-jakub@cloudflare.com>
-Content-Language: en-US
-From: Kui-Feng Lee <sinquersw@gmail.com>
-In-Reply-To: <20230920102055.42662-1-jakub@cloudflare.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+References: <20230829205936.766544-1-luiz.dentz@gmail.com> <169343402479.21564.11565149320234658166.git-patchwork-notify@kernel.org>
+ <de698d06-9784-43ed-9437-61d6edf9672b@leemhuis.info> <CABBYNZK2PPkLra8Au-fdN2nG2YLkfFRmPtEPQL0suLzBv=HHcA@mail.gmail.com>
+ <574ca8dd-ee97-4c8b-a154-51faf83cabdf@leemhuis.info> <CABBYNZJ=5VH2+my7Gw1fMCaGgdOQfbWNtBGOc27_XQqCP7jD-A@mail.gmail.com>
+ <ff2abfbe-a46b-414b-a757-8185495838b7@leemhuis.info> <cd12622b-bfc6-093d-5c10-493e10935440@leemhuis.info>
+In-Reply-To: <cd12622b-bfc6-093d-5c10-493e10935440@leemhuis.info>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 20 Sep 2023 11:27:02 -0700
+Message-ID: <CABBYNZKg8dbD0CY2yR=JUYLjXcRm_Pq7GU3W5gPErx6-_7GAJQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: hci_sync: Fix handling of HCI_QUIRK_STRICT_DUPLICATE_FILTER
+To: Thorsten Leemhuis <regressions@leemhuis.info>
+Cc: Linux regressions mailing list <regressions@lists.linux.dev>, patchwork-bot+bluetooth@kernel.org, 
+	linux-bluetooth@vger.kernel.org, netdev <netdev@vger.kernel.org>, 
+	Stefan Agner <stefan@agner.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Hi Thorsten,
+
+On Wed, Sep 20, 2023 at 7:02=E2=80=AFAM Thorsten Leemhuis
+<regressions@leemhuis.info> wrote:
+>
+> Hi, Thorsten here, the Linux kernel's regression tracker. Top-posting
+> for once, to make this easily accessible to everyone.
+>
+> @Luiz Augusto von Dentz: did you make any progress to get this into net
+> to make sure this rather sooner then later heads to mainline? Doesn't
+> looks like it from here, but maybe I'm missing something.
+
+Just sent the pull-request:
+
+https://patchwork.kernel.org/project/bluetooth/patch/20230920181344.571274-=
+1-luiz.dentz@gmail.com/
+
+> Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+> --
+> Everything you wanna know about Linux kernel regression tracking:
+> https://linux-regtracking.leemhuis.info/about/#tldr
+> If I did something stupid, please tell me, as explained on that page.
+>
+> #regzbot poke
+>
+>
+> On 14.09.23 20:08, Thorsten Leemhuis wrote:
+> > On 14.09.23 19:51, Luiz Augusto von Dentz wrote:
+> >> On Wed, Sep 13, 2023 at 10:13=E2=80=AFPM Thorsten Leemhuis
+> >> <regressions@leemhuis.info> wrote:
+> >>> On 12.09.23 21:09, Luiz Augusto von Dentz wrote:
+> >>>> On Mon, Sep 11, 2023 at 6:40=E2=80=AFAM Linux regression tracking (T=
+horsten
+> >>>> Leemhuis) <regressions@leemhuis.info> wrote:
+> >>>>> On 31.08.23 00:20, patchwork-bot+bluetooth@kernel.org wrote:
+> >>>>>> This patch was applied to bluetooth/bluetooth-next.git (master)
+> >>>>>> by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+> >>>>>> On Tue, 29 Aug 2023 13:59:36 -0700 you wrote:
+> >>>>>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >>>>>>>
+> >>>>>>> When HCI_QUIRK_STRICT_DUPLICATE_FILTER is set LE scanning require=
+s
+> >>>>>>> periodic restarts of the scanning procedure as the controller wou=
+ld
+> >>>>>>> consider device previously found as duplicated despite of RSSI ch=
+anges,
+> >>>>>>> but in order to set the scan timeout properly set le_scan_restart=
+ needs
+> >>>>>>> to be synchronous so it shall not use hci_cmd_sync_queue which de=
+fers
+> >>>>>>> the command processing to cmd_sync_work.
+> >>>>>>> [...]
+> >>>>>>
+> >>>>>> Here is the summary with links:
+> >>>>>>   - Bluetooth: hci_sync: Fix handling of HCI_QUIRK_STRICT_DUPLICAT=
+E_FILTER
+> >>>>>>     https://git.kernel.org/bluetooth/bluetooth-next/c/52bf4fd43f75
+> >>>>>
+> >>>>> That is (maybe among others?) a fix for a regression from 6.1, so w=
+hy
+> >>>>> was this merged into a "for-next" branch instead of a branch that
+> >>>>> targets the current cycle?
+> >> [...]
+> >>> That answer doesn't answer the question afaics, as both 6.1 and 6.4 w=
+ere
+> >>> released in the past year -- the fix thus should not wait till the ne=
+xt
+> >>> merge window, unless it's high risk or something. See this statement
+> >>> from Linus:
+> >>> https://lore.kernel.org/all/CAHk-=3Dwis_qQy4oDNynNKi5b7Qhosmxtoj1jxo5=
+wmB6SRUwQUBQ@mail.gmail.com/
+> >> Thanks for the feedback, I will try to push fixes to net more often.
+> >
+> > Great, many thx!
+> >
+> >>>> but I could probably have it marked for stable just
+> >>>> to make sure it would get backported to affected versions.
+> >>> That would be great, too!
+> >> Well now that it has already been merged via -next tree shall we still
+> >> attempt to mark it as stable? Perhaps we need to check if it was not
+> >> backported already based on the Fixes tag.
+> >
+> > Changes only get backported once they hit mainline, which hasn't
+> > happened yet. And to get them into the net branch (and from there to
+> > mainline) a new commit is needed anyway, so you might as well add the
+> > stable tag to it. Side note: And don't worry that identical commit is
+> > already in -next, git handles that well afaik (but if you rebase
+> > bluetooth-next for other reasons anyway you might as well remove it).
+> >
+> > Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat=
+)
+> > --
+> > Everything you wanna know about Linux kernel regression tracking:
+> > https://linux-regtracking.leemhuis.info/about/#tldr
+> > If I did something stupid, please tell me, as explained on that page.
 
 
-On 9/20/23 03:20, Jakub Sitnicki wrote:
-> 
-> diff --git a/net/core/sock_map.c b/net/core/sock_map.c
-> index cb11750b1df5..4292c2ed1828 100644
-> --- a/net/core/sock_map.c
-> +++ b/net/core/sock_map.c
-> @@ -668,6 +668,8 @@ BPF_CALL_4(bpf_msg_redirect_map, struct sk_msg *, msg,
->   	sk = __sock_map_lookup_elem(map, key);
->   	if (unlikely(!sk || !sock_map_redirect_allowed(sk)))
->   		return SK_DROP;
-> +	if (!(flags & BPF_F_INGRESS) && !sk_is_tcp(sk))
-> +		return SK_DROP;
->   
->   	msg->flags = flags;
->   	msg->sk_redir = sk;
-> @@ -1267,6 +1269,8 @@ BPF_CALL_4(bpf_msg_redirect_hash, struct sk_msg *, msg,
->   	sk = __sock_hash_lookup_elem(map, key);
->   	if (unlikely(!sk || !sock_map_redirect_allowed(sk)))
->   		return SK_DROP;
-> +	if (!(flags & BPF_F_INGRESS) && !sk_is_tcp(sk))
-> +		return SK_DROP;
->   
->   	msg->flags = flags;
->   	msg->sk_redir = sk;
 
-Just be curious! Can it happen to other socket types?
-I mean to redirect a msg from a sk of any type to one of another type.
+--=20
+Luiz Augusto von Dentz
 
