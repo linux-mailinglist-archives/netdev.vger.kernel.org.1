@@ -1,130 +1,141 @@
-Return-Path: <netdev+bounces-35144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44D957A741A
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 09:29:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 197277A741D
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 09:30:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FC1A1C20AD0
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 07:29:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7EEF281CBB
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 07:30:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3614F8C15;
-	Wed, 20 Sep 2023 07:29:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C46788C06;
+	Wed, 20 Sep 2023 07:30:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0091C26
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 07:29:31 +0000 (UTC)
-Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B8C7C9
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 00:29:30 -0700 (PDT)
-Received: by mail-qt1-x82a.google.com with SMTP id d75a77b69052e-41761e9181eso200381cf.1
-        for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 00:29:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE6868472
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 07:30:14 +0000 (UTC)
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9370197
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 00:30:05 -0700 (PDT)
+Received: by mail-wm1-x329.google.com with SMTP id 5b1f17b1804b1-404314388ceso69464185e9.2
+        for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 00:30:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695194969; x=1695799769; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=g8CBGO1I/tDVZ3US3iYHvNzW5AeogXVILN8LHzMcHOE=;
-        b=36hQ0jWZSsQBeD6E5KlLx1TUvzI+bH03QnUqNj9P8b/E7/6HewdS3EXQWPKxn/8JaA
-         KlxiAv/oXo1ZQp49QAO/ZBrP3k6wOoS+ATdx8c4dckY9muR/V0CGXPU85J0Z4aLnLgvT
-         8RLVcXYsTbsUoJ/E5r9yHigFfAGAPoQ4DEH233re14mpK6ZABG5AoFH84BsHfiNryv1X
-         GycrAH89FPisN/nCkTyqFtsNUToa4x9gzPqle7MjpW3nBaKKW9mmGXAoWG85KwRlMKm4
-         WcCKJ5rg1gpSzslZKysbeDxFhT1GoUWRwEINgQjoIPCpFU2Kr0NcfyAk94wR7EBm9aEE
-         GR0w==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1695195004; x=1695799804; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1rtjlC7wvTtYXnGDRzxmeHUydnBvIkEdX00Z0ufSrUE=;
+        b=NF/W/erIIisajc7S3in/Hze6i1FPSAf3x/qkXz2CCI1rrtPfcu69IZFYDlpTmRVoLI
+         lVyrB4bsHKAVd0GaR5zz7JXqbM9HyXGiQTMG9geVx8KDA2Y6xb5eNWv0oqgM+xokX23j
+         JQMZ0UloxKLiZ+Duo4b9GdycDJwa1jaNyrNUL+S4dkmO14t2zy+cXQ6Rie9OFFC1L4GW
+         1GpnmqGO9YQmm5iadNjzmy2jQNDrwJHHM0Glhu3Y7MMErkRhde5E9naq46pzkZX0obTo
+         o7aTnTKnvDPjnb2J6B7PES/1b57xbbX25yO4zj1jNA/JaZjxVj37ZqNBA+oyCBI4Wxo6
+         V7+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695194969; x=1695799769;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=g8CBGO1I/tDVZ3US3iYHvNzW5AeogXVILN8LHzMcHOE=;
-        b=oYBgp67uA2O1i6A9icFaHTg8V8MuB1C7OVOkXdgFN7L0lxnBebIMF4JZ2KksyB3VRP
-         5MyEV4J5p6AY8k3zoBtd1+BXWbPtdPB8mv282zESalcyG4H36tNtuZPJPUGUmrXRkeRq
-         ZJk+7USAMfiIr63C0U/js6PDzVkyM+GbjvFe8DqK37j28am1iDVgR3S1cIX8AGjNDuCG
-         lznSmSWccqeXgEGEtddu3QCElzLGvS2DhnpavY8g38vDn696Pen7fHcOTvMZZEi2nRvN
-         qBSaK0ccoT2LAdGiTIEOmV0razsmOnxon+LA6zng6WbPzIL9awFx29WkQDF1jdkGoA/Y
-         Vwtw==
-X-Gm-Message-State: AOJu0YxRD45h2BAfxPfErhWwFT7O53DdS1SEGHvvhVOWpR3lR5OSl25W
-	zhUsSFTbqi49GvDE1yewLAqwNUmf3a7PIEsJzmX7lQ==
-X-Google-Smtp-Source: AGHT+IEmNp7iYwhpX0ipMJu8lXWl+bUUlXj6MEdDbPhow8vB4O+lJiSTl9l3uW61zvFNRVU9Q20UOWBKTvIEvkawyVo=
-X-Received: by 2002:a05:622a:1d4:b0:416:6784:bd60 with SMTP id
- t20-20020a05622a01d400b004166784bd60mr123929qtw.21.1695194969239; Wed, 20 Sep
- 2023 00:29:29 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1695195004; x=1695799804;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1rtjlC7wvTtYXnGDRzxmeHUydnBvIkEdX00Z0ufSrUE=;
+        b=M0HCnDG2P4yIOqix+tFg98C+QzExDT3bNDgrg27KOj66S12qlFVpv4BytrvNe0BLTc
+         QKm2JEvFevyKRa/4j7nazlLSdysRBw7crd5d7kHJTMEpAfpxgINMGUWljgpyapFR+neN
+         AhdtSsfub4Kpx0Em7i0sd+WFmBs/HMz4eFS/e/DQCHa7y+50VfmNY/UxfQOuBzPuF98X
+         YW0XV797CK2RSeoAw+V1A1+IkRkjgNCD8ftr9msQa6LnfxxssEHpLI8PS3wFR0PTWRps
+         YLozkBIPdIKDvIwGCP7VVqUXrbw4KkkkPzSUN3qK3yzgAS/krv4q0Ol1bSghKVeYDyKK
+         vkqw==
+X-Gm-Message-State: AOJu0YwU5SJGMQ8sm5tuzkVEmZZezTu5E0l4HQcxxPin62MhL3tlnj76
+	9kXyhd16b7OBmfkYALRGhgDcbhyUHQP7zdRieWc=
+X-Google-Smtp-Source: AGHT+IHRTLCqYdllW6BqpGo/tB4n4x0LNMSK6YUmAswnU620mWclMpc4bjj2okzz1gLT07K/dSxLuA==
+X-Received: by 2002:a05:600c:22da:b0:3fe:173e:4a34 with SMTP id 26-20020a05600c22da00b003fe173e4a34mr1578310wmg.40.1695195003729;
+        Wed, 20 Sep 2023 00:30:03 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id d6-20020adfef86000000b0031f82743e25sm17628489wro.67.2023.09.20.00.30.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Sep 2023 00:30:02 -0700 (PDT)
+Date: Wed, 20 Sep 2023 09:30:01 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: David Ahern <dsahern@gmail.com>
+Cc: netdev@vger.kernel.org, stephen@networkplumber.org,
+	daniel.machon@microchip.com
+Subject: Re: [patch iproute2-next v2 3/5] devlink: introduce support for
+ netns id for nested handle
+Message-ID: <ZQqfeQiz2OoVHqdS@nanopsycho>
+References: <20230919115644.1157890-1-jiri@resnulli.us>
+ <20230919115644.1157890-4-jiri@resnulli.us>
+ <3652856a-1cda-c050-04da-fe2204949ff5@gmail.com>
+ <ZQnYDVBeuIRn7uwK@nanopsycho>
+ <5476af84-7f3d-2895-3be3-83b5abc38485@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <64CCB695-BA43-48F5-912A-AFD5B9C103A7@gmail.com>
- <51294220-A244-46A9-A5B8-34819CE30CF4@gmail.com> <67303CFE-1938-4510-B9AE-5038BF98ABB7@gmail.com>
- <8a62f57a9454b0592ab82248fca5a21fc963995b.camel@redhat.com>
- <CALidq=UR=3rOHZczCnb1bEhbt9So60UZ5y60Cdh4aP41FkB5Tw@mail.gmail.com>
- <43ED0333-18AB-4C38-A615-7755E5BE9C3E@gmail.com> <5A853CC5-F15C-4F30-B845-D9E5B43EC039@gmail.com>
- <A416E134-BFAA-45FE-9061-9545F6DCC246@gmail.com> <CANn89iKXxyAQG-N+mdhNA8H+LEf=OK+goMFxYCV6yU1BpE=Xvw@mail.gmail.com>
- <BB129799-E196-428C-909D-721670DD5E21@gmail.com> <ZQqOJOa_qTwz_k0V@debian.me>
- <94BC75CD-A34A-4FED-A2EA-C18A28512230@gmail.com> <CANn89iKvv7F9G8AbYTEu7wca_SDHEp4GVTOEWk7_Yq0KFJrWgw@mail.gmail.com>
-In-Reply-To: <CANn89iKvv7F9G8AbYTEu7wca_SDHEp4GVTOEWk7_Yq0KFJrWgw@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 20 Sep 2023 09:29:18 +0200
-Message-ID: <CANn89iJCJhJ=RWqPGkdbPoXhoa1W9ovi0s1t4242vsz-1=0WLw@mail.gmail.com>
-Subject: Re: Urgent Bug Report Kernel crash 6.5.2
-To: Martin Zaharinov <micron10@gmail.com>
-Cc: Bagas Sanjaya <bagasdotme@gmail.com>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev <netdev@vger.kernel.org>, patchwork-bot+netdevbpf@kernel.org, 
-	Jakub Kicinski <kuba@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>, kuba+netdrv@kernel.org, 
-	dsahern@gmail.com, Florian Westphal <fw@strlen.de>, Pablo Neira Ayuso <pablo@netfilter.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5476af84-7f3d-2895-3be3-83b5abc38485@gmail.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,T_SPF_TEMPERROR
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Sep 20, 2023 at 9:25=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
+Tue, Sep 19, 2023 at 08:48:29PM CEST, dsahern@gmail.com wrote:
+>On 9/19/23 11:19 AM, Jiri Pirko wrote:
+>>>
+>>>>  static void pr_out_nested_handle(struct nlattr *nla_nested_dl)
+>>>>  {
+>>>>  	struct nlattr *tb[DEVLINK_ATTR_MAX + 1] = {};
+>>>> @@ -2740,6 +2776,30 @@ static void pr_out_nested_handle(struct nlattr *nla_nested_dl)
+>>>>  	sprintf(buf, "%s/%s", mnl_attr_get_str(tb[DEVLINK_ATTR_BUS_NAME]),
+>>>>  		mnl_attr_get_str(tb[DEVLINK_ATTR_DEV_NAME]));
+>>>>  	print_string(PRINT_ANY, "nested_devlink", " nested_devlink %s", buf);
+>>>> +
+>>>> +	if (tb[DEVLINK_ATTR_NETNS_ID]) {
+>>>> +		int32_t id = mnl_attr_get_u32(tb[DEVLINK_ATTR_NETNS_ID]);
+>>>> +
+>>>> +		if (id >= 0) {
+>>>> +			char *name = netns_name_by_id(id);
+>>>> +
+>>>> +			if (name) {
+>>>> +				print_string(PRINT_ANY,
+>>>> +					     "nested_devlink_netns",
+>>>> +					     " nested_devlink_netns %s", name);
+>>>> +				free(name);
+>>>> +			} else {
+>>>> +				print_int(PRINT_ANY,
+>>>> +					  "nested_devlink_netnsid",
+>>>> +					  " nested_devlink_netnsid %d", id);
+>>>> +			}
+>>>> +		} else {
+>>>> +			print_string(PRINT_FP, NULL,
+>>>> +				     " nested_devlink_netnsid %s", "unknown");
+>>>> +			print_int(PRINT_JSON,
+>>>> +				  "nested_devlink_netnsid", NULL, id);
+>>>> +		}
+>>> Also, devlink in the name here provides no addititional value (devlink
+>>> is the command name) and why add 'nested'? The attribute is just
+>>> NETNS_ID, so why not just 'netnsid' here.
+>> Well, it is a netnsid of the nested devlink instance, not the object
+>> (e.g. port) itself. Omitting that would be misleading. Any idea how to
+>> do this differently?
+>> 
+>> 
 >
-> On Wed, Sep 20, 2023 at 9:04=E2=80=AFAM Martin Zaharinov <micron10@gmail.=
-com> wrote:
-> >
-> > Hi
-> >
-> > Ok on first see all is look come after in kernel 6.4 add : atomics: Pro=
-vide rcuref - scalable reference counting  ( https://www.spinics.net/lists/=
-linux-tip-commits/msg62042.html )
-> >
-> > I check all running machine with kernel 6.4.2 is minimal and have same =
-bug report.
-> >
-> > i have fell machine with kernel 6.3.9 and not see problems there .
-> >
-> > and the problem may be is allocate in this part :
-> >
-> > [39651.444202] ? rcuref_put_slowpath (lib/rcuref.c:267 (discriminator 1=
-))
-> > [39651.444297] ? rcuref_put_slowpath (lib/rcuref.c:267 (discriminator 1=
-))
-> > [39651.444391] dst_release (./arch/x86/include/asm/preempt.h:95 ./inclu=
-de/linux/rcuref.h:151 net/core/dst.c:166)
-> > [39651.444487] __dev_queue_xmit (./include/net/dst.h:283 net/core/dev.c=
-:4158)
-> > [39651.444582] ? nf_hook_slow (./include/linux/netfilter.h:143 net/netf=
-ilter/core.c:626)
-> >
-> > may be changes in dst.c make problem , I'm guessing at the moment.
-> >
-> > but in real with kernel 6.3 all is fine for now.
-> >
-> > dst.c changes 6.3.9 > 6.5.4 :
->
-> Then start a real bisection. This is going to be the last time I say it.
+>The attribute is a namespace id, and the value is a namespace id. Given
+>that, the name here should be netnsid (or nsid - we did a horrible job
+>with consistency across iproute2 commands). I have not followed the
+>kernel patches to understand what you mean by nested devlink instance.
 
-Or stick to an older kernel for your production, and wait for others
-to find the issue.
+Please do that. Again, the netnsid is related to the nested instance.
+Therefore I put the "nested_devlink" in the name. Putting just "netnsid"
+as you suggest is wrong. Another possibility would be do nest this into
+object, but:
+1) I didn't find nice way to do that
+2) We would break linecards as they expose nested_devlink already
+
+IDK :/
 
