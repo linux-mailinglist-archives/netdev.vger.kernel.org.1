@@ -1,185 +1,107 @@
-Return-Path: <netdev+bounces-35284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E42807A8A6A
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 19:17:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 314C97A8A70
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 19:20:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F5E1281B03
-	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 17:17:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC247281B79
+	for <lists+netdev@lfdr.de>; Wed, 20 Sep 2023 17:20:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B0D41A593;
-	Wed, 20 Sep 2023 17:17:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5684B1A59A;
+	Wed, 20 Sep 2023 17:20:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD82F1A583
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 17:16:58 +0000 (UTC)
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BE87A3
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 10:16:56 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-68c576d35feso9411b3a.2
-        for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 10:16:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=isovalent.com; s=google; t=1695230216; x=1695835016; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OYwRvNZSIbVvYcsjP7/mGng1taIa+q8dT51QL9d0Cbk=;
-        b=d5ZxicKwvYDzZDIyxpRwIU4j2QoleyiC0sqdknoYeqna7W4Ka5lIip6HgKJf8sAdpG
-         hRb8HmEXkpH6mRPp7PO26opb0QHp7PkluolXLd+16YjJLsyAzP6bIbJ8OrK4/NlueDC+
-         8T2eUAJJhJX6xx1kniQ1DCOuZGVCxdmfeiUOMj78zXn1V88DiHjBfcY9QQcuTAoyAD3d
-         Ce5A3vlYvLq2SH9wtVQibt7sXMbmfuXR2DOCeAlGeaGa7fNtdHDgNGAns5cSbdtjfn2y
-         WcPDw8B401fgmBQvXusOfWI5FjzhpX8fEmRfUkSWzyvAONPOaL/GFM/kwEPCUCnp5I5i
-         WSNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695230216; x=1695835016;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OYwRvNZSIbVvYcsjP7/mGng1taIa+q8dT51QL9d0Cbk=;
-        b=vFjTuzbUuE9R9LnSeJyLDVzHbMN79HktBigXDxJWJ/ja2v1Nr970HkNOnuMldduPDp
-         GXKgNlTfyPpvgnR6k2yWD6LAZeHD9ljr/MtigIwO4BjVQOxG8UwQQuxiTCZIgDrq2bjN
-         30j3ObQuDLeclZT74DAE88vOwPG7aZcuTBZ7eFGSFvSA1SoFD4kQbaY9Ygb022+JNYhe
-         QhtpCan8KDKZerFWPgtx2mWZrz/CPglPqblOWntlLRB+SLRFKGgP+O9+pr4DYkW4Dsqs
-         H/lK3WZzrQtFV/0zR0fl1G07COQvEzbYMdknHyX2FSOYQvGVIUk5qtGdProttspSvy4q
-         D6gw==
-X-Gm-Message-State: AOJu0Yx90fLDIHc2ilggBNj45X21AHg4AgXsOXNu/ZDY5vXRSgr5etk2
-	JgSRI6dMUJ3E764RdLgcGlscmA==
-X-Google-Smtp-Source: AGHT+IGX0hV6Wb1tBEtR/OuSD3hhWU88zk8Wq0jmh1WmOSi5rHqT2vrJgOaxBqatemI2DS1aANrBAQ==
-X-Received: by 2002:a05:6a20:3ca7:b0:13a:59b1:c884 with SMTP id b39-20020a056a203ca700b0013a59b1c884mr3678913pzj.40.1695230215934;
-        Wed, 20 Sep 2023 10:16:55 -0700 (PDT)
-Received: from ?IPv6:2601:647:4900:1fbb:850f:189d:ef1b:52b8? ([2601:647:4900:1fbb:850f:189d:ef1b:52b8])
-        by smtp.gmail.com with ESMTPSA id fk1-20020a056a003a8100b00690fb385ea9sm762825pfb.47.2023.09.20.10.16.55
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 20 Sep 2023 10:16:55 -0700 (PDT)
-Content-Type: text/plain;
-	charset=us-ascii
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE8A71A589
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 17:20:04 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F293EAF
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 10:20:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695230401; x=1726766401;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=dIMXniZpgLdpRRcdCCGYZ9veGviTLORLYa9ZzUmIDg4=;
+  b=AtHw3Hez03Dfs2eagzWd+IEB4KOs/MyKEtBDRYVuBdUuXZmRdTmUhApq
+   dBQRPNgnbpdT5g2KL6aJTHfNpKQFAuZa2LFUOt6WXuO7ckXyNGfiLQvbu
+   DS1popQe0V4c+6AjOUVDYTWmzn8LRs9EdbeoWYF5bKLXZZtayolbalL93
+   5raqwxhfVRWGN+Ya2dgXMG7Vphcy1ik7jv2UiUoqNtoSpaVG1QNYpPMZC
+   /i/hVKIay45hK/4g4CT3OXrNv24jG9o9tcHEU63Xe4JiuRMYV17SsiiTO
+   nVqK2lpwa0fmafqAlyMGi8OtErYXHPXVyyOrg9BEmArgAd/ZjaCZfuVEx
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="411234456"
+X-IronPort-AV: E=Sophos;i="6.03,162,1694761200"; 
+   d="scan'208";a="411234456"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2023 10:20:01 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="1077543712"
+X-IronPort-AV: E=Sophos;i="6.03,162,1694761200"; 
+   d="scan'208";a="1077543712"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by fmsmga005.fm.intel.com with ESMTP; 20 Sep 2023 10:19:59 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	michal.michalik@intel.com,
+	jacob.e.keller@intel.com,
+	richardcochran@gmail.com
+Subject: [PATCH net-next 0/4][pull request] ice: add PTP auxiliary bus support
+Date: Wed, 20 Sep 2023 10:19:25 -0700
+Message-Id: <20230920171929.2198273-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.7\))
-Subject: Re: [PATCH v9 bpf-next 5/9] bpf: udp: Implement batching for sockets
- iterator
-From: Aditi Ghag <aditi.ghag@isovalent.com>
-In-Reply-To: <f85fbac6-a1d7-3f63-9d0f-8eaa261ddb26@linux.dev>
-Date: Wed, 20 Sep 2023 10:16:54 -0700
-Cc: Stanislav Fomichev <sdf@google.com>,
- Martin KaFai Lau <martin.lau@kernel.org>,
- bpf@vger.kernel.org,
- Network Development <netdev@vger.kernel.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <A2130EF3-793F-4D4A-BA99-03F89EF38844@isovalent.com>
-References: <20230519225157.760788-1-aditi.ghag@isovalent.com>
- <20230519225157.760788-6-aditi.ghag@isovalent.com>
- <f85fbac6-a1d7-3f63-9d0f-8eaa261ddb26@linux.dev>
-To: Martin KaFai Lau <martin.lau@linux.dev>
-X-Mailer: Apple Mail (2.3608.120.23.2.7)
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Michal Michalik says:
 
+Auxiliary bus allows exchanging information between PFs, which allows
+both fixing problems and simplifying new features implementation.
+The auxiliary bus is enabled for all devices supported by ice driver.
 
-> On Sep 19, 2023, at 5:38 PM, Martin KaFai Lau <martin.lau@linux.dev> =
-wrote:
->=20
-> On 5/19/23 3:51 PM, Aditi Ghag wrote:
->> +static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
->> +{
->> +	struct bpf_udp_iter_state *iter =3D seq->private;
->> +	struct udp_iter_state *state =3D &iter->state;
->> +	struct net *net =3D seq_file_net(seq);
->> +	struct udp_table *udptable;
->> +	unsigned int batch_sks =3D 0;
->> +	bool resized =3D false;
->> +	struct sock *sk;
->> +
->> +	/* The current batch is done, so advance the bucket. */
->> +	if (iter->st_bucket_done) {
->> +		state->bucket++;
->> +		iter->offset =3D 0;
->> +	}
->> +
->> +	udptable =3D udp_get_table_seq(seq, net);
->> +
->> +again:
->> +	/* New batch for the next bucket.
->> +	 * Iterate over the hash table to find a bucket with sockets =
-matching
->> +	 * the iterator attributes, and return the first matching socket =
-from
->> +	 * the bucket. The remaining matched sockets from the bucket are =
-batched
->> +	 * before releasing the bucket lock. This allows BPF programs =
-that are
->> +	 * called in seq_show to acquire the bucket lock if needed.
->> +	 */
->> +	iter->cur_sk =3D 0;
->> +	iter->end_sk =3D 0;
->> +	iter->st_bucket_done =3D false;
->> +	batch_sks =3D 0;
->> +
->> +	for (; state->bucket <=3D udptable->mask; state->bucket++) {
->> +		struct udp_hslot *hslot2 =3D =
-&udptable->hash2[state->bucket];
->> +
->> +		if (hlist_empty(&hslot2->head)) {
->> +			iter->offset =3D 0;
->> +			continue;
->> +		}
->> +
->> +		spin_lock_bh(&hslot2->lock);
->> +		udp_portaddr_for_each_entry(sk, &hslot2->head) {
->> +			if (seq_sk_match(seq, sk)) {
->> +				/* Resume from the last iterated socket =
-at the
->> +				 * offset in the bucket before iterator =
-was stopped.
->> +				 */
->> +				if (iter->offset) {
->> +					--iter->offset;
->=20
-> Hi Aditi, I think this part has a bug.
->=20
-> When I run './test_progs -t bpf_iter/udp6' in a machine with some udp =
-so_reuseport sockets, this test is never finished.
->=20
-> A broken case I am seeing is when the bucket has >1 sockets and =
-bpf_seq_read() can only get one sk at a time before it calls =
-bpf_iter_udp_seq_stop().
->=20
-> I did not try the change yet. However, from looking at the code where =
-iter->offset is changed, --iter->offset here is the most likely culprit =
-and it will make backward progress for the same bucket (state->bucket). =
-Other places touching iter->offset look fine.
->=20
-> It needs a local "int offset" variable for the zero test. Could you =
-help to take a look, add (or modify) a test and fix it?
->=20
-> The progs/bpf_iter_udp[46].c test can be used to reproduce. The =
-test_udp[46] in prog_tests/bpf_iter.c needs to be changed though to =
-ensure there is multiple sk in the same bucket. Probably a few =
-so_reuseport sk should do.
+The following are changes since commit b3af9c0e89ca721dfed95401c88c8c6e8067b558:
+  Merge git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 100GbE
 
-Hi Martin,
+Michal Michalik (4):
+  ice: Auxbus devices & driver for E822 TS
+  ice: Use PTP auxbus for all PHYs restart in E822
+  ice: PTP: add clock domain number to auxiliary interface
+  ice: Remove the FW shared parameters
 
-Thanks for the report. I'll take a look.
+ drivers/net/ethernet/intel/ice/ice.h          |  12 +
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  10 -
+ drivers/net/ethernet/intel/ice/ice_common.c   |  75 ---
+ drivers/net/ethernet/intel/ice/ice_common.h   |   6 -
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  |   2 +-
+ .../net/ethernet/intel/ice/ice_hw_autogen.h   |   1 +
+ drivers/net/ethernet/intel/ice/ice_main.c     |  11 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.c      | 576 +++++++++++++-----
+ drivers/net/ethernet/intel/ice/ice_ptp.h      |  41 +-
+ 9 files changed, 483 insertions(+), 251 deletions(-)
 
-
->=20
-> Thanks.
->=20
->> +					continue;
->> +				}
->> +				if (iter->end_
->=20
+-- 
+2.38.1
 
 
