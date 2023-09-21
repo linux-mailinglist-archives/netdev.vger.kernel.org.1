@@ -1,62 +1,114 @@
-Return-Path: <netdev+bounces-35617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B2CD7AA3C1
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 23:56:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A87D77AA47B
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 00:10:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 1F67A28438B
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:56:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 9599F2861FE
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 22:10:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C43A1A5B4;
-	Thu, 21 Sep 2023 21:56:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4865D20310;
+	Thu, 21 Sep 2023 22:10:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DDF09CA57;
-	Thu, 21 Sep 2023 21:56:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB590C433C8;
-	Thu, 21 Sep 2023 21:56:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FC161947B;
+	Thu, 21 Sep 2023 22:10:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D5E4C433CB;
+	Thu, 21 Sep 2023 22:10:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695333398;
-	bh=Wpp57ufkeo2BOxTu1oY8alqL7fdUWfQ9ZHnmfMHpyZ8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RJ7V63Uukk2lynSRs7RVx2hEPaK3aT3LotGjxBDz5a3ladQw2dW06GVEftzGvc8pc
-	 InPHL1q55VU5bT1UdQfaCfvl4zwPh7J3OxZhnlzC5mMcs0AVnEEkdtaWjZzvYBGPIp
-	 OkeruOrpt6aYW+HZ4IefcE3dL5N4fjESMsh0XUJ/pRCQ6t7HYRscvIsHCdl1N8xAgG
-	 HDhc1ZqU6k+ppLdBRAkwebSPiyaKgOBwzeGoKzUVGPwmoNcm/XCZkAoxIGs972FG3K
-	 lllvtoAAJZdnBiqjFlnChSX7sInaJg0zh372S0sZoqW2HMFQNfelr6cDjakhNtpeTK
-	 CFVyaOSGWDmoQ==
-Date: Thu, 21 Sep 2023 22:56:27 +0100
-From: Simon Horman <horms@kernel.org>
-To: Chuck Lever <cel@kernel.org>
-Cc: netdev@vger.kernel.org, kernel-tls-handshake@lists.linux.dev,
-	Chuck Lever <chuck.lever@oracle.com>
-Subject: Re: [PATCH v2 0/2] Fix implicit sign conversions in handshake upcall
-Message-ID: <20230921215627.GT224399@kernel.org>
-References: <169530154802.8905.2645661840284268222.stgit@oracle-102.nfsv4bat.org>
+	s=k20201202; t=1695334240;
+	bh=N5hdFpyXSiGpYG0511NDyp6fv24cJcs4QSVnP7w1UAU=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Wvqk0n6jq0ct52sblCUd8L/Xq8+N+SorW8zAWVSuS8RApVD17k7plQRRz/k5AtqcZ
+	 GfT0CHWwJxWi4gUehtxR+8ljjuQTqjvYKgxWb2XNuVdjKevxRu1ENJFvPX5YXAHSbF
+	 Ix9CdbGlyzCm8uVsj2Qxltwpt5fiLP3w48irVYCfZTdJDqTfRku6xjijf57j/ZypWU
+	 97yg0mO2y5J78oLs+yCmKD+nXRc3T+EFcvHppUt3wuFXOaWZdvIvQ4j8dq0mhxHV1+
+	 hn7FVpnRYo4KhRE7dodDocdh21fQMMb+Di7kRnH5vPdK32pTNVgx3GHtydByNaiHSX
+	 2EmQpYW6b+alA==
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5041bb9ce51so2466137e87.1;
+        Thu, 21 Sep 2023 15:10:40 -0700 (PDT)
+X-Gm-Message-State: AOJu0YxFcVtmEm3oEWo8idFtMNYq2G4WIU9xIxKGAeDSLaC8XzC5nHA6
+	A/Os7unXe6c0ie2bw3wFW2fEWkGcW0nssbBNJ5k=
+X-Google-Smtp-Source: AGHT+IFpnRd6TFzlAtTmG0SVL+ey3URugDNbqT5vmaLEkxDXDZHK88BxPcak1tSmyXSq9q54rWpyKjCd5XFO26LBHOk=
+X-Received: by 2002:a19:6903:0:b0:4fe:2d93:2b50 with SMTP id
+ e3-20020a196903000000b004fe2d932b50mr5173357lfc.31.1695334238605; Thu, 21 Sep
+ 2023 15:10:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <169530154802.8905.2645661840284268222.stgit@oracle-102.nfsv4bat.org>
+References: <20230918072955.2507221-1-rppt@kernel.org> <20230918072955.2507221-3-rppt@kernel.org>
+In-Reply-To: <20230918072955.2507221-3-rppt@kernel.org>
+From: Song Liu <song@kernel.org>
+Date: Thu, 21 Sep 2023 15:10:26 -0700
+X-Gmail-Original-Message-ID: <CAPhsuW4bQY5fo_+K2z4uUdd4r0wYF1eT3bAya=YqcEcmqdGXvg@mail.gmail.com>
+Message-ID: <CAPhsuW4bQY5fo_+K2z4uUdd4r0wYF1eT3bAya=YqcEcmqdGXvg@mail.gmail.com>
+Subject: Re: [PATCH v3 02/13] mm: introduce execmem_text_alloc() and execmem_free()
+To: Mike Rapoport <rppt@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, 
+	=?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Christophe Leroy <christophe.leroy@csgroup.eu>, 
+	"David S. Miller" <davem@davemloft.net>, Dinh Nguyen <dinguyen@kernel.org>, 
+	Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>, Huacai Chen <chenhuacai@kernel.org>, 
+	Kent Overstreet <kent.overstreet@linux.dev>, Luis Chamberlain <mcgrof@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Nadav Amit <nadav.amit@gmail.com>, "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Puranjay Mohan <puranjay12@gmail.com>, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, Russell King <linux@armlinux.org.uk>, 
+	Steven Rostedt <rostedt@goodmis.org>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>, bpf@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org, 
+	linux-mm@kvack.org, linux-modules@vger.kernel.org, 
+	linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev, 
+	netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 21, 2023 at 09:07:14AM -0400, Chuck Lever wrote:
-> An internal static analysis tool noticed some implicit sign
-> conversions for some of the arguments in the handshake upcall
-> protocol.
-> 
-> ---
+On Mon, Sep 18, 2023 at 12:30=E2=80=AFAM Mike Rapoport <rppt@kernel.org> wr=
+ote:
+>
+[...]
+> +
+> +#include <linux/mm.h>
+> +#include <linux/vmalloc.h>
+> +#include <linux/execmem.h>
+> +#include <linux/moduleloader.h>
+> +
+> +static void *execmem_alloc(size_t size)
+> +{
+> +       return module_alloc(size);
+> +}
+> +
+> +void *execmem_text_alloc(enum execmem_type type, size_t size)
+> +{
+> +       return execmem_alloc(size);
+> +}
 
-...
+execmem_text_alloc (and later execmem_data_alloc) both take "type" as
+input. I guess we can just use execmem_alloc(type, size) for everything?
 
-For series,
+Thanks,
+Song
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-
+> +
+> +void execmem_free(void *ptr)
+> +{
+> +       /*
+> +        * This memory may be RO, and freeing RO memory in an interrupt i=
+s not
+> +        * supported by vmalloc.
+> +        */
+> +       WARN_ON(in_interrupt());
+> +       vfree(ptr);
+> +}
+> --
+> 2.39.2
+>
 
