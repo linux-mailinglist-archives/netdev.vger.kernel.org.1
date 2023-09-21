@@ -1,347 +1,216 @@
-Return-Path: <netdev+bounces-35533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A8247A9CBC
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:24:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EE63E7A9900
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 20:09:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD610B24C88
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:19:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8BF13B211C9
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 18:09:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCC364C864;
-	Thu, 21 Sep 2023 18:11:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B15201DDC2;
+	Thu, 21 Sep 2023 17:22:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DD274BDAF
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 18:11:18 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E730DA0C24
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:57:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695319056; x=1726855056;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=ei7+yLJLLAyihdDLjCFKsIDW8cjcNk94KbQ4HOvuuog=;
-  b=OYsQtIuJOr0DlpQ4ICSs+AeatJyQJ9CVvMwtAcjGtHG7QNWxO0Q7zZHT
-   +nczHxaGLkdxJ0U6qHxFpN+DAvp+wtyMYAtB7RyByLOeYV8JUjxsl4tJC
-   asnbXwD5KuENnPjKOE3JEHYMzFnSbUKJL+dxwZIbVWtJIJH3K81hquvFE
-   WGVES5UQ+SWtwDnFuKDKFJS+iQsAvjcCK+FfAHtn9kCKCY3WOZ2ga84L4
-   gJhAWQ8UsJo7YMQEuy9ShMOHrUNQoo5s2UK2uYs7DFFE5HH50xhoQQ71P
-   kgp3fZcw3jWEOIMHdSaPvSfrK3PUCB/nmBBSU78FlxHriwxPqvYa47yXG
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10840"; a="383278159"
-X-IronPort-AV: E=Sophos;i="6.03,165,1694761200"; 
-   d="scan'208";a="383278159"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 06:55:02 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10840"; a="890377523"
-X-IronPort-AV: E=Sophos;i="6.03,165,1694761200"; 
-   d="scan'208";a="890377523"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmsmga001.fm.intel.com with ESMTP; 21 Sep 2023 06:54:08 -0700
-Received: from baltimore.igk.intel.com (baltimore.igk.intel.com [10.102.21.1])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 908B32FC46;
-	Thu, 21 Sep 2023 14:54:57 +0100 (IST)
-From: Pawel Chmielewski <pawel.chmielewski@intel.com>
-To: netdev@vger.kernel.org
-Cc: intel-wired-lan@lists.osuosl.org,
-	andrew@lunn.ch,
-	aelior@marvell.com,
-	manishc@marvell.com,
-	horms@kernel.org,
-	Pawel Chmielewski <pawel.chmielewski@intel.com>,
-	Paul Greenwalt <paul.greenwalt@intel.com>
-Subject: [PATCH net-next v2 2/2] ice: Refactor finding advertised link speed
-Date: Thu, 21 Sep 2023 15:51:40 +0200
-Message-Id: <20230921135140.1134153-3-pawel.chmielewski@intel.com>
-X-Mailer: git-send-email 2.37.3
-In-Reply-To: <20230921135140.1134153-1-pawel.chmielewski@intel.com>
-References: <20230921135140.1134153-1-pawel.chmielewski@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38E0841A98
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 17:22:45 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B36E2566FD
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:18:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1695316692;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TlC67XxjnP+ZVW2NhM88mr2tYX+uJkcJVmDqrakHLxg=;
+	b=bWQ+TWmTwmljW/giLf5DXD20giZPm1DHdDvXbHdu+g+Xc8VxcdtcFV9k912pfAqjOLq4ED
+	NtW/1D5JFxx1KCzSLb6tq5Rvmb7am0PHQbpDXWr7y90aEAQXE+TpoTMd4gAaD6bot3s8j1
+	3g9lbcLGOc/I5c4K92wf1jApKabwluk=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-283-vK5aPMMuOx6Rvu9TQoFeWw-1; Thu, 21 Sep 2023 10:02:50 -0400
+X-MC-Unique: vK5aPMMuOx6Rvu9TQoFeWw-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40298cbbcdbso7774075e9.3
+        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 07:02:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695304949; x=1695909749;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TlC67XxjnP+ZVW2NhM88mr2tYX+uJkcJVmDqrakHLxg=;
+        b=jeXvRxuTarkyn0AICZwl8ONgiY8j0A7UUBtkgi8TP+118gSMiydhjiOmMRPwodalLO
+         /+0A7hwUwxr6IAjcdX5lLALhYafvOri5jKTNmDkYFrQPRin68vZPp9i6CcSnlyxPB61p
+         YBgucfyZWVkVKseUlOFr1DDD++aHm766WOjLVJGmUZUgDMyn8lA7cInMPLO4r/0NK9xX
+         OO9z/rN1Skhp+JcIbysAbTYyT5oWTEsXvxcYay57fBOVZoGfg0q7Fqnmh717ESL0Zh/0
+         SsrQW2YHbf+tr4Rj8lpfhE5V0uOun8luIDn8ArwmFyNoPEerw/+iZ647ukxPD3MaOLOt
+         RKTg==
+X-Gm-Message-State: AOJu0Ywa6DsZ7/9StVM7lZVMA45c3yiOQLCo8VEY3BKPByyBluWY3gS/
+	T5L/NJO6zWrYcX8BzeJ4BUBb2UXrf2Kf/cruH4zyNhNKe2Q3OUFojEXAJ4WapcR6TTDhTO1CaHt
+	2ppA8z6NUVv/oKT7ealdIW+YpDxCtW3AJ
+X-Received: by 2002:a5d:6909:0:b0:31f:f1f4:ca8e with SMTP id t9-20020a5d6909000000b0031ff1f4ca8emr5334194wru.36.1695304949268;
+        Thu, 21 Sep 2023 07:02:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHNTL6nYnReHMxIE2eeSXN3WfDyrQQNkn8rAgYHxF7+Q3qpnqcBEXgV8EV9/Y02we+Lvs9Dzqktaq7bM20Yrgk=
+X-Received: by 2002:a5d:6909:0:b0:31f:f1f4:ca8e with SMTP id
+ t9-20020a5d6909000000b0031ff1f4ca8emr5334163wru.36.1695304948913; Thu, 21 Sep
+ 2023 07:02:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20230912030008.3599514-1-lulu@redhat.com> <20230912030008.3599514-5-lulu@redhat.com>
+ <CACGkMEtCYG8-Pt+V-OOwUV7fYFp_cnxU68Moisfxju9veJ-=qw@mail.gmail.com>
+In-Reply-To: <CACGkMEtCYG8-Pt+V-OOwUV7fYFp_cnxU68Moisfxju9veJ-=qw@mail.gmail.com>
+From: Cindy Lu <lulu@redhat.com>
+Date: Thu, 21 Sep 2023 22:01:46 +0800
+Message-ID: <CACLfguW3NS_4+YhqTtGqvQb70mVazGVfheryHx4aCBn+=Skf9w@mail.gmail.com>
+Subject: Re: [RFC v2 4/4] vduse: Add new ioctl VDUSE_GET_RECONNECT_INFO
+To: Jason Wang <jasowang@redhat.com>
+Cc: mst@redhat.com, maxime.coquelin@redhat.com, xieyongji@bytedance.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Refactor ice_get_link_ksettings to using forced speed to link modes mapping.
+On Mon, Sep 18, 2023 at 4:49=E2=80=AFPM Jason Wang <jasowang@redhat.com> wr=
+ote:
+>
+> On Tue, Sep 12, 2023 at 11:01=E2=80=AFAM Cindy Lu <lulu@redhat.com> wrote=
+:
+> >
+> > In VDUSE_GET_RECONNECT_INFO, the Userspace App can get the map size
+> > and The number of mapping memory pages from the kernel. The userspace
+> > App can use this information to map the pages.
+> >
+> > Signed-off-by: Cindy Lu <lulu@redhat.com>
+> > ---
+> >  drivers/vdpa/vdpa_user/vduse_dev.c | 15 +++++++++++++++
+> >  include/uapi/linux/vduse.h         | 15 +++++++++++++++
+> >  2 files changed, 30 insertions(+)
+> >
+> > diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_use=
+r/vduse_dev.c
+> > index 680b23dbdde2..c99f99892b5c 100644
+> > --- a/drivers/vdpa/vdpa_user/vduse_dev.c
+> > +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
+> > @@ -1368,6 +1368,21 @@ static long vduse_dev_ioctl(struct file *file, u=
+nsigned int cmd,
+> >                 ret =3D 0;
+> >                 break;
+> >         }
+> > +       case VDUSE_GET_RECONNECT_INFO: {
+> > +               struct vduse_reconnect_mmap_info info;
+> > +
+> > +               ret =3D -EFAULT;
+> > +               if (copy_from_user(&info, argp, sizeof(info)))
+> > +                       break;
+> > +
+> > +               info.size =3D PAGE_SIZE;
+> > +               info.max_index =3D dev->vq_num + 1;
+> > +
+> > +               if (copy_to_user(argp, &info, sizeof(info)))
+> > +                       break;
+> > +               ret =3D 0;
+> > +               break;
+> > +       }
+> >         default:
+> >                 ret =3D -ENOIOCTLCMD;
+> >                 break;
+> > diff --git a/include/uapi/linux/vduse.h b/include/uapi/linux/vduse.h
+> > index d585425803fd..ce55e34f63d7 100644
+> > --- a/include/uapi/linux/vduse.h
+> > +++ b/include/uapi/linux/vduse.h
+> > @@ -356,4 +356,19 @@ struct vhost_reconnect_vring {
+> >         _Bool avail_wrap_counter;
+> >  };
+> >
+> > +/**
+> > + * struct vduse_reconnect_mmap_info
+> > + * @size: mapping memory size, always page_size here
+> > + * @max_index: the number of pages allocated in kernel,just
+> > + * use for check
+> > + */
+> > +
+> > +struct vduse_reconnect_mmap_info {
+> > +       __u32 size;
+> > +       __u32 max_index;
+> > +};
+>
+> One thing I didn't understand is that, aren't the things we used to
+> store connection info belong to uAPI? If not, how can we make sure the
+> connections work across different vendors/implementations. If yes,
+> where?
+>
+> Thanks
+>
+The process for this reconnecttion  is
+A.The first-time connection
+1> The userland app checks if the device exists
+2>  use the ioctl to create the vduse device
+3> Mapping the kernel page to userland and save the
+App-version/features/other information to this page
+4>  if the Userland app needs to exit, then the Userland app will only
+unmap the page and then exit
 
-Suggested-by : Alexander Lobakin <aleksander.lobakin@intel.com>
-Signed-off-by: Pawel Chmielewski <pawel.chmielewski@intel.com>
-Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
----
- drivers/net/ethernet/intel/ice/ice.h         |   1 +
- drivers/net/ethernet/intel/ice/ice_ethtool.c | 200 +++++++++++++------
- drivers/net/ethernet/intel/ice/ice_main.c    |   2 +
- 3 files changed, 138 insertions(+), 65 deletions(-)
+B, the re-connection
+1> the userland app finds the device is existing
+2> Mapping the kernel page to userland
+3> check if the information in shared memory is satisfied to
+reconnect,if ok then continue to reconnect
+4> continue working
 
-diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-index 5022b036ca4f..5eda0fa39d81 100644
---- a/drivers/net/ethernet/intel/ice/ice.h
-+++ b/drivers/net/ethernet/intel/ice/ice.h
-@@ -942,6 +942,7 @@ int ice_stop(struct net_device *netdev);
- void ice_service_task_schedule(struct ice_pf *pf);
- int ice_load(struct ice_pf *pf);
- void ice_unload(struct ice_pf *pf);
-+void ice_adv_lnk_speed_maps_init(void);
- 
- /**
-  * ice_set_rdma_cap - enable RDMA support
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index ad4d4702129f..8b84bb539e1a 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -345,6 +345,86 @@ static const struct ice_priv_flag ice_gstrings_priv_flags[] = {
- 
- #define ICE_PRIV_FLAG_ARRAY_SIZE	ARRAY_SIZE(ice_gstrings_priv_flags)
- 
-+static const u32 ice_adv_lnk_speed_100[] __initconst = {
-+	ETHTOOL_LINK_MODE_100baseT_Full_BIT,
-+};
-+
-+static const u32 ice_adv_lnk_speed_1000[] __initconst = {
-+	ETHTOOL_LINK_MODE_1000baseX_Full_BIT,
-+	ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
-+	ETHTOOL_LINK_MODE_1000baseKX_Full_BIT,
-+};
-+
-+static const u32 ice_adv_lnk_speed_2500[] __initconst = {
-+	ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
-+	ETHTOOL_LINK_MODE_2500baseX_Full_BIT,
-+};
-+
-+static const u32 ice_adv_lnk_speed_5000[] __initconst = {
-+	ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
-+};
-+
-+static const u32 ice_adv_lnk_speed_10000[] __initconst = {
-+	ETHTOOL_LINK_MODE_10000baseT_Full_BIT,
-+	ETHTOOL_LINK_MODE_10000baseKR_Full_BIT,
-+	ETHTOOL_LINK_MODE_10000baseSR_Full_BIT,
-+	ETHTOOL_LINK_MODE_10000baseLR_Full_BIT,
-+};
-+
-+static const u32 ice_adv_lnk_speed_25000[] __initconst = {
-+	ETHTOOL_LINK_MODE_25000baseCR_Full_BIT,
-+	ETHTOOL_LINK_MODE_25000baseSR_Full_BIT,
-+	ETHTOOL_LINK_MODE_25000baseKR_Full_BIT,
-+};
-+
-+static const u32 ice_adv_lnk_speed_40000[] __initconst = {
-+	ETHTOOL_LINK_MODE_40000baseCR4_Full_BIT,
-+	ETHTOOL_LINK_MODE_40000baseSR4_Full_BIT,
-+	ETHTOOL_LINK_MODE_40000baseLR4_Full_BIT,
-+	ETHTOOL_LINK_MODE_40000baseKR4_Full_BIT,
-+};
-+
-+static const u32 ice_adv_lnk_speed_50000[] __initconst = {
-+	ETHTOOL_LINK_MODE_50000baseCR2_Full_BIT,
-+	ETHTOOL_LINK_MODE_50000baseKR2_Full_BIT,
-+	ETHTOOL_LINK_MODE_50000baseSR2_Full_BIT,
-+};
-+
-+static const u32 ice_adv_lnk_speed_100000[] __initconst = {
-+	ETHTOOL_LINK_MODE_100000baseCR4_Full_BIT,
-+	ETHTOOL_LINK_MODE_100000baseSR4_Full_BIT,
-+	ETHTOOL_LINK_MODE_100000baseLR4_ER4_Full_BIT,
-+	ETHTOOL_LINK_MODE_100000baseKR4_Full_BIT,
-+	ETHTOOL_LINK_MODE_100000baseCR2_Full_BIT,
-+	ETHTOOL_LINK_MODE_100000baseSR2_Full_BIT,
-+	ETHTOOL_LINK_MODE_100000baseKR2_Full_BIT,
-+};
-+
-+#define ICE_ADV_LNK_SPEED_MAP(value)					\
-+{									\
-+	.speed		= SPEED_##value,				\
-+	.cap_arr	= ice_adv_lnk_speed_##value,			\
-+	.arr_size	= ARRAY_SIZE(ice_adv_lnk_speed_##value),	\
-+}
-+
-+static struct ethtool_forced_speed_map ice_adv_lnk_speed_maps[] __ro_after_init = {
-+	ICE_ADV_LNK_SPEED_MAP(100),
-+	ICE_ADV_LNK_SPEED_MAP(1000),
-+	ICE_ADV_LNK_SPEED_MAP(2500),
-+	ICE_ADV_LNK_SPEED_MAP(5000),
-+	ICE_ADV_LNK_SPEED_MAP(10000),
-+	ICE_ADV_LNK_SPEED_MAP(25000),
-+	ICE_ADV_LNK_SPEED_MAP(40000),
-+	ICE_ADV_LNK_SPEED_MAP(50000),
-+	ICE_ADV_LNK_SPEED_MAP(100000),
-+};
-+
-+void __init ice_adv_lnk_speed_maps_init(void)
-+{
-+	ethtool_forced_speed_maps_init(ice_adv_lnk_speed_maps,
-+				       ARRAY_SIZE(ice_adv_lnk_speed_maps));
-+}
-+
- static void
- __ice_get_drvinfo(struct net_device *netdev, struct ethtool_drvinfo *drvinfo,
- 		  struct ice_vsi *vsi)
-@@ -2007,6 +2087,55 @@ ice_get_link_ksettings(struct net_device *netdev,
- 	return err;
- }
- 
-+/**
-+ * ice_speed_to_aq_link - Get AQ link speed by Ethtool forced speed
-+ * @speed: ethtool forced speed
-+ */
-+static u16 ice_speed_to_aq_link(int speed)
-+{
-+	int aq_speed;
-+
-+	switch (speed) {
-+	case SPEED_10:
-+		aq_speed = ICE_AQ_LINK_SPEED_10MB;
-+		break;
-+	case SPEED_100:
-+		aq_speed = ICE_AQ_LINK_SPEED_100MB;
-+		break;
-+	case SPEED_1000:
-+		aq_speed = ICE_AQ_LINK_SPEED_1000MB;
-+		break;
-+	case SPEED_2500:
-+		aq_speed = ICE_AQ_LINK_SPEED_2500MB;
-+		break;
-+	case SPEED_5000:
-+		aq_speed = ICE_AQ_LINK_SPEED_5GB;
-+		break;
-+	case SPEED_10000:
-+		aq_speed = ICE_AQ_LINK_SPEED_10GB;
-+		break;
-+	case SPEED_20000:
-+		aq_speed = ICE_AQ_LINK_SPEED_20GB;
-+		break;
-+	case SPEED_25000:
-+		aq_speed = ICE_AQ_LINK_SPEED_25GB;
-+		break;
-+	case SPEED_40000:
-+		aq_speed = ICE_AQ_LINK_SPEED_40GB;
-+		break;
-+	case SPEED_50000:
-+		aq_speed = ICE_AQ_LINK_SPEED_50GB;
-+		break;
-+	case SPEED_100000:
-+		aq_speed = ICE_AQ_LINK_SPEED_100GB;
-+		break;
-+	default:
-+	       aq_speed = ICE_AQ_LINK_SPEED_UNKNOWN;
-+		break;
-+	}
-+	return aq_speed;
-+}
-+
- /**
-  * ice_ksettings_find_adv_link_speed - Find advertising link speed
-  * @ks: ethtool ksettings
-@@ -2014,73 +2143,14 @@ ice_get_link_ksettings(struct net_device *netdev,
- static u16
- ice_ksettings_find_adv_link_speed(const struct ethtool_link_ksettings *ks)
- {
-+	const struct ethtool_forced_speed_map *map;
- 	u16 adv_link_speed = 0;
- 
--	if (ethtool_link_ksettings_test_link_mode(ks, advertising,
--						  100baseT_Full))
--		adv_link_speed |= ICE_AQ_LINK_SPEED_100MB;
--	if (ethtool_link_ksettings_test_link_mode(ks, advertising,
--						  1000baseX_Full) ||
--	    ethtool_link_ksettings_test_link_mode(ks, advertising,
--						  1000baseT_Full) ||
--	    ethtool_link_ksettings_test_link_mode(ks, advertising,
--						  1000baseKX_Full))
--		adv_link_speed |= ICE_AQ_LINK_SPEED_1000MB;
--	if (ethtool_link_ksettings_test_link_mode(ks, advertising,
--						  2500baseT_Full) ||
--	    ethtool_link_ksettings_test_link_mode(ks, advertising,
--						  2500baseX_Full))
--		adv_link_speed |= ICE_AQ_LINK_SPEED_2500MB;
--	if (ethtool_link_ksettings_test_link_mode(ks, advertising,
--						  5000baseT_Full))
--		adv_link_speed |= ICE_AQ_LINK_SPEED_5GB;
--	if (ethtool_link_ksettings_test_link_mode(ks, advertising,
--						  10000baseT_Full) ||
--	    ethtool_link_ksettings_test_link_mode(ks, advertising,
--						  10000baseKR_Full) ||
--	    ethtool_link_ksettings_test_link_mode(ks, advertising,
--						  10000baseSR_Full) ||
--	    ethtool_link_ksettings_test_link_mode(ks, advertising,
--						  10000baseLR_Full))
--		adv_link_speed |= ICE_AQ_LINK_SPEED_10GB;
--	if (ethtool_link_ksettings_test_link_mode(ks, advertising,
--						  25000baseCR_Full) ||
--	    ethtool_link_ksettings_test_link_mode(ks, advertising,
--						  25000baseSR_Full) ||
--	    ethtool_link_ksettings_test_link_mode(ks, advertising,
--						  25000baseKR_Full))
--		adv_link_speed |= ICE_AQ_LINK_SPEED_25GB;
--	if (ethtool_link_ksettings_test_link_mode(ks, advertising,
--						  40000baseCR4_Full) ||
--	    ethtool_link_ksettings_test_link_mode(ks, advertising,
--						  40000baseSR4_Full) ||
--	    ethtool_link_ksettings_test_link_mode(ks, advertising,
--						  40000baseLR4_Full) ||
--	    ethtool_link_ksettings_test_link_mode(ks, advertising,
--						  40000baseKR4_Full))
--		adv_link_speed |= ICE_AQ_LINK_SPEED_40GB;
--	if (ethtool_link_ksettings_test_link_mode(ks, advertising,
--						  50000baseCR2_Full) ||
--	    ethtool_link_ksettings_test_link_mode(ks, advertising,
--						  50000baseKR2_Full) ||
--	    ethtool_link_ksettings_test_link_mode(ks, advertising,
--						  50000baseSR2_Full))
--		adv_link_speed |= ICE_AQ_LINK_SPEED_50GB;
--	if (ethtool_link_ksettings_test_link_mode(ks, advertising,
--						  100000baseCR4_Full) ||
--	    ethtool_link_ksettings_test_link_mode(ks, advertising,
--						  100000baseSR4_Full) ||
--	    ethtool_link_ksettings_test_link_mode(ks, advertising,
--						  100000baseLR4_ER4_Full) ||
--	    ethtool_link_ksettings_test_link_mode(ks, advertising,
--						  100000baseKR4_Full) ||
--	    ethtool_link_ksettings_test_link_mode(ks, advertising,
--						  100000baseCR2_Full) ||
--	    ethtool_link_ksettings_test_link_mode(ks, advertising,
--						  100000baseSR2_Full) ||
--	    ethtool_link_ksettings_test_link_mode(ks, advertising,
--						  100000baseKR2_Full))
--		adv_link_speed |= ICE_AQ_LINK_SPEED_100GB;
-+	for (u32 i = 0; i < ARRAY_SIZE(ice_adv_lnk_speed_maps); i++) {
-+		map = ice_adv_lnk_speed_maps + i;
-+		if (linkmode_intersects(ks->link_modes.advertising, map->caps))
-+			adv_link_speed |= ice_speed_to_aq_link(map->speed);
-+	}
- 
- 	return adv_link_speed;
- }
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index c8286adae946..04047f869a99 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -5627,6 +5627,8 @@ static int __init ice_module_init(void)
- 	pr_info("%s\n", ice_driver_string);
- 	pr_info("%s\n", ice_copyright);
- 
-+	ice_adv_lnk_speed_maps_init();
-+
- 	ice_wq = alloc_workqueue("%s", 0, 0, KBUILD_MODNAME);
- 	if (!ice_wq) {
- 		pr_err("Failed to create workqueue\n");
--- 
-2.37.3
+ For now these information are all from userland,So here the page will
+be maintained by the userland App
+in the previous code we only saved the api-version by uAPI .  if  we
+need to support reconnection maybe we need to add 2 new uAPI for this,
+one of the uAPI is to save the reconnect  information and another is
+to get the information
+
+maybe something like
+
+struct vhost_reconnect_data {
+uint32_t version;
+uint64_t features;
+uint8_t status;
+struct virtio_net_config config;
+uint32_t nr_vrings;
+};
+
+#define VDUSE_GET_RECONNECT_INFO _IOR (VDUSE_BASE, 0x1c, struct
+vhost_reconnect_data)
+
+#define VDUSE_SET_RECONNECT_INFO  _IOWR(VDUSE_BASE, 0x1d, struct
+vhost_reconnect_data)
+
+Thanks
+Cindy
+
+
+
+
+> > +
+> > +#define VDUSE_GET_RECONNECT_INFO \
+> > +       _IOWR(VDUSE_BASE, 0x1b, struct vduse_reconnect_mmap_info)
+> > +
+> >  #endif /* _UAPI_VDUSE_H_ */
+> > --
+> > 2.34.3
+> >
+>
 
 
