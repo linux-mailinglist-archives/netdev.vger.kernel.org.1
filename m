@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-35367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20D827A912A
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 05:15:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D5C627A912D
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 05:15:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE5161C208C4
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 03:15:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D50511C20843
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 03:15:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47A5717D9;
-	Thu, 21 Sep 2023 03:14:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60C521843;
+	Thu, 21 Sep 2023 03:14:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4FC11845
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 03:14:30 +0000 (UTC)
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FD29F4
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 20:14:28 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-69002ef0104so353816b3a.1
-        for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 20:14:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A75A20FE
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 03:14:34 +0000 (UTC)
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEA0DED
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 20:14:32 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-690b7cb71aeso291461b3a.0
+        for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 20:14:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695266067; x=1695870867; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1695266071; x=1695870871; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VhTEm5+a18oUUkUxQB97Kv5HfRcqcJmruHfG+xCNqc8=;
-        b=My7qnsMwYkdXa0OXbOGZjZuPlAcmeZaTG/YqOHujKfU6wFJoP0HTJ5R4hW8YPrVOB4
-         0P3kQ2UqQvFka2pWu63djV83R2gimTRg6cE/PvODT0O9+GOwVTlX4qlVuWAn0nq9mz/6
-         oPdVH7X++4baAuJDijMLSAu+72gI6yerA1QERREIbvcdFnSa3QQujoDB+AgwUBEiCUui
-         DCKQ5UmydH+MyS/AOdWJ1etBiuKspjdDWfBuuj97OWDUW+saENRDqxkZW4lT3BzPOg8q
-         WZkKNoTotiJuVomp+Wv+N64qNW78gUXwrBsqIsk3HoHjIFHNdDml+BKuSHgV/8otpoap
-         kA8A==
+        bh=IyRu9ZFQ6bf2X/vqxHPZ5XhAAvrYOzQr3LtH33jTLEI=;
+        b=dU9P+aG48VIaj2BFfkRlwvhbiUTBpl2ZM8uQoMqOXbj/hF3CxQJQRGl4LXTXhsY5Yr
+         +d7TCeMukGlq7RVOxRMsXY0X3C4Y6BUIt/IZBVgZgGFWRidjDDY8wfcE3Bo3RAMgVDnQ
+         uMrRuFZrr6QADyGsqF+9Wfbo+siTsTNuQpHE1xc4vYeGn5dJFl0EQiRNSaUY2FnSooKw
+         +gSAjVvEAwhiz8DEYaQGocxFKo/NBRMik0pe3KnCi4nFXS3noJNL03TkOiAzU2WSHMsr
+         uD7hWom6xBVXpFdDaxF12GblHKGRD+1eXEZbHlwzRMQAW1HM0rTZXrJ1orCBY66Pyzxl
+         hO1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695266067; x=1695870867;
+        d=1e100.net; s=20230601; t=1695266071; x=1695870871;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=VhTEm5+a18oUUkUxQB97Kv5HfRcqcJmruHfG+xCNqc8=;
-        b=rIL/MaVQ8WpZNBhwi+9nqrN5bNw10YSkgJW49pfiP0zAs7A7QW34QWRJaTRP/ktcVF
-         YkgZREjDEpG9X6l6G/skifDPZxDh0LcnUL37qAtFww0qJSCqzDxijMLVmqP532XGRMPY
-         UHXQ7MZzrLCpzc5T9/r1ixwkPFJEl/KvIRu74w2CVMZZgrNDJC3xjQalp0B2IpLT4Mii
-         z5oGZDHY8CjSE1sdFWLRR2voYyGLjNsbVsf2bqmCJVydJ6ZDh/UQ9NvXKY2B6W40YJHU
-         1xxD7M8J7q6bHjbGTijj3GLQvjhDMWqKyZS2m4ZuJqOIX7ASmV9A2cJrHMvk3KxEoxAq
-         k15g==
-X-Gm-Message-State: AOJu0Yw5Lj1++KZEqBr9x7+AOfA0ffj7vHBcogpUFufqDurjsWwxO4Ij
-	ZhRJZ/mF59thh/8kIO8/phOFSpONH3jswHjm
-X-Google-Smtp-Source: AGHT+IEwb+gnSGOd2YXmrMB2V9odRSHYwOpTu3AqKtlqUtkMFy/AEEDYxoxA1yaTpBtmUD5fkHnrSw==
-X-Received: by 2002:a05:6a00:847:b0:68a:69ba:6791 with SMTP id q7-20020a056a00084700b0068a69ba6791mr4926254pfk.8.1695266066926;
-        Wed, 20 Sep 2023 20:14:26 -0700 (PDT)
+        bh=IyRu9ZFQ6bf2X/vqxHPZ5XhAAvrYOzQr3LtH33jTLEI=;
+        b=L0Jv6xjzDogFpPIoBSh1BuzierLUz2M1PM44h02fzKlr2hO4k9PmLAm5dW8I1LVHNZ
+         RnwjxXS9JHEG7JuQNzJY14zSu6jkWKRev638WKmZ123jxTzvOxRgVbYYni4hGnJxafdP
+         XKW/j9IR9DO/DTP88k9TyJIu0k4wFPUFcWv3+5nUp81phxga8ykkCe7p8+tKgCR1dlzl
+         fNn34FfVZ0DiBXU0iL+sMCKadqsP8i/IJ3LjO5MK6ny1nhjwxOcCzeeg0VJ9qAjJuWus
+         R87ZXXzrCilF3LBDg91LOzR3tobUY4BP7Vr7Vxs6aVOeWR/niyN3aIQzKEVPpmBsV2Pg
+         ngMA==
+X-Gm-Message-State: AOJu0Yy7DRwHg7aFhCMKb4AnZu0egCcxoUjk1rJANtR8moBjU2DcUshV
+	fd35iyub8bGbkKgf7NXxTZOLz9bDJ01hR66v
+X-Google-Smtp-Source: AGHT+IEvO7dJxaBqfT/4NYhSea9qvtXK62Z6RIHCfPLQlcWWHJkx7oeJqDSHbmzBq8TInZbBFMzIuw==
+X-Received: by 2002:a05:6a00:16d0:b0:690:fd48:1aa4 with SMTP id l16-20020a056a0016d000b00690fd481aa4mr3595826pfc.0.1695266071049;
+        Wed, 20 Sep 2023 20:14:31 -0700 (PDT)
 Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id bg2-20020a056a001f8200b0068fe76cdc62sm236032pfb.93.2023.09.20.20.14.22
+        by smtp.gmail.com with ESMTPSA id bg2-20020a056a001f8200b0068fe76cdc62sm236032pfb.93.2023.09.20.20.14.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Sep 2023 20:14:25 -0700 (PDT)
+        Wed, 20 Sep 2023 20:14:29 -0700 (PDT)
 From: Hangbin Liu <liuhangbin@gmail.com>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -68,11 +68,10 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Stephen Hemminger <stephen@networkplumber.org>,
 	Eric Dumazet <edumazet@google.com>,
 	Nicolas Dichtel <nicolas.dichtel@6wind.com>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Ido Schimmel <idosch@idosch.org>
-Subject: [PATCHv3 net 1/2] fib: convert fib_nh_is_v6 and nh_updated to use a single bit
-Date: Thu, 21 Sep 2023 11:14:08 +0800
-Message-ID: <20230921031409.514488-2-liuhangbin@gmail.com>
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCHv3 net 2/2] ipv4/fib: send notify when delete source address routes
+Date: Thu, 21 Sep 2023 11:14:09 +0800
+Message-ID: <20230921031409.514488-3-liuhangbin@gmail.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230921031409.514488-1-liuhangbin@gmail.com>
 References: <20230921031409.514488-1-liuhangbin@gmail.com>
@@ -90,89 +89,106 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The FIB info structure currently looks like this:
-struct fib_info {
-        struct hlist_node          fib_hash;             /*     0    16 */
-        [...]
-        u32                        fib_priority;         /*    80     4 */
+After deleting an interface address in fib_del_ifaddr(), the function
+scans the fib_info list for stray entries and calls fib_flush() and
+fib_table_flush(). Then the stray entries will be deleted silently and no
+RTM_DELROUTE notification will be sent.
 
-        /* XXX 4 bytes hole, try to pack */
+This lack of notification can make routing daemons, or monitor like
+`ip monitor route` miss the routing changes. e.g.
 
-        struct dst_metrics *       fib_metrics;          /*    88     8 */
-        int                        fib_nhs;              /*    96     4 */
-        bool                       fib_nh_is_v6;         /*   100     1 */
-        bool                       nh_updated;           /*   101     1 */
++ ip link add dummy1 type dummy
++ ip link add dummy2 type dummy
++ ip link set dummy1 up
++ ip link set dummy2 up
++ ip addr add 192.168.5.5/24 dev dummy1
++ ip route add 7.7.7.0/24 dev dummy2 src 192.168.5.5
++ ip -4 route
+7.7.7.0/24 dev dummy2 scope link src 192.168.5.5
+192.168.5.0/24 dev dummy1 proto kernel scope link src 192.168.5.5
++ ip monitor route
++ ip addr del 192.168.5.5/24 dev dummy1
+Deleted 192.168.5.0/24 dev dummy1 proto kernel scope link src 192.168.5.5
+Deleted broadcast 192.168.5.255 dev dummy1 table local proto kernel scope link src 192.168.5.5
+Deleted local 192.168.5.5 dev dummy1 table local proto kernel scope host src 192.168.5.5
 
-        /* XXX 2 bytes hole, try to pack */
+As Ido reminded, fib_table_flush() isn't only called when an address is
+deleted, but also when an interface is deleted or put down. The lack of
+notification in these cases is deliberate. And commit 7c6bb7d2faaf
+("net/ipv6: Add knob to skip DELROUTE message on device down") introduced
+a sysctl to make IPv6 behave like IPv4 in this regard. So we can't send
+the route delete notify blindly in fib_table_flush().
 
-        struct nexthop *           nh;                   /*   104     8 */
-        struct callback_head       rcu __attribute__((__aligned__(8))); /*   112    16 */
-        /* --- cacheline 2 boundary (128 bytes) --- */
-        struct fib_nh              fib_nh[];             /*   128     0 */
+To fix this issue, let's add a new bit in "struct fib_info" to track the
+deleted prefer source address routes, and only send notify for them.
 
-        /* size: 128, cachelines: 2, members: 21 */
-        /* sum members: 122, holes: 2, sum holes: 6 */
-        /* forced alignments: 1 */
-} __attribute__((__aligned__(8)));
+After update:
++ ip monitor route
++ ip addr del 192.168.5.5/24 dev dummy1
+Deleted 192.168.5.0/24 dev dummy1 proto kernel scope link src 192.168.5.5
+Deleted broadcast 192.168.5.255 dev dummy1 table local proto kernel scope link src 192.168.5.5
+Deleted local 192.168.5.5 dev dummy1 table local proto kernel scope host src 192.168.5.5
+Deleted 7.7.7.0/24 dev dummy2 scope link src 192.168.5.5
 
-Let's convert fib_nh_is_v6 and nh_updated to use a single bit, so that
-we can add other functional bits in later patch.
-
-Suggested-by: Ido Schimmel <idosch@idosch.org>
+Suggested-by: Thomas Haller <thaller@redhat.com>
 Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
- include/net/ip_fib.h     | 4 ++--
- net/ipv4/fib_semantics.c | 2 +-
- net/ipv4/nexthop.c       | 4 ++--
- 3 files changed, 5 insertions(+), 5 deletions(-)
+v3: update patch description
+v2: Add a bit in fib_info to mark the deleted src route.
+---
+ include/net/ip_fib.h     | 3 ++-
+ net/ipv4/fib_semantics.c | 1 +
+ net/ipv4/fib_trie.c      | 4 ++++
+ 3 files changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/include/net/ip_fib.h b/include/net/ip_fib.h
-index f0c13864180e..6d05469cf5da 100644
+index 6d05469cf5da..d7fc03c1d115 100644
 --- a/include/net/ip_fib.h
 +++ b/include/net/ip_fib.h
-@@ -152,8 +152,8 @@ struct fib_info {
- #define fib_rtt fib_metrics->metrics[RTAX_RTT-1]
+@@ -153,7 +153,8 @@ struct fib_info {
  #define fib_advmss fib_metrics->metrics[RTAX_ADVMSS-1]
  	int			fib_nhs;
--	bool			fib_nh_is_v6;
--	bool			nh_updated;
-+	u8			fib_nh_is_v6:1,
-+				nh_updated:1;
+ 	u8			fib_nh_is_v6:1,
+-				nh_updated:1;
++				nh_updated:1,
++				pfsrc_removed:1;
  	struct nexthop		*nh;
  	struct rcu_head		rcu;
  	struct fib_nh		fib_nh[];
 diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
-index eafa4a033515..b2858b0a1229 100644
+index b2858b0a1229..ced474d5584d 100644
 --- a/net/ipv4/fib_semantics.c
 +++ b/net/ipv4/fib_semantics.c
-@@ -1573,7 +1573,7 @@ struct fib_info *fib_create_info(struct fib_config *cfg,
- 			fib_info_update_nhc_saddr(net, &nexthop_nh->nh_common,
- 						  fi->fib_scope);
- 			if (nexthop_nh->fib_nh_gw_family == AF_INET6)
--				fi->fib_nh_is_v6 = true;
-+				fi->fib_nh_is_v6 = 1;
- 		} endfor_nexthops(fi)
- 
- 		fib_rebalance(fi);
-diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
-index bbff68b5b5d4..54ba53c89b3d 100644
---- a/net/ipv4/nexthop.c
-+++ b/net/ipv4/nexthop.c
-@@ -2213,12 +2213,12 @@ static void __nexthop_replace_notify(struct net *net, struct nexthop *nh,
- 		 * and then walk the fib tables once
- 		 */
- 		list_for_each_entry(fi, &nh->fi_list, nh_list)
--			fi->nh_updated = true;
-+			fi->nh_updated = 1;
- 
- 		fib_info_notify_update(net, info);
- 
- 		list_for_each_entry(fi, &nh->fi_list, nh_list)
--			fi->nh_updated = false;
-+			fi->nh_updated = 0;
+@@ -1887,6 +1887,7 @@ int fib_sync_down_addr(struct net_device *dev, __be32 local)
+ 			continue;
+ 		if (fi->fib_prefsrc == local) {
+ 			fi->fib_flags |= RTNH_F_DEAD;
++			fi->pfsrc_removed = 1;
+ 			ret++;
+ 		}
  	}
+diff --git a/net/ipv4/fib_trie.c b/net/ipv4/fib_trie.c
+index d13fb9e76b97..9bdfdab906fe 100644
+--- a/net/ipv4/fib_trie.c
++++ b/net/ipv4/fib_trie.c
+@@ -2027,6 +2027,7 @@ void fib_table_flush_external(struct fib_table *tb)
+ int fib_table_flush(struct net *net, struct fib_table *tb, bool flush_all)
+ {
+ 	struct trie *t = (struct trie *)tb->tb_data;
++	struct nl_info info = { .nl_net = net };
+ 	struct key_vector *pn = t->kv;
+ 	unsigned long cindex = 1;
+ 	struct hlist_node *tmp;
+@@ -2089,6 +2090,9 @@ int fib_table_flush(struct net *net, struct fib_table *tb, bool flush_all)
  
- 	list_for_each_entry(f6i, &nh->f6i_list, nh_list)
+ 			fib_notify_alias_delete(net, n->key, &n->leaf, fa,
+ 						NULL);
++			if (fi->pfsrc_removed)
++				rtmsg_fib(RTM_DELROUTE, htonl(n->key), fa,
++					  KEYLENGTH - fa->fa_slen, tb->tb_id, &info, 0);
+ 			hlist_del_rcu(&fa->fa_list);
+ 			fib_release_info(fa->fa_info);
+ 			alias_free_mem_rcu(fa);
 -- 
 2.41.0
 
