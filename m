@@ -1,192 +1,109 @@
-Return-Path: <netdev+bounces-35596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CC8E7A9E23
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:56:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCA187A9E22
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:56:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49265281DAD
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:56:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 670C9B20C67
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:56:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B837182CC;
-	Thu, 21 Sep 2023 19:56:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8385182CC;
+	Thu, 21 Sep 2023 19:56:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BC3318AF0
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 19:56:41 +0000 (UTC)
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76B62A48D
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 12:56:38 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1qjPmW-0000I3-Nv; Thu, 21 Sep 2023 21:56:12 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1qjPmS-00803P-Vj; Thu, 21 Sep 2023 21:56:09 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1qjPmS-003iAF-Jd; Thu, 21 Sep 2023 21:56:08 +0200
-Date: Thu, 21 Sep 2023 21:56:08 +0200
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To: Guenter Roeck <linux@roeck-us.net>
-Cc: Jisheng Zhang <jszhang@kernel.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-sunxi@lists.linux.dev
-Subject: Re: [PATCH net-next v5 2/2] net: stmmac: use per-queue 64 bit
- statistics where necessary
-Message-ID: <20230921195608.dlol2f6fifx6ahd6@pengutronix.de>
-References: <20230717160630.1892-1-jszhang@kernel.org>
- <20230717160630.1892-3-jszhang@kernel.org>
- <11fce633-4699-470f-a2f3-94b99b3e6da6@roeck-us.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93A861805D
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 19:56:35 +0000 (UTC)
+Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F83C5BB0
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 12:56:33 -0700 (PDT)
+Received: by mail-qt1-x82c.google.com with SMTP id d75a77b69052e-41761e9181eso3391cf.1
+        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 12:56:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695326192; x=1695930992; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ikz2a4N7UFzKRwtkzQFTTgRBMnXjiDyuZ2j1nEVvN04=;
+        b=qRqpxQ92QxL052ACclCyturK4JBotWGLpZzLDBtAsY1Zh0tQbFhSb8l5wRo0K7AMQ2
+         2BXHLQ63/C2BsUzCxRxpdOi/YPPAVP/wvhCfOdaPSR5ybh3iGGCLz+LVh7pXYICdSnCX
+         I3DasgmGLZYA6QEIdgKwTYB5+de0dr3lC/3He3kwXroSQOQ61HSA+K1LSgB/neVJg8lO
+         qYLutOTfIGiZzgFiCoha5PvgdV4A6jqSZ+No59vBDFxdXYFDjn3/9VWRhvD8bkVXlh2J
+         8qgKFbZ8VTwdZ2UPzWtueTgpf/fH33Z2g4RG288nzydYcfnvPTG8qqgxrRkU4iaOZEl7
+         BQyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695326192; x=1695930992;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ikz2a4N7UFzKRwtkzQFTTgRBMnXjiDyuZ2j1nEVvN04=;
+        b=pJ3DiVwJ+76OK3sBq4fncVQ0RETHI93r64JGaMenpMQQZQqhvsYaKRfCFuwybECumH
+         zKeIWzUNL5ijAAacN/bwnnKO1ZFwkhJ6+4udfKYPGs63XDTgkzHHIPzjm4xZXLf4DI2l
+         V4TR7IPz4KOXt0hZDiAYBqss4s/yel8v2vk81aq6NnP6Y6ACTg/HUku/hn+aCb1V4K5G
+         MU67uW4z9HCyvVwb3K0tmQ1Nb0c9bZKePLTNl2HNtV0bqKjPN9We2BVlSkbD04j7lSaB
+         zoj/oTg0/KzeaJxH9LnMCZ+XgYIHtIdNfZqgzltHvfyTREhkyfEqdEV3bFgzowiCYdSK
+         ZWCw==
+X-Gm-Message-State: AOJu0YzHV58ylftExFqn74BoXzok25kFymTPfMgypMY7zqUHwUP3NH8M
+	JpXfXT4uQVVcgLjgNpE8l8btWzPrDqUYAK7K9CrB2A==
+X-Google-Smtp-Source: AGHT+IFLDgkTFR2oj15zWX13oxgiotdHdt94RLVPz8ag0+nX/g2oqhVrGRGjlTMHLMWz0B9i3by6UkOxpe7JzHTD3B0=
+X-Received: by 2002:ac8:5b4a:0:b0:410:a4cb:9045 with SMTP id
+ n10-20020ac85b4a000000b00410a4cb9045mr8338qtw.18.1695326192082; Thu, 21 Sep
+ 2023 12:56:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="pnzxc5jwo3r4gi2f"
-Content-Disposition: inline
-In-Reply-To: <11fce633-4699-470f-a2f3-94b99b3e6da6@roeck-us.net>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+References: <20230921092713.1488792-1-edumazet@google.com> <121d8e5b-1471-6252-219b-6ec4abf872f0@kernel.org>
+In-Reply-To: <121d8e5b-1471-6252-219b-6ec4abf872f0@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 21 Sep 2023 21:56:20 +0200
+Message-ID: <CANn89iL0qUDk8j02zdMFVxof+a4kxFAdxDSe42Gmx405=V4=fA@mail.gmail.com>
+Subject: Re: [PATCH net] neighbour: fix data-races around n->output
+To: David Ahern <dsahern@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Thu, Sep 21, 2023 at 9:38=E2=80=AFPM David Ahern <dsahern@kernel.org> wr=
+ote:
+>
+> On 9/21/23 3:27 AM, Eric Dumazet wrote:
+> > n->output field can be read locklessly, while a writer
+> > might change the pointer concurrently.
+> >
+> > Add missing annotations to prevent load-store tearing.
+> >
+> > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > ---
+> >  include/net/neighbour.h         |  2 +-
+> >  net/bridge/br_netfilter_hooks.c |  2 +-
+> >  net/core/neighbour.c            | 10 +++++-----
+> >  3 files changed, 7 insertions(+), 7 deletions(-)
+> >
+>
+> Reviewed-by: David Ahern <dsahern@kernel.org>
+>
+>
+> WRITE_ONCE is needed for net/atm/clip.c
 
---pnzxc5jwo3r4gi2f
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Like other constructors (ipv4, ipv6), clip_constructor() is called on
+a not yet published object,
+no particular burier is needed.
 
-Hello Guenter,
-
-On Thu, Sep 21, 2023 at 11:34:09AM -0700, Guenter Roeck wrote:
-> On Tue, Jul 18, 2023 at 12:06:30AM +0800, Jisheng Zhang wrote:
-> > Currently, there are two major issues with stmmac driver statistics
-> > First of all, statistics in stmmac_extra_stats, stmmac_rxq_stats
-> > and stmmac_txq_stats are 32 bit variables on 32 bit platforms. This
-> > can cause some stats to overflow after several minutes of
-> > high traffic, for example rx_pkt_n, tx_pkt_n and so on.
-> >=20
-> > Secondly, if HW supports multiqueues, there are frequent cacheline
-> > ping pongs on some driver statistic vars, for example, normal_irq_n,
-> > tx_pkt_n and so on. What's more, frequent cacheline ping pongs on
-> > normal_irq_n happens in ISR, this makes the situation worse.
-> >=20
-> > To improve the driver, we convert those statistics to 64 bit, implement
-> > ndo_get_stats64 and update .get_ethtool_stats implementation
-> > accordingly. We also use per-queue statistics where necessary to remove
-> > the cacheline ping pongs as much as possible to make multiqueue
-> > operations faster. Those statistics which are not possible to overflow
-> > and not frequently updated are kept as is.
-> >=20
-> > Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
->=20
-> Your patch results in lockdep splats. This is with the orangepi-pc
-> emulation in qemu.
->=20
-> [   11.126950] dwmac-sun8i 1c30000.ethernet eth0: PHY [mdio_mux-0.1:01] d=
-river [Generic PHY] (irq=3DPOLL)
-> [   11.127912] dwmac-sun8i 1c30000.ethernet eth0: No Safety Features supp=
-ort found
-> [   11.128294] dwmac-sun8i 1c30000.ethernet eth0: No MAC Management Count=
-ers available
-> [   11.128511] dwmac-sun8i 1c30000.ethernet eth0: PTP not supported by HW
-> [   11.138990] dwmac-sun8i 1c30000.ethernet eth0: configuring for phy/mii=
- link mode
-> [   11.144387] INFO: trying to register non-static key.
-> [   11.144483] The code is fine but needs lockdep annotation, or maybe
-> [   11.144568] you didn't initialize this object before use?
-> [   11.144640] turning off the locking correctness validator.
-> [   11.144845] CPU: 2 PID: 688 Comm: ip Tainted: G                 N 6.6.=
-0-rc2 #1
-> [   11.144956] Hardware name: Allwinner sun8i Family
-> [   11.145137]  unwind_backtrace from show_stack+0x10/0x14
-> [   11.145610]  show_stack from dump_stack_lvl+0x68/0x90
-> [   11.145692]  dump_stack_lvl from register_lock_class+0x99c/0x9b0
-> [   11.145779]  register_lock_class from __lock_acquire+0x6c/0x2244
-> [   11.145861]  __lock_acquire from lock_acquire+0x11c/0x368
-> [   11.145938]  lock_acquire from stmmac_get_stats64+0x350/0x374
-> [   11.146021]  stmmac_get_stats64 from dev_get_stats+0x3c/0x160
-> [   11.146101]  dev_get_stats from rtnl_fill_stats+0x30/0x118
-> [   11.146179]  rtnl_fill_stats from rtnl_fill_ifinfo.constprop.0+0x82c/0=
-x1770
-> [   11.146273]  rtnl_fill_ifinfo.constprop.0 from rtmsg_ifinfo_build_skb+=
-0xac/0x138
-> [   11.146370]  rtmsg_ifinfo_build_skb from rtmsg_ifinfo+0x44/0x7c
-> [   11.146452]  rtmsg_ifinfo from __dev_notify_flags+0xac/0xd8
-> [   11.146531]  __dev_notify_flags from dev_change_flags+0x48/0x54
-> [   11.146612]  dev_change_flags from do_setlink+0x244/0xe6c
-> [   11.146689]  do_setlink from rtnl_newlink+0x514/0x838
-> [   11.146761]  rtnl_newlink from rtnetlink_rcv_msg+0x170/0x5b0
-> [   11.146841]  rtnetlink_rcv_msg from netlink_rcv_skb+0xb4/0x10c
-> [   11.146925]  netlink_rcv_skb from netlink_unicast+0x190/0x254
-> [   11.147006]  netlink_unicast from netlink_sendmsg+0x1dc/0x460
-> [   11.147086]  netlink_sendmsg from ____sys_sendmsg+0xa0/0x2a0
-> [   11.147168]  ____sys_sendmsg from ___sys_sendmsg+0x68/0x94
-> [   11.147245]  ___sys_sendmsg from sys_sendmsg+0x4c/0x88
-> [   11.147329]  sys_sendmsg from ret_fast_syscall+0x0/0x1c
-> [   11.147439] Exception stack(0xf23edfa8 to 0xf23edff0)
-> [   11.147558] dfa0:                   00000000 00000000 00000003 bef9a8d=
-8 00000000 00000000
-> [   11.147668] dfc0: 00000000 00000000 ffffffff 00000128 00000001 0000000=
-2 bef9af4a bef9af4d
-> [   11.147769] dfe0: bef9a868 bef9a858 b6f9ddac b6f9d228
-> [   11.150020] dwmac-sun8i 1c30000.ethernet eth0: Link is Up - 100Mbps/Fu=
-ll - flow control rx/tx
->=20
-> My apologies for the noise if this has already been reported.
-
-This seems to be the issue I reported earlier. So you might want to test
-the patch that fixed it for me:
-https://lore.kernel.org/netdev/20230917165328.3403-1-jszhang@kernel.org/
-
-Best regards
-Uwe
-
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
-
---pnzxc5jwo3r4gi2f
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmUMn9gACgkQj4D7WH0S
-/k7rUgf8Do4jrDAFY1lWHDffdvpiTZaBLWA4KR4avRZTYWxyJfadl2V2mMRtjCm0
-WQGg5FGLCVCtRGfQEkWaH8xUGxRbGoKBoE+b0LW6qT4QMCPnMBhuXjLdjcSUw2/U
-pw2YIGBLIadA2FiT8XdVf5Fcw7zXe02Or+ay7Fm3ZZZhgPCch3dWNlfKgICGSvu/
-QIitK/7a5CJN79vCBtDKtaHR8dd9K4DpbTSvrruFMfMaIlq65u6S/q5FhtAIA5gi
-SPIz51s7sljwAp9s/0fsEhPOh/13DyJHsc1T4efsGT9ARv3mTAsTC8Nlo34Eb3EI
-kcvjIOsje+QB67aM9ixc8dswHhCvQA==
-=TTJ7
------END PGP SIGNATURE-----
-
---pnzxc5jwo3r4gi2f--
+Thanks.
 
