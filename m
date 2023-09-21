@@ -1,140 +1,135 @@
-Return-Path: <netdev+bounces-35529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35542-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE48C7A9CC3
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:24:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 060007A9CB9
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:24:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EE230B24845
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:18:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1C33BB21E97
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:19:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 330254BDD1;
-	Thu, 21 Sep 2023 18:11:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BC004D905;
+	Thu, 21 Sep 2023 18:11:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BA0C43AAE;
-	Thu, 21 Sep 2023 18:11:17 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C313A1505;
-	Thu, 21 Sep 2023 10:57:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=CC2gkTGhITx2Tkn4hzBnyxcQlVD3H0K9p7hCx7iKc0I=; b=RX/Dh/JlHN7+Dr2mKIx1OHw08j
-	abawgMlrvxjDlsbIPFGzplofhq7VcEHhhGFZr5v8TUs2rmkpzNCwTdiU/ex1Izqw2rmGLteOf6T3b
-	rafTyBkIl6Vl7p+9BVOfWbBV6ztXErezBRlJ0k1UNn9OTHkTcAr7tQi0CZZ2getl6yCEM4qAHxcUF
-	0KrBEHNL0Z7sRA9uEwAO55WvgagpdOLapZsmOUsOq3ojQ/D5eDQ9JBA++gwR1mHYPfVN/hpVeI3CF
-	AADotTfqbGiEqrhzLlKFo3aGvIzijqZ5x69wIwORuvfZRHh61rlcTaxBdznV8HpM6ZdVxWJ73Kr2f
-	hqa/s60A==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56250)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qjJk4-0004de-0F;
-	Thu, 21 Sep 2023 14:29:16 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qjJjc-0003ZN-MP; Thu, 21 Sep 2023 14:28:48 +0100
-Date: Thu, 21 Sep 2023 14:28:48 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-Cc: Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
-	David E Box <david.e.box@linux.intel.com>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Mark Gross <markgross@kernel.org>,
-	Jose Abreu <Jose.Abreu@synopsys.com>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Jean Delvare <jdelvare@suse.com>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Wong Vee Khee <veekhee@apple.com>,
-	Jon Hunter <jonathanh@nvidia.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Revanth Kumar Uppala <ruppala@nvidia.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Andrey Konovalov <andrey.konovalov@linaro.org>,
-	Jochen Henneberg <jh@henneberg-systemdesign.com>,
-	David E Box <david.e.box@intel.com>,
-	Andrew Halaney <ahalaney@redhat.com>,
-	Simon Horman <simon.horman@corigine.com>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	platform-driver-x86@vger.kernel.org, linux-hwmon@vger.kernel.org,
-	bpf@vger.kernel.org, Voon Wei Feng <weifeng.voon@intel.com>,
-	Tan Tee Min <tee.min.tan@linux.intel.com>,
-	Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>,
-	Lai Peter Jun Ann <jun.ann.lai@intel.com>
-Subject: Re: [PATCH net-next v3 4/5] net: stmmac: enable Intel mGbE 1G/2.5G
- auto-negotiation support
-Message-ID: <ZQxFEChbKJtsGm2w@shell.armlinux.org.uk>
-References: <20230921121946.3025771-1-yong.liang.choong@linux.intel.com>
- <20230921121946.3025771-5-yong.liang.choong@linux.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45ACB4BDCE
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 18:11:28 +0000 (UTC)
+Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AE988FB02;
+	Thu, 21 Sep 2023 10:54:49 -0700 (PDT)
+Received: by mail-qk1-x72a.google.com with SMTP id af79cd13be357-77410032cedso39257585a.1;
+        Thu, 21 Sep 2023 10:54:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695318887; x=1695923687; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=U7cHkJ3V+tDc4JCHmCJHLHbSISI10y+DT6XLi9kEwS4=;
+        b=fL7cIJznkO+mFEABeCwVDCYoRmcoghK9hTEvs/y/IUAjwRWT1G46L++6D+eNVFjB9I
+         fVL0L0YFAfICtyLuwfqF1K69eWaU8ii4/JoTerdRki25+OfUzM9DBNd4UAJFGIgXo9oK
+         ePhy6U9Yr9/ZdUXCewi4gn27G7pLDf/TMGV3tSVvJ6wHvdZ/FMR8s3oHtIrsMAJe+uZf
+         BsDvco6N/JaNXzBmzqYI0W0u1RmipWtDoPZbqp68duqC/Ku6i5T8yKJmc20BABYcMh8Y
+         W3l0c+JeYYdIW0AwACPo2DJ3kmFtjHTioXgE7Zpb16VhZyfu0riHs5uit8NZckHkKVq2
+         QQHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695318887; x=1695923687;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=U7cHkJ3V+tDc4JCHmCJHLHbSISI10y+DT6XLi9kEwS4=;
+        b=BGqyzh8kVHdRkoSI5ngj0ujhubNbiTtmvsCZOw0SQ/xsw2znvMYwKJJ45yuo86kmj4
+         c3HfUwWRVD6GxPsJrs6i02BraMsviEBgATA2qjbo4xX4DIe9D3B2CvE5CKuXI1/qKn7c
+         wDINyRmZplrivNn0N1LTMUUU1ZZLaKIUbcMo6IyFEXmVolpBnU5BTt1E3AeZHSWbJlXM
+         Yj8Q8G90DPRb9z3IGCqXYorFbrROVEUW6MSVGj87O+lE7cOhmg3UUL4I1iIo2sa9xv1N
+         vb61X/s7xACTOBlX7musR2JOvnFDhgvM7KvSecp14kpXLfVDdYIC4EbBbeFTo0+GYNyM
+         WK5g==
+X-Gm-Message-State: AOJu0YwSg6nRh/Vu9n6Aqs6hp6m/yt262Jk3Tz29kJVoFMDJNcozcSxQ
+	OLP19vrPqusn71BsYM+6sFfShJxhLfm7/fvhR9vV5b+jQKMmKQ==
+X-Google-Smtp-Source: AGHT+IFXwd14O3Klb7T/qnAv3+NSV90XXQEhHJaUfO8KyLSBpmpiky7lagddf4rT9Zx3gjhlQ7XJQYRzOAOWrUcmtvY=
+X-Received: by 2002:a67:b913:0:b0:452:7715:ef96 with SMTP id
+ q19-20020a67b913000000b004527715ef96mr6430010vsn.21.1695303041349; Thu, 21
+ Sep 2023 06:30:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230921121946.3025771-5-yong.liang.choong@linux.intel.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+References: <20230919175323.144902-1-jrife@google.com> <650af4001eb7c_37ac7329443@willemb.c.googlers.com.notmuch>
+ <550df73160cd600f797823b86fde2c2b3526b133.camel@redhat.com>
+In-Reply-To: <550df73160cd600f797823b86fde2c2b3526b133.camel@redhat.com>
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Thu, 21 Sep 2023 09:30:05 -0400
+Message-ID: <CAF=yD-K3oLn++V_zJMjGRXdiPh2qi+Fit6uOh4z4HxuuyCOyog@mail.gmail.com>
+Subject: Re: [PATCH net v4 3/3] net: prevent address rewrite in kernel_bind()
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Jordan Rife <jrife@google.com>, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, netdev@vger.kernel.org, dborkman@kernel.org, 
+	philipp.reisner@linbit.com, lars.ellenberg@linbit.com, 
+	christoph.boehmwalder@linbit.com, axboe@kernel.dk, airlied@redhat.com, 
+	chengyou@linux.alibaba.com, kaishen@linux.alibaba.com, jgg@ziepe.ca, 
+	leon@kernel.org, bmt@zurich.ibm.com, isdn@linux-pingi.de, ccaulfie@redhat.com, 
+	teigland@redhat.com, mark@fasheh.com, jlbec@evilplan.org, 
+	joseph.qi@linux.alibaba.com, sfrench@samba.org, pc@manguebit.com, 
+	lsahlber@redhat.com, sprasad@microsoft.com, tom@talpey.com, 
+	horms@verge.net.au, ja@ssi.bg, pablo@netfilter.org, kadlec@netfilter.org, 
+	fw@strlen.de, santosh.shilimkar@oracle.com, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-0.5 required=5.0 tests=BAYES_00,DATE_IN_PAST_03_06,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Sep 21, 2023 at 08:19:45PM +0800, Choong Yong Liang wrote:
-> +#if IS_ENABLED(CONFIG_INTEL_PMC_IPC)
+On Thu, Sep 21, 2023 at 4:35=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> On Wed, 2023-09-20 at 09:30 -0400, Willem de Bruijn wrote:
+> > Jordan Rife wrote:
+> > > Similar to the change in commit 0bdf399342c5("net: Avoid address
+> > > overwrite in kernel_connect"), BPF hooks run on bind may rewrite the
+> > > address passed to kernel_bind(). This change
+> > >
+> > > 1) Makes a copy of the bind address in kernel_bind() to insulate
+> > >    callers.
+> > > 2) Replaces direct calls to sock->ops->bind() with kernel_bind()
+> > >
+> > > Link: https://lore.kernel.org/netdev/20230912013332.2048422-1-jrife@g=
+oogle.com/
+> > > Fixes: 4fbac77d2d09 ("bpf: Hooks for sys_bind")
+> > > Cc: stable@vger.kernel.org
+> > > Signed-off-by: Jordan Rife <jrife@google.com>
+> >
+> > Reviewed-by: Willem de Bruijn <willemb@google.com>
+>
+> I fear this is going to cause a few conflicts with other trees. We can
+> still take it, but at very least we will need some acks from the
+> relevant maintainers.
+>
+> I *think* it would be easier split this and patch 1/3 in individual
+> patches targeting the different trees, hopefully not many additional
+> patches will be required. What do you think?
 
-There shouldn't be any need to make this conditional.
+Roughly how many patches would result from this one patch. From the
+stat line I count { block/drbd, char/agp, infiniband, isdn, fs/dlm,
+fs/ocfs2, fs/smb, netfilter, rds }. That's worst case nine callers
+plus the core patch to net/socket.c?
 
-> +static int stmmac_mac_prepare(struct phylink_config *config, unsigned int mode,
-> +			      phy_interface_t interface)
-> +{
-> +	struct net_device *ndev = to_net_dev(config->dev);
-> +	struct stmmac_priv *priv = netdev_priv(ndev);
-> +	int ret = 0;
-> +
-> +	priv->plat->phy_interface = interface;
-> +
-> +	if (priv->plat->config_serdes)
-> +		ret = priv->plat->config_serdes(ndev, priv->plat->bsp_priv);
+If logistically simpler and you prefer the approach, we can also
+revisit Jordan's original approach, which embedded the memcpy inside
+the BPF branches.
 
-Please call this "phylink_mac_prepare" and pass the parameters that
-phylink passes you to this function, so we don't end up at a later
-date with people needing to extend this function to do other stuff,
-thus repeating mistakes from earlier.
+That has the slight benefit to in-kernel callers that it limits the
+cost of the memcpy to cgroup_bpf_enabled. But adds a superfluous
+second copy to the more common userspace callers, again at least only
+if cgroup_bpf_enabled.
 
-This is what has led to some very yucky code in all those
-"fix_mac_speed" implementations, with duplicated data in the BSPs
-to get the PHY mode and store it separately, etc.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+If so, it should at least move the whole logic around those BPF hooks
+into helper functions.
 
