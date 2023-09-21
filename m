@@ -1,167 +1,136 @@
-Return-Path: <netdev+bounces-35548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35569-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3097A7A9CA8
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:23:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4436C7A9B93
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:02:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59192284931
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:21:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D9DA71F21214
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:02:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FE33658AD;
-	Thu, 21 Sep 2023 18:34:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CF2218B14;
+	Thu, 21 Sep 2023 19:02:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 569A265886
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 18:34:23 +0000 (UTC)
-Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADAD6DC718;
-	Thu, 21 Sep 2023 11:34:12 -0700 (PDT)
-Received: by mail-il1-x12b.google.com with SMTP id e9e14a558f8ab-34fc96995ddso4109605ab.2;
-        Thu, 21 Sep 2023 11:34:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6EF8BEA
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 19:02:03 +0000 (UTC)
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FF5F7F37E
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 12:02:00 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d81841ef79bso1953506276.1
+        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 12:01:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695321252; x=1695926052; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5Xqa4yr7yrsXtE2ALcRd+e1TwnuQsGz/pquNeqyhBOM=;
-        b=hgfTXbX55QQSaYgVCgSvb77l8tQZysC8MV3eTWdBn4EmAJh7oo0DZk8VvKokGZK/2z
-         2xe6Rgekz5J5ujEJAYUKwbFMhCud5mJwlNG6e0MwrrpwcBMeNfz/KOaZjWVgpvR6swMC
-         HdPyUONRrr0SNJT2ok224lKfSY/yzEdhTNRaCrfuHKZqb03k6WtB91mExFw/DUBrQ98G
-         hnYG7pZsZO1E/c1n6PQEla/lfeKx6p3yofrM8dupMq0+p71QNlYaWTKN+U0Q1Vq65aEO
-         n4b7OmCpQLjrNJPbqX2Q44lv6Q4jA513n/hE3sPo9sODS/L8GbaSOjf3ufmjQb/QJY49
-         Srog==
+        d=google.com; s=20230601; t=1695322919; x=1695927719; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5idGDJHajfRBbMuSzPd4i5/t54vfHNdbr48RChRWzqM=;
+        b=2BooiXDRdGdVMAlVcBWQCNkTEkbZrHYrWY31LpUZEk3fc9eDkThZx1AwQUhKMDHkf5
+         UEyShVv3rLaiV+P0txfMCu8MFamgMEoSeykzTzRYfhJiK7l3FTwudW7TF2GY6cMIItPu
+         mapw67pjL/Xp6/6FZWKO4aDatRspS7w3PvHw5jx+fYJzj3jiq7O10CBFxYbRTpZvkvKO
+         C2UAyiwt4K87AE6oq/qeak2O6pgrFVjeVTPo7Sbv1PJyk5ia01xFsOHhPoGnk6TJRTWW
+         uj4QSq4wDmgUk9K61I2I/5B6GmcisxUc0apclpo1nVwVDm0qZVujLDa51jAfqqcswzI2
+         UNtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695321252; x=1695926052;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5Xqa4yr7yrsXtE2ALcRd+e1TwnuQsGz/pquNeqyhBOM=;
-        b=s+mu2vtuGpBLynqZnvI5pDfJx5PWVxFjIsUYlfuxSCUVfDOvvGAiF5a7kNVFeX7ddt
-         BqeB9UKWzPTrI3E1+9iuJUQg3McksrrYAzLxv25NHQqxcUCkIL0Qi9J0DpsCs4EOu431
-         umQkzXGMKB4i2cQgOwscw9bOa1PyYAtyZMJ3k9O/UgwS/7QCe9jXGli9cA1g4OQNWskK
-         T/3JSob/CWGOiKrV7HSJYnkWWBJofr0CHaafIE0jytI19dcaqgOhsnfK5fbuHsQqYv6Y
-         AKmTRz1TJ0xI5gI5tASz3h/x1hQYoEF9kh7ns3NA9EkJdHQgKlj76br3GzPwD3N5dldD
-         vFSA==
-X-Gm-Message-State: AOJu0Yw8TeF4jzslLFscYETA8ZeUsboRdWlGxutX6sJsttVPcoNg8F2b
-	kD3GghqJzhzo4G9y7Wzv+As=
-X-Google-Smtp-Source: AGHT+IF8jE2OC20tnm/t8jgynrtyfubCOpBW9F5WUr3ayImBT5J2BIGinpNhl9W5IfM+N5gFPP4yTA==
-X-Received: by 2002:a92:c26f:0:b0:350:f510:3990 with SMTP id h15-20020a92c26f000000b00350f5103990mr7704043ild.2.1695321252010;
-        Thu, 21 Sep 2023 11:34:12 -0700 (PDT)
-Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id fs11-20020a05663865cb00b004313f22611csm498677jab.151.2023.09.21.11.34.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Sep 2023 11:34:10 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Date: Thu, 21 Sep 2023 11:34:09 -0700
-From: Guenter Roeck <linux@roeck-us.net>
-To: Jisheng Zhang <jszhang@kernel.org>
-Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-sunxi@lists.linux.dev
-Subject: Re: [PATCH net-next v5 2/2] net: stmmac: use per-queue 64 bit
- statistics where necessary
-Message-ID: <11fce633-4699-470f-a2f3-94b99b3e6da6@roeck-us.net>
-References: <20230717160630.1892-1-jszhang@kernel.org>
- <20230717160630.1892-3-jszhang@kernel.org>
+        d=1e100.net; s=20230601; t=1695322919; x=1695927719;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5idGDJHajfRBbMuSzPd4i5/t54vfHNdbr48RChRWzqM=;
+        b=kPaa2lE08HVaA4gVVVCaEYgrAYP97g0+w94x4DhJtQzEk2tF0MC29056KnZfvN+B5j
+         I061r4B/cSvH6JLZIRoMXG1a97FXvhfWlbJdtwG6MVMUt91+upO6psoqY8jhZ5A3UWUu
+         /UaOw8arYUj1F7lgnYnavZbTN5ZVv5fMIr50vp89vcM5CYsPC1zKWEAa3MYVB2xBnZsz
+         vMzKeKcr1VOdxgBMoIj2NuQaY7kTUXbvrD7u7QZsTY6C57BtpoH/6oVECL1/uLA7DWtN
+         AxgXelYRpTxqyvpD4q6PSNW49HIKCHd0YdE64SaIWJB9Wa5cxExdgBs2Out5VuTxU6Xn
+         tkKQ==
+X-Gm-Message-State: AOJu0YyWLx7P2SkON5E7bdLMoUIhYyhTDGfcp38duMJAi/3/lKO8Q4bW
+	SXmgMt4YO1RuvncagLgO4glMlhkRDL9jnA==
+X-Google-Smtp-Source: AGHT+IGiWhkZQI2qsIIIWvhihaksfZHxJa3nw+xhY08FFXLOqY3cnBSLU1oGhU9kfs+YQ6I22pIVz3FchgxXQA==
+X-Received: from shakeelb.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:262e])
+ (user=shakeelb job=sendgmr) by 2002:a05:6902:a84:b0:d7b:94f5:1301 with SMTP
+ id cd4-20020a0569020a8400b00d7b94f51301mr93080ybb.9.1695322919028; Thu, 21
+ Sep 2023 12:01:59 -0700 (PDT)
+Date: Thu, 21 Sep 2023 19:01:56 +0000
+In-Reply-To: <20230920132545.56834-2-wuyun.abel@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230717160630.1892-3-jszhang@kernel.org>
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+References: <20230920132545.56834-1-wuyun.abel@bytedance.com> <20230920132545.56834-2-wuyun.abel@bytedance.com>
+Message-ID: <20230921190156.s4oygohw4hud42tx@google.com>
+Subject: Re: [PATCH net-next 2/2] sock: Fix improper heuristic on raising memory
+From: Shakeel Butt <shakeelb@google.com>
+To: Abel Wu <wuyun.abel@bytedance.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Breno Leitao <leitao@debian.org>, 
+	Alexander Mikhalitsyn <alexander@mihalicyn.com>, David Howells <dhowells@redhat.com>, 
+	Jason Xing <kernelxing@tencent.com>, Xin Long <lucien.xin@gmail.com>, 
+	Glauber Costa <glommer@parallels.com>, KAMEZAWA Hiroyuki <kamezawa.hiroyu@jp.fujtsu.com>, 
+	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
-
-On Tue, Jul 18, 2023 at 12:06:30AM +0800, Jisheng Zhang wrote:
-> Currently, there are two major issues with stmmac driver statistics
-> First of all, statistics in stmmac_extra_stats, stmmac_rxq_stats
-> and stmmac_txq_stats are 32 bit variables on 32 bit platforms. This
-> can cause some stats to overflow after several minutes of
-> high traffic, for example rx_pkt_n, tx_pkt_n and so on.
+On Wed, Sep 20, 2023 at 09:25:41PM +0800, Abel Wu wrote:
+> Before sockets became aware of net-memcg's memory pressure since
+> commit e1aab161e013 ("socket: initial cgroup code."), the memory
+> usage would be granted to raise if below average even when under
+> protocol's pressure. This provides fairness among the sockets of
+> same protocol.
 > 
-> Secondly, if HW supports multiqueues, there are frequent cacheline
-> ping pongs on some driver statistic vars, for example, normal_irq_n,
-> tx_pkt_n and so on. What's more, frequent cacheline ping pongs on
-> normal_irq_n happens in ISR, this makes the situation worse.
+> That commit changes this because the heuristic will also be
+> effective when only memcg is under pressure which makes no sense.
+> Fix this by skipping this heuristic when under memcg pressure.
 > 
-> To improve the driver, we convert those statistics to 64 bit, implement
-> ndo_get_stats64 and update .get_ethtool_stats implementation
-> accordingly. We also use per-queue statistics where necessary to remove
-> the cacheline ping pongs as much as possible to make multiqueue
-> operations faster. Those statistics which are not possible to overflow
-> and not frequently updated are kept as is.
+> Fixes: e1aab161e013 ("socket: initial cgroup code.")
+> Signed-off-by: Abel Wu <wuyun.abel@bytedance.com>
+> ---
+>  net/core/sock.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
 > 
-> Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index 379eb8b65562..ef5cf6250f17 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -3093,8 +3093,16 @@ int __sk_mem_raise_allocated(struct sock *sk, int size, int amt, int kind)
+>  	if (sk_has_memory_pressure(sk)) {
+>  		u64 alloc;
+>  
+> -		if (!sk_under_memory_pressure(sk))
+> +		if (memcg && mem_cgroup_under_socket_pressure(memcg))
+> +			goto suppress_allocation;
+> +
+> +		if (!sk_under_global_memory_pressure(sk))
+>  			return 1;
 
-Your patch results in lockdep splats. This is with the orangepi-pc
-emulation in qemu.
+I am onboard with replacing sk_under_memory_pressure() with
+sk_under_global_memory_pressure(). However suppressing on memcg pressure
+is a behavior change from status quo and need more thought and testing.
 
-[   11.126950] dwmac-sun8i 1c30000.ethernet eth0: PHY [mdio_mux-0.1:01] driver [Generic PHY] (irq=POLL)
-[   11.127912] dwmac-sun8i 1c30000.ethernet eth0: No Safety Features support found
-[   11.128294] dwmac-sun8i 1c30000.ethernet eth0: No MAC Management Counters available
-[   11.128511] dwmac-sun8i 1c30000.ethernet eth0: PTP not supported by HW
-[   11.138990] dwmac-sun8i 1c30000.ethernet eth0: configuring for phy/mii link mode
-[   11.144387] INFO: trying to register non-static key.
-[   11.144483] The code is fine but needs lockdep annotation, or maybe
-[   11.144568] you didn't initialize this object before use?
-[   11.144640] turning off the locking correctness validator.
-[   11.144845] CPU: 2 PID: 688 Comm: ip Tainted: G                 N 6.6.0-rc2 #1
-[   11.144956] Hardware name: Allwinner sun8i Family
-[   11.145137]  unwind_backtrace from show_stack+0x10/0x14
-[   11.145610]  show_stack from dump_stack_lvl+0x68/0x90
-[   11.145692]  dump_stack_lvl from register_lock_class+0x99c/0x9b0
-[   11.145779]  register_lock_class from __lock_acquire+0x6c/0x2244
-[   11.145861]  __lock_acquire from lock_acquire+0x11c/0x368
-[   11.145938]  lock_acquire from stmmac_get_stats64+0x350/0x374
-[   11.146021]  stmmac_get_stats64 from dev_get_stats+0x3c/0x160
-[   11.146101]  dev_get_stats from rtnl_fill_stats+0x30/0x118
-[   11.146179]  rtnl_fill_stats from rtnl_fill_ifinfo.constprop.0+0x82c/0x1770
-[   11.146273]  rtnl_fill_ifinfo.constprop.0 from rtmsg_ifinfo_build_skb+0xac/0x138
-[   11.146370]  rtmsg_ifinfo_build_skb from rtmsg_ifinfo+0x44/0x7c
-[   11.146452]  rtmsg_ifinfo from __dev_notify_flags+0xac/0xd8
-[   11.146531]  __dev_notify_flags from dev_change_flags+0x48/0x54
-[   11.146612]  dev_change_flags from do_setlink+0x244/0xe6c
-[   11.146689]  do_setlink from rtnl_newlink+0x514/0x838
-[   11.146761]  rtnl_newlink from rtnetlink_rcv_msg+0x170/0x5b0
-[   11.146841]  rtnetlink_rcv_msg from netlink_rcv_skb+0xb4/0x10c
-[   11.146925]  netlink_rcv_skb from netlink_unicast+0x190/0x254
-[   11.147006]  netlink_unicast from netlink_sendmsg+0x1dc/0x460
-[   11.147086]  netlink_sendmsg from ____sys_sendmsg+0xa0/0x2a0
-[   11.147168]  ____sys_sendmsg from ___sys_sendmsg+0x68/0x94
-[   11.147245]  ___sys_sendmsg from sys_sendmsg+0x4c/0x88
-[   11.147329]  sys_sendmsg from ret_fast_syscall+0x0/0x1c
-[   11.147439] Exception stack(0xf23edfa8 to 0xf23edff0)
-[   11.147558] dfa0:                   00000000 00000000 00000003 bef9a8d8 00000000 00000000
-[   11.147668] dfc0: 00000000 00000000 ffffffff 00000128 00000001 00000002 bef9af4a bef9af4d
-[   11.147769] dfe0: bef9a868 bef9a858 b6f9ddac b6f9d228
-[   11.150020] dwmac-sun8i 1c30000.ethernet eth0: Link is Up - 100Mbps/Full - flow control rx/tx
+I think there are three options for this hunk:
 
-My apologies for the noise if this has already been reported.
+1. proposed patch
+2. Consider memcg pressure only for !in_softirq().
+3. Don't consider memcg pressure at all.
 
-Guenter
+All three options are behavior change from the status quo but with
+different risk levels. (1) may reintroduce the regression fixed by
+720ca52bcef22 ("net-memcg: avoid stalls when under memory pressure").
+(2) is more inlined with 720ca52bcef22. (3) has the risk to making memcg
+limits ineffective.
+
+IMHO we should go with (2) as there is already a precedence in
+720ca52bcef22.
+
+thanks,
+Shakeel
 
