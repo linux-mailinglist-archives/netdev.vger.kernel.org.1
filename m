@@ -1,82 +1,100 @@
-Return-Path: <netdev+bounces-35429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D39237A979E
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:26:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3E277A98E3
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:56:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D6B31F21134
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 17:26:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B08EB1C21226
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 17:56:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99B151772A;
-	Thu, 21 Sep 2023 17:05:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD0E31DA4B;
+	Thu, 21 Sep 2023 17:22:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 280B2171C8
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 17:05:42 +0000 (UTC)
-Received: from out-225.mta0.migadu.com (out-225.mta0.migadu.com [IPv6:2001:41d0:1004:224b::e1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 978147ED4;
-	Thu, 21 Sep 2023 10:05:38 -0700 (PDT)
-Message-ID: <83d2d685-3c3e-1758-55f7-6c829957e51d@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1695307305;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 037B518C38
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 17:22:38 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C95D35491C
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:17:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1695316629;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=J4F2fUPcR6NfJ9mAonWAyFBxw+y/d1QPP6AzZ+x+r3A=;
-	b=FGYzkQEnCvr/opzfYOz86RJUtsE+p4cbQ1uePHwU1FuJipkFC8Zvor9BEatrhPYJyMQcai
-	d4Y/oA4rVKCyx5STvMJN6C1ggz1j9m2F0ta5DChEfkS0NFjs91q7vcke5jtw8OYBft0VBn
-	HdCPEkdKu4/74UtNrjyQDPSqIL6ITZA=
-Date: Thu, 21 Sep 2023 15:41:41 +0100
+	bh=oo4GNctLz8Shf19nIoryBMjQyKRYmeTybgYDXDbksM4=;
+	b=PwCzORY5We0QtRqIy4eR7RIK030z5MfL9ut7Zzu29SNKsKTBsXrDSKHu1w2NQxZODKM7/h
+	fHVE5yju/otgp5UT8gSvchbSgp0e0jst5lmCIDGkLz7RU+COQ2QIHxHSEDrj6CA/umsFNC
+	5XHPq7XhmhhX4eBsaob+r8T+zv64M/w=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-679-hp6VtaakNtupnp-MguiVZA-1; Thu, 21 Sep 2023 11:03:47 -0400
+X-MC-Unique: hp6VtaakNtupnp-MguiVZA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A7FF71C01EA3;
+	Thu, 21 Sep 2023 15:03:37 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.216])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A56CC40C200E;
+	Thu, 21 Sep 2023 15:03:29 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <87o7hvzn12.wl-tiwai@suse.de>
+References: <87o7hvzn12.wl-tiwai@suse.de> <20230920222231.686275-1-dhowells@redhat.com> <20230920222231.686275-2-dhowells@redhat.com>
+To: Takashi Iwai <tiwai@suse.de>
+Cc: dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
+    Al Viro <viro@zeniv.linux.org.uk>,
+    Linus Torvalds <torvalds@linux-foundation.org>,
+    Christoph Hellwig <hch@lst.de>,
+    Christian Brauner <christian@brauner.io>,
+    David Laight <David.Laight@ACULAB.COM>,
+    Matthew Wilcox <willy@infradead.org>,
+    Jeff Layton <jlayton@kernel.org>, linux-fsdevel@vger.kernel.org,
+    linux-block@vger.kernel.org, linux-mm@kvack.org,
+    netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+    Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+    Oswald Buddenhagen <oswald.buddenhagen@gmx.de>,
+    Suren Baghdasaryan <surenb@google.com>,
+    Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>,
+    alsa-devel@alsa-project.org
+Subject: Re: [PATCH v5 01/11] sound: Fix snd_pcm_readv()/writev() to use iov access functions
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next] netdev: Remove unneeded semicolon
-Content-Language: en-US
-To: Paolo Abeni <pabeni@redhat.com>, Yang Li <yang.lee@linux.alibaba.com>,
- arkadiusz.kubalewski@intel.com, jiri@resnulli.us
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Abaci Robot <abaci@linux.alibaba.com>
-References: <20230919010305.120991-1-yang.lee@linux.alibaba.com>
- <0ae9f426-7225-ac4b-4ecd-d53e36dbf365@linux.dev>
- <b638de8abaa2e468bbcda116368c8e690a461a5d.camel@redhat.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <b638de8abaa2e468bbcda116368c8e690a461a5d.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <809185.1695308608.1@warthog.procyon.org.uk>
+Date: Thu, 21 Sep 2023 16:03:28 +0100
+Message-ID: <809186.1695308608@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+X-Spam-Status: No, score=1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	RCVD_IN_SBL_CSS,SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no
+	version=3.4.6
+X-Spam-Level: *
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On 21/09/2023 14:07, Paolo Abeni wrote:
-> On Wed, 2023-09-20 at 12:10 +0100, Vadim Fedorenko wrote:
->> On 19/09/2023 02:03, Yang Li wrote:
->>> ./drivers/dpll/dpll_netlink.c:847:3-4: Unneeded semicolon
->>>
->>> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
->>> Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=6605
->>> Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
->>
->> Hi Yang!
->> There was a report from Intel's bot too about the issue, could you
->> please add the tags from it?
->>
->> Reported-by: kernel test robot <lkp@intel.com>
->> Closes:
->> https://lore.kernel.org/oe-kbuild-all/202309190540.RFwfIgO7-lkp@intel.com/
-> 
-> No need to repost, the pw tools import the above tags automatically. 
+Takashi Iwai <tiwai@suse.de> wrote:
 
-Ok, cool.
+> Would you apply it through your tree, or shall I apply this one via
+> sound git tree?
 
-The fix itself is trivial.
+It's a prerequisite for a later patch in this series, so I'd prefer to keep it
+with my other patches.
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+David
+
 
