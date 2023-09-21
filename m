@@ -1,183 +1,142 @@
-Return-Path: <netdev+bounces-35525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04F607A9CC0
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:24:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89D8C7A9C0C
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:05:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 41FC3B22097
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:17:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44C8D1C2011F
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:05:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 254CF4B22B;
-	Thu, 21 Sep 2023 18:11:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E719018C28;
+	Thu, 21 Sep 2023 18:53:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9B604B209
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 18:11:01 +0000 (UTC)
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AE97AC3E5;
-	Thu, 21 Sep 2023 11:01:51 -0700 (PDT)
-Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-31fe2c8db0dso1155065f8f.3;
-        Thu, 21 Sep 2023 11:01:51 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65BA412B69
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 18:53:27 +0000 (UTC)
+Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 199DE79602
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 11:53:15 -0700 (PDT)
+Received: by mail-il1-x12d.google.com with SMTP id e9e14a558f8ab-34fcc39fae1so18955ab.0
+        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 11:53:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695319310; x=1695924110; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=yFp64Aiq4OgTS6P/UmNQbVYb/YqY2yHQa/A83YIhmwM=;
-        b=gzu4JHUJCAZoyxDBUfFOp/tXzfXnkuo7TW74qDc4B2NA3NrDeMq64E3IaVY7KD5IpC
-         tvGQYdqTxhRxunChTTRQyDYQ2TPKqflyEKEH297kJg5YHf6oN50wTn/rlNFk/RBhR5Qh
-         Uh26Aj8rEyiq0xoSg5fqVUJUBeXh2nspxliTOSyZW7H3BkYR72VffNzU2RNtkMIgvnfr
-         8UH1vX9xTNnbWr20cQiHaG8YO/tHFOVG7dOEJSl8uy0yZ1E2ggrQWRWTnFgB0ir8Tn5O
-         Ci4dMjdxlGF0qkYiXBdJWte/8VU3X7NCQwkPa78rrFfG5lu7gGIHE4ECk5EPmEURy73R
-         xi7Q==
+        d=google.com; s=20230601; t=1695322394; x=1695927194; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mZhZTyGMIwZ/ie/LDnjolHR2PA5j6eoOnn74VlJviEM=;
+        b=MHYyaSZFDHxJdp+KNJa72USUNY4jSsVlN1zFOuDcDHbfhbOvl7Ed3OorsanXvud7AX
+         OlUCffcr/lk0BYL6+4f9ok0xeIPT5wyyi/6qtvtCuhtjwvkC02buiYaWWidzkHQIbFjM
+         682+p1OmHT+1buNLV3tBovrfaL8qa4cYsU8iHZUG4KsECHEIQ3wtfyiJZITsJMQ43uo2
+         CcvQNsgpQXWXeteuM8I1ahsyt2Hcf81pQUsO3fTmB4RmeUqqn5tPhLrN69/LQeiJEYn6
+         hmhCzOlRfn3q1lqHn46rgKEstKL+A8LNU8dzvmzmOuMLvXOFviLLJVw1rAPXB49H+tZr
+         +Ntg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695319310; x=1695924110;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yFp64Aiq4OgTS6P/UmNQbVYb/YqY2yHQa/A83YIhmwM=;
-        b=aHupiJ151nl1Y6CBWc4IStrhYcXTdQlVD9VPnSkL5fzOLZnhjTAuaEcFsBKJm6X2nE
-         0bQ+rI/XYzjzqsph24o5Z0fylvoQd/aVs+N/+B8Kx/rILUAZnIyrTgFMpKw/+2BD5qzA
-         56DGif7EQ6Hlb5sjbr1bzZIyT08ob+t74wOOAIGXjGq/hHlWQt7mT0V6qiek1f1P1c6l
-         WJm15FbBPLtba6sWpauC+vJAayVfhR0qsnVR+7CMMyxbL/e/sV9rYkJBp+0fcX2+WNPy
-         OypKaQu2Pf90f6PPpOyx8ptQgAwBbSTCN3kGGqzeSa6vAUV+/EN6fn43JrLnl1uAW+NO
-         YB4w==
-X-Gm-Message-State: AOJu0YzxSYTvtYXVD0tuHPH7wOqd05tzDVFX0CbYRXud8N1BVs743dw2
-	0RYWiterQ9xFIIHrWa9dqnd4oFB6BVPsMxxgvpU=
-X-Google-Smtp-Source: AGHT+IFCLYbFamU0osn8Cwpa3+RTV2OdXq4qe1ZCQ6bwJ2nYYTCjkS+YsPaiw021Wx7nOYXBW1/1qQ==
-X-Received: by 2002:a5d:4988:0:b0:319:7656:3863 with SMTP id r8-20020a5d4988000000b0031976563863mr4309058wrq.47.1695292895471;
-        Thu, 21 Sep 2023 03:41:35 -0700 (PDT)
-Received: from [10.148.84.122] (business-89-135-192-225.business.broadband.hu. [89.135.192.225])
-        by smtp.gmail.com with ESMTPSA id n5-20020a5d4005000000b0031c5dda3aedsm1386459wrp.95.2023.09.21.03.41.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Sep 2023 03:41:34 -0700 (PDT)
-Message-ID: <2eb9af65d098bb54ed54178d7269e7197d6de5a0.camel@gmail.com>
-Subject: Re: [RFC PATCH net-next 1/2] net: Use SMP threads for backlog NAPI.
-From: Ferenc Fejes <primalgamer@gmail.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Paolo Abeni
-	 <pabeni@redhat.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, "David S. Miller"
-	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	 <kuba@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner
-	 <tglx@linutronix.de>, Wander Lairson Costa <wander@redhat.com>
-Date: Thu, 21 Sep 2023 12:41:33 +0200
-In-Reply-To: <20230920155754.KzYGXMWh@linutronix.de>
-References: <20230814093528.117342-1-bigeasy@linutronix.de>
-	 <20230814093528.117342-2-bigeasy@linutronix.de>
-	 <0a842574fd0acc113ef925c48d2ad9e67aa0e101.camel@redhat.com>
-	 <20230920155754.KzYGXMWh@linutronix.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.0-1 
+        d=1e100.net; s=20230601; t=1695322394; x=1695927194;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mZhZTyGMIwZ/ie/LDnjolHR2PA5j6eoOnn74VlJviEM=;
+        b=BzRJefJdzN+0Y2s0T+6ViLNlKyrhlGOA/KjAq4vGdS0GpPzNI6tX6S62U6bgvwGiMB
+         C5vTrWpRHodGT9EzMpFx7hitAK15rar9jHIKC/bxipgWDW218WTwgRO8EPG3+Fc0fvHF
+         /a6/LCWqf00iJpurVho9WAJdqpsbJbACm3+H5giC8jjBLcj9fJ0xIFxTAVhqCHnFG9hF
+         Nyj59HU6xFkPf+0RT61EiXq7/6eSojGZeSJNRTGGH3/D6obZy75PvZxRRZ4VByhJKk6N
+         jhLrTInV12t7L3Hp8xqZ7q0qTRJ8y/Fk13FHCY3UbVP37+RUp/vxv/okFWz2ev4ll1ZF
+         4B4g==
+X-Gm-Message-State: AOJu0YyUw/nQT9PAa4Bvj7A2L8A4yxF5DhsHK02Q28R8JZZSlZK/xUl4
+	ds1MaiyO8i/ww/1xIwn0TsmKH7ibfBqIul25J4F7aYOAGkQyfa2ibYM=
+X-Google-Smtp-Source: AGHT+IFWIeurUPvjpL8vBL+NRQRjjve76EQFHIAx0HeE7Z69wb2lo8venh8x2KPWv7LuxH/KDV+UnqVPhre4/L2Akrw=
+X-Received: by 2002:ac8:5b11:0:b0:403:e1d1:8b63 with SMTP id
+ m17-20020ac85b11000000b00403e1d18b63mr211399qtw.24.1695294572440; Thu, 21 Sep
+ 2023 04:09:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+References: <730408.1695292879@warthog.procyon.org.uk>
+In-Reply-To: <730408.1695292879@warthog.procyon.org.uk>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 21 Sep 2023 13:09:21 +0200
+Message-ID: <CANn89i+wUq5R2nFO8eGLp7=8Y5OiJ0fwjR+ES74gk1X4k9r0rw@mail.gmail.com>
+Subject: Re: [PATCH net v3] ipv4, ipv6: Fix handling of transhdrlen in __ip{,6}_append_data()
+To: David Howells <dhowells@redhat.com>
+Cc: netdev@vger.kernel.org, 
+	syzbot+62cbf263225ae13ff153@syzkaller.appspotmail.com, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, 
+	bpf@vger.kernel.org, syzkaller-bugs@googlegroups.com, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-16.1 required=5.0 tests=BAYES_00,DATE_IN_PAST_06_12,
+	DKIMWL_WL_MED,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi!
+On Thu, Sep 21, 2023 at 12:41=E2=80=AFPM David Howells <dhowells@redhat.com=
+> wrote:
+>
+>
+> Including the transhdrlen in length is a problem when the packet is
+> partially filled (e.g. something like send(MSG_MORE) happened previously)
+> when appending to an IPv4 or IPv6 packet as we don't want to repeat the
+> transport header or account for it twice.  This can happen under some
+> circumstances, such as splicing into an L2TP socket.
+>
+> The symptom observed is a warning in __ip6_append_data():
+>
+>     WARNING: CPU: 1 PID: 5042 at net/ipv6/ip6_output.c:1800 __ip6_append_=
+data.isra.0+0x1be8/0x47f0 net/ipv6/ip6_output.c:1800
+>
+> that occurs when MSG_SPLICE_PAGES is used to append more data to an alrea=
+dy
+> partially occupied skbuff.  The warning occurs when 'copy' is larger than
+> the amount of data in the message iterator.  This is because the requeste=
+d
+> length includes the transport header length when it shouldn't.  This can =
+be
+> triggered by, for example:
+>
+>         sfd =3D socket(AF_INET6, SOCK_DGRAM, IPPROTO_L2TP);
+>         bind(sfd, ...); // ::1
+>         connect(sfd, ...); // ::1 port 7
+>         send(sfd, buffer, 4100, MSG_MORE);
+>         sendfile(sfd, dfd, NULL, 1024);
+>
+> Fix this by only adding transhdrlen into the length if the write queue is
+> empty in l2tp_ip6_sendmsg(), analogously to how UDP does things.
+>
+> l2tp_ip_sendmsg() looks like it won't suffer from this problem as it buil=
+ds
+> the UDP packet itself.
+>
+> Fixes: a32e0eec7042 ("l2tp: introduce L2TPv3 IP encapsulation support for=
+ IPv6")
+> Reported-by: syzbot+62cbf263225ae13ff153@syzkaller.appspotmail.com
+> Link: https://lore.kernel.org/r/0000000000001c12b30605378ce8@google.com/
+> Suggested-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Eric Dumazet <edumazet@google.com>
+> cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+> cc: "David S. Miller" <davem@davemloft.net>
+> cc: David Ahern <dsahern@kernel.org>
+> cc: Paolo Abeni <pabeni@redhat.com>
+> cc: Jakub Kicinski <kuba@kernel.org>
+> cc: netdev@vger.kernel.org
+> cc: bpf@vger.kernel.org
+> cc: syzkaller-bugs@googlegroups.com
+> ---
 
-On Wed, 2023-09-20 at 17:57 +0200, Sebastian Andrzej Siewior wrote:
-> On 2023-08-23 15:35:41 [+0200], Paolo Abeni wrote:
-> > On Mon, 2023-08-14 at 11:35 +0200, Sebastian Andrzej Siewior wrote:
-> > > @@ -4781,7 +4733,7 @@ static int enqueue_to_backlog(struct
-> > > sk_buff *skb, int cpu,
-> > > =C2=A0		 * We can use non atomic operation since we own
-> > > the queue lock
-> > > =C2=A0		 */
-> > > =C2=A0		if (!__test_and_set_bit(NAPI_STATE_SCHED, &sd-
-> > > >backlog.state))
-> > > -			napi_schedule_rps(sd);
-> > > +			__napi_schedule_irqoff(&sd->backlog);
-> > > =C2=A0		goto enqueue;
-> > > =C2=A0	}
-> > > =C2=A0	reason =3D SKB_DROP_REASON_CPU_BACKLOG;
-> >=20
-> > I *think* that the above could be quite dangerous when cpu =3D=3D
-> > smp_processor_id() - that is, with plain veth usage.
-> >=20
-> > Currently, each packet runs into the rx path just after
-> > enqueue_to_backlog()/tx completes.
-> >=20
-> > With this patch there will be a burst effect, where the backlog
-> > thread
-> > will run after a few (several) packets will be enqueued, when the
-> > process scheduler will decide - note that the current CPU is
-> > already
-> > hosting a running process, the tx thread.
-> >=20
-> > The above can cause packet drops (due to limited buffering) or very
-> > high latency (due to long burst), even in non overload situation,
-> > quite
-> > hard to debug.
-> >=20
-> > I think the above needs to be an opt-in, but I guess that even RT
-> > deployments doing some packet forwarding will not be happy with
-> > this
-> > on.
->=20
-> I've been looking at this again and have been thinking what you said
-> here. I think part of the problem is that we lack a policy/ mechanism
-> when a DoS is happening and what to do.
->=20
-> Before commit d15121be74856 ("Revert "softirq: Let ksoftirqd do its
-> job"") when a lot of network packets are processed then processing is
-> moved to ksoftirqd and continues based on how the scheduler schedules
-> the SCHED_OTHER ksoftirqd task. This avoids lock-ups of the system
-> and
-> it can do something else in between. Any interrupt will not continue
-> the
-> outstanding softirq backlog but wait for ksoftirqd. So it basically
-> avoids the networking overload. It throttles the throughput if
-> needed.
->=20
-> This isn't the case after that commit. Now, the CPU can be stuck with
-> processing networking packets if the packets come in fast enough.
-> Even
-> if ksoftirqd is woken up, the next interrupt (say the timer) will
-> continue with at least one round.
-> By using NAPI-threads it is possible to give the control back to the
-> scheduler which can throttle the NAPI processing in favour of other
-> threads that ask for CPU. As you pointed out, waking the thread does
-> not
-> guarantee that it will immediately do the NAPI work. It can be
-> delayed
-> based on current load on the system.
->=20
-> This could be influenced by assigning the NAPI-thread a SCHED_FIFO
-> priority. Based on the priority it could be ensured that the thread
-> starts right away or "later" if something else is more important.
-> However, this opens the DoS window again: The scheduler will put the
-> NAPI thread on CPU as long as it asks for it with no throttling.
->=20
-> If we could somehow define a DoS condition once we are overwhelmed
-> with
-> packets, then we could act on it and throttle it. This in turn would
-> allow a SCHED_FIFO priority without the fear of a lockup if the
-> system
-> is flooded with packets.
+Looks safer indeed, thanks to you and Willem !
 
-Can this be avoided if we reuse gro_flush_timeout as the maximum time
-the NAPI thread can be scheduled?
-
->=20
-> > Cheers,
-> >=20
-> > Paolo
->=20
-> Sebastian
-
-Ferenc
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
