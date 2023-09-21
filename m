@@ -1,217 +1,115 @@
-Return-Path: <netdev+bounces-35493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 127147A9C49
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:14:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 007257A9CB3
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:24:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD100282C26
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:14:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EA8FCB24568
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:18:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8396219BAA;
-	Thu, 21 Sep 2023 17:49:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2AE44B212;
+	Thu, 21 Sep 2023 18:11:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E4CB2943A
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 17:49:48 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4440C7E7F0
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:35:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1695317722;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZYjLYdC6bYqbx573ucWhNT5xpdkIsrp3gQR4k/ermH0=;
-	b=Ty0pOjiGYmhQZyKAZqO0BZHvI3jvCk8t46uxiR8KglhdweX9FhbrMrhH9jFeG2i20Z6QBx
-	ouVKeoK1ScOk72E10UQmGjolXd/rUnbEvNcgfGb6RcGdwVDiPOLVF4oLck2/Dg38Z1cdCW
-	EeS8YVvm1QbdqxJYuFy2srMY9j4sZCM=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-120-NQmmX4aSMUuWUJT4ySG9zA-1; Thu, 21 Sep 2023 03:04:12 -0400
-X-MC-Unique: NQmmX4aSMUuWUJT4ySG9zA-1
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-504319087d9so131446e87.1
-        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 00:04:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695279850; x=1695884650;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZYjLYdC6bYqbx573ucWhNT5xpdkIsrp3gQR4k/ermH0=;
-        b=D9+XxObeGJ9MtXtfGOQifUujDOqoRvndRNi6NAbhJCAJOzdqCQLiVmrU/4HLKGkyVE
-         c5DWmv6LlJ7deOevClPHArL54rtZSGUrevHc+MgioHSH8Soxub36mTzKpz4Yajty+I7N
-         8HKOFLmU257yM/vINtH9pvGGYnVIqWS8nhCnFFmaHHXoOT+ZRMKJvTwcIVMdU8GdbOb5
-         K44XER5si9fYoqyC/z/xOrwCvLWIPiHRDREGAEgJ83DOA9dd0L6qC1W9UvPulbK7M4Xy
-         14bud9WPOkoZ7QptC/YFejF+1VUmAD+1J6fZUXiy1T40Pxzqau+S0uKTGbssVmZ3j3Hu
-         8eCw==
-X-Gm-Message-State: AOJu0YxLfE+GDUCsRG2p2wXnumVj98QuMksp3yFS5dCpTkup7meQrtzl
-	7yYXnCX7tNIA5bny1KodQ3PF03pQHPSKJj7RKqRxAJxhAg+tj4B9dw+42eWqg1RNLl+uH00MuXr
-	4vHICKgZX2d/Q9y+wzbLj5k5a/nLZAweS/rX7zCzLsoe69Q==
-X-Received: by 2002:ac2:5b1d:0:b0:503:258f:fd15 with SMTP id v29-20020ac25b1d000000b00503258ffd15mr4261490lfn.20.1695279850552;
-        Thu, 21 Sep 2023 00:04:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFaRL9J24xhrUI+WEGVcfvlAUK7d91sBxB1lJhgep/7cEowKEj+hm9NK/We8OqBiMdsZQry//JoWzITfTumPYg=
-X-Received: by 2002:ac2:5b1d:0:b0:503:258f:fd15 with SMTP id
- v29-20020ac25b1d000000b00503258ffd15mr4261463lfn.20.1695279850095; Thu, 21
- Sep 2023 00:04:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 812484B205
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 18:11:03 +0000 (UTC)
+Received: from mail.avm.de (mail.avm.de [IPv6:2001:bf0:244:244::120])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E97F2A659B;
+	Thu, 21 Sep 2023 11:00:03 -0700 (PDT)
+Received: from mail-auth.avm.de (dovecot-mx-01.avm.de [212.42.244.71])
+	by mail.avm.de (Postfix) with ESMTPS;
+	Thu, 21 Sep 2023 09:23:46 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=avm.de; s=mail;
+	t=1695281026; bh=MGHRpPfMK3dwPqFHNJENwclFJsK7s432jc0AWt8qpKo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lMv+D89SeUIroDzj3vpDvYr7y3M0PoPLmr9tkOthBnQGSLo+hcx1XT9UFQM0hgSlH
+	 xHaAXKtsZeL6XEjJmPq0Q4wHjoS0ePKH/Wgj4XjyHyUqWm4LTZ6KyEeZ6ykYL7Hb2p
+	 9EHrhm5VgBl1R5uzbSvyn+aOT7kXqu9MTNT9n8oM=
+Received: from localhost (unknown [172.17.88.63])
+	by mail-auth.avm.de (Postfix) with ESMTPSA id E88A582147;
+	Thu, 21 Sep 2023 09:23:46 +0200 (CEST)
+Date: Thu, 21 Sep 2023 09:23:46 +0200
+From: Johannes Nixdorf <jnixdorf-oss@avm.de>
+To: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+	David Ahern <dsahern@gmail.com>, Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Ido Schimmel <idosch@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
+	Oleksij Rempel <linux@rempel-privat.de>,
+	Paolo Abeni <pabeni@redhat.com>, Roopa Prabhu <roopa@nvidia.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	bridge@lists.linux-foundation.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v4 2/6] net: bridge: Set strict_start_type for
+ br_policy
+Message-ID: <ZQvvgiz4rE8u6vba@u-jnixdorf.ads.avm.de>
+References: <20230919-fdb_limit-v4-0-39f0293807b8@avm.de>
+ <20230919-fdb_limit-v4-2-39f0293807b8@avm.de>
+ <1c12b8f2-b28b-f326-b24f-f1ea602832d7@blackwall.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230919074915.103110-1-hengqi@linux.alibaba.com> <20230919074915.103110-2-hengqi@linux.alibaba.com>
-In-Reply-To: <20230919074915.103110-2-hengqi@linux.alibaba.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 21 Sep 2023 15:03:58 +0800
-Message-ID: <CACGkMEudQDW4xvOqs0Nufx62hB-QFgO+u4DndS24vWmJkML=Mg@mail.gmail.com>
-Subject: Re: [PATCH net 1/6] virtio-net: initially change the value of tx-frames
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	"Michael S . Tsirkin" <mst@redhat.com>, "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1c12b8f2-b28b-f326-b24f-f1ea602832d7@blackwall.org>
+X-purgate-ID: 149429::1695281026-306BAD89-D1FD54B6/0/0
+X-purgate-type: clean
+X-purgate-size: 1728
+X-purgate-Ad: Categorized by eleven eXpurgate (R) http://www.eleven.de
+X-purgate: This mail is considered clean (visit http://www.eleven.de for further information)
+X-purgate: clean
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Sep 19, 2023 at 3:49=E2=80=AFPM Heng Qi <hengqi@linux.alibaba.com> =
-wrote:
->
-> Background:
-> 1. Commit 0c465be183c7 ("virtio_net: ethtool tx napi configuration") uses
->    tx-frames to toggle napi_tx (0 off and 1 on) if notification coalescin=
-g
->    is not supported.
-> 2. Commit 31c03aef9bc2 ("virtio_net: enable napi_tx by default") enables
->    napi_tx for all txqs by default.
->
-> Status:
-> When virtio-net supports notification coalescing, after initialization,
-> tx-frames is 0 and napi_tx is true.
->
-> Problem:
-> When the user only wants to set rx coalescing params using
->            ethtool -C eth0 rx-usecs 10, or
->            ethtool -Q eth0 queue_mask 0x1 -C rx-usecs 10,
-> these cmds will carry tx-frames as 0, causing the napi_tx switching condi=
-tion
-> is satisfied. Then the user gets:
->            netlink error: Device or resource busy.
->
-> The same happens when trying to set rx-frames, adaptive_rx, adaptive_tx..=
-.
->
-> Result:
+On Wed, Sep 20, 2023 at 01:46:02PM +0300, Nikolay Aleksandrov wrote:
+> On 9/19/23 11:12, Johannes Nixdorf wrote:
+> > Set any new attributes added to br_policy to be parsed strictly, to
+> > prevent userspace from passing garbage.
+> > 
+> > Signed-off-by: Johannes Nixdorf <jnixdorf-oss@avm.de>
+> > ---
+> >   net/bridge/br_netlink.c | 2 ++
+> >   1 file changed, 2 insertions(+)
+> > 
+> > diff --git a/net/bridge/br_netlink.c b/net/bridge/br_netlink.c
+> > index 10f0d33d8ccf..505683ef9a26 100644
+> > --- a/net/bridge/br_netlink.c
+> > +++ b/net/bridge/br_netlink.c
+> > @@ -1229,6 +1229,8 @@ static size_t br_port_get_slave_size(const struct net_device *brdev,
+> >   }
+> >   static const struct nla_policy br_policy[IFLA_BR_MAX + 1] = {
+> > +	[IFLA_BR_UNSPEC]	= { .strict_start_type =
+> > +				    IFLA_BR_MCAST_QUERIER_STATE + 1 },
+> >   	[IFLA_BR_FORWARD_DELAY]	= { .type = NLA_U32 },
+> >   	[IFLA_BR_HELLO_TIME]	= { .type = NLA_U32 },
+> >   	[IFLA_BR_MAX_AGE]	= { .type = NLA_U32 },
+> > 
+> 
+> instead of IFLA_BR_MCAST_QUERIER_STATE + 1, why not move around the patch
+> and just use the new attribute name?
+> These are uapi, they won't change.
 
-It's probably not the result but how to fix it?
+I wanted to avoid having a state between the two commits where the new
+attributes are already added, but not yet strictly verified. Otherwise
+they would present a slightly different UAPI at that one commit boundary
+than after this commit.
 
-> When notification coalescing feature is negotiated, initially make the
-> value of tx-frames to be consistent with napi_tx.
->
-> For compatibility with the past, it is still supported to use tx-frames
-> to toggle napi_tx.
->
-> Reported-by: Xiaoming Zhao <zxm377917@alibaba-inc.com>
-> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
-> ---
->  drivers/net/virtio_net.c | 42 +++++++++++++++++++++++++++++++++-------
->  1 file changed, 35 insertions(+), 7 deletions(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index fe7f314d65c9..fd5bc8d59eda 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -4442,13 +4442,6 @@ static int virtnet_probe(struct virtio_device *vde=
-v)
->                 dev->xdp_features |=3D NETDEV_XDP_ACT_RX_SG;
->         }
->
-> -       if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_NOTF_COAL)) {
-> -               vi->intr_coal_rx.max_usecs =3D 0;
-> -               vi->intr_coal_tx.max_usecs =3D 0;
-> -               vi->intr_coal_tx.max_packets =3D 0;
-> -               vi->intr_coal_rx.max_packets =3D 0;
-> -       }
-> -
->         if (virtio_has_feature(vdev, VIRTIO_NET_F_HASH_REPORT))
->                 vi->has_rss_hash_report =3D true;
->
-> @@ -4523,6 +4516,41 @@ static int virtnet_probe(struct virtio_device *vde=
-v)
->         if (err)
->                 goto free;
->
-> +       if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_NOTF_COAL)) {
-> +               vi->intr_coal_rx.max_usecs =3D 0;
-> +               vi->intr_coal_tx.max_usecs =3D 0;
-> +               vi->intr_coal_rx.max_packets =3D 0;
-> +
-> +               /* Why is this needed?
-> +                * If without this setting, consider that when VIRTIO_NET=
-_F_NOTF_COAL is
-> +                * negotiated and napi_tx is initially true: when the use=
-r sets non tx-frames
-> +                * parameters, such as the following cmd or others,
-> +                *              ethtool -C eth0 rx-usecs 10.
-> +                * Then
-> +                * 1. ethtool_set_coalesce() first calls virtnet_get_coal=
-esce() to get
-> +                *    the last parameters except rx-usecs. If tx-frames h=
-as never been set before,
-> +                *    virtnet_get_coalesce() returns with tx-frames=3D0 i=
-n the parameters.
-> +                * 2. virtnet_set_coalesce() is then called, according to=
- 1:
-> +                *    ec->tx_max_coalesced_frames=3D0. Now napi_tx switch=
-ing condition is met.
-> +                * 3. If the device is up, the user setting fails:
-> +                *             "netlink error: Device or resource busy"
-> +                * This is not intuitive. Therefore, we keep napi_tx stat=
-e consistent with
-> +                * tx-frames when VIRTIO_NET_F_NOTF_COAL is negotiated. T=
-his behavior is
-> +                * compatible with before.
-> +                */
-
-Maybe it's sufficient to say it tries to align the behaviour with that
-tx NAPI is enabled by default?
-
-Other than these minor issues:
-
-Acked-by: Jason Wang <jasowang@redhat.com>
-
-Thanks
-
-> +               if (vi->sq[0].napi.weight)
-> +                       vi->intr_coal_tx.max_packets =3D 1;
-> +               else
-> +                       vi->intr_coal_tx.max_packets =3D 0;
-> +       }
-> +
-> +       if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL)) {
-> +               /* The reason is the same as VIRTIO_NET_F_NOTF_COAL. */
-> +               for (i =3D 0; i < vi->max_queue_pairs; i++)
-> +                       if (vi->sq[i].napi.weight)
-> +                               vi->sq[i].intr_coal.max_packets =3D 1;
-> +       }
-> +
->  #ifdef CONFIG_SYSFS
->         if (vi->mergeable_rx_bufs)
->                 dev->sysfs_rx_queue_group =3D &virtio_net_mrg_rx_group;
-> --
-> 2.19.1.6.gb485710b
->
-
+This is also not the only place in the kernel where strict_start_type
+is specified that way. See e.g. commit c00041cf1cb8 ("net: bridge: Set
+strict_start_type at two policies"), even though that seems mostly be
+done to turn on strict_start_type preemtively, not in the same series
+that adds the new attribute.
 
