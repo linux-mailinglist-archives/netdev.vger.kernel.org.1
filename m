@@ -1,70 +1,213 @@
-Return-Path: <netdev+bounces-35381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0DE47A93C0
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 13:09:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85FC77A93D7
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 13:25:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3D08EB20975
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 11:09:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 21002B209BA
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 11:25:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BFEF947B;
-	Thu, 21 Sep 2023 11:09:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55BB2A956;
+	Thu, 21 Sep 2023 11:25:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5697F946D
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 11:09:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E967DC4AF6F;
-	Thu, 21 Sep 2023 11:09:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44C16946D
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 11:25:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C3B0C4AF77;
+	Thu, 21 Sep 2023 11:25:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695294557;
-	bh=2kCSV6P6YfeKSmCvyz6qPCQfpRAvSYHPQsHOVANhBmg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=W76eLcPAw4H/BBi1wsSNGxZjZFUI3sArOoZWHS+54hEC0lrQ0mn+HZUhhD8bddLl3
-	 vzsdCSFXS0E3diGzNDIUcTsOcTDN4aR1RccVZZEDtJepz0vIXJVtjHzC0qSaRmCuvJ
-	 NTIlJoXiIHSrs42tUlRzfiZGrW3Xk6Z164Vfsjt6HV0rP9096saieHSLRW8IMmTEqq
-	 X+GgsgNB2o3Owq4bRZzrYLaLfvnKNkcbaEiedgx4M7gYJkCdYWiIyIxzoUPbz9uwqH
-	 UE/0/hy5KPo5ry9BXXh+GLc58TUBkRUy/xECrNjb4XqwWJoQwbR1RinkJOD18trAUk
-	 njLkZPgI38MCQ==
-Date: Thu, 21 Sep 2023 12:09:11 +0100
-From: Simon Horman <horms@kernel.org>
-To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	leon@kernel.org, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>
-Subject: Re: [PATCH] [Intel-wired-lan][PATCH iwl-next v2] ice: store VF's
- pci_dev ptr in ice_vf
-Message-ID: <20230921110911.GJ224399@kernel.org>
-References: <20230912115626.105828-1-mateusz.polchlopek@intel.com>
+	s=k20201202; t=1695295545;
+	bh=t4ry7//CzzJohA2MxLm7JobvhK5R16tidfZmy/skTKI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=E+RHM/0nm/ZfWk42C534jVIWFMefKm7Ty3hKQ4Hyswv04LpkLVCqkWxeGIL3oKKBP
+	 fcDaBLBNm3x1VYbuiBOfYJ9iKZWaDMh2R96h3b8+HAIyg/nWYdcGOmTkF6plHHuyqW
+	 PVUlJ6n/XUjv0i7wtNkiDMyvcqyZNs6eOho7EyGKVxBXXU8VfAis+v/J0iHL/DYriE
+	 k5L16ftgwm+V2nOqoVSIfDB6WRekOeZs1QAiidvYArDmj2oVgyHSuwEpqAESiaPKtw
+	 J2CddwE0QGM2Iayy6tSHYx41BksAOShY4Xd7Uo9tGKvlDfmVlSAjiEElXdLvqK6rUn
+	 0cg6plV0ZdZGw==
+Message-ID: <4a9c1f89-99c6-40dc-a56c-64d06386d5a1@kernel.org>
+Date: Thu, 21 Sep 2023 14:25:38 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230912115626.105828-1-mateusz.polchlopek@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 2/3] net: ethernet: ti: am65-cpsw: add mqprio
+ qdisc offload in channel mode
+Content-Language: en-US
+To: Simon Horman <horms@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, vladimir.oltean@nxp.com, s-vadapalli@ti.com, srk@ti.com,
+ vigneshr@ti.com, p-varis@ti.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20230920121530.4710-1-rogerq@kernel.org>
+ <20230920121530.4710-3-rogerq@kernel.org>
+ <20230921104529.GI224399@kernel.org>
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <20230921104529.GI224399@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 12, 2023 at 07:56:26AM -0400, Mateusz Polchlopek wrote:
-> From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> 
-> Extend struct ice_vf by vfdev.
-> Calculation of vfdev falls more nicely into ice_create_vf_entries().
-> 
-> Caching of vfdev enables simplification of ice_restore_all_vfs_msi_state().
-> 
-> Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Co-developed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-> Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Hi Simon,
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+On 21/09/2023 13:45, Simon Horman wrote:
+> On Wed, Sep 20, 2023 at 03:15:29PM +0300, Roger Quadros wrote:
+>> From: Grygorii Strashko <grygorii.strashko@ti.com>
+>>
+>> This patch adds MQPRIO Qdisc offload in full 'channel' mode which allows
+>> not only setting up pri:tc mapping, but also configuring TX shapers
+>> (rate-limiting) on external port FIFOs.
+>>
+>> The MQPRIO Qdisc offload is expected to work with or without VLAN/priority
+>> tagged packets.
+>>
+>> The CPSW external Port FIFO has 8 Priority queues. The rate-limit can be
+>> set for each of these priority queues. Which Priority queue a packet is
+>> assigned to depends on PN_REG_TX_PRI_MAP register which maps header
+>> priority to switch priority.
+>>
+>> The header priority of a packet is assigned via the RX_PRI_MAP_REG which
+>> maps packet priority to header priority.
+>>
+>> The packet priority is either the VLAN priority (for VLAN tagged packets)
+>> or the thread/channel offset.
+>>
+>> For simplicity, we assign the same priority queue to all queues of a
+>> Traffic Class so it can be rate-limited correctly.
+>>
+>> Configuration example:
+>>  ethtool -L eth1 tx 5
+>>  ethtool --set-priv-flags eth1 p0-rx-ptype-rrobin off
+>>
+>>  tc qdisc add dev eth1 parent root handle 100: mqprio num_tc 3 \
+>>  map 0 0 1 2 0 0 0 0 0 0 0 0 0 0 0 0 \
+>>  queues 1@0 1@1 1@2 hw 1 mode channel \
+>>  shaper bw_rlimit min_rate 0 100mbit 200mbit max_rate 0 101mbit 202mbit
+>>
+>>  tc qdisc replace dev eth2 handle 100: parent root mqprio num_tc 1 \
+>>  map 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 queues 1@0 hw 1
+>>
+>>  ip link add link eth1 name eth1.100 type vlan id 100
+>>  ip link set eth1.100 type vlan egress 0:0 1:1 2:2 3:3 4:4 5:5 6:6 7:7
+>>
+>> In the above example two ports share the same TX CPPI queue 0 for low
+>> priority traffic. 3 traffic classes are defined for eth1 and mapped to:
+>> TC0 - low priority, TX CPPI queue 0 -> ext Port 1 fifo0, no rate limit
+>> TC1 - prio 2, TX CPPI queue 1 -> ext Port 1 fifo1, CIR=100Mbit/s, EIR=1Mbit/s
+>> TC2 - prio 3, TX CPPI queue 2 -> ext Port 1 fifo2, CIR=200Mbit/s, EIR=2Mbit/s
+>>
+>> Signed-off-by: Grygorii Strashko <grygorii.strashko@ti.com>
+>> Signed-off-by: Roger Quadros <rogerq@kernel.org>
+> 
+> ...
+> 
+>> +static int am65_cpsw_mqprio_verify_shaper(struct am65_cpsw_port *port,
+>> +					  struct tc_mqprio_qopt_offload *mqprio)
+>> +{
+>> +	struct am65_cpsw_mqprio *p_mqprio = &port->qos.mqprio;
+>> +	struct netlink_ext_ack *extack = mqprio->extack;
+>> +	u64 min_rate_total = 0, max_rate_total = 0;
+>> +	u32 min_rate_msk = 0, max_rate_msk = 0;
+>> +	bool has_min_rate, has_max_rate;
+>> +	int num_tc, i;
+>> +
+>> +	if (!(mqprio->flags & TC_MQPRIO_F_SHAPER))
+>> +		return 0;
+>> +
+>> +	if (mqprio->shaper != TC_MQPRIO_SHAPER_BW_RATE)
+>> +		return 0;
+>> +
+>> +	has_min_rate = !!(mqprio->flags & TC_MQPRIO_F_MIN_RATE);
+>> +	has_max_rate = !!(mqprio->flags & TC_MQPRIO_F_MAX_RATE);
+>> +
+>> +	if (!has_min_rate && has_max_rate) {
+>> +		NL_SET_ERR_MSG_MOD(extack, "min_rate is required with max_rate");
+>> +		return -EOPNOTSUPP;
+>> +	}
+>> +
+>> +	if (!has_min_rate)
+>> +		return 0;
+>> +
+>> +	num_tc = mqprio->qopt.num_tc;
+>> +
+>> +	for (i = num_tc - 1; i >= 0; i--) {
+>> +		u32 ch_msk;
+>> +
+>> +		if (mqprio->min_rate[i])
+>> +			min_rate_msk |= BIT(i);
+>> +		min_rate_total +=  mqprio->min_rate[i];
+>> +
+>> +		if (has_max_rate) {
+>> +			if (mqprio->max_rate[i])
+>> +				max_rate_msk |= BIT(i);
+>> +			max_rate_total +=  mqprio->max_rate[i];
+>> +
+>> +			if (!mqprio->min_rate[i] && mqprio->max_rate[i]) {
+>> +				NL_SET_ERR_MSG_FMT_MOD(extack,
+>> +						       "TX tc%d rate max>0 but min=0\n",
+>> +						       i);
+>> +				return -EINVAL;
+>> +			}
+>> +
+>> +			if (mqprio->max_rate[i] &&
+>> +			    mqprio->max_rate[i] < mqprio->min_rate[i]) {
+>> +				NL_SET_ERR_MSG_FMT_MOD(extack,
+>> +						       "TX tc%d rate min(%llu)>max(%llu)\n",
+>> +						       i, mqprio->min_rate[i],
+>> +						       mqprio->max_rate[i]);
+>> +				return -EINVAL;
+>> +			}
+>> +		}
+>> +
+>> +		ch_msk = GENMASK(num_tc - 1, i);
+>> +		if ((min_rate_msk & BIT(i)) && (min_rate_msk ^ ch_msk)) {
+>> +			NL_SET_ERR_MSG_FMT_MOD(extack,
+>> +					       "TX min rate limiting has to be enabled sequentially hi->lo tx_rate_msk%x\n",
+>> +					       min_rate_msk);
+> 
+> Hi Grygorii and Roger,
+> 
+> An allmodconfig build with gcc-13 W=1 warns that:
+> 
+>  drivers/net/ethernet/ti/am65-cpsw-qos.c: In function 'am65_cpsw_mqprio_verify_shaper':
+>  ./include/linux/netlink.h:116:13: warning: 'am65_cpsw_qos: TX min rate l...' directive output truncated writing 85 bytes into a region of size 80 [-Wformat-truncation=]
+> 
+>> +			return -EINVAL;
+>> +		}
+>> +
+>> +		if ((max_rate_msk & BIT(i)) && (max_rate_msk ^ ch_msk)) {
+>> +			NL_SET_ERR_MSG_FMT_MOD(extack,
+>> +					       "TX max rate limiting has to be enabled sequentially hi->lo tx_rate_msk%x\n",
+>> +					       max_rate_msk);
+> 
+> Likewise, here too.
 
+OK. I'll have to reduce the message by 5 characters. Thanks!
+
+> 
+>> +			return -EINVAL;
+>> +		}
+>> +	}
+>> +
+>> +	min_rate_total = TO_MBPS(min_rate_total);
+>> +	max_rate_total = TO_MBPS(max_rate_total);
+>> +
+>> +	p_mqprio->shaper_en = true;
+>> +	p_mqprio->max_rate_total = max_t(u64, min_rate_total, max_rate_total);
+>> +
+>> +	return 0;
+>> +}
+> 
+> ,..
+
+-- 
+cheers,
+-roger
 
