@@ -1,119 +1,149 @@
-Return-Path: <netdev+bounces-35434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35413-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FE9C7A9835
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:33:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 024607A963F
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:05:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2496F1C20F1B
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 17:33:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D0141C20944
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 17:05:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76F8A18036;
-	Thu, 21 Sep 2023 17:10:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42E1A8F58;
+	Thu, 21 Sep 2023 17:02:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 326A517996
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 17:09:59 +0000 (UTC)
-Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFA412120
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:09:27 -0700 (PDT)
-Received: by mail-ot1-x336.google.com with SMTP id 46e09a7af769-6beff322a97so741270a34.3
-        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:09:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695316167; x=1695920967; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AVcvvu/JFjnu+QrVzMYimtmbCiKo0Cmt5bIvcu2c+Og=;
-        b=bD6jowcgW8QgQ2k2FEMeCG0rV8F6NAktmgtxg27XWVqvB8Cs2p52G46RMzIFpo2oTa
-         yySMReiWn1AE/tkypIqFEJYbfHMPqbK31IRMjtSv2ewvGAwJ1vKmIZQkEe1Eke3e5G5r
-         tjnr/jZh+yomx6gMm+gR7cuyDMXJYKyy006vvf4rsarh2vlS3vosWu3yTdIupQRC0/OL
-         tWZ2Urw677gGoGSqXOq8J16BmjtSg0qUA8cFhf7Z56YNt3oxdOR6j4lU6i4LzrGzwh44
-         wxcCd5j2JCLRDrk0d3P9yb1TeBt0SatctVVkAj3MwdqjcTWB57PeU4BKy0GYqQusFL+/
-         ciug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695316167; x=1695920967;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AVcvvu/JFjnu+QrVzMYimtmbCiKo0Cmt5bIvcu2c+Og=;
-        b=HOvzdN0/2qVaeNHQN4Q/F4RQA1s+Wh5GOeqLe4FcYDgZpYxX2z59m3H6PMhYUtJZDu
-         K63Fc8YDYnagC8aGUuETvoJpGbjD2A/7541M5mG7IVWJflh4LSw0DqIwZR+qeGQZOhFe
-         VoseOn8847RodnZ8ZGzgASpExKpplmgoD8PXBT3N9MRK+yc3VUxe+Es8qlAylTgEEMP5
-         dySg6bpgL1d7f5uMjYxiRTIUoHurClTpXhsCLXIOYiQe2FJpE/FuGkqO5K06oFvpgVmj
-         hpWk+q67oQkKxjq3RSwxIJMv3Ko5b758X8Il11PAIabCzMB6j+tKUHhxWK8Lw+kDem8x
-         h4rw==
-X-Gm-Message-State: AOJu0YxjKAg4zgmuO1S6+iay2MUhpkYPewiy1yPl2xrtkfIg64zWn3oC
-	HLespkt4MHUTyWLKmBqH4zkOAV3UOEs=
-X-Google-Smtp-Source: AGHT+IG6oddQ51epnwGypAV5ylkotDRLWmvf1cAm59XtvXlGEBE+kRUDCVW24cX245cOZi/WF3b9zA==
-X-Received: by 2002:a17:90a:4f4b:b0:26d:43f0:7ce4 with SMTP id w11-20020a17090a4f4b00b0026d43f07ce4mr5030413pjl.8.1695282654322;
-        Thu, 21 Sep 2023 00:50:54 -0700 (PDT)
-Received: from [192.168.0.106] ([103.124.138.83])
-        by smtp.gmail.com with ESMTPSA id jx4-20020a17090b46c400b00274a43c3414sm2420784pjb.47.2023.09.21.00.50.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Sep 2023 00:50:53 -0700 (PDT)
-Message-ID: <be58d429-90d1-42ff-a36b-da318db6ee68@gmail.com>
-Date: Thu, 21 Sep 2023 14:50:47 +0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9222E199DF
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 17:02:02 +0000 (UTC)
+Received: from mail.avm.de (mail.avm.de [IPv6:2001:bf0:244:244::94])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 510FB2112;
+	Thu, 21 Sep 2023 10:01:14 -0700 (PDT)
+Received: from mail-auth.avm.de (unknown [IPv6:2001:bf0:244:244::71])
+	by mail.avm.de (Postfix) with ESMTPS;
+	Thu, 21 Sep 2023 10:06:01 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=avm.de; s=mail;
+	t=1695283566; bh=EzGmNrSKOJc7ZUWqu95aGt4JAKmhiqLPdGsju567CAk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=s5BAmOkMuI+eBqvoX4jxWJ6gSAWinUICiwcr9FCuzw16BjWz/LRBk2pOKtoc289IH
+	 LLJsqZbrXEYCAGHSdUrrGPH+OErDMkrB5B6yA98g/ZVu5NLG3t/vI0+YXCJQzJw16Z
+	 0CqlBe9j3IF5pEnsxff5BskDQAnpen3+7kaJM3Fo=
+Received: from localhost (unknown [172.17.88.63])
+	by mail-auth.avm.de (Postfix) with ESMTPSA id 1044581C20;
+	Thu, 21 Sep 2023 10:06:01 +0200 (CEST)
+Date: Thu, 21 Sep 2023 10:06:00 +0200
+From: Johannes Nixdorf <jnixdorf-oss@avm.de>
+To: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+	David Ahern <dsahern@gmail.com>, Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Ido Schimmel <idosch@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
+	Oleksij Rempel <linux@rempel-privat.de>,
+	Paolo Abeni <pabeni@redhat.com>, Roopa Prabhu <roopa@nvidia.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	bridge@lists.linux-foundation.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v4 5/6] net: bridge: Add a configurable default
+ FDB learning limit
+Message-ID: <ZQv5aNbgqxCuOKyr@u-jnixdorf.ads.avm.de>
+References: <20230919-fdb_limit-v4-0-39f0293807b8@avm.de>
+ <20230919-fdb_limit-v4-5-39f0293807b8@avm.de>
+ <cc14cd4a-f3bb-3d6f-5b38-ec73cad32570@blackwall.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Urgent Bug Report Kernel crash 6.5.2
-To: Martin Zaharinov <micron10@gmail.com>, Eric Dumazet <edumazet@google.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev <netdev@vger.kernel.org>,
- patchwork-bot+netdevbpf@kernel.org, Jakub Kicinski <kuba@kernel.org>,
- Stephen Hemminger <stephen@networkplumber.org>, kuba+netdrv@kernel.org,
- dsahern@gmail.com, Florian Westphal <fw@strlen.de>,
- Pablo Neira Ayuso <pablo@netfilter.org>
-References: <64CCB695-BA43-48F5-912A-AFD5B9C103A7@gmail.com>
- <51294220-A244-46A9-A5B8-34819CE30CF4@gmail.com>
- <67303CFE-1938-4510-B9AE-5038BF98ABB7@gmail.com>
- <8a62f57a9454b0592ab82248fca5a21fc963995b.camel@redhat.com>
- <CALidq=UR=3rOHZczCnb1bEhbt9So60UZ5y60Cdh4aP41FkB5Tw@mail.gmail.com>
- <43ED0333-18AB-4C38-A615-7755E5BE9C3E@gmail.com>
- <5A853CC5-F15C-4F30-B845-D9E5B43EC039@gmail.com>
- <A416E134-BFAA-45FE-9061-9545F6DCC246@gmail.com>
- <CANn89iKXxyAQG-N+mdhNA8H+LEf=OK+goMFxYCV6yU1BpE=Xvw@mail.gmail.com>
- <BB129799-E196-428C-909D-721670DD5E21@gmail.com> <ZQqOJOa_qTwz_k0V@debian.me>
- <94BC75CD-A34A-4FED-A2EA-C18A28512230@gmail.com>
- <CANn89iKvv7F9G8AbYTEu7wca_SDHEp4GVTOEWk7_Yq0KFJrWgw@mail.gmail.com>
- <CANn89iJCJhJ=RWqPGkdbPoXhoa1W9ovi0s1t4242vsz-1=0WLw@mail.gmail.com>
- <85F1F301-BECA-4210-A81F-12CAEEC85FD7@gmail.com>
-Content-Language: en-US
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-In-Reply-To: <85F1F301-BECA-4210-A81F-12CAEEC85FD7@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cc14cd4a-f3bb-3d6f-5b38-ec73cad32570@blackwall.org>
+X-purgate-ID: 149429::1695283561-FD4345D2-604B728F/0/0
+X-purgate-type: clean
+X-purgate-size: 3303
+X-purgate-Ad: Categorized by eleven eXpurgate (R) http://www.eleven.de
+X-purgate: This mail is considered clean (visit http://www.eleven.de for further information)
+X-purgate: clean
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 20/09/2023 14:32, Martin Zaharinov wrote:
-> I will make this yes .
+On Wed, Sep 20, 2023 at 02:00:27PM +0300, Nikolay Aleksandrov wrote:
+> On 9/19/23 11:12, Johannes Nixdorf wrote:
+> > Add a Kconfig option to configure a default FDB learning limit system
+> > wide, so a distributor building a special purpose kernel can limit all
+> > created bridges by default.
+> > 
+> > The limit is only a soft default setting and overrideable on a per bridge
+> > basis using netlink.
+> > 
+> > Signed-off-by: Johannes Nixdorf <jnixdorf-oss@avm.de>
+> > ---
+> >   net/bridge/Kconfig     | 13 +++++++++++++
+> >   net/bridge/br_device.c |  2 ++
+> >   2 files changed, 15 insertions(+)
+> > 
+> > diff --git a/net/bridge/Kconfig b/net/bridge/Kconfig
+> > index 3c8ded7d3e84..c0d9c08088c4 100644
+> > --- a/net/bridge/Kconfig
+> > +++ b/net/bridge/Kconfig
+> > @@ -84,3 +84,16 @@ config BRIDGE_CFM
+> >   	  Say N to exclude this support and reduce the binary size.
+> >   	  If unsure, say N.
+> > +
+> > +config BRIDGE_DEFAULT_FDB_MAX_LEARNED
+> > +	int "Default FDB learning limit"
+> > +	default 0
+> > +	depends on BRIDGE
+> > +	help
+> > +	  Sets a default limit on the number of learned FDB entries on
+> > +	  new bridges. This limit can be overwritten via netlink on a
+> > +	  per bridge basis.
+> > +
+> > +	  The default of 0 disables the limit.
+> > +
+> > +	  If unsure, say 0.
+> > diff --git a/net/bridge/br_device.c b/net/bridge/br_device.c
+> > index 9a5ea06236bd..3214391c15a0 100644
+> > --- a/net/bridge/br_device.c
+> > +++ b/net/bridge/br_device.c
+> > @@ -531,6 +531,8 @@ void br_dev_setup(struct net_device *dev)
+> >   	br->bridge_ageing_time = br->ageing_time = BR_DEFAULT_AGEING_TIME;
+> >   	dev->max_mtu = ETH_MAX_MTU;
+> > +	br->fdb_max_learned = CONFIG_BRIDGE_DEFAULT_FDB_MAX_LEARNED;
+> > +
+> >   	br_netfilter_rtable_init(br);
+> >   	br_stp_timer_init(br);
+> >   	br_multicast_init(br);
+> > 
 > 
-> And will wait if any find fix in future release.
-> 
+> This one I'm not sure about at all. Distributions can just create the bridge
+> with a predefined limit. This is not flexible and just adds
+> one more kconfig option that is rather unnecessary. Why having a kconfig
+> knob is better than bridge creation time limit setting? You still have
+> to create the bridge, so why not set the limit then?
 
-Please don't top-post; reply inline with appropriate context instead.
+The problem I'm trying to solve here are unaware applications. Assuming
+this change lands in the next Linux release there will still be quite
+some time until the major applications that create bridges (distribution
+specific or common network management tools, the container solution of
+they day, for embedded some random vendor tools, etc.) will pick it
+up. In this series I chose a default of 0 to not break existing setups
+that rely on some arbitrary amount of FDB entries, so those unaware
+applications will create bridges without limits. I added the Kconfig
+setting so someone who knows their use cases can still set a more fitting
+default limit.
 
-Martin, what prevents you from doing bisection as Eric requested again?
-If you only have production systems, why can't you afford to have
-testing ones? Why not turning one of your prod machines to be testing
-and bisect from there?
-
-Sorry for inconvenience.
-
--- 
-An old man doll... just what I always wanted! - Clara
-
+More specifically to our use case as an embedded vendor that builds their
+own kernels and knows they have no use case that requires huge FDB tables,
+the kernel config allows us to set a safe default limit before starting
+to teach all our applications and our upstream vendors' code about the
+new netlink attribute. As this patch is relatively simple, we can also
+keep it downstream if there is opposition to it here though.
 
