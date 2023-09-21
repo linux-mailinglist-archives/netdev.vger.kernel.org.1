@@ -1,209 +1,199 @@
-Return-Path: <netdev+bounces-35412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAC3E7A963A
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:03:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8ACF47A9648
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:09:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 559CC1C20BC7
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 17:03:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 28818B209DE
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 17:09:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D30C8C126;
-	Thu, 21 Sep 2023 17:00:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBE5A14A9E;
+	Thu, 21 Sep 2023 17:03:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D06CCBE65
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 17:00:34 +0000 (UTC)
-Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30A4A173E
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 09:59:47 -0700 (PDT)
-Received: by mail-qt1-x82e.google.com with SMTP id d75a77b69052e-414ba610766so14301cf.0
-        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 09:59:47 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 183EE13FEA
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 17:03:17 +0000 (UTC)
+Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59F731FCA
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:02:52 -0700 (PDT)
+Received: by mail-wm1-x341.google.com with SMTP id 5b1f17b1804b1-40475103519so12700125e9.0
+        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:02:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695315579; x=1695920379; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=naoJVF9HbMRZX+B7dXjdrn6QCO6e9BTPcTRn9BmRVQo=;
-        b=AnxvlAqmL4olb4unt6D9woHHeBL0bIMbR0w619vsXWUQzBTqNZ0V07RSu0SCx7DjF/
-         GRusEyXqRkU8WfJABjCSyT1HLDlzR0RrT4MvK6daBvclhOZK7pfURT0Mcq+Oa+eFQxa5
-         feYCIHdj+mSPu44sHf5oCTdB24zXQAD+Bnces3M33rYdp5qkD15pCjPbj4+NYOamjk0P
-         OPD7sccLv8JivCPXPOXE9GpbjxhjPOtW9lg0893u/SWj4BMlyaU7oeMznPghEY9fa6sU
-         vO+esg7/0aosh1nFd3B8UH8C2cKbGt0w/WWO3D8DLW69MliSbPmE9oNqptxkIlH9/H3Z
-         hfvw==
+        d=arista.com; s=google; t=1695315694; x=1695920494; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XBT0O/Xci7r3f2IqHjI7FX0fJC0mLhgfI/yPTEIS3vE=;
+        b=KsF2HMB/AX5p0ZsP26KrsKe+E7ja9Ajg21IU8nwXYSRTdGljT2zl6UMdAUmbtEASZV
+         RnYSKzFcENgBd6KATjtVg/g1VGOHD+ieNowLBHH122Y6lkoy8UpOsKH6gbyig8MLIrdO
+         sNqzC1zMxzyiToJF0iArL2xhcYnI3sKkiQr/f+wIV8xCqz4fXMpCAP5H32B0WmhEk+CC
+         tW/at2ygDmCy+ubtmE0npAq6U3gKkU240+I9JTexSZn/nV38fZkzyHnO8RC3b9HQM9pw
+         RdBibPiqqBOyHkylnydtndn6gqdbYPUn+B2ImWTXK0ZAOivtqtICrrBPkiKANIlhZ733
+         3ahQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695315579; x=1695920379;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=naoJVF9HbMRZX+B7dXjdrn6QCO6e9BTPcTRn9BmRVQo=;
-        b=UW2FjDbOSu148Qa5v1lCVBk8gazIFarXMYus2wYGprKCfbpA5aX0Je3bbrMAtR6R6d
-         81flzgVx8uIMmZWqZkbt7Bur3OpLg8bZvvOjoMR6lcJINWO0azjSZv0PPb90v5v8JYt3
-         SCH1IfBOzyIzvBN/HgVe/BvXGF2SM0YfCalZ5H6SkP3hI6Q3sxYef2L7JAnCBLiR2b4V
-         g1Da/azPLFlIhgAo/jMhf6FGVMbUhBFC1JTisJUyERjyHHt2aaD5ugz3Nt+7A5ZmxmFq
-         ZLRuT4f5/EIeEg7tRux/YCFcCOekOK26gQQr148TNpwdK93X4dPqEWrMrs3/5x/WJWRy
-         Hcnw==
-X-Gm-Message-State: AOJu0YzIP+IjkVQfDNmHlKunCFe9ZIqR8Kqf5/FBGjd2uLkcAu5IpXEB
-	hbAWOEUHsr3w+Ue/5Ov6eseUQCn45l2KFwkOMvy3Gw==
-X-Google-Smtp-Source: AGHT+IEocgCFfss9NjDKifXqo58yzByIGTIgDGjthrt/xt8ZRoOEl9+u4+8EWbujjTPiefCZJnv9frIfvIcjNiHIrmk=
-X-Received: by 2002:ac8:4e53:0:b0:403:b1d0:2f0a with SMTP id
- e19-20020ac84e53000000b00403b1d02f0amr288293qtw.28.1695315579116; Thu, 21 Sep
- 2023 09:59:39 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1695315694; x=1695920494;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XBT0O/Xci7r3f2IqHjI7FX0fJC0mLhgfI/yPTEIS3vE=;
+        b=sS9BpcuBdZzPObHLybYW8W2puKpb7m8FUOSLyWGjxx8g5l0PeLLh1I2l43bIjLjCN9
+         DqBNUVA5GZnQf5Gcbf7qlrCSyLt30UrWx2x/cRQm+Vzuneqhy6zrbp6SIJX5jF7z8oDz
+         e9LRYIxXOM54Dz/YzZEObRUmvY11j7vvV98cPbag9V8UbBbkDdSteQVUtsf9RtJUpuL5
+         326TGY6qiCzR6gbp3lnRRpqzAni/SUnls4GkkafF1jRj2irET5Aig8S4WdTIqk2j0/ga
+         0CNJ2+pgK7NXN0/SQsTrN8VTVOjfcPs7k1oWsAQDHXllyEyj6kguznQ0e4Lu9H1+6VPf
+         0Vng==
+X-Gm-Message-State: AOJu0Yw9jZEPwBRG8wmw1O083O9dG0t6nJd9UbHC9syN331zbcei3XJO
+	ee5dESBt0OKre73MHgtZ7QAl2A==
+X-Google-Smtp-Source: AGHT+IESPHzkLKo4hVQmmDh60dY4Pt7P6L91htiazcU1+sSr3zf3jv+A/Vrd8EboGQoplhi5DKMTIw==
+X-Received: by 2002:a05:600c:1e05:b0:405:3a3d:6f41 with SMTP id ay5-20020a05600c1e0500b004053a3d6f41mr723959wmb.22.1695315693942;
+        Thu, 21 Sep 2023 10:01:33 -0700 (PDT)
+Received: from [10.83.37.178] ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id a3-20020a5d4d43000000b003177074f830sm2260297wru.59.2023.09.21.10.01.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Sep 2023 10:01:33 -0700 (PDT)
+Message-ID: <18267b34-1dcf-08d5-5ba1-4f5162e6c43a@arista.com>
+Date: Thu, 21 Sep 2023 18:01:27 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <0000000000004d83170605e16003@google.com>
-In-Reply-To: <0000000000004d83170605e16003@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 21 Sep 2023 18:59:27 +0200
-Message-ID: <CANn89iJwQ3TCSm+SMs=W90oThgRMLoiSAcTBJ9LH2AVsJY1NBA@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
 Subject: Re: [syzbot] [net?] memory leak in tcp_md5_do_add
-To: syzbot <syzbot+68662811b3d5f6695bcb@syzkaller.appspotmail.com>, 
-	Dmitry Safonov <dima@arista.com>
-Cc: bpf@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>
+Cc: bpf@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
+ kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ pabeni@redhat.com, syzkaller-bugs@googlegroups.com,
+ syzbot <syzbot+68662811b3d5f6695bcb@syzkaller.appspotmail.com>
+References: <0000000000004d83170605e16003@google.com>
+ <CANn89iJwQ3TCSm+SMs=W90oThgRMLoiSAcTBJ9LH2AVsJY1NBA@mail.gmail.com>
+From: Dmitry Safonov <dima@arista.com>
+In-Reply-To: <CANn89iJwQ3TCSm+SMs=W90oThgRMLoiSAcTBJ9LH2AVsJY1NBA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Sep 21, 2023 at 6:56=E2=80=AFPM syzbot
-<syzbot+68662811b3d5f6695bcb@syzkaller.appspotmail.com> wrote:
->
-> Hello,
->
-> syzbot found the following issue on:
->
-> HEAD commit:    ee3f96b16468 Merge tag 'nfsd-6.3-1' of git://git.kernel.o=
-r..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=3D1312bba8c8000=
-0
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=3Df5733ca175717=
-2ad
-> dashboard link: https://syzkaller.appspot.com/bug?extid=3D68662811b3d5f66=
-95bcb
-> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binuti=
-ls for Debian) 2.35.2
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D105393a8c80=
-000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D1113917f48000=
-0
->
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/29e7966ab711/dis=
-k-ee3f96b1.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/ae21b8e855de/vmlinu=
-x-ee3f96b1.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/803ee0425ad6/b=
-zImage-ee3f96b1.xz
->
-> IMPORTANT: if you fix the issue, please add the following tag to the comm=
-it:
-> Reported-by: syzbot+68662811b3d5f6695bcb@syzkaller.appspotmail.com
->
-> executing program
-> BUG: memory leak
-> unreferenced object 0xffff88810a86f7a0 (size 32):
->   comm "syz-executor325", pid 5099, jiffies 4294978342 (age 119.240s)
->   hex dump (first 32 bytes):
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->   backtrace:
->     [<ffffffff81533d64>] kmalloc_trace+0x24/0x90 mm/slab_common.c:1061
->     [<ffffffff840edaa0>] kmalloc include/linux/slab.h:580 [inline]
->     [<ffffffff840edaa0>] tcp_md5sig_info_add net/ipv4/tcp_ipv4.c:1169 [in=
-line]
->     [<ffffffff840edaa0>] tcp_md5_do_add+0xa0/0x150 net/ipv4/tcp_ipv4.c:12=
-40
->     [<ffffffff84262c73>] tcp_v6_parse_md5_keys+0x253/0x4a0 net/ipv6/tcp_i=
-pv6.c:671
->     [<ffffffff840c720e>] do_tcp_setsockopt+0x40e/0x1360 net/ipv4/tcp.c:37=
-20
->     [<ffffffff840c81fb>] tcp_setsockopt+0x9b/0xa0 net/ipv4/tcp.c:3806
->     [<ffffffff83d72a8b>] __sys_setsockopt+0x1ab/0x330 net/socket.c:2274
->     [<ffffffff83d72c36>] __do_sys_setsockopt net/socket.c:2285 [inline]
->     [<ffffffff83d72c36>] __se_sys_setsockopt net/socket.c:2282 [inline]
->     [<ffffffff83d72c36>] __x64_sys_setsockopt+0x26/0x30 net/socket.c:2282
->     [<ffffffff849ad699>] do_syscall_x64 arch/x86/entry/common.c:50 [inlin=
-e]
->     [<ffffffff849ad699>] do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:=
-80
->     [<ffffffff84a0008b>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
->
-> BUG: memory leak
-> unreferenced object 0xffff88811225ccc0 (size 192):
->   comm "syz-executor325", pid 5099, jiffies 4294978342 (age 119.240s)
->   hex dump (first 32 bytes):
->     00 00 00 00 00 00 00 00 22 01 00 00 00 00 ad de  ........".......
->     22 0a 80 00 fe 80 00 00 00 00 00 00 00 00 00 00  "...............
->   backtrace:
->     [<ffffffff8153444a>] __do_kmalloc_node mm/slab_common.c:966 [inline]
->     [<ffffffff8153444a>] __kmalloc+0x4a/0x120 mm/slab_common.c:980
->     [<ffffffff83d75c15>] kmalloc include/linux/slab.h:584 [inline]
->     [<ffffffff83d75c15>] sock_kmalloc net/core/sock.c:2635 [inline]
->     [<ffffffff83d75c15>] sock_kmalloc+0x65/0xa0 net/core/sock.c:2624
->     [<ffffffff840eb9bb>] __tcp_md5_do_add+0xcb/0x300 net/ipv4/tcp_ipv4.c:=
-1212
->     [<ffffffff840eda67>] tcp_md5_do_add+0x67/0x150 net/ipv4/tcp_ipv4.c:12=
-53
->     [<ffffffff84262c73>] tcp_v6_parse_md5_keys+0x253/0x4a0 net/ipv6/tcp_i=
-pv6.c:671
->     [<ffffffff840c720e>] do_tcp_setsockopt+0x40e/0x1360 net/ipv4/tcp.c:37=
-20
->     [<ffffffff840c81fb>] tcp_setsockopt+0x9b/0xa0 net/ipv4/tcp.c:3806
->     [<ffffffff83d72a8b>] __sys_setsockopt+0x1ab/0x330 net/socket.c:2274
->     [<ffffffff83d72c36>] __do_sys_setsockopt net/socket.c:2285 [inline]
->     [<ffffffff83d72c36>] __se_sys_setsockopt net/socket.c:2282 [inline]
->     [<ffffffff83d72c36>] __x64_sys_setsockopt+0x26/0x30 net/socket.c:2282
->     [<ffffffff849ad699>] do_syscall_x64 arch/x86/entry/common.c:50 [inlin=
-e]
->     [<ffffffff849ad699>] do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:=
-80
->     [<ffffffff84a0008b>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
->
->
->
-> ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
->
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
->
-> If the bug is already fixed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
->
-> If you want syzbot to run the reproducer, reply with:
-> #syz test: git://repo/address.git branch-or-commit-hash
-> If you attach or paste a git patch, syzbot will apply it before testing.
->
-> If you want to overwrite bug's subsystems, reply with:
-> #syz set subsystems: new-subsystem
-> (See the list of subsystem names on the web dashboard)
->
-> If the bug is a duplicate of another bug, reply with:
-> #syz dup: exact-subject-of-another-report
->
-> If you want to undo deduplication, reply with:
-> #syz undup
+On 9/21/23 17:59, Eric Dumazet wrote:
+> On Thu, Sep 21, 2023 at 6:56 PM syzbot
+> <syzbot+68662811b3d5f6695bcb@syzkaller.appspotmail.com> wrote:
+>>
+>> Hello,
+>>
+>> syzbot found the following issue on:
+>>
+>> HEAD commit:    ee3f96b16468 Merge tag 'nfsd-6.3-1' of git://git.kernel.or..
+>> git tree:       upstream
+>> console output: https://syzkaller.appspot.com/x/log.txt?x=1312bba8c80000
+>> kernel config:  https://syzkaller.appspot.com/x/.config?x=f5733ca1757172ad
+>> dashboard link: https://syzkaller.appspot.com/bug?extid=68662811b3d5f6695bcb
+>> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+>> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=105393a8c80000
+>> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1113917f480000
+>>
+>> Downloadable assets:
+>> disk image: https://storage.googleapis.com/syzbot-assets/29e7966ab711/disk-ee3f96b1.raw.xz
+>> vmlinux: https://storage.googleapis.com/syzbot-assets/ae21b8e855de/vmlinux-ee3f96b1.xz
+>> kernel image: https://storage.googleapis.com/syzbot-assets/803ee0425ad6/bzImage-ee3f96b1.xz
+>>
+>> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+>> Reported-by: syzbot+68662811b3d5f6695bcb@syzkaller.appspotmail.com
+>>
+>> executing program
+>> BUG: memory leak
+>> unreferenced object 0xffff88810a86f7a0 (size 32):
+>>   comm "syz-executor325", pid 5099, jiffies 4294978342 (age 119.240s)
+>>   hex dump (first 32 bytes):
+>>     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>>     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>>   backtrace:
+>>     [<ffffffff81533d64>] kmalloc_trace+0x24/0x90 mm/slab_common.c:1061
+>>     [<ffffffff840edaa0>] kmalloc include/linux/slab.h:580 [inline]
+>>     [<ffffffff840edaa0>] tcp_md5sig_info_add net/ipv4/tcp_ipv4.c:1169 [inline]
+>>     [<ffffffff840edaa0>] tcp_md5_do_add+0xa0/0x150 net/ipv4/tcp_ipv4.c:1240
+>>     [<ffffffff84262c73>] tcp_v6_parse_md5_keys+0x253/0x4a0 net/ipv6/tcp_ipv6.c:671
+>>     [<ffffffff840c720e>] do_tcp_setsockopt+0x40e/0x1360 net/ipv4/tcp.c:3720
+>>     [<ffffffff840c81fb>] tcp_setsockopt+0x9b/0xa0 net/ipv4/tcp.c:3806
+>>     [<ffffffff83d72a8b>] __sys_setsockopt+0x1ab/0x330 net/socket.c:2274
+>>     [<ffffffff83d72c36>] __do_sys_setsockopt net/socket.c:2285 [inline]
+>>     [<ffffffff83d72c36>] __se_sys_setsockopt net/socket.c:2282 [inline]
+>>     [<ffffffff83d72c36>] __x64_sys_setsockopt+0x26/0x30 net/socket.c:2282
+>>     [<ffffffff849ad699>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+>>     [<ffffffff849ad699>] do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+>>     [<ffffffff84a0008b>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
+>>
+>> BUG: memory leak
+>> unreferenced object 0xffff88811225ccc0 (size 192):
+>>   comm "syz-executor325", pid 5099, jiffies 4294978342 (age 119.240s)
+>>   hex dump (first 32 bytes):
+>>     00 00 00 00 00 00 00 00 22 01 00 00 00 00 ad de  ........".......
+>>     22 0a 80 00 fe 80 00 00 00 00 00 00 00 00 00 00  "...............
+>>   backtrace:
+>>     [<ffffffff8153444a>] __do_kmalloc_node mm/slab_common.c:966 [inline]
+>>     [<ffffffff8153444a>] __kmalloc+0x4a/0x120 mm/slab_common.c:980
+>>     [<ffffffff83d75c15>] kmalloc include/linux/slab.h:584 [inline]
+>>     [<ffffffff83d75c15>] sock_kmalloc net/core/sock.c:2635 [inline]
+>>     [<ffffffff83d75c15>] sock_kmalloc+0x65/0xa0 net/core/sock.c:2624
+>>     [<ffffffff840eb9bb>] __tcp_md5_do_add+0xcb/0x300 net/ipv4/tcp_ipv4.c:1212
+>>     [<ffffffff840eda67>] tcp_md5_do_add+0x67/0x150 net/ipv4/tcp_ipv4.c:1253
+>>     [<ffffffff84262c73>] tcp_v6_parse_md5_keys+0x253/0x4a0 net/ipv6/tcp_ipv6.c:671
+>>     [<ffffffff840c720e>] do_tcp_setsockopt+0x40e/0x1360 net/ipv4/tcp.c:3720
+>>     [<ffffffff840c81fb>] tcp_setsockopt+0x9b/0xa0 net/ipv4/tcp.c:3806
+>>     [<ffffffff83d72a8b>] __sys_setsockopt+0x1ab/0x330 net/socket.c:2274
+>>     [<ffffffff83d72c36>] __do_sys_setsockopt net/socket.c:2285 [inline]
+>>     [<ffffffff83d72c36>] __se_sys_setsockopt net/socket.c:2282 [inline]
+>>     [<ffffffff83d72c36>] __x64_sys_setsockopt+0x26/0x30 net/socket.c:2282
+>>     [<ffffffff849ad699>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+>>     [<ffffffff849ad699>] do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+>>     [<ffffffff84a0008b>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
+>>
+>>
+>>
+>> ---
+>> This report is generated by a bot. It may contain errors.
+>> See https://goo.gl/tpsmEJ for more information about syzbot.
+>> syzbot engineers can be reached at syzkaller@googlegroups.com.
+>>
+>> syzbot will keep track of this issue. See:
+>> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+>>
+>> If the bug is already fixed, let syzbot know by replying with:
+>> #syz fix: exact-commit-title
+>>
+>> If you want syzbot to run the reproducer, reply with:
+>> #syz test: git://repo/address.git branch-or-commit-hash
+>> If you attach or paste a git patch, syzbot will apply it before testing.
+>>
+>> If you want to overwrite bug's subsystems, reply with:
+>> #syz set subsystems: new-subsystem
+>> (See the list of subsystem names on the web dashboard)
+>>
+>> If the bug is a duplicate of another bug, reply with:
+>> #syz dup: exact-subject-of-another-report
+>>
+>> If you want to undo deduplication, reply with:
+>> #syz undup
+> 
+> Dmitry, please take a look at this bug, we need to fix it before your
+> patch series.
 
-Dmitry, please take a look at this bug, we need to fix it before your
-patch series.
+Sure, seems reasonable to me to fix before merging something on top.
 
-Thank you.
+> Thank you.
+
+Thanks,
+           Dmitry
+
 
