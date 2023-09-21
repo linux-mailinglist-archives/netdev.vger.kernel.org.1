@@ -1,149 +1,82 @@
-Return-Path: <netdev+bounces-35441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF4707A9853
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:40:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D39237A979E
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:26:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7909F282540
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 17:40:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D6B31F21134
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 17:26:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1745B18C13;
-	Thu, 21 Sep 2023 17:11:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99B151772A;
+	Thu, 21 Sep 2023 17:05:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C49114F63;
-	Thu, 21 Sep 2023 17:11:21 +0000 (UTC)
-Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DED579025;
-	Thu, 21 Sep 2023 10:11:02 -0700 (PDT)
-Received: by mail-qk1-x72a.google.com with SMTP id af79cd13be357-76f2843260bso72941785a.3;
-        Thu, 21 Sep 2023 10:11:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695316262; x=1695921062; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vmAqS4POZPQ4cWVva2XsitwLpylcffcICW2xKCJAJKs=;
-        b=MRqMb0ErSrr4wYpe1itOlcjN7/APkPythWOmRjzTboiRL9JfU7RByvJ+F5O+xIFIUE
-         //9lhMbVyepYpQBzICN6lJx8Z4RsedsNuXC9qIJePcKhw/0lGnni6JIxgZY+9xXpni+/
-         e1rvMEpKozskOfDaWLuqGRHkmdtLf2IrjzyANzv8Zg/X84BcAP2f3tjmkizpd1Br3Viq
-         IhJtiFosCPVtAMeygLusVi/Emx/c9XtrNWlHtuSd/Rn6pUtp0oAWRY6PA3E4W6ibTaOD
-         l15BVKpKVTCdJn16jYhf03QerAUZ/Z6+A7hrcoy5oDhoVPVdsRNhR6bavnhvhiU4VGib
-         3HhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695316262; x=1695921062;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vmAqS4POZPQ4cWVva2XsitwLpylcffcICW2xKCJAJKs=;
-        b=T4wm7iURJMAeaggidUIV1+o/pv+Da1DiBqEulNbkY0UKyZesupg90ao9L1bma0p1P4
-         M8+pcHGb+wllbDQRel1sEFEaI6W4K4vyvLNHoNG1rvfPEFNrjlUkvZZWXZ6Gg1Ehm1Gt
-         fKnGjgfbrcWKPc8A2IsdDRoTHN5/dO6/o3GIZ975j+pR8ep3UmNOzn+8dbOowZWYbtwL
-         3CJ157xLeZFajm4FAqjOqJgO+Hi2/9/M6ZM0sHP8ZL9thhu/xS4OkQledWccUF+2Mlnl
-         YuZ3YmWSMHf9tDKZfVOG2E6n/1Vcl7iEg6xifvtVNJARbVIrUX5PvDMXaF76pMlCKmFZ
-         DQ/g==
-X-Gm-Message-State: AOJu0YwPNJI+WREc5Q+AMX58ylpzRsn68gH40hU+CkObp+wNT1Hnk9aU
-	nO2KG/WYYnmIVGUNFAA+eOzexHSZ7w92WLXbuIx2wqTx
-X-Google-Smtp-Source: AGHT+IGlJdba7Njyh19TjaAtxrKa+auxnuBas8gb+0vYCa3DLBBmCmHN8Sx2z82f9gjmZ9zPPKAz/33voSKrEqm8sUA=
-X-Received: by 2002:a1f:c886:0:b0:496:21dc:ec73 with SMTP id
- y128-20020a1fc886000000b0049621dcec73mr5737338vkf.5.1695302243773; Thu, 21
- Sep 2023 06:17:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 280B2171C8
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 17:05:42 +0000 (UTC)
+Received: from out-225.mta0.migadu.com (out-225.mta0.migadu.com [IPv6:2001:41d0:1004:224b::e1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 978147ED4;
+	Thu, 21 Sep 2023 10:05:38 -0700 (PDT)
+Message-ID: <83d2d685-3c3e-1758-55f7-6c829957e51d@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1695307305;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=J4F2fUPcR6NfJ9mAonWAyFBxw+y/d1QPP6AzZ+x+r3A=;
+	b=FGYzkQEnCvr/opzfYOz86RJUtsE+p4cbQ1uePHwU1FuJipkFC8Zvor9BEatrhPYJyMQcai
+	d4Y/oA4rVKCyx5STvMJN6C1ggz1j9m2F0ta5DChEfkS0NFjs91q7vcke5jtw8OYBft0VBn
+	HdCPEkdKu4/74UtNrjyQDPSqIL6ITZA=
+Date: Thu, 21 Sep 2023 15:41:41 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <730408.1695292879@warthog.procyon.org.uk> <CANn89i+wUq5R2nFO8eGLp7=8Y5OiJ0fwjR+ES74gk1X4k9r0rw@mail.gmail.com>
-In-Reply-To: <CANn89i+wUq5R2nFO8eGLp7=8Y5OiJ0fwjR+ES74gk1X4k9r0rw@mail.gmail.com>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Thu, 21 Sep 2023 09:16:48 -0400
-Message-ID: <CAF=yD-JhsNCtP7iWCL830=JWwsKHMqo4OMb9NSgReGJK7C=_0w@mail.gmail.com>
-Subject: Re: [PATCH net v3] ipv4, ipv6: Fix handling of transhdrlen in __ip{,6}_append_data()
-To: Eric Dumazet <edumazet@google.com>
-Cc: David Howells <dhowells@redhat.com>, netdev@vger.kernel.org, 
-	syzbot+62cbf263225ae13ff153@syzkaller.appspotmail.com, 
-	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, bpf@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-0.5 required=5.0 tests=BAYES_00,DATE_IN_PAST_03_06,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: Re: [PATCH net-next] netdev: Remove unneeded semicolon
+Content-Language: en-US
+To: Paolo Abeni <pabeni@redhat.com>, Yang Li <yang.lee@linux.alibaba.com>,
+ arkadiusz.kubalewski@intel.com, jiri@resnulli.us
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Abaci Robot <abaci@linux.alibaba.com>
+References: <20230919010305.120991-1-yang.lee@linux.alibaba.com>
+ <0ae9f426-7225-ac4b-4ecd-d53e36dbf365@linux.dev>
+ <b638de8abaa2e468bbcda116368c8e690a461a5d.camel@redhat.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <b638de8abaa2e468bbcda116368c8e690a461a5d.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Sep 21, 2023 at 7:09=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Thu, Sep 21, 2023 at 12:41=E2=80=AFPM David Howells <dhowells@redhat.c=
-om> wrote:
-> >
-> >
-> > Including the transhdrlen in length is a problem when the packet is
-> > partially filled (e.g. something like send(MSG_MORE) happened previousl=
-y)
-> > when appending to an IPv4 or IPv6 packet as we don't want to repeat the
-> > transport header or account for it twice.  This can happen under some
-> > circumstances, such as splicing into an L2TP socket.
-> >
-> > The symptom observed is a warning in __ip6_append_data():
-> >
-> >     WARNING: CPU: 1 PID: 5042 at net/ipv6/ip6_output.c:1800 __ip6_appen=
-d_data.isra.0+0x1be8/0x47f0 net/ipv6/ip6_output.c:1800
-> >
-> > that occurs when MSG_SPLICE_PAGES is used to append more data to an alr=
-eady
-> > partially occupied skbuff.  The warning occurs when 'copy' is larger th=
-an
-> > the amount of data in the message iterator.  This is because the reques=
-ted
-> > length includes the transport header length when it shouldn't.  This ca=
-n be
-> > triggered by, for example:
-> >
-> >         sfd =3D socket(AF_INET6, SOCK_DGRAM, IPPROTO_L2TP);
-> >         bind(sfd, ...); // ::1
-> >         connect(sfd, ...); // ::1 port 7
-> >         send(sfd, buffer, 4100, MSG_MORE);
-> >         sendfile(sfd, dfd, NULL, 1024);
-> >
-> > Fix this by only adding transhdrlen into the length if the write queue =
-is
-> > empty in l2tp_ip6_sendmsg(), analogously to how UDP does things.
-> >
-> > l2tp_ip_sendmsg() looks like it won't suffer from this problem as it bu=
-ilds
-> > the UDP packet itself.
-> >
-> > Fixes: a32e0eec7042 ("l2tp: introduce L2TPv3 IP encapsulation support f=
-or IPv6")
-> > Reported-by: syzbot+62cbf263225ae13ff153@syzkaller.appspotmail.com
-> > Link: https://lore.kernel.org/r/0000000000001c12b30605378ce8@google.com=
-/
-> > Suggested-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-> > Signed-off-by: David Howells <dhowells@redhat.com>
-> > cc: Eric Dumazet <edumazet@google.com>
-> > cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-> > cc: "David S. Miller" <davem@davemloft.net>
-> > cc: David Ahern <dsahern@kernel.org>
-> > cc: Paolo Abeni <pabeni@redhat.com>
-> > cc: Jakub Kicinski <kuba@kernel.org>
-> > cc: netdev@vger.kernel.org
-> > cc: bpf@vger.kernel.org
-> > cc: syzkaller-bugs@googlegroups.com
-> > ---
->
-> Looks safer indeed, thanks to you and Willem !
->
-> Reviewed-by: Eric Dumazet <edumazet@google.com>
+On 21/09/2023 14:07, Paolo Abeni wrote:
+> On Wed, 2023-09-20 at 12:10 +0100, Vadim Fedorenko wrote:
+>> On 19/09/2023 02:03, Yang Li wrote:
+>>> ./drivers/dpll/dpll_netlink.c:847:3-4: Unneeded semicolon
+>>>
+>>> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+>>> Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=6605
+>>> Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
+>>
+>> Hi Yang!
+>> There was a report from Intel's bot too about the issue, could you
+>> please add the tags from it?
+>>
+>> Reported-by: kernel test robot <lkp@intel.com>
+>> Closes:
+>> https://lore.kernel.org/oe-kbuild-all/202309190540.RFwfIgO7-lkp@intel.com/
+> 
+> No need to repost, the pw tools import the above tags automatically. 
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Ok, cool.
+
+The fix itself is trivial.
+
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
