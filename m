@@ -1,120 +1,272 @@
-Return-Path: <netdev+bounces-35473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 898A57A9A35
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 20:37:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CE877A9920
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 20:11:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43FB4281B15
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 18:37:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 932A41F2127F
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 18:11:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F182E1549B;
-	Thu, 21 Sep 2023 17:48:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 222E344481;
+	Thu, 21 Sep 2023 17:23:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D2D91170D
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 17:48:56 +0000 (UTC)
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 719819280F
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:48:47 -0700 (PDT)
-Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-4053a7b36b0so8105e9.1
-        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:48:47 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B26842BF4;
+	Thu, 21 Sep 2023 17:22:47 +0000 (UTC)
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 414D3573CE;
+	Thu, 21 Sep 2023 10:18:33 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-690fe1d9ba1so300400b3a.0;
+        Thu, 21 Sep 2023 10:18:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695318526; x=1695923326; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9dWFJnVjGFmbTuADXXCQGOQYxstl8fO1IHn2a61y2ws=;
-        b=ikmCRr3QjEKJrHPA6I7TmQ8GYFVntrsGAMWvaRLR5Lq+56cuYT8Rhfx5kIrl2umQy5
-         74vBSnG4swd9m9YGkMLWKvYMKQIo4qF0unjc913d19VvE8A0drAcxts9PyKu1GF/GVFY
-         iU1ISWzi8qEgl22Yqqs1b9gs2R1aOxh4pfx6a3hPJ1t3C7D/0lFx4bfC70aM8rM76SB3
-         JZHR436YVIrbDBd0b9mICFSNWOOyJlBhgEWXSd3hZl/VgSGXkUobviBGQHOnc2mu0Y/B
-         q8RYpppaQ5mljDO8+6P24i79dy+tsSs9KnQJ3/0VXp/ZACK6nSeQTgRrEWelRyoTksff
-         Bzww==
+        d=gmail.com; s=20230601; t=1695316713; x=1695921513; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=5q3Il3iyqMne8gqEjfUahXva7VtyYgk1IJOkOH3elkw=;
+        b=cieT2Pk3hlEbrw0pFniWYuCRBCBGNT3OKcPz3qetJQTfjtRUjJZWgAKPtX0wpGWcau
+         /+owfP1t/YKOBxlWhq2fB9AKK8NA12mHwRKmRpkORUWPtw5w47xQfZKS7UdJ61YDBVIr
+         zhjpUw1owuB3OWMYSUGL2tGjjFKWA/zsPr2m3oxqvg3t5F+ux0jV2+bsOCx9ZqObXY+a
+         WfO33dfirNtEnBIDLwOmxtqQzK/lqx+AdvzpmuPVCU9pgkEtF5UvjeonOOubXFaeSar6
+         ylZgiB1DPJTsOhcC8OhMjl+8bCdjTZYasg6cdtH1SJcfwms+0wu11obrnSOYVoK9c/mr
+         C/Sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695318526; x=1695923326;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9dWFJnVjGFmbTuADXXCQGOQYxstl8fO1IHn2a61y2ws=;
-        b=Sfb1tglxE6zbNb8TDYTBjwj2ojWb2Lnup2c7FXoSrYKYs/+yM0RWzCutCGK2b6RAF3
-         ooxQJG2rxv+lU78cTN7bmYurF0xvBwFrhoepIPJ9xY2TxaoqLMLxWUByCd+d7l31beQG
-         p0cgYwQCbT6NX0pS7PNBAJqVW5VCphqbKj6mKd0oE1CtB86T7HjD0ufQ/KMP/s9Pb2xP
-         yVyrwjXNdVWYwUmuFTnZNYeTc3nkcQXuY23LJFQQPy3Q61JbQtGt9Bsce6IeT3jd937H
-         E2T7SIlZiP2pUyre32w7wzlIQSeK6xhyYR41VZpJMO4mAuVIyGRp1eGn9kvp9izZVss0
-         uuVA==
-X-Gm-Message-State: AOJu0YyyoqMGWRt5KYhrhYf038J4ZBq9k5M2+ovQObUZBYV5+9qAvN0j
-	DgQgfQjAuX8huyzhHW9JPbETDDe5Ta+jewl6LbxyQaumH0v0+j7lCOSLhxSM
-X-Google-Smtp-Source: AGHT+IEWwglfNsMiSEUReu6IkMvRcHC4kESDo+aWQBIwsEObNM9dneHBzDmbGNXhXRdQGo1H2UPWJwg7AKIluhlmKc4=
-X-Received: by 2002:a50:d610:0:b0:525:573c:643b with SMTP id
- x16-20020a50d610000000b00525573c643bmr34629edi.7.1695278298934; Wed, 20 Sep
- 2023 23:38:18 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1695316713; x=1695921513;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5q3Il3iyqMne8gqEjfUahXva7VtyYgk1IJOkOH3elkw=;
+        b=XyZtoxXSNKlRRCGCFO9GPL5W28Uhr9+C4Z5BLCNR15Qnr1XXpBZ9B/CJNS9pJvk61b
+         qRmbJSRubLrK2iEY9B7MIAhHbTlP8Mmi32r5q7zQL4Lb9Iw3pV+kMpuxeZ8Q4imbzW0C
+         2ZRKoDVfy+GxIU+NoHfseAEUUo0/TmTPUt28Pynhv/MK2RYGsV4LX6qQhzGxmRNPo4Wq
+         SJp9yO138FWCeR3syDCzn1fUVnuVn9HJWDGyJYJX1YGzjY3hS37hA1WcenO7POceMSDU
+         Zz8p12Sk827aDZ24sMJStf7aAB63aZHDt9DgHjC7KwhxBNFVJefIq1FLMDQVFWg7SKE1
+         mo6g==
+X-Gm-Message-State: AOJu0Yx64oAPCSqUlPVstMmBINB1OU/smXee+qfwwZLUTJDt6PDdvo0b
+	h4SQY024G2wjXf6gb2HDLL7F2b+TFDfnfAM1sJUWuuMMakI=
+X-Google-Smtp-Source: AGHT+IHG8NxDP/QinPs3JQlu8rvBxT1D7zqKf8WDI0BZ3NF4fzjARx7yPaFthNuIAdktLFgWb9oJLI5DtP8a8rzEVnE=
+X-Received: by 2002:a05:6214:21ab:b0:655:ebd0:1fc2 with SMTP id
+ t11-20020a05621421ab00b00655ebd01fc2mr4592620qvc.5.1695278604404; Wed, 20 Sep
+ 2023 23:43:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230916010625.2771731-1-lixiaoyan@google.com>
- <20230916010625.2771731-2-lixiaoyan@google.com> <69c8b5ce-7b08-42fe-a4f3-724b9b676d19@lunn.ch>
-In-Reply-To: <69c8b5ce-7b08-42fe-a4f3-724b9b676d19@lunn.ch>
-From: Coco Li <lixiaoyan@google.com>
-Date: Wed, 20 Sep 2023 23:38:07 -0700
-Message-ID: <CADjXwji6+OSxZzLoPUKpEHM9VNcN4nm5Lq9LAzU0qO619uk_8Q@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next 1/5] Documentations: Analyze heavily used
- Networking related structs
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Neal Cardwell <ncardwell@google.com>, Mubashir Adnan Qureshi <mubashirq@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, Chao Wu <wwchao@google.com>, 
-	Wei Wang <weiwan@google.com>
+References: <20230918093304.367826-1-tushar.vyavahare@intel.com> <20230918093304.367826-4-tushar.vyavahare@intel.com>
+In-Reply-To: <20230918093304.367826-4-tushar.vyavahare@intel.com>
+From: Magnus Karlsson <magnus.karlsson@gmail.com>
+Date: Thu, 21 Sep 2023 08:43:13 +0200
+Message-ID: <CAJ8uoz1nLdzY3BDYwaRnYbZZvtASOWg39=Cwyy1WsfELA9WNpQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 3/8] selftests/xsk: implement a function that
+ generates MAC addresses
+To: Tushar Vyavahare <tushar.vyavahare@intel.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, bjorn@kernel.org, 
+	magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
+	jonathan.lemon@gmail.com, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net, 
+	tirthendu.sarkar@intel.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-16.1 required=5.0 tests=BAYES_00,DATE_IN_PAST_06_12,
-	DKIMWL_WL_MED,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,HK_RANDOM_ENVFROM,HK_RANDOM_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
-	USER_IN_DEF_SPF_WL autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DATE_IN_PAST_06_12,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-We used 64 bytes for L3_cacheline_size_x86.
+On Mon, 18 Sept 2023 at 11:13, Tushar Vyavahare
+<tushar.vyavahare@intel.com> wrote:
+>
+> Move the src_mac and dst_mac fields from the ifobject structure to the
+> xsk_socket_info structure to achieve per-socket MAC address assignment.
+> Implement the function called generate_mac_addresses() to generate MAC
+> addresses based on the required number by the framework.
+>
+> Require this in order to steer traffic to various sockets in subsequent
+> patches.
+>
+> Signed-off-by: Tushar Vyavahare <tushar.vyavahare@intel.com>
+> ---
+>  tools/testing/selftests/bpf/xskxceiver.c | 45 ++++++++++++++----------
+>  tools/testing/selftests/bpf/xskxceiver.h |  8 +++--
+>  2 files changed, 33 insertions(+), 20 deletions(-)
+>
+> diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testing/selftests/bpf/xskxceiver.c
+> index ad1f7f078f5f..9f241f503eed 100644
+> --- a/tools/testing/selftests/bpf/xskxceiver.c
+> +++ b/tools/testing/selftests/bpf/xskxceiver.c
+> @@ -104,9 +104,6 @@
+>  #include "../kselftest.h"
+>  #include "xsk_xdp_common.h"
+>
+> -static const char *MAC1 = "\x00\x0A\x56\x9E\xEE\x62";
+> -static const char *MAC2 = "\x00\x0A\x56\x9E\xEE\x61";
+> -
+>  static bool opt_verbose;
+>  static bool opt_print_tests;
+>  static enum test_mode opt_mode = TEST_MODE_ALL;
+> @@ -145,6 +142,18 @@ static void report_failure(struct test_spec *test)
+>         test->fail = true;
+>  }
+>
+> +static void generate_mac_addresses(const u8 *g_mac, u32 num_macs)
+> +{
+> +       u32 i, j;
+> +
+> +       for (i = 0; i < num_macs; i++) {
+> +               for (j = 0; j < ETH_ALEN; j++)
+> +                       macs[i][j] = g_mac[j];
+> +
+> +               macs[i][ETH_ALEN - 1] += i;
+> +       }
+> +}
+> +
+>  /* The payload is a word consisting of a packet sequence number in the upper
+>   * 16-bits and a intra packet data sequence number in the lower 16 bits. So the 3rd packet's
+>   * 5th word of data will contain the number (2<<16) | 4 as they are numbered from 0.
+> @@ -159,10 +168,10 @@ static void write_payload(void *dest, u32 pkt_nb, u32 start, u32 size)
+>                 ptr[i] = htonl(pkt_nb << 16 | (i + start));
+>  }
+>
+> -static void gen_eth_hdr(struct ifobject *ifobject, struct ethhdr *eth_hdr)
+> +static void gen_eth_hdr(struct xsk_socket_info *xsk, struct ethhdr *eth_hdr)
+>  {
+> -       memcpy(eth_hdr->h_dest, ifobject->dst_mac, ETH_ALEN);
+> -       memcpy(eth_hdr->h_source, ifobject->src_mac, ETH_ALEN);
+> +       memcpy(eth_hdr->h_dest, xsk->dst_mac, ETH_ALEN);
+> +       memcpy(eth_hdr->h_source, xsk->src_mac, ETH_ALEN);
+>         eth_hdr->h_proto = htons(ETH_P_LOOPBACK);
+>  }
+>
+> @@ -445,6 +454,9 @@ static void __test_spec_init(struct test_spec *test, struct ifobject *ifobj_tx,
+>                                 ifobj->xsk_arr[j].pkt_stream = test->tx_pkt_stream_default;
+>                         else
+>                                 ifobj->xsk_arr[j].pkt_stream = test->rx_pkt_stream_default;
+> +
+> +                       memcpy(ifobj->xsk_arr[j].src_mac, macs[j * 2 + i % 2], ETH_ALEN);
+> +                       memcpy(ifobj->xsk_arr[j].dst_mac, macs[j * 2 + (i + 1) % 2], ETH_ALEN);
+>                 }
+>         }
+>
+> @@ -726,16 +738,16 @@ static void pkt_stream_cancel(struct pkt_stream *pkt_stream)
+>         pkt_stream->current_pkt_nb--;
+>  }
+>
+> -static void pkt_generate(struct ifobject *ifobject, u64 addr, u32 len, u32 pkt_nb,
+> -                        u32 bytes_written)
+> +static void pkt_generate(struct xsk_socket_info *xsk, struct xsk_umem_info *umem, u64 addr, u32 len,
+> +                        u32 pkt_nb, u32 bytes_written)
+>  {
+> -       void *data = xsk_umem__get_data(ifobject->umem->buffer, addr);
+> +       void *data = xsk_umem__get_data(umem->buffer, addr);
+>
+>         if (len < MIN_PKT_SIZE)
+>                 return;
+>
+>         if (!bytes_written) {
+> -               gen_eth_hdr(ifobject, data);
+> +               gen_eth_hdr(xsk, data);
+>
+>                 len -= PKT_HDR_SIZE;
+>                 data += PKT_HDR_SIZE;
+> @@ -1209,7 +1221,7 @@ static int __send_pkts(struct ifobject *ifobject, struct pollfd *fds, bool timeo
+>                                 tx_desc->options = 0;
+>                         }
+>                         if (pkt->valid)
+> -                               pkt_generate(ifobject, tx_desc->addr, tx_desc->len, pkt->pkt_nb,
+> +                               pkt_generate(xsk, umem, tx_desc->addr, tx_desc->len, pkt->pkt_nb,
+>                                              bytes_written);
+>                         bytes_written += tx_desc->len;
+>
+> @@ -2120,15 +2132,11 @@ static bool hugepages_present(void)
+>         return true;
+>  }
+>
+> -static void init_iface(struct ifobject *ifobj, const char *dst_mac, const char *src_mac,
+> -                      thread_func_t func_ptr)
+> +static void init_iface(struct ifobject *ifobj, thread_func_t func_ptr)
+>  {
+>         LIBBPF_OPTS(bpf_xdp_query_opts, query_opts);
+>         int err;
+>
+> -       memcpy(ifobj->dst_mac, dst_mac, ETH_ALEN);
+> -       memcpy(ifobj->src_mac, src_mac, ETH_ALEN);
+> -
+>         ifobj->func_ptr = func_ptr;
+>
+>         err = xsk_load_xdp_programs(ifobj);
+> @@ -2391,6 +2399,7 @@ int main(int argc, char **argv)
+>                 ksft_exit_xfail();
+>         }
+>
+> +       generate_mac_addresses(g_mac, NUM_MAC_ADDRESSES);
 
-We only have arm64 in our testing environment, and we can update some
-results on that with the different levels of cache lines on arm64 and
-x86.
+Why pass down a global variable?
 
-On Sat, Sep 16, 2023 at 7:36=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
+>         shared_netdev = (ifobj_tx->ifindex == ifobj_rx->ifindex);
+>         ifobj_tx->shared_umem = shared_netdev;
+>         ifobj_rx->shared_umem = shared_netdev;
+> @@ -2404,8 +2413,8 @@ int main(int argc, char **argv)
+>                         modes++;
+>         }
 >
-> On Sat, Sep 16, 2023 at 01:06:21AM +0000, Coco Li wrote:
-> > Analyzed a few structs in the networking stack by looking at variables
-> > within them that are used in the TCP/IP fast path.
-> >
-> > Fast path is defined as TCP path where data is transferred from sender =
-to
-> > receiver unidirectionaly. It doesn't include phases other than
-> > TCP_ESTABLISHED, nor does it look at error paths.
-> >
-> > We hope to re-organizing variables that span many cachelines whose fast
-> > path variables are also spread out, and this document can help future
-> > developers keep networking fast path cachelines small.
-> >
-> > Optimized_cacheline field is computed as
-> > (Fastpath_Bytes/L3_cacheline_size_x86), and not the actual organized
-> > results (see patches to come for these).
+> -       init_iface(ifobj_rx, MAC1, MAC2, worker_testapp_validate_rx);
+> -       init_iface(ifobj_tx, MAC2, MAC1, worker_testapp_validate_tx);
+> +       init_iface(ifobj_rx, worker_testapp_validate_rx);
+> +       init_iface(ifobj_tx, worker_testapp_validate_tx);
 >
-> What value do you use for L3_cacheline_size_x86? What is
-> L3_cacheline_size_arm64, L3_cacheline_size_s390, etc.
+>         test_spec_init(&test, ifobj_tx, ifobj_rx, 0, &tests[0]);
+>         tx_pkt_stream_default = pkt_stream_generate(ifobj_tx->umem, DEFAULT_PKT_CNT, MIN_PKT_SIZE);
+> diff --git a/tools/testing/selftests/bpf/xskxceiver.h b/tools/testing/selftests/bpf/xskxceiver.h
+> index 06b82b39c59c..e003f9ca4692 100644
+> --- a/tools/testing/selftests/bpf/xskxceiver.h
+> +++ b/tools/testing/selftests/bpf/xskxceiver.h
+> @@ -59,6 +59,7 @@
+>  #define HUGEPAGE_SIZE (2 * 1024 * 1024)
+>  #define PKT_DUMP_NB_TO_PRINT 16
+>  #define RUN_ALL_TESTS UINT_MAX
+> +#define NUM_MAC_ADDRESSES 4
 >
-> Do you have any profile data which compares L3 cache misses vs L2, vs
-> L1. I guess there should be some gains by changing the order of
-> structure members, such that those which are used at a similar time
-> are in the same L1 and L2 cache lines, and so only need to be fetched
-> once, so reducing cache thrashing.
+>  #define print_verbose(x...) do { if (opt_verbose) ksft_print_msg(x); } while (0)
 >
->       Andrew
+> @@ -90,6 +91,8 @@ struct xsk_socket_info {
+>         struct pkt_stream *pkt_stream;
+>         u32 outstanding_tx;
+>         u32 rxqsize;
+> +       u8 dst_mac[ETH_ALEN];
+> +       u8 src_mac[ETH_ALEN];
+>  };
+>
+>  struct pkt {
+> @@ -140,8 +143,6 @@ struct ifobject {
+>         bool unaligned_supp;
+>         bool multi_buff_supp;
+>         bool multi_buff_zc_supp;
+> -       u8 dst_mac[ETH_ALEN];
+> -       u8 src_mac[ETH_ALEN];
+>  };
+>
+>  struct test_spec {
+> @@ -168,4 +169,7 @@ pthread_mutex_t pacing_mutex = PTHREAD_MUTEX_INITIALIZER;
+>
+>  int pkts_in_flight;
+>
+> +static const u8 g_mac[] = {0x55, 0x44, 0x33, 0x22, 0x11, 0x00};
+> +static u8 macs[NUM_MAC_ADDRESSES][ETH_ALEN] = {0};
+
+I do not think you need this last array. You already have added
+dst_mac and src_mac in the xsk_socket_info that you can use, so no
+need for this.
+
+> +
+>  #endif                         /* XSKXCEIVER_H_ */
+> --
+> 2.34.1
+>
+>
 
