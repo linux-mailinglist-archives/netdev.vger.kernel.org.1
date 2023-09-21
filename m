@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-35568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AB7E7A9C12
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:06:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 898A57A9A35
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 20:37:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20E511C214ED
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:06:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43FB4281B15
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 18:37:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AF6C41757;
-	Thu, 21 Sep 2023 18:59:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F182E1549B;
+	Thu, 21 Sep 2023 17:48:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4003312B96
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 18:59:18 +0000 (UTC)
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0932F1B15C
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 11:59:17 -0700 (PDT)
-Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-53074ee0c2aso3689a12.1
-        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 11:59:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D2D91170D
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 17:48:56 +0000 (UTC)
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 719819280F
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:48:47 -0700 (PDT)
+Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-4053a7b36b0so8105e9.1
+        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:48:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695322755; x=1695927555; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1695318526; x=1695923326; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yJV2mqqSprXSlM87WQkx2XPFyvLFRft18WJ1B6UsVOQ=;
-        b=nmqpbbYw2mHC3Xn9JAcabZFiYhUapWbXKhiKxW0a891XlFst918MiG5tUDzlbhS5NL
-         w1qo7E1el+I/m/N5nFFgyO9M7sXAh0qJzeXsppiOBiCVxLOLe9jlc01xLmjVsmdzeyIm
-         aUSMNbP8p5QRV6YxhZrUs9ODliJ72kcnfuDgaVALQCZge8xiRU4GgBIfU92gAxvkYOmG
-         wQXBPi/Za1mvgaMT0krd5ArimVavT/9AHeuujwVWZ558hTNlimtoT6iK7osrf50s3nJd
-         D/IkB/3XMysA/ok2zdyu0/gAhkfjh/VmiyM4DMYjroKRU2d7G0R4h7ecB77jcJnTTHky
-         nMHA==
+        bh=9dWFJnVjGFmbTuADXXCQGOQYxstl8fO1IHn2a61y2ws=;
+        b=ikmCRr3QjEKJrHPA6I7TmQ8GYFVntrsGAMWvaRLR5Lq+56cuYT8Rhfx5kIrl2umQy5
+         74vBSnG4swd9m9YGkMLWKvYMKQIo4qF0unjc913d19VvE8A0drAcxts9PyKu1GF/GVFY
+         iU1ISWzi8qEgl22Yqqs1b9gs2R1aOxh4pfx6a3hPJ1t3C7D/0lFx4bfC70aM8rM76SB3
+         JZHR436YVIrbDBd0b9mICFSNWOOyJlBhgEWXSd3hZl/VgSGXkUobviBGQHOnc2mu0Y/B
+         q8RYpppaQ5mljDO8+6P24i79dy+tsSs9KnQJ3/0VXp/ZACK6nSeQTgRrEWelRyoTksff
+         Bzww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695322755; x=1695927555;
+        d=1e100.net; s=20230601; t=1695318526; x=1695923326;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=yJV2mqqSprXSlM87WQkx2XPFyvLFRft18WJ1B6UsVOQ=;
-        b=ejkRA+oPcFkeDFSknpOUFfyfpkOZamwXB/LwnUitbYsE6R7fwcYlz2kWwd1S9lQ9Ce
-         utpOymlBj4vT1abd5S1ZR/PtvBjstfZn8gdAsZNDHSxtCdCpNHJ4wj2QbsncVehJ0WwI
-         PgzrQk/VTkgBkiszje1jiHRPyFb0m2cLyBs5eYqmxuPo4OLxuqFRCwJLb1pfpeZ1RSFE
-         5tOdne+tMXU4hS2Z7orYa7n5Krpm9jr6zv17zbZn93rtC5MXZcfSKMhDmoP1cpBf4rva
-         eXmC5rsde3e517v1MCmijLjXx+Suckqd7mPBSVZ/e6+T5w8Q543H5X6jZPa2j3dAIcDU
-         SH8g==
-X-Gm-Message-State: AOJu0YyA6Hdna96jF0ptbbh+iO7HdQDxI6sOFU8q09UjkHtYpuZk5hAM
-	4gkskHf4zPr2MLhkvSwmUvdk8Mmsn0P8uMzXqiBGyOVA/hvFXWzxXLs=
-X-Google-Smtp-Source: AGHT+IGTGIuL37pTAr1CP4rxL5KVyHYrnsTABHVu9UTLIPsivfUISf+7tm4EwX665pbAm9tA2COYZ6PI/LwGJFXB8tY=
-X-Received: by 2002:ac2:46cb:0:b0:502:cdb6:f316 with SMTP id
- p11-20020ac246cb000000b00502cdb6f316mr19784lfo.3.1695277913764; Wed, 20 Sep
- 2023 23:31:53 -0700 (PDT)
+        bh=9dWFJnVjGFmbTuADXXCQGOQYxstl8fO1IHn2a61y2ws=;
+        b=Sfb1tglxE6zbNb8TDYTBjwj2ojWb2Lnup2c7FXoSrYKYs/+yM0RWzCutCGK2b6RAF3
+         ooxQJG2rxv+lU78cTN7bmYurF0xvBwFrhoepIPJ9xY2TxaoqLMLxWUByCd+d7l31beQG
+         p0cgYwQCbT6NX0pS7PNBAJqVW5VCphqbKj6mKd0oE1CtB86T7HjD0ufQ/KMP/s9Pb2xP
+         yVyrwjXNdVWYwUmuFTnZNYeTc3nkcQXuY23LJFQQPy3Q61JbQtGt9Bsce6IeT3jd937H
+         E2T7SIlZiP2pUyre32w7wzlIQSeK6xhyYR41VZpJMO4mAuVIyGRp1eGn9kvp9izZVss0
+         uuVA==
+X-Gm-Message-State: AOJu0YyyoqMGWRt5KYhrhYf038J4ZBq9k5M2+ovQObUZBYV5+9qAvN0j
+	DgQgfQjAuX8huyzhHW9JPbETDDe5Ta+jewl6LbxyQaumH0v0+j7lCOSLhxSM
+X-Google-Smtp-Source: AGHT+IEWwglfNsMiSEUReu6IkMvRcHC4kESDo+aWQBIwsEObNM9dneHBzDmbGNXhXRdQGo1H2UPWJwg7AKIluhlmKc4=
+X-Received: by 2002:a50:d610:0:b0:525:573c:643b with SMTP id
+ x16-20020a50d610000000b00525573c643bmr34629edi.7.1695278298934; Wed, 20 Sep
+ 2023 23:38:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,54 +60,61 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20230916010625.2771731-1-lixiaoyan@google.com>
- <20230916010625.2771731-4-lixiaoyan@google.com> <56d32e37-afdd-342c-947d-dec329a504e5@linux.dev>
-In-Reply-To: <56d32e37-afdd-342c-947d-dec329a504e5@linux.dev>
+ <20230916010625.2771731-2-lixiaoyan@google.com> <69c8b5ce-7b08-42fe-a4f3-724b9b676d19@lunn.ch>
+In-Reply-To: <69c8b5ce-7b08-42fe-a4f3-724b9b676d19@lunn.ch>
 From: Coco Li <lixiaoyan@google.com>
-Date: Wed, 20 Sep 2023 23:31:42 -0700
-Message-ID: <CADjXwjj8ntkj=A_oY3om=QKJRts1zqihZSRV0iaVEXodQRQ64g@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next 3/5] netns-ipv4: reorganize netns_ipv4 fast
- path variables
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Date: Wed, 20 Sep 2023 23:38:07 -0700
+Message-ID: <CADjXwji6+OSxZzLoPUKpEHM9VNcN4nm5Lq9LAzU0qO619uk_8Q@mail.gmail.com>
+Subject: Re: [PATCH v1 net-next 1/5] Documentations: Analyze heavily used
+ Networking related structs
+To: Andrew Lunn <andrew@lunn.ch>
 Cc: Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
 	Neal Cardwell <ncardwell@google.com>, Mubashir Adnan Qureshi <mubashirq@google.com>, 
 	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, Chao Wu <wwchao@google.com>, 
 	Wei Wang <weiwan@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-16.6 required=5.0 tests=BAYES_00,DATE_IN_PAST_12_24,
+X-Spam-Status: No, score=-16.1 required=5.0 tests=BAYES_00,DATE_IN_PAST_06_12,
 	DKIMWL_WL_MED,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
 	ENV_AND_HDR_SPF_MATCH,HK_RANDOM_ENVFROM,HK_RANDOM_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
 	USER_IN_DEF_SPF_WL autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, Sep 17, 2023 at 10:10=E2=80=AFAM Vadim Fedorenko
-<vadim.fedorenko@linux.dev> wrote:
->
-> On 16/09/2023 02:06, Coco Li wrote:
-> > Reorganize fast path variables on tx-txrx-rx order.
-> > Fastpath cacheline ends after sysctl_tcp_rmem.
-> > There are only read-only variables here. (write is on the control path
-> > and not considered in this case)
->
-> I believe udp sysctls can be aligned the same way. With HTTP/3 adoption
-> we should think about UDP traffic too, and looks like we do have some
-> space in hot-path cache lines for udp_early_demux and rmem/wmem.
->
-> And have you thought about cache-line boundary alignment for these values=
-?
->
+We used 64 bytes for L3_cacheline_size_x86.
 
-Thank you for the suggestion!
+We only have arm64 in our testing environment, and we can update some
+results on that with the different levels of cache lines on arm64 and
+x86.
 
-The patch set was created and tested with TCP traffic in mind, and it
-is really with the entire series that with TCP traffic we can see the
-cpu per ops improvement, whereas it is difficult to measure
-performance improvements of the individual patches including this one.
-
-As you pointed out, there is still space in the hot cache line to fit
-UDP traffic sysctls. We encourage folks to use this series and its
-documentation as a template to add fast path network stack protocol
-variables that are important to them :)
+On Sat, Sep 16, 2023 at 7:36=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Sat, Sep 16, 2023 at 01:06:21AM +0000, Coco Li wrote:
+> > Analyzed a few structs in the networking stack by looking at variables
+> > within them that are used in the TCP/IP fast path.
+> >
+> > Fast path is defined as TCP path where data is transferred from sender =
+to
+> > receiver unidirectionaly. It doesn't include phases other than
+> > TCP_ESTABLISHED, nor does it look at error paths.
+> >
+> > We hope to re-organizing variables that span many cachelines whose fast
+> > path variables are also spread out, and this document can help future
+> > developers keep networking fast path cachelines small.
+> >
+> > Optimized_cacheline field is computed as
+> > (Fastpath_Bytes/L3_cacheline_size_x86), and not the actual organized
+> > results (see patches to come for these).
+>
+> What value do you use for L3_cacheline_size_x86? What is
+> L3_cacheline_size_arm64, L3_cacheline_size_s390, etc.
+>
+> Do you have any profile data which compares L3 cache misses vs L2, vs
+> L1. I guess there should be some gains by changing the order of
+> structure members, such that those which are used at a similar time
+> are in the same L1 and L2 cache lines, and so only need to be fetched
+> once, so reducing cache thrashing.
+>
+>       Andrew
 
