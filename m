@@ -1,253 +1,165 @@
-Return-Path: <netdev+bounces-35624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEEE17AA57F
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 01:15:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70B7D7AA5A8
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 01:30:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 5763628209A
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 23:15:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id D9C9A28343F
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 23:30:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18C1629403;
-	Thu, 21 Sep 2023 23:15:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42CF52940E;
+	Thu, 21 Sep 2023 23:30:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 514F69CA5A
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 23:15:45 +0000 (UTC)
-Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 019A78F
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 16:15:42 -0700 (PDT)
-Received: by mail-wr1-x444.google.com with SMTP id ffacd0b85a97d-32164a6af64so1326878f8f.2
-        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 16:15:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1695338141; x=1695942941; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Q0jmxeUHMyRvSul47ykDzG/kcgtqwpKI1qC1sVJFmMs=;
-        b=Uu67o6wHSCJOmW99y3/jtHtDUDAtf/NQmtb7dPJHoFi2nsTzA4MNbQoRMvDuygl3n+
-         eA6WHhNZ264slaSeFY8ulm8mNBDmt0GbEzrOMf1VvTmqGgBKnXIvTEMz8iAxge9XKNq/
-         86SmNvBauir3eZPjMQdzX2KiZ3RUTkRoJPgNXal7PkQ2dQs/j8tXWTAlaFQxuRT8/Nti
-         JrAwTA5DmI6P8UNLwVZQ4SiFGVtx9+V2jbEwcmqmW8JH1i/YIo93kP0GnA8XwEu4a94O
-         X6Y36LkX3DqpWEDoFrMrbijZMFFwnhdKwP1NzlOxSN5t1ksFxPCwGhOzl4R29uYHkTAd
-         NftQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695338141; x=1695942941;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q0jmxeUHMyRvSul47ykDzG/kcgtqwpKI1qC1sVJFmMs=;
-        b=TEr2tZIEXObAqB+hdFsu32Ys6IohTtFp8NJpq0wbRuoA7ufiDa3y+fzGpoxqP/xhy0
-         IzLS3wX4gAjjNFTTVAQLYhK+poKT4rUjEYcEZ6VZ0zwenef3zjrGzJoC7S0IxbneoVBD
-         m7MzZNzPZZbbAgk4Sib9v4UPzxsDdg7IItvz7uYX0TO6K6cywmedN8hOazr/O7LgJ2/q
-         abzWc2zU3o6NB6dq90o0wz3isXiWdWIt8o4IFC1o/a1Y41bSV1wDDeKdtrc5OaQu47nu
-         evyWCQF/uDoFEXJpNVEhNBNwHdmbipg3OiJMRvRgCAYRiUiJAqxTtlzXFAp70YjjATdH
-         LJyw==
-X-Gm-Message-State: AOJu0YzCTohyX9gdNoFFDXn8brEm6uQOTt5eQa3IPBiUl6ghq4DjwCYd
-	ag7a6YvxYoWPSbagxDSxz2YY4ldPO58kua1Ne9qCkw==
-X-Google-Smtp-Source: AGHT+IEP2PI1/W7hWYftVLg/4+qyY/LqCbYhRiu1QhICRTxA7xUEXZmBZJCSCOGW/2v1WCOr5XNfoQ==
-X-Received: by 2002:a5d:440b:0:b0:319:6d03:13ae with SMTP id z11-20020a5d440b000000b003196d0313aemr6267180wrq.55.1695338141414;
-        Thu, 21 Sep 2023 16:15:41 -0700 (PDT)
-Received: from [10.83.37.178] ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id a3-20020a5d5083000000b003198a9d758dsm2911162wrt.78.2023.09.21.16.15.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Sep 2023 16:15:40 -0700 (PDT)
-Message-ID: <0d9983af-1483-d43e-810e-64ce6068a381@arista.com>
-Date: Fri, 22 Sep 2023 00:15:27 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B1029408;
+	Thu, 21 Sep 2023 23:30:42 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B7B18F;
+	Thu, 21 Sep 2023 16:30:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=cTXKwjxtldkfqXx+SXk/6A/UnwSLoK4UrexStTF47tk=; b=mA
+	PFKnKwZNfEAUXq9Vl812F9mSnn7XT/oV04Fnon/LzgqN7yAlSl68OROHuZmgfman10e1tUw/f6Vja
+	DparwyGO4juYkofrJrC+UuUpDENXJroLSr7l2FzDTqmPrfhVx9duW7bJj+I3ArMyUEzZSC3ViUseA
+	8C2rW8sML3oYYds=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qjT7L-0078ta-H8; Fri, 22 Sep 2023 01:29:55 +0200
+Date: Fri, 22 Sep 2023 01:29:55 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: Rob Herring <robh@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	George McCollister <george.mccollister@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Kurt Kanzenbach <kurt@linutronix.de>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
+	Marcin Wojtas <mw@semihalf.com>,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@microchip.com>,
+	Marek Vasut <marex@denx.de>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	John Crispin <john@phrozen.org>,
+	Madalin Bucur <madalin.bucur@nxp.com>,
+	Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	Oleksij Rempel <linux@rempel-privat.de>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Grygorii Strashko <grygorii.strashko@ti.com>,
+	Sekhar Nori <nsekhar@ti.com>,
+	Shyam Pandey <radhey.shyam.pandey@xilinx.com>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH net-next v2 07/10] dt-bindings: net: enforce phylink
+ bindings on certain ethernet controllers
+Message-ID: <8935d431-be0c-43e0-a908-f7dff2048f7c@lunn.ch>
+References: <20230916110902.234273-1-arinc.unal@arinc9.com>
+ <20230916110902.234273-8-arinc.unal@arinc9.com>
+ <20230918181319.GA1445647-robh@kernel.org>
+ <16710cf9-8911-4fed-8e2d-b19b581446c1@arinc9.com>
+ <a8d49992-4fa8-4a9f-b954-79011a3040a8@lunn.ch>
+ <85cc3b27-417e-4cf4-9f77-347a338c9d67@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [syzbot] [net?] memory leak in tcp_md5_do_add
-From: Dmitry Safonov <dima@arista.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: bpf@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
- kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- pabeni@redhat.com, syzkaller-bugs@googlegroups.com,
- syzbot <syzbot+68662811b3d5f6695bcb@syzkaller.appspotmail.com>,
- Catalin Marinas <catalin.marinas@arm.com>
-References: <0000000000004d83170605e16003@google.com>
- <CANn89iJwQ3TCSm+SMs=W90oThgRMLoiSAcTBJ9LH2AVsJY1NBA@mail.gmail.com>
- <18267b34-1dcf-08d5-5ba1-4f5162e6c43a@arista.com>
-Content-Language: en-US
-In-Reply-To: <18267b34-1dcf-08d5-5ba1-4f5162e6c43a@arista.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
+In-Reply-To: <85cc3b27-417e-4cf4-9f77-347a338c9d67@arinc9.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Eric,
-
-On 9/21/23 18:01, Dmitry Safonov wrote:
-> On 9/21/23 17:59, Eric Dumazet wrote:
->> On Thu, Sep 21, 2023 at 6:56 PM syzbot
->> <syzbot+68662811b3d5f6695bcb@syzkaller.appspotmail.com> wrote:
->>>
->>> Hello,
->>>
->>> syzbot found the following issue on:
->>>
->>> HEAD commit:    ee3f96b16468 Merge tag 'nfsd-6.3-1' of git://git.kernel.or..
->>> git tree:       upstream
->>> console output: https://syzkaller.appspot.com/x/log.txt?x=1312bba8c80000
->>> kernel config:  https://syzkaller.appspot.com/x/.config?x=f5733ca1757172ad
->>> dashboard link: https://syzkaller.appspot.com/bug?extid=68662811b3d5f6695bcb
->>> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
->>> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=105393a8c80000
->>> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1113917f480000
->>>
->>> Downloadable assets:
->>> disk image: https://storage.googleapis.com/syzbot-assets/29e7966ab711/disk-ee3f96b1.raw.xz
->>> vmlinux: https://storage.googleapis.com/syzbot-assets/ae21b8e855de/vmlinux-ee3f96b1.xz
->>> kernel image: https://storage.googleapis.com/syzbot-assets/803ee0425ad6/bzImage-ee3f96b1.xz
->>>
->>> IMPORTANT: if you fix the issue, please add the following tag to the commit:
->>> Reported-by: syzbot+68662811b3d5f6695bcb@syzkaller.appspotmail.com
->>>
->>> executing program
->>> BUG: memory leak
->>> unreferenced object 0xffff88810a86f7a0 (size 32):
->>>   comm "syz-executor325", pid 5099, jiffies 4294978342 (age 119.240s)
->>>   hex dump (first 32 bytes):
->>>     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->>>     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->>>   backtrace:
->>>     [<ffffffff81533d64>] kmalloc_trace+0x24/0x90 mm/slab_common.c:1061
->>>     [<ffffffff840edaa0>] kmalloc include/linux/slab.h:580 [inline]
->>>     [<ffffffff840edaa0>] tcp_md5sig_info_add net/ipv4/tcp_ipv4.c:1169 [inline]
->>>     [<ffffffff840edaa0>] tcp_md5_do_add+0xa0/0x150 net/ipv4/tcp_ipv4.c:1240
->>>     [<ffffffff84262c73>] tcp_v6_parse_md5_keys+0x253/0x4a0 net/ipv6/tcp_ipv6.c:671
->>>     [<ffffffff840c720e>] do_tcp_setsockopt+0x40e/0x1360 net/ipv4/tcp.c:3720
->>>     [<ffffffff840c81fb>] tcp_setsockopt+0x9b/0xa0 net/ipv4/tcp.c:3806
->>>     [<ffffffff83d72a8b>] __sys_setsockopt+0x1ab/0x330 net/socket.c:2274
->>>     [<ffffffff83d72c36>] __do_sys_setsockopt net/socket.c:2285 [inline]
->>>     [<ffffffff83d72c36>] __se_sys_setsockopt net/socket.c:2282 [inline]
->>>     [<ffffffff83d72c36>] __x64_sys_setsockopt+0x26/0x30 net/socket.c:2282
->>>     [<ffffffff849ad699>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
->>>     [<ffffffff849ad699>] do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
->>>     [<ffffffff84a0008b>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
->>>
->>> BUG: memory leak
->>> unreferenced object 0xffff88811225ccc0 (size 192):
->>>   comm "syz-executor325", pid 5099, jiffies 4294978342 (age 119.240s)
->>>   hex dump (first 32 bytes):
->>>     00 00 00 00 00 00 00 00 22 01 00 00 00 00 ad de  ........".......
->>>     22 0a 80 00 fe 80 00 00 00 00 00 00 00 00 00 00  "...............
->>>   backtrace:
->>>     [<ffffffff8153444a>] __do_kmalloc_node mm/slab_common.c:966 [inline]
->>>     [<ffffffff8153444a>] __kmalloc+0x4a/0x120 mm/slab_common.c:980
->>>     [<ffffffff83d75c15>] kmalloc include/linux/slab.h:584 [inline]
->>>     [<ffffffff83d75c15>] sock_kmalloc net/core/sock.c:2635 [inline]
->>>     [<ffffffff83d75c15>] sock_kmalloc+0x65/0xa0 net/core/sock.c:2624
->>>     [<ffffffff840eb9bb>] __tcp_md5_do_add+0xcb/0x300 net/ipv4/tcp_ipv4.c:1212
->>>     [<ffffffff840eda67>] tcp_md5_do_add+0x67/0x150 net/ipv4/tcp_ipv4.c:1253
->>>     [<ffffffff84262c73>] tcp_v6_parse_md5_keys+0x253/0x4a0 net/ipv6/tcp_ipv6.c:671
->>>     [<ffffffff840c720e>] do_tcp_setsockopt+0x40e/0x1360 net/ipv4/tcp.c:3720
->>>     [<ffffffff840c81fb>] tcp_setsockopt+0x9b/0xa0 net/ipv4/tcp.c:3806
->>>     [<ffffffff83d72a8b>] __sys_setsockopt+0x1ab/0x330 net/socket.c:2274
->>>     [<ffffffff83d72c36>] __do_sys_setsockopt net/socket.c:2285 [inline]
->>>     [<ffffffff83d72c36>] __se_sys_setsockopt net/socket.c:2282 [inline]
->>>     [<ffffffff83d72c36>] __x64_sys_setsockopt+0x26/0x30 net/socket.c:2282
->>>     [<ffffffff849ad699>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
->>>     [<ffffffff849ad699>] do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
->>>     [<ffffffff84a0008b>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
->>>
->>>
->>>
->>> ---
->>> This report is generated by a bot. It may contain errors.
->>> See https://goo.gl/tpsmEJ for more information about syzbot.
->>> syzbot engineers can be reached at syzkaller@googlegroups.com.
->>>
->>> syzbot will keep track of this issue. See:
->>> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
->>>
->>> If the bug is already fixed, let syzbot know by replying with:
->>> #syz fix: exact-commit-title
->>>
->>> If you want syzbot to run the reproducer, reply with:
->>> #syz test: git://repo/address.git branch-or-commit-hash
->>> If you attach or paste a git patch, syzbot will apply it before testing.
->>>
->>> If you want to overwrite bug's subsystems, reply with:
->>> #syz set subsystems: new-subsystem
->>> (See the list of subsystem names on the web dashboard)
->>>
->>> If the bug is a duplicate of another bug, reply with:
->>> #syz dup: exact-subject-of-another-report
->>>
->>> If you want to undo deduplication, reply with:
->>> #syz undup
->>
->> Dmitry, please take a look at this bug, we need to fix it before your
->> patch series.
+On Thu, Sep 21, 2023 at 09:21:40PM +0300, Arınç ÜNAL wrote:
+> On 21.09.2023 16:00, Andrew Lunn wrote:
+> > > - Link descriptions must be required on ethernet controllers. We don't care
+> > >    whether some Linux driver can or cannot find the PHY or set up a fixed
+> > >    link without looking at the devicetree.
+> > 
+> > That can lead to future surprises, and breakage.
+> > 
+> > Something which is not used is not tested, and so sometimes wrong, and
+> > nobody knows. Say the driver is extended to a new device and actually
+> > does need to use this never before used information. You then find it
+> > is wrong, and you get a regression.
+> > 
+> > We have had issues like this before. There are four rgmii phy-link
+> > modes. We have had PHY drivers which ignored one of those modes, it
+> > silently accepted it, but did not change the hardware to actually use
+> > that mode. The PHY continues to use its reset defaults or strapping,
+> > and it worked. A lot of device trees ended up using this mode. And it
+> > was not the same as reset defaults/strapping.
+> > 
+> > And then somebody needed that fourth mode, and made it actually
+> > work. And all those boards wrongly using that mode broke.
+> > 
+> > The lesson i learned from that episode is that anything in device tree
+> > must actually be used and tested.
 > 
-> Sure, seems reasonable to me to fix before merging something on top.
+> It looks like the root cause here was the lack of dt-bindings to
+> only allow the phy-mode values the hardware supports.
 
-It seems to me that it's related to a race between RCU grace period and
-kmemleak scan period. There seems to be a patch [1] that likely fixes
-that, albeit I couldn't verify it as all my attempts to reproduce syzbot
-issue produced only unrelated to TCP-MD5 log:
+That would not help. The hardware supported all 4 RGMII modes. So
+listing all four in the dt-binding would be correct. But the driver
+for the hardware had a bug, and so silently ignored one of the
+modes. That then masked the bugs in board DT files.
 
-> [  263.201211] kmemleak: unreferenced object 0xffff9ceb047d9948 (size 192):
-> [  263.201781] kmemleak:   comm "ip", pid 730, jiffies 4294937874 (age 257.270s)
-> [  263.202460] kmemleak:   hex dump (first 32 bytes):
-> [  263.202921] kmemleak:     00 c8 e9 01 eb 9c ff ff e0 00 00 01 00 00 00 00  ................
-> [  263.203700] kmemleak:     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-> [  263.204484] kmemleak:   backtrace:
-> [  263.204814] kmemleak:     [<ffffffff830a2946>] kmalloc_trace+0x26/0x90
-> [  263.205440] kmemleak:     [<ffffffff837e8310>] ____ip_mc_inc_group+0xa0/0x240
-> [  263.206134] kmemleak:     [<ffffffff837e9a9b>] ip_mc_up+0x4b/0xb0
-> [  263.206725] kmemleak:     [<ffffffff837e28fb>] inetdev_event+0xbb/0x5c0
-> [  263.207358] kmemleak:     [<ffffffff82f3caf6>] notifier_call_chain+0x56/0xc0
-> [  263.208070] kmemleak:     [<ffffffff836f1818>] __dev_notify_flags+0x58/0xf0
-> [  263.208784] kmemleak:     [<ffffffff836f2210>] dev_change_flags+0x50/0x60
-> [  263.209471] kmemleak:     [<ffffffff837e1718>] devinet_ioctl+0x378/0x770
-> [  263.210152] kmemleak:     [<ffffffff837e34a7>] inet_ioctl+0x187/0x1d0
-> [  263.210805] kmemleak:     [<ffffffff836c40ed>] sock_do_ioctl+0x3d/0x100
-> [  263.211482] kmemleak:     [<ffffffff836c4293>] sock_ioctl+0xe3/0x2b0
-> [  263.212131] kmemleak:     [<ffffffff8313cbec>] __x64_sys_ioctl+0x8c/0xc0
-> [  263.212789] kmemleak:     [<ffffffff83a2ad75>] do_syscall_64+0x35/0x80
-> [  263.213438] kmemleak:     [<ffffffff83c0006a>] entry_SYSCALL_64_after_hwframe+0x46/0xb0
-> [  263.214283] kmemleak: unreferenced object 0xffff9ceb03ad5400 (size 512):
-> [  263.214982] kmemleak:   comm "ip", pid 730, jiffies 4294937874 (age 257.290s)
-> [  263.215728] kmemleak:   hex dump (first 32 bytes):
-> [  263.216231] kmemleak:     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01  ................
-> [  263.217106] kmemleak:     80 00 00 00 00 00 00 00 ff ff ff ff ff ff ff ff  ................
-> [  263.218041] kmemleak:   backtrace:
-> [  263.218438] kmemleak:     [<ffffffff830a2946>] kmalloc_trace+0x26/0x90
-> [  263.219181] kmemleak:     [<ffffffff8384b90b>] ipv6_add_addr+0x13b/0x6c0
-> [  263.219931] kmemleak:     [<ffffffff8384d4b5>] add_addr+0x75/0x150
-> [  263.220627] kmemleak:     [<ffffffff8385357d>] addrconf_notify+0x53d/0x730
-> [  263.221377] kmemleak:     [<ffffffff82f3caf6>] notifier_call_chain+0x56/0xc0
-> [  263.222104] kmemleak:     [<ffffffff836f1818>] __dev_notify_flags+0x58/0xf0
-> [  263.222844] kmemleak:     [<ffffffff836f2210>] dev_change_flags+0x50/0x60
-> [  263.223581] kmemleak:     [<ffffffff837e1718>] devinet_ioctl+0x378/0x770
-> [  263.224293] kmemleak:     [<ffffffff837e34a7>] inet_ioctl+0x187/0x1d0
-> [  263.224961] kmemleak:     [<ffffffff836c40ed>] sock_do_ioctl+0x3d/0x100
-> [  263.225660] kmemleak:     [<ffffffff836c4293>] sock_ioctl+0xe3/0x2b0
-> [  263.226331] kmemleak:     [<ffffffff8313cbec>] __x64_sys_ioctl+0x8c/0xc0
-> [  263.227039] kmemleak:     [<ffffffff83a2ad75>] do_syscall_64+0x35/0x80
-> [  263.227747] kmemleak:     [<ffffffff83c0006a>] entry_SYSCALL_64_after_hwframe+0x46/0xb0
-> [  263.228708] kmemleak: 2 new suspected memory leaks (see /sys/kernel/debug/kmemleak)
+> What I see here is the driver change should've been tested on all
+> different hardware the driver controls then the improper describing
+> of hardware on the devicetree source file addressed.
 
-This seems to be quite the same issue: inet6_ifa_finish_destroy()
-destroys inet6_ifaddr with kfree_rcu().
+Which is what did happen. But it took a while to find all those broken
+boards.  For a period of time, we had regressions.
 
-[1]
-https://lore.kernel.org/linux-mm/ZQA064908T5nngcc@arm.com/T/#ma4a68fdc44793e2594c9e7cadefa8ea40da5807d
+Bugs happen. It is a fact of life. But we want those bugs to be easy
+to find as possible. If we force DT writers to add properties which
+the driver never uses, they are going to be bugs in those
+properties. And those bugs are not going to be easy to find, and quite
+likely, they will only be found a long time after they are added. We
+should not be adding unused properties and bugs just to keep a yaml
+checker happy.
 
-Thanks,
-            Dmitry
+	Andrew
 
 
