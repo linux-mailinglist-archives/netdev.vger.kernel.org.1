@@ -1,116 +1,113 @@
-Return-Path: <netdev+bounces-35491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A10E27A9C6B
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:17:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 057357A99D1
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 20:26:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EA80EB21864
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:13:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B39F1282630
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 18:26:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1166F29409;
-	Thu, 21 Sep 2023 17:49:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA7B2171DB;
+	Thu, 21 Sep 2023 17:25:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7224919BAA
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 17:49:38 +0000 (UTC)
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9314080F9C;
-	Thu, 21 Sep 2023 10:36:54 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0129045F6F
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 17:25:31 +0000 (UTC)
+Received: from us-smtp-delivery-44.mimecast.com (unknown [207.211.30.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BA706A5A
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:24:58 -0700 (PDT)
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-314-OaVbmCMZP7yeyxSGinlawg-1; Thu, 21 Sep 2023 11:11:45 -0400
+X-MC-Unique: OaVbmCMZP7yeyxSGinlawg-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id AA6873377F;
-	Thu, 21 Sep 2023 15:10:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1695309006; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0eTKe2XuZQ29/5KHHLZyTd//jnc11IR/vGdwjTaApTI=;
-	b=ZhL02ap/z8114SestHHkj/X32LfJyKAawxzSi0z0cG5UMMNUJBiiNu2hMZWUsXYMllpVFh
-	UyZNJU+88gHEteRNtFUBR63qeooUlYAUKVaPHnMGf7j4IJrJOcaQDDKYxLNji+8XKgon3K
-	VGgn/dFYKdEq/rEkjPj1gSO+F7d3iMU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1695309006;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0eTKe2XuZQ29/5KHHLZyTd//jnc11IR/vGdwjTaApTI=;
-	b=2qhkMIKiIIrhDoE9b1Mqgp7UFDZwFtxXvuHXv20tIduMEA5tO9L4G59EMKri9+VLb4ZJhe
-	ZD3xbl4RgNFwitCw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 39BA1134B0;
-	Thu, 21 Sep 2023 15:10:06 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-	by imap2.suse-dmz.suse.de with ESMTPSA
-	id ccT8DM5cDGUAbgAAMHmgww
-	(envelope-from <tiwai@suse.de>); Thu, 21 Sep 2023 15:10:06 +0000
-Date: Thu, 21 Sep 2023 17:10:05 +0200
-Message-ID: <87sf77y33m.wl-tiwai@suse.de>
-From: Takashi Iwai <tiwai@suse.de>
-To: David Howells <dhowells@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Al Viro <viro@zeniv.linux.org.uk>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Christian Brauner <christian@brauner.io>,
-	David Laight <David.Laight@ACULAB.COM>,
-	Matthew Wilcox <willy@infradead.org>,
-	Jeff Layton <jlayton@kernel.org>,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>,
-	Oswald Buddenhagen <oswald.buddenhagen@gmx.de>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>,
-	alsa-devel@alsa-project.org
-Subject: Re: [PATCH v5 01/11] sound: Fix snd_pcm_readv()/writev() to use iov access functions
-In-Reply-To: <809186.1695308608@warthog.procyon.org.uk>
-References: <87o7hvzn12.wl-tiwai@suse.de>
-	<20230920222231.686275-1-dhowells@redhat.com>
-	<20230920222231.686275-2-dhowells@redhat.com>
-	<809186.1695308608@warthog.procyon.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) Emacs/27.2 Mule/6.0
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4978018172CA;
+	Thu, 21 Sep 2023 15:11:44 +0000 (UTC)
+Received: from hog (unknown [10.39.192.47])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 935BF492C37;
+	Thu, 21 Sep 2023 15:11:42 +0000 (UTC)
+Date: Thu, 21 Sep 2023 17:11:41 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: "Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, richardcochran@gmail.com,
+	sebastian.tobuschat@oss.nxp.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v5 3/7] net: macsec: indicate next pn update
+ when offloading
+Message-ID: <ZQxdLZJa0EpnxpCl@hog>
+References: <20230920092237.121033-1-radu-nicolae.pirea@oss.nxp.com>
+ <20230920092237.121033-4-radu-nicolae.pirea@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230920092237.121033-4-radu-nicolae.pirea@oss.nxp.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+X-Spam-Status: No, score=0.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_VALIDITY_RPBL,RDNS_NONE,SPF_HELO_NONE,SPF_NONE autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, 21 Sep 2023 17:03:28 +0200,
-David Howells wrote:
+2023-09-20, 12:22:33 +0300, Radu Pirea (NXP OSS) wrote:
+> Indicate next PN update using update_pn flag in macsec_context.
+> Offloaded MACsec implementations does not know whether or not the
+> MACSEC_SA_ATTR_PN attribute was passed for an SA update and assume
+> that next PN should always updated, but this is not always true.
+
+This should probably go through net so that we can fix some drivers
+that are currently doing the wrong thing. octeontx2 should be
+fixable. atlantic looks like it would reset the PN to whatever was
+read during the last dump, and it's unclear if that can be fixed
+(AFAIU set_egress_sa_record writes the whole config at once).  mscc
+doesn't seem to modify the PN (even if requested -- should it should
+reject the update), and mlx5 doesn't allow PN update (by storing the
+initial value of next_pn on SA creation).
+
+> diff --git a/include/net/macsec.h b/include/net/macsec.h
+> index ecae5eeb021a..42072fdcc183 100644
+> --- a/include/net/macsec.h
+> +++ b/include/net/macsec.h
+> @@ -254,6 +254,7 @@ struct macsec_secy {
+>   * @offload: MACsec offload status
+>   * @secy: pointer to a MACsec SecY
+>   * @rx_sc: pointer to a RX SC
+> + * @update_pn: this flag indicates updating the next PN when updating the SA
+
+nit: "this flag indicates" is not very useful, thus:
+
+@update_pn: when updating the SA, update the next PN
+
+>   * @assoc_num: association number of the target SA
+>   * @key: key of the target SA
+>   * @rx_sa: pointer to an RX SA if a RX SA is added/updated/removed
+> @@ -274,6 +275,7 @@ struct macsec_context {
+>  	struct macsec_secy *secy;
+>  	struct macsec_rx_sc *rx_sc;
+>  	struct {
+> +		bool update_pn;
+>  		unsigned char assoc_num;
+>  		u8 key[MACSEC_MAX_KEY_LEN];
+>  		union {
+> -- 
+> 2.34.1
 > 
-> Takashi Iwai <tiwai@suse.de> wrote:
-> 
-> > Would you apply it through your tree, or shall I apply this one via
-> > sound git tree?
-> 
-> It's a prerequisite for a later patch in this series, so I'd prefer to keep it
-> with my other patches.
 
-Sure, please go ahead.
+-- 
+Sabrina
 
-
-thanks,
-
-Takashi
 
