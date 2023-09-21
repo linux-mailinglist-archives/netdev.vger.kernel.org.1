@@ -1,68 +1,69 @@
-Return-Path: <netdev+bounces-35555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF4377A9CE1
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:25:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A7DB7A9C97
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:22:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C2523B239B9
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:21:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C4A0282E40
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:20:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17B8C67BFB;
-	Thu, 21 Sep 2023 18:34:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C07194CFA6;
+	Thu, 21 Sep 2023 18:11:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 294254885B
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 18:34:52 +0000 (UTC)
-Received: from mail-oa1-x4a.google.com (mail-oa1-x4a.google.com [IPv6:2001:4860:4864:20::4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1B57D483E
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 11:25:15 -0700 (PDT)
-Received: by mail-oa1-x4a.google.com with SMTP id 586e51a60fabf-1dc27f7c838so1723018fac.0
-        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 11:25:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A3364C868
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 18:11:31 +0000 (UTC)
+Received: from mail-oo1-xc49.google.com (mail-oo1-xc49.google.com [IPv6:2607:f8b0:4864:20::c49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B45079F
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 11:10:31 -0700 (PDT)
+Received: by mail-oo1-xc49.google.com with SMTP id 006d021491bc7-57b6321d600so741010eaf.0
+        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 11:10:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695320715; x=1695925515; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=7oiEzk8ZF/N/fLGrK1CVb3pAXd3Gw3hdWoPv5Oq9zyM=;
-        b=L9QEQc83qGeGgpyCwipeCmdIh3adyEcpOzNMf4PsX/t2ZTfftz7hRJllvNVq2mYcJM
-         Sas4YwXnFG8rCV5POEu5JJUvxvxm8OqRnUZzoRawT6edx5y03i/x62lGB0gADQ/o4z6K
-         pwhDU/4at67yjZhQJt46Unzo8SO7RVv8TcVnKEsCuoGL6l14zHbATHOjiLXydxDJZU72
-         0U258UbqusmTIJRhahiU/lsbeGG44h/xrVs2ZmJF9YW5yM6QGEzhk5Z/OCTU7NF0Ui39
-         +AnWUNTDJV2ZbA+W8Je4XfYwfCBHAUFanPxrfVeEXDx9uSAcIf0ZRFdS1RWWQLzHqjig
-         /ZMg==
+        d=google.com; s=20230601; t=1695319831; x=1695924631; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=NN0qVPUEzKFEN93CTjUFaZ6yz24zt8p50LMx9YRcXPk=;
+        b=lktTTm/vBJaV9jYbq58GfVd8iBvb6fku4kY95dAU+JUVmKu1ZzEDdGkUyFsO/IJkDh
+         9HjlioE0OJgodKNrYAY93kttw5dVpyR43a86ZflabzkjlXuuszJhDb8fIl2JKf0Uy2xa
+         lWF+iQGmJ0CWrnECzNDJJiZJPIC6c5Mqalod/PBQsJbFqa6tEkqFGuuQvdGz5moBAfOh
+         jglqmXmA7ILyOdNXvfzf3rGI/LWypwtjBa+38zmyEL8w3AJmsHq9O1tNceX4e9fRJ89B
+         q7d/vqPP0HCug0mJdWu67GZduqXR4On/4gcOVDSP+fi1waDeA7m/mtCgYGHYAP7GgHrS
+         dwSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695320715; x=1695925515;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7oiEzk8ZF/N/fLGrK1CVb3pAXd3Gw3hdWoPv5Oq9zyM=;
-        b=AlNh/jrpcST5SLjnCI/MAyPMeHjeX8Yi1oqXJ7VaZPuk1PRBvba5yXX2a84AqD4R6g
-         HD6VIE6gVhImOCmsEJWsxIQBp2jffSTBAAPK0VP6Pj+pwrMjVEfqfmHRux3tIlOjGaSL
-         FIiLnVi6cP29vcHvKSBKX5PXm1kuy0zIHWRVxpgtqZKA2kObl89CjK7I70h7BHuyCGEV
-         Z8uckGAzmo3zCIriqZ4kK00xtwumy2eqm363iiuk74sqA2eyxMr6Qi4OglreOTmoBs/Y
-         JHN7/QZvCP8fL3TZIT6mBjJKYTQkXNqktm00qWc3YPjDhpSOegLesFGBsmuEVIm5qsOI
-         HeAg==
-X-Gm-Message-State: AOJu0Yx4SpH3SuDAC8zOIAbXJH8VNY08bVAh4flD/NkzSsZiedIDUWGv
-	a9PWP103Je9NGe9foupWxesYPizJ0ARiUQ==
-X-Google-Smtp-Source: AGHT+IF/Re9/4c7A3PY/aEEc/MGQVgRppCl646oOsdATu+vQYiYPtq/UlMTCkZNhqjd6Aox6ydpp7XzG4UqbHQ==
+        d=1e100.net; s=20230601; t=1695319831; x=1695924631;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NN0qVPUEzKFEN93CTjUFaZ6yz24zt8p50LMx9YRcXPk=;
+        b=HANi7D+lWHWbQGSKu1bPDNF4HzKL4+ndIS5ETmfKEVLUIG6H7TZVf1ElQI2AhsrmZP
+         NHH9yAM9ZhkRRUaFpvvH/DfztBOrQsXbUD8LhdAkZ27g4QO5lGvyNWkdvZKSze7g4CYt
+         etn907QV2zVhw2XN6Vid0hKTd5WbJ9ukqM5QAZy5+i6LtcjT+dRJ4JLjih8JZ2Pcg4i/
+         apKs+DSdPENZYk5ouUesZSd8i86f+ShvvLBBkfrQCC4O9sbfgSGMfSi5mSg5DkRzOySe
+         flc6Xf+23GH7GiTkrbThTPP3QqaVsea7feXj0qYZBacqNb+YwC9A+glXva1VsNYuQ4m+
+         UsXA==
+X-Gm-Message-State: AOJu0Yx6tKiD2frZzfXn4h/8wiyFcRJvE0aIne6soDrn328lnBY/CWVj
+	OmckDqIyU4itpVQX4x2ScKg4u4Zz6yUS1g==
+X-Google-Smtp-Source: AGHT+IE/hcEUexcASIDQ5LiqL9XSAesD7c5bxZT3tIow2KDdt5LpivJF9D6h0WWo43JLN24u0gFR655byCKb7w==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:e617:0:b0:d85:ac12:aadb with SMTP id
- d23-20020a25e617000000b00d85ac12aadbmr53861ybh.9.1695286340938; Thu, 21 Sep
- 2023 01:52:20 -0700 (PDT)
-Date: Thu, 21 Sep 2023 08:52:15 +0000
+ (user=edumazet job=sendgmr) by 2002:a25:cecf:0:b0:d85:aa2f:5715 with SMTP id
+ x198-20020a25cecf000000b00d85aa2f5715mr57788ybe.10.1695286342559; Thu, 21 Sep
+ 2023 01:52:22 -0700 (PDT)
+Date: Thu, 21 Sep 2023 08:52:16 +0000
+In-Reply-To: <20230921085218.954120-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20230921085218.954120-1-edumazet@google.com>
 X-Mailer: git-send-email 2.42.0.459.ge4e396fd5e-goog
-Message-ID: <20230921085218.954120-1-edumazet@google.com>
-Subject: [PATCH v2 net-next 0/3] net: use DEV_STATS_xxx() helpers in
- virtio_net and l2tp_eth
+Message-ID: <20230921085218.954120-2-edumazet@google.com>
+Subject: [PATCH v2 net-next 1/3] net: add DEV_STATS_READ() helper
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -71,27 +72,51 @@ Cc: Simon Horman <simon.horman@corigine.com>, netdev@vger.kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-8.1 required=5.0 tests=BAYES_00,DATE_IN_PAST_06_12,
 	DKIMWL_WL_MED,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
 	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Inspired by another (minor) KCSAN syzbot report.
-Both virtio_net and l2tp_eth can use DEV_STATS_xxx() helpers.
+Companion of DEV_STATS_INC() & DEV_STATS_ADD().
 
-v2: removed unused @priv variable (Simon, kernel build bot)
+This is going to be used in the series.
 
-Eric Dumazet (3):
-  net: add DEV_STATS_READ() helper
-  virtio_net: avoid data-races on dev->stats fields
-  net: l2tp_eth: use generic dev->stats fields
+Use it in macsec_get_stats64().
 
- drivers/net/macsec.c      |  6 +++---
- drivers/net/virtio_net.c  | 30 +++++++++++++++---------------
- include/linux/netdevice.h |  1 +
- net/l2tp/l2tp_eth.c       | 34 ++++++++++++----------------------
- 4 files changed, 31 insertions(+), 40 deletions(-)
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ drivers/net/macsec.c      | 6 +++---
+ include/linux/netdevice.h | 1 +
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
+diff --git a/drivers/net/macsec.c b/drivers/net/macsec.c
+index b7e151439c4886f851ba87e27a34e33cd834069a..7a44e1cbe30558dafcc2bc1a6ee47faad2e60d15 100644
+--- a/drivers/net/macsec.c
++++ b/drivers/net/macsec.c
+@@ -3655,9 +3655,9 @@ static void macsec_get_stats64(struct net_device *dev,
+ 
+ 	dev_fetch_sw_netstats(s, dev->tstats);
+ 
+-	s->rx_dropped = atomic_long_read(&dev->stats.__rx_dropped);
+-	s->tx_dropped = atomic_long_read(&dev->stats.__tx_dropped);
+-	s->rx_errors = atomic_long_read(&dev->stats.__rx_errors);
++	s->rx_dropped = DEV_STATS_READ(dev, rx_dropped);
++	s->tx_dropped = DEV_STATS_READ(dev, tx_dropped);
++	s->rx_errors = DEV_STATS_READ(dev, rx_errors);
+ }
+ 
+ static int macsec_get_iflink(const struct net_device *dev)
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 7e520c14eb8c68cf2e3821c86c7c3d1f0d8ab226..e070a4540fbaf4a9cf310d5f53c4401840c72776 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -5236,5 +5236,6 @@ extern struct net_device *blackhole_netdev;
+ #define DEV_STATS_INC(DEV, FIELD) atomic_long_inc(&(DEV)->stats.__##FIELD)
+ #define DEV_STATS_ADD(DEV, FIELD, VAL) 	\
+ 		atomic_long_add((VAL), &(DEV)->stats.__##FIELD)
++#define DEV_STATS_READ(DEV, FIELD) atomic_long_read(&(DEV)->stats.__##FIELD)
+ 
+ #endif	/* _LINUX_NETDEVICE_H */
 -- 
 2.42.0.459.ge4e396fd5e-goog
 
