@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-35497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 488F57A9C8B
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:21:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F3EB7A9B3C
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 20:56:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C363FB2197C
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:15:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD990282359
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 18:56:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9627B29432;
-	Thu, 21 Sep 2023 17:49:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28CC44734D;
+	Thu, 21 Sep 2023 17:49:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE7AA48E83
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 17:49:53 +0000 (UTC)
-Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88E19720DA
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:33:31 -0700 (PDT)
-Received: by mail-qv1-xf49.google.com with SMTP id 6a1803df08f44-6562fff4a2fso11070486d6.3
-        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:33:31 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7777C18B14
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 17:49:23 +0000 (UTC)
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD5B18848F
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:38:58 -0700 (PDT)
+Received: by mail-qk1-x749.google.com with SMTP id af79cd13be357-7740829f2bfso98517685a.0
+        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:38:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695317610; x=1695922410; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1695317938; x=1695922738; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zEMZVyVjKUva06I6qbZdF0YySvj2lKgT7U0Rk8yQNq0=;
-        b=KM4dREt7F8xDiUGqlPh3VgB/4HU+YuwYgmr5LomyHlsYMxuuv2H0oMtUW1mOa/NMi6
-         qYy6ziRx48EXNGocTNko+0ChE10UQfmurLmALmEbaAFCNdeM9pNEwjmHQj9epvXztLTF
-         x5qq//4ekKRWlJaVBLwN78ywr6tSZlFF6tnJ/4rgxY+B89aDH8+tfATtFiiD88rhl+3S
-         0Yti6h5FsftFoNrFF3XXhqmnAFdSvuCbvu3XfWqthAbnQy+n2G1/Nv3qc5+pHRXJfozp
-         FIef2EgNm/jzRDceCDyVKN77r2xwn89/HJYagWt7a3iz83jKkj6AiyTKtX87kt/MBYiJ
-         QBVw==
+        bh=GZcl8dkKLaXNSNXGbbeqaXAT2s+m+/IKC5s13djBtlo=;
+        b=Fbn53/jBHz0eS3jWWa9XvCi44VQoIg3/Ll3gUOn0Q5MbiUvuu2ZhZZawenYwx8bjdA
+         V9ydFjgFDJYEKLBmXicrsrt+16xuu+a/esqgbE2u3TAlD+99IIlZNMgnKLrUWVqoMJvh
+         CRU8kMZIQvu53wCNbdWGqKG2TLVXVUZhIY0wJev2LaMFzj0P96XaTjINg7hXcrV+IYDs
+         oldh/uxUvuNhu/R5M+eE5HR3ISHke6MTxqsPsjOMelMaYgyi3gWjMhgLMbUybOD9OyCo
+         EVhmeTY55OJPfSXplVjFiKLtgcrBu7+SzC+ZziRVEqK26e5u+XEAZEZZc9szt3SMJsNE
+         acWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695317610; x=1695922410;
+        d=1e100.net; s=20230601; t=1695317938; x=1695922738;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zEMZVyVjKUva06I6qbZdF0YySvj2lKgT7U0Rk8yQNq0=;
-        b=COa6SvgNPCP3WWhpZHpVonZItdy5CT8ToWza9qZdwoknRnIcRj67egxvGnvydIlZyu
-         +FkvJJzUk831jWeiffesq1seTHtBJ/PaqFT+BgoNjHfUl3XX+l1HT0MOeO09ROn1lT/Q
-         YqjoIms+iJcXCTPUUJ+ss8QKbWCLEHavK6UOUVwY6IsYfm0W3AojG6UWVpwIf5E05JMI
-         GuuItDXy6LfZhG74/PzVcj5wsdrKvqlZxHNXQap6UFOG2eARrj2cBOEeX5SOhC3LP7Yq
-         84XQMBddj7gA8Wu6ex/cN1IPaesUz/ecVybOyKKorDIw2492moCgq9wlWZEuecyqP9Ct
-         wXiQ==
-X-Gm-Message-State: AOJu0Yw1yLO3cUW4XrUJ1kalkyfRY7gtYwdx38jxQm7dp9iAMOdn0kP2
-	eMauqPo2RS9rFAuL4Ivx33bRq/QE893dAw==
-X-Google-Smtp-Source: AGHT+IFs0GY6Lu1jpb8565J7cLewO5oIJqulC0j/Wz0yepkkkT7PJO8xGGCTn4QAGoWgQxX3334uKxhNfNNp9A==
+        bh=GZcl8dkKLaXNSNXGbbeqaXAT2s+m+/IKC5s13djBtlo=;
+        b=idm+MPOKTAIqo41dCfW7DIM0Pso1RpYidSri2Suu3XH1SnTCAZQj6Ke4896tKcX+AV
+         cZAz7SEMo5OEoECx4vVLMHI12sg0GxHU/+pATN35Xf+wnr4b/VaP433PRUcRQDtuq8lo
+         YbY7nZGCnbDyzsg1XxXVnm0bYxRc2kazs0eWxkEgGiksz78EpKbeatqmDrc8kWWNBKWT
+         AJ17GpTaG7NBOHDdlFfYb/GU5DIIT4CZJXL+33/wRwFbaRd37lx8Z1X9xwFhauvjE2O2
+         M1R+TslwluKIaQRgDFVtQIM9iRXB2MfCVMPqgHEZ1gI7sP7+zsxw6L2yR4iiEC7Ue5hP
+         SCsA==
+X-Gm-Message-State: AOJu0YzX8cm6Lk6OM6qCS0bV/mOAZtQt0lZokEuPNark2anSN5Vlruw1
+	cb7l9pG8bV/qYw6pH9XLAqImJaBEvqywnw==
+X-Google-Smtp-Source: AGHT+IFQpG++YB1/GUIwdYGbotjqbrFfY+j1Gg+lSicA69GQcKn8HpIeiixUKvzqAlEZ0nU4sgnfX4T0D3X3AQ==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a81:4103:0:b0:58c:a9b4:a64c with SMTP id
- o3-20020a814103000000b0058ca9b4a64cmr85161ywa.1.1695303036598; Thu, 21 Sep
- 2023 06:30:36 -0700 (PDT)
-Date: Thu, 21 Sep 2023 13:30:19 +0000
+ (user=edumazet job=sendgmr) by 2002:a81:8b48:0:b0:59b:ea2e:23e5 with SMTP id
+ e8-20020a818b48000000b0059bea2e23e5mr82989ywk.7.1695303037989; Thu, 21 Sep
+ 2023 06:30:37 -0700 (PDT)
+Date: Thu, 21 Sep 2023 13:30:20 +0000
 In-Reply-To: <20230921133021.1995349-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -62,8 +62,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20230921133021.1995349-1-edumazet@google.com>
 X-Mailer: git-send-email 2.42.0.459.ge4e396fd5e-goog
-Message-ID: <20230921133021.1995349-7-edumazet@google.com>
-Subject: [PATCH net-next 6/8] inet: implement lockless getsockopt(IP_UNICAST_IF)
+Message-ID: <20230921133021.1995349-8-edumazet@google.com>
+Subject: [PATCH net-next 7/8] inet: lockless IP_PKTOPTIONS implementation
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -72,181 +72,118 @@ Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-8.0 required=5.0 tests=BAYES_00,DATE_IN_PAST_03_06,
 	DKIMWL_WL_MED,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,USER_IN_DEF_DKIM_WL autolearn=no
-	autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add missing READ_ONCE() annotations when reading inet->uc_index
+Current implementation is already lockless, because the socket
+lock is released before reading socket fields.
 
-Implementing getsockopt(IP_UNICAST_IF) locklessly seems possible,
-the setsockopt() part might not be possible at the moment.
+Add missing READ_ONCE() annotations.
+
+Note that corresponding WRITE_ONCE() are needed, the order
+of the patches do not really matter.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/ipv4/datagram.c    |  2 +-
- net/ipv4/ip_sockglue.c | 10 +++++-----
- net/ipv4/ping.c        |  2 +-
- net/ipv4/raw.c         | 13 +++++++------
- net/ipv4/udp.c         | 12 +++++++-----
- 5 files changed, 21 insertions(+), 18 deletions(-)
+ net/ipv4/ip_sockglue.c | 76 ++++++++++++++++++++----------------------
+ 1 file changed, 37 insertions(+), 39 deletions(-)
 
-diff --git a/net/ipv4/datagram.c b/net/ipv4/datagram.c
-index cb5dbee9e018fbba1bc1e5705e8bec6c4203af56..1480e9ebdfef445960e1f70f34f33a0e0c52b65b 100644
---- a/net/ipv4/datagram.c
-+++ b/net/ipv4/datagram.c
-@@ -43,7 +43,7 @@ int __ip4_datagram_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len
- 		if (!saddr)
- 			saddr = inet->mc_addr;
- 	} else if (!oif) {
--		oif = inet->uc_index;
-+		oif = READ_ONCE(inet->uc_index);
- 	}
- 	fl4 = &inet->cork.fl.u.ip4;
- 	rt = ip_route_connect(fl4, usin->sin_addr.s_addr, saddr, oif,
 diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
-index 04579e390ddd4dadb8a107ef0b5da15e7a60f1ff..58995526c6e965d613b8cdea61b84916d608a6fb 100644
+index 58995526c6e965d613b8cdea61b84916d608a6fb..1ee01ff64171c94b6b244589518a53ce807a212d 100644
 --- a/net/ipv4/ip_sockglue.c
 +++ b/net/ipv4/ip_sockglue.c
-@@ -1113,7 +1113,7 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
- 
- 		ifindex = (__force int)ntohl((__force __be32)val);
- 		if (ifindex == 0) {
--			inet->uc_index = 0;
-+			WRITE_ONCE(inet->uc_index, 0);
- 			err = 0;
- 			break;
- 		}
-@@ -1130,7 +1130,7 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
- 		if (sk->sk_bound_dev_if && midx != sk->sk_bound_dev_if)
- 			break;
- 
--		inet->uc_index = ifindex;
-+		WRITE_ONCE(inet->uc_index, ifindex);
- 		err = 0;
- 		break;
- 	}
-@@ -1633,6 +1633,9 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
+@@ -1633,6 +1633,43 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
  			return -ENOTCONN;
  		goto copyval;
  	}
-+	case IP_UNICAST_IF:
-+		val = (__force int)htonl((__u32) READ_ONCE(inet->uc_index));
-+		goto copyval;
- 	}
- 
- 	if (needs_rtnl)
-@@ -1640,9 +1643,6 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
- 	sockopt_lock_sock(sk);
- 
- 	switch (optname) {
--	case IP_UNICAST_IF:
--		val = (__force int)htonl((__u32) inet->uc_index);
--		break;
- 	case IP_MULTICAST_IF:
- 	{
- 		struct in_addr addr;
-diff --git a/net/ipv4/ping.c b/net/ipv4/ping.c
-index 50d12b0c8d46fdcd9b448c3ebc90395ebf426075..66ad1f95af49f222afe0ee75b9163dd0af0a2c49 100644
---- a/net/ipv4/ping.c
-+++ b/net/ipv4/ping.c
-@@ -777,7 +777,7 @@ static int ping_v4_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- 		if (!saddr)
- 			saddr = inet->mc_addr;
- 	} else if (!ipc.oif)
--		ipc.oif = inet->uc_index;
-+		ipc.oif = READ_ONCE(inet->uc_index);
- 
- 	flowi4_init_output(&fl4, ipc.oif, ipc.sockc.mark, tos, scope,
- 			   sk->sk_protocol, inet_sk_flowi_flags(sk), faddr,
-diff --git a/net/ipv4/raw.c b/net/ipv4/raw.c
-index ade1aecd7c71184d753a28a67bc9b30087247db4..e2357d23202e5a39832bb1550c365de9a836c363 100644
---- a/net/ipv4/raw.c
-+++ b/net/ipv4/raw.c
-@@ -482,7 +482,7 @@ static int raw_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- 	int free = 0;
- 	__be32 daddr;
- 	__be32 saddr;
--	int err;
-+	int uc_index, err;
- 	struct ip_options_data opt_copy;
- 	struct raw_frag_vec rfv;
- 	int hdrincl;
-@@ -576,24 +576,25 @@ static int raw_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- 	tos = get_rttos(&ipc, inet);
- 	scope = ip_sendmsg_scope(inet, &ipc, msg);
- 
-+	uc_index = READ_ONCE(inet->uc_index);
- 	if (ipv4_is_multicast(daddr)) {
- 		if (!ipc.oif || netif_index_is_l3_master(sock_net(sk), ipc.oif))
- 			ipc.oif = inet->mc_index;
- 		if (!saddr)
- 			saddr = inet->mc_addr;
- 	} else if (!ipc.oif) {
--		ipc.oif = inet->uc_index;
--	} else if (ipv4_is_lbcast(daddr) && inet->uc_index) {
-+		ipc.oif = uc_index;
-+	} else if (ipv4_is_lbcast(daddr) && uc_index) {
- 		/* oif is set, packet is to local broadcast
- 		 * and uc_index is set. oif is most likely set
- 		 * by sk_bound_dev_if. If uc_index != oif check if the
- 		 * oif is an L3 master and uc_index is an L3 slave.
- 		 * If so, we want to allow the send using the uc_index.
- 		 */
--		if (ipc.oif != inet->uc_index &&
-+		if (ipc.oif != uc_index &&
- 		    ipc.oif == l3mdev_master_ifindex_by_index(sock_net(sk),
--							      inet->uc_index)) {
--			ipc.oif = inet->uc_index;
-+							      uc_index)) {
-+			ipc.oif = uc_index;
- 		}
- 	}
- 
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 731a723dc80816f0b5b0803d7397f7e9e8cd8b09..1e0c3aba1e5a88c7ba50a28511412a1710f1bab5 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -1055,6 +1055,7 @@ int udp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- 	int (*getfrag)(void *, char *, int, int, int, struct sk_buff *);
- 	struct sk_buff *skb;
- 	struct ip_options_data opt_copy;
-+	int uc_index;
- 
- 	if (len > 0xFFFF)
- 		return -EMSGSIZE;
-@@ -1173,6 +1174,7 @@ int udp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- 	if (scope == RT_SCOPE_LINK)
- 		connected = 0;
- 
-+	uc_index = READ_ONCE(inet->uc_index);
- 	if (ipv4_is_multicast(daddr)) {
- 		if (!ipc.oif || netif_index_is_l3_master(sock_net(sk), ipc.oif))
- 			ipc.oif = inet->mc_index;
-@@ -1180,18 +1182,18 @@ int udp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- 			saddr = inet->mc_addr;
- 		connected = 0;
- 	} else if (!ipc.oif) {
--		ipc.oif = inet->uc_index;
--	} else if (ipv4_is_lbcast(daddr) && inet->uc_index) {
-+		ipc.oif = uc_index;
-+	} else if (ipv4_is_lbcast(daddr) && uc_index) {
- 		/* oif is set, packet is to local broadcast and
- 		 * uc_index is set. oif is most likely set
- 		 * by sk_bound_dev_if. If uc_index != oif check if the
- 		 * oif is an L3 master and uc_index is an L3 slave.
- 		 * If so, we want to allow the send using the uc_index.
- 		 */
--		if (ipc.oif != inet->uc_index &&
-+		if (ipc.oif != uc_index &&
- 		    ipc.oif == l3mdev_master_ifindex_by_index(sock_net(sk),
--							      inet->uc_index)) {
--			ipc.oif = inet->uc_index;
-+							      uc_index)) {
-+			ipc.oif = uc_index;
- 		}
- 	}
- 
++	case IP_PKTOPTIONS:
++	{
++		struct msghdr msg;
++
++		if (sk->sk_type != SOCK_STREAM)
++			return -ENOPROTOOPT;
++
++		if (optval.is_kernel) {
++			msg.msg_control_is_user = false;
++			msg.msg_control = optval.kernel;
++		} else {
++			msg.msg_control_is_user = true;
++			msg.msg_control_user = optval.user;
++		}
++		msg.msg_controllen = len;
++		msg.msg_flags = in_compat_syscall() ? MSG_CMSG_COMPAT : 0;
++
++		if (inet_test_bit(PKTINFO, sk)) {
++			struct in_pktinfo info;
++
++			info.ipi_addr.s_addr = READ_ONCE(inet->inet_rcv_saddr);
++			info.ipi_spec_dst.s_addr = READ_ONCE(inet->inet_rcv_saddr);
++			info.ipi_ifindex = READ_ONCE(inet->mc_index);
++			put_cmsg(&msg, SOL_IP, IP_PKTINFO, sizeof(info), &info);
++		}
++		if (inet_test_bit(TTL, sk)) {
++			int hlim = READ_ONCE(inet->mc_ttl);
++
++			put_cmsg(&msg, SOL_IP, IP_TTL, sizeof(hlim), &hlim);
++		}
++		if (inet_test_bit(TOS, sk)) {
++			int tos = READ_ONCE(inet->rcv_tos);
++			put_cmsg(&msg, SOL_IP, IP_TOS, sizeof(tos), &tos);
++		}
++		len -= msg.msg_controllen;
++		return copy_to_sockptr(optlen, &len, sizeof(int));
++	}
+ 	case IP_UNICAST_IF:
+ 		val = (__force int)htonl((__u32) READ_ONCE(inet->uc_index));
+ 		goto copyval;
+@@ -1678,45 +1715,6 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
+ 		else
+ 			err = ip_get_mcast_msfilter(sk, optval, optlen, len);
+ 		goto out;
+-	case IP_PKTOPTIONS:
+-	{
+-		struct msghdr msg;
+-
+-		sockopt_release_sock(sk);
+-
+-		if (sk->sk_type != SOCK_STREAM)
+-			return -ENOPROTOOPT;
+-
+-		if (optval.is_kernel) {
+-			msg.msg_control_is_user = false;
+-			msg.msg_control = optval.kernel;
+-		} else {
+-			msg.msg_control_is_user = true;
+-			msg.msg_control_user = optval.user;
+-		}
+-		msg.msg_controllen = len;
+-		msg.msg_flags = in_compat_syscall() ? MSG_CMSG_COMPAT : 0;
+-
+-		if (inet_test_bit(PKTINFO, sk)) {
+-			struct in_pktinfo info;
+-
+-			info.ipi_addr.s_addr = inet->inet_rcv_saddr;
+-			info.ipi_spec_dst.s_addr = inet->inet_rcv_saddr;
+-			info.ipi_ifindex = inet->mc_index;
+-			put_cmsg(&msg, SOL_IP, IP_PKTINFO, sizeof(info), &info);
+-		}
+-		if (inet_test_bit(TTL, sk)) {
+-			int hlim = READ_ONCE(inet->mc_ttl);
+-
+-			put_cmsg(&msg, SOL_IP, IP_TTL, sizeof(hlim), &hlim);
+-		}
+-		if (inet_test_bit(TOS, sk)) {
+-			int tos = inet->rcv_tos;
+-			put_cmsg(&msg, SOL_IP, IP_TOS, sizeof(tos), &tos);
+-		}
+-		len -= msg.msg_controllen;
+-		return copy_to_sockptr(optlen, &len, sizeof(int));
+-	}
+ 	case IP_LOCAL_PORT_RANGE:
+ 		val = inet->local_port_range.hi << 16 | inet->local_port_range.lo;
+ 		break;
 -- 
 2.42.0.459.ge4e396fd5e-goog
 
