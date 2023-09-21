@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-35607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F0087A9FF8
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 22:29:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2F827AA00D
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 22:31:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A8E22819BF
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 20:29:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B18D1C20C9C
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 20:31:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8612F18C38;
-	Thu, 21 Sep 2023 20:29:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A783D18C24;
+	Thu, 21 Sep 2023 20:31:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A9C318C20
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 20:29:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5C0017988
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 20:31:14 +0000 (UTC)
 Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED7F4B0A22
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 13:28:55 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59c0eb18f09so19227187b3.2
-        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 13:28:55 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC3C465B2
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 13:28:56 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59beea5ce93so27804337b3.0
+        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 13:28:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695328112; x=1695932912; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1695328114; x=1695932914; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qQlu8AcxqDlthTNfcXPJSX8cyQ36W0kmNhwkM5OL+9o=;
-        b=O3QDVY5iV+/2ikZvzXQZzgzAf7WI2TFkeFpfixCnF9YCLGk1N1nAG4CI8SsJf7xkAl
-         vCwIzwWITTfI4SY5W7DSOr0DlGFi1iyq1Tn7NpC/jVt1lEy2plBy7Q6L7fO/ZZjp4Yy5
-         Rq/Hpp7wVJQLXxSMLwc3vNsv4xdWVQ96QqYpbXqM6+D9xiCXPbEMU/OKncS15Mn7zd2A
-         1jQr6OM6h0ADvykpcSlYS8NgRyrWuEZhbDXGzDbV7mk6KmfVqicR+9qcJDyAAeNa4yA5
-         MdNhh1SSgWZjHy4y/vCu9UuOI0ETCiHcXJhaVqbVBEu8pzKxnc/aHqUCaZZ8eRQAwaiW
-         UkOA==
+        bh=1doV0y3T2t0Qynjg1/NAElnJnJ/4setzjesc12Z4yyw=;
+        b=xCvjzUIisAgSKobIyrOuJ4bptM2JXOCtKhsQHbOJmFHDmc5z3KC8bsfgItTYB8msSN
+         7agwlgU1SEfjhqWLhRv4cpfidAdx/hxlBebGu2P6r/OXbfPpYzwILvt1PFot0NSZW/7p
+         yq0Wup3tTA2Me3paU8tRgywSEwNkErkjuGE7i2R1InC3SLPhcbf3O6juoNHBkWB56Xtr
+         RxlTuphGsr1ahI+AV+k6h02Rr6IY5Q/huhXTBrxgEcl5Ia0VqajO+Y5p2Tr45lA4GLYH
+         VR9c0QwZRFk8mYX9fN+ogn2e7xNex6dUrGXl1nglkS6+GIlfULAptz7KDMPSgRAooOBI
+         XDyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695328112; x=1695932912;
+        d=1e100.net; s=20230601; t=1695328114; x=1695932914;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qQlu8AcxqDlthTNfcXPJSX8cyQ36W0kmNhwkM5OL+9o=;
-        b=sc9Wqci3ikmAwwE3PQpaPTLDKb2UL/KpDKZH/dfRRM+EckGqkUQ09iWOtu/IZ5Ww0P
-         rGuPNmMVczlbnbtX0yJCQ4XlsLr1K4pFXadRTHpUHHS/aVe4CDHeQL+vrWZscEfzo77s
-         84GAbzePprLwNTzWtQs88K4SpZzuscPTt1IO05rHe6rTNI66bFHUE8ZWYm/b1/NimFvO
-         UjG3i5me2GkqABUPlF5wtts5YIlZ2onkdzwE7zGxErjx8d3q/u/hxULUNw109g5nWt2M
-         pqBdSA+8fitB+t/2UJsxo5Q3s+rzroarf/1fpeJ/hZNWGbP8bTX/p8c1fCi2H6t0Fq5C
-         9prQ==
-X-Gm-Message-State: AOJu0YwKf/pwFu6KGR0n610eGjzTmD1ejyjf3GaBxDWTXe5xvsZNXsCz
-	8Kxt8Tif8oUanq1gCNvaYQaAfwIXzqyENA==
-X-Google-Smtp-Source: AGHT+IG0SQDQPySfuvY7ur/80FbXyLjLsiEX1dBefE0VZoo7LXPBIcMP8l/xDgGXKmtJtvck4SthIK1D5Nl22g==
+        bh=1doV0y3T2t0Qynjg1/NAElnJnJ/4setzjesc12Z4yyw=;
+        b=JuYZj0rZ483iMszeARq9MPRyNsWuXcXefPLqjQR1zd6FoRRH6tq3apyhBnrjyKGvGm
+         tHmFOmxrvxYmOHNLYK7qMfbMQIHiSxUkQ4L7mFWenA1CRCVUJavdDzwmE9uOZ9upZfLb
+         J51rPApxuOCmHlHit+tFdlYUe+OOf/S2wFpq2MTrkBtpVoBh3D/Y1QMd/jAUR4QZFgsu
+         2HT1eKDMCXbvfg8I3GI/l//qUMmjFQpPL7Dz2JJ7f3WxJUrzzOcUcqb5IfhccNNVGGHR
+         xfJqY7SVvexPX7Oc3ghzdtj/axzh94suX11y4hXg5r4vQQ/BCyVBEn5Abglz3KtHpXDf
+         yXfQ==
+X-Gm-Message-State: AOJu0YwgEjQwGz4flTSmN9iIqqspz/AJpnmDa31RG1j/mDpXDhpITYdH
+	S+bpay8EszvYruKbMNNdHj7/uQ0eNDhVcA==
+X-Google-Smtp-Source: AGHT+IFR8kfQR00T4D7XymFaHAnl7SX/N4BOC1RZOGd4ClG2lnMN3NETFSymqDH7Jw8mSjb57Ac/qHPPRi70/w==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:8b0c:0:b0:cf9:3564:33cc with SMTP id
- i12-20020a258b0c000000b00cf9356433ccmr106334ybl.13.1695328111955; Thu, 21 Sep
- 2023 13:28:31 -0700 (PDT)
-Date: Thu, 21 Sep 2023 20:28:17 +0000
+ (user=edumazet job=sendgmr) by 2002:a81:e703:0:b0:595:8166:7be with SMTP id
+ x3-20020a81e703000000b00595816607bemr10744ywl.0.1695328114181; Thu, 21 Sep
+ 2023 13:28:34 -0700 (PDT)
+Date: Thu, 21 Sep 2023 20:28:18 +0000
 In-Reply-To: <20230921202818.2356959-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -62,8 +62,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20230921202818.2356959-1-edumazet@google.com>
 X-Mailer: git-send-email 2.42.0.515.g380fc7ccd1-goog
-Message-ID: <20230921202818.2356959-8-edumazet@google.com>
-Subject: [PATCH net-next 7/8] net: annotate data-races around sk->sk_tx_queue_mapping
+Message-ID: <20230921202818.2356959-9-edumazet@google.com>
+Subject: [PATCH net-next 8/8] net: annotate data-races around sk->sk_dst_pending_confirm
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -83,51 +83,68 @@ Add annotations to avoid load-store tearing.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/net/sock.h | 20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
+ include/net/sock.h    | 6 +++---
+ net/core/sock.c       | 2 +-
+ net/ipv4/tcp_output.c | 2 +-
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/include/net/sock.h b/include/net/sock.h
-index 56ac1abadea59e6734396a7ef2e22518a0ba80a1..f33e733167df8c2da9240f4af5ed7d715f347394 100644
+index f33e733167df8c2da9240f4af5ed7d715f347394..e70afdb4d29b680aa1081f2b57bab60700b56f5f 100644
 --- a/include/net/sock.h
 +++ b/include/net/sock.h
-@@ -2007,21 +2007,33 @@ static inline void sk_tx_queue_set(struct sock *sk, int tx_queue)
- 	/* sk_tx_queue_mapping accept only upto a 16-bit value */
- 	if (WARN_ON_ONCE((unsigned short)tx_queue >= USHRT_MAX))
- 		return;
--	sk->sk_tx_queue_mapping = tx_queue;
-+	/* Paired with READ_ONCE() in sk_tx_queue_get() and
-+	 * other WRITE_ONCE() because socket lock might be not held.
-+	 */
-+	WRITE_ONCE(sk->sk_tx_queue_mapping, tx_queue);
+@@ -2182,7 +2182,7 @@ static inline void __dst_negative_advice(struct sock *sk)
+ 		if (ndst != dst) {
+ 			rcu_assign_pointer(sk->sk_dst_cache, ndst);
+ 			sk_tx_queue_clear(sk);
+-			sk->sk_dst_pending_confirm = 0;
++			WRITE_ONCE(sk->sk_dst_pending_confirm, 0);
+ 		}
+ 	}
  }
+@@ -2199,7 +2199,7 @@ __sk_dst_set(struct sock *sk, struct dst_entry *dst)
+ 	struct dst_entry *old_dst;
  
- #define NO_QUEUE_MAPPING	USHRT_MAX
+ 	sk_tx_queue_clear(sk);
+-	sk->sk_dst_pending_confirm = 0;
++	WRITE_ONCE(sk->sk_dst_pending_confirm, 0);
+ 	old_dst = rcu_dereference_protected(sk->sk_dst_cache,
+ 					    lockdep_sock_is_held(sk));
+ 	rcu_assign_pointer(sk->sk_dst_cache, dst);
+@@ -2212,7 +2212,7 @@ sk_dst_set(struct sock *sk, struct dst_entry *dst)
+ 	struct dst_entry *old_dst;
  
- static inline void sk_tx_queue_clear(struct sock *sk)
- {
--	sk->sk_tx_queue_mapping = NO_QUEUE_MAPPING;
-+	/* Paired with READ_ONCE() in sk_tx_queue_get() and
-+	 * other WRITE_ONCE() because socket lock might be not held.
-+	 */
-+	WRITE_ONCE(sk->sk_tx_queue_mapping, NO_QUEUE_MAPPING);
+ 	sk_tx_queue_clear(sk);
+-	sk->sk_dst_pending_confirm = 0;
++	WRITE_ONCE(sk->sk_dst_pending_confirm, 0);
+ 	old_dst = xchg((__force struct dst_entry **)&sk->sk_dst_cache, dst);
+ 	dst_release(old_dst);
  }
+diff --git a/net/core/sock.c b/net/core/sock.c
+index f0930f858714b6efdb5b4168d7eb5135f65aded4..290165954379292782a484d378a865cc52ca6753 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -600,7 +600,7 @@ struct dst_entry *__sk_dst_check(struct sock *sk, u32 cookie)
+ 	    INDIRECT_CALL_INET(dst->ops->check, ip6_dst_check, ipv4_dst_check,
+ 			       dst, cookie) == NULL) {
+ 		sk_tx_queue_clear(sk);
+-		sk->sk_dst_pending_confirm = 0;
++		WRITE_ONCE(sk->sk_dst_pending_confirm, 0);
+ 		RCU_INIT_POINTER(sk->sk_dst_cache, NULL);
+ 		dst_release(dst);
+ 		return NULL;
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index 696dfd64c8c5ffaef43f0f33c9402df2f673dcd3..a13779b24a6c18419836651f82352b324f1dec57 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -1325,7 +1325,7 @@ static int __tcp_transmit_skb(struct sock *sk, struct sk_buff *skb,
+ 	skb->destructor = skb_is_tcp_pure_ack(skb) ? __sock_wfree : tcp_wfree;
+ 	refcount_add(skb->truesize, &sk->sk_wmem_alloc);
  
- static inline int sk_tx_queue_get(const struct sock *sk)
- {
--	if (sk && sk->sk_tx_queue_mapping != NO_QUEUE_MAPPING)
--		return sk->sk_tx_queue_mapping;
-+	if (sk) {
-+		/* Paired with WRITE_ONCE() in sk_tx_queue_clear()
-+		 * and sk_tx_queue_set().
-+		 */
-+		int val = READ_ONCE(sk->sk_tx_queue_mapping);
+-	skb_set_dst_pending_confirm(skb, sk->sk_dst_pending_confirm);
++	skb_set_dst_pending_confirm(skb, READ_ONCE(sk->sk_dst_pending_confirm));
  
-+		if (val != NO_QUEUE_MAPPING)
-+			return val;
-+	}
- 	return -1;
- }
- 
+ 	/* Build TCP header and checksum it. */
+ 	th = (struct tcphdr *)skb->data;
 -- 
 2.42.0.515.g380fc7ccd1-goog
 
