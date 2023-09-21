@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-35456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C44CA7A98F0
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 20:02:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47B537A98E7
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:57:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77877282A37
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 18:02:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A3408B21549
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 17:57:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FB4D42BFA;
-	Thu, 21 Sep 2023 17:22:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB14941219;
+	Thu, 21 Sep 2023 17:22:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B9DC19BAE;
-	Thu, 21 Sep 2023 17:22:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42BEC1DDC2;
+	Thu, 21 Sep 2023 17:22:38 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D41E851F7A;
-	Thu, 21 Sep 2023 10:17:06 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E14154903;
+	Thu, 21 Sep 2023 10:17:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695316628; x=1726852628;
+  t=1695316629; x=1726852629;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=8OopbPLd2PLuBzWXbD5OoXxEWQBz7+T1Q1+Yh3tIdx8=;
-  b=V95QsCdPjyyhPyUIwK5cZ4f2HYUd5Felu0d6Dgxaw2DhyjMucY9X256P
-   TlgRACOLpCwvuZ2kPVBodQWZBTUlrDIPMAWJUVeAw2H9ezxKbu11RPrJL
-   QEANBhA2tYot3kMXLCEpgcZg4XnUXMDW1HxqbB8MWVbXO92skcBJW+j9d
-   QnEPbvupOsTfNJOdVpol3VfhHfscBsGNelI2W/Z+pDOrSyHOJGz1IbyGW
-   RSf59+s8VXA6PN21b8dKSEno3xOzB/+ud4t49B73Wpo22k7aA07GizZXV
-   vEy8m307alt/nmJYeROC7Kej2qTzL6N45/6m/Jv/hSTcWrqvNhBcaf85g
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="444608195"
+  bh=UKg+X6Op5cASxXwGUeFtTyF/wDyM/yKi1ZuAir9nXgg=;
+  b=P51JNEHwKo6mppy3GG5ZE2goYqd8JI/hbgjJYpTidMJZ+OK03CreTy2Z
+   VP1le3IG+Ho7SOl9tl22dLu5Nt+ehnqBXeeQ1WIcTg+jE2ZJeFeGGIz6j
+   fQhgbh0v0ASvUp6TwfFAlAUcldlZ1Qk/n9Z0tVMbUauciz866Ffrw0aZc
+   yhcKeikvhGDRU/H0T93/Y47kbm32yY9JsA8BX9Ts5rdS5uFiMKjnRz9ql
+   Zf0fM0GDJFxNWfiQnuA91CSlT3b4dQjwIA7PJyCADHBQNBfpLdf9a21v2
+   FyUUs+URmxHEZWe/25+cO/fmi4rr2TOAQrOjg99EKX+TQvmiF695Hr6Fa
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="444608334"
 X-IronPort-AV: E=Sophos;i="6.03,165,1694761200"; 
-   d="scan'208";a="444608195"
+   d="scan'208";a="444608334"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 05:20:47 -0700
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 05:21:12 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="862441839"
+X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="862442052"
 X-IronPort-AV: E=Sophos;i="6.03,165,1694761200"; 
-   d="scan'208";a="862441839"
+   d="scan'208";a="862442052"
 Received: from yongliang-ubuntu20-ilbpg12.png.intel.com ([10.88.229.33])
-  by fmsmga002.fm.intel.com with ESMTP; 21 Sep 2023 05:20:37 -0700
+  by fmsmga002.fm.intel.com with ESMTP; 21 Sep 2023 05:21:00 -0700
 From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
 To: Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
 	David E Box <david.e.box@linux.intel.com>,
@@ -93,9 +93,9 @@ Cc: David E Box <david.e.box@intel.com>,
 	Tan Tee Min <tee.min.tan@linux.intel.com>,
 	Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>,
 	Lai Peter Jun Ann <jun.ann.lai@intel.com>
-Subject: [PATCH net-next v3 2/5] net: pcs: xpcs: combine C37 SGMII AN and 2500BASEX for Intel mGbE controller
-Date: Thu, 21 Sep 2023 20:19:43 +0800
-Message-Id: <20230921121946.3025771-3-yong.liang.choong@linux.intel.com>
+Subject: [PATCH net-next v3 4/5] net: stmmac: enable Intel mGbE 1G/2.5G auto-negotiation support
+Date: Thu, 21 Sep 2023 20:19:45 +0800
+Message-Id: <20230921121946.3025771-5-yong.liang.choong@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230921121946.3025771-1-yong.liang.choong@linux.intel.com>
 References: <20230921121946.3025771-1-yong.liang.choong@linux.intel.com>
@@ -114,181 +114,397 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: "Tan, Tee Min" <tee.min.tan@linux.intel.com>
 
-This commit introduces xpcs_sgmii_2500basex_features[] that combine
-xpcs_sgmii_features[] and xpcs_2500basex_features[] for Intel mGbE
-controller that desire to interchange the speed mode of
-10/100/1000/2500Mbps at runtime.
+Initially, Intel mGbE was only able to configure the overclocking of 2.5
+times clock rate to enable 2.5Gbps in the BIOS during boot time. Kernel
+driver had no access to modify the clock rate for 1G/2.5G mode at runtime.
 
-Also, we introduce xpcs_config_aneg_c37_sgmii_2500basex() function
-which is called by the xpcs_do_config() with the new AN mode:
-DW_SGMII_2500BASEX, and this new function will proceed next-level
-calling to perform C37 SGMII AN/2500BASEX configuration based on
-the PHY interface updated by PHY driver.
+Now, this patch enables the runtime 1G/2.5G auto-negotiation support to
+gets rid of the dependency on BIOS to change the 1G/2.5G clock rate.
+
+This patch adds several new functions below:-
+- intel_tsn_interface_is_available(): This new function reads FIA lane
+  ownership registers and common lane registers through IPC commands
+  to know which lane the mGbE port is assigned to.
+- stmmac_mac_prepare(): To obtain the latest PHY interface from phylink
+  during initialization and call intel_config_serdes() to proceed with
+  SERDES configuration.
+- intel_config_serdes(): To configure the SERDES based on the assigned
+  lane and latest PHY interface, it sends IPC command to the PMC through
+  PMC driver/API. The PMC acts as a proxy for R/W on behalf of the driver.
+- intel_set_reg_access(): Set the register access to the available TSN
+  interface.
 
 Signed-off-by: Tan, Tee Min <tee.min.tan@linux.intel.com>
 Signed-off-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
 ---
- drivers/net/pcs/pcs-xpcs.c   | 72 ++++++++++++++++++++++++++++++------
- include/linux/pcs/pcs-xpcs.h |  1 +
- 2 files changed, 62 insertions(+), 11 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/Kconfig   |   1 +
+ .../net/ethernet/stmicro/stmmac/dwmac-intel.c | 134 +++++++++++++++++-
+ .../net/ethernet/stmicro/stmmac/dwmac-intel.h |  79 +++++++++++
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |  20 +++
+ include/linux/stmmac.h                        |   1 +
+ 5 files changed, 231 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
-index 4dbc21f604f2..60d90191677d 100644
---- a/drivers/net/pcs/pcs-xpcs.c
-+++ b/drivers/net/pcs/pcs-xpcs.c
-@@ -104,6 +104,21 @@ static const int xpcs_2500basex_features[] = {
- 	__ETHTOOL_LINK_MODE_MASK_NBITS,
+diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
+index a2b9e289aa36..4340efd9bd50 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
++++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
+@@ -273,6 +273,7 @@ config DWMAC_INTEL
+ 	default X86
+ 	depends on X86 && STMMAC_ETH && PCI
+ 	depends on COMMON_CLK
++	select INTEL_PMC_IPC
+ 	help
+ 	  This selects the Intel platform specific bus support for the
+ 	  stmmac driver. This driver is used for Intel Quark/EHL/TGL.
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+index a3a249c63598..a211f42914a2 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+@@ -5,6 +5,7 @@
+ #include <linux/clk-provider.h>
+ #include <linux/pci.h>
+ #include <linux/dmi.h>
++#include <linux/platform_data/x86/intel_pmc_ipc.h>
+ #include "dwmac-intel.h"
+ #include "dwmac4.h"
+ #include "stmmac.h"
+@@ -14,6 +15,9 @@ struct intel_priv_data {
+ 	int mdio_adhoc_addr;	/* mdio address for serdes & etc */
+ 	unsigned long crossts_adj;
+ 	bool is_pse;
++	const int *tsn_lane_registers;
++	int max_tsn_lane_registers;
++	int pid_modphy;
  };
  
-+static const int xpcs_sgmii_2500basex_features[] = {
-+	ETHTOOL_LINK_MODE_Pause_BIT,
-+	ETHTOOL_LINK_MODE_Asym_Pause_BIT,
-+	ETHTOOL_LINK_MODE_Autoneg_BIT,
-+	ETHTOOL_LINK_MODE_10baseT_Half_BIT,
-+	ETHTOOL_LINK_MODE_10baseT_Full_BIT,
-+	ETHTOOL_LINK_MODE_100baseT_Half_BIT,
-+	ETHTOOL_LINK_MODE_100baseT_Full_BIT,
-+	ETHTOOL_LINK_MODE_1000baseT_Half_BIT,
-+	ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
-+	ETHTOOL_LINK_MODE_2500baseX_Full_BIT,
-+	ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
-+	__ETHTOOL_LINK_MODE_MASK_NBITS,
-+};
-+
- static const phy_interface_t xpcs_usxgmii_interfaces[] = {
- 	PHY_INTERFACE_MODE_USXGMII,
- };
-@@ -133,6 +148,12 @@ static const phy_interface_t xpcs_2500basex_interfaces[] = {
- 	PHY_INTERFACE_MODE_MAX,
- };
+ /* This struct is used to associate PCI Function of MAC controller on a board,
+@@ -93,7 +97,7 @@ static int intel_serdes_powerup(struct net_device *ndev, void *priv_data)
+ 	data &= ~SERDES_RATE_MASK;
+ 	data &= ~SERDES_PCLK_MASK;
  
-+static const phy_interface_t xpcs_sgmii_2500basex_interfaces[] = {
-+	PHY_INTERFACE_MODE_SGMII,
-+	PHY_INTERFACE_MODE_2500BASEX,
-+	PHY_INTERFACE_MODE_MAX,
-+};
-+
- enum {
- 	DW_XPCS_USXGMII,
- 	DW_XPCS_10GKR,
-@@ -141,6 +162,7 @@ enum {
- 	DW_XPCS_SGMII,
- 	DW_XPCS_1000BASEX,
- 	DW_XPCS_2500BASEX,
-+	DW_XPCS_SGMII_2500BASEX,
- 	DW_XPCS_INTERFACE_MAX,
- };
- 
-@@ -290,6 +312,7 @@ static int xpcs_soft_reset(struct dw_xpcs *xpcs,
- 	case DW_AN_C37_SGMII:
- 	case DW_2500BASEX:
- 	case DW_AN_C37_1000BASEX:
-+	case DW_SGMII_2500BASEX:
- 		dev = MDIO_MMD_VEND2;
- 		break;
- 	default:
-@@ -748,6 +771,8 @@ static int xpcs_config_aneg_c37_sgmii(struct dw_xpcs *xpcs,
- 	if (xpcs->dev_flag == DW_DEV_TXGBE)
- 		ret |= DW_VR_MII_DIG_CTRL1_PHY_MODE_CTRL;
- 
-+	/* Disable 2.5G GMII for SGMII C37 mode */
-+	ret &= ~DW_VR_MII_DIG_CTRL1_2G5_EN;
- 	ret = xpcs_write(xpcs, MDIO_MMD_VEND2, DW_VR_MII_DIG_CTRL1, ret);
- 	if (ret < 0)
- 		return ret;
-@@ -848,6 +873,26 @@ static int xpcs_config_2500basex(struct dw_xpcs *xpcs)
- 	return xpcs_write(xpcs, MDIO_MMD_VEND2, DW_VR_MII_MMD_CTRL, ret);
+-	if (priv->plat->max_speed == 2500)
++	if (priv->plat->phy_interface == PHY_INTERFACE_MODE_2500BASEX)
+ 		data |= SERDES_RATE_PCIE_GEN2 << SERDES_RATE_PCIE_SHIFT |
+ 			SERDES_PCLK_37p5MHZ << SERDES_PCLK_SHIFT;
+ 	else
+@@ -414,6 +418,106 @@ static void intel_mgbe_pse_crossts_adj(struct intel_priv_data *intel_priv,
+ 	}
  }
  
-+static int xpcs_config_aneg_c37_sgmii_2500basex(struct dw_xpcs *xpcs,
-+						unsigned int neg_mode,
-+						phy_interface_t interface)
++#if IS_ENABLED(CONFIG_INTEL_PMC_IPC)
++static bool intel_tsn_interface_is_available(struct net_device *ndev,
++					     struct intel_priv_data *intel_priv)
 +{
-+	int ret = -EOPNOTSUPP;
++	struct stmmac_priv *priv = netdev_priv(ndev);
++	struct pmc_ipc_cmd tmp = {0};
++	u32 rbuf[4] = {0};
++	int ret, i, j;
 +
-+	switch (interface) {
-+	case PHY_INTERFACE_MODE_SGMII:
-+		ret = xpcs_config_aneg_c37_sgmii(xpcs, neg_mode);
-+		break;
-+	case PHY_INTERFACE_MODE_2500BASEX:
-+		ret = xpcs_config_2500basex(xpcs);
-+		break;
-+	default:
-+		break;
++	if (priv->plat->serdes_powerup) {
++		tmp.cmd = IPC_SOC_REGISTER_ACCESS;
++		tmp.sub_cmd = IPC_SOC_SUB_CMD_READ;
++
++		for (i = 0; i < 5; i++) {
++			tmp.wbuf[0] = R_PCH_FIA_15_PCR_LOS1_REG_BASE + i;
++
++			ret = intel_pmc_ipc(&tmp, rbuf);
++			if (ret < 0) {
++				netdev_info(priv->dev,
++					    "Failed to read from PMC.\n");
++				return false;
++			}
++
++			for (j = 0; j <= intel_priv->max_tsn_lane_registers; j++)
++				if ((rbuf[0] >>
++				    (4 * (intel_priv->tsn_lane_registers[j] % 8)) &
++				     B_PCH_FIA_PCR_L0O) == 0xB)
++					return true;
++		}
++	}
++	return false;
++}
++
++static int intel_set_reg_access(const struct pmc_serdes_regs *regs, int max_regs)
++{
++	int ret = 0, i;
++
++	for (i = 0; i < max_regs; i++) {
++		struct pmc_ipc_cmd tmp = {0};
++		u32 buf[4] = {0};
++
++		tmp.cmd = IPC_SOC_REGISTER_ACCESS;
++		tmp.sub_cmd = IPC_SOC_SUB_CMD_WRITE;
++		tmp.wbuf[0] = (u32)regs[i].index;
++		tmp.wbuf[1] = regs[i].val;
++
++		ret = intel_pmc_ipc(&tmp, buf);
++		if (ret < 0)
++			return ret;
 +	}
 +
 +	return ret;
 +}
 +
- int xpcs_do_config(struct dw_xpcs *xpcs, phy_interface_t interface,
- 		   const unsigned long *advertising, unsigned int neg_mode)
- {
-@@ -890,6 +935,12 @@ int xpcs_do_config(struct dw_xpcs *xpcs, phy_interface_t interface,
- 		if (ret)
- 			return ret;
- 		break;
-+	case DW_SGMII_2500BASEX:
-+		ret = xpcs_config_aneg_c37_sgmii_2500basex(xpcs, neg_mode,
-+							   interface);
-+		if (ret)
-+			return ret;
-+		break;
- 	default:
- 		return -1;
- 	}
-@@ -1114,6 +1165,11 @@ static void xpcs_get_state(struct phylink_pcs *pcs,
- 		}
- 		break;
- 	case DW_AN_C37_SGMII:
-+	case DW_SGMII_2500BASEX:
-+		/* 2500BASEX is not supported for in-band AN mode. */
-+		if (state->interface == PHY_INTERFACE_MODE_2500BASEX)
-+			break;
++static int intel_config_serdes(struct net_device *ndev, void *intel_data)
++{
++	struct intel_priv_data *intel_priv = intel_data;
++	struct stmmac_priv *priv = netdev_priv(ndev);
++	int ret = 0;
 +
- 		ret = xpcs_get_state_c37_sgmii(xpcs, state);
- 		if (ret) {
- 			pr_err("xpcs_get_state_c37_sgmii returned %pe\n",
-@@ -1266,23 +1322,17 @@ static const struct xpcs_compat synopsys_xpcs_compat[DW_XPCS_INTERFACE_MAX] = {
- 		.num_interfaces = ARRAY_SIZE(xpcs_10gbaser_interfaces),
- 		.an_mode = DW_10GBASER,
- 	},
--	[DW_XPCS_SGMII] = {
--		.supported = xpcs_sgmii_features,
--		.interface = xpcs_sgmii_interfaces,
--		.num_interfaces = ARRAY_SIZE(xpcs_sgmii_interfaces),
--		.an_mode = DW_AN_C37_SGMII,
--	},
- 	[DW_XPCS_1000BASEX] = {
- 		.supported = xpcs_1000basex_features,
- 		.interface = xpcs_1000basex_interfaces,
- 		.num_interfaces = ARRAY_SIZE(xpcs_1000basex_interfaces),
- 		.an_mode = DW_AN_C37_1000BASEX,
- 	},
--	[DW_XPCS_2500BASEX] = {
--		.supported = xpcs_2500basex_features,
--		.interface = xpcs_2500basex_interfaces,
--		.num_interfaces = ARRAY_SIZE(xpcs_2500basex_interfaces),
--		.an_mode = DW_2500BASEX,
-+	[DW_XPCS_SGMII_2500BASEX] = {
-+		.supported = xpcs_sgmii_2500basex_features,
-+		.interface = xpcs_sgmii_2500basex_interfaces,
-+		.num_interfaces = ARRAY_SIZE(xpcs_sgmii_2500basex_features),
-+		.an_mode = DW_SGMII_2500BASEX,
- 	},
++	if (!intel_tsn_interface_is_available(ndev, intel_priv)) {
++		netdev_info(priv->dev,
++			    "No TSN interface available to set the registers.\n");
++		goto pmc_read_error;
++	}
++
++	if (intel_priv->pid_modphy == PID_MODPHY1) {
++		if (priv->plat->phy_interface == PHY_INTERFACE_MODE_2500BASEX) {
++			ret = intel_set_reg_access(pid_modphy1_2p5g_regs,
++						   ARRAY_SIZE(pid_modphy1_2p5g_regs));
++		} else {
++			ret = intel_set_reg_access(pid_modphy1_1g_regs,
++						   ARRAY_SIZE(pid_modphy1_1g_regs));
++		}
++	} else {
++		if (priv->plat->phy_interface == PHY_INTERFACE_MODE_2500BASEX) {
++			ret = intel_set_reg_access(pid_modphy3_2p5g_regs,
++						   ARRAY_SIZE(pid_modphy3_2p5g_regs));
++		} else {
++			ret = intel_set_reg_access(pid_modphy3_1g_regs,
++						   ARRAY_SIZE(pid_modphy3_1g_regs));
++		}
++	}
++
++	if (ret < 0)
++		goto pmc_read_error;
++
++pmc_read_error:
++	intel_serdes_powerdown(ndev, intel_priv);
++	intel_serdes_powerup(ndev, intel_priv);
++
++	return ret;
++}
++#else
++static int intel_config_serdes(struct net_device *ndev, void *intel_data)
++{
++	return -EOPNOTSUPP;
++}
++#endif /* CONFIG_INTEL_PMC_IPC */
++
+ static void common_default_data(struct plat_stmmacenet_data *plat)
+ {
+ 	plat->clk_csr = 2;	/* clk_csr_i = 20-35MHz & MDC = clk_csr_i/16 */
+@@ -624,6 +728,8 @@ static int intel_mgbe_common_data(struct pci_dev *pdev,
+ static int ehl_common_data(struct pci_dev *pdev,
+ 			   struct plat_stmmacenet_data *plat)
+ {
++	struct intel_priv_data *intel_priv = plat->bsp_priv;
++
+ 	plat->rx_queues_to_use = 8;
+ 	plat->tx_queues_to_use = 8;
+ 	plat->flags |= STMMAC_FLAG_USE_PHY_WOL;
+@@ -639,20 +745,28 @@ static int ehl_common_data(struct pci_dev *pdev,
+ 	plat->safety_feat_cfg->prtyen = 0;
+ 	plat->safety_feat_cfg->tmouten = 0;
+ 
++	intel_priv->tsn_lane_registers = ehl_tsn_lane_registers;
++	intel_priv->max_tsn_lane_registers = ARRAY_SIZE(ehl_tsn_lane_registers);
++
+ 	return intel_mgbe_common_data(pdev, plat);
+ }
+ 
+ static int ehl_sgmii_data(struct pci_dev *pdev,
+ 			  struct plat_stmmacenet_data *plat)
+ {
++	struct intel_priv_data *intel_priv = plat->bsp_priv;
++
+ 	plat->bus_id = 1;
+ 	plat->phy_interface = PHY_INTERFACE_MODE_SGMII;
+-	plat->speed_mode_2500 = intel_speed_mode_2500;
++	plat->max_speed = SPEED_2500;
+ 	plat->serdes_powerup = intel_serdes_powerup;
+ 	plat->serdes_powerdown = intel_serdes_powerdown;
++	plat->config_serdes = intel_config_serdes;
+ 
+ 	plat->clk_ptp_rate = 204800000;
+ 
++	intel_priv->pid_modphy = PID_MODPHY3;
++
+ 	return ehl_common_data(pdev, plat);
+ }
+ 
+@@ -705,10 +819,16 @@ static struct stmmac_pci_info ehl_pse0_rgmii1g_info = {
+ static int ehl_pse0_sgmii1g_data(struct pci_dev *pdev,
+ 				 struct plat_stmmacenet_data *plat)
+ {
++	struct intel_priv_data *intel_priv = plat->bsp_priv;
++
+ 	plat->phy_interface = PHY_INTERFACE_MODE_SGMII;
+-	plat->speed_mode_2500 = intel_speed_mode_2500;
++	plat->max_speed = SPEED_2500;
+ 	plat->serdes_powerup = intel_serdes_powerup;
+ 	plat->serdes_powerdown = intel_serdes_powerdown;
++	plat->config_serdes = intel_config_serdes;
++
++	intel_priv->pid_modphy = PID_MODPHY1;
++
+ 	return ehl_pse0_common_data(pdev, plat);
+ }
+ 
+@@ -746,10 +866,16 @@ static struct stmmac_pci_info ehl_pse1_rgmii1g_info = {
+ static int ehl_pse1_sgmii1g_data(struct pci_dev *pdev,
+ 				 struct plat_stmmacenet_data *plat)
+ {
++	struct intel_priv_data *intel_priv = plat->bsp_priv;
++
+ 	plat->phy_interface = PHY_INTERFACE_MODE_SGMII;
+-	plat->speed_mode_2500 = intel_speed_mode_2500;
++	plat->max_speed = SPEED_2500;
+ 	plat->serdes_powerup = intel_serdes_powerup;
+ 	plat->serdes_powerdown = intel_serdes_powerdown;
++	plat->config_serdes = intel_config_serdes;
++
++	intel_priv->pid_modphy = PID_MODPHY1;
++
+ 	return ehl_pse1_common_data(pdev, plat);
+ }
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.h b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.h
+index 0a37987478c1..093eed977ab0 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.h
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.h
+@@ -50,4 +50,83 @@
+ #define PCH_PTP_CLK_FREQ_19_2MHZ	(GMAC_GPO0)
+ #define PCH_PTP_CLK_FREQ_200MHZ		(0)
+ 
++#define	PID_MODPHY1 0xAA
++#define	PID_MODPHY3 0xA8
++
++#if IS_ENABLED(CONFIG_INTEL_PMC_IPC)
++struct pmc_serdes_regs {
++	u8 index;
++	u32 val;
++};
++
++/* Modphy Register index */
++#define R_PCH_FIA_15_PCR_LOS1_REG_BASE			8
++#define R_PCH_FIA_15_PCR_LOS2_REG_BASE			9
++#define R_PCH_FIA_15_PCR_LOS3_REG_BASE			10
++#define R_PCH_FIA_15_PCR_LOS4_REG_BASE			11
++#define R_PCH_FIA_15_PCR_LOS5_REG_BASE			12
++#define B_PCH_FIA_PCR_L0O				GENMASK(3, 0)
++#define PID_MODPHY1_B_MODPHY_PCR_LCPLL_DWORD0		13
++#define PID_MODPHY1_N_MODPHY_PCR_LCPLL_DWORD2		14
++#define PID_MODPHY1_N_MODPHY_PCR_LCPLL_DWORD7		15
++#define PID_MODPHY1_N_MODPHY_PCR_LPPLL_DWORD10		16
++#define PID_MODPHY1_N_MODPHY_PCR_CMN_ANA_DWORD30	17
++#define PID_MODPHY3_B_MODPHY_PCR_LCPLL_DWORD0		18
++#define PID_MODPHY3_N_MODPHY_PCR_LCPLL_DWORD2		19
++#define PID_MODPHY3_N_MODPHY_PCR_LCPLL_DWORD7		20
++#define PID_MODPHY3_N_MODPHY_PCR_LPPLL_DWORD10		21
++#define PID_MODPHY3_N_MODPHY_PCR_CMN_ANA_DWORD30	22
++
++#define B_MODPHY_PCR_LCPLL_DWORD0_1G		0x46AAAA41
++#define N_MODPHY_PCR_LCPLL_DWORD2_1G		0x00000139
++#define N_MODPHY_PCR_LCPLL_DWORD7_1G		0x002A0003
++#define N_MODPHY_PCR_LPPLL_DWORD10_1G		0x00170008
++#define N_MODPHY_PCR_CMN_ANA_DWORD30_1G		0x0000D4AC
++#define B_MODPHY_PCR_LCPLL_DWORD0_2P5G		0x58555551
++#define N_MODPHY_PCR_LCPLL_DWORD2_2P5G		0x0000012D
++#define N_MODPHY_PCR_LCPLL_DWORD7_2P5G		0x001F0003
++#define N_MODPHY_PCR_LPPLL_DWORD10_2P5G		0x00170008
++#define N_MODPHY_PCR_CMN_ANA_DWORD30_2P5G	0x8200ACAC
++
++static const struct pmc_serdes_regs pid_modphy3_1g_regs[] = {
++	{ PID_MODPHY3_B_MODPHY_PCR_LCPLL_DWORD0,	B_MODPHY_PCR_LCPLL_DWORD0_1G },
++	{ PID_MODPHY3_N_MODPHY_PCR_LCPLL_DWORD2,	N_MODPHY_PCR_LCPLL_DWORD2_1G },
++	{ PID_MODPHY3_N_MODPHY_PCR_LCPLL_DWORD7,	N_MODPHY_PCR_LCPLL_DWORD7_1G },
++	{ PID_MODPHY3_N_MODPHY_PCR_LPPLL_DWORD10,	N_MODPHY_PCR_LPPLL_DWORD10_1G },
++	{ PID_MODPHY3_N_MODPHY_PCR_CMN_ANA_DWORD30,	N_MODPHY_PCR_CMN_ANA_DWORD30_1G },
++	{}
++};
++
++static const struct pmc_serdes_regs pid_modphy3_2p5g_regs[] = {
++	{ PID_MODPHY3_B_MODPHY_PCR_LCPLL_DWORD0,	B_MODPHY_PCR_LCPLL_DWORD0_2P5G },
++	{ PID_MODPHY3_N_MODPHY_PCR_LCPLL_DWORD2,	N_MODPHY_PCR_LCPLL_DWORD2_2P5G },
++	{ PID_MODPHY3_N_MODPHY_PCR_LCPLL_DWORD7,	N_MODPHY_PCR_LCPLL_DWORD7_2P5G },
++	{ PID_MODPHY3_N_MODPHY_PCR_LPPLL_DWORD10,	N_MODPHY_PCR_LPPLL_DWORD10_2P5G },
++	{ PID_MODPHY3_N_MODPHY_PCR_CMN_ANA_DWORD30,	N_MODPHY_PCR_CMN_ANA_DWORD30_2P5G },
++	{}
++};
++
++static const struct pmc_serdes_regs pid_modphy1_1g_regs[] = {
++	{ PID_MODPHY1_B_MODPHY_PCR_LCPLL_DWORD0,	B_MODPHY_PCR_LCPLL_DWORD0_1G },
++	{ PID_MODPHY1_N_MODPHY_PCR_LCPLL_DWORD2,	N_MODPHY_PCR_LCPLL_DWORD2_1G },
++	{ PID_MODPHY1_N_MODPHY_PCR_LCPLL_DWORD7,	N_MODPHY_PCR_LCPLL_DWORD7_1G },
++	{ PID_MODPHY1_N_MODPHY_PCR_LPPLL_DWORD10,	N_MODPHY_PCR_LPPLL_DWORD10_1G },
++	{ PID_MODPHY1_N_MODPHY_PCR_CMN_ANA_DWORD30,	N_MODPHY_PCR_CMN_ANA_DWORD30_1G },
++	{}
++};
++
++static const struct pmc_serdes_regs pid_modphy1_2p5g_regs[] = {
++	{ PID_MODPHY1_B_MODPHY_PCR_LCPLL_DWORD0,	B_MODPHY_PCR_LCPLL_DWORD0_2P5G },
++	{ PID_MODPHY1_N_MODPHY_PCR_LCPLL_DWORD2,	N_MODPHY_PCR_LCPLL_DWORD2_2P5G },
++	{ PID_MODPHY1_N_MODPHY_PCR_LCPLL_DWORD7,	N_MODPHY_PCR_LCPLL_DWORD7_2P5G },
++	{ PID_MODPHY1_N_MODPHY_PCR_LPPLL_DWORD10,	N_MODPHY_PCR_LPPLL_DWORD10_2P5G },
++	{ PID_MODPHY1_N_MODPHY_PCR_CMN_ANA_DWORD30,	N_MODPHY_PCR_CMN_ANA_DWORD30_2P5G },
++	{}
++};
++
++static const int ehl_tsn_lane_registers[] = {7, 8, 9, 10, 11};
++#else
++static const int ehl_tsn_lane_registers[] = {};
++#endif /* CONFIG_INTEL_PMC_IPC */
++
+ #endif /* __DWMAC_INTEL_H__ */
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 9201ed778ebc..75765cf52cd1 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -1103,11 +1103,31 @@ static void stmmac_mac_link_up(struct phylink_config *config,
+ 		stmmac_hwtstamp_correct_latency(priv, priv);
+ }
+ 
++#if IS_ENABLED(CONFIG_INTEL_PMC_IPC)
++static int stmmac_mac_prepare(struct phylink_config *config, unsigned int mode,
++			      phy_interface_t interface)
++{
++	struct net_device *ndev = to_net_dev(config->dev);
++	struct stmmac_priv *priv = netdev_priv(ndev);
++	int ret = 0;
++
++	priv->plat->phy_interface = interface;
++
++	if (priv->plat->config_serdes)
++		ret = priv->plat->config_serdes(ndev, priv->plat->bsp_priv);
++
++	return ret;
++}
++#endif
++
+ static const struct phylink_mac_ops stmmac_phylink_mac_ops = {
+ 	.mac_select_pcs = stmmac_mac_select_pcs,
+ 	.mac_config = stmmac_mac_config,
+ 	.mac_link_down = stmmac_mac_link_down,
+ 	.mac_link_up = stmmac_mac_link_up,
++#if IS_ENABLED(CONFIG_INTEL_PMC_IPC)
++	.mac_prepare = stmmac_mac_prepare,
++#endif
  };
  
-diff --git a/include/linux/pcs/pcs-xpcs.h b/include/linux/pcs/pcs-xpcs.h
-index da3a6c30f6d2..f075d2fca54a 100644
---- a/include/linux/pcs/pcs-xpcs.h
-+++ b/include/linux/pcs/pcs-xpcs.h
-@@ -19,6 +19,7 @@
- #define DW_2500BASEX			3
- #define DW_AN_C37_1000BASEX		4
- #define DW_10GBASER			5
-+#define DW_SGMII_2500BASEX		6
- 
- /* device vendor OUI */
- #define DW_OUI_WX			0x0018fc80
+ /**
+diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+index c0079a7574ae..aa7d4d96391c 100644
+--- a/include/linux/stmmac.h
++++ b/include/linux/stmmac.h
+@@ -275,6 +275,7 @@ struct plat_stmmacenet_data {
+ 	int (*serdes_powerup)(struct net_device *ndev, void *priv);
+ 	void (*serdes_powerdown)(struct net_device *ndev, void *priv);
+ 	void (*speed_mode_2500)(struct net_device *ndev, void *priv);
++	int (*config_serdes)(struct net_device *ndev, void *priv);
+ 	void (*ptp_clk_freq_config)(struct stmmac_priv *priv);
+ 	int (*init)(struct platform_device *pdev, void *priv);
+ 	void (*exit)(struct platform_device *pdev, void *priv);
 -- 
 2.25.1
 
