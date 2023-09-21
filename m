@@ -1,216 +1,212 @@
-Return-Path: <netdev+bounces-35459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35461-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE63E7A9900
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 20:09:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E1BF7A992A
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 20:12:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8BF13B211C9
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 18:09:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBC891C21386
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 18:12:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B15201DDC2;
-	Thu, 21 Sep 2023 17:22:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A82AF44493;
+	Thu, 21 Sep 2023 17:23:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38E0841A98
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 17:22:45 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B36E2566FD
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:18:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D09C444468
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 17:22:56 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CA0058C00
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:19:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1695316692;
+	s=mimecast20190719; t=1695316773;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=TlC67XxjnP+ZVW2NhM88mr2tYX+uJkcJVmDqrakHLxg=;
-	b=bWQ+TWmTwmljW/giLf5DXD20giZPm1DHdDvXbHdu+g+Xc8VxcdtcFV9k912pfAqjOLq4ED
-	NtW/1D5JFxx1KCzSLb6tq5Rvmb7am0PHQbpDXWr7y90aEAQXE+TpoTMd4gAaD6bot3s8j1
-	3g9lbcLGOc/I5c4K92wf1jApKabwluk=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=mYFUdBslfSemlERse4Us5f4NKymG/+Lupcjrt0UUg2s=;
+	b=Hn26/kUwVxoEIfM2R98owlgqEQVRfgNSjsastGbCD6CaNLdWGvs0dbPhDW7PvYwZbFHJoF
+	Fjo0Cbta/E5pN0IZlzxxRCAr9eAsgxjk1hfkqAHLazWvJlUEv2q9MsrlDNOnWEEwuhuARu
+	37mKLPiFGGDX7TYqps/0rnksrPKTIdQ=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-283-vK5aPMMuOx6Rvu9TQoFeWw-1; Thu, 21 Sep 2023 10:02:50 -0400
-X-MC-Unique: vK5aPMMuOx6Rvu9TQoFeWw-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40298cbbcdbso7774075e9.3
-        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 07:02:41 -0700 (PDT)
+ us-mta-16-T44hhCwqNpW5AbC6LKd2KA-1; Thu, 21 Sep 2023 10:03:02 -0400
+X-MC-Unique: T44hhCwqNpW5AbC6LKd2KA-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-9ae686dafedso46168666b.3
+        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 07:03:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695304949; x=1695909749;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TlC67XxjnP+ZVW2NhM88mr2tYX+uJkcJVmDqrakHLxg=;
-        b=jeXvRxuTarkyn0AICZwl8ONgiY8j0A7UUBtkgi8TP+118gSMiydhjiOmMRPwodalLO
-         /+0A7hwUwxr6IAjcdX5lLALhYafvOri5jKTNmDkYFrQPRin68vZPp9i6CcSnlyxPB61p
-         YBgucfyZWVkVKseUlOFr1DDD++aHm766WOjLVJGmUZUgDMyn8lA7cInMPLO4r/0NK9xX
-         OO9z/rN1Skhp+JcIbysAbTYyT5oWTEsXvxcYay57fBOVZoGfg0q7Fqnmh717ESL0Zh/0
-         SsrQW2YHbf+tr4Rj8lpfhE5V0uOun8luIDn8ArwmFyNoPEerw/+iZ647ukxPD3MaOLOt
-         RKTg==
-X-Gm-Message-State: AOJu0Ywa6DsZ7/9StVM7lZVMA45c3yiOQLCo8VEY3BKPByyBluWY3gS/
-	T5L/NJO6zWrYcX8BzeJ4BUBb2UXrf2Kf/cruH4zyNhNKe2Q3OUFojEXAJ4WapcR6TTDhTO1CaHt
-	2ppA8z6NUVv/oKT7ealdIW+YpDxCtW3AJ
-X-Received: by 2002:a5d:6909:0:b0:31f:f1f4:ca8e with SMTP id t9-20020a5d6909000000b0031ff1f4ca8emr5334194wru.36.1695304949268;
-        Thu, 21 Sep 2023 07:02:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHNTL6nYnReHMxIE2eeSXN3WfDyrQQNkn8rAgYHxF7+Q3qpnqcBEXgV8EV9/Y02we+Lvs9Dzqktaq7bM20Yrgk=
-X-Received: by 2002:a5d:6909:0:b0:31f:f1f4:ca8e with SMTP id
- t9-20020a5d6909000000b0031ff1f4ca8emr5334163wru.36.1695304948913; Thu, 21 Sep
- 2023 07:02:28 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1695304980; x=1695909780;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mYFUdBslfSemlERse4Us5f4NKymG/+Lupcjrt0UUg2s=;
+        b=A0z5+OTN7W83Gb3I1XVIG4u/Fwok21sxxo79VCKkHQ+RjrrDBhq0DvJNsNDUROxAlh
+         MpJzkLoNhXt7BAoKyIHrf+ZRhMU5HC5M3ndBdfCTw4SADmdT9y92116KgdBy+8Rj62d9
+         MDCm2l1ZfJEatpu94dBnWynCGP7yAu/9F2IS86a4gRJt6DRI5wy6CBT1Um9omL2YkW42
+         GKB5w/2UV2L6dATdU5f6ljuAELSn3jas8ZCwre7BqAvtcfz979lbDPQk/8eACgUKrtIp
+         f5XM6mJiigB6z3xyJTukncozgF60p7ckRT7FeiAEERDBfNTjc6CPYnHARzkxnLzNJAB7
+         yHbw==
+X-Gm-Message-State: AOJu0YzwT3fpXhq375aoFVkE64t766c3ESSwqZIQ+4ml2T6igBUG+/ly
+	QQYflxPG6tuTtMXw6xFo3UE46QMihM7tIlGppZJwZpDhrAiGzR0Thhiq1yqyzGSwdi/A5fMZJT7
+	09ZYVlFyh4tnEqt9X
+X-Received: by 2002:a17:906:13:b0:9a5:7e63:2e0 with SMTP id 19-20020a170906001300b009a57e6302e0mr5496777eja.30.1695304980542;
+        Thu, 21 Sep 2023 07:03:00 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEGDrtu0JFw6590Ay/MhiYHIEI6g5Txx1wcLitr4s1+bWtmtSPAeMYJ5QGJ2kmybduZxOWLIA==
+X-Received: by 2002:a17:906:13:b0:9a5:7e63:2e0 with SMTP id 19-20020a170906001300b009a57e6302e0mr5496721eja.30.1695304980143;
+        Thu, 21 Sep 2023 07:03:00 -0700 (PDT)
+Received: from redhat.com ([2.52.150.187])
+        by smtp.gmail.com with ESMTPSA id dt11-20020a170906b78b00b009ae482d70besm1079598ejb.134.2023.09.21.07.02.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Sep 2023 07:02:59 -0700 (PDT)
+Date: Thu, 21 Sep 2023 10:02:53 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: virtualization@lists.linux-foundation.org,
+	Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Jason Wang <jasowang@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Mark Gross <markgross@kernel.org>,
+	Vadim Pasternak <vadimp@nvidia.com>,
+	Bjorn Andersson <bjorn.andersson@linaro.org>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	Eric Farman <farman@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Vincent Whitchurch <vincent.whitchurch@axis.com>,
+	linux-um@lists.infradead.org, netdev@vger.kernel.org,
+	platform-driver-x86@vger.kernel.org,
+	linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+	kvm@vger.kernel.org, bpf@vger.kernel.org,
+	kangjie.xu@linux.alibaba.com
+Subject: Re: [PATCH v14 30/42] virtio_pci: introduce helper to get/set queue
+ reset
+Message-ID: <20230921100112-mutt-send-email-mst@kernel.org>
+References: <20220801063902.129329-1-xuanzhuo@linux.alibaba.com>
+ <20220801063902.129329-31-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230912030008.3599514-1-lulu@redhat.com> <20230912030008.3599514-5-lulu@redhat.com>
- <CACGkMEtCYG8-Pt+V-OOwUV7fYFp_cnxU68Moisfxju9veJ-=qw@mail.gmail.com>
-In-Reply-To: <CACGkMEtCYG8-Pt+V-OOwUV7fYFp_cnxU68Moisfxju9veJ-=qw@mail.gmail.com>
-From: Cindy Lu <lulu@redhat.com>
-Date: Thu, 21 Sep 2023 22:01:46 +0800
-Message-ID: <CACLfguW3NS_4+YhqTtGqvQb70mVazGVfheryHx4aCBn+=Skf9w@mail.gmail.com>
-Subject: Re: [RFC v2 4/4] vduse: Add new ioctl VDUSE_GET_RECONNECT_INFO
-To: Jason Wang <jasowang@redhat.com>
-Cc: mst@redhat.com, maxime.coquelin@redhat.com, xieyongji@bytedance.com, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
-	stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220801063902.129329-31-xuanzhuo@linux.alibaba.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
 	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Sep 18, 2023 at 4:49=E2=80=AFPM Jason Wang <jasowang@redhat.com> wr=
-ote:
->
-> On Tue, Sep 12, 2023 at 11:01=E2=80=AFAM Cindy Lu <lulu@redhat.com> wrote=
-:
-> >
-> > In VDUSE_GET_RECONNECT_INFO, the Userspace App can get the map size
-> > and The number of mapping memory pages from the kernel. The userspace
-> > App can use this information to map the pages.
-> >
-> > Signed-off-by: Cindy Lu <lulu@redhat.com>
-> > ---
-> >  drivers/vdpa/vdpa_user/vduse_dev.c | 15 +++++++++++++++
-> >  include/uapi/linux/vduse.h         | 15 +++++++++++++++
-> >  2 files changed, 30 insertions(+)
-> >
-> > diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_use=
-r/vduse_dev.c
-> > index 680b23dbdde2..c99f99892b5c 100644
-> > --- a/drivers/vdpa/vdpa_user/vduse_dev.c
-> > +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
-> > @@ -1368,6 +1368,21 @@ static long vduse_dev_ioctl(struct file *file, u=
-nsigned int cmd,
-> >                 ret =3D 0;
-> >                 break;
-> >         }
-> > +       case VDUSE_GET_RECONNECT_INFO: {
-> > +               struct vduse_reconnect_mmap_info info;
-> > +
-> > +               ret =3D -EFAULT;
-> > +               if (copy_from_user(&info, argp, sizeof(info)))
-> > +                       break;
-> > +
-> > +               info.size =3D PAGE_SIZE;
-> > +               info.max_index =3D dev->vq_num + 1;
-> > +
-> > +               if (copy_to_user(argp, &info, sizeof(info)))
-> > +                       break;
-> > +               ret =3D 0;
-> > +               break;
-> > +       }
-> >         default:
-> >                 ret =3D -ENOIOCTLCMD;
-> >                 break;
-> > diff --git a/include/uapi/linux/vduse.h b/include/uapi/linux/vduse.h
-> > index d585425803fd..ce55e34f63d7 100644
-> > --- a/include/uapi/linux/vduse.h
-> > +++ b/include/uapi/linux/vduse.h
-> > @@ -356,4 +356,19 @@ struct vhost_reconnect_vring {
-> >         _Bool avail_wrap_counter;
-> >  };
-> >
-> > +/**
-> > + * struct vduse_reconnect_mmap_info
-> > + * @size: mapping memory size, always page_size here
-> > + * @max_index: the number of pages allocated in kernel,just
-> > + * use for check
-> > + */
-> > +
-> > +struct vduse_reconnect_mmap_info {
-> > +       __u32 size;
-> > +       __u32 max_index;
-> > +};
->
-> One thing I didn't understand is that, aren't the things we used to
-> store connection info belong to uAPI? If not, how can we make sure the
-> connections work across different vendors/implementations. If yes,
-> where?
->
-> Thanks
->
-The process for this reconnecttion  is
-A.The first-time connection
-1> The userland app checks if the device exists
-2>  use the ioctl to create the vduse device
-3> Mapping the kernel page to userland and save the
-App-version/features/other information to this page
-4>  if the Userland app needs to exit, then the Userland app will only
-unmap the page and then exit
+On Mon, Aug 01, 2022 at 02:38:50PM +0800, Xuan Zhuo wrote:
+> Introduce new helpers to implement queue reset and get queue reset
+> status.
+> 
+>  https://github.com/oasis-tcs/virtio-spec/issues/124
+>  https://github.com/oasis-tcs/virtio-spec/issues/139
+> 
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> Acked-by: Jason Wang <jasowang@redhat.com>
+> ---
+>  drivers/virtio/virtio_pci_modern_dev.c | 39 ++++++++++++++++++++++++++
+>  include/linux/virtio_pci_modern.h      |  2 ++
+>  2 files changed, 41 insertions(+)
+> 
+> diff --git a/drivers/virtio/virtio_pci_modern_dev.c b/drivers/virtio/virtio_pci_modern_dev.c
+> index fa2a9445bb18..869cb46bef96 100644
+> --- a/drivers/virtio/virtio_pci_modern_dev.c
+> +++ b/drivers/virtio/virtio_pci_modern_dev.c
+> @@ -3,6 +3,7 @@
+>  #include <linux/virtio_pci_modern.h>
+>  #include <linux/module.h>
+>  #include <linux/pci.h>
+> +#include <linux/delay.h>
+>  
+>  /*
+>   * vp_modern_map_capability - map a part of virtio pci capability
+> @@ -474,6 +475,44 @@ void vp_modern_set_status(struct virtio_pci_modern_device *mdev,
+>  }
+>  EXPORT_SYMBOL_GPL(vp_modern_set_status);
+>  
+> +/*
+> + * vp_modern_get_queue_reset - get the queue reset status
+> + * @mdev: the modern virtio-pci device
+> + * @index: queue index
+> + */
+> +int vp_modern_get_queue_reset(struct virtio_pci_modern_device *mdev, u16 index)
+> +{
+> +	struct virtio_pci_modern_common_cfg __iomem *cfg;
+> +
+> +	cfg = (struct virtio_pci_modern_common_cfg __iomem *)mdev->common;
+> +
+> +	vp_iowrite16(index, &cfg->cfg.queue_select);
+> +	return vp_ioread16(&cfg->queue_reset);
+> +}
+> +EXPORT_SYMBOL_GPL(vp_modern_get_queue_reset);
+> +
 
-B, the re-connection
-1> the userland app finds the device is existing
-2> Mapping the kernel page to userland
-3> check if the information in shared memory is satisfied to
-reconnect,if ok then continue to reconnect
-4> continue working
-
- For now these information are all from userland,So here the page will
-be maintained by the userland App
-in the previous code we only saved the api-version by uAPI .  if  we
-need to support reconnection maybe we need to add 2 new uAPI for this,
-one of the uAPI is to save the reconnect  information and another is
-to get the information
-
-maybe something like
-
-struct vhost_reconnect_data {
-uint32_t version;
-uint64_t features;
-uint8_t status;
-struct virtio_net_config config;
-uint32_t nr_vrings;
-};
-
-#define VDUSE_GET_RECONNECT_INFO _IOR (VDUSE_BASE, 0x1c, struct
-vhost_reconnect_data)
-
-#define VDUSE_SET_RECONNECT_INFO  _IOWR(VDUSE_BASE, 0x1d, struct
-vhost_reconnect_data)
-
-Thanks
-Cindy
+Actually, this does not validate that the config structure is big
+enough. So it can access some unrelated memory. Don't know whether
+that's exploitable e.g. for CoCo but not nice, anyway.
+Need to validate the size and disable reset if it's too small.
 
 
-
-
-> > +
-> > +#define VDUSE_GET_RECONNECT_INFO \
-> > +       _IOWR(VDUSE_BASE, 0x1b, struct vduse_reconnect_mmap_info)
-> > +
-> >  #endif /* _UAPI_VDUSE_H_ */
-> > --
-> > 2.34.3
-> >
->
+> +/*
+> + * vp_modern_set_queue_reset - reset the queue
+> + * @mdev: the modern virtio-pci device
+> + * @index: queue index
+> + */
+> +void vp_modern_set_queue_reset(struct virtio_pci_modern_device *mdev, u16 index)
+> +{
+> +	struct virtio_pci_modern_common_cfg __iomem *cfg;
+> +
+> +	cfg = (struct virtio_pci_modern_common_cfg __iomem *)mdev->common;
+> +
+> +	vp_iowrite16(index, &cfg->cfg.queue_select);
+> +	vp_iowrite16(1, &cfg->queue_reset);
+> +
+> +	while (vp_ioread16(&cfg->queue_reset))
+> +		msleep(1);
+> +
+> +	while (vp_ioread16(&cfg->cfg.queue_enable))
+> +		msleep(1);
+> +}
+> +EXPORT_SYMBOL_GPL(vp_modern_set_queue_reset);
+> +
+>  /*
+>   * vp_modern_queue_vector - set the MSIX vector for a specific virtqueue
+>   * @mdev: the modern virtio-pci device
+> diff --git a/include/linux/virtio_pci_modern.h b/include/linux/virtio_pci_modern.h
+> index 05123b9a606f..c4eeb79b0139 100644
+> --- a/include/linux/virtio_pci_modern.h
+> +++ b/include/linux/virtio_pci_modern.h
+> @@ -113,4 +113,6 @@ void __iomem * vp_modern_map_vq_notify(struct virtio_pci_modern_device *mdev,
+>  				       u16 index, resource_size_t *pa);
+>  int vp_modern_probe(struct virtio_pci_modern_device *mdev);
+>  void vp_modern_remove(struct virtio_pci_modern_device *mdev);
+> +int vp_modern_get_queue_reset(struct virtio_pci_modern_device *mdev, u16 index);
+> +void vp_modern_set_queue_reset(struct virtio_pci_modern_device *mdev, u16 index);
+>  #endif
+> -- 
+> 2.31.0
 
 
