@@ -1,612 +1,620 @@
-Return-Path: <netdev+bounces-35567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35565-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D42367A9C03
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:05:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A42D77A9C0D
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:05:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A80B280CAB
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:05:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A9465B212A8
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:05:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 730543F4D5;
-	Thu, 21 Sep 2023 18:59:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30BFD1772B;
+	Thu, 21 Sep 2023 18:47:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74F911643A;
-	Thu, 21 Sep 2023 18:59:09 +0000 (UTC)
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C3FC59158;
-	Thu, 21 Sep 2023 11:59:06 -0700 (PDT)
-Received: by mail-pg1-x529.google.com with SMTP id 41be03b00d2f7-55b5a37acb6so164783a12.0;
-        Thu, 21 Sep 2023 11:59:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695322745; x=1695927545; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RM0Kr0OylFS8h4HMgyBWTdSjUbHONrsWq/2Y18Dc9+w=;
-        b=hxbPaxD0P2oGrfy2z5bsfHIihlYLMR8k2ZgadeqVqTrZVttMSOHR/4jljB1IUOXO7l
-         wEc7ZUiEe+8OjcFAECob/VCnPBXNbjXwyHsvzmo2CqzBQCaDhQdcGzmL+jfUl8YqwIie
-         TsWGNfKLYKif5sg+D/XIW6fBu1fah5BRAQPrG3EwnahRUJ28nF/ptJLacS/u8Te4VVw6
-         TQ+3sU5WH3p4n373H8GwLA9Zne9mOEgGF73MeCiGs0na/S4xk/x8j/+vNLGnFYFdowmC
-         JHKZAubdxIJ+BzsCxZvlrvCaoqrqbhtZ/8/hpP8G4CO4w4HfNh/RGNeA+lIDd4vf8Ybw
-         6FHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695322745; x=1695927545;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RM0Kr0OylFS8h4HMgyBWTdSjUbHONrsWq/2Y18Dc9+w=;
-        b=Zsnl1z2jnaDBMCub64WIJmNqoevlCwQWVW2PskC3/CqsLQgILwxXRZzP9OusuGQjx6
-         TiToAQfdfnCbx0Nc1fVM08Yq8gHW3rs8kNUYOpMVekQ98xnlIrb+5n3zeby7+VDLlOo4
-         QMDDc2Rdj85RR7FvmDwa9hZe+mMSuD1R5wf5fiw2he2CfR/8RoFXGzGz2HAUP/pfXIRS
-         VnOWN9a+l43A9CP7nzjWvUZK57l2tu6MgHXxSBLvP3AIjBJq1hpuLR0aS5AlLhvs8/Xi
-         ftD0qiSmFdqD+xjR138NZ8Cxa4vAAobzUDzEaeVZZvjdPaln+GtwLwA2FGFivNPwUzP/
-         DHhQ==
-X-Gm-Message-State: AOJu0Yz0wEtK+IoK8MZQifmM1lRRtMXP410BqPym4V1R+aulraiD5/xM
-	PpsDYZOsrAjDAKEMY2WHwEudZSzATEeqnaHRhZ7EjHHlWSX3o5HT
-X-Google-Smtp-Source: AGHT+IH42ZePTEEcyeAWZsr6Nka8QYq4XjZvfjMPXGICv02k5AWL9uBwUYNwDDB7UCYIumNNOxJxWgVcYVEpAl7nLhY=
-X-Received: by 2002:a05:6214:20ea:b0:64a:8d39:3378 with SMTP id
- 10-20020a05621420ea00b0064a8d393378mr4561058qvk.4.1695279076016; Wed, 20 Sep
- 2023 23:51:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF3B19CA7F
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 18:47:40 +0000 (UTC)
+Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5F28EE854;
+	Thu, 21 Sep 2023 11:47:32 -0700 (PDT)
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 38L70dHZ078923;
+	Thu, 21 Sep 2023 02:00:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1695279639;
+	bh=HGEVPu3/G05dF1oqwNzCbo8K/2TKu+DIPFTrlWOMu6I=;
+	h=From:To:CC:Subject:Date;
+	b=JHbakeAZPJROTvZ8P3zzTRIjDX7ET0NcFSdOjhQsnXSRNMgZUlG5SP+pZe3itWjlW
+	 GzT7zabWc4SynRdW2Qsw7TjJ9P2PqYCXotYvi98XxDlDH1U6X9TUmLjt5Z1IM/SDo6
+	 0tBMF+KDVttdhqFmT2fAn0vRnNyQsD11YfBqqAF4=
+Received: from DFLE101.ent.ti.com (dfle101.ent.ti.com [10.64.6.22])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 38L70dNX100871
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 21 Sep 2023 02:00:39 -0500
+Received: from DFLE112.ent.ti.com (10.64.6.33) by DFLE101.ent.ti.com
+ (10.64.6.22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 21
+ Sep 2023 02:00:39 -0500
+Received: from lelv0326.itg.ti.com (10.180.67.84) by DFLE112.ent.ti.com
+ (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 21 Sep 2023 02:00:39 -0500
+Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
+	by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 38L70dZc024268;
+	Thu, 21 Sep 2023 02:00:39 -0500
+Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.199])
+	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 38L70cXI005614;
+	Thu, 21 Sep 2023 02:00:38 -0500
+From: MD Danish Anwar <danishanwar@ti.com>
+To: Andrew Lunn <andrew@lunn.ch>, Roger Quadros <rogerq@kernel.org>,
+        Vignesh
+ Raghavendra <vigneshr@ti.com>,
+        MD Danish Anwar <danishanwar@ti.com>,
+        Richard
+ Cochran <richardcochran@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>, Jakub
+ Kicinski <kuba@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        "David S.
+ Miller" <davem@davemloft.net>, <vladimir.oltean@nxp.com>,
+        Simon Horman
+	<horms@kernel.org>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <srk@ti.com>,
+        <r-gunasekaran@ti.com>, Roger Quadros <rogerq@ti.com>
+Subject: [PATCH net-next v2] net: ti: icssg_prueth: add TAPRIO offload support
+Date: Thu, 21 Sep 2023 12:30:31 +0530
+Message-ID: <20230921070031.795788-1-danishanwar@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230918093304.367826-1-tushar.vyavahare@intel.com> <20230918093304.367826-5-tushar.vyavahare@intel.com>
-In-Reply-To: <20230918093304.367826-5-tushar.vyavahare@intel.com>
-From: Magnus Karlsson <magnus.karlsson@gmail.com>
-Date: Thu, 21 Sep 2023 08:51:05 +0200
-Message-ID: <CAJ8uoz15WdTgQSqSY6Bge9cjo6q8=EKf6Jf6qTvW3wajr=wk8g@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 4/8] selftests/xsk: iterate over all the sockets
- in the receive pkts function
-To: Tushar Vyavahare <tushar.vyavahare@intel.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, bjorn@kernel.org, 
-	magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
-	jonathan.lemon@gmail.com, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net, 
-	tirthendu.sarkar@intel.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.0 required=5.0 tests=BAYES_00,DATE_IN_PAST_12_24,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, 18 Sept 2023 at 11:14, Tushar Vyavahare
-<tushar.vyavahare@intel.com> wrote:
->
-> Improve the receive_pkt() function to enable it to receive packets from
-> multiple sockets. Define a sock_num variable to iterate through all the
-> sockets in the Rx path. Add nb_valid_entries to check that all the
-> expected number of packets are received.
->
-> Revise the function __receive_pkts() to only inspect the receive ring
-> once, handle any received packets, and promptly return. Implement a bitma=
-p
-> to store the value of MAX_SOCKETS.
->
-> Signed-off-by: Tushar Vyavahare <tushar.vyavahare@intel.com>
-> ---
->  tools/testing/selftests/bpf/xskxceiver.c | 276 ++++++++++++++---------
->  tools/testing/selftests/bpf/xskxceiver.h |   2 +
->  2 files changed, 171 insertions(+), 107 deletions(-)
->
-> diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testing/sel=
-ftests/bpf/xskxceiver.c
-> index 9f241f503eed..cf3a723cc827 100644
-> --- a/tools/testing/selftests/bpf/xskxceiver.c
-> +++ b/tools/testing/selftests/bpf/xskxceiver.c
-> @@ -80,6 +80,7 @@
->  #include <linux/if_ether.h>
->  #include <linux/mman.h>
->  #include <linux/netdev.h>
-> +#include <linux/bitmap.h>
->  #include <arpa/inet.h>
->  #include <net/if.h>
->  #include <locale.h>
-> @@ -540,8 +541,10 @@ static int test_spec_set_mtu(struct test_spec *test,=
- int mtu)
->
->  static void pkt_stream_reset(struct pkt_stream *pkt_stream)
->  {
-> -       if (pkt_stream)
-> +       if (pkt_stream) {
->                 pkt_stream->current_pkt_nb =3D 0;
-> +               pkt_stream->nb_rx_pkts =3D 0;
-> +       }
->  }
->
->  static struct pkt *pkt_stream_get_next_tx_pkt(struct pkt_stream *pkt_str=
-eam)
-> @@ -641,14 +644,16 @@ static u32 pkt_nb_frags(u32 frame_size, struct pkt_=
-stream *pkt_stream, struct pk
->         return nb_frags;
->  }
->
-> -static void pkt_set(struct xsk_umem_info *umem, struct pkt *pkt, int off=
-set, u32 len)
-> +static void pkt_set(struct pkt_stream *pkt_stream, struct pkt *pkt, int =
-offset, u32 len)
->  {
->         pkt->offset =3D offset;
->         pkt->len =3D len;
-> -       if (len > MAX_ETH_JUMBO_SIZE)
-> +       if (len > MAX_ETH_JUMBO_SIZE) {
->                 pkt->valid =3D false;
-> -       else
-> +       } else {
->                 pkt->valid =3D true;
-> +               pkt_stream->nb_valid_entries++;
-> +       }
->  }
->
->  static u32 pkt_get_buffer_len(struct xsk_umem_info *umem, u32 len)
-> @@ -670,7 +675,7 @@ static struct pkt_stream *pkt_stream_generate(struct =
-xsk_umem_info *umem, u32 nb
->         for (i =3D 0; i < nb_pkts; i++) {
->                 struct pkt *pkt =3D &pkt_stream->pkts[i];
->
-> -               pkt_set(umem, pkt, 0, pkt_len);
-> +               pkt_set(pkt_stream, pkt, 0, pkt_len);
->                 pkt->pkt_nb =3D i;
->         }
->
-> @@ -702,7 +707,7 @@ static void __pkt_stream_replace_half(struct ifobject=
- *ifobj, u32 pkt_len,
->
->         pkt_stream =3D pkt_stream_clone(umem, ifobj->xsk->pkt_stream);
->         for (i =3D 1; i < ifobj->xsk->pkt_stream->nb_pkts; i +=3D 2)
-> -               pkt_set(umem, &pkt_stream->pkts[i], offset, pkt_len);
-> +               pkt_set(pkt_stream, &pkt_stream->pkts[i], offset, pkt_len=
-);
->
->         ifobj->xsk->pkt_stream =3D pkt_stream;
->  }
-> @@ -724,6 +729,8 @@ static void pkt_stream_receive_half(struct test_spec =
-*test)
->         pkt_stream =3D test->ifobj_rx->xsk->pkt_stream;
->         for (i =3D 1; i < pkt_stream->nb_pkts; i +=3D 2)
->                 pkt_stream->pkts[i].valid =3D false;
-> +
-> +       pkt_stream->nb_valid_entries /=3D 2;
->  }
->
->  static u64 pkt_get_addr(struct pkt *pkt, struct xsk_umem_info *umem)
-> @@ -797,6 +804,10 @@ static struct pkt_stream *__pkt_stream_generate_cust=
-om(struct ifobject *ifobj, s
->
->                 if (pkt->valid && pkt->len > pkt_stream->max_pkt_len)
->                         pkt_stream->max_pkt_len =3D pkt->len;
-> +
-> +               if (pkt->valid)
-> +                       pkt_stream->nb_valid_entries++;
-> +
->                 pkt_nb++;
->         }
->
-> @@ -1018,133 +1029,179 @@ static int complete_pkts(struct xsk_socket_info=
- *xsk, int batch_size)
->         return TEST_PASS;
->  }
->
-> -static int receive_pkts(struct test_spec *test, struct pollfd *fds)
-> +static int __receive_pkts(struct test_spec *test, struct xsk_socket_info=
- *xsk)
->  {
-> -       struct timeval tv_end, tv_now, tv_timeout =3D {THREAD_TMOUT, 0};
-> -       struct pkt_stream *pkt_stream =3D test->ifobj_rx->xsk->pkt_stream=
-;
-> -       struct xsk_socket_info *xsk =3D test->ifobj_rx->xsk;
-> +       u32 frags_processed =3D 0, nb_frags =3D 0, pkt_len =3D 0;
->         u32 idx_rx =3D 0, idx_fq =3D 0, rcvd, pkts_sent =3D 0;
-> +       struct pkt_stream *pkt_stream =3D xsk->pkt_stream;
->         struct ifobject *ifobj =3D test->ifobj_rx;
->         struct xsk_umem_info *umem =3D xsk->umem;
-> +       struct pollfd fds =3D { };
->         struct pkt *pkt;
-> +       u64 first_addr;
->         int ret;
->
-> -       ret =3D gettimeofday(&tv_now, NULL);
-> -       if (ret)
-> -               exit_with_error(errno);
-> -       timeradd(&tv_now, &tv_timeout, &tv_end);
-> -
-> -       pkt =3D pkt_stream_get_next_rx_pkt(pkt_stream, &pkts_sent);
-> -       while (pkt) {
-> -               u32 frags_processed =3D 0, nb_frags =3D 0, pkt_len =3D 0;
-> -               u64 first_addr;
-> +       fds.fd =3D xsk_socket__fd(xsk->xsk);
-> +       fds.events =3D POLLIN;
->
-> -               ret =3D gettimeofday(&tv_now, NULL);
-> -               if (ret)
-> -                       exit_with_error(errno);
-> -               if (timercmp(&tv_now, &tv_end, >)) {
-> -                       ksft_print_msg("ERROR: [%s] Receive loop timed ou=
-t\n", __func__);
-> -                       return TEST_FAILURE;
-> -               }
-> +       ret =3D kick_rx(xsk);
-> +       if (ret)
-> +               return TEST_FAILURE;
->
-> -               ret =3D kick_rx(xsk);
-> -               if (ret)
-> +       if (ifobj->use_poll) {
-> +               ret =3D poll(&fds, 1, POLL_TMOUT);
-> +               if (ret < 0)
->                         return TEST_FAILURE;
->
-> -               if (ifobj->use_poll) {
-> -                       ret =3D poll(fds, 1, POLL_TMOUT);
-> -                       if (ret < 0)
-> -                               return TEST_FAILURE;
-> -
-> -                       if (!ret) {
-> -                               if (!is_umem_valid(test->ifobj_tx))
-> -                                       return TEST_PASS;
-> -
-> -                               ksft_print_msg("ERROR: [%s] Poll timed ou=
-t\n", __func__);
-> -                               return TEST_FAILURE;
-> -                       }
-> +               if (!ret) {
-> +                       if (!is_umem_valid(test->ifobj_tx))
-> +                               return TEST_PASS;
->
-> -                       if (!(fds->revents & POLLIN))
-> -                               continue;
-> +                       ksft_print_msg("ERROR: [%s] Poll timed out\n", __=
-func__);
-> +                       return TEST_CONTINUE;
->                 }
->
-> -               rcvd =3D xsk_ring_cons__peek(&xsk->rx, BATCH_SIZE, &idx_r=
-x);
-> -               if (!rcvd)
-> -                       continue;
-> +               if (!(fds.revents & POLLIN))
-> +                       return TEST_CONTINUE;
-> +       }
->
-> -               if (ifobj->use_fill_ring) {
-> -                       ret =3D xsk_ring_prod__reserve(&umem->fq, rcvd, &=
-idx_fq);
-> -                       while (ret !=3D rcvd) {
-> -                               if (xsk_ring_prod__needs_wakeup(&umem->fq=
-)) {
-> -                                       ret =3D poll(fds, 1, POLL_TMOUT);
-> -                                       if (ret < 0)
-> -                                               return TEST_FAILURE;
-> -                               }
-> -                               ret =3D xsk_ring_prod__reserve(&umem->fq,=
- rcvd, &idx_fq);
-> +       rcvd =3D xsk_ring_cons__peek(&xsk->rx, BATCH_SIZE, &idx_rx);
-> +       if (!rcvd)
-> +               return TEST_CONTINUE;
-> +
-> +       if (ifobj->use_fill_ring) {
-> +               ret =3D xsk_ring_prod__reserve(&umem->fq, rcvd, &idx_fq);
-> +               while (ret !=3D rcvd) {
-> +                       if (xsk_ring_prod__needs_wakeup(&umem->fq)) {
-> +                               ret =3D poll(&fds, 1, POLL_TMOUT);
-> +                               if (ret < 0)
-> +                                       return TEST_FAILURE;
->                         }
-> +                       ret =3D xsk_ring_prod__reserve(&umem->fq, rcvd, &=
-idx_fq);
->                 }
-> +       }
->
-> -               while (frags_processed < rcvd) {
-> -                       const struct xdp_desc *desc =3D xsk_ring_cons__rx=
-_desc(&xsk->rx, idx_rx++);
-> -                       u64 addr =3D desc->addr, orig;
-> +       while (frags_processed < rcvd) {
-> +               const struct xdp_desc *desc =3D xsk_ring_cons__rx_desc(&x=
-sk->rx, idx_rx++);
-> +               u64 addr =3D desc->addr, orig;
->
-> -                       orig =3D xsk_umem__extract_addr(addr);
-> -                       addr =3D xsk_umem__add_offset_to_addr(addr);
-> +               orig =3D xsk_umem__extract_addr(addr);
-> +               addr =3D xsk_umem__add_offset_to_addr(addr);
->
-> +               if (!nb_frags) {
-> +                       pkt =3D pkt_stream_get_next_rx_pkt(pkt_stream, &p=
-kts_sent);
->                         if (!pkt) {
->                                 ksft_print_msg("[%s] received too many pa=
-ckets addr: %lx len %u\n",
->                                                __func__, addr, desc->len)=
-;
->                                 return TEST_FAILURE;
->                         }
-> +               }
->
-> -                       print_verbose("Rx: addr: %lx len: %u options: %u =
-pkt_nb: %u valid: %u\n",
-> -                                     addr, desc->len, desc->options, pkt=
-->pkt_nb, pkt->valid);
-> +               print_verbose("Rx: addr: %lx len: %u options: %u pkt_nb: =
-%u valid: %u\n",
-> +                             addr, desc->len, desc->options, pkt->pkt_nb=
-, pkt->valid);
->
-> -                       if (!is_frag_valid(umem, addr, desc->len, pkt->pk=
-t_nb, pkt_len) ||
-> -                           !is_offset_correct(umem, pkt, addr) ||
-> -                           (ifobj->use_metadata && !is_metadata_correct(=
-pkt, umem->buffer, addr)))
-> -                               return TEST_FAILURE;
-> +               if (!is_frag_valid(umem, addr, desc->len, pkt->pkt_nb, pk=
-t_len) ||
-> +                   !is_offset_correct(umem, pkt, addr) || (ifobj->use_me=
-tadata &&
-> +                   !is_metadata_correct(pkt, umem->buffer, addr)))
-> +                       return TEST_FAILURE;
->
-> -                       if (!nb_frags++)
-> -                               first_addr =3D addr;
-> -                       frags_processed++;
-> -                       pkt_len +=3D desc->len;
-> -                       if (ifobj->use_fill_ring)
-> -                               *xsk_ring_prod__fill_addr(&umem->fq, idx_=
-fq++) =3D orig;
-> +               if (!nb_frags++)
-> +                       first_addr =3D addr;
-> +               frags_processed++;
-> +               pkt_len +=3D desc->len;
-> +               if (ifobj->use_fill_ring)
-> +                       *xsk_ring_prod__fill_addr(&umem->fq, idx_fq++) =
-=3D orig;
->
-> -                       if (pkt_continues(desc->options))
-> -                               continue;
-> +               if (pkt_continues(desc->options))
-> +                       continue;
->
-> -                       /* The complete packet has been received */
-> -                       if (!is_pkt_valid(pkt, umem->buffer, first_addr, =
-pkt_len) ||
-> -                           !is_offset_correct(umem, pkt, addr))
-> -                               return TEST_FAILURE;
-> +               /* The complete packet has been received */
-> +               if (!is_pkt_valid(pkt, umem->buffer, first_addr, pkt_len)=
- ||
-> +                   !is_offset_correct(umem, pkt, addr))
-> +                       return TEST_FAILURE;
->
-> -                       pkt =3D pkt_stream_get_next_rx_pkt(pkt_stream, &p=
-kts_sent);
-> -                       nb_frags =3D 0;
-> -                       pkt_len =3D 0;
-> -               }
-> +               pkt_stream->nb_rx_pkts++;
-> +               nb_frags =3D 0;
-> +               pkt_len =3D 0;
-> +       }
->
-> -               if (nb_frags) {
-> -                       /* In the middle of a packet. Start over from beg=
-inning of packet. */
-> -                       idx_rx -=3D nb_frags;
-> -                       xsk_ring_cons__cancel(&xsk->rx, nb_frags);
-> -                       if (ifobj->use_fill_ring) {
-> -                               idx_fq -=3D nb_frags;
-> -                               xsk_ring_prod__cancel(&umem->fq, nb_frags=
-);
-> -                       }
-> -                       frags_processed -=3D nb_frags;
-> +       if (nb_frags) {
-> +               /* In the middle of a packet. Start over from beginning o=
-f packet. */
-> +               idx_rx -=3D nb_frags;
-> +               xsk_ring_cons__cancel(&xsk->rx, nb_frags);
-> +               if (ifobj->use_fill_ring) {
-> +                       idx_fq -=3D nb_frags;
-> +                       xsk_ring_prod__cancel(&umem->fq, nb_frags);
->                 }
-> +               frags_processed -=3D nb_frags;
-> +       }
->
-> -               if (ifobj->use_fill_ring)
-> -                       xsk_ring_prod__submit(&umem->fq, frags_processed)=
-;
-> -               if (ifobj->release_rx)
-> -                       xsk_ring_cons__release(&xsk->rx, frags_processed)=
-;
-> +       if (ifobj->use_fill_ring)
-> +               xsk_ring_prod__submit(&umem->fq, frags_processed);
-> +       if (ifobj->release_rx)
-> +               xsk_ring_cons__release(&xsk->rx, frags_processed);
-> +
-> +       pthread_mutex_lock(&pacing_mutex);
-> +       pkts_in_flight -=3D pkts_sent;
-> +       pthread_mutex_unlock(&pacing_mutex);
-> +       pkts_sent =3D 0;
+ICSSG dual-emac f/w supports Enhanced Scheduled Traffic (EST – defined
+in P802.1Qbv/D2.2 that later got included in IEEE 802.1Q-2018)
+configuration. EST allows express queue traffic to be scheduled
+(placed) on the wire at specific repeatable time intervals. In
+Linux kernel, EST configuration is done through tc command and
+the taprio scheduler in the net core implements a software only
+scheduler (SCH_TAPRIO). If the NIC is capable of EST configuration,
+user indicate "flag 2" in the command which is then parsed by
+taprio scheduler in net core and indicate that the command is to
+be offloaded to h/w. taprio then offloads the command to the
+driver by calling ndo_setup_tc() ndo ops. This patch implements
+ndo_setup_tc() to offload EST configuration to ICSSG.
 
-This patch looks much bigger than it is. You have only removed the
-while loop and therefore had to change the indentation of the whole
-function. The change looks good.
+Signed-off-by: Roger Quadros <rogerq@ti.com>
+Signed-off-by: Vignesh Raghavendra <vigneshr@ti.com>
+Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+---
+Cc: Roger Quadros <rogerq@ti.com>
+Cc: Andrew Lunn <andrew@lunn.ch>
 
-> +
-> +return TEST_CONTINUE;
-> +}
-> +
-> +bool all_packets_received(struct test_spec *test, struct xsk_socket_info=
- *xsk, u32 sock_num,
-> +                         unsigned long *bitmap)
-> +{
-> +       struct pkt_stream *pkt_stream =3D xsk->pkt_stream;
->
-> -               pthread_mutex_lock(&pacing_mutex);
-> -               pkts_in_flight -=3D pkts_sent;
-> -               pthread_mutex_unlock(&pacing_mutex);
-> -               pkts_sent =3D 0;
-> +       if (!pkt_stream) {
-> +               __test_and_set_bit((1 << sock_num), bitmap);
-> +               return false;
-> +       }
-> +
-> +       if (pkt_stream->nb_rx_pkts =3D=3D pkt_stream->nb_valid_entries) {
-> +               __test_and_set_bit((1 << sock_num), bitmap);
-> +               if (test_bit(test->nb_sockets, bitmap))
-> +                       return true;
-> +       }
-> +
-> +       return false;
-> +}
-> +
-> +static int receive_pkts(struct test_spec *test)
-> +{
-> +       struct timeval tv_end, tv_now, tv_timeout =3D {THREAD_TMOUT, 0};
-> +       u32 sock_num =3D 0;
-> +       int res, ret;
-> +
-> +       DECLARE_BITMAP(bitmap, MAX_SOCKETS);
+Changes from v1 to v2:
+*) Rebased on the latest next-20230821 linux-next.
+*) Dropped the RFC tag as merge window is open now.
+*) Splitted this patch from the switch mode series [v1].
+*) Removed TODO comment as asked by Andrew and Roger.
+*) Changed Copyright to 2023 as asked by Roger.
 
-This is a declaration that should be bunched with the declarations above.
+v1: https://lore.kernel.org/all/20230830110847.1219515-1-danishanwar@ti.com/
 
-> +
-> +       ret =3D gettimeofday(&tv_now, NULL);
-> +       if (ret)
-> +               exit_with_error(errno);
-> +
-> +       timeradd(&tv_now, &tv_timeout, &tv_end);
-> +
-> +       while (1) {
-> +               sock_num =3D (sock_num + 1) % test->nb_sockets;
-> +
-> +               struct xsk_socket_info *xsk =3D &test->ifobj_rx->xsk_arr[=
-sock_num];
-> +
-> +               if ((all_packets_received(test, xsk, sock_num, bitmap)))
-> +                       break;
-> +
-> +               res =3D __receive_pkts(test, xsk);
-> +               if (!(res =3D=3D TEST_PASS || res =3D=3D TEST_CONTINUE))
-> +                       return res;
-> +
-> +               ret =3D gettimeofday(&tv_now, NULL);
-> +               if (ret)
-> +                       exit_with_error(errno);
-> +
-> +               if (timercmp(&tv_now, &tv_end, >)) {
-> +                       ksft_print_msg("ERROR: [%s] Receive loop timed ou=
-t\n", __func__);
-> +                       return TEST_FAILURE;
-> +               }
->         }
->
->         return TEST_PASS;
-> @@ -1577,7 +1634,6 @@ static void *worker_testapp_validate_rx(void *arg)
->  {
->         struct test_spec *test =3D (struct test_spec *)arg;
->         struct ifobject *ifobject =3D test->ifobj_rx;
-> -       struct pollfd fds =3D { };
->         int err;
->
->         if (test->current_step =3D=3D 1) {
-> @@ -1592,12 +1648,9 @@ static void *worker_testapp_validate_rx(void *arg)
->                 }
->         }
->
-> -       fds.fd =3D xsk_socket__fd(ifobject->xsk->xsk);
-> -       fds.events =3D POLLIN;
-> -
->         pthread_barrier_wait(&barr);
->
-> -       err =3D receive_pkts(test, &fds);
-> +       err =3D receive_pkts(test);
->
->         if (!err && ifobject->validation_func)
->                 err =3D ifobject->validation_func(ifobject);
-> @@ -1734,9 +1787,15 @@ static int __testapp_validate_traffic(struct test_=
-spec *test, struct ifobject *i
->                 pthread_join(t0, NULL);
->
->         if (test->total_steps =3D=3D test->current_step || test->fail) {
-> +               u32 i;
-> +
->                 if (ifobj2)
-> -                       xsk_socket__delete(ifobj2->xsk->xsk);
-> -               xsk_socket__delete(ifobj1->xsk->xsk);
-> +                       for (i =3D 0; i < test->nb_sockets; i++)
-> +                               xsk_socket__delete(ifobj2->xsk_arr[i].xsk=
-);
-> +
-> +               for (i =3D 0; i < test->nb_sockets; i++)
-> +                       xsk_socket__delete(ifobj1->xsk_arr[i].xsk);
-> +
->                 testapp_clean_xsk_umem(ifobj1);
->                 if (ifobj2 && !ifobj2->shared_umem)
->                         testapp_clean_xsk_umem(ifobj2);
-> @@ -1812,8 +1871,6 @@ static int swap_xsk_resources(struct ifobject *ifob=
-j_tx, struct ifobject *ifobj_
->  {
->         int ret;
->
-> -       xsk_socket__delete(ifobj_tx->xsk->xsk);
-> -       xsk_socket__delete(ifobj_rx->xsk->xsk);
->         ifobj_tx->xsk =3D &ifobj_tx->xsk_arr[1];
->         ifobj_rx->xsk =3D &ifobj_rx->xsk_arr[1];
->
-> @@ -1831,6 +1888,10 @@ static int testapp_xdp_prog_cleanup(struct test_sp=
-ec *test)
->         if (testapp_validate_traffic(test))
->                 return TEST_FAILURE;
->
-> +       test->ifobj_tx->xsk_arr[0].pkt_stream =3D NULL;
-> +       test->ifobj_rx->xsk_arr[0].pkt_stream =3D NULL;
-> +       test->ifobj_tx->xsk_arr[1].pkt_stream =3D test->tx_pkt_stream_def=
-ault;
-> +       test->ifobj_rx->xsk_arr[1].pkt_stream =3D test->rx_pkt_stream_def=
-ault;=C2=B4
+ drivers/net/ethernet/ti/Makefile             |   3 +-
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c |   5 +-
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h |   7 +
+ drivers/net/ethernet/ti/icssg/icssg_qos.c    | 286 +++++++++++++++++++
+ drivers/net/ethernet/ti/icssg/icssg_qos.h    | 119 ++++++++
+ 5 files changed, 418 insertions(+), 2 deletions(-)
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_qos.c
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_qos.h
 
-Would it make more sense if this was part of the function below?
+diff --git a/drivers/net/ethernet/ti/Makefile b/drivers/net/ethernet/ti/Makefile
+index 34fd7a716ba6..0df60ded1b2d 100644
+--- a/drivers/net/ethernet/ti/Makefile
++++ b/drivers/net/ethernet/ti/Makefile
+@@ -37,5 +37,6 @@ icssg-prueth-y := k3-cppi-desc-pool.o \
+ 		  icssg/icssg_config.o \
+ 		  icssg/icssg_mii_cfg.o \
+ 		  icssg/icssg_stats.o \
+-		  icssg/icssg_ethtool.o
++		  icssg/icssg_ethtool.o \
++		  icssg/icssg_qos.o
+ obj-$(CONFIG_TI_ICSS_IEP) += icssg/icss_iep.o
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+index 6635b28bc672..89c301716926 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+@@ -1166,7 +1166,7 @@ static int emac_phy_connect(struct prueth_emac *emac)
+ 	return 0;
+ }
+ 
+-static u64 prueth_iep_gettime(void *clockops_data, struct ptp_system_timestamp *sts)
++u64 prueth_iep_gettime(void *clockops_data, struct ptp_system_timestamp *sts)
+ {
+ 	u32 hi_rollover_count, hi_rollover_count_r;
+ 	struct prueth_emac *emac = clockops_data;
+@@ -1403,6 +1403,8 @@ static int emac_ndo_open(struct net_device *ndev)
+ 		napi_enable(&emac->tx_chns[i].napi_tx);
+ 	napi_enable(&emac->napi_rx);
+ 
++	icssg_qos_tas_init(ndev);
++
+ 	/* start PHY */
+ 	phy_start(ndev->phydev);
+ 
+@@ -1669,6 +1671,7 @@ static const struct net_device_ops emac_netdev_ops = {
+ 	.ndo_set_rx_mode = emac_ndo_set_rx_mode,
+ 	.ndo_eth_ioctl = emac_ndo_ioctl,
+ 	.ndo_get_stats64 = emac_ndo_get_stats64,
++	.ndo_setup_tc = icssg_qos_ndo_setup_tc,
+ };
+ 
+ /* get emac_port corresponding to eth_node name */
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+index 8b6d6b497010..5712a65bced4 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
++++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+@@ -37,6 +37,7 @@
+ #include "icssg_config.h"
+ #include "icss_iep.h"
+ #include "icssg_switch_map.h"
++#include "icssg_qos.h"
+ 
+ #define PRUETH_MAX_MTU          (2000 - ETH_HLEN - ETH_FCS_LEN)
+ #define PRUETH_MIN_PKT_SIZE     (VLAN_ETH_ZLEN)
+@@ -174,6 +175,9 @@ struct prueth_emac {
+ 
+ 	struct pruss_mem_region dram;
+ 
++	struct prueth_qos qos;
++	struct work_struct ts_work;
++
+ 	struct delayed_work stats_work;
+ 	u64 stats[ICSSG_NUM_STATS];
+ };
+@@ -285,4 +289,7 @@ u32 icssg_queue_level(struct prueth *prueth, int queue);
+ void emac_stats_work_handler(struct work_struct *work);
+ void emac_update_hardware_stats(struct prueth_emac *emac);
+ int emac_get_stat_by_name(struct prueth_emac *emac, char *stat_name);
++
++u64 prueth_iep_gettime(void *clockops_data, struct ptp_system_timestamp *sts);
++
+ #endif /* __NET_TI_ICSSG_PRUETH_H */
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_qos.c b/drivers/net/ethernet/ti/icssg/icssg_qos.c
+new file mode 100644
+index 000000000000..63a19142ee69
+--- /dev/null
++++ b/drivers/net/ethernet/ti/icssg/icssg_qos.c
+@@ -0,0 +1,286 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Texas Instruments ICSSG PRUETH QoS submodule
++ * Copyright (C) 2023 Texas Instruments Incorporated - http://www.ti.com/
++ */
++
++#include <linux/printk.h>
++#include "icssg_prueth.h"
++#include "icssg_switch_map.h"
++
++static void tas_update_fw_list_pointers(struct prueth_emac *emac)
++{
++	struct tas_config *tas = &emac->qos.tas.config;
++
++	if ((readb(tas->active_list)) == TAS_LIST0) {
++		tas->fw_active_list = emac->dram.va + TAS_GATE_MASK_LIST0;
++		tas->fw_shadow_list = emac->dram.va + TAS_GATE_MASK_LIST1;
++	} else {
++		tas->fw_active_list = emac->dram.va + TAS_GATE_MASK_LIST1;
++		tas->fw_shadow_list = emac->dram.va + TAS_GATE_MASK_LIST0;
++	}
++}
++
++static void tas_update_maxsdu_table(struct prueth_emac *emac)
++{
++	struct tas_config *tas = &emac->qos.tas.config;
++	u16 __iomem *max_sdu_tbl_ptr;
++	u8 gate_idx;
++
++	/* update the maxsdu table */
++	max_sdu_tbl_ptr = emac->dram.va + TAS_QUEUE_MAX_SDU_LIST;
++
++	for (gate_idx = 0; gate_idx < TAS_MAX_NUM_QUEUES; gate_idx++)
++		writew(tas->max_sdu_table.max_sdu[gate_idx], &max_sdu_tbl_ptr[gate_idx]);
++}
++
++static void tas_reset(struct prueth_emac *emac)
++{
++	struct tas_config *tas = &emac->qos.tas.config;
++	int i;
++
++	for (i = 0; i < TAS_MAX_NUM_QUEUES; i++)
++		tas->max_sdu_table.max_sdu[i] = 2048;
++
++	tas_update_maxsdu_table(emac);
++
++	writeb(TAS_LIST0, tas->active_list);
++
++	memset_io(tas->fw_active_list, 0, sizeof(*tas->fw_active_list));
++	memset_io(tas->fw_shadow_list, 0, sizeof(*tas->fw_shadow_list));
++}
++
++static int tas_set_state(struct prueth_emac *emac, enum tas_state state)
++{
++	struct tas_config *tas = &emac->qos.tas.config;
++	int ret;
++
++	if (tas->state == state)
++		return 0;
++
++	switch (state) {
++	case TAS_STATE_RESET:
++		tas_reset(emac);
++		ret = emac_set_port_state(emac, ICSSG_EMAC_PORT_TAS_RESET);
++		tas->state = TAS_STATE_RESET;
++		break;
++	case TAS_STATE_ENABLE:
++		ret = emac_set_port_state(emac, ICSSG_EMAC_PORT_TAS_ENABLE);
++		tas->state = TAS_STATE_ENABLE;
++		break;
++	case TAS_STATE_DISABLE:
++		ret = emac_set_port_state(emac, ICSSG_EMAC_PORT_TAS_DISABLE);
++		tas->state = TAS_STATE_DISABLE;
++		break;
++	default:
++		netdev_err(emac->ndev, "%s: unsupported state\n", __func__);
++		ret = -EINVAL;
++		break;
++	}
++
++	if (ret)
++		netdev_err(emac->ndev, "TAS set state failed %d\n", ret);
++	return ret;
++}
++
++static int tas_set_trigger_list_change(struct prueth_emac *emac)
++{
++	struct tc_taprio_qopt_offload *admin_list = emac->qos.tas.taprio_admin;
++	struct tas_config *tas = &emac->qos.tas.config;
++	struct ptp_system_timestamp sts;
++	u32 change_cycle_count;
++	u32 cycle_time;
++	u64 base_time;
++	u64 cur_time;
++
++	cycle_time = admin_list->cycle_time - 4; /* -4ns to compensate for IEP wraparound time */
++	base_time = admin_list->base_time;
++	cur_time = prueth_iep_gettime(emac, &sts);
++
++	if (base_time > cur_time)
++		change_cycle_count = DIV_ROUND_UP_ULL(base_time - cur_time, cycle_time);
++	else
++		change_cycle_count = 1;
++
++	writel(cycle_time, emac->dram.va + TAS_ADMIN_CYCLE_TIME);
++	writel(change_cycle_count, emac->dram.va + TAS_CONFIG_CHANGE_CYCLE_COUNT);
++	writeb(admin_list->num_entries, emac->dram.va + TAS_ADMIN_LIST_LENGTH);
++
++	/* config_change cleared by f/w to ack reception of new shadow list */
++	writeb(1, &tas->config_list->config_change);
++	/* config_pending cleared by f/w when new shadow list is copied to active list */
++	writeb(1, &tas->config_list->config_pending);
++
++	return emac_set_port_state(emac, ICSSG_EMAC_PORT_TAS_TRIGGER);
++}
++
++static int tas_update_oper_list(struct prueth_emac *emac)
++{
++	struct tc_taprio_qopt_offload *admin_list = emac->qos.tas.taprio_admin;
++	struct tas_config *tas = &emac->qos.tas.config;
++	u32 tas_acc_gate_close_time = 0;
++	u8 idx, gate_idx, val;
++	int ret;
++
++	tas_update_fw_list_pointers(emac);
++
++	for (idx = 0; idx < admin_list->num_entries; idx++) {
++		writeb(admin_list->entries[idx].gate_mask,
++		       &tas->fw_shadow_list->gate_mask_list[idx]);
++		tas_acc_gate_close_time += admin_list->entries[idx].interval;
++
++		/* extend last entry till end of cycle time */
++		if (idx == admin_list->num_entries - 1)
++			writel(admin_list->cycle_time,
++			       &tas->fw_shadow_list->win_end_time_list[idx]);
++		else
++			writel(tas_acc_gate_close_time,
++			       &tas->fw_shadow_list->win_end_time_list[idx]);
++	}
++
++	/* clear remaining entries */
++	for (idx = admin_list->num_entries; idx < TAS_MAX_CMD_LISTS; idx++) {
++		writeb(0, &tas->fw_shadow_list->gate_mask_list[idx]);
++		writel(0, &tas->fw_shadow_list->win_end_time_list[idx]);
++	}
++
++	/* update the Array of gate close time for each queue in each window */
++	for (idx = 0 ; idx < admin_list->num_entries; idx++) {
++		/* On Linux, only PRUETH_MAX_TX_QUEUES are supported per port */
++		for (gate_idx = 0; gate_idx < PRUETH_MAX_TX_QUEUES; gate_idx++) {
++			u8 gate_mask_list_idx = readb(&tas->fw_shadow_list->gate_mask_list[idx]);
++			u32 gate_close_time = 0;
++
++			if (gate_mask_list_idx & BIT(gate_idx))
++				gate_close_time = readl(&tas->fw_shadow_list->win_end_time_list[idx]);
++
++			writel(gate_close_time,
++			       &tas->fw_shadow_list->gate_close_time_list[idx][gate_idx]);
++		}
++	}
++
++	/* tell f/w to swap active & shadow list */
++	ret = tas_set_trigger_list_change(emac);
++	if (ret) {
++		netdev_err(emac->ndev, "failed to swap f/w config list: %d\n", ret);
++		return ret;
++	}
++
++	/* Wait for completion */
++	ret = readb_poll_timeout(&tas->config_list->config_change, val, !val,
++				 USEC_PER_MSEC, 10 * USEC_PER_MSEC);
++	if (ret) {
++		netdev_err(emac->ndev, "TAS list change completion time out\n");
++		return ret;
++	}
++
++	tas_update_fw_list_pointers(emac);
++
++	return 0;
++}
++
++static int emac_set_taprio(struct prueth_emac *emac)
++{
++	struct tc_taprio_qopt_offload *taprio = emac->qos.tas.taprio_admin;
++	int ret;
++
++	if (taprio->cmd == TAPRIO_CMD_DESTROY)
++		return tas_set_state(emac, TAS_STATE_DISABLE);
++
++	if (taprio->cmd != TAPRIO_CMD_REPLACE)
++		return -EOPNOTSUPP;
++
++	ret = tas_update_oper_list(emac);
++	if (ret)
++		return ret;
++
++	return tas_set_state(emac, TAS_STATE_ENABLE);
++}
++
++static void emac_cp_taprio(struct tc_taprio_qopt_offload *from,
++			   struct tc_taprio_qopt_offload *to)
++{
++	int i;
++
++	*to = *from;
++	for (i = 0; i < from->num_entries; i++)
++		to->entries[i] = from->entries[i];
++}
++
++static int emac_setup_taprio(struct net_device *ndev, struct tc_taprio_qopt_offload *taprio)
++{
++	struct prueth_emac *emac = netdev_priv(ndev);
++	struct tc_taprio_qopt_offload *est_new;
++	int ret, idx;
++
++	if (!netif_running(ndev)) {
++		netdev_err(ndev, "interface is down, link speed unknown\n");
++		return -ENETDOWN;
++	}
++
++	if (taprio->cycle_time_extension) {
++		netdev_err(ndev, "Failed to set cycle time extension");
++		return -EOPNOTSUPP;
++	}
++
++	if (taprio->num_entries == 0 ||
++	    taprio->num_entries > TAS_MAX_CMD_LISTS) {
++		netdev_err(ndev, "unsupported num_entries %ld in taprio config\n",
++			   taprio->num_entries);
++		return -EINVAL;
++	}
++
++	/* If any time_interval is 0 in between the list, then exit */
++	for (idx = 0; idx < taprio->num_entries; idx++) {
++		if (taprio->entries[idx].interval == 0) {
++			netdev_err(ndev, "0 interval in taprio config not supported\n");
++			return -EINVAL;
++		}
++	}
++
++	if (emac->qos.tas.taprio_admin)
++		devm_kfree(&ndev->dev, emac->qos.tas.taprio_admin);
++
++	est_new = devm_kzalloc(&ndev->dev,
++			       struct_size(est_new, entries, taprio->num_entries),
++			       GFP_KERNEL);
++	emac_cp_taprio(taprio, est_new);
++	emac->qos.tas.taprio_admin = est_new;
++	ret = emac_set_taprio(emac);
++	if (ret)
++		devm_kfree(&ndev->dev, est_new);
++
++	return ret;
++}
++
++int icssg_qos_ndo_setup_tc(struct net_device *ndev, enum tc_setup_type type,
++			   void *type_data)
++{
++	switch (type) {
++	case TC_SETUP_QDISC_TAPRIO:
++		return emac_setup_taprio(ndev, type_data);
++	default:
++		return -EOPNOTSUPP;
++	}
++}
++
++void icssg_qos_tas_init(struct net_device *ndev)
++{
++	struct prueth_emac *emac = netdev_priv(ndev);
++	bool need_setup = false;
++	struct tas_config *tas;
++
++	tas = &emac->qos.tas.config;
++
++	if (tas->state == TAS_STATE_ENABLE)
++		need_setup = true;
++
++	tas->config_list = emac->dram.va + TAS_CONFIG_CHANGE_TIME;
++	tas->active_list = emac->dram.va + TAS_ACTIVE_LIST_INDEX;
++
++	tas_update_fw_list_pointers(emac);
++
++	tas_set_state(emac, TAS_STATE_RESET);
++
++	if (need_setup)
++		emac_set_taprio(emac);
++}
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_qos.h b/drivers/net/ethernet/ti/icssg/icssg_qos.h
+new file mode 100644
+index 000000000000..4e2ddf81d5ec
+--- /dev/null
++++ b/drivers/net/ethernet/ti/icssg/icssg_qos.h
+@@ -0,0 +1,119 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Copyright (C) 2023 Texas Instruments Incorporated - http://www.ti.com/
++ */
++
++#ifndef __NET_TI_ICSSG_QOS_H
++#define __NET_TI_ICSSG_QOS_H
++
++#include <linux/atomic.h>
++#include <linux/netdevice.h>
++#include <net/pkt_sched.h>
++
++/**
++ * Maximum number of gate command entries in each list.
++ */
++#define TAS_MAX_CMD_LISTS   (16)
++
++/**
++ * Maximum number of transmit queues supported by implementation
++ */
++#define TAS_MAX_NUM_QUEUES  (8)
++
++/**
++ * Minimum cycle time supported by implementation (in ns)
++ */
++#define TAS_MIN_CYCLE_TIME  (1000000)
++
++/**
++ * Minimum TAS window duration supported by implementation (in ns)
++ */
++#define TAS_MIN_WINDOW_DURATION  (10000)
++
++/**
++ * List number 0 or 1. Also the value at memory location TAS_ACTIVE_LIST_INDEX
++ */
++enum tas_list_num {
++	TAS_LIST0 = 0,
++	TAS_LIST1 = 1
++};
++
++/**
++ * state of TAS in f/w
++ */
++enum tas_state {
++	/* PRU's are idle */
++	TAS_STATE_DISABLE = 0,
++	/* Enable TAS */
++	TAS_STATE_ENABLE = 1,
++	/* Firmware will reset the state machine */
++	TAS_STATE_RESET = 2,
++};
++
++/**
++ * Config state machine variables. See IEEE Std 802.1Q-2018 8.6.8.4
++ */
++struct tas_config_list {
++	/* New list is copied at this time */
++	u64 config_change_time;
++	/* config change error counter, incremented if
++	 * admin->BaseTime < current time and TAS_enabled is true
++	 */
++	u32 config_change_error_counter;
++	/* True if list update is pending */
++	u8 config_pending;
++	/* Set to true when application trigger updating of admin list
++	 * to active list, cleared when configChangeTime is updated
++	 */
++	u8 config_change;
++};
++
++/**
++ * Max SDU table. See IEEE Std 802.1Q-2018 12.29.1.1
++ */
++struct tas_max_sdu_table {
++	u16 max_sdu[TAS_MAX_NUM_QUEUES];
++};
++
++/**
++ * TAS List Structure based on firmware memory map
++ */
++struct tas_firmware_list {
++	/* window gate mask list */
++	u8 gate_mask_list[TAS_MAX_CMD_LISTS];
++	/* window end time list */
++	u32 win_end_time_list[TAS_MAX_CMD_LISTS];
++	/* Array of gate close time for each queue in each window */
++	u32 gate_close_time_list[TAS_MAX_CMD_LISTS][TAS_MAX_NUM_QUEUES];
++};
++
++/**
++ * Main Time Aware Shaper Handle
++ */
++struct tas_config {
++	enum tas_state state;
++	struct tas_max_sdu_table max_sdu_table;
++	/* Config change variables */
++	struct tas_config_list __iomem *config_list;
++	/* Whether list 1 or list 2 is the operating list */
++	u8 __iomem *active_list;
++	/* active List pointer, used by firmware */
++	struct tas_firmware_list __iomem *fw_active_list;
++	/* shadow List pointer, used by driver */
++	struct tas_firmware_list __iomem *fw_shadow_list;
++};
++
++struct prueth_qos_tas {
++	struct tc_taprio_qopt_offload *taprio_admin;
++	struct tc_taprio_qopt_offload *taprio_oper;
++	struct tas_config config;
++};
++
++struct prueth_qos {
++	/* IET data structure goes here */
++	struct prueth_qos_tas tas;
++};
++
++void icssg_qos_tas_init(struct net_device *ndev);
++int icssg_qos_ndo_setup_tc(struct net_device *ndev, enum tc_setup_type type,
++			   void *type_data);
++#endif /* __NET_TI_ICSSG_QOS_H */
 
->         if (swap_xsk_resources(test->ifobj_tx, test->ifobj_rx))
->                 return TEST_FAILURE;
->         return testapp_validate_traffic(test);
-> @@ -1861,6 +1922,7 @@ static int testapp_stats_tx_invalid_descs(struct te=
-st_spec *test)
->  {
->         pkt_stream_replace_half(test, XSK_UMEM__INVALID_FRAME_SIZE, 0);
->         test->ifobj_tx->validation_func =3D validate_tx_invalid_descs;
-> +       test->ifobj_rx->xsk->pkt_stream->nb_valid_entries /=3D 2;
+base-commit: 940fcc189c51032dd0282cbee4497542c982ac59	
+-- 
+2.34.1
 
-Should be part of  pkt_stream_replace_half()
-
->         return testapp_validate_traffic(test);
->  }
->
-> diff --git a/tools/testing/selftests/bpf/xskxceiver.h b/tools/testing/sel=
-ftests/bpf/xskxceiver.h
-> index e003f9ca4692..aa6cccb862bc 100644
-> --- a/tools/testing/selftests/bpf/xskxceiver.h
-> +++ b/tools/testing/selftests/bpf/xskxceiver.h
-> @@ -108,6 +108,8 @@ struct pkt_stream {
->         u32 current_pkt_nb;
->         struct pkt *pkts;
->         u32 max_pkt_len;
-> +       u32 nb_rx_pkts;
-> +       u32 nb_valid_entries;
->         bool verbatim;
->  };
->
-> --
-> 2.34.1
->
->
 
