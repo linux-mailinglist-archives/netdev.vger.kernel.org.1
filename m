@@ -1,132 +1,141 @@
-Return-Path: <netdev+bounces-35590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EA877A9D6A
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:34:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0655C7A9CE4
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:25:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA3E6282AD9
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:34:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 877B12842F5
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:22:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D6518050;
-	Thu, 21 Sep 2023 19:34:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56A8D8D62D;
+	Thu, 21 Sep 2023 18:41:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FE7B1773A
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 19:34:18 +0000 (UTC)
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00072115FA4
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 12:34:15 -0700 (PDT)
-Received: by mail-yb1-xb2c.google.com with SMTP id 3f1490d57ef6-d801c83325fso1613327276.0
-        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 12:34:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B772D8D60C;
+	Thu, 21 Sep 2023 18:41:01 +0000 (UTC)
+Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05F52C066C;
+	Thu, 21 Sep 2023 11:40:32 -0700 (PDT)
+Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-58dce1f42d6so35438467b3.0;
+        Thu, 21 Sep 2023 11:40:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1695324855; x=1695929655; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1695321630; x=1695926430; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Yr/T9kX37mjruI2YODshHpmgcsopLzBXqNS+RBfjBUE=;
-        b=hU7InRML2JYYfbd+FLHOuqsZqo+WOB81a6AdqQNUvjdSw6PWDEZ2ECUn+O433v3vIx
-         KbKUh/Ww4v0wkDiEitRImweROpjqqBNT2TB4F0FhhwL1CKt6eypmJtd2QKWffHf4A94k
-         ulBOiU1h+oQRcc3F6rJc47b/h+BFSaNSx2Ry4Nw2AS0OsOG8lu9ceLID1c2ZKbEryvu5
-         s1917Pg/TGG8HDLbS/iqa+jH2mHikBN/M7Y7cD64q3gq/C++/ccLRSruyhZ2m3qkR/+N
-         6ZwG/Ouy1KqKTHrB0z2lhhIiAGgTBBPtLKPTtt6Jm2AX4zEuAtg7OFNhdGGJoLnSaSg6
-         BjsA==
+        bh=ofSWuZZY4bEa02tXmv8xlB2YJR3Z2AWM+YX2J2Kxd10=;
+        b=mtkZF+KAD5HlJHqOTZ2WDBfGQlhknJAr1lzNrklsP+vcO3mnlwVBil/26YhUFIk1Aa
+         RQrj+UaVmcoH+U3Eg00ByPWmtx/sAecBraOESvoFr9oMDSJRQNzD5eGlNcO633VxT/1f
+         Q78xC0p272Sy9mW5s/MABIe7yLrBJcBnZBhXegWdJaesCu62jOYs4j0GekYCgbZGkM5B
+         +U4icQtgiX50gUjg+RoeRHJQahmejqKPnnehtNCohXqYe6lgJTJ9b07Pa6sYzNdis41J
+         F6chWFpburnVk8nTBRFHNiGJzLEPlWc8KgpuONmaVkvEvp7EXCbXFb6qTvAJbnI/IqLu
+         dNQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695324855; x=1695929655;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Yr/T9kX37mjruI2YODshHpmgcsopLzBXqNS+RBfjBUE=;
-        b=vVzLZ0d7eyKDF/z3Unq3veNAQD0jGUNPDszt/SMoHktRjKX1XwlNHkBs3LMJbVcpDm
-         aBj4PdH/ETVxcXyRY9qR9mgIGVbEq5+Dzfu3ERmVwCtd4Ipmq09266S08mW7sPEeNxMN
-         etwwQs07GEfTmFtB6KlxS0hhVmpoWgUSoCUQcDj3kja2tbhkF1Q0DV8vUqrcDKV/6v97
-         LdKpXDypOOihm100Ljxv8fp+Pm9C67/N4lfBOPBtCh834fDYItEDUKMLpKFGXtButqy/
-         wUY3D0qRGEA7AtdEIHeq42RfQk/Od5v2mYRymtaQ2u0Lz2itPHTEA68BT20YjAjSikNc
-         srTw==
-X-Gm-Message-State: AOJu0Yzh2jxya10ujmRO5igWoPGJ0Q3uKT83InkmLMnES1Tebjp3cqvI
-	0TxJnx7i+a5b6KufUC67vnaYg2dwCCvasAGGre+3CA==
-X-Google-Smtp-Source: AGHT+IE3J0hPYG3mlCf0LBXPDD4F3dt6Xy+7aUsS0fZmwILVCrE54YYcSKTbvRwSwG6maa7zoRunYA==
-X-Received: by 2002:a05:6a20:914e:b0:14b:e604:9f0a with SMTP id x14-20020a056a20914e00b0014be6049f0amr5003289pzc.20.1695267460994;
-        Wed, 20 Sep 2023 20:37:40 -0700 (PDT)
-Received: from hermes.local (204-195-112-131.wavecable.com. [204.195.112.131])
-        by smtp.gmail.com with ESMTPSA id jc10-20020a17090325ca00b001b9be3b94d3sm251294plb.140.2023.09.20.20.37.40
+        d=1e100.net; s=20230601; t=1695321630; x=1695926430;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ofSWuZZY4bEa02tXmv8xlB2YJR3Z2AWM+YX2J2Kxd10=;
+        b=uJLy7VQ4ffRRJe1sk2d/aEkT6h1mUXL3f7lwFbCAZrb2cpGsIiOKP0tubHpcrmfODW
+         k6K8iVWAyQdIiuchQ709l5mvOy6fyZnN0W/mJJqZM9/5uI2DmKs80gSaER4vDj4gvKi6
+         5/X3LbmebnfcWqw1tzHozf1JBDilsyLyobY8kp6xTPJsEDrIADx6qCHBQYTSlSNS41Jt
+         TaWittHUA4Q1bqJ83d7vs6OvlvGcS3OOHP8UFh/OpKTpt+6ai/LEOYyFArVdCc6ZhgCk
+         ly4psM1TB0b+4W08JoNPCTR/5Yi2HlPFofpfTcR21xLEfmFPuyD3UCFhzXZrYhmEWzTA
+         RktA==
+X-Gm-Message-State: AOJu0Yww+Yka5tAkW99FO3Qe3JNcTFuGMGaWS/taty3/6F+1d7e4EIwH
+	dMtfjA14ohuNQ1iCgetUJ6yWlrUClFE=
+X-Google-Smtp-Source: AGHT+IGIJZh89SHkayG95dKRNldnohSO7TVARbXQAfTa6hwHa8apb3a2ZwoBvaHU6riFVfmtkY0FTQ==
+X-Received: by 2002:a05:6a00:2d16:b0:68c:44ed:fb6 with SMTP id fa22-20020a056a002d1600b0068c44ed0fb6mr6423829pfb.16.1695271955225;
+        Wed, 20 Sep 2023 21:52:35 -0700 (PDT)
+Received: from localhost ([98.97.37.198])
+        by smtp.gmail.com with ESMTPSA id i6-20020aa787c6000000b0068a0b5df6b2sm352972pfo.196.2023.09.20.21.52.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Sep 2023 20:37:40 -0700 (PDT)
-Date: Wed, 20 Sep 2023 20:37:38 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Mirko Lindner <mlindner@marvell.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- kernel test robot <lkp@intel.com>, linux-kernel@vger.kernel.org,
- linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] sky2: Make sure there is at least one frag_addr
- available
-Message-ID: <20230920203738.7e2c58c6@hermes.local>
-In-Reply-To: <20230920202509.never.299-kees@kernel.org>
-References: <20230920202509.never.299-kees@kernel.org>
+        Wed, 20 Sep 2023 21:52:34 -0700 (PDT)
+Date: Wed, 20 Sep 2023 21:52:32 -0700
+From: John Fastabend <john.fastabend@gmail.com>
+To: Martin KaFai Lau <martin.lau@linux.dev>, 
+ John Fastabend <john.fastabend@gmail.com>
+Cc: netdev@vger.kernel.org, 
+ bpf@vger.kernel.org, 
+ Kui-Feng Lee <sinquersw@gmail.com>, 
+ Ma Ke <make_ruc2021@163.com>, 
+ jakub@cloudflare.com, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com
+Message-ID: <650bcc10d2735_7d31e208e7@john.notmuch>
+In-Reply-To: <d05b61ca-0575-de1e-8638-9815ad67f597@linux.dev>
+References: <20230918093620.3479627-1-make_ruc2021@163.com>
+ <dc84f39f-5b13-4a7d-a26c-598227fd9a42@gmail.com>
+ <650b34ca2b41c_4e8122080@john.notmuch>
+ <d05b61ca-0575-de1e-8638-9815ad67f597@linux.dev>
+Subject: Re: [PATCH] bpf, sockmap: fix deadlocks in the sockhash and sockmap
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, 20 Sep 2023 13:25:13 -0700
-Kees Cook <keescook@chromium.org> wrote:
+Martin KaFai Lau wrote:
+> On 9/20/23 11:07 AM, John Fastabend wrote:
+> >>> pay much attention to their deletion. Compared with hash
+> >>> maps, sockhash only provides spin_lock_bh protection.
+> >>> This causes it to appear to have self-locking behavior
+> >>> in the interrupt context, as CVE-2023-0160 points out.
+> > 
+> > CVE is a bit exagerrated in my opinion. I'm not sure why
+> > anyone would delete an element from interrupt context. But,
+> > OK if someone wrote such a thing we shouldn't lock up.
+> 
+> This should only happen in tracing program?
+> not sure if it will be too drastic to disallow tracing program to use 
+> bpf_map_delete_elem during load time now.
 
-> In the likely pathological case of building sky2 with 16k PAGE_SIZE,
-> make sure there is at least 1 frag_addr in struct rx_ring_info:
-> 
->    In file included from include/linux/skbuff.h:28,
->                     from include/net/net_namespace.h:43,
->                     from include/linux/netdevice.h:38,
->                     from drivers/net/ethernet/marvell/sky2.c:18:
->    drivers/net/ethernet/marvell/sky2.c: In function 'sky2_rx_unmap_skb':
->    include/linux/dma-mapping.h:416:36: warning: array subscript i is outside array bounds of 'dma_addr_t[0]' {aka 'long long unsigned int[]'} [-Warray-bounds=]
->      416 | #define dma_unmap_page(d, a, s, r) dma_unmap_page_attrs(d, a, s, r, 0)
->          |                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->    drivers/net/ethernet/marvell/sky2.c:1257:17: note: in expansion of macro 'dma_unmap_page'
->     1257 |                 dma_unmap_page(&pdev->dev, re->frag_addr[i],
->          |                 ^~~~~~~~~~~~~~
->    In file included from drivers/net/ethernet/marvell/sky2.c:41:
->    drivers/net/ethernet/marvell/sky2.h:2198:25: note: while referencing 'frag_addr'
->     2198 |         dma_addr_t      frag_addr[ETH_JUMBO_MTU >> PAGE_SHIFT];
->          |                         ^~~~~~~~~
-> 
-> With CONFIG_PAGE_SIZE_16KB=y, PAGE_SHIFT == 14, so:
-> 
->   #define ETH_JUMBO_MTU   9000
-> 
-> causes "ETH_JUMBO_MTU >> PAGE_SHIFT" to be 0. Use "?: 1" to solve this build warning.
-> 
-> Cc: Mirko Lindner <mlindner@marvell.com>
-> Cc: Stephen Hemminger <stephen@networkplumber.org>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: netdev@vger.kernel.org
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202309191958.UBw1cjXk-lkp@intel.com/
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-> ---
+I don't think we have any users from tracing programs, but
+might be something out there?
 
-With page size of 16K the frag_addr[] array would never be used, so the original
-code was correct that size should be 0. But the compiler now gets upset with 0
-size arrays thinking this is some flex array leftover? Or can't figure out that
-in this case an rx skb with fragments would never be created.
+> 
+> A followup question, if sockmap can be accessed from tracing program, does it 
+> need an in_nmi() check?
 
-The workaround is fine, but could you add an explanatory comment?
+I think we could just do 'in_nmi(); return EOPNOTSUPP;'
+
+> 
+> >>>    	hash = sock_hash_bucket_hash(key, key_size);
+> >>>    	bucket = sock_hash_select_bucket(htab, hash);
+> >>>    
+> >>> -	spin_lock_bh(&bucket->lock);
+> >>> +	spin_lock_irqsave(&bucket->lock, flags);
+> > 
+> > The hashtab code htab_lock_bucket also does a preempt_disable()
+> > followed by raw_spin_lock_irqsave(). Do we need this as well
+> > to handle the PREEMPT_CONFIG cases.
+> 
+> iirc, preempt_disable in htab is for the CONFIG_PREEMPT but it is for the 
+> __this_cpu_inc_return to avoid unnecessary lock failure due to preemption, so 
+> probably it is not needed here. The commit 2775da216287 ("bpf: Disable 
+> preemption when increasing per-cpu map_locked")
+> 
+> If map_delete can be called from any tracing context, the raw_spin_lock_xxx 
+> version is probably needed though. Otherwise, splat (e.g. 
+> PROVE_RAW_LOCK_NESTING) could be triggered.
+
+Yep. I'll look at it I guess. We should probably either block
+access from tracing programs or add some tests.
 
