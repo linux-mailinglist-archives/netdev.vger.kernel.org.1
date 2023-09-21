@@ -1,120 +1,165 @@
-Return-Path: <netdev+bounces-35558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C337E7A9CDA
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:25:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7172F7A9CA4
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:23:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4AA3C285547
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:22:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF06E284748
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:20:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B8A4691E7;
-	Thu, 21 Sep 2023 18:35:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8796F69876;
+	Thu, 21 Sep 2023 18:35:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E46268C26
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 18:35:05 +0000 (UTC)
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 462BACFF2F
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 11:20:35 -0700 (PDT)
-Received: by mail-wm1-x329.google.com with SMTP id 5b1f17b1804b1-405361bb93bso8333035e9.3
-        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 11:20:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1695320433; x=1695925233; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Drrb5cgIdX9bQlcJOAIQy6p22Hd1U/QgsuYhc+HIXtc=;
-        b=Kog+eSd/G+OKGBIna647e1Ji2iWLColpgLdyRmRDriv/fj6rKzO+ySjWta9E691KkV
-         MbBqH09NXbjpprj4ZpVNNZgh01esP/80SWbUFTEuYS55JY4URFpTg4TEZp51m04XdAop
-         FDOr2yVWXJ59otp+eh1vOBT6s2JaKfMg1aZXnHf2mpYXWXhlUMNMCj3Wc8lZJe7U95zW
-         sDvJ0D20jnrb16gwrxTsvVXhNZ3kHsYNJOYuJB/QbGWpYKR9rlkROhRZhiJHz+l2zX2R
-         2UwQA/K8sBDWhZivIL5XQ1QJwsrFk0L6R1l05Rppg2giYHHDzmTQ5tE1Jt4Tytb79p8f
-         mlUg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A174D51BAA
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 18:35:07 +0000 (UTC)
+Received: from mail-oi1-f207.google.com (mail-oi1-f207.google.com [209.85.167.207])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D079C3435
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 11:19:15 -0700 (PDT)
+Received: by mail-oi1-f207.google.com with SMTP id 5614622812f47-3ade3847902so1581634b6e.2
+        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 11:19:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695320433; x=1695925233;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Drrb5cgIdX9bQlcJOAIQy6p22Hd1U/QgsuYhc+HIXtc=;
-        b=lbqVEMfdHWcZkFd1hTD2tjDlC9bP4bSY1RJIkht2qYStpFEsgvKkYGlUCSQx42YoSY
-         y4FmpYuFfIDO8rIY0c205+SOX7cd/lOK/ZBfW2GhR2sGwJore6VApdo3HUqZYaR98WG5
-         B9sQm4yf66QMRqroXc30DK4VTjWJ7BIiqPzSTeeNSaPCvk+VkuATOoYgAqzyZCfOkQlB
-         7fHK1FqLSE1WFcCK8GxB8xYrN4na90Viz7in66WdqpRWRT75pzPbePWUYnr0YePpNvaz
-         AHd3ht47jTURtDnC49lvJ5q2OmnUk4gIUZ5DkYJWW6p611ngyiQTSZC4X4361u6w+FpZ
-         MjRQ==
-X-Gm-Message-State: AOJu0YxpZVOtAT5mcxo4Lrk8VAWRIm1bKh7sI97qmklSOfJwtiUBkQyE
-	RUOt4yjo3kLdHVPtdCgUGYhkjofWUmvk952lAXd1ionljUijiitJ1TPXWg==
-X-Google-Smtp-Source: AGHT+IHtAdCqWfyKxt1ELmKKg//qfdzKK9qhy8uM34Bqm0u8o8sOZrkwXfRLF0pU4lRrTWBBCH79wK6kC1VudFfOvFA=
-X-Received: by 2002:a05:6402:3228:b0:533:f22:17b9 with SMTP id
- g40-20020a056402322800b005330f2217b9mr3895347eda.19.1695289023375; Thu, 21
- Sep 2023 02:37:03 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1695320306; x=1695925106;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=M5eKlR0bOZ9M5Cm2koJtpaOYOwUm+68GDkQPHQ8NLg8=;
+        b=Q91FvQnHWg4ypW4FrTXURMsUuyXKgiDBUh5fOTNei71o7w6iiWdxRlxln7iOpaDEDy
+         Tc1UelaSsbCOELSsn3Y/fW9xQc0GLoS23hRXD/l2L2Yt0qB4pafN5JaAQmr+5PCkw9Vq
+         wv+NBjAKeIjl1Nyiix+PD2NCJuOQxNEjgTqMlAbqjpr4/uUlTJ9jDZV/L8jD+++xAAmd
+         mHaEMQ2lO+YWatmCpSZemcIHRZHmM4+Hv6uKNBkSy27hHbM7ex2jnLQb9fqtXaZS2GZb
+         2l/kkMKyQCeor60G5OTrWbvwNimgqapfouE6pva6AS77SV+E/dqBVu/i1srz+2sZutki
+         e2Pw==
+X-Gm-Message-State: AOJu0YwvMczliwP6mO9rC0oiWPrfj69EJzEG61ju7bG8oxJZz3UKfnUx
+	d3ebjwXLxbrJ8tbOczJkh8TiPsYjd2Jv7YbT7pauBoDdINhG
+X-Google-Smtp-Source: AGHT+IEGsNcV85CID5pSiL55ACOjxAP6chPeC2dcnrPnHY3rRCNACulzsocADpcJgo+ZhtdenRVKbgvuWL+fAtaMkJj7mw+w+Knd
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ME3P282MB270323F98B97A1A98A50F8F7BBF1A@ME3P282MB2703.AUSP282.PROD.OUTLOOK.COM>
- <ZQF+PHTYDZRX1gql@nanopsycho>
-In-Reply-To: <ZQF+PHTYDZRX1gql@nanopsycho>
-From: Loic Poulain <loic.poulain@linaro.org>
-Date: Thu, 21 Sep 2023 11:36:26 +0200
-Message-ID: <CAMZdPi-qZ3JjZmEAtEmJETNzKd+k6UcLnLkM0MZoSZ1hKaOXuA@mail.gmail.com>
-Subject: Re: [net-next v4 0/5] net: wwan: t7xx: fw flashing & coredump support
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Jinjian Song <songjinjian@hotmail.com>, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net, ryazanov.s.a@gmail.com, 
-	johannes@sipsolutions.net, chandrashekar.devegowda@intel.com, 
-	linuxwwan@intel.com, chiranjeevi.rapolu@linux.intel.com, 
-	haijun.liu@mediatek.com, m.chetan.kumar@linux.intel.com, 
-	ricardo.martinez@linux.intel.com, netdev@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, nmarupaka@google.com, 
-	vsankar@lenovo.com, danielwinkler@google.com
+X-Received: by 2002:a05:6870:c79d:b0:1d6:5d92:c94f with SMTP id
+ dy29-20020a056870c79d00b001d65d92c94fmr2065665oab.11.1695289013480; Thu, 21
+ Sep 2023 02:36:53 -0700 (PDT)
+Date: Thu, 21 Sep 2023 02:36:53 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000070b4660605db3b5d@google.com>
+Subject: [syzbot] [tipc?] KMSAN: uninit-value in tipc_nl_node_reset_link_stats
+From: syzbot <syzbot+5138ca807af9d2b42574@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, jmaloy@redhat.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
+	tipc-discussion@lists.sourceforge.net, ying.xue@windriver.com
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DATE_IN_PAST_06_12,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=2.4 required=5.0 tests=BAYES_00,DATE_IN_PAST_06_12,
+	FROM_LOCAL_HEX,HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H2,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: **
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, 13 Sept 2023 at 11:17, Jiri Pirko <jiri@resnulli.us> wrote:
->
-> Tue, Sep 12, 2023 at 11:48:40AM CEST, songjinjian@hotmail.com wrote:
-> >Adds support for t7xx wwan device firmware flashing & coredump collection
-> >using devlink.
->
-> I don't believe that use of devlink is correct here. It seems like a
-> misfit. IIUC, what you need is to communicate with the modem. Basically
-> a communication channel to modem. The other wwan drivers implement these
-> channels in _ctrl.c files, using multiple protocols. Why can't you do
-> something similar and let devlink out of this please?
->
-> Until you put in arguments why you really need devlink and why is it a
-> good fit, I'm against this. Please don't send any other versions of this
-> patchset that use devlink.
+Hello,
 
-The t7xx driver already has regular wwan data and control interfaces
-registered with the wwan framework, making it functional. Here the
-exposed low level resources are not really wwan/class specific as it
-is for firmware upgrade and coredump, so I think that is why Jinjian
-chose the 'feature agnostic' devlink framework. IMHO I think it makes
-sense to rely on such a framework, or maybe on the devcoredump class.
+syzbot found the following issue on:
 
-That said, I see the protocol for flashing and doing the coreboot is
-fastboot, which is already supported on the user side with the
-fastboot tool, so I'm not sure abstracting it here makes sense. If the
-protocol is really fasboot compliant, Wouldn't it be simpler to
-directly expose it as a new device/channel? and rely on a userspace
-tool for regular fastboot operations (flash, boot, dump). This may
-require slightly modifying the fastboot tool to detect and support
-that new transport (in addition to the existing usb and ethernet
-support).
+HEAD commit:    e42bebf6db29 Merge tag 'efi-fixes-for-v6.6-1' of git://git..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=13627ea0680000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=754d6383bae8bc99
+dashboard link: https://syzkaller.appspot.com/bug?extid=5138ca807af9d2b42574
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11bbea38680000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1692689c680000
 
-Regards,
-Loic
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/dc8a44662519/disk-e42bebf6.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/9ee44b8b9dd0/vmlinux-e42bebf6.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/d5d5e45bf97a/bzImage-e42bebf6.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+5138ca807af9d2b42574@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in strlen lib/string.c:418 [inline]
+BUG: KMSAN: uninit-value in strstr+0xb8/0x2f0 lib/string.c:756
+ strlen lib/string.c:418 [inline]
+ strstr+0xb8/0x2f0 lib/string.c:756
+ tipc_nl_node_reset_link_stats+0x3ea/0xb50 net/tipc/node.c:2595
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:971 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1051 [inline]
+ genl_rcv_msg+0x11ec/0x1290 net/netlink/genetlink.c:1066
+ netlink_rcv_skb+0x371/0x650 net/netlink/af_netlink.c:2545
+ genl_rcv+0x40/0x60 net/netlink/genetlink.c:1075
+ netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
+ netlink_unicast+0xf47/0x1250 net/netlink/af_netlink.c:1368
+ netlink_sendmsg+0x1238/0x13d0 net/netlink/af_netlink.c:1910
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ sock_sendmsg net/socket.c:753 [inline]
+ ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2541
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2595
+ __sys_sendmsg net/socket.c:2624 [inline]
+ __do_sys_sendmsg net/socket.c:2633 [inline]
+ __se_sys_sendmsg net/socket.c:2631 [inline]
+ __x64_sys_sendmsg+0x307/0x490 net/socket.c:2631
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+Uninit was created at:
+ slab_post_alloc_hook+0x12f/0xb70 mm/slab.h:767
+ slab_alloc_node mm/slub.c:3478 [inline]
+ kmem_cache_alloc_node+0x577/0xa80 mm/slub.c:3523
+ kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:559
+ __alloc_skb+0x318/0x740 net/core/skbuff.c:650
+ alloc_skb include/linux/skbuff.h:1286 [inline]
+ netlink_alloc_large_skb net/netlink/af_netlink.c:1214 [inline]
+ netlink_sendmsg+0xb34/0x13d0 net/netlink/af_netlink.c:1885
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ sock_sendmsg net/socket.c:753 [inline]
+ ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2541
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2595
+ __sys_sendmsg net/socket.c:2624 [inline]
+ __do_sys_sendmsg net/socket.c:2633 [inline]
+ __se_sys_sendmsg net/socket.c:2631 [inline]
+ __x64_sys_sendmsg+0x307/0x490 net/socket.c:2631
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+CPU: 0 PID: 4999 Comm: syz-executor394 Not tainted 6.6.0-rc1-syzkaller-00125-ge42bebf6db29 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/04/2023
+=====================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
