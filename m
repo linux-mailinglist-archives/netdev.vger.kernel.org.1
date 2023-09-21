@@ -1,210 +1,192 @@
-Return-Path: <netdev+bounces-35453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EC1A7A98E8
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:59:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C6EA7A988A
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:49:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC97CB20EE9
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 17:59:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A34CB21254
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 17:49:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA7394123D;
-	Thu, 21 Sep 2023 17:22:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAD9F19BAC;
+	Thu, 21 Sep 2023 17:22:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7E33CD13;
-	Thu, 21 Sep 2023 17:22:40 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAAC354925;
-	Thu, 21 Sep 2023 10:17:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695316633; x=1726852633;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=A586LM0+gOXd/iEXjaMd75qtDywyXfu3CO1tYPaBTEU=;
-  b=EGyrJUi6MWNaAgyLgzFST1Cw8KC9HLwVF/MDSOQ1DwRqEEtMoghOcJx8
-   aBSLporeERcX2a7FzdJNv6i9tkNUQSO0E43uKg3jFHgZyND+5xO86TPOm
-   aT6RPGdn+1zAL5D6cNzUGOM/rlNhomdtuuctBKMMVgqnhjxX3ckrayL5M
-   TBCZXG4XlGkF6RAFmRCrTC+TY1DPJLLikXSztng/pwbV92B+Fhp9YNVCs
-   gPEV7+1j3eckDTE9tEn5brf2J0EEKwUaSP5CTC5NkI85EbtH4Zj5viFZY
-   G2vXiikhUY65LItYksI0n8apto+zFcMOCBFdjegAez7VmEnDwXK9Olkn3
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="444608385"
-X-IronPort-AV: E=Sophos;i="6.03,165,1694761200"; 
-   d="scan'208";a="444608385"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 05:21:21 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="862442142"
-X-IronPort-AV: E=Sophos;i="6.03,165,1694761200"; 
-   d="scan'208";a="862442142"
-Received: from yongliang-ubuntu20-ilbpg12.png.intel.com ([10.88.229.33])
-  by fmsmga002.fm.intel.com with ESMTP; 21 Sep 2023 05:21:11 -0700
-From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-To: Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
-	David E Box <david.e.box@linux.intel.com>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Mark Gross <markgross@kernel.org>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
-	Jean Delvare <jdelvare@suse.com>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Wong Vee Khee <veekhee@apple.com>,
-	Jon Hunter <jonathanh@nvidia.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Revanth Kumar Uppala <ruppala@nvidia.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Andrey Konovalov <andrey.konovalov@linaro.org>,
-	Jochen Henneberg <jh@henneberg-systemdesign.com>
-Cc: David E Box <david.e.box@intel.com>,
-	Andrew Halaney <ahalaney@redhat.com>,
-	Simon Horman <simon.horman@corigine.com>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	platform-driver-x86@vger.kernel.org,
-	linux-hwmon@vger.kernel.org,
-	bpf@vger.kernel.org,
-	Voon Wei Feng <weifeng.voon@intel.com>,
-	Tan Tee Min <tee.min.tan@linux.intel.com>,
-	Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>,
-	Lai Peter Jun Ann <jun.ann.lai@intel.com>
-Subject: [PATCH net-next v3 5/5] stmmac: intel: Add 1G/2.5G auto-negotiation support for ADL-N
-Date: Thu, 21 Sep 2023 20:19:46 +0800
-Message-Id: <20230921121946.3025771-6-yong.liang.choong@linux.intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230921121946.3025771-1-yong.liang.choong@linux.intel.com>
-References: <20230921121946.3025771-1-yong.liang.choong@linux.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FFC5171A8
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 17:22:32 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7907A43CB4;
+	Thu, 21 Sep 2023 10:16:17 -0700 (PDT)
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38LCaUDN029973;
+	Thu, 21 Sep 2023 12:37:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=iySTcB8YPzCuneBG/HH3M+8tVPuZgnLJvVYQh59frdk=;
+ b=tdzvLqZ3rB0vbquq4pgg3CC9893HAupuqpwi9JDn30Gs/98hs4+Zm60Zzgqr2Y7Uwl63
+ DXIvJrQzWi4m1+GoRPyqxObiC79ahSA2f6SVo4LM6vgRity/0w9jx7plJKnIBdOD6U6r
+ eQ1XgEHKa/mNyERKFbu8jChljAz3zms5wbDmzNtkEyoYcelXBSVkzpkpxL1cqDrNlbbO
+ LWaA7bgJw5acMYCNXCU8AX1GgUplt+GWEqT/0b54nO0/yFGlLuwOWn/qRtC+E4JqyiVp
+ EUYVwUGQNSGM7fEsZo4PCNE5DaGPumJq1N6t0j2bB/abd0eT9jj6ompYjU9GXwlteahK Lg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t855eyy66-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 21 Sep 2023 12:37:09 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38LCabdW030858;
+	Thu, 21 Sep 2023 12:36:55 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t855eyx3s-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 21 Sep 2023 12:36:55 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38LBfGVE018185;
+	Thu, 21 Sep 2023 12:36:40 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3t5ppt9yh6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 21 Sep 2023 12:36:39 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38LCab6C59900370
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 21 Sep 2023 12:36:37 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 15E372005A;
+	Thu, 21 Sep 2023 12:36:37 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D5A5220040;
+	Thu, 21 Sep 2023 12:36:36 +0000 (GMT)
+Received: from [9.152.224.54] (unknown [9.152.224.54])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 21 Sep 2023 12:36:36 +0000 (GMT)
+Message-ID: <c0ba8e0b-f2b2-b65b-e21a-54c3d920ba72@linux.ibm.com>
+Date: Thu, 21 Sep 2023 14:36:36 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [RFC net-next 0/2] Optimize the parallelism of SMC-R connections
+To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
+        wenjia@linux.ibm.com, jaka@linux.ibm.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
+References: <1694008530-85087-1-git-send-email-alibuda@linux.alibaba.com>
+ <794f9f68-4671-5e5e-45e4-2c8a4de568b3@linux.ibm.com>
+ <522d823c-b656-ffb5-bcce-65b96bdfa46d@linux.alibaba.com>
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <522d823c-b656-ffb5-bcce-65b96bdfa46d@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: zQHcU6IWTThM4VmpFRZJtWe-KBM2aC_p
+X-Proofpoint-GUID: zFotIsyC8_fziOcjR2d03rmbctIchod0
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-09-21_10,2023-09-21_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 adultscore=0
+ clxscore=1015 spamscore=0 priorityscore=1501 impostorscore=0 phishscore=0
+ suspectscore=0 mlxscore=0 bulkscore=0 malwarescore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2308100000
+ definitions=main-2309210111
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H4,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add modphy register lane to have 1G/2.5G auto-negotiation support for
-ADL-N.
 
-Signed-off-by: Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>
-Signed-off-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
----
- .../net/ethernet/stmicro/stmmac/dwmac-intel.c | 49 ++++++++++++++++++-
- .../net/ethernet/stmicro/stmmac/dwmac-intel.h |  2 +
- 2 files changed, 50 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-index a211f42914a2..bece46faa710 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-@@ -961,6 +961,53 @@ static int adls_sgmii_phy1_data(struct pci_dev *pdev,
- static struct stmmac_pci_info adls_sgmii1g_phy1_info = {
- 	.setup = adls_sgmii_phy1_data,
- };
-+
-+static int adln_common_data(struct pci_dev *pdev,
-+			    struct plat_stmmacenet_data *plat)
-+{
-+	struct intel_priv_data *intel_priv = plat->bsp_priv;
-+
-+	plat->rx_queues_to_use = 6;
-+	plat->tx_queues_to_use = 4;
-+	plat->clk_ptp_rate = 204800000;
-+
-+	plat->safety_feat_cfg->tsoee = 1;
-+	plat->safety_feat_cfg->mrxpee = 0;
-+	plat->safety_feat_cfg->mestee = 1;
-+	plat->safety_feat_cfg->mrxee = 1;
-+	plat->safety_feat_cfg->mtxee = 1;
-+	plat->safety_feat_cfg->epsi = 0;
-+	plat->safety_feat_cfg->edpp = 0;
-+	plat->safety_feat_cfg->prtyen = 0;
-+	plat->safety_feat_cfg->tmouten = 0;
-+
-+	intel_priv->tsn_lane_registers = adln_tsn_lane_registers;
-+	intel_priv->max_tsn_lane_registers = ARRAY_SIZE(adln_tsn_lane_registers);
-+
-+	return intel_mgbe_common_data(pdev, plat);
-+}
-+
-+static int adln_sgmii_phy0_data(struct pci_dev *pdev,
-+				struct plat_stmmacenet_data *plat)
-+{
-+	struct intel_priv_data *intel_priv = plat->bsp_priv;
-+
-+	plat->bus_id = 1;
-+	plat->phy_interface = PHY_INTERFACE_MODE_SGMII;
-+	plat->max_speed = SPEED_2500;
-+	plat->serdes_powerup = intel_serdes_powerup;
-+	plat->serdes_powerdown = intel_serdes_powerdown;
-+	plat->config_serdes = intel_config_serdes;
-+
-+	intel_priv->pid_modphy = PID_MODPHY1;
-+
-+	return adln_common_data(pdev, plat);
-+}
-+
-+static struct stmmac_pci_info adln_sgmii1g_phy0_info = {
-+	.setup = adln_sgmii_phy0_data,
-+};
-+
- static const struct stmmac_pci_func_data galileo_stmmac_func_data[] = {
- 	{
- 		.func = 6,
-@@ -1343,7 +1390,7 @@ static const struct pci_device_id intel_eth_pci_id_table[] = {
- 	{ PCI_DEVICE_DATA(INTEL, TGLH_SGMII1G_1, &tgl_sgmii1g_phy1_info) },
- 	{ PCI_DEVICE_DATA(INTEL, ADLS_SGMII1G_0, &adls_sgmii1g_phy0_info) },
- 	{ PCI_DEVICE_DATA(INTEL, ADLS_SGMII1G_1, &adls_sgmii1g_phy1_info) },
--	{ PCI_DEVICE_DATA(INTEL, ADLN_SGMII1G, &tgl_sgmii1g_phy0_info) },
-+	{ PCI_DEVICE_DATA(INTEL, ADLN_SGMII1G, &adln_sgmii1g_phy0_info) },
- 	{ PCI_DEVICE_DATA(INTEL, RPLP_SGMII1G, &tgl_sgmii1g_phy0_info) },
- 	{}
- };
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.h b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.h
-index 093eed977ab0..2c6b50958988 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.h
-@@ -124,8 +124,10 @@ static const struct pmc_serdes_regs pid_modphy1_2p5g_regs[] = {
- 	{}
- };
- 
-+static const int adln_tsn_lane_registers[] = {6};
- static const int ehl_tsn_lane_registers[] = {7, 8, 9, 10, 11};
- #else
-+static const int adln_tsn_lane_registers[] = {};
- static const int ehl_tsn_lane_registers[] = {};
- #endif /* CONFIG_INTEL_PMC_IPC */
- 
--- 
-2.25.1
+On 18.09.23 05:58, D. Wythe wrote:
+> Hi Alexandra,
+> 
+> Sorry for the late reply. I have been thinking about the question you mentioned for a while, and this is a great opportunity to discuss this issue.
+> My point is that the purpose of the locks is to minimize the expansion of the number of link groups as much as possible.
+> 
+> As we all know, the SMC-R protocol has the following specifications:
+> 
+>  * A SMC-R connection MUST be mapped into one link group.
+>  * A link group is usually created by a connection, which is also known
+>    as "First Contact."
+> 
+> If we start from scratch, we can design the connection process as follows:
+> 
+> 1. Check if there are any available link groups. If so, map the
+>    connection into it and go to step 3.
+> 2. Mark this connection as "First Contact," create a link group, and
+>    mark the new link group as unavailable.
+> 3. Finish connection establishment.
+> 4. If the connection is "First Contact," mark the new link group as
+>    available and map the connection into it.
+> 
+> I think there is no logical problem with this process, but there is a practical issue where burst traffic can result in burst link groups.
+> 
+> For example, if there are 10,000 incoming connections, based on the above logic, the most extreme scenario would be to create 10,000 link groups.
+> This can cause significant memory pressure and even be used for security attacks.
+> 
+> To address this goal, the simplest way is to make each connection process mutually exclusive, having the following process:
+> 
+> 1. Block other incoming connections.
+> 2. Check if there are any available link groups. If so, map the
+>    connection into it and go to step 4.
+> 3. Mark this connection as "First Contact," create a link group, and
+>    mark it as unavailable.
+> 4. Finish connection establishment.
+> 5. If the connection is "First Contact," mark the new link group as
+>    available and map the connection into it.
+> 6. Allow other connections to come in.
+> 
+> And this is our current process now!
+> 
+> Regarding the purpose of the locks, to minimize the expansion of the number of link groups. If we agree with this point, we can observe that
+> in phase 2 going to phase 4, this process will never create a new link group. Obviously, the lock is not needed here.
+
+Well, you still have issue of a link group going away. Thread 1 is deleting the last connection from a link group and shutting it down. Thread 2 is adding a 'second' connection (from its poitn ov view) to the linkgroup.
+
+> 
+> Then the last question: why is the lock needed until after smc_clc_send_confirm in the new-LGR case? We can try to move phase 6 ahead as follows:
+> 
+> 1. Block other incoming connections.
+> 2. Check if there are any available link groups. If so, map the
+>    connection into it and go to step 4.
+> 3. Mark this connection as "First Contact," create a link group, and
+>    mark it as unavailable.
+> 4. Allow other connections to come in.
+> 5. Finish connection establishment.
+> 6. If the connection is "First Contact," mark the new link group as
+>    available and map the connection into it.
+> 
+> There is also no problem with this process! However, note that this logic does not address burst issues.
+> Burst traffic will still result in burst link groups because a new link group can only be marked as available when the "First Contact" is completed,
+> which is after sending the CLC Confirm.
+> 
+> Hope my point is helpful to you. If you have any questions, please let me know. Thanks.
+> 
+> Best wishes,
+> D. Wythe
+
+You are asking exactly the right questions here. Creation of new connections is on the critical path,
+and if the design can be optimized for parallelism that will increase perfromance, while insufficient
+locking will create nasty bugs.
+Many programmers have dealt with these issues before us. I would recommend to consult existing proven
+patterns; e.g. the ones listed in Paul McKenney's book 
+(https://mirrors.edge.kernel.org/pub/linux/kernel/people/paulmck/perfbook/) 
+e.g. 'Chapter 10.3 Read-Mostly Data Structures' and of course the kernel documentation folder.
+Improving an existing codebase like smc without breaking is not trivial. Obviuosly a step-by-step approach,
+works best. So if you can identify actions that can be be done under a smaller (as in more granular) lock
+instead of under a global lock. OR change a mutex into R/W or RCU.
+Smaller changes are easier to review (and bisect in case of regressions).
+
 
 
