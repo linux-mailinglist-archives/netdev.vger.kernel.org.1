@@ -1,117 +1,149 @@
-Return-Path: <netdev+bounces-35470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F04A7A99DC
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 20:29:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80AB27A9C43
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:13:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A9B11C2042B
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 18:29:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C289282B05
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:13:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1540A20321;
-	Thu, 21 Sep 2023 17:27:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32FFA499BA;
+	Thu, 21 Sep 2023 17:50:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB5C20306
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 17:26:58 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFDB32718
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:26:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1695317163;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D9ED48EBA
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 17:49:57 +0000 (UTC)
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FCFA645BE;
+	Thu, 21 Sep 2023 10:32:11 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 1C1591FE17;
+	Thu, 21 Sep 2023 13:14:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1695302058; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=1Wdj4gmGyib5pMNvMgx8QBu8AD7+XWhaNCUkURKcfP8=;
-	b=gMxAAfio1QneeZg+IHbTXg/yaHYVeT7psLPFt41PHWGaZNUJ+AMih/LwI51gzJGN/Dl41v
-	oobi5WRKETVv0ISY9IIQK4Dw01UvFmTurOW+KHw0eKaAvh6vJ0xqJ+rXLoWNC6w7EZb67q
-	pSsxwU+PHbAtpNudyLvT2J4pAHJWyk4=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-36-NnAiH4QoPwaO7GMnfx_-Bw-1; Thu, 21 Sep 2023 09:07:24 -0400
-X-MC-Unique: NnAiH4QoPwaO7GMnfx_-Bw-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-9a9cd336c9cso21752866b.1
-        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 06:07:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695301642; x=1695906442;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1Wdj4gmGyib5pMNvMgx8QBu8AD7+XWhaNCUkURKcfP8=;
-        b=YPo2YJGoNtuVvdH2Suy98ix0Fk3jT5smofPEn0dFIh+CcIKunTYeT1hrrGXI93lSa4
-         Nj3osilqhj5klgr/PeY0nzEYPv4YCcdz6DtvFV3E786UxeG0tZ5DAxLoEL9FOVhGlwjn
-         0H1VfKwkef1Un836XB3mxcJRz71XecqK550qQOTafDLU7fMyQrdQNovdqMrzA3Y410by
-         qvr7PUKjPZe/wp7Fg8++v058hHh7rdCsEa8ZnMfxwueFvLOWe0Ky7xUMdY/2vQuGOoWp
-         AVC1g/LK4ltZRc7P7IYMOZdn67Ayd03k7gg73uprJPmBMjl8uWm0q880Ixqp/ESQF/GT
-         sOkw==
-X-Gm-Message-State: AOJu0YwYTDxsHu2adbJzBu/1qjkfDLihSJGJm927YALCs5jHAvNJtVdY
-	bU+0UgxwYYxXftpjxcH6iEv74axdZFlHkeP3Ja/6dzmpaBei2oeRYjQXYjcgZOsoyDaiCP9DWTA
-	nIa6NI78bjTLm1f1x
-X-Received: by 2002:a17:906:208d:b0:9ae:3ee2:6feb with SMTP id 13-20020a170906208d00b009ae3ee26febmr4648492ejq.2.1695301642750;
-        Thu, 21 Sep 2023 06:07:22 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE3W1LmJ2SxmmQZv7FoDBvo0P2UY69D+N3DmcsbEdcSOJH+3jb8tLq0YNrFjbHs9IerRt7Jcg==
-X-Received: by 2002:a17:906:208d:b0:9ae:3ee2:6feb with SMTP id 13-20020a170906208d00b009ae3ee26febmr4648483ejq.2.1695301642389;
-        Thu, 21 Sep 2023 06:07:22 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-251-4.dyn.eolo.it. [146.241.251.4])
-        by smtp.gmail.com with ESMTPSA id rh27-20020a17090720fb00b0099b6becb107sm1030565ejb.95.2023.09.21.06.07.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Sep 2023 06:07:21 -0700 (PDT)
-Message-ID: <b638de8abaa2e468bbcda116368c8e690a461a5d.camel@redhat.com>
-Subject: Re: [PATCH net-next] netdev: Remove unneeded semicolon
-From: Paolo Abeni <pabeni@redhat.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Yang Li
- <yang.lee@linux.alibaba.com>, arkadiusz.kubalewski@intel.com,
- jiri@resnulli.us
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Abaci Robot
-	 <abaci@linux.alibaba.com>
-Date: Thu, 21 Sep 2023 15:07:20 +0200
-In-Reply-To: <0ae9f426-7225-ac4b-4ecd-d53e36dbf365@linux.dev>
-References: <20230919010305.120991-1-yang.lee@linux.alibaba.com>
-	 <0ae9f426-7225-ac4b-4ecd-d53e36dbf365@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	bh=hr4dJrGCAHGoorv5nC8n0VYn5plN0T8DDF/tRgAs9xw=;
+	b=yQ9zS8MLtbBzIv4XI+Fx8UAy9OA58BxnvA0q2n1vhQLjUSsNzM4w4MdLAlqHixUwTRUdoz
+	XubkwoYkWO2vMUvbTapSgZvfIRIZERoGsyfrIx8lbCcnL4Q5xOqDi0chiiy+ZoYKd3EIit
+	dDKtvAuqYXOAhz9Frc0BAj0JX4LPLQU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1695302058;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hr4dJrGCAHGoorv5nC8n0VYn5plN0T8DDF/tRgAs9xw=;
+	b=956IPJl5aJAhxsQTTbR4rPzctFBiEm6NaXj8nUVK+t2LBvTby0r5Safd7j/+V6jKUnW38T
+	CX4LhyiTf45bK1Bw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A5F23134B0;
+	Thu, 21 Sep 2023 13:14:17 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+	by imap2.suse-dmz.suse.de with ESMTPSA
+	id o5KBJ6lBDGVtMQAAMHmgww
+	(envelope-from <tiwai@suse.de>); Thu, 21 Sep 2023 13:14:17 +0000
+Date: Thu, 21 Sep 2023 15:14:17 +0200
+Message-ID: <87o7hvzn12.wl-tiwai@suse.de>
+From: Takashi Iwai <tiwai@suse.de>
+To: David Howells <dhowells@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Christoph Hellwig <hch@lst.de>,
+	Christian Brauner <christian@brauner.io>,
+	David Laight <David.Laight@ACULAB.COM>,
+	Matthew Wilcox <willy@infradead.org>,
+	Jeff Layton <jlayton@kernel.org>,
+	linux-fsdevel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-mm@kvack.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>,
+	Oswald Buddenhagen <oswald.buddenhagen@gmx.de>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>,
+	alsa-devel@alsa-project.org
+Subject: Re: [PATCH v5 01/11] sound: Fix snd_pcm_readv()/writev() to use iov access functions
+In-Reply-To: <20230920222231.686275-2-dhowells@redhat.com>
+References: <20230920222231.686275-1-dhowells@redhat.com>
+	<20230920222231.686275-2-dhowells@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) Emacs/27.2 Mule/6.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, 2023-09-20 at 12:10 +0100, Vadim Fedorenko wrote:
-> On 19/09/2023 02:03, Yang Li wrote:
-> > ./drivers/dpll/dpll_netlink.c:847:3-4: Unneeded semicolon
-> >=20
-> > Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-> > Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=3D6605
-> > Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
->=20
-> Hi Yang!
-> There was a report from Intel's bot too about the issue, could you=20
-> please add the tags from it?
->=20
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes:=20
-> https://lore.kernel.org/oe-kbuild-all/202309190540.RFwfIgO7-lkp@intel.com=
-/
+On Thu, 21 Sep 2023 00:22:21 +0200,
+David Howells wrote:
+> 
+> Fix snd_pcm_readv()/writev() to use iov access functions rather than poking
+> at the iov_iter internals directly.
+> 
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Jaroslav Kysela <perex@perex.cz>
+> cc: Takashi Iwai <tiwai@suse.com>
+> cc: Oswald Buddenhagen <oswald.buddenhagen@gmx.de>
+> cc: Jens Axboe <axboe@kernel.dk>
+> cc: Suren Baghdasaryan <surenb@google.com>
+> cc: Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>
+> cc: alsa-devel@alsa-project.org
 
-No need to repost, the pw tools import the above tags automatically.
+Reviewed-by: Takashi Iwai <tiwai@suse.de>
 
-Cheers,
+Would you apply it through your tree, or shall I apply this one via
+sound git tree?
 
-Paolo
 
+thanks,
+
+Takashi
+
+> ---
+>  sound/core/pcm_native.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/sound/core/pcm_native.c b/sound/core/pcm_native.c
+> index bd9ddf412b46..9a69236fa207 100644
+> --- a/sound/core/pcm_native.c
+> +++ b/sound/core/pcm_native.c
+> @@ -3527,7 +3527,7 @@ static ssize_t snd_pcm_readv(struct kiocb *iocb, struct iov_iter *to)
+>  	if (runtime->state == SNDRV_PCM_STATE_OPEN ||
+>  	    runtime->state == SNDRV_PCM_STATE_DISCONNECTED)
+>  		return -EBADFD;
+> -	if (!to->user_backed)
+> +	if (!user_backed_iter(to))
+>  		return -EINVAL;
+>  	if (to->nr_segs > 1024 || to->nr_segs != runtime->channels)
+>  		return -EINVAL;
+> @@ -3567,7 +3567,7 @@ static ssize_t snd_pcm_writev(struct kiocb *iocb, struct iov_iter *from)
+>  	if (runtime->state == SNDRV_PCM_STATE_OPEN ||
+>  	    runtime->state == SNDRV_PCM_STATE_DISCONNECTED)
+>  		return -EBADFD;
+> -	if (!from->user_backed)
+> +	if (!user_backed_iter(from))
+>  		return -EINVAL;
+>  	if (from->nr_segs > 128 || from->nr_segs != runtime->channels ||
+>  	    !frame_aligned(runtime, iov->iov_len))
+> 
 
