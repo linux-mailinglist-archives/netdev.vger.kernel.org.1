@@ -1,150 +1,157 @@
-Return-Path: <netdev+bounces-35358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B04537A9027
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 02:26:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C6727A904A
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 02:57:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3D9C7B20AE7
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 00:26:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCAF61C2089C
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 00:57:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 371EA377;
-	Thu, 21 Sep 2023 00:26:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A43A6623;
+	Thu, 21 Sep 2023 00:56:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B5A17E
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 00:26:38 +0000 (UTC)
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE799D7;
-	Wed, 20 Sep 2023 17:26:36 -0700 (PDT)
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38L0QRU1005211;
-	Thu, 21 Sep 2023 00:26:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=hiFCCl/MJHW12WaPm21+mtf9pdSpv8QL8D+K6g5ozQU=;
- b=GJAiIcVhPBP2epM0fRlLXLhMudaIR4OEilS6FY46jD6BHN6EnddPOTniw6YE7V+ppjKX
- AE3mb+nex4TjmpZ0cxhUjmQNbDqe4eyj7gU1d4Q1arYnnn7By9Lkf4mqcn3LMut/DYEt
- +xUgloYnI9wszyxdJ4QN3qqRr70vKwIVSHZUclck06YgoDEntSq5ljwm33bLkta9CMCj
- ELn1KSkbpMjdGGbF6TL9VLvR6mEZeD24sPNR7av22yM6qNJuRWVIjdRUwHh0V81SH+Gm
- AkX/X7tlt8t2txWEktQWl25D+xGDaUtRi6bHvh+gXvq0FqiCaDLjn8yhN0t7+NK5T4tx qg== 
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3t7rhutkr3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 21 Sep 2023 00:26:27 +0000
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 38L0QQZJ003410
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 21 Sep 2023 00:26:26 GMT
-Received: from [192.168.142.6] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.36; Wed, 20 Sep
- 2023 17:26:25 -0700
-Message-ID: <349a7b1c-915f-4f58-260f-900aa7e3db65@quicinc.com>
-Date: Wed, 20 Sep 2023 17:26:25 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40BF5622
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 00:56:56 +0000 (UTC)
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A31CBD3;
+	Wed, 20 Sep 2023 17:56:54 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-690f7d73a3aso353944b3a.0;
+        Wed, 20 Sep 2023 17:56:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695257814; x=1695862614; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bagVEl6M2d5FIlSzY0anx8WgPT2rmaHrI3Hcd6Q8CcI=;
+        b=ZiVcYiXEdK/8EZhVniQPvOwzRDp3H46UM40v2C1HRFmAGB2iRiLF+WlTJsAW7RfPF9
+         z5ZxyBmsL0B8/AiykZbffZ6C2IXkv4GHovXLUIhmqxZw+ZgAjpig/aTvFHgiAjELV2zE
+         B+HQw7hJs+aMisnQfN1ydMK1Bstq8HceK0NzvLzLVg/UKSyQBIuZPI5uXDJ35k6nf+4O
+         cq1hyOjvlJss/sBYqItJTWcE+vbbtbOSfe4jIFu4VDEVO5XqzbGXkvB7Omm/iS8R2yHB
+         3jIoCfG0GAKkfPPp/T3W2nJyU36HcY5lqF5tosy0plJTjqXUgjo+yWXhmtDpHkfpQ1Cx
+         qSMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695257814; x=1695862614;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bagVEl6M2d5FIlSzY0anx8WgPT2rmaHrI3Hcd6Q8CcI=;
+        b=B1kQWN7t6wnZm1OePVqDOSWv7kC6WyS40j18O+t8fAWdnWLnhl+JIF//w+ureXL9Vc
+         /qKb3DLZtv53gotdNVxtny9U2VrNJ0jdtkmusG0bZ/8Qo5klXJDewDg6Mm5ppGywzc0d
+         65mSPrBBRllQBBQNk/JqPQa8jWqLOayhdRaF5nECqshRfBq4zYOhmudvW29gyI3DH658
+         5Eu1kJI1WrkakFZQ6ZO08SsFJt32D7Kp0clf1tEG8qcwnykgNoOG6AsYGuE2JZgm+9LD
+         0Nm++x4C0//J97b2af3y1dk//RWCTxEdqfp1iNkmYKsGIr+QCFRMfrCA+cVchJhkrHZ2
+         mYiQ==
+X-Gm-Message-State: AOJu0YxO3ni4ICkTlVVydtJs24G+9SVbWfH0W40KAQInl4S7Z10r4Aal
+	HbWYZjw3Zjaz29PTlJMXNG8=
+X-Google-Smtp-Source: AGHT+IFUcPFST8m/McJD1VU6r71vUMY0Tmsem/TpC8OsulBLO3kYTcnPgQvWIbb0N1edCoMuvFgXwg==
+X-Received: by 2002:a05:6a21:78a7:b0:136:e26b:6401 with SMTP id bf39-20020a056a2178a700b00136e26b6401mr4781000pzc.16.1695257814004;
+        Wed, 20 Sep 2023 17:56:54 -0700 (PDT)
+Received: from localhost.localdomain ([104.28.226.90])
+        by smtp.gmail.com with ESMTPSA id d17-20020aa78e51000000b00688c733fe92sm123696pfr.215.2023.09.20.17.56.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Sep 2023 17:56:53 -0700 (PDT)
+From: Sieng-Piaw Liew <liew.s.piaw@gmail.com>
+To: chris.snook@gmail.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Sieng-Piaw Liew <liew.s.piaw@gmail.com>
+Subject: [PATCH net-next] net: atl1c: switch to napi_consume_skb()
+Date: Thu, 21 Sep 2023 08:56:23 +0800
+Message-Id: <20230921005623.3768-1-liew.s.piaw@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2 net-next 2/2] net: qrtr: Add support for processing
- DEL_PROC type control message
-Content-Language: en-US
-To: Sricharan Ramabadhran <quic_srichara@quicinc.com>, <mani@kernel.org>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <linux-arm-msm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <quic_viswanat@quicinc.com>, <horms@kernel.org>
-References: <20230920053317.2165867-1-quic_srichara@quicinc.com>
- <20230920053317.2165867-3-quic_srichara@quicinc.com>
-From: Chris Lew <quic_clew@quicinc.com>
-In-Reply-To: <20230920053317.2165867-3-quic_srichara@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: dQ90yI795B6dzzHNMLJKua5wLu4G7y-r
-X-Proofpoint-GUID: dQ90yI795B6dzzHNMLJKua5wLu4G7y-r
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-09-20_12,2023-09-20_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
- priorityscore=1501 bulkscore=0 phishscore=0 lowpriorityscore=0
- malwarescore=0 clxscore=1011 adultscore=0 mlxlogscore=999 mlxscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2308100000 definitions=main-2309210001
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Switch to napi_consume_skb() to take advantage of bulk free, and skb
+reuse through skb cache in conjunction with napi_build_skb().
 
-On 9/19/2023 10:33 PM, Sricharan Ramabadhran wrote:
+When parameter 'budget' = 0, indicating non-NAPI context,
+dev_consume_skb_any() is called internally.
 
-> @@ -122,6 +123,9 @@ static DEFINE_XARRAY_ALLOC(qrtr_ports);
->    * @qrtr_tx_lock: lock for qrtr_tx_flow inserts
->    * @rx_queue: receive queue
->    * @item: list item for broadcast list
-> + * @kworker: worker thread for recv work
-> + * @task: task to run the worker thread
-> + * @read_data: scheduled work for recv work
+Signed-off-by: Sieng-Piaw Liew <liew.s.piaw@gmail.com>
+---
+ drivers/net/ethernet/atheros/atl1c/atl1c_main.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-I think I made these descriptions a bit ambiguous with "recv work". 
-Since we are only parsing DEL_PROC messages at the moment, the 
-descriptions should be more accurate on what they are for.
+diff --git a/drivers/net/ethernet/atheros/atl1c/atl1c_main.c b/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
+index 74b78164cf74..46cdc32b4e31 100644
+--- a/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
++++ b/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
+@@ -842,7 +842,8 @@ static int atl1c_sw_init(struct atl1c_adapter *adapter)
+ }
+ 
+ static inline void atl1c_clean_buffer(struct pci_dev *pdev,
+-				struct atl1c_buffer *buffer_info)
++				      struct atl1c_buffer *buffer_info,
++				      int budget)
+ {
+ 	u16 pci_driection;
+ 	if (buffer_info->flags & ATL1C_BUFFER_FREE)
+@@ -861,7 +862,7 @@ static inline void atl1c_clean_buffer(struct pci_dev *pdev,
+ 				       buffer_info->length, pci_driection);
+ 	}
+ 	if (buffer_info->skb)
+-		dev_consume_skb_any(buffer_info->skb);
++		napi_consume_skb(buffer_info->skb, budget);
+ 	buffer_info->dma = 0;
+ 	buffer_info->skb = NULL;
+ 	ATL1C_SET_BUFFER_STATE(buffer_info, ATL1C_BUFFER_FREE);
+@@ -882,7 +883,7 @@ static void atl1c_clean_tx_ring(struct atl1c_adapter *adapter,
+ 	ring_count = tpd_ring->count;
+ 	for (index = 0; index < ring_count; index++) {
+ 		buffer_info = &tpd_ring->buffer_info[index];
+-		atl1c_clean_buffer(pdev, buffer_info);
++		atl1c_clean_buffer(pdev, buffer_info, 0);
+ 	}
+ 
+ 	netdev_tx_reset_queue(netdev_get_tx_queue(adapter->netdev, queue));
+@@ -909,7 +910,7 @@ static void atl1c_clean_rx_ring(struct atl1c_adapter *adapter, u32 queue)
+ 
+ 	for (j = 0; j < rfd_ring->count; j++) {
+ 		buffer_info = &rfd_ring->buffer_info[j];
+-		atl1c_clean_buffer(pdev, buffer_info);
++		atl1c_clean_buffer(pdev, buffer_info, 0);
+ 	}
+ 	/* zero out the descriptor ring */
+ 	memset(rfd_ring->desc, 0, rfd_ring->size);
+@@ -1607,7 +1608,7 @@ static int atl1c_clean_tx(struct napi_struct *napi, int budget)
+ 			total_bytes += buffer_info->skb->len;
+ 			total_packets++;
+ 		}
+-		atl1c_clean_buffer(pdev, buffer_info);
++		atl1c_clean_buffer(pdev, buffer_info, budget);
+ 		if (++next_to_clean == tpd_ring->count)
+ 			next_to_clean = 0;
+ 		atomic_set(&tpd_ring->next_to_clean, next_to_clean);
+@@ -2151,7 +2152,7 @@ static void atl1c_tx_rollback(struct atl1c_adapter *adpt,
+ 	while (index != tpd_ring->next_to_use) {
+ 		tpd = ATL1C_TPD_DESC(tpd_ring, index);
+ 		buffer_info = &tpd_ring->buffer_info[index];
+-		atl1c_clean_buffer(adpt->pdev, buffer_info);
++		atl1c_clean_buffer(adpt->pdev, buffer_info, 0);
+ 		memset(tpd, 0, sizeof(struct atl1c_tpd_desc));
+ 		if (++index == tpd_ring->count)
+ 			index = 0;
+-- 
+2.34.1
 
->    */
->   struct qrtr_node {
->   	struct mutex ep_lock;
-> @@ -134,6 +138,9 @@ struct qrtr_node {
->   
->   	struct sk_buff_head rx_queue;
->   	struct list_head item;
-> +	struct kthread_worker kworker;
-> +	struct task_struct *task;
-> +	struct kthread_work read_data;
-
-I think our own kthread here might have been overkill. I forget why we 
-needed it instead of using a workqueue.
-
-> +		if (cb->type == QRTR_TYPE_DEL_PROC) {
-> +			/* Free tx flow counters */
-> +			mutex_lock(&node->qrtr_tx_lock);
-> +			radix_tree_for_each_slot(slot, &node->qrtr_tx_flow, &iter, 0) {
-> +				flow = rcu_dereference_raw(*slot);
-> +				wake_up_interruptible_all(&flow->resume_tx);
-> +			}
-> +			mutex_unlock(&node->qrtr_tx_lock);
-> +
-
-I don't see any other places where we use rcu_dereference_raw for the 
-flow. Does this need to be updated for the rest of the places we get the 
-flow?
-
-The same loop is done in qrtr_endpoint_unregister() so maybe we should 
-look into adding a helper for this logic?
-
-> +			/* Translate DEL_PROC to BYE for local enqueue */
-> +			cb->type = QRTR_TYPE_BYE;
-> +			pkt = (struct qrtr_ctrl_pkt *)skb->data;
-> +			memset(pkt, 0, sizeof(*pkt));
-> +			pkt->cmd = cpu_to_le32(QRTR_TYPE_BYE);
-> +
-
-Are we relying on the remote to program the destination of this packet 
-to be the control port?
-
-Thanks,
-Chris
 
