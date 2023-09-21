@@ -1,135 +1,170 @@
-Return-Path: <netdev+bounces-35536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FB2A7A9CB7
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:24:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3FB07A9CAF
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:23:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 567C0B25026
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:19:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EE036B2159B
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:19:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AB2F4BDD0;
-	Thu, 21 Sep 2023 18:11:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C253C4C87C;
+	Thu, 21 Sep 2023 18:11:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA5A63F4A0
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 18:11:21 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A08D9D45C
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:56:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1695318962;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GW0FxKMlEbyyqLVslDTbsm2PoLR7WFqvyt3jzMjJMK8=;
-	b=ZxZsTbgiy8MZrdvhje9koE7PDxY8+EC6ow+UufsyPt6kEwtvSyHEnN8YkPQk7C0278duGl
-	cIuqf2pKgZj9Q2xm62cNQ0Hx4T1VT6H97AsnyVwXXHnbs8v9lTrjAwkyakwGtQ4/knNlcE
-	ghfsYF/3I3AqTn9n3NBtJaBdvcXkAig=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-221-9Wz4neAcOYqXoybVj_czZw-1; Thu, 21 Sep 2023 09:39:19 -0400
-X-MC-Unique: 9Wz4neAcOYqXoybVj_czZw-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3214d1d4bbcso71362f8f.0
-        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 06:39:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695303558; x=1695908358;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GW0FxKMlEbyyqLVslDTbsm2PoLR7WFqvyt3jzMjJMK8=;
-        b=CZMNj9aIyJ0OxTpVIhV+qDRVWPvIS2NocsmmjErteH3pu4MZCwoA3UwYly37nTS1o2
-         GlxM/Rzb6Hj/EZG0VrvxTOUJsWpfV2J0ot4h2cg0Atzdqz6UuYoo8ngJI6tn5bJ5ePMR
-         fwUzNUEDZISX3j9KJNZ64wSlGOtrGShQQOKg1i0CAGba73DJx6dqLha3b237vk6Qx5eU
-         627JWtK+/KzMXbeS7zLgYna8vzmSB2OV1kKQrH8U1OyI5c1ja6czPuLJIGlry8mLpest
-         IkHgqO9vJQ8rqp5roZISFu7cAD3uDEOvRfgQkxevCPLUcBfPAiUKoUNBqF4jCr5B83d0
-         XLqw==
-X-Gm-Message-State: AOJu0Yw7AJzTTZ0iMN4iqHN8TAQvGvzH06L58gbPjb89eaH7oliKQKz2
-	SnhVZTtyOwXK8rFHsQxsYKkiN8ixnMlsZCreype6fj+mrv+E5gc+kecQxSIdVuO4UWModE0h228
-	Wh5tz5B2OH/VcvJYb
-X-Received: by 2002:adf:f688:0:b0:319:7624:4ca2 with SMTP id v8-20020adff688000000b0031976244ca2mr4576723wrp.0.1695303558367;
-        Thu, 21 Sep 2023 06:39:18 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF17zexuhF9lQgbUMZlJkczKiweixlp/YM0Tz4cyQ9l/8XZueYGNkMJfqJ937KA3+cIlKRGKg==
-X-Received: by 2002:adf:f688:0:b0:319:7624:4ca2 with SMTP id v8-20020adff688000000b0031976244ca2mr4576712wrp.0.1695303557921;
-        Thu, 21 Sep 2023 06:39:17 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-251-4.dyn.eolo.it. [146.241.251.4])
-        by smtp.gmail.com with ESMTPSA id y2-20020adffa42000000b0031423a8f4f7sm1824147wrr.56.2023.09.21.06.39.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Sep 2023 06:39:17 -0700 (PDT)
-Message-ID: <50a8ec7dece0100c931fd187e19e14dd1ca1a0e9.camel@redhat.com>
-Subject: Re: [PATCH net-next v2 1/2] r8152: remove queuing rx packets in
- driver
-From: Paolo Abeni <pabeni@redhat.com>
-To: Hayes Wang <hayeswang@realtek.com>, Andrew Lunn <andrew@lunn.ch>
-Cc: "kuba@kernel.org" <kuba@kernel.org>, "davem@davemloft.net"
- <davem@davemloft.net>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
- nic_swsd <nic_swsd@realtek.com>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>,  "linux-usb@vger.kernel.org"
- <linux-usb@vger.kernel.org>, "edumazet@google.com" <edumazet@google.com>, 
- "bjorn@mork.no" <bjorn@mork.no>
-Date: Thu, 21 Sep 2023 15:39:15 +0200
-In-Reply-To: <1a57cf3f867d4dfd991ef1d4024c931b@realtek.com>
-References: <20230919031351.7334-429-nic_swsd@realtek.com>
-	 <20230919031351.7334-430-nic_swsd@realtek.com>
-	 <369f3139-4e63-4327-8745-2d72d7dfea8f@lunn.ch>
-	 <1a57cf3f867d4dfd991ef1d4024c931b@realtek.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50B4B4BDD4;
+	Thu, 21 Sep 2023 18:11:21 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5078E98A72;
+	Thu, 21 Sep 2023 10:56:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=etZ2gpA0uz+JRPag03uqb6cfh/kPa8Z3gAMOKitX9GI=; b=XJFeAWsJK6qNPSOEXR7+0kE+V4
+	4M/gOJKBPlGa+X30hfCd+WanZJzjvHIg3FOF+0PiDMyYKdq2GmP3ET7jaqP+coWsJhapZAKkw8XBp
+	YXoEu+OSuRKJy8kMvQA+1uK6bnykQqT3wiDi16tAorZtuVizYtC0+q1DOQqAlh1wAjC8THQ5j1tBb
+	n/IVlVmgzyC3E/JOKzyKNxwUAzemhr/7mg2Mnn9ljY2801G2xkTtLiqJpDZMyMiXD40F4Rjw8bpZ1
+	iLzGICk+q44J1b1OKypm+kQ/qteOXGLyEtKJFXgJpGWWDjwMCPUvm9uR4EZYSUOWmQK0fR8ZT1pgq
+	aMWFFDyg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46552)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qjJuR-0004g0-21;
+	Thu, 21 Sep 2023 14:39:59 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qjJuO-0003aT-Te; Thu, 21 Sep 2023 14:39:56 +0100
+Date: Thu, 21 Sep 2023 14:39:56 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
+	David E Box <david.e.box@linux.intel.com>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Mark Gross <markgross@kernel.org>,
+	Jose Abreu <Jose.Abreu@synopsys.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Jean Delvare <jdelvare@suse.com>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Wong Vee Khee <veekhee@apple.com>,
+	Jon Hunter <jonathanh@nvidia.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Revanth Kumar Uppala <ruppala@nvidia.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Andrey Konovalov <andrey.konovalov@linaro.org>,
+	Jochen Henneberg <jh@henneberg-systemdesign.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	platform-driver-x86@vger.kernel.org, linux-hwmon@vger.kernel.org,
+	bpf@vger.kernel.org, Voon Wei Feng <weifeng.voon@intel.com>,
+	Tan Tee Min <tee.min.tan@linux.intel.com>,
+	Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>,
+	Lai Peter Jun Ann <jun.ann.lai@intel.com>
+Subject: Re: [PATCH net-next v2 0/5] TSN auto negotiation between 1G and 2.5G
+Message-ID: <ZQxHrPS5C13SfTfA@shell.armlinux.org.uk>
+References: <20230804084527.2082302-1-yong.liang.choong@linux.intel.com>
+ <5bd05ba2-fd88-4e5c-baed-9971ff917484@lunn.ch>
+ <f9b21a9d-4ae2-1f91-b621-2e27f746f661@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f9b21a9d-4ae2-1f91-b621-2e27f746f661@linux.intel.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 2023-09-19 at 12:26 +0000, Hayes Wang wrote:
-> Andrew Lunn <andrew@lunn.ch>
-> > Sent: Tuesday, September 19, 2023 8:08 PM
-> [...]
-> > > -     return work_done;
-> > > +     if (work_done > budget)
-> > > +             return budget;
-> > > +     else
-> > > +             return work_done;
-> > >  }
-> >=20
-> > I don't know NAPI too well. Are there implications of not telling it
-> > the truth?
->=20
-> You could check the reply from Jakub Kicinski, as following link.
-> https://www.spinics.net/lists/netdev/msg933846.html
-> https://www.spinics.net/lists/netdev/msg933923.html
->=20
-> If the work_done is more than budget, I should return budget.
+On Thu, Sep 21, 2023 at 08:25:05PM +0800, Choong Yong Liang wrote:
+> 
+> 
+> On 4/8/2023 8:04 pm, Andrew Lunn wrote:
+> > On Fri, Aug 04, 2023 at 04:45:22PM +0800, Choong Yong Liang wrote:
+> > > Intel platforms’ integrated Gigabit Ethernet controllers support
+> > > 2.5Gbps mode statically using BIOS programming. In the current
+> > > implementation, the BIOS menu provides an option to select between
+> > > 10/100/1000Mbps and 2.5Gbps modes. Based on the selection, the BIOS
+> > > programs the Phase Lock Loop (PLL) registers. The BIOS also read the
+> > > TSN lane registers from Flexible I/O Adapter (FIA) block and provided
+> > > 10/100/1000Mbps/2.5Gbps information to the stmmac driver. But
+> > > auto-negotiation between 10/100/1000Mbps and 2.5Gbps is not allowed.
+> > > The new proposal is to support auto-negotiation between 10/100/1000Mbps
+> > > and 2.5Gbps . Auto-negotiation between 10, 100, 1000Mbps will use
+> > > in-band auto negotiation. Auto-negotiation between 10/100/1000Mbps and
+> > > 2.5Gbps will work as the following proposed flow, the stmmac driver reads
+> > > the PHY link status registers then identifies the negotiated speed.
+> > > Based on the speed stmmac driver will identify TSN lane registers from
+> > > FIA then send IPC command to the Power Management controller (PMC)
+> > > through PMC driver/API. PMC will act as a proxy to programs the
+> > > PLL registers.
+> > 
+> > Have you considered using out of band for all link modes? You might
+> > end up with a cleaner architecture, and not need any phylink/phylib
+> > hacks.
+> > 
+> > 	Andrew
+> Hi Andrew,
+> 
+> After conducting a comprehensive study, it seems that implementing
+> out-of-band for all link modes might not be feasible. I may have missed some
+> key aspects during my analysis.
 
-One of the key points in Jakub's reply is that the burst must exceed
-the budget by a limited number of packets:
+You need to provide details of why you think it's not feasible, because
+you're making those reading your message have to guess.
 
-"Nothing will explode if we process a few more packets than budget
-(assuming budget > 0)"
+We _do_ have cases where this is already supported. The DM7052 SFP
+module for example has a BCM84881 PHY on board that has no in-band
+support, so always has to use out-of-band. This module supports 10G,
+5G, 2.5G, 1G, 100M and 10M speeds. It switches its interface between
+10G, 2500base-X and SGMII mode. It's been supported in Linux for a
+while with MAC/PCS that implement phylink _correctly_.
 
-How many packets can contain at most a single URB?
+I wouldn't call stmmac a proper phylink implementation, especially
+when it comes to switching between different interfaces.
 
-If that number can be significant greater then the napi budget, I think
-we are better off keeping the packet in the queue - otherwise the whole
-system latency/stability would be affected.
+My attempt at starting to clean up the stmmac code was thwarted by
+niggly review comments (over whether %u or %d should be used to print
+a _signed integer_ that stmmac stupidly implicitly casts to an unsigned
+integer. That lead me to decide that stmmac was beyond being cleaned
+up, so I junked the large patch set of improvements that I had - along
+with multiple issues that I had found in the driver.
 
-Cheers,
+Someone else needs to sort stmmac out, and I suspect that may be a
+pre-requisit for your changes so that stmmac operates _correctly_ with
+phylink.
 
-Paolo
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
