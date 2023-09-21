@@ -1,237 +1,103 @@
-Return-Path: <netdev+bounces-35531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4F9E7A9C81
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:19:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 211A87A9BBC
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:04:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D701128362B
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:18:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94AD31C2144D
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:03:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 311F24C843;
-	Thu, 21 Sep 2023 18:11:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B0E94A52B;
+	Thu, 21 Sep 2023 17:51:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF0814BDB9;
-	Thu, 21 Sep 2023 18:11:18 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44DA5A0C2B;
-	Thu, 21 Sep 2023 10:57:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695319056; x=1726855056;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=+pwHUZ/2swYVy2VSDvF9eI7bZY/Pr2mIwCivK34bjD0=;
-  b=e+RMHdL/iTwtXU+VahcqhLks/o3X7BCNdrchx46BCJkt6K5iQVHrXXPu
-   Eyeq38yzDuOK/fNq3WeYM1FhzKjtQgVu8jqdWv9Qwf+33669UCXlCNuAo
-   ZmmmHc+035WdKYjyA8XfPFL/AvmSg/rG+RWicMcQXrUhW69eZhdcY381E
-   HBKy4NIzm2dUeJsIvjX5vEhsWaxBLU/nuAeo4x9nUeCaxpPZmYc2eF3GH
-   MywA03M4VgxL2XI8/y1yBapeomsONCRnNPU/Gb1vHkidPTVbPz0Cphha/
-   0zGi7lFnZn7H01lcQXnBlZoBH5DwSg9xmnbk6rupLxlXLHanVeaVYMtQH
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10840"; a="383284305"
-X-IronPort-AV: E=Sophos;i="6.03,165,1694761200"; 
-   d="scan'208";a="383284305"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 07:15:35 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10840"; a="1077903851"
-X-IronPort-AV: E=Sophos;i="6.03,165,1694761200"; 
-   d="scan'208";a="1077903851"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmsmga005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 21 Sep 2023 07:15:28 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Thu, 21 Sep 2023 07:15:27 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Thu, 21 Sep 2023 07:15:27 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.102)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Thu, 21 Sep 2023 07:15:27 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IaFMBb6ge/DQ3To+BZrKCDRwSD25sg9CuWej7x7OfvVDQm7g8976FlyZlmoPR9w/I7xtgTTxC2AdEV/+jBuCeTeM4TEug0KYbrQTqspCN7t8Ysqj6xjlmEjmApeSVqx1YTvvzLqgCUynooDsRDgacH05cICsxs8rtNsRjP94HykbELg9Synv3l3t5UbByZurNGnrqwpiQJTJjDUMw5HQBCnawdKwAEIjAdZs7HAB9aODnl6niXjar+LXa2JGhQb5H7gV2xArwLTiD9+Kq+k/nAsUyxo8RVZrTUCRGu1AtgT5xCfqNMkYxmCdYZxngYx66gujQcBsPjhvE0IF4tGm4w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nUEQRtq692kemEgPUm+d+dXMnJHtjEjJZpe0o9CyDkk=;
- b=JWKePhJa0uI0++UEI+C9808BLS0yjTBjZdSx2uMdemRQ0kFD2I6+TZYNBsC1PUx5k7SGdi7uQjvXvUAVkj3dZaNEjHy3fgW+Hcj7LmKTuFNnzPshbTwW62h0wPx0gzrVMvaVGN+4S3OGU1cZnHIwTm3vMl6XowafzCbEjCvENARW3OfhTfr/2dWmDGqV/IVGBTmlXNxKXMEFp8SuPf+UiFvrPlBimfC0agg0ep5UyQ31DIbzqvkLZOjVTRoe8QW2cS84jRv5Ddx2ciIt1u1O1E1HdTcqdczPBmGLJhjLDy7ookvHR1Qs/G0W3vxJxIIho143DGdswRknCEPc25op/g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
- by BN9PR11MB5274.namprd11.prod.outlook.com (2603:10b6:408:133::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.20; Thu, 21 Sep
- 2023 14:15:25 +0000
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::bede:bd20:31e9:fcb4]) by DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::bede:bd20:31e9:fcb4%7]) with mapi id 15.20.6768.029; Thu, 21 Sep 2023
- 14:15:25 +0000
-Message-ID: <d7462ae5-c971-452f-49d7-855f60c850d3@intel.com>
-Date: Thu, 21 Sep 2023 16:14:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH] sky2: Make sure there is at least one frag_addr available
-Content-Language: en-US
-To: Kees Cook <keescook@chromium.org>
-CC: Mirko Lindner <mlindner@marvell.com>, Stephen Hemminger
-	<stephen@networkplumber.org>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>, kernel test robot
-	<lkp@intel.com>, <linux-kernel@vger.kernel.org>,
-	<linux-hardening@vger.kernel.org>
-References: <20230920202509.never.299-kees@kernel.org>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-In-Reply-To: <20230920202509.never.299-kees@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02B2F4A528
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 17:51:13 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E042E7E7D0
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:50:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1695318645;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=7gLU3+rfv3HHSp+DEvudAw0y1szA/aWbZkWDtyEikvk=;
+	b=BmdLBp92AbesraJKxWOI5+H/820A4lB+1b1x8zs2XvUGvN0zea9QXWaWG6ymOhD4U5vcYs
+	csmgy4I3oW4awRrFDu8NqlnDEIZt9gzIs7JCQoTpJI6qgqbQXxN8sMcxWijogbR2TiPfTo
+	PPRADXtohV3MzQKIY/LUzxvobqH38Y4=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-68-xLnmuW6LM86sIfYlLuN5cA-1; Thu, 21 Sep 2023 10:35:35 -0400
+X-MC-Unique: xLnmuW6LM86sIfYlLuN5cA-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2a7a6393ba6so2289011fa.1
+        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 07:35:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695306933; x=1695911733;
+        h=mime-version:user-agent:content-transfer-encoding:date:cc:to:from
+         :subject:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7gLU3+rfv3HHSp+DEvudAw0y1szA/aWbZkWDtyEikvk=;
+        b=DX/BVLG8nwNkhrdZaypp+92Z1t2swY4raZPzXw8Y04FEsCBnMARKjVgPfOW30S3YKt
+         fNVXtyjvzTrUcMWfzzHMAzqNM6gzljUPNS4Af/QYfOoi4n7dn7WPuEXabft0CApGioCW
+         8zPl5dngWFw5ChjOcTcBThHtPMOtkiEWJBGOJuZwgOMPsAXFOlJAojdM746sYnh9Ve6A
+         uu3Q7uVMKwSriZi8X5pUyGNqtckpA7Md3c8C8rx7e/iEMJYzJLysigjbsBTePNbFEFau
+         gnrBWgqLHcFXafAO5OpHrJ0/cdJf8PXBR7rmHOpFilaejrXDy8feUhss1PY3VJmBn8bG
+         KHfg==
+X-Gm-Message-State: AOJu0YyK3D7b2M5nRWTzmEG01IxsRhYGPDVgEVJlBsHc8GHPQW+1L5Gc
+	BPu5Kd9PVWb9/TONRwwPXMLD4hRXEnfCPyYy3PyK8AU1BMNGkov7fgtgbuE/0YSM3196U9d25vc
+	dwYO2z722wIG0MjP/
+X-Received: by 2002:a2e:a60a:0:b0:2bf:eafb:3442 with SMTP id v10-20020a2ea60a000000b002bfeafb3442mr4138864ljp.3.1695306933641;
+        Thu, 21 Sep 2023 07:35:33 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFuAp7m0hjif9+lpPxXN9OH1XssIg13XiXVjnldMBJ6IlMoqth3cyfJJFOhFSvkHo1V5fnjJQ==
+X-Received: by 2002:a2e:a60a:0:b0:2bf:eafb:3442 with SMTP id v10-20020a2ea60a000000b002bfeafb3442mr4138856ljp.3.1695306933291;
+        Thu, 21 Sep 2023 07:35:33 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-251-4.dyn.eolo.it. [146.241.251.4])
+        by smtp.gmail.com with ESMTPSA id j8-20020a170906474800b0099297c99314sm1126843ejs.113.2023.09.21.07.35.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Sep 2023 07:35:32 -0700 (PDT)
+Message-ID: <a15822902e9e751b982a07621d180e3fa00353d4.camel@redhat.com>
+Subject: Re:  [GIT PULL] Networking for 6.6-rc3
+From: Paolo Abeni <pabeni@redhat.com>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Date: Thu, 21 Sep 2023 16:35:31 +0200
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR2P281CA0096.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:9b::19) To DM6PR11MB3625.namprd11.prod.outlook.com
- (2603:10b6:5:13a::21)
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|BN9PR11MB5274:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1715514c-4f8e-4db0-1ceb-08dbbaad3291
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 4U0eBLt4Iy8TsDLrNGZ72EDB127ST1QRi3ZDaL7j0UFlwuIqFXU1Y31+thRujaWcfoHmSAYavCBLXGCemduusaQX5lXVnvY78DmQxLooFbeSgCMEXTvDJ85GO/XL/1b74Eue2hIK/ksMVYtUQVlUW5kQpvykVdyYpvWsfdec3MKMe/448Wqb8C6pS7JwtqCqqRMCIr2xDi7II7ChVFgmtCaDG9vNgjedDqV+Y4ig+m5wZtGB7zKFydsgxH+7XwPSjajIuIYLmLIWc75Tt6GUCYOgN2oHZcGsfBj5ODjV0HJHZlqV1IUzttQI45RkYHaHXU2PP/GgXafPHzM7RfVXs75bIdM8WJh+npJta9wcmpn6B5Utz894Fdo+jkP16S0Ee1OtJeqsYq3yMPM/8gRleQ8PUoD6gFv7+Dcdg6N404emaR0ZDL38A5hvoXVqOppHjSrIgU6GgwKF0tfWO3diZEeUDuHFb/a5g3N7q1Ago6+kWmQOMICgyWM0VOhF6oMNIzOMSBYGfQtiAzttf2RZzjTMlpSmQKpDg/0n89AYhUw9LTEFdkdOKtXkE7ptBd3OQzHdIgqD/klAlfuW6qMCI9eVAW5jQNVEi4CUYxvo+BMmmWjv68pm3SyJCjxKINa/52yaHv+h1j+t7+6YU/DYWw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(366004)(376002)(136003)(396003)(39860400002)(451199024)(1800799009)(186009)(31686004)(6666004)(6512007)(6506007)(6486002)(38100700002)(82960400001)(36756003)(86362001)(31696002)(7416002)(2906002)(6916009)(966005)(83380400001)(26005)(478600001)(2616005)(5660300002)(41300700001)(8936002)(316002)(66476007)(4326008)(66556008)(54906003)(66946007)(8676002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Y3JEalBtbGF5dVpzektPMEJDdkxjdEkveVBtb0xqLzNvc1NuK3BzZUFzd2tW?=
- =?utf-8?B?VkgyZWgxemxMQ1JuYWVrNENJWkowRHE5eDZWdG5KaXM1UXJLdXJxMzBDTUtq?=
- =?utf-8?B?Sk8rQzNRbjZvUnFxeVNKUGc4R0hCNlRXaW9VUDNNcWtvOHh2RUlQZ0RHR1Fa?=
- =?utf-8?B?RG5nYmJYcmovL3cyMjg5ZXRVcnQzN0UrS1BqV2pIOGVTUmV5QmtHa0Vyb1hM?=
- =?utf-8?B?MTMyT2JWc1MxbU9hcHRENWdRc3dETG9yQTF5cUI1aWErZEt1Vis5SzVlcytN?=
- =?utf-8?B?dlVzYlV4dlplYStrYS9TZFBsaFRveHNqNmtYeGtBeDhObUlPT1I3ZTRmQzA2?=
- =?utf-8?B?bUNKQUxYYlpZRXp6TGg5OC9MdlZaaUJYbHp2cUtTQmtBeWIweFEzV2hldElm?=
- =?utf-8?B?UllvOERKWUY5MjdFUVh3TWRUNmxHUGFmaHdKaE8yK2dkb1NMZnpYU3VucUJJ?=
- =?utf-8?B?cTVkYVU0Z0FhMHMyZS9xWWZFMHgycEt1VDlhOGljVm5vOTNUVkJ0NlB1cmI0?=
- =?utf-8?B?cDhhd0k0eHEwcFRyV1BqUXptVkdYc2dkZ1VTMlBaSjdsWHVCakdMYzNTNkFw?=
- =?utf-8?B?dWdDcUR6cTIxV3hOSWxOeFBoekZvRzg1QnpIa2t1dXpiYXJFZTN3cGE0Z3dF?=
- =?utf-8?B?bnFxR2VNaXV1ZklWL0cxS05LUDV2SkpqNXBVbWlkOTI0ekc5aGJyUll5dWFT?=
- =?utf-8?B?ZDVlUUFjNThCN2l0b3hyMlViRUQxLzZNT29rMGoxWmRCclQvUUpSbENhcnpm?=
- =?utf-8?B?djNMRVMrbFhNTmpNeFNqeVhla3RiVzBlZmV3WWc4aVpUMVIyNXd6emNzTHJY?=
- =?utf-8?B?dUUyRmVqVklwMXliWEx4a0NxalB2WFBwUExlTkxWRHFEeTBVeDNqb2FPOGJC?=
- =?utf-8?B?QzdwVlQwTGRLamVZTEdxb2R2OTZNWEN4OXRTYWQvSEJydlNHK2JiQnVUWDhk?=
- =?utf-8?B?STJXNU1pZHFkdzRZWnAyZnBGMlVTRmIrdGhWREtjSnFLZzQ2RW5SbDV0MHNT?=
- =?utf-8?B?WE1PV3k0NklnVjFQcTMraTI4L2hjRy9WZXNIVHFPZFYwSnE1ME8vLy9vc20r?=
- =?utf-8?B?THlKUndtcFhDODQ4Zlo0VXM5RDJUbmxCUzJPdHJucW1YZkErTW81ZnNueUtx?=
- =?utf-8?B?QzNsajZyb1hHRUV6dlgvQXdpVFI3ZHI1K3NWV2QvZSt0TTE2cFNIVkZmNGpz?=
- =?utf-8?B?aENpMmVjeU1aZTFRNmdIcERQclZjNUxacXhDTmdIYnFQbXpPQ0lYWS96d3RE?=
- =?utf-8?B?SDRjdXllaTFSNVcxYUVKSTcvd1hjcnRBSFZ5NmlmVEp6M2dQUXJNZ2Zvc2p3?=
- =?utf-8?B?UmRWRit2QlBWb3BwQjdBdU5RNVJBODc3WXFnSDd3YU5MbmxmckxNejcySis3?=
- =?utf-8?B?NWxsc1N3VEVLdDFmQWpFRVpxRFk5SjVPc2h1WGxKc1A4cXNTczJEdmJ4am1Y?=
- =?utf-8?B?WXQyaUlTM1A5SURkYUpGZENobzVaZThmb3FQVEZYdVNEcnlXWkJBTUFVZW9U?=
- =?utf-8?B?dFJrb1NWMVZRZURFSThqd0lnd1RLcnllZERpc2RQVE85cnlXVnM1dUVjYTRR?=
- =?utf-8?B?cDY2bnBBUmlLTHFoQ3hScGR2anF3YklpckdEOGVGcDgwU1drUnlYWEZiQmFU?=
- =?utf-8?B?OXROVVVvd095UWZTWnFodXJoV1dhb0x4M1U0aERVbCsyU1dZVUNVSnZOckpl?=
- =?utf-8?B?MG03OTFUVFgvYzdLNDJIRzN1UVEvRG9IK0NGNWJueUh1bmFrWEh4am8rTnhV?=
- =?utf-8?B?Y0dwOFJaNG5UMk1icmVTb3l6UUl6N3MwUnBSdU1HOSs5R0NnQVMwRWxPamV2?=
- =?utf-8?B?ZE5vYXNoN0pJMTdHWHNhSG8rKy92Um9qZVpzSmQ0OENBc21vQXd3bFJ4bHJI?=
- =?utf-8?B?dkkwOTI3MHVvdVU3VDhEN3VXRlRFSEY2UHZmVGRXN2oyZk5adzlYZ0lpMFl2?=
- =?utf-8?B?ZmNNSGtrSnJianZiTE1tcHk1UU8xMlEySWxUcTZ4VWwveDF1ZFlVcDRjamVW?=
- =?utf-8?B?RDAzS0NRV0JWVCt3UVovTi9EOXFNS215bWpDZHBQMHFPbDBKTDdhSHl3TXBF?=
- =?utf-8?B?MXFSWFY5V2ZGTXdBeEJoWmhvY016QUFCZUM0NTQ0ZjJ2SzN4Y1FtNDR4OE1Y?=
- =?utf-8?B?TzJ2eVQwY1d6M2gyUEszaDJtRFUvcEk3YkNZM0ROQWxZVDRRUDg5UHpLSWVI?=
- =?utf-8?B?aUE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1715514c-4f8e-4db0-1ceb-08dbbaad3291
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Sep 2023 14:15:25.0900
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: L4ZvzvLK7uSBZZJWeKZ3elPZmq30i8OZ7V3gcfLMDujqSpN5TmaA6smsOwAfoB6FjyVozAfAYPgLGglUrycJODQfECNW+LF/GSl2ImL+fas=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR11MB5274
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Kees Cook <keescook@chromium.org>
-Date: Wed, 20 Sep 2023 13:25:13 -0700
+Hi Linus,
 
-> In the likely pathological case of building sky2 with 16k PAGE_SIZE,
-> make sure there is at least 1 frag_addr in struct rx_ring_info:
-> 
->    In file included from include/linux/skbuff.h:28,
->                     from include/net/net_namespace.h:43,
->                     from include/linux/netdevice.h:38,
->                     from drivers/net/ethernet/marvell/sky2.c:18:
->    drivers/net/ethernet/marvell/sky2.c: In function 'sky2_rx_unmap_skb':
->    include/linux/dma-mapping.h:416:36: warning: array subscript i is outside array bounds of 'dma_addr_t[0]' {aka 'long long unsigned int[]'} [-Warray-bounds=]
->      416 | #define dma_unmap_page(d, a, s, r) dma_unmap_page_attrs(d, a, s, r, 0)
->          |                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->    drivers/net/ethernet/marvell/sky2.c:1257:17: note: in expansion of macro 'dma_unmap_page'
->     1257 |                 dma_unmap_page(&pdev->dev, re->frag_addr[i],
->          |                 ^~~~~~~~~~~~~~
->    In file included from drivers/net/ethernet/marvell/sky2.c:41:
->    drivers/net/ethernet/marvell/sky2.h:2198:25: note: while referencing 'frag_addr'
->     2198 |         dma_addr_t      frag_addr[ETH_JUMBO_MTU >> PAGE_SHIFT];
->          |                         ^~~~~~~~~
-> 
-> With CONFIG_PAGE_SIZE_16KB=y, PAGE_SHIFT == 14, so:
-> 
->   #define ETH_JUMBO_MTU   9000
-> 
-> causes "ETH_JUMBO_MTU >> PAGE_SHIFT" to be 0. Use "?: 1" to solve this build warning.
-> 
-> Cc: Mirko Lindner <mlindner@marvell.com>
-> Cc: Stephen Hemminger <stephen@networkplumber.org>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: netdev@vger.kernel.org
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202309191958.UBw1cjXk-lkp@intel.com/
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+I noticed after sending the PR that since this morning I have email
+delivery problems with lore: "Recipient server unavailable or busy."=20
 
-Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+That is likely something in between my corporate server and lore, as
+messages form other sources are reaching there.
 
-That "nobody uses this HW on non-x86 systems, why bother" is fun each time.
+I'm wondering is if my PR reached somehow your inbox and/or if I have
+to re-send it.
 
-> ---
->  drivers/net/ethernet/marvell/sky2.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/marvell/sky2.h b/drivers/net/ethernet/marvell/sky2.h
-> index ddec1627f1a7..8d0bacf4e49c 100644
-> --- a/drivers/net/ethernet/marvell/sky2.h
-> +++ b/drivers/net/ethernet/marvell/sky2.h
-> @@ -2195,7 +2195,7 @@ struct rx_ring_info {
->  	struct sk_buff	*skb;
->  	dma_addr_t	data_addr;
->  	DEFINE_DMA_UNMAP_LEN(data_size);
-> -	dma_addr_t	frag_addr[ETH_JUMBO_MTU >> PAGE_SHIFT];
-> +	dma_addr_t	frag_addr[ETH_JUMBO_MTU >> PAGE_SHIFT ?: 1];
->  };
->  
->  enum flow_control {
+Thanks!
 
-Thanks,
-Olek
+Paolo
+
 
