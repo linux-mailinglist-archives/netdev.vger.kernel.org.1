@@ -1,78 +1,110 @@
-Return-Path: <netdev+bounces-35574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 925FD7A9C74
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:18:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0B8A7A9CD2
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:24:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B61FD282DF1
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:18:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3042282945
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:23:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D2FB9CA44;
-	Thu, 21 Sep 2023 19:10:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 539A616415;
+	Thu, 21 Sep 2023 19:23:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D3B59CA42
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 19:10:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0305C433C7;
-	Thu, 21 Sep 2023 19:10:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695323414;
-	bh=OsddfhZZNaovHAfvxR6GOOhcxdW6sx5FotsIGV/i4zc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Qf0z3Vh9pRGNCTc2kLn8VPWamMlPuxYFoedseW1XwCBlEWKVCa2jbe+y742ZIMGs0
-	 0lciVaP1Dpg57+sXAV59skXE8kybZzx5uyHawvjgtqwTsmEZvagIKVliLUA0qsPrZp
-	 i+9QfoZMFSHzTXB1i+1BNVbE7FXnjfZEsbue8392YHr0VvAPjWBSFFv6alWeGyIipo
-	 Af8RpgXXt1HqhOd19j060aAhXJkrzuOQNz3PRDSNsAM5ShSpfanytseBpU77NWgw6/
-	 5oTKi8kJEEkGY6q8Ma1w6wMoRxqCY5E+1Q09mrJXPakkXr/+WmG4+1ZdPg5WKLXViL
-	 OVJ79NQdNSW5g==
-Message-ID: <3473bea6-00c8-2949-5029-122b599be9b2@kernel.org>
-Date: Thu, 21 Sep 2023 13:10:13 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3890216400
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 19:23:26 +0000 (UTC)
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F8E3FBB35;
+	Thu, 21 Sep 2023 12:12:33 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-5042bfb4fe9so1808573e87.1;
+        Thu, 21 Sep 2023 12:12:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695323552; x=1695928352; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yfOa60jin+Cg2UGV5vWmkOgyjYutq/4P6GMhlzuMcDo=;
+        b=PLJlxNIyWrNPIcQKpgONFau4S/DloaKpWyLed0pKo2Crv3KQpt0eFbXt4pLTZFCKdp
+         3OtYpe3k+rimHz1mnLNuyb6jWbYZKVk8M0be6iYW26inIwcbup/PcebGVY2GUFhpX2GM
+         MfQ0ZyHe1j/V5UzdKsvsKy58Xf03MkgkZTUG/momHoa7bPC7VBfc+BP85Wa9dGbcpHaq
+         dq13ub1Rq99sqMf2n3Rvz4yTNY9Kkr2Gz5UxScIav7B8ctLx6zGvZutR9bWAv6xe7V6e
+         zE4c/lw9PhyR3eyFacTWFL/l1kfOTy50VGL7RfaUHkyHAbVgmmGwsvnRUzg4QNWCcSiZ
+         ZYFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695323552; x=1695928352;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yfOa60jin+Cg2UGV5vWmkOgyjYutq/4P6GMhlzuMcDo=;
+        b=wIpteHIdYcdmvOa2b3ZaA9H5LSkW6EVH5b/hqQ+7RLZAuqIZx41vSN1NiINb54Zuku
+         aei9OILKIL4ZQR60OsetjnODoZtqp1rmlH6JxTkOdJIV2u2Lw2fD5LYTNkef/J70az6p
+         jK0eMRJ3RKnOl7nxg/0FGvnWFJDYns4hCPQum8RHG2tXWp7X+kh1lN47Xt84z2WYS0+6
+         hrzAcwf0VW4NgCqbZIO16M9sAmVDrLTlwK5bCfvQ0sMaSZ1q9zrBwkbaILgl5fn7p4bf
+         Sbaho/1fH+c9GlZr9uyXsIdPdq6j7vu68YWvYLi9ty7POWMk4j80//2kiQLQYjED6+FV
+         o4bg==
+X-Gm-Message-State: AOJu0YxsxCgcKrNp/5piz3fZCGYm9/f/+1Y5dPAMSZN+B/r+WA5CUgcI
+	1h51DWAbQPbFKLRj3hPkpeM=
+X-Google-Smtp-Source: AGHT+IFiR3BZ50HhvuUo0VjWL52ste+XHJS0kip8vz2GEZHYZy+dHSf6y3rQjd8WF2vTCW0bvKMZ/Q==
+X-Received: by 2002:a05:6512:3147:b0:500:c5df:1872 with SMTP id s7-20020a056512314700b00500c5df1872mr4619332lfi.44.1695323551612;
+        Thu, 21 Sep 2023 12:12:31 -0700 (PDT)
+Received: from skbuf ([188.25.255.147])
+        by smtp.gmail.com with ESMTPSA id l24-20020aa7c318000000b00533349696f1sm1206729edq.16.2023.09.21.12.12.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Sep 2023 12:12:31 -0700 (PDT)
+Date: Thu, 21 Sep 2023 22:12:29 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Tristram.Ha@microchip.com, Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 net-next 3/5] net: dsa: tag_ksz: Extend ksz9477_xmit()
+ for HSR frame duplication
+Message-ID: <20230921191229.72v3ndgli66lyhdy@skbuf>
+References: <20230920114343.1979843-1-lukma@denx.de>
+ <20230920114343.1979843-4-lukma@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH net-next 3/8] inet: implement lockless IP_TOS
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com
-References: <20230921133021.1995349-1-edumazet@google.com>
- <20230921133021.1995349-4-edumazet@google.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20230921133021.1995349-4-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230920114343.1979843-4-lukma@denx.de>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On 9/21/23 7:30 AM, Eric Dumazet wrote:
-> Some reads of inet->tos are racy.
+On Wed, Sep 20, 2023 at 01:43:41PM +0200, Lukasz Majewski wrote:
+> The KSZ9477 has support for HSR (High-Availability Seamless Redundancy).
+> One of its offloading (i.e. performed in the switch IC hardware) features
+> is to duplicate received frame to both HSR aware switch ports.
 > 
-> Add needed READ_ONCE() annotations and convert IP_TOS option lockless.
+> To achieve this goal - the tail TAG needs to be modified. To be more
+> specific, both ports must be marked as destination (egress) ones.
 > 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> The NETIF_F_HW_HSR_DUP flag indicates that the device supports HSR and
+> assures (in HSR core code) that frame is sent only once from HOST to
+> switch with tail tag indicating both ports.
+> 
+> Signed-off-by: Lukasz Majewski <lukma@denx.de>
+> 
 > ---
->  include/net/ip.h                              |  1 -
->  net/dccp/ipv4.c                               |  2 +-
->  net/ipv4/inet_diag.c                          |  2 +-
->  net/ipv4/ip_output.c                          |  4 +--
->  net/ipv4/ip_sockglue.c                        | 29 ++++++++-----------
->  net/ipv4/tcp_ipv4.c                           |  9 +++---
->  net/mptcp/sockopt.c                           |  8 ++---
->  net/sctp/protocol.c                           |  4 +--
->  .../selftests/net/mptcp/mptcp_connect.sh      |  2 +-
->  9 files changed, 28 insertions(+), 33 deletions(-)
-> 
 
-include/net/route.h dereferences sk tos as well.
-net/ipv4/icmp.c has a setting of it
+I'm not sure what in your process causes this, but there is an atypical
+extra new line between the last Signed-off-by: line and ---. Anyway.
 
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
