@@ -1,139 +1,160 @@
-Return-Path: <netdev+bounces-35444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 909857A987A
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:47:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0363E7A9840
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:36:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E84F1C21186
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 17:47:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CEB51C2106C
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 17:36:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98A12171AA;
-	Thu, 21 Sep 2023 17:22:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 221EC18AE0;
+	Thu, 21 Sep 2023 17:10:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11611168B7
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 17:22:28 +0000 (UTC)
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 771135102F
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:15:33 -0700 (PDT)
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38LF7P3e008335;
-	Thu, 21 Sep 2023 15:38:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=k2kLLXvSLj5YVi4WtjW7nxi7sPiTyIKNDigk5CN1lEY=;
- b=HQ1gnIJYUEqzoJzsmq66Z6f0Ko5PRA2Zm5v+2Rs8L65gzqnQcmPVxdlCtnikrq3ie9dx
- Tud/sAB4JjG65RhLsIZQKIYiR6hNpqF89sVQxohJBRghQ/hBvJ3eYteVbZj0UkEaUtno
- wXnFByEGeW9NIEVpBgvky0M3tRHvzU8Yylsevvs3IFEa2xgrdaX5NQ8eVrEGPeUFoAyW
- kwSGfM+lndToBVcFOz3d2JeUDgKy6bIJV0JlfH3ASaOn5RsIrtg/3udMGscYo2u8puwl
- TOlI3bDBvao2Z1npSAvl1KZjl/AqYzf43DoXez1W8R4f23v5GK0XjQa9AKmOGGM+/Ekt RQ== 
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3t82mqjrt8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 21 Sep 2023 15:38:19 +0000
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 38LFcId9013220
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 21 Sep 2023 15:38:18 GMT
-Received: from [10.110.20.98] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.36; Thu, 21 Sep
- 2023 08:38:17 -0700
-Message-ID: <5702613e-ea14-40db-2557-7f8363563e33@quicinc.com>
-Date: Thu, 21 Sep 2023 09:38:03 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6D1C182DC
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 17:10:31 +0000 (UTC)
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A2D06EAD
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:10:03 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-4051fea48a8so14109875e9.2
+        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:10:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google; t=1695316201; x=1695921001; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OCpRQy5aFVcZAnovNBYBG32aGoqs2l5V062iaInDme4=;
+        b=ZViFqG/exH7BFOu+Uy1bm9zfm70HFq4q5PdYjIdSBCNrK7xmD8fE/QMUUrQ07pGx0i
+         w5dE2l2OszGq/TiJuoQB/8zKepRrBOzCcM3VrYQ/VYDQTLmn/Em9N0/znEC23gKzg/05
+         fZ03wiodIvLwXhkOmhsv8gW3mIhFOVFV70wlqNBBx1X6iTOGkrMvkevYPJGBdkFbZZuU
+         2P6yyZWpZi/z0EkGnUKkV3HErS4yXnAziHLYm3pyDAl6dZ4YCjNm/uU6iMEQO1501lgh
+         lFhuDJxCnjpGg2/8IguRQ2GgTG5cUoBGUmZtNlstLXif0RsxrDFKkC5gw9piq2Nru0mN
+         FV1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695316201; x=1695921001;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OCpRQy5aFVcZAnovNBYBG32aGoqs2l5V062iaInDme4=;
+        b=nrWzIOFiEb2dbwQ6T+DTQnVr2/HeFDBnmvWi0uq4lI7VLeYdLSkOYD6VBjnOVMmNPP
+         HkFHhuHVcf3kXCxulx6HcR0uo10sT5omCUwyGkSJWpDzNuHrmWXkEIUNwgmBeG1rd6sO
+         5uA3JR9a9fjsT5vfH9KCFBDklAllle12y4MbnyUJMg1rxt9Y3aMlb5inSltxsvqK8MDI
+         R1cHJpUI/EHKTrGedbZQcEZ7ZmWuHcXKNZRMaui3wnooCfsunGYN8UVAYKgLvWazXUyr
+         dClGOwYaS6NNqWr9kOh90DV8mZ0tt+ux3G987ucvF1JI7F9DIpzpo1BYxE17/K+H3e0J
+         oSYQ==
+X-Gm-Message-State: AOJu0YxkL4XUbSkC05o+MNzpu9nkPe96v4/7E5SX4sE4W09Hg4dAyvuw
+	kqSUIjYqYGj3y30uMnnGvvg5YgBT7cYLI9k5DjQ=
+X-Google-Smtp-Source: AGHT+IEEGHtTkBEuwYW4pmvslrb0EckxI5A8QgaFbGs8wI47y6FHoHEO87io8T2rbmf1lRpQLmBnnw==
+X-Received: by 2002:a5d:410a:0:b0:319:6d91:28bf with SMTP id l10-20020a5d410a000000b003196d9128bfmr5395098wrp.60.1695312081381;
+        Thu, 21 Sep 2023 09:01:21 -0700 (PDT)
+Received: from [10.83.37.178] ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id z16-20020a056000111000b003176eab8868sm2105482wrw.82.2023.09.21.09.01.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Sep 2023 09:01:20 -0700 (PDT)
+Message-ID: <65981909-e330-dc91-a977-032d427cdd6a@arista.com>
+Date: Thu, 21 Sep 2023 17:01:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH net-next] net: qualcomm: rmnet: Add side band flow control
- support
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, <davem@davemloft.net>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <netdev@vger.kernel.org>
-CC: Sean Tranchetti <quic_stranche@quicinc.com>
-References: <20230920003337.1317132-1-quic_subashab@quicinc.com>
- <49fed647-f8aa-857c-4edc-d38cf6a793d7@linux.dev>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v12 net-next 06/23] net/tcp: Add TCP-AO sign to outgoing
+ packets
 Content-Language: en-US
-From: "Subash Abhinov Kasiviswanathan (KS)" <quic_subashab@quicinc.com>
-In-Reply-To: <49fed647-f8aa-857c-4edc-d38cf6a793d7@linux.dev>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ linux-kernel@vger.kernel.org, Andy Lutomirski <luto@amacapital.net>,
+ Ard Biesheuvel <ardb@kernel.org>, Bob Gilligan <gilligan@arista.com>,
+ Dan Carpenter <error27@gmail.com>, David Laight <David.Laight@aculab.com>,
+ Dmitry Safonov <0x7f454c46@gmail.com>, Donald Cassidy <dcassidy@redhat.com>,
+ Eric Biggers <ebiggers@kernel.org>, "Eric W. Biederman"
+ <ebiederm@xmission.com>, Francesco Ruggeri <fruggeri05@gmail.com>,
+ "Gaillardetz, Dominik" <dgaillar@ciena.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+ Ivan Delalande <colona@arista.com>, Leonard Crestez <cdleonard@gmail.com>,
+ "Nassiri, Mohammad" <mnassiri@ciena.com>,
+ Salam Noureddine <noureddine@arista.com>,
+ Simon Horman <simon.horman@corigine.com>,
+ "Tetreault, Francois" <ftetreau@ciena.com>, netdev@vger.kernel.org
+References: <20230918190027.613430-1-dima@arista.com>
+ <20230918190027.613430-7-dima@arista.com>
+ <d0e332b4326eec032b77c7492f501f3c1fbe8242.camel@redhat.com>
+From: Dmitry Safonov <dima@arista.com>
+In-Reply-To: <d0e332b4326eec032b77c7492f501f3c1fbe8242.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: CNCbkl8eMnZ4WcZjYwqn_sZm9f9XARRS
-X-Proofpoint-ORIG-GUID: CNCbkl8eMnZ4WcZjYwqn_sZm9f9XARRS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-09-21_13,2023-09-21_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
- spamscore=0 clxscore=1011 lowpriorityscore=0 mlxscore=0 bulkscore=0
- priorityscore=1501 mlxlogscore=790 impostorscore=0 adultscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2308100000 definitions=main-2309210134
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-On 9/21/2023 4:51 AM, Vadim Fedorenko wrote:
-> On 20/09/2023 01:33, Subash Abhinov Kasiviswanathan wrote:
->> Individual rmnet devices map to specific network types such as internet,
->> multimedia messaging services, IP multimedia subsystem etc. Each of
->> these network types may support varying quality of service for different
->> bearers or traffic types.
+On 9/21/23 12:20, Paolo Abeni wrote:
+> On Mon, 2023-09-18 at 20:00 +0100, Dmitry Safonov wrote:
+>> @@ -615,19 +616,43 @@ static void bpf_skops_write_hdr_opt(struct sock *sk, struct sk_buff *skb,
+>>   * (but it may well be that other scenarios fail similarly).
+>>   */
+>>  static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
+>> -			      struct tcp_out_options *opts)
+>> +			      struct tcp_out_options *opts,
+>> +			      struct tcp_key *key)
+>>  {
+>>  	__be32 *ptr = (__be32 *)(th + 1);
+>>  	u16 options = opts->options;	/* mungable copy */
+>>  
+>> -	if (unlikely(OPTION_MD5 & options)) {
+>> +	if (tcp_key_is_md5(key)) {
+>>  		*ptr++ = htonl((TCPOPT_NOP << 24) | (TCPOPT_NOP << 16) |
+>>  			       (TCPOPT_MD5SIG << 8) | TCPOLEN_MD5SIG);
+>>  		/* overload cookie hash location */
+>>  		opts->hash_location = (__u8 *)ptr;
+>>  		ptr += 4;
+>> -	}
+>> +	} else if (tcp_key_is_ao(key)) {
+>> +#ifdef CONFIG_TCP_AO
 >>
->                   should it be xa_to_value(p)? otherwise txq is always 1
+>> +		struct tcp_ao_key *rnext_key;
+>> +		struct tcp_ao_info *ao_info;
+>> +		u8 maclen;
+>>  
+>> +		ao_info = rcu_dereference_check(tp->ao_info,
+>> +				lockdep_sock_is_held(&tp->inet_conn.icsk_inet.sk));
+>> +		rnext_key = READ_ONCE(ao_info->rnext_key);
+>> +		if (WARN_ON_ONCE(!rnext_key))
+>> +			goto out_ao;
+>> +		maclen = tcp_ao_maclen(key->ao_key);
 > 
+> It looks like only TCP_AO really accesses 'key', and TCP_AO can easily
+> fetch it from ao_info. Can the AO key change in between
+> tcp_get_current_key() and here?
 
-Agree, this does indeed need to be xa_to_value(p)
+Yes, you read it right: current_key can be changed at any moment, when
+the peer asks to start a rotation (tcp_inbound_ao_hash() on RX does
+that). So, here we have to provide the fetched key as ao_key->maclen
+(the length of MAC, the authentication/hash may be different between
+different keys).
 
->> +static u16 rmnet_vnd_select_queue(struct net_device *dev,
->> +                  struct sk_buff *skb,
->> +                  struct net_device *sb_dev)
->> +{
->> +    struct rmnet_priv *priv = netdev_priv(dev);
->> +    void *p = xa_load(&priv->queue_map, skb->mark);
->> +    u8 txq;
->> +
->> +    if (!p && !xa_is_value(p))
->> +        return 0;
+> Otherwise I think it would be better omitting the 'key' argument here
+> and use the 'options' flag to pick TCP_AO vs MD5.
 > 
-> The check is meaningless. I believe you were thinking about
+> And:
 > 
-> if (!p || !xa_is_value(p))
+> 	if (unlikely(OPTION_MD5 & options)) {
 > 
-> But the main question: is it even possible to get something from xarray
-> that won't pass the check? queue_map is filled in the same code, there 
-> is now way (I believe) to change it from anywhere else, right?
-> 
->> +
->> +    txq = xa_to_value(p);
->> +
->> +    netdev_dbg(dev, "mark %u -> txq %u\n", skb->mark, txq);
->> +    return (txq < dev->num_tx_queues) ? txq : 0;
->> +}
+> could possibly be moved under a CONFIG_MD5 compiler conditional.
 
+Thanks,
+          Dmitry
 
-I'll update these checks as well.
-It is not possible for the txq value to exceed the tx_queue limit for a 
-given rmnet device.
-
-> 
 
