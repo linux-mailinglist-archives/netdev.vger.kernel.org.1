@@ -1,135 +1,115 @@
-Return-Path: <netdev+bounces-35542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35481-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 060007A9CB9
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:24:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BE4E7A9AB1
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 20:47:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1C33BB21E97
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:19:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB8762822BF
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 18:47:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BC004D905;
-	Thu, 21 Sep 2023 18:11:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB8CB18048;
+	Thu, 21 Sep 2023 17:49:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45ACB4BDCE
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 18:11:28 +0000 (UTC)
-Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AE988FB02;
-	Thu, 21 Sep 2023 10:54:49 -0700 (PDT)
-Received: by mail-qk1-x72a.google.com with SMTP id af79cd13be357-77410032cedso39257585a.1;
-        Thu, 21 Sep 2023 10:54:49 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E5A918B01
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 17:49:17 +0000 (UTC)
+Received: from mail-io1-xd4a.google.com (mail-io1-xd4a.google.com [IPv6:2607:f8b0:4864:20::d4a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7C328D225
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:43:11 -0700 (PDT)
+Received: by mail-io1-xd4a.google.com with SMTP id ca18e2360f4ac-797f764a6faso81896439f.0
+        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:43:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695318887; x=1695923687; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=U7cHkJ3V+tDc4JCHmCJHLHbSISI10y+DT6XLi9kEwS4=;
-        b=fL7cIJznkO+mFEABeCwVDCYoRmcoghK9hTEvs/y/IUAjwRWT1G46L++6D+eNVFjB9I
-         fVL0L0YFAfICtyLuwfqF1K69eWaU8ii4/JoTerdRki25+OfUzM9DBNd4UAJFGIgXo9oK
-         ePhy6U9Yr9/ZdUXCewi4gn27G7pLDf/TMGV3tSVvJ6wHvdZ/FMR8s3oHtIrsMAJe+uZf
-         BsDvco6N/JaNXzBmzqYI0W0u1RmipWtDoPZbqp68duqC/Ku6i5T8yKJmc20BABYcMh8Y
-         W3l0c+JeYYdIW0AwACPo2DJ3kmFtjHTioXgE7Zpb16VhZyfu0riHs5uit8NZckHkKVq2
-         QQHw==
+        d=google.com; s=20230601; t=1695318191; x=1695922991; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Pzl6G1Eyv/Q2LUGxc5AwBBdY5Bj1hB+8H+ASF74zNG8=;
+        b=bYFQysRVnSZAx4o3DptGEMckxQy5iU3cw3mgZ+EdyOrvbvz5t9B/edPIjNxrJhmpWw
+         n8axsWrkNm7w+1pHBQECu/7YCgg2rsUz6+ic+kG24ksx1hcWDFKLp+FwGtz0IVp+N1Xx
+         yue0iy90DxWyt3l253RH8BJgHrFqQeIoI8JugPp0JbtWg4NqncS0pKiwTaawVwkw1NGh
+         rkzLNYFr+wmM80w8caSCUKtos+PG9Ocqiark5vjzlBEp/v/iOJm7hQHUSsff/rWkmkws
+         zByU0T6OLzEnBtVWPVzGEtMQwBreHM/7IdrmYkfrEpQJhAPRR9Bq6AVJCpRYmHiF7bzB
+         994g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695318887; x=1695923687;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=U7cHkJ3V+tDc4JCHmCJHLHbSISI10y+DT6XLi9kEwS4=;
-        b=BGqyzh8kVHdRkoSI5ngj0ujhubNbiTtmvsCZOw0SQ/xsw2znvMYwKJJ45yuo86kmj4
-         c3HfUwWRVD6GxPsJrs6i02BraMsviEBgATA2qjbo4xX4DIe9D3B2CvE5CKuXI1/qKn7c
-         wDINyRmZplrivNn0N1LTMUUU1ZZLaKIUbcMo6IyFEXmVolpBnU5BTt1E3AeZHSWbJlXM
-         Yj8Q8G90DPRb9z3IGCqXYorFbrROVEUW6MSVGj87O+lE7cOhmg3UUL4I1iIo2sa9xv1N
-         vb61X/s7xACTOBlX7musR2JOvnFDhgvM7KvSecp14kpXLfVDdYIC4EbBbeFTo0+GYNyM
-         WK5g==
-X-Gm-Message-State: AOJu0YwSg6nRh/Vu9n6Aqs6hp6m/yt262Jk3Tz29kJVoFMDJNcozcSxQ
-	OLP19vrPqusn71BsYM+6sFfShJxhLfm7/fvhR9vV5b+jQKMmKQ==
-X-Google-Smtp-Source: AGHT+IFXwd14O3Klb7T/qnAv3+NSV90XXQEhHJaUfO8KyLSBpmpiky7lagddf4rT9Zx3gjhlQ7XJQYRzOAOWrUcmtvY=
-X-Received: by 2002:a67:b913:0:b0:452:7715:ef96 with SMTP id
- q19-20020a67b913000000b004527715ef96mr6430010vsn.21.1695303041349; Thu, 21
- Sep 2023 06:30:41 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1695318191; x=1695922991;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Pzl6G1Eyv/Q2LUGxc5AwBBdY5Bj1hB+8H+ASF74zNG8=;
+        b=HccetdHpJqkZOLV8dZrt62/7wbKOhQOHgR9iW6J2wW4p2+R9WCn/23ZgY8iiowoS2N
+         5Q+55SPi0RGt3CJhPPxVxu2W4s1+BJFedQsl9K7uShU7XlmZrJCSRxJ+7rlmCZ/ryz/1
+         3kmj36qYip+Mh8sf0nw16jNXayzS2R/up2y47L7u4jLj3ooWgvdSZpIuVZyoZ1CcKVZ0
+         IFO5eveUaG76Dx0x9/Naj/2i0Z2dU6x1BCx+l5g+R5nUSCQ37Mz/86xej0/SqZ/VhrrF
+         1lmyCgxFSb2NnNoQMMvUeqRHGyxRCoEec8ueoSxscVXT46qHfRItLxfagQOMSTgvhQq9
+         yPew==
+X-Gm-Message-State: AOJu0YxDUUYnU4hOQZqS+ZOcx7mxDLoJ/gMU2TZdvxCqzixLHHa2dWFX
+	I3f83DWH29cI+VJza/zNxKiKKl1JHPu+hg==
+X-Google-Smtp-Source: AGHT+IFPW6EnCS5+xCgiVQnmTRAgML3UQWJk+NxZuWM0+kComdmNISsfHGZR5RLzC/GyYtCIRVLul4xbVzaJUg==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a25:258d:0:b0:d81:5c03:df95 with SMTP id
+ l135-20020a25258d000000b00d815c03df95mr70830ybl.12.1695303025363; Thu, 21 Sep
+ 2023 06:30:25 -0700 (PDT)
+Date: Thu, 21 Sep 2023 13:30:13 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20230919175323.144902-1-jrife@google.com> <650af4001eb7c_37ac7329443@willemb.c.googlers.com.notmuch>
- <550df73160cd600f797823b86fde2c2b3526b133.camel@redhat.com>
-In-Reply-To: <550df73160cd600f797823b86fde2c2b3526b133.camel@redhat.com>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Thu, 21 Sep 2023 09:30:05 -0400
-Message-ID: <CAF=yD-K3oLn++V_zJMjGRXdiPh2qi+Fit6uOh4z4HxuuyCOyog@mail.gmail.com>
-Subject: Re: [PATCH net v4 3/3] net: prevent address rewrite in kernel_bind()
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Jordan Rife <jrife@google.com>, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, netdev@vger.kernel.org, dborkman@kernel.org, 
-	philipp.reisner@linbit.com, lars.ellenberg@linbit.com, 
-	christoph.boehmwalder@linbit.com, axboe@kernel.dk, airlied@redhat.com, 
-	chengyou@linux.alibaba.com, kaishen@linux.alibaba.com, jgg@ziepe.ca, 
-	leon@kernel.org, bmt@zurich.ibm.com, isdn@linux-pingi.de, ccaulfie@redhat.com, 
-	teigland@redhat.com, mark@fasheh.com, jlbec@evilplan.org, 
-	joseph.qi@linux.alibaba.com, sfrench@samba.org, pc@manguebit.com, 
-	lsahlber@redhat.com, sprasad@microsoft.com, tom@talpey.com, 
-	horms@verge.net.au, ja@ssi.bg, pablo@netfilter.org, kadlec@netfilter.org, 
-	fw@strlen.de, santosh.shilimkar@oracle.com, stable@vger.kernel.org
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.459.ge4e396fd5e-goog
+Message-ID: <20230921133021.1995349-1-edumazet@google.com>
+Subject: [PATCH net-next 0/8] inet: more data-race fixes
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-0.5 required=5.0 tests=BAYES_00,DATE_IN_PAST_03_06,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-8.0 required=5.0 tests=BAYES_00,DATE_IN_PAST_03_06,
+	DKIMWL_WL_MED,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Sep 21, 2023 at 4:35=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On Wed, 2023-09-20 at 09:30 -0400, Willem de Bruijn wrote:
-> > Jordan Rife wrote:
-> > > Similar to the change in commit 0bdf399342c5("net: Avoid address
-> > > overwrite in kernel_connect"), BPF hooks run on bind may rewrite the
-> > > address passed to kernel_bind(). This change
-> > >
-> > > 1) Makes a copy of the bind address in kernel_bind() to insulate
-> > >    callers.
-> > > 2) Replaces direct calls to sock->ops->bind() with kernel_bind()
-> > >
-> > > Link: https://lore.kernel.org/netdev/20230912013332.2048422-1-jrife@g=
-oogle.com/
-> > > Fixes: 4fbac77d2d09 ("bpf: Hooks for sys_bind")
-> > > Cc: stable@vger.kernel.org
-> > > Signed-off-by: Jordan Rife <jrife@google.com>
-> >
-> > Reviewed-by: Willem de Bruijn <willemb@google.com>
->
-> I fear this is going to cause a few conflicts with other trees. We can
-> still take it, but at very least we will need some acks from the
-> relevant maintainers.
->
-> I *think* it would be easier split this and patch 1/3 in individual
-> patches targeting the different trees, hopefully not many additional
-> patches will be required. What do you think?
+This series fixes some existing data-races on inet fields:
 
-Roughly how many patches would result from this one patch. From the
-stat line I count { block/drbd, char/agp, infiniband, isdn, fs/dlm,
-fs/ocfs2, fs/smb, netfilter, rds }. That's worst case nine callers
-plus the core patch to net/socket.c?
+inet->mc_ttl, inet->pmtudisc, inet->tos, inet->uc_index,
+inet->mc_index and inet->mc_addr.
 
-If logistically simpler and you prefer the approach, we can also
-revisit Jordan's original approach, which embedded the memcpy inside
-the BPF branches.
+While fixing them, we convert eight socket options
+to lockless implementation.
 
-That has the slight benefit to in-kernel callers that it limits the
-cost of the memcpy to cgroup_bpf_enabled. But adds a superfluous
-second copy to the more common userspace callers, again at least only
-if cgroup_bpf_enabled.
+Eric Dumazet (8):
+  inet: implement lockless IP_MULTICAST_TTL
+  inet: implement lockless IP_MTU_DISCOVER
+  inet: implement lockless IP_TOS
+  inet: lockless getsockopt(IP_OPTIONS)
+  inet: lockless getsockopt(IP_MTU)
+  inet: implement lockless getsockopt(IP_UNICAST_IF)
+  inet: lockless IP_PKTOPTIONS implementation
+  inet: implement lockless getsockopt(IP_MULTICAST_IF)
 
-If so, it should at least move the whole logic around those BPF hooks
-into helper functions.
+ include/net/ip.h                              |  14 +-
+ net/dccp/ipv4.c                               |   2 +-
+ net/ipv4/datagram.c                           |   6 +-
+ net/ipv4/inet_diag.c                          |   2 +-
+ net/ipv4/ip_output.c                          |  13 +-
+ net/ipv4/ip_sockglue.c                        | 192 ++++++++----------
+ net/ipv4/ping.c                               |   8 +-
+ net/ipv4/raw.c                                |  19 +-
+ net/ipv4/tcp_ipv4.c                           |   9 +-
+ net/ipv4/udp.c                                |  18 +-
+ net/mptcp/sockopt.c                           |   8 +-
+ net/netfilter/ipvs/ip_vs_sync.c               |   4 +-
+ net/sctp/protocol.c                           |   4 +-
+ .../selftests/net/mptcp/mptcp_connect.sh      |   2 +-
+ 14 files changed, 147 insertions(+), 154 deletions(-)
+
+-- 
+2.42.0.459.ge4e396fd5e-goog
+
 
