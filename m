@@ -1,58 +1,75 @@
-Return-Path: <netdev+bounces-35579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35585-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DD9C7A9CD0
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:24:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33AEB7A9CC6
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:24:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84BD028325D
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:23:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39A151C213AA
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:24:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84E8C15AED;
-	Thu, 21 Sep 2023 19:22:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B8D19CA7F;
+	Thu, 21 Sep 2023 19:24:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64AAF9CA7E;
-	Thu, 21 Sep 2023 19:22:53 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 256CF10250C;
-	Thu, 21 Sep 2023 12:19:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=y/4WeEF6bN1yrtbIGksz8Co0XtSt537OFniIJItRBBI=; b=HCsMc/KJYehWkA0EELVwxmv8nP
-	YmnIs0f3MLpD3Vo6XnE0jEplVdB5aOiYfkVoQ0qkyliMh/l62SO0UwjUMgZiP99EEhqQoxolOv2Pt
-	GFg6Dz5QObtx5A9AbcRLdcGqQ2pFGlkdDBYFG76YoSEtCC0EUhXpisPvn/waj6jX0/9E=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qjPD0-0077lE-4D; Thu, 21 Sep 2023 21:19:30 +0200
-Date: Thu, 21 Sep 2023 21:19:30 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Parthiban.Veerasooran@microchip.com
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	corbet@lwn.net, Steen.Hegelund@microchip.com, rdunlap@infradead.org,
-	horms@kernel.org, casper.casan@gmail.com, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, Horatiu.Vultur@microchip.com,
-	Woojung.Huh@microchip.com, Nicolas.Ferre@microchip.com,
-	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com
-Subject: Re: [RFC PATCH net-next 1/6] net: ethernet: implement OPEN Alliance
- control transaction interface
-Message-ID: <61e316c5-e504-4ad1-93a3-f2df5a16b654@lunn.ch>
-References: <20230908142919.14849-1-Parthiban.Veerasooran@microchip.com>
- <20230908142919.14849-2-Parthiban.Veerasooran@microchip.com>
- <8d53ca8d-bcf6-4673-a8ff-b621d700576e@lunn.ch>
- <9615b403-52c1-f24f-382f-8eea3ddfcf04@microchip.com>
- <4c1d0d38-c459-4722-bead-7660d85f4925@lunn.ch>
- <e037b12b-e592-f451-102e-61401c7ea5d0@microchip.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F088114F89
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 19:24:22 +0000 (UTC)
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAC14EBCC6;
+	Thu, 21 Sep 2023 12:23:12 -0700 (PDT)
+Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-50435ad51bbso312179e87.2;
+        Thu, 21 Sep 2023 12:23:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695324191; x=1695928991; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=x4itH0RtPrQrvEWQ7YNqEtHSYRc/MZwID9TMRLsspzo=;
+        b=FOwbGl1N95WlEG3mzvcCIhT8gDBYTnHPSXeHj9rl8fZUyEZPXJOoqUAz9BA3wtHWsv
+         gt/AKpELILOGyIt4n946Pj5Ocw92hZZtCfoRnMgAafroFd6520DMiCR7FnBEzp0nJpTJ
+         Tc8u77BFrnEsoEKlJpCal44OFxTf7K/Arl1yBIjMUgVVtKJPTG/1d6MsMnQmJXcCg6db
+         EeUbNqHrgJh34tOqeha0PbpqMdnroQ3FETh4kriJM5PdxQ2lx3QOOHWBydIQIW0JXPJC
+         sztJfptemvA2tkjEkWz+h/IQWamaqvopjDGcZ/H2Vj9zm+JMj/QBM43uLr6QiD3dIQc2
+         msAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695324191; x=1695928991;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=x4itH0RtPrQrvEWQ7YNqEtHSYRc/MZwID9TMRLsspzo=;
+        b=MN3rS+ERGJQi9knZjSaPSmh/o0LuJV3Ql3/kVz8z60yWVAFvHQdTQD/otxVBBD4kcA
+         xE0wghzNy23R7f4JCMXLyS4WgqEqEpVA/feSDtlDsRvprV7JC9Oq/5aqB688I9yZCE0B
+         PFdS6j6EBDrkoHCyVALXqbeOzAY1YGOd5BSZD33qj52rFkdyB0aM3m2khTnDh77IkUrh
+         mhttdbONtF3UY1MUU4/zzTJo8zGXNCI7KY4qr06ZuWuqE1gZmZ1/6Lf/kNtbSwTDYzFE
+         SseXwxIaRdevcTjTlnWrbesyomtdq1q0np/NwNUKe4jk2Y26IDrIuQDadR5ygCWgJ/uB
+         V81Q==
+X-Gm-Message-State: AOJu0Yxa12pVqHwtD5noWL/FCRIckKTL5XnFZP5URbb+WQs4j9kWs0KO
+	iVKH2fKRLXyVrOUke1Nzo7E=
+X-Google-Smtp-Source: AGHT+IFr/QOQNTwaADJFkWONIUg85Frzsn+vPGhJj1JJdU1yCZkcp3NVAdN2nnHZvoVDAJqP9Bj//w==
+X-Received: by 2002:a05:6512:23a2:b0:503:258d:643c with SMTP id c34-20020a05651223a200b00503258d643cmr6689482lfv.21.1695324190909;
+        Thu, 21 Sep 2023 12:23:10 -0700 (PDT)
+Received: from skbuf ([188.25.255.147])
+        by smtp.gmail.com with ESMTPSA id b20-20020aa7d494000000b00531990ec4dbsm1229876edr.54.2023.09.21.12.23.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Sep 2023 12:23:10 -0700 (PDT)
+Date: Thu, 21 Sep 2023 22:23:08 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Tristram.Ha@microchip.com, Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 net-next 0/5] net: dsa: hsr: Enable HSR HW offloading
+ for KSZ9477
+Message-ID: <20230921192308.kntudhbwc4j4skza@skbuf>
+References: <20230920114343.1979843-1-lukma@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,25 +78,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e037b12b-e592-f451-102e-61401c7ea5d0@microchip.com>
+In-Reply-To: <20230920114343.1979843-1-lukma@denx.de>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> Yes, as "struct oa_tc6" and its members are not or going to be accessed 
-> in the MAC driver, I will consider this as an opaque structure and 
-> declare it as void *opaque_oa_tc6 in the MAC driver private structure 
-> "struct lan865x_priv" and will pass to the APIs exported from oa_tc6.c lib.
-> 
-> Is my understanding correct?
+Hi Lukasz,
 
-Yes.
+On Wed, Sep 20, 2023 at 01:43:38PM +0200, Lukasz Majewski wrote:
+> Code: v6.6.0-rc1+ Linux repository
 
-If the structure is going to be truly opaque, i suggest having it in
-the C file, not the H file.
+Your patches conflict with Oleksij's ACL patches, merged on the 14th of September.
+https://patchwork.kernel.org/project/netdevbpf/patch/20230914131145.23336-1-o.rempel@pengutronix.de/
 
-	Andrew
+Please always submit patches formatted on the most recent tip of the
+"main" branch of https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git
+at the time of submission, not "v6.6.0-rc1+ Linux repository". There is
+nothing that will be done with patches formatted on older trees.
+
+https://patchwork.kernel.org/project/netdevbpf/patch/20230920114343.1979843-2-lukma@denx.de/
+netdev/apply 	fail 	Patch does not apply to net-next
 
