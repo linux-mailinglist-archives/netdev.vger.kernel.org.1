@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-35628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD88F7AA5B2
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 01:37:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CD847AA5B9
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 01:38:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by am.mirrors.kernel.org (Postfix) with ESMTP id 47CD01F21BA3
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 23:37:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 1F12E28344E
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 23:38:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFD7E29413;
-	Thu, 21 Sep 2023 23:37:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA5B22941D;
+	Thu, 21 Sep 2023 23:37:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EBF216429
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 23:37:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F67A16429
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 23:37:56 +0000 (UTC)
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4650E129;
-	Thu, 21 Sep 2023 16:37:29 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 999F918C
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 16:37:52 -0700 (PDT)
 Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38LNbLQq001748;
-	Thu, 21 Sep 2023 23:37:25 GMT
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38LNbLDj001793;
+	Thu, 21 Sep 2023 23:37:48 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : from : subject : to : cc : references : in-reply-to :
+ mime-version : subject : to : cc : references : from : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=J4tPXsGAIwPWKiDS0fRDZ3GSuFmDHRRzMOCHHXbXTNI=;
- b=jUMDd6s+YrFom/9i5YFDnXx/DOisLyRKxnVuRvbUrrAznZ2vi5DkTKVN3iXF43zjGpik
- zzP/sSunnfQKgDvbaeteKAfeW2HAgU3vOv3eMsIqNQxHKsFj5+xWWKm7Fruy/ccsO3lu
- 38brUJUSh81BItccWQsX3NM7kIwc0mv2/mY+knmZ37cmiZ3y2iHLFvpHNnROBM0HZfQu
- mZ1rhVLJSU1cpkIsRHNZgPEZ5IbA0DCTo18ifC7y+gP54JMXMQyZIhQmgTv7cEuq53KT
- 2hdXuloFhRxvaPSsuwiGTjJRS7gRXt2rZ7hEts+eYhBn6CuAwLIPpIWydJiyjWO95vh2 Sg== 
+ bh=oPgLwC1sigPqhnkN886g7hVjTJIWydlwpW+ZWPC14iU=;
+ b=nLZvtm+EDfpnFStmFEd/oRKFiXoWQtyyfQccSIW9KrC1AF2SidIqgrjfi07eWUUPAIZ+
+ ETVRXDqCs+MMq+gSCyGkgaAfJfFpRTSxQNZtVUSV5irFGiJ0w2pEaCMv6qDMFhSBIat/
+ fVDXN3HY9/bB9wuiPl4QJNn7OTRm+RVRDU3YzS+AJ2Aw7mCuLVMs6nk/dqmnakhb5CJB
+ Rmh+QBtWZIlu17AG88XpdG2w0g2/wNH/T+cqCR9d+3L9EHJGzdaMslcigai4qUcMuqZB
+ Z2d8mhNnjVKa0iaPXpW6Sc/Ou7sjtnfvnrGuUJ7fKJ0U+X9IDTJPkET7uxMUekSuR1pO Iw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t8w11uwjb-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t8w11ux9f-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 21 Sep 2023 23:37:24 +0000
+	Thu, 21 Sep 2023 23:37:47 +0000
 Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38LNbMEg001904;
-	Thu, 21 Sep 2023 23:37:23 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t8w11uw9a-1
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38LNbUuc002947;
+	Thu, 21 Sep 2023 23:37:46 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t8w11ux8w-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 21 Sep 2023 23:37:22 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38LNAYmd025939;
-	Thu, 21 Sep 2023 23:32:37 GMT
-Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3t8tspmrb2-1
+	Thu, 21 Sep 2023 23:37:46 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38LN89KZ029361;
+	Thu, 21 Sep 2023 23:37:46 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3t8tsnmsu6-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 21 Sep 2023 23:32:37 +0000
+	Thu, 21 Sep 2023 23:37:46 +0000
 Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38LNWbVU21758336
+	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38LNbjR77209712
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 21 Sep 2023 23:32:37 GMT
+	Thu, 21 Sep 2023 23:37:45 GMT
 Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EE45858053;
-	Thu, 21 Sep 2023 23:32:36 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 068EC58053;
+	Thu, 21 Sep 2023 23:37:45 +0000 (GMT)
 Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 927AA58043;
-	Thu, 21 Sep 2023 23:32:34 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id C5EF65805F;
+	Thu, 21 Sep 2023 23:37:43 +0000 (GMT)
 Received: from [9.171.4.137] (unknown [9.171.4.137])
 	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 21 Sep 2023 23:32:34 +0000 (GMT)
-Message-ID: <0a150c58-5fdc-5e8d-1ea6-861406f2c70a@linux.ibm.com>
-Date: Fri, 22 Sep 2023 01:32:33 +0200
+	Thu, 21 Sep 2023 23:37:43 +0000 (GMT)
+Message-ID: <f7b690e1-2afb-1126-8ca7-210dfa77ba85@linux.ibm.com>
+Date: Fri, 22 Sep 2023 01:37:42 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,23 +72,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
  Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH net-next 1/8] net: implement lockless SO_PRIORITY
+To: Eric Dumazet <edumazet@google.com>,
+        "David S . Miller"
+ <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <20230921202818.2356959-1-edumazet@google.com>
+ <20230921202818.2356959-2-edumazet@google.com>
 From: Wenjia Zhang <wenjia@linux.ibm.com>
-Subject: Re: [PATCH net-next v3 05/18] net/smc: reserve CHID range for SMC-D
- virtual device
-To: Wen Gu <guwen@linux.alibaba.com>, kgraul@linux.ibm.com, jaka@linux.ibm.com,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com
-Cc: alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <1695302360-46691-1-git-send-email-guwen@linux.alibaba.com>
- <1695302360-46691-6-git-send-email-guwen@linux.alibaba.com>
-In-Reply-To: <1695302360-46691-6-git-send-email-guwen@linux.alibaba.com>
+In-Reply-To: <20230921202818.2356959-2-edumazet@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Q_NCqUikah0oJnJqcpPiaUiAp1LeTz-o
-X-Proofpoint-GUID: R0t4DEMOwiRSCu9U8-jWZl9kEOzVC1wW
+X-Proofpoint-ORIG-GUID: 2fAsoeLvgoNnAjlTXJSQRFsM8mu9JNrf
+X-Proofpoint-GUID: drAn2rdJC6OH1_Xl6dURzVQWEVRvkKQ1
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2023-09-21_19,2023-09-21_01,2023-05-22_02
@@ -106,45 +104,42 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 
 
-On 21.09.23 15:19, Wen Gu wrote:
-> This patch reserve CHID range from 0xFF00 to 0xFFFF for SMC-D virtual
-> device and introduces helpers to identify them.
+On 21.09.23 22:28, Eric Dumazet wrote:
+> This is a followup of 8bf43be799d4 ("net: annotate data-races
+> around sk->sk_priority").
 > 
-> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+> sk->sk_priority can be read and written without holding the socket lock.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 > ---
->   net/smc/smc_ism.h | 15 +++++++++++++++
->   1 file changed, 15 insertions(+)
+>   drivers/net/ppp/pppoe.c           |  2 +-
+>   include/net/bluetooth/bluetooth.h |  2 +-
+>   net/appletalk/aarp.c              |  2 +-
+>   net/ax25/af_ax25.c                |  2 +-
+>   net/bluetooth/l2cap_sock.c        |  2 +-
+>   net/can/j1939/socket.c            |  2 +-
+>   net/can/raw.c                     |  2 +-
+>   net/core/sock.c                   | 23 ++++++++++++-----------
+>   net/dccp/ipv6.c                   |  2 +-
+>   net/ipv4/inet_diag.c              |  2 +-
+>   net/ipv4/ip_output.c              |  2 +-
+>   net/ipv4/tcp_ipv4.c               |  2 +-
+>   net/ipv4/tcp_minisocks.c          |  2 +-
+>   net/ipv6/inet6_connection_sock.c  |  2 +-
+>   net/ipv6/ip6_output.c             |  2 +-
+>   net/ipv6/tcp_ipv6.c               |  4 ++--
+>   net/mptcp/sockopt.c               |  2 +-
+>   net/netrom/af_netrom.c            |  2 +-
+>   net/rose/af_rose.c                |  2 +-
+>   net/sched/em_meta.c               |  2 +-
+>   net/sctp/ipv6.c                   |  2 +-
+>   net/smc/af_smc.c                  |  2 +-
+>   net/x25/af_x25.c                  |  2 +-
+>   net/xdp/xsk.c                     |  2 +-
+>   24 files changed, 36 insertions(+), 35 deletions(-)
 > 
-> diff --git a/net/smc/smc_ism.h b/net/smc/smc_ism.h
-> index 14d2e77..2ecc8de 100644
-> --- a/net/smc/smc_ism.h
-> +++ b/net/smc/smc_ism.h
-> @@ -15,6 +15,9 @@
->   
->   #include "smc.h"
->   
-> +#define SMC_VIRT_ISM_CHID_MAX		0xFFFF
-> +#define SMC_VIRT_ISM_CHID_MIN		0xFF00
-> +
->   struct smcd_dev_list {	/* List of SMCD devices */
->   	struct list_head list;
->   	struct mutex mutex;	/* Protects list of devices */
-> @@ -57,4 +60,16 @@ static inline int smc_ism_write(struct smcd_dev *smcd, u64 dmb_tok,
->   	return rc < 0 ? rc : 0;
->   }
->   
-> +static inline bool __smc_ism_is_virtdev(u16 chid)
-> +{
-> +	return (chid >= SMC_VIRT_ISM_CHID_MIN && chid <= SMC_VIRT_ISM_CHID_MAX);
-> +}
-> +
-> +static inline bool smc_ism_is_virtdev(struct smcd_dev *smcd)
-> +{
-> +	u16 chid = smcd->ops->get_chid(smcd);
-> +
-> +	return __smc_ism_is_virtdev(chid);
-> +}
-> +
-I'm wondering if barrier is needed here.
->   #endif
+
+Thank you, Eric, for the fix!
+
+Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
 
