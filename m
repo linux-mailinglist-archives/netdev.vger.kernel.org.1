@@ -1,112 +1,139 @@
-Return-Path: <netdev+bounces-35432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C7A77A9818
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:30:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 909857A987A
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:47:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80FFC281BA7
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 17:30:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E84F1C21186
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 17:47:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DEE617989;
-	Thu, 21 Sep 2023 17:09:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98A12171AA;
+	Thu, 21 Sep 2023 17:22:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D019461;
-	Thu, 21 Sep 2023 17:09:22 +0000 (UTC)
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EC6A5FF9;
-	Thu, 21 Sep 2023 10:09:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=0AQbnpGz46/mpizmCCyRAg/7hwEOBwjnI7rzkRejNrw=;
-	t=1695316146; x=1696525746; b=G2QMVjnzufFtmb5P7z6Q3J/+ZBHqtVk0szWK9vtGuV0QGOG
-	Rl2rp3sat3NFCzXUBLcGFGt33bdeHBFGA4bM9k+W4y2dNeMRzqjcEyZ+JG+y0YABFh+DboCzqNl82
-	SSMff83SGx7kk711+kx9sw+/iTFRWuSmGmk9VPX06ga5nXFE8TxcW9DEzDcAlMtSrlRlCEFm8JJLB
-	wILgcdynH9Vgm4bY6l9cYzwtCl79qf3FYGesV+dEl/Z0LmN5uoZS9jFf9xvqvYpSoCCT3j2Ovr6Zp
-	1GWlEMXZDI/QQ0SP7ttzPlvuPSo/5FOG5G9PY5i+0MrtTqalVT6AexQGW4+hNc8Q==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1qjLQQ-00DReL-34;
-	Thu, 21 Sep 2023 17:17:07 +0200
-Message-ID: <73ddab4151160d4d30aa83fb24ba6c976125da4a.camel@sipsolutions.net>
-Subject: Re: [RFC PATCH 1/4] tracing: add __print_sym() to replace
- __print_symbolic()
-From: Johannes Berg <johannes@sipsolutions.net>
-To: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Cc: "linux-trace-kernel@vger.kernel.org"
- <linux-trace-kernel@vger.kernel.org>,  "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "linux-wireless@vger.kernel.org"
- <linux-wireless@vger.kernel.org>
-Date: Thu, 21 Sep 2023 17:17:06 +0200
-In-Reply-To: <20230921105129.cd040deee13e.I9bd2617499f0d170df58471bc51379742190f92d@changeid>
-References: <20230921085129.261556-5-johannes@sipsolutions.net>
-	 <20230921105129.cd040deee13e.I9bd2617499f0d170df58471bc51379742190f92d@changeid>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11611168B7
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 17:22:28 +0000 (UTC)
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 771135102F
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:15:33 -0700 (PDT)
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38LF7P3e008335;
+	Thu, 21 Sep 2023 15:38:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=k2kLLXvSLj5YVi4WtjW7nxi7sPiTyIKNDigk5CN1lEY=;
+ b=HQ1gnIJYUEqzoJzsmq66Z6f0Ko5PRA2Zm5v+2Rs8L65gzqnQcmPVxdlCtnikrq3ie9dx
+ Tud/sAB4JjG65RhLsIZQKIYiR6hNpqF89sVQxohJBRghQ/hBvJ3eYteVbZj0UkEaUtno
+ wXnFByEGeW9NIEVpBgvky0M3tRHvzU8Yylsevvs3IFEa2xgrdaX5NQ8eVrEGPeUFoAyW
+ kwSGfM+lndToBVcFOz3d2JeUDgKy6bIJV0JlfH3ASaOn5RsIrtg/3udMGscYo2u8puwl
+ TOlI3bDBvao2Z1npSAvl1KZjl/AqYzf43DoXez1W8R4f23v5GK0XjQa9AKmOGGM+/Ekt RQ== 
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3t82mqjrt8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 21 Sep 2023 15:38:19 +0000
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 38LFcId9013220
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 21 Sep 2023 15:38:18 GMT
+Received: from [10.110.20.98] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.36; Thu, 21 Sep
+ 2023 08:38:17 -0700
+Message-ID: <5702613e-ea14-40db-2557-7f8363563e33@quicinc.com>
+Date: Thu, 21 Sep 2023 09:38:03 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH net-next] net: qualcomm: rmnet: Add side band flow control
+ support
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <netdev@vger.kernel.org>
+CC: Sean Tranchetti <quic_stranche@quicinc.com>
+References: <20230920003337.1317132-1-quic_subashab@quicinc.com>
+ <49fed647-f8aa-857c-4edc-d38cf6a793d7@linux.dev>
+Content-Language: en-US
+From: "Subash Abhinov Kasiviswanathan (KS)" <quic_subashab@quicinc.com>
+In-Reply-To: <49fed647-f8aa-857c-4edc-d38cf6a793d7@linux.dev>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: CNCbkl8eMnZ4WcZjYwqn_sZm9f9XARRS
+X-Proofpoint-ORIG-GUID: CNCbkl8eMnZ4WcZjYwqn_sZm9f9XARRS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-09-21_13,2023-09-21_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
+ spamscore=0 clxscore=1011 lowpriorityscore=0 mlxscore=0 bulkscore=0
+ priorityscore=1501 mlxlogscore=790 impostorscore=0 adultscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2308100000 definitions=main-2309210134
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, 2023-09-21 at 08:51 +0000, Johannes Berg wrote:
->=20
->  - Is it correct that we can assume RCU critical section when in
->    the lookup function? The SKB code currently does, but I may
->    not ever have actually run this code yet.
-
-Well, I could easily answer that myself, and no, it's incorrect.
-
-It'd be really useful though for these lookups to be able to do them
-under RCU, so I think I'll fold this?
-
---- a/include/linux/tracepoint.h
-+++ b/include/linux/tracepoint.h
-@@ -34,7 +34,7 @@ struct trace_eval_map {
- struct trace_sym_def {
- 	const char		*system;
- 	const char		*symbol_id;
--	/* may return NULL */
-+	/* may return NULL, called under rcu_read_lock() */
- 	const char *		(*lookup)(unsigned long long);
- 	/*
- 	 * Must print the list: ', { val, "name"}, ...'
---- a/kernel/trace/trace_output.c
-+++ b/kernel/trace/trace_output.c
-@@ -155,11 +155,13 @@ trace_print_sym_seq(struct trace_seq *p, unsigned
-long long val,
- 	const char *ret =3D trace_seq_buffer_ptr(p);
- 	const char *name;
-=20
-+	rcu_read_lock();
- 	name =3D lookup(val);
- 	if (name)
- 		trace_seq_puts(p, name);
- 	else
- 		trace_seq_printf(p, "0x%llx", val);
-+	rcu_read_unlock();
-=20
- 	trace_seq_putc(p, 0);
-=20
 
 
-johannes
+On 9/21/2023 4:51 AM, Vadim Fedorenko wrote:
+> On 20/09/2023 01:33, Subash Abhinov Kasiviswanathan wrote:
+>> Individual rmnet devices map to specific network types such as internet,
+>> multimedia messaging services, IP multimedia subsystem etc. Each of
+>> these network types may support varying quality of service for different
+>> bearers or traffic types.
+>>
+>                   should it be xa_to_value(p)? otherwise txq is always 1
+> 
 
+Agree, this does indeed need to be xa_to_value(p)
+
+>> +static u16 rmnet_vnd_select_queue(struct net_device *dev,
+>> +                  struct sk_buff *skb,
+>> +                  struct net_device *sb_dev)
+>> +{
+>> +    struct rmnet_priv *priv = netdev_priv(dev);
+>> +    void *p = xa_load(&priv->queue_map, skb->mark);
+>> +    u8 txq;
+>> +
+>> +    if (!p && !xa_is_value(p))
+>> +        return 0;
+> 
+> The check is meaningless. I believe you were thinking about
+> 
+> if (!p || !xa_is_value(p))
+> 
+> But the main question: is it even possible to get something from xarray
+> that won't pass the check? queue_map is filled in the same code, there 
+> is now way (I believe) to change it from anywhere else, right?
+> 
+>> +
+>> +    txq = xa_to_value(p);
+>> +
+>> +    netdev_dbg(dev, "mark %u -> txq %u\n", skb->mark, txq);
+>> +    return (txq < dev->num_tx_queues) ? txq : 0;
+>> +}
+
+
+I'll update these checks as well.
+It is not possible for the txq value to exceed the tx_queue limit for a 
+given rmnet device.
+
+> 
 
