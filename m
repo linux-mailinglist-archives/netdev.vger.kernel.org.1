@@ -1,213 +1,108 @@
-Return-Path: <netdev+bounces-35382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85FC77A93D7
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 13:25:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA39C7A940E
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 14:10:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 21002B209BA
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 11:25:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29F01281231
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 12:10:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55BB2A956;
-	Thu, 21 Sep 2023 11:25:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F44FAD2C;
+	Thu, 21 Sep 2023 12:10:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44C16946D
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 11:25:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C3B0C4AF77;
-	Thu, 21 Sep 2023 11:25:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 386A9A956
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 12:10:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14856C4E663;
+	Thu, 21 Sep 2023 12:10:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695295545;
-	bh=t4ry7//CzzJohA2MxLm7JobvhK5R16tidfZmy/skTKI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=E+RHM/0nm/ZfWk42C534jVIWFMefKm7Ty3hKQ4Hyswv04LpkLVCqkWxeGIL3oKKBP
-	 fcDaBLBNm3x1VYbuiBOfYJ9iKZWaDMh2R96h3b8+HAIyg/nWYdcGOmTkF6plHHuyqW
-	 PVUlJ6n/XUjv0i7wtNkiDMyvcqyZNs6eOho7EyGKVxBXXU8VfAis+v/J0iHL/DYriE
-	 k5L16ftgwm+V2nOqoVSIfDB6WRekOeZs1QAiidvYArDmj2oVgyHSuwEpqAESiaPKtw
-	 J2CddwE0QGM2Iayy6tSHYx41BksAOShY4Xd7Uo9tGKvlDfmVlSAjiEElXdLvqK6rUn
-	 0cg6plV0ZdZGw==
-Message-ID: <4a9c1f89-99c6-40dc-a56c-64d06386d5a1@kernel.org>
-Date: Thu, 21 Sep 2023 14:25:38 +0300
+	s=k20201202; t=1695298243;
+	bh=3zUerJob8LTaLhGfDXM3f8fNe7+0Vp+OP7wcaT6sgF0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=UEI4nhusOGx2X/DJ36lARYRKoo5KvubaseFamdvlR+YELv35D+Ps9pJ9pbXkq3OnP
+	 JoWgE04zwdU7oP0s1PH2F+4xjsh3PiJjUsrq95W2FniU4N4yefFdfCebjBlm14j656
+	 u5G9eI+SBC/Z/r6nu7TAKyJVraOnhpQqFHa2g08OpZVzghOvPdRAYMRzYaah/SWASA
+	 wTzkxCMPIWzbW08MAYVWW7qLf7qia5RLSpKl5wGXbsRprALAgoP09lmURY8WzuWeXb
+	 IW6qZpd0km/CXSqxWbJAPFHsjCt6yXB5Xg37vLYeukeIHr4Y/8Hr9Sr/D9cV8hLYPc
+	 6tE4GxhLaR64w==
+From: Leon Romanovsky <leon@kernel.org>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Leon Romanovsky <leonro@nvidia.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-rdma@vger.kernel.org,
+	Mark Bloch <mbloch@nvidia.com>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Patrisious Haddad <phaddad@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH mlx5-next 0/9] Support IPsec packet offload in multiport RoCE devices
+Date: Thu, 21 Sep 2023 15:10:26 +0300
+Message-ID: <cover.1695296682.git.leon@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 2/3] net: ethernet: ti: am65-cpsw: add mqprio
- qdisc offload in channel mode
-Content-Language: en-US
-To: Simon Horman <horms@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, vladimir.oltean@nxp.com, s-vadapalli@ti.com, srk@ti.com,
- vigneshr@ti.com, p-varis@ti.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20230920121530.4710-1-rogerq@kernel.org>
- <20230920121530.4710-3-rogerq@kernel.org>
- <20230921104529.GI224399@kernel.org>
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20230921104529.GI224399@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Simon,
+From: Leon Romanovsky <leonro@nvidia.com>
 
-On 21/09/2023 13:45, Simon Horman wrote:
-> On Wed, Sep 20, 2023 at 03:15:29PM +0300, Roger Quadros wrote:
->> From: Grygorii Strashko <grygorii.strashko@ti.com>
->>
->> This patch adds MQPRIO Qdisc offload in full 'channel' mode which allows
->> not only setting up pri:tc mapping, but also configuring TX shapers
->> (rate-limiting) on external port FIFOs.
->>
->> The MQPRIO Qdisc offload is expected to work with or without VLAN/priority
->> tagged packets.
->>
->> The CPSW external Port FIFO has 8 Priority queues. The rate-limit can be
->> set for each of these priority queues. Which Priority queue a packet is
->> assigned to depends on PN_REG_TX_PRI_MAP register which maps header
->> priority to switch priority.
->>
->> The header priority of a packet is assigned via the RX_PRI_MAP_REG which
->> maps packet priority to header priority.
->>
->> The packet priority is either the VLAN priority (for VLAN tagged packets)
->> or the thread/channel offset.
->>
->> For simplicity, we assign the same priority queue to all queues of a
->> Traffic Class so it can be rate-limited correctly.
->>
->> Configuration example:
->>  ethtool -L eth1 tx 5
->>  ethtool --set-priv-flags eth1 p0-rx-ptype-rrobin off
->>
->>  tc qdisc add dev eth1 parent root handle 100: mqprio num_tc 3 \
->>  map 0 0 1 2 0 0 0 0 0 0 0 0 0 0 0 0 \
->>  queues 1@0 1@1 1@2 hw 1 mode channel \
->>  shaper bw_rlimit min_rate 0 100mbit 200mbit max_rate 0 101mbit 202mbit
->>
->>  tc qdisc replace dev eth2 handle 100: parent root mqprio num_tc 1 \
->>  map 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 queues 1@0 hw 1
->>
->>  ip link add link eth1 name eth1.100 type vlan id 100
->>  ip link set eth1.100 type vlan egress 0:0 1:1 2:2 3:3 4:4 5:5 6:6 7:7
->>
->> In the above example two ports share the same TX CPPI queue 0 for low
->> priority traffic. 3 traffic classes are defined for eth1 and mapped to:
->> TC0 - low priority, TX CPPI queue 0 -> ext Port 1 fifo0, no rate limit
->> TC1 - prio 2, TX CPPI queue 1 -> ext Port 1 fifo1, CIR=100Mbit/s, EIR=1Mbit/s
->> TC2 - prio 3, TX CPPI queue 2 -> ext Port 1 fifo2, CIR=200Mbit/s, EIR=2Mbit/s
->>
->> Signed-off-by: Grygorii Strashko <grygorii.strashko@ti.com>
->> Signed-off-by: Roger Quadros <rogerq@kernel.org>
-> 
-> ...
-> 
->> +static int am65_cpsw_mqprio_verify_shaper(struct am65_cpsw_port *port,
->> +					  struct tc_mqprio_qopt_offload *mqprio)
->> +{
->> +	struct am65_cpsw_mqprio *p_mqprio = &port->qos.mqprio;
->> +	struct netlink_ext_ack *extack = mqprio->extack;
->> +	u64 min_rate_total = 0, max_rate_total = 0;
->> +	u32 min_rate_msk = 0, max_rate_msk = 0;
->> +	bool has_min_rate, has_max_rate;
->> +	int num_tc, i;
->> +
->> +	if (!(mqprio->flags & TC_MQPRIO_F_SHAPER))
->> +		return 0;
->> +
->> +	if (mqprio->shaper != TC_MQPRIO_SHAPER_BW_RATE)
->> +		return 0;
->> +
->> +	has_min_rate = !!(mqprio->flags & TC_MQPRIO_F_MIN_RATE);
->> +	has_max_rate = !!(mqprio->flags & TC_MQPRIO_F_MAX_RATE);
->> +
->> +	if (!has_min_rate && has_max_rate) {
->> +		NL_SET_ERR_MSG_MOD(extack, "min_rate is required with max_rate");
->> +		return -EOPNOTSUPP;
->> +	}
->> +
->> +	if (!has_min_rate)
->> +		return 0;
->> +
->> +	num_tc = mqprio->qopt.num_tc;
->> +
->> +	for (i = num_tc - 1; i >= 0; i--) {
->> +		u32 ch_msk;
->> +
->> +		if (mqprio->min_rate[i])
->> +			min_rate_msk |= BIT(i);
->> +		min_rate_total +=  mqprio->min_rate[i];
->> +
->> +		if (has_max_rate) {
->> +			if (mqprio->max_rate[i])
->> +				max_rate_msk |= BIT(i);
->> +			max_rate_total +=  mqprio->max_rate[i];
->> +
->> +			if (!mqprio->min_rate[i] && mqprio->max_rate[i]) {
->> +				NL_SET_ERR_MSG_FMT_MOD(extack,
->> +						       "TX tc%d rate max>0 but min=0\n",
->> +						       i);
->> +				return -EINVAL;
->> +			}
->> +
->> +			if (mqprio->max_rate[i] &&
->> +			    mqprio->max_rate[i] < mqprio->min_rate[i]) {
->> +				NL_SET_ERR_MSG_FMT_MOD(extack,
->> +						       "TX tc%d rate min(%llu)>max(%llu)\n",
->> +						       i, mqprio->min_rate[i],
->> +						       mqprio->max_rate[i]);
->> +				return -EINVAL;
->> +			}
->> +		}
->> +
->> +		ch_msk = GENMASK(num_tc - 1, i);
->> +		if ((min_rate_msk & BIT(i)) && (min_rate_msk ^ ch_msk)) {
->> +			NL_SET_ERR_MSG_FMT_MOD(extack,
->> +					       "TX min rate limiting has to be enabled sequentially hi->lo tx_rate_msk%x\n",
->> +					       min_rate_msk);
-> 
-> Hi Grygorii and Roger,
-> 
-> An allmodconfig build with gcc-13 W=1 warns that:
-> 
->  drivers/net/ethernet/ti/am65-cpsw-qos.c: In function 'am65_cpsw_mqprio_verify_shaper':
->  ./include/linux/netlink.h:116:13: warning: 'am65_cpsw_qos: TX min rate l...' directive output truncated writing 85 bytes into a region of size 80 [-Wformat-truncation=]
-> 
->> +			return -EINVAL;
->> +		}
->> +
->> +		if ((max_rate_msk & BIT(i)) && (max_rate_msk ^ ch_msk)) {
->> +			NL_SET_ERR_MSG_FMT_MOD(extack,
->> +					       "TX max rate limiting has to be enabled sequentially hi->lo tx_rate_msk%x\n",
->> +					       max_rate_msk);
-> 
-> Likewise, here too.
+Hi,
 
-OK. I'll have to reduce the message by 5 characters. Thanks!
+This series from Patrisious extends mlx5 to support IPsec packet offload
+in multiport devices (MPV, see [1] for more details).
 
-> 
->> +			return -EINVAL;
->> +		}
->> +	}
->> +
->> +	min_rate_total = TO_MBPS(min_rate_total);
->> +	max_rate_total = TO_MBPS(max_rate_total);
->> +
->> +	p_mqprio->shaper_en = true;
->> +	p_mqprio->max_rate_total = max_t(u64, min_rate_total, max_rate_total);
->> +
->> +	return 0;
->> +}
-> 
-> ,..
+These devices have single flow steering logic and two netdev interfaces,
+which require extra logic to manage IPsec configurations as they performed
+on netdevs.
+
+Thanks
+
+[1] https://lore.kernel.org/linux-rdma/20180104152544.28919-1-leon@kernel.org/
+
+Thanks
+
+Patrisious Haddad (9):
+  RDMA/mlx5: Send events from IB driver about device affiliation state
+  net/mlx5: Register mlx5e priv to devcom in MPV mode
+  net/mlx5: Store devcom pointer inside IPsec RoCE
+  net/mlx5: Add alias flow table bits
+  net/mlx5: Implement alias object allow and create functions
+  net/mlx5: Add create alias flow table function to ipsec roce
+  net/mlx5: Configure IPsec steering for egress RoCEv2 MPV traffic
+  net/mlx5: Configure IPsec steering for ingress RoCEv2 MPV traffic
+  net/mlx5: Handle IPsec steering upon master unbind/bind
+
+ drivers/infiniband/hw/mlx5/main.c             |  17 +
+ drivers/net/ethernet/mellanox/mlx5/core/cmd.c |  70 +++
+ drivers/net/ethernet/mellanox/mlx5/core/en.h  |   8 +
+ .../mellanox/mlx5/core/en_accel/ipsec.c       |   3 +-
+ .../mellanox/mlx5/core/en_accel/ipsec.h       |  25 +-
+ .../mellanox/mlx5/core/en_accel/ipsec_fs.c    | 122 +++-
+ .../mlx5/core/en_accel/ipsec_offload.c        |   3 +-
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |  63 ++
+ .../net/ethernet/mellanox/mlx5/core/fs_core.c |  10 +-
+ .../ethernet/mellanox/mlx5/core/lib/devcom.h  |   1 +
+ .../mellanox/mlx5/core/lib/ipsec_fs_roce.c    | 542 +++++++++++++++++-
+ .../mellanox/mlx5/core/lib/ipsec_fs_roce.h    |  14 +-
+ .../net/ethernet/mellanox/mlx5/core/main.c    |   6 +
+ .../ethernet/mellanox/mlx5/core/mlx5_core.h   |  22 +
+ include/linux/mlx5/device.h                   |   2 +
+ include/linux/mlx5/driver.h                   |   2 +
+ include/linux/mlx5/mlx5_ifc.h                 |  56 +-
+ 17 files changed, 925 insertions(+), 41 deletions(-)
 
 -- 
-cheers,
--roger
+2.41.0
+
 
