@@ -1,421 +1,113 @@
-Return-Path: <netdev+bounces-35356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E7F87A900A
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 02:06:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E3317A901F
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 02:17:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 243BC1C20AA7
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 00:06:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B9A6281910
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 00:17:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E76C361;
-	Thu, 21 Sep 2023 00:06:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F11C361;
+	Thu, 21 Sep 2023 00:17:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88C5B179
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 00:06:41 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56B4ACF
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 17:06:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695254799; x=1726790799;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=i073M4JOYiPIIs/8A/DMZJZ3u62SvZhupk71CioOZK8=;
-  b=lf5/pknGxhp3fFiqKWfSFj/fxMitgs+8s3yf/JbfR0yIzU4DQzwWYow2
-   hnhyOO4wx31cVyQemSaO+YuHMDqNAvORm3nkig7dFXe9mQTexZ35YkULZ
-   04INsyG8J0q7FFVHxhaTDlQxcjsFnTZpe2XH6qS5SqLXz1ggSSeGZ8zSZ
-   53+8LXIVg93FYCeGZd1xX67Z8Jb2ulTl7sIBysGHUyppg0I3UMV1nByoC
-   EzyGdyVCnIoiT8nh7z9oBZCA/8sMPLMh4cQmIJKJBkoo3JhUx3v1qLtFP
-   j2hCx2QcCiifPZYAGx0WLrxTzLEsqBU42csbFuaWHzKz3wCvw5df7my1y
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="377674157"
-X-IronPort-AV: E=Sophos;i="6.03,162,1694761200"; 
-   d="scan'208";a="377674157"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2023 17:06:37 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10839"; a="696528156"
-X-IronPort-AV: E=Sophos;i="6.03,162,1694761200"; 
-   d="scan'208";a="696528156"
-Received: from jekeller-desk.amr.corp.intel.com ([10.166.241.1])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2023 17:06:37 -0700
-From: Jacob Keller <jacob.e.keller@intel.com>
-To: netdev@vger.kernel.org,
-	Intel Wired LAN <intel-wired-lan@lists.osuosl.org>
-Cc: Anthony Nguyen <anthony.l.nguyen@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	David Miller <davem@davemloft.net>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	kernel test robot <lkp@intel.com>
-Subject: [PATCH net-next] ice: fix linking when CONFIG_PTP_1588_CLOCK=n
-Date: Wed, 20 Sep 2023 17:06:33 -0700
-Message-ID: <20230921000633.1238097-1-jacob.e.keller@intel.com>
-X-Mailer: git-send-email 2.41.0.1.g9857a21e0017.dirty
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F104F17E
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 00:17:09 +0000 (UTC)
+Received: from mail-ua1-x92e.google.com (mail-ua1-x92e.google.com [IPv6:2607:f8b0:4864:20::92e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D58FACF
+	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 17:17:07 -0700 (PDT)
+Received: by mail-ua1-x92e.google.com with SMTP id a1e0cc1a2514c-7a8aec82539so163001241.2
+        for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 17:17:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695255427; x=1695860227; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lVjqvKAKBEExCNM0G7YjTOPY1DzXNTD+n1Ka2Ltpgys=;
+        b=RjRwsCEKaPM4fMeSfFFDTZvqW25ws+xJZkMBHb6MQSASbNgja+xsVDPN6ANIU2JCeM
+         RTO+kfZqdr0Mg5lhO3PjKo+XAP+m4nBQKZiBXLcVMl9TYb66rd+z51chPgj2UOcyb0Mr
+         UeQ8r4ZcLZW8eXj1fvbt9BGp3KI2abkHb25xQPHjpIdHOS4oyC5OxJhWLwyQoeWjB9rD
+         MQvArTcMOa/dz9QRRan/+P0/UKklSaJE/Zog0FbJah+bBSjN0PXISu7H8Vw4X254vgP8
+         V6fdNMEzPDTQXn13i0XdY/WQMUxNVLU0bcuwNzfdMxUFV5jI228IS/54BDikqXri2sGz
+         CtMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695255427; x=1695860227;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lVjqvKAKBEExCNM0G7YjTOPY1DzXNTD+n1Ka2Ltpgys=;
+        b=U9DYSLe5T53vKOtZCD1WCaTzEJpLhUmfiw8Du9z9r8BDJD9xFPQ/D1hRCHAMifTfX6
+         a6WTpuZfrTSzlI9OI9oDMQ6WOBXnhcTDAN9G3ukVGCI12fLsg5fCiB1lD2fC1dzQnS6i
+         lnTW5JnaWuuhkD+31zHeJXjrwBdv5FXc/CUsa5tcRVneT7CafiQJIkgaQhTG++hLUtjR
+         qRbOcxe4B4LLcAVteIEftMB/Ey5yNn8dNBLbiG2Du+y1Cwgm9N5oG/XYM6IrIuPoZ4rh
+         VvEZoHH05Ht51J6NdXXBlUGH3RS6WemWxx05TjSwhYnDnfLD4rVKXAuH9FCg0XY8bu14
+         Fp6Q==
+X-Gm-Message-State: AOJu0YyZSl6foZEFI4HstTxndht0RKxEunsNsdeB4InSx4qjEIRLsx+A
+	ls8hbAXSp4nbdaIzoD3x8InUIl9K8aYil7h/+JdBI9WW
+X-Google-Smtp-Source: AGHT+IEDHojdvlRsR+KAIoLpQGm8zYvaTzhOuhDCyoMVStkDMOy3teeY8OmUnSXWbVVlseiPZMTr4DqN77w050Kx5eU=
+X-Received: by 2002:a1f:c942:0:b0:48f:e2eb:6dd2 with SMTP id
+ z63-20020a1fc942000000b0048fe2eb6dd2mr3860304vkf.9.1695255426773; Wed, 20 Sep
+ 2023 17:17:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+References: <20230920201715.418491-1-edumazet@google.com> <CAM0EoMm87U7sGESCtcekr-Avsx4+WMnOS7HuNztJdE=G8VFs+g@mail.gmail.com>
+In-Reply-To: <CAM0EoMm87U7sGESCtcekr-Avsx4+WMnOS7HuNztJdE=G8VFs+g@mail.gmail.com>
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Wed, 20 Sep 2023 20:16:30 -0400
+Message-ID: <CAF=yD-LZmJ-a0kO8UtKaj+NTwYaRFQfZkDVHTthz4gNYJfCN4w@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 0/5] net_sched: sch_fq: round of improvements
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Eric Dumazet <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, Soheil Hassas Yeganeh <soheil@google.com>, 
+	Neal Cardwell <ncardwell@google.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The recent support for DPLL introduced by commit 8a3a565ff210 ("ice: add
-admin commands to access cgu configuration") and commit d7999f5ea64b ("ice:
-implement dpll interface to control cgu") broke linking the ice driver if
-CONFIG_PTP_1588_CLOCK=n:
+On Wed, Sep 20, 2023 at 7:22=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com>=
+ wrote:
+>
+> On Wed, Sep 20, 2023 at 4:17=E2=80=AFPM Eric Dumazet <edumazet@google.com=
+> wrote:
+> >
+> > For FQ tenth anniversary, it was time for making it faster.
+> >
+> > The FQ part (as in Fair Queue) is rather expensive, because
+> > we have to classify packets and store them in a per-flow structure,
+> > and add this per-flow structure in a hash table. Then the RR lists
+> > also add cache line misses.
+> >
+> > Most fq qdisc are almost idle. Trying to share NIC bandwidth has
+> > no benefits, thus the qdisc could behave like a FIFO.
+> >
+> > This series brings a 5 % throughput increase in intensive
+> > tcp_rr workload, and 13 % increase for (unpaced) UDP packets.
+> >
+> > v2: removed an extra label (build bot).
+> >     Fix an accidental increase of stat_internal_packets counter
+> >     in fast path.
+> >     Added "constify qdisc_priv()" patch to allow fq_fastpath_check()
+> >     first parameter to be const.
+> >     typo on 'eligible' (Willem)
+>
+> For the patchset:
+> Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
 
-ld: vmlinux.o: in function `ice_init_feature_support':
-(.text+0x8702b8): undefined reference to `ice_is_phy_rclk_present'
-ld: (.text+0x8702cd): undefined reference to `ice_is_cgu_present'
-ld: (.text+0x8702d9): undefined reference to `ice_is_clock_mux_present_e810t'
-ld: vmlinux.o: in function `ice_dpll_init_info_direct_pins':
-ice_dpll.c:(.text+0x894167): undefined reference to `ice_cgu_get_pin_freq_supp'
-ld: ice_dpll.c:(.text+0x894197): undefined reference to `ice_cgu_get_pin_name'
-ld: ice_dpll.c:(.text+0x8941a8): undefined reference to `ice_cgu_get_pin_type'
-ld: vmlinux.o: in function `ice_dpll_update_state':
-ice_dpll.c:(.text+0x894494): undefined reference to `ice_get_cgu_state'
-ld: vmlinux.o: in function `ice_dpll_init':
-(.text+0x8953d5): undefined reference to `ice_get_cgu_rclk_pin_info'
-
-The first commit broke things by calling functions in
-ice_init_feature_support that are compiled as part of ice_ptp_hw.o,
-including:
-
-* ice_is_phy_rclk_present
-* ice_is_clock_mux_present_e810t
-* ice_is_cgU_present
-
-The second commit continued the break by calling several CGU functions
-defined in ice_ptp_hw.c in the DPLL code.
-Because the ice_dpll.c file is compiled unconditionally, it will not
-link when CONFIG_PTP_1588_CLOCK=n.
-
-It might be possible to break this dependency and expose those functions
-without CONFIG_PTP_1588_CLOCK, but that is not clear to me.
-
-For the DPLL case, simply compile ice_dpll.o only when we have
-CONFIG_PTP_1588_CLOCK. Add stub no-op implementation of ice_dpll_init() and
-ice_dpll_uninit() when CONFIG_PTP_1588_CLOCK=n into ice_dpll.h
-
-The other functions are part of checking the netlist to see if hardware
-features are enabled. These checks don't really belong in ice_ptp_hw.c, and
-make more sense as part of the ice_common.c file. We already have
-ice_is_gps_in_netlist() in ice_common.c which is doing a similar check.
-
-Move the functions into ice_common.c and rename them to have the similar
-postfix of "in_netlist()" to be more expressive of what they are actually
-checking.
-
-This also makes the ice_find_netlist_node only called from within
-ice_common.c, so its safe to mark it static and stop declaring it in the
-ice_common.h header as well.
-
-Fixes: 8a3a565ff210 ("ice: add admin commands to access cgu configuration")
-Fixes: d7999f5ea64b ("ice: implement dpll interface to control cgu")
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202309191214.TaYEct4H-lkp@intel.com
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
----
-This is an alternative approach to fixing the same compilation errors of the
-ice driver compared to [1]. It does not include the fix for idpf which I
-have no issue with.
-
-I prefer this over the stubs for the functions in ice_ptp_hw.h, and I had
-proposed these a while ago as part of [2], but the DPLL code merged first
-and had apparently duplicated some of the work.
-
-[1]: https://lore.kernel.org/netdev/20230920180745.1607563-1-aleksander.lobakin@intel.com/T/#mfeeb599a95334e78dba08330a6bd8edee7843fbb
-[2]: https://lore.kernel.org/netdev/20230918212814.435688-1-anthony.l.nguyen@intel.com/
-
- drivers/net/ethernet/intel/ice/Makefile     |  5 +-
- drivers/net/ethernet/intel/ice/ice_common.c | 66 ++++++++++++++++++++-
- drivers/net/ethernet/intel/ice/ice_common.h |  6 +-
- drivers/net/ethernet/intel/ice/ice_dpll.h   |  6 +-
- drivers/net/ethernet/intel/ice/ice_lib.c    |  6 +-
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 66 ---------------------
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h |  3 -
- 7 files changed, 76 insertions(+), 82 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/Makefile b/drivers/net/ethernet/intel/ice/Makefile
-index 00806ddf5bf0..0679907980f7 100644
---- a/drivers/net/ethernet/intel/ice/Makefile
-+++ b/drivers/net/ethernet/intel/ice/Makefile
-@@ -34,8 +34,7 @@ ice-y := ice_main.o	\
- 	 ice_lag.o	\
- 	 ice_ethtool.o  \
- 	 ice_repr.o	\
--	 ice_tc_lib.o	\
--	 ice_dpll.o
-+	 ice_tc_lib.o
- ice-$(CONFIG_PCI_IOV) +=	\
- 	ice_sriov.o		\
- 	ice_virtchnl.o		\
-@@ -44,7 +43,7 @@ ice-$(CONFIG_PCI_IOV) +=	\
- 	ice_vf_mbx.o		\
- 	ice_vf_vsi_vlan_ops.o	\
- 	ice_vf_lib.o
--ice-$(CONFIG_PTP_1588_CLOCK) += ice_ptp.o ice_ptp_hw.o
-+ice-$(CONFIG_PTP_1588_CLOCK) += ice_ptp.o ice_ptp_hw.o ice_dpll.o
- ice-$(CONFIG_DCB) += ice_dcb.o ice_dcb_nl.o ice_dcb_lib.o
- ice-$(CONFIG_RFS_ACCEL) += ice_arfs.o
- ice-$(CONFIG_XDP_SOCKETS) += ice_xsk.o
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 8f31ae449948..a1f1f037f327 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -477,9 +477,8 @@ ice_aq_get_netlist_node(struct ice_hw *hw, struct ice_aqc_get_link_topo *cmd,
-  * netlist. When found ICE_SUCCESS is returned, ICE_ERR_DOES_NOT_EXIST
-  * otherwise. If node_handle provided, it would be set to found node handle.
-  */
--int
--ice_find_netlist_node(struct ice_hw *hw, u8 node_type_ctx, u8 node_part_number,
--		      u16 *node_handle)
-+static int ice_find_netlist_node(struct ice_hw *hw, u8 node_type_ctx,
-+				 u8 node_part_number, u16 *node_handle)
- {
- 	struct ice_aqc_get_link_topo cmd;
- 	u8 rec_node_part_number;
-@@ -2764,6 +2763,67 @@ bool ice_is_pf_c827(struct ice_hw *hw)
- 	return false;
- }
- 
-+/**
-+ * ice_is_phy_rclk_in_netlist
-+ * @hw: pointer to the hw struct
-+ *
-+ * Check if the PHY Recovered Clock device is present in the netlist
-+ */
-+bool ice_is_phy_rclk_in_netlist(struct ice_hw *hw)
-+{
-+	if (ice_find_netlist_node(hw, ICE_AQC_LINK_TOPO_NODE_TYPE_CLK_CTRL,
-+				  ICE_AQC_GET_LINK_TOPO_NODE_NR_C827, NULL) &&
-+	    ice_find_netlist_node(hw, ICE_AQC_LINK_TOPO_NODE_TYPE_CLK_CTRL,
-+				  ICE_AQC_GET_LINK_TOPO_NODE_NR_E822_PHY, NULL))
-+		return false;
-+
-+	return true;
-+}
-+
-+/**
-+ * ice_is_clock_mux_in_netlist
-+ * @hw: pointer to the hw struct
-+ *
-+ * Check if the Clock Multiplexer device is present in the netlist
-+ */
-+bool ice_is_clock_mux_in_netlist(struct ice_hw *hw)
-+{
-+	if (ice_find_netlist_node(hw, ICE_AQC_LINK_TOPO_NODE_TYPE_CLK_MUX,
-+				  ICE_AQC_GET_LINK_TOPO_NODE_NR_GEN_CLK_MUX,
-+				  NULL))
-+		return false;
-+
-+	return true;
-+}
-+
-+/**
-+ * ice_is_cgu_in_netlist - check for CGU presence
-+ * @hw: pointer to the hw struct
-+ *
-+ * Check if the Clock Generation Unit (CGU) device is present in the netlist.
-+ * Save the CGU part number in the hw structure for later use.
-+ * Return:
-+ * * true - cgu is present
-+ * * false - cgu is not present
-+ */
-+bool ice_is_cgu_in_netlist(struct ice_hw *hw)
-+{
-+	if (!ice_find_netlist_node(hw, ICE_AQC_LINK_TOPO_NODE_TYPE_CLK_CTRL,
-+				   ICE_AQC_GET_LINK_TOPO_NODE_NR_ZL30632_80032,
-+				   NULL)) {
-+		hw->cgu_part_number = ICE_AQC_GET_LINK_TOPO_NODE_NR_ZL30632_80032;
-+		return true;
-+	} else if (!ice_find_netlist_node(hw,
-+					  ICE_AQC_LINK_TOPO_NODE_TYPE_CLK_CTRL,
-+					  ICE_AQC_GET_LINK_TOPO_NODE_NR_SI5383_5384,
-+					  NULL)) {
-+		hw->cgu_part_number = ICE_AQC_GET_LINK_TOPO_NODE_NR_SI5383_5384;
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
- /**
-  * ice_is_gps_in_netlist
-  * @hw: pointer to the hw struct
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
-index 47a75651ca38..7a966a0c224f 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.h
-+++ b/drivers/net/ethernet/intel/ice/ice_common.h
-@@ -93,11 +93,11 @@ ice_aq_get_phy_caps(struct ice_port_info *pi, bool qual_mods, u8 report_mode,
- 		    struct ice_aqc_get_phy_caps_data *caps,
- 		    struct ice_sq_cd *cd);
- bool ice_is_pf_c827(struct ice_hw *hw);
-+bool ice_is_phy_rclk_in_netlist(struct ice_hw *hw);
-+bool ice_is_clock_mux_in_netlist(struct ice_hw *hw);
-+bool ice_is_cgu_in_netlist(struct ice_hw *hw);
- bool ice_is_gps_in_netlist(struct ice_hw *hw);
- int
--ice_find_netlist_node(struct ice_hw *hw, u8 node_type_ctx, u8 node_part_number,
--		      u16 *node_handle);
--int
- ice_aq_get_netlist_node(struct ice_hw *hw, struct ice_aqc_get_link_topo *cmd,
- 			u8 *node_part_number, u16 *node_handle);
- int
-diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.h b/drivers/net/ethernet/intel/ice/ice_dpll.h
-index 9c524c4bdfd7..2dfe764b81e1 100644
---- a/drivers/net/ethernet/intel/ice/ice_dpll.h
-+++ b/drivers/net/ethernet/intel/ice/ice_dpll.h
-@@ -97,8 +97,12 @@ struct ice_dplls {
- 	s32 output_phase_adj_max;
- };
- 
-+#if IS_ENABLED(CONFIG_PTP_1588_CLOCK)
- void ice_dpll_init(struct ice_pf *pf);
--
- void ice_dpll_deinit(struct ice_pf *pf);
-+#else
-+static inline void ice_dpll_init(struct ice_pf *pf) { }
-+static inline void ice_dpll_deinit(struct ice_pf *pf) { }
-+#endif
- 
- #endif
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index 1549890a3cbf..3f0f780110de 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -3989,14 +3989,14 @@ void ice_init_feature_support(struct ice_pf *pf)
- 	case ICE_DEV_ID_E810_XXV_QSFP:
- 	case ICE_DEV_ID_E810_XXV_SFP:
- 		ice_set_feature_support(pf, ICE_F_DSCP);
--		if (ice_is_phy_rclk_present(&pf->hw))
-+		if (ice_is_phy_rclk_in_netlist(&pf->hw))
- 			ice_set_feature_support(pf, ICE_F_PHY_RCLK);
- 		/* If we don't own the timer - don't enable other caps */
- 		if (!ice_pf_src_tmr_owned(pf))
- 			break;
--		if (ice_is_cgu_present(&pf->hw))
-+		if (ice_is_cgu_in_netlist(&pf->hw))
- 			ice_set_feature_support(pf, ICE_F_CGU);
--		if (ice_is_clock_mux_present_e810t(&pf->hw))
-+		if (ice_is_clock_mux_in_netlist(&pf->hw))
- 			ice_set_feature_support(pf, ICE_F_SMA_CTRL);
- 		if (ice_gnss_is_gps_present(&pf->hw))
- 			ice_set_feature_support(pf, ICE_F_GNSS);
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index f839f186797d..de16cf14c4b2 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -3556,45 +3556,6 @@ int ice_clear_phy_tstamp(struct ice_hw *hw, u8 block, u8 idx)
- 	}
- }
- 
--/**
-- * ice_is_phy_rclk_present - check recovered clk presence
-- * @hw: pointer to the hw struct
-- *
-- * Check if the PHY Recovered Clock device is present in the netlist
-- * Return:
-- * * true - device found in netlist
-- * * false - device not found
-- */
--bool ice_is_phy_rclk_present(struct ice_hw *hw)
--{
--	if (ice_find_netlist_node(hw, ICE_AQC_LINK_TOPO_NODE_TYPE_CLK_CTRL,
--				  ICE_AQC_GET_LINK_TOPO_NODE_NR_C827, NULL) &&
--	    ice_find_netlist_node(hw, ICE_AQC_LINK_TOPO_NODE_TYPE_CLK_CTRL,
--				  ICE_AQC_GET_LINK_TOPO_NODE_NR_E822_PHY, NULL))
--		return false;
--
--	return true;
--}
--
--/**
-- * ice_is_clock_mux_present_e810t
-- * @hw: pointer to the hw struct
-- *
-- * Check if the Clock Multiplexer device is present in the netlist
-- * Return:
-- * * true - device found in netlist
-- * * false - device not found
-- */
--bool ice_is_clock_mux_present_e810t(struct ice_hw *hw)
--{
--	if (ice_find_netlist_node(hw, ICE_AQC_LINK_TOPO_NODE_TYPE_CLK_MUX,
--				  ICE_AQC_GET_LINK_TOPO_NODE_NR_GEN_CLK_MUX,
--				  NULL))
--		return false;
--
--	return true;
--}
--
- /**
-  * ice_get_pf_c827_idx - find and return the C827 index for the current pf
-  * @hw: pointer to the hw struct
-@@ -3708,33 +3669,6 @@ int ice_get_phy_tx_tstamp_ready(struct ice_hw *hw, u8 block, u64 *tstamp_ready)
- 	}
- }
- 
--/**
-- * ice_is_cgu_present - check for CGU presence
-- * @hw: pointer to the hw struct
-- *
-- * Check if the Clock Generation Unit (CGU) device is present in the netlist
-- * Return:
-- * * true - cgu is present
-- * * false - cgu is not present
-- */
--bool ice_is_cgu_present(struct ice_hw *hw)
--{
--	if (!ice_find_netlist_node(hw, ICE_AQC_LINK_TOPO_NODE_TYPE_CLK_CTRL,
--				   ICE_AQC_GET_LINK_TOPO_NODE_NR_ZL30632_80032,
--				   NULL)) {
--		hw->cgu_part_number = ICE_AQC_GET_LINK_TOPO_NODE_NR_ZL30632_80032;
--		return true;
--	} else if (!ice_find_netlist_node(hw,
--					  ICE_AQC_LINK_TOPO_NODE_TYPE_CLK_CTRL,
--					  ICE_AQC_GET_LINK_TOPO_NODE_NR_SI5383_5384,
--					  NULL)) {
--		hw->cgu_part_number = ICE_AQC_GET_LINK_TOPO_NODE_NR_SI5383_5384;
--		return true;
--	}
--
--	return false;
--}
--
- /**
-  * ice_cgu_get_pin_desc_e823 - get pin description array
-  * @hw: pointer to the hw struct
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-index 6f277e7b06b9..18a993134826 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-@@ -271,10 +271,7 @@ int ice_read_sma_ctrl_e810t(struct ice_hw *hw, u8 *data);
- int ice_write_sma_ctrl_e810t(struct ice_hw *hw, u8 data);
- int ice_read_pca9575_reg_e810t(struct ice_hw *hw, u8 offset, u8 *data);
- bool ice_is_pca9575_present(struct ice_hw *hw);
--bool ice_is_phy_rclk_present(struct ice_hw *hw);
--bool ice_is_clock_mux_present_e810t(struct ice_hw *hw);
- int ice_get_pf_c827_idx(struct ice_hw *hw, u8 *idx);
--bool ice_is_cgu_present(struct ice_hw *hw);
- enum dpll_pin_type ice_cgu_get_pin_type(struct ice_hw *hw, u8 pin, bool input);
- struct dpll_pin_frequency *
- ice_cgu_get_pin_freq_supp(struct ice_hw *hw, u8 pin, bool input, u8 *num);
--- 
-2.41.0.1.g9857a21e0017.dirty
-
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
