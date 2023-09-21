@@ -1,172 +1,132 @@
-Return-Path: <netdev+bounces-35418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A9C17A9720
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:12:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EA877A9D6A
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:34:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7B581C209C7
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 17:12:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA3E6282AD9
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:34:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F6B2BE71;
-	Thu, 21 Sep 2023 17:04:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D6518050;
+	Thu, 21 Sep 2023 19:34:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73B6014F9A
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 17:04:06 +0000 (UTC)
-Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 472153588
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:03:13 -0700 (PDT)
-Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2b703a0453fso20405451fa.3
-        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:03:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FE7B1773A
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 19:34:18 +0000 (UTC)
+Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00072115FA4
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 12:34:15 -0700 (PDT)
+Received: by mail-yb1-xb2c.google.com with SMTP id 3f1490d57ef6-d801c83325fso1613327276.0
+        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 12:34:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695315715; x=1695920515; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1695324855; x=1695929655; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rK21WYzVm30pkR03hEDVnx/qoe/Q1Eu8nWyTdq2Kd2M=;
-        b=AtK9WFo9j6TXScvSqMuZzlK961dmvO5IByqc3CEdoSnvmpGARZL++KF/danrXxiVjj
-         0JsouZzSWVMXvnusSHy2HgP+UFPVxMMOlXSVS18d3BSsk8yI7k6CPjjnbBp1iKs9vA4G
-         xObgaytINSPBG1jGTnszAbRyygnWqP0/AqMTwIJmLSWL9wjw7B6KM2LTj2qalPjdB1Jm
-         z+D1noypmil7Hf7z7pga7lBx60LOW40G9DcBtjtvcfXP7facYdyMOyXleNujcAQREF+c
-         eQMnjPhed9g9fqldsb8OHpUHTlR1iA8owLezktX8e+ZuXdi4J6VqqsdKihslWxSK9/pw
-         tizQ==
+        bh=Yr/T9kX37mjruI2YODshHpmgcsopLzBXqNS+RBfjBUE=;
+        b=hU7InRML2JYYfbd+FLHOuqsZqo+WOB81a6AdqQNUvjdSw6PWDEZ2ECUn+O433v3vIx
+         KbKUh/Ww4v0wkDiEitRImweROpjqqBNT2TB4F0FhhwL1CKt6eypmJtd2QKWffHf4A94k
+         ulBOiU1h+oQRcc3F6rJc47b/h+BFSaNSx2Ry4Nw2AS0OsOG8lu9ceLID1c2ZKbEryvu5
+         s1917Pg/TGG8HDLbS/iqa+jH2mHikBN/M7Y7cD64q3gq/C++/ccLRSruyhZ2m3qkR/+N
+         6ZwG/Ouy1KqKTHrB0z2lhhIiAGgTBBPtLKPTtt6Jm2AX4zEuAtg7OFNhdGGJoLnSaSg6
+         BjsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695315715; x=1695920515;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1695324855; x=1695929655;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rK21WYzVm30pkR03hEDVnx/qoe/Q1Eu8nWyTdq2Kd2M=;
-        b=IKWrUx1xLgd0wuWCQ5Maiuq08K1IWTQQLaUOIYaSrvYfVtiGUqJzOEWwauk0RbXeKd
-         P1xpG9CX5ZMuAtphD5Sd6eIPHi3f4pieES8Ucvpy8leRQSOBlucpVSwKqf9FqLSamfyI
-         x7GynCBpOsMLhqohDMQw0UFuBu2bgTNitqF0BddyEawPG7DumDQ3MugcZtTjo6n51C/H
-         2ntp0T/kCGPgoP79Ndad9XfDBgU7QE8kunFtIE7FBG8KTrY9Khq60C+pRVAFT/FZeWR4
-         pLgCw0WnpBvvqGB8UT1uIbTqN001tIOMpngYDOYKPR+8Ao3r3tULgZbkYwGjR1N0cmNu
-         XJBQ==
-X-Gm-Message-State: AOJu0YyzEfG+J5NODcHIrctBfijg9usl4uP7ZiyvuBW9DLSueiyjvVbr
-	4TcfKxW2M9RF+rLR41zbW3z4h5Qa/aw2pvrZb01bng==
-X-Google-Smtp-Source: AGHT+IHLbVQVPTbY4mDzyywro5wxLvNUrwqDk+GNRXLAejAiLRmP8JbYyOL8hu0K3iY3VhZahUwBpgI5KJvnt87aXJs=
-X-Received: by 2002:a2e:8882:0:b0:2bf:e65d:e815 with SMTP id
- k2-20020a2e8882000000b002bfe65de815mr5662841lji.38.1695315715063; Thu, 21 Sep
- 2023 10:01:55 -0700 (PDT)
+        bh=Yr/T9kX37mjruI2YODshHpmgcsopLzBXqNS+RBfjBUE=;
+        b=vVzLZ0d7eyKDF/z3Unq3veNAQD0jGUNPDszt/SMoHktRjKX1XwlNHkBs3LMJbVcpDm
+         aBj4PdH/ETVxcXyRY9qR9mgIGVbEq5+Dzfu3ERmVwCtd4Ipmq09266S08mW7sPEeNxMN
+         etwwQs07GEfTmFtB6KlxS0hhVmpoWgUSoCUQcDj3kja2tbhkF1Q0DV8vUqrcDKV/6v97
+         LdKpXDypOOihm100Ljxv8fp+Pm9C67/N4lfBOPBtCh834fDYItEDUKMLpKFGXtButqy/
+         wUY3D0qRGEA7AtdEIHeq42RfQk/Od5v2mYRymtaQ2u0Lz2itPHTEA68BT20YjAjSikNc
+         srTw==
+X-Gm-Message-State: AOJu0Yzh2jxya10ujmRO5igWoPGJ0Q3uKT83InkmLMnES1Tebjp3cqvI
+	0TxJnx7i+a5b6KufUC67vnaYg2dwCCvasAGGre+3CA==
+X-Google-Smtp-Source: AGHT+IE3J0hPYG3mlCf0LBXPDD4F3dt6Xy+7aUsS0fZmwILVCrE54YYcSKTbvRwSwG6maa7zoRunYA==
+X-Received: by 2002:a05:6a20:914e:b0:14b:e604:9f0a with SMTP id x14-20020a056a20914e00b0014be6049f0amr5003289pzc.20.1695267460994;
+        Wed, 20 Sep 2023 20:37:40 -0700 (PDT)
+Received: from hermes.local (204-195-112-131.wavecable.com. [204.195.112.131])
+        by smtp.gmail.com with ESMTPSA id jc10-20020a17090325ca00b001b9be3b94d3sm251294plb.140.2023.09.20.20.37.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Sep 2023 20:37:40 -0700 (PDT)
+Date: Wed, 20 Sep 2023 20:37:38 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: Mirko Lindner <mlindner@marvell.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ kernel test robot <lkp@intel.com>, linux-kernel@vger.kernel.org,
+ linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] sky2: Make sure there is at least one frag_addr
+ available
+Message-ID: <20230920203738.7e2c58c6@hermes.local>
+In-Reply-To: <20230920202509.never.299-kees@kernel.org>
+References: <20230920202509.never.299-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230919175323.144902-1-jrife@google.com> <650af4001eb7c_37ac7329443@willemb.c.googlers.com.notmuch>
- <550df73160cd600f797823b86fde2c2b3526b133.camel@redhat.com>
- <CAF=yD-K3oLn++V_zJMjGRXdiPh2qi+Fit6uOh4z4HxuuyCOyog@mail.gmail.com> <b822f1246a35682ad6f2351d451191825416af58.camel@redhat.com>
-In-Reply-To: <b822f1246a35682ad6f2351d451191825416af58.camel@redhat.com>
-From: Jordan Rife <jrife@google.com>
-Date: Thu, 21 Sep 2023 10:01:42 -0700
-Message-ID: <CADKFtnTz-gDRKtDpw1p=AEkBSa3MispZDV8Rz5n+ZahdBr3vnA@mail.gmail.com>
-Subject: Re: [PATCH net v4 3/3] net: prevent address rewrite in kernel_bind()
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org, 
-	dborkman@kernel.org, philipp.reisner@linbit.com, lars.ellenberg@linbit.com, 
-	christoph.boehmwalder@linbit.com, axboe@kernel.dk, airlied@redhat.com, 
-	chengyou@linux.alibaba.com, kaishen@linux.alibaba.com, jgg@ziepe.ca, 
-	leon@kernel.org, bmt@zurich.ibm.com, isdn@linux-pingi.de, ccaulfie@redhat.com, 
-	teigland@redhat.com, mark@fasheh.com, jlbec@evilplan.org, 
-	joseph.qi@linux.alibaba.com, sfrench@samba.org, pc@manguebit.com, 
-	lsahlber@redhat.com, sprasad@microsoft.com, tom@talpey.com, 
-	horms@verge.net.au, ja@ssi.bg, pablo@netfilter.org, kadlec@netfilter.org, 
-	fw@strlen.de, santosh.shilimkar@oracle.com, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Sep 21, 2023 at 8:26=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On Thu, 2023-09-21 at 09:30 -0400, Willem de Bruijn wrote:
-> > On Thu, Sep 21, 2023 at 4:35=E2=80=AFAM Paolo Abeni <pabeni@redhat.com>=
- wrote:
-> > >
-> > > On Wed, 2023-09-20 at 09:30 -0400, Willem de Bruijn wrote:
-> > > > Jordan Rife wrote:
-> > > > > Similar to the change in commit 0bdf399342c5("net: Avoid address
-> > > > > overwrite in kernel_connect"), BPF hooks run on bind may rewrite =
-the
-> > > > > address passed to kernel_bind(). This change
-> > > > >
-> > > > > 1) Makes a copy of the bind address in kernel_bind() to insulate
-> > > > >    callers.
-> > > > > 2) Replaces direct calls to sock->ops->bind() with kernel_bind()
-> > > > >
-> > > > > Link: https://lore.kernel.org/netdev/20230912013332.2048422-1-jri=
-fe@google.com/
-> > > > > Fixes: 4fbac77d2d09 ("bpf: Hooks for sys_bind")
-> > > > > Cc: stable@vger.kernel.org
-> > > > > Signed-off-by: Jordan Rife <jrife@google.com>
-> > > >
-> > > > Reviewed-by: Willem de Bruijn <willemb@google.com>
-> > >
-> > > I fear this is going to cause a few conflicts with other trees. We ca=
-n
-> > > still take it, but at very least we will need some acks from the
-> > > relevant maintainers.
-> > >
-> > > I *think* it would be easier split this and patch 1/3 in individual
-> > > patches targeting the different trees, hopefully not many additional
-> > > patches will be required. What do you think?
-> >
-> > Roughly how many patches would result from this one patch. From the
-> > stat line I count { block/drbd, char/agp, infiniband, isdn, fs/dlm,
-> > fs/ocfs2, fs/smb, netfilter, rds }. That's worst case nine callers
-> > plus the core patch to net/socket.c?
->
-> I think there should not be problems taking directly changes for rds
-> and nf/ipvs.
->
-> Additionally, I think the non network changes could consolidate the
-> bind and connect changes in a single patch.
->
-> It should be 7 not-network patches overall.
->
-> > If logistically simpler and you prefer the approach, we can also
-> > revisit Jordan's original approach, which embedded the memcpy inside
-> > the BPF branches.
-> >
-> > That has the slight benefit to in-kernel callers that it limits the
-> > cost of the memcpy to cgroup_bpf_enabled. But adds a superfluous
-> > second copy to the more common userspace callers, again at least only
-> > if cgroup_bpf_enabled.
-> >
-> > If so, it should at least move the whole logic around those BPF hooks
-> > into helper functions.
->
-> IMHO the approach implemented here is preferable, I suggest going
-> forward with it.
->
-> Thanks,
->
-> Paolo
->
+On Wed, 20 Sep 2023 13:25:13 -0700
+Kees Cook <keescook@chromium.org> wrote:
 
-> Additionally, I think the non network changes could consolidate the
-> bind and connect changes in a single patch.
->
-> It should be 7 not-network patches overall.
+> In the likely pathological case of building sky2 with 16k PAGE_SIZE,
+> make sure there is at least 1 frag_addr in struct rx_ring_info:
+> 
+>    In file included from include/linux/skbuff.h:28,
+>                     from include/net/net_namespace.h:43,
+>                     from include/linux/netdevice.h:38,
+>                     from drivers/net/ethernet/marvell/sky2.c:18:
+>    drivers/net/ethernet/marvell/sky2.c: In function 'sky2_rx_unmap_skb':
+>    include/linux/dma-mapping.h:416:36: warning: array subscript i is outside array bounds of 'dma_addr_t[0]' {aka 'long long unsigned int[]'} [-Warray-bounds=]
+>      416 | #define dma_unmap_page(d, a, s, r) dma_unmap_page_attrs(d, a, s, r, 0)
+>          |                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>    drivers/net/ethernet/marvell/sky2.c:1257:17: note: in expansion of macro 'dma_unmap_page'
+>     1257 |                 dma_unmap_page(&pdev->dev, re->frag_addr[i],
+>          |                 ^~~~~~~~~~~~~~
+>    In file included from drivers/net/ethernet/marvell/sky2.c:41:
+>    drivers/net/ethernet/marvell/sky2.h:2198:25: note: while referencing 'frag_addr'
+>     2198 |         dma_addr_t      frag_addr[ETH_JUMBO_MTU >> PAGE_SHIFT];
+>          |                         ^~~~~~~~~
+> 
+> With CONFIG_PAGE_SIZE_16KB=y, PAGE_SHIFT == 14, so:
+> 
+>   #define ETH_JUMBO_MTU   9000
+> 
+> causes "ETH_JUMBO_MTU >> PAGE_SHIFT" to be 0. Use "?: 1" to solve this build warning.
+> 
+> Cc: Mirko Lindner <mlindner@marvell.com>
+> Cc: Stephen Hemminger <stephen@networkplumber.org>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: netdev@vger.kernel.org
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202309191958.UBw1cjXk-lkp@intel.com/
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> ---
 
-I'm fine with this. If there are no objections, I can drop the non-net
-changes in this patch series and send out several
-kernel_connect/kernel_bind patches to the appropriate trees as a
-follow up. Shall we wait to hear back from the maintainers or just go
-ahead with this plan?
+With page size of 16K the frag_addr[] array would never be used, so the original
+code was correct that size should be 0. But the compiler now gets upset with 0
+size arrays thinking this is some flex array leftover? Or can't figure out that
+in this case an rx skb with fragments would never be created.
 
--Jordan
+The workaround is fine, but could you add an explanatory comment?
 
