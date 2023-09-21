@@ -1,178 +1,158 @@
-Return-Path: <netdev+bounces-35492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A7D77A9C46
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:14:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12B917A9C19
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:08:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7012282BA9
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:13:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0CC01F21435
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:08:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCECC2942C;
-	Thu, 21 Sep 2023 17:49:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B3A2374E4;
+	Thu, 21 Sep 2023 18:10:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8371029417
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 17:49:44 +0000 (UTC)
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 473867D708
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:35:38 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-9ad8bba8125so160148066b.3
-        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 10:35:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1695317736; x=1695922536; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4cxYqhV2vF1/qTyjoXVFQ+TzTovUXbNHaLzLCCyWR1E=;
-        b=nEbpdKK9/cYxA9NEKzRXGJKxnzOp3oeuGuJcj1Wg0zenJIN4mLao4FL+9QqCg8xiO2
-         qFhn5u5ZkZuo2JOZiGf+Rb91LxDxUBCdzEjIKojE3vHjCa0Q977tNNx6ouJ8ozhwOrtd
-         rbDgVvDenbm7wKSOjKs95FDgKL74+ui0asjRQmif2NCAIJ31O9zv4/cvQwmD529Ubi0s
-         ON2q9CMY1wJLbSPCm/QAB+ZrQ/LcOffyG/NVnRSSsz9iECxeXSWdzrN2vH8oK8fcqKn2
-         lLxbO6IHDkO5vGyio2xx7nj3xlqoZqyAb1rkEThMALuUFdItQQ7gxjsGrT9avAtxKA8J
-         ay3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695317736; x=1695922536;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4cxYqhV2vF1/qTyjoXVFQ+TzTovUXbNHaLzLCCyWR1E=;
-        b=XsY+qXJla1kQav1V1UY/Yr+dAfK7/t02Oujdi5tz5moVOOl/3MlZa1RqfrFz1an+Jk
-         Ettc07SWOgOztX8cRinFRYW9d9QDLhbnmHKsGj7mYwalaloGkbW91szuEraXFBKjdtlI
-         vy2JlZdRRqV0WV5NMjvlt+lAx7X6JyaFrGNvufDJYCdu9Ws2THcxoCSxIPX6mn0v6BLO
-         UcKpgaPMb8U9r0GjC0eacH+Q+UZSK1aE1pkNaE8j1NBWByNSCeLEDQQMVamXvYNfG/Mb
-         Ypk4pxTnUGD1llcFoHc9c4KMBix50CAQOS26YXorpWl8+ivny8NBL9WOBq06s9UNO3VO
-         oiZQ==
-X-Gm-Message-State: AOJu0YxyzvwNNqaJSOvu75KRNO0y6vuniR9C23n0DzQswz0TeVf3s+mC
-	hce2E4RhqWn8lct2qqlb3UUtyRcdmw1IcY/cnq6kjmbZ
-X-Google-Smtp-Source: AGHT+IGvFbJ6Db71oV5a8RSKNQD5duku5npuZ17s6sJi9JPyuKunEwciIHFTyflTn2v/2DkUgSn7gA==
-X-Received: by 2002:a17:907:75f2:b0:9ae:567f:6f78 with SMTP id jz18-20020a17090775f200b009ae567f6f78mr2060971ejc.19.1695291586361;
-        Thu, 21 Sep 2023 03:19:46 -0700 (PDT)
-Received: from [192.168.0.105] (haunt.prize.volia.net. [93.72.109.136])
-        by smtp.gmail.com with ESMTPSA id s2-20020a170906354200b0098ec690e6d7sm814062eja.73.2023.09.21.03.19.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Sep 2023 03:19:46 -0700 (PDT)
-Message-ID: <50814314-55a3-6cff-2e9e-2abf93fa5f1b@blackwall.org>
-Date: Thu, 21 Sep 2023 13:19:44 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A998B41E4B
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 18:10:41 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A82BB05A6
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 11:08:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1695319716;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=R9gyNPaV4zuqNuZuo/vx9UBWKean5gdHBlkkwmtG0SQ=;
+	b=XOT1ZkquHLDF5KYxecldIkAlvz1YAy9XUOfXoxfhBbLGEdCHnCqL6d0ANRy24G6Iz695TE
+	y2EdXZsBVzp4Y5PQLRAB8P6iZyEcBQ1dsT9h2GrpBXxjgS1UomGJgdYDVxT+2ErLeoQuuV
+	b5CT83oWz75Gxo23TbMyR8WycKrz0jU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-515-0ruNuvMkOS6GtcLt8Ah2FA-1; Thu, 21 Sep 2023 06:41:22 -0400
+X-MC-Unique: 0ruNuvMkOS6GtcLt8Ah2FA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BBA57101A529;
+	Thu, 21 Sep 2023 10:41:21 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.216])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 5A0D751E3;
+	Thu, 21 Sep 2023 10:41:20 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+To: netdev@vger.kernel.org
+cc: dhowells@redhat.com,
+    syzbot+62cbf263225ae13ff153@syzkaller.appspotmail.com,
+    Eric Dumazet <edumazet@google.com>,
+    Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+    "David S. Miller" <davem@davemloft.net>,
+    David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+    Jakub Kicinski <kuba@kernel.org>, bpf@vger.kernel.org,
+    syzkaller-bugs@googlegroups.com, linux-kernel@vger.kernel.org
+Subject: [PATCH net v3] ipv4, ipv6: Fix handling of transhdrlen in __ip{,6}_append_data()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH net-next v4 5/6] net: bridge: Add a configurable default
- FDB learning limit
-Content-Language: en-US
-To: Johannes Nixdorf <jnixdorf-oss@avm.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
- David Ahern <dsahern@gmail.com>, Eric Dumazet <edumazet@google.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Ido Schimmel <idosch@nvidia.com>,
- Jakub Kicinski <kuba@kernel.org>, Oleksij Rempel <linux@rempel-privat.de>,
- Paolo Abeni <pabeni@redhat.com>, Roopa Prabhu <roopa@nvidia.com>,
- Shuah Khan <shuah@kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- bridge@lists.linux-foundation.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20230919-fdb_limit-v4-0-39f0293807b8@avm.de>
- <20230919-fdb_limit-v4-5-39f0293807b8@avm.de>
- <cc14cd4a-f3bb-3d6f-5b38-ec73cad32570@blackwall.org>
- <ZQv5aNbgqxCuOKyr@u-jnixdorf.ads.avm.de>
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <ZQv5aNbgqxCuOKyr@u-jnixdorf.ads.avm.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <730407.1695292879.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 21 Sep 2023 11:41:19 +0100
+Message-ID: <730408.1695292879@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 9/21/23 11:06, Johannes Nixdorf wrote:
-> On Wed, Sep 20, 2023 at 02:00:27PM +0300, Nikolay Aleksandrov wrote:
->> On 9/19/23 11:12, Johannes Nixdorf wrote:
->>> Add a Kconfig option to configure a default FDB learning limit system
->>> wide, so a distributor building a special purpose kernel can limit all
->>> created bridges by default.
->>>
->>> The limit is only a soft default setting and overrideable on a per bridge
->>> basis using netlink.
->>>
->>> Signed-off-by: Johannes Nixdorf <jnixdorf-oss@avm.de>
->>> ---
->>>    net/bridge/Kconfig     | 13 +++++++++++++
->>>    net/bridge/br_device.c |  2 ++
->>>    2 files changed, 15 insertions(+)
->>>
->>> diff --git a/net/bridge/Kconfig b/net/bridge/Kconfig
->>> index 3c8ded7d3e84..c0d9c08088c4 100644
->>> --- a/net/bridge/Kconfig
->>> +++ b/net/bridge/Kconfig
->>> @@ -84,3 +84,16 @@ config BRIDGE_CFM
->>>    	  Say N to exclude this support and reduce the binary size.
->>>    	  If unsure, say N.
->>> +
->>> +config BRIDGE_DEFAULT_FDB_MAX_LEARNED
->>> +	int "Default FDB learning limit"
->>> +	default 0
->>> +	depends on BRIDGE
->>> +	help
->>> +	  Sets a default limit on the number of learned FDB entries on
->>> +	  new bridges. This limit can be overwritten via netlink on a
+    =
 
-overwritten doesn't sound good, how about This limit can be set (or changed)
+Including the transhdrlen in length is a problem when the packet is
+partially filled (e.g. something like send(MSG_MORE) happened previously)
+when appending to an IPv4 or IPv6 packet as we don't want to repeat the
+transport header or account for it twice.  This can happen under some
+circumstances, such as splicing into an L2TP socket.
 
->>> +	  per bridge basis.
->>> +
->>> +	  The default of 0 disables the limit.
->>> +
->>> +	  If unsure, say 0.
->>> diff --git a/net/bridge/br_device.c b/net/bridge/br_device.c
->>> index 9a5ea06236bd..3214391c15a0 100644
->>> --- a/net/bridge/br_device.c
->>> +++ b/net/bridge/br_device.c
->>> @@ -531,6 +531,8 @@ void br_dev_setup(struct net_device *dev)
->>>    	br->bridge_ageing_time = br->ageing_time = BR_DEFAULT_AGEING_TIME;
->>>    	dev->max_mtu = ETH_MAX_MTU;
->>> +	br->fdb_max_learned = CONFIG_BRIDGE_DEFAULT_FDB_MAX_LEARNED;
->>> +
->>>    	br_netfilter_rtable_init(br);
->>>    	br_stp_timer_init(br);
->>>    	br_multicast_init(br);
->>>
->>
->> This one I'm not sure about at all. Distributions can just create the bridge
->> with a predefined limit. This is not flexible and just adds
->> one more kconfig option that is rather unnecessary. Why having a kconfig
->> knob is better than bridge creation time limit setting? You still have
->> to create the bridge, so why not set the limit then?
-> 
-> The problem I'm trying to solve here are unaware applications. Assuming
-> this change lands in the next Linux release there will still be quite
-> some time until the major applications that create bridges (distribution
-> specific or common network management tools, the container solution of
-> they day, for embedded some random vendor tools, etc.) will pick it
-> up. In this series I chose a default of 0 to not break existing setups
-> that rely on some arbitrary amount of FDB entries, so those unaware
-> applications will create bridges without limits. I added the Kconfig
-> setting so someone who knows their use cases can still set a more fitting
-> default limit.
-> 
-> More specifically to our use case as an embedded vendor that builds their
-> own kernels and knows they have no use case that requires huge FDB tables,
-> the kernel config allows us to set a safe default limit before starting
-> to teach all our applications and our upstream vendors' code about the
-> new netlink attribute. As this patch is relatively simple, we can also
-> keep it downstream if there is opposition to it here though.
+The symptom observed is a warning in __ip6_append_data():
 
-I'm not strongly against, just IMO it is unnecessary. I won't block the 
-set because of this, but it would be nice to get input from others as
-well. If you can recompile your kernel to set a limit, it should be 
-easier to change your app to set the same limit via netlink, but I'm not 
-familiar with your use case.
+    WARNING: CPU: 1 PID: 5042 at net/ipv6/ip6_output.c:1800 __ip6_append_d=
+ata.isra.0+0x1be8/0x47f0 net/ipv6/ip6_output.c:1800
+
+that occurs when MSG_SPLICE_PAGES is used to append more data to an alread=
+y
+partially occupied skbuff.  The warning occurs when 'copy' is larger than
+the amount of data in the message iterator.  This is because the requested
+length includes the transport header length when it shouldn't.  This can b=
+e
+triggered by, for example:
+
+        sfd =3D socket(AF_INET6, SOCK_DGRAM, IPPROTO_L2TP);
+        bind(sfd, ...); // ::1
+        connect(sfd, ...); // ::1 port 7
+        send(sfd, buffer, 4100, MSG_MORE);
+        sendfile(sfd, dfd, NULL, 1024);
+
+Fix this by only adding transhdrlen into the length if the write queue is
+empty in l2tp_ip6_sendmsg(), analogously to how UDP does things.
+
+l2tp_ip_sendmsg() looks like it won't suffer from this problem as it build=
+s
+the UDP packet itself.
+
+Fixes: a32e0eec7042 ("l2tp: introduce L2TPv3 IP encapsulation support for =
+IPv6")
+Reported-by: syzbot+62cbf263225ae13ff153@syzkaller.appspotmail.com
+Link: https://lore.kernel.org/r/0000000000001c12b30605378ce8@google.com/
+Suggested-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: David Ahern <dsahern@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: netdev@vger.kernel.org
+cc: bpf@vger.kernel.org
+cc: syzkaller-bugs@googlegroups.com
+---
+ net/l2tp/l2tp_ip6.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/l2tp/l2tp_ip6.c b/net/l2tp/l2tp_ip6.c
+index ed8ebb6f5909..11f3d375cec0 100644
+--- a/net/l2tp/l2tp_ip6.c
++++ b/net/l2tp/l2tp_ip6.c
+@@ -507,7 +507,6 @@ static int l2tp_ip6_sendmsg(struct sock *sk, struct ms=
+ghdr *msg, size_t len)
+ 	 */
+ 	if (len > INT_MAX - transhdrlen)
+ 		return -EMSGSIZE;
+-	ulen =3D len + transhdrlen;
+ =
+
+ 	/* Mirror BSD error message compatibility */
+ 	if (msg->msg_flags & MSG_OOB)
+@@ -628,6 +627,7 @@ static int l2tp_ip6_sendmsg(struct sock *sk, struct ms=
+ghdr *msg, size_t len)
+ =
+
+ back_from_confirm:
+ 	lock_sock(sk);
++	ulen =3D len + skb_queue_empty(&sk->sk_write_queue) ? transhdrlen : 0;
+ 	err =3D ip6_append_data(sk, ip_generic_getfrag, msg,
+ 			      ulen, transhdrlen, &ipc6,
+ 			      &fl6, (struct rt6_info *)dst,
 
 
