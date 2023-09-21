@@ -1,165 +1,354 @@
-Return-Path: <netdev+bounces-35625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70B7D7AA5A8
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 01:30:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 956D17AA5AF
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 01:37:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id D9C9A28343F
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 23:30:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 7816B283444
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 23:37:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42CF52940E;
-	Thu, 21 Sep 2023 23:30:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DDAB29413;
+	Thu, 21 Sep 2023 23:37:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B1029408;
-	Thu, 21 Sep 2023 23:30:42 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B7B18F;
-	Thu, 21 Sep 2023 16:30:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=cTXKwjxtldkfqXx+SXk/6A/UnwSLoK4UrexStTF47tk=; b=mA
-	PFKnKwZNfEAUXq9Vl812F9mSnn7XT/oV04Fnon/LzgqN7yAlSl68OROHuZmgfman10e1tUw/f6Vja
-	DparwyGO4juYkofrJrC+UuUpDENXJroLSr7l2FzDTqmPrfhVx9duW7bJj+I3ArMyUEzZSC3ViUseA
-	8C2rW8sML3oYYds=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qjT7L-0078ta-H8; Fri, 22 Sep 2023 01:29:55 +0200
-Date: Fri, 22 Sep 2023 01:29:55 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: Rob Herring <robh@kernel.org>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	George McCollister <george.mccollister@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Kurt Kanzenbach <kurt@linutronix.de>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
-	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
-	Marcin Wojtas <mw@semihalf.com>,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@microchip.com>,
-	Marek Vasut <marex@denx.de>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	John Crispin <john@phrozen.org>,
-	Madalin Bucur <madalin.bucur@nxp.com>,
-	Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	Oleksij Rempel <linux@rempel-privat.de>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Grygorii Strashko <grygorii.strashko@ti.com>,
-	Sekhar Nori <nsekhar@ti.com>,
-	Shyam Pandey <radhey.shyam.pandey@xilinx.com>,
-	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH net-next v2 07/10] dt-bindings: net: enforce phylink
- bindings on certain ethernet controllers
-Message-ID: <8935d431-be0c-43e0-a908-f7dff2048f7c@lunn.ch>
-References: <20230916110902.234273-1-arinc.unal@arinc9.com>
- <20230916110902.234273-8-arinc.unal@arinc9.com>
- <20230918181319.GA1445647-robh@kernel.org>
- <16710cf9-8911-4fed-8e2d-b19b581446c1@arinc9.com>
- <a8d49992-4fa8-4a9f-b954-79011a3040a8@lunn.ch>
- <85cc3b27-417e-4cf4-9f77-347a338c9d67@arinc9.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D666216429
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 23:37:16 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6852DF7;
+	Thu, 21 Sep 2023 16:37:14 -0700 (PDT)
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38LNaVq3019344;
+	Thu, 21 Sep 2023 23:37:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : from : subject : to : cc : references : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=EO/d9pHekLqRpgsfzm2Ra1JOPWYWuC4JKQlVK5hjhhA=;
+ b=T0q5uCQuREtvugGsjcjC7XVvlb8JAgLxenZ048lNxrr8teV4asoMhem+EmlKbH+yuyaM
+ VtI/megQtpDZ+ndDSHCCSOQwpCjSZwLD7oCcUjiR61L8JUjbNdDjqkcxLisZjsKItHGs
+ svzxCRZOfZYq7D1kqfgh+UbirSR9WyGTIvdPQz2X7yoTmkNPwwqYMP2hkBFfO1NJYQdY
+ 0kXGXlel7agSMsH3L3MT/qx0gGjIBFRvuF7P7WVcykV9V6UfX5sQSImz0JVk72yDbpcJ
+ fRyxloD/22lCUT2pS1/iJSVmeDsnQN+H6GZRBAq7RhAiCU2qd0+viyEPMeBJVvFrxh7L wQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t8xvg91ru-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 21 Sep 2023 23:37:08 +0000
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38LNb4X0022362;
+	Thu, 21 Sep 2023 23:37:04 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t8xvg9169-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 21 Sep 2023 23:37:04 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38LN8Hv2015471;
+	Thu, 21 Sep 2023 23:31:56 GMT
+Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3t8tsp4rpt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 21 Sep 2023 23:31:56 +0000
+Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
+	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38LNVuO020906610
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 21 Sep 2023 23:31:56 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E04975805F;
+	Thu, 21 Sep 2023 23:31:55 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9210258043;
+	Thu, 21 Sep 2023 23:31:53 +0000 (GMT)
+Received: from [9.171.4.137] (unknown [9.171.4.137])
+	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 21 Sep 2023 23:31:53 +0000 (GMT)
+Message-ID: <881e43f8-54e0-4847-67c4-82b9c0b3e50c@linux.ibm.com>
+Date: Fri, 22 Sep 2023 01:31:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <85cc3b27-417e-4cf4-9f77-347a338c9d67@arinc9.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+Subject: Re: [PATCH net-next v3 12/18] net/smc: implement DMB-related
+ operations of loopback
+To: Wen Gu <guwen@linux.alibaba.com>, kgraul@linux.ibm.com, jaka@linux.ibm.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com
+Cc: alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <1695302360-46691-1-git-send-email-guwen@linux.alibaba.com>
+ <1695302360-46691-13-git-send-email-guwen@linux.alibaba.com>
+In-Reply-To: <1695302360-46691-13-git-send-email-guwen@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: yXKKzDRr1JKdcoHGtq4N7wSiX_CjoCuA
+X-Proofpoint-GUID: 636YQuLCp2OOa0fo0e_k2ywgefInpqJ9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-09-21_19,2023-09-21_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ priorityscore=1501 spamscore=0 malwarescore=0 mlxlogscore=874 mlxscore=0
+ lowpriorityscore=0 phishscore=0 clxscore=1011 impostorscore=0
+ suspectscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2309180000 definitions=main-2309210205
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Sep 21, 2023 at 09:21:40PM +0300, Arınç ÜNAL wrote:
-> On 21.09.2023 16:00, Andrew Lunn wrote:
-> > > - Link descriptions must be required on ethernet controllers. We don't care
-> > >    whether some Linux driver can or cannot find the PHY or set up a fixed
-> > >    link without looking at the devicetree.
-> > 
-> > That can lead to future surprises, and breakage.
-> > 
-> > Something which is not used is not tested, and so sometimes wrong, and
-> > nobody knows. Say the driver is extended to a new device and actually
-> > does need to use this never before used information. You then find it
-> > is wrong, and you get a regression.
-> > 
-> > We have had issues like this before. There are four rgmii phy-link
-> > modes. We have had PHY drivers which ignored one of those modes, it
-> > silently accepted it, but did not change the hardware to actually use
-> > that mode. The PHY continues to use its reset defaults or strapping,
-> > and it worked. A lot of device trees ended up using this mode. And it
-> > was not the same as reset defaults/strapping.
-> > 
-> > And then somebody needed that fourth mode, and made it actually
-> > work. And all those boards wrongly using that mode broke.
-> > 
-> > The lesson i learned from that episode is that anything in device tree
-> > must actually be used and tested.
+
+
+On 21.09.23 15:19, Wen Gu wrote:
+> This patch implements DMB registration, unregistration and data move
+> operations of SMC-D loopback.
 > 
-> It looks like the root cause here was the lack of dt-bindings to
-> only allow the phy-mode values the hardware supports.
+> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+> ---
+>   net/smc/smc_cdc.c      |   6 +++
+>   net/smc/smc_cdc.h      |   1 +
+>   net/smc/smc_loopback.c | 128 +++++++++++++++++++++++++++++++++++++++++++++++--
+>   net/smc/smc_loopback.h |  13 +++++
+>   4 files changed, 145 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/smc/smc_cdc.c b/net/smc/smc_cdc.c
+> index 89105e9..2641800 100644
+> --- a/net/smc/smc_cdc.c
+> +++ b/net/smc/smc_cdc.c
+> @@ -411,6 +411,12 @@ static void smc_cdc_msg_recv(struct smc_sock *smc, struct smc_cdc_msg *cdc)
+>   static void smcd_cdc_rx_tsklet(struct tasklet_struct *t)
+>   {
+>   	struct smc_connection *conn = from_tasklet(conn, t, rx_tsklet);
+> +
+> +	smcd_cdc_rx_handler(conn);
+> +}
+> +
+> +void smcd_cdc_rx_handler(struct smc_connection *conn)
+> +{
+>   	struct smcd_cdc_msg *data_cdc;
+>   	struct smcd_cdc_msg cdc;
+>   	struct smc_sock *smc;
+> diff --git a/net/smc/smc_cdc.h b/net/smc/smc_cdc.h
+> index 696cc11..11559d4 100644
+> --- a/net/smc/smc_cdc.h
+> +++ b/net/smc/smc_cdc.h
+> @@ -301,5 +301,6 @@ int smcr_cdc_msg_send_validation(struct smc_connection *conn,
+>   				 struct smc_wr_buf *wr_buf);
+>   int smc_cdc_init(void) __init;
+>   void smcd_cdc_rx_init(struct smc_connection *conn);
+> +void smcd_cdc_rx_handler(struct smc_connection *conn);
+>   
+>   #endif /* SMC_CDC_H */
+> diff --git a/net/smc/smc_loopback.c b/net/smc/smc_loopback.c
+> index 9034ebd..cfbcabf 100644
+> --- a/net/smc/smc_loopback.c
+> +++ b/net/smc/smc_loopback.c
+> @@ -16,6 +16,7 @@
+>   #include <linux/smc.h>
+>   #include <net/smc.h>
+>   
+> +#include "smc_cdc.h"
+>   #include "smc_ism.h"
+>   #include "smc_loopback.h"
+>   
+> @@ -74,6 +75,93 @@ static int smc_lo_query_rgid(struct smcd_dev *smcd, struct smcd_gid *rgid,
+>   	return 0;
+>   }
+>   
+> +static int smc_lo_register_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb,
+> +			       void *client_priv)
+> +{
+> +	struct smc_lo_dmb_node *dmb_node, *tmp_node;
+> +	struct smc_lo_dev *ldev = smcd->priv;
+> +	int sba_idx, rc;
+> +
+> +	/* check space for new dmb */
+> +	for_each_clear_bit(sba_idx, ldev->sba_idx_mask, SMC_LODEV_MAX_DMBS) {
+> +		if (!test_and_set_bit(sba_idx, ldev->sba_idx_mask))
+> +			break;
+> +	}
+> +	if (sba_idx == SMC_LODEV_MAX_DMBS)
+> +		return -ENOSPC;
+> +
+> +	dmb_node = kzalloc(sizeof(*dmb_node), GFP_KERNEL);
+> +	if (!dmb_node) {
+> +		rc = -ENOMEM;
+> +		goto err_bit;
+> +	}
+> +
+> +	dmb_node->sba_idx = sba_idx;
+> +	dmb_node->cpu_addr = kzalloc(dmb->dmb_len, GFP_KERNEL |
+> +				     __GFP_NOWARN | __GFP_NORETRY |
+> +				     __GFP_NOMEMALLOC);
+kzalloc()/kmalloc() allocates physically contigueous memory. Are you 
+sure it is suitable for allocating the dmb?
 
-That would not help. The hardware supported all 4 RGMII modes. So
-listing all four in the dt-binding would be correct. But the driver
-for the hardware had a bug, and so silently ignored one of the
-modes. That then masked the bugs in board DT files.
-
-> What I see here is the driver change should've been tested on all
-> different hardware the driver controls then the improper describing
-> of hardware on the devicetree source file addressed.
-
-Which is what did happen. But it took a while to find all those broken
-boards.  For a period of time, we had regressions.
-
-Bugs happen. It is a fact of life. But we want those bugs to be easy
-to find as possible. If we force DT writers to add properties which
-the driver never uses, they are going to be bugs in those
-properties. And those bugs are not going to be easy to find, and quite
-likely, they will only be found a long time after they are added. We
-should not be adding unused properties and bugs just to keep a yaml
-checker happy.
-
-	Andrew
-
+> +	if (!dmb_node->cpu_addr) {
+> +		rc = -ENOMEM;
+> +		goto err_node;
+> +	}
+> +	dmb_node->len = dmb->dmb_len;
+> +	dmb_node->dma_addr = (dma_addr_t)dmb_node->cpu_addr;
+> +
+> +again:
+> +	/* add new dmb into hash table */
+> +	get_random_bytes(&dmb_node->token, sizeof(dmb_node->token));
+> +	write_lock(&ldev->dmb_ht_lock);
+> +	hash_for_each_possible(ldev->dmb_ht, tmp_node, list, dmb_node->token) {
+> +		if (tmp_node->token == dmb_node->token) {
+> +			write_unlock(&ldev->dmb_ht_lock);
+> +			goto again;
+> +		}
+> +	}
+> +	hash_add(ldev->dmb_ht, &dmb_node->list, dmb_node->token);
+> +	write_unlock(&ldev->dmb_ht_lock);
+> +
+> +	dmb->sba_idx = dmb_node->sba_idx;
+> +	dmb->dmb_tok = dmb_node->token;
+> +	dmb->cpu_addr = dmb_node->cpu_addr;
+> +	dmb->dma_addr = dmb_node->dma_addr;
+> +	dmb->dmb_len = dmb_node->len;
+> +
+> +	return 0;
+> +
+> +err_node:
+> +	kfree(dmb_node);
+> +err_bit:
+> +	clear_bit(sba_idx, ldev->sba_idx_mask);
+> +	return rc;
+> +}
+> +
+> +static int smc_lo_unregister_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb)
+> +{
+> +	struct smc_lo_dmb_node *dmb_node = NULL, *tmp_node;
+> +	struct smc_lo_dev *ldev = smcd->priv;
+> +
+> +	/* remove dmb from hash table */
+> +	write_lock(&ldev->dmb_ht_lock);
+> +	hash_for_each_possible(ldev->dmb_ht, tmp_node, list, dmb->dmb_tok) {
+> +		if (tmp_node->token == dmb->dmb_tok) {
+> +			dmb_node = tmp_node;
+> +			break;
+> +		}
+> +	}
+> +	if (!dmb_node) {
+> +		write_unlock(&ldev->dmb_ht_lock);
+> +		return -EINVAL;
+> +	}
+> +	hash_del(&dmb_node->list);
+> +	write_unlock(&ldev->dmb_ht_lock);
+> +
+> +	clear_bit(dmb_node->sba_idx, ldev->sba_idx_mask);
+> +	kfree(dmb_node->cpu_addr);
+> +	kfree(dmb_node);
+> +
+> +	return 0;
+> +}
+> +
+>   static int smc_lo_add_vlan_id(struct smcd_dev *smcd, u64 vlan_id)
+>   {
+>   	return -EOPNOTSUPP;
+> @@ -100,6 +188,38 @@ static int smc_lo_signal_event(struct smcd_dev *dev, struct smcd_gid *rgid,
+>   	return 0;
+>   }
+>   
+> +static int smc_lo_move_data(struct smcd_dev *smcd, u64 dmb_tok, unsigned int idx,
+> +			    bool sf, unsigned int offset, void *data,
+> +			    unsigned int size)
+> +{
+> +	struct smc_lo_dmb_node *rmb_node = NULL, *tmp_node;
+> +	struct smc_lo_dev *ldev = smcd->priv;
+> +
+> +	read_lock(&ldev->dmb_ht_lock);
+> +	hash_for_each_possible(ldev->dmb_ht, tmp_node, list, dmb_tok) {
+> +		if (tmp_node->token == dmb_tok) {
+> +			rmb_node = tmp_node;
+> +			break;
+> +		}
+> +	}
+> +	if (!rmb_node) {
+> +		read_unlock(&ldev->dmb_ht_lock);
+> +		return -EINVAL;
+> +	}
+> +	read_unlock(&ldev->dmb_ht_lock);
+> +
+> +	memcpy((char *)rmb_node->cpu_addr + offset, data, size);
+> +
+> +	if (sf) {
+> +		struct smc_connection *conn =
+> +			smcd->conn[rmb_node->sba_idx];
+> +
+> +		if (conn && !conn->killed)
+> +			smcd_cdc_rx_handler(conn);
+> +	}
+> +	return 0;
+> +}
+> +
+>   static int smc_lo_supports_v2(void)
+>   {
+>   	return SMC_LO_SUPPORTS_V2;
+> @@ -131,14 +251,14 @@ static struct device *smc_lo_get_dev(struct smcd_dev *smcd)
+>   
+>   static const struct smcd_ops lo_ops = {
+>   	.query_remote_gid = smc_lo_query_rgid,
+> -	.register_dmb		= NULL,
+> -	.unregister_dmb		= NULL,
+> +	.register_dmb = smc_lo_register_dmb,
+> +	.unregister_dmb = smc_lo_unregister_dmb,
+>   	.add_vlan_id = smc_lo_add_vlan_id,
+>   	.del_vlan_id = smc_lo_del_vlan_id,
+>   	.set_vlan_required = smc_lo_set_vlan_required,
+>   	.reset_vlan_required = smc_lo_reset_vlan_required,
+>   	.signal_event = smc_lo_signal_event,
+> -	.move_data		= NULL,
+> +	.move_data = smc_lo_move_data,
+>   	.supports_v2 = smc_lo_supports_v2,
+>   	.get_system_eid = smc_lo_get_system_eid,
+>   	.get_local_gid = smc_lo_get_local_gid,
+> @@ -212,6 +332,8 @@ static void smc_lo_dev_release(struct device *dev)
+>   static int smc_lo_dev_init(struct smc_lo_dev *ldev)
+>   {
+>   	smc_lo_generate_id(ldev);
+> +	rwlock_init(&ldev->dmb_ht_lock);
+> +	hash_init(ldev->dmb_ht);
+>   
+>   	return smcd_lo_register_dev(ldev);
+>   }
+> diff --git a/net/smc/smc_loopback.h b/net/smc/smc_loopback.h
+> index 2156f22..943424f 100644
+> --- a/net/smc/smc_loopback.h
+> +++ b/net/smc/smc_loopback.h
+> @@ -20,12 +20,25 @@
+>   
+>   #define SMC_LO_CHID 0xFFFF
+>   #define SMC_LODEV_MAX_DMBS 5000
+> +#define SMC_LODEV_DMBS_HASH_BITS 12
+> +
+> +struct smc_lo_dmb_node {
+> +	struct hlist_node list;
+> +	u64 token;
+> +	u32 len;
+> +	u32 sba_idx;
+> +	void *cpu_addr;
+> +	dma_addr_t dma_addr;
+> +};
+>   
+>   struct smc_lo_dev {
+>   	struct smcd_dev *smcd;
+>   	struct device dev;
+>   	u16 chid;
+>   	struct smcd_gid local_gid;
+> +	DECLARE_BITMAP(sba_idx_mask, SMC_LODEV_MAX_DMBS);
+> +	rwlock_t dmb_ht_lock;
+> +	DECLARE_HASHTABLE(dmb_ht, SMC_LODEV_DMBS_HASH_BITS);
+>   };
+>   
+>   int smc_loopback_init(void);
 
