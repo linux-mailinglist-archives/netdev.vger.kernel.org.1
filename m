@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-35431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03B697A9817
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:30:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA2757A983B
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:34:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2732281D79
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 17:30:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58E8E1C20FFE
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 17:34:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D2D013FF5;
-	Thu, 21 Sep 2023 17:09:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A35C8182A1;
+	Thu, 21 Sep 2023 17:10:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92E7B13AF1;
-	Thu, 21 Sep 2023 17:09:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48D7618042;
+	Thu, 21 Sep 2023 17:10:06 +0000 (UTC)
 Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D76DAE3A4;
-	Thu, 21 Sep 2023 10:08:03 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64E3E6A4F;
+	Thu, 21 Sep 2023 10:09:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
 	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender
 	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=KcbEGqZWRjDRIS84NcPwJ70wJrRePDMy7FnnB2l/XTc=;
-	t=1695316084; x=1696525684; b=IQW96roGNxzONuN9PjcFsaqTedRIWrD2bO14nXq8M2es3l8
-	bnZzAgnlNO6iaNG8dZUfCxVtzGQIk7LmP08aymBYLKrVBRpBMA070wDeZbXvgFBJtc1e8tMHt8hE+
-	HKYHvfTAa1XJVyjEPdBJT4NVHQBbX1kiKr8XZxsNK7qVjLpfa5rJn2wsMYeuoqj24HR603rRzp0vx
-	WeVqVWhCvy2IAjHVj0dFk4AEnkppQMzs3yUq0/1LQMyGb16wbeJ7NDcibUv1pgYG0IUANitDQPVCU
-	kgDCgNuXOBRi7p5RKLqVnYBNBe/V6nNAB9yQWy0R4gQT+O6ZIiv44a76jalixKbA==;
+	Resent-Cc:Resent-Message-ID; bh=+GqK9nIH4JMvkwqjWovkNfDPm8gLz4+0kcQHvxgQK7c=;
+	t=1695316173; x=1696525773; b=hfLzyQE+WLIlacNFWoSUHIDtrcbN7yLr/2lefzwXQS+b9/D
+	vT6FHChv0AaYBFMryeKkr49rZFPJcG1O0qGyCql0ue/gMeJj0PJH+sM4s4PRQPDqeTUoqh1UasO6g
+	EmhU3IgX/YfTrg6tJGPOlPS99UxOV9BQXi7/CUlEa/LRg5/laO6IwWfC/pdu4hLz6kFfhkaMJBdAN
+	2CDzoRlC3Z1ttsPOXOa0POfXIw12k1CNdOwMgRyPK30ju06siYlpLujGc4lOy3BwYbt+ihuUHWdV0
+	PoBY84MOxD+5bzRmJa5P6lRUzScr2hSAnOHsPcpfrSARAc0FGwbp1ggC52V1lmdg==;
 Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.96)
 	(envelope-from <johannes@sipsolutions.net>)
-	id 1qjFPm-00D3lb-0E;
-	Thu, 21 Sep 2023 10:52:02 +0200
+	id 1qjFPn-00D3lb-1V;
+	Thu, 21 Sep 2023 10:52:03 +0200
 From: Johannes Berg <johannes@sipsolutions.net>
 To: linux-kernel@vger.kernel.org
 Cc: linux-trace-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-wireless@vger.kernel.org,
 	Johannes Berg <johannes.berg@intel.com>
-Subject: [RFC PATCH 2/4] net: dropreason: use new __print_sym() in tracing
-Date: Thu, 21 Sep 2023 10:51:32 +0200
-Message-ID: <20230921105129.2f2774a87760.I075de1ac698b47710b94c631afdfb328f07be961@changeid>
+Subject: [RFC PATCH 3/4] net: drop_monitor: use drop_reason_lookup()
+Date: Thu, 21 Sep 2023 10:51:33 +0200
+Message-ID: <20230921105129.c6e7e803398d.Idc122c3395bea9652f34ccaa678e918bfd4fae75@changeid>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230921085129.261556-5-johannes@sipsolutions.net>
 References: <20230921085129.261556-5-johannes@sipsolutions.net>
@@ -64,130 +64,97 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Johannes Berg <johannes.berg@intel.com>
 
-The __print_symbolic() could only ever print the core
-drop reasons, since that's the way the infrastructure
-works. Now that we have __print_sym() with all the
-advantages mentioned in that commit, convert to that
-and get all the drop reasons from all subsystems. As
-we already have a list of them, that's really easy.
-
-This is a little bit of .text (~100 bytes in my build)
-and saves a lot of .data (~17k).
+Now that we have drop_reason_lookup(), we can just use it for
+drop_monitor as well, rather than exporting the list itself.
 
 Signed-off-by: Johannes Berg <johannes.berg@intel.com>
 ---
- include/net/dropreason.h   |  5 +++++
- include/trace/events/skb.h | 16 +++-----------
- net/core/skbuff.c          | 43 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 51 insertions(+), 13 deletions(-)
+ include/net/dropreason.h |  4 ----
+ net/core/drop_monitor.c  | 18 +++---------------
+ net/core/skbuff.c        |  6 +++---
+ 3 files changed, 6 insertions(+), 22 deletions(-)
 
 diff --git a/include/net/dropreason.h b/include/net/dropreason.h
-index 56cb7be92244..c157070b5303 100644
+index c157070b5303..0e2195ccf2cd 100644
 --- a/include/net/dropreason.h
 +++ b/include/net/dropreason.h
-@@ -42,6 +42,11 @@ struct drop_reason_list {
- extern const struct drop_reason_list __rcu *
- drop_reasons_by_subsys[SKB_DROP_REASON_SUBSYS_NUM];
+@@ -38,10 +38,6 @@ struct drop_reason_list {
+ 	size_t n_reasons;
+ };
  
-+#ifdef CONFIG_TRACEPOINTS
-+const char *drop_reason_lookup(unsigned long long value);
-+void drop_reason_show(struct seq_file *m);
-+#endif
-+
- void drop_reasons_register_subsys(enum skb_drop_reason_subsys subsys,
- 				  const struct drop_reason_list *list);
- void drop_reasons_unregister_subsys(enum skb_drop_reason_subsys subsys);
-diff --git a/include/trace/events/skb.h b/include/trace/events/skb.h
-index 07e0715628ec..8a1a63f9e796 100644
---- a/include/trace/events/skb.h
-+++ b/include/trace/events/skb.h
-@@ -8,15 +8,9 @@
- #include <linux/skbuff.h>
- #include <linux/netdevice.h>
- #include <linux/tracepoint.h>
-+#include <net/dropreason.h>
- 
--#undef FN
--#define FN(reason)	TRACE_DEFINE_ENUM(SKB_DROP_REASON_##reason);
--DEFINE_DROP_REASON(FN, FN)
+-/* Note: due to dynamic registrations, access must be under RCU */
+-extern const struct drop_reason_list __rcu *
+-drop_reasons_by_subsys[SKB_DROP_REASON_SUBSYS_NUM];
 -
--#undef FN
--#undef FNe
--#define FN(reason)	{ SKB_DROP_REASON_##reason, #reason },
--#define FNe(reason)	{ SKB_DROP_REASON_##reason, #reason }
-+TRACE_DEFINE_SYM_FNS(drop_reason, drop_reason_lookup, drop_reason_show);
+ #ifdef CONFIG_TRACEPOINTS
+ const char *drop_reason_lookup(unsigned long long value);
+ void drop_reason_show(struct seq_file *m);
+diff --git a/net/core/drop_monitor.c b/net/core/drop_monitor.c
+index aff31cd944c2..d110a16cde46 100644
+--- a/net/core/drop_monitor.c
++++ b/net/core/drop_monitor.c
+@@ -610,9 +610,8 @@ static int net_dm_packet_report_fill(struct sk_buff *msg, struct sk_buff *skb,
+ 				     size_t payload_len)
+ {
+ 	struct net_dm_skb_cb *cb = NET_DM_SKB_CB(skb);
+-	const struct drop_reason_list *list = NULL;
+-	unsigned int subsys, subsys_reason;
+ 	char buf[NET_DM_MAX_SYMBOL_LEN];
++	const char *reason_str;
+ 	struct nlattr *attr;
+ 	void *hdr;
+ 	int rc;
+@@ -630,19 +629,8 @@ static int net_dm_packet_report_fill(struct sk_buff *msg, struct sk_buff *skb,
+ 		goto nla_put_failure;
  
- /*
-  * Tracepoint for free an sk_buff:
-@@ -44,13 +38,9 @@ TRACE_EVENT(kfree_skb,
- 
- 	TP_printk("skbaddr=%p protocol=%u location=%pS reason: %s",
- 		  __entry->skbaddr, __entry->protocol, __entry->location,
--		  __print_symbolic(__entry->reason,
--				   DEFINE_DROP_REASON(FN, FNe)))
-+		  __print_sym(__entry->reason, drop_reason ))
- );
- 
--#undef FN
--#undef FNe
--
- TRACE_EVENT(consume_skb,
- 
- 	TP_PROTO(struct sk_buff *skb, void *location),
+ 	rcu_read_lock();
+-	subsys = u32_get_bits(cb->reason, SKB_DROP_REASON_SUBSYS_MASK);
+-	if (subsys < SKB_DROP_REASON_SUBSYS_NUM)
+-		list = rcu_dereference(drop_reasons_by_subsys[subsys]);
+-	subsys_reason = cb->reason & ~SKB_DROP_REASON_SUBSYS_MASK;
+-	if (!list ||
+-	    subsys_reason >= list->n_reasons ||
+-	    !list->reasons[subsys_reason] ||
+-	    strlen(list->reasons[subsys_reason]) > NET_DM_MAX_REASON_LEN) {
+-		list = rcu_dereference(drop_reasons_by_subsys[SKB_DROP_REASON_SUBSYS_CORE]);
+-		subsys_reason = SKB_DROP_REASON_NOT_SPECIFIED;
+-	}
+-	if (nla_put_string(msg, NET_DM_ATTR_REASON,
+-			   list->reasons[subsys_reason])) {
++	reason_str = drop_reason_lookup(cb->reason);
++	if (nla_put_string(msg, NET_DM_ATTR_REASON, reason_str)) {
+ 		rcu_read_unlock();
+ 		goto nla_put_failure;
+ 	}
 diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 4eaf7ed0d1f4..415329b76921 100644
+index 415329b76921..9efde769949d 100644
 --- a/net/core/skbuff.c
 +++ b/net/core/skbuff.c
-@@ -132,6 +132,49 @@ drop_reasons_by_subsys[SKB_DROP_REASON_SUBSYS_NUM] = {
+@@ -126,13 +126,11 @@ static const struct drop_reason_list drop_reasons_core = {
+ 	.n_reasons = ARRAY_SIZE(drop_reasons),
  };
- EXPORT_SYMBOL(drop_reasons_by_subsys);
+ 
+-const struct drop_reason_list __rcu *
++static const struct drop_reason_list __rcu *
+ drop_reasons_by_subsys[SKB_DROP_REASON_SUBSYS_NUM] = {
+ 	[SKB_DROP_REASON_SUBSYS_CORE] = RCU_INITIALIZER(&drop_reasons_core),
+ };
+-EXPORT_SYMBOL(drop_reasons_by_subsys);
+ 
+-#ifdef CONFIG_TRACEPOINTS
+ const char *drop_reason_lookup(unsigned long long value)
+ {
+ 	unsigned long long subsys_id = value >> SKB_DROP_REASON_SUBSYS_SHIFT;
+@@ -149,7 +147,9 @@ const char *drop_reason_lookup(unsigned long long value)
+ 		return NULL;
+ 	return subsys->reasons[reason];
+ }
++EXPORT_SYMBOL(drop_reason_lookup);
  
 +#ifdef CONFIG_TRACEPOINTS
-+const char *drop_reason_lookup(unsigned long long value)
-+{
-+	unsigned long long subsys_id = value >> SKB_DROP_REASON_SUBSYS_SHIFT;
-+	u32 reason = value & ~SKB_DROP_REASON_SUBSYS_MASK;
-+	const struct drop_reason_list *subsys;
-+
-+	if (subsys_id >= SKB_DROP_REASON_SUBSYS_NUM)
-+		return NULL;
-+
-+	subsys = rcu_dereference(drop_reasons_by_subsys[subsys_id]);
-+	if (!subsys)
-+		return NULL;
-+	if (reason >= subsys->n_reasons)
-+		return NULL;
-+	return subsys->reasons[reason];
-+}
-+
-+void drop_reason_show(struct seq_file *m)
-+{
-+	u32 subsys_id;
-+
-+	rcu_read_lock();
-+	for (subsys_id = 0; subsys_id < SKB_DROP_REASON_SUBSYS_NUM; subsys_id++) {
-+		const struct drop_reason_list *subsys;
-+		u32 i;
-+
-+		subsys = rcu_dereference(drop_reasons_by_subsys[subsys_id]);
-+		if (!subsys)
-+			continue;
-+
-+		for (i = 0; i < subsys->n_reasons; i++) {
-+			if (!subsys->reasons[i])
-+				continue;
-+			seq_printf(m, ", { %u, \"%s\" }",
-+				   (subsys_id << SKB_DROP_REASON_SUBSYS_SHIFT) | i,
-+				   subsys->reasons[i]);
-+		}
-+	}
-+	rcu_read_unlock();
-+}
-+#endif
-+
- /**
-  * drop_reasons_register_subsys - register another drop reason subsystem
-  * @subsys: the subsystem to register, must not be the core
+ void drop_reason_show(struct seq_file *m)
+ {
+ 	u32 subsys_id;
 -- 
 2.41.0
 
