@@ -1,54 +1,39 @@
-Return-Path: <netdev+bounces-35370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35374-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BB827A9137
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 05:20:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99B977A9233
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 09:40:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0AF78B2098A
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 03:20:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F22D1F20F43
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 07:40:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6A931FC5;
-	Thu, 21 Sep 2023 03:20:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B75885239;
+	Thu, 21 Sep 2023 07:40:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA04B1C05
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 03:19:58 +0000 (UTC)
-Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FE1FF4
-	for <netdev@vger.kernel.org>; Wed, 20 Sep 2023 20:19:56 -0700 (PDT)
-X-QQ-mid: bizesmtp89t1695266339twm9ab1b
-Received: from wxdbg.localdomain.com ( [125.119.240.142])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 21 Sep 2023 11:18:58 +0800 (CST)
-X-QQ-SSF: 01400000000000K0Z000000A0000000
-X-QQ-FEAT: 3M0okmaRx3i6xiiU4p2dDyb2l7mk/3SQUESKav7+3uBUKW7Gm/lPkAfJpVzkE
-	pP8tOnJdc+pZREWiocR/BeS4WXBDFOYsBYiVJcFV5qkJlWBiC9nHZP/KS1BXO/w5SFWgkBW
-	cZ8O890xv5WAZkW6x2MbJ2O5ishBk6X60mY1e7KJ0l0BbI3CqKBk1E4Bh/rVojzOVuMco1t
-	pM5CPR+hkf8WPa5coeX+FREdV5MRUl7MbrzqKmeHDeIli1MQmSytv74KKWXvabOourdLa/J
-	2GqDM8PD/axw3pM7T9RckEGbAjg9PYU+2gVnucOXOyn+7RL/KFpkArYbf4E4bPOfLX/vyIH
-	7ri03+BzdAgoPP3Sg99bo6tiUI2LNlXz6gDBp+NhXPlFMwoGUxcJbRNrY0He9JwkXtcu+sT
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 17669601877561668245
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: netdev@vger.kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew@lunn.ch
-Cc: mengyuanlou@net-swift.com,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v2 3/3] net: ngbe: add ethtool stats support
-Date: Thu, 21 Sep 2023 11:30:20 +0800
-Message-Id: <20230921033020.853040-4-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20230921033020.853040-1-jiawenwu@trustnetic.com>
-References: <20230921033020.853040-1-jiawenwu@trustnetic.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EEAA3D90;
+	Thu, 21 Sep 2023 07:40:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6980EC43142;
+	Thu, 21 Sep 2023 07:40:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695282036;
+	bh=050Q5WMmZnTiDzRGfQUvp1iyQDTG+GBX9pc9ivL1p/8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ZckeWmJnXpAMsas5kgCK6SohB/oAT0PrHQ63kFdXyd7RdNP/NglJ6y8ZqsvLj7/SY
+	 1EGbQWeWjhrBUr6mKJUfNJs8iVqo7pDRysYz+MkpPDH9YMSWFi0A/YLVM5popCYhMr
+	 TGr4dXdddFXPnG30GqBV9Lyh1DHHGrY2liAzTUzm2G0Sx5lXHmbR0vUMvm6gLPWV40
+	 eXl1338jlJSM/eYuAmhZkgmqOCy4qX9XZ9yIBAEEyAu1gTudizkgk9wo9Cy2D4PGlC
+	 gEQ/HGpTxg0jhliVQwBlK5GYgZUNMgV+yJm4EVaAqQkOSX9pllyESw+5v+/970w/1+
+	 Xx5twF5w77mww==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4F791C595C4;
+	Thu, 21 Sep 2023 07:40:36 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,64 +41,49 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: Re: [PATCH net v2 0/3] Add missing xdp_do_flush() invocations.
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169528203632.16376.17350345625835195632.git-patchwork-notify@kernel.org>
+Date: Thu, 21 Sep 2023 07:40:36 +0000
+References: <20230918153611.165722-1-bigeasy@linutronix.de>
+In-Reply-To: <20230918153611.165722-1-bigeasy@linutronix.de>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
+ ast@kernel.org, daniel@iogearbox.net, edumazet@google.com, kuba@kernel.org,
+ hawk@kernel.org, john.fastabend@gmail.com, pabeni@redhat.com,
+ tglx@linutronix.de
 
-Support to show ethtool statistics.
+Hello:
 
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
----
- drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c | 3 +++
- drivers/net/ethernet/wangxun/ngbe/ngbe_hw.c      | 2 ++
- drivers/net/ethernet/wangxun/ngbe/ngbe_main.c    | 2 ++
- 3 files changed, 7 insertions(+)
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-index ec0e869e9aac..1ab6efd993dc 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
-@@ -49,6 +49,9 @@ static const struct ethtool_ops ngbe_ethtool_ops = {
- 	.nway_reset		= phy_ethtool_nway_reset,
- 	.get_wol		= ngbe_get_wol,
- 	.set_wol		= ngbe_set_wol,
-+	.get_sset_count		= wx_get_sset_count,
-+	.get_strings		= wx_get_strings,
-+	.get_ethtool_stats	= wx_get_ethtool_stats,
- };
- 
- void ngbe_set_ethtool_ops(struct net_device *netdev)
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_hw.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_hw.c
-index 6562a2de9527..6459bc1d7c22 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_hw.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_hw.c
-@@ -85,6 +85,8 @@ int ngbe_reset_hw(struct wx *wx)
- 	}
- 	ngbe_reset_misc(wx);
- 
-+	wx_clear_hw_cntrs(wx);
-+
- 	/* Store the permanent mac address */
- 	wx_get_mac_addr(wx, wx->mac.perm_addr);
- 
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-index 2b431db6085a..652e6576e36a 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-@@ -332,6 +332,8 @@ static void ngbe_disable_device(struct wx *wx)
- 
- 		wr32(wx, WX_PX_TR_CFG(reg_idx), WX_PX_TR_CFG_SWFLSH);
- 	}
-+
-+	wx_update_stats(wx);
- }
- 
- static void ngbe_down(struct wx *wx)
+On Mon, 18 Sep 2023 17:36:08 +0200 you wrote:
+> Hi,
+> 
+> I've been looking at the drivers/ XDP users and noticed that some
+> XDP_REDIRECT user don't invoke xdp_do_flush() at the end.
+> 
+> v1…v2: https://lore.kernel.org/all/20230908135748.794163-1-bigeasy@linutronix.de
+>   - Collected tags.
+>   - Dropped the #4 patch which was touching cpu_map_bpf_prog_run()
+>     because it is not needed.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2,1/3] net: ena: Flush XDP packets on error.
+    https://git.kernel.org/netdev/net/c/6f411fb5ca94
+  - [net,v2,2/3] bnxt_en: Flush XDP for bnxt_poll_nitroa0()'s NAPI
+    https://git.kernel.org/netdev/net/c/edc0140cc3b7
+  - [net,v2,3/3] octeontx2-pf: Do xdp_do_flush() after redirects.
+    https://git.kernel.org/netdev/net/c/70b2b6892645
+
+You are awesome, thank you!
 -- 
-2.27.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
