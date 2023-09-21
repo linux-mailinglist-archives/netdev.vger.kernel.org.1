@@ -1,183 +1,252 @@
-Return-Path: <netdev+bounces-35598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B80AF7A9EF1
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 22:15:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C39C7A9FA7
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 22:26:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51FAF281F6D
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 20:15:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E53C71C20AF9
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 20:26:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB98E18B08;
-	Thu, 21 Sep 2023 20:15:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10E6D18B17;
+	Thu, 21 Sep 2023 20:26:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CBCE168D8
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 20:15:22 +0000 (UTC)
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C967FF83A;
-	Thu, 21 Sep 2023 13:14:50 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1c5dd017b30so6435785ad.0;
-        Thu, 21 Sep 2023 13:14:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695327290; x=1695932090; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id:sender
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JyEngoB20EiGdQxWeRrp1wv5Ks/o+AuWbIIGFDAcGkc=;
-        b=Cq82qJPLnBw0PQroS1GAaxWyadVPIxbTqUWPZtPXMjo4x+eRMAFLeX6irGvBLxgJ0D
-         EXiC+oVpJYn5MmU+pbrgl2BzyAbd9ss6c/qrWuqBgqcJ6J6wC498WvZtp56l3u+/gox0
-         Q5/jWAbPN69pQGbb4al5xyPeBD4xWWq08Yh/hxCWPacQeJ/m49wkuQtluhSO9G2u+pNv
-         3Mun4YawjX7t6Re9obCUdT5l2AhXjYLym2aGRRuln4iEBJJtFfBLJpSQiAJQU1vCK4Yh
-         0QcJn7heAQ2YiVY6MU9CDqLK8JgJczxMugvEk5XCr5XTmAjf1B8RtnqQXnBlne3IG4dC
-         SD7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695327290; x=1695932090;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id:sender
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JyEngoB20EiGdQxWeRrp1wv5Ks/o+AuWbIIGFDAcGkc=;
-        b=BmR7mDY1JWMwFtz7vSwPV+4Wiy6EknfYlSso7BHD8jsc85F+llY4PkIRP8vymtoSTJ
-         t0wh5MHjarPzC6HUu3pVK0zizfcTdPmIvnyRsRbZYcqwbGM48KAsTfmffguztuoEifOp
-         19dXgqGfbbIjydAKHECudUwLc67S/3j/ED4Dk9hBxAqLiUDalUUWe3dtUzLuQsWz3a6h
-         W/jMYRqDOGl/jidQiBan7Ef58N+F87UrEMjpUUoJkxTrWf4JI6valmga7aJ/g0vATmia
-         ay7lLbOZJtIzNE88XXRI7OAELN6/FVFY5snSvX6a3YZIFNQIPNb8Wtp25exQnevPyvGD
-         CUVg==
-X-Gm-Message-State: AOJu0Yz8QTIaYkLjT82Qm2JxBAiX8xKlkiA72ouydGb0IsdIl0szTPyy
-	+Nb2BEZ+0H5Pm1OUy/64luQ=
-X-Google-Smtp-Source: AGHT+IEXFS/tfXu/U8U2r/q8qDaqvI0FMUVqjfM/+vJynfUb+k1UGCrLSXvalSGl0pBWUjWMwDE6Cg==
-X-Received: by 2002:a17:902:ab48:b0:1b7:ca9c:4f5c with SMTP id ij8-20020a170902ab4800b001b7ca9c4f5cmr725279plb.28.1695327289856;
-        Thu, 21 Sep 2023 13:14:49 -0700 (PDT)
-Received: from ?IPV6:2600:1700:e321:62f0:329c:23ff:fee3:9d7c? ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id g4-20020a170902c38400b001b8a00d4f7asm1940872plg.9.2023.09.21.13.14.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Sep 2023 13:14:49 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Message-ID: <b28abd34-a7ef-661a-aafa-3e6c8e963726@roeck-us.net>
-Date: Thu, 21 Sep 2023 13:14:47 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D377718B0C
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 20:26:01 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F4732D231;
+	Thu, 21 Sep 2023 13:25:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695327933; x=1726863933;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=FjaawV4eOwqk7xBHsT3QNk0R4ncRQwi5kQ7vn93XHAg=;
+  b=YkV3hgrObBpAwSpLbnQbmiK+bbncV2oABxfyzX+aY9f3vy1Wq5+1b5RJ
+   wziXEJ9/ONQrnbmTbtfKslbILBzZLoWQbo9b0lGG5L/Yom1dBPjGORclN
+   tcK2l+2XeWAaGR3eNGWVcX7eck2ygKLKyiYseiFzto4Y22cMP/+vm+/dz
+   vgJkoyD1cEHLwAU1mGPWVgqAAbs6U+5NxjhlzDPXquJeBoW5VWtsnB/Dy
+   8VLNF+Hu3xrKDfthTGdQu1dcWK51ftaaDMJgBMyuZrqn+VPatP+jY81TX
+   jSrYcTrlc+G6kFUO8IbsUNrHue6sLLHotgrLDg7cttqCl9/drBSaKdkuI
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10840"; a="444761146"
+X-IronPort-AV: E=Sophos;i="6.03,166,1694761200"; 
+   d="scan'208";a="444761146"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 13:25:21 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10840"; a="870966811"
+X-IronPort-AV: E=Sophos;i="6.03,166,1694761200"; 
+   d="scan'208";a="870966811"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 21 Sep 2023 13:25:21 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Thu, 21 Sep 2023 13:25:20 -0700
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Thu, 21 Sep 2023 13:25:20 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Thu, 21 Sep 2023 13:25:20 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.106)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Thu, 21 Sep 2023 13:25:20 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BLYv2UDJYXLa0bCEnFY7++fRo4pMjYdfgOzxZMxQOA9gflU2tV89GQhvbZeINyQ+SwttC3SMr7+2XH3B8MtTygdEWrjVMed+KursO7NHsK0y4hDVbm5orG7Sy5Am8T9Zb0ozRZwtwDqtuSxEuN2MncORAJak1+q1QcCvPUxI0CIqT7EdLzOapNUbXzM/4KwriN19BsAvG8efy5AFWpgd2RiejoCabU1icHj+2xmgTXbBWD7aIuHq+lRmm5rMR1Iw+lpoTXov0oIrMsggD+teq2QECVsaeJJCmAn2pGr+EgQRioQ3FngEj2cDSHlNMb6GROLw6itXrg4pe0rXmPjwHg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=b1xvLWA/PORBwyIcLuPqUFqNsgyBL6wUC0/cKzTbDZQ=;
+ b=XzGH5/3jB/lXSTVn0WpGCcwDeg5bk3/YR3V+KqEcy8VxK2Xx41BLFoHA5yB4OiYg+/nTf5G8vwzqWt+1M0up0SHKdwqLL5iVwo/ZjpbWBVtusMw6fcHzyaxtVzm7aAoOivS3Gx7ImdyLepHFqQ27RevNbUDD858b91tnzjP4HuPlCbb2kt+8eeg07qIuplJgH+JmxGAVvsB+QUr/Qm8kI1p+CGjIvl/YS7RwfqpBDTXtVvuvJsoV7472DgEZguRr0xR2yN8bzLCyXQoTSU1DqisecTZuz7/CiEIjOEbp6eR7V4V0ttTv1eMMiCQIoAoK+fwkOn6rSYHFR5uA1z8lDA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by SJ2PR11MB8450.namprd11.prod.outlook.com (2603:10b6:a03:578::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.26; Thu, 21 Sep
+ 2023 20:25:18 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::9654:610d:227a:104f]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::9654:610d:227a:104f%4]) with mapi id 15.20.6813.018; Thu, 21 Sep 2023
+ 20:25:18 +0000
+Message-ID: <873f07e6-cc99-1901-4d09-db77994d88db@intel.com>
+Date: Thu, 21 Sep 2023 13:25:16 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH net] net: stmmac: platform: fix the incorrect parameter
+To: Clark Wang <xiaoning.wang@nxp.com>, <alexandre.torgue@foss.st.com>,
+	<joabreu@synopsys.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <mcoquelin.stm32@gmail.com>,
+	<bartosz.golaszewski@linaro.org>
+CC: <netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+References: <20230921062443.1251292-1-xiaoning.wang@nxp.com>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <20230921062443.1251292-1-xiaoning.wang@nxp.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR04CA0269.namprd04.prod.outlook.com
+ (2603:10b6:303:88::34) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Content-Language: en-US
-To: =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>
-Cc: Jisheng Zhang <jszhang@kernel.org>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Chen-Yu Tsai <wens@csie.org>,
- Jernej Skrabec <jernej.skrabec@gmail.com>,
- Samuel Holland <samuel@sholland.org>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-sunxi@lists.linux.dev
-References: <20230717160630.1892-1-jszhang@kernel.org>
- <20230717160630.1892-3-jszhang@kernel.org>
- <11fce633-4699-470f-a2f3-94b99b3e6da6@roeck-us.net>
- <20230921195608.dlol2f6fifx6ahd6@pengutronix.de>
-From: Guenter Roeck <linux@roeck-us.net>
-Subject: Re: [PATCH net-next v5 2/2] net: stmmac: use per-queue 64 bit
- statistics where necessary
-In-Reply-To: <20230921195608.dlol2f6fifx6ahd6@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|SJ2PR11MB8450:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7f3e74db-0fce-4a91-7184-08dbbae0df39
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: y6U1LYUw5fUsR1SB7k1983OvOsHCkQQYuqdE8il6rOjGRhTnYJEKHgva5bGx+nNAzBNHSJdXHcvONDTpoICfOFKzDw2k8XBlr6llI61I+0fvehuZmBEXjQIcp/1srBclKNLbCRQ+WRrEOk9amaeMnqFqsPk00VbuReV0lPWy7tkF7LgbcWnQCERlKKRGAZyZhPe9mmqAj/7kcPP+qwniOOMnK6X+8BRhpT9H4ji5AyXLPSLtvJrBcdXN/OCH/IL1vdP1tfPbUDZADBxYOuj2jLR7fABxbcEUsjbw5OBnM7o2skWesJ7YjAbJ70wnU9O2UED19Co6q7rfCL94X65CiZwUOgvIaRj+/pJkVoPYlzHDhAb02UN/jtWAfN6u178/kW76s3UYOBmSj5c7Uz/aAADL+u0c9yyQW4Kk9E5TVHpA1FHPaLmSn/bKY87Jpci7rctNOROOveMrmlORHJl2h9ev21XwnoMvLBErMSPT3KcmlUCNa56kSdwonkhvu4f1Y44iyHjZMx3UYBTQ4ppvUTbXQRCVucgfZGVM0XLywq31bPEuREwDQ6qV06/+s7Jk0RIv3fV7bsydMAEhf8dQ9ZYaZwnr8UUrkryB5SzghvZdCrZlCKa7TdMv9r5FGWA+rPMLD/s5715wid29aZ9Imw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(346002)(396003)(39860400002)(136003)(1800799009)(186009)(451199024)(478600001)(53546011)(6486002)(6506007)(45080400002)(6512007)(83380400001)(2906002)(66556008)(66476007)(4326008)(8936002)(316002)(66946007)(5660300002)(41300700001)(2616005)(7416002)(8676002)(86362001)(26005)(31696002)(82960400001)(38100700002)(36756003)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?L2VlYkN0ejFKS0F2WHRQYWx1cXE1cVpoT3lhbE1xNDFQTDI5UDZ0ZlYyTm44?=
+ =?utf-8?B?RXN0b0taY3IwdHd6Y2w2a2x1dDZiaFFITFlFK3R0NFNnRzZjc05yN3lxNXRr?=
+ =?utf-8?B?dnorYXNRTjR4MjNWQkhFcVpaNTcyTGh2Rk4xbXZiYUdvSXNiOFp4dE1FcUhS?=
+ =?utf-8?B?NkxVbUd6ajN4M2V5ZkRSVVJkYmNjT3N5cjdmbHNDWFZZTHNhMnhreEdlVTc2?=
+ =?utf-8?B?bkFybXByYy81ZVlyYXdwWHNaVkF6d3RldDRwcmhBK1J6SmVKVGlNcGxkckov?=
+ =?utf-8?B?YU04bDRMYlpBWHBiZVFIWGV6RkNWeFpiM1cxcWt2Y1A0MXhTSnVseHVIL0FE?=
+ =?utf-8?B?Z0NYc0VmalQzdWlmMkpzSUQzL0tOK2pSZEMrTHFKNlJNUDlnZTVjdDVYaEFE?=
+ =?utf-8?B?Qkl1OGx6YU5qNThVSWpQUkRsRklOb0JoN3dIdFVoZmZZZG1xTzA1WFgxUXor?=
+ =?utf-8?B?S2cvVlhLZ3hjQ0UvQWxKZStrSzdkU2JSTnRiUjdMMVlVbmE3MmNiaEFBSmp4?=
+ =?utf-8?B?dkNyc04vVVJ6ZEdtdk56NnM0dWJ6bDIyWDlLS1RtaWpiWUh0YmNIdm1RcGsx?=
+ =?utf-8?B?NFZjQjVDN2Q0VWxQS05VVzgvZm8zUjRTMmdMSVpzdU9uVUpPMFo2emZZbU1F?=
+ =?utf-8?B?SWl6MDdud3B6V08rRWdkenh3QTlWR1IxSDVnTkxaTlR4M3l2cytGOHE4UGFv?=
+ =?utf-8?B?MlYxZWZmZEFJOXVEZ0M2OFJ0dW9SWm5KOEg4bkQyS3ZtTzJ2MzlNYVBwaVB5?=
+ =?utf-8?B?cGFyWldKV2tHMVVyczhFZnJhQVpNazliZEcwanVCTGtkMmpuNW1mWWFkWFlx?=
+ =?utf-8?B?cUxWWEltd2pSZmNxRmJxckZHM1VaSTRqZDY5VTE5Yk1PYmk5blFMYVp4dUJ0?=
+ =?utf-8?B?TUxJTFAxN0diYkNwM1FURm1kTC85cFpFTUhUakMvUWhRVXpXSEJqMHEvYm1o?=
+ =?utf-8?B?MDg4bDlnd3FUWXpHZFlMTFVjSUJTMnQ2M1I4MFFvSmJmdUJwb3NLRmQzQVdI?=
+ =?utf-8?B?UjlqaGZIdllCakR3Wkd4TVdtTS9wYVVnYmZOUlZJTFJuTGtySUdHZm1NT0cr?=
+ =?utf-8?B?NnV5ZHFpTmpYOVIvRTlGeVBGNnhrYTFmOWJWNkJoUlBwMkhMN2cyR016a2VU?=
+ =?utf-8?B?NVRjMk9LNXVXdi9wZDAxSmFkcDlQN1dKcEJRQWYwcEFpT051cUxtOStra0dT?=
+ =?utf-8?B?WXVqZ1FRMmU4TVpMeTJ3QjRQaHV2OW9VYy82UDRvUDZSekVXZTZaK0NaQXV2?=
+ =?utf-8?B?M1JmT3ZSa29xaGI4aWlnY2xvNE5mdFdZeEtSTlVDM1FaRDcxdzU1U2xvY3hy?=
+ =?utf-8?B?bXdYTFEwcnFCLzQxdG9OcXpRYjRaSVRWM2Y0ZUxjVE9FQVZzS3U0YzFoa3V4?=
+ =?utf-8?B?SGFIWmNJRkhlZ2w5cGxqbzUyNFdubzZvaFYyVThOTTRTa0xlOFp5Y0lsYXhT?=
+ =?utf-8?B?VnQ5Y1E4K2pkS2pMNzQrZXNlbHprdWxXSHpqcHdsT2UvSkxZODBlR0RtaEJm?=
+ =?utf-8?B?MTRKbGc2Y3NZbjJadVBSU3NnandRd0QxNWowbXVFcFFEeENGOXpiWjhNMU82?=
+ =?utf-8?B?b2p0a2JJZVExOFJ6bW02bEZJL2VCakd2czNsSkhtbUxLQlZCRGpyNko1ZnVS?=
+ =?utf-8?B?V3JrRUlRaUZIVzlIOFJBMGdGSDVFSnZONExIaTFydnNReVkydENxRlRrN3Aw?=
+ =?utf-8?B?MnJGVm4yR2t4U2NyemxYQVorUnduQVFYQmtDZTd1WUN3RVlUZXNmM3RjK1d0?=
+ =?utf-8?B?cjB0NjhFRllJdnFDOVQ5VmU5RkJQaGpKSk5kQmtpUEZ5cThQR2x6dFI1cHVo?=
+ =?utf-8?B?bThpcklxNExJZ0pRejhmQVk3VmcwTExSYnFUVDhleDRIdUwzUGdYNnlremtr?=
+ =?utf-8?B?ajRPVGh5SExNUVMwWDl5Uy9nTE5ZNzZWd2dpTWVzRmJncldBcm5YV1ptVExt?=
+ =?utf-8?B?MitjZ0l5N1hNYjdxalJxSGl2dUhQTEUxaTZrUm5OdFlPRjlhbFZDL3l4bU11?=
+ =?utf-8?B?VTZBYWEyRGh1T2lLNDdSM3dLTy96WWs0bTlJTG9Yb2NyejlCM3VnVmJKVjFn?=
+ =?utf-8?B?WGViSncrYUM3dzUzV1RGeFlOVWMxcWFSalBYZmhuZlA4STJCWEZRaTdkdUVu?=
+ =?utf-8?B?Z3htYmZ1Tzg0bnBVM2t5NXpVS1A0UDErNUFyQjBTKzh3eXF5MG5lZWRKc1F1?=
+ =?utf-8?B?Snc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7f3e74db-0fce-4a91-7184-08dbbae0df39
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Sep 2023 20:25:18.4461
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +EcIXmdAhTAz2t3+j7RESICjSIMvUXa1sImnipnZlYNbxTg5thCLQ/y92uQicJFl0CaLey/v6tzD6pmN9D1UfZLsCxCZgVrs4qGw9Q9OHVU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB8450
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 9/21/23 12:56, Uwe Kleine-König wrote:
-> Hello Guenter,
+
+
+On 9/20/2023 11:24 PM, Clark Wang wrote:
+> The second parameter of stmmac_pltfr_init() needs the pointer of
+> "struct plat_stmmacenet_data". So, correct the parameter typo when calling the
+> function.
 > 
-> On Thu, Sep 21, 2023 at 11:34:09AM -0700, Guenter Roeck wrote:
->> On Tue, Jul 18, 2023 at 12:06:30AM +0800, Jisheng Zhang wrote:
->>> Currently, there are two major issues with stmmac driver statistics
->>> First of all, statistics in stmmac_extra_stats, stmmac_rxq_stats
->>> and stmmac_txq_stats are 32 bit variables on 32 bit platforms. This
->>> can cause some stats to overflow after several minutes of
->>> high traffic, for example rx_pkt_n, tx_pkt_n and so on.
->>>
->>> Secondly, if HW supports multiqueues, there are frequent cacheline
->>> ping pongs on some driver statistic vars, for example, normal_irq_n,
->>> tx_pkt_n and so on. What's more, frequent cacheline ping pongs on
->>> normal_irq_n happens in ISR, this makes the situation worse.
->>>
->>> To improve the driver, we convert those statistics to 64 bit, implement
->>> ndo_get_stats64 and update .get_ethtool_stats implementation
->>> accordingly. We also use per-queue statistics where necessary to remove
->>> the cacheline ping pongs as much as possible to make multiqueue
->>> operations faster. Those statistics which are not possible to overflow
->>> and not frequently updated are kept as is.
->>>
->>> Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
->>
->> Your patch results in lockdep splats. This is with the orangepi-pc
->> emulation in qemu.
->>
->> [   11.126950] dwmac-sun8i 1c30000.ethernet eth0: PHY [mdio_mux-0.1:01] driver [Generic PHY] (irq=POLL)
->> [   11.127912] dwmac-sun8i 1c30000.ethernet eth0: No Safety Features support found
->> [   11.128294] dwmac-sun8i 1c30000.ethernet eth0: No MAC Management Counters available
->> [   11.128511] dwmac-sun8i 1c30000.ethernet eth0: PTP not supported by HW
->> [   11.138990] dwmac-sun8i 1c30000.ethernet eth0: configuring for phy/mii link mode
->> [   11.144387] INFO: trying to register non-static key.
->> [   11.144483] The code is fine but needs lockdep annotation, or maybe
->> [   11.144568] you didn't initialize this object before use?
->> [   11.144640] turning off the locking correctness validator.
->> [   11.144845] CPU: 2 PID: 688 Comm: ip Tainted: G                 N 6.6.0-rc2 #1
->> [   11.144956] Hardware name: Allwinner sun8i Family
->> [   11.145137]  unwind_backtrace from show_stack+0x10/0x14
->> [   11.145610]  show_stack from dump_stack_lvl+0x68/0x90
->> [   11.145692]  dump_stack_lvl from register_lock_class+0x99c/0x9b0
->> [   11.145779]  register_lock_class from __lock_acquire+0x6c/0x2244
->> [   11.145861]  __lock_acquire from lock_acquire+0x11c/0x368
->> [   11.145938]  lock_acquire from stmmac_get_stats64+0x350/0x374
->> [   11.146021]  stmmac_get_stats64 from dev_get_stats+0x3c/0x160
->> [   11.146101]  dev_get_stats from rtnl_fill_stats+0x30/0x118
->> [   11.146179]  rtnl_fill_stats from rtnl_fill_ifinfo.constprop.0+0x82c/0x1770
->> [   11.146273]  rtnl_fill_ifinfo.constprop.0 from rtmsg_ifinfo_build_skb+0xac/0x138
->> [   11.146370]  rtmsg_ifinfo_build_skb from rtmsg_ifinfo+0x44/0x7c
->> [   11.146452]  rtmsg_ifinfo from __dev_notify_flags+0xac/0xd8
->> [   11.146531]  __dev_notify_flags from dev_change_flags+0x48/0x54
->> [   11.146612]  dev_change_flags from do_setlink+0x244/0xe6c
->> [   11.146689]  do_setlink from rtnl_newlink+0x514/0x838
->> [   11.146761]  rtnl_newlink from rtnetlink_rcv_msg+0x170/0x5b0
->> [   11.146841]  rtnetlink_rcv_msg from netlink_rcv_skb+0xb4/0x10c
->> [   11.146925]  netlink_rcv_skb from netlink_unicast+0x190/0x254
->> [   11.147006]  netlink_unicast from netlink_sendmsg+0x1dc/0x460
->> [   11.147086]  netlink_sendmsg from ____sys_sendmsg+0xa0/0x2a0
->> [   11.147168]  ____sys_sendmsg from ___sys_sendmsg+0x68/0x94
->> [   11.147245]  ___sys_sendmsg from sys_sendmsg+0x4c/0x88
->> [   11.147329]  sys_sendmsg from ret_fast_syscall+0x0/0x1c
->> [   11.147439] Exception stack(0xf23edfa8 to 0xf23edff0)
->> [   11.147558] dfa0:                   00000000 00000000 00000003 bef9a8d8 00000000 00000000
->> [   11.147668] dfc0: 00000000 00000000 ffffffff 00000128 00000001 00000002 bef9af4a bef9af4d
->> [   11.147769] dfe0: bef9a868 bef9a858 b6f9ddac b6f9d228
->> [   11.150020] dwmac-sun8i 1c30000.ethernet eth0: Link is Up - 100Mbps/Full - flow control rx/tx
->>
->> My apologies for the noise if this has already been reported.
+> Otherwise, it may cause this alignment exception when doing suspend/resume.
+> [   49.067201] CPU1 is up
+> [   49.135258] Internal error: SP/PC alignment exception: 000000008a000000 [#1] PREEMPT SMP
+> [   49.143346] Modules linked in: soc_imx9 crct10dif_ce polyval_ce nvmem_imx_ocotp_fsb_s400 polyval_generic layerscape_edac_mod snd_soc_fsl_asoc_card snd_soc_imx_audmux snd_soc_imx_card snd_soc_wm8962 el_enclave snd_soc_fsl_micfil rtc_pcf2127 rtc_pcf2131 flexcan can_dev snd_soc_fsl_xcvr snd_soc_fsl_sai imx8_media_dev(C) snd_soc_fsl_utils fuse
+> [   49.173393] CPU: 0 PID: 565 Comm: sh Tainted: G         C         6.5.0-rc4-next-20230804-05047-g5781a6249dae #677
+> [   49.183721] Hardware name: NXP i.MX93 11X11 EVK board (DT)
+> [   49.189190] pstate: 60400009 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+> [   49.196140] pc : 0x80800052
+> [   49.198931] lr : stmmac_pltfr_resume+0x34/0x50
+> [   49.203368] sp : ffff800082f8bab0
+> [   49.206670] x29: ffff800082f8bab0 x28: ffff0000047d0ec0 x27: ffff80008186c170
+> [   49.213794] x26: 0000000b5e4ff1ba x25: ffff800081e5fa74 x24: 0000000000000010
+> [   49.220918] x23: ffff800081fe0000 x22: 0000000000000000 x21: 0000000000000000
+> [   49.228042] x20: ffff0000001b4010 x19: ffff0000001b4010 x18: 0000000000000006
+> [   49.235166] x17: ffff7ffffe007000 x16: ffff800080000000 x15: 0000000000000000
+> [   49.242290] x14: 00000000000000fc x13: 0000000000000000 x12: 0000000000000000
+> [   49.249414] x11: 0000000000000001 x10: 0000000000000a60 x9 : ffff800082f8b8c0
+> [   49.256538] x8 : 0000000000000008 x7 : 0000000000000001 x6 : 000000005f54a200
+> [   49.263662] x5 : 0000000001000000 x4 : ffff800081b93680 x3 : ffff800081519be0
+> [   49.270786] x2 : 0000000080800052 x1 : 0000000000000000 x0 : ffff0000001b4000
+> [   49.277911] Call trace:
+> [   49.280346]  0x80800052
+> [   49.282781]  platform_pm_resume+0x2c/0x68
+> [   49.286785]  dpm_run_callback.constprop.0+0x74/0x134
+> [   49.291742]  device_resume+0x88/0x194
+> [   49.295391]  dpm_resume+0x10c/0x230
+> [   49.298866]  dpm_resume_end+0x18/0x30
+> [   49.302515]  suspend_devices_and_enter+0x2b8/0x624
+> [   49.307299]  pm_suspend+0x1fc/0x348
+> [   49.310774]  state_store+0x80/0x104
+> [   49.314258]  kobj_attr_store+0x18/0x2c
+> [   49.318002]  sysfs_kf_write+0x44/0x54
+> [   49.321659]  kernfs_fop_write_iter+0x120/0x1ec
+> [   49.326088]  vfs_write+0x1bc/0x300
+> [   49.329485]  ksys_write+0x70/0x104
+> [   49.332874]  __arm64_sys_write+0x1c/0x28
+> [   49.336783]  invoke_syscall+0x48/0x114
+> [   49.340527]  el0_svc_common.constprop.0+0xc4/0xe4
+> [   49.345224]  do_el0_svc+0x38/0x98
+> [   49.348526]  el0_svc+0x2c/0x84
+> [   49.351568]  el0t_64_sync_handler+0x100/0x12c
+> [   49.355910]  el0t_64_sync+0x190/0x194
+> [   49.359567] Code: ???????? ???????? ???????? ???????? (????????)
+> [   49.365644] ---[ end trace 0000000000000000 ]---
 > 
-> This seems to be the issue I reported earlier. So you might want to test
-> the patch that fixed it for me:
-> https://lore.kernel.org/netdev/20230917165328.3403-1-jszhang@kernel.org/
+> Fixes: 97117eb51ec8 ("net: stmmac: platform: provide stmmac_pltfr_init()")
+> Signed-off-by: Clark Wang <xiaoning.wang@nxp.com>
+> --->  drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> index 0d9b2138b60a..3c6fd9027934 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> @@ -900,7 +900,7 @@ static int __maybe_unused stmmac_pltfr_resume(struct device *dev)
+>  	struct platform_device *pdev = to_platform_device(dev);
+>  	int ret;
+>  
+> -	ret = stmmac_pltfr_init(pdev, priv->plat->bsp_priv);
+> +	ret = stmmac_pltfr_init(pdev, priv->plat);
+>  	if (ret)
 
-That just showed up in mainline and, yes, of course it fixes the problem.
-As I said, sorry for the noise.
+And this compiled because priv->plat->bsp_priv is a void pointer.
 
-Guenter
+Makes sense.
 
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 
+>  		return ret;
+>  
 
