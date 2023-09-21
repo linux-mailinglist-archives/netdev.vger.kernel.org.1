@@ -1,84 +1,111 @@
-Return-Path: <netdev+bounces-35518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D0907A9C1C
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 21:09:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3244B7A9A48
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 20:37:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4607C1C213A4
-	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 19:09:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07DCE1C20C30
+	for <lists+netdev@lfdr.de>; Thu, 21 Sep 2023 18:37:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E0A342C00;
-	Thu, 21 Sep 2023 18:10:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C595715AED;
+	Thu, 21 Sep 2023 17:48:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E20393F4C3
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 18:10:47 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D64A8AF96C;
-	Thu, 21 Sep 2023 11:07:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=0Pf7QAqDNb+p8bWlfrIyHJVZ4jtnajPgptNvSy4IZPI=; b=g5
-	gkpSG/9cOftC6F92ZPW42OexlxLwh7n353jEq11uPhN6yUs5OqKea93qAl2ERfGW/0mINvTnnHFNw
-	K2W3YVYGZXE6BdfWyFwBnv7Ny6H9YqIU0zirZRCrbqbylTM9W73z7bNDbZfjWzmbCaoV+Qn/O4mgf
-	KXrttycikFARIUY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qjMdy-0076bl-CW; Thu, 21 Sep 2023 18:35:10 +0200
-Date: Thu, 21 Sep 2023 18:35:10 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Roger Quadros <rogerq@kernel.org>
-Cc: MD Danish Anwar <danishanwar@ti.com>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>, vladimir.oltean@nxp.com,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, srk@ti.com, r-gunasekaran@ti.com,
-	Roger Quadros <rogerq@ti.com>
-Subject: Re: [PATCH net-next v2] net: ti: icssg_prueth: add TAPRIO offload
- support
-Message-ID: <f54b6cd6-3f9f-4a4c-a14d-de2201f1e8b0@lunn.ch>
-References: <20230921070031.795788-1-danishanwar@ti.com>
- <b3248b40-38a1-47b0-a61d-e81a451fa0a7@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FA6114F6D
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 17:48:55 +0000 (UTC)
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90DA3914E7;
+	Thu, 21 Sep 2023 10:47:39 -0700 (PDT)
+Received: by mail-pg1-x536.google.com with SMTP id 41be03b00d2f7-577a98f78b2so836220a12.3;
+        Thu, 21 Sep 2023 10:47:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695318459; x=1695923259; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YZDt//U5q7EunYH01zrIXPRDmp4Gue1Cz0eDg+G3evQ=;
+        b=K5/yl1dkXIIy1u5IZmZFHSYI2ppEaLh9FK6bAx9GCk1qvCoeRv00WnPKHV9LCtfnTY
+         46jL6XKx//gu7w82BblyR239kKpRv7286BdzOU8rn9xJ5QE8sstytxQaCxYciTGylQwm
+         Ve7C9dT6T/9nmEWSCcGaIouw2cjkDykpdWOSk1bk5FNyqfnWmv0y8JJdDaTOFACNv9kz
+         uC+kexdnloC611HP3MMFC93vnyCOkW/mfIbBch/kb9P4vMmm21X0R/XdH5ZOtQQktNgq
+         iZiAknKw+zoe+fKyLEQAUo1MWjaL98sSoh+Xy7fC1nscJ6KD1Q/EBEedaR6nBR/69JzY
+         oDCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695318459; x=1695923259;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YZDt//U5q7EunYH01zrIXPRDmp4Gue1Cz0eDg+G3evQ=;
+        b=C6w4j4lwLpcPKoTIqH8ZZUcVThz8ZN8M03q6r4az8wu5GjbAzKf8RLVqcu4/rnMZSx
+         2AMEwfwmTvJX8tQReq+TfvK5jQu7MLHlp815n5wG9SeSHRHOjpdasKpyGnotnit9a6yX
+         U4g3rN+MuZMSj9eaZm6rLtaE2iHkFS1VToWa0CTkhnMhg0UcW11Midy3U4BsFIxqPs42
+         +GRcHWNp/j/8L3+bNwMmHxrAJgkIHo5g6W6w0ZPMymf1aeh+XuRk0dA78tIhQ9B+EZ/S
+         o6JG5R10vvAjC0DTqiQ2CRkhpjcNLk0jqlennDTYiHIkKFYUdEuUidl1zDSf9AihKxNi
+         1h3A==
+X-Gm-Message-State: AOJu0YxRXiBuWBuzblLkqXDfYJAALiPHvdfetzGfRC9nSP836Qw0PgvO
+	Y4lBXMWGKPiixncHxC2vAKM=
+X-Google-Smtp-Source: AGHT+IGpvsTzceD4+eMTpJs59OlOsS8/rmYFsLk8dMqA6Eb9D8Oz6CpW/gwPkWW0xXJkJZocGRHOyQ==
+X-Received: by 2002:a17:90b:17c7:b0:274:735c:e2d3 with SMTP id me7-20020a17090b17c700b00274735ce2d3mr6244390pjb.8.1695318458747;
+        Thu, 21 Sep 2023 10:47:38 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id ev9-20020a17090aeac900b00274aa305adesm2944188pjb.0.2023.09.21.10.47.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 21 Sep 2023 10:47:37 -0700 (PDT)
+Message-ID: <6fe64e91-399a-fa7e-492f-db34d063e0e6@gmail.com>
+Date: Thu, 21 Sep 2023 10:47:35 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <b3248b40-38a1-47b0-a61d-e81a451fa0a7@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v5 net-next 1/5] net: dsa: propagate extack to
+ ds->ops->port_hsr_join()
+Content-Language: en-US
+To: Lukasz Majewski <lukma@denx.de>, Tristram.Ha@microchip.com,
+ Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
+ davem@davemloft.net, Woojung Huh <woojung.huh@microchip.com>,
+ Vladimir Oltean <olteanv@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Vladimir Oltean <vladimir.oltean@nxp.com>
+References: <20230920114343.1979843-1-lukma@denx.de>
+ <20230920114343.1979843-2-lukma@denx.de>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20230920114343.1979843-2-lukma@denx.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Sep 21, 2023 at 01:42:36PM +0300, Roger Quadros wrote:
-> Hi Danish,
+On 9/20/23 04:43, Lukasz Majewski wrote:
+> From: Vladimir Oltean <vladimir.oltean@nxp.com>
 > 
-> On 21/09/2023 10:00, MD Danish Anwar wrote:
+> Drivers can provide meaningful error messages which state a reason why
+> they can't perform an offload, and dsa_slave_changeupper() already has
+> the infrastructure to propagate these over netlink rather than printing
+> to the kernel log. So pass the extack argument and modify the xrs700x
+> driver's port_hsr_join() prototype.
 > 
-> Can you please retain patch authorhsip?
+> Also take the opportunity and use the extack for the 2 -EOPNOTSUPP cases
+> from xrs700x_hsr_join().
 > 
-> > ICSSG dual-emac f/w supports Enhanced Scheduled Traffic (EST – defined
-> > in P802.1Qbv/D2.2 that later got included in IEEE 802.1Q-2018)
-> > configuration.
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> Signed-off-by: Lukasz Majewski <lukma@denx.de>
 
-Does the switch version of the firmware support this?
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+-- 
+Florian
 
-     Andrew
 
