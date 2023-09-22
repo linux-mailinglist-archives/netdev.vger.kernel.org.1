@@ -1,107 +1,152 @@
-Return-Path: <netdev+bounces-35665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9034E7AA814
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 07:12:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 473077AA845
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 07:32:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id B657028208C
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 05:12:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTP id C22E21F21FB7
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 05:31:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 230D153BE;
-	Fri, 22 Sep 2023 05:12:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABF30154A1;
+	Fri, 22 Sep 2023 05:31:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42A4533D4;
-	Fri, 22 Sep 2023 05:12:10 +0000 (UTC)
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1B7B18F;
-	Thu, 21 Sep 2023 22:12:06 -0700 (PDT)
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 38M5B8Jr83708355, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/2.92/5.92) with ESMTPS id 38M5B8Jr83708355
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 22 Sep 2023 13:11:08 +0800
-Received: from RTEXMBS06.realtek.com.tw (172.21.6.99) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.32; Fri, 22 Sep 2023 13:11:07 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS06.realtek.com.tw (172.21.6.99) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.34; Fri, 22 Sep 2023 13:11:06 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::7445:d92b:d0b3:f79c]) by
- RTEXMBS04.realtek.com.tw ([fe80::7445:d92b:d0b3:f79c%5]) with mapi id
- 15.01.2375.007; Fri, 22 Sep 2023 13:11:06 +0800
-From: Hayes Wang <hayeswang@realtek.com>
-To: Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>
-CC: "kuba@kernel.org" <kuba@kernel.org>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        nic_swsd <nic_swsd@realtek.com>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "linux-usb@vger.kernel.org"
-	<linux-usb@vger.kernel.org>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "bjorn@mork.no" <bjorn@mork.no>
-Subject: RE: [PATCH net-next v2 1/2] r8152: remove queuing rx packets in driver
-Thread-Topic: [PATCH net-next v2 1/2] r8152: remove queuing rx packets in
- driver
-Thread-Index: AQHZ6qdYyQovugIsME21Grz+cVcRerAhiHwAgACHqzCAArZ0gIABgcUA
-Date: Fri, 22 Sep 2023 05:11:05 +0000
-Message-ID: <9e03e260818940bcb37828eea83e0137@realtek.com>
-References: <20230919031351.7334-429-nic_swsd@realtek.com>
-	 <20230919031351.7334-430-nic_swsd@realtek.com>
-	 <369f3139-4e63-4327-8745-2d72d7dfea8f@lunn.ch>
-	 <1a57cf3f867d4dfd991ef1d4024c931b@realtek.com>
- <50a8ec7dece0100c931fd187e19e14dd1ca1a0e9.camel@redhat.com>
-In-Reply-To: <50a8ec7dece0100c931fd187e19e14dd1ca1a0e9.camel@redhat.com>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-x-originating-ip: [172.22.228.6]
-x-kse-serverinfo: RTEXMBS06.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C923DC8EE
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 05:31:48 +0000 (UTC)
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59C41192;
+	Thu, 21 Sep 2023 22:31:45 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 374F2120005;
+	Fri, 22 Sep 2023 08:31:42 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 374F2120005
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1695360702;
+	bh=uU0HiYEbsNKJ6Oi4dggUk9GqK8ftuB4QtmG8yc6O7uU=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+	b=VWszeK37rEj0s4kVOt2eBpEaOL4o4HpfCBh7b5JEG/l5COgNz7ZNtwvMC9Nd/UiIr
+	 BOu+BMJvSGslSnORFfvyNc+PSKszJMVh2xp5tNlrpuSOAXjLqCUjE+UuPXpEkDTqkB
+	 jsovjfLftMh9pyHgY+hbEIKSrmNlhYWlg+ge+uvTHfcUCo8QdE7Rfo1zj6MG9BI14R
+	 1Gv8JiG1OZWkdWTh1kG2bK5wGKPt6f/b5bnUMsmhaGrHRkPFtz5IPvjaX2vsBKYCz5
+	 0fR2kdpQtD5dv/C1AXLCNQb1XSiAXObhYICGgQpGHBRoezdrcQrDV8uF/z7yxDirY7
+	 NpVba60wOLlpw==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Fri, 22 Sep 2023 08:31:42 +0300 (MSK)
+Received: from localhost.localdomain (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Fri, 22 Sep 2023 08:31:41 +0300
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
+	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
+	<jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>
+CC: <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<kernel@sberdevices.ru>, <oxffffaa@gmail.com>, <avkrasnov@salutedevices.com>
+Subject: [PATCH net-next v1 00/12] vsock/virtio: continue MSG_ZEROCOPY support
+Date: Fri, 22 Sep 2023 08:24:16 +0300
+Message-ID: <20230922052428.4005676-1-avkrasnov@salutedevices.com>
+X-Mailer: git-send-email 2.35.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 180033 [Sep 21 2023]
+X-KSMG-AntiSpam-Version: 5.9.59.0
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 534 534 808c2ea49f7195c68d40844e073217da4fa0d1e3, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;100.64.160.123:7.1.2;127.0.0.199:7.1.2;git.kernel.org:7.1.1;lore.kernel.org:7.1.1;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2023/09/22 02:40:00
+X-KSMG-LinksScanning: Clean, bases: 2023/09/22 02:40:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/09/22 02:22:00 #21944311
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-UGFvbG8gQWJlbmkgPHBhYmVuaUByZWRoYXQuY29tPg0KPiBTZW50OiBUaHVyc2RheSwgU2VwdGVt
-YmVyIDIxLCAyMDIzIDk6MzkgUE0NClsuLi5dDQo+IE9uZSBvZiB0aGUga2V5IHBvaW50cyBpbiBK
-YWt1YidzIHJlcGx5IGlzIHRoYXQgdGhlIGJ1cnN0IG11c3QgZXhjZWVkDQo+IHRoZSBidWRnZXQg
-YnkgYSBsaW1pdGVkIG51bWJlciBvZiBwYWNrZXRzOg0KPiANCj4gIk5vdGhpbmcgd2lsbCBleHBs
-b2RlIGlmIHdlIHByb2Nlc3MgYSBmZXcgbW9yZSBwYWNrZXRzIHRoYW4gYnVkZ2V0DQo+IChhc3N1
-bWluZyBidWRnZXQgPiAwKSINCj4gDQo+IEhvdyBtYW55IHBhY2tldHMgY2FuIGNvbnRhaW4gYXQg
-bW9zdCBhIHNpbmdsZSBVUkI/DQoNCkkgdGhpbmsgaXQgZGVwZW5kcyBvbg0KMS4gaWYgdGhlIHBh
-Y2tldHMgY29taW5nIGNvbnRpbnVhbGx5DQoyLiB0aGUgc2l6ZSBvZiB0aGUgcGFja2V0DQoNClRo
-ZSBVUkIgd291bGQgYmUgY29tcGxldGVkIHdoZW4NCjEuIHRoZSBkZXZpY2UgZG9lc24ndCByZWNl
-aXZlIGFueSBwYWNrZXQgZHVyaW5nIHNldmVyYWwgdXMuDQoyLiB0aGUgZGVzaXJlZCBzaXplIGlz
-IHJlYWNoZWQuDQoNCkZvciAyLjVHIE5JQyB3aXRoIHRoZSBwYWNrZXRzIG9mIDE1MTQgYnl0ZXMs
-IGEgdXJiIGF0IG1vc3QgY29udGFpbnMgYWJvdXQgMjEgcGFja2V0cy4NCklmIGFsbCBwYWNrZXQg
-YXJlIDYwIGJ5dGVzLCB0aGUgbnVtYmVyIHdvdWxkIGJlIGFib3V0IDM5MC4NCklmIHRoZSBhdmVy
-YWdlIHNpemUgb2YgdGhlIHBhY2tldHMgaXMgNDg4IGJ5dGVzLCB0aGUgbnVtYmVyIGlzIGFib3V0
-IDY0Lg0KDQo+IElmIHRoYXQgbnVtYmVyIGNhbiBiZSBzaWduaWZpY2FudCBncmVhdGVyIHRoZW4g
-dGhlIG5hcGkgYnVkZ2V0LCBJIHRoaW5rDQo+IHdlIGFyZSBiZXR0ZXIgb2ZmIGtlZXBpbmcgdGhl
-IHBhY2tldCBpbiB0aGUgcXVldWUgLSBvdGhlcndpc2UgdGhlIHdob2xlDQo+IHN5c3RlbSBsYXRl
-bmN5L3N0YWJpbGl0eSB3b3VsZCBiZSBhZmZlY3RlZC4NCg0KU2hvdWxkIEkgZ28gYmFjayB0aGUg
-cGF0Y2ggd2l0aCBxdWV1aW5nIHRoZSByeCBwYWNrZXQgaW4gZHJpdmVyPw0KDQpCZXN0IFJlZ2Fy
-ZHMsDQpIYXllcw0KDQo=
+Hello,
+
+this patchset contains second and third parts of another big patchset
+for MSG_ZEROCOPY flag support:
+https://lore.kernel.org/netdev/20230701063947.3422088-1-AVKrasnov@sberdevices.ru/
+
+During review of this series, Stefano Garzarella <sgarzare@redhat.com>
+suggested to split it for three parts to simplify review and merging:
+
+1) virtio and vhost updates (for fragged skbs) (merged to net-next, see
+   link below)
+2) AF_VSOCK updates (allows to enable MSG_ZEROCOPY mode and read
+   tx completions) and update for Documentation/. <-- this patchset
+3) Updates for tests and utils. <-- this patchset
+
+Part 1) was merged:
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=71b263e79370348349553ecdf46f4a69eb436dc7
+
+Head for this patchset is:
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=71b263e79370348349553ecdf46f4a69eb436dc7
+
+Arseniy Krasnov (12):
+  vsock: fix EPOLLERR set on non-empty error queue
+  vsock: read from socket's error queue
+  vsock: check for MSG_ZEROCOPY support on send
+  vsock: enable SOCK_SUPPORT_ZC bit
+  vhost/vsock: support MSG_ZEROCOPY for transport
+  vsock/virtio: support MSG_ZEROCOPY for transport
+  vsock/loopback: support MSG_ZEROCOPY for transport
+  vsock: enable setting SO_ZEROCOPY
+  docs: net: description of MSG_ZEROCOPY for AF_VSOCK
+  test/vsock: MSG_ZEROCOPY flag tests
+  test/vsock: MSG_ZEROCOPY support for vsock_perf
+  test/vsock: io_uring rx/tx tests
+
+ Documentation/networking/msg_zerocopy.rst |  13 +-
+ drivers/vhost/vsock.c                     |   7 +
+ include/linux/socket.h                    |   1 +
+ include/net/af_vsock.h                    |   7 +
+ include/uapi/linux/vsock.h                |   9 +
+ net/vmw_vsock/af_vsock.c                  |  64 ++++-
+ net/vmw_vsock/virtio_transport.c          |   7 +
+ net/vmw_vsock/vsock_loopback.c            |   6 +
+ tools/testing/vsock/Makefile              |   9 +-
+ tools/testing/vsock/util.c                | 222 +++++++++++++++
+ tools/testing/vsock/util.h                |  19 ++
+ tools/testing/vsock/vsock_perf.c          | 143 +++++++++-
+ tools/testing/vsock/vsock_test.c          |  16 ++
+ tools/testing/vsock/vsock_test_zerocopy.c | 314 +++++++++++++++++++++
+ tools/testing/vsock/vsock_test_zerocopy.h |  15 +
+ tools/testing/vsock/vsock_uring_test.c    | 321 ++++++++++++++++++++++
+ 16 files changed, 1158 insertions(+), 15 deletions(-)
+ create mode 100644 include/uapi/linux/vsock.h
+ create mode 100644 tools/testing/vsock/vsock_test_zerocopy.c
+ create mode 100644 tools/testing/vsock/vsock_test_zerocopy.h
+ create mode 100644 tools/testing/vsock/vsock_uring_test.c
+
+-- 
+2.25.1
+
 
