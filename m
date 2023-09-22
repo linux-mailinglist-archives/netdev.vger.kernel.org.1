@@ -1,374 +1,109 @@
-Return-Path: <netdev+bounces-35814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D99227AB207
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 14:19:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 383ED7AB21F
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 14:28:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 8A6D928226B
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 12:19:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTP id BC72C1F22E9E
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 12:28:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD23F22F0E;
-	Fri, 22 Sep 2023 12:19:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECFF122F17;
+	Fri, 22 Sep 2023 12:28:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC9D022F03
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 12:19:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AFACC433C8;
-	Fri, 22 Sep 2023 12:19:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695385194;
-	bh=d390+nRjt4zscfWtuBU8BIEsPdBXvLYymLe2KGyR9y8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=gF95SBC1H8UDsVJJAQIUojQDU1JSa6yZStDpRxgOeTnzmaqo8y9dDEeK8b/0GK96j
-	 TbcqROu/qRS0jQwm+bnvJexUywkeQREgYG20A6fO6qTiqSW3fw0T5iRf0Rq289eA9v
-	 JX+CjVlG0+SpYk3t7W1l0VLQ7REcuIZUxuxWqYhVmrb2OoAXrvFOCzycM5N11B8GTE
-	 Z1mWQQoeGP1pohJCyePMPFfpH43Ld+MUqLCn4VGZjYD1aShZKVeKiUmb63cCxr8JyC
-	 DAlNNEbZXjHVnjBMpwh0qbi3w7k+OoxPIYJZIdz2ygseHNZk6Cag8hjkW2/sN8ENjT
-	 rOlAwHh/OLn6g==
-From: Roger Quadros <rogerq@kernel.org>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	vladimir.oltean@nxp.com
-Cc: horms@kernel.org,
-	s-vadapalli@ti.com,
-	srk@ti.com,
-	vigneshr@ti.com,
-	p-varis@ti.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	rogerq@kernel.org
-Subject: [PATCH] net: ethernet: ti: am65-cpsw: add sw tx/rx irq coalescing based on hrtimers
-Date: Fri, 22 Sep 2023 15:19:47 +0300
-Message-Id: <20230922121947.36403-1-rogerq@kernel.org>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1083168AA
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 12:28:43 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31DA71A5;
+	Fri, 22 Sep 2023 05:28:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=/hHJSVVNBq+Q25kH/Q3wHbSMiRa2RSWRIm+2U1rOzjk=; b=RGnfJOeunzJN6IjLYEZrXxcAL/
+	fpuqpfDgH6Qj5AGs24gad1FLT/whsUz9i+WsoI2JuCWqvJREJGjVEjZGDNHJYKJ6ciBPPNTd/I/0+
+	Zj7N6VWu/XuVFoJ4TnxeWgPsNcLEZE4uTMKvr56eStvdFil+9r9xQ7pQu1x1FCDurx1c=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qjfGQ-007CHP-5B; Fri, 22 Sep 2023 14:28:06 +0200
+Date: Fri, 22 Sep 2023 14:28:06 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Vincent Whitchurch <vincent.whitchurch@axis.com>,
+	Raju Rangoju <rajur@chelsio.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Ping-Ke Shih <pkshih@realtek.com>, Kalle Valo <kvalo@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jiri Pirko <jiri@resnulli.us>, Hangbin Liu <liuhangbin@gmail.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-wireless@vger.kernel.org
+Subject: Re: [net-next PATCH 3/3] net: stmmac: increase TX coalesce timer to
+ 5ms
+Message-ID: <13bc074d-30c2-4bbf-8b4c-82f561c844b0@lunn.ch>
+References: <20230922111247.497-1-ansuelsmth@gmail.com>
+ <20230922111247.497-3-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230922111247.497-3-ansuelsmth@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Grygorii Strashko <grygorii.strashko@ti.com>
+On Fri, Sep 22, 2023 at 01:12:47PM +0200, Christian Marangi wrote:
+> Commit 8fce33317023 ("net: stmmac: Rework coalesce timer and fix
+> multi-queue races") decreased the TX coalesce timer from 40ms to 1ms.
+> 
+> This caused some performance regression on some target (regression was
+> reported at least on ipq806x) in the order of 600mbps dropping from
+> gigabit handling to only 200mbps.
+> 
+> The problem was identified in the TX timer getting armed too much time.
+> While this was fixed and improved in another commit, performance can be
+> improved even further by increasing the timer delay a bit moving from
+> 1ms to 5ms.
+> 
+> The value is a good balance between battery saving by prevending too
+> much interrupt to be generated and permitting good performance for
+> internet oriented devices.
 
-Add SW IRQ coalescing based on hrtimers for TX and RX data path which
-can be enabled by ethtool commands:
+ethtool has a settings you can use for this:
 
-- RX coalescing
-  ethtool -C eth1 rx-usecs 50
+      ethtool -C|--coalesce devname [adaptive-rx on|off] [adaptive-tx on|off]
+              [rx-usecs N] [rx-frames N] [rx-usecs-irq N] [rx-frames-irq N]
+              [tx-usecs N] [tx-frames N] [tx-usecs-irq N] [tx-frames-irq N]
+              [stats-block-usecs N] [pkt-rate-low N] [rx-usecs-low N]
+              [rx-frames-low N] [tx-usecs-low N] [tx-frames-low N]
+              [pkt-rate-high N] [rx-usecs-high N] [rx-frames-high N]
+              [tx-usecs-high N] [tx-frames-high N] [sample-interval N]
+              [cqe-mode-rx on|off] [cqe-mode-tx on|off] [tx-aggr-max-bytes N]
+              [tx-aggr-max-frames N] [tx-aggr-time-usecs N]
 
-- TX coalescing can be enabled per TX queue
+If this is not implemented, i suggest you add support for it.
 
-  - by default enables coalesing for TX0
-  ethtool -C eth1 tx-usecs 50
-  - configure TX0
-  ethtool -Q eth0 queue_mask 1 --coalesce tx-usecs 100
-  - configure TX1
-  ethtool -Q eth0 queue_mask 2 --coalesce tx-usecs 100
-  - configure TX0 and TX1
-  ethtool -Q eth0 queue_mask 3 --coalesce tx-usecs 100 --coalesce tx-usecs 100
+Changing the default might cause regressions. Say there is a VoIP
+application which wants this low latency? It would be safer to allow
+user space to configure it as wanted.
 
-  show configuration for TX0 and TX1:
-  ethtool -Q eth0 queue_mask 3 --show-coalesce
-
-Comparing to gro_flush_timeout and napi_defer_hard_irqs, this patch
-allows to enable IRQ coalesing for RX path separately.
-
-Signed-off-by: Grygorii Strashko <grygorii.strashko@ti.com>
-Signed-off-by: Roger Quadros <rogerq@kernel.org>
----
- drivers/net/ethernet/ti/am65-cpsw-ethtool.c | 79 +++++++++++++++++++++
- drivers/net/ethernet/ti/am65-cpsw-nuss.c    | 59 ++++++++++++---
- drivers/net/ethernet/ti/am65-cpsw-nuss.h    |  4 ++
- 3 files changed, 134 insertions(+), 8 deletions(-)
-
-Patch depends on series [1]
-
-[1] am65-cpsw: mqprio and Frame Pre-emption support
-https://lore.kernel.org/all/20230920121530.4710-1-rogerq@kernel.org/
-
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
-index f6b081b7e754..d53360b00e7c 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
-@@ -862,6 +862,80 @@ static void am65_cpsw_get_mm_stats(struct net_device *ndev,
- 	s->MACMergeHoldCount = readl(base + AM65_CPSW_STATN_IET_TX_HOLD);
- }
- 
-+static int am65_cpsw_get_coalesce(struct net_device *ndev, struct ethtool_coalesce *coal,
-+				  struct kernel_ethtool_coalesce *kernel_coal,
-+				  struct netlink_ext_ack *extack)
-+{
-+	struct am65_cpsw_common *common = am65_ndev_to_common(ndev);
-+	struct am65_cpsw_tx_chn *tx_chn;
-+
-+	tx_chn = &common->tx_chns[0];
-+
-+	coal->rx_coalesce_usecs = common->rx_pace_timeout / 1000;
-+	coal->tx_coalesce_usecs = tx_chn->tx_pace_timeout / 1000;
-+
-+	return 0;
-+}
-+
-+static int am65_cpsw_get_per_queue_coalesce(struct net_device *ndev, u32 queue,
-+					    struct ethtool_coalesce *coal)
-+{
-+	struct am65_cpsw_common *common = am65_ndev_to_common(ndev);
-+	struct am65_cpsw_tx_chn *tx_chn;
-+
-+	if (queue >= AM65_CPSW_MAX_TX_QUEUES)
-+		return -EINVAL;
-+
-+	tx_chn = &common->tx_chns[queue];
-+
-+	coal->tx_coalesce_usecs = tx_chn->tx_pace_timeout / 1000;
-+
-+	return 0;
-+}
-+
-+static int am65_cpsw_set_coalesce(struct net_device *ndev, struct ethtool_coalesce *coal,
-+				  struct kernel_ethtool_coalesce *kernel_coal,
-+				  struct netlink_ext_ack *extack)
-+{
-+	struct am65_cpsw_common *common = am65_ndev_to_common(ndev);
-+	struct am65_cpsw_tx_chn *tx_chn;
-+
-+	tx_chn = &common->tx_chns[0];
-+
-+	if (coal->rx_coalesce_usecs && coal->rx_coalesce_usecs < 20)
-+		return -EINVAL;
-+
-+	if (coal->tx_coalesce_usecs && coal->tx_coalesce_usecs < 20)
-+		return -EINVAL;
-+
-+	common->rx_pace_timeout = coal->rx_coalesce_usecs * 1000;
-+	tx_chn->tx_pace_timeout = coal->tx_coalesce_usecs * 1000;
-+
-+	return 0;
-+}
-+
-+static int am65_cpsw_set_per_queue_coalesce(struct net_device *ndev, u32 queue,
-+					    struct ethtool_coalesce *coal)
-+{
-+	struct am65_cpsw_common *common = am65_ndev_to_common(ndev);
-+	struct am65_cpsw_tx_chn *tx_chn;
-+
-+	if (queue >= AM65_CPSW_MAX_TX_QUEUES)
-+		return -EINVAL;
-+
-+	tx_chn = &common->tx_chns[queue];
-+
-+	if (coal->tx_coalesce_usecs && coal->tx_coalesce_usecs < 20) {
-+		dev_info(common->dev, "defaulting to min value of 20us for tx-usecs for tx-%u\n",
-+			 queue);
-+		coal->tx_coalesce_usecs = 20;
-+	}
-+
-+	tx_chn->tx_pace_timeout = coal->tx_coalesce_usecs * 1000;
-+
-+	return 0;
-+}
-+
- const struct ethtool_ops am65_cpsw_ethtool_ops_slave = {
- 	.begin			= am65_cpsw_ethtool_op_begin,
- 	.complete		= am65_cpsw_ethtool_op_complete,
-@@ -879,6 +953,11 @@ const struct ethtool_ops am65_cpsw_ethtool_ops_slave = {
- 	.get_ts_info		= am65_cpsw_get_ethtool_ts_info,
- 	.get_priv_flags		= am65_cpsw_get_ethtool_priv_flags,
- 	.set_priv_flags		= am65_cpsw_set_ethtool_priv_flags,
-+	.supported_coalesce_params = ETHTOOL_COALESCE_USECS,
-+	.get_coalesce           = am65_cpsw_get_coalesce,
-+	.set_coalesce           = am65_cpsw_set_coalesce,
-+	.get_per_queue_coalesce = am65_cpsw_get_per_queue_coalesce,
-+	.set_per_queue_coalesce = am65_cpsw_set_per_queue_coalesce,
- 
- 	.get_link		= ethtool_op_get_link,
- 	.get_link_ksettings	= am65_cpsw_get_link_ksettings,
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index 2004f6a020d3..5a35269e2bbe 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -496,8 +496,10 @@ static int am65_cpsw_nuss_common_stop(struct am65_cpsw_common *common)
- 					msecs_to_jiffies(1000));
- 	if (!i)
- 		dev_err(common->dev, "tx timeout\n");
--	for (i = 0; i < common->tx_ch_num; i++)
-+	for (i = 0; i < common->tx_ch_num; i++) {
- 		napi_disable(&common->tx_chns[i].napi_tx);
-+		hrtimer_cancel(&common->tx_chns[i].tx_hrtimer);
-+	}
- 
- 	for (i = 0; i < common->tx_ch_num; i++) {
- 		k3_udma_glue_reset_tx_chn(common->tx_chns[i].tx_chn,
-@@ -516,6 +518,7 @@ static int am65_cpsw_nuss_common_stop(struct am65_cpsw_common *common)
- 	}
- 
- 	napi_disable(&common->napi_rx);
-+	hrtimer_cancel(&common->rx_hrtimer);
- 
- 	for (i = 0; i < AM65_CPSW_MAX_RX_FLOWS; i++)
- 		k3_udma_glue_reset_rx_chn(common->rx_chns.rx_chn, i,
-@@ -806,6 +809,15 @@ static int am65_cpsw_nuss_rx_packets(struct am65_cpsw_common *common,
- 	return ret;
- }
- 
-+static enum hrtimer_restart am65_cpsw_nuss_rx_timer_callback(struct hrtimer *timer)
-+{
-+	struct am65_cpsw_common *common =
-+			container_of(timer, struct am65_cpsw_common, rx_hrtimer);
-+
-+	enable_irq(common->rx_chns.irq);
-+	return HRTIMER_NORESTART;
-+}
-+
- static int am65_cpsw_nuss_rx_poll(struct napi_struct *napi_rx, int budget)
- {
- 	struct am65_cpsw_common *common = am65_cpsw_napi_to_common(napi_rx);
-@@ -833,7 +845,13 @@ static int am65_cpsw_nuss_rx_poll(struct napi_struct *napi_rx, int budget)
- 	if (num_rx < budget && napi_complete_done(napi_rx, num_rx)) {
- 		if (common->rx_irq_disabled) {
- 			common->rx_irq_disabled = false;
--			enable_irq(common->rx_chns.irq);
-+			if (unlikely(common->rx_pace_timeout)) {
-+				hrtimer_start(&common->rx_hrtimer,
-+					      ns_to_ktime(common->rx_pace_timeout),
-+					      HRTIMER_MODE_REL_PINNED);
-+			} else {
-+				enable_irq(common->rx_chns.irq);
-+			}
- 		}
- 	}
- 
-@@ -939,7 +957,7 @@ static void am65_cpsw_nuss_tx_wake(struct am65_cpsw_tx_chn *tx_chn, struct net_d
- }
- 
- static int am65_cpsw_nuss_tx_compl_packets(struct am65_cpsw_common *common,
--					   int chn, unsigned int budget)
-+					   int chn, unsigned int budget, bool *tdown)
- {
- 	struct device *dev = common->dev;
- 	struct am65_cpsw_tx_chn *tx_chn;
-@@ -962,6 +980,7 @@ static int am65_cpsw_nuss_tx_compl_packets(struct am65_cpsw_common *common,
- 		if (cppi5_desc_is_tdcm(desc_dma)) {
- 			if (atomic_dec_and_test(&common->tdown_cnt))
- 				complete(&common->tdown_complete);
-+			*tdown = true;
- 			break;
- 		}
- 
-@@ -984,7 +1003,7 @@ static int am65_cpsw_nuss_tx_compl_packets(struct am65_cpsw_common *common,
- }
- 
- static int am65_cpsw_nuss_tx_compl_packets_2g(struct am65_cpsw_common *common,
--					      int chn, unsigned int budget)
-+					      int chn, unsigned int budget, bool *tdown)
- {
- 	struct device *dev = common->dev;
- 	struct am65_cpsw_tx_chn *tx_chn;
-@@ -1005,6 +1024,7 @@ static int am65_cpsw_nuss_tx_compl_packets_2g(struct am65_cpsw_common *common,
- 		if (cppi5_desc_is_tdcm(desc_dma)) {
- 			if (atomic_dec_and_test(&common->tdown_cnt))
- 				complete(&common->tdown_complete);
-+			*tdown = true;
- 			break;
- 		}
- 
-@@ -1030,21 +1050,40 @@ static int am65_cpsw_nuss_tx_compl_packets_2g(struct am65_cpsw_common *common,
- 	return num_tx;
- }
- 
-+static enum hrtimer_restart am65_cpsw_nuss_tx_timer_callback(struct hrtimer *timer)
-+{
-+	struct am65_cpsw_tx_chn *tx_chns =
-+			container_of(timer, struct am65_cpsw_tx_chn, tx_hrtimer);
-+
-+	enable_irq(tx_chns->irq);
-+	return HRTIMER_NORESTART;
-+}
-+
- static int am65_cpsw_nuss_tx_poll(struct napi_struct *napi_tx, int budget)
- {
- 	struct am65_cpsw_tx_chn *tx_chn = am65_cpsw_napi_to_tx_chn(napi_tx);
-+	bool tdown = false;
- 	int num_tx;
- 
- 	if (AM65_CPSW_IS_CPSW2G(tx_chn->common))
--		num_tx = am65_cpsw_nuss_tx_compl_packets_2g(tx_chn->common, tx_chn->id, budget);
-+		num_tx = am65_cpsw_nuss_tx_compl_packets_2g(tx_chn->common, tx_chn->id,
-+							    budget, &tdown);
- 	else
--		num_tx = am65_cpsw_nuss_tx_compl_packets(tx_chn->common, tx_chn->id, budget);
-+		num_tx = am65_cpsw_nuss_tx_compl_packets(tx_chn->common,
-+							 tx_chn->id, budget, &tdown);
- 
- 	if (num_tx >= budget)
- 		return budget;
- 
--	if (napi_complete_done(napi_tx, num_tx))
--		enable_irq(tx_chn->irq);
-+	if (napi_complete_done(napi_tx, num_tx)) {
-+		if (unlikely(tx_chn->tx_pace_timeout && !tdown)) {
-+			hrtimer_start(&tx_chn->tx_hrtimer,
-+				      ns_to_ktime(tx_chn->tx_pace_timeout),
-+				      HRTIMER_MODE_REL_PINNED);
-+		} else {
-+			enable_irq(tx_chn->irq);
-+		}
-+	}
- 
- 	return 0;
- }
-@@ -1676,6 +1715,8 @@ static int am65_cpsw_nuss_ndev_add_tx_napi(struct am65_cpsw_common *common)
- 
- 		netif_napi_add_tx(common->dma_ndev, &tx_chn->napi_tx,
- 				  am65_cpsw_nuss_tx_poll);
-+		hrtimer_init(&tx_chn->tx_hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_REL_PINNED);
-+		tx_chn->tx_hrtimer.function = &am65_cpsw_nuss_tx_timer_callback;
- 
- 		ret = devm_request_irq(dev, tx_chn->irq,
- 				       am65_cpsw_nuss_tx_irq,
-@@ -1900,6 +1941,8 @@ static int am65_cpsw_nuss_init_rx_chns(struct am65_cpsw_common *common)
- 
- 	netif_napi_add(common->dma_ndev, &common->napi_rx,
- 		       am65_cpsw_nuss_rx_poll);
-+	hrtimer_init(&common->rx_hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_REL_PINNED);
-+	common->rx_hrtimer.function = &am65_cpsw_nuss_rx_timer_callback;
- 
- 	ret = devm_request_irq(dev, rx_chn->irq,
- 			       am65_cpsw_nuss_rx_irq,
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.h b/drivers/net/ethernet/ti/am65-cpsw-nuss.h
-index 1e4a045057fc..7da0492dc091 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.h
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.h
-@@ -75,6 +75,8 @@ struct am65_cpsw_tx_chn {
- 	struct k3_cppi_desc_pool *desc_pool;
- 	struct k3_udma_glue_tx_channel *tx_chn;
- 	spinlock_t lock; /* protect TX rings in multi-port mode */
-+	struct hrtimer tx_hrtimer;
-+	unsigned long tx_pace_timeout;
- 	int irq;
- 	u32 id;
- 	u32 descs_num;
-@@ -138,6 +140,8 @@ struct am65_cpsw_common {
- 	struct napi_struct	napi_rx;
- 
- 	bool			rx_irq_disabled;
-+	struct hrtimer		rx_hrtimer;
-+	unsigned long		rx_pace_timeout;
- 
- 	u32			nuss_ver;
- 	u32			cpsw_ver;
-
-base-commit: 0bb80ecc33a8fb5a682236443c1e740d5c917d1d
-prerequisite-patch-id: 281ee877d949be7a0c0d4460281c7c6a356cffdf
-prerequisite-patch-id: 2633189c7e9e0d30c8d5b8edc2468b2475e42816
-prerequisite-patch-id: 656c6308f2b6782a43371ef66a9f1bfa8177b1cf
--- 
-2.34.1
-
+     Andrew
 
