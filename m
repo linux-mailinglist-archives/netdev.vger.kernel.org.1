@@ -1,176 +1,319 @@
-Return-Path: <netdev+bounces-35818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 122587AB24B
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 14:41:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 680E57AB262
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 14:45:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id B8C48282411
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 12:41:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 1168128240C
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 12:45:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3BEE22EEB;
-	Fri, 22 Sep 2023 12:41:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4C1022F1D;
+	Fri, 22 Sep 2023 12:45:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42B112F25;
-	Fri, 22 Sep 2023 12:41:15 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E9488F;
-	Fri, 22 Sep 2023 05:41:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=yvGliCzM7qR9cjwG6OFrxm7XoeY8chqa33iD7TfYF9g=; b=lZm9bmh9bX4vJV7N6gXQkI3orG
-	zGDpsAFxG6Z8J3pwy7jZY5q9zdQBewF7xPzkwVqKcnIXeOpSMLDiT9vx91NXTJL4TKTDfqMxl8VmF
-	00A8OH6092aKIauO2XgRfqHFoT6s/Q949MDmsDVAKpowyBYFcwu71cpJcLQSreWpKQ3NtsiVHMwoh
-	+Bt9QjogKZdkYYbb09Sm03zcoKIdFB2rRi1f2Z7BqckuRb1t0OcnP7aOwqqncjkWwJgBFYQO2zT90
-	bPYGmJc+fnBXeqB5Kc7zpYjRzqfIhLdY4TdjI3sN0w2JfpuF/l64bNxiSsOPpJ4SScHNBucvTZL1F
-	Y9zblyZg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55764)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qjfSL-0006d7-0y;
-	Fri, 22 Sep 2023 13:40:25 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qjfSD-0004Zz-QK; Fri, 22 Sep 2023 13:40:17 +0100
-Date: Fri, 22 Sep 2023 13:40:17 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	George McCollister <george.mccollister@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Kurt Kanzenbach <kurt@linutronix.de>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
-	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
-	Marcin Wojtas <mw@semihalf.com>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@microchip.com>,
-	Marek Vasut <marex@denx.de>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	John Crispin <john@phrozen.org>,
-	Madalin Bucur <madalin.bucur@nxp.com>,
-	Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	Oleksij Rempel <linux@rempel-privat.de>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Grygorii Strashko <grygorii.strashko@ti.com>,
-	Sekhar Nori <nsekhar@ti.com>,
-	Shyam Pandey <radhey.shyam.pandey@xilinx.com>,
-	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH net-next v2 00/10] define and enforce phylink bindings
-Message-ID: <ZQ2LMe9aa1ViBcSH@shell.armlinux.org.uk>
-References: <20230916110902.234273-1-arinc.unal@arinc9.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3540168AA
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 12:45:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA577C433C8;
+	Fri, 22 Sep 2023 12:45:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695386701;
+	bh=lXu3gbEYpYxZKk3OtpxHdDR4wko55KgbOhVSsGGEhX8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=HlnehsXr3+8B0A9BavZvjuUGf6m9A2+W8MZzu2GtgTc/w34siY3Jb0U9Ihs91qS1D
+	 F8FfoTU052AEJbNaqmzE4+Ba1Aqx5HA351eE9LCsHVjvelNXlH71JFE107MKfAncmP
+	 IRyXuTnNeyflVrEO/XBJOPdBnrdu3etEGCwhnw5IZSJ/P2HqwrE4Vd65TjaOo6KBAE
+	 8pZd/3FItNL3Hbh384P8YiOB6JxaTdGgDnWZaDL0y2BC4v6R0jljI35eDOakcaOl+d
+	 wwhFHWN7yLZehLGTJX2669bd7MhKeQ52fMY4LPFWP7XjvQNfpMZiv/zq681NFpYmSE
+	 H1Q0zzR5b8cLQ==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: linux-nfs@vger.kernel.org
+Cc: lorenzo.bianconi@redhat.com,
+	jlayton@kernel.org,
+	neilb@suse.de,
+	chuck.lever@oracle.com,
+	netdev@vger.kernel.org
+Subject: [PATCH] NFSD: convert write_threads and write_v4_end_grace to netlink commands
+Date: Fri, 22 Sep 2023 14:44:52 +0200
+Message-ID: <b7985d6f0708d4a2836e1b488d641cdc11ace61b.1695386483.git.lorenzo@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230916110902.234273-1-arinc.unal@arinc9.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Sat, Sep 16, 2023 at 02:08:52PM +0300, Arınç ÜNAL wrote:
-> Hello there.
-> 
-> This patch series defines phylink bindings and enforces them for the
-> ethernet controllers that need them.
-> 
-> Some schemas had to be changed to properly enforce phylink bindings for all
-> of the affected ethernet controllers. Some of the documents of these
-> ethernet controllers were non json-schema, which had to be converted.
-> 
-> I will convert the remaining documents to json-schema while this patch
-> series receives reviews.
+Introduce write_threads and write_v4_end_grace netlink commands similar
+to the ones available through the procfs.
+Introduce nfsd_nl_server_status_get_dumpit netlink command in order to
+report global server metadata.
 
-I can't say that I'm comfortable with this. We appear to be defining
-bindings based on software implementation, and a desire for the DT
-tooling to enforce what the software implementation wants. Isn't this
-against the aims of device tree and device tree binding documentation?
-Seems to me like feature-creep.
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+This patch can be tested with user-space tool reported below:
+https://github.com/LorenzoBianconi/nfsd-netlink.git
+---
+ Documentation/netlink/specs/nfsd.yaml | 33 +++++++++
+ fs/nfsd/netlink.c                     | 30 ++++++++
+ fs/nfsd/netlink.h                     |  5 ++
+ fs/nfsd/nfsctl.c                      | 98 +++++++++++++++++++++++++++
+ include/uapi/linux/nfsd_netlink.h     | 11 +++
+ 5 files changed, 177 insertions(+)
 
-The bindings that phylink parses are already documented in the
-ethernet controller yaml document. Specifically:
-
-- phylink does not parse the phy-mode property, that is left to the
-  implementation to pass to phylink, which can implement it any
-  which way they choose (and even default to something.)
-
-- phylink does not require a phy property - phylink does expect a PHY
-  to be attached, but how that PHY is attached is up to the ethernet
-  controller driver. It may call one of the phylink functions that
-  parses the phy property, or it may manually supply the phy device to
-  phylink. Either way, phylink does not itself require a PHY property.
-
-- phylink does not require a sfp property - this obviously is optional.
-
-So, all in all, ethernet-controller already describes it, and to create
-a DT binding document that pretends that phylink requires any of this
-stuff is, in my mind, wrong.
-
-DSA requires certain properties by dint of the parsing and setup of
-phylink being in generic code - this is not because phylink requires
-certain properties, but phylink does require certain information in
-order to function correctly.
-
-The issue here is _how_ phylink gets that information, and as I state
-above, it _can_ come from DT, but it can also be given that information
-manually.
-
-As an example, there are plenty of drivers in the tree which try to
-parse a phy node, and if that's not present, they try to see if a PHY
-exists at a default# bus address.
-
-We seem to be digging outselves a hole here, where "phylink must have
-these properties". No, that is wrong.
-
+diff --git a/Documentation/netlink/specs/nfsd.yaml b/Documentation/netlink/specs/nfsd.yaml
+index 403d3e3a04f3..fa1204892703 100644
+--- a/Documentation/netlink/specs/nfsd.yaml
++++ b/Documentation/netlink/specs/nfsd.yaml
+@@ -62,6 +62,15 @@ attribute-sets:
+         name: compound-ops
+         type: u32
+         multi-attr: true
++  -
++    name: server-attr
++    attributes:
++      -
++        name: threads
++        type: u16
++      -
++        name: v4-grace
++        type: u8
+ 
+ operations:
+   list:
+@@ -72,3 +81,27 @@ operations:
+       dump:
+         pre: nfsd-nl-rpc-status-get-start
+         post: nfsd-nl-rpc-status-get-done
++    -
++      name: threads-set
++      doc: set the number of running threads
++      attribute-set: server-attr
++      flags: [ admin-perm ]
++      do:
++        request:
++          attributes:
++            - threads
++    -
++      name: v4-grace-release
++      doc: release the grace period for nfsd's v4 lock manager
++      attribute-set: server-attr
++      flags: [ admin-perm ]
++      do:
++        request:
++          attributes:
++            - v4-grace
++    -
++      name: server-status-get
++      doc: dump server status info
++      attribute-set: server-attr
++      dump:
++        pre: nfsd-nl-server-status-get-start
+diff --git a/fs/nfsd/netlink.c b/fs/nfsd/netlink.c
+index 0e1d635ec5f9..783a34e69354 100644
+--- a/fs/nfsd/netlink.c
++++ b/fs/nfsd/netlink.c
+@@ -10,6 +10,16 @@
+ 
+ #include <uapi/linux/nfsd_netlink.h>
+ 
++/* NFSD_CMD_THREADS_SET - do */
++static const struct nla_policy nfsd_threads_set_nl_policy[NFSD_A_SERVER_ATTR_THREADS + 1] = {
++	[NFSD_A_SERVER_ATTR_THREADS] = { .type = NLA_U16, },
++};
++
++/* NFSD_CMD_V4_GRACE_RELEASE - do */
++static const struct nla_policy nfsd_v4_grace_release_nl_policy[NFSD_A_SERVER_ATTR_V4_GRACE + 1] = {
++	[NFSD_A_SERVER_ATTR_V4_GRACE] = { .type = NLA_U8, },
++};
++
+ /* Ops table for nfsd */
+ static const struct genl_split_ops nfsd_nl_ops[] = {
+ 	{
+@@ -19,6 +29,26 @@ static const struct genl_split_ops nfsd_nl_ops[] = {
+ 		.done	= nfsd_nl_rpc_status_get_done,
+ 		.flags	= GENL_CMD_CAP_DUMP,
+ 	},
++	{
++		.cmd		= NFSD_CMD_THREADS_SET,
++		.doit		= nfsd_nl_threads_set_doit,
++		.policy		= nfsd_threads_set_nl_policy,
++		.maxattr	= NFSD_A_SERVER_ATTR_THREADS,
++		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
++	},
++	{
++		.cmd		= NFSD_CMD_V4_GRACE_RELEASE,
++		.doit		= nfsd_nl_v4_grace_release_doit,
++		.policy		= nfsd_v4_grace_release_nl_policy,
++		.maxattr	= NFSD_A_SERVER_ATTR_V4_GRACE,
++		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
++	},
++	{
++		.cmd	= NFSD_CMD_SERVER_STATUS_GET,
++		.start	= nfsd_nl_server_status_get_start,
++		.dumpit	= nfsd_nl_server_status_get_dumpit,
++		.flags	= GENL_CMD_CAP_DUMP,
++	},
+ };
+ 
+ struct genl_family nfsd_nl_family __ro_after_init = {
+diff --git a/fs/nfsd/netlink.h b/fs/nfsd/netlink.h
+index d83dd6bdee92..2e98061fbb0a 100644
+--- a/fs/nfsd/netlink.h
++++ b/fs/nfsd/netlink.h
+@@ -12,10 +12,15 @@
+ #include <uapi/linux/nfsd_netlink.h>
+ 
+ int nfsd_nl_rpc_status_get_start(struct netlink_callback *cb);
++int nfsd_nl_server_status_get_start(struct netlink_callback *cb);
+ int nfsd_nl_rpc_status_get_done(struct netlink_callback *cb);
+ 
+ int nfsd_nl_rpc_status_get_dumpit(struct sk_buff *skb,
+ 				  struct netlink_callback *cb);
++int nfsd_nl_threads_set_doit(struct sk_buff *skb, struct genl_info *info);
++int nfsd_nl_v4_grace_release_doit(struct sk_buff *skb, struct genl_info *info);
++int nfsd_nl_server_status_get_dumpit(struct sk_buff *skb,
++				     struct netlink_callback *cb);
+ 
+ extern struct genl_family nfsd_nl_family;
+ 
+diff --git a/fs/nfsd/nfsctl.c b/fs/nfsd/nfsctl.c
+index b71744e355a8..c631b59b7a4f 100644
+--- a/fs/nfsd/nfsctl.c
++++ b/fs/nfsd/nfsctl.c
+@@ -1694,6 +1694,104 @@ int nfsd_nl_rpc_status_get_done(struct netlink_callback *cb)
+ 	return 0;
+ }
+ 
++/**
++ * nfsd_nl_threads_set_doit - set the number of running threads
++ * @skb: reply buffer
++ * @info: netlink metadata and command arguments
++ *
++ * Return 0 on success or a negative errno.
++ */
++int nfsd_nl_threads_set_doit(struct sk_buff *skb, struct genl_info *info)
++{
++	u16 nthreads;
++	int ret;
++
++	if (!info->attrs[NFSD_A_SERVER_ATTR_THREADS])
++		return -EINVAL;
++
++	nthreads = nla_get_u16(info->attrs[NFSD_A_SERVER_ATTR_THREADS]);
++
++	ret = nfsd_svc(nthreads, genl_info_net(info), get_current_cred());
++	return ret == nthreads ? 0 : ret;
++}
++
++/**
++ * nfsd_nl_v4_grace_release_doit - release the nfs4 grace period
++ * @skb: reply buffer
++ * @info: netlink metadata and command arguments
++ *
++ * Return 0 on success or a negative errno.
++ */
++int nfsd_nl_v4_grace_release_doit(struct sk_buff *skb, struct genl_info *info)
++{
++#ifdef CONFIG_NFSD_V4
++	struct nfsd_net *nn = net_generic(genl_info_net(info), nfsd_net_id);
++
++	if (!info->attrs[NFSD_A_SERVER_ATTR_V4_GRACE])
++		return -EINVAL;
++
++	if (nla_get_u8(info->attrs[NFSD_A_SERVER_ATTR_V4_GRACE]))
++		nfsd4_end_grace(nn);
++
++	return 0;
++#else
++	return -EOPNOTSUPP;
++#endif /* CONFIG_NFSD_V4 */
++}
++
++/**
++ * nfsd_nl_server_status_get_start - Prepare server_status_get dumpit
++ * @cb: netlink metadata and command arguments
++ *
++ * Return values:
++ *   %0: The server_status_get command may proceed
++ *   %-ENODEV: There is no NFSD running in this namespace
++ */
++int nfsd_nl_server_status_get_start(struct netlink_callback *cb)
++{
++	struct nfsd_net *nn = net_generic(sock_net(cb->skb->sk), nfsd_net_id);
++
++	return nn->nfsd_serv ? 0 : -ENODEV;
++}
++
++/**
++ * nfsd_nl_server_status_get_dumpit - dump server status info
++ * @skb: reply buffer
++ * @cb: netlink metadata and command arguments
++ *
++ * Returns the size of the reply or a negative errno.
++ */
++int nfsd_nl_server_status_get_dumpit(struct sk_buff *skb,
++				     struct netlink_callback *cb)
++{
++	struct net *net = sock_net(skb->sk);
++#ifdef CONFIG_NFSD_V4
++	struct nfsd_net *nn = net_generic(net, nfsd_net_id);
++#endif /* CONFIG_NFSD_V4 */
++	void *hdr;
++
++	if (cb->args[0]) /* already consumed */
++		return 0;
++
++	hdr = genlmsg_put(skb, NETLINK_CB(cb->skb).portid, cb->nlh->nlmsg_seq,
++			  &nfsd_nl_family, NLM_F_MULTI,
++			  NFSD_CMD_SERVER_STATUS_GET);
++	if (!hdr)
++		return -ENOBUFS;
++
++	if (nla_put_u16(skb, NFSD_A_SERVER_ATTR_THREADS, nfsd_nrthreads(net)))
++		return -ENOBUFS;
++#ifdef CONFIG_NFSD_V4
++	if (nla_put_u8(skb, NFSD_A_SERVER_ATTR_V4_GRACE, !nn->grace_ended))
++		return -ENOBUFS;
++#endif /* CONFIG_NFSD_V4 */
++
++	genlmsg_end(skb, hdr);
++	cb->args[0] = 1;
++
++	return skb->len;
++}
++
+ /**
+  * nfsd_net_init - Prepare the nfsd_net portion of a new net namespace
+  * @net: a freshly-created network namespace
+diff --git a/include/uapi/linux/nfsd_netlink.h b/include/uapi/linux/nfsd_netlink.h
+index c8ae72466ee6..b82fbc53d336 100644
+--- a/include/uapi/linux/nfsd_netlink.h
++++ b/include/uapi/linux/nfsd_netlink.h
+@@ -29,8 +29,19 @@ enum {
+ 	NFSD_A_RPC_STATUS_MAX = (__NFSD_A_RPC_STATUS_MAX - 1)
+ };
+ 
++enum {
++	NFSD_A_SERVER_ATTR_THREADS = 1,
++	NFSD_A_SERVER_ATTR_V4_GRACE,
++
++	__NFSD_A_SERVER_ATTR_MAX,
++	NFSD_A_SERVER_ATTR_MAX = (__NFSD_A_SERVER_ATTR_MAX - 1)
++};
++
+ enum {
+ 	NFSD_CMD_RPC_STATUS_GET = 1,
++	NFSD_CMD_THREADS_SET,
++	NFSD_CMD_V4_GRACE_RELEASE,
++	NFSD_CMD_SERVER_STATUS_GET,
+ 
+ 	__NFSD_CMD_MAX,
+ 	NFSD_CMD_MAX = (__NFSD_CMD_MAX - 1)
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.41.0
+
 
