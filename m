@@ -1,117 +1,91 @@
-Return-Path: <netdev+bounces-35785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10F2C7AB0CA
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 13:31:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A54077AB108
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 13:39:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id B6894282FD0
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 11:31:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 53916282967
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 11:38:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 062941F93F;
-	Fri, 22 Sep 2023 11:31:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28D131F94D;
+	Fri, 22 Sep 2023 11:38:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 801BF1F93D
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 11:31:46 +0000 (UTC)
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ABF3AC;
-	Fri, 22 Sep 2023 04:31:41 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-502e7d66c1eso3344572e87.1;
-        Fri, 22 Sep 2023 04:31:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695382300; x=1695987100; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FDWp5uiOwDwoGc4/Ybg3Oz+ADX7nwDhG7f/HnAB3i7M=;
-        b=OwaeSkJnWHuDQ/Ayxlc8hTQ+cUH2a0b9mxuKqskUTMuY3lXoYiOa6eqzU7JDrBlZtV
-         OI+mMUSQAmkqByZfzQMRnwZxIvl5hsRw5v2hlmc7GIEEOj4yhD1gFx3okv70+JQTbJte
-         uI9UBtbO6WfvTIoFbe+12A0i8ABsdCsl5FK+dq+YaUjeQBFN7kCHrRev1ETTjryINGpN
-         1+r5FqvWLQZMSGRmXRbUm0MFGRrasa0tYxk6DXXQgZUeWV2EQChvmu+d21UhcCTr6Md7
-         6LmBBBkc/VUYcd0+smZid+Ex0iayyRNs3ctXBSmhVVL8CcRBw9i5hU7SrSkH1jVa7qd1
-         HMLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695382300; x=1695987100;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FDWp5uiOwDwoGc4/Ybg3Oz+ADX7nwDhG7f/HnAB3i7M=;
-        b=UGjd2cah2F44GARSnlNoKGio58AWWYxEdiCzQEvUYqkmqsqQFNSXOMYYA04KodNCEl
-         duvnvYRUlDJhTe3XLLfuoOTxZKVpkh9SLW3blPDoKCxthAhMoiceBgNABcvRgAQddD5L
-         QYtxTNYunBoRt239yb8WhpXJmze5z3FiNJwT3aGVO3nWIoIgNlmoX/lOs9Km5t1p2/fd
-         IJsbgvmLFW7r+itr91TzJyQ/ILVbKLbvOFyEhswqDlytPCKo4hOtAC7hUc2MQSirF+H2
-         oJcz0O0V9ggHRYzppCl8wzspJVGb6WNC4BWyJQdRp3cz7JGR6o71SVN0bVMeV5uzj0Aj
-         Eu+A==
-X-Gm-Message-State: AOJu0YwBexk3NGI/I3h+UfZwzb8QMOTA2AtkKlyQSFAmmtunxU+0Vs+M
-	vo6Hj2sA+f+uyR6imTh3z90=
-X-Google-Smtp-Source: AGHT+IH+Po4obqpRXpBKtY/vOBw8JlAG0X1n45dmY7bPGn0wadoIcozZVmPT1J/z6KSYak5aQQ08IA==
-X-Received: by 2002:a05:6512:2013:b0:502:ffdf:b098 with SMTP id a19-20020a056512201300b00502ffdfb098mr6495626lfb.6.1695382299590;
-        Fri, 22 Sep 2023 04:31:39 -0700 (PDT)
-Received: from skbuf ([188.25.255.147])
-        by smtp.gmail.com with ESMTPSA id d13-20020a50fb0d000000b0052567e6586bsm2188130edq.38.2023.09.22.04.31.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Sep 2023 04:31:39 -0700 (PDT)
-Date: Fri, 22 Sep 2023 14:31:36 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Tristram.Ha@microchip.com, Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 net-next 0/5] net: dsa: hsr: Enable HSR HW offloading
- for KSZ9477
-Message-ID: <20230922113136.jgfo2waalz2pya6b@skbuf>
-References: <20230920114343.1979843-1-lukma@denx.de>
- <20230921192308.kntudhbwc4j4skza@skbuf>
- <20230922131838.4bab19e7@wsk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FE7C182B3
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 11:38:55 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF6BF114
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 04:38:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1695382734;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vqnEy0wH1bRBI/JHqHM2nHKGqTGkN0LbDHJj9EUZRuk=;
+	b=Al6e67xlt3fhFPhvWL+h++y3yRR1aq1jmtc1giMfnbV1B7a67a5aKN0TgXES56jh7kx6ok
+	++8jQUZVRa9sQEEbINq8T+bvqd2X/W00YhTRlzg0OEbZnIiRIF8oV0EEucjSgpkv1vhcqN
+	OD4/9VviZbXqzvFdpZQz89LWksao+TU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-360-HVMKZAOLOw-KxFRtFcPAbA-1; Fri, 22 Sep 2023 07:38:49 -0400
+X-MC-Unique: HVMKZAOLOw-KxFRtFcPAbA-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 51A108032F6;
+	Fri, 22 Sep 2023 11:38:48 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.216])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A4DB871128A;
+	Fri, 22 Sep 2023 11:38:46 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20230922093227.GV224399@kernel.org>
+References: <20230922093227.GV224399@kernel.org> <20230920222231.686275-1-dhowells@redhat.com> <20230920222231.686275-6-dhowells@redhat.com>
+To: Simon Horman <horms@kernel.org>
+Cc: dhowells@redhat.com, Jens Axboe <axboe@kernel.dk>,
+    Al Viro <viro@zeniv.linux.org.uk>,
+    Linus Torvalds <torvalds@linux-foundation.org>,
+    Christoph Hellwig <hch@lst.de>,
+    Christian Brauner <christian@brauner.io>,
+    David Laight <David.Laight@aculab.com>,
+    Matthew Wilcox <willy@infradead.org>,
+    Jeff Layton <jlayton@kernel.org>, linux-fsdevel@vger.kernel.org,
+    linux-block@vger.kernel.org, linux-mm@kvack.org,
+    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 05/11] iov_iter: Convert iterate*() to inline funcs
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230922131838.4bab19e7@wsk>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1142468.1695382726.1@warthog.procyon.org.uk>
+Date: Fri, 22 Sep 2023 12:38:46 +0100
+Message-ID: <1142470.1695382726@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Sep 22, 2023 at 01:18:38PM +0200, Lukasz Majewski wrote:
-> By mistake my net-next repo was pointing to:
-> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net
-> 
-> Please correct me if I'm wrong but it looks like the net repo for
-> current mainline fixes...
+Simon Horman <horms@kernel.org> wrote:
 
-Yes, net.git is for fixes to the current mainline branch, and net-next
-is for new features to be included in mainline during the next merge window.
-They are the same at the beginning of the development cycle and then
-they start to diverge.
+> Sparse complains a bit about the line above, perhaps the '(__force void *)'
+> should be retained from the old code?
 
-> However, after fetching net-next - I can apply v5 without issues on top
-> of it.
-> 
-> SHA1: 5a1b322cb0b7d0d33a2d13462294dc0f46911172
-> "Merge branch 'mlxsw-multicast'"
-> 
-> https://source.denx.de/linux/linux-ksz9477/-/commits/net-next-ksz-HSR-devel-v5?ref_type=heads
-> Linux version from `uname -a`: 6.6.0-rc2+
-> 
-> However, it looks like I would need to prepare v6 anyway...
+I've added a patch to add the missing __user to the x86 copy_mc_to_user().
+The powerpc one already has it.
 
-I don't know. "git rebase" is a bit smarter than "git am" and can
-automatically resolve some conflicts, on which "git am" will simply bail
-out if even the context is not identical. Either way, both patchwork and
-me failed to apply your v5 series on net-next, and the patches won't be
-accepted without build testing.
+David
+
 
