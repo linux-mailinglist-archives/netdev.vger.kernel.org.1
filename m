@@ -1,479 +1,162 @@
-Return-Path: <netdev+bounces-35851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D5C97AB581
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 18:07:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E102E7AB5C5
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 18:21:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 8B6881C20A34
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 16:07:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 92CDD282050
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 16:21:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE3CD41761;
-	Fri, 22 Sep 2023 16:07:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D0D14177A;
+	Fri, 22 Sep 2023 16:21:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F9241233
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 16:06:58 +0000 (UTC)
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B753D100;
-	Fri, 22 Sep 2023 09:06:56 -0700 (PDT)
-Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38MFuGKV016532;
-	Fri, 22 Sep 2023 16:06:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-id : content-transfer-encoding : mime-version; s=corp-2023-03-30;
- bh=Vv2y1r84cGj+5b/NLq83L8hmvElcxfoiOdgRxkE6dz8=;
- b=dlm5Bd6k9Zh4hrBFpHQ19s0pjhUDIy1C/e85F7Vmri2FbDR2uXze9g9BB3gaWDt/t4J0
- L1wDsaJqircLSkcykEC4YZBbRUFf1J1iRALDvFN8ts6DoXZvz68ssPVdgu3NlTDfjYFS
- 6qo5+qJG7zufIQaN4Fiw9WZWCW8+PqHLGHgFlP5kzSTxDwbNtKpSmZyyLGf48hKHFdLK
- oc2D3n1C2fozq+LZ0ts/MfPEXx7lOOfSEgL0VsHLy2fcptIeVL0EgIjJJRklH1RtHwhf
- AUMtkY2dh1d6QFPaEwXu+PN0Y7y0yykbPwwduV7MhOWIHDjzDTfmg6NChUDBHMQooXdp Jg== 
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3t8tsxt68y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 22 Sep 2023 16:06:49 +0000
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 38MFUSEG007584;
-	Fri, 22 Sep 2023 16:06:47 GMT
-Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2176.outbound.protection.outlook.com [104.47.59.176])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3t8uhcxyss-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 22 Sep 2023 16:06:47 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BrZbfaj2C1L64UhrGICTVpiv280ju4sjdtgTcw0x2jvQjfTmGrpohOKKAr24rkXhkvKDIzGqV4nqKxmk4n+ligcTSw/I2QOPzR7ZPrg4lb1nD5NUHQ5LiYYgurFSrvVsqDjxiib/3fjXDS+ZvJLO7QgbAbU4Fr1z/oBiAJPvs1xsirwR2DryzvSFjfFC59ueTK7QoiG8wi3t/eEZ7bWpRlDXgaoP2rASYRZPisb08cTANw9uOPeajEou4cB4z98pJXB+It1XrSjFrcnx8jOaoitvo4nVmDjJ7XhL0kXwgfKbg7DRgwYhB6UyCO9W2Mmt5fA6WnXqHdLwNaolh01PkA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Vv2y1r84cGj+5b/NLq83L8hmvElcxfoiOdgRxkE6dz8=;
- b=Eko9Dtahr5aiVfuy/8lGQs9HeryOhGuxCyt+SFRtei9UV0LjH+DuXGZcy6/LJ+y1agKjXwHfliOjT4ZrxMPyqWPFPARdJ768h304me3QoE6CMNe4NKnjdyaDDJQr8WgoFqC3LeMe3aROGxEikz8Fdcxc8CodaPSXirEr2WcKjHAZrocEbgtCKpYDg5/YMutQDkO8Ih8x+wLwi8/AlGx5zP2xex9wktqUCdMLS1XN7d7S97qZz5+W6E1tH8CffcoLefxXGHEqXLqZ4F8Vc3OxhMtyMEruewVgKZtTCMmSAbHp+aTiivl0wXf7j0Q0iIt87DYVND1UsXlDQ7FcqjoYnA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Vv2y1r84cGj+5b/NLq83L8hmvElcxfoiOdgRxkE6dz8=;
- b=fBVLJgT8EDKR2QlI3bVgyb0nXQZv0e6JcAcTj3SJ47WA8cBxCKHKMuMwIUjJTi7j816dgMH902ZIZZhIMm23Va1zzFCEz1GwS6ZMHz8P65/g9nXYQqTkUk2JpuehC2v2cpfHJwVGYVAhUZaNzrQ6mxg3uo9XN0JiWzbnW7dwPRk=
-Received: from BN0PR10MB5128.namprd10.prod.outlook.com (2603:10b6:408:117::24)
- by DS7PR10MB5376.namprd10.prod.outlook.com (2603:10b6:5:3a9::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.24; Fri, 22 Sep
- 2023 16:06:45 +0000
-Received: from BN0PR10MB5128.namprd10.prod.outlook.com
- ([fe80::bffc:4f39:2aa8:6144]) by BN0PR10MB5128.namprd10.prod.outlook.com
- ([fe80::bffc:4f39:2aa8:6144%5]) with mapi id 15.20.6813.017; Fri, 22 Sep 2023
- 16:06:44 +0000
-From: Chuck Lever III <chuck.lever@oracle.com>
-To: Jeff Layton <jlayton@kernel.org>
-CC: Lorenzo Bianconi <lorenzo@kernel.org>,
-        Linux NFS Mailing List
-	<linux-nfs@vger.kernel.org>,
-        Lorenzo Bianconi <lorenzo.bianconi@redhat.com>,
-        Neil Brown <neilb@suse.de>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH] NFSD: convert write_threads and write_v4_end_grace to
- netlink commands
-Thread-Topic: [PATCH] NFSD: convert write_threads and write_v4_end_grace to
- netlink commands
-Thread-Index: AQHZ7VKfQ7YihRKqAEKLYXScgapUUbAnAk0AgAAAkQA=
-Date: Fri, 22 Sep 2023 16:06:44 +0000
-Message-ID: <ADA8068B-B289-4210-9E28-E69F4EBB9355@oracle.com>
-References: 
- <b7985d6f0708d4a2836e1b488d641cdc11ace61b.1695386483.git.lorenzo@kernel.org>
- <cc6341a7c5f09b731298236b260c9dfd94a811d8.camel@kernel.org>
-In-Reply-To: <cc6341a7c5f09b731298236b260c9dfd94a811d8.camel@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-mailer: Apple Mail (2.3731.700.6)
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN0PR10MB5128:EE_|DS7PR10MB5376:EE_
-x-ms-office365-filtering-correlation-id: 25f55fda-d66a-4b85-8356-08dbbb85eae9
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 
- eOwR8LqH+985rTCq8p+LggNVhKZbF5eCcgNkEggGGc5F479wmTbdN2tLvQ9BnITKhqLfqeP8kzTEqgSgfnUBRT9qx7Lf1dmX3Hn3yRg1B8Rf2iOdZ85uAsZm/ZL6Ai384YyZ4oGisBq9qZfj+KYs1vblozX4+EA17lbOkt2QF6YtH0/8+6fScp65co1ctXiMfAKRDSZLTkFGEzuhzBV6teFsyTul8bbz03N2T/tmMC7XvuzCXzF64A5nlnAh3RYI9K3nITk+EBMZzEfXIKRGeltyFOPG5Svtvp3RgymIG2J5ADNqkAVo9nFhGaM0/QZjSmAS5TQewwO8Ol/KPNSm90AzCwZa30x7QlrqizQE5238c5/8TLkyqYNxwnA8V+7/tSQfOGJYFcF8WGFwv+TtW2Nhff6PdinPnpX6hduRw4DDg7TiDHh8rHmtgzCI8cqfSpN9qy8ETFDU6me603HlHcV6/TsRALND2P29uK/MmshAVV8+ejGmVHrYrdcJr7rXmL8fJDWQ9HV/F4bXgGqPgqzJm5C0unAovxiggMEOY817ZTolw2Lpf0UXPutYfFqeC1o+vw3wCKDRK125sWSdjW3rKw54m05lxVMvvD2zt0uXovQjxLZUNg6h1QJzIVYsHqZ2FGhRfP8P+xax3utrgQ==
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR10MB5128.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(366004)(396003)(376002)(346002)(39860400002)(186009)(1800799009)(451199024)(53546011)(6506007)(6486002)(966005)(71200400001)(478600001)(6512007)(2616005)(83380400001)(26005)(2906002)(66476007)(76116006)(6916009)(66556008)(316002)(66446008)(66946007)(64756008)(54906003)(91956017)(4326008)(8936002)(8676002)(41300700001)(5660300002)(38070700005)(36756003)(86362001)(33656002)(122000001)(38100700002)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?us-ascii?Q?Y14OBaqdk0bWrNxDRoTqLKQssYmuc4VRPIIpbO9xscppAuoOusQ+z0OcvIdq?=
- =?us-ascii?Q?SKHlPF+RS3EuwedqLIH2aeNEbce4IwpfQWq0PAktnoUg4Ao/nxTVEbO4VVZp?=
- =?us-ascii?Q?t5sirOlWNj1DecNrbwIyWg8VTekM7jhYJEQnIj9sbjJlFFtkdXL9bcW2YAZR?=
- =?us-ascii?Q?LJBJMPdWVVXTkNeCPZrQyjMqnzhQsGd4InsUuUzJ99uIJQ3UO2RTYCKwl/zz?=
- =?us-ascii?Q?c9TFQ5toz+jcuOPunKjw9GeX+VDUQNKMvdo7n+O24x6bT8q8Gb4mSDQOkGfz?=
- =?us-ascii?Q?MV9jig4n3QLuH3BwjjIGfq+yh6DhKAGdXfJ2uE0RS4QWtkc8xuatVlGUJAvU?=
- =?us-ascii?Q?H59+7Pwr6R65bGQBBajlI3NA4Zt4XPSR5b0DxxRkfXpsLZclAtLoesrdm6D1?=
- =?us-ascii?Q?/NYjYWONk5sPMly5NahWtVPGSdcuVkRgqCjy0S7QMJ/NFirT6MG4ccykNuxt?=
- =?us-ascii?Q?QinYevs6BeXFfC9K8YTWvYR9YUwT+Mzj1QmMsJhhu2Gp9mlWz1pEUL8Bb+PH?=
- =?us-ascii?Q?XpVDfD2blv/pA4V+poNFhjc//0B18z3se5tK0HVdOA87hkRRCCC11JOktaCX?=
- =?us-ascii?Q?wnYtuCmCamQEL6UcDaVg08/4CdBFRGOU5SYVdpywg+I5HeFWXHe1fKA4hKqi?=
- =?us-ascii?Q?DcLWcCkFPitJqLlPsD1mEzAQSPjVgKgIZQNClAQCCuYXpPeAMIVb6hI1mUMN?=
- =?us-ascii?Q?mJuGnOnO+mOhTKKKKuSYV2GMHVydyUF3WEkfsBH9L843vdncTqNylwyPXK49?=
- =?us-ascii?Q?kp4C/wIg9p8RUlWINLuGP0CBoFOuE9tq7zE3oe5mng9s/XJD291IX6AbqB9Y?=
- =?us-ascii?Q?HTsZoAerYri9MXSjciWu4uAHdE8f2xrzMiRNcopWWuRqdm97oOB7x+heJMie?=
- =?us-ascii?Q?1wXV1lnu2HO1mheZUJtvxMx1krs2rCU1mUKMLS2WsZwWmy2K3CeWQpQQNjeN?=
- =?us-ascii?Q?Eq1pO94vGEeaBLTSrW34+nRTyxKxiwjLCfPOy5GadXFxQxK9wWb7DUsJgaZL?=
- =?us-ascii?Q?MNMD32gwkxvcxlp509ju/uyI6FhWOKEyrdmlJgKlIxbcGqNU0BRqbig6pzW4?=
- =?us-ascii?Q?JYpH3o7H7Vi3dCh+Tf2SaJ/X60BWXEPyavtfycSDUXuNfl8hjnfHH/1Lbd+V?=
- =?us-ascii?Q?JtLSOzOtDegHNqLe551iBWEUq5hvrQfLFUbmPSX5mlTNLGq9uxIENZDKc+BJ?=
- =?us-ascii?Q?xGKoXIfrmcNnB7F8d/WSnQJbPaBPhJVDznsEhhMt7YVIttvImeuLafhE6rCG?=
- =?us-ascii?Q?TH0uyvOO5VPw+CoS5W386yL5EhoG6oOmZoNaHSf+bGRr1PW24TzQkfTYZjPC?=
- =?us-ascii?Q?EbEH21ay6QtdwMYHAMxwXWeHHPx8U+mUe6zbNsSXqlynIMebbPYxo0AUmuro?=
- =?us-ascii?Q?RbCDSoCdZuIgGYaVVGMUhrOfpJ9UlxXzTClBeesDoXBpysDW+884MItxcGBP?=
- =?us-ascii?Q?r0sBgSgV1MwADW02hKC0EwtSn7s0ift5qe//a8+eE2AO6VjUVsk2K4P9fesH?=
- =?us-ascii?Q?VGJ7i5acvWwpRKa1cYh9lBj3x6OfwbYiapmby5xUR4I+mOALw8z6NbgQ8A+g?=
- =?us-ascii?Q?zd+yYnJNkseSqtA+o0zJ2TnzFUvR0bJ7P1XcvqmImTbGQEC8Siwj8Tq369HS?=
- =?us-ascii?Q?DA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <92FF45CC6D5E5341AF9C5FE24AB176F0@namprd10.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5FCA41773
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 16:21:38 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E71718F
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 09:21:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695399692; x=1726935692;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=MVHsb1hX19s0UbaJH6I80TECq8Yl3GkfDPzwBHRL6Tw=;
+  b=hA8jMW5HTNslIShaxjjYENZ/9MDCn22XxwMpObC1COS9bF0hA3VklgAt
+   Lr3eg4lPv7KRRWPBQqHMUTHouZ5gvRQfEzGXOUNHHbB3mT24nQ5UnectS
+   K7ne6XB+jC1B/7fB+ew6f9AnhhcY26Pg0+VAs92b/WLVs8xvdspmgl1Ed
+   F1WGNvSq3Sh7BtyOYSvayaUqMq9rlYuf+0r77zYpJh5MdB9Sfo4QvrqpA
+   a+ENBr4z2xB37fxiEifUFuVaYrDeLrJZeUhITdFdurT+F4p1zr9+fNOuY
+   Dyh7h5eaHavGhxLcSX+mNe+YXol3T+cb4ouAuHJlsTSfru29J0h7lmKzT
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10841"; a="384707090"
+X-IronPort-AV: E=Sophos;i="6.03,167,1694761200"; 
+   d="scan'208";a="384707090"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2023 09:16:56 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10841"; a="813116698"
+X-IronPort-AV: E=Sophos;i="6.03,167,1694761200"; 
+   d="scan'208";a="813116698"
+Received: from kkazimiedevpc.igk.intel.com (HELO localhost.igk.intel.com) ([10.102.102.224])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2023 09:16:53 -0700
+From: Michal Kubiak <michal.kubiak@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: aleksander.lobakin@intel.com,
+	larysa.zaremba@intel.com,
+	alan.brady@intel.com,
+	joshua.a.hay@intel.com,
+	emil.s.tantilov@intel.com,
+	netdev@vger.kernel.org,
+	Michal Kubiak <michal.kubiak@intel.com>
+Subject: [PATCH iwl-next] idpf: set scheduling mode for completion queue
+Date: Fri, 22 Sep 2023 18:16:03 +0200
+Message-Id: <20230922161603.3461104-1-michal.kubiak@intel.com>
+X-Mailer: git-send-email 2.33.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	mDZ8ECoZMhD3WReCujB6Zs/HaMOmnhgV6qmuR4AQ0RLXVPFQG9n4wnr3FtwKHNKBWGm8AqDiK1MS/HSvjfeEk5z7GdRXu8CGVxTTxdtTYva28/Jm/Yy1nmzopfSnP+6DxWP2Df3YRUvgMAnlY36fcuVa6ag24xITRGLrIPRG/MCFc/xJFeb0/EoK4ACM5GR6Dp478RtvSXt+d6f457xm1+x7yQP0jDRAsTxJ76EkzXbsBwIOpgK+DQUKoRHuH7bgLJ1Ea7s6gV39ccxLtpTaIzg+OVthkUU1Gw+1uTPlP5h4dm8xoA9eg0Qii26IE3kfN2Q90fmZ4HxJ6dT8DGLfD2ExZ4Ump8eTT1QIvlgJKMlnvjLKeBoDwZpvCNslNb6DE7CCxxHSFOGyonZI3Adja/8Yt3+3fOFiz0k7RNCd6GFVBSS35y1t6ATgga4pBe1cq8ajUsiXL6iPzUm2KrbDVBReJfVqJLLtFZIjE8gcbGnGSa/tVxjWxMovqQlbU43B5ZCe+PZODNL+ildpm8Hgxo/LFwd4XHOE4VEH8il7Sz2XAwxftdRqZlzQyqATBDmz3DPDlAQDKCWAJMeMacVsBO1+BkfM2efx5VoFTHBA9PXFu+wLXebFoeb7Qn2OPCduBIyVtrpUvPzgaPCUCB9jyAArChTrB9EpWEaYQ8cCSJcuYpCBBOePH6Do7uoTzfReDrSYDMjaqX7RffDZI2hdJSgEEfeJmp9m7Hty3oqabHKBIBzl4Y5Kiy1ZOVEHtUewvsY9B5ck+Ut4fJHDVzSTbOzh1jclB9WvUD5U38mpiqs7jiZySM0k3YOyNq760rvhH3AiZEIUPdIT/UnHHpvAyw==
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN0PR10MB5128.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 25f55fda-d66a-4b85-8356-08dbbb85eae9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Sep 2023 16:06:44.8954
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 03TeBVvGrLAkYm5OzrBGLGnZs/X3kFZCp/rghbWPUxp52FBxsMtYyD1ypfT6mNq4rdtDdYXSydyPny0FtcGUCw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR10MB5376
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-09-22_14,2023-09-21_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 malwarescore=0 mlxscore=0
- bulkscore=0 mlxlogscore=999 phishscore=0 suspectscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
- definitions=main-2309220139
-X-Proofpoint-ORIG-GUID: pdyr2rMlYD-wp8GUHKCg4B3q36E4mHjW
-X-Proofpoint-GUID: pdyr2rMlYD-wp8GUHKCg4B3q36E4mHjW
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+The HW must be programmed differently for queue-based scheduling mode.
+To program the completion queue context correctly, the control plane
+must know the scheduling mode not only for the Tx queue, but also for
+the completion queue.
+Unfortunately, currently the driver sets the scheduling mode only for
+the Tx queues.
 
+Propagate the scheduling mode data for the completion queue as
+well when sending the queue configuration messages.
 
-> On Sep 22, 2023, at 12:04 PM, Jeff Layton <jlayton@kernel.org> wrote:
->=20
-> On Fri, 2023-09-22 at 14:44 +0200, Lorenzo Bianconi wrote:
->> Introduce write_threads and write_v4_end_grace netlink commands similar
->> to the ones available through the procfs.
->> Introduce nfsd_nl_server_status_get_dumpit netlink command in order to
->> report global server metadata.
->>=20
->> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
->> ---
->> This patch can be tested with user-space tool reported below:
->> https://github.com/LorenzoBianconi/nfsd-netlink.git
->> ---
->> Documentation/netlink/specs/nfsd.yaml | 33 +++++++++
->> fs/nfsd/netlink.c                     | 30 ++++++++
->> fs/nfsd/netlink.h                     |  5 ++
->> fs/nfsd/nfsctl.c                      | 98 +++++++++++++++++++++++++++
->> include/uapi/linux/nfsd_netlink.h     | 11 +++
->> 5 files changed, 177 insertions(+)
->>=20
->> diff --git a/Documentation/netlink/specs/nfsd.yaml b/Documentation/netli=
-nk/specs/nfsd.yaml
->> index 403d3e3a04f3..fa1204892703 100644
->> --- a/Documentation/netlink/specs/nfsd.yaml
->> +++ b/Documentation/netlink/specs/nfsd.yaml
->> @@ -62,6 +62,15 @@ attribute-sets:
->>         name: compound-ops
->>         type: u32
->>         multi-attr: true
->> +  -
->> +    name: server-attr
->> +    attributes:
->> +      -
->> +        name: threads
->> +        type: u16
->=20
-> 65k threads ought to be enough for anybody!
+Fixes: 1c325aac10a8 ("idpf: configure resources for TX queues")
+Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
+---
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c     | 10 ++++++++--
+ drivers/net/ethernet/intel/idpf/idpf_virtchnl.c |  8 +++++++-
+ 2 files changed, 15 insertions(+), 3 deletions(-)
 
-No argument.
-
-But I thought you could echo a negative number of threads in /proc/fs/nfsd/=
-threads
-to reduce the thread count. Maybe this field should be an s32?
-
-
->> +      -
->> +        name: v4-grace
->> +        type: u8
->>=20
->> operations:
->>   list:
->> @@ -72,3 +81,27 @@ operations:
->>       dump:
->>         pre: nfsd-nl-rpc-status-get-start
->>         post: nfsd-nl-rpc-status-get-done
->> +    -
->> +      name: threads-set
->> +      doc: set the number of running threads
->> +      attribute-set: server-attr
->> +      flags: [ admin-perm ]
->> +      do:
->> +        request:
->> +          attributes:
->> +            - threads
->> +    -
->> +      name: v4-grace-release
->> +      doc: release the grace period for nfsd's v4 lock manager
->> +      attribute-set: server-attr
->> +      flags: [ admin-perm ]
->> +      do:
->> +        request:
->> +          attributes:
->> +            - v4-grace
->> +    -
->> +      name: server-status-get
->> +      doc: dump server status info
->> +      attribute-set: server-attr
->> +      dump:
->> +        pre: nfsd-nl-server-status-get-start
->> diff --git a/fs/nfsd/netlink.c b/fs/nfsd/netlink.c
->> index 0e1d635ec5f9..783a34e69354 100644
->> --- a/fs/nfsd/netlink.c
->> +++ b/fs/nfsd/netlink.c
->> @@ -10,6 +10,16 @@
->>=20
->> #include <uapi/linux/nfsd_netlink.h>
->>=20
->> +/* NFSD_CMD_THREADS_SET - do */
->> +static const struct nla_policy nfsd_threads_set_nl_policy[NFSD_A_SERVER=
-_ATTR_THREADS + 1] =3D {
->> + [NFSD_A_SERVER_ATTR_THREADS] =3D { .type =3D NLA_U16, },
->> +};
->> +
->> +/* NFSD_CMD_V4_GRACE_RELEASE - do */
->> +static const struct nla_policy nfsd_v4_grace_release_nl_policy[NFSD_A_S=
-ERVER_ATTR_V4_GRACE + 1] =3D {
->> + [NFSD_A_SERVER_ATTR_V4_GRACE] =3D { .type =3D NLA_U8, },
->> +};
->> +
->> /* Ops table for nfsd */
->> static const struct genl_split_ops nfsd_nl_ops[] =3D {
->> {
->> @@ -19,6 +29,26 @@ static const struct genl_split_ops nfsd_nl_ops[] =3D =
-{
->> .done =3D nfsd_nl_rpc_status_get_done,
->> .flags =3D GENL_CMD_CAP_DUMP,
->> },
->> + {
->> + .cmd =3D NFSD_CMD_THREADS_SET,
->> + .doit =3D nfsd_nl_threads_set_doit,
->> + .policy =3D nfsd_threads_set_nl_policy,
->> + .maxattr =3D NFSD_A_SERVER_ATTR_THREADS,
->> + .flags =3D GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
->> + },
->> + {
->> + .cmd =3D NFSD_CMD_V4_GRACE_RELEASE,
->> + .doit =3D nfsd_nl_v4_grace_release_doit,
->> + .policy =3D nfsd_v4_grace_release_nl_policy,
->> + .maxattr =3D NFSD_A_SERVER_ATTR_V4_GRACE,
->> + .flags =3D GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
->> + },
->> + {
->> + .cmd =3D NFSD_CMD_SERVER_STATUS_GET,
->> + .start =3D nfsd_nl_server_status_get_start,
->> + .dumpit =3D nfsd_nl_server_status_get_dumpit,
->> + .flags =3D GENL_CMD_CAP_DUMP,
->> + },
->> };
->>=20
->> struct genl_family nfsd_nl_family __ro_after_init =3D {
->> diff --git a/fs/nfsd/netlink.h b/fs/nfsd/netlink.h
->> index d83dd6bdee92..2e98061fbb0a 100644
->> --- a/fs/nfsd/netlink.h
->> +++ b/fs/nfsd/netlink.h
->> @@ -12,10 +12,15 @@
->> #include <uapi/linux/nfsd_netlink.h>
->>=20
->> int nfsd_nl_rpc_status_get_start(struct netlink_callback *cb);
->> +int nfsd_nl_server_status_get_start(struct netlink_callback *cb);
->> int nfsd_nl_rpc_status_get_done(struct netlink_callback *cb);
->>=20
->> int nfsd_nl_rpc_status_get_dumpit(struct sk_buff *skb,
->>   struct netlink_callback *cb);
->> +int nfsd_nl_threads_set_doit(struct sk_buff *skb, struct genl_info *inf=
-o);
->> +int nfsd_nl_v4_grace_release_doit(struct sk_buff *skb, struct genl_info=
- *info);
->> +int nfsd_nl_server_status_get_dumpit(struct sk_buff *skb,
->> +      struct netlink_callback *cb);
->>=20
->> extern struct genl_family nfsd_nl_family;
->>=20
->> diff --git a/fs/nfsd/nfsctl.c b/fs/nfsd/nfsctl.c
->> index b71744e355a8..c631b59b7a4f 100644
->> --- a/fs/nfsd/nfsctl.c
->> +++ b/fs/nfsd/nfsctl.c
->> @@ -1694,6 +1694,104 @@ int nfsd_nl_rpc_status_get_done(struct netlink_c=
-allback *cb)
->> return 0;
->> }
->>=20
->> +/**
->> + * nfsd_nl_threads_set_doit - set the number of running threads
->> + * @skb: reply buffer
->> + * @info: netlink metadata and command arguments
->> + *
->> + * Return 0 on success or a negative errno.
->> + */
->> +int nfsd_nl_threads_set_doit(struct sk_buff *skb, struct genl_info *inf=
-o)
->> +{
->> + u16 nthreads;
->> + int ret;
->> +
->> + if (!info->attrs[NFSD_A_SERVER_ATTR_THREADS])
->> + return -EINVAL;
->> +
->> + nthreads =3D nla_get_u16(info->attrs[NFSD_A_SERVER_ATTR_THREADS]);
->> +
->> + ret =3D nfsd_svc(nthreads, genl_info_net(info), get_current_cred());
->> + return ret =3D=3D nthreads ? 0 : ret;
->> +}
->> +
->> +/**
->> + * nfsd_nl_v4_grace_release_doit - release the nfs4 grace period
->> + * @skb: reply buffer
->> + * @info: netlink metadata and command arguments
->> + *
->> + * Return 0 on success or a negative errno.
->> + */
->> +int nfsd_nl_v4_grace_release_doit(struct sk_buff *skb, struct genl_info=
- *info)
->> +{
->> +#ifdef CONFIG_NFSD_V4
->> + struct nfsd_net *nn =3D net_generic(genl_info_net(info), nfsd_net_id);
->> +
->> + if (!info->attrs[NFSD_A_SERVER_ATTR_V4_GRACE])
->> + return -EINVAL;
->> +
->> + if (nla_get_u8(info->attrs[NFSD_A_SERVER_ATTR_V4_GRACE]))
->> + nfsd4_end_grace(nn);
->> +
->=20
-> To be clear here. Issuing this with anything but 0 will end the grace
-> period. A value of 0 is ignored. It might be best to make the value not
-> matter at all. Do we have to send down a value at all?
->=20
->> + return 0;
->> +#else
->> + return -EOPNOTSUPP;
->> +#endif /* CONFIG_NFSD_V4 */
->> +}
->> +
->> +/**
->> + * nfsd_nl_server_status_get_start - Prepare server_status_get dumpit
->> + * @cb: netlink metadata and command arguments
->> + *
->> + * Return values:
->> + *   %0: The server_status_get command may proceed
->> + *   %-ENODEV: There is no NFSD running in this namespace
->> + */
->> +int nfsd_nl_server_status_get_start(struct netlink_callback *cb)
->> +{
->> + struct nfsd_net *nn =3D net_generic(sock_net(cb->skb->sk), nfsd_net_id=
-);
->> +
->> + return nn->nfsd_serv ? 0 : -ENODEV;
->> +}
->> +
->> +/**
->> + * nfsd_nl_server_status_get_dumpit - dump server status info
->> + * @skb: reply buffer
->> + * @cb: netlink metadata and command arguments
->> + *
->> + * Returns the size of the reply or a negative errno.
->> + */
->> +int nfsd_nl_server_status_get_dumpit(struct sk_buff *skb,
->> +      struct netlink_callback *cb)
->> +{
->> + struct net *net =3D sock_net(skb->sk);
->> +#ifdef CONFIG_NFSD_V4
->> + struct nfsd_net *nn =3D net_generic(net, nfsd_net_id);
->> +#endif /* CONFIG_NFSD_V4 */
->> + void *hdr;
->> +
->> + if (cb->args[0]) /* already consumed */
->> + return 0;
->> +
->> + hdr =3D genlmsg_put(skb, NETLINK_CB(cb->skb).portid, cb->nlh->nlmsg_se=
-q,
->> +   &nfsd_nl_family, NLM_F_MULTI,
->> +   NFSD_CMD_SERVER_STATUS_GET);
->> + if (!hdr)
->> + return -ENOBUFS;
->> +
->> + if (nla_put_u16(skb, NFSD_A_SERVER_ATTR_THREADS, nfsd_nrthreads(net)))
->> + return -ENOBUFS;
->> +#ifdef CONFIG_NFSD_V4
->> + if (nla_put_u8(skb, NFSD_A_SERVER_ATTR_V4_GRACE, !nn->grace_ended))
->> + return -ENOBUFS;
->> +#endif /* CONFIG_NFSD_V4 */
->> +
->> + genlmsg_end(skb, hdr);
->> + cb->args[0] =3D 1;
->> +
->> + return skb->len;
->> +}
->> +
->> /**
->>  * nfsd_net_init - Prepare the nfsd_net portion of a new net namespace
->>  * @net: a freshly-created network namespace
->> diff --git a/include/uapi/linux/nfsd_netlink.h b/include/uapi/linux/nfsd=
-_netlink.h
->> index c8ae72466ee6..b82fbc53d336 100644
->> --- a/include/uapi/linux/nfsd_netlink.h
->> +++ b/include/uapi/linux/nfsd_netlink.h
->> @@ -29,8 +29,19 @@ enum {
->> NFSD_A_RPC_STATUS_MAX =3D (__NFSD_A_RPC_STATUS_MAX - 1)
->> };
->>=20
->> +enum {
->> + NFSD_A_SERVER_ATTR_THREADS =3D 1,
->> + NFSD_A_SERVER_ATTR_V4_GRACE,
->> +
->> + __NFSD_A_SERVER_ATTR_MAX,
->> + NFSD_A_SERVER_ATTR_MAX =3D (__NFSD_A_SERVER_ATTR_MAX - 1)
->> +};
->> +
->> enum {
->> NFSD_CMD_RPC_STATUS_GET =3D 1,
->> + NFSD_CMD_THREADS_SET,
->> + NFSD_CMD_V4_GRACE_RELEASE,
->> + NFSD_CMD_SERVER_STATUS_GET,
->>=20
->> __NFSD_CMD_MAX,
->> NFSD_CMD_MAX =3D (__NFSD_CMD_MAX - 1)
->=20
-> --=20
-> Jeff Layton <jlayton@kernel.org>
-
-
---
-Chuck Lever
-
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+index 6fa79898c42c..58c5412d3173 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+@@ -1160,6 +1160,7 @@ static void idpf_rxq_set_descids(struct idpf_vport *vport, struct idpf_queue *q)
+  */
+ static int idpf_txq_group_alloc(struct idpf_vport *vport, u16 num_txq)
+ {
++	bool flow_sch_en;
+ 	int err, i;
+ 
+ 	vport->txq_grps = kcalloc(vport->num_txq_grp,
+@@ -1167,6 +1168,9 @@ static int idpf_txq_group_alloc(struct idpf_vport *vport, u16 num_txq)
+ 	if (!vport->txq_grps)
+ 		return -ENOMEM;
+ 
++	flow_sch_en = !idpf_is_cap_ena(vport->adapter, IDPF_OTHER_CAPS,
++				       VIRTCHNL2_CAP_SPLITQ_QSCHED);
++
+ 	for (i = 0; i < vport->num_txq_grp; i++) {
+ 		struct idpf_txq_group *tx_qgrp = &vport->txq_grps[i];
+ 		struct idpf_adapter *adapter = vport->adapter;
+@@ -1195,8 +1199,7 @@ static int idpf_txq_group_alloc(struct idpf_vport *vport, u16 num_txq)
+ 			q->txq_grp = tx_qgrp;
+ 			hash_init(q->sched_buf_hash);
+ 
+-			if (!idpf_is_cap_ena(adapter, IDPF_OTHER_CAPS,
+-					     VIRTCHNL2_CAP_SPLITQ_QSCHED))
++			if (flow_sch_en)
+ 				set_bit(__IDPF_Q_FLOW_SCH_EN, q->flags);
+ 		}
+ 
+@@ -1215,6 +1218,9 @@ static int idpf_txq_group_alloc(struct idpf_vport *vport, u16 num_txq)
+ 		tx_qgrp->complq->desc_count = vport->complq_desc_count;
+ 		tx_qgrp->complq->vport = vport;
+ 		tx_qgrp->complq->txq_grp = tx_qgrp;
++
++		if (flow_sch_en)
++			__set_bit(__IDPF_Q_FLOW_SCH_EN, tx_qgrp->complq->flags);
+ 	}
+ 
+ 	return 0;
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+index 9bc85b2f1709..e276b5360c2e 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+@@ -1473,7 +1473,7 @@ static int idpf_send_config_tx_queues_msg(struct idpf_vport *vport)
+ 	/* Populate the queue info buffer with all queue context info */
+ 	for (i = 0; i < vport->num_txq_grp; i++) {
+ 		struct idpf_txq_group *tx_qgrp = &vport->txq_grps[i];
+-		int j;
++		int j, sched_mode;
+ 
+ 		for (j = 0; j < tx_qgrp->num_txq; j++, k++) {
+ 			qi[k].queue_id =
+@@ -1514,6 +1514,12 @@ static int idpf_send_config_tx_queues_msg(struct idpf_vport *vport)
+ 		qi[k].ring_len = cpu_to_le16(tx_qgrp->complq->desc_count);
+ 		qi[k].dma_ring_addr = cpu_to_le64(tx_qgrp->complq->dma);
+ 
++		if (test_bit(__IDPF_Q_FLOW_SCH_EN, tx_qgrp->complq->flags))
++			sched_mode = VIRTCHNL2_TXQ_SCHED_MODE_FLOW;
++		else
++			sched_mode = VIRTCHNL2_TXQ_SCHED_MODE_QUEUE;
++		qi[k].sched_mode = cpu_to_le16(sched_mode);
++
+ 		k++;
+ 	}
+ 
+-- 
+2.33.1
 
 
