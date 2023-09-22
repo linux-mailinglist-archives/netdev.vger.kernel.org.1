@@ -1,195 +1,201 @@
-Return-Path: <netdev+bounces-35755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A88EB7AAF2C
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 12:10:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FE8D7AAF43
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 12:13:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id A160628298E
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 10:10:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 390BD282B1D
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 10:13:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB3511EA8B;
-	Fri, 22 Sep 2023 10:10:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 491E41EA95;
+	Fri, 22 Sep 2023 10:13:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 064CF1EA87
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 10:10:16 +0000 (UTC)
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1234891
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 03:10:15 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id 41be03b00d2f7-578a3069f1eso1456675a12.1
-        for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 03:10:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1695377414; x=1695982214; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=F2ufTk+SzQXAhmOt0ss0e42lnYpRlYTzhmX5B7/leRY=;
-        b=FFJ4HrP3kPrgXxxsiKz6vEPbePxc89gPQznYNlgPstWun+Xe7k144ikeKa0v53JCyX
-         DXhWWBlZF3RBytQ3qzdo1Qco9FG7M5bybQ594j6LWUJoYFR6tG1we9jMltkbliv57U3s
-         WCnIDsn1SBcgCS7H9mgbTnazqr9uQCgft4b3Shr4mRyA5Bcp0iyEhYRUxA3LVXO/ezqE
-         TQONTeB2T+syxInIddzgoIw0XUABv2L1xGxrX83CLjFCp25oDdykSWLT7pY7lcSV+HTa
-         /nG0yARncmNNVXcSIpx5oqZxBVK1sc4jgaMGjyWag/+1H4YQJsbVTvZ+cRm7eE2meChl
-         PSZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695377414; x=1695982214;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=F2ufTk+SzQXAhmOt0ss0e42lnYpRlYTzhmX5B7/leRY=;
-        b=QlpbbdTySflIw/5GDIWW/r6xL494SsAYusZsD3cFj5iLX92ySomKRV/nRxzmP02BdH
-         jeLybZmtY+jrSmxarl1UR1knavviZ/wfrqicox7If8lgwTuaUor8YlY5fGIHhzFiIXdf
-         VCtpwV9kQjTKYgk/R5TJvF53upqYoM5jr8fNwbOUe/imLif0Lyl5ORXCEDBjdsaNT+i2
-         OeYnyJFwv7jSe9oGtra0J69NTdqHUDhHkj+EARYJE1QMG/DxIc2AmKR9usihbuV2W9nh
-         zujvY1b/UunKjTGiTKBeCMjH+FFFBfuw0d+2lYR273oy4DjQFmMWn5p7YS1XhAjCF7un
-         262g==
-X-Gm-Message-State: AOJu0Yw4LPgel1AP9sjIZ5T/E5n2qTC0Pf2a4SUUlIg6LLCHaGOIrMWJ
-	i8YxRMTgcf/qCNGB1Ub339SKdQ==
-X-Google-Smtp-Source: AGHT+IEvTnBwyn42Dtb8JwSLkt4T9yGIU/WtgulmCFaF4ocTFB5yZsK0JYM/GWXqXuL1KyVp/lyo+w==
-X-Received: by 2002:a17:90b:390a:b0:268:3f2d:66e4 with SMTP id ob10-20020a17090b390a00b002683f2d66e4mr7502221pjb.37.1695377414528;
-        Fri, 22 Sep 2023 03:10:14 -0700 (PDT)
-Received: from [10.254.1.169] ([139.177.225.254])
-        by smtp.gmail.com with ESMTPSA id 22-20020a17090a001600b0026b4d215627sm3186459pja.21.2023.09.22.03.10.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 Sep 2023 03:10:14 -0700 (PDT)
-Message-ID: <71ac08d3-9f36-e0de-870e-3e252abcb66a@bytedance.com>
-Date: Fri, 22 Sep 2023 18:10:06 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BFC61EA7C;
+	Fri, 22 Sep 2023 10:13:29 +0000 (UTC)
+Received: from FRA01-PR2-obe.outbound.protection.outlook.com (mail-pr2fra01on2043.outbound.protection.outlook.com [40.107.12.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B51B91;
+	Fri, 22 Sep 2023 03:13:28 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=V4GSs/gNgQjxuOmqAgpg4tFUNzBI5ibWPjVluM9WyQmgaUWVb3kTqqeqvwM9DxP2DpkPKBo6KTkAKVYvBcMcLVuadwRe8exhrE9k7ejzVGjPRR6Q7aeHIOgyYt9C6O56A4rImxHOd1p6KnXgz+WpsjuBbicQl5MATxcC5pKul3a8XThswbTk480JULFTQ3SPOPhOFdo8TfOoJcA7ojzLllPLrrZTNYdCC9VQAjTvuh5Q9Hf6DBdF4kx9ayiKMS7Gzj+N20jkOPKLpqvvLLuSTtKfUnl6oFSOyFptUw9ValFik0S0zLBZE9aawjB+p6lBaIYLPAugaLM0QQEIEQd0hw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=aKyKBC06DhwCRBlehBH4loXxGa8zVBJDKD5oLFAr/SU=;
+ b=Cnucl7tNMLptuEmIV35T6vvXXdN3pmT7Dkg3/i/7wbbk35Nue9dhFWITqAdDec2NM4GLV5DYrQ5g0nkLu3+8OWxlikR+7aWkBCHLmjvTgnoL4kI2v5kZtiLjb3fWexVD8hlhcIfu8yZA1AoEzIS6JulmTRulw1T5oUyqvC1kjlJbSGP2SMTGsVMNS8tFIss+TngT9fcpCG5Zf3pZSH6Bc978JxXPIXES2z/KENUbRDkefnMCH7HRWVRanAU+oqju/62TkPsvj5NkxYz2U6N2V0P2DxumwuJUiIlIkARd61nAppC9HvpTDHFaIouO+yyup3oUGia9BIHCYiquSKbFGw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=csgroup.eu; dmarc=pass action=none header.from=csgroup.eu;
+ dkim=pass header.d=csgroup.eu; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=csgroup.eu;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aKyKBC06DhwCRBlehBH4loXxGa8zVBJDKD5oLFAr/SU=;
+ b=AlO6JPT6Y2wBHxi686V01qZFLZfm/G7PdGmO/uu9rEt+5/n7GJ2q4/i/+ab4qIZdDCJJbWtiWzVshbGaa8HyIprl6gAtOpPGeOydBNfMZk/zjISQi8SLbnW9N/QIzjIyRaXyVYqxxkSfwgw1JE+w4gqFFlq8iFmJozM+tLIYtil7liWM02hEA56axcU/UIudKhMgy611gcJpqWJmH8N0RKNTftO04M/5sr+/SxCSg4QQeCoFK0vsbFXv5Ik/UKMHD/0Q+fJyNmb8JtyuqGUYzCGNntyXd9vMxU60aku4zw6bmNw/mkdwI0pJrbww7V0wXkW2gZS3W4VIZir4QCuJEw==
+Received: from MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM (2603:10a6:501:31::15)
+ by PR0P264MB3015.FRAP264.PROD.OUTLOOK.COM (2603:10a6:102:1d6::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.23; Fri, 22 Sep
+ 2023 10:13:25 +0000
+Received: from MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM
+ ([fe80::2820:d3a6:1cdf:c60e]) by MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM
+ ([fe80::2820:d3a6:1cdf:c60e%7]) with mapi id 15.20.6813.017; Fri, 22 Sep 2023
+ 10:13:25 +0000
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+To: Song Liu <song@kernel.org>
+CC: Mike Rapoport <rppt@kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
+	=?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, Catalin Marinas
+	<catalin.marinas@arm.com>, "David S. Miller" <davem@davemloft.net>, Dinh
+ Nguyen <dinguyen@kernel.org>, Heiko Carstens <hca@linux.ibm.com>, Helge
+ Deller <deller@gmx.de>, Huacai Chen <chenhuacai@kernel.org>, Kent Overstreet
+	<kent.overstreet@linux.dev>, Luis Chamberlain <mcgrof@kernel.org>, Mark
+ Rutland <mark.rutland@arm.com>, Michael Ellerman <mpe@ellerman.id.au>, Nadav
+ Amit <nadav.amit@gmail.com>, "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>, Puranjay Mohan <puranjay12@gmail.com>,
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, Russell King
+	<linux@armlinux.org.uk>, Steven Rostedt <rostedt@goodmis.org>, Thomas
+ Bogendoerfer <tsbogend@alpha.franken.de>, Thomas Gleixner
+	<tglx@linutronix.de>, Will Deacon <will@kernel.org>, "bpf@vger.kernel.org"
+	<bpf@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-mips@vger.kernel.org"
+	<linux-mips@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"linux-modules@vger.kernel.org" <linux-modules@vger.kernel.org>,
+	"linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>,
+	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+	"linux-trace-kernel@vger.kernel.org" <linux-trace-kernel@vger.kernel.org>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>, "x86@kernel.org"
+	<x86@kernel.org>
+Subject: Re: [PATCH v3 06/13] mm/execmem: introduce execmem_data_alloc()
+Thread-Topic: [PATCH v3 06/13] mm/execmem: introduce execmem_data_alloc()
+Thread-Index: AQHZ6gIemvXxoUb2LEiShTuWJhQ1PLAl6IqAgACM8oCAABuSgIAAFcIA
+Date: Fri, 22 Sep 2023 10:13:25 +0000
+Message-ID: <c92ded27-6e14-7265-c76e-76f4f2238a35@csgroup.eu>
+References: <20230918072955.2507221-1-rppt@kernel.org>
+ <20230918072955.2507221-7-rppt@kernel.org>
+ <CAPhsuW73NMvdpmyrhGouQSAHEL9wRw_A+8dZ-5R4BU=UHH83cw@mail.gmail.com>
+ <9b73ad3d-cfda-bce5-2589-e8674a58c827@csgroup.eu>
+ <CAPhsuW4_3oYhN6LnPPyBVA4VAM=7voXKmcJNKLqiNEUboq1rnA@mail.gmail.com>
+In-Reply-To:
+ <CAPhsuW4_3oYhN6LnPPyBVA4VAM=7voXKmcJNKLqiNEUboq1rnA@mail.gmail.com>
+Accept-Language: fr-FR, en-US
+Content-Language: fr-FR
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=csgroup.eu;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MRZP264MB2988:EE_|PR0P264MB3015:EE_
+x-ms-office365-filtering-correlation-id: b58f6d78-cab4-4847-c89b-08dbbb548efd
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ 2zVhOMplHLhuu5ZU6pbLh0mJW/K2PZADYGflAQI6z5DccBLWAtS394Ro0MkCoEeZ1zIOF5yZW+o8IvVdIZsOEXHkd+RuXQn2aR2vK1VI8qD+ZbjIAH+ywAqhAcBem0BF+4ewPaLy6WVNqit9YxrvltyJtKy+K4DwOYbigeZKoofyfzhg2/xrXr7mZHA/EsDt5MtL3102wYSPZODWe9/MKd+UY7jyT9G3sVApUun4NSeub+XkxIoqNGQzNsTt2HdloNGIKMwHfbfU+qAaomJ3S+TM2+xP6ez9HAb193EwMKG+IOvm6JP2NyjuNn0bWdvbIgkPG5HFm2ixY3Lsr3qpl/Ztf/UbB3h1cuq2Y6T9uB0LZvomIVF4xMf0sto7cKl/2yKZgdXkKRm7MBaIfO6c3GEN8BsBYrjeKGkCnFn9JwBnkKh/PaoBgpiTipjteZM125he68ofyXmKpDc0q5UTCGyLd/QsenRGa3Ed99jfjun9V8oQ983zoA30XkMedaX46qjkKOm0CuVnhuJ7n/Hx48jLkDRb9XdMkZ0rCrhxEJgyXBKWFWhLmw1saU/bol748dgHAKKZQPRcYuM0U3tQpc2PQA3v8ZHN/bI9/81XbzSZ9XJRB77apKmnphy0mWWYCs+0gKcNu8bn0Wk2gcRtZH5PEBc6pz9DmQWRpxm9kdz8WlEB1O8Lfo99G8NQ87sQ
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(366004)(136003)(39860400002)(346002)(1800799009)(186009)(451199024)(2616005)(26005)(6916009)(316002)(4326008)(8936002)(44832011)(8676002)(5660300002)(31686004)(122000001)(71200400001)(38070700005)(38100700002)(6512007)(6506007)(6486002)(53546011)(66946007)(76116006)(91956017)(66446008)(64756008)(54906003)(66556008)(66476007)(36756003)(41300700001)(2906002)(7406005)(7416002)(478600001)(31696002)(86362001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?cXJJdHdSeWMzYUpyTXVWeVZuVUZ0S2tzYm9FWkQ4bitudUZYMEVvcFdoUXRX?=
+ =?utf-8?B?L1dvVmZveFJBWlg3aVljOFg2RHFkWWlCQmI1RWlnb24rRk5iSThTVWRtcUQy?=
+ =?utf-8?B?QWtIV3BkMktqUHNkZzlaaXlkeENqS0VLYzB4QmRZYmg2QkFEcDVlZmRvbFZn?=
+ =?utf-8?B?dnNpWW9vWHMyS09abnVhTGEyb1NlNXR2dlJsbEczSnBLbndBL0hsbHMyenBG?=
+ =?utf-8?B?Vmd2MUNhMDRmSlMwUGtPZ0ROK1JiVytoekF1Zlc1NG9Zd1RhNzdaZmJHMmFj?=
+ =?utf-8?B?dUt4Z0k5WFg0dXJwZURZOWhPRHlNcldnYVEzYkhXaHlFTjN5RFQyRXFQYThK?=
+ =?utf-8?B?REFFTUJwUWF5aFJTdWJoZjdGb2NoOGxhbjQxcFNaQUJHT1FzVXhSODlqbkhW?=
+ =?utf-8?B?Smpzenl6U3U0TkFJanJFdWpCeXE1UE1xRUxjTzRURERrazJoRW02UUNJVjhj?=
+ =?utf-8?B?K0lObEdLV1B4ZG1RN0l0djVTbGEyb0I0bU8rOTlIZTA0aDlVRFVqbEI3b3F3?=
+ =?utf-8?B?VWZXT3E1MlVmeFFuaitjV1V6OUZjM3RRNEdwb1ZPbHl4SlI1MDBEVGJ0YXl5?=
+ =?utf-8?B?eXVZMWNpSFdLd3VIOEpGUHJDY3l2SXgxaXVMcWJ0RC84QWlheWxzNUErMlgx?=
+ =?utf-8?B?MVpuZ3dLVnkyek56VTNFeTBSaDFtU1FYbzBIT1gzblIxVnVhWnIxTFN1RE5C?=
+ =?utf-8?B?Szh1NUp4VGd2dk4xOTBEVG93TXkyS2VrREVMOUFlaUc5NGI0RysxWERXWGFp?=
+ =?utf-8?B?MFQxVHVzR2NScDNjYnYwUnhzYmZUeW8zSlU4dWFJMHovcExjeWNvdXNHQlZ3?=
+ =?utf-8?B?ZUtZMURETUNTbG1hbXhGTTFvS0NmRTNBakgyandxN3NNZVBhOEgwbW9vT0cr?=
+ =?utf-8?B?cTc3N1pzOFNiZnNRcmoxMmJEano1VmNQVWtCTkRra0JOMmUyU2k5SUhKTjh5?=
+ =?utf-8?B?Q3VzZUdqOEMyRXIyV0xRZHpQSHR5RkxydFh1aUVaQ1ZSM1QrZGlPbEE1VjlS?=
+ =?utf-8?B?QlJHWVlLZ2MyT3JHK2pRYnk5bmJaanVvMVRpSDVUUjNpQmtPdkxNWHBFZ2lW?=
+ =?utf-8?B?WTU1YWR2KzY3a1p2eVVHb3BsaU1JVXV3eFZBYU04MHhlN1ZQaiswYW9WOXEx?=
+ =?utf-8?B?ZmN5MTZSaW9CK1FyclBvejYva0JIR0ExTEFyaVVuU0NPS2NOYU5aeUoyeWhv?=
+ =?utf-8?B?blFjYXF2ZEx6N0ZmQ1dNamsvUktMclZRYkRBL0hYeFBtY0ZkeWdWRkxBVzJ4?=
+ =?utf-8?B?WGxXeEF3NnpaTkhsQy9YNGNKMVJzWEFLd2dLT05CVUd2SDMzWG1aaS9lQlRh?=
+ =?utf-8?B?cUVYNCt3Qm80WTdZUGR6ZGcyS3VzZGJ3c3VXb085dVVaVE5RcXRvd2puOWdW?=
+ =?utf-8?B?eXdyYkJkYkZsQmF0Q2lKaTZLQlZoaTh2RVpzblR0YittWWlQeUord1h2d0p0?=
+ =?utf-8?B?OGs1Z0VHdVQ4ck5SZGFrK0s2aDhIMFBnM3VYaHNpK3c4WjdoZkhXQ09UTmpX?=
+ =?utf-8?B?dmlIakxsQloycnNXTHRzTzF5MUdET21XRmhNSnRldFVTeXBGb21DVzlxYUVG?=
+ =?utf-8?B?YUFhaVU1bzFtWHI0VTBCMGtGYUM4SUFxMkl1UzRnOFdGcFNNVnRGakRzQmp5?=
+ =?utf-8?B?cU4vWVdqbUt3aTRsNEFGbFdjSG9DODdCV3IwYVFxa1NkajZHOXVTK3I4VkpM?=
+ =?utf-8?B?azFCK1JnS3hoYnNIMmlWYzlSVDQvRTA1SXdaMHlDdjRuQ2lrZzgyMkRYN1dG?=
+ =?utf-8?B?N3JHaUZSME5zdjBmRnRnMmRucHJhOWMxcTBlRThTQTRDVU1nbXc5Rkd0bll0?=
+ =?utf-8?B?M25qUXdMcURQTUF1b0tvOGtGbkMyYXQ2SG5pUTVsR05Oa2NzV1Mxd0g4SHVZ?=
+ =?utf-8?B?RXFJenFtM2g4TzF2WHZ1aStjQXdOTmJ3MklJUGFWenk5TnhTRzNiY2tjRG5Q?=
+ =?utf-8?B?TjFzOFovSDgwQ1hoNmJaVExGL0hTMWw5T25qWlZzNDJOeHY5SW5hTk52dHZu?=
+ =?utf-8?B?VWtoRDhUajFrS05Gdlg3NHpOa3hDdldjTzJidjdEcDM0VDYvdTBUKzJHUkFr?=
+ =?utf-8?B?QTV4TlVWTzgxcVFLMlNZZ2VqT0FCMDRBOS9pR05MV0kwMkVBKzJ2UmlMMEl3?=
+ =?utf-8?B?bUF3UDdFSFlXZEVnSndyT3VBdFYwakNjaWx3UGVxbW5kR3VpekNKSWszNk82?=
+ =?utf-8?B?Qmc9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <332ADFD079FF3747B57CDDB034F24190@FRAP264.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH net-next 2/2] sock: Fix improper heuristic on raising
- memory
-Content-Language: en-US
-From: Abel Wu <wuyun.abel@bytedance.com>
-To: Shakeel Butt <shakeelb@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
- Breno Leitao <leitao@debian.org>,
- Alexander Mikhalitsyn <alexander@mihalicyn.com>,
- David Howells <dhowells@redhat.com>, Jason Xing <kernelxing@tencent.com>,
- Xin Long <lucien.xin@gmail.com>,
- KAMEZAWA Hiroyuki <kamezawa.hiroyu@jp.fujtsu.com>,
- "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
- open list <linux-kernel@vger.kernel.org>
-References: <20230920132545.56834-1-wuyun.abel@bytedance.com>
- <20230920132545.56834-2-wuyun.abel@bytedance.com>
- <20230921190156.s4oygohw4hud42tx@google.com>
- <82c0a442-c7d7-d0f1-54de-7a5e7e6a31d5@bytedance.com>
-In-Reply-To: <82c0a442-c7d7-d0f1-54de-7a5e7e6a31d5@bytedance.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: csgroup.eu
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: b58f6d78-cab4-4847-c89b-08dbbb548efd
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Sep 2023 10:13:25.3175
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 9914def7-b676-4fda-8815-5d49fb3b45c8
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: W6Mgg6k7khJTD76ZUrLoIl4imKNqlDkWAY6OY+qYmqBYwFltJ9d1l6pXLipczywMoGyPKGDwSAWYg1IRva/hUpvwX953qfea5oyV0SPcvdw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR0P264MB3015
 X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 9/22/23 4:36 PM, Abel Wu wrote:
-> On 9/22/23 3:01 AM, Shakeel Butt wrote:
->> On Wed, Sep 20, 2023 at 09:25:41PM +0800, Abel Wu wrote:
->>> Before sockets became aware of net-memcg's memory pressure since
->>> commit e1aab161e013 ("socket: initial cgroup code."), the memory
->>> usage would be granted to raise if below average even when under
->>> protocol's pressure. This provides fairness among the sockets of
->>> same protocol.
->>>
->>> That commit changes this because the heuristic will also be
->>> effective when only memcg is under pressure which makes no sense.
->>> Fix this by skipping this heuristic when under memcg pressure.
->>>
->>> Fixes: e1aab161e013 ("socket: initial cgroup code.")
->>> Signed-off-by: Abel Wu <wuyun.abel@bytedance.com>
->>> ---
->>>   net/core/sock.c | 10 +++++++++-
->>>   1 file changed, 9 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/net/core/sock.c b/net/core/sock.c
->>> index 379eb8b65562..ef5cf6250f17 100644
->>> --- a/net/core/sock.c
->>> +++ b/net/core/sock.c
->>> @@ -3093,8 +3093,16 @@ int __sk_mem_raise_allocated(struct sock *sk, 
->>> int size, int amt, int kind)
->>>       if (sk_has_memory_pressure(sk)) {
->>>           u64 alloc;
->>> -        if (!sk_under_memory_pressure(sk))
->>> +        if (memcg && mem_cgroup_under_socket_pressure(memcg))
->>> +            goto suppress_allocation;
->>> +
->>> +        if (!sk_under_global_memory_pressure(sk))
->>>               return 1;
->>
->> I am onboard with replacing sk_under_memory_pressure() with
->> sk_under_global_memory_pressure(). However suppressing on memcg pressure
->> is a behavior change from status quo and need more thought and testing.
->>
->> I think there are three options for this hunk:
->>
->> 1. proposed patch
->> 2. Consider memcg pressure only for !in_softirq().
->> 3. Don't consider memcg pressure at all.
->>
->> All three options are behavior change from the status quo but with
->> different risk levels. (1) may reintroduce the regression fixed by
->> 720ca52bcef22 ("net-memcg: avoid stalls when under memory pressure").
-> 
-> Just for the record, it is same for the current upstream implementation
-> if the socket reaches average usage. Taking option 2 will fix this too.
-> 
->> (2) is more inlined with 720ca52bcef22. (3) has the risk to making memcg
->> limits ineffective.
->>
->> IMHO we should go with (2) as there is already a precedence in
->> 720ca52bcef22.
-> 
-> Yes, I agree. Actually applying option(2) would make this patch quite
-> similar to the previous version[a], except the below part:
-> 
->       /* Under limit. */
->       if (allocated <= sk_prot_mem_limits(sk, 0)) {
->           sk_leave_memory_pressure(sk);
-> -        return 1;
-> +        if (!under_memcg_pressure)
-> +            return 1;
->       }
-
-After a second thought, it is still vague to me about the position
-the memcg pressure should be in socket memory allocation. It lacks
-convincing design. I think the above hunk helps, but not much.
-
-I wonder if we should take option (3) first. Thoughts?
-
-Thanks,
-	Abel
-
-> 
-> My original thought is to inherit the behavior of tcpmem pressure.
-> There are also 3 levels of memcg pressure named low/medium/critical,
-> but considering that the 'low' level is too much conservative for
-> socket allocation, I made the following match:
-> 
->      PROTOCOL    MEMCG        ACTION
->      -----------------------------------------------------
->      low        <medium        allow allocation
->      pressure    medium        be more conservative
->      high        critical    throttle
-> 
-> which also seems align with the design[b] of memcg pressure. Anyway
-> I will take option (2) and post v2.
-> 
-> Thanks & Best,
->      Abel
-> 
-> [a] 
-> https://lore.kernel.org/lkml/20230901062141.51972-4-wuyun.abel@bytedance.com/
-> [b] 
-> https://docs.kernel.org/admin-guide/cgroup-v1/memory.html#memory-pressure
+DQoNCkxlIDIyLzA5LzIwMjMgw6AgMTA6NTUsIFNvbmcgTGl1IGEgw6ljcml0wqA6DQo+IE9uIEZy
+aSwgU2VwIDIyLCAyMDIzIGF0IDEyOjE34oCvQU0gQ2hyaXN0b3BoZSBMZXJveQ0KPiA8Y2hyaXN0
+b3BoZS5sZXJveUBjc2dyb3VwLmV1PiB3cm90ZToNCj4+DQo+Pg0KPj4NCj4+IExlIDIyLzA5LzIw
+MjMgw6AgMDA6NTIsIFNvbmcgTGl1IGEgw6ljcml0IDoNCj4+PiBPbiBNb24sIFNlcCAxOCwgMjAy
+MyBhdCAxMjozMeKAr0FNIE1pa2UgUmFwb3BvcnQgPHJwcHRAa2VybmVsLm9yZz4gd3JvdGU6DQo+
+Pj4+DQo+Pj4gWy4uLl0NCj4+Pj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvbGludXgvZXhlY21lbS5o
+IGIvaW5jbHVkZS9saW51eC9leGVjbWVtLmgNCj4+Pj4gaW5kZXggNTE5YmRmZGNhNTk1Li4wOWQ0
+NWFjNzg2ZTkgMTAwNjQ0DQo+Pj4+IC0tLSBhL2luY2x1ZGUvbGludXgvZXhlY21lbS5oDQo+Pj4+
+ICsrKyBiL2luY2x1ZGUvbGludXgvZXhlY21lbS5oDQo+Pj4+IEBAIC0yOSw2ICsyOSw3IEBADQo+
+Pj4+ICAgICAqIEBFWEVDTUVNX0tQUk9CRVM6IHBhcmFtZXRlcnMgZm9yIGtwcm9iZXMNCj4+Pj4g
+ICAgICogQEVYRUNNRU1fRlRSQUNFOiBwYXJhbWV0ZXJzIGZvciBmdHJhY2UNCj4+Pj4gICAgICog
+QEVYRUNNRU1fQlBGOiBwYXJhbWV0ZXJzIGZvciBCUEYNCj4+Pj4gKyAqIEBFWEVDTUVNX01PRFVM
+RV9EQVRBOiBwYXJhbWV0ZXJzIGZvciBtb2R1bGUgZGF0YSBzZWN0aW9ucw0KPj4+PiAgICAgKiBA
+RVhFQ01FTV9UWVBFX01BWDoNCj4+Pj4gICAgICovDQo+Pj4+ICAgIGVudW0gZXhlY21lbV90eXBl
+IHsNCj4+Pj4gQEAgLTM3LDYgKzM4LDcgQEAgZW51bSBleGVjbWVtX3R5cGUgew0KPj4+PiAgICAg
+ICAgICAgRVhFQ01FTV9LUFJPQkVTLA0KPj4+PiAgICAgICAgICAgRVhFQ01FTV9GVFJBQ0UsDQo+
+Pj4NCj4+PiBJbiBsb25nZXIgdGVybSwgSSB0aGluayB3ZSBjYW4gaW1wcm92ZSB0aGUgSklUZWQg
+Y29kZSBhbmQgbWVyZ2UNCj4+PiBrcHJvYmUvZnRyYWNlL2JwZi4gdG8gdXNlIHRoZSBzYW1lIHJh
+bmdlcy4gQWxzbywgZG8gd2UgbmVlZCBzcGVjaWFsDQo+Pj4gc2V0dGluZyBmb3IgRlRSQUNFPyBJ
+ZiBub3QsIGxldCdzIGp1c3QgcmVtb3ZlIGl0Lg0KPj4NCj4+IEhvdyBjYW4gd2UgZG8gdGhhdCA/
+IFNvbWUgcGxhdGZvcm1zIGxpa2UgcG93ZXJwYyByZXF1aXJlIGV4ZWN1dGFibGUNCj4+IG1lbW9y
+eSBmb3IgQlBGIGFuZCBub24tZXhlYyBtZW0gZm9yIEtQUk9CRSBzbyBpdCBjYW4ndCBiZSBpbiB0
+aGUgc2FtZQ0KPj4gYXJlYS9yYW5nZXMuDQo+IA0KPiBIbW0uLi4gbm9uLWV4ZWMgbWVtIGZvciBr
+cHJvYmVzPw0KPiANCj4gICAgICAgICBpZiAoc3RyaWN0X21vZHVsZV9yd3hfZW5hYmxlZCgpKQ0K
+PiAgICAgICAgICAgICAgICAgZXhlY21lbV9wYXJhbXMucmFuZ2VzW0VYRUNNRU1fS1BST0JFU10u
+cGdwcm90ID0gUEFHRV9LRVJORUxfUk9YOw0KPiAgICAgICAgIGVsc2UNCj4gICAgICAgICAgICAg
+ICAgIGV4ZWNtZW1fcGFyYW1zLnJhbmdlc1tFWEVDTUVNX0tQUk9CRVNdLnBncHJvdCA9IFBBR0Vf
+S0VSTkVMX0VYRUM7DQo+IA0KPiBEbyB5b3UgbWVhbiB0aGUgbGF0dGVyIGNhc2U/DQo+IA0KDQpJ
+biBmYWN0IEkgbWF5IGhhdmUgbWlzdW5kZXJzdG9vZCBwYXRjaCA5LiBJJ2xsIHByb3ZpZGUgYSBy
+ZXNwb25zZSB0aGVyZS4NCg0KQ2hyaXN0b3BoZQ0K
 
