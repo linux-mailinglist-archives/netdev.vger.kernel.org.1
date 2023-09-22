@@ -1,140 +1,155 @@
-Return-Path: <netdev+bounces-35899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE9757AB8EA
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 20:13:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E2B87AB8FB
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 20:18:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 6012B282229
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 18:13:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 02E291C20988
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 18:18:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B309C45F4B;
-	Fri, 22 Sep 2023 18:13:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A73D045F52;
+	Fri, 22 Sep 2023 18:18:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F88244483
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 18:13:25 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15C009F;
-	Fri, 22 Sep 2023 11:13:24 -0700 (PDT)
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38MI7TrA018275;
-	Fri, 22 Sep 2023 18:13:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=tXL9ZfYTERR3en1PBqoFEJXsooQVxAx94EFww22n28M=;
- b=YB1Yic+Ha629EOugPehYhBqa0hKg3NAiiD3Z+q3pT8w44sY1n4aNhIWRAGUjp4X0VBCt
- XLdZq3hI2nA8KMVbAf1IFuhGL22xqTND6yxJUgt6oJ3FIqZALGxJNEKaCZbpHxQlfDmc
- AecUUEeZcBe2Koaewtlacrm/LZsVPZjBU3ARH2Nl3pVlcz9D2uBaiq+YAvitYFnjM3g1
- lys6jAY072m9wZ9SfDTO9NlRrD597kJEzHSLLb1SPz+yEIF1P+EFiXIsCT7/L/YLYai3
- /6S4NMsslbZV6XtLoqbD0um1LLiPYFRVHo/HQzJIHjCYBVt//5qvikZ/cyx7V878ICi1 0g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t9f8y8wrm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 22 Sep 2023 18:13:19 +0000
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38MI7iui020475;
-	Fri, 22 Sep 2023 18:13:19 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t9f8y8wr5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 22 Sep 2023 18:13:19 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38MHKkdS015474;
-	Fri, 22 Sep 2023 18:13:17 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3t8tspphbv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 22 Sep 2023 18:13:17 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38MIDEfP22938114
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 22 Sep 2023 18:13:14 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B08752004B;
-	Fri, 22 Sep 2023 18:13:14 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F1BE420043;
-	Fri, 22 Sep 2023 18:13:13 +0000 (GMT)
-Received: from [9.171.80.27] (unknown [9.171.80.27])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 22 Sep 2023 18:13:13 +0000 (GMT)
-Message-ID: <b7dad8b72ec94d27378eca87fea4cb0c86b8c361.camel@linux.ibm.com>
-Subject: Re: [PATCH net-next 01/18] net/smc: decouple ism_dev from SMC-D
- device dump
-From: Gerd Bayer <gbayer@linux.ibm.com>
-To: Wen Gu <guwen@linux.alibaba.com>, Simon Horman <horms@kernel.org>
-Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date: Fri, 22 Sep 2023 20:13:13 +0200
-In-Reply-To: <2c9d570c-f780-0484-a26c-78b115e1a6a3@linux.alibaba.com>
-References: <1695134522-126655-1-git-send-email-guwen@linux.alibaba.com>
-	 <1695134522-126655-2-git-send-email-guwen@linux.alibaba.com>
-	 <20230921204153.GQ224399@kernel.org>
-	 <2c9d570c-f780-0484-a26c-78b115e1a6a3@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.module_f38+17164+63eeee4a) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34AB642C06
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 18:18:10 +0000 (UTC)
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB690AB
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 11:18:08 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1c3cbfa40d6so22552745ad.1
+        for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 11:18:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1695406688; x=1696011488; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=l4T/fTfBwkAD/muqS7Lm7m+/C+nhl1XGVqC9ttPy9eA=;
+        b=MGEnSZ5DvLoOIcKKMbU6bsWVx1QGxFDEfjRso+SeDZ1c0ST9rD35Hw1u3cdnEFlO95
+         a85vrPMSDS90VVCy7DbU/JrVvf5SLAfy4IEpnG7XOJfrl5j2yDPYOhSUrOa/pfA2WQJ4
+         C4WQbFy+bg3FkEs/NOyLd8UBmheBFHOE7j/qU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695406688; x=1696011488;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=l4T/fTfBwkAD/muqS7Lm7m+/C+nhl1XGVqC9ttPy9eA=;
+        b=h9i2iyD/QAq6FuBf43k35NC9XUMn7rF+xMnApzkIzQ87jO7XmyodlPoVKQvKWDmTiy
+         LFCj9Tvjs9/HcrNG8sDPG9uoB0yBii36AlUvqHaregAla1WX1OikOqP2H/uykU1YonLh
+         QwY+d00AUevOP12Or6gM6Yo0TqqiBKZt696C4D9d93T9JaKDpmfsQviA639s0mwaVPxc
+         DxuZwqM91XSV+grdFvIJh1Aw7ThPQc2ncd9bpBMi9elvfeqOa+2ljfAG3cS7n6owARbu
+         C7x6GapnYeW/9SvbXiSfgo/ia6L7VDcpeMiBJqt5qrKhyCSDcED7m/cS2HWta8TEKuF4
+         LxaA==
+X-Gm-Message-State: AOJu0Yz/cXdlHDTsYbm9xzJKxRnpMqbnzgsdn/GKM7gbgKNNp36ctK4/
+	ym+yvrQET73dq003kdxAcNjNSg==
+X-Google-Smtp-Source: AGHT+IH5/bxePU0F2RoHuDHcwpnFv3qhRHMIDj1hzz6KjFthqubQPCi6uc81wCdHv55oKzyGphjbaA==
+X-Received: by 2002:a17:902:d48f:b0:1c3:6d97:e89e with SMTP id c15-20020a170902d48f00b001c36d97e89emr297047plg.58.1695406688329;
+        Fri, 22 Sep 2023 11:18:08 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id e3-20020a17090301c300b001b531e8a000sm3797390plh.157.2023.09.22.11.18.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Sep 2023 11:18:07 -0700 (PDT)
+Date: Fri, 22 Sep 2023 11:18:07 -0700
+From: Kees Cook <keescook@chromium.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>,
+	Martin KaFai Lau <martin.lau@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Long Li <longli@microsoft.com>,
+	Ajay Sharma <sharmaajay@microsoft.com>,
+	Alex Elder <elder@kernel.org>, Pravin B Shelar <pshelar@ovn.org>,
+	Shaokun Zhang <zhangshaokun@hisilicon.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Tom Rix <trix@redhat.com>, Simon Horman <horms@kernel.org>,
+	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	linux-rdma@vger.kernel.org, dev@openvswitch.org,
+	linux-parisc@vger.kernel.org, llvm@lists.linux.dev,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH 14/14] net: sched: Annotate struct tc_pedit with
+ __counted_by
+Message-ID: <202309221117.160257BAB@keescook>
+References: <20230922172449.work.906-kees@kernel.org>
+ <20230922172858.3822653-14-keescook@chromium.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 3D4AtFu0GrkfgE5YJ6-yJxHczBLp0Bq3
-X-Proofpoint-GUID: gVtzBIBRzLHhqbexIMkocvwnOQ7UsNQr
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-09-22_16,2023-09-21_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
- phishscore=0 mlxlogscore=779 spamscore=0 lowpriorityscore=0
- priorityscore=1501 impostorscore=0 bulkscore=0 suspectscore=0
- clxscore=1011 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2309180000 definitions=main-2309220156
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230922172858.3822653-14-keescook@chromium.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, 2023-09-22 at 16:05 +0800, Wen Gu wrote:
-> On 2023/9/22 04:41, Simon Horman wrote:
-> > On Tue, Sep 19, 2023 at 10:41:45PM +0800, Wen Gu wrote:
-> >=20
-> > priv_dev is uninitialised here.
-> >=20
-> > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0smc_set_pci_values(to_pci_=
-dev(ism->dev.parent),
-> > > &smc_pci_dev);
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (smcd->ops->get_dev)
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0priv_dev =3D smcd->ops->get_dev(smcd);
-> >=20
-> > It is conditionally initialised here.
-> >=20
-> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (priv_dev->parent)
-> >=20
-> > But unconditionally dereferenced here.
-> >=20
-> > As flagged by clang-16 W=3D1, and Smatch
-> >=20
->=20
-> Hi Simon. Yes, I fixed it in v3. Thank you!
+On Fri, Sep 22, 2023 at 10:28:56AM -0700, Kees Cook wrote:
+> Prepare for the coming implementation by GCC and Clang of the __counted_by
+> attribute. Flexible array members annotated with __counted_by can have
+> their accesses bounds-checked at run-time checking via CONFIG_UBSAN_BOUNDS
+> (for array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
+> functions).
+> 
+> As found with Coccinelle[1], add __counted_by for struct tc_pedit.
+> Additionally, since the element count member must be set before accessing
+> the annotated flexible array member, move its initialization earlier.
+> 
+> [1] https://github.com/kees/kernel-tools/blob/trunk/coccinelle/examples/counted_by.cocci
+> 
+> Cc: Jamal Hadi Salim <jhs@mojatatu.com>
+> Cc: Cong Wang <xiyou.wangcong@gmail.com>
+> Cc: Jiri Pirko <jiri@resnulli.us>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: netdev@vger.kernel.org
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> ---
+>  net/sched/act_pedit.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/sched/act_pedit.c b/net/sched/act_pedit.c
+> index 1ef8fcfa9997..77c407eff3b0 100644
+> --- a/net/sched/act_pedit.c
+> +++ b/net/sched/act_pedit.c
+> @@ -515,11 +515,11 @@ static int tcf_pedit_dump(struct sk_buff *skb, struct tc_action *a,
+>  		spin_unlock_bh(&p->tcf_lock);
+>  		return -ENOBUFS;
+>  	}
+> +	opt->nkeys = parms->tcfp_nkeys;
+>  
+>  	memcpy(opt->keys, parms->tcfp_keys,
+>  	       flex_array_size(opt, keys, parms->tcfp_nkeys));
+>  	opt->index = p->tcf_index;
+> -	opt->nkeys = parms->tcfp_nkeys;
+>  	opt->flags = parms->tcfp_flags;
+>  	opt->action = p->tcf_action;
+>  	opt->refcnt = refcount_read(&p->tcf_refcnt) - ref;
+> -- 
+> 2.34.1
 
-Hi Wen Gu,
+Gustavo pointed out that the annotation half of this patch in missing.
+My mistake! I will figure out where it went. :P Ah, the joys of
+splitting up a treewide patch series...
 
-seems like there is some email filter at work. Neither v2 nor v3 made
-it to the netdev mailing list - nor to patchwork.kernel.org.
-There's traces of Wenjia's replies and your replies to her - but not
-the original mail.
-
-Could you please check? Thanks!
-Gerd
+-- 
+Kees Cook
 
