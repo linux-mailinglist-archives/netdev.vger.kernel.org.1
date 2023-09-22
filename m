@@ -1,191 +1,95 @@
-Return-Path: <netdev+bounces-35912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B33237ABB4B
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 23:58:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A5717ABB99
+	for <lists+netdev@lfdr.de>; Sat, 23 Sep 2023 00:04:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 642EB281DEA
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 21:58:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 9A94F1C208BD
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 22:04:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60E1B47C69;
-	Fri, 22 Sep 2023 21:58:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 329ED47C6B;
+	Fri, 22 Sep 2023 22:04:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 575964177F;
-	Fri, 22 Sep 2023 21:58:23 +0000 (UTC)
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C4F8197;
-	Fri, 22 Sep 2023 14:58:20 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 3E790240002;
-	Fri, 22 Sep 2023 21:57:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1695419898;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/YVTZcfReib7t/7pkUyxikgIMHTHiQw2lUN/ib+i8mE=;
-	b=Ja/5fpeT5o5akQ0s5PhqFJUDY6DQ7QeszgvhChp7+woMQdUgGJW0GPwQA0aCTTG1OGy9Hb
-	+1p6OYpCKg7g/jxXASbU6FMY0XJsjosnVSVh1i+y1bWLDL2msdeQe7ZdQcxP++36sYwLcn
-	tu11yHNRFvgPiyIdH14mXaKjcyzntmp0K2kg7QiHYToaPwIcWvVSqBH3jFdn8CdJyFjfpj
-	tdeVDShAPsGMOZmtAe0mhghv1EuT8kYzBSy2d6Hhvwx7EMpIaemtl9DdmnIBVGTTnTagzY
-	P+X0gsJTPfggsQk9zBywEZD5TRUEFOcRSr2PWM1Vn94oEDspzq6M+iHqMcF9Xw==
-Message-ID: <6c1bb7df-34cd-4db9-95b6-959c87b68588@arinc9.com>
-Date: Sat, 23 Sep 2023 00:57:52 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C71264736C
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 22:03:59 +0000 (UTC)
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAD7883
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 15:03:58 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d852a6749baso3961909276.0
+        for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 15:03:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695420238; x=1696025038; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=lihguCqmQrO7MN4k6u+r2CqnjSzZDlVBm/BVuMAF3N4=;
+        b=gMxCWz1e215LisOjxx0Gj/2YNaqzrIuSwmcVxvJgsQJaahnAtFb1P4C/Zd8fwM5qZ6
+         qQHzqLR7izVPSDIizEUHWuUai5GdR+vFeNCEf9BybV57plGFdapTIEGojS4DhGzKPVQI
+         do5qBWeTV/7KMVNl1cRfVkr03aNkhie0hy9j4flJi8OGxX6+FdRN9TcRY7D+pdcIEdpL
+         kMdjE1/8f/uakIsL9dFrPeXihF2uAUiX4NfUPY0UcjbX6oV7v68XpEvuuOR62cR2o+a1
+         wY+v7uTSkRp5oko8vMp+OQ+xxaLnXwlLhsDW713DHBn68fr7Oh22ow8ALUpLgYe/Jp2d
+         BK1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695420238; x=1696025038;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lihguCqmQrO7MN4k6u+r2CqnjSzZDlVBm/BVuMAF3N4=;
+        b=Vdaw8WOQ4+2nDYJEltUcMUF0xV6BGPHS2FcqZy3vNJ8Uw4InF6bKxz9nrfOm8B/iaR
+         kJyBUd/DZfVb2O8k5AcCBrX64WWziLjVdWWfFiPlqJJ/iBzIwrnsVz3yUaM1ugwEKoxH
+         kY+Ea1l9JGWZfA3+5Ou95Z5ZKMPRtQLxZv1m4h/ZwLwievyhdK12Sxq/Fjiop1v9gyAg
+         3RyXd+9F06KrSoBVrkSKZgZU6NpGYcGnn09gp8Uu2uB37hUPEZ9DvgceraTOAvtgXpRI
+         2p3S13aj7EgMF9dusFsi28X0n5ZpkqDl4SeFP9ebBeTWI1RVNoU13MZTlq5vmNI64gJW
+         ml6Q==
+X-Gm-Message-State: AOJu0Yx8ErrFFtI3WUv7rws16sPmg+Zj/MaEPZR2zZoTYTLiakTDDsVp
+	sqb9lrdfTrgLtoBa53KddFjWZqxvH2u1Dg==
+X-Google-Smtp-Source: AGHT+IEcXopLcguuy0CWevBKFqxjQiBiH/wIteA3v+sfn/Jl4jUt6zznqFHfzDfgSUFeL0M+LZFaqNIf4v+gvg==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:1105:b0:d81:6637:b5b2 with SMTP
+ id o5-20020a056902110500b00d816637b5b2mr7883ybu.0.1695420238020; Fri, 22 Sep
+ 2023 15:03:58 -0700 (PDT)
+Date: Fri, 22 Sep 2023 22:03:52 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 00/10] define and enforce phylink bindings
-Content-Language: en-US
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Conor Dooley <conor+dt@kernel.org>,
- George McCollister <george.mccollister@gmail.com>,
- Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <olteanv@gmail.com>, Kurt Kanzenbach <kurt@linutronix.de>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
- Linus Walleij <linus.walleij@linaro.org>,
- =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
- =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
- Marcin Wojtas <mw@semihalf.com>, Lars Povlsen <lars.povlsen@microchip.com>,
- Steen Hegelund <Steen.Hegelund@microchip.com>,
- Daniel Machon <daniel.machon@microchip.com>,
- Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
- Daniel Golle <daniel@makrotopia.org>, Landen Chao
- <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Magnus Damm <magnus.damm@gmail.com>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Nicolas Ferre <nicolas.ferre@microchip.com>,
- Claudiu Beznea <claudiu.beznea@microchip.com>, Marek Vasut <marex@denx.de>,
- Claudiu Manoil <claudiu.manoil@nxp.com>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- John Crispin <john@phrozen.org>, Madalin Bucur <madalin.bucur@nxp.com>,
- Ioana Ciornei <ioana.ciornei@nxp.com>, Lorenzo Bianconi
- <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
- Horatiu Vultur <horatiu.vultur@microchip.com>,
- Oleksij Rempel <linux@rempel-privat.de>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Grygorii Strashko <grygorii.strashko@ti.com>, Sekhar Nori <nsekhar@ti.com>,
- Shyam Pandey <radhey.shyam.pandey@xilinx.com>, mithat.guner@xeront.com,
- erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- linux-renesas-soc@vger.kernel.org
-References: <20230916110902.234273-1-arinc.unal@arinc9.com>
- <ZQ2LMe9aa1ViBcSH@shell.armlinux.org.uk>
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <ZQ2LMe9aa1ViBcSH@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.515.g380fc7ccd1-goog
+Message-ID: <20230922220356.3739090-1-edumazet@google.com>
+Subject: [PATCH net-next 0/4] tcp_metrics: four fixes
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Neal Cardwell <ncardwell@google.com>, Yuchung Cheng <ycheng@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 22/09/2023 15:40, Russell King (Oracle) wrote:
-> On Sat, Sep 16, 2023 at 02:08:52PM +0300, Arınç ÜNAL wrote:
->> Hello there.
->>
->> This patch series defines phylink bindings and enforces them for the
->> ethernet controllers that need them.
->>
->> Some schemas had to be changed to properly enforce phylink bindings for all
->> of the affected ethernet controllers. Some of the documents of these
->> ethernet controllers were non json-schema, which had to be converted.
->>
->> I will convert the remaining documents to json-schema while this patch
->> series receives reviews.
-> 
-> I can't say that I'm comfortable with this. We appear to be defining
-> bindings based on software implementation, and a desire for the DT
-> tooling to enforce what the software implementation wants. Isn't this
-> against the aims of device tree and device tree binding documentation?
-> Seems to me like feature-creep.
-> 
-> The bindings that phylink parses are already documented in the
-> ethernet controller yaml document. Specifically:
-> 
-> - phylink does not parse the phy-mode property, that is left to the
->    implementation to pass to phylink, which can implement it any
->    which way they choose (and even default to something.)
-> 
-> - phylink does not require a phy property - phylink does expect a PHY
->    to be attached, but how that PHY is attached is up to the ethernet
->    controller driver. It may call one of the phylink functions that
->    parses the phy property, or it may manually supply the phy device to
->    phylink. Either way, phylink does not itself require a PHY property.
-> 
-> - phylink does not require a sfp property - this obviously is optional.
-> 
-> So, all in all, ethernet-controller already describes it, and to create
-> a DT binding document that pretends that phylink requires any of this
-> stuff is, in my mind, wrong.
-> 
-> DSA requires certain properties by dint of the parsing and setup of
-> phylink being in generic code - this is not because phylink requires
-> certain properties, but phylink does require certain information in
-> order to function correctly.
-> 
-> The issue here is _how_ phylink gets that information, and as I state
-> above, it _can_ come from DT, but it can also be given that information
-> manually.
-> 
-> As an example, there are plenty of drivers in the tree which try to
-> parse a phy node, and if that's not present, they try to see if a PHY
-> exists at a default# bus address.
-> 
-> We seem to be digging outselves a hole here, where "phylink must have
-> these properties". No, that is wrong.
+Looking at an inconclusive syzbot report, I was surprised
+to see that tcp_metrics cache on my host was full of
+useless entries, even though I have
+/proc/sys/net/ipv4/tcp_no_metrics_save set to 1.
 
-I agree. My patch description here failed to explain the actual issue,
-which is missing hardware descriptions. Here's what I understand. An
-ethernet-controller is a MAC. For the MAC to work properly with its link
-partner, at least one of these must be described:
-- pointer to a PHY to retrieve link information from the PHY
-- pointer to a PCS to retrieve link information from the PCS
-- pointer to an SFP to retrieve link information from the SFP
-- static link information
+While looking more closely I found a total of four issues.
 
-Andrew under the discussion of patch 7 said that enforcing this may expose
-bugs on MAC drivers that never looked at the devicetree to control the
-MAC's link which would cause regressions, implying we should hold back on
-enforcing it. I've agreed not to enforce it, not because it is incorrect
-description of ethernet controller hardware - I think it is correct - but
-because I won't be the one to deal with the regressions when this
-dt-bindings change goes through.
+Eric Dumazet (4):
+  tcp_metrics: add missing barriers on delete
+  tcp_metrics: properly set tp->snd_ssthresh in tcp_init_metrics()
+  tcp_metrics: do not create an entry from tcp_init_metrics()
+  tcp_metrics: optimize tcp_metrics_flush_all()
 
-I won't also enforce it selectively, as saying "these drivers use
-phylink_fwnode_phy_connect() therefore there won't be any bad surprises on
-the hardware they control so let's enforce it only for them" is nonsense in
-the context of describing hardware.
+ net/ipv4/tcp_metrics.c | 22 ++++++++++++----------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
 
-I will focus on documenting the missing MDIO bus descriptions on certain
-ethernet switches and converting ethernet switch documents (maybe ethernet
-controllers too) to json-schema. There's the incorrect link descriptions on
-dsa-port.yaml as confirmed by Vladimir on the discussion of v1 series so
-I'll fix that.
+-- 
+2.42.0.515.g380fc7ccd1-goog
 
-I've also got some ethernet controller rules that I think won't break any
-driver so I will submit them as well.
-
-Arınç
 
