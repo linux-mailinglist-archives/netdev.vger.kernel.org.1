@@ -1,156 +1,114 @@
-Return-Path: <netdev+bounces-35702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6503B7AAB11
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 09:59:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E4EA57AAB00
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 09:58:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 15F4A282B37
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 07:59:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 98DB428243D
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 07:58:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6702B1A733;
-	Fri, 22 Sep 2023 07:59:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EA0E1A29F;
+	Fri, 22 Sep 2023 07:58:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D522C1A5A8;
-	Fri, 22 Sep 2023 07:59:45 +0000 (UTC)
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F12D0198;
-	Fri, 22 Sep 2023 00:59:41 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPA id DBA7A1BF209;
-	Fri, 22 Sep 2023 07:59:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1695369580;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=47AJJX9nKRaseqWZw0zOFwaVtfIj/ZlHaGyGR6Dcxfk=;
-	b=aVa/IbEhLcUVHtev73ra9qChSwDgiMaBWbUZQjrha8d9W2mM2x+NAui/0JyxwPIYoOAOk3
-	/CagIAQhbsRvIFYfYojZWl5ZsjMmGRSw+yZYTBePuef6MzbEpebbYKlmTW0jXEkG4JMtVM
-	MTQOO6Cj+s0U16KY1MBe92+Qj5W6KfbcqXNANtYOOLN3Xj4iza+IFbz6XeR4zwmrkxXxfZ
-	IfB468Y1LeUJVLIOlOSnqjrOJ+4fL2nD2zfM9s5GJ8HFQAsHqrUig4WgphKyyF1AAaVb2F
-	kz4xa1NEaT2CdfNeweAZDmh5ESlfLuO+IK3IjGPi9XkrGTqBgZKFBVehxbzEGQ==
-From: Herve Codina <herve.codina@bootlin.com>
-To: Herve Codina <herve.codina@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Lee Jones <lee@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Qiang Zhao <qiang.zhao@nxp.com>,
-	Li Yang <leoyang.li@nxp.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>,
-	Shengjiu Wang <shengjiu.wang@gmail.com>,
-	Xiubo Li <Xiubo.Lee@gmail.com>,
-	Fabio Estevam <festevam@gmail.com>,
-	Nicolin Chen <nicoleotsuka@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Randy Dunlap <rdunlap@infradead.org>
-Cc: netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	alsa-devel@alsa-project.org,
-	Simon Horman <horms@kernel.org>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: [PATCH v6 05/30] soc: fsl: cpm1: qmc: Remove inline function specifiers
-Date: Fri, 22 Sep 2023 09:58:40 +0200
-Message-ID: <20230922075913.422435-6-herve.codina@bootlin.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230922075913.422435-1-herve.codina@bootlin.com>
-References: <20230922075913.422435-1-herve.codina@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07EDE14F81
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 07:58:49 +0000 (UTC)
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17E0F195
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 00:58:45 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VschYeO_1695369521;
+Received: from 30.221.145.61(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0VschYeO_1695369521)
+          by smtp.aliyun-inc.com;
+          Fri, 22 Sep 2023 15:58:43 +0800
+Message-ID: <2ffd0e15-107e-4c46-8d98-caf47ff6a0c6@linux.alibaba.com>
+Date: Fri, 22 Sep 2023 15:58:40 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 5/6] virtio-net: fix the vq coalescing setting for vq
+ resize
+To: Jason Wang <jasowang@redhat.com>
+Cc: netdev@vger.kernel.org, virtualization@lists.linux-foundation.org,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Gavin Li <gavinl@nvidia.com>
+References: <20230919074915.103110-1-hengqi@linux.alibaba.com>
+ <20230919074915.103110-6-hengqi@linux.alibaba.com>
+ <CACGkMEuJjxAmr6WC9ETYAw2K9dp0AUoD6LSZCduQyUQ9y7oM3Q@mail.gmail.com>
+ <c95274cd-d119-402b-baf1-0c500472c9fb@linux.alibaba.com>
+ <CACGkMEv4me_mjRJ8wEd-w_b9tjo370d6idioCTmFwJo-3TH3-A@mail.gmail.com>
+From: Heng Qi <hengqi@linux.alibaba.com>
+In-Reply-To: <CACGkMEv4me_mjRJ8wEd-w_b9tjo370d6idioCTmFwJo-3TH3-A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_IN_DEF_SPF_WL autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The inline function specifier is present on some functions but it is
-better to let the compiler decide inlining or not these functions.
 
-Remove inline specifiers.
 
-Fixes: 3178d58e0b97 ("soc: fsl: cpm1: Add support for QMC")
-Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-Suggested-by: Andrew Lunn <andrew@lunn.ch>
-Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
----
- drivers/soc/fsl/qe/qmc.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+在 2023/9/22 下午3:32, Jason Wang 写道:
+> On Fri, Sep 22, 2023 at 1:02 PM Heng Qi <hengqi@linux.alibaba.com> wrote:
+>>
+>>
+>> 在 2023/9/22 下午12:29, Jason Wang 写道:
+>>> On Tue, Sep 19, 2023 at 3:49 PM Heng Qi <hengqi@linux.alibaba.com> wrote:
+>>>> According to the definition of virtqueue coalescing spec[1]:
+>>>>
+>>>>     Upon disabling and re-enabling a transmit virtqueue, the device MUST set
+>>>>     the coalescing parameters of the virtqueue to those configured through the
+>>>>     VIRTIO_NET_CTRL_NOTF_COAL_TX_SET command, or, if the driver did not set
+>>>>     any TX coalescing parameters, to 0.
+>>>>
+>>>>     Upon disabling and re-enabling a receive virtqueue, the device MUST set
+>>>>     the coalescing parameters of the virtqueue to those configured through the
+>>>>     VIRTIO_NET_CTRL_NOTF_COAL_RX_SET command, or, if the driver did not set
+>>>>     any RX coalescing parameters, to 0.
+>>>>
+>>>> We need to add this setting for vq resize (ethtool -G) where vq_reset happens.
+>>>>
+>>>> [1] https://lists.oasis-open.org/archives/virtio-dev/202303/msg00415.html
+>>>>
+>>>> Fixes: 394bd87764b6 ("virtio_net: support per queue interrupt coalesce command")
+>>> I'm not sure this is a real fix as spec allows it to go zero?
+>> The spec says that if the user has configured interrupt coalescing
+>> parameters,
+>> parameters need to be restored after vq_reset, otherwise set to 0.
+>> vi->intr_coal_tx and vi->intr_coal_rx always save the newest global
+>> parameters,
+>> regardless of whether the command is sent or not. So I think we need
+>> this patch
+>> it complies with the specification requirements.
+> How can we make sure the old coalescing parameters still make sense
+> for the new ring size?
 
-diff --git a/drivers/soc/fsl/qe/qmc.c b/drivers/soc/fsl/qe/qmc.c
-index 2d2a9d88ba6c..459e0bbd723d 100644
---- a/drivers/soc/fsl/qe/qmc.c
-+++ b/drivers/soc/fsl/qe/qmc.c
-@@ -218,37 +218,37 @@ struct qmc {
- 	struct qmc_chan *chans[64];
- };
- 
--static inline void qmc_write16(void __iomem *addr, u16 val)
-+static void qmc_write16(void __iomem *addr, u16 val)
- {
- 	iowrite16be(val, addr);
- }
- 
--static inline u16 qmc_read16(void __iomem *addr)
-+static u16 qmc_read16(void __iomem *addr)
- {
- 	return ioread16be(addr);
- }
- 
--static inline void qmc_setbits16(void __iomem *addr, u16 set)
-+static void qmc_setbits16(void __iomem *addr, u16 set)
- {
- 	qmc_write16(addr, qmc_read16(addr) | set);
- }
- 
--static inline void qmc_clrbits16(void __iomem *addr, u16 clr)
-+static void qmc_clrbits16(void __iomem *addr, u16 clr)
- {
- 	qmc_write16(addr, qmc_read16(addr) & ~clr);
- }
- 
--static inline void qmc_write32(void __iomem *addr, u32 val)
-+static void qmc_write32(void __iomem *addr, u32 val)
- {
- 	iowrite32be(val, addr);
- }
- 
--static inline u32 qmc_read32(void __iomem *addr)
-+static u32 qmc_read32(void __iomem *addr)
- {
- 	return ioread32be(addr);
- }
- 
--static inline void qmc_setbits32(void __iomem *addr, u32 set)
-+static void qmc_setbits32(void __iomem *addr, u32 set)
- {
- 	qmc_write32(addr, qmc_read32(addr) | set);
- }
--- 
-2.41.0
+I'm not sure, ringsize has a wider range of changes. Maybe we should 
+only keep coalescing
+parameters in cases where only vq_reset occurs (no ring size change 
+involved)?
+
+Thanks!
+
+>
+> Thanks
+>
+>> Thanks!
+>>
+>>> Thanks
 
 
