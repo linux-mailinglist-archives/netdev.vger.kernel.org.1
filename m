@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-35867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C93B87AB719
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 19:19:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F39D7AB71A
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 19:19:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by am.mirrors.kernel.org (Postfix) with ESMTP id 640971F23184
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 17:19:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 421072820C3
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 17:19:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A8D042BF0;
-	Fri, 22 Sep 2023 17:19:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD5AA42BF5;
+	Fri, 22 Sep 2023 17:19:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FEF841E47
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 17:19:10 +0000 (UTC)
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2076.outbound.protection.outlook.com [40.107.94.76])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C1B2F1
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 10:19:09 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B90E42C0C
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 17:19:14 +0000 (UTC)
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2083.outbound.protection.outlook.com [40.107.94.83])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98B701A3
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 10:19:13 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YGGa5BD+sgMV3m3sVoeJiUOFogKn5yFq0y3nWjYm3ZvDzHQGUf8jR+8xl9RjeC9XJHUNmWGe9BQ4XWWEuTLT4/cjh1fMvcJfSJFhgM3R/TZRvvmf4kDKmnlvZq9ngzuOX5k74Jw0fSHaSpkynJ9kUtnU8LVNm23YxNXzeIFeYHj/DtSd0Gm3GQhXwbhwcMBbI5vcsHjRI1yMiSxv2kZkTiBCn2NJeUOhFVr/zfKTHOAmYJi4Cojx6YlZt9EDT8G+UXbXPtZ90NCukMpqT0BG/6VC+sDF1C3q0QbkDc+W2h+z2G3QHC87ZlCR4eiO/QWY21zKlK3e+m4ctGC6McYsmw==
+ b=KqyYQgH2ZpXM1s3cC9Z3iGWoNjkkSulajhfFwhOnXeh8Lmu1osrcVA0oBQKtOOUF6DA1GwVT08JLEkyABAmQHa38CcTOl7AiiZvoP1Dmw35YlWrVkrTSmHBJ+BlFMW5He3IHFm1NzGMU5NdPv6X8tR6Bq19TLEk6wx4pKC/ZchLPvDkOGpWtgSG/dd6mUOp3deC3q9xaBhpORyfpXL1tEQRGS9XfX1fwsE54nmEdL8iGICzl6Ccz2XA3vvn221RmLE9Qr33xqOInzqvD2vyKmN/L3Cmz+NP6IeAlXoTE39E2P+f3OxQ8cb/Imwi4vBUdM1+poYj0jL7GPCbvKGyjgA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WHhFbCuoCKIKtdEhK1xGQALMhADlLG1eqdNsm12KHB8=;
- b=nQ/hb0EQQPre+/jAtZ5jgJeggr+ndq3CAKKBzFqwe1fzNUJ8Kq72v09EfAUuJoS0JRA+NvXbo0jZclR+8OLmvQCVhqVLrOv7u8E6/YZRBjQ+c4rtN8U4r2CONDqFjS5f54oyukc8ZGDjCYYmO9hV4MhV+21N6VD0oBK3pM7JwaAKcmYVAJAVwjqgpTREx6N/pdmFv4VMsiC3TDXhrZG3cuCCXwN+e/AikBVfReGeNveBHvHUgMzy2VNH+TVUf4pacEBHe/EyWJ3Xw7S9bywz6FPkpcKFd2yJ1XMO42enB6YlPa0b7j81LUgiTOJAPsxRPtfWgWZQXmzXLSaWB5y7Cw==
+ bh=7ApAZF0oWGUDrjjYsFdYswixdc9mEzWwniHNtvu629g=;
+ b=AtmUblu/voH3UP4CMNCpGnrqIN03uTuPoU9AQ8eMiNbArooQc3Kd6EZqQEq/ggsbqqnfotBlPsmI4iT8U8dl9lMr6AZx9ikPSY5C/D8hFFG8+hInLxrn0PT5wyb+7pKWnw9icD77++bT11hD9IremD2yPzRPD5WZSBB6sVY8ZAtk87R0HwCAA4rAOMfrt42o4OOawjCne2ra2qqLUhKlQIuLmQHXAKXeIbJAM0yDOzea6OXCjL6uwVnumqCUNd6CDlMw/uyk16hDziSq04aSo4AIsH3/jxcN0jkb1gD+MD+tPFltZq5WX7jLJ0iW0GIW2BgjUdxvCAadv1lzsv3jMg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -33,18 +33,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WHhFbCuoCKIKtdEhK1xGQALMhADlLG1eqdNsm12KHB8=;
- b=qQTM9kDNoXZkOV7DdoHTtmDSqQlmqpIMhvKInR9/ATM5eM6ISp20GzJhfwhYHNcihY6HqfYWyXZWS3jZ3eo8qZHWFUKjIJtmNdJysH5BlGH/CrNKgi1H0C3X518UUfWbkShgapBAAsVowdwYmKoVCX5qvMFi2/tJ7QRmj8rRKfCiNCLwEvLv9psrxfy7PmDlM0zX0hReHzbkzrPIBUVFk86ks6C6TWNt/Qe4Pbi7RDBhKwAEVa+xVkvGBu938LGYo27h81XhKwjwuLDnKznhNgMyaDotj4DNrEASIANu98cxQLxUJVjPr8VQw/wNkpkh0OMxhAVwxB+kexIV6x0UDw==
-Received: from MW4PR03CA0007.namprd03.prod.outlook.com (2603:10b6:303:8f::12)
- by CYYPR12MB9015.namprd12.prod.outlook.com (2603:10b6:930:c8::6) with
+ bh=7ApAZF0oWGUDrjjYsFdYswixdc9mEzWwniHNtvu629g=;
+ b=GS4NPARqDUaHbpFCuoB12EnEYdPb04pSSvNzpti1Qk5Uem1ZWzf112634EqcHyhA+g3uYeDQpYpguVtLLoNQF0+vd0RHmT6LAdDMGHxCv5RfZhL2YLCrjhv5HG6tkAeSjndV4BgQnboxle8JvbSwudOnASwG5XiooUln/93E9TPSRlXxIS2/znSQ5ilI9cL5dtL+MxwZSi7AMm/d9cjxhfzh/3IYtg8/Ry28Rg4Cn4/+gLYWLmFMD5mJtxTkEpW+oTOA2hM0P90Dp/qOVxJ97Tna1iOe+YkmsG4DeXT+63RtLxcv1wpL15nlAs76XgIEQViESduKHiNNt+5y//jbnA==
+Received: from SJ0PR03CA0115.namprd03.prod.outlook.com (2603:10b6:a03:333::30)
+ by DS0PR12MB7511.namprd12.prod.outlook.com (2603:10b6:8:139::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.20; Fri, 22 Sep
- 2023 17:19:07 +0000
-Received: from MWH0EPF000971E7.namprd02.prod.outlook.com
- (2603:10b6:303:8f:cafe::3b) by MW4PR03CA0007.outlook.office365.com
- (2603:10b6:303:8f::12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.34 via Frontend
- Transport; Fri, 22 Sep 2023 17:19:07 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.23; Fri, 22 Sep
+ 2023 17:19:11 +0000
+Received: from MWH0EPF000971E8.namprd02.prod.outlook.com
+ (2603:10b6:a03:333:cafe::a9) by SJ0PR03CA0115.outlook.office365.com
+ (2603:10b6:a03:333::30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.30 via Frontend
+ Transport; Fri, 22 Sep 2023 17:19:11 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -52,26 +52,26 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.161 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.161) by
- MWH0EPF000971E7.mail.protection.outlook.com (10.167.243.75) with Microsoft
+ MWH0EPF000971E8.mail.protection.outlook.com (10.167.243.68) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6838.14 via Frontend Transport; Fri, 22 Sep 2023 17:19:07 +0000
+ 15.20.6792.20 via Frontend Transport; Fri, 22 Sep 2023 17:19:10 +0000
 Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
  (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Fri, 22 Sep
- 2023 10:18:55 -0700
+ 2023 10:18:57 -0700
 Received: from yaviefel.vdiclient.nvidia.com (10.126.231.35) by
  rnnvmail202.nvidia.com (10.129.68.7) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.41; Fri, 22 Sep 2023 10:18:52 -0700
+ 15.2.986.41; Fri, 22 Sep 2023 10:18:55 -0700
 From: Petr Machata <petrm@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, <netdev@vger.kernel.org>
 CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, "Vadim
  Pasternak" <vadimp@nvidia.com>, <mlxsw@nvidia.com>
-Subject: [PATCH net-next 1/3] mlxsw: reg: Limit MTBR register payload to a single data record
-Date: Fri, 22 Sep 2023 19:18:36 +0200
-Message-ID: <58bff93e616a002c7f72c687916964286591604c.1695396848.git.petrm@nvidia.com>
+Subject: [PATCH net-next 2/3] mlxsw: core: Extend allowed list of external cooling devices for thermal zone binding
+Date: Fri, 22 Sep 2023 19:18:37 +0200
+Message-ID: <8fd3ef09c37675d6bdf487a1ce95ab9efbe5b22d.1695396848.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <cover.1695396848.git.petrm@nvidia.com>
 References: <cover.1695396848.git.petrm@nvidia.com>
@@ -88,26 +88,26 @@ X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail202.nvidia.com (10.129.68.7)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000971E7:EE_|CYYPR12MB9015:EE_
-X-MS-Office365-Filtering-Correlation-Id: e27b0e97-d774-4678-19c8-08dbbb90072f
+X-MS-TrafficTypeDiagnostic: MWH0EPF000971E8:EE_|DS0PR12MB7511:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6f57cd90-60f4-4cca-8ca7-08dbbb900955
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	zCy3bxvchMhYKrMQtcPkU2u+pGIb1RM1WzneCvOEm5QSv7X7ByWElzSoUi29llz/Nd/Ng/yaNWGvSli5bX0KbK/QmsIRIZwhXvH9fQVsWEx6SlHEnJjYkovQvGpeC59FUA7U/ZxckMvP7kzg6puqer+mNiKShPkW7TMgs9136GNb9Z0ABRRKOAf4wUEqg8SPDkGAuKfBVZQVVWkllZ2vCGYCuS26CD/I6bCBs4FfRsviMMd3YvKpf9ma5kSXqjAt8kn/Qhqbtq/3lYLfxKVJdITfIvP4hYfq8+LuJIl/PVPQgPx6CCXgVIpfWgVhMnapyAackUVKQH9GpqZCcWeBdVfOuEid21XzrNZZxVvlOJH1zJ8DSfwRDX18BBp8U/zzTwg/GUM85KzSUrIop+vdmx84nbcmsm6w07uPFbq+pdFlrnDI0dEfgDYSGwaQvStpUShpOqmvdSF8JRZL+tY++iyqjm2SjF4lvmEXKqRS3bgQXS3CFOBQcLKkWOS85/w3LXnd1I0vGKFBbCn0DSxxzX7PluuFeSR+cL76/Np+H0+RGQ/mQpO9auBvkyu5n8WkmVgUYXTlJJJnDRunSjz+VxPoBS3TNLY0KSA7A0pqEJDzcd+ADpgzTxN1lqFzOfUChqyU7wXnRec/ip6OJPi6s0dUsF2BmvX2jIGihzmPB8JdgSRxZQMNAjpWPBsPAklfXOeSCN/EFnK9jZwPjSwWQHI8JuAkDcD5CYKIeNfL511QIREK6F81Uu3NURLfwSL3nbbqXb/rkKu4gbsbQ7tYrA==
+	sDshQXMqm4PaIlvjyxHisKjvDaa1IZAKOxVb68+Za0f9obJj7jMLNjaxQ8foNPQCFoqLhRRPv2YDck3C5FrRaJMBiTMSCPcVQq78ZfeyxSEPNMgkZafNmai33kM+4RW8pCcl2bZ5HsIfK69iuF72xkqKTbng/95T39kSj0QMEVexrE4zPvZRmsqXHhfu5gRNAoPV3y7X0HZLYUO6eFTb4cX8cCDv14F+ARtTfc7aYi2UDjmZ89LWhDRfWbEftyGhLfFWtrWQRJfAkZFiD2XHxaCFyLsWG36i1N+WAf7I739GrFgetzYcTjSjY3+SV/uZKIruT83LSqabRpIomoz4qI1AvTUGPWqyxJXZ6/Z431WO1b8PTn7V6QQ+UURFZ9jOhg5pKI7Ytv7oA/D4SnJxAK1cdo/kLLfb5e8sp9VgTNsXH68nxml7WK2OkEGJZvdIxeixMsg9Uoin69OfyKdvYQeub2si8v5BT5ZaaiCDOcy7WVBtm41nUWxAEvKrZVzVwFgBqtxCJOTtsgrkscDLz1JgdWy/PUy0ApuMu7DBeo7j7WCBYX2cUx8+vUa3kMZoePuLCR1LNJzkmWXvsL4PsmQ+d3rSnFXBq0TOQ2uyVgvfeohB9Yli3I0DhhZKLJN/+9btjeOej2c20yQQAcpqWusqwvo5ld6Tj2iY0NZ3McfWBH4FfuTU4lQwepp2qx4iIAhwNFZEatRlGAxltdFx+g79q9Te+i2Fv6QO+2Bpi6kofSeJYRvfCWqhRVYuaE27iwYk1c/P3kYb5UJVxNl3wg==
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(39860400002)(396003)(376002)(346002)(230921699003)(82310400011)(1800799009)(451199024)(186009)(46966006)(36840700001)(40470700004)(16526019)(107886003)(83380400001)(70206006)(70586007)(316002)(7696005)(6666004)(36756003)(26005)(7636003)(336012)(356005)(2616005)(426003)(478600001)(47076005)(40460700003)(110136005)(2906002)(5660300002)(82740400003)(40480700001)(54906003)(8676002)(8936002)(4326008)(86362001)(41300700001)(36860700001);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(376002)(396003)(346002)(136003)(39860400002)(451199024)(230921699003)(82310400011)(1800799009)(186009)(46966006)(40470700004)(36840700001)(8936002)(8676002)(4326008)(110136005)(5660300002)(41300700001)(40460700003)(316002)(36860700001)(26005)(16526019)(336012)(7696005)(40480700001)(54906003)(70206006)(70586007)(82740400003)(356005)(7636003)(6666004)(2616005)(107886003)(86362001)(426003)(47076005)(36756003)(478600001)(2906002);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2023 17:19:07.1706
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2023 17:19:10.7624
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e27b0e97-d774-4678-19c8-08dbbb90072f
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6f57cd90-60f4-4cca-8ca7-08dbbb900955
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000971E7.namprd02.prod.outlook.com
+	MWH0EPF000971E8.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB9015
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7511
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
@@ -117,76 +117,33 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Vadim Pasternak <vadimp@nvidia.com>
 
-The MTBR register is used to read temperatures from multiple sensors in
-one transaction, but the driver only reads from a single sensor in each
-transaction.
+Extend the list of allowed external cooling devices for thermal zone
+binding to include devices of type "emc2305".
 
-Rrestrict the payload size of the MTBR register to prevent the
-transmission of redundant data to the firmware.
+The motivation is to provide support for the system SN2201, which is
+equipped with the Spectrum-1 ASIC.
+The system's airflow control is managed by the EMC2305 RPM-based PWM
+Fan Speed Controller as the cooling device.
 
 Signed-off-by: Vadim Pasternak <vadimp@nvidia.com>
 Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 Signed-off-by: Petr Machata <petrm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlxsw/core_env.c   | 2 +-
- drivers/net/ethernet/mellanox/mlxsw/core_hwmon.c | 2 +-
- drivers/net/ethernet/mellanox/mlxsw/reg.h        | 6 +++---
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/mellanox/mlxsw/core_thermal.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/core_env.c b/drivers/net/ethernet/mellanox/mlxsw/core_env.c
-index d637c0348fa1..7286f0deb5f9 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/core_env.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/core_env.c
-@@ -775,7 +775,7 @@ static int mlxsw_env_module_has_temp_sensor(struct mlxsw_core *mlxsw_core,
- 	int err;
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/core_thermal.c b/drivers/net/ethernet/mellanox/mlxsw/core_thermal.c
+index 70d7fff24fa2..f709e44c76a8 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/core_thermal.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/core_thermal.c
+@@ -31,6 +31,7 @@
+ /* External cooling devices, allowed for binding to mlxsw thermal zones. */
+ static char * const mlxsw_thermal_external_allowed_cdev[] = {
+ 	"mlxreg_fan",
++	"emc2305",
+ };
  
- 	mlxsw_reg_mtbr_pack(mtbr_pl, slot_index,
--			    MLXSW_REG_MTBR_BASE_MODULE_INDEX + module, 1);
-+			    MLXSW_REG_MTBR_BASE_MODULE_INDEX + module);
- 	err = mlxsw_reg_query(mlxsw_core, MLXSW_REG(mtbr), mtbr_pl);
- 	if (err)
- 		return err;
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/core_hwmon.c b/drivers/net/ethernet/mellanox/mlxsw/core_hwmon.c
-index 0fd290d776ff..9c12e1feb643 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/core_hwmon.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/core_hwmon.c
-@@ -293,7 +293,7 @@ static ssize_t mlxsw_hwmon_module_temp_fault_show(struct device *dev,
- 
- 	module = mlxsw_hwmon_attr->type_index - mlxsw_hwmon_dev->sensor_count;
- 	mlxsw_reg_mtbr_pack(mtbr_pl, mlxsw_hwmon_dev->slot_index,
--			    MLXSW_REG_MTBR_BASE_MODULE_INDEX + module, 1);
-+			    MLXSW_REG_MTBR_BASE_MODULE_INDEX + module);
- 	err = mlxsw_reg_query(mlxsw_hwmon->core, MLXSW_REG(mtbr), mtbr_pl);
- 	if (err) {
- 		dev_err(dev, "Failed to query module temperature sensor\n");
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/reg.h b/drivers/net/ethernet/mellanox/mlxsw/reg.h
-index ae556ddd7624..9970921ceef3 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/reg.h
-+++ b/drivers/net/ethernet/mellanox/mlxsw/reg.h
-@@ -9551,7 +9551,7 @@ MLXSW_ITEM_BIT_ARRAY(reg, mtwe, sensor_warning, 0x0, 0x10, 1);
- #define MLXSW_REG_MTBR_ID 0x900F
- #define MLXSW_REG_MTBR_BASE_LEN 0x10 /* base length, without records */
- #define MLXSW_REG_MTBR_REC_LEN 0x04 /* record length */
--#define MLXSW_REG_MTBR_REC_MAX_COUNT 47 /* firmware limitation */
-+#define MLXSW_REG_MTBR_REC_MAX_COUNT 1
- #define MLXSW_REG_MTBR_LEN (MLXSW_REG_MTBR_BASE_LEN +	\
- 			    MLXSW_REG_MTBR_REC_LEN *	\
- 			    MLXSW_REG_MTBR_REC_MAX_COUNT)
-@@ -9597,12 +9597,12 @@ MLXSW_ITEM32_INDEXED(reg, mtbr, rec_temp, MLXSW_REG_MTBR_BASE_LEN, 0, 16,
- 		     MLXSW_REG_MTBR_REC_LEN, 0x00, false);
- 
- static inline void mlxsw_reg_mtbr_pack(char *payload, u8 slot_index,
--				       u16 base_sensor_index, u8 num_rec)
-+				       u16 base_sensor_index)
- {
- 	MLXSW_REG_ZERO(mtbr, payload);
- 	mlxsw_reg_mtbr_slot_index_set(payload, slot_index);
- 	mlxsw_reg_mtbr_base_sensor_index_set(payload, base_sensor_index);
--	mlxsw_reg_mtbr_num_rec_set(payload, num_rec);
-+	mlxsw_reg_mtbr_num_rec_set(payload, 1);
- }
- 
- /* Error codes from temperatute reading */
+ struct mlxsw_cooling_states {
 -- 
 2.41.0
 
