@@ -1,134 +1,148 @@
-Return-Path: <netdev+bounces-35641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 107097AA706
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 04:38:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 146227AA72E
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 05:00:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id B27D91C20928
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 02:38:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id CF3AA281DA5
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 03:00:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88D937F2;
-	Fri, 22 Sep 2023 02:38:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73B9480E;
+	Fri, 22 Sep 2023 03:00:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FA4D64C
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 02:38:36 +0000 (UTC)
-Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17245192;
-	Thu, 21 Sep 2023 19:38:35 -0700 (PDT)
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 38LBJKR7107142;
-	Thu, 21 Sep 2023 06:19:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1695295160;
-	bh=sV7+6G3yKC3Rpx42RLBRQq3uGcn7glfICsPgVYKKByo=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=xpRQXcmWi6VYTxsITB7mGzxgyg+3h6wKMH3+cSgTgmoEgf8sMgRFPJVyY6cROZ+FZ
-	 MkbdbcGpuUxwi8InT6DeVTbmUdlx4s37gqO6YBK+oQizWj3pYRO70LR3CCqN2Eozps
-	 X3DSrm5GDS4Ny/P4KGjydccseo/IvJvNjaAhRKXY=
-Received: from DFLE112.ent.ti.com (dfle112.ent.ti.com [10.64.6.33])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 38LBJKot122446
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 21 Sep 2023 06:19:20 -0500
-Received: from DFLE109.ent.ti.com (10.64.6.30) by DFLE112.ent.ti.com
- (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 21
- Sep 2023 06:19:20 -0500
-Received: from lelv0326.itg.ti.com (10.180.67.84) by DFLE109.ent.ti.com
- (10.64.6.30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 21 Sep 2023 06:19:20 -0500
-Received: from [10.24.69.199] (ileaxei01-snat2.itg.ti.com [10.180.69.6])
-	by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 38LBJFNJ013074;
-	Thu, 21 Sep 2023 06:19:16 -0500
-Message-ID: <92864bda-3028-f8be-0e27-487024d1a874@ti.com>
-Date: Thu, 21 Sep 2023 16:49:14 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8548B64C;
+	Fri, 22 Sep 2023 03:00:07 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3C798F;
+	Thu, 21 Sep 2023 20:00:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695351605; x=1726887605;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=QltdyQ5UE0fnQZfOVgAuavBny+Gjji38QKmh+97005k=;
+  b=guFBsH+cY1aGdq7HZoWmOKVja4+BCbJC90HE3MfLB9MGhNGvUYTFTte0
+   NsT0FC1/6Jjope8TGCtegDmBhdh8emYkkRFvuZgBuT0o6i4gOBFVzRuP/
+   bcXd1VacTyaZsEDRM7wCgj//9etjOJfDC5g+PQdWRLFdtBits97DOPX7v
+   1CJVE/ODWxlLTbMQ+5aByWOCi8dT5xH+d9woS8Ty8xe3U44PfNNjeks5C
+   +9Mvs7VKViP5WGFAlvqSWo9w7YlMnAN6xdz9Xyg96lLRiNK8c/qORGPQV
+   v0Picbh8ynSpPNKEncgic3G2Ldx3t6UYTVsaOk/5FWPCLQZgLT5bhGO2Y
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10840"; a="444830854"
+X-IronPort-AV: E=Sophos;i="6.03,167,1694761200"; 
+   d="scan'208";a="444830854"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2023 20:00:05 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10840"; a="782479798"
+X-IronPort-AV: E=Sophos;i="6.03,167,1694761200"; 
+   d="scan'208";a="782479798"
+Received: from lkp-server02.sh.intel.com (HELO b77866e22201) ([10.239.97.151])
+  by orsmga001.jf.intel.com with ESMTP; 21 Sep 2023 20:00:03 -0700
+Received: from kbuild by b77866e22201 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qjWOf-0000j7-0M;
+	Fri, 22 Sep 2023 03:00:01 +0000
+Date: Fri, 22 Sep 2023 10:59:02 +0800
+From: kernel test robot <lkp@intel.com>
+To: Daan De Meyer <daan.j.demeyer@gmail.com>, bpf@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Daan De Meyer <daan.j.demeyer@gmail.com>,
+	martin.lau@linux.dev, kernel-team@meta.com, netdev@vger.kernel.org
+Subject: Re: [PATCH bpf-next v5 2/9] bpf: Propagate modified uaddrlen from
+ cgroup sockaddr programs
+Message-ID: <202309221052.Tb6xh9pg-lkp@intel.com>
+References: <20230921120913.566702-3-daan.j.demeyer@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [RFC PATCH net-next 3/4] net: ti: icssg-prueth: Add support for
- ICSSG switch firmware on AM654 PG2.0 EVM
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Roger Quadros <rogerq@kernel.org>, Simon Horman <horms@kernel.org>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Jacob Keller
-	<jacob.e.keller@intel.com>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Paolo
- Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-        Eric Dumazet
-	<edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <srk@ti.com>,
-        <r-gunasekaran@ti.com>, Pekka Varis <p-varis@ti.com>
-References: <20230830110847.1219515-1-danishanwar@ti.com>
- <20230830110847.1219515-4-danishanwar@ti.com>
- <1fb683f4-d762-427b-98b7-8567ca1f797c@lunn.ch>
- <0d70cebf-8fd0-cf04-ccc2-6f240b27ecca@ti.com>
- <12c11462-5449-b100-5f92-f66c775237fa@kernel.org>
- <3fbf9514-8f9f-d362-9006-1fd435540e67@ti.com>
- <09931a97-df62-9803-967f-df6135dc3be7@ti.com>
- <055e781e-f614-4436-9d8d-e60e17fac5c9@lunn.ch>
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <055e781e-f614-4436-9d8d-e60e17fac5c9@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230921120913.566702-3-daan.j.demeyer@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Andrew,
+Hi Daan,
 
-On 13/09/23 17:49, Andrew Lunn wrote:
->> As discussed on this thread, switching operation can work with the ICSSG
->> switch firmware, without creating bridge. However without bridge only
->> forwarding works. If we want the switch to consume packets bridge is
->> required.
-> 
-> What packets will the switch consume? The only packets i can think of
-> are pause frames. Everything else get passed to the CPU.
-> 
-> You also need to think of what happens when a single switch port is
-> added to the bridge, and an external port, like a tun/tap device for a
-> VPN is added to the bridge.
-> 
-> For most switches, a port not being a member of a switch means the
-> port is pretty dumb and every frame is forwarded to the CPU. There are
-> however some switches which perform address learning as usual,
-> learning if an address is on the port, or on the CPU. Maybe you can
-> see if that is possible.
-> 
-> It might be you need your firmware people involved to produce a new
-> firmware version which combines both firmwares in one.
-> 
+kernel test robot noticed the following build warnings:
 
-Thanks for the offline discussion and explanations. As discussed, we can
-not have one combined firmware to do both switch operations and dual
-emac operations. It is required to have two different firmwares.
-Currently which firmware to load is decided by flag 'is_switch_mode'
-which is set / unset by devlink. I will not use devlink here as asked by
-you. Instead, I'll use the approach suggested by you.
-ndo_open() will load the dual mac firmware. I'll swap to switch firmware
-when the second port is added to the same bridge as the first port.
+[auto build test WARNING on bpf-next/master]
 
-I will re-work the changes and post v2 soon.
+url:    https://github.com/intel-lab-lkp/linux/commits/Daan-De-Meyer/selftests-bpf-Add-missing-section-name-tests-for-getpeername-getsockname/20230922-032515
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
+patch link:    https://lore.kernel.org/r/20230921120913.566702-3-daan.j.demeyer%40gmail.com
+patch subject: [PATCH bpf-next v5 2/9] bpf: Propagate modified uaddrlen from cgroup sockaddr programs
+config: arm-defconfig (https://download.01.org/0day-ci/archive/20230922/202309221052.Tb6xh9pg-lkp@intel.com/config)
+compiler: arm-linux-gnueabi-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230922/202309221052.Tb6xh9pg-lkp@intel.com/reproduce)
 
-> 	 Andrew
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202309221052.Tb6xh9pg-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   net/ipv4/af_inet.c: In function 'inet_getname':
+>> net/ipv4/af_inet.c:791:13: warning: unused variable 'sin_addr_len' [-Wunused-variable]
+     791 |         int sin_addr_len = sizeof(*sin);
+         |             ^~~~~~~~~~~~
+
+
+vim +/sin_addr_len +791 net/ipv4/af_inet.c
+
+   781	
+   782	/*
+   783	 *	This does both peername and sockname.
+   784	 */
+   785	int inet_getname(struct socket *sock, struct sockaddr *uaddr,
+   786			 int peer)
+   787	{
+   788		struct sock *sk		= sock->sk;
+   789		struct inet_sock *inet	= inet_sk(sk);
+   790		DECLARE_SOCKADDR(struct sockaddr_in *, sin, uaddr);
+ > 791		int sin_addr_len = sizeof(*sin);
+   792	
+   793		sin->sin_family = AF_INET;
+   794		lock_sock(sk);
+   795		if (peer) {
+   796			if (!inet->inet_dport ||
+   797			    (((1 << sk->sk_state) & (TCPF_CLOSE | TCPF_SYN_SENT)) &&
+   798			     peer == 1)) {
+   799				release_sock(sk);
+   800				return -ENOTCONN;
+   801			}
+   802			sin->sin_port = inet->inet_dport;
+   803			sin->sin_addr.s_addr = inet->inet_daddr;
+   804			BPF_CGROUP_RUN_SA_PROG(sk, (struct sockaddr *)sin, &sin_addr_len,
+   805					       CGROUP_INET4_GETPEERNAME);
+   806		} else {
+   807			__be32 addr = inet->inet_rcv_saddr;
+   808			if (!addr)
+   809				addr = inet->inet_saddr;
+   810			sin->sin_port = inet->inet_sport;
+   811			sin->sin_addr.s_addr = addr;
+   812			BPF_CGROUP_RUN_SA_PROG(sk, (struct sockaddr *)sin, &sin_addr_len,
+   813					       CGROUP_INET4_GETSOCKNAME);
+   814		}
+   815		release_sock(sk);
+   816		memset(sin->sin_zero, 0, sizeof(sin->sin_zero));
+   817		return sizeof(*sin);
+   818	}
+   819	EXPORT_SYMBOL(inet_getname);
+   820	
 
 -- 
-Thanks and Regards,
-Danish
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
