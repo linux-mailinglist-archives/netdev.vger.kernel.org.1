@@ -1,312 +1,127 @@
-Return-Path: <netdev+bounces-35904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C20297ABA02
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 21:25:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A2AB7ABA3B
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 21:46:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 74981281264
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 19:25:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 82D4C1C208CE
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 19:46:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76DF345F70;
-	Fri, 22 Sep 2023 19:25:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AD6347341;
+	Fri, 22 Sep 2023 19:45:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5AB345F68
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 19:25:30 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 530BBA3
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 12:25:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1695410728;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=b1iw1laBUN5rzxgrcLFInMJ18Xo8+ygFbeYJ2uUzQns=;
-	b=jUwzmXLm1w1rtnzOb6vDFEIWdQaNs0s4jLLyUtuxf8U3ewnqFz5C84n5LMSuTCTxQUiwTx
-	TlgFQcMj0DvRCLg/QEgH4qlS+/FgBuXQkJmdQeX9+ZPlTxncT+N7OIjxqLv4puqWkvK6Iz
-	PFf10ksckCjKzoJvyvqi0Wq3wDCezrk=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-446-tRvs9yRLMhKLTZh7tJTIDw-1; Fri, 22 Sep 2023 15:25:27 -0400
-X-MC-Unique: tRvs9yRLMhKLTZh7tJTIDw-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-9ae70250ef5so413934966b.0
-        for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 12:25:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695410725; x=1696015525;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=b1iw1laBUN5rzxgrcLFInMJ18Xo8+ygFbeYJ2uUzQns=;
-        b=Vr23vL9tX8ffrhL26+/Jlmj3lx0JhH7DJjzIUD0XwoVckb3OocLrEuFKEsPbLVZeud
-         WunsdEBUKstGovRQ70U5BlQtbcVdG0y9Gdw/cOuW8QiXPfnZcdCjhQad65X/ch+cZUes
-         SLyAgWTxJPIPpVfY+5MhU3ESuTbALlB2p7zGqK/GOfR/WqJpvpWzECpjT4D2VdrZRBgC
-         dBdv+E9ylSdLJo8JXGfCzMmHPDHdTar5//gVSW3MAuluisEU8rzgVbcZMwAKvosIgeek
-         g/Y2PLz9922JGK0rLx4LSXBin3b1cmhAdhydYsfzmHumfu3v28yNSIkqerWOW09YIsDy
-         3tRg==
-X-Gm-Message-State: AOJu0Yz+TPFGkJRuzjp1eMWQfzFiQ3Mcp7nGs+0TycPUZM8lD7JwYB0v
-	+wEHq8qEI6tUCEZD8egeHiuSBL5pQV9nSt9wSWky2DU6TS5kIc/MZJQt7ho7VLXi0hjUk57Yedv
-	NghniIfLf0YfXBA2YKfPVwD/k
-X-Received: by 2002:a17:907:daa:b0:9aa:1794:945b with SMTP id go42-20020a1709070daa00b009aa1794945bmr4502198ejc.22.1695410724803;
-        Fri, 22 Sep 2023 12:25:24 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEnQmZGvhaMeVqNnDrASCUCp33iXAvTOjgrp6hSRA6qrnHq5xh/KwQN8YxIXT9xlCHkkoce4g==
-X-Received: by 2002:a17:907:daa:b0:9aa:1794:945b with SMTP id go42-20020a1709070daa00b009aa1794945bmr4502151ejc.22.1695410723845;
-        Fri, 22 Sep 2023 12:25:23 -0700 (PDT)
-Received: from localhost (net-2-34-76-254.cust.vodafonedsl.it. [2.34.76.254])
-        by smtp.gmail.com with ESMTPSA id z25-20020aa7c659000000b00530ba0fd672sm2589428edr.75.2023.09.22.12.25.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Sep 2023 12:25:23 -0700 (PDT)
-Date: Fri, 22 Sep 2023 21:25:21 +0200
-From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
-To: Chuck Lever III <chuck.lever@oracle.com>
-Cc: Jeff Layton <jlayton@kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>,
-	Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
-	Neil Brown <neilb@suse.de>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH] NFSD: convert write_threads and write_v4_end_grace to
- netlink commands
-Message-ID: <ZQ3qIR036VrSTmAA@lore-desk>
-References: <b7985d6f0708d4a2836e1b488d641cdc11ace61b.1695386483.git.lorenzo@kernel.org>
- <cc6341a7c5f09b731298236b260c9dfd94a811d8.camel@kernel.org>
- <ZQ2+1NhagxR5bZF+@lore-desk>
- <C6FD2BD6-442D-4F96-82E7-D0F99F700E03@oracle.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C4745F77;
+	Fri, 22 Sep 2023 19:45:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F816C43391;
+	Fri, 22 Sep 2023 19:45:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695411957;
+	bh=Z73INrp+tUCDrn3nt/IznNU60OcEzvbVv581pkRDXlE=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=P4ZZPqOmhipnrgdjc5Cicuv4gwGoR5ahpSW6RraPJhB2FOCevSoVAq7M03SUqbiJq
+	 K7C83A8rvE9vTWF2PZ5kYCMKgg3G1IVvpRh+NW3hqCEKgBE5APzZ0p6is/9D0IzpXy
+	 L4KFq+qRrX7Nsl9X/FVhceTOut8PENgISZ7V9Hgc0n17gQFch+sOZHm06uwoEbBMFg
+	 bdQku4DZghgBK/X1clycJXNjGfpUaVv8cK0r9G/b2uMU+jMiHYfIm/lqjl9v/3n8cS
+	 tduJT5OdwlLHx5IjPVmN9jiMNIWgStlkcTXysI9oJM3ogbUGEUzRoqqQuRZPSge2DG
+	 XwBXMnxxa/mIQ==
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-502e7d66c1eso4403480e87.1;
+        Fri, 22 Sep 2023 12:45:57 -0700 (PDT)
+X-Gm-Message-State: AOJu0YzET3fIoLVxGM9RxuqSwL+djuYNXhC9P6ZumOlepuoR4JARMjx+
+	h4LOZERLC7Rm7GHf2X+sobwCVY8k0UHqW/Y9dA==
+X-Google-Smtp-Source: AGHT+IEyL15UWPDOOifALHGXr9zT3PFp6EFjcQQ6N5sRMKjOVNVOEvEhKETlB6KYvfp58mdiyeysUyZjSt5CkUaQLB8=
+X-Received: by 2002:a19:651e:0:b0:503:18c5:6833 with SMTP id
+ z30-20020a19651e000000b0050318c56833mr310830lfb.61.1695411955742; Fri, 22 Sep
+ 2023 12:45:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="czcUg8cbmTF6BK8e"
-Content-Disposition: inline
-In-Reply-To: <C6FD2BD6-442D-4F96-82E7-D0F99F700E03@oracle.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
-
-
---czcUg8cbmTF6BK8e
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20230922075913.422435-1-herve.codina@bootlin.com>
+ <20230922075913.422435-26-herve.codina@bootlin.com> <169538601225.2919383.2942072541503354871.robh@kernel.org>
+ <20230922154546.4ca18b6f@bootlin.com>
+In-Reply-To: <20230922154546.4ca18b6f@bootlin.com>
+From: Rob Herring <robh@kernel.org>
+Date: Fri, 22 Sep 2023 14:45:43 -0500
+X-Gmail-Original-Message-ID: <CAL_JsqJTruTExc=uHCPCp3q-fo+fB-wAJ-ggPpHpWcHSoGALdw@mail.gmail.com>
+Message-ID: <CAL_JsqJTruTExc=uHCPCp3q-fo+fB-wAJ-ggPpHpWcHSoGALdw@mail.gmail.com>
+Subject: Re: [PATCH v6 25/30] dt-bindings: net: Add the Lantiq PEF2256
+ E1/T1/J1 framer
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: linux-arm-kernel@lists.infradead.org, Randy Dunlap <rdunlap@infradead.org>, 
+	Takashi Iwai <tiwai@suse.com>, Simon Horman <horms@kernel.org>, Jaroslav Kysela <perex@perex.cz>, 
+	Liam Girdwood <lgirdwood@gmail.com>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+	linux-gpio@vger.kernel.org, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, netdev@vger.kernel.org, 
+	Fabio Estevam <festevam@gmail.com>, Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
+	Christophe Leroy <christophe.leroy@csgroup.eu>, Nicolin Chen <nicoleotsuka@gmail.com>, 
+	Conor Dooley <conor+dt@kernel.org>, Mark Brown <broonie@kernel.org>, 
+	Linus Walleij <linus.walleij@linaro.org>, alsa-devel@alsa-project.org, 
+	Paolo Abeni <pabeni@redhat.com>, Lee Jones <lee@kernel.org>, linux-kernel@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Xiubo Li <Xiubo.Lee@gmail.com>, 
+	Shengjiu Wan g <shengjiu.wang@gmail.com>, linuxppc-dev@lists.ozlabs.org, 
+	devicetree@vger.kernel.org, Li Yang <leoyang.li@nxp.com>, 
+	Qiang Zhao <qiang.zhao@nxp.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
->=20
->=20
-> > On Sep 22, 2023, at 12:20 PM, Lorenzo Bianconi <lorenzo.bianconi@redhat=
-=2Ecom> wrote:
-> >=20
-> >> On Fri, 2023-09-22 at 14:44 +0200, Lorenzo Bianconi wrote:
-> >>> Introduce write_threads and write_v4_end_grace netlink commands simil=
-ar
-> >>> to the ones available through the procfs.
-> >>> Introduce nfsd_nl_server_status_get_dumpit netlink command in order to
-> >>> report global server metadata.
-> >>>=20
-> >>> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> >>> ---
-> >>> This patch can be tested with user-space tool reported below:
-> >>> https://github.com/LorenzoBianconi/nfsd-netlink.git
-> >>> ---
-> >>> Documentation/netlink/specs/nfsd.yaml | 33 +++++++++
-> >>> fs/nfsd/netlink.c                     | 30 ++++++++
-> >>> fs/nfsd/netlink.h                     |  5 ++
-> >>> fs/nfsd/nfsctl.c                      | 98 +++++++++++++++++++++++++++
-> >>> include/uapi/linux/nfsd_netlink.h     | 11 +++
-> >>> 5 files changed, 177 insertions(+)
-> >>>=20
-> >>> diff --git a/Documentation/netlink/specs/nfsd.yaml b/Documentation/ne=
-tlink/specs/nfsd.yaml
-> >>> index 403d3e3a04f3..fa1204892703 100644
-> >>> --- a/Documentation/netlink/specs/nfsd.yaml
-> >>> +++ b/Documentation/netlink/specs/nfsd.yaml
-> >>> @@ -62,6 +62,15 @@ attribute-sets:
-> >>>         name: compound-ops
-> >>>         type: u32
-> >>>         multi-attr: true
-> >>> +  -
-> >>> +    name: server-attr
-> >>> +    attributes:
-> >>> +      -
-> >>> +        name: threads
-> >>> +        type: u16
-> >>=20
-> >> 65k threads ought to be enough for anybody!
-> >=20
-> > maybe u8 is fine here :)
->=20
-> 32-bit is the usual for this kind of interface. I don't think we need to =
-go with 16-bit.
+On Fri, Sep 22, 2023 at 8:46=E2=80=AFAM Herve Codina <herve.codina@bootlin.=
+com> wrote:
+>
+> Hi Rob,
+>
+> On Fri, 22 Sep 2023 07:33:32 -0500
+> Rob Herring <robh@kernel.org> wrote:
+>
+> > On Fri, 22 Sep 2023 09:59:00 +0200, Herve Codina wrote:
+> > > The Lantiq PEF2256 is a framer and line interface component designed =
+to
+> > > fulfill all required interfacing between an analog E1/T1/J1 line and =
+the
+> > > digital PCM system highway/H.100 bus.
+> > >
+> > > Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+> > > Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+> > > ---
+> > >  .../bindings/net/lantiq,pef2256.yaml          | 214 ++++++++++++++++=
+++
+> > >  1 file changed, 214 insertions(+)
+> > >  create mode 100644 Documentation/devicetree/bindings/net/lantiq,pef2=
+256.yaml
+> > >
+> >
+> > My bot found errors running 'make DT_CHECKER_FLAGS=3D-m dt_binding_chec=
+k'
+> > on your patch (DT_CHECKER_FLAGS is new in v5.13):
+> >
+> > yamllint warnings/errors:
+> >
+> > dtschema/dtc warnings/errors:
+> > /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings=
+/net/lantiq,pef2256.yaml: properties:lantiq,data-rate-bps: '$ref' should no=
+t be valid under {'const': '$ref'}
+> >       hint: Standard unit suffix properties don't need a type $ref
+> >       from schema $id: http://devicetree.org/meta-schemas/core.yaml#
+> >
+>
+> The '-bps' suffix was added recently in
+> https://github.com/devicetree-org/dt-schema/
+> commit 033d0b1 ("Add '-bps' as a standard unit suffix for bits per second=
+")
+>
+> This commit is not yet present in any dt-schema release.
+>
+> Should I update my patch (ie. removing $ref) right now even if this updat=
+e will
+> make the last dt-schema release not happy ?
 
-ack, fine
+Yes. I will spin a release soon as well.
 
->=20
->=20
-> >>> +      -
-> >>> +        name: v4-grace
-> >>> +        type: u8
-> >>>=20
-> >>> operations:
-> >>>   list:
-> >>> @@ -72,3 +81,27 @@ operations:
-> >>>       dump:
-> >>>         pre: nfsd-nl-rpc-status-get-start
-> >>>         post: nfsd-nl-rpc-status-get-done
-> >>> +    -
-> >>> +      name: threads-set
-> >>> +      doc: set the number of running threads
-> >>> +      attribute-set: server-attr
-> >>> +      flags: [ admin-perm ]
-
-[...]
-
-> >=20
-> > I am not sure if ynl supports a doit operation with a request with no p=
-arameters.
-> > @Chuck, Jakub: any input here?
->=20
-> I think it does, I might have done something like that for one of the
-> handshake protocol commands.
-
-please correct me if I am wrong but in Documentation/netlink/specs/handshak=
-e.yaml
-we have accept and done operations and both of them have some parameters in=
- the
-request field, right?
-
->=20
-> But I think Jeff's right, end_grace might be better postponed. Pick any of
-> the others that you think might be easy to implement instead.
-
-ack, fine. Do you agree to have a global container (server-status-get) for =
-all
-the server metadata instead of adding dedicated get APIs?
-
-Regards,
-Lorenzo
-
->=20
->=20
-> > Regards,
-> > Lorenzo
-> >=20
-> >>=20
-> >>> + return 0;
-> >>> +#else
-> >>> + return -EOPNOTSUPP;
-> >>> +#endif /* CONFIG_NFSD_V4 */
-> >>> +}
-> >>> +
-> >>> +/**
-> >>> + * nfsd_nl_server_status_get_start - Prepare server_status_get dumpit
-> >>> + * @cb: netlink metadata and command arguments
-> >>> + *
-> >>> + * Return values:
-> >>> + *   %0: The server_status_get command may proceed
-> >>> + *   %-ENODEV: There is no NFSD running in this namespace
-> >>> + */
-> >>> +int nfsd_nl_server_status_get_start(struct netlink_callback *cb)
-> >>> +{
-> >>> + struct nfsd_net *nn =3D net_generic(sock_net(cb->skb->sk), nfsd_net=
-_id);
-> >>> +
-> >>> + return nn->nfsd_serv ? 0 : -ENODEV;
-> >>> +}
-> >>> +
-> >>> +/**
-> >>> + * nfsd_nl_server_status_get_dumpit - dump server status info
-> >>> + * @skb: reply buffer
-> >>> + * @cb: netlink metadata and command arguments
-> >>> + *
-> >>> + * Returns the size of the reply or a negative errno.
-> >>> + */
-> >>> +int nfsd_nl_server_status_get_dumpit(struct sk_buff *skb,
-> >>> +     struct netlink_callback *cb)
-> >>> +{
-> >>> + struct net *net =3D sock_net(skb->sk);
-> >>> +#ifdef CONFIG_NFSD_V4
-> >>> + struct nfsd_net *nn =3D net_generic(net, nfsd_net_id);
-> >>> +#endif /* CONFIG_NFSD_V4 */
-> >>> + void *hdr;
-> >>> +
-> >>> + if (cb->args[0]) /* already consumed */
-> >>> + return 0;
-> >>> +
-> >>> + hdr =3D genlmsg_put(skb, NETLINK_CB(cb->skb).portid, cb->nlh->nlmsg=
-_seq,
-> >>> +  &nfsd_nl_family, NLM_F_MULTI,
-> >>> +  NFSD_CMD_SERVER_STATUS_GET);
-> >>> + if (!hdr)
-> >>> + return -ENOBUFS;
-> >>> +
-> >>> + if (nla_put_u16(skb, NFSD_A_SERVER_ATTR_THREADS, nfsd_nrthreads(net=
-)))
-> >>> + return -ENOBUFS;
-> >>> +#ifdef CONFIG_NFSD_V4
-> >>> + if (nla_put_u8(skb, NFSD_A_SERVER_ATTR_V4_GRACE, !nn->grace_ended))
-> >>> + return -ENOBUFS;
-> >>> +#endif /* CONFIG_NFSD_V4 */
-> >>> +
-> >>> + genlmsg_end(skb, hdr);
-> >>> + cb->args[0] =3D 1;
-> >>> +
-> >>> + return skb->len;
-> >>> +}
-> >>> +
-> >>> /**
-> >>>  * nfsd_net_init - Prepare the nfsd_net portion of a new net namespace
-> >>>  * @net: a freshly-created network namespace
-> >>> diff --git a/include/uapi/linux/nfsd_netlink.h b/include/uapi/linux/n=
-fsd_netlink.h
-> >>> index c8ae72466ee6..b82fbc53d336 100644
-> >>> --- a/include/uapi/linux/nfsd_netlink.h
-> >>> +++ b/include/uapi/linux/nfsd_netlink.h
-> >>> @@ -29,8 +29,19 @@ enum {
-> >>> NFSD_A_RPC_STATUS_MAX =3D (__NFSD_A_RPC_STATUS_MAX - 1)
-> >>> };
-> >>>=20
-> >>> +enum {
-> >>> + NFSD_A_SERVER_ATTR_THREADS =3D 1,
-> >>> + NFSD_A_SERVER_ATTR_V4_GRACE,
-> >>> +
-> >>> + __NFSD_A_SERVER_ATTR_MAX,
-> >>> + NFSD_A_SERVER_ATTR_MAX =3D (__NFSD_A_SERVER_ATTR_MAX - 1)
-> >>> +};
-> >>> +
-> >>> enum {
-> >>> NFSD_CMD_RPC_STATUS_GET =3D 1,
-> >>> + NFSD_CMD_THREADS_SET,
-> >>> + NFSD_CMD_V4_GRACE_RELEASE,
-> >>> + NFSD_CMD_SERVER_STATUS_GET,
-> >>>=20
-> >>> __NFSD_CMD_MAX,
-> >>> NFSD_CMD_MAX =3D (__NFSD_CMD_MAX - 1)
-> >>=20
-> >> --=20
-> >> Jeff Layton <jlayton@kernel.org>
-> >>=20
->=20
-> --
-> Chuck Lever
->=20
->=20
-
---czcUg8cbmTF6BK8e
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZQ3qIQAKCRA6cBh0uS2t
-rJ48AP0VvpNgQKtdjwn7ofeNi3L5yI66kg6kpSFYRk2bS0CzjgD+M07e7zYmkJuh
-kV7bYV5G4kaRAMQdiofyYSixUiVYRA8=
-=TXI6
------END PGP SIGNATURE-----
-
---czcUg8cbmTF6BK8e--
-
+Rob
 
