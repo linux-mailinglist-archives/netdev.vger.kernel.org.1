@@ -1,284 +1,139 @@
-Return-Path: <netdev+bounces-35846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35847-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C41C7AB53E
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 17:51:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A89A37AB542
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 17:51:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 6EB4CB20B02
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 15:51:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id E094DB209E9
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 15:51:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03E9941757;
-	Fri, 22 Sep 2023 15:51:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82D864174A;
+	Fri, 22 Sep 2023 15:51:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEF8E41A82
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 15:50:53 +0000 (UTC)
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::223])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C5BC18F;
-	Fri, 22 Sep 2023 08:50:51 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 861316000B;
-	Fri, 22 Sep 2023 15:50:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1695397850;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=s1UC3fzYGcBMGdPtiNcq5oEjC+YI4rLYDS3FCENR0vw=;
-	b=CLEFlePN5zBKkmOjq9VVnA0OUcKGGhhNjAeIlZznA4jrmi2nipjBHV3M2klXKigJMLNcXI
-	5cLF7b24jksPb63VcLYUZBxDF5sGH0J4QKZY+bwy+vj3UwwtK3FbnVUGdhAqYjsas6bdIY
-	YMKlLEIpf2q72w5CWgXMF7DD9FaSWKh97HceiYgdybLV7PBw3dGzrksiSzrnXYv47aIcpS
-	SLceirucacvmJnRDM1dft/FXT/k3b6F7Auruq5fPzszOQ6CrX50KLgfEV9IGARuzlzdcIl
-	bQp+/116s/sCk2hTIhHH/cJ539+Olqk6jX/pxVdyRcRbFXDscCNrJ5j7HrJ3Hg==
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	linux-wpan@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	netdev@vger.kernel.org,
-	David Girault <david.girault@qorvo.com>,
-	Romuald Despres <romuald.despres@qorvo.com>,
-	Frederic Blain <frederic.blain@qorvo.com>,
-	Nicolas Schodet <nico@ni.fr.eu.org>,
-	Guilhem Imberton <guilhem.imberton@qorvo.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: [PATCH wpan-next v4 11/11] ieee802154: Give the user the association list
-Date: Fri, 22 Sep 2023 17:50:29 +0200
-Message-Id: <20230922155029.592018-12-miquel.raynal@bootlin.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230922155029.592018-1-miquel.raynal@bootlin.com>
-References: <20230922155029.592018-1-miquel.raynal@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88B74405E6
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 15:51:21 +0000 (UTC)
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63D5C1A4
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 08:51:19 -0700 (PDT)
+Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-3216ba1b01eso2239906f8f.2
+        for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 08:51:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1695397878; x=1696002678; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=PesNzGzgs/M04opEkHztma2ejl/yk8qPHiAQF6kIYXs=;
+        b=h0NxG8zKdc6AybJsLljYvh80UImr1uTdH+fhZDwdPFYZlNDLvtUiFnR06IzEztlt5E
+         nrFyB/fqjYah76RaK5Bz4mGeRU+jxJg2Y7GAWtpP4ajmBaEu1GP0elyqYCqzI2LgPcbl
+         hDYkskJrGhsLPXaIAULLHcDTuywBENaxn+A05+OZ+DL7xTm5DXQfGba4Ph5y8TYsR1+/
+         rL8H8wWaNbbmi8lCK5LpALp1RoaVcOQAmrjFKmGf4toq+xI+fwOcpktdhUd6S/fPgcFY
+         C8B6YCXbdNrRWyG4xtm8VxJ09T9dwEfeQfPT/sdJCdDoPLqeNlfWtUtFdDu9BTQ46md7
+         054Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695397878; x=1696002678;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PesNzGzgs/M04opEkHztma2ejl/yk8qPHiAQF6kIYXs=;
+        b=Z644j/ek/HnolpyNFCRV65FDN9mycbq/zpjFU8Z6yEgqTU2VMlyzdv0iAW1t9Rfao1
+         frg1LjQ1xDwl5TJiep3nifZmuCtT8sOP1W4V2vxtQW0e3Nc7uZUjFdhzdV3Xgg2unHyc
+         4fJfyIPCi7dHy/4P7afoO2mIIGWGZd7zhvSvtGfILwtILFdoO86sDL/nkDHH0tU2++uG
+         dpT4gsYaxy4fX4J1XIZRwJwYZNUvF9IKXcxQVFnYetRddpp3ZXIUAwnCBROpc46biwR0
+         Qv1jiw172uh+GJDsHFAZZfFv8GLOPzgraxCkf/ycNrSKqJwhOOt5vf08ZDXVTwm6trzu
+         SEpg==
+X-Gm-Message-State: AOJu0YyFFb2xUyiS9avUdmLa2iPKBcC/iMESoLhXpK1Sa+QrKsUYJv64
+	2bs3Uq9jKmoQiVjAAU5vVSXc4A==
+X-Google-Smtp-Source: AGHT+IEeD0srB04JPyidhV+jDln6djApiAcFBVSa+XLgP6L2lQpRLdsIMRc5oV1wIvDkTdJTvpxD7Q==
+X-Received: by 2002:a5d:4f04:0:b0:31f:f9fe:e739 with SMTP id c4-20020a5d4f04000000b0031ff9fee739mr54713wru.59.1695397877790;
+        Fri, 22 Sep 2023 08:51:17 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:b41:c160:fa64:3224:433b:7ca1? ([2a01:e0a:b41:c160:fa64:3224:433b:7ca1])
+        by smtp.gmail.com with ESMTPSA id w10-20020adfd4ca000000b0031762e89f94sm4759379wrk.117.2023.09.22.08.51.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 22 Sep 2023 08:51:16 -0700 (PDT)
+Message-ID: <7ed5f6ab-4206-1c1e-6485-f970b9b5b79d@6wind.com>
+Date: Fri, 22 Sep 2023 17:51:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCHv4 net] ipv4/fib: send notify when delete source address
+ routes
+Content-Language: en-US
+To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Ido Schimmel <idosch@nvidia.com>, David Ahern <dsahern@kernel.org>,
+ Benjamin Poirier <bpoirier@nvidia.com>, Thomas Haller <thaller@redhat.com>,
+ Stephen Hemminger <stephen@networkplumber.org>,
+ Eric Dumazet <edumazet@google.com>
+References: <20230922075508.848925-1-liuhangbin@gmail.com>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Organization: 6WIND
+In-Reply-To: <20230922075508.848925-1-liuhangbin@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: miquel.raynal@bootlin.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Upon request, we must be able to provide to the user the list of
-associations currently in place. Let's add a new netlink command and
-attribute for this purpose.
 
-Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
----
- include/net/nl802154.h    |  18 ++++++-
- net/ieee802154/nl802154.c | 103 +++++++++++++++++++++++++++++++++++++-
- 2 files changed, 117 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/nl802154.h b/include/net/nl802154.h
-index 8b26faae49e8..4c752f799957 100644
---- a/include/net/nl802154.h
-+++ b/include/net/nl802154.h
-@@ -81,6 +81,7 @@ enum nl802154_commands {
- 	NL802154_CMD_ASSOCIATE,
- 	NL802154_CMD_DISASSOCIATE,
- 	NL802154_CMD_SET_MAX_ASSOCIATIONS,
-+	NL802154_CMD_LIST_ASSOCIATIONS,
- 
- 	/* add new commands above here */
- 
-@@ -151,6 +152,7 @@ enum nl802154_attrs {
- 	NL802154_ATTR_SCAN_DONE_REASON,
- 	NL802154_ATTR_BEACON_INTERVAL,
- 	NL802154_ATTR_MAX_ASSOCIATIONS,
-+	NL802154_ATTR_PEER,
- 
- 	/* add attributes here, update the policy in nl802154.c */
- 
-@@ -389,8 +391,6 @@ enum nl802154_supported_bool_states {
- 	NL802154_SUPPORTED_BOOL_MAX = __NL802154_SUPPORTED_BOOL_AFTER_LAST - 1
- };
- 
--#ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
--
- enum nl802154_dev_addr_modes {
- 	NL802154_DEV_ADDR_NONE,
- 	__NL802154_DEV_ADDR_INVALID,
-@@ -410,12 +410,26 @@ enum nl802154_dev_addr_attrs {
- 	NL802154_DEV_ADDR_ATTR_SHORT,
- 	NL802154_DEV_ADDR_ATTR_EXTENDED,
- 	NL802154_DEV_ADDR_ATTR_PAD,
-+	NL802154_DEV_ADDR_ATTR_PEER_TYPE,
- 
- 	/* keep last */
- 	__NL802154_DEV_ADDR_ATTR_AFTER_LAST,
- 	NL802154_DEV_ADDR_ATTR_MAX = __NL802154_DEV_ADDR_ATTR_AFTER_LAST - 1
- };
- 
-+enum nl802154_peer_type {
-+	NL802154_PEER_TYPE_UNSPEC,
-+
-+	NL802154_PEER_TYPE_PARENT,
-+	NL802154_PEER_TYPE_CHILD,
-+
-+	/* keep last */
-+	__NL802154_PEER_TYPE_AFTER_LAST,
-+	NL802154_PEER_TYPE_MAX = __NL802154_PEER_TYPE_AFTER_LAST - 1
-+};
-+
-+#ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
-+
- enum nl802154_key_id_modes {
- 	NL802154_KEY_ID_MODE_IMPLICIT,
- 	NL802154_KEY_ID_MODE_INDEX,
-diff --git a/net/ieee802154/nl802154.c b/net/ieee802154/nl802154.c
-index e16e57fc34d0..e4d290d0e0a0 100644
---- a/net/ieee802154/nl802154.c
-+++ b/net/ieee802154/nl802154.c
-@@ -235,6 +235,7 @@ static const struct nla_policy nl802154_policy[NL802154_ATTR_MAX+1] = {
- 	[NL802154_ATTR_BEACON_INTERVAL] =
- 		NLA_POLICY_MAX(NLA_U8, IEEE802154_ACTIVE_SCAN_DURATION),
- 	[NL802154_ATTR_MAX_ASSOCIATIONS] = { .type = NLA_U32 },
-+	[NL802154_ATTR_PEER] = { .type = NLA_NESTED },
- 
- #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
- 	[NL802154_ATTR_SEC_ENABLED] = { .type = NLA_U8, },
-@@ -249,7 +250,6 @@ static const struct nla_policy nl802154_policy[NL802154_ATTR_MAX+1] = {
- #endif /* CONFIG_IEEE802154_NL802154_EXPERIMENTAL */
- };
- 
--#ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
- static int
- nl802154_prepare_wpan_dev_dump(struct sk_buff *skb,
- 			       struct netlink_callback *cb,
-@@ -308,7 +308,6 @@ nl802154_finish_wpan_dev_dump(struct cfg802154_registered_device *rdev)
- {
- 	rtnl_unlock();
- }
--#endif /* CONFIG_IEEE802154_NL802154_EXPERIMENTAL */
- 
- /* message building helper */
- static inline void *nl802154hdr_put(struct sk_buff *skb, u32 portid, u32 seq,
-@@ -1717,6 +1716,101 @@ static int nl802154_set_max_associations(struct sk_buff *skb, struct genl_info *
- 	return 0;
- }
- 
-+static int nl802154_send_peer_info(struct sk_buff *msg,
-+				   struct netlink_callback *cb,
-+				   u32 seq, int flags,
-+				   struct cfg802154_registered_device *rdev,
-+				   struct wpan_dev *wpan_dev,
-+				   struct ieee802154_pan_device *peer,
-+				   enum nl802154_peer_type type)
-+{
-+	struct nlattr *nla;
-+	void *hdr;
-+
-+	ASSERT_RTNL();
-+
-+	hdr = nl802154hdr_put(msg, NETLINK_CB(cb->skb).portid, seq, flags,
-+			      NL802154_CMD_LIST_ASSOCIATIONS);
-+	if (!hdr)
-+		return -ENOBUFS;
-+
-+	genl_dump_check_consistent(cb, hdr);
-+
-+	nla = nla_nest_start_noflag(msg, NL802154_ATTR_PEER);
-+	if (!nla)
-+		goto nla_put_failure;
-+
-+	if (nla_put_u8(msg, NL802154_DEV_ADDR_ATTR_PEER_TYPE, type))
-+		goto nla_put_failure;
-+
-+	if (nla_put_u8(msg, NL802154_DEV_ADDR_ATTR_MODE, peer->mode))
-+		goto nla_put_failure;
-+
-+	if (nla_put(msg, NL802154_DEV_ADDR_ATTR_SHORT,
-+		    IEEE802154_SHORT_ADDR_LEN, &peer->short_addr))
-+		goto nla_put_failure;
-+
-+	if (nla_put(msg, NL802154_DEV_ADDR_ATTR_EXTENDED,
-+		    IEEE802154_EXTENDED_ADDR_LEN, &peer->extended_addr))
-+		goto nla_put_failure;
-+
-+	nla_nest_end(msg, nla);
-+
-+	genlmsg_end(msg, hdr);
-+
-+	return 0;
-+
-+ nla_put_failure:
-+	genlmsg_cancel(msg, hdr);
-+	return -EMSGSIZE;
-+}
-+
-+static int nl802154_list_associations(struct sk_buff *skb,
-+				      struct netlink_callback *cb)
-+{
-+	struct cfg802154_registered_device *rdev;
-+	struct ieee802154_pan_device *child;
-+	struct wpan_dev *wpan_dev;
-+	int err;
-+
-+	err = nl802154_prepare_wpan_dev_dump(skb, cb, &rdev, &wpan_dev);
-+	if (err)
-+		return err;
-+
-+	mutex_lock(&wpan_dev->association_lock);
-+
-+	if (cb->args[2])
-+		goto out;
-+
-+	if (wpan_dev->parent) {
-+		err = nl802154_send_peer_info(skb, cb, cb->nlh->nlmsg_seq,
-+					      NLM_F_MULTI, rdev, wpan_dev,
-+					      wpan_dev->parent,
-+					      NL802154_PEER_TYPE_PARENT);
-+		if (err < 0)
-+			goto out_err;
-+	}
-+
-+	list_for_each_entry(child, &wpan_dev->children, node) {
-+		err = nl802154_send_peer_info(skb, cb, cb->nlh->nlmsg_seq,
-+					      NLM_F_MULTI, rdev, wpan_dev,
-+					      child,
-+					      NL802154_PEER_TYPE_CHILD);
-+		if (err < 0)
-+			goto out_err;
-+	}
-+
-+	cb->args[2] = 1;
-+out:
-+	err = skb->len;
-+out_err:
-+	mutex_unlock(&wpan_dev->association_lock);
-+
-+	nl802154_finish_wpan_dev_dump(rdev);
-+
-+	return err;
-+}
-+
- #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
- static const struct nla_policy nl802154_dev_addr_policy[NL802154_DEV_ADDR_ATTR_MAX + 1] = {
- 	[NL802154_DEV_ADDR_ATTR_PAN_ID] = { .type = NLA_U16 },
-@@ -2861,6 +2955,11 @@ static const struct genl_ops nl802154_ops[] = {
- 		.internal_flags = NL802154_FLAG_NEED_NETDEV |
- 				  NL802154_FLAG_NEED_RTNL,
- 	},
-+	{
-+		.cmd = NL802154_CMD_LIST_ASSOCIATIONS,
-+		.dumpit = nl802154_list_associations,
-+		/* can be retrieved by unprivileged users */
-+	},
- #ifdef CONFIG_IEEE802154_NL802154_EXPERIMENTAL
- 	{
- 		.cmd = NL802154_CMD_SET_SEC_PARAMS,
--- 
-2.34.1
-
+Le 22/09/2023 à 09:55, Hangbin Liu a écrit :
+> After deleting an interface address in fib_del_ifaddr(), the function
+> scans the fib_info list for stray entries and calls fib_flush() and
+> fib_table_flush(). Then the stray entries will be deleted silently and no
+> RTM_DELROUTE notification will be sent.
+> 
+> This lack of notification can make routing daemons, or monitor like
+> `ip monitor route` miss the routing changes. e.g.
+> 
+> + ip link add dummy1 type dummy
+> + ip link add dummy2 type dummy
+> + ip link set dummy1 up
+> + ip link set dummy2 up
+> + ip addr add 192.168.5.5/24 dev dummy1
+> + ip route add 7.7.7.0/24 dev dummy2 src 192.168.5.5
+> + ip -4 route
+> 7.7.7.0/24 dev dummy2 scope link src 192.168.5.5
+> 192.168.5.0/24 dev dummy1 proto kernel scope link src 192.168.5.5
+> + ip monitor route
+> + ip addr del 192.168.5.5/24 dev dummy1
+> Deleted 192.168.5.0/24 dev dummy1 proto kernel scope link src 192.168.5.5
+> Deleted broadcast 192.168.5.255 dev dummy1 table local proto kernel scope link src 192.168.5.5
+> Deleted local 192.168.5.5 dev dummy1 table local proto kernel scope host src 192.168.5.5
+> 
+> As Ido reminded, fib_table_flush() isn't only called when an address is
+> deleted, but also when an interface is deleted or put down. The lack of
+> notification in these cases is deliberate. And commit 7c6bb7d2faaf
+> ("net/ipv6: Add knob to skip DELROUTE message on device down") introduced
+> a sysctl to make IPv6 behave like IPv4 in this regard. So we can't send
+> the route delete notify blindly in fib_table_flush().
+> 
+> To fix this issue, let's add a new flag in "struct fib_info" to track the
+> deleted prefer source address routes, and only send notify for them.
+> 
+> After update:
+> + ip monitor route
+> + ip addr del 192.168.5.5/24 dev dummy1
+> Deleted 192.168.5.0/24 dev dummy1 proto kernel scope link src 192.168.5.5
+> Deleted broadcast 192.168.5.255 dev dummy1 table local proto kernel scope link src 192.168.5.5
+> Deleted local 192.168.5.5 dev dummy1 table local proto kernel scope host src 192.168.5.5
+> Deleted 7.7.7.0/24 dev dummy2 scope link src 192.168.5.5
+> 
+> Suggested-by: Thomas Haller <thaller@redhat.com>
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+Acked-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 
