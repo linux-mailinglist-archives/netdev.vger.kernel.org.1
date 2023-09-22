@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-35895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75F0A7AB807
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 19:47:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5B527AB808
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 19:48:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id EEA6628236B
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 17:47:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 30C2428239C
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 17:48:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45415436B1;
-	Fri, 22 Sep 2023 17:47:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42B3743A81;
+	Fri, 22 Sep 2023 17:48:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1000C436BC
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 17:47:46 +0000 (UTC)
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8800AAF
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 10:47:45 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1c5bbb205e3so23314065ad.0
-        for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 10:47:45 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F5DC41E33
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 17:48:06 +0000 (UTC)
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 713798F
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 10:48:05 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1c5db4925f9so17668975ad.1
+        for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 10:48:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695404865; x=1696009665; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1695404885; x=1696009685; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=s3WBfS9k0hhwa67Mh2traYG0/caEY7Z1Kl5Zw3aenPM=;
-        b=eZGn300fALXHBzTEYhiuww5jSfgZU/SkTh3yG6cGevosV7LUIcJ/r3K1yTU9TCfvaW
-         jSlA1mzmTlSafx/FpZ8Pl5wQ87YROOLRPFRy7YGl7CHr8BglM62P7GFxGkzIkqPywofs
-         tR3X5nt+Yj9J+lw3ocbqQH5QdUZfoOA1RPsjKJlvN30vDsNtkBxDzdi3PdwPNtHdzXMx
-         q9tFX2Q0BTynvkRQEuBAN3cGsumsJXnb+M10MOvfSX4kwtyMGySxEwlHSz+MGtdNwNU/
-         itE9WSbSP/pqQJ0jBZEd5mLUpdqPWR8v8uONOD6jWIVJZAxmRPPWuESQH4wrVSB22X4x
-         +uCQ==
+        bh=ZDQiy/7rzxHndWIo2eHT7YJAhtALvq5paJxFdkDPMFY=;
+        b=NT9SRryZZaGJV6im2f10mv5ZhU/e0CCpBJSlKjQu97xn1L2ZXD4Efo6t0PiorakRgR
+         SlC4+trVubHWJLEkH2f+M/S1toSD8Eh8xSVsMgNd8MFIO5FmdjxYZdhyo56RK1F5+x6e
+         wMvgnazvFjpkfG8c4ktc7wXMTikKEDr4W5SrOK+kVM5TFQUrwdqIqcCSwgr6Ug+nyvvp
+         386PEd1A+Xyhave11oj7GurCV7Lzidmbva3MKDljDxWPFLUcLE1KtheGjZzyu/GuDdHv
+         qnX5xY4ST2gebunPNEtAsfzb7zxyFOBwgI9O5oeCnrumc0yKzVTuEZmeE/Jn/QkKCWId
+         6QXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695404865; x=1696009665;
+        d=1e100.net; s=20230601; t=1695404885; x=1696009685;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=s3WBfS9k0hhwa67Mh2traYG0/caEY7Z1Kl5Zw3aenPM=;
-        b=grY5WOP45EKeGiRPYrFj+fC4Nv2+X0l++DcG4Lptc7mB8kS/f2Dn82jMTq/sWbgcfy
-         aClTtMAAj0gXHBdFrWLiBglQKloBI9m/NysbqRIpy+cNfYQDlF4BP9Gmk7FSA4c2WFYg
-         tSoBhCGWO0zqVyUjJUcwzqVCSLPrBh7Df0zs58VsG8PB5jnbRzJHRcpZszs09sWz7cDJ
-         mAUy4MbYsnWqhUZM2DWArFgM76Oa+aWZ7KdtFy69FUxawHs5t8BttJxV6ZwK48YCewOH
-         70EgTLWHw0ji1rFl98G8mS06+rIm+fMDVq65zOSiRdGll5vDvH0dqyKIc71eH/tVd0U5
-         zT/w==
-X-Gm-Message-State: AOJu0Yx0VhYDVyx7o36A9x4amW0s3SF+td/mpEN1GVuvpNhUbOo9sZ0g
-	d9wu9cKIwhYcVNvBuakfDcY=
-X-Google-Smtp-Source: AGHT+IGiTsNNGReLNA+fZ+LRTwF+fm0dIFHVS8cy6iFkqFEKBeq5UzUdIbsuDRPtleoh0YpJUagIKw==
-X-Received: by 2002:a17:902:a386:b0:1c3:9544:cf51 with SMTP id x6-20020a170902a38600b001c39544cf51mr127371pla.1.1695404864884;
-        Fri, 22 Sep 2023 10:47:44 -0700 (PDT)
+        bh=ZDQiy/7rzxHndWIo2eHT7YJAhtALvq5paJxFdkDPMFY=;
+        b=YJO61fJTkQgK9MXC6CKLrGKR1ZotLOHGZBA++YrqDchUrH9EHtD+BzHU6+qB9izmty
+         MCYH3vw+LFRRvi9+xNAkLWfZ86nB7DFWaM8AHEKSH6YDvTlaWr3r+b8hszfYS9tLE1dr
+         9e6rfMJPOJ8BkzXM8aANiTmCidkiKKT3w+4PAM5Gv9F1KApEbQ60CNJbhh/7Aj1XnkAW
+         599tRoA4ivYSFHSfJqKShzdmvUrqLLGN1qVQ8ilv1AFUGV4KPr7+gyhZuCcowt7sQd8u
+         LjCPFnSKw3Cx5FTpXmPB1g7vlNxWTXFUA9GvkehIeftH/8X/baJMNzc68TMD6Eai+xN6
+         lZqg==
+X-Gm-Message-State: AOJu0YxUqC5KiBzdqZyeMYgfGvpzKFU45UwJEiNS62yUdGP10gu/MO5m
+	RNX46PBOJeFW8otSe8n47GTLmPdW7Qc=
+X-Google-Smtp-Source: AGHT+IHKC0VItTLKS11bP4cvBmjdizql+YdnuxIhOCp6Uh+BCsInpszoBHE8IM1/teEcRZ6pxn1jzw==
+X-Received: by 2002:a17:903:32cf:b0:1c0:e87e:52ba with SMTP id i15-20020a17090332cf00b001c0e87e52bamr602919plr.2.1695404884891;
+        Fri, 22 Sep 2023 10:48:04 -0700 (PDT)
 Received: from [192.168.1.3] (ip72-194-116-95.oc.oc.cox.net. [72.194.116.95])
-        by smtp.gmail.com with ESMTPSA id e3-20020a170902b78300b001befac3b3cbsm3739610pls.290.2023.09.22.10.47.42
+        by smtp.gmail.com with ESMTPSA id e3-20020a170902b78300b001befac3b3cbsm3739610pls.290.2023.09.22.10.48.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 Sep 2023 10:47:44 -0700 (PDT)
-Message-ID: <763a584b-ead6-46fe-a50c-147ce5846768@gmail.com>
-Date: Fri, 22 Sep 2023 10:47:41 -0700
+        Fri, 22 Sep 2023 10:48:04 -0700 (PDT)
+Message-ID: <3279f31e-a81a-454c-b3b2-b0dc1559fa85@gmail.com>
+Date: Fri, 22 Sep 2023 10:48:01 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,13 +63,14 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/3] mlxbf_gige: Fix intermittent no ip issue
+Subject: Re: [PATCH v3 3/3] mlxbf_gige: Enable the GigE port in
+ mlxbf_gige_open
 Content-Language: en-US
 To: Asmaa Mnebhi <asmaa@nvidia.com>, davem@davemloft.net,
  edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, olteanv@gmail.com
 Cc: netdev@vger.kernel.org, davthompson@nvidia.com
 References: <20230922173626.23790-1-asmaa@nvidia.com>
- <20230922173626.23790-3-asmaa@nvidia.com>
+ <20230922173626.23790-4-asmaa@nvidia.com>
 From: Florian Fainelli <f.fainelli@gmail.com>
 Autocrypt: addr=f.fainelli@gmail.com; keydata=
  xsDiBEjPuBIRBACW9MxSJU9fvEOCTnRNqG/13rAGsj+vJqontvoDSNxRgmafP8d3nesnqPyR
@@ -104,12 +105,12 @@ Autocrypt: addr=f.fainelli@gmail.com; keydata=
  y5arMQorqTFWlEOgRA8OP47L9knl9i4xuR0euV6DChDrguup2aJVU8JPBBgRAgAPAhsMBQJU
  X9LxBQkeXB3fAAoJEGFXmRW1Y3YOj4UAn3nrFLPZekMeqX5aD/aq/dsbXSfyAKC45Go0YyxV
  HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20230922173626.23790-3-asmaa@nvidia.com>
+In-Reply-To: <20230922173626.23790-4-asmaa@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
@@ -117,31 +118,17 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 
 On 9/22/2023 10:36 AM, Asmaa Mnebhi wrote:
-> Although the link is up, there is no ip assigned on a setup with high background
-> traffic. Nothing is transmitted nor received.
-> The RX error count keeps on increasing. After several minutes, the RX error count
-> stagnates and the GigE interface finally gets an ip.
-> 
-> The issue is in the mlxbf_gige_rx_init function. As soon as the RX DMA is enabled,
-> the RX CI reaches the max of 128, and it becomes equal to RX PI. RX CI doesn't decrease
-> since the code hasn't ran phy_start yet.
-> 
-> The solution is to move the rx init after phy_start.
+> At the moment, the GigE port is enabled in the mlxbf_gige_probe
+> function. If the mlxbf_gige_open is not executed, this could cause
+> pause frames to increase in the case where there is high backgroud
+> traffic. This results in clogging the port.
+> So move enabling the OOB port to mlxbf_gige_open.
 > 
 > Fixes: f92e1869d74e ("Add Mellanox BlueField Gigabit Ethernet driver")
 > Signed-off-by: Asmaa Mnebhi <asmaa@nvidia.com>
 > Reviewed-by: David Thompson <davthompson@nvidia.com>
 
-This seems fine, but your description of the problem still looks like 
-there may be a more fundamental ordering issue when you enable your RX 
-pipe here.
-
-It seems to me like you should enable it from "inner" as in closest to 
-the CPU/DMA subsystem towards "outer" which is the MAC and finally the PHY.
-
-It should be fine to enable your RX DMA as long as you keep the MAC's RX 
-disabled, and then you can enable your MAC's RX enable and later start 
-the PHY.
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 -- 
 Florian
 
