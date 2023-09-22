@@ -1,90 +1,66 @@
-Return-Path: <netdev+bounces-35746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91C617AAE66
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 11:41:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C2517AAE6D
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 11:41:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id D83B0B20A7B
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 09:41:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTP id 0A9211F22733
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 09:41:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67E1F1DDFC;
-	Fri, 22 Sep 2023 09:41:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1792F1E51E;
+	Fri, 22 Sep 2023 09:41:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8521C6109
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 09:40:59 +0000 (UTC)
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 89309192;
-	Fri, 22 Sep 2023 02:40:57 -0700 (PDT)
-Received: from localhost.localdomain (unknown [10.181.203.255])
-	by mail-app2 (Coremail) with SMTP id by_KCgA3r3odYQ1lJWmuAA--.3668S4;
-	Fri, 22 Sep 2023 17:40:50 +0800 (CST)
-From: Dinghao Liu <dinghao.liu@zju.edu.cn>
-To: dinghao.liu@zju.edu.cn
-Cc: Richard Cochran <richardcochran@gmail.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Vadim Fedorenko <vadfed@fb.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] ptp: ocp: Fix error handling in ptp_ocp_device_init
-Date: Fri, 22 Sep 2023 17:40:44 +0800
-Message-Id: <20230922094044.28820-1-dinghao.liu@zju.edu.cn>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:by_KCgA3r3odYQ1lJWmuAA--.3668S4
-X-Coremail-Antispam: 1UD129KBjvdXoWrtryfWFW5ZFW3WFy5tFyfXrb_yoW3GFc_Gw
-	1j9FWxWryvkw1kGw1rGw1xZrWIkrnFvr47Crs5tF93A39avF45Xr98uryUGw4DWw4rGrWU
-	ZasIqr1xAr4q9jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb28Fc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AK
-	wVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20x
-	vE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26rxl6s0DM28EF7xvwVC2z280
-	aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcVAq07
-	x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18
-	McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr4
-	1lF7I21c0EjII2zVCS5cI20VAGYxC7MxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIE
-	Y20_GFWkJr1UJwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI
-	8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41l
-	IxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIx
-	AIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2
-	jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUdHUDUUUUU=
-X-CM-SenderInfo: qrrzjiaqtzq6lmxovvfxof0/1tbiAgAGBmUMUaAikwAHss
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07EF31E518
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 09:41:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57AC1C433C8;
+	Fri, 22 Sep 2023 09:41:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695375716;
+	bh=707q8KlBrRGVzyK7ourpz6f5DIZ+NIPge1U57ZXA3Pg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qxnHK/AljLoxCzLaH+Gw/L4MAOXFf/eWvO/SbiJj6c/ektV0+m67vGpENhCyLBoqq
+	 G0sFFTmuXGEYTj3cWnOCPeOVy4BJMI8RicfkERtqbYD+FJ7gCMhO60QyNpyrd170Ds
+	 JvfkMIwx3r3h6ji/rvyseqiwQ3Ls4yX/1Rye3lYoRBFZdZuaZFMTc50K9qoYCDOEwA
+	 +53E4/Fst/UbYuuUrzq8XcviALVWvBaklJyODOJ3MEtFjYHDtTtM/rGnnQuQRhgNKn
+	 QFKijM1NirLUIfto5cttSKDdtUm819jPu9qaVuF2Pc6vaf+AJWs2jm1EAvLvd2WLrs
+	 IEqWiDfRtcKOA==
+Date: Fri, 22 Sep 2023 10:41:51 +0100
+From: Simon Horman <horms@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, eric.dumazet@gmail.com
+Subject: Re: [PATCH v2 net-next 0/3] net: use DEV_STATS_xxx() helpers in
+ virtio_net and l2tp_eth
+Message-ID: <20230922094151.GX224399@kernel.org>
+References: <20230921085218.954120-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230921085218.954120-1-edumazet@google.com>
 
-When device_add() fails, ptp_ocp_dev_release() will be called
-after put_device(). Therefore, it seems that the
-ptp_ocp_dev_release() before put_device() is redundant.
+On Thu, Sep 21, 2023 at 08:52:15AM +0000, Eric Dumazet wrote:
+> Inspired by another (minor) KCSAN syzbot report.
+> Both virtio_net and l2tp_eth can use DEV_STATS_xxx() helpers.
+> 
+> v2: removed unused @priv variable (Simon, kernel build bot)
+> 
+> Eric Dumazet (3):
+>   net: add DEV_STATS_READ() helper
+>   virtio_net: avoid data-races on dev->stats fields
+>   net: l2tp_eth: use generic dev->stats fields
 
-Fixes: 773bda964921 ("ptp: ocp: Expose various resources on the timecard.")
-Signed-off-by: Dinghao Liu <dinghao.liu@zju.edu.cn>
----
- drivers/ptp/ptp_ocp.c | 1 -
- 1 file changed, 1 deletion(-)
+For series,
 
-diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
-index 20a974ced8d6..a7a6947ab4bc 100644
---- a/drivers/ptp/ptp_ocp.c
-+++ b/drivers/ptp/ptp_ocp.c
-@@ -3998,7 +3998,6 @@ ptp_ocp_device_init(struct ptp_ocp *bp, struct pci_dev *pdev)
- 	return 0;
- 
- out:
--	ptp_ocp_dev_release(&bp->dev);
- 	put_device(&bp->dev);
- 	return err;
- }
--- 
-2.17.1
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
