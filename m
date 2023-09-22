@@ -1,73 +1,191 @@
-Return-Path: <netdev+bounces-35911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C16B7ABB03
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 23:22:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B33237ABB4B
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 23:58:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 814EE1C20905
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 21:22:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 642EB281DEA
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 21:58:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 657EE47372;
-	Fri, 22 Sep 2023 21:22:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60E1B47C69;
+	Fri, 22 Sep 2023 21:58:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C94D9CA5C;
-	Fri, 22 Sep 2023 21:22:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C73FFC433C8;
-	Fri, 22 Sep 2023 21:22:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695417737;
-	bh=lmE8y4Naioq26myIwcGDskn3NlpSCo/s3ZeWn2dloK4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Nv4Cz9sw3ckJXfg8gZo7FWOFFfqKqYySpjfLY7cZhQEb3LyIpaBvywrHA5M7C21Gc
-	 mcsEqkC8cx13Dy8R/0X9lYJTpyRNr1qeElcsH00EHluLpOe3wRmDsUaEfIDdc00HgN
-	 YZ5dnQxIkGqFegnvjx8fmrE8SjNnqVDUNMtF6lnOb5ybGvy1egpqEP36TNfvlgqqAO
-	 kv5OnNDigOmYh5tnIGwghQpSuqDTEEDzwtyzW8MsyYi2xdU3YdARgKPEIx0roJsDT1
-	 QMAlycnsTsH07IM9iuVX100coPa5Ms77i08JVt5XAfgf3pojKcODfR7zRW+tGBrVPO
-	 6Cus0vP5Brspw==
-Received: (nullmailer pid 3638530 invoked by uid 1000);
-	Fri, 22 Sep 2023 21:22:12 -0000
-Date: Fri, 22 Sep 2023 16:22:12 -0500
-From: Rob Herring <robh@kernel.org>
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: Lee Jones <lee@kernel.org>, alsa-devel@alsa-project.org, devicetree@vger.kernel.org, Christophe Leroy <christophe.leroy@csgroup.eu>, linuxppc-dev@lists.ozlabs.org, Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Jakub Kicinski <kuba@kernel.org>, Qiang Zhao <qiang.zhao@nxp.com>, Takashi Iwai <tiwai@suse.com>, linux-gpio@vger.kernel.org, Fabio Estevam <festevam@gmail.com>, Christophe JAILLET <christophe.jaillet@wanadoo.fr>, netdev@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Xiubo Li <Xiubo.Lee@gmail.com>, Mark Brown <broonie@kernel.org>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Liam Girdwood <lgirdwood@gmail.com>, Nicolin Chen <nicoleotsuka@gmail.com>, Rob Herring <robh+dt@kernel.org>, linux-arm-kernel@lists.infradead.org, Li Yang <leoyang.li@nxp.com>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Krzysztof K
- ozlowski <krzysztof.kozlowski+dt@linaro.org>, Andrew Lunn <andrew@lunn.ch>, Jaroslav Kysela <perex@perex.cz>, Shengjiu Wang <shengjiu.wang@gmail.com>
-Subject: Re: [PATCH v6 08/30] dt-bindings: soc: fsl: cpm_qe: cpm1-scc-qmc:
- Add support for QMC HDLC
-Message-ID: <169541773236.3638470.1013241809358556101.robh@kernel.org>
-References: <20230922075913.422435-1-herve.codina@bootlin.com>
- <20230922075913.422435-9-herve.codina@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 575964177F;
+	Fri, 22 Sep 2023 21:58:23 +0000 (UTC)
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C4F8197;
+	Fri, 22 Sep 2023 14:58:20 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 3E790240002;
+	Fri, 22 Sep 2023 21:57:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1695419898;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/YVTZcfReib7t/7pkUyxikgIMHTHiQw2lUN/ib+i8mE=;
+	b=Ja/5fpeT5o5akQ0s5PhqFJUDY6DQ7QeszgvhChp7+woMQdUgGJW0GPwQA0aCTTG1OGy9Hb
+	+1p6OYpCKg7g/jxXASbU6FMY0XJsjosnVSVh1i+y1bWLDL2msdeQe7ZdQcxP++36sYwLcn
+	tu11yHNRFvgPiyIdH14mXaKjcyzntmp0K2kg7QiHYToaPwIcWvVSqBH3jFdn8CdJyFjfpj
+	tdeVDShAPsGMOZmtAe0mhghv1EuT8kYzBSy2d6Hhvwx7EMpIaemtl9DdmnIBVGTTnTagzY
+	P+X0gsJTPfggsQk9zBywEZD5TRUEFOcRSr2PWM1Vn94oEDspzq6M+iHqMcF9Xw==
+Message-ID: <6c1bb7df-34cd-4db9-95b6-959c87b68588@arinc9.com>
+Date: Sat, 23 Sep 2023 00:57:52 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230922075913.422435-9-herve.codina@bootlin.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 00/10] define and enforce phylink bindings
+Content-Language: en-US
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Conor Dooley <conor+dt@kernel.org>,
+ George McCollister <george.mccollister@gmail.com>,
+ Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <olteanv@gmail.com>, Kurt Kanzenbach <kurt@linutronix.de>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+ Linus Walleij <linus.walleij@linaro.org>,
+ =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+ =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
+ Marcin Wojtas <mw@semihalf.com>, Lars Povlsen <lars.povlsen@microchip.com>,
+ Steen Hegelund <Steen.Hegelund@microchip.com>,
+ Daniel Machon <daniel.machon@microchip.com>,
+ Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+ Daniel Golle <daniel@makrotopia.org>, Landen Chao
+ <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Claudiu Beznea <claudiu.beznea@microchip.com>, Marek Vasut <marex@denx.de>,
+ Claudiu Manoil <claudiu.manoil@nxp.com>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ John Crispin <john@phrozen.org>, Madalin Bucur <madalin.bucur@nxp.com>,
+ Ioana Ciornei <ioana.ciornei@nxp.com>, Lorenzo Bianconi
+ <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+ Horatiu Vultur <horatiu.vultur@microchip.com>,
+ Oleksij Rempel <linux@rempel-privat.de>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Grygorii Strashko <grygorii.strashko@ti.com>, Sekhar Nori <nsekhar@ti.com>,
+ Shyam Pandey <radhey.shyam.pandey@xilinx.com>, mithat.guner@xeront.com,
+ erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ linux-renesas-soc@vger.kernel.org
+References: <20230916110902.234273-1-arinc.unal@arinc9.com>
+ <ZQ2LMe9aa1ViBcSH@shell.armlinux.org.uk>
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <ZQ2LMe9aa1ViBcSH@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-
-On Fri, 22 Sep 2023 09:58:43 +0200, Herve Codina wrote:
-> The QMC (QUICC mutichannel controller) is a controller present in some
-> PowerQUICC SoC such as MPC885.
-> The QMC HDLC uses the QMC controller to transfer HDLC data.
+On 22/09/2023 15:40, Russell King (Oracle) wrote:
+> On Sat, Sep 16, 2023 at 02:08:52PM +0300, Arınç ÜNAL wrote:
+>> Hello there.
+>>
+>> This patch series defines phylink bindings and enforces them for the
+>> ethernet controllers that need them.
+>>
+>> Some schemas had to be changed to properly enforce phylink bindings for all
+>> of the affected ethernet controllers. Some of the documents of these
+>> ethernet controllers were non json-schema, which had to be converted.
+>>
+>> I will convert the remaining documents to json-schema while this patch
+>> series receives reviews.
 > 
-> Additionally, a framer can be connected to the QMC HDLC.
-> If present, this framer is the interface between the TDM bus used by the
-> QMC HDLC and the E1/T1 line.
-> The QMC HDLC can use this framer to get information about the E1/T1 line
-> and configure the E1/T1 line.
+> I can't say that I'm comfortable with this. We appear to be defining
+> bindings based on software implementation, and a desire for the DT
+> tooling to enforce what the software implementation wants. Isn't this
+> against the aims of device tree and device tree binding documentation?
+> Seems to me like feature-creep.
 > 
-> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-> ---
->  .../soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml      | 24 +++++++++++++++++++
->  1 file changed, 24 insertions(+)
+> The bindings that phylink parses are already documented in the
+> ethernet controller yaml document. Specifically:
 > 
+> - phylink does not parse the phy-mode property, that is left to the
+>    implementation to pass to phylink, which can implement it any
+>    which way they choose (and even default to something.)
+> 
+> - phylink does not require a phy property - phylink does expect a PHY
+>    to be attached, but how that PHY is attached is up to the ethernet
+>    controller driver. It may call one of the phylink functions that
+>    parses the phy property, or it may manually supply the phy device to
+>    phylink. Either way, phylink does not itself require a PHY property.
+> 
+> - phylink does not require a sfp property - this obviously is optional.
+> 
+> So, all in all, ethernet-controller already describes it, and to create
+> a DT binding document that pretends that phylink requires any of this
+> stuff is, in my mind, wrong.
+> 
+> DSA requires certain properties by dint of the parsing and setup of
+> phylink being in generic code - this is not because phylink requires
+> certain properties, but phylink does require certain information in
+> order to function correctly.
+> 
+> The issue here is _how_ phylink gets that information, and as I state
+> above, it _can_ come from DT, but it can also be given that information
+> manually.
+> 
+> As an example, there are plenty of drivers in the tree which try to
+> parse a phy node, and if that's not present, they try to see if a PHY
+> exists at a default# bus address.
+> 
+> We seem to be digging outselves a hole here, where "phylink must have
+> these properties". No, that is wrong.
 
-Reviewed-by: Rob Herring <robh@kernel.org>
+I agree. My patch description here failed to explain the actual issue,
+which is missing hardware descriptions. Here's what I understand. An
+ethernet-controller is a MAC. For the MAC to work properly with its link
+partner, at least one of these must be described:
+- pointer to a PHY to retrieve link information from the PHY
+- pointer to a PCS to retrieve link information from the PCS
+- pointer to an SFP to retrieve link information from the SFP
+- static link information
 
+Andrew under the discussion of patch 7 said that enforcing this may expose
+bugs on MAC drivers that never looked at the devicetree to control the
+MAC's link which would cause regressions, implying we should hold back on
+enforcing it. I've agreed not to enforce it, not because it is incorrect
+description of ethernet controller hardware - I think it is correct - but
+because I won't be the one to deal with the regressions when this
+dt-bindings change goes through.
+
+I won't also enforce it selectively, as saying "these drivers use
+phylink_fwnode_phy_connect() therefore there won't be any bad surprises on
+the hardware they control so let's enforce it only for them" is nonsense in
+the context of describing hardware.
+
+I will focus on documenting the missing MDIO bus descriptions on certain
+ethernet switches and converting ethernet switch documents (maybe ethernet
+controllers too) to json-schema. There's the incorrect link descriptions on
+dsa-port.yaml as confirmed by Vladimir on the discussion of v1 series so
+I'll fix that.
+
+I've also got some ethernet controller rules that I think won't break any
+driver so I will submit them as well.
+
+Arınç
 
