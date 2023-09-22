@@ -1,163 +1,140 @@
-Return-Path: <netdev+bounces-35898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB3D47AB81D
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 19:50:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE9757AB8EA
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 20:13:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by am.mirrors.kernel.org (Postfix) with ESMTP id 2A3B31F234A8
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 17:50:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 6012B282229
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 18:13:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D286143AA0;
-	Fri, 22 Sep 2023 17:50:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B309C45F4B;
+	Fri, 22 Sep 2023 18:13:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A2D043A9E
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 17:50:33 +0000 (UTC)
-Received: from omta36.uswest2.a.cloudfilter.net (omta36.uswest2.a.cloudfilter.net [35.89.44.35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43F30CDD
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 10:50:29 -0700 (PDT)
-Received: from eig-obgw-6002a.ext.cloudfilter.net ([10.0.30.222])
-	by cmsmtp with ESMTP
-	id jjHfqsSSMEoVsjkIPqCs1M; Fri, 22 Sep 2023 17:50:29 +0000
-Received: from gator4166.hostgator.com ([108.167.133.22])
-	by cmsmtp with ESMTPS
-	id jkIOqVZNReD44jkIOq8935; Fri, 22 Sep 2023 17:50:28 +0000
-X-Authority-Analysis: v=2.4 cv=ArD9YcxP c=1 sm=1 tr=0 ts=650dd3e4
- a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=P7XfKmiOJ4/qXqHZrN7ymg==:17
- a=OWjo9vPv0XrRhIrVQ50Ab3nP57M=:19 a=dLZJa+xiwSxG16/P+YVxDGlgEgI=:19
- a=IkcTkHD0fZMA:10 a=zNV7Rl7Rt7sA:10 a=wYkD_t78qR0A:10 a=NEAV23lmAAAA:8
- a=J1Y8HTJGAAAA:8 a=1XWaLZrsAAAA:8 a=VwQbUJbxAAAA:8 a=20KFwNOVAAAA:8
- a=cm27Pg_UAAAA:8 a=YSKGN3ub9cUXa_79IdMA:9 a=QEXdDO2ut3YA:10
- a=y1Q9-5lHfBjTkpIzbSAN:22 a=AjGcO6oz07-iQ99wixmX:22 a=xmb-EsYY8bH0VWELuYED:22
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=LPvTS1JzLrPismrf0ber/g2NvMqPEXpyMEUgBlNSyx4=; b=IxJX69U/JBsYGBW9ZV493LUEH1
-	y/qZBCwU71a2dCSFaPOR+ELmo2S7dIQnOQN1I0vArT5N8krNNGsGB6BRp/TOhHlh8K9mLDH+9eyvj
-	eYM17ijyOgXB4Bo3yHFbkyTdiz/Ib70vKx8rNQ+Z3SsLa6wAQ+s6Ko9SEgYBrl5ieIKGYBAto9prW
-	cKixZSotOqr9gIjhuK98DWEt1yikfE3iIhcLNLiQqZZ3AQZAbgGi4ZEzq5E1FPMTnb4wI4nlk7aQX
-	EGtqe9Gmz2LkXaymYyyMRRgBn/oLq5VUa3M0cOFaBUyk0U4gO3mxRKn3tQPkD6a6OKAV1/DQimIr9
-	smbUw4Dw==;
-Received: from [94.239.20.48] (port=35670 helo=[192.168.1.98])
-	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96)
-	(envelope-from <gustavo@embeddedor.com>)
-	id 1qjkIL-004OGj-0o;
-	Fri, 22 Sep 2023 12:50:25 -0500
-Message-ID: <68545f64-067f-4109-8e63-dd00d92cbe09@embeddedor.com>
-Date: Fri, 22 Sep 2023 19:51:22 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F88244483
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 18:13:25 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15C009F;
+	Fri, 22 Sep 2023 11:13:24 -0700 (PDT)
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38MI7TrA018275;
+	Fri, 22 Sep 2023 18:13:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=tXL9ZfYTERR3en1PBqoFEJXsooQVxAx94EFww22n28M=;
+ b=YB1Yic+Ha629EOugPehYhBqa0hKg3NAiiD3Z+q3pT8w44sY1n4aNhIWRAGUjp4X0VBCt
+ XLdZq3hI2nA8KMVbAf1IFuhGL22xqTND6yxJUgt6oJ3FIqZALGxJNEKaCZbpHxQlfDmc
+ AecUUEeZcBe2Koaewtlacrm/LZsVPZjBU3ARH2Nl3pVlcz9D2uBaiq+YAvitYFnjM3g1
+ lys6jAY072m9wZ9SfDTO9NlRrD597kJEzHSLLb1SPz+yEIF1P+EFiXIsCT7/L/YLYai3
+ /6S4NMsslbZV6XtLoqbD0um1LLiPYFRVHo/HQzJIHjCYBVt//5qvikZ/cyx7V878ICi1 0g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t9f8y8wrm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 22 Sep 2023 18:13:19 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38MI7iui020475;
+	Fri, 22 Sep 2023 18:13:19 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3t9f8y8wr5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 22 Sep 2023 18:13:19 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38MHKkdS015474;
+	Fri, 22 Sep 2023 18:13:17 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3t8tspphbv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 22 Sep 2023 18:13:17 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38MIDEfP22938114
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 22 Sep 2023 18:13:14 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B08752004B;
+	Fri, 22 Sep 2023 18:13:14 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id F1BE420043;
+	Fri, 22 Sep 2023 18:13:13 +0000 (GMT)
+Received: from [9.171.80.27] (unknown [9.171.80.27])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 22 Sep 2023 18:13:13 +0000 (GMT)
+Message-ID: <b7dad8b72ec94d27378eca87fea4cb0c86b8c361.camel@linux.ibm.com>
+Subject: Re: [PATCH net-next 01/18] net/smc: decouple ism_dev from SMC-D
+ device dump
+From: Gerd Bayer <gbayer@linux.ibm.com>
+To: Wen Gu <guwen@linux.alibaba.com>, Simon Horman <horms@kernel.org>
+Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Date: Fri, 22 Sep 2023 20:13:13 +0200
+In-Reply-To: <2c9d570c-f780-0484-a26c-78b115e1a6a3@linux.alibaba.com>
+References: <1695134522-126655-1-git-send-email-guwen@linux.alibaba.com>
+	 <1695134522-126655-2-git-send-email-guwen@linux.alibaba.com>
+	 <20230921204153.GQ224399@kernel.org>
+	 <2c9d570c-f780-0484-a26c-78b115e1a6a3@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.module_f38+17164+63eeee4a) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH 03/14] ipv6: Annotate struct ip6_sf_socklist with
- __counted_by
-Content-Language: en-US
-To: Kees Cook <keescook@chromium.org>, Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, Jamal Hadi Salim <jhs@mojatatu.com>,
- David Ahern <dsahern@kernel.org>, Martin KaFai Lau <martin.lau@kernel.org>,
- "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Yisen Zhuang <yisen.zhuang@huawei.com>,
- Salil Mehta <salil.mehta@huawei.com>, Claudiu Manoil
- <claudiu.manoil@nxp.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- "K. Y. Srinivasan" <kys@microsoft.com>,
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
- Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>,
- Ajay Sharma <sharmaajay@microsoft.com>, Alex Elder <elder@kernel.org>,
- Pravin B Shelar <pshelar@ovn.org>, Shaokun Zhang
- <zhangshaokun@hisilicon.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>, Nathan Chancellor <nathan@kernel.org>,
- Nick Desaulniers <ndesaulniers@google.com>, Tom Rix <trix@redhat.com>,
- Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
- linux-hyperv@vger.kernel.org, linux-rdma@vger.kernel.org,
- dev@openvswitch.org, linux-parisc@vger.kernel.org, llvm@lists.linux.dev,
- linux-hardening@vger.kernel.org
-References: <20230922172449.work.906-kees@kernel.org>
- <20230922172858.3822653-3-keescook@chromium.org>
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-In-Reply-To: <20230922172858.3822653-3-keescook@chromium.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 94.239.20.48
-X-Source-L: No
-X-Exim-ID: 1qjkIL-004OGj-0o
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: ([192.168.1.98]) [94.239.20.48]:35670
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 106
-X-Org: HG=hgshared;ORG=hostgator;
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
-X-CMAE-Envelope: MS4xfAJc/08XeNuhGLgSP2GBTsaTBx1P9Qn2CfF7w92Zi3KUQJa9ok3l9Qe/xhG7PEkFDB8AtwTpBZf+c/Wab5t+F5+SRETOeso7nA7UQMSOkpeCu0QZv+Px
- F0DJn2bJ8RXC3t0YRf8tIcLChJ7FPJY5GU11pOja9XOttEGX07x7MZXu9qKusYJJqFfoGtGrb8uOFDndX5X8/Z6ptVT0gBxQP3M=
-X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,DATE_IN_FUTURE_06_12,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 3D4AtFu0GrkfgE5YJ6-yJxHczBLp0Bq3
+X-Proofpoint-GUID: gVtzBIBRzLHhqbexIMkocvwnOQ7UsNQr
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-09-22_16,2023-09-21_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
+ phishscore=0 mlxlogscore=779 spamscore=0 lowpriorityscore=0
+ priorityscore=1501 impostorscore=0 bulkscore=0 suspectscore=0
+ clxscore=1011 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2309180000 definitions=main-2309220156
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Fri, 2023-09-22 at 16:05 +0800, Wen Gu wrote:
+> On 2023/9/22 04:41, Simon Horman wrote:
+> > On Tue, Sep 19, 2023 at 10:41:45PM +0800, Wen Gu wrote:
+> >=20
+> > priv_dev is uninitialised here.
+> >=20
+> > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0smc_set_pci_values(to_pci_=
+dev(ism->dev.parent),
+> > > &smc_pci_dev);
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (smcd->ops->get_dev)
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0priv_dev =3D smcd->ops->get_dev(smcd);
+> >=20
+> > It is conditionally initialised here.
+> >=20
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (priv_dev->parent)
+> >=20
+> > But unconditionally dereferenced here.
+> >=20
+> > As flagged by clang-16 W=3D1, and Smatch
+> >=20
+>=20
+> Hi Simon. Yes, I fixed it in v3. Thank you!
 
+Hi Wen Gu,
 
-On 9/22/23 11:28, Kees Cook wrote:
-> Prepare for the coming implementation by GCC and Clang of the __counted_by
-> attribute. Flexible array members annotated with __counted_by can have
-> their accesses bounds-checked at run-time checking via CONFIG_UBSAN_BOUNDS
-> (for array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
-> functions).
-> 
-> As found with Coccinelle[1], add __counted_by for struct ip6_sf_socklist.
-> 
-> [1] https://github.com/kees/kernel-tools/blob/trunk/coccinelle/examples/counted_by.cocci
-> 
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: netdev@vger.kernel.org
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+seems like there is some email filter at work. Neither v2 nor v3 made
+it to the netdev mailing list - nor to patchwork.kernel.org.
+There's traces of Wenjia's replies and your replies to her - but not
+the original mail.
 
-Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-
-Thanks
--- 
-Gustavo
-
-> ---
->   include/net/if_inet6.h | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/include/net/if_inet6.h b/include/net/if_inet6.h
-> index c8490729b4ae..3e454c4d7ba6 100644
-> --- a/include/net/if_inet6.h
-> +++ b/include/net/if_inet6.h
-> @@ -89,7 +89,7 @@ struct ip6_sf_socklist {
->   	unsigned int		sl_max;
->   	unsigned int		sl_count;
->   	struct rcu_head		rcu;
-> -	struct in6_addr		sl_addr[];
-> +	struct in6_addr		sl_addr[] __counted_by(sl_max);
->   };
->   
->   #define IP6_SFBLOCK	10	/* allocate this many at once */
+Could you please check? Thanks!
+Gerd
 
