@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-35650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC4687AA75E
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 05:42:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 019F97AA75F
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 05:42:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id DD6611C2096F
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 03:42:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id D641F1C20B8B
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 03:42:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD7271844;
-	Fri, 22 Sep 2023 03:42:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4710CA5B;
+	Fri, 22 Sep 2023 03:42:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 069C117E3
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 03:42:31 +0000 (UTC)
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDF27E8
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 20:42:30 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59c4ec85ea9so23526127b3.0
-        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 20:42:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF1B10FF
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 03:42:33 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7B57CC
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 20:42:31 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59c0eb18f09so23256837b3.2
+        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 20:42:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695354150; x=1695958950; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1695354151; x=1695958951; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KAXfaDq5o/U4CNkRJJ9vfHLNSgkjhaG3ePlNPBwX+Zc=;
-        b=CyXDIPrjDPais0uJYZIabKZw140eWv1DC6J1CKZ0QchslFzo3kqn88gJCGk1K1rzRA
-         WhDOV1YPCxhOz7hUNWcG7OKXIMW6LaibHbdzC7BwoPVt9F+cGPULFjX370SYB3N3n6nQ
-         yeYM5gcB1SrnNuhUtKNRT9X6ZrqMIkMd4nGLShKP9gTpymsKyupQo4eVuwO7274VUy/e
-         1Xqlp+NuBUxtuHqi8k0Y+Atpp6Kwjd/ZrXJhLDR0i+39t/hqWa+R7iFdc0tZ1pMzjGkR
-         nHmSQXHgmOqEsdQJLwuz01qdIaDlauarhzaJj7ucrmmjOyEOiObQjE4h8/myQNUQH7Uz
-         GA7w==
+        bh=lN5SHdGTtSiIBimeJqkKHD15hOXuYc81ODJ2mQLbnM8=;
+        b=blc/nKwJba9AgQfRbYWPGTKSeuk/544+WXATHnnVhM3VAcHuMkg81r+FZ/DKyG5kJ5
+         EqlQGSpeOJvpMz7y1tBN46mr3Zu1WW9BW9XoOObHIbUJpp5PYI2892Ff1aGOsafbjaXd
+         1xmzr3lDVnye845SpzYCBmoUOjxTP+L3fcZn7y9tjhP+9anPEStuxPjsFL7YUdIaeLZU
+         8dOEp680xg4qRxiSGmYYothwShz23Ol7rE2Q5oRZaZkiTdrS9OyAJFMFKDQfaSm4Rm7s
+         JMno23sutOaTe5/sh7OmYALbW98t9sMwUBeVo4iTjvuAF4iRiU4ECSkZ58RF/P0AvkOz
+         FzEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695354150; x=1695958950;
+        d=1e100.net; s=20230601; t=1695354151; x=1695958951;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KAXfaDq5o/U4CNkRJJ9vfHLNSgkjhaG3ePlNPBwX+Zc=;
-        b=Vqt+f8ttCls6Lc0CGjI8MZNtV/wZoUTjHIOblDvUHknYFscHVIqo4j9Ds7NGuYJy4b
-         xzCNAOTvaZG8Z206VIGU/NYPi7zzEgjd4btpMFDrln0A3ijt0f8YCplPLZ6fSHrWaAvQ
-         TVxhSICL1rpVV1X6qbeUCKBVn8PjqNomgGg9lIsGlQuzkEKMOehxgYA+zLzghQucprQ5
-         QYWVQP7vRz4umxeNSsC/wX+FZxp6avOQJPwBPnjidl2kQRSRx/LOuzMta3KjdJNLiu3w
-         /DeUUdIozka6aHM+Pvi5735hrMilsINWJl5iRJlQnFv7sTc/R4b0spBKfTqgBIQdZ8X9
-         HykA==
-X-Gm-Message-State: AOJu0YyFPSSO1GQ2Vl0MrRoINi7/XLOb+QWZDHqtVKoCXyyFAuEiVsqh
-	f8+NZMb9sHAw3Ko410z2V5D5RyQI1+C3RQ==
-X-Google-Smtp-Source: AGHT+IHxVhCcWE7LDM/Lsrw5TGyKrzYfGzh6LY1G9ocXyBovGcD3Np2GwqMTLqlZEhQ4W4KaTfhSxPBzGCoMTA==
+        bh=lN5SHdGTtSiIBimeJqkKHD15hOXuYc81ODJ2mQLbnM8=;
+        b=mO2vzjW+ubvCchQCN0ByDRwWW7/dZ0nHHX37ZmnhzRu7I4VXDTahjj3sLmGQlnjYPd
+         qUjDAliWO7FkjBZACF4nbjGAcCOcvMiG+Ad06KIDFFupwaP1QJTTtiHmmn8xbMUs2twS
+         9Tqh8C5SLMFqE6MBrGehELMaysY51J+c5DOR9EtaaX9SCtZhVsUn3VQgdizMpMZHDrhg
+         wJD5U03Fu117zF9f/x8sVMbjIMvsO51heea8XZyk5fW6wOw6NRIoDtSQBWoM0jd7m0+c
+         U1ydt7uxwHJSOQ4LCCysdjvBwycjtAIMuGo+BWD4s9nCB8i2t4j0VzSWD3jRQbzAa8vr
+         7+qQ==
+X-Gm-Message-State: AOJu0Yzvsam3F+nKSz7t3zxLxPQrhzOvF1zsvaJItVmQdYXm07Fa+KYZ
+	SaXCiExuYq2za1hvkVC/WBDvfpaMZuH2NA==
+X-Google-Smtp-Source: AGHT+IEm2/XBA6F4BSgrsxDukIw4lakWVVxYmNhH555JIjJZysCvRs0v3GbeS82mPJRfi6Lb9ZsOxJW6xya7Hg==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a81:c549:0:b0:59b:edd3:fdab with SMTP id
- o9-20020a81c549000000b0059bedd3fdabmr97970ywj.4.1695354149896; Thu, 21 Sep
- 2023 20:42:29 -0700 (PDT)
-Date: Fri, 22 Sep 2023 03:42:17 +0000
+ (user=edumazet job=sendgmr) by 2002:a81:c842:0:b0:586:a8ab:f8fe with SMTP id
+ k2-20020a81c842000000b00586a8abf8femr128485ywl.10.1695354151164; Thu, 21 Sep
+ 2023 20:42:31 -0700 (PDT)
+Date: Fri, 22 Sep 2023 03:42:18 +0000
 In-Reply-To: <20230922034221.2471544-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -60,8 +60,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20230922034221.2471544-1-edumazet@google.com>
 X-Mailer: git-send-email 2.42.0.515.g380fc7ccd1-goog
-Message-ID: <20230922034221.2471544-5-edumazet@google.com>
-Subject: [PATCH v2 net-next 4/8] inet: lockless getsockopt(IP_OPTIONS)
+Message-ID: <20230922034221.2471544-6-edumazet@google.com>
+Subject: [PATCH v2 net-next 5/8] inet: lockless getsockopt(IP_MTU)
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -75,23 +75,22 @@ X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-inet->inet_opt being RCU protected, we can use RCU instead
-of locking the socket.
+sk_dst_get() does not require socket lock.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 Reviewed-by: David Ahern <dsahern@kernel.org>
 ---
- net/ipv4/ip_sockglue.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ net/ipv4/ip_sockglue.c | 20 +++++++++-----------
+ 1 file changed, 9 insertions(+), 11 deletions(-)
 
 diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
-index 50c008efbb6de7303621dd30b178c90cb3f5a2fc..45d89487914a12061f05c192004ad79f0abbf756 100644
+index 45d89487914a12061f05c192004ad79f0abbf756..04579e390ddd4dadb8a107ef0b5da15e7a60f1ff 100644
 --- a/net/ipv4/ip_sockglue.c
 +++ b/net/ipv4/ip_sockglue.c
-@@ -1591,27 +1591,20 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
- 	case IP_TOS:
- 		val = READ_ONCE(inet->tos);
- 		goto copyval;
+@@ -1620,13 +1620,6 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
+ 			return -EFAULT;
+ 		return 0;
+ 	}
 -	}
 -
 -	if (needs_rtnl)
@@ -99,40 +98,31 @@ index 50c008efbb6de7303621dd30b178c90cb3f5a2fc..45d89487914a12061f05c192004ad79f
 -	sockopt_lock_sock(sk);
 -
 -	switch (optname) {
- 	case IP_OPTIONS:
+ 	case IP_MTU:
  	{
- 		unsigned char optbuf[sizeof(struct ip_options)+40];
- 		struct ip_options *opt = (struct ip_options *)optbuf;
- 		struct ip_options_rcu *inet_opt;
- 
--		inet_opt = rcu_dereference_protected(inet->inet_opt,
--						     lockdep_sock_is_held(sk));
-+		rcu_read_lock();
-+		inet_opt = rcu_dereference(inet->inet_opt);
- 		opt->optlen = 0;
- 		if (inet_opt)
- 			memcpy(optbuf, &inet_opt->opt,
- 			       sizeof(struct ip_options) +
- 			       inet_opt->opt.optlen);
--		sockopt_release_sock(sk);
-+		rcu_read_unlock();
- 
- 		if (opt->optlen == 0) {
- 			len = 0;
-@@ -1627,6 +1620,13 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
- 			return -EFAULT;
- 		return 0;
- 	}
+ 		struct dst_entry *dst;
+@@ -1636,12 +1629,17 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
+ 			val = dst_mtu(dst);
+ 			dst_release(dst);
+ 		}
+-		if (!val) {
+-			sockopt_release_sock(sk);
++		if (!val)
+ 			return -ENOTCONN;
+-		}
+-		break;
++		goto copyval;
 +	}
+ 	}
 +
 +	if (needs_rtnl)
 +		rtnl_lock();
 +	sockopt_lock_sock(sk);
 +
 +	switch (optname) {
- 	case IP_MTU:
- 	{
- 		struct dst_entry *dst;
+ 	case IP_UNICAST_IF:
+ 		val = (__force int)htonl((__u32) inet->uc_index);
+ 		break;
 -- 
 2.42.0.515.g380fc7ccd1-goog
 
