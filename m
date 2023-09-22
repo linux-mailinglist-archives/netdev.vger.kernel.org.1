@@ -1,109 +1,94 @@
-Return-Path: <netdev+bounces-35815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 383ED7AB21F
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 14:28:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8758B7AB22F
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 14:33:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by am.mirrors.kernel.org (Postfix) with ESMTP id BC72C1F22E9E
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 12:28:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTP id E7D001F22EA3
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 12:33:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECFF122F17;
-	Fri, 22 Sep 2023 12:28:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4A621DDEC;
+	Fri, 22 Sep 2023 12:33:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1083168AA
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 12:28:43 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31DA71A5;
-	Fri, 22 Sep 2023 05:28:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=/hHJSVVNBq+Q25kH/Q3wHbSMiRa2RSWRIm+2U1rOzjk=; b=RGnfJOeunzJN6IjLYEZrXxcAL/
-	fpuqpfDgH6Qj5AGs24gad1FLT/whsUz9i+WsoI2JuCWqvJREJGjVEjZGDNHJYKJ6ciBPPNTd/I/0+
-	Zj7N6VWu/XuVFoJ4TnxeWgPsNcLEZE4uTMKvr56eStvdFil+9r9xQ7pQu1x1FCDurx1c=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qjfGQ-007CHP-5B; Fri, 22 Sep 2023 14:28:06 +0200
-Date: Fri, 22 Sep 2023 14:28:06 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Vincent Whitchurch <vincent.whitchurch@axis.com>,
-	Raju Rangoju <rajur@chelsio.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Ping-Ke Shih <pkshih@realtek.com>, Kalle Valo <kvalo@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jiri Pirko <jiri@resnulli.us>, Hangbin Liu <liuhangbin@gmail.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-wireless@vger.kernel.org
-Subject: Re: [net-next PATCH 3/3] net: stmmac: increase TX coalesce timer to
- 5ms
-Message-ID: <13bc074d-30c2-4bbf-8b4c-82f561c844b0@lunn.ch>
-References: <20230922111247.497-1-ansuelsmth@gmail.com>
- <20230922111247.497-3-ansuelsmth@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7B9225100;
+	Fri, 22 Sep 2023 12:33:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68252C433C7;
+	Fri, 22 Sep 2023 12:33:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695386016;
+	bh=RzoEDKgXA9Plve5Vj9i1yQ82lvCPe4tIm9i1J+xrNbo=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=WXWXW5xBiYKZk3MrZ3MFLRAgcBn0R31B8ZNj2AuqPCzk+0Wzk6sgKzXf7UHDyh/n0
+	 dV4FcaGJTmvygVdouHHwRcrTHWKun9ktn8gwloWlIF7vCBQS1eWCq/O5AKOlDJVmnt
+	 XLNSnLPYo1j9Gug2yMjntpdQjIWXPUeFu5xqBC7rC2UnpsFat6nj8TcuhfXh01qJUC
+	 jeZGohmVpJSgSmtql/ZqFWiYyvRnDAsPOAm1VZJFoYdvCRBTE1apiup+5laG9NfQ9O
+	 01D9CnITZPeK7d4eGlyMYc7adVzZk112bEqkg6sTtQpxhWLKexeAtRKB2ViyP8mOuY
+	 j4yZ3wRBvNfYQ==
+Received: (nullmailer pid 2919399 invoked by uid 1000);
+	Fri, 22 Sep 2023 12:33:32 -0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230922111247.497-3-ansuelsmth@gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+From: Rob Herring <robh@kernel.org>
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: linux-arm-kernel@lists.infradead.org, Randy Dunlap <rdunlap@infradead.org>, Takashi Iwai <tiwai@suse.com>, Simon Horman <horms@kernel.org>, Jaroslav Kysela <perex@perex.cz>, Liam Girdwood <lgirdwood@gmail.com>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>, linux-gpio@vger.kernel.org, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, netdev@vger.kernel.org, Fabio Estevam <festevam@gmail.com>, Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>, Christophe JAILLET <christophe.jaillet@wanadoo.fr>, Christophe Leroy <christophe.leroy@csgroup.eu>, Nicolin Chen <nicoleotsuka@gmail.com>, Conor Dooley <conor+dt@kernel.org>, Mark Brown <broonie@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, alsa-devel@alsa-project.org, Paolo Abeni <pabeni@redhat.com>, Lee Jones <lee@kernel.org>, linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Xiubo Li <Xiubo.Lee@gmail.com>, Rob Herring <robh+dt@kernel.org>, Shengjiu Wan
+ g <shengjiu.wang@gmail.com>, linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org, Li Yang <leoyang.li@nxp.com>, Qiang Zhao <qiang.zhao@nxp.com>
+In-Reply-To: <20230922075913.422435-26-herve.codina@bootlin.com>
+References: <20230922075913.422435-1-herve.codina@bootlin.com>
+ <20230922075913.422435-26-herve.codina@bootlin.com>
+Message-Id: <169538601225.2919383.2942072541503354871.robh@kernel.org>
+Subject: Re: [PATCH v6 25/30] dt-bindings: net: Add the Lantiq PEF2256
+ E1/T1/J1 framer
+Date: Fri, 22 Sep 2023 07:33:32 -0500
 
-On Fri, Sep 22, 2023 at 01:12:47PM +0200, Christian Marangi wrote:
-> Commit 8fce33317023 ("net: stmmac: Rework coalesce timer and fix
-> multi-queue races") decreased the TX coalesce timer from 40ms to 1ms.
+
+On Fri, 22 Sep 2023 09:59:00 +0200, Herve Codina wrote:
+> The Lantiq PEF2256 is a framer and line interface component designed to
+> fulfill all required interfacing between an analog E1/T1/J1 line and the
+> digital PCM system highway/H.100 bus.
 > 
-> This caused some performance regression on some target (regression was
-> reported at least on ipq806x) in the order of 600mbps dropping from
-> gigabit handling to only 200mbps.
+> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+> Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+> ---
+>  .../bindings/net/lantiq,pef2256.yaml          | 214 ++++++++++++++++++
+>  1 file changed, 214 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/lantiq,pef2256.yaml
 > 
-> The problem was identified in the TX timer getting armed too much time.
-> While this was fixed and improved in another commit, performance can be
-> improved even further by increasing the timer delay a bit moving from
-> 1ms to 5ms.
-> 
-> The value is a good balance between battery saving by prevending too
-> much interrupt to be generated and permitting good performance for
-> internet oriented devices.
 
-ethtool has a settings you can use for this:
+My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
+on your patch (DT_CHECKER_FLAGS is new in v5.13):
 
-      ethtool -C|--coalesce devname [adaptive-rx on|off] [adaptive-tx on|off]
-              [rx-usecs N] [rx-frames N] [rx-usecs-irq N] [rx-frames-irq N]
-              [tx-usecs N] [tx-frames N] [tx-usecs-irq N] [tx-frames-irq N]
-              [stats-block-usecs N] [pkt-rate-low N] [rx-usecs-low N]
-              [rx-frames-low N] [tx-usecs-low N] [tx-frames-low N]
-              [pkt-rate-high N] [rx-usecs-high N] [rx-frames-high N]
-              [tx-usecs-high N] [tx-frames-high N] [sample-interval N]
-              [cqe-mode-rx on|off] [cqe-mode-tx on|off] [tx-aggr-max-bytes N]
-              [tx-aggr-max-frames N] [tx-aggr-time-usecs N]
+yamllint warnings/errors:
 
-If this is not implemented, i suggest you add support for it.
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/lantiq,pef2256.yaml: properties:lantiq,data-rate-bps: '$ref' should not be valid under {'const': '$ref'}
+	hint: Standard unit suffix properties don't need a type $ref
+	from schema $id: http://devicetree.org/meta-schemas/core.yaml#
 
-Changing the default might cause regressions. Say there is a VoIP
-application which wants this low latency? It would be safer to allow
-user space to configure it as wanted.
+doc reference errors (make refcheckdocs):
 
-     Andrew
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20230922075913.422435-26-herve.codina@bootlin.com
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
+
 
