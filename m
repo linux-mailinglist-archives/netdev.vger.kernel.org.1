@@ -1,109 +1,128 @@
-Return-Path: <netdev+bounces-35732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0D007AACED
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 10:42:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC1CE7AAD39
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 10:55:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 0191CB209CC
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 08:42:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 44ADB281D5C
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 08:55:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B152A4416;
-	Fri, 22 Sep 2023 08:42:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25439168DB;
+	Fri, 22 Sep 2023 08:55:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C07A0EB8
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 08:42:13 +0000 (UTC)
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55225FB;
-	Fri, 22 Sep 2023 01:42:10 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0Vscql3G_1695372126;
-Received: from 30.221.128.225(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0Vscql3G_1695372126)
-          by smtp.aliyun-inc.com;
-          Fri, 22 Sep 2023 16:42:07 +0800
-Message-ID: <b7684046-39eb-f0a1-a1ff-12580d8db42e@linux.alibaba.com>
-Date: Fri, 22 Sep 2023 16:42:05 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6F4514F6F;
+	Fri, 22 Sep 2023 08:55:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B218CC433C9;
+	Fri, 22 Sep 2023 08:55:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695372943;
+	bh=8QkGhwghTGYPhExKboS3z0PsUiDKGGvXCleAsd5SH5o=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=CjAAOHnW+m8+RDAztDmFbJSI8mdUHvPboMtroHiybyvatO27zYyfR1Wv55g8Fv01I
+	 te0s9HGkJ0VGUxcVzi6S21q5ZnP3kW3G91E9EzkcgwFh/S+KI1A7tuuEMTGE3HIqBt
+	 6nRrji+IFh6kZxhnMEpdwcEddc5XEiLgoKEsYESe9+KRFo95Dw/rmUlDTh3/54BTTX
+	 9KM5MArpAD0s7o4CKVI6Ii4apE868YOc1Vz8d3/fGW7P9s5e+247+f0d/ycaOQufD9
+	 8mHhukuVVMeyYfCV4bv8fVCeskg+IFFN9ztlmxGPfhc3ExSSu6BsWAGJwgW8ktELWJ
+	 FSaXLLenObg+g==
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-502a4f33440so3234084e87.1;
+        Fri, 22 Sep 2023 01:55:43 -0700 (PDT)
+X-Gm-Message-State: AOJu0YyoBMjZb8rQESVje9/kRPLVWuTOkCtq5JEZr4gWNmQaTKnELTh/
+	rNJEHyctSpE+6kVmt2HO/SEyUHB8fr33pwPeRNw=
+X-Google-Smtp-Source: AGHT+IF8cgUepodrWyUy99Ge6z4o9GbKwpmdAjZ3R33ypUsIeilkKxYeO+uhK8l2iNZFEKGHs3hnsEm9jfUciGjro48=
+X-Received: by 2002:ac2:5bc5:0:b0:503:79e:fb7b with SMTP id
+ u5-20020ac25bc5000000b00503079efb7bmr6817575lfn.68.1695372941964; Fri, 22 Sep
+ 2023 01:55:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.0
-Subject: Re: [PATCH net-next v3 05/18] net/smc: reserve CHID range for SMC-D
- virtual device
-To: Wenjia Zhang <wenjia@linux.ibm.com>, kgraul@linux.ibm.com,
- jaka@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
-Cc: alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <1695302360-46691-1-git-send-email-guwen@linux.alibaba.com>
- <1695302360-46691-6-git-send-email-guwen@linux.alibaba.com>
- <0a150c58-5fdc-5e8d-1ea6-861406f2c70a@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <0a150c58-5fdc-5e8d-1ea6-861406f2c70a@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-11.4 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+References: <20230918072955.2507221-1-rppt@kernel.org> <20230918072955.2507221-7-rppt@kernel.org>
+ <CAPhsuW73NMvdpmyrhGouQSAHEL9wRw_A+8dZ-5R4BU=UHH83cw@mail.gmail.com> <9b73ad3d-cfda-bce5-2589-e8674a58c827@csgroup.eu>
+In-Reply-To: <9b73ad3d-cfda-bce5-2589-e8674a58c827@csgroup.eu>
+From: Song Liu <song@kernel.org>
+Date: Fri, 22 Sep 2023 01:55:29 -0700
+X-Gmail-Original-Message-ID: <CAPhsuW4_3oYhN6LnPPyBVA4VAM=7voXKmcJNKLqiNEUboq1rnA@mail.gmail.com>
+Message-ID: <CAPhsuW4_3oYhN6LnPPyBVA4VAM=7voXKmcJNKLqiNEUboq1rnA@mail.gmail.com>
+Subject: Re: [PATCH v3 06/13] mm/execmem: introduce execmem_data_alloc()
+To: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: Mike Rapoport <rppt@kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	=?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, "David S. Miller" <davem@davemloft.net>, 
+	Dinh Nguyen <dinguyen@kernel.org>, Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>, 
+	Huacai Chen <chenhuacai@kernel.org>, Kent Overstreet <kent.overstreet@linux.dev>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Nadav Amit <nadav.amit@gmail.com>, 
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Puranjay Mohan <puranjay12@gmail.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	Russell King <linux@armlinux.org.uk>, Steven Rostedt <rostedt@goodmis.org>, 
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Thomas Gleixner <tglx@linutronix.de>, 
+	Will Deacon <will@kernel.org>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
+	"linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
+	"linux-modules@vger.kernel.org" <linux-modules@vger.kernel.org>, 
+	"linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>, 
+	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>, 
+	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>, 
+	"linux-trace-kernel@vger.kernel.org" <linux-trace-kernel@vger.kernel.org>, 
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>, 
+	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Sep 22, 2023 at 12:17=E2=80=AFAM Christophe Leroy
+<christophe.leroy@csgroup.eu> wrote:
+>
+>
+>
+> Le 22/09/2023 =C3=A0 00:52, Song Liu a =C3=A9crit :
+> > On Mon, Sep 18, 2023 at 12:31=E2=80=AFAM Mike Rapoport <rppt@kernel.org=
+> wrote:
+> >>
+> > [...]
+> >> diff --git a/include/linux/execmem.h b/include/linux/execmem.h
+> >> index 519bdfdca595..09d45ac786e9 100644
+> >> --- a/include/linux/execmem.h
+> >> +++ b/include/linux/execmem.h
+> >> @@ -29,6 +29,7 @@
+> >>    * @EXECMEM_KPROBES: parameters for kprobes
+> >>    * @EXECMEM_FTRACE: parameters for ftrace
+> >>    * @EXECMEM_BPF: parameters for BPF
+> >> + * @EXECMEM_MODULE_DATA: parameters for module data sections
+> >>    * @EXECMEM_TYPE_MAX:
+> >>    */
+> >>   enum execmem_type {
+> >> @@ -37,6 +38,7 @@ enum execmem_type {
+> >>          EXECMEM_KPROBES,
+> >>          EXECMEM_FTRACE,
+> >
+> > In longer term, I think we can improve the JITed code and merge
+> > kprobe/ftrace/bpf. to use the same ranges. Also, do we need special
+> > setting for FTRACE? If not, let's just remove it.
+>
+> How can we do that ? Some platforms like powerpc require executable
+> memory for BPF and non-exec mem for KPROBE so it can't be in the same
+> area/ranges.
 
+Hmm... non-exec mem for kprobes?
 
-On 2023/9/22 07:32, Wenjia Zhang wrote:
-> 
-> 
-> On 21.09.23 15:19, Wen Gu wrote:
->> This patch reserve CHID range from 0xFF00 to 0xFFFF for SMC-D virtual
->> device and introduces helpers to identify them.
->>
->> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
->> ---
->>   net/smc/smc_ism.h | 15 +++++++++++++++
->>   1 file changed, 15 insertions(+)
->>
->> diff --git a/net/smc/smc_ism.h b/net/smc/smc_ism.h
->> index 14d2e77..2ecc8de 100644
->> --- a/net/smc/smc_ism.h
->> +++ b/net/smc/smc_ism.h
->> @@ -15,6 +15,9 @@
->>   #include "smc.h"
->> +#define SMC_VIRT_ISM_CHID_MAX        0xFFFF
->> +#define SMC_VIRT_ISM_CHID_MIN        0xFF00
->> +
->>   struct smcd_dev_list {    /* List of SMCD devices */
->>       struct list_head list;
->>       struct mutex mutex;    /* Protects list of devices */
->> @@ -57,4 +60,16 @@ static inline int smc_ism_write(struct smcd_dev *smcd, u64 dmb_tok,
->>       return rc < 0 ? rc : 0;
->>   }
->> +static inline bool __smc_ism_is_virtdev(u16 chid)
->> +{
->> +    return (chid >= SMC_VIRT_ISM_CHID_MIN && chid <= SMC_VIRT_ISM_CHID_MAX);
->> +}
->> +
->> +static inline bool smc_ism_is_virtdev(struct smcd_dev *smcd)
->> +{
->> +    u16 chid = smcd->ops->get_chid(smcd);
->> +
->> +    return __smc_ism_is_virtdev(chid);
->> +}
->> +
-> I'm wondering if barrier is needed here.
+       if (strict_module_rwx_enabled())
+               execmem_params.ranges[EXECMEM_KPROBES].pgprot =3D PAGE_KERNE=
+L_ROX;
+       else
+               execmem_params.ranges[EXECMEM_KPROBES].pgprot =3D PAGE_KERNE=
+L_EXEC;
 
-I think this helper doesn't involve memory race or multi-threaded/multi-processor
-cases that needs enforcing ordering and synchronization of memory operations.
+Do you mean the latter case?
 
-So IMHO barrier is no very necessary here.
-
-Thank you.
-
->>   #endif
+Thanks,
+Song
 
