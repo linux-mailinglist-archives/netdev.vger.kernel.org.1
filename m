@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-35712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90A2C7AAB3A
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 10:00:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11D6D7AAB3C
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 10:00:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by am.mirrors.kernel.org (Postfix) with ESMTP id E50FD1F224A2
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 08:00:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id B98C4282DF6
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 08:00:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 659371A72F;
-	Fri, 22 Sep 2023 08:00:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50C3B1A735;
+	Fri, 22 Sep 2023 08:00:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BD811DA27;
-	Fri, 22 Sep 2023 08:00:48 +0000 (UTC)
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA7FD1999;
-	Fri, 22 Sep 2023 01:00:24 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPA id A7EFC1BF216;
-	Fri, 22 Sep 2023 08:00:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C57471DA2B;
+	Fri, 22 Sep 2023 08:00:52 +0000 (UTC)
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::228])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96723CDB;
+	Fri, 22 Sep 2023 01:00:29 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPA id 92ECE1BF21C;
+	Fri, 22 Sep 2023 08:00:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1695369623;
+	t=1695369628;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=6W9oVhEO6bMU8YfnlBol3aSpzYKADclXRgrQd2t+5FA=;
-	b=Yor/n7xGZdLQcJp6ER/JjiWnt7s5zrlnCnJxQAT49zDwFT7e/gV5E/sLL5EXnd2SeT1Byu
-	CWROpFgR34bTVDfRFTpSM7wa9mnYF8wmOBo/5T/aahTrNfvKJm9m+DZFbDlPDbRMEhHVEx
-	SU8BR/+HVHc99eQSvgZvcTChkxXVTViQnWPoIp2rEIhPDK2RcrETWT8IGLVx/6RcBmHEfD
-	QIJWf4xJIYVZFrbQLAUMP8JcmoswtaY642hwxUnMvpxzKdRoZev7aA/hE7p75ray7ztdit
-	+DpUT2YR9CKtIDLo7z2KaKXnJ3qP9o/idrZDXwCUoCRIQEwy/62LSGNO9UPOtg==
+	bh=o/xbDf8eMD5E6WB0NjH/5DUWVpmxRzR+EOenyt8frKM=;
+	b=m4PUcdB2hwlwOLHtO08bRzFGFp4Ckfi5VE/iCrhfsY1LbRe3Fkc88jks0GvifP+FCDLwUv
+	TfRmyGm9TgPN1N5CKTAPebWaGZUrUjHrg3ZZJ7aP4hJbhd93FqvKAEkx0VhQKoxOZWSGDy
+	KW2jXf+H+t8r7fk58QR8DnaZk9iYM0pSljKMWQlD4d0uKM/dMQOihUdTGUk7xAtdKmleUu
+	6DlH2ksnnDhUFzHbHDaCmON2/30InZS5+yRWdV3wubB0RXdb2mBJYgMmAsO2lQjVxFewLa
+	PNIhFqHLvP0RCZh8rSsTvZ4EjmC271jmOc0ySj4gtg/zytqZZ9oD1oCycUJRrA==
 From: Herve Codina <herve.codina@bootlin.com>
 To: Herve Codina <herve.codina@bootlin.com>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -67,9 +67,9 @@ Cc: netdev@vger.kernel.org,
 	Simon Horman <horms@kernel.org>,
 	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
 	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: [PATCH v6 15/30] soc: fsl: cpm1: qmc: Remove no more needed checks from qmc_check_chans()
-Date: Fri, 22 Sep 2023 09:58:50 +0200
-Message-ID: <20230922075913.422435-16-herve.codina@bootlin.com>
+Subject: [PATCH v6 16/30] soc: fsl: cpm1: qmc: Check available timeslots in qmc_check_chans()
+Date: Fri, 22 Sep 2023 09:58:51 +0200
+Message-ID: <20230922075913.422435-17-herve.codina@bootlin.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230922075913.422435-1-herve.codina@bootlin.com>
 References: <20230922075913.422435-1-herve.codina@bootlin.com>
@@ -83,75 +83,47 @@ Content-Transfer-Encoding: 8bit
 X-GND-Sasl: herve.codina@bootlin.com
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The newly introduced qmc_chan_setup_tsa* functions check that the
-channel entries are not already used.
-These checks are also performed by qmc_check_chans() and are no more
-needed.
+The timeslots checked in qmc_check_chans() are the timeslots used.
+With the introduction of the available timeslots, the used timeslots
+are a subset of the available timeslots. The timeslots checked during
+the qmc_check_chans() call should be the available ones.
 
-Remove them from qmc_check_chans().
+Simply update and check the available timeslots instead of the used
+timeslots in qmc_check_chans().
 
 Signed-off-by: Herve Codina <herve.codina@bootlin.com>
 Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
 ---
- drivers/soc/fsl/qe/qmc.c | 20 --------------------
- 1 file changed, 20 deletions(-)
+ drivers/soc/fsl/qe/qmc.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/soc/fsl/qe/qmc.c b/drivers/soc/fsl/qe/qmc.c
-index 8e8bd1942c08..1189e6076e37 100644
+index 1189e6076e37..269d10cd3c7a 100644
 --- a/drivers/soc/fsl/qe/qmc.c
 +++ b/drivers/soc/fsl/qe/qmc.c
-@@ -884,10 +884,7 @@ EXPORT_SYMBOL(qmc_chan_reset);
- static int qmc_check_chans(struct qmc *qmc)
- {
- 	struct tsa_serial_info info;
--	bool is_one_table = false;
- 	struct qmc_chan *chan;
--	u64 tx_ts_mask = 0;
--	u64 rx_ts_mask = 0;
- 	u64 tx_ts_assigned_mask;
- 	u64 rx_ts_assigned_mask;
- 	int ret;
-@@ -911,7 +908,6 @@ static int qmc_check_chans(struct qmc *qmc)
- 			dev_err(qmc->dev, "Number of TSA Tx/Rx TS assigned are not equal\n");
+@@ -914,13 +914,13 @@ static int qmc_check_chans(struct qmc *qmc)
+ 	rx_ts_assigned_mask = info.nb_rx_ts == 64 ? U64_MAX : (((u64)1) << info.nb_rx_ts) - 1;
+ 
+ 	list_for_each_entry(chan, &qmc->chan_head, list) {
+-		if (chan->tx_ts_mask > tx_ts_assigned_mask) {
+-			dev_err(qmc->dev, "chan %u uses TSA unassigned Tx TS\n", chan->id);
++		if (chan->tx_ts_mask_avail > tx_ts_assigned_mask) {
++			dev_err(qmc->dev, "chan %u can use TSA unassigned Tx TS\n", chan->id);
  			return -EINVAL;
  		}
--		is_one_table = true;
+ 
+-		if (chan->rx_ts_mask > rx_ts_assigned_mask) {
+-			dev_err(qmc->dev, "chan %u uses TSA unassigned Rx TS\n", chan->id);
++		if (chan->rx_ts_mask_avail > rx_ts_assigned_mask) {
++			dev_err(qmc->dev, "chan %u can use TSA unassigned Rx TS\n", chan->id);
+ 			return -EINVAL;
+ 		}
  	}
- 
- 	tx_ts_assigned_mask = info.nb_tx_ts == 64 ? U64_MAX : (((u64)1) << info.nb_tx_ts) - 1;
-@@ -922,27 +918,11 @@ static int qmc_check_chans(struct qmc *qmc)
- 			dev_err(qmc->dev, "chan %u uses TSA unassigned Tx TS\n", chan->id);
- 			return -EINVAL;
- 		}
--		if (tx_ts_mask & chan->tx_ts_mask) {
--			dev_err(qmc->dev, "chan %u uses an already used Tx TS\n", chan->id);
--			return -EINVAL;
--		}
- 
- 		if (chan->rx_ts_mask > rx_ts_assigned_mask) {
- 			dev_err(qmc->dev, "chan %u uses TSA unassigned Rx TS\n", chan->id);
- 			return -EINVAL;
- 		}
--		if (rx_ts_mask & chan->rx_ts_mask) {
--			dev_err(qmc->dev, "chan %u uses an already used Rx TS\n", chan->id);
--			return -EINVAL;
--		}
--
--		if (is_one_table && (chan->tx_ts_mask != chan->rx_ts_mask)) {
--			dev_err(qmc->dev, "chan %u uses different Rx and Tx TS\n", chan->id);
--			return -EINVAL;
--		}
--
--		tx_ts_mask |= chan->tx_ts_mask;
--		rx_ts_mask |= chan->rx_ts_mask;
- 	}
- 
- 	return 0;
 -- 
 2.41.0
 
