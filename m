@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-35916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97F0B7ABB9C
-	for <lists+netdev@lfdr.de>; Sat, 23 Sep 2023 00:04:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B05F7ABB9D
+	for <lists+netdev@lfdr.de>; Sat, 23 Sep 2023 00:04:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 917DF28285B
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 22:04:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 35A2F2829E2
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 22:04:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F35C47C77;
-	Fri, 22 Sep 2023 22:04:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06CD347C6C;
+	Fri, 22 Sep 2023 22:04:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8F9847C6C
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 22:04:04 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94204A7
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 15:04:03 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d7fd4c23315so3666106276.2
-        for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 15:04:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B16447C79
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 22:04:06 +0000 (UTC)
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24D3ACA
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 15:04:05 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d8186d705a9so3964997276.3
+        for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 15:04:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695420243; x=1696025043; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1695420244; x=1696025044; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ba76KfzLtltiSCDhSXln8dsbXSoIWpM8tlwuX9Pp/eA=;
-        b=VCSKRehiImmtiwkvbS+x7WgErfxkwaAjw0H21OLDg48riXFCyDYvKVOdceHKsDtZBb
-         nvBwNyOr9NwxzLuiJ99C+2Lq+bWmHWXjuG9tFrC2VVFyn5nXVLhkqEpTasNV+ZZrEkg7
-         /pcvqdNt1Bw7vUmBAmaofmdgSbvbEy6vMmGCw87VY93OrYPr4cKp18yE9W5GNCKmv1Sr
-         hrkBLQjsy1PrZ4JYoGRKVpKv1A9oWi2LecXNGU5DDLL2Xmu34uFwFEBJyoIe1uTKcbIz
-         4V39DGrJtjBMbE8+pULuW14QBuugFfij2/6LqHdvstNPkKn00MekHmkid0mDWx9+8p6O
-         7arg==
+        bh=vOoHuARRoMJdHZshUfr8rtC8fEwoEwY5sGRuZy8YhbQ=;
+        b=TWnxwhgi8zvvvPGwIrXr/w0ZtT/ZrOghtJbGbU2hJhJf0ZTbiUKFgOZFC8UkE186LQ
+         WAtqBRGWePXE+QVoLFPeciXozflZOflVyCTk83GunmI5UuG0FkpeVwawPDBj48PWvUt6
+         a3Ty4l1qVjWqKRCc6NLmPxZVGgnJRzTd5Ibji2BuXL9t2gsQOxnhNXkV8ai5Y9naG3P1
+         pIoOfpKyntzPgAGNBccpQyTuWu2NMr3k2B5j2XR0utuccgy4vPyitvwrT9cjR+pDhokF
+         gu1icABGTn6gNfyhQM2SPXRRPUXBRzW3CcIXo8ajoS8K0pqpWpWPomvwkoHiKMO8ddtT
+         +kNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695420243; x=1696025043;
+        d=1e100.net; s=20230601; t=1695420244; x=1696025044;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ba76KfzLtltiSCDhSXln8dsbXSoIWpM8tlwuX9Pp/eA=;
-        b=tY5CeE0s8lz7tq+zgwEc2b2NjNbz2ifR2W7qpaxB/Mb/4tRm4jaBAxT4tFoc77sTKV
-         2CX0rLj53BZpQpk2xSMArZZZ8/iTG2vq42hwsuiSfrPGuRklIKV+ZZzu2IlKOcUqPxV4
-         Srnd9rNIhAippd9j/JzaNZ9Tso819I36x3QueYZxCbVqsyjzw5CenzgN3jh4e1PaxnTI
-         pt/brIsCq0n0Z31MtLjCD4r5rmjHFK75BkZR5dMrERhHBHcSy8bs2NPz7NyqmlQ3M6qX
-         /dKSNQxgJst3ODf5iXcmHCcKYb3YLoNnMI1u+QpGgdy2qKh5vIq/ic0RimUHMYvTf6Y9
-         jgNQ==
-X-Gm-Message-State: AOJu0YwQ/iThG439Rb/oMFThhgQkiSWgXEI6l9ZHtFpgKi61P+kOhsn9
-	dF+fZpoBJaf1yz5zNqaqryEfbuupuwJM7g==
-X-Google-Smtp-Source: AGHT+IGOINbPqQvL7zO77US0aiQ+DDXFO4A3NJPhk8KP6i+3Ck25LDz0YlOTnDWqnn/8FbZlMoslAQnFb+gMBQ==
+        bh=vOoHuARRoMJdHZshUfr8rtC8fEwoEwY5sGRuZy8YhbQ=;
+        b=bz90WcZz2XDY0K2g3slvXXoWSWH/wrPJy7Cq2vcyEx3oVTin8BPG3Q7IXazD/duJ/d
+         BDNHOd4/TKF6DNV8+mJjiXbxgDMesQC0vooZoyYpeTnXi6u3OH2KQpI/5fkXaQZk30F3
+         1Vy9r+jdPZr5XxS5Uua6nBthDT+9NcFWVqBiiv8pgm28gGpErpE8HLWFhBKUjfqJ2pIe
+         O2866OCo0HbW6rcBsig1jeWUhP/xICpxYKaU2P42pJkF0UYcJYyGIy+pfs7QbexjEmvz
+         t4/E10z4ZYaAuykovQWSf5XVkJazPMrqUTgU0gMJkDSEhofkfGZsv6L8bQFv2sbXlIkm
+         SyIQ==
+X-Gm-Message-State: AOJu0YzMYZ81lpqYMwrxdTuk+FL4/QRUM/YS9nQs1lgX6otXkcV05BiM
+	hUuFQdsZXnv5ba3XLvok+QxlsZlezQ106w==
+X-Google-Smtp-Source: AGHT+IHwsH8KQoZoPfsoYUrvXmQzpoEsBlAxfujimG58F7a9mdpOPZjAjHm0C8vumhALnEJovOd36qv5IPWGUA==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:46c5:0:b0:d4b:df05:3500 with SMTP id
- t188-20020a2546c5000000b00d4bdf053500mr5505yba.11.1695420242864; Fri, 22 Sep
- 2023 15:04:02 -0700 (PDT)
-Date: Fri, 22 Sep 2023 22:03:55 +0000
+ (user=edumazet job=sendgmr) by 2002:a25:dbcc:0:b0:d85:ac12:aadb with SMTP id
+ g195-20020a25dbcc000000b00d85ac12aadbmr5602ybf.9.1695420244412; Fri, 22 Sep
+ 2023 15:04:04 -0700 (PDT)
+Date: Fri, 22 Sep 2023 22:03:56 +0000
 In-Reply-To: <20230922220356.3739090-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -60,8 +60,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20230922220356.3739090-1-edumazet@google.com>
 X-Mailer: git-send-email 2.42.0.515.g380fc7ccd1-goog
-Message-ID: <20230922220356.3739090-4-edumazet@google.com>
-Subject: [PATCH net-next 3/4] tcp_metrics: do not create an entry from tcp_init_metrics()
+Message-ID: <20230922220356.3739090-5-edumazet@google.com>
+Subject: [PATCH net-next 4/4] tcp_metrics: optimize tcp_metrics_flush_all()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -75,29 +75,45 @@ X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-tcp_init_metrics() only wants to get metrics if they were
-previously stored in the cache. Creating an entry is adding
-useless costs, especially when tcp_no_metrics_save is set.
+This is inspired by several syzbot reports where
+tcp_metrics_flush_all() was seen in the traces.
 
-Fixes: 51c5d0c4b169 ("tcp: Maintain dynamic metrics in local cache.")
+We can avoid acquiring tcp_metrics_lock for empty buckets,
+and we should add one cond_resched() to break potential long loops.
+
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/ipv4/tcp_metrics.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/ipv4/tcp_metrics.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/net/ipv4/tcp_metrics.c b/net/ipv4/tcp_metrics.c
-index 0c03f564878ff0a0dbefd9b631f54697346c8fa9..7aca12c59c18483f42276d01252ed0fac326e5d8 100644
+index 7aca12c59c18483f42276d01252ed0fac326e5d8..c2a925538542b5d787596b7d76705dda86cf48d8 100644
 --- a/net/ipv4/tcp_metrics.c
 +++ b/net/ipv4/tcp_metrics.c
-@@ -478,7 +478,7 @@ void tcp_init_metrics(struct sock *sk)
- 		goto reset;
+@@ -898,11 +898,13 @@ static void tcp_metrics_flush_all(struct net *net)
+ 	unsigned int row;
  
- 	rcu_read_lock();
--	tm = tcp_get_metrics(sk, dst, true);
-+	tm = tcp_get_metrics(sk, dst, false);
- 	if (!tm) {
- 		rcu_read_unlock();
- 		goto reset;
+ 	for (row = 0; row < max_rows; row++, hb++) {
+-		struct tcp_metrics_block __rcu **pp;
++		struct tcp_metrics_block __rcu **pp = &hb->chain;
+ 		bool match;
+ 
++		if (!rcu_access_pointer(*pp))
++			continue;
++
+ 		spin_lock_bh(&tcp_metrics_lock);
+-		pp = &hb->chain;
+ 		for (tm = deref_locked(*pp); tm; tm = deref_locked(*pp)) {
+ 			match = net ? net_eq(tm_net(tm), net) :
+ 				!refcount_read(&tm_net(tm)->ns.count);
+@@ -914,6 +916,7 @@ static void tcp_metrics_flush_all(struct net *net)
+ 			}
+ 		}
+ 		spin_unlock_bh(&tcp_metrics_lock);
++		cond_resched();
+ 	}
+ }
+ 
 -- 
 2.42.0.515.g380fc7ccd1-goog
 
