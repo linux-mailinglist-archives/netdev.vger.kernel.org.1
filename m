@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-35900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E2B87AB8FB
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 20:18:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EA8B7AB91B
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 20:23:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 02E291C20988
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 18:18:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id ED2041C20ADE
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 18:23:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A73D045F52;
-	Fri, 22 Sep 2023 18:18:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A47A445F5B;
+	Fri, 22 Sep 2023 18:23:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34AB642C06
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 18:18:10 +0000 (UTC)
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB690AB
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 11:18:08 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1c3cbfa40d6so22552745ad.1
-        for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 11:18:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 274C642C11
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 18:23:33 +0000 (UTC)
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61B7BF7
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 11:23:31 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1c434c33ec0so21717605ad.3
+        for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 11:23:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1695406688; x=1696011488; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1695407011; x=1696011811; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=l4T/fTfBwkAD/muqS7Lm7m+/C+nhl1XGVqC9ttPy9eA=;
-        b=MGEnSZ5DvLoOIcKKMbU6bsWVx1QGxFDEfjRso+SeDZ1c0ST9rD35Hw1u3cdnEFlO95
-         a85vrPMSDS90VVCy7DbU/JrVvf5SLAfy4IEpnG7XOJfrl5j2yDPYOhSUrOa/pfA2WQJ4
-         C4WQbFy+bg3FkEs/NOyLd8UBmheBFHOE7j/qU=
+        bh=yr61q+Y7qYRmoBTJuHgU+TYxnPKaIi9OdQT3qJe9OKQ=;
+        b=iCmOCMPCCL9WxWQPipTKjiZkcJbnyvLx9UAPFJ3jfhYVo/UdCh0+xaVLO4N9WYho8k
+         kwoYiIC6rCezw41K9BZ5BxuzU58U2S9lh0QTPIiFfbUnsxxQWWZ7K35huxRzNJ/XR+1R
+         tR5rhVSDtJqtpZRXG+d9pwjq4V4cuAJtk6ZWk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695406688; x=1696011488;
+        d=1e100.net; s=20230601; t=1695407011; x=1696011811;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=l4T/fTfBwkAD/muqS7Lm7m+/C+nhl1XGVqC9ttPy9eA=;
-        b=h9i2iyD/QAq6FuBf43k35NC9XUMn7rF+xMnApzkIzQ87jO7XmyodlPoVKQvKWDmTiy
-         LFCj9Tvjs9/HcrNG8sDPG9uoB0yBii36AlUvqHaregAla1WX1OikOqP2H/uykU1YonLh
-         QwY+d00AUevOP12Or6gM6Yo0TqqiBKZt696C4D9d93T9JaKDpmfsQviA639s0mwaVPxc
-         DxuZwqM91XSV+grdFvIJh1Aw7ThPQc2ncd9bpBMi9elvfeqOa+2ljfAG3cS7n6owARbu
-         C7x6GapnYeW/9SvbXiSfgo/ia6L7VDcpeMiBJqt5qrKhyCSDcED7m/cS2HWta8TEKuF4
-         LxaA==
-X-Gm-Message-State: AOJu0Yz/cXdlHDTsYbm9xzJKxRnpMqbnzgsdn/GKM7gbgKNNp36ctK4/
-	ym+yvrQET73dq003kdxAcNjNSg==
-X-Google-Smtp-Source: AGHT+IH5/bxePU0F2RoHuDHcwpnFv3qhRHMIDj1hzz6KjFthqubQPCi6uc81wCdHv55oKzyGphjbaA==
-X-Received: by 2002:a17:902:d48f:b0:1c3:6d97:e89e with SMTP id c15-20020a170902d48f00b001c36d97e89emr297047plg.58.1695406688329;
-        Fri, 22 Sep 2023 11:18:08 -0700 (PDT)
+        bh=yr61q+Y7qYRmoBTJuHgU+TYxnPKaIi9OdQT3qJe9OKQ=;
+        b=ZQ8vGvInkyON7sK87MUPcMGR+88M9XPNZIe8lXCpphd+2gFeydsR79ULK4rtGG5/J/
+         NV55Jpy9CueEbApuVVHg0eQcBK0lHODIz1IqhfZxEdvkEZa5AZBSiZvGd5epfB0dBg21
+         Qe3RBVIsUykOEkZ9a85hxUUi8rT1nQzeRpsoAJ1qPAh9S90/Zw/KZWyONamlXWxBaTsk
+         US/3vbu5GLvbm/wRb6Kb3FTDlnyHz0SPo5AqORz6x8tDpl2giTPFlsVVpcui1x0ZIYOY
+         T7m4WvEustTxa4aYAbT4Pc4zYX7SYfBcYXQK5ci+x9/c2d17qcMq0rp8w7Jq8DkSIOZu
+         1zZQ==
+X-Gm-Message-State: AOJu0Yy9oZcRyEJmCe5GCrtOEHa1j7r1vJS+OtCzNE92svyvmEp3L1J3
+	QiQIV/0E+YHxIuuOgrfo/s1SaQ==
+X-Google-Smtp-Source: AGHT+IEPfMe5MVG2BsIHv/EtqHgJb805J/3mFScd6v8b4SEGGTa1wBOOaNI8zST/3Yhw8KfpVcqPdA==
+X-Received: by 2002:a17:902:b7c9:b0:1c5:cbfb:c16f with SMTP id v9-20020a170902b7c900b001c5cbfbc16fmr265044plz.25.1695407010837;
+        Fri, 22 Sep 2023 11:23:30 -0700 (PDT)
 Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id e3-20020a17090301c300b001b531e8a000sm3797390plh.157.2023.09.22.11.18.07
+        by smtp.gmail.com with ESMTPSA id f8-20020a17090274c800b001bdc9daadc9sm3775058plt.89.2023.09.22.11.23.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Sep 2023 11:18:07 -0700 (PDT)
-Date: Fri, 22 Sep 2023 11:18:07 -0700
+        Fri, 22 Sep 2023 11:23:30 -0700 (PDT)
+Date: Fri, 22 Sep 2023 11:23:29 -0700
 From: Kees Cook <keescook@chromium.org>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
@@ -81,7 +81,7 @@ Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
 	linux-hardening@vger.kernel.org
 Subject: Re: [PATCH 14/14] net: sched: Annotate struct tc_pedit with
  __counted_by
-Message-ID: <202309221117.160257BAB@keescook>
+Message-ID: <202309221122.74FA902A@keescook>
 References: <20230922172449.work.906-kees@kernel.org>
  <20230922172858.3822653-14-keescook@chromium.org>
 Precedence: bulk
@@ -145,10 +145,20 @@ On Fri, Sep 22, 2023 at 10:28:56AM -0700, Kees Cook wrote:
 >  	opt->refcnt = refcount_read(&p->tcf_refcnt) - ref;
 > -- 
 > 2.34.1
+> 
 
-Gustavo pointed out that the annotation half of this patch in missing.
-My mistake! I will figure out where it went. :P Ah, the joys of
-splitting up a treewide patch series...
+Coccinelle was not happy about the #define ...
+
+struct tc_pedit_sel {
+	tc_gen;
+	unsigned char           nkeys;
+	unsigned char           flags;
+	struct tc_pedit_key     keys[0];
+};
+
+#define tc_pedit tc_pedit_sel
+
+Also, it's not been converted to a proper flexible array...
 
 -- 
 Kees Cook
