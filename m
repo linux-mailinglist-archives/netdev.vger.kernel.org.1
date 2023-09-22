@@ -1,127 +1,208 @@
-Return-Path: <netdev+bounces-35905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35906-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A2AB7ABA3B
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 21:46:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48DB37ABA53
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 22:03:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 82D4C1C208CE
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 19:46:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 7EA14B20975
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 20:03:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AD6347341;
-	Fri, 22 Sep 2023 19:45:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD21D47346;
+	Fri, 22 Sep 2023 20:03:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32C4745F77;
-	Fri, 22 Sep 2023 19:45:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F816C43391;
-	Fri, 22 Sep 2023 19:45:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695411957;
-	bh=Z73INrp+tUCDrn3nt/IznNU60OcEzvbVv581pkRDXlE=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=P4ZZPqOmhipnrgdjc5Cicuv4gwGoR5ahpSW6RraPJhB2FOCevSoVAq7M03SUqbiJq
-	 K7C83A8rvE9vTWF2PZ5kYCMKgg3G1IVvpRh+NW3hqCEKgBE5APzZ0p6is/9D0IzpXy
-	 L4KFq+qRrX7Nsl9X/FVhceTOut8PENgISZ7V9Hgc0n17gQFch+sOZHm06uwoEbBMFg
-	 bdQku4DZghgBK/X1clycJXNjGfpUaVv8cK0r9G/b2uMU+jMiHYfIm/lqjl9v/3n8cS
-	 tduJT5OdwlLHx5IjPVmN9jiMNIWgStlkcTXysI9oJM3ogbUGEUzRoqqQuRZPSge2DG
-	 XwBXMnxxa/mIQ==
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-502e7d66c1eso4403480e87.1;
-        Fri, 22 Sep 2023 12:45:57 -0700 (PDT)
-X-Gm-Message-State: AOJu0YzET3fIoLVxGM9RxuqSwL+djuYNXhC9P6ZumOlepuoR4JARMjx+
-	h4LOZERLC7Rm7GHf2X+sobwCVY8k0UHqW/Y9dA==
-X-Google-Smtp-Source: AGHT+IEyL15UWPDOOifALHGXr9zT3PFp6EFjcQQ6N5sRMKjOVNVOEvEhKETlB6KYvfp58mdiyeysUyZjSt5CkUaQLB8=
-X-Received: by 2002:a19:651e:0:b0:503:18c5:6833 with SMTP id
- z30-20020a19651e000000b0050318c56833mr310830lfb.61.1695411955742; Fri, 22 Sep
- 2023 12:45:55 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DC6E45F63
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 20:03:10 +0000 (UTC)
+Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A517219B;
+	Fri, 22 Sep 2023 13:03:08 -0700 (PDT)
+Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-59f4f80d084so2106817b3.1;
+        Fri, 22 Sep 2023 13:03:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695412988; x=1696017788; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gQxVwDWGzICCtzIyR/1ybOxtmRno79pEfOcqjcENqi8=;
+        b=k92Na7MQzZl3UDgIoik+tSsBfP/ktc3ogoXB3qSJrn0sDk6MXRExsumh4Pa346ZUP8
+         ZYOtGosibwfRw2yZHNX8oq3hj0heIV59XVgZg2u7FI4xFF8Jdpo912+nm6SgkxYN7+Ir
+         EzCcozDuGMVHYax1s3W/EMXKGnJl/GI3lUFt4YVlfotlIbTB5vP+9ftFNOVbBRBArq3u
+         3frbYxj3gXaVDQsKzAvLHS5GQzcSkORZzglPy9hrSJ0aBQS4SY2NQt5rWQRID/Xzlcup
+         9x2qTmMoGcN6z6Jd3ImptClkjQVstlaej+eJje+vSOoX5AiCAN+bYwXif98Jabyz+kPm
+         KeOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695412988; x=1696017788;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gQxVwDWGzICCtzIyR/1ybOxtmRno79pEfOcqjcENqi8=;
+        b=NJ0o4grIzogD5CpKVo+kb5+f4MFGBkAcZ33+FO0uXlwFTZaOxAmQ7l7FN2dqgTd5FG
+         51Aj5uD9uYU3m9YxgAuTwmitPiWX2MZ6LT3Q10u1n2j8xC3meN0hAoZxMT09+jxmbgu6
+         Asi7LSCbAdqDodmWdv2nAqH3tygEK37bGA6FFZVYRywVZFdMuJeLwdddz87YlXf8Bb6l
+         atHVk3HMbBbAdsw21M36AnodRpIYQxQ6/Qo6Id4YAiFEaW7hWZwGlDcw41folHKu7Oz8
+         zk0fb2ePrZb+UqT+D9kQp9rnjZLwML9Og/+bmKFbVqoJrkonGl0mTeDaktIBrsXrOQ/4
+         Gupg==
+X-Gm-Message-State: AOJu0YyyHvnhn8/6IyYJWOID9m0QLlorq1Ob3/NeQZofTLFt4Sj1avUO
+	8nhnr7lzp3p3HjTEFx2FVp10RLCJaat4o8id4dg=
+X-Google-Smtp-Source: AGHT+IHzt5WM9Wp1e/5x78GHrBbk1G/TM58GZnAzfq+tYJUVDOOcij3HKdxqrFvyenoQ7+gvZQKYkFdiTKLyTMB0BHs=
+X-Received: by 2002:a81:5205:0:b0:59b:69cf:72c0 with SMTP id
+ g5-20020a815205000000b0059b69cf72c0mr772796ywb.6.1695412987630; Fri, 22 Sep
+ 2023 13:03:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230922075913.422435-1-herve.codina@bootlin.com>
- <20230922075913.422435-26-herve.codina@bootlin.com> <169538601225.2919383.2942072541503354871.robh@kernel.org>
- <20230922154546.4ca18b6f@bootlin.com>
-In-Reply-To: <20230922154546.4ca18b6f@bootlin.com>
-From: Rob Herring <robh@kernel.org>
-Date: Fri, 22 Sep 2023 14:45:43 -0500
-X-Gmail-Original-Message-ID: <CAL_JsqJTruTExc=uHCPCp3q-fo+fB-wAJ-ggPpHpWcHSoGALdw@mail.gmail.com>
-Message-ID: <CAL_JsqJTruTExc=uHCPCp3q-fo+fB-wAJ-ggPpHpWcHSoGALdw@mail.gmail.com>
-Subject: Re: [PATCH v6 25/30] dt-bindings: net: Add the Lantiq PEF2256
- E1/T1/J1 framer
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: linux-arm-kernel@lists.infradead.org, Randy Dunlap <rdunlap@infradead.org>, 
-	Takashi Iwai <tiwai@suse.com>, Simon Horman <horms@kernel.org>, Jaroslav Kysela <perex@perex.cz>, 
-	Liam Girdwood <lgirdwood@gmail.com>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
-	linux-gpio@vger.kernel.org, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, netdev@vger.kernel.org, 
-	Fabio Estevam <festevam@gmail.com>, Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
-	Christophe Leroy <christophe.leroy@csgroup.eu>, Nicolin Chen <nicoleotsuka@gmail.com>, 
-	Conor Dooley <conor+dt@kernel.org>, Mark Brown <broonie@kernel.org>, 
-	Linus Walleij <linus.walleij@linaro.org>, alsa-devel@alsa-project.org, 
-	Paolo Abeni <pabeni@redhat.com>, Lee Jones <lee@kernel.org>, linux-kernel@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Xiubo Li <Xiubo.Lee@gmail.com>, 
-	Shengjiu Wan g <shengjiu.wang@gmail.com>, linuxppc-dev@lists.ozlabs.org, 
-	devicetree@vger.kernel.org, Li Yang <leoyang.li@nxp.com>, 
-	Qiang Zhao <qiang.zhao@nxp.com>
+References: <20230922111247.497-1-ansuelsmth@gmail.com> <20230922111247.497-3-ansuelsmth@gmail.com>
+ <13bc074d-30c2-4bbf-8b4c-82f561c844b0@lunn.ch> <650d8af4.5d0a0220.5ce38.2c5e@mx.google.com>
+In-Reply-To: <650d8af4.5d0a0220.5ce38.2c5e@mx.google.com>
+From: Dave Taht <dave.taht@gmail.com>
+Date: Fri, 22 Sep 2023 13:02:55 -0700
+Message-ID: <CAA93jw5fXb2d6xqBud3jxO5eQhg0eykOM80p28t7c9gA5AneUw@mail.gmail.com>
+Subject: Re: [net-next PATCH 3/3] net: stmmac: increase TX coalesce timer to 5ms
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vincent Whitchurch <vincent.whitchurch@axis.com>, 
+	Raju Rangoju <rajur@chelsio.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Ping-Ke Shih <pkshih@realtek.com>, 
+	Kalle Valo <kvalo@kernel.org>, Simon Horman <horms@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jiri Pirko <jiri@resnulli.us>, 
+	Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-wireless@vger.kernel.org, 
+	dave seddon <dave.seddon.ca@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, Sep 22, 2023 at 8:46=E2=80=AFAM Herve Codina <herve.codina@bootlin.=
-com> wrote:
+On Fri, Sep 22, 2023 at 5:39=E2=80=AFAM Christian Marangi <ansuelsmth@gmail=
+.com> wrote:
 >
-> Hi Rob,
->
-> On Fri, 22 Sep 2023 07:33:32 -0500
-> Rob Herring <robh@kernel.org> wrote:
->
-> > On Fri, 22 Sep 2023 09:59:00 +0200, Herve Codina wrote:
-> > > The Lantiq PEF2256 is a framer and line interface component designed =
-to
-> > > fulfill all required interfacing between an analog E1/T1/J1 line and =
-the
-> > > digital PCM system highway/H.100 bus.
+> On Fri, Sep 22, 2023 at 02:28:06PM +0200, Andrew Lunn wrote:
+> > On Fri, Sep 22, 2023 at 01:12:47PM +0200, Christian Marangi wrote:
+> > > Commit 8fce33317023 ("net: stmmac: Rework coalesce timer and fix
+> > > multi-queue races") decreased the TX coalesce timer from 40ms to 1ms.
 > > >
-> > > Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-> > > Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-> > > ---
-> > >  .../bindings/net/lantiq,pef2256.yaml          | 214 ++++++++++++++++=
-++
-> > >  1 file changed, 214 insertions(+)
-> > >  create mode 100644 Documentation/devicetree/bindings/net/lantiq,pef2=
-256.yaml
+> > > This caused some performance regression on some target (regression wa=
+s
+> > > reported at least on ipq806x) in the order of 600mbps dropping from
+> > > gigabit handling to only 200mbps.
 > > >
-> >
-> > My bot found errors running 'make DT_CHECKER_FLAGS=3D-m dt_binding_chec=
-k'
-> > on your patch (DT_CHECKER_FLAGS is new in v5.13):
-> >
-> > yamllint warnings/errors:
-> >
-> > dtschema/dtc warnings/errors:
-> > /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings=
-/net/lantiq,pef2256.yaml: properties:lantiq,data-rate-bps: '$ref' should no=
-t be valid under {'const': '$ref'}
-> >       hint: Standard unit suffix properties don't need a type $ref
-> >       from schema $id: http://devicetree.org/meta-schemas/core.yaml#
-> >
->
-> The '-bps' suffix was added recently in
-> https://github.com/devicetree-org/dt-schema/
-> commit 033d0b1 ("Add '-bps' as a standard unit suffix for bits per second=
-")
->
-> This commit is not yet present in any dt-schema release.
->
-> Should I update my patch (ie. removing $ref) right now even if this updat=
-e will
-> make the last dt-schema release not happy ?
+> > > The problem was identified in the TX timer getting armed too much tim=
+e.
+> > > While this was fixed and improved in another commit, performance can =
+be
+> > > improved even further by increasing the timer delay a bit moving from
+> > > 1ms to 5ms.
 
-Yes. I will spin a release soon as well.
+I am always looking for finding ways to improve interrupt service
+time, rather than paper over the problem by increasing batchi-ness.
 
-Rob
+http://www.taht.net/~d/broadcom_aug9_2018.pdf
+
+But also looking for hard data, particularly as to observed power
+savings. How much power does upping this number save?
+
+I have tried to question other assumptions more modern kernels are
+making, in particular I wish more folk would experience with
+decreasing the overlarge (IMHO) NAPI default of 64 packets to, say 8
+in the mq case, benefiting from multiple arm cores still equipped with
+limited cache, as well as looking at the impact of TLB flushes. Other
+deferred multi-core processing... that is looking good on a modern
+xeon, but might not be so good on a more limited arm, worries me.
+
+Over here there was an enormous test series recently run against a
+bunch of older arm64s which appears to indicate that memory bandwidth
+is a source of problems:
+
+https://docs.google.com/document/d/1HxIU_TEBI6xG9jRHlr8rzyyxFEN43zMcJXUFlRu=
+hiUI/edit
+
+We are looking to add more devices to that testbed.
+
+> > >
+> > > The value is a good balance between battery saving by prevending too
+> > > much interrupt to be generated and permitting good performance for
+> > > internet oriented devices.
+> >
+> > ethtool has a settings you can use for this:
+> >
+> >       ethtool -C|--coalesce devname [adaptive-rx on|off] [adaptive-tx o=
+n|off]
+> >               [rx-usecs N] [rx-frames N] [rx-usecs-irq N] [rx-frames-ir=
+q N]
+> >               [tx-usecs N] [tx-frames N] [tx-usecs-irq N] [tx-frames-ir=
+q N]
+> >               [stats-block-usecs N] [pkt-rate-low N] [rx-usecs-low N]
+> >               [rx-frames-low N] [tx-usecs-low N] [tx-frames-low N]
+> >               [pkt-rate-high N] [rx-usecs-high N] [rx-frames-high N]
+> >               [tx-usecs-high N] [tx-frames-high N] [sample-interval N]
+> >               [cqe-mode-rx on|off] [cqe-mode-tx on|off] [tx-aggr-max-by=
+tes N]
+> >               [tx-aggr-max-frames N] [tx-aggr-time-usecs N]
+> >
+> > If this is not implemented, i suggest you add support for it.
+> >
+> > Changing the default might cause regressions. Say there is a VoIP
+> > application which wants this low latency? It would be safer to allow
+> > user space to configure it as wanted.
+> >
+>
+> Yep stmmac already support it. Idea here was to not fallback to use
+> ethtool and find a good value.
+>
+> Just for reference before one commit, the value was set to 40ms and
+> nobody ever pointed out regression about VoIP application. Wtih some
+> testing I found 5ms a small increase that restore original perf and
+> should not cause any regression.
+
+Does this driver have BQL?
+
+> (for reference keeping this to 1ms cause a lost of about 100-200mbps)
+> (also the tx timer implementation was created before any napi poll logic
+> and before dma interrupt handling was a thing, with the later change I
+> expect this timer to be very little used in VoIP scenario or similar
+> with continuous traffic as napi will take care of handling packet)
+
+I would be pretty interested in a kernel flame graph of the before vs the a=
+fter.
+
+> Aside from these reason I totally get the concern and totally ok with
+> this not getting applied, was just an idea to push for a common value.
+
+I try to get people to run much longer and more complicated tests such
+as the flent rrul test to see what kind of damage bigger buffers did
+to latency, as well as how other problems might show up. Really
+notable in the above test series was how badly various devices behaved
+over time on that workload. Extremely notable in that test series
+above was how badly the  jetson performed:
+
+https://github.com/randomizedcoder/cake/blob/2023_09_02/pfifo_fast/jetson.p=
+ng
+
+And the nanopi was weird.
+
+https://github.com/randomizedcoder/cake/blob/2023_09_02/pfifo_fast/nanopi-n=
+eo3.png
+
+> Just preferred to handle this here instead of script+userspace :(
+> (the important part is the previous patch)
+>
+> --
+>         Ansuel
+>
+--
+Oct 30: https://netdevconf.info/0x17/news/the-maestro-and-the-music-bof.htm=
+l
+Dave T=C3=A4ht CSO, LibreQos
 
